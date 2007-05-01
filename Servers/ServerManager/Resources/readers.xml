@@ -2450,6 +2450,612 @@
    <!-- End ExodusReader -->
    </SourceProxy>
 
+   <SourceProxy name="ExodusIIReader" 
+                class="vtkPExodusIIReader">
+     <Documentation
+       short_help="Read Exodus II files."
+       long_help="Read an Exodus II file to produce an unstructured grid.">
+        The Exodus reader loads Exodus II files and produces an unstructured grid output. The default file extensions is .exii.
+     </Documentation>
+     
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1"
+        animateable="0">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the Exodus reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="FilePrefixInfo"
+        command="GetFilePrefix"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="FilePrefix"
+        command="SetFilePrefix"
+        number_of_elements="1"
+        animateable="0"
+        information_property="FilePrefixInfo" >
+       <FileListDomain name="default_value" optional="1">
+          <RequiredProperties>
+             <Property name="FilePrefixInfo" function="Prefix"/>
+          </RequiredProperties>
+       </FileListDomain>
+        <Documentation>
+          This property specifies the file root used with the file pattern to format a file name. (See the File Pattern property.)
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="FilePatternInfo"
+        command="GetFilePattern"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="FilePattern"
+        command="SetFilePattern"
+        number_of_elements="1"
+        animateable="0"
+        information_property="FilePatternInfo" >
+       <FileListDomain name="default_value" optional="1">
+          <RequiredProperties>
+             <Property name="FilePatternInfo" function="Pattern"/>
+          </RequiredProperties>
+       </FileListDomain>
+       <Documentation>
+         This property contains a text string specifying the pattern used to load files. There are two parts to it: the prefix (%s) and the file number (%i). The format used is the same as that used for printf.
+       </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty 
+        name="FileRangeInfo"
+        command="GetFileRange"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="FileRange"
+        command="SetFileRange"
+        number_of_elements="2" 
+        default_values="-1 -1"
+        animateable="0"
+        information_property="FileRangeInfo" >
+       <IntRangeDomain name="range">
+          <RequiredProperties>
+             <Property name="FileRangeInfo" function="Range"/>
+          </RequiredProperties>
+       </IntRangeDomain>
+       <Documentation>
+         This property controls the indices of the first and last files to be read.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="TimeStepRangeInfo"
+        command="GetTimeStepRange"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="TimeStep"
+        command="SetTimeStep"
+        number_of_elements="1"
+        default_values="0"
+        animateable="0"
+        information_property="TimestepValues">
+       <IntRangeDomain name="range">
+          <RequiredProperties>
+             <Property name="TimeStepRangeInfo" function="Range"/>
+          </RequiredProperties>
+       </IntRangeDomain>
+       <Documentation>
+         This property specifies the current timestep.
+       </Documentation>
+     </IntVectorProperty>
+     
+     <StringVectorProperty 
+        name="EdgeBlockArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="EdgeBlock"/>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="EdgeBlockArrayStatus"
+        command="SetEdgeBlockArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="EdgeBlockArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="EdgeBlockArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="FaceBlockArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="FaceBlock"/>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="FaceBlockArrayStatus"
+        command="SetFaceBlockArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="FaceBlockArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="FaceBlockArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="ElementBlockArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="ElementBlock"/>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="ElementBlockArrayStatus"
+        command="SetElementBlockArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="ElementBlockArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="ElementBlockArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="PointResultArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="PointResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointResultArrayStatus"
+        command="SetPointResultArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointResultArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointResultArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="EdgeResultArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="EdgeResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="EdgeResultArrayStatus"
+        command="SetEdgeResultArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="EdgeResultArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="EdgeResultArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="FaceResultArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="FaceResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="FaceResultArrayStatus"
+        command="SetFaceResultArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="FaceResultArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="FaceResultArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="ElementResultArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="ElementResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="ElementResultArrayStatus"
+        command="SetElementResultArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="ElementResultArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="ElementResultArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+      
+     <StringVectorProperty 
+        name="NodeMapInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="NodeMap"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="NodeMapArrayStatus"
+        command="SetNodeMapArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="NodeMapInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="NodeMapInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+      <StringVectorProperty 
+        name="EdgeMapInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="EdgeMap"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="EdgeMapArrayStatus"
+        command="SetEdgeMapArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="EdgeMapInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="EdgeMapInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+      <StringVectorProperty 
+        name="FaceMapInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="FaceMap"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="FaceMapArrayStatus"
+        command="SetFaceMapArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="FaceMapInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="FaceMapInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+      <StringVectorProperty 
+        name="ElementMapInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="ElementMap"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="ElementMapArrayStatus"
+        command="SetElementMapArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="ElementMapInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="ElementMapInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+      
+     <StringVectorProperty 
+        name="NodeSetInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="NodeSet"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="NodeSetArrayStatus"
+        command="SetNodeSetArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="NodeSetInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="NodeSetInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="SideSetInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="SideSet"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="SideSetArrayStatus"
+        command="SetSideSetArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="SideSetInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="SideSetInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="FaceSetInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="FaceSet"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="FaceSetArrayStatus"
+        command="SetFaceSetArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="FaceSetInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="FaceSetInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="EdgeSetInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="EdgeSet"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="EdgeSetArrayStatus"
+        command="SetEdgeSetArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="EdgeSetInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="EdgeSetInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="ElementSetInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="ElementSet"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="ElementSetArrayStatus"
+        command="SetElementSetArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="ElementSetInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="ElementSetInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="ElementSetResultArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="ElementSetResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="ElementSetResultArrayStatus"
+        command="SetElementSetResultArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="ElementSetResultArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="ElementSetResultArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="SideSetResultArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="SideSetResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="SideSetResultArrayStatus"
+        command="SetSideSetResultArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="SideSetResultArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="SideSetResultArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="FaceSetResultArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="FaceSetResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="FaceSetResultArrayStatus"
+        command="SetFaceSetResultArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="FaceSetResultArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="FaceSetResultArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="EdgeSetResultArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="EdgeSetResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="EdgeSetResultArrayStatus"
+        command="SetEdgeSetResultArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="EdgeSetResultArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="EdgeSetResultArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="NodeSetResultArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="NodeSetResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="NodeSetResultArrayStatus"
+        command="SetNodeSetResultArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="NodeSetResultArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="NodeSetResultArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <IntVectorProperty 
+        name="ApplyDisplacements" 
+        command="SetApplyDisplacements" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty 
+        name="DisplacementMagnitude" 
+        command="SetDisplacementMagnitude" 
+        number_of_elements="1"
+        default_values="1" > 
+       <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+     
+     <IntVectorProperty 
+        name="GenerateObjectIdCellArray" 
+        command="SetGenerateObjectIdCellArray" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="GenerateGlobalNodeIdArray" 
+        command="SetGenerateGlobalNodeIdArray" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     
+     <IntVectorProperty 
+        name="GenerateGlobalElementIdArray" 
+        command="SetGenerateGlobalElementIdArray" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ExodusModelMetadata" 
+        command="SetExodusModelMetadata" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+   <!-- End ExodusIIReader -->
+   </SourceProxy>
+
+
    <SourceProxy name="AVSucdReader" 
                 class="vtkAVSucdReader"
                 label="AVS UCD reader">
