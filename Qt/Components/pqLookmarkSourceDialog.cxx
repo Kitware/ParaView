@@ -220,15 +220,15 @@ void pqLookmarkSourceDialog::setModels(QStandardItemModel *lmkModel, pqPipelineM
   // Listen to the new selection model.
   this->connect(this->CurrentPipelineView->getSelectionModel(),
     SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-    this, SLOT(selectSource(const QItemSelection &)));
+    this, SLOT(selectSource()));
 
   this->setWindowTitle("Lookmark Source Chooser");
 }
 
-void pqLookmarkSourceDialog::selectSource(const QItemSelection &selected)
+void pqLookmarkSourceDialog::selectSource()
 {
   // If the selected item is a server, do not set to current:
-  QModelIndexList indices =
+  QModelIndexList indices = 
        this->CurrentPipelineView->getSelectionModel()->selectedIndexes();
   if(indices.size()==0)
     {
