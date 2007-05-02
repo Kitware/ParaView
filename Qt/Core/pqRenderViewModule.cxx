@@ -466,6 +466,10 @@ void pqRenderViewModule::onResetCameraEvent()
     {
     this->resetCenterOfRotation();
     }
+
+  // Ensures that the scale factor is correctly set for the center axes
+  // on reset camera.
+  this->updateCenterAxes();
 }
 
 //-----------------------------------------------------------------------------
