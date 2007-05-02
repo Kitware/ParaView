@@ -27,21 +27,6 @@
   <pqevent object="MainWindow/FileSaveServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/temp.pvsm" />
   
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Delete" command="activate" arguments="" />
-
- <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="SphereSource" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Delete" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="RTAnalyticSource" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/representationToolbar/displayRepresentation/comboBox" command="set_string" arguments="Surface" />
-  <pqevent object="MainWindow/representationToolbar/displayRepresentation/comboBox" command="set_string" arguments="Wireframe" />
-  <pqevent object="MainWindow/representationToolbar/displayRepresentation/comboBox" command="set_string" arguments="Points" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Delete" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="ImageMandelbrotSource" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Delete" command="activate" arguments="" />
-
-
   <pqevent object="MainWindow/menubar/menuFile" command="activate" arguments="actionFileLoadServerState" />
   <pqevent object="MainWindow/FileLoadServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/temp.pvsm" />
   <pqevent object="MainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
