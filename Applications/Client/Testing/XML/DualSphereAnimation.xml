@@ -11,4 +11,5 @@
   <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRNextFrame" />
   <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRNextFrame" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTimeIndex" command="set_int" arguments="1" />
+  <pqevent object="MainWindow/currentTimeToolbar/CurrentTimeIndex" command="key" arguments="16777221" />
 </pqevents>

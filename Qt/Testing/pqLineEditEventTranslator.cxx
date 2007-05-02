@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSpinBox>
 #include <QTextDocument>
 #include <QTextEdit>
+#include <QKeyEvent>
 
 pqLineEditEventTranslator::pqLineEditEventTranslator(QObject* p)
   : pqWidgetEventTranslator(p)
@@ -62,13 +63,22 @@ bool pqLineEditEventTranslator::translateEvent(QObject* Object, QEvent* Event, b
     {
     case QEvent::KeyRelease:
       {
-      if (object)
+      QKeyEvent* ke = static_cast<QKeyEvent*>(Event);
+      QString keyText = ke->text();
+      if(keyText.length() && keyText.at(0).isLetterOrNumber())
         {
-        emit recordEvent(Object, "set_string", object->text());
+        if (object)
+          {
+          emit recordEvent(Object, "set_string", object->text());
+          }
+        else if (teObject)
+          {
+          emit recordEvent(Object, "set_string", teObject->document()->toPlainText());
+          }
         }
-      else if (teObject)
+      else
         {
-        emit recordEvent(Object, "set_string", teObject->document()->toPlainText());
+        emit recordEvent(Object, "key", QString("%1").arg(ke->key()));
         }
       }
       break;
