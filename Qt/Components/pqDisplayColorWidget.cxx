@@ -109,6 +109,12 @@ pqDisplayColorWidget::~pqDisplayColorWidget()
 }
 
 //-----------------------------------------------------------------------------
+QString pqDisplayColorWidget::getCurrentText() const
+{
+  return this->Variables->currentText();
+}
+
+//-----------------------------------------------------------------------------
 void pqDisplayColorWidget::clear()
 {
   this->BlockEmission = true;
