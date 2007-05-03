@@ -75,10 +75,16 @@ bool pqImageUtil::toImageData(const QImage& img, vtkImageData* vtkimage)
 
 bool pqImageUtil::fromImageData(vtkImageData* vtkimage, QImage& img)
 {
+
+  if (vtkimage->GetScalarType() != VTK_UNSIGNED_CHAR)
+    {
+    return false;
+    }
+
   int extent[6];
-  vtkimage->GetWholeExtent(extent);
-  int width = extent[1]+1;
-  int height = extent[3]+1;
+  vtkimage->GetExtent(extent);
+  int width = extent[1]-extent[0]+1;
+  int height = extent[3]-extent[2]+1;
   int numcomponents = vtkimage->GetNumberOfScalarComponents();
   if(!(numcomponents == 3 || numcomponents == 4))
     {
@@ -91,7 +97,8 @@ bool pqImageUtil::fromImageData(vtkImageData* vtkimage, QImage& img)
     {
     QRgb* bits = reinterpret_cast<QRgb*>(newimg.scanLine(i));
     unsigned char* row;
-    row = static_cast<unsigned char*>(vtkimage->GetScalarPointer(0, height-i-1, 0));
+    row = static_cast<unsigned char*>(
+      vtkimage->GetScalarPointer(extent[0], extent[2] + height-i-1, extent[4]));
     for(int j=0; j<width; j++)
       {
       unsigned char* data = &row[j*numcomponents];
