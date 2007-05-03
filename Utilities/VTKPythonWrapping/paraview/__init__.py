@@ -716,7 +716,7 @@ def CreateRenderWindow(connection=None):
     ren_module.UnRegister(None)
     pxm.RegisterProxy("render_modules", ren_module.GetSelfIDAsString(), ren_module)
     ren_module.UpdateVTKObjects()
-    return pyProxy(ren_module)
+    return ren_module
 
 def CreateDisplay(proxy, renModule):
     """Create a display for the proxy and adds it to the render module."""
@@ -727,9 +727,9 @@ def CreateDisplay(proxy, renModule):
     display = renModule.CreateDisplayProxy()
     if not display:
         return None
-    display.UnRegister(None)
     pxm = pyProxyManager()
     pxm.RegisterProxy("displays", display.GetSelfIDAsString(), display)
+    display.UnRegister(None)
     display.SetInput(proxy)
     display.UpdateVTKObjects()
     renModule.AddToDisplays(display)
