@@ -57,8 +57,8 @@ SET(QtWidgets_SRCS
   pqSpinBox.h
   pqListWidgetCheckHelper.cxx
   pqListWidgetCheckHelper.h
-  pqSelectionTreeWidget.cxx
-  pqSelectionTreeWidget.h
+  pqTreeWidget.cxx
+  pqTreeWidget.h
   pqTreeWidgetCheckHelper.cxx
   pqTreeWidgetCheckHelper.h
   pqTreeWidgetItemObject.cxx
@@ -92,7 +92,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqSignalAdaptors.h
   pqSpinBox.h
   pqListWidgetCheckHelper.h
-  pqSelectionTreeWidget.h
+  pqTreeWidget.h
   pqTreeWidgetCheckHelper.h
   pqTreeWidgetItemObject.h
   pqViewMenu.h

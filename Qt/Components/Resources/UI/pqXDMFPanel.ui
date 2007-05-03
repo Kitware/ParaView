@@ -74,7 +74,7 @@
     </layout>
    </item>
    <item row="3" column="0" >
-    <widget class="pqSelectionTreeWidget" name="Variables" >
+    <widget class="pqTreeWidget" name="Variables" >
      <property name="sizePolicy" >
       <sizepolicy>
        <hsizetype>13</hsizetype>
@@ -142,9 +142,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqSelectionTreeWidget</class>
+   <class>pqTreeWidget</class>
    <extends>QTreeWidget</extends>
-   <header>pqSelectionTreeWidget.h</header>
+   <header>pqTreeWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

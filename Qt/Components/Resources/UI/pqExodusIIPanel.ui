@@ -28,7 +28,7 @@
     <number>6</number>
    </property>
    <item>
-    <widget class="pqSelectionTreeWidget" name="Variables" >
+    <widget class="pqTreeWidget" name="Variables" >
      <property name="minimumSize" >
       <size>
        <width>0</width>
@@ -81,7 +81,7 @@
     </layout>
    </item>
    <item>
-    <widget class="pqSelectionTreeWidget" name="Blocks" >
+    <widget class="pqTreeWidget" name="Blocks" >
      <property name="rootIsDecorated" >
       <bool>false</bool>
      </property>
@@ -93,7 +93,7 @@
     </widget>
    </item>
    <item>
-    <widget class="pqSelectionTreeWidget" name="Sets" >
+    <widget class="pqTreeWidget" name="Sets" >
      <property name="minimumSize" >
       <size>
        <width>0</width>
@@ -111,7 +111,7 @@
     </widget>
    </item>
    <item>
-    <widget class="pqSelectionTreeWidget" name="SetResults" >
+    <widget class="pqTreeWidget" name="SetResults" >
      <property name="minimumSize" >
       <size>
        <width>0</width>
@@ -129,7 +129,7 @@
     </widget>
    </item>
    <item>
-    <widget class="pqSelectionTreeWidget" name="Maps" >
+    <widget class="pqTreeWidget" name="Maps" >
      <property name="minimumSize" >
       <size>
        <width>0</width>
@@ -295,9 +295,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqSelectionTreeWidget</class>
+   <class>pqTreeWidget</class>
    <extends>QTreeWidget</extends>
-   <header>pqSelectionTreeWidget.h</header>
+   <header>pqTreeWidget.h</header>
   </customwidget>
   <customwidget>
    <class>pqCollapsedGroup</class>

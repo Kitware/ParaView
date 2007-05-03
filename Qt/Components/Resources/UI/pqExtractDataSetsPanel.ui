@@ -28,7 +28,7 @@
     <number>6</number>
    </property>
    <item>
-    <widget class="pqSelectionTreeWidget" name="DataSetsList" >
+    <widget class="pqTreeWidget" name="DataSetsList" >
      <property name="rootIsDecorated" >
       <bool>false</bool>
      </property>
@@ -43,9 +43,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqSelectionTreeWidget</class>
+   <class>pqTreeWidget</class>
    <extends>QTreeWidget</extends>
-   <header>pqSelectionTreeWidget.h</header>
+   <header>pqTreeWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

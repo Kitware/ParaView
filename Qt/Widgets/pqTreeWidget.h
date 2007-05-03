@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSelectionTreeWidget.h
+   Module:    pqTreeWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,30 +30,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqSelectionTreeWidget_h
-#define _pqSelectionTreeWidget_h
+#ifndef _pqTreeWidget_h
+#define _pqTreeWidget_h
 
 #include "QtWidgetsExport.h"
 #include <QTreeWidget>
 
 /**
-  Provides a QTreeWidget with a pre-defined column zero for checking items
+  A convenience QTreeWidget with extra features:
+  1.  Automatic size hints based on contents
+  2.  A check box added in a header if items have check boxes
 */
-class QTWIDGETS_EXPORT pqSelectionTreeWidget : public QTreeWidget
+class QTWIDGETS_EXPORT pqTreeWidget : public QTreeWidget
 {
   typedef QTreeWidget Superclass;
   Q_OBJECT
 public:
   
-  pqSelectionTreeWidget(QWidget* p);
-  ~pqSelectionTreeWidget();
-
-  Qt::CheckState checkState() const;
+  pqTreeWidget(QWidget* p);
+  ~pqTreeWidget();
 
   bool event(QEvent* e);
 
   /// give a hint on the size
   QSize sizeHint() const;
+  QSize minimumSizeHint() const;
   
 public slots:
   void allOn();
@@ -61,7 +62,6 @@ public slots:
 
 protected slots:
   void doToggle(int col);
-  void dataChanged(const QModelIndex&, const QModelIndex&);
   void updateCheckState();
   void invalidateLayout();
 
@@ -70,5 +70,5 @@ protected:
   QPixmap pixmap(Qt::CheckState state, bool active);
 };
 
-#endif // !_pqSelectionTreeWidget_h
+#endif // !_pqTreeWidget_h
 

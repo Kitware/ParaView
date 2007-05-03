@@ -70,7 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPropertyManager.h"
 #include "pqProxySelectionWidget.h"
-#include "pqSelectionTreeWidget.h"
+#include "pqTreeWidget.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqSignalAdaptorSelectionTreeWidget.h"
@@ -200,8 +200,8 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
     QCheckBox* checkBox = qobject_cast<QCheckBox*>(object);
     QComboBox* comboBox = qobject_cast<QComboBox*>(object);
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(object);
-    pqSelectionTreeWidget* treeWidget = 
-      qobject_cast<pqSelectionTreeWidget*>(object);
+    pqTreeWidget* treeWidget = 
+      qobject_cast<pqTreeWidget*>(object);
     if(checkBox)
       {
       property_manager->registerLink(
@@ -625,8 +625,8 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
     QCheckBox* checkBox = qobject_cast<QCheckBox*>(object);
     QComboBox* comboBox = qobject_cast<QComboBox*>(object);
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(object);
-    pqSelectionTreeWidget* treeWidget = 
-      qobject_cast<pqSelectionTreeWidget*>(object);
+    pqTreeWidget* treeWidget = 
+      qobject_cast<pqTreeWidget*>(object);
     if(checkBox)
       {
       property_manager->unregisterLink(

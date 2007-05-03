@@ -129,18 +129,34 @@
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox_2" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>7</hsizetype>
+       <vsizetype>7</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title" >
       <string>Data Arrays</string>
      </property>
      <layout class="QGridLayout" >
       <property name="margin" >
-       <number>3</number>
+       <number>4</number>
       </property>
       <property name="spacing" >
-       <number>6</number>
+       <number>4</number>
       </property>
       <item row="0" column="0" >
-       <widget class="QTreeWidget" name="dataArrays" >
+       <widget class="pqTreeWidget" name="dataArrays" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>13</hsizetype>
+          <vsizetype>3</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="rootIsDecorated" >
          <bool>false</bool>
         </property>
@@ -184,31 +200,17 @@
       <property name="spacing" >
        <number>4</number>
       </property>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_7" >
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_8" >
         <property name="text" >
-         <string>Y range:</string>
+         <string>Z range:</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QLabel" name="xRange" >
+      <item row="2" column="1" >
+       <widget class="QLabel" name="zRange" >
         <property name="text" >
-         <string>X range:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_6" >
-        <property name="text" >
-         <string>X range:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QLabel" name="yRange" >
-        <property name="text" >
-         <string>Y range:</string>
+         <string>Z range:</string>
         </property>
        </widget>
       </item>
@@ -225,50 +227,67 @@
         </property>
        </spacer>
       </item>
-      <item row="2" column="1" >
-       <widget class="QLabel" name="zRange" >
+      <item row="1" column="1" >
+       <widget class="QLabel" name="yRange" >
         <property name="text" >
-         <string>Z range:</string>
+         <string>Y range:</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_8" >
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_6" >
         <property name="text" >
-         <string>Z range:</string>
+         <string>X range:</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1" >
-       <spacer>
-        <property name="orientation" >
-         <enum>Qt::Vertical</enum>
+      <item row="0" column="1" >
+       <widget class="QLabel" name="xRange" >
+        <property name="text" >
+         <string>X range:</string>
         </property>
-        <property name="sizeHint" >
-         <size>
-          <width>20</width>
-          <height>0</height>
-         </size>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_7" >
+        <property name="text" >
+         <string>Y range:</string>
         </property>
-       </spacer>
+       </widget>
       </item>
      </layout>
     </widget>
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox_4" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>7</hsizetype>
+       <vsizetype>7</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title" >
       <string>Time</string>
      </property>
-     <layout class="QVBoxLayout" >
+     <layout class="QGridLayout" >
       <property name="margin" >
-       <number>9</number>
+       <number>4</number>
       </property>
       <property name="spacing" >
-       <number>6</number>
+       <number>4</number>
       </property>
-      <item>
-       <widget class="QTreeWidget" name="timeValues" >
+      <item row="0" column="0" >
+       <widget class="pqTreeWidget" name="timeValues" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>13</hsizetype>
+          <vsizetype>3</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="columnCount" >
          <number>2</number>
         </property>
@@ -302,6 +321,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>pqTreeWidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

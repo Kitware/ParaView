@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSelectionTreeWidget.cxx
+   Module:    pqTreeWidget.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqSelectionTreeWidget.h"
+#include "pqTreeWidget.h"
 
 #include <QApplication>
 #include <QPainter>
@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLayout>
 
 // enum for different pixmap types
-enum pqSelectionTreeWidgetPixmap
+enum pqTreeWidgetPixmap
 {
   pqCheck               = 0,
   pqPartialCheck        = 1,
@@ -54,8 +54,8 @@ enum pqSelectionTreeWidgetPixmap
   pqMaxCheck            = 6
 };
 
-// array of style corresponding with the pqSelectionTreeWidgetPixmap enum
-static const QStyle::State pqSelectionTreeWidgetPixmapStyle[] =
+// array of style corresponding with the pqTreeWidgetPixmap enum
+static const QStyle::State pqTreeWidgetPixmapStyle[] =
 {
   QStyle::State_On | QStyle::State_Enabled,
   QStyle::State_NoChange | QStyle::State_Enabled,
@@ -65,7 +65,7 @@ static const QStyle::State pqSelectionTreeWidgetPixmapStyle[] =
   QStyle::State_Off | QStyle::State_Enabled | QStyle::State_Active
 };
 
-QPixmap pqSelectionTreeWidget::pixmap(Qt::CheckState cs, bool active)
+QPixmap pqTreeWidget::pixmap(Qt::CheckState cs, bool active)
 {
   int offset = active ? pqMaxCheck/2 : 0;
   switch(cs)
@@ -80,7 +80,7 @@ QPixmap pqSelectionTreeWidget::pixmap(Qt::CheckState cs, bool active)
   return QPixmap();
 }
 
-pqSelectionTreeWidget::pqSelectionTreeWidget(QWidget* p)
+pqTreeWidget::pqTreeWidget(QWidget* p)
   : QTreeWidget(p)
 {
   QStyleOptionButton option;
@@ -94,21 +94,22 @@ pqSelectionTreeWidget::pqSelectionTreeWidget(QWidget* p)
     this->CheckPixmaps[i] = new QPixmap(r.size());
     this->CheckPixmaps[i]->fill(QColor(0,0,0,0));
     QPainter painter(this->CheckPixmaps[i]);
-    option.state = pqSelectionTreeWidgetPixmapStyle[i];
+    option.state = pqTreeWidgetPixmapStyle[i];
     
     this->style()->drawPrimitive(QStyle::PE_IndicatorCheckBox, &option, 
                          &painter, this);
     }
   
-  this->headerItem()->setCheckState(0, Qt::Checked);
-  this->headerItem()->setData(0, Qt::DecorationRole, 
-                              pixmap(Qt::Checked, this->hasFocus()));
-
   QObject::connect(this->header(), SIGNAL(sectionClicked(int)),
                    this, SLOT(doToggle(int)),
                    Qt::QueuedConnection);
   
   this->header()->setClickable(true);
+
+  QObject::connect(this->model(), SIGNAL(dataChanged(QModelIndex, QModelIndex)),
+                   this, SLOT(updateCheckState()));
+  QObject::connect(this->model(), SIGNAL(rowsInserted(QModelIndex, int, int)),
+                   this, SLOT(updateCheckState()));
 
   QObject::connect(this->model(), SIGNAL(rowsInserted(QModelIndex, int, int)),
                    this, SLOT(invalidateLayout()));
@@ -116,7 +117,7 @@ pqSelectionTreeWidget::pqSelectionTreeWidget(QWidget* p)
                    this, SLOT(invalidateLayout()));
 }
 
-pqSelectionTreeWidget::~pqSelectionTreeWidget()
+pqTreeWidget::~pqTreeWidget()
 {
   for(int i=0; i<pqMaxCheck; i++)
     {
@@ -125,47 +126,60 @@ pqSelectionTreeWidget::~pqSelectionTreeWidget()
   delete [] this->CheckPixmaps;
 }
 
-bool pqSelectionTreeWidget::event(QEvent* e)
+bool pqTreeWidget::event(QEvent* e)
 {
   if(e->type() == QEvent::FocusIn ||
      e->type() == QEvent::FocusOut)
     {
-    Qt::CheckState cs = this->checkState();
-    bool active = e->type() == QEvent::FocusIn;
-    this->headerItem()->setData(0, Qt::DecorationRole, 
-                              pixmap(cs, active));
+    bool convert = false;
+    int cs = this->headerItem()->data(0, Qt::CheckStateRole).toInt(&convert);
+    if(convert)
+      {
+      bool active = e->type() == QEvent::FocusIn;
+      this->headerItem()->setData(0, Qt::DecorationRole, 
+                            pixmap(static_cast<Qt::CheckState>(cs), active));
+      }
     }
 
   return Superclass::event(e);
 }
 
-void pqSelectionTreeWidget::dataChanged(const QModelIndex& topLeft,
-                                        const QModelIndex& bottomRight)
-{
-  Superclass::dataChanged(topLeft, bottomRight);
-  QTimer::singleShot(0, this, SLOT(updateCheckState()));
-}
-
-void pqSelectionTreeWidget::updateCheckState()
+void pqTreeWidget::updateCheckState()
 {
   Qt::CheckState newState = Qt::Checked;
   int numChecked = 0;
   int numPartial = 0;
+  int numUnchecked = 0;
   QAbstractItemModel* m = this->model();
   int numRows = m->rowCount(QModelIndex());
   for(int i=0; i<numRows; i++)
     {
     QModelIndex idx = m->index(i, 0);
-    QVariant v = m->data(idx, Qt::CheckStateRole);
-    if(v == Qt::Checked)
+    bool convert = 0;
+    int v = m->data(idx, Qt::CheckStateRole).toInt(&convert);
+    if(convert)
       {
-      numChecked++;
-      }
-    else if (v == Qt::PartiallyChecked)
-      { 
-      numPartial++;
+      if(v == Qt::Checked)
+        {
+        numChecked++;
+        }
+      else if (v == Qt::PartiallyChecked)
+        { 
+        numPartial++;
+        }
+      else
+        {
+        numUnchecked++;
+        }
       }
     }
+
+  // if there are no check boxes at all
+  if(0 == (numUnchecked + numPartial + numChecked))
+    {
+    return;
+    }
+  
   if(numChecked != numRows)
     {
       newState = ((numChecked==0) && (numPartial==0)) 
@@ -177,12 +191,7 @@ void pqSelectionTreeWidget::updateCheckState()
                               pixmap(newState, this->hasFocus()));
 }
 
-Qt::CheckState pqSelectionTreeWidget::checkState() const
-{
-  return this->headerItem()->checkState(0);
-}
-  
-void pqSelectionTreeWidget::allOn()
+void pqTreeWidget::allOn()
 {
   QTreeWidgetItem* item;
   int i, end = this->topLevelItemCount();
@@ -193,7 +202,7 @@ void pqSelectionTreeWidget::allOn()
     }
 }
 
-void pqSelectionTreeWidget::allOff()
+void pqTreeWidget::allOff()
 {
   QTreeWidgetItem* item;
   int i, end = this->topLevelItemCount();
@@ -205,30 +214,35 @@ void pqSelectionTreeWidget::allOff()
 }
 
 
-void pqSelectionTreeWidget::doToggle(int column)
+void pqTreeWidget::doToggle(int column)
 {
   if(column == 0)
     {
-    if(this->checkState() == Qt::Checked)
+    bool convert = false;
+    int cs = this->headerItem()->data(0, Qt::CheckStateRole).toInt(&convert);
+    if(convert)
       {
-      this->allOff();
-      }
-    else
-      {
-      // both unchecked and partial checked go here
-      this->allOn();
+      if(cs == Qt::Checked)
+        {
+        this->allOff();
+        }
+      else
+        {
+        // both unchecked and partial checked go here
+        this->allOn();
+        }
       }
     }
 }
 
-QSize pqSelectionTreeWidget::sizeHint() const
+QSize pqTreeWidget::sizeHint() const
 {
   // lets show X items before we get a scrollbar
   // probably want to make this a member variable
   // that a caller has access to
   int maxItemHint = 10;
   // for no items, let's give a space of X pixels
-  int minItemHeight = 16;
+  int minItemHeight = 50;
 
   int num = this->topLevelItemCount();
   num = qMin(num, maxItemHint);
@@ -237,8 +251,7 @@ QSize pqSelectionTreeWidget::sizeHint() const
 
   if(num)
     {
-    QRect r = this->visualItemRect(this->topLevelItem(0));
-    pix = r.height() * num;
+    pix = this->sizeHintForRow(0) * num;
     }
 
   int margin[4];
@@ -247,13 +260,19 @@ QSize pqSelectionTreeWidget::sizeHint() const
   return QSize(156, h);
 }
 
-void pqSelectionTreeWidget::invalidateLayout()
+QSize pqTreeWidget::minimumSizeHint() const
+{
+  return this->sizeHint();
+}
+
+void pqTreeWidget::invalidateLayout()
 {
   // sizeHint is dynamic, so we need to invalidate parent layouts
   // when items are added or removed
-  if(this->parentWidget() && this->parentWidget()->layout())
+  QWidget* w = this->parentWidget();
+  if(w && w->layout())
     {
-    this->parentWidget()->layout()->invalidate();
+    w->layout()->invalidate();
     }
 }
 
