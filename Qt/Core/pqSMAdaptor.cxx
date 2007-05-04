@@ -53,7 +53,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMPropertyAdaptor.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxyGroupDomain.h"
@@ -67,6 +66,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMVectorProperty.h"
 #include "vtkSMExtentDomain.h"
+#include "vtkSMFileListDomain.h"
 
 // ParaView includes
 #include "pqSMProxy.h"
@@ -108,20 +108,55 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
     }
   else
     {
-    vtkSMPropertyAdaptor* adaptor = vtkSMPropertyAdaptor::New();
-    adaptor->SetProperty(Property);
+    vtkSMStringListRangeDomain* stringListRangeDomain = NULL;
+    vtkSMBooleanDomain* booleanDomain = NULL;
+    vtkSMEnumerationDomain* enumerationDomain = NULL;
+    vtkSMProxyGroupDomain* proxyGroupDomain = NULL;
+    vtkSMFileListDomain* fileListDomain = NULL;
+    vtkSMStringListDomain* stringListDomain = NULL;
+    
+    vtkSMDomainIterator* iter = Property->NewDomainIterator();
+    for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
+      {
+      if(!stringListRangeDomain)
+        {
+        stringListRangeDomain = vtkSMStringListRangeDomain::SafeDownCast(iter->GetDomain());
+        }
+      if(!booleanDomain)
+        {
+        booleanDomain = vtkSMBooleanDomain::SafeDownCast(iter->GetDomain());
+        }
+      if(!enumerationDomain)
+        {
+        enumerationDomain = vtkSMEnumerationDomain::SafeDownCast(iter->GetDomain());
+        }
+      if(!proxyGroupDomain)
+        {
+        proxyGroupDomain = vtkSMProxyGroupDomain::SafeDownCast(iter->GetDomain());
+        }
+      if(!fileListDomain)
+        {
+        fileListDomain = vtkSMFileListDomain::SafeDownCast(iter->GetDomain());
+        }
+      if(!stringListDomain)
+        {
+        stringListDomain = vtkSMStringListDomain::SafeDownCast(iter->GetDomain());
+        }
+      }
+    iter->Delete();
 
-    if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::SELECTION)
+    if(fileListDomain)
+      {
+      type = pqSMAdaptor::FILE_LIST;
+      }
+    else if(stringListRangeDomain)
       {
       type = pqSMAdaptor::SELECTION;
       }
-    else if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::ENUMERATION)
+    else if(booleanDomain || enumerationDomain || 
+            proxyGroupDomain || stringListDomain)
       {
       type = pqSMAdaptor::ENUMERATION;
-      }
-    else if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::FILE_LIST)
-      {
-      type = pqSMAdaptor::FILE_LIST;
       }
     else 
       {
@@ -139,7 +174,6 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
         type = pqSMAdaptor::SINGLE_ELEMENT;
         }
       }
-    adaptor->Delete();
     }
 
   return type;
