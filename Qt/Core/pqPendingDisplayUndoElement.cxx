@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPendingDisplayManager.h"
 
 vtkStandardNewMacro(pqPendingDisplayUndoElement);
-vtkCxxRevisionMacro(pqPendingDisplayUndoElement, "1.5");
+vtkCxxRevisionMacro(pqPendingDisplayUndoElement, "1.6");
 //-----------------------------------------------------------------------------
 pqPendingDisplayUndoElement::pqPendingDisplayUndoElement()
 {
@@ -110,11 +110,17 @@ int pqPendingDisplayUndoElement::InternalUndoRedo(bool undo)
     }
   if ((state && undo) || (!state && !undo))
     {
+    // TODO:  is this the right place?
+    pqPipelineSource* pxy = smModel->getPQSource(proxy);
+    pxy->setModifiedState(pqProxy::UNMODIFIED);
     pdmanager->removePendingDisplayForSource(smModel->getPQSource(proxy));
     }
   else
     {
-    pdmanager->internalAddPendingDisplayForSource(smModel->getPQSource(proxy));
+    // TODO:  is this the right place?
+    pqPipelineSource* pxy = smModel->getPQSource(proxy);
+    pxy->setModifiedState(pqProxy::UNINITIALIZED);
+    pdmanager->internalAddPendingDisplayForSource(pxy);
     }
   proxy->Delete();
   return 1;

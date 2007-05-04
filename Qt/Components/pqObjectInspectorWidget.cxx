@@ -261,6 +261,7 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->connect(pqApplicationCore::instance()->getServerManagerModel(), 
       SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*)),
       SLOT(handleConnectionChanged(pqPipelineSource*, pqPipelineSource*)));
+
 }
 
 //-----------------------------------------------------------------------------
@@ -271,12 +272,6 @@ pqObjectInspectorWidget::~pqObjectInspectorWidget()
     {
     delete p;
     }
-}
-
-//-----------------------------------------------------------------------------
-void pqObjectInspectorWidget::setAcceptEnabled()
-{
-  this->canAccept(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -410,11 +405,12 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
   
   if(!reusedPanel)
     {
-    QObject::connect(this->CurrentPanel, SIGNAL(modified()), 
-                     this, SLOT(setAcceptEnabled()));
-    
     QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderViewModule*)), 
                      this->CurrentPanel, SLOT(setRenderModule(pqRenderViewModule*)));
+    
+    QObject::connect(this->CurrentPanel->referenceProxy(),
+      SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
+      this, SLOT(updateAcceptState()));
     }
     
   this->PanelArea->layout()->addWidget(this->CurrentPanel);
@@ -425,11 +421,7 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
 
   this->PanelStore[proxy] = this->CurrentPanel;
 
-  if(this->CurrentPanel->referenceProxy()->modifiedState() ==
-    pqProxy::UNINITIALIZED)
-    {
-    this->canAccept(true);
-    }
+  this->updateAcceptState();
 }
 
 //-----------------------------------------------------------------------------
@@ -456,8 +448,6 @@ void pqObjectInspectorWidget::accept()
   
   // Essential to render all views.
   pqApplicationCore::instance()->render();
-  
-  this->canAccept(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -478,8 +468,6 @@ void pqObjectInspectorWidget::reset()
     }
 
   emit this->postreject();
-  
-  this->canAccept(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -501,6 +489,10 @@ QSize pqObjectInspectorWidget::sizeHint() const
 //-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::removeProxy(pqPipelineSource* proxy)
 {
+  QObject::disconnect(proxy,
+    SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
+    this, SLOT(updateAcceptState()));
+
   QMap<pqProxy*, pqObjectPanel*>::iterator iter;
   iter = this->QueuedPanels.find(proxy);
   if(iter != this->QueuedPanels.end())
@@ -519,6 +511,8 @@ void pqObjectInspectorWidget::removeProxy(pqPipelineSource* proxy)
     delete iter.value();
     this->PanelStore.erase(iter);
     }
+
+  this->updateAcceptState();
 }
 
 //-----------------------------------------------------------------------------
@@ -571,6 +565,20 @@ void pqObjectInspectorWidget::updateDeleteButtonState()
     }
 
   this->DeleteButton->setEnabled(source && source->getNumberOfConsumers() == 0);
+}
+
+void pqObjectInspectorWidget::updateAcceptState()
+{
+  // watch for modified state changes
+  bool acceptable = false;
+  foreach(pqObjectPanel* p, this->PanelStore)
+    {
+    if(p->referenceProxy()->modifiedState() != pqProxy::UNMODIFIED)
+      {
+      acceptable = true;
+      }
+    }
+  this->canAccept(acceptable);
 }
 
 
