@@ -1254,7 +1254,7 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
           <Entry value="2" text="GLOBALID" />
           <Entry value="3" text="VALUE" />
           <Entry value="4" text="INDICES" />
-          <Entry value="5" text="FRUSTU" />
+          <Entry value="5" text="FRUSTUM" />
           <Entry value="6" text="LOCATION" />
           <Entry value="7" text="THRESHOLDS" />
         </EnumerationDomain>
