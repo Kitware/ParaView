@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "pqApplicationCore.h"
 #include "pqServer.h"
+#include "pqDisplay.h"
 #include "pqGenericViewModule.h"
 #include "pqRenderViewModule.h"
 #include "vtkSMStateLoader.h"
@@ -48,7 +49,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMRenderModuleProxy.h"
+#include "vtkSMAbstractDisplayProxy.h"
 #include "pqObjectBuilder.h"
+#include "pqPipelineFilter.h"
+#include "pqConsumerDisplay.h"
 
 #include <QtDebug>
 
@@ -207,15 +211,13 @@ void pqLookmarkModel::setPipelineHierarchy(vtkPVXMLElement *pipeline)
 }
 
 
-void pqLookmarkModel::load(pqServer *server, QList<pqPipelineSource*> *sources, pqGenericViewModule *view,  vtkSMStateLoader *arg_loader)
+void pqLookmarkModel::load(
+              pqServer *server, 
+              QList<pqPipelineSource*> *sources, 
+              pqGenericViewModule *view,  
+              vtkSMStateLoader *arg_loader)
 {
-  pqRenderViewModule* renModule;
-
-  if(sources->size()==0)
-    {
-    qDebug() << "No source to apply lookmark to.";
-    return;
-    }
+  pqApplicationCore* core = pqApplicationCore::instance();
 
   if(!server)
     {
@@ -223,34 +225,48 @@ void pqLookmarkModel::load(pqServer *server, QList<pqPipelineSource*> *sources, 
     return;
     }
 
-  pqApplicationCore* core = pqApplicationCore::instance();
   // Now deal with the different types of possible state loaders:
-
   vtkSmartPointer<vtkSMStateLoader> loader = arg_loader;
   if (!loader)
     {
     loader.TakeReference(pqLookmarkStateLoader::New());
     }
 
-  // If this is a lookmark of a single view, the active view needs to be added to the beginning 
-  // of the loader's preferred view list to ensure it is used before any others
-  vtkSMPQStateLoader* smpqLoader = vtkSMPQStateLoader::SafeDownCast(loader);
-  if (smpqLoader)
+  bool resetCamera = false;
+  if(view)
     {
-    // if no view was specified, and this lookmark is made up of only one view, load lookmark in the current view (which can only be render view for now)
-    // (otherwise, if this lookmark has multiple views, just create new views instead of reusing existing ones)
-    if(view)
+    // remember to reset the camera later if the view has no displays visible
+    if(view->getVisibleDisplayCount()==0 && !this->RestoreCamera)
       {
-      //view = pqActiveView::instance().current();
-      renModule = qobject_cast<pqRenderViewModule*>(view);
-      if(!renModule)
-        {
-        renModule = qobject_cast<pqRenderViewModule*>(
-          core->getObjectBuilder()->createView(
-            pqRenderViewModule::renderViewType(), server));
-        }
-      smpqLoader->AddPreferredRenderModule(renModule->getRenderModuleProxy());
+      resetCamera = true;
       }
+
+    // Now turn off visibility of all displays currently added to view.
+    // We do this before the lookmark is loaded so that other sources
+    // do not obstruct the view of the lookmark sources.
+    QList<pqDisplay*> displays = view->getDisplays();
+    for(int i=0; i<displays.count(); i++)
+      {
+      pqDisplay *disp = displays[i];
+      disp->setVisible(0);
+      }
+    }
+
+  // If this is a lookmark of a single view, the active view needs to be 
+  // added to the beginning of the loader's preferred view list to ensure 
+  // it is used before any others
+  vtkSMPQStateLoader* smpqLoader = vtkSMPQStateLoader::SafeDownCast(loader);
+  pqRenderViewModule* renModule = NULL;
+  if (smpqLoader && view)
+    {
+    renModule = qobject_cast<pqRenderViewModule*>(view);
+    if(!renModule)
+      {
+      renModule = qobject_cast<pqRenderViewModule*>(
+        core->getObjectBuilder()->createView(
+          pqRenderViewModule::renderViewType(), server));
+      }
+    smpqLoader->AddPreferredRenderModule(renModule->getRenderModuleProxy());
     }
 
   // set some parameters specific to the lookmark state loader
@@ -276,6 +292,14 @@ void pqLookmarkModel::load(pqServer *server, QList<pqPipelineSource*> *sources, 
     }
 
   pqApplicationCore::instance()->loadState(stateElement,server,loader);
+
+  // reset the camera after loading the lookmark if we did not restore
+  // the lookmark's camera state
+  if(resetCamera && renModule)
+    {
+    renModule->resetCamera();
+    renModule->render();
+    }
 
   parser->Delete();
   emit this->loaded(this);

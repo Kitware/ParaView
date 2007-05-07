@@ -42,10 +42,11 @@ class pqLookmarkStateLoaderInternal;
 class pqPipelineSource;
 class pqTimeKeeper;
 class QStandardItem;
+class pqGenericViewModule;
 
+//
 // State loader for the lookmark state.
-// Supports 
-// When UseCameraFlag is turned off, the camera properties of the render module proxy are filtered out.
+//
 
 class PQCOMPONENTS_EXPORT pqLookmarkStateLoader : public vtkSMPQStateLoader
 {
@@ -54,17 +55,36 @@ public:
   vtkTypeRevisionMacro(pqLookmarkStateLoader, vtkSMPQStateLoader);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Load the state from the given root element. This root
+  // element must have Proxy and ProxyCollection sub-elements
+  // Returns 1 on success, 0 on failure.
+  // If keep_proxies is set, then the internal map
+  // of proxy ids to proxies is not cleared on loading of the state.
+  //
+  // Overloaded to check whether there are enough existing sources to support 
+  // this lookmark.
   virtual int LoadState(vtkPVXMLElement* rootElement, int keep_proxies=0);
 
-  // Can be given a list of sources to use before any others
+  // Description:
+  // Overloaded to check whether the proxyElement is a source and if so, 
+  // look for a display proxy element in the state that has it for an input.
+  // Store the id of this display for later so that we know not to load its state.
+  virtual vtkSMProxy* NewProxyFromElement(vtkPVXMLElement* proxyElement, int id);
+
+  // Can be given a list of sources to use before any others. 
+  // Right now these are the sources that are selected in the pipeline browser.
   void SetPreferredSources(QList<pqPipelineSource*> *sources);
 
   // The XML representation of the lookmark's pipeline hierarchy.
-  // see pqLookmarkModel
+  // This is used to generate a pipeline mode of the lookmark state which is
+  // used by the pqLookmarkSourceDialog
   void SetPipelineHierarchy(vtkPVXMLElement*);
 
+  // Provide access to the timekeeper in case this lookmark restores time
   void SetTimeKeeper(pqTimeKeeper *timekeeper);
 
+  // Set whether or not the lookmark's time/camera should be restored
   void SetRestoreCameraFlag(bool state);
   void SetRestoreTimeFlag(bool state);
 
@@ -73,20 +93,30 @@ protected:
   ~pqLookmarkStateLoader();
 
   // Description:
+  // Make sure the "sources" proxy collection gets loaded before any other.
+  // When the source collection element does get passed, reorder child elements
+  // so that sources get loaded in the same order as their entries in the lookmark 
+  // pipeline. This is required for the pqLookmarkSourceDialog to work correctly
+  virtual int HandleProxyCollection(vtkPVXMLElement* collectionElement);
+
+  // Description:
   // When a source proxy is about to be created, provide it with an existing one instead.
   virtual vtkSMProxy* NewProxyInternal(const char* xmlgroup, const char* xmlname);
 
-  // Make sure we do not re-register proxies that are being reused
-  virtual void RegisterProxyInternal(const char* group, 
-    const char* name, vtkSMProxy* proxy);
+  // Make sure we do not re-register proxies that are being reused or ignored
+  virtual void RegisterProxy(int id, vtkSMProxy* proxy);
 
+  // Right now compound proxy definitions get saved with a lookmark when
+  // it's created so we do this so loading the lookmark won't load these proxies
   virtual void HandleCompoundProxyDefinitions(vtkPVXMLElement* element);
 
   // Description:
-  // This method is called to load a proxy state. Overloaded to make sure their are enough existing source for this lookmark
+  // This method is called to load a proxy state. 
+  // It handles different proxy types different ways. 
   virtual int LoadProxyState(vtkPVXMLElement* proxyElement, vtkSMProxy* proxy);
 
-  // Helper function for constructing a QAbstractItemModel from the lookmark's pipeline hierarchy
+  // Helper function for constructing a QAbstractItemModel from the lookmark's 
+  // pipeline hierarchy
   void AddChildItems(vtkPVXMLElement *elem, QStandardItem *item);
 
 private:

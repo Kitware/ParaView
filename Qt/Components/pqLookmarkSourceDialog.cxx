@@ -131,7 +131,8 @@ void pqLookmarkSourceDialog::setLookmarkSource(QStandardItem *item)
   for(int i=0; i<this->LookmarkPipelineModel->rowCount();i++)
     {
     QFont srcFont = this->LookmarkPipelineModel->item(i)->font();
-    if(this->CurrentLookmarkItem == this->LookmarkPipelineModel->item(i))
+    QString srcText = this->LookmarkPipelineModel->item(i)->text();
+    if(item == this->LookmarkPipelineModel->item(i))
       {
       srcFont.setBold(true);
       }
@@ -202,7 +203,7 @@ void pqLookmarkSourceDialog::setModels(QStandardItemModel *lmkModel, pqPipelineM
     }
   this->CurrentPipelineView->expandAll();
 
-  // Find and select an initial non-server, non-filter source
+  // Find and select an initial source (so something is selected)
   pqServerManagerModel *model = pqApplicationCore::instance()->getServerManagerModel();
   pqPipelineSource *src;
   for(unsigned int j=0; j<model->getNumberOfSources();j++)
@@ -216,27 +217,31 @@ void pqLookmarkSourceDialog::setModels(QStandardItemModel *lmkModel, pqPipelineM
       }
     }
 
-  this->setWindowTitle("Lookmark Source Chooser");
-
   // Listen to the new selection model.
   this->connect(this->CurrentPipelineView->getSelectionModel(),
     SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-    this, SLOT(selectSource(const QItemSelection &)));
+    this, SLOT(selectSource()));
 
+  this->setWindowTitle("Lookmark Source Chooser");
 }
 
-void pqLookmarkSourceDialog::selectSource(const QItemSelection &selected)
+void pqLookmarkSourceDialog::selectSource()
 {
-  if(selected.indexes().size()==0)
+  // If the selected item is a server, do not set to current:
+  QModelIndexList indices = 
+       this->CurrentPipelineView->getSelectionModel()->selectedIndexes();
+  if(indices.size()==0)
     {
     return;
     }
 
-  // If the selected item is a server or filter, do not set to current:
-  pqServer *server = dynamic_cast<pqServer*>(this->CurrentPipelineModel->getItemFor(selected.indexes().at(0)));  
-  pqPipelineFilter *filter = dynamic_cast<pqPipelineFilter*>(this->CurrentPipelineModel->getItemFor(selected.indexes().at(0)));  
-  pqPipelineSource *src = dynamic_cast<pqPipelineSource*>(this->CurrentPipelineModel->getItemFor(selected.indexes().at(0)));  
-  if(server || filter)
+  pqServer *server = dynamic_cast<pqServer*>(
+      this->CurrentPipelineModel->getItemFor(indices.at(0)));
+
+  //pqPipelineFilter *filter = dynamic_cast<pqPipelineFilter*>(this->CurrentPipelineModel->getItemFor(selected.indexes().at(0)));  
+  pqPipelineSource *src = dynamic_cast<pqPipelineSource*>(
+      this->CurrentPipelineModel->getItemFor(indices.at(0)));  
+  if(server) // || filter)
     {
     if(this->SelectedSource)
       {

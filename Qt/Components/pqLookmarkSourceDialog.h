@@ -73,7 +73,7 @@ public:
   pqPipelineSource* getSelectedSource(){return this->SelectedSource;};
 
 private slots:
-  void selectSource(const QItemSelection &selection);
+  void selectSource();
 
 protected:
   void setModels(QStandardItemModel *lookmarkModel, pqPipelineModel *pipelineModel);

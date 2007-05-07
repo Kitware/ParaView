@@ -53,7 +53,7 @@ protected:
   vtkPVXMLElement* RootElement;
   void SetRootElement(vtkPVXMLElement*);
 
-  int HandleProxyCollection(vtkPVXMLElement* collectionElement);
+  virtual int HandleProxyCollection(vtkPVXMLElement* collectionElement);
   virtual void HandleCompoundProxyDefinitions(vtkPVXMLElement* element);
   int HandleLinks(vtkPVXMLElement* linksElement);
   virtual int BuildProxyCollectionInformation(vtkPVXMLElement*);
@@ -69,7 +69,7 @@ protected:
   // The DS keeps info
   // about each proxy ID and the groups and names 
   // the proxy should be registered as (as indicated in the state file).
-  void RegisterProxy(int id, vtkSMProxy* proxy);
+  virtual void RegisterProxy(int id, vtkSMProxy* proxy);
   virtual void RegisterProxyInternal(const char* group, 
     const char* name, vtkSMProxy* proxy);
 
