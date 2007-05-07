@@ -28,19 +28,40 @@
 #include "vtkProcessModule.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
+#include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.15.2.1");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.15.2.2");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
-vtkPythonProgrammableFilter::vtkPythonProgrammableFilter()
+
+typedef vtkstd::map<vtkstd::string, vtkstd::string> ParametersT;
+
+class vtkPythonProgrammableFilterImplementation
+{
+public:
+  vtkPythonProgrammableFilterImplementation() :
+    Running(0),
+    Interpretor(NULL)
+  {
+  }
+
+  //state used to get by a reference counting cyclic loop
+  int Running;
+  vtkPVPythonInterpretor* Interpretor;
+  
+  // Stores name-value parameters that will be passed to running scripts
+  ParametersT Parameters;
+};
+
+//----------------------------------------------------------------------------
+vtkPythonProgrammableFilter::vtkPythonProgrammableFilter() :
+  Implementation(new vtkPythonProgrammableFilterImplementation())
 {
   this->Script = NULL;
   this->InformationScript = NULL;
-  this->Interpretor = NULL;
   this->OutputDataSetType = VTK_DATA_SET;
-  this->Running = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -48,18 +69,18 @@ void vtkPythonProgrammableFilter::UnRegister(vtkObjectBase *o)
 {
   this->Superclass::UnRegister(o);
   if (this->GetReferenceCount() == 4 && 
-      this->Interpretor != NULL &&
-      !this->Running
+      this->Implementation->Interpretor != NULL &&
+      !this->Implementation->Running
     )
     {
-    vtkPVPythonInterpretor *cpy = this->Interpretor;
+    vtkPVPythonInterpretor *cpy = this->Implementation->Interpretor;
     vtkstd::string script;
     script  = "";
     script += "self = 0\n";
     cpy->MakeCurrent();
     cpy->RunSimpleString(script.c_str());
     cpy->ReleaseControl();
-    this->Interpretor = NULL;
+    this->Implementation->Interpretor = NULL;
     cpy->UnRegister(this);
     }
 }
@@ -73,10 +94,12 @@ vtkPythonProgrammableFilter::~vtkPythonProgrammableFilter()
     }
   this->SetInformationScript(NULL);
 
-  if (this->Interpretor != NULL)
+  if (this->Implementation->Interpretor != NULL)
     {
-    this->Interpretor->Delete();
+    this->Implementation->Interpretor->Delete();
     }
+    
+  delete this->Implementation;
 }
 
 //----------------------------------------------------------------------------
@@ -170,6 +193,29 @@ void vtkPythonProgrammableFilter::SetScript(const char *script)
 }
 
 //----------------------------------------------------------------------------
+void vtkPythonProgrammableFilter::SetParameter(const char *raw_name, const char *raw_value)
+{
+  const vtkstd::string name = raw_name ? raw_name : "";
+  const vtkstd::string value = raw_value ? raw_value : "";
+
+  if(name.empty())
+    {
+    vtkErrorMacro(<< "cannot set parameter with empty name");
+    return;
+    }
+    
+  this->Implementation->Parameters[name] = value;
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPythonProgrammableFilter::ClearParameters()
+{
+  this->Implementation->Parameters.clear();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
 void vtkPythonProgrammableFilter::ExecuteScript(void *arg)
 {  
   vtkPythonProgrammableFilter *self = 
@@ -188,13 +234,13 @@ void vtkPythonProgrammableFilter::Exec(const char* script)
     return;
     }
 
-  this->Running = 1;
-  if (this->Interpretor == NULL)
+  this->Implementation->Running = 1;
+  if (this->Implementation->Interpretor == NULL)
     {
-    this->Interpretor = vtkPVPythonInterpretor::New();
+    this->Implementation->Interpretor = vtkPVPythonInterpretor::New();
     const char* argv0 = vtkProcessModule::GetProcessModule()->
       GetOptions()->GetArgv0();
-    this->Interpretor->InitializeSubInterpretor(1, (char**)&argv0);
+    this->Implementation->Interpretor->InitializeSubInterpretor(1, (char**)&argv0);
 
     char addrofthis[1024];
     sprintf(addrofthis, "%p", this);    
@@ -209,14 +255,23 @@ void vtkPythonProgrammableFilter::Exec(const char* script)
     initscript += "self = paraview.vtkProgrammableFilter('";
     initscript += aplus;
     initscript +=  "');\n";
-    this->Interpretor->MakeCurrent();
-    this->Interpretor->RunSimpleString(initscript.c_str());
+    
+    for(
+      ParametersT::const_iterator parameter = this->Implementation->Parameters.begin();
+      parameter != this->Implementation->Parameters.end();
+      ++parameter)
+      {
+      initscript += parameter->first + " = " + parameter->second + "\n";
+      } 
+    
+    this->Implementation->Interpretor->MakeCurrent();
+    this->Implementation->Interpretor->RunSimpleString(initscript.c_str());
     }
   
-  this->Interpretor->MakeCurrent();
-  this->Interpretor->RunSimpleString(script);
-  this->Interpretor->ReleaseControl();
-  this->Running = 0;
+  this->Implementation->Interpretor->MakeCurrent();
+  this->Implementation->Interpretor->RunSimpleString(script);
+  this->Implementation->Interpretor->ReleaseControl();
+  this->Implementation->Running = 0;
 }
 
 //----------------------------------------------------------------------------
