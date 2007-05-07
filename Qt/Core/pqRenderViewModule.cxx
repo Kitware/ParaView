@@ -89,7 +89,7 @@ public:
   vtkSmartPointer<vtkSMUndoStack> InteractionUndoStack;
   vtkSmartPointer<vtkSMInteractionUndoStackBuilder> UndoStackBuilder;
 
-  QList<QPointer<pqRenderViewModule> > LinkedUndoStacks;
+  QList<pqRenderViewModule* > LinkedUndoStacks;
   bool UpdatingStack;
 
   int DefaultBackground[3];
