@@ -7,6 +7,10 @@
           extensions="exii"
           file_description="ExodusII">
   </Reader>
+  <Reader name="LSDynaReader"
+          extensions="d3plot k lsdyna"
+          file_description="LSDyna">
+  </Reader>
   <Reader name="PVDReader" 
           extensions="pvd" 
           file_description="ParaView Data Files">
