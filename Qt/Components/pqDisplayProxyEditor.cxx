@@ -530,22 +530,7 @@ void pqDisplayProxyEditor::rescaleToDataRange()
     return;
     }
 
-  pqScalarsToColors *colorMap = this->Internal->Display->getLookupTable();
-  if(colorMap)
-    {
-    QString colorField = this->Internal->Display->getColorField();
-    int component_no = -1;
-    if(colorMap->getVectorMode() == pqScalarsToColors::COMPONENT)
-      {
-      component_no = colorMap->getVectorComponent();
-      }
-
-    QPair<double, double> range = 
-        this->Internal->Display->getColorFieldRange(colorField, component_no);
-    this->Internal->Display->setScalarOpacityRange(range.first, range.second);
-    colorMap->setScalarRange(range.first, range.second);
-    this->Internal->Display->renderAllViews();
-    }
+  this->Internal->Display->resetLookupTableScalarRange();
 
   // TODO: This method is too slow using the vtk tfe.
   // Use the color map editor to scale to the data range. This will

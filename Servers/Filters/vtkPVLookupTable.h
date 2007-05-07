@@ -75,11 +75,17 @@ public:
   virtual void GetColor(double v, double rgb[3]);
 
   // Description:
-  // An internal method typically not used in applications.
-  virtual void MapScalarsThroughTable2(void *input, unsigned char *output,
-                                       int inputDataType, int numberOfValues,
-                                       int inputIncrement, 
-                                       int outputFormat);
+  // An internal method maps a data array into a 4-component, unsigned char
+  // RGBA array. The color mode determines the behavior of mapping. If 
+  // VTK_COLOR_MODE_DEFAULT is set, then unsigned char data arrays are
+  // treated as colors (and converted to RGBA if necessary); otherwise, 
+  // the data is mapped through this instance of ScalarsToColors. The offset
+  // is used for data arrays with more than one component; it indicates 
+  // which component to use to do the blending.
+  // When the component argument is -1, then the this object uses its
+  // own selected technique to change a vector into a scalar to map.
+  virtual vtkUnsignedCharArray *MapScalars(vtkDataArray *scalars, int colorMode,
+                                   int component);
 
   // Description:
   // Returns the (x, r, g, b) values as an array.

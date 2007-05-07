@@ -20,7 +20,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVLookupTable);
-vtkCxxRevisionMacro(vtkPVLookupTable, "1.9");
+vtkCxxRevisionMacro(vtkPVLookupTable, "1.9.2.1");
 //-----------------------------------------------------------------------------
 vtkPVLookupTable::vtkPVLookupTable()
 {
@@ -79,6 +79,9 @@ void vtkPVLookupTable::SetNumberOfValues(vtkIdType number)
 void vtkPVLookupTable::Build()
 {
   this->Superclass::Build();
+
+  this->LookupTable->SetVectorMode(this->VectorMode);
+  this->LookupTable->SetVectorComponent(this->VectorComponent);
 
   if (this->Discretize && (this->GetMTime() > this->BuildTime ||
     this->GetMTime() > this->BuildTime))
@@ -153,25 +156,16 @@ void vtkPVLookupTable::GetColor(double v, double rgb[3])
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVLookupTable::MapScalarsThroughTable2(void *input, 
-  unsigned char *output, int inputDataType, int numberOfValues,
-  int inputIncrement, int outputFormat)
+vtkUnsignedCharArray* vtkPVLookupTable::MapScalars(vtkDataArray *scalars, 
+  int colorMode, int component)
 {
+  this->Build();
   if (this->Discretize)
     {
-    // Make sure the LUT is built.
-    this->Build();
+    return this->LookupTable->MapScalars(scalars, colorMode, component);
+    }
 
-    this->LookupTable->MapScalarsThroughTable2(
-      input, output, inputDataType, numberOfValues, inputIncrement, 
-      outputFormat);
-    }
-  else
-    {
-    this->Superclass::MapScalarsThroughTable2(
-      input, output, inputDataType, numberOfValues, inputIncrement,
-      outputFormat);
-    }
+  return this->Superclass::MapScalars(scalars, colorMode, component);
 }
 
 //-----------------------------------------------------------------------------

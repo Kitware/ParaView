@@ -135,12 +135,14 @@ pqPipelineDisplay::pqPipelineDisplay(const QString& name,
       this, SIGNAL(colorChanged()));
     }
 
+  /*
   // Whenever representation changes to VolumeRendering, we have to
   // ensure that the ColorArray has been initialized to something.
   // Otherwise, the VolumeMapper segfaults.
   this->Internal->VTKConnect->Connect(
     display->GetProperty("Representation"), vtkCommand::ModifiedEvent,
     this, SLOT(onRepresentationChanged()), 0, 0, Qt::QueuedConnection);
+    */
 }
 
 //-----------------------------------------------------------------------------
@@ -459,18 +461,15 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
 //-----------------------------------------------------------------------------
 void pqPipelineDisplay::resetLookupTableScalarRange()
 {
-
   pqScalarsToColors* lut = this->getLookupTable();
   QString colorField = this->getColorField();
   if (lut && colorField!= "" && colorField != "Solid Color")
     {
-    QList<QPair<double,double> > ranges = this->getColorFieldRanges(colorField);
-    if (ranges.size() > 0)
-      {
-      // TODO: use the correct array component.
-      QPair<double, double> range = ranges[0];
-      lut->setScalarRange(range.first, range.second);
-      }
+    QPair<double,double> range = this->getColorFieldRange();
+    lut->setScalarRange(range.first, range.second);
+
+    // scalar opacity is treated as slave to the lookup table.
+    this->setScalarOpacityRange(range.first, range.second);
     }
 }
 
@@ -489,22 +488,20 @@ void pqPipelineDisplay::updateLookupTableScalarRange()
     return;
     }
 
-  QList<QPair<double, double> >ranges = this->getColorFieldRanges(colorField);
-  if (ranges.size() > 0)
-    {
-    QPair<double, double> range = ranges[0];
-    lut->setWholeScalarRange(range.first, range.second);
+  QPair<double, double> range = this->getColorFieldRange();
+  lut->setWholeScalarRange(range.first, range.second);
 
-    // Adjust opacity function range.
-    vtkSMProxy* opacityFunction = this->getScalarOpacityFunctionProxy();
-    if (opacityFunction && !lut->getScalarRangeLock() &&
-      this->getDisplayProxy()->GetRepresentationCM() == 
-      vtkSMDataObjectDisplayProxy::VOLUME)
-      {
-      QPair<double, double> adjusted_range = lut->getScalarRange();
-      // Opacity function always follows the LUT scalar range.
-      this->setScalarOpacityRange(adjusted_range.first, adjusted_range.second);
-      }
+  // Adjust opacity function range.
+  vtkSMProxy* opacityFunction = this->getScalarOpacityFunctionProxy();
+  if (opacityFunction && !lut->getScalarRangeLock() &&
+    this->getDisplayProxy()->GetRepresentationCM() == 
+    vtkSMDataObjectDisplayProxy::VOLUME)
+    {
+    QPair<double, double> adjusted_range = lut->getScalarRange();
+
+    // Opacity function always follows the LUT scalar range.
+    // scalar opacity is treated as slave to the lookup table.
+    this->setScalarOpacityRange(adjusted_range.first, adjusted_range.second);
     }
 }
 
@@ -696,41 +693,24 @@ pqPipelineDisplay::getColorFieldRange(const QString& array, int component)
 }
 
 //-----------------------------------------------------------------------------
-QList<QPair<double, double> >
-pqPipelineDisplay::getColorFieldRanges(const QString& array)
+QPair<double, double> pqPipelineDisplay::getColorFieldRange()
 {
-  QList<QPair<double,double> > ret;
-  
-  QString field = array;
-  int fieldType = vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA;
-
-  if(field == "Solid Color")
+  pqScalarsToColors* lut = this->getLookupTable();
+  QString colorField = this->getColorField();
+  if (lut && colorField!= "" && colorField != "Solid Color")
     {
-    return ret;
-    }
-  if(field.right(strlen(" (cell)")) == " (cell)")
-    {
-    field.chop(strlen(" (cell)"));
-    fieldType = vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA;
-    }
-  else if(field.right(strlen(" (point)")) == " (point)")
-    {
-    field.chop(strlen(" (point)"));
-    fieldType = vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA;
-    }
- 
-  vtkPVArrayInformation* info = this->Internal->getArrayInformation(
-    field.toAscii().data(), fieldType);
-  if(info)
-    {
-    double range[2];
-    for(int i=0; i<info->GetNumberOfComponents(); i++)
+    int component = pqSMAdaptor::getElementProperty(
+      lut->getProxy()->GetProperty("VectorComponent")).toInt();
+    if (pqSMAdaptor::getEnumerationProperty(
+        lut->getProxy()->GetProperty("VectorMode")) == "Magnitude")
       {
-      info->GetComponentRange(i, range);
-      ret.append(QPair<double,double>(range[0], range[1]));
+      component = -1;
       }
+
+    return this->getColorFieldRange(colorField, component);
     }
-  return ret;
+
+  return QPair<double, double>(0.0, 1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -816,6 +796,14 @@ bool pqPipelineDisplay::getDataBounds(double bounds[6])
     }
   display->GetDisplayedDataInformation()->GetBounds(bounds);
   return true;
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineDisplay::setRepresentation(int representation)
+{
+  vtkSMDataObjectDisplayProxy* display = this->getDisplayProxy();
+  display->SetRepresentationCM(representation);
+  this->onRepresentationChanged();
 }
 
 //-----------------------------------------------------------------------------
