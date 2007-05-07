@@ -77,6 +77,7 @@
   <Filter name="PointDataToCellData" />
   <Filter name="PolyDataNormals" />
   <Filter name="ProcessIdScalars" />
+  <Filter name="Probe" />
   <Filter name="ProbeLine" />
   <Filter name="ProbePoint" />
   <Filter name="Programmable Filter" />
