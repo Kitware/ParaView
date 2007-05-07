@@ -1240,6 +1240,19 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
         </Documentation>
      </IdTypeVectorProperty> 
 
+     <DoubleVectorProperty 
+        name="Locations"
+        command="AddLocation" 
+        clean_command="RemoveAllValues"
+        repeat_command="1"
+        number_of_elements_per_command="3"
+        number_of_elements="0"
+        label="Locations">
+        <Documentation>
+          The list of locations that will be added to the selection produced by the selection source.
+        </Documentation>
+     </DoubleVectorProperty> 
+
      <IntVectorProperty
         name="ContentType"
         command="SetContentType"

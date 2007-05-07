@@ -23,6 +23,8 @@
     <Filter name="ExtractPointsOverTime" />
     <Filter name="ProbeLine" />
     <Filter name="ProbePoint" />
+    <Filter name="ProbeLocationOverTimePoint" />
+    <Filter name="ProbeLocationOverTimeCell" />
     <Filter name="Programmable Filter" />
   </Category>
 

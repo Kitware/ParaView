@@ -1,5 +1,95 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
+
+   <ExtractLocationsProxy name="ProbeLocationOverTimePoint"
+                          class="vtkPExtractArraysOverTime"
+                          label="Probe Location over Time (point)"
+                          selection_field_type="POINT">
+     <Documentation> 
+This filter extracts point variables at a given location over time. The output is a 1D rectilinear grid where the x coordinates correspond to time (the same array is also copied to a point array named Time or TimeData (if Time exists in the input)). 
+     </Documentation>
+     <InputProperty
+         name="Input"
+         command="SetInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet"/>
+       </DataTypeDomain>
+       <Documentation>
+         The input from which the selection is extracted.
+       </Documentation>
+     </InputProperty>
+
+     <DoubleVectorProperty 
+        name="Locations"
+        command="AddLocation"
+        clean_command="RemoveAllLocations"
+        repeat_command="1"
+        number_of_elements_per_command="3"
+        number_of_elements="3"
+        update_self="1"
+        label="Locations" 
+        default_values="0 0 0">
+        <Documentation>
+          The list of locations that will be added to the selection produced by the selection source. So far only a single location will actually be plotted.
+        </Documentation>
+     </DoubleVectorProperty> 
+
+     <SubProxy>
+        <Proxy name="SelectionSource" proxygroup="sources"
+          proxyname="SelectionSource">
+        </Proxy>
+     </SubProxy>
+     <!-- End ProbeLocationOverTimePoine -->
+   </ExtractLocationsProxy>
+
+   <ExtractLocationsProxy name="ProbeLocationOverTimeCell"
+                          class="vtkPExtractArraysOverTime"
+                          label="Probe Location over Time (cell)"
+                          selection_field_type="CELL">
+     <Documentation> 
+This filter extracts point variables at a given location over time. The output is a 1D rectilinear grid where the x coordinates correspond to time (the same array is also copied to a point array named Time or TimeData (if Time exists in the input)). 
+     </Documentation>
+     <InputProperty
+         name="Input"
+         command="SetInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet"/>
+       </DataTypeDomain>
+       <Documentation>
+         The input from which the selection is extracted.
+       </Documentation>
+     </InputProperty>
+
+     <DoubleVectorProperty 
+        name="Locations"
+        command="AddLocation"
+        clean_command="RemoveAllLocations"
+        repeat_command="1"
+        number_of_elements_per_command="3"
+        number_of_elements="3"
+        update_self="1"
+        label="Locations" 
+        default_values="0 0 0">
+        <Documentation>
+          The list of locations that will be added to the selection produced by the selection source. So far only a single location will actually be plotted.
+        </Documentation>
+     </DoubleVectorProperty> 
+
+     <SubProxy>
+        <Proxy name="SelectionSource" proxygroup="sources"
+          proxyname="SelectionSource">
+        </Proxy>
+     </SubProxy>
+     <!-- End ProbeLocationOverTimeCell -->
+   </ExtractLocationsProxy>
     
    <ExtractSelectionProxy name="ExtractPointsOverTime"
                           class="vtkPExtractArraysOverTime"

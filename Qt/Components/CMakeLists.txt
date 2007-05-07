@@ -79,6 +79,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqExodusIIPanel.h
   pqExodusPanel.h
   pqExtractDataSetsPanel.h  
+  pqExtractLocationsPanel.h  
   pqExtractSelectionPanel.h  
   pqFileChooserWidget.h
   pqFilterInputDialog.h
@@ -184,6 +185,7 @@ SET(UI_FORMS
   Resources/UI/pqExodusIIPanel.ui
   Resources/UI/pqExodusPanel.ui
   Resources/UI/pqExtractDataSetsPanel.ui
+  Resources/UI/pqExtractLocationsPanel.ui
   Resources/UI/pqExtractSelectionPanel.ui
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
@@ -353,6 +355,8 @@ ADD_LIBRARY(pqComponents
   pqExodusPanel.h
   pqExtractDataSetsPanel.cxx
   pqExtractDataSetsPanel.h
+  pqExtractLocationsPanel.cxx
+  pqExtractLocationsPanel.h
   pqExtractSelectionPanel.cxx
   pqExtractSelectionPanel.h
   pqFileChooserWidget.cxx
