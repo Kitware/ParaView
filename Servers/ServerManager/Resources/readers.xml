@@ -2123,30 +2123,6 @@
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty 
-        name="TimeStepRangeInfo"
-        command="GetTimeStepRange"
-        information_only="1">
-        <SimpleIntInformationHelper/>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="TimeStep"
-        command="SetTimeStep"
-        number_of_elements="1"
-        default_values="0"
-        animateable="0"
-        information_property="TimestepValues">
-       <IntRangeDomain name="range">
-          <RequiredProperties>
-             <Property name="TimeStepRangeInfo" function="Range"/>
-          </RequiredProperties>
-       </IntRangeDomain>
-       <Documentation>
-         This property specifies the current timestep.
-       </Documentation>
-     </IntVectorProperty>
-
      <StringVectorProperty 
         name="CellArrayInfo"
         information_only="1">
@@ -3390,36 +3366,31 @@
    <!-- Beginning of LSDyna Reader -->
    <SourceProxy name="LSDynaReader" class="vtkLSDynaReader">
 
-     <StringVectorProperty name="FileName" command="SetFileName" number_of_elements="1">
+     <StringVectorProperty name="FileName" 
+                           command="SetFileName" 
+                           number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
           Set the file name for the LSDyna reader.
         </Documentation>
      </StringVectorProperty>
 
-     <IntVectorProperty name="TimeStepRangeInfo" command="GetTimeStepRange" information_only="1">
-        <SimpleIntInformationHelper/>
-     </IntVectorProperty>
-
-     <IntVectorProperty name="TimeStep" command="SetTimeStep" number_of_elements="1" animateable="1"
-         default_values="0" information_property="TimestepValues">
-       <IntRangeDomain name="range">
-          <RequiredProperties>
-             <Property name="TimeStepRangeInfo" function="Range"/>
-          </RequiredProperties>
-       </IntRangeDomain>
-       <Documentation>
-         Set the current timestep.
-       </Documentation>
-     </IntVectorProperty>
+     <DoubleVectorProperty name="TimestepValues" information_only="1">
+       <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
 
      <StringVectorProperty name="SolidArrayInfo" information_only="1">
         <ArraySelectionInformationHelper attribute_name="Solid"/>
      </StringVectorProperty>
 
-     <StringVectorProperty name="SolidArrayStatus" command="SetSolidArrayStatus" number_of_elements="2" repeat_command="1"
-        number_of_elements_per_command="2" element_types="2 0" information_property="SolidArrayInfo"
-        label="Solid Arrays">
+     <StringVectorProperty name="SolidArrayStatus" 
+                           command="SetSolidArrayStatus" 
+                           number_of_elements="2" 
+                           repeat_command="1"
+                           number_of_elements_per_command="2" 
+                           element_types="2 0" 
+                           information_property="SolidArrayInfo"
+                           label="Solid Arrays">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="SolidArrayInfo" function="ArrayList"/>
@@ -3434,9 +3405,14 @@
         <ArraySelectionInformationHelper attribute_name="ThickShell"/>
      </StringVectorProperty>
 
-     <StringVectorProperty name="ThickShellArrayStatus" command="SetThickShellArrayStatus" number_of_elements="2" repeat_command="1"
-        number_of_elements_per_command="2" element_types="2 0" information_property="ThickShellArrayInfo"
-        label="Thick Shell Arrays">
+     <StringVectorProperty name="ThickShellArrayStatus" 
+                           command="SetThickShellArrayStatus" 
+                           number_of_elements="2" 
+                           repeat_command="1"
+                           number_of_elements_per_command="2" 
+                           element_types="2 0" 
+                           information_property="ThickShellArrayInfo"
+                           label="Thick Shell Arrays">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="ThickShellArrayInfo" function="ArrayList"/>
@@ -3451,9 +3427,14 @@
         <ArraySelectionInformationHelper attribute_name="Shell"/>
      </StringVectorProperty>
 
-     <StringVectorProperty name="ShellArrayStatus" command="SetShellArrayStatus" number_of_elements="2" repeat_command="1"
-        number_of_elements_per_command="2" element_types="2 0" information_property="ShellArrayInfo"
-        label="Shell Arrays">
+     <StringVectorProperty name="ShellArrayStatus" 
+                           command="SetShellArrayStatus"
+                           number_of_elements="2" 
+                           repeat_command="1"
+                           number_of_elements_per_command="2" 
+                           element_types="2 0" 
+                           information_property="ShellArrayInfo"
+                           label="Shell Arrays">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="ShellArrayInfo" function="ArrayList"/>
@@ -3468,9 +3449,14 @@
         <ArraySelectionInformationHelper attribute_name="RigidBody"/>
      </StringVectorProperty>
 
-     <StringVectorProperty name="RigidBodyArrayStatus" command="SetRigidBodyArrayStatus" number_of_elements="2" repeat_command="1"
-        number_of_elements_per_command="2" element_types="2 0" information_property="RigidBodyArrayInfo"
-        label="Rigid Body Arrays">
+     <StringVectorProperty name="RigidBodyArrayStatus" 
+                           command="SetRigidBodyArrayStatus" 
+                           number_of_elements="2" 
+                           repeat_command="1"
+                           number_of_elements_per_command="2" 
+                           element_types="2 0" 
+                           information_property="RigidBodyArrayInfo"
+                           label="Rigid Body Arrays">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="RigidBodyArrayInfo" function="ArrayList"/>
@@ -3485,9 +3471,14 @@
         <ArraySelectionInformationHelper attribute_name="RoadSurface"/>
      </StringVectorProperty>
 
-     <StringVectorProperty name="RoadSurfaceArrayStatus" command="SetRoadSurfaceArrayStatus" number_of_elements="2" repeat_command="1"
-        number_of_elements_per_command="2" element_types="2 0" information_property="RoadSurfaceArrayInfo"
-        label="Road Surface Arrays">
+     <StringVectorProperty name="RoadSurfaceArrayStatus" 
+                           command="SetRoadSurfaceArrayStatus" 
+                           number_of_elements="2" 
+                           repeat_command="1"
+                           number_of_elements_per_command="2"
+                           element_types="2 0" 
+                           information_property="RoadSurfaceArrayInfo"
+                           label="Road Surface Arrays">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="RoadSurfaceArrayInfo" function="ArrayList"/>
@@ -3502,9 +3493,14 @@
         <ArraySelectionInformationHelper attribute_name="Beam"/>
      </StringVectorProperty>
 
-     <StringVectorProperty name="BeamArrayStatus" command="SetBeamArrayStatus" number_of_elements="2" repeat_command="1"
-        number_of_elements_per_command="2" element_types="2 0" information_property="BeamArrayInfo"
-        label="Beam Arrays">
+     <StringVectorProperty name="BeamArrayStatus" 
+                           command="SetBeamArrayStatus" 
+                           number_of_elements="2" 
+                           repeat_command="1"
+                           number_of_elements_per_command="2" 
+                           element_types="2 0" 
+                           information_property="BeamArrayInfo"
+                           label="Beam Arrays">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="BeamArrayInfo" function="ArrayList"/>
@@ -3519,9 +3515,14 @@
         <ArraySelectionInformationHelper attribute_name="Particle"/>
      </StringVectorProperty>
 
-     <StringVectorProperty name="ParticleArrayStatus" command="SetParticleArrayStatus" number_of_elements="2" repeat_command="1"
-        number_of_elements_per_command="2" element_types="2 0" information_property="ParticleArrayInfo"
-        label="Particle Arrays">
+     <StringVectorProperty name="ParticleArrayStatus" 
+                           command="SetParticleArrayStatus" 
+                           number_of_elements="2" 
+                           repeat_command="1"
+                           number_of_elements_per_command="2" 
+                           element_types="2 0" 
+                           information_property="ParticleArrayInfo"
+                           label="Particle Arrays">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="ParticleArrayInfo" function="ArrayList"/>
@@ -3536,9 +3537,13 @@
         <ArraySelectionInformationHelper attribute_name="Point"/>
      </StringVectorProperty>
 
-     <StringVectorProperty name="PointArrayStatus" command="SetPointArrayStatus" number_of_elements="2" repeat_command="1"
-        number_of_elements_per_command="2" element_types="2 0" information_property="PointArrayInfo"
-        label="Point Arrays">
+     <StringVectorProperty name="PointArrayStatus" 
+                           command="SetPointArrayStatus" 
+                           number_of_elements="2" repeat_command="1"
+                           number_of_elements_per_command="2" 
+                           element_types="2 0" 
+                           information_property="PointArrayInfo"
+                           label="Point Arrays">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -3553,9 +3558,14 @@
         <ArraySelectionInformationHelper attribute_name="Part"/>
      </StringVectorProperty>
 
-     <StringVectorProperty name="PartArrayStatus" command="SetPartArrayStatus" number_of_elements="2" repeat_command="1"
-        number_of_elements_per_command="2" element_types="2 0" information_property="PartArrayInfo"
-        label="Part Arrays">
+     <StringVectorProperty name="PartArrayStatus" 
+                           command="SetPartArrayStatus" 
+                           number_of_elements="2" 
+                           repeat_command="1"
+                           number_of_elements_per_command="2" 
+                           element_types="2 0" 
+                           information_property="PartArrayInfo"
+                           label="Part Arrays">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PartArrayInfo" function="ArrayList"/>
@@ -3566,22 +3576,30 @@
        </Documentation>
      </StringVectorProperty>
 
-     <IntVectorProperty name="DeformedMesh" command="SetDeformedMesh" number_of_elements="1" default_values="1" >
+     <IntVectorProperty name="DeformedMesh" 
+                        command="SetDeformedMesh" 
+                        number_of_elements="1" 
+                        default_values="1" >
        <BooleanDomain name="bool"/>
        <Documentation>
          Should the mesh be deformed over time (if the Deflection node array is set to load)?
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty name="RemoveDeletedCells" command="SetRemoveDeletedCells" number_of_elements="1" default_values="1" >
+     <IntVectorProperty name="RemoveDeletedCells" 
+                        command="SetRemoveDeletedCells" 
+                        number_of_elements="1" 
+                        default_values="1" >
        <BooleanDomain name="bool"/>
        <Documentation>
          Should cells that have been deleted (failed structurally, for example) be removed from the mesh?
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty name="SplitByMaterialId" command="SetSplitByMaterialId"
-                        number_of_elements="1" default_values="0"
+     <IntVectorProperty name="SplitByMaterialId" 
+                        command="SetSplitByMaterialId"
+                        number_of_elements="1" 
+                        default_values="0"
                         label="Split by Material Id">
        <BooleanDomain name="bool"/>
        <Documentation>
