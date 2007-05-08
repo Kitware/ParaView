@@ -256,7 +256,7 @@ void pqLookmarkModel::load(
   // added to the beginning of the loader's preferred view list to ensure 
   // it is used before any others
   vtkSMPQStateLoader* smpqLoader = vtkSMPQStateLoader::SafeDownCast(loader);
-  pqRenderViewModule* renModule;
+  pqRenderViewModule* renModule = NULL;
   if (smpqLoader && view)
     {
     renModule = qobject_cast<pqRenderViewModule*>(view);
@@ -295,7 +295,7 @@ void pqLookmarkModel::load(
 
   // reset the camera after loading the lookmark if we did not restore
   // the lookmark's camera state
-  if(resetCamera)
+  if(resetCamera && renModule)
     {
     renModule->resetCamera();
     renModule->render();
