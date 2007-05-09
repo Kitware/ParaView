@@ -155,7 +155,7 @@ void pqProgressBar::enableProgress(bool e)
     {
     this->Helper->enableProgress(true);
     }
-  if(!this->CleanUp)
+  else if(!this->CleanUp)
     {
     this->Helper->setProgress(100);
     this->CleanUp = true;
