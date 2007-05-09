@@ -15,6 +15,7 @@
 #include "vtkSMRepresentationStrategy.h"
 
 #include "vtkCommand.h"
+#include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVRenderModuleHelper.h"
@@ -22,8 +23,7 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.3");
-vtkCxxSetObjectMacro(vtkSMRepresentationStrategy, ViewHelperProxy, vtkSMProxy);
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 {
@@ -38,6 +38,12 @@ vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
   this->DataValid = false;
   this->Information = vtkPVDataInformation::New();
   this->InformationValid = false;
+
+  vtkMemberFunctionCommand<vtkSMRepresentationStrategy>* observer =
+    vtkMemberFunctionCommand<vtkSMRepresentationStrategy>::New();
+  observer->SetCallback(*this, 
+    &vtkSMRepresentationStrategy::LODResolutionChanged);
+  this->LODResolutionObserver = observer;
 }
 
 //----------------------------------------------------------------------------
@@ -48,19 +54,59 @@ vtkSMRepresentationStrategy::~vtkSMRepresentationStrategy()
 
   this->LODInformation->Delete();
   this->Information->Delete();
+  this->LODResolutionObserver->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationStrategy::SetViewHelperProxy(vtkSMProxy* viewHelper)
+{
+  vtkSMProperty* prop = 0;
+  if (this->ViewHelperProxy && 
+    (prop = this->ViewHelperProxy->GetProperty("LODResolution")))
+    {
+    prop->RemoveObserver(this->LODResolutionObserver);
+    }
+
+  vtkSetObjectBodyMacro(ViewHelperProxy, vtkSMProxy, viewHelper);
+
+  if (this->ViewHelperProxy &&
+    (prop = this->ViewHelperProxy->GetProperty("LODResolution")))
+    {
+    prop->AddObserver(vtkCommand::ModifiedEvent, 
+      this->LODResolutionObserver);
+    this->LODResolutionChanged();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationStrategy::LODResolutionChanged()
+{
+  vtkSMProperty* myProp = this->GetProperty("LODResolution");
+  vtkSMProperty* viewProp = this->ViewHelperProxy->GetProperty("LODResolution");
+  if (myProp && viewProp)
+    {
+    myProp->Copy(viewProp);
+    this->UpdateProperty("LODResolution");
+
+    // Invalidate LOD data.
+    this->LODDataValid = false;
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMRepresentationStrategy::MarkModified(vtkSMProxy* modifiedProxy)
 {
-  if (modifiedProxy != this)
-    {
-    // Mark all data invalid.
-    // Note that we are not marking the information invalid. The information
-    // won't get invalidated until the pipeline is updated.
-    this->DataValid = false;
-    this->LODDataValid = false;
-    }
+  // If properties on the strategy itself are modified, then we are assuming
+  // that the pipeline inside the strategy will get affected.
+  // This is generally the case since a strategy does not include any
+  // mappers/actors but pipelines upto a mapper. Hence this assumption is
+  // generally valid.
+
+  // Mark all data invalid.
+  // Note that we are not marking the information invalid. The information
+  // won't get invalidated until the pipeline is updated.
+  this->DataValid = false;
+  this->LODDataValid = false;
   
   this->Superclass::MarkModified(modifiedProxy);
 }

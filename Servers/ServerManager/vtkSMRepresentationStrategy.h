@@ -174,6 +174,10 @@ protected:
 private:
   vtkSMRepresentationStrategy(const vtkSMRepresentationStrategy&); // Not implemented
   void operator=(const vtkSMRepresentationStrategy&); // Not implemented
+
+  void LODResolutionChanged();
+
+  vtkCommand* LODResolutionObserver;
 //ETX
 };
 

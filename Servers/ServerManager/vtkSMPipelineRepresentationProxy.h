@@ -28,9 +28,10 @@
 
 #include "vtkSMRepresentationProxy.h"
 
-class vtkSMSourceProxy;
-class vtkSMRepresentationStrategy;
 class vtkSMPipelineRepresentationProxyObserver;
+class vtkSMPropertyLink;
+class vtkSMRepresentationStrategy;
+class vtkSMSourceProxy;
 
 class VTK_EXPORT vtkSMPipelineRepresentationProxy : 
   public vtkSMRepresentationProxy
@@ -88,6 +89,20 @@ public:
   // Get the representation strategy used by this representation, if any.
   vtkGetObjectMacro(Strategy, vtkSMRepresentationStrategy);
 
+  // Description:
+  // When set to true, the UpdateTime for this representation is linked to the
+  // ViewTime for the view to which this representation is added (default
+  // behaviour). Otherwise the update time is independent of the ViewTime.
+  void SetUseViewTimeForUpdate(bool);
+  vtkGetMacro(UseViewTimeForUpdate, bool);
+
+  // Description:
+  // Overridden to make the Strategy modified as well.
+  // The strategy is not marked modified if the modifiedProxy == this, 
+  // thus if the changes to representation itself invalidates the data pipelines
+  // it must explicity mark the strategy invalid.
+  virtual void MarkModified(vtkSMProxy* modifiedProxy);
+
 //BTX
 protected:
   vtkSMPipelineRepresentationProxy();
@@ -99,6 +114,13 @@ protected:
   // Overridden to abort CreateVTKObjects() only if the input has
   // been initialized correctly.
   virtual bool BeginCreateVTKObjects(int numObjects);
+
+  // Description:
+  // This method is called after CreateVTKObjects(). 
+  // This gives subclasses an opportunity to do some post-creation
+  // initialization.
+  // Overridden to setup view time link.
+  virtual bool EndCreateVTKObjects(int numObjects);
 
   // Description:
   // Called when a representation is added to a view. 
@@ -131,6 +153,9 @@ protected:
 
   double UpdateTime;
   bool UpdateTimeInitialized;
+  bool UseViewTimeForUpdate;
+
+  vtkSMPropertyLink* ViewTimeLink;
 private:
   vtkSMPipelineRepresentationProxy(const vtkSMPipelineRepresentationProxy&); // Not implemented
   void operator=(const vtkSMPipelineRepresentationProxy&); // Not implemented

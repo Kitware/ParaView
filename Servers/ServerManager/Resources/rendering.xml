@@ -4035,11 +4035,20 @@
             default_values="0">
             <BooleanDomain name="bool" />
           </IntVectorProperty>
+
+          <IntVectorProperty
+            name="LODResolution"
+            number_of_elements="3"
+            default_values="50 50 50" >
+            <IntRangeDomain name="range" min="10" />
+          </IntVectorProperty>
+          
         </Proxy>
         <!-- We don't expose LODFlag, since using LOD is a private 
         decision that the render view makes -->
         <ExposedProperties>
           <Property name="CachingEnabled" />
+          <Property name="LODResolution" />
         </ExposedProperties>
       </SubProxy>
 
@@ -4142,6 +4151,7 @@
           <Property name="LineWidth" />
           <Property name="Opacity" />
           <Property name="PointSize" />
+          <Property name="Representation" />
           <Property name="Shading" />
           <Property name="SpecularColor" />
           <Property name="SpecularPower" />

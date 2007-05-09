@@ -14,12 +14,14 @@
 =========================================================================*/
 #include "vtkSMPipelineRepresentationProxy.h"
 
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMPropertyLink.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkCommand.h"
+#include "vtkSMViewProxy.h"
 
 class vtkSMPipelineRepresentationProxyObserver : public vtkCommand
 {
@@ -50,7 +52,7 @@ protected:
 };
 
 
-vtkCxxRevisionMacro(vtkSMPipelineRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMPipelineRepresentationProxy, "1.4");
 vtkCxxSetObjectMacro(vtkSMPipelineRepresentationProxy, InputProxy, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMPipelineRepresentationProxy::vtkSMPipelineRepresentationProxy()
@@ -61,18 +63,26 @@ vtkSMPipelineRepresentationProxy::vtkSMPipelineRepresentationProxy()
   this->UpdateTime = 0.0;
   this->UpdateTimeInitialized = false;
 
+  this->UseViewTimeForUpdate = false;
+
   this->Observer = vtkSMPipelineRepresentationProxyObserver::New();
   this->Observer->SetTarget(this);
+
+  this->ViewTimeLink = vtkSMPropertyLink::New();
 }
 
 //----------------------------------------------------------------------------
 vtkSMPipelineRepresentationProxy::~vtkSMPipelineRepresentationProxy()
 {
+  this->ViewTimeLink->RemoveAllLinks();
+  this->ViewTimeLink->Delete();
+
   this->SetInputProxy(0);
   this->SetStrategy(0);
 
   this->Observer->SetTarget(0);
   this->Observer->Delete();
+
 }
 
 //----------------------------------------------------------------------------
@@ -90,7 +100,17 @@ bool vtkSMPipelineRepresentationProxy::AddToView(vtkSMViewProxy* view)
 
   // If representation needs compositing strategy from the view,
   // give it a chance to set it up.
-  return this->InitializeStrategy(view);
+  if (!this->InitializeStrategy(view))
+    {
+    return false;
+    }
+
+  // Link with view time.
+  if (vtkSMProperty* prop = view->GetProperty("ViewTime"))
+    {
+    this->ViewTimeLink->AddLinkedProperty(prop, vtkSMLink::INPUT);
+    }
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -103,6 +123,17 @@ bool vtkSMPipelineRepresentationProxy::BeginCreateVTKObjects(int numObjects)
 
   // We can create the display proxy only if the input has been set.
   return (this->InputProxy != 0);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPipelineRepresentationProxy::EndCreateVTKObjects(int numObjects)
+{
+  if (vtkSMProperty* prop = this->GetProperty("UpdateTime"))
+    {
+    this->ViewTimeLink->AddLinkedProperty(prop, vtkSMLink::OUTPUT);
+    }
+
+  return this->Superclass::EndCreateVTKObjects(numObjects);
 }
 
 //----------------------------------------------------------------------------
@@ -127,6 +158,7 @@ void vtkSMPipelineRepresentationProxy::AddInput(vtkSMSourceProxy* input,
   this->SetInputProxy(input);
   this->CreateVTKObjects(numParts);
 }
+
 //----------------------------------------------------------------------------
 void vtkSMPipelineRepresentationProxy::Update(vtkSMViewProxy* view)
 {
@@ -169,6 +201,18 @@ vtkPVDataInformation* vtkSMPipelineRepresentationProxy::GetFullResDataInformatio
     }
 
   return this->Superclass::GetFullResDataInformation();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPipelineRepresentationProxy::SetUseViewTimeForUpdate(bool val)
+{
+  if (val == this->UseViewTimeForUpdate)
+    {
+    return;
+    }
+
+  this->UseViewTimeForUpdate = val;
+  this->ViewTimeLink->SetEnabled(val);
 }
 
 //----------------------------------------------------------------------------
@@ -234,6 +278,19 @@ void vtkSMPipelineRepresentationProxy::SetStrategy(
     this->Strategy->AddObserver(vtkCommand::StartEvent, this->Observer);
     this->Strategy->AddObserver(vtkCommand::EndEvent, this->Observer);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPipelineRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)
+{
+  // If some changes to the representation proxy invalidate the data
+  // then we must expilictly call Strategy->MarkModified();
+  if (modifiedProxy != this && this->Strategy)
+    {
+    this->Strategy->MarkModified(modifiedProxy); 
+    }
+
+  this->Superclass::MarkModified(modifiedProxy);
 }
 
 //----------------------------------------------------------------------------
