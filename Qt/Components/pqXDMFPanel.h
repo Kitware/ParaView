@@ -36,8 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqNamedObjectPanel.h"
 #include "pqComponentsExport.h"
 
-class QListWidgetItem;
-class pqXDMFPanelArrayRecord;
+class QTreeWidgetItem;
 
 // a panel for XDMF readers
 // allows user to choose a domain name and select from the available groups
@@ -55,43 +54,40 @@ public:
 signals:
 
 public slots:
+  
+  /// accept changes made by this panel
+  virtual void accept();
+  /// reset changes made by this panel
+  virtual void reset();
 
 protected:
   /// populate widgets with properties from the server manager
   virtual void linkServerManagerProperties();
 
   // fill the domain selection part of the GUI
-  void PopulateDomainWidget();
+  void populateDomainWidget();
 
   // fill the grid selection part of the GUI
-  void PopulateGridWidget();
+  void populateGridWidget();
 
   // ask the server what the selection state of the arrays is
-  void ResetArrays();
+  void resetArrays();
 
   // fill the array selection part of the GUI
-  void PopulateArrayWidget();
+  void populateArrayWidget();
 
   // fill the parameters part of the GUI
-  void PopulateParameterWidget();
-
-  // overridden to make domain and grid choices const after 1st selection
-  virtual void accept();
+  void populateParameterWidget();
 
   class pqUI;
   pqUI* UI;
 
 protected slots:
-  void SetSelectedDomain(QString newDomain);
-  void SetSelectedGrids();
-  void RecordLastSelectedGrid(QListWidgetItem *);
-  void SetCellValue(int r);
+  void setSelectedDomain(QString newDomain);
+  void gridItemChanged(QTreeWidgetItem*, int);
 
-private:
-  QList<pqXDMFPanelArrayRecord> ArrayList;
-  QListWidgetItem *LastGridDeselected;
-  bool NeedsResetGrid;
-  bool FirstAcceptHappened;
+  void setGridProperty(vtkSMProxy* pxy);
+
 };
 
 #endif
