@@ -2044,7 +2044,7 @@ void pqMainWindowCore::onFileSaveAnimation()
 #endif
   filters +="JPEG images (*.jpg);;TIFF images (*.tif);;PNG images (*.png);;";
   filters +="All files(*)";
-  pqFileDialog* const file_dialog = new pqFileDialog(this->getActiveServer(),
+  pqFileDialog* const file_dialog = new pqFileDialog(NULL,
     this->Implementation->Parent, tr("Save Animation:"), QString(), filters);
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setObjectName("FileSaveAnimationDialog");
@@ -2093,7 +2093,7 @@ void pqMainWindowCore::onSaveGeometry()
 
   QString filters = "ParaView Data files (*.pvd);;All files (*)";
   pqFileDialog* const file_dialog = new pqFileDialog(
-    NULL,
+    this->getActiveServer(),
     this->Implementation->Parent, 
     tr("Save Animation Geometry"), 
     QString(), 
