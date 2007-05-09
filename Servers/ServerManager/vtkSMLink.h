@@ -52,6 +52,12 @@ public:
   vtkBooleanMacro(PropagateUpdateVTKObjects, int);
 
   // Description:
+  // Get/Set if the link is enabled.
+  // (true by default).
+  vtkSetMacro(Enabled, bool);
+  vtkGetMacro(Enabled, bool);
+
+  // Description:
   // Remove all links.
   virtual void RemoveAllLinks() = 0;
 protected:
@@ -91,6 +97,8 @@ protected:
   // is updated i.e. UpdateVTKObjects() is called, this class calls
   // UpdateVTKObjects on Proxy with P2.
   int PropagateUpdateVTKObjects;
+
+  bool Enabled;
 private:
   vtkSMLink(const vtkSMLink&); // Not implemented.
   void operator=(const vtkSMLink&); // Not implemented.
