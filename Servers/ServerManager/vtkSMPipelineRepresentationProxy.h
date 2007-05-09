@@ -17,6 +17,11 @@
 // .SECTION Description
 // vtkSMPipelineRepresentationProxy is a superclass for representations that
 // consume data i.e. require some input.
+// .SECTION Caveats
+// \li Generally speaking, this proxy requires that the input is set before the
+// representation is added to any view. This requirement stems from the fact
+// that to deterine the right strategy to use for a representation, it may be
+// necessary to know the data type of the input data.
 
 #ifndef __vtkSMPipelineRepresentationProxy_h
 #define __vtkSMPipelineRepresentationProxy_h
@@ -24,6 +29,7 @@
 #include "vtkSMRepresentationProxy.h"
 
 class vtkSMSourceProxy;
+class vtkSMRepresentationStrategy;
 
 class VTK_EXPORT vtkSMPipelineRepresentationProxy : 
   public vtkSMRepresentationProxy
@@ -45,8 +51,27 @@ public:
   // Representations that do not have significatant data representations such as
   // 3D widgets, text annotations may return NULL. Default implementation
   // returns NULL.
-  virtual vtkPVDataInformation* GetDataInformation()
-    { return 0; }
+  virtual vtkPVDataInformation* GetDisplayedDataInformation();
+
+  // Description:
+  // Called to update the Representation. 
+  // Overridden to forward the update request to the strategy if any. 
+  // If subclasses don't use any strategy, they may want to override this
+  // method.
+  virtual void Update(vtkSMViewProxy* view);
+  virtual void Update() { this->Superclass::Update(); };
+
+  // Description:
+  // Returns if the representation's input has changed since most recent
+  // Update(). Overridden to forward the request to the strategy, if any. If
+  // subclasses don't use any strategy, they may want to override this method.
+  virtual bool UpdateRequired();
+  
+  // Description:
+  // Set the time used during update requests.
+  // Default implementation passes the time to the strategy, if any. If
+  // subclasses don't use any stratgy, they may want to override this method.
+  virtual void SetUpdateTime(double time);
 
 //BTX
 protected:
@@ -76,18 +101,29 @@ protected:
   virtual bool InitializeStrategy(vtkSMViewProxy* vtkNotUsed(view))
     { return true; }
 
+  // Description:
+  // Set the representation strategy. Simply initializes the Strategy ivar.
+  void SetStrategy(vtkSMRepresentationStrategy*);
+  vtkGetObjectMacro(Strategy, vtkSMRepresentationStrategy);
 
   // Description:
-  // Set the representation strategy.
-  void SetStrategy(vtkSMRepresentationStrategy*);
+  // Provide access to Input for subclasses.
+  vtkGetObjectMacro(InputProxy, vtkSMSourceProxy);
 
-  vtkSMSourceProxy* InputProxy;
-  vtkSMRepresentationStrategy* Strategy;
+  // Description:
+  // Subclasses can use this method to traverse up the input connection
+  // from this representation and mark them modified.
+  void MarkUpstreamModified();
+
+  double UpdateTime;
+  bool UpdateTimeInitialized;
 private:
   vtkSMPipelineRepresentationProxy(const vtkSMPipelineRepresentationProxy&); // Not implemented
   void operator=(const vtkSMPipelineRepresentationProxy&); // Not implemented
 
   void SetInputProxy(vtkSMSourceProxy*);
+  vtkSMSourceProxy* InputProxy;
+  vtkSMRepresentationStrategy* Strategy;
 //ETX
 };
 

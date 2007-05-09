@@ -20,7 +20,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationProxy.h"
+#include "vtkSMRepresentationStrategy.h"
 #include "vtkTimerLog.h"
 
 //----------------------------------------------------------------------------
@@ -46,13 +48,17 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMViewProxy::vtkSMViewProxy()
 {
   this->Representations = vtkCollection::New();
   this->Observer = vtkSMViewProxy::Command::New();
   this->Observer->SetTarget(this);
+  this->ViewHelper = 0;
+
+  this->GUISize[0] = this->GUISize[1] = 300;
+  this->WindowPosition[0] = this->WindowPosition[1] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -63,6 +69,28 @@ vtkSMViewProxy::~vtkSMViewProxy()
 
   this->RemoveAllRepresentations();
   this->Representations->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewProxy::CreateVTKObjects(int numObjects)
+{
+  if (this->ObjectsCreated)
+    {
+    return;
+    }
+
+  if (!this->ViewHelper)
+    {
+    this->ViewHelper = this->GetSubProxy("ViewHelper");
+    }
+
+  if (this->ViewHelper)
+    {
+    this->ViewHelper->SetServers(
+      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+    }
+
+  this->Superclass::CreateVTKObjects(numObjects);
 }
 
 //----------------------------------------------------------------------------
@@ -91,6 +119,12 @@ void vtkSMViewProxy::AddRepresentation(vtkSMRepresentationProxy* repr)
 //----------------------------------------------------------------------------
 void vtkSMViewProxy::AddRepresentationInternal(vtkSMRepresentationProxy* repr)
 {
+  if (this->ViewHelper && repr->GetProperty("ViewHelper"))
+    {
+    // Provide th representation with the helper if it needs it.
+    this->Connect(this->ViewHelper, repr, "ViewHelper");
+    }
+
   this->Representations->AddItem(repr);
   // repr->AddObserver(vtkCommand::SelectionChanged, this->Observer);
 }
@@ -108,6 +142,14 @@ void vtkSMViewProxy::RemoveRepresentation(vtkSMRepresentationProxy* repr)
 //----------------------------------------------------------------------------
 void vtkSMViewProxy::RemoveRepresentationInternal(vtkSMRepresentationProxy* repr)
 {
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    repr->GetProperty("ViewHelper"));
+  if (pp)
+    {
+    pp->RemoveAllProxies();
+    repr->UpdateProperty("ViewHelper");
+    }
+
   this->Representations->RemoveItem(repr);
   // repr->RemoveObserver(this->Observer);
 }
@@ -232,10 +274,47 @@ void vtkSMViewProxy::ProcessEvents(vtkObject* caller, unsigned long eventId,
   (void)callData;
 }
 
+//-----------------------------------------------------------------------------
+void vtkSMViewProxy::Connect(vtkSMProxy* producer, vtkSMProxy* consumer,
+    const char* propertyname/*="Input"*/)
+{
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    consumer->GetProperty(propertyname));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to locate property " << propertyname
+      << " on " << consumer->GetXMLName());
+    return;
+    }
+
+  pp->AddProxy(producer);
+  consumer->UpdateProperty(propertyname);
+}
+
+//----------------------------------------------------------------------------
+vtkSMRepresentationStrategy* vtkSMViewProxy::NewStrategy(int dataType, int type)
+{
+  vtkSMRepresentationStrategy* strategy = 
+    this->NewStrategyInternal(dataType, type);
+  if (strategy && this->ViewHelper)
+    {
+    // Deliberately not going the proxy property route here since otherwise the
+    // strategy becomes a consumer of the ViewHelper and whenever the ViewHelper
+    // properties are modified, the startegy will mark it's data invalid etc
+    // etc.
+    strategy->SetViewHelperProxy(this->ViewHelper);
+    }
+  return strategy;
+}
+
 //----------------------------------------------------------------------------
 void vtkSMViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "GUISize: " 
+    << this->GUISize[0] << ", " << this->GUISize[1] << endl;
+  os << indent << "WindowPosition: " 
+    << this->WindowPosition[0] << ", " << this->WindowPosition[1] << endl;
 }
 
 

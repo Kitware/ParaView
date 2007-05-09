@@ -22,6 +22,7 @@
 #include "vtkDataObjectAlgorithm.h"
 
 class vtkCacheSizeKeeper;
+class vtkPVUpdateSuppressorCacheMap;
 
 class VTK_EXPORT vtkPVUpdateSuppressor : public vtkDataObjectAlgorithm
 {
@@ -38,7 +39,13 @@ public:
   // Cache update will update and save cache or just use previous cache.
   // "idx" is the time index, "total" is the number of time steps.
   void RemoveAllCaches();
+
+  // FIXME: deprecated -- to remove.
   void CacheUpdate(int idx, int total);
+
+  // Description:
+  // Force update with caching.
+  void CacheUpdate();
 
   // Description:
   // Force update on the input.
@@ -110,6 +117,7 @@ protected:
   // This can be removed when streaming is removed.
   int PreviousUpdateWasBlockedByStreaming;  
 
+  vtkPVUpdateSuppressorCacheMap* Cache;
 private:
   vtkPVUpdateSuppressor(const vtkPVUpdateSuppressor&);  // Not implemented.
   void operator=(const vtkPVUpdateSuppressor&);  // Not implemented.

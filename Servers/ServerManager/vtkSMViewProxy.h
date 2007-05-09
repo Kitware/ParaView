@@ -87,8 +87,24 @@ public:
   // strategy encapsulates the pipelines for managing
   // level-of-detail/parallelism. Views that do not support parallelism or LOD
   // may not provide any strategy at all.
-  virtual vtkSMRepresentationStrategy* NewStrategy(int dataType, int type)
-    { return 0; }
+  // Subclasses should override NewStrategyInternal.
+  vtkSMRepresentationStrategy* NewStrategy(int dataType, int type);
+
+  // Description:
+  // Multi-view methods:
+  // This is useful when using multiple views. Set the dimensions
+  // of the GUI with all the multiple views take together.
+  vtkSetVector2Macro(GUISize, int);
+  vtkGetVector2Macro(GUISize, int);
+
+  // Description:
+  // Multi-view methods:
+  // This is useful when using multiple views. 
+  // Sets the position of the view associated with this module inside
+  // the server render window. (0,0) corresponds to upper left corner.
+  vtkSetVector2Macro(WindowPosition, int);
+  vtkGetVector2Macro(WindowPosition, int);
+
 
 //BTX
 protected:
@@ -138,8 +154,39 @@ protected:
   // ProcessEvents() to handle these events.
   vtkCommand* GetObserver();
 
+  // Description:
+  // Initializes ViewHelper, if any.
+  virtual void CreateVTKObjects(int numObjects);
+
+  // Description:
+  // Implementation to create a representation requested strategy.
+  virtual vtkSMRepresentationStrategy* NewStrategyInternal(
+    int vtkNotUsed(dataType), int vtkNotUsed(type))
+    { return 0; }
+
+  // Description:
+  // Equivaluent to 
+  // vtkSMProxyProperty::SafeDownCast(consumer)->GetProperty(
+  //    propertyname)->AddProxy(producer).
+  void Connect(vtkSMProxy* producer, vtkSMProxy* consumer,
+    const char* propertyname="Input");
+
   // Collection of representation objects added to this view.
   vtkCollection* Representations;
+
+  int GUISize[2];
+  int WindowPosition[2];
+
+  // Description:
+  // View helper is used to pass certain view specific information to the
+  // representations added to the view. This may include things like whether LOD
+  // is current being used for rendering, whether caching is enabled etc etc.
+  // By default no ViewHelper is used, however subclasses can define a
+  // subproxy with name "ViewHelper" and it will be used as the view helper for
+  // this view. It will be passed to the strategies created by this view as
+  // well as to any representations added to this view (provided they have
+  // a proxy property name "ViewHelper").
+  vtkSMProxy* ViewHelper;
 
 private:
   vtkSMViewProxy(const vtkSMViewProxy&); // Not implemented

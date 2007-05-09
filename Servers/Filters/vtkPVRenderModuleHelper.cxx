@@ -17,13 +17,14 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVRenderModuleHelper);
-vtkCxxRevisionMacro(vtkPVRenderModuleHelper, "1.1");
+vtkCxxRevisionMacro(vtkPVRenderModuleHelper, "1.2");
 //-----------------------------------------------------------------------------
 vtkPVRenderModuleHelper::vtkPVRenderModuleHelper()
 {
   this->LODFlag = 0;
   this->UseTriangleStrips = 0;
   this->UseImmediateMode = 0;
+  this->CachingEnabled = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -38,4 +39,5 @@ void vtkPVRenderModuleHelper::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LODFlag: " << this->LODFlag << endl;
   os << indent << "UseTriangleStrips: " << this->UseTriangleStrips << endl;
   os << indent << "UseImmediateMode: " << this->UseImmediateMode << endl;
+  os << indent << "CachingEnabled: " << this->CachingEnabled << endl;
 }

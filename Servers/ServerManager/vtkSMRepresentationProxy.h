@@ -57,7 +57,7 @@ public:
   // Representations that do not have significatant data representations such as
   // 3D widgets, text annotations may return NULL. Default implementation
   // returns NULL.
-  virtual vtkPVDataInformation* GetDataInformation()
+  virtual vtkPVDataInformation* GetDisplayedDataInformation()
     { return 0; }
 
 //BTX
@@ -80,9 +80,10 @@ protected:
 
   // Description:
   // Called to remove a representation from a view.
-  // Returns true on success/
+  // Returns true on success.
   // Currently a representation can be added to only one view.
-  virtual bool RemoveFromView(vtkSMViewProxy* view)=0;
+  virtual bool RemoveFromView(vtkSMViewProxy* vtkNotUsed(view)) 
+    { return true; }
 
   // Description:
   // This method is called at the beginning of CreateVTKObjects().

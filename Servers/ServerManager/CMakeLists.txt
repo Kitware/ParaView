@@ -167,6 +167,14 @@ SET(Kit_SRCS
   vtkSMXMLPVAnimationWriterProxy.cxx
   vtkSMXYPlotActorProxy.cxx
   vtkSMXYPlotDisplayProxy.cxx
+
+  vtkSMPipelineRepresentationProxy.cxx
+  vtkSMRenderViewProxy.cxx
+  vtkSMRepresentationProxy.cxx
+  vtkSMRepresentationStrategy.cxx
+  vtkSMSimpleStrategy.cxx
+  vtkSMSurfaceRepresentationProxy.cxx
+  vtkSMViewProxy.cxx
   )
 
 SET( ServerManagerCS_SRCS
@@ -203,6 +211,10 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMStateLoaderBase.cxx
   vtkSMUndoElement.cxx
   vtkSMVectorProperty.cxx
+
+  vtkSMRepresentationProxy.cxx
+  vtkSMPipelineRepresentationProxy.cxx
+  vtkSMRepresentationStrategy.cxx
   ABSTRACT
   )
 

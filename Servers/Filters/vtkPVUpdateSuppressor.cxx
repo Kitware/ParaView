@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkPVUpdateSuppressor.h"
 
-#include "vtkAlgorithm.h"
 #include "vtkAlgorithmOutput.h"
 #include "vtkCacheSizeKeeper.h"
 #include "vtkCollection.h"
@@ -28,10 +27,29 @@
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 #include "vtkProcessModule.h"
+#include "vtkSmartPointer.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.48");
+#include <vtkstd/map>
+
+class vtkPVUpdateSuppressorCacheMap : 
+  public vtkstd::map<double, vtkSmartPointer<vtkDataObject> >
+{
+public:
+  unsigned long GetActualMemorySize() 
+    {
+    unsigned long actual_size = 0;
+    vtkPVUpdateSuppressorCacheMap::iterator iter;
+    for (iter = this->begin(); iter != this->end(); ++iter)
+      {
+      actual_size += iter->second.GetPointer()->GetActualMemorySize();
+      }
+    return actual_size;
+    }
+};
+
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.49");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 vtkCxxSetObjectMacro(vtkPVUpdateSuppressor, CacheSizeKeeper, vtkCacheSizeKeeper);
 //----------------------------------------------------------------------------
@@ -45,6 +63,8 @@ vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
 
   this->CachedGeometry = NULL;
   this->CachedGeometryLength = 0;
+
+  this->Cache = new vtkPVUpdateSuppressorCacheMap();
 
   this->Enabled = 1;
 
@@ -66,6 +86,9 @@ vtkPVUpdateSuppressor::~vtkPVUpdateSuppressor()
 
   // Unset cache keeper only after having cleared the cache.
   this->SetCacheSizeKeeper(0);
+
+  delete this->Cache;
+  this->Cache = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -103,7 +126,7 @@ void vtkPVUpdateSuppressor::ForceUpdate()
     {
     return;
     }
-
+  
   // Make sure that output type matches input type
   this->UpdateInformation();
 
@@ -191,6 +214,56 @@ void vtkPVUpdateSuppressor::RemoveAllCaches()
     {
     this->CacheSizeKeeper->FreeCacheSize(freed_size);
     }
+
+
+  // Clean new style cache.
+  freed_size = this->Cache->GetActualMemorySize();
+  this->Cache->clear();
+  if (freed_size > 0 && this->CacheSizeKeeper)
+    {
+    this->CacheSizeKeeper->FreeCacheSize(freed_size);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVUpdateSuppressor::CacheUpdate()
+{
+  if (this->UpdateTimeInitialized)
+    {
+    // No caching without update time.
+    this->ForceUpdate();
+    return;
+    }
+
+  vtkPVUpdateSuppressorCacheMap::iterator iter = this->Cache->find(
+    this->UpdateTime);
+  if (iter == this->Cache->end())
+    {
+    // No cache present, force update.
+
+    this->ForceUpdate();
+  
+    if (this->SaveCacheOnCacheUpdate)
+      {
+      vtkDataObject* output = this->GetOutput();
+      vtkSmartPointer<vtkDataObject> cache;
+      cache.TakeReference(output->NewInstance());
+      cache->ShallowCopy(output);
+
+      // FIXME: I am commenting this code as I don't know what it's doing.
+      // // Compositing seems to update the input properly.
+      // // But this update is needed when doing animation without compositing.
+      // cache->Update();
+      (*this->Cache)[this->UpdateTime] = cache;
+      }
+    }
+  else
+    {
+    // Using the cached data.
+    vtkDataObject* output = this->GetOutput();
+    output->ShallowCopy(iter->second.GetPointer());
+    this->Modified();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -227,6 +300,7 @@ void vtkPVUpdateSuppressor::CacheUpdate(int idx, int num)
   if (pd == NULL)
     { // we need to update and save.
     this->ForceUpdate();
+
     pd = output->NewInstance();
     pd->ShallowCopy(output);
     //  Compositing seems to update the input properly.

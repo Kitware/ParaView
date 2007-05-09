@@ -27,7 +27,6 @@
 
 #include "vtkSMProxy.h"
 
-class vtkPVRenderModuleHelper;
 class vtkSMSourceProxy;
 class vtkPVDataInformation;
 
@@ -68,8 +67,8 @@ public:
 
   // Description:
   // Helper is used to determine the current LOD decision.
-  void SetViewHelper(vtkPVRenderModuleHelper*);
-  vtkGetObjectMacro(ViewHelper, vtkPVRenderModuleHelper);
+  void SetViewHelperProxy(vtkSMProxy*);
+  vtkGetObjectMacro(ViewHelperProxy, vtkSMProxy);
 
   // Description:
   // Returns if the strategy is not up-to-date. This happens
@@ -154,7 +153,7 @@ protected:
   bool InformationValid;
   vtkPVDataInformation* Information;
 
-  vtkPVRenderModuleHelper* ViewHelper;
+  vtkSMProxy* ViewHelperProxy;
 private:
   vtkSMRepresentationStrategy(const vtkSMRepresentationStrategy&); // Not implemented
   void operator=(const vtkSMRepresentationStrategy&); // Not implemented

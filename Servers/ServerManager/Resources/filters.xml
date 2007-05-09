@@ -5539,6 +5539,57 @@ The Level Scalars filter uses colors to show levels of a hierarchical dataset.
       </DoubleVectorProperty>
     <!-- End UpdateSuppressor -->
     </UpdateSuppressorProxy>
+
+    <UpdateSuppressorProxy name="UpdateSuppressor2" class="vtkPVUpdateSuppressor"
+      executive="vtkUpdateSuppressorPipeline">
+
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <Documentation>
+            Set the input to the Update Suppressor filter.
+          </Documentation>
+      </InputProperty>
+
+      <Property name="ForceUpdate" command="ForceUpdate" />
+      <Property name="CacheUpdate" command="CacheUpdate" />
+      <Property name="RemoveAllCaches" command="RemoveAllCaches" />
+
+      <IntVectorProperty
+        name="SaveCacheOnCacheUpdate"
+        command="SetSaveCacheOnCacheUpdate"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="Enabled"
+        command="SetEnabled"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle whether the update suppressor is enabled.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="UpdateTime"
+        command="SetUpdateTime"
+        number_of_elements="1"
+        default_values="none"
+        immediate_update="1"
+        is_internal="1">
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+
+      <!-- End UpdateSuppressor2 -->
+    </UpdateSuppressorProxy>
     
     <SourceProxy name="MPIMoveData" class="vtkMPIMoveData">
       <InputProperty

@@ -1562,7 +1562,7 @@
         name="Diffuse"
         command="SetDiffuse"
         number_of_elements="1"
-        default_values="0.0"
+        default_values="1.0"
         animateable="0">
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
@@ -1761,6 +1761,14 @@
           <IntVectorProperty
             name="LODFlag"
             command="SetLODFlag"
+            number_of_elements="1"
+            default_values="0">
+            <BooleanDomain name="bool" />
+          </IntVectorProperty>
+
+          <IntVectorProperty
+            name="CachingEnabled"
+            command="SetCachingEnabled"
             number_of_elements="1"
             default_values="0">
             <BooleanDomain name="bool" />
@@ -3941,8 +3949,206 @@
       </Property>
       
     </Proxy>
-    
+    <!-- End of PropPickers --> 
   </ProxyGroup>
+
+  <ProxyGroup name="strategies">
+    <SimpleStrategy name="PolyDataStrategy" class="">
+      <Documentation>
+        Representation stragegy can be used for poly data surface rendering with
+        LOD. (Does not support client-server/parallel pipelines).
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="LODDecimator" 
+          proxygroup="filters" proxyname="QuadricClustering" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="UpdateSuppressor"
+          proxygroup="filters" proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="UpdateTime" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="UpdateSuppressorLOD"
+          proxygroup="filters" proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
+      </SubProxy>
+
+      <!-- End of PolyDataStrategy -->
+    </SimpleStrategy>
+
+    <!-- End of strategies -->
+  </ProxyGroup>
+
+  <ProxyGroup name="newviews">
+    <RenderViewProxy name="RenderView" base_proxygroup="rendermodules"
+      base_proxyname="SimpleRenderModule">
+
+      <ProxyProperty
+        name="Representations"
+        command="AddRepresentation"
+        update_self="1"
+        remove_command="RemoveRepresentation">
+      </ProxyProperty>
+
+
+      <SubProxy>
+        <Proxy name="ViewHelper" class="vtkPVRenderModuleHelper">
+          <IntVectorProperty
+            name="LODFlag"
+            command="SetLODFlag"
+            number_of_elements="1"
+            default_values="0">
+            <BooleanDomain name="bool" />
+          </IntVectorProperty>
+
+          <IntVectorProperty
+            name="CachingEnabled"
+            command="SetCachingEnabled"
+            number_of_elements="1"
+            default_values="0">
+            <BooleanDomain name="bool" />
+          </IntVectorProperty>
+        </Proxy>
+      </SubProxy>
+
+      <!-- End of RenderView -->
+    </RenderViewProxy>
+
+  </ProxyGroup>
+
+  <ProxyGroup name="representations">
+    <SurfaceRepresentationProxy name="SurfaceRepresentation">
+      
+      <InputProperty name="Input" 
+        command="NotUsed"
+        />
+
+      <DoubleVectorProperty name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        is_internal="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <SubProxy>
+        <!-- 
+          Geometry filter is used to conver non-polydata input to polydata.
+          It is also used to convert poly data to triangle strips when
+          requested.
+        -->
+        <Proxy name="GeometryFilter"
+          proxygroup="filters" proxyname="GeometryFilter" />
+        <ExposedProperties>
+          <Property name="UseStrips" />
+          <Property name="ForceStrips" />
+        </ExposedProperties>
+      </SubProxy>
+  
+      <SubProxy>
+        <!-- 
+          Mapper for high-res geometry.
+        -->
+        <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper" />
+        <ExposedProperties>
+          <Property name="LookupTable" />
+          <Property name="ScalarVisibility" />
+          <Property name="ColorMode" />
+          <Property name="MapScalars" />
+          <Property name="ImmediateModeRendering" />
+          <Property name="InterpolateScalarsBeforeMapping" />
+          <Property name="UseLookupTableScalarRange" />
+          <Property name="ScalarMode" />
+          <Property name="ColorArray" />
+          <Property name="ClippingPlanes" />
+          <Property name="NumberOfSubPieces" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!-- 
+          Mapper for low-res geometry. It shares all its properties with the
+          high-res mapper (except input ofcourse).
+        -->
+        <Proxy name="LODMapper" 
+          proxygroup="mappers" proxyname="PolyDataMapper" />
+        <ShareProperties subproxy="Mapper" >
+          <Exception name="Input" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!--
+          Prop3D that gets added to the 3D renderer 
+        -->
+        <Proxy name="Prop3D" proxygroup="props" proxyname="LODActor" />
+        <ExposedProperties>
+          <Property name="Orientation" />
+          <Property name="Origin" />
+          <Property name="Pickable" />
+          <Property name="Position" />
+          <Property name="RenderModuleHelper" />
+          <Property name="Scale" />
+          <Property name="Visibility" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!--
+          Property for the vtkProp.
+        -->
+        <Proxy name="Property" proxygroup="properties" proxyname="Property" />
+        <ExposedProperties>
+          <Property name="Ambient" />
+          <Property name="AmbientColor" />
+          <Property name="Color" />
+          <Property name="Diffuse" />
+          <Property name="DiffuseColor" />
+          <Property name="Interpolation" />
+          <Property name="LineWidth" />
+          <Property name="Opacity" />
+          <Property name="PointSize" />
+          <Property name="Shading" />
+          <Property name="SpecularColor" />
+          <Property name="SpecularPower" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!-- This is the helper that assures that the material xml is provided
+          to the servers from the client, when needed. Note that this is 
+          a client only proxy -->
+        <MaterialLoaderProxy name="MaterialLoader" >
+          <StringVectorProperty name="Material"
+            command="LoadMaterial"
+            number_of_elements="1"
+            update_self="1">
+          </StringVectorProperty>
+        </MaterialLoaderProxy>
+        <ExposedProperties>
+          <Property name="Material" />
+        </ExposedProperties>
+      </SubProxy>
+
+    <!-- End of SurfaceRepresentation -->
+    </SurfaceRepresentationProxy>
+  </ProxyGroup>
+
+
 
 </ServerManagerConfiguration>
 

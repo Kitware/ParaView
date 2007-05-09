@@ -51,6 +51,11 @@ public:
   vtkSetMacro(UseImmediateMode, int);
   vtkGetMacro(UseImmediateMode, int);
   vtkBooleanMacro(UseImmediateMode, int);
+
+  // Description:
+  // Get/Set if caching is enabled.
+  vtkSetMacro(CachingEnabled, bool);
+  vtkGetMacro(CachingEnabled, bool);
 protected:
   vtkPVRenderModuleHelper();
   ~vtkPVRenderModuleHelper();
@@ -58,6 +63,7 @@ protected:
   int LODFlag;
   int UseTriangleStrips;
   int UseImmediateMode;
+  bool CachingEnabled;
 
 private:
   vtkPVRenderModuleHelper(const vtkPVRenderModuleHelper&); // Not implemented.

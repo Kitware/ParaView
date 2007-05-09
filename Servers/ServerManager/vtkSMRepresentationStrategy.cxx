@@ -17,16 +17,17 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVRenderModuleHelper.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.1");
-vtkCxxSetObjectMacro(vtkSMRepresentationStrategy, ViewHelper, vtkPVRenderModuleHelper);
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.2");
+vtkCxxSetObjectMacro(vtkSMRepresentationStrategy, ViewHelperProxy, vtkSMProxy);
 //----------------------------------------------------------------------------
 vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 {
   this->Input = 0;
-  this->ViewHelper = 0;
+  this->ViewHelperProxy = 0;
   this->EnableLOD = false;
  
   this->LODDataValid = false;
@@ -42,7 +43,7 @@ vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 vtkSMRepresentationStrategy::~vtkSMRepresentationStrategy()
 {
   this->SetInput(0);
-  this->SetViewHelper(0);
+  this->SetViewHelperProxy(0);
 
   this->LODInformation->Delete();
   this->Information->Delete();
@@ -86,16 +87,35 @@ vtkPVDataInformation* vtkSMRepresentationStrategy::GetDisplayedDataInformation()
 }
 
 //----------------------------------------------------------------------------
+inline int vtkSMRepresentationStrategyGetInt(vtkSMProxy* proxy, 
+  const char* pname, int default_value)
+{
+  if (proxy && pname)
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      proxy->GetProperty(pname));
+    if (ivp)
+      {
+      return ivp->GetElement(0);
+      }
+    }
+  return default_value;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMRepresentationStrategy::UseLODPipeline()
 {
-  return (this->EnableLOD && 
-    this->ViewHelper && this->ViewHelper->GetLODFlag() && !this->UseCache());
+  return (this->EnableLOD && !this->UseCache() &&
+    this->ViewHelperProxy && 
+    vtkSMRepresentationStrategyGetInt(this->ViewHelperProxy,"LODFlag", 0));
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMRepresentationStrategy::UseCache()
 {
-  return (this->ViewHelper && this->ViewHelper->GetCachingEnabled());
+  return (this->ViewHelperProxy && 
+    vtkSMRepresentationStrategyGetInt(
+      this->ViewHelperProxy, "CachingEnabled", 0));
 }
 
 //----------------------------------------------------------------------------
@@ -105,10 +125,10 @@ bool vtkSMRepresentationStrategy::UpdateRequired()
   // otherwise update is required if non-LOD data is invalid.
   if (this->UseLODPipeline())
     {
-    return this->LODDataValid;
+    return !this->LODDataValid;
     }
 
-  return this->DataValid;
+  return !this->DataValid;
 }
 
 //----------------------------------------------------------------------------
@@ -150,7 +170,7 @@ void vtkSMRepresentationStrategy::SetInput(vtkSMSourceProxy* input)
 void vtkSMRepresentationStrategy::UpdatePipeline()
 {
   this->DataValid = true;
-  this->Information = false;
+  this->InformationValid = false;
 }
 
 //----------------------------------------------------------------------------
@@ -183,13 +203,12 @@ void vtkSMRepresentationStrategy::Connect(vtkSMProxy* producer,
   consumer->UpdateProperty(propertyname);
 }
 
-
 //----------------------------------------------------------------------------
 void vtkSMRepresentationStrategy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "EnableLOD: " << this->EnableLOD << endl;
-  os << indent << "ViewHelper: " << this->ViewHelper << endl;
+  os << indent << "ViewHelperProxy: " << this->ViewHelperProxy << endl;
 }
 
 
