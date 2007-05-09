@@ -277,6 +277,7 @@ IF(BUILD_TESTING)
     UndoRedo4
     UndoRedo5
     UndoRedo6
+    XdmfRead
   )
 
   SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/pvTestDriver)
