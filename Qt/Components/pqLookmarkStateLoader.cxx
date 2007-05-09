@@ -74,7 +74,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.9.2.1");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.9.2.2");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
@@ -287,19 +287,19 @@ vtkSMProxy* pqLookmarkStateLoader::NewProxyFromElement(
         vtkPVXMLElement* currentElement = 
             this->Internal->RootElement->GetNestedElement(i);
         const char* name = currentElement->GetName();
-        const char* type = currentElement->GetAttribute("group");
-        if (name && type)
+        const char* groupName = currentElement->GetAttribute("group");
+        if (name && groupName)
           {
-          if (strcmp(name, "Proxy") == 0 && strcmp(type, "displays") == 0)
+          if (strcmp(name, "Proxy") == 0 && strcmp(groupName, "displays") == 0)
             {
             for (unsigned int j=0; j<currentElement->GetNumberOfNestedElements(); j++)
               {
               vtkPVXMLElement* inputElement = currentElement->GetNestedElement(j);
-              name = inputElement->GetName();
-              type = inputElement->GetAttribute("name");
-              if (name && type)
+              const char *inputTag = inputElement->GetName();
+              const char *inputName = inputElement->GetAttribute("name");
+              if (inputTag && inputName)
                 {
-                if (strcmp(name, "Property") == 0 && strcmp(type, "Input") == 0)
+                if (strcmp(inputTag, "Property") == 0 && strcmp(inputName, "Input") == 0)
                   {
                   vtkPVXMLElement *srcElem = inputElement->FindNestedElementByName("Proxy");
                   if(QString::number(id) == QString(srcElem->GetAttribute("value")))
