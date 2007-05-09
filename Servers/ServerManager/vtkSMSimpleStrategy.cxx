@@ -20,7 +20,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.2");
+vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMSimpleStrategy::vtkSMSimpleStrategy()
 {
@@ -73,7 +73,6 @@ void vtkSMSimpleStrategy::CreateLODPipeline(vtkSMSourceProxy* input)
 //----------------------------------------------------------------------------
 void vtkSMSimpleStrategy::GatherInformation(vtkPVDataInformation* info)
 {
-  // TODO: reset info before adding more information to it.
   info->AddInformation(
     this->UpdateSuppressor->GetDataInformation());
 }
@@ -81,7 +80,6 @@ void vtkSMSimpleStrategy::GatherInformation(vtkPVDataInformation* info)
 //----------------------------------------------------------------------------
 void vtkSMSimpleStrategy::GatherLODInformation(vtkPVDataInformation* info)
 {
-  // TODO: reset info before adding more information to it.
   info->AddInformation(
     this->UpdateSuppressorLOD->GetDataInformation());
 }

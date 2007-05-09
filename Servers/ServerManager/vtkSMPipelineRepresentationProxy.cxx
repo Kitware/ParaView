@@ -19,8 +19,38 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkCommand.h"
 
-vtkCxxRevisionMacro(vtkSMPipelineRepresentationProxy, "1.2");
+class vtkSMPipelineRepresentationProxyObserver : public vtkCommand
+{
+public:
+  static vtkSMPipelineRepresentationProxyObserver* New()
+    { return new vtkSMPipelineRepresentationProxyObserver; }
+
+  void SetTarget(vtkSMPipelineRepresentationProxy* t)
+    {
+    this->Target = t;
+    }
+
+  virtual void Execute(vtkObject *vtkNotUsed(caller), unsigned long eventId,
+                       void *callData)
+    {
+    if (this->Target)
+      {
+      this->Target->InvokeEvent(eventId, callData);
+      }
+    }
+
+protected:
+  vtkSMPipelineRepresentationProxy* Target;
+  vtkSMPipelineRepresentationProxyObserver()
+    {
+    this->Target = 0;
+    }
+};
+
+
+vtkCxxRevisionMacro(vtkSMPipelineRepresentationProxy, "1.3");
 vtkCxxSetObjectMacro(vtkSMPipelineRepresentationProxy, InputProxy, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMPipelineRepresentationProxy::vtkSMPipelineRepresentationProxy()
@@ -30,6 +60,9 @@ vtkSMPipelineRepresentationProxy::vtkSMPipelineRepresentationProxy()
 
   this->UpdateTime = 0.0;
   this->UpdateTimeInitialized = false;
+
+  this->Observer = vtkSMPipelineRepresentationProxyObserver::New();
+  this->Observer->SetTarget(this);
 }
 
 //----------------------------------------------------------------------------
@@ -37,6 +70,9 @@ vtkSMPipelineRepresentationProxy::~vtkSMPipelineRepresentationProxy()
 {
   this->SetInputProxy(0);
   this->SetStrategy(0);
+
+  this->Observer->SetTarget(0);
+  this->Observer->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -125,6 +161,17 @@ vtkPVDataInformation* vtkSMPipelineRepresentationProxy::GetDisplayedDataInformat
 }
 
 //----------------------------------------------------------------------------
+vtkPVDataInformation* vtkSMPipelineRepresentationProxy::GetFullResDataInformation()
+{
+  if (this->Strategy)
+    {
+    return this->Strategy->GetFullResDataInformation();
+    }
+
+  return this->Superclass::GetFullResDataInformation();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMPipelineRepresentationProxy::SetUpdateTime(double time)
 {
   this->UpdateTimeInitialized = true;
@@ -166,6 +213,11 @@ void vtkSMPipelineRepresentationProxy::MarkUpstreamModified()
 void vtkSMPipelineRepresentationProxy::SetStrategy(
   vtkSMRepresentationStrategy* strategy)
 {
+  if (this->Strategy)
+    {
+    this->Strategy->RemoveObserver(this->Observer);
+    }
+
   vtkSetObjectBodyMacro(Strategy, vtkSMRepresentationStrategy, strategy);
 
   if (this->Strategy && this->UpdateTimeInitialized)
@@ -178,6 +230,9 @@ void vtkSMPipelineRepresentationProxy::SetStrategy(
       dvp->SetElement(0, this->UpdateTime);
       this->Strategy->UpdateVTKObjects();
       }
+
+    this->Strategy->AddObserver(vtkCommand::StartEvent, this->Observer);
+    this->Strategy->AddObserver(vtkCommand::EndEvent, this->Observer);
     }
 }
 

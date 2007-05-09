@@ -105,7 +105,16 @@ public:
   vtkSetVector2Macro(WindowPosition, int);
   vtkGetVector2Macro(WindowPosition, int);
 
+  // Description:
+  // Returns the memory size for the visible data.
+  unsigned long GetVisibleDisplayedDataSize();
 
+  // Description:
+  // Returns the full resoultion memory size for the all the visible
+  // representations irresepective of whether low resolution (LOD) data is
+  // currently shown in the view.
+  unsigned long GetVisibileFullResDataSize();
+  
 //BTX
 protected:
   vtkSMViewProxy();
@@ -171,6 +180,10 @@ protected:
   void Connect(vtkSMProxy* producer, vtkSMProxy* consumer,
     const char* propertyname="Input");
 
+  // Description:
+  // Marks all data size information as invalid.
+  void InvalidateDataSizes();
+
   // Collection of representation objects added to this view.
   vtkCollection* Representations;
 
@@ -195,6 +208,12 @@ private:
   class Command;
   friend class Command;
   Command* Observer;
+
+  unsigned long DisplayedDataSize;
+  bool DisplayedDataSizeValid;
+
+  unsigned long FullResDataSize;
+  bool FullResDataSizeValid;
 //ETX
 };
 

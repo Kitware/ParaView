@@ -30,6 +30,7 @@
 
 class vtkSMSourceProxy;
 class vtkSMRepresentationStrategy;
+class vtkSMPipelineRepresentationProxyObserver;
 
 class VTK_EXPORT vtkSMPipelineRepresentationProxy : 
   public vtkSMRepresentationProxy
@@ -49,15 +50,25 @@ public:
   // Description:
   // Get the data information for the represented data.
   // Representations that do not have significatant data representations such as
-  // 3D widgets, text annotations may return NULL. Default implementation
-  // returns NULL.
+  // 3D widgets, text annotations may return NULL.
+  // Overridden to return the strategy's data information.
   virtual vtkPVDataInformation* GetDisplayedDataInformation();
+
+  // Description:
+  // Get the data information for the full resolution data irrespective of
+  // whether current rendering decision was to use LOD. For representations that
+  // don't have separate LOD pipelines, this simply calls
+  // GetDisplayedDataInformation().
+  // Overridden to return the strategy's data information.
+  virtual vtkPVDataInformation* GetFullResDataInformation();
 
   // Description:
   // Called to update the Representation. 
   // Overridden to forward the update request to the strategy if any. 
   // If subclasses don't use any strategy, they may want to override this
   // method.
+  // Fires vtkCommand:StartEvent and vtkCommand:EndEvent and start and end of
+  // the update if it is indeed going to cause some pipeline execution.
   virtual void Update(vtkSMViewProxy* view);
   virtual void Update() { this->Superclass::Update(); };
 
@@ -72,6 +83,10 @@ public:
   // Default implementation passes the time to the strategy, if any. If
   // subclasses don't use any stratgy, they may want to override this method.
   virtual void SetUpdateTime(double time);
+
+  // Description:
+  // Get the representation strategy used by this representation, if any.
+  vtkGetObjectMacro(Strategy, vtkSMRepresentationStrategy);
 
 //BTX
 protected:
@@ -104,7 +119,6 @@ protected:
   // Description:
   // Set the representation strategy. Simply initializes the Strategy ivar.
   void SetStrategy(vtkSMRepresentationStrategy*);
-  vtkGetObjectMacro(Strategy, vtkSMRepresentationStrategy);
 
   // Description:
   // Provide access to Input for subclasses.
@@ -124,6 +138,8 @@ private:
   void SetInputProxy(vtkSMSourceProxy*);
   vtkSMSourceProxy* InputProxy;
   vtkSMRepresentationStrategy* Strategy;
+
+  vtkSMPipelineRepresentationProxyObserver* Observer;
 //ETX
 };
 

@@ -28,7 +28,6 @@ class vtkCollection;
 class vtkImageData;
 class vtkPVClientServerIdCollectionInformation;
 class vtkPVGenericRenderWindowInteractor;
-class vtkPVRenderModuleHelper;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkSelection;
@@ -49,6 +48,11 @@ public:
   // Description:
   // Callback for the immediate mode rendering check button
   void SetUseImmediateMode(int val);
+
+  // Description:
+  // Set the LOD Threshold.
+  vtkSetMacro(LODThreshold, double);
+  vtkGetMacro(LODThreshold, double);
    
   // Description:
   // Access to the rendering-related objects for the GUI.
@@ -217,7 +221,15 @@ protected:
 
   // Description:
   // Set the LOD decision.
-  void SetLODFlag(int val);
+  void SetLODFlag(bool use_lod);
+
+  // Description:
+  // Get whether the view module is currently using LOD.
+  bool GetLODFlag();
+
+  // Description:
+  // Determines if the LOD must be used for rendering
+  virtual bool GetLODDecision();
 
   // Description:
   // Called to process events.
@@ -246,7 +258,6 @@ protected:
   vtkSMProxy* InteractorProxy;
   vtkSMProxy* LightKitProxy;
   vtkSMProxy* LightProxy;
-  vtkSMProxy* HelperProxy;
 
   // Pointer to client side objects,
   // for convienience.
@@ -255,13 +266,12 @@ protected:
   vtkRenderWindow* RenderWindow;
   vtkPVGenericRenderWindowInteractor* Interactor;
   vtkCamera* ActiveCamera;
-  vtkPVRenderModuleHelper* Helper;
   
   int RenderInterruptsEnabled;
-
   int UseTriangleStrips;
   int ForceTriStripUpdate;
   int UseImmediateMode;
+  double LODThreshold;
   
   // Description:
   // Method called before/after Still Render is called.

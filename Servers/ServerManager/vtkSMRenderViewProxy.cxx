@@ -55,7 +55,7 @@
 
 #include "vtkSMClientServerRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.2");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 //-----------------------------------------------------------------------------
@@ -68,7 +68,6 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
   this->RenderWindowProxy = 0;
   this->InteractorProxy = 0;
   this->LightKitProxy = 0;
-  this->HelperProxy = 0;
   this->RenderInterruptsEnabled = 1;
 
   this->Renderer = 0;
@@ -76,7 +75,6 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
   this->RenderWindow = 0;
   this->Interactor = 0;
   this->ActiveCamera = 0;
-  this->Helper = 0;
 
   this->UseTriangleStrips = 0;
   this->ForceTriStripUpdate = 0;
@@ -87,6 +85,8 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
   this->MeasurePolygonsPerSecond = 0;
 
   this->CacheLimit = 100*1024; // 100 MBs.
+
+  this->LODThreshold = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -100,14 +100,12 @@ vtkSMRenderViewProxy::~vtkSMRenderViewProxy()
   this->RenderWindowProxy = 0;
   this->InteractorProxy = 0;
   this->LightKitProxy = 0;
-  this->HelperProxy = 0;
 
   this->Renderer = 0;
   this->Renderer2D = 0;
   this->RenderWindow = 0;
   this->Interactor = 0;
   this->ActiveCamera = 0;
-  this->Helper = 0;
   this->RenderTimer->Delete();
   this->RenderTimer = 0;
 }
@@ -148,7 +146,6 @@ void vtkSMRenderViewProxy::CreateVTKObjects(int numObjects)
   this->InteractorProxy = this->GetSubProxy("Interactor");
   this->LightKitProxy = this->GetSubProxy("LightKit");
   this->LightProxy = this->GetSubProxy("Light");
-  this->HelperProxy = this->GetSubProxy("Helper");
 
   if (!this->RendererProxy)
     {
@@ -192,13 +189,6 @@ void vtkSMRenderViewProxy::CreateVTKObjects(int numObjects)
                   "file.");
     return;
     }
-  if (!this->HelperProxy)
-    {
-    vtkErrorMacro("Helper subproxy must be defined in the configuration "
-                  "file.");
-    return;
-    }
-    
 
   // I don't directly use this->SetServers() to set the servers of the
   // subproxies, as the subclasses may have special subproxies that have
@@ -220,8 +210,6 @@ void vtkSMRenderViewProxy::CreateVTKObjects(int numObjects)
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->LightProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  this->HelperProxy->SetServers(
-    vtkProcessModule::CLIENT_AND_SERVERS);
 
   this->Superclass::CreateVTKObjects(numObjects);
 
@@ -238,8 +226,6 @@ void vtkSMRenderViewProxy::CreateVTKObjects(int numObjects)
     pvm->GetObjectFromID(this->InteractorProxy->GetID(0)));
   this->ActiveCamera = vtkCamera::SafeDownCast(
     pvm->GetObjectFromID(this->ActiveCameraProxy->GetID(0)));
-  this->Helper = vtkPVRenderModuleHelper::SafeDownCast(
-    pvm->GetObjectFromID(this->HelperProxy->GetID(0))); 
  
   if (pvm->GetOptions()->GetUseStereoRendering())
     {
@@ -377,20 +363,45 @@ void vtkSMRenderViewProxy::SetUseLight(int enable)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::SetLODFlag(int val)
+void vtkSMRenderViewProxy::SetLODFlag(bool use_lod)
 {
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->HelperProxy->GetProperty("LODFlag"));
-  if (!ivp)
+  if (this->ViewHelper)
     {
-    vtkErrorMacro("Failed to find property LODFlag on HelperProxy.");
-    return;
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->ViewHelper->GetProperty("LODFlag"));
+    if (!ivp)
+      {
+      vtkErrorMacro("Failed to find property LODFlag on ViewHelper.");
+      return;
+      }
+    ivp->SetElement(0, (use_lod? 1 : 0));
+    this->ViewHelper->UpdateProperty("LODFlag");
     }
-  if (ivp->GetElement(0) != val)
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::GetLODFlag()
+{
+  if (this->ViewHelper)
     {
-    ivp->SetElement(0, val);
-    this->HelperProxy->UpdateVTKObjects();
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->ViewHelper->GetProperty("LODFlag"));
+    if (!ivp)
+      {
+      vtkErrorMacro("Failed to find property LODFlag on ViewHelper.");
+      return false;
+      }
+
+    return (ivp->GetElement(0) > 0);
     }
+
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::GetLODDecision()
+{
+  return (this->GetVisibileFullResDataSize() >= this->LODThreshold* 1000);
 }
 
 //-----------------------------------------------------------------------------
@@ -398,8 +409,29 @@ void vtkSMRenderViewProxy::BeginInteractiveRender()
 {
   vtkRenderWindow *renWin = this->GetRenderWindow(); 
   renWin->SetDesiredUpdateRate(5.0);
-  this->GetRenderer()->ResetCameraClippingRange();
 
+  bool using_lod = this->GetLODFlag();
+
+  // Determine if we are using LOD or not.
+  if (this->ViewHelper && this->GetLODDecision())
+    {
+    this->SetLODFlag(true);
+    if (!using_lod)
+      {
+      // We changed LOD decision, implying that the LOD pipelines for all
+      // representations aren't up-to-date, ensure that they are updated.
+      this->UpdateAllRepresentations();
+      }
+    }
+  else
+    {
+    this->SetLODFlag(false);
+    // Even if using_lod was true, we don't need to UpdateAllRepresentations
+    // since calling UpdateAllRepresentations when LODFlag is true updates the
+    // full-res pipeline anyways.
+    }
+
+  this->GetRenderer()->ResetCameraClippingRange();
   this->Superclass::BeginInteractiveRender();
 }
 
@@ -426,7 +458,7 @@ void vtkSMRenderViewProxy::BeginStillRender()
     }
   renWindow->SetDesiredUpdateRate(0.002);
 
-  this->SetLODFlag(0);
+  this->SetLODFlag(false);
   this->Superclass::BeginStillRender();
 }
 
@@ -475,14 +507,6 @@ void vtkSMRenderViewProxy::AddRepresentationInternal(
     ivp->SetElement(0, this->UseImmediateMode);
     }
  
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    repr->GetProperty("RenderModuleHelper"));
-  if (pp)
-    {
-    pp->RemoveAllProxies();
-    pp->AddProxy(this->HelperProxy);
-    }
-
   this->Superclass::AddRepresentationInternal(repr);
 }
 
@@ -1181,6 +1205,7 @@ void vtkSMRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
     << this->MaximumPolygonsPerSecond << endl;
   os << indent << "LastPolygonsPerSecond: " 
     << this->LastPolygonsPerSecond << endl;
+  os << indent << "LODThreshold: " << this->LODThreshold << endl;
 }
 
 //-----------------------------------------------------------------------------

@@ -38,6 +38,11 @@ public:
   // Called to update the Representation. Default implementation does nothing.
   // Argument is the view requesting the update. Can be null in the
   // case when something other than a view is requesting the update.
+  // Typically update should cause any pipeline execution only is
+  // UpdateRequired() is true.
+  // If Update() is going to result in some execution that changes data or data
+  // information, it must fire vtkCommand::StartEvent and vtkCommand::EndEvent
+  // to mark the start and end of the update.
   virtual void Update() { this->Update(0); };
   virtual void Update(vtkSMViewProxy*) { };
 
@@ -59,6 +64,16 @@ public:
   // returns NULL.
   virtual vtkPVDataInformation* GetDisplayedDataInformation()
     { return 0; }
+
+  // Description:
+  // Get the data information for the full resolution data irrespective of
+  // whether current rendering decision was to use LOD. For representations that
+  // don't have separate LOD pipelines, this simply calls
+  // GetDisplayedDataInformation().
+  virtual vtkPVDataInformation* GetFullResDataInformation()
+    {
+    return this->GetDisplayedDataInformation();
+    }
 
 //BTX
 protected:

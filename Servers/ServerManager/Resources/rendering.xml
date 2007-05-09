@@ -3962,6 +3962,9 @@
       <SubProxy>
         <Proxy name="LODDecimator" 
           proxygroup="filters" proxyname="QuadricClustering" />
+        <ExposedProperties>
+          <Property name="NumberOfDivisions" exposed_name="LODResolution" />
+        </ExposedProperties>
       </SubProxy>
 
       <SubProxy>
@@ -4002,6 +4005,18 @@
         remove_command="RemoveRepresentation">
       </ProxyProperty>
 
+      <DoubleVectorProperty
+        name="LODThreshold"
+        command="SetLODThreshold"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <Documentation>
+          Set the memory size threshold above which LOD will be used while
+          rendering interactively.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
 
       <SubProxy>
         <Proxy name="ViewHelper" class="vtkPVRenderModuleHelper">
@@ -4021,6 +4036,11 @@
             <BooleanDomain name="bool" />
           </IntVectorProperty>
         </Proxy>
+        <!-- We don't expose LODFlag, since using LOD is a private 
+        decision that the render view makes -->
+        <ExposedProperties>
+          <Property name="CachingEnabled" />
+        </ExposedProperties>
       </SubProxy>
 
       <!-- End of RenderView -->
@@ -4101,7 +4121,7 @@
           <Property name="Origin" />
           <Property name="Pickable" />
           <Property name="Position" />
-          <Property name="RenderModuleHelper" />
+          <Property name="RenderModuleHelper" exposed_name="ViewHelper" />
           <Property name="Scale" />
           <Property name="Visibility" />
         </ExposedProperties>

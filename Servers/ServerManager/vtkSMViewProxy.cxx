@@ -19,6 +19,7 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVDataInformation.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationProxy.h"
@@ -48,7 +49,7 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMViewProxy::vtkSMViewProxy()
 {
@@ -59,6 +60,12 @@ vtkSMViewProxy::vtkSMViewProxy()
 
   this->GUISize[0] = this->GUISize[1] = 300;
   this->WindowPosition[0] = this->WindowPosition[1] = 0;
+
+  this->DisplayedDataSize = 0;
+  this->DisplayedDataSizeValid = false;
+
+  this->FullResDataSize = 0;
+  this->FullResDataSizeValid = false;
 }
 
 //----------------------------------------------------------------------------
@@ -119,6 +126,8 @@ void vtkSMViewProxy::AddRepresentation(vtkSMRepresentationProxy* repr)
 //----------------------------------------------------------------------------
 void vtkSMViewProxy::AddRepresentationInternal(vtkSMRepresentationProxy* repr)
 {
+  this->InvalidateDataSizes();
+
   if (this->ViewHelper && repr->GetProperty("ViewHelper"))
     {
     // Provide th representation with the helper if it needs it.
@@ -126,6 +135,12 @@ void vtkSMViewProxy::AddRepresentationInternal(vtkSMRepresentationProxy* repr)
     }
 
   this->Representations->AddItem(repr);
+  // If representation is modified, we invalidate the data information.
+  repr->AddObserver(vtkCommand::ModifiedEvent, this->Observer);
+
+  // If representation pipeline is updated, we invalidate the data info.
+  repr->AddObserver(vtkCommand::EndEvent, this->Observer);
+
   // repr->AddObserver(vtkCommand::SelectionChanged, this->Observer);
 }
 
@@ -142,6 +157,8 @@ void vtkSMViewProxy::RemoveRepresentation(vtkSMRepresentationProxy* repr)
 //----------------------------------------------------------------------------
 void vtkSMViewProxy::RemoveRepresentationInternal(vtkSMRepresentationProxy* repr)
 {
+  this->InvalidateDataSizes();
+
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     repr->GetProperty("ViewHelper"));
   if (pp)
@@ -151,6 +168,8 @@ void vtkSMViewProxy::RemoveRepresentationInternal(vtkSMRepresentationProxy* repr
     }
 
   this->Representations->RemoveItem(repr);
+  repr->RemoveObserver(this->Observer);
+
   // repr->RemoveObserver(this->Observer);
 }
 
@@ -272,6 +291,13 @@ void vtkSMViewProxy::ProcessEvents(vtkObject* caller, unsigned long eventId,
   (void)caller;
   (void)eventId;
   (void)callData;
+
+  if (vtkSMRepresentationProxy::SafeDownCast(caller) && 
+    ( eventId == vtkCommand::ModifiedEvent  ||
+      eventId == vtkCommand::EndEvent))
+    {
+    this->InvalidateDataSizes();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -305,6 +331,75 @@ vtkSMRepresentationStrategy* vtkSMViewProxy::NewStrategy(int dataType, int type)
     strategy->SetViewHelperProxy(this->ViewHelper);
     }
   return strategy;
+}
+
+//----------------------------------------------------------------------------
+unsigned long vtkSMViewProxy::GetVisibleDisplayedDataSize()
+{
+  if (!this->DisplayedDataSizeValid)
+    {
+    this->DisplayedDataSizeValid = true;
+    this->DisplayedDataSize = 0;
+
+    vtkSmartPointer<vtkCollectionIterator> iter;
+    iter.TakeReference(this->Representations->NewIterator());
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+      {
+      vtkSMRepresentationProxy* repr = 
+        vtkSMRepresentationProxy::SafeDownCast(iter->GetCurrentObject());
+      if (!repr->GetVisibility())
+        {
+        // Skip invisible representations.
+        continue;
+        }
+
+      vtkPVDataInformation* info = repr->GetDisplayedDataInformation();
+      if (info)
+        {
+        this->DisplayedDataSize += info->GetMemorySize();
+        }
+      }
+    }
+
+  return this->DisplayedDataSize;
+}
+
+//----------------------------------------------------------------------------
+unsigned long vtkSMViewProxy::GetVisibileFullResDataSize()
+{
+  if (!this->FullResDataSizeValid)
+    {
+    this->FullResDataSize = 0;
+    this->FullResDataSizeValid = true;
+
+    vtkSmartPointer<vtkCollectionIterator> iter;
+    iter.TakeReference(this->Representations->NewIterator());
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+      {
+      vtkSMRepresentationProxy* repr = 
+        vtkSMRepresentationProxy::SafeDownCast(iter->GetCurrentObject());
+      if (!repr->GetVisibility())
+        {
+        // Skip invisible representations.
+        continue;
+        }
+
+      vtkPVDataInformation* info = repr->GetFullResDataInformation();
+      if (info)
+        {
+        this->DisplayedDataSize += info->GetMemorySize();
+        }
+      }
+    }
+
+  return this->FullResDataSize;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewProxy::InvalidateDataSizes()
+{
+  this->FullResDataSizeValid = false;
+  this->DisplayedDataSizeValid = false;
 }
 
 //----------------------------------------------------------------------------

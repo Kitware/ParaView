@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMRepresentationStrategy.h"
 
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVRenderModuleHelper.h"
@@ -21,7 +22,7 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.2");
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.3");
 vtkCxxSetObjectMacro(vtkSMRepresentationStrategy, ViewHelperProxy, vtkSMProxy);
 //----------------------------------------------------------------------------
 vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
@@ -69,17 +70,33 @@ vtkPVDataInformation* vtkSMRepresentationStrategy::GetDisplayedDataInformation()
 {
   if (this->UseLODPipeline())
     {
-    if (!this->LODInformationValid)
-      {
-      this->LODInformationValid = true;
-      this->GatherLODInformation(this->LODInformation);
-      }
-    return this->LODInformation;
+    return this->GetLODDataInformation();
     }
 
+  return this->GetFullResDataInformation();
+}
+
+//----------------------------------------------------------------------------
+vtkPVDataInformation* vtkSMRepresentationStrategy::GetLODDataInformation()
+{
+  if (!this->LODInformationValid)
+    {
+    this->LODInformationValid = true;
+    this->LODInformation->Delete();
+    this->LODInformation = vtkPVDataInformation::New();
+    this->GatherLODInformation(this->LODInformation);
+    }
+  return this->LODInformation;
+}
+
+//----------------------------------------------------------------------------
+vtkPVDataInformation* vtkSMRepresentationStrategy::GetFullResDataInformation()
+{
   if (!this->InformationValid)
     {
     this->InformationValid = true;
+    this->Information->Delete();
+    this->Information = vtkPVDataInformation::New();
     this->GatherInformation(this->Information);
     }
 
@@ -121,14 +138,18 @@ bool vtkSMRepresentationStrategy::UseCache()
 //----------------------------------------------------------------------------
 bool vtkSMRepresentationStrategy::UpdateRequired()
 {
-  // If using LOD, then update is required if LOD data is invalid,
-  // otherwise update is required if non-LOD data is invalid.
+  // Since fullres is pipeline always needs to be up-to-date, if it is not
+  // up-to-date, we need an Update. Additionally, is LOD is enabled and LOD
+  // pipeline is not up-to-date, then too, we need an update.
+
+  bool update_required = !this->DataValid;
+
   if (this->UseLODPipeline())
     {
-    return !this->LODDataValid;
+    update_required |= !this->LODDataValid;
     }
 
-  return !this->DataValid;
+  return update_required;
 }
 
 //----------------------------------------------------------------------------
@@ -136,14 +157,19 @@ void vtkSMRepresentationStrategy::Update()
 {
   if (this->UpdateRequired())
     {
-    if (this->UseLODPipeline())
-      {
-      this->UpdateLODPipeline();
-      }
-    else
+    this->InvokeEvent(vtkCommand::StartEvent);
+
+    if (!this->DataValid)
       {
       this->UpdatePipeline();
       }
+
+    if (this->UseLODPipeline() && !this->LODDataValid)
+      {
+      this->UpdateLODPipeline();
+      }
+
+    this->InvokeEvent(vtkCommand::EndEvent);
     }
 }
 

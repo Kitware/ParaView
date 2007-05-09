@@ -59,6 +59,17 @@ public:
   vtkPVDataInformation* GetDisplayedDataInformation();
 
   // Description:
+  // Returns data information from the full res pipeline. Note that this
+  // returns the current data information irrespective of whether the pipeline
+  // is up-to-date.
+  vtkPVDataInformation* GetFullResDataInformation();
+
+  // Description:
+  // Returns data information from the lod pipeline. This returns the current
+  // data information irrespective of whether the pipeline is up-to-date.
+  vtkPVDataInformation* GetLODDataInformation();
+
+  // Description:
   // Must be set if the representation makes use of the LOD pipeline provided 
   // by the strategy. false by default, implying that the representation only 
   // displays the high resolution data.
@@ -80,6 +91,12 @@ public:
 
   // Description:
   // Updates the displayed pipeline if update is required.
+  // A representation always updates the full-res pipeline if it needs any
+  // updating i.e. irrepective of if LOD is being used. On the other hand, LOD
+  // pipeline is updated only when the ViewHelperProxy indicates that LOD is
+  // enabled.
+  // When an update is required, this method invokes StartEvent and EndEvent to
+  // mark the start and end of update request.
   void Update();
 
   // Description:
