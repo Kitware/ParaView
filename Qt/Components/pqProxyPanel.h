@@ -73,6 +73,8 @@ public:
 public slots:
   /// accept the changes made to the properties
   /// changes will be propogated down to the server manager
+  /// subclasses should only change properties when accept is called to work
+  /// properly with undo/redo
   virtual void accept();
 
   /// reset the changes made
