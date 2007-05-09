@@ -26,7 +26,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMCameraLink);
-vtkCxxRevisionMacro(vtkSMCameraLink, "1.8");
+vtkCxxRevisionMacro(vtkSMCameraLink, "1.8.2.1");
 
 //---------------------------------------------------------------------------
 struct vtkSMCameraLinkInternals
@@ -114,6 +114,7 @@ const char* vtkSMCameraLinkInternals::LinkedPropertyNames[] =
   "CameraPositionInfo", "CameraPosition",
   "CameraFocalPointInfo", "CameraFocalPoint",
   "CameraViewUpInfo", "CameraViewUp",
+  "CenterOfRotation", "CenterOfRotation",
   0
 };
 
@@ -169,10 +170,16 @@ void vtkSMCameraLink::RemoveLinkedProxy(vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMCameraLink::UpdateProperties(vtkSMProxy* vtkNotUsed(fromProxy), 
-                                       const char* vtkNotUsed(pname))
+void vtkSMCameraLink::UpdateProperties(vtkSMProxy* fromProxy, 
+                                       const char* pname)
 {
-  return;  // do nothing
+  if (pname && strcmp(pname, "CenterOfRotation") == 0)
+    {
+    // We are linking center of rotations for linked views as well.
+    // Center of rotation is not changed during interaction, hence
+    // we listen to center of rotation changed events explicitly.
+    this->UpdateViews(fromProxy, false);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -207,6 +214,7 @@ void vtkSMCameraLink::UpdateViews(vtkSMProxy* caller, bool interactive)
         {
         vtkSMProperty* toProp = p->GetProperty(props[1]);
         toProp->Copy(fromProp);
+        p->UpdateProperty(props[1]);
         }
       }
     }

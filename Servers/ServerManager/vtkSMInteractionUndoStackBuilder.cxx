@@ -53,7 +53,7 @@ protected:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMInteractionUndoStackBuilder);
-vtkCxxRevisionMacro(vtkSMInteractionUndoStackBuilder, "1.2");
+vtkCxxRevisionMacro(vtkSMInteractionUndoStackBuilder, "1.2.2.1");
 vtkCxxSetObjectMacro(vtkSMInteractionUndoStackBuilder, UndoStack, vtkSMUndoStack);
 
 //-----------------------------------------------------------------------------
@@ -131,6 +131,7 @@ void vtkSMInteractionUndoStackBuilder::StartInteraction()
   this->PropertyModified("CameraFocalPoint");
   this->PropertyModified("CameraViewUp");
   this->PropertyModified("CameraClippingRange");
+  this->PropertyModified("CenterOfRotation");
 }
 
 //-----------------------------------------------------------------------------
@@ -149,6 +150,7 @@ void vtkSMInteractionUndoStackBuilder::EndInteraction()
   this->PropertyModified("CameraFocalPoint");
   this->PropertyModified("CameraViewUp");
   this->PropertyModified("CameraClippingRange");
+  this->PropertyModified("CenterOfRotation");
 
   if (this->UndoStack)
     {

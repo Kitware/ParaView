@@ -235,8 +235,8 @@ void pqElementInspectorWidget::updateGUI()
 
   if (visibleDisplay)
     {
-    this->setDataObject(vtkUnstructuredGrid::SafeDownCast(
-        visibleDisplay->GetOutput()));
+    pqDataSetModel* model = qobject_cast<pqDataSetModel*>(
+      this->Implementation->TreeView->model());
 
     // Now update the labels etc.
     if (visibleDisplay == this->Implementation->SelectionDisplayer)
@@ -246,6 +246,7 @@ void pqElementInspectorWidget::updateGUI()
         this->Implementation->SelectionManager->getSelectedSource();
       this->Implementation->SourceLabel->setText(
         QString("%1 (Selection)").arg(input->getSMName()));
+      model->setSubstitutePointCellIdNames(true);
       }
     else
       {
@@ -256,8 +257,11 @@ void pqElementInspectorWidget::updateGUI()
       pqPipelineSource* input = cdisplay->getInput();
       this->Implementation->SourceLabel->setText(
         QString("%1 (Output)").arg(input->getSMName()));
+      model->setSubstitutePointCellIdNames(false);
       }
     this->Implementation->DataTypeComboBox->setEnabled(true);
+    this->setDataObject(vtkUnstructuredGrid::SafeDownCast(
+        visibleDisplay->GetOutput()));
     }
   else
     {
@@ -334,6 +338,8 @@ void pqElementInspectorWidget::inspect(pqPipelineSource* source)
         pqSMAdaptor::setEnumerationProperty(
           srcDisplay->getProxy()->GetProperty("ReductionType"),
           "UNSTRUCTURED_APPEND");
+        pqSMAdaptor::setElementProperty(
+          srcDisplay->getProxy()->GetProperty("GenerateProcessIds"), 1);
         srcDisplay->getProxy()->UpdateVTKObjects();
         }
       }

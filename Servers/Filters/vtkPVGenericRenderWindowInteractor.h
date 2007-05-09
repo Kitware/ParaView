@@ -78,6 +78,17 @@ public:
 
   // Overridden to pass interaction events from the interactor style out.
   virtual void SetInteractorStyle(vtkInteractorObserver *);
+
+  // Description:
+  // Propagates the center to the interactor style.
+  // Currently, center of rotation is propagated only with the 
+  // interactor style is a vtkPVInteractorStyle or subclass.
+  vtkGetVector3Macro(CenterOfRotation, float);
+  void SetCenterOfRotation(float x, float y, float z);
+  void SetCenterOfRotation(float xyz[3])
+    {
+    this->SetCenterOfRotation(xyz[0], xyz[1], xyz[2]);
+    }
 protected:
   vtkPVGenericRenderWindowInteractor();
   ~vtkPVGenericRenderWindowInteractor();
@@ -86,6 +97,7 @@ protected:
   int InteractiveRenderEnabled;
   vtkRenderer* Renderer;
 
+  float CenterOfRotation[3];
 
 private:
   vtkPVGenericRenderWindowInteractor(const vtkPVGenericRenderWindowInteractor&); // Not implemented

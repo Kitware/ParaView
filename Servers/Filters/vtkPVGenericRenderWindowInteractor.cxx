@@ -12,10 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkPVGenericRenderWindowInteractor.h"
+
 #include "vtkCommand.h"
 #include "vtkInteractorObserver.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVInteractorStyle.h"
 #include "vtkPVRenderViewProxy.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderer.h"
@@ -38,6 +40,14 @@ public:
     if (this->Target)
       {
       this->Target->InvokeEvent(event, data);
+      if (event == vtkCommand::StartInteractionEvent)
+        {
+        this->Target->SetInteractiveRenderEnabled(1);
+        }
+      else if (event == vtkCommand::EndInteractionEvent)
+        {
+        this->Target->SetInteractiveRenderEnabled(0);
+        }
       }
     }
 
@@ -51,7 +61,7 @@ protected:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.4");
+vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.4.2.1");
 vtkCxxSetObjectMacro(vtkPVGenericRenderWindowInteractor,Renderer,vtkRenderer);
 
 //----------------------------------------------------------------------------
@@ -62,6 +72,9 @@ vtkPVGenericRenderWindowInteractor::vtkPVGenericRenderWindowInteractor()
   this->InteractiveRenderEnabled = 0;
   this->Observer = vtkPVGenericRenderWindowInteractorObserver::New();
   this->Observer->SetTarget(this);
+
+  this->CenterOfRotation[0] = this->CenterOfRotation[1]
+    = this->CenterOfRotation[2] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -75,6 +88,28 @@ vtkPVGenericRenderWindowInteractor::~vtkPVGenericRenderWindowInteractor()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVGenericRenderWindowInteractor::SetCenterOfRotation(float x,
+  float y, float z)
+{
+  if (this->CenterOfRotation[0] != x ||
+    this->CenterOfRotation[1] != y ||
+    this->CenterOfRotation[2] != z)
+    {
+    this->CenterOfRotation[0] = x;
+    this->CenterOfRotation[1] = y;
+    this->CenterOfRotation[2] = z;
+    vtkPVInteractorStyle* style = vtkPVInteractorStyle::SafeDownCast(
+      this->GetInteractorStyle());
+    // Pass center of rotation.
+    if (style)
+      {
+      style->SetCenterOfRotation(this->CenterOfRotation);
+      }
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVGenericRenderWindowInteractor::SetInteractorStyle(
   vtkInteractorObserver *style)
 {
@@ -84,6 +119,13 @@ void vtkPVGenericRenderWindowInteractor::SetInteractorStyle(
     }
 
   this->Superclass::SetInteractorStyle(style);
+
+  // Pass center of rotation.
+  if (vtkPVInteractorStyle::SafeDownCast(style))
+    {
+    vtkPVInteractorStyle::SafeDownCast(style)->SetCenterOfRotation(
+      this->CenterOfRotation);
+    }
 
   if (this->GetInteractorStyle())
     {
@@ -254,4 +296,6 @@ void vtkPVGenericRenderWindowInteractor::PrintSelf(ostream& os, vtkIndent indent
   os << indent << "InteractiveRenderEnabled: " 
      << this->InteractiveRenderEnabled << endl;
   os << indent << "Renderer: " << this->Renderer << endl;
+  os << indent << "CenterOfRotation: " << this->CenterOfRotation[0] << ", "
+    << this->CenterOfRotation[1] << ", " << this->CenterOfRotation[2] << endl;
 }

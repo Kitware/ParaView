@@ -294,7 +294,7 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
   QObject::connect(this->Internal->StyleRepresentation,
     SIGNAL(currentTextChanged(const QString&)),
     this->Internal->ColorBy, SLOT(reloadGUI()));
-  
+
   // material
   this->Internal->StyleMaterial->blockSignals(true);
   this->Internal->StyleMaterial->clear();
@@ -459,9 +459,7 @@ void pqDisplayProxyEditor::setupGUIConnections()
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::updateEnableState()
 {
-  QString val = this->Internal->Display->getColorField(); 
-
-  if(val == "Solid Color")
+  if (this->Internal->ColorBy->getCurrentText() == "Solid Color")
     {
     this->Internal->ColorInterpolateColors->setEnabled(false);
     this->Internal->ColorButtonStack->setCurrentWidget(

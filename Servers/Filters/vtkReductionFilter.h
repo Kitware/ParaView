@@ -67,6 +67,14 @@ public:
   vtkSetMacro(PassThrough, int);
   vtkGetMacro(PassThrough, int);
 
+  // Description:
+  // When set, a new array vtkOriginalProcessIds will be added
+  // to the output of the the pre-gather helper (or input, if no pre-gather
+  // helper is set). The values in the array indicate the process id.
+  // Note that the array is added only if the number of processes is > 1.
+  vtkSetMacro(GenerateProcessIds, int);
+  vtkGetMacro(GenerateProcessIds, int);
+
 protected:
   vtkReductionFilter();
   ~vtkReductionFilter();
@@ -93,6 +101,7 @@ protected:
   vtkAlgorithm* PostGatherHelper;
   vtkMultiProcessController* Controller;
   int PassThrough;
+  int GenerateProcessIds;
 
 private:
   vtkReductionFilter(const vtkReductionFilter&); // Not implemented.

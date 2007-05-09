@@ -84,7 +84,6 @@ public:
   vtkSmartPointer<vtkSMRenderModuleProxy> RenderModuleProxy;
   vtkSmartPointer<vtkPVAxesWidget> OrientationAxesWidget;
   vtkSmartPointer<vtkSMProxy> CenterAxesProxy;
-  vtkSmartPointer<vtkSMProxy> InteractorStyleProxy;
 
   vtkSmartPointer<vtkSMUndoStack> InteractionUndoStack;
   vtkSmartPointer<vtkSMInteractionUndoStackBuilder> UndoStackBuilder;
@@ -103,7 +102,6 @@ public:
     this->RenderViewProxy = vtkSmartPointer<pqRenderViewProxy>::New();
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     this->OrientationAxesWidget = vtkSmartPointer<vtkPVAxesWidget>::New();
-    this->InteractorStyleProxy = 0;
     this->DefaultBackground[0] = 84;
     this->DefaultBackground[1] = 89;
     this->DefaultBackground[2] = 109;
@@ -169,16 +167,6 @@ pqRenderViewModule::pqRenderViewModule(const QString& name,
   this->Internal->VTKConnect->Connect(
     renModule, vtkCommand::ResetCameraEvent,
     this, SLOT(onResetCameraEvent()));
-
-  // We need to listen to events from the render module's interactor
-  // style. So whenever it changes, we set up observers.
-  this->Internal->VTKConnect->Connect(
-    renModule->GetProperty("InteractorStyle"), vtkCommand::ModifiedEvent,
-    this, SLOT(onInteractorStyleChanged()));
-  
-  // If there is a InteractorStyle, initialize it.
-  this->onInteractorStyleChanged();
-
 
   // The render module needs to obtain client side objects
   // for the RenderWindow etc. to initialize the QVTKWidget
@@ -266,37 +254,6 @@ void pqRenderViewModule::initializeWidgets()
 }
 
 //-----------------------------------------------------------------------------
-// Called when the "InteractorStyle" property on the render module proxy changes.
-// We end up observers on the interactor style to know about
-// start and end of interaction.
-void pqRenderViewModule::onInteractorStyleChanged()
-{
-  if (this->Internal->InteractorStyleProxy)
-    {
-    // remove observers from old interactor style.
-    this->Internal->VTKConnect->Disconnect(
-      this->Internal->InteractorStyleProxy);
-    this->Internal->InteractorStyleProxy = 0;
-    }
-
-  this->Internal->InteractorStyleProxy = pqSMAdaptor::getProxyProperty(
-    this->getProxy()->GetProperty("InteractorStyle"));
-
-  if (this->Internal->InteractorStyleProxy.GetPointer())
-    {
-    vtkProcessModule* pvm = vtkProcessModule::GetProcessModule();
-    vtkObject *style = vtkObject::SafeDownCast(pvm->GetObjectFromID(
-      this->Internal->InteractorStyleProxy->GetID(0)));
-    this->Internal->VTKConnect->Connect(style,
-      vtkCommand::StartInteractionEvent, 
-      this, SLOT(startInteraction()));
-    this->Internal->VTKConnect->Connect(style,
-      vtkCommand::EndInteractionEvent, 
-      this, SLOT(endInteraction()));
-    }
-}
-
-//-----------------------------------------------------------------------------
 // Sets default values for the underlying proxy.  This is during the 
 // initialization stage of the pqProxy for proxies created by the GUI itself 
 // i.e. for proxies loaded through state or created by python client or 
@@ -324,6 +281,7 @@ void pqRenderViewModule::setDefaultPropertyValues()
 
   this->restoreSettings();
   this->resetCamera();
+  this->clearUndoStack();
 }
 
 //-----------------------------------------------------------------------------
@@ -340,10 +298,10 @@ void pqRenderViewModule::createDefaultInteractors()
 
   vtkSMProxy* interactorStyle = 
     pxm->NewProxy("interactorstyles", "InteractorStyle");
-  this->Internal->InteractorStyleProxy.TakeReference(interactorStyle);
   interactorStyle->SetConnectionID(cid);
   interactorStyle->SetServers(vtkProcessModule::CLIENT);
   this->addHelperProxy("InteractorStyles", interactorStyle);
+  interactorStyle->Delete();
 
   vtkSMProperty *styleManips = 
     interactorStyle->GetProperty("CameraManipulators");
@@ -453,8 +411,6 @@ void pqRenderViewModule::createDefaultInteractors()
   interactorStyle->UpdateVTKObjects();
 
   // Set interactor style on the render module.
-  // This will trigger a call to onInteractorStyleChanged() which
-  // updates the observers etc.
   pqSMAdaptor::setProxyProperty(
     this->Internal->RenderModuleProxy->GetProperty("InteractorStyle"),
     interactorStyle);
@@ -481,28 +437,17 @@ void pqRenderViewModule::initializeCenterAxes()
   pqSMAdaptor::setElementProperty(centerAxes->GetProperty("Pickable"), 0);
   centerAxes->UpdateVTKObjects();
   this->Internal->CenterAxesProxy = centerAxes;
+
+  // Update the center axes position whenever the center of rotation changes.
+  this->Internal->VTKConnect->Connect(
+    this->Internal->RenderModuleProxy->GetProperty("CenterOfRotation"), 
+    vtkCommand::ModifiedEvent, this, SLOT(updateCenterAxes()));
   
   // Add to render module without using properties. That way it does not
   // get saved in state.
   this->Internal->RenderModuleProxy->AddDisplay(
     vtkSMDisplayProxy::SafeDownCast(centerAxes));
   centerAxes->Delete();
-}
-
-//-----------------------------------------------------------------------------
-void pqRenderViewModule::startInteraction()
-{
-  vtkPVGenericRenderWindowInteractor* iren = 
-      this->Internal->RenderModuleProxy->GetInteractor();
-  iren->SetInteractiveRenderEnabled(true);
-}
-
-//-----------------------------------------------------------------------------
-void pqRenderViewModule::endInteraction()
-{
-  vtkPVGenericRenderWindowInteractor* iren = 
-      this->Internal->RenderModuleProxy->GetInteractor();
-  iren->SetInteractiveRenderEnabled(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -521,6 +466,10 @@ void pqRenderViewModule::onResetCameraEvent()
     {
     this->resetCenterOfRotation();
     }
+
+  // Ensures that the scale factor is correctly set for the center axes
+  // on reset camera.
+  this->updateCenterAxes();
 }
 
 //-----------------------------------------------------------------------------
@@ -882,11 +831,6 @@ QColor pqRenderViewModule::getOrientationAxesLabelColor() const
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::updateCenterAxes()
 {
-  if(!this->Internal->InteractorStyleProxy)
-    {
-    return;
-    }
-
   if (!this->getCenterAxesVisibility())
     {
     return;
@@ -895,7 +839,7 @@ void pqRenderViewModule::updateCenterAxes()
   double center[3];
   QList<QVariant> val =
     pqSMAdaptor::getMultipleElementProperty(
-      this->Internal->InteractorStyleProxy->GetProperty("CenterOfRotation"));
+      this->Internal->RenderModuleProxy->GetProperty("CenterOfRotation"));
   center[0] = val[0].toDouble();
   center[1] = val[1].toDouble();
   center[2] = val[2].toDouble();
@@ -926,44 +870,23 @@ void pqRenderViewModule::updateCenterAxes()
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::setCenterOfRotation(double x, double y, double z)
 {
-  if(!this->Internal->InteractorStyleProxy)
-    {
-    return;
-    }
-
-  vtkPVGenericRenderWindowInteractor* iren =
-    vtkPVGenericRenderWindowInteractor::SafeDownCast(
-      this->Internal->RenderModuleProxy->GetInteractor());
-  vtkPVInteractorStyle* style = vtkPVInteractorStyle::SafeDownCast(
-    iren->GetInteractorStyle());
-  if (!style)
-    {
-    return;
-    }
-
   QList<QVariant> positionValues;
   positionValues << x << y << z;
 
+  // this modifies the CenterOfRotation property resulting to a call
+  // to updateCenterAxes().
   pqSMAdaptor::setMultipleElementProperty(
-    this->Internal->InteractorStyleProxy->GetProperty("CenterOfRotation"),
+    this->Internal->RenderModuleProxy->GetProperty("CenterOfRotation"),
     positionValues);
-
-  this->Internal->InteractorStyleProxy->UpdateVTKObjects();
-
-  this->updateCenterAxes();
+  this->Internal->RenderModuleProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::getCenterOfRotation(double center[3]) const
 {
-  if(!this->Internal->InteractorStyleProxy)
-    {
-    return;
-    }
-
   QList<QVariant> val =
     pqSMAdaptor::getMultipleElementProperty(
-      this->Internal->InteractorStyleProxy->GetProperty("CenterOfRotation"));
+      this->Internal->RenderModuleProxy->GetProperty("CenterOfRotation"));
   center[0] = val[0].toDouble();
   center[1] = val[1].toDouble();
   center[2] = val[2].toDouble();
