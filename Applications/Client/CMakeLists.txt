@@ -278,6 +278,12 @@ IF(BUILD_TESTING)
     UndoRedo5
     UndoRedo6
     XdmfRead
+    XdmfReadImageData
+    XdmfReadImageDataCollection
+    XdmfReadRectilinearGrid
+    XdmfReadRectilinearGridCollection
+    XdmfReadStructuredGrid
+    XdmfReadStructuredGridCollection
   )
 
   SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/pvTestDriver)
