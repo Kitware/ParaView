@@ -1170,6 +1170,10 @@ void pqChartAxis::calculateInterval()
   if(this->TrueMax.getType() == pqChartValue::IntValue)
     {
     interval.setValue(range.getIntValue());
+    if(interval == 0)
+      {
+      interval = this->TrueMax - this->TrueMin;
+      }
     }
   else
     {
@@ -1232,6 +1236,17 @@ void pqChartAxis::calculateInterval()
       {
       break;
       }
+    numberOfIntervals++;
+    }
+
+  // Adding half the interval misses the last value when the interval
+  // is an integer of 1.
+  if(interval.getType() == pqChartValue::IntValue && interval == 1)
+    {
+    pair = new pqChartAxisPair();
+    pair->Value = v;
+    pair->Pixel = this->getPixelFor(v);
+    this->Data->push_back(pair);
     numberOfIntervals++;
     }
 
