@@ -262,6 +262,7 @@ IF(BUILD_TESTING)
     CutMulti
     DualSphereAnimation
     ExodusPanel
+    Flow
     Fractal2D
     Fractal3D
     LinePlot
