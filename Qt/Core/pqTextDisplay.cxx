@@ -64,6 +64,13 @@ void pqTextDisplay::setDefaultPropertyValues()
     proxy->GetProperty("Selectable"), 0);
   pqSMAdaptor::setElementProperty(
     proxy->GetProperty("Enabled"),1);
+  pqSMAdaptor::setElementProperty(
+    proxy->GetProperty("ScaledText"),0);
+  pqSMAdaptor::setElementProperty(
+    proxy->GetProperty("Resizable"),0);
+  pqSMAdaptor::setElementProperty(
+    proxy->GetProperty("FontSize"),24);
+
   proxy->UpdateVTKObjects();
 }
 

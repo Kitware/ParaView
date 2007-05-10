@@ -39,15 +39,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqDisplay.h"
 #include "pqTextDisplay.h"
+#include "pqSignalAdaptors.h"
 
 class pqTextDisplayPropertiesWidget::pqInternal : 
   public Ui::pqTextDisplayPropertiesWidget
 {
 public:
+  pqInternal();
+  ~pqInternal();
+
   QPointer<pqDisplay> Display;
   pqPropertyLinks Links;
+
+  pqSignalAdaptorColor *ColorAdaptor;
+  pqSignalAdaptorComboBox *FontFamilyAdaptor;
+  pqSignalAdaptorComboBox *TextAlignAdaptor;
 };
 
+//----------------------------------------------------------------------------
+pqTextDisplayPropertiesWidget::pqInternal::pqInternal() : 
+Ui::pqTextDisplayPropertiesWidget()
+{
+  this->ColorAdaptor = 0;
+  this->FontFamilyAdaptor = 0;
+  this->TextAlignAdaptor = 0;
+}
+
+//----------------------------------------------------------------------------
+pqTextDisplayPropertiesWidget::pqInternal::~pqInternal() 
+{
+  delete this->ColorAdaptor;
+  delete this->FontFamilyAdaptor;
+  delete this->TextAlignAdaptor;
+}
 
 //-----------------------------------------------------------------------------
 pqTextDisplayPropertiesWidget::pqTextDisplayPropertiesWidget(pqDisplay* display, QWidget* p)
@@ -57,6 +81,17 @@ pqTextDisplayPropertiesWidget::pqTextDisplayPropertiesWidget(pqDisplay* display,
   this->Internal->setupUi(this);
   QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(updateAllViews()));
+  
+  this->Internal->ColorAdaptor = new pqSignalAdaptorColor(
+      this->Internal->buttonColor, "chosenColor", 
+      SIGNAL(chosenColorChanged(const QColor&)), false);
+
+  this->Internal->FontFamilyAdaptor = new pqSignalAdaptorComboBox(
+      this->Internal->comboFontFamily);
+
+  this->Internal->TextAlignAdaptor = new pqSignalAdaptorComboBox(
+      this->Internal->comboTextAlign);
+
   this->setDisplay(display);
 }
 
@@ -105,12 +140,34 @@ void pqTextDisplayPropertiesWidget::setDisplay(pqDisplay* display)
   this->Internal->Links.addPropertyLink(
     this->Internal->Position1Y, "value", SIGNAL(valueChanged(double)),
     proxy, proxy->GetProperty("Position"), 1);
+
   this->Internal->Links.addPropertyLink(
-    this->Internal->Position2X, "value", SIGNAL(valueChanged(double)),
-    proxy, proxy->GetProperty("Position2"), 0);
+    this->Internal->toolButtonBold, "checked", SIGNAL(toggled(bool)),
+    proxy, proxy->GetProperty("Bold"), 1);
   this->Internal->Links.addPropertyLink(
-    this->Internal->Position2Y, "value", SIGNAL(valueChanged(double)),
-    proxy, proxy->GetProperty("Position2"), 1);
+    this->Internal->toolButtonItalic, "checked", SIGNAL(toggled(bool)),
+    proxy, proxy->GetProperty("Italic"), 1);
+  this->Internal->Links.addPropertyLink(
+    this->Internal->toolButtonShadow, "checked", SIGNAL(toggled(bool)),
+    proxy, proxy->GetProperty("Shadow"), 1);
+
+  this->Internal->Links.addPropertyLink(this->Internal->ColorAdaptor, 
+      "color", SIGNAL(colorChanged(const QVariant&)),
+      proxy, proxy->GetProperty("Color"));
+  this->Internal->Links.addPropertyLink(this->Internal->FontFamilyAdaptor,
+      "currentText", SIGNAL(currentTextChanged(const QString&)),
+      proxy, proxy->GetProperty("FontFamily"));
+  this->Internal->Links.addPropertyLink(this->Internal->TextAlignAdaptor,
+      "currentText", SIGNAL(currentTextChanged(const QString&)),
+      proxy, proxy->GetProperty("Justification"));
+
+  this->Internal->Links.addPropertyLink(
+    this->Internal->spinBoxSize, "value", SIGNAL(valueChanged(int)),
+    proxy, proxy->GetProperty("FontSize"), 1);
+
+  this->Internal->Links.addPropertyLink(
+      this->Internal->spinBoxOpacity, "value", SIGNAL(valueChanged(double)),
+      proxy, proxy->GetProperty("Opacity"));
 }
 
 //-----------------------------------------------------------------------------
@@ -121,5 +178,3 @@ void pqTextDisplayPropertiesWidget::onVisibilityChanged(int state)
     this->Internal->Interactivity->setCheckState(Qt::Unchecked);
     }
 }
-
-
