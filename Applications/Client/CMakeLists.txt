@@ -255,6 +255,7 @@ IF(BUILD_TESTING)
     ClipUndo
     ColorEditor1
     ColorEditor2
+    ColorEditor4
     Contour
     ContourRange
     CreateAndLoadLookmark
