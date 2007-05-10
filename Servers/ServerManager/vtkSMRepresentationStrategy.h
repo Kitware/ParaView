@@ -170,12 +170,18 @@ protected:
   bool InformationValid;
   vtkPVDataInformation* Information;
 
+  // Flag used to avoid unnecessary "RemoveAllCaches" requests being set to the
+  // server.
+  bool SomethingCached;
+
   vtkSMProxy* ViewHelperProxy;
 private:
   vtkSMRepresentationStrategy(const vtkSMRepresentationStrategy&); // Not implemented
   void operator=(const vtkSMRepresentationStrategy&); // Not implemented
 
   void LODResolutionChanged();
+
+
 
   vtkCommand* LODResolutionObserver;
 //ETX

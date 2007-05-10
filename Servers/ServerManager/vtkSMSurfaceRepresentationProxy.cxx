@@ -22,7 +22,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -31,6 +31,16 @@ vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
   this->LODMapper = 0;
   this->Prop3D = 0;
   this->Property = 0;
+
+  this->ExtractSelection = 0;
+  this->SelectionGeometryFilter = 0;
+  this->SelectionMapper = 0;
+  this->SelectionLODMapper = 0;
+  this->SelectionProp3D = 0;
+  this->SelectionProperty = 0;
+
+  // This representation supports selection.
+  this->SetSelectionSupported(true);
 }
 
 //----------------------------------------------------------------------------
@@ -99,8 +109,28 @@ bool vtkSMSurfaceRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
   // (Look at vtkSMPipelineRepresentationProxy::AddToView()).
 
   strategy->SetInput(this->GeometryFilter);
-  this->Connect(strategy->GetOutput(), this->Mapper, "Input");
-  this->Connect(strategy->GetLODOutput(), this->LODMapper, "Input");
+  this->Connect(strategy->GetOutput(), this->Mapper);
+  this->Connect(strategy->GetLODOutput(), this->LODMapper);
+
+  // Initialize strategy for the selection pipeline.
+  strategy.TakeReference(
+    view->NewStrategy(VTK_POLY_DATA, vtkSMRenderViewProxy::SURFACE));
+  if (!strategy.GetPointer())
+    {
+    vtkErrorMacro("Could not create strategy for selection pipeline. Disabling selection.");
+    this->SetSelectionSupported(false);
+    }
+  else
+    {
+    this->SetStrategyForSelection(strategy);
+    strategy->SetEnableLOD(true);
+    strategy->UpdateVTKObjects();
+
+    strategy->SetInput(this->SelectionGeometryFilter);
+    this->Connect(strategy->GetOutput(), this->SelectionMapper);
+    this->Connect(strategy->GetLODOutput(), this->SelectionLODMapper);
+    }
+
   return true;
 }
 
@@ -130,6 +160,27 @@ bool vtkSMSurfaceRepresentationProxy::BeginCreateVTKObjects(int numObjects)
   this->Property->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
+  // Initialize selection pipeline subproxies.
+  this->ExtractSelection = 
+    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("ExtractSelection"));
+  this->SelectionGeometryFilter = vtkSMSourceProxy::SafeDownCast(
+    this->GetSubProxy("SelectionGeometryFilter"));
+  this->SelectionMapper = this->GetSubProxy("SelectionMapper");
+  this->SelectionLODMapper = this->GetSubProxy("SelectionLODMapper");
+  this->SelectionProp3D = this->GetSubProxy("SelectionProp3D");
+  this->SelectionProperty = this->GetSubProxy("SelectionProperty");
+
+  this->ExtractSelection->SetServers(vtkProcessModule::DATA_SERVER);
+  this->SelectionGeometryFilter->SetServers(vtkProcessModule::DATA_SERVER);
+  this->SelectionMapper->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->SelectionLODMapper->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->SelectionProp3D->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->SelectionProperty->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+
   return true;
 }
 
@@ -141,6 +192,12 @@ bool vtkSMSurfaceRepresentationProxy::EndCreateVTKObjects(int numObjects)
   this->Connect(this->LODMapper, this->Prop3D, "LODMapper");
   this->Connect(this->Property, this->Prop3D, "Property");
 
+  // Setup selection pipeline connections.
+  this->Connect(this->GetInputProxy(), this->ExtractSelection);
+  this->Connect(this->ExtractSelection, this->SelectionGeometryFilter);
+  this->Connect(this->SelectionMapper, this->SelectionProp3D, "Mapper");
+  this->Connect(this->SelectionLODMapper, this->SelectionProp3D, "LODMapper");
+  this->Connect(this->SelectionProperty, this->SelectionProp3D, "Property");
 
   return this->Superclass::EndCreateVTKObjects(numObjects);
 }

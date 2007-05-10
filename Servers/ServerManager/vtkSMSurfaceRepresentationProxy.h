@@ -73,6 +73,17 @@ protected:
   vtkSMProxy* LODMapper;
   vtkSMProxy* Prop3D;
   vtkSMProxy* Property;
+
+  // TODO: provide mechanism to share ExtractSelection and
+  // SelectionGeometryFilter among representations.
+
+  // Proxies for the selection pipeline.
+  vtkSMSourceProxy* ExtractSelection;
+  vtkSMSourceProxy* SelectionGeometryFilter;
+  vtkSMProxy* SelectionMapper;
+  vtkSMProxy* SelectionLODMapper;
+  vtkSMProxy* SelectionProp3D;
+  vtkSMProxy* SelectionProperty;
 private:
   vtkSMSurfaceRepresentationProxy(const vtkSMSurfaceRepresentationProxy&); // Not implemented
   void operator=(const vtkSMSurfaceRepresentationProxy&); // Not implemented

@@ -17,11 +17,42 @@
 // .SECTION Description
 // vtkSMPipelineRepresentationProxy is a superclass for representations that
 // consume data i.e. require some input.
+//
+// A data representation takes on selection obligations. This makes it possible
+// for representations to show selections on the input data. If a subclass does
+// not support selection then \c SelectionSupported flag should be false.
+// If selection is supported, the representation should be able to "render" a
+// proxy for a vtkSelection in the view. By default \c SelectionSupported is 
+// false.
+//
+// When dealing with data inputs, often times some data pipeline is needed to
+// ensure that the data is made available to the location where the rendering
+// happens. Also there might be some data distribution obligations that such
+// representations have to fulfill. These depend on the type of view that the
+// representation gets added to. These data-distribution/delivery pipelines are
+// abstracted in what we call \c {Representation Strategies}.
+// 
+// When a representation is added to a view, this class class
+// InitializeStrategy() which gives subclasses an opportunity to get different
+// types of strategies from the view and set them up it their data pipelines.
+//
+// Subclasses are free to not use any strategies at all. In which case they have
+// to provide implementations for Update(), UpdateRequired(),
+// GetDisplayedDataInformation(), GetFullResDataInformation(), MarkModified(). 
+// This class provides default implementation for these methods for 
+// representations using a single strategy (and if SelectionSupported, another 
+// strategy for the selection pipeline). If subclasses need more strategies for 
+// multiple internal pipelines, then they should override these methods as well.
+// One may also want to override SetUpdateTime() to ensure that the update time
+// is passed to the strategies correctly.
+//
 // .SECTION Caveats
 // \li Generally speaking, this proxy requires that the input is set before the
 // representation is added to any view. This requirement stems from the fact
 // that to deterine the right strategy to use for a representation, it may be
 // necessary to know the data type of the input data.
+// .SECTION See Also
+// vtkSMRepresentationStrategy
 
 #ifndef __vtkSMPipelineRepresentationProxy_h
 #define __vtkSMPipelineRepresentationProxy_h
@@ -78,16 +109,12 @@ public:
   // Update(). Overridden to forward the request to the strategy, if any. If
   // subclasses don't use any strategy, they may want to override this method.
   virtual bool UpdateRequired();
-  
+
   // Description:
   // Set the time used during update requests.
   // Default implementation passes the time to the strategy, if any. If
   // subclasses don't use any stratgy, they may want to override this method.
   virtual void SetUpdateTime(double time);
-
-  // Description:
-  // Get the representation strategy used by this representation, if any.
-  vtkGetObjectMacro(Strategy, vtkSMRepresentationStrategy);
 
   // Description:
   // When set to true, the UpdateTime for this representation is linked to the
@@ -102,6 +129,16 @@ public:
   // thus if the changes to representation itself invalidates the data pipelines
   // it must explicity mark the strategy invalid.
   virtual void MarkModified(vtkSMProxy* modifiedProxy);
+
+  // Description:
+  // Returns whether this representation shows selection.
+  // This is always false if GetVisibility() is false or GetSelectionSupported()
+  // is false.
+  virtual bool GetSelectionVisibility();
+
+  // Description:
+  // Returns if this representation supports selection.
+  vtkGetMacro(SelectionSupported, bool);
 
 //BTX
 protected:
@@ -139,8 +176,15 @@ protected:
     { return true; }
 
   // Description:
-  // Set the representation strategy. Simply initializes the Strategy ivar.
+  // Set the representation strategy. Simply initializes the Strategy ivar and
+  // initializes UpdateTime.
   void SetStrategy(vtkSMRepresentationStrategy*);
+
+  // Description:
+  // Set the representation strategy for the selection pipeline.
+  // Simply initializes the StrategyForSelection ivar and initializes
+  // UpdateTime.
+  void SetStrategyForSelection(vtkSMRepresentationStrategy*);
 
   // Description:
   // Provide access to Input for subclasses.
@@ -150,6 +194,18 @@ protected:
   // Subclasses can use this method to traverse up the input connection
   // from this representation and mark them modified.
   void MarkUpstreamModified();
+
+  // Description:
+  // Get the representation strategy used by this representation, if any.
+  vtkGetObjectMacro(Strategy, vtkSMRepresentationStrategy);
+
+  // Get the representation strategy used for the selection pipeline, if any.
+  vtkGetObjectMacro(StrategyForSelection, vtkSMRepresentationStrategy);
+
+  // Description:
+  // Subclassess should set this to true if they support selection pipelines.
+  bool SelectionSupported;
+  vtkSetMacro(SelectionSupported, bool);
 
   double UpdateTime;
   bool UpdateTimeInitialized;
@@ -163,6 +219,7 @@ private:
   void SetInputProxy(vtkSMSourceProxy*);
   vtkSMSourceProxy* InputProxy;
   vtkSMRepresentationStrategy* Strategy;
+  vtkSMRepresentationStrategy* StrategyForSelection;
 
   vtkSMPipelineRepresentationProxyObserver* Observer;
 //ETX

@@ -3973,6 +3973,7 @@
         </Proxy>
         <ExposedProperties>
           <Property name="UpdateTime" />
+          <Property name="RemoveAllCaches" />
         </ExposedProperties>
       </SubProxy>
 
@@ -4155,6 +4156,66 @@
           <Property name="Shading" />
           <Property name="SpecularColor" />
           <Property name="SpecularPower" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="ExtractSelection"
+          proxygroup="filters" proxyname="ExtractSelection" />
+        <ExposedProperties>
+          <Property name="Selection" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!-- GeometryFilter for selection pipeline -->
+        <Proxy name="SelectionGeometryFilter"
+          proxygroup="filters" proxyname="GeometryFilter" />
+        <ShareProperties subproxy="GeometryFilter">
+          <Exception name="Input" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!-- 
+          Mapper for selection 
+        -->
+        <Proxy name="SelectionMapper" 
+          proxygroup="mappers" proxyname="PolyDataMapper" />
+      </SubProxy>
+
+      <SubProxy>
+        <!-- 
+          Mapper for low-res selection. It shares all its properties with the
+          high-res mapper (except input ofcourse).
+        -->
+        <Proxy name="SelectionLODMapper" 
+          proxygroup="mappers" proxyname="PolyDataMapper" />
+        <ShareProperties subproxy="SelectionMapper" >
+          <Exception name="Input" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!--
+          SelectionProp3D that gets added to the 3D renderer 
+        -->
+        <Proxy name="SelectionProp3D" proxygroup="props" proxyname="LODActor" />
+        <ExposedProperties>
+          <!-- FIXME 
+          <Property name="RenderModuleHelper" exposed_name="ViewHelper" />
+          -->
+          <Property name="Visibility" exposed_name="SelectionVisibility" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!--
+          Property for the vtkProp.
+        -->
+        <Proxy name="SelectionProperty" proxygroup="properties" proxyname="Property" />
+        <ExposedProperties>
+          <Property name="Color" exposed_name="SelectionColor" />
         </ExposedProperties>
       </SubProxy>
 

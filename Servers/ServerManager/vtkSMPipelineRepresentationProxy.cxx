@@ -17,6 +17,7 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationStrategy.h"
@@ -52,13 +53,16 @@ protected:
 };
 
 
-vtkCxxRevisionMacro(vtkSMPipelineRepresentationProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMPipelineRepresentationProxy, "1.5");
 vtkCxxSetObjectMacro(vtkSMPipelineRepresentationProxy, InputProxy, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMPipelineRepresentationProxy::vtkSMPipelineRepresentationProxy()
 {
   this->InputProxy = 0;
   this->Strategy = 0;
+
+  this->SelectionSupported = false;
+  this->StrategyForSelection = 0;
 
   this->UpdateTime = 0.0;
   this->UpdateTimeInitialized = false;
@@ -79,10 +83,10 @@ vtkSMPipelineRepresentationProxy::~vtkSMPipelineRepresentationProxy()
 
   this->SetInputProxy(0);
   this->SetStrategy(0);
+  this->SetStrategyForSelection(0);
 
   this->Observer->SetTarget(0);
   this->Observer->Delete();
-
 }
 
 //----------------------------------------------------------------------------
@@ -167,18 +171,32 @@ void vtkSMPipelineRepresentationProxy::Update(vtkSMViewProxy* view)
     this->Strategy->Update();
     }
 
+  // Update selection strategy is selection is visible.
+  if (this->GetSelectionVisibility() && this->StrategyForSelection)
+    {
+    this->StrategyForSelection->Update();
+    }
+
   this->Superclass::Update(view);
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMPipelineRepresentationProxy::UpdateRequired()
 {
+  bool update_required = false;
   if (this->Strategy)
     {
-    return this->Strategy->UpdateRequired();
+    update_required |= this->Strategy->UpdateRequired();
     }
 
-  return this->Superclass::UpdateRequired();
+  // If selection is supported, check if the selection pipeline needs updating.
+  if (!update_required && 
+    this->GetSelectionVisibility() && this->StrategyForSelection)
+    {
+    update_required |= this->StrategyForSelection->UpdateRequired();
+    }
+
+  return (update_required? true: this->Superclass::UpdateRequired());
 }
 
 //----------------------------------------------------------------------------
@@ -201,6 +219,24 @@ vtkPVDataInformation* vtkSMPipelineRepresentationProxy::GetFullResDataInformatio
     }
 
   return this->Superclass::GetFullResDataInformation();
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPipelineRepresentationProxy::GetSelectionVisibility()
+{
+  if (!this->GetVisibility() || !this->GetSelectionSupported())
+    {
+    return false;
+    }
+
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("SelectionVisibility"));
+  if (ivp && ivp->GetNumberOfElements()== 1 && ivp->GetElement(0))
+    {
+    return true;
+    }
+
+  return false;
 }
 
 //----------------------------------------------------------------------------
@@ -229,6 +265,17 @@ void vtkSMPipelineRepresentationProxy::SetUpdateTime(double time)
       {
       dvp->SetElement(0, time);
       this->Strategy->UpdateVTKObjects();
+      }
+    }
+
+  if (this->GetSelectionSupported() && this->StrategyForSelection)
+    {
+    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->StrategyForSelection->GetProperty("UpdateTime"));
+    if (dvp)
+      {
+      dvp->SetElement(0, time);
+      this->StrategyForSelection->UpdateVTKObjects();
       }
     }
 
@@ -281,13 +328,41 @@ void vtkSMPipelineRepresentationProxy::SetStrategy(
 }
 
 //----------------------------------------------------------------------------
+void vtkSMPipelineRepresentationProxy::SetStrategyForSelection(
+  vtkSMRepresentationStrategy* strategy)
+{
+  vtkSetObjectBodyMacro(StrategyForSelection, 
+    vtkSMRepresentationStrategy, strategy);
+
+  if (this->StrategyForSelection && this->UpdateTimeInitialized)
+    {
+    // Pass the update time to the strategy if it has been initialized.
+    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->StrategyForSelection->GetProperty("UpdateTime"));
+    if (dvp)
+      {
+      dvp->SetElement(0, this->UpdateTime);
+      this->StrategyForSelection->UpdateVTKObjects();
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkSMPipelineRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)
 {
   // If some changes to the representation proxy invalidate the data
   // then we must expilictly call Strategy->MarkModified();
-  if (modifiedProxy != this && this->Strategy)
+  if (modifiedProxy != this)
     {
-    this->Strategy->MarkModified(modifiedProxy); 
+    if (this->Strategy)
+      {
+      this->Strategy->MarkModified(modifiedProxy); 
+      }
+
+    if (this->StrategyForSelection)
+      {
+      this->StrategyForSelection->MarkModified(modifiedProxy);
+      }
     }
 
   this->Superclass::MarkModified(modifiedProxy);
@@ -297,6 +372,7 @@ void vtkSMPipelineRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)
 void vtkSMPipelineRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "SelectionSupported : " << this->SelectionSupported << endl;
 }
 
 

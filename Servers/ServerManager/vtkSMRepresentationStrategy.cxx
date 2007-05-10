@@ -23,7 +23,7 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.4");
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 {
@@ -38,6 +38,8 @@ vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
   this->DataValid = false;
   this->Information = vtkPVDataInformation::New();
   this->InformationValid = false;
+
+  this->SomethingCached = false;
 
   vtkMemberFunctionCommand<vtkSMRepresentationStrategy>* observer =
     vtkMemberFunctionCommand<vtkSMRepresentationStrategy>::New();
@@ -107,6 +109,14 @@ void vtkSMRepresentationStrategy::MarkModified(vtkSMProxy* modifiedProxy)
   // won't get invalidated until the pipeline is updated.
   this->DataValid = false;
   this->LODDataValid = false;
+
+  // Cache is cleaned up whenever something changes and caching is not currently
+  // enabled.
+  if (this->SomethingCached && !this->UseCache())
+    {
+    this->SomethingCached = false;
+    this->InvokeCommand("RemoveAllCaches");
+    }
   
   this->Superclass::MarkModified(modifiedProxy);
 }

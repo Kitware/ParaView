@@ -20,7 +20,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.3");
+vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMSimpleStrategy::vtkSMSimpleStrategy()
 {
@@ -89,6 +89,7 @@ void vtkSMSimpleStrategy::UpdatePipeline()
 {
   if (this->UseCache())
     {
+    this->SomethingCached = true;
     this->UpdateSuppressorLOD->InvokeCommand("CacheUpdate");
     }
   else
