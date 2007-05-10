@@ -55,7 +55,7 @@
 
 #include "vtkSMClientServerRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.3");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 //-----------------------------------------------------------------------------
@@ -702,6 +702,8 @@ vtkSMProxy *vtkSMRenderViewProxy::GetProxyFromPropID(
   vtkClientServerID *id,
   int proxyType)
 {
+  (void)id;
+  (void)proxyType;
   vtkSMProxy *ret = NULL;
 // FIXME
 #if 0 
@@ -751,6 +753,8 @@ vtkSMProxy *vtkSMRenderViewProxy::GetProxyForDisplay(
   int number,
   int proxyType)
 {
+  (void)number;
+  (void)proxyType;
   vtkSMProxy *ret = NULL;
 
   /* FIXME
