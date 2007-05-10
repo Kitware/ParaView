@@ -251,6 +251,8 @@ IF(BUILD_TESTING)
     Clip
     ClipHidden
     ClipUndo
+    ColorEditor1
+    ColorEditor2
     Contour
     ContourRange
     CreateAndLoadLookmark
