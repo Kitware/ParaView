@@ -20,34 +20,14 @@
   <property name="windowTitle" >
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" >
+  <layout class="QVBoxLayout" >
    <property name="margin" >
     <number>9</number>
    </property>
    <property name="spacing" >
     <number>6</number>
    </property>
-   <item row="6" column="0" >
-    <widget class="QTableWidget" name="Parameters" >
-     <property name="autoFillBackground" >
-      <bool>true</bool>
-     </property>
-     <property name="columnCount" >
-      <number>3</number>
-     </property>
-     <column/>
-     <column/>
-     <column/>
-    </widget>
-   </item>
-   <item row="5" column="0" >
-    <widget class="QLabel" name="Parameters_label" >
-     <property name="text" >
-      <string>Parameters</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0" >
+   <item>
     <layout class="QHBoxLayout" >
      <property name="margin" >
       <number>0</number>
@@ -56,24 +36,30 @@
       <number>6</number>
      </property>
      <item>
-      <widget class="QLabel" name="label_5" >
+      <widget class="QLabel" name="label" >
        <property name="text" >
-        <string>Stride</string>
+        <string>Domain</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QSpinBox" name="Stride:0" />
-     </item>
-     <item>
-      <widget class="QSpinBox" name="Stride:1" />
-     </item>
-     <item>
-      <widget class="QSpinBox" name="Stride:2" />
+      <widget class="QComboBox" name="DomainNames" />
      </item>
     </layout>
    </item>
-   <item row="3" column="0" >
+   <item>
+    <widget class="pqSelectionTreeWidget" name="GridNames" >
+     <property name="rootIsDecorated" >
+      <bool>false</bool>
+     </property>
+     <column>
+      <property name="text" >
+       <string>Grids</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
     <widget class="pqSelectionTreeWidget" name="Variables" >
      <property name="sizePolicy" >
       <sizepolicy>
@@ -104,21 +90,7 @@
      </column>
     </widget>
    </item>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="label_2" >
-     <property name="text" >
-      <string>Grids</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" >
-    <widget class="QListWidget" name="GridNames" >
-     <property name="selectionMode" >
-      <enum>QAbstractItemView::MultiSelection</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0" >
+   <item>
     <layout class="QHBoxLayout" >
      <property name="margin" >
       <number>0</number>
@@ -127,16 +99,42 @@
       <number>6</number>
      </property>
      <item>
-      <widget class="QLabel" name="label" >
+      <widget class="QLabel" name="label_5" >
        <property name="text" >
-        <string>Domain</string>
+        <string>Stride</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="DomainNames" />
+      <widget class="QSpinBox" name="Stride:0" />
+     </item>
+     <item>
+      <widget class="QSpinBox" name="Stride:1" />
+     </item>
+     <item>
+      <widget class="QSpinBox" name="Stride:2" />
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="Parameters_label" >
+     <property name="text" >
+      <string>Parameters</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="Parameters" >
+     <property name="autoFillBackground" >
+      <bool>true</bool>
+     </property>
+     <property name="columnCount" >
+      <number>3</number>
+     </property>
+     <column/>
+     <column/>
+     <column/>
+    </widget>
    </item>
   </layout>
  </widget>
