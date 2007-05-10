@@ -18,10 +18,11 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMRepresentationProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMRepresentationProxy::vtkSMRepresentationProxy()
 {
+  this->SelectionSupported = false;
 }
 
 //----------------------------------------------------------------------------
@@ -65,6 +66,25 @@ bool vtkSMRepresentationProxy::GetVisibility()
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMRepresentationProxy::GetSelectionVisibility()
+{
+  if (!this->GetVisibility() || !this->GetSelectionSupported())
+    {
+    return false;
+    }
+
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("SelectionVisibility"));
+  if (ivp && ivp->GetNumberOfElements()== 1 && ivp->GetElement(0))
+    {
+    return true;
+    }
+
+  return false;
+}
+
+
+//----------------------------------------------------------------------------
 void vtkSMRepresentationProxy::Connect(vtkSMProxy* producer,
   vtkSMProxy* consumer, const char* propertyname/*="Input"*/)
 {
@@ -91,6 +111,7 @@ void vtkSMRepresentationProxy::Connect(vtkSMProxy* producer,
 void vtkSMRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "SelectionSupported : " << this->SelectionSupported << endl;
 }
 
 

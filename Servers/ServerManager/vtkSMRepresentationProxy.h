@@ -19,6 +19,11 @@
 // proxies. A representation proxy is a representation of something in a view.
 // That something can be data (vtkSMPipelineRepresentationProxy and subclasses) 
 // or widgets (those that have no data inputs). 
+//
+// A representation additionally has selection obligations i.e. a representation
+// may be able to show a selection. Here we define API to query whether the
+// representation fulfills selection obligations. For more details look at
+// vtkSMPipelineRepresentationProxy.
 
 #ifndef __vtkSMRepresentationProxy_h
 #define __vtkSMRepresentationProxy_h
@@ -56,6 +61,17 @@ public:
   // Returns true if this representation is visible.
   // Default implementation returns the state of "Visibility" property, if any.
   virtual bool GetVisibility();
+
+  // Description:
+  // Returns whether this representation shows selection.
+  // This is always false if GetVisibility() is false or GetSelectionSupported()
+  // is false. If both are true, then default implementation
+  // returns the state of "SelectionVisibility" property, if any.
+  virtual bool GetSelectionVisibility();
+
+  // Description:
+  // Returns if this representation supports selection.
+  vtkGetMacro(SelectionSupported, bool);
 
   // Description:
   // Get the data information for the represented data.
@@ -120,9 +136,15 @@ protected:
   void Connect(vtkSMProxy* producer, vtkSMProxy* consumer,
     const char* propertyname="Input");
 
+  // Description:
+  // Subclassess should set this to true if they support selection pipelines.
+  vtkSetMacro(SelectionSupported, bool);
+
 private:
   vtkSMRepresentationProxy(const vtkSMRepresentationProxy&); // Not implemented
   void operator=(const vtkSMRepresentationProxy&); // Not implemented
+
+  bool SelectionSupported;
 //ETX
 };
 

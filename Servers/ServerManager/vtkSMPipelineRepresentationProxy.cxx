@@ -17,7 +17,6 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationStrategy.h"
@@ -53,7 +52,7 @@ protected:
 };
 
 
-vtkCxxRevisionMacro(vtkSMPipelineRepresentationProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMPipelineRepresentationProxy, "1.6");
 vtkCxxSetObjectMacro(vtkSMPipelineRepresentationProxy, InputProxy, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMPipelineRepresentationProxy::vtkSMPipelineRepresentationProxy()
@@ -61,7 +60,6 @@ vtkSMPipelineRepresentationProxy::vtkSMPipelineRepresentationProxy()
   this->InputProxy = 0;
   this->Strategy = 0;
 
-  this->SelectionSupported = false;
   this->StrategyForSelection = 0;
 
   this->UpdateTime = 0.0;
@@ -222,24 +220,6 @@ vtkPVDataInformation* vtkSMPipelineRepresentationProxy::GetFullResDataInformatio
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPipelineRepresentationProxy::GetSelectionVisibility()
-{
-  if (!this->GetVisibility() || !this->GetSelectionSupported())
-    {
-    return false;
-    }
-
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->GetProperty("SelectionVisibility"));
-  if (ivp && ivp->GetNumberOfElements()== 1 && ivp->GetElement(0))
-    {
-    return true;
-    }
-
-  return false;
-}
-
-//----------------------------------------------------------------------------
 void vtkSMPipelineRepresentationProxy::SetUseViewTimeForUpdate(bool val)
 {
   if (val == this->UseViewTimeForUpdate)
@@ -372,7 +352,7 @@ void vtkSMPipelineRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)
 void vtkSMPipelineRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "SelectionSupported : " << this->SelectionSupported << endl;
+  os << indent << "UseViewTimeForUpdate: " << this->UseViewTimeForUpdate
+    << endl;
 }
-
 

@@ -130,16 +130,6 @@ public:
   // it must explicity mark the strategy invalid.
   virtual void MarkModified(vtkSMProxy* modifiedProxy);
 
-  // Description:
-  // Returns whether this representation shows selection.
-  // This is always false if GetVisibility() is false or GetSelectionSupported()
-  // is false.
-  virtual bool GetSelectionVisibility();
-
-  // Description:
-  // Returns if this representation supports selection.
-  vtkGetMacro(SelectionSupported, bool);
-
 //BTX
 protected:
   vtkSMPipelineRepresentationProxy();
@@ -201,11 +191,6 @@ protected:
 
   // Get the representation strategy used for the selection pipeline, if any.
   vtkGetObjectMacro(StrategyForSelection, vtkSMRepresentationStrategy);
-
-  // Description:
-  // Subclassess should set this to true if they support selection pipelines.
-  bool SelectionSupported;
-  vtkSetMacro(SelectionSupported, bool);
 
   double UpdateTime;
   bool UpdateTimeInitialized;
