@@ -225,7 +225,7 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->connect(this->Form->Opacity, SIGNAL(textEdited(const QString &)),
       this, SLOT(handleOpacityEdit()));
 
-  this->connect(this->Form->ColorSpace, SIGNAL(activated(int)),
+  this->connect(this->Form->ColorSpace, SIGNAL(currentIndexChanged(int)),
       this, SLOT(setColorSpace(int)));
 
   this->connect(this->Form->SaveButton, SIGNAL(clicked()),
