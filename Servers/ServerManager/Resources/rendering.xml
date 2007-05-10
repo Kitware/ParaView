@@ -909,6 +909,20 @@
         animateable="0">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
+      
+      <IntVectorProperty name="ScaledText"
+        command="SetScaledText"
+        number_of_elements="1"
+        default_values="1"
+        animateable="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <ProxyProperty name="TextProperty"
+        command="SetTextProperty">
+        <ProxyGroupDomain name="groups">
+          <Group name="properties"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
     </Proxy>
     
     
@@ -1359,6 +1373,12 @@
           <Group name="renderers"/>
         </ProxyGroupDomain>
       </ProxyProperty>
+
+      <ProxyProperty name="TextActor" command="SetTextActor">
+        <ProxyGroupDomain name="groups">
+          <Group name="props"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
       <!-- End of TextRepresentation -->
     </Proxy>
   </ProxyGroup>
@@ -1431,6 +1451,26 @@
         animateable="0">
         <IntRangeDomain name="range" min="0" />
       </IntVectorProperty>
+      
+      <DoubleVectorProperty name="Orientation"
+        command="SetOrientation"
+        number_of_elements="1"
+        default_values="0"
+        animateable="0">
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Justification"
+        command="SetJustification"
+        number_of_elements="1"
+        default_values="0"
+        animateable="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Left"/>
+          <Entry value="1" text="Center"/>
+          <Entry value="2" text="Right"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <!-- End of TextProperty -->
     </Proxy>
   
@@ -2640,6 +2680,20 @@
           <Property name="Position2" />
           <Property name="PositionInfo" />
           <Property name="Position2Info" />
+
+          <Property name="ScaledText"/>
+          <Property name="Resizable"/>
+                    
+          <!-- properties for Text -->
+          <Property name="Justification"/>
+          <Property name="Orientation"/>
+          <Property name="Color"/>
+          <Property name="Opacity"/>
+          <Property name="FontFamily"/>
+          <Property name="Bold"/>
+          <Property name="Italic"/>
+          <Property name="Shadow"/>
+          <Property name="FontSize"/>
         </ExposedProperties>
       </SubProxy>
 
@@ -3525,14 +3579,13 @@
       <!--- End of SliderWidgetDisplay -->
     </New3DWidgetProxy>
 
-    <New3DWidgetProxy name="TextWidgetDisplay">
-      <IntVectorProperty
-        name="Enabled"
+    <TextWidgetDisplayProxy name="TextWidgetDisplay">
+      <IntVectorProperty name="Enabled"
         command="SetEnabled"
         number_of_elements="1"
         default_values="0"
         update_self="1">
-        <BooleanDomain name="bool" />
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
       <SubProxy>
@@ -3540,13 +3593,43 @@
           proxygroup="props" proxyname="TextRepresentation">
         </Proxy>
         <ExposedProperties>
-          <Property name="Visibility" />
-          <Property name="Text" />
-          <Property name="Position" />
-          <Property name="Position2" />
-          <Property name="PositionInfo" />
-          <Property name="Position2Info" />
+          <Property name="Visibility"/>
+          <Property name="Text"/>
+          <Property name="Position"/>
+          <Property name="Position2"/>
+          <Property name="PositionInfo"/>
+          <Property name="Position2Info"/>
+          <Property name="TextActor"/>
         </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Prop2DActor"
+          proxygroup="props" proxyname="TextActor">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ScaledText"/>
+          <Property name="TextProperty"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Prop2DProperty"
+          proxygroup="properties" proxyname="TextProperty">
+        </Proxy>
+
+        <ExposedProperties>
+          <Property name="Justification"/>
+          <Property name="Orientation"/>
+          <Property name="Color"/>
+          <Property name="Opacity"/>
+          <Property name="FontFamily"/>
+          <Property name="Bold"/>
+          <Property name="Italic"/>
+          <Property name="Shadow"/>
+          <Property name="FontSize"/>
+        </ExposedProperties>
+
       </SubProxy>
 
       <SubProxy>
@@ -3554,13 +3637,14 @@
           proxygroup="3d_widgets" proxyname="TextWidget">
         </Proxy>
         <ExposedProperties>
-          <Property name="Enabled" />
-          <Property name="Selectable" />
+          <Property name="Enabled"/>
+          <Property name="Selectable"/>
+          <Property name="Resizable"/>
         </ExposedProperties>
       </SubProxy>     
 
       <!-- End of TextWidgetDisplay -->
-    </New3DWidgetProxy>
+    </TextWidgetDisplayProxy>
 
     <!-- End of displays group -->
   </ProxyGroup>

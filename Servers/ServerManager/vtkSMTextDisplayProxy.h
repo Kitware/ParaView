@@ -21,7 +21,7 @@
 
 #include "vtkSMConsumerDisplayProxy.h"
 
-class vtkSMNew3DWidgetProxy;
+class vtkSMTextWidgetDisplayProxy;
 
 class VTK_EXPORT vtkSMTextDisplayProxy : public vtkSMConsumerDisplayProxy
 {
@@ -77,7 +77,8 @@ protected:
 
   virtual void CreateVTKObjects(int numObjects);
 
-  vtkSMNew3DWidgetProxy* TextWidgetProxy;
+  vtkSMTextWidgetDisplayProxy* TextWidgetProxy;
+
   vtkSMSourceProxy* UpdateSuppressorProxy;
   vtkSMSourceProxy* CollectProxy;
   vtkSMSourceProxy* Input;

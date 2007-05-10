@@ -1216,6 +1216,9 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
        command="SetText"
        number_of_elements="1"
        default_values="Text">
+             <Hints>
+              <Widget type="multi_line"/>
+            </Hints>
         <Documentation>
           This property specifies the text to display.
         </Documentation>

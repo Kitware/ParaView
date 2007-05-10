@@ -147,6 +147,7 @@ SET(Kit_SRCS
 #  vtkSMTemporalXYPlotDisplayProxy.cxx
   vtkSMTesting.cxx
   vtkSMTextDisplayProxy.cxx
+  vtkSMTextWidgetDisplayProxy.cxx
   vtkSMTimeRangeInformationHelper.cxx
   vtkSMTimeStepsInformationHelper.cxx
   vtkSMTransformProxy.cxx
