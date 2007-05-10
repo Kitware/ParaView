@@ -4215,7 +4215,32 @@
         -->
         <Proxy name="SelectionProperty" proxygroup="properties" proxyname="Property" />
         <ExposedProperties>
-          <Property name="Color" exposed_name="SelectionColor" />
+          <Property name="Ambient" 
+                    exposed_name="SelectionAmbient" />
+          <Property name="AmbientColor" 
+                    exposed_name="SelectionAmbientColor" />
+          <Property name="Color" 
+                    exposed_name="SelectionColor" />
+          <Property name="Diffuse" 
+                    exposed_name="SelectionDiffuse" />
+          <Property name="DiffuseColor" 
+                    exposed_name="SelectionDiffuseColor" />
+          <Property name="Interpolation" 
+                    exposed_name="SelectionInterpolation" />
+          <Property name="LineWidth" 
+                    exposed_name="SelectionLineWidth" />
+          <Property name="Opacity" 
+                    exposed_name="SelectionOpacity" />
+          <Property name="PointSize" 
+                    exposed_name="SelectionPointSize" />
+          <Property name="Representation" 
+                    exposed_name="SelectionRepresentation" />
+          <Property name="Shading" 
+                    exposed_name="SelectionShading" />
+          <Property name="SpecularColor" 
+                    exposed_name="SelectionSpecularColor" />
+          <Property name="SpecularPower" 
+                    exposed_name="SelectionSpecularPower" />
         </ExposedProperties>
       </SubProxy>
 

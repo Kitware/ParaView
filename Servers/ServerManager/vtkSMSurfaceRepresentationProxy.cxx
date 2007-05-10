@@ -15,14 +15,15 @@
 #include "vtkSMSurfaceRepresentationProxy.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -49,6 +50,19 @@ vtkSMSurfaceRepresentationProxy::~vtkSMSurfaceRepresentationProxy()
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMSurfaceRepresentationProxy::GetSelectionVisibility()
+{
+  if (!this->Superclass::GetSelectionVisibility())
+    {
+    return false;
+    }
+
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->GetProperty("Selection"));
+  return (pp && pp->GetNumberOfProxies() > 0);
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMSurfaceRepresentationProxy::AddToView(vtkSMViewProxy* view)
 {
   vtkSMRenderViewProxy* renderView = vtkSMRenderViewProxy::SafeDownCast(view);
@@ -64,6 +78,10 @@ bool vtkSMSurfaceRepresentationProxy::AddToView(vtkSMViewProxy* view)
     }
 
   renderView->AddPropToRenderer(this->Prop3D);
+  if (this->GetSelectionSupported())
+    {
+    renderView->AddPropToRenderer(this->SelectionProp3D);
+    }
   return true;
 }
 
@@ -78,6 +96,7 @@ bool vtkSMSurfaceRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
     }
 
   renderView->RemovePropFromRenderer(this->Prop3D);
+  renderView->RemovePropFromRenderer(this->SelectionProp3D);
   return this->Superclass::RemoveFromView(view);
 }
 

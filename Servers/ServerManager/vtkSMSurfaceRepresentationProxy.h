@@ -33,6 +33,12 @@ public:
   vtkTypeRevisionMacro(vtkSMSurfaceRepresentationProxy, vtkSMPipelineRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Returns whether this representation shows selection.
+  // Overridden to turn off selection visibility if no "Selection" object is
+  // set.
+  virtual bool GetSelectionVisibility();
+
 //BTX
 protected:
   vtkSMSurfaceRepresentationProxy();
