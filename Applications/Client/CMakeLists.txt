@@ -147,6 +147,8 @@ IF(BUILD_TESTING)
   SET(TEST_IMAGE ${PARAVIEW_DATA_ROOT}/Baseline)
 
   SET (XML_TESTS_WITH_BASELINES
+    # ColorEditor3 doesn't work in client/server mode
+    ColorEditor3
     CreateSourceWithoutConnect
 #    LoadStateSelection
     OpenFile
