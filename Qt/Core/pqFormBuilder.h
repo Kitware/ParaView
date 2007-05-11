@@ -34,7 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqFormBuilder_h
 
 #include "pqCoreExport.h"
+#include <QObject>
+#ifdef Q_WS_MAC
+#include <QUiLoader>  // build fine with Qt install from dmg
+#else
 #include <QtUiTools/QUiLoader>   // CMake 2.4.3+ finds QtUiTools correctly
+#endif
 
 /// form builder that can create forms
 /// dynamic and static plugins are searched
