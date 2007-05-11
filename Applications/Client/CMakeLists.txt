@@ -265,6 +265,7 @@ IF(BUILD_TESTING)
     CustomFilter
     CutMulti
     DualSphereAnimation
+    ExodusIIPanel
     ExodusPanel
     Flow
     Fractal2D
