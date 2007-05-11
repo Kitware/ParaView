@@ -150,6 +150,7 @@ IF(BUILD_TESTING)
     # ColorEditor3 doesn't work in client/server mode
     ColorEditor3
     CreateSourceWithoutConnect
+    ElementInspector
 #    LoadStateSelection
     OpenFile
     OpenSaveData

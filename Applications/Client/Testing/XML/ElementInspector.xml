@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="SphereSource" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuView" command="activate" arguments="Element Inspector" />
+  <pqevent object="MainWindow/menubar/menuEdit" command="activate" arguments="actionSelectionMode" />
+  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.336811,0.107759,1,1,0)" />
+  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.687034,0.922414,1,0,0)" />
+  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.687034,0.922414,1,0,0)" />
+  <pqevent object="MainWindow/elementInspectorDock/ElementInspector/DataTypeComboBox" command="set_string" arguments="Point Data" />
+  <pqevent object="MainWindow/elementInspectorDock/ElementInspector/DataTypeComboBox" command="set_string" arguments="Field Data" />
+  <pqevent object="MainWindow/elementInspectorDock/ElementInspector/DataTypeComboBox" command="set_string" arguments="Point Data" />
+</pqevents>
