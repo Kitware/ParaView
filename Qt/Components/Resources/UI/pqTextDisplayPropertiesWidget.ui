@@ -352,6 +352,20 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>Visibility</tabstop>
+  <tabstop>Interactivity</tabstop>
+  <tabstop>Position1X</tabstop>
+  <tabstop>Position1Y</tabstop>
+  <tabstop>spinBoxSize</tabstop>
+  <tabstop>comboFontFamily</tabstop>
+  <tabstop>toolButtonBold</tabstop>
+  <tabstop>toolButtonItalic</tabstop>
+  <tabstop>toolButtonShadow</tabstop>
+  <tabstop>comboTextAlign</tabstop>
+  <tabstop>spinBoxOpacity</tabstop>
+  <tabstop>buttonColor</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
