@@ -84,7 +84,6 @@ static const char* ProxyListTitleTemplate =
     "  <div class=\"ProxyHeading\">\n"\
     "    %TITLE%\n"\
     "  </div>\n"\
-    "  <br />\n"\
     "</div>\n";
 
 static const char* ProxyListTableHeaderTemplate = 
