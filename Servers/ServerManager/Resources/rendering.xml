@@ -4159,6 +4159,13 @@
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
 
+      <IntVectorProperty name="SelectionVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+
       <SubProxy>
         <!-- 
           Geometry filter is used to conver non-polydata input to polydata.
@@ -4289,7 +4296,6 @@
           <!-- FIXME 
           <Property name="RenderModuleHelper" exposed_name="ViewHelper" />
           -->
-          <Property name="Visibility" exposed_name="SelectionVisibility" />
         </ExposedProperties>
       </SubProxy>
 

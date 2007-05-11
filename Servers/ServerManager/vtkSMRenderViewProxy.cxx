@@ -52,10 +52,18 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtkSMPropRepresentationProxy.h"
 
 #include "vtkSMClientServerRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.3");
+#include <vtkstd/map>
+
+class vtkSMRenderViewProxy::vtkPropToRepresentationMap : 
+  public vtkstd::map<vtkClientServerID, vtkSmartPointer<vtkSMRepresentationProxy> >
+{
+};
+
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.4");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 //-----------------------------------------------------------------------------
@@ -87,6 +95,8 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
   this->CacheLimit = 100*1024; // 100 MBs.
 
   this->LODThreshold = 0.0;
+
+  this->PropToRepresentationMap = new vtkPropToRepresentationMap();
 }
 
 //-----------------------------------------------------------------------------
@@ -506,8 +516,53 @@ void vtkSMRenderViewProxy::AddRepresentationInternal(
     {
     ivp->SetElement(0, this->UseImmediateMode);
     }
- 
+
+  vtkSMPropRepresentationProxy* propRepr = 
+    vtkSMPropRepresentationProxy::SafeDownCast(repr);
+  if (propRepr)
+    {
+    vtkSmartPointer<vtkCollection> col = vtkSmartPointer<vtkCollection>::New();
+    propRepr->GetSelectableProps(col);
+    for (int cc=0; cc < col->GetNumberOfItems(); cc++)
+      {
+      vtkSMProxy* propProxy = vtkSMProxy::SafeDownCast(
+        col->GetItemAsObject(cc));
+      if (propProxy)
+        {
+        (*this->PropToRepresentationMap)[propProxy->GetSelfID()] = repr;
+        }
+      }
+    }
+
   this->Superclass::AddRepresentationInternal(repr);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::RemoveRepresentationInternal(
+  vtkSMRepresentationProxy* repr)
+{
+  vtkSMPropRepresentationProxy* propRepr = 
+    vtkSMPropRepresentationProxy::SafeDownCast(repr);
+  if (propRepr)
+    {
+    vtkPropToRepresentationMap::iterator iter = 
+      this->PropToRepresentationMap->begin();
+    while (iter != this->PropToRepresentationMap->end())
+      {
+      if (iter->second.GetPointer() == repr)
+        {
+        vtkPropToRepresentationMap::iterator temp = iter;
+        ++iter;
+        this->PropToRepresentationMap->erase(iter);
+        }
+      else
+        {
+        ++iter;
+        }
+      }
+    }
+
+  this->Superclass::RemoveRepresentationInternal(repr);
 }
 
 //-----------------------------------------------------------------------------
@@ -1246,6 +1301,26 @@ int vtkSMRenderViewProxy::IsSelectionAvailable()
 
   //yeah!
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::SelectOnSurface(unsigned int x0, 
+  unsigned int y0, unsigned int x1, unsigned int y1,
+  vtkCollection* selectionRepresentations/*=0*/)
+{
+  // 1) Create surface selection.
+  //   Will returns a surface selection in terms of cells selected on the 
+  //   visible props from all representations.
+  vtkSelection* surfaceSel = this->SelectVisibleCells(x0, y0, x1, y1);
+  (void)surfaceSel;
+  (void)selectionRepresentations;
+
+  // 2) Split the selection into selections on each of the representations.
+ 
+  // Since we have populate vtkPropToRepresentationMap when representations were
+  // added or removed, we'll
+  
+  return true;
 }
 
 //-----------------------------------------------------------------------------

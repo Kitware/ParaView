@@ -14,16 +14,19 @@
 =========================================================================*/
 #include "vtkSMSurfaceRepresentationProxy.h"
 
+#include "vtkCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
+#include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -60,6 +63,23 @@ bool vtkSMSurfaceRepresentationProxy::GetSelectionVisibility()
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->GetProperty("Selection"));
   return (pp && pp->GetNumberOfProxies() > 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSurfaceRepresentationProxy::UpdateSelectionPropVisibility()
+{
+  int visibility  = this->GetSelectionVisibility()? 1 : 0;
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->SelectionProp3D->GetProperty("Visibility"));
+  ivp->SetElement(0, visibility);
+  this->SelectionProp3D->UpdateProperty("Visibility");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSurfaceRepresentationProxy::Update(vtkSMViewProxy* view)
+{
+  this->UpdateSelectionPropVisibility();
+  this->Superclass::Update(view);
 }
 
 //----------------------------------------------------------------------------
@@ -218,7 +238,28 @@ bool vtkSMSurfaceRepresentationProxy::EndCreateVTKObjects(int numObjects)
   this->Connect(this->SelectionLODMapper, this->SelectionProp3D, "LODMapper");
   this->Connect(this->SelectionProperty, this->SelectionProp3D, "Property");
 
+  // Selection prop is not pickable.
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->SelectionProp3D->GetProperty("Pickable"));
+  ivp->SetElement(0, 0);
+  this->SelectionProp3D->UpdateProperty("Pickable");
+
   return this->Superclass::EndCreateVTKObjects(numObjects);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSurfaceRepresentationProxy::GetSelectableProps(
+  vtkCollection* collection)
+{
+  collection->AddItem(this->Prop3D);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSurfaceRepresentationProxy::ConvertSurfaceSelectionToVolumeSelection(
+  vtkSelection* input, vtkSelection* output)
+{
+  vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelection(
+    this->ConnectionID, input, output);
 }
 
 //----------------------------------------------------------------------------

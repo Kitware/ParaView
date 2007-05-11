@@ -23,14 +23,14 @@
 #ifndef __vtkSMSurfaceRepresentationProxy_h
 #define __vtkSMSurfaceRepresentationProxy_h
 
-#include "vtkSMPipelineRepresentationProxy.h"
+#include "vtkSMPropRepresentationProxy.h"
 
 class VTK_EXPORT vtkSMSurfaceRepresentationProxy : 
-  public vtkSMPipelineRepresentationProxy
+  public vtkSMPropRepresentationProxy
 {
 public:
   static vtkSMSurfaceRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMSurfaceRepresentationProxy, vtkSMPipelineRepresentationProxy);
+  vtkTypeRevisionMacro(vtkSMSurfaceRepresentationProxy, vtkSMPropRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -38,6 +38,24 @@ public:
   // Overridden to turn off selection visibility if no "Selection" object is
   // set.
   virtual bool GetSelectionVisibility();
+
+  // Description:
+  // Called to update the Representation. 
+  // Overridden to ensure that UpdateSelectionPropVisibility() is called.
+  virtual void Update(vtkSMViewProxy* view);
+  virtual void Update() { this->Superclass::Update(); };
+
+  // Description:
+  // Adds to the passed in collection the props that representation has which
+  // are selectable. The passed in collection object must be empty.
+  virtual void GetSelectableProps(vtkCollection*);
+
+  // Description:
+  // Given a surface selection for this representation, this returns a new
+  // vtkSelection for the selected cells/points in the input of this
+  // representation.
+  virtual void ConvertSurfaceSelectionToVolumeSelection(
+   vtkSelection* input, vtkSelection* output);
 
 //BTX
 protected:
@@ -74,6 +92,11 @@ protected:
   // Currently a representation can be added to only one view.
   virtual bool RemoveFromView(vtkSMViewProxy* view);
 
+  // Description:
+  // Updates selection prop visibility based on whether selection can actually
+  // be shown.
+  void UpdateSelectionPropVisibility();
+
   vtkSMSourceProxy* GeometryFilter;
   vtkSMProxy* Mapper;
   vtkSMProxy* LODMapper;
@@ -90,6 +113,7 @@ protected:
   vtkSMProxy* SelectionLODMapper;
   vtkSMProxy* SelectionProp3D;
   vtkSMProxy* SelectionProperty;
+
 private:
   vtkSMSurfaceRepresentationProxy(const vtkSMSurfaceRepresentationProxy&); // Not implemented
   void operator=(const vtkSMSurfaceRepresentationProxy&); // Not implemented

@@ -175,6 +175,14 @@ public:
     unsigned int x1, unsigned int y1);
 
   // Description:
+  // Creates a surface selection. Returns if selection was successful.
+  // selectedRepresentations (if non-null) is filled with the representations
+  // that were selected in the process.
+  bool SelectOnSurface(unsigned int x0, unsigned int y0,
+    unsigned int x1, unsigned int y1,
+    vtkCollection* selectedRepresentations=0);
+
+  // Description:
   // Get/Set the cache limit (in kilobytes) for each process. If cache size
   // grows beyond the limit, no caching is done on any of the processes.
   vtkGetMacro(CacheLimit, int);
@@ -212,6 +220,10 @@ protected:
   // Called by AddRepresentation(). Subclasses can override to add 
   // observers etc.
   virtual void AddRepresentationInternal(vtkSMRepresentationProxy* rep);
+
+  // Description:
+  // Removes a representation proxy from this view.
+  virtual void RemoveRepresentationInternal(vtkSMRepresentationProxy*);
 
   // Description:
   // Creates a new vtkSMRepresentationStrategy subclass based on the type
@@ -301,6 +313,11 @@ protected:
 private:
   vtkSMRenderViewProxy(const vtkSMRenderViewProxy&); // Not implemented.
   void operator=(const vtkSMRenderViewProxy&); // Not implemented.
+
+  class vtkPropToRepresentationMap;
+
+  // This map helps during surface selections.
+  vtkPropToRepresentationMap* PropToRepresentationMap;
 //ETX
 };
 
