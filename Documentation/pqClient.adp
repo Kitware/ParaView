@@ -12,6 +12,7 @@
 </profile>
 
 <DCF ref="Documentation/index.html" icon="images/handbook.png" title="ParaView">
+  <section ref="Documentation/GUIOverview.html" title="Interface Overview"/>
   <section ref="Documentation/ObjectInspector.html" title="Object Inspector">
     <keyword ref="Documentation/ObjectInspector.html">Object Inspector</keyword>
     <keyword ref="Documentation/Properties.html">Properties Panel</keyword>

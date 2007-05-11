@@ -25,6 +25,7 @@ set(PARAVIEW_HTML_DOCUMENTATION
   ElementInspector.html
   ElementInspector.png
   Exponential.png
+  GUIOverview.html
   HistogramDisplayTab.png
   HistogramView.png
   index.html
@@ -37,6 +38,7 @@ set(PARAVIEW_HTML_DOCUMENTATION
   MaximizeViewButton.png
   ObjectInspector.html
   ParaViewDoc.css
+  ParaViewGUIOverview.png
   ParaViewLogo.png
   PipelineBrowser.html
   PipelineBrowser.png
