@@ -85,7 +85,12 @@ int pqDataSetModel::rowCount(const QModelIndex&) const
 int pqDataSetModel::columnCount(const QModelIndex&) const
 {
   vtkFieldData* fd = this->getFieldData();
-  return fd? fd->GetNumberOfArrays() : 0;
+  int numCols = fd? fd->GetNumberOfArrays() : 0;
+  if (this->Type == POINT_DATA_FIELD)
+    {
+    numCols++;
+    }
+  return numCols;
 }
 
 //-----------------------------------------------------------------------------
@@ -148,23 +153,41 @@ QVariant pqDataSetModel::data(const QModelIndex& idx, int role) const
     {
     return QVariant();
     }
-  vtkFieldData* fd = this->getFieldData();
-  vtkDataArray* array = fd?  fd->GetArray(idx.column()) : 0;
 
-  if(role == Qt::DisplayRole && array)
+  int cidx = idx.column();
+  if(role == Qt::DisplayRole)
     {
     QString text;
-    int num_of_components = array->GetNumberOfComponents();
-    switch (array->GetDataType())
-      {
-      vtkExtendedTemplateMacro(::pqDataSetModelPrintTuple(text,
-          static_cast<VTK_TT*>(array->GetVoidPointer(idx.row()*num_of_components)),
-          num_of_components));
 
-    default:
-      qDebug() << "Unsupported data type: " << array->GetDataType();
+    // NOTE: First column is point coordinates if the type is point data.
+    if (this->Type == POINT_DATA_FIELD && cidx == 0)
+      {
+      double* pt = this->DataSet->GetPoint(idx.row());
+      ::pqDataSetModelPrintTuple(text, pt, 3);
+      return text;
       }
-    return text;
+    else
+      {
+      vtkFieldData* fd = this->getFieldData();
+      if (this->Type == POINT_DATA_FIELD)
+        {
+        cidx--;
+        }
+      vtkDataArray* array = fd?  fd->GetArray(cidx) : 0;
+      if (array)
+        {
+        int num_of_components = array->GetNumberOfComponents();
+        switch (array->GetDataType())
+          {
+          vtkExtendedTemplateMacro(
+            ::pqDataSetModelPrintTuple(text, static_cast<VTK_TT*>(array->GetVoidPointer(idx.row()*num_of_components)), num_of_components));
+          
+          default:
+            qDebug() << "Unsupported data type: " << array->GetDataType();
+          }
+        return text;
+        }
+      }
     }
   
   return QVariant();
@@ -177,26 +200,37 @@ QVariant pqDataSetModel::headerData(int section, Qt::Orientation orientation, in
     {
     if(role == Qt::DisplayRole)
       {
-      vtkFieldData* fd = this->getFieldData();
-      vtkDataArray* array = fd?  fd->GetArray(section) : 0;
-      QVariant arrayname = array? array->GetName() : QVariant();
-      if (arrayname.toString() == "vtkOriginalProcessIds")
+      if (this->Type == POINT_DATA_FIELD && section == 0)
         {
-        arrayname = "Process ID";
+        return "Point Locations";
         }
-      else if (this->SubstitutePointCellIdNames)
+      else
         {
-        if (arrayname.toString() == "vtkOriginalPointIds")
+        if (this->Type == POINT_DATA_FIELD)
           {
-          arrayname = "Point ID";
+          section--;
           }
-
-        else if (arrayname.toString() == "vtkOriginalCellIds")
+        vtkFieldData* fd = this->getFieldData();
+        vtkDataArray* array = fd?  fd->GetArray(section) : 0;
+        QVariant arrayname = array? array->GetName() : QVariant();
+        if (arrayname.toString() == "vtkOriginalProcessIds")
           {
-          arrayname = "Cell ID";
+          arrayname = "Process ID";
           }
+        else if (this->SubstitutePointCellIdNames)
+          {
+          if (arrayname.toString() == "vtkOriginalPointIds")
+            {
+            arrayname = "Point ID";
+            }
+          
+          else if (arrayname.toString() == "vtkOriginalCellIds")
+            {
+            arrayname = "Cell ID";
+            }
+          }
+        return arrayname;
         }
-      return arrayname;
       }
     }
 
