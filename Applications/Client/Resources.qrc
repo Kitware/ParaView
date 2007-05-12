@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/pqClient" >
-        <file>ParaViewLogo.png</file>
         <file>PVSplashScreen.png</file>
     </qresource>
 </RCC>
