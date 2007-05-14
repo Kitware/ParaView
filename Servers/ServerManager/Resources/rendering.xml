@@ -4043,6 +4043,13 @@
         LOD. (Does not support client-server/parallel pipelines).
       </Documentation>
 
+      <ProxyProperty
+        name="Input"
+        command="SetInput"
+        update_self="1"
+        immediate_update="1">
+      </ProxyProperty>
+
       <SubProxy>
         <Proxy name="LODDecimator" 
           proxygroup="filters" proxyname="QuadricClustering" />
@@ -4357,6 +4364,7 @@
 
 
 </ServerManagerConfiguration>
+
 
 
 

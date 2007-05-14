@@ -30,7 +30,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -151,7 +151,7 @@ bool vtkSMSurfaceRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
   // can assume that the objects for this proxy have been created.
   // (Look at vtkSMPipelineRepresentationProxy::AddToView()).
 
-  strategy->SetInput(this->GeometryFilter);
+  this->Connect(this->GeometryFilter, strategy);
   this->Connect(strategy->GetOutput(), this->Mapper);
   this->Connect(strategy->GetLODOutput(), this->LODMapper);
 
@@ -169,7 +169,7 @@ bool vtkSMSurfaceRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
     strategy->SetEnableLOD(true);
     strategy->UpdateVTKObjects();
 
-    strategy->SetInput(this->SelectionGeometryFilter);
+    this->Connect(this->SelectionGeometryFilter, strategy);
     this->Connect(strategy->GetOutput(), this->SelectionMapper);
     this->Connect(strategy->GetLODOutput(), this->SelectionLODMapper);
     }
