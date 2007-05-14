@@ -59,13 +59,14 @@
 #include "vtkSMClientServerRenderModuleProxy.h"
 
 #include <vtkstd/map>
+#include <vtkstd/set>
 
 class vtkSMRenderViewProxy::vtkPropToRepresentationMap : 
   public vtkstd::map<vtkClientServerID, vtkSmartPointer<vtkSMPropRepresentationProxy> >
 {
 };
 
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.6");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 //-----------------------------------------------------------------------------
@@ -1306,6 +1307,30 @@ int vtkSMRenderViewProxy::IsSelectionAvailable()
 }
 
 //-----------------------------------------------------------------------------
+vtkSelection* vtkSMRenderViewProxy::NewSelectionForProp(
+  vtkSelection* selection, vtkClientServerID propId)
+{
+  vtkSelection* newSelection = vtkSelection::New();
+  newSelection->GetProperties()->Copy(selection->GetProperties(), 0);
+  unsigned int numChildren = selection->GetNumberOfChildren();
+  for(unsigned int i=0; i<numChildren; i++)
+    {
+    vtkSelection* child = selection->GetChild(i);
+    vtkInformation* properties = child->GetProperties();
+    if (properties->Has(vtkSelection::PROP_ID()) &&
+      properties->Get(vtkSelection::PROP_ID()) == (int)propId.ID)
+      {
+      vtkSelection* newChildSelection = vtkSelection::New();
+      newChildSelection->ShallowCopy(child);
+      newSelection->AddChild(newChildSelection);
+      newChildSelection->Delete();
+      }
+    }
+
+  return newSelection;
+}
+
+//-----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::SelectOnSurface(unsigned int x0, 
   unsigned int y0, unsigned int x1, unsigned int y1,
   vtkCollection* selectedRepresentations/*=0*/)
@@ -1322,12 +1347,16 @@ bool vtkSMRenderViewProxy::SelectOnSurface(unsigned int x0,
   //    selection source objects (using proxies).
   // 5) Set each of the selection source as the current selection to show on the
   //    representations.
- 
+
   // surfaceSel will have PROP_ID keys which we use to determine which selection
   // subtree belongs to which representation.
-  
+
   unsigned int numChildren = surfaceSel->GetNumberOfChildren();
   unsigned int cc;
+
+
+  vtkstd::set<vtkClientServerID> selectedProps;
+  vtkstd::set<vtkClientServerID>::iterator selectedPropsIter;
 
   for (cc=0; cc < numChildren; cc++)
     {
@@ -1341,38 +1370,51 @@ bool vtkSMRenderViewProxy::SelectOnSurface(unsigned int x0,
     vtkClientServerID propId;
     propId.ID = static_cast<vtkTypeUInt32>(properties->Get(
         vtkSelection::PROP_ID()));
+    selectedProps.insert(propId);
+    }
+
+  for (selectedPropsIter = selectedProps.begin();
+    selectedPropsIter != selectedProps.end(); ++selectedPropsIter)
+    {
+    vtkClientServerID propId = (*selectedPropsIter);
+
     vtkPropToRepresentationMap::iterator iter =
       this->PropToRepresentationMap->find(propId);
-    if (iter != this->PropToRepresentationMap->end())
+    if (iter == this->PropToRepresentationMap->end())
       {
-      // Give the surface selection to the representation to convert it to
-      // volume selection i.e. selection its data input.
-      vtkSMPropRepresentationProxy* rep = iter->second.GetPointer();
-      vtkSelection* volSelection = vtkSelection::New();
-      rep->ConvertSurfaceSelectionToVolumeSelection(child, volSelection);
-  
-      vtkSMProxy* selectionSource = 
-        vtkSMSelectionHelper::NewSelectionSourceFromSelection(
-          this->ConnectionID, volSelection);
-      vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-        rep->GetProperty("Selection"));
-      if (pp)
-        {
-        pp->RemoveAllProxies();
-        pp->AddProxy(selectionSource);
-        }
-      rep->UpdateProperty("Selection");
-
-      if (selectedRepresentations)
-        {
-        selectedRepresentations->AddItem(rep);
-        }
-
-      selectionSource->Delete();
-      volSelection->Delete();
+      continue;
       }
+
+    vtkSelection* child = this->NewSelectionForProp(surfaceSel, propId);
+
+    // Give the surface selection to the representation to convert it to
+    // volume selection i.e. selection its data input.
+    vtkSMPropRepresentationProxy* rep = iter->second.GetPointer();
+    vtkSelection* volSelection = vtkSelection::New();
+    rep->ConvertSurfaceSelectionToVolumeSelection(child, volSelection);
+
+    vtkSMProxy* selectionSource = 
+      vtkSMSelectionHelper::NewSelectionSourceFromSelection(
+        this->ConnectionID, volSelection);
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      rep->GetProperty("Selection"));
+    if (pp)
+      {
+      pp->RemoveAllProxies();
+      pp->AddProxy(selectionSource);
+      }
+    rep->UpdateProperty("Selection");
+
+    if (selectedRepresentations)
+      {
+      selectedRepresentations->AddItem(rep);
+      }
+
+    selectionSource->Delete();
+    volSelection->Delete();
+    child->Delete();
     }
- 
+
   surfaceSel->Delete();
   return true;
 }

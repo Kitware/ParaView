@@ -257,6 +257,12 @@ protected:
   // Reset the camera clipping range.
   void ResetCameraClippingRange();
 
+  // Description:
+  // Returns a new selection consisting of all the selections with the given
+  // prop id in the surfaceSelection.
+  vtkSelection* NewSelectionForProp(vtkSelection* surfaceSelection, 
+    vtkClientServerID propId);
+
   // Collection of props added to the renderer.
   vtkCollection* RendererProps; 
 
