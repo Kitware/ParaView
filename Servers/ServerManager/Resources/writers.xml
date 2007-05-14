@@ -86,7 +86,7 @@
       </IntVectorProperty>
     </Proxy>
 
-    <PWriterProxy name="XMLPVDWriter" class="vtkXMLPVDWriter" 
+    <WriterProxy name="XMLPVDWriter" class="vtkXMLPVDWriter" 
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
 
       <InputProperty name="Input" command="SetInputConnection">
@@ -94,16 +94,16 @@
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
       </InputProperty>
-    </PWriterProxy>
+    </WriterProxy>
 
     <WriterProxy name="XMLPolyDataWriter" class="vtkXMLPolyDataWriter"
       base_proxygroup="writers" base_proxyname="XMLWriterBase">
       <InputProperty name="Input" command="SetInputConnection">
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkPolyData" />
         </DataTypeDomain>
       </InputProperty>
@@ -113,7 +113,7 @@
       class="vtkXMLUnstructuredGridWriter"
       base_proxygroup="writers" base_proxyname="XMLWriterBase">
       <InputProperty name="Input" command="SetInputConnection">
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkUnstructuredGrid" />
         </DataTypeDomain>
       </InputProperty>
@@ -123,7 +123,7 @@
       class="vtkXMLStructuredGridWriter"
       base_proxygroup="writers" base_proxyname="XMLWriterBase">
       <InputProperty name="Input" command="SetInputConnection">
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkStructuredGrid" />
         </DataTypeDomain>
       </InputProperty>
@@ -133,7 +133,7 @@
       class="vtkXMLRectilinearGridWriter"
       base_proxygroup="writers" base_proxyname="XMLWriterBase">
       <InputProperty name="Input" command="SetInputConnection">
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkRectilinearGrid" />
         </DataTypeDomain>
       </InputProperty>
@@ -143,7 +143,7 @@
       class="vtkXMLImageDataWriter"
       base_proxygroup="writers" base_proxyname="XMLWriterBase">
       <InputProperty name="Input" command="SetInputConnection">
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkImageData" />
         </DataTypeDomain>
       </InputProperty>
@@ -153,7 +153,7 @@
       class="vtkXMLMultiGroupDataWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
       <InputProperty name="Input" command="SetInputConnection">
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="1">
           <DataType value="vtkMultiGroupDataSet" />
         </DataTypeDomain>
       </InputProperty>
@@ -163,7 +163,7 @@
       class="vtkXMLPPolyDataWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
       <InputProperty name="Input" command="SetInputConnection">
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkPolyData" />
         </DataTypeDomain>
       </InputProperty>
@@ -173,7 +173,7 @@
       class="vtkXMLPUnstructuredGridWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
       <InputProperty name="Input" command="SetInputConnection">
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkUnstructuredGrid" />
         </DataTypeDomain>
       </InputProperty>
@@ -183,7 +183,7 @@
       class="vtkXMLPStructuredGridWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
       <InputProperty name="Input" command="SetInputConnection">
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkStructuredGrid" />
         </DataTypeDomain>
       </InputProperty>
@@ -193,7 +193,7 @@
       class="vtkXMLPRectilinearGridWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
       <InputProperty name="Input" command="SetInputConnection">
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkRectilinearGrid" />
         </DataTypeDomain>
       </InputProperty>
@@ -203,7 +203,7 @@
       class="vtkXMLPImageDataWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
       <InputProperty name="Input" command="SetInputConnection">
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkImageData" />
         </DataTypeDomain>
       </InputProperty>
@@ -213,7 +213,7 @@
       class="vtkXMLPMultiGroupDataWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
       <InputProperty name="Input" command="SetInputConnection">
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="1">
           <DataType value="vtkMultiGroupDataSet" />
         </DataTypeDomain>
       </InputProperty>
@@ -222,7 +222,7 @@
     <WriterProxy name="DataSetWriter" class="vtkGenericDataObjectWriter"
       base_proxygroup="writers" base_proxyname="DataWriterBase">
       <InputProperty name="Input" command="SetInputConnection">
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkDataObject" />
         </DataTypeDomain>
       </InputProperty>
@@ -236,7 +236,7 @@
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkPolyData"/>
         </DataTypeDomain>
       </InputProperty>
@@ -249,7 +249,7 @@
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkImageData"/>
         </DataTypeDomain>
       </InputProperty>
@@ -262,7 +262,7 @@
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkImageData"/>
         </DataTypeDomain>
       </InputProperty>
@@ -274,7 +274,7 @@
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
       </InputProperty>
@@ -293,7 +293,7 @@
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkUnstructuredGrid"/>
         </DataTypeDomain>
       </InputProperty>
@@ -306,7 +306,7 @@
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkUnstructuredGrid"/>
         </DataTypeDomain>
       </InputProperty>
@@ -400,7 +400,7 @@
 
     <WriterProxy name="CSVWriter" class="vtkCSVWriter">
       <InputProperty name="Input" command="SetInputConnection">
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkRectilinearGrid" />
         </DataTypeDomain>
       </InputProperty>
