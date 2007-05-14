@@ -536,6 +536,8 @@ void pqDisplayProxyEditor::rescaleToDataRange()
   //pqColorScaleEditor colorScale(this);
   //colorScale.setDisplay(this->Internal->Display);
   //colorScale.rescaleRange();
+
+  this->updateView();
 }
 
 //-----------------------------------------------------------------------------
