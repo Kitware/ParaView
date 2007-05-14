@@ -151,6 +151,8 @@ IF(BUILD_TESTING)
     ColorEditor3
     CreateSourceWithoutConnect
     ElementInspector
+    # flow crashes in SurfaceVectors in an mpi build in client/server mode
+    Flow
 #    LoadStateSelection
     OpenFile
     OpenSaveData
@@ -267,7 +269,6 @@ IF(BUILD_TESTING)
     DualSphereAnimation
     ExodusIIPanel
     ExodusPanel
-    Flow
     Fractal2D
     Fractal3D
     LinePlot
