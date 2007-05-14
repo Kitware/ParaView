@@ -77,6 +77,13 @@ public:
   vtkGetMacro(EnableLOD, bool);
 
   // Description:
+  // Must be set if the representation wants the strategy to enable caching.
+  // When set to true the stratergy will use cache when the ViewHelperProxy
+  // indicates so. true by default.
+  vtkSetMacro(EnableCaching, bool);
+  vtkGetMacro(EnableCaching, bool);
+
+  // Description:
   // Helper is used to determine the current LOD decision.
   void SetViewHelperProxy(vtkSMProxy*);
   vtkGetObjectMacro(ViewHelperProxy, vtkSMProxy);
@@ -162,6 +169,8 @@ protected:
 
   vtkSMSourceProxy* Input;
   bool EnableLOD;
+  bool EnableCaching;
+
   bool LODDataValid;
   bool LODInformationValid;
   vtkPVDataInformation* LODInformation;

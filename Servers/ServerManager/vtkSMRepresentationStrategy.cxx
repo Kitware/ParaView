@@ -23,13 +23,14 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.5");
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 {
   this->Input = 0;
   this->ViewHelperProxy = 0;
   this->EnableLOD = false;
+  this->EnableCaching = true;
  
   this->LODDataValid = false;
   this->LODInformation = vtkPVDataInformation::New();;
@@ -186,7 +187,7 @@ bool vtkSMRepresentationStrategy::UseLODPipeline()
 //----------------------------------------------------------------------------
 bool vtkSMRepresentationStrategy::UseCache()
 {
-  return (this->ViewHelperProxy && 
+  return (this->EnableCaching && this->ViewHelperProxy && 
     vtkSMRepresentationStrategyGetInt(
       this->ViewHelperProxy, "CachingEnabled", 0));
 }
@@ -290,6 +291,7 @@ void vtkSMRepresentationStrategy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "EnableLOD: " << this->EnableLOD << endl;
+  os << indent << "EnableCaching: " << this->EnableCaching << endl;
   os << indent << "ViewHelperProxy: " << this->ViewHelperProxy << endl;
 }
 

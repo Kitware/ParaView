@@ -30,7 +30,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -167,6 +167,7 @@ bool vtkSMSurfaceRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
     {
     this->SetStrategyForSelection(strategy);
     strategy->SetEnableLOD(true);
+    strategy->SetEnableCaching(false); // no cache needed for selection.
     strategy->UpdateVTKObjects();
 
     this->Connect(this->SelectionGeometryFilter, strategy);
