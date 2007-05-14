@@ -57,7 +57,6 @@ AboutDialog::AboutDialog(QWidget* Parent) :
   str.rdbuf()->freeze(0);
   int idx = info.indexOf("Runtime information:");
   info = info.remove(0, idx);
-  this->Ui->Information->append("ParaView was developed by Kitware Inc.");
   this->Ui->Information->append("<a href=\"http://www.paraview.org\">www.paraview.org</a>");
   this->Ui->Information->append("<a href=\"http://www.kitware.com\">www.kitware.com</a>");
   QString version = QString("This is version %1").arg(PARAVIEW_VERSION_FULL);
