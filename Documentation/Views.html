@@ -1,0 +1,92 @@
+<html>
+<head>
+  <title>Views</title>
+  <link rel="stylesheet" type="text/css" href="ParaViewDoc.css"/>
+</head>
+
+<body>
+<div class="ProxyDocumentation">
+  <div class="ProxyHeading">
+    Views
+  </div>
+</div>
+
+<p align="center">
+<img src="3DView.png"/>
+</p>
+
+<p>
+ParaView supports three different types of views (i.e., rendering
+windows). It also allows multiple views, regardless of type, to be open at
+the same time in a ParaView application window. When the application
+launches, ParaView contains a single view: a 3D View. This is the type of
+view that displays the geometry of datasets that have been loaded or created.
+
+<p align="center">
+<img src="HistogramView.png"/>
+<img src="XYPlotView.png"/>
+</p>
+
+<p>
+The two other types of views are the Bar Chart view and the XY Plot view. The
+Bar Chart view can display a histogram of data values contained in a
+dataset. The XY Plot view can display a 2D plot of one or more scalar
+variables, either within a given dataset or across timesteps of a dataset
+containing time information.
+
+<p align="center">
+<img src="CreateViewButtons.png"/>
+</p>
+
+<p>
+If the bar just above a view is right-clicked, a menu appears; it contains a
+"Convert To" submenu that allows the type of a particular 3D view to be
+changed to one of the other two types. Additionally, from this menu you may
+close the view or split it horizontally or vertically. When a view is split,
+creating a new view, the new view initially contains the buttons shown above
+for selecting the view type.
+
+<p align="center">
+<img src="ViewTitleBarButtons.png"/>
+</p>
+
+<p>
+In the upper right corner just above each view is a set of buttons specific to each view. A description of each button is given below.<br>
+
+<table class="PropertiesTable" border="1" cellpadding="3">
+<tr><td><img src="LookmarkButton.png"></td><td>Create a lookmark for the contents of this view.</td></tr>
+<tr><td><img src="SplitViewHorizontalButton.png"></td><td>Split this view into two views that are side-by-side horizontally.</td></tr>
+<tr><td><img src="SplitViewVerticalButton.png"></td><td>Split this view into two views that are side-by-side vertically.</td></tr>
+<tr><td><img src="MaximizeViewButton.png"</td><td>Maximize this view so it uses all the space in the ParaView application window available to views.</td></tr>
+<tr><td><img src="RestoreViewButton.png"></td><td>This button becomes visible when the maximize button for a view has been pressed. It restores the view to its size before being maximized and re-displays the other views that were visible.</td></tr>
+<tr><td><img src="CloseViewButton.png"></td><td>Close the associated view so it is no longer visible.</td></tr>
+</table>
+
+<p align="center">
+<img src="3DViewTitleBarButtons.png"/>
+</p>
+<p>
+There is also a series of buttons in the upper left corner just above the 3D view. A description of each button is given below.<br>
+
+<table class="PropertiesTable" border="1" cellpadding="3">
+<tr><td><img src="UndoCameraButton.png"></td><td>Undo the last camera motion.<
+/td></tr>
+<tr><td><img src="RedoCameraButton.png"></td><td>Redo the last undone camera m
+otion.</td></tr>
+</table>
+
+<p>
+The position of views within the ParaView application window can be
+interactively rearranged. Left-click in the bar above a view and drag it to
+the bar above another view. The two views will swap places with one
+another. Note that the view layout in the ParaView application window does
+not change. (For example, the right-hand image below is the result of
+swapping the position of the view at the top with the view in the lower
+left in the left-hand image below.)
+
+<p align="center">
+<img src="BeforeSwapViews.png"> <img src="AfterSwapViews.png">
+</p>
+
+</body>
+</html>
