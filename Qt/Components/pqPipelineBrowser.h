@@ -86,11 +86,15 @@ public:
   pqPipelineModel *getModel() const {return this->Model;}
   pqFlatTreeView *getTreeView() const {return this->TreeView;}
 
+#if 0
   pqSourceInfoIcons *getIcons() const {return this->Icons;}
+#endif
 
   /// \name Session Continuity Methods
   //@{
+#if 0
   void loadFilterInfo(vtkPVXMLElement *root);
+#endif
 
   void saveState(vtkPVXMLElement *root) const;
 
@@ -112,8 +116,10 @@ public:
 public slots:
   /// \name Model Modification Methods
   //@{
+#if 0
   void addSource();
   void addFilter();
+#endif
   void changeInput();
   void deleteSelected();
   //@}
@@ -137,18 +143,20 @@ private slots:
   void onRename(const QModelIndex& index, const QString& name);
 
 private:
+#if 0
   pqSourceInfoModel *getFilterModel();
   void setupConnections(pqSourceInfoModel *model, pqSourceInfoGroupMap *map);
   void getAllowedSources(pqSourceInfoModel *model,
       const QModelIndexList &indexes, QStringList &list);
+#endif
 
 private:
   pqPipelineBrowserInternal *Internal; ///< Stores the class data.
   pqPipelineModel *Model;              ///< Stores the pipeline model.
   pqFlatTreeView *TreeView;            ///< Stores the tree view.
-  pqSourceInfoIcons *Icons;            ///< Stores the icons.
-  pqSourceInfoGroupMap *FilterGroups;  ///< Stores the filter grouping.
-  pqSourceHistoryModel *FilterHistory; ///< Stores the recent filters.
+  //pqSourceInfoIcons *Icons;            ///< Stores the icons.
+  //pqSourceInfoGroupMap *FilterGroups;  ///< Stores the filter grouping.
+  //pqSourceHistoryModel *FilterHistory; ///< Stores the recent filters.
 
   /// Keeps track of tree state for moving indexes.
   pqPipelineBrowserStateManager *Manager;

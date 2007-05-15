@@ -102,13 +102,13 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
   this->Internal = new pqPipelineBrowserInternal();
   this->Model = 0;
   this->TreeView = 0;
-  this->Icons = new pqSourceInfoIcons(this);
-  this->FilterGroups = new pqSourceInfoGroupMap(this);
-  this->FilterHistory = new pqSourceHistoryModel(this);
+  //this->Icons = new pqSourceInfoIcons(this);
+  //this->FilterGroups = new pqSourceInfoGroupMap(this);
+  //this->FilterHistory = new pqSourceHistoryModel(this);
   this->Manager = new pqPipelineBrowserStateManager(this);
 
   // Set the icons for the history models.
-  this->FilterHistory->setIcons(this->Icons, pqSourceInfoIcons::Filter);
+  //this->FilterHistory->setIcons(this->Icons, pqSourceInfoIcons::Filter);
 
   // Get the pipeline model from the pipeline data.
   this->Model = new pqPipelineModel(this);
@@ -212,6 +212,7 @@ bool pqPipelineBrowser::eventFilter(QObject *object, QEvent *e)
   return QWidget::eventFilter(object, e);
 }
 
+#if 0
 //----------------------------------------------------------------------------
 void pqPipelineBrowser::loadFilterInfo(vtkPVXMLElement *root)
 {
@@ -223,6 +224,7 @@ void pqPipelineBrowser::loadFilterInfo(vtkPVXMLElement *root)
   this->FilterGroups->addSource("Cut", "Released");
   this->FilterGroups->addSource("Threshold", "Released");
 }
+#endif
 
 //----------------------------------------------------------------------------
 void pqPipelineBrowser::saveState(vtkPVXMLElement *root) const
@@ -248,6 +250,7 @@ pqGenericViewModule *pqPipelineBrowser::getViewModule() const
   return this->Internal->ViewModule;
 }
 
+#if 0
 //----------------------------------------------------------------------------
 void pqPipelineBrowser::addSource()
 {
@@ -324,6 +327,7 @@ void pqPipelineBrowser::addFilter()
   delete modelFilter;
   delete history;
 }
+#endif
 
 //----------------------------------------------------------------------------
 void pqPipelineBrowser::changeInput()
@@ -491,6 +495,7 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
     }
 }
 
+#if 0
 //----------------------------------------------------------------------------
 pqSourceInfoModel *pqPipelineBrowser::getFilterModel()
 {
@@ -609,5 +614,6 @@ void pqPipelineBrowser::getAllowedSources(pqSourceInfoModel *model,
       }
     }
 }
+#endif
 
 

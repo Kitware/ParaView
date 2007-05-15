@@ -109,7 +109,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSimpleServerStartup.h"
 #include "pqSMAdaptor.h"
 #include "pqSMAdaptor.h"
-#include "pqSourceProxyInfo.h"
 #include "pqStateLoader.h"
 #include "pqTimerLogDisplay.h"
 #include "pqToolTipTrapper.h"
