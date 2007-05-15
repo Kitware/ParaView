@@ -4299,11 +4299,22 @@
           SelectionProp3D that gets added to the 3D renderer 
         -->
         <Proxy name="SelectionProp3D" proxygroup="props" proxyname="LODActor" />
-        <ExposedProperties>
-          <!-- FIXME 
-          <Property name="RenderModuleHelper" exposed_name="ViewHelper" />
+        <ShareProperties subproxy="Prop3D">
+          <!-- 
+            We are simply linking RenderModuleHelper property.
+            All other properties are not shared 
           -->
-        </ExposedProperties>
+          <Exception name="LODMapper" />
+          <Exception name="Mapper" />
+          <Exception name="Orientation" />
+          <Exception name="Origin" />
+          <Exception name="Pickable" />
+          <Exception name="Position" />
+          <Exception name="Property" />
+          <Exception name="Scale" />
+          <Exception name="Texture" />
+          <Exception name="Visibility" />
+        </ShareProperties>
       </SubProxy>
 
       <SubProxy>
@@ -4557,6 +4568,7 @@
 
 
 </ServerManagerConfiguration>
+
 
 
 
