@@ -280,7 +280,12 @@ QList<pqSMProxy> pqSMAdaptor::getProxyPropertyDomain(vtkSMProperty* Property)
         unsigned int numProxies = pm->GetNumberOfProxies(group);
         for(unsigned int j=0; j<numProxies; j++)
           {
-          pqSMProxy p = pm->GetProxy(group, pm->GetProxyName(group, j));
+          const char *name = pm->GetProxyName(group, j);
+          if(!name)
+            {
+            continue;
+            }
+          pqSMProxy p = pm->GetProxy(group, name);
           proxydomain.append(p);
           }
         }

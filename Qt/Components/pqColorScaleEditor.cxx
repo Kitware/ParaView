@@ -1330,7 +1330,7 @@ void pqColorScaleEditor::initColorScale()
         }
 
       int index = 0;
-      if(this->ColorMap->getVectorMode() == pqScalarsToColors::COMPONENT)
+      if(this->ColorMap && this->ColorMap->getVectorMode() == pqScalarsToColors::COMPONENT)
         {
         index = this->ColorMap->getVectorComponent() + 1;
         }
