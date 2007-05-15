@@ -7,7 +7,7 @@ SET(QT_MIN_VERSION "4.2.2")
 FIND_PACKAGE(Qt4)
 
 IF(NOT QT4_FOUND)
-  MESSAGE("Qt ${QT_MIN_VERSION} or greater not found")
+  MESSAGE(SEND_ERROR "Qt ${QT_MIN_VERSION} or greater not found.  Please check the QT_QMAKE_EXECUTABLE variable.")
 ELSE(NOT QT4_FOUND)
 
 # help CMake fine QtUiTools on Mac (binary install)
