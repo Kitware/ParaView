@@ -769,7 +769,9 @@ void pqSimpleServerStartup::startReverseConnection()
       }
     else
       {
-      options->SetConnectID(0);
+      // If no connection id is specified in the connection options,
+      // don't change the command line connection id.
+      // options->SetConnectID(0);
       }
     }
   

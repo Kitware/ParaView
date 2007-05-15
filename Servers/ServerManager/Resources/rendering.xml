@@ -1707,7 +1707,7 @@
       <DoubleVectorProperty
         name="ViewTime"
         number_of_elements="1"
-        default_values="0">
+        default_values="none">
         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
@@ -2017,7 +2017,7 @@
       <DoubleVectorProperty
         name="ViewTime"
         number_of_elements="1"
-        default_values="0">
+        default_values="none">
         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 

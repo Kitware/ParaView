@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMPWriterProxy);
-vtkCxxRevisionMacro(vtkSMPWriterProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMPWriterProxy, "1.3.2.1");
 //-----------------------------------------------------------------------------
 vtkSMPWriterProxy::vtkSMPWriterProxy()
 {
@@ -50,11 +50,66 @@ void vtkSMPWriterProxy::CreateVTKObjects(int numObjects)
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream str;
- 
-  if (this->VTKClassName && strstr(this->VTKClassName, "XMLP"))
+
+  int isXMLPWriter = 0;
+  int isPVDWriter = 0;
+
+  str << vtkClientServerStream::Invoke
+    << this->GetID(0)
+    << "IsA"
+    << "vtkXMLPDataWriter"
+    << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, 
+    vtkProcessModule::GetRootId(this->Servers), str);
+  pm->GetLastResult(this->ConnectionID,
+    vtkProcessModule::GetRootId(this->Servers)).GetArgument(0, 0, &isXMLPWriter);
+
+  str << vtkClientServerStream::Invoke
+    << this->GetID(0)
+    << "IsA"
+    << "vtkXMLPVDWriter"
+    << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, 
+    vtkProcessModule::GetRootId(this->Servers), str);
+  pm->GetLastResult(this->ConnectionID,
+    vtkProcessModule::GetRootId(this->Servers)).GetArgument(0, 0, &isPVDWriter);
+
+  if (isXMLPWriter)
     {
-    unsigned int idx;
-    for (idx = 0; idx < this->GetNumberOfIDs(); idx++)
+    for (unsigned int idx = 0; idx < this->GetNumberOfIDs(); idx++)
+      {
+      str << vtkClientServerStream::Invoke
+        << pm->GetProcessModuleID()
+        << "GetNumberOfLocalPartitions"
+        << vtkClientServerStream::End;
+      str << vtkClientServerStream::Invoke
+        << this->GetID(idx)
+        << "SetNumberOfPieces"
+        << vtkClientServerStream::LastResult 
+        << vtkClientServerStream::End;
+      str << vtkClientServerStream::Invoke
+        << pm->GetProcessModuleID()
+        << "GetPartitionId"
+        << vtkClientServerStream::End;
+      str << vtkClientServerStream::Invoke
+        << this->GetID(idx)
+        << "SetStartPiece"
+        << vtkClientServerStream::LastResult
+        << vtkClientServerStream::End;
+      str << vtkClientServerStream::Invoke
+        << pm->GetProcessModuleID()
+        << "GetPartitionId"
+        << vtkClientServerStream::End;
+      str << vtkClientServerStream::Invoke
+        << this->GetID(idx)
+        << "SetEndPiece"
+        << vtkClientServerStream::LastResult
+        << vtkClientServerStream::End;
+      }
+    }
+  else if (isPVDWriter)
+    {
+    for (unsigned int idx = 0; idx < this->GetNumberOfIDs(); idx++)
       {
       str << vtkClientServerStream::Invoke
         << pm->GetProcessModuleID()
@@ -75,10 +130,11 @@ void vtkSMPWriterProxy::CreateVTKObjects(int numObjects)
         << vtkClientServerStream::LastResult
         << vtkClientServerStream::End;
       }
-    if (str.GetNumberOfMessages() > 0)
-      {
-      pm->SendStream(this->ConnectionID, this->Servers, str);
-      }
+    }
+
+  if (str.GetNumberOfMessages() > 0)
+    {
+    pm->SendStream(this->ConnectionID, this->Servers, str);
     }
 }
 

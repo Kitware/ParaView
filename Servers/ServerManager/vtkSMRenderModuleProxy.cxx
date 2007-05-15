@@ -56,7 +56,7 @@
 
 #include "vtkSMClientServerRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.84");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.84.2.1");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -639,7 +639,7 @@ bool vtkSMRenderModuleProxy::CheckCacheSizeWithinLimit()
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::CacheUpdate(int idx, int total)
 {
-  int save_cache = (!this->CheckCacheSizeWithinLimit())? 1: 0;
+  int save_cache = (this->CheckCacheSizeWithinLimit())? 1: 0;
 
   vtkCollectionIterator* iter = this->GetDisplays()->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())

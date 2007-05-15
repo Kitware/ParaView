@@ -606,6 +606,9 @@
       </property>
       <item row="0" column="0" >
        <widget class="QCheckBox" name="caching" >
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="toolTip" >
          <string>Cache geometry during playback.</string>
         </property>
