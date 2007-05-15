@@ -39,10 +39,6 @@ public:
   virtual void UpdateVTKObjects();
 
   // Description:
-  // Get the selection field type.
-  vtkGetMacro(SelectionFieldType, int);
-
-  // Description:
   // Add an Location to the selection.
   void AddLocation(double x, double y, double z);
   void RemoveAllLocations();
@@ -54,11 +50,6 @@ protected:
 
   virtual void CreateVTKObjects(int numObjects);
 
-  // Description:
-  // Read attributes from an XML element.
-  virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
-
-  int SelectionFieldType;
 private:
   vtkSMExtractLocationsProxy(const vtkSMExtractLocationsProxy&); // Not implemented.
   void operator=(const vtkSMExtractLocationsProxy&); // Not implemented.

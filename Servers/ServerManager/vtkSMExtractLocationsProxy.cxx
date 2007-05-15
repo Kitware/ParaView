@@ -23,11 +23,10 @@
 #include "vtkDoubleArray.h"
 
 vtkStandardNewMacro(vtkSMExtractLocationsProxy);
-vtkCxxRevisionMacro(vtkSMExtractLocationsProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMExtractLocationsProxy, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMExtractLocationsProxy::vtkSMExtractLocationsProxy()
 {
-  this->SelectionFieldType = vtkSelection::CELL;
   this->Locations = NULL;
 }
 
@@ -114,7 +113,7 @@ void vtkSMExtractLocationsProxy::UpdateVTKObjects()
 
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     selectionSource->GetProperty("FieldType"));
-  ivp->SetElement(0, this->SelectionFieldType);
+  ivp->SetElement(0, vtkSelection::CELL);
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     selectionSource->GetProperty("ContentType"));
@@ -124,24 +123,7 @@ void vtkSMExtractLocationsProxy::UpdateVTKObjects()
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMExtractLocationsProxy::ReadXMLAttributes(
-  vtkSMProxyManager* pm, vtkPVXMLElement* element)
-{
-  if (!this->Superclass::ReadXMLAttributes(pm, element))
-    {
-    return 0;
-    }
-  const char* type = element->GetAttribute("selection_field_type");
-  if (type && strcmp(type,"POINT") == 0)
-    {
-    this->SelectionFieldType  = vtkSelection::POINT;
-    }
-  return 1;
-}
-
-//-----------------------------------------------------------------------------
 void vtkSMExtractLocationsProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "SelectionFieldType: " << this->SelectionFieldType << endl;
 }
