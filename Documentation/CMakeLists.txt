@@ -43,6 +43,7 @@ set(PARAVIEW_HTML_DOCUMENTATION
   PipelineBrowser.html
   PipelineBrowser.png
   PointData.png
+  pqLookmark16.png
   Properties.html
   PropertiesButtons.png
   Ramp.png
