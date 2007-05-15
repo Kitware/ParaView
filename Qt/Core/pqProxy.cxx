@@ -68,7 +68,7 @@ pqProxy::pqProxy(const QString& group, const QString& name,
 {
   this->Internal = new pqProxyInternal;
   this->Internal->Proxy = proxy;
-  this->Modified = pqProxy::UNINITIALIZED;
+  this->Modified = pqProxy::UNMODIFIED;
 }
 
 //-----------------------------------------------------------------------------

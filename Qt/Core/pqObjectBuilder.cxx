@@ -88,6 +88,7 @@ pqPipelineSource* pqObjectBuilder::createSource(const QString& sm_group,
 
     // initialize the source.
     source->setDefaultPropertyValues();
+    source->setModifiedState(pqProxy::UNINITIALIZED);
 
     emit this->sourceCreated(source);
     emit this->proxyCreated(source);
@@ -156,6 +157,7 @@ pqPipelineSource* pqObjectBuilder::createFilter(const QString& sm_group,
 
   // Set default property values.
   filter->setDefaultPropertyValues();
+  filter->setModifiedState(pqProxy::UNINITIALIZED);
 
   emit this->filterCreated(filter);
   emit this->proxyCreated(filter);
@@ -192,6 +194,7 @@ pqPipelineSource* pqObjectBuilder::createCustomFilter(const QString& sm_name,
 
   // Set default property values.
   filter->setDefaultPropertyValues();
+  filter->setModifiedState(pqProxy::UNINITIALIZED);
   emit this->customFilterCreated(filter);
   emit this->proxyCreated(filter);
   return filter;
@@ -229,6 +232,7 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
     prop->UpdateDependentDomains();
     }
   reader->setDefaultPropertyValues();
+  reader->setModifiedState(pqProxy::UNINITIALIZED);
 
   emit this->readerCreated(reader, filename);
   emit this->proxyCreated(reader);
