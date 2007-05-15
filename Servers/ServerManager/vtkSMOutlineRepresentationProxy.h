@@ -57,7 +57,7 @@ public:
   // representation. Since there is no surface selection in this 
   // representation, this will just return;
   virtual void ConvertSurfaceSelectionToVolumeSelection(
-    vtkSelection* input, vtkSelection* output) { return; };
+    vtkSelection* , vtkSelection* ) { return; };
 
 //BTX
 protected:
