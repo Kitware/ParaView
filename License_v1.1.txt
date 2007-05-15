@@ -1,3 +1,5 @@
+Parts of ParaView are under the following licenses:
+
 ParaView License Version 1.1
 ========================================================================
 
