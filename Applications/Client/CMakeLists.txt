@@ -150,7 +150,6 @@ IF(BUILD_TESTING)
     # ColorEditor3 doesn't work in client/server mode
     ColorEditor3
     CreateSourceWithoutConnect
-    ElementInspector
     # flow crashes in SurfaceVectors in an mpi build in client/server mode
     Flow
 #    LoadStateSelection
@@ -171,6 +170,7 @@ IF(BUILD_TESTING)
     SET (TESTS_WITHOUT_BASELINES
       ${TESTS_WITHOUT_BASELINES}
       LoadStateHistogram
+      ElementInspector
       )
   ENDIF(PARAVIEW_DATA_ROOT)
 
@@ -289,6 +289,7 @@ IF(BUILD_TESTING)
     UndoRedo4
     UndoRedo5
     UndoRedo6
+    UndoRedo7
     XdmfRead
     XdmfReadImageData
     XdmfReadImageDataCollection
