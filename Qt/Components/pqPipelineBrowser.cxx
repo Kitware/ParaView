@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPipelineBrowser.h"
 
-#include "pqAddSourceDialog.h"
 #include "pqApplicationCore.h"
 #include "pqDisplayPolicy.h"
 #include "pqFilterInputDialog.h"
@@ -51,11 +50,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
-#include "pqSourceHistoryModel.h"
-#include "pqSourceInfoFilterModel.h"
-#include "pqSourceInfoGroupMap.h"
-#include "pqSourceInfoIcons.h"
-#include "pqSourceInfoModel.h"
+//#include "pqSourceInfoIcons.h"
+//#include "pqSourceHistoryModel.h"
+//#include "pqSourceInfoFilterModel.h"
+//#include "pqSourceInfoGroupMap.h"
+//#include "pqSourceInfoModel.h"
+//#include "pqAddSourceDialog.h"
 
 #include <QApplication>
 #include <QEvent>
@@ -80,7 +80,7 @@ public:
   ~pqPipelineBrowserInternal() {}
 
   // TODO: Add support for multiple servers.
-  pqSourceInfoModel *FilterModel;
+  //pqSourceInfoModel *FilterModel;
   QString LastFilterGroup;
   QPointer<pqGenericViewModule> ViewModule;
 };
@@ -90,7 +90,7 @@ public:
 pqPipelineBrowserInternal::pqPipelineBrowserInternal()
   : LastFilterGroup()
 {
-  this->FilterModel = 0;
+  //this->FilterModel = 0;
   this->ViewModule = 0;
 }
 
