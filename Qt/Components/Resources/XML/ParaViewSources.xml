@@ -1,4 +1,5 @@
 <ParaViewSources>
+  <Source name="TimeSource" />
   <Source name="TimeToTextConvertorSource" />
   <Source name="GlyphSource2D" />
   <Source name="VectorText" />

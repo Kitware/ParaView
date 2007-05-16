@@ -1311,5 +1311,59 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
      </StringVectorProperty>
      <!-- End of TimeToTextConvertorSource -->
    </SourceProxy>
+
+   <SourceProxy name="TimeSource" class="vtkTimeSourceExample"
+                label="TimeSource">
+      <Documentation
+        long_help="Produces a single cell uniform grid with data values that vary over a sin(t) wave from t=0 to t=1 (radian)."
+        short_help="Produces a sine wave over time">
+Produces a single cell uniform grid with data values that vary over a sin(t) wave from t=0 to t=1 (radian).
+      </Documentation>
+
+     <IntVectorProperty 
+        name="Analytic"
+        command="SetAnalytic"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+        Makes the time source produce discrete steps of or an analytic sin wave.
+        </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty 
+        name="X Amplitude"
+        command="SetXAmplitude"
+        number_of_elements="1"
+        default_values="0.0">
+        <Documentation>
+        Controls how far the data set moves along X over time.
+        </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="Y Amplitude"
+        command="SetYAmplitude"
+        number_of_elements="1"
+        default_values="0.0">
+        <Documentation>
+        Controls how far the data set moves along Y over time.
+        </Documentation>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="Growing"
+        command="SetGrowing"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+        Makes the time source grow and shrink along Y over time.
+        </Documentation>
+     </IntVectorProperty>
+
+     <!-- End of TimeSource -->
+   </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>
