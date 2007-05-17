@@ -2481,6 +2481,22 @@ void pqMainWindowCore::onToolsPythonShell()
       GetOptions()->GetArgv0();
     this->Implementation->PythonDialog = 
       new pqPythonDialog(this->Implementation->Parent, 1, (char**)&argv0);
+
+    // Since paraview application always has a server connection,
+    // intialize the paraview.ActiveConnection to point to the currently
+    // existsing connection, so that the user can directly start creating
+    // proxies etc.
+    pqServer* activeServer = this->getActiveServer();
+    if (activeServer)
+      {
+      int cid = static_cast<int>(activeServer->GetConnectionID());
+      QString initStr = QString("import paraview\n"
+                                "paraview.ActiveConnection = paraview.pyConnection(%1)\n"
+                                "paraview.ActiveConnection.SetHost(\"%2\", 0)\n").arg(cid)
+                          .arg(activeServer->getResource().toURI());
+      this->Implementation->PythonDialog->runString(initStr);
+      }
+
     this->Implementation->PythonDialog->setAttribute(Qt::WA_QuitOnClose, false);
     }
   this->Implementation->PythonDialog->show();

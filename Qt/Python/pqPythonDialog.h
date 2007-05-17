@@ -51,7 +51,10 @@ class QTPYTHON_EXPORT pqPythonDialog :
 
 public:
   pqPythonDialog(QWidget* Parent, int argc, char** argv);
-  
+
+  /// Execute a commond in the python shell.
+  void runString(const QString& script);
+
 private slots:
   void runScript();
   void runScript(const QStringList&);
