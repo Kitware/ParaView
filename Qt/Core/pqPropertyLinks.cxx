@@ -530,6 +530,7 @@ void pqPropertyLinks::addPropertyLink(QObject* qObject, const char* qProperty,
 {
   if(!Proxy || !Property || !qObject || !qProperty || !signal)
     {
+    qWarning("Invalid parameters to add link\n");
     return;
     }
   

@@ -209,6 +209,12 @@ void pqPropertyManager::registerLink(
   QObject* qObject, const char* qProperty, const char* signal,
   vtkSMProxy* Proxy, vtkSMProperty* Property, int Index)
 {
+  if(!Proxy || !Property || !qObject || !qProperty || !signal)
+    {
+    qWarning("Invalid parameter(s) to register link\n");
+    return;
+    }
+
   pqInternal::PropertyMap::iterator iter;
   iter = 
     this->Internal->Properties.find(pqInternal::PropertyKey(Property, Index));
