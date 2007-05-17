@@ -14,6 +14,7 @@
 #include <QFileDialog>
 
 #include "vtkProcessModule.h"
+#include "vtkObjectFactory.h"
 
 #include "pqMain.h"
 #include "pqProcessModuleGUIHelper.h"
@@ -233,10 +234,8 @@ void pqFileDialogTestWidget::record()
 class GUIHelper : public pqProcessModuleGUIHelper
 {
 public:
-  static GUIHelper* New()
-  {
-    return new GUIHelper;
-  }
+  vtkTypeMacro(GUIHelper, pqProcessModuleGUIHelper)
+  static GUIHelper* New();
 
   pqTestUtility* TestUtility()
   {
@@ -250,6 +249,8 @@ public:
   }
   pqFileDialogTestWidget* TestWidget;
 };
+
+vtkStandardNewMacro(GUIHelper);
 
 
 int main(int argc, char** argv)
