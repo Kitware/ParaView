@@ -107,6 +107,8 @@ IF (VTK_USE_X)
   INCLUDE_DIRECTORIES(${X11_INCLUDE_DIR})
 ENDIF (VTK_USE_X)
 
+SET(VTK_WRAP_HINTS ${CMAKE_CURRENT_SOURCE_DIR}/hints)
+
 # Setup vtkInstantiator registration for this library's classes.
 INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cmake)
 VTK_MAKE_INSTANTIATOR3(vtk${KIT}Instantiator KitInstantiator_SRCS
