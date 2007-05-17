@@ -280,7 +280,7 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqGenericViewModule* viewModul
     this->orderedCompositing->setVisible(true);
     this->Links.registerLink(this->orderedCompositing, "checked", 
       SIGNAL(stateChanged(int)),
-      proxy, proxy->GetProperty("OrderedCompositing"));
+      proxy, proxy->GetProperty("DisableOrderedCompositing"));
     }
   else
     {

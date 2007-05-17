@@ -169,6 +169,7 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
     "color", SIGNAL(colorChanged(const QVariant&)),
     displayProxy, displayProxy->GetProperty("DiffuseColor"));
 
+#if 0
   // setup for specular lighting
   QObject::connect(this->Internal->SpecularWhite, SIGNAL(toggled(bool)),
                    this, SIGNAL(specularColorChanged()));
@@ -193,6 +194,7 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
   QObject::connect(this->Internal->SpecularPower, SIGNAL(valueChanged(int)),
                    this, SLOT(updateView()),
                    Qt::QueuedConnection);
+#endif
   
   // setup for interpolation
   this->Internal->StyleInterpolation->clear();
