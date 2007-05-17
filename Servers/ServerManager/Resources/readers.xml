@@ -2423,6 +2423,22 @@
      <DoubleVectorProperty name="TimeRange" information_only="1">
        <TimeRangeInformationHelper/>
      </DoubleVectorProperty>
+
+     <IntVectorProperty name="ModeShape"
+                        command="SetTimeStep"
+                        number_of_elements="1"
+                        default_values="0"
+                        animateable="0"
+                        information_property="TimestepValues">
+       <IntRangeDomain name="range">
+         <RequiredProperties>
+           <Property name="TimeStepRangeInfo" function="Range"/>
+         </RequiredProperties>
+       </IntRangeDomain>
+       <Documentation>
+         Specify the current mode shape with HasModeShapes in on.
+       </Documentation>
+     </IntVectorProperty>
    <!-- End ExodusReader -->
    </SourceProxy>
 

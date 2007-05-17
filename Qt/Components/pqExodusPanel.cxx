@@ -357,13 +357,13 @@ void pqExodusPanel::linkServerManagerProperties()
                                         SIGNAL(valueChanged(int)),
                                         this->proxy(),
                                         this->proxy()
-                                        ->GetProperty("TimeStep"));
+                                        ->GetProperty("ModeShape"));
   this->propertyManager()->registerLink(this->UI->ModeSelectSpinBox,
                                         "value",
                                         SIGNAL(valueChanged(int)),
                                         this->proxy(),
                                         this->proxy()
-                                        ->GetProperty("TimeStep"));
+                                        ->GetProperty("ModeShape"));
   QObject::connect(this->UI->ModeSelectSlider, SIGNAL(sliderMoved(int)),
                    this, SLOT(modeChanged(int)));
   QObject::connect(this->UI->ModeSelectSpinBox, SIGNAL(valueChanged(int)),
