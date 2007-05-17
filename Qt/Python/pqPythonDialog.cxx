@@ -134,6 +134,11 @@ void pqPythonDialog::runScript(const QStringList& files)
     }
 }
 
+void pqPythonDialog::runString(const QString& str)
+{
+  this->Implementation->Ui.shellWidget->executeScript(str);
+}
+
 void pqPythonDialog::clearConsole()
 {
   this->Implementation->Ui.shellWidget->clear();

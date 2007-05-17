@@ -169,41 +169,66 @@ class vtkPVPythonInterpretorInternal
 {
 public:
   PyThreadState* Interpretor;
+  PyThreadState* ParentThreadState;
+  bool MultithreadSupport;
+
   static PyThreadState *MainThreadState;
 
   vtkPVPythonInterpretorInternal()
     {
     this->Interpretor = 0;
+    this->ParentThreadState = 0;
+    this->MultithreadSupport = false;
     }
+
   ~vtkPVPythonInterpretorInternal()
     {
     if (this->Interpretor)
       {
       this->MakeCurrent();
-      Py_EndInterpreter(this->Interpretor);
-      if (this->Interpretor == this->MainThreadState)
+      PyThreadState_Swap(0);
+      PyThreadState_Clear(this->Interpretor);
+      PyThreadState_Delete(this->Interpretor);
+      PyThreadState_Swap(this->ParentThreadState);
+
+      this->Interpretor = 0;
+      this->ParentThreadState = 0;
+      if (this->MultithreadSupport)
         {
-        this->MainThreadState = 0;
+        PyEval_ReleaseLock();
         }
-      PyThreadState_Swap(this->MainThreadState);
-      this->Interpretor= 0;
       }
     }
+
   void MakeCurrent()
     {
+    if (this->MultithreadSupport)
+      {
+      PyEval_AcquireLock();
+      }
     PyThreadState_Swap(this->Interpretor);
+    }
+
+  void ReleaseControl()
+    {
+    PyThreadState_Swap(this->ParentThreadState);
+    if (this->MultithreadSupport)
+      {
+      PyEval_ReleaseLock();
+      }
     }
 };
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.11.4.3");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.11.4.4");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
 {
   this->Internal = new vtkPVPythonInterpretorInternal();
   this->ExecutablePath = 0;
+  this->MultithreadSupport = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -248,6 +273,7 @@ int vtkPVPythonInterpretor::InitializeSubInterpretor(int vtkNotUsed(argc),
     return 0;
     }
 
+  this->Internal->MultithreadSupport = this->MultithreadSupport;
   this->SetExecutablePath(argv[0]);
   if (!Py_IsInitialized())
     {
@@ -255,15 +281,43 @@ int vtkPVPythonInterpretor::InitializeSubInterpretor(int vtkNotUsed(argc),
     // full path.
     Py_SetProgramName(argv[0]);
     Py_Initialize();
+
+    if (this->MultithreadSupport)
+      {
+      PyEval_InitThreads();
+      }
+
     this->Internal->MainThreadState = PyThreadState_Get();
 #ifdef SIGINT
     signal(SIGINT, SIG_DFL);
 #endif
+
+    if (this->MultithreadSupport)
+      {
+      // Since PyEval_InitThreads acquires the lock for this thread,
+      // we release it.
+      PyEval_ReleaseLock();
+      }
     }
 
-  this->Internal->Interpretor = Py_NewInterpreter();
+  this->Internal->ParentThreadState = PyThreadState_Get();
+
+  this->Internal->ParentThreadState = 
+    this->Internal->ParentThreadState? this->Internal->ParentThreadState:
+    this->Internal->MainThreadState;
+
+  if (!this->Internal->ParentThreadState)
+    {
+    vtkErrorMacro("No active python state. Cannot create a new interpretor "
+      " without active context.");
+    return 0;
+    }
+
+  this->Internal->Interpretor = PyThreadState_New(
+    this->Internal->ParentThreadState->interp);
   this->Internal->MakeCurrent();
   this->InitializeInternal();
+  this->Internal->ReleaseControl();
   return 1;
 }
 
@@ -290,8 +344,16 @@ void vtkPVPythonInterpretor::MakeCurrent()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVPythonInterpretor::ReleaseControl()
+{
+  this->Internal->ReleaseControl(); 
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVPythonInterpretor::RunSimpleString(const char* const script)
 {
+  this->MakeCurrent();
+
   // The embedded python interpreter cannot handle DOS line-endings, see
   // http://sourceforge.net/tracker/?group_id=5470&atid=105470&func=detail&aid=1167922
   vtkstd::string buffer = script ? script : "";
@@ -299,15 +361,8 @@ void vtkPVPythonInterpretor::RunSimpleString(const char* const script)
   
   // The cast is necessary because PyRun_SimpleString() hasn't always been const-correct
   PyRun_SimpleString(const_cast<char*>(buffer.c_str()));
-}
 
-//-----------------------------------------------------------------------------
-void vtkPVPythonInterpretor::ReleaseControl()
-{
-  if (this->Internal)
-    {
-    PyThreadState_Swap(this->Internal->MainThreadState);
-    }
+  this->ReleaseControl();
 }
 
 //-----------------------------------------------------------------------------

@@ -51,14 +51,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct pqPythonShell::pqImplementation
 {
   pqImplementation(QWidget* Parent) 
-    : Console(Parent)
+    : Console(Parent) 
   {
     this->Interpreter = vtkPVPythonInterpretor::New();
   }
 
   void Initialize(int argc, char* argv[])
   {
+    this->Interpreter->SetMultithreadSupport(true);
     this->Interpreter->InitializeSubInterpretor(argc, argv);
+    this->Interpreter->MakeCurrent();
     
     // Redirect Python's stdout and stderr
     PySys_SetObject(const_cast<char*>("stdout"), reinterpret_cast<PyObject*>(pqWrap(this->pythonStdout)));
@@ -78,6 +80,7 @@ struct pqPythonShell::pqImplementation
       PySys_SetObject(const_cast<char*>("ps2"), ps2 = PyString_FromString("... "));
       Py_XDECREF(ps2);
       }
+    this->Interpreter->ReleaseControl();
   }
 
   ~pqImplementation()
@@ -87,12 +90,12 @@ struct pqPythonShell::pqImplementation
     // Restore Python's original stdout and stderr
     PySys_SetObject(const_cast<char*>("stdout"), PySys_GetObject(const_cast<char*>("__stdout__")));
     PySys_SetObject(const_cast<char*>("stderr"), PySys_GetObject(const_cast<char*>("__stderr__")));
+    this->Interpreter->ReleaseControl();
     this->Interpreter->Delete();
   }
 
   void executeCommand(const QString& Command)
   {
-    this->Interpreter->MakeCurrent();
     this->Interpreter->RunSimpleString(Command.toAscii().data());
   }
 
@@ -112,6 +115,7 @@ struct pqPythonShell::pqImplementation
       {
       this->Console.printString(PyString_AsString(PySys_GetObject(const_cast<char*>("ps2"))));
       }
+    this->Interpreter->ReleaseControl();
   }
 
   /// Provides a console for gathering user input and displaying Python output

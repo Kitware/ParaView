@@ -430,6 +430,8 @@ pqPythonEventSource::pqPythonEventSource(QObject* p)
   // add QtTesting to python's inittab, so it is
   // available to all interpreters
   PyImport_AppendInittab(const_cast<char*>("QtTesting"), initQtTesting);
+
+  PyEval_ReleaseLock();
 }
 
 pqPythonEventSource::~pqPythonEventSource()
@@ -538,15 +540,21 @@ void pqPythonEventSource::run()
     return;
     } 
 
+  PyEval_AcquireLock();
+
+  PyThreadState* curState = PyThreadState_Get();
   PyThreadState* threadState = Py_NewInterpreter();
   
   Instance = this;
+  PyThreadState_Swap(threadState);
 
   // finally run the script
   QByteArray wholeFile = file.readAll();
   int result = PyRun_SimpleString(wholeFile.data()) == 0 ? 0 : 1;
-  
+
   Py_EndInterpreter(threadState);
+  PyThreadState_Swap(curState);
+  PyEval_ReleaseLock();
   
   this->done(result);
 }
