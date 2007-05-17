@@ -268,6 +268,7 @@ IF(BUILD_TESTING)
     CutMulti
     DualSphereAnimation
     ExodusIIPanel
+    ExodusModeShapes
     ExodusPanel
     Fractal2D
     Fractal3D

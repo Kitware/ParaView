@@ -364,6 +364,8 @@ void pqExodusPanel::linkServerManagerProperties()
                                         this->proxy(),
                                         this->proxy()
                                         ->GetProperty("ModeShape"));
+  QObject::connect(this->UI->HasModeShapes, SIGNAL(toggled(bool)),
+                   this->UI->ModeShapeOptions, SLOT(setEnabled(bool)));
   QObject::connect(this->UI->ModeSelectSlider, SIGNAL(sliderMoved(int)),
                    this, SLOT(modeChanged(int)));
   QObject::connect(this->UI->ModeSelectSpinBox, SIGNAL(valueChanged(int)),
