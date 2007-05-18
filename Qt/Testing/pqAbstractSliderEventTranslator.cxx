@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAbstractSliderEventTranslator.h"
 
+#include <QScrollBar>
 #include <QAbstractSlider>
 #include <QEvent>
 
@@ -44,7 +45,7 @@ pqAbstractSliderEventTranslator::pqAbstractSliderEventTranslator(QObject* p)
 bool pqAbstractSliderEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& /*Error*/)
 {
   QAbstractSlider* const object = qobject_cast<QAbstractSlider*>(Object);
-  if(!object)
+  if(!object || qobject_cast<QScrollBar*>(object))
     return false;
     
   switch(Event->type())
