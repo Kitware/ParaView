@@ -4563,6 +4563,177 @@
     <!-- End of OutlineRepresentation -->
     </OutlineRepresentationProxy>
 
+    <UniformGridVolumeRepresentationProxy name="UniformGridVolumeRepresentation">     
+      <InputProperty name="Input" 
+        command="NotUsed"
+        />
+
+      <DoubleVectorProperty name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        is_internal="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="SelectionVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="VolumeFixedPointRayCastMapper" 
+          proxygroup="mappers" 
+          proxyname="FixedPointVolumeRayCastMapper">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ScalarMode" />
+          <Property name="SelectScalarArray" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeActor" proxygroup="props" proxyname="LODVolume" />
+        <ExposedProperties>
+          <Property name="Position" />
+          <Property name="Scale" />
+          <Property name="Orientation" />
+          <Property name="Origin" />
+          <Property name="RenderModuleHelper" />
+          <Property name="Pickable" />
+          <Property name="Visibility" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeProperty" 
+          proxygroup="properties" proxyname="VolumeProperty" >
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ScalarOpacityUnitDistance" />
+          <Property name="ScalarOpacityFunction" />
+          <Property name="ColorTransferFunction" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="ExtractSelection"
+          proxygroup="filters" proxyname="ExtractSelection" />
+        <ExposedProperties>
+          <Property name="Selection" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!-- GeometryFilter for selection pipeline -->
+        <Proxy name="SelectionGeometryFilter"
+          proxygroup="filters" proxyname="GeometryFilter" />
+        <ExposedProperties>
+          <Property name="UseStrips" />
+          <Property name="ForceStrips" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!-- 
+          Mapper for selection 
+        -->
+        <Proxy name="SelectionMapper" 
+          proxygroup="mappers" proxyname="PolyDataMapper" />
+      </SubProxy>
+
+      <SubProxy>
+        <!-- 
+          Mapper for low-res selection. It shares all its properties with the
+          high-res mapper (except input ofcourse).
+        -->
+        <Proxy name="SelectionLODMapper" 
+          proxygroup="mappers" proxyname="PolyDataMapper" />
+        <ShareProperties subproxy="SelectionMapper" >
+          <Exception name="Input" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!--
+          SelectionProp3D that gets added to the 3D renderer 
+        -->
+        <Proxy name="SelectionProp3D" proxygroup="props" proxyname="LODActor" />
+        <ShareProperties subproxy="VolumeActor">
+          <!-- 
+            We are simply linking RenderViewHelper property.
+            All other properties are not shared 
+          -->
+          <Exception name="LODMapper" />
+          <Exception name="Mapper" />
+          <Exception name="Orientation" />
+          <Exception name="Origin" />
+          <Exception name="Pickable" />
+          <Exception name="Position" />
+          <Exception name="Property" />
+          <Exception name="Scale" />
+          <Exception name="Texture" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!--
+          Property for the vtkProp.
+        -->
+        <Proxy name="SelectionProperty" proxygroup="properties" proxyname="Property" />
+        <ExposedProperties>
+          <Property name="Ambient" 
+                    exposed_name="SelectionAmbient" />
+          <Property name="AmbientColor" 
+                    exposed_name="SelectionAmbientColor" />
+          <Property name="Color" 
+                    exposed_name="SelectionColor" />
+          <Property name="Diffuse" 
+                    exposed_name="SelectionDiffuse" />
+          <Property name="DiffuseColor" 
+                    exposed_name="SelectionDiffuseColor" />
+          <Property name="Interpolation" 
+                    exposed_name="SelectionInterpolation" />
+          <Property name="LineWidth" 
+                    exposed_name="SelectionLineWidth" />
+          <Property name="Opacity" 
+                    exposed_name="SelectionOpacity" />
+          <Property name="PointSize" 
+                    exposed_name="SelectionPointSize" />
+          <Property name="Representation" 
+                    exposed_name="SelectionRepresentation" />
+          <Property name="Shading" 
+                    exposed_name="SelectionShading" />
+          <Property name="SpecularColor" 
+                    exposed_name="SelectionSpecularColor" />
+          <Property name="SpecularPower" 
+                    exposed_name="SelectionSpecularPower" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!-- This is the helper that assures that the material xml is provided
+          to the servers from the client, when needed. Note that this is 
+          a client only proxy -->
+        <MaterialLoaderProxy name="MaterialLoader" >
+          <StringVectorProperty name="Material"
+            command="LoadMaterial"
+            number_of_elements="1"
+            update_self="1">
+          </StringVectorProperty>
+        </MaterialLoaderProxy>
+        <ExposedProperties>
+          <Property name="Material" />
+        </ExposedProperties>
+      </SubProxy>
+
+    <!-- End of UniformGridVolumeRepresentation -->
+    </UniformGridVolumeRepresentationProxy>
+
   </ProxyGroup>
 
 

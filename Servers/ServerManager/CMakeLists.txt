@@ -179,7 +179,7 @@ SET(Kit_SRCS
   vtkSMSimpleStrategy.cxx
   vtkSMSurfaceRepresentationProxy.cxx
   vtkSMViewProxy.cxx
-#  vtkSMVolumeRepresentationProxy.cxx
+  vtkSMUniformGridVolumeRepresentationProxy.cxx
   )
 
 SET( ServerManagerCS_SRCS
