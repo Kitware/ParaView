@@ -169,6 +169,7 @@ SET(Kit_SRCS
   vtkSMXYPlotActorProxy.cxx
   vtkSMXYPlotDisplayProxy.cxx
 
+  vtkSMClientServerRenderViewProxy.cxx
   vtkSMOutlineRepresentationProxy.cxx
   vtkSMPipelineRepresentationProxy.cxx
   vtkSMPropRepresentationProxy.cxx

@@ -22,7 +22,6 @@
 #include "vtkImageWriter.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVDisplayInformation.h"
 #include "vtkPVLODPartDisplayInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
@@ -37,7 +36,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkWindowToImageFilter.h"
 
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.19");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.20");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {

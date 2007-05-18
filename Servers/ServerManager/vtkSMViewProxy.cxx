@@ -49,7 +49,7 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMViewProxy::vtkSMViewProxy()
 {
@@ -66,6 +66,8 @@ vtkSMViewProxy::vtkSMViewProxy()
 
   this->FullResDataSize = 0;
   this->FullResDataSizeValid = false;
+
+  this->ForceRepresentationUpdate = false;
 }
 
 //----------------------------------------------------------------------------
@@ -226,7 +228,13 @@ void vtkSMViewProxy::StillRender()
   // Ensure that all representation pipelines are updated.
   this->UpdateAllRepresentations();
 
+  this->ForceRepresentationUpdate = false;
   this->BeginStillRender();
+  if (this->ForceRepresentationUpdate)
+    {
+    // BeginStillRender modified the representations, we need another update.
+    this->UpdateAllRepresentations();
+    }
   this->PerformRender();
   this->EndStillRender();
 }
@@ -237,7 +245,14 @@ void vtkSMViewProxy::InteractiveRender()
   // Ensure that all representation pipelines are updated.
   this->UpdateAllRepresentations();
 
+  this->ForceRepresentationUpdate = false;
   this->BeginInteractiveRender();
+  if (this->ForceRepresentationUpdate)
+    {
+    // BeginInteractiveRender modified the representations, we need another 
+    // update.
+    this->UpdateAllRepresentations();
+    }
   this->PerformRender();
   this->EndInteractiveRender();
 }

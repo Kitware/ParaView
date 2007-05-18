@@ -140,29 +140,6 @@ public:
   vtkGetMacro(MaximumPolygonsPerSecond, double);
   vtkGetMacro(AveragePolygonsPerSecond, double);
 
-  //BTX
-  enum ProxyType
-    {
-    GEOMETRY,
-    INPUT,
-    DISPLAY
-    };
-  //ETX
-
-  // Description:
-  // This will look in the RenderModule's Displays and find the one
-  // that corresponds to the given id (obtained by Pick()).
-  // Which proxy is returned depends on the second argument (proxyType).
-  // If DISPLAY, the corresponding display proxy is returned.
-  // If INPUT, the input of the display proxy is returned.
-  // If GEOMETRY, the geometry filter proxy is returned
-  vtkSMProxy *GetProxyFromPropID(vtkClientServerID *id, int proxyType);
-
-  // Decription:
-  // Like GetProxyFromPropIds, but this lets you iterate over the displays when
-  // you don't have an id to request specifically.
-  vtkSMProxy *GetProxyForDisplay(int number, int proxyType);
-
   // Description:
   // Checks if color depth is sufficient to support selection.
   // If not, will return 0 and any calls to SelectVisibleCells will 
@@ -240,7 +217,11 @@ protected:
   bool GetLODFlag();
 
   // Description:
-  // Determines if the LOD must be used for rendering
+  // Determines if the LOD must be used for rendering. The difference between 
+  // GetLODFlag() and GetLODDecision() is that GetLODFlag() indicates if the
+  // most recent render decided to use LOD or not, while GetLODDecision()
+  // uses the current geometry sizes to indicate if their sum is above
+  // the LOD threshold.
   virtual bool GetLODDecision();
 
   // Description:
@@ -293,13 +274,19 @@ protected:
   
   // Description:
   // Method called before/after Still Render is called.
-  // Can be used to set GlobalLODFlag.
+  // Used to perform some every-still-render-setup actions.
   virtual void BeginStillRender();
   virtual void EndStillRender();
 
+  // Description:
+  // Methods called before/after Interactive Render.
+  // Used to perform some every-interactive-render-setup actions.
   virtual void BeginInteractiveRender();
   virtual void EndInteractiveRender();
 
+  // Description:
+  // Performs actual rendering. Called for both still render and interactive 
+  // render.
   virtual void PerformRender();
 
   vtkTimerLog *RenderTimer;

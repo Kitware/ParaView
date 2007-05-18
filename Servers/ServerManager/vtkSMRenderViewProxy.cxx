@@ -66,7 +66,7 @@ class vtkSMRenderViewProxy::vtkPropToRepresentationMap :
 {
 };
 
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.7");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 //-----------------------------------------------------------------------------
@@ -433,7 +433,10 @@ void vtkSMRenderViewProxy::BeginInteractiveRender()
       {
       // We changed LOD decision, implying that the LOD pipelines for all
       // representations aren't up-to-date, ensure that they are updated.
-      this->UpdateAllRepresentations();
+      // This can be done by setting the ForceRepresentationUpdate to true
+      // as a result of which the superclass will update the representations once 
+      // again before performing render.
+      this->SetForceRepresentationUpdate(true);
       }
     }
   else
@@ -755,91 +758,6 @@ vtkPVClientServerIdCollectionInformation* vtkSMRenderViewProxy
   return propCollectionInfo;
 }
 
-//----------------------------------------------------------------------------
-vtkSMProxy *vtkSMRenderViewProxy::GetProxyFromPropID(
-  vtkClientServerID *id,
-  int proxyType)
-{
-  (void)id;
-  (void)proxyType;
-  vtkSMProxy *ret = NULL;
-// FIXME
-#if 0 
-  vtkCollectionIterator* iter = NULL;
-
-  //find the SMDisplayProxy that contains the CSID.
-  iter = this->Representations->NewIterator();
-  for (iter->InitTraversal(); 
-       !iter->IsDoneWithTraversal(); 
-       iter->GoToNextItem())
-    {
-    vtkSMDataObjectDisplayProxy* dodp = 
-      vtkSMDataObjectDisplayProxy::SafeDownCast(iter->GetCurrentObject());
-    
-    if (dodp)
-      {
-      vtkSMProxy *actorProxy = dodp->GetActorProxy();
-      vtkClientServerID idA = actorProxy->GetID(0);
-      if (idA == *id)
-        {
-        //we found it, now return the proxy for the algorithm that produced it
-        if (proxyType == DISPLAY)
-          {
-          ret = dodp;
-          }
-        else if (proxyType == INPUT)
-          {
-          ret = dodp->GetInput(0);
-          }
-        else if (proxyType == GEOMETRY)
-          {
-          ret = dodp->GetGeometryFilterProxy();
-          }
-        break;
-        }
-      }    
-    }
-
-  iter->Delete();  
-#endif
-  return ret;
-}
-
-
-//----------------------------------------------------------------------------
-vtkSMProxy *vtkSMRenderViewProxy::GetProxyForDisplay(
-  int number,
-  int proxyType)
-{
-  (void)number;
-  (void)proxyType;
-  vtkSMProxy *ret = NULL;
-
-  /* FIXME
-  vtkSMDataObjectDisplayProxy* dodp = 
-    vtkSMDataObjectDisplayProxy::SafeDownCast(
-      this->Representations->GetItemAsObject(number)
-      );
-    
-  if (dodp)
-    {
-    if (proxyType == DISPLAY)
-      {
-      ret = dodp;
-      }
-    else if (proxyType == INPUT)
-      {
-      ret = dodp->GetInput(0);
-      }
-    else if (proxyType == GEOMETRY)
-      {
-      ret = dodp->GetGeometryFilterProxy();
-      }
-    }    
-  */
-  return ret;
-}
-
 //-----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::ResetCamera()
 {
@@ -1120,8 +1038,7 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindow(int magnification)
   capture->GetExtent(extents);
   for (int cc=0; cc < 4; cc++)
     {
-    // FIXME
-    //extents[cc] += this->WindowPosition[cc/2]*magnification;
+    extents[cc] += this->WindowPosition[cc/2]*magnification;
     }
   capture->SetExtent(extents);
 
@@ -1249,30 +1166,9 @@ void vtkSMRenderViewProxy::ResetPolygonsPerSecondResults()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-  os << indent << "RenderInterruptsEnabled: " << this->RenderInterruptsEnabled 
-    << endl;
-  os << indent << "Renderer: " << this->Renderer << endl;
-  os << indent << "Renderer2D: " << this->Renderer2D << endl;
-  os << indent << "RenderWindow: " << this->RenderWindow << endl;
-  os << indent << "Interactor: " << this->Interactor << endl;
-  os << indent << "ActiveCamera: " << this->ActiveCamera << endl;
-  os << indent << "MeasurePolygonsPerSecond: " 
-    << this->MeasurePolygonsPerSecond << endl;
-  os << indent << "AveragePolygonsPerSecond: " 
-    << this->AveragePolygonsPerSecond << endl;
-  os << indent << "MaximumPolygonsPerSecond: " 
-    << this->MaximumPolygonsPerSecond << endl;
-  os << indent << "LastPolygonsPerSecond: " 
-    << this->LastPolygonsPerSecond << endl;
-  os << indent << "LODThreshold: " << this->LODThreshold << endl;
-}
-
-//-----------------------------------------------------------------------------
 int vtkSMRenderViewProxy::IsSelectionAvailable()
-{  
+{ 
+  //FIXME:-- cannot use vtkSMClientServerRenderModuleProxy.
   //check if we are not supposed to turn compositing on (in parallel)
   //the paraview gui uses a big number to say never composite
   //it we are not supposed to turn it on, then disallow selections
@@ -1666,3 +1562,24 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
   return selection;
 }
 
+//-----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "RenderInterruptsEnabled: " << this->RenderInterruptsEnabled 
+    << endl;
+  os << indent << "Renderer: " << this->Renderer << endl;
+  os << indent << "Renderer2D: " << this->Renderer2D << endl;
+  os << indent << "RenderWindow: " << this->RenderWindow << endl;
+  os << indent << "Interactor: " << this->Interactor << endl;
+  os << indent << "ActiveCamera: " << this->ActiveCamera << endl;
+  os << indent << "MeasurePolygonsPerSecond: " 
+    << this->MeasurePolygonsPerSecond << endl;
+  os << indent << "AveragePolygonsPerSecond: " 
+    << this->AveragePolygonsPerSecond << endl;
+  os << indent << "MaximumPolygonsPerSecond: " 
+    << this->MaximumPolygonsPerSecond << endl;
+  os << indent << "LastPolygonsPerSecond: " 
+    << this->LastPolygonsPerSecond << endl;
+  os << indent << "LODThreshold: " << this->LODThreshold << endl;
+}

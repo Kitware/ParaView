@@ -122,6 +122,10 @@ protected:
 
   // Description:
   // Method called at the start of StillRender().
+  // Before this method is called, we as assured that all representations are
+  // updated. However, if this method invalidates any of the representations,
+  // it must set ForceRepresentationUpdate flag to true so that representations
+  // are updated once again before performing the render.
   virtual void BeginStillRender();
 
   // Description:
@@ -130,6 +134,8 @@ protected:
 
   // Description:
   // Method called at the start of InteractiveRender().
+  // Before this method is called, we as assured that all representations are
+  // updated. However, if this method invalidates any of the representations,
   virtual void BeginInteractiveRender();
   
   // Description:
@@ -201,6 +207,13 @@ protected:
   // a proxy property name "ViewHelper").
   vtkSMProxy* ViewHelper;
 
+  // Can be set to true in BeginInteractiveRender() or BeginStillRender() is the
+  // representations are modified by these methods. This flag is reset at the
+  // end of the render.
+  void SetForceRepresentationUpdate(bool b)
+    { this->ForceRepresentationUpdate = b; }
+  vtkGetMacro(ForceRepresentationUpdate, bool);
+
 private:
   vtkSMViewProxy(const vtkSMViewProxy&); // Not implemented
   void operator=(const vtkSMViewProxy&); // Not implemented
@@ -214,6 +227,8 @@ private:
 
   unsigned long FullResDataSize;
   bool FullResDataSizeValid;
+
+  bool ForceRepresentationUpdate;
 //ETX
 };
 
