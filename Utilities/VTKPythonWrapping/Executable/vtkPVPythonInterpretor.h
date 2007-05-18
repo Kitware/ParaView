@@ -51,21 +51,23 @@ public:
   // This method will make the sub-interpretor represented by this object
   // the active one. If MultithreadSupport is enabled, this method also acquires
   // the global interpretor lock. A MakeCurrent() call must have a corresponding
-  // ReleaseControl().
+  // ReleaseControl() to avoid deadlocks.
   void MakeCurrent();
 
   // Description:
   // Helper function that executes a script using PyRun_SimpleString() - handles
-  // some pesky details with DOS line endings. */
+  // some pesky details with DOS line endings.
   // This method calls MakeCurrent() at the start and ReleaseControl() at the
   // end, hence the interpretor will not be the active one when the control
-  // returns from this call.
+  // returns from this call. 
   void RunSimpleString(const char* const script);
 
   // Description:
   // Call in a subinterpretter to pause it and return control to the 
   // main interpretor. If MultithreadSupport is enabled, this method also
   // releases the global interpretor lock.
+  // A MakeCurrent() call must have a corresponding
+  // ReleaseControl() to avoid deadlocks.
   void ReleaseControl();
 
   // Description:
