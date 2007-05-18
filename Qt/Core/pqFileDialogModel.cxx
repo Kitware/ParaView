@@ -361,7 +361,20 @@ public:
     {
     QStringList results;
 
-    if(Index.row() < this->FileList.size())
+    QModelIndex p = Index.parent();
+    if(p.isValid())
+      {
+      if(p.row() < this->FileList.size())
+        {
+        pqFileDialogModelFileInfo& file = this->FileList[p.row()];
+        const QList<pqFileDialogModelFileInfo>& grp = file.group();
+        if(Index.row() < grp.size())
+          {
+          results.push_back(grp[Index.row()].filePath());
+          }
+        }
+      }
+    else if(Index.row() < this->FileList.size())
       { 
       pqFileDialogModelFileInfo& file = this->FileList[Index.row()];
       results.push_back(file.filePath());
