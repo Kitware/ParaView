@@ -128,6 +128,7 @@ private slots:
   void onModelReset();
   void onNavigate(const QString&);
   void onNavigateUp();
+  void onNavigateBack();
   void onNavigateDown(const QModelIndex&);
   void onFilterChange(const QString&);
 

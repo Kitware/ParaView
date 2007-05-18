@@ -115,6 +115,7 @@ public:
   Ui::pqFileDialog Ui;
   QStringList SelectedFiles;
   QString TempFolderName;
+  QStringList NavigationHistory;
 
   pqImplementation(pqServer* server) :
     Model(new pqFileDialogModel(server, NULL)),
@@ -151,7 +152,10 @@ pqFileDialog::pqFileDialog(
   
   this->Implementation->Ui.NavigateBack->setIcon(style()->
       standardPixmap(QStyle::SP_FileDialogBack));
-  this->Implementation->Ui.NavigateBack->setDisabled( true );
+  this->Implementation->Ui.NavigateBack->setEnabled(false);
+  QObject::connect(this->Implementation->Ui.NavigateBack,
+                   SIGNAL(clicked(bool)),
+                   this, SLOT(onNavigateBack()));
   this->Implementation->Ui.NavigateForward->setIcon( 
       QIcon(":/pqWidgets/pqNavigateForward16.png"));
   this->Implementation->Ui.NavigateForward->setDisabled( true );
@@ -250,6 +254,7 @@ pqFileDialog::pqFileDialog(
     {
     startPath = this->Implementation->Model->getStartPath();
     }
+  this->Implementation->NavigationHistory.append(startPath);
   this->Implementation->Model->setCurrentPath(startPath);
 }
 
@@ -519,12 +524,16 @@ void pqFileDialog::onModelReset()
 //-----------------------------------------------------------------------------
 void pqFileDialog::onNavigate(const QString& Path)
 {
+  this->Implementation->Ui.NavigateBack->setEnabled(true);
+  this->Implementation->NavigationHistory.append(this->Implementation->Model->getCurrentPath());
   this->Implementation->Model->setCurrentPath(Path);
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onNavigateUp()
 {
+  this->Implementation->Ui.NavigateBack->setEnabled(true);
+  this->Implementation->NavigationHistory.append(this->Implementation->Model->getCurrentPath());
   this->Implementation->Model->setParentPath();
 }
 
@@ -539,7 +548,21 @@ void pqFileDialog::onNavigateDown(const QModelIndex& idx)
   if(1 != paths.size())
     return;
     
+  this->Implementation->Ui.NavigateBack->setEnabled(true);
+  this->Implementation->NavigationHistory.append(this->Implementation->Model->getCurrentPath());
   this->Implementation->Model->setCurrentPath(paths[0]);
+}
+  
+//-----------------------------------------------------------------------------
+void pqFileDialog::onNavigateBack()
+{
+  QString path = this->Implementation->NavigationHistory.takeLast();
+  this->Implementation->Model->setCurrentPath(path);
+  // never remove the start path
+  if(this->Implementation->NavigationHistory.size() == 1)
+    {
+    this->Implementation->Ui.NavigateBack->setEnabled(false);
+    }
 }
 
 //-----------------------------------------------------------------------------
