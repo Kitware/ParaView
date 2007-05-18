@@ -28,6 +28,7 @@ class vtkCollection;
 class vtkImageData;
 class vtkPVClientServerIdCollectionInformation;
 class vtkPVGenericRenderWindowInteractor;
+class vtkPVOpenGLExtensionsInformation;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkSelection;
@@ -174,6 +175,11 @@ public:
   virtual void RemovePropFromRenderer(vtkSMProxy* proxy);
   virtual void RemovePropFromRenderer2D(vtkSMProxy* proxy);
 
+  // Description:
+  // Returns the information object for this render module can can provide information
+  // about server-side extensions supported.
+  vtkPVOpenGLExtensionsInformation* GetOpenGLExtensionsInformation();
+
   //BTX
   enum Strategies
     {
@@ -311,6 +317,8 @@ private:
 
   // This map helps during surface selections.
   vtkPropToRepresentationMap* PropToRepresentationMap;
+
+  vtkPVOpenGLExtensionsInformation* OpenGLExtensionsInformation;
 //ETX
 };
 

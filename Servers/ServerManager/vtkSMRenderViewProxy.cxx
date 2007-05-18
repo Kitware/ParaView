@@ -66,7 +66,7 @@ class vtkSMRenderViewProxy::vtkPropToRepresentationMap :
 {
 };
 
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.8");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 //-----------------------------------------------------------------------------
@@ -100,6 +100,7 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
   this->LODThreshold = 0.0;
 
   this->PropToRepresentationMap = new vtkPropToRepresentationMap();
+  this->OpenGLExtensionsInformation = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -121,6 +122,11 @@ vtkSMRenderViewProxy::~vtkSMRenderViewProxy()
   this->ActiveCamera = 0;
   this->RenderTimer->Delete();
   this->RenderTimer = 0;
+  if (this->OpenGLExtensionsInformation)
+    {
+    this->OpenGLExtensionsInformation->Delete();
+    this->OpenGLExtensionsInformation = 0;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -130,10 +136,16 @@ vtkSMRepresentationStrategy* vtkSMRenderViewProxy::NewStrategyInternal(
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMRepresentationStrategy* strategy = 0;
 
-  if (type == SURFACE && dataType == VTK_POLY_DATA)
+  if ((type == SURFACE && dataType == VTK_POLY_DATA) ||
+       type == VOLUME && dataType == VTK_UNIFORM_GRID)
     {
     strategy = vtkSMRepresentationStrategy::SafeDownCast(
       pxm->NewProxy("strategies", "PolyDataStrategy"));
+    }
+  else if (type == VOLUME && dataType == VTK_UNSTRUCTURED_GRID)
+    {
+    strategy = vtkSMRepresentationStrategy::SafeDownCast(
+      pxm->NewProxy("strategies", "UnStructuredGridVolumeStrategy"));
     }
   else
     {
@@ -142,6 +154,35 @@ vtkSMRepresentationStrategy* vtkSMRenderViewProxy::NewStrategyInternal(
     }
 
   return strategy;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVOpenGLExtensionsInformation* 
+vtkSMRenderViewProxy::GetOpenGLExtensionsInformation()
+{
+  if (!this->ObjectsCreated)
+    {
+    vtkErrorMacro("Objects not created yet. Cannot get OpenGL extensions information");
+    return 0;
+    }
+  if (this->OpenGLExtensionsInformation)
+    {
+    return this->OpenGLExtensionsInformation;
+    }
+
+  this->OpenGLExtensionsInformation = vtkPVOpenGLExtensionsInformation::New();
+  /*
+  // FIXME:
+  // When in client-server mode, if the client has not created the
+  // server-side windows, then asking for extentions on the server side
+  // triggers a render on the server-side render window which hangs.
+  // Hence for now, using only the client side information.
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->GatherInformation(this->ConnectionID, vtkProcessModule::CLIENT,
+    this->OpenGLExtensionsInformation, 
+    this->RenderWindowProxy->GetID(0));
+    */
+  return this->OpenGLExtensionsInformation;
 }
 
 //-----------------------------------------------------------------------------
@@ -1582,4 +1623,13 @@ void vtkSMRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LastPolygonsPerSecond: " 
     << this->LastPolygonsPerSecond << endl;
   os << indent << "LODThreshold: " << this->LODThreshold << endl;
+  if (this->OpenGLExtensionsInformation)
+    {
+    os << endl;
+    this->OpenGLExtensionsInformation->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }  
 }
