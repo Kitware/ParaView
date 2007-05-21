@@ -11,7 +11,7 @@
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.5");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.6");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -802,6 +802,7 @@ int vtkSpyPlotUniReader::MakeCurrent()
   return 1;
 }
 
+#if 0
 //-----------------------------------------------------------------------------
 void vtkSpyPlotUniReader::PrintMemoryUsage()
 {
@@ -976,8 +977,8 @@ void vtkSpyPlotUniReader::PrintInformation()
     }
 
   this->CellArraySelection->Print(cout);
-
 }
+#endif
 
 //-----------------------------------------------------------------------------
 /* Routine run-length-encodes the data pointed to by *data, placing

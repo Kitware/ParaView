@@ -62,8 +62,10 @@ public:
   // else it will read in the required data from file
   int MakeCurrent();
 
+#if 0
   void PrintInformation();
   void PrintMemoryUsage();
+#endif
 
   //Description:
   // Set and get the current time step to process
