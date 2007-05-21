@@ -55,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqContourPanel.h"
 #include "pqCutPanel.h"
 #include "pqExodusPanel.h"
+#include "pqExtractLocationsPanel.h"
 #include "pqExtractSelectionPanel.h"
 #include "pqLoadedFormObjectPanel.h"
 #include "pqObjectBuilder.h"
@@ -125,6 +126,16 @@ public:
         {
         return new pqExtractSelectionPanel(proxy, p);
         }
+      if(QString("ProbeLocationOverTimePoint") == 
+         proxy->getProxy()->GetXMLName())
+        {
+        return new pqExtractLocationsPanel(proxy, p);
+        }
+      if(QString("ProbeLocationOverTimeCell") == 
+         proxy->getProxy()->GetXMLName())
+        {
+        return new pqExtractLocationsPanel(proxy, p);
+        }
       if(QString("Contour") == proxy->getProxy()->GetXMLName())
         {
         return new pqContourPanel(proxy, p);
@@ -161,6 +172,10 @@ public:
          QString("ExtractCellSelection") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractPointsOverTime") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractCellsOverTime") == proxy->getProxy()->GetXMLName() ||
+         QString("ProbeLocationOverTimePoint") == 
+         proxy->getProxy()->GetXMLName() ||
+         QString("ProbeLocationOverTimeCell") == 
+         proxy->getProxy()->GetXMLName() ||
          QString("Contour") == proxy->getProxy()->GetXMLName())
         {
         return true;

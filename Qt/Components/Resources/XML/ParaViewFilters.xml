@@ -23,6 +23,7 @@
     <Filter name="ExtractPointsOverTime" />
     <Filter name="ProbeLine" />
     <Filter name="ProbePoint" />
+    <Filter name="ProbeLocationOverTime" />
     <Filter name="Programmable Filter" />
   </Category>
 
@@ -79,6 +80,7 @@
   <Filter name="ProcessIdScalars" />
   <Filter name="ProbeLine" />
   <Filter name="ProbePoint" />
+  <Filter name="ProbeLocationOverTime" />
   <Filter name="Programmable Filter" />
   <Filter name="PVConnectivityFilter" />
   <Filter name="QuadricClustering" />
