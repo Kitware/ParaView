@@ -17,6 +17,7 @@
 #include <QColor>
 #include <QPen>
 #include <QSize>
+#include <QTimer>
 
 // TODO: Expand the chart test to test other charts.
 
@@ -96,6 +97,12 @@ int main(int argc, char *argv[])
   histogram->getLineChart().setModel(lines);
 
   histogram->show();
+
+  QStringList args = app.arguments();
+  if(args.size() > 1 && args.at(1) == "--exit")
+    {
+    QTimer::singleShot(100, QApplication::instance(), SLOT(quit()));
+    }
   int status = app.exec();
 
   //delete colorMap;
