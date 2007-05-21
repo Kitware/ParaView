@@ -115,7 +115,6 @@ public:
   Ui::pqFileDialog Ui;
   QStringList SelectedFiles;
   QString TempFolderName;
-  QStringList NavigationHistory;
 
   pqImplementation(pqServer* server) :
     Model(new pqFileDialogModel(server, NULL)),
@@ -131,6 +130,47 @@ public:
     delete this->Model;
     delete this->FavoriteModel;
   }
+
+  void addHistory(const QString& p)
+    {
+    this->BackHistory.append(p);
+    this->ForwardHistory.clear();
+    if(this->BackHistory.size() > 1)
+      {
+      this->Ui.NavigateBack->setEnabled(true);
+      }
+    else
+      {
+      this->Ui.NavigateBack->setEnabled(false);
+      }
+    this->Ui.NavigateForward->setEnabled(false);
+    }
+  QString backHistory()
+    {
+    QString path = this->BackHistory.takeLast();
+    this->ForwardHistory.append(this->Model->getCurrentPath());
+    this->Ui.NavigateForward->setEnabled(true);
+    if(this->BackHistory.size() == 1)
+      {
+      this->Ui.NavigateBack->setEnabled(false);
+      }
+    return path;
+    }
+  QString forwardHistory()
+    {
+    QString path = this->ForwardHistory.takeFirst();
+    this->BackHistory.append(this->Model->getCurrentPath());
+    this->Ui.NavigateBack->setEnabled(true);
+    if(this->ForwardHistory.size() == 0)
+      {
+      this->Ui.NavigateForward->setEnabled(false);
+      }
+    return path;
+    }
+  
+protected:
+  QStringList BackHistory;
+  QStringList ForwardHistory;
 
 };
 
@@ -150,15 +190,19 @@ pqFileDialog::pqFileDialog(
 
   this->setWindowTitle(title);
   
-  this->Implementation->Ui.NavigateBack->setIcon(style()->
-      standardPixmap(QStyle::SP_FileDialogBack));
+  QPixmap back = style()->standardPixmap(QStyle::SP_FileDialogBack);
+  this->Implementation->Ui.NavigateBack->setIcon(back);
   this->Implementation->Ui.NavigateBack->setEnabled(false);
   QObject::connect(this->Implementation->Ui.NavigateBack,
                    SIGNAL(clicked(bool)),
                    this, SLOT(onNavigateBack()));
-  this->Implementation->Ui.NavigateForward->setIcon( 
-      QIcon(":/pqWidgets/pqNavigateForward16.png"));
+  // just flip the back image to make a forward image
+  QPixmap forward = QPixmap::fromImage(back.toImage().mirrored(true, false));
+  this->Implementation->Ui.NavigateForward->setIcon(forward);
   this->Implementation->Ui.NavigateForward->setDisabled( true );
+  QObject::connect(this->Implementation->Ui.NavigateForward,
+                   SIGNAL(clicked(bool)),
+                   this, SLOT(onNavigateForward()));
   this->Implementation->Ui.NavigateUp->setIcon(style()->
       standardPixmap(QStyle::SP_FileDialogToParent));
   this->Implementation->Ui.CreateFolder->setIcon(style()->
@@ -254,7 +298,7 @@ pqFileDialog::pqFileDialog(
     {
     startPath = this->Implementation->Model->getStartPath();
     }
-  this->Implementation->NavigationHistory.append(startPath);
+  this->Implementation->addHistory(startPath);
   this->Implementation->Model->setCurrentPath(startPath);
 }
 
@@ -524,16 +568,14 @@ void pqFileDialog::onModelReset()
 //-----------------------------------------------------------------------------
 void pqFileDialog::onNavigate(const QString& Path)
 {
-  this->Implementation->Ui.NavigateBack->setEnabled(true);
-  this->Implementation->NavigationHistory.append(this->Implementation->Model->getCurrentPath());
+  this->Implementation->addHistory(this->Implementation->Model->getCurrentPath());
   this->Implementation->Model->setCurrentPath(Path);
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onNavigateUp()
 {
-  this->Implementation->Ui.NavigateBack->setEnabled(true);
-  this->Implementation->NavigationHistory.append(this->Implementation->Model->getCurrentPath());
+  this->Implementation->addHistory(this->Implementation->Model->getCurrentPath());
   this->Implementation->Model->setParentPath();
 }
 
@@ -548,21 +590,22 @@ void pqFileDialog::onNavigateDown(const QModelIndex& idx)
   if(1 != paths.size())
     return;
     
-  this->Implementation->Ui.NavigateBack->setEnabled(true);
-  this->Implementation->NavigationHistory.append(this->Implementation->Model->getCurrentPath());
+  this->Implementation->addHistory(this->Implementation->Model->getCurrentPath());
   this->Implementation->Model->setCurrentPath(paths[0]);
 }
   
 //-----------------------------------------------------------------------------
 void pqFileDialog::onNavigateBack()
 {
-  QString path = this->Implementation->NavigationHistory.takeLast();
+  QString path = this->Implementation->backHistory();
   this->Implementation->Model->setCurrentPath(path);
-  // never remove the start path
-  if(this->Implementation->NavigationHistory.size() == 1)
-    {
-    this->Implementation->Ui.NavigateBack->setEnabled(false);
-    }
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::onNavigateForward()
+{
+  QString path = this->Implementation->forwardHistory();
+  this->Implementation->Model->setCurrentPath(path);
 }
 
 //-----------------------------------------------------------------------------
