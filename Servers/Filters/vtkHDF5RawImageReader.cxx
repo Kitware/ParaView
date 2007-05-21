@@ -40,7 +40,7 @@
 #define VTK_HDF5_DEBUG 1
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.16");
+vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.17");
 vtkStandardNewMacro(vtkHDF5RawImageReader);
 
 //----------------------------------------------------------------------------
@@ -140,6 +140,8 @@ vtkHDF5RawImageReader::vtkHDF5RawImageReader()
                                              this->SelectionObserver);
   this->CellDataArraySelection->AddObserver(vtkCommand::ModifiedEvent,
                                             this->SelectionObserver);
+
+  this->SetNumberOfInputPorts(0);
 }
 
 //----------------------------------------------------------------------------
