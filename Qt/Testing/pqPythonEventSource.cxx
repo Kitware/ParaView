@@ -424,9 +424,12 @@ pqPythonEventSource::pqPythonEventSource(QObject* p)
 #ifdef SIGINT
     signal(SIGINT, SIG_DFL);
 #endif
+    PyEval_InitThreads();
+    PyEval_ReleaseLock();
     }
-  PyEval_InitThreads();
 
+  PyEval_AcquireLock();
+  
   // add QtTesting to python's inittab, so it is
   // available to all interpreters
   PyImport_AppendInittab(const_cast<char*>("QtTesting"), initQtTesting);
