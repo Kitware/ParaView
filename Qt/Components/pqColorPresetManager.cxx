@@ -333,6 +333,7 @@ void pqColorPresetManager::exportColorMap(const QStringList &files)
       element = vtkPVXMLElement::New();
       element->SetName("ColorMap");
       root->AddNestedElement(element);
+      element->Delete();
       }
 
     this->exportColorMap(*index, element);
@@ -627,6 +628,7 @@ void pqColorPresetManager::exportColorMap(const QModelIndex &index,
       point->SetAttribute("b",
           QString::number(color.blueF()).toAscii().data());
       element->AddNestedElement(point);
+      point->Delete();
       }
     }
 }
