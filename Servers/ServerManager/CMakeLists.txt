@@ -57,6 +57,7 @@ SET(Kit_SRCS
   vtkSMEnumerationDomain.cxx
   vtkSMExponentialKeyFrameProxy.cxx
   vtkSMExtentDomain.cxx
+  vtkSMExtractLocationsProxy.cxx
   vtkSMExtractSelectionProxy.cxx
   vtkSMFieldDataDomain.cxx
   vtkSMFileListDomain.cxx
