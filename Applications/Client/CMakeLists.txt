@@ -303,6 +303,10 @@ IF(BUILD_TESTING)
   SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/pvTestDriver)
 
   IF(PARAVIEW_DATA_ROOT)
+    OPTION(PARAVIEW_CLIENT_RENDER_SERVER_TESTS
+      "Turn on/off client tests that involve separate data and render servers."
+      ON)
+    MARK_AS_ADVANCED(PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
     FOREACH(test ${XML_TESTS_WITH_BASELINES})
       ADD_TEST(pqClient${test}-Builtin
         ${TEST_BINARY}
@@ -320,13 +324,15 @@ IF(BUILD_TESTING)
         --compare-view=${TEST_IMAGE}/${test}.png
         --exit)
 
-      ADD_TEST(pqClient${test}-ClientRenderServer
-        ${TEST_BINARY} --test-render-server
-        --test-directory=${PARAVIEW_TEST_DIR}
-        -dr
-        --run-test=${TEST_XML}/${test}.xml
-        --compare-view=${TEST_IMAGE}/${test}.png
-        --exit)
+      IF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
+        ADD_TEST(pqClient${test}-ClientRenderServer
+          ${TEST_BINARY} --test-render-server
+          --test-directory=${PARAVIEW_TEST_DIR}
+          -dr
+          --run-test=${TEST_XML}/${test}.xml
+          --compare-view=${TEST_IMAGE}/${test}.png
+          --exit)
+      ENDIF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
     ENDFOREACH(test)
   ENDIF(PARAVIEW_DATA_ROOT)
 
