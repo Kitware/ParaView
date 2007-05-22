@@ -4,6 +4,8 @@ PROJECT(pqChartTest)
 SET(MyTests
   ColorMap
   Histogram
+  HistogramSelection
+  HistogramInteraction
   )
 
 INCLUDE_DIRECTORIES(${QtChart_SOURCE_DIR} ${QtChart_BINARY_DIR})
