@@ -113,10 +113,6 @@
           file_description="SpyPlot CTH dataset">
   </Reader>
 
-  <Reader name="HDF5RawImageReader"
-          extensions="h5"
-          file_description="HDF5 Raw ImageData Files">
-  </Reader>
   <Reader name="DEMReader"
           extensions="dem"
           file_description="Digital Elevation Map Files">
