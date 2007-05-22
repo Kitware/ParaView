@@ -80,9 +80,25 @@ for a in ${QT_LIB_DIR}/*.dylib; do
   fi
 done
 
+VTK_USE_FFMPEG=@VTK_USE_FFMPEG_ENCODER@
+if [ "x$VTK_USE_FFMPEG" = "xON" ]; then
+    FFMPEG_LIB_DIR=@FFMPEG_avcodec_LIBRARY@
+    FFMPEG_LIB_DIR=`dirname $FFMPEG_LIB_DIR`
+
+    echo ""
+    echo "Stage 1.a - Install FFMPEG libraries"
+
+    echo "FFMPEG is ON, libdir: $FFMPEG_LIB_DIR"
+    for a in ${FFMPEG_LIB_DIR}/libavcodec*dylib* ${FFMPEG_LIB_DIR}/libavformat*dylib* ${FFMPEG_LIB_DIR}/libavutil*dylib*; do
+	echo -n .
+	cp $a  paraview.app/Contents/MacOS/
+    done
+    echo "."
+fi
+
 echo ""
 echo "Stage 2 - Fix all the remaining dylib's"
-for a in @ParaView_BINARY_DIR@/bin/*.so @ParaView_BINARY_DIR@/bin/*.dylib; do
+for a in @ParaView_BINARY_DIR@/bin/*.so @ParaView_BINARY_DIR@/bin/*.dylib ${FFMPEG_LIB_DIR}/libavcodec*dylib* ${FFMPEG_LIB_DIR}/libavformat*dylib* ${FFMPEG_LIB_DIR}/libavutil*dylib*; do
     if [ -e $a ]; then
         echo -n .
         file=$(basename $a)
@@ -97,7 +113,7 @@ for a in @ParaView_BINARY_DIR@/bin/*.so @ParaView_BINARY_DIR@/bin/*.dylib; do
         if [ "x$DEBUG" = "x1" ]; then
             echo "Stage 2.a.$a"
         fi
-        for lib in @ParaView_BINARY_DIR@/bin/*.dylib; do
+        for lib in @ParaView_BINARY_DIR@/bin/*.dylib ${FFMPEG_LIB_DIR}/libavcodec*dylib* ${FFMPEG_LIB_DIR}/libavformat*dylib* ${FFMPEG_LIB_DIR}/libavutil*dylib*; do
             libfile=$(basename ${lib})
             install_name_tool paraview.app/Contents/MacOS/${file} -change ${lib} @executable_path/${libfile}
         done
