@@ -136,7 +136,7 @@ MainWindow::MainWindow() :
     new pqViewMenu(*this->Implementation->UI.menuToolbars);
 
   this->setWindowTitle(
-    QString("Kitware ParaView %1 (beta)").arg(PARAVIEW_VERSION_FULL));
+    QString("Kitware ParaView %1").arg(PARAVIEW_VERSION_FULL));
 
   // Setup menus and toolbars ...
   connect(this->Implementation->UI.actionFileOpen,
