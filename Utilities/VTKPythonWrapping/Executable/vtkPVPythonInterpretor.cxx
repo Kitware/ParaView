@@ -170,7 +170,8 @@ class vtkPVPythonInterpretorInternal
 public:
   PyThreadState* Interpretor;
   PyThreadState* ParentThreadState;
-  bool MultithreadSupport;
+  static int GILByPVPythonInterpretor;
+  static bool MultithreadSupport;
 
   static PyThreadState *MainThreadState;
 
@@ -178,7 +179,6 @@ public:
     {
     this->Interpretor = 0;
     this->ParentThreadState = 0;
-    this->MultithreadSupport = false;
     }
 
   ~vtkPVPythonInterpretorInternal()
@@ -186,49 +186,85 @@ public:
     if (this->Interpretor)
       {
       this->MakeCurrent();
-      PyThreadState_Swap(0);
-      PyThreadState_Clear(this->Interpretor);
-      PyThreadState_Delete(this->Interpretor);
-      PyThreadState_Swap(this->ParentThreadState);
+      Py_EndInterpreter(this->Interpretor);
 
+      // Swap the state back to the state that was present when this interpretor
+      // was created. This assumes that the parent state hasn't been destroyed
+      // yet.
+      PyThreadState_Swap(this->ParentThreadState);
       this->Interpretor = 0;
       this->ParentThreadState = 0;
-      if (this->MultithreadSupport)
-        {
-        PyEval_ReleaseLock();
-        }
+      this->ReleaseLock();
       }
     }
 
   void MakeCurrent()
     {
-    if (this->MultithreadSupport)
-      {
-      PyEval_AcquireLock();
-      }
+    this->AcquireLock();
     PyThreadState_Swap(this->Interpretor);
     }
 
   void ReleaseControl()
     {
     PyThreadState_Swap(this->ParentThreadState);
-    if (this->MultithreadSupport)
+    this->ReleaseLock();
+    }
+
+  void AcquireLock()
+    {
+    if (vtkPVPythonInterpretorInternal::MultithreadSupport)
       {
-      PyEval_ReleaseLock();
+      if (vtkPVPythonInterpretorInternal::GILByPVPythonInterpretor == 0)
+        {
+        PyEval_AcquireLock();
+        }
+      vtkPVPythonInterpretorInternal::GILByPVPythonInterpretor++;
+      }
+    }
+
+  void ReleaseLock()
+    {
+    if (vtkPVPythonInterpretorInternal::MultithreadSupport)
+      {
+      vtkPVPythonInterpretorInternal::GILByPVPythonInterpretor--;
+      if (vtkPVPythonInterpretorInternal::GILByPVPythonInterpretor == 0)
+        {
+        PyEval_ReleaseLock();
+        }
+      if (vtkPVPythonInterpretorInternal::GILByPVPythonInterpretor < 0)
+        {
+        vtkPVPythonInterpretorInternal::GILByPVPythonInterpretor = 0;
+        vtkGenericWarningMacro("Unmatched ReleaseLock.");
+        }
       }
     }
 };
 
+PyThreadState* vtkPVPythonInterpretorInternal::MainThreadState = NULL;
+bool vtkPVPythonInterpretorInternal::MultithreadSupport= false;
+int vtkPVPythonInterpretorInternal::GILByPVPythonInterpretor = 0;
+
+//-----------------------------------------------------------------------------
+bool vtkPVPythonInterpretor::GetMultithreadSupport()
+{
+  return vtkPVPythonInterpretorInternal::MultithreadSupport;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPythonInterpretor::SetMultithreadSupport(bool enable)
+{
+  vtkPVPythonInterpretorInternal::MultithreadSupport = enable;
+}
+
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.11.4.4");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.11.4.5");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
 {
   this->Internal = new vtkPVPythonInterpretorInternal();
   this->ExecutablePath = 0;
-  this->MultithreadSupport = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -273,7 +309,6 @@ int vtkPVPythonInterpretor::InitializeSubInterpretor(int vtkNotUsed(argc),
     return 0;
     }
 
-  this->Internal->MultithreadSupport = this->MultithreadSupport;
   this->SetExecutablePath(argv[0]);
   if (!Py_IsInitialized())
     {
@@ -282,17 +317,17 @@ int vtkPVPythonInterpretor::InitializeSubInterpretor(int vtkNotUsed(argc),
     Py_SetProgramName(argv[0]);
     Py_Initialize();
 
-    if (this->MultithreadSupport)
+    if (this->GetMultithreadSupport())
       {
       PyEval_InitThreads();
       }
-
+    
     this->Internal->MainThreadState = PyThreadState_Get();
 #ifdef SIGINT
     signal(SIGINT, SIG_DFL);
 #endif
 
-    if (this->MultithreadSupport)
+    if (this->GetMultithreadSupport())
       {
       // Since PyEval_InitThreads acquires the lock for this thread,
       // we release it.
@@ -300,6 +335,7 @@ int vtkPVPythonInterpretor::InitializeSubInterpretor(int vtkNotUsed(argc),
       }
     }
 
+  this->Internal->AcquireLock();
   this->Internal->ParentThreadState = PyThreadState_Get();
 
   this->Internal->ParentThreadState = 
@@ -310,18 +346,17 @@ int vtkPVPythonInterpretor::InitializeSubInterpretor(int vtkNotUsed(argc),
     {
     vtkErrorMacro("No active python state. Cannot create a new interpretor "
       " without active context.");
+    this->Internal->ReleaseLock();
     return 0;
     }
-
-  this->Internal->Interpretor = PyThreadState_New(
-    this->Internal->ParentThreadState->interp);
+  
+  this->Internal->Interpretor = Py_NewInterpreter();
+  this->Internal->ReleaseLock();
   this->Internal->MakeCurrent();
   this->InitializeInternal();
   this->Internal->ReleaseControl();
   return 1;
 }
-
-PyThreadState* vtkPVPythonInterpretorInternal::MainThreadState = NULL;
 
 //-----------------------------------------------------------------------------
 int vtkPVPythonInterpretor::PyMain(int argc, char** argv)
