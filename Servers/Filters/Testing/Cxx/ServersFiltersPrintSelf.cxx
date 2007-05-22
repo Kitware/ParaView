@@ -20,7 +20,6 @@
 #include "vtkCompleteArrays.h"
 #include "vtkCVGeometryCache.h"
 #include "vtkDataSetSubdivisionAlgorithm.h"
-#include "vtkHDF5RawImageReader.h"
 #include "vtkHierarchicalFractal.h"
 #include "vtkImageCompressor.h"
 #include "vtkIntegrateAttributes.h"
@@ -110,7 +109,6 @@ int main(int , char *[])
   c = vtkCompleteArrays::New(); c->Print(cout); c->Delete();
   c = vtkCVGeometryCache::New(); c->Print(cout); c->Delete();
   c = vtkDataSetSubdivisionAlgorithm::New(); c->Print(cout); c->Delete();
-  c = vtkHDF5RawImageReader::New(); c->Print(cout); c->Delete();
   c = vtkHierarchicalFractal::New(); c->Print(cout); c->Delete();
   c = vtkImageCompressor::New(); c->Print(cout); c->Delete();
   c = vtkIntegrateAttributes::New(); c->Print(cout); c->Delete();
