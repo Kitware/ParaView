@@ -72,7 +72,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.18");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.18.10.1");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -685,14 +685,18 @@ vtkIdType vtkProcessModuleConnectionManager::CreateConnection(
         }
       }
 
-    if (rc->Initialize(0, 0)==0)
+    if (rc->Initialize(0, 0)!=0) // 0 == SUCCESS.
       {
-      // Handshake and authentication succeded.
-      // Connection is set up perfect!
-      id = this->GetUniqueConnectionID();
-      this->SetConnection(id, rc);
-      this->AddManagedSocket(cs, rc);
+      vtkErrorMacro("Rejecting new connection.");
+      rc->Delete();
+      return id;
       }
+
+    // Handshake and authentication succeded.
+    // Connection is set up perfect!
+    id = this->GetUniqueConnectionID();
+    this->SetConnection(id, rc);
+    this->AddManagedSocket(cs, rc);
     rc->Delete();
     } 
 
