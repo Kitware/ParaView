@@ -114,6 +114,7 @@ public:
   // Here, only for RenderModuleProxy.
   vtkGetMacro(VolumeRenderMode, int);
 
+/*
   // Description:
   // Convenience methods for switching between volume
   // mappers.
@@ -126,7 +127,8 @@ public:
   // Convenience method for determining which
   // volume mapper is in use
   virtual int GetVolumeMapperTypeCM();
-  
+*/
+
   // Description:
   // This method will set the subproxy GeometryFilterProxy
   // as the input (using property "Input") on the argument
@@ -160,16 +162,17 @@ public:
   };
   //ETX
  
-
   // Description:
   // Convienience method to set/get the material name.
   void SetMaterialCM(const char* materialname);
+
   // Description:
   // Convienience method to set/get the material name.
   // The material name is returned only when Shading is enabled.
   // When Shading is disabled 0 is returned.
   const char* GetMaterialCM();
   
+/*
   // Description:
   // Convenience method to get/set the Interpolation for this proxy.
   int GetInterpolationCM();
@@ -179,17 +182,21 @@ public:
   // Convenience method to get/set Point Size.
   void SetPointSizeCM(double size);
   double GetPointSizeCM();
+*/
 
   // Description:
   // Convenience method to get/set Line Width.
   void SetLineWidthCM(double width);
+/*
   double GetLineWidthCM();
 
   // Description:
   // Convenience method to get/set Scalar Mode.
   void SetScalarModeCM(int  mode);
+*/
   int GetScalarModeCM();
 
+/*
   // Description:
   // Convenience method to get/set ScalarArray (Volume Mapper).
   void SetScalarArrayCM(const char* arrayname);
@@ -198,12 +205,15 @@ public:
   // Description:
   // Convenience method to get/set Opacity.
   void SetOpacityCM(double op);
+*/
   double GetOpacityCM();
 
+/*
   // Description:
   // Convenience method to get/set ColorMode.
   void SetColorModeCM(int mode);
   int GetColorModeCM();
+*/
 
   // Description:
   // Convenience method to get/set Actor color.
@@ -214,17 +224,20 @@ public:
     double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
     this->SetColorCM(rgb);
     }
-        
+
+/*
   // Description:
   // Convenience method to get/set InterpolateColorsBeforeMapping property.
   void SetInterpolateScalarsBeforeMappingCM(int flag);
   int GetInterpolateScalarsBeforeMappingCM();
+*/
 
   // Description:
   // Convenience method to get/set ScalarVisibility property.
   void SetScalarVisibilityCM(int);
   int GetScalarVisibilityCM();
 
+/*
   // Description:
   // Convenience method to get/set Position property.
   void SetPositionCM(double pos[3]);
@@ -264,12 +277,14 @@ public:
     double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
     this->SetOriginCM(rgb);
     }
+*/
 
   // Description:
   // Convenience method to get/set Representation.
   void SetRepresentationCM(int r);
   int GetRepresentationCM();
 
+/*
   // Description:
   // Convenience method to get/set ImmediateModeRendering property.
   void SetImmediateModeRenderingCM(int f);
@@ -279,6 +294,7 @@ public:
   // Convenience method to get/set Pickability of the vtkActor.
   void SetPickableCM(int pickable);
   int GetPickableCM();
+*/
 
 protected:
   vtkSMDataObjectDisplayProxy();

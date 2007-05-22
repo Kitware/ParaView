@@ -40,7 +40,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.39");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.40");
 
 
 //-----------------------------------------------------------------------------
@@ -925,6 +925,7 @@ void vtkSMDataObjectDisplayProxy::ResetTransferFunctions(
 }
 */
 
+/*
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetVolumeMapperToBunykCM()
 {
@@ -1069,6 +1070,7 @@ int vtkSMDataObjectDisplayProxy::GetVolumeMapperTypeCM()
   
   return vtkSMDataObjectDisplayProxy::UNKNOWN_VOLUME_MAPPER;
 }
+*/
 
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetVisibility(int visible)
@@ -1448,6 +1450,7 @@ void vtkSMDataObjectDisplayProxy::SetInputAsGeometryFilter(vtkSMProxy *onProxy)
   ip->AddProxy(this->GeometryFilterProxy);
 }
 
+/*
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetInterpolationCM(int flag)
 {
@@ -1501,6 +1504,7 @@ double vtkSMDataObjectDisplayProxy::GetPointSizeCM()
     }
   return dvp->GetElement(0);
 }
+*/
 
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetLineWidthCM(double width)
@@ -1516,6 +1520,7 @@ void vtkSMDataObjectDisplayProxy::SetLineWidthCM(double width)
   this->UpdateVTKObjects(); 
 }
 
+/*
 //-----------------------------------------------------------------------------
 double vtkSMDataObjectDisplayProxy::GetLineWidthCM()
 {
@@ -1542,6 +1547,7 @@ void vtkSMDataObjectDisplayProxy::SetScalarModeCM(int mode)
   ivp->SetElement(0, mode);
   this->UpdateVTKObjects();
 }
+*/
 
 //-----------------------------------------------------------------------------
 int vtkSMDataObjectDisplayProxy::GetScalarModeCM()
@@ -1555,6 +1561,8 @@ int vtkSMDataObjectDisplayProxy::GetScalarModeCM()
     }
   return ivp->GetElement(0);
 }
+
+/*
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetColorModeCM(int mode)
 {
@@ -1626,6 +1634,7 @@ void vtkSMDataObjectDisplayProxy::SetOpacityCM(double op)
   this->UpdateVTKObjects(); 
 
 }
+*/
 
 //-----------------------------------------------------------------------------
 double vtkSMDataObjectDisplayProxy::GetOpacityCM()
@@ -1670,6 +1679,7 @@ void vtkSMDataObjectDisplayProxy::GetColorCM(double rgb[3])
   rgb[2] = dvp->GetElement(2);
 }
 
+/*
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetInterpolateScalarsBeforeMappingCM(int flag)
 {
@@ -1696,6 +1706,7 @@ int vtkSMDataObjectDisplayProxy::GetInterpolateScalarsBeforeMappingCM()
     }
   return ivp->GetElement(0);
 }
+*/
 
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetScalarVisibilityCM(int v)
@@ -1724,6 +1735,7 @@ int vtkSMDataObjectDisplayProxy::GetScalarVisibilityCM()
   return ivp->GetElement(0);
 }
 
+/*
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetPositionCM(double pos[3])
 {
@@ -1752,6 +1764,7 @@ void vtkSMDataObjectDisplayProxy::GetPositionCM(double pos[3])
   pos[1] = dvp->GetElement(1);
   pos[2] = dvp->GetElement(2);
 }
+
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::GetScaleCM(double pos[3])
 {
@@ -1838,6 +1851,7 @@ void vtkSMDataObjectDisplayProxy::SetOriginCM(double pos[3])
   dvp->SetElements(pos);
   this->UpdateVTKObjects();
 }
+*/
 
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetRepresentationCM(int r)
@@ -1866,6 +1880,7 @@ int vtkSMDataObjectDisplayProxy::GetRepresentationCM()
   return ivp->GetElement(0);
 }
 
+/*
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetImmediateModeRenderingCM(int i)
 {
@@ -1920,6 +1935,7 @@ int vtkSMDataObjectDisplayProxy::GetPickableCM()
     }
   return dvp->GetElement(0);
 }
+*/
 
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetMaterialCM(const char* name)
