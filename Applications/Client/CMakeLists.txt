@@ -282,6 +282,7 @@ IF(BUILD_TESTING)
     SelectReader
     StreamTracer
     StreamTracerUpdates
+    Tessellate
     TextWidget
     Threshold
     UndoRedo
