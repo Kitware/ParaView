@@ -266,6 +266,7 @@ IF(BUILD_TESTING)
     CreateSource
     CustomFilter
     CutMulti
+    D3SmallCells
     DualSphereAnimation
     ExodusIIPanel
     ExodusModeShapes
