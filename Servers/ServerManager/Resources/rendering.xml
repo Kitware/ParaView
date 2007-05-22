@@ -513,7 +513,12 @@
         animateable="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
-      
+      <DoubleVectorProperty
+        name="ScalarRange"
+        command="SetScalarRange"
+        number_of_elements="2"
+        default_values="0 1"
+        animateable="0"/>
       <IntVectorProperty 
         name="ImmediateModeRendering" 
         command="SetImmediateModeRendering"
@@ -2972,6 +2977,7 @@
           <Property name="ScalarVisibility" />
           <Property name="ColorMode" />
           <Property name="MapScalars" />
+          <Property name="ScalarRange" />
           <Property name="ImmediateModeRendering" />
           <Property name="InterpolateScalarsBeforeMapping" />
           <Property name="UseLookupTableScalarRange" />
