@@ -19,7 +19,6 @@ SET(Filters_SRCS
   vtkCaveRenderManager.cxx
 #  vtkCellSelect.cxx
   vtkCleanUnstructuredGrid.cxx
-  vtkClientCompositeManager.cxx
   vtkClientServerMoveData.cxx
 #  vtkColorByPart.cxx
   vtkCompleteArrays.cxx

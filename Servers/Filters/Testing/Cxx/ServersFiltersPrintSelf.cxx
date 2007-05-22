@@ -17,7 +17,6 @@
 #include "vtkAttributeEditor.h"
 #include "vtkCaveRenderManager.h"
 #include "vtkCleanUnstructuredGrid.h"
-#include "vtkClientCompositeManager.h"
 #include "vtkCompleteArrays.h"
 #include "vtkCVGeometryCache.h"
 #include "vtkDataSetSubdivisionAlgorithm.h"
@@ -108,7 +107,6 @@ int main(int , char *[])
   c = vtkAttributeEditor::New(); c->Print(cout); c->Delete();
   c = vtkCaveRenderManager::New(); c->Print(cout); c->Delete();
   c = vtkCleanUnstructuredGrid::New(); c->Print(cout); c->Delete();
-  c = vtkClientCompositeManager::New(); c->Print(cout); c->Delete();
   c = vtkCompleteArrays::New(); c->Print(cout); c->Delete();
   c = vtkCVGeometryCache::New(); c->Print(cout); c->Delete();
   c = vtkDataSetSubdivisionAlgorithm::New(); c->Print(cout); c->Delete();
