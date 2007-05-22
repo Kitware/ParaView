@@ -17,7 +17,7 @@
 #include <QSize>
 #include <QTimer>
 
-int HistogramSelection(int argc, char** argv)
+int HistogramSelection(int argc, char* argv[])
 {
   QApplication app(argc, argv);
 

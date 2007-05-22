@@ -23,7 +23,7 @@ int sendKeyEvent(QWidget* w, Qt::Key k, Qt::KeyboardModifiers m = 0)
   return sendEvent(w, &kd) + sendEvent(w, &ku);
 }
 
-int HistogramInteraction(int argc, char** argv)
+int HistogramInteraction(int argc, char* argv[])
 {
   QApplication app(argc, argv);
 

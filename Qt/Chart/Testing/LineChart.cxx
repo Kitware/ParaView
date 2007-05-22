@@ -18,7 +18,7 @@
 #include <QSize>
 #include <QTimer>
 
-int LineChart(int argc, char** argv)
+int LineChart(int argc, char* argv[])
 {
   QApplication app(argc, argv);
 

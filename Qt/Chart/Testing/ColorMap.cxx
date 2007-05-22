@@ -8,7 +8,7 @@
 #include <QTimer>
 #include <iostream>
 
-int ColorMap(int argc, char** argv)
+int ColorMap(int argc, char* argv[])
 {
   QApplication app(argc, argv);
 
