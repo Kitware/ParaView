@@ -18,6 +18,12 @@
 // Encapsulates a python interpretor. It also initializes the interpretor
 // with the paths to the paraview libraries and modules. This object can 
 // represent the main interpretor or any sub-interpretor.
+// .SECTION Caveat
+// Since this class uses a static variable to keep track of interpretor lock
+// state, it is not safe to use vtkPVPythonInterpretor instances in different
+// threads. It is however possible to use it in the same thread of a
+// multithreaded application and use python C calls in the other thread(s).
+// In that case, it is necessary to set MultithreadSupport to true.
 
 #ifndef __vtkPVPythonInterpretor_h
 #define __vtkPVPythonInterpretor_h
@@ -75,9 +81,12 @@ public:
   // requires additional initialization/locking. Set this to true to enable
   // initialization and locking of the global interpretor, if application is
   // multithreaded with sub-interpretors being initialized by different threads.
-  // Changing this flag after InitializeSubInterpretor() has no effect.
-  vtkSetMacro(MultithreadSupport, bool);
-  vtkGetMacro(MultithreadSupport, bool);
+  // Must be set before python is initialized. 
+  // Currently, it is not safe to use vtkPVPythonInterpretor in different
+  // threads, however it is safe to use vtkPVPythonInterpretor in one thread and
+  // explicit python calls in another (using python global interpretor locks).
+  static void SetMultithreadSupport(bool enable);
+  static bool GetMultithreadSupport();
 
 protected:
   vtkPVPythonInterpretor();
@@ -89,8 +98,6 @@ protected:
 
   char* ExecutablePath;
   vtkSetStringMacro(ExecutablePath);
-
-  bool MultithreadSupport;
 
 private:
   vtkPVPythonInterpretor(const vtkPVPythonInterpretor&); // Not implemented.
