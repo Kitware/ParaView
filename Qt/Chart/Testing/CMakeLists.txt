@@ -6,6 +6,7 @@ SET(MyTests
   Histogram
   HistogramSelection
   HistogramInteraction
+  LineChart
   )
 
 INCLUDE_DIRECTORIES(${QtChart_SOURCE_DIR} ${QtChart_BINARY_DIR})
