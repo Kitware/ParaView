@@ -24,7 +24,6 @@ SET(Filters_SRCS
   vtkCompleteArrays.cxx
   vtkCSVReader.cxx
   vtkCSVWriter.cxx
-  vtkCVGeometryCache.cxx
 #  vtkDataAnalysisFilter.cxx
   vtkDataSetSubdivisionAlgorithm.cxx
   vtkDesktopDeliveryClient.cxx
@@ -44,7 +43,6 @@ SET(Filters_SRCS
   vtkMPIDuplicatePolyData.cxx
   vtkMPIDuplicateUnstructuredGrid.cxx
   vtkMPIMoveData.cxx
-  vtkMultiActorHelper.cxx
   vtkMultiDisplayManager.cxx
   vtkNetworkImageSource.cxx
   vtkOrderedCompositeDistributor.cxx

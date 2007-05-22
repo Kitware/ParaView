@@ -18,7 +18,6 @@
 #include "vtkCaveRenderManager.h"
 #include "vtkCleanUnstructuredGrid.h"
 #include "vtkCompleteArrays.h"
-#include "vtkCVGeometryCache.h"
 #include "vtkDataSetSubdivisionAlgorithm.h"
 #include "vtkHierarchicalFractal.h"
 #include "vtkImageCompressor.h"
@@ -29,7 +28,6 @@
 #include "vtkMPIDuplicateUnstructuredGrid.h"
 #include "vtkMPIMoveData.h"
 #include "vtkMergeArrays.h"
-#include "vtkMultiActorHelper.h"
 #include "vtkMultiDisplayManager.h"
 #include "vtkOrderedCompositeDistributor.h"
 #include "vtkPhastaReader.h"
@@ -107,7 +105,6 @@ int main(int , char *[])
   c = vtkCaveRenderManager::New(); c->Print(cout); c->Delete();
   c = vtkCleanUnstructuredGrid::New(); c->Print(cout); c->Delete();
   c = vtkCompleteArrays::New(); c->Print(cout); c->Delete();
-  c = vtkCVGeometryCache::New(); c->Print(cout); c->Delete();
   c = vtkDataSetSubdivisionAlgorithm::New(); c->Print(cout); c->Delete();
   c = vtkHierarchicalFractal::New(); c->Print(cout); c->Delete();
   c = vtkImageCompressor::New(); c->Print(cout); c->Delete();
@@ -118,7 +115,6 @@ int main(int , char *[])
   c = vtkMPIDuplicatePolyData::New(); c->Print(cout); c->Delete();
   c = vtkMPIDuplicateUnstructuredGrid::New(); c->Print(cout); c->Delete();
   c = vtkMPIMoveData::New(); c->Print(cout); c->Delete();
-  c = vtkMultiActorHelper::New(); c->Print(cout); c->Delete();
   c = vtkMultiDisplayManager::New(); c->Print(cout); c->Delete();
   c = vtkOrderedCompositeDistributor::New(); c->Print(cout); c->Delete();
   c = vtkPhastaReader::New(); c->Print(cout); c->Delete();
