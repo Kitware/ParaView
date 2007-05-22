@@ -1,9 +1,6 @@
 
 #include "pqChartCoordinate.h"
 #include "pqChartValue.h"
-#include "pqColorMapColorChanger.h"
-#include "pqColorMapWidget.h"
-#include "pqColorMapModel.h"
 #include "pqHistogramChart.h"
 #include "pqHistogramListModel.h"
 #include "pqHistogramWidget.h"
@@ -20,26 +17,9 @@
 #include <QSize>
 #include <QTimer>
 
-// TODO: Expand the chart test to test other charts.
-
-int main(int argc, char *argv[])
+int Histogram(int argc, char** argv)
 {
   QApplication app(argc, argv);
-
-  // Set up the color map.
-  pqColorMapWidget *colorMap = new pqColorMapWidget();
-  pqColorMapModel* cmodel = new pqColorMapModel(colorMap);
-  colorMap->setModel(cmodel);
-  colorMap->resize(250, 50);
-  //colorMap->setTableSize(13);
-  cmodel->addPoint(pqChartValue((double)0.0), QColor::fromHsv(240, 255, 255));
-  cmodel->addPoint(pqChartValue((double)1.0), QColor::fromHsv(0, 255, 255));
-  cmodel->addPoint(pqChartValue((double)0.5), QColor::fromHsv(60, 255, 255));
-
-  // The color changer will be cleaned up when the color map is deleted.
-  new pqColorMapColorChanger(colorMap);
-
-  colorMap->show();
 
   // Set up the histogram.
   pqHistogramWidget *histogram = new pqHistogramWidget();
@@ -101,14 +81,12 @@ int main(int argc, char *argv[])
 
   histogram->show();
 
-  QStringList args = app.arguments();
-  if(args.size() > 1 && args.at(1) == "--exit")
+  if(app.arguments().contains("--exit"))
     {
     QTimer::singleShot(100, QApplication::instance(), SLOT(quit()));
     }
-  int status = app.exec();
+  int status = QApplication::exec();
 
-  delete colorMap;
   delete histogram;
   delete model;
   delete lines;
@@ -117,5 +95,4 @@ int main(int argc, char *argv[])
 
   return status;
 }
-
 
