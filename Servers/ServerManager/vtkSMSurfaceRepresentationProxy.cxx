@@ -30,7 +30,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -131,7 +131,7 @@ bool vtkSMSurfaceRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
   // always polydata.
   vtkSmartPointer<vtkSMRepresentationStrategy> strategy;
   strategy.TakeReference(
-    view->NewStrategy(VTK_POLY_DATA, vtkSMRenderViewProxy::SURFACE));
+    view->NewStrategy(VTK_POLY_DATA));
   if (!strategy.GetPointer())
     {
     vtkErrorMacro("View could not provide a strategy to use. "
@@ -139,7 +139,7 @@ bool vtkSMSurfaceRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
     return false;
     }
 
-  this->SetStrategy(strategy);
+  this->AddStrategy(strategy);
 
   strategy->SetEnableLOD(true);
 
@@ -149,7 +149,7 @@ bool vtkSMSurfaceRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
   // Now initialize the data pipelines involving this strategy.
   // Since representations are not added to views unless their input is set, we
   // can assume that the objects for this proxy have been created.
-  // (Look at vtkSMPipelineRepresentationProxy::AddToView()).
+  // (Look at vtkSMDataRepresentationProxy::AddToView()).
 
   this->Connect(this->GeometryFilter, strategy);
   this->Connect(strategy->GetOutput(), this->Mapper);
@@ -157,7 +157,7 @@ bool vtkSMSurfaceRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
 
   // Initialize strategy for the selection pipeline.
   strategy.TakeReference(
-    view->NewStrategy(VTK_POLY_DATA, vtkSMRenderViewProxy::SURFACE));
+    view->NewStrategy(VTK_POLY_DATA));
   if (!strategy.GetPointer())
     {
     vtkErrorMacro("Could not create strategy for selection pipeline. Disabling selection.");
@@ -165,7 +165,7 @@ bool vtkSMSurfaceRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
     }
   else
     {
-    this->SetStrategyForSelection(strategy);
+    this->AddStrategyForSelection(strategy);
     strategy->SetEnableLOD(true);
     strategy->SetEnableCaching(false); // no cache needed for selection.
     strategy->UpdateVTKObjects();
@@ -253,13 +253,6 @@ bool vtkSMSurfaceRepresentationProxy::EndCreateVTKObjects(int numObjects)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSurfaceRepresentationProxy::GetSelectableProps(
-  vtkCollection* collection)
-{
-  collection->AddItem(this->Prop3D);
-}
-
-//----------------------------------------------------------------------------
 static void vtkSMSurfaceRepresentationProxyAddSourceIDs(
   vtkSelection* sel, vtkClientServerID propId, vtkClientServerID sourceId,
   vtkClientServerID originalSourceId)
@@ -307,6 +300,58 @@ void vtkSMSurfaceRepresentationProxy::ConvertSurfaceSelectionToVolumeSelection(
     this->Prop3D->GetID(0), sourceId, originalSourceId);
   vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelection(
     this->ConnectionID, selInput, selOutput);
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkSMSurfaceRepresentationProxy::ConvertSelection(
+  vtkSelection* surfaceSel)
+{
+  if (!this->GetVisibility())
+    {
+    return 0;
+    }
+
+  vtkSmartPointer<vtkSelection> mySelection = 
+    vtkSmartPointer<vtkSelection>::New();
+  mySelection->GetProperties()->Copy(surfaceSel->GetProperties(), 0);
+
+  unsigned int numChildren = surfaceSel->GetNumberOfChildren();
+  for (unsigned int cc=0; cc < numChildren; cc++)
+    {
+    vtkSelection* child = surfaceSel->GetChild(cc);
+    vtkInformation* properties = child->GetProperties();
+    if (!properties->Has(vtkSelection::PROP_ID()))
+      {
+      continue;
+      }
+    vtkClientServerID propId;
+    propId.ID = static_cast<vtkTypeUInt32>(properties->Get(
+        vtkSelection::PROP_ID()));
+    if (propId == this->Prop3D->GetID(0))
+      {
+      vtkSelection* myChild = vtkSelection::New();
+      myChild->ShallowCopy(child);
+      mySelection->AddChild(myChild);
+      myChild->Delete();
+      }
+    }
+
+  if (mySelection->GetNumberOfChildren() == 0)
+    {
+    return 0;
+    }
+
+  // Convert surface selection to volume selection.
+  vtkSmartPointer<vtkSelection> volSelection = 
+    vtkSmartPointer<vtkSelection>::New();
+  this->ConvertSurfaceSelectionToVolumeSelection(surfaceSel, volSelection);
+
+  // Create a selection source for the selection.
+  vtkSMProxy* selectionSource = 
+    vtkSMSelectionHelper::NewSelectionSourceFromSelection(
+      this->ConnectionID, volSelection);
+  
+  return selectionSource;
 }
 
 //----------------------------------------------------------------------------

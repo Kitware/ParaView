@@ -88,7 +88,7 @@ public:
   // level-of-detail/parallelism. Views that do not support parallelism or LOD
   // may not provide any strategy at all.
   // Subclasses should override NewStrategyInternal.
-  vtkSMRepresentationStrategy* NewStrategy(int dataType, int type);
+  vtkSMRepresentationStrategy* NewStrategy(int dataType);
 
   // Description:
   // Multi-view methods:
@@ -176,7 +176,7 @@ protected:
   // Description:
   // Implementation to create a representation requested strategy.
   virtual vtkSMRepresentationStrategy* NewStrategyInternal(
-    int vtkNotUsed(dataType), int vtkNotUsed(type))
+    int vtkNotUsed(dataType))
     { return 0; }
 
   // Description:

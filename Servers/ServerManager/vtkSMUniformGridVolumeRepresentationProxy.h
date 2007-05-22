@@ -22,14 +22,14 @@
 #ifndef __vtkSMUniformGridVolumeRepresentationProxy_h
 #define __vtkSMUniformGridVolumeRepresentationProxy_h
 
-#include "vtkSMPropRepresentationProxy.h"
+#include "vtkSMDataRepresentationProxy.h"
 
 class VTK_EXPORT vtkSMUniformGridVolumeRepresentationProxy : 
-  public vtkSMPropRepresentationProxy
+  public vtkSMDataRepresentationProxy
 {
 public:
   static vtkSMUniformGridVolumeRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, vtkSMPropRepresentationProxy);
+  vtkTypeRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, vtkSMDataRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -43,18 +43,6 @@ public:
   // Overridden to ensure that UpdateSelectionPropVisibility() is called.
   virtual void Update(vtkSMViewProxy* view);
   virtual void Update() { this->Superclass::Update(); };
-
-  // Description:
-  // Adds to the passed in collection the props that representation has which
-  // are selectable. The passed in collection object must be empty.
-  virtual void GetSelectableProps(vtkCollection*);
-
-  // Description:
-  // Given a surface selection for this representation, this returns a new
-  // vtkSelection for the selected cells/points in the input of this
-  // representation.
-  virtual void ConvertSurfaceSelectionToVolumeSelection(
-   vtkSelection* input, vtkSelection* output);
 
 //BTX
 protected:

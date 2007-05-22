@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMPipelineRepresentationProxy.cxx
+  Module:    vtkSMDataRepresentationProxy.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,24 +12,26 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMPipelineRepresentationProxy.h"
+#include "vtkSMDataRepresentationProxy.h"
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVDataInformation.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationStrategy.h"
+#include "vtkSMRepresentationStrategyVector.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
 
-class vtkSMPipelineRepresentationProxyObserver : public vtkCommand
+class vtkSMDataRepresentationProxyObserver : public vtkCommand
 {
 public:
-  static vtkSMPipelineRepresentationProxyObserver* New()
-    { return new vtkSMPipelineRepresentationProxyObserver; }
+  static vtkSMDataRepresentationProxyObserver* New()
+    { return new vtkSMDataRepresentationProxyObserver; }
 
-  void SetTarget(vtkSMPipelineRepresentationProxy* t)
+  void SetTarget(vtkSMDataRepresentationProxy* t)
     {
     this->Target = t;
     }
@@ -44,51 +46,80 @@ public:
     }
 
 protected:
-  vtkSMPipelineRepresentationProxy* Target;
-  vtkSMPipelineRepresentationProxyObserver()
+  vtkSMDataRepresentationProxy* Target;
+  vtkSMDataRepresentationProxyObserver()
     {
     this->Target = 0;
     }
 };
 
 
-vtkCxxRevisionMacro(vtkSMPipelineRepresentationProxy, "1.6");
-vtkCxxSetObjectMacro(vtkSMPipelineRepresentationProxy, InputProxy, vtkSMSourceProxy);
+vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.1");
+vtkCxxSetObjectMacro(vtkSMDataRepresentationProxy, InputProxy, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
-vtkSMPipelineRepresentationProxy::vtkSMPipelineRepresentationProxy()
+vtkSMDataRepresentationProxy::vtkSMDataRepresentationProxy()
 {
   this->InputProxy = 0;
-  this->Strategy = 0;
-
-  this->StrategyForSelection = 0;
+  this->RepresentationStrategies = new vtkSMRepresentationStrategyVector();
+  this->RepresentationStrategiesForSelection = 
+    new vtkSMRepresentationStrategyVector();
 
   this->UpdateTime = 0.0;
   this->UpdateTimeInitialized = false;
 
   this->UseViewTimeForUpdate = false;
 
-  this->Observer = vtkSMPipelineRepresentationProxyObserver::New();
+  this->Observer = vtkSMDataRepresentationProxyObserver::New();
   this->Observer->SetTarget(this);
 
   this->ViewTimeLink = vtkSMPropertyLink::New();
 }
 
 //----------------------------------------------------------------------------
-vtkSMPipelineRepresentationProxy::~vtkSMPipelineRepresentationProxy()
+vtkSMDataRepresentationProxy::~vtkSMDataRepresentationProxy()
 {
   this->ViewTimeLink->RemoveAllLinks();
   this->ViewTimeLink->Delete();
 
   this->SetInputProxy(0);
-  this->SetStrategy(0);
-  this->SetStrategyForSelection(0);
+
+  delete this->RepresentationStrategies;
+  this->RepresentationStrategies = 0;
+
+  delete this->RepresentationStrategiesForSelection;
+  this->RepresentationStrategiesForSelection = 0;
 
   this->Observer->SetTarget(0);
   this->Observer->Delete();
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPipelineRepresentationProxy::AddToView(vtkSMViewProxy* view)
+void vtkSMDataRepresentationProxy::GetActiveStrategies(
+  vtkSMRepresentationStrategyVector& activeStrategies)
+{
+  vtkSMRepresentationStrategyVector::iterator iter;
+
+  if (this->GetVisibility())
+    {
+    for (iter = this->RepresentationStrategies->begin(); 
+      iter != this->RepresentationStrategies->end(); ++iter)
+      {
+      activeStrategies.push_back(iter->GetPointer());
+      }
+    }
+
+  if (this->GetSelectionVisibility())
+    {
+    for (iter = this->RepresentationStrategiesForSelection->begin();
+      iter != this->RepresentationStrategiesForSelection->end(); ++iter)
+      {
+      activeStrategies.push_back(iter->GetPointer());
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMDataRepresentationProxy::AddToView(vtkSMViewProxy* view)
 {
   // Since adding representation to a view setups the view pipeline,
   // it is essential that the view proxy has been created.
@@ -116,7 +147,7 @@ bool vtkSMPipelineRepresentationProxy::AddToView(vtkSMViewProxy* view)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPipelineRepresentationProxy::BeginCreateVTKObjects(int numObjects)
+bool vtkSMDataRepresentationProxy::BeginCreateVTKObjects(int numObjects)
 {
   if (!this->Superclass::BeginCreateVTKObjects(numObjects))
     {
@@ -128,7 +159,7 @@ bool vtkSMPipelineRepresentationProxy::BeginCreateVTKObjects(int numObjects)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPipelineRepresentationProxy::EndCreateVTKObjects(int numObjects)
+bool vtkSMDataRepresentationProxy::EndCreateVTKObjects(int numObjects)
 {
   if (vtkSMProperty* prop = this->GetProperty("UpdateTime"))
     {
@@ -139,7 +170,7 @@ bool vtkSMPipelineRepresentationProxy::EndCreateVTKObjects(int numObjects)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPipelineRepresentationProxy::AddInput(vtkSMSourceProxy* input, 
+void vtkSMDataRepresentationProxy::AddInput(vtkSMSourceProxy* input, 
   const char* vtkNotUsed(method), int vtkNotUsed(hasMultipleInputs))
 {
   if (!input)
@@ -162,65 +193,75 @@ void vtkSMPipelineRepresentationProxy::AddInput(vtkSMSourceProxy* input,
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPipelineRepresentationProxy::Update(vtkSMViewProxy* view)
+void vtkSMDataRepresentationProxy::Update(vtkSMViewProxy* view)
 {
-  if (this->Strategy)
-    {
-    this->Strategy->Update();
-    }
+  vtkSMRepresentationStrategyVector activeStrategies;
+  this->GetActiveStrategies(activeStrategies);
 
-  // Update selection strategy is selection is visible.
-  if (this->GetSelectionVisibility() && this->StrategyForSelection)
+  vtkSMRepresentationStrategyVector::iterator iter;
+  for (iter = activeStrategies.begin(); iter != activeStrategies.end(); ++iter)
     {
-    this->StrategyForSelection->Update();
+    iter->GetPointer()->Update();
     }
 
   this->Superclass::Update(view);
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPipelineRepresentationProxy::UpdateRequired()
+bool vtkSMDataRepresentationProxy::UpdateRequired()
 {
   bool update_required = false;
-  if (this->Strategy)
-    {
-    update_required |= this->Strategy->UpdateRequired();
-    }
 
-  // If selection is supported, check if the selection pipeline needs updating.
-  if (!update_required && 
-    this->GetSelectionVisibility() && this->StrategyForSelection)
+  vtkSMRepresentationStrategyVector activeStrategies;
+  this->GetActiveStrategies(activeStrategies);
+
+  vtkSMRepresentationStrategyVector::iterator iter;
+  for (iter = activeStrategies.begin(); 
+    !update_required && iter != activeStrategies.end(); ++iter)
     {
-    update_required |= this->StrategyForSelection->UpdateRequired();
+    update_required |= iter->GetPointer()->UpdateRequired();
     }
 
   return (update_required? true: this->Superclass::UpdateRequired());
 }
 
 //----------------------------------------------------------------------------
-vtkPVDataInformation* vtkSMPipelineRepresentationProxy::GetDisplayedDataInformation()
+vtkPVDataInformation* vtkSMDataRepresentationProxy::GetDisplayedDataInformation()
 {
-  if (this->Strategy)
+  vtkSMRepresentationStrategyVector::iterator iter;
+  for (iter = this->RepresentationStrategies->begin(); 
+    iter != this->RepresentationStrategies->end(); ++iter)
     {
-    return this->Strategy->GetDisplayedDataInformation();
+    vtkPVDataInformation* subInfo = 
+      iter->GetPointer()->GetDisplayedDataInformation();
+    if (subInfo)
+      {
+      return subInfo;
+      }
     }
+  return 0;
 
-  return this->Superclass::GetDisplayedDataInformation();
 }
 
 //----------------------------------------------------------------------------
-vtkPVDataInformation* vtkSMPipelineRepresentationProxy::GetFullResDataInformation()
+vtkPVDataInformation* vtkSMDataRepresentationProxy::GetFullResDataInformation()
 {
-  if (this->Strategy)
+  vtkSMRepresentationStrategyVector::iterator iter;
+  for (iter = this->RepresentationStrategies->begin(); 
+    iter != this->RepresentationStrategies->end(); ++iter)
     {
-    return this->Strategy->GetFullResDataInformation();
+    vtkPVDataInformation* subInfo = 
+      iter->GetPointer()->GetFullResDataInformation();
+    if (subInfo)
+      {
+      return subInfo;
+      }
     }
-
-  return this->Superclass::GetFullResDataInformation();
+  return 0;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPipelineRepresentationProxy::SetUseViewTimeForUpdate(bool val)
+void vtkSMDataRepresentationProxy::SetUseViewTimeForUpdate(bool val)
 {
   if (val == this->UseViewTimeForUpdate)
     {
@@ -232,38 +273,42 @@ void vtkSMPipelineRepresentationProxy::SetUseViewTimeForUpdate(bool val)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPipelineRepresentationProxy::SetUpdateTime(double time)
+void vtkSMDataRepresentationProxy::SetUpdateTime(double time)
 {
   this->UpdateTimeInitialized = true;
   this->UpdateTime = time;
 
-  if (this->Strategy)
+  vtkSMRepresentationStrategyVector::iterator iter;
+  for (iter = this->RepresentationStrategies->begin(); 
+    iter != this->RepresentationStrategies->end(); ++iter)
     {
     vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->Strategy->GetProperty("UpdateTime"));
+      iter->GetPointer()->GetProperty("UpdateTime"));
     if (dvp)
       {
       dvp->SetElement(0, time);
-      this->Strategy->UpdateVTKObjects();
+      iter->GetPointer()->UpdateProperty("UpdateTime");
       }
     }
 
-  if (this->GetSelectionSupported() && this->StrategyForSelection)
+  for (iter = this->RepresentationStrategiesForSelection->begin(); 
+    iter != this->RepresentationStrategiesForSelection->end(); ++iter)
     {
     vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->StrategyForSelection->GetProperty("UpdateTime"));
+      iter->GetPointer()->GetProperty("UpdateTime"));
     if (dvp)
       {
       dvp->SetElement(0, time);
-      this->StrategyForSelection->UpdateVTKObjects();
+      iter->GetPointer()->UpdateProperty("UpdateTime");
       }
     }
+
 
   this->MarkUpstreamModified();
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPipelineRepresentationProxy::MarkUpstreamModified()
+void vtkSMDataRepresentationProxy::MarkUpstreamModified()
 {
   vtkSMProxy* current = this;
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
@@ -281,75 +326,61 @@ void vtkSMPipelineRepresentationProxy::MarkUpstreamModified()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPipelineRepresentationProxy::SetStrategy(
+void vtkSMDataRepresentationProxy::AddStrategy(
   vtkSMRepresentationStrategy* strategy)
 {
-  if (this->Strategy)
+  this->RepresentationStrategies->push_back(strategy);
+
+  strategy->AddObserver(vtkCommand::StartEvent, this->Observer);
+  strategy->AddObserver(vtkCommand::EndEvent, this->Observer);
+
+  if (this->UpdateTimeInitialized)
     {
-    this->Strategy->RemoveObserver(this->Observer);
-    }
-
-  vtkSetObjectBodyMacro(Strategy, vtkSMRepresentationStrategy, strategy);
-
-  if (this->Strategy && this->UpdateTimeInitialized)
-    {
-    // Pass the update time to the strategy if it has been initialized.
-    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->Strategy->GetProperty("UpdateTime"));
-    if (dvp)
-      {
-      dvp->SetElement(0, this->UpdateTime);
-      this->Strategy->UpdateVTKObjects();
-      }
-
-    this->Strategy->AddObserver(vtkCommand::StartEvent, this->Observer);
-    this->Strategy->AddObserver(vtkCommand::EndEvent, this->Observer);
+    // This will propagate the update time to the newly added strategy.
+    this->SetUpdateTime(this->UpdateTime);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPipelineRepresentationProxy::SetStrategyForSelection(
+void vtkSMDataRepresentationProxy::AddStrategyForSelection(
   vtkSMRepresentationStrategy* strategy)
 {
-  vtkSetObjectBodyMacro(StrategyForSelection, 
-    vtkSMRepresentationStrategy, strategy);
+  this->RepresentationStrategiesForSelection->push_back(strategy);
 
-  if (this->StrategyForSelection && this->UpdateTimeInitialized)
+  if (this->UpdateTimeInitialized)
     {
-    // Pass the update time to the strategy if it has been initialized.
-    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->StrategyForSelection->GetProperty("UpdateTime"));
-    if (dvp)
-      {
-      dvp->SetElement(0, this->UpdateTime);
-      this->StrategyForSelection->UpdateVTKObjects();
-      }
+    // This will propagate the update time to the newly added strategy.
+    this->SetUpdateTime(this->UpdateTime);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPipelineRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)
+void vtkSMDataRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)
 {
   // If some changes to the representation proxy invalidate the data
   // then we must expilictly call Strategy->MarkModified();
   if (modifiedProxy != this)
     {
-    if (this->Strategy)
+    vtkSMRepresentationStrategyVector::iterator iter;
+    for (iter = this->RepresentationStrategies->begin(); 
+      iter != this->RepresentationStrategies->end(); ++iter)
       {
-      this->Strategy->MarkModified(modifiedProxy); 
+      iter->GetPointer()->MarkModified(modifiedProxy);
       }
 
-    if (this->StrategyForSelection)
+    for (iter = this->RepresentationStrategiesForSelection->begin(); 
+      iter != this->RepresentationStrategiesForSelection->end(); ++iter)
       {
-      this->StrategyForSelection->MarkModified(modifiedProxy);
+      iter->GetPointer()->MarkModified(modifiedProxy);
       }
     }
+
 
   this->Superclass::MarkModified(modifiedProxy);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPipelineRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMDataRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "UseViewTimeForUpdate: " << this->UseViewTimeForUpdate

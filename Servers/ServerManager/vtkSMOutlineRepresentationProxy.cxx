@@ -26,7 +26,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMOutlineRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMOutlineRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMOutlineRepresentationProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMOutlineRepresentationProxy::vtkSMOutlineRepresentationProxy()
 {
@@ -126,7 +126,7 @@ bool vtkSMOutlineRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
   // always polydata.
   vtkSmartPointer<vtkSMRepresentationStrategy> strategy;
   strategy.TakeReference(
-    view->NewStrategy(VTK_POLY_DATA, vtkSMRenderViewProxy::SURFACE ));
+    view->NewStrategy(VTK_POLY_DATA));
   if (!strategy.GetPointer())
     {
     vtkErrorMacro("View could not provide a strategy to use. "
@@ -134,7 +134,7 @@ bool vtkSMOutlineRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
     return false;
     }
 
-  this->SetStrategy(strategy);
+  this->AddStrategy(strategy);
 
   strategy->SetEnableLOD(false);
 
@@ -144,14 +144,14 @@ bool vtkSMOutlineRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
   // Now initialize the data pipelines involving this strategy.
   // Since representations are not added to views unless their input is set, we
   // can assume that the objects for this proxy have been created.
-  // (Look at vtkSMPipelineRepresentationProxy::AddToView()).
+  // (Look at vtkSMDataRepresentationProxy::AddToView()).
 
   strategy->SetInput(this->OutlineFilter);
   this->Connect(strategy->GetOutput(), this->Mapper);
 
   // Initialize strategy for the selection pipeline.
   strategy.TakeReference(
-    view->NewStrategy(VTK_POLY_DATA, vtkSMRenderViewProxy::SURFACE));
+    view->NewStrategy(VTK_POLY_DATA));
   if (!strategy.GetPointer())
     {
     vtkErrorMacro("Could not create strategy for selection pipeline. Disabling selection.");
@@ -159,7 +159,7 @@ bool vtkSMOutlineRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
     }
   else
     {
-    this->SetStrategyForSelection(strategy);
+    this->AddStrategyForSelection(strategy);
     strategy->SetEnableLOD(true);
     strategy->UpdateVTKObjects();
 

@@ -49,7 +49,7 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMViewProxy::vtkSMViewProxy()
 {
@@ -333,10 +333,10 @@ void vtkSMViewProxy::Connect(vtkSMProxy* producer, vtkSMProxy* consumer,
 }
 
 //----------------------------------------------------------------------------
-vtkSMRepresentationStrategy* vtkSMViewProxy::NewStrategy(int dataType, int type)
+vtkSMRepresentationStrategy* vtkSMViewProxy::NewStrategy(int dataType)
 {
   vtkSMRepresentationStrategy* strategy = 
-    this->NewStrategyInternal(dataType, type);
+    this->NewStrategyInternal(dataType);
   if (strategy && this->ViewHelper)
     {
     // Deliberately not going the proxy property route here since otherwise the

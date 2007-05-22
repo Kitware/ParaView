@@ -43,13 +43,12 @@
 #include "vtkRenderWindow.h"
 #include "vtkSelection.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMDataRepresentationProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMPropRepresentationProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMRepresentationProxy.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMStringVectorProperty.h"
@@ -61,12 +60,7 @@
 #include <vtkstd/map>
 #include <vtkstd/set>
 
-class vtkSMRenderViewProxy::vtkPropToRepresentationMap : 
-  public vtkstd::map<vtkClientServerID, vtkSmartPointer<vtkSMPropRepresentationProxy> >
-{
-};
-
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.9");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 //-----------------------------------------------------------------------------
@@ -99,7 +93,6 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
 
   this->LODThreshold = 0.0;
 
-  this->PropToRepresentationMap = new vtkPropToRepresentationMap();
   this->OpenGLExtensionsInformation = 0;
 }
 
@@ -131,18 +124,17 @@ vtkSMRenderViewProxy::~vtkSMRenderViewProxy()
 
 //-----------------------------------------------------------------------------
 vtkSMRepresentationStrategy* vtkSMRenderViewProxy::NewStrategyInternal(
-  int dataType, int type)
+  int dataType)
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMRepresentationStrategy* strategy = 0;
 
-  if ((type == SURFACE && dataType == VTK_POLY_DATA) ||
-       type == VOLUME && dataType == VTK_UNIFORM_GRID)
+  if ((dataType == VTK_POLY_DATA) || dataType == VTK_UNIFORM_GRID)
     {
     strategy = vtkSMRepresentationStrategy::SafeDownCast(
       pxm->NewProxy("strategies", "PolyDataStrategy"));
     }
-  else if (type == VOLUME && dataType == VTK_UNSTRUCTURED_GRID)
+  else if (dataType == VTK_UNSTRUCTURED_GRID)
     {
     strategy = vtkSMRepresentationStrategy::SafeDownCast(
       pxm->NewProxy("strategies", "UnStructuredGridVolumeStrategy"));
@@ -150,7 +142,7 @@ vtkSMRepresentationStrategy* vtkSMRenderViewProxy::NewStrategyInternal(
   else
     {
     vtkWarningMacro("This view does not provide a suitable strategy for "
-      << dataType << ": " << type);
+      << dataType);
     }
 
   return strategy;
@@ -564,52 +556,7 @@ void vtkSMRenderViewProxy::AddRepresentationInternal(
     ivp->SetElement(0, this->UseImmediateMode);
     }
 
-  vtkSMPropRepresentationProxy* propRepr = 
-    vtkSMPropRepresentationProxy::SafeDownCast(repr);
-  if (propRepr)
-    {
-    vtkSmartPointer<vtkCollection> col = vtkSmartPointer<vtkCollection>::New();
-    propRepr->GetSelectableProps(col);
-    for (int cc=0; cc < col->GetNumberOfItems(); cc++)
-      {
-      vtkSMProxy* propProxy = vtkSMProxy::SafeDownCast(
-        col->GetItemAsObject(cc));
-      if (propProxy)
-        {
-        (*this->PropToRepresentationMap)[propProxy->GetID(0)] = propRepr;
-        }
-      }
-    }
-
   this->Superclass::AddRepresentationInternal(repr);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::RemoveRepresentationInternal(
-  vtkSMRepresentationProxy* repr)
-{
-  vtkSMPropRepresentationProxy* propRepr = 
-    vtkSMPropRepresentationProxy::SafeDownCast(repr);
-  if (propRepr)
-    {
-    vtkPropToRepresentationMap::iterator iter = 
-      this->PropToRepresentationMap->begin();
-    while (iter != this->PropToRepresentationMap->end())
-      {
-      if (iter->second.GetPointer() == repr)
-        {
-        vtkPropToRepresentationMap::iterator temp = iter;
-        ++iter;
-        this->PropToRepresentationMap->erase(temp);
-        }
-      else
-        {
-        ++iter;
-        }
-      }
-    }
-
-  this->Superclass::RemoveRepresentationInternal(repr);
 }
 
 //-----------------------------------------------------------------------------
@@ -1277,79 +1224,39 @@ bool vtkSMRenderViewProxy::SelectOnSurface(unsigned int x0,
   //   visible props from all representations.
   vtkSelection* surfaceSel = this->SelectVisibleCells(x0, y0, x1, y1);
 
-  // 2) Split the selection into selections on each of the representations.
-  // 3) Ask each representation to convert its surface selection to volume
-  //    selection.
-  // 4) Convert the volSelections (which are client side objects) to server side
-  //    selection source objects (using proxies).
-  // 5) Set each of the selection source as the current selection to show on the
-  //    representations.
+  // 2) Ask each representation to convert the selection.
+  
+  vtkSmartPointer<vtkCollectionIterator> iter;
+  iter.TakeReference(this->Representations->NewIterator());
 
-  // surfaceSel will have PROP_ID keys which we use to determine which selection
-  // subtree belongs to which representation.
-
-  unsigned int numChildren = surfaceSel->GetNumberOfChildren();
-  unsigned int cc;
-
-
-  vtkstd::set<vtkClientServerID> selectedProps;
-  vtkstd::set<vtkClientServerID>::iterator selectedPropsIter;
-
-  for (cc=0; cc < numChildren; cc++)
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    vtkSelection* child = surfaceSel->GetChild(cc);
-    vtkInformation* properties = child->GetProperties();
-    if (!properties->Has(vtkSelection::PROP_ID()))
+    vtkSMDataRepresentationProxy* repr = 
+      vtkSMDataRepresentationProxy::SafeDownCast(iter->GetCurrentObject());
+    if (!repr)
+      {
+      continue;
+      }
+    vtkSMProxy* selectionSource = repr->ConvertSelection(surfaceSel);
+    if (!selectionSource)
       {
       continue;
       }
 
-    vtkClientServerID propId;
-    propId.ID = static_cast<vtkTypeUInt32>(properties->Get(
-        vtkSelection::PROP_ID()));
-    selectedProps.insert(propId);
-    }
-
-  for (selectedPropsIter = selectedProps.begin();
-    selectedPropsIter != selectedProps.end(); ++selectedPropsIter)
-    {
-    vtkClientServerID propId = (*selectedPropsIter);
-
-    vtkPropToRepresentationMap::iterator iter =
-      this->PropToRepresentationMap->find(propId);
-    if (iter == this->PropToRepresentationMap->end())
-      {
-      continue;
-      }
-
-    vtkSelection* child = this->NewSelectionForProp(surfaceSel, propId);
-
-    // Give the surface selection to the representation to convert it to
-    // volume selection i.e. selection its data input.
-    vtkSMPropRepresentationProxy* rep = iter->second.GetPointer();
-    vtkSelection* volSelection = vtkSelection::New();
-    rep->ConvertSurfaceSelectionToVolumeSelection(child, volSelection);
-
-    vtkSMProxy* selectionSource = 
-      vtkSMSelectionHelper::NewSelectionSourceFromSelection(
-        this->ConnectionID, volSelection);
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      rep->GetProperty("Selection"));
+      repr->GetProperty("Selection"));
     if (pp)
       {
       pp->RemoveAllProxies();
       pp->AddProxy(selectionSource);
       }
-    rep->UpdateProperty("Selection");
+    repr->UpdateProperty("Selection");
 
     if (selectedRepresentations)
       {
-      selectedRepresentations->AddItem(rep);
+      selectedRepresentations->AddItem(repr);
       }
-
     selectionSource->Delete();
-    volSelection->Delete();
-    child->Delete();
     }
 
   surfaceSel->Delete();

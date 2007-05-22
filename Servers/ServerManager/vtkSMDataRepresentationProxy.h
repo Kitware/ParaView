@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMPipelineRepresentationProxy.h
+  Module:    vtkSMDataRepresentationProxy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,10 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMPipelineRepresentationProxy - Superclass for representations that
+// .NAME vtkSMDataRepresentationProxy - Superclass for representations that
 // have some data input.
 // .SECTION Description
-// vtkSMPipelineRepresentationProxy is a superclass for representations that
+// vtkSMDataRepresentationProxy is a superclass for representations that
 // consume data i.e. require some input.
 //
 // A data representation takes on selection obligations. This makes it possible
@@ -40,11 +40,10 @@
 // to provide implementations for Update(), UpdateRequired(),
 // GetDisplayedDataInformation(), GetFullResDataInformation(), MarkModified(). 
 // This class provides default implementation for these methods for 
-// representations using a single strategy (and if SelectionSupported, another 
-// strategy for the selection pipeline). If subclasses need more strategies for 
-// multiple internal pipelines, then they should override these methods as well.
-// One may also want to override SetUpdateTime() to ensure that the update time
-// is passed to the strategies correctly.
+// representations using a collection of strategies (and if SelectionSupported, another 
+// collection of strategies for the selection pipeline). If these startegies are
+// used conditionally, then the subclass must override the above mentioned
+// methods are provide its own implementations.
 //
 // .SECTION Caveats
 // \li Generally speaking, this proxy requires that the input is set before the
@@ -54,21 +53,23 @@
 // .SECTION See Also
 // vtkSMRepresentationStrategy
 
-#ifndef __vtkSMPipelineRepresentationProxy_h
-#define __vtkSMPipelineRepresentationProxy_h
+#ifndef __vtkSMDataRepresentationProxy_h
+#define __vtkSMDataRepresentationProxy_h
 
 #include "vtkSMRepresentationProxy.h"
 
-class vtkSMPipelineRepresentationProxyObserver;
+class vtkSelection;
+class vtkSMDataRepresentationProxyObserver;
 class vtkSMPropertyLink;
 class vtkSMRepresentationStrategy;
+class vtkSMRepresentationStrategyVector;
 class vtkSMSourceProxy;
 
-class VTK_EXPORT vtkSMPipelineRepresentationProxy : 
+class VTK_EXPORT vtkSMDataRepresentationProxy : 
   public vtkSMRepresentationProxy
 {
 public:
-  vtkTypeRevisionMacro(vtkSMPipelineRepresentationProxy, 
+  vtkTypeRevisionMacro(vtkSMDataRepresentationProxy, 
     vtkSMRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -83,7 +84,9 @@ public:
   // Get the data information for the represented data.
   // Representations that do not have significatant data representations such as
   // 3D widgets, text annotations may return NULL.
-  // Overridden to return the strategy's data information.
+  // Overridden to return the strategy's data information. Currently, it returns
+  // the data information from the first representation strategy,
+  // subclasses using multiple strategies may want to override this.
   virtual vtkPVDataInformation* GetDisplayedDataInformation();
 
   // Description:
@@ -91,7 +94,9 @@ public:
   // whether current rendering decision was to use LOD. For representations that
   // don't have separate LOD pipelines, this simply calls
   // GetDisplayedDataInformation().
-  // Overridden to return the strategy's data information.
+  // Overridden to return the strategy's data information. Currently, it returns
+  // the data information from the first representation strategy,
+  // subclasses using multiple strategies may want to override this.
   virtual vtkPVDataInformation* GetFullResDataInformation();
 
   // Description:
@@ -130,10 +135,27 @@ public:
   // it must explicity mark the strategy invalid.
   virtual void MarkModified(vtkSMProxy* modifiedProxy);
 
+  // Description:
+  // Fill the activeStrategies collection with strategies that are currently
+  // active i.e. being used.
+  virtual void GetActiveStrategies(
+    vtkSMRepresentationStrategyVector& activeStrategies);
+
+  // Description:
+  // Views typically support a mechanism to create a selection in the view
+  // itself, eg. by click-and-dragging over a region in the view. The view
+  // passes this selection to each of the representations and asks them to
+  // convert it to a proxy for a selection which can be set on the view. 
+  // It a representation does not support selection creation, it should simply
+  // return NULL.  On success, this method returns a new vtkSMProxy instance 
+  // which the caller must free after use.
+  virtual vtkSMProxy* ConvertSelection(vtkSelection* vtkNotUsed(input))
+    { return 0; }
+
 //BTX
 protected:
-  vtkSMPipelineRepresentationProxy();
-  ~vtkSMPipelineRepresentationProxy();
+  vtkSMDataRepresentationProxy();
+  ~vtkSMDataRepresentationProxy();
 
   // Description:
   // This method is called at the beginning of CreateVTKObjects().
@@ -168,13 +190,11 @@ protected:
   // Description:
   // Set the representation strategy. Simply initializes the Strategy ivar and
   // initializes UpdateTime.
-  void SetStrategy(vtkSMRepresentationStrategy*);
+  void AddStrategy(vtkSMRepresentationStrategy*);
 
   // Description:
-  // Set the representation strategy for the selection pipeline.
-  // Simply initializes the StrategyForSelection ivar and initializes
-  // UpdateTime.
-  void SetStrategyForSelection(vtkSMRepresentationStrategy*);
+  // Add a representation strategy for the selection pipeline.
+  void AddStrategyForSelection(vtkSMRepresentationStrategy*);
 
   // Description:
   // Provide access to Input for subclasses.
@@ -185,12 +205,12 @@ protected:
   // from this representation and mark them modified.
   void MarkUpstreamModified();
 
-  // Description:
-  // Get the representation strategy used by this representation, if any.
-  vtkGetObjectMacro(Strategy, vtkSMRepresentationStrategy);
+  // These are the representation strategies used for data display. 
+  vtkSMRepresentationStrategyVector* RepresentationStrategies;
 
-  // Get the representation strategy used for the selection pipeline, if any.
-  vtkGetObjectMacro(StrategyForSelection, vtkSMRepresentationStrategy);
+  // These are the representation stategies used for displaying selections on
+  // the data.
+  vtkSMRepresentationStrategyVector* RepresentationStrategiesForSelection;
 
   double UpdateTime;
   bool UpdateTimeInitialized;
@@ -198,15 +218,13 @@ protected:
 
   vtkSMPropertyLink* ViewTimeLink;
 private:
-  vtkSMPipelineRepresentationProxy(const vtkSMPipelineRepresentationProxy&); // Not implemented
-  void operator=(const vtkSMPipelineRepresentationProxy&); // Not implemented
+  vtkSMDataRepresentationProxy(const vtkSMDataRepresentationProxy&); // Not implemented
+  void operator=(const vtkSMDataRepresentationProxy&); // Not implemented
 
   void SetInputProxy(vtkSMSourceProxy*);
   vtkSMSourceProxy* InputProxy;
-  vtkSMRepresentationStrategy* Strategy;
-  vtkSMRepresentationStrategy* StrategyForSelection;
 
-  vtkSMPipelineRepresentationProxyObserver* Observer;
+  vtkSMDataRepresentationProxyObserver* Observer;
 //ETX
 };
 

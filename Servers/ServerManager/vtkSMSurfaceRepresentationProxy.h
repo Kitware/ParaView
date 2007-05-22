@@ -23,14 +23,14 @@
 #ifndef __vtkSMSurfaceRepresentationProxy_h
 #define __vtkSMSurfaceRepresentationProxy_h
 
-#include "vtkSMPropRepresentationProxy.h"
+#include "vtkSMDataRepresentationProxy.h"
 
 class VTK_EXPORT vtkSMSurfaceRepresentationProxy : 
-  public vtkSMPropRepresentationProxy
+  public vtkSMDataRepresentationProxy
 {
 public:
   static vtkSMSurfaceRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMSurfaceRepresentationProxy, vtkSMPropRepresentationProxy);
+  vtkTypeRevisionMacro(vtkSMSurfaceRepresentationProxy, vtkSMDataRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -46,16 +46,15 @@ public:
   virtual void Update() { this->Superclass::Update(); };
 
   // Description:
-  // Adds to the passed in collection the props that representation has which
-  // are selectable. The passed in collection object must be empty.
-  virtual void GetSelectableProps(vtkCollection*);
-
-  // Description:
-  // Given a surface selection for this representation, this returns a new
-  // vtkSelection for the selected cells/points in the input of this
-  // representation.
-  virtual void ConvertSurfaceSelectionToVolumeSelection(
-   vtkSelection* input, vtkSelection* output);
+  // Views typically support a mechanism to create a selection in the view
+  // itself, eg. by click-and-dragging over a region in the view. The view
+  // passes this selection to each of the representations and asks them to
+  // convert it to a proxy for a selection which can be set on the view. 
+  // It a representation does not support selection creation, it should simply
+  // return NULL. This method returns a new vtkSMProxy instance which the 
+  // caller must free after use.
+  // This implementation converts a prop selection to a selection source.
+  virtual vtkSMProxy* ConvertSelection(vtkSelection* input);
 
 //BTX
 protected:
@@ -96,6 +95,14 @@ protected:
   // Updates selection prop visibility based on whether selection can actually
   // be shown.
   void UpdateSelectionPropVisibility();
+
+  // Description:
+  // Given a surface selection for this representation, this returns a new
+  // vtkSelection for the selected cells/points in the input of this
+  // representation.
+  void ConvertSurfaceSelectionToVolumeSelection(
+   vtkSelection* input, vtkSelection* output);
+
 
   vtkSMSourceProxy* GeometryFilter;
   vtkSMProxy* Mapper;

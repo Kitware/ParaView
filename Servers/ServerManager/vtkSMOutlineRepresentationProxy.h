@@ -23,14 +23,14 @@
 #ifndef __vtkSMOutlineRepresentationProxy_h
 #define __vtkSMOutlineRepresentationProxy_h
 
-#include "vtkSMPropRepresentationProxy.h"
+#include "vtkSMDataRepresentationProxy.h"
 
 class VTK_EXPORT vtkSMOutlineRepresentationProxy : 
-  public vtkSMPropRepresentationProxy
+  public vtkSMDataRepresentationProxy
 {
 public:
   static vtkSMOutlineRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMOutlineRepresentationProxy, vtkSMPropRepresentationProxy);
+  vtkTypeRevisionMacro(vtkSMOutlineRepresentationProxy, vtkSMDataRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -44,20 +44,6 @@ public:
   // Overridden to ensure that UpdateSelectionPropVisibility() is called.
   virtual void Update(vtkSMViewProxy* view);
   virtual void Update() { this->Superclass::Update(); };
-
-  // Description:
-  // Adds to the passed in collection the props that representation has which
-  // are selectable. The passed in collection object must be empty. There is
-  // no selectable Prop in this representation.
-  virtual void GetSelectableProps(vtkCollection*) { return;};
-
-  // Description:
-  // Given a surface selection, this function returns a new
-  // vtkSelection for the selected cells/points in the input of this
-  // representation. Since there is no surface selection in this 
-  // representation, this will just return;
-  virtual void ConvertSurfaceSelectionToVolumeSelection(
-    vtkSelection* , vtkSelection* ) { return; };
 
 //BTX
 protected:

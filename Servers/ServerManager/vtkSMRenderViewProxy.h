@@ -180,14 +180,6 @@ public:
   // about server-side extensions supported.
   vtkPVOpenGLExtensionsInformation* GetOpenGLExtensionsInformation();
 
-  //BTX
-  enum Strategies
-    {
-    SURFACE,
-    VOLUME
-    };
-  //ETX
-
 //BTX
 protected:
   vtkSMRenderViewProxy();
@@ -205,14 +197,10 @@ protected:
   virtual void AddRepresentationInternal(vtkSMRepresentationProxy* rep);
 
   // Description:
-  // Removes a representation proxy from this view.
-  virtual void RemoveRepresentationInternal(vtkSMRepresentationProxy*);
-
-  // Description:
   // Creates a new vtkSMRepresentationStrategy subclass based on the type
-  // requested. \c type can be either SURFACE or VOLUME.
+  // requested.
   virtual vtkSMRepresentationStrategy* NewStrategyInternal(
-    int dataType, int type);
+    int dataType);
 
   // Description:
   // Set the LOD decision.
@@ -312,11 +300,6 @@ protected:
 private:
   vtkSMRenderViewProxy(const vtkSMRenderViewProxy&); // Not implemented.
   void operator=(const vtkSMRenderViewProxy&); // Not implemented.
-
-  class vtkPropToRepresentationMap;
-
-  // This map helps during surface selections.
-  vtkPropToRepresentationMap* PropToRepresentationMap;
 
   vtkPVOpenGLExtensionsInformation* OpenGLExtensionsInformation;
 //ETX

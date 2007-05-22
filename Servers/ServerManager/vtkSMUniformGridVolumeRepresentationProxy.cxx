@@ -30,7 +30,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMUniformGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMUniformGridVolumeRepresentationProxy::vtkSMUniformGridVolumeRepresentationProxy()
 {
@@ -136,8 +136,7 @@ bool vtkSMUniformGridVolumeRepresentationProxy::RemoveFromView(vtkSMViewProxy* v
 bool vtkSMUniformGridVolumeRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
 {
   vtkSmartPointer<vtkSMRepresentationStrategy> strategy;
-  strategy.TakeReference(
-    view->NewStrategy(VTK_UNIFORM_GRID, vtkSMRenderViewProxy::VOLUME));
+  strategy.TakeReference(view->NewStrategy(VTK_UNIFORM_GRID));
   if (!strategy.GetPointer())
     {
     vtkErrorMacro("View could not provide a strategy to use. "
@@ -145,7 +144,7 @@ bool vtkSMUniformGridVolumeRepresentationProxy::InitializeStrategy(vtkSMViewProx
     return false;
     }
 
-  this->SetStrategy(strategy);
+  this->AddStrategy(strategy);
 
   strategy->SetEnableLOD(false);
 
@@ -155,14 +154,13 @@ bool vtkSMUniformGridVolumeRepresentationProxy::InitializeStrategy(vtkSMViewProx
   // Now initialize the data pipelines involving this strategy.
   // Since representations are not added to views unless their input is set, we
   // can assume that the objects for this proxy have been created.
-  // (Look at vtkSMPipelineRepresentationProxy::AddToView()).
+  // (Look at vtkSMDataRepresentationProxy::AddToView()).
 
   this->Connect(this->GetInputProxy(), strategy, "Input");
   this->Connect(strategy->GetOutput(), this->VolumeFixedPointRayCastMapper);
 
   // Initialize strategy for the selection pipeline.
-  strategy.TakeReference(
-    view->NewStrategy(VTK_POLY_DATA, vtkSMRenderViewProxy::SURFACE));
+  strategy.TakeReference(view->NewStrategy(VTK_POLY_DATA));
   if (!strategy.GetPointer())
     {
     vtkErrorMacro("Could not create strategy for selection pipeline. Disabling selection.");
@@ -170,7 +168,7 @@ bool vtkSMUniformGridVolumeRepresentationProxy::InitializeStrategy(vtkSMViewProx
     }
   else
     {
-    this->SetStrategyForSelection(strategy);
+    this->AddStrategyForSelection(strategy);
     strategy->SetEnableLOD(true);
     strategy->UpdateVTKObjects();
 
@@ -247,62 +245,6 @@ bool vtkSMUniformGridVolumeRepresentationProxy::EndCreateVTKObjects(int numObjec
   this->SelectionProp3D->UpdateProperty("Pickable");
 
   return this->Superclass::EndCreateVTKObjects(numObjects);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMUniformGridVolumeRepresentationProxy::GetSelectableProps(
-  vtkCollection* collection)
-{
-  collection->AddItem(this->VolumeActor);
-}
-
-//----------------------------------------------------------------------------
-static void vtkSMUniformGridVolumeRepresentationProxyAddSourceIDs(
-  vtkSelection* sel, vtkClientServerID propId, vtkClientServerID sourceId,
-  vtkClientServerID originalSourceId)
-{
-  unsigned int numChildren = sel->GetNumberOfChildren();
-  for (unsigned int cc=0; cc < numChildren; cc++)
-    {
-    vtkSMUniformGridVolumeRepresentationProxyAddSourceIDs(sel->GetChild(cc),
-      propId, sourceId, originalSourceId);
-    }
-
-  vtkInformation* properties = sel->GetProperties();
-  if (!properties->Has(vtkSelection::PROP_ID()) || 
-    propId.ID != static_cast<vtkTypeUInt32>(
-      properties->Get(vtkSelection::PROP_ID())))
-    {
-    return;
-    }
-  properties->Set(vtkSelection::SOURCE_ID(), sourceId.ID);
-  properties->Set(vtkSelectionSerializer::ORIGINAL_SOURCE_ID(), 
-    originalSourceId.ID);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMUniformGridVolumeRepresentationProxy::ConvertSurfaceSelectionToVolumeSelection(
-  vtkSelection* selInput, vtkSelection* selOutput)
-{
-  // Process selInput to add SOURCE_ID() and ORIGINAL_SOURCE_ID() keys to it to
-  // help the converter in converting the selection.
-
-  vtkClientServerID originalSourceId;
-  vtkSMProxy* input = this->GetInputProxy();
-  if (vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(input))
-    {
-    // For compound proxies, the selected proxy is the consumed proxy.
-    originalSourceId = cp->GetConsumableProxy()->GetID(0);
-    }
-  else
-    {
-    originalSourceId = input->GetID(0);
-    }
-
-  vtkSMUniformGridVolumeRepresentationProxyAddSourceIDs(selInput,
-    this->VolumeActor->GetID(0), originalSourceId, originalSourceId);
-  vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelection(
-    this->ConnectionID, selInput, selOutput);
 }
 
 //----------------------------------------------------------------------------

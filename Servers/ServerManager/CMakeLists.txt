@@ -170,9 +170,9 @@ SET(Kit_SRCS
   vtkSMXYPlotDisplayProxy.cxx
 
   vtkSMClientServerRenderViewProxy.cxx
+  vtkSMCompositeRenderViewProxy.cxx
   vtkSMOutlineRepresentationProxy.cxx
-  vtkSMPipelineRepresentationProxy.cxx
-  vtkSMPropRepresentationProxy.cxx
+  vtkSMDataRepresentationProxy.cxx
   vtkSMRenderViewProxy.cxx
   vtkSMRepresentationProxy.cxx
   vtkSMRepresentationStrategy.cxx
@@ -217,10 +217,10 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMUndoElement.cxx
   vtkSMVectorProperty.cxx
 
-  vtkSMPipelineRepresentationProxy.cxx
-  vtkSMPropRepresentationProxy.cxx
+  vtkSMDataRepresentationProxy.cxx
   vtkSMRepresentationProxy.cxx
   vtkSMRepresentationStrategy.cxx
+  vtkSMCompositeRenderViewProxy.cxx
   ABSTRACT
   )
 

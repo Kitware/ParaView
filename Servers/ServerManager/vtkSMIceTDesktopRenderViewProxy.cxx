@@ -31,7 +31,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.2");
 
 vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderViewProxy, 
                      ServerDisplayManagerProxy,
@@ -395,6 +395,7 @@ void vtkSMIceTDesktopRenderViewProxy::SetOrderedCompositing(int flag)
     }
 }
 
+/* FIXME: provide the ordered compositing tree on the strategy.
 //-----------------------------------------------------------------------------
 void vtkSMIceTDesktopRenderViewProxy::AddDisplay(
   vtkSMAbstractDisplayProxy *disp)
@@ -427,12 +428,16 @@ void vtkSMIceTDesktopRenderViewProxy::RemoveDisplay(
 
   this->Superclass::RemoveDisplay(disp);
 }
+*/
 
 //-----------------------------------------------------------------------------
 void vtkSMIceTDesktopRenderViewProxy::StillRender()
 {
   int orderedCompositingNeeded = 0;
   bool new_dataset = false;
+
+  // This has to happen prior to updating the representations, hence we don't
+  // perform these checks in BeginStillRender().
   if (!this->DisableOrderedCompositing)
     {
     // Update the PKdTree, but only if there is something to divide that has
@@ -455,40 +460,29 @@ void vtkSMIceTDesktopRenderViewProxy::StillRender()
         }
       }
 
-
     // Check to see if the geometry of any visible objects has changed.
     vtkObject *obj;
     vtkCollectionSimpleIterator cookie;
-    vtkCollection* displays = this->GetDisplays();
-    displays->InitTraversal(cookie);
-    for (obj = displays->GetNextItemAsObject(cookie); obj != NULL;
-         obj = displays->GetNextItemAsObject(cookie))
+    vtkCollection* representations = this->Representations;
+    representations->InitTraversal(cookie);
+    for (obj = representations->GetNextItemAsObject(cookie); obj != NULL;
+         obj = representations->GetNextItemAsObject(cookie))
       {
-      vtkSMCompositeDisplayProxy *disp = 
-        vtkSMCompositeDisplayProxy::SafeDownCast(obj);
-      if (disp && disp->GetVisibilityCM())
+      vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(obj);
+      if (repr && repr->GetVisibility())
         {
-        // If any of the displays is volume rendering, we need to
-        // turn on ordered compositing.
+        // Check if the representation requires ordered compositing.
         if (!orderedCompositingNeeded)
           {
-          if (disp->GetVolumeRenderMode())
+          vtkSMPropRepresentationProxy* propRepr = 
+            vtkSMPropRepresentationProxy::SafeDownCast(repr);
+          if (propRepr && propRepr->UseOrderedCompositing())
             {
             orderedCompositingNeeded = 1;
             }
-          else
-            {
-            vtkSMDoubleVectorProperty* opacity = 
-              vtkSMDoubleVectorProperty::SafeDownCast(
-                disp->GetProperty("Opacity"));
-            if (opacity && opacity->GetElement(0) < 1.0)
-              {
-              orderedCompositingNeeded = 1;
-              }
-            }
           }
 
-        if (!disp->IsDistributedGeometryValid())
+        if (!disp->UpdateRequired())
           {
           doBuildLocator = 1;
           }

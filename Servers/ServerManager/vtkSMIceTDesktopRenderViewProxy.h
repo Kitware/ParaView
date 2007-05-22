@@ -44,9 +44,6 @@ public:
   vtkSetMacro(DisableOrderedCompositing, int);
   vtkBooleanMacro(DisableOrderedCompositing, int);
 
-  virtual void AddDisplay(vtkSMAbstractDisplayProxy* disp);
-  virtual void RemoveDisplay(vtkSMAbstractDisplayProxy* disp);
-
   virtual void StillRender();
 
   // Multi-view methods:

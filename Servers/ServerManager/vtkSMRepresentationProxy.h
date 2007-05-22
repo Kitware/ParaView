@@ -17,13 +17,13 @@
 // .SECTION Description
 // vtkSMRepresentationProxy is an abstract superclass of all representation
 // proxies. A representation proxy is a representation of something in a view.
-// That something can be data (vtkSMPipelineRepresentationProxy and subclasses) 
+// That something can be data (vtkSMDataRepresentationProxy and subclasses) 
 // or widgets (those that have no data inputs). 
 //
 // A representation additionally has selection obligations i.e. a representation
 // may be able to show a selection. Here we define API to query whether the
 // representation fulfills selection obligations. For more details look at
-// vtkSMPipelineRepresentationProxy.
+// vtkSMDataRepresentationProxy.
 
 #ifndef __vtkSMRepresentationProxy_h
 #define __vtkSMRepresentationProxy_h
