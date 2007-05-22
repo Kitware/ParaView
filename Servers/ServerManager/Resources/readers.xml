@@ -1029,62 +1029,6 @@
    <!-- End ensight -->
    </SourceProxy>
 
-   <SourceProxy name="HDF5RawImageReader" class="vtkHDF5RawImageReader"
-                label="HDF5 Raw Image reader">
-     <Documentation
-       short_help="Read HDF5 datasets."
-       long_help="Read HDF5 raw image data files.">
-       The HDF5 Raw Image reader reads data in the hierarchical data format (HDF). This format was created at the National Center for Supercomputing Applications (NCSA) at the University of Illinois at Urbana-Champaign. Files of this type have a .h5 extension. The output of this reader is uniform rectilinear (image/volume) data.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        animateable="1"
-        command="SetFileName"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the HDF5 raw image reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="PointArrayStatus"
-        command="SetPointArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="PointArrayInfo"
-        label="Point Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="PointArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which point-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-
-      <IntVectorProperty
-         name="Stride"
-         command="SetStride"
-         number_of_elements="3"
-         default_values="1 1 1" >
-        <IntRangeDomain name="range" min="1 1 1" />
-        <Documentation>
-          The values in this property indicate whether/how the data should be subsampled. Points will be skipped so that a smaller version of the data is produced. The first value indicates the change in index from one point to the next in X. The remaining two values do the same for Y and Z, respectively.
-        </Documentation>
-      </IntVectorProperty>
-   <!-- End HDF5RawImageReader -->
-   </SourceProxy>
-
    <SourceProxy name="spcthreader" class="vtkSpyPlotReader"
                 label="Spy Plot reader">
      <Documentation

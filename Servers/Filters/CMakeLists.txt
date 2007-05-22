@@ -32,7 +32,6 @@ SET(Filters_SRCS
   vtkExtractHistogram.cxx
   vtkExtractScatterPlot.cxx
 #  vtkGroup.cxx
-  vtkHDF5RawImageReader.cxx
   vtkHierarchicalFractal.cxx
   vtkImageCompressor.cxx
   vtkIntegrateAttributes.cxx
