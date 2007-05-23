@@ -48,6 +48,10 @@ int HistogramSelection(int argc, char* argv[])
   histogram->selectAll();
   histogram->selectNone();
   histogram->selectInverse();
+  histogram->setInteractMode(pqHistogramWidget::Value);
+  histogram->selectAll();
+  histogram->selectNone();
+  histogram->selectInverse();
 
   if(app.arguments().contains("--exit"))
     {
