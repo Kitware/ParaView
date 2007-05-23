@@ -7,15 +7,16 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkProcessModuleConnectionManagerInternals.h
       vtkPVServerOptionsInternals.h
       vtkSMPropertyInternals.h
-      vtkSMProxyInternals.h
       vtkSMPropertyInternals.h
+      vtkSMProxyInternals.h
       vtkSMProxyManagerInternals.h      
-      vtkUndoStackInternal.h
+      vtkSMRepresentationStrategyVector.h
       vtkSpyPlotBlock.h
       vtkSpyPlotBlockIterator.h
-      vtkSpyPlotUniReader.h
       vtkSpyPlotIStream.h
       vtkSpyPlotReaderMap.h
+      vtkSpyPlotUniReader.h
+      vtkUndoStackInternal.h
       )
   ENDFOREACH(part)
 ENDIF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
