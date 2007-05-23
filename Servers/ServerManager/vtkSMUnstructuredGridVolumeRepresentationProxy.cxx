@@ -15,13 +15,16 @@
 #include "vtkSMUnstructuredGridVolumeRepresentationProxy.h"
 
 #include "vtkCollection.h"
+#include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSelection.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDataTypeDomain.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMRepresentationStrategyVector.h"
 #include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
@@ -29,7 +32,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepresentationProxy()
 {
@@ -167,7 +170,7 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::InitializeStrategy(vtkSMVie
   // always polydata.
   vtkSmartPointer<vtkSMRepresentationStrategy> strategy;
   strategy.TakeReference(
-    view->NewStrategy(VTK_UNSTRUCTURED_GRID, vtkSMRenderViewProxy::VOLUME));
+    view->NewStrategy(VTK_UNSTRUCTURED_GRID));
   if (!strategy.GetPointer())
     {
     vtkErrorMacro("View could not provide a strategy to use. "
@@ -175,7 +178,7 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::InitializeStrategy(vtkSMVie
     return false;
     }
 
-  this->SetStrategy(strategy);
+  this->AddStrategy(strategy);
 
   strategy->SetEnableLOD(false);
 
@@ -190,7 +193,7 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::InitializeStrategy(vtkSMVie
   
   // Initialize strategy for the selection pipeline.
   strategy.TakeReference(
-    view->NewStrategy(VTK_POLY_DATA, vtkSMRenderViewProxy::SURFACE));
+    view->NewStrategy(VTK_POLY_DATA));
   if (!strategy.GetPointer())
     {
     vtkErrorMacro("Could not create strategy for selection pipeline. Disabling selection.");
@@ -198,7 +201,7 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::InitializeStrategy(vtkSMVie
     }
   else
     {
-    this->SetStrategyForSelection(strategy);
+    this->AddStrategyForSelection(strategy);
     strategy->SetEnableLOD(true);
     strategy->UpdateVTKObjects();
 
@@ -294,10 +297,56 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::EndCreateVTKObjects(int num
 }
 
 //----------------------------------------------------------------------------
-void vtkSMUnstructuredGridVolumeRepresentationProxy::GetSelectableProps(
-  vtkCollection* collection)
+// TODO: 
+vtkSMProxy* vtkSMUnstructuredGridVolumeRepresentationProxy::ConvertSelection(
+  vtkSelection* surfaceSel)
 {
-  collection->AddItem(this->VolumeActor);
+  if (!this->GetVisibility())
+    {
+    return 0;
+    }
+
+  vtkSmartPointer<vtkSelection> mySelection = 
+    vtkSmartPointer<vtkSelection>::New();
+  mySelection->GetProperties()->Copy(surfaceSel->GetProperties(), 0);
+
+  unsigned int numChildren = surfaceSel->GetNumberOfChildren();
+  for (unsigned int cc=0; cc < numChildren; cc++)
+    {
+    vtkSelection* child = surfaceSel->GetChild(cc);
+    vtkInformation* properties = child->GetProperties();
+    if (!properties->Has(vtkSelection::PROP_ID()))
+      {
+      continue;
+      }
+    vtkClientServerID propId;
+    propId.ID = static_cast<vtkTypeUInt32>(properties->Get(
+        vtkSelection::PROP_ID()));
+    if (propId == this->VolumeActor->GetID(0))
+      {
+      vtkSelection* myChild = vtkSelection::New();
+      myChild->ShallowCopy(child);
+      mySelection->AddChild(myChild);
+      myChild->Delete();
+      }
+    }
+
+  if (mySelection->GetNumberOfChildren() == 0)
+    {
+    return 0;
+    }
+
+  // Convert surface selection to volume selection.
+  vtkSmartPointer<vtkSelection> volSelection = 
+    vtkSmartPointer<vtkSelection>::New();
+  this->ConvertSurfaceSelectionToVolumeSelection(surfaceSel, volSelection);
+
+  // Create a selection source for the selection.
+  vtkSMProxy* selectionSource = 
+    vtkSMSelectionHelper::NewSelectionSourceFromSelection(
+      this->ConnectionID, volSelection);
+  
+  return selectionSource;
 }
 
 //----------------------------------------------------------------------------
@@ -345,22 +394,22 @@ void vtkSMUnstructuredGridVolumeRepresentationProxy::SetupVolumePipeline()
   pp->RemoveAllProxies();
   if (this->SupportsHAVSMapper)
     {
-    this->Connect(this->GetStrategy()->GetOutput(), this->VolumeHAVSMapper);
+    this->Connect(this->RepresentationStrategies->front()->GetOutput(), this->VolumeHAVSMapper);
     pp->AddProxy(this->VolumeHAVSMapper);
     }
   else if(this->SupportsBunykMapper)
     {
-    this->Connect(this->GetStrategy()->GetOutput(), this->VolumeBunykMapper);
+    this->Connect(this->RepresentationStrategies->front()->GetOutput(), this->VolumeBunykMapper);
     pp->AddProxy(this->VolumeBunykMapper);
     }
   else if(this->SupportsZSweepMapper)
     {
-    this->Connect(this->GetStrategy()->GetOutput(), this->VolumeZSweepMapper);
+    this->Connect(this->RepresentationStrategies->front()->GetOutput(), this->VolumeZSweepMapper);
     pp->AddProxy(this->VolumeZSweepMapper);
     }
   else
     {
-    this->Connect(this->GetStrategy()->GetOutput(), this->VolumePTMapper);
+    this->Connect(this->RepresentationStrategies->front()->GetOutput(), this->VolumePTMapper);
     pp->AddProxy(this->VolumePTMapper);
     }
   this->VolumeActor->UpdateVTKObjects();
@@ -535,7 +584,6 @@ void vtkSMUnstructuredGridVolumeRepresentationProxy::PrintSelf(ostream& os, vtkI
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "VolumeFilterProxy: " << this->VolumeFilter << endl;
-  os << indent << "StrategyProxy: " << this->GetStrategy() << endl;
   os << indent << "VolumePropertyProxy: " << this->VolumeProperty << endl;
   os << indent << "VolumeActorProxy: " << this->VolumeActor << endl;
   os << indent << "SupportsHAVSMapper: " << this->SupportsHAVSMapper << endl;
