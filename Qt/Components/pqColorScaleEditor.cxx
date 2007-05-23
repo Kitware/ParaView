@@ -909,7 +909,9 @@ void pqColorScaleEditor::loadPreset()
 #endif
 
       // Update the color space chooser.
+      this->Form->ColorSpace->blockSignals(true);
       this->Form->ColorSpace->setCurrentIndex(colorSpace);
+      this->Form->ColorSpace->blockSignals(false);
       if(this->ColorMap)
         {
         // Set the property on the lookup table.
@@ -1426,12 +1428,19 @@ void pqColorScaleEditor::initColorScale()
     // Set up the color space combo box.
     int space = pqSMAdaptor::getElementProperty(
         lookupTable->GetProperty("ColorSpace")).toInt();
+    this->Form->ColorSpace->blockSignals(true);
     this->Form->ColorSpace->setCurrentIndex(space);
     if(pqSMAdaptor::getElementProperty(
         lookupTable->GetProperty("HSVWrap")).toInt())
       {
       this->Form->ColorSpace->setCurrentIndex(2);
       }
+    else
+      {
+      this->Form->ColorSpace->setCurrentIndex(space);
+      }
+
+    this->Form->ColorSpace->blockSignals(false);
 
 #if USE_VTK_TFE
     this->Viewer->SetColorSpace(this->Form->ColorSpace->currentIndex());
