@@ -60,7 +60,7 @@
 #include <vtkstd/map>
 #include <vtkstd/set>
 
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.10");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 //-----------------------------------------------------------------------------
@@ -137,7 +137,7 @@ vtkSMRepresentationStrategy* vtkSMRenderViewProxy::NewStrategyInternal(
   else if (dataType == VTK_UNSTRUCTURED_GRID)
     {
     strategy = vtkSMRepresentationStrategy::SafeDownCast(
-      pxm->NewProxy("strategies", "UnStructuredGridVolumeStrategy"));
+      pxm->NewProxy("strategies", "UnstructuredGridStrategy"));
     }
   else
     {

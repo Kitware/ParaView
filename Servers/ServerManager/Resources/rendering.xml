@@ -4021,6 +4021,47 @@
 
       <!-- End of PolyDataStrategy -->
     </SimpleStrategy>
+    
+    <UnstructuredGridVolumeStrategyProxy name="UnstructuredGridStrategy" class="">
+      <Documentation>
+        Representation stragegy can be used for unstructured grid volume rendering.
+      </Documentation>
+
+      <ProxyProperty
+        name="Input"
+        command="SetInput"
+        update_self="1"
+        immediate_update="1">
+      </ProxyProperty>
+
+      <SubProxy>
+        <Proxy name="LODDecimator"
+          proxygroup="filters" proxyname="QuadricClustering" />
+      </SubProxy>
+      
+      <SubProxy>
+        <Proxy name="UpdateSuppressor"
+          proxygroup="filters" proxyname="UpdateSuppressor2" />
+        <ExposedProperties>
+          <Property name="UpdateTime" />
+          <Property name="RemoveAllCaches" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="UpdateSuppressorLOD"
+          proxygroup="filters" proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
+      </SubProxy>
+
+      <!-- End of UnstructuredGridStrategy -->
+    </UnstructuredGridVolumeStrategyProxy >
 
     <!-- End of strategies -->
   </ProxyGroup>
@@ -4672,6 +4713,237 @@
 
     <!-- End of UniformGridVolumeRepresentation -->
     </UniformGridVolumeRepresentationProxy>
+
+    <UnstructuredGridVolumeRepresentationProxy name="UnstructuredGridVolumeRepresentation">
+
+      <InputProperty name="Input"
+        command="NotUsed"
+        />
+
+      <DoubleVectorProperty name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        is_internal="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="SelectionVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="ExtractSelection"
+          proxygroup="filters" proxyname="ExtractSelection" />
+        <ExposedProperties>
+          <Property name="Selection" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!-- GeometryFilter for selection pipeline -->
+        <Proxy name="SelectionGeometryFilter"
+          proxygroup="filters" proxyname="GeometryFilter" />
+        <ExposedProperties>
+          <Property name="UseStrips" />
+          <Property name="ForceStrips" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!-- 
+          Mapper for selection 
+        -->
+        <Proxy name="SelectionMapper"
+          proxygroup="mappers" proxyname="PolyDataMapper" />
+      </SubProxy>
+
+      <SubProxy>
+        <!-- 
+          Mapper for low-res selection. It shares all its properties with the
+          high-res mapper (except input ofcourse).
+        -->
+        <Proxy name="SelectionLODMapper"
+          proxygroup="mappers" proxyname="PolyDataMapper" />
+        <ShareProperties subproxy="SelectionMapper" >
+          <Exception name="Input" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!--
+          SelectionProp3D that gets added to the 3D renderer 
+        -->
+        <Proxy name="SelectionProp3D" proxygroup="props" proxyname="LODActor" />
+      </SubProxy>
+
+      <SubProxy>
+        <!--
+          Property for the vtkProp.
+        -->
+        <Proxy name="SelectionProperty" proxygroup="properties" proxyname="Property" />
+        <ExposedProperties>
+          <Property name="Ambient"
+                    exposed_name="SelectionAmbient" />
+          <Property name="AmbientColor"
+                    exposed_name="SelectionAmbientColor" />
+          <Property name="Color"
+                    exposed_name="SelectionColor" />
+          <Property name="Diffuse"
+                    exposed_name="SelectionDiffuse" />
+          <Property name="DiffuseColor"
+                    exposed_name="SelectionDiffuseColor" />
+          <Property name="Interpolation"
+                    exposed_name="SelectionInterpolation" />
+          <Property name="LineWidth"
+                    exposed_name="SelectionLineWidth" />
+          <Property name="Opacity"
+                    exposed_name="SelectionOpacity" />
+          <Property name="PointSize"
+                    exposed_name="SelectionPointSize" />
+          <Property name="Representation"
+                    exposed_name="SelectionRepresentation" />
+          <Property name="Shading"
+                    exposed_name="SelectionShading" />
+          <Property name="SpecularColor"
+                    exposed_name="SelectionSpecularColor" />
+          <Property name="SpecularPower"
+                    exposed_name="SelectionSpecularPower" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!-- This is the helper that assures that the material xml is provided
+          to the servers from the client, when needed. Note that this is 
+          a client only proxy -->
+        <MaterialLoaderProxy name="MaterialLoader" >
+          <StringVectorProperty name="Material"
+            command="LoadMaterial"
+            number_of_elements="1"
+            update_self="1">
+          </StringVectorProperty>
+        </MaterialLoaderProxy>
+        <ExposedProperties>
+          <Property name="Material" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- Subproxies for Volume Pipeline -->
+      <SubProxy>
+        <SourceProxy name="VolumeFilter" class="vtkDataSetTriangleFilter" >
+          <!-- I don't directly use the DataSetTriangleFilter since I need
+          a more restrictive domain for this one -->
+          <!-- note this property is not exposed -->
+          <InputProperty
+            name="Input"
+            command="SetInputConnection">
+            <ProxyGroupDomain name="groups">
+              <Group name="sources"/>
+              <Group name="filters"/>
+            </ProxyGroupDomain>
+            <DataTypeDomain name="input_type">
+              <DataType value="vtkUnstructuredGrid" />
+            </DataTypeDomain>
+          </InputProperty>
+          <IntVectorProperty
+            name="SetTetrahedraOnly"
+            command="SetTetrahedraOnly"
+            number_of_elements="1"
+            default_values="1" >
+            <BooleanDomain name="bool"/>
+          </IntVectorProperty>
+        </SourceProxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeDummyMapper"
+               proxygroup="mappers"
+               proxyname="DummyVolumeMapper">
+        </Proxy>
+        <!--
+          This property is linked with "ColorArray" property on
+          the PolyDataMapper. So, the volume rendering pipeline uses
+          the same scalar array as the polygonal pipeline.
+
+        <ExposedProperties>
+          <Property name="SelectScalarArray" />
+        </ExposedProperties>
+        -->
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeBunykMapper"
+          proxygroup="mappers"
+          proxyname="UnstructuredGridVolumeRayCastMapper">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ScalarMode" />
+          <Property name="SelectScalarArray" />
+          <Property name="ColorArray" />
+        </ExposedProperties>
+        <ShareProperties subproxy="VolumeDummyMapper"/>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeZSweepMapper"
+          proxygroup="mappers"
+          proxyname="UnstructuredGridVolumeZSweepMapper">
+        </Proxy>
+        <ShareProperties subproxy="VolumeBunykMapper">
+          <Exception name="Input"/>
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumePTMapper"
+          proxygroup="mappers"
+          proxyname="ProjectedTetrahedraMapper">
+        </Proxy>
+        <ShareProperties subproxy="VolumeBunykMapper">
+          <Exception name="Input"/>
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeHAVSMapper"
+          proxygroup="mappers"
+          proxyname="HAVSVolumeMapper">
+        </Proxy>
+        <ShareProperties subproxy="VolumeBunykMapper">
+          <Exception name="Input"/>
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeActor" proxygroup="props" proxyname="LODVolume" />
+        <ExposedProperties>
+          <Property name="Position" />
+          <Property name="Scale" />
+          <Property name="Orientation" />
+          <Property name="Origin" />
+          <Property name="RenderModuleHelper" />
+          <Property name="Pickable" />
+          <Property name="Visibility" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeProperty"
+          proxygroup="properties" proxyname="VolumeProperty" >
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ScalarOpacityUnitDistance" />
+          <Property name="ScalarOpacityFunction" />
+          <Property name="ColorTransferFunction" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of UnstructuredGridVolumeRepresentation -->
+    </UnstructuredGridVolumeRepresentationProxy>
 
   </ProxyGroup>
 
