@@ -1,6 +1,9 @@
 
 PROJECT(pqChartTest)
 
+SET(QT_USE_QTTEST ON)
+INCLUDE(${QT_USE_FILE})
+
 SET(MyTests
   ColorMap
   Histogram

@@ -8,20 +8,7 @@
 #include <QColor>
 #include <QTimer>
 #include <QKeyEvent>
-
-int sendEvent(QWidget* w, QEvent* e)
-{
-  QApplication::sendEvent(w, e);
-  QTimer::singleShot(50, QApplication::instance(), SLOT(quit()));
-  return QApplication::exec();
-}
-
-int sendKeyEvent(QWidget* w, Qt::Key k, Qt::KeyboardModifiers m = 0)
-{
-  QKeyEvent kd(QEvent::KeyPress, k, m);
-  QKeyEvent ku(QEvent::KeyRelease, k, m);
-  return sendEvent(w, &kd) + sendEvent(w, &ku);
-}
+#include <QtTest>
 
 int HistogramInteraction(int argc, char* argv[])
 {
@@ -29,6 +16,8 @@ int HistogramInteraction(int argc, char* argv[])
 
   // Set up the histogram.
   pqHistogramWidget *histogram = new pqHistogramWidget();
+  int size[2] = {300,300};
+  histogram->resize(size[0], size[1]);
 
   // Set up the histogram data.
   pqHistogramListModel *model = new pqHistogramListModel();
@@ -51,16 +40,20 @@ int HistogramInteraction(int argc, char* argv[])
   int status = 0;
 
   // zoom some
-  status += sendKeyEvent(histogram, Qt::Key_Plus);
-  status += sendKeyEvent(histogram, Qt::Key_Plus);
-  status += sendKeyEvent(histogram, Qt::Key_Minus);
+  QTest::keyClick(histogram, Qt::Key_Plus, Qt::NoModifier, 20);
+  QTest::keyClick(histogram, Qt::Key_Plus, Qt::NoModifier, 20);
+  QTest::keyClick(histogram, Qt::Key_Minus, Qt::NoModifier, 20);
   // pan some
-  status += sendKeyEvent(histogram, Qt::Key_Left);
-  status += sendKeyEvent(histogram, Qt::Key_Right);
-  status += sendKeyEvent(histogram, Qt::Key_Down);
-  status += sendKeyEvent(histogram, Qt::Key_Up);
+  QTest::keyClick(histogram, Qt::Key_Left, Qt::NoModifier, 20);
+  QTest::keyClick(histogram, Qt::Key_Right, Qt::NoModifier, 20);
+  QTest::keyClick(histogram, Qt::Key_Down, Qt::NoModifier, 20);
+  QTest::keyClick(histogram, Qt::Key_Up, Qt::NoModifier, 20);
 
-  // TODO  add some mouse interaction
+  // some mouse interaction
+  QTest::mouseClick(histogram->viewport(), Qt::LeftButton, 0, 
+                    QPoint(size[0]/2, size[1]/2), 20);
+  QTest::mouseClick(histogram->viewport(), Qt::LeftButton, 0, 
+                    QPoint(size[0]/3, size[1]/2), 20);
 
   if(app.arguments().contains("--exit"))
     {
