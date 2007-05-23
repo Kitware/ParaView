@@ -32,15 +32,15 @@ int HistogramInteraction(int argc, char* argv[])
 
   // Set up the histogram data.
   pqHistogramListModel *model = new pqHistogramListModel();
-  model->addBinValue(pqChartValue((float)1.35));
-  model->addBinValue(pqChartValue((float)1.40));
-  model->addBinValue(pqChartValue((float)1.60));
-  model->addBinValue(pqChartValue((float)2.00));
-  model->addBinValue(pqChartValue((float)1.50));
-  model->addBinValue(pqChartValue((float)1.80));
-  model->addBinValue(pqChartValue((float)1.40));
-  model->addBinValue(pqChartValue((float)1.30));
-  model->addBinValue(pqChartValue((float)1.20));
+  model->addBinValue(pqChartValue((int)1));
+  model->addBinValue(pqChartValue((int)1));
+  model->addBinValue(pqChartValue((int)2));
+  model->addBinValue(pqChartValue((int)4));
+  model->addBinValue(pqChartValue((int)3));
+  model->addBinValue(pqChartValue((int)3));
+  model->addBinValue(pqChartValue((int)2));
+  model->addBinValue(pqChartValue((int)1));
+  model->addBinValue(pqChartValue((int)1));
   pqChartValue min((int)0);
   pqChartValue max((int)90);
   model->setRangeX(min, max);
