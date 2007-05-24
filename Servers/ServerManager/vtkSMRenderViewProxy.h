@@ -61,7 +61,9 @@ public:
   vtkGetObjectMacro(Renderer2D, vtkRenderer);
   vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
   vtkGetObjectMacro(Interactor, vtkPVGenericRenderWindowInteractor);
-
+  vtkGetObjectMacro(RendererProxy, vtkSMProxy);
+  vtkGetObjectMacro(Renderer2DProxy, vtkSMProxy);
+  
   // Description:
   // Convenience method to set the background color.
   void SetBackgroundColorCM(double rgb[3]);
