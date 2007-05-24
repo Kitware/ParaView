@@ -2049,6 +2049,7 @@ This filter creates a new cell array containing a geometric measure of each cell
         default_values="2">
        <EnumerationDomain name="enum">
          <Entry value="0" text="Edge Ratio"/>
+         <Entry value="29" text="Aspect Beta"/>
          <Entry value="27" text="Aspect Gamma"/>
          <Entry value="3" text="Aspect Frobenius"/>
          <Entry value="1" text="Aspect Ratio"/>
