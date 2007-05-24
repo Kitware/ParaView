@@ -761,8 +761,23 @@
 
       <!-- End of TextWidget -->
     </Proxy>
+    
+    <Proxy name="AbstractWidget" class="vtkAbstractWidget">
+      <ProxyProperty name="Representation"
+         command="SetRepresentation">
+        <ProxyGroupDomain name="groups">
+          <Group name="props" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty name="Enabled"
+                         command="SetEnabled"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain/>
+      </IntVectorProperty>
+    </Proxy>
 
-  <!-- End of ProxyGroup 3d_widgets -->
+    <!-- End of ProxyGroup 3d_widgets -->
   </ProxyGroup>
 
   <ProxyGroup name="animation">
