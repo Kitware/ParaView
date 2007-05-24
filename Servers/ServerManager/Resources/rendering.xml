@@ -128,6 +128,7 @@
   </ProxyGroup>
    
   <ProxyGroup name="renderers">
+
     <Proxy name="Renderer" class="vtkRenderer">
       <!-- Renderer purposefully doesn't have an active camera property.
       Since the renderer is managed by RenderModule, it sets the camera
@@ -182,14 +183,6 @@
         <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty
-        name="Viewport"
-        command="SetViewport"
-        number_of_elements="4"
-        default_values="0 0 1 1"
-        is_internal="1">
-        <DoubleRangeDomain name="range" min="0 0 0 0" max="1 1 1 1" />
-      </DoubleVectorProperty>
       <ProxyProperty name="Lights" 
                      command="AddLight"
                      remove_command="RemoveLight">
@@ -200,6 +193,14 @@
 
     <!-- End Renderer -->
     </Proxy>
+
+    <Proxy name="IceTRenderer" 
+           base_proxygroup="renderers"
+           base_proxyname="Renderer"
+           class="vtkIceTRenderer">
+    </Proxy>
+
+  <!-- End of group "renderers" -->
   </ProxyGroup>
 
   <ProxyGroup name="lights">
@@ -4067,34 +4068,186 @@
   </ProxyGroup>
 
   <ProxyGroup name="newviews">
-    <RenderViewProxy name="RenderView" base_proxygroup="rendermodules"
-      base_proxyname="SimpleRenderModule">
+    <Proxy name="RenderViewBase">
+      <Documentation>
+        This defines the properties/subproxies common to all render view
+        subclasses.
+      </Documentation>
 
       <ProxyProperty
         name="Representations"
         command="AddRepresentation"
         update_self="1"
         remove_command="RemoveRepresentation">
+        <Documentation>
+          Add representations to be rendered by this view.
+        </Documentation>
       </ProxyProperty>
 
+      <IntVectorProperty
+        name="ViewPosition"
+        command="SetViewPosition"
+        number_of_elements="2"
+        default_values="0 0"
+        update_self="1"
+        immediate_update="1">
+        <IntRangeDomain name="range" min="0 0" />
+        <Documentation>
+          Position of the view. This is useful in multiview configurations.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="GUISize"
+        command="SetGUISize"
+        number_of_elements="2"
+        default_values="0 0"
+        update_self="1"
+        immediate_update="1">
+        <IntRangeDomain name="range" min="1 1" />
+        <Documentation>
+          Total GUI size when using mutliple views. This includes the sizes of
+          all view modules.
+        </Documentation>
+      </IntVectorProperty>
+
       <DoubleVectorProperty
-        name="LODThreshold"
-        command="SetLODThreshold"
+        name="ViewTime"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The pipeline update time for this view.
+          This gets passed to all representations added to this view.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="UseTriangleStrips"
+        command="SetUseTriangleStrips"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether triangle strips should be used when rendering polydata.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="UseImmediateMode"
+        command="SetUseImmediateMode"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="RenderInterruptsEnabled"
+        command="SetRenderInterruptsEnabled"
+        number_of_elements="1"
+        update_self="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="UseLight"
+        command="SetUseLight"
         number_of_elements="1"
         default_values="0"
         update_self="1">
-        <Documentation>
-          Set the memory size threshold above which LOD will be used while
-          rendering interactively.
-        </Documentation>
-        <DoubleRangeDomain name="range" min="0" />
-      </DoubleVectorProperty>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <!-- 
+        Some common subproxies that are not affected by the type of render
+        view. Note the absence of such essential subproxies as RenderWindow,
+        Renderer.
+      -->
+
+      <SubProxy>
+        <Proxy name="Renderer2D" proxyname="Renderer" proxygroup="renderers">
+        </Proxy>
+      </SubProxy>
+
+
+      <SubProxy>
+        <Proxy name="Light" proxyname="Light" proxygroup="lights">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="LightAmbientColor" />
+          <Property name="LightSpecularColor" />
+          <Property name="LightDiffuseColor" />
+          <Property name="LightIntensity" />
+          <Property name="LightSwitch" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="LightKit" proxyname="LightKit" proxygroup="rendering">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="KeyLightWarmth" />
+          <Property name="KeyLightIntensity" />
+          <Property name="KeyLightElevation" />
+          <Property name="KeyLightAzimuth" />
+          <Property name="FillLightWarmth" />
+          <Property name="FillLightK:F Ratio" />
+          <Property name="FillLightElevation" />
+          <Property name="FillLightAzimuth" />
+          <Property name="BackLightWarmth" />
+          <Property name="BackLightK:B Ratio" />
+          <Property name="BackLightElevation" />
+          <Property name="BackLightAzimuth" />
+          <Property name="HeadLightWarmth" />
+          <Property name="HeadLightK:H Ratio" />
+          <Property name="MaintainLuminance" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="ActiveCamera" proxyname="Camera" proxygroup="camera">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="CameraPositionInfo" />
+          <Property name="CameraPosition" />
+          <Property name="CameraFocalPointInfo" />
+          <Property name="CameraFocalPoint" />
+          <Property name="CameraViewUpInfo" />
+          <Property name="CameraViewUp" />
+          <Property name="CameraViewAngle" />
+          <Property name="CameraClippingRangeInfo" />
+          <Property name="CameraClippingRange" />
+          <Property name="CameraParallelScale" />
+          <Property name="CameraParallelProjection" />
+          <Property name="EyeAngle" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Interactor" proxyname="GenericRenderWindowInteractor" 
+          proxygroup="interactors">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="InteractorStyle" />
+          <Property name="CenterOfRotation" />
+        </ExposedProperties>
+      </SubProxy>
 
       <SubProxy>
         <Proxy name="ViewHelper" class="vtkPVRenderModuleHelper">
           <IntVectorProperty
             name="LODFlag"
             command="SetLODFlag"
+            number_of_elements="1"
+            default_values="0">
+            <BooleanDomain name="bool" />
+          </IntVectorProperty>
+
+          <IntVectorProperty
+            name="UseCompositing"
             number_of_elements="1"
             default_values="0">
             <BooleanDomain name="bool" />
@@ -4114,19 +4267,247 @@
             default_values="50 50 50" >
             <IntRangeDomain name="range" min="10" />
           </IntVectorProperty>
-          
+          <!-- End of subproxy "ViewHelper" -->
         </Proxy>
+
         <!-- We don't expose LODFlag, since using LOD is a private 
         decision that the render view makes -->
         <ExposedProperties>
           <Property name="CachingEnabled" />
           <Property name="LODResolution" />
         </ExposedProperties>
+        <!-- End of SubProxy ViewHelper -->
+      </SubProxy>
+
+      <!-- End of RenderViewBase -->
+    </Proxy>
+
+    <RenderViewProxy name="RenderView" 
+      base_proxygroup="newviews" base_proxyname="RenderViewBase">
+      <Documentation>
+        Simplest render view without compositing/client-server support.
+      </Documentation>
+
+      <DoubleVectorProperty
+        name="LODThreshold"
+        command="SetLODThreshold"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <Documentation>
+          Set the memory size threshold above which LOD will be used while
+          rendering interactively.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+
+      <SubProxy>
+        <Proxy name="Renderer" proxyname="Renderer" proxygroup="renderers">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Background" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="RenderWindow" proxyname="RenderWindow" proxygroup="renderwindow">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="RenderWindowSize" exposed_name="ViewSize" />
+          <Property name="RenderWindowSizeInfo" />
+        </ExposedProperties>
       </SubProxy>
 
       <!-- End of RenderView -->
     </RenderViewProxy>
 
+    <IceTCompositeViewProxy name="IceTCompositeView"
+      base_proxygroup="newviews" base_proxyname="RenderViewBase">
+      <Documentation>
+        IceT Render View with compositing which can be used when no
+        client-server delivery is required.
+      </Documentation>
+
+      <DoubleVectorProperty
+        name="LODThreshold"
+        command="SetLODThreshold"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <Documentation>
+          Set the memory size threshold above which LOD will be used while
+          rendering interactively.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="CompositeThreshold"
+        command="SetCompositeThreshold"
+        number_of_elements="1"
+        default_values="20.0"
+        update_self="1">
+        <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+           The threshold used to determine if the compositing should be used
+           for rendering. 
+        </Documentation>
+      </DoubleVectorProperty>
+     
+      <IntVectorProperty
+        name="ImageReductionFactor"
+        command="SetImageReductionFactor"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <IntRangeDomain name="range" min="0" max="100" />
+        <Documentation>
+          The image reduction factor used for compositing parallel images in
+          InteractiveRender. ImageReductionFactor=1 implies no reduction at all.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ViewSize"
+        command="SetViewSize"
+        number_of_elements="2"
+        update_self="1"
+        default_values="400 400">
+        <IntRangeDomain name="range" min="1 1" />
+        <Documentation>
+          Set the view size for this view module.
+        </Documentation>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="Renderer" proxyname="IceTRenderer" proxygroup="renderers">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Background" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="RenderWindow" proxyname="RenderWindow" proxygroup="renderwindow">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="RenderWindowSizeInfo" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="MultiViewManager" class="vtkMultiViewManager">
+          <ProxyProperty  
+            name="RenderWindow"
+            command="SetRenderWindow">
+          </ProxyProperty>
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy  name="ParallelRenderManager" 
+                proxygroup="composite_managers"
+                proxyname="IceTRenderManager">
+        </Proxy>
+      </SubProxy>
+
+      <!-- End of IceTCompositeView -->
+    </IceTCompositeViewProxy>
+
+    <IceTDesktopRenderViewProxy name="IceTDesktopRenderView"
+      base_proxygroup="newviews" base_proxyname="RenderViewBase">
+      <Documentation>
+        IceT Render View with compositing and client delivery mechanisms.
+      </Documentation>
+
+      <DoubleVectorProperty
+        name="LODThreshold"
+        command="SetLODThreshold"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <Documentation>
+          Set the memory size threshold above which LOD will be used while
+          rendering interactively.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="CompositeThreshold"
+        command="SetCompositeThreshold"
+        number_of_elements="1"
+        default_values="20.0"
+        update_self="1">
+        <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+           The threshold used to determine if the compositing should be used
+           for rendering. This may alternatively thought as the remote render
+           threshold, since when ever we use compositing, we render on the
+           server.
+        </Documentation>
+      </DoubleVectorProperty>
+     
+      <IntVectorProperty
+        name="ImageReductionFactor"
+        command="SetImageReductionFactor"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <IntRangeDomain name="range" min="0" max="100" />
+        <Documentation>
+          The image reduction factor used for compositing parallel images in
+          InteractiveRender. ImageReductionFactor=1 implies no reduction at all.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="SquirtLevel"
+        command="SetSquirtLevel"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <IntRangeDomain name="range" min="0" max="7" />
+        <Documentation>
+          Set the level for squirt compression to use when delivering rendered
+          image to the client during interactive rendering.
+        </Documentation>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="Renderer" proxyname="Renderer" proxygroup="renderers">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Background" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="RenderWindow" proxyname="RenderWindow" proxygroup="renderwindow">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="RenderWindowSizeInfo" />
+          <Property name="RenderWindowSize" exposed_name="ViewSize" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="RenderSyncManager" proxygroup="composite_managers"
+          proxyname="DesktopDeliveryClient">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy  name="ParallelRenderManager" 
+                proxygroup="composite_managers"
+                proxyname="IceTRenderManager">
+        </Proxy>
+      </SubProxy>
+
+      <!-- End of IceTDesktopRenderView -->
+    </IceTDesktopRenderViewProxy>
+
+    <!-- End if group "newviews" -->
   </ProxyGroup>
 
   <ProxyGroup name="representations">
@@ -4950,6 +5331,8 @@
 
 
 </ServerManagerConfiguration>
+
+
 
 
 

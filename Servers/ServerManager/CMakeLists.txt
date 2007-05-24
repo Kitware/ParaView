@@ -168,19 +168,19 @@ SET(Kit_SRCS
   vtkSMXYPlotActorProxy.cxx
   vtkSMXYPlotDisplayProxy.cxx
 
-  vtkSMClientServerRenderViewProxy.cxx
-  vtkSMCompositeRenderViewProxy.cxx
-  vtkSMOutlineRepresentationProxy.cxx
   vtkSMDataRepresentationProxy.cxx
+  vtkSMIceTCompositeViewProxy.cxx
+  vtkSMIceTDesktopRenderViewProxy.cxx
+  vtkSMOutlineRepresentationProxy.cxx
   vtkSMRenderViewProxy.cxx
   vtkSMRepresentationProxy.cxx
   vtkSMRepresentationStrategy.cxx
   vtkSMSimpleStrategy.cxx
   vtkSMSurfaceRepresentationProxy.cxx
-  vtkSMViewProxy.cxx
   vtkSMUniformGridVolumeRepresentationProxy.cxx
-  vtkSMUnstructuredGridVolumeStrategyProxy.cxx
   vtkSMUnstructuredGridVolumeRepresentationProxy.cxx
+  vtkSMUnstructuredGridVolumeStrategyProxy.cxx
+  vtkSMViewProxy.cxx
   )
 
 SET( ServerManagerCS_SRCS

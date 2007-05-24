@@ -12,92 +12,99 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMIceTDesktopRenderViewProxy - IceT render module, without
-// tiles.
-// Composite render module to support client/server compositing with one or
-// more views. In multi-view mode, the client can have multiple render
-// windows and the server has only one render window and one or more
-// renderers for each render window the client has. The client has to tell
-// the server the size of the render window and the position of each
-// renderer. Each render module represents one render window (client)/
-// renderers (server) pair.
-
+// .NAME vtkSMIceTDesktopRenderViewProxy
+// .SECTION Description
+// IceT Render View that can be used in client server configurations.
 
 #ifndef __vtkSMIceTDesktopRenderViewProxy_h
 #define __vtkSMIceTDesktopRenderViewProxy_h
 
-#include "vtkSMCompositeRenderViewProxy.h"
+#include "vtkSMIceTCompositeViewProxy.h"
 
-class vtkSMIceTDesktopRenderViewProxyProxySet;
-
-class VTK_EXPORT vtkSMIceTDesktopRenderViewProxy : public vtkSMCompositeRenderViewProxy
+class VTK_EXPORT vtkSMIceTDesktopRenderViewProxy : public vtkSMIceTCompositeViewProxy
 {
 public:
   static vtkSMIceTDesktopRenderViewProxy* New();
-  vtkTypeRevisionMacro(vtkSMIceTDesktopRenderViewProxy, vtkSMCompositeRenderViewProxy);
+  vtkTypeRevisionMacro(vtkSMIceTDesktopRenderViewProxy, vtkSMIceTCompositeViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set whether or not to order compositing.  If compositing is not ordered,
-  // then the z buffer is used to composite.
-  vtkGetMacro(DisableOrderedCompositing, int);
-  vtkSetMacro(DisableOrderedCompositing, int);
-  vtkBooleanMacro(DisableOrderedCompositing, int);
-
-  virtual void StillRender();
-
-  // Multi-view methods:
+  // Squirt is a hybrid run length encoding and bit reduction compression
+  // algorithm that is used to compress images for transmition from the
+  // server to client.  Value of 0 disabled all compression.  Level zero is just
+  // run length compression with no bit compression (lossless).
+  // Squirt compression is only used for client-server image delivery during
+  // InteractiveRender.
+  vtkSetClampMacro(SquirtLevel, int, 0, 7);
+  vtkGetMacro(SquirtLevel, int);
 
   // Description:
-  // Set the proxy of the server display manager. This should be set
-  // immediately after the render module is created. Setting this after
-  // CreateVTKObjects() has been called has no effect.
-  void SetServerDisplayManagerProxy(vtkSMProxy*);
-  vtkGetObjectMacro(ServerDisplayManagerProxy, vtkSMProxy);
+  // In mutlview configurations, all the render views must share the same
+  // instance of the server-side render sync manager. 
+  // Use this method to set that shared
+  // instance. It must be set before calling CreateVTKObjects() on the view
+  // proxy.
+  void SetSharedServerRenderSyncManager(vtkSMProxy*);
 
+//BTX
 protected:
   vtkSMIceTDesktopRenderViewProxy();
   ~vtkSMIceTDesktopRenderViewProxy();
 
-  // This method is the wierdest CreateVTKObjects I have known.
-  // Basically we are trying to create the Renderer in a non-standard way.
-  virtual void CreateVTKObjects(int numObjects);
+  // Description:
+  // Pre-CreateVTKObjects initialization.
+  virtual bool BeginCreateVTKObjects(int numObjects);
 
   // Description:
-  // Subclasses should override this method to intialize the Composite Manager.
-  // This is called after CreateVTKObjects();
-  virtual void InitializeCompositingPipeline();
-
-  int TileDimensions[2];
-  int TileMullions[2];
-
-  // Control the RemoteDisplay property on vtkDesktopDeliveryServer.
-  int RemoteDisplay;
- 
-  int DisableOrderedCompositing;
-  int OrderedCompositing;
-  void SetOrderedCompositing(int oc);
-
-  vtkSMProxy* DisplayManagerProxy;
-  vtkSMProxy* PKdTreeProxy;
-
-  // Generator is used only when volume rendering structured data.
-  vtkSMProxy* PKdTreeGeneratorProxy;
-
-  vtkSMProxy* ServerDisplayManagerProxy;
-
-  // This flag is set when we generate the k-d tree ourselves 
-  // (in case of structured volume rendering). 
-  int UsingCustomKdTree;
+  // Post-CreateVTKObjects initialization.
+  virtual void EndCreateVTKObjects(int numObjects);
 
   // Description:
-  // The set of inputs (as proxies) to PKdTreeProxy that existed the last
-  // time BuildLocator was called on PKdTreeProxy.
-  vtkSMIceTDesktopRenderViewProxyProxySet *PartitionedData;
+  // Overridden to disable squirt compression.
+  virtual void BeginStillRender();
+
+  // Description:
+  // Overridden to use user-specified squirt compression.
+  virtual void BeginInteractiveRender();
+
+  // Description:
+  // Initialize the RenderSyncManager properties. Called in
+  // EndCreateVTKObjects().
+  virtual void InitializeRenderSyncManager();
+
+  // Description:
+  // ImageReductionFactor needs to be set on the RenderSyncManager
+  // rather than the ParallelRenderManager.
+  virtual void SetImageReductionFactorInternal(int factor);
+
+  // Description:
+  // Overridden to pass the UseCompositing state to the RenderSyncManager rather
+  // than the ParallelRenderManager.
+  virtual void SetUseCompositing(bool usecompositing);
+
+  // Description:
+  // Internal method to set the squirt level on the RenderSyncManager.
+  void SetSquirtLevelInternal(int level);
+
+  // Description:
+  // Overridden to pass the GUISize to the RenderSyncManager.
+  virtual void SetGUISize(int x, int y);
+
+  // Description:
+  // Overridden to pass the ViewPosition to the RenderSyncManager.
+  virtual void SetViewPosition(int x, int y);
+
+  // RenderManager managing client-server rendering.
+  vtkSMProxy* RenderSyncManager;
+  vtkSMProxy* SharedServerRenderSyncManager;
+
+  int SquirtLevel;
 
 private:
-  vtkSMIceTDesktopRenderViewProxy(const vtkSMIceTDesktopRenderViewProxy&); // Not implemented.
-  void operator=(const vtkSMIceTDesktopRenderViewProxy&); // Not implemented.
+  vtkSMIceTDesktopRenderViewProxy(const vtkSMIceTDesktopRenderViewProxy&); // Not implemented
+  void operator=(const vtkSMIceTDesktopRenderViewProxy&); // Not implemented
+//ETX
 };
 
 #endif
+

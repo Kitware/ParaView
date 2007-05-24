@@ -49,7 +49,7 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMViewProxy::vtkSMViewProxy()
 {
@@ -59,7 +59,7 @@ vtkSMViewProxy::vtkSMViewProxy()
   this->ViewHelper = 0;
 
   this->GUISize[0] = this->GUISize[1] = 300;
-  this->WindowPosition[0] = this->WindowPosition[1] = 0;
+  this->ViewPosition[0] = this->ViewPosition[1] = 0;
 
   this->DisplayedDataSize = 0;
   this->DisplayedDataSizeValid = false;
@@ -99,7 +99,14 @@ void vtkSMViewProxy::CreateVTKObjects(int numObjects)
       vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
     }
 
+  if (!this->BeginCreateVTKObjects(numObjects))
+    {
+    return;
+    }
+
   this->Superclass::CreateVTKObjects(numObjects);
+
+  this->EndCreateVTKObjects(numObjects);
 }
 
 //----------------------------------------------------------------------------
@@ -423,8 +430,8 @@ void vtkSMViewProxy::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "GUISize: " 
     << this->GUISize[0] << ", " << this->GUISize[1] << endl;
-  os << indent << "WindowPosition: " 
-    << this->WindowPosition[0] << ", " << this->WindowPosition[1] << endl;
+  os << indent << "ViewPosition: " 
+    << this->ViewPosition[0] << ", " << this->ViewPosition[1] << endl;
 }
 
 

@@ -186,10 +186,12 @@ protected:
   ~vtkSMRenderViewProxy();
 
   // Description:
-  // Given the number of objects (numObjects), class name (VTKClassName)
-  // and server ids ( this->GetServerIDs()), this methods instantiates
-  // the objects on the server(s)
-  virtual void CreateVTKObjects(int numObjects);
+  // Called at the start of CreateVTKObjects().
+  virtual bool BeginCreateVTKObjects(int vtkNotUsed(numObjects));
+
+  // Description:
+  // Called at the end of CreateVTKObjects().
+  virtual void EndCreateVTKObjects(int vtkNotUsed(numObjects));
 
   // Description:
   // Called by AddRepresentation(). Subclasses can override to add 

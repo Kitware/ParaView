@@ -134,6 +134,8 @@ SET(Filters_SRCS
   vtkXMLCollectionReader.cxx
   vtkXMLPVAnimationWriter.cxx
   vtkXMLPVDWriter.cxx
+  vtkMultiViewManager.cxx
+  
   )
 
 SET_SOURCE_FILES_PROPERTIES(

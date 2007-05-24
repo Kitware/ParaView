@@ -60,7 +60,27 @@
 #include <vtkstd/map>
 #include <vtkstd/set>
 
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.10");
+//-----------------------------------------------------------------------------
+inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
+  int val, bool report_error=true)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    proxy->GetProperty(pname));
+  if (!ivp)
+    {
+    if (report_error)
+      {
+      vtkGenericWarningMacro("Failed to locate property "
+        << pname << " on proxy  " << proxy->GetXMLName());
+      return false;
+      }
+    }
+  ivp->SetElement(0, val);
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.11");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 //-----------------------------------------------------------------------------
@@ -178,13 +198,10 @@ vtkSMRenderViewProxy::GetOpenGLExtensionsInformation()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::CreateVTKObjects(int numObjects)
+bool vtkSMRenderViewProxy::BeginCreateVTKObjects(int numObjects)
 {
-  if (this->ObjectsCreated)
-    {
-    return;
-    }
-
+  // Initialize all subproxy pointers and servers on which those subproxies are
+  // to be created.
   this->RendererProxy = this->GetSubProxy("Renderer");
   this->Renderer2DProxy = this->GetSubProxy("Renderer2D");
   this->ActiveCameraProxy = this->GetSubProxy("ActiveCamera");
@@ -197,57 +214,64 @@ void vtkSMRenderViewProxy::CreateVTKObjects(int numObjects)
     {
     vtkErrorMacro("Renderer subproxy must be defined in the "
                   "configuration file.");
-    return;
+    return false;
     }
+
   if (!this->Renderer2DProxy)
     {
     vtkErrorMacro("Renderer2D subproxy must be defined in the "
                   "configuration file.");
-    return;
+    return false;
     }
+
   if (!this->ActiveCameraProxy)
     {
     vtkErrorMacro("ActiveCamera subproxy must be defined in the "
                   "configuration file.");
-    return;
+    return false;
     }
+
   if (!this->RenderWindowProxy)
     {
     vtkErrorMacro("RenderWindow subproxy must be defined in the configuration "
                   "file.");
-    return;
+    return false;
     }
+
   if (!this->InteractorProxy)
     {
     vtkErrorMacro("Interactor subproxy must be defined in the configuration "
                   "file.");
-    return;
+    return false;
     }
+
   if (!this->LightKitProxy)
     {
     vtkErrorMacro("LightKit subproxy must be defined in the configuration "
                   "file.");
-    return;
+    return false;
     }
+
   if (!this->LightProxy)
     {
     vtkErrorMacro("Light subproxy must be defined in the configuration "
                   "file.");
-    return;
+    return false;
     }
 
-  // I don't directly use this->SetServers() to set the servers of the
-  // subproxies, as the subclasses may have special subproxies that have
-  // specific servers on which they want those to be created.
+  // Set the servers on which each of the subproxies is to be created.
+
   this->RendererProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->Renderer2DProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER); 
+
   // Camera vtkObject is only created on the client.  This is so as we
   // don't change the active camera on the servers as creation renderer
   // (like IceT Tile renderer) fail if the active camera on the renderer is
   // modified.
   this->ActiveCameraProxy->SetServers(vtkProcessModule::CLIENT);
+
   this->RenderWindowProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->InteractorProxy->SetServers(
@@ -257,7 +281,13 @@ void vtkSMRenderViewProxy::CreateVTKObjects(int numObjects)
   this->LightProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  return this->Superclass::BeginCreateVTKObjects(numObjects);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::EndCreateVTKObjects(int numObjects)
+{
+  this->Superclass::EndCreateVTKObjects(numObjects);
 
   vtkProcessModule* pvm = vtkProcessModule::GetProcessModule();
   
@@ -275,61 +305,16 @@ void vtkSMRenderViewProxy::CreateVTKObjects(int numObjects)
  
   if (pvm->GetOptions()->GetUseStereoRendering())
     {
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->RenderWindowProxy->GetProperty("StereoCapableWindow"));
-    if (!ivp)
-      {
-      vtkErrorMacro("Failed to find propery StereoCapableWindow.");
-      return;
-      }
-    ivp->SetElement(0, 1);
-
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->RenderWindowProxy->GetProperty("StereoRender"));
-    if (!ivp)
-      {
-      vtkErrorMacro("Failed to find property StereoRender.");
-      return;
-      }
-    ivp->SetElement(0, 1);
+    SetIntVectorProperty(this->RenderWindowProxy, "StereoCapableWindow", 1);
+    SetIntVectorProperty(this->RenderWindowProxy, "StereoRender", 1);
     }
 
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->Renderer2DProxy->GetProperty("Erase"));
-  if (!ivp)
-    {
-    vtkErrorMacro("Failed to find property Erase.");
-    return;
-    }
-  ivp->SetElement(0, 0);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->Renderer2DProxy->GetProperty("Layer"));
-  if (!ivp)
-    {
-    vtkErrorMacro("Failed to find property Layer.");
-    return;
-    }
-  ivp->SetElement(0, 2);
+  SetIntVectorProperty(this->Renderer2DProxy, "Erase", 0);
+  SetIntVectorProperty(this->Renderer2DProxy, "Layer", 2);
 
-  // TODO: Enable this to enable depth peeling.
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->RendererProxy->GetProperty("DepthPeeling"));
-  if (!ivp)
-    {
-    vtkErrorMacro("Failed to find property DepthPeeling.");
-    return;
-    }
-  ivp->SetElement(0, 1);
+  SetIntVectorProperty(this->RendererProxy, "DepthPeeling", 1);
+  SetIntVectorProperty(this->RenderWindowProxy, "NumberOfLayers", 3);
    
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->RenderWindowProxy->GetProperty("NumberOfLayers"));
-  if (!ivp)
-    {
-    vtkErrorMacro("Failed to find property NumberOfLayers.");
-    return;
-    }
-  ivp->SetElement(0, 3);
-
   this->Connect(this->RendererProxy, this->RenderWindowProxy, "Renderer");
   this->Connect(this->Renderer2DProxy, this->RenderWindowProxy, "Renderer");
   this->Connect(this->RenderWindowProxy, this->InteractorProxy, "RenderWindow");
@@ -413,14 +398,7 @@ void vtkSMRenderViewProxy::SetLODFlag(bool use_lod)
 {
   if (this->ViewHelper)
     {
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->ViewHelper->GetProperty("LODFlag"));
-    if (!ivp)
-      {
-      vtkErrorMacro("Failed to find property LODFlag on ViewHelper.");
-      return;
-      }
-    ivp->SetElement(0, (use_lod? 1 : 0));
+    SetIntVectorProperty(this->ViewHelper, "LODFlag", use_lod? 1 : 0);
     this->ViewHelper->UpdateProperty("LODFlag");
     }
 }
@@ -542,19 +520,8 @@ void vtkSMRenderViewProxy::PerformRender()
 void vtkSMRenderViewProxy::AddRepresentationInternal(
   vtkSMRepresentationProxy* repr)
 {
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    repr->GetProperty("UseStrips"));
-  if (ivp)
-    {
-    ivp->SetElement(0, this->UseTriangleStrips);
-    }
-
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    repr->GetProperty("ImmediateModeRendering"));
-  if (ivp)
-    {
-    ivp->SetElement(0, this->UseImmediateMode);
-    }
+  SetIntVectorProperty(repr, "UseStrips", this->UseTriangleStrips, false);
+  SetIntVectorProperty(repr, "ImmediateModeRendering", this->UseImmediateMode, false);
 
   this->Superclass::AddRepresentationInternal(repr);
 }
@@ -618,11 +585,8 @@ void vtkSMRenderViewProxy::SetUseImmediateMode(int val)
       {
       continue;
       }
-    vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
-      repr->GetProperty("ImmediateModeRendering"));
-    if (ivp)
+    if (SetIntVectorProperty(repr, "ImmediateModeRendering", val, false))
       {
-      ivp->SetElement(0, val);
       repr->UpdateVTKObjects();
       }
     }
@@ -1021,12 +985,12 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindow(int magnification)
   this->GetRenderWindow()->SetOffScreenRendering(0);
 #endif
 
-  // Update image extents based on WindowPosition.
+  // Update image extents based on ViewPosition
   int extents[6];
   capture->GetExtent(extents);
   for (int cc=0; cc < 4; cc++)
     {
-    extents[cc] += this->WindowPosition[cc/2]*magnification;
+    extents[cc] += this->ViewPosition[cc/2]*magnification;
     }
   capture->SetExtent(extents);
 

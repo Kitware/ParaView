@@ -102,8 +102,8 @@ public:
   // This is useful when using multiple views. 
   // Sets the position of the view associated with this module inside
   // the server render window. (0,0) corresponds to upper left corner.
-  vtkSetVector2Macro(WindowPosition, int);
-  vtkGetVector2Macro(WindowPosition, int);
+  vtkSetVector2Macro(ViewPosition, int);
+  vtkGetVector2Macro(ViewPosition, int);
 
   // Description:
   // Returns the memory size for the visible data.
@@ -147,6 +147,15 @@ protected:
   // both InteractiveRender() and StillRender(). 
   // Default implementation is empty.
   virtual void PerformRender() {};
+
+  // Description:
+  // Called at the start of CreateVTKObjects().
+  // If returns false, CreateVTKObjects is aborted.
+  virtual bool BeginCreateVTKObjects(int vtkNotUsed(numObjects)) {return true; }
+
+  // Description:
+  // Called at the end of CreateVTKObjects().
+  virtual void EndCreateVTKObjects(int vtkNotUsed(numObjects)) {};
 
   // Description:
   // Called by AddRepresentation(). Subclasses can override to add 
@@ -194,7 +203,7 @@ protected:
   vtkCollection* Representations;
 
   int GUISize[2];
-  int WindowPosition[2];
+  int ViewPosition[2];
 
   // Description:
   // View helper is used to pass certain view specific information to the

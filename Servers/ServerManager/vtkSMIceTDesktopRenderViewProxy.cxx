@@ -15,608 +15,369 @@
 #include "vtkSMIceTDesktopRenderViewProxy.h"
 
 #include "vtkClientServerStream.h"
-#include "vtkClientServerID.h"
-#include "vtkCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDisplayInformation.h"
 #include "vtkPVOptions.h"
-#include "vtkRenderWindow.h"
-#include "vtkSMDisplayProxy.h"
-#include "vtkSMCompositeDisplayProxy.h"
-#include "vtkSMDoubleVectorProperty.h"
+#include "vtkPVServerInformation.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMProxyProperty.h"
-
-#include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.2");
-
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.3");
 vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderViewProxy, 
-                     ServerDisplayManagerProxy,
-                     vtkSMProxy);
-
-//-----------------------------------------------------------------------------
-class vtkSMIceTDesktopRenderViewProxyProxySet
-  : public vtkstd::set<vtkSMProxy *> { };
-
-//-----------------------------------------------------------------------------
+  SharedServerRenderSyncManager, vtkSMProxy);
+//----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderViewProxy::vtkSMIceTDesktopRenderViewProxy()
 {
-  this->TileDimensions[0] = this->TileDimensions[1] = 1;
-  this->TileMullions[0] = this->TileMullions[1] = 1;
-  this->RemoteDisplay = 1;
-  this->DisableOrderedCompositing = 0;
-  this->OrderedCompositing = 0;
-
-  this->DisplayManagerProxy = 0;
-  this->PKdTreeProxy = 0;
-  this->PKdTreeGeneratorProxy = 0;
-
-  this->ServerDisplayManagerProxy = 0;
-
-  this->UsingCustomKdTree = 0;
-
-  this->PartitionedData = new vtkSMIceTDesktopRenderViewProxyProxySet;
+  this->RenderSyncManager = 0;
+  this->SharedServerRenderSyncManager = 0;
+  this->SquirtLevel = 0;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderViewProxy::~vtkSMIceTDesktopRenderViewProxy()
 {
-  this->SetServerDisplayManagerProxy(0);
-  delete this->PartitionedData;
+  this->SetSharedServerRenderSyncManager(0);
 }
 
-//-----------------------------------------------------------------------------
-void vtkSMIceTDesktopRenderViewProxy::CreateVTKObjects(int numObjects)
+//----------------------------------------------------------------------------
+bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects(int numObjects)
 {
-  if (this->ObjectsCreated)
-    {
-    return;
-    }
-  this->RendererProxy = this->GetSubProxy("Renderer");
-  this->RenderWindowProxy = this->GetSubProxy("RenderWindow");
-  this->DisplayManagerProxy = this->GetSubProxy("DisplayManager");
-  this->PKdTreeProxy = this->GetSubProxy("PKdTree");
-  this->PKdTreeGeneratorProxy = this->GetSubProxy("PKdTreeGenerator");
-
-  if (!this->RenderWindowProxy)
-    {
-    vtkErrorMacro("RenderWindow subproxy must be defined.");
-    return;
-    }
-
-  if (!this->RendererProxy)
-    {
-    vtkErrorMacro("Renderer subproxy must be defined.");
-    return;
-    }
-
-  if (!this->DisplayManagerProxy)
-    {
-    vtkErrorMacro("DisplayManager subproxy must be defined.");
-    return;
-    }
-
-  if (!this->PKdTreeProxy)
-    {
-    vtkErrorMacro("PKdTree subproxy must be defined.");
-    return;
-    }
-
-  if (!this->PKdTreeGeneratorProxy)
-    {
-    vtkErrorMacro("PKdTreeGenerator subproxy must be defined.");
-    return;
-    }
-
-
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-  this->DisplayManagerProxy->SetServers(vtkProcessModule::RENDER_SERVER);
-  if (this->ServerDisplayManagerProxy)
-    {
-    vtkClientServerID id = pm->GetUniqueID();
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Assign 
-           << id
-           << this->ServerDisplayManagerProxy->GetID(0)
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-      vtkProcessModule::RENDER_SERVER, stream);
-
-    this->DisplayManagerProxy->CreateVTKObjects(0);
-    this->DisplayManagerProxy->SetID(0, id);
-    }
-  this->DisplayManagerProxy->UpdateVTKObjects();
-
-  this->PKdTreeProxy->SetServers(vtkProcessModule::RENDER_SERVER);
-  this->PKdTreeGeneratorProxy->SetServers(vtkProcessModule::RENDER_SERVER);
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->PKdTreeGeneratorProxy->GetProperty("KdTree"));
-  pp->AddProxy(this->PKdTreeProxy);
-  this->PKdTreeGeneratorProxy->UpdateVTKObjects();
-
-  // Allow a minimum number of cells in case we break up small data.
-  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
-                                   this->PKdTreeProxy->GetProperty("MinCells"));
-  ivp->SetElements1(0);
-  this->PKdTreeProxy->UpdateVTKObjects();
-
-  // We must create an ICE-T Renderer on the server and a regular renderer
-  // on the client.
-  this->RendererProxy->SetServers(vtkProcessModule::CLIENT);
-  // Create the client side render.
-  this->RendererProxy->CreateVTKObjects(1); 
-
-  vtkClientServerStream stream1;
-  stream1 << vtkClientServerStream::New 
-          << "vtkIceTRenderer" << this->RendererProxy->GetID(0)
-          << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID,
-    vtkProcessModule::RENDER_SERVER, stream1);
-
-  this->RendererProxy->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  // Now we can use the RendererProxy as one!
-
-  this->RendererProxy->UpdateVTKObjects(); 
-  
-  this->Superclass::CreateVTKObjects(numObjects);
-
-  // Ordered compositing requires alpha bit planes.
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-                        this->RenderWindowProxy->GetProperty("AlphaBitPlanes"));
-  ivp->SetElements1(1);
-
-  this->RenderWindowProxy->UpdateVTKObjects();
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMIceTDesktopRenderViewProxy::InitializeCompositingPipeline()
-{
-  vtkSMIntVectorProperty* ivp;
-  vtkSMProxyProperty* pp;
-
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
 
-  // Cannot do this with the server manager because this method only
-  // exists on the render server, not the client.
-  stream << vtkClientServerStream::Invoke << this->RendererProxy->GetID(0)
-         << "SetSortingKdTree" << this->PKdTreeProxy->GetID(0)
-         << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID,
-    vtkProcessModule::RENDER_SERVER, stream);
-
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->DisplayManagerProxy->GetProperty("TileDimensions"));
-  if (!ivp)
+  // vtkSMIceTCompositeViewProxy (i.e. the superclass) uses the shared render
+  // window directly, however, in client-server mode, we share the render
+  // windows only on the server side. Hence we create client side instances for
+  // the render window.
+  if (this->SharedRenderWindow)
     {
-    vtkErrorMacro("Failed to find property TileDimensions on DisplayManagerProxy.");
-    return;
-    }
-  ivp->SetElements(this->TileDimensions);
+    this->RenderWindowProxy = this->GetSubProxy("RenderWindow");
+    if (!this->RenderWindowProxy)
+      {
+      vtkErrorMacro("RenderWindow subproxy must be defined.");
+      return false;
+      }
 
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->DisplayManagerProxy->GetProperty("TileMullions"));
-  if (!ivp)
-    {
-    vtkErrorMacro("Failed to find property TileMullions on DisplayManagerProxy.");
-    return;
+    this->RenderWindowProxy->SetServers(vtkProcessModule::CLIENT);
+    this->RenderWindowProxy->UpdateVTKObjects();
+
+    stream  << vtkClientServerStream::Assign
+            << this->RenderWindowProxy->GetID(0)
+            << this->SharedRenderWindow->GetID(0)
+            << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
+
+    this->RenderWindowProxy->SetServers(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
-  ivp->SetElements(this->TileMullions);
-  this->DisplayManagerProxy->UpdateVTKObjects(); 
-  // Tile Dimensions must be set before the RenderWindow is set,
-  // hence the call to DisplayManagerProxy->UpdateVTKObjects()  is required.
-  // I know, calling UpdateVTKObjects so many times is waaaay expensive,
-  // but hey! This is called only during creating.
+
+  if (!this->Superclass::BeginCreateVTKObjects(numObjects))
+    {
+    return false;
+    }
+
+  this->RenderSyncManager = this->GetSubProxy("RenderSyncManager");
+  if (!this->RenderSyncManager)
+    {
+    vtkErrorMacro("RenderSyncManager subproxy must be defined.");
+    return false;
+    }
+
+  // RenderSyncManager proxy represents vtkPVDesktopDeliveryClient on the client
+  // side and vtkPVDesktopDeliveryServer on the server root.
+  // Additionally, if SharedServerRenderSyncManager is set, then the server side
+  // vtkPVDesktopDeliveryServer instance is shared among all views.
   
-  pp = vtkSMProxyProperty::SafeDownCast(
-    this->DisplayManagerProxy->GetProperty("RenderWindow"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find property RenderWindow on DisplayManagerProxy.");
-    return;
-    }
-  pp->RemoveAllProxies();
-  pp->AddProxy(this->RenderWindowProxy);
-  this->DisplayManagerProxy->UpdateVTKObjects(); 
-
-  unsigned int i;
-
-  if (this->RenderModuleId == 0)
-    {
-    stream << vtkClientServerStream::Invoke
-           << pm->GetProcessModuleID()
-           << "GetController"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->DisplayManagerProxy->GetID(0) << "SetController"
-           << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->DisplayManagerProxy->GetID(0) 
-           << "InitializeRMIs"
-           << vtkClientServerStream::End;
-    }
-    
-  for (i = 0; i < this->PKdTreeProxy->GetNumberOfIDs(); i++)
-    {
-    vtkClientServerStream cmd;
-
-    stream << vtkClientServerStream::Invoke
-           << pm->GetProcessModuleID() << "GetController"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->PKdTreeProxy->GetID(i) << "SetController"
-           << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << pm->GetProcessModuleID() << "GetController"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << vtkClientServerStream::LastResult << "GetNumberOfProcesses"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->PKdTreeProxy->GetID(i) << "SetNumberOfRegionsOrMore"
-           << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-
-    // Set up logging for building kd-tree.
-    cmd << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "LogStartEvent"
-        << "Build kd-tree" << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->PKdTreeProxy->GetID(i) << "AddObserver"
-           << "StartEvent" << cmd << vtkClientServerStream::End;
-    cmd.Reset();
-    cmd << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "LogEndEvent"
-        << "Build kd-tree" << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->PKdTreeProxy->GetID(i) << "AddObserver"
-           << "EndEvent" << cmd << vtkClientServerStream::End;
-    }
-
-  for (i=0; i < this->PKdTreeGeneratorProxy->GetNumberOfIDs(); i++)
-    {
-    stream << vtkClientServerStream::Invoke
-           << pm->GetProcessModuleID() << "GetController"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << vtkClientServerStream::LastResult << "GetNumberOfProcesses"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->PKdTreeGeneratorProxy->GetID(i) << "SetNumberOfPieces"
-           << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-    }
-  pm->SendStream(this->ConnectionID,
-    vtkProcessModule::RENDER_SERVER, stream);
-
-  this->Superclass::InitializeCompositingPipeline();
+  // XML Configuration defines the client side class for RenderSyncManager.
+  this->RenderSyncManager->SetServers(vtkProcessModule::CLIENT);
+  this->RenderSyncManager->UpdateVTKObjects();
+  // This will create the client side  vtkPVDesktopDeliveryClient.
   
-  
-  for (i=0; i < this->RenderSyncManagerProxy->GetNumberOfIDs(); i++)
+  if (this->SharedServerRenderSyncManager)
     {
-    // The client server manager needs to set parameters on the IceT manager.
-    stream << vtkClientServerStream::Invoke 
-           << this->RenderSyncManagerProxy->GetID(i)
-           << "SetParallelRenderManager" 
-           << this->DisplayManagerProxy->GetID(i)
-           << vtkClientServerStream::End;
-
-    stream << vtkClientServerStream::Invoke 
-           << this->RenderSyncManagerProxy->GetID(i)
-           << "SetRemoteDisplay" 
-           << this->RemoteDisplay 
-           << vtkClientServerStream::End;
+    stream  << vtkClientServerStream::Invoke
+            << this->RenderSyncManager->GetID(0)
+            << this->SharedServerRenderSyncManager->GetID(0)
+            << vtkClientServerStream::End;
+    }
+  else
+    {
+    stream  << vtkClientServerStream::New
+            << "vtkPVDesktopDeliveryServer"
+            << this->RenderSyncManager->GetID(0)
+            << vtkClientServerStream::End;
     }
   pm->SendStream(this->ConnectionID, 
     vtkProcessModule::RENDER_SERVER_ROOT, stream);
 
+  this->RenderSyncManager->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER_ROOT);
+
+  // This class does not use a separate multi-view manager. That is done by
+  // RenderSyncManager itself.
+  this->MultiViewManager = 0;
+
+  // We need to create vtkIceTRenderer on the server side and vtkRenderer on
+  // the client.
+  this->RendererProxy->SetServers(vtkProcessModule::CLIENT);
+  this->RendererProxy->UpdateVTKObjects();
+
+  stream  << vtkClientServerStream::New 
+          << "vtkIceTRenderer" 
+          << this->RendererProxy->GetID(0)
+          << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
+  this->RendererProxy->SetServers(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMIceTDesktopRenderViewProxy::EndCreateVTKObjects(int numObjects)
+{
+  this->Superclass::EndCreateVTKObjects(numObjects);
+
+  // * Initialize the RenderSyncManager.
+  this->InitializeRenderSyncManager();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMIceTDesktopRenderViewProxy::InitializeRenderSyncManager()
+{
+  vtkSMIntVectorProperty* ivp;
+  vtkClientServerStream stream;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
+  // RenderSyncManager needs the parallel render manager on the server side to
+  // pass parameters to the parallel render manager.
+  stream  << vtkClientServerStream::Invoke
+          << this->RenderSyncManager->GetID(0)
+          << "SetParallelRenderManager"
+          << this->ParallelRenderManager->GetID(0)
+          << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, 
+    vtkProcessModule::RENDER_SERVER_ROOT, stream);
+
+  // Synchronize the environment among all the render server nodes.
+  vtkPVServerInformation* serverInfo = pm->GetServerInformation(this->ConnectionID);
+  unsigned int idx;
+  unsigned int numMachines = serverInfo->GetNumberOfMachines();
+  for (idx = 0; idx < numMachines; idx++)
+    {
+    if (serverInfo->GetEnvironment(idx))
+      {
+      stream  << vtkClientServerStream::Invoke 
+              << pm->GetProcessModuleID() 
+              << "SetProcessEnvironmentVariable" 
+              << idx 
+              << serverInfo->GetEnvironment(idx)
+              << vtkClientServerStream::End;
+      }
+    }
+  pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, 
+    stream);
+
+  // RenderSyncManager needs access to the socket controller between the client 
+  // and the render server root. This is the socket connection that is used by
+  // the vtkPVDesktopDeliveryClient and vtkPVDesktopDeliveryServer to
+  // communicate. So, set that up.
+  stream  << vtkClientServerStream::Invoke 
+          << pm->GetProcessModuleID()
+          << "GetRenderServerSocketController"
+          << pm->GetConnectionClientServerID(this->ConnectionID)
+          << vtkClientServerStream::End;
+  stream  << vtkClientServerStream::Invoke 
+          << this->RenderSyncManager->GetID(0)
+          << "SetController" 
+          << vtkClientServerStream::LastResult
+          << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+    this->RenderSyncManager->GetServers(), stream);
+
+  // In case we are using MultiView support, the server side RenderWindow may
+  // have more renderers than this view module has (since all view modules share
+  // the server side render windows). In that case, we don't want to sync the
+  // render window renderers.
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->RenderSyncManager->GetProperty("SyncRenderWindowRenderers"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Falied to find property SyncRenderWindowRenderers");
+    return;
+    }
+  ivp->SetElement(0, 0);
+  this->RenderSyncManager->UpdateVTKObjects();
+
+  // Setup RMI callbacks. 
+  // FIXME: Make InitializeRMIs idempotent.
+  this->RenderSyncManager->InvokeCommand("InitializeRMIs");
+
+  this->Connect(this->RenderWindowProxy, this->RenderSyncManager, "RenderWindow");
+
+  // Update the server process so that the render window is set before
+  // we initialize offscreen rendering.
+  this->RenderSyncManager->UpdateVTKObjects();
+
+  if (getenv("PV_DISABLE_COMPOSITE_INTERRUPTS"))
+    {
+    // Does anything support EnableAbort right now?
+    this->RenderSyncManager->InvokeCommand("EnableAbort");
+    }
+
   if (pm->GetOptions()->GetUseOffscreenRendering())
     {
-    int enableOffscreen = 1;
-
     // Non-mesa, X offscreen rendering requires access to the display
-    
     vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
-    pm->GatherInformation(this->ConnectionID, 
+    pm->GatherInformation(this->ConnectionID,
       vtkProcessModule::RENDER_SERVER, di, pm->GetProcessModuleID());
     if (!di->GetCanOpenDisplay())
       {
-      enableOffscreen = 0;
+      this->RenderSyncManager->InvokeCommand("InitializeOffScreen");
       }
     di->Delete();
-    if (enableOffscreen)
-      {
-      vtkSMProperty* p = 
-        this->DisplayManagerProxy->GetProperty("InitializeOffScreen");
-      if (!p)
-        {
-        vtkErrorMacro("Failed to find property InitializeOffScreen "
-                      "on RenderSyncManagerProxy.");
-        return;
-        }
-      p->Modified();
-      this->DisplayManagerProxy->UpdateVTKObjects();
-      }
     }
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->RenderSyncManager->GetProperty("UseCompositing"));
+  if (ivp)
+    {
+    // So that the server window does not popup until needed.
+    ivp->SetElement(0, 0); 
+    }
+
+  this->RenderSyncManager->UpdateVTKObjects();
+
+  // Make the render sync manager aware of our renderers.
+  stream  << vtkClientServerStream::Invoke 
+          << this->RenderSyncManager->GetID(0)
+          << "AddRenderer" 
+          << (int)this->GetSelfID().ID
+          << this->RendererProxy->GetID(0) 
+          << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+    vtkProcessModule::RENDER_SERVER_ROOT, stream);
+
+  stream  << vtkClientServerStream::Invoke 
+          << this->RenderSyncManager->GetID(0)
+          << "AddRenderer" 
+          << this->RendererProxy->GetID(0)
+          << vtkClientServerStream::End;
+  stream  << vtkClientServerStream::Invoke 
+          << this->RenderSyncManager->GetID(0)
+          << "SetId" 
+          << (int)this->GetSelfID().ID
+          << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
 }
 
-//-----------------------------------------------------------------------------
-void vtkSMIceTDesktopRenderViewProxy::SetOrderedCompositing(int flag)
+//----------------------------------------------------------------------------
+void vtkSMIceTDesktopRenderViewProxy::BeginStillRender()
 {
-  if (this->OrderedCompositing == flag) 
-    {
-    return;
-    }
+  this->Superclass::BeginStillRender();
 
-  this->OrderedCompositing = flag;
-
-  vtkObject *obj;
-  vtkCollection* displays = this->GetDisplays();
-  displays->InitTraversal();
-  for (obj = displays->GetNextItemAsObject(); obj != NULL;
-       obj = displays->GetNextItemAsObject())
-    {
-    vtkSMCompositeDisplayProxy *disp = 
-      vtkSMCompositeDisplayProxy::SafeDownCast(obj);
-    if (disp)
-      {
-      disp->SetOrderedCompositing(this->OrderedCompositing);
-      }
-    }
-
-  if (this->OrderedCompositing)
-    {
-    // Cannot do this with the server manager because this method only
-    // exists on the render server, not the client.
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke << this->RendererProxy->GetID(0)
-           << "SetComposeOperation" << 1 // Over
-           << vtkClientServerStream::End;
-    vtkProcessModule::GetProcessModule()->SendStream(
-                   this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
-    }
-  else
-    {
-    // Cannot do this with the server manager because this method only
-    // exists on the render server, not the client.
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke << this->RendererProxy->GetID(0)
-           << "SetComposeOperation" << 0 // Closest
-           << vtkClientServerStream::End;
-    vtkProcessModule::GetProcessModule()->SendStream(
-                   this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
-    }
+  // Disable squirt compression.
+  this->SetSquirtLevelInternal(0);
 }
 
-/* FIXME: provide the ordered compositing tree on the strategy.
-//-----------------------------------------------------------------------------
-void vtkSMIceTDesktopRenderViewProxy::AddDisplay(
-  vtkSMAbstractDisplayProxy *disp)
+//----------------------------------------------------------------------------
+void vtkSMIceTDesktopRenderViewProxy::BeginInteractiveRender()
 {
-  this->Superclass::AddDisplay(disp);
+  this->Superclass::BeginInteractiveRender();
 
-  vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-    disp->GetProperty("OrderedCompositingTree"));
-  if (pp)
-    {
-    pp->RemoveAllProxies();
-    pp->AddProxy(this->PKdTreeProxy);
-    disp->UpdateProperty("OrderedCompositingTree");
-    }
-
+  // Use user-specified squirt compression.
+  this->SetSquirtLevelInternal(this->SquirtLevel);
 }
 
-//-----------------------------------------------------------------------------
-void vtkSMIceTDesktopRenderViewProxy::RemoveDisplay(
-  vtkSMAbstractDisplayProxy* disp)
+//----------------------------------------------------------------------------
+void vtkSMIceTDesktopRenderViewProxy::SetImageReductionFactorInternal(int factor)
 {
-  vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-    disp->GetProperty("OrderedCompositingTree"));
-  if (pp)
+  // We don't need to set the image reduction factor on the
+  // ParallelRenderManager, but on the RenderSyncManager.
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->RenderSyncManager->GetProperty("ImageReductionFactor"));
+  if (ivp)
     {
-    pp->RemoveAllProxies();
-    pp->AddProxy(0);
-    disp->UpdateProperty("OrderedCompositingTree");
+    ivp->SetElement(0, factor);
+    this->RenderSyncManager->UpdateProperty("ImageReductionFactor");
     }
-
-  this->Superclass::RemoveDisplay(disp);
 }
-*/
 
-//-----------------------------------------------------------------------------
-void vtkSMIceTDesktopRenderViewProxy::StillRender()
+//----------------------------------------------------------------------------
+void vtkSMIceTDesktopRenderViewProxy::SetSquirtLevelInternal(int level)
 {
-  int orderedCompositingNeeded = 0;
-  bool new_dataset = false;
-
-  // This has to happen prior to updating the representations, hence we don't
-  // perform these checks in BeginStillRender().
-  if (!this->DisableOrderedCompositing)
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->RenderSyncManager->GetProperty("SquirtLevel"));
+  if (ivp)
     {
-    // Update the PKdTree, but only if there is something to divide that has
-    // not been divided the last time or some geometry has become invalid.
-    int doBuildLocator = 0;
-
-    // Check to see if there is anything new added to the k-d tree.
-    vtkSMProxyProperty *toPartition = vtkSMProxyProperty::SafeDownCast(
-      this->PKdTreeProxy->GetProperty("DataSets"));
-    unsigned int i, numProxies;
-    numProxies = toPartition->GetNumberOfProxies();
-    for (i = 0; i < numProxies; i++)
-      {
-      if (this->PartitionedData->find(toPartition->GetProxy(i)) == 
-          this->PartitionedData->end() )
-        {
-        doBuildLocator = 1;
-        new_dataset = true;
-        break;
-        }
-      }
-
-    // Check to see if the geometry of any visible objects has changed.
-    vtkObject *obj;
-    vtkCollectionSimpleIterator cookie;
-    vtkCollection* representations = this->Representations;
-    representations->InitTraversal(cookie);
-    for (obj = representations->GetNextItemAsObject(cookie); obj != NULL;
-         obj = representations->GetNextItemAsObject(cookie))
-      {
-      vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(obj);
-      if (repr && repr->GetVisibility())
-        {
-        // Check if the representation requires ordered compositing.
-        if (!orderedCompositingNeeded)
-          {
-          vtkSMPropRepresentationProxy* propRepr = 
-            vtkSMPropRepresentationProxy::SafeDownCast(repr);
-          if (propRepr && propRepr->UseOrderedCompositing())
-            {
-            orderedCompositingNeeded = 1;
-            }
-          }
-
-        if (!disp->UpdateRequired())
-          {
-          doBuildLocator = 1;
-          }
-        }
-
-      if (doBuildLocator && orderedCompositingNeeded)
-        {
-        break;
-        }
-      }
-
-    if (orderedCompositingNeeded)
-      {
-      if (doBuildLocator)
-        {
-        // Update PartitionedData ivar.
-        this->PartitionedData->erase(this->PartitionedData->begin(),
-                                     this->PartitionedData->end());
-        for (i = 0; i < numProxies; i++)
-          {
-          this->PartitionedData->insert(toPartition->GetProxy(i));
-          }
-        
-        // For all visibile displays, make sure their geometry is up to date
-        // for the k-d tree and make sure the distribution gets updated after
-        // the tree is reformed.
-        // At the same time, we will also check if any display is
-        // volume rendering structured data. If so, we need to 
-        // generate the k-d tree using the structured data's distribution.
-        // Currently, at most one display can volume render structured
-        // data.
-        displays = this->GetDisplays();
-        displays->InitTraversal(cookie);
-        int self_generate_kdtree = 0;
-        for (obj = displays->GetNextItemAsObject(cookie); obj != NULL;
-          obj = displays->GetNextItemAsObject(cookie))
-          {
-          vtkSMCompositeDisplayProxy *disp = 
-            vtkSMCompositeDisplayProxy::SafeDownCast(obj);
-          if (disp && disp->GetVisibilityCM())
-            {
-            disp->Update(this);
-            disp->InvalidateDistributedGeometry();
-
-            if (!self_generate_kdtree &&
-              disp->GetVolumeRenderMode() && disp->GetVolumePipelineType() 
-              == vtkSMDataObjectDisplayProxy::IMAGE_DATA)
-              {
-              // We are volume rendering structured data. We need to build 
-              // the k-d tree using the data distribution. 
-              self_generate_kdtree = 1;
-              disp->BuildKdTreeUsingDataPartitions(this->PKdTreeGeneratorProxy);
-              }
-            }
-          }
-
-        vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-        if (!self_generate_kdtree && this->UsingCustomKdTree)
-          {
-          // we need to ensure that the PKdTreeProxy no longer
-          // uses the user-defined cuts. Settings the cuts to NULL
-          // ensures that. 
-          vtkClientServerStream stream;
-          stream << vtkClientServerStream::Invoke
-            << this->PKdTreeProxy->GetID(0)
-            << "SetCuts" << 0
-            << vtkClientServerStream::End;
-          pm->SendStream(this->PKdTreeProxy->GetConnectionID(),
-            this->PKdTreeProxy->GetServers(), stream);
-          }
-        this->UsingCustomKdTree = self_generate_kdtree;
-        
-        // Build the global k-d tree.
-        pm->SendPrepareProgress(this->GetConnectionID());
-        this->PKdTreeProxy->InvokeCommand("BuildLocator");
-        pm->SendCleanupPendingProgress(this->GetConnectionID());
-        }
-      }
+    ivp->SetElement(0, level);
+    this->RenderSyncManager->UpdateProperty("SquirtLevel");
     }
-
-  if (new_dataset && this->OrderedCompositing && orderedCompositingNeeded)
-    {
-    // SetOrderedCompositing has no effect if OrderedCompositing is value
-    // is unchanged. However, a new display was added and it's 
-    // OrderedCompositing flag hasn;t been synchronized with that
-    // of the render module. Clearing the value will ensure
-    // that SetOrderedCompositing() will update all displays.
-    this->OrderedCompositing = 0;
-    }
-
-  this->SetOrderedCompositing(orderedCompositingNeeded);
-
-  this->Superclass::StillRender();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+void vtkSMIceTDesktopRenderViewProxy::SetUseCompositing(bool usecompositing)
+{
+  // We don't need to set the UseCompositing flag on the
+  // ParallelRenderManager, but on the RenderSyncManager.
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->RenderSyncManager->GetProperty("UseCompositing"));
+  if (ivp)
+    {
+    ivp->SetElement(0, usecompositing? 1 : 0);
+    this->RenderSyncManager->UpdateProperty("UseCompositing");
+    } 
+
+  // We need to make all representation strategies aware of our compositing
+  // decision. To do that, we set it on the ViewHelper. All strategies use
+  // ViewHelper to get LOD or Compositing decisions made by the view.
+  if (this->ViewHelper)
+    {
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->ViewHelper->GetProperty("UseCompositing"));
+    if (!ivp)
+      {
+      vtkErrorMacro("Failed to find property CompositingFlag on ViewHelper.");
+      return;
+      }
+    ivp->SetElement(0, (usecompositing? 1 : 0));
+    this->ViewHelper->UpdateProperty("CompositingFlag");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMIceTDesktopRenderViewProxy::SetGUISize(int x, int y)
+{
+  this->vtkSMRenderViewProxy::SetGUISize(x, y);
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  stream  << vtkClientServerStream::Invoke 
+          << this->RenderSyncManager->GetID(0)
+          << "SetGUISize" << x << y
+          << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMIceTDesktopRenderViewProxy::SetViewPosition(int x, int y)
+{
+  this->Superclass::SetViewPosition(x, y);
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  stream  << vtkClientServerStream::Invoke 
+          << this->RenderSyncManager->GetID(0)
+          << "SetWindowPosition" << x << y
+          << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMIceTDesktopRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "TileDimensions: " << this->TileDimensions[0] 
-    << ", " << this->TileDimensions[1] << endl;
-  os << indent << "RemoteDisplay: " << this->RemoteDisplay 
-    << endl;
-  os << indent << "DisableOrderedCompositing: " 
-     << this->DisableOrderedCompositing << endl;
-
-  os << indent << "DisplayManagerProxy: ";
-  if (this->DisplayManagerProxy)
-    {
-    this->DisplayManagerProxy->PrintSelf(os, indent.GetNextIndent());
-    }
-  else
-    {
-    os << "(none)" << endl;
-    }
-
-  os << indent << "PKdTreeProxy: ";
-  if (this->PKdTreeProxy)
-    {
-    this->PKdTreeProxy->PrintSelf(os, indent.GetNextIndent());
-    }
-  else
-    {
-    os << "(none)" << endl;
-    }
-
-  os << indent << "ServerDisplayManagerProxy: ";
-  if (this->ServerDisplayManagerProxy)
-    {
-    this->ServerDisplayManagerProxy->PrintSelf(os, indent.GetNextIndent());
-    }
-  else
-    {
-    os << "(none)" << endl;
-    }
 }
+
 
