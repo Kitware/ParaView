@@ -4,15 +4,14 @@
 #include "pqHistogramListModel.h"
 #include "pqHistogramWidget.h"
 
-#include <QApplication>
 #include <QColor>
 #include <QTimer>
-#include <QKeyEvent>
-#include <QtTest>
+
+#include "QTestApp.h"
 
 int HistogramInteraction(int argc, char* argv[])
 {
-  QApplication app(argc, argv);
+  QTestApp app(argc, argv);
 
   // Set up the histogram.
   pqHistogramWidget *histogram = new pqHistogramWidget();
@@ -37,29 +36,35 @@ int HistogramInteraction(int argc, char* argv[])
 
   histogram->show();
 
-  int status = 0;
-
   // zoom some
-  QTest::keyClick(histogram, Qt::Key_Plus, Qt::NoModifier, 20);
-  QTest::keyClick(histogram, Qt::Key_Plus, Qt::NoModifier, 20);
-  QTest::keyClick(histogram, Qt::Key_Minus, Qt::NoModifier, 20);
+  QTestApp::keyClick(histogram, Qt::Key_Plus, Qt::NoModifier, 20);
+  QTestApp::keyClick(histogram, Qt::Key_Plus, Qt::NoModifier, 20);
+  QTestApp::keyClick(histogram, Qt::Key_Minus, Qt::NoModifier, 20);
   // pan some
-  QTest::keyClick(histogram, Qt::Key_Left, Qt::NoModifier, 20);
-  QTest::keyClick(histogram, Qt::Key_Right, Qt::NoModifier, 20);
-  QTest::keyClick(histogram, Qt::Key_Down, Qt::NoModifier, 20);
-  QTest::keyClick(histogram, Qt::Key_Up, Qt::NoModifier, 20);
+  QTestApp::keyClick(histogram, Qt::Key_Left, Qt::NoModifier, 20);
+  QTestApp::keyClick(histogram, Qt::Key_Right, Qt::NoModifier, 20);
+  QTestApp::keyClick(histogram, Qt::Key_Down, Qt::NoModifier, 20);
+  QTestApp::keyClick(histogram, Qt::Key_Up, Qt::NoModifier, 20);
 
   // some mouse interaction
-  QTest::mouseClick(histogram->viewport(), Qt::LeftButton, 0, 
-                    QPoint(size[0]/2, size[1]/2), 20);
-  QTest::mouseClick(histogram->viewport(), Qt::LeftButton, 0, 
-                    QPoint(size[0]/3, size[1]/2), 20);
+  QTestApp::mouseClick(histogram->viewport(), QPoint(size[0]/2, size[1]/2), 
+                       Qt::LeftButton, 0, 20);
+  QTestApp::mouseClick(histogram->viewport(), QPoint(size[0]/3, size[1]/2),
+                       Qt::LeftButton, 0, 20);
+  
+  QTestApp::mouseDown(histogram->viewport(), QPoint(size[0]/4, size[1]/2),
+                       Qt::LeftButton, 0, 20);
+  QTestApp::mouseMove(histogram->viewport(), QPoint(size[0]/2, size[1]/2),
+                       Qt::LeftButton, 0, 20);
+  QTestApp::mouseUp(histogram->viewport(), QPoint(size[0]/2, size[1]/2),
+                       Qt::LeftButton, 0, 20);
 
-  if(app.arguments().contains("--exit"))
+  if(QCoreApplication::arguments().contains("--exit"))
     {
     QTimer::singleShot(100, QApplication::instance(), SLOT(quit()));
     }
-  status += QApplication::exec();
+  
+  int status = QTestApp::exec();
 
   delete histogram;
   delete model;

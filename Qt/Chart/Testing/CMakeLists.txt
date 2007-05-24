@@ -1,9 +1,6 @@
 
 PROJECT(pqChartTest)
 
-SET(QT_USE_QTTEST ON)
-INCLUDE(${QT_USE_FILE})
-
 SET(MyTests
   ColorMap
   Histogram
@@ -14,7 +11,7 @@ SET(MyTests
 
 INCLUDE_DIRECTORIES(${QtChart_SOURCE_DIR} ${QtChart_BINARY_DIR})
 CREATE_TEST_SOURCELIST(Tests pqChartTest.cxx ${MyTests}) 
-ADD_EXECUTABLE(pqChartTest MACOSX_BUNDLE ${Tests})
+ADD_EXECUTABLE(pqChartTest MACOSX_BUNDLE QTestApp.cxx ${Tests})
 TARGET_LINK_LIBRARIES(pqChartTest QtChart ${QT_LIBRARIES})
   
 MACRO(GET_TEST_BINARY in out)
