@@ -176,6 +176,7 @@ SET(Kit_SRCS
   vtkSMUniformGridVolumeRepresentationProxy.cxx
   vtkSMUnstructuredGridVolumeRepresentationProxy.cxx
   vtkSMUnstructuredGridVolumeStrategyProxy.cxx
+  vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMViewProxy.cxx
   )
 
