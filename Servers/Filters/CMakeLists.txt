@@ -10,7 +10,6 @@ ENDIF(PARAVIEW_ENABLE_PYTHON)
 
 
 SET(Filters_SRCS
-  vtkAcuSolveReaderProxy.cxx
   vtkAppendRectilinearGrid.cxx
   vtkAttributeDataReductionFilter.cxx
   vtkAttributeEditor.cxx
@@ -96,7 +95,6 @@ SET(Filters_SRCS
   vtkPVTrackballRoll.cxx
   vtkPVTrackballRotate.cxx
   vtkPVTrackballZoom.cxx
-  vtkPVTreeComposite.cxx
   vtkPVUpdateSuppressor.cxx
   vtkPVVisibleCellSelector.cxx
   vtkReductionFilter.cxx

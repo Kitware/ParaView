@@ -73,7 +73,6 @@
 #include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMCompositeDisplayProxy.h"
 #include "vtkSMMultiDisplayProxy.h"
-#include "vtkSMXYPlotDisplayProxy.h"
 #include "vtkSMXYPlotActorProxy.h"
 #include "vtkSMScalarBarActorProxy.h"
 
@@ -157,7 +156,6 @@ int main(int , char *[])
   c = vtkSMDataObjectDisplayProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMCompositeDisplayProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMMultiDisplayProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMXYPlotDisplayProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMXYPlotActorProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMScalarBarActorProxy::New(); c->Print( cout ); c->Delete();
 

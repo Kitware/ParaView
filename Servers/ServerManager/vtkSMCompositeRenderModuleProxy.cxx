@@ -26,7 +26,6 @@
 #include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
 #include "vtkPVServerInformation.h"
-#include "vtkPVTreeComposite.h"
 #include "vtkPointData.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMCompositeDisplayProxy.h"
@@ -36,7 +35,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkWindowToImageFilter.h"
 
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.21");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {

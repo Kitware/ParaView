@@ -95,8 +95,6 @@ SET(Kit_SRCS
   vtkSMOrderedPropertyIterator.cxx
   vtkSMPVDWriterProxy.cxx
   vtkSMPart.cxx
-  vtkSMPickLineWidgetProxy.cxx
-  vtkSMPickPointWidgetProxy.cxx
   vtkSMPluginLoader.cxx
   vtkSMPointWidgetProxy.cxx 
   vtkSMProperty.cxx
@@ -163,10 +161,8 @@ SET(Kit_SRCS
   vtkSMWidgetRepresentationProxy.cxx
   vtkSMWriterProxy.cxx
   vtkSMCubeAxesDisplayProxy.cxx
-  vtkSMPointLabelDisplayProxy.cxx
   vtkSMXMLPVAnimationWriterProxy.cxx
   vtkSMXYPlotActorProxy.cxx
-  vtkSMXYPlotDisplayProxy.cxx
 
   vtkSMDataRepresentationProxy.cxx
   vtkSMIceTCompositeViewProxy.cxx
@@ -181,11 +177,6 @@ SET(Kit_SRCS
   vtkSMUnstructuredGridVolumeRepresentationProxy.cxx
   vtkSMUnstructuredGridVolumeStrategyProxy.cxx
   vtkSMViewProxy.cxx
-  )
-
-SET( ServerManagerCS_SRCS
-  vtkPickPointWidget.cxx
-  vtkPickLineWidget.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS
