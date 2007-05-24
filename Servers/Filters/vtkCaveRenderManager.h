@@ -20,12 +20,11 @@
 // and the origin is where the person is initially standing.  The
 // person can move to an arbitrary location, but the defining cameras
 // are always positioned at the origin.
-// This might replace vtkMultiDisplayManager in the future.
 
 // This assumes data is duplicated on all nodes.  There is no compositing.
 
 // .SECTION see also
-// vtkRenderWindow vtkCompositeManager vtkMultiDisplayManager.
+// vtkRenderWindow vtkCompositeManager
 
 #ifndef __vtkCaveRenderManager_h
 #define __vtkCaveRenderManager_h
@@ -37,12 +36,9 @@ class vtkMultiProcessController;
 class vtkSocketController;
 class vtkRenderer;
 class vtkCamera;
-class vtkTiledDisplaySchedule;
-class vtkPVCompositeUtilities;
 class vtkFloatArray;
 class vtkUnsignedCharArray;
 class vtkPVCaveClientInfo;
-class vtkPVCompositeBuffer;
 
 class VTK_EXPORT vtkCaveRenderManager : public vtkParallelRenderManager
 {

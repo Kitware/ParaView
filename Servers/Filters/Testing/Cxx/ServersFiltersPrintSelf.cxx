@@ -24,11 +24,8 @@
 #include "vtkIntegrateAttributes.h"
 #include "vtkIntegrateFlowThroughSurface.h"
 #include "vtkMPICompositeManager.h"
-#include "vtkMPIDuplicatePolyData.h"
-#include "vtkMPIDuplicateUnstructuredGrid.h"
 #include "vtkMPIMoveData.h"
 #include "vtkMergeArrays.h"
-#include "vtkMultiDisplayManager.h"
 #include "vtkOrderedCompositeDistributor.h"
 #include "vtkPhastaReader.h"
 #include "vtkPickFilter.h"
@@ -36,8 +33,6 @@
 #include "vtkPPickFilter.h"
 #include "vtkPVArrowSource.h"
 #include "vtkPVClipDataSet.h"
-#include "vtkPVCompositeBuffer.h"
-#include "vtkPVCompositeUtilities.h"
 #include "vtkPVConnectivityFilter.h"
 #include "vtkPVDesktopDeliveryClient.h"
 #include "vtkPVDesktopDeliveryServer.h"
@@ -73,7 +68,6 @@
 #include "vtkSubdivisionAlgorithm.h"
 #include "vtkSurfaceVectors.h"
 #include "vtkTessellatorFilter.h"
-#include "vtkTiledDisplaySchedule.h"
 #include "vtkUpdateSuppressorPipeline.h"
 #include "vtkVRMLSource.h"
 #include "vtkXMLCollectionReader.h"
@@ -91,7 +85,6 @@
 #  include "vtkIceTRenderer.h"
 #  include "vtkIceTRenderManager.h"
 # endif
-# include "vtkPVDuplicatePolyData.h"
 # include "vtkRedistributePolyData.h"
 //#include "vtkStructuredCacheFilter.h"
 # include "vtkWeightedRedistributePolyData.h"
@@ -111,10 +104,7 @@ int main(int , char *[])
   c = vtkIntegrateFlowThroughSurface::New(); c->Print(cout); c->Delete();
   c = vtkMergeArrays::New(); c->Print(cout); c->Delete();
   c = vtkMPICompositeManager::New(); c->Print(cout); c->Delete();
-  c = vtkMPIDuplicatePolyData::New(); c->Print(cout); c->Delete();
-  c = vtkMPIDuplicateUnstructuredGrid::New(); c->Print(cout); c->Delete();
   c = vtkMPIMoveData::New(); c->Print(cout); c->Delete();
-  c = vtkMultiDisplayManager::New(); c->Print(cout); c->Delete();
   c = vtkOrderedCompositeDistributor::New(); c->Print(cout); c->Delete();
   c = vtkPhastaReader::New(); c->Print(cout); c->Delete();
   c = vtkPickFilter::New(); c->Print(cout); c->Delete();
@@ -122,8 +112,6 @@ int main(int , char *[])
   c = vtkPPickFilter::New(); c->Print(cout); c->Delete();
   c = vtkPVArrowSource::New(); c->Print(cout); c->Delete();
   c = vtkPVClipDataSet::New(); c->Print(cout); c->Delete();
-  c = vtkPVCompositeBuffer::New(); c->Print(cout); c->Delete();
-  c = vtkPVCompositeUtilities::New(); c->Print(cout); c->Delete();
   c = vtkPVConnectivityFilter::New(); c->Print(cout); c->Delete();
   c = vtkPVDesktopDeliveryClient::New(); c->Print(cout); c->Delete();
   c = vtkPVDesktopDeliveryServer::New(); c->Print(cout); c->Delete();
@@ -155,7 +143,6 @@ int main(int , char *[])
   c = vtkStreamingTessellator::New(); c->Print(cout); c->Delete();
   c = vtkSubdivisionAlgorithm::New(); c->Print(cout); c->Delete();
   c = vtkTessellatorFilter::New(); c->Print(cout); c->Delete();
-  c = vtkTiledDisplaySchedule::New(); c->Print(cout); c->Delete();
   c = vtkUpdateSuppressorPipeline::New(); c->Print(cout); c->Delete();
   c = vtkVRMLSource::New(); c->Print(cout); c->Delete();
   c = vtkXMLCollectionReader::New(); c->Print(cout); c->Delete();
@@ -173,7 +160,6 @@ int main(int , char *[])
   c = vtkIceTRenderer::New(); c->Print(cout); c->Delete();
   c = vtkIceTRenderManager::New(); c->Print(cout); c->Delete();
 # endif
-  c = vtkPVDuplicatePolyData::New(); c->Print(cout); c->Delete();
   c = vtkRedistributePolyData::New(); c->Print(cout); c->Delete();
 //  c = vtkStructuredCacheFilter::New(); c->Print(cout); c->Delete();
   c = vtkWeightedRedistributePolyData::New(); c->Print(cout); c->Delete();

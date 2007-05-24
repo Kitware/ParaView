@@ -2399,52 +2399,6 @@
       </Property>
     </Proxy>
 
-    <Proxy name="MultiDisplayManager" class="vtkMultiDisplayManager">
-       <ProxyProperty
-        name="RenderWindow"
-        command="SetRenderWindow">
-        <ProxyGroupDomain name="groups">
-          <Group name="renderwindow" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
-      <Property
-        name="InitializeOffScreen"
-        command="InitializeOffScreen">
-      </Property>
-      <Property
-        name="InitializeRMIs"
-        command="InitializeRMIs">
-      </Property>
-      <IntVectorProperty
-        name="ImageReductionFactor"
-        command="SetImageReductionFactor"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="0" />
-      </IntVectorProperty>
-      <IntVectorProperty
-        name="UseCompositing"
-        command="SetUseCompositing"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty
-        name="TileDimensions"
-        command="SetTileDimensions"
-        number_of_elements="2"
-        default_values="0 0">
-        <IntRangeDomain name="range" min="0 0" />
-      </IntVectorProperty>
-      <IntVectorProperty
-        name="UseCompositeCompression"
-        command="SetUseCompositeCompression"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-    </Proxy>
-    
     <Proxy name="MPICompositeManager" class="vtkMPICompositeManager">
       <ProxyProperty
         name="RenderWindow"

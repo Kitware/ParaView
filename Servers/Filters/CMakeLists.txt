@@ -39,10 +39,7 @@ SET(Filters_SRCS
   vtkMergeArrays.cxx
   vtkMinMax.cxx
   vtkMPICompositeManager.cxx
-  vtkMPIDuplicatePolyData.cxx
-  vtkMPIDuplicateUnstructuredGrid.cxx
   vtkMPIMoveData.cxx
-  vtkMultiDisplayManager.cxx
   vtkNetworkImageSource.cxx
   vtkOrderedCompositeDistributor.cxx
   vtkPExtractHistogram.cxx
@@ -55,8 +52,6 @@ SET(Filters_SRCS
   vtkPVAnimationScene.cxx
   vtkPVArrowSource.cxx
   vtkPVClipDataSet.cxx
-  vtkPVCompositeBuffer.cxx
-  vtkPVCompositeUtilities.cxx
   vtkPVConnectivityFilter.cxx
   vtkPVDesktopDeliveryClient.cxx
   vtkPVDesktopDeliveryServer.cxx
@@ -113,7 +108,6 @@ SET(Filters_SRCS
 #  vtkTemporalPickFilter.cxx
 #  vtkTemporalProbeFilter.cxx
   vtkTessellatorFilter.cxx
-  vtkTiledDisplaySchedule.cxx
   vtkTimeToTextConvertor.cxx
   vtkTrackballPan.cxx
   vtkTransferFunctionEditorRepresentation.cxx
@@ -167,7 +161,6 @@ IF(VTK_USE_MPI)
   SET(Filters_SRCS ${Filters_SRCS}
     vtkBalancedRedistributePolyData.cxx
     vtkAllToNRedistributePolyData.cxx
-    vtkPVDuplicatePolyData.cxx
     vtkRedistributePolyData.cxx
     vtkWeightedRedistributePolyData.cxx
     )
