@@ -2180,6 +2180,89 @@
     </Property>
     <SubProxy name="Prop2D" id="95"/>
   </Proxy>
+  <Proxy group="displays" type="PointLabelDisplay" id="97">
+    <Property name="Input" id="97.Input" number_of_elements="1">
+      <Proxy value="35"/>
+      <Domain name="groups" id="97.Input.groups">
+        <Group value="sources"/>
+        <Group value="filters"/>
+        <Group value="glyph_sources"/>
+      </Domain>
+    </Property>
+    <Property name="Bold" id="97.Bold" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="97.Bold.bool"/>
+    </Property>
+    <Property name="Color" id="97.Color" number_of_elements="3">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Element index="2" value="1"/>
+      <Domain name="range" id="97.Color.range">
+        <Min index="0" value="0"/>
+        <Min index="1" value="0"/>
+        <Min index="2" value="0"/>
+        <Max index="0" value="1"/>
+        <Max index="1" value="1"/>
+        <Max index="2" value="1"/>
+      </Domain>
+    </Property>
+    <Property name="FontFamily" id="97.FontFamily" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="97.FontFamily.enum">
+        <Entry value="0" text="Arial"/>
+        <Entry value="1" text="Courier"/>
+        <Entry value="2" text="Times"/>
+      </Domain>
+    </Property>
+    <Property name="FontSize" id="97.FontSize" number_of_elements="1">
+      <Element index="0" value="24"/>
+      <Domain name="range" id="97.FontSize.range">
+        <Min index="0" value="0"/>
+      </Domain>
+    </Property>
+    <Property name="Italic" id="97.Italic" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="97.Italic.bool"/>
+    </Property>
+    <Property name="LabelMode" id="97.LabelMode" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="97.LabelMode.enum">
+        <Entry value="0" text="IDs"/>
+        <Entry value="1" text="Scalars"/>
+        <Entry value="2" text="Vectors"/>
+        <Entry value="3" text="Normals"/>
+        <Entry value="4" text="TCoords"/>
+        <Entry value="5" text="Tensors"/>
+        <Entry value="6" text="FieldData"/>
+      </Domain>
+    </Property>
+    <Property name="Opacity" id="97.Opacity" number_of_elements="1">
+      <Element index="0" value="1"/>
+    </Property>
+    <Property name="Position" id="97.Position" number_of_elements="2">
+      <Element index="0" value="0"/>
+      <Element index="1" value="0"/>
+      <Domain name="range" id="97.Position.range"/>
+    </Property>
+    <Property name="Position2" id="97.Position2" number_of_elements="2">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Domain name="range" id="97.Position2.range"/>
+    </Property>
+    <Property name="Shadow" id="97.Shadow" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="97.Shadow.bool"/>
+    </Property>
+    <Property name="Visibility" id="97.Visibility" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="bool" id="97.Visibility.bool"/>
+    </Property>
+    <SubProxy name="Collect" id="98"/>
+    <SubProxy name="Mapper" id="101"/>
+    <SubProxy name="Prop2D" id="104"/>
+    <SubProxy name="Property" id="106"/>
+    <SubProxy name="UpdateSuppressor" id="108"/>
+  </Proxy>
   <Proxy group="displays" type="CubeAxesDisplay" id="172">
     <Property name="Input" id="172.Input" number_of_elements="1">
       <Proxy value="113"/>
@@ -2194,6 +2277,89 @@
       <Domain name="bool" id="172.Visibility.bool"/>
     </Property>
     <SubProxy name="Prop2D" id="173"/>
+  </Proxy>
+  <Proxy group="displays" type="PointLabelDisplay" id="175">
+    <Property name="Input" id="175.Input" number_of_elements="1">
+      <Proxy value="113"/>
+      <Domain name="groups" id="175.Input.groups">
+        <Group value="sources"/>
+        <Group value="filters"/>
+        <Group value="glyph_sources"/>
+      </Domain>
+    </Property>
+    <Property name="Bold" id="175.Bold" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="175.Bold.bool"/>
+    </Property>
+    <Property name="Color" id="175.Color" number_of_elements="3">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Element index="2" value="1"/>
+      <Domain name="range" id="175.Color.range">
+        <Min index="0" value="0"/>
+        <Min index="1" value="0"/>
+        <Min index="2" value="0"/>
+        <Max index="0" value="1"/>
+        <Max index="1" value="1"/>
+        <Max index="2" value="1"/>
+      </Domain>
+    </Property>
+    <Property name="FontFamily" id="175.FontFamily" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="175.FontFamily.enum">
+        <Entry value="0" text="Arial"/>
+        <Entry value="1" text="Courier"/>
+        <Entry value="2" text="Times"/>
+      </Domain>
+    </Property>
+    <Property name="FontSize" id="175.FontSize" number_of_elements="1">
+      <Element index="0" value="24"/>
+      <Domain name="range" id="175.FontSize.range">
+        <Min index="0" value="0"/>
+      </Domain>
+    </Property>
+    <Property name="Italic" id="175.Italic" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="175.Italic.bool"/>
+    </Property>
+    <Property name="LabelMode" id="175.LabelMode" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="175.LabelMode.enum">
+        <Entry value="0" text="IDs"/>
+        <Entry value="1" text="Scalars"/>
+        <Entry value="2" text="Vectors"/>
+        <Entry value="3" text="Normals"/>
+        <Entry value="4" text="TCoords"/>
+        <Entry value="5" text="Tensors"/>
+        <Entry value="6" text="FieldData"/>
+      </Domain>
+    </Property>
+    <Property name="Opacity" id="175.Opacity" number_of_elements="1">
+      <Element index="0" value="1"/>
+    </Property>
+    <Property name="Position" id="175.Position" number_of_elements="2">
+      <Element index="0" value="0"/>
+      <Element index="1" value="0"/>
+      <Domain name="range" id="175.Position.range"/>
+    </Property>
+    <Property name="Position2" id="175.Position2" number_of_elements="2">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Domain name="range" id="175.Position2.range"/>
+    </Property>
+    <Property name="Shadow" id="175.Shadow" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="175.Shadow.bool"/>
+    </Property>
+    <Property name="Visibility" id="175.Visibility" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="bool" id="175.Visibility.bool"/>
+    </Property>
+    <SubProxy name="Collect" id="176"/>
+    <SubProxy name="Mapper" id="179"/>
+    <SubProxy name="Prop2D" id="182"/>
+    <SubProxy name="Property" id="184"/>
+    <SubProxy name="UpdateSuppressor" id="186"/>
   </Proxy>
   <Proxy group="displays" type="CubeAxesDisplay" id="1188">
     <Property name="Input" id="1188.Input" number_of_elements="1">
@@ -2210,6 +2376,89 @@
     </Property>
     <SubProxy name="Prop2D" id="1189"/>
   </Proxy>
+  <Proxy group="displays" type="PointLabelDisplay" id="1191">
+    <Property name="Input" id="1191.Input" number_of_elements="1">
+      <Proxy value="1129"/>
+      <Domain name="groups" id="1191.Input.groups">
+        <Group value="sources"/>
+        <Group value="filters"/>
+        <Group value="glyph_sources"/>
+      </Domain>
+    </Property>
+    <Property name="Bold" id="1191.Bold" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="1191.Bold.bool"/>
+    </Property>
+    <Property name="Color" id="1191.Color" number_of_elements="3">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Element index="2" value="1"/>
+      <Domain name="range" id="1191.Color.range">
+        <Min index="0" value="0"/>
+        <Min index="1" value="0"/>
+        <Min index="2" value="0"/>
+        <Max index="0" value="1"/>
+        <Max index="1" value="1"/>
+        <Max index="2" value="1"/>
+      </Domain>
+    </Property>
+    <Property name="FontFamily" id="1191.FontFamily" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="1191.FontFamily.enum">
+        <Entry value="0" text="Arial"/>
+        <Entry value="1" text="Courier"/>
+        <Entry value="2" text="Times"/>
+      </Domain>
+    </Property>
+    <Property name="FontSize" id="1191.FontSize" number_of_elements="1">
+      <Element index="0" value="24"/>
+      <Domain name="range" id="1191.FontSize.range">
+        <Min index="0" value="0"/>
+      </Domain>
+    </Property>
+    <Property name="Italic" id="1191.Italic" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="1191.Italic.bool"/>
+    </Property>
+    <Property name="LabelMode" id="1191.LabelMode" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="1191.LabelMode.enum">
+        <Entry value="0" text="IDs"/>
+        <Entry value="1" text="Scalars"/>
+        <Entry value="2" text="Vectors"/>
+        <Entry value="3" text="Normals"/>
+        <Entry value="4" text="TCoords"/>
+        <Entry value="5" text="Tensors"/>
+        <Entry value="6" text="FieldData"/>
+      </Domain>
+    </Property>
+    <Property name="Opacity" id="1191.Opacity" number_of_elements="1">
+      <Element index="0" value="1"/>
+    </Property>
+    <Property name="Position" id="1191.Position" number_of_elements="2">
+      <Element index="0" value="0"/>
+      <Element index="1" value="0"/>
+      <Domain name="range" id="1191.Position.range"/>
+    </Property>
+    <Property name="Position2" id="1191.Position2" number_of_elements="2">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Domain name="range" id="1191.Position2.range"/>
+    </Property>
+    <Property name="Shadow" id="1191.Shadow" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="1191.Shadow.bool"/>
+    </Property>
+    <Property name="Visibility" id="1191.Visibility" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="bool" id="1191.Visibility.bool"/>
+    </Property>
+    <SubProxy name="Collect" id="1192"/>
+    <SubProxy name="Mapper" id="1195"/>
+    <SubProxy name="Prop2D" id="1198"/>
+    <SubProxy name="Property" id="1200"/>
+    <SubProxy name="UpdateSuppressor" id="1202"/>
+  </Proxy>
   <Proxy group="displays" type="CubeAxesDisplay" id="250">
     <Property name="Input" id="250.Input" number_of_elements="1">
       <Proxy value="191"/>
@@ -2224,6 +2473,89 @@
       <Domain name="bool" id="250.Visibility.bool"/>
     </Property>
     <SubProxy name="Prop2D" id="251"/>
+  </Proxy>
+  <Proxy group="displays" type="PointLabelDisplay" id="253">
+    <Property name="Input" id="253.Input" number_of_elements="1">
+      <Proxy value="191"/>
+      <Domain name="groups" id="253.Input.groups">
+        <Group value="sources"/>
+        <Group value="filters"/>
+        <Group value="glyph_sources"/>
+      </Domain>
+    </Property>
+    <Property name="Bold" id="253.Bold" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="253.Bold.bool"/>
+    </Property>
+    <Property name="Color" id="253.Color" number_of_elements="3">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Element index="2" value="1"/>
+      <Domain name="range" id="253.Color.range">
+        <Min index="0" value="0"/>
+        <Min index="1" value="0"/>
+        <Min index="2" value="0"/>
+        <Max index="0" value="1"/>
+        <Max index="1" value="1"/>
+        <Max index="2" value="1"/>
+      </Domain>
+    </Property>
+    <Property name="FontFamily" id="253.FontFamily" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="253.FontFamily.enum">
+        <Entry value="0" text="Arial"/>
+        <Entry value="1" text="Courier"/>
+        <Entry value="2" text="Times"/>
+      </Domain>
+    </Property>
+    <Property name="FontSize" id="253.FontSize" number_of_elements="1">
+      <Element index="0" value="24"/>
+      <Domain name="range" id="253.FontSize.range">
+        <Min index="0" value="0"/>
+      </Domain>
+    </Property>
+    <Property name="Italic" id="253.Italic" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="253.Italic.bool"/>
+    </Property>
+    <Property name="LabelMode" id="253.LabelMode" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="253.LabelMode.enum">
+        <Entry value="0" text="IDs"/>
+        <Entry value="1" text="Scalars"/>
+        <Entry value="2" text="Vectors"/>
+        <Entry value="3" text="Normals"/>
+        <Entry value="4" text="TCoords"/>
+        <Entry value="5" text="Tensors"/>
+        <Entry value="6" text="FieldData"/>
+      </Domain>
+    </Property>
+    <Property name="Opacity" id="253.Opacity" number_of_elements="1">
+      <Element index="0" value="1"/>
+    </Property>
+    <Property name="Position" id="253.Position" number_of_elements="2">
+      <Element index="0" value="0"/>
+      <Element index="1" value="0"/>
+      <Domain name="range" id="253.Position.range"/>
+    </Property>
+    <Property name="Position2" id="253.Position2" number_of_elements="2">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Domain name="range" id="253.Position2.range"/>
+    </Property>
+    <Property name="Shadow" id="253.Shadow" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="253.Shadow.bool"/>
+    </Property>
+    <Property name="Visibility" id="253.Visibility" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="bool" id="253.Visibility.bool"/>
+    </Property>
+    <SubProxy name="Collect" id="254"/>
+    <SubProxy name="Mapper" id="257"/>
+    <SubProxy name="Prop2D" id="260"/>
+    <SubProxy name="Property" id="262"/>
+    <SubProxy name="UpdateSuppressor" id="264"/>
   </Proxy>
   <Proxy group="displays" type="CubeAxesDisplay" id="1284">
     <Property name="Input" id="1284.Input" number_of_elements="1">
@@ -2240,6 +2572,89 @@
     </Property>
     <SubProxy name="Prop2D" id="1285"/>
   </Proxy>
+  <Proxy group="displays" type="PointLabelDisplay" id="1287">
+    <Property name="Input" id="1287.Input" number_of_elements="1">
+      <Proxy value="1225"/>
+      <Domain name="groups" id="1287.Input.groups">
+        <Group value="sources"/>
+        <Group value="filters"/>
+        <Group value="glyph_sources"/>
+      </Domain>
+    </Property>
+    <Property name="Bold" id="1287.Bold" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="1287.Bold.bool"/>
+    </Property>
+    <Property name="Color" id="1287.Color" number_of_elements="3">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Element index="2" value="1"/>
+      <Domain name="range" id="1287.Color.range">
+        <Min index="0" value="0"/>
+        <Min index="1" value="0"/>
+        <Min index="2" value="0"/>
+        <Max index="0" value="1"/>
+        <Max index="1" value="1"/>
+        <Max index="2" value="1"/>
+      </Domain>
+    </Property>
+    <Property name="FontFamily" id="1287.FontFamily" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="1287.FontFamily.enum">
+        <Entry value="0" text="Arial"/>
+        <Entry value="1" text="Courier"/>
+        <Entry value="2" text="Times"/>
+      </Domain>
+    </Property>
+    <Property name="FontSize" id="1287.FontSize" number_of_elements="1">
+      <Element index="0" value="24"/>
+      <Domain name="range" id="1287.FontSize.range">
+        <Min index="0" value="0"/>
+      </Domain>
+    </Property>
+    <Property name="Italic" id="1287.Italic" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="1287.Italic.bool"/>
+    </Property>
+    <Property name="LabelMode" id="1287.LabelMode" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="1287.LabelMode.enum">
+        <Entry value="0" text="IDs"/>
+        <Entry value="1" text="Scalars"/>
+        <Entry value="2" text="Vectors"/>
+        <Entry value="3" text="Normals"/>
+        <Entry value="4" text="TCoords"/>
+        <Entry value="5" text="Tensors"/>
+        <Entry value="6" text="FieldData"/>
+      </Domain>
+    </Property>
+    <Property name="Opacity" id="1287.Opacity" number_of_elements="1">
+      <Element index="0" value="1"/>
+    </Property>
+    <Property name="Position" id="1287.Position" number_of_elements="2">
+      <Element index="0" value="0"/>
+      <Element index="1" value="0"/>
+      <Domain name="range" id="1287.Position.range"/>
+    </Property>
+    <Property name="Position2" id="1287.Position2" number_of_elements="2">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Domain name="range" id="1287.Position2.range"/>
+    </Property>
+    <Property name="Shadow" id="1287.Shadow" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="1287.Shadow.bool"/>
+    </Property>
+    <Property name="Visibility" id="1287.Visibility" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="bool" id="1287.Visibility.bool"/>
+    </Property>
+    <SubProxy name="Collect" id="1288"/>
+    <SubProxy name="Mapper" id="1291"/>
+    <SubProxy name="Prop2D" id="1294"/>
+    <SubProxy name="Property" id="1296"/>
+    <SubProxy name="UpdateSuppressor" id="1298"/>
+  </Proxy>
   <Proxy group="displays" type="CubeAxesDisplay" id="486">
     <Property name="Input" id="486.Input" number_of_elements="1">
       <Proxy value="427"/>
@@ -2254,6 +2669,89 @@
       <Domain name="bool" id="486.Visibility.bool"/>
     </Property>
     <SubProxy name="Prop2D" id="487"/>
+  </Proxy>
+  <Proxy group="displays" type="PointLabelDisplay" id="489">
+    <Property name="Input" id="489.Input" number_of_elements="1">
+      <Proxy value="427"/>
+      <Domain name="groups" id="489.Input.groups">
+        <Group value="sources"/>
+        <Group value="filters"/>
+        <Group value="glyph_sources"/>
+      </Domain>
+    </Property>
+    <Property name="Bold" id="489.Bold" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="489.Bold.bool"/>
+    </Property>
+    <Property name="Color" id="489.Color" number_of_elements="3">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Element index="2" value="1"/>
+      <Domain name="range" id="489.Color.range">
+        <Min index="0" value="0"/>
+        <Min index="1" value="0"/>
+        <Min index="2" value="0"/>
+        <Max index="0" value="1"/>
+        <Max index="1" value="1"/>
+        <Max index="2" value="1"/>
+      </Domain>
+    </Property>
+    <Property name="FontFamily" id="489.FontFamily" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="489.FontFamily.enum">
+        <Entry value="0" text="Arial"/>
+        <Entry value="1" text="Courier"/>
+        <Entry value="2" text="Times"/>
+      </Domain>
+    </Property>
+    <Property name="FontSize" id="489.FontSize" number_of_elements="1">
+      <Element index="0" value="24"/>
+      <Domain name="range" id="489.FontSize.range">
+        <Min index="0" value="0"/>
+      </Domain>
+    </Property>
+    <Property name="Italic" id="489.Italic" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="489.Italic.bool"/>
+    </Property>
+    <Property name="LabelMode" id="489.LabelMode" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="489.LabelMode.enum">
+        <Entry value="0" text="IDs"/>
+        <Entry value="1" text="Scalars"/>
+        <Entry value="2" text="Vectors"/>
+        <Entry value="3" text="Normals"/>
+        <Entry value="4" text="TCoords"/>
+        <Entry value="5" text="Tensors"/>
+        <Entry value="6" text="FieldData"/>
+      </Domain>
+    </Property>
+    <Property name="Opacity" id="489.Opacity" number_of_elements="1">
+      <Element index="0" value="1"/>
+    </Property>
+    <Property name="Position" id="489.Position" number_of_elements="2">
+      <Element index="0" value="0"/>
+      <Element index="1" value="0"/>
+      <Domain name="range" id="489.Position.range"/>
+    </Property>
+    <Property name="Position2" id="489.Position2" number_of_elements="2">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Domain name="range" id="489.Position2.range"/>
+    </Property>
+    <Property name="Shadow" id="489.Shadow" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="489.Shadow.bool"/>
+    </Property>
+    <Property name="Visibility" id="489.Visibility" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="bool" id="489.Visibility.bool"/>
+    </Property>
+    <SubProxy name="Collect" id="490"/>
+    <SubProxy name="Mapper" id="493"/>
+    <SubProxy name="Prop2D" id="496"/>
+    <SubProxy name="Property" id="498"/>
+    <SubProxy name="UpdateSuppressor" id="500"/>
   </Proxy>
   <Proxy group="displays" type="CubeAxesDisplay" id="1082">
     <Property name="Input" id="1082.Input" number_of_elements="1">
@@ -2270,6 +2768,89 @@
     </Property>
     <SubProxy name="Prop2D" id="1083"/>
   </Proxy>
+  <Proxy group="displays" type="PointLabelDisplay" id="1085">
+    <Property name="Input" id="1085.Input" number_of_elements="1">
+      <Proxy value="1023"/>
+      <Domain name="groups" id="1085.Input.groups">
+        <Group value="sources"/>
+        <Group value="filters"/>
+        <Group value="glyph_sources"/>
+      </Domain>
+    </Property>
+    <Property name="Bold" id="1085.Bold" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="1085.Bold.bool"/>
+    </Property>
+    <Property name="Color" id="1085.Color" number_of_elements="3">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Element index="2" value="1"/>
+      <Domain name="range" id="1085.Color.range">
+        <Min index="0" value="0"/>
+        <Min index="1" value="0"/>
+        <Min index="2" value="0"/>
+        <Max index="0" value="1"/>
+        <Max index="1" value="1"/>
+        <Max index="2" value="1"/>
+      </Domain>
+    </Property>
+    <Property name="FontFamily" id="1085.FontFamily" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="1085.FontFamily.enum">
+        <Entry value="0" text="Arial"/>
+        <Entry value="1" text="Courier"/>
+        <Entry value="2" text="Times"/>
+      </Domain>
+    </Property>
+    <Property name="FontSize" id="1085.FontSize" number_of_elements="1">
+      <Element index="0" value="24"/>
+      <Domain name="range" id="1085.FontSize.range">
+        <Min index="0" value="0"/>
+      </Domain>
+    </Property>
+    <Property name="Italic" id="1085.Italic" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="1085.Italic.bool"/>
+    </Property>
+    <Property name="LabelMode" id="1085.LabelMode" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="1085.LabelMode.enum">
+        <Entry value="0" text="IDs"/>
+        <Entry value="1" text="Scalars"/>
+        <Entry value="2" text="Vectors"/>
+        <Entry value="3" text="Normals"/>
+        <Entry value="4" text="TCoords"/>
+        <Entry value="5" text="Tensors"/>
+        <Entry value="6" text="FieldData"/>
+      </Domain>
+    </Property>
+    <Property name="Opacity" id="1085.Opacity" number_of_elements="1">
+      <Element index="0" value="1"/>
+    </Property>
+    <Property name="Position" id="1085.Position" number_of_elements="2">
+      <Element index="0" value="0"/>
+      <Element index="1" value="0"/>
+      <Domain name="range" id="1085.Position.range"/>
+    </Property>
+    <Property name="Position2" id="1085.Position2" number_of_elements="2">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Domain name="range" id="1085.Position2.range"/>
+    </Property>
+    <Property name="Shadow" id="1085.Shadow" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="1085.Shadow.bool"/>
+    </Property>
+    <Property name="Visibility" id="1085.Visibility" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="bool" id="1085.Visibility.bool"/>
+    </Property>
+    <SubProxy name="Collect" id="1086"/>
+    <SubProxy name="Mapper" id="1089"/>
+    <SubProxy name="Prop2D" id="1092"/>
+    <SubProxy name="Property" id="1094"/>
+    <SubProxy name="UpdateSuppressor" id="1096"/>
+  </Proxy>
   <Proxy group="displays" type="CubeAxesDisplay" id="986">
     <Property name="Input" id="986.Input" number_of_elements="1">
       <Proxy value="924"/>
@@ -2285,6 +2866,89 @@
     </Property>
     <SubProxy name="Prop2D" id="987"/>
   </Proxy>
+  <Proxy group="displays" type="PointLabelDisplay" id="989">
+    <Property name="Input" id="989.Input" number_of_elements="1">
+      <Proxy value="924"/>
+      <Domain name="groups" id="989.Input.groups">
+        <Group value="sources"/>
+        <Group value="filters"/>
+        <Group value="glyph_sources"/>
+      </Domain>
+    </Property>
+    <Property name="Bold" id="989.Bold" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="989.Bold.bool"/>
+    </Property>
+    <Property name="Color" id="989.Color" number_of_elements="3">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Element index="2" value="1"/>
+      <Domain name="range" id="989.Color.range">
+        <Min index="0" value="0"/>
+        <Min index="1" value="0"/>
+        <Min index="2" value="0"/>
+        <Max index="0" value="1"/>
+        <Max index="1" value="1"/>
+        <Max index="2" value="1"/>
+      </Domain>
+    </Property>
+    <Property name="FontFamily" id="989.FontFamily" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="989.FontFamily.enum">
+        <Entry value="0" text="Arial"/>
+        <Entry value="1" text="Courier"/>
+        <Entry value="2" text="Times"/>
+      </Domain>
+    </Property>
+    <Property name="FontSize" id="989.FontSize" number_of_elements="1">
+      <Element index="0" value="24"/>
+      <Domain name="range" id="989.FontSize.range">
+        <Min index="0" value="0"/>
+      </Domain>
+    </Property>
+    <Property name="Italic" id="989.Italic" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="989.Italic.bool"/>
+    </Property>
+    <Property name="LabelMode" id="989.LabelMode" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="989.LabelMode.enum">
+        <Entry value="0" text="IDs"/>
+        <Entry value="1" text="Scalars"/>
+        <Entry value="2" text="Vectors"/>
+        <Entry value="3" text="Normals"/>
+        <Entry value="4" text="TCoords"/>
+        <Entry value="5" text="Tensors"/>
+        <Entry value="6" text="FieldData"/>
+      </Domain>
+    </Property>
+    <Property name="Opacity" id="989.Opacity" number_of_elements="1">
+      <Element index="0" value="1"/>
+    </Property>
+    <Property name="Position" id="989.Position" number_of_elements="2">
+      <Element index="0" value="0"/>
+      <Element index="1" value="0"/>
+      <Domain name="range" id="989.Position.range"/>
+    </Property>
+    <Property name="Position2" id="989.Position2" number_of_elements="2">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Domain name="range" id="989.Position2.range"/>
+    </Property>
+    <Property name="Shadow" id="989.Shadow" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="989.Shadow.bool"/>
+    </Property>
+    <Property name="Visibility" id="989.Visibility" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="bool" id="989.Visibility.bool"/>
+    </Property>
+    <SubProxy name="Collect" id="990"/>
+    <SubProxy name="Mapper" id="993"/>
+    <SubProxy name="Prop2D" id="996"/>
+    <SubProxy name="Property" id="998"/>
+    <SubProxy name="UpdateSuppressor" id="1000"/>
+  </Proxy>
   <Proxy group="displays" type="CubeAxesDisplay" id="330">
     <Property name="Input" id="330.Input" number_of_elements="1">
       <Proxy value="269"/>
@@ -2299,6 +2963,89 @@
       <Domain name="bool" id="330.Visibility.bool"/>
     </Property>
     <SubProxy name="Prop2D" id="331"/>
+  </Proxy>
+  <Proxy group="displays" type="PointLabelDisplay" id="333">
+    <Property name="Input" id="333.Input" number_of_elements="1">
+      <Proxy value="269"/>
+      <Domain name="groups" id="333.Input.groups">
+        <Group value="sources"/>
+        <Group value="filters"/>
+        <Group value="glyph_sources"/>
+      </Domain>
+    </Property>
+    <Property name="Bold" id="333.Bold" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="333.Bold.bool"/>
+    </Property>
+    <Property name="Color" id="333.Color" number_of_elements="3">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Element index="2" value="1"/>
+      <Domain name="range" id="333.Color.range">
+        <Min index="0" value="0"/>
+        <Min index="1" value="0"/>
+        <Min index="2" value="0"/>
+        <Max index="0" value="1"/>
+        <Max index="1" value="1"/>
+        <Max index="2" value="1"/>
+      </Domain>
+    </Property>
+    <Property name="FontFamily" id="333.FontFamily" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="333.FontFamily.enum">
+        <Entry value="0" text="Arial"/>
+        <Entry value="1" text="Courier"/>
+        <Entry value="2" text="Times"/>
+      </Domain>
+    </Property>
+    <Property name="FontSize" id="333.FontSize" number_of_elements="1">
+      <Element index="0" value="24"/>
+      <Domain name="range" id="333.FontSize.range">
+        <Min index="0" value="0"/>
+      </Domain>
+    </Property>
+    <Property name="Italic" id="333.Italic" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="333.Italic.bool"/>
+    </Property>
+    <Property name="LabelMode" id="333.LabelMode" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="333.LabelMode.enum">
+        <Entry value="0" text="IDs"/>
+        <Entry value="1" text="Scalars"/>
+        <Entry value="2" text="Vectors"/>
+        <Entry value="3" text="Normals"/>
+        <Entry value="4" text="TCoords"/>
+        <Entry value="5" text="Tensors"/>
+        <Entry value="6" text="FieldData"/>
+      </Domain>
+    </Property>
+    <Property name="Opacity" id="333.Opacity" number_of_elements="1">
+      <Element index="0" value="1"/>
+    </Property>
+    <Property name="Position" id="333.Position" number_of_elements="2">
+      <Element index="0" value="0"/>
+      <Element index="1" value="0"/>
+      <Domain name="range" id="333.Position.range"/>
+    </Property>
+    <Property name="Position2" id="333.Position2" number_of_elements="2">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Domain name="range" id="333.Position2.range"/>
+    </Property>
+    <Property name="Shadow" id="333.Shadow" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="333.Shadow.bool"/>
+    </Property>
+    <Property name="Visibility" id="333.Visibility" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="bool" id="333.Visibility.bool"/>
+    </Property>
+    <SubProxy name="Collect" id="334"/>
+    <SubProxy name="Mapper" id="337"/>
+    <SubProxy name="Prop2D" id="340"/>
+    <SubProxy name="Property" id="342"/>
+    <SubProxy name="UpdateSuppressor" id="344"/>
   </Proxy>
   <Proxy group="displays" type="ScalarBarWidget" id="792">
     <Property name="Visibility" id="792.Visibility" number_of_elements="1">
@@ -2453,6 +3200,89 @@
       <Domain name="bool" id="408.Visibility.bool"/>
     </Property>
     <SubProxy name="Prop2D" id="409"/>
+  </Proxy>
+  <Proxy group="displays" type="PointLabelDisplay" id="411">
+    <Property name="Input" id="411.Input" number_of_elements="1">
+      <Proxy value="349"/>
+      <Domain name="groups" id="411.Input.groups">
+        <Group value="sources"/>
+        <Group value="filters"/>
+        <Group value="glyph_sources"/>
+      </Domain>
+    </Property>
+    <Property name="Bold" id="411.Bold" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="411.Bold.bool"/>
+    </Property>
+    <Property name="Color" id="411.Color" number_of_elements="3">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Element index="2" value="1"/>
+      <Domain name="range" id="411.Color.range">
+        <Min index="0" value="0"/>
+        <Min index="1" value="0"/>
+        <Min index="2" value="0"/>
+        <Max index="0" value="1"/>
+        <Max index="1" value="1"/>
+        <Max index="2" value="1"/>
+      </Domain>
+    </Property>
+    <Property name="FontFamily" id="411.FontFamily" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="411.FontFamily.enum">
+        <Entry value="0" text="Arial"/>
+        <Entry value="1" text="Courier"/>
+        <Entry value="2" text="Times"/>
+      </Domain>
+    </Property>
+    <Property name="FontSize" id="411.FontSize" number_of_elements="1">
+      <Element index="0" value="24"/>
+      <Domain name="range" id="411.FontSize.range">
+        <Min index="0" value="0"/>
+      </Domain>
+    </Property>
+    <Property name="Italic" id="411.Italic" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="411.Italic.bool"/>
+    </Property>
+    <Property name="LabelMode" id="411.LabelMode" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="enum" id="411.LabelMode.enum">
+        <Entry value="0" text="IDs"/>
+        <Entry value="1" text="Scalars"/>
+        <Entry value="2" text="Vectors"/>
+        <Entry value="3" text="Normals"/>
+        <Entry value="4" text="TCoords"/>
+        <Entry value="5" text="Tensors"/>
+        <Entry value="6" text="FieldData"/>
+      </Domain>
+    </Property>
+    <Property name="Opacity" id="411.Opacity" number_of_elements="1">
+      <Element index="0" value="1"/>
+    </Property>
+    <Property name="Position" id="411.Position" number_of_elements="2">
+      <Element index="0" value="0"/>
+      <Element index="1" value="0"/>
+      <Domain name="range" id="411.Position.range"/>
+    </Property>
+    <Property name="Position2" id="411.Position2" number_of_elements="2">
+      <Element index="0" value="1"/>
+      <Element index="1" value="1"/>
+      <Domain name="range" id="411.Position2.range"/>
+    </Property>
+    <Property name="Shadow" id="411.Shadow" number_of_elements="1">
+      <Element index="0" value="1"/>
+      <Domain name="bool" id="411.Shadow.bool"/>
+    </Property>
+    <Property name="Visibility" id="411.Visibility" number_of_elements="1">
+      <Element index="0" value="0"/>
+      <Domain name="bool" id="411.Visibility.bool"/>
+    </Property>
+    <SubProxy name="Collect" id="412"/>
+    <SubProxy name="Mapper" id="415"/>
+    <SubProxy name="Prop2D" id="418"/>
+    <SubProxy name="Property" id="420"/>
+    <SubProxy name="UpdateSuppressor" id="422"/>
   </Proxy>
   <Proxy group="lookup_tables" type="PVLookupTable" id="790">
     <Property name="ColorSpace" id="790.ColorSpace" number_of_elements="1">
@@ -2866,25 +3696,35 @@
   <ProxyCollection name="displays">
     <Item id="94" name="Arrow0.CubeAxesDisplay"/>
     <Item id="40" name="Arrow0.Display"/>
+    <Item id="97" name="Arrow0.PointLabelDisplay"/>
     <Item id="172" name="Cone0.CubeAxesDisplay"/>
     <Item id="118" name="Cone0.Display"/>
+    <Item id="175" name="Cone0.PointLabelDisplay"/>
     <Item id="1188" name="Contour1.CubeAxesDisplay"/>
     <Item id="1134" name="Contour1.Display"/>
+    <Item id="1191" name="Contour1.PointLabelDisplay"/>
     <Item id="250" name="Cube0.CubeAxesDisplay"/>
     <Item id="196" name="Cube0.Display"/>
+    <Item id="253" name="Cube0.PointLabelDisplay"/>
     <Item id="1284" name="Glyph1.CubeAxesDisplay"/>
     <Item id="1230" name="Glyph1.Display"/>
+    <Item id="1287" name="Glyph1.PointLabelDisplay"/>
     <Item id="486" name="Glyph2D0.CubeAxesDisplay"/>
     <Item id="432" name="Glyph2D0.Display"/>
+    <Item id="489" name="Glyph2D0.PointLabelDisplay"/>
     <Item id="1082" name="ImageClip1.CubeAxesDisplay"/>
     <Item id="1028" name="ImageClip1.Display"/>
+    <Item id="1085" name="ImageClip1.PointLabelDisplay"/>
     <Item id="986" name="LegaVTK1.CubeAxesDisplay"/>
     <Item id="932" name="LegaVTK1.Display"/>
+    <Item id="989" name="LegaVTK1.PointLabelDisplay"/>
     <Item id="330" name="Line0.CubeAxesDisplay"/>
     <Item id="276" name="Line0.Display"/>
+    <Item id="333" name="Line0.PointLabelDisplay"/>
     <Item id="792" name="PVColorMap_ScalarBarWidget1"/>
     <Item id="408" name="Sphere0.CubeAxesDisplay"/>
     <Item id="354" name="Sphere0.Display"/>
+    <Item id="411" name="Sphere0.PointLabelDisplay"/>
   </ProxyCollection>
   <ProxyCollection name="filters">
     <Item id="1129" name="Contour1"/>

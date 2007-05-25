@@ -2561,7 +2561,76 @@
     <!-- End of TextDisplay -->
     </TextDisplayProxy>
 
-    <ScalarBarWidgetProxy name="ScalarBarWidget" class="vtkScalarBarWidget">
+     <PointLabelDisplayProxy name="PointLabelDisplay">
+       <InputProperty
+         name="Input"
+         command="SetInput-not-used">
+         <ProxyGroupDomain name="groups">
+           <Group name="sources" />
+           <Group name="filters" />
+           <Group name="glyph_sources" />
+         </ProxyGroupDomain>
+       </InputProperty>
+       <Property
+         name="Update"
+         command="Update"
+         update_self="1"
+         is_internal="1">
+       </Property>
+       <Property
+         name="InvalidateGeometry"
+         command="InvalidateGeometry"
+         update_self="1">
+       </Property>
+
+       <SubProxy>
+         <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
+         </Proxy>
+       </SubProxy>
+
+       <SubProxy>
+         <Proxy name="UpdateSuppressor"
+           proxygroup="filters" proxyname="UpdateSuppressor">
+         </Proxy>
+         <ExposedProperties>
+           <Property name="CacheUpdate" />
+         </ExposedProperties>
+       </SubProxy>
+       <SubProxy>
+         <Proxy name="Property"
+           proxygroup="properties" proxyname="TextProperty">
+         </Proxy>
+         <ExposedProperties>
+           <Property name="Color" /> 
+           <Property name="Opacity" />
+           <Property name="FontFamily" />
+           <Property name="Bold" /> 
+           <Property name="Italic" />
+           <Property name="Shadow" />
+           <Property name="FontSize" />
+         </ExposedProperties>
+       </SubProxy>
+       <SubProxy>
+         <Proxy name="Prop2D"
+           proxygroup="props" proxyname="Actor2D">
+         </Proxy>
+         <ExposedProperties>
+           <Property name="Visibility" />
+           <Property name="Position" />
+           <Property name="Position2" />
+         </ExposedProperties>
+       </SubProxy>
+       <SubProxy>
+         <Proxy name="Mapper"
+           proxygroup="mappers" proxyname="LabeledDataMapper">
+         </Proxy>
+         <ExposedProperties>
+           <Property name="LabelMode" />
+         </ExposedProperties>
+       </SubProxy>
+     </PointLabelDisplayProxy>
+
+     <ScalarBarWidgetProxy name="ScalarBarWidget" class="vtkScalarBarWidget">
       <IntVectorProperty
         name="Visibility"
         command="SetVisibility"

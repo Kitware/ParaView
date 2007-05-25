@@ -160,6 +160,7 @@ SET(Kit_SRCS
   vtkSMViewModuleProxy.cxx
   vtkSMWidgetRepresentationProxy.cxx
   vtkSMWriterProxy.cxx
+  vtkSMPointLabelDisplayProxy.cxx
   vtkSMCubeAxesDisplayProxy.cxx
   vtkSMXMLPVAnimationWriterProxy.cxx
   vtkSMXYPlotActorProxy.cxx

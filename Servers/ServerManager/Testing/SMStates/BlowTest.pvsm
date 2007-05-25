@@ -1,45 +1,4 @@
 <ServerManagerState version="2.9.10">
-  <Proxy group="3d_widgets" type="LineWidgetProxy" id="278">
-    <Property name="IgnorePlaceWidgetChanges" id="278.IgnorePlaceWidgetChanges" number_of_elements="1">
-      <Element index="0" value="1"/>
-      <Domain name="bool" id="278.IgnorePlaceWidgetChanges.bool"/>
-    </Property>
-    <Property name="PlaceWidget" id="278.PlaceWidget" number_of_elements="6">
-      <Element index="0" value="0"/>
-      <Element index="1" value="1"/>
-      <Element index="2" value="0"/>
-      <Element index="3" value="1"/>
-      <Element index="4" value="0"/>
-      <Element index="5" value="1"/>
-    </Property>
-    <Property name="Point1" id="278.Point1" number_of_elements="3">
-      <Element index="0" value="-0.5"/>
-      <Element index="1" value="0"/>
-      <Element index="2" value="0"/>
-    </Property>
-    <Property name="Point1Info" id="278.Point1Info" number_of_elements="3">
-      <Element index="0" value="-0.5"/>
-      <Element index="1" value="0"/>
-      <Element index="2" value="0"/>
-    </Property>
-    <Property name="Point2" id="278.Point2" number_of_elements="3">
-      <Element index="0" value="0.5"/>
-      <Element index="1" value="0"/>
-      <Element index="2" value="0"/>
-    </Property>
-    <Property name="Point2Info" id="278.Point2Info" number_of_elements="3">
-      <Element index="0" value="0.5"/>
-      <Element index="1" value="0"/>
-      <Element index="2" value="0"/>
-    </Property>
-    <Property name="Resolution" id="278.Resolution" number_of_elements="1">
-      <Element index="0" value="20"/>
-    </Property>
-    <Property name="Visibility" id="278.Visibility" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="278.Visibility.bool"/>
-    </Property>
-  </Proxy>
   <Proxy group="sources" type="ArrowSource" id="37">
     <Property name="ShaftRadius" id="37.ShaftRadius" number_of_elements="1">
       <Element index="0" value="0.03"/>
@@ -3679,9 +3638,6 @@
     <SubProxy name="Renderer" id="19"/>
     <SubProxy name="Renderer2D" id="21"/>
   </Proxy>
-  <ProxyCollection name="3d_widgets">
-    <Item id="278" name="PV3DWidget_LineWidgetProxy0"/>
-  </ProxyCollection>
   <ProxyCollection name="animateable">
     <Item id="37" name="GlyphSources.Arrow0"/>
     <Item id="44" name="GlyphSources.Arrow0.Display"/>
