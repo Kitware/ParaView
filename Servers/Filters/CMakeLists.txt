@@ -36,6 +36,7 @@ SET(Filters_SRCS
   vtkIntegrateFlowThroughSurface.cxx
   vtkInteractorStyleTransferFunctionEditor.cxx
   vtkKdTreeGenerator.cxx
+  vtkKdTreeManager.cxx
   vtkMergeArrays.cxx
   vtkMinMax.cxx
   vtkMPICompositeManager.cxx
