@@ -3917,46 +3917,28 @@
       <!-- End of PolyDataParallelStrategy -->
     </SimpleParallelStrategy>
     
-    <UnstructuredGridVolumeStrategyProxy name="UnstructuredGridStrategy" class="">
+    <SimpleStrategy name="UnstructuredGridStrategy" 
+      base_proxygroup="strategies"
+      base_proxyname="PolyDataStrategy" >
       <Documentation>
         Representation stragegy can be used for unstructured grid volume rendering.
       </Documentation>
-
-      <ProxyProperty
-        name="Input"
-        command="SetInput"
-        update_self="1"
-        immediate_update="1">
-      </ProxyProperty>
-
-      <SubProxy>
-        <Proxy name="LODDecimator"
-          proxygroup="filters" proxyname="QuadricClustering" />
-      </SubProxy>
-      
-      <SubProxy>
-        <Proxy name="UpdateSuppressor"
-          proxygroup="filters" proxyname="UpdateSuppressor2" />
-        <ExposedProperties>
-          <Property name="UpdateTime" />
-          <Property name="RemoveAllCaches" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="UpdateSuppressorLOD"
-          proxygroup="filters" proxyname="UpdateSuppressor2">
-        </Proxy>
-        <ShareProperties subproxy="UpdateSuppressor" >
-          <Exception name="Input" />
-          <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
-        </ShareProperties>
-      </SubProxy>
-
       <!-- End of UnstructuredGridStrategy -->
-    </UnstructuredGridVolumeStrategyProxy >
+    </SimpleStrategy>
+
+    <SimpleParallelStrategy name="UnstructuredGridParallelStrategy"
+      base_proxygroup="strategies" 
+      base_proxyname="PolyDataParallelStrategy">
+    </SimpleParallelStrategy>
+
+    <SimpleStrategy name="UniformGridParallelStrategy" 
+      base_proxygroup="strategies"
+      base_proxyname="PolyDataStrategy" >
+      <Documentation>
+        Representation stragegy can be used for unstructured grid volume rendering.
+      </Documentation>
+      <!-- End of UnstructuredGridStrategy -->
+    </SimpleStrategy>
 
     <!-- End of strategies -->
   </ProxyGroup>

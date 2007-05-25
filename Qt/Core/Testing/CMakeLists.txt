@@ -13,6 +13,10 @@ IF(PARAVIEW_DATA_ROOT)
   SET(BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline)
   ADD_EXECUTABLE(pqCoreBasicApp MACOSX_BUNDLE BasicApp.cxx)
   TARGET_LINK_LIBRARIES(pqCoreBasicApp pqCore QtTesting ${QT_LIBRARIES} )
+
+  ADD_EXECUTABLE(pqCoreBasicApp2 MACOSX_BUNDLE BasicApp2.cxx)
+  TARGET_LINK_LIBRARIES(pqCoreBasicApp2 pqCore QtTesting ${QT_LIBRARIES} )
+
   GET_TEST_BINARY(pqCoreBasicApp TEST_BINARY)
   ADD_TEST(pqCoreBasicApp "${TEST_BINARY}" -dr "--test-directory=${PARAVIEW_TEST_DIR}"
            "--compare-view=${BASELINE_DIR}/pqCoreBasicApp.png" --exit)

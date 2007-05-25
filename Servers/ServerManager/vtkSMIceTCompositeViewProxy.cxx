@@ -33,7 +33,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.4");
 vtkCxxSetObjectMacro(vtkSMIceTCompositeViewProxy, SharedMultiViewManager, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMIceTCompositeViewProxy, SharedParallelRenderManager, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMIceTCompositeViewProxy, SharedRenderWindow, vtkSMProxy);
@@ -350,15 +350,20 @@ vtkSMRepresentationStrategy* vtkSMIceTCompositeViewProxy::NewStrategyInternal(
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMRepresentationStrategy* strategy = 0;
 
-  if ((dataType == VTK_POLY_DATA) || dataType == VTK_UNIFORM_GRID)
+  if (dataType == VTK_POLY_DATA)
     {
     strategy = vtkSMRepresentationStrategy::SafeDownCast(
       pxm->NewProxy("strategies", "PolyDataParallelStrategy"));
     }
+  else if (dataType == VTK_UNIFORM_GRID)
+    {
+    strategy = vtkSMRepresentationStrategy::SafeDownCast(
+      pxm->NewProxy("strategies", "UniformGridParallelStrategy"));
+    }
   else if (dataType == VTK_UNSTRUCTURED_GRID)
     {
     strategy = vtkSMRepresentationStrategy::SafeDownCast(
-      pxm->NewProxy("strategies", "UnstructuredParallelGridStrategy"));
+      pxm->NewProxy("strategies", "UnstructuredGridParallelStrategy"));
     }
   else
     {
@@ -515,7 +520,8 @@ void vtkSMIceTCompositeViewProxy::UpdateOrderedCompositingPipeline()
   iter->Delete();
 
   // If ordered compositing is disabled or no representation requires ordered
-  // compositing, we tell all the strategies so.
+  // compositing or if we are doing a local render we don't need ordered
+  // compositing. Hence we tell all the strategies so.
   if (this->DisableOrderedCompositing || !ordered_compositing_needed 
     || !this->LastCompositingDecision)
     {
@@ -542,20 +548,22 @@ void vtkSMIceTCompositeViewProxy::UpdateOrderedCompositingPipeline()
   for (strategyIter = this->ActiveStrategyVector->begin();
     strategyIter != this->ActiveStrategyVector->end(); ++strategyIter)
     {
-    vtkSMSimpleParallelStrategy* pstrategy = 
-      vtkSMSimpleParallelStrategy::SafeDownCast(strategyIter->GetPointer());
-    if (pstrategy && pstrategy->GetDistributedSource())
+    if (strcmp(strategyIter->GetPointer()->GetXMLName(), 
+        "UniformGridParallelStrategy") == 0)
       {
-      if (strcmp(pstrategy->GetXMLName(), "StructuredGridParallelStrategy")==0)
-        {
-        ppStructuredProducer->RemoveAllProxies();
-        ppStructuredProducer->AddProxy(pstrategy->GetDistributedSource());
-        }
-      else
+      ppStructuredProducer->RemoveAllProxies();
+      ppStructuredProducer->AddProxy(strategyIter->GetPointer()->GetOutput());
+      strategyIter->GetPointer()->Update();
+      }
+    else
+      {
+      vtkSMSimpleParallelStrategy* pstrategy = 
+        vtkSMSimpleParallelStrategy::SafeDownCast(strategyIter->GetPointer());
+      if (pstrategy && pstrategy->GetDistributedSource())
         {
         ppProducers->AddProxy(pstrategy->GetDistributedSource());
+        pstrategy->UpdateDistributedData();
         }
-      pstrategy->UpdateDistributedData();
       }
     }
   this->KdTreeManager->UpdateVTKObjects();
