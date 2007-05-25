@@ -56,6 +56,10 @@ public:
   // This implementation converts a prop selection to a selection source.
   virtual vtkSMProxy* ConvertSelection(vtkSelection* input);
 
+  // Description:
+  // Returns true is opactity < 1.0
+  virtual bool GetOrderedCompositingNeeded();
+
 //BTX
 protected:
   vtkSMSurfaceRepresentationProxy();

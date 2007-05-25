@@ -15,6 +15,9 @@
 // .NAME vtkSMIceTDesktopRenderViewProxy
 // .SECTION Description
 // IceT Render View that can be used in client server configurations.
+//
+// This class does not use a MultiViewManager for multi-view configurations,
+// instead, that reponsibilty is taken on by the RenderSyncManager.
 
 #ifndef __vtkSMIceTDesktopRenderViewProxy_h
 #define __vtkSMIceTDesktopRenderViewProxy_h
@@ -45,6 +48,14 @@ public:
   // instance. It must be set before calling CreateVTKObjects() on the view
   // proxy.
   void SetSharedServerRenderSyncManager(vtkSMProxy*);
+
+  // Description:
+  // Overridden to pass the GUISize to the RenderSyncManager.
+  virtual void SetGUISize(int x, int y);
+
+  // Description:
+  // Overridden to pass the ViewPosition to the RenderSyncManager.
+  virtual void SetViewPosition(int x, int y);
 
 //BTX
 protected:
@@ -85,14 +96,6 @@ protected:
   // Description:
   // Internal method to set the squirt level on the RenderSyncManager.
   void SetSquirtLevelInternal(int level);
-
-  // Description:
-  // Overridden to pass the GUISize to the RenderSyncManager.
-  virtual void SetGUISize(int x, int y);
-
-  // Description:
-  // Overridden to pass the ViewPosition to the RenderSyncManager.
-  virtual void SetViewPosition(int x, int y);
 
   // RenderManager managing client-server rendering.
   vtkSMProxy* RenderSyncManager;

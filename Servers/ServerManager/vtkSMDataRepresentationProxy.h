@@ -152,6 +152,13 @@ public:
   virtual vtkSMProxy* ConvertSelection(vtkSelection* vtkNotUsed(input))
     { return 0; }
 
+  // Description:
+  // Representations can request ordered compositing eg. representations that
+  // perform volume rendering or have opacity < 1.0. Such representations must
+  // return true for this method. Default implementation return false.
+  virtual bool GetOrderedCompositingNeeded()
+    { return false; }
+
 //BTX
 protected:
   vtkSMDataRepresentationProxy();

@@ -94,7 +94,13 @@ public:
     {if(v){this->SetMoveModeToPassThrough();} else {this->SetMoveModeToClone();}}
   void SetSocketController(vtkSocketController* c) {this->SetClientDataServerSocketController(c);}
 
-
+//BTX
+  enum MoveModes {
+    PASS_THROUGH=0,
+    COLLECT=1,
+    CLONE=2
+  };
+//ETX
 protected:
   vtkMPIMoveData();
   ~vtkMPIMoveData();
@@ -139,13 +145,6 @@ protected:
   int Server;
 
   int DefineCollectAsClone;
-//BTX
-  enum MoveModes {
-    PASS_THROUGH=0,
-    COLLECT=1,
-    CLONE=2
-  };
-//ETX
 
 //BTX
   enum Servers {

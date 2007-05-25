@@ -172,6 +172,7 @@ SET(Kit_SRCS
   vtkSMRenderViewProxy.cxx
   vtkSMRepresentationProxy.cxx
   vtkSMRepresentationStrategy.cxx
+  vtkSMSimpleParallelStrategy.cxx
   vtkSMSimpleStrategy.cxx
   vtkSMSurfaceRepresentationProxy.cxx
   vtkSMUniformGridVolumeRepresentationProxy.cxx

@@ -3816,6 +3816,19 @@
         command="SetInput"
         update_self="1"
         immediate_update="1">
+        <Documentation>
+          The input to the strategy.
+        </Documentation>
+      </ProxyProperty>
+
+      <ProxyProperty
+        name="ViewHelper"
+        command="SetViewHelperProxy"
+        update_self="1">
+        <Documentation>
+          The helper that gives the strategy information about critical view
+          properties without requiring a reference to the view proxy itself.
+        </Documentation>
       </ProxyProperty>
 
       <SubProxy>
@@ -3850,6 +3863,59 @@
 
       <!-- End of PolyDataStrategy -->
     </SimpleStrategy>
+
+    <SimpleParallelStrategy name="PolyDataParallelStrategy"
+      base_proxygroup="strategies" 
+      base_proxyname="PolyDataStrategy">
+
+      <SubProxy>
+        <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PreDistributorSuppressor" proxygroup="filters"
+          proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Distributor" proxygroup="filters"
+          proxyname="OrderedCompositeDistributor">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="CollectLOD" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PreDistributorSuppressorLOD" proxygroup="filters"
+          proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressorLOD" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="DistributorLOD" proxygroup="filters"
+          proxyname="OrderedCompositeDistributor">
+        </Proxy>
+      </SubProxy>
+      
+      <!-- End of PolyDataParallelStrategy -->
+    </SimpleParallelStrategy>
     
     <UnstructuredGridVolumeStrategyProxy name="UnstructuredGridStrategy" class="">
       <Documentation>
@@ -4239,6 +4305,15 @@
         </Proxy>
       </SubProxy>
 
+      <SubProxy>
+        <Proxy name="KdTree" proxygroup="locators" proxyname="PKdTree" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="KdTreeManager" proxygroup="misc" proxygroup="KdTreeManager">
+        </Proxy>
+      </SubProxy>
+
       <!-- End of IceTCompositeView -->
     </IceTCompositeViewProxy>
 
@@ -4329,6 +4404,15 @@
         <Proxy  name="ParallelRenderManager" 
                 proxygroup="composite_managers"
                 proxyname="IceTRenderManager">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="KdTree" proxygroup="locators" proxyname="PKdTree" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="KdTreeManager" proxygroup="misc" proxygroup="KdTreeManager">
         </Proxy>
       </SubProxy>
 
@@ -5398,6 +5482,9 @@
 
 
 </ServerManagerConfiguration>
+
+
+
 
 
 

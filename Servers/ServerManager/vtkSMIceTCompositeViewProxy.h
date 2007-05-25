@@ -23,6 +23,8 @@
 
 #include "vtkSMRenderViewProxy.h"
 
+class vtkSMRepresentationStrategyVector;
+
 class VTK_EXPORT vtkSMIceTCompositeViewProxy : public vtkSMRenderViewProxy
 {
 public:
@@ -55,6 +57,14 @@ public:
   // InteractiveRender. ImageReductionFactor=1 implies no reduction at all.
   vtkSetClampMacro(ImageReductionFactor, int, 1, 100);
   vtkGetMacro(ImageReductionFactor, int);
+
+  // Description:
+  // When set, ordered compositing is disabled even when requested by
+  // representation strategies. Typically ordered compositing is needed when
+  // rendering representations that have opactity < 1.0 or volume rendering.
+  // By default, set to false.
+  vtkSetMacro(DisableOrderedCompositing, int);
+  vtkGetMacro(DisableOrderedCompositing, int);
 
   // Description:
   // In multiview configurations, all the render views must share the same
@@ -124,6 +134,16 @@ protected:
   // ParallelRenderManager.
   virtual void SetImageReductionFactorInternal(int factor);
 
+  // Description:
+  // This method should update the KdTree used for ordered compositing. This
+  // method should also verify if ordered compositing is needed at all and
+  // update the renderer accordingly.
+  void UpdateOrderedCompositingPipeline();
+
+  // Description:
+  // Pass ordered compositing decision to all strategies.
+  void SetOrderedCompositingDecision(bool decision);
+
   // Manager used for multiview.
   vtkSMProxy* MultiViewManager;
   vtkSMProxy* SharedMultiViewManager;
@@ -132,11 +152,19 @@ protected:
   vtkSMProxy* ParallelRenderManager;
   vtkSMProxy* SharedParallelRenderManager;
 
+  // Used when ordered compositing is needed.
+  vtkSMProxy* KdTree;
+
+  // Used to generate the KdTree.
+  vtkSMProxy* KdTreeManager;
+
   // Render window shared on the server side.
   vtkSMProxy* SharedRenderWindow;
 
   // Reduction factor used for compositing when using interactive render.
   int ImageReductionFactor;
+
+  int DisableOrderedCompositing;
 
   double CompositeThreshold;
 
@@ -148,7 +176,8 @@ protected:
   int TileDimensions[2];
   int TileMullions[2];
 
-  // TODO: We also need the Kdtree generator etc.
+  vtkSMRepresentationStrategyVector *ActiveStrategyVector;
+
 private:
   vtkSMIceTCompositeViewProxy(const vtkSMIceTCompositeViewProxy&); // Not implemented
   void operator=(const vtkSMIceTCompositeViewProxy&); // Not implemented

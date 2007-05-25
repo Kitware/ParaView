@@ -1812,7 +1812,7 @@
                      remove_command="RemoveDataSet"/>
       <IntVectorProperty name="MinCells" command="SetMinCells"
                          number_of_elements="1"
-                         default_values="100"/>
+                         default_values="0"/>
       <Property
         name="OmitZPartitioning"
         command="OmitZPartitioning"/>
@@ -2344,6 +2344,42 @@
       <!-- End of ExodusReaderHelper -->
     </Proxy>
 
+    <Proxy name="KdTreeManager" class="vtkKdTreeManager">
+      <ProxyProperty  
+        name="KdTree"
+        command="SetKdTree">
+        <Documentation>
+          Set the KdTree managed by this manager.
+        </Documentation>
+      </ProxyProperty>
+
+      <ProxyProperty
+        name="Producers"
+        command="AddProducer"
+        remove_command="RemoveProducer" >
+        <Documentation>
+          Producers/algorithms producing data that needs to be distributed.
+        </Documentation>
+      </ProxyProperty>
+      
+      <ProxyProperty
+        name="StructuredProducer"
+        command="SetStructuredProducer">
+        <Documentation>
+          The optional producer whose partitioning is used to build the
+          KdTree.
+        </Documentation>
+      </ProxyProperty>
+
+      <Property
+        name="Update"
+        command="Update">
+      </Property>
+
+      <!-- End of KdTreeManager -->
+    </Proxy>
+
+    <!-- End of group "misc" -->
   </ProxyGroup>
 
 </ServerManagerConfiguration>

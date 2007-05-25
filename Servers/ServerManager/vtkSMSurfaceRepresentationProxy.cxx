@@ -22,6 +22,7 @@
 #include "vtkSelectionSerializer.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMCompoundProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
@@ -30,7 +31,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -77,6 +78,14 @@ void vtkSMSurfaceRepresentationProxy::UpdateSelectionPropVisibility()
     this->SelectionProp3D->GetProperty("Visibility"));
   ivp->SetElement(0, visibility);
   this->SelectionProp3D->UpdateProperty("Visibility");
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSurfaceRepresentationProxy::GetOrderedCompositingNeeded()
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("Opacity"));
+  return (dvp && dvp->GetElement(0) < 1.0);
 }
 
 //----------------------------------------------------------------------------
