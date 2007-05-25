@@ -4412,7 +4412,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="KdTreeManager" proxygroup="misc" proxygroup="KdTreeManager">
+        <Proxy name="KdTreeManager" proxygroup="misc" proxyname="KdTreeManager">
         </Proxy>
       </SubProxy>
 
