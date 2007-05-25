@@ -21,9 +21,11 @@
 #include "vtkPVOptions.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMRepresentationStrategy.h"
+#include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.2");
 vtkCxxSetObjectMacro(vtkSMIceTCompositeViewProxy, SharedMultiViewManager, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMIceTCompositeViewProxy, SharedParallelRenderManager, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMIceTCompositeViewProxy, SharedRenderWindow, vtkSMProxy);
@@ -105,7 +107,6 @@ void vtkSMIceTCompositeViewProxy::EndCreateVTKObjects(int numObjects)
   if (this->GetRenderWindow()->IsA("vtkOpenGLRenderWindow") &&
     (pm->GetNumberOfPartitions(this->ConnectionID) > 1))
     {
-    vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
            << this->RenderWindowProxy->GetID(0) 
            << "SetMultiSamples" << 0
@@ -250,6 +251,32 @@ void vtkSMIceTCompositeViewProxy::SetViewSize(int x, int y)
     pm->SendStream(this->ConnectionID,
       this->MultiViewManager->GetServers(), stream);
     }
+}
+
+//-----------------------------------------------------------------------------
+vtkSMRepresentationStrategy* vtkSMIceTCompositeViewProxy::NewStrategyInternal(
+  int dataType)
+{
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMRepresentationStrategy* strategy = 0;
+
+  if ((dataType == VTK_POLY_DATA) || dataType == VTK_UNIFORM_GRID)
+    {
+    strategy = vtkSMRepresentationStrategy::SafeDownCast(
+      pxm->NewProxy("strategies", "PolyDataParallelStrategy"));
+    }
+  else if (dataType == VTK_UNSTRUCTURED_GRID)
+    {
+    strategy = vtkSMRepresentationStrategy::SafeDownCast(
+      pxm->NewProxy("strategies", "UnstructuredParallelGridStrategy"));
+    }
+  else
+    {
+    vtkWarningMacro("This view does not provide a suitable strategy for "
+      << dataType);
+    }
+
+  return strategy;
 }
 
 //----------------------------------------------------------------------------

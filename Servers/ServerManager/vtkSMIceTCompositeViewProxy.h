@@ -92,6 +92,12 @@ protected:
   virtual void EndCreateVTKObjects(int numObjects);
 
   // Description:
+  // Creates a new vtkSMRepresentationStrategy subclass based on the type
+  // requested.
+  virtual vtkSMRepresentationStrategy* NewStrategyInternal(
+    int dataType);
+
+  // Description:
   // Method called before Still Render is called.
   // Used to perform some every-still-render-setup actions.
   virtual void BeginStillRender();
