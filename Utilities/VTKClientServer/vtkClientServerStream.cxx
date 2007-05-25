@@ -1753,7 +1753,7 @@ static const char* const vtkClientServerStreamTypeNames[][4] =
   {"uint32_value","uint32","u32",0}, {"uint32_array","uint32a","u32a",0},
   {"uint64_value","uint64","u64",0}, {"uint64_array","uint64a","u64a",0},
   {"float32_value","float32","f32",0}, {"float32_array","float32a","f32a",0},
-  {"float64_value","float64","f64",0}, {"float64_array","float32a","f32a",0},
+  {"float64_value","float64","f64",0}, {"float64_array","float64a","f64a",0},
   {"bool_value", "bool", "bool", 0},
   {"string_value","string","str",0},
   {"id_value","id",0,0},
