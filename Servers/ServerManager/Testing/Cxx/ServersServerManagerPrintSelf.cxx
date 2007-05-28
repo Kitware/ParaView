@@ -56,7 +56,6 @@
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMShrunkContoursProxy.h"
 #include "vtkSMSimpleIntInformationHelper.h"
 #include "vtkSMSimpleStringInformationHelper.h"
 #include "vtkSMSourceProxy.h"
@@ -140,7 +139,6 @@ int main(int , char *[])
   c = vtkSMProxyIterator::New(); c->Print( cout ); c->Delete();
   c = vtkSMProxyManager::New(); c->Print( cout ); c->Delete();
   c = vtkSMProxyProperty::New(); c->Print( cout ); c->Delete();
-  c = vtkSMShrunkContoursProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMSimpleIntInformationHelper::New(); c->Print( cout ); c->Delete();
   c = vtkSMSimpleStringInformationHelper::New(); c->Print( cout ); c->Delete();
   c = vtkSMSourceProxy::New(); c->Print( cout ); c->Delete();
