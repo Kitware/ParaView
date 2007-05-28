@@ -22,7 +22,7 @@
 #include "vtkMath.h"
 
 vtkStandardNewMacro(vtkSMLookupTableProxy);
-vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.17");
 
 //---------------------------------------------------------------------------
 vtkSMLookupTableProxy::vtkSMLookupTableProxy()
@@ -45,7 +45,7 @@ vtkSMLookupTableProxy::~vtkSMLookupTableProxy()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMLookupTableProxy::CreateVTKObjects(int numObjects)
+void vtkSMLookupTableProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
@@ -53,7 +53,7 @@ void vtkSMLookupTableProxy::CreateVTKObjects(int numObjects)
     }
   this->SetServers(vtkProcessModule::CLIENT | 
     vtkProcessModule::RENDER_SERVER);
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 }
 
 //---------------------------------------------------------------------------
@@ -97,81 +97,76 @@ void vtkSMLookupTableProxy::Build()
   saturationRange[1] = doubleVectProp->GetElement(1);
   
 
-  int numObjects = this->GetNumberOfIDs();
-
-  for (int i=0; i<numObjects; i++)
-    {
-    if (hueRange[0]<1.1) // Hack to deal with sandia color map.
-      { // not Sandia interpolation.
-      stream << vtkClientServerStream::Invoke << this->GetID(i)
-             << "ForceBuild" << vtkClientServerStream::End;
-      int numColors = (numberOfTableValues < 1) ? 1 : numberOfTableValues;
-      if (this->UseLowOutOfRangeColor)
-        {
-        stream << vtkClientServerStream::Invoke
-               << this->GetID(i) << "SetTableValue" << 0
-               << this->LowOutOfRangeColor[0] << this->LowOutOfRangeColor[1]
-               << this->LowOutOfRangeColor[2] << 1
-               << vtkClientServerStream::End;
-        }
-      if (this->UseHighOutOfRangeColor)
-        {
-        stream << vtkClientServerStream::Invoke << this->GetID(i)
-               << "SetTableValue" << numColors-1
-               << this->HighOutOfRangeColor[0] << this->HighOutOfRangeColor[1]
-               << this->HighOutOfRangeColor[2]
-               << 1 << vtkClientServerStream::End;
-        }
-      }
-    else
+  if (hueRange[0]<1.1) // Hack to deal with sandia color map.
+    { // not Sandia interpolation.
+    stream << vtkClientServerStream::Invoke << this->GetID()
+           << "ForceBuild" << vtkClientServerStream::End;
+    int numColors = (numberOfTableValues < 1) ? 1 : numberOfTableValues;
+    if (this->UseLowOutOfRangeColor)
       {
-      //now we need to loop through the number of colors setting the colors
-      //in the table
       stream << vtkClientServerStream::Invoke
-             << this->GetID(i) << "SetNumberOfTableValues"
-             << numberOfTableValues
+             << this->GetID() << "SetTableValue" << 0
+             << this->LowOutOfRangeColor[0] << this->LowOutOfRangeColor[1]
+             << this->LowOutOfRangeColor[2] << 1
              << vtkClientServerStream::End;
-
-      int j;
-      double rgba[4];
-      double xyz[3];
-      double lab[3];
-      //only use opaque colors
-      rgba[3]=1;
-      
-      int numColors= numberOfTableValues - 1;
-      if (numColors<=0) numColors=1;
-
-      for (j=0;j<numberOfTableValues;j++) 
-        {
-        // Get the color
-        lab[0] = hueRange[0]+(hueRange[1]-hueRange[0])/(numColors)*j;
-        lab[1] = saturationRange[0]+(saturationRange[1]-saturationRange[0])/
-            (numColors)*j;
-        lab[2] = valueRange[0]+(valueRange[1]-valueRange[0])/
-            (numColors)*j;
-        vtkMath::LabToXYZ(lab,xyz);
-        vtkMath::XYZToRGB(xyz,rgba);
-        stream << vtkClientServerStream::Invoke
-               << this->GetID(i) << "SetTableValue" << j
-               << rgba[0] << rgba[1] << rgba[2] << rgba[3] 
-               << vtkClientServerStream::End;
-        }
-      if (this->UseLowOutOfRangeColor)
-        {
-        stream << vtkClientServerStream::Invoke << this->GetID(i)
-               << "SetTableValue 0" << this->LowOutOfRangeColor[0]
-               << this->LowOutOfRangeColor[1] << this->LowOutOfRangeColor[2]
-               << 1 << vtkClientServerStream::End;
-        }
-      if (this->UseHighOutOfRangeColor)
-        {
-        stream << vtkClientServerStream::Invoke << this->GetID(i)
-               << "SetTableValue" << numColors-1
-               << this->HighOutOfRangeColor[0] << this->HighOutOfRangeColor[1]
-               << this->HighOutOfRangeColor[2]
-               << 1 << vtkClientServerStream::End;
-        }
+      }
+    if (this->UseHighOutOfRangeColor)
+      {
+      stream << vtkClientServerStream::Invoke << this->GetID()
+             << "SetTableValue" << numColors-1
+             << this->HighOutOfRangeColor[0] << this->HighOutOfRangeColor[1]
+             << this->HighOutOfRangeColor[2]
+             << 1 << vtkClientServerStream::End;
+      }
+    }
+  else
+    {
+    //now we need to loop through the number of colors setting the colors
+    //in the table
+    stream << vtkClientServerStream::Invoke
+           << this->GetID() << "SetNumberOfTableValues"
+           << numberOfTableValues
+           << vtkClientServerStream::End;
+    
+    int j;
+    double rgba[4];
+    double xyz[3];
+    double lab[3];
+    //only use opaque colors
+    rgba[3]=1;
+    
+    int numColors= numberOfTableValues - 1;
+    if (numColors<=0) numColors=1;
+    
+    for (j=0;j<numberOfTableValues;j++) 
+      {
+      // Get the color
+      lab[0] = hueRange[0]+(hueRange[1]-hueRange[0])/(numColors)*j;
+      lab[1] = saturationRange[0]+(saturationRange[1]-saturationRange[0])/
+        (numColors)*j;
+      lab[2] = valueRange[0]+(valueRange[1]-valueRange[0])/
+        (numColors)*j;
+      vtkMath::LabToXYZ(lab,xyz);
+      vtkMath::XYZToRGB(xyz,rgba);
+      stream << vtkClientServerStream::Invoke
+             << this->GetID() << "SetTableValue" << j
+             << rgba[0] << rgba[1] << rgba[2] << rgba[3] 
+             << vtkClientServerStream::End;
+      }
+    if (this->UseLowOutOfRangeColor)
+      {
+      stream << vtkClientServerStream::Invoke << this->GetID()
+             << "SetTableValue 0" << this->LowOutOfRangeColor[0]
+             << this->LowOutOfRangeColor[1] << this->LowOutOfRangeColor[2]
+             << 1 << vtkClientServerStream::End;
+      }
+    if (this->UseHighOutOfRangeColor)
+      {
+      stream << vtkClientServerStream::Invoke << this->GetID()
+             << "SetTableValue" << numColors-1
+             << this->HighOutOfRangeColor[0] << this->HighOutOfRangeColor[1]
+             << this->HighOutOfRangeColor[2]
+             << 1 << vtkClientServerStream::End;
       }
     }
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();

@@ -239,7 +239,9 @@ protected:
 
 
   void AppendProxyToStream(vtkSMProxy* toAppend,
-  vtkSMProxy* cons, vtkClientServerStream* str, vtkClientServerID objectId, int remove=0 );
+                           vtkClientServerStream* str, 
+                           vtkClientServerID objectId, 
+                           int remove=0);
 
 private:
   vtkSMProxyProperty(const vtkSMProxyProperty&); // Not implemented

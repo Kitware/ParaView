@@ -46,8 +46,8 @@ protected:
   vtkSMMultiDisplayProxy();
   ~vtkSMMultiDisplayProxy();
 
+   virtual void CreateVTKObjects();
 
-   virtual void CreateVTKObjects(int num);
 private:
   vtkSMMultiDisplayProxy(const vtkSMMultiDisplayProxy&); // Not implemented.
   void operator=(const vtkSMMultiDisplayProxy&); // Not implemented.

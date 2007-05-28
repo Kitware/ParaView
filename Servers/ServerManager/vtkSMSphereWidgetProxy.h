@@ -49,16 +49,13 @@ protected:
   // Overloaded to update the property values before saving state
   virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
   
-  // Description:
-  // Execute event of the 3D Widget.
-  // When the user interacts with the 3DWidget on the client, events are fired.
-  // Since this class listens to such events, it leads to a call to ExecuteEvent.
-  // This method updates the iVars based on the values on the client 3DWidget and
-  // calls Superclass ExecuteEvent which triggers a WidgetModifiedEvent indicating that
-  // widget has been manipulated. 
+  // Execute event of the 3D Widget.  When the user interacts
+  // with the 3DWidget on the client, events are fired.  Since this class
+  // listens to such events, it leads to a call to ExecuteEvent.  This
+  // method updates the iVars based on the values on the client 3DWidget
+  // and calls Superclass ExecuteEvent which triggers a WidgetModifiedEvent
+  // indicating that widget has been manipulated.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
-
-  virtual void CreateVTKObjects(int numObjects); 
 
   double Center[3];
   double Radius;

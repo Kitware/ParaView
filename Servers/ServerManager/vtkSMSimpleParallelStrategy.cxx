@@ -37,7 +37,7 @@ inline int vtkSMSimpleParallelStrategyGetInt(vtkSMProxy* proxy,
 }
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.1");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
@@ -56,7 +56,7 @@ vtkSMSimpleParallelStrategy::~vtkSMSimpleParallelStrategy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleParallelStrategy::CreateVTKObjects(int numObjects)
+void vtkSMSimpleParallelStrategy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
@@ -85,7 +85,7 @@ void vtkSMSimpleParallelStrategy::CreateVTKObjects(int numObjects)
   this->PreDistributorSuppressorLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
   this->DistributorLOD->SetServers(vtkProcessModule::RENDER_SERVER);
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -143,11 +143,11 @@ void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
   // (or data server), we directly connect the PreDistributorSuppressor to the
   // UpdateSuppressor on the client and data server.
   stream  << vtkClientServerStream::Invoke
-          << distributor->GetID(0) 
+          << distributor->GetID() 
           << "GetOutputPort" << 0
           << vtkClientServerStream::End;
   stream  << vtkClientServerStream::Invoke
-          << updatesuppressor->GetID(0)
+          << updatesuppressor->GetID()
           << "SetInputConnection" << 0 
           << vtkClientServerStream::LastResult
           << vtkClientServerStream::End;
@@ -155,11 +155,11 @@ void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
 
   // Now send to the dataserver/client
   stream  << vtkClientServerStream::Invoke
-          << predistributorsuppressor->GetID(0)
+          << predistributorsuppressor->GetID()
           << "GetOutputPort" << 0
           << vtkClientServerStream::End;
   stream  << vtkClientServerStream::Invoke
-          << updatesuppressor->GetID(0)
+          << updatesuppressor->GetID()
           << "SetInputConnection" << 0
           << vtkClientServerStream::LastResult
           << vtkClientServerStream::End;
@@ -176,7 +176,7 @@ void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
           << pm->GetConnectionClientServerID(this->ConnectionID)
           << vtkClientServerStream::End;
   stream  << vtkClientServerStream::Invoke
-          << collect->GetID(0)
+          << collect->GetID()
           << "SetSocketController"
           << vtkClientServerStream::LastResult
           << vtkClientServerStream::End;
@@ -186,7 +186,7 @@ void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
   // Collect filter needs the MPIMToNSocketConnection to communicate between
   // render server and data server nodes.
   stream  << vtkClientServerStream::Invoke
-          << collect->GetID(0)
+          << collect->GetID()
           << "SetMPIMToNSocketConnection"
           << pm->GetMPIMToNSocketConnectionID(this->ConnectionID)
           << vtkClientServerStream::End;
@@ -196,17 +196,17 @@ void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
   // Set the server flag on the collect filter to correctly identify each
   // processes.
   stream  << vtkClientServerStream::Invoke
-          << collect->GetID(0)
+          << collect->GetID()
           << "SetServerToRenderServer"
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
   stream  << vtkClientServerStream::Invoke
-          << collect->GetID(0)
+          << collect->GetID()
           << "SetServerToDataServer"
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, vtkProcessModule::DATA_SERVER, stream);
   stream  << vtkClientServerStream::Invoke
-          << collect->GetID(0)
+          << collect->GetID()
           << "SetServerToClient"
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
@@ -218,7 +218,7 @@ void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
           << "GetController"
           << vtkClientServerStream::End;
   stream  << vtkClientServerStream::Invoke
-          << distributor->GetID(0)
+          << distributor->GetID()
           << "SetController"
           << vtkClientServerStream::LastResult
           << vtkClientServerStream::End;

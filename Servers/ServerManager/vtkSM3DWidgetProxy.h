@@ -101,7 +101,7 @@ protected:
 
   friend class vtkPV3DWidget;
   void InitializeObservers(vtk3DWidget* widget3D); 
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   void SetCurrentRenderModuleProxy(vtkSMRenderModuleProxy* rm);
 

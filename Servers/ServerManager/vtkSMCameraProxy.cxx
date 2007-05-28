@@ -20,7 +20,7 @@
 #include "vtkCamera.h"
 
 vtkStandardNewMacro(vtkSMCameraProxy);
-vtkCxxRevisionMacro(vtkSMCameraProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMCameraProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMCameraProxy::vtkSMCameraProxy()
 {
@@ -40,7 +40,7 @@ void vtkSMCameraProxy::UpdatePropertyInformation()
     }
 
   vtkCamera* camera = vtkCamera::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetObjectFromID(this->GetID(0)));
+    vtkProcessModule::GetProcessModule()->GetObjectFromID(this->GetID()));
   if (!camera)
     {
     this->Superclass::UpdatePropertyInformation();

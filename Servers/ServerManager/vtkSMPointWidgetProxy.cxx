@@ -22,7 +22,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPointWidgetProxy);
-vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.14");
 
 //----------------------------------------------------------------------------
 vtkSMPointWidgetProxy::vtkSMPointWidgetProxy()
@@ -36,26 +36,21 @@ vtkSMPointWidgetProxy::~vtkSMPointWidgetProxy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPointWidgetProxy::CreateVTKObjects(int numObjects)
+void vtkSMPointWidgetProxy::CreateVTKObjects()
 {
   if(this->ObjectsCreated)
     {
     return;
     }
-  unsigned int cc;
-  
-  this->Superclass::CreateVTKObjects(numObjects); 
+  this->Superclass::CreateVTKObjects(); 
   
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
-  for( cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    vtkClientServerID id = this->GetID(cc);
-    stream << vtkClientServerStream::Invoke 
-           << id << "AllOff" 
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->GetServers(), stream);
-    }
+  vtkClientServerID id = this->GetID();
+  stream << vtkClientServerStream::Invoke 
+         << id << "AllOff" 
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->GetServers(), stream);
 }
 
 //----------------------------------------------------------------------------
@@ -64,22 +59,15 @@ void vtkSMPointWidgetProxy::UpdateVTKObjects()
   this->Superclass::UpdateVTKObjects();
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream str;
-  unsigned int cc;
-  for(cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    vtkClientServerID id = this->GetID(cc);
-    str << vtkClientServerStream::Invoke 
-                    << id
-                    << "SetPosition" 
-                    << this->Position[0]
-                    << this->Position[1]
-                    << this->Position[2]
-                    << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->Servers,str);
-    }
+  vtkClientServerID id = this->GetID();
+  str << vtkClientServerStream::Invoke 
+      << id
+      << "SetPosition" 
+      << this->Position[0]
+      << this->Position[1]
+      << this->Position[2]
+      << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers,str);
 }
 
 //----------------------------------------------------------------------------

@@ -28,7 +28,7 @@
 #include "vtkPVServerInformation.h"
 
 vtkStandardNewMacro(vtkSMCaveRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.11");
 //-----------------------------------------------------------------------------
 vtkSMCaveRenderModuleProxy::vtkSMCaveRenderModuleProxy()
 {
@@ -68,20 +68,16 @@ void vtkSMCaveRenderModuleProxy::InitializeCompositingPipeline()
   
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  unsigned int i;
   vtkClientServerStream stream;
 
   // We had trouble with SGI/aliasing with compositing.
   if (this->GetRenderWindow()->IsA("vtkOpenGLRenderWindow") &&
       (pm->GetNumberOfPartitions(this->ConnectionID ) > 1))
     {
-    for (i=0; i < this->RenderWindowProxy->GetNumberOfIDs(); i++)
-      {
-      stream << vtkClientServerStream::Invoke
-        << this->RenderWindowProxy->GetID(i) 
-        << "SetMultiSamples" << 0
-        << vtkClientServerStream::End;
-      }
+    stream << vtkClientServerStream::Invoke
+           << this->RenderWindowProxy->GetID() 
+           << "SetMultiSamples" << 0
+           << vtkClientServerStream::End;
     pm->SendStream(this->RenderWindowProxy->GetConnectionID(),
       this->RenderWindowProxy->GetServers(), stream);
     }
@@ -89,27 +85,24 @@ void vtkSMCaveRenderModuleProxy::InitializeCompositingPipeline()
   if (pm->GetOptions()->GetClientMode())
     {
     // using vtkClientRenderSyncManager. 
-    for (i=0; i < this->RenderSyncManagerProxy->GetNumberOfIDs(); i++)
-      {
-      // Clean up this mess !!!!!!!!!!!!!
-      // Even a cast to vtkPVClientServerModule would be better than this.
-      // How can we syncronize the process modules and render modules?
-      stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
-        << "GetClientMode" << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke 
-        << this->RenderSyncManagerProxy->GetID(i) 
-        << "SetClientFlag"
-        << vtkClientServerStream::LastResult << vtkClientServerStream::End;
-
-      stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
-        << "GetRenderServerSocketController" 
-        << pm->GetConnectionClientServerID(this->ConnectionID)
-        << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke 
-        << this->RenderSyncManagerProxy->GetID(i)
-        << "SetSocketController" << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-      }
+    // Clean up this mess !!!!!!!!!!!!!
+    // Even a cast to vtkPVClientServerModule would be better than this.
+    // How can we syncronize the process modules and render modules?
+    stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
+           << "GetClientMode" << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << this->RenderSyncManagerProxy->GetID() 
+           << "SetClientFlag"
+           << vtkClientServerStream::LastResult << vtkClientServerStream::End;
+    
+    stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
+           << "GetRenderServerSocketController" 
+           << pm->GetConnectionClientServerID(this->ConnectionID)
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << this->RenderSyncManagerProxy->GetID()
+           << "SetSocketController" << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
     pm->SendStream(this->RenderSyncManagerProxy->GetConnectionID(),
       this->RenderSyncManagerProxy->GetServers(), stream);
     }
@@ -183,7 +176,7 @@ void vtkSMCaveRenderModuleProxy::LoadConfigurationFile(int numDisplays)
 
   vtkCaveRenderManager* crm = 
     vtkCaveRenderManager::SafeDownCast(pm->GetObjectFromID(
-        this->RenderSyncManagerProxy->GetID(0)));
+        this->RenderSyncManagerProxy->GetID()));
 
   for (idx = 0; idx < numDisplays; ++idx)
     { // Just a test case.  Configuration file later.
@@ -236,7 +229,7 @@ void vtkSMCaveRenderModuleProxy::ConfigureFromServerInformation()
     this->ConnectionID);
   vtkCaveRenderManager* crm = 
     vtkCaveRenderManager::SafeDownCast(pm->GetObjectFromID(
-        this->RenderSyncManagerProxy->GetID(0)));
+        this->RenderSyncManagerProxy->GetID()));
 
   unsigned int idx;
   unsigned int numMachines = serverInfo->GetNumberOfMachines();

@@ -25,7 +25,7 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.18");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.19");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
@@ -106,7 +106,7 @@ void vtkSMAnimationCueProxy::SetCaching(int enable)
   
 
 //----------------------------------------------------------------------------
-void vtkSMAnimationCueProxy::CreateVTKObjects(int numObjects)
+void vtkSMAnimationCueProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
@@ -115,9 +115,9 @@ void vtkSMAnimationCueProxy::CreateVTKObjects(int numObjects)
   this->AnimationCue = vtkAnimationCue::New();
   this->InitializeObservers(this->AnimationCue);
   this->ObjectsCreated = 1; //since we don't have any serverside-vtkobjects
-    //we set the objects created flag so that vtkSMProxy does not
-    //attempt to create objects.
-  this->Superclass::CreateVTKObjects(numObjects);
+  //we set the objects created flag so that vtkSMProxy does not
+  //attempt to create objects.
+  this->Superclass::CreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

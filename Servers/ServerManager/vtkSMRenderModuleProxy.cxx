@@ -56,7 +56,7 @@
 
 #include "vtkSMClientServerRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.85");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.86");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -204,13 +204,13 @@ vtkSMRenderModuleProxy::GetOpenGLExtensionsInformation()
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->GatherInformation(this->ConnectionID, vtkProcessModule::CLIENT,
     this->OpenGLExtensionsInformation, 
-    this->RenderWindowProxy->GetID(0));
+    this->RenderWindowProxy->GetID());
     */
   return this->OpenGLExtensionsInformation;
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
+void vtkSMRenderModuleProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
@@ -299,23 +299,23 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
   this->HelperProxy->SetServers(
     vtkProcessModule::CLIENT_AND_SERVERS);
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 
   vtkProcessModule* pvm = vtkProcessModule::GetProcessModule();
   
   // Set all the client side pointers.
   this->Renderer2D = vtkRenderer::SafeDownCast(
-    pvm->GetObjectFromID(this->Renderer2DProxy->GetID(0)));
+    pvm->GetObjectFromID(this->Renderer2DProxy->GetID()));
   this->Renderer = vtkRenderer::SafeDownCast(
-    pvm->GetObjectFromID(this->RendererProxy->GetID(0)));
+    pvm->GetObjectFromID(this->RendererProxy->GetID()));
   this->RenderWindow = vtkRenderWindow::SafeDownCast(
-    pvm->GetObjectFromID(this->RenderWindowProxy->GetID(0)));
+    pvm->GetObjectFromID(this->RenderWindowProxy->GetID()));
   this->Interactor = vtkPVGenericRenderWindowInteractor::SafeDownCast(
-    pvm->GetObjectFromID(this->InteractorProxy->GetID(0)));
+    pvm->GetObjectFromID(this->InteractorProxy->GetID()));
   this->ActiveCamera = vtkCamera::SafeDownCast(
-    pvm->GetObjectFromID(this->ActiveCameraProxy->GetID(0)));
+    pvm->GetObjectFromID(this->ActiveCameraProxy->GetID()));
   this->Helper = vtkPVRenderModuleHelper::SafeDownCast(
-    pvm->GetObjectFromID(this->HelperProxy->GetID(0)));
+    pvm->GetObjectFromID(this->HelperProxy->GetID()));
 
   // Set the active camera for the renderers.  We can't use the Proxy
   // Property since Camera is only create on the CLIENT.  Proxy properties
@@ -864,7 +864,7 @@ vtkPVClientServerIdCollectionInformation* vtkSMRenderModuleProxy
       vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
       vtkProcessModule::RENDER_SERVER, 
       propCollectionInfo, 
-      areaPickerProxy->GetID(0)
+      areaPickerProxy->GetID()
       );
     }
 
@@ -896,7 +896,7 @@ vtkSMProxy *vtkSMRenderModuleProxy::GetProxyFromPropID(
     if (dodp)
       {
       vtkSMProxy *actorProxy = dodp->GetActorProxy();
-      vtkClientServerID idA = actorProxy->GetID(0);
+      vtkClientServerID idA = actorProxy->GetID();
       if (idA == *id)
         {
         //we found it, now return the proxy for the algorithm that produced it
@@ -1051,99 +1051,67 @@ void vtkSMRenderModuleProxy::ComputeVisiblePropBounds(double bds[6])
 // 3D widgets (since they get cleaned out when a source is added!).
 void vtkSMRenderModuleProxy::AddPropToRenderer(vtkSMProxy* proxy)
 {
+  // Make sure that the display was created
+  proxy->CreateVTKObjects();
+
   vtkClientServerStream stream;
-  for (unsigned int i=0; i < this->RendererProxy->GetNumberOfIDs(); i++)
-    {
-    // Make sure that the display was created
-    proxy->CreateVTKObjects(1);
-    for (unsigned int j=0; j < proxy->GetNumberOfIDs(); j++)
-      {
-      stream << vtkClientServerStream::Invoke
-        << this->RendererProxy->GetID(i)
-        << "AddViewProp"
-        << proxy->GetID(j)
-        << vtkClientServerStream::End;
-      }
-    }
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    this->RendererProps->AddItem(proxy);
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->RendererProxy->GetConnectionID(),
-      this->RendererProxy->GetServers(), stream);
-    }
+  stream << vtkClientServerStream::Invoke
+         << this->RendererProxy->GetID()
+         << "AddViewProp"
+         << proxy->GetID()
+         << vtkClientServerStream::End;
+  this->RendererProps->AddItem(proxy);
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->RendererProxy->GetConnectionID(),
+    this->RendererProxy->GetServers(), stream);
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::AddPropToRenderer2D(vtkSMProxy* proxy)
 {
+  // Make sure that the display was created
+  proxy->CreateVTKObjects();
+
   vtkClientServerStream stream;
-  for (unsigned int i=0; i < this->Renderer2DProxy->GetNumberOfIDs(); i++)
-    {
-    for (unsigned int j=0; j < proxy->GetNumberOfIDs(); j++)
-      {
-      stream << vtkClientServerStream::Invoke
-        << this->Renderer2DProxy->GetID(i)
+  stream << vtkClientServerStream::Invoke
+         << this->Renderer2DProxy->GetID()
         << "AddViewProp"
-        << proxy->GetID(j)
+        << proxy->GetID()
         << vtkClientServerStream::End;
-      }
-    }
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    this->Renderer2DProps->AddItem(proxy);
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->RendererProxy->GetConnectionID(),
-      this->RendererProxy->GetServers(), stream);
-    }
+  this->Renderer2DProps->AddItem(proxy);
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->RendererProxy->GetConnectionID(),
+    this->RendererProxy->GetServers(), stream);
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::RemovePropFromRenderer(vtkSMProxy* proxy)
 {
   vtkClientServerStream stream;
-  for (unsigned int i=0; i < this->RendererProxy->GetNumberOfIDs(); i++)
-    {
-    for (unsigned int j=0; j < proxy->GetNumberOfIDs(); j++)
-      {
-      stream << vtkClientServerStream::Invoke
-        << this->RendererProxy->GetID(i)
-        << "RemoveViewProp"
-        << proxy->GetID(j)
-        << vtkClientServerStream::End;
-      }
-    }
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    this->RendererProps->RemoveItem(proxy);
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->RendererProxy->GetConnectionID(),
-      this->RendererProxy->GetServers(), stream);
-    }
+  stream << vtkClientServerStream::Invoke
+         << this->RendererProxy->GetID()
+         << "RemoveViewProp"
+         << proxy->GetID()
+         << vtkClientServerStream::End;
+  this->RendererProps->RemoveItem(proxy);
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->RendererProxy->GetConnectionID(),
+    this->RendererProxy->GetServers(), stream);
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::RemovePropFromRenderer2D(vtkSMProxy* proxy)
 {
   vtkClientServerStream stream;
-  for (unsigned int i=0; i < this->Renderer2DProxy->GetNumberOfIDs(); i++)
-    {
-    for (unsigned int j=0; j < proxy->GetNumberOfIDs(); j++)
-      {
-      stream << vtkClientServerStream::Invoke
-        << this->Renderer2DProxy->GetID(i)
-        << "RemoveViewProp"
-        << proxy->GetID(j)
-        << vtkClientServerStream::End;
-      }
-    }
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    this->Renderer2DProps->RemoveItem(proxy);
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->RendererProxy->GetConnectionID(),
-      this->RendererProxy->GetServers(), stream);
-    }
+  stream << vtkClientServerStream::Invoke
+         << this->Renderer2DProxy->GetID()
+         << "RemoveViewProp"
+         << proxy->GetID()
+         << vtkClientServerStream::End;
+  this->Renderer2DProps->RemoveItem(proxy);
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->RendererProxy->GetConnectionID(),
+    this->RendererProxy->GetServers(), stream);
 }
 
 //-----------------------------------------------------------------------------

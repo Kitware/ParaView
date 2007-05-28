@@ -126,7 +126,7 @@ public:
     helper->UpdateVTKObjects();
 
     pm->GatherInformation(server->GetConnectionID(),
-      vtkProcessModule::DATA_SERVER, information, helper->GetID(0));
+      vtkProcessModule::DATA_SERVER, information, helper->GetID());
 
     helper->Delete();
     }

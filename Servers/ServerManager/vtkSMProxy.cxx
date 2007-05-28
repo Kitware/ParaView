@@ -37,7 +37,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.93");
+vtkCxxRevisionMacro(vtkSMProxy, "1.94");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -118,8 +118,6 @@ vtkSMProxy::vtkSMProxy()
   this->XMLLabel = 0;
   this->ObjectsCreated = 0;
 
-  vtkClientServerID nullID = { 0 };
-  this->SelfID = nullID;
   this->ConnectionID = 
     vtkProcessModuleConnectionManager::GetRootServerConnectionID();
 
@@ -265,19 +263,13 @@ void vtkSMProxy::UnRegisterVTKObjects()
     {
     return;
     }
-  vtkClientServerStream stream;
 
-  vtkstd::vector<vtkClientServerID>::iterator it;
-  for (it=this->Internals->IDs.begin(); it!=this->Internals->IDs.end(); ++it)
+  if (!this->VTKObjectID.IsNull())
     {
-    if (it->ID != 0)
-      {
-      pm->DeleteStreamObject(*it, stream);
-      }
+    vtkClientServerStream stream;
+    pm->DeleteStreamObject(this->VTKObjectID, stream);
+    pm->SendStream(this->ConnectionID, this->Servers, stream);
     }
-  pm->SendStream(this->ConnectionID, this->Servers, stream);
-
-  this->Internals->IDs.clear();
 
   this->ObjectsCreated = 0;
 }
@@ -417,27 +409,10 @@ void vtkSMProxy::SetConnectionIDSelf(vtkIdType id)
 }
 
 //---------------------------------------------------------------------------
-unsigned int vtkSMProxy::GetNumberOfIDs()
+vtkClientServerID vtkSMProxy::GetID()
 {
-  return this->Internals->IDs.size();
-}
-
-//---------------------------------------------------------------------------
-vtkClientServerID vtkSMProxy::GetID(unsigned int idx)
-{
-  this->CreateVTKObjects(idx+1);
-
-  return this->Internals->IDs[idx];
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxy::SetID(unsigned int idx, vtkClientServerID id)
-{
-  if (idx >= this->Internals->IDs.size())
-    {
-    this->Internals->IDs.resize(idx+1);
-    }
-  this->Internals->IDs[idx] = id;
+  this->CreateVTKObjects();
+  return this->VTKObjectID;
 }
 
 //---------------------------------------------------------------------------
@@ -701,20 +676,21 @@ void vtkSMProxy::UpdateProperty(const char* name, int force)
       }
     else
       {
-      vtkClientServerStream str;
-      int numObjects = this->Internals->IDs.size();
-      for (int i=0; i<numObjects; i++)
-        {
-        prop->AppendCommandToStream(this, &str, this->Internals->IDs[i]);
-        }
-      if (str.GetNumberOfMessages() > 0)
+      if (this->VTKObjectID.IsNull())
         {
         // Make sure that server side objects exist before
         // pushing values to them
-        this->CreateVTKObjects(1);
-
-        pm->SendStream(this->ConnectionID, this->Servers, str);
-        this->MarkModified(this);
+        this->CreateVTKObjects();
+        }
+      if (!this->VTKObjectID.IsNull())
+        {
+        vtkClientServerStream str;
+        prop->AppendCommandToStream(this, &str, this->VTKObjectID);
+        if (str.GetNumberOfMessages() > 0)
+          {
+          pm->SendStream(this->ConnectionID, this->Servers, str);
+          this->MarkModified(this);
+          }
         }
       }
     }
@@ -755,7 +731,7 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
     // be created before the input is set.
     if (!vtkSMInputProperty::SafeDownCast(prop))
       {
-      this->CreateVTKObjects(1);
+      this->CreateVTKObjects();
       }
     this->UpdateProperty(it->first.c_str());
     }
@@ -798,7 +774,7 @@ void vtkSMProxy::UpdatePropertyInformation(vtkSMProperty* prop)
     return;
     }
 
-  this->CreateVTKObjects(1);
+  this->CreateVTKObjects();
 
   if (this->ObjectsCreated)
     {
@@ -807,12 +783,14 @@ void vtkSMProxy::UpdatePropertyInformation(vtkSMProperty* prop)
       if (prop->GetUpdateSelf())
         {
         prop->UpdateInformation(this->ConnectionID, 
-          vtkProcessModule::CLIENT, this->GetSelfID());
+                                vtkProcessModule::CLIENT, 
+                                this->GetSelfID());
         }
       else
         {
         prop->UpdateInformation(this->ConnectionID,
-          this->Servers, this->Internals->IDs[0]);
+                                this->Servers, 
+                                this->VTKObjectID);
         }
       prop->UpdateDependentDomains();
       }
@@ -826,7 +804,7 @@ void vtkSMProxy::UpdatePropertyInformation(vtkSMProperty* prop)
 //---------------------------------------------------------------------------
 void vtkSMProxy::UpdatePropertyInformation()
 {
-  this->CreateVTKObjects(1);
+  this->CreateVTKObjects();
 
   if (!this->ObjectsCreated)
     {
@@ -850,7 +828,8 @@ void vtkSMProxy::UpdatePropertyInformation()
       else
         {
         prop->UpdateInformation(this->ConnectionID,
-          this->Servers, this->Internals->IDs[0]);
+                                this->Servers, 
+                                this->VTKObjectID);
         }
       }
     }
@@ -967,7 +946,7 @@ void vtkSMProxy::UpdateVTKObjects()
       }
     }
 
-  this->CreateVTKObjects(1);
+  this->CreateVTKObjects();
   if (!this->ObjectsCreated)
     {
     this->InUpdateVTKObjects = 0;
@@ -1043,7 +1022,60 @@ void vtkSMProxy::UpdatePipelineInformation()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::CreateVTKObjects(int numObjects)
+void vtkSMProxy::InitializeWithID(vtkClientServerID id)
+{
+  if (this->ObjectsCreated || id.IsNull())
+    {
+    return;
+    }
+  this->ObjectsCreated = 1;
+  this->GetSelfID(); // this will ensure that the SelfID is assigned properly.
+  this->VTKObjectID = id;
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke 
+         << pm->GetProcessModuleID()
+         << "RegisterProgressEvent" 
+         << this->VTKObjectID
+         << static_cast<int>(this->VTKObjectID.ID)
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
+
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    this->Internals->SubProxies.begin();
+  for( ; it2 != this->Internals->SubProxies.end(); it2++)
+    {
+    it2->second.GetPointer()->CreateVTKObjects();
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::InitializeAndCopyFromProxy(vtkSMProxy* fromP)
+{
+  if (this->ObjectsCreated)
+    {
+    return;
+    }
+
+  fromP->CreateVTKObjects();
+  this->SetConnectionID(fromP->GetConnectionID());
+  this->SetServers(fromP->GetServers());
+
+  vtkClientServerStream stream;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerID newid = pm->GetUniqueID();
+  stream  << vtkClientServerStream::Assign
+          << newid
+          << fromP->GetID()
+          << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
+  this->InitializeWithID(newid);
+}
+
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
@@ -1056,30 +1088,22 @@ void vtkSMProxy::CreateVTKObjects(int numObjects)
     {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkClientServerStream stream;
-    for (int i=0; i<numObjects; i++)
-      {
-      vtkClientServerID objectId = 
-        pm->NewStreamObject(this->VTKClassName, stream);
-      this->Internals->IDs.push_back(objectId);
-
-      stream << vtkClientServerStream::Invoke 
-             << pm->GetProcessModuleID()
-             << "RegisterProgressEvent" 
-             << objectId 
-             << static_cast<int>(objectId.ID)
-             << vtkClientServerStream::End;
-      }
-    if (stream.GetNumberOfMessages() > 0)
-      {
-      pm->SendStream(this->ConnectionID, this->Servers, stream);
-      }
+    this->VTKObjectID =
+      pm->NewStreamObject(this->VTKClassName, stream);
+    stream << vtkClientServerStream::Invoke 
+           << pm->GetProcessModuleID()
+           << "RegisterProgressEvent" 
+           << this->VTKObjectID
+           << static_cast<int>(this->VTKObjectID.ID)
+           << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, this->Servers, stream);
     }
 
   vtkSMProxyInternals::ProxyMap::iterator it2 =
     this->Internals->SubProxies.begin();
   for( ; it2 != this->Internals->SubProxies.end(); it2++)
     {
-    it2->second.GetPointer()->CreateVTKObjects(numObjects);
+    it2->second.GetPointer()->CreateVTKObjects();
     }
 }
 
@@ -1097,7 +1121,6 @@ void vtkSMProxy::ReviveVTKObjects()
   this->GetSelfID();
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  int numObjects = this->Internals->IDs.size();
 
   vtkPVOptions* options = pm->GetOptions();
   if (options->GetServerMode() || options->GetRenderServerMode())
@@ -1105,41 +1128,32 @@ void vtkSMProxy::ReviveVTKObjects()
     // This server manager is running on the server. 
     // Reviving such VTK objects means creating the objects only
     // when the Servers == CLIENT only.
-    if (this->Servers != vtkProcessModule::CLIENT)
+    if (this->Servers != vtkProcessModule::CLIENT &&
+        !this->VTKObjectID.IsNull())
       {
-      // We still need to update the PM to make sure that the IDs don't get
+      // We still need to update the PM to make sure that the ID doesn't get
       // accidently reused.
-      for (int cc=0; cc < numObjects; cc++)
-        {
-        pm->ReserveID(this->Internals->IDs[cc]);
-        }
+      pm->ReserveID(this->VTKObjectID);
       return;
       }
     }
 
   if (this->VTKClassName && this->VTKClassName[0] != '\0')
     {
-    if (numObjects == 0)
+    if (this->VTKObjectID.IsNull())
       {
-      vtkErrorMacro("No IDs set to revive.");
+      vtkErrorMacro("No ID set to revive.");
       return;
       }
     vtkClientServerStream stream;
-    for (int i=0; i<numObjects; i++)
-      {
-      vtkClientServerID objectId = { 0 };
-      objectId = this->Internals->IDs[i];
-      pm->NewStreamObject(this->VTKClassName, stream, objectId);
+    pm->NewStreamObject(this->VTKClassName, stream, this->VTKObjectID);
 
-      stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
-        << "RegisterProgressEvent"
-        << objectId << static_cast<int>(objectId.ID)
-        << vtkClientServerStream::End;
-      }
-    if (stream.GetNumberOfMessages() > 0)
-      {
-      pm->SendStream(this->ConnectionID, this->Servers, stream);
-      }
+    stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
+           << "RegisterProgressEvent"
+           << this->VTKObjectID 
+           << static_cast<int>(this->VTKObjectID.ID)
+           << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, this->Servers, stream);
     }
   vtkSMProxyInternals::ProxyMap::iterator it2 =
     this->Internals->SubProxies.begin();
@@ -1869,7 +1883,7 @@ int vtkSMProxy::LoadRevivalState(vtkPVXMLElement* revivalElem,
     return 0;
     }
 
-  vtkClientServerID selfid = { 0 };
+  vtkClientServerID selfid;
   int temp = 0;
 
   if (revivalElem->GetScalarAttribute("servers", &temp))
@@ -1896,10 +1910,11 @@ int vtkSMProxy::LoadRevivalState(vtkPVXMLElement* revivalElem,
     {
     vtkPVXMLElement* currentElement = revivalElem->GetNestedElement(cc);
     const char* name = currentElement->GetName();
-    if (name && strcmp(name, "VTKObjectIDs") == 0)
+    if (name && strncmp(name, "VTKObjectID", strlen("VTKObjectID")) == 0)
       {
-      this->Internals->IDs.clear();
-      for (unsigned int i=0; i < currentElement->GetNumberOfNestedElements(); i++)
+      for (unsigned int i=0; 
+           i < currentElement->GetNumberOfNestedElements(); 
+           i++)
         {
         vtkPVXMLElement* element = currentElement->GetNestedElement(i);
         if (element->GetName() && strcmp(element->GetName(), "Element") == 0)
@@ -1908,9 +1923,17 @@ int vtkSMProxy::LoadRevivalState(vtkPVXMLElement* revivalElem,
           int int_id;
           if (element->GetScalarAttribute("id", &int_id) && int_id)
             {
-            id.ID = int_id;
-            this->Internals->IDs.push_back(id);
+            this->VTKObjectID.ID = int_id;
             }
+          else
+            {
+            vtkErrorMacro("Element with id attribute found.");
+            }
+          }
+        else
+          {
+          vtkErrorMacro("Unexpected element, name: " 
+                        << (element->GetName()?element->GetName():"(null)"));
           }
         }
       }
@@ -1984,21 +2007,19 @@ vtkPVXMLElement* vtkSMProxy::SaveRevivalState(vtkPVXMLElement* root)
   root->AddNestedElement(proxyElement);
   proxyElement->Delete();
 
-  // Save VTKObject IDs as well.
+  // Save VTKObject ID as well.
   vtkPVXMLElement* idRoot = vtkPVXMLElement::New();
-  idRoot->SetName("VTKObjectIDs");
-  idRoot->AddAttribute("number_of_ids", this->GetNumberOfIDs());
+  idRoot->SetName("VTKObjectID");
   proxyElement->AddNestedElement(idRoot);
   idRoot->Delete();
-  for (unsigned int cc=0; cc < this->Internals->IDs.size(); cc++)
-    {
-    vtkPVXMLElement* elem = vtkPVXMLElement::New();
-    elem->SetName("Element");
-    elem->AddAttribute("id", 
-      static_cast<unsigned int>(this->Internals->IDs[cc].ID));
-    idRoot->AddNestedElement(elem);
-    elem->Delete();
-    }
+
+  vtkPVXMLElement* elem = vtkPVXMLElement::New();
+  elem->SetName("Element");
+  elem->AddAttribute("id", 
+                     static_cast<unsigned int>(this->VTKObjectID.ID));
+  idRoot->AddNestedElement(elem);
+  elem->Delete();
+
   vtkSMProxyInternals::ProxyMap::iterator iter =
     this->Internals->SubProxies.begin();
   for (; iter != this->Internals->SubProxies.end(); ++iter)
@@ -2157,35 +2178,6 @@ void vtkSMProxy::ExposeSubProxyProperty(const char* subproxy_name,
   // This vector keeps track of the order in which properties
   // were added.
   this->Internals->PropertyNamesInOrder.push_back(exposed_name);
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxy::CopyIDs(vtkSMProxy* copyTo)
-{
-  // Ensure we are created.
-  this->CreateVTKObjects(1);
-
-  if (copyTo->GetObjectsCreated())
-    {
-    vtkErrorMacro("Proxy has already been created, argument must be an "
-      "initialized proxy.");
-    return;
-    }
-
-  vtkClientServerStream stream;
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  for (unsigned int cc=0; cc < this->Internals->IDs.size(); cc++)
-    {
-    vtkClientServerID newid = pm->GetUniqueID();
-    stream  << vtkClientServerStream::Assign
-      << newid
-      << this->Internals->IDs[cc]
-      << vtkClientServerStream::End;
-    copyTo->Internals->IDs.push_back(newid);
-    }
-  pm->SendStream(copyTo->GetConnectionID(), copyTo->GetServers(), stream);
-
-  copyTo->ObjectsCreated = 1;
 }
 
 //---------------------------------------------------------------------------

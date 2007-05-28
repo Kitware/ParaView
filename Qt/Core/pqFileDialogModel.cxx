@@ -281,7 +281,7 @@ public:
       pm->GatherInformation(this->FileInformationHelperProxy->GetConnectionID(),
         vtkProcessModule::DATA_SERVER, 
         this->FileInformation, 
-        this->FileInformationHelperProxy->GetID(0));
+        this->FileInformationHelperProxy->GetID());
       }
     else
       {

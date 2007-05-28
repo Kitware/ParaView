@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMXYPlotActorProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.10");
 vtkCxxSetObjectMacro(vtkSMXYPlotActorProxy, Input, vtkSMSourceProxy);
 
 class vtkSMXYPlotActorProxyInternals
@@ -72,21 +72,15 @@ void vtkSMXYPlotActorProxy::SetPosition(double x, double y)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
-  for (unsigned int i=0; i < this->GetNumberOfIDs(); i++)
-    {
-    vtkClientServerID sourceID = this->GetID(i); 
-    stream << vtkClientServerStream::Invoke
-      << sourceID  << "GetPositionCoordinate"
-      << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult << "SetValue"
-      << x << y << 0.0
-      << vtkClientServerStream::End;
-    }
-  if ( stream.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->GetServers(), stream);
-    }
+  vtkClientServerID sourceID = this->GetID();
+  stream << vtkClientServerStream::Invoke
+         << sourceID  << "GetPositionCoordinate"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << vtkClientServerStream::LastResult << "SetValue"
+         << x << y << 0.0
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->GetServers(), stream);
 }
 
 //-----------------------------------------------------------------------------
@@ -94,21 +88,15 @@ void vtkSMXYPlotActorProxy::SetPosition2(double x, double y)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
-  for (unsigned int i=0; i < this->GetNumberOfIDs(); i++)
-    {
-    vtkClientServerID sourceID = this->GetID(i); 
-    stream << vtkClientServerStream::Invoke
-      << sourceID  << "GetPosition2Coordinate"
-      << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult << "SetValue"
-      << x << y << 0.0
-      << vtkClientServerStream::End;
-    }
-  if ( stream.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->GetServers(), stream);
-    }
+  vtkClientServerID sourceID = this->GetID(); 
+  stream << vtkClientServerStream::Invoke
+         << sourceID  << "GetPosition2Coordinate"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << vtkClientServerStream::LastResult << "SetValue"
+         << x << y << 0.0
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->GetServers(), stream);
 }
 
 //-----------------------------------------------------------------------------
@@ -132,7 +120,7 @@ void vtkSMXYPlotActorProxy::SetupInputs()
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
-  vtkClientServerID sourceID = this->GetID(0);
+  vtkClientServerID sourceID = this->GetID();
 
   stream << vtkClientServerStream::Invoke
     << sourceID << "RemoveAllInputs"
@@ -233,7 +221,7 @@ void vtkSMXYPlotActorProxy::AddInput(vtkSMSourceProxy* input,
     }
   input->CreateParts();
   this->SetInput(input);
-  this->CreateVTKObjects(1);
+  this->CreateVTKObjects();
   this->ArrayNamesModified = 1;
 }
 
@@ -242,7 +230,7 @@ void vtkSMXYPlotActorProxy::CleanInputs(const char* command)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
-  vtkClientServerID sourceID = this->GetID(0);
+  vtkClientServerID sourceID = this->GetID();
 
   stream << vtkClientServerStream::Invoke
     << sourceID << command << vtkClientServerStream::End;

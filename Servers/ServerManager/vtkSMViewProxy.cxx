@@ -49,7 +49,7 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMViewProxy::vtkSMViewProxy()
 {
@@ -81,7 +81,7 @@ vtkSMViewProxy::~vtkSMViewProxy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMViewProxy::CreateVTKObjects(int numObjects)
+void vtkSMViewProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
@@ -99,14 +99,14 @@ void vtkSMViewProxy::CreateVTKObjects(int numObjects)
       vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
     }
 
-  if (!this->BeginCreateVTKObjects(numObjects))
+  if (!this->BeginCreateVTKObjects())
     {
     return;
     }
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 
-  this->EndCreateVTKObjects(numObjects);
+  this->EndCreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

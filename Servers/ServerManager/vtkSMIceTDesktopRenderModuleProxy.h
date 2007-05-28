@@ -62,9 +62,9 @@ protected:
   vtkSMIceTDesktopRenderModuleProxy();
   ~vtkSMIceTDesktopRenderModuleProxy();
 
-  // This method is the wierdest CreateVTKObjects I have known.
+  // This method is the weirdest CreateVTKObjects I have known.
   // Basically we are trying to create the Renderer in a non-standard way.
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   // Description:
   // Subclasses should override this method to intialize the Composite Manager.

@@ -72,7 +72,7 @@ public:
     // items in the hierarchy view).
     vtkSMProxyManager* pm = vtkSMProxy::GetProxyManager();
     ExodusHelper.TakeReference(pm->NewProxy("misc", "ExodusReaderHelper"));
-    p->proxy()->CopyIDs(ExodusHelper);
+    ExodusHelper->InitializeAndCopyFromProxy(p->proxy());
   }
   vtkSmartPointer<vtkSMProxy> ExodusHelper;
   QVector<double> TimestepValues;

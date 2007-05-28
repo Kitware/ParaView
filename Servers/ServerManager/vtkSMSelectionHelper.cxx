@@ -33,7 +33,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.3");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.4");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -71,7 +71,7 @@ void vtkSMSelectionHelper::AddSourceIDs(vtkSelection* sel,
 
   if (geomP)
     {
-    properties->Set(vtkSelection::SOURCE_ID(), geomP->GetID(0).ID);
+    properties->Set(vtkSelection::SOURCE_ID(), geomP->GetID().ID);
     }
 
   if (objP)
@@ -80,12 +80,12 @@ void vtkSMSelectionHelper::AddSourceIDs(vtkSelection* sel,
       {
       // For compound proxies, the selected proxy is the consumed proxy.
       properties->Set(vtkSelectionSerializer::ORIGINAL_SOURCE_ID(), 
-        cp->GetConsumableProxy()->GetID(0).ID);
+        cp->GetConsumableProxy()->GetID().ID);
       }
     else
       {
       properties->Set(vtkSelectionSerializer::ORIGINAL_SOURCE_ID(), 
-        objP->GetID(0).ID);
+        objP->GetID().ID);
       }
     }
 }
@@ -102,7 +102,7 @@ void vtkSMSelectionHelper::SendSelection(vtkSelection* sel, vtkSMProxy* proxy)
   vtkClientServerID parserID =
     processModule->NewStreamObject("vtkSelectionSerializer", stream);
   stream << vtkClientServerStream::Invoke
-         << parserID << "Parse" << res.str() << proxy->GetID(0)
+         << parserID << "Parse" << res.str() << proxy->GetID()
          << vtkClientServerStream::End;
   processModule->DeleteStreamObject(parserID, stream);
 
@@ -246,8 +246,8 @@ void vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelectionInternal(
   stream << vtkClientServerStream::Invoke
          << converterID 
          << "Convert" 
-         << selectionP->GetID(0) 
-         << volumeSelectionP->GetID(0)
+         << selectionP->GetID() 
+         << volumeSelectionP->GetID()
          << global_ids
          << vtkClientServerStream::End;
   processModule->DeleteStreamObject(converterID, stream);
@@ -260,7 +260,7 @@ void vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelectionInternal(
   processModule->GatherInformation(connectionID,
                                    vtkProcessModule::DATA_SERVER, 
                                    selInfo, 
-                                   volumeSelectionP->GetID(0));
+                                   volumeSelectionP->GetID());
 
   output->ShallowCopy(selInfo->GetSelection());
 

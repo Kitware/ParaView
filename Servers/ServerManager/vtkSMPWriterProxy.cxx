@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMPWriterProxy);
-vtkCxxRevisionMacro(vtkSMPWriterProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMPWriterProxy, "1.5");
 //-----------------------------------------------------------------------------
 vtkSMPWriterProxy::vtkSMPWriterProxy()
 {
@@ -34,14 +34,14 @@ vtkSMPWriterProxy::~vtkSMPWriterProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPWriterProxy::CreateVTKObjects(int numObjects)
+void vtkSMPWriterProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
     return;
     }
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 
   if (!this->ObjectsCreated)
     {
@@ -55,17 +55,17 @@ void vtkSMPWriterProxy::CreateVTKObjects(int numObjects)
   int isPVDWriter = 0;
 
   str << vtkClientServerStream::Invoke
-    << this->GetID(0)
+    << this->GetID()
     << "IsA"
     << "vtkXMLPDataWriter"
     << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, 
-    vtkProcessModule::GetRootId(this->Servers), str);
+                 vtkProcessModule::GetRootId(this->Servers), str);
   pm->GetLastResult(this->ConnectionID,
-    vtkProcessModule::GetRootId(this->Servers)).GetArgument(0, 0, &isXMLPWriter);
+                    vtkProcessModule::GetRootId(this->Servers)).GetArgument(0, 0, &isXMLPWriter);
 
   str << vtkClientServerStream::Invoke
-    << this->GetID(0)
+    << this->GetID()
     << "IsA"
     << "vtkXMLPVDWriter"
     << vtkClientServerStream::End;
@@ -76,71 +76,63 @@ void vtkSMPWriterProxy::CreateVTKObjects(int numObjects)
 
   if (isXMLPWriter)
     {
-    for (unsigned int idx = 0; idx < this->GetNumberOfIDs(); idx++)
-      {
-      str << vtkClientServerStream::Invoke
+    str << vtkClientServerStream::Invoke
         << pm->GetProcessModuleID()
         << "GetNumberOfLocalPartitions"
         << vtkClientServerStream::End;
-      str << vtkClientServerStream::Invoke
-        << this->GetID(idx)
+    str << vtkClientServerStream::Invoke
+        << this->GetID()
         << "SetNumberOfPieces"
         << vtkClientServerStream::LastResult 
         << vtkClientServerStream::End;
-      str << vtkClientServerStream::Invoke
+    str << vtkClientServerStream::Invoke
         << pm->GetProcessModuleID()
         << "GetPartitionId"
         << vtkClientServerStream::End;
-      str << vtkClientServerStream::Invoke
-        << this->GetID(idx)
+    str << vtkClientServerStream::Invoke
+        << this->GetID()
         << "SetStartPiece"
         << vtkClientServerStream::LastResult
         << vtkClientServerStream::End;
-      str << vtkClientServerStream::Invoke
+    str << vtkClientServerStream::Invoke
         << pm->GetProcessModuleID()
         << "GetPartitionId"
         << vtkClientServerStream::End;
-      str << vtkClientServerStream::Invoke
-        << this->GetID(idx)
+    str << vtkClientServerStream::Invoke
+        << this->GetID()
         << "SetEndPiece"
         << vtkClientServerStream::LastResult
         << vtkClientServerStream::End;
-      }
     }
   else if (isPVDWriter)
     {
-    for (unsigned int idx = 0; idx < this->GetNumberOfIDs(); idx++)
-      {
-      str << vtkClientServerStream::Invoke
+    str << vtkClientServerStream::Invoke
         << pm->GetProcessModuleID()
         << "GetNumberOfLocalPartitions"
         << vtkClientServerStream::End;
-      str << vtkClientServerStream::Invoke
-        << this->GetID(idx)
+    str << vtkClientServerStream::Invoke
+        << this->GetID()
         << "SetNumberOfPieces"
         << vtkClientServerStream::LastResult 
         << vtkClientServerStream::End;
-      str << vtkClientServerStream::Invoke
+    str << vtkClientServerStream::Invoke
         << pm->GetProcessModuleID()
         << "GetPartitionId"
         << vtkClientServerStream::End;
-      str << vtkClientServerStream::Invoke
-        << this->GetID(idx)
+    str << vtkClientServerStream::Invoke
+        << this->GetID()
         << "SetPiece"
         << vtkClientServerStream::LastResult
         << vtkClientServerStream::End;
-      }
     }
 
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->Servers, str);
-    }
+  pm->SendStream(this->ConnectionID, this->Servers, str);
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPWriterProxy::AddInput(vtkSMSourceProxy* input, const char* method,
-  int hasMultipleInputs)
+void vtkSMPWriterProxy::AddInput(vtkSMSourceProxy* input, 
+                                 const char* method,
+                                 int hasMultipleInputs)
 {
 
   vtkSMSourceProxy* completeArrays = vtkSMSourceProxy::SafeDownCast(
@@ -165,19 +157,16 @@ void vtkSMPWriterProxy::AddInput(vtkSMSourceProxy* input, const char* method,
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkClientServerStream stream;
 
-    for (unsigned int cc=0; cc < sumHelper->GetNumberOfIDs(); cc++)
-      {
-      stream << vtkClientServerStream::Invoke
-             << sumHelper->GetID(cc) << "SetWriter" << this->GetID(0)
-             << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke
-             << pm->GetProcessModuleID() << "GetController"
-             << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke
-             << sumHelper->GetID(cc) << "SetController"
-             << vtkClientServerStream::LastResult
-             << vtkClientServerStream::End;
-      }
+    stream << vtkClientServerStream::Invoke
+           << sumHelper->GetID() << "SetWriter" << this->GetID()
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << pm->GetProcessModuleID() << "GetController"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << sumHelper->GetID() << "SetController"
+           << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, this->Servers, stream);
     }
 }
@@ -191,13 +180,10 @@ void vtkSMPWriterProxy::UpdatePipeline()
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkClientServerStream stream;
 
-    for (unsigned int cc=0; cc < sumHelper->GetNumberOfIDs(); cc++)
-      {
-      stream << vtkClientServerStream::Invoke
-             << sumHelper->GetID(cc) 
-             << "SynchronizeSummaryFiles"
-             << vtkClientServerStream::End;
-      }
+    stream << vtkClientServerStream::Invoke
+           << sumHelper->GetID() 
+           << "SynchronizeSummaryFiles"
+           << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, this->Servers, stream);
     }
   this->Superclass::UpdatePipeline();
@@ -212,13 +198,10 @@ void vtkSMPWriterProxy::UpdatePipeline(double time)
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkClientServerStream stream;
 
-    for (unsigned int cc=0; cc < sumHelper->GetNumberOfIDs(); cc++)
-      {
-      stream << vtkClientServerStream::Invoke
-             << sumHelper->GetID(cc) 
-             << "SynchronizeSummaryFiles"
-             << vtkClientServerStream::End;
-      }
+    stream << vtkClientServerStream::Invoke
+           << sumHelper->GetID() 
+           << "SynchronizeSummaryFiles"
+           << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, this->Servers, stream);
     }
   this->Superclass::UpdatePipeline(time);

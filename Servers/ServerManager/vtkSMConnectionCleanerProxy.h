@@ -47,7 +47,7 @@ protected:
 
   // Description:
   // Overridden to set the connection ID correctly on the server side objects.
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 private:
   vtkSMConnectionCleanerProxy(const vtkSMConnectionCleanerProxy&); // Not implemented.
   void operator=(const vtkSMConnectionCleanerProxy&); // Not implemented.

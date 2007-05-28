@@ -64,7 +64,7 @@ protected:
   vtkSMNew3DWidgetProxy();
   ~vtkSMNew3DWidgetProxy();
 
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   vtkSMProxy* RepresentationProxy;
   vtkSMProxy* WidgetProxy;

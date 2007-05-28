@@ -125,7 +125,7 @@ protected:
 
   int RenderModuleId;
 
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   vtkSMProxy* RenderSyncManagerProxy;
 

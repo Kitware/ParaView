@@ -226,7 +226,7 @@ public:
 //BTX
   // Description:
   // Returns the id of a server object.
-  vtkClientServerID GetID(unsigned int idx);
+  vtkClientServerID GetID();
 
   // Description:
   // Returns the Self ID of the proxy.
@@ -235,20 +235,6 @@ public:
   // proxy exists i.e. this->ConnectionID.
   vtkClientServerID GetSelfID();
 //ETX
-
-  // Description:
-  // Returns the number of server ids (same as the number of server objects
-  // if CreateVTKObjects() has already been called)
-  unsigned int GetNumberOfIDs();
-
-  // Description:
-  // Use the method with caution. It copies the VTK object IDs from this 
-  // proxy to the proxy passed in as the argument. This proxy must
-  // be created while the passed in proxy should not have any VTK objects
-  // associated with it. This is useful to make two (or more) proxies 
-  // represent the same VTK object.
-  // This method does not copy IDs for any subproxies.
-  void CopyIDs(vtkSMProxy* copyTo);
 
   // Description:
   // Returns a new (initialized) iterator of the properties.
@@ -385,6 +371,26 @@ public:
   // Description:
   // Retuns if the VTK objects for this proxy have been created.
   vtkGetMacro(ObjectsCreated, int);
+
+  // Description:
+  // Given a source proxy, makes this proxy point to the same server-side
+  // object (with a new id). This method copies connection id as well as
+  // server ids. This method can be called only once on an uninitialized
+  // proxy (CreateVTKObjects() also initialized a proxy) This is useful to
+  // make two (or more) proxies represent the same VTK object. This method
+  // does not copy IDs for any subproxies.
+  void InitializeAndCopyFromProxy(vtkSMProxy* source);
+
+//BTX
+  // Description:
+  // Initializes this proxy with the given id for an already created server
+  // side object. Make sure to set Servers before calling this method.
+  // This method will call CreateVTKObjects() on all sub-proxies. This
+  // method can be called only once on an uninitialized proxy
+  // (CreateVTKObjects() also initialized a proxy)
+  virtual void InitializeWithID(vtkClientServerID id);
+//ETX
+
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
@@ -456,38 +462,24 @@ protected:
   void SetSelfID(vtkClientServerID id);
   
   // Description:
-  // Given the number of objects (numObjects), class name (VTKClassName)
-  // and server ids ( this->GetServerIDs()), this methods instantiates
-  // the objects on the server(s)
-  virtual void CreateVTKObjects(int numObjects);
+  // Given a class name (by setting VTKClassName) and server ids (by
+  // setting ServerIDs), this methods instantiates the objects on the
+  // server(s)
+  virtual void CreateVTKObjects();
 
   // Description:
-  // This method is complementary to CreateVTKObjects() when we want the proxy to
-  // reuse the VTK object IDs are defined. When reviving a proxy on the client,
-  // this method creates new client-side objects and reuses the server side objects.
-  // When reviving a proxy on the server, it reuses the server objects while creating
-  // new "client-only" objects on the server itself.
+  // This method is complementary to CreateVTKObjects() when we want the
+  // proxy to reuse the VTK object ID are defined. When reviving a proxy
+  // on the client, this method creates new client-side objects and reuses
+  // the server side objects.  When reviving a proxy on the server, it
+  // reuses the server objects while creating new "client-only" objects on
+  // the server itself.
   virtual void ReviveVTKObjects();
 
   // Description:
   // UnRegister all managed objects. This also resets the ID list.
   // However, it does not remove the properties.
   void UnRegisterVTKObjects();
-
-
-  // Description:
-  // IDs are used to access server objects using the stream-based wrappers.
-  // The following methods manage the IDs of objects maintained by the proxy.
-  // Note that the IDs are assigned by the proxy at creation time. They
-  // can not be set.
-  // Add an ID to be managed by the proxy. In this case, the proxy
-  // takes control of the reference (it unassigns the ID in destructor).
-  // One easy of creating an empty proxy and assigning IDs to it is:
-  // proxy->SetVTKClassName("foobar");
-  // proxy->CreateVTKObjects(0);
-  // proxy->SetID(0, id1);
-  // proxy->SetID(1, id2);
-  virtual void SetID(unsigned int idx, vtkClientServerID id);
 
   // Description:
   // Server IDs determine on which server(s) the VTK objects are
@@ -637,8 +629,8 @@ protected:
   // Loads the revival state for the proxy.
   // RevivalState includes the entire state saved by calling 
   // SaveState() as well additional information such as server side
-  // object IDs. This makes it possible to restore the servermanager state
-  // while reusing server side object ids.
+  // object ID. This makes it possible to restore the servermanager state
+  // while reusing server side object id.
   virtual int LoadRevivalState(vtkPVXMLElement* revivalElement, 
     vtkSMStateLoaderBase* loader);
  
@@ -685,7 +677,7 @@ protected:
   // which can be used to revive the proxy using server side objects
   // already present. RevivalState includes the entire state saved by calling 
   // SaveState() as well additional information such as server side
-  // object IDs. This makes it possible to restore the servermanager state
+  // object ID. This makes it possible to restore the servermanager state
   // while reusing server side object ids.
   virtual vtkPVXMLElement* SaveRevivalState(vtkPVXMLElement* root);
 
@@ -704,6 +696,10 @@ protected:
 
   // Flag used to break consumer loops.
   int InMarkModified;
+
+  // Description:
+  // Client/server id of the VTK object this is a proxy of.
+  vtkClientServerID VTKObjectID;
 
 private:
   vtkSMProxyInternals* Internals;

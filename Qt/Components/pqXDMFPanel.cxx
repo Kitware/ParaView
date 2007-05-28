@@ -65,7 +65,7 @@ public:
    // and we'll do that with the clone.
     vtkSMProxyManager* pm = vtkSMProxy::GetProxyManager();
     XDMFHelper.TakeReference(pm->NewProxy("misc", "XdmfReaderHelper"));
-    p->proxy()->CopyIDs(XDMFHelper);
+    XDMFHelper->InitializeAndCopyFromProxy(p->proxy());
     this->XDMFHelper->UpdatePropertyInformation();
   }
   // our helper

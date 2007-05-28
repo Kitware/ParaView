@@ -23,7 +23,7 @@
 #include "vtkDoubleArray.h"
 
 vtkStandardNewMacro(vtkSMExtractLocationsProxy);
-vtkCxxRevisionMacro(vtkSMExtractLocationsProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMExtractLocationsProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMExtractLocationsProxy::vtkSMExtractLocationsProxy()
 {
@@ -61,14 +61,14 @@ void vtkSMExtractLocationsProxy::RemoveAllLocations()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMExtractLocationsProxy::CreateVTKObjects(int num)
+void vtkSMExtractLocationsProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
     return;
     }
 
-  this->Superclass::CreateVTKObjects(num);
+  this->Superclass::CreateVTKObjects();
 
   if (!this->ObjectsCreated)
     {

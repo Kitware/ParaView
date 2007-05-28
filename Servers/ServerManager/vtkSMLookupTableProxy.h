@@ -39,13 +39,6 @@ public:
   virtual void UpdateVTKObjects();
 
   // Description:
-  // Given the number of objects (numObjects), class name 
-  // (VTKClassName) and server ids ( this->GetServerIDs()), 
-  // this methods instantiates the objects on the server(s)
-  // This method is overridden to change the servers.
-  virtual void CreateVTKObjects(int numObjects);
-
-  // Description:
   // This map is used for arrays with this name 
   // and this number of components.  In the future, they may
   // handle more than one type of array.
@@ -76,6 +69,9 @@ public:
 protected:
   vtkSMLookupTableProxy();
   ~vtkSMLookupTableProxy();
+
+  // This method is overridden to change the servers.
+  virtual void CreateVTKObjects();
 
   char* ArrayName;
 

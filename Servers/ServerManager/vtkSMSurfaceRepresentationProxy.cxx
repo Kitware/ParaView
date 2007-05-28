@@ -31,7 +31,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -188,9 +188,9 @@ bool vtkSMSurfaceRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSurfaceRepresentationProxy::BeginCreateVTKObjects(int numObjects)
+bool vtkSMSurfaceRepresentationProxy::BeginCreateVTKObjects()
 {
-  if (!this->Superclass::BeginCreateVTKObjects(numObjects))
+  if (!this->Superclass::BeginCreateVTKObjects())
     {
     return false;
     }
@@ -238,7 +238,7 @@ bool vtkSMSurfaceRepresentationProxy::BeginCreateVTKObjects(int numObjects)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSurfaceRepresentationProxy::EndCreateVTKObjects(int numObjects)
+bool vtkSMSurfaceRepresentationProxy::EndCreateVTKObjects()
 {
   this->Connect(this->GetInputProxy(), this->GeometryFilter, "Input");
   this->Connect(this->Mapper, this->Prop3D, "Mapper");
@@ -258,7 +258,7 @@ bool vtkSMSurfaceRepresentationProxy::EndCreateVTKObjects(int numObjects)
   ivp->SetElement(0, 0);
   this->SelectionProp3D->UpdateProperty("Pickable");
 
-  return this->Superclass::EndCreateVTKObjects(numObjects);
+  return this->Superclass::EndCreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -292,21 +292,21 @@ void vtkSMSurfaceRepresentationProxy::ConvertSurfaceSelectionToVolumeSelection(
   // Process selInput to add SOURCE_ID() and ORIGINAL_SOURCE_ID() keys to it to
   // help the converter in converting the selection.
 
-  vtkClientServerID sourceId = this->GeometryFilter->GetID(0);
+  vtkClientServerID sourceId = this->GeometryFilter->GetID();
   vtkClientServerID originalSourceId;
   vtkSMProxy* input = this->GetInputProxy();
   if (vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(input))
     {
     // For compound proxies, the selected proxy is the consumed proxy.
-    originalSourceId = cp->GetConsumableProxy()->GetID(0);
+    originalSourceId = cp->GetConsumableProxy()->GetID();
     }
   else
     {
-    originalSourceId = input->GetID(0);
+    originalSourceId = input->GetID();
     }
 
   vtkSMSurfaceRepresentationProxyAddSourceIDs(selInput,
-    this->Prop3D->GetID(0), sourceId, originalSourceId);
+    this->Prop3D->GetID(), sourceId, originalSourceId);
   vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelection(
     this->ConnectionID, selInput, selOutput);
 }
@@ -336,7 +336,7 @@ vtkSMProxy* vtkSMSurfaceRepresentationProxy::ConvertSelection(
     vtkClientServerID propId;
     propId.ID = static_cast<vtkTypeUInt32>(properties->Get(
         vtkSelection::PROP_ID()));
-    if (propId == this->Prop3D->GetID(0))
+    if (propId == this->Prop3D->GetID())
       {
       vtkSelection* myChild = vtkSelection::New();
       myChild->ShallowCopy(child);

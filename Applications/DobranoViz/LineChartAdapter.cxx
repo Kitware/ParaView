@@ -873,7 +873,7 @@ struct LineChartAdapter::pqImplementation
 
     vtkProcessModule* const process_module = vtkProcessModule::GetProcessModule();
     vtkExodusReader* const reader = vtkExodusReader::SafeDownCast(
-      process_module->GetObjectFromID(this->SourceProxy->GetID(0)));
+      process_module->GetObjectFromID(this->SourceProxy->GetID()));
     if(!reader)
       return;
 

@@ -192,7 +192,7 @@ void pqPluginManager::loadPlugins(pqServer* server)
     vtkPVEnvironmentInformation* info = vtkPVEnvironmentInformation::New();
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     pm->GatherInformation(helper->GetConnectionID(),
-      vtkProcessModule::DATA_SERVER, info, helper->GetID(0));
+      vtkProcessModule::DATA_SERVER, info, helper->GetID());
 
     pv_plugin_path = info->GetVariable();
 

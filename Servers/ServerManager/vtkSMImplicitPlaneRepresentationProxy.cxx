@@ -20,7 +20,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMImplicitPlaneRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneRepresentationProxy, "1.4");
 
 //---------------------------------------------------------------------------
 vtkSMImplicitPlaneRepresentationProxy::vtkSMImplicitPlaneRepresentationProxy()
@@ -33,13 +33,13 @@ vtkSMImplicitPlaneRepresentationProxy::~vtkSMImplicitPlaneRepresentationProxy()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMImplicitPlaneRepresentationProxy::CreateVTKObjects(int numObjects)
+void vtkSMImplicitPlaneRepresentationProxy::CreateVTKObjects()
 {
   if(this->ObjectsCreated)
     {
     return;
     }
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
   
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   float opacity = 1.0;
@@ -48,7 +48,7 @@ void vtkSMImplicitPlaneRepresentationProxy::CreateVTKObjects(int numObjects)
     opacity = .25;
     }
   
-  vtkClientServerID id = this->GetID(0);
+  vtkClientServerID id = this->GetID();
     
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << id
@@ -78,7 +78,7 @@ void vtkSMImplicitPlaneRepresentationProxy::CreateVTKObjects(int numObjects)
 void vtkSMImplicitPlaneRepresentationProxy::SendRepresentation()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerID id = this->GetID(0);
+  vtkClientServerID id = this->GetID();
 
   vtkImplicitPlaneRepresentation* rep = 
     vtkImplicitPlaneRepresentation::SafeDownCast(pm->GetObjectFromID(id));

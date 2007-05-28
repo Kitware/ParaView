@@ -40,7 +40,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.40");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.41");
 
 
 //-----------------------------------------------------------------------------
@@ -139,7 +139,7 @@ bool vtkSMDataObjectDisplayProxy::Connect(vtkSMProxy* consumer, vtkSMProxy* prod
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDataObjectDisplayProxy::CreateVTKObjects(int numObjects)
+void vtkSMDataObjectDisplayProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated || !this->CanCreateProxy)
     {
@@ -194,7 +194,7 @@ void vtkSMDataObjectDisplayProxy::CreateVTKObjects(int numObjects)
   this->VolumePropertyProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 
   // Link "ColorArray" property to 
   // "SelectScalarArray" property of the VolumeMappers.
@@ -279,7 +279,7 @@ void vtkSMDataObjectDisplayProxy::SetInputInternal(vtkSMSourceProxy* input)
   // We haven't determined yet if volume rendering is supported.
   this->VolumePipelineType = INVALID;
 
-  this->CreateVTKObjects(numInputs);
+  this->CreateVTKObjects();
 
   // We only set up the geometry pipeline.
   this->Connect(this->GeometryFilterProxy, input);
@@ -377,7 +377,6 @@ void vtkSMDataObjectDisplayProxy::SetupDefaults()
     }
   vtkSMIntVectorProperty* ivp = 0;
   vtkSMDoubleVectorProperty* dvp = 0;
-  unsigned int i;
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GeometryFilterProxy->GetProperty("UseStrips"));
@@ -385,30 +384,27 @@ void vtkSMDataObjectDisplayProxy::SetupDefaults()
 
   //TODO: stuff for logging geometry filter times.
   vtkClientServerStream stream;
-  for (i = 0; i < this->GeometryFilterProxy->GetNumberOfIDs(); i++)
-    {  
-    // Keep track of how long each geometry filter takes to execute.
-    vtkClientServerStream start;
-    start << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
-      << "LogStartEvent" << "Execute Geometry" 
-      << vtkClientServerStream::End;
-    vtkClientServerStream end;
-    end << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
+  // Keep track of how long each geometry filter takes to execute.
+  vtkClientServerStream start;
+  start << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
+        << "LogStartEvent" << "Execute Geometry" 
+        << vtkClientServerStream::End;
+  vtkClientServerStream end;
+  end << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
       << "LogEndEvent" << "Execute Geometry" 
       << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke 
-      << this->GeometryFilterProxy->GetID(i) 
-      << "AddObserver"
-      << "StartEvent"
-      << start
-      << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke 
-      << this->GeometryFilterProxy->GetID(i) 
-      << "AddObserver"
-      << "EndEvent"
-      << end
-      << vtkClientServerStream::End;
-    }
+  stream << vtkClientServerStream::Invoke 
+         << this->GeometryFilterProxy->GetID() 
+         << "AddObserver"
+         << "StartEvent"
+         << start
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke 
+         << this->GeometryFilterProxy->GetID() 
+         << "AddObserver"
+         << "EndEvent"
+         << end
+         << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID,
     vtkProcessModule::DATA_SERVER, stream);
   // Init Mapper properties.
@@ -454,51 +450,46 @@ void vtkSMDataObjectDisplayProxy::SetupDefaults()
   // Init UpdateSuppressor properties.
   // Seems like we can't use properties for this 
   // to work properly.
-  for (i=0; i < this->UpdateSuppressorProxy->GetNumberOfIDs(); i++)
-    {
-    stream
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->UpdateSuppressorProxy->GetID(i) << "SetUpdateNumberOfPieces"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    stream
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetPartitionId"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->UpdateSuppressorProxy->GetID(i) << "SetUpdatePiece"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    }
+  stream
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->UpdateSuppressorProxy->GetID() << "SetUpdateNumberOfPieces"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  stream
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetPartitionId"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->UpdateSuppressorProxy->GetID() << "SetUpdatePiece"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID,
-    this->UpdateSuppressorProxy->GetServers(), stream);
-
+                 this->UpdateSuppressorProxy->GetServers(), stream);
+  
   if (pm->GetStreamBlock())
     {
     // This is here just for streaming (can be removed if streaming is removed).
     vtkClientServerStream stream2;
-    for (i=0; i < this->UpdateSuppressorProxy->GetNumberOfIDs(); i++)
-      {
-      stream2
-        << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
-        << vtkClientServerStream::End
-        << vtkClientServerStream::Invoke
-        << this->MapperProxy->GetID(i) << "SetNumberOfPieces"
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-      stream2
-        << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "GetPartitionId"
-        << vtkClientServerStream::End
-        << vtkClientServerStream::Invoke
-        << this->MapperProxy->GetID(i) << "SetPiece"
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-      }
+    stream2
+      << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->MapperProxy->GetID() << "SetNumberOfPieces"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    stream2
+      << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "GetPartitionId"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->MapperProxy->GetID() << "SetPiece"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+
     // Do we need to client too?
     pm->SendStream(this->ConnectionID,
                    vtkProcessModule::RENDER_SERVER, stream2);  
@@ -597,30 +588,27 @@ void vtkSMDataObjectDisplayProxy::SetupVolumeDefaults()
     return;
     }
   vtkClientServerStream stream;
-  unsigned int i;
   // Init UpdateSuppressor properties.
   // Seems like we can't use properties for this 
   // to work properly.
-  for (i = 0; i < this->VolumeUpdateSuppressorProxy->GetNumberOfIDs(); i++)
-    {
-    stream
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->VolumeUpdateSuppressorProxy->GetID(i)
-      << "SetUpdateNumberOfPieces"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    stream
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetPartitionId"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->VolumeUpdateSuppressorProxy->GetID(i) << "SetUpdatePiece"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    }
+  stream
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->VolumeUpdateSuppressorProxy->GetID()
+    << "SetUpdateNumberOfPieces"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  stream
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetPartitionId"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->VolumeUpdateSuppressorProxy->GetID() << "SetUpdatePiece"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+
   pm->SendStream(this->ConnectionID,
     this->VolumeUpdateSuppressorProxy->GetServers(), stream);
 }
@@ -1137,7 +1125,7 @@ void vtkSMDataObjectDisplayProxy::CacheUpdate(int idx, int total)
   vtkClientServerStream stream;
   stream
     << vtkClientServerStream::Invoke
-    << this->MapperProxy->GetID(0) << "Modified"
+    << this->MapperProxy->GetID() << "Modified"
     << vtkClientServerStream::End;
   vtkProcessModule::GetProcessModule()->SendStream(
     this->ConnectionID,
@@ -1392,7 +1380,7 @@ void vtkSMDataObjectDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy*
 void vtkSMDataObjectDisplayProxy::GatherDisplayedDataInformation()
 {
   this->DisplayedDataInformation->Initialize();
-  if (this->GeometryFilterProxy->GetNumberOfIDs() < 1)
+  if (this->GeometryFilterProxy->GetID().IsNull())
     {
     vtkErrorMacro("Display has no associated object, can not gather info.");
     return;
@@ -1406,17 +1394,12 @@ void vtkSMDataObjectDisplayProxy::GatherDisplayedDataInformation()
 
   if (this->Representation != VOLUME)
     {
-    int num, i;
     vtkPVGeometryInformation* information;
-    num = this->GeometryFilterProxy->GetNumberOfIDs();
     information = vtkPVGeometryInformation::New();
-    for (i = 0; i < num; ++i)
-      {
-      pm->GatherInformation(this->ConnectionID,
-        this->GeometryFilterProxy->GetServers(),
-        information, this->GeometryFilterProxy->GetID(i));
-      this->DisplayedDataInformation->AddInformation(information);
-      }
+    pm->GatherInformation(this->ConnectionID,
+                          this->GeometryFilterProxy->GetServers(),
+                          information, this->GeometryFilterProxy->GetID());
+    this->DisplayedDataInformation->AddInformation(information);
     information->Delete();
     }
   else

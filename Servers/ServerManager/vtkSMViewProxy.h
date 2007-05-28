@@ -151,11 +151,11 @@ protected:
   // Description:
   // Called at the start of CreateVTKObjects().
   // If returns false, CreateVTKObjects is aborted.
-  virtual bool BeginCreateVTKObjects(int vtkNotUsed(numObjects)) {return true; }
+  virtual bool BeginCreateVTKObjects() {return true; }
 
   // Description:
   // Called at the end of CreateVTKObjects().
-  virtual void EndCreateVTKObjects(int vtkNotUsed(numObjects)) {};
+  virtual void EndCreateVTKObjects() {};
 
   // Description:
   // Called by AddRepresentation(). Subclasses can override to add 
@@ -180,7 +180,7 @@ protected:
 
   // Description:
   // Initializes ViewHelper, if any.
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   // Description:
   // Implementation to create a representation requested strategy.

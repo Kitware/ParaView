@@ -26,44 +26,29 @@ void vtkSMPVDWriterProxy::UpdatePipeline()
 {
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream str;
-  unsigned int idx;
-
-  for (idx = 0; idx < this->GetNumberOfIDs(); idx++)
-    {
-    str << vtkClientServerStream::Invoke
-        << this->GetID(idx)
-        << "SetNumberOfPieces"
-        << pm->GetNumberOfPartitions(this->ConnectionID)
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID()
-        << "GetPartitionId"
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-        << this->GetID(idx)
-        << "SetPiece"
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->Servers, str);
-    }
+  str << vtkClientServerStream::Invoke
+      << this->GetID()
+      << "SetNumberOfPieces"
+      << pm->GetNumberOfPartitions(this->ConnectionID)
+      << vtkClientServerStream::End;
+  str << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID()
+      << "GetPartitionId"
+      << vtkClientServerStream::End;
+  str << vtkClientServerStream::Invoke
+      << this->GetID()
+      << "SetPiece"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers, str);
 
   this->Superclass::UpdatePipeline();
 
-  for (idx = 0; idx < this->GetNumberOfIDs(); idx++)
-    {
-    str << vtkClientServerStream::Invoke
-        << this->GetID(idx)
-        << "Write"
-        << vtkClientServerStream::End;
-    }
-
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->Servers, str);
-    }
+  str << vtkClientServerStream::Invoke
+      << this->GetID()
+      << "Write"
+      << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers, str);
 }
 
 //-----------------------------------------------------------------------------
@@ -71,44 +56,29 @@ void vtkSMPVDWriterProxy::UpdatePipeline(double time)
 {
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream str;
-  unsigned int idx;
-
-  for (idx = 0; idx < this->GetNumberOfIDs(); idx++)
-    {
-    str << vtkClientServerStream::Invoke
-        << this->GetID(idx)
-        << "SetNumberOfPieces"
-        << pm->GetNumberOfPartitions(this->ConnectionID)
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID()
-        << "GetPartitionId"
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-        << this->GetID(idx)
-        << "SetPiece"
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->Servers, str);
-    }
+  str << vtkClientServerStream::Invoke
+      << this->GetID()
+      << "SetNumberOfPieces"
+      << pm->GetNumberOfPartitions(this->ConnectionID)
+      << vtkClientServerStream::End;
+  str << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID()
+      << "GetPartitionId"
+      << vtkClientServerStream::End;
+  str << vtkClientServerStream::Invoke
+      << this->GetID()
+      << "SetPiece"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers, str);
 
   this->Superclass::UpdatePipeline(time);
 
-  for (idx = 0; idx < this->GetNumberOfIDs(); idx++)
-    {
-    str << vtkClientServerStream::Invoke
-        << this->GetID(idx)
-        << "Write"
-        << vtkClientServerStream::End;
-    }
-
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->Servers, str);
-    }
+  str << vtkClientServerStream::Invoke
+      << this->GetID()
+      << "Write"
+      << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers, str);
 }
 
 void vtkSMPVDWriterProxy::PrintSelf(ostream& os, vtkIndent indent)

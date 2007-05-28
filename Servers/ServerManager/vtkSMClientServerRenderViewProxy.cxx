@@ -32,7 +32,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMClientServerRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMClientServerRenderViewProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMClientServerRenderViewProxy, "1.2");
 vtkCxxSetObjectMacro(vtkSMClientServerRenderViewProxy, 
                      ServerRenderWindowProxy,
                      vtkSMProxy);
@@ -66,7 +66,7 @@ vtkSMClientServerRenderViewProxy::~vtkSMClientServerRenderViewProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMClientServerRenderViewProxy::CreateVTKObjects(int numObjects)
+void vtkSMClientServerRenderViewProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated )
     {
@@ -115,7 +115,7 @@ void vtkSMClientServerRenderViewProxy::CreateVTKObjects(int numObjects)
       vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
     }
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 
   // Give subclasses a chance to initialize the render sync.
   this->InitializeRenderSyncPipeline();

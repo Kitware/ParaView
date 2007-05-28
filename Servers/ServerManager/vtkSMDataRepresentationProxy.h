@@ -169,14 +169,14 @@ protected:
   // If this method returns false, CreateVTKObjects() is aborted.
   // Overridden to abort CreateVTKObjects() only if the input has
   // been initialized correctly.
-  virtual bool BeginCreateVTKObjects(int numObjects);
+  virtual bool BeginCreateVTKObjects();
 
   // Description:
   // This method is called after CreateVTKObjects(). 
   // This gives subclasses an opportunity to do some post-creation
   // initialization.
   // Overridden to setup view time link.
-  virtual bool EndCreateVTKObjects(int numObjects);
+  virtual bool EndCreateVTKObjects();
 
   // Description:
   // Called when a representation is added to a view. 

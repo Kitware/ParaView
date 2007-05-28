@@ -20,7 +20,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMMultiDisplayProxy);
-vtkCxxRevisionMacro(vtkSMMultiDisplayProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMMultiDisplayProxy, "1.7");
 //-----------------------------------------------------------------------------
 vtkSMMultiDisplayProxy::vtkSMMultiDisplayProxy()
 {
@@ -50,32 +50,28 @@ void vtkSMMultiDisplayProxy::SetLODCollectionDecision(int)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMMultiDisplayProxy::CreateVTKObjects(int numObjects)
+void vtkSMMultiDisplayProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated || !this->CanCreateProxy)
     {
     return;
     }
   
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  int i;
-  
   vtkClientServerStream stream;
-  for (i = 0; i < numObjects; ++i)
-    {
-    // This little hack causes collect mode to be iditical to clone mode.
-    // This allows the superclass to treat tiled display like normal compositing.
-    stream << vtkClientServerStream::Invoke
-           << this->CollectProxy->GetID(i) << "DefineCollectAsCloneOn"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->LODCollectProxy->GetID(i) << "DefineCollectAsCloneOn"
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, 
-      this->CollectProxy->GetServers(), stream);
-    }
+  // This little hack causes collect mode to be iditical to clone mode.
+  // This allows the superclass to treat tiled display like normal
+  // compositing.
+  stream << vtkClientServerStream::Invoke
+         << this->CollectProxy->GetID() << "DefineCollectAsCloneOn"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->LODCollectProxy->GetID() << "DefineCollectAsCloneOn"
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, 
+                 this->CollectProxy->GetServers(), stream);
 }
 
 //-----------------------------------------------------------------------------

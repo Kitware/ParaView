@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMXMLPVAnimationWriterProxy);
-vtkCxxRevisionMacro(vtkSMXMLPVAnimationWriterProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMXMLPVAnimationWriterProxy, "1.6");
 //*****************************************************************************
 class vtkSMXMLPVAnimationWriterProxyInternals
 {
@@ -69,40 +69,29 @@ vtkSMXMLPVAnimationWriterProxy::~vtkSMXMLPVAnimationWriterProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMXMLPVAnimationWriterProxy::CreateVTKObjects(int numObjects)
+void vtkSMXMLPVAnimationWriterProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
     return;
     }
-  if (numObjects != 1)
-    {
-    numObjects = 1; // this is a multi-input sink.
-    vtkErrorMacro("numObjects must be 1");
-    return;
-    }
     
   this->SetServers(vtkProcessModule::DATA_SERVER);
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
   vtkClientServerStream stream;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int numPartitions = pm->GetNumberOfPartitions(this->ConnectionID);
   
-  for (unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    stream << vtkClientServerStream::Invoke
-      << this->GetID(cc) << "SetNumberOfPieces" <<
-      numPartitions << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetPartitionId" << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-      << this->GetID(cc) << "SetPiece" << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    }
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->Servers, stream);
-    }
+  stream << vtkClientServerStream::Invoke
+         << this->GetID() << "SetNumberOfPieces" <<
+    numPartitions << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() << "GetPartitionId" 
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->GetID() << "SetPiece" << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
 }
 //-----------------------------------------------------------------------------
 void vtkSMXMLPVAnimationWriterProxy::AddInput(vtkSMSourceProxy *input,
@@ -113,45 +102,43 @@ void vtkSMXMLPVAnimationWriterProxy::AddInput(vtkSMSourceProxy *input,
   int numPartitions = pm->GetNumberOfPartitions(this->ConnectionID);
   vtkClientServerStream stream;
  
-  this->CreateVTKObjects(1);
+  this->CreateVTKObjects();
+
   // Since we don't have the PVSource name. To mimic that 
   // we will just create unique names  here.
   static int name_count = 0;
   ostrstream groupname_str;
   groupname_str << "source" << name_count++ << ends;
+
   // when numPartitions > 1, for the vtkXMLPVAnimationWriter to treat the
   // different parts as multiple parts of the same input, we
   // have to specify the same group name.
-
-  for (unsigned int i=0; i < input->GetNumberOfIDs(); i++)
+  if (numPartitions > 1)
     {
-    if (numPartitions > 1)
-      {
-      vtkClientServerID ca_id = pm->NewStreamObject("vtkCompleteArrays", stream);
-      this->Internals->IDs.push_back(ca_id);
+    vtkClientServerID ca_id = pm->NewStreamObject("vtkCompleteArrays", stream);
+    this->Internals->IDs.push_back(ca_id);
 
-      stream << vtkClientServerStream::Invoke
-        << input->GetID(i) << "GetOutput" 
-        << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke
-        << ca_id << "SetInput" 
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-
-      stream << vtkClientServerStream::Invoke
-        << ca_id << "GetOutput" << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke
-        << this->GetID(0) << method << vtkClientServerStream::LastResult
-        << groupname_str.str() << vtkClientServerStream::End;
-      }
-    else
-      {
-      stream << vtkClientServerStream::Invoke
-        << input->GetID(i) << "GetOutput" << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke
-        << this->GetID(0) << method << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-      }
+    stream << vtkClientServerStream::Invoke
+           << input->GetID() << "GetOutput" 
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << ca_id << "SetInput" 
+           << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
+    
+    stream << vtkClientServerStream::Invoke
+           << ca_id << "GetOutput" << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->GetID() << method << vtkClientServerStream::LastResult
+           << groupname_str.str() << vtkClientServerStream::End;
+    }
+  else
+    {
+    stream << vtkClientServerStream::Invoke
+           << input->GetID() << "GetOutput" << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->GetID() << method << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
     }
   groupname_str.rdbuf()->freeze(0);
   pm->SendStream(this->ConnectionID, this->Servers, stream);
@@ -169,14 +156,10 @@ void vtkSMXMLPVAnimationWriterProxy::WriteTime(double time)
   vtkClientServerStream stream;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   
-  for (unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    stream << vtkClientServerStream::Invoke << this->GetID(cc) 
-      << "WriteTime" << time << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke << this->GetID(cc)
-      << "GetErrorCode" << vtkClientServerStream::End;
-    }
-  
+  stream << vtkClientServerStream::Invoke << this->GetID() 
+         << "WriteTime" << time << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->GetID()
+         << "GetErrorCode" << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, this->Servers, stream);
   int retVal =0;
   pm->GetLastResult(this->ConnectionID, 
@@ -222,28 +205,20 @@ void vtkSMXMLPVAnimationWriterProxy::Start()
     this->SummaryHelperProxy->UpdateVTKObjects();
     }
   
-  for (unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc) << "Start" << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->Servers, str);
-    }
+  str << vtkClientServerStream::Invoke
+      << this->GetID() << "Start" << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers, str);
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMXMLPVAnimationWriterProxy::Finish()
 {
   vtkClientServerStream str;
-  for (unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc) << "Finish" << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc) << "GetErrorCode" << vtkClientServerStream::End;
-    }
+  str << vtkClientServerStream::Invoke
+      << this->GetID() << "Finish" << vtkClientServerStream::End;
+  str << vtkClientServerStream::Invoke
+      << this->GetID() << "GetErrorCode" << vtkClientServerStream::End;
+
   int retVal = 0;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendStream(this->ConnectionID, this->Servers, str);

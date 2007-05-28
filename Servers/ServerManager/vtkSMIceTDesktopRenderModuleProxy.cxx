@@ -31,7 +31,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.28");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.29");
 
 vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderModuleProxy, 
                      ServerDisplayManagerProxy,
@@ -69,7 +69,7 @@ vtkSMIceTDesktopRenderModuleProxy::~vtkSMIceTDesktopRenderModuleProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects(int numObjects)
+void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
@@ -121,13 +121,12 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects(int numObjects)
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Assign 
            << id
-           << this->ServerDisplayManagerProxy->GetID(0)
+           << this->ServerDisplayManagerProxy->GetID()
            << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
       vtkProcessModule::RENDER_SERVER, stream);
 
-    this->DisplayManagerProxy->CreateVTKObjects(0);
-    this->DisplayManagerProxy->SetID(0, id);
+    this->DisplayManagerProxy->InitializeWithID(id);
     }
   this->DisplayManagerProxy->UpdateVTKObjects();
 
@@ -148,11 +147,11 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects(int numObjects)
   // on the client.
   this->RendererProxy->SetServers(vtkProcessModule::CLIENT);
   // Create the client side render.
-  this->RendererProxy->CreateVTKObjects(1); 
+  this->RendererProxy->CreateVTKObjects(); 
 
   vtkClientServerStream stream1;
   stream1 << vtkClientServerStream::New 
-          << "vtkIceTRenderer" << this->RendererProxy->GetID(0)
+          << "vtkIceTRenderer" << this->RendererProxy->GetID()
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID,
     vtkProcessModule::RENDER_SERVER, stream1);
@@ -163,7 +162,7 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects(int numObjects)
 
   this->RendererProxy->UpdateVTKObjects(); 
   
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 
   // Ordered compositing requires alpha bit planes.
   ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -184,8 +183,8 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
 
   // Cannot do this with the server manager because this method only
   // exists on the render server, not the client.
-  stream << vtkClientServerStream::Invoke << this->RendererProxy->GetID(0)
-         << "SetSortingKdTree" << this->PKdTreeProxy->GetID(0)
+  stream << vtkClientServerStream::Invoke << this->RendererProxy->GetID()
+         << "SetSortingKdTree" << this->PKdTreeProxy->GetID()
          << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID,
     vtkProcessModule::RENDER_SERVER, stream);
@@ -194,7 +193,8 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
     this->DisplayManagerProxy->GetProperty("TileDimensions"));
   if (!ivp)
     {
-    vtkErrorMacro("Failed to find property TileDimensions on DisplayManagerProxy.");
+    vtkErrorMacro("Failed to find property TileDimensions on "
+                  "DisplayManagerProxy.");
     return;
     }
   ivp->SetElements(this->TileDimensions);
@@ -203,7 +203,8 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
     this->DisplayManagerProxy->GetProperty("TileMullions"));
   if (!ivp)
     {
-    vtkErrorMacro("Failed to find property TileMullions on DisplayManagerProxy.");
+    vtkErrorMacro("Failed to find property TileMullions on "
+                  "DisplayManagerProxy.");
     return;
     }
   ivp->SetElements(this->TileMullions);
@@ -224,8 +225,6 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
   pp->AddProxy(this->RenderWindowProxy);
   this->DisplayManagerProxy->UpdateVTKObjects(); 
 
-  unsigned int i;
-
   if (this->RenderModuleId == 0)
     {
     stream << vtkClientServerStream::Invoke
@@ -233,89 +232,81 @@ void vtkSMIceTDesktopRenderModuleProxy::InitializeCompositingPipeline()
            << "GetController"
            << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
-           << this->DisplayManagerProxy->GetID(0) << "SetController"
+           << this->DisplayManagerProxy->GetID() << "SetController"
            << vtkClientServerStream::LastResult
            << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
-           << this->DisplayManagerProxy->GetID(0) 
+           << this->DisplayManagerProxy->GetID() 
            << "InitializeRMIs"
            << vtkClientServerStream::End;
     }
     
-  for (i = 0; i < this->PKdTreeProxy->GetNumberOfIDs(); i++)
-    {
-    vtkClientServerStream cmd;
+  vtkClientServerStream cmd;
+  
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() << "GetController"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->PKdTreeProxy->GetID() << "SetController"
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() << "GetController"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << vtkClientServerStream::LastResult << "GetNumberOfProcesses"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->PKdTreeProxy->GetID() << "SetNumberOfRegionsOrMore"
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  
+  // Set up logging for building kd-tree.
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "LogStartEvent"
+      << "Build kd-tree" << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->PKdTreeProxy->GetID() << "AddObserver"
+         << "StartEvent" << cmd << vtkClientServerStream::End;
+  cmd.Reset();
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "LogEndEvent"
+      << "Build kd-tree" << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->PKdTreeProxy->GetID() << "AddObserver"
+         << "EndEvent" << cmd << vtkClientServerStream::End;
 
-    stream << vtkClientServerStream::Invoke
-           << pm->GetProcessModuleID() << "GetController"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->PKdTreeProxy->GetID(i) << "SetController"
-           << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << pm->GetProcessModuleID() << "GetController"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << vtkClientServerStream::LastResult << "GetNumberOfProcesses"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->PKdTreeProxy->GetID(i) << "SetNumberOfRegionsOrMore"
-           << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() << "GetController"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << vtkClientServerStream::LastResult << "GetNumberOfProcesses"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->PKdTreeGeneratorProxy->GetID() << "SetNumberOfPieces"
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
 
-    // Set up logging for building kd-tree.
-    cmd << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "LogStartEvent"
-        << "Build kd-tree" << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->PKdTreeProxy->GetID(i) << "AddObserver"
-           << "StartEvent" << cmd << vtkClientServerStream::End;
-    cmd.Reset();
-    cmd << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "LogEndEvent"
-        << "Build kd-tree" << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->PKdTreeProxy->GetID(i) << "AddObserver"
-           << "EndEvent" << cmd << vtkClientServerStream::End;
-    }
-
-  for (i=0; i < this->PKdTreeGeneratorProxy->GetNumberOfIDs(); i++)
-    {
-    stream << vtkClientServerStream::Invoke
-           << pm->GetProcessModuleID() << "GetController"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << vtkClientServerStream::LastResult << "GetNumberOfProcesses"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->PKdTreeGeneratorProxy->GetID(i) << "SetNumberOfPieces"
-           << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-    }
   pm->SendStream(this->ConnectionID,
     vtkProcessModule::RENDER_SERVER, stream);
-
+  
   this->Superclass::InitializeCompositingPipeline();
   
   
-  for (i=0; i < this->RenderSyncManagerProxy->GetNumberOfIDs(); i++)
-    {
-    // The client server manager needs to set parameters on the IceT manager.
-    stream << vtkClientServerStream::Invoke 
-           << this->RenderSyncManagerProxy->GetID(i)
-           << "SetParallelRenderManager" 
-           << this->DisplayManagerProxy->GetID(i)
-           << vtkClientServerStream::End;
-
-    stream << vtkClientServerStream::Invoke 
-           << this->RenderSyncManagerProxy->GetID(i)
-           << "SetRemoteDisplay" 
-           << this->RemoteDisplay 
-           << vtkClientServerStream::End;
-    }
+  // The client server manager needs to set parameters on the IceT manager.
+  stream << vtkClientServerStream::Invoke 
+         << this->RenderSyncManagerProxy->GetID()
+         << "SetParallelRenderManager" 
+         << this->DisplayManagerProxy->GetID()
+         << vtkClientServerStream::End;
+  
+  stream << vtkClientServerStream::Invoke 
+         << this->RenderSyncManagerProxy->GetID()
+         << "SetRemoteDisplay" 
+         << this->RemoteDisplay 
+         << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, 
-    vtkProcessModule::RENDER_SERVER_ROOT, stream);
+                 vtkProcessModule::RENDER_SERVER_ROOT, stream);
 
   if (pm->GetOptions()->GetUseOffscreenRendering())
     {
@@ -376,7 +367,7 @@ void vtkSMIceTDesktopRenderModuleProxy::SetOrderedCompositing(int flag)
     // Cannot do this with the server manager because this method only
     // exists on the render server, not the client.
     vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke << this->RendererProxy->GetID(0)
+    stream << vtkClientServerStream::Invoke << this->RendererProxy->GetID()
            << "SetComposeOperation" << 1 // Over
            << vtkClientServerStream::End;
     vtkProcessModule::GetProcessModule()->SendStream(
@@ -387,7 +378,7 @@ void vtkSMIceTDesktopRenderModuleProxy::SetOrderedCompositing(int flag)
     // Cannot do this with the server manager because this method only
     // exists on the render server, not the client.
     vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke << this->RendererProxy->GetID(0)
+    stream << vtkClientServerStream::Invoke << this->RendererProxy->GetID()
            << "SetComposeOperation" << 0 // Closest
            << vtkClientServerStream::End;
     vtkProcessModule::GetProcessModule()->SendStream(
@@ -553,7 +544,7 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
           // ensures that. 
           vtkClientServerStream stream;
           stream << vtkClientServerStream::Invoke
-            << this->PKdTreeProxy->GetID(0)
+            << this->PKdTreeProxy->GetID()
             << "SetCuts" << 0
             << vtkClientServerStream::End;
           pm->SendStream(this->PKdTreeProxy->GetConnectionID(),

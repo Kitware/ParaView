@@ -20,7 +20,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.4");
+vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMSimpleStrategy::vtkSMSimpleStrategy()
 {
@@ -36,7 +36,7 @@ vtkSMSimpleStrategy::~vtkSMSimpleStrategy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleStrategy::CreateVTKObjects(int numObjects)
+void vtkSMSimpleStrategy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
@@ -54,7 +54,7 @@ void vtkSMSimpleStrategy::CreateVTKObjects(int numObjects)
   this->UpdateSuppressor->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
   this->UpdateSuppressorLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

@@ -137,7 +137,7 @@ protected:
   vtkSMAnimationCueProxy();
   ~vtkSMAnimationCueProxy();
 
-  virtual void CreateVTKObjects(int numeObjects);
+  virtual void CreateVTKObjects();
 
   virtual void InitializeObservers(vtkAnimationCue* cue); 
 
@@ -151,11 +151,11 @@ protected:
   virtual void EndCueInternal(void* info);
 
   // Description;
-  // Since animation Cue has no server side objects, reviving an animation Cue
-  // is no different from create a new animation Cue. Hence, we override this method
-  // to simply call CreateVTKObjects().
+  // Since animation Cue has no server side objects, reviving an animation
+  // Cue is no different from create a new animation Cue. Hence, we
+  // override this method to simply call CreateVTKObjects().
   virtual void ReviveVTKObjects()
-    { this->CreateVTKObjects(1); }
+    { this->CreateVTKObjects(); }
   
 //BTX
   vtkCommand* Observer;

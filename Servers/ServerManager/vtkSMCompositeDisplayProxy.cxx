@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notice for more information.
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.32");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.33");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -74,7 +74,7 @@ vtkSMCompositeDisplayProxy::~vtkSMCompositeDisplayProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMCompositeDisplayProxy::CreateVTKObjects(int numObjects)
+void vtkSMCompositeDisplayProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated || !this->CanCreateProxy)
     {
@@ -169,7 +169,7 @@ void vtkSMCompositeDisplayProxy::CreateVTKObjects(int numObjects)
   this->VolumeDistributorSuppressorProxy->SetServers(
     vtkProcessModule::CLIENT_AND_SERVERS);
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 
   // We activate the update suppressor after the distributor and make
   // the one before the distributor behave like a simply pass through 
@@ -184,167 +184,156 @@ void vtkSMCompositeDisplayProxy::CreateVTKObjects(int numObjects)
 //-----------------------------------------------------------------------------
 void vtkSMCompositeDisplayProxy::SetupDefaults()
 {
-  unsigned int i;
-
   this->Superclass::SetupDefaults();
   this->SetupCollectionFilter(this->CollectProxy);
   this->SetupCollectionFilter(this->LODCollectProxy);
 
-  for (i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
+  vtkClientServerStream cmd;
+  vtkClientServerStream stream;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "LogStartEvent" << "Execute Collect"
+      << vtkClientServerStream::End;
+  stream
+    << vtkClientServerStream::Invoke
+    << this->CollectProxy->GetID() << "AddObserver" << "StartEvent" << cmd
+    << vtkClientServerStream::End;
+  cmd.Reset();
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "LogEndEvent" << "Execute Collect"
+      << vtkClientServerStream::End;
+  stream
+    << vtkClientServerStream::Invoke
+    << this->CollectProxy->GetID() << "AddObserver" << "EndEvent" << cmd
+    << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+                 vtkProcessModule::CLIENT_AND_SERVERS, stream);
+  
+  cmd.Reset();
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "LogStartEvent" << "Execute LODCollect"
+      << vtkClientServerStream::End;
+  stream
+    << vtkClientServerStream::Invoke
+    << this->LODCollectProxy->GetID() << "AddObserver" << "StartEvent" << cmd
+    << vtkClientServerStream::End;
+  cmd.Reset();
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "LogEndEvent" << "Execute LODCollect"
+      << vtkClientServerStream::End;
+  stream
+    << vtkClientServerStream::Invoke
+    << this->LODCollectProxy->GetID() << "AddObserver" << "EndEvent" << cmd
+    << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+                 vtkProcessModule::CLIENT_AND_SERVERS, stream);
+  
+  // Handle collection setup with client server.
+  stream
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetSocketController"
+    << pm->GetConnectionClientServerID(this->ConnectionID)
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->CollectProxy->GetID() << "SetSocketController"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  stream
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetSocketController"
+    << pm->GetConnectionClientServerID(this->ConnectionID)
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->LODCollectProxy->GetID() << "SetSocketController"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+                 vtkProcessModule::CLIENT_AND_SERVERS, stream);
+  
+  // Special condition to signal the client.
+  // Because both processes of the Socket controller think they are 0!!!!
+  if (pm->GetClientMode())
     {
-    vtkClientServerStream cmd;
-    vtkClientServerStream stream;
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-    cmd << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "LogStartEvent" << "Execute Collect"
-        << vtkClientServerStream::End;
     stream
       << vtkClientServerStream::Invoke
-      << this->CollectProxy->GetID(i) << "AddObserver" << "StartEvent" << cmd
+      << this->CollectProxy->GetID() << "SetController" << 0
       << vtkClientServerStream::End;
-    cmd.Reset();
-    cmd << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "LogEndEvent" << "Execute Collect"
-        << vtkClientServerStream::End;
     stream
       << vtkClientServerStream::Invoke
-      << this->CollectProxy->GetID(i) << "AddObserver" << "EndEvent" << cmd
+      << this->LODCollectProxy->GetID() << "SetController" << 0
       << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
-                   vtkProcessModule::CLIENT_AND_SERVERS, stream);
-
-    cmd.Reset();
-    cmd << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "LogStartEvent" << "Execute LODCollect"
-        << vtkClientServerStream::End;
-    stream
-      << vtkClientServerStream::Invoke
-      << this->LODCollectProxy->GetID(i) << "AddObserver" << "StartEvent" << cmd
-      << vtkClientServerStream::End;
-    cmd.Reset();
-    cmd << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "LogEndEvent" << "Execute LODCollect"
-        << vtkClientServerStream::End;
-    stream
-      << vtkClientServerStream::Invoke
-      << this->LODCollectProxy->GetID(i) << "AddObserver" << "EndEvent" << cmd
-      << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-                   vtkProcessModule::CLIENT_AND_SERVERS, stream);
-
-    // Handle collection setup with client server.
-    stream
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetSocketController"
-      << pm->GetConnectionClientServerID(this->ConnectionID)
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->CollectProxy->GetID(i) << "SetSocketController"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    stream
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetSocketController"
-      << pm->GetConnectionClientServerID(this->ConnectionID)
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->LODCollectProxy->GetID(i) << "SetSocketController"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-                   vtkProcessModule::CLIENT_AND_SERVERS, stream);
-
-    // Special condition to signal the client.
-    // Because both processes of the Socket controller think they are 0!!!!
-    if (pm->GetClientMode())
-      {
-      stream
-        << vtkClientServerStream::Invoke
-        << this->CollectProxy->GetID(i) << "SetController" << 0
-        << vtkClientServerStream::End;
-      stream
-        << vtkClientServerStream::Invoke
-        << this->LODCollectProxy->GetID(i) << "SetController" << 0
-        << vtkClientServerStream::End;
-      pm->SendStream(this->ConnectionID,
-                     vtkProcessModule::CLIENT, stream);
-      }
+                   vtkProcessModule::CLIENT, stream);
     }
 
   this->SetOrderedCompositing(0);
 
-  for (i=0; i < this->DistributorProxy->GetNumberOfIDs(); i++)
-    {
-    vtkClientServerStream cmd;
-    vtkClientServerStream stream;
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-    cmd << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "LogStartEvent"
-        << "Execute OrderedCompositeDistribute"
-        << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->DistributorProxy->GetID(i) << "AddObserver"
-           << "StartEvent" << cmd
-           << vtkClientServerStream::End;
-    cmd.Reset();
-    cmd << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "LogEndEvent"
-        << "Execute OrderedCompositeDistribute"
-        << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->DistributorProxy->GetID(i) << "AddObserver"
-           << "EndEvent" << cmd
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-                   vtkProcessModule::RENDER_SERVER, stream);
-
-    cmd.Reset();
-    cmd << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "LogStartEvent"
-        << "Execute LODOrderedCompositeDistribute"
-        << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->LODDistributorProxy->GetID(i) << "AddObserver"
-           << "StartEvent" << cmd
-           << vtkClientServerStream::End;
-    cmd.Reset();
-    cmd << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "LogEndEvent"
-        << "Execute LODOrderedCompositeDistribute"
-        << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->LODDistributorProxy->GetID(i) << "AddObserver"
-           << "EndEvent" << cmd
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, 
-                   vtkProcessModule::RENDER_SERVER, stream);
-
-    stream << vtkClientServerStream::Invoke
-           << pm->GetProcessModuleID() << "GetController"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->DistributorProxy->GetID(i) << "SetController"
-           << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << pm->GetProcessModuleID() << "GetController"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->LODDistributorProxy->GetID(i) << "SetController"
-           << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, 
-                   stream);
-    }
+  cmd.Reset();
+  stream.Reset();
+  
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "LogStartEvent"
+      << "Execute OrderedCompositeDistribute"
+      << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->DistributorProxy->GetID() << "AddObserver"
+         << "StartEvent" << cmd
+         << vtkClientServerStream::End;
+  cmd.Reset();
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "LogEndEvent"
+      << "Execute OrderedCompositeDistribute"
+      << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->DistributorProxy->GetID() << "AddObserver"
+         << "EndEvent" << cmd
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+                 vtkProcessModule::RENDER_SERVER, stream);
+  
+  cmd.Reset();
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "LogStartEvent"
+      << "Execute LODOrderedCompositeDistribute"
+      << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->LODDistributorProxy->GetID() << "AddObserver"
+         << "StartEvent" << cmd
+         << vtkClientServerStream::End;
+  cmd.Reset();
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "LogEndEvent"
+      << "Execute LODOrderedCompositeDistribute"
+      << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->LODDistributorProxy->GetID() << "AddObserver"
+         << "EndEvent" << cmd
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, 
+                 vtkProcessModule::RENDER_SERVER, stream);
+  
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() << "GetController"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->DistributorProxy->GetID() << "SetController"
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() << "GetController"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->LODDistributorProxy->GetID() << "SetController"
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, 
+                 stream);
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMCompositeDisplayProxy::SetupPipeline()
 {
-  unsigned int i;
-
   this->Superclass::SetupPipeline();
   vtkSMStringVectorProperty *svp = 0;
   vtkClientServerStream stream;
@@ -355,37 +344,31 @@ void vtkSMCompositeDisplayProxy::SetupPipeline()
   this->LODCollectProxy->UpdateVTKObjects();
   this->CollectProxy->UpdateVTKObjects();
   
-  for (i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
+  if (this->CollectProxy)
     {
-    if (this->CollectProxy)
-      {
-      stream
-        << vtkClientServerStream::Invoke
-        << this->CollectProxy->GetID(i) << "GetPolyDataOutput"
-        << vtkClientServerStream::End
-        << vtkClientServerStream::Invoke
-        << this->UpdateSuppressorProxy->GetID(i) << "SetInput"
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-      }
-
-    if (this->LODCollectProxy)
-      {
-      stream
-        << vtkClientServerStream::Invoke
-        << this->LODCollectProxy->GetID(i) << "GetPolyDataOutput"
-        << vtkClientServerStream::End
-        << vtkClientServerStream::Invoke
-        << this->LODUpdateSuppressorProxy->GetID(i) << "SetInput"
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-      }
+    stream
+      << vtkClientServerStream::Invoke
+      << this->CollectProxy->GetID() << "GetPolyDataOutput"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->UpdateSuppressorProxy->GetID() << "SetInput"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
     }
-  if (stream.GetNumberOfMessages() > 0)
+  
+  if (this->LODCollectProxy)
     {
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->ConnectionID, vtkProcessModule::CLIENT_AND_SERVERS, stream);
+    stream
+      << vtkClientServerStream::Invoke
+      << this->LODCollectProxy->GetID() << "GetPolyDataOutput"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->LODUpdateSuppressorProxy->GetID() << "SetInput"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
     }
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID, vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
   // On the render server, insert a distributor.
   this->Connect(this->DistributorProxy, this->UpdateSuppressorProxy);
@@ -394,55 +377,43 @@ void vtkSMCompositeDisplayProxy::SetupPipeline()
   // On the render server, attach an update suppressor to the distributor.  On
   // the client side (since the distributor is not there) attach it to the other
   // update suppressor.  We cannot do this through the server manager interface.
-  for (i = 0; i < this->DistributorProxy->GetNumberOfIDs(); i++)
-    {
-    stream << vtkClientServerStream::Invoke
-           << this->UpdateSuppressorProxy->GetID(i) << "GetOutputPort" << 0
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->DistributorSuppressorProxy->GetID(i)
-           << "SetInputConnection" << 0 << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->UpdateSuppressorProxy->GetID() << "GetOutputPort" << 0
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->DistributorSuppressorProxy->GetID()
+         << "SetInputConnection" << 0 << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  
+  stream << vtkClientServerStream::Invoke
+         << this->LODUpdateSuppressorProxy->GetID() << "GetOutputPort" << 0
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->LODDistributorSuppressorProxy->GetID()
+         << "SetInputConnection" << 0 << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID,
+    vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER, stream);
 
-    stream << vtkClientServerStream::Invoke
-           << this->LODUpdateSuppressorProxy->GetID(i) << "GetOutputPort" << 0
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->LODDistributorSuppressorProxy->GetID(i)
-           << "SetInputConnection" << 0 << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-    }
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->ConnectionID,
-      vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER, stream);
-    }
-
-  for (i = 0; i < this->DistributorProxy->GetNumberOfIDs(); i++)
-    {
-    stream << vtkClientServerStream::Invoke
-           << this->DistributorProxy->GetID(i) << "GetOutputPort" << 0
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->DistributorSuppressorProxy->GetID(i)
-           << "SetInputConnection" << 0 << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-
-    stream << vtkClientServerStream::Invoke
-           << this->LODDistributorProxy->GetID(i) << "GetOutputPort" << 0
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->LODDistributorSuppressorProxy->GetID(i)
-           << "SetInputConnection" << 0 << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-    }
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->ConnectionID,
-      vtkProcessModule::RENDER_SERVER, stream);
-    }
+  stream << vtkClientServerStream::Invoke
+         << this->DistributorProxy->GetID() << "GetOutputPort" << 0
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->DistributorSuppressorProxy->GetID()
+         << "SetInputConnection" << 0 << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  
+  stream << vtkClientServerStream::Invoke
+         << this->LODDistributorProxy->GetID() << "GetOutputPort" << 0
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->LODDistributorSuppressorProxy->GetID()
+         << "SetInputConnection" << 0 << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID,
+    vtkProcessModule::RENDER_SERVER, stream);
 
   this->Connect(this->MapperProxy, this->DistributorSuppressorProxy);
   this->Connect(this->LODMapperProxy, this->LODDistributorSuppressorProxy);
@@ -483,128 +454,101 @@ void vtkSMCompositeDisplayProxy::SetupVolumePipeline()
     ip->AddProxy(usInput->GetProxy(0));
     this->VolumeCollectProxy->UpdateVTKObjects();
 
-    unsigned int i;
-    for (i = 0; 
-         i < this->VolumeUpdateSuppressorProxy->GetNumberOfIDs(); 
-         i++)
-      {
-      stream
-        << vtkClientServerStream::Invoke
-        << this->VolumeCollectProxy->GetID(i) 
-        << "SetOutputDataType"
-        << VTK_IMAGE_DATA
-        << vtkClientServerStream::End;
-      stream
-        << vtkClientServerStream::Invoke
-        << this->VolumeCollectProxy->GetID(i) << "GetOutputPort"
-        << vtkClientServerStream::End;
-      stream
-        << vtkClientServerStream::Invoke
-        << this->VolumeUpdateSuppressorProxy->GetID(i) 
-        << "SetInputConnection"
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-      }
-    if (stream.GetNumberOfMessages() > 0)
-      {
-      vtkProcessModule::GetProcessModule()->SendStream(
-        this->ConnectionID, 
-        this->VolumeUpdateSuppressorProxy->GetServers(), 
-        stream);
-      }
+    stream
+      << vtkClientServerStream::Invoke
+      << this->VolumeCollectProxy->GetID() 
+      << "SetOutputDataType"
+      << VTK_IMAGE_DATA
+      << vtkClientServerStream::End;
+    stream
+      << vtkClientServerStream::Invoke
+      << this->VolumeCollectProxy->GetID() << "GetOutputPort"
+      << vtkClientServerStream::End;
+    stream
+      << vtkClientServerStream::Invoke
+      << this->VolumeUpdateSuppressorProxy->GetID() 
+      << "SetInputConnection"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID, 
+      this->VolumeUpdateSuppressorProxy->GetServers(), 
+      stream);
     }
   else if (this->VolumePipelineType == UNSTRUCTURED_GRID)
     {
     this->Connect(this->VolumeCollectProxy, this->VolumeFilterProxy);
     
-    unsigned int i;
-    for (i = 0; i < this->VolumeCollectProxy->GetNumberOfIDs(); i++)
-      {
-      stream
-        << vtkClientServerStream::Invoke
-        << this->VolumeCollectProxy->GetID(i) 
-        << "SetOutputDataType"
-        << VTK_UNSTRUCTURED_GRID
-        << vtkClientServerStream::End;
-      stream
-        << vtkClientServerStream::Invoke
-        << this->VolumeCollectProxy->GetID(i) << "GetOutputPort"
-        << vtkClientServerStream::End;
-      stream
-        << vtkClientServerStream::Invoke
-        << this->VolumeUpdateSuppressorProxy->GetID(i) << "SetInputConnection"
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-      }
-    if (stream.GetNumberOfMessages() > 0)
-      {
-      vtkProcessModule::GetProcessModule()->SendStream(
-        this->ConnectionID, vtkProcessModule::CLIENT_AND_SERVERS, stream);
-      }
-
+    stream
+      << vtkClientServerStream::Invoke
+      << this->VolumeCollectProxy->GetID() 
+      << "SetOutputDataType"
+      << VTK_UNSTRUCTURED_GRID
+      << vtkClientServerStream::End;
+    stream
+      << vtkClientServerStream::Invoke
+      << this->VolumeCollectProxy->GetID() << "GetOutputPort"
+      << vtkClientServerStream::End;
+    stream
+      << vtkClientServerStream::Invoke
+      << this->VolumeUpdateSuppressorProxy->GetID() << "SetInputConnection"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID, vtkProcessModule::CLIENT_AND_SERVERS, stream);
+    
     // On the render server, insert a distributor.
     this->Connect(this->VolumeDistributorProxy, this->VolumeUpdateSuppressorProxy);
-
+    
     // On the render server, attach an update suppressor to the
     // distributor.  On the client side (since the distributor is not
     // there) attach it to the other update suppressor.  We cannot do this
     // through the server manager interface.
-    for (i = 0; i < this->DistributorProxy->GetNumberOfIDs(); i++)
-      {
-      stream 
-        << vtkClientServerStream::Invoke
-        << this->VolumeUpdateSuppressorProxy->GetID(i)<< "GetOutputPort" << 0
-        << vtkClientServerStream::End;
-      stream 
-        << vtkClientServerStream::Invoke
-        << this->VolumeDistributorSuppressorProxy->GetID(i)
-        << "SetInputConnection" << 0 << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-      }
-    if (stream.GetNumberOfMessages() > 0)
-      {
-      vtkProcessModule::GetProcessModule()->SendStream(
-        this->ConnectionID,
-        vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER, stream);
-      }
+    stream 
+      << vtkClientServerStream::Invoke
+      << this->VolumeUpdateSuppressorProxy->GetID()<< "GetOutputPort" << 0
+      << vtkClientServerStream::End;
+    stream 
+      << vtkClientServerStream::Invoke
+      << this->VolumeDistributorSuppressorProxy->GetID()
+      << "SetInputConnection" << 0 << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID,
+      vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER, stream);
 
-    for (i = 0; i < this->DistributorProxy->GetNumberOfIDs(); i++)
-      {
-      stream << vtkClientServerStream::Invoke
-             << this->VolumeDistributorProxy->GetID(i) << "GetOutputPort" << 0
-             << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke
-             << this->VolumeDistributorSuppressorProxy->GetID(i)
-             << "SetInputConnection" << 0 << vtkClientServerStream::LastResult
-             << vtkClientServerStream::End;
-      }
-    if (stream.GetNumberOfMessages() > 0)
-      {
-      vtkProcessModule::GetProcessModule()->SendStream(
-        this->ConnectionID,
-        vtkProcessModule::RENDER_SERVER, stream);
-      }
+    stream << vtkClientServerStream::Invoke
+           << this->VolumeDistributorProxy->GetID() << "GetOutputPort" << 0
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->VolumeDistributorSuppressorProxy->GetID()
+           << "SetInputConnection" << 0 << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID,
+      vtkProcessModule::RENDER_SERVER, stream);
 
     this->Connect(this->VolumePTMapperProxy, 
-      this->VolumeDistributorSuppressorProxy);
+                  this->VolumeDistributorSuppressorProxy);
     this->Connect(this->VolumeHAVSMapperProxy, 
-      this->VolumeDistributorSuppressorProxy);
+                  this->VolumeDistributorSuppressorProxy);
     this->Connect(this->VolumeBunykMapperProxy, 
-      this->VolumeDistributorSuppressorProxy);
+                  this->VolumeDistributorSuppressorProxy);
     this->Connect(this->VolumeZSweepMapperProxy, 
-      this->VolumeDistributorSuppressorProxy);
-
+                  this->VolumeDistributorSuppressorProxy);
+    
     svp = vtkSMStringVectorProperty::SafeDownCast(
       this->VolumeDistributorProxy->GetProperty("OutputType"));
     svp->SetElement(0, "vtkUnstructuredGrid");
-
+    
     this->VolumeDistributorProxy->UpdateVTKObjects();
     }
 
   // The VolumeMapper for Image Data is directly connected to the 
   // VolumeUpdateSuppressorProxy, and not to VolumeDistributorSuppressorProxy
   // as is the case with UNSTRUCTURED_GRID volume rendering.
-  if (this->VolumePipelineType != IMAGE_DATA && this->VolumeDistributorSuppressorProxy)
+  if (this->VolumePipelineType != IMAGE_DATA && 
+      this->VolumeDistributorSuppressorProxy)
     {
     this->VolumeCacherProxy = this->VolumeDistributorSuppressorProxy;
 
@@ -631,96 +575,88 @@ void vtkSMCompositeDisplayProxy::SetupVolumeDefaults()
 
   this->SetupCollectionFilter(this->VolumeCollectProxy);
 
-  unsigned int i;
-  for (i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
+  vtkClientServerStream cmd;
+  vtkClientServerStream stream;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "LogStartEvent"
+      << "Execute VolumeCollect"
+      << vtkClientServerStream::End;
+  stream
+    << vtkClientServerStream::Invoke
+    << this->VolumeCollectProxy->GetID() << "AddObserver" << "StartEvent"
+    << cmd << vtkClientServerStream::End;
+  cmd.Reset();
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "LogEndEvent"
+      << "Execute VolumeCollect"
+      << vtkClientServerStream::End;
+  stream
+    << vtkClientServerStream::Invoke
+    << this->VolumeCollectProxy->GetID() << "AddObserver" << "EndEvent"
+    << cmd << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+                 vtkProcessModule::CLIENT_AND_SERVERS, stream);
+  
+  stream
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetSocketController"
+    << pm->GetConnectionClientServerID(this->ConnectionID)
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->VolumeCollectProxy->GetID() << "SetSocketController"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+                 vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER_ROOT|
+                 vtkProcessModule::RENDER_SERVER_ROOT, stream);
+  
+  
+  // Special condition to signal the client.
+  // Because both processes of the Socket controller think they are 0!!!!
+  if (pm->GetClientMode())
     {
-    vtkClientServerStream cmd;
-    vtkClientServerStream stream;
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-    cmd << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "LogStartEvent"
-        << "Execute VolumeCollect"
-        << vtkClientServerStream::End;
     stream
       << vtkClientServerStream::Invoke
-      << this->VolumeCollectProxy->GetID(i) << "AddObserver" << "StartEvent"
-      << cmd << vtkClientServerStream::End;
-    cmd.Reset();
-    cmd << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "LogEndEvent"
-        << "Execute VolumeCollect"
-        << vtkClientServerStream::End;
-    stream
-      << vtkClientServerStream::Invoke
-      << this->VolumeCollectProxy->GetID(i) << "AddObserver" << "EndEvent"
-      << cmd << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-                   vtkProcessModule::CLIENT_AND_SERVERS, stream);
-
-    stream
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetSocketController"
-      << pm->GetConnectionClientServerID(this->ConnectionID)
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->VolumeCollectProxy->GetID(i) << "SetSocketController"
-      << vtkClientServerStream::LastResult
+      << this->VolumeCollectProxy->GetID() << "SetController" << 0
       << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
-                   vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER_ROOT|
-                   vtkProcessModule::RENDER_SERVER_ROOT, stream);
-
-
-    // Special condition to signal the client.
-    // Because both processes of the Socket controller think they are 0!!!!
-    if (pm->GetClientMode())
-      {
-      stream
-        << vtkClientServerStream::Invoke
-        << this->VolumeCollectProxy->GetID(i) << "SetController" << 0
-        << vtkClientServerStream::End;
-      pm->SendStream(this->ConnectionID,
-                     vtkProcessModule::CLIENT, stream);
-      }
+                   vtkProcessModule::CLIENT, stream);
     }
 
-  for (i=0; i < this->VolumeDistributorProxy->GetNumberOfIDs(); i++)
-    {
-    vtkClientServerStream cmd;
-    vtkClientServerStream stream;
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-    cmd << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "LogStartEvent"
-        << "Execute LODOrderedCompositeDistribute"
-        << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->VolumeDistributorProxy->GetID(i) << "AddObserver"
-           << "StartEvent" << cmd
-           << vtkClientServerStream::End;
-    cmd.Reset();
-    cmd << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "LogEndEvent"
-        << "Execute LODOrderedCompositeDistribute"
-        << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->VolumeDistributorProxy->GetID(i) << "AddObserver"
-           << "EndEvent" << cmd
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-                   vtkProcessModule::RENDER_SERVER, stream);
-
-    stream << vtkClientServerStream::Invoke
-           << pm->GetProcessModuleID() << "GetController"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->VolumeDistributorProxy->GetID(i) << "SetController"
-           << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-                   vtkProcessModule::RENDER_SERVER, stream);
-    }
+  cmd.Reset();
+  stream.Reset();
+  
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "LogStartEvent"
+      << "Execute LODOrderedCompositeDistribute"
+      << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->VolumeDistributorProxy->GetID() << "AddObserver"
+         << "StartEvent" << cmd
+         << vtkClientServerStream::End;
+  cmd.Reset();
+  cmd << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "LogEndEvent"
+      << "Execute LODOrderedCompositeDistribute"
+      << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->VolumeDistributorProxy->GetID() << "AddObserver"
+         << "EndEvent" << cmd
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+                 vtkProcessModule::RENDER_SERVER, stream);
+  
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() << "GetController"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->VolumeDistributorProxy->GetID() << "SetController"
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+                 vtkProcessModule::RENDER_SERVER, stream);
 }
 
 //-----------------------------------------------------------------------------
@@ -728,57 +664,52 @@ void vtkSMCompositeDisplayProxy::SetupCollectionFilter(vtkSMProxy* collectProxy)
 { 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  int i, num;
-  
   vtkClientServerStream stream;
 
-  num = collectProxy->GetNumberOfIDs();
-  for (i = 0; i < num; ++i)
+  // Default is pass through because it executes fastest.  
+  stream
+    << vtkClientServerStream::Invoke
+    << collectProxy->GetID() << "SetMoveModeToPassThrough"
+    << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+                 vtkProcessModule::CLIENT_AND_SERVERS, stream);
+  stream
+    << vtkClientServerStream::Invoke
+    << collectProxy->GetID() << "SetMPIMToNSocketConnection" 
+    << pm->GetMPIMToNSocketConnectionID(this->ConnectionID)
+    << vtkClientServerStream::End;
+  // create, SetPassThrough, and set the mToN connection
+  // object on all servers and client
+  pm->SendStream(this->ConnectionID,
+      vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER, stream);
+
+  // always set client mode
+  stream
+    << vtkClientServerStream::Invoke
+    << collectProxy->GetID() << "SetServerToClient"
+    << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+                 vtkProcessModule::CLIENT, stream);
+  // if running in client mode
+  // then set the server to be servermode
+  if(pm->GetClientMode())
     {
-    // Default is pass through because it executes fastest.  
     stream
       << vtkClientServerStream::Invoke
-      << collectProxy->GetID(i) << "SetMoveModeToPassThrough"
+      << collectProxy->GetID() << "SetServerToDataServer"
       << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
-                   vtkProcessModule::CLIENT_AND_SERVERS, stream);
+                   vtkProcessModule::DATA_SERVER, stream);
+    }
+  // if running in render server mode
+  if(pm->GetRenderClientMode(this->GetConnectionID()))
+    {
     stream
       << vtkClientServerStream::Invoke
-      << collectProxy->GetID(i) << "SetMPIMToNSocketConnection" 
-      << pm->GetMPIMToNSocketConnectionID(this->ConnectionID)
-      << vtkClientServerStream::End;
-    // create, SetPassThrough, and set the mToN connection
-    // object on all servers and client
-    pm->SendStream(this->ConnectionID,
-                   vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER, stream);
-    // always set client mode
-    stream
-      << vtkClientServerStream::Invoke
-      << collectProxy->GetID(i) << "SetServerToClient"
+      << collectProxy->GetID() << "SetServerToRenderServer"
       << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
-                   vtkProcessModule::CLIENT, stream);
-    // if running in client mode
-    // then set the server to be servermode
-    if(pm->GetClientMode())
-      {
-      stream
-        << vtkClientServerStream::Invoke
-        << collectProxy->GetID(i) << "SetServerToDataServer"
-        << vtkClientServerStream::End;
-      pm->SendStream(this->ConnectionID,
-                     vtkProcessModule::DATA_SERVER, stream);
-      }
-    // if running in render server mode
-    if(pm->GetRenderClientMode(this->GetConnectionID()))
-      {
-      stream
-        << vtkClientServerStream::Invoke
-        << collectProxy->GetID(i) << "SetServerToRenderServer"
-        << vtkClientServerStream::End;
-      pm->SendStream(this->ConnectionID,
-                     vtkProcessModule::RENDER_SERVER, stream);
-      }
+                   vtkProcessModule::RENDER_SERVER, stream);
     }
 }
 
@@ -1104,11 +1035,11 @@ void vtkSMCompositeDisplayProxy::BuildKdTreeUsingDataPartitions(
 {
    vtkClientServerStream stream;
    stream << vtkClientServerStream::Invoke
-     << this->VolumeUpdateSuppressorProxy->GetID(0)
+     << this->VolumeUpdateSuppressorProxy->GetID()
      << "GetInput"
      << vtkClientServerStream::End;
    stream << vtkClientServerStream::Invoke
-     << kdGenerator->GetID(0)
+     << kdGenerator->GetID()
      << "BuildTree"
      << vtkClientServerStream::LastResult
      << vtkClientServerStream::End;
@@ -1136,34 +1067,23 @@ void vtkSMCompositeDisplayProxy::CacheUpdate(int idx, int total)
   // get any chance to  mark the collect filter modified on the client
   // side, hence we explicitly mark it modified.
   vtkClientServerStream stream;
-  unsigned int cc;
   if (this->VolumeCollectProxy && this->VolumeRenderMode)
     {
-    for (cc=0; cc < this->VolumeCollectProxy->GetNumberOfIDs(); cc++)
-      {
-      stream << vtkClientServerStream::Invoke
-        << this->VolumeCollectProxy->GetID(cc)
-        << "Modified"
-        << vtkClientServerStream::End;
-      }
+    stream << vtkClientServerStream::Invoke
+           << this->VolumeCollectProxy->GetID()
+           << "Modified"
+           << vtkClientServerStream::End;
     }
   else if (this->CollectProxy)
     {
-    for (cc=0; cc < this->CollectProxy->GetNumberOfIDs(); cc++)
-      {
-      stream << vtkClientServerStream::Invoke
-        << this->CollectProxy->GetID(cc)
-        << "Modified"
-        << vtkClientServerStream::End;    
-      }
+    stream << vtkClientServerStream::Invoke
+           << this->CollectProxy->GetID()
+           << "Modified"
+           << vtkClientServerStream::End;    
     }
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->GetConnectionID(), vtkProcessModule::CLIENT_AND_SERVERS,
-      stream);
-    }
-
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->GetConnectionID(), vtkProcessModule::CLIENT_AND_SERVERS,
+    stream);
   this->Superclass::CacheUpdate(idx, total);
 
   this->DistributedLODGeometryIsValid = 0;

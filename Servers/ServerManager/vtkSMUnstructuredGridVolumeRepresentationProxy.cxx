@@ -32,7 +32,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepresentationProxy()
 {
@@ -214,9 +214,9 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::InitializeStrategy(vtkSMVie
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMUnstructuredGridVolumeRepresentationProxy::BeginCreateVTKObjects(int numObjects)
+bool vtkSMUnstructuredGridVolumeRepresentationProxy::BeginCreateVTKObjects()
 {
-  if (!this->Superclass::BeginCreateVTKObjects(numObjects))
+  if (!this->Superclass::BeginCreateVTKObjects())
     {
     return false;
     }
@@ -271,7 +271,7 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::BeginCreateVTKObjects(int n
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMUnstructuredGridVolumeRepresentationProxy::EndCreateVTKObjects(int numObjects)
+bool vtkSMUnstructuredGridVolumeRepresentationProxy::EndCreateVTKObjects()
 {
   this->Connect(this->GetInputProxy(), this->VolumeFilter, "Input");
   this->Connect(this->VolumeBunykMapper, this->VolumeActor, "Mapper");
@@ -293,7 +293,7 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::EndCreateVTKObjects(int num
   ivp->SetElement(0, 0);
   this->SelectionProp3D->UpdateProperty("Pickable");
 
-  return this->Superclass::EndCreateVTKObjects(numObjects);
+  return this->Superclass::EndCreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -322,7 +322,7 @@ vtkSMProxy* vtkSMUnstructuredGridVolumeRepresentationProxy::ConvertSelection(
     vtkClientServerID propId;
     propId.ID = static_cast<vtkTypeUInt32>(properties->Get(
         vtkSelection::PROP_ID()));
-    if (propId == this->VolumeActor->GetID(0))
+    if (propId == this->VolumeActor->GetID())
       {
       vtkSelection* myChild = vtkSelection::New();
       myChild->ShallowCopy(child);

@@ -75,13 +75,13 @@ protected:
   // This gives the subclasses an opportunity to set the servers flags
   // on the subproxies.
   // If this method returns false, CreateVTKObjects() is aborted.
-  virtual bool BeginCreateVTKObjects(int numObjects);
+  virtual bool BeginCreateVTKObjects();
 
   // Description:
   // This method is called after CreateVTKObjects(). 
   // This gives subclasses an opportunity to do some post-creation
   // initialization.
-  virtual bool EndCreateVTKObjects(int numObjects);
+  virtual bool EndCreateVTKObjects();
 
   // Description:
   // Called when a representation is added to a view. 

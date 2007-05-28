@@ -54,7 +54,7 @@ protected:
 };
 
 
-vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.2");
 vtkCxxSetObjectMacro(vtkSMDataRepresentationProxy, InputProxy, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMDataRepresentationProxy::vtkSMDataRepresentationProxy()
@@ -147,9 +147,9 @@ bool vtkSMDataRepresentationProxy::AddToView(vtkSMViewProxy* view)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMDataRepresentationProxy::BeginCreateVTKObjects(int numObjects)
+bool vtkSMDataRepresentationProxy::BeginCreateVTKObjects()
 {
-  if (!this->Superclass::BeginCreateVTKObjects(numObjects))
+  if (!this->Superclass::BeginCreateVTKObjects())
     {
     return false;
     }
@@ -159,14 +159,14 @@ bool vtkSMDataRepresentationProxy::BeginCreateVTKObjects(int numObjects)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMDataRepresentationProxy::EndCreateVTKObjects(int numObjects)
+bool vtkSMDataRepresentationProxy::EndCreateVTKObjects()
 {
   if (vtkSMProperty* prop = this->GetProperty("UpdateTime"))
     {
     this->ViewTimeLink->AddLinkedProperty(prop, vtkSMLink::OUTPUT);
     }
 
-  return this->Superclass::EndCreateVTKObjects(numObjects);
+  return this->Superclass::EndCreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -189,7 +189,7 @@ void vtkSMDataRepresentationProxy::AddInput(vtkSMSourceProxy* input,
     }
 
   this->SetInputProxy(input);
-  this->CreateVTKObjects(numParts);
+  this->CreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

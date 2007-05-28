@@ -55,7 +55,7 @@ protected:
   // Description:
   // Overridden from vtkSMProxy to call BeginCreateVTKObjects() and
   // EndCreateVTKObjects().
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   // Description:
   // Called when a representation is added to a view. 

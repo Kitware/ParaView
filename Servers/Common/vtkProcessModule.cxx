@@ -103,7 +103,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.67");
+vtkCxxRevisionMacro(vtkProcessModule, "1.68");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -1042,7 +1042,7 @@ void vtkProcessModule::ReserveID(vtkClientServerID id)
 //-----------------------------------------------------------------------------
 vtkClientServerID vtkProcessModule::GetProcessModuleID()
 {
-  vtkClientServerID id = { 2 };
+  vtkClientServerID id(2);
   return id;
 }
 

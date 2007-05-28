@@ -84,6 +84,7 @@ public:
   virtual void CacheUpdate(int idx, int total);
 
   void BuildKdTreeUsingDataPartitions(vtkSMProxy* kdTreeGenerator);
+
 protected:
   vtkSMCompositeDisplayProxy();
   ~vtkSMCompositeDisplayProxy();
@@ -97,7 +98,7 @@ protected:
   virtual void SetInputInternal(vtkSMSourceProxy* input);
 
 
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
   void SetupCollectionFilter(vtkSMProxy* collectProxy);
 
   // The generic set method.

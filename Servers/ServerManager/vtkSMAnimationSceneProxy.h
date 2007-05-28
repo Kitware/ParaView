@@ -123,7 +123,7 @@ protected:
   vtkSMAnimationSceneProxy();
   ~vtkSMAnimationSceneProxy();
 
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
   virtual void ExecuteEvent(vtkObject* wdg, unsigned long event, void* calldata);
   virtual void InitializeObservers(vtkAnimationCue* cue); 
 

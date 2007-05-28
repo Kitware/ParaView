@@ -24,7 +24,7 @@
 #include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkSMMaterialLoaderProxy);
-vtkCxxRevisionMacro(vtkSMMaterialLoaderProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMMaterialLoaderProxy, "1.3");
 vtkCxxSetObjectMacro(vtkSMMaterialLoaderProxy, PropertyProxy, vtkSMProxy);
 
 //-----------------------------------------------------------------------------
@@ -85,27 +85,20 @@ void vtkSMMaterialLoaderProxy::LoadMaterial(const char* materialname)
         }
       }
     }
-  unsigned int cc;
   vtkClientServerStream stream;
-  for (cc=0; cc < this->PropertyProxy->GetNumberOfIDs(); cc++)
+  stream << vtkClientServerStream::Invoke
+         << this->PropertyProxy->GetID();
+  if (send_contents)
     {
-    stream << vtkClientServerStream::Invoke
-      << this->PropertyProxy->GetID(cc);
-    if (send_contents)
-      {
-      stream << "LoadMaterialFromString" << xml;
-      }
-    else
-      {
-      stream << "LoadMaterial" << (materialname? materialname : 0);
-      }
-    stream << vtkClientServerStream::End;
+    stream << "LoadMaterialFromString" << xml;
     }
-  if (stream.GetNumberOfMessages() > 0)
+  else
     {
-    pm->SendStream(this->PropertyProxy->GetConnectionID(),
-      this->PropertyProxy->GetServers(), stream);
+    stream << "LoadMaterial" << (materialname? materialname : 0);
     }
+  stream << vtkClientServerStream::End;
+  pm->SendStream(this->PropertyProxy->GetConnectionID(),
+                 this->PropertyProxy->GetServers(), stream);
   delete [] xml;
 }
 

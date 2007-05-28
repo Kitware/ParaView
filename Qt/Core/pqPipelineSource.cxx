@@ -482,25 +482,20 @@ vtkPVDataInformation* pqPipelineSource::getDataInformation() const
   /// Set number of pieces/piece no information on the update suppressor.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
-  for (unsigned int i=0; i < updateSuppressor->GetNumberOfIDs(); i++)
-    {
-    stream
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << updateSuppressor->GetID(i) << "SetUpdateNumberOfPieces"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    stream
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetPartitionId"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << updateSuppressor->GetID(i) << "SetUpdatePiece"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    }
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
+         << vtkClientServerStream::End
+         << vtkClientServerStream::Invoke
+         << updateSuppressor->GetID() << "SetUpdateNumberOfPieces"
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  stream  << vtkClientServerStream::Invoke
+          << pm->GetProcessModuleID() << "GetPartitionId"
+          << vtkClientServerStream::End
+          << vtkClientServerStream::Invoke
+          << updateSuppressor->GetID() << "SetUpdatePiece"
+          << vtkClientServerStream::LastResult
+          << vtkClientServerStream::End;
   pm->SendStream(updateSuppressor->GetConnectionID(),
     updateSuppressor->GetServers(), stream);
 

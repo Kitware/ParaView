@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMBoxProxy);
-vtkCxxRevisionMacro(vtkSMBoxProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMBoxProxy, "1.3");
 
 
 //----------------------------------------------------------------------------
@@ -50,21 +50,14 @@ void vtkSMBoxProxy::UpdateVTKObjects()
   this->GetMatrix(mat);
    
   vtkClientServerStream str;
-  unsigned int i;
-  unsigned int numObjects = this->GetNumberOfIDs();
-  for (i=0; i < numObjects; i++)
-    {
-    str << vtkClientServerStream::Invoke
-        << this->GetID(i) << "SetTransform"
-        << vtkClientServerStream::InsertArray(
-          &(mat->Element[0][0]),16)
-        << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    pm->SendStream(this->ConnectionID, this->Servers, str, 0);
-    }
+  str << vtkClientServerStream::Invoke
+      << this->GetID() 
+      << "SetTransform"
+      << vtkClientServerStream::InsertArray(
+        &(mat->Element[0][0]),16)
+      << vtkClientServerStream::End;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendStream(this->ConnectionID, this->Servers, str, 0);
   mat->Delete();
 }
 

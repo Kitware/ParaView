@@ -313,7 +313,7 @@ protected:
   virtual void SetupVolumeDefaults();
 
  
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   virtual void GatherDisplayedDataInformation();
 

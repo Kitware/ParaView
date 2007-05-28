@@ -80,7 +80,7 @@ protected:
   virtual void SetupPipeline();
   virtual void SetupDefaults();
 
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   vtkSMProxy *LODDecimatorProxy;
   vtkSMProxy *LODUpdateSuppressorProxy;

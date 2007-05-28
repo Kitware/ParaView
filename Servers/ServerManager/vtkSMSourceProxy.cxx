@@ -35,7 +35,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.47");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.48");
 
 struct vtkSMSourceProxyInternals
 {
@@ -80,18 +80,15 @@ vtkSMPart* vtkSMSourceProxy::GetPart(unsigned int idx)
 //---------------------------------------------------------------------------
 void vtkSMSourceProxy::UpdatePipelineInformation()
 {
-  int numIDs = this->GetNumberOfIDs();
-  if (numIDs <= 0)
+  if (this->GetID().IsNull())
     {
     return;
     }
   
   vtkClientServerStream command;
-  for(int i=0; i<numIDs; i++)
-    {
-    command << vtkClientServerStream::Invoke << this->GetID(i)
-            << "UpdateInformation" << vtkClientServerStream::End;
-    }
+  command << vtkClientServerStream::Invoke 
+          << this->GetID() << "UpdateInformation" 
+          << vtkClientServerStream::End;
   
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendStream(this->ConnectionID, this->Servers, command);
@@ -120,8 +117,7 @@ int vtkSMSourceProxy::ReadXMLAttributes(vtkSMProxyManager* pm,
 void vtkSMSourceProxy::UpdatePipeline()
 {
   int i;
-  int numIDs = this->GetNumberOfIDs();
-  if (numIDs <= 0)
+  if (this->GetID().IsNull())
     {
     return;
     }
@@ -133,13 +129,9 @@ void vtkSMSourceProxy::UpdatePipeline()
     // of every source.  Multiblock should fix this.
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkClientServerStream command;
-    for(i=0; i<numIDs; i++)
-      {
-      command << vtkClientServerStream::Invoke 
-              << this->GetID(i)
-              << "Update" 
-              << vtkClientServerStream::End;
-      }
+    command << vtkClientServerStream::Invoke 
+            << this->GetID() << "Update" 
+            << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, this->Servers, command);
     return;
     }
@@ -160,8 +152,7 @@ void vtkSMSourceProxy::UpdatePipeline()
 void vtkSMSourceProxy::UpdatePipeline(double time)
 {
   int i;
-  int numIDs = this->GetNumberOfIDs();
-  if (numIDs <= 0)
+  if (this->GetID().IsNull())
     {
     return;
     }
@@ -173,13 +164,9 @@ void vtkSMSourceProxy::UpdatePipeline(double time)
     // of every source.  Multiblock should fix this.
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkClientServerStream command;
-    for(i=0; i<numIDs; i++)
-      {
-      command << vtkClientServerStream::Invoke 
-              << this->GetID(i)
-              << "Update" 
-              << vtkClientServerStream::End;
-      }
+    command << vtkClientServerStream::Invoke 
+            << this->GetID() << "Update" 
+            << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, this->Servers, command);
     return;
     }
@@ -195,58 +182,52 @@ void vtkSMSourceProxy::UpdatePipeline(double time)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMSourceProxy::CreateVTKObjects(int numObjects)
+void vtkSMSourceProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
     return;
     }
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  int numIDs = this->GetNumberOfIDs();
+  vtkClientServerID sourceID = this->GetID();
+  vtkClientServerStream stream;
+
   if (this->ExecutiveName)
     {
-    vtkClientServerStream stream;
-    for (int i=0; i<numIDs; i++)
-      {
-      vtkClientServerID execId = pm->NewStreamObject(
-        this->ExecutiveName, stream);
-      vtkClientServerID sourceID = this->GetID(i);
-      stream << vtkClientServerStream::Invoke << sourceID
-        << "SetExecutive" << execId <<  vtkClientServerStream::End;
-
-      // Keep track of how long each filter takes to execute.
-      ostrstream filterName_with_warning_C4701;
-      filterName_with_warning_C4701 << "Execute " << this->VTKClassName
-                                    << " id: " << sourceID.ID << ends;
-      vtkClientServerStream start;
-      start << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
-            << "LogStartEvent" << filterName_with_warning_C4701.str()
-            << vtkClientServerStream::End;
-      vtkClientServerStream end;
-      end << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
-          << "LogEndEvent" << filterName_with_warning_C4701.str()
-          << vtkClientServerStream::End;
-      delete[] filterName_with_warning_C4701.str();
-      
-      stream << vtkClientServerStream::Invoke 
-             << sourceID << "AddObserver" << "StartEvent" << start
-             << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke 
-             << sourceID << "AddObserver" << "EndEvent" << end
-             << vtkClientServerStream::End;
-      pm->DeleteStreamObject(execId, stream);
-      }
-
-
-    if (stream.GetNumberOfMessages() > 0)
-      {
-      pm->SendStream(this->ConnectionID, this->Servers, stream);
-      }
+    vtkClientServerID execId = pm->NewStreamObject(
+      this->ExecutiveName, stream);
+    stream << vtkClientServerStream::Invoke 
+           << sourceID << "SetExecutive" << execId 
+           << vtkClientServerStream::End;
+    pm->DeleteStreamObject(execId, stream);
     }
+
+  // Keep track of how long each filter takes to execute.
+  ostrstream filterName_with_warning_C4701;
+  filterName_with_warning_C4701 << "Execute " << this->VTKClassName
+                                << " id: " << sourceID.ID << ends;
+  vtkClientServerStream start;
+  start << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
+        << "LogStartEvent" << filterName_with_warning_C4701.str()
+        << vtkClientServerStream::End;
+  vtkClientServerStream end;
+  end << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
+      << "LogEndEvent" << filterName_with_warning_C4701.str()
+      << vtkClientServerStream::End;
+  delete[] filterName_with_warning_C4701.str();
+  
+  stream << vtkClientServerStream::Invoke 
+         << sourceID << "AddObserver" << "StartEvent" << start
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke 
+         << sourceID << "AddObserver" << "EndEvent" << end
+         << vtkClientServerStream::End;
+  
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
 }
 
 
@@ -270,60 +251,51 @@ void vtkSMSourceProxy::CreatePartsInternal(vtkSMProxy* op)
   // This happens when connecting a filter to a source which is not
   // initialized. In other situations, SetInput() creates the VTK
   // objects before this gets called.
-  op->CreateVTKObjects(1);
-
+  op->CreateVTKObjects();
 
   this->PInternals->Parts.clear();
 
-  int numIDs = op->GetNumberOfIDs();
-
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  vtkPVNumberOfOutputsInformation* info = vtkPVNumberOfOutputsInformation::New();
+  vtkPVNumberOfOutputsInformation* info = 
+    vtkPVNumberOfOutputsInformation::New();
 
   // Create one part each output of each filter
   vtkClientServerStream stream;
-  for (int i=0; i<numIDs; i++)
+  vtkClientServerID sourceID = op->GetID();
+  // TODO replace this with UpdateInformation and OutputInformation
+  // property.
+  pm->GatherInformation(
+    this->ConnectionID, this->Servers, info, sourceID);
+  int numOutputs = info->GetNumberOfOutputs();
+  for (int j=0; j<numOutputs; j++)
     {
-    vtkClientServerID sourceID = op->GetID(i);
-    // TODO replace this with UpdateInformation and OutputInformation
-    // property.
-    pm->GatherInformation(
-      this->ConnectionID, this->Servers, info, sourceID);
-    int numOutputs = info->GetNumberOfOutputs();
-    for (int j=0; j<numOutputs; j++)
-      {
-      stream << vtkClientServerStream::Invoke << sourceID
-             << "GetOutputPort" << j <<  vtkClientServerStream::End;
-      vtkClientServerID portID = pm->GetUniqueID();
-      stream << vtkClientServerStream::Assign << portID
-             << vtkClientServerStream::LastResult
-             << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << sourceID
+           << "GetOutputPort" << j <<  vtkClientServerStream::End;
+    vtkClientServerID portID = pm->GetUniqueID();
+    stream << vtkClientServerStream::Assign << portID
+           << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
 
-      vtkClientServerID producerID = pm->GetUniqueID();
-      stream << vtkClientServerStream::Assign << producerID
-             << sourceID
-             << vtkClientServerStream::End;
+    vtkClientServerID producerID = pm->GetUniqueID();
+    stream << vtkClientServerStream::Assign << producerID
+           << sourceID
+           << vtkClientServerStream::End;
 
-      stream << vtkClientServerStream::Invoke << sourceID
-             << "GetExecutive" <<  vtkClientServerStream::End;
-      vtkClientServerID execID = pm->GetUniqueID();
-      stream << vtkClientServerStream::Assign << execID
-             << vtkClientServerStream::LastResult
-             << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << sourceID
+           << "GetExecutive" <<  vtkClientServerStream::End;
+    vtkClientServerID execID = pm->GetUniqueID();
+    stream << vtkClientServerStream::Assign << execID
+           << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
 
-      vtkSMPart* part = vtkSMPart::New();
-      part->SetConnectionID(this->ConnectionID);
-      part->SetServers(this->Servers);
-      part->CreateVTKObjects(0);
-      // Assign ids of various objects related to the output
-      part->SetAlgorithmOutputID(portID);
-      part->SetProducerID(producerID);
-      part->SetExecutiveID(execID);
-      part->SetPortIndex(j);
-      this->PInternals->Parts.push_back(part);
-      part->Delete();
-      }
+    vtkSMPart* part = vtkSMPart::New();
+    part->SetConnectionID(this->ConnectionID);
+    part->SetServers(this->Servers);
+    part->InitializeWithIDs(portID, producerID, execID);
+    part->SetPortIndex(j);
+    this->PInternals->Parts.push_back(part);
+    part->Delete();
     }
   if (stream.GetNumberOfMessages() > 0)
     {
@@ -345,7 +317,6 @@ void vtkSMSourceProxy::CreatePartsInternal(vtkSMProxy* op)
         }
       }
     }
-
 }
 
 //----------------------------------------------------------------------------
@@ -354,20 +325,12 @@ void vtkSMSourceProxy::CleanInputs(const char* method)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   vtkClientServerStream stream;
-  int numSources = this->GetNumberOfIDs();
-
-  for (int sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
-    {
-    vtkClientServerID sourceID = this->GetID(sourceIdx);
-    stream << vtkClientServerStream::Invoke 
-           << sourceID << method 
-           << vtkClientServerStream::End;
-    }
-
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->Servers, stream);
-    }
+  vtkClientServerID sourceID = this->GetID();
+  stream << vtkClientServerStream::Invoke 
+         << sourceID << method 
+         << vtkClientServerStream::End;
+  
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
 }
 
 //----------------------------------------------------------------------------
@@ -383,53 +346,37 @@ void vtkSMSourceProxy::AddInput(vtkSMSourceProxy *input,
 
   input->CreateParts();
   int numInputs = input->GetNumberOfParts();
-  if (!numInputs)
+  if (numInputs < 1)
     {
     return;
     }
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (numInputs > 1 && !hasMultipleInputs)
+    {
+    vtkErrorMacro("This algorithm (" 
+                  << (this->VTKClassName?this->VTKClassName:"(null)")
+                  << ") cannot handle multiple inputs (input is: "
+                  << (input->VTKClassName?input->VTKClassName:"(null)")
+                  << "). Only the first"
+                  " output of the input proxy will be used.");
+    numInputs = 1;
+    }
 
+  this->CreateVTKObjects();
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
-  if (hasMultipleInputs)
+  vtkClientServerID sourceID = this->GetID();
+  for (int partIdx = 0; partIdx < numInputs; ++partIdx)
     {
-    // One filter, multiple inputs
-    this->CreateVTKObjects(1);
-    vtkClientServerID sourceID = this->GetID(0);
-    for (int partIdx = 0; partIdx < numInputs; ++partIdx)
-      {
-      vtkSMPart* part = input->GetPart(partIdx);
-      stream << vtkClientServerStream::Invoke 
-             << sourceID << method;
-      stream << part->GetAlgorithmOutputID();
-      stream << vtkClientServerStream::End;
-      }
-    pm->SendStream(this->ConnectionID, this->Servers, stream);
+    vtkSMPart* part = input->GetPart(partIdx);
+    stream << vtkClientServerStream::Invoke 
+           << sourceID << method << part->GetID();
+    stream << vtkClientServerStream::End;
     }
-  else
-    {
-    // n inputs, n filters
-    this->CreateVTKObjects(numInputs);
-    int numSources = this->GetNumberOfIDs();
-    for (int sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
-      {
-      vtkClientServerID sourceID = this->GetID(sourceIdx);
-      // This is to handle the case when there are multiple
-      // inputs and the first one has multiple parts. For
-      // example, in the Glyph filter, when the input has multiple
-      // parts, the glyph source has to be applied to each.
-      // NOTE: Make sure that you set the input which has as
-      // many parts as there will be filters first. OR call
-      // CreateVTKObjects() with the right number of inputs.
-      int partIdx = sourceIdx % numInputs;
-      vtkSMPart* part = input->GetPart(partIdx);
-      stream << vtkClientServerStream::Invoke 
-             << sourceID << method; 
-      stream << part->GetAlgorithmOutputID();
-      stream << vtkClientServerStream::End;
-      }
-    pm->SendStream(this->ConnectionID, (this->Servers & input->GetServers()), stream);
-    }
+  pm->SendStream(this->ConnectionID, 
+                 this->Servers & input->GetServers(), 
+                 stream);
 }
 
 //----------------------------------------------------------------------------

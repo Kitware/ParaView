@@ -49,7 +49,7 @@ protected:
   ~vtkSMScalarBarWidgetProxy();
 
   
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
   
   void ExecuteEvent(vtkObject*obj, unsigned long event, void*p);
 

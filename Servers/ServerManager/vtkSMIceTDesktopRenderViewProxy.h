@@ -64,11 +64,11 @@ protected:
 
   // Description:
   // Pre-CreateVTKObjects initialization.
-  virtual bool BeginCreateVTKObjects(int numObjects);
+  virtual bool BeginCreateVTKObjects();
 
   // Description:
   // Post-CreateVTKObjects initialization.
-  virtual void EndCreateVTKObjects(int numObjects);
+  virtual void EndCreateVTKObjects();
 
   // Description:
   // Overridden to disable squirt compression.

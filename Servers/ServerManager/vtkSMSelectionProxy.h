@@ -112,7 +112,7 @@ protected:
 
   // Overridden to avoid creation of the camera subproxy, since
   // the camera subproxy is merely used for the data.
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   int ScreenRectangle[4];
   int NumIds;

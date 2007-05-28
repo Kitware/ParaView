@@ -72,7 +72,7 @@ static void vtkSMSelectionProxyExtractPropIds(
 }
 
 vtkStandardNewMacro(vtkSMSelectionProxy);
-vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.15");
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, RenderModule, vtkSMRenderModuleProxy);
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, ClientSideSelection, vtkSelection);
 //-----------------------------------------------------------------------------
@@ -146,7 +146,7 @@ void vtkSMSelectionProxy::GetSelectedSourceProxies(vtkCollection* coll)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSelectionProxy::CreateVTKObjects(int numObjects)
+void vtkSMSelectionProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
@@ -158,7 +158,7 @@ void vtkSMSelectionProxy::CreateVTKObjects(int numObjects)
     vtkErrorMacro("Camera subproxy must be defined in the configuration.");
     return;
     }
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

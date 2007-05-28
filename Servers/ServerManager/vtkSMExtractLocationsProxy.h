@@ -48,7 +48,7 @@ protected:
   vtkSMExtractLocationsProxy();
   ~vtkSMExtractLocationsProxy();
 
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
 private:
   vtkSMExtractLocationsProxy(const vtkSMExtractLocationsProxy&); // Not implemented.

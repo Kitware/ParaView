@@ -29,7 +29,7 @@ class vtkSMMultiViewRenderModuleProxyVector :
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMMultiViewRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMMultiViewRenderModuleProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMMultiViewRenderModuleProxy, "1.9");
 
 //----------------------------------------------------------------------------
 vtkSMMultiViewRenderModuleProxy::vtkSMMultiViewRenderModuleProxy()
@@ -49,7 +49,7 @@ vtkSMMultiViewRenderModuleProxy::~vtkSMMultiViewRenderModuleProxy()
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMMultiViewRenderModuleProxy::NewRenderModule()
 {
-  this->CreateVTKObjects(1);
+  this->CreateVTKObjects();
 
   if (!this->RenderModuleName)
     {
@@ -137,7 +137,7 @@ void vtkSMMultiViewRenderModuleProxy::RemoveRenderModule(
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMMultiViewRenderModuleProxy::CreateVTKObjects(int numObjects)
+void vtkSMMultiViewRenderModuleProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
@@ -181,7 +181,7 @@ void vtkSMMultiViewRenderModuleProxy::CreateVTKObjects(int numObjects)
     displayMan->Delete();
     }
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

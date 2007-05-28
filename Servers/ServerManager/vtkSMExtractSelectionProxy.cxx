@@ -33,7 +33,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMExtractSelectionProxy);
-vtkCxxRevisionMacro(vtkSMExtractSelectionProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMExtractSelectionProxy, "1.5");
 //-----------------------------------------------------------------------------
 vtkSMExtractSelectionProxy::vtkSMExtractSelectionProxy()
 {
@@ -76,14 +76,14 @@ void vtkSMExtractSelectionProxy::RemoveAllGlobalIDs()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMExtractSelectionProxy::CreateVTKObjects(int num)
+void vtkSMExtractSelectionProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
     return;
     }
 
-  this->Superclass::CreateVTKObjects(num);
+  this->Superclass::CreateVTKObjects();
 
   if (!this->ObjectsCreated)
     {

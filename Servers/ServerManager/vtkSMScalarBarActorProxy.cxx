@@ -25,7 +25,7 @@
 #include "vtkSMPropertyIterator.h"
 
 vtkStandardNewMacro(vtkSMScalarBarActorProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarActorProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMScalarBarActorProxy, "1.7");
 //-----------------------------------------------------------------------------
 vtkSMScalarBarActorProxy::vtkSMScalarBarActorProxy()
 {
@@ -37,36 +37,30 @@ vtkSMScalarBarActorProxy::~vtkSMScalarBarActorProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMScalarBarActorProxy::CreateVTKObjects(int numObjects)
+void vtkSMScalarBarActorProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
     return;
     }
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 
   vtkSMProxy* labelTextProperty = this->GetSubProxy("LabelTextProperty");
   vtkSMProxy* titleTextProperty = this->GetSubProxy("TitleTextProperty");
   
  
   vtkClientServerStream stream;
-  for (unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    stream << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "SetLabelTextProperty" << labelTextProperty->GetID(0)
-      << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "SetTitleTextProperty" << titleTextProperty->GetID(0)
-      << vtkClientServerStream::End;
-    }
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->ConnectionID, this->GetServers(), stream);
-    }
+  stream << vtkClientServerStream::Invoke
+         << this->GetID()
+         << "SetLabelTextProperty" << labelTextProperty->GetID()
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->GetID()
+         << "SetTitleTextProperty" << titleTextProperty->GetID()
+         << vtkClientServerStream::End;
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID, this->GetServers(), stream);
 
   /*
   // Let's set bold/shadow/italic on the text properties.
@@ -117,22 +111,16 @@ void vtkSMScalarBarActorProxy::SetPosition(double x, double y)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
-  for (unsigned int i=0; i < this->GetNumberOfIDs(); i++)
-    {
-    vtkClientServerID id = this->GetID(i);
-    stream << vtkClientServerStream::Invoke
-      << id 
-      << "GetPositionCoordinate"
-      << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetValue" << x  << y
-      << vtkClientServerStream::End;
-    }
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->GetServers(), stream);
-    }
+  vtkClientServerID id = this->GetID();
+  stream << vtkClientServerStream::Invoke
+         << id 
+         << "GetPositionCoordinate"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << vtkClientServerStream::LastResult
+         << "SetValue" << x  << y
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->GetServers(), stream);
 }
 
 //-----------------------------------------------------------------------------
@@ -140,22 +128,16 @@ void vtkSMScalarBarActorProxy::SetPosition2(double x, double y)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
-  for (unsigned int i=0; i < this->GetNumberOfIDs(); i++)
-    {
-    vtkClientServerID id = this->GetID(i);
-    stream << vtkClientServerStream::Invoke
-      << id 
-      << "GetPosition2Coordinate"
-      << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetValue" << x  << y
-      << vtkClientServerStream::End;
-    }
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->GetServers(), stream);
-    }
+  vtkClientServerID id = this->GetID();
+  stream << vtkClientServerStream::Invoke
+         << id 
+         << "GetPosition2Coordinate"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << vtkClientServerStream::LastResult
+         << "SetValue" << x  << y
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->GetServers(), stream);
 }
 
 //-----------------------------------------------------------------------------

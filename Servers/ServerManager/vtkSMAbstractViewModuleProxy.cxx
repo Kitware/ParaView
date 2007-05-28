@@ -26,7 +26,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkSMAbstractViewModuleProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMAbstractViewModuleProxy, "1.12");
 
 //-----------------------------------------------------------------------------
 vtkSMAbstractViewModuleProxy::vtkSMAbstractViewModuleProxy()
@@ -52,7 +52,7 @@ vtkSMAbstractViewModuleProxy::~vtkSMAbstractViewModuleProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMAbstractViewModuleProxy::CreateVTKObjects(int numObjects)
+void vtkSMAbstractViewModuleProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
@@ -65,7 +65,7 @@ void vtkSMAbstractViewModuleProxy::CreateVTKObjects(int numObjects)
   this->SetServersSelf(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 
   this->ViewTimeLinks->AddLinkedProperty(
     this->GetProperty("ViewTime"), vtkSMLink::INPUT);

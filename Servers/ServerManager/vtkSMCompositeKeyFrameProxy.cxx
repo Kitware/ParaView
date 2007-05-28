@@ -19,7 +19,7 @@
 #include "vtkSMPropertyLink.h"
 
 vtkStandardNewMacro(vtkSMCompositeKeyFrameProxy);
-vtkCxxRevisionMacro(vtkSMCompositeKeyFrameProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMCompositeKeyFrameProxy, "1.5");
 //-----------------------------------------------------------------------------
 vtkSMCompositeKeyFrameProxy::vtkSMCompositeKeyFrameProxy()
 {
@@ -87,14 +87,14 @@ int vtkSMCompositeKeyFrameProxy::GetTypeFromString(const char* type)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMCompositeKeyFrameProxy::CreateVTKObjects(int numObjects)
+void vtkSMCompositeKeyFrameProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
     return;
     }
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 
   if (!this->ObjectsCreated)
     {

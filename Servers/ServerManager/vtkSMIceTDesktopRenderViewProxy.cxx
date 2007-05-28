@@ -23,7 +23,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.4");
 vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderViewProxy, 
   SharedServerRenderSyncManager, vtkSMProxy);
 //----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ vtkSMIceTDesktopRenderViewProxy::~vtkSMIceTDesktopRenderViewProxy()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects(int numObjects)
+bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
@@ -63,8 +63,8 @@ bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects(int numObjects)
     this->RenderWindowProxy->UpdateVTKObjects();
 
     stream  << vtkClientServerStream::Assign
-            << this->RenderWindowProxy->GetID(0)
-            << this->SharedRenderWindow->GetID(0)
+            << this->RenderWindowProxy->GetID()
+            << this->SharedRenderWindow->GetID()
             << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
 
@@ -72,7 +72,7 @@ bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects(int numObjects)
       vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
 
-  if (!this->Superclass::BeginCreateVTKObjects(numObjects))
+  if (!this->Superclass::BeginCreateVTKObjects())
     {
     return false;
     }
@@ -97,15 +97,15 @@ bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects(int numObjects)
   if (this->SharedServerRenderSyncManager)
     {
     stream  << vtkClientServerStream::Invoke
-            << this->RenderSyncManager->GetID(0)
-            << this->SharedServerRenderSyncManager->GetID(0)
+            << this->RenderSyncManager->GetID()
+            << this->SharedServerRenderSyncManager->GetID()
             << vtkClientServerStream::End;
     }
   else
     {
     stream  << vtkClientServerStream::New
             << "vtkPVDesktopDeliveryServer"
-            << this->RenderSyncManager->GetID(0)
+            << this->RenderSyncManager->GetID()
             << vtkClientServerStream::End;
     }
   pm->SendStream(this->ConnectionID, 
@@ -125,7 +125,7 @@ bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects(int numObjects)
 
   stream  << vtkClientServerStream::New 
           << "vtkIceTRenderer" 
-          << this->RendererProxy->GetID(0)
+          << this->RendererProxy->GetID()
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
   this->RendererProxy->SetServers(
@@ -135,9 +135,9 @@ bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects(int numObjects)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMIceTDesktopRenderViewProxy::EndCreateVTKObjects(int numObjects)
+void vtkSMIceTDesktopRenderViewProxy::EndCreateVTKObjects()
 {
-  this->Superclass::EndCreateVTKObjects(numObjects);
+  this->Superclass::EndCreateVTKObjects();
 
   // * Initialize the RenderSyncManager.
   this->InitializeRenderSyncManager();
@@ -153,9 +153,9 @@ void vtkSMIceTDesktopRenderViewProxy::InitializeRenderSyncManager()
   // RenderSyncManager needs the parallel render manager on the server side to
   // pass parameters to the parallel render manager.
   stream  << vtkClientServerStream::Invoke
-          << this->RenderSyncManager->GetID(0)
+          << this->RenderSyncManager->GetID()
           << "SetParallelRenderManager"
-          << this->ParallelRenderManager->GetID(0)
+          << this->ParallelRenderManager->GetID()
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, 
     vtkProcessModule::RENDER_SERVER_ROOT, stream);
@@ -189,7 +189,7 @@ void vtkSMIceTDesktopRenderViewProxy::InitializeRenderSyncManager()
           << pm->GetConnectionClientServerID(this->ConnectionID)
           << vtkClientServerStream::End;
   stream  << vtkClientServerStream::Invoke 
-          << this->RenderSyncManager->GetID(0)
+          << this->RenderSyncManager->GetID()
           << "SetController" 
           << vtkClientServerStream::LastResult
           << vtkClientServerStream::End;
@@ -251,21 +251,21 @@ void vtkSMIceTDesktopRenderViewProxy::InitializeRenderSyncManager()
 
   // Make the render sync manager aware of our renderers.
   stream  << vtkClientServerStream::Invoke 
-          << this->RenderSyncManager->GetID(0)
+          << this->RenderSyncManager->GetID()
           << "AddRenderer" 
           << (int)this->GetSelfID().ID
-          << this->RendererProxy->GetID(0) 
+          << this->RendererProxy->GetID() 
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID,
     vtkProcessModule::RENDER_SERVER_ROOT, stream);
 
   stream  << vtkClientServerStream::Invoke 
-          << this->RenderSyncManager->GetID(0)
+          << this->RenderSyncManager->GetID()
           << "AddRenderer" 
-          << this->RendererProxy->GetID(0)
+          << this->RendererProxy->GetID()
           << vtkClientServerStream::End;
   stream  << vtkClientServerStream::Invoke 
-          << this->RenderSyncManager->GetID(0)
+          << this->RenderSyncManager->GetID()
           << "SetId" 
           << (int)this->GetSelfID().ID
           << vtkClientServerStream::End;
@@ -354,7 +354,7 @@ void vtkSMIceTDesktopRenderViewProxy::SetGUISize(int x, int y)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   stream  << vtkClientServerStream::Invoke 
-          << this->RenderSyncManager->GetID(0)
+          << this->RenderSyncManager->GetID()
           << "SetGUISize" << x << y
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
@@ -368,7 +368,7 @@ void vtkSMIceTDesktopRenderViewProxy::SetViewPosition(int x, int y)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   stream  << vtkClientServerStream::Invoke 
-          << this->RenderSyncManager->GetID(0)
+          << this->RenderSyncManager->GetID()
           << "SetWindowPosition" << x << y
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);

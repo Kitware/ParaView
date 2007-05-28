@@ -29,18 +29,14 @@ public:
   vtkTypeRevisionMacro(vtkSMImplicitPlaneRepresentationProxy, vtkSMWidgetRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Given the number of objects (numObjects), class name 
-  // (VTKClassName) and server ids ( this->GetServerIDs()), 
-  // this methods instantiates the objects on the server(s)
-  // This method is overridden to change the default appearance.
-  virtual void CreateVTKObjects(int numObjects);
-
 protected:
   vtkSMImplicitPlaneRepresentationProxy();
   ~vtkSMImplicitPlaneRepresentationProxy();
 
   virtual void SendRepresentation();
+
+  // This method is overridden to change the default appearance.
+  virtual void CreateVTKObjects();
 
 private:
   vtkSMImplicitPlaneRepresentationProxy(const vtkSMImplicitPlaneRepresentationProxy&); // Not implemented

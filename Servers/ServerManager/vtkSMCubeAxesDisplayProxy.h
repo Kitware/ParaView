@@ -32,7 +32,6 @@ class vtkSMSourceProxy;
 class vtkUnstructuredGrid;
 class vtkSMRenderModuleProxy;
 
-
 class VTK_EXPORT vtkSMCubeAxesDisplayProxy : public vtkSMConsumerDisplayProxy
 {
 public:
@@ -93,7 +92,7 @@ protected:
   vtkSMProxy* CubeAxesProxy;
   vtkSMSourceProxy* Input;
 
-  virtual void CreateVTKObjects(int num);
+  virtual void CreateVTKObjects();
 
   vtkSMCubeAxesDisplayProxy(const vtkSMCubeAxesDisplayProxy&); // Not implemented
   void operator=(const vtkSMCubeAxesDisplayProxy&); // Not implemented

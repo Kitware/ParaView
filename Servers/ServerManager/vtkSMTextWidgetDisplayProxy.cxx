@@ -21,7 +21,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMTextWidgetDisplayProxy);
-vtkCxxRevisionMacro(vtkSMTextWidgetDisplayProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMTextWidgetDisplayProxy, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMTextWidgetDisplayProxy::vtkSMTextWidgetDisplayProxy()
@@ -57,7 +57,7 @@ void vtkSMTextWidgetDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy*
 }
 
 //----------------------------------------------------------------------------
-void vtkSMTextWidgetDisplayProxy::CreateVTKObjects(int numObjects)
+void vtkSMTextWidgetDisplayProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
@@ -82,14 +82,13 @@ void vtkSMTextWidgetDisplayProxy::CreateVTKObjects(int numObjects)
   this->TextPropertyProxy->SetServers(
     vtkProcessModule::RENDER_SERVER | vtkProcessModule::CLIENT);
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 
   if (!this->RepresentationProxy)
     {
     vtkErrorMacro("Failed to find subproxy Prop2D.");
     return;
     }
-
 
   vtkSMProxyProperty* tppp = vtkSMProxyProperty::SafeDownCast(
     this->TextActorProxy->GetProperty("TextProperty"));

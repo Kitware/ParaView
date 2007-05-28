@@ -161,7 +161,7 @@ protected:
   // Description:
   // Call superclass' and then assigns a new executive 
   // (vtkCompositeDataPipeline)
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   char *ExecutiveName;
   vtkSetStringMacro(ExecutiveName);

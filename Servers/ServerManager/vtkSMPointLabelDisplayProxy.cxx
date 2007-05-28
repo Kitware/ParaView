@@ -70,7 +70,7 @@ void vtkSMPointLabelDisplayProxy::SetInput(vtkSMSourceProxy* input)
     }
 
   this->InvalidateGeometry();
-  this->CreateVTKObjects(1);
+  this->CreateVTKObjects();
 
   this->SetupPipeline(); // Have to this earlier
   this->SetupDefaults(); 
@@ -90,16 +90,11 @@ void vtkSMPointLabelDisplayProxy::SetInput(vtkSMSourceProxy* input)
 
 
 //-----------------------------------------------------------------------------
-void vtkSMPointLabelDisplayProxy::CreateVTKObjects(int numObjects)
+void vtkSMPointLabelDisplayProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
     return;
-    }
-  if (numObjects != 1)
-    {
-    vtkErrorMacro("Can handle on 1 input!");
-    numObjects = 1;
     }
  
   this->CollectProxy = this->GetSubProxy("Collect");
@@ -123,7 +118,7 @@ void vtkSMPointLabelDisplayProxy::CreateVTKObjects(int numObjects)
   this->TextPropertyProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -140,22 +135,16 @@ void vtkSMPointLabelDisplayProxy::SetupPipeline()
     otype->SetElement(0,4); //vtkUnstructuredGrid
     }
   
-  for (unsigned int i=0; i < this->UpdateSuppressorProxy->GetNumberOfIDs();i++)
-    {
-    stream << vtkClientServerStream::Invoke
-      << this->CollectProxy->GetID(i) << "GetOutputPort"
-      << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-      << this->UpdateSuppressorProxy->GetID(i) << "SetInputConnection"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    }
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->ConnectionID,
-      this->UpdateSuppressorProxy->GetServers(), stream);
-    }
+  stream << vtkClientServerStream::Invoke
+         << this->CollectProxy->GetID() << "GetOutputPort"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->UpdateSuppressorProxy->GetID() << "SetInputConnection"
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID,
+    this->UpdateSuppressorProxy->GetServers(), stream);
 
   ip = vtkSMInputProperty::SafeDownCast(
     this->MapperProxy->GetProperty("Input"));
@@ -198,61 +187,57 @@ void vtkSMPointLabelDisplayProxy::SetupDefaults()
   vtkClientServerStream stream;
   vtkSMIntVectorProperty* ivp;
 
-  unsigned int i;
-  for (i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
+  // A rather complex mess to set the correct server variable 
+  // on all of the remote duplication filters.
+  if(pm->GetClientMode())
     {
-    // A rather complex mess to set the correct server variable 
-    // on all of the remote duplication filters.
-    if(pm->GetClientMode())
-      {
-      // We need this because the socket controller has no way of distinguishing
-      // between processes.
-      stream << vtkClientServerStream::Invoke
-        << this->CollectProxy->GetID(i) << "SetServerToClient"
-        << vtkClientServerStream::End;
-      pm->SendStream(this->ConnectionID, 
-        vtkProcessModule::CLIENT, stream);
-      }
-    // pm->ClientMode is only set when there is a server.
-    if(pm->GetClientMode())
-      {
-      stream << vtkClientServerStream::Invoke
-        << this->CollectProxy->GetID(i) << "SetServerToDataServer"
-        << vtkClientServerStream::End;
-      pm->SendStream(this->ConnectionID,
-        vtkProcessModule::DATA_SERVER, stream);
-      }
-    // if running in render server mode
-    if(pm->GetRenderClientMode(this->GetConnectionID()))
-      {
-      stream << vtkClientServerStream::Invoke
-        << this->CollectProxy->GetID(i) << "SetServerToRenderServer"
-        << vtkClientServerStream::End;
-      pm->SendStream(this->ConnectionID,
-        vtkProcessModule::RENDER_SERVER, stream);
-      }  
-
-    // Handle collection setup with client server.
+    // We need this because the socket controller has no way of distinguishing
+    // between processes.
     stream << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetSocketController"
-      << pm->GetConnectionClientServerID(this->ConnectionID)
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->CollectProxy->GetID(i) 
-      << "SetClientDataServerSocketController"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-      vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
-
-    stream << vtkClientServerStream::Invoke
-      << this->CollectProxy->GetID(i) << "SetMPIMToNSocketConnection" 
-      << pm->GetMPIMToNSocketConnectionID(this->ConnectionID)
-      << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-      vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER, stream);
-
+           << this->CollectProxy->GetID() << "SetServerToClient"
+           << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, 
+                   vtkProcessModule::CLIENT, stream);
     }
+  // pm->ClientMode is only set when there is a server.
+  if(pm->GetClientMode())
+    {
+    stream << vtkClientServerStream::Invoke
+           << this->CollectProxy->GetID() << "SetServerToDataServer"
+           << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID,
+                   vtkProcessModule::DATA_SERVER, stream);
+    }
+  // if running in render server mode
+  if(pm->GetRenderClientMode(this->GetConnectionID()))
+    {
+    stream << vtkClientServerStream::Invoke
+           << this->CollectProxy->GetID() << "SetServerToRenderServer"
+           << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID,
+                   vtkProcessModule::RENDER_SERVER, stream);
+    }  
+
+  // Handle collection setup with client server.
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() << "GetSocketController"
+         << pm->GetConnectionClientServerID(this->ConnectionID)
+         << vtkClientServerStream::End
+         << vtkClientServerStream::Invoke
+         << this->CollectProxy->GetID() 
+         << "SetClientDataServerSocketController"
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+             vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
+
+  stream << vtkClientServerStream::Invoke
+         << this->CollectProxy->GetID() << "SetMPIMToNSocketConnection" 
+         << pm->GetMPIMToNSocketConnectionID(this->ConnectionID)
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+       vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER, stream);
+
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->CollectProxy->GetProperty("MoveMode"));
   if (!ivp)
@@ -263,26 +248,23 @@ void vtkSMPointLabelDisplayProxy::SetupDefaults()
   ivp->SetElement(0, 2); // Clone mode.
   this->CollectProxy->UpdateVTKObjects();
 
-  for (i=0; i < this->UpdateSuppressorProxy->GetNumberOfIDs(); i++)
-    {
-    // Tell the update suppressor to produce the correct partition.
-    stream << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->UpdateSuppressorProxy->GetID(i) << "SetUpdateNumberOfPieces"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetPartitionId"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->UpdateSuppressorProxy->GetID(i) << "SetUpdatePiece"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-      this->UpdateSuppressorProxy->GetServers(), stream);
-    }
+  // Tell the update suppressor to produce the correct partition.
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
+         << vtkClientServerStream::End
+         << vtkClientServerStream::Invoke
+         << this->UpdateSuppressorProxy->GetID() << "SetUpdateNumberOfPieces"
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() << "GetPartitionId"
+         << vtkClientServerStream::End
+         << vtkClientServerStream::Invoke
+         << this->UpdateSuppressorProxy->GetID() << "SetUpdatePiece"
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+                 this->UpdateSuppressorProxy->GetServers(), stream);
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->TextPropertyProxy->GetProperty("FontSize"));
@@ -331,7 +313,7 @@ vtkUnstructuredGrid* vtkSMPointLabelDisplayProxy::GetCollectedData()
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
 
   vtkMPIMoveData* dp = vtkMPIMoveData::SafeDownCast(
-    pm->GetObjectFromID(this->CollectProxy->GetID(0)));
+    pm->GetObjectFromID(this->CollectProxy->GetID()));
   if (dp == NULL)
     {
     return NULL;

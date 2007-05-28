@@ -114,7 +114,7 @@ void pqVTKHistogramColor::setScalarsToColors(vtkSMProxy* lut)
   // Get the client side stc and save it.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   this->Internals->ScalarToColors = 
-    vtkScalarsToColors::SafeDownCast(pm->GetObjectFromID(lut->GetID(0)));
+    vtkScalarsToColors::SafeDownCast(pm->GetObjectFromID(lut->GetID()));
   if (this->Internals->ScalarToColors)
     {
     // This ensures that the LUT is up-to-date.
@@ -122,5 +122,3 @@ void pqVTKHistogramColor::setScalarsToColors(vtkSMProxy* lut)
     }
 }
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------

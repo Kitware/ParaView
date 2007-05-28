@@ -75,7 +75,7 @@ protected:
   virtual void InvalidateGeometryInternal(int /*useCache*/)
     { this->Dirty = true; }
 
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   vtkSMTextWidgetDisplayProxy* TextWidgetProxy;
 

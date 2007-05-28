@@ -24,7 +24,7 @@
 
 
 vtkStandardNewMacro(vtkSMLineWidgetProxy);
-vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.15");
 //----------------------------------------------------------------------------
 vtkSMLineWidgetProxy::vtkSMLineWidgetProxy()
 {
@@ -46,51 +46,38 @@ void vtkSMLineWidgetProxy::UpdateVTKObjects()
   this->Superclass::UpdateVTKObjects();
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream str;
-  unsigned int cc;
-  unsigned int numObjects = this->GetNumberOfIDs();
-  for (cc=0; cc < numObjects; cc++)
-    {
-    vtkClientServerID id = this->GetID(cc);
-    str << vtkClientServerStream::Invoke 
-        <<  id
-        << "SetPoint1" << this->Point1[0] << this->Point1[1] 
-        <<  this->Point1[2]
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke 
-        <<  id
-        << "SetPoint2" << this->Point2[0] << this->Point2[1] 
-        <<  this->Point2[2]
-        << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->Servers,str);
-    }
+  vtkClientServerID id = this->GetID();
+  str << vtkClientServerStream::Invoke 
+      <<  id
+      << "SetPoint1" << this->Point1[0] << this->Point1[1] 
+      <<  this->Point1[2]
+      << vtkClientServerStream::End;
+  str << vtkClientServerStream::Invoke 
+      <<  id
+      << "SetPoint2" << this->Point2[0] << this->Point2[1] 
+      <<  this->Point2[2]
+      << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers,str);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMLineWidgetProxy::CreateVTKObjects(int numObjects)
+void vtkSMLineWidgetProxy::CreateVTKObjects()
 {
   if(this->ObjectsCreated)
     {
     return;
     }
   
-  unsigned int cc;
-
   //superclass will create the stream objects
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
   
   //now do additional initialization on the streamobjects
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
-  for(cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    vtkClientServerID id = this->GetID(cc);
-    stream << vtkClientServerStream::Invoke <<  id
-           << "SetAlignToNone" << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->GetServers(), stream);
-    }
+  vtkClientServerID id = this->GetID();
+  stream << vtkClientServerStream::Invoke <<  id
+         << "SetAlignToNone" << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->GetServers(), stream);
 }
 
 //----------------------------------------------------------------------------

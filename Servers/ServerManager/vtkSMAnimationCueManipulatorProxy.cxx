@@ -16,7 +16,7 @@
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueManipulatorProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMAnimationCueManipulatorProxy, "1.9");
 
 //----------------------------------------------------------------------------
 vtkSMAnimationCueManipulatorProxy::vtkSMAnimationCueManipulatorProxy()
@@ -31,10 +31,10 @@ vtkSMAnimationCueManipulatorProxy::~vtkSMAnimationCueManipulatorProxy()
 //----------------------------------------------------------------------------
 // Overridden simply to set ObjectsCreated to 1, since this class does 
 // not create any server side objects.
-void vtkSMAnimationCueManipulatorProxy::CreateVTKObjects(int numObjects)
+void vtkSMAnimationCueManipulatorProxy::CreateVTKObjects()
 {
   this->ObjectsCreated = 1;
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

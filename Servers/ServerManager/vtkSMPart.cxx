@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.29");
+vtkCxxRevisionMacro(vtkSMPart, "1.30");
 
 
 //----------------------------------------------------------------------------
@@ -54,6 +54,23 @@ vtkSMPart::~vtkSMPart()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMPart::InitializeWithIDs(vtkClientServerID outputID, 
+                                  vtkClientServerID producerID, 
+                                  vtkClientServerID executiveID)
+{
+  if (this->ObjectsCreated || outputID.IsNull() || producerID.IsNull() ||
+      executiveID.IsNull())
+    {
+    return;
+    }
+  this->ObjectsCreated = 1;
+  this->GetSelfID(); // this will ensure that the SelfID is assigned properly.
+  this->VTKObjectID = outputID;
+  this->ProducerID = producerID;
+  this->ExecutiveID = executiveID;
+}
+
+//----------------------------------------------------------------------------
 vtkSMProxy* vtkSMPart::GetDataObjectProxy(int recheck)
 {
   if (!this->DataObjectProxy)
@@ -69,7 +86,6 @@ vtkSMProxy* vtkSMPart::GetDataObjectProxy(int recheck)
     this->DataObjectProxy = vtkSMProxy::New();
     this->DataObjectProxy->SetConnectionID(this->ConnectionID);
     this->DataObjectProxy->SetServers(this->Servers);
-    this->DataObjectProxy->CreateVTKObjects(0);
 
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkClientServerStream stream;
@@ -83,7 +99,7 @@ vtkSMProxy* vtkSMPart::GetDataObjectProxy(int recheck)
            << uid << vtkClientServerStream::LastResult
            << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, this->Servers, stream);
-    this->DataObjectProxy->SetID(0, uid);
+    this->DataObjectProxy->InitializeWithID(uid);
     }
 
   return this->DataObjectProxy;
@@ -119,7 +135,7 @@ void vtkSMPart::InvalidateDataInformation()
 // vtkPVPart used to update before gathering this information ...
 void vtkSMPart::GatherDataInformation(int doUpdate)
 {
-  if (this->GetNumberOfIDs() < 1)
+  if (this->GetID().IsNull())
     {
     vtkErrorMacro("Part has no associated object, can not gather info.");
     return;
@@ -128,7 +144,7 @@ void vtkSMPart::GatherDataInformation(int doUpdate)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   pm->GatherInformation(this->ConnectionID, this->Servers, 
-    this->DataInformation, this->GetAlgorithmOutputID());
+                        this->DataInformation, this->GetID());
 
   if (doUpdate)
     {
@@ -139,7 +155,7 @@ void vtkSMPart::GatherDataInformation(int doUpdate)
 //----------------------------------------------------------------------------
 void vtkSMPart::GatherClassNameInformation()
 {
-  if (this->GetNumberOfIDs() < 1)
+  if (this->GetID().IsNull())
     {
     vtkErrorMacro("Part has no associated object, can not gather info.");
     return;
@@ -177,7 +193,7 @@ void vtkSMPart::GatherClassNameInformation()
 //----------------------------------------------------------------------------
 void vtkSMPart::InsertExtractPiecesIfNecessary()
 {
-  if (this->GetNumberOfIDs() < 1)
+  if (this->GetID().IsNull())
     {
     return;
     }
@@ -185,7 +201,7 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
   
   const char* className = this->GetClassNameInformation()->GetVTKClassName();
   vtkClientServerStream stream;
-  vtkClientServerID tempDataPiece = {0};
+  vtkClientServerID tempDataPiece;
   if (className == NULL)
     {
     vtkErrorMacro("Missing data information.");
@@ -365,12 +381,12 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
   // Connect filter
   stream << vtkClientServerStream::Invoke << tempDataPiece 
          << "SetInputConnection"
-         << this->GetAlgorithmOutputID()
+         << this->GetID()
          << vtkClientServerStream::End;
 
   // Release references to old ids
   stream << vtkClientServerStream::Delete 
-         << this->GetAlgorithmOutputID()
+         << this->GetID()
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Delete 
          << this->GetProducerID()
@@ -383,7 +399,7 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
   stream << vtkClientServerStream::Invoke << tempDataPiece 
          << "GetOutputPort" << 0
          << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Assign << this->GetAlgorithmOutputID()
+  stream << vtkClientServerStream::Assign << this->GetID()
          << vtkClientServerStream::LastResult
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << tempDataPiece 
@@ -410,7 +426,7 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
 // Needs to be before "ExtractPieces" because translator propagates.
 void vtkSMPart::CreateTranslatorIfNecessary()
 {
-  if (this->GetNumberOfIDs() < 1)
+  if (this->GetID().IsNull())
     {
     return;
     }

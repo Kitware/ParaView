@@ -33,7 +33,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMNew3DWidgetProxy);
-vtkCxxRevisionMacro(vtkSMNew3DWidgetProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMNew3DWidgetProxy, "1.10");
 
 class vtkSMNew3DWidgetObserver : public vtkCommand
 {
@@ -77,7 +77,7 @@ vtkSMNew3DWidgetProxy::~vtkSMNew3DWidgetProxy()
     {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkAbstractWidget* widget = vtkAbstractWidget::SafeDownCast(
-      pm->GetObjectFromID(this->WidgetProxy->GetID(0)));
+      pm->GetObjectFromID(this->WidgetProxy->GetID()));
     widget->SetInteractor(0);
     }
 
@@ -100,7 +100,7 @@ void vtkSMNew3DWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
   if (this->WidgetProxy)
     {
     vtkAbstractWidget* widget = vtkAbstractWidget::SafeDownCast(
-      pm->GetObjectFromID(this->WidgetProxy->GetID(0)));
+      pm->GetObjectFromID(this->WidgetProxy->GetID()));
     if (widget)
       {
       widget->SetInteractor(rm->GetInteractor());
@@ -129,7 +129,7 @@ void vtkSMNew3DWidgetProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
   if (this->WidgetProxy)
     {
     vtkAbstractWidget* widget = vtkAbstractWidget::SafeDownCast(
-      pm->GetObjectFromID(this->WidgetProxy->GetID(0)));
+      pm->GetObjectFromID(this->WidgetProxy->GetID()));
     if (this->Widget)
       {
       widget->SetEnabled(0);
@@ -165,7 +165,7 @@ void vtkSMNew3DWidgetProxy::SetEnabled(int enable)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMNew3DWidgetProxy::CreateVTKObjects(int numObjects)
+void vtkSMNew3DWidgetProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
@@ -194,7 +194,7 @@ void vtkSMNew3DWidgetProxy::CreateVTKObjects(int numObjects)
     }
   this->WidgetProxy->SetServers(vtkProcessModule::CLIENT);
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->WidgetProxy->GetProperty("Representation"));
@@ -206,7 +206,7 @@ void vtkSMNew3DWidgetProxy::CreateVTKObjects(int numObjects)
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   this->Widget = vtkAbstractWidget::SafeDownCast(
-    pm->GetObjectFromID(this->WidgetProxy->GetID(0)));
+    pm->GetObjectFromID(this->WidgetProxy->GetID()));
   if (this->Widget)
     {
     this->Widget->AddObserver(

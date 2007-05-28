@@ -47,7 +47,7 @@ protected:
   vtkSMXMLPVAnimationWriterProxy();
   ~vtkSMXMLPVAnimationWriterProxy();
   
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
   int ErrorCode;
 
   vtkSMSummaryHelperProxy* SummaryHelperProxy;

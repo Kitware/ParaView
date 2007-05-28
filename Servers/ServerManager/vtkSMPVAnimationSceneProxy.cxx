@@ -20,7 +20,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPVAnimationSceneProxy);
-vtkCxxRevisionMacro(vtkSMPVAnimationSceneProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMPVAnimationSceneProxy, "1.8");
 vtkCxxSetObjectMacro(vtkSMPVAnimationSceneProxy, TimeKeeper, vtkSMProxy);
 //-----------------------------------------------------------------------------
 vtkSMPVAnimationSceneProxy::vtkSMPVAnimationSceneProxy()
@@ -39,7 +39,7 @@ vtkSMPVAnimationSceneProxy::~vtkSMPVAnimationSceneProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPVAnimationSceneProxy::CreateVTKObjects(int numObjects)
+void vtkSMPVAnimationSceneProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
@@ -49,7 +49,7 @@ void vtkSMPVAnimationSceneProxy::CreateVTKObjects(int numObjects)
   this->InitializeObservers(this->AnimationCue);
   this->ObjectsCreated = 1;
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
   this->SetTimeMode(vtkAnimationScene::TIMEMODE_RELATIVE);
 }
 

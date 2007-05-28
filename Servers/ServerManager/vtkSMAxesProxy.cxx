@@ -24,7 +24,7 @@
 #include "vtkSMInputProperty.h"
 
 vtkStandardNewMacro(vtkSMAxesProxy);
-vtkCxxRevisionMacro(vtkSMAxesProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMAxesProxy, "1.7");
 //---------------------------------------------------------------------------
 vtkSMAxesProxy::vtkSMAxesProxy()
 {
@@ -37,30 +37,23 @@ vtkSMAxesProxy::~vtkSMAxesProxy()
 
 
 //---------------------------------------------------------------------------
-void vtkSMAxesProxy::CreateVTKObjects(int numObjects)
+void vtkSMAxesProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
     return;
     }
   this->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  int cc;
 
   vtkClientServerStream str;
-  for (cc=0; cc< numObjects; cc++)
-    {
-    vtkClientServerID id = this->GetID(cc);
-    str << vtkClientServerStream::Invoke << id 
+  vtkClientServerID id = this->GetID();
+  str << vtkClientServerStream::Invoke << id 
       << "SymmetricOn" << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke << id
+  str << vtkClientServerStream::Invoke << id
       << "ComputeNormalsOff" << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->Servers,str,0);
-    }
+  pm->SendStream(this->ConnectionID, this->Servers,str,0);
 
   // Setup the pipeline.
   vtkSMProxy* mapper = this->GetSubProxy("Mapper");
@@ -78,19 +71,13 @@ void vtkSMAxesProxy::CreateVTKObjects(int numObjects)
     return;
     }
  
-  for (cc=0; cc< numObjects; cc++)
-    {
-    str << vtkClientServerStream::Invoke << this->GetID(cc) 
+  str << vtkClientServerStream::Invoke << this->GetID() 
       << "GetOutput" << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke << mapper->GetID(cc)
+  str << vtkClientServerStream::Invoke << mapper->GetID()
       << "SetInput" 
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->Servers,str,0);
-    }
+  pm->SendStream(this->ConnectionID, this->Servers,str,0);
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     actor->GetProperty("Mapper"));

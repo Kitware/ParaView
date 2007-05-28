@@ -44,7 +44,7 @@ protected:
   // Description:
   // Execute event of the 3D Widget.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   double Position[3];
   

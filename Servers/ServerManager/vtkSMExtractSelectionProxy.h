@@ -43,7 +43,6 @@ public:
   vtkGetMacro(UseGlobalIDs, int);
   vtkBooleanMacro(UseGlobalIDs, int);
 
-
   // Description:
   // Get the selection field type.
   vtkGetMacro(SelectionFieldType, int);
@@ -63,7 +62,7 @@ protected:
   vtkSMExtractSelectionProxy();
   ~vtkSMExtractSelectionProxy();
 
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   // Description:
   // Read attributes from an XML element.

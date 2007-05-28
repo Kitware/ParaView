@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneWidgetProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.17");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneWidgetProxy::vtkSMImplicitPlaneWidgetProxy()
@@ -42,13 +42,13 @@ vtkSMImplicitPlaneWidgetProxy::~vtkSMImplicitPlaneWidgetProxy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMImplicitPlaneWidgetProxy::CreateVTKObjects(int numObjects)
+void vtkSMImplicitPlaneWidgetProxy::CreateVTKObjects()
 {
   if(this->ObjectsCreated)
     {
     return;
     }
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
   
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   float opacity = 1.0;
@@ -58,32 +58,29 @@ void vtkSMImplicitPlaneWidgetProxy::CreateVTKObjects(int numObjects)
     }
   
   vtkClientServerStream stream;
-  for(unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    vtkClientServerID id = this->GetID(cc);
+  vtkClientServerID id = this->GetID();
     
-    stream << vtkClientServerStream::Invoke << id
-           << "OutlineTranslationOff"
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->GetServers(), stream, 1);
-    stream << vtkClientServerStream::Invoke << id
-           << "GetPlaneProperty"
-           << vtkClientServerStream::End
-           << vtkClientServerStream::Invoke 
-           << vtkClientServerStream::LastResult 
-           << "SetOpacity" 
-           << opacity 
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke << id
-           << "GetSelectedPlaneProperty" 
-           << vtkClientServerStream::End
-           << vtkClientServerStream::Invoke 
-           << vtkClientServerStream::LastResult 
-           << "SetOpacity" 
-           << opacity 
-                    << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->GetServers(), stream, 1);
-    }
+  stream << vtkClientServerStream::Invoke << id
+         << "OutlineTranslationOff"
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->GetServers(), stream, 1);
+  stream << vtkClientServerStream::Invoke << id
+         << "GetPlaneProperty"
+         << vtkClientServerStream::End
+         << vtkClientServerStream::Invoke 
+         << vtkClientServerStream::LastResult 
+         << "SetOpacity" 
+         << opacity 
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << id
+         << "GetSelectedPlaneProperty" 
+         << vtkClientServerStream::End
+         << vtkClientServerStream::Invoke 
+         << vtkClientServerStream::LastResult 
+         << "SetOpacity" 
+         << opacity 
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->GetServers(), stream, 1);
   this->SetDrawPlane(0);
 }
 
@@ -145,30 +142,24 @@ void vtkSMImplicitPlaneWidgetProxy::UpdateVTKObjects()
 
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream str;
-  for(unsigned int cc=0; cc<this->GetNumberOfIDs();cc++)
-    { 
-    vtkClientServerID id = this->GetID(cc);
-    str << vtkClientServerStream::Invoke 
-        << id << "SetOrigin" 
-        << this->Center[0] 
-        << this->Center[1] 
-        << this->Center[2]
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke 
-        << id << "SetNormal"
-        << this->Normal[0]
-        << this->Normal[1]
-        << this->Normal[2]
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke 
-        << id << "SetDrawPlane" 
-        << this->DrawPlane
-        << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->Servers, str);
-    }
+  vtkClientServerID id = this->GetID();
+  str << vtkClientServerStream::Invoke 
+      << id << "SetOrigin" 
+      << this->Center[0] 
+      << this->Center[1] 
+      << this->Center[2]
+      << vtkClientServerStream::End;
+  str << vtkClientServerStream::Invoke 
+      << id << "SetNormal"
+      << this->Normal[0]
+      << this->Normal[1]
+      << this->Normal[2]
+      << vtkClientServerStream::End;
+  str << vtkClientServerStream::Invoke 
+      << id << "SetDrawPlane" 
+      << this->DrawPlane
+      << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers, str);
 }
 
 //----------------------------------------------------------------------------

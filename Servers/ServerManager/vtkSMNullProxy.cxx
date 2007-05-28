@@ -18,7 +18,7 @@
 
 
 vtkStandardNewMacro(vtkSMNullProxy);
-vtkCxxRevisionMacro(vtkSMNullProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMNullProxy, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMNullProxy::vtkSMNullProxy()
 {
@@ -30,7 +30,7 @@ vtkSMNullProxy::~vtkSMNullProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMNullProxy::CreateVTKObjects(int vtkNotUsed(numObjects))
+void vtkSMNullProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
@@ -39,8 +39,12 @@ void vtkSMNullProxy::CreateVTKObjects(int vtkNotUsed(numObjects))
   this->ObjectsCreated = 1;
   this->GetSelfID(); // this will ensure that the SelfID is assigned properly.
 
-  vtkClientServerID objectId = { 0 };
-  this->SetID(0, objectId);
+  vtkClientServerID objectId(0);
+  this->VTKObjectID = vtkClientServerID(0); // The null id is 0. This call
+                                            // is here just for
+                                            // clarity. VTKObjectID is
+                                            // already initialized to 0 in
+                                            // the constructor.
 }
 
 //-----------------------------------------------------------------------------

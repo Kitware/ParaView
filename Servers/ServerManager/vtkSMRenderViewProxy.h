@@ -189,11 +189,11 @@ protected:
 
   // Description:
   // Called at the start of CreateVTKObjects().
-  virtual bool BeginCreateVTKObjects(int vtkNotUsed(numObjects));
+  virtual bool BeginCreateVTKObjects();
 
   // Description:
   // Called at the end of CreateVTKObjects().
-  virtual void EndCreateVTKObjects(int vtkNotUsed(numObjects));
+  virtual void EndCreateVTKObjects();
 
   // Description:
   // Called by AddRepresentation(). Subclasses can override to add 

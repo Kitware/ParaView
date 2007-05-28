@@ -69,7 +69,7 @@ protected:
   // Given the number of objects (numObjects), class name (VTKClassName)
   // and server ids ( this->GetServerIDs()), this methods instantiates
   // the objects on the server(s)
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   vtkSMPropertyLink* TimeLink;
   vtkSMPropertyLink* ValueLink;

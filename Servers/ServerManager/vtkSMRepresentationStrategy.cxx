@@ -23,7 +23,7 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.6");
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 {
@@ -241,7 +241,7 @@ void vtkSMRepresentationStrategy::SetInput(vtkSMSourceProxy* input)
 
   // Not using the input number of parts here since that logic
   // is going to disappear in near future.
-  this->CreateVTKObjects(1);
+  this->CreateVTKObjects();
 
   this->CreatePipeline(this->Input);
 

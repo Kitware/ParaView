@@ -24,9 +24,16 @@
 
 #include "vtkClientServerConfigure.h" // Top-level vtkClientServer header.
 #include "vtkSystemIncludes.h" // vtkTypeUInt32
+#include "vtkIOStream.h" // Needed for operator <<
 
 struct VTK_CLIENT_SERVER_EXPORT vtkClientServerID
 {
+  vtkClientServerID() : ID(0) {}
+  vtkClientServerID(vtkTypeUInt32 id) : ID(id) {}
+
+  bool IsNull() { return this->ID == 0; }
+  void SetToNull() { this->ID = 0; }
+
   // Convenience operators.
   bool operator<(const vtkClientServerID& i) const
     {

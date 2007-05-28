@@ -26,7 +26,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMOutlineRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMOutlineRepresentationProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMOutlineRepresentationProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMOutlineRepresentationProxy::vtkSMOutlineRepresentationProxy()
 {
@@ -172,9 +172,9 @@ bool vtkSMOutlineRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMOutlineRepresentationProxy::BeginCreateVTKObjects(int numObjects)
+bool vtkSMOutlineRepresentationProxy::BeginCreateVTKObjects()
 {
-  if (!this->Superclass::BeginCreateVTKObjects(numObjects))
+  if (!this->Superclass::BeginCreateVTKObjects())
     {
     return false;
     }
@@ -219,7 +219,7 @@ bool vtkSMOutlineRepresentationProxy::BeginCreateVTKObjects(int numObjects)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMOutlineRepresentationProxy::EndCreateVTKObjects(int numObjects)
+bool vtkSMOutlineRepresentationProxy::EndCreateVTKObjects()
 {
   this->Connect(this->GetInputProxy(), this->OutlineFilter, "Input");
   this->Connect(this->Mapper, this->Prop3D, "Mapper");
@@ -238,7 +238,7 @@ bool vtkSMOutlineRepresentationProxy::EndCreateVTKObjects(int numObjects)
   ivp->SetElement(0, 0);
   this->SelectionProp3D->UpdateProperty("Pickable");
 
-  return this->Superclass::EndCreateVTKObjects(numObjects);
+  return this->Superclass::EndCreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

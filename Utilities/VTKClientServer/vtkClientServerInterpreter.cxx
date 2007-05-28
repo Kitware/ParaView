@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.15");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.16");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals
@@ -107,7 +107,7 @@ vtkClientServerID
 vtkClientServerInterpreter::GetIDFromObject(vtkObjectBase* key)
 {
   // Search the hash table for the given object.
-  vtkClientServerID result = {0};
+  vtkClientServerID result;
   vtkClientServerInterpreterInternals::IDToMessageMapType::iterator hi;
   for(hi = this->Internal->IDToMessageMap.begin();
       hi != this->Internal->IDToMessageMap.end(); ++hi)
@@ -589,7 +589,7 @@ int vtkClientServerInterpreter::ExpandMessage(const vtkClientServerStream& in,
     {
     if(in.GetArgumentType(inIndex, a) == vtkClientServerStream::id_value)
       {
-      vtkClientServerID id = { 0 };
+      vtkClientServerID id;
       in.GetArgument(inIndex, a, &id);
 
       // If the ID is in the map, expand it.  Otherwise, leave it.

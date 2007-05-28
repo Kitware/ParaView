@@ -35,7 +35,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkWindowToImageFilter.h"
 
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.21");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.22");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -47,7 +47,7 @@ vtkSMCompositeRenderModuleProxy::~vtkSMCompositeRenderModuleProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMCompositeRenderModuleProxy::CreateVTKObjects(int numObjects)
+void vtkSMCompositeRenderModuleProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated )
     {
@@ -63,7 +63,7 @@ void vtkSMCompositeRenderModuleProxy::CreateVTKObjects(int numObjects)
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 
   // Anti-aliasing generally screws up compositing.  Turn it off.
   if (this->GetRenderWindow()->IsA("vtkOpenGLRenderWindow") &&
@@ -71,7 +71,7 @@ void vtkSMCompositeRenderModuleProxy::CreateVTKObjects(int numObjects)
     {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
-           << this->RenderWindowProxy->GetID(0) << "SetMultiSamples" << 0
+           << this->RenderWindowProxy->GetID() << "SetMultiSamples" << 0
            << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
     }

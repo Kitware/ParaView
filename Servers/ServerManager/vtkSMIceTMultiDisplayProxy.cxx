@@ -22,7 +22,7 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 
-vtkCxxRevisionMacro(vtkSMIceTMultiDisplayProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMIceTMultiDisplayProxy, "1.9");
 vtkStandardNewMacro(vtkSMIceTMultiDisplayProxy);
 
 //-----------------------------------------------------------------------------
@@ -65,7 +65,7 @@ void vtkSMIceTMultiDisplayProxy::PrintSelf(ostream &os, vtkIndent indent)
 
 //-----------------------------------------------------------------------------
 
-void vtkSMIceTMultiDisplayProxy::CreateVTKObjects(int numObjects)
+void vtkSMIceTMultiDisplayProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated || !this->CanCreateProxy)
     {
@@ -82,7 +82,7 @@ void vtkSMIceTMultiDisplayProxy::CreateVTKObjects(int numObjects)
   this->OutlineUpdateSuppressorProxy->SetServers(
                                           vtkProcessModule::CLIENT_AND_SERVERS);
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -104,20 +104,17 @@ void vtkSMIceTMultiDisplayProxy::SetupPipeline()
   pp->AddProxy(this->OutlineFilterProxy);
   this->OutlineCollectProxy->UpdateVTKObjects();
 
-  for (unsigned int i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
-    {
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << this->OutlineCollectProxy->GetID(i) << "GetPolyDataOutput"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->OutlineUpdateSuppressorProxy->GetID(i) << "SetInput"
-           << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->ConnectionID,
-      vtkProcessModule::CLIENT_AND_SERVERS, stream);
-    }
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->OutlineCollectProxy->GetID() << "GetPolyDataOutput"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->OutlineUpdateSuppressorProxy->GetID() << "SetInput"
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID,
+    vtkProcessModule::CLIENT_AND_SERVERS, stream);
   this->OutlineUpdateSuppressorProxy->UpdateVTKObjects();
 }
 
@@ -125,63 +122,58 @@ void vtkSMIceTMultiDisplayProxy::SetupPipeline()
 
 void vtkSMIceTMultiDisplayProxy::SetupDefaults()
 {
-  unsigned int i;
-
   this->Superclass::SetupDefaults();
 
   this->SetupCollectionFilter(this->OutlineCollectProxy);
 
-  for (i = 0; i < this->OutlineCollectProxy->GetNumberOfIDs(); i++)
-    {
-    vtkClientServerStream cmd;
-    vtkClientServerStream stream;
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-    cmd << vtkClientServerStream::Invoke
+  vtkClientServerStream cmd;
+  vtkClientServerStream stream;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  
+  cmd << vtkClientServerStream::Invoke
       << pm->GetProcessModuleID() << "LogStartEvent" << "Execute OutlineCollect"
       << vtkClientServerStream::End;
-    stream
-      << vtkClientServerStream::Invoke
-      << this->OutlineCollectProxy->GetID(i) << "AddObserver" << "StartEvent"
-      << cmd << vtkClientServerStream::End;
-    cmd.Reset();
-    cmd << vtkClientServerStream::Invoke
+  stream
+    << vtkClientServerStream::Invoke
+    << this->OutlineCollectProxy->GetID() << "AddObserver" << "StartEvent"
+    << cmd << vtkClientServerStream::End;
+  cmd.Reset();
+  cmd << vtkClientServerStream::Invoke
       << pm->GetProcessModuleID() << "LogEndEvent" << "Execute OutlineCollect"
       << vtkClientServerStream::End;
+  stream
+    << vtkClientServerStream::Invoke
+    << this->OutlineCollectProxy->GetID() << "AddObserver" << "EndEvent"
+    << cmd << vtkClientServerStream::End;
+  pm->SendStream(
+    this->ConnectionID,
+    vtkProcessModule::CLIENT_AND_SERVERS, stream);
+  
+  // Handle collection setup with client server.
+  stream
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetSocketController"
+    << pm->GetConnectionClientServerID(this->ConnectionID)
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->OutlineCollectProxy->GetID() << "SetSocketController"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  // Since socket controllers are only available on the root nodes,
+  // we send this stream only to the roots.
+  pm->SendStream(this->ConnectionID,
+                 vtkProcessModule::CLIENT_AND_SERVERS, stream);
+  
+  // Special condition to signal the client.
+  // Because both processes of the Socket controller think they are 0!!!!
+  if (pm->GetClientMode())
+    {
     stream
       << vtkClientServerStream::Invoke
-      << this->OutlineCollectProxy->GetID(i) << "AddObserver" << "EndEvent"
-      << cmd << vtkClientServerStream::End;
-    pm->SendStream(
-      this->ConnectionID,
-      vtkProcessModule::CLIENT_AND_SERVERS, stream);
-
-    // Handle collection setup with client server.
-    stream
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetSocketController"
-      << pm->GetConnectionClientServerID(this->ConnectionID)
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->OutlineCollectProxy->GetID(i) << "SetSocketController"
-      << vtkClientServerStream::LastResult
+      << this->OutlineCollectProxy->GetID() << "SetController" << 0
       << vtkClientServerStream::End;
-    // Since socket controllers are only available on the root nodes,
-    // we send this stream only to the roots.
     pm->SendStream(this->ConnectionID,
-      vtkProcessModule::CLIENT_AND_SERVERS, stream);
-
-    // Special condition to signal the client.
-    // Because both processes of the Socket controller think they are 0!!!!
-    if (pm->GetClientMode())
-      {
-      stream
-        << vtkClientServerStream::Invoke
-        << this->OutlineCollectProxy->GetID(i) << "SetController" << 0
-        << vtkClientServerStream::End;
-      pm->SendStream(this->ConnectionID,
-        vtkProcessModule::CLIENT, stream);
-      }
+                   vtkProcessModule::CLIENT, stream);
     }
 
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -191,30 +183,26 @@ void vtkSMIceTMultiDisplayProxy::SetupDefaults()
 
   // This is how the superclasses setup their update suppressors.  I'm just
   // following the herd.
-  for (i = 0; i < this->OutlineUpdateSuppressorProxy->GetNumberOfIDs(); i++)
-    {
-    vtkClientServerStream stream;
-    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-    stream
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->OutlineUpdateSuppressorProxy->GetID(i)
-      << "SetUpdateNumberOfPieces"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    stream
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetPartitionId"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->OutlineUpdateSuppressorProxy->GetID(i) << "SetUpdatePiece"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-      vtkProcessModule::CLIENT_AND_SERVERS, stream);
-    }
+  stream.Reset();
+  stream
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->OutlineUpdateSuppressorProxy->GetID()
+    << "SetUpdateNumberOfPieces"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  stream
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetPartitionId"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->OutlineUpdateSuppressorProxy->GetID() << "SetUpdatePiece"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+                 vtkProcessModule::CLIENT_AND_SERVERS, stream);
 }
 
 //-----------------------------------------------------------------------------
@@ -233,17 +221,13 @@ void vtkSMIceTMultiDisplayProxy::SetCollectionDecision(int v)
     {
     // Set the mapper's input on the client to the outline.
     vtkClientServerStream stream;
-    for (unsigned int i=0;
-         i < this->OutlineUpdateSuppressorProxy->GetNumberOfIDs(); i++)
-      {
-      stream << vtkClientServerStream::Invoke
-             << this->OutlineUpdateSuppressorProxy->GetID(i) << "GetOutput"
-             << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke
-             << this->MapperProxy->GetID(i) << "SetInput"
-             << vtkClientServerStream::LastResult
-             << vtkClientServerStream::End;
-      }
+    stream << vtkClientServerStream::Invoke
+           << this->OutlineUpdateSuppressorProxy->GetID() << "GetOutput"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->MapperProxy->GetID() << "SetInput"
+           << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
     vtkProcessModule::GetProcessModule()->SendStream(
       this->ConnectionID, vtkProcessModule::CLIENT, stream);
 
@@ -255,17 +239,13 @@ void vtkSMIceTMultiDisplayProxy::SetCollectionDecision(int v)
     {
     // Set the mapper's input on the client to the geometry.
     vtkClientServerStream stream;
-    for (unsigned int i=0;
-         i < this->UpdateSuppressorProxy->GetNumberOfIDs(); i++)
-      {
-      stream << vtkClientServerStream::Invoke
-             << this->UpdateSuppressorProxy->GetID(i) << "GetOutput"
-             << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke
-             << this->MapperProxy->GetID(i) << "SetInput"
-             << vtkClientServerStream::LastResult
-             << vtkClientServerStream::End;
-      }
+    stream << vtkClientServerStream::Invoke
+           << this->UpdateSuppressorProxy->GetID() << "GetOutput"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->MapperProxy->GetID() << "SetInput"
+           << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
     vtkProcessModule::GetProcessModule()->SendStream(
       this->ConnectionID, vtkProcessModule::CLIENT, stream);
 
@@ -289,17 +269,13 @@ void vtkSMIceTMultiDisplayProxy::SetLODCollectionDecision(int v)
     {
     // Set the mapper's input on the client to the outline.
     vtkClientServerStream stream;
-    for (unsigned int i=0;
-         i < this->OutlineUpdateSuppressorProxy->GetNumberOfIDs(); i++)
-      {
-      stream << vtkClientServerStream::Invoke
-             << this->OutlineUpdateSuppressorProxy->GetID(i) << "GetOutput"
-             << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke
-             << this->LODMapperProxy->GetID(i) << "SetInput"
-             << vtkClientServerStream::LastResult
-             << vtkClientServerStream::End;
-      }
+    stream << vtkClientServerStream::Invoke
+           << this->OutlineUpdateSuppressorProxy->GetID() << "GetOutput"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->LODMapperProxy->GetID() << "SetInput"
+           << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
     vtkProcessModule::GetProcessModule()->SendStream(
       this->ConnectionID, vtkProcessModule::CLIENT, stream);
 
@@ -311,17 +287,13 @@ void vtkSMIceTMultiDisplayProxy::SetLODCollectionDecision(int v)
     {
     // Set the mapper's input on the client to the geometry.
     vtkClientServerStream stream;
-    for (unsigned int i=0;
-         i < this->OutlineUpdateSuppressorProxy->GetNumberOfIDs(); i++)
-      {
-      stream << vtkClientServerStream::Invoke
-             << this->LODUpdateSuppressorProxy->GetID(i) << "GetOutput"
-             << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke
-             << this->LODMapperProxy->GetID(i) << "SetInput"
-             << vtkClientServerStream::LastResult
-             << vtkClientServerStream::End;
-      }
+    stream << vtkClientServerStream::Invoke
+           << this->LODUpdateSuppressorProxy->GetID() << "GetOutput"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->LODMapperProxy->GetID() << "SetInput"
+           << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
     vtkProcessModule::GetProcessModule()->SendStream(
       this->ConnectionID, vtkProcessModule::CLIENT, stream);
 

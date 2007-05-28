@@ -18,7 +18,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMServerFileListingProxy);
-vtkCxxRevisionMacro(vtkSMServerFileListingProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMServerFileListingProxy, "1.5");
 //-----------------------------------------------------------------------------
 vtkSMServerFileListingProxy::vtkSMServerFileListingProxy()
 {
@@ -60,11 +60,11 @@ void vtkSMServerFileListingProxy::SetActiveFileName(const char* name)
 void vtkSMServerFileListingProxy::UpdatePropertyInformation()
 {
   if (this->ObjectsCreated && this->ActiveFileName && 
-    this->GetNumberOfIDs() > 0)
+      !this->GetID().IsNull())
     {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkClientServerStream stream;
-    vtkClientServerID id = this->GetID(0);
+    vtkClientServerID id = this->GetID();
     stream << vtkClientServerStream::Invoke
       << id << "FileIsDirectory" << this->ActiveFileName
       << vtkClientServerStream::End;

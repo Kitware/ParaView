@@ -20,7 +20,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMConnectionCleanerProxy);
-vtkCxxRevisionMacro(vtkSMConnectionCleanerProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMConnectionCleanerProxy, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMConnectionCleanerProxy::vtkSMConnectionCleanerProxy()
 {
@@ -32,14 +32,14 @@ vtkSMConnectionCleanerProxy::~vtkSMConnectionCleanerProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMConnectionCleanerProxy::CreateVTKObjects(int numObjects)
+void vtkSMConnectionCleanerProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
     return;
     }
-  this->Superclass::CreateVTKObjects(numObjects);
-  if (!this->ObjectsCreated || this->GetNumberOfIDs() == 0)
+  this->Superclass::CreateVTKObjects();
+  if (!this->ObjectsCreated || this->GetID().IsNull())
     {
     return;
     }
@@ -54,7 +54,7 @@ void vtkSMConnectionCleanerProxy::CreateVTKObjects(int numObjects)
     << vtkClientServerStream::End;
 
   stream << vtkClientServerStream::Invoke
-    << this->GetID(0) << "SetConnectionID"
+    << this->GetID() << "SetConnectionID"
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
   pm->SendStream(this->GetConnectionID(), this->GetServers(), stream);

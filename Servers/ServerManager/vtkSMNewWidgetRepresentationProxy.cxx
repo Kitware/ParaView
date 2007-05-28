@@ -33,7 +33,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.2");
 
 class vtkSMNewWidgetRepresentationObserver : public vtkCommand
 {
@@ -77,7 +77,7 @@ vtkSMNewWidgetRepresentationProxy::~vtkSMNewWidgetRepresentationProxy()
     {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkAbstractWidget* widget = vtkAbstractWidget::SafeDownCast(
-      pm->GetObjectFromID(this->WidgetProxy->GetID(0)));
+      pm->GetObjectFromID(this->WidgetProxy->GetID()));
     widget->SetInteractor(0);
     }
 
@@ -106,7 +106,7 @@ bool vtkSMNewWidgetRepresentationProxy::AddToView(vtkSMViewProxy* view)
   if (this->WidgetProxy)
     {
     vtkAbstractWidget* widget = vtkAbstractWidget::SafeDownCast(
-      pm->GetObjectFromID(this->WidgetProxy->GetID(0)));
+      pm->GetObjectFromID(this->WidgetProxy->GetID()));
     if (widget)
       {
       widget->SetInteractor(renderView->GetInteractor());
@@ -144,7 +144,7 @@ bool vtkSMNewWidgetRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
   if (this->WidgetProxy)
     {
     vtkAbstractWidget* widget = vtkAbstractWidget::SafeDownCast(
-      pm->GetObjectFromID(this->WidgetProxy->GetID(0)));
+      pm->GetObjectFromID(this->WidgetProxy->GetID()));
     if (this->Widget)
       {
       widget->SetEnabled(0);
@@ -180,7 +180,7 @@ void vtkSMNewWidgetRepresentationProxy::SetEnabled(int enable)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects(int numObjects)
+void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
@@ -209,7 +209,7 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects(int numObjects)
     }
   this->WidgetProxy->SetServers(vtkProcessModule::CLIENT);
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->WidgetProxy->GetProperty("Representation"));
@@ -221,7 +221,7 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects(int numObjects)
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   this->Widget = vtkAbstractWidget::SafeDownCast(
-    pm->GetObjectFromID(this->WidgetProxy->GetID(0)));
+    pm->GetObjectFromID(this->WidgetProxy->GetID()));
   if (this->Widget)
     {
     this->Widget->AddObserver(

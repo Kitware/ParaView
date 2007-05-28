@@ -55,7 +55,7 @@ protected:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.11");
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetProxy::vtkSMScalarBarWidgetProxy()
@@ -104,7 +104,7 @@ void vtkSMScalarBarWidgetProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* r
 }
 
 //----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::CreateVTKObjects(int numObjects)
+void vtkSMScalarBarWidgetProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
@@ -121,12 +121,12 @@ void vtkSMScalarBarWidgetProxy::CreateVTKObjects(int numObjects)
   this->ScalarBarActorProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 
   // Set up the widget.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkScalarBarActor* actor = vtkScalarBarActor::SafeDownCast(
-    pm->GetObjectFromID(this->ScalarBarActorProxy->GetID(0)));
+    pm->GetObjectFromID(this->ScalarBarActorProxy->GetID()));
 
   if (!actor)
     {
@@ -155,7 +155,7 @@ void vtkSMScalarBarWidgetProxy::SetVisibility(int visible)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::SafeDownCast(
     pm->GetObjectFromID(
-      this->GetInteractorProxy(this->RenderModuleProxy)->GetID(0)));
+      this->GetInteractorProxy(this->RenderModuleProxy)->GetID()));
   if (!iren)
     {
     vtkErrorMacro("Failed to get client side Interactor.");
@@ -165,7 +165,7 @@ void vtkSMScalarBarWidgetProxy::SetVisibility(int visible)
 
   vtkRenderer* ren = vtkRenderer::SafeDownCast(
     pm->GetObjectFromID(
-      this->GetRenderer2DProxy(this->RenderModuleProxy)->GetID(0)));
+      this->GetRenderer2DProxy(this->RenderModuleProxy)->GetID()));
   if (!ren)
     {
     vtkErrorMacro("Failed to get client side 2D renderer.");

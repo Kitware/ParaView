@@ -47,7 +47,7 @@ protected:
   vtkSMIceTMultiDisplayProxy();
   ~vtkSMIceTMultiDisplayProxy();
 
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   // Description:
   // Sets the local collectors inputs to be bounding boxes.

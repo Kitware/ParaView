@@ -77,7 +77,7 @@ protected:
   vtkSMMultiViewRenderModuleProxy();
   ~vtkSMMultiViewRenderModuleProxy();
 
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   char* RenderModuleName;
   int RenderModuleId;

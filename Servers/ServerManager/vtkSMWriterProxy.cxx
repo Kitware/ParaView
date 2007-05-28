@@ -49,25 +49,17 @@ void vtkSMWriterProxy::UpdatePipeline()
 
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream str;
-  unsigned int idx;
-  for (idx = 0; idx < this->GetNumberOfIDs(); idx++)
-    {
-    str << vtkClientServerStream::Invoke
-        << this->GetID(idx)
-        << "Write"
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-        << this->GetID(idx)
-        << "GetErrorCode"
-        << vtkClientServerStream::End;
-    }
-
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->Servers, str);
-    pm->GetLastResult(this->GetConnectionID(), this->GetServers()).GetArgument(
-      0, 0, &this->ErrorCode);
-    }
+  str << vtkClientServerStream::Invoke
+      << this->GetID()
+      << "Write"
+      << vtkClientServerStream::End;
+  str << vtkClientServerStream::Invoke
+      << this->GetID()
+      << "GetErrorCode"
+      << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers, str);
+  pm->GetLastResult(this->GetConnectionID(), this->GetServers()).GetArgument(
+    0, 0, &this->ErrorCode);
 }
 
 //-----------------------------------------------------------------------------
@@ -77,25 +69,17 @@ void vtkSMWriterProxy::UpdatePipeline(double time)
 
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream str;
-  unsigned int idx;
-  for (idx = 0; idx < this->GetNumberOfIDs(); idx++)
-    {
-    str << vtkClientServerStream::Invoke
-        << this->GetID(idx)
-        << "Write"
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-        << this->GetID(idx)
-        << "GetErrorCode"
-        << vtkClientServerStream::End;
-    }
-
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, this->Servers, str);
-    pm->GetLastResult(this->GetConnectionID(), this->GetServers()).GetArgument(
-      0, 0, &this->ErrorCode);
-    }
+  str << vtkClientServerStream::Invoke
+      << this->GetID()
+      << "Write"
+      << vtkClientServerStream::End;
+  str << vtkClientServerStream::Invoke
+      << this->GetID()
+      << "GetErrorCode"
+      << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers, str);
+  pm->GetLastResult(this->GetConnectionID(), this->GetServers()).GetArgument(
+    0, 0, &this->ErrorCode);
 }
 
 //-----------------------------------------------------------------------------

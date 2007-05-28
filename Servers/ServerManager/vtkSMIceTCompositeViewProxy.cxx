@@ -33,7 +33,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.5");
 vtkCxxSetObjectMacro(vtkSMIceTCompositeViewProxy, SharedMultiViewManager, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMIceTCompositeViewProxy, SharedParallelRenderManager, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMIceTCompositeViewProxy, SharedRenderWindow, vtkSMProxy);
@@ -72,9 +72,9 @@ vtkSMIceTCompositeViewProxy::~vtkSMIceTCompositeViewProxy()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMIceTCompositeViewProxy::BeginCreateVTKObjects(int numObjects)
+bool vtkSMIceTCompositeViewProxy::BeginCreateVTKObjects()
 {
-  if (!this->Superclass::BeginCreateVTKObjects(numObjects))
+  if (!this->Superclass::BeginCreateVTKObjects())
     {
     return false;
     }
@@ -134,10 +134,9 @@ bool vtkSMIceTCompositeViewProxy::BeginCreateVTKObjects(int numObjects)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMIceTCompositeViewProxy::EndCreateVTKObjects(int numObjects)
+void vtkSMIceTCompositeViewProxy::EndCreateVTKObjects()
 {
-  this->Superclass::EndCreateVTKObjects(numObjects);
-
+  this->Superclass::EndCreateVTKObjects();
   vtkClientServerStream stream;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkSMIntVectorProperty* ivp;
@@ -146,11 +145,12 @@ void vtkSMIceTCompositeViewProxy::EndCreateVTKObjects(int numObjects)
   if (this->GetRenderWindow()->IsA("vtkOpenGLRenderWindow") &&
     (pm->GetNumberOfPartitions(this->ConnectionID) > 1))
     {
-    stream << vtkClientServerStream::Invoke
-           << this->RenderWindowProxy->GetID(0) 
-           << "SetMultiSamples" << 0
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
+    vtkClientServerStream stream2;
+    stream2 << vtkClientServerStream::Invoke
+            << this->RenderWindowProxy->GetID() 
+            << "SetMultiSamples" << 0
+            << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID,vtkProcessModule::RENDER_SERVER,stream2);
     }
 
   // * Initialize the MultiViewManager, if one exists.
@@ -162,15 +162,15 @@ void vtkSMIceTCompositeViewProxy::EndCreateVTKObjects(int numObjects)
 
     // Make the multiview manager aware of our renderers.
     stream  << vtkClientServerStream::Invoke
-      << this->MultiViewManager->GetID(0)
+      << this->MultiViewManager->GetID()
       << "AddRenderer" << (int)this->GetSelfID().ID
-      << this->RendererProxy->GetID(0)
+      << this->RendererProxy->GetID()
       << vtkClientServerStream::End;
 
     stream  << vtkClientServerStream::Invoke
-      << this->MultiViewManager->GetID(0)
+      << this->MultiViewManager->GetID()
       << "AddRenderer" << (int)this->GetSelfID().ID
-      << this->Renderer2DProxy->GetID(0)
+      << this->Renderer2DProxy->GetID()
       << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER_ROOT, stream);
     this->MultiViewManager->UpdateVTKObjects();
@@ -207,11 +207,11 @@ void vtkSMIceTCompositeViewProxy::EndCreateVTKObjects(int numObjects)
             << "GetController"
             << vtkClientServerStream::End;
     stream  << vtkClientServerStream::Invoke
-            << this->ParallelRenderManager->GetID(0)
+            << this->ParallelRenderManager->GetID()
             << "SetController" << vtkClientServerStream::LastResult
             << vtkClientServerStream::End;
     stream  << vtkClientServerStream::Invoke
-            << this->ParallelRenderManager->GetID(0)
+            << this->ParallelRenderManager->GetID()
             << "InitializeRMIs" 
             << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, 
@@ -238,9 +238,9 @@ void vtkSMIceTCompositeViewProxy::EndCreateVTKObjects(int numObjects)
   // This call may fail if the server-side renderer is not vtkIceTRenderer.
   // Hence subclasses must be careful about that.
   stream  << vtkClientServerStream::Invoke
-          << this->RendererProxy->GetID(0)
+          << this->RendererProxy->GetID()
           << "SetSortingKdTree"
-          << this->KdTree->GetID(0)
+          << this->KdTree->GetID()
           << vtkClientServerStream::End;
 
   // Set the controllers for the kdtree.
@@ -249,7 +249,7 @@ void vtkSMIceTCompositeViewProxy::EndCreateVTKObjects(int numObjects)
           << "GetController"
           << vtkClientServerStream::End;
   stream  << vtkClientServerStream::Invoke
-          << this->KdTree->GetID(0) 
+          << this->KdTree->GetID() 
           << "SetController"
           << vtkClientServerStream::LastResult
           << vtkClientServerStream::End;
@@ -262,7 +262,7 @@ void vtkSMIceTCompositeViewProxy::EndCreateVTKObjects(int numObjects)
           << "GetNumberOfProcesses"
           << vtkClientServerStream::End;
   stream  << vtkClientServerStream::Invoke
-          << this->KdTree->GetID(0) 
+          << this->KdTree->GetID() 
           << "SetNumberOfRegionsOrMore"
           << vtkClientServerStream::LastResult
           << vtkClientServerStream::End;
@@ -275,7 +275,7 @@ void vtkSMIceTCompositeViewProxy::EndCreateVTKObjects(int numObjects)
           << "GetNumberOfProcesses"
           << vtkClientServerStream::End;
   stream  << vtkClientServerStream::Invoke
-          << this->KdTreeManager->GetID(0)
+          << this->KdTreeManager->GetID()
           << "SetNumberOfPieces"
           << vtkClientServerStream::LastResult
           << vtkClientServerStream::End;
@@ -293,7 +293,7 @@ void vtkSMIceTCompositeViewProxy::SetGUISize(int x, int y)
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkClientServerStream stream;
     stream  << vtkClientServerStream::Invoke 
-            << this->MultiViewManager->GetID(0)
+            << this->MultiViewManager->GetID()
             << "SetGUISize" << x << y
             << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, 
@@ -319,7 +319,7 @@ void vtkSMIceTCompositeViewProxy::SetViewPosition(int x, int y)
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkClientServerStream stream;
     stream  << vtkClientServerStream::Invoke 
-            << this->MultiViewManager->GetID(0)
+            << this->MultiViewManager->GetID()
             << "SetWindowPosition" << x << y
             << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, 
@@ -335,7 +335,7 @@ void vtkSMIceTCompositeViewProxy::SetViewSize(int x, int y)
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkClientServerStream stream;
     stream  << vtkClientServerStream::Invoke
-            << this->MultiViewManager->GetID(0)
+            << this->MultiViewManager->GetID()
             << "SetWindowSize" << x << y
             << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,

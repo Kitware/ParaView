@@ -32,7 +32,7 @@ protected:
   vtkSMSummaryHelperProxy();
   ~vtkSMSummaryHelperProxy();
 
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
 private:
   vtkSMSummaryHelperProxy(const vtkSMSummaryHelperProxy&); // Not implemented.

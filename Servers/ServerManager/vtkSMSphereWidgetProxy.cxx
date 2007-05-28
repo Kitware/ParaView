@@ -22,7 +22,7 @@
 #include "vtkSphereWidget.h"
 
 vtkStandardNewMacro(vtkSMSphereWidgetProxy);
-vtkCxxRevisionMacro(vtkSMSphereWidgetProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMSphereWidgetProxy, "1.15");
 
 //----------------------------------------------------------------------------
 vtkSMSphereWidgetProxy::vtkSMSphereWidgetProxy()
@@ -44,25 +44,17 @@ void vtkSMSphereWidgetProxy::UpdateVTKObjects()
 
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream str;
-  unsigned int cc;
-  unsigned int numObjects = this->GetNumberOfIDs();
-  for (cc=0; cc < numObjects; cc++)
-    {
-    vtkClientServerID id = this->GetID(cc);
-    str << vtkClientServerStream::Invoke << id
-        << "SetCenter" 
-        << this->Center[0]
-        << this->Center[1]
-        << this->Center[2]
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke << id
-        << "SetRadius" << this->Radius
-        << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID ,this->Servers,str);
-    }
+  vtkClientServerID id = this->GetID();
+  str << vtkClientServerStream::Invoke << id
+      << "SetCenter" 
+      << this->Center[0]
+      << this->Center[1]
+      << this->Center[2]
+      << vtkClientServerStream::End;
+  str << vtkClientServerStream::Invoke << id
+      << "SetRadius" << this->Radius
+      << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID ,this->Servers,str);
 }
 
 //----------------------------------------------------------------------------
@@ -115,16 +107,6 @@ vtkPVXMLElement* vtkSMSphereWidgetProxy::SaveState(vtkPVXMLElement* root)
     dvp->SetElements1(this->Radius);
     }
   return this->Superclass::SaveState(root);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSphereWidgetProxy::CreateVTKObjects(int numObjects)
-{
-  if(this->ObjectsCreated)
-    {
-    return;
-    }
-  this->Superclass::CreateVTKObjects(numObjects);
 }
 
 //----------------------------------------------------------------------------

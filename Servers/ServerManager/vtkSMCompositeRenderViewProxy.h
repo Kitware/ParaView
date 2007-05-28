@@ -37,7 +37,7 @@ protected:
   vtkSMCompositeRenderViewProxy();
   ~vtkSMCompositeRenderViewProxy();
 
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   // Description:
   // Subclasses should override this method to setup any compositing classes.

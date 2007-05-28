@@ -55,7 +55,6 @@ struct vtkSMProxyInternals
   // were added.
   vtkstd::vector<vtkStdString> PropertyNamesInOrder;
 
-  vtkstd::vector<vtkClientServerID > IDs;
   vtkstd::vector<int> ServerIDs;
 
   typedef vtkstd::map<vtkStdString,  vtkSmartPointer<vtkSMProxy> > ProxyMap;

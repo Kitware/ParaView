@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCubeAxesDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.12");
 
 
 //----------------------------------------------------------------------------
@@ -59,17 +59,13 @@ vtkSMCubeAxesDisplayProxy::~vtkSMCubeAxesDisplayProxy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMCubeAxesDisplayProxy::CreateVTKObjects(int num)
+void vtkSMCubeAxesDisplayProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
     {
     return;
     }
-  
-  if (num != 1)
-    {
-    vtkErrorMacro("Only one cube axes per source.");
-    }
+
   this->CubeAxesProxy = this->GetSubProxy("Prop2D");
   if (!this->CubeAxesProxy)
     {
@@ -77,9 +73,10 @@ void vtkSMCubeAxesDisplayProxy::CreateVTKObjects(int num)
     return;
     }
   
-  this->CubeAxesProxy->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  this->CubeAxesProxy->SetServers(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
  
-  this->Superclass::CreateVTKObjects(1);
+  this->Superclass::CreateVTKObjects();
 
   vtkSMIntVectorProperty* ivp;
   ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -114,7 +111,7 @@ void vtkSMCubeAxesDisplayProxy::AddInput(vtkSMSourceProxy* input, const char*,
 //----------------------------------------------------------------------------
 void vtkSMCubeAxesDisplayProxy::SetInput(vtkSMProxy* input)
 {  
-  this->CreateVTKObjects(1);
+  this->CreateVTKObjects();
   //input->AddConsumer(0, this); This will happen automatically when
   //the caller uses ProxyProperty to add the input.
   
@@ -141,21 +138,15 @@ void vtkSMCubeAxesDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
   // on the CLIENT, and CubeAxesActor needs the camera on the servers as well.
   vtkClientServerStream stream;
   vtkSMProxy* renderer = this->GetRenderer2DProxy(rm);
-  for (unsigned int i=0; i < this->CubeAxesProxy->GetNumberOfIDs(); i++)
-    {
-    stream << vtkClientServerStream::Invoke
-      << renderer->GetID(0)
-      << "GetActiveCamera" << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-      << this->CubeAxesProxy->GetID(i)
-      << "SetCamera" << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    }
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
-      this->CubeAxesProxy->GetServers(), stream);
-    }
+  stream << vtkClientServerStream::Invoke
+         << renderer->GetID()
+         << "GetActiveCamera" << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->CubeAxesProxy->GetID()
+         << "SetCamera" << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID, this->CubeAxesProxy->GetServers(), stream);
   this->RenderModuleProxy = rm;
 }
 
@@ -249,39 +240,34 @@ void vtkSMCubeAxesDisplayProxy::Update(vtkSMAbstractViewModuleProxy*)
   this->Input->UpdatePipeline();    
   vtkPVDataInformation* dataInfo = this->Input->GetDataInformation();
   dataInfo->GetBounds(bounds);
-  int i, num;
-  num = this->CubeAxesProxy->GetNumberOfIDs();
-  for (i = 0; i < num; ++i)
-    {
-    stream << vtkClientServerStream::Invoke 
-           << this->CubeAxesProxy->GetID(i) << "SetBounds"
-           << bounds[0] << bounds[1] << bounds[2]
-           << bounds[3] << bounds[4] << bounds[5]
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->CubeAxesProxy->GetID(0) << "GetProperty"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << vtkClientServerStream::LastResult << "SetColor"
-           << rgb[0] << rgb[1] << rgb[2]
-           << vtkClientServerStream::End;
-           
-    stream << vtkClientServerStream::Invoke
-           << this->CubeAxesProxy->GetID(0) << "GetAxisTitleTextProperty"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << vtkClientServerStream::LastResult << "SetColor"
-           << rgb[0] << rgb[1] << rgb[2]
-           << vtkClientServerStream::End;
-
-    stream << vtkClientServerStream::Invoke
-           << this->CubeAxesProxy->GetID(0) << "GetAxisLabelTextProperty"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << vtkClientServerStream::LastResult << "SetColor"
-           << rgb[0] << rgb[1] << rgb[2]
-           << vtkClientServerStream::End;  
-    }
+  stream << vtkClientServerStream::Invoke 
+         << this->CubeAxesProxy->GetID() << "SetBounds"
+         << bounds[0] << bounds[1] << bounds[2]
+         << bounds[3] << bounds[4] << bounds[5]
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->CubeAxesProxy->GetID() << "GetProperty"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << vtkClientServerStream::LastResult << "SetColor"
+         << rgb[0] << rgb[1] << rgb[2]
+         << vtkClientServerStream::End;
+  
+  stream << vtkClientServerStream::Invoke
+         << this->CubeAxesProxy->GetID() << "GetAxisTitleTextProperty"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << vtkClientServerStream::LastResult << "SetColor"
+         << rgb[0] << rgb[1] << rgb[2]
+         << vtkClientServerStream::End;
+  
+  stream << vtkClientServerStream::Invoke
+         << this->CubeAxesProxy->GetID() << "GetAxisLabelTextProperty"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << vtkClientServerStream::LastResult << "SetColor"
+         << rgb[0] << rgb[1] << rgb[2]
+         << vtkClientServerStream::End;  
   pm->SendStream(this->ConnectionID, this->CubeAxesProxy->GetServers(), stream);
   this->GeometryIsValid = 1;
 
@@ -335,18 +321,13 @@ void vtkSMCubeAxesDisplayProxy::CacheUpdate(int idx, int total)
     }
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  int num;
-  num = this->CubeAxesProxy->GetNumberOfIDs();
   vtkClientServerStream stream; 
-  for (i = 0; i < num; ++i)
-    {
-    stream << vtkClientServerStream::Invoke 
-           << this->CubeAxesProxy->GetID(i) << "SetBounds"
-           << this->Caches[idx][0] << this->Caches[idx][1] 
-           << this->Caches[idx][2] << this->Caches[idx][3] 
-           << this->Caches[idx][4] << this->Caches[idx][5]
-           << vtkClientServerStream::End;
-    }
+  stream << vtkClientServerStream::Invoke 
+         << this->CubeAxesProxy->GetID() << "SetBounds"
+         << this->Caches[idx][0] << this->Caches[idx][1] 
+         << this->Caches[idx][2] << this->Caches[idx][3] 
+         << this->Caches[idx][4] << this->Caches[idx][5]
+         << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, this->CubeAxesProxy->GetServers(), stream);
 }
 

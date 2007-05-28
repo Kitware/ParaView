@@ -42,7 +42,7 @@ protected:
 
   // Description:
   // Create all the VTK objects.
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 private:
   vtkSMAxesProxy(const vtkSMAxesProxy&); // Not implemented
   void operator=(const vtkSMAxesProxy&); // Not implemented

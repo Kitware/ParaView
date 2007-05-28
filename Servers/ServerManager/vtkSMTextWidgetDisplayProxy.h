@@ -38,7 +38,7 @@ protected:
   vtkSMTextWidgetDisplayProxy();
   ~vtkSMTextWidgetDisplayProxy();
   
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   int Visibility;
 

@@ -70,7 +70,7 @@ protected:
   // Description:
   // Overridden simply to set ObjectsCreated to 1, since this class does 
   // not create any server side objects.
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   // Description:
   // This method is called when the AnimationCue's StartAnimationCueEvent is

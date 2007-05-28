@@ -71,7 +71,7 @@ protected:
   void SetupPipeline();
   void SetupDefaults();
 
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   // Description:
   // Marks for Update.

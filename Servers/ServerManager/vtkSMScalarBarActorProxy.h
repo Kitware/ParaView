@@ -40,7 +40,7 @@ protected:
   vtkSMScalarBarActorProxy();
   ~vtkSMScalarBarActorProxy();
 
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 private:
   vtkSMScalarBarActorProxy(const vtkSMScalarBarActorProxy&); // Not implemented.
   void operator=(const vtkSMScalarBarActorProxy&); // Not implemented.

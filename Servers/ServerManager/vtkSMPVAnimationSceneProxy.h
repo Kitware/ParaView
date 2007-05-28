@@ -108,7 +108,7 @@ protected:
   vtkSMPVAnimationSceneProxy();
   ~vtkSMPVAnimationSceneProxy();
 
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
   virtual void TickInternal(void* info);
 
 

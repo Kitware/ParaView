@@ -28,7 +28,7 @@ struct Help
 // Store a bunch of values in a stream.
 void do_store(vtkClientServerStream& css)
 {
-  vtkClientServerID id = {123};
+  vtkClientServerID id(123);
   css.Reserve(64);
   css.Reset();
   css << vtkClientServerStream::Reply;

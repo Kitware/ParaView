@@ -101,7 +101,7 @@ protected:
   // Description:
   // Overridden from vtkSMProxy to call BeginCreateVTKObjects() and
   // EndCreateVTKObjects().
-  virtual void CreateVTKObjects(int numObjects);
+  virtual void CreateVTKObjects();
 
   // Description:
   // Called when a representation is added to a view. 
@@ -121,13 +121,13 @@ protected:
   // This gives the subclasses an opportunity to set the servers flags
   // on the subproxies.
   // If this method returns false, CreateVTKObjects() is aborted.
-  virtual bool BeginCreateVTKObjects(int vtkNotUsed(numObjects)) {return true;}
+  virtual bool BeginCreateVTKObjects() {return true;}
 
   // Description:
   // This method is called after CreateVTKObjects(). 
   // This gives subclasses an opportunity to do some post-creation
   // initialization.
-  virtual bool EndCreateVTKObjects(int vtkNotUsed(numObjects)) {return true;}
+  virtual bool EndCreateVTKObjects() {return true;}
 
   // Description:
   // Creates a connection between the producer and the consumer

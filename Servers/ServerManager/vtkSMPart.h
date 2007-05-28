@@ -76,18 +76,11 @@ public:
 
 //BTX
   // Description:
-  // Returns the client/server id of the output pointed by this part.
-  vtkClientServerID GetAlgorithmOutputID()
-    {
-      return this->GetID(0);
-    }
-
-  // Description:
   // Returns the client/server id of the producer that has the output
   // of this part.
   vtkClientServerID GetProducerID()
     {
-      return this->GetID(1);
+      return this->ProducerID;
     }
 
   // Description:
@@ -95,7 +88,7 @@ public:
   // of this part.
   vtkClientServerID GetExecutiveID()
     {
-      return this->GetID(2);
+      return this->ExecutiveID;
     }
 //ETX
 
@@ -104,6 +97,8 @@ protected:
   ~vtkSMPart();
 
   vtkSMProxy* DataObjectProxy;
+  vtkClientServerID ProducerID;
+  vtkClientServerID ExecutiveID;
 
 private:
   vtkSMPart(const vtkSMPart&); // Not implemented
@@ -116,23 +111,13 @@ private:
   // Update Pipeline with the given timestep request.
   void UpdatePipeline(double time);
 
-
   // The index of the port the output is obtained from.
   vtkSetMacro(PortIndex, int);
   int PortIndex;
 
-  void SetAlgorithmOutputID(vtkClientServerID id)
-    {
-      this->SetID(0, id);
-    }
-  void SetProducerID(vtkClientServerID id)
-    {
-      this->SetID(1, id);
-    }
-  void SetExecutiveID(vtkClientServerID id)
-    {
-      this->SetID(2, id);
-    }
+  void InitializeWithIDs(vtkClientServerID outputID, 
+                         vtkClientServerID producerID, 
+                         vtkClientServerID executiveID);
 
   // Description:
   // Insert a filter to extract (and redistribute) unstructured

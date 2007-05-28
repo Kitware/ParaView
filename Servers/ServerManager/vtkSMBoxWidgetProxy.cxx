@@ -27,7 +27,7 @@
 
 
 vtkStandardNewMacro(vtkSMBoxWidgetProxy);
-vtkCxxRevisionMacro(vtkSMBoxWidgetProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMBoxWidgetProxy, "1.12");
 
 //----------------------------------------------------------------------------
 vtkSMBoxWidgetProxy::vtkSMBoxWidgetProxy()
@@ -51,34 +51,28 @@ vtkSMBoxWidgetProxy::~vtkSMBoxWidgetProxy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMBoxWidgetProxy::CreateVTKObjects(int numObjects)
+void vtkSMBoxWidgetProxy::CreateVTKObjects()
 {
   if(this->ObjectsCreated)
     {
     return;
     }
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
     
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   vtkClientServerStream stream;
-  for (unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    vtkClientServerID id = this->GetID(cc);
-    
-    stream << vtkClientServerStream::Invoke << id 
-           << "SetPlaceFactor" << 1.0 
-           << vtkClientServerStream::End;
-    
-    stream << vtkClientServerStream::Invoke << id
-           << "PlaceWidget"
-           << 0 << 1 << 0 << 1 << 0 << 1
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->GetServers(), stream, 1);
-    }
+  vtkClientServerID id = this->GetID();
+  stream << vtkClientServerStream::Invoke << id 
+         << "SetPlaceFactor" << 1.0 
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << id
+         << "PlaceWidget"
+         << 0 << 1 << 0 << 1 << 0 << 1
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->GetServers(), stream, 1);
   
   vtkSMProxy* transformProxy = this->GetSubProxy("transform");
-  
   if (!transformProxy)
     {
     vtkErrorMacro("Tranform must be defined in the configuration file");
@@ -91,14 +85,14 @@ void vtkSMBoxWidgetProxy::CreateVTKObjects(int numObjects)
     return;
     }
   this->BoxTransform = vtkTransform::SafeDownCast(
-    pm->GetObjectFromID(transformProxy->GetID(0)));
+    pm->GetObjectFromID(transformProxy->GetID()));
   
 }
 
 //----------------------------------------------------------------------------
 void vtkSMBoxWidgetProxy::SetMatrix(vtkMatrix4x4* mat)
 {
-  if (this->GetNumberOfIDs() == 0)
+  if (this->GetID().IsNull())
     {
     vtkErrorMacro("Not created yet");
     return;
@@ -143,14 +137,11 @@ void vtkSMBoxWidgetProxy::SetMatrix(vtkMatrix4x4* mat)
   transformProxy->UpdateVTKObjects();
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerID transformid = transformProxy->GetID(0);
+  vtkClientServerID transformid = transformProxy->GetID();
   vtkClientServerStream stream;
-  for (unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    stream << vtkClientServerStream::Invoke << this->GetID(cc)
-           << "SetTransform" << transformid << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->GetServers(), stream, 1);
-    }
+  stream << vtkClientServerStream::Invoke << this->GetID()
+         << "SetTransform" << transformid << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->GetServers(), stream, 1);
 }
 
 //----------------------------------------------------------------------------

@@ -84,7 +84,7 @@ protected:
   double KeyTime;
   vtkSMKeyFrameProxyInternals* Internals;
 
-  virtual void CreateVTKObjects(int) { this->ObjectsCreated=1; }
+  virtual void CreateVTKObjects() { this->ObjectsCreated=1; }
 private:
   vtkSMKeyFrameProxy(const vtkSMKeyFrameProxy&); // Not implemented.
   void operator=(const vtkSMKeyFrameProxy&); // Not implemented.

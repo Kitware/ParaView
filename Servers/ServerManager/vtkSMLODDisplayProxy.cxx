@@ -26,7 +26,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMLODDisplayProxy);
-vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.18");
+vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.19");
 //-----------------------------------------------------------------------------
 vtkSMLODDisplayProxy::vtkSMLODDisplayProxy()
 {
@@ -86,11 +86,11 @@ vtkPVLODPartDisplayInformation* vtkSMLODDisplayProxy::GetLODInformation()
     this->UpdateTime);
   
   this->LODInformation->CopyFromObject(0); // Clear information.
-  if (this->LODDecimatorProxy->GetNumberOfIDs() > 0)
+  if (!this->LODDecimatorProxy->GetID().IsNull())
     {
     vtkProcessModule::GetProcessModule()->GatherInformation(
       this->ConnectionID, this->LODDecimatorProxy->GetServers(),
-      this->LODInformation, this->LODDecimatorProxy->GetID(0));
+      this->LODInformation, this->LODDecimatorProxy->GetID());
     }
   this->LODInformationIsValid = 1;
 
@@ -167,57 +167,50 @@ void vtkSMLODDisplayProxy::SetupDefaults()
   // Broadcast for subclasses.
   vtkClientServerStream stream;
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  unsigned int i;
-  for (i = 0; i < this->LODUpdateSuppressorProxy->GetNumberOfIDs(); i++)
-    {
-    stream
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->LODUpdateSuppressorProxy->GetID(i) << "SetUpdateNumberOfPieces"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    stream
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetPartitionId"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->LODUpdateSuppressorProxy->GetID(i) << "SetUpdatePiece"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    }
+  stream
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->LODUpdateSuppressorProxy->GetID() << "SetUpdateNumberOfPieces"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  stream
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetPartitionId"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->LODUpdateSuppressorProxy->GetID() << "SetUpdatePiece"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID,
     vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
   // This is here just for streaming (can be removed if streaming is removed).
   vtkClientServerStream stream2;
-  for (i = 0; i < this->LODUpdateSuppressorProxy->GetNumberOfIDs(); i++)
-    {
-    stream2
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->LODMapperProxy->GetID(i) << "SetNumberOfPieces"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    stream2
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetPartitionId"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->LODMapperProxy->GetID(i) << "SetPiece"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    }
+  stream2
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->LODMapperProxy->GetID() << "SetNumberOfPieces"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  stream2
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetPartitionId"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->LODMapperProxy->GetID() << "SetPiece"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
   // Do we need to client too?
   pm->SendStream(this->ConnectionID,
-    vtkProcessModule::RENDER_SERVER, stream2);
+                 vtkProcessModule::RENDER_SERVER, stream2);
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMLODDisplayProxy::CreateVTKObjects(int numObjects)
+void vtkSMLODDisplayProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated || !this->CanCreateProxy)
     {
@@ -232,7 +225,7 @@ void vtkSMLODDisplayProxy::CreateVTKObjects(int numObjects)
   this->LODMapperProxy->SetServers(vtkProcessModule::CLIENT | 
     vtkProcessModule::RENDER_SERVER);
 
-  this->Superclass::CreateVTKObjects(numObjects);
+  this->Superclass::CreateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -250,7 +243,7 @@ void vtkSMLODDisplayProxy::CacheUpdate(int idx, int total)
   vtkClientServerStream stream;
   stream
     << vtkClientServerStream::Invoke
-    << this->LODMapperProxy->GetID(0) << "Modified"
+    << this->LODMapperProxy->GetID() << "Modified"
     << vtkClientServerStream::End;
   vtkProcessModule::GetProcessModule()->SendStream(
     this->ConnectionID,
@@ -282,7 +275,7 @@ int vtkSMLODDisplayProxy::GetLODFlag()
     }
   vtkPVRenderModuleHelper* helper = vtkPVRenderModuleHelper::SafeDownCast(
     vtkProcessModule::GetProcessModule()->
-    GetObjectFromID(pp->GetProxy(0)->GetID(0)));
+    GetObjectFromID(pp->GetProxy(0)->GetID()));
   if (!helper)
     {
     vtkErrorMacro("RenderModuleHelper object not found.");

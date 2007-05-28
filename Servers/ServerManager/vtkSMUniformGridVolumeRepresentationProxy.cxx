@@ -30,7 +30,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMUniformGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMUniformGridVolumeRepresentationProxy::vtkSMUniformGridVolumeRepresentationProxy()
 {
@@ -181,9 +181,9 @@ bool vtkSMUniformGridVolumeRepresentationProxy::InitializeStrategy(vtkSMViewProx
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMUniformGridVolumeRepresentationProxy::BeginCreateVTKObjects(int numObjects)
+bool vtkSMUniformGridVolumeRepresentationProxy::BeginCreateVTKObjects()
 {
-  if (!this->Superclass::BeginCreateVTKObjects(numObjects))
+  if (!this->Superclass::BeginCreateVTKObjects())
     {
     return false;
     }
@@ -226,7 +226,7 @@ bool vtkSMUniformGridVolumeRepresentationProxy::BeginCreateVTKObjects(int numObj
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMUniformGridVolumeRepresentationProxy::EndCreateVTKObjects(int numObjects)
+bool vtkSMUniformGridVolumeRepresentationProxy::EndCreateVTKObjects()
 {
   this->Connect(this->VolumeFixedPointRayCastMapper, this->VolumeActor, "Mapper");
   this->Connect(this->VolumeProperty, this->VolumeActor, "Property");
@@ -244,7 +244,7 @@ bool vtkSMUniformGridVolumeRepresentationProxy::EndCreateVTKObjects(int numObjec
   ivp->SetElement(0, 0);
   this->SelectionProp3D->UpdateProperty("Pickable");
 
-  return this->Superclass::EndCreateVTKObjects(numObjects);
+  return this->Superclass::EndCreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
