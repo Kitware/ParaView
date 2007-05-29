@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class QTreeWidget;
-class QTreeWidgetItem;
+class pqTreeWidgetItemObject;
 
 /// pqSignalAdaptorTreeWidget can be used to connect any property with 
 /// repeat_command to a tree widget that displays the property value.
@@ -66,7 +66,10 @@ public:
   /// Append an item to the tree.
   /// The size of values == this->TreeWidget->columnCount().
   /// Returns the newly created item, or 0 on failure.
-  QTreeWidgetItem* appendValue(const QList<QVariant>& values);
+  pqTreeWidgetItemObject* appendValue(const QList<QVariant>& values);
+  
+  /// Append an item to the tree.
+  void appendItem(pqTreeWidgetItemObject* item);
 
 signals:
   /// Fired when the tree widget is modified.

@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqServer.h"
 #include "pqSignalAdaptorTreeWidget.h"
+#include "pqTreeWidgetItemObject.h"
 
 class pqExtractLocationsPanel::pqInternal : public Ui::ExtractLocationsPanel
 {

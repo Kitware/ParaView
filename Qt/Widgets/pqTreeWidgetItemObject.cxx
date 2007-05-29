@@ -32,6 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqTreeWidgetItemObject.h"
 
+pqTreeWidgetItemObject::pqTreeWidgetItemObject(const QStringList& t)
+  : QTreeWidgetItem(t) 
+{
+}
 
 pqTreeWidgetItemObject::pqTreeWidgetItemObject(QTreeWidget* p, const QStringList& t)
   : QTreeWidgetItem(p, t) 

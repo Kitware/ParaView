@@ -44,6 +44,7 @@ class QTWIDGETS_EXPORT pqTreeWidgetItemObject : public QObject, public QTreeWidg
   Q_PROPERTY(bool checked READ isChecked WRITE setChecked)
 public:
   /// construct list widget item to for QTreeWidget with a string
+  pqTreeWidgetItemObject(const QStringList& t);
   pqTreeWidgetItemObject(QTreeWidget* p, const QStringList& t);
   pqTreeWidgetItemObject(QTreeWidgetItem* p, const QStringList& t);
 

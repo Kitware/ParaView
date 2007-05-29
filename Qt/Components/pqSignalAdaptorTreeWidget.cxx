@@ -71,7 +71,24 @@ QList<QVariant> pqSignalAdaptorTreeWidget::values() const
 }
 
 //-----------------------------------------------------------------------------
-QTreeWidgetItem* pqSignalAdaptorTreeWidget::appendValue(
+void pqSignalAdaptorTreeWidget::appendItem(pqTreeWidgetItemObject* item)
+{
+  this->TreeWidget->addTopLevelItem(item);
+
+  if (this->Editable)
+    {
+    item->setFlags(item->flags()| Qt::ItemIsEditable);
+    QObject::connect(item, SIGNAL(modified()), 
+      this, SIGNAL(valuesChanged()));
+    }
+  QObject::connect(item, SIGNAL(destroyed()), this, SIGNAL(valuesChanged()),
+    Qt::QueuedConnection);
+
+  emit this->valuesChanged();
+}
+
+//-----------------------------------------------------------------------------
+pqTreeWidgetItemObject* pqSignalAdaptorTreeWidget::appendValue(
   const QList<QVariant> &value)
 {
   int column_count = this->TreeWidget->columnCount();
@@ -87,19 +104,9 @@ QTreeWidgetItem* pqSignalAdaptorTreeWidget::appendValue(
     columnValues << value[cc].toString();
     }
 
-  pqTreeWidgetItemObject* item = new pqTreeWidgetItemObject(
-      this->TreeWidget, columnValues);
+  pqTreeWidgetItemObject* item = new pqTreeWidgetItemObject(columnValues);
 
-  if (this->Editable)
-    {
-    item->setFlags(item->flags()| Qt::ItemIsEditable);
-    QObject::connect(item, SIGNAL(modified()), 
-      this, SIGNAL(valuesChanged()));
-    }
-  QObject::connect(item, SIGNAL(destroyed()), this, SIGNAL(valuesChanged()),
-    Qt::QueuedConnection);
-
-  emit this->valuesChanged();
+  this->appendItem(item);
   return item;
 }
 

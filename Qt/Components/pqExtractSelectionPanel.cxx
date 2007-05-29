@@ -48,6 +48,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqServer.h"
 #include "pqSignalAdaptorTreeWidget.h"
+#include "pqTreeWidgetItemObject.h"
+
+class pqExtractSelectionTreeItem : public pqTreeWidgetItemObject
+{
+public:
+  pqExtractSelectionTreeItem(const QStringList& l) 
+    : pqTreeWidgetItemObject(l)
+  {
+  }
+  bool operator< ( const QTreeWidgetItem & other ) const  
+  {
+    int sortCol = treeWidget()->sortColumn();
+    double myNumber = text(sortCol).toDouble();
+    double otherNumber = other.text(sortCol).toDouble();
+    return myNumber < otherNumber;
+  }
+};
 
 class pqExtractSelectionPanel::pqInternal : public Ui::ExtractSelectionPanel
 {
@@ -62,6 +79,9 @@ pqExtractSelectionPanel::pqExtractSelectionPanel(pqProxy* _proxy, QWidget* _pare
 {
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
+  
+  this->Internal->GlobalIDs->sortItems(0, Qt::AscendingOrder);
+  this->Internal->Indices->sortItems(0, Qt::AscendingOrder);
 
   this->Internal->GlobalIDsAdaptor =
     new pqSignalAdaptorTreeWidget(this->Internal->GlobalIDs, true);
@@ -204,15 +224,16 @@ void pqExtractSelectionPanel::newValue()
   QTreeWidget* activeTree = (this->Internal->UseGlobalIDs->isChecked()?  
     this->Internal->GlobalIDs: this->Internal->Indices);
 
-  QList<QVariant> value;
+  QStringList value;
   // TODO: Use some good defaults.
-  value.push_back(0);
+  value.push_back(QString::number(0));
   if (!this->Internal->UseGlobalIDs->isChecked())
     {
-    value.push_back(0);
+    value.push_back(QString::number(0));
     }
 
-  QTreeWidgetItem* item = adaptor->appendValue(value);
+  pqExtractSelectionTreeItem* item = new pqExtractSelectionTreeItem(value);
+  adaptor->appendItem(item);
 
   // change the current item and make it editable.
   activeTree->setCurrentItem(item, 0);
