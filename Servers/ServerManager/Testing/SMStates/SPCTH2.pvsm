@@ -1,46 +1,4 @@
 <ServerManagerState version="2.9.10">
-  <Proxy group="3d_widgets" type="ImplicitPlaneWidgetProxy" id="1099">
-    <Property name="Center" id="1099.Center" number_of_elements="3">
-      <Element index="0" value="0"/>
-      <Element index="1" value="0"/>
-      <Element index="2" value="0"/>
-    </Property>
-    <Property name="CenterInfo" id="1099.CenterInfo" number_of_elements="3">
-      <Element index="0" value="0"/>
-      <Element index="1" value="0"/>
-      <Element index="2" value="0"/>
-    </Property>
-    <Property name="DrawPlane" id="1099.DrawPlane" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="1099.DrawPlane.bool"/>
-    </Property>
-    <Property name="IgnorePlaceWidgetChanges" id="1099.IgnorePlaceWidgetChanges" number_of_elements="1">
-      <Element index="0" value="1"/>
-      <Domain name="bool" id="1099.IgnorePlaceWidgetChanges.bool"/>
-    </Property>
-    <Property name="Normal" id="1099.Normal" number_of_elements="3">
-      <Element index="0" value="0"/>
-      <Element index="1" value="0"/>
-      <Element index="2" value="1"/>
-    </Property>
-    <Property name="NormalInfo" id="1099.NormalInfo" number_of_elements="3">
-      <Element index="0" value="0"/>
-      <Element index="1" value="0"/>
-      <Element index="2" value="1"/>
-    </Property>
-    <Property name="PlaceWidget" id="1099.PlaceWidget" number_of_elements="6">
-      <Element index="0" value="-5"/>
-      <Element index="1" value="5"/>
-      <Element index="2" value="-3"/>
-      <Element index="3" value="3"/>
-      <Element index="4" value="-3"/>
-      <Element index="5" value="3"/>
-    </Property>
-    <Property name="Visibility" id="1099.Visibility" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="1099.Visibility.bool"/>
-    </Property>
-  </Proxy>
   <Proxy group="sources" type="ArrowSource" id="35">
     <Property name="ShaftRadius" id="35.ShaftRadius" number_of_elements="1">
       <Element index="0" value="0.03"/>
@@ -2577,7 +2535,6 @@
   </Proxy>
   <Proxy group="implicit_functions" type="Plane" id="1101">
     <Property name="Normal" id="1101.Normal" number_of_elements="3">
-      <ControllerProperty id="1099" name="Normal"/>
       <Element index="0" value="0"/>
       <Element index="1" value="0"/>
       <Element index="2" value="1"/>
@@ -2591,7 +2548,6 @@
       </Domain>
     </Property>
     <Property name="Origin" id="1101.Origin" number_of_elements="3">
-      <ControllerProperty id="1099" name="Center"/>
       <Element index="0" value="0"/>
       <Element index="1" value="0"/>
       <Element index="2" value="0"/>
@@ -2673,7 +2629,6 @@
       <Proxy value="486"/>
       <Proxy value="489"/>
       <Proxy value="995"/>
-      <Proxy value="1099"/>
       <Proxy value="1107"/>
       <Proxy value="1199"/>
       <Proxy value="1202"/>
@@ -2972,9 +2927,6 @@
     <SubProxy name="Renderer" id="19"/>
     <SubProxy name="Renderer2D" id="21"/>
   </Proxy>
-  <ProxyCollection name="3d_widgets">
-    <Item id="1099" name="PV3DWidget_ImplicitPlaneWidgetProxy1"/>
-  </ProxyCollection>
   <ProxyCollection name="animateable">
     <Item id="35" name="GlyphSources.Arrow0"/>
     <Item id="40" name="GlyphSources.Arrow0.Display"/>

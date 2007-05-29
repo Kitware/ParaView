@@ -15,12 +15,6 @@
 
 #include "vtkSMAxesProxy.h"
 #include "vtkSMScalarBarWidgetProxy.h"
-#include "vtkSM3DWidgetProxy.h"
-#include "vtkSMBoxWidgetProxy.h"
-#include "vtkSMImplicitPlaneWidgetProxy.h"
-#include "vtkSMLineWidgetProxy.h"
-#include "vtkSMPointWidgetProxy.h"
-#include "vtkSMSphereWidgetProxy.h"
 #include "vtkSMApplication.h"
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMArrayRangeDomain.h"
@@ -98,12 +92,6 @@ int main(int , char *[])
   vtkObject *c;
   c = vtkSMAxesProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMScalarBarWidgetProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSM3DWidgetProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMBoxWidgetProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMImplicitPlaneWidgetProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMLineWidgetProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMPointWidgetProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMSphereWidgetProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMApplication::New(); c->Print( cout ); c->Delete();
   c = vtkSMArrayListDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMArrayRangeDomain::New(); c->Print( cout ); c->Delete();

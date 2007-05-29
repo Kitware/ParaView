@@ -7,9 +7,7 @@ SET (SMSTATE_FILES
   Arrow
   Axes
   #  BlowTest
-  BoundsDisplay
   CalcInput
-  # ClipCut
   ExtractGrid
   TestPHT
   SPCTH2

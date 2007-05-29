@@ -10,7 +10,6 @@ ENDIF(NOT WIN32)
 
 SET(Kit_SRCS
   vtkSMProxyManager.cxx
-  vtkSM3DWidgetProxy.cxx
   vtkSMAbstractDisplayProxy.cxx
   vtkSMAbstractViewModuleProxy.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
@@ -30,7 +29,6 @@ SET(Kit_SRCS
   vtkSMBooleanKeyFrameProxy.cxx
   vtkSMBoundsDomain.cxx
   vtkSMBoxProxy.cxx
-  vtkSMBoxWidgetProxy.cxx
   vtkSMCameraKeyFrameProxy.cxx
   vtkSMCameraLink.cxx
   vtkSMCameraManipulatorProxy.cxx
@@ -67,7 +65,6 @@ SET(Kit_SRCS
   vtkSMIceTRenderModuleProxy.cxx
   vtkSMIdTypeVectorProperty.cxx
   vtkSMImplicitPlaneProxy.cxx
-  vtkSMImplicitPlaneWidgetProxy.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMInformationHelper.cxx
   vtkSMInteractionUndoStackBuilder.cxx
@@ -79,7 +76,6 @@ SET(Kit_SRCS
   vtkSMKeyFrameProxy.cxx
   vtkSMKeyFrameAnimationCueManipulatorProxy.cxx
   vtkSMLinearAnimationCueManipulatorProxy.cxx
-  vtkSMLineWidgetProxy.cxx
   vtkSMLink.cxx
   vtkSMLookupTableProxy.cxx
   vtkSMLODDisplayProxy.cxx
@@ -96,7 +92,6 @@ SET(Kit_SRCS
   vtkSMPVDWriterProxy.cxx
   vtkSMPart.cxx
   vtkSMPluginLoader.cxx
-  vtkSMPointWidgetProxy.cxx 
   vtkSMProperty.cxx
   vtkSMPropertyAdaptor.cxx
   vtkSMPropertyIterator.cxx
@@ -132,7 +127,6 @@ SET(Kit_SRCS
   vtkSMSimpleRenderModuleProxy.cxx
   vtkSMSimpleStringInformationHelper.cxx
   vtkSMSourceProxy.cxx
-  vtkSMSphereWidgetProxy.cxx
   vtkSMStateLoader.cxx
   vtkSMStateLoaderBase.cxx
   vtkSMStringListDomain.cxx
@@ -195,7 +189,6 @@ SET( ServerManager_SRCS
 
 # Abstract and Wrap exclude
 SET_SOURCE_FILES_PROPERTIES(
-  vtkSM3DWidgetProxy.cxx
   vtkSMAbstractDisplayProxy.cxx
   vtkSMAbstractViewModuleProxy.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
