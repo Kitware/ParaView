@@ -77,7 +77,6 @@ public:
       }
     else
       {
-      vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
       this->RenderView.TakeReference(vtkSMRenderViewProxy::SafeDownCast(
           pxm->NewProxy("newviews", "IceTDesktopRenderView")));
       pqSMAdaptor::setElementProperty(this->RenderView->GetProperty("CompositeThreshold"), 0);
