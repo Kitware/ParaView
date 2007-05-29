@@ -45,6 +45,7 @@ public:
 
 protected slots:
   void onVisibilityChanged(int);
+  void onTextLocationChanged(bool);
 
 private:
   /// Set the display whose properties this editor will edit.

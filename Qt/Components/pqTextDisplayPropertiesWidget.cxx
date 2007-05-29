@@ -33,6 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqTextDisplayPropertiesWidget.h"
 
 #include "vtkSMProxy.h"
+#include "vtkTextRepresentation.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMDoubleVectorProperty.h"
 
 #include <QPointer>
 
@@ -168,6 +171,22 @@ void pqTextDisplayPropertiesWidget::setDisplay(pqDisplay* display)
   this->Internal->Links.addPropertyLink(
       this->Internal->spinBoxOpacity, "value", SIGNAL(valueChanged(double)),
       proxy, proxy->GetProperty("Opacity"));
+
+  QObject::connect(this->Internal->groupBoxLocation, SIGNAL(clicked(bool)),
+    this, SLOT(onTextLocationChanged(bool)));
+  QObject::connect(this->Internal->toolButtonLL, SIGNAL(clicked(bool)),
+    this, SLOT(onTextLocationChanged(bool)));
+  QObject::connect(this->Internal->toolButtonLC, SIGNAL(clicked(bool)),
+    this, SLOT(onTextLocationChanged(bool)));
+  QObject::connect(this->Internal->toolButtonLR, SIGNAL(clicked(bool)),
+    this, SLOT(onTextLocationChanged(bool)));
+  QObject::connect(this->Internal->toolButtonUL, SIGNAL(clicked(bool)),
+    this, SLOT(onTextLocationChanged(bool)));
+  QObject::connect(this->Internal->toolButtonUC, SIGNAL(clicked(bool)),
+    this, SLOT(onTextLocationChanged(bool)));
+  QObject::connect(this->Internal->toolButtonUR, SIGNAL(clicked(bool)),
+    this, SLOT(onTextLocationChanged(bool)));
+
 }
 
 //-----------------------------------------------------------------------------
@@ -177,4 +196,67 @@ void pqTextDisplayPropertiesWidget::onVisibilityChanged(int state)
     {
     this->Internal->Interactivity->setCheckState(Qt::Unchecked);
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqTextDisplayPropertiesWidget::onTextLocationChanged(bool checked)
+{
+  int winLocation = vtkTextRepresentation::AnyLocation;
+  if (checked)
+    {
+    if(this->Internal->toolButtonLL->isChecked())
+      {
+      winLocation = vtkTextRepresentation::LowerLeftCorner;
+      }
+    else if(this->Internal->toolButtonLC->isChecked())
+      {
+      winLocation = vtkTextRepresentation::LowerCenter;
+      }
+    else if(this->Internal->toolButtonLR->isChecked())
+      {
+      winLocation = vtkTextRepresentation::LowerRightCorner;
+      }
+    else if(this->Internal->toolButtonUL->isChecked())
+      {
+      winLocation = vtkTextRepresentation::UpperLeftCorner;
+      }
+    else if(this->Internal->toolButtonUC->isChecked())
+      {
+      winLocation = vtkTextRepresentation::UpperCenter;
+      }
+    else if(this->Internal->toolButtonUR->isChecked())
+      {
+      winLocation = vtkTextRepresentation::UpperRightCorner;
+      }
+    }
+
+  vtkSMProxy* proxy = this->Internal->Display->getProxy();
+  vtkSMIntVectorProperty* pLocation =
+    vtkSMIntVectorProperty::SafeDownCast(
+    proxy->GetProperty("WindowLocation"));
+  if(!pLocation)
+    {
+    return;
+    }
+  pLocation->SetElement(0, winLocation);
+  proxy->UpdateVTKObjects();
+
+  //Reset the text position according to the PositionX and PositionY box
+  if(winLocation == vtkTextRepresentation::AnyLocation)
+    {
+    proxy->UpdatePropertyInformation();
+    vtkSMDoubleVectorProperty* pPosition =
+      vtkSMDoubleVectorProperty::SafeDownCast(
+      proxy->GetProperty("PositionInfo"));
+   
+    if(pPosition)
+      {
+      double *pos = pPosition->GetElements();
+      this->Internal->Position1X->setValue(pos[0]);
+      this->Internal->Position1Y->setValue(pos[1]);
+      }
+    }
+
+  this->Internal->Display->renderAllViews();
+
 }
