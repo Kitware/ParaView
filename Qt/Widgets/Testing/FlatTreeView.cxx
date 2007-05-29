@@ -16,6 +16,12 @@ void FlatTreeViewTests(pqFlatTreeView* w)
 {
   QTestApp::keyClick(w, Qt::Key_Down, 0, 20);
   VERIFY(w->getSelectionModel()->currentIndex() == w->getModel()->index(0, 0));
+  QTestApp::keyClick(w, Qt::Key_PageDown, 0, 20);
+  QTestApp::keyClick(w, Qt::Key_PageUp, 0, 20);
+  VERIFY(w->getSelectionModel()->currentIndex() == w->getModel()->index(0, 0));
+  QTestApp::keyClick(w, Qt::Key_End, 0, 20);
+  QTestApp::keyClick(w, Qt::Key_Home, 0, 20);
+  VERIFY(w->getSelectionModel()->currentIndex() == w->getModel()->index(0, 0));
 
   QTestApp::delay(20);
   w->collapse(w->getModel()->index(1,0));
@@ -27,6 +33,7 @@ void FlatTreeViewTests(pqFlatTreeView* w)
   
   QTestApp::mouseDown(w->viewport(), QPoint(31, 38), Qt::LeftButton, 0, 20);
   VERIFY(w->getSelectionModel()->currentIndex() == w->getModel()->index(0, 0));
+  VERIFY(w->getIndexVisibleAt(QPoint(31,38)) == w->getModel()->index(0, 0));
 
   QTestApp::mouseDown(w->viewport(), QPoint(31, 38), Qt::LeftButton, 0, 20);
   QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_A, 0, 20);
@@ -34,6 +41,27 @@ void FlatTreeViewTests(pqFlatTreeView* w)
   QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_C, 0, 20);
   QTestApp::keyDown(QApplication::focusWidget(), Qt::Key_Enter, 0, 20);
   QTestApp::mouseDown(w->viewport(), QPoint(31, 59), Qt::LeftButton, 0, 20);
+  
+  QTestApp::mouseDown(w->viewport(), QPoint(31, 38), Qt::LeftButton, 0, 20);
+  QTestApp::mouseDown(w->viewport(), QPoint(31, 38), Qt::LeftButton, 0, 20);
+  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_C, 0, 20);
+  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_B, Qt::ShiftModifier, 20);
+  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_A, 0, 20);
+  QTestApp::keyDown(QApplication::focusWidget(), Qt::Key_Escape, 0, 20);
+
+
+  w->setSelectionMode(pqFlatTreeView::ExtendedSelection);
+  w->setSelectionBehavior(pqFlatTreeView::SelectItems);
+  w->setIconSize(24);
+  
+  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_A, Qt::ControlModifier, 20);
+  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_B, 0, 20);
+  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_C, 0, 20);
+  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_C, 0, 20);
+  QTestApp::keyClick(w, Qt::Key_Up, 0, 20);
+  QTestApp::keyClick(w, Qt::Key_Up, 0, 20);
+  QTestApp::keyClick(w, Qt::Key_Up, 0, 20);
+  VERIFY(w->getSelectionModel()->currentIndex() == w->getModel()->index(1, 0));
 
 }
 
