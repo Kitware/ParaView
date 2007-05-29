@@ -15,7 +15,6 @@
 #include "vtkSMRepresentationStrategy.h"
 
 #include "vtkCommand.h"
-#include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVRenderModuleHelper.h"
@@ -23,10 +22,12 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.7");
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 {
+  this->UseCache = false;
+  this->UseLOD = false;
   this->Input = 0;
   this->ViewHelperProxy = 0;
   this->EnableLOD = false;
@@ -35,18 +36,14 @@ vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
   this->LODDataValid = false;
   this->LODInformation = vtkPVDataInformation::New();;
   this->LODInformationValid = false;
+  this->LODResolution = 50;
 
   this->DataValid = false;
   this->Information = vtkPVDataInformation::New();
   this->InformationValid = false;
 
-  this->SomethingCached = false;
 
-  vtkMemberFunctionCommand<vtkSMRepresentationStrategy>* observer =
-    vtkMemberFunctionCommand<vtkSMRepresentationStrategy>::New();
-  observer->SetCallback(*this, 
-    &vtkSMRepresentationStrategy::LODResolutionChanged);
-  this->LODResolutionObserver = observer;
+  this->SomethingCached = false;
 }
 
 //----------------------------------------------------------------------------
@@ -57,48 +54,26 @@ vtkSMRepresentationStrategy::~vtkSMRepresentationStrategy()
 
   this->LODInformation->Delete();
   this->Information->Delete();
-  this->LODResolutionObserver->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMRepresentationStrategy::SetViewHelperProxy(vtkSMProxy* viewHelper)
 {
-  vtkSMProperty* prop = 0;
-  if (this->ViewHelperProxy && 
-    (prop = this->ViewHelperProxy->GetProperty("LODResolution")))
-    {
-    prop->RemoveObserver(this->LODResolutionObserver);
-    }
-
   vtkSetObjectBodyMacro(ViewHelperProxy, vtkSMProxy, viewHelper);
 
-  if (this->ViewHelperProxy &&
-    (prop = this->ViewHelperProxy->GetProperty("LODResolution")))
-    {
-    prop->AddObserver(vtkCommand::ModifiedEvent, 
-      this->LODResolutionObserver);
-    this->LODResolutionChanged();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMRepresentationStrategy::LODResolutionChanged()
-{
-  vtkSMProperty* myProp = this->GetProperty("LODResolution");
-  vtkSMProperty* viewProp = this->ViewHelperProxy->GetProperty("LODResolution");
-  if (myProp && viewProp)
-    {
-    myProp->Copy(viewProp);
-    this->UpdateProperty("LODResolution");
-
-    // Invalidate LOD data.
-    this->LODDataValid = false;
-    }
+  // Get the current values from the view helper.
+  this->ViewHelperModified();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMRepresentationStrategy::MarkModified(vtkSMProxy* modifiedProxy)
 {
+  if (modifiedProxy == this->ViewHelperProxy)
+    {
+    this->ViewHelperModified();
+    return;
+    }
+
   // If properties on the strategy itself are modified, then we are assuming
   // that the pipeline inside the strategy will get affected.
   // This is generally the case since a strategy does not include any
@@ -108,24 +83,36 @@ void vtkSMRepresentationStrategy::MarkModified(vtkSMProxy* modifiedProxy)
   // Mark all data invalid.
   // Note that we are not marking the information invalid. The information
   // won't get invalidated until the pipeline is updated.
-  this->DataValid = false;
-  this->LODDataValid = false;
-
-  // Cache is cleaned up whenever something changes and caching is not currently
-  // enabled.
-  if (this->SomethingCached && !this->UseCache())
-    {
-    this->SomethingCached = false;
-    this->InvokeCommand("RemoveAllCaches");
-    }
+  this->InvalidatePipeline();
+  this->InvalidateLODPipeline();
   
   this->Superclass::MarkModified(modifiedProxy);
 }
 
 //----------------------------------------------------------------------------
+void vtkSMRepresentationStrategy::InvalidatePipeline()
+{
+  this->DataValid = false;
+
+  // Cache is cleaned up whenever something changes and caching is not currently
+  // enabled.
+  if (this->SomethingCached && !this->GetUseCache())
+    {
+    this->SomethingCached = false;
+    this->InvokeCommand("RemoveAllCaches");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationStrategy::InvalidateLODPipeline()
+{
+  this->LODDataValid = false;
+}
+
+//----------------------------------------------------------------------------
 vtkPVDataInformation* vtkSMRepresentationStrategy::GetDisplayedDataInformation()
 {
-  if (this->UseLODPipeline())
+  if (this->GetUseLOD())
     {
     return this->GetLODDataInformation();
     }
@@ -177,19 +164,16 @@ inline int vtkSMRepresentationStrategyGetInt(vtkSMProxy* proxy,
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRepresentationStrategy::UseLODPipeline()
+bool vtkSMRepresentationStrategy::GetUseLOD()
 {
-  return (this->EnableLOD && !this->UseCache() &&
-    this->ViewHelperProxy && 
-    vtkSMRepresentationStrategyGetInt(this->ViewHelperProxy,"LODFlag", 0));
+  return (this->EnableLOD && !this->GetUseCache() && this->UseLOD);
+;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRepresentationStrategy::UseCache()
+bool vtkSMRepresentationStrategy::GetUseCache()
 {
-  return (this->EnableCaching && this->ViewHelperProxy && 
-    vtkSMRepresentationStrategyGetInt(
-      this->ViewHelperProxy, "CachingEnabled", 0));
+  return (this->EnableCaching && this->UseCache);
 }
 
 //----------------------------------------------------------------------------
@@ -201,7 +185,7 @@ bool vtkSMRepresentationStrategy::UpdateRequired()
 
   bool update_required = !this->DataValid;
 
-  if (this->UseLODPipeline())
+  if (this->GetUseLOD())
     {
     update_required |= !this->LODDataValid;
     }
@@ -221,7 +205,7 @@ void vtkSMRepresentationStrategy::Update()
       this->UpdatePipeline();
       }
 
-    if (this->UseLODPipeline() && !this->LODDataValid)
+    if (this->GetUseLOD() && !this->LODDataValid)
       {
       this->UpdateLODPipeline();
       }
@@ -284,6 +268,37 @@ void vtkSMRepresentationStrategy::Connect(vtkSMProxy* producer,
   pp->RemoveAllProxies();
   pp->AddProxy(producer);
   consumer->UpdateProperty(propertyname);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationStrategy::ViewHelperModified()
+{
+  if (!this->ViewHelperProxy)
+    {
+    return;
+    }
+
+  vtkSMIntVectorProperty* ivp;
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ViewHelperProxy->GetProperty("UseLOD"));
+  if (ivp && ivp->GetNumberOfElements() == 1)
+    {
+    this->SetUseLOD(ivp->GetElement(0) == 1);
+    }
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ViewHelperProxy->GetProperty("UseCache"));
+  if (ivp && ivp->GetNumberOfElements() == 1)
+    {
+    this->SetUseCache(ivp->GetElement(0) == 1);
+    }
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ViewHelperProxy->GetProperty("LODResolution"));
+  if (ivp && ivp->GetNumberOfElements() == 1)
+    {
+    this->SetLODResolution(ivp->GetElement(0));
+    }
 }
 
 //----------------------------------------------------------------------------

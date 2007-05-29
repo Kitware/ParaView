@@ -110,6 +110,17 @@ public:
   // Overridden to clear data valid flags.
   virtual void MarkModified(vtkSMProxy* modifiedProxy);
 
+  // Description:
+  // Returns if the strategy is currently using LOD 
+  // (UseLOD && EnableLOD && !this->GetUseCache()).
+  bool GetUseLOD();
+
+
+  // Description:
+  // Returns if the strategy is currently using cache 
+  // (UseCache && EnableCaching).
+  bool GetUseCache();
+
 //BTX
 protected:
   vtkSMRepresentationStrategy();
@@ -153,12 +164,12 @@ protected:
   virtual void UpdatePipeline();
 
   // Description:
-  // Returns if the strategy should use LOD pipeline for its operations.
-  bool UseLODPipeline();
+  // Invalidates the LOD pipeline.
+  virtual void InvalidateLODPipeline();
 
   // Description:
-  // Retruns if caching is enabled.
-  bool UseCache();
+  // Invalidates the full resolution pipeline.
+  virtual void InvalidatePipeline();
 
   // Description:
   // Creates a connection between the producer and the consumer
@@ -166,6 +177,38 @@ protected:
   // pipelines.
   void Connect(vtkSMProxy* producer, vtkSMProxy* consumer,
     const char* propertyname="Input");
+
+  // Description:
+  // Called when the view helper proxy is modified. The strategy must update
+  // its state based on the new state of the ViewHelperProxy.
+  virtual void ViewHelperModified();
+
+  // Description:
+  // Called when the ViewHelperProxy is modified to set whether 
+  // the strategy should use LOD pipeline if
+  // enabled. This does not invalidate any pipeline.
+  vtkSetMacro(UseLOD, bool);
+
+  // Description:
+  // Called when the ViewHelperProxy is modified to set whether the strategy 
+  // should use cache if enabled. This does not invalidate any pipeline.
+  vtkSetMacro(UseCache, bool);
+
+  // Description:
+  // Called when the ViewHelperProxy is modified to set LOD resolution.
+  // Set the LOD resolution. This invalidates the LOD pipeline if the resolution
+  // has indeed changed.
+  virtual void SetLODResolution(int resolution)
+    {
+    if (this->LODResolution != resolution)
+      {
+      this->LODResolution = resolution;
+      this->InvalidateLODPipeline();
+      }
+    }
+
+  bool UseCache;
+  bool UseLOD;
 
   vtkSMSourceProxy* Input;
   bool EnableLOD;
@@ -179,6 +222,8 @@ protected:
   bool InformationValid;
   vtkPVDataInformation* Information;
 
+  int LODResolution;
+
   // Flag used to avoid unnecessary "RemoveAllCaches" requests being set to the
   // server.
   bool SomethingCached;
@@ -188,11 +233,6 @@ private:
   vtkSMRepresentationStrategy(const vtkSMRepresentationStrategy&); // Not implemented
   void operator=(const vtkSMRepresentationStrategy&); // Not implemented
 
-  void LODResolutionChanged();
-
-
-
-  vtkCommand* LODResolutionObserver;
 //ETX
 };
 

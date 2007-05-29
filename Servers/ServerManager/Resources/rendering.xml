@@ -3853,9 +3853,6 @@
       <SubProxy>
         <Proxy name="LODDecimator" 
           proxygroup="filters" proxyname="QuadricClustering" />
-        <ExposedProperties>
-          <Property name="NumberOfDivisions" exposed_name="LODResolution" />
-        </ExposedProperties>
       </SubProxy>
 
       <SubProxy>
@@ -4134,7 +4131,7 @@
       <SubProxy>
         <Proxy name="ViewHelper" class="vtkPVRenderModuleHelper">
           <IntVectorProperty
-            name="LODFlag"
+            name="UseLOD"
             command="SetLODFlag"
             number_of_elements="1"
             default_values="0">
@@ -4149,7 +4146,14 @@
           </IntVectorProperty>
 
           <IntVectorProperty
-            name="CachingEnabled"
+            name="UseOrderedCompositing"
+            number_of_elements="1"
+            default_values="0">
+            <BooleanDomain name="bool" />
+          </IntVectorProperty>
+
+          <IntVectorProperty
+            name="UseCache"
             command="SetCachingEnabled"
             number_of_elements="1"
             default_values="0">
@@ -4158,17 +4162,15 @@
 
           <IntVectorProperty
             name="LODResolution"
-            number_of_elements="3"
-            default_values="50 50 50" >
+            number_of_elements="1"
+            default_values="50" >
             <IntRangeDomain name="range" min="10" />
           </IntVectorProperty>
           <!-- End of subproxy "ViewHelper" -->
         </Proxy>
 
-        <!-- We don't expose LODFlag, since using LOD is a private 
-        decision that the render view makes -->
         <ExposedProperties>
-          <Property name="CachingEnabled" />
+          <Property name="UseCache" />
           <Property name="LODResolution" />
         </ExposedProperties>
         <!-- End of SubProxy ViewHelper -->

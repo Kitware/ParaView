@@ -80,7 +80,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.13");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 //-----------------------------------------------------------------------------
@@ -394,25 +394,25 @@ void vtkSMRenderViewProxy::SetUseLight(int enable)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::SetLODFlag(bool use_lod)
+void vtkSMRenderViewProxy::SetUseLOD(bool use_lod)
 {
   if (this->ViewHelper)
     {
-    SetIntVectorProperty(this->ViewHelper, "LODFlag", use_lod? 1 : 0);
-    this->ViewHelper->UpdateProperty("LODFlag");
+    SetIntVectorProperty(this->ViewHelper, "UseLOD", use_lod? 1 : 0);
+    this->ViewHelper->UpdateProperty("UseLOD");
     }
 }
 
 //-----------------------------------------------------------------------------
-bool vtkSMRenderViewProxy::GetLODFlag()
+bool vtkSMRenderViewProxy::GetUseLOD()
 {
   if (this->ViewHelper)
     {
     vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->ViewHelper->GetProperty("LODFlag"));
+      this->ViewHelper->GetProperty("UseLOD"));
     if (!ivp)
       {
-      vtkErrorMacro("Failed to find property LODFlag on ViewHelper.");
+      vtkErrorMacro("Failed to find property UseLOD on ViewHelper.");
       return false;
       }
 
@@ -434,12 +434,12 @@ void vtkSMRenderViewProxy::BeginInteractiveRender()
   vtkRenderWindow *renWin = this->GetRenderWindow(); 
   renWin->SetDesiredUpdateRate(5.0);
 
-  bool using_lod = this->GetLODFlag();
+  bool using_lod = this->GetUseLOD();
 
   // Determine if we are using LOD or not.
   if (this->ViewHelper && this->GetLODDecision())
     {
-    this->SetLODFlag(true);
+    this->SetUseLOD(true);
     if (!using_lod)
       {
       // We changed LOD decision, implying that the LOD pipelines for all
@@ -452,9 +452,9 @@ void vtkSMRenderViewProxy::BeginInteractiveRender()
     }
   else
     {
-    this->SetLODFlag(false);
+    this->SetUseLOD(false);
     // Even if using_lod was true, we don't need to UpdateAllRepresentations
-    // since calling UpdateAllRepresentations when LODFlag is true updates the
+    // since calling UpdateAllRepresentations when UseLOD is true updates the
     // full-res pipeline anyways.
     }
 
@@ -485,7 +485,7 @@ void vtkSMRenderViewProxy::BeginStillRender()
     }
   renWindow->SetDesiredUpdateRate(0.002);
 
-  this->SetLODFlag(false);
+  this->SetUseLOD(false);
   this->Superclass::BeginStillRender();
 }
 

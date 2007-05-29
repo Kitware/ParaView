@@ -17,10 +17,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.5");
+vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMSimpleStrategy::vtkSMSimpleStrategy()
 {
@@ -87,7 +88,7 @@ void vtkSMSimpleStrategy::GatherLODInformation(vtkPVDataInformation* info)
 //----------------------------------------------------------------------------
 void vtkSMSimpleStrategy::UpdatePipeline()
 {
-  if (this->UseCache())
+  if (this->GetUseCache())
     {
     this->SomethingCached = true;
     this->UpdateSuppressorLOD->InvokeCommand("CacheUpdate");
@@ -106,6 +107,22 @@ void vtkSMSimpleStrategy::UpdateLODPipeline()
   // need to check if caching is enabled.
   this->UpdateSuppressorLOD->InvokeCommand("ForceUpdate");
   this->Superclass::UpdateLODPipeline();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSimpleStrategy::SetLODResolution(int resolution)
+{
+  this->Superclass::SetLODResolution(resolution);
+
+  if (this->LODDecimator)
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->LODDecimator->GetProperty("NumberOfDivisions"));
+    ivp->SetElement(0, this->LODResolution);
+    ivp->SetElement(1, this->LODResolution);
+    ivp->SetElement(2, this->LODResolution);
+    this->LODDecimator->UpdateVTKObjects();
+    }
 }
 
 //----------------------------------------------------------------------------

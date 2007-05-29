@@ -34,11 +34,6 @@ public:
     { return this->PreDistributorSuppressor; }
 
   // Description:
-  // Update the distributor to use ordered compositing.
-  vtkGetMacro(UseOrderedCompositing, bool);
-  virtual void SetUseOrderedCompositing(bool);
-
-  // Description:
   // Update the data the gets distributed.
   virtual void UpdateDistributedData();
 //BTX
@@ -63,18 +58,31 @@ protected:
   // Description:
   // Update the LOD pipeline.
   // Overridden to pass correct collection decision to the Collect filter
-  // based on UseCompositing() flag.
+  // based on UseCompositing flag.
   virtual void UpdateLODPipeline();
 
   // Description:
   // Updates the data pipeline (non-LOD only).
   // Overridden to pass correct collection decision to the Collect filter
-  // based on UseCompositing() flag.
+  // based on UseCompositing flag.
   virtual void UpdatePipeline();
 
   // Description:
-  // Indicates if the current update should use compositing or not.
-  bool UseCompositing();
+  // Called when the view helper proxy is modified. The strategy must update
+  // its state based on the new state of the ViewHelperProxy.
+  virtual void ViewHelperModified();
+
+  // Description:
+  // Update the distributor to use ordered compositing.
+  // Called in ViewHelperModified.
+  vtkGetMacro(UseOrderedCompositing, bool);
+  virtual void SetUseOrderedCompositing(bool);
+
+  // Description:
+  // Called by the view to make the strategy use compositing.
+  // Called in ViewHelperModified.
+  void SetUseCompositing(bool);
+  vtkGetMacro(UseCompositing, bool);
 
   vtkSMSourceProxy* Collect;
   vtkSMSourceProxy* PreDistributorSuppressor;
@@ -85,6 +93,7 @@ protected:
   vtkSMSourceProxy* DistributorLOD;
   
   bool UseOrderedCompositing;
+  bool UseCompositing;
 
 private:
   vtkSMSimpleParallelStrategy(const vtkSMSimpleParallelStrategy&); // Not implemented

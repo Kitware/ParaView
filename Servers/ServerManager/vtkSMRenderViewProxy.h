@@ -208,15 +208,15 @@ protected:
 
   // Description:
   // Set the LOD decision.
-  void SetLODFlag(bool use_lod);
+  void SetUseLOD(bool use_lod);
 
   // Description:
   // Get whether the view module is currently using LOD.
-  bool GetLODFlag();
+  bool GetUseLOD();
 
   // Description:
   // Determines if the LOD must be used for rendering. The difference between 
-  // GetLODFlag() and GetLODDecision() is that GetLODFlag() indicates if the
+  // GetUseLOD() and GetLODDecision() is that GetUseLOD() indicates if the
   // most recent render decided to use LOD or not, while GetLODDecision()
   // uses the current geometry sizes to indicate if their sum is above
   // the LOD threshold.

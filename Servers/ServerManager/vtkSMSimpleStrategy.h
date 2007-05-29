@@ -84,6 +84,12 @@ protected:
   // UseCache() to check if caching is to be employed.
   virtual void UpdatePipeline();
 
+  // Description:
+  // Called when the ViewHelperProxy is modified to set LOD resolution.
+  // Set the LOD resolution. This invalidates the LOD pipeline if the resolution
+  // has indeed changed.
+  virtual void SetLODResolution(int resolution);
+
   vtkSMSourceProxy* UpdateSuppressor;
   vtkSMSourceProxy* UpdateSuppressorLOD;
   vtkSMSourceProxy* LODDecimator;

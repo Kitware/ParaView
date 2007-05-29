@@ -37,7 +37,7 @@ inline int vtkSMSimpleParallelStrategyGetInt(vtkSMProxy* proxy,
 }
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.2");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
@@ -48,6 +48,9 @@ vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
   this->CollectLOD = 0;
   this->PreDistributorSuppressorLOD = 0;
   this->DistributorLOD = 0;
+
+  this->UseCompositing = false;
+  this->UseOrderedCompositing = false;
 }
 
 //----------------------------------------------------------------------------
@@ -242,12 +245,6 @@ void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
   distributor->UpdateVTKObjects();
 }
 
-//----------------------------------------------------------------------------
-bool vtkSMSimpleParallelStrategy::UseCompositing()
-{
-  return (this->ViewHelperProxy && 
-    vtkSMSimpleParallelStrategyGetInt(this->ViewHelperProxy, "UseCompositing", 0));
-}
 
 //----------------------------------------------------------------------------
 void vtkSMSimpleParallelStrategy::UpdatePipeline()
@@ -255,7 +252,7 @@ void vtkSMSimpleParallelStrategy::UpdatePipeline()
   // Based on the compositing decision made by the render view,
   // decide where the data should be delivered for rendering.
 
-  bool usecompositing = this->UseCompositing();
+  bool usecompositing = this->GetUseCompositing();
   cout << "usecompositing: " << usecompositing << endl;
 
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -281,7 +278,7 @@ void vtkSMSimpleParallelStrategy::UpdateLODPipeline()
   // Based on the compositing decision made by the render view,
   // decide where the data should be delivered for rendering.
 
-  bool usecompositing = this->UseCompositing();
+  bool usecompositing = this->GetUseCompositing();
 
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->CollectLOD->GetProperty("MoveMode"));
@@ -306,8 +303,47 @@ void vtkSMSimpleParallelStrategy::SetUseOrderedCompositing(bool use)
     this->UseOrderedCompositing = use;
 
     // invalidate data, since distribution changed.
-    this->MarkModified(0);
+    this->InvalidatePipeline();
+    this->InvalidateLODPipeline();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSimpleParallelStrategy::SetUseCompositing(bool compositing)
+{
+  if (this->UseCompositing != compositing)
+    {
+    this->UseCompositing = compositing;
+    
+    this->InvalidatePipeline();
+    this->InvalidateLODPipeline();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSimpleParallelStrategy::ViewHelperModified()
+{
+  if (!this->ViewHelperProxy)
+    {
+    return;
+    }
+
+  vtkSMIntVectorProperty* ivp;
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ViewHelperProxy->GetProperty("UseCompositing"));
+  if (ivp && ivp->GetNumberOfElements() == 1)
+    {
+    this->SetUseCompositing(ivp->GetElement(0) == 1);
+    }
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ViewHelperProxy->GetProperty("UseOrderedCompositing"));
+  if (ivp && ivp->GetNumberOfElements() == 1)
+    {
+    this->SetUseOrderedCompositing(ivp->GetElement(0) == 1);
+    }
+
+  this->Superclass::ViewHelperModified();
 }
 
 //----------------------------------------------------------------------------
@@ -316,6 +352,7 @@ void vtkSMSimpleParallelStrategy::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "UseOrderedCompositing: " << this->UseOrderedCompositing
     << endl;
+  os << indent << "UseCompositing: " << this->UseCompositing << endl;
 }
 
 

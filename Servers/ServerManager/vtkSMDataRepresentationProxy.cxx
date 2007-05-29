@@ -54,7 +54,7 @@ protected:
 };
 
 
-vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.3");
 vtkCxxSetObjectMacro(vtkSMDataRepresentationProxy, InputProxy, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMDataRepresentationProxy::vtkSMDataRepresentationProxy()
@@ -88,6 +88,7 @@ vtkSMDataRepresentationProxy::~vtkSMDataRepresentationProxy()
 
   delete this->RepresentationStrategiesForSelection;
   this->RepresentationStrategiesForSelection = 0;
+
 
   this->Observer->SetTarget(0);
   this->Observer->Delete();
@@ -374,7 +375,6 @@ void vtkSMDataRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)
       iter->GetPointer()->MarkModified(modifiedProxy);
       }
     }
-
 
   this->Superclass::MarkModified(modifiedProxy);
 }
