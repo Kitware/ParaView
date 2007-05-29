@@ -1382,6 +1382,23 @@
          immediate_update="1"
          default_values="Some Default">
       </StringVectorProperty>
+      
+      <IntVectorProperty
+        name="WindowLocation"
+        command="SetWindowLocation"
+        number_of_elements="1"
+        default_values="0"
+        animateable="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="AnyLocation"/>
+          <Entry value="1" text="LowerLeftCorner"/>
+          <Entry value="2" text="LowerRightCorner"/>
+          <Entry value="3" text="LowerCenter"/>
+          <Entry value="4" text="UpperLeftCorner"/>
+          <Entry value="5" text="UpperRightCorner"/>
+          <Entry value="6" text="UpperCenter"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
 
       <ProxyProperty name="Renderer" command="SetRenderer">
         <ProxyGroupDomain name="groups">
@@ -2536,6 +2553,7 @@
           <Property name="Position2" />
           <Property name="PositionInfo" />
           <Property name="Position2Info" />
+          <Property name="WindowLocation" />
 
           <Property name="ScaledText"/>
           <Property name="Resizable"/>
@@ -3367,6 +3385,7 @@
           <Property name="Position2"/>
           <Property name="PositionInfo"/>
           <Property name="Position2Info"/>
+          <Property name="WindowLocation"/>
           <Property name="TextActor"/>
         </ExposedProperties>
       </SubProxy>
