@@ -161,6 +161,8 @@ SET(Kit_SRCS
   vtkSMDataRepresentationProxy.cxx
   vtkSMIceTCompositeViewProxy.cxx
   vtkSMIceTDesktopRenderViewProxy.cxx
+#  vtkSMMultiViewFactory.cxx
+  vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMOutlineRepresentationProxy.cxx
   vtkSMRenderViewProxy.cxx
   vtkSMRepresentationProxy.cxx
@@ -170,7 +172,6 @@ SET(Kit_SRCS
   vtkSMSurfaceRepresentationProxy.cxx
   vtkSMUniformGridVolumeRepresentationProxy.cxx
   vtkSMUnstructuredGridVolumeRepresentationProxy.cxx
-  vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMViewProxy.cxx
   )
 
@@ -206,7 +207,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMDataRepresentationProxy.cxx
   vtkSMRepresentationProxy.cxx
   vtkSMRepresentationStrategy.cxx
-  vtkSMCompositeRenderViewProxy.cxx
   ABSTRACT
   )
 
