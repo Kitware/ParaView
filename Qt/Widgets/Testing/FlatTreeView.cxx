@@ -54,10 +54,11 @@ void FlatTreeViewTests(pqFlatTreeView* w)
   w->setSelectionBehavior(pqFlatTreeView::SelectItems);
   w->setIconSize(24);
   
+  int searchDelay = 2 * QApplication::keyboardInputInterval();
   QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_A, Qt::ControlModifier, 20);
   QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_B, 0, 20);
-  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_C, 0, 20);
-  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_C, 0, 20);
+  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_C, 0, searchDelay);
+  QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_C, 0, searchDelay);
   QTestApp::keyClick(w, Qt::Key_Up, 0, 20);
   QTestApp::keyClick(w, Qt::Key_Up, 0, 20);
   QTestApp::keyClick(w, Qt::Key_Up, 0, 20);
