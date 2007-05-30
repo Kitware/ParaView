@@ -4276,6 +4276,20 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty
+        name="DisableOrderedCompositing"
+        command="SetDisableOrderedCompositing"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Ordered compositing is used if any representation added to the view
+          indicates that it requires ordered compositing. This flag can be set
+          to true to override this behaviour.
+        </Documentation>
+      </IntVectorProperty>
+
       <SubProxy>
         <Proxy name="Renderer" proxyname="IceTRenderer" proxygroup="renderers">
         </Proxy>
@@ -4377,6 +4391,20 @@
         <Documentation>
           Set the level for squirt compression to use when delivering rendered
           image to the client during interactive rendering.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="DisableOrderedCompositing"
+        command="SetDisableOrderedCompositing"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Ordered compositing is used if any representation added to the view
+          indicates that it requires ordered compositing. This flag can be set
+          to true to override this behaviour.
         </Documentation>
       </IntVectorProperty>
 
@@ -5485,6 +5513,7 @@
 
 
 </ServerManagerConfiguration>
+
 
 
 
