@@ -3531,12 +3531,12 @@ pqFlatTreeViewItem *pqFlatTreeView::getNextVisibleItem(
 pqFlatTreeViewItem *pqFlatTreeView::getPreviousVisibleItem(
     pqFlatTreeViewItem *item) const
 {
-  if(item && item->Parent && item->Parent != this->Root)
+  if(item && item->Parent)
     {
     int row = item->Parent->Items.indexOf(item);
     if(row == 0)
       {
-      return item->Parent;
+      return item->Parent == this->Root ? 0 : item->Parent;
       }
     else
       {
