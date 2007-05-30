@@ -44,16 +44,12 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMApplication.h"
 #include "vtkSMProperty.h"
 
-#include <unistd.h>
-
 // forward declare the initialize function
 static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-  //sleep(20);
-
   vtkPVMain::Initialize(&argc, &argv);
   // First create the correct options for this process
   vtkPVServerOptions* options = vtkPVServerOptions::New();
