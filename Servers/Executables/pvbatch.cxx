@@ -81,7 +81,7 @@ extern "C" void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVServerCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
 
-extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
+//extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
 
 //----------------------------------------------------------------------------
 void ParaViewInitializeInterpreter(vtkProcessModule* pm)
@@ -100,5 +100,5 @@ void ParaViewInitializeInterpreter(vtkProcessModule* pm)
   vtkParallelCS_Initialize(pm->GetInterpreter());
   vtkPVServerCommonCS_Initialize(pm->GetInterpreter());
   vtkPVFiltersCS_Initialize(pm->GetInterpreter());
-  vtkXdmfCS_Initialize(pm->GetInterpreter());
+//  vtkXdmfCS_Initialize(pm->GetInterpreter());
 }

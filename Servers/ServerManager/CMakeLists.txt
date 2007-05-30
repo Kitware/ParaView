@@ -147,8 +147,8 @@ SET(Kit_SRCS
   vtkSMUndoStack.cxx
   vtkSMUpdateInformationUndoElement.cxx
   vtkSMUpdateSuppressorProxy.cxx
-  vtkSMXDMFInformationHelper.cxx
-  vtkSMXDMFPropertyDomain.cxx
+#  vtkSMXDMFInformationHelper.cxx
+#  vtkSMXDMFPropertyDomain.cxx
   vtkSMVectorProperty.cxx
   vtkSMViewModuleProxy.cxx
   vtkSMWidgetRepresentationProxy.cxx

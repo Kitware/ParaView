@@ -75,7 +75,7 @@ extern "C" void vtkWidgetsCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVServerCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
+//extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
 
 // This is the client-server wrapper for our own "custom" VTK components
 extern "C" void csServer_Initialize(vtkClientServerInterpreter *);
@@ -97,7 +97,7 @@ void ParaViewInitializeInterpreter(vtkProcessModule* pm)
   vtkParallelCS_Initialize(pm->GetInterpreter());
   vtkPVServerCommonCS_Initialize(pm->GetInterpreter());
   vtkPVFiltersCS_Initialize(pm->GetInterpreter());
-  vtkXdmfCS_Initialize(pm->GetInterpreter());
+//  vtkXdmfCS_Initialize(pm->GetInterpreter());
   
   // Initialize "custom" VTK components
   csServer_Initialize(pm->GetInterpreter());

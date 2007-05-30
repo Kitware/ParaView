@@ -88,9 +88,9 @@ SUBDIRS(Wrapping)
 SUBDIRS(Common Filtering GenericFiltering Imaging Graphics IO Rendering Hybrid Parallel VolumeRendering Widgets)
 
 # Build vtkClientServer wrappers for Xdmf if it is available.
-IF(PARAVIEW_SOURCE_DIR OR ParaView_SOURCE_DIR)
-  SUBDIRS(Xdmf)
-ENDIF(PARAVIEW_SOURCE_DIR OR ParaView_SOURCE_DIR)
+#IF(PARAVIEW_SOURCE_DIR OR ParaView_SOURCE_DIR)
+#  SUBDIRS(Xdmf)
+#ENDIF(PARAVIEW_SOURCE_DIR OR ParaView_SOURCE_DIR)
 
 # Build vtkClientServer wrappers for Infovis if it is enabled
 IF(VTK_USE_INFOVIS)

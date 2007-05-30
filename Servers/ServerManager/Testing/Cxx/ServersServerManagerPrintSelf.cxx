@@ -58,8 +58,8 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMSubPropertyIterator.h"
 #include "vtkSMVectorProperty.h"
-#include "vtkSMXDMFInformationHelper.h"
-#include "vtkSMXDMFPropertyDomain.h"
+//#include "vtkSMXDMFInformationHelper.h"
+//#include "vtkSMXDMFPropertyDomain.h"
 #include "vtkSMXMLParser.h"
 
 // Display Proxies
@@ -135,8 +135,8 @@ int main(int , char *[])
   c = vtkSMStringVectorProperty::New(); c->Print( cout ); c->Delete();
   c = vtkSMSubPropertyIterator::New(); c->Print( cout ); c->Delete();
   c = vtkSMVectorProperty::New(); c->Print( cout ); c->Delete();
-  c = vtkSMXDMFInformationHelper::New(); c->Print( cout ); c->Delete();
-  c = vtkSMXDMFPropertyDomain::New(); c->Print( cout ); c->Delete();
+//  c = vtkSMXDMFInformationHelper::New(); c->Print( cout ); c->Delete();
+//  c = vtkSMXDMFPropertyDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMXMLParser::New(); c->Print( cout ); c->Delete();
 
   c = vtkSMDataObjectDisplayProxy::New(); c->Print( cout ); c->Delete();

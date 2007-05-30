@@ -57,7 +57,7 @@
 #include "vtkPVServerObject.h"
 #include "vtkPVServerSelectTimeSet.h"
 #include "vtkPVServerTimeSteps.h"
-#include "vtkPVServerXDMFParameters.h"
+//#include "vtkPVServerXDMFParameters.h"
 #include "vtkPVSummaryHelper.h"
 #include "vtkPVUpdateSuppressor.h"
 #include "vtkPVXMLElement.h"
@@ -133,7 +133,7 @@ int main(int , char *[])
   c = vtkPVServerFileListing::New(); c->Print(cout); c->Delete();
   c = vtkPVServerObject::New(); c->Print(cout); c->Delete();
   c = vtkPVServerSelectTimeSet::New(); c->Print(cout); c->Delete();
-  c = vtkPVServerXDMFParameters::New(); c->Print(cout); c->Delete();
+//  c = vtkPVServerXDMFParameters::New(); c->Print(cout); c->Delete();
   c = vtkPVSummaryHelper::New(); c->Print(cout); c->Delete();
   c = vtkPVUpdateSuppressor::New(); c->Print(cout); c->Delete();
   c = vtkPVXMLElement::New(); c->Print(cout); c->Delete();

@@ -91,10 +91,12 @@
           extensions="g"
           file_description="BYU Files">
   </Reader>
+<!--
   <Reader name="XdmfReader"
           extensions="xmf xdmf"
           file_description="Xdmf Reader">
   </Reader>
+-->
   <Reader name="pdbreader"
           extensions="pdb"
           file_description="Protein Data Bank Files">

@@ -343,7 +343,6 @@ ENDIF(PARAVIEW_USE_SYSTEM_HDF5)
 #########################################################################
 # Configure Xdmf
 
-
 SET(XDMF_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
 SET(XDMF_INSTALL_NO_RUNTIME ${PV_INSTALL_NO_RUNTIME})
 SET(XDMF_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
@@ -356,7 +355,7 @@ SET(XDMF_INCLUDE_DIRS
   "${ParaView_SOURCE_DIR}/Utilities/Xdmf/vtk"
   "${ParaView_BINARY_DIR}/Utilities/Xdmf/vtk")
 SET(PARAVIEW_LINK_XDMF ON)
-ADD_SUBDIRECTORY(Utilities/Xdmf)
+#ADD_SUBDIRECTORY(Utilities/Xdmf)
 
 
 #########################################################################

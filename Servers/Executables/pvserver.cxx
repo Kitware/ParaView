@@ -44,12 +44,16 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMApplication.h"
 #include "vtkSMProperty.h"
 
+#include <unistd.h>
+
 // forward declare the initialize function
 static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
+  //sleep(20);
+
   vtkPVMain::Initialize(&argc, &argv);
   // First create the correct options for this process
   vtkPVServerOptions* options = vtkPVServerOptions::New();
@@ -93,7 +97,7 @@ extern "C" void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVServerCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
 
-extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
+//extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
 
 //----------------------------------------------------------------------------
 void ParaViewInitializeInterpreter(vtkProcessModule* pm)
@@ -113,5 +117,5 @@ void ParaViewInitializeInterpreter(vtkProcessModule* pm)
   vtkParallelCS_Initialize(pm->GetInterpreter());
   vtkPVServerCommonCS_Initialize(pm->GetInterpreter());
   vtkPVFiltersCS_Initialize(pm->GetInterpreter());
-  vtkXdmfCS_Initialize(pm->GetInterpreter());
+//  vtkXdmfCS_Initialize(pm->GetInterpreter());
 }
