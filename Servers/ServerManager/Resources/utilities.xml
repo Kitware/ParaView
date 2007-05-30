@@ -2004,12 +2004,12 @@
 
       <!-- End of ExodusReaderHelper -->
     </Proxy>
-    
+#if 0
     <Proxy name="XdmfReaderHelper" class="">
-      <!--
+      <Documentation>
         This proxy helps apps with the interaction of
         interdependent properties in the XdmfReader 
-      -->
+      </Documentation>
      
       <StringVectorProperty
         name="GetDomainName"
@@ -2124,7 +2124,7 @@
      
       <!-- End of ExodusReaderHelper -->
     </Proxy>
-
+#endif
     <Proxy name="KdTreeManager" class="vtkKdTreeManager">
       <ProxyProperty  
         name="KdTree"

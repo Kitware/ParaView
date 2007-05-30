@@ -1794,7 +1794,7 @@
      </StringVectorProperty>
    <!-- End ImageReader -->
    </SourceProxy>
-
+#if 0
    <SourceProxy name="XdmfReader" 
                 class="vtkXdmfReader"
                 label="XDMF reader">
@@ -1966,6 +1966,7 @@
      </StringVectorProperty>
    <!-- End XdmfReader -->
    </SourceProxy>
+#endif
 
    <SourceProxy name="ExodusReader" 
                 class="vtkPExodusReader"
