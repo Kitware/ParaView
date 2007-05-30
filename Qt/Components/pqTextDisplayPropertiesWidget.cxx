@@ -251,9 +251,9 @@ void pqTextDisplayPropertiesWidget::onTextLocationChanged(bool checked)
    
     if(pPosition)
       {
-      double *pos = pPosition->GetElements();
-      this->Internal->Position1X->setValue(pos[0]);
-      this->Internal->Position1Y->setValue(pos[1]);
+      double *textPos = pPosition->GetElements();
+      this->Internal->Position1X->setValue(textPos[0]);
+      this->Internal->Position1Y->setValue(textPos[1]);
       }
     }
 
