@@ -61,6 +61,7 @@ ENDIF (PVServerManagerTestData)
 SET(PY_TESTS_NO_BASELINE
   CSVWriterReader
   ProxyManager
+  SMPropertyAdaptor
 )
 
 IF (PVServerManagerTestData)
