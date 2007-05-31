@@ -35,7 +35,6 @@ void do_store(vtkClientServerStream& css)
   css << true;
   css << id;
   Help<char>::Store(css);
-  Help<char>::Store(css);
   Help<short>::Store(css);
   Help<int>::Store(css);
   Help<long>::Store(css);
@@ -92,7 +91,6 @@ bool do_check(vtkClientServerStream& css)
     }
   }
   {
-  if(!Help<char>::Check(css, arg)) { return false; }
   if(!Help<char>::Check(css, arg)) { return false; }
   if(!Help<short>::Check(css, arg)) { return false; }
   if(!Help<int>::Check(css, arg)) { return false; }
