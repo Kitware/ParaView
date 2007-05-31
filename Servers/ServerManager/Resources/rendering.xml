@@ -5531,6 +5531,25 @@
       <!-- End of ClientDeliveryRepresentation -->
     </ClientDeliveryRepresentationProxy>
 
+    <AxesRepresentationProxy name="Axes" class="vtkAxes" >
+      <SubProxy>
+        <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Prop" proxygroup="props" proxyname="Actor">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="Position" />
+          <Property name="Scale" />
+          <Property name="Origin" />
+          <Property name="Pickable" />
+        </ExposedProperties>
+      </SubProxy>
+    </AxesRepresentationProxy>
+
   </ProxyGroup>
 
 

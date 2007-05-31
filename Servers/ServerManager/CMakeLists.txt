@@ -162,6 +162,7 @@ SET(Kit_SRCS
   vtkSMIceTCompositeViewProxy.cxx
   vtkSMIceTDesktopRenderViewProxy.cxx
 
+  vtkSMAxesRepresentationProxy.cxx
   vtkSMClientDeliveryRepresentationProxy.cxx
   vtkSMClientDeliveryStrategyProxy.cxx
   vtkSMMultiViewFactory.cxx
