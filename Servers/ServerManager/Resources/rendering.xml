@@ -3932,7 +3932,33 @@
       
       <!-- End of PolyDataParallelStrategy -->
     </SimpleParallelStrategy>
-    
+
+    <ClientDeliveryStrategyProxy name="ClientDeliveryStrategy"
+      base_proxygroup="strategies"
+      base_proxyname="PolyDataStrategy">
+
+      <SubProxy>
+        <Proxy name="Collect" proxygroup="filters" proxyname="ClientServerMoveData">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="OutputDataType" />
+        </ExposedProperties>
+      </SubProxy>
+      
+      <SubProxy>
+        <Proxy name="PostProcessor"
+          proxygroup="filters" proxyname="PolyLineToRectilinearGrid">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="CollectLOD" proxygroup="filters" proxyname="ClientServerMoveData">
+        </Proxy>
+      </SubProxy>
+      
+      <!-- End of ClientDeliveryStrategy -->
+    </ClientDeliveryStrategyProxy>
+
     <SimpleStrategy name="UnstructuredGridStrategy" 
       base_proxygroup="strategies"
       base_proxyname="PolyDataStrategy" >
@@ -4848,22 +4874,6 @@
         </ExposedProperties>
       </SubProxy>
 
-      <SubProxy>
-        <!-- This is the helper that assures that the material xml is provided
-          to the servers from the client, when needed. Note that this is 
-          a client only proxy -->
-        <MaterialLoaderProxy name="MaterialLoader" >
-          <StringVectorProperty name="Material"
-            command="LoadMaterial"
-            number_of_elements="1"
-            update_self="1">
-          </StringVectorProperty>
-        </MaterialLoaderProxy>
-        <ExposedProperties>
-          <Property name="Material" />
-        </ExposedProperties>
-      </SubProxy>
-
     <!-- End of OutlineRepresentation -->
     </OutlineRepresentationProxy>
 
@@ -5019,22 +5029,6 @@
         </ExposedProperties>
       </SubProxy>
 
-      <SubProxy>
-        <!-- This is the helper that assures that the material xml is provided
-          to the servers from the client, when needed. Note that this is 
-          a client only proxy -->
-        <MaterialLoaderProxy name="MaterialLoader" >
-          <StringVectorProperty name="Material"
-            command="LoadMaterial"
-            number_of_elements="1"
-            update_self="1">
-          </StringVectorProperty>
-        </MaterialLoaderProxy>
-        <ExposedProperties>
-          <Property name="Material" />
-        </ExposedProperties>
-      </SubProxy>
-
     <!-- End of UniformGridVolumeRepresentation -->
     </UniformGridVolumeRepresentationProxy>
 
@@ -5137,22 +5131,6 @@
                     exposed_name="SelectionSpecularColor" />
           <Property name="SpecularPower"
                     exposed_name="SelectionSpecularPower" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!-- This is the helper that assures that the material xml is provided
-          to the servers from the client, when needed. Note that this is 
-          a client only proxy -->
-        <MaterialLoaderProxy name="MaterialLoader" >
-          <StringVectorProperty name="Material"
-            command="LoadMaterial"
-            number_of_elements="1"
-            update_self="1">
-          </StringVectorProperty>
-        </MaterialLoaderProxy>
-        <ExposedProperties>
-          <Property name="Material" />
         </ExposedProperties>
       </SubProxy>
 
@@ -5471,22 +5449,6 @@
       </SubProxy>
 
       <SubProxy>
-        <!-- This is the helper that assures that the material xml is provided
-          to the servers from the client, when needed. Note that this is 
-          a client only proxy -->
-        <MaterialLoaderProxy name="MaterialLoader" >
-          <StringVectorProperty name="Material"
-            command="LoadMaterial"
-            number_of_elements="1"
-            update_self="1">
-          </StringVectorProperty>
-        </MaterialLoaderProxy>
-        <ExposedProperties>
-          <Property name="Material" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
         <Proxy name="Prop"
           proxygroup="props" proxyname="WidgetRepresentation">
         </Proxy>
@@ -5507,6 +5469,67 @@
         </ExposedProperties>
       </SubProxy>
     </NewWidgetRepresentationProxy>
+
+    <ClientDeliveryRepresentationProxy name="ClientDeliveryRepresentation">
+      <InputProperty name="Input"
+        command="NotUsed"
+        />
+      
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1"
+        animateable="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ReductionType"
+        command="SetReductionType"
+        default_values="3"
+        number_of_elements="1"
+        update_self="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="ADD" />
+          <Entry value="1" text="POLYDATA_APPEND" />
+          <Entry value="2" text="UNSTRUCTURED_APPEND" />
+          <Entry value="3" text="FIRST_NODE_ONLY" />
+          <Entry value="4" text="RECTILINEAR_GRID_APPEND" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        is_internal="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <SubProxy>
+        <Proxy name="Reduce" proxygroup="filters" proxyname="ReductionFilter">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="PreGatherHelper" />
+          <Property name="PostGatherHelper" />
+          <Property name="PassThrough" />
+          <Property name="GenerateProcessIds" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="ExtractSelection"
+          proxygroup="filters" proxyname="ExtractSelection" />
+        <ExposedProperties>
+          <Property name="Selection" />
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of ClientDeliveryRepresentation -->
+    </ClientDeliveryRepresentationProxy>
 
   </ProxyGroup>
 
