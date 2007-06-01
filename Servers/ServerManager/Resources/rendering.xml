@@ -5247,229 +5247,6 @@
       <!-- End of UnstructuredGridVolumeRepresentation -->
     </UnstructuredGridVolumeRepresentationProxy>
 
-    <NewWidgetRepresentationProxy name="NewWidgetRepresentation">
-      <InputProperty name="Input"
-        command="NotUsed"
-        />
-
-      <DoubleVectorProperty name="UpdateTime"
-        command="SetUpdateTime"
-        update_self="1"
-        is_internal="1"
-        immediate_update="1"
-        number_of_elements="1"
-        default_values="none">
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
-
-      <IntVectorProperty name="SelectionVisibility"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-
-
-      <SubProxy>
-        <!-- 
-          Geometry filter is used to conver non-polydata input to polydata.
-          It is also used to convert poly data to triangle strips when
-          requested.
-        -->
-        <Proxy name="GeometryFilter"
-          proxygroup="filters" proxyname="GeometryFilter" />
-        <ExposedProperties>
-          <Property name="UseStrips" />
-          <Property name="ForceStrips" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!-- 
-          Mapper for high-res geometry.
-        -->
-        <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper" />
-        <ExposedProperties>
-          <Property name="LookupTable" />
-          <Property name="ScalarVisibility" />
-          <Property name="ColorMode" />
-          <Property name="MapScalars" />
-          <Property name="ImmediateModeRendering" />
-          <Property name="InterpolateScalarsBeforeMapping" />
-          <Property name="UseLookupTableScalarRange" />
-          <Property name="ScalarMode" />
-          <Property name="ColorArray" />
-          <Property name="ClippingPlanes" />
-          <Property name="NumberOfSubPieces" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!-- 
-          Mapper for low-res geometry. It shares all its properties with the
-          high-res mapper (except input ofcourse).
-        -->
-        <Proxy name="LODMapper"
-          proxygroup="mappers" proxyname="PolyDataMapper" />
-        <ShareProperties subproxy="Mapper" >
-          <Exception name="Input" />
-        </ShareProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!--
-          Prop3D that gets added to the 3D renderer 
-        -->
-        <Proxy name="Prop3D" proxygroup="props" proxyname="LODActor" />
-        <ExposedProperties>
-          <Property name="Orientation" />
-          <Property name="Origin" />
-          <Property name="Pickable" />
-          <Property name="Position" />
-          <Property name="RenderModuleHelper" exposed_name="ViewHelper" />
-          <Property name="Scale" />
-          <Property name="Visibility" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!--
-          Property for the vtkProp.
-        -->
-        <Proxy name="Property" proxygroup="properties" proxyname="Property" />
-        <ExposedProperties>
-          <Property name="Ambient" />
-          <Property name="AmbientColor" />
-          <Property name="Color" />
-          <Property name="Diffuse" />
-          <Property name="DiffuseColor" />
-          <Property name="Interpolation" />
-          <Property name="LineWidth" />
-          <Property name="Opacity" />
-          <Property name="PointSize" />
-          <Property name="Representation" />
-          <Property name="Shading" />
-          <Property name="SpecularColor" />
-          <Property name="SpecularPower" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="ExtractSelection"
-          proxygroup="filters" proxyname="ExtractSelection" />
-        <ExposedProperties>
-          <Property name="Selection" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!-- GeometryFilter for selection pipeline -->
-        <Proxy name="SelectionGeometryFilter"
-          proxygroup="filters" proxyname="GeometryFilter" />
-        <ShareProperties subproxy="GeometryFilter">
-          <Exception name="Input" />
-        </ShareProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!-- 
-          Mapper for selection 
-        -->
-        <Proxy name="SelectionMapper"
-          proxygroup="mappers" proxyname="PolyDataMapper" />
-      </SubProxy>
-
-      <SubProxy>
-        <!-- 
-          Mapper for low-res selection. It shares all its properties with the
-          high-res mapper (except input ofcourse).
-        -->
-        <Proxy name="SelectionLODMapper"
-          proxygroup="mappers" proxyname="PolyDataMapper" />
-        <ShareProperties subproxy="SelectionMapper" >
-          <Exception name="Input" />
-        </ShareProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!--
-          SelectionProp3D that gets added to the 3D renderer 
-        -->
-        <Proxy name="SelectionProp3D" proxygroup="props" proxyname="LODActor" />
-        <ShareProperties subproxy="Prop3D">
-          <!-- 
-            We are simply linking RenderModuleHelper property.
-            All other properties are not shared 
-          -->
-          <Exception name="LODMapper" />
-          <Exception name="Mapper" />
-          <Exception name="Orientation" />
-          <Exception name="Origin" />
-          <Exception name="Pickable" />
-          <Exception name="Position" />
-          <Exception name="Property" />
-          <Exception name="Scale" />
-          <Exception name="Texture" />
-          <Exception name="Visibility" />
-        </ShareProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!--
-          Property for the vtkProp.
-        -->
-        <Proxy name="SelectionProperty" proxygroup="properties" proxyname="Property" />
-        <ExposedProperties>
-          <Property name="Ambient"
-                    exposed_name="SelectionAmbient" />
-          <Property name="AmbientColor"
-                    exposed_name="SelectionAmbientColor" />
-          <Property name="Color"
-                    exposed_name="SelectionColor" />
-          <Property name="Diffuse"
-                    exposed_name="SelectionDiffuse" />
-          <Property name="DiffuseColor"
-                    exposed_name="SelectionDiffuseColor" />
-          <Property name="Interpolation"
-                    exposed_name="SelectionInterpolation" />
-          <Property name="LineWidth"
-                    exposed_name="SelectionLineWidth" />
-          <Property name="Opacity"
-                    exposed_name="SelectionOpacity" />
-          <Property name="PointSize"
-                    exposed_name="SelectionPointSize" />
-          <Property name="Representation"
-                    exposed_name="SelectionRepresentation" />
-          <Property name="Shading"
-                    exposed_name="SelectionShading" />
-          <Property name="SpecularColor"
-                    exposed_name="SelectionSpecularColor" />
-          <Property name="SpecularPower"
-                    exposed_name="SelectionSpecularPower" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="Prop"
-          proxygroup="props" proxyname="WidgetRepresentation">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="Renderer" />
-          <Property name="PlaceFactor" />
-          <Property name="HandleSize" />
-          <Property name="NeedToRender" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="Widget"
-          proxygroup="3d_widgets" proxyname="AbstractWidget">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="Enabled" />
-        </ExposedProperties>
-      </SubProxy>
-    </NewWidgetRepresentationProxy>
-
     <ClientDeliveryRepresentationProxy name="ClientDeliveryRepresentation">
       <InputProperty name="Input"
         command="NotUsed"
@@ -5549,6 +5326,148 @@
         </ExposedProperties>
       </SubProxy>
     </AxesRepresentationProxy>
+    
+    <NewWidgetRepresentationProxy name="HandleWidgetRepresentation">
+      <SubProxy>
+        <Proxy name="Prop"
+          proxygroup="props" proxyname="HandleRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="WorldPositionInfo" />
+          <Property name="WorldPosition" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Widget"
+          proxygroup="3d_widgets" proxyname="HandleWidget">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Enabled" />
+        </ExposedProperties>
+      </SubProxy>
+    </NewWidgetRepresentationProxy>
+
+    <NewWidgetRepresentationProxy name="PointSourceWidgetRepresentation"
+      base_proxygroup="representations" base_proxyname="HandleWidgetRepresentation">
+      <!-- 
+        This is same as handle widget except that it provides
+        dummy properties for the radius/number of points in a point 
+        source. 
+      -->
+      <DoubleVectorProperty
+        name="Radius"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="NumberOfPoints"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+    </NewWidgetRepresentationProxy>
+
+    <NewWidgetRepresentationProxy name="LineWidgetRepresentation">
+      <SubProxy>
+        <Proxy name="Prop"
+          proxygroup="props" proxyname="LineRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="Point1WorldPositionInfo" />
+          <Property name="Point1WorldPosition" />
+          <Property name="Point2WorldPositionInfo" />
+          <Property name="Point2WorldPosition" />
+          <Property name="PlaceWidget" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Widget"
+          proxygroup="3d_widgets" proxyname="LineWidget2">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Enabled" />
+          <Property name="ProcessEvents" />
+        </ExposedProperties>
+      </SubProxy>
+    </NewWidgetRepresentationProxy>
+
+    <NewWidgetRepresentationProxy name="LineSourceWidgetRepresentation"
+      base_proxygroup="representations" base_proxyname="LineWidgetRepresentation">
+      <!-- 
+        This is same as LineWidgetRepresentation except that it provides
+        dummy property for the resolution for the line source. 
+      -->
+      <IntVectorProperty
+        name="Resolution"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+    </NewWidgetRepresentationProxy>
+
+    <NewWidgetRepresentationProxy name="ImplicitPlaneWidgetRepresentation">
+      <SubProxy>
+        <Proxy name="Prop"
+          proxygroup="props" proxyname="ImplicitPlaneRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="DrawPlane" />
+          <Property name="OriginInfo" />
+          <Property name="Origin" />
+          <Property name="NormalInfo" />
+          <Property name="Normal" />
+          <Property name="PlaceWidget" />
+          <Property name="Visibility" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Widget"
+          proxygroup="3d_widgets" proxyname="ImplicitPlaneWidget2">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Enabled" />
+        </ExposedProperties>
+      </SubProxy>
+    </NewWidgetRepresentationProxy>
+
+    <NewWidgetRepresentationProxy name="SliderWidgetRepresentation">
+      <IntVectorProperty
+        name="Enabled"
+        command="SetEnabled"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Prop"
+          proxygroup="props" proxyname="SliderRepresentation3D">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="ValueInfo" />
+          <Property name="Value" />
+          <Property name="Point1" />
+          <Property name="Point2" />
+          <Property name="MinimumValue" />
+          <Property name="MaximumValue" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Widget"
+          proxygroup="3d_widgets" proxyname="SliderWidget">
+        </Proxy>
+      </SubProxy>
+      <!--- End of SliderWidgetRepresentaion -->
+    </NewWidgetRepresentationProxy>
 
   </ProxyGroup>
 
