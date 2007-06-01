@@ -34,7 +34,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy, "1.2");
 
 class vtkSMScalarBarWidgetRepresentationObserver : public vtkCommand
 {
@@ -56,7 +56,7 @@ public:
 vtkSMScalarBarWidgetRepresentationProxy::vtkSMScalarBarWidgetRepresentationProxy()
 {
   this->ActorProxy = 0;
-  this->Widget = 0;
+  this->Widget = vtkScalarBarWidget::New();
   this->Observer = vtkSMScalarBarWidgetRepresentationObserver::New();
   this->Observer->Proxy = this;
   this->ViewProxy = 0;
@@ -67,6 +67,7 @@ vtkSMScalarBarWidgetRepresentationProxy::vtkSMScalarBarWidgetRepresentationProxy
 vtkSMScalarBarWidgetRepresentationProxy::~vtkSMScalarBarWidgetRepresentationProxy()
 {
   this->ActorProxy = 0;
+  this->Widget->Delete();
   this->Widget = 0;
   this->Observer->Delete();
   this->Observer = 0;
