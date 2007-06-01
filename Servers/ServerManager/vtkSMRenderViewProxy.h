@@ -63,6 +63,7 @@ public:
   vtkGetObjectMacro(Interactor, vtkPVGenericRenderWindowInteractor);
   vtkGetObjectMacro(RendererProxy, vtkSMProxy);
   vtkGetObjectMacro(Renderer2DProxy, vtkSMProxy);
+  vtkGetObjectMacro(InteractorProxy, vtkSMProxy);
   
   // Description:
   // Convenience method to set the background color.

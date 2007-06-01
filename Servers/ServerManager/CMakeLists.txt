@@ -177,6 +177,7 @@ SET(Kit_SRCS
   vtkSMUniformGridVolumeRepresentationProxy.cxx
   vtkSMUnstructuredGridVolumeRepresentationProxy.cxx
   vtkSMViewProxy.cxx
+  vtkSMScalarBarWidgetRepresentationProxy.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS
