@@ -26,6 +26,7 @@
 #include "vtkSMRepresentationProxy.h"
 class vtkSMViewProxy;
 class vtkScalarBarWidget;
+class vtkSMScalarBarWidgetRepresentationObserver;
 
 class VTK_EXPORT vtkSMScalarBarWidgetRepresentationProxy : 
   public vtkSMRepresentationProxy
