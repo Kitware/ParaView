@@ -18,7 +18,6 @@
 #include "vtkCaveRenderManager.h"
 #include "vtkCleanUnstructuredGrid.h"
 #include "vtkCompleteArrays.h"
-#include "vtkDataSetSubdivisionAlgorithm.h"
 #include "vtkHierarchicalFractal.h"
 #include "vtkImageCompressor.h"
 #include "vtkIntegrateAttributes.h"
@@ -64,10 +63,7 @@
 #include "vtkPVXMLParser.h"
 #include "vtkSpyPlotReader.h"
 #include "vtkSquirtCompressor.h"
-#include "vtkStreamingTessellator.h"
-#include "vtkSubdivisionAlgorithm.h"
 #include "vtkSurfaceVectors.h"
-#include "vtkTessellatorFilter.h"
 #include "vtkUpdateSuppressorPipeline.h"
 #include "vtkVRMLSource.h"
 #include "vtkXMLCollectionReader.h"
@@ -97,7 +93,6 @@ int main(int , char *[])
   c = vtkCaveRenderManager::New(); c->Print(cout); c->Delete();
   c = vtkCleanUnstructuredGrid::New(); c->Print(cout); c->Delete();
   c = vtkCompleteArrays::New(); c->Print(cout); c->Delete();
-  c = vtkDataSetSubdivisionAlgorithm::New(); c->Print(cout); c->Delete();
   c = vtkHierarchicalFractal::New(); c->Print(cout); c->Delete();
   c = vtkImageCompressor::New(); c->Print(cout); c->Delete();
   c = vtkIntegrateAttributes::New(); c->Print(cout); c->Delete();
@@ -140,9 +135,6 @@ int main(int , char *[])
   c = vtkPVXMLParser::New(); c->Print(cout); c->Delete();
   c = vtkSpyPlotReader::New(); c->Print(cout); c->Delete();
   c = vtkSquirtCompressor::New(); c->Print(cout); c->Delete();
-  c = vtkStreamingTessellator::New(); c->Print(cout); c->Delete();
-  c = vtkSubdivisionAlgorithm::New(); c->Print(cout); c->Delete();
-  c = vtkTessellatorFilter::New(); c->Print(cout); c->Delete();
   c = vtkUpdateSuppressorPipeline::New(); c->Print(cout); c->Delete();
   c = vtkVRMLSource::New(); c->Print(cout); c->Delete();
   c = vtkXMLCollectionReader::New(); c->Print(cout); c->Delete();

@@ -24,7 +24,6 @@ SET(Filters_SRCS
   vtkCSVReader.cxx
   vtkCSVWriter.cxx
 #  vtkDataAnalysisFilter.cxx
-  vtkDataSetSubdivisionAlgorithm.cxx
   vtkDesktopDeliveryClient.cxx
   vtkDesktopDeliveryServer.cxx
   vtkExtractHistogram.cxx
@@ -102,13 +101,10 @@ SET(Filters_SRCS
   vtkSpyPlotReaderMap.cxx
   vtkSpyPlotUniReader.cxx
   vtkSquirtCompressor.cxx
-  vtkStreamingTessellator.cxx
-  vtkSubdivisionAlgorithm.cxx
   vtkSurfaceVectors.cxx
 #  vtkTemporalCacheFilter.cxx
 #  vtkTemporalPickFilter.cxx
 #  vtkTemporalProbeFilter.cxx
-  vtkTessellatorFilter.cxx
   vtkTimeToTextConvertor.cxx
   vtkTrackballPan.cxx
   vtkTransferFunctionEditorRepresentation.cxx
@@ -145,7 +141,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkImageCompressor.cxx
   vtkPVRenderViewProxy.cxx
   vtkPVJoystickFly.cxx
-  vtkSubdivisionAlgorithm.cxx 
   vtkTransferFunctionEditorRepresentation.cxx
   vtkTransferFunctionEditorRepresentation1D.cxx
   vtkTransferFunctionEditorWidget.cxx
