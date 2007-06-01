@@ -28,7 +28,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
 {
@@ -184,8 +184,7 @@ void vtkSMClientDeliveryRepresentationProxy::SetReductionType(int type)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMClientDeliveryRepresentationProxy::SetInputInternal(
-  vtkSMProxy* sinput)
+void vtkSMClientDeliveryRepresentationProxy::SetInputInternal()
 {
   vtkSMSourceProxy* input = this->GetInputProxy();
   if(!input)
@@ -251,7 +250,7 @@ void vtkSMClientDeliveryRepresentationProxy::AddInput(vtkSMSourceProxy* input,
   const char* method, int hasMultipleInputs)
 {
   this->Superclass::AddInput(input, method, hasMultipleInputs);
-  this->SetInputInternal(input);
+  this->SetInputInternal();
 }
 
 //----------------------------------------------------------------------------

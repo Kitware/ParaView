@@ -24,7 +24,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryStrategyProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryStrategyProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMClientDeliveryStrategyProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryStrategyProxy::vtkSMClientDeliveryStrategyProxy()
 {
@@ -101,8 +101,6 @@ void vtkSMClientDeliveryStrategyProxy::CreatePipelineInternal(
   this->Connect(input, collect);
 
   // Now we need to set up some default parameters on these filters.
-
-  vtkSMInputProperty* ip = 0;
 
   stream
     << vtkClientServerStream::Invoke

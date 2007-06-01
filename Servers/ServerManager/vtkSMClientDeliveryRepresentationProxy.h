@@ -76,7 +76,7 @@ protected:
   // initialization.
   virtual bool EndCreateVTKObjects();
 
-  void SetInputInternal(vtkSMProxy* input);
+  void SetInputInternal();
   bool SetupStrategy();
 
   vtkSMProxy* ReduceProxy;

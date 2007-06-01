@@ -48,7 +48,7 @@ protected:
   // Called when a representation is added to a view. 
   // Returns true on success.
   // Currently a representation can be added to only one view.
-  virtual bool AddToView(vtkSMViewProxy* view) 
+  virtual bool AddToView(vtkSMViewProxy* ) 
     { return true; }
 
 private:
