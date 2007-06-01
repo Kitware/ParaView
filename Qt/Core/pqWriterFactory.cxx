@@ -150,8 +150,15 @@ pqWriterFactory::pqWriterFactory(QObject* _parent/*=NULL*/) : QObject(_parent)
 {
   this->Internal = new pqWriterFactoryInternal;
   this->loadFileTypes();
+  
+  // watch for both types of plugins
+  // the client vs. server load order is not defined
+  // and we require both before adding a new reader to the GUI
   QObject::connect(pqApplicationCore::instance()->getPluginManager(),
                    SIGNAL(guiPluginLoaded()),
+                   this, SLOT(loadFileTypes()));
+  QObject::connect(pqApplicationCore::instance()->getPluginManager(),
+                   SIGNAL(serverManagerExtensionLoaded()),
                    this, SLOT(loadFileTypes()));
 }
 
