@@ -5469,6 +5469,48 @@
       <!--- End of SliderWidgetRepresentaion -->
     </NewWidgetRepresentationProxy>
 
+    <ScalarBarWidgetRepresentationProxy name="ScalarBarWidgetRepresentation" class="vtkScalarBarWidget">
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Prop2D"
+          proxygroup="annotations"
+          proxyname="ScalarBarActor">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="LookupTable" />
+          <Property name="Orientation" />
+          <Property name="Position" />
+          <Property name="Position2" />
+          <Property name="Title" />
+          <Property name="LabelFormat" />
+          <Property name="NumberOfLabels" />
+          <!-- properties for Label -->
+          <Property name="LabelColor"     />
+          <Property name="LabelOpacity"   />
+          <Property name="LabelFontFamily"/>
+          <Property name="LabelBold"      />
+          <Property name="LabelItalic"    />
+          <Property name="LabelShadow"    />
+          <Property name="LabelFontSize"  />
+          <!-- properties for Title -->
+          <Property name="TitleColor"     />
+          <Property name="TitleOpacity"   />
+          <Property name="TitleFontFamily"/>
+          <Property name="TitleBold"      />
+          <Property name="TitleItalic"    />
+          <Property name="TitleShadow"    />
+          <Property name="TitleFontSize"  />
+        </ExposedProperties>
+      </SubProxy>
+    </ScalarBarWidgetRepresentationProxy>
+
   </ProxyGroup>
 
 
