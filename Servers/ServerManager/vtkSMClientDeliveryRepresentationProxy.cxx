@@ -28,7 +28,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
 {
@@ -194,7 +194,6 @@ void vtkSMClientDeliveryRepresentationProxy::SetInputInternal()
 
   vtkClientServerStream stream;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkSMInputProperty* ip = 0;
 
   if (this->ReduceProxy)
     {
