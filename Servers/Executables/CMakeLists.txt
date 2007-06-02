@@ -31,26 +31,6 @@ FOREACH(pvexe ${PV_EXE_LIST})
   ENDIF(NOT PV_INSTALL_NO_RUNTIME)
 ENDFOREACH(pvexe)
 
-# Optionally add pvbatch executable.
-IF (PARAVIEW_BUILD_GUI)
-  ADD_EXECUTABLE(pvbatch${PV_EXE_SUFFIX} pvbatch.cxx)
-  TARGET_LINK_LIBRARIES(pvbatch${PV_EXE_SUFFIX} ${LIBS} 
-    vtkPVServerManagerTCL 
-    vtkPVServerCommonTCL
-    vtkCommonTCL)
-
-  IF(NOT PV_INSTALL_NO_RUNTIME)
-    IF(PV_INSTALL_HAS_CMAKE_24)
-      INSTALL(TARGETS pvbatch${PV_EXE_SUFFIX} 
-        DESTINATION ${PV_EXE_INSTALL_CM24}
-        COMPONENT Runtime)
-    ELSE(PV_INSTALL_HAS_CMAKE_24)
-      INSTALL_TARGETS(${PV_EXE_INSTALL} pvbatch${PV_EXE_SUFFIX})
-    ENDIF(PV_INSTALL_HAS_CMAKE_24)
-  ENDIF(NOT PV_INSTALL_NO_RUNTIME)
-  SET(PV_EXE_LIST ${PV_EXE_LIST} pvbatch)
-ENDIF (PARAVIEW_BUILD_GUI)
-
 # Add shared link forwarding executables if necessary.
 IF(PV_NEED_SHARED_FORWARD)
   FOREACH(pvexe ${PV_EXE_LIST})
