@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkPVConfig.h"
 
-#include "vtkAttributeEditor.h"
 #include "vtkCaveRenderManager.h"
 #include "vtkCleanUnstructuredGrid.h"
 #include "vtkCompleteArrays.h"
@@ -89,7 +88,6 @@
 int main(int , char *[])
 {
   vtkObject *c;
-  c = vtkAttributeEditor::New(); c->Print(cout); c->Delete();
   c = vtkCaveRenderManager::New(); c->Print(cout); c->Delete();
   c = vtkCleanUnstructuredGrid::New(); c->Print(cout); c->Delete();
   c = vtkCompleteArrays::New(); c->Print(cout); c->Delete();

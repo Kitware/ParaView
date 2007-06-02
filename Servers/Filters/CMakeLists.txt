@@ -12,7 +12,6 @@ ENDIF(PARAVIEW_ENABLE_PYTHON)
 SET(Filters_SRCS
   vtkAppendRectilinearGrid.cxx
   vtkAttributeDataReductionFilter.cxx
-  vtkAttributeEditor.cxx
   vtkCameraManipulator.cxx
   vtkCameraManipulatorGUIHelper.cxx
   vtkCaveRenderManager.cxx
