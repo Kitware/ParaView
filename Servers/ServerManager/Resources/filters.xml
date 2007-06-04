@@ -3037,6 +3037,18 @@ The Tessellate filter tessellates cells with nonlinear geometry and/or scalar fi
        </Documentation>
      </IntVectorProperty>
 
+     <IntVectorProperty 
+        name="MergePoints" 
+        command="SetMergePoints" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If the value of this property is set to 1, coincident vertices will be merged after tessellation has occurred. Only geometry is considered during the merge and the first vertex encountered is the one whose point attributes will be used. Any discontinuities in point fields will be lost. On the other hand, many operations, such as streamline generation, require coincident vertices to be merged.
+         Toggle whether to merge coincident vertices.
+       </Documentation>
+     </IntVectorProperty>
+
      <Property
         name="ResetFieldCriteria"
         command="ResetFieldCriteria"
