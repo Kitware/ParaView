@@ -1,4 +1,4 @@
-# Test the CSV writer and reader.
+# Test the vtkSMPropertyAdaptor.
 
 import SMPythonTesting
 import os
