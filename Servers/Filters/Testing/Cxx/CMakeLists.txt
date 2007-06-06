@@ -32,13 +32,14 @@ ENDFOREACH(name)
 
 IF (VTK_USE_DISPLAY)
   SET(ServersFiltersImage_SRCS
+    TestTransferFunctionEditor
     )
   FOREACH(name ${ServersFiltersImage_SRCS})
     ADD_EXECUTABLE(${name} ${name}.cxx)
     ADD_TEST(${name} ${CXX_TEST_PATH}/${name} ${name}
       -D ${VTK_DATA_ROOT}
       -T ${ParaView_BINARY_DIR}/Testing/Temporary
-      -V ${ParaView_SOURCE_DIR}/Data/Baseline/${name}.png
+      -V ${PARAVIEW_DATA_ROOT}/Baseline/${name}.png
       )
     TARGET_LINK_LIBRARIES(${name} vtkPVFilters)
   ENDFOREACH(name)
