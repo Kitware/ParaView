@@ -48,8 +48,13 @@ protected:
   // Called when a representation is added to a view. 
   // Returns true on success.
   // Currently a representation can be added to only one view.
-  virtual bool AddToView(vtkSMViewProxy* ) 
-    { return true; }
+  virtual bool AddToView(vtkSMViewProxy* view);
+
+  // Description:
+  // Called to remove a representation from a view.
+  // Returns true on success.
+  // Currently a representation can be added to only one view.
+  virtual bool RemoveFromView(vtkSMViewProxy* view);
 
 private:
   vtkSMAxesRepresentationProxy(const vtkSMAxesRepresentationProxy&); // Not implemented

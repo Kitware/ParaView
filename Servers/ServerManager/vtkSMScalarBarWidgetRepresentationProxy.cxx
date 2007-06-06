@@ -34,7 +34,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy, "1.3");
 
 class vtkSMScalarBarWidgetRepresentationObserver : public vtkCommand
 {
@@ -60,7 +60,7 @@ vtkSMScalarBarWidgetRepresentationProxy::vtkSMScalarBarWidgetRepresentationProxy
   this->Observer = vtkSMScalarBarWidgetRepresentationObserver::New();
   this->Observer->Proxy = this;
   this->ViewProxy = 0;
-  this->Visibility = 0;
+  this->Visibility = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -84,15 +84,9 @@ bool vtkSMScalarBarWidgetRepresentationProxy::AddToView(vtkSMViewProxy* view)
     return false;
     }
 
-  vtkSMProxy* p = this->GetSubProxy("Prop");
-  if (p)
+  if (this->ActorProxy)
     {
-    renderView->AddPropToRenderer(p);
-    }
-  p = this->GetSubProxy("Prop2D");
-  if (p)
-    {
-    renderView->AddPropToRenderer(p);
+    renderView->AddPropToRenderer2D(this->ActorProxy);
     }
   
   this->ViewProxy = view;
@@ -111,15 +105,9 @@ bool vtkSMScalarBarWidgetRepresentationProxy::RemoveFromView(vtkSMViewProxy* vie
     return false;
     }
 
-  vtkSMProxy* p = this->GetSubProxy("Prop");
-  if (p)
+  if (this->ActorProxy)
     {
-    renderView->RemovePropFromRenderer(p);
-    }
-  p = this->GetSubProxy("Prop2D");
-  if (p)
-    {
-    renderView->RemovePropFromRenderer2D(p);
+    renderView->RemovePropFromRenderer2D(this->ActorProxy);
     }
   
   if (this->Widget->GetEnabled())
@@ -175,6 +163,7 @@ void vtkSMScalarBarWidgetRepresentationProxy::CreateVTKObjects()
 //----------------------------------------------------------------------------
 void vtkSMScalarBarWidgetRepresentationProxy::SetVisibility(int visible)
 {
+  this->Visibility = visible;
   if (!this->ViewProxy)
     {
     return;

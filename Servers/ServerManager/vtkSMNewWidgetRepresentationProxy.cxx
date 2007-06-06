@@ -33,7 +33,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.3");
 
 class vtkSMNewWidgetRepresentationObserver : public vtkCommand
 {
@@ -112,6 +112,7 @@ bool vtkSMNewWidgetRepresentationProxy::AddToView(vtkSMViewProxy* view)
       widget->SetInteractor(renderView->GetInteractor());
       widget->SetCurrentRenderer(renderView->GetRenderer());
       }
+    this->WidgetProxy->UpdateVTKObjects();
     }
 
   if (this->RepresentationProxy)
@@ -125,6 +126,16 @@ bool vtkSMNewWidgetRepresentationProxy::AddToView(vtkSMViewProxy* view)
       rendererProp->AddProxy(renderView->GetRendererProxy());
       this->RepresentationProxy->UpdateProperty("Renderer");
       }
+
+    if(this->GetSubProxy("Prop"))
+      {
+      renderView->AddPropToRenderer(this->RepresentationProxy);
+      }
+    else if(this->GetSubProxy("Prop2D"))
+      {
+      renderView->AddPropToRenderer2D(this->RepresentationProxy);
+      }
+    this->RepresentationProxy->UpdateVTKObjects();
     }
 
   return true;
@@ -163,7 +174,17 @@ bool vtkSMNewWidgetRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
       rendererProp->RemoveAllProxies();
       this->RepresentationProxy->UpdateProperty("Renderer");
       }
+
+    if(this->GetSubProxy("Prop"))
+      {
+      renderView->RemovePropFromRenderer(this->RepresentationProxy);
+      }
+    else if(this->GetSubProxy("Prop2D"))
+      {
+      renderView->RemovePropFromRenderer2D(this->RepresentationProxy);
+      }
     }
+
   return this->Superclass::RemoveFromView(view);
 }
 
