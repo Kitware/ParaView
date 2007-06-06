@@ -136,6 +136,8 @@ void pqXDMFPanel::accept()
   pqSMAdaptor::setMultipleElementProperty(
     this->proxy()->GetProperty("ParameterIndex"), params);
 
+  this->proxy()->UpdateVTKObjects();
+
   pqNamedObjectPanel::accept();
 }
 
