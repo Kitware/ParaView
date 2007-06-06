@@ -19,7 +19,7 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkTransferFunctionEditorRepresentation1D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget1D, "1.6");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget1D, "1.7");
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidget1D::vtkTransferFunctionEditorWidget1D()
@@ -44,14 +44,14 @@ void vtkTransferFunctionEditorWidget1D::SetHistogram(
     if (rep)
       {
       vtkIntArray *histValues = vtkIntArray::SafeDownCast(
-        histogram->GetCellData()->GetArray("bin values"));
+        histogram->GetCellData()->GetArray("bin_values"));
       if (histValues)
         {
         rep->SetHistogram(histValues);
         }
       else
         {
-        vtkErrorMacro("Histogram does not have cell-centered array called bin values.")
+        vtkErrorMacro("Histogram does not have cell-centered array called bin_values.")
         }
       }
     }
