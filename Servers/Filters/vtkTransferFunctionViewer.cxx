@@ -32,7 +32,7 @@
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.21");
+vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.22");
 vtkStandardNewMacro(vtkTransferFunctionViewer);
 
 //----------------------------------------------------------------------------
@@ -390,6 +390,10 @@ void vtkTransferFunctionViewer::SetSize(int x, int y)
     int size[2];
     size[0] = x;
     size[1] = y;
+    if (this->RenderWindow)
+      {
+      this->RenderWindow->SetSize(size);
+      }
     this->EditorWidget->Configure(size);
     this->Render();
     }
