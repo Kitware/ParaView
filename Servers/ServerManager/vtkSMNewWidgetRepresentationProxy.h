@@ -27,9 +27,6 @@
 class vtkSMViewProxy;
 class vtkSMNewWidgetRepresentationObserver;
 class vtkAbstractWidget;
-//BTX
-struct vtkSMNewWidgetRepresentationInternals;
-//ETX
 
 class VTK_EXPORT vtkSMNewWidgetRepresentationProxy : 
   public vtkSMRepresentationProxy
@@ -38,10 +35,6 @@ public:
   static vtkSMNewWidgetRepresentationProxy* New();
   vtkTypeRevisionMacro(vtkSMNewWidgetRepresentationProxy, vtkSMRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
- 
-  // Description:
-  // Break reference loop that are due to links.
-  virtual void UnRegister(vtkObjectBase* o);
  
   // Description:
   // Calls set enabled on the WidgetProxy.
@@ -73,7 +66,6 @@ protected:
   vtkSMProxy* WidgetProxy;
   vtkAbstractWidget* Widget;
   vtkSMNewWidgetRepresentationObserver* Observer;
-  vtkSMNewWidgetRepresentationInternals* Internal;
 
 //BTX
   friend class vtkSMNewWidgetRepresentationObserver;

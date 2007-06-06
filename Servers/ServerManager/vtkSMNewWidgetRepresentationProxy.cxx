@@ -20,10 +20,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkProcessModule.h"
-#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMPropertyIterator.h"
-#include "vtkSMPropertyLink.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMViewProxy.h"
@@ -33,7 +30,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.4");
 
 class vtkSMNewWidgetRepresentationObserver : public vtkCommand
 {
@@ -51,12 +48,6 @@ public:
   vtkSMNewWidgetRepresentationProxy* Proxy;
 };
 
-struct vtkSMNewWidgetRepresentationInternals
-{
-  typedef vtkstd::list<vtkSmartPointer<vtkSMLink> > LinksType;
-  LinksType Links;
-};
-
 //----------------------------------------------------------------------------
 vtkSMNewWidgetRepresentationProxy::vtkSMNewWidgetRepresentationProxy()
 {
@@ -65,31 +56,15 @@ vtkSMNewWidgetRepresentationProxy::vtkSMNewWidgetRepresentationProxy()
   this->Widget = 0;
   this->Observer = vtkSMNewWidgetRepresentationObserver::New();
   this->Observer->Proxy = this;
-  this->Internal = new vtkSMNewWidgetRepresentationInternals;
 }
 
 //----------------------------------------------------------------------------
 vtkSMNewWidgetRepresentationProxy::~vtkSMNewWidgetRepresentationProxy()
 {
-  // Unless the interactor is set to 0, the widget leaks.
-  // There must be a reference loop somewhere.
-  if (this->WidgetProxy)
-    {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkAbstractWidget* widget = vtkAbstractWidget::SafeDownCast(
-      pm->GetObjectFromID(this->WidgetProxy->GetID()));
-    widget->SetInteractor(0);
-    }
-
   this->RepresentationProxy = 0;
   this->WidgetProxy = 0;
   this->Widget = 0;
   this->Observer->Delete();
-
-  if (this->Internal)
-    {
-    delete this->Internal;
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -252,31 +227,6 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
     this->Widget->AddObserver(
       vtkCommand::InteractionEvent, this->Observer);
     }
-
-  // Since links copy values from input to output,
-  // we need to make sure that input properties i.e. the info
-  // properties are not empty.
-  this->UpdatePropertyInformation();
-
-  vtkSMPropertyIterator* piter = this->NewPropertyIterator();
-  for(piter->Begin(); !piter->IsAtEnd(); piter->Next())
-    {
-    vtkSMProperty* prop = piter->GetProperty();
-    vtkSMProperty* info = prop->GetInformationProperty();
-    if (info)
-      {
-      vtkSMPropertyLink* link = vtkSMPropertyLink::New();
-      link->AddLinkedProperty(this, 
-                              piter->GetKey(), 
-                              vtkSMLink::OUTPUT);
-      link->AddLinkedProperty(this, 
-                              this->GetPropertyName(info),
-                              vtkSMLink::INPUT);
-      this->Internal->Links.push_back(link);
-      link->Delete();
-      }
-    }
-  piter->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -338,32 +288,6 @@ void vtkSMNewWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
       this->RepresentationProxy->UpdateProperty("OnEndInteraction");
       }
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMNewWidgetRepresentationProxy::UnRegister(vtkObjectBase* obj)
-{
-  if ( this->GetSelfID().ID != 0 )
-    {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    // If the object is not being deleted by the interpreter and it
-    // has a reference count of 2 (SelfID and the reference that is
-    // being released), delete the internals so that the links
-    // release their references to the proxy
-    if ( pm && obj != pm->GetInterpreter() && this->Internal )
-      {
-      int size = this->Internal->Links.size();
-      if (size > 0 && this->ReferenceCount == 2 + 2*size)
-        {
-        vtkSMNewWidgetRepresentationInternals* aInternal = this->Internal;
-        this->Internal = 0;
-        delete aInternal;
-        aInternal = 0;
-        }
-      }
-    }
-
-  this->Superclass::UnRegister(obj);
 }
 
 //----------------------------------------------------------------------------
