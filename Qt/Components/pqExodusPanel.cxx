@@ -55,11 +55,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes
 #include "pqPropertyManager.h"
 #include "pqProxy.h"
+#include "pqPipelineSource.h"
 #include "pqSMAdaptor.h"
 #include "pqTreeWidgetCheckHelper.h"
 #include "pqTreeWidgetItemObject.h"
 #include "ui_pqExodusPanel.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "pqServer.h"
+#include "pqTimeKeeper.h"
 
 class pqExodusPanel::pqUI : public QObject, public Ui::ExodusPanel 
 {
@@ -90,6 +93,11 @@ pqExodusPanel::pqExodusPanel(pqProxy* object_proxy, QWidget* p) :
   this->DisplItem = 0;
   QObject::connect(this, SIGNAL(onaccept()),
                    this, SLOT(propertyChanged()));
+
+  QObject::connect(this->referenceProxy()->getServer()->getTimeKeeper(),
+                   SIGNAL(timeChanged()),
+                   this, SLOT(updateDataRanges()),
+                   Qt::QueuedConnection);
 
   this->UI->XMLFileName->setServer(this->referenceProxy()->getServer());
   
@@ -447,13 +455,12 @@ void pqExodusPanel::updateDataRanges()
 
   // update data information about loaded arrays
 
-  vtkSMSourceProxy* sp =
-    vtkSMSourceProxy::SafeDownCast(this->proxy());
+  vtkPVDataInformation* di = qobject_cast<pqPipelineSource*>
+    (this->referenceProxy())->getDataInformation();
   vtkPVDataSetAttributesInformation* pdi = 0;
   vtkPVDataSetAttributesInformation* cdi = 0;
-  if (sp->GetNumberOfParts() > 0)
+  if (di)
     {
-    vtkPVDataInformation* di = sp->GetDataInformation();
     pdi = di->GetPointDataInformation();
     cdi = di->GetCellDataInformation();
     }
