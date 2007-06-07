@@ -30,974 +30,1088 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/*!
- * \file pqChartAxis.cxx
- *
- * \brief
- *   The pqChartAxis class is used to display a chart axis.
- *
- * \author Mark Richardson
- * \date   May 12, 2005
- */
+/// \file pqChartAxis.cxx
+/// \date 12/1/2006
 
 #include "pqChartAxis.h"
-#include "pqChartLabel.h"
-#include <QPainter>
-#include <QFontMetrics>
 
-#include <vtkstd/vector>
+#include "pqChartAxisModel.h"
+#include "pqChartAxisOptions.h"
+#include "pqChartContentsSpace.h"
+
+#include <QFont>
+#include <QFontMetrics>
+#include <QList>
+#include <QPainter>
+#include <QRect>
+#include <QtDebug>
+
 #include <math.h>
 
-#define TICK_LENGTH_SMALL 3
-#define TICK_LENGTH 5
-#define TICK_MARGIN 8
-#define LABEL_MARGIN 10
 
-
-class pqChartAxisPair
+class pqChartAxisItem
 {
 public:
-  pqChartAxisPair();
-  ~pqChartAxisPair() {}
+  pqChartAxisItem();
+  ~pqChartAxisItem() {}
 
-public:
-  pqChartValue Value;
   int Pixel;
+  int Width;
 };
 
 
-class pqChartAxisData : public vtkstd::vector<pqChartAxisPair *> {};
+class pqChartAxisInternal
+{
+public:
+  pqChartAxisInternal();
+  ~pqChartAxisInternal() {}
+
+  QList<pqChartAxisItem *> Items;
+  QRect Bounds;
+  pqChartValue Minimum;
+  pqChartValue Maximum;
+  int FontHeight;
+  int TickLabelSpacing;
+  int TickLength;
+  int SmallTickLength;
+  int MaxLabelWidth;
+  int Skip;
+  bool InLayout;
+  bool UsingBestFit;
+  bool DataAvailable;
+  bool ExtraMinPadding;
+  bool ExtraMaxPadding;
+  bool SpaceTooSmall;
+};
 
 
-// The interval list is used to determine a suitable interval
-// for a shifting axis.
+// The interval list is used to determine a suitable interval for a
+// best-fit axis.
 static pqChartValue IntervalList[] = {
     pqChartValue((float)1.0),
     pqChartValue((float)2.0),
     pqChartValue((float)2.5),
     pqChartValue((float)5.0)};
 static int IntervalListLength = 4;
-
 static double MinIntLogPower = -1;
-double pqChartAxis::MinLogValue = 0.0001;
 
 
-pqChartAxisPair::pqChartAxisPair()
-  : Value()
+//----------------------------------------------------------------------------
+pqChartAxisItem::pqChartAxisItem()
 {
   this->Pixel = 0;
+  this->Width = 0;
 }
 
 
-pqChartAxis::pqChartAxis(AxisLocation location, QObject *p)
-  : QObject(p), Bounds(), AxisColor(Qt::black), GridColor(178, 178, 178),
-    TickLabelColor(Qt::black), TickLabelFont(), ValueMin(), ValueMax(),
-    TrueMin(), TrueMax()
+//----------------------------------------------------------------------------
+pqChartAxisInternal::pqChartAxisInternal()
+  : Items(), Bounds(), Minimum(), Maximum()
 {
-  this->Location = location;
-  this->Scale = pqChartAxis::Linear;
-  this->Layout = pqChartAxis::BestInterval;
-  this->GridType = pqChartAxis::Lighter;
-  this->Label = new pqChartLabel();
-  this->Data = new pqChartAxisData();
+  this->FontHeight = 0;
+  this->TickLabelSpacing = 0;
+  this->TickLength = 5;
+  this->SmallTickLength = 3;
+  this->MaxLabelWidth = 0;
+  this->Skip = 1;
+  this->InLayout = false;
+  this->UsingBestFit = false;
+  this->DataAvailable = false;
+  this->ExtraMinPadding = false;
+  this->ExtraMaxPadding = false;
+  this->SpaceTooSmall = false;
+}
+
+
+//----------------------------------------------------------------------------
+pqChartAxis::pqChartAxis(pqChartAxis::AxisLocation location,
+    QObject *parentObject)
+  : QObject(parentObject)
+{
+  this->Internal = new pqChartAxisInternal();
+  this->Options = new pqChartAxisOptions(this);
+  this->Model = 0;
+  this->Scale = new pqChartPixelScale();
   this->AtMin = 0;
   this->AtMax = 0;
-  this->Intervals = 0;
-  this->PixelMin = 0;
-  this->PixelMax = 0;
-  this->Precision = 2;
-  this->WidthMax = 0;
-  this->Count = 0;
-  this->Skip = 1;
-  this->Visible = true;
-  this->GridVisible = true;
-  this->ExtraMaxPadding = false;
-  this->ExtraMinPadding = false;
-  this->DataAvailable = false;
-  this->Notation = pqChartValue::StandardOrExponential;
+  this->Zoom = 0;
+  this->Location = location;
+
+  // Set up the options object.
+  this->Options->setObjectName("Options");
+  this->connect(this->Options, SIGNAL(visibilityChanged()),
+      this, SIGNAL(layoutNeeded()));
+  this->connect(this->Options, SIGNAL(colorChanged()),
+      this, SIGNAL(repaintNeeded()));
+  this->connect(this->Options, SIGNAL(fontChanged()),
+      this, SLOT(handleFontChange()));
+  this->connect(this->Options, SIGNAL(presentationChanged()),
+      this, SLOT(clearLabelWidthCache()));
+
+  // Set the font height and tick-label space.
+  QFontMetrics fm(this->Options->getLabelFont());
+  this->Internal->FontHeight = fm.height();
+  if(this->Location == pqChartAxis::Top ||
+      this->Location == pqChartAxis::Bottom)
+    {
+    this->Internal->TickLabelSpacing = fm.leading();
+    }
+  else
+    {
+    this->Internal->TickLabelSpacing = fm.width(" ");
+    }
 }
 
 pqChartAxis::~pqChartAxis()
 {
-  delete this->Label;
-  
-  if(this->Data)
+  QList<pqChartAxisItem *>::Iterator iter = this->Internal->Items.begin();
+  for( ; iter != this->Internal->Items.end(); ++iter)
     {
-    this->cleanData();
-    delete this->Data;
-    }
-}
-
-void pqChartAxis::setValueRange(const pqChartValue &min,
-    const pqChartValue &max)
-{
-  this->ValueMin = min;
-  this->ValueMax = max;
-  if(this->Scale == pqChartAxis::Logarithmic)
-    {
-    // A logarithmic scale axis cannot contain zero because it is
-    // undefined. If the range includes zero, set the scale to linear.
-    if((min <= 0 && max >= 0) || (max <= 0 && min >= 0))
-      {
-      this->Scale = pqChartAxis::Linear;
-      }
+    delete *iter;
     }
 
-  if(this->Scale == pqChartAxis::Logarithmic)
-    {
-    if(max < min)
-      {
-      this->ValueMin = max;
-      this->ValueMax = min;
-      }
+  delete this->Internal;
+  delete this->Scale;
+}
 
-    // Adjust the values that are close to zero if they are
-    // below the minimum log value.
-    if(this->ValueMin < 0)
-      {
-      if(this->ValueMax.getType() != pqChartValue::IntValue &&
-          this->ValueMax > -pqChartAxis::MinLogValue)
-        {
-        this->ValueMax = -pqChartAxis::MinLogValue;
-        if(this->ValueMin.getType() != pqChartValue::DoubleValue)
-          {
-          this->ValueMax.convertTo(pqChartValue::FloatValue);
-          }
-        }
-      }
-    else
-      {
-      if(this->ValueMin.getType() != pqChartValue::IntValue &&
-          this->ValueMin < pqChartAxis::MinLogValue)
-        {
-        this->ValueMin = pqChartAxis::MinLogValue;
-        if(this->ValueMax.getType() != pqChartValue::DoubleValue)
-          {
-          this->ValueMin.convertTo(pqChartValue::FloatValue);
-          }
-        }
-      }
+void pqChartAxis::setModel(pqChartAxisModel *model)
+{
+  if(this->Model == model)
+    {
+    return;
     }
 
-  this->TrueMin = this->ValueMin;
-  this->TrueMax = this->ValueMax;
-  this->calculateMaxWidth();
-}
-
-pqChartValue pqChartAxis::getValueRange() const
-{
-  return this->ValueMax - this->ValueMin;
-}
-
-void pqChartAxis::setMinValue(const pqChartValue &min)
-{
-  this->setValueRange(min, this->TrueMax);
-}
-
-void pqChartAxis::setMaxValue(const pqChartValue &max)
-{
-  this->setValueRange(this->TrueMin, max);
-}
-
-int pqChartAxis::getPixelRange() const
-{
-  if(this->PixelMax > this->PixelMin)
-    return this->PixelMax - this->PixelMin;
-  else
-    return this->PixelMin - this->PixelMax;
-}
-
-int pqChartAxis::getPixelFor(const pqChartValue &value) const
-{
-  // Convert the value to a pixel location using:
-  // px = ((vx - v1)*(p2 - p1))/(v2 - v1) + p1
-  // If using a log scale, the values should be in exponents in
-  // order to get a linear mapping.
-  pqChartValue result;
-  pqChartValue valueRange;
-  if(this->Scale == pqChartAxis::Logarithmic)
+  if(this->Model)
     {
-    // If the value is less than the minimum log number, return
-    // the minimum pixel value.
-    bool reversed = this->TrueMin < 0;
-    if(reversed)
-      {
-      if(value >= -pqChartAxis::MinLogValue)
-        {
-        return this->PixelMax;
-        }
-      }
-    else
-      {
-      if(value <= pqChartAxis::MinLogValue)
-        {
-        return this->PixelMin;
-        }
-      }
-
-    // If the log scale uses integers, the first value may be zero.
-    // In that case, use -1 instead of taking the log of zero.
-    pqChartValue v1;
-    if(this->TrueMin.getType() == pqChartValue::IntValue &&
-        this->ValueMin == 0)
-      {
-      v1 = MinIntLogPower;
-      }
-    else
-      {
-      if(reversed)
-        {
-        v1 = log10(-this->ValueMin.getDoubleValue());
-        }
-      else
-        {
-        v1 = log10(this->ValueMin.getDoubleValue());
-        }
-      }
-
-    if(this->TrueMin.getType() == pqChartValue::IntValue &&
-        this->ValueMax == 0)
-      {
-      valueRange = MinIntLogPower;
-      }
-    else
-      {
-      if(reversed)
-        {
-        valueRange = log10(-this->ValueMax.getDoubleValue());
-        }
-      else
-        {
-        valueRange = log10(this->ValueMax.getDoubleValue());
-        }
-      }
-
-    if(reversed)
-      {
-      result = log10(-value.getDoubleValue());
-      }
-    else
-      {
-      result = log10(value.getDoubleValue());
-      }
-
-    result -= v1;
-    valueRange -= v1;
-    }
-  else
-    {
-    result = value - this->ValueMin;
-    valueRange = this->ValueMax - this->ValueMin;
+    // Clean up connections to the old model.
+    this->disconnect(this->Model, 0, this, 0);
     }
 
-  result *= this->PixelMax - this->PixelMin;
-  if(valueRange != 0)
+  this->Model = model;
+  if(this->Model)
     {
-    result /= valueRange;
+    // Listen to the new model's events.
+    this->connect(this->Model, SIGNAL(labelInserted(int)),
+        this, SLOT(insertLabel(int)));
+    this->connect(this->Model, SIGNAL(removingLabel(int)),
+        this, SLOT(startLabelRemoval(int)));
+    this->connect(this->Model, SIGNAL(labelRemoved(int)),
+        this, SLOT(finishLabelRemoval(int)));
+    this->connect(this->Model, SIGNAL(labelsReset()),
+        this, SLOT(reset()));
     }
 
-  return result.getIntValue() + this->PixelMin;
-}
-
-int pqChartAxis::getPixelForIndex(int index) const
-{
-  int pixel = 0;
-  if(this->Data && index >= 0 && index < static_cast<int>(this->Data->size()))
-    {
-    pixel = (*this->Data)[index]->Pixel;
-    }
-
-  return pixel;
-}
-
-pqChartValue pqChartAxis::getValueFor(int pixel)
-{
-  // Convert the pixel location to a value using:
-  // vx = ((px - p1)*(v2 - v1))/(p2 - p1) + v1
-  // If using a log scale, the values should be in exponents in
-  // order to get a linear mapping.
-  pqChartValue v1;
-  pqChartValue result;
-  bool reversed = false;
-  if(this->Scale == pqChartAxis::Logarithmic)
-    {
-    // If the log scale uses integers, the first value may be zero.
-    // In that case, use -1 instead of taking the log of zero.
-    reversed = this->TrueMin < 0;
-    if(this->TrueMin.getType() == pqChartValue::IntValue &&
-        this->ValueMin == 0)
-      {
-      v1 = MinIntLogPower;
-      }
-    else
-      {
-      if(reversed)
-        {
-        v1 = log10(-this->ValueMin.getDoubleValue());
-        }
-      else
-        {
-        v1 = log10(this->ValueMin.getDoubleValue());
-        }
-      }
-
-    if(this->TrueMin.getType() == pqChartValue::IntValue &&
-        this->ValueMax == 0)
-      {
-      result = MinIntLogPower;
-      }
-    else
-      {
-      if(reversed)
-        {
-        result = log10(-this->ValueMax.getDoubleValue());
-        }
-      else
-        {
-        result = log10(this->ValueMax.getDoubleValue());
-        }
-      }
-
-    result -= v1;
-    }
-  else
-    {
-    v1 = this->ValueMin;
-    result = this->ValueMax - this->ValueMin;
-    }
-
-  result *= pixel - this->PixelMin;
-  int pixelRange = this->PixelMax - this->PixelMin;
-  if(pixelRange != 0)
-    {
-    result /= pixelRange;
-    }
-
-  result += v1;
-  if(this->Scale == pqChartAxis::Logarithmic)
-    {
-    result = pow((double)10.0, result.getDoubleValue());
-    if(reversed)
-      {
-      result *= -1;
-      }
-    if(this->TrueMin.getType() != pqChartValue::DoubleValue)
-      {
-      result.convertTo(pqChartValue::FloatValue);
-      }
-    }
-
-  return result;
-}
-
-pqChartValue pqChartAxis::getValueForIndex(int index) const
-{
-  pqChartValue value = 0;
-  if(this->Data && index >= 0 && index < static_cast<int>(this->Data->size()))
-    {
-    value = (*this->Data)[index]->Value;
-    }
-
-  return value;
-}
-
-bool pqChartAxis::isValid() const
-{
-  if(this->ValueMax == this->ValueMin)
-    return false;
-  if(this->PixelMax == this->PixelMin)
-    return false;
-  return true;
-}
-
-bool pqChartAxis::isZeroInRange() const
-{
-  return (this->ValueMax >= 0 && this->ValueMin <= 0) ||
-      (this->ValueMax <= 0 && this->ValueMin >= 0);
-}
-
-void pqChartAxis::setAxisColor(const QColor &color)
-{
-  if(this->AxisColor != color)
-    {
-    this->AxisColor = color;
-    if(this->GridType == pqChartAxis::Lighter)
-      this->GridColor = pqChartAxis::lighter(this->AxisColor);
-    emit this->repaintNeeded();
-    }
-}
-
-void pqChartAxis::setGridColor(const QColor &color)
-{
-  if(this->GridType == pqChartAxis::Lighter || this->GridColor != color)
-    {
-    this->GridColor = color;
-    this->GridType = pqChartAxis::Lighter;
-    emit this->repaintNeeded();
-    }
-}
-
-void pqChartAxis::setGridColorType(AxisGridColor type)
-{
-  if(this->GridType != type)
-    {
-    this->GridType = type;
-    if(this->GridType == pqChartAxis::Lighter)
-      {
-      this->GridColor = pqChartAxis::lighter(this->AxisColor);
-      emit this->repaintNeeded();
-      }
-    }
-}
-
-void pqChartAxis::setTickLabelColor(const QColor &color)
-{
-  if(this->TickLabelColor != color)
-    {
-    this->TickLabelColor = color;
-    emit this->repaintNeeded();
-    }
-}
-
-void pqChartAxis::setTickLabelFont(const QFont &font)
-{
-  this->TickLabelFont = font;
-  this->calculateMaxWidth();
-}
-
-void pqChartAxis::setPrecision(int precision)
-{
-  this->Precision = precision;
-  if(this->Precision < 0)
-    this->Precision = 0;
-  this->calculateMaxWidth();
-}
-
-void pqChartAxis::setNotation(pqChartValue::NotationType notation)
-{
-  this->Notation = notation;
-  this->calculateMaxWidth();
-}
-
-void pqChartAxis::setVisible(bool visible)
-{
-  if(this->Visible != visible)
-    {
-    this->Visible = visible;
-    emit this->layoutNeeded();
-    }
-}
-
-void pqChartAxis::setDataAvailable(bool available)
-{
-  this->DataAvailable = available;
-  if(this->DataAvailable && this->TrueMin == this->TrueMax)
-    {
-    this->ValueMin = this->TrueMin - 1;
-    this->ValueMax = this->TrueMax + 1;
-    this->Intervals = 2;
-    this->blockSignals(true);
-    this->calculateMaxWidth();
-    this->blockSignals(false);
-    }
-}
-
-void pqChartAxis::setNumberOfIntervals(int intervals)
-{
-  this->Intervals = intervals;
-  this->Layout = pqChartAxis::FixedInterval;
-  emit this->layoutNeeded();
+  // Clean up the old view data and request a re-layout.
+  this->reset();
 }
 
 void pqChartAxis::setNeigbors(const pqChartAxis *atMin,
     const pqChartAxis *atMax)
 {
+  // TODO: Listen for a font change from the other axes to adjust the
+  // tick length for top and bottom axes.
   this->AtMin = atMin;
   this->AtMax = atMax;
 }
 
-const int pqChartAxis::getLayoutThickness() const
+void pqChartAxis::setContentsScpace(const pqChartContentsSpace *contents)
 {
-  switch(this->Location)
+  this->Zoom = contents;
+}
+
+void pqChartAxis::setScaleType(pqChartPixelScale::ValueScale scale)
+{
+  if(this->Scale->getScaleType() != scale)
     {
-    case pqChartAxis::Top:
-    case pqChartAxis::Bottom:
-      return TICK_MARGIN + QFontMetrics(this->TickLabelFont).height() + this->Label->getSizeRequest().height();
-    case pqChartAxis::Left:
-    case pqChartAxis::Right:
-      return TICK_MARGIN + this->getMaxWidth() + this->Label->getSizeRequest().width();
+    this->Scale->setScaleType(scale);
+    this->clearLabelWidthCache();
     }
-    
-  return 0;
+}
+
+bool pqChartAxis::isBestFitGenerated() const
+{
+  return this->Internal->UsingBestFit;
+}
+
+void pqChartAxis::setBestFitGenerated(bool on)
+{
+  this->Internal->UsingBestFit = on;
+}
+
+void pqChartAxis::setDataAvailable(bool available)
+{
+  this->Internal->DataAvailable = available;
+}
+
+void pqChartAxis::getBestFitRange(pqChartValue &min,
+    pqChartValue &max) const
+{
+  min = this->Internal->Minimum;
+  max = this->Internal->Maximum;
+}
+
+void pqChartAxis::setBestFitRange(const pqChartValue &min,
+    const pqChartValue &max)
+{
+  this->Internal->Minimum = min;
+  this->Internal->Maximum = max;
+}
+
+bool pqChartAxis::isMaxExtraPadded() const
+{
+  return this->Internal->ExtraMaxPadding;
+}
+
+void pqChartAxis::setExtraMaxPadding(bool on)
+{
+  this->Internal->ExtraMaxPadding = on;
+}
+
+bool pqChartAxis::isMinExtraPadded() const
+{
+  return this->Internal->ExtraMinPadding;
+}
+
+void pqChartAxis::setExtraMinPadding(bool on)
+{
+  this->Internal->ExtraMinPadding = on;
+}
+
+bool pqChartAxis::isSpaceTooSmall() const
+{
+  return this->Internal->SpaceTooSmall;
+}
+
+void pqChartAxis::setSpaceTooSmall(bool tooSmall)
+{
+  this->Internal->SpaceTooSmall = tooSmall;
+}
+
+void pqChartAxis::setOptions(const pqChartAxisOptions &options)
+{
+  // Copy the new options.
+  *(this->Options) = options;
+
+  // Handle the worst case option change: font.
+  this->handleFontChange();
 }
 
 void pqChartAxis::layoutAxis(const QRect &area)
 {
-  if(this->WidthMax <= 0 || !area.isValid())
-    return;
-
-  QFontMetrics fm(this->TickLabelFont);
-  int fontHeight = fm.height();
-
-  QRect label_bounds;
-
-  // Set up the bounding rectangle. Then, set up the pixel range
-  // based on font, margin, visibility, bounds, and neighbors.
-  if(this->Location == pqChartAxis::Top ||
-    this->Location == pqChartAxis::Bottom)
-    {
-    this->Bounds.setLeft(area.left());
-    this->Bounds.setRight(area.right());
-    if(this->Location == pqChartAxis::Top)
-      {
-      this->Bounds.setTop(area.top());
-      this->Bounds.setBottom(area.top());
-      if(this->isVisible())
-        {
-        label_bounds = QRect(area.left(), area.top(), area.width(), area.top() + this->Label->getSizeRequest().height());
-        this->Bounds.setTop(area.top() + this->Label->getSizeRequest().height());
-        this->Bounds.setBottom(area.top() + TICK_MARGIN + fontHeight + this->Label->getSizeRequest().height());
-        }
-      }
-    else
-      {
-      this->Bounds.setTop(area.bottom());
-      this->Bounds.setBottom(area.bottom());
-      if(this->isVisible())
-        {
-        this->Bounds.setTop(area.bottom() - TICK_MARGIN - fontHeight - this->Label->getSizeRequest().height());
-        this->Bounds.setBottom(area.bottom() - this->Label->getSizeRequest().height());
-        label_bounds = QRect(area.left(), this->Bounds.bottom(), area.width(), this->Label->getSizeRequest().height());
-        }
-      }
-
-    if(this->isVisible())
-      this->PixelMin = this->WidthMax/2;
-    else
-      this->PixelMin = 0;
-    this->PixelMax = this->PixelMin;
-
-    if(this->AtMin && this->AtMin->isVisible())
-      {
-      this->PixelMin = vtkstd::max(this->PixelMin, this->AtMin->getLayoutThickness());
-      }
-
-    if(this->AtMax && this->AtMax->isVisible())
-      {
-      this->PixelMax = vtkstd::max(this->PixelMax, this->AtMax->getLayoutThickness());
-      }
-
-    this->PixelMin = this->Bounds.left() + this->PixelMin;
-    this->PixelMax = this->Bounds.right() - this->PixelMax;
-    
-    label_bounds.setLeft(this->PixelMin);
-    label_bounds.setRight(this->PixelMax);
-    }
-  else
-    {
-    this->Bounds.setTop(area.top());
-    this->Bounds.setBottom(area.bottom());
-    if(this->Location == pqChartAxis::Left)
-      {
-      this->Bounds.setLeft(area.left());
-      this->Bounds.setRight(area.left());
-      if(this->isVisible())
-        {
-        label_bounds = QRect(area.left(), area.top(), this->Label->getSizeRequest().width(), area.height());
-        this->Bounds.setLeft(area.left() + this->Label->getSizeRequest().width());
-        this->Bounds.setRight(area.left() + this->Label->getSizeRequest().width() + TICK_MARGIN + this->WidthMax);
-        }
-      }
-    else
-      {
-      this->Bounds.setLeft(area.right());
-      this->Bounds.setRight(area.right());
-      if(this->isVisible())
-        {
-        this->Bounds.setLeft(area.right() - TICK_MARGIN - this->WidthMax - this->Label->getSizeRequest().width());
-        this->Bounds.setRight(area.right() - this->Label->getSizeRequest().width());
-        label_bounds = QRect(area.right() - this->Label->getSizeRequest().width(), area.top(), this->Label->getSizeRequest().width(), area.height());
-        }
-      }
-
-    if(this->isVisible())
-      this->PixelMin = fontHeight/2;
-    else
-      this->PixelMin = 0;
-    this->PixelMax = this->PixelMin;
-
-    if(this->AtMin && this->AtMin->isVisible())
-      {
-      this->PixelMin = vtkstd::max(this->PixelMin, this->AtMin->getLayoutThickness());
-      }
-      
-    if(this->AtMax && this->AtMax->isVisible())
-      {
-      this->PixelMax = vtkstd::max(this->PixelMax, this->AtMax->getLayoutThickness());
-      }
-
-    this->PixelMin = this->Bounds.bottom() - this->PixelMin;
-    this->PixelMax = this->Bounds.top() + this->PixelMax;
-    
-    label_bounds.setTop(this->PixelMax);
-    label_bounds.setBottom(this->PixelMin);
-    }
-
-  this->Label->setBounds(label_bounds);
-
-  // Set up the remaining parameters.
-  this->cleanData();
-  if(this->DataAvailable && this->TrueMin == this->TrueMax)
-    {
-    this->calculateFixedLayout();
-    }
-  else if(this->Layout == pqChartAxis::FixedInterval)
-    {
-    this->calculateFixedLayout();
-    }
-  else if(this->Scale == pqChartAxis::Logarithmic)
-    {
-    this->calculateLogInterval();
-    }
-  else
-    {
-    this->calculateInterval();
-    }
-}
-
-void pqChartAxis::drawAxis(QPainter *p, const QRect &area)
-{
-  if(!p || !p->isActive() || !this->isVisible() || !this->isValid() ||
-      !this->Data)
-    {
-    return;
-    }
-
-  p->setFont(this->TickLabelFont);
-
-  // Set up the grid area.
-  QRect gridArea;
-  if(this->AtMin || this->AtMax)
-    {
-    if(this->Location == pqChartAxis::Top ||
-        this->Location == pqChartAxis::Bottom)
-      {
-      gridArea.setLeft(this->PixelMin);
-      gridArea.setRight(this->PixelMax);
-      if(this->AtMin && this->AtMin->isVisible() && this->AtMin->isValid())
-        {
-        gridArea.setTop(this->AtMin->PixelMax);
-        gridArea.setBottom(this->AtMin->PixelMin);
-        if(this->AtMax && this->AtMax->isVisible() && this->AtMax->isValid())
-          {
-          if(this->AtMax->PixelMax < this->AtMin->PixelMax)
-            {
-            gridArea.setTop(this->AtMax->PixelMax);
-            }
-          if(this->AtMax->PixelMin > this->AtMin->PixelMin)
-            {
-            gridArea.setBottom(this->AtMax->PixelMin);
-            }
-          }
-        }
-      else if(this->AtMax && this->AtMax->isVisible() && this->AtMax->isValid())
-        {
-        gridArea.setTop(this->AtMax->PixelMax);
-        gridArea.setBottom(this->AtMax->PixelMin);
-        }
-      }
-    else
-      {
-      gridArea.setBottom(this->PixelMin);
-      gridArea.setTop(this->PixelMax);
-      if(this->AtMin && this->AtMin->isVisible() && this->AtMin->isValid())
-        {
-        gridArea.setLeft(this->AtMin->PixelMin);
-        gridArea.setRight(this->AtMin->PixelMax);
-        if(this->AtMax && this->AtMax->isVisible() && this->AtMax->isValid())
-          {
-          if(this->AtMax->PixelMin < this->AtMin->PixelMin)
-            {
-            gridArea.setLeft(this->AtMax->PixelMin);
-            }
-          if(this->AtMax->PixelMax > this->AtMin->PixelMax)
-            {
-            gridArea.setRight(this->AtMax->PixelMax);
-            }
-          }
-        }
-      else if(this->AtMax && this->AtMax->isVisible() && this->AtMax->isValid())
-        {
-        gridArea.setLeft(this->AtMax->PixelMin);
-        gridArea.setRight(this->AtMax->PixelMax);
-        }
-      }
-    }
-
-  // Only paint the axis and grid if either intersects the drawing
-  // area. The bounds for some axes might not extend to the full
-  // axis drawing area, so assume the axis is on an edge.
-  bool isInArea = true;
+  // Use the total chart area and the neighboring axes to set the
+  // bounding rectangle.
+  int space = 0;
+  this->Internal->Bounds = area;
   if(this->Location == pqChartAxis::Top)
     {
-    isInArea = area.top() <= this->Bounds.bottom();
+    QRect neighbor;
+    int topDiff = 0;
+    if(!this->Internal->SpaceTooSmall)
+      {
+      space = this->getPreferredSpace();
+      }
+
+    if(this->AtMin)
+      {
+      this->AtMin->getBounds(neighbor);
+      if(neighbor.isValid())
+        {
+        topDiff = neighbor.top() - area.top();
+        if(topDiff > space)
+          {
+          space = topDiff;
+          }
+        }
+      }
+
+    if(this->AtMax)
+      {
+      this->AtMax->getBounds(neighbor);
+      if(neighbor.isValid())
+        {
+        topDiff = neighbor.top() - area.top();
+        if(topDiff > space)
+          {
+          space = topDiff;
+          }
+        }
+      }
+
+    this->Internal->Bounds.setBottom(area.top() + space);
     }
-  else if(this->Location == pqChartAxis::Left)
+  else if(this->Location == pqChartAxis::Bottom)
     {
-    isInArea = area.left() <= this->Bounds.right();
+    QRect neighbor;
+    int bottomDiff = 0;
+    if(!this->Internal->SpaceTooSmall)
+      {
+      space = this->getPreferredSpace();
+      }
+
+    if(this->AtMin)
+      {
+      this->AtMin->getBounds(neighbor);
+      if(neighbor.isValid())
+        {
+        bottomDiff = area.bottom() - neighbor.bottom();
+        if(bottomDiff > space)
+          {
+          space = bottomDiff;
+          }
+        }
+      }
+
+    if(this->AtMax)
+      {
+      this->AtMax->getBounds(neighbor);
+      if(neighbor.isValid())
+        {
+        bottomDiff = area.bottom() - neighbor.bottom();
+        if(bottomDiff > space)
+          {
+          space = bottomDiff;
+          }
+        }
+      }
+
+    this->Internal->Bounds.setTop(area.bottom() - space);
+    }
+  else
+    {
+    int halfHeight = 0;
+    if(this->Options->isVisible() && this->Options->areLabelsVisible() &&
+        !this->Internal->SpaceTooSmall)
+      {
+      halfHeight = this->Internal->FontHeight / 2;
+      }
+
+    if(this->AtMin && !this->AtMin->isSpaceTooSmall())
+      {
+      space = this->AtMin->getPreferredSpace();
+      if(halfHeight > space)
+        {
+        space = halfHeight;
+        }
+      }
+    else
+      {
+      space = halfHeight;
+      }
+
+    this->Internal->Bounds.setBottom(area.bottom() - space);
+    if(this->AtMax && !this->AtMax->isSpaceTooSmall())
+      {
+      space = this->AtMax->getPreferredSpace();
+      if(halfHeight > space)
+        {
+        space = halfHeight;
+        }
+      }
+    else
+      {
+      space = halfHeight;
+      }
+
+    this->Internal->Bounds.setTop(area.top() + space);
+    }
+
+  // Set up the contents rectangle.
+  QRect contents = this->Internal->Bounds;
+  if(this->Zoom)
+    {
+    if(this->Location == pqChartAxis::Left ||
+        this->Location == pqChartAxis::Right)
+      {
+      contents.setBottom(contents.bottom() + this->Zoom->getMaximumYOffset());
+      }
+    else
+      {
+      contents.setRight(contents.right() + this->Zoom->getMaximumXOffset());
+      }
+    }
+
+  // If the axis model is based on the size, it needs to be generated
+  // here. Don't send a layout request change for the model events.
+  this->Internal->InLayout = true;
+  if(this->Scale->getScaleType() == pqChartPixelScale::Linear)
+    {
+    this->generateLabels(contents);
+    }
+  else
+    {
+    this->generateLogLabels(contents);
+    }
+
+  this->Internal->InLayout = false;
+
+  // Calculate the label width for any new labels.
+  int i = 0;
+  pqChartValue value;
+  QList<pqChartAxisItem *>::Iterator iter;
+  if(this->Options->isVisible() && this->Options->areLabelsVisible())
+    {
+    QFontMetrics fm(this->Options->getLabelFont());
+    bool maxWidthReset = this->Internal->MaxLabelWidth == 0;
+    iter = this->Internal->Items.begin();
+    for( ; iter != this->Internal->Items.end(); ++iter, ++i)
+      {
+      // Get the label value from the model.
+      this->Model->getLabel(i, value);
+      if((*iter)->Width == 0)
+        {
+        // If the item has no width assigned, use the font metrics to
+        // calculate the necessary width.
+        QString label = value.getString(this->Options->getPrecision(),
+            this->Options->getNotation());
+        (*iter)->Width = fm.width(label);
+        if((*iter)->Width > this->Internal->MaxLabelWidth)
+          {
+          this->Internal->MaxLabelWidth = (*iter)->Width;
+          }
+        }
+      else if(maxWidthReset && (*iter)->Width > this->Internal->MaxLabelWidth)
+        {
+        // If the max label width was reset, use the labels widths to
+        // find the new max.
+        this->Internal->MaxLabelWidth = (*iter)->Width;
+        }
+      }
+    }
+
+  // Use the maximum label width to finish setting the bounds.
+  if(this->Location == pqChartAxis::Left)
+    {
+    space = this->Internal->SpaceTooSmall ? 0 : this->getPreferredSpace();
+    this->Internal->Bounds.setRight(area.left() + space);
     }
   else if(this->Location == pqChartAxis::Right)
     {
-    isInArea = area.right() >= this->Bounds.left();
+    space = this->Internal->SpaceTooSmall ? 0 : this->getPreferredSpace();
+    this->Internal->Bounds.setLeft(area.right() - space);
     }
   else
     {
-    isInArea = area.bottom() >= this->Bounds.top();
+    int halfWidth = 0;
+    if(this->Options->isVisible() && this->Options->areLabelsVisible() &&
+        !this->Internal->SpaceTooSmall)
+      {
+      halfWidth = this->Internal->MaxLabelWidth / 2;
+      }
+
+    if(this->AtMin && !this->AtMin->isSpaceTooSmall())
+      {
+      space = this->AtMin->getPreferredSpace();
+      if(halfWidth > space)
+        {
+        space = halfWidth;
+        }
+      }
+    else
+      {
+      space = halfWidth;
+      }
+
+    this->Internal->Bounds.setLeft(area.left() + space);
+    contents.setLeft(contents.left() + space);
+    if(this->AtMax && !this->AtMax->isSpaceTooSmall())
+      {
+      space = this->AtMax->getPreferredSpace();
+      if(halfWidth > space)
+        {
+        space = halfWidth;
+        }
+      }
+    else
+      {
+      space = halfWidth;
+      }
+
+    this->Internal->Bounds.setRight(area.right() - space);
+    contents.setRight(contents.right() - space);
     }
 
-  if(!(isInArea || (this->GridVisible && gridArea.intersects(area))))
+  // Set up the pixel-value scale.
+  int pixelMin = 0;
+  int pixelMax = 0;
+  bool pixelChanged = false;
+  if(this->Location == pqChartAxis::Left ||
+      this->Location == pqChartAxis::Right)
+    {
+    // The contents bounds determine the min and max pixel locations
+    // for left and right axes.
+    pixelMin = contents.bottom();
+    pixelMax = contents.top();
+    if(pixelMin > pixelMax)
+      {
+      pixelChanged = this->Scale->setPixelRange(pixelMin, pixelMax);
+      }
+    else
+      {
+      pixelChanged = this->Scale->setPixelRange(0, 0);
+      }
+    }
+  else
+    {
+    pixelMin = contents.left();
+    pixelMax = contents.right();
+    if(pixelMin < pixelMax)
+      {
+      pixelChanged = this->Scale->setPixelRange(pixelMin, pixelMax);
+      }
+    else
+      {
+      pixelChanged = this->Scale->setPixelRange(0, 0);
+      }
+    }
+
+  bool valueChanged = false;
+  if(this->Model && this->Model->getNumberOfLabels() > 1)
+    {
+    pqChartValue max;
+    this->Model->getLabel(0, value);
+    this->Model->getLabel(this->Model->getNumberOfLabels() - 1, max);
+    valueChanged = this->Scale->setValueRange(value, max);
+    }
+  else
+    {
+    valueChanged = this->Scale->setValueRange(pqChartValue(), pqChartValue());
+    }
+
+  // Signal the chart layers if the pixel-value map changed.
+  if(pixelChanged || valueChanged)
+    {
+    emit this->pixelScaleChanged();
+    }
+
+  // Calculate the pixel location for each label.
+  this->Internal->Skip = 1;
+  if(this->Scale->isValid() && this->Options->isVisible() &&
+      this->Options->areLabelsVisible())
+    {
+    iter = this->Internal->Items.begin();
+    for(i = 0; iter != this->Internal->Items.end(); ++iter, ++i)
+      {
+      // Use the pixel-value scale to determine the pixel location for
+      // the label.
+      this->Model->getLabel(i, value);
+      (*iter)->Pixel = this->Scale->getPixelFor(value);
+      }
+
+    // If there is not space for all the labels, set up the skip count.
+    if(this->Scale->getScaleType() == pqChartPixelScale::Logarithmic ||
+        !this->Internal->UsingBestFit || this->Internal->Items.size() < 3)
+      {
+      int needed = 0;
+      if(this->Location == pqChartAxis::Left ||
+          this->Location == pqChartAxis::Right)
+        {
+        needed = 2 * this->Internal->FontHeight;
+        }
+      else
+        {
+        needed = this->Internal->FontHeight + this->Internal->MaxLabelWidth;
+        }
+
+      needed *= this->Internal->Items.size() - 1;
+      int pixelRange = this->Scale->getPixelRange();
+      this->Internal->Skip = needed / pixelRange;
+      if(this->Internal->Skip == 0 || needed % pixelRange > 0)
+        {
+        this->Internal->Skip += 1;
+        }
+      }
+    }
+}
+
+void pqChartAxis::adjustAxisLayout()
+{
+  if(!this->Internal->Bounds.isValid())
     {
     return;
     }
 
-  bool vertical = this->Location == pqChartAxis::Left ||
-      this->Location == pqChartAxis::Right;
-  QString label;
-  QFontMetrics fm(this->TickLabelFont);
-  int fontAscent = fm.ascent();
-  int halfAscent = fontAscent/2;
-  int fontDescent = fm.descent();
+  QRect bounds;
+  if(this->Location == pqChartAxis::Left)
+    {
+    int right = this->Internal->Bounds.right();
+    if(this->AtMin)
+      {
+      this->AtMin->getBounds(bounds);
+      if(bounds.left() > right)
+        {
+        right = bounds.left();
+        }
+      }
+
+    if(this->AtMax)
+      {
+      this->AtMin->getBounds(bounds);
+      if(bounds.left() > right)
+        {
+        right = bounds.left();
+        }
+      }
+
+    this->Internal->Bounds.setRight(right);
+    }
+  else if(this->Location == pqChartAxis::Right)
+    {
+    int left = this->Internal->Bounds.left();
+    if(this->AtMin)
+      {
+      this->AtMin->getBounds(bounds);
+      if(bounds.right() < left)
+        {
+        left = bounds.right();
+        }
+      }
+
+    if(this->AtMax)
+      {
+      this->AtMin->getBounds(bounds);
+      if(bounds.right() < left)
+        {
+        left = bounds.right();
+        }
+      }
+
+    this->Internal->Bounds.setLeft(left);
+    }
+}
+
+int pqChartAxis::getPreferredSpace() const
+{
+  if(this->Options->isVisible() && this->Options->areLabelsVisible() &&
+      this->Model && this->Model->getNumberOfLabels() > 1)
+    {
+    if(this->Location == pqChartAxis::Top ||
+      this->Location == pqChartAxis::Bottom)
+      {
+      // The preferred height is the sum of the font height, the tick
+      // length and the tick-label spacing.
+      return this->Internal->FontHeight + this->Internal->TickLength +
+          this->Internal->TickLabelSpacing;
+      }
+    else
+      {
+      // The preferred width is the sum of the widest label, the tick
+      // length and the tick-label spacing.
+      return this->Internal->MaxLabelWidth + this->Internal->TickLength +
+          this->Internal->TickLabelSpacing;
+      }
+    }
+
+  return 0;
+}
+
+int pqChartAxis::getFontHeight() const
+{
+  return this->Internal->FontHeight;
+}
+
+void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
+{
+  if(!painter.isActive() || !area.isValid() || !this->Options->isVisible())
+    {
+    return;
+    }
+
+  // Make sure the repaint area overlaps the axis area.
+  if(this->Location == pqChartAxis::Left)
+    {
+    if(area.left() > this->Internal->Bounds.right())
+      {
+      return;
+      }
+    }
+  else if(this->Location == pqChartAxis::Top)
+    {
+    if(area.top() > this->Internal->Bounds.bottom())
+      {
+      return;
+      }
+    }
+  else if(this->Location == pqChartAxis::Right)
+    {
+    if(area.right() < this->Internal->Bounds.left())
+      {
+      return;
+      }
+    }
+  else if(area.bottom() < this->Internal->Bounds.top())
+    {
+    return;
+    }
+
+  // Draw the axis line.
+  painter.setPen(this->Options->getAxisColor());
+  if(this->Location == pqChartAxis::Left)
+    {
+    painter.drawLine(this->Internal->Bounds.topRight(),
+        this->Internal->Bounds.bottomRight());
+    }
+  else if(this->Location == pqChartAxis::Top)
+    {
+    painter.drawLine(this->Internal->Bounds.bottomLeft(),
+        this->Internal->Bounds.bottomRight());
+    }
+  else if(this->Location == pqChartAxis::Right)
+    {
+    painter.drawLine(this->Internal->Bounds.topLeft(),
+        this->Internal->Bounds.bottomLeft());
+    }
+  else
+    {
+    painter.drawLine(this->Internal->Bounds.topLeft(),
+        this->Internal->Bounds.topRight());
+    }
+
+  // Only draw the labels if they are visible.
+  if(!this->Options->areLabelsVisible() || !this->Model ||
+      this->Internal->SpaceTooSmall)
+    {
+    return;
+    }
+
+  // Set up the constant values based on the axis location.
   int x = 0;
   int y = 0;
   int tick = 0;
   int tickSmall = 0;
-
-  // Set up the constant values based on the axis location.
-  if(this->Location == pqChartAxis::Top)
+  if(this->Location == pqChartAxis::Left)
     {
-    y = this->Bounds.bottom();
-    tick = y - TICK_LENGTH;
-    tickSmall = y - TICK_LENGTH_SMALL;
+    x = this->Internal->Bounds.right();
+    tick = x - this->Internal->TickLength;
+    tickSmall = x - this->Internal->SmallTickLength;
     }
-  else if(this->Location == pqChartAxis::Left)
+  else if(this->Location == pqChartAxis::Top)
     {
-    x = this->Bounds.right();
-    tick = x - TICK_LENGTH;
-    tickSmall = x - TICK_LENGTH_SMALL;
+    y = this->Internal->Bounds.bottom();
+    tick = y - this->Internal->TickLength;
+    tickSmall = y - this->Internal->SmallTickLength;
     }
   else if(this->Location == pqChartAxis::Right)
     {
-    x = this->Bounds.left();
-    tick = x + TICK_LENGTH;
-    tickSmall = x + TICK_LENGTH_SMALL;
+    x = this->Internal->Bounds.left();
+    tick = x + this->Internal->TickLength;
+    tickSmall = x + this->Internal->SmallTickLength;
     }
   else
     {
-    y = this->Bounds.top();
-    tick = y + TICK_LENGTH;
-    tickSmall = y + TICK_LENGTH_SMALL;
+    y = this->Internal->Bounds.top();
+    tick = y + this->Internal->TickLength;
+    tickSmall = y + this->Internal->SmallTickLength;
     }
 
-  // Draw the axis labels. Draw the axis grid lines if specified.
-  int i = 0;
-  p->setPen(this->AxisColor);
-  pqChartAxisData::iterator iter = this->Data->begin();
-  for( ; iter != this->Data->end(); ++iter, ++i)
-    {
-    // Make sure the label needs to be drawn.
-    if((this->Layout == pqChartAxis::FixedInterval ||
-        this->Scale == pqChartAxis::Logarithmic) && i > this->Count)
-      {
-      break;
-      }
-    if(!(*iter))
-      {
-      continue;
-      }
+  QFontMetrics fm(this->Options->getLabelFont());
+  int fontAscent = fm.ascent();
+  int halfAscent = fontAscent/2;
+  int fontDescent = fm.descent();
 
-    if(vertical)
-      {
-      y = (*iter)->Pixel;
-      if(y - halfAscent > area.bottom())
-        continue;
-      else if(y + halfAscent < area.top())
-        break;
-      }
-    else
-      {
-      x = (*iter)->Pixel;
-      if(this->WidthMax > 0)
-        {
-        if(x + this->WidthMax/2 < area.left())
-          continue;
-        else if(x - this->WidthMax/2 > area.right())
-          break;
-        }
-      }
-
-    label = (*iter)->Value.getString(this->Precision, this->Notation);
-    if(vertical)
-      {
-      if(this->GridVisible)
-        {
-        p->setPen(this->GridColor);
-        p->drawLine(gridArea.left(), y, gridArea.right(), y);
-        }
-
-      if(this->Skip == 1 || i % this->Skip == 0)
-        {
-        p->setPen(this->AxisColor);
-        p->drawLine(tick, y, x, y);
-        y += halfAscent;
-        p->setPen(this->TickLabelColor);
-        if(this->Location == pqChartAxis::Left)
-          p->drawText(x - fm.width(label) - TICK_MARGIN, y, label);
-        else
-          p->drawText(x + TICK_MARGIN, y, label);
-        }
-      else
-        {
-        p->setPen(this->AxisColor);
-        p->drawLine(tickSmall, y, x, y);
-        }
-      }
-    else
-      {
-      if(this->GridVisible)
-        {
-        p->setPen(this->GridColor);
-        p->drawLine(x, gridArea.top(), x, gridArea.bottom());
-        }
-
-      if(this->Skip == 1 || i % this->Skip == 0)
-        {
-        p->setPen(this->AxisColor);
-        p->drawLine(x, tick, x, y);
-        x -= fm.width(label)/2;
-        p->setPen(this->TickLabelColor);
-        if(this->Location == pqChartAxis::Top)
-          p->drawText(x, y - TICK_MARGIN - fontDescent, label);
-        else
-          p->drawText(x, y + TICK_MARGIN + fontAscent, label);
-        }
-      else
-        {
-        p->setPen(this->AxisColor);
-        p->drawLine(x, tickSmall, x, y);
-        }
-      }
-    }
-
-  // Draw the axis line in last to cover the grid lines.
-  p->setPen(this->AxisColor);
-  if(vertical)
-    {
-    p->drawLine(x, this->PixelMin, x, this->PixelMax);
-    }
-  else
-    {
-    p->drawLine(this->PixelMin, y, this->PixelMax, y);
-    }
-    
-  // Draw the axis label
-  this->Label->draw(*p, area);
-}
-
-void pqChartAxis::drawAxisLine(QPainter *p)
-{
-  if(!p || !p->isActive() || !this->isVisible() || !this->isValid())
-    {
-    return;
-    }
-
-  int x = 0;
-  int y = 0;
+  // Use the font height and max label width to determine the minimum
+  // space between labels.
+  int lastTick = 0;
   bool vertical = this->Location == pqChartAxis::Left ||
       this->Location == pqChartAxis::Right;
-  if(this->Location == pqChartAxis::Top)
-    {
-    y = this->Bounds.bottom();
-    }
-  else if(this->Location == pqChartAxis::Left)
-    {
-    x = this->Bounds.right();
-    }
-  else if(this->Location == pqChartAxis::Right)
-    {
-    x = this->Bounds.left();
-    }
-  else
-    {
-    y = this->Bounds.top();
-    }
-
-  p->setPen(this->AxisColor);
   if(vertical)
     {
-    p->drawLine(x, this->PixelMin, x, this->PixelMax);
+    lastTick = this->Internal->Bounds.bottom() + 1;
+    if(this->Zoom)
+      {
+      lastTick -= this->Zoom->getYOffset();
+      }
     }
   else
     {
-    p->drawLine(this->PixelMin, y, this->PixelMax, y);
+    lastTick = this->Internal->Bounds.left() - 1;
+    if(this->Zoom)
+      {
+      lastTick -= this->Zoom->getXOffset();
+      }
+    }
+
+  // Draw the axis labels.
+  int i = 0;
+  QString label;
+  pqChartValue value;
+  QList<pqChartAxisItem *>::Iterator iter = this->Internal->Items.begin();
+  painter.setFont(this->Options->getLabelFont());
+  for( ; iter != this->Internal->Items.end(); ++iter, ++i)
+    {
+    if(vertical)
+      {
+      // Transform the contents coordinate to bounds space.
+      y = (*iter)->Pixel;
+      if(this->Zoom)
+        {
+        y -= this->Zoom->getYOffset();
+        }
+
+      // Make sure the label is inside the axis bounds.
+      if(y > this->Internal->Bounds.bottom())
+        {
+        lastTick = y;
+        continue;
+        }
+      else if(y < this->Internal->Bounds.top())
+        {
+        break;
+        }
+
+      // Draw the tick mark for the label. If the label won't fit,
+      // draw a smaller tick mark.
+      if(this->Internal->Skip == 1 || i % this->Internal->Skip == 0)
+        {
+        lastTick = y;
+        painter.setPen(this->Options->getAxisColor());
+        painter.drawLine(tick, y, x, y);
+        this->Model->getLabel(i, value);
+        label = value.getString(this->Options->getPrecision(),
+            this->Options->getNotation());
+        painter.setPen(this->Options->getLabelColor());
+        y += halfAscent;
+        if(this->Location == pqChartAxis::Left)
+          {
+          painter.drawText(tick - (*iter)->Width -
+              this->Internal->TickLabelSpacing, y, label);
+          }
+        else
+          {
+          painter.drawText(tick + this->Internal->TickLabelSpacing, y, label);
+          }
+        }
+      else if(y < lastTick)
+        {
+        // Only draw the tick mark if it isn't in the same position
+        // as the previous one.
+        lastTick = y;
+        painter.setPen(this->Options->getAxisColor());
+        painter.drawLine(tickSmall, y, x, y);
+        }
+      }
+    else
+      {
+      // Transform the contents coordinate to bounds space.
+      x = (*iter)->Pixel;
+      if(this->Zoom)
+        {
+        x -= this->Zoom->getXOffset();
+        }
+
+      // Make sure the label is inside the axis bounds.
+      if(x < this->Internal->Bounds.left())
+        {
+        lastTick = x;
+        continue;
+        }
+      else if(x > this->Internal->Bounds.right())
+        {
+        break;
+        }
+
+      // Draw the tick mark for the label. If the label won't fit,
+      // draw a smaller tick mark.
+      if(this->Internal->Skip == 1 || i % this->Internal->Skip == 0)
+        {
+        lastTick = x;
+        painter.setPen(this->Options->getAxisColor());
+        painter.drawLine(x, tick, x, y);
+        this->Model->getLabel(i, value);
+        label = value.getString(this->Options->getPrecision(),
+            this->Options->getNotation());
+        painter.setPen(this->Options->getLabelColor());
+        x -= (*iter)->Width / 2;
+        if(this->Location == pqChartAxis::Top)
+          {
+          painter.drawText(
+              x, tick - this->Internal->TickLabelSpacing - fontDescent, label);
+          }
+        else
+          {
+          painter.drawText(
+              x, tick + this->Internal->TickLabelSpacing + fontAscent, label);
+          }
+        }
+      else if(x > lastTick)
+        {
+        // Only draw the tick mark if it isn't in the same position
+        // as the previous one.
+        lastTick = x;
+        painter.setPen(this->Options->getAxisColor());
+        painter.drawLine(x, tickSmall, x, y);
+        }
+      }
     }
 }
 
-QColor pqChartAxis::lighter(const QColor color, float factor)
+void pqChartAxis::getBounds(QRect &bounds) const
 {
-  if(factor <= 0.0)
-    {
-    return color;
-    }
-  else if(factor >= 1.0)
-    {
-    return Qt::white;
-    }
-
-  // Find the distance between the current color and white.
-  float r = color.red();
-  float g = color.green();
-  float b = color.blue();
-  float d = sqrt(((255.0 - r) * (255.0 - r)) + ((255.0 - g) * (255.0 - g)) +
-      ((255.0 - b) * (255.0 - b)));
-  float f = factor * d;
-  float s = d - f;
-
-  // For a point on a line distance f from p1 and distance s
-  // from p2, the equation is:
-  // px = (fx2 + sx1)/(f + s)
-  // py = (fy2 + sy1)/(f + s)
-  // px = (fz2 + sz1)/(f + s)
-  r = ((f * 255.0) + (s * r))/(d);
-  g = ((f * 255.0) + (s * g))/(d);
-  b = ((f * 255.0) + (s * b))/(d);
-  return QColor((int)r, (int)g, (int)b);
+  bounds = this->Internal->Bounds;
 }
 
-void pqChartAxis::calculateMaxWidth()
+const pqChartPixelScale *pqChartAxis::getPixelValueScale() const
 {
-  if(this->ValueMax == this->ValueMin)
+  return this->Scale;
+}
+
+int pqChartAxis::getLabelLocation(int index) const
+{
+  if(index >= 0 && index < this->Internal->Items.size())
     {
+    int pixel = this->Internal->Items[index]->Pixel;
+    if(this->Zoom)
+      {
+      if(this->Location == pqChartAxis::Top ||
+          this->Location == pqChartAxis::Bottom)
+        {
+        pixel -= this->Zoom->getXOffset();
+        }
+      else
+        {
+        pixel -= this->Zoom->getYOffset();
+        }
+      }
+
+    return pixel;
+    }
+
+  return 0;
+}
+
+void pqChartAxis::reset()
+{
+  // Clean up the current view data.
+  QList<pqChartAxisItem *>::Iterator iter = this->Internal->Items.begin();
+  for( ; iter != this->Internal->Items.end(); ++iter)
+    {
+    delete *iter;
+    }
+
+  this->Internal->Items.clear();
+  this->Internal->MaxLabelWidth = 0;
+  if(this->Model)
+    {
+    // Query the model for the new list of labels.
+    int total = this->Model->getNumberOfLabels();
+    for(int i = 0; i < total; i++)
+      {
+      this->Internal->Items.append(new pqChartAxisItem());
+      }
+    }
+
+  // Request a re-layout.
+  if(!this->Internal->InLayout)
+    {
+    emit this->layoutNeeded();
+    }
+}
+
+void pqChartAxis::handleFontChange()
+{
+  // Set the font height and tick-label spacing.
+  QFontMetrics fm(this->Options->getLabelFont());
+  this->Internal->FontHeight = fm.height();
+  if(this->Location == pqChartAxis::Top ||
+      this->Location == pqChartAxis::Bottom)
+    {
+    this->Internal->TickLabelSpacing = fm.leading();
+    }
+  else
+    {
+    this->Internal->TickLabelSpacing = fm.width(" ");
+    }
+
+  // clear the label width cache.
+  this->clearLabelWidthCache();
+}
+
+void pqChartAxis::clearLabelWidthCache()
+{
+  // Clean up the current cache of label widths.
+  this->Internal->MaxLabelWidth = 0;
+  QList<pqChartAxisItem *>::Iterator iter = this->Internal->Items.begin();
+  for( ; iter != this->Internal->Items.end(); ++iter)
+    {
+    (*iter)->Width = 0;
+    }
+
+  // Request a re-layout.
+  emit this->layoutNeeded();
+}
+
+void pqChartAxis::insertLabel(int index)
+{
+  if(index < 0)
+    {
+    qDebug() << "Chart axis label inserted at index less than zero.";
     return;
+    }
+
+  if(index < this->Internal->Items.size())
+    {
+    this->Internal->Items.insert(index, new pqChartAxisItem());
+    }
+  else
+    {
+    this->Internal->Items.append(new pqChartAxisItem());
+    }
+
+  // Request a re-layout.
+  if(!this->Internal->InLayout)
+    {
+    emit this->layoutNeeded();
+    }
+}
+
+void pqChartAxis::startLabelRemoval(int index)
+{
+  if(index >= 0 && index < this->Internal->Items.size())
+    {
+    delete this->Internal->Items.takeAt(index);
+    }
+}
+
+void pqChartAxis::finishLabelRemoval(int)
+{
+  // Reset the max width.
+  this->Internal->MaxLabelWidth = 0;
+
+  // Request a re-layout.
+  if(!this->Internal->InLayout)
+    {
+    emit this->layoutNeeded();
+    }
+}
+
+int pqChartAxis::getLabelWidthGuess() const
+{
+  if(this->Internal->Maximum == this->Internal->Minimum)
+    {
+    return 0;
     }
 
   // If the axis uses logarithmic scale on integer values, the
   // values can be converted to floats.
   int length1 = 0;
   int length2 = 0;
-  if(this->Scale == pqChartAxis::Logarithmic &&
-      this->ValueMin.getType() == pqChartValue::IntValue)
+  if(this->Scale->getScaleType() == pqChartPixelScale::Logarithmic &&
+      this->Internal->Minimum.getType() == pqChartValue::IntValue)
     {
-    pqChartValue value = this->ValueMax;
+    pqChartValue value = this->Internal->Maximum;
     value.convertTo(pqChartValue::FloatValue);
-    length1 = value.getString(this->Precision, this->Notation).length();
-    value = this->ValueMin;
+    length1 = value.getString(this->Options->getPrecision(),
+        this->Options->getNotation()).length();
+    value = this->Internal->Minimum;
     value.convertTo(pqChartValue::FloatValue);
-    length2 = value.getString(this->Precision, this->Notation).length();
+    length2 = value.getString(this->Options->getPrecision(),
+        this->Options->getNotation()).length();
     }
   else
     {
-    length1 = this->ValueMax.getString(this->Precision, this->Notation).length();
-    length2 = this->ValueMin.getString(this->Precision, this->Notation).length();
+    length1 = this->Internal->Maximum.getString(this->Options->getPrecision(),
+        this->Options->getNotation()).length();
+    length2 = this->Internal->Minimum.getString(this->Options->getPrecision(),
+        this->Options->getNotation()).length();
     }
 
   if(length2 > length1)
@@ -1007,681 +1121,453 @@ void pqChartAxis::calculateMaxWidth()
 
   // Use a string of '8's to determine the maximum font width
   // in case the font is not fixed-pitch.
-  QFontMetrics fm(this->TickLabelFont);
-  QString str;
-  str.fill('8', length1);
-  this->WidthMax = fm.width(str);
-
-  // Let the observers know the axis needs to be layed out again.
-  emit this->layoutNeeded();
+  QFontMetrics fm(this->Options->getLabelFont());
+  QString label;
+  label.fill('8', length1);
+  return fm.width(label);
 }
 
-void pqChartAxis::calculateInterval()
+void pqChartAxis::generateLabels(const QRect &contents)
 {
-  if(!this->Data || !this->isValid())
-    return;
-
-  int allowed = 0;
-  if(this->Location == pqChartAxis::Top ||
-      this->Location == pqChartAxis::Bottom)
-    {
-    if(this->WidthMax == 0)
-      {
-      return;
-      }
-
-    allowed = this->getPixelRange()/(this->WidthMax + LABEL_MARGIN);
-    }
-  else
-    {
-    QFontMetrics fm(this->TickLabelFont);
-    allowed = this->getPixelRange()/(2*fm.height());
-    }
-
-  // There is no need to calculate anything for one interval.
-  pqChartAxisPair *pair = 0;
-  if(allowed <= 1)
-    {
-    this->ValueMax = this->TrueMax;
-    this->ValueMin = this->TrueMin;
-    pair = new pqChartAxisPair();
-    if(pair)
-      {
-      pair->Value = this->TrueMin;
-      pair->Pixel = this->PixelMin;
-      this->Data->push_back(pair);
-      }
-
-    pair = new pqChartAxisPair();
-    if(pair)
-      {
-      pair->Value = this->TrueMax;
-      pair->Pixel = this->PixelMax;
-      this->Data->push_back(pair);
-      }
-
-    return;
-    }
-
-  // Find the value range. Convert integers to floating point
-  // values to compare with the interval list.
-  pqChartValue range = this->TrueMax - this->TrueMin;
-  if(range.getType() == pqChartValue::IntValue)
-    {
-    range.convertTo(pqChartValue::FloatValue);
-    }
-
-  // Convert the value interval to exponent format for comparison.
-  // Save the exponent for re-application.
-  range /= allowed;
-  QString rangeString;
-  if(range.getType() == pqChartValue::DoubleValue)
-    {
-    rangeString.setNum(range.getDoubleValue(), 'e', 1);
-    }
-  else
-    {
-    rangeString.setNum(range.getFloatValue(), 'e', 1);
-    }
-
-  const char *temp = rangeString.toAscii().data();
-  int exponent = 0;
-  int index = rangeString.indexOf("e");
-  if(index != -1)
-    {
-    exponent = rangeString.right(rangeString.length() - index - 1).toInt();
-    rangeString.truncate((unsigned int)index);
-    }
-
-  // Set the new value for the range, which excludes exponent.
-  range.setValue(rangeString.toFloat());
-
-  // Search through the interval list for the closest one.
-  // Convert the negative interval to match the positive
-  // list values. Make sure the interval is not too small
-  // for the chart label precision.
-  bool negative = range < 0.0;
-  if(negative)
-    {
-    range *= -1;
-    }
-
-  bool found = false;
-  int minExponent = -this->Precision;
-  if(this->TrueMax.getType() == pqChartValue::IntValue)
-    {
-    minExponent = 0;
-    }
-  // FIX: if the range is very small (exponent<0) we want to use more intervals, not fewer
-  if(exponent < minExponent && exponent>0)
-    {
-    found = true;
-    range = IntervalList[0];
-    exponent = minExponent;
-    }
-  else
-    {
-    int i = 0;
-    for( ; i < IntervalListLength; i++)
-      {
-      // Skip 2.5 if the precision is reached.
-      if(exponent == minExponent && i == 2)
-        {
-        continue;
-        }
-      if(range <= IntervalList[i])
-        {
-        range = IntervalList[i];
-        found = true;
-        break;
-        }
-      }
-    }
-
-  if(!found)
-    {
-    range = IntervalList[0];
-    exponent++;
-    }
-
-  if(negative)
-    {
-    range *= -1;
-    }
-
-  // After finding a suitable interval, convert it back to
-  // a usable form.
-  rangeString.setNum(range.getFloatValue(), 'f', 1);
-  QString expString;
-  expString.setNum(exponent);
-  rangeString.append("e").append(expString);
-  temp = rangeString.toAscii().data();
-  if(this->TrueMax.getType() == pqChartValue::DoubleValue)
-    {
-    range.setValue(rangeString.toDouble());
-    }
-  else
-    {
-    range.setValue(rangeString.toFloat());
-    }
-
-  // Assign the pixel interval from the calculated value interval.
-  pqChartValue interval;
-  if(this->TrueMax.getType() == pqChartValue::IntValue)
-    {
-    interval.setValue(range.getIntValue());
-    if(interval == 0)
-      {
-      interval = this->TrueMax - this->TrueMin;
-      }
-    }
-  else
-    {
-    interval = range;
-    }
-
-  // Adjust the displayed min/max to align to the interval.
-  if(this->TrueMin == 0)
-    {
-    this->ValueMin = this->TrueMin;
-    }
-  else
-    {
-    int numIntervals = this->TrueMin/interval;
-    this->ValueMin = interval * numIntervals;
-    if(this->ValueMin > this->TrueMin)
-      {
-      this->ValueMin -= interval;
-      }
-    else if(this->ExtraMinPadding && this->ValueMin == this->TrueMin)
-      {
-      this->ValueMin -= interval;
-      }
-    }
-
-  if(this->TrueMax == 0)
-    {
-    this->ValueMax = this->TrueMax;
-    }
-  else
-    {
-    int numIntervals = this->TrueMax/interval;
-    this->ValueMax = interval * numIntervals;
-    if(this->ValueMax < this->TrueMax)
-      {
-      this->ValueMax += interval;
-      }
-    else if(this->ExtraMaxPadding && this->ValueMax == this->TrueMax)
-      {
-      this->ValueMax += interval;
-      }
-    }
-
-  // Fill in the data based on the interval.
-  this->Skip = 1;
-  int numberOfIntervals = 0;
-  pqChartValue v = this->ValueMin;
-  pqChartValue max = this->ValueMax;
-  max += interval/2; // Account for round-off error.
-  for( ; v < max; v += interval)
-    {
-    pair = new pqChartAxisPair();
-    if(pair)
-      {
-      pair->Value = v;
-      pair->Pixel = this->getPixelFor(v);
-      this->Data->push_back(pair);
-      }
-    else
-      {
-      break;
-      }
-    numberOfIntervals++;
-    }
-
-  // Adding half the interval misses the last value when the interval
-  // is an integer of 1.
-  if(interval.getType() == pqChartValue::IntValue && interval == 1)
-    {
-    pair = new pqChartAxisPair();
-    pair->Value = v;
-    pair->Pixel = this->getPixelFor(v);
-    this->Data->push_back(pair);
-    numberOfIntervals++;
-    }
-
-  this->Intervals = numberOfIntervals;
-}
-
-void pqChartAxis::calculateLogInterval()
-{
-  if(!this->Data || !this->isValid())
+  if(!this->Internal->UsingBestFit || !this->Model)
     {
     return;
     }
 
-  int needed = 0;
-  if(this->Location == pqChartAxis::Top ||
-      this->Location == pqChartAxis::Bottom)
+  // Clear the current labels from the model.
+  this->Model->startModifyingData();
+  this->Model->removeAllLabels();
+  if(this->Internal->Minimum != this->Internal->Maximum)
     {
-    if(this->WidthMax == 0)
+    // Find the number of labels that will fit in the contents.
+    int allowed = 0;
+    if(this->Location == pqChartAxis::Top ||
+        this->Location == pqChartAxis::Bottom)
       {
-      return;
-      }
-
-    needed = this->WidthMax + LABEL_MARGIN;
-    }
-  else
-    {
-    QFontMetrics fm(this->TickLabelFont);
-    needed = 2*fm.height();
-    }
-
-  // Adjust the min/max to a power of ten.
-  int maxExp = -1;
-  int minExp = -1;
-  double logValue = 0.0;
-  bool reversed = this->TrueMin < 0;
-  if(reversed)
-    {
-    logValue = log10(-this->TrueMin.getDoubleValue());
-    }
-  else
-    {
-    logValue = log10(this->TrueMax.getDoubleValue());
-    }
-
-  maxExp = (int)logValue;
-  if(logValue > (double)maxExp)
-    {
-    maxExp++;
-    }
-
-  if(!(this->TrueMin.getType() == pqChartValue::IntValue &&
-      ((reversed && this->TrueMax == 0) || this->TrueMin == 0)))
-    {
-    if(reversed)
-      {
-      logValue = log10(-this->TrueMax.getDoubleValue());
-      }
-    else
-      {
-      logValue = log10(this->TrueMin.getDoubleValue());
-      }
-
-    // The log10 result can be off for certain values so adjust
-    // the result to get a better integer exponent.
-    if(logValue < 0.0)
-      {
-      logValue -= pqChartAxis::MinLogValue;
-      }
-    else
-      {
-      logValue += pqChartAxis::MinLogValue;
-      }
-
-    minExp = (int)logValue;
-    }
-
-  int pixelRange = this->getPixelRange();
-  int allowed = pixelRange/needed;
-  int subInterval = 0;
-  this->Intervals = maxExp - minExp;
-  this->Count = this->Intervals;
-  if(reversed)
-    {
-    this->ValueMax = -pow((double)10.0, (double)minExp);
-    this->ValueMax.convertTo(this->TrueMin.getType());
-    }
-  else
-    {
-    this->ValueMin = pow((double)10.0, (double)minExp);
-    this->ValueMin.convertTo(this->TrueMin.getType());
-    }
-
-  if(allowed > this->Intervals)
-    {
-    this->Skip = 1;
-    if(reversed)
-      {
-      this->ValueMin = -pow((double)10.0, (double)maxExp);
-      this->ValueMin.convertTo(this->TrueMin.getType());
-      }
-    else
-      {
-      this->ValueMax = pow((double)10.0, (double)maxExp);
-      this->ValueMax.convertTo(this->TrueMin.getType());
-      }
-
-    // If the number of allowed tick marks is greater than the
-    // exponent range, there may be space for sub-intervals.
-    int remaining = allowed/this->Intervals;
-    if(remaining >= 20)
-      {
-      subInterval = 1;
-      this->Count *= 9;
-      }
-    else if(remaining >= 10)
-      {
-      subInterval = 2;
-      this->Count *= 5;
-      }
-    else if(remaining >= 3)
-      {
-      subInterval = 5;
-      this->Count *= 2;
-      }
-    }
-  else
-    {
-    // Set up the skip interval and number showing for the axis.
-    if(pixelRange/this->Count < 2)
-      {
-      this->Count = pixelRange/2;
-      if(this->Count == 0)
+      // The contents width doesn't account for the label width or the
+      // neighbor width.
+      int labelWidth = this->getLabelWidthGuess();
+      int halfWidth = labelWidth / 2;
+      int total = contents.width();
+      int space = halfWidth;
+      if(this->AtMin && !this->AtMin->isSpaceTooSmall())
         {
-        this->Count = 1;
-        }
-
-      if(reversed)
-        {
-        this->ValueMin = -pow((double)10.0, (double)(minExp + this->Count));
-        this->ValueMin.convertTo(this->TrueMax.getType());
-        }
-      else
-        {
-        this->ValueMax = pow((double)10.0, (double)(minExp + this->Count));
-        this->ValueMax.convertTo(this->TrueMax.getType());
-        }
-      }
-    else
-      {
-      if(reversed)
-        {
-        this->ValueMin = -pow((double)10.0, (double)maxExp);
-        this->ValueMin.convertTo(this->TrueMax.getType());
-        }
-      else
-        {
-        this->ValueMax = pow((double)10.0, (double)maxExp);
-        this->ValueMax.convertTo(this->TrueMax.getType());
-        }
-      }
-
-    needed *= this->Count - 1;
-    this->Skip = needed/pixelRange;
-    if(this->Skip == 0 || needed % pixelRange > 0)
-      {
-      this->Skip += 1;
-      }
-    }
-
-  // Place the first value on the list using value min in case
-  // the first value is int zero.
-  pqChartAxisPair *pair = new pqChartAxisPair();
-  if(!pair)
-    {
-    return;
-    }
-
-  this->Data->push_back(pair);
-  if(reversed)
-    {
-    pair->Value = this->ValueMax;
-    pair->Pixel = this->PixelMax;
-    }
-  else
-    {
-    pair->Value = this->ValueMin;
-    pair->Pixel = this->PixelMin;
-    }
-
-  // Fill in the data based on the interval.
-  pqChartAxisPair *subItem = 0;
-  for(int i = 1; i <= this->Intervals; i++)
-    {
-    // Add entries for the sub-intervals if there are any. Don't
-    // add sub-intervals for int values less than one.
-    if(subInterval > 0 && !(pair->Value.getType() == pqChartValue::IntValue &&
-        pair->Value == 0))
-      {
-      for(int j = subInterval; j < 10; j += subInterval)
-        {
-        subItem = new pqChartAxisPair();
-        if(!pair)
+        space = this->AtMin->getPreferredSpace();
+        if(space < halfWidth)
           {
-          break;
+          space = halfWidth;
           }
+        }
 
-        subItem->Value = pair->Value;
-        subItem->Value *= j;
-        subItem->Pixel = this->getPixelFor(subItem->Value);
-        this->Data->push_back(subItem);
+      total -= space;
+      space = halfWidth;
+      if(this->AtMax && !this->AtMax->isSpaceTooSmall())
+        {
+        space = this->AtMax->getPreferredSpace();
+        if(space < halfWidth)
+          {
+          space = halfWidth;
+          }
+        }
+
+      total -= space;
+      allowed = total / (labelWidth + this->Internal->FontHeight);
+      }
+    else
+      {
+      allowed = contents.height() / (2 * this->Internal->FontHeight);
+      }
+
+    if(allowed > 1)
+      {
+      // Find the value range. Convert integers to floating point
+      // values to compare with the interval list.
+      pqChartValue range = this->Internal->Maximum - this->Internal->Minimum;
+      if(range.getType() == pqChartValue::IntValue)
+        {
+        range.convertTo(pqChartValue::FloatValue);
+        }
+
+      // Convert the value interval to exponent format for comparison.
+      // Save the exponent for re-application.
+      range /= allowed;
+      QString rangeString;
+      if(range.getType() == pqChartValue::DoubleValue)
+        {
+        rangeString.setNum(range.getDoubleValue(), 'e', 1);
+        }
+      else
+        {
+        rangeString.setNum(range.getFloatValue(), 'e', 1);
+        }
+
+      int exponent = 0;
+      int index = rangeString.indexOf("e");
+      if(index != -1)
+        {
+        exponent = rangeString.right(rangeString.length() - index - 1).toInt();
+        rangeString.truncate((unsigned int)index);
+        }
+
+      // Set the new value for the range, which excludes exponent.
+      range.setValue(rangeString.toFloat());
+
+      // Search through the interval list for the closest one.
+      // Convert the negative interval to match the positive
+      // list values. Make sure the interval is not too small
+      // for the chart label precision.
+      bool negative = range < 0.0;
+      if(negative)
+        {
+        range *= -1;
+        }
+
+      bool found = false;
+      int minExponent = -this->Options->getPrecision();
+      if(this->Internal->Maximum.getType() == pqChartValue::IntValue)
+        {
+        minExponent = 0;
+        }
+
+      // FIX: If the range is very small (exponent<0), we want to use
+      // more intervals, not fewer.
+      if(exponent < minExponent && exponent > 0)
+        {
+        found = true;
+        range = IntervalList[0];
+        exponent = minExponent;
+        }
+      else
+        {
+        int i = 0;
+        for( ; i < IntervalListLength; i++)
+          {
+          // Skip 2.5 if the precision is reached.
+          if(exponent == minExponent && i == 2)
+            {
+            continue;
+            }
+          if(range <= IntervalList[i])
+            {
+            range = IntervalList[i];
+            found = true;
+            break;
+            }
+          }
+        }
+
+      if(!found)
+        {
+        range = IntervalList[0];
+        exponent++;
+        }
+
+      if(negative)
+        {
+        range *= -1;
+        }
+
+      // After finding a suitable interval, convert it back to
+      // a usable form.
+      rangeString.setNum(range.getFloatValue(), 'f', 1);
+      QString expString;
+      expString.setNum(exponent);
+      rangeString.append("e").append(expString);
+      if(this->Internal->Maximum.getType() == pqChartValue::DoubleValue)
+        {
+        range.setValue(rangeString.toDouble());
+        }
+      else
+        {
+        range.setValue(rangeString.toFloat());
+        }
+
+      // Assign the pixel interval from the calculated value interval.
+      pqChartValue interval;
+      if(this->Internal->Maximum.getType() == pqChartValue::IntValue)
+        {
+        interval.setValue(range.getIntValue());
+        if(interval == 0)
+          {
+          interval = this->Internal->Maximum - this->Internal->Minimum;
+          }
+        }
+      else
+        {
+        interval = range;
+        }
+
+      // Adjust the displayed min/max to align to the interval.
+      pqChartValue minimum = this->Internal->Minimum;
+      if(this->Internal->Minimum != 0)
+        {
+        int numIntervals = this->Internal->Minimum / interval;
+        minimum = interval * numIntervals;
+        if(minimum > this->Internal->Minimum)
+          {
+          minimum -= interval;
+          }
+        else if(this->Internal->ExtraMinPadding &&
+            minimum == this->Internal->Minimum)
+          {
+          minimum -= interval;
+          }
+        }
+
+      pqChartValue maximum = this->Internal->Maximum;
+      if(this->Internal->Maximum != 0)
+        {
+        int numIntervals = this->Internal->Maximum / interval;
+        maximum = interval * numIntervals;
+        if(maximum < this->Internal->Maximum)
+          {
+          maximum += interval;
+          }
+        else if(this->Internal->ExtraMaxPadding &&
+            maximum == this->Internal->Maximum)
+          {
+          maximum += interval;
+          }
+        }
+
+      // Fill in the data based on the interval.
+      maximum += interval/2; // Account for round-off error.
+      for( ; minimum < maximum; minimum += interval)
+        {
+        this->Model->addLabel(minimum);
+        }
+
+      // Adding half the interval misses the last value when the interval
+      // is an integer of 1.
+      if(interval.getType() == pqChartValue::IntValue && interval == 1)
+        {
+        this->Model->addLabel(minimum);
         }
       }
-
-    pair = new pqChartAxisPair();
-    if(!pair)
+    else
       {
-      break;
+      this->Model->addLabel(this->Internal->Minimum);
+      this->Model->addLabel(this->Internal->Maximum);
       }
-
-    pair->Value = pow((double)10.0, (double)(minExp + i));
-    if(reversed)
-      {
-      pair->Value *= -1;
-      }
-
-    pair->Value.convertTo(this->TrueMin.getType());
-    pair->Pixel = this->getPixelFor(pair->Value);
-    this->Data->push_back(pair);
     }
+  else if(this->Internal->DataAvailable)
+    {
+    // The best fit range is zero, but there is data available. Use a
+    // small interval to place labels around the data.
+    this->Model->addLabel(this->Internal->Minimum - 1);
+    this->Model->addLabel(this->Internal->Minimum);
+    this->Model->addLabel(this->Internal->Minimum + 1);
+    }
+
+  this->Model->finishModifyingData();
 }
 
-void pqChartAxis::calculateFixedLayout()
+void pqChartAxis::generateLogLabels(const QRect &contents)
 {
-  if(!this->Data || !this->isValid() || this->Intervals <= 0)
+  if(!this->Internal->UsingBestFit || !this->Model)
     {
     return;
     }
 
-  // For a log scale that is equally spaced, use the exponent
-  // as the interval.
-  pqChartValue logMin;
-  pqChartValue logMax;
-  pqChartValue interval;
-  bool reversed = false;
-  if(this->Scale == pqChartAxis::Logarithmic)
+  // Make sure the range is valid for log scale.
+  if((this->Internal->Maximum >= 0 && this->Internal->Minimum <= 0) ||
+      (this->Internal->Maximum <= 0 && this->Internal->Minimum >= 0))
     {
-    reversed = this->ValueMin < 0;
-    if(this->ValueMin.getType() == pqChartValue::IntValue &&
-        this->ValueMin == 0)
+    qCritical() << "Error: Invalid range for a logarithmic scale.";
+    return;
+    }
+
+  // Clear the current labels from the model.
+  this->Model->startModifyingData();
+  this->Model->removeAllLabels();
+  if(this->Internal->Minimum != this->Internal->Maximum)
+    {
+    int needed = 0;
+    int pixelRange = 0;
+    if(this->Location == pqChartAxis::Top ||
+        this->Location == pqChartAxis::Bottom)
       {
-      logMin = MinIntLogPower;
+      int labelWidth = this->getLabelWidthGuess();
+      needed = labelWidth + this->Internal->FontHeight;
+
+      // The contents width doesn't account for the label width or the
+      // neighbor width.
+      pixelRange = contents.width();
+      int space = labelWidth;
+      if(this->AtMin && !this->AtMin->isSpaceTooSmall())
+        {
+        space = this->AtMin->getPreferredSpace();
+        if(space < labelWidth)
+          {
+          space = labelWidth;
+          }
+        }
+
+      pixelRange -= space;
+      space = labelWidth;
+      if(this->AtMax && !this->AtMax->isSpaceTooSmall())
+        {
+        space = this->AtMax->getPreferredSpace();
+        if(space < labelWidth)
+          {
+          space = labelWidth;
+          }
+        }
+
+      pixelRange -= space;
       }
     else
       {
+      needed = 2 * this->Internal->FontHeight;
+      pixelRange = contents.height();
+      }
+
+    // Adjust the min/max to a power of ten.
+    int maxExp = -1;
+    int minExp = -1;
+    double logValue = 0.0;
+    bool reversed = this->Internal->Minimum < 0;
+    if(reversed)
+      {
+      logValue = log10(-this->Internal->Minimum.getDoubleValue());
+      }
+    else
+      {
+      logValue = log10(this->Internal->Maximum.getDoubleValue());
+      }
+
+    maxExp = (int)logValue;
+    if(logValue > (double)maxExp)
+      {
+      maxExp++;
+      }
+
+    if(!(this->Internal->Minimum.getType() == pqChartValue::IntValue &&
+        ((reversed && this->Internal->Maximum == 0) ||
+        this->Internal->Minimum == 0)))
+      {
       if(reversed)
         {
-        logMin = log10(-this->ValueMin.getDoubleValue());
+        logValue = log10(-this->Internal->Maximum.getDoubleValue());
         }
       else
         {
-        logMin = log10(this->ValueMin.getDoubleValue());
+        logValue = log10(this->Internal->Minimum.getDoubleValue());
         }
-      }
 
-    if(this->ValueMax.getType() == pqChartValue::IntValue &&
-        this->ValueMax == 0)
-      {
-      logMax = MinIntLogPower;
-      }
-    else
-      {
-      if(reversed)
+      // The log10 result can be off for certain values so adjust
+      // the result to get a better integer exponent.
+      if(logValue < 0.0)
         {
-        logMax = log10(-this->ValueMax.getDoubleValue());
+        logValue -= this->Scale->MinLogValue;
         }
       else
         {
-        logMax = log10(this->ValueMax.getDoubleValue());
+        logValue += this->Scale->MinLogValue;
         }
+
+      minExp = (int)logValue;
       }
 
-    interval = (logMax - logMin)/this->Intervals;
-    }
-  else
-    {
-    interval = (this->ValueMax - this->ValueMin)/this->Intervals;
-    }
-
-  int needed = 0;
-  if(this->Location == pqChartAxis::Top ||
-      this->Location == pqChartAxis::Bottom)
-    {
-    if(this->WidthMax == 0)
+    int allowed = pixelRange / needed;
+    int subInterval = 0;
+    int intervals = maxExp - minExp;
+    pqChartValue value;
+    if(reversed)
       {
-      return;
-      }
-
-    needed = this->WidthMax + LABEL_MARGIN;
-    }
-  else
-    {
-    QFontMetrics fm(this->TickLabelFont);
-    needed = 2*fm.height();
-    }
-
-  // Determine the pixel length between each tick mark on the
-  // axis. If the length is too small, only show a portion of
-  // the values.
-  int pixelRange = getPixelRange();
-  this->Count = this->Intervals;
-  if(pixelRange/this->Count < 2)
-    {
-    this->Count = pixelRange/2;
-    if(this->Count == 0)
-      {
-      this->Count = 1;
-      }
-
-    if(this->Scale == pqChartAxis::Logarithmic)
-      {
-      pqChartValue newMax = logMin + (interval * this->Count);
-      this->ValueMax = pow((double)10.0, newMax.getDoubleValue());
-      if(reversed)
-        {
-        this->ValueMax *= -1;
-        }
-      if(this->TrueMin.getType() != pqChartValue::DoubleValue)
-        {
-        this->ValueMax.convertTo(pqChartValue::FloatValue);
-        }
+      value = -pow((double)10.0, (double)minExp);
       }
     else
       {
-      this->ValueMax = this->ValueMin + (interval * this->Count);
+      value = pow((double)10.0, (double)minExp);
       }
-    }
-  else if(this->TrueMin != this->TrueMax)
-    {
-    this->ValueMax = this->TrueMax;
-    }
 
-  // Set the skip interval for the axis.
-  needed *= this->Count - 1;
-  this->Skip = needed/pixelRange;
-  if(this->Skip == 0 || needed % pixelRange > 0)
-    {
-    this->Skip += 1;
-    }
+    value.convertTo(this->Internal->Minimum.getType());
+    if(allowed > intervals)
+      {
+      // If the number of allowed tick marks is greater than the
+      // exponent range, there may be space for sub-intervals.
+      int remaining = allowed / intervals;
+      if(remaining >= 20)
+        {
+        subInterval = 1;
+        }
+      else if(remaining >= 10)
+        {
+        subInterval = 2;
+        }
+      else if(remaining >= 3)
+        {
+        subInterval = 5;
+        }
+      }
 
-  int i = 0;
-  pqChartAxisPair *pair = 0;
-  if(this->Scale == pqChartAxis::Logarithmic)
-    {
     // Place the first value on the list using value min in case
     // the first value is int zero.
-    pair = new pqChartAxisPair();
-    if(!pair)
-      {
-      return;
-      }
+    this->Model->addLabel(value);
 
-    pair->Value = this->ValueMin;
-    if(this->TrueMin.getType() == pqChartValue::IntValue)
+    // Fill in the data based on the interval.
+    pqChartValue subItem;
+    for(int i = 1; i <= intervals; i++)
       {
-      pair->Value.convertTo(pqChartValue::FloatValue);
-      }
+      // Add entries for the sub-intervals if there are any. Don't
+      // add sub-intervals for int values less than one.
+      if(subInterval > 0 && !(value.getType() == pqChartValue::IntValue &&
+          value == 0))
+        {
+        for(int j = subInterval; j < 10; j += subInterval)
+          {
+          subItem = value;
+          subItem *= j;
+          this->Model->addLabel(subItem);
+          }
+        }
 
-    pair->Pixel = this->PixelMin;
-    this->Data->push_back(pair);
-    i = 1;
-    }
-
-  // Fill in the data based on the interval.
-  pqChartValue v = this->ValueMin;
-  for( ; i <= this->Intervals; i++)
-    {
-    pair = new pqChartAxisPair();
-    if(!pair)
-      {
-      break;
-      }
-
-    if(this->Scale == pqChartAxis::Logarithmic)
-      {
-      logMin += interval;
-      pair->Value = pow((double)10.0, logMin.getDoubleValue());
+      value = pow((double)10.0, (double)(minExp + i));
       if(reversed)
         {
-        pair->Value *= -1;
+        value *= -1;
         }
-      if(this->TrueMin.getType() != pqChartValue::DoubleValue)
-        {
-        pair->Value.convertTo(pqChartValue::FloatValue);
-        }
+
+      value.convertTo(this->Internal->Minimum.getType());
+      this->Model->addLabel(value);
+      }
+    }
+  else if(this->Internal->DataAvailable)
+    {
+    // The best fit range is zero, but there is data available. Find
+    // the closest power of ten around the value.
+    int logValue = 0;
+    bool reversed = this->Internal->Minimum < 0;
+    if(reversed)
+      {
+      logValue = (int)log10(-this->Internal->Minimum.getDoubleValue());
       }
     else
       {
-      pair->Value = v;
-      v += interval;
+      logValue = (int)log10(this->Internal->Maximum.getDoubleValue());
       }
 
-    if(i == this->Intervals && this->Count == this->Intervals)
+    pqChartValue value = pow((double)10.0, (double)logValue);
+    if(reversed)
       {
-      pair->Pixel = this->PixelMax;
-      }
-    else
-      {
-      pair->Pixel = this->getPixelFor(pair->Value);
+      value *= -1;
       }
 
-    this->Data->push_back(pair);
+    value.convertTo(this->Internal->Minimum.getType());
+    this->Model->addLabel(value);
+    logValue += 1;
+    value = pow((double)10.0, (double)logValue);
+    if(reversed)
+      {
+      value *= -1;
+      }
+
+    value.convertTo(this->Internal->Minimum.getType());
+    this->Model->addLabel(value);
     }
 
-  // If the axis is a reversed log scale of integer type, the max
-  // may need to be adjusted to zero.
-  if(reversed && this->Scale == pqChartAxis::Logarithmic && pair &&
-      this->TrueMax.getType() == pqChartValue::IntValue && this->TrueMax == 0)
-    {
-    pair->Value = (float)0.0;
-    }
-}
-
-void pqChartAxis::cleanData()
-{
-  if(this->Data)
-    {
-    pqChartAxisData::iterator iter = this->Data->begin();
-    for( ; iter != this->Data->end(); ++iter)
-      {
-      delete *iter;
-      *iter = 0;
-      }
-
-    this->Data->clear();
-    }
+  this->Model->finishModifyingData();
 }
 
 

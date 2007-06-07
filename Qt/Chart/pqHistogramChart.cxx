@@ -30,96 +30,91 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/*!
- * \file pqHistogramChart.cxx
- *
- * \brief
- *   The pqHistogramChart class is used to display a histogram chart.
- *
- * \author Mark Richardson
- * \date   May 12, 2005
- */
+/// \file pqHistogramChart.cxx
+/// \date 2/14/2007
 
 #include "pqHistogramChart.h"
 
-#include "pqChartValue.h"
+#include "pqChartAxisModel.h"
 #include "pqChartAxis.h"
-#include "pqHistogramColor.h"
+#include "pqChartContentsSpace.h"
+#include "pqHistogramChartOptions.h"
 #include "pqHistogramModel.h"
-#include "pqHistogramSelection.h"
-#include "pqHistogramSelectionModel.h"
+#include "pqChartPixelScale.h"
 
-#include <QFontMetrics>
 #include <QPainter>
+#include <QRect>
+#include <QtDebug>
 #include <QVector>
 
 
-/// \class pqHistogramChartData
-/// \brief
-///   The pqHistogramChartData class hides the private data of the
-///   pqHistogramChart class.
-class pqHistogramChartData
+class pqHistogramChartInternal
 {
 public:
-  pqHistogramChartData();
-  ~pqHistogramChartData() {}
+  pqHistogramChartInternal();
+  ~pqHistogramChartInternal() {}
 
-public:
   QVector<QRect> Items;      ///< The list of histogram bars.
   QVector<QRect> Highlights; ///< The list of highlighted ranges.
-
-  /// Stores the default color scheme for the histogram.
-  static pqHistogramColor ColorScheme;
+  QRect Bounds;              ///< Stores the chart bounds.
+  QRect Contents;            ///< Stores the contents area.
 };
 
 
 //----------------------------------------------------------------------------
-pqHistogramColor pqHistogramChartData::ColorScheme;
-
-pqHistogramChartData::pqHistogramChartData()
-  : Items(), Highlights()
+pqHistogramChartInternal::pqHistogramChartInternal()
+  : Items(), Highlights(), Bounds(), Contents()
 {
 }
 
 
 //----------------------------------------------------------------------------
-QColor pqHistogramChart::LightBlue = QColor(125, 165, 230);
-
-pqHistogramChart::pqHistogramChart(QObject *p)
-  : QObject(p), Bounds(), Select(LightBlue)
+pqHistogramChart::pqHistogramChart(QObject *parentObject)
+  : pqChartLayer(parentObject)
 {
-  this->Style = pqHistogramChart::Fill;
-  this->OutlineType = pqHistogramChart::Darker;
-  this->Colors = &pqHistogramChartData::ColorScheme;
-  this->Data = new pqHistogramChartData();
+  this->Internal = new pqHistogramChartInternal();
+  this->Options = new pqHistogramChartOptions(this);
+  this->XAxis = 0;
+  this->YAxis = 0;
   this->Model = 0;
   this->Selection = new pqHistogramSelectionModel(this);
   this->InModelChange = false;
 
+  // Listen for option changes.
+  this->connect(this->Options, SIGNAL(optionsChanged()),
+      this, SIGNAL(repaintNeeded()));
+
   // Listen for selection changes.
   this->connect(this->Selection,
       SIGNAL(selectionChanged(const pqHistogramSelectionList &)),
-      this, SLOT(updateHighlights(const pqHistogramSelectionList &)));
+      this, SLOT(updateHighlights()));
 }
 
 pqHistogramChart::~pqHistogramChart()
 {
-  this->clearData();
-  delete this->Data;
+  delete this->Internal;
+  delete this->Options;
   delete this->Selection;
 }
 
 void pqHistogramChart::setAxes(pqChartAxis *xAxis, pqChartAxis *yAxis)
 {
+  if(xAxis->getLocation() == pqChartAxis::Left ||
+      xAxis->getLocation() == pqChartAxis::Right)
+    {
+    qCritical() << "Error: The x-axis must be a horizontal axis.";
+    return;
+    }
+
+  if(yAxis->getLocation() == pqChartAxis::Top ||
+      yAxis->getLocation() == pqChartAxis::Bottom)
+    {
+    qCritical() << "Error: The y-axis must be a vertical axis.";
+    return;
+    }
+
   this->XAxis = xAxis;
   this->YAxis = yAxis;
-
-  // If the model is set, update the axis ranges from the model.
-  if(this->Model)
-    {
-    this->updateAxisRanges();
-    emit this->layoutNeeded();
-    }
 }
 
 void pqHistogramChart::setModel(pqHistogramModel *model)
@@ -133,7 +128,8 @@ void pqHistogramChart::setModel(pqHistogramModel *model)
   // selection model is notified of the change.
   this->InModelChange = true;
   this->Selection->beginModelReset();
-  this->clearData();
+  this->Internal->Items.clear();
+  this->Internal->Highlights.clear();
 
   if(this->Model)
     {
@@ -146,20 +142,22 @@ void pqHistogramChart::setModel(pqHistogramModel *model)
   if(this->Model)
     {
     // Connect to the new model's signals.
-    this->connect(this->Model, SIGNAL(binValuesReset()),
+    this->connect(this->Model, SIGNAL(histogramReset()),
         this, SLOT(handleModelReset()));
-    this->connect(this->Model, SIGNAL(aboutToInsertBinValues(int, int)),
+    this->connect(this->Model, SIGNAL(aboutToInsertBins(int, int)),
         this, SLOT(startBinInsertion(int, int)));
-    this->connect(this->Model, SIGNAL(binValuesInserted()),
+    this->connect(this->Model, SIGNAL(binsInserted()),
         this, SLOT(finishBinInsertion()));
-    this->connect(this->Model, SIGNAL(aboutToRemoveBinValues(int, int)),
+    this->connect(this->Model, SIGNAL(aboutToRemoveBins(int, int)),
         this, SLOT(startBinRemoval(int, int)));
-    this->connect(this->Model, SIGNAL(binValuesRemoved()),
+    this->connect(this->Model, SIGNAL(binsRemoved()),
         this, SLOT(finishBinRemoval()));
+    this->connect(this->Model, SIGNAL(histogramRangeChanged()),
+        this, SIGNAL(rangeChanged()));
     }
 
   // Set up the axis ranges and update the chart layout.
-  this->updateAxisRanges();
+  emit this->rangeChanged();
   emit this->layoutNeeded();
 
   // Notify the slection model that the reset is complete, which may
@@ -171,22 +169,25 @@ void pqHistogramChart::setModel(pqHistogramModel *model)
 int pqHistogramChart::getBinWidth() const
 {
   if(this->Model && this->Model->getNumberOfBins() > 0 &&
-      this->Bounds.isValid())
+      this->Internal->Contents.isValid())
     {
-    return this->Bounds.width()/this->Model->getNumberOfBins();
+    return this->Internal->Contents.width()/this->Model->getNumberOfBins();
     }
 
   return 0;
 }
 
-int pqHistogramChart::getBinAt(int x, int y, bool entireBin) const
+int pqHistogramChart::getBinAt(int x, int y,
+    pqHistogramChart::BinPickMode mode) const
 {
-  if(this->Bounds.isValid() && this->Bounds.contains(x, y))
+  if(this->Internal->Contents.isValid() &&
+      this->Internal->Contents.contains(x, y))
     {
-    QVector<QRect>::Iterator iter = this->Data->Items.begin();
-    for(int i = 0; iter != this->Data->Items.end(); iter++, i++)
+    QVector<QRect>::Iterator iter = this->Internal->Items.begin();
+    for(int i = 0; iter != this->Internal->Items.end(); iter++, i++)
       {
-      if(entireBin && iter->isValid() && iter->left() < x && x < iter->right())
+      if(mode == pqHistogramChart::BinRange && iter->isValid() &&
+          iter->left() < x && x < iter->right())
         {
         return i;
         }
@@ -202,10 +203,16 @@ int pqHistogramChart::getBinAt(int x, int y, bool entireBin) const
 
 bool pqHistogramChart::getValueAt(int x, int y, pqChartValue &value) const
 {
-  if(this->Bounds.isValid() && this->XAxis->isValid() &&
-      this->Bounds.contains(x, y))
+  if(!this->XAxis)
     {
-    pqChartValue range = this->XAxis->getValueRange();
+    return false;
+    }
+
+  const pqChartPixelScale *scale = this->XAxis->getPixelValueScale();
+  if(this->Internal->Contents.isValid() && scale->isValid() &&
+      this->Internal->Contents.contains(x, y))
+    {
+    pqChartValue range = scale->getValueRange();
     if(range.getType() == pqChartValue::IntValue)
       {
       // Adjust the pick location if the pixel to value ratio is
@@ -213,19 +220,21 @@ bool pqHistogramChart::getValueAt(int x, int y, pqChartValue &value) const
       int pixel = 0;
       if(range != 0)
         {
-        pixel = this->XAxis->getPixelRange() / range;
+        pixel = scale->getPixelRange() / range;
         }
+
       if(pixel < 0)
         {
         pixel = -pixel;
         }
+
       if(pixel > 1)
         {
         x += (pixel/2) + 1;
         }
       }
 
-    value = this->XAxis->getValueFor(x);
+    value = scale->getValueFor(x);
     return true;
     }
 
@@ -235,14 +244,20 @@ bool pqHistogramChart::getValueAt(int x, int y, pqChartValue &value) const
 bool pqHistogramChart::getValueRangeAt(int x, int y,
     pqHistogramSelection &range) const
 {
-  if(this->Bounds.isValid() && this->XAxis->isValid() &&
-    this->Bounds.contains(x, y))
+  if(!this->XAxis)
+    {
+    return false;
+    }
+
+  const pqChartPixelScale *scale = this->XAxis->getPixelValueScale();
+  if(this->Internal->Contents.isValid() && scale->isValid() &&
+    this->Internal->Contents.contains(x, y))
     {
     // Make sure the selection type is 'Value'.
     if(this->Selection->getType() == pqHistogramSelection::Value)
       {
       const pqHistogramSelectionList &list = this->Selection->getSelection();
-      pqChartValue diff = this->XAxis->getValueRange();
+      pqChartValue diff = scale->getValueRange();
       if(diff.getType() == pqChartValue::IntValue)
         {
         // Adjust the pick location if the pixel to value ratio is
@@ -250,7 +265,7 @@ bool pqHistogramChart::getValueRangeAt(int x, int y,
         int pixel = 0;
         if(diff != 0)
           {
-          pixel = this->XAxis->getPixelRange() / diff;
+          pixel = scale->getPixelRange() / diff;
           }
         if(pixel < 0)
           {
@@ -263,7 +278,7 @@ bool pqHistogramChart::getValueRangeAt(int x, int y,
         }
 
       // Search through the current selection list.
-      pqChartValue value = this->XAxis->getValueFor(x);
+      pqChartValue value = scale->getValueFor(x);
       pqHistogramSelectionList::ConstIterator iter = list.begin();
       for( ; iter != list.end(); ++iter)
         {
@@ -288,13 +303,14 @@ bool pqHistogramChart::getValueRangeAt(int x, int y,
 }
 
 void pqHistogramChart::getBinsIn(const QRect &area,
-    pqHistogramSelectionList &list, bool entireBins) const
+    pqHistogramSelectionList &list, pqHistogramChart::BinPickMode mode) const
 {
-  if(this->Bounds.isValid() && area.intersects(this->Bounds))
+  if(this->Internal->Contents.isValid() && area.isValid() &&
+      area.intersects(this->Internal->Contents))
     {
     pqChartValue i((int)0);
-    QVector<QRect>::Iterator iter = this->Data->Items.begin();
-    for( ; iter != this->Data->Items.end(); ++iter, ++i)
+    QVector<QRect>::Iterator iter = this->Internal->Items.begin();
+    for( ; iter != this->Internal->Items.end(); ++iter, ++i)
       {
       if(area.right() < iter->left())
         {
@@ -302,8 +318,8 @@ void pqHistogramChart::getBinsIn(const QRect &area,
         }
 
       bool intersection = false;
-      if(entireBins && iter->isValid() && iter->left() < area.right() &&
-          iter->right() > area.left())
+      if(mode == pqHistogramChart::BinRange && iter->isValid() &&
+          iter->left() < area.right() && iter->right() > area.left())
         {
         intersection = true;
         }
@@ -330,19 +346,19 @@ void pqHistogramChart::getBinsIn(const QRect &area,
 void pqHistogramChart::getValuesIn(const QRect &area,
     pqHistogramSelectionList &list) const
 {
-  if(!area.isValid() || !this->Bounds.isValid())
+  if(!this->XAxis || !area.isValid() || !this->Internal->Contents.isValid())
     {
     return;
     }
 
-  if(!this->XAxis->isValid() || !area.intersects(this->Bounds))
+  const pqChartPixelScale *scale = this->XAxis->getPixelValueScale();
+  if(!scale->isValid() || !area.intersects(this->Internal->Contents))
     {
     return;
     }
 
-  pqChartValue left;
-  pqChartValue right;
-  QRect i = area.intersect(this->Bounds);
+  pqChartValue left, right;
+  QRect i = area.intersect(this->Internal->Contents);
   if(this->getValueAt(i.left(), i.top(), left) &&
       this->getValueAt(i.right(), i.top(), right))
     {
@@ -352,102 +368,189 @@ void pqHistogramChart::getValuesIn(const QRect &area,
     }
 }
 
-void pqHistogramChart::setBinColorScheme(pqHistogramColor *scheme)
+void pqHistogramChart::setOptions(const pqHistogramChartOptions &options)
 {
-  if(!scheme && this->Colors == &pqHistogramChartData::ColorScheme)
-    {
-    return;
-    }
+  // Copy the new options and repaint the chart.
+  *(this->Options) = options;
+  emit this->repaintNeeded();
+}
 
-  if(this->Colors != scheme)
+bool pqHistogramChart::getAxisRange(const pqChartAxis *axis,
+    pqChartValue &min, pqChartValue &max, bool &padMin, bool &padMax) const
+{
+  if(this->Model && this->Model->getNumberOfBins() > 0)
     {
-    if(scheme)
+    if(axis == this->XAxis)
       {
-      this->Colors = scheme;
+      this->Model->getRangeX(min, max);
+      return true;
       }
-    else
+    else if(axis == this->YAxis)
       {
-      this->Colors = &pqHistogramChartData::ColorScheme;
+      this->Model->getRangeY(min, max);
+      if(axis->getPixelValueScale()->getScaleType() ==
+          pqChartPixelScale::Logarithmic)
+        {
+        if(max < 0)
+          {
+          if(max.getType() == pqChartValue::IntValue)
+            {
+            max = (int)0;
+            }
+          else if(max <= -1)
+            {
+            max = -0.1;
+            max.convertTo(min.getType());
+            }
+          }
+        else if(min > 0)
+          {
+          if(min.getType() == pqChartValue::IntValue)
+            {
+            min = (int)0;
+            }
+          else if(min >= 1)
+            {
+            min = 0.1;
+            min.convertTo(max.getType());
+            }
+          }
+        }
+      else
+        {
+        // The range returned from the model is the data range.
+        // Adjust the range to look nice.
+        if(max < 0)
+          {
+          max = (int)0;
+          max.convertTo(min.getType());
+          }
+        else if(min > 0)
+          {
+          min = (int)0;
+          min.convertTo(max.getType());
+          }
+
+        // Set up the extra padding parameters for the min/max.
+        padMin = true;
+        padMax = true;
+        if(min == 0)
+          {
+          padMin = false;
+          }
+        else if(max == 0)
+          {
+          padMax = false;
+          }
+        }
+
+      return true;
+      }
+    }
+
+  return false;
+}
+
+bool pqHistogramChart::isAxisControlPreferred(
+    const pqChartAxis *axis) const
+{
+  return this->Model != 0 && this->Model->getNumberOfBins() > 0 &&
+      this->XAxis != 0 && this->XAxis == axis;
+}
+
+void pqHistogramChart::generateAxisLabels(pqChartAxis *axis)
+{
+  if(this->isAxisControlPreferred(axis))
+    {
+    pqChartAxisModel *axisModel = axis->getModel();
+    axisModel->startModifyingData();
+    axisModel->removeAllLabels();
+    pqChartValue min, max;
+    for(int i = 0; i < this->Model->getNumberOfBins(); i++)
+      {
+      this->Model->getBinRange(i, min, max);
+      if(i == 0)
+        {
+        axisModel->addLabel(min);
+        }
+
+      axisModel->addLabel(max);
       }
 
-    emit this->repaintNeeded();
+    axisModel->finishModifyingData();
     }
 }
 
-void pqHistogramChart::setBinHighlightStyle(HighlightStyle style)
+void pqHistogramChart::layoutChart(const QRect &area)
 {
-  if(this->Style != style)
-    {
-    this->Style = style;
-    emit this->repaintNeeded();
-    }
-}
-
-void pqHistogramChart::setBinOutlineStyle(OutlineStyle style)
-{
-  if(this->OutlineType != style)
-    {
-    this->OutlineType = style;
-    emit repaintNeeded();
-    }
-}
-
-void pqHistogramChart::layoutChart()
-{
-  if(!this->Model || !this->XAxis || !this->YAxis)
+  if(!this->Model || !this->XAxis || !this->YAxis || !area.isValid())
     {
     return;
     }
 
   // Make sure the axes are valid.
-  if(!this->XAxis->isValid() || !this->YAxis->isValid())
+  const pqChartPixelScale *xScale = this->XAxis->getPixelValueScale();
+  const pqChartPixelScale *yScale = this->YAxis->getPixelValueScale();
+  if(!xScale->isValid() || !yScale->isValid())
     {
     return;
     }
 
-  // Set up the chart area based on the remaining space.
-  this->Bounds.setTop(this->YAxis->getMaxPixel());
-  this->Bounds.setLeft(this->XAxis->getMinPixel());
-  this->Bounds.setRight(this->XAxis->getMaxPixel());
-  this->Bounds.setBottom(this->YAxis->getMinPixel());
+  // Save the chart bounds.
+  this->Internal->Bounds = area;
+
+  // Set up the contents size.
+  this->Internal->Contents = this->Internal->Bounds;
+  const pqChartContentsSpace *zoomPan = this->getContentsSpace();
+  if(zoomPan)
+    {
+    this->Internal->Contents.setRight(this->Internal->Contents.right() +
+        zoomPan->getMaximumXOffset());
+    this->Internal->Contents.setBottom(this->Internal->Contents.bottom() +
+        zoomPan->getMaximumYOffset());
+    }
 
   // Allocate space for the histogram bars.
-  if(this->Data->Items.size() != this->Model->getNumberOfBins())
+  if(this->Internal->Items.size() != this->Model->getNumberOfBins())
     {
-    this->Data->Items.resize(this->Model->getNumberOfBins());
+    this->Internal->Items.resize(this->Model->getNumberOfBins());
     }
 
   // Set up the size for each bar in the histogram.
-  int bottom = this->YAxis->getMinPixel();
+  pqChartValue value, min, max;
+  int bottom = yScale->getMinPixel();
   bool reversed = false;
-  if(this->YAxis->isZeroInRange())
+  if(yScale->isZeroInRange())
     {
     pqChartValue zero(0);
-    zero.convertTo(this->YAxis->getMaxValue().getType());
-    bottom = this->YAxis->getPixelFor(zero);
+    zero.convertTo(yScale->getMaxValue().getType());
+    bottom = yScale->getPixelFor(zero);
     }
-  else if(this->YAxis->getMaxValue() <= 0)
+  else
     {
-    bottom = this->YAxis->getMaxPixel();
-    reversed = true;
+    this->Model->getRangeY(min, max);
+    if(max <= 0)
+      {
+      bottom = yScale->getMaxPixel();
+      reversed = true;
+      }
     }
 
-  pqChartValue value;
-  int total = this->XAxis->getNumberShowing();
-  QVector<QRect>::Iterator iter = this->Data->Items.begin();
-  for(int i = 0; iter != this->Data->Items.end() && i < total; ++iter, ++i)
+  QVector<QRect>::Iterator iter = this->Internal->Items.begin();
+  for(int i = 0; iter != this->Internal->Items.end(); ++iter, ++i)
     {
     this->Model->getBinValue(i, value);
-    iter->setLeft(this->XAxis->getPixelForIndex(i));
-    iter->setRight(this->XAxis->getPixelForIndex(i + 1));
+    this->Model->getBinRange(i, min, max);
+    iter->setLeft(xScale->getPixelFor(min));
+    iter->setRight(xScale->getPixelFor(max));
     if(reversed || value < 0)
       {
       iter->setTop(bottom);
-      iter->setBottom(this->YAxis->getPixelFor(value));
+      iter->setBottom(yScale->getPixelFor(value));
       }
     else
       {
-      iter->setTop(this->YAxis->getPixelFor(value));
+      iter->setTop(yScale->getPixelFor(value));
       iter->setBottom(bottom);
       }
     }
@@ -455,38 +558,75 @@ void pqHistogramChart::layoutChart()
   this->layoutSelection();
 }
 
-void pqHistogramChart::drawBackground(QPainter *p, const QRect &area)
+void pqHistogramChart::drawBackground(QPainter &painter, const QRect &area)
 {
-  if(!p || !p->isActive() || !area.isValid() || !this->Bounds.isValid())
+  if(!painter.isActive() || !area.isValid() ||
+      !this->Internal->Bounds.isValid())
     {
     return;
     }
+
+  // Translate the painter and the area to paint to contents space.
+  painter.save();
+  QRect clipArea = area.intersect(this->Internal->Bounds);
+  QRect toPaint = area;
+  const pqChartContentsSpace *zoomPan = this->getContentsSpace();
+  if(zoomPan)
+    {
+    painter.translate(-zoomPan->getXOffset(), -zoomPan->getYOffset());
+    toPaint.translate(zoomPan->getXOffset(), zoomPan->getYOffset());
+    clipArea.translate(zoomPan->getXOffset(), zoomPan->getYOffset());
+    }
+
+  // Clip the painting area to the chart bounds.
+  painter.setClipping(true);
+  painter.setClipRect(clipArea);
 
   // Draw in the selection if there is one.
-  QVector<QRect>::Iterator highlight = this->Data->Highlights.begin();
-  for( ; highlight != this->Data->Highlights.end(); ++highlight)
+  QVector<QRect>::Iterator highlight = this->Internal->Highlights.begin();
+  for( ; highlight != this->Internal->Highlights.end(); ++highlight)
     {
-    if(highlight->intersects(area))
+    if(highlight->intersects(toPaint))
       {
-      p->fillRect(*highlight, this->Select);
+      painter.fillRect(*highlight, this->Options->getHighlightColor());
       }
     }
+
+  painter.restore();
 }
 
-void pqHistogramChart::drawChart(QPainter *p, const QRect &area)
+void pqHistogramChart::drawChart(QPainter &painter, const QRect &area)
 {
-  if(!p || !p->isActive() || !area.isValid() || !this->Bounds.isValid())
+  if(!painter.isActive() || !area.isValid() ||
+      !this->Internal->Bounds.isValid())
     {
     return;
     }
+
+
+  // Translate the painter and the area to paint to contents space.
+  painter.save();
+  QRect clipArea = area.intersect(this->Internal->Bounds);
+  QRect toPaint = area;
+  const pqChartContentsSpace *zoomPan = this->getContentsSpace();
+  if(zoomPan)
+    {
+    painter.translate(-zoomPan->getXOffset(), -zoomPan->getYOffset());
+    toPaint.translate(zoomPan->getXOffset(), zoomPan->getYOffset());
+    clipArea.translate(zoomPan->getXOffset(), zoomPan->getYOffset());
+    }
+
+  // Clip the painting area to the chart bounds.
+  painter.setClipping(true);
+  painter.setClipRect(clipArea);
 
   // Draw in the histogram bars.
   int i = 0;
   bool areaFound = false;
-  int total = this->XAxis->getNumberShowing();
-  QVector<QRect>::Iterator highlight = this->Data->Highlights.begin();
-  QVector<QRect>::Iterator iter = this->Data->Items.begin();
-  for( ; iter != this->Data->Items.end() && i < total; ++iter, ++i)
+  int total = this->Model->getNumberOfBins();
+  QVector<QRect>::Iterator highlight = this->Internal->Highlights.begin();
+  QVector<QRect>::Iterator iter = this->Internal->Items.begin();
+  for( ; iter != this->Internal->Items.end(); ++iter, ++i)
     {
     // Make sure the bounding rectangle is known.
     if(!iter->isValid())
@@ -495,27 +635,27 @@ void pqHistogramChart::drawChart(QPainter *p, const QRect &area)
       }
 
     // Check to see if the bar needs to be drawn.
-    if(!(iter->left() > area.right() || iter->right() < area.left()))
+    if(!(iter->left() > toPaint.right() || iter->right() < toPaint.left()))
       {
       areaFound = true;
-      if(!(iter->top() > area.bottom() || iter->bottom() < area.top()))
+      if(!(iter->top() > toPaint.bottom() || iter->bottom() < toPaint.top()))
         {
         // First, fill the rectangle. If a bar color scheme is set,
         // get the bar color from the scheme.
         QColor bin = Qt::red;
-        if(this->Colors)
+        if(this->Options->getColorScheme())
           {
-          bin = this->Colors->getColor(i, this->Model->getNumberOfBins());
+          bin = this->Options->getColorScheme()->getColor(i, total);
           }
 
-        p->fillRect(iter->x(), iter->y(), iter->width() - 1,
+        painter.fillRect(iter->x(), iter->y(), iter->width() - 1,
             iter->height() - 1, bin);
 
         // Draw in the highlighted portion of the bar if it is selected
         // and fill highlighting is being used.
-        if(this->Style == pqHistogramChart::Fill)
+        if(this->Options->getHighlightStyle() == pqHistogramChartOptions::Fill)
           {
-          for( ; highlight != this->Data->Highlights.end(); ++highlight)
+          for( ; highlight != this->Internal->Highlights.end(); ++highlight)
             {
             if(iter->right() < highlight->left())
               {
@@ -523,7 +663,7 @@ void pqHistogramChart::drawChart(QPainter *p, const QRect &area)
               }
             else if(iter->left() <= highlight->right())
               {
-              p->fillRect(iter->intersect(*highlight), bin.light(170));
+              painter.fillRect(iter->intersect(*highlight), bin.light(170));
               if(iter->right() <= highlight->right())
                 {
                 break;
@@ -533,23 +673,24 @@ void pqHistogramChart::drawChart(QPainter *p, const QRect &area)
           }
 
         // Draw in the outline last to make sure it is on top.
-        if(this->OutlineType == pqHistogramChart::Darker)
+        if(this->Options->getOutlineStyle() == pqHistogramChartOptions::Darker)
           {
-          p->setPen(bin.dark());
+          painter.setPen(bin.dark());
           }
         else
           {
-          p->setPen(Qt::black);
+          painter.setPen(Qt::black);
           }
 
-        p->drawRect(iter->x(), iter->y(), iter->width() - 1,
+        painter.drawRect(iter->x(), iter->y(), iter->width() - 1,
             iter->height() - 1);
 
         // If the bar is selected and outline highlighting is used, draw
         // a lighter and thicker outline around the bar.
-        if(this->Style == pqHistogramChart::Outline)
+        if(this->Options->getHighlightStyle() ==
+            pqHistogramChartOptions::Outline)
           {
-          for( ; highlight != this->Data->Highlights.end(); ++highlight)
+          for( ; highlight != this->Internal->Highlights.end(); ++highlight)
             {
             if(iter->right() < highlight->left())
               {
@@ -557,15 +698,15 @@ void pqHistogramChart::drawChart(QPainter *p, const QRect &area)
               }
             else if(iter->left() <= highlight->right())
               {
-              p->setPen(bin.light(170));
+              painter.setPen(bin.light(170));
               QRect inter = iter->intersect(*highlight);
               inter.setWidth(inter.width() - 1);
               inter.setHeight(inter.height() - 1);
-              p->drawRect(inter);
+              painter.drawRect(inter);
               inter.translate(1, 1);
               inter.setWidth(inter.width() - 2);
               inter.setHeight(inter.height() - 2);
-              p->drawRect(inter);
+              painter.drawRect(inter);
               if(iter->right() <= highlight->right())
                 {
                 break;
@@ -582,16 +723,18 @@ void pqHistogramChart::drawChart(QPainter *p, const QRect &area)
     }
 
   // Draw in the selection outline.
-  p->setPen(QColor(60, 90, 135));
-  highlight = this->Data->Highlights.begin();
-  for( ; highlight != this->Data->Highlights.end(); ++highlight)
+  painter.setPen(QColor(60, 90, 135));
+  highlight = this->Internal->Highlights.begin();
+  for( ; highlight != this->Internal->Highlights.end(); ++highlight)
     {
-    if(highlight->intersects(area))
+    if(highlight->intersects(toPaint))
       {
-      p->drawRect(highlight->x(), highlight->y(), highlight->width() - 1,
+      painter.drawRect(highlight->x(), highlight->y(), highlight->width() - 1,
           highlight->height() - 1);
       }
     }
+
+  painter.restore();
 }
 
 void pqHistogramChart::handleModelReset()
@@ -605,10 +748,11 @@ void pqHistogramChart::handleModelReset()
   // selection model is notified of the change.
   this->InModelChange = true;
   this->Selection->beginModelReset();
-  this->clearData();
+  this->Internal->Items.clear();
+  this->Internal->Highlights.clear();
 
   // Set up the axis ranges and update the chart layout.
-  this->updateAxisRanges();
+  emit this->rangeChanged();
   emit this->layoutNeeded();
 
   // Notify the slection model that the reset is complete, which may
@@ -628,10 +772,6 @@ void pqHistogramChart::startBinInsertion(int first, int last)
 
 void pqHistogramChart::finishBinInsertion()
 {
-  // Adjust the y-axis range to account for the new values. Inserting
-  // any number of bins will require all the bin sizes to be
-  // re-calculated.
-  this->updateYAxisRange();
   emit this->layoutNeeded();
 
   // Close the event for the selection model, which will trigger a
@@ -651,9 +791,6 @@ void pqHistogramChart::startBinRemoval(int first, int last)
 
 void pqHistogramChart::finishBinRemoval()
 {
-  // Removing bins can change the y-axis range. Removing any number
-  // of bins will require all the bin sizes to be re-calculated.
-  this->updateYAxisRange();
   emit this->layoutNeeded();
 
   // Close the event for the selection model, which will trigger a
@@ -662,9 +799,9 @@ void pqHistogramChart::finishBinRemoval()
   this->InModelChange = false;
 }
 
-void pqHistogramChart::updateHighlights(const pqHistogramSelectionList &)
+void pqHistogramChart::updateHighlights()
 {
-  if(!this->InModelChange)
+  if(!this->InModelChange && this->Internal->Contents.isValid() && this->XAxis)
     {
     this->layoutSelection();
     emit this->repaintNeeded();
@@ -673,151 +810,43 @@ void pqHistogramChart::updateHighlights(const pqHistogramSelectionList &)
 
 void pqHistogramChart::layoutSelection()
 {
-  if(this->Bounds.isValid())
-    {
-    // Get the selected ranges from the selection model.
-    const pqHistogramSelectionList &list = this->Selection->getSelection();
-
-    // Make sure the space allocated for the selection highlight(s)
-    // is the same as the space needed.
-    if(this->Data->Highlights.size() != list.size())
-      {
-      this->Data->Highlights.resize(list.size());
-      }
-
-    QVector<QRect>::Iterator highlight = this->Data->Highlights.begin();
-    pqHistogramSelectionList::ConstIterator iter = list.begin();
-    for( ; iter != list.end(); ++iter, ++highlight)
-      {
-      // Set up the highlight rectangle for each selection range
-      // using the axis scale.
-      highlight->setTop(this->Bounds.top());
-      highlight->setBottom(this->Bounds.bottom());
-      if(iter->getType() == pqHistogramSelection::Value)
-        {
-        highlight->setLeft(this->XAxis->getPixelFor(iter->getFirst()));
-        highlight->setRight(this->XAxis->getPixelFor(iter->getSecond()));
-        }
-      else
-        {
-        highlight->setLeft(this->XAxis->getPixelForIndex(iter->getFirst()));
-        highlight->setRight(this->XAxis->getPixelForIndex(
-            iter->getSecond() + 1));
-        }
-      }
-    }
-}
-
-void pqHistogramChart::updateAxisRanges()
-{
-  this->updateXAxisRange();
-  this->updateYAxisRange();
-}
-
-void pqHistogramChart::updateXAxisRange()
-{
-  if(!this->XAxis)
+  // Make sure the axes are valid.
+  const pqChartPixelScale *xScale = this->XAxis->getPixelValueScale();
+  if(!xScale->isValid())
     {
     return;
     }
 
-  int intervals = 0;
-  pqChartValue xMin, xMax;
-  if(this->Model)
+  // Get the selected ranges from the selection model.
+  const pqHistogramSelectionList &list = this->Selection->getSelection();
+
+  // Make sure the space allocated for the selection highlight(s)
+  // is the same as the space needed.
+  if(this->Internal->Highlights.size() != list.size())
     {
-    this->Model->getRangeX(xMin, xMax);
-    intervals = this->Model->getNumberOfBins();
+    this->Internal->Highlights.resize(list.size());
     }
 
-  this->XAxis->blockSignals(true);
-  this->XAxis->setValueRange(xMin, xMax);
-  this->XAxis->setNumberOfIntervals(intervals);
-  this->XAxis->blockSignals(false);
-}
-
-void pqHistogramChart::updateYAxisRange()
-{
-  // Don't set the y-axis range when using a fixed-interval layout.
-  if(!this->YAxis || this->YAxis->getLayoutType() == pqChartAxis::FixedInterval)
+  QVector<QRect>::Iterator highlight = this->Internal->Highlights.begin();
+  pqHistogramSelectionList::ConstIterator iter = list.begin();
+  for( ; iter != list.end(); ++iter, ++highlight)
     {
-    return;
-    }
-
-  pqChartValue yMin, yMax;
-  if(this->Model)
-    {
-    // Adjust the y-axis range for the histogram.
-    this->Model->getRangeY(yMin, yMax);
-    if(this->YAxis->getScaleType() == pqChartAxis::Logarithmic)
+    // Set up the highlight rectangle for each selection range
+    // using the axis scale.
+    highlight->setTop(this->Internal->Contents.top());
+    highlight->setBottom(this->Internal->Contents.bottom());
+    if(iter->getType() == pqHistogramSelection::Value)
       {
-      if(yMax < 0)
-        {
-        if(yMax.getType() == pqChartValue::IntValue)
-          {
-          yMax = (int)0;
-          }
-        else if(yMax <= -1)
-          {
-          yMax = -0.1;
-          yMax.convertTo(yMin.getType());
-          }
-        }
-      else if(yMin > 0)
-        {
-        if(yMin.getType() == pqChartValue::IntValue)
-          {
-          yMin = (int)0;
-          }
-        else if(yMin >= 1)
-          {
-          yMin = 0.1;
-          yMin.convertTo(yMax.getType());
-          }
-        }
+      highlight->setLeft(xScale->getPixelFor(iter->getFirst()));
+      highlight->setRight(xScale->getPixelFor(iter->getSecond()));
       }
     else
       {
-      // The range returned from the model is the data range. Adjust
-      // the range to look nice.
-      if(yMax < 0)
-        {
-        yMax = (int)0;
-        yMax.convertTo(yMin.getType());
-        }
-      else if(yMin > 0)
-        {
-        yMin = (int)0;
-        yMin.convertTo(yMax.getType());
-        }
-
-      // Set up the extra padding parameters for the min/max.
-      if(yMin == 0)
-        {
-        this->YAxis->setExtraMaxPadding(true);
-        this->YAxis->setExtraMinPadding(false);
-        }
-      else if(yMax == 0)
-        {
-        this->YAxis->setExtraMaxPadding(false);
-        this->YAxis->setExtraMinPadding(true);
-        }
-      else
-        {
-        this->YAxis->setExtraMaxPadding(true);
-        this->YAxis->setExtraMinPadding(true);
-        }
+      // Use the bin rectangles to set the sides.
+      highlight->setLeft(this->Internal->Items[iter->getFirst()].left());
+      highlight->setRight(this->Internal->Items[iter->getSecond()].right());
       }
     }
-
-  this->YAxis->blockSignals(true);
-  this->YAxis->setValueRange(yMin, yMax);
-  this->YAxis->blockSignals(false);
-}
-
-void pqHistogramChart::clearData()
-{
-  this->Data->Items.clear();
-  this->Data->Highlights.clear();
 }
 
 

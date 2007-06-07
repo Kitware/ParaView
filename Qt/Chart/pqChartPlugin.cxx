@@ -35,28 +35,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "pqChartPlugin.h"
-#include "pqHistogramWidget.h"
-#include "pqHistogramWidgetPlugin.h"
-#include "pqLineChartWidget.h"
-#include "pqLineChartWidgetPlugin.h"
+#include "pqChartWidget.h"
+#include "pqChartWidgetPlugin.h"
 #include "pqColorMapWidget.h"
 #include "pqColorMapWidgetPlugin.h"
 
 
-pqHistogramWidgetPlugin::pqHistogramWidgetPlugin(QObject *p)
+//----------------------------------------------------------------------------
+pqChartWidgetPlugin::pqChartWidgetPlugin(QObject *p)
   : QObject(p)
 {
 }
 
-QWidget *pqHistogramWidgetPlugin::createWidget(QWidget *p)
+QWidget *pqChartWidgetPlugin::createWidget(QWidget *p)
 {
-  return new pqHistogramWidget(p);
+  return new pqChartWidget(p);
 }
 
-QString pqHistogramWidgetPlugin::domXml() const
+QString pqChartWidgetPlugin::domXml() const
 {
   return QLatin1String(
-      "<widget class=\"pqHistogramWidget\" name=\"pqHistogram\">\n"
+      "<widget class=\"pqChartWidget\" name=\"pqChart\">\n"
       " <property name=\"geometry\">\n"
       "  <rect>\n"
       "   <x>0</x>\n"
@@ -68,73 +67,28 @@ QString pqHistogramWidgetPlugin::domXml() const
       "</widget>\n");
 }
 
-QIcon pqHistogramWidgetPlugin::icon() const
+QIcon pqChartWidgetPlugin::icon() const
 {
   return QIcon(QPixmap(":/pqChart/pqHistogram22.png"));
 }
 
-QString pqHistogramWidgetPlugin::includeFile() const
+QString pqChartWidgetPlugin::includeFile() const
 {
-  return QLatin1String("pqHistogramWidget.h");
+  return QLatin1String("pqChartWidget.h");
 }
 
-QString pqHistogramWidgetPlugin::toolTip() const
+QString pqChartWidgetPlugin::toolTip() const
 {
-  return QLatin1String("Qt Histogram");
+  return QLatin1String("Qt Chart");
 }
 
-QString pqHistogramWidgetPlugin::whatsThis() const
+QString pqChartWidgetPlugin::whatsThis() const
 {
-  return QLatin1String("Qt Histogram");
-}
-
-
-pqLineChartWidgetPlugin::pqLineChartWidgetPlugin(QObject *p)
-  : QObject(p)
-{
-}
-
-QWidget *pqLineChartWidgetPlugin::createWidget(QWidget *p)
-{
-  return new pqLineChartWidget(p);
-}
-
-QString pqLineChartWidgetPlugin::domXml() const
-{
-  return QLatin1String(
-      "<widget class=\"pqLineChartWidget\" name=\"pqLineChart\">\n"
-      " <property name=\"geometry\">\n"
-      "  <rect>\n"
-      "   <x>0</x>\n"
-      "   <y>0</y>\n"
-      "   <width>100</width>\n"
-      "   <height>100</height>\n"
-      "  </rect>\n"
-      " </property>\n"
-      "</widget>\n");
-}
-
-QIcon pqLineChartWidgetPlugin::icon() const
-{
-  return QIcon(QPixmap(":/pqChart/pqLineChart22.png"));
-}
-
-QString pqLineChartWidgetPlugin::includeFile() const
-{
-  return QLatin1String("pqLineChartWidget.h");
-}
-
-QString pqLineChartWidgetPlugin::toolTip() const
-{
-  return QLatin1String("Qt Line Chart");
-}
-
-QString pqLineChartWidgetPlugin::whatsThis() const
-{
-  return QLatin1String("Qt Line Chart.");
+  return QLatin1String("Qt Chart");
 }
 
 
+//----------------------------------------------------------------------------
 pqColorMapWidgetPlugin::pqColorMapWidgetPlugin(QObject *p)
   : QObject(p)
 {
@@ -181,38 +135,25 @@ QString pqColorMapWidgetPlugin::whatsThis() const
 }
 
 
+//----------------------------------------------------------------------------
 pqChartPlugin::pqChartPlugin(QObject *p)
   : QObject(p), QDesignerCustomWidgetCollectionInterface()
 {
+  this->Chart = new pqChartWidgetPlugin();
   this->ColorMap = new pqColorMapWidgetPlugin();
-  this->Histogram = new pqHistogramWidgetPlugin();
-  this->LineChart = new pqLineChartWidgetPlugin();
 }
 
 pqChartPlugin::~pqChartPlugin()
 {
-  if(this->ColorMap)
-    {
-    delete this->ColorMap;
-    }
-
-  if(this->Histogram)
-    {
-    delete this->Histogram;
-    }
-
-  if(this->LineChart)
-    {
-    delete this->LineChart;
-    }
+  delete this->Chart;
+  delete this->ColorMap;
 }
 
 QList<QDesignerCustomWidgetInterface*> pqChartPlugin::customWidgets() const
 {
   QList<QDesignerCustomWidgetInterface*> plugins;
+  plugins.append(this->Chart);
   plugins.append(this->ColorMap);
-  plugins.append(this->Histogram);
-  plugins.append(this->LineChart);
   return plugins;
 }
 

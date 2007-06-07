@@ -42,8 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqChartValue;
 class pqLineChartModelInternal;
-class pqLineChartPlot;
-class pqLineChartPlotOptions;
+class pqLineChartSeries;
 
 
 /// \class pqLineChartModel
@@ -51,10 +50,10 @@ class pqLineChartPlotOptions;
 ///   The pqLineChartModel class is the line chart's interface to the
 ///   chart data.
 ///
-/// The model uses the pqLineChartPlot interface to draw the
-/// individual line plots. The line chart will draw the plots in the
-/// order the model stores them. The first plot will be drawn first,
-/// and so on. This can be used as a layering effect.
+/// The model uses the pqLineChartSeries interface to draw the
+/// individual line chart series. The line chart will draw the series
+/// in the order the model stores them. The first series will be drawn
+/// first, and so on. This can be used as a layering effect.
 class QTCHART_EXPORT pqLineChartModel : public QObject
 {
   Q_OBJECT
@@ -69,70 +68,60 @@ public:
   /// \name Model Data Methods
   //@{
   /// \brief
-  ///   Gets the number of plots in the model.
+  ///   Gets the number of series in the model.
   /// \return
-  ///   The number of plots in the model.
-  int getNumberOfPlots() const;
+  ///   The number of series in the model.
+  int getNumberOfSeries() const;
 
   /// \brief
-  ///   Gets the index for the given plot.
-  /// \param plot The line chart plot to look up.
+  ///   Gets the index for the given series.
+  /// \param series The line chart series to look up.
   /// \return
-  ///   The index for the given plot.
-  int getIndexOf(pqLineChartPlot *plot) const;
+  ///   The index for the given series.
+  int getIndexOf(pqLineChartSeries *series) const;
 
   /// \brief
-  ///   Gets the plot at the given index.
-  /// \param index The plot's model index.
+  ///   Gets the series at the given index.
+  /// \param index The series' model index.
   /// \return
-  ///   A pointer to the plot or null if the index is out of range.
-  pqLineChartPlot *getPlot(int index) const;
+  ///   A pointer to the series or null if the index is out of range.
+  pqLineChartSeries *getSeries(int index) const;
 
   /// \brief
-  ///   Appends a new plot to the end of the model list.
-  /// \param plot The new plot to add.
-  void appendPlot(pqLineChartPlot *plot);
+  ///   Appends a new series to the end of the model list.
+  /// \param series The new series to add.
+  void appendSeries(pqLineChartSeries *series);
 
   /// \brief
-  ///   Inserts a new plot in the model list.
-  /// \param plot The new plot to add.
-  /// \param index Where to insert the plot.
-  void insertPlot(pqLineChartPlot *plot, int index);
+  ///   Inserts a new series in the model list.
+  /// \param series The new series to add.
+  /// \param index Where to insert the series.
+  void insertSeries(pqLineChartSeries *series, int index);
 
   /// \brief
-  ///   Removes the given plot from the model.
-  /// \param plot The plot to remove.
-  void removePlot(pqLineChartPlot *plot);
+  ///   Removes the given series from the model.
+  /// \param series The series to remove.
+  void removeSeries(pqLineChartSeries *series);
 
   /// \brief
-  ///   Removes the plot at the given index from the model.
-  /// \param index The index of the plot to remove.
-  void removePlot(int index);
+  ///   Removes the series at the given index from the model.
+  /// \param index The index of the series to remove.
+  void removeSeries(int index);
 
   /// \brief
-  ///   Moves the given plot to the new position.
-  /// \param plot The plot to move.
-  /// \param index Where to move the plot to.
-  void movePlot(pqLineChartPlot *plot, int index);
+  ///   Moves the given series to the new position.
+  /// \param series The series to move.
+  /// \param index Where to move the series to.
+  void moveSeries(pqLineChartSeries *series, int index);
 
   /// \brief
-  ///   Moves the plot at the given index to the new position.
-  /// \param current The index of the plot to move.
-  /// \param index Where to move the plot to.
-  void movePlot(int current, int index);
+  ///   Moves the series at the given index to the new position.
+  /// \param current The index of the series to move.
+  /// \param index Where to move the series to.
+  void moveSeries(int current, int index);
 
-  /// \brief
-  ///   Moves the plot at the given index to the new position.
-  ///
-  /// The corresponding display options will also get moved with the
-  /// plot.
-  ///
-  /// \param current The index of the plot to move.
-  /// \param index Where to move the plot to.
-  void movePlotAndOptions(int current, int index);
-
-  /// Removes all the plots from the model.
-  virtual void clearPlots();
+  /// Removes all the series from the model.
+  virtual void removeAll();
   //@}
 
   /// \name Chart Range Methods
@@ -150,190 +139,174 @@ public:
   void getRangeY(pqChartValue &min, pqChartValue &max) const;
   //@}
 
-  /// \name Chart Display Options
-  //@{
-  /// \brief
-  ///   Gets the line chart plot's display options.
-  /// \return
-  ///   A pointer to the line chart plot's display options.
-  virtual pqLineChartPlotOptions *getOptions(int index) const;
-
-  /// \brief
-  ///   Sets the line chart plot's display options.
-  /// \param options The new display options.
-  void setOptions(int index, pqLineChartPlotOptions *options);
-
-  /// Removes all the display options from the model.
-  void clearOptions();
-  //@}
-
 signals:
   /// Emitted when the model has been reset.
-  void plotsReset();
+  void modelReset();
 
   /// \brief
-  ///   Emitted when new plots will be inserted.
-  /// \param first The first index of the plot insertion.
-  /// \param last The last index of the plot insertion.
-  void aboutToInsertPlots(int first, int last);
+  ///   Emitted when new series will be inserted.
+  /// \param first The first index of the series insertion.
+  /// \param last The last index of the series insertion.
+  void aboutToInsertSeries(int first, int last);
 
   /// \brief
-  ///   Emitted when new plots have been inserted.
-  /// \param first The first index of the plot insertion.
-  /// \param last The last index of the plot insertion.
-  void plotsInserted(int first, int last);
+  ///   Emitted when new series have been inserted.
+  /// \param first The first index of the series insertion.
+  /// \param last The last index of the series insertion.
+  void seriesInserted(int first, int last);
 
   /// \brief
-  ///   Emitted when plots will be removed from the model.
-  /// \param first The first index of the plot removal.
-  /// \param last The last index of the plot removal.
-  void aboutToRemovePlots(int first, int last);
+  ///   Emitted when series will be removed from the model.
+  /// \param first The first index of the series removal.
+  /// \param last The last index of the series removal.
+  void aboutToRemoveSeries(int first, int last);
 
   /// \brief
-  ///   Emitted when plots have been removed from the model.
-  /// \param first The first index of the plot removal.
-  /// \param last The last index of the plot removal.
-  void plotsRemoved(int first, int last);
+  ///   Emitted when series have been removed from the model.
+  /// \param first The first index of the series removal.
+  /// \param last The last index of the series removal.
+  void seriesRemoved(int first, int last);
 
   /// \brief
-  ///   Emitted when a plot is moved in the list.
-  /// \param current The known index of the plot.
-  /// \param index The new index of the plot.
-  void plotMoved(int current, int index);
+  ///   Emitted when a series is moved in the list.
+  /// \param current The known index of the series.
+  /// \param index The new index of the series.
+  void seriesMoved(int current, int index);
 
   /// \brief
-  ///   Emitted when the data for a plot has changed drastically.
-  /// \param plot The modified plot.
-  void plotReset(const pqLineChartPlot *plot);
+  ///   Emitted when the data for a series has changed drastically.
+  /// \param series The modified series.
+  void seriesReset(const pqLineChartSeries *series);
 
   /// \brief
-  ///   Emitted when new points will be inserted in a plot.
-  /// \param plot The plot to be modified.
-  /// \param series The index of the series to be modified.
+  ///   Emitted when new points will be inserted in a series.
+  /// \param series The series to be modified.
+  /// \param sequence The index of the sequence to be modified.
   /// \param first The first index of the point insertion.
   /// \param last The last index of the point insertion.
-  void aboutToInsertPoints(const pqLineChartPlot *plot, int series, int first,
-      int last);
+  void aboutToInsertPoints(const pqLineChartSeries *series, int sequence,
+      int first, int last);
 
   /// \brief
-  ///   Emitted when new points have been inserted in a plot.
-  /// \param plot The modified plot.
-  /// \param series The index of the modified series.
-  void pointsInserted(const pqLineChartPlot *plot, int series);
+  ///   Emitted when new points have been inserted in a series.
+  /// \param series The modified series.
+  /// \param sequence The index of the modified sequence.
+  void pointsInserted(const pqLineChartSeries *series, int sequence);
 
   /// \brief
-  ///   Emitted when points will be removed from a plot.
-  /// \param plot The plot to be modified.
-  /// \param series The index of the series to be modified.
+  ///   Emitted when points will be removed from a series.
+  /// \param series The series to be modified.
+  /// \param sequence The index of the sequence to be modified.
   /// \param first The first index of the point removal.
   /// \param last The last index of the point removal.
-  void aboutToRemovePoints(const pqLineChartPlot *plot, int series, int first,
-      int last);
+  void aboutToRemovePoints(const pqLineChartSeries *series, int sequence,
+      int first, int last);
 
   /// \brief
-  ///   Emitted when points have been removed from a plot.
-  /// \param plot The modified plot.
-  /// \param series The index of the modified series.
-  void pointsRemoved(const pqLineChartPlot *plot, int series);
+  ///   Emitted when points have been removed from a series.
+  /// \param series The modified series.
+  /// \param sequence The index of the modified sequence.
+  void pointsRemoved(const pqLineChartSeries *series, int sequence);
 
   /// \brief
-  ///   Emitted when changes will be made to multiple series of a plot
-  ///   simultaneously.
-  /// \param plot The plot to be modified.
-  /// \sa pqLineChartPlot::beginMultiSeriesChange()
-  void aboutToChangeMultipleSeries(const pqLineChartPlot *plot);
+  ///   Emitted when changes will be made to multiple sequences of a
+  ///   series simultaneously.
+  /// \param series The series to be modified.
+  /// \sa pqLineChartSeries::beginMultiSeriesChange()
+  void aboutToChangeMultipleSeries(const pqLineChartSeries *series);
 
   /// \brief
   ///   Emitted when simultaneous changes have been made to multiple
-  ///   series of a plot.
-  /// \param plot The modified plot.
-  /// \sa pqLineChartPlot::beginMultiSeriesChange()
-  void changedMultipleSeries(const pqLineChartPlot *plot);
+  ///   sequences of a series.
+  /// \param series The modified series.
+  /// \sa pqLineChartSeries::beginMultiSeriesChange()
+  void changedMultipleSeries(const pqLineChartSeries *series);
 
   /// \brief
-  ///   Emitted when the error bounds for a plot have changed.
-  /// \param plot The modified plot.
-  /// \param series The index of the modified series.
+  ///   Emitted when the error bounds for a series have changed.
+  /// \param series The modified series.
+  /// \param sequence The index of the modified sequence.
   /// \param first The first index of the modified points.
   /// \param last The last index of the modified points.
-  void errorBoundsChanged(const pqLineChartPlot *plot, int series, int first,
-      int last);
+  void errorBoundsChanged(const pqLineChartSeries *series, int sequence,
+      int first, int last);
 
   /// \brief
-  ///   Emitted when the error bar width for a series of a plot has
-  ///   changed.
-  /// \param plot The modified plot.
-  /// \param series The index of the modified series.
-  void errorWidthChanged(const pqLineChartPlot *plot, int series);
+  ///   Emitted when the error bar width for a sequence of a series
+  ///   has changed.
+  /// \param series The modified series.
+  /// \param sequence The index of the modified sequence.
+  void errorWidthChanged(const pqLineChartSeries *series, int sequence);
 
-  /// Emitted when the drawing options for a plot change.
-  void optionsChanged();
+  /// Emitted when the line chart range in x and/or y changes.
+  void chartRangeChanged();
 
 private slots:
-  /// \name Plot Modification Handlers
+  /// \name Series Modification Handlers
   //@{
-  /// Handles a plot reset signal from a line chart plot.
-  void handlePlotReset();
+  /// Handles a series reset signal from a line chart series.
+  void handleSeriesReset();
 
   /// \brief
-  ///   Handles a plot begin insertion notification.
-  /// \param series The index of the series to be modified.
+  ///   Handles a series begin insertion notification.
+  /// \param sequence The index of the sequence to be modified.
   /// \param first The first index of the point insertion.
   /// \param last The last index of the point insertion.
-  void handlePlotBeginInsert(int series, int first, int last);
+  void handleSeriesBeginInsert(int sequence, int first, int last);
 
   /// \brief
-  ///   Handles a plot end insertion notification.
-  /// \param series The index of the modified series.
-  void handlePlotEndInsert(int series);
+  ///   Handles a series end insertion notification.
+  /// \param sequence The index of the modified sequence.
+  void handleSeriesEndInsert(int sequence);
 
   /// \brief
-  ///   Handles a plot begin removal notification.
-  /// \param series The index of the series to be modified.
+  ///   Handles a series begin removal notification.
+  /// \param sequence The index of the sequence to be modified.
   /// \param first The first index of the point removal.
   /// \param last The last index of the point removal.
-  void handlePlotBeginRemove(int series, int first, int last);
+  void handleSeriesBeginRemove(int sequence, int first, int last);
 
   /// \brief
-  ///   Handles a plot end removal notification.
-  /// \param series The index of the modified series.
-  void handlePlotEndRemove(int series);
+  ///   Handles a series end removal notification.
+  /// \param sequence The index of the modified sequence.
+  void handleSeriesEndRemove(int sequence);
 
-  /// Handles a plot begin multi-series change signal.
-  void handlePlotBeginMultiSeriesChange();
+  /// Handles a series begin multi-sequence change signal.
+  void startSeriesMultiSequenceChange();
 
-  /// Handles a plot end multi-series change signal.
-  void handlePlotEndMultiSeriesChange();
+  /// Handles a series end multi-sequence change signal.
+  void finishSeriesMultiSequenceChange();
 
   /// \brief
-  ///   Handles a plot error bounds changed signal.
-  /// \param series The index of the modified series.
+  ///   Handles a series error bounds changed signal.
+  /// \param sequence The index of the modified sequence.
   /// \param first The first index of the modified points.
   /// \param last The last index of the modified points.
-  void handlePlotErrorBoundsChange(int series, int first, int last);
+  void handleSeriesErrorBoundsChange(int sequence, int first, int last);
 
   /// \brief
-  ///   Handles a plot error bar width changed signal.
-  /// \param series The index of the modified series.
-  void handlePlotErrorWidthChange(int series);
+  ///   Handles a series error bar width changed signal.
+  /// \param sequence The index of the modified sequence.
+  void handleSeriesErrorWidthChange(int sequence);
   //@}
 
 private:
-  /// Compiles the overall chart range from the plots.
+  /// Compiles the overall chart range from the series.
   void updateChartRanges();
 
   /// \brief
-  ///   Updates the chart range after a plot addition or point
+  ///   Updates the chart range after a series addition or point
   ///   insertion.
   ///
-  /// This method can only be called after a plot or point insertion.
-  /// In both cases, the chart ranges can only grow not shrink.
+  /// This method can only be called after a series or point
+  /// insertion. In both cases, the chart ranges can only grow not
+  /// shrink.
   ///
-  /// \param plot The new or expanded plot.
-  void updateChartRanges(const pqLineChartPlot *plot);
+  /// \param series The new or expanded series.
+  void updateChartRanges(const pqLineChartSeries *series);
 
 private:
-  pqLineChartModelInternal *Internal; ///< Stores the list of plots.
+  pqLineChartModelInternal *Internal; ///< Stores the line data.
 };
 
 #endif

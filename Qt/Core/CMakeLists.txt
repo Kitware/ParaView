@@ -92,8 +92,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqTextDisplay.h
   pqUndoStack.h
   pqVTKHistogramModel.h
-  pqVTKLineChartModel.h
-  pqVTKLineChartPlot.h
   pqWriterFactory.h
   ${PYTHON_MOC_SRCS}
   )
@@ -285,10 +283,8 @@ ADD_LIBRARY(pqCore
   pqVTKHistogramColor.h
   pqVTKHistogramModel.cxx
   pqVTKHistogramModel.h
-  pqVTKLineChartModel.cxx
-  pqVTKLineChartModel.h
-  pqVTKLineChartPlot.cxx
-  pqVTKLineChartPlot.h
+  pqVTKLineChartSeries.cxx
+  pqVTKLineChartSeries.h
   pqWriterFactory.cxx
   pqWriterFactory.h
   pqXMLUtil.cxx

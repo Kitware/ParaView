@@ -12,47 +12,68 @@ IF(NOT BUILD_SHARED_LIBS)
 ENDIF(NOT BUILD_SHARED_LIBS)
 
 SET(QtChart_SRCS
-  pqChartPlugin.cxx
-  pqChartPlugin.h
-  pqColorMapWidgetPlugin.h
-  pqHistogramWidgetPlugin.h
-  pqLineChartWidgetPlugin.h
-
-
+  pqChartArea.cxx
+  pqChartArea.h
   pqChartAxis.cxx
   pqChartAxis.h
+  pqChartAxisLayer.cxx
+  pqChartAxisLayer.h
+  pqChartAxisModel.cxx
+  pqChartAxisModel.h
+  pqChartAxisOptions.cxx
+  pqChartAxisOptions.h
+  pqChartContentsSpace.cxx
+  pqChartContentsSpace.h
   pqChartCoordinate.cxx
   pqChartCoordinate.h
-  pqChartLabel.cxx
-  pqChartLabel.h
+  pqChartGridLayer.cxx
+  pqChartGridLayer.h
+  pqChartInteractor.cxx
+  pqChartInteractor.h
+  pqChartLayer.cxx
+  pqChartLayer.h
   pqChartLegend.cxx
   pqChartLegend.h
+  pqChartLegendModel.cxx
+  pqChartLegendModel.h
   pqChartMouseBox.cxx
   pqChartMouseBox.h
+  pqChartPixelScale.cxx
+  pqChartPixelScale.h
+  pqChartPlugin.cxx
+  pqChartPlugin.h
+  pqChartSelectionHelper.cxx
+  pqChartSelectionHelper.h
+  pqChartSeriesOptionsGenerator.cxx
+  pqChartSeriesOptionsGenerator.h
+  pqChartTitle.cxx
+  pqChartTitle.h
   pqChartValue.cxx
   pqChartValue.h
+  pqChartWidget.cxx
+  pqChartWidget.h
+  pqChartWidgetPlugin.h
   pqChartZoomHistory.cxx
   pqChartZoomHistory.h
-  pqChartZoomPan.cxx
-  pqChartZoomPan.h
-  pqChartZoomPanAlt.cxx
-  pqChartZoomPanAlt.h
   pqColorMapColorChanger.cxx
   pqColorMapColorChanger.h
   pqColorMapModel.cxx
   pqColorMapModel.h
   pqColorMapWidget.cxx
   pqColorMapWidget.h
+  pqColorMapWidgetPlugin.h
   pqHistogramChart.cxx
   pqHistogramChart.h
+  pqHistogramChartOptions.cxx
+  pqHistogramChartOptions.h
   pqHistogramColor.cxx
   pqHistogramColor.h
-  pqHistogramListModel.cxx
-  pqHistogramListModel.h
   pqHistogramModel.cxx
   pqHistogramModel.h
   pqHistogramSelection.cxx
   pqHistogramSelection.h
+  pqHistogramSelectionHelper.cxx
+  pqHistogramSelectionHelper.h
   pqHistogramSelectionModel.cxx
   pqHistogramSelectionModel.h
   pqHistogramWidget.cxx
@@ -61,20 +82,20 @@ SET(QtChart_SRCS
   pqLineChart.h
   pqLineChartModel.cxx
   pqLineChartModel.h
-  pqLineChartPlot.cxx
-  pqLineChartPlot.h
-  pqLineChartPlotOptions.cxx
-  pqLineChartPlotOptions.h
+  pqLineChartOptions.cxx
+  pqLineChartOptions.h
+  pqLineChartSeries.cxx
+  pqLineChartSeries.h
+  pqLineChartSeriesOptions.cxx
+  pqLineChartSeriesOptions.h
   pqLineChartWidget.cxx
   pqLineChartWidget.h
-  pqMarkerPen.cxx
-  pqMarkerPen.h
-  pqPixelTransferFunction.cxx
-  pqPixelTransferFunction.h
   pqPointMarker.cxx
   pqPointMarker.h
-  pqSimpleLineChartPlot.cxx
-  pqSimpleLineChartPlot.h
+  pqSimpleHistogramModel.cxx
+  pqSimpleHistogramModel.h
+  pqSimpleLineChartSeries.cxx
+  pqSimpleLineChartSeries.h
   QtChartExport.h
 )
 
@@ -85,30 +106,35 @@ GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
 QT4_WRAP_CPP(QtChart_MOC_SRCS
-  pqChartPlugin.h
-  pqColorMapWidgetPlugin.h
-  pqHistogramWidgetPlugin.h
-  pqLineChartWidgetPlugin.h
-
-
+  pqChartArea.h
   pqChartAxis.h
-  pqChartLabel.h
+  pqChartAxisModel.h
+  pqChartAxisOptions.h
+  pqChartContentsSpace.h
+  pqChartInteractor.h
   pqChartLegend.h
-  pqChartZoomPan.h
-  pqChartZoomPanAlt.h
+  pqChartLegendModel.h
+  pqChartLayer.h
+  pqChartPlugin.h
+  pqChartSelectionHelper.h
+  pqChartTitle.h
+  pqChartWidget.h
+  pqChartWidgetPlugin.h
   pqColorMapColorChanger.h
   pqColorMapModel.h
   pqColorMapWidget.h
+  pqColorMapWidgetPlugin.h
   pqHistogramChart.h
-  pqHistogramListModel.h
+  pqHistogramChartOptions.h
   pqHistogramModel.h
+  pqHistogramSelectionHelper.h
   pqHistogramSelectionModel.h
-  pqHistogramWidget.h
   pqLineChart.h
   pqLineChartModel.h
-  pqLineChartPlot.h
-  pqLineChartPlotOptions.h
-  pqLineChartWidget.h
+  pqLineChartOptions.h
+  pqLineChartSeries.h
+  pqLineChartSeriesOptions.h
+  pqSimpleHistogramModel.h
 )
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")

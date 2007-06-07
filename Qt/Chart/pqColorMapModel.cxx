@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorMapModel.h"
 
 #include "pqChartValue.h"
-#include "pqPixelTransferFunction.h"
+#include "pqChartPixelScale.h"
 
 #include <QColor>
 #include <QList>
@@ -396,7 +396,7 @@ QPixmap pqColorMapModel::generateGradient(const QSize &size) const
   QPainter painter(&gradient);
 
   // Set up the pixel-value map for the image size.
-  pqPixelTransferFunction pixelMap;
+  pqChartPixelScale pixelMap;
   pixelMap.setPixelRange(1, size.width() - 1);
   pixelMap.setValueRange(this->Internal->first()->Value,
       this->Internal->last()->Value);

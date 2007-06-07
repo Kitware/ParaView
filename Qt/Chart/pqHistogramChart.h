@@ -30,63 +30,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/*!
- * \file pqHistogramChart.h
- *
- * \brief
- *   The pqHistogramChart class is used to display a histogram chart.
- *
- * \author Mark Richardson
- * \date   May 12, 2005
- */
+/// \file pqHistogramChart.h
+/// \date 2/14/2007
 
 #ifndef _pqHistogramChart_h
 #define _pqHistogramChart_h
 
 
 #include "QtChartExport.h"
-#include <QObject>
+#include "pqChartLayer.h"
 
-#include "pqHistogramSelectionModel.h" // Needed for list type.
-#include <QColor> // Needed for select member.
-#include <QRect>  // Needed for bounds member.
+#include "pqHistogramSelectionModel.h" // Needed for typedef
 
 class pqChartAxis;
 class pqChartValue;
-class pqHistogramChartData;
-class pqHistogramColor;
+class pqHistogramChartOptions;
+class pqHistogramChartInternal;
 class pqHistogramModel;
-class QPainter;
+class QRect;
 
 
-/// \class pqHistogramChart
-/// \brief
-///   The pqHistogramChart class is used to draw a histogram chart.
-///
-/// The histogram chart uses two axes to lay out the histogram bars.
-/// The histogram can have a highlighted selection of bars or values.
-/// The outline style determines what color the bar outline is. The
-/// outline can be black or a dark color based on the bar color. The
-/// highlight style determines how the bars will be highlighted when
-/// they are selected. Either the outline or the filled portion of
-/// the bar can be highlighted. The default settings are as follows:
-///   - highlight style: \c Fill
-///   - outline style: \c Darker
-///   - selection background: \c LightBlue
-class QTCHART_EXPORT pqHistogramChart : public QObject
+class QTCHART_EXPORT pqHistogramChart : public pqChartLayer
 {
   Q_OBJECT
 
 public:
-  enum OutlineStyle {
-    Darker,
-    Black
-  };
-
-  enum HighlightStyle {
-    Outline,
-    Fill
-  };
+  enum BinPickMode
+    {
+    BinRectangle, ///< Pick must be within the bin rectangle.
+    BinRange      ///< Pick only has to be within the bin range.
+    };
 
 public:
   /// \brief
@@ -95,13 +68,25 @@ public:
   pqHistogramChart(QObject *parent=0);
   virtual ~pqHistogramChart();
 
-  /// \name Data Methods
+  /// \name Setup Methods
   //@{
   /// \brief
   ///   Sets the axes for the chart.
   /// \param xAxis The x-axis object.
   /// \param yAxis The y-axis object.
   void setAxes(pqChartAxis *xAxis, pqChartAxis *yAxis);
+
+  /// \brief
+  ///   Gets the x-axis for the chart.
+  /// \return
+  ///   A pointer to the x-axis for the chart.
+  pqChartAxis *getXAxis() const {return this->XAxis;}
+
+  /// \brief
+  ///   Gets the y-axis for the chart.
+  /// \return
+  ///   A pointer to the y-axis for the chart.
+  pqChartAxis *getYAxis() const {return this->YAxis;}
 
   /// \brief
   ///   Sets the histogram model to be displayed.
@@ -113,12 +98,6 @@ public:
   /// \return
   ///   A pointer to the currect histogram model.
   pqHistogramModel *getModel() const {return this->Model;}
-
-  /// \brief
-  ///   Gets the pixel width of a bin on the chart.
-  /// \return
-  ///   The pixel width of a bin on the chart.
-  int getBinWidth() const;
   //@}
 
   /// \name Selection Methods
@@ -130,18 +109,24 @@ public:
   pqHistogramSelectionModel *getSelectionModel() const {return this->Selection;}
 
   /// \brief
+  ///   Gets the pixel width of a bin on the chart.
+  /// \return
+  ///   The pixel width of a bin on the chart.
+  int getBinWidth() const;
+
+  /// \brief
   ///   Gets the bin index for the given location.
   ///
   /// If there is no bin in the given location, -1 is returned.
   ///  
   /// \param x The x pixel coordinate.
   /// \param y The y pixel coordinate.
-  /// \param entireBin Test the location against the entire bin, not just the "filled" portion.
+  /// \param mode The bin picking mode to use (rectangle or range).
   /// \return
   ///   The bin index for the given location.
   /// \sa pqHistogramChart::getBinsIn(const QRect &,
-  ///         pqHistogramSelectionList &)
-  int getBinAt(int x, int y, bool entireBin = true) const;
+  ///         pqHistogramSelectionList &, bool)
+  int getBinAt(int x, int y, BinPickMode mode=BinRange) const;
 
   /// \brief
   ///   Gets the value for the given location.
@@ -168,9 +153,10 @@ public:
   ///   Gets a list of bin indexes within the given area.
   /// \param area The area of the chart to query.
   /// \param list Used to return the list of index ranges.
-  /// \param entireBins Test the area for intersection with entire bins, not just the "filled" portions.
+  /// \param mode The bin picking mode to use (rectangle or range).
   /// \sa pqHistogramChart::getBinAt(int, int)
-  void getBinsIn(const QRect &area, pqHistogramSelectionList &list, bool entireBins = true) const;
+  void getBinsIn(const QRect &area, pqHistogramSelectionList &list,
+      BinPickMode mode=BinRange) const;
 
   /// \brief
   ///   Gets a list of values within the given area.
@@ -183,51 +169,31 @@ public:
   /// \name Drawing Parameters
   //@{
   /// \brief
-  ///   Sets the histogram bar color scheme.
-  /// \param scheme The color scheme interface to use.
-  void setBinColorScheme(pqHistogramColor *scheme);
-
-  /// \brief
-  ///   Sets the highlight style for the histogram bars.
-  ///
-  /// The default style is \c Fill.
-  ///
-  /// \param style The highlight style to use.
-  void setBinHighlightStyle(HighlightStyle style);
-
-  /// \brief
-  ///   Gets the highlight style for the histogram bars.
+  ///   Gets the histogram chart drawing options.
   /// \return
-  ///   The current bin highlight style.
-  HighlightStyle getBinHighlightStyle() const {return this->Style;}
+  ///   A pointer to the histogram chart drawing options.
+  pqHistogramChartOptions *getOptions() const {return this->Options;}
 
   /// \brief
-  ///   Sets the outline style for the histogram bars.
+  ///   Sets the histogram chart drawing options.
   ///
-  /// The default style is \c Darker.
+  /// This method sets all the options at once, which can prevent
+  /// unnecessary view updates.
   ///
-  /// \param style The outline style to use.
-  void setBinOutlineStyle(OutlineStyle style);
-
-  /// \brief
-  ///   Gets the outline style for the histogram bars.
-  /// \return
-  ///   The current bin outline style.
-  OutlineStyle getBinOutlineStyle() const {return this->OutlineType;}
+  /// \param options The new histogram drawing options.
+  void setOptions(const pqHistogramChartOptions &options);
   //@}
 
-  /// \name Display Methods
+  /// \name pqChartLayer Methods
   //@{
-  /// \brief
-  ///   Used to layout the histogram.
-  ///
-  /// The chart axes must be layed out before this method is called.
-  /// This method must be called before the chart can be drawn.
-  ///
-  /// \sa pqHistogramChart::setAxes(pqChartAxis *, pqChartAxis *)
-  ///     pqHistogramChart::drawChart(QPainter *, const QRect &,
-  ///         QHistogramColorParams *)
-  void layoutChart();
+  virtual bool getAxisRange(const pqChartAxis *axis, pqChartValue &min,
+      pqChartValue &max, bool &padMin, bool &padMax) const;
+
+  virtual bool isAxisControlPreferred(const pqChartAxis *axis) const;
+
+  virtual void generateAxisLabels(pqChartAxis *axis);
+
+  virtual void layoutChart(const QRect &area);
 
   /// \brief
   ///   Draws the highlight background for the chart.
@@ -235,33 +201,13 @@ public:
   /// The highlight background is drawn separately so it can be
   /// drawn before the background grid.
   ///
-  /// \param p The painter to use.
+  /// \param painter The painter to use.
   /// \param area The area that needs to be painted.
-  /// \sa pqHistogramChart::drawChart(QPainter *, const QRect &,
-  ///         QHistogramColorParams *)
-  void drawBackground(QPainter *p, const QRect &area);
+  /// \sa pqHistogramChart::drawChart(QPainter &, const QRect &)
+  virtual void drawBackground(QPainter &painter, const QRect &area);
 
-  /// \brief
-  ///   Used to draw the histogram chart.
-  ///
-  /// The histogram chart needs to be layed out before it can be
-  /// drawn. Separating the layout and drawing functions improves
-  /// the repainting performance.
-  ///
-  /// \param p The painter to use.
-  /// \param area The area that needs to be painted.
-  /// \sa pqHistogramChart::layoutChart()
-  void drawChart(QPainter *p, const QRect &area);
+  virtual void drawChart(QPainter &painter, const QRect &area);
   //@}
-
-signals:
-  /// \brief
-  ///   Called when the chart needs to be layed out again.
-  void layoutNeeded();
-
-  /// \brief
-  ///   Called when the chart needs to be repainted.
-  void repaintNeeded();
 
 private slots:
   /// Updates the layout of the histogram when the model is reset.
@@ -285,41 +231,20 @@ private slots:
   /// Finishes the histogram bin removal process.
   void finishBinRemoval();
 
-  /// \brief
-  ///   Updates the histogram highlights when the selection changes.
-  /// \param list The list of selected ranges.
-  void updateHighlights(const pqHistogramSelectionList &list);
+  /// Updates the histogram highlights when the selection changes.
+  void updateHighlights();
 
 private:
   /// Used to layout the selection list.
   void layoutSelection();
 
-  /// Used to update the axis ranges when the model changes.
-  void updateAxisRanges();
-
-  /// Used to update the x-axis range when the model changes.
-  void updateXAxisRange();
-
-  /// Used to update the y-axis range when the model changes.
-  void updateYAxisRange();
-
-  /// Cleans up the bar and highlight lists.
-  void clearData();
-
-public:
-  QRect Bounds;              ///< Stores the chart area.
-
-  static QColor LightBlue;   ///< Defines the default selection background.
-
 private:
-  HighlightStyle Style;       ///< Stores the highlight style.
-  OutlineStyle OutlineType;   ///< Stores the outline style.
-  QColor Select;              ///< Stores the highlight background color.
-  pqHistogramColor *Colors;   ///< A pointer to the bar color scheme.
-  pqChartAxis *XAxis;         ///< Stores the x-axis object.
-  pqChartAxis *YAxis;         ///< Stores the y-axis object.
-  pqHistogramModel *Model;    ///< A pointer to the histogram model.
-  pqHistogramChartData *Data; ///< Stores the bar and highlight lists.
+  /// Stores the view items.
+  pqHistogramChartInternal *Internal;
+  pqHistogramChartOptions *Options; ///< Stores the histogram options.
+  pqChartAxis *XAxis;               ///< Stores the x-axis.
+  pqChartAxis *YAxis;               ///< Stores the y-axis.
+  pqHistogramModel *Model;          ///< Stores the histogram model.
 
   /// Stores the selection model.
   pqHistogramSelectionModel *Selection;

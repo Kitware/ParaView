@@ -30,42 +30,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/*!
- * \file pqLineChart.h
- *
- * \brief
- *   The pqLineChart class is used to display a line plot.
- *
- * \author Mark Richardson
- * \date   August 1, 2005
- */
+/// \file pqLineChart.h
+/// \date 2/28/2007
 
 #ifndef _pqLineChart_h
 #define _pqLineChart_h
 
+
 #include "QtChartExport.h"
-#include <QObject>
-#include <QRect> // Needed for bounds member.
+#include "pqChartLayer.h"
 
 class pqChartAxis;
-class pqChartCoordinate;
-class pqLineChartInternal;
-class pqLineChartItem;
+class pqChartValue;
 class pqLineChartModel;
-class pqLineChartPlot;
-class pqLineChartPlotOptions;
+class pqLineChartOptions;
+class pqLineChartSeries;
+class pqLineChartSeriesItem;
+class pqLineChartInternal;
 class QPainter;
-class QHelpEvent;
+class QRect;
 
-/// \class pqLineChart
-/// \brief
-///   The pqLineChart class is used to display a line plot.
-///
-/// The line chart can display more than one line plot on the
-/// same chart. The line chart can also be drawn over a
-/// histogram as well. When combined with another chart, the
-/// x-axis should be marked as a shared axis.
-class QTCHART_EXPORT pqLineChart : public QObject
+
+class QTCHART_EXPORT pqLineChart : public pqChartLayer
 {
   Q_OBJECT
 
@@ -76,19 +62,25 @@ public:
   pqLineChart(QObject *parent=0);
   virtual ~pqLineChart();
 
-  /// \name Data Methods
+  /// \name Setup Methods
   //@{
   /// \brief
   ///   Sets the axes for the chart.
-  ///
-  /// If the x-axis is shared by another chart, the line chart will
-  /// not modify the x-axis.
-  ///
   /// \param xAxis The x-axis object.
   /// \param yAxis The y-axis object.
-  /// \param shared True if the x-axis is shared by another chart.
-  void setAxes(pqChartAxis *xAxis, pqChartAxis *yAxis,
-      bool shared=false);
+  void setAxes(pqChartAxis *xAxis, pqChartAxis *yAxis);
+
+  /// \brief
+  ///   Gets the x-axis for the chart.
+  /// \return
+  ///   A pointer to the x-axis for the chart.
+  pqChartAxis *getXAxis() const {return this->XAxis;}
+
+  /// \brief
+  ///   Gets the y-axis for the chart.
+  /// \return
+  ///   A pointer to the y-axis for the chart.
+  pqChartAxis *getYAxis() const {return this->YAxis;}
 
   /// \brief
   ///   Sets the line chart model to be displayed.
@@ -102,181 +94,170 @@ public:
   pqLineChartModel *getModel() const {return this->Model;}
   //@}
 
-  /// \name Display Methods
+  /// \name Drawing Parameters
   //@{
   /// \brief
-  ///   Used to layout the line chart.
-  ///
-  /// The chart axes must be layed out before this method is called.
-  /// This method must be called before the chart can be drawn.
-  ///
-  /// \sa pqLineChart::drawChart(QPainter *, const QRect &)
-  void layoutChart();
+  ///   Gets the line chart drawing options.
+  /// \return
+  ///   A pointer to the line chart drawing options.
+  pqLineChartOptions *getOptions() const {return this->Options;}
 
   /// \brief
-  ///   Used to draw the line chart.
+  ///   Rebuilds the line chart series options.
   ///
-  /// The line chart needs to be layed out before it can be drawn.
-  /// Separating the layout and drawing functions improves the
-  /// repainting performance.
-  ///
-  /// \param painter The painter to use.
-  /// \param area The area that needs to be painted.
-  void drawChart(QPainter &painter, const QRect &area);
+  /// The current line chart series options are removed. New series
+  /// options are created to replace the current ones.
+  void resetSeriesOptions();
   //@}
 
-  /// Displays a tooltip based on the position of the given event, relative to the chart data
-  //void showTooltip(QHelpEvent *event);
+  /// \name pqChartLayer Methods
+  //@{
+  virtual bool getAxisRange(const pqChartAxis *axis, pqChartValue &min,
+      pqChartValue &max, bool &padMin, bool &padMax) const;
 
-signals:
-  /// Called when the line chart needs to be layed-out
-  void layoutNeeded();
+  virtual void layoutChart(const QRect &area);
 
-  /// Called when the line chart needs to be repainted.
-  void repaintNeeded();
+  virtual void drawChart(QPainter &painter, const QRect &area);
+  //@}
 
 private slots:
   /// Updates the layout of the line chart when the model is reset.
   void handleModelReset();
 
   /// \brief
-  ///   Prepares the chart for a plot insertion.
-  /// \param first The first index of the new plots.
-  /// \param last The last index of the new plots.
-  void startPlotInsertion(int first, int last);
+  ///   Prepares the chart for a series insertion.
+  /// \param first The first index of the new series.
+  /// \param last The last index of the new series.
+  void startSeriesInsertion(int first, int last);
 
   /// \brief
-  ///   Updates the chart layout after a plot is inserted.
-  /// \param first The first index of the new plots.
-  /// \param last The last index of the new plots.
-  void finishPlotInsertion(int first, int last);
+  ///   Updates the chart layout after a series is inserted.
+  /// \param first The first index of the new series.
+  /// \param last The last index of the new series.
+  void finishSeriesInsertion(int first, int last);
 
   /// \brief
-  ///   Prepares the chart for a plot removal.
-  /// \param first The first index of the plots being removed.
-  /// \param last The last index of the plots being removed.
-  void startPlotRemoval(int first, int last);
+  ///   Prepares the chart for a series removal.
+  /// \param first The first index of the series being removed.
+  /// \param last The last index of the series being removed.
+  void startSeriesRemoval(int first, int last);
 
   /// \brief
-  ///   Updates the chart layout after a plot is removed.
+  ///   Updates the chart layout after a series is removed.
   ///
-  /// If the chart ranges do not change after removing the plots, the
-  /// chart only has to be repainted. Otherwise, the layout has to be
-  /// re-calculated.
+  /// If the chart ranges do not change after removing the series,
+  /// the chart only has to be repainted. Otherwise, the layout has
+  /// to be re-calculated.
   ///
-  /// \param first The first index of the plots being removed.
-  /// \param last The last index of the plots being removed.
-  void finishPlotRemoval(int first, int last);
+  /// \param first The first index of the series being removed.
+  /// \param last The last index of the series being removed.
+  void finishSeriesRemoval(int first, int last);
 
   /// \brief
-  ///   Changes the plot painting order.
-  /// \param current The current index of the moving plot.
-  /// \param index The index to move the plot to.
-  void handlePlotMoved(int current, int index);
+  ///   Changes the series painting order.
+  /// \param current The current index of the moving series.
+  /// \param index The index to move the series to.
+  void handleSeriesMoved(int current, int index);
 
   /// \brief
-  ///   Updates the plot layout after a major change.
-  /// \param plot The plot that changed.
-  void handlePlotReset(const pqLineChartPlot *plot);
+  ///   Updates the series layout after a major change.
+  /// \param series The series that changed.
+  void handleSeriesReset(const pqLineChartSeries *series);
 
   /// \brief
-  ///   Prepares the chart for a plot point insertion.
-  /// \param plot The affected plot.
-  /// \param series The index of the point series.
+  ///   Prepares the chart for a series point insertion.
+  /// \param series The affected series.
+  /// \param sequence The index of the point sequence.
   /// \param first The first index of the new points.
   /// \param last The last index of the new points.
-  void startPointInsertion(const pqLineChartPlot *plot, int series, int first,
-      int last);
-
-  /// \brief
-  ///   Updates the plot layout after a point is inserted.
-  ///
-  /// If the new points modify the overall chart ranges, the layout
-  /// for all the plots is re-calculated.
-  ///
-  /// \param plot The affected plot.
-  /// \param series The index of the point series.
-  void finishPointInsertion(const pqLineChartPlot *plot, int series);
-
-  /// \brief
-  ///   Prepares the chart for a plot point removal.
-  /// \param plot The affected plot.
-  /// \param series The index of the point series.
-  /// \param first The first index of the points being removed.
-  /// \param last The last index of the points being removed.
-  void startPointRemoval(const pqLineChartPlot *plot, int series, int first,
-      int last);
-
-  /// \brief
-  ///   Updates the plot layout after a point is removed.
-  ///
-  /// If the new plot ranges modify the overall chart ranges, the
-  /// layout for all the plots is re-calculated.
-  ///
-  /// \param plot The affected plot.
-  /// \param series The index of the point series.
-  void finishPointRemoval(const pqLineChartPlot *plot, int series);
-
-  /// \brief
-  ///   Prepares the chart for a multi-series change.
-  /// \param plot The plot to be modified.
-  void startMultiSeriesChange(const pqLineChartPlot *plot);
-
-  /// \brief
-  ///   Updates the chart layout after a multi-series change.
-  /// \param plot The plot that was modified.
-  void finishMultiSeriesChange(const pqLineChartPlot *plot);
-
-  /// \brief
-  ///   Updates the plot layout when its error boundaries change.
-  ///
-  /// The entire chart layout may need to be re-calculated if the new
-  /// plot ranges affect the chart ranges.
-  ///
-  /// \param plot The plot that was modified.
-  /// \param series The index of the point series.
-  /// \param first The first index of the modified points.
-  /// \param last The last index of the modified points.
-  void handlePlotErrorBoundsChanged(const pqLineChartPlot *plot, int series,
+  void startPointInsertion(const pqLineChartSeries *series, int sequence,
       int first, int last);
 
   /// \brief
-  ///   Updates the plot layout when the error bar width is changed.
-  /// \param plot The plot that was modified.
-  /// \param series The index of the modified point series.
-  void handlePlotErrorWidthChanged(const pqLineChartPlot *plot, int series);
+  ///   Updates the series layout after a point is inserted.
+  ///
+  /// If the new points modify the overall chart ranges, the layout
+  /// for all the series is re-calculated.
+  ///
+  /// \param series The affected series.
+  /// \param sequence The index of the point sequence.
+  void finishPointInsertion(const pqLineChartSeries *series, int sequence);
+
+  /// \brief
+  ///   Prepares the chart for a series point removal.
+  /// \param series The affected series.
+  /// \param sequence The index of the point sequence.
+  /// \param first The first index of the points being removed.
+  /// \param last The last index of the points being removed.
+  void startPointRemoval(const pqLineChartSeries *series, int sequence,
+      int first, int last);
+
+  /// \brief
+  ///   Updates the series layout after a point is removed.
+  ///
+  /// If the new series ranges modify the overall chart ranges, the
+  /// layout for all the series is re-calculated.
+  ///
+  /// \param series The affected series.
+  /// \param sequence The index of the point sequence.
+  void finishPointRemoval(const pqLineChartSeries *series, int sequence);
+
+  /// \brief
+  ///   Prepares the chart for a multi-sequence change.
+  /// \param series The series to be modified.
+  void startMultiSeriesChange(const pqLineChartSeries *series);
+
+  /// \brief
+  ///   Updates the chart layout after a multi-sequence change.
+  /// \param series The series that was modified.
+  void finishMultiSeriesChange(const pqLineChartSeries *series);
+
+  /// \brief
+  ///   Updates the series layout when its error boundaries change.
+  ///
+  /// The entire chart layout may need to be re-calculated if the new
+  /// series ranges affect the chart ranges.
+  ///
+  /// \param series The series that was modified.
+  /// \param sequence The index of the point sequence.
+  /// \param first The first index of the modified points.
+  /// \param last The last index of the modified points.
+  void handleSeriesErrorBoundsChanged(const pqLineChartSeries *series,
+      int sequence, int first, int last);
+
+  /// \brief
+  ///   Updates the series layout when the error bar width is changed.
+  /// \param series The series that was modified.
+  /// \param sequence The index of the modified point sequence.
+  void handleSeriesErrorWidthChanged(const pqLineChartSeries *series,
+      int sequence);
+
+  /// Initiates a full chart layout when the range changes.
+  void handleRangeChange();
 
   /// Initiates a chart repaint for the changed drawing options.
-  void handlePlotOptionsChanged();
+  void handleSeriesOptionsChanged();
 
 private:
-  /// \brief
-  ///   Updates the axis ranges when the model changes.
-  /// \param force True if the ranges should be set unchecked.
-  void updateAxisRanges(bool force=true);
+  /// Removes all the line series from the chart.
+  void clearSeriesList();
 
-  /// Removes all the line plots from the chart.
-  void clearData();
-
-  /// Builds the plot list when the model is reset.
-  void buildPlotList();
+  /// Builds the series list when the model is reset.
+  void buildSeriesList();
 
   /// \brief
-  ///   Gets the internal line chart item for the given plot.
-  /// \param plot The plot to look up.
+  ///   Gets the internal line chart item for the given series.
+  /// \param series The series to look up.
   /// \return
-  ///   A pointer to the internal chart item for the given plot.
-  pqLineChartItem *getItem(const pqLineChartPlot *plot) const;
-
-public:
-  QRect Bounds;                  ///< Stores the chart area.
+  ///   A pointer to the internal chart item for the given series.
+  pqLineChartSeriesItem *getItem(const pqLineChartSeries *series) const;
 
 private:
-  pqLineChartInternal *Internal; ///< Stores the plot layout.
+  pqLineChartInternal *Internal; /// Stores the line chart layout.
+  pqLineChartOptions *Options;   ///< Stores the drawing options.
   pqLineChartModel *Model;       ///< A pointer to the model.
   pqChartAxis *XAxis;            ///< A pointer to the x-axis.
   pqChartAxis *YAxis;            ///< A pointer to the y-axis.
-  bool XShared;                  ///< True if the x-axis is shared.
   bool NeedsLayout;              ///< True if a chart layout is needed.
 };
 

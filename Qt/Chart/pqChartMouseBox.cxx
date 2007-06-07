@@ -83,7 +83,7 @@ void pqChartMouseBox::adjustBox(const QPoint &current)
 
 void pqChartMouseBox::resetBox()
 {
-  this->Box.setCoords(0, 0, 0, 0);
+  this->Box = QRect();
 }
 
 

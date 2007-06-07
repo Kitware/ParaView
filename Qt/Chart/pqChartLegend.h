@@ -33,48 +33,114 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqChartLegend_h
 #define _pqChartLegend_h
 
+
 #include "QtChartExport.h"
+#include <QWidget>
 
-#include <QObject>
-#include <QRect>
-
+class pqChartLegendInternal;
+class pqChartLegendModel;
+class QFont;
 class QPainter;
-class pqChartLabel;
-class pqMarkerPen;
+class QPoint;
+class QRect;
 
-/// Encapsulates a legend "box" that identifies data displayed in a chart (e.g. individual line plots)
-class QTCHART_EXPORT pqChartLegend :
-  public QObject
+
+/// \class pqChartLegend
+/// \brief
+///   The pqChartLegend class displays a chart legend.
+///
+/// A pqChartLegendModel is used to describe the entries. Each entry
+/// can have an icon and a label. The icon is used to visually
+/// identify the series on the chart. For a line chart series, the
+/// image should be drawn in the same color and line style.
+class QTCHART_EXPORT pqChartLegend : public QWidget
 {
   Q_OBJECT
 
 public:
-  pqChartLegend(QObject* parent = 0);
-  ~pqChartLegend();
+  enum LegendLocation
+    {
+    Left,  ///< Place the legend on the left of the chart.
+    Top,   ///< Place the legend on the top of the chart.
+    Right, ///< Place the legend on the right of the chart.
+    Bottom ///< Place the legend on the bottom of the chart.
+    };
 
-  /// Removes all entries from the legend
-  void clear();
-  /// Adds a line-plot entry to the legend (pqChartLegend takes ownership of the pen and label objects)
-  void addEntry(pqMarkerPen* pen, pqChartLabel* label);
+  enum ItemFlow
+    {
+    LeftToRight, ///< Items are arranged left to right.
+    TopToBottom  ///< Items are arranged top to bottom.
+    };
 
-  /// Returns the legend's preferred size, based on font and orientation
-  const QRect getSizeRequest();
-  /// Sets the bounds within which the legend will be drawn
-  void setBounds(const QRect& bounds);
+public:
+  /// \brief
+  ///   Creates a chart legend instance.
+  /// \param parent The parent widget.
+  pqChartLegend(QWidget *parent=0);
+  virtual ~pqChartLegend();
 
-  /// Renders the legend using the given painter and the stored legend bounds 
-  void draw(QPainter& painter, const QRect& area);
+  /// \name Setup Methods
+  //@{
+  pqChartLegendModel *getModel() const {return this->Model;}
+  void setModel(pqChartLegendModel *model);
+
+  LegendLocation getLocation() const {return this->Location;}
+  void setLocation(LegendLocation location);
+
+  ItemFlow getFlow() const {return this->Flow;}
+  void setFlow(ItemFlow flow);
+  //@}
+
+  /// \brief
+  ///   Gets the preferred size of the chart legend.
+  /// \return
+  ///   The preferred size of the chart legend.
+  virtual QSize sizeHint() const {return this->Bounds;}
+
+  /// \brief
+  ///   Draws the legend using the given painter.
+  /// \param painter The painter to use.
+  void drawLegend(QPainter &painter);
 
 signals:
-  /// Called when the legend needs to be layed-out again.
-  void layoutNeeded();
+  /// Emitted when the legend location is changed.
+  void locationChanged();
 
-  /// Called when the legend needs to be repainted.
-  void repaintNeeded();
+public slots:
+  /// Resets the chart legend.
+  void reset();
+
+protected slots:
+  void insertEntry(int index);
+  void startEntryRemoval(int index);
+  void finishEntryRemoval(int index);
+
+protected:
+  /// \brief
+  ///   Updates the layout when the font changes.
+  /// \param e Event specific information.
+  /// \return
+  ///   True if the event was handled.
+  virtual bool event(QEvent *e);
+
+  /// \brief
+  ///   Draws the chart title.
+  /// \param e Event specific information.
+  virtual void paintEvent(QPaintEvent *e);
 
 private:
-  class pqImplementation;
-  pqImplementation* const Implementation;
+  /// Calculates the preferred size of the chart legend.
+  void calculateSize();
+
+private:
+  pqChartLegendInternal *Internal; ///< Stores the graphical items.
+  pqChartLegendModel *Model;       ///< A pointer to the model.
+  LegendLocation Location;         ///< Stores the legend location.
+  ItemFlow Flow;                   ///< Stores the order of the items.
+  QSize Bounds;                    ///< Stores the prefered size.
+  int IconSize;                    ///< Stores the icon size.
+  int TextSpacing;                 ///< The space between icon and text.
+  int Margin;                      ///< The margin around the entries.
 };
 
 #endif

@@ -41,29 +41,24 @@ pqHistogramModel::pqHistogramModel(QObject *parentObject)
 {
 }
 
-void pqHistogramModel::resetBinValues()
+void pqHistogramModel::beginInsertBins(int first, int last)
 {
-  emit this->binValuesReset();
+  emit this->aboutToInsertBins(first, last);
 }
 
-void pqHistogramModel::beginInsertBinValues(int first, int last)
+void pqHistogramModel::endInsertBins()
 {
-  emit this->aboutToInsertBinValues(first, last);
+  emit this->binsInserted();
 }
 
-void pqHistogramModel::endInsertBinValues()
+void pqHistogramModel::beginRemoveBins(int first, int last)
 {
-  emit this->binValuesInserted();
+  emit this->aboutToRemoveBins(first, last);
 }
 
-void pqHistogramModel::beginRemoveBinValues(int first, int last)
+void pqHistogramModel::endRemoveBins()
 {
-  emit this->aboutToRemoveBinValues(first, last);
-}
-
-void pqHistogramModel::endRemoveBinValues()
-{
-  emit this->binValuesRemoved();
+  emit this->binsRemoved();
 }
 
 

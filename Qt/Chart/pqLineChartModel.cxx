@@ -37,8 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqChartCoordinate.h"
 #include "pqChartValue.h"
-#include "pqLineChartPlot.h"
-#include "pqLineChartPlotOptions.h"
+#include "pqLineChartSeries.h"
 
 #include <QList>
 #include <QVector>
@@ -50,20 +49,16 @@ public:
   pqLineChartModelInternal();
   ~pqLineChartModelInternal() {}
 
-  QList<pqLineChartPlot *> List;
-  QList<pqLineChartPlot *> MultiSeries;
-  QVector<pqLineChartPlotOptions *> Options;
-  pqChartValue MinimumX;
-  pqChartValue MaximumX;
-  pqChartValue MinimumY;
-  pqChartValue MaximumY;
+  QList<pqLineChartSeries *> List;
+  QList<pqLineChartSeries *> MultiSeries;
+  pqChartCoordinate Minimum;
+  pqChartCoordinate Maximum;
 };
 
 
 //----------------------------------------------------------------------------
 pqLineChartModelInternal::pqLineChartModelInternal()
-  : List(), MultiSeries(), Options(), MinimumX(), MaximumX(), MinimumY(),
-    MaximumY()
+  : List(), MultiSeries(), Minimum(), Maximum()
 {
 }
 
@@ -80,17 +75,17 @@ pqLineChartModel::~pqLineChartModel()
   delete this->Internal;
 }
 
-int pqLineChartModel::getNumberOfPlots() const
+int pqLineChartModel::getNumberOfSeries() const
 {
   return this->Internal->List.size();
 }
 
-int pqLineChartModel::getIndexOf(pqLineChartPlot *plot) const
+int pqLineChartModel::getIndexOf(pqLineChartSeries *series) const
 {
-  return this->Internal->List.indexOf(plot);
+  return this->Internal->List.indexOf(series);
 }
 
-pqLineChartPlot *pqLineChartModel::getPlot(int index) const
+pqLineChartSeries *pqLineChartModel::getSeries(int index) const
 {
   if(index >= 0 && index < this->Internal->List.size())
     {
@@ -100,15 +95,15 @@ pqLineChartPlot *pqLineChartModel::getPlot(int index) const
   return 0;
 }
 
-void pqLineChartModel::appendPlot(pqLineChartPlot *plot)
+void pqLineChartModel::appendSeries(pqLineChartSeries *series)
 {
-  this->insertPlot(plot, this->Internal->List.size());
+  this->insertSeries(series, this->Internal->List.size());
 }
 
-void pqLineChartModel::insertPlot(pqLineChartPlot *plot, int index)
+void pqLineChartModel::insertSeries(pqLineChartSeries *series, int index)
 {
-  // Make sure the plot is not in the list.
-  if(!plot || this->Internal->List.indexOf(plot) != -1)
+  // Make sure the series is not in the list.
+  if(!series || this->Internal->List.indexOf(series) != -1)
     {
     return;
     }
@@ -118,63 +113,65 @@ void pqLineChartModel::insertPlot(pqLineChartPlot *plot, int index)
     index = this->Internal->List.size();
     }
 
-  // Insert the new plot. Listen to the plot signals for rebroadcast.
-  emit this->aboutToInsertPlots(index, index);
-  this->Internal->List.insert(index, plot);
-  this->connect(plot, SIGNAL(plotReset()), this, SLOT(handlePlotReset()));
-  this->connect(plot, SIGNAL(aboutToInsertPoints(int, int, int)),
-      this, SLOT(handlePlotBeginInsert(int, int, int)));
-  this->connect(plot, SIGNAL(pointsInserted(int)),
-      this, SLOT(handlePlotEndInsert(int)));
-  this->connect(plot, SIGNAL(aboutToRemovePoints(int, int, int)),
-      this, SLOT(handlePlotBeginRemove(int, int, int)));
-  this->connect(plot, SIGNAL(pointsRemoved(int)),
-      this, SLOT(handlePlotEndRemove(int)));
-  this->connect(plot, SIGNAL(aboutToChangeMultipleSeries()),
-      this, SLOT(handlePlotBeginMultiSeriesChange()));
-  this->connect(plot, SIGNAL(changedMultipleSeries()),
-      this, SLOT(handlePlotEndMultiSeriesChange()));
+  // Insert the new series. Listen to the series signals for rebroadcast.
+  emit this->aboutToInsertSeries(index, index);
+  this->Internal->List.insert(index, series);
+  this->connect(series, SIGNAL(seriesReset()),
+      this, SLOT(handleSeriesReset()));
+  this->connect(series, SIGNAL(aboutToInsertPoints(int, int, int)),
+      this, SLOT(handleSeriesBeginInsert(int, int, int)));
+  this->connect(series, SIGNAL(pointsInserted(int)),
+      this, SLOT(handleSeriesEndInsert(int)));
+  this->connect(series, SIGNAL(aboutToRemovePoints(int, int, int)),
+      this, SLOT(handleSeriesBeginRemove(int, int, int)));
+  this->connect(series, SIGNAL(pointsRemoved(int)),
+      this, SLOT(handleSeriesEndRemove(int)));
+  this->connect(series, SIGNAL(aboutToChangeMultipleSequences()),
+      this, SLOT(startSeriesMultiSequenceChange()));
+  this->connect(series, SIGNAL(changedMultipleSequences()),
+      this, SLOT(finishSeriesMultiSequenceChange()));
 
-  // Update the chart ranges for the new plot.
-  this->updateChartRanges(plot);
-  emit this->plotsInserted(index, index);
+  // Update the axis ranges for the new series. If the series can fit
+  // in the current layout, only the new series need to be layed out.
+  this->updateChartRanges(series);
+  emit this->seriesInserted(index, index);
 }
 
-void pqLineChartModel::removePlot(pqLineChartPlot *plot)
+void pqLineChartModel::removeSeries(pqLineChartSeries *series)
 {
-  if(plot)
+  if(series)
     {
-    // Remove the plot by index.
-    this->removePlot(this->Internal->List.indexOf(plot));
+    // Remove the series by index.
+    this->removeSeries(this->Internal->List.indexOf(series));
     }
 }
 
-void pqLineChartModel::removePlot(int index)
+void pqLineChartModel::removeSeries(int index)
 {
   if(index < 0 || index >= this->Internal->List.size())
     {
     return;
     }
 
-  emit this->aboutToRemovePlots(index, index);
-  pqLineChartPlot *plot = this->Internal->List.takeAt(index);
-  this->disconnect(plot, 0, this, 0);
+  emit this->aboutToRemoveSeries(index, index);
+  pqLineChartSeries *series = this->Internal->List.takeAt(index);
+  this->disconnect(series, 0, this, 0);
 
   // Re-calculate the chart ranges.
   this->updateChartRanges();
-  emit this->plotsRemoved(index, index);
+  emit this->seriesRemoved(index, index);
 }
 
-void pqLineChartModel::movePlot(pqLineChartPlot *plot, int index)
+void pqLineChartModel::moveSeries(pqLineChartSeries *series, int index)
 {
-  if(plot)
+  if(series)
     {
-    // Move the plot by index.
-    this->movePlot(this->Internal->List.indexOf(plot), index);
+    // Move the series by index.
+    this->moveSeries(this->Internal->List.indexOf(series), index);
     }
 }
 
-void pqLineChartModel::movePlot(int current, int index)
+void pqLineChartModel::moveSeries(int current, int index)
 {
   if(current < 0 || current >= this->Internal->List.size() ||
       index < 0 || index >= this->Internal->List.size())
@@ -188,61 +185,23 @@ void pqLineChartModel::movePlot(int current, int index)
     index--;
     }
 
-  // Move the plot to the new place in the list.
-  pqLineChartPlot *plot = this->Internal->List.takeAt(current);
+  // Move the series to the new place in the list.
+  pqLineChartSeries *series = this->Internal->List.takeAt(current);
   if(index < this->Internal->List.size())
     {
-    this->Internal->List.insert(index, plot);
+    this->Internal->List.insert(index, series);
     }
   else
     {
-    this->Internal->List.append(plot);
+    this->Internal->List.append(series);
     }
 
-  emit this->plotMoved(current, index);
+  emit this->seriesMoved(current, index);
 }
 
-void pqLineChartModel::movePlotAndOptions(int current, int index)
+void pqLineChartModel::removeAll()
 {
-  if(current < 0 || current >= this->Internal->List.size() ||
-      index < 0 || index >= this->Internal->List.size())
-    {
-    return;
-    }
-
-  // Check if the options have been set for the current location.
-  pqLineChartPlotOptions *options = 0;
-  if(current >= 0 && current < this->Internal->Options.size())
-    {
-    // Remove the options from the list.
-    options = this->Internal->Options[current];
-    this->Internal->Options.remove(current);
-    }
-
-  // Adjust the index if it is after the current one.
-  if(index > current)
-    {
-    index--;
-    }
-
-  // Move the plot options to the new place.
-  if(index < this->Internal->Options.size())
-    {
-    this->Internal->Options.insert(index, options);
-    }
-  else
-    {
-    this->blockSignals(true);
-    this->setOptions(index, options);
-    this->blockSignals(false);
-    }
-
-  this->movePlot(current, index);
-}
-
-void pqLineChartModel::clearPlots()
-{
-  QList<pqLineChartPlot *>::Iterator iter = this->Internal->List.begin();
+  QList<pqLineChartSeries *>::Iterator iter = this->Internal->List.begin();
   for( ; iter != this->Internal->List.end(); ++iter)
     {
     QObject::disconnect(*iter, 0, this, 0);
@@ -250,242 +209,192 @@ void pqLineChartModel::clearPlots()
 
   this->Internal->List.clear();
   this->updateChartRanges();
-  emit this->plotsReset();
+  emit this->modelReset();
 }
 
 void pqLineChartModel::getRangeX(pqChartValue &min, pqChartValue &max) const
 {
-  min = this->Internal->MinimumX;
-  max = this->Internal->MaximumX;
+  min = this->Internal->Minimum.X;
+  max = this->Internal->Maximum.X;
 }
 
 void pqLineChartModel::getRangeY(pqChartValue &min, pqChartValue &max) const
 {
-  min = this->Internal->MinimumY;
-  max = this->Internal->MaximumY;
+  min = this->Internal->Minimum.Y;
+  max = this->Internal->Maximum.Y;
 }
 
-pqLineChartPlotOptions *pqLineChartModel::getOptions(int index) const
+void pqLineChartModel::handleSeriesReset()
 {
-  if(index >= 0 && index < this->Internal->Options.size())
-    {
-    return this->Internal->Options[index];
-    }
-
-  return 0;
-}
-
-void pqLineChartModel::setOptions(int index, pqLineChartPlotOptions *options)
-{
-  if(index < 0)
-    {
-    return;
-    }
-
-  // Expand the vector to fit the plot index if needed.
-  if(index >= this->Internal->Options.size())
-    {
-    int i = this->Internal->Options.size();
-    this->Internal->Options.resize(index + 1);
-    for( ; i < this->Internal->Options.size(); i++)
-      {
-      this->Internal->Options[i] = 0;
-      }
-    }
-
-  if(this->Internal->Options[index])
-    {
-    QObject::disconnect(this->Internal->Options[index], 0, this, 0);
-    }
-
-  this->Internal->Options[index] = options;
-  if(options)
-    {
-    // Forward the options changed signal from the object.
-    this->connect(options, SIGNAL(optionsChanged()),
-        this, SIGNAL(optionsChanged()));
-    }
-
-  if(index < this->Internal->List.size())
-    {
-    emit this->optionsChanged();
-    }
-}
-
-void pqLineChartModel::clearOptions()
-{
-  QVector<pqLineChartPlotOptions *>::Iterator iter =
-      this->Internal->Options.begin();
-  for( ; iter != this->Internal->Options.end(); ++iter)
-    {
-    QObject::disconnect(*iter, 0, this, 0);
-    }
-
-  bool hadOptions = this->Internal->Options.size() > 0;
-  this->Internal->Options.clear();
-  if(hadOptions && this->Internal->List.size() > 0)
-    {
-    emit this->optionsChanged();
-    }
-}
-
-void pqLineChartModel::handlePlotReset()
-{
-  pqLineChartPlot *plot = qobject_cast<pqLineChartPlot *>(this->sender());
+  pqLineChartSeries *series = qobject_cast<pqLineChartSeries *>(this->sender());
   this->updateChartRanges();
-  emit this->plotReset(plot);
+  emit this->seriesReset(series);
 }
 
-void pqLineChartModel::handlePlotBeginInsert(int series, int first, int last)
+void pqLineChartModel::handleSeriesBeginInsert(int sequence, int first, int last)
 {
-  pqLineChartPlot *plot = qobject_cast<pqLineChartPlot *>(this->sender());
-  emit this->aboutToInsertPoints(plot, series, first, last);
+  pqLineChartSeries *series = qobject_cast<pqLineChartSeries *>(this->sender());
+  emit this->aboutToInsertPoints(series, sequence, first, last);
 }
 
-void pqLineChartModel::handlePlotEndInsert(int series)
+void pqLineChartModel::handleSeriesEndInsert(int sequence)
 {
-  pqLineChartPlot *plot = qobject_cast<pqLineChartPlot *>(this->sender());
-  if(!this->Internal->MultiSeries.contains(plot))
+  pqLineChartSeries *series = qobject_cast<pqLineChartSeries *>(this->sender());
+  if(!this->Internal->MultiSeries.contains(series))
     {
     // Update the chart ranges for the new points.
-    this->updateChartRanges(plot);
+    this->updateChartRanges(series);
     }
 
-  emit this->pointsInserted(plot, series);
+  emit this->pointsInserted(series, sequence);
 }
 
-void pqLineChartModel::handlePlotBeginRemove(int series, int first, int last)
+void pqLineChartModel::handleSeriesBeginRemove(int sequence, int first, int last)
 {
-  pqLineChartPlot *plot = qobject_cast<pqLineChartPlot *>(this->sender());
-  emit this->aboutToRemovePoints(plot, series, first, last);
+  pqLineChartSeries *series = qobject_cast<pqLineChartSeries *>(this->sender());
+  emit this->aboutToRemovePoints(series, sequence, first, last);
 }
 
-void pqLineChartModel::handlePlotEndRemove(int series)
+void pqLineChartModel::handleSeriesEndRemove(int sequence)
 {
-  pqLineChartPlot *plot = qobject_cast<pqLineChartPlot *>(this->sender());
-  if(!this->Internal->MultiSeries.contains(plot))
+  pqLineChartSeries *series = qobject_cast<pqLineChartSeries *>(this->sender());
+  if(!this->Internal->MultiSeries.contains(series))
     {
     this->updateChartRanges();
     }
 
-  emit this->pointsRemoved(plot, series);
+  emit this->pointsRemoved(series, sequence);
 }
 
-void pqLineChartModel::handlePlotBeginMultiSeriesChange()
+void pqLineChartModel::startSeriesMultiSequenceChange()
 {
-  pqLineChartPlot *plot = qobject_cast<pqLineChartPlot *>(this->sender());
-  if(plot)
+  pqLineChartSeries *series = qobject_cast<pqLineChartSeries *>(this->sender());
+  if(series)
     {
-    this->Internal->MultiSeries.append(plot);
-    emit this->aboutToChangeMultipleSeries(plot);
+    this->Internal->MultiSeries.append(series);
+    emit this->aboutToChangeMultipleSeries(series);
     }
 }
 
-void pqLineChartModel::handlePlotEndMultiSeriesChange()
+void pqLineChartModel::finishSeriesMultiSequenceChange()
 {
-  pqLineChartPlot *plot = qobject_cast<pqLineChartPlot *>(this->sender());
-  if(plot && this->Internal->MultiSeries.contains(plot))
+  pqLineChartSeries *series = qobject_cast<pqLineChartSeries *>(this->sender());
+  if(series && this->Internal->MultiSeries.contains(series))
     {
     // Re-calculate the chart ranges.
     this->updateChartRanges();
-    this->Internal->MultiSeries.removeAll(plot);
-    emit this->changedMultipleSeries(plot);
+    this->Internal->MultiSeries.removeAll(series);
+    emit this->changedMultipleSeries(series);
     }
 }
 
-void pqLineChartModel::handlePlotErrorBoundsChange(int series, int first,
+void pqLineChartModel::handleSeriesErrorBoundsChange(int sequence, int first,
     int last)
 {
-  pqLineChartPlot *plot = qobject_cast<pqLineChartPlot *>(this->sender());
-  if(plot)
+  pqLineChartSeries *series = qobject_cast<pqLineChartSeries *>(this->sender());
+  if(series)
     {
     this->updateChartRanges();
-    emit this->errorBoundsChanged(plot, series, first, last);
+    emit this->errorBoundsChanged(series, sequence, first, last);
     }
 }
 
-void pqLineChartModel::handlePlotErrorWidthChange(int series)
+void pqLineChartModel::handleSeriesErrorWidthChange(int sequence)
 {
-  pqLineChartPlot *plot = qobject_cast<pqLineChartPlot *>(this->sender());
-  if(plot)
+  pqLineChartSeries *series = qobject_cast<pqLineChartSeries *>(this->sender());
+  if(series)
     {
-    emit this->errorWidthChanged(plot, series);
+    emit this->errorWidthChanged(series, sequence);
     }
 }
 
 void pqLineChartModel::updateChartRanges()
 {
-  // Reset the current chart ranges.
-  this->Internal->MinimumX = (int)0;
-  this->Internal->MaximumX = (int)0;
-  this->Internal->MinimumY = (int)0;
-  this->Internal->MaximumY = (int)0;
-
-  // Find the extents of the plot data.
-  QList<pqLineChartPlot *>::Iterator plot = this->Internal->List.begin();
-  if(plot != this->Internal->List.end())
+  // Find the extents of the series data.
+  pqChartCoordinate min, max;
+  QList<pqLineChartSeries *>::Iterator series = this->Internal->List.begin();
+  if(series != this->Internal->List.end())
     {
-    (*plot)->getRangeX(this->Internal->MinimumX, this->Internal->MaximumX);
-    (*plot)->getRangeY(this->Internal->MinimumY, this->Internal->MaximumY);
-    ++plot;
+    (*series)->getRangeX(min.X, max.X);
+    (*series)->getRangeY(min.Y, max.Y);
+    ++series;
     }
 
-  pqChartValue min, max;
-  for( ; plot != this->Internal->List.end(); ++plot)
+  pqChartValue seriesMin, seriesMax;
+  for( ; series != this->Internal->List.end(); ++series)
     {
-    (*plot)->getRangeX(min, max);
-    if(min < this->Internal->MinimumX)
+    (*series)->getRangeX(seriesMin, seriesMax);
+    if(seriesMin < min.X)
       {
-      this->Internal->MinimumX = min;
+      min.X = seriesMin;
       }
-    if(max > this->Internal->MaximumX)
+    if(seriesMax > max.X)
       {
-      this->Internal->MaximumX = max;
+      max.X = seriesMax;
       }
 
-    (*plot)->getRangeY(min, max);
-    if(min < this->Internal->MinimumY)
+    (*series)->getRangeY(seriesMin, seriesMax);
+    if(seriesMin < min.Y)
       {
-      this->Internal->MinimumY = min;
+      min.Y = seriesMin;
       }
-    if(max > this->Internal->MaximumY)
+    if(seriesMax > max.Y)
       {
-      this->Internal->MaximumY = max;
+      max.Y = seriesMax;
       }
+    }
+
+  if(min.X != this->Internal->Minimum.X ||
+      max.X != this->Internal->Maximum.X ||
+      min.Y != this->Internal->Minimum.Y ||
+      max.Y != this->Internal->Maximum.Y)
+    {
+    this->Internal->Minimum.X = min.X;
+    this->Internal->Maximum.X = max.X;
+    this->Internal->Minimum.Y = min.Y;
+    this->Internal->Maximum.Y = max.Y;
+    emit this->chartRangeChanged();
     }
 }
 
-void pqLineChartModel::updateChartRanges(const pqLineChartPlot *plot)
+void pqLineChartModel::updateChartRanges(const pqLineChartSeries *series)
 {
   pqChartCoordinate min, max;
-  plot->getRangeX(min.X, max.X);
-  plot->getRangeY(min.Y, max.Y);
-  if(this->getNumberOfPlots() == 1)
+  series->getRangeX(min.X, max.X);
+  series->getRangeY(min.Y, max.Y);
+  if(this->getNumberOfSeries() > 1)
     {
-    this->Internal->MinimumX = min.X;
-    this->Internal->MaximumX = max.X;
-    this->Internal->MinimumY = min.Y;
-    this->Internal->MaximumY = max.Y;
-    }
-  else
-    {
-    if(min.X < this->Internal->MinimumX)
+    if(this->Internal->Minimum.X < min.X)
       {
-      this->Internal->MinimumX = min.X;
-      }
-    if(max.X > this->Internal->MaximumX)
-      {
-      this->Internal->MaximumX = max.X;
+      min.X = this->Internal->Minimum.X;
       }
 
-    if(min.Y < this->Internal->MinimumY)
+    if(this->Internal->Maximum.X > max.X)
       {
-      this->Internal->MinimumY = min.Y;
+      max.X = this->Internal->Maximum.X;
       }
-    if(max.Y > this->Internal->MaximumY)
+
+    if(this->Internal->Minimum.Y < min.Y)
       {
-      this->Internal->MaximumY = max.Y;
+      min.Y = this->Internal->Minimum.Y;
       }
+
+    if(this->Internal->Maximum.Y > max.Y)
+      {
+      max.Y = this->Internal->Maximum.Y;
+      }
+    }
+
+  if(min.X != this->Internal->Minimum.X ||
+      max.X != this->Internal->Maximum.X ||
+      min.Y != this->Internal->Minimum.Y ||
+      max.Y != this->Internal->Maximum.Y)
+    {
+    this->Internal->Minimum.X = min.X;
+    this->Internal->Maximum.X = max.X;
+    this->Internal->Minimum.Y = min.Y;
+    this->Internal->Maximum.Y = max.Y;
+    emit this->chartRangeChanged();
     }
 }
 

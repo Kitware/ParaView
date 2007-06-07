@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \file pqChartZoomHistory.cxx
  *
  * \brief
- *   The pqChartZoomItem and pqChartZoomHistory classes are used to
+ *   The pqChartZoomViewport and pqChartZoomHistory classes are used to
  *   keep track of the user's zoom position(s).
  *
  * \author Mark Richardson
@@ -43,18 +43,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqChartZoomHistory.h"
 
-#include <vtkstd/vector>
-#include <vtkstd/algorithm>
+#include <QVector>
 
 
-/// \class pqChartZoomHistoryData
+/// \class pqChartZoomHistoryInternal
 /// \brief
-///   The pqChartZoomHistoryData class hides the private data of the
-///   pqChartZoomHistory class.
-class pqChartZoomHistoryData : public vtkstd::vector<pqChartZoomItem *> {};
+///   The pqChartZoomHistoryInternal class hides the private data of
+///   the pqChartZoomHistory class.
+class pqChartZoomHistoryInternal : public QVector<pqChartZoomViewport *> {};
 
 
-pqChartZoomItem::pqChartZoomItem()
+//----------------------------------------------------------------------------
+pqChartZoomViewport::pqChartZoomViewport()
 {
   this->X = 0;
   this->Y = 0;
@@ -62,38 +62,39 @@ pqChartZoomItem::pqChartZoomItem()
   this->YPercent = 100;
 }
 
-void pqChartZoomItem::setPosition(int x, int y)
+void pqChartZoomViewport::setPosition(int x, int y)
 {
   this->X = x;
   this->Y = y;
 }
 
-void pqChartZoomItem::setZoom(int x, int y)
+void pqChartZoomViewport::setZoom(int x, int y)
 {
   this->XPercent = x;
   this->YPercent = y;
 }
 
 
+//----------------------------------------------------------------------------
 pqChartZoomHistory::pqChartZoomHistory()
 {
-  this->Data = new pqChartZoomHistoryData();
+  this->Internal = new pqChartZoomHistoryInternal();
   this->Current = 0;
   this->Allowed = 10;
 
-  if(this->Data)
-    this->Data->reserve(this->Allowed);
+  // Reserve space for the history list.
+  this->Internal->reserve(this->Allowed);
 }
 
 pqChartZoomHistory::~pqChartZoomHistory()
 {
-  if(this->Data)
+  QVector<pqChartZoomViewport *>::Iterator iter = this->Internal->begin();
+  for( ; iter != this->Internal->end(); iter++)
     {
-    pqChartZoomHistoryData::iterator iter = this->Data->begin();
-    for( ; iter != this->Data->end(); iter++)
-      delete *iter;
-    delete this->Data;
+    delete *iter;
     }
+
+  delete this->Internal;
 }
 
 void pqChartZoomHistory::setLimit(int limit)
@@ -101,69 +102,85 @@ void pqChartZoomHistory::setLimit(int limit)
   if(limit > 0)
     {
     this->Allowed = limit;
-    if(this->Data)
-      this->Data->reserve(this->Allowed);
+    this->Internal->reserve(this->Allowed);
     }
 }
 
 void pqChartZoomHistory::addHistory(int x, int y, int xZoom, int yZoom)
 {
-  if(this->Data)
+  pqChartZoomViewport *zoom = new pqChartZoomViewport();
+  zoom->setPosition(x, y);
+  zoom->setZoom(xZoom, yZoom);
+
+  // Remove history items after the current one.
+  if(this->Internal->size() >= this->Allowed ||
+      this->Current < this->Internal->size() - 1)
     {
-    pqChartZoomItem *zoom = new pqChartZoomItem();
-    if(zoom)
+    int front = this->Internal->size() - this->Allowed + 1;
+    if(this->Current < this->Allowed - 1)
       {
-      zoom->setPosition(x, y);
-      zoom->setZoom(xZoom, yZoom);
+      front = 0;
+      }
 
-      // Remove history items after the current one.
-      if(static_cast<int>(this->Data->size()) >= this->Allowed ||
-          this->Current < static_cast<int>(this->Data->size()))
+    QVector<pqChartZoomViewport *>::Iterator iter = this->Internal->begin();
+    for(int i = 0; iter != this->Internal->end(); ++iter, ++i)
+      {
+      if(i < front || i > this->Current)
         {
-        int front = static_cast<int>(this->Data->size()) - this->Allowed + 1;
-        if(this->Current < this->Allowed - 1)
-          front = 0;
-        pqChartZoomHistoryData::iterator iter = Data->begin();
-        for(int i = 0; iter != Data->end(); iter++, i++)
-          {
-          if(i < front || i > this->Current)
-            {
-            delete *iter;
-            *iter = 0;
-            }
-          }
-
-        Data->erase(vtkstd::remove(Data->begin(), Data->end(),
-            static_cast<pqChartZoomItem *>(0)), Data->end());
+        delete *iter;
+        *iter = 0;
         }
+      }
 
-      // Add the zoom item to the end of the list and update
-      // the current position.
-      this->Data->push_back(zoom);
-      this->Current = static_cast<int>(this->Data->size()) - 1;
-      if(this->Current < 0)
-        this->Current = 0;
+    // First, remove the empty items from the end.
+    if(this->Current < this->Internal->size() - 1)
+      {
+      this->Internal->resize(this->Current + 1);
+      }
+
+    // Remove any empty items from the front of the list.
+    if(front > 0)
+      {
+      this->Internal->remove(0, front);
       }
     }
+
+  // Add the zoom item to the end of the list and update the current
+  // position.
+  this->Internal->append(zoom);
+  this->Current = this->Internal->size() - 1;
 }
 
 void pqChartZoomHistory::updatePosition(int x, int y)
 {
-  if(this->Current < static_cast<int>(this->Data->size()))
+  if(this->Current < this->Internal->size())
     {
-    pqChartZoomItem *zoom = (*this->Data)[this->Current];
+    pqChartZoomViewport *zoom = (*this->Internal)[this->Current];
     zoom->setPosition(x, y);
     }
 }
 
-const pqChartZoomItem *pqChartZoomHistory::getCurrent() const
+bool pqChartZoomHistory::isPreviousAvailable() const
 {
-  if(this->Current < static_cast<int>(this->Data->size()))
-    return (*this->Data)[this->Current];
+  return this->Current > 0;
+}
+
+bool pqChartZoomHistory::isNextAvailable() const
+{
+  return this->Current < this->Internal->size() - 1;
+}
+
+const pqChartZoomViewport *pqChartZoomHistory::getCurrent() const
+{
+  if(this->Current < this->Internal->size())
+    {
+    return (*this->Internal)[this->Current];
+    }
+
   return 0;
 }
 
-const pqChartZoomItem *pqChartZoomHistory::getPrevious()
+const pqChartZoomViewport *pqChartZoomHistory::getPrevious()
 {
   this->Current--;
   if(this->Current < 0)
@@ -172,18 +189,25 @@ const pqChartZoomItem *pqChartZoomHistory::getPrevious()
     return 0;
     }
   else
+    {
     return this->getCurrent();
+    }
 }
 
-const pqChartZoomItem *pqChartZoomHistory::getNext()
+const pqChartZoomViewport *pqChartZoomHistory::getNext()
 {
   this->Current++;
-  if(this->Current < static_cast<int>(this->Data->size()))
-    return getCurrent();
+  if(this->Current < this->Internal->size())
+    {
+    return this->getCurrent();
+    }
   else
     {
     if(this->Current > 0)
+      {
       this->Current--;
+      }
+
     return 0;
     }
 }

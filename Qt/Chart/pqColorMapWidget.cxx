@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartValue.h"
 #include "pqColorMapModel.h"
 #include "pqPointMarker.h"
-#include "pqPixelTransferFunction.h"
+#include "pqChartPixelScale.h"
 
 #include <QColor>
 #include <QList>
@@ -67,15 +67,15 @@ public:
   pqColorMapWidgetInternal();
   ~pqColorMapWidgetInternal() {}
 
-  QList<int> Items;                    ///< The list of point locations.
-  QRect ImageArea;                     ///< The color scale rectangle.
-  QPoint LastPoint;                    ///< Used for interaction.
-  pqPixelTransferFunction PixelMap;    ///< The pixel to value map.
-  QTimer *MoveTimer;                   ///< Used for mouse interaction.
-  MouseMode Mode;                      ///< The current mouse mode.
-  int PointIndex;                      ///< Used for mouse interaction.
-  int CurrentPoint;                    ///< Used for point selection.
-  bool PointMoved;                     ///< True if point was moved.
+  QList<int> Items;           ///< The list of point locations.
+  QRect ImageArea;            ///< The color scale rectangle.
+  QPoint LastPoint;           ///< Used for interaction.
+  pqChartPixelScale PixelMap; ///< The pixel to value map.
+  QTimer *MoveTimer;          ///< Used for mouse interaction.
+  MouseMode Mode;             ///< The current mouse mode.
+  int PointIndex;             ///< Used for mouse interaction.
+  int CurrentPoint;           ///< Used for point selection.
+  bool PointMoved;            ///< True if point was moved.
 };
 
 

@@ -1,34 +1,38 @@
 
-#include "pqChartValue.h"
 #include "pqChartCoordinate.h"
-#include "pqLineChartWidget.h"
+#include "pqChartLegend.h"
+#include "pqChartLegendModel.h"
+#include "pqChartValue.h"
+#include "pqChartWidget.h"
+#include "pqChartSeriesOptionsGenerator.h"
 #include "pqLineChart.h"
 #include "pqLineChartModel.h"
-#include "pqLineChartPlotOptions.h"
+#include "pqLineChartOptions.h"
+#include "pqLineChartSeriesOptions.h"
+#include "pqLineChartWidget.h"
 #include "pqPointMarker.h"
-#include "pqSimpleLineChartPlot.h"
-#include "pqChartLegend.h"
-#include "pqMarkerPen.h"
-#include "pqChartLabel.h"
+#include "pqSimpleLineChartSeries.h"
 
 #include <QApplication>
 #include <QBrush>
 #include <QColor>
 #include <QPen>
-#include <QSize>
 #include <QTimer>
 
 int LineChart(int argc, char* argv[])
 {
   QApplication app(argc, argv);
 
-  // Set up the line chart.
-  pqLineChartWidget *lineChart = new pqLineChartWidget();
+  // Create the chart widget.
+  pqLineChart *lineChart = 0;
+  pqChartWidget *chart = pqLineChartWidget::createLineChart(0, &lineChart);
+  lineChart->getOptions()->getGenerator()->setColorScheme(
+      pqChartSeriesOptionsGenerator::WildFlower);
   
-  // Add a line chart over the histogram.
+  // Set up the line chart model.
   pqLineChartModel *lines = new pqLineChartModel();
-  pqSimpleLineChartPlot *plot = new pqSimpleLineChartPlot(lines);
-  plot->addSeries(pqLineChartPlot::Line);
+  pqSimpleLineChartSeries *plot = new pqSimpleLineChartSeries(lines);
+  plot->addSequence(pqLineChartSeries::Line);
   plot->addPoint(0, pqChartCoordinate(pqChartValue((int)0),
       pqChartValue((float)1.2)));
   plot->addPoint(0, pqChartCoordinate(pqChartValue((int)10),
@@ -49,20 +53,25 @@ int LineChart(int argc, char* argv[])
       pqChartValue((float)1.2)));
   plot->addPoint(0, pqChartCoordinate(pqChartValue((int)90),
       pqChartValue((float)1.0)));
-  plot->addSeries(pqLineChartPlot::Point);
-  plot->copySeriesPoints(0, 1);
-  lines->appendPlot(plot);
+  plot->addSequence(pqLineChartSeries::Point);
+  plot->copySequencePoints(0, 1);
+  lines->appendSeries(plot);
 
-  lineChart->getLineChart().setModel(lines);
+  lineChart->setModel(lines);
 
   // add a legend
-  lineChart->getLegend().addEntry(new pqPlusMarkerPen(QPen(Qt::DotLine),
-                                                      QSize(10,10),
-                                                      QPen(Qt::SolidLine)),
-                                  new pqChartLabel("label1", 
-                                                   &lineChart->getLegend()));
+  pqChartLegendModel *legendModel = new pqChartLegendModel();
+  pqPlusPointMarker plus(QSize(10,10));
+  QPen plusPen(Qt::SolidLine);
+  legendModel->addEntry(pqChartLegendModel::generateLineIcon(
+      QPen(Qt::DotLine), &plus, &plusPen), "label1");
+  pqChartLegend *legend = new pqChartLegend();
+  legend->setModel(legendModel);
+  legend->setLocation(pqChartLegend::Right);
+  legend->setFlow(pqChartLegend::TopToBottom);
+  chart->setLegend(legend);
 
-  lineChart->show();
+  chart->show();
 
   if(app.arguments().contains("--exit"))
     {
@@ -70,8 +79,9 @@ int LineChart(int argc, char* argv[])
     }
   int status = QApplication::exec();
 
-  delete lineChart;
+  delete chart;
   delete lines;
+  delete legendModel;
 
   return status;
 }

@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqGenericViewModule.h"
 
 class pqPlotViewModuleInternal;
+class vtkObject;
+
 
 class PQCORE_EXPORT pqPlotViewModule : public pqGenericViewModule
 {
@@ -73,9 +75,16 @@ public:
 
   virtual bool canDisplaySource(pqPipelineSource* source) const;
 
-signals:
-  /// Fired to update the internal VTK model.
-  void modelUpdate();
+public slots:
+  /// Add display to the view. Although this model supports adding
+  /// more than 1 display, it shows only 1 plot at a time.
+  void addDisplay(pqDisplay* display);
+
+  /// Remove a display.
+  void removeDisplay(pqDisplay* display);
+
+  /// Remove all displays.
+  void removeAllDisplays();
 
 private slots:
   void visibilityChanged(pqDisplay* disp);
@@ -87,9 +96,8 @@ private slots:
 
   /// Internal slot.
   void delayedRender();
-protected:
-  void renderBarChart();
-  void renderXYPlot();
+
+  void markLineItemModified(vtkObject *object);
 
 private:
   pqPlotViewModule(const pqPlotViewModule&); // Not implemented.

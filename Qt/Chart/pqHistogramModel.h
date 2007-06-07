@@ -67,70 +67,93 @@ public:
   virtual int getNumberOfBins() const=0;
 
   /// \brief
-  ///   Get the value for a particular bin.
-  /// \param index The index of the bin value.
+  ///   Gets the value for a particular bin.
+  /// \param index The index of the bin.
   /// \param bin Used to return the bin value.
   virtual void getBinValue(int index, pqChartValue &bin) const=0;
+
+  /// \brief
+  ///   Gets the x-axis range for the particular bin.
+  /// \param index The index of the bin.
+  /// \param min Used to return the minumum.
+  /// \param max Used to return the maxumum.
+  virtual void getBinRange(int index, pqChartValue &min,
+      pqChartValue &max) const=0;
   //@}
 
   /// \name Histogram Range Methods
   //@{
   /// \brief
-  ///   Get the x-axis range for the histogram.
+  ///   Gets the x-axis range for the histogram.
   /// \param min Used to return the minimum x-axis value.
   /// \param max Used to return the maximum x-axis value.
   virtual void getRangeX(pqChartValue &min, pqChartValue &max) const=0;
 
   /// \brief
-  ///   Get the y-axis range for the histogram.
+  ///   Gets the y-axis range for the histogram.
   /// \param min Used to return the minimum y-axis value.
   /// \param max Used to return the maximum y-axis value.
   virtual void getRangeY(pqChartValue &min, pqChartValue &max) const=0;
   //@}
 
 signals:
-  /// Emitted when the histogram has been reset of changed dramatically.
-  void binValuesReset();
+  /// Emitted when the histogram has been reset or changed dramatically.
+  void histogramReset();
 
   /// \brief
   ///   Emitted when new bins will be inserted.
   /// \param first The first index of the bin insertion.
   /// \param last The last index of the bin insertion.
-  void aboutToInsertBinValues(int first, int last);
+  void aboutToInsertBins(int first, int last);
 
   /// Emitted when new points have been inserted.
-  void binValuesInserted();
+  void binsInserted();
 
   /// \brief
   ///   Emitted when bins will be removed.
   /// \param first The first index of the bin removal.
   /// \param last The last index of the bin removal.
-  void aboutToRemoveBinValues(int first, int last);
+  void aboutToRemoveBins(int first, int last);
 
   /// Emitted when bins have been removed.
-  void binValuesRemoved();
+  void binsRemoved();
+
+  /// \brief
+  ///   Emitted when bin values have changed.
+  /// \param first The first index of the bin change.
+  /// \param last The last index of the bin change.
+  void binValuesChanged(int first, int last);
+
+  /// \brief
+  ///   Emitted when bin ranges have changed.
+  /// \param first The first index of the bin range change.
+  /// \param last The last index of the bin range change.
+  void binRangesChanged(int first, int last);
+
+  /// \brief
+  ///   Emitted when the histogram range in x and/or y changes.
+  /// \note
+  ///   This signal is emitted during bin insertion or removal.
+  void histogramRangeChanged();
 
 protected:
-  /// Called to emit the bin values reset signal.
-  void resetBinValues();
-
   /// \brief
   ///   Called to begin the bin insertion process.
   /// \param first The first index of the bin insertion.
   /// \param last The last index of the bin insertion.
-  void beginInsertBinValues(int first, int last);
+  void beginInsertBins(int first, int last);
 
   /// Called to end the bin insertion process.
-  void endInsertBinValues();
+  void endInsertBins();
 
   /// \brief
   ///   Called to begin the bin removal process.
   /// \param first The first index of the bin removal.
   /// \param last The last index of the bin removal.
-  void beginRemoveBinValues(int first, int last);
+  void beginRemoveBins(int first, int last);
 
   /// Called to end the bin removal process.
-  void endRemoveBinValues();
+  void endRemoveBins();
 };
 
 #endif

@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \file pqChartZoomHistory.h
  *
  * \brief
- *   The pqChartZoomItem and pqChartZoomHistory classes are used to
+ *   The pqChartZoomViewport and pqChartZoomHistory classes are used to
  *   keep track of the user's zoom position(s).
  *
  * \author Mark Richardson
@@ -47,66 +47,66 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QtChartExport.h"
 
-class pqChartZoomHistoryData;
+class pqChartZoomHistoryInternal;
 
 
-/// \class pqChartZoomItem
+/// \class pqChartZoomViewport
 /// \brief
-///   The pqChartZoomItem class stores the position and zoom factors
+///   The pqChartZoomViewport class stores the position and zoom factors
 ///   for a particular viewport.
 ///
 /// The position stores the top-left corner of the viewport in
 /// content coordinates. These coordinates are used to set the
 /// content's position in the scroll view. The zoom factors are
 /// stored as percentages.
-class QTCHART_EXPORT pqChartZoomItem
+class QTCHART_EXPORT pqChartZoomViewport
 {
 public:
-  pqChartZoomItem();
-  ~pqChartZoomItem() {}
+  pqChartZoomViewport();
+  ~pqChartZoomViewport() {}
 
   /// \brief
   ///   Sets the viewport position coordinates.
   /// \param x The x coordinate.
   /// \param y The y coordinate.
-  /// \sa pqChartZoomItem::getXPosition(),
-  ///     pqChartZoomItem::getYPosition()
+  /// \sa pqChartZoomViewport::getXPosition(),
+  ///     pqChartZoomViewport::getYPosition()
   void setPosition(int x, int y);
 
   /// \brief
-  ///   Sets the xoom percentages.
+  ///   Sets the zoom percentages.
   /// \param x The x-axis zoom factor.
   /// \param y The y-axis zoom factor.
-  /// \sa pqChartZoomItem::getXZoom(),
-  ///     pqChartZoomItem::getYZoom()
+  /// \sa pqChartZoomViewport::getXZoom(),
+  ///     pqChartZoomViewport::getYZoom()
   void setZoom(int x, int y);
 
   /// \brief
   ///   Gets the x coordinate of the viewport.
   /// \return
   ///   The x coordinate of the viewport.
-  /// \sa pqChartZoomItem::setPosition(int, int)
+  /// \sa pqChartZoomViewport::setPosition(int, int)
   int getXPosition() const {return this->X;}
 
   /// \brief
   ///   Gets the y coordinate of the viewport.
   /// \return
   ///   The y coordinate of the viewport.
-  /// \sa pqChartZoomItem::setPosition(int, int)
+  /// \sa pqChartZoomViewport::setPosition(int, int)
   int getYPosition() const {return this->Y;}
 
   /// \brief
   ///   Gets the x-axis zoom factor.
   /// \return
   ///   The x-axis zoom factor.
-  /// \sa pqChartZoomItem::setZoom(int, int)
+  /// \sa pqChartZoomViewport::setZoom(int, int)
   int getXZoom() const {return this->XPercent;}
 
   /// \brief
   ///   Gets the y-axis zoom factor.
   /// \return
   ///   The y-axis zoom factor.
-  /// \sa pqChartZoomItem::setZoom(int, int)
+  /// \sa pqChartZoomViewport::setZoom(int, int)
   int getYZoom() const {return this->YPercent;}
 
 private:
@@ -119,7 +119,7 @@ private:
 
 /// \class pqChartZoomHistory
 /// \brief
-///   The pqChartZoomHistory class stores a list of pqChartZoomItem
+///   The pqChartZoomHistory class stores a list of pqChartZoomViewport
 ///   objects.
 ///
 /// The zoom history contains a list of zoom viewports. The list is
@@ -190,11 +190,23 @@ public:
   void updatePosition(int x, int y);
 
   /// \brief
+  ///   Gets whether or not a zoom viewport is before the current.
+  /// \return
+  ///   True if a zoom viewport is before the current.
+  bool isPreviousAvailable() const;
+
+  /// \brief
+  ///   Gets whether or not a zoom viewport is after the current.
+  /// \return
+  ///   True if a zoom viewport is after the current.
+  bool isNextAvailable() const;
+
+  /// \brief
   ///   Gets the current zoom viewport.
   /// \return
   ///   A pointer to the current zoom viewport or null if the list
   ///   is empty.
-  const pqChartZoomItem *getCurrent() const;
+  const pqChartZoomViewport *getCurrent() const;
 
   /// \brief
   ///   Gets the previous zoom viewport in the history.
@@ -202,7 +214,7 @@ public:
   ///   A pointer to the previous zoom viewport or null if the
   ///   beginning of the list is reached.
   /// \sa pqChartZoomHistory::getNext()
-  const pqChartZoomItem *getPrevious();
+  const pqChartZoomViewport *getPrevious();
 
   /// \brief
   ///   Gets the next zoom viewport in the history.
@@ -210,12 +222,14 @@ public:
   ///   A pointer to the next zoom viewport or null if the end
   ///   of the list is reached.
   /// \sa pqChartZoomHistory::getPrevious()
-  const pqChartZoomItem *getNext();
+  const pqChartZoomViewport *getNext();
 
 private:
-  pqChartZoomHistoryData *Data; ///< Stores the zoom viewport list.
-  int Current;                  ///< Stores the current item index.
-  int Allowed;                  ///< Stores the list length limit.
+  /// Stores the zoom viewport list.
+  pqChartZoomHistoryInternal *Internal;
+
+  int Current; ///< Stores the current item index.
+  int Allowed; ///< Stores the list length limit.
 };
 
 #endif

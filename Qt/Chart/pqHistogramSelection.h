@@ -153,7 +153,7 @@ public:
   ///   Makes a copy of another selection.
   /// \param other The selection range to copy.
   /// \return
-  ///   A reference the object being assigned.
+  ///   A reference to the object being assigned.
   pqHistogramSelection &operator=(const pqHistogramSelection &other);
 
   /// \brief

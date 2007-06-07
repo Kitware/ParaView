@@ -94,7 +94,7 @@ void pqChartContextMenu::savePDF()
       file_dialog->setObjectName("fileSavePDFDialog");
       file_dialog->setFileMode(QFileDialog::AnyFile);
       QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)),
-          chart, SLOT(savePDF(const QStringList&)));
+          chart, SLOT(saveChart(const QStringList&)));
         
       file_dialog->show();
       }
@@ -117,7 +117,7 @@ void pqChartContextMenu::savePNG()
       file_dialog->setObjectName("fileSavePNGDialog");
       file_dialog->setFileMode(QFileDialog::AnyFile);
       QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)),
-          chart, SLOT(savePNG(const QStringList&)));
+          chart, SLOT(saveChart(const QStringList&)));
         
       file_dialog->show();
       }

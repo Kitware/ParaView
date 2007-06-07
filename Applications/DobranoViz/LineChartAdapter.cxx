@@ -14,24 +14,29 @@
 #include <pqDelimitedTextParser.h>
 #include <pqFileDialog.h>
 #include <pqServer.h>
+#include <pqChartArea.h>
+#include <pqChartAxisOptions.h>
 #include <pqChartAxis.h>
-#include <pqChartLabel.h>
 #include <pqChartLegend.h>
-#include <pqLineChart.h>
+#include <pqChartSeriesOptionsGenerator.h>
+#include <pqChartTitle.h>
+#include <pqChartWidget.h>
 #include <pqLineChartModel.h>
-#include <pqLineChartPlotOptions.h>
-#include <pqLineChartWidget.h>
-#include <pqSimpleLineChartPlot.h>
-#include <pqMarkerPen.h>
+#include <pqLineChartOptions.h>
+#include <pqLineChartSeriesOptions.h>
+#include <pqLineChart.h>
+#include <pqSimpleLineChartSeries.h>
 #include <pqPointMarker.h>
 #include <pqWaitCursor.h>
 
+#include <QBrush>
 #include <QDir>
 #include <QDomDocument>
 #include <QFileInfo>
 #include <QHBoxLayout>
 #include <QMap>
 #include <QMessageBox>
+#include <QPen>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QtDebug>
@@ -98,13 +103,13 @@ struct LineChartAdapter::pqImplementation
     QVector<double> LowerBounds;
   };
 
-  pqImplementation(pqLineChartWidget& chart) :
+  pqImplementation(pqChartWidget& chart) :
     SourceProxy(0),
     EventAdaptor(vtkSmartPointer<vtkEventQtSlotConnect>::New()),
     Chart(chart),
+    LineChart(0),
     ChartModel(new pqLineChartModel()),
     ChartPlots(),
-    ChartPlotOptions(),
     CircleMarker(new pqCirclePointMarker(QSize(4, 4))),
     ExodusVariableType(VARIABLE_TYPE_CELL),
     Samples(50),
@@ -130,28 +135,46 @@ struct LineChartAdapter::pqImplementation
     bold_italic.setItalic(true);
     bold_italic.setStyleStrategy(QFont::PreferAntialias);
 
-    this->Chart.getLineChart().setModel(this->ChartModel);
+    pqChartTitle *title = new pqChartTitle();
+    title->setFont(h1);
+    this->Chart.setTitle(title);
+    QPalette titleColors = title->palette();
+    titleColors.setColor(QPalette::WindowText, Qt::black);
+    title->setPalette(titleColors);
     
-    this->Chart.setBackgroundColor(Qt::white);
-    
-    this->Chart.getTitle().setFont(h1);
-    this->Chart.getTitle().setColor(Qt::black);
-    
-    this->Chart.getXAxis().setGridColor(Qt::lightGray);
-    this->Chart.getXAxis().setAxisColor(Qt::darkGray);
-    this->Chart.getXAxis().setTickLabelColor(Qt::darkGray);
-    this->Chart.getXAxis().setTickLabelFont(italic);
+    pqChartArea *area = this->Chart.getChartArea();
+    area->createAxis(pqChartAxis::Bottom);
+    pqChartAxis *xAxis = area->getAxis(pqChartAxis::Bottom);
+    pqChartAxisOptions *axisOptions = xAxis->getOptions();
+    axisOptions->setGridColorType(pqChartAxisOptions::Specified);
+    axisOptions->setGridColor(Qt::lightGray);
+    axisOptions->setAxisColor(Qt::darkGray);
+    axisOptions->setLabelFont(italic);
 
-    this->Chart.getXAxis().getLabel().setText("Time");
-    this->Chart.getXAxis().getLabel().setFont(bold);
+    title = new pqChartTitle();
+    title->setText("Time");
+    title->setFont(bold);
+    this->Chart.setAxisTitle(pqChartAxis::Bottom, title);
     
-    this->Chart.getYAxis().setGridColor(Qt::lightGray);
-    this->Chart.getYAxis().setAxisColor(Qt::darkGray);
-    this->Chart.getYAxis().setTickLabelColor(Qt::darkGray);
-    this->Chart.getYAxis().setTickLabelFont(italic);
+    area->createAxis(pqChartAxis::Left);
+    pqChartAxis *yAxis = area->getAxis(pqChartAxis::Left);
+    axisOptions = yAxis->getOptions();
+    axisOptions->setGridColorType(pqChartAxisOptions::Specified);
+    axisOptions->setGridColor(Qt::lightGray);
+    axisOptions->setAxisColor(Qt::darkGray);
+    axisOptions->setLabelFont(italic);
 
-    this->Chart.getYAxis().getLabel().setFont(bold);
-    this->Chart.getYAxis().getLabel().setOrientation(pqChartLabel::VERTICAL);
+    title = new pqChartTitle();
+    title->setFont(bold);
+    this->Chart.setAxisTitle(pqChartAxis::Left, title);
+
+    this->LineChart = new pqLineChart(area);
+    this->LineChart->setAxes(xAxis, yAxis);
+    this->LineChart->getOptions()->getGenerator()->setColorScheme(
+      pqChartSeriesOptionsGenerator::WildFlower);
+    area->addLayer(this->LineChart);
+
+    this->LineChart->setModel(this->ChartModel);
   }
   
   ~pqImplementation()
@@ -160,21 +183,13 @@ struct LineChartAdapter::pqImplementation
     delete this->ChartModel;
 
     // Clean up the plots in the model.
-    QList<pqSimpleLineChartPlot *>::Iterator plot = this->ChartPlots.begin();
+    QList<pqSimpleLineChartSeries *>::Iterator plot = this->ChartPlots.begin();
     for( ; plot != this->ChartPlots.end(); ++plot)
       {
       delete *plot;
       }
 
-    QList<pqLineChartPlotOptions *>::Iterator options =
-        this->ChartPlotOptions.begin();
-    for( ; options != this->ChartPlotOptions.end(); ++options)
-      {
-      delete *options;
-      }
-
     this->ChartPlots.clear();
-    this->ChartPlotOptions.clear();
     delete this->CircleMarker;
   }
   
@@ -595,22 +610,13 @@ struct LineChartAdapter::pqImplementation
   
     const int samples = vtkstd::min(data.Values.size(), this->Samples);
 
-    // Set up the plot drawing parameters.
-    pqLineChartPlotOptions *options = new pqLineChartPlotOptions();
-    this->ChartPlotOptions.append(options);
-    options->setPen(0, plot_pen);
-    options->setPen(1, whisker_pen);
-    options->setPen(2, QPen(plot_pen.color(), 0.5));
-    options->setBrush(2, QBrush(Qt::white));
-    options->setMarker(2, this->CircleMarker);
-
     // Set up the error plot.
     // TODO: handle the image tooltip.
-    pqSimpleLineChartPlot *plot = new pqSimpleLineChartPlot();
+    pqSimpleLineChartSeries *plot = new pqSimpleLineChartSeries();
     this->ChartPlots.append(plot);
-    plot->addSeries(pqLineChartPlot::Line);
-    plot->addSeries(pqLineChartPlot::Error);
-    plot->addSeries(pqLineChartPlot::Point);
+    plot->addSequence(pqLineChartSeries::Line);
+    plot->addSequence(pqLineChartSeries::Error);
+    plot->addSequence(pqLineChartSeries::Point);
 
     double time_delta = VTK_DOUBLE_MAX;
     for(int i = 0; i != samples; ++i)
@@ -638,13 +644,30 @@ struct LineChartAdapter::pqImplementation
 
     // Copy the point data from the error series to the point and line
     // series.
-    plot->copySeriesPoints(1, 0);
-    plot->copySeriesPoints(1, 2);
+    plot->copySequencePoints(1, 0);
+    plot->copySequencePoints(1, 2);
 
-    // Add the plot options to the chart. Add the plot to the line
-    // chart model.
-    this->ChartModel->setOptions(this->ChartModel->getNumberOfPlots(), options);
-    this->ChartModel->appendPlot(plot);
+    // Reset the axis behavior when there is data to display.
+    int plotIndex = this->ChartModel->getNumberOfSeries();
+    if(plotIndex == 0)
+      {
+      pqChartArea *area = this->Chart.getChartArea();
+      area->setAxisBehavior(pqChartAxis::Left, pqChartArea::ChartSelect);
+      area->setAxisBehavior(pqChartAxis::Bottom, pqChartArea::ChartSelect);
+      }
+
+    // Add the plot to the line chart model.
+    this->ChartModel->appendSeries(plot);
+
+    // Set up the plot drawing parameters.
+    pqLineChartSeriesOptions options;
+    options.setSequenceDependent(true);
+    options.setPen(0, plot_pen);
+    options.setPen(1, whisker_pen);
+    options.setPen(2, QPen(plot_pen.color(), 0.5));
+    options.setBrush(2, QBrush(Qt::white));
+    options.setMarker(2, this->CircleMarker);
+    this->LineChart->getOptions()->setSeriesOptions(plotIndex, options);
 
     /*this->Chart.getLineChart().addData(
       new ImageLineErrorPlot(
@@ -652,32 +675,23 @@ struct LineChartAdapter::pqImplementation
         whisker_pen,
         this->ErrorBarWidth * time_delta,
         coordinates,
-        getReferenceImage(experimental_data)));*/
+        getReferenceImage(experimental_data)));
 
     this->Chart.getLegend().addEntry(
       new pqCircleMarkerPen(plot_pen, QSize(4, 4), QPen(plot_pen.color(), 0.5), QBrush(Qt::white)),
-      new pqChartLabel(data.Label));
+      new pqChartLabel(data.Label));*/
   }
   
   void addSimulationPlot(vtkExodusReader& reader, const int simulation_element_id, const QPen& pen)
   {
     const DataT data = getSimulationData(reader, simulation_element_id);
 
-    // Set up the plot drawing parameters.
-    pqLineChartPlotOptions *options = new pqLineChartPlotOptions();
-    this->ChartPlotOptions.append(options);
-    options->setPen(0, pen);
-    options->setPen(1, pen);
-    options->setPen(2, QPen(pen.color(), 0.5));
-    options->setBrush(2, QBrush(Qt::white));
-    options->setMarker(2, this->CircleMarker);
-
     // Set up the error plot.
-    pqSimpleLineChartPlot *plot = new pqSimpleLineChartPlot();
+    pqSimpleLineChartSeries *plot = new pqSimpleLineChartSeries();
     this->ChartPlots.append(plot);
-    plot->addSeries(pqLineChartPlot::Line);
-    plot->addSeries(pqLineChartPlot::Error);
-    plot->addSeries(pqLineChartPlot::Point);
+    plot->addSequence(pqLineChartSeries::Line);
+    plot->addSequence(pqLineChartSeries::Error);
+    plot->addSequence(pqLineChartSeries::Point);
 
     double time_delta = VTK_DOUBLE_MAX;
     for(int i = 0; i != data.Times.size(); ++i)
@@ -702,17 +716,34 @@ struct LineChartAdapter::pqImplementation
 
     // Copy the point data from the error series to the point and line
     // series.
-    plot->copySeriesPoints(1, 0);
-    plot->copySeriesPoints(1, 2);
+    plot->copySequencePoints(1, 0);
+    plot->copySequencePoints(1, 2);
 
-    // Add the plot options to the chart. Add the plot to the line
-    // chart model.
-    this->ChartModel->setOptions(this->ChartModel->getNumberOfPlots(), options);
-    this->ChartModel->appendPlot(plot);
+    // Reset the axis behavior when there is data to display.
+    int plotIndex = this->ChartModel->getNumberOfSeries();
+    if(plotIndex == 0)
+      {
+      pqChartArea *area = this->Chart.getChartArea();
+      area->setAxisBehavior(pqChartAxis::Left, pqChartArea::ChartSelect);
+      area->setAxisBehavior(pqChartAxis::Bottom, pqChartArea::ChartSelect);
+      }
 
-    this->Chart.getLegend().addEntry(
+    // Add the plot to the line chart model.
+    this->ChartModel->appendSeries(plot);
+
+    // Set up the plot drawing parameters.
+    pqLineChartSeriesOptions options;
+    options.setSequenceDependent(true);
+    options.setPen(0, pen);
+    options.setPen(1, pen);
+    options.setPen(2, QPen(pen.color(), 0.5));
+    options.setBrush(2, QBrush(Qt::white));
+    options.setMarker(2, this->CircleMarker);
+    this->LineChart->getOptions()->setSeriesOptions(plotIndex, options);
+
+    /*this->Chart.getLegend().addEntry(
       new pqCircleMarkerPen(pen, QSize(4, 4), QPen(pen.color(), 0.5), QBrush(Qt::white)),
-      new pqChartLabel(data.Label));
+      new pqChartLabel(data.Label));*/
   }
 
   static inline double lerp(const double A, const double B, const double Amount)
@@ -727,21 +758,12 @@ struct LineChartAdapter::pqImplementation
   
     const int samples = vtkstd::min(experimental_data.Values.size(), this->Samples);
 
-    // Set up the plot drawing parameters.
-    pqLineChartPlotOptions *options = new pqLineChartPlotOptions();
-    this->ChartPlotOptions.append(options);
-    options->setPen(0, QPen(Qt::gray));
-    options->setPen(1, QPen(Qt::gray));
-    options->setPen(2, QPen(Qt::gray, 0.5));
-    options->setBrush(2, QBrush(Qt::white));
-    options->setMarker(2, this->CircleMarker);
-
     // Set up the error plot.
-    pqSimpleLineChartPlot *plot = new pqSimpleLineChartPlot();
+    pqSimpleLineChartSeries *plot = new pqSimpleLineChartSeries();
     this->ChartPlots.append(plot);
-    plot->addSeries(pqLineChartPlot::Line);
-    plot->addSeries(pqLineChartPlot::Error);
-    plot->addSeries(pqLineChartPlot::Point);
+    plot->addSequence(pqLineChartSeries::Line);
+    plot->addSequence(pqLineChartSeries::Error);
+    plot->addSequence(pqLineChartSeries::Point);
 
     // For each experimental value ...   
     double time_delta = VTK_DOUBLE_MAX;
@@ -800,46 +822,62 @@ struct LineChartAdapter::pqImplementation
 
     // Copy the point data from the error series to the point and line
     // series.
-    plot->copySeriesPoints(1, 0);
-    plot->copySeriesPoints(1, 2);
+    plot->copySequencePoints(1, 0);
+    plot->copySequencePoints(1, 2);
 
-    // Add the plot options to the chart. Add the plot to the line
-    // chart model.
-    this->ChartModel->setOptions(this->ChartModel->getNumberOfPlots(), options);
-    this->ChartModel->appendPlot(plot);
+    // Reset the axis behavior when there is data to display.
+    int plotIndex = this->ChartModel->getNumberOfSeries();
+    if(plotIndex == 0)
+      {
+      pqChartArea *area = this->Chart.getChartArea();
+      area->setAxisBehavior(pqChartAxis::Left, pqChartArea::ChartSelect);
+      area->setAxisBehavior(pqChartAxis::Bottom, pqChartArea::ChartSelect);
+      }
 
-    this->Chart.getLegend().addEntry(
+    // Add the plot to the line chart model.
+    this->ChartModel->appendSeries(plot);
+
+    // Set up the plot drawing parameters.
+    pqLineChartSeriesOptions options;
+    options.setSequenceDependent(true);
+    options.setPen(0, QPen(Qt::gray));
+    options.setPen(1, QPen(Qt::gray));
+    options.setPen(2, QPen(Qt::gray, 0.5));
+    options.setBrush(2, QBrush(Qt::white));
+    options.setMarker(2, this->CircleMarker);
+    this->LineChart->getOptions()->setSeriesOptions(plotIndex, options);
+
+    /*this->Chart.getLegend().addEntry(
       new pqCircleMarkerPen(QPen(Qt::gray), QSize(4, 4), QPen(Qt::gray, 0.5), QBrush(Qt::white)),
-      new pqChartLabel(QString("Element %1 Error").arg(simulation_element_id)));
+      new pqChartLabel(QString("Element %1 Error").arg(simulation_element_id)));*/
   }
 
   void updateChart()
   {
     // Set the default (no data) appearance of the chart ...
     // Clean up the plots in the model.
-    this->ChartModel->clearPlots();
-    QList<pqSimpleLineChartPlot *>::Iterator plot = this->ChartPlots.begin();
+    this->ChartModel->removeAll();
+    QList<pqSimpleLineChartSeries *>::Iterator plot = this->ChartPlots.begin();
     for( ; plot != this->ChartPlots.end(); ++plot)
       {
       delete *plot;
       }
 
-    QList<pqLineChartPlotOptions *>::Iterator options = this->ChartPlotOptions.begin();
-    for( ; options != this->ChartPlotOptions.end(); ++options)
-      {
-      delete *options;
-      }
-
     this->ChartPlots.clear();
-    this->ChartPlotOptions.clear();
 
-    this->Chart.getTitle().setText("Time Plot (no data)");
-    this->Chart.getXAxis().setVisible(true);
-    this->Chart.getXAxis().setValueRange(0.0, 100.0);
-    this->Chart.getYAxis().getLabel().setText("Value");
-    this->Chart.getYAxis().setVisible(true);
-    this->Chart.getYAxis().setValueRange(0.0, 100.0);
-    this->Chart.getLegend().clear();
+    this->Chart.getTitle()->setText("Time Plot (no data)");
+    this->Chart.getAxisTitle(pqChartAxis::Left)->setText("Value");
+
+    pqChartArea *area = this->Chart.getChartArea();
+    area->setAxisBehavior(pqChartAxis::Bottom, pqChartArea::BestFit);
+    pqChartAxis *axis = area->getAxis(pqChartAxis::Bottom);
+    axis->setBestFitRange(0.0, 100.0);
+    //this->Chart.getXAxis().setVisible(true);
+    area->setAxisBehavior(pqChartAxis::Left, pqChartArea::BestFit);
+    axis = area->getAxis(pqChartAxis::Left);
+    axis->setBestFitRange(0.0, 100.0);
+    //this->Chart.getYAxis().setVisible(true);
+    //this->Chart.getLegend().clear();
  
     // Plot experimental data ...
     if(this->ShowData)
@@ -912,7 +950,7 @@ struct LineChartAdapter::pqImplementation
         }
       }
 
-    this->Chart.getYAxis().getLabel().setText(this->ExodusVariableName);
+    this->Chart.getAxisTitle(pqChartAxis::Left)->setText(this->ExodusVariableName);
 
     if(this->ShowData)
       {
@@ -928,10 +966,10 @@ struct LineChartAdapter::pqImplementation
   
   vtkSMProxy* SourceProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> EventAdaptor;
-  pqLineChartWidget& Chart;
+  pqChartWidget& Chart;
+  pqLineChart *LineChart;
   pqLineChartModel *ChartModel;
-  QList<pqSimpleLineChartPlot *> ChartPlots;
-  QList<pqLineChartPlotOptions *> ChartPlotOptions;
+  QList<pqSimpleLineChartSeries *> ChartPlots;
   pqCirclePointMarker *CircleMarker;
   
   pqVariableType ExodusVariableType;
@@ -959,7 +997,7 @@ struct LineChartAdapter::pqImplementation
 /////////////////////////////////////////////////////////////////////////////////
 // LineChartAdapter
 
-LineChartAdapter::LineChartAdapter(pqLineChartWidget& chart) :
+LineChartAdapter::LineChartAdapter(pqChartWidget& chart) :
   Implementation(new pqImplementation(chart))
 {
 }

@@ -13,7 +13,7 @@
 #include <pqVariableType.h>
 #include <QObject>
 
-class pqLineChartWidget;
+class pqChartWidget;
 class pqServer;
 class vtkCommand;
 class vtkObject;
@@ -27,7 +27,7 @@ class LineChartAdapter :
   Q_OBJECT
   
 public:
-  LineChartAdapter(pqLineChartWidget& chart);
+  LineChartAdapter(pqChartWidget& chart);
   ~LineChartAdapter();
 
 signals:

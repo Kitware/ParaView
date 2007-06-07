@@ -37,14 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHistogramModel.h"
 #include "pqCoreExport.h"
 
-class pqBarChartDisplay;
-class pqDisplay;
-class pqHistogramColor;
 class pqVTKHistogramModelInternal;
 class vtkDataArray;
 
-/// Concrete implementation for the pqHistogramModel for 
-/// vtkRectilinearGrid.
+
+/// \class pqVTKHistogramModel
+/// \brief
+///   The pqVTKHistogramModel class uses two vtkDataArray objects to
+///   define a histogram.
 class PQCORE_EXPORT pqVTKHistogramModel : public pqHistogramModel
 {
   Q_OBJECT
@@ -56,52 +56,26 @@ public:
   //@{
   virtual int getNumberOfBins() const;
   virtual void getBinValue(int index, pqChartValue &bin) const;
+  virtual void getBinRange(int index, pqChartValue &min,
+      pqChartValue &max) const;
 
   virtual void getRangeX(pqChartValue &min, pqChartValue &max) const;
 
   virtual void getRangeY(pqChartValue &min, pqChartValue &max) const;
   //@}
 
-  /// Returns the color scheme to be used by the chart.
-  pqHistogramColor* getColorScheme() const;
-
-public slots:
-  /// Add display to the view. Although this model supports adding
-  /// more than 1 display, it shows only 1 plot at a time.
-  void addDisplay(pqDisplay*);
-
-  /// Remove a display.
-  void removeDisplay(pqDisplay*);
-
-  /// Remove all displays.
-  void removeAllDisplays();
-
-  /// Equivalent to "render". Leads to the updating of the widget.
-  /// update leads to a call to forceUpdate only it anything
-  /// has been modified since last update.
-  void update();
-
-  /// Forces update of the widget.
-  void forceUpdate();
-
-protected:
-  /// Called by forceUpdate when the data is empty.
-  void forceUpdateEmptyData();
-
-  /// Set the display that is being currently displayed.
-  void setCurrentDisplay(pqBarChartDisplay* display);
-
-  /// Returns the array to be plotted on x axis.
-  vtkDataArray* getXArray(pqBarChartDisplay* display) const;
-
-  /// Returns the array to be plotted on y axis.
-  vtkDataArray* getYArray(pqBarChartDisplay* display) const;
-
-  /// updates the color scheme.
-  void updateColorScheme();
+  /// \brief
+  ///   Sets the data arrays for the model to use.
+  ///
+  /// The x-axis array should have one more entry than the y-axis
+  /// array.
+  ///
+  /// \param xarray The x-axis data array.
+  /// \param yarray The y-axis data array.
+  void setDataArrays(vtkDataArray *xarray, vtkDataArray *yarray);
 
 private:
-  pqVTKHistogramModelInternal *Internal; ///< Stores the data bounds.
+  pqVTKHistogramModelInternal *Internal; ///< Stores the histogram data.
 };
 
 #endif

@@ -18,7 +18,7 @@
 #include <pqConnect.h>
 #include <pqSetName.h>
 #include <pqFileDialog.h>
-#include <pqLineChartWidget.h>
+#include <pqChartWidget.h>
 #include <pqMainWindowCore.h>
 #include <pqObjectInspectorWidget.h>
 #include <pqPipelineMenu.h>
@@ -62,7 +62,7 @@ public:
   Ui::MainWindow UI;
   pqMainWindowCore Core;
   pqViewMenu* ViewMenu;
-  pqLineChartWidget* LineChartWidget;
+  pqChartWidget* LineChartWidget;
   pqChartContextMenu *ChartMenu;
   LineChartAdapter* LineChart;
   QComboBox* ChooseDataCombo;
@@ -318,7 +318,7 @@ MainWindow::MainWindow() :
     Qt::LeftDockWidgetArea |
     Qt::RightDockWidgetArea);
 
-  this->Implementation->LineChartWidget = new pqLineChartWidget(0);
+  this->Implementation->LineChartWidget = new pqChartWidget(0);
   this->Implementation->LineChartWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   this->connect(this->Implementation->LineChartWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onLineChartContextMenu(const QPoint&)));
   
@@ -578,7 +578,6 @@ void MainWindow::onLineChartContextMenu(const QPoint&)
 
   popup_menu.addSeparator();
 
-  //this->Implementation->LineChartWidget->addMenuActions(popup_menu);
   this->Implementation->ChartMenu->addMenuActions(popup_menu,
       this->Implementation->LineChartWidget);
 

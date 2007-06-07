@@ -1,14 +1,20 @@
 
+#include "pqChartArea.h"
+#include "pqChartAxis.h"
+#include "pqChartAxisOptions.h"
 #include "pqChartCoordinate.h"
+#include "pqChartInteractor.h"
+#include "pqChartSeriesOptionsGenerator.h"
 #include "pqChartValue.h"
+#include "pqChartWidget.h"
 #include "pqHistogramChart.h"
-#include "pqHistogramListModel.h"
-#include "pqHistogramWidget.h"
-#include "pqLineChart.h"
 #include "pqLineChartModel.h"
-#include "pqLineChartPlotOptions.h"
+#include "pqLineChartOptions.h"
+#include "pqLineChartSeriesOptions.h"
+#include "pqLineChart.h"
 #include "pqPointMarker.h"
-#include "pqSimpleLineChartPlot.h"
+#include "pqSimpleHistogramModel.h"
+#include "pqSimpleLineChartSeries.h"
 
 #include <QApplication>
 #include <QBrush>
@@ -21,29 +27,53 @@ int Histogram(int argc, char* argv[])
 {
   QApplication app(argc, argv);
 
+  // Set up the chart widget.
+  pqChartWidget *chart = new pqChartWidget();
+
+  // Get the chart area and set up the axes.
+  pqChartArea *chartArea = chart->getChartArea();
+  chartArea->createAxis(pqChartAxis::Left);
+  chartArea->createAxis(pqChartAxis::Bottom);
+  chartArea->createAxis(pqChartAxis::Right);
+  chartArea->setInteractor(new pqChartInteractor(chartArea));
+
   // Set up the histogram.
-  pqHistogramWidget *histogram = new pqHistogramWidget();
+  pqHistogramChart *histogram = new pqHistogramChart(chartArea);
+  histogram->setAxes(chartArea->getAxis(pqChartAxis::Bottom),
+      chartArea->getAxis(pqChartAxis::Left));
+  chartArea->insertLayer(chartArea->getAxisLayerIndex(), histogram);
 
   // Set up the histogram data.
-  pqHistogramListModel *model = new pqHistogramListModel();
-  model->addBinValue(pqChartValue((float)1.35));
-  model->addBinValue(pqChartValue((float)1.40));
-  model->addBinValue(pqChartValue((float)1.60));
-  model->addBinValue(pqChartValue((float)2.00));
-  model->addBinValue(pqChartValue((float)1.50));
-  model->addBinValue(pqChartValue((float)1.80));
-  model->addBinValue(pqChartValue((float)1.40));
-  model->addBinValue(pqChartValue((float)1.30));
-  model->addBinValue(pqChartValue((float)1.20));
-  pqChartValue min((int)0);
-  pqChartValue max((int)90);
-  model->setRangeX(min, max);
-  histogram->getHistogram().setModel(model);
+  pqSimpleHistogramModel *model = new pqSimpleHistogramModel();
+  model->generateBoundaries(pqChartValue((int)0), pqChartValue((int)90), 9);
 
-  // Add a line chart over the histogram.
+  model->setBinValue(0, pqChartValue((float)1.35));
+  model->setBinValue(1, pqChartValue((float)1.40));
+  model->setBinValue(2, pqChartValue((float)1.60));
+  model->setBinValue(3, pqChartValue((float)2.00));
+  model->setBinValue(4, pqChartValue((float)1.50));
+  model->setBinValue(5, pqChartValue((float)1.80));
+  model->setBinValue(6, pqChartValue((float)1.40));
+  model->setBinValue(7, pqChartValue((float)1.30));
+  model->setBinValue(8, pqChartValue((float)1.20));
+  histogram->setModel(model);
+
+  // Set up the line chart.
+  pqLineChart *lineView = new pqLineChart(chartArea);
+  lineView->setAxes(chartArea->getAxis(pqChartAxis::Bottom),
+      chartArea->getAxis(pqChartAxis::Right));
+  lineView->getOptions()->getGenerator()->setColorScheme(
+      pqChartSeriesOptionsGenerator::WildFlower);
+  chartArea->addLayer(lineView);
+
+  // Change the color of the right axis to differentiate it.
+  chartArea->getAxis(pqChartAxis::Right)->getOptions()->setAxisColor(
+      Qt::darkBlue);
+
+  // Set up the line chart data.
   pqLineChartModel *lines = new pqLineChartModel();
-  pqSimpleLineChartPlot *plot = new pqSimpleLineChartPlot();
-  plot->addSeries(pqLineChartPlot::Line);
+  pqSimpleLineChartSeries *plot = new pqSimpleLineChartSeries();
+  plot->addSequence(pqLineChartSeries::Line);
   plot->addPoint(0, pqChartCoordinate(pqChartValue((int)0),
       pqChartValue((float)1.2)));
   plot->addPoint(0, pqChartCoordinate(pqChartValue((int)10),
@@ -64,22 +94,22 @@ int Histogram(int argc, char* argv[])
       pqChartValue((float)1.2)));
   plot->addPoint(0, pqChartCoordinate(pqChartValue((int)90),
       pqChartValue((float)1.0)));
-  plot->addSeries(pqLineChartPlot::Point);
-  plot->copySeriesPoints(0, 1);
-  lines->appendPlot(plot);
+  plot->addSequence(pqLineChartSeries::Point);
+  plot->copySequencePoints(0, 1);
+  lines->appendSeries(plot);
+
+  lineView->setModel(lines);
 
   // Set up the drawing options for the plot.
   pqCirclePointMarker circle(QSize(3, 3));
-  pqLineChartPlotOptions *options = new pqLineChartPlotOptions();
+  pqLineChartSeriesOptions *options = lineView->getOptions()->getSeriesOptions(0);
+  options->setSequenceDependent(true);
   options->setPen(0, QPen(QColor(Qt::black), 1.0));
   options->setPen(1, QPen(QColor(Qt::black), 0.5));
   options->setBrush(1, QBrush(Qt::white));
   options->setMarker(1, &circle);
 
-  lines->setOptions(0, options);
-  histogram->getLineChart().setModel(lines);
-
-  histogram->show();
+  chart->show();
 
   if(app.arguments().contains("--exit"))
     {
@@ -87,11 +117,10 @@ int Histogram(int argc, char* argv[])
     }
   int status = QApplication::exec();
 
-  delete histogram;
+  delete chart;
   delete model;
   delete lines;
   delete plot;
-  delete options;
 
   return status;
 }

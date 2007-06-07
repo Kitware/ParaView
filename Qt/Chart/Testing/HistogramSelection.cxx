@@ -1,20 +1,12 @@
 
-#include "pqChartCoordinate.h"
 #include "pqChartValue.h"
+#include "pqChartWidget.h"
 #include "pqHistogramChart.h"
-#include "pqHistogramListModel.h"
 #include "pqHistogramWidget.h"
-#include "pqLineChart.h"
-#include "pqLineChartModel.h"
-#include "pqLineChartPlotOptions.h"
-#include "pqPointMarker.h"
-#include "pqSimpleLineChartPlot.h"
+#include "pqSimpleHistogramModel.h"
 
 #include <QApplication>
-#include <QBrush>
-#include <QColor>
-#include <QPen>
-#include <QSize>
+#include <QFont>
 #include <QTimer>
 
 int HistogramSelection(int argc, char* argv[])
@@ -22,36 +14,41 @@ int HistogramSelection(int argc, char* argv[])
   QApplication app(argc, argv);
 
   // Set up the histogram.
-  pqHistogramWidget *histogram = new pqHistogramWidget();
+  pqHistogramChart *histogram = 0;
+  pqChartWidget *chart = pqHistogramWidget::createHistogram(0, &histogram);
+
+  // Resize the chart.
+  int size[2] = {300,300};
+  chart->resize(size[0], size[1]);
 
   // Set up the histogram data.
-  pqHistogramListModel *model = new pqHistogramListModel();
-  model->addBinValue(pqChartValue((float)1.35));
-  model->addBinValue(pqChartValue((float)1.40));
-  model->addBinValue(pqChartValue((float)1.60));
-  model->addBinValue(pqChartValue((float)2.00));
-  model->addBinValue(pqChartValue((float)1.50));
-  model->addBinValue(pqChartValue((float)1.80));
-  model->addBinValue(pqChartValue((float)1.40));
-  model->addBinValue(pqChartValue((float)1.30));
-  model->addBinValue(pqChartValue((float)1.20));
-  pqChartValue min((int)0);
-  pqChartValue max((int)90);
-  model->setRangeX(min, max);
-  histogram->getHistogram().setModel(model);
+  pqSimpleHistogramModel *model = new pqSimpleHistogramModel();
+  model->generateBoundaries(pqChartValue((int)0), pqChartValue((int)90), 9);
 
-  histogram->show();
+  model->setBinValue(0, pqChartValue((float)1.35));
+  model->setBinValue(1, pqChartValue((float)1.40));
+  model->setBinValue(2, pqChartValue((float)1.60));
+  model->setBinValue(3, pqChartValue((float)2.00));
+  model->setBinValue(4, pqChartValue((float)1.50));
+  model->setBinValue(5, pqChartValue((float)1.80));
+  model->setBinValue(6, pqChartValue((float)1.40));
+  model->setBinValue(7, pqChartValue((float)1.30));
+  model->setBinValue(8, pqChartValue((float)1.20));
+  histogram->setModel(model);
 
-  histogram->setBackgroundColor(QColor("purple"));
-  histogram->setFont(QFont("Courier", -1, -1, true));
+  chart->show();
 
-  histogram->selectAll();
-  histogram->selectNone();
-  histogram->selectInverse();
-  histogram->setInteractMode(pqHistogramWidget::Value);
-  histogram->selectAll();
-  histogram->selectNone();
-  histogram->selectInverse();
+  // TODO
+  //histogram->setBackgroundColor(QColor("purple"));
+  chart->setFont(QFont("Courier", -1, -1, true));
+
+  //histogram->selectAll();
+  //histogram->selectNone();
+  //histogram->selectInverse();
+  //histogram->setInteractMode(pqHistogramWidget::Value);
+  //histogram->selectAll();
+  //histogram->selectNone();
+  //histogram->selectInverse();
 
   if(app.arguments().contains("--exit"))
     {
@@ -59,7 +56,7 @@ int HistogramSelection(int argc, char* argv[])
     }
   int status = QApplication::exec();
 
-  delete histogram;
+  delete chart;
   delete model;
 
   return status;
