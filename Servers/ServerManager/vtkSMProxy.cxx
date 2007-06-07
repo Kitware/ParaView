@@ -37,7 +37,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.94");
+vtkCxxRevisionMacro(vtkSMProxy, "1.95");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -237,22 +237,21 @@ void vtkSMProxy::RegisterSelfID()
 //---------------------------------------------------------------------------
 vtkClientServerID vtkSMProxy::GetSelfID()
 {
-  if (this->SelfID.ID != 0)
+  if (this->SelfID.ID == 0)
     {
-    return this->SelfID;
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    if (!pm)
+      {
+      vtkErrorMacro("Can not fully initialize without a global "
+        "ProcessModule. This object will not be fully "
+        "functional.");
+      return this->SelfID;
+      }
+    this->SelfID = pm->GetUniqueID();
+    this->RegisterSelfID();  
     }
   
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (!pm)
-    {
-    vtkErrorMacro("Can not fully initialize without a global "
-      "ProcessModule. This object will not be fully "
-      "functional.");
-    return this->SelfID;
-    }
-  this->SelfID = pm->GetUniqueID();
-  this->RegisterSelfID();  
-  return this->SelfID;
+  return this->GetSelfIDInternal();
 }
 
 //---------------------------------------------------------------------------

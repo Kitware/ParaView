@@ -460,6 +460,13 @@ protected:
   // an ID was assigned to the proxy. This is used by vtkSMStateLoaderBase
   // and subclasses.
   void SetSelfID(vtkClientServerID id);
+
+  // Description:
+  // Returns the Self ID of the proxy.
+  // Note: unlike GetSelfID(), this method simply return SelfID without assigning it 
+  // if the SelfID is not assigned yet, so the SelfID.ID could be zero.
+  vtkClientServerID GetSelfIDInternal()
+    { return this->SelfID; }
   
   // Description:
   // Given a class name (by setting VTKClassName) and server ids (by
