@@ -439,19 +439,23 @@ MainWindow::MainWindow() :
 
   this->Implementation->Core.setupVariableToolbar(
     this->Implementation->UI.variableToolbar);
-  connect(
-    &this->Implementation->Core,
-    SIGNAL(enableVariableToolbar(bool)),
-    this->Implementation->UI.variableToolbar,
-    SLOT(setEnabled(bool)));
+  foreach(QAction* a, this->Implementation->UI.variableToolbar->actions())
+    {
+    connect(
+      &this->Implementation->Core,
+      SIGNAL(enableVariableToolbar(bool)),
+      a, SLOT(setEnabled(bool)));
+    }
 
   this->Implementation->Core.setupRepresentationToolbar(
     this->Implementation->UI.representationToolbar);
-  connect(
-    &this->Implementation->Core,
-    SIGNAL(enableVariableToolbar(bool)),
-    this->Implementation->UI.representationToolbar,
-    SLOT(setEnabled(bool)));
+  foreach(QAction* a, this->Implementation->UI.representationToolbar->actions())
+    {
+    connect(
+      &this->Implementation->Core,
+      SIGNAL(enableVariableToolbar(bool)),
+      a, SLOT(setEnabled(bool)));
+    }
 
   connect(
     &this->Implementation->Core,
