@@ -43,11 +43,9 @@ SET(Filters_SRCS
   vtkOrderedCompositeDistributor.cxx
   vtkPExtractHistogram.cxx
   vtkPhastaReader.cxx
-  vtkPickFilter.cxx
   vtkPointHandleRepresentationSphere.cxx
   vtkPolyLineToRectilinearGridFilter.cxx
   vtkPPhastaReader.cxx
-  vtkPPickFilter.cxx
   vtkPVAnimationScene.cxx
   vtkPVArrowSource.cxx
   vtkPVClipDataSet.cxx

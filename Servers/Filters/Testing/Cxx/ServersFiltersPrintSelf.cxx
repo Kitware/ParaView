@@ -26,9 +26,7 @@
 #include "vtkMergeArrays.h"
 #include "vtkOrderedCompositeDistributor.h"
 #include "vtkPhastaReader.h"
-#include "vtkPickFilter.h"
 #include "vtkPPhastaReader.h"
-#include "vtkPPickFilter.h"
 #include "vtkPVArrowSource.h"
 #include "vtkPVClipDataSet.h"
 #include "vtkPVConnectivityFilter.h"
@@ -100,9 +98,7 @@ int main(int , char *[])
   c = vtkMPIMoveData::New(); c->Print(cout); c->Delete();
   c = vtkOrderedCompositeDistributor::New(); c->Print(cout); c->Delete();
   c = vtkPhastaReader::New(); c->Print(cout); c->Delete();
-  c = vtkPickFilter::New(); c->Print(cout); c->Delete();
   c = vtkPPhastaReader::New(); c->Print(cout); c->Delete();
-  c = vtkPPickFilter::New(); c->Print(cout); c->Delete();
   c = vtkPVArrowSource::New(); c->Print(cout); c->Delete();
   c = vtkPVClipDataSet::New(); c->Print(cout); c->Delete();
   c = vtkPVConnectivityFilter::New(); c->Print(cout); c->Delete();

@@ -4006,7 +4006,7 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
     <Documentation
        long_help="Sample data attributes at the points in a point cloud."
        short_help="Sample data values at the points in a point cloud.">
-The Probe filter samples the data set attributes of the current data set at the points in a point cloud. Probing with a point is different than using the Pick filter at a point because the Pick filter returns the values for the input point closest to the selected point. Instead the Probe filter uses interpolation to determine the values at the selected point, whether or not it lies at an input point. The Probe filter operates on any type of data and produces polygonal output (a point cloud).
+The Probe filter samples the data set attributes of the current data set at the points in a point cloud. The Probe filter uses interpolation to determine the values at the selected point, whether or not it lies at an input point. The Probe filter operates on any type of data and produces polygonal output (a point cloud).
     </Documentation>
     <InputProperty
        name="Input"
@@ -4650,82 +4650,6 @@ The Outline filter generates an outline of the outside edges of the input datase
            </Documentation>
       </InputProperty>
    <!-- End StructuredGridOutlineFilter -->
-   </SourceProxy>
-
-   <SourceProxy name="Pick" class="vtkPickFilter">
-     <Documentation
-        long_help="Find the cell or point closest to the input point."
-        short_help="Pick cells or points.">
-The Pick filter displays the underlying data nearest to a user-selected point. A point widget, with its usual controls in the display area and on the Parameters tab, is provided for choosing this point. (See section 7.4 for information about using the point widget.) Pressing the "P" key positions the point widget at the point on the data set under the current cursor position. If you select Point from the Pick Type menu, the output of the filter will be the nearest point to the point widget. If you select Cell, the output of the filter is the cell which is closest to the selected point. All the output point-centered attributes, cell-centered attributes, and original ids are displayed on the Parameters tab. Also, the selected cell will be outlined in red in the display area, and the reference ids of the points within that cell will be labeled.
-The Pick filter operates on any type of data and produces unstructured grid output.
-     </Documentation>
-     <InputProperty
-        name="Input"
-        command="AddInputConnection"
-        clean_command="RemoveAllInputs"
-        multiple_input="1">
-           <ProxyGroupDomain name="groups">
-             <Group name="sources"/>
-             <Group name="filters"/>
-           </ProxyGroupDomain>
-           <DataTypeDomain name="input_type" composite_data_supported="0">
-             <DataType value="vtkDataSet"/>
-           </DataTypeDomain>
-           <Documentation>
-             Set the input to the Pick filter.
-           </Documentation>
-      </InputProperty>
-
-      <DoubleVectorProperty
-         name="WorldPoint"
-         command="SetWorldPoint"
-         number_of_elements="3"
-         default_values="0 0 0" >
-         <Documentation>
-           Pick the cell or point closest to this world point.  The 'p' key can be used to select the point under the cursor.
-         </Documentation>
-      </DoubleVectorProperty>
-
-     <IntVectorProperty 
-        name="PickCell" 
-        command="SetPickCell" 
-        number_of_elements="1"
-        default_values="1"
-        label="Pick Type">
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="Point"/>
-         <Entry value="1" text="Cell"/>
-       </EnumerationDomain>
-       <Documentation>
-         Choose whether to pick a point or a cell.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="UseIdToPick" 
-        command="SetUseIdToPick" 
-        number_of_elements="1"
-        default_values="0"
-        label="Use Id to Pick">
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="Off"/>
-         <Entry value="1" text="On"/>
-       </EnumerationDomain>
-       <Documentation>
-         Choose whether to pick a point/cell by Id.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="Id" 
-        command="SetId" 
-        number_of_elements="1"
-        default_values="0" >
-        <Documentation>
-          If picking by Id, specify the point or cell Id.
-        </Documentation>
-     </IntVectorProperty>
-
    </SourceProxy>
 
   <SourceProxy name="GenericClip" class="vtkGenericClip" label="Clip (Generic Datasets)">

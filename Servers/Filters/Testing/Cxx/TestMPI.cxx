@@ -13,7 +13,6 @@
 
 =========================================================================*/
 #include "vtkConeSource.h"
-#include "vtkPickFilter.h"
 #include "vtkPVConnectivityFilter.h"
 #include "vtkMPIMoveData.h"
 #include "vtkPolyData.h"
@@ -24,15 +23,6 @@ int main(int , char* [])
   vtkConeSource *cone = vtkConeSource::New();
   cone->Update(); //For GetCenter
   
-  vtkPickFilter *pick = vtkPickFilter::New();
-  
-  //law int fixme;  // why is this a problem.
-  //pick->SetInput( cone->GetOutput() );
-  pick->SetWorldPoint ( cone->GetOutput()->GetCenter() );
-  pick->GetWorldPoint ();
-  pick->SetPickCell ( 1 );
-  pick->Update();
-
   vtkPVConnectivityFilter *connect = vtkPVConnectivityFilter::New();
   connect->SetInput( cone->GetOutput() );
   
@@ -42,7 +32,6 @@ int main(int , char* [])
   move->Update();
 
   cone->Delete();
-  pick->Delete();
   connect->Delete();
   move->Delete();
 
