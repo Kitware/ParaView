@@ -81,6 +81,7 @@ int main(int argc, char* argv[])
     viewer->Delete();
     cFunc->Delete();
     oFunc->Delete();
+    t->Delete();
     return 1;
     }
 
@@ -94,6 +95,7 @@ int main(int argc, char* argv[])
     viewer->Delete();
     cFunc->Delete();
     oFunc->Delete();
+    t->Delete();
     return 1;
     }
 
@@ -110,6 +112,7 @@ int main(int argc, char* argv[])
     viewer->Delete();
     cFunc->Delete();
     oFunc->Delete();
+    t->Delete();
     return 1;
     }
 

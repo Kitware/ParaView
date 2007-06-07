@@ -30,7 +30,7 @@ ENDFOREACH(name)
 
 
 
-IF (VTK_USE_DISPLAY)
+IF (VTK_USE_DISPLAY AND VTK_DATA_ROOT)
   SET(ServersFiltersImage_SRCS
     TestTransferFunctionEditor
     )
@@ -43,5 +43,5 @@ IF (VTK_USE_DISPLAY)
       )
     TARGET_LINK_LIBRARIES(${name} vtkPVFilters)
   ENDFOREACH(name)
-ENDIF (VTK_USE_DISPLAY)
+ENDIF (VTK_USE_DISPLAY AND VTK_DATA_ROOT)
 
