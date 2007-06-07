@@ -44,8 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QFileInfo>
 #include <QImage>
-#include <List>
-#include <Map>
+#include <QList>
+#include <QMap>
 #include <QPainter>
 #include <QPixmap>
 #include <QPointer>
