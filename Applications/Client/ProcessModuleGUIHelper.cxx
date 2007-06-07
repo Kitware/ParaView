@@ -39,8 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqApplicationCore.h>
 #include <vtkObjectFactory.h>
 
+#include "vtkPVConfig.h"
+
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.9");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.10");
 
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
@@ -60,7 +62,7 @@ ProcessModuleGUIHelper::~ProcessModuleGUIHelper()
 //-----------------------------------------------------------------------------
 QWidget* ProcessModuleGUIHelper::CreateMainWindow()
 {
-  pqApplicationCore::instance()->setApplicationName("ParaView3.0");
+  pqApplicationCore::instance()->setApplicationName("ParaView" PARAVIEW_VERSION);
   pqApplicationCore::instance()->setOrganizationName("Kitware");
   QWidget* w = new MainWindow();
   QTimer::singleShot(10, this->Splash, SLOT(close()));
