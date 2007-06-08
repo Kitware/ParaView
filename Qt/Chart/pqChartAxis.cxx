@@ -93,7 +93,6 @@ static pqChartValue IntervalList[] = {
     pqChartValue((float)2.5),
     pqChartValue((float)5.0)};
 static int IntervalListLength = 4;
-static double MinIntLogPower = -1;
 
 
 //----------------------------------------------------------------------------

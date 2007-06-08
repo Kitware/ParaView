@@ -904,9 +904,9 @@ void pqChartArea::handleZoomChange()
     }
 }
 
-void pqChartArea::changeCursor(const QCursor &cursor)
+void pqChartArea::changeCursor(const QCursor &newCursor)
 {
-  this->setCursor(cursor);
+  this->setCursor(newCursor);
 }
 
 void pqChartArea::updateArea(const QRect &area)

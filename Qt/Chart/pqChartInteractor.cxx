@@ -84,13 +84,13 @@ bool pqChartInteractor::keyPressEvent(QKeyEvent *e)
     // both axes by the same amount. Mask off the shift key since
     // it is needed to press the plus key.
     pqChartContentsSpace::InteractFlags flags = pqChartContentsSpace::ZoomBoth;
-    int state = e->modifiers() & (Qt::ControlModifier | Qt::AltModifier |
-        Qt::MetaModifier);
-    if(state == this->XModifier)
+    Qt::KeyboardModifiers state = e->modifiers() & (Qt::ControlModifier |
+        Qt::AltModifier | Qt::MetaModifier);
+    if(state & this->XModifier)
       {
       flags = pqChartContentsSpace::ZoomXOnly;
       }
-    else if(state == this->YModifier)
+    else if(state & this->YModifier)
       {
       flags = pqChartContentsSpace::ZoomYOnly;
       }
@@ -115,7 +115,7 @@ bool pqChartInteractor::keyPressEvent(QKeyEvent *e)
     }
   else if(e->key() == Qt::Key_Left)
     {
-    if(e->modifiers() == Qt::AltModifier)
+    if(e->modifiers() & Qt::AltModifier)
       {
       this->Contents->historyPrevious();
       }
@@ -126,7 +126,7 @@ bool pqChartInteractor::keyPressEvent(QKeyEvent *e)
     }
   else if(e->key() == Qt::Key_Right)
     {
-    if(e->modifiers() == Qt::AltModifier)
+    if(e->modifiers() & Qt::AltModifier)
       {
       this->Contents->historyNext();
       }
@@ -157,7 +157,7 @@ void pqChartInteractor::mouseMoveEvent(QMouseEvent *e)
     {
     if(e->buttons() == this->ZoomButton)
       {
-      if(e->modifiers() == this->BoxModifier)
+      if(e->modifiers() & this->BoxModifier)
         {
         this->Mode = pqChartInteractor::ZoomBox;
         if(this->Contents)
@@ -194,11 +194,11 @@ void pqChartInteractor::mouseMoveEvent(QMouseEvent *e)
   if(this->Mode == pqChartInteractor::Zoom)
     {
     pqChartContentsSpace::InteractFlags flags = pqChartContentsSpace::ZoomBoth;
-    if(e->modifiers() == this->XModifier)
+    if(e->modifiers() & this->XModifier)
       {
       flags = pqChartContentsSpace::ZoomXOnly;
       }
-    else if(e->modifiers() == this->YModifier)
+    else if(e->modifiers() & this->YModifier)
       {
       flags = pqChartContentsSpace::ZoomYOnly;
       }
@@ -278,11 +278,11 @@ void pqChartInteractor::wheelEvent(QWheelEvent *e)
   if(this->Contents)
     {
     pqChartContentsSpace::InteractFlags flags = pqChartContentsSpace::ZoomBoth;
-    if(e->modifiers() == this->XModifier)
+    if(e->modifiers() & this->XModifier)
       {
       flags = pqChartContentsSpace::ZoomXOnly;
       }
-    else if(e->modifiers() == this->YModifier)
+    else if(e->modifiers() & this->YModifier)
       {
       flags = pqChartContentsSpace::ZoomYOnly;
       }
