@@ -33,6 +33,7 @@ ENDFOREACH(name)
 IF (VTK_USE_DISPLAY AND VTK_DATA_ROOT)
   SET(ServersFiltersImage_SRCS
     TestTransferFunctionEditor
+    TestTransferFunctionEditor2
     )
   FOREACH(name ${ServersFiltersImage_SRCS})
     ADD_EXECUTABLE(${name} ${name}.cxx)
