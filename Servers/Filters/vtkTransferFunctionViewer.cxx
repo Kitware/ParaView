@@ -32,7 +32,7 @@
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.22");
+vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.23");
 vtkStandardNewMacro(vtkTransferFunctionViewer);
 
 //----------------------------------------------------------------------------
@@ -830,4 +830,37 @@ void vtkTransferFunctionViewer::SetHistogram(vtkRectilinearGrid *histogram)
 void vtkTransferFunctionViewer::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "RenderWindow:";
+  if (this->RenderWindow)
+    {
+    os << "\n";
+    this->RenderWindow->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << " none\n";
+    }
+  os << indent << "Renderer:\n";
+  this->Renderer->PrintSelf(os, indent.GetNextIndent());
+  os << indent << "Interactor:";
+  if (this->Interactor)
+    {
+    os << "\n";
+    this->Interactor->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << " none\n";
+    }
+  os << indent << "EditorWidget:";
+  if (this->EditorWidget)
+    {
+    os << "\n";
+    this->EditorWidget->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << " none\n";
+    }
 }

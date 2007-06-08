@@ -62,6 +62,13 @@
 #include "vtkSpyPlotReader.h"
 #include "vtkSquirtCompressor.h"
 #include "vtkSurfaceVectors.h"
+#include "vtkTransferFunctionEditorRepresentationShapes1D.h"
+#include "vtkTransferFunctionEditorRepresentationShapes2D.h"
+#include "vtkTransferFunctionEditorRepresentationSimple1D.h"
+#include "vtkTransferFunctionEditorWidgetShapes1D.h"
+#include "vtkTransferFunctionEditorWidgetShapes2D.h"
+#include "vtkTransferFunctionEditorWidgetSimple1D.h"
+#include "vtkTransferFunctionViewer.h"
 #include "vtkUpdateSuppressorPipeline.h"
 #include "vtkVRMLSource.h"
 #include "vtkXMLCollectionReader.h"
@@ -131,6 +138,13 @@ int main(int , char *[])
   c = vtkPVXMLParser::New(); c->Print(cout); c->Delete();
   c = vtkSpyPlotReader::New(); c->Print(cout); c->Delete();
   c = vtkSquirtCompressor::New(); c->Print(cout); c->Delete();
+  c = vtkTransferFunctionEditorRepresentationShapes1D::New(); c->Print(cout); c->Delete();
+  c = vtkTransferFunctionEditorRepresentationShapes2D::New(); c->Print(cout); c->Delete();
+  c = vtkTransferFunctionEditorRepresentationSimple1D::New(); c->Print(cout); c->Delete();
+  c = vtkTransferFunctionEditorWidgetShapes1D::New(); c->Print(cout); c->Delete();
+  c = vtkTransferFunctionEditorWidgetShapes2D::New(); c->Print(cout); c->Delete();
+  c = vtkTransferFunctionEditorWidgetSimple1D::New(); c->Print(cout); c->Delete();
+  c = vtkTransferFunctionViewer::New(); c->Print(cout); c->Delete();
   c = vtkUpdateSuppressorPipeline::New(); c->Print(cout); c->Delete();
   c = vtkVRMLSource::New(); c->Print(cout); c->Delete();
   c = vtkXMLCollectionReader::New(); c->Print(cout); c->Delete();

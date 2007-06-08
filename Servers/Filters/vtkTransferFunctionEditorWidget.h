@@ -138,10 +138,6 @@ public:
   virtual void OnChar();
 
   // Description:
-  // Return whether the underlying transfer functions have been initialized.
-  int TransferFunctionsInitialized();
-
-  // Description:
   // Get the modified time associated with the color / opacity transfer
   // functions.
   vtkGetMacro(ColorMTime, unsigned long);

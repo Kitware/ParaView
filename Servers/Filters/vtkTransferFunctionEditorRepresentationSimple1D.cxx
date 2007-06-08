@@ -34,7 +34,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.14");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.15");
 vtkStandardNewMacro(vtkTransferFunctionEditorRepresentationSimple1D);
 
 // The vtkHandleList is a PIMPLed list<T>.
@@ -647,4 +647,7 @@ void vtkTransferFunctionEditorRepresentationSimple1D::PrintSelf(
   ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "ActiveHandle: " << this->ActiveHandle << endl;
+  os << indent << "Tolerance: " << this->Tolerance << endl;
 }
