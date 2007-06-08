@@ -24,6 +24,7 @@
 #include "vtkMPICompositeManager.h"
 #include "vtkMPIMoveData.h"
 #include "vtkMergeArrays.h"
+#include "vtkMinMax.h"
 #include "vtkOrderedCompositeDistributor.h"
 #include "vtkPhastaReader.h"
 #include "vtkPPhastaReader.h"
@@ -94,6 +95,7 @@ int main(int , char *[])
   c = vtkIntegrateAttributes::New(); c->Print(cout); c->Delete();
   c = vtkIntegrateFlowThroughSurface::New(); c->Print(cout); c->Delete();
   c = vtkMergeArrays::New(); c->Print(cout); c->Delete();
+  c = vtkMinMax::New(); c->Print(cout); c->Delete();
   c = vtkMPICompositeManager::New(); c->Print(cout); c->Delete();
   c = vtkMPIMoveData::New(); c->Print(cout); c->Delete();
   c = vtkOrderedCompositeDistributor::New(); c->Print(cout); c->Delete();

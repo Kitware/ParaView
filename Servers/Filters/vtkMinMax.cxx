@@ -29,7 +29,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkMinMax);
-vtkCxxRevisionMacro(vtkMinMax, "1.5");
+vtkCxxRevisionMacro(vtkMinMax, "1.6");
 
 template <class T>
 void vtkMinMaxExecute(
@@ -351,7 +351,8 @@ void vtkMinMax::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Operation: " << this->Operation << endl;
-  os << indent << "FirstPasses: " << this->FirstPasses << endl;
+  os << indent << "FirstPasses: "
+     << (this->FirstPasses ? this->FirstPasses : "None") << endl;
   os << indent << "MismatchOccurred: " << this->MismatchOccurred << endl;
 
 }
