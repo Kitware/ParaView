@@ -28,7 +28,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
 {
@@ -44,7 +44,10 @@ vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryRepresentationProxy::~vtkSMClientDeliveryRepresentationProxy()
 {
-  this->StrategyProxy->Delete();
+  if (this->StrategyProxy)
+    {
+    this->StrategyProxy->Delete();
+    }
   this->StrategyProxy = 0;
 
   this->ExtractSelection = 0;

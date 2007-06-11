@@ -31,7 +31,7 @@
 #include "vtkSphereSource.h"
 #include "vtkWindow.h"
 
-vtkCxxRevisionMacro(vtkPointHandleRepresentationSphere, "1.2");
+vtkCxxRevisionMacro(vtkPointHandleRepresentationSphere, "1.3");
 vtkStandardNewMacro(vtkPointHandleRepresentationSphere);
 
 vtkCxxSetObjectMacro(vtkPointHandleRepresentationSphere,Property,vtkProperty);
@@ -391,4 +391,5 @@ void vtkPointHandleRepresentationSphere::PrintSelf(ostream& os, vtkIndent indent
     os << indent << "Cursor Shape: (none)\n";
     }
 
+  os << indent << "Scalar: " << this->Scalar << endl;
 }
