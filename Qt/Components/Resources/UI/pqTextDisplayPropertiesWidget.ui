@@ -5,9 +5,17 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>438</width>
-    <height>425</height>
+    <width>261</width>
+    <height>439</height>
    </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy>
+    <hsizetype>1</hsizetype>
+    <vsizetype>5</vsizetype>
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
@@ -21,6 +29,14 @@
    </property>
    <item>
     <widget class="QCheckBox" name="Visibility" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>1</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="toolTip" >
       <string>Toggle visibility if the Text in the current view.</string>
      </property>
@@ -31,6 +47,14 @@
    </item>
    <item>
     <widget class="QCheckBox" name="Interactivity" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>1</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="toolTip" >
       <string>Toggle interactivity of the text.</string>
      </property>
@@ -46,8 +70,8 @@
     <widget class="QGroupBox" name="TextPropertyFrame" >
      <property name="sizePolicy" >
       <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>1</vsizetype>
+       <hsizetype>1</hsizetype>
+       <vsizetype>5</vsizetype>
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -62,24 +86,32 @@
       <property name="spacing" >
        <number>6</number>
       </property>
-      <item row="3" column="1" >
-       <widget class="QDoubleSpinBox" name="spinBoxOpacity" >
-        <property name="whatsThis" >
-         <string>Used to set the label opacity.</string>
+      <item row="0" column="1" >
+       <widget class="QSpinBox" name="spinBoxSize" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
         <property name="maximum" >
-         <double>1.000000000000000</double>
+         <number>1024</number>
         </property>
-        <property name="singleStep" >
-         <double>0.100000000000000</double>
+        <property name="minimum" >
+         <number>1</number>
+        </property>
+        <property name="value" >
+         <number>24</number>
         </property>
        </widget>
       </item>
-      <item row="2" column="1" >
-       <widget class="QComboBox" name="comboTextAlign" >
+      <item row="1" column="1" >
+       <widget class="QComboBox" name="comboFontFamily" >
         <property name="sizePolicy" >
          <sizepolicy>
-          <hsizetype>3</hsizetype>
+          <hsizetype>1</hsizetype>
           <vsizetype>0</vsizetype>
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
@@ -90,41 +122,19 @@
         </property>
         <item>
          <property name="text" >
-          <string>Left</string>
+          <string>Arial</string>
          </property>
         </item>
         <item>
          <property name="text" >
-          <string>Center</string>
+          <string>Courier</string>
          </property>
         </item>
         <item>
          <property name="text" >
-          <string>Right</string>
+          <string>Times</string>
          </property>
         </item>
-       </widget>
-      </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_10" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>1</hsizetype>
-          <vsizetype>5</vsizetype>
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text" >
-         <string>Align</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_size" >
-        <property name="text" >
-         <string>Font Size</string>
-        </property>
        </widget>
       </item>
       <item row="1" column="2" >
@@ -169,6 +179,9 @@
         </item>
         <item>
          <widget class="QToolButton" name="toolButtonShadow" >
+          <property name="enabled" >
+           <bool>true</bool>
+          </property>
           <property name="toolTip" >
            <string>Shadow</string>
           </property>
@@ -185,26 +198,11 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_8" >
+      <item row="2" column="1" >
+       <widget class="QComboBox" name="comboTextAlign" >
         <property name="sizePolicy" >
          <sizepolicy>
           <hsizetype>1</hsizetype>
-          <vsizetype>5</vsizetype>
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text" >
-         <string>Font</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QComboBox" name="comboFontFamily" >
-        <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>3</hsizetype>
           <vsizetype>0</vsizetype>
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
@@ -215,19 +213,77 @@
         </property>
         <item>
          <property name="text" >
-          <string>Arial</string>
+          <string>Left</string>
          </property>
         </item>
         <item>
          <property name="text" >
-          <string>Courier</string>
+          <string>Center</string>
          </property>
         </item>
         <item>
          <property name="text" >
-          <string>Times</string>
+          <string>Right</string>
          </property>
         </item>
+       </widget>
+      </item>
+      <item row="3" column="1" >
+       <widget class="QDoubleSpinBox" name="spinBoxOpacity" >
+        <property name="whatsThis" >
+         <string>Used to set the label opacity.</string>
+        </property>
+        <property name="maximum" >
+         <double>1.000000000000000</double>
+        </property>
+        <property name="singleStep" >
+         <double>0.100000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_size" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text" >
+         <string>Font Size</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_8" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text" >
+         <string>Font</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_10" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text" >
+         <string>Align</string>
+        </property>
        </widget>
       </item>
       <item row="3" column="0" >
@@ -235,7 +291,7 @@
         <property name="sizePolicy" >
          <sizepolicy>
           <hsizetype>1</hsizetype>
-          <vsizetype>5</vsizetype>
+          <vsizetype>0</vsizetype>
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -245,8 +301,8 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QSpinBox" name="spinBoxSize" >
+      <item row="3" column="2" >
+       <widget class="pqColorChooserButton" name="buttonColor" >
         <property name="sizePolicy" >
          <sizepolicy>
           <hsizetype>1</hsizetype>
@@ -255,19 +311,6 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="maximum" >
-         <number>1024</number>
-        </property>
-        <property name="minimum" >
-         <number>1</number>
-        </property>
-        <property name="value" >
-         <number>24</number>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2" >
-       <widget class="pqColorChooserButton" name="buttonColor" >
         <property name="whatsThis" >
          <string>Click this button to set the title color.</string>
         </property>
@@ -283,7 +326,7 @@
     <widget class="QGroupBox" name="TextPositionFrame" >
      <property name="sizePolicy" >
       <sizepolicy>
-       <hsizetype>5</hsizetype>
+       <hsizetype>1</hsizetype>
        <vsizetype>5</vsizetype>
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
@@ -303,6 +346,14 @@
        <widget class="QGroupBox" name="groupBoxLLC" >
         <property name="enabled" >
          <bool>true</bool>
+        </property>
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>1</hsizetype>
+          <vsizetype>5</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
         <property name="title" >
          <string>Lower Left Corner</string>
@@ -345,6 +396,14 @@
       </item>
       <item>
        <widget class="QGroupBox" name="groupBoxLocation" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>5</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="title" >
          <string>Use Window Location</string>
         </property>
@@ -361,10 +420,30 @@
          <property name="spacing" >
           <number>6</number>
          </property>
-         <item row="1" column="2" >
-          <widget class="QToolButton" name="toolButtonLR" >
+         <item row="0" column="0" >
+          <widget class="QToolButton" name="toolButtonUL" >
+           <property name="sizePolicy" >
+            <sizepolicy>
+             <hsizetype>1</hsizetype>
+             <vsizetype>0</vsizetype>
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip" >
+            <string>Top Left Corner</string>
+           </property>
            <property name="text" >
-            <string>Lower Right Corner</string>
+            <string/>
+           </property>
+           <property name="icon" >
+            <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqTopLeftCorner32.png</iconset>
+           </property>
+           <property name="iconSize" >
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
            </property>
            <property name="checkable" >
             <bool>true</bool>
@@ -376,8 +455,28 @@
          </item>
          <item row="1" column="1" >
           <widget class="QToolButton" name="toolButtonLC" >
+           <property name="sizePolicy" >
+            <sizepolicy>
+             <hsizetype>1</hsizetype>
+             <vsizetype>0</vsizetype>
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip" >
+            <string>Bottom Center</string>
+           </property>
            <property name="text" >
-            <string>Lower Center</string>
+            <string/>
+           </property>
+           <property name="icon" >
+            <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqBottomCenter32.png</iconset>
+           </property>
+           <property name="iconSize" >
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
            </property>
            <property name="checkable" >
             <bool>true</bool>
@@ -392,8 +491,28 @@
          </item>
          <item row="1" column="0" >
           <widget class="QToolButton" name="toolButtonLL" >
+           <property name="sizePolicy" >
+            <sizepolicy>
+             <hsizetype>1</hsizetype>
+             <vsizetype>0</vsizetype>
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip" >
+            <string>Bottom Left Corner</string>
+           </property>
            <property name="text" >
-            <string>Lower Left Corner</string>
+            <string/>
+           </property>
+           <property name="icon" >
+            <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqBottomLeftCorner32.png</iconset>
+           </property>
+           <property name="iconSize" >
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
            </property>
            <property name="checkable" >
             <bool>true</bool>
@@ -406,10 +525,30 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="2" >
-          <widget class="QToolButton" name="toolButtonUR" >
+         <item row="1" column="2" >
+          <widget class="QToolButton" name="toolButtonLR" >
+           <property name="sizePolicy" >
+            <sizepolicy>
+             <hsizetype>1</hsizetype>
+             <vsizetype>0</vsizetype>
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip" >
+            <string>Bottom Right Corner</string>
+           </property>
            <property name="text" >
-            <string>Upper Right Corner</string>
+            <string/>
+           </property>
+           <property name="icon" >
+            <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqBottomRightCorner32.png</iconset>
+           </property>
+           <property name="iconSize" >
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
            </property>
            <property name="checkable" >
             <bool>true</bool>
@@ -421,8 +560,28 @@
          </item>
          <item row="0" column="1" >
           <widget class="QToolButton" name="toolButtonUC" >
+           <property name="sizePolicy" >
+            <sizepolicy>
+             <hsizetype>1</hsizetype>
+             <vsizetype>0</vsizetype>
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip" >
+            <string>Top Center</string>
+           </property>
            <property name="text" >
-            <string>Upper Center</string>
+            <string/>
+           </property>
+           <property name="icon" >
+            <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqTopCenter32.png</iconset>
+           </property>
+           <property name="iconSize" >
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
            </property>
            <property name="checkable" >
             <bool>true</bool>
@@ -432,10 +591,30 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0" >
-          <widget class="QToolButton" name="toolButtonUL" >
+         <item row="0" column="2" >
+          <widget class="QToolButton" name="toolButtonUR" >
+           <property name="sizePolicy" >
+            <sizepolicy>
+             <hsizetype>1</hsizetype>
+             <vsizetype>0</vsizetype>
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip" >
+            <string>Top Right Corner</string>
+           </property>
            <property name="text" >
-            <string>Upper Left Corner</string>
+            <string/>
+           </property>
+           <property name="icon" >
+            <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqTopRightCorner32.png</iconset>
+           </property>
+           <property name="iconSize" >
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
            </property>
            <property name="checkable" >
             <bool>true</bool>
@@ -457,11 +636,11 @@
       <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeType" >
-      <enum>QSizePolicy::Expanding</enum>
+      <enum>QSizePolicy::Preferred</enum>
      </property>
      <property name="sizeHint" >
       <size>
-       <width>342</width>
+       <width>151</width>
        <height>16</height>
       </size>
      </property>
@@ -497,7 +676,9 @@
   <tabstop>toolButtonLC</tabstop>
   <tabstop>toolButtonLR</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../pqComponents.qrc" />
+ </resources>
  <connections>
   <connection>
    <sender>Visibility</sender>
