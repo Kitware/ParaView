@@ -72,6 +72,7 @@ pqSettingsDialog::pqSettingsDialog(QWidget* _p/*=null*/,
   
 
   QObject::connect(this, SIGNAL(finished(int)), this, SLOT(onFinished(int)));
+  QObject::connect(this->Internal->applyButton, SIGNAL(clicked()), this, SLOT(onApplied()));
 }
 
 //-----------------------------------------------------------------------------
@@ -111,6 +112,11 @@ void pqSettingsDialog::onFinished(int end_result)
     {
     return;
     }
-  this->Internal->ViewProperties->accept();
+  this->onApplied();
 }
 
+//-----------------------------------------------------------------------------
+void pqSettingsDialog::onApplied()
+{
+  this->Internal->ViewProperties->accept();
+}

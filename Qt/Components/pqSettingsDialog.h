@@ -49,6 +49,7 @@ public slots:
 
 private slots:
   void onFinished(int);
+  void onApplied();
 
 protected:
   void setupGUI();
