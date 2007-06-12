@@ -11,6 +11,9 @@
         <file>Icons/pqArrowDown16.png</file>
         <file>Icons/pqArrowUp16.png</file>
         <file>Icons/pqBack16.png</file>
+        <file>Icons/pqBottomCenter32.png</file>
+        <file>Icons/pqBottomLeftCorner32.png</file>
+        <file>Icons/pqBottomRightCorner32.png</file>
         <file>Icons/pqBundle16.png</file>
         <file>Icons/pqBundle22.png</file>
         <file>Icons/pqBundle32.png</file>
@@ -134,6 +137,9 @@
         <file>Icons/pqStreamTracer24.png</file>
         <file>Icons/pqStructuredGrid16.png</file>
         <file>Icons/pqThreshold24.png</file>
+        <file>Icons/pqTopCenter32.png</file>
+        <file>Icons/pqTopLeftCorner32.png</file>
+        <file>Icons/pqTopRightCorner32.png</file>
         <file>Icons/pqUndo16.png</file>
         <file>Icons/pqUndo24.png</file>
         <file>Icons/pqUndo32.png</file>
