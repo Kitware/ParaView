@@ -5511,6 +5511,149 @@
       </SubProxy>
     </ScalarBarWidgetRepresentationProxy>
 
+    <TextWidgetRepresentationProxy name="TextWidgetRepresentation">
+      <IntVectorProperty name="Enabled"
+        command="SetEnabled"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="Prop2D"
+          proxygroup="props" proxyname="TextRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility"/>
+          <Property name="Text"/>
+          <Property name="Position"/>
+          <Property name="Position2"/>
+          <Property name="PositionInfo"/>
+          <Property name="Position2Info"/>
+          <Property name="WindowLocation"/>
+          <Property name="TextActor"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Prop2DActor"
+          proxygroup="props" proxyname="TextActor">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ScaledText"/>
+          <Property name="TextProperty"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Prop2DProperty"
+          proxygroup="properties" proxyname="TextProperty">
+        </Proxy>
+
+        <ExposedProperties>
+          <Property name="Justification"/>
+          <Property name="Orientation"/>
+          <Property name="Color"/>
+          <Property name="Opacity"/>
+          <Property name="FontFamily"/>
+          <Property name="Bold"/>
+          <Property name="Italic"/>
+          <Property name="Shadow"/>
+          <Property name="FontSize"/>
+        </ExposedProperties>
+
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Widget"
+          proxygroup="3d_widgets" proxyname="TextWidget">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Enabled"/>
+          <Property name="Selectable"/>
+          <Property name="Resizable"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of TextWidgetRepresentation -->
+    </TextWidgetRepresentationProxy>
+
+    <TextSourceRepresentationProxy name="TextSourceRepresentation">
+      <InputProperty name="Input" command="">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+      </InputProperty>
+
+      <Property name="Update"
+        command="Update"
+        update_self="1">
+      </Property>
+
+      <Property name="InvalidateGeometry"
+        command="InvalidateGeometry"
+        update_self="1">
+      </Property>
+
+      <DoubleVectorProperty
+        name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        is_internal="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <SubProxy>
+        <Proxy name="UpdateSuppressor"
+          proxygroup="filters" proxyname="UpdateSuppressor">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="CacheUpdate" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="TextWidgetRepresentation"
+          proxygroup="representations" proxyname="TextWidgetRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Enabled" />
+          <Property name="Visibility" />
+          <Property name="Position" />
+          <Property name="Position2" />
+          <Property name="PositionInfo" />
+          <Property name="Position2Info" />
+          <Property name="WindowLocation" />
+
+          <Property name="ScaledText"/>
+          <Property name="Resizable"/>
+
+          <!-- properties for Text -->
+          <Property name="Justification"/>
+          <Property name="Orientation"/>
+          <Property name="Color"/>
+          <Property name="Opacity"/>
+          <Property name="FontFamily"/>
+          <Property name="Bold"/>
+          <Property name="Italic"/>
+          <Property name="Shadow"/>
+          <Property name="FontSize"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Collect"
+        proxygroup="filters" proxyname="ClientServerMoveData">
+        </Proxy>
+      </SubProxy>
+      <!-- End of TextSourceRepresentation -->
+    </TextSourceRepresentationProxy>
+
   </ProxyGroup>
 
 
