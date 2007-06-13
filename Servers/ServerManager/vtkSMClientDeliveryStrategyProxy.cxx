@@ -24,13 +24,12 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryStrategyProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryStrategyProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMClientDeliveryStrategyProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryStrategyProxy::vtkSMClientDeliveryStrategyProxy()
 {
   this->CollectProxy = 0;
   this->CollectLODProxy = 0;
-  this->PostProcessorProxy = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -38,7 +37,6 @@ vtkSMClientDeliveryStrategyProxy::~vtkSMClientDeliveryStrategyProxy()
 {
   this->CollectProxy = 0;
   this->CollectLODProxy = 0;
-  this->PostProcessorProxy = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -59,13 +57,6 @@ void vtkSMClientDeliveryStrategyProxy::CreateVTKObjects()
   this->CollectLODProxy->SetServers(
     this->Servers | vtkProcessModule::CLIENT);
 
-  this->PostProcessorProxy = vtkSMSourceProxy::SafeDownCast(
-    this->GetSubProxy("PostProcessor"));
-  if (this->PostProcessorProxy)
-    {
-    this->PostProcessorProxy->SetServers(vtkProcessModule::CLIENT);
-    }
-
   this->Superclass::CreateVTKObjects();
 }
 
@@ -74,8 +65,7 @@ void vtkSMClientDeliveryStrategyProxy::CreatePipeline(vtkSMSourceProxy* input)
 {
   this->CreatePipelineInternal(input,
                                this->CollectProxy, 
-                               this->UpdateSuppressor,
-                               this->PostProcessorProxy);
+                               this->UpdateSuppressor);
 }
 
 //----------------------------------------------------------------------------
@@ -84,16 +74,14 @@ void vtkSMClientDeliveryStrategyProxy::CreateLODPipeline(vtkSMSourceProxy* input
   this->Connect(input, this->LODDecimator);
   this->CreatePipelineInternal(this->LODDecimator,
                                this->CollectLODProxy, 
-                               this->UpdateSuppressorLOD, 
-                               NULL);
+                               this->UpdateSuppressorLOD);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMClientDeliveryStrategyProxy::CreatePipelineInternal(
   vtkSMSourceProxy* input,
   vtkSMSourceProxy* collect,
-  vtkSMSourceProxy* updatesuppressor,
-  vtkSMSourceProxy* postprocessor)
+  vtkSMSourceProxy* updatesuppressor)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
@@ -134,11 +122,6 @@ void vtkSMClientDeliveryStrategyProxy::CreatePipelineInternal(
                    stream);
     }
 
-  if (postprocessor)
-    {
-    this->Connect(collect, postprocessor);
-    }
-
   // Init UpdateSuppressor properties.
   // Seems like we can't use properties for this 
   // to work properly.
@@ -169,22 +152,19 @@ void vtkSMClientDeliveryStrategyProxy::CreatePipelineInternal(
 void vtkSMClientDeliveryStrategyProxy::UpdatePipeline()
 {
   this->UpdatePipelineInternal(this->CollectProxy, 
-                               this->UpdateSuppressor,
-                               this->PostProcessorProxy);
+                               this->UpdateSuppressor);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMClientDeliveryStrategyProxy::UpdateLODPipeline()
 {
   this->UpdatePipelineInternal(this->CollectLODProxy, 
-                               this->UpdateSuppressorLOD,
-                               NULL);
+                               this->UpdateSuppressorLOD);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMClientDeliveryStrategyProxy::UpdatePipelineInternal(
-  vtkSMSourceProxy* collect, vtkSMSourceProxy* updatesuppressor,
-  vtkSMSourceProxy* postprocessor)
+  vtkSMSourceProxy* collect, vtkSMSourceProxy* updatesuppressor)
 {
   vtkSMSourceProxy* input = this->Input;
   if (input)
@@ -219,34 +199,12 @@ void vtkSMClientDeliveryStrategyProxy::UpdatePipelineInternal(
     }
       
   updatesuppressor->InvokeCommand("ForceUpdate");
-  //this->Superclass::Update();
-
-  if (postprocessor)
-    {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkAlgorithm* dp = vtkAlgorithm::SafeDownCast(
-      pm->GetObjectFromID(postprocessor->GetID())); 
-    if (!dp)
-      {
-      vtkErrorMacro("Failed to get algorithm for PostProcessorProxy.");
-      }
-    else
-      {
-      dp->Update();
-      }
-    }
+  this->Superclass::Update();
 }
 //-----------------------------------------------------------------------------
 vtkSMSourceProxy* vtkSMClientDeliveryStrategyProxy::GetOutput()
 {
-  if (this->PostProcessorProxy)
-    {
-    return this->PostProcessorProxy; 
-    }
-  else
-    {
-    return this->CollectProxy;
-    }
+  return this->CollectProxy;
 }
 
 //----------------------------------------------------------------------------

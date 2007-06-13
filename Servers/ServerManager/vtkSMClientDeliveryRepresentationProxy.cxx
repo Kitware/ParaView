@@ -29,12 +29,13 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
 {
   this->ReduceProxy = 0;
   this->StrategyProxy = 0;
+  this->PostProcessorProxy = 0;
 
   this->ReductionType = 0;
   this->ExtractSelection = 0;
@@ -50,6 +51,7 @@ vtkSMClientDeliveryRepresentationProxy::~vtkSMClientDeliveryRepresentationProxy(
     this->StrategyProxy->Delete();
     }
   this->StrategyProxy = 0;
+  this->PostProcessorProxy = 0;
 
   this->ExtractSelection = 0;
 }
@@ -94,6 +96,13 @@ bool vtkSMClientDeliveryRepresentationProxy::BeginCreateVTKObjects()
   if (!this->Superclass::BeginCreateVTKObjects())
     {
     return false;
+    }
+
+  this->PostProcessorProxy = vtkSMSourceProxy::SafeDownCast(
+    this->GetSubProxy("PostProcessor"));
+  if (this->PostProcessorProxy)
+    {
+    this->PostProcessorProxy->SetServers(vtkProcessModule::CLIENT);
     }
 
   // Initialize selection pipeline subproxies.
@@ -221,27 +230,52 @@ void vtkSMClientDeliveryRepresentationProxy::SetInputInternal()
     }
 
   this->SetupStrategy();
+
+  vtkSMInputProperty* ip = 0;
+  if (this->PostProcessorProxy)
+    {
+    ip = vtkSMInputProperty::SafeDownCast(
+      this->PostProcessorProxy->GetProperty("Input"));
+    ip->RemoveAllProxies();
+    if(this->StrategyProxy && this->StrategyProxy->GetOutput())
+      {
+      ip->AddProxy(this->StrategyProxy->GetOutput());
+      }
+    else if(this->ReduceProxy)
+      {
+      ip->AddProxy(this->ReduceProxy);
+      }
+    else
+      {
+      ip->AddProxy(input);
+      }
+
+    this->PostProcessorProxy->UpdateVTKObjects();
+    }
 }
 
 //-----------------------------------------------------------------------------
 vtkDataObject* vtkSMClientDeliveryRepresentationProxy::GetOutput()
 {
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  if (!pm || !this->StrategyProxy)
-    {
-    return NULL;
-    }
-
   vtkAlgorithm* dp;
-  vtkSMSourceProxy* pOutput = this->StrategyProxy->GetOutput();
-  if (pOutput)
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (this->PostProcessorProxy)
     {
     dp = vtkAlgorithm::SafeDownCast(
-      pm->GetObjectFromID(pOutput->GetID())); 
+      pm->GetObjectFromID(this->PostProcessorProxy->GetID())); 
     }
   else
     {
-    dp = NULL;
+    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+    if (pm && this->StrategyProxy && this->StrategyProxy->GetOutput())
+      {
+      dp = vtkAlgorithm::SafeDownCast(
+        pm->GetObjectFromID(this->StrategyProxy->GetOutput()->GetID()));
+      }
+    else
+      {
+      dp = NULL;
+      }
     }
 
   if (dp == NULL)
@@ -258,6 +292,32 @@ void vtkSMClientDeliveryRepresentationProxy::AddInput(vtkSMSourceProxy* input,
 {
   this->Superclass::AddInput(input, method, hasMultipleInputs);
   this->SetInputInternal();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMClientDeliveryRepresentationProxy::Update(vtkSMViewProxy* view)
+{
+  if (!this->ObjectsCreated)
+    {
+    vtkErrorMacro("Objects not created yet!");
+    return;
+    }
+
+  if (this->PostProcessorProxy)
+    {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkAlgorithm* dp = vtkAlgorithm::SafeDownCast(
+      pm->GetObjectFromID(this->PostProcessorProxy->GetID())); 
+    if (!dp)
+      {
+      vtkErrorMacro("Failed to get algorithm for PostProcessorProxy.");
+      }
+    else
+      {
+      dp->Update();
+      }
+    }
+  this->Superclass::Update(view);
 }
 
 //----------------------------------------------------------------------------

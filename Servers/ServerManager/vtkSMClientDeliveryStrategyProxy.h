@@ -65,7 +65,6 @@ protected:
 
   vtkSMSourceProxy* CollectProxy;
   vtkSMSourceProxy* CollectLODProxy;
-  vtkSMSourceProxy* PostProcessorProxy;
   
 private:
   vtkSMClientDeliveryStrategyProxy(const vtkSMClientDeliveryStrategyProxy&); // Not implemented
@@ -74,9 +73,9 @@ private:
   // Since LOD and full res pipeline have exactly the same setup, we have this
   // common method.
   void CreatePipelineInternal(vtkSMSourceProxy* input, vtkSMSourceProxy* collect,
-    vtkSMSourceProxy* updatesuppressor, vtkSMSourceProxy *postprocessor);
+    vtkSMSourceProxy* updatesuppressor);
   void UpdatePipelineInternal(vtkSMSourceProxy* collect,
-    vtkSMSourceProxy* updatesuppressor, vtkSMSourceProxy *postprocessor);
+    vtkSMSourceProxy* updatesuppressor);
 
 //ETX
 };
