@@ -57,6 +57,50 @@ public:
   // coloring is disabled.
   void SetColorArrayName(const char* name);
 
+  // Description:
+  // Set the ambient coefficient. This is used only when representation type is
+  // Surface.
+  void SetAmbient(double a)
+    {
+    if (this->Ambient != a)
+      {
+      this->Ambient = a;
+      this->UpdateShadingParameters();
+      this->Modified();
+      }
+    }
+
+  // Description:
+  // Set the diffuse coefficient. This is used only when representation type is
+  // Surface.
+  void SetDiffuse(double d)
+    {
+    if (this->Diffuse != d)
+      {
+      this->Diffuse = d;
+      this->UpdateShadingParameters();
+      this->Modified();
+      }
+    }
+
+  // Description:
+  // Set the specular coefficient. This is used only when representation type is
+  // Surface.
+  void SetSpecular(double d)
+    {
+    if (this->Specular != d)
+      {
+      this->Specular = d;
+      this->UpdateShadingParameters();
+      this->Modified();
+      }
+    }
+
+  // Description:
+  // Set the representation type.
+  // repr can be VTK_SURFACE or VTK_WIREFRAME or VTK_POINTS.
+  void SetRepresentation(int repr);
+
 //BTX
 protected:
   vtkSMSurfaceRepresentationProxy();
@@ -87,6 +131,10 @@ protected:
   void ConvertSurfaceSelectionToVolumeSelection(
    vtkSelection* input, vtkSelection* output);
 
+  // Description:
+  // Internal method to update actual diffuse/specular/ambient coefficients used
+  // based on the representation.
+  void UpdateShadingParameters();
 
   vtkSMSourceProxy* GeometryFilter;
   vtkSMProxy* Mapper;
@@ -94,6 +142,11 @@ protected:
   vtkSMProxy* Prop3D;
   vtkSMProxy* Property;
 
+  double Ambient;
+  double Diffuse;
+  double Specular;
+
+  int Representation;
 private:
   vtkSMSurfaceRepresentationProxy(const vtkSMSurfaceRepresentationProxy&); // Not implemented
   void operator=(const vtkSMSurfaceRepresentationProxy&); // Not implemented

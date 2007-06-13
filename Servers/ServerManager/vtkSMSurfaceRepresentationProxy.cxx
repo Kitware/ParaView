@@ -19,10 +19,12 @@
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkProperty.h"
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMCompoundProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
@@ -33,7 +35,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.11.2.1");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -42,6 +44,10 @@ vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
   this->LODMapper = 0;
   this->Prop3D = 0;
   this->Property = 0;
+  this->Ambient = 0.0;
+  this->Diffuse = 1.0;
+  this->Specular = 0.1;
+  this->Representation = VTK_SURFACE;
 
   this->SetSelectionSupported(true);
 }
@@ -284,6 +290,46 @@ void vtkSMSurfaceRepresentationProxy::SetColorAttributeType(int type)
     }
   this->Mapper->UpdateVTKObjects();
   this->LODMapper->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSurfaceRepresentationProxy::SetRepresentation(int repr)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->Property->GetProperty("Representation"));
+  ivp->SetElement(0, repr);
+  this->Property->UpdateVTKObjects();
+
+  this->Representation = repr;
+
+  // Change shading off for that wireframe/points.
+  this->UpdateShadingParameters();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSurfaceRepresentationProxy::UpdateShadingParameters()
+{
+  double diffuse = this->Diffuse;
+  double specular = this->Specular;
+  double ambient = this->Ambient;
+
+  if (this->Representation != VTK_SURFACE)
+    {
+    diffuse = 0.0;
+    ambient = 1.0;
+    specular = 0.0;
+    }
+
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->Property->GetProperty("Ambient"));
+  dvp->SetElement(0, ambient);
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->Property->GetProperty("Diffuse"));
+  dvp->SetElement(0, diffuse);
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->Property->GetProperty("Specular"));
+  dvp->SetElement(0, specular);
+  this->Property->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

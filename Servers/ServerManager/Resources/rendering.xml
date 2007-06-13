@@ -4636,6 +4636,7 @@
           <Property name="Opacity"/> 
           <Property name="PointSize"/> 
           <Property name="Representation"/> 
+          <Property name="Specular"/> 
           <Property name="SpecularColor"/> 
           <Property name="SpecularPower"/> 
         </ExposedProperties>
@@ -4700,6 +4701,46 @@
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
+
+      <IntVectorProperty
+        name="Representation"
+        command="SetRepresentation"
+        number_of_elements="1"
+        default_values="2"
+        update_self="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Points" />
+          <Entry value="1" text="Wireframe" />
+          <Entry value="2" text="Surface" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="Ambient"
+        command="SetAmbient"
+        number_of_elements="1"
+        default_values="0.0"
+        update_self="1">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Diffuse"
+        command="SetDiffuse"
+        number_of_elements="1"
+        default_values="1.0"
+        update_self="1">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Specular"
+        command="SetSpecular"
+        number_of_elements="1"
+        default_values="0.1"
+        update_self="1">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
 
       <SubProxy>
         <!-- 
@@ -4766,16 +4807,13 @@
         -->
         <Proxy name="Property" proxygroup="properties" proxyname="Property" />
         <ExposedProperties>
-          <Property name="Ambient" />
           <Property name="AmbientColor" />
           <Property name="Color" />
-          <Property name="Diffuse" />
           <Property name="DiffuseColor" />
           <Property name="Interpolation" />
           <Property name="LineWidth" />
           <Property name="Opacity" />
           <Property name="PointSize" />
-          <Property name="Representation" />
           <Property name="Shading" />
           <Property name="SpecularColor" />
           <Property name="SpecularPower" />
@@ -4824,6 +4862,8 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
+          <Property name="Specular" 
+                    exposed_name="SelectionSpecular" />
           <Property name="SpecularColor" 
                     exposed_name="SelectionSpecularColor" />
           <Property name="SpecularPower" 
@@ -4946,6 +4986,7 @@
           <Property name="PointSize" />
           <Property name="Representation" />
           <Property name="Shading" />
+          <Property name="Specular" />
           <Property name="SpecularColor" />
           <Property name="SpecularPower" />
         </ExposedProperties>
@@ -4977,6 +5018,8 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
+          <Property name="Specular" 
+                    exposed_name="SelectionSpecular" />
           <Property name="SpecularColor" 
                     exposed_name="SelectionSpecularColor" />
           <Property name="SpecularPower" 
@@ -5097,6 +5140,8 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
+          <Property name="Specular" 
+                    exposed_name="SelectionSpecular" />
           <Property name="SpecularColor" 
                     exposed_name="SelectionSpecularColor" />
           <Property name="SpecularPower" 
@@ -5286,6 +5331,8 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
+          <Property name="Specular" 
+                    exposed_name="SelectionSpecular" />
           <Property name="SpecularColor" 
                     exposed_name="SelectionSpecularColor" />
           <Property name="SpecularPower" 
@@ -5372,6 +5419,7 @@
           <Property name="PointSize" />
           <Property name="Representation" />
           <Property name="Shading" />
+          <Property name="Specular" />
           <Property name="SpecularColor" />
           <Property name="SpecularPower" />
         </ExposedProperties>
@@ -5413,6 +5461,8 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
+          <Property name="Specular" 
+                    exposed_name="SelectionSpecular" />
           <Property name="SpecularColor" 
                     exposed_name="SelectionSpecularColor" />
           <Property name="SpecularPower" 
