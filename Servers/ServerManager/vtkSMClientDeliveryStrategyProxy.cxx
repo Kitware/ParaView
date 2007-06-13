@@ -24,7 +24,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryStrategyProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryStrategyProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMClientDeliveryStrategyProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryStrategyProxy::vtkSMClientDeliveryStrategyProxy()
 {
@@ -186,13 +186,7 @@ void vtkSMClientDeliveryStrategyProxy::UpdatePipelineInternal(
   vtkSMSourceProxy* collect, vtkSMSourceProxy* updatesuppressor,
   vtkSMSourceProxy* postprocessor)
 {
-  vtkSMSourceProxy* input = 0;
-  vtkSMInputProperty* inProp = vtkSMInputProperty::SafeDownCast(
-    this->GetProperty("Input"));
-  if (inProp && inProp->GetNumberOfProxies() == 1)
-    {
-    input = vtkSMSourceProxy::SafeDownCast(inProp->GetProxy(0));
-    }
+  vtkSMSourceProxy* input = this->Input;
   if (input)
     {
     input->UpdatePipeline();
