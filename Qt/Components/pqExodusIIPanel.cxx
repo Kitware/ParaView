@@ -67,6 +67,7 @@ public:
   pqUI(pqExodusIIPanel* p) : QObject(p)
   {
   }
+  QVector<double> TimestepValues;
 };
 
 pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
@@ -117,7 +118,10 @@ void pqExodusIIPanel::addSelectionToTreeWidget(const QString& name,
     QPixmap(":/pqWidgets/Icons/pqPointData16.png"),
     QPixmap(":/pqWidgets/Icons/pqCellData16.png"),
     QPixmap(":/pqWidgets/Icons/pqSideSet16.png"),
-    QPixmap(":/pqWidgets/Icons/pqNodeSet16.png")
+    QPixmap(":/pqWidgets/Icons/pqNodeSet16.png"),
+    QPixmap(":/pqWidgets/Icons/pqCellCenterData16.png"),
+    QPixmap(":/pqWidgets/Icons/pqFaceCenterData16.png"),
+    QPixmap(":/pqWidgets/Icons/pqEdgeCenterData16.png")
     };
 
   vtkSMProperty* SMProperty = this->proxy()->GetProperty(prop.toAscii().data());
@@ -159,16 +163,24 @@ void pqExodusIIPanel::linkServerManagerProperties()
                    PM_ELEM, "GenerateObjectIdCellArray");
   
   this->addSelectionToTreeWidget("Global Element Ids", "GlobalElementId", this->UI->Variables,
-                   PM_ELEM, "GenerateGlobalElementIdArray");
+                   PM_ELEMBLK, "GenerateGlobalElementIdArray");
   
   // do the cell variables
   this->addSelectionsToTreeWidget("ElementResultArrayStatus",
-                                  this->UI->Variables, PM_ELEM);
+                                  this->UI->Variables, PM_ELEMBLK);
+  
+  // do the face variables
+  this->addSelectionsToTreeWidget("FaceResultArrayStatus",
+                                  this->UI->Variables, PM_FACEBLK);
+  
+  // do the edge variables
+  this->addSelectionsToTreeWidget("EdgeResultArrayStatus",
+                                  this->UI->Variables, PM_EDGEBLK);
+  
   
   this->addSelectionToTreeWidget("Global Node Ids", "GlobalNodeId", this->UI->Variables,
                    PM_NODE, "GenerateGlobalNodeIdArray");
 
-  
   int numBef = this->UI->Variables->topLevelItemCount();
   
   // do the node variables
@@ -257,6 +269,48 @@ void pqExodusIIPanel::linkServerManagerProperties()
   // update ranges to begin with
   this->updateDataRanges();
 
+  // Get the timestep values.  Note that the TimestepValues property will change
+  // if HasModeShapes is on.  However, we know that when this method is called
+  // on initialization, it has the actual time steps in the data.  Store the
+  // values now.
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+                      this->proxy()->GetProperty("TimestepValues"));
+  this->UI->TimestepValues.resize(dvp->GetNumberOfElements());
+  qCopy(dvp->GetElements(), dvp->GetElements()+dvp->GetNumberOfElements(),
+        this->UI->TimestepValues.begin());
+
+  // connect the mode shapes
+  this->propertyManager()->registerLink(this->UI->HasModeShapes,
+                                        "checked",
+                                        SIGNAL(toggled(bool)),
+                                        this->proxy(),
+                                        this->proxy()->
+                                        GetProperty("HasModeShapes"));
+  this->UI->ModeSelectSlider->setMaximum(this->UI->TimestepValues.size()-1);
+  this->UI->ModeSelectSlider->setMaximum(this->UI->TimestepValues.size()-1);
+  if (this->UI->TimestepValues.size() > 0)
+    {
+    this->UI->ModeLabel->setText(
+                                QString("%1").arg(this->UI->TimestepValues[0]));
+    }
+  this->propertyManager()->registerLink(this->UI->ModeSelectSlider,
+                                        "value",
+                                        SIGNAL(valueChanged(int)),
+                                        this->proxy(),
+                                        this->proxy()
+                                        ->GetProperty("ModeShape"));
+  this->propertyManager()->registerLink(this->UI->ModeSelectSpinBox,
+                                        "value",
+                                        SIGNAL(valueChanged(int)),
+                                        this->proxy(),
+                                        this->proxy()
+                                        ->GetProperty("ModeShape"));
+  QObject::connect(this->UI->HasModeShapes, SIGNAL(toggled(bool)),
+                   this->UI->ModeShapeOptions, SLOT(setEnabled(bool)));
+  QObject::connect(this->UI->ModeSelectSlider, SIGNAL(sliderMoved(int)),
+                   this, SLOT(modeChanged(int)));
+  QObject::connect(this->UI->ModeSelectSpinBox, SIGNAL(valueChanged(int)),
+                   this, SLOT(modeChanged(int)));
 }
   
 void pqExodusIIPanel::applyDisplacements(int state)
@@ -317,6 +371,15 @@ QString pqExodusIIPanel::formatDataFor(vtkPVArrayInformation* ai)
     info = "Unavailable";
     }
   return info;
+}
+
+void pqExodusIIPanel::modeChanged(int value)
+{
+  if ((value >= 0) && (value < this->UI->TimestepValues.size()))
+    {
+    this->UI->ModeLabel->setText(
+                            QString("%1").arg(this->UI->TimestepValues[value]));
+    }
 }
 
 void pqExodusIIPanel::updateDataRanges()

@@ -2488,27 +2488,46 @@
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty 
-        name="TimeStepRangeInfo"
-        command="GetTimeStepRange"
-        information_only="1">
-        <SimpleIntInformationHelper/>
+     <IntVectorProperty name="HasModeShapes"
+                        command="SetHasModeShapes"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         Some simulations overload the Exodus time steps to represent mode
+         shapes.  In this case, it does not make sense to iterate over the
+         "time steps", because they are not meant to be played in order.
+         Rather, each represents the vibration at a different "mode."
+         Setting the value of this property to 1 changes the semantics of the reader to not
+         report the time steps to downstream filters.
+       </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty 
-        name="TimeStep"
-        command="SetTimeStep"
-        number_of_elements="1"
-        default_values="0"
-        animateable="0"
-        information_property="TimestepValues">
+     <!-- The following two properties magically send time information -->
+     <!-- to the animation panel.  Usually you only need one (the former -->
+     <!-- for discrete time, the latter for continuous time), but changing -->
+     <!-- the HasModeShapes ivar switches between discrete and continuous -->
+     <!-- time. -->
+     <DoubleVectorProperty name="TimestepValues" information_only="1">
+       <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
+     <DoubleVectorProperty name="TimeRange" information_only="1">
+       <TimeRangeInformationHelper/>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty name="ModeShape"
+                        command="SetTimeStep"
+                        number_of_elements="1"
+                        default_values="0"
+                        animateable="0"
+                        information_property="TimestepValues">
        <IntRangeDomain name="range">
-          <RequiredProperties>
-             <Property name="TimeStepRangeInfo" function="Range"/>
-          </RequiredProperties>
+         <RequiredProperties>
+           <Property name="TimeStepRangeInfo" function="Range"/>
+         </RequiredProperties>
        </IntRangeDomain>
        <Documentation>
-         This property specifies the current timestep.
+         Specify the current mode shape with HasModeShapes in on.
        </Documentation>
      </IntVectorProperty>
      

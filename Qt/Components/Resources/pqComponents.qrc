@@ -197,5 +197,8 @@
         <file>Icons/pqZPlus16.png</file>
         <file>Icons/pqZPlus24.png</file>
         <file>Icons/pqZPlus32.png</file>
+        <file>Icons/pqCellCenterData16.png</file>
+        <file>Icons/pqFaceCenterData16.png</file>
+        <file>Icons/pqEdgeCenterData16.png</file>
     </qresource>
 </RCC>
