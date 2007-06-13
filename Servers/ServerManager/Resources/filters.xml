@@ -2440,7 +2440,7 @@ The Quadric Clustering filter produces a reduced-resolution polygonal approximat
         name="UseInputPoints" 
         command="SetUseInputPoints" 
         number_of_elements="1"
-        default_values="0" > 
+        default_values="1" > 
        <BooleanDomain name="bool"/>
        <Documentation>
          If the value of this property is set to 1, the representative point for each bin is selected from one of the input points that lies in that bin; the input point that produces the least error is chosen. If the value of this property is 0, the location of the representative point is calculated to produce the least error possible for that bin, but the point will most likely not be one of the input points.
@@ -2473,7 +2473,7 @@ The Quadric Clustering filter produces a reduced-resolution polygonal approximat
         name="CopyCellData" 
         command="SetCopyCellData" 
         number_of_elements="1"
-        default_values="0" > 
+        default_values="1" > 
        <BooleanDomain name="bool"/>
        <Documentation>
          If this property is set to 1, the cell data from the input will be copied to the output.
