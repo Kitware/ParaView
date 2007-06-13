@@ -261,6 +261,10 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->ResetButton->setEnabled(false);
   this->DeleteButton->setEnabled(false);
 
+  // Change the accept button palette so it is green when it is active.
+  QPalette acceptPalette = this->AcceptButton->palette();
+  acceptPalette.setColor(QPalette::Active, QPalette::Button, QColor(161, 213, 135));
+  this->AcceptButton->setPalette(acceptPalette);
 
   this->connect(pqApplicationCore::instance()->getServerManagerModel(), 
                 SIGNAL(sourceRemoved(pqPipelineSource*)),
