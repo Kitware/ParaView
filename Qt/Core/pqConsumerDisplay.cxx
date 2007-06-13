@@ -84,7 +84,7 @@ pqConsumerDisplay::~pqConsumerDisplay()
 {
   if (this->Internal->Input)
     {
-    this->Internal->Input->removeDisplay(this);
+    //this->Internal->Input->removeDisplay(this);
     }
   delete this->Internal;
 }
@@ -136,11 +136,11 @@ void pqConsumerDisplay::onInputChanged()
   // Now tell the pqPipelineSource about the changes in the displays.
   if (removed)
     {
-    removed->removeDisplay(this);
+    //removed->removeDisplay(this);
     }
   if (added)
     {
-    added->addDisplay(this);
+    //added->addDisplay(this);
     }
 }
 

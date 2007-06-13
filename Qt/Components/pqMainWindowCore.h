@@ -57,13 +57,14 @@ class pqPipelineSource;
 class pqPlotViewModule;
 class pqProxy;
 class pqProxyTabWidget;
-class pqRenderViewModule;
+class pqRenderView;
 class pqSelectionManager;
 class pqServer;
 class pqServerManagerModelItem;
 class pqToolsMenu;
 class pqUndoStack;
 class pqVCRController;
+class pqView;
 class pqViewManager;
 class pqViewMenu;
 class vtkUnstructuredGrid;
@@ -282,7 +283,7 @@ public slots:
   // Right now this creates one for a single render view only.
   void onToolsCreateLookmark();
   void onToolsCreateLookmark(QWidget* widget);
-  void onToolsCreateLookmark(pqGenericViewModule*);
+  void onToolsCreateLookmark(pqView*);
 
   // Have the main window handle all lookmark load signals (from the toolbar, inspector, browser)
   // Load a lookmark with the given name on the active server. 
@@ -362,8 +363,14 @@ private slots:
 
   void onSelectionChanged();
   void onPendingDisplayChanged(bool pendingDisplays);
-  void onActiveViewChanged(pqGenericViewModule *view);
+
+  /// Called when the active view in the pqActiveView singleton changes.
+  void onActiveViewChanged(pqView* view);
+
   void onActiveViewUndoChanged();
+
+  /// Called when the active animation scene changes. We update the menu state
+  /// for items such as "Save Animation"/"Save Geometry".
   void onActiveSceneChanged(pqAnimationScene *scene);
 
   /// Called when a new source/filter/reader is created
@@ -413,7 +420,7 @@ private:
   pqServerManagerModelItem *getActiveObject() const;
   void updatePendingActions(pqServer *server, pqPipelineSource *source,
       int numServers, bool pendingDisplays);
-  void updateViewUndoRedo(pqRenderViewModule *renderModule);
+  void updateViewUndoRedo(pqRenderView* renderView);
   void saveRecentFilterMenu();
   class pqImplementation;
   pqImplementation* const Implementation;

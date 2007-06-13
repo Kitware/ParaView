@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
-#include "pqServerManagerModel.h"
+#include "pqServerManagerModel2.h"
 #include "pqSMAdaptor.h"
 
 #include <vtkstd/vector>
@@ -102,8 +102,8 @@ pqTimeKeeper::pqTimeKeeper( const QString& group, const QString& name,
   this->Internals->VTKConnect->Connect(timekeeper->GetProperty("Time"),
     vtkCommand::ModifiedEvent, this, SIGNAL(timeChanged()));
 
-  pqServerManagerModel* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerModel2* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel2();
 
   QObject::connect(smmodel, SIGNAL(sourceAdded(pqPipelineSource*)),
     this, SLOT(sourceAdded(pqPipelineSource*)));
@@ -115,7 +115,8 @@ pqTimeKeeper::pqTimeKeeper( const QString& group, const QString& name,
   // (happens when loading state).
   // So we pretend that every one of the sources is getting
   // newly added.
-  QList<pqPipelineSource*> sources = smmodel->getSources(this->getServer());
+  QList<pqPipelineSource*> sources = smmodel->findItems<pqPipelineSource*>(
+    this->getServer());
   foreach(pqPipelineSource* src, sources)
     {
     this->sourceAdded(src);
@@ -237,8 +238,9 @@ void pqTimeKeeper::propertyModified(vtkObject* obj, unsigned long, void*, void* 
     return;
     }
 
-  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
-  pqPipelineSource* source = smmodel->getPQSource(proxy);
+  pqServerManagerModel2* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel2();
+  pqPipelineSource* source = smmodel->findItem<pqPipelineSource*>(proxy);
   if (source)
     {
     this->propertyModified(source);

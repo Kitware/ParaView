@@ -260,8 +260,10 @@ void pqPipelineDisplay::setDefaultPropertyValues()
   if (myInput && myInput->getInputCount() > 0)
     {
     pqPipelineSource* myInputsInput = myInput->getInput(0);
+    /*
     upstreamDisplay = qobject_cast<pqPipelineDisplay*>(
       myInputsInput->getDisplay(this->getViewModule(0)));
+      */
     if (upstreamDisplay)
       {
       inGeomInfo = upstreamDisplay->getDisplayProxy()->GetDisplayedDataInformation();

@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataInformationModel.h"
 #include "pqDataInformationModelSelectionAdaptor.h"
 #include "pqSectionVisibilityContextMenu.h"
-#include "pqServerManagerModel.h"
+#include "pqServerManagerModel2.h"
 #include "pqSetName.h"
 
 //-----------------------------------------------------------------------------
@@ -74,8 +74,8 @@ pqDataInformationWidget::pqDataInformationWidget(QWidget* _parent /*=0*/)
     _layout->addWidget(this->View);
     }
 
-  pqServerManagerModel* smModel = 
-    pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerModel2* smModel = 
+    pqApplicationCore::instance()->getServerManagerModel2();
   QObject::connect(smModel, SIGNAL(sourceAdded(pqPipelineSource*)),
     this->Model, SLOT(addSource(pqPipelineSource*)));
   QObject::connect(smModel, SIGNAL(sourceRemoved(pqPipelineSource*)),

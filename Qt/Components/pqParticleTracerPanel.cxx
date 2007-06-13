@@ -34,12 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqLineSourceWidget.h"
 #include "pqNamedWidgets.h"
-#include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPointSourceWidget.h"
 #include "pqPropertyManager.h"
-#include "pqServerManagerModel.h"
-#include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
 

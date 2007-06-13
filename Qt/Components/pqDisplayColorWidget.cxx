@@ -32,13 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDisplayColorWidget.h"
 
-#include "vtkSMDataObjectDisplayProxy.h"
-#include "vtkPVArrayInformation.h"
-#include "vtkPVGeometryInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMStringVectorProperty.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVGeometryInformation.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMStringVectorProperty.h"
 
 #include <QComboBox>
 #include <QHBoxLayout>
@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTimer>
 
 #include "pqApplicationCore.h"
-#include "pqPipelineDisplay.h"
+#include "pqPipelineRepresentation.h"
 #include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
@@ -212,7 +212,7 @@ const QString pqDisplayColorWidget::variableData(pqVariableType type,
 void pqDisplayColorWidget::onVariableChanged(pqVariableType type, 
   const QString& name)
 {
-  pqPipelineDisplay* display = this->getDisplay();
+  pqPipelineRepresentation* display = this->getRepresentation();
   if (display)
     {
     emit this->begin("Color Change");
@@ -223,15 +223,15 @@ void pqDisplayColorWidget::onVariableChanged(pqVariableType type,
       break;
     case VARIABLE_TYPE_NODE:
       display->colorByArray(name.toAscii().data(),
-        vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+        vtkSMDataRepresentationProxy::POINT_DATA);
       break;
     case VARIABLE_TYPE_CELL:
       display->colorByArray(name.toAscii().data(), 
-        vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+        vtkSMDataRepresentationProxy::CELL_DATA);
       break;
       }
     emit this->end();
-    display->renderAllViews();
+    display->renderViewEventually();
     }
 }
 
@@ -239,7 +239,7 @@ void pqDisplayColorWidget::onVariableChanged(pqVariableType type,
 void pqDisplayColorWidget::updateGUI()
 {
   this->BlockEmission = true;
-  pqPipelineDisplay* display = this->getDisplay();
+  pqPipelineRepresentation* display = this->getRepresentation();
   if (display)
     {
     int index = this->AvailableArrays.indexOf(display->getColorField());
@@ -253,7 +253,7 @@ void pqDisplayColorWidget::updateGUI()
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplayColorWidget::setDisplay(pqConsumerDisplay* display) 
+void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* display) 
 {
   if(display == this->Display)
     {
@@ -266,25 +266,20 @@ void pqDisplayColorWidget::setDisplay(pqConsumerDisplay* display)
     }
 
   this->VTKConnect->Disconnect();
-  this->Display = dynamic_cast<pqPipelineDisplay*>(display);
+  this->Display = qobject_cast<pqPipelineRepresentation*>(display);
   if(this->Display)
     {
-    vtkSMDataObjectDisplayProxy* displayProxy;
-    displayProxy = this->Display->getDisplayProxy();
-    this->VTKConnect->Connect(displayProxy->GetProperty("ScalarVisibility"),
+    vtkSMProxy* repr = this->Display->getProxy();
+    this->VTKConnect->Connect(repr->GetProperty("ColorAttributeType"),
       vtkCommand::ModifiedEvent, this, SLOT(reloadGUI()),
       NULL, 0.0,
       Qt::QueuedConnection);
-    this->VTKConnect->Connect(displayProxy->GetProperty("ScalarMode"),
-      vtkCommand::ModifiedEvent, this, SLOT(reloadGUI()),
-      NULL, 0.0,
-      Qt::QueuedConnection);
-    this->VTKConnect->Connect(displayProxy->GetProperty("ColorArray"),
+    this->VTKConnect->Connect(repr->GetProperty("ColorArrayName"),
       vtkCommand::ModifiedEvent, this, SLOT(reloadGUI()),
       NULL, 0.0,
       Qt::QueuedConnection);
     this->VTKConnect->Connect(
-      displayProxy->GetProperty("Representation"), vtkCommand::ModifiedEvent, 
+      repr->GetProperty("Representation"), vtkCommand::ModifiedEvent, 
       this, SLOT(reloadGUI()),
       NULL, 0.0,
       Qt::QueuedConnection);
@@ -298,7 +293,7 @@ void pqDisplayColorWidget::setDisplay(pqConsumerDisplay* display)
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineDisplay* pqDisplayColorWidget::getDisplay() const
+pqPipelineRepresentation* pqDisplayColorWidget::getRepresentation() const
 {
   return this->Display;
 }
@@ -309,7 +304,7 @@ void pqDisplayColorWidget::reloadGUI()
   this->BlockEmission = true;
   this->clear();
 
-  pqPipelineDisplay* display = this->getDisplay();
+  pqPipelineRepresentation* display = this->getRepresentation();
   if (!display)
     {
     this->addVariable(VARIABLE_TYPE_NONE, "Solid Color");

@@ -36,16 +36,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include "pqDisplayPanel.h"
 
-class pqDisplay;
-class pqDisplayProxyEditorWidgetInternal;
-class pqGenericViewModule;
-class pqPipelineDisplay;
 class pqPipelineSource;
+class pqRepresentation;
+class pqView;
 
-// This is a widget that can create different kinds of display
-// editors based on the type of the display. It encapsulates the code
+// This is a widget that can create different kinds of display 
+// editors based on the type of the representations. It encapsulates the code
 // to decide what GUI for display editing must be shown to the user
-// based on the type of the display.
+// based on the type of the representation.
 class PQCOMPONENTS_EXPORT pqDisplayProxyEditorWidget : public QWidget
 {
   Q_OBJECT
@@ -54,16 +52,16 @@ public:
   virtual ~pqDisplayProxyEditorWidget();
 
   /// Set the source and view. Source and view are used by this class
-  /// only if display is NULL. It is used to decide if a new display 
-  /// can be created for the source at all.
+  /// only if representation is NULL. It is used to decide if a new
+  /// representation can be created for the source at all.
   void setSource(pqPipelineSource* source);
-  void setView(pqGenericViewModule* view);
+  void setView(pqView* view);
 
-  /// Set the display to edit. If NULL, source and view must be set so
+  /// Set the representation to edit. If NULL, source and view must be set so
   /// that the widget can show a default GUI which allows the user to
-  /// turn visibility on which entails creating a new display.
-  void setDisplay(pqDisplay*);
-  pqDisplay* getDisplay() const;
+  /// turn visibility on which entails creating a new representation.
+  void setRepresentation(pqRepresentation*);
+  pqRepresentation* getRepresentation() const;
 
 public slots:
   void reloadGUI();
@@ -82,17 +80,18 @@ private:
   pqDisplayProxyEditorWidget(const pqDisplayProxyEditorWidget&); // Not implemented.
   void operator=(const pqDisplayProxyEditorWidget&); // Not implemented.
 
-  pqDisplayProxyEditorWidgetInternal *Internal;
+  class pqInternal;
+  pqInternal* Internal;
   void showDefaultWidget();
 };
 
 
-/// default display panel with only a visibility checkbox
+/// default representation panel with only a visibility checkbox
 class pqDefaultDisplayPanel : public pqDisplayPanel
 {
   Q_OBJECT
 public:
-  pqDefaultDisplayPanel(pqDisplay* display, QWidget* p);
+  pqDefaultDisplayPanel(pqRepresentation* repr, QWidget* p);
   ~pqDefaultDisplayPanel();
 
 signals:

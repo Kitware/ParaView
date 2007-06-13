@@ -65,13 +65,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileChooserWidget.h"
 #include "pqListWidgetItemObject.h"
 #include "pqObjectPanel.h"
-#include "pqPipelineDisplay.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyManager.h"
 #include "pqProxySelectionWidget.h"
 #include "pqTreeWidget.h"
-#include "pqServerManagerModel.h"
+#include "pqServerManagerModel2.h"
 #include "pqServerManagerObserver.h"
 #include "pqSignalAdaptorSelectionTreeWidget.h"
 #include "pqSignalAdaptors.h"
@@ -301,14 +300,15 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
     QComboBox* comboBox = qobject_cast<QComboBox*>(object);
     if(comboBox)
       {
+      pqServerManagerModel2* smmodel = 
+        pqApplicationCore::instance()->getServerManagerModel2();
       // TODO: use pqComboBoxDomain
       QList<pqSMProxy> propertyDomain = 
         pqSMAdaptor::getProxyPropertyDomain(SMProperty);
       comboBox->clear();
       foreach(pqSMProxy v, propertyDomain)
         {
-        pqPipelineSource* o = 
-          pqServerManagerModel::instance()->getPQSource(v);
+        pqPipelineSource* o = smmodel->findItem<pqPipelineSource*>(v);
         if(o)
           {
           comboBox->addItem(o->getSMName());
@@ -339,9 +339,9 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
       pqObjectPanel* object_panel = qobject_cast<pqObjectPanel*>(parent);
       if(object_panel)
         {
-        w->setRenderModule(object_panel->renderModule());
-        QObject::connect(parent, SIGNAL(renderModuleChanged(pqRenderViewModule*)),
-                         w, SLOT(setRenderModule(pqRenderViewModule*)));
+        w->setView(object_panel->view());
+        QObject::connect(parent, SIGNAL(viewChanged(pqView*)),
+                         w, SLOT(setView(pqView*)));
         QObject::connect(parent, SIGNAL(onaccept()), w, SLOT(accept()));
         QObject::connect(parent, SIGNAL(onreset()), w, SLOT(reset()));
         QObject::connect(parent, SIGNAL(onselect()), w, SLOT(select()));

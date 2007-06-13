@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqMainWindowCore.h"
 #include "pqProxy.h"
-#include "pqServerManagerModel.h"
+#include "pqServerManagerModel2.h"
 #include "pqViewManager.h"
 
 //-----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqStateLoader);
-vtkCxxRevisionMacro(pqStateLoader, "1.8");
+vtkCxxRevisionMacro(pqStateLoader, "1.8.6.1");
 //-----------------------------------------------------------------------------
 pqStateLoader::pqStateLoader()
 {
@@ -239,8 +239,8 @@ int pqStateLoader::BuildProxyCollectionInformation(
 //-----------------------------------------------------------------------------
 void pqStateLoader::DiscoverHelperProxies()
 {
-  pqServerManagerModel* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerModel2* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel2();
   QRegExp helper_group_rx ("pq_helper_proxies.(\\d+)");
 
   foreach(vtkPVXMLElement* proxyCollection, 
@@ -254,7 +254,7 @@ void pqStateLoader::DiscoverHelperProxies()
     int proxyid = helper_group_rx.cap(1).toInt();
     vtkSmartPointer<vtkSMProxy> proxy;
     proxy.TakeReference(this->NewProxy(proxyid));
-    pqProxy *pq_proxy = smmodel->getPQProxy(proxy);
+    pqProxy *pq_proxy = smmodel->findItem<pqProxy*>(proxy);
     if (!pq_proxy)
       {
       continue;

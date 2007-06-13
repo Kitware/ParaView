@@ -78,7 +78,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqXYPlotDisplayProxyEditor::pqXYPlotDisplayProxyEditor(pqDisplay* display, QWidget* p)
+pqXYPlotDisplayProxyEditor::pqXYPlotDisplayProxyEditor(pqRepresentation* display, QWidget* p)
   : pqDisplayPanel(display, p)
 {
   this->Internal = new pqXYPlotDisplayProxyEditor::pqInternal();
@@ -124,7 +124,7 @@ pqXYPlotDisplayProxyEditor::~pqXYPlotDisplayProxyEditor()
 }
 
 //-----------------------------------------------------------------------------
-void pqXYPlotDisplayProxyEditor::setDisplay(pqDisplay* disp)
+void pqXYPlotDisplayProxyEditor::setDisplay(pqRepresentation* disp)
 {
   pqLineChartDisplay* display = qobject_cast<pqLineChartDisplay*>(disp);
   if (this->Internal->Display == display)

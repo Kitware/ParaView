@@ -50,8 +50,7 @@ class pqObjectPanel;
 class QPushButton;
 class pqPipelineSource;
 class pqObjectPanel;
-class pqGenericViewModule;
-class pqRenderViewModule;
+class pqView;
 class pqObjectPanelInterface;
 
 
@@ -69,9 +68,8 @@ public:
   /// hint for sizing this widget
   virtual QSize sizeHint() const;
   
-  
   /// get the render module to work in
-  pqRenderViewModule* getRenderModule();
+  pqView* view();
 
 public slots:
   void setProxy(pqProxy *proxy);
@@ -88,7 +86,7 @@ public slots:
   void canAccept(bool status);
 
   /// set the render module to work in
-  void setView(pqGenericViewModule* view);
+  void setView(pqView* view);
 
   /// set the visibility of the delete button.
   void setDeleteButtonVisibility(bool visible);
@@ -110,7 +108,7 @@ signals:
   void postreject();
 
   /// emitted when render module is changed
-  void renderModuleChanged(pqRenderViewModule*);
+  void viewChanged(pqView*);
 
 protected slots:
 
@@ -131,7 +129,7 @@ private:
   QPushButton* AcceptButton;
   QPushButton* ResetButton;
   QPushButton* DeleteButton;
-  QPointer<pqRenderViewModule> RenderModule;
+  QPointer<pqView> View;
   
   pqObjectPanel* CurrentPanel;
   QMap<pqProxy*, pqObjectPanel*> QueuedPanels;

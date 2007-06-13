@@ -384,7 +384,8 @@ void pqLookmarkManagerModel::exportLookmarksToFiles(const QList<pqLookmarkModel*
     }
 }
 
-void pqLookmarkManagerModel::loadLookmark(pqServer *server, pqGenericViewModule *view, QList<pqPipelineSource*> *sources, pqLookmarkModel *lookmark)
+void pqLookmarkManagerModel::loadLookmark(pqServer *server, pqView *view, 
+  QList<pqPipelineSource*> *sources, pqLookmarkModel *lookmark)
 {
   if(!server || !lookmark)
     {
@@ -394,7 +395,8 @@ void pqLookmarkManagerModel::loadLookmark(pqServer *server, pqGenericViewModule 
   this->loadLookmark(server, view, sources, lookmark->getName());
 }
 
-void pqLookmarkManagerModel::loadLookmark(pqServer *server, pqGenericViewModule *view, QList<pqPipelineSource*> *sources, const QString &name)
+void pqLookmarkManagerModel::loadLookmark(pqServer *server, pqView *view, 
+  QList<pqPipelineSource*> *sources, const QString &name)
 {
   foreach (pqLookmarkModel* tempLmk, this->Internal->Lookmarks)
     {

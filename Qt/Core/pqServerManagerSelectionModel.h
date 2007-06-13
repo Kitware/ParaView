@@ -39,16 +39,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 #include "pqServerManagerModelItem.h"
 
-class pqServerManagerModel;
+class pqServerManagerModel2;
 class pqServerManagerModelItem;
 class pqServerManagerSelection;
 class pqServerManagerSelectionModelInternal;
 
 // This is a QItemSelectionModel-like selection model for the
-// pqServerManagerModel. pqServerManagerSelectionModel is part
+// pqServerManagerModel2. pqServerManagerSelectionModel is part
 // of the "Synchronized Selection" mechanism, which makes it 
 // possible for different Qt views based on different Qt models, all
-// of which are based on thq pqServerManagerModel to coordintae selection
+// of which are based on thq pqServerManagerModel2 to coordintae selection
 // state.
 class PQCORE_EXPORT pqServerManagerSelectionModel : public QObject
 {
@@ -66,7 +66,7 @@ public:
   Q_DECLARE_FLAGS(SelectionFlags, SelectionFlag)
 
 public:
-  pqServerManagerSelectionModel(pqServerManagerModel* model, 
+  pqServerManagerSelectionModel(pqServerManagerModel2* model, 
     QObject* parent=NULL);
   virtual ~pqServerManagerSelectionModel();
 
@@ -83,8 +83,8 @@ public:
   // Returns true if the item is selected.
   bool isSelected(pqServerManagerModelItem* item) const;
 
-  // Returns the pqServerManagerModel operated on by the selection model.
-  pqServerManagerModel* model() const;
+  // Returns the pqServerManagerModel2 operated on by the selection model.
+  pqServerManagerModel2* model() const;
 
   // Returns the list of selected items.
   const pqServerManagerSelection* selectedItems() const;

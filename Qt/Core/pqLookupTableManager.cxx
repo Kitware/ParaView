@@ -35,14 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqScalarsToColors.h"
-#include "pqServerManagerModel.h"
+#include "pqServerManagerModel2.h"
 
 //-----------------------------------------------------------------------------
 pqLookupTableManager::pqLookupTableManager(QObject* _parent/*=0*/)
   : QObject(_parent)
 {
-  pqServerManagerModel* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerModel2* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel2();
   QObject::connect(smmodel, SIGNAL(proxyAdded(pqProxy*)),
     this, SLOT(onAddProxy(pqProxy*)));
   QObject::connect(smmodel, SIGNAL(proxyRemoved(pqProxy*)),

@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include <QObject>
 
-class pqConsumerDisplay;
-class pqGenericViewModule;
+class pqDataRepresentation;
+class pqView;
 class pqPipelineSource;
 class pqProxy;
 class pqServerManagerSelectionModel;
@@ -87,7 +87,7 @@ public slots:
   /// active display.
   ///
   /// \param view The new active view.
-  void setActiveView(pqGenericViewModule *view);
+  void setActiveView(pqView *view);
 
 signals:
   /// \brief
@@ -99,7 +99,7 @@ signals:
   ///   Emitted when the display to be shown changes.
   /// \param display The display to show.
   /// \param view The view the display is in.
-  void displayChanged(pqConsumerDisplay *display, pqGenericViewModule *view);
+  void representationChanged(pqDataRepresentation *display, pqView *view);
 
 private slots:
   /// Determines the source to show and emits the signal.
@@ -121,7 +121,7 @@ private slots:
   ///   Checks whether or not the current display is being removed.
   /// \param source The source owning the display.
   /// \param display The display being removed.
-  void checkDisplay(pqPipelineSource *source, pqConsumerDisplay *display);
+  void checkDisplay(pqPipelineSource *source, pqDataRepresentation *display);
 
 private:
   /// \brief
@@ -143,14 +143,14 @@ private:
   ///   Gets the display that should be shown in the display panel.
   /// \return
   ///   A pointer to the active display.
-  pqConsumerDisplay *findDisplay() const;
+  pqDataRepresentation *findDisplay() const;
 
 private:
   /// Used to find the selected item(s).
   pqServerManagerSelectionModel *Selection;
   pqPipelineSource *Source;   ///< Stores the active source.
-  pqConsumerDisplay *Display; ///< Stores the active display.
-  pqGenericViewModule *View;  ///< Stores the active view.
+  pqDataRepresentation *Display; ///< Stores the active display.
+  pqView *View;  ///< Stores the active view.
   bool ShowCurrent;           ///< True if the current is shown for multiple.
 };
 

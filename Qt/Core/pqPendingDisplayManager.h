@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 #include <QObject>
 
-class pqGenericViewModule;
+class pqView;
 class pqPendingDisplayUndoElement;
 class pqPipelineSource;
 class pqUndoStack;
@@ -66,7 +66,7 @@ public slots:
   void removePendingDisplayForSource(pqPipelineSource* s);
   
   /// create deferred displays. 
-  void createPendingDisplays(pqGenericViewModule* view);
+  void createPendingDisplays(pqView* view);
 
   /// get the number of deferred displays
   int getNumberOfPendingDisplays();

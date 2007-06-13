@@ -37,9 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
-#include "pqPipelineDisplay.h"
-#include "pqRenderViewModule.h"
-#include "pqScalarBarDisplay.h"
+#include "pqPipelineRepresentation.h"
+#include "pqRenderView.h"
+#include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
 #include "pqUndoStack.h"
 
@@ -47,8 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqScalarBarVisibilityAdaptor::pqInternal
 {
 public:
-  QPointer<pqPipelineDisplay> ActiveDisplay;
-  QPointer<pqRenderViewModule> ActiveRenderModule;
+  QPointer<pqPipelineRepresentation> ActiveDisplay;
+  QPointer<pqRenderView> ActiveRenderView;
   QPointer<pqScalarsToColors> ActiveLUT;
 };
 
@@ -60,7 +60,7 @@ pqScalarBarVisibilityAdaptor::pqScalarBarVisibilityAdaptor(QAction* p)
   QObject::connect(p, SIGNAL(toggled(bool)),
     this, SLOT(setScalarBarVisibility(bool)));
   QObject::connect(this, SIGNAL(canChangeVisibility(bool)),
-    p, SLOT(setEnabled(bool)));
+    p, SLOT(setEnabled(bool)), Qt::QueuedConnection);
   QObject::connect(this, SIGNAL(scalarBarVisible(bool)),
     p, SLOT(setChecked(bool)));
 
@@ -81,8 +81,8 @@ pqScalarBarVisibilityAdaptor::~pqScalarBarVisibilityAdaptor()
 }
 
 //-----------------------------------------------------------------------------
-void pqScalarBarVisibilityAdaptor::setActiveDisplay(pqConsumerDisplay *display,
-    pqGenericViewModule *view)
+void pqScalarBarVisibilityAdaptor::setActiveRepresentation(
+  pqDataRepresentation *display)
 {
   if(display != this->Internal->ActiveDisplay)
     {
@@ -91,11 +91,12 @@ void pqScalarBarVisibilityAdaptor::setActiveDisplay(pqConsumerDisplay *display,
       QObject::disconnect(this->Internal->ActiveDisplay, 0, this, 0);
       }
 
-    this->Internal->ActiveDisplay = dynamic_cast<pqPipelineDisplay *>(display);
-    this->Internal->ActiveRenderModule =
-        dynamic_cast<pqRenderViewModule *>(view);
+    this->Internal->ActiveDisplay = qobject_cast<pqPipelineRepresentation *>(display);
+    this->Internal->ActiveRenderView = 0;
     if(this->Internal->ActiveDisplay)
       {
+      this->Internal->ActiveRenderView =  
+        qobject_cast<pqRenderView *>(display->getView());
       QObject::connect(this->Internal->ActiveDisplay,
           SIGNAL(visibilityChanged(bool)), 
           this, SLOT(updateState()), Qt::QueuedConnection);
@@ -123,8 +124,8 @@ void pqScalarBarVisibilityAdaptor::setScalarBarVisibility(bool visible)
     return;
     }
 
-  pqScalarBarDisplay* sb = 
-    lut->getScalarBar(this->Internal->ActiveRenderModule);
+  pqScalarBarRepresentation* sb = 
+    lut->getScalarBar(this->Internal->ActiveRenderView);
 
   if (!sb && !visible)
     {
@@ -137,7 +138,7 @@ void pqScalarBarVisibilityAdaptor::setScalarBarVisibility(bool visible)
     {
     pqObjectBuilder* builder = 
       pqApplicationCore::instance()->getObjectBuilder();
-    sb = builder->createScalarBarDisplay(lut, this->Internal->ActiveRenderModule);
+    sb = builder->createScalarBarDisplay(lut, this->Internal->ActiveRenderView);
     sb->makeTitle(this->Internal->ActiveDisplay);
     }
   if (!sb)
@@ -149,7 +150,7 @@ void pqScalarBarVisibilityAdaptor::setScalarBarVisibility(bool visible)
 
   emit this->end();
 
-  sb->renderAllViews();
+  sb->renderViewEventually();
 
   this->updateState();
 }
@@ -190,7 +191,7 @@ void pqScalarBarVisibilityAdaptor::updateStateInternal()
   // Is the display colored with some array? Scalar bar only
   // is scalar coloring used.
   QString colorField = this->Internal->ActiveDisplay->getColorField();
-  if (colorField == "" || colorField == "Solid Color")
+  if (colorField == "" || colorField == pqPipelineRepresentation::solidColor())
     {
     emit this->canChangeVisibility(false);
     return;
@@ -208,8 +209,8 @@ void pqScalarBarVisibilityAdaptor::updateStateInternal()
   this->Internal->ActiveLUT = lut;
 
   // update check state.
-  pqScalarBarDisplay* sb = 
-    lut->getScalarBar(this->Internal->ActiveRenderModule);
+  pqScalarBarRepresentation* sb = 
+    lut->getScalarBar(this->Internal->ActiveRenderView);
   if (sb)
     {
     emit this->scalarBarVisible(sb->isVisible());

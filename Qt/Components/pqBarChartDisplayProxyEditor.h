@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDisplayPanel.h"
 
-class pqDisplay;
+class pqRepresentation;
 
 /// pqBarChartDisplayProxyEditor is the editor widget for
 /// a Bar Chart display.
@@ -42,7 +42,7 @@ class PQCOMPONENTS_EXPORT pqBarChartDisplayProxyEditor : public pqDisplayPanel
 {
   Q_OBJECT
 public:
-  pqBarChartDisplayProxyEditor(pqDisplay* display, QWidget* parent=0);
+  pqBarChartDisplayProxyEditor(pqRepresentation* display, QWidget* parent=0);
   virtual ~pqBarChartDisplayProxyEditor();
 
 public slots:
@@ -63,7 +63,7 @@ private:
   /// Set the display whose properties this editor is editing.
   /// This call will raise an error is the display is not
   /// a BarChartPlotDisplay proxy.
-  void setDisplay(pqDisplay* display);
+  void setRepresentation(pqRepresentation* display);
 
   pqBarChartDisplayProxyEditor(const pqBarChartDisplayProxyEditor&); // Not implemented.
   void operator=(const pqBarChartDisplayProxyEditor&); // Not implemented.

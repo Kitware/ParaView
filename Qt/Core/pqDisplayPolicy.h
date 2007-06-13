@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h" // Needed for PQCORE_EXPORT macro
 
 class pqPipelineSource;
-class pqGenericViewModule;
-class pqConsumerDisplay;
+class pqView;
+class pqDataRepresentation;
 class vtkSMProxy;
 
 /// Display policy defines the application specific policy
@@ -63,7 +63,7 @@ public:
   /// about preferred views for the source (use createPreferredDisplay instead). 
   /// It should simply create the display for the given arguments.
   virtual vtkSMProxy* newDisplayProxy(pqPipelineSource* source,
-    pqGenericViewModule* view) const;
+    pqView* view) const;
 
   /// Returns a new display for the given (source,view) pair, or NULL 
   /// on failure. If the \c view is not a preferred view to display the source
@@ -92,8 +92,8 @@ public:
   /// or not of the type preferred by the source, it may create a new view and 
   /// add the displayto new view. \c dont_create_view can be used to 
   /// override this behaviour.
-  virtual pqConsumerDisplay* createPreferredDisplay(
-    pqPipelineSource* source, pqGenericViewModule* view,
+  virtual pqDataRepresentation* createPreferredDisplay(
+    pqPipelineSource* source, pqView* view,
     bool dont_create_view) const;
 
   /// Set the visibility of the source in the given view. 
@@ -102,15 +102,15 @@ public:
   /// be created for the source. Since custom applications may not necessarily
   /// create new views, we provide this as part of display policy which can 
   /// be easily overridden by creating a new subclass.
-  virtual pqConsumerDisplay* setDisplayVisibility(
-    pqPipelineSource* source, pqGenericViewModule* view, bool visible);
+  virtual pqDataRepresentation* setDisplayVisibility(
+    pqPipelineSource* source, pqView* view, bool visible);
 
 protected:
   /// Determines the type of view that's preferred by the \c source. If \c view
   /// is of the preferred type, returns it. Otherwise a new view of the preferred 
   /// type may be created and returned.
-  virtual pqGenericViewModule* getPreferredView(pqPipelineSource* source,
-    pqGenericViewModule* view) const;
+  virtual pqView* getPreferredView(pqPipelineSource* source,
+    pqView* view) const;
 };
 
 #endif

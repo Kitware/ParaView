@@ -40,6 +40,8 @@ class vtkSMApplication;
 class vtkSMMultiViewRenderModuleProxy;
 class vtkSMProxyManager;
 class vtkSMRenderModuleProxy;
+class vtkSMMultiViewFactory;
+class vtkSMRenderViewProxy;
 
 #include "pqCoreExport.h"
 #include "pqServerManagerModelItem.h"
@@ -70,9 +72,17 @@ public:
   /// to remove it.
   vtkSMRenderModuleProxy* newRenderModule();
 
+  /// Returns the mutiview factory used for this connection.
+  vtkSMMultiViewFactory* getMultiViewFactory();
+
+  /// Creates and returns a new render view. A new render view is created and
+  /// it's the responsibility of the caller to delete it.
+  vtkSMRenderViewProxy* newRenderView();
+
   const pqServerResource& getResource();
   void setResource(const pqServerResource &server_resource);
 
+  /// Returns the connection id for the server connection.
   vtkIdType GetConnectionID();
 
   /// Return the number of data server partitions on this 
@@ -100,13 +110,14 @@ public:
   void getSupportedProxies(const QString& xmlgroup, QList<QString>& names);
 
 signals:
-  void nameChanged();
+  /// Fired when the name of the proxy is changed.
+  void nameChanged(pqServerManagerModelItem*);
 
 protected:
-  /// Creates vtkSMMultiViewRenderModuleProxy for this connection and 
+  /// Creates vtkSMMultiViewFactory for this connection and 
   /// initializes it to create render modules of correct type 
   /// depending upon the connection.
-  void createRenderModule();
+  void createMultiViewFactory();
 
   // Creates the TimeKeeper proxy for this connection.
   void createTimeKeeper();
@@ -118,6 +129,9 @@ private:
   pqServerResource Resource;
   vtkIdType ConnectionID;
   vtkSmartPointer<vtkSMMultiViewRenderModuleProxy> RenderModule;
+
+  vtkSmartPointer<vtkSMMultiViewFactory> MultiViewFactory;
+
   // TODO:
   // Each connection will eventually have a PVOptions object. 
   // For now, this is same as the vtkProcessModule::Options.

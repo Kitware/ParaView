@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqApplicationCore.h"
 #include "pqServerManagerSelectionModel.h"
-#include "pqServerManagerModel.h"
+#include "pqServerManagerModel2.h"
 #include "pqLookmarkSourceDialog.h"
 #include "pqPipelineModel.h"
 #include "pqTimeKeeper.h"
@@ -74,7 +74,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.11");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.11.4.1");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
@@ -88,7 +88,8 @@ pqLookmarkStateLoader::pqLookmarkStateLoader()
   this->Internal->TimeKeeper = 0;
   this->Internal->SourceProxyCollectionLoaded = false;
 
-  pqServerManagerModel *model = pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerModel2 *model = 
+    pqApplicationCore::instance()->getServerManagerModel2();
   this->Internal->PipelineModel = new pqPipelineModel(*model);
 }
 
@@ -173,7 +174,7 @@ void pqLookmarkStateLoader::AddChildItems(vtkPVXMLElement *elem, QStandardItem *
 //---------------------------------------------------------------------------
 int pqLookmarkStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*=0*/)
 {
-  pqServerManagerModel *model = pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerModel2 *model = pqApplicationCore::instance()->getServerManagerModel2();
 
   if (!rootElement)
     {
@@ -184,11 +185,12 @@ int pqLookmarkStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_prox
   this->Internal->RootElement = rootElement;
 
   // Do we have enough open sources to accomodate this lookmark's state?
-  int numSources = model->getNumberOfSources();
+  int numSources = model->getNumberOfItems<pqPipelineSource*>();
   if(numSources<this->Internal->NumberOfLookmarkSources)
     {
     QMessageBox::warning(NULL, "Error Loading Lookmark",
-       "There are not enough existing sources or filters in the pipeline to accomodate this lookmark.");
+       "There are not enough existing sources or filters in the pipeline to "
+       "accomodate this lookmark.");
     return 0;
     }
 
@@ -431,23 +433,20 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
 
     // if a filter is being used in place of a source, find the filter's reader
     //    and use its proxy instead
-    if(strcmp(proxy->GetXMLGroup(),"filters")==0)
+    if(strcmp(proxy->GetXMLGroup(), "filters")==0)
       {
-      pqServerManagerModel *model = pqApplicationCore::instance()->getServerManagerModel();
-      for(unsigned int i=0; i<model->getNumberOfSources(); i++)
+      pqServerManagerModel2 *model = pqApplicationCore::instance()->getServerManagerModel2();
+      pqPipelineFilter *filter = model->findItem<pqPipelineFilter*>(proxy);
+      if(filter)
         {
-        pqPipelineFilter *filter = dynamic_cast<pqPipelineFilter*>(model->getPQSource(i));
-        if(filter && filter->getProxy()==proxy)
+        // move up the pipeline until we find a non-filter source
+        pqPipelineSource *src;
+        while(filter)
           {
-          // move up the pipeline until we find a non-filter source
-          pqPipelineSource *src;
-          while(filter)
-            {
-            src = filter->getInput(0);
-            filter = dynamic_cast<pqPipelineFilter*>(src);
-            }
-          proxy = src->getProxy();
+          src = filter->getInput(0);
+          filter = dynamic_cast<pqPipelineFilter*>(src);
           }
+        proxy = src->getProxy();
         }
       }
     }

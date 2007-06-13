@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDisplayPanel.h"
 
-pqDisplayPanel::pqDisplayPanel(pqDisplay* display, QWidget* p)
-  : QWidget(p), Display(display)
+pqDisplayPanel::pqDisplayPanel(pqRepresentation* display, QWidget* p)
+  : QWidget(p), Representation(display)
 {
 }
 
@@ -41,9 +41,9 @@ pqDisplayPanel::~pqDisplayPanel()
 {
 }
   
-pqDisplay* pqDisplayPanel::getDisplay()
+pqRepresentation* pqDisplayPanel::getRepresentation()
 {
-  return this->Display;
+  return this->Representation;
 }
 
 void pqDisplayPanel::reloadGUI()
@@ -52,9 +52,9 @@ void pqDisplayPanel::reloadGUI()
 
 void pqDisplayPanel::updateAllViews()
 {
-  if (this->Display)
+  if (this->Representation)
     {
-    this->Display->renderAllViews();
+    this->Representation->renderViewEventually();
     }
 }
 

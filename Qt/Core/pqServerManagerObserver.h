@@ -45,7 +45,6 @@ class vtkCommand;
 class vtkObject;
 class vtkPVXMLElement;
 class vtkSMProxy;
-class vtkSMAbstractViewModuleProxy;
 
 // This is a vtkSMProxyManager observer. This class should simply listen to events
 // fired by proxy manager and responds. It does not support any creation method. 
@@ -60,38 +59,19 @@ public:
   virtual ~pqServerManagerObserver();
 
 signals:
-  /// Fired when a proxy is registered under the "sources" group. 
-  void sourceRegistered(QString name, vtkSMProxy *source);
-
-  /// Fired when a proxy under the "sources" group is unregistered.
-  void sourceUnRegistered(QString name, vtkSMProxy *proxy);
-
-  /// Fired when a proxy is registered under the "displays" group.
-  void displayRegistered(QString name, vtkSMProxy* display);
-
-  // Fired when a proxy registered under group "displays" is unregistered.
-  void displayUnRegistered(vtkSMProxy* display);
-
-  /// Fired when a view module proxy is registered under the "view_modules"
-  /// group.
-  void viewModuleRegistered(QString name, vtkSMAbstractViewModuleProxy* rm);
-
-  /// Fired when a view module proxy is unregistred.
-  void viewModuleUnRegistered(vtkSMAbstractViewModuleProxy* rm);
-
   /// Fired when a compound proxy definition is registered.
   void compoundProxyDefinitionRegistered(QString name);
 
   /// Fired when a compound proxy definition is unregistered.
   void compoundProxyDefinitionUnRegistered(QString name);
   
-  // Fired when a proxy is registered, and not in the "sources" or
-  // "view_modules" groups.
-  void proxyRegistered(QString group, QString name, vtkSMProxy* proxy);
+  // Fired when a proxy is registered.
+  void proxyRegistered(const QString& group, const QString& name, 
+    vtkSMProxy* proxy);
   
-  // Fired when a proxy is unregistered, and does not belong to
-  // the "sources" or "view_modules" group.
-  void proxyUnRegistered(QString group, QString name, vtkSMProxy* proxy);
+  // Fired when a proxy is unregistered.
+  void proxyUnRegistered(const QString& group, const QString& name, 
+    vtkSMProxy* proxy);
 
   /// Fired when a server connection is created by the vtkProcessModule.
   void connectionCreated(vtkIdType connectionId);

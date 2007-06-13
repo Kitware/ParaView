@@ -12,14 +12,14 @@
   <property name="windowTitle" >
    <string>3D View Properties Dialog</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QGridLayout" >
    <property name="margin" >
     <number>9</number>
    </property>
    <property name="spacing" >
     <number>6</number>
    </property>
-   <item>
+   <item row="0" column="0" >
     <widget class="QTabWidget" name="tabWidget" >
      <property name="currentIndex" >
       <number>0</number>
@@ -1382,6 +1382,49 @@
           <property name="spacing" >
            <number>6</number>
           </property>
+          <item row="1" column="0" colspan="3" >
+           <widget class="QCheckBox" name="orderedCompositing" >
+            <property name="toolTip" >
+             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle use of ordered compositing. Ordered compositing makes updates and animations slower, but makes volume rendering correct and may speed up compositing in general.&lt;/p>&lt;/body>&lt;/html></string>
+            </property>
+            <property name="whatsThis" >
+             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle use of ordered compositing. Ordered compositing makes updates and animations slower, but makes volume rendering correct and may speed up compositing in general.&lt;/p>&lt;/body>&lt;/html></string>
+            </property>
+            <property name="text" >
+             <string>Disable Ordered Compositing</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" >
+           <widget class="QCheckBox" name="enableCompositing" >
+            <property name="toolTip" >
+             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle compositing. When off all rendering is done locally. Otherwise, rendering is done on server or client depending on the threshold.&lt;/p>&lt;/body>&lt;/html></string>
+            </property>
+            <property name="whatsThis" >
+             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle compositing. When off all rendering is done locally. Otherwise, rendering is done on server or client depending on the threshold.&lt;/p>&lt;/body>&lt;/html></string>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3" >
+           <widget class="QLabel" name="compositeThresholdLabel" >
+            <property name="enabled" >
+             <bool>false</bool>
+            </property>
+            <property name="text" >
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" >
+           <widget class="QLabel" name="label_7" >
+            <property name="text" >
+             <string>Composite Threshold</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="2" >
            <widget class="QSlider" name="compositeThreshold" >
             <property name="enabled" >
@@ -1401,28 +1444,22 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0" >
-           <widget class="QLabel" name="label_9" >
-            <property name="text" >
-             <string>Squirt Compression</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" >
-           <widget class="QLabel" name="label_8" >
-            <property name="text" >
-             <string>Subsample Rate</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" >
-           <widget class="QLabel" name="label_7" >
-            <property name="text" >
-             <string>Composite Threshold</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="3" >
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="clientServerParameters" >
+         <property name="title" >
+          <string>Client/Server Parameters</string>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item row="1" column="3" >
            <widget class="QLabel" name="squirtLevelLabel" >
             <property name="enabled" >
              <bool>false</bool>
@@ -1432,49 +1469,40 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="3" >
-           <widget class="QLabel" name="subsamplingRateLabel" >
-            <property name="enabled" >
-             <bool>false</bool>
+          <item row="1" column="1" >
+           <widget class="QCheckBox" name="enableSquirt" >
+            <property name="toolTip" >
+             <string>Toggle use of Squirt compression while interacting.</string>
+            </property>
+            <property name="whatsThis" >
+             <string>Toggle use of Squirt compression while interacting.</string>
             </property>
             <property name="text" >
-             <string>TextLabel</string>
+             <string/>
             </property>
            </widget>
           </item>
-          <item row="0" column="3" >
-           <widget class="QLabel" name="compositeThresholdLabel" >
-            <property name="enabled" >
-             <bool>false</bool>
+          <item row="1" column="0" >
+           <widget class="QLabel" name="label_9" >
+            <property name="text" >
+             <string>Squirt Compression</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" >
+           <widget class="QCheckBox" name="enableSubsampling" >
+            <property name="toolTip" >
+             <string>Toggle use of subsampling while interacting.</string>
+            </property>
+            <property name="whatsThis" >
+             <string>Toggle use of subsampling while interacting.</string>
             </property>
             <property name="text" >
-             <string>TextLabel</string>
+             <string/>
             </property>
            </widget>
           </item>
           <item row="1" column="2" >
-           <widget class="QSlider" name="subsamplingRate" >
-            <property name="enabled" >
-             <bool>false</bool>
-            </property>
-            <property name="toolTip" >
-             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Subsampling is a compositing LOD technique. Subsampling will use larger pixels during interaction.&lt;/p>&lt;/body>&lt;/html></string>
-            </property>
-            <property name="whatsThis" >
-             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Subsampling is a compositing LOD technique. Subsampling will use larger pixels during interaction.&lt;/p>&lt;/body>&lt;/html></string>
-            </property>
-            <property name="minimum" >
-             <number>2</number>
-            </property>
-            <property name="maximum" >
-             <number>20</number>
-            </property>
-            <property name="orientation" >
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2" >
            <widget class="QSlider" name="squirtLevel" >
             <property name="enabled" >
              <bool>false</bool>
@@ -1496,55 +1524,42 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="1" >
-           <widget class="QCheckBox" name="enableSubsampling" >
-            <property name="toolTip" >
-             <string>Toggle use of subsampling while interacting.</string>
-            </property>
-            <property name="whatsThis" >
-             <string>Toggle use of subsampling while interacting.</string>
-            </property>
+          <item row="0" column="0" >
+           <widget class="QLabel" name="label_8" >
             <property name="text" >
-             <string/>
+             <string>Subsample Rate</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1" >
-           <widget class="QCheckBox" name="enableSquirt" >
-            <property name="toolTip" >
-             <string>Toggle use of Squirt compression while interacting.</string>
-            </property>
-            <property name="whatsThis" >
-             <string>Toggle use of Squirt compression while interacting.</string>
+          <item row="0" column="3" >
+           <widget class="QLabel" name="subsamplingRateLabel" >
+            <property name="enabled" >
+             <bool>false</bool>
             </property>
             <property name="text" >
-             <string/>
+             <string>TextLabel</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" >
-           <widget class="QCheckBox" name="enableCompositing" >
+          <item row="0" column="2" >
+           <widget class="QSlider" name="subsamplingRate" >
+            <property name="enabled" >
+             <bool>false</bool>
+            </property>
             <property name="toolTip" >
-             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle compositing. When off all rendering is done locally. Otherwise, rendering is done on server or client depending on the threshold.&lt;/p>&lt;/body>&lt;/html></string>
+             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Subsampling is a compositing LOD technique. Subsampling will use larger pixels during interaction.&lt;/p>&lt;/body>&lt;/html></string>
             </property>
             <property name="whatsThis" >
-             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle compositing. When off all rendering is done locally. Otherwise, rendering is done on server or client depending on the threshold.&lt;/p>&lt;/body>&lt;/html></string>
+             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Subsampling is a compositing LOD technique. Subsampling will use larger pixels during interaction.&lt;/p>&lt;/body>&lt;/html></string>
             </property>
-            <property name="text" >
-             <string/>
+            <property name="minimum" >
+             <number>2</number>
             </property>
-           </widget>
-          </item>
-          <item row="3" column="0" colspan="3" >
-           <widget class="QCheckBox" name="orderedCompositing" >
-            <property name="toolTip" >
-             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle use of ordered compositing. Ordered compositing makes updates and animations slower, but makes volume rendering correct and may speed up compositing in general.&lt;/p>&lt;/body>&lt;/html></string>
+            <property name="maximum" >
+             <number>20</number>
             </property>
-            <property name="whatsThis" >
-             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle use of ordered compositing. Ordered compositing makes updates and animations slower, but makes volume rendering correct and may speed up compositing in general.&lt;/p>&lt;/body>&lt;/html></string>
-            </property>
-            <property name="text" >
-             <string>Disable Ordered Compositing</string>
+            <property name="orientation" >
+             <enum>Qt::Horizontal</enum>
             </property>
            </widget>
           </item>
@@ -1735,38 +1750,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>enableSubsampling</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>subsamplingRate</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>174</x>
-     <y>477</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>285</x>
-     <y>477</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>enableSquirt</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>squirtLevel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>174</x>
-     <y>504</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>285</x>
-     <y>507</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>enableLOD</sender>
    <signal>toggled(bool)</signal>
    <receiver>lodResolution</receiver>
@@ -1827,38 +1810,6 @@
     <hint type="destinationlabel" >
      <x>412</x>
      <y>447</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>enableSubsampling</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>subsamplingRateLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>174</x>
-     <y>477</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>412</x>
-     <y>477</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>enableSquirt</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>squirtLevelLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>174</x>
-     <y>504</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>412</x>
-     <y>507</y>
     </hint>
    </hints>
   </connection>
@@ -1987,6 +1938,70 @@
     <hint type="destinationlabel" >
      <x>287</x>
      <y>239</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableSubsampling</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>subsamplingRate</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>190</x>
+     <y>203</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>299</x>
+     <y>203</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableSquirt</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>squirtLevel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>190</x>
+     <y>226</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>299</x>
+     <y>226</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableSubsampling</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>subsamplingRateLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>190</x>
+     <y>203</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>426</x>
+     <y>204</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableSquirt</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>squirtLevelLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>190</x>
+     <y>226</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>426</x>
+     <y>227</y>
     </hint>
    </hints>
   </connection>

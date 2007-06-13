@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPlugin.h"
 #include "pqServer.h"
-#include "pqServerManagerModel.h"
+#include "pqServerManagerModel2.h"
 #include "pqApplicationCore.h"
 #include "pqSMAdaptor.h"
 #include "pqFileDialogModel.h"
@@ -56,8 +56,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqPluginManager::pqPluginManager(QObject* p)
   : QObject(p)
 {
-  pqServerManagerModel* sm =
-    pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerModel2* sm =
+    pqApplicationCore::instance()->getServerManagerModel2();
   QObject::connect(sm, SIGNAL(serverAdded(pqServer*)),
                    this, SLOT(onServerConnected(pqServer*)),
                    Qt::QueuedConnection);

@@ -57,7 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPluginManager.h"
 #include "pqRenderViewModule.h"
-#include "pqScalarBarDisplay.h"
+// #include "pqScalarBarDisplay.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerResource.h"
@@ -399,7 +399,7 @@ void pqServerManagerModel::onAddDisplay(QString name,
       pqViewModuleInterface* vmi = qobject_cast<pqViewModuleInterface*>(iface);
       if(vmi && vmi->displayTypes().contains(xml_name))
         {
-        display = vmi->createDisplay(xml_name, "displays", name, proxy, server,this);
+        //display = vmi->createDisplay(xml_name, "displays", name, proxy, server,this);
         break;
         }
       }
@@ -555,7 +555,7 @@ void pqServerManagerModel::onAddViewModule(QString name,
       pqViewModuleInterface* vmi = qobject_cast<pqViewModuleInterface*>(iface);
       if(vmi && vmi->viewTypes().contains(xml_type))
         {
-        pqview = vmi->createView(xml_type, "view_modules", name, view, server,this);
+        //pqview = vmi->createView(xml_type, "view_modules", name, view, server,this);
         break;
         }
       }
@@ -623,7 +623,7 @@ void pqServerManagerModel::onProxyRegistered(QString group, QString name,
     }
   else if (group == "scalar_bars")
     {
-    pq_proxy = new pqScalarBarDisplay(group, name, proxy, server, this);
+    // pq_proxy = new pqScalarBarDisplay(group, name, proxy, server, this);
     }
   else if (group == "animation")
     {

@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 #include "vtkPVRenderViewProxy.h"
 
-class pqRenderViewModule;
+class pqRenderView;
 
 /// Integrates the PVS render window with the Qt window
 class PQCORE_EXPORT pqRenderViewProxy : public vtkPVRenderViewProxy
@@ -51,17 +51,17 @@ public:
   virtual void EventuallyRender();
   virtual vtkRenderWindow* GetRenderWindow();
 
-  // Set the pqRenderViewModule.
-  void setRenderModule(pqRenderViewModule*);
+  // Set the pqRenderView.
+  void setRenderView(pqRenderView*);
 
-  // Get the pqRenderViewModule.
-  pqRenderViewModule* getRenderModule() 
-    {return this->RenderModule;}
+  // Get the pqRenderView.
+  pqRenderView* getRenderView() 
+    {return this->RenderView;}
 protected:
   pqRenderViewProxy();
   ~pqRenderViewProxy();
 
-  pqRenderViewModule* RenderModule;
+  pqRenderView* RenderView;
 private:
   pqRenderViewProxy(const pqRenderViewProxy&); // Not implemented
   void operator=(const pqRenderViewProxy&); // Not implemented

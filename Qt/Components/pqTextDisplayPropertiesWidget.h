@@ -40,7 +40,7 @@ class PQCOMPONENTS_EXPORT pqTextDisplayPropertiesWidget : public pqDisplayPanel
 {
   Q_OBJECT
 public:
-  pqTextDisplayPropertiesWidget(pqDisplay* display, QWidget* parent=0);
+  pqTextDisplayPropertiesWidget(pqRepresentation* display, QWidget* parent=0);
   virtual ~pqTextDisplayPropertiesWidget();
 
 protected slots:
@@ -49,7 +49,7 @@ protected slots:
 
 private:
   /// Set the display whose properties this editor will edit.
-  void setDisplay(pqDisplay* display);
+  void setDisplay(pqRepresentation* display);
 
   class pqInternal;
   pqInternal* Internal;

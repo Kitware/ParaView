@@ -35,33 +35,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include <QPointer>
 #include "pqComponentsExport.h"
-#include "pqDisplay.h"
+#include "pqRepresentation.h"
 
 
-/// Widget which provides an editor for the properties of a display.
+/// Widget which provides an editor for the properties of a 
+/// representation.
 class PQCOMPONENTS_EXPORT pqDisplayPanel : public QWidget
 {
   Q_OBJECT
 public:
   /// constructor
-  pqDisplayPanel(pqDisplay* display, QWidget* p = NULL);
+  pqDisplayPanel(pqRepresentation* Representation, QWidget* p = NULL);
   /// destructor
   ~pqDisplayPanel();
 
   /// get the proxy for which properties are displayed
-  pqDisplay* getDisplay();
+  pqRepresentation* getRepresentation();
 
 public slots:
   /// TODO: get rid of this function once the server manager can
-  /// inform us of display property changes
+  /// inform us of Representation property changes
   virtual void reloadGUI();
   
   /// Requests update on all views the
-  /// display is visible in.
+  /// Representation is visible in.
   virtual void updateAllViews();
 
 protected:
-  QPointer<pqDisplay> Display;
+  QPointer<pqRepresentation> Representation;
 };
 
 #endif

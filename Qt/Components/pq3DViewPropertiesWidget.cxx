@@ -34,9 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager includes.
 #include "vtkSMProxy.h"
-#include "vtkSMLODRenderModuleProxy.h"
-#include "vtkSMCompositeRenderModuleProxy.h"
-#include "vtkSMIceTDesktopRenderModuleProxy.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSmartPointer.h"
 
 // Qt includes.
@@ -45,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Client includes.
 #include "pqApplicationCore.h"
 #include "pqPropertyManager.h"
-#include "pqRenderViewModule.h"
+#include "pqRenderView.h"
 #include "pqSettings.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
@@ -57,7 +55,7 @@ class pq3DViewPropertiesWidgetInternal : public Ui::pq3DViewProperties
 public:
   pqPropertyManager Links;
   pqSignalAdaptorColor *ColorAdaptor;
-  QPointer<pqGenericViewModule> ViewModule;
+  QPointer<pqRenderView> ViewModule;
 
   pq3DViewPropertiesWidgetInternal() 
     {
@@ -126,20 +124,30 @@ public:
       QString("%1 MBytes").arg(value_in_mb));
     }
 
+  bool supportsCompositing(vtkSMProxy* proxy)
+    {
+    return (proxy && proxy->GetProperty("CompositeThreshold"));
+    }
 
-  void loadValues(pqGenericViewModule* proxy);
+  bool supportsClientServer(vtkSMProxy* proxy)
+    {
+    return (proxy && proxy->GetProperty("ImageReductionFactor") &&
+      proxy->GetProperty("SquirtLevel"));
+    }
+
+  void loadValues(pqRenderView* proxy);
   void accept();
 };
 
 //-----------------------------------------------------------------------------
-void pq3DViewPropertiesWidgetInternal::loadValues(pqGenericViewModule* viewModule)
+void pq3DViewPropertiesWidgetInternal::loadValues(pqRenderView* viewModule)
 {
   if (!this->ColorAdaptor)
     {
     this->ColorAdaptor = new pqSignalAdaptorColor(this->backgroundColor, 
       "chosenColor", SIGNAL(chosenColorChanged(const QColor&)), false);
     }
-  
+
   this->ViewModule = viewModule;
   vtkSMProxy* proxy = viewModule->getProxy();
 
@@ -163,24 +171,24 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqGenericViewModule* viewModul
 
   // link default light params
   this->Links.registerLink(this->DefaultLightSwitch, "checked", 
-                           SIGNAL(toggled(bool)),
-                           proxy, proxy->GetProperty("LightSwitch"));
+    SIGNAL(toggled(bool)),
+    proxy, proxy->GetProperty("LightSwitch"));
   pqSignalAdaptorSliderRange* sliderAdaptor;
   sliderAdaptor = new pqSignalAdaptorSliderRange(this->LightIntensity);
   this->Links.registerLink(sliderAdaptor, "value",
-                           SIGNAL(valueChanged(double)),
-                           proxy, proxy->GetProperty("LightIntensity"));
+    SIGNAL(valueChanged(double)),
+    proxy, proxy->GetProperty("LightIntensity"));
   this->Links.registerLink(this->LightIntensity_Edit, "text",
-                           SIGNAL(textChanged(const QString&)),
-                           proxy, proxy->GetProperty("LightIntensity"));
+    SIGNAL(textChanged(const QString&)),
+    proxy, proxy->GetProperty("LightIntensity"));
   pqSignalAdaptorColor* lightColorAdaptor;
   lightColorAdaptor = new pqSignalAdaptorColor(this->SetLightColor,
-                                   "chosenColor",
-                                   SIGNAL(chosenColorChanged(const QColor&)),
-                                   false);
+    "chosenColor",
+    SIGNAL(chosenColorChanged(const QColor&)),
+    false);
   this->Links.registerLink(lightColorAdaptor, "color",
-                           SIGNAL(colorChanged(const QVariant&)),
-                           proxy, proxy->GetProperty("LightDiffuseColor"));
+    SIGNAL(colorChanged(const QVariant&)),
+    proxy, proxy->GetProperty("LightDiffuseColor"));
 
 
   // link light kit params
@@ -189,45 +197,37 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqGenericViewModule* viewModul
     proxy, proxy->GetProperty("UseLight"));
 
 
-
-  if (vtkSMLODRenderModuleProxy::SafeDownCast(proxy))
+  this->lodParameters->setVisible(true);
+  double val = pqSMAdaptor::getElementProperty(
+    proxy->GetProperty("LODThreshold")).toDouble();
+  if (val >= VTK_LARGE_FLOAT)
     {
-    this->lodParameters->setVisible(true);
-    double val = pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("LODThreshold")).toDouble();
-    if (val >= VTK_LARGE_FLOAT)
-      {
-      this->enableLOD->setCheckState(Qt::Unchecked);
-      this->updateLODThresholdLabel(this->lodThreshold->value());
-      }
-    else
-      {
-      this->enableLOD->setCheckState(Qt::Checked);
-      this->lodThreshold->setValue(static_cast<int>(val*10));
-      this->updateLODThresholdLabel(this->lodThreshold->value());
-      }
-
-    val = pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("LODResolution")).toDouble();
-    this->lodResolution->setValue(static_cast<int>(160-val + 10));
-    this->updateLODResolutionLabel(this->lodResolution->value());
-
-    this->Links.registerLink(this->renderingInterrupts, "checked",
-      SIGNAL(stateChanged(int)),
-      proxy, proxy->GetProperty("RenderInterruptsEnabled"));
+    this->enableLOD->setCheckState(Qt::Unchecked);
+    this->updateLODThresholdLabel(this->lodThreshold->value());
     }
   else
     {
-    this->lodParameters->setVisible(false);
+    this->enableLOD->setCheckState(Qt::Checked);
+    this->lodThreshold->setValue(static_cast<int>(val*10));
+    this->updateLODThresholdLabel(this->lodThreshold->value());
     }
 
+  val = pqSMAdaptor::getElementProperty(
+    proxy->GetProperty("LODResolution")).toDouble();
+  this->lodResolution->setValue(static_cast<int>(160-val + 10));
+  this->updateLODResolutionLabel(this->lodResolution->value());
+
+  this->Links.registerLink(this->renderingInterrupts, "checked",
+    SIGNAL(stateChanged(int)),
+    proxy, proxy->GetProperty("RenderInterruptsEnabled"));
+
   this->noServerSettingsLabel->setVisible(true);
-  if (vtkSMCompositeRenderModuleProxy::SafeDownCast(proxy))
+  if (this->supportsCompositing(proxy))
     {
     this->noServerSettingsLabel->setVisible(false);
     this->compositingParameters->setVisible(true);
     double val = pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("RemoteRenderThreshold")).toDouble();
+      proxy->GetProperty("CompositeThreshold")).toDouble();
     if (val >= VTK_LARGE_FLOAT)
       {
       this->enableCompositing->setCheckState(Qt::Unchecked);
@@ -240,8 +240,28 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqGenericViewModule* viewModul
       this->updateCompositeThresholdLabel(this->compositeThreshold->value());
       }
 
+    if (proxy->GetProperty("DisableOrderedCompositing"))
+      {
+      this->orderedCompositing->setVisible(true);
+      this->Links.registerLink(this->orderedCompositing, "checked", 
+        SIGNAL(stateChanged(int)),
+        proxy, proxy->GetProperty("DisableOrderedCompositing"));
+      }
+    else
+      {
+      this->orderedCompositing->setVisible(false);
+      }
+    }
+  else
+    {
+    this->compositingParameters->setVisible(false);
+    }
+
+  if (this->supportsClientServer(proxy))
+    {
+    this->clientServerParameters->setVisible(true);
     int ival = pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("ReductionFactor")).toInt();
+      proxy->GetProperty("ImageReductionFactor")).toInt();
     if (ival == 1)
       {
       this->enableSubsampling->setCheckState(Qt::Unchecked);
@@ -270,22 +290,9 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqGenericViewModule* viewModul
     }
   else
     {
-    this->compositingParameters->setVisible(false);
+    this->clientServerParameters->setVisible(false);
     }
 
-  if (vtkSMIceTDesktopRenderModuleProxy::SafeDownCast(proxy))
-    {
-    this->noServerSettingsLabel->setVisible(false);
-    // Only available for IceT.
-    this->orderedCompositing->setVisible(true);
-    this->Links.registerLink(this->orderedCompositing, "checked", 
-      SIGNAL(stateChanged(int)),
-      proxy, proxy->GetProperty("DisableOrderedCompositing"));
-    }
-  else
-    {
-    this->orderedCompositing->setVisible(false);
-    }
 
   if (proxy->IsA("vtkSMIceTRenderModuleProxy"))
     {
@@ -327,34 +334,29 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqGenericViewModule* viewModul
     this->tileDisplayParameters->setVisible(false);
     }
 
-  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(this->ViewModule);
-  if(rm)
-    {
-    this->OrientationAxes->setChecked(rm->getOrientationAxesVisibility());
-    this->OrientationAxesInteraction->setCheckState(
-      rm->getOrientationAxesInteractivity()? Qt::Checked : Qt::Unchecked);
-    this->OrientationAxesOutlineColor->setChosenColor(
-      rm->getOrientationAxesOutlineColor());
-    this->OrientationAxesLabelColor->setChosenColor(
-      rm->getOrientationAxesLabelColor());
+  this->OrientationAxes->setChecked(this->ViewModule->getOrientationAxesVisibility());
+  this->OrientationAxesInteraction->setCheckState(
+    this->ViewModule->getOrientationAxesInteractivity()? Qt::Checked : Qt::Unchecked);
+  this->OrientationAxesOutlineColor->setChosenColor(
+    this->ViewModule->getOrientationAxesOutlineColor());
+  this->OrientationAxesLabelColor->setChosenColor(
+    this->ViewModule->getOrientationAxesLabelColor());
 
-    this->CustomCenter->setCheckState(Qt::Unchecked);
-    this->AutoResetCenterOfRotation->setCheckState(
-      rm->getResetCenterWithCamera()? Qt::Checked : Qt::Unchecked);
-    this->CenterAxesVisibility->setCheckState(
-      rm->getCenterAxesVisibility()? Qt::Checked : Qt::Unchecked);
-    double center[3];
-    rm->getCenterOfRotation(center);
-    this->CenterX->setText(QString::number(center[0],'g',3));
-    this->CenterY->setText(QString::number(center[1],'g',3));
-    this->CenterZ->setText(QString::number(center[2],'g',3));
-    }
+  this->CustomCenter->setCheckState(Qt::Unchecked);
+  this->AutoResetCenterOfRotation->setCheckState(
+    this->ViewModule->getResetCenterWithCamera()? Qt::Checked : Qt::Unchecked);
+  this->CenterAxesVisibility->setCheckState(
+    this->ViewModule->getCenterAxesVisibility()? Qt::Checked : Qt::Unchecked);
+  double center[3];
+  this->ViewModule->getCenterOfRotation(center);
+  this->CenterX->setText(QString::number(center[0],'g',3));
+  this->CenterY->setText(QString::number(center[1],'g',3));
+  this->CenterZ->setText(QString::number(center[2],'g',3));
 }
 
 //-----------------------------------------------------------------------------
 void pq3DViewPropertiesWidgetInternal::accept()
 {
-
   if(!this->ViewModule)
     {
     return;
@@ -364,50 +366,58 @@ void pq3DViewPropertiesWidgetInternal::accept()
   this->Links.accept();
 
   vtkSMProxy* renModule = this->ViewModule->getProxy();
-  if (vtkSMLODRenderModuleProxy::SafeDownCast(renModule))
-    {
-    // Push changes for LOD parameters.
-    if (this->enableLOD->checkState() == Qt::Checked)
-      {
-      pqSMAdaptor::setElementProperty(
-        renModule->GetProperty("LODThreshold"), 
-        this->lodThreshold->value() / 10.0);
 
-      pqSMAdaptor::setElementProperty(
-        renModule->GetProperty("LODResolution"),
-        160-this->lodResolution->value() + 10);
-      }
-    else
-      {
-      pqSMAdaptor::setElementProperty(
-        renModule->GetProperty("LODThreshold"), VTK_DOUBLE_MAX);
-      }
+  // Push changes for LOD parameters.
+  if (this->enableLOD->checkState() == Qt::Checked)
+    {
+    pqSMAdaptor::setElementProperty(
+      renModule->GetProperty("LODThreshold"), 
+      this->lodThreshold->value() / 10.0);
+
+    pqSMAdaptor::setElementProperty(
+      renModule->GetProperty("LODResolution"),
+      160-this->lodResolution->value() + 10);
+    }
+  else
+    {
+    pqSMAdaptor::setElementProperty(
+      renModule->GetProperty("LODThreshold"), VTK_DOUBLE_MAX);
     }
 
-  if (vtkSMCompositeRenderModuleProxy::SafeDownCast(renModule))
+  if (this->supportsCompositing(renModule))
     {
     if (this->enableCompositing->checkState() == Qt::Checked)
       {
       pqSMAdaptor::setElementProperty(
-        renModule->GetProperty("RemoteRenderThreshold"),
+        renModule->GetProperty("CompositeThreshold"),
         this->compositeThreshold->value() / 10.0);
       }
     else
       {
       pqSMAdaptor::setElementProperty(
-        renModule->GetProperty("RemoteRenderThreshold"), VTK_DOUBLE_MAX);
+        renModule->GetProperty("CompositeThreshold"), VTK_DOUBLE_MAX);
       }
 
+    if (renModule->GetProperty("DisableOrderedCompositing"))
+      {
+      pqSMAdaptor::setElementProperty(
+        renModule->GetProperty("DisableOrderedCompositing"),
+        (this->orderedCompositing->checkState() == Qt::Checked));
+      }
+    }
+
+  if (this->supportsClientServer(renModule))
+    {
     if (this->enableSubsampling->checkState() == Qt::Checked)
       {
       pqSMAdaptor::setElementProperty(
-        renModule->GetProperty("ReductionFactor"),
+        renModule->GetProperty("ImageReductionFactor"),
         this->subsamplingRate->value());
       }
     else
       {
       pqSMAdaptor::setElementProperty(
-        renModule->GetProperty("ReductionFactor"), 1);
+        renModule->GetProperty("ImageReductionFactor"), 1);
       }
 
     if (this->enableSquirt->checkState() == Qt::Checked)
@@ -451,32 +461,28 @@ void pq3DViewPropertiesWidgetInternal::accept()
     }
   renModule->UpdateVTKObjects();
 
-  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(this->ViewModule);
-  if(rm)
-    {
-    rm->setOrientationAxesVisibility(this->OrientationAxes->isChecked());
+  this->ViewModule->setOrientationAxesVisibility(this->OrientationAxes->isChecked());
 
-    rm->setOrientationAxesInteractivity(
-      this->OrientationAxesInteraction->checkState() == Qt::Checked);
-    rm->setOrientationAxesOutlineColor(
-      this->OrientationAxesOutlineColor->chosenColor());
-    rm->setOrientationAxesLabelColor(
-      this->OrientationAxesLabelColor->chosenColor());
-  
-    rm->setCenterAxesVisibility(
-      this->CenterAxesVisibility->checkState() == Qt::Checked);
-    rm->setResetCenterWithCamera(
-      this->AutoResetCenterOfRotation->checkState() == Qt::Checked);
-    if (this->CustomCenter->checkState() == Qt::Checked)
-      {
-      double center[3];
-      center[0] = this->CenterX->text().toDouble();
-      center[1] = this->CenterY->text().toDouble();
-      center[2] = this->CenterZ->text().toDouble();
-      rm->setCenterOfRotation(center);
-      }
-    rm->saveSettings();
+  this->ViewModule->setOrientationAxesInteractivity(
+    this->OrientationAxesInteraction->checkState() == Qt::Checked);
+  this->ViewModule->setOrientationAxesOutlineColor(
+    this->OrientationAxesOutlineColor->chosenColor());
+  this->ViewModule->setOrientationAxesLabelColor(
+    this->OrientationAxesLabelColor->chosenColor());
+
+  this->ViewModule->setCenterAxesVisibility(
+    this->CenterAxesVisibility->checkState() == Qt::Checked);
+  this->ViewModule->setResetCenterWithCamera(
+    this->AutoResetCenterOfRotation->checkState() == Qt::Checked);
+  if (this->CustomCenter->checkState() == Qt::Checked)
+    {
+    double center[3];
+    center[0] = this->CenterX->text().toDouble();
+    center[1] = this->CenterY->text().toDouble();
+    center[2] = this->CenterZ->text().toDouble();
+    this->ViewModule->setCenterOfRotation(center);
     }
+  this->ViewModule->saveSettings();
 }
 
 //-----------------------------------------------------------------------------
@@ -535,9 +541,9 @@ pq3DViewPropertiesWidget::~pq3DViewPropertiesWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pq3DViewPropertiesWidget::setRenderModule(pqGenericViewModule* renderModule)
+void pq3DViewPropertiesWidget::setRenderView(pqRenderView* renderView)
 {
-  this->Internal->loadValues(renderModule);
+  this->Internal->loadValues(renderView);
 }
 
 //-----------------------------------------------------------------------------
@@ -600,11 +606,9 @@ void pq3DViewPropertiesWidget::clientCollectSliderChanged(int value)
 //-----------------------------------------------------------------------------
 void pq3DViewPropertiesWidget::restoreDefaultBackground()
 {
-  pqRenderViewModule* rvm =
-    qobject_cast<pqRenderViewModule*>(this->Internal->ViewModule);
-  if(rvm)
+  if (this->Internal->ViewModule)
     {
-    int* col = rvm->defaultBackgroundColor();
+    int* col = this->Internal->ViewModule->defaultBackgroundColor();
     this->Internal->backgroundColor->setChosenColor(
                QColor(col[0], col[1], col[2]));
     }
@@ -613,11 +617,9 @@ void pq3DViewPropertiesWidget::restoreDefaultBackground()
 //-----------------------------------------------------------------------------
 void pq3DViewPropertiesWidget::resetLights()
 {
-  pqRenderViewModule* rvm =
-    qobject_cast<pqRenderViewModule*>(this->Internal->ViewModule);
-  if(rvm)
+  if(this->Internal->ViewModule)
     {
-    rvm->restoreDefaultLightSettings();
+    this->Internal->ViewModule->restoreDefaultLightSettings();
     }
 }
 

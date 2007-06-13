@@ -13,10 +13,10 @@
 
 =========================================================================*/
 // .NAME vtkSMInteractionUndoStackBuilder - builder server manager undo 
-// sets for render module interactions and pushes them on the undo stack.
+// sets for render view interactions and pushes them on the undo stack.
 // .SECTION Description
 // vtkSMInteractionUndoStackBuilder specializes in interaction. 
-// This class can create undo elements for only one render module
+// This class can create undo elements for only one render view 
 // at a time.
 
 #ifndef __vtkSMInteractionUndoStackBuilder_h
@@ -25,7 +25,7 @@
 #include "vtkSMObject.h"
 
 class vtkSMInteractionUndoStackBuilderObserver;
-class vtkSMRenderModuleProxy;
+class vtkSMRenderViewProxy;
 class vtkSMUndoStack;
 class vtkUndoSet;
 
@@ -37,10 +37,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Get/Set the render module proxy for which we are monitoring the 
+  // Get/Set the render view proxy for which we are monitoring the 
   // interactions.
-  void SetRenderModule(vtkSMRenderModuleProxy*);
-  vtkGetObjectMacro(RenderModule, vtkSMRenderModuleProxy);
+  void SetRenderView(vtkSMRenderViewProxy*);
+  vtkGetObjectMacro(RenderView, vtkSMRenderViewProxy);
 
   // Description:
   // Get/Set the undo stack that this builder will build.
@@ -74,7 +74,7 @@ protected:
   vtkSMInteractionUndoStackBuilder();
   ~vtkSMInteractionUndoStackBuilder();
 
-  vtkSMRenderModuleProxy* RenderModule;
+  vtkSMRenderViewProxy* RenderView;
   vtkSMUndoStack* UndoStack;
   vtkUndoSet* UndoSet;
 

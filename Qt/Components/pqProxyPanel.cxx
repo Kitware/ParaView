@@ -51,12 +51,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes
 #include "pqServerManagerObserver.h"
-#include "pqPipelineDisplay.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyManager.h"
-#include "pqServerManagerModel.h"
-#include "pqRenderViewModule.h"
+#include "pqView.h"
 
 //-----------------------------------------------------------------------------
 
@@ -66,7 +64,6 @@ public:
   pqImplementation(pqProxy* refProxy, vtkSMProxy* pxy) :
     ReferenceProxy(refProxy), Proxy(pxy)
   {
-  this->RenderModule = NULL;
   this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   this->InformationObsolete = true;
   this->Selected = false;
@@ -81,7 +78,7 @@ public:
   vtkSmartPointer<vtkSMProxy> Proxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   pqPropertyManager* PropertyManager;
-  QPointer<pqRenderViewModule> RenderModule;
+  QPointer<pqView> View;
 
   // Flag indicating to the best of our knowledge, the information properties
   // and domains are not up-to-date since the proxy was modified since the last
@@ -138,9 +135,9 @@ pqPropertyManager* pqProxyPanel::propertyManager()
 }
 
 //-----------------------------------------------------------------------------
-pqRenderViewModule* pqProxyPanel::renderModule() const
+pqView* pqProxyPanel::view() const
 {
-  return this->Implementation->RenderModule;
+  return this->Implementation->View;
 }
 
 //-----------------------------------------------------------------------------
@@ -204,15 +201,15 @@ void pqProxyPanel::deselect()
 }
   
 //-----------------------------------------------------------------------------
-void pqProxyPanel::setRenderModule(pqRenderViewModule* rm)
+void pqProxyPanel::setView(pqView* rm)
 {
-  if(this->Implementation->RenderModule == rm)
+  if(this->Implementation->View == rm)
     {
     return;
     }
 
-  this->Implementation->RenderModule = rm;
-  emit this->renderModuleChanged(this->Implementation->RenderModule);
+  this->Implementation->View = rm;
+  emit this->viewChanged(this->Implementation->View);
 }
 
 //-----------------------------------------------------------------------------

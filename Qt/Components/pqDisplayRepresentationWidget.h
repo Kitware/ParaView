@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 
 class pqDisplayRepresentationWidgetInternal;
-class pqConsumerDisplay;
+class pqDataRepresentation;
 
 /// A widget for representation of a display proxy.
 class PQCOMPONENTS_EXPORT pqDisplayRepresentationWidget : public QWidget
@@ -58,7 +58,7 @@ signals:
   void endUndo();
 
 public slots:
-  void setDisplay(pqConsumerDisplay* display);
+  void setRepresentation(pqDataRepresentation* display);
   
   void reloadGUI();
 

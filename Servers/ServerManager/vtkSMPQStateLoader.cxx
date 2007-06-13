@@ -16,23 +16,22 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMDataObjectDisplayProxy.h"
-#include "vtkSMMultiViewRenderModuleProxy.h"
+#include "vtkSMMultiViewFactory.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSmartPointer.h"
 #include <vtkstd/list>
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.16");
-vtkCxxSetObjectMacro(vtkSMPQStateLoader, MultiViewRenderModuleProxy, 
-  vtkSMMultiViewRenderModuleProxy);
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.16.6.1");
+vtkCxxSetObjectMacro(vtkSMPQStateLoader, MultiViewFactory, 
+  vtkSMMultiViewFactory);
 
 
 struct vtkSMPQStateLoaderInternals
 {
-  vtkstd::list<vtkSmartPointer<vtkSMRenderModuleProxy> > PreferredRenderModules;
+  vtkstd::list<vtkSmartPointer<vtkSMRenderViewProxy> > PreferredRenderViews;
 };
 
 
@@ -40,13 +39,13 @@ struct vtkSMPQStateLoaderInternals
 vtkSMPQStateLoader::vtkSMPQStateLoader()
 {
   this->PQInternal = new vtkSMPQStateLoaderInternals;
-  this->MultiViewRenderModuleProxy = 0;
+  this->MultiViewFactory = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMPQStateLoader::~vtkSMPQStateLoader()
 {
-  this->SetMultiViewRenderModuleProxy(0);
+  this->SetMultiViewFactory(0);
   delete this->PQInternal;
 }
 
@@ -57,60 +56,48 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
   // Check if the proxy requested is a render module.
   if (xml_group && xml_name && strcmp(xml_group, "rendermodules") == 0)
     {
-    if (strcmp(xml_name, "MultiViewRenderModule") == 0)
+    if (strcmp(xml_name, "MultiViewFactory") == 0)
       {
-      if (this->MultiViewRenderModuleProxy)
+      if (this->MultiViewFactory)
         {
-        this->MultiViewRenderModuleProxy->Register(this);
-        return this->MultiViewRenderModuleProxy;
+        this->MultiViewFactory->Register(this);
+        return this->MultiViewFactory;
         }
-      vtkWarningMacro("MultiViewRenderModuleProxy is not set. "
-        "Creating MultiViewRenderModuleProxy from the state.");
+      vtkWarningMacro("MultiViewFactory is not set. "
+        "Creating MultiViewFactory from the state.");
       }
     else
       {
       // Create a rendermodule.
-      if (this->MultiViewRenderModuleProxy)
+      if (this->MultiViewFactory)
         {
-        if (!this->PQInternal->PreferredRenderModules.empty())
+        if (!this->PQInternal->PreferredRenderViews.empty())
           {
-          vtkSMRenderModuleProxy *renMod = this->PQInternal->PreferredRenderModules.front();
+          vtkSMRenderViewProxy *renMod = this->PQInternal->PreferredRenderViews.front();
           unsigned int i=0;
-          for(i=0; i<this->MultiViewRenderModuleProxy->GetNumberOfRenderModules(); i++)
+          for(i=0; i<this->MultiViewFactory->GetNumberOfRenderViews(); i++)
             {
-            if(this->MultiViewRenderModuleProxy->GetRenderModule(i) == renMod)
+            if(this->MultiViewFactory->GetRenderView(i) == renMod)
               {
               break;
               }
             }
-          if(i<this->MultiViewRenderModuleProxy->GetNumberOfRenderModules())
+
+          if(i<this->MultiViewFactory->GetNumberOfRenderViews())
             {
             renMod->Register(this);
-            this->PQInternal->PreferredRenderModules.pop_front();
+            this->PQInternal->PreferredRenderViews.pop_front();
             return renMod;
             }
-          this->PQInternal->PreferredRenderModules.pop_front();
+          this->PQInternal->PreferredRenderViews.pop_front();
           }
         // Can't use exiting module (none present, or all present are have
         // already been used, hence we allocate a new one.
-        return this->MultiViewRenderModuleProxy->NewRenderModule();
+        return this->MultiViewFactory->NewRenderView();
         }
-      vtkWarningMacro("MultiViewRenderModuleProxy is not set. "
-        "Creating MultiViewRenderModuleProxy from the state.");
+      vtkWarningMacro("MultiViewFactory is not set. "
+        "Creating MultiViewFactory from the state.");
       }
-    }
-  else if (xml_group && xml_name && strcmp(xml_group, "displays")==0)
-    {
-    vtkSMProxy *display = this->Superclass::NewProxyInternal(xml_group, xml_name);
-    if (vtkSMDataObjectDisplayProxy::SafeDownCast(display))
-      {
-      if (this->MultiViewRenderModuleProxy)
-        {
-        display->Delete();
-        display = this->MultiViewRenderModuleProxy->CreateDisplayProxy();
-        }
-      }
-    return display;
     }
   else if (xml_group && xml_name && strcmp(xml_group, "misc") == 0 
     && strcmp(xml_name, "TimeKeeper") == 0)
@@ -129,32 +116,34 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMPQStateLoader::AddPreferredRenderModule(vtkSMRenderModuleProxy *renderModule)
+void vtkSMPQStateLoader::AddPreferredRenderView(vtkSMRenderViewProxy *renderView)
 {
-  if(!renderModule)
+  if(!renderView)
     { 
     vtkWarningMacro("Could not add preffered render module.");
     return;
     }
   // Make sure it is not part of the list yet
-  vtkstd::list<vtkSmartPointer<vtkSMRenderModuleProxy> >::iterator begin = this->PQInternal->PreferredRenderModules.begin();
-  vtkstd::list<vtkSmartPointer<vtkSMRenderModuleProxy> >::iterator end = this->PQInternal->PreferredRenderModules.end();
-  if(find(begin,end,renderModule) == end)
+  vtkstd::list<vtkSmartPointer<vtkSMRenderViewProxy> >::iterator begin = 
+    this->PQInternal->PreferredRenderViews.begin();
+  vtkstd::list<vtkSmartPointer<vtkSMRenderViewProxy> >::iterator end = 
+    this->PQInternal->PreferredRenderViews.end();
+  if(find(begin,end,renderView) == end)
     {
-    this->PQInternal->PreferredRenderModules.push_back(renderModule);
+    this->PQInternal->PreferredRenderViews.push_back(renderView);
     }
 }
 
 //---------------------------------------------------------------------------
-void vtkSMPQStateLoader::RemovePreferredRenderModule(vtkSMRenderModuleProxy *renderModule)
+void vtkSMPQStateLoader::RemovePreferredRenderView(vtkSMRenderViewProxy *renderView)
 {
-  this->PQInternal->PreferredRenderModules.remove(renderModule);
+  this->PQInternal->PreferredRenderViews.remove(renderView);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMPQStateLoader::ClearPreferredRenderModules()
+void vtkSMPQStateLoader::ClearPreferredRenderViews()
 {
-  this->PQInternal->PreferredRenderModules.clear();
+  this->PQInternal->PreferredRenderViews.clear();
 }
 
 
@@ -179,6 +168,5 @@ void vtkSMPQStateLoader::RegisterProxyInternal(const char* group,
 void vtkSMPQStateLoader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "MultiViewRenderModuleProxy: " 
-     << this->MultiViewRenderModuleProxy << endl;
+  os << indent << "MultiViewFactory: " << this->MultiViewFactory << endl;
 }

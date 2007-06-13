@@ -38,12 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractItemModel>
 
 class pqProxy;
-class pqRenderViewModule;
+class pqRenderView;
 class pqServerManagerModelItem;
 class vtkSMLink;
 class vtkSMProxy;
 class vtkSMProxyListDomain;
-class vtkSMRenderModuleProxy;
 
 /// A Qt based model to represent the vtkSMLinks in the
 /// server manager.
@@ -110,8 +109,8 @@ public:
   
   /// add a camera based link
   void addCameraLink(const QString& name, 
-                    vtkSMRenderModuleProxy* proxy1,
-                    vtkSMRenderModuleProxy* proxy2);
+                    vtkSMProxy* proxy1,
+                    vtkSMProxy* proxy2);
 
   /// add a property based link
   void addPropertyLink(const QString& name,
@@ -162,7 +161,7 @@ private:
   pqInternal* Internal;
 
   void linkUndoStacks();
-  void unlinkUndoStacks(pqRenderViewModule*);
+  void unlinkUndoStacks(pqRenderView*);
 };
 
 #endif

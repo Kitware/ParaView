@@ -51,10 +51,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 
 // pqCore
-#include "pqServerManagerModel.h"
 #include "pqApplicationCore.h"
-#include "pqRenderViewModule.h"
 #include "pqPipelineSource.h"
+#include "pqRenderView.h"
+#include "pqServerManagerModel2.h"
 
 // pqComponents
 #include "pqLinksModel.h"
@@ -178,18 +178,18 @@ public:
       return 2;
       }
     QModelIndex pidx = this->parent(idx);
-    pqServerManagerModel* smModel;
-    smModel = pqApplicationCore::instance()->getServerManagerModel();
+    pqServerManagerModel2* smModel;
+    smModel = pqApplicationCore::instance()->getServerManagerModel2();
 
     if(!pidx.isValid())
       {
       if(idx.row() == 0)
         {
-        return smModel->getNumberOfRenderModules();
+        return smModel->getNumberOfItems<pqRenderView*>();
         }
       else if(idx.row() == 1)
         {
-        return smModel->getNumberOfSources();
+        return smModel->getNumberOfItems<pqPipelineSource*>();
         }
       }
     if(pidx.isValid() && pidx.row() == 1)
@@ -237,11 +237,11 @@ public:
       if(!ri.hasIndex)
         {
         vtkSMProxy* pxy = this->getProxy(idx);
-        pqServerManagerModel* m;
-        m = pqApplicationCore::instance()->getServerManagerModel();
+        pqServerManagerModel2* m;
+        m = pqApplicationCore::instance()->getServerManagerModel2();
         if(pxy)
           {
-          return m->getPQProxy(pxy)->getSMName();
+          return m->findItem<pqProxy*>(pxy)->getSMName();
           }
         }
       else
@@ -326,17 +326,17 @@ public:
     if(pidx.isValid())
       {
       RowIndex ri = this->decodeIndex(idx.internalPointer());
-      pqServerManagerModel* m;
-      m = pqApplicationCore::instance()->getServerManagerModel();
+      pqServerManagerModel2* m;
+      m = pqApplicationCore::instance()->getServerManagerModel2();
       if(ri.type == 0)
         {
-        return m->getRenderModule(idx.row())->getProxy();
+        return m->getItemAtIndex<pqRenderView*>(idx.row())->getProxy();
         }
       else if(ri.type == 1)
         {
         if(!ri.hasIndex)
           {
-          return m->getPQSource(idx.row())->getProxy();
+          return m->getItemAtIndex<pqPipelineSource*>(idx.row())->getProxy();
           }
         else
           {

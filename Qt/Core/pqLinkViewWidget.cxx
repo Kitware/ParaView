@@ -42,13 +42,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QMouseEvent>
 
-#include "QVTKWidget.h"
-#include "pqRenderViewModule.h"
 #include "pqApplicationCore.h"
 #include "pqLinksModel.h"
-#include "pqServerManagerModel.h"
+#include "pqRenderView.h"
+#include "pqServerManagerModel2.h"
+#include "QVTKWidget.h"
 
-pqLinkViewWidget::pqLinkViewWidget(pqRenderViewModule* firstLink)
+//-----------------------------------------------------------------------------
+pqLinkViewWidget::pqLinkViewWidget(pqRenderView* firstLink)
   : QWidget(firstLink->getWidget(), 
             Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint),
     RenderView(firstLink)
@@ -80,10 +81,12 @@ pqLinkViewWidget::pqLinkViewWidget(pqRenderViewModule* firstLink)
   this->LineEdit->selectAll();
 }
 
+//-----------------------------------------------------------------------------
 pqLinkViewWidget::~pqLinkViewWidget()
 {
 }
   
+//-----------------------------------------------------------------------------
 bool pqLinkViewWidget::event(QEvent* e)
 {
   if(e->type() == QEvent::Show)
@@ -100,18 +103,29 @@ bool pqLinkViewWidget::event(QEvent* e)
   return QWidget::event(e);
 }
 
+//-----------------------------------------------------------------------------
 bool pqLinkViewWidget::eventFilter(QObject* watched, QEvent* e)
 {
   if(e->type() == QEvent::MouseButtonPress ||
      e->type() == QEvent::MouseButtonDblClick )
     {
-    pqServerManagerModel* smModel =
-      pqApplicationCore::instance()->getServerManagerModel();
+    pqServerManagerModel2* smModel =
+      pqApplicationCore::instance()->getServerManagerModel2();
+
     QMouseEvent* me = static_cast<QMouseEvent*>(e);
     QPoint globalpos(me->globalX(), me->globalY());
     QWidget* wid = QApplication::widgetAt(globalpos);
-    pqRenderViewModule* otherView;
-    otherView = smModel->getRenderModule(qobject_cast<QVTKWidget*>(wid));
+    pqRenderView* otherView = 0;
+
+    QList<pqRenderView*> views = smModel->findItems<pqRenderView*>();
+    foreach (pqRenderView* view, views)
+      {
+      if (view && view->getWidget() == wid)
+        {
+        otherView = view;
+        break;
+        }
+      }
     
     // if the user clicked on another view
     if(otherView && otherView != this->RenderView)
@@ -125,8 +139,7 @@ bool pqLinkViewWidget::eventFilter(QObject* watched, QEvent* e)
         }
 
       model->addCameraLink(name, 
-        this->RenderView->getRenderModuleProxy(),
-        otherView->getRenderModuleProxy());
+        this->RenderView->getProxy(), otherView->getProxy());
 
       this->close();
       }

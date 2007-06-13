@@ -42,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QComboBox;
 class QHBoxLayout;
 
-class pqConsumerDisplay;
-class pqPipelineDisplay;
+class pqDataRepresentation;
+class pqPipelineRepresentation;
 class vtkEventQtSlotConnect;
 
 /// Provides a standard user interface for selecting among a collection 
@@ -68,7 +68,7 @@ public:
 
   /// Returns the display whose color this widget is currently 
   /// editing.
-  pqPipelineDisplay* getDisplay() const;
+  pqPipelineRepresentation* getRepresentation() const;
 
   /// Returns the current text in the combo box.
   QString getCurrentText() const;
@@ -79,7 +79,7 @@ public slots:
 
   /// When set, the source/renModule is not used to locate the
   /// display, instead this display is used.
-  void setDisplay(pqConsumerDisplay* display);
+  void setRepresentation(pqDataRepresentation* display);
 
   /// Called when the GUI must reload the arrays shown in the widget.
   /// i.e. this updates the domain for the combo box.
@@ -129,7 +129,7 @@ private:
   QComboBox* Variables;
   bool BlockEmission;
   vtkEventQtSlotConnect* VTKConnect;
-  QPointer<pqPipelineDisplay> Display;
+  QPointer<pqPipelineRepresentation> Display;
   QList<QString> AvailableArrays;
 };
 

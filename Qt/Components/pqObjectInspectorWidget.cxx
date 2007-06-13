@@ -64,8 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPluginManager.h"
 #include "pqPropertyManager.h"
-#include "pqRenderViewModule.h"
-#include "pqServerManagerModel.h"
+#include "pqServerManagerModel2.h"
 #include "pqServerManagerObserver.h"
 #include "pqStreamTracerPanel.h"
 #include "pqExtractDataSetsPanel.h"
@@ -73,6 +72,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 //#include "pqXDMFPanel.h"
 #include "pqExodusIIPanel.h"
+#include "pqView.h"
 
 class pqStandardCustomPanels : public QObject, public pqObjectPanelInterface
 {
@@ -269,13 +269,13 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->DeleteButton->setEnabled(false);
 
 
-  this->connect(pqApplicationCore::instance()->getServerManagerModel(), 
+  this->connect(pqApplicationCore::instance()->getServerManagerModel2(),
                 SIGNAL(sourceRemoved(pqPipelineSource*)),
                 SLOT(removeProxy(pqPipelineSource*)));
-  this->connect(pqApplicationCore::instance()->getServerManagerModel(), 
+  this->connect(pqApplicationCore::instance()->getServerManagerModel2(), 
       SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)),
       SLOT(handleConnectionChanged(pqPipelineSource*, pqPipelineSource*)));
-  this->connect(pqApplicationCore::instance()->getServerManagerModel(), 
+  this->connect(pqApplicationCore::instance()->getServerManagerModel2(), 
       SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*)),
       SLOT(handleConnectionChanged(pqPipelineSource*, pqPipelineSource*)));
 
@@ -303,20 +303,6 @@ void pqObjectInspectorWidget::canAccept(bool status)
     resetStatus = false;
     }
   this->ResetButton->setEnabled(resetStatus);
-}
-
-//-----------------------------------------------------------------------------
-void pqObjectInspectorWidget::setView(pqGenericViewModule* view)
-{
-  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(view);
-  this->RenderModule = rm;
-  emit this->renderModuleChanged(this->RenderModule);
-}
-
-//-----------------------------------------------------------------------------
-pqRenderViewModule* pqObjectInspectorWidget::getRenderModule()
-{
-  return this->RenderModule;
 }
 
 //-----------------------------------------------------------------------------
@@ -422,8 +408,8 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
   
   if(!reusedPanel)
     {
-    QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderViewModule*)), 
-                     this->CurrentPanel, SLOT(setRenderModule(pqRenderViewModule*)));
+    QObject::connect(this, SIGNAL(viewChanged(pqView*)), 
+                     this->CurrentPanel, SLOT(setView(pqView*)));
     
     QObject::connect(this->CurrentPanel->referenceProxy(),
       SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
@@ -431,7 +417,7 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
     }
     
   this->PanelArea->layout()->addWidget(this->CurrentPanel);
-  this->CurrentPanel->setRenderModule(this->getRenderModule());
+  this->CurrentPanel->setView(this->View);
   this->CurrentPanel->select();
   this->CurrentPanel->show();
   this->updateDeleteButtonState();
@@ -584,6 +570,7 @@ void pqObjectInspectorWidget::updateDeleteButtonState()
   this->DeleteButton->setEnabled(source && source->getNumberOfConsumers() == 0);
 }
 
+//-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::updateAcceptState()
 {
   // watch for modified state changes
@@ -598,4 +585,15 @@ void pqObjectInspectorWidget::updateAcceptState()
   this->canAccept(acceptable);
 }
 
+//-----------------------------------------------------------------------------
+void pqObjectInspectorWidget::setView(pqView* view)
+{
+  this->View = view;
+  emit this->viewChanged(view);
+}
 
+//-----------------------------------------------------------------------------
+pqView* pqObjectInspectorWidget::view()
+{
+  return this->View;
+}

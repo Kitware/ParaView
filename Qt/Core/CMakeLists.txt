@@ -74,7 +74,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqQVTKWidgetEventTranslator.h
   pqReaderFactory.h
   pqRenderViewModule.h
-  pqScalarBarDisplay.h
   pqScalarBarVisibilityAdaptor.h
   pqScalarsToColors.h
   pqServer.h
@@ -93,6 +92,17 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqUndoStack.h
   pqVTKHistogramModel.h
   pqWriterFactory.h
+
+  pqRepresentation.h
+  pqView.h
+  pqRenderView.h
+  pqServerManagerModel2.h
+  pqStandardServerManagerModelInterface.h
+  pqScalarBarRepresentation.h
+  pqDataRepresentation.h
+  pqPipelineRepresentation.h
+  pqElementInspectorView.h
+  pqTextRepresentation.h
   ${PYTHON_MOC_SRCS}
   )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
@@ -127,6 +137,27 @@ SOURCE_GROUP("Generated" FILES
 )
 
 ADD_LIBRARY(pqCore
+  pqRepresentation.cxx
+  pqRepresentation.h
+  pqView.cxx
+  pqView.h
+  pqRenderView.cxx
+  pqRenderView.h
+  pqServerManagerModel2.cxx
+  pqServerManagerModel2.h
+  pqStandardServerManagerModelInterface.cxx
+  pqStandardServerManagerModelInterface.h
+  pqScalarBarRepresentation.cxx
+  pqScalarBarRepresentation.h
+  pqDataRepresentation.cxx
+  pqDataRepresentation.h
+  pqPipelineRepresentation.cxx
+  pqPipelineRepresentation.h
+  pqElementInspectorView.h
+  pqElementInspectorView.cxx
+  pqTextRepresentation.h
+  pqTextRepresentation.cxx
+
   pq3DWidgetFactory.cxx
   pq3DWidgetFactory.h
   pqAnimationCue.cxx
@@ -242,8 +273,6 @@ ADD_LIBRARY(pqCore
   pqSMAdaptor.h
   pqSMProxy.cxx
   pqSMProxy.h
-  pqScalarBarDisplay.cxx
-  pqScalarBarDisplay.h
   pqScalarBarVisibilityAdaptor.cxx
   pqScalarBarVisibilityAdaptor.h
   pqScalarsToColors.cxx

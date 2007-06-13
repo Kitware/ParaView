@@ -116,7 +116,7 @@ public:
 
   ~pqRenderViewModuleInternal()
     {
-    this->RenderViewProxy->setRenderModule(0);
+    //this->RenderViewProxy->setRenderModule(0);
     }
 };
 
@@ -127,7 +127,7 @@ pqRenderViewModule::pqRenderViewModule(const QString& name,
   renderViewType(), "view_modules", name, renModule, server, _parent)
 {
   this->Internal = new pqRenderViewModuleInternal();
-  this->Internal->RenderViewProxy->setRenderModule(this);
+ // this->Internal->RenderViewProxy->setRenderModule(this);
   this->Internal->RenderModuleProxy = renModule;
 
   // we need to fire signals when undo stack changes.
@@ -250,7 +250,7 @@ void pqRenderViewModule::initializeWidgets()
   // setup the center axes.
   this->initializeCenterAxes();
 
-  this->Internal->UndoStackBuilder->SetRenderModule(renModule);
+  //this->Internal->UndoStackBuilder->SetRenderModule(renModule);
 }
 
 //-----------------------------------------------------------------------------
@@ -986,11 +986,13 @@ void pqRenderViewModule::restoreDefaultLightSettings()
 //-----------------------------------------------------------------------------
 void pqRenderViewModule::linkToOtherView()
 {
+  /*
   pqLinkViewWidget* linkWidget = new pqLinkViewWidget(this);
   linkWidget->setAttribute(Qt::WA_DeleteOnClose);
   QPoint pos = this->getWidget()->mapToGlobal(QPoint(2,2));
   linkWidget->move(pos);
   linkWidget->show();
+  */
 }
   
 //-----------------------------------------------------------------------------

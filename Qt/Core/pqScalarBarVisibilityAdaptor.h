@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "pqCoreExport.h"
 
-class pqConsumerDisplay;
-class pqGenericViewModule;
+class pqDataRepresentation;
+class pqView;
 class QAction;
 
 /// pqScalarBarVisibilityAdaptor is an adptor that can be hooked on to
@@ -68,7 +68,7 @@ signals:
 public slots:
   /// Set the active display which this adaptor is going to
   /// show/hide the scalar bar for.
-  void setActiveDisplay(pqConsumerDisplay *display, pqGenericViewModule *view);
+  void setActiveRepresentation(pqDataRepresentation *display);
 
 protected slots:
   void updateState();

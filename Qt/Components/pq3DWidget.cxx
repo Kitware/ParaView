@@ -52,11 +52,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqImplicitPlaneWidget.h"
 #include "pqLineSourceWidget.h"
-#include "pqPipelineSource.h"
 #include "pqPipelineFilter.h"
+#include "pqPipelineSource.h"
 #include "pqPointSourceWidget.h"
 #include "pqProxy.h"
-#include "pqRenderViewModule.h"
+#include "pqRenderView.h"
 #include "pqSMAdaptor.h"
 
 class pq3DWidgetInternal
@@ -99,7 +99,7 @@ pq3DWidget::pq3DWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* _p) :
 //-----------------------------------------------------------------------------
 pq3DWidget::~pq3DWidget()
 {
-  this->setRenderModule(0);
+  this->setView(0);
   this->setControlledProxy(0);
   delete this->Internal;
 }
@@ -150,34 +150,45 @@ QList<pq3DWidget*> pq3DWidget::createWidgets(pqProxy* o, vtkSMProxy* pxy)
 }
 
 //-----------------------------------------------------------------------------
-void pq3DWidget::setRenderModule(pqRenderViewModule* renModule)
+pqRenderView* pq3DWidget::renderView() const
 {
-  if (renModule == this->renderModule())
+  return qobject_cast<pqRenderView*>(this->view());
+}
+
+//-----------------------------------------------------------------------------
+void pq3DWidget::setView(pqView* view)
+{
+  if (view == this->renderView())
     {
+    this->Superclass::setView(view);
     return;
     }
 
   bool cur_visbility = this->widgetVisible();
   this->hideWidget();
 
+  /* FIXME: UDA
   vtkSMDisplayProxy* widget = this->getWidgetProxy();
-  if (this->renderModule() && widget)
+  if (this->renderView() && widget)
     {
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    this->renderModule()->getRenderModuleProxy()->RemoveDisplay(widget);
+    this->renderView()->getRenderViewProxy()->RemoveDisplay(widget);
     }
+    */
 
-  pqProxyPanel::setRenderModule(renModule);
+  this->Superclass::setView(view);
 
-  if (this->renderModule() && widget)
+  /* FIXME: UDA
+  if (this->renderView() && widget)
     {
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    this->renderModule()->getRenderModuleProxy()->AddDisplay(widget);
+    this->renderView()->getRenderModuleProxy()->AddDisplay(widget);
     }
+    */
 
   if (cur_visbility)
     {
@@ -188,9 +199,9 @@ void pq3DWidget::setRenderModule(pqRenderViewModule* renModule)
 //-----------------------------------------------------------------------------
 void pq3DWidget::render()
 {
-  if (this->renderModule())
+  if (this->renderView())
     {
-    this->renderModule()->render();
+    this->renderView()->render();
     }
 }
 
@@ -211,23 +222,27 @@ void pq3DWidget::setWidgetProxy(vtkSMNew3DWidgetProxy* pxy)
 {
  vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
 
- if (this->renderModule() && widget)
+ if (this->renderView() && widget)
     {
+    /* FIXME:UDA
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    this->renderModule()->getRenderModuleProxy()->RemoveDisplay(widget);
-    this->renderModule()->render();
+    this->renderView()->getRenderModuleProxy()->RemoveDisplay(widget);
+    */
+    this->renderView()->render();
     }
   this->Internal->WidgetProxy = pxy;
 
-  if (this->renderModule() && pxy)
+  if (this->renderView() && pxy)
     {
+    /* FIXME: UDA
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    this->renderModule()->getRenderModuleProxy()->AddDisplay(widget);
-    this->renderModule()->render();
+    this->renderView()->getRenderModuleProxy()->AddDisplay(widget);
+    */
+    this->renderView()->render();
     }
 }
 
@@ -453,7 +468,7 @@ void pq3DWidget::updateWidgetVisibility()
     
   const bool widget_enabled = widget_visible;
   
-  if(this->Internal->WidgetProxy && this->renderModule())
+  if(this->Internal->WidgetProxy && this->renderView())
     {
     if(vtkSMIntVectorProperty* const visibility =
       vtkSMIntVectorProperty::SafeDownCast(

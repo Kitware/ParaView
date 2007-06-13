@@ -33,11 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pq3DWidgetFactory.h"
 #include "pqApplicationCore.h"
 #include "pqImplicitPlaneWidget.h"
-#include "pqRenderViewModule.h"
-#include "pqPipelineSource.h"
 #include "pqPipelineFilter.h"
-#include "pqPipelineDisplay.h"
+#include "pqPipelineSource.h"
 #include "pqPropertyLinks.h"
+#include "pqRenderView.h"
 #include "pqSMSignalAdaptors.h"
 
 #include "ui_pqImplicitPlaneWidget.h"
@@ -56,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMNew3DWidgetProxy.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMProxyProperty.h>
-#include <vtkSMRenderModuleProxy.h>
+#include <vtkSMRenderViewProxy.h>
 #include <vtkSMSourceProxy.h>
 
 /////////////////////////////////////////////////////////////////////////
@@ -428,9 +427,9 @@ void pqImplicitPlaneWidget::resetBounds()
       origin->SetElements(input_origin);
       }
     widget->UpdateProperty("Origin");
-    if(this->renderModule())
+    if(this->renderView())
       {
-      this->renderModule()->render();
+      this->renderView()->render();
       }
     this->setModified();
     }
@@ -475,9 +474,9 @@ void pqImplicitPlaneWidget::onUseCenterBounds()
           {
           origin->SetElements(input_origin);
           widget->UpdateVTKObjects();
-          if(this->renderModule())
+          if(this->renderView())
             {
-            this->renderModule()->render();
+            this->renderView()->render();
             }
           this->setModified();
           }
@@ -497,9 +496,9 @@ void pqImplicitPlaneWidget::onUseXNormal()
       {
       normal->SetElements3(1, 0, 0);
       widget->UpdateVTKObjects();
-      if(this->renderModule())
+      if(this->renderView())
         {
-        this->renderModule()->render();
+        this->renderView()->render();
         }
       this->setModified();
       }
@@ -517,9 +516,9 @@ void pqImplicitPlaneWidget::onUseYNormal()
       {
       normal->SetElements3(0, 1, 0);
       widget->UpdateVTKObjects();
-      if(this->renderModule())
+      if(this->renderView())
         {
-        this->renderModule()->render();
+        this->renderView()->render();
         }
       this->setModified();
       }
@@ -537,9 +536,9 @@ void pqImplicitPlaneWidget::onUseZNormal()
       {
       normal->SetElements3(0, 0, 1);
       widget->UpdateVTKObjects();
-      if(this->renderModule())
+      if(this->renderView())
         {
-        this->renderModule()->render();
+        this->renderView()->render();
         }
       this->setModified();
       }
@@ -551,7 +550,7 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
   vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
   if(widget)
     {
-    if(vtkCamera* const camera = this->renderModule()->getRenderModuleProxy()->GetRenderer()->GetActiveCamera())
+    if(vtkCamera* const camera = this->renderView()->getRenderViewProxy()->GetActiveCamera())
       {
       if(vtkSMDoubleVectorProperty* const normal =
         vtkSMDoubleVectorProperty::SafeDownCast(
@@ -563,9 +562,9 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
           -camera_normal[0], -camera_normal[1], -camera_normal[2]);
         
         widget->UpdateVTKObjects();
-        if(this->renderModule())
+        if(this->renderView())
           {
-          this->renderModule()->render();
+          this->renderView()->render();
           }
         this->setModified();
         }

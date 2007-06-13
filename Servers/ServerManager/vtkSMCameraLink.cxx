@@ -20,13 +20,13 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
-#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMStateLoader.h"
 
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMCameraLink);
-vtkCxxRevisionMacro(vtkSMCameraLink, "1.11");
+vtkCxxRevisionMacro(vtkSMCameraLink, "1.11.4.1");
 
 //---------------------------------------------------------------------------
 struct vtkSMCameraLinkInternals
@@ -65,7 +65,7 @@ struct vtkSMCameraLinkInternals
       this->Observer->SetCallback(vtkSMCameraLinkInternals::UpdateViewCallback);
       proxy->AddObserver(vtkCommand::EndEvent, this->Observer);
 
-      vtkSMRenderModuleProxy* rmp = vtkSMRenderModuleProxy::SafeDownCast(proxy);
+      vtkSMRenderViewProxy* rmp = vtkSMRenderViewProxy::SafeDownCast(proxy);
       if (rmp)
         {
         vtkPVGenericRenderWindowInteractor* iren = rmp->GetInteractor();
@@ -76,8 +76,8 @@ struct vtkSMCameraLinkInternals
     ~LinkedCamera()
       {
       this->Proxy->RemoveObserver(this->Observer);
-      vtkSMRenderModuleProxy* rmp = 
-        vtkSMRenderModuleProxy::SafeDownCast(this->Proxy);
+      vtkSMRenderViewProxy* rmp = 
+        vtkSMRenderViewProxy::SafeDownCast(this->Proxy);
       if (rmp)
         {
         vtkPVGenericRenderWindowInteractor* iren = rmp->GetInteractor();
@@ -139,7 +139,7 @@ vtkSMCameraLink::~vtkSMCameraLink()
 void vtkSMCameraLink::AddLinkedProxy(vtkSMProxy* proxy, int updateDir)
 {
   // must be render module to link cameras
-  if(vtkSMRenderModuleProxy::SafeDownCast(proxy))
+  if(vtkSMRenderViewProxy::SafeDownCast(proxy))
     {
     this->Superclass::AddLinkedProxy(proxy, updateDir);
     if(updateDir == vtkSMLink::INPUT)
@@ -230,8 +230,8 @@ void vtkSMCameraLink::UpdateViews(vtkSMProxy* caller, bool interactive)
     vtkSMProxy* p = this->GetLinkedProxy(i);
     if(this->GetLinkedProxyDirection(i) == vtkSMLink::OUTPUT && p != caller)
       {
-      vtkSMRenderModuleProxy* rmp;
-      rmp = vtkSMRenderModuleProxy::SafeDownCast(p);
+      vtkSMRenderViewProxy* rmp;
+      rmp = vtkSMRenderViewProxy::SafeDownCast(p);
       if(rmp)
         {
         if (interactive)
@@ -260,7 +260,7 @@ void vtkSMCameraLink::StartInteraction(vtkObject* caller)
   int numObjects = this->GetNumberOfLinkedProxies();
   for(int i=0; i<numObjects; i++)
     {
-    vtkSMRenderModuleProxy* rmp = vtkSMRenderModuleProxy::SafeDownCast(
+    vtkSMRenderViewProxy* rmp = vtkSMRenderViewProxy::SafeDownCast(
       this->GetLinkedProxy(i));
     if(rmp && this->GetLinkedProxyDirection(i) == vtkSMLink::OUTPUT && 
       rmp->GetInteractor() != caller)
@@ -283,7 +283,7 @@ void vtkSMCameraLink::EndInteraction(vtkObject* caller)
   int numObjects = this->GetNumberOfLinkedProxies();
   for(int i=0; i<numObjects; i++)
     {
-    vtkSMRenderModuleProxy* rmp = vtkSMRenderModuleProxy::SafeDownCast(
+    vtkSMRenderViewProxy* rmp = vtkSMRenderViewProxy::SafeDownCast(
       this->GetLinkedProxy(i));
     if(rmp && this->GetLinkedProxyDirection(i) == vtkSMLink::OUTPUT && 
       rmp->GetInteractor() != caller)

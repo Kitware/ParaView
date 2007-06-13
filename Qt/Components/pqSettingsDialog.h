@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDialog.h"
 
 class pqSettingsDialogInternal;
-class pqRenderViewModule;
+class pqRenderView;
 
 class PQCOMPONENTS_EXPORT pqSettingsDialog : public pqDialog 
 {
@@ -45,7 +45,9 @@ public:
   virtual ~pqSettingsDialog();
 
 public slots:
-  void setRenderModule(pqRenderViewModule*);
+  /// Set the render view whose properties are to be shown in the dialog.
+  /// We may want to make this general and work for all types of views.
+  void setRenderView(pqRenderView*);
 
 private slots:
   void onFinished(int);

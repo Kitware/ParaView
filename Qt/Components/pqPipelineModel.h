@@ -40,16 +40,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include <QAbstractItemModel>
 
-class pqConsumerDisplay;
-class pqPipelineDisplay;
+class pqDataRepresentation;
 class pqPipelineModelFilter;
 class pqPipelineModelInternal;
 class pqPipelineModelItem;
 class pqPipelineModelSource;
 class pqPipelineSource;
-class pqGenericViewModule;
+class pqView;
 class pqServer;
-class pqServerManagerModel;
+class pqServerManagerModel2;
 class pqServerManagerModelItem;
 class QFont;
 class QPixmap;
@@ -103,7 +102,7 @@ public:
   ///   Creates a pipeline model from a server manager model.
   /// \param other Used to build a pipeline model.
   /// \param parent The parent object.
-  pqPipelineModel(const pqServerManagerModel &other, QObject *parent=0);
+  pqPipelineModel(const pqServerManagerModel2 &other, QObject *parent=0);
   virtual ~pqPipelineModel();
 
   /// \name QAbstractItemModel Methods
@@ -302,8 +301,7 @@ public slots:
   /// \brief
   ///   Updates the display columns for the given source.
   /// \param source The source to update.
-  /// \param display The display that is changing.
-  void updateDisplays(pqPipelineSource *source, pqConsumerDisplay* display);
+  void updateRepresentations(pqPipelineSource *source);
 
   /// \brief
   ///   Updates the icons in the current window column.
@@ -313,7 +311,7 @@ public slots:
   /// the entire column needs to be updated.
   ///
   /// \param module The current render module.
-  void setViewModule(pqGenericViewModule *module);
+  void setView(pqView *module);
   //@}
 
 signals:
@@ -398,7 +396,7 @@ private:
   ///   Updates the display columns for sources displayed in the
   ///   render module.
   /// \param module The modified render module.
-  void updateDisplays(pqGenericViewModule *module);
+  void updateDisplays(pqView *module);
 
   /// \brief
   ///   Notifies the view that the input link items have changed.

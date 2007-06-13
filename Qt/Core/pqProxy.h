@@ -137,6 +137,7 @@ signals:
 
 protected:
   friend class pqServerManagerModel;
+  friend class pqServerManagerModel2;
 
   /// Make this pqProxy take on a new identity. This is following case:
   /// Proxy A registered as (gA, nA), then is again registered as (gA, nA2).

@@ -38,12 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "vtkType.h"
 
-class pqGenericViewModule;
+class pqView;
 class pqPipelineSource;
-class pqRenderViewModule;
+class pqRenderView;
 class pqSelectionManagerImplementation;
 class vtkDataObject;
-class vtkSMGenericViewDisplayProxy;
+class vtkSMClientDeliveryRepresentationProxy;
 class vtkSMProxy;
 
 /// pqSelectionManager is the nexus for selection in paraview.
@@ -65,7 +65,7 @@ public:
 
   /// Returns the client side selection displayer for the source,
   /// if the source is currently selected, otherwise return 0;
-  vtkSMGenericViewDisplayProxy* getClientSideDisplayer(
+  vtkSMClientDeliveryRepresentationProxy* getClientSideDisplayer(
     pqPipelineSource* source) const;
 
   /// Returns the currently selected source, if any.
@@ -120,14 +120,14 @@ public slots:
   void clearSelection();
 
   /// Used to keep track of active render module
-  void setActiveView(pqGenericViewModule*);
+  void setActiveView(pqView*);
 
 private slots:
   /// Called when a source is removed from the pipeline browser
   void sourceRemoved(pqPipelineSource*);
 
   /// Called when a view is deleted
-  void viewModuleRemoved(pqGenericViewModule* rm);
+  void viewRemoved(pqView* rm);
 
 protected:  
   void select();
@@ -137,11 +137,12 @@ private:
   int Mode;
 
   //helpers
-  int setInteractorStyleToSelect(pqRenderViewModule*);
-  int setInteractorStyleToInteract(pqRenderViewModule*);
+  int setInteractorStyleToSelect(pqRenderView*);
+  int setInteractorStyleToInteract(pqRenderView*);
   void processEvents(unsigned long event);
   void createSelectionDisplayer(vtkSMProxy* input);
   void selectOnSurface(int screenRectange[4]);
+  void selectOnSurfaceOld(int screenRectange[4]);
 };
 #endif
 

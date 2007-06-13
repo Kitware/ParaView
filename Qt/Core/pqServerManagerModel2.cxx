@@ -1,0 +1,418 @@
+/*=========================================================================
+
+   Program: ParaView
+   Module:    pqServerManagerModel2.cxx
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
+
+   See License_v1.1.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+========================================================================*/
+#include "pqServerManagerModel2.h"
+
+// Server Manager Includes.
+#include "vtkProcessModule.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkStringList.h"
+
+// Qt Includes.
+#include <QPointer>
+#include <QList>
+#include <QMap>
+#include <QtDebug>
+
+// ParaView Includes.
+#include "pqApplicationCore.h"
+#include "pqPluginManager.h"
+#include "pqProxy.h"
+#include "pqServer.h"
+#include "pqServerManagerModelInterface.h"
+#include "pqServerManagerObserver.h"
+#include "pqPipelineSource.h"
+#include "pqView.h"
+#include "pqRepresentation.h"
+
+//-----------------------------------------------------------------------------
+class pqServerManagerModel2::pqInternal
+{
+public:
+  typedef QMap<vtkIdType, QPointer<pqServer> > ServerMap;
+  ServerMap Servers;
+
+  typedef QMap<vtkSMProxy*, QPointer<pqProxy> > ProxyMap;
+  ProxyMap Proxies;
+
+  QList<QPointer<pqServerManagerModelItem> > ItemList;
+};
+
+//-----------------------------------------------------------------------------
+pqServerManagerModel2::pqServerManagerModel2(
+    pqServerManagerObserver* observer,
+    QObject* _parent /*=0*/) :
+  QObject(_parent)
+{
+  this->Internal = new pqServerManagerModel2::pqInternal();
+  QObject::connect(observer, 
+    SIGNAL(proxyRegistered(const QString&, const QString&, vtkSMProxy*)),
+    this, SLOT(onProxyRegistered(const QString&, const QString&, vtkSMProxy*)));
+  QObject::connect(observer, 
+    SIGNAL(proxyUnRegistered(const QString&, const QString&, vtkSMProxy*)),
+    this, SLOT(onProxyUnRegistered(const QString&, const QString&, vtkSMProxy*)));
+
+  QObject::connect(observer, SIGNAL(connectionCreated(vtkIdType)),
+    this, SLOT(onConnectionCreated(vtkIdType)));
+  QObject::connect(observer, SIGNAL(connectionClosed(vtkIdType)),
+    this, SLOT(onConnectionClosed(vtkIdType)));
+}
+
+//-----------------------------------------------------------------------------
+pqServerManagerModel2::~pqServerManagerModel2()
+{
+  delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+pqServer* pqServerManagerModel2::findServer(vtkIdType cid) const
+{
+  pqInternal::ServerMap::iterator iter = this->Internal->Servers.find(cid);
+  if (iter != this->Internal->Servers.end())
+    {
+    return iter.value();
+    }
+
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+pqServer* pqServerManagerModel2::findServer(const pqServerResource& resource) const
+{
+  foreach(pqServer* server, this->Internal->Servers)
+    {
+    if (server && server->getResource() == resource)  
+      {
+      return server;
+      }
+    }
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
+pqProxy* pqServerManagerModel2::findItemHelper(
+  const pqServerManagerModel2* const model, const QMetaObject& vtkNotUsed(mo), 
+  vtkSMProxy* proxy)
+{
+  pqInternal::ProxyMap::iterator iter = model->Internal->Proxies.find(proxy);
+  if (iter != model->Internal->Proxies.end())
+    {
+    return iter.value();
+    }
+
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+pqProxy* pqServerManagerModel2::findItemHelper(
+  const pqServerManagerModel2* const model, const QMetaObject& mo, 
+  const QString& name)
+{
+  foreach (pqServerManagerModelItem* item, model->Internal->ItemList)
+    {
+    if (item && mo.cast(item))
+      {
+      pqProxy* proxy = qobject_cast<pqProxy*>(item);
+      if (proxy && proxy->getSMName() == name)
+        {
+        return proxy;
+        }
+      }
+    }
+
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerModel2::findItemsHelper(const pqServerManagerModel2 *const model, 
+  const QMetaObject &mo, QList<void *> *list, pqServer* server/*=0*/)
+{
+  if (!model || !list)
+    {
+    return;
+    }
+
+  foreach (pqServerManagerModelItem* item, model->Internal->ItemList)
+    {
+    if (item && mo.cast(item))
+      {
+      if (server)
+        {
+        pqProxy* pitem = qobject_cast<pqProxy*>(item);
+        if (pitem && pitem->getServer() != server)
+          {
+          continue;
+          }
+        }
+      list->push_back(item);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerModel2::onProxyRegistered(const QString& group,
+  const QString& name, vtkSMProxy* proxy)
+{
+  if (group.endsWith("_prototypes"))
+    {
+    // Ignore prototype proxies.
+    return;
+    }
+
+  if (!proxy)
+    {
+    qCritical() << "Null proxy cannot be registered.";
+    return;
+    }
+
+  pqServer* server = this->findServer(proxy->GetConnectionID());
+  if (!server)
+    {
+    qDebug() << "Failed to locate server for newly registered proxy ("
+      << group << ", " << name << ")";
+    return;
+    }
+
+  if (this->findItem<pqProxy*>(proxy))
+    {
+    // item already exists for this proxy, don't create a new one.
+    return;
+    }
+
+  pqProxy* item = 0;
+
+  QObjectList ifaces =
+    pqApplicationCore::instance()->getPluginManager()->interfaces();
+  foreach(QObject* iface, ifaces)
+    {
+    pqServerManagerModelInterface* smi = 
+      qobject_cast<pqServerManagerModelInterface*>(iface);
+    if(smi)
+      {
+      item = smi->createPQProxy(group, name, proxy, server);
+      if (item)
+        {
+        break;
+        }
+      }
+    }
+
+  if (!item)
+    {
+    return;
+    }
+
+  // Set the QObject parent, simplifying clean up of objects.
+  item->setParent(this);
+
+  emit this->preItemAdded(item);
+  emit this->preProxyAdded(item);
+
+  pqView* view = qobject_cast<pqView*>(item);
+  pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
+  pqRepresentation* repr = qobject_cast<pqRepresentation*>(item);
+
+  if (view)
+    {
+    emit this->preViewAdded(view);
+    }
+  else if (source)
+    {
+    QObject::connect(source, 
+      SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*)),
+      this, SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*)));
+    QObject::connect(source, 
+      SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)),
+      this, SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)));
+    QObject::connect(source, 
+      SIGNAL(preConnectionAdded(pqPipelineSource*, pqPipelineSource*)),
+      this, SIGNAL(preConnectionAdded(pqPipelineSource*, pqPipelineSource*)));
+    QObject::connect(source, 
+      SIGNAL(preConnectionRemoved(pqPipelineSource*, pqPipelineSource*)),
+      this, SIGNAL(preConnectionRemoved(pqPipelineSource*, pqPipelineSource*)));
+    QObject::connect(source, SIGNAL(nameChanged(pqServerManagerModelItem*)), 
+      this, SIGNAL(nameChanged(pqServerManagerModelItem*)));
+    QObject::connect(
+      source, SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
+      this, SIGNAL(nameChanged(pqServerManagerModelItem*)));
+
+    emit this->preSourceAdded(source);
+    }
+  else if (repr)
+    {
+    emit this->preRepresentationAdded(repr);
+    }
+
+  this->Internal->Proxies[proxy] = item;
+  this->Internal->ItemList.push_back(item);
+
+  emit this->itemAdded(item);
+  emit this->proxyAdded(item);
+
+  if (view)
+    {
+    emit this->viewAdded(view);
+    }
+  else if (source)
+    {
+    emit this->sourceAdded(source);
+    }
+  else if (repr)
+    {
+    emit this->representationAdded(repr);
+    }
+
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerModel2::onProxyUnRegistered(const QString& group,
+  const QString& name, vtkSMProxy* proxy)
+{
+  // TODO:UDA
+  // Handle proxy renaming.
+  pqProxy* item = this->findItem<pqProxy*>(proxy);
+  if (!item || item->getSMName() != name || item->getSMGroup() != group)
+    {
+    // Proxy is unknown or being registered from a group/name for which we
+    // didn't create any pq object.
+    return;
+    }
+
+  // Verify if the proxy is registered under a different name in the same group.
+  // If so, we are simply renaming the proxy.
+  vtkSmartPointer<vtkStringList> names = vtkSmartPointer<vtkStringList>::New();
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  pxm->GetProxyNames(group.toAscii().data(), proxy, names);
+  for (int cc=0; cc < names->GetLength(); cc++)
+    {
+    if (name == names->GetString(cc))
+      {
+      continue;
+      }
+    // Change the name of the pqsource.
+    item->setSMName(names->GetString(cc));
+    return;
+    }
+
+  pqView* view = qobject_cast<pqView*>(item);
+  pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
+  pqRepresentation* repr = qobject_cast<pqRepresentation*>(item);
+
+
+  if (view)
+    {
+    emit this->preViewRemoved(view);
+    }
+  else if (source)
+    {
+    emit this->preSourceRemoved(source);
+    }
+  else if (repr)
+    {
+    emit this->preRepresentationRemoved(repr);
+    }
+
+  emit this->preProxyRemoved(item);
+  emit this->preItemRemoved(item);
+
+  QObject::disconnect(item, 0, this, 0);
+  this->Internal->ItemList.removeAll(item);
+  this->Internal->Proxies.remove(item->getProxy());
+
+  if (view)
+    {
+    emit this->viewRemoved(view);
+    }
+  else if (source)
+    {
+    emit this->sourceRemoved(source);
+    }
+  else if (repr)
+    {
+    emit this->representationRemoved(repr);
+    }
+
+  emit this->proxyRemoved(item);
+  emit this->itemRemoved(item);
+  delete item;
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerModel2::onConnectionCreated(vtkIdType id)
+{
+  // Avoid duplicate server creations.
+  if (this->findServer(id))
+    {
+    return; // server already exists.
+    }
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pqServer* server = new pqServer(id, pm->GetOptions(), this);
+
+  emit this->preItemAdded(server);
+  emit this->preServerAdded(server);
+
+  this->Internal->Servers[id] = server;
+  this->Internal->ItemList.push_back(server);
+
+  // Lets the world know when the server name changes.
+  this->connect(server, SIGNAL(nameChanged(pqServerManagerModelItem*)), 
+    this, SIGNAL(nameChanged(pqServerManagerModelItem*)));
+  
+  server->initialize();
+
+  emit this->itemAdded(server);
+  emit this->serverAdded(server);
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerModel2::onConnectionClosed(vtkIdType id)
+{
+  pqServer* server = this->findServer(id);
+  if (!server)
+    {
+    qDebug() << "Unknown connection closed, simply ignoring it.";
+    return;
+    }
+
+  emit this->preServerRemoved(server);
+  emit this->preItemRemoved(server);
+
+  this->Internal->Servers.remove(server->GetConnectionID());
+  this->Internal->ItemList.removeAll(server);
+
+  emit this->serverRemoved(server);
+  emit this->itemRemoved(server);
+  delete server;
+}
+

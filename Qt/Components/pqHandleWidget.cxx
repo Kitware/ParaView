@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqHandleWidget.h"
 #include "pqRenderViewModule.h"
-#include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
 #include "pqPipelineFilter.h"
 #include "pqPropertyLinks.h"

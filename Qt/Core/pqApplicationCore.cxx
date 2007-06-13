@@ -70,27 +70,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationScene.h"
 #include "pqCoreInit.h"
 #include "pqDisplayPolicy.h"
+#include "pqEventDispatcher.h"
 #include "pqLinksModel.h"
 #include "pqLookupTableManager.h"
 #include "pqObjectBuilder.h"
 #include "pqOptions.h"
-#include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPluginManager.h"
 #include "pqProgressManager.h"
-#include "pqRenderViewModule.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqServerManagerModel2.h"
 #include "pqServerManagerObserver.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqServerResources.h"
 #include "pqServerStartups.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
+#include "pqStandardServerManagerModelInterface.h"
 #include "pqStandardViewModules.h"
 #include "pqUndoStack.h"
 #include "pqXMLUtil.h"
-#include "pqEventDispatcher.h"
+#include "pqRenderView.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCoreInternal
@@ -98,6 +99,7 @@ class pqApplicationCoreInternal
 public:
   pqServerManagerObserver* ServerManagerObserver;
   pqServerManagerModel* ServerManagerModel;
+  pqServerManagerModel2* ServerManagerModel2;
   pqObjectBuilder* ObjectBuilder;
   pq3DWidgetFactory* WidgetFactory;
   pqServerManagerSelectionModel* SelectionModel;
@@ -149,8 +151,10 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   this->Internal->ServerManagerModel = new pqServerManagerModel(this);
 
   // *  Make signal-slot connections between ServerManagerObserver and ServerManagerModel.
-  this->connect(this->Internal->ServerManagerObserver, this->Internal->ServerManagerModel);
+  //this->connect(this->Internal->ServerManagerObserver, this->Internal->ServerManagerModel);
 
+  this->Internal->ServerManagerModel2 = new pqServerManagerModel2(
+    this->Internal->ServerManagerObserver, this);
 
   // *  Create the pqObjectBuilder. This is used to create pipeline objects.
   this->Internal->ObjectBuilder = new pqObjectBuilder(this);
@@ -167,7 +171,7 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
 
   // * Setup the selection model.
   this->Internal->SelectionModel = new pqServerManagerSelectionModel(
-    this->Internal->ServerManagerModel, this);
+    this->Internal->ServerManagerModel2, this);
   
   this->Internal->DisplayPolicy = new pqDisplayPolicy(this);
 
@@ -176,6 +180,10 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   // add standard views
   this->Internal->PluginManager->addInterface(
     new pqStandardViewModules(this->Internal->PluginManager));
+
+  // add standard server manager model interface
+  this->Internal->PluginManager->addInterface(
+    new pqStandardServerManagerModelInterface(this->Internal->PluginManager));
 
   this->LoadingState = false;
 }
@@ -188,6 +196,10 @@ pqApplicationCore::~pqApplicationCore()
     pqApplicationCore::Instance = 0;
     }
   delete this->Internal;
+
+  // Unregister all proxies registered with the proxy manager.
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  pxm->UnRegisterProxies();
 }
 
 //-----------------------------------------------------------------------------
@@ -261,6 +273,12 @@ pqServerManagerObserver* pqApplicationCore::getServerManagerObserver()
 pqServerManagerModel* pqApplicationCore::getServerManagerModel()
 {
   return this->Internal->ServerManagerModel;
+}
+
+//-----------------------------------------------------------------------------
+pqServerManagerModel2* pqApplicationCore::getServerManagerModel2()
+{
+  return this->Internal->ServerManagerModel2;
 }
 
 //-----------------------------------------------------------------------------
@@ -339,6 +357,7 @@ QObject* pqApplicationCore::manager(const QString& function)
 //-----------------------------------------------------------------------------
 void pqApplicationCore::removeServer(pqServer* server)
 {
+  cout << "removeServer" << endl;
   if (!server)
     {
     qDebug() << "No server to remove.";
@@ -403,17 +422,13 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
   if (pqLoader)
     {
     // tell the state loader to use the existing render modules before creating new ones
-    vtkSMRenderModuleProxy *smRen;
-    for(unsigned int i=0; 
-      i<server->GetRenderModule()->GetNumberOfRenderModules(); i++)
+    QList<pqRenderView*> renderViews = this->Internal->ServerManagerModel2->
+      findItems<pqRenderView*>(server);
+    foreach (pqRenderView* renderView, renderViews)
       {
-      if( (smRen = dynamic_cast<vtkSMRenderModuleProxy*>(
-            server->GetRenderModule()->GetRenderModule(i))) )
-        {
-        pqLoader->AddPreferredRenderModule(smRen);
-        }
+      pqLoader->AddPreferredRenderView(renderView->getRenderViewProxy());
       }
-    pqLoader->SetMultiViewRenderModuleProxy(server->GetRenderModule());
+    pqLoader->SetMultiViewFactory(server->getMultiViewFactory());
     }
 
   this->LoadingState = true;
@@ -430,9 +445,9 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     {
     // this is necessary to avoid unnecesary references to the render module,
     // enabling the proxy to be cleaned up before server disconnect.
-    pqLoader->SetMultiViewRenderModuleProxy(0);
+    pqLoader->SetMultiViewFactory(0);
     // delete any unused rendermodules from state loader
-    pqLoader->ClearPreferredRenderModules();
+    pqLoader->ClearPreferredRenderViews();
     }
 
   pqEventDispatcher::processEventsAndWait(1);
@@ -545,15 +560,15 @@ pqServer* pqApplicationCore::createServer(const pqServerResource& resource)
   const pqServerResource server_resource = resource.schemeHostsPorts();
 
   // See if the server is already created.
-  pqServerManagerModel *smModel = this->getServerManagerModel();
-  pqServer *server = smModel->getServer(server_resource);
+  pqServerManagerModel2 *smModel = this->getServerManagerModel2();
+  pqServer *server = smModel->findServer(server_resource);
   if(!server)
     {
     // TEMP: ParaView only allows one server connection. Remove this
     // code when it supports multiple server connections.
-    if(smModel->getNumberOfServers() > 0)
+    if(smModel->getNumberOfItems<pqServer*>() > 0)
       {
-      this->removeServer(smModel->getServerByIndex(0));
+      this->removeServer(smModel->getItemAtIndex<pqServer*>(0));
       }
 
     // Based on the server resource, create the correct type of server ...
@@ -600,7 +615,7 @@ pqServer* pqApplicationCore::createServer(const pqServerResource& resource)
         pm->SynchronizeServerClientOptions(id);
         }
 
-      server = smModel->getServer(id);
+      server = smModel->findServer(id);
       server->setResource(server_resource);
       emit this->finishedAddingServer(server);
       }
@@ -612,9 +627,9 @@ pqServer* pqApplicationCore::createServer(const pqServerResource& resource)
 //-----------------------------------------------------------------------------
 void pqApplicationCore::render()
 {
-  QList<pqGenericViewModule*> list = 
-    this->getServerManagerModel()->getViewModules(NULL);
-  foreach(pqGenericViewModule* view, list)
+  QList<pqView*> list = 
+    this->Internal->ServerManagerModel2->findItems<pqView*>();
+  foreach(pqView* view, list)
     {
     view->render();
     }

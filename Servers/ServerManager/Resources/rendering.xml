@@ -3944,12 +3944,6 @@
           <Property name="OutputDataType" />
         </ExposedProperties>
       </SubProxy>
-      
-      <SubProxy>
-        <Proxy name="PostProcessor"
-          proxygroup="filters" proxyname="PolyLineToRectilinearGrid">
-        </Proxy>
-      </SubProxy>
 
       <SubProxy>
         <Proxy name="CollectLOD" proxygroup="filters" proxyname="ClientServerMoveData">
@@ -5456,6 +5450,14 @@
           <Property name="Selection" />
         </ExposedProperties>
       </SubProxy>
+
+      <!-- 
+      <SubProxy>
+        <Proxy name="PostProcessor"
+          proxygroup="filters" proxyname="PolyLineToRectilinearGrid">
+        </Proxy>
+      </SubProxy>
+      -->
       <!-- End of ClientDeliveryRepresentation -->
     </ClientDeliveryRepresentationProxy>
 
@@ -5812,6 +5814,7 @@
 
 
 </ServerManagerConfiguration>
+
 
 
 

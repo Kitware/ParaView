@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGlobalStatic>
 
 #include "pqServerManagerModelItem.h"
-#include "pqServerManagerModel.h"
+#include "pqServerManagerModel2.h"
 
 // register meta type for pqSMProxy
 static const int pqServerManagerSelectionId = 
@@ -45,14 +45,14 @@ qRegisterMetaType<pqServerManagerSelection>("pqServerManagerSelection");
 class pqServerManagerSelectionModelInternal
 {
 public:
-  QPointer<pqServerManagerModel> Model;
+  QPointer<pqServerManagerModel2> Model;
   pqServerManagerSelection Selection;
   QPointer<pqServerManagerModelItem> Current;
 };
 
 //-----------------------------------------------------------------------------
 pqServerManagerSelectionModel::pqServerManagerSelectionModel(
-  pqServerManagerModel* _model, QObject* _parent /*=null*/) :QObject(_parent)
+  pqServerManagerModel2* _model, QObject* _parent /*=null*/) :QObject(_parent)
 {
   this->Internal = new pqServerManagerSelectionModelInternal;
   this->Internal->Model = _model;
@@ -86,7 +86,7 @@ void pqServerManagerSelectionModel::setCurrentItem(
 }
 
 //-----------------------------------------------------------------------------
-pqServerManagerModel* pqServerManagerSelectionModel::model() const
+pqServerManagerModel2* pqServerManagerSelectionModel::model() const
 {
   return this->Internal->Model;
 }

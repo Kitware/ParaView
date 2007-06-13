@@ -26,7 +26,7 @@
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkTIFFWriter.h"
 #include "vtkToolkits.h"
 
@@ -46,7 +46,7 @@
 #endif
 
 vtkStandardNewMacro(vtkSMAnimationSceneImageWriter);
-vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.7");
+vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.7.12.1");
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
   ImageWriter, vtkImageWriter);
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
@@ -140,9 +140,9 @@ vtkImageData* vtkSMAnimationSceneImageWriter::NewFrame()
 
 //-----------------------------------------------------------------------------
 vtkImageData* vtkSMAnimationSceneImageWriter::CaptureViewImage(
-  vtkSMAbstractViewModuleProxy* view, int magnification)
+  vtkSMViewProxy* view, int magnification)
 {
-  vtkSMRenderModuleProxy* rmview = vtkSMRenderModuleProxy::SafeDownCast(view);
+  vtkSMRenderViewProxy* rmview = vtkSMRenderViewProxy::SafeDownCast(view);
   if (rmview)
     {
     return rmview->CaptureWindow(magnification);
@@ -192,7 +192,7 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
     combinedImage.TakeReference(this->NewFrame());
     for (unsigned int cc=0; cc < num_modules; cc++)
       {
-      vtkSMAbstractViewModuleProxy* view = this->AnimationScene->GetViewModule(cc);
+      vtkSMViewProxy* view = this->AnimationScene->GetViewModule(cc);
       vtkImageData* capture = this->CaptureViewImage(view, this->Magnification);
       if (capture)
         {
@@ -205,7 +205,7 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
     {
     // If only one view, we speed things up slightly by using the 
     // captured image directly.
-    vtkSMAbstractViewModuleProxy* view = this->AnimationScene->GetViewModule(0);
+    vtkSMViewProxy* view = this->AnimationScene->GetViewModule(0);
     vtkImageData* capture = this->CaptureViewImage(view, this->Magnification);
     if (!capture)
       {
@@ -369,7 +369,7 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
 void vtkSMAnimationSceneImageWriter::UpdateImageSize()
 {
   int gui_size[2] = {1, 1};
-  vtkSMAbstractViewModuleProxy* view = this->AnimationScene->GetViewModule(0);
+  vtkSMViewProxy* view = this->AnimationScene->GetViewModule(0);
   if (view)
     {
     view->GetGUISize(gui_size);

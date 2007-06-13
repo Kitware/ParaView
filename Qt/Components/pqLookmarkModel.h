@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMStateLoader;
 class pqServer;
-class pqGenericViewModule;
+class pqView;
 class vtkPVXMLElement;
 class pqPipelineSource;
 
@@ -118,7 +118,8 @@ public slots:
   // Display this lookmark in the given view, on the given server, using the given state loader
   // Setting the default view only makes sense if this lookmark is made up of a single view because
   // otherwise existing views will not be reused
-  virtual void load(pqServer *server,QList<pqPipelineSource*> *sources, pqGenericViewModule *view=NULL, vtkSMStateLoader *loader=NULL);
+  virtual void load(pqServer *server,QList<pqPipelineSource*> *sources, 
+    pqView *view=NULL, vtkSMStateLoader *loader=NULL);
 
   // The name of a lookmark is unique among all lookmarks in the application
   void setName(QString name);

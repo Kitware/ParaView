@@ -33,7 +33,7 @@
 class vtkGenericMovieWriter;
 class vtkImageData;
 class vtkImageWriter;
-class vtkSMAbstractViewModuleProxy;
+class vtkSMViewProxy;
 
 class VTK_EXPORT vtkSMAnimationSceneImageWriter : public vtkSMAnimationSceneWriter
 {
@@ -102,7 +102,7 @@ protected:
   // Default implementation can only handle vtkSMRenderModuleProxy subclasses.
   // Subclassess must override to handle other types of view modules.
   virtual vtkImageData* CaptureViewImage(
-    vtkSMAbstractViewModuleProxy*, int magnification);
+    vtkSMViewProxy*, int magnification);
 
   vtkImageData* NewFrame();
   void Merge(vtkImageData* dest, vtkImageData* src);

@@ -48,7 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView includes.
-#include "pqServerManagerModel.h"
+#include "pqApplicationCore.h"
+#include "pqServerManagerModel2.h"
 
 //-----------------------------------------------------------------------------
 class pqPipelineFilterInternal
@@ -185,7 +186,8 @@ void pqPipelineFilter::buildInputList(QSet<pqPipelineSource*> &set)
   vtkSMInputProperty* ivp = vtkSMInputProperty::SafeDownCast(
     this->getProxy()->GetProperty("Input"));
 
-  pqServerManagerModel* model = pqServerManagerModel::instance();
+  pqServerManagerModel2* model = 
+    pqApplicationCore::instance()->getServerManagerModel2();
 
   unsigned int max = ivp->GetNumberOfProxies();
   for (unsigned int cc=0; cc <max; cc++)
@@ -195,7 +197,7 @@ void pqPipelineFilter::buildInputList(QSet<pqPipelineSource*> &set)
       {
       continue;
       }
-    pqPipelineSource* pqSrc = model->getPQSource(proxy);
+    pqPipelineSource* pqSrc = model->findItem<pqPipelineSource*>(proxy);
     if (!pqSrc)
       {
       qCritical() << "Some proxy is added as input but was not registered with"

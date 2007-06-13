@@ -38,10 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMMultiViewFactory.h"
 #include "vtkSMMultiViewRenderModuleProxy.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderModuleProxy.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
 
 #include <QtDebug>
@@ -49,17 +51,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqConsumerDisplay.h"
+#include "pqDataRepresentation.h"
 #include "pqDisplayPolicy.h"
 #include "pqNameCount.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqPluginManager.h"
-#include "pqRenderViewModule.h"
-#include "pqScalarBarDisplay.h"
+#include "pqRenderView.h"
+#include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
-#include "pqServerManagerModel.h"
+#include "pqServerManagerModel2.h"
 #include "pqSMAdaptor.h"
+#include "pqView.h"
 #include "pqViewModuleInterface.h"
 
 //-----------------------------------------------------------------------------
@@ -84,7 +88,7 @@ pqPipelineSource* pqObjectBuilder::createSource(const QString& sm_group,
   if (proxy)
     {
     pqPipelineSource* source = pqApplicationCore::instance()->
-      getServerManagerModel()->getPQSource(proxy);
+      getServerManagerModel2()->findItem<pqPipelineSource*>(proxy);
 
     // initialize the source.
     source->setDefaultPropertyValues();
@@ -139,8 +143,8 @@ pqPipelineSource* pqObjectBuilder::createFilter(const QString& sm_group,
     return 0;
     }
 
-  pqPipelineSource* filter = qobject_cast<pqPipelineSource*>(
-    pqApplicationCore::instance()->getServerManagerModel()->getPQSource(proxy));
+  pqPipelineSource* filter = pqApplicationCore::instance()->getServerManagerModel2()->
+    findItem<pqPipelineSource*>(proxy);
   if (!filter)
     {
     qDebug() << "Failed to locate pqPipelineSource for the created proxy "
@@ -175,8 +179,8 @@ pqPipelineSource* pqObjectBuilder::createCustomFilter(const QString& sm_name,
     return 0;
     }
 
-  pqPipelineSource* filter = qobject_cast<pqPipelineSource*>(
-    pqApplicationCore::instance()->getServerManagerModel()->getPQSource(proxy));
+  pqPipelineSource* filter = pqApplicationCore::instance()->
+    getServerManagerModel2()->findItem<pqPipelineSource*>(proxy);
   if (!filter)
     {
     qDebug() << "Failed to locate pqPipelineSource for the created custom filter proxy "
@@ -214,8 +218,8 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
     return 0;
     }
 
-  pqPipelineSource* reader = qobject_cast<pqPipelineSource*>(
-    pqApplicationCore::instance()->getServerManagerModel()->getPQSource(proxy));
+  pqPipelineSource* reader = pqApplicationCore::instance()->
+    getServerManagerModel2()->findItem<pqPipelineSource*>(proxy);
   if (!reader)
     {
     qDebug() << "Failed to locate pqPipelineSource for the created proxy "
@@ -265,10 +269,14 @@ void pqObjectBuilder::destroy(pqPipelineSource* source)
     pp->RemoveAllProxies();
     }
 
-  // * remove all displays.
-  while (source->getDisplayCount())
+  // * remove all representations.
+  QList<pqDataRepresentation*> reprs = source->getRepresentations(0);
+  foreach (pqDataRepresentation* repr, reprs)
     {
-    this->destroy(source->getDisplay(0));
+    if (repr)
+      {
+      this->destroy(repr);
+      }
     }
 
   // * Unregister proxy.
@@ -276,7 +284,7 @@ void pqObjectBuilder::destroy(pqPipelineSource* source)
 }
 
 //-----------------------------------------------------------------------------
-pqGenericViewModule* pqObjectBuilder::createView(const QString& type,
+pqView* pqObjectBuilder::createView(const QString& type,
   pqServer* server)
 {
   if (!server)
@@ -287,9 +295,9 @@ pqGenericViewModule* pqObjectBuilder::createView(const QString& type,
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* proxy= 0;
-  if(type == pqRenderViewModule::renderViewType())
+  if(type == pqRenderView::renderViewType())
     {
-    proxy = server->newRenderModule();
+    proxy = server->newRenderView();
     }
   else
     {
@@ -319,18 +327,18 @@ pqGenericViewModule* pqObjectBuilder::createView(const QString& type,
   pxm->RegisterProxy("view_modules", name.toAscii().data(), proxy);
   proxy->Delete();
 
-  if (type == pqRenderViewModule::renderViewType())
+  if (type == pqRenderView::renderViewType())
     {
-    pqSMAdaptor::addProxyProperty(
-      server->GetRenderModule()->GetProperty("RenderModules"),
+    vtkSMMultiViewFactory* factory = server->getMultiViewFactory();
+    pqSMAdaptor::addProxyProperty(factory->GetProperty("RenderViews"),
       proxy);
-    server->GetRenderModule()->UpdateProperty("RenderModules");
+    factory->UpdateProperty("RenderViews");
     }
 
-  pqServerManagerModel* model = 
-    pqApplicationCore::instance()->getServerManagerModel();
-  pqGenericViewModule* view = qobject_cast<pqGenericViewModule*>(
-    model->getPQProxy(proxy));
+  pqServerManagerModel2* model = 
+    pqApplicationCore::instance()->getServerManagerModel2();
+
+  pqView* view = model->findItem<pqView*>(proxy);
   if (view)
     {
     view->setDefaultPropertyValues();
@@ -347,7 +355,7 @@ pqGenericViewModule* pqObjectBuilder::createView(const QString& type,
 }
 
 //-----------------------------------------------------------------------------
-void pqObjectBuilder::destroy(pqGenericViewModule* view)
+void pqObjectBuilder::destroy(pqView* view)
 {
   if (!view)
     {
@@ -356,37 +364,37 @@ void pqObjectBuilder::destroy(pqGenericViewModule* view)
 
   emit this->destroying(view);
 
-  // Get a list of all displays belonging to this render module. We delete
-  // all the displays that belong only to this render module.
-  QList<pqDisplay*> displays = view->getDisplays();
+  // Get a list of all reprs belonging to this render module. We delete
+  // all the reprs that belong only to this render module.
+  QList<pqRepresentation*> reprs = view->getRepresentations();
 
   // Unregister the proxy....the rest of the GUI will(rather should) manage itself!
   QString name = view->getSMName();
   vtkSMProxy* proxy = view->getProxy();
 
-  if (qobject_cast<pqRenderViewModule*>(view))
+  if (qobject_cast<pqRenderView*>(view))
     {
     // remove the render module from the multiview proxy.
-    vtkSMMultiViewRenderModuleProxy* multiRM = view->getServer()->GetRenderModule();  
-    pqSMAdaptor::removeProxyProperty(multiRM->GetProperty("RenderModules"), proxy);
-    multiRM->UpdateProperty("RenderModules");
+    vtkSMMultiViewFactory* factory = view->getServer()->getMultiViewFactory();  
+    pqSMAdaptor::removeProxyProperty(factory->GetProperty("RenderViews"), proxy);
+    factory->UpdateProperty("RenderViews");
     }
 
   this->destroyProxyInternal(view);
 
-  // Now clean up any orphan displays.
-  foreach (pqDisplay* disp, displays)
+  // Now clean up any orphan reprs.
+  foreach (pqRepresentation* repr, reprs)
     {
-    if (disp && disp->getNumberOfViewModules() == 0)
+    if (repr)
       {
-      this->destroyProxyInternal(disp);      
+      this->destroyProxyInternal(repr);
       }
     }
 }
 
 //-----------------------------------------------------------------------------
-pqConsumerDisplay* pqObjectBuilder::createDataDisplay(pqPipelineSource* source,
-  pqGenericViewModule* view)
+pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
+  pqPipelineSource* source, pqView* view)
 {
   if (!source|| !view)
     {
@@ -397,8 +405,8 @@ pqConsumerDisplay* pqObjectBuilder::createDataDisplay(pqPipelineSource* source,
   // FIXME: This class should not refer to any policies.
   pqApplicationCore* core= pqApplicationCore::instance();
   pqDisplayPolicy* policy = core->getDisplayPolicy();
-  vtkSMProxy* displayProxy = policy? policy->newDisplayProxy(source, view) : 0; 
-  if (!displayProxy)
+  vtkSMProxy* reprProxy = policy? policy->newDisplayProxy(source, view) : 0; 
+  if (!reprProxy)
     {
     return NULL;
     }
@@ -407,84 +415,78 @@ pqConsumerDisplay* pqObjectBuilder::createDataDisplay(pqPipelineSource* source,
   // (of undo/redo to work).
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
-  QString name = QString("DataDisplay%1").arg(
-    this->NameGenerator->GetCountAndIncrement("DataDisplay"));
-  pxm->RegisterProxy("displays", name.toAscii().data(), displayProxy);
-  displayProxy->Delete();
+  QString name = QString("DataRepresentation%1").arg(
+    this->NameGenerator->GetCountAndIncrement("DataRepresentation"));
+  pxm->RegisterProxy("displays", name.toAscii().data(), reprProxy);
+  reprProxy->Delete();
 
   vtkSMProxy* viewModuleProxy = view->getProxy();
 
-  // Set the displayProxy's input.
+  // Set the reprProxy's input.
   pqSMAdaptor::setProxyProperty(
-    displayProxy->GetProperty("Input"), source->getProxy());
-  displayProxy->UpdateVTKObjects();
+    reprProxy->GetProperty("Input"), source->getProxy());
+  reprProxy->UpdateVTKObjects();
 
-  // Add the displayProxy to render module.
+  // Add the reprProxy to render module.
   pqSMAdaptor::addProxyProperty(
-    viewModuleProxy->GetProperty("Displays"), displayProxy);
+    viewModuleProxy->GetProperty("Representations"), reprProxy);
   viewModuleProxy->UpdateVTKObjects();
 
-  pqConsumerDisplay* display = core->getServerManagerModel()->getPQDisplay(
-    displayProxy);
-  if (display)
+  pqDataRepresentation* repr = core->getServerManagerModel2()->
+    findItem<pqDataRepresentation*>(reprProxy);
+  if (repr)
     {
-    display->setDefaultPropertyValues();
+    repr->setDefaultPropertyValues();
 
-    emit this->dataDisplayCreated(display);
-    emit this->proxyCreated(display);
+    emit this->dataRepresentationCreated(repr);
+    emit this->proxyCreated(repr);
     }
-  return display;
+  return repr;
 }
 
 //-----------------------------------------------------------------------------
-void pqObjectBuilder::destroy(pqDisplay* display)
+void pqObjectBuilder::destroy(pqRepresentation* repr)
 {
-  if (!display)
+  if (!repr)
     {
     return;
     }
 
-  emit this->destroying(display);
+  emit this->destroying(repr);
 
-  vtkSMProxy* displayProxy = display->getProxy();
 
-  // Remove display from the render module.
-  unsigned int num_views = display->getNumberOfViewModules();
-  for(unsigned int i=0; i < num_views ; i++)
+  // Remove repr from the view module.
+  pqView* view = repr->getView();
+  if (view)
     {
-    pqGenericViewModule* view = display->getViewModule(i);
-    if (!view)
-      {
-      continue;
-      }
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      view->getProxy()->GetProperty("Displays"));
-    pp->RemoveProxy(displayProxy);
+      view->getProxy()->GetProperty("Representations"));
+    pp->RemoveProxy(repr->getProxy());
     view->getProxy()->UpdateVTKObjects();
     }
 
-  // If this display has a lookuptable, we hide all scalar bars for that
-  // lookup table unless there is some other display that's using it.
+  // If this repr has a lookuptable, we hide all scalar bars for that
+  // lookup table unless there is some other repr that's using it.
   pqScalarsToColors* stc =0;
-  if (pqConsumerDisplay* cd = qobject_cast<pqConsumerDisplay*>(display))
+  if (pqDataRepresentation* dataRepr = qobject_cast<pqDataRepresentation*>(repr))
     {
-    stc = cd->getLookupTable();
+    stc = dataRepr->getLookupTable();
     }
 
-  this->destroyProxyInternal(display);
+  this->destroyProxyInternal(repr);
 
   if (stc)
     {
     // this hides scalar bars only if the LUT is not used by
-    // any other display. This must happen after the display has 
+    // any other repr. This must happen after the repr has 
     // been deleted.
     stc->hideUnusedScalarBars();
     }
 }
 
 //-----------------------------------------------------------------------------
-pqScalarBarDisplay* pqObjectBuilder::createScalarBarDisplay(
-    pqScalarsToColors* lookupTable, pqGenericViewModule* view)
+pqScalarBarRepresentation* pqObjectBuilder::createScalarBarDisplay(
+    pqScalarsToColors* lookupTable, pqView* view)
 {
   if (!lookupTable || !view)
     {
@@ -499,19 +501,20 @@ pqScalarBarDisplay* pqObjectBuilder::createScalarBarDisplay(
 
   pqServer* server = view->getServer();
   vtkSMProxy* scalarBarProxy = this->createProxyInternal(
-    "displays", "ScalarBarWidget", server, "scalar_bars");
+    "representations", "ScalarBarWidgetRepresentation", server, "scalar_bars");
 
   if (!scalarBarProxy)
     {
     return 0;
     }
-  pqScalarBarDisplay* scalarBar = qobject_cast<pqScalarBarDisplay*>(
-    pqServerManagerModel::instance()->getPQProxy(scalarBarProxy));
+  pqScalarBarRepresentation* scalarBar = 
+    pqApplicationCore::instance()->getServerManagerModel2()->
+    findItem<pqScalarBarRepresentation*>(scalarBarProxy);
   pqSMAdaptor::setProxyProperty(scalarBarProxy->GetProperty("LookupTable"),
     lookupTable->getProxy());
   scalarBarProxy->UpdateVTKObjects();
 
-  pqSMAdaptor::addProxyProperty(view->getProxy()->GetProperty("Displays"),
+  pqSMAdaptor::addProxyProperty(view->getProxy()->GetProperty("Representations"),
     scalarBarProxy);
   view->getProxy()->UpdateVTKObjects();
   scalarBar->setDefaultPropertyValues();
@@ -619,12 +622,12 @@ void pqObjectBuilder::destroy(pqProxy* proxy)
 //-----------------------------------------------------------------------------
 void pqObjectBuilder::destroySources(pqServer* server)
 {
-  pqServerManagerModel* model = 
-    pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerModel2* model = 
+    pqApplicationCore::instance()->getServerManagerModel2();
   pqObjectBuilder* builder =
     pqApplicationCore::instance()->getObjectBuilder();
 
-  QList<pqPipelineSource*> sources = model->getSources(server);
+  QList<pqPipelineSource*> sources = model->findItems<pqPipelineSource*>(server);
   while(!sources.isEmpty())
     {
     for(int i=0; i<sources.size(); i++)
@@ -642,9 +645,9 @@ void pqObjectBuilder::destroySources(pqServer* server)
 //-----------------------------------------------------------------------------
 void pqObjectBuilder::destroySources()
 {
-  pqServerManagerModel* model = 
-    pqApplicationCore::instance()->getServerManagerModel();
-  QList<pqServer*> servers = model->getServers();
+  pqServerManagerModel2* model = 
+    pqApplicationCore::instance()->getServerManagerModel2();
+  QList<pqServer*> servers = model->findItems<pqServer*>();
   foreach(pqServer* server, servers)
     {
     this->destroySources(server);

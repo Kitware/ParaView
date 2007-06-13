@@ -1,0 +1,297 @@
+/*=========================================================================
+
+   Program: ParaView
+   Module:    pqServerManagerModel2.h
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
+
+   See License_v1.1.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+========================================================================*/
+#ifndef __pqServerManagerModel2_h 
+#define __pqServerManagerModel2_h
+
+#include <QObject>
+#include <QList>
+#include "pqCoreExport.h"
+#include "vtkType.h" // for vtkIdType.
+
+class pqPipelineSource;
+class pqProxy;
+class pqRepresentation;
+class pqServer;
+class pqServerManagerModelItem;
+class pqServerManagerObserver;
+class pqServerResource;
+class pqView;
+class vtkSMProxy;
+
+//BTX
+class pqServerManagerModel2;
+
+template <class T> inline QList<T> pqFindItems(
+  const pqServerManagerModel2* const model);
+template <class T> inline QList<T> pqFindItems(
+  const pqServerManagerModel2* const model, pqServer* server);
+template <class T> inline T pqFindItem(
+  const pqServerManagerModel2* const model, const QString& name);
+template <class T> inline T pqFindItem(
+  const pqServerManagerModel2* const model, vtkSMProxy* proxy);
+template <class T> inline int pqGetNumberOfItems(
+  const pqServerManagerModel2* const model);
+template <class T> inline T pqGetItemAtIndex(
+  const pqServerManagerModel2* const model, int index);
+//ETX
+
+/// pqServerManagerModel is the model for the Server Manager.
+/// All the pipelines in the Server Manager need a GUI representation
+/// to obtain additional information about their connections etc.
+/// This class collects that. This is merely representation of all the
+/// information available in the Server Manager in a more GUI friendly 
+/// way. Simplicity is the key here.
+class PQCORE_EXPORT pqServerManagerModel2 : public QObject
+{
+  Q_OBJECT
+  typedef QObject Superclass;
+public:
+  /// Constructor:
+  /// \c observer  :- instance of pqServerManagerObserver observing the server
+  ///                 manager.
+  pqServerManagerModel2(pqServerManagerObserver* observer, 
+    QObject* parent=0);
+  ~pqServerManagerModel2();
+
+  /// Given a connection Id, returns the pqServer instance for that connection,
+  /// if any.
+  pqServer* findServer(vtkIdType cid) const;
+
+  /// Given a server resource, locates the pqServer instance for it, if any.
+  pqServer* findServer(const pqServerResource& resource) const;
+
+  /// Given a proxy, locates a pqServerManagerModelItem subclass for the given 
+  /// proxy.
+  template<class T>
+    T findItem(vtkSMProxy* proxy) const
+      {
+      return ::pqFindItem<T>(this, proxy);
+      }
+
+  /// Returns a list of pqServerManagerModelItem of the given type.
+  template <class T>
+    QList<T> findItems() const
+      {
+      return ::pqFindItems<T>(this);
+      }
+
+  /// Returns the number of items of the given type.
+  template <class T>
+    int getNumberOfItems() const
+      {
+      return ::pqGetNumberOfItems<T>(this);
+      }
+
+  /// Returns the item of the given type and the given index.
+  /// The index is determined by collecting all the items of the given type in a
+  /// list (findItems()).
+  template <class T>
+    T getItemAtIndex(int index) const
+      {
+      return ::pqGetItemAtIndex<T>(this, index);
+      }
+
+  /// Same as findItems<T>() except that this returns only those items that are
+  /// on the indicated server. If server == 0, then all items are returned.
+  template <class T>
+    QList<T> findItems(pqServer* server) const
+      {
+      return ::pqFindItems<T>(this, server);
+      }
+
+  /// Returns an item with the given name. The type can be pqProxy
+  /// subclass, since these are the ones that can have a name.
+  /// Note that since names need not be unique, using this method is not
+  /// recommended. This is provided for backwards compatibility alone.
+  template <class T>
+    T findItem(const QString& name) const
+      {
+      return ::pqFindItem<T>(this, name);
+      }
+
+  /// Internal method.
+  static void findItemsHelper(const pqServerManagerModel2 * const model, 
+    const QMetaObject &mo, QList<void *> *list, pqServer* server=0);
+
+  /// Internal method.
+  static pqProxy* findItemHelper(const pqServerManagerModel2* const model, 
+    const QMetaObject& mo, vtkSMProxy* proxy);
+
+  /// Internal method.
+  static pqProxy* findItemHelper(const pqServerManagerModel2* const model, 
+    const QMetaObject& mo, const QString& name);
+
+signals:
+  /// Siganls emitted when a new pqServer object is created.
+  void preServerAdded(pqServer*);
+  void serverAdded(pqServer*);
+
+  /// Signals emitted when a pqServer instance is being destroyed.
+  void preServerRemoved(pqServer*);
+  void serverRemoved(pqServer*);
+
+  /// Signals emitted when any pqServerManagerModelItem subclass is created.
+  void preItemAdded(pqServerManagerModelItem*);
+  void itemAdded(pqServerManagerModelItem*); 
+
+  /// Signals emitted when any new pqServerManagerModelItem subclass is
+  /// being destroyed.
+  void preItemRemoved(pqServerManagerModelItem*);
+  void itemRemoved(pqServerManagerModelItem*);
+
+  void preProxyAdded(pqProxy*);
+  void proxyAdded(pqProxy*);
+
+  void preProxyRemoved(pqProxy*);
+  void proxyRemoved(pqProxy*);
+
+  /// Signals emitted when a source/filter is created.
+  void preSourceAdded(pqPipelineSource* source);
+  void sourceAdded(pqPipelineSource* source);
+
+  /// Signals emitted when a source/filter is destroyed.
+  void preSourceRemoved(pqPipelineSource*);
+  void sourceRemoved(pqPipelineSource*);
+
+  /// Signals emitted when a view is created
+  void preViewAdded(pqView* view);
+  void viewAdded(pqView* view);
+
+  /// Signals emitted when a view is destroyed.
+  void preViewRemoved(pqView*);
+  void viewRemoved(pqView*);
+
+  /// Signals emitted when a representation is created.
+  void preRepresentationAdded(pqRepresentation* rep);
+  void representationAdded(pqRepresentation* rep);
+
+  /// Signals emitted when a representation is destroyed.
+  void preRepresentationRemoved(pqRepresentation*);
+  void representationRemoved(pqRepresentation*);
+  
+  /// Fired when the name of an item changes.
+  void nameChanged(pqServerManagerModelItem *item);
+
+  /// Fired when a connection between two pqPipelineSources is created.
+  void connectionAdded(pqPipelineSource* in, pqPipelineSource* out);
+  void preConnectionAdded(pqPipelineSource* in, pqPipelineSource* out);
+
+  /// Fired when a connection between tow pqPipelineSources is broken.
+  void connectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
+  void preConnectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
+
+
+protected slots:
+  /// Called when a proxy is registered.
+  virtual void onProxyRegistered(const QString& group, const QString& name,
+    vtkSMProxy* proxy);
+
+  /// Called when a proxy is unregistered.
+  virtual void onProxyUnRegistered(const QString& group, const QString& name,
+    vtkSMProxy* proxy);
+  
+  /// Called when a new server connection is created.
+  virtual void onConnectionCreated(vtkIdType id);
+
+  /// Called when a server connection is closed.
+  virtual void onConnectionClosed(vtkIdType id);
+
+private:
+  pqServerManagerModel2(const pqServerManagerModel2&); // Not implemented.
+  void operator=(const pqServerManagerModel2&); // Not implemented.
+
+  class pqInternal;
+  pqInternal* Internal;
+};
+
+
+//-----------------------------------------------------------------------------
+template <class T>
+inline QList<T> pqFindItems(const pqServerManagerModel2* const model)
+{
+  QList<T> list;
+  pqServerManagerModel2::findItemsHelper(model, ((T)0)->staticMetaObject,
+    reinterpret_cast<QList<void *>*>(&list), 0);
+  return list;
+}
+
+//-----------------------------------------------------------------------------
+template <class T>
+inline QList<T> pqFindItems(const pqServerManagerModel2* const model,
+  pqServer* server)
+{
+  QList<T> list;
+  pqServerManagerModel2::findItemsHelper(model, ((T)0)->staticMetaObject,
+    reinterpret_cast<QList<void *>*>(&list), server);
+  return list;
+}
+
+//-----------------------------------------------------------------------------
+template <class T> 
+inline T pqFindItem(const pqServerManagerModel2* const model, vtkSMProxy* proxy)
+{
+  return qobject_cast<T>(
+    pqServerManagerModel2::findItemHelper(model, ((T)0)->staticMetaObject, proxy));
+}
+
+//-----------------------------------------------------------------------------
+template <class T> 
+inline T pqFindItem(const pqServerManagerModel2* const model, 
+  const QString& name)
+{
+  return qobject_cast<T>(
+    pqServerManagerModel2::findItemHelper(model, ((T)0)->staticMetaObject, name));
+}
+
+//-----------------------------------------------------------------------------
+template <class T> 
+inline int pqGetNumberOfItems(const pqServerManagerModel2* const model)
+{
+  return pqFindItems<T>(model).size();
+}
+
+//-----------------------------------------------------------------------------
+template <class T> 
+inline T pqGetItemAtIndex(const pqServerManagerModel2* const model, int index)
+{
+  QList<T> items = pqFindItems<T>(model);
+  if (index < items.size())
+    {
+    return items[index];
+    }
+
+  return 0;
+}
+
+#endif
+
+

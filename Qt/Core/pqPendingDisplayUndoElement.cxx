@@ -38,11 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPipelineSource.h"
 #include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
+#include "pqServerManagerModel2.h"
 #include "pqPendingDisplayManager.h"
 
 vtkStandardNewMacro(pqPendingDisplayUndoElement);
-vtkCxxRevisionMacro(pqPendingDisplayUndoElement, "1.6");
+vtkCxxRevisionMacro(pqPendingDisplayUndoElement, "1.6.4.1");
 //-----------------------------------------------------------------------------
 pqPendingDisplayUndoElement::pqPendingDisplayUndoElement()
 {
@@ -99,7 +99,7 @@ int pqPendingDisplayUndoElement::InternalUndoRedo(bool undo)
     }
 
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerManagerModel* smModel = core->getServerManagerModel();
+  pqServerManagerModel2* smModel = core->getServerManagerModel2();
   pqPendingDisplayManager* pdmanager = qobject_cast<pqPendingDisplayManager*>(
     core->manager("PENDING_DISPLAY_MANAGER"));
   if (!pdmanager)
@@ -111,14 +111,14 @@ int pqPendingDisplayUndoElement::InternalUndoRedo(bool undo)
   if ((state && undo) || (!state && !undo))
     {
     // TODO:  is this the right place?
-    pqPipelineSource* pxy = smModel->getPQSource(proxy);
+    pqPipelineSource* pxy = smModel->findItem<pqPipelineSource*>(proxy);
     pxy->setModifiedState(pqProxy::UNMODIFIED);
-    pdmanager->removePendingDisplayForSource(smModel->getPQSource(proxy));
+    pdmanager->removePendingDisplayForSource(smModel->findItem<pqPipelineSource*>(proxy));
     }
   else
     {
     // TODO:  is this the right place?
-    pqPipelineSource* pxy = smModel->getPQSource(proxy);
+    pqPipelineSource* pxy = smModel->findItem<pqPipelineSource*>(proxy);
     pxy->setModifiedState(pqProxy::UNINITIALIZED);
     pdmanager->internalAddPendingDisplayForSource(pxy);
     }

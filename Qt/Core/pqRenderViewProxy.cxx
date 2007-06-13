@@ -33,67 +33,67 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderViewProxy.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMRenderViewProxy.h"
 
-#include "pqRenderViewModule.h"
+#include "pqRenderView.h"
 
-vtkCxxRevisionMacro(pqRenderViewProxy, "1.2");
+vtkCxxRevisionMacro(pqRenderViewProxy, "1.2.18.1");
 vtkStandardNewMacro(pqRenderViewProxy);
 //-----------------------------------------------------------------------------
 pqRenderViewProxy::pqRenderViewProxy()
 {
-  this->RenderModule = 0;
+  this->RenderView = 0;
 }
 
 //-----------------------------------------------------------------------------
 pqRenderViewProxy::~pqRenderViewProxy()
 {
-  this->RenderModule = 0;
+  this->RenderView = 0;
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderViewProxy::EventuallyRender()
 {
-  if (this->RenderModule)
+  if (this->RenderView)
     {
     // EventuallyRender is never called during interactive render,
     // this should try to collapse render requests and all,
     // for now simply StillRender.
-    this->RenderModule->getRenderModuleProxy()->StillRender();
+    this->RenderView->getRenderViewProxy()->StillRender();
     }
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderViewProxy::Render()
 {
-  if (this->RenderModule)
+  if (this->RenderView)
     {
     // pqRenderViewProxy::Render() is only called for interactive render.
     // Hence...
     // render LOD's
-    this->RenderModule->getRenderModuleProxy()->InteractiveRender();
+    this->RenderView->getRenderViewProxy()->InteractiveRender();
     }
 }
 
 //-----------------------------------------------------------------------------
 vtkRenderWindow* pqRenderViewProxy::GetRenderWindow()
 {
-  if (!this->RenderModule)
+  if (!this->RenderView)
     {
     return 0;
     }
-  return this->RenderModule->getRenderModuleProxy()->GetRenderWindow();
+  return this->RenderView->getRenderViewProxy()->GetRenderWindow();
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewProxy::setRenderModule(pqRenderViewModule* rm)
+void pqRenderViewProxy::setRenderView(pqRenderView* rm)
 {
-  this->RenderModule = rm;
+  this->RenderView = rm;
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "RenderModule: " << this->RenderModule << endl;
+  os << indent << "RenderView: " << this->RenderView << endl;
 }

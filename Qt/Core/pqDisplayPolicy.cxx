@@ -43,13 +43,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 
 #include "pqApplicationCore.h"
-#include "pqConsumerDisplay.h"
+#include "pqDataRepresentation.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
 #include "pqPlotViewModule.h"
-#include "pqRenderViewModule.h"
+#include "pqRenderView.h"
 #include "pqServer.h"
-#include "pqServerManagerModel.h"
 
 //-----------------------------------------------------------------------------
 pqDisplayPolicy::pqDisplayPolicy(QObject* _parent) :QObject(_parent)
@@ -63,28 +62,44 @@ pqDisplayPolicy::~pqDisplayPolicy()
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* pqDisplayPolicy::newDisplayProxy(
-  pqPipelineSource* source, pqGenericViewModule* view) const
+  pqPipelineSource* source, pqView* view) const
 {
   if(view && !view->canDisplaySource(source))
     {
     return NULL;
     }
   QString srcProxyName = source->getProxy()->GetXMLName();
-  if (srcProxyName == "TextSource" || srcProxyName == "TimeToTextConvertor"
-      || srcProxyName == "TimeToTextConvertorSource")
+  if ( (srcProxyName == "TextSource" || srcProxyName == "TimeToTextConvertor"
+      || srcProxyName == "TimeToTextConvertorSource") && 
+      qobject_cast<pqRenderView*>(view))
     {
     vtkSMProxy* p = vtkSMObject::GetProxyManager()->NewProxy(
-      "displays", "TextDisplay");
+      "representations", "TextSourceRepresentation");
     p->SetConnectionID(view->getServer()->GetConnectionID());
     return p;
     }
 
-  return view->getViewModuleProxy()->CreateDisplayProxy(); 
+  // vtkPVDataInformation* datainfo = source->getDataInformation();
+  vtkSMProxy* p =0;
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  if (view->getProxy()->IsA("vtkSMRenderViewProxy"))
+    {
+    p = pxm->NewProxy("representations", "GeometryRepresentation");
+    }
+  else if (view->getProxy()->GetXMLName() == QString("ElementInspectorView"))
+    {
+    p = pxm->NewProxy("representations", "ElementInspectorRepresentation");
+    }
+  if (p)
+    {
+    p->SetConnectionID(view->getServer()->GetConnectionID());
+    }
+  return p; 
 }
 
 //-----------------------------------------------------------------------------
-pqGenericViewModule* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
-  pqGenericViewModule* currentView) const
+pqView* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
+  pqView* currentView) const
 {
   pqObjectBuilder* builder = 
     pqApplicationCore::instance()->getObjectBuilder();
@@ -151,7 +166,7 @@ pqGenericViewModule* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
     {
     // The user has selected a frame that is empty or the source does not
     // recommend any view type. Hence we create a render view.
-    currentView = builder->createView(pqRenderViewModule::renderViewType(),
+    currentView = builder->createView(pqRenderView::renderViewType(),
       source->getServer());
     }
 
@@ -161,8 +176,8 @@ pqGenericViewModule* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
 }
 
 //-----------------------------------------------------------------------------
-pqConsumerDisplay* pqDisplayPolicy::createPreferredDisplay(
-  pqPipelineSource* source, pqGenericViewModule* view,
+pqDataRepresentation* pqDisplayPolicy::createPreferredDisplay(
+  pqPipelineSource* source, pqView* view,
   bool dont_create_view) const
 {
   if (source)
@@ -197,14 +212,14 @@ pqConsumerDisplay* pqDisplayPolicy::createPreferredDisplay(
 
   // Simply create a display for the view set up the connections and
   // return.
-  pqConsumerDisplay* display = 
+  pqDataRepresentation* display = 
     pqApplicationCore::instance()->getObjectBuilder()->
-    createDataDisplay(source, view);
+    createDataRepresentation(source, view);
 
   // If this is the only source displayed in the view, reset the camera to make sure its visible
-  if(view->getVisibleDisplayCount()==1)
+  if(view->getNumberOfVisibleRepresentations()==1)
     {
-    pqRenderViewModule* ren = qobject_cast<pqRenderViewModule*>(view);
+    pqRenderView* ren = qobject_cast<pqRenderView*>(view);
     if (ren)
       {
       ren->resetCamera();
@@ -216,25 +231,26 @@ pqConsumerDisplay* pqDisplayPolicy::createPreferredDisplay(
 }
 
 //-----------------------------------------------------------------------------
-pqConsumerDisplay* pqDisplayPolicy::setDisplayVisibility(
-  pqPipelineSource* source, pqGenericViewModule* view, bool visible) 
+pqDataRepresentation* pqDisplayPolicy::setDisplayVisibility(
+  pqPipelineSource* source, pqView* view, bool visible) 
 {
   if (!source)
     {
-    // Cannot really display a NULL source.
+    // Cannot really repr a NULL source.
     return 0;
     }
 
-  pqConsumerDisplay* display = source->getDisplay(view);
+  pqDataRepresentation* repr = source->getRepresentation(view);
 
-  if (!display && !visible)
+  if (!repr && !visible)
     {
     // isn't visible already, nothing to change.
     return 0;
     }
-  else if(!display)
+  else if(!repr)
     {
-    // No display exists for this view.
+    // FIXME:UDA -- can't we simply use createPreferredDisplay?
+    // No repr exists for this view.
     // First check if the view exists. If not, we will create a "suitable" view.
     if (!view)
       {
@@ -242,19 +258,19 @@ pqConsumerDisplay* pqDisplayPolicy::setDisplayVisibility(
       }
     if (view)
       {
-      display = pqApplicationCore::instance()->getObjectBuilder()->
-        createDataDisplay(source, view);
+      repr = pqApplicationCore::instance()->getObjectBuilder()->
+        createDataRepresentation(source, view);
       }
     }
 
-  display->setVisible(visible);
+  repr->setVisible(visible);
 
   // If this is the only source displayed in the view, reset the camera to make sure its visible
   // Only do so if a source is being turned ON. Otherwise when the next to last source is turned off, 
   // the camera would be reset to fit the last remaining one which would be unexpected to the user (hence the conditional on "visible")
-  if(view->getVisibleDisplayCount()==1 && visible)
+  if(view->getNumberOfVisibleRepresentations()==1 && visible)
     {
-    pqRenderViewModule* ren = qobject_cast<pqRenderViewModule*>(view);
+    pqRenderView* ren = qobject_cast<pqRenderView*>(view);
     if (ren)
       {
       ren->resetCamera();
@@ -262,7 +278,7 @@ pqConsumerDisplay* pqDisplayPolicy::setDisplayVisibility(
       }
     }
 
-  return display;
+  return repr;
 }
 
 

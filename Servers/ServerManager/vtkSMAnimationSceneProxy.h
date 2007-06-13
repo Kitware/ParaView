@@ -32,8 +32,7 @@ class vtkCollectionIterator;
 class vtkGenericMovieWriter;
 class vtkImageWriter;
 class vtkSMAnimationSceneProxyInternals;
-class vtkSMRenderModuleProxy;
-class vtkSMAbstractViewModuleProxy;
+class vtkSMViewProxy;
 
 class VTK_EXPORT vtkSMAnimationSceneProxy : public vtkSMAnimationCueProxy
 {
@@ -93,7 +92,7 @@ public:
   virtual void SetCaching(int enable); 
 
   // Description:
-  // This method calls InvalidateAllGeometries on the vtkSMRenderModuleProxy.
+  // This method calls InvalidateAllGeometries on the vtkSMRenderViewProxy.
   // However, to minimize the calls to InvalidateAllGeometries, this call
   // keeps a flag indicating if CacheUpdate was ever called on the 
   // Render Module and calls InvalidateAllGeometries only of the flag
@@ -105,14 +104,14 @@ public:
   // When playing animation, the scene proxy will call Render()
   // and CacheUpdate() on view modules that it is aware of. Also, while saving,
   // geometry or images, the scene considers only the view modules it is aware of.
-  void AddViewModule(vtkSMAbstractViewModuleProxy*);
-  void RemoveViewModule(vtkSMAbstractViewModuleProxy*);
+  void AddViewModule(vtkSMViewProxy*);
+  void RemoveViewModule(vtkSMViewProxy*);
   void RemoveAllViewModules();
 
   // Description:
   // API to get the view modules.
   unsigned int GetNumberOfViewModules();
-  vtkSMAbstractViewModuleProxy* GetViewModule(unsigned int cc);
+  vtkSMViewProxy* GetViewModule(unsigned int cc);
  
   // Description:
   // Method to set the current time. This updates the proxies to reflect the state
