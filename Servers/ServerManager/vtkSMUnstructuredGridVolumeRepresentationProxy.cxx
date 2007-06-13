@@ -14,23 +14,25 @@
 =========================================================================*/
 #include "vtkSMUnstructuredGridVolumeRepresentationProxy.h"
 
+#include "vtkAbstractMapper.h"
 #include "vtkCollection.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDataTypeDomain.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMRepresentationStrategyVector.h"
-#include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
+#include "vtkSMRepresentationStrategyVector.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.4.2.1");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepresentationProxy()
 {
@@ -41,6 +43,7 @@ vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepre
   this->VolumeZSweepMapper = 0;
   this->VolumeActor = 0;
   this->VolumeProperty = 0;
+  this->VolumeDummyMapper = 0;
 
   this->SupportsBunykMapper  = 0;
   this->SupportsZSweepMapper = 0;
@@ -61,6 +64,7 @@ vtkSMUnstructuredGridVolumeRepresentationProxy::~vtkSMUnstructuredGridVolumeRepr
   this->VolumeZSweepMapper = 0;
   this->VolumeActor = 0;
   this->VolumeProperty = 0;
+  this->VolumeDummyMapper = 0;
 
 }
 
@@ -168,6 +172,7 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::BeginCreateVTKObjects()
   this->VolumeHAVSMapper = this->GetSubProxy("VolumeHAVSMapper");
   this->VolumeActor = this->GetSubProxy("VolumeActor");
   this->VolumeProperty = this->GetSubProxy("VolumeProperty");
+  this->VolumeDummyMapper = this->GetSubProxy("VolumeDummyMapper");
 
   this->VolumeFilter->SetServers(vtkProcessModule::DATA_SERVER);
   this->VolumeBunykMapper->SetServers(
@@ -182,6 +187,8 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::BeginCreateVTKObjects()
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->VolumeProperty->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->VolumeDummyMapper->SetServers(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
   return true;
 }
@@ -420,6 +427,53 @@ int vtkSMUnstructuredGridVolumeRepresentationProxy::GetVolumeMapperTypeCM()
   
   return vtkSMUnstructuredGridVolumeRepresentationProxy::UNKNOWN_VOLUME_MAPPER;
 }
+
+//----------------------------------------------------------------------------
+void vtkSMUnstructuredGridVolumeRepresentationProxy::SetColorArrayName(
+  const char* name)
+{
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->VolumeDummyMapper->GetProperty("SelectScalarArray"));
+
+  if (name && name[0])
+    {
+    svp->SetElement(0, name);
+    }
+  else
+    {
+    svp->SetElement(0, "");
+    }
+
+  this->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMUnstructuredGridVolumeRepresentationProxy::SetColorAttributeType(
+  int type)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->VolumeDummyMapper->GetProperty("ScalarMode"));
+  switch (type)
+    {
+  case POINT_DATA:
+    ivp->SetElement(0, VTK_SCALAR_MODE_USE_POINT_FIELD_DATA); 
+    break;
+
+  case CELL_DATA:
+    ivp->SetElement(0, VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
+    break;
+
+  case FIELD_DATA:
+    ivp->SetElement(0, VTK_SCALAR_MODE_USE_FIELD_DATA);
+    break;
+
+  default:
+    ivp->SetElement(0,  VTK_SCALAR_MODE_DEFAULT);
+    }
+
+  this->UpdateVTKObjects();
+}
+
 
 //----------------------------------------------------------------------------
 void vtkSMUnstructuredGridVolumeRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)

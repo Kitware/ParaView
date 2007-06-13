@@ -70,6 +70,20 @@ public:
   };
 //ETX
 
+  // Description:
+  // Set the scalar coloring mode
+  void SetColorAttributeType(int type);
+
+  // Description:
+  // Set the scalar color array name. If array name is 0 or "" then scalar
+  // coloring is disabled.
+  void SetColorArrayName(const char* name);
+
+  // Description:
+  // Volume rendering always need ordered compositing.
+  virtual bool GetOrderedCompositingNeeded()
+    { return true; }
+
 //BTX
 protected:
   vtkSMUnstructuredGridVolumeRepresentationProxy();
@@ -124,6 +138,7 @@ protected:
   vtkSMProxy* VolumeHAVSMapper;
   vtkSMProxy* VolumeBunykMapper;
   vtkSMProxy* VolumeZSweepMapper;
+  vtkSMProxy* VolumeDummyMapper;
 
   // Common volume rendering classes
   vtkSMProxy* VolumeActor;

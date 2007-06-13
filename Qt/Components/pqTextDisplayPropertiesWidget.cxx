@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPropertyLinks.h"
 #include "pqRepresentation.h"
-#include "pqTextDisplay.h"
+#include "pqTextRepresentation.h"
 #include "pqSignalAdaptors.h"
 
 class pqTextDisplayPropertiesWidget::pqInternal : 
@@ -119,8 +119,7 @@ void pqTextDisplayPropertiesWidget::setDisplay(pqRepresentation* display)
     QObject::disconnect(this->Internal->Display, 0, this, 0);
     }
 
-  // FIXME:UDA
-  //this->Internal->Display = qobject_cast<pqTextDisplay*>(display);
+  this->Internal->Display = qobject_cast<pqTextRepresentation*>(display);
   if (!this->Internal->Display)
     {
     return;

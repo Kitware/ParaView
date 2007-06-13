@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMUniformGridVolumeRepresentationProxy.h"
 
+#include "vtkAbstractMapper.h"
 #include "vtkCollection.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
@@ -26,11 +27,11 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
-#include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUniformGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.4.2.1");
 //----------------------------------------------------------------------------
 vtkSMUniformGridVolumeRepresentationProxy::vtkSMUniformGridVolumeRepresentationProxy()
 {
@@ -144,6 +145,52 @@ bool vtkSMUniformGridVolumeRepresentationProxy::EndCreateVTKObjects()
   this->Connect(this->VolumeProperty, this->VolumeActor, "Property");
 
   return this->Superclass::EndCreateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMUniformGridVolumeRepresentationProxy::SetColorArrayName(
+  const char* name)
+{
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->VolumeFixedPointRayCastMapper->GetProperty("SelectScalarArray"));
+
+  if (name && name[0])
+    {
+    svp->SetElement(0, name);
+    }
+  else
+    {
+    svp->SetElement(0, "");
+    }
+
+  this->VolumeFixedPointRayCastMapper->UpdateVTKObjects();;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMUniformGridVolumeRepresentationProxy::SetColorAttributeType(
+  int type)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->VolumeFixedPointRayCastMapper->GetProperty("ScalarMode"));
+  switch (type)
+    {
+  case POINT_DATA:
+    ivp->SetElement(0, VTK_SCALAR_MODE_USE_POINT_FIELD_DATA); 
+    break;
+
+  case CELL_DATA:
+    ivp->SetElement(0, VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
+    break;
+
+  case FIELD_DATA:
+    ivp->SetElement(0, VTK_SCALAR_MODE_USE_FIELD_DATA);
+    break;
+
+  default:
+    ivp->SetElement(0,  VTK_SCALAR_MODE_DEFAULT);
+    }
+
+  this->VolumeFixedPointRayCastMapper->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

@@ -61,7 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerResource.h"
-#include "pqTextDisplay.h"
+//#include "pqTextDisplay.h"
 #include "pqTimeKeeper.h"
 #include "pqViewModuleInterface.h"
 
@@ -388,7 +388,7 @@ void pqServerManagerModel::onAddDisplay(QString name,
     }
   else if (xml_name == QString("TextDisplay"))
     {
-    display = new pqTextDisplay("displays", name, proxy, server, this);
+//    display = new pqTextDisplay("displays", name, proxy, server, this);
     }
   else
     {

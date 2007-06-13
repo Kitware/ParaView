@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMAbstractDisplayProxy.h"
 #include "vtkSMAbstractViewModuleProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
 #include <QtDebug>
@@ -79,12 +80,50 @@ vtkSMProxy* pqDisplayPolicy::newDisplayProxy(
     return p;
     }
 
-  // vtkPVDataInformation* datainfo = source->getDataInformation();
-  vtkSMProxy* p =0;
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  
+
+
+
+  vtkSMProxy* p =0;
   if (view->getProxy()->IsA("vtkSMRenderViewProxy"))
     {
-    p = pxm->NewProxy("representations", "GeometryRepresentation");
+    bool usg = false;
+    bool sg = false;
+
+    // Choose which type of representation proxy to create.
+    vtkSMProxy* prototype = pxm->GetPrototypeProxy("representations", 
+      "UnstructuredGridRepresentation");
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      prototype->GetProperty("Input"));
+    pp->RemoveAllUncheckedProxies();
+    pp->AddUncheckedProxy(source->getProxy());
+    usg = pp->IsInDomains();
+    pp->RemoveAllUncheckedProxies();
+    if (!usg)
+      {
+      prototype = pxm->GetPrototypeProxy("representations",
+        "UniformGridRepresentation");
+      pp = vtkSMProxyProperty::SafeDownCast(
+        prototype->GetProperty("Input"));
+      pp->RemoveAllUncheckedProxies();
+      pp->AddUncheckedProxy(source->getProxy());
+      sg = pp->IsInDomains();
+      pp->RemoveAllUncheckedProxies();
+      }
+
+    if (usg)
+      {
+      p = pxm->NewProxy("representations", "UnstructuredGridRepresentation");
+      }
+    else if (sg)
+      {
+      p = pxm->NewProxy("representations", "UniformGridRepresentation");
+      }
+    else
+      {
+      p = pxm->NewProxy("representations", "GeometryRepresentation");
+      }
     }
   else if (view->getProxy()->GetXMLName() == QString("ElementInspectorView"))
     {
