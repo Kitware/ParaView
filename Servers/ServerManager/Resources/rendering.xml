@@ -5737,13 +5737,9 @@
     </TextWidgetRepresentationProxy>
 
     <TextSourceRepresentationProxy name="TextSourceRepresentation">
-      <InputProperty name="Input" command="">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-      </InputProperty>
-
+      <InputProperty name="Input" 
+                     command="NotUsed"
+                     />
       <Property name="Update"
         command="Update"
         update_self="1">

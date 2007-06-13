@@ -67,7 +67,18 @@ protected:
   virtual void InvalidateGeometryInternal(int /*useCache*/)
     { this->Dirty = true; }
 
-  virtual void CreateVTKObjects();
+    // Description:
+  // This method is called at the beginning of CreateVTKObjects().
+  // This gives the subclasses an opportunity to set the servers flags
+  // on the subproxies.
+  // If this method returns false, CreateVTKObjects() is aborted.
+  virtual bool BeginCreateVTKObjects();
+
+  // Description:
+  // This method is called after CreateVTKObjects(). 
+  // This gives subclasses an opportunity to do some post-creation
+  // initialization.
+  virtual bool EndCreateVTKObjects();
 
   // Description:
   // Called when a representation is added to a view. 
@@ -85,8 +96,6 @@ protected:
 
   vtkSMSourceProxy* UpdateSuppressorProxy;
   vtkSMSourceProxy* CollectProxy;
-  vtkSMSourceProxy* Input;
-  void SetInput(vtkSMSourceProxy*);
   bool Dirty;
 
 private:

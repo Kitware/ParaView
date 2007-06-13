@@ -31,12 +31,10 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMTextSourceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMTextSourceRepresentationProxy, "1.1");
-vtkCxxSetObjectMacro(vtkSMTextSourceRepresentationProxy, Input, vtkSMSourceProxy);
+vtkCxxRevisionMacro(vtkSMTextSourceRepresentationProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMTextSourceRepresentationProxy::vtkSMTextSourceRepresentationProxy()
 {
-  this->Input = 0;
   this->Dirty = true;
   this->UpdateSuppressorProxy = 0;
   this->TextWidgetProxy = 0;
@@ -46,7 +44,6 @@ vtkSMTextSourceRepresentationProxy::vtkSMTextSourceRepresentationProxy()
 //----------------------------------------------------------------------------
 vtkSMTextSourceRepresentationProxy::~vtkSMTextSourceRepresentationProxy()
 {
-  this->SetInput(0);
   this->UpdateSuppressorProxy = 0;
   this->TextWidgetProxy = 0;
   this->CollectProxy = 0;
@@ -77,11 +74,11 @@ bool vtkSMTextSourceRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMTextSourceRepresentationProxy::CreateVTKObjects()
+bool vtkSMTextSourceRepresentationProxy::BeginCreateVTKObjects()
 {
-  if (this->ObjectsCreated)
+  if (!this->Superclass::BeginCreateVTKObjects())
     {
-    return;
+    return false;
     }
 
   this->UpdateSuppressorProxy = vtkSMSourceProxy::SafeDownCast(
@@ -94,7 +91,7 @@ void vtkSMTextSourceRepresentationProxy::CreateVTKObjects()
 
   if(!this->TextWidgetProxy)
     {
-    return;
+    return false;
     }
 
   this->CollectProxy = vtkSMSourceProxy::SafeDownCast(
@@ -102,13 +99,12 @@ void vtkSMTextSourceRepresentationProxy::CreateVTKObjects()
   this->CollectProxy->SetServers(
     vtkProcessModule::DATA_SERVER|vtkProcessModule::CLIENT);
 
-  this->Superclass::CreateVTKObjects();
+  return true;
+}
 
-  if (!this->ObjectsCreated)
-    {
-    return;
-    }
-
+//----------------------------------------------------------------------------
+bool vtkSMTextSourceRepresentationProxy::EndCreateVTKObjects()
+{
   // Init UpdateSuppressor properties.
   // Seems like we can't use properties for this 
   // to work properly.
@@ -137,20 +133,15 @@ void vtkSMTextSourceRepresentationProxy::CreateVTKObjects()
          << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, 
                  this->CollectProxy->GetServers(), stream);
+  
+  return this->Superclass::EndCreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMTextSourceRepresentationProxy::AddInput(vtkSMSourceProxy* input, 
-  const char* vtkNotUsed(method), int vtkNotUsed(hasMultipleInputs))
+  const char* method, int hasMultipleInputs)
 {
-  this->SetInput(input);
-  if (!input)
-    {
-    return;
-    }
-
-  input->CreateParts();
-  this->CreateVTKObjects();
+  this->Superclass::AddInput(input, method, hasMultipleInputs);
 
   vtkSMProxyProperty* pp;
   pp = vtkSMProxyProperty::SafeDownCast(
