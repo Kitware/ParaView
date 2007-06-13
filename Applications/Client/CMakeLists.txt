@@ -274,6 +274,7 @@ IF(BUILD_TESTING)
     ExodusIIPanel
     ExodusModeShapes
     ExodusPanel
+    Flow2
     Fractal2D
     Fractal3D
     LinePlot
@@ -281,6 +282,7 @@ IF(BUILD_TESTING)
     LoadSaveStateAnimation
     ObjectInspectorSphere
     Plot3DReader
+    RectilinearFractal
     RepresentationSelector
     SelectReader
     StreamTracer
