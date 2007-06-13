@@ -91,30 +91,30 @@ public:
     return this->GetDisplayedDataInformation();
     }
 
+
 //BTX
-protected:
-  vtkSMRepresentationProxy();
-  ~vtkSMRepresentationProxy();
-
-  friend class vtkSMViewProxy;
-
-  // Description:
-  // Overridden from vtkSMProxy to call BeginCreateVTKObjects() and
-  // EndCreateVTKObjects().
-  virtual void CreateVTKObjects();
-
   // Description:
   // Called when a representation is added to a view. 
   // Returns true on success.
   // Currently a representation can be added to only one view.
+  // Don't call this directly, it is called by the View.
   virtual bool AddToView(vtkSMViewProxy* view)=0;
 
   // Description:
   // Called to remove a representation from a view.
   // Returns true on success.
   // Currently a representation can be added to only one view.
+  // Don't call this directly, it is called by the View.
   virtual bool RemoveFromView(vtkSMViewProxy* vtkNotUsed(view)) 
     { return true; }
+protected:
+  vtkSMRepresentationProxy();
+  ~vtkSMRepresentationProxy();
+
+  // Description:
+  // Overridden from vtkSMProxy to call BeginCreateVTKObjects() and
+  // EndCreateVTKObjects().
+  virtual void CreateVTKObjects();
 
   // Description:
   // This method is called at the beginning of CreateVTKObjects().
@@ -140,6 +140,7 @@ protected:
   // Subclassess should set this to true if they support selection pipelines.
   vtkSetMacro(SelectionSupported, bool);
 
+  friend class vtkSMPVRepresentationProxy;
 private:
   vtkSMRepresentationProxy(const vtkSMRepresentationProxy&); // Not implemented
   void operator=(const vtkSMRepresentationProxy&); // Not implemented

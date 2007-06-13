@@ -40,8 +40,7 @@
 // to provide implementations for Update(), UpdateRequired(),
 // GetDisplayedDataInformation(), GetFullResDataInformation(), MarkModified(). 
 // This class provides default implementation for these methods for 
-// representations using a collection of strategies (and if SelectionSupported, another 
-// collection of strategies for the selection pipeline). If these startegies are
+// representations using a collection of strategies. If these startegies are
 // used conditionally, then the subclass must override the above mentioned
 // methods are provide its own implementations.
 //
@@ -160,6 +159,20 @@ public:
     { return false; }
 
 //BTX
+
+  // Description:
+  // Called when a representation is added to a view. 
+  // Returns true on success.
+  // Added to call InitializeStrategy() to give subclassess the opportunity to
+  // set up pipelines involving compositing strategy it they support it.
+  virtual bool AddToView(vtkSMViewProxy* view);
+
+  enum AttributeTypes
+    {
+    POINT_DATA =0,
+    CELL_DATA  =1,
+    FIELD_DATA =2
+    };
 protected:
   vtkSMDataRepresentationProxy();
   ~vtkSMDataRepresentationProxy();
@@ -179,13 +192,6 @@ protected:
   virtual bool EndCreateVTKObjects();
 
   // Description:
-  // Called when a representation is added to a view. 
-  // Returns true on success.
-  // Added to call InitializeStrategy() to give subclassess the opportunity to
-  // set up pipelines involving compositing strategy it they support it.
-  virtual bool AddToView(vtkSMViewProxy* view);
-
-  // Description:
   // Some representations may require lod/compositing strategies from the view
   // proxy. This method gives such subclasses an opportunity to as the view
   // module for the right kind of strategy and plug it in the representation
@@ -200,10 +206,6 @@ protected:
   void AddStrategy(vtkSMRepresentationStrategy*);
 
   // Description:
-  // Add a representation strategy for the selection pipeline.
-  void AddStrategyForSelection(vtkSMRepresentationStrategy*);
-
-  // Description:
   // Provide access to Input for subclasses.
   vtkGetObjectMacro(InputProxy, vtkSMSourceProxy);
 
@@ -214,10 +216,6 @@ protected:
 
   // These are the representation strategies used for data display. 
   vtkSMRepresentationStrategyVector* RepresentationStrategies;
-
-  // These are the representation stategies used for displaying selections on
-  // the data.
-  vtkSMRepresentationStrategyVector* RepresentationStrategiesForSelection;
 
   double UpdateTime;
   bool UpdateTimeInitialized;

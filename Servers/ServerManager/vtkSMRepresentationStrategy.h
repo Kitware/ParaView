@@ -16,7 +16,7 @@
 // encapsulates lod/parallel pipelines.
 // .SECTION Description
 // vtkSMRepresentationStrategy is an abstract superclass for representation
-// stragtegies that encapsulate the lod/parallel pipelines. 
+// strategies that encapsulate the lod/parallel pipelines. 
 // Representation implementations don't need to implement pipeline for handling
 // parallel rendering instead, they simply ask for a strategy based on their
 // data type and mode of rendering (ie. surface/volume) from the view proxy to

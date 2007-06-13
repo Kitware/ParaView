@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMSurfaceRepresentationProxy.h"
 
+#include "vtkAbstractMapper.h"
 #include "vtkCollection.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
@@ -29,9 +30,10 @@
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.11");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -41,14 +43,6 @@ vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
   this->Prop3D = 0;
   this->Property = 0;
 
-  this->ExtractSelection = 0;
-  this->SelectionGeometryFilter = 0;
-  this->SelectionMapper = 0;
-  this->SelectionLODMapper = 0;
-  this->SelectionProp3D = 0;
-  this->SelectionProperty = 0;
-
-  // This representation supports selection.
   this->SetSelectionSupported(true);
 }
 
@@ -58,79 +52,11 @@ vtkSMSurfaceRepresentationProxy::~vtkSMSurfaceRepresentationProxy()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSurfaceRepresentationProxy::GetSelectionVisibility()
-{
-  if (!this->Superclass::GetSelectionVisibility())
-    {
-    return false;
-    }
-
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->GetProperty("Selection"));
-  return (pp && pp->GetNumberOfProxies() > 0);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSurfaceRepresentationProxy::UpdateSelectionPropVisibility()
-{
-  int visibility  = this->GetSelectionVisibility()? 1 : 0;
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->SelectionProp3D->GetProperty("Visibility"));
-  ivp->SetElement(0, visibility);
-  this->SelectionProp3D->UpdateProperty("Visibility");
-}
-
-//----------------------------------------------------------------------------
 bool vtkSMSurfaceRepresentationProxy::GetOrderedCompositingNeeded()
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("Opacity"));
   return (dvp && dvp->GetElement(0) < 1.0);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSurfaceRepresentationProxy::Update(vtkSMViewProxy* view)
-{
-  this->UpdateSelectionPropVisibility();
-  this->Superclass::Update(view);
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMSurfaceRepresentationProxy::AddToView(vtkSMViewProxy* view)
-{
-  vtkSMRenderViewProxy* renderView = vtkSMRenderViewProxy::SafeDownCast(view);
-  if (!renderView)
-    {
-    vtkErrorMacro("View must be a vtkSMRenderViewProxy.");
-    return false;
-    }
-
-  if (!this->Superclass::AddToView(view))
-    {
-    return false;
-    }
-
-  renderView->AddPropToRenderer(this->Prop3D);
-  if (this->GetSelectionSupported())
-    {
-    renderView->AddPropToRenderer(this->SelectionProp3D);
-    }
-  return true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMSurfaceRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
-{
-  vtkSMRenderViewProxy* renderView = vtkSMRenderViewProxy::SafeDownCast(view);
-  if (!renderView)
-    {
-    vtkErrorMacro("View must be a vtkSMRenderViewProxy.");
-    return false;
-    }
-
-  renderView->RemovePropFromRenderer(this->Prop3D);
-  renderView->RemovePropFromRenderer(this->SelectionProp3D);
-  return this->Superclass::RemoveFromView(view);
 }
 
 //----------------------------------------------------------------------------
@@ -164,27 +90,7 @@ bool vtkSMSurfaceRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
   this->Connect(strategy->GetOutput(), this->Mapper);
   this->Connect(strategy->GetLODOutput(), this->LODMapper);
 
-  // Initialize strategy for the selection pipeline.
-  strategy.TakeReference(
-    view->NewStrategy(VTK_POLY_DATA));
-  if (!strategy.GetPointer())
-    {
-    vtkErrorMacro("Could not create strategy for selection pipeline. Disabling selection.");
-    this->SetSelectionSupported(false);
-    }
-  else
-    {
-    this->AddStrategyForSelection(strategy);
-    strategy->SetEnableLOD(true);
-    strategy->SetEnableCaching(false); // no cache needed for selection.
-    strategy->UpdateVTKObjects();
-
-    this->Connect(this->SelectionGeometryFilter, strategy);
-    this->Connect(strategy->GetOutput(), this->SelectionMapper);
-    this->Connect(strategy->GetLODOutput(), this->SelectionLODMapper);
-    }
-
-  return true;
+  return this->Superclass::InitializeStrategy(view);
 }
 
 //----------------------------------------------------------------------------
@@ -213,27 +119,6 @@ bool vtkSMSurfaceRepresentationProxy::BeginCreateVTKObjects()
   this->Property->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
-  // Initialize selection pipeline subproxies.
-  this->ExtractSelection = 
-    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("ExtractSelection"));
-  this->SelectionGeometryFilter = vtkSMSourceProxy::SafeDownCast(
-    this->GetSubProxy("SelectionGeometryFilter"));
-  this->SelectionMapper = this->GetSubProxy("SelectionMapper");
-  this->SelectionLODMapper = this->GetSubProxy("SelectionLODMapper");
-  this->SelectionProp3D = this->GetSubProxy("SelectionProp3D");
-  this->SelectionProperty = this->GetSubProxy("SelectionProperty");
-
-  this->ExtractSelection->SetServers(vtkProcessModule::DATA_SERVER);
-  this->SelectionGeometryFilter->SetServers(vtkProcessModule::DATA_SERVER);
-  this->SelectionMapper->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  this->SelectionLODMapper->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  this->SelectionProp3D->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  this->SelectionProperty->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-
   return true;
 }
 
@@ -245,18 +130,7 @@ bool vtkSMSurfaceRepresentationProxy::EndCreateVTKObjects()
   this->Connect(this->LODMapper, this->Prop3D, "LODMapper");
   this->Connect(this->Property, this->Prop3D, "Property");
 
-  // Setup selection pipeline connections.
-  this->Connect(this->GetInputProxy(), this->ExtractSelection);
-  this->Connect(this->ExtractSelection, this->SelectionGeometryFilter);
-  this->Connect(this->SelectionMapper, this->SelectionProp3D, "Mapper");
-  this->Connect(this->SelectionLODMapper, this->SelectionProp3D, "LODMapper");
-  this->Connect(this->SelectionProperty, this->SelectionProp3D, "Property");
-
-  // Selection prop is not pickable.
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->SelectionProp3D->GetProperty("Pickable"));
-  ivp->SetElement(0, 0);
-  this->SelectionProp3D->UpdateProperty("Pickable");
+  this->LinkSelectionProp(this->Prop3D);
 
   return this->Superclass::EndCreateVTKObjects();
 }
@@ -353,7 +227,7 @@ vtkSMProxy* vtkSMSurfaceRepresentationProxy::ConvertSelection(
   // Convert surface selection to volume selection.
   vtkSmartPointer<vtkSelection> volSelection = 
     vtkSmartPointer<vtkSelection>::New();
-  this->ConvertSurfaceSelectionToVolumeSelection(surfaceSel, volSelection);
+  this->ConvertSurfaceSelectionToVolumeSelection(mySelection, volSelection);
 
   // Create a selection source for the selection.
   vtkSMProxy* selectionSource = 
@@ -361,6 +235,55 @@ vtkSMProxy* vtkSMSurfaceRepresentationProxy::ConvertSelection(
       this->ConnectionID, volSelection);
   
   return selectionSource;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSurfaceRepresentationProxy::SetColorArrayName(const char* name)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->Mapper->GetProperty("ScalarVisibility"));
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Mapper->GetProperty("ColorArray"));
+
+  if (name && name[0])
+    {
+    ivp->SetElement(0, 1);
+    svp->SetElement(0, name);
+    }
+  else
+    {
+    ivp->SetElement(0, 0);
+    svp->SetElement(0, "");
+    }
+
+  this->Mapper->UpdateVTKObjects();
+  this->LODMapper->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSurfaceRepresentationProxy::SetColorAttributeType(int type)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->Mapper->GetProperty("ScalarMode"));
+  switch (type)
+    {
+  case POINT_DATA:
+    ivp->SetElement(0, VTK_SCALAR_MODE_USE_POINT_FIELD_DATA); 
+    break;
+
+  case CELL_DATA:
+    ivp->SetElement(0, VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
+    break;
+
+  case FIELD_DATA:
+    ivp->SetElement(0, VTK_SCALAR_MODE_USE_FIELD_DATA);
+    break;
+
+  default:
+    ivp->SetElement(0,  VTK_SCALAR_MODE_DEFAULT);
+    }
+  this->Mapper->UpdateVTKObjects();
+  this->LODMapper->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

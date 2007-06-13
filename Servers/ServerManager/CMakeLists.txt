@@ -158,28 +158,30 @@ SET(Kit_SRCS
   vtkSMXMLPVAnimationWriterProxy.cxx
   vtkSMXYPlotActorProxy.cxx
 
-  vtkSMDataRepresentationProxy.cxx
-  vtkSMIceTCompositeViewProxy.cxx
-  vtkSMIceTDesktopRenderViewProxy.cxx
-
   vtkSMAxesRepresentationProxy.cxx
   vtkSMClientDeliveryRepresentationProxy.cxx
   vtkSMClientDeliveryStrategyProxy.cxx
+  vtkSMDataRepresentationProxy.cxx
+  vtkSMIceTCompositeViewProxy.cxx
+  vtkSMIceTDesktopRenderViewProxy.cxx
   vtkSMMultiViewFactory.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMOutlineRepresentationProxy.cxx
+  vtkSMPropRepresentationProxy.cxx
+  vtkSMPVRepresentationProxy.cxx
   vtkSMRenderViewProxy.cxx
   vtkSMRepresentationProxy.cxx
   vtkSMRepresentationStrategy.cxx
+  vtkSMScalarBarWidgetRepresentationProxy.cxx
+  vtkSMSelectionRepresentationProxy.cxx
   vtkSMSimpleParallelStrategy.cxx
   vtkSMSimpleStrategy.cxx
   vtkSMSurfaceRepresentationProxy.cxx
+  vtkSMTextSourceRepresentationProxy.cxx
+  vtkSMTextWidgetRepresentationProxy.cxx
   vtkSMUniformGridVolumeRepresentationProxy.cxx
   vtkSMUnstructuredGridVolumeRepresentationProxy.cxx
   vtkSMViewProxy.cxx
-  vtkSMScalarBarWidgetRepresentationProxy.cxx
-  vtkSMTextWidgetRepresentationProxy.cxx
-  vtkSMTextSourceRepresentationProxy.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS

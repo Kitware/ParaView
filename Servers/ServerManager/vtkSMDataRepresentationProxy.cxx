@@ -54,15 +54,13 @@ protected:
 };
 
 
-vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.4");
 vtkCxxSetObjectMacro(vtkSMDataRepresentationProxy, InputProxy, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMDataRepresentationProxy::vtkSMDataRepresentationProxy()
 {
   this->InputProxy = 0;
   this->RepresentationStrategies = new vtkSMRepresentationStrategyVector();
-  this->RepresentationStrategiesForSelection = 
-    new vtkSMRepresentationStrategyVector();
 
   this->UpdateTime = 0.0;
   this->UpdateTimeInitialized = false;
@@ -86,10 +84,6 @@ vtkSMDataRepresentationProxy::~vtkSMDataRepresentationProxy()
   delete this->RepresentationStrategies;
   this->RepresentationStrategies = 0;
 
-  delete this->RepresentationStrategiesForSelection;
-  this->RepresentationStrategiesForSelection = 0;
-
-
   this->Observer->SetTarget(0);
   this->Observer->Delete();
 }
@@ -104,15 +98,6 @@ void vtkSMDataRepresentationProxy::GetActiveStrategies(
     {
     for (iter = this->RepresentationStrategies->begin(); 
       iter != this->RepresentationStrategies->end(); ++iter)
-      {
-      activeStrategies.push_back(iter->GetPointer());
-      }
-    }
-
-  if (this->GetSelectionVisibility())
-    {
-    for (iter = this->RepresentationStrategiesForSelection->begin();
-      iter != this->RepresentationStrategiesForSelection->end(); ++iter)
       {
       activeStrategies.push_back(iter->GetPointer());
       }
@@ -292,19 +277,6 @@ void vtkSMDataRepresentationProxy::SetUpdateTime(double time)
       }
     }
 
-  for (iter = this->RepresentationStrategiesForSelection->begin(); 
-    iter != this->RepresentationStrategiesForSelection->end(); ++iter)
-    {
-    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      iter->GetPointer()->GetProperty("UpdateTime"));
-    if (dvp)
-      {
-      dvp->SetElement(0, time);
-      iter->GetPointer()->UpdateProperty("UpdateTime");
-      }
-    }
-
-
   this->MarkUpstreamModified();
 }
 
@@ -343,19 +315,6 @@ void vtkSMDataRepresentationProxy::AddStrategy(
 }
 
 //----------------------------------------------------------------------------
-void vtkSMDataRepresentationProxy::AddStrategyForSelection(
-  vtkSMRepresentationStrategy* strategy)
-{
-  this->RepresentationStrategiesForSelection->push_back(strategy);
-
-  if (this->UpdateTimeInitialized)
-    {
-    // This will propagate the update time to the newly added strategy.
-    this->SetUpdateTime(this->UpdateTime);
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkSMDataRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)
 {
   // If some changes to the representation proxy invalidate the data
@@ -365,12 +324,6 @@ void vtkSMDataRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)
     vtkSMRepresentationStrategyVector::iterator iter;
     for (iter = this->RepresentationStrategies->begin(); 
       iter != this->RepresentationStrategies->end(); ++iter)
-      {
-      iter->GetPointer()->MarkModified(modifiedProxy);
-      }
-
-    for (iter = this->RepresentationStrategiesForSelection->begin(); 
-      iter != this->RepresentationStrategiesForSelection->end(); ++iter)
       {
       iter->GetPointer()->MarkModified(modifiedProxy);
       }

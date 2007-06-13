@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMUniformGridVolumeRepresentationProxy.h
+  Module:    vtkSMSelectionRepresentationProxy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,34 +12,35 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMUniformGridVolumeRepresentationProxy - representation that can be used to
-// show a uniform grid volume in a render view.
+// .NAME vtkSMSelectionRepresentationProxy
 // .SECTION Description
-// vtkSMUniformGridVolumeRepresentationProxy is a concrete representation that can be used
-// to render the uniform grid volume in a vtkSMRenderViewProxy. 
-// It supports rendering the uniform grid volume data.
+// Representation use to show selection. This shows only the selection i.e.
+// output of ExtractSelection filter.
 
-#ifndef __vtkSMUniformGridVolumeRepresentationProxy_h
-#define __vtkSMUniformGridVolumeRepresentationProxy_h
+#ifndef __vtkSMSelectionRepresentationProxy_h
+#define __vtkSMSelectionRepresentationProxy_h
 
-#include "vtkSMPropRepresentationProxy.h"
+#include "vtkSMDataRepresentationProxy.h"
 
-class VTK_EXPORT vtkSMUniformGridVolumeRepresentationProxy : 
-  public vtkSMPropRepresentationProxy
+class VTK_EXPORT vtkSMSelectionRepresentationProxy : public vtkSMDataRepresentationProxy
 {
 public:
-  static vtkSMUniformGridVolumeRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, 
-    vtkSMPropRepresentationProxy);
+  static vtkSMSelectionRepresentationProxy* New();
+  vtkTypeRevisionMacro(vtkSMSelectionRepresentationProxy, vtkSMDataRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Set the input connection to the extract selection filter.
+  void SetSelection(vtkSMSourceProxy* selection);
+  void CleanSelectionInput();
 
 //BTX
 protected:
-  vtkSMUniformGridVolumeRepresentationProxy();
-  ~vtkSMUniformGridVolumeRepresentationProxy();
+  vtkSMSelectionRepresentationProxy();
+  ~vtkSMSelectionRepresentationProxy();
 
   // Description:
-  // This representation needs a uniform grid volume compositing strategy.
+  // This representation needs a surface compositing strategy.
   // Overridden to request the correct type of strategy from the view.
   virtual bool InitializeStrategy(vtkSMViewProxy* view);
 
@@ -68,16 +69,18 @@ protected:
   // Currently a representation can be added to only one view.
   virtual bool RemoveFromView(vtkSMViewProxy* view);
 
-  // Structured grid volume rendering classes
-  vtkSMProxy* VolumeFixedPointRayCastMapper;
-
-  // Common volume rendering classes
-  vtkSMProxy* VolumeActor;
-  vtkSMProxy* VolumeProperty;
+  // Proxies for the selection pipeline.
+  vtkSMSourceProxy* ExtractSelection;
+  vtkSMSourceProxy* GeometryFilter;
+  vtkSMProxy* Mapper;
+  vtkSMProxy* LODMapper;
+  vtkSMProxy* Prop3D;
+  vtkSMProxy* Property;
+  vtkSMProxy* EmptySelectionSource;
 
 private:
-  vtkSMUniformGridVolumeRepresentationProxy(const vtkSMUniformGridVolumeRepresentationProxy&); // Not implemented
-  void operator=(const vtkSMUniformGridVolumeRepresentationProxy&); // Not implemented
+  vtkSMSelectionRepresentationProxy(const vtkSMSelectionRepresentationProxy&); // Not implemented
+  void operator=(const vtkSMSelectionRepresentationProxy&); // Not implemented
 //ETX
 };
 

@@ -23,27 +23,24 @@
 #ifndef __vtkSMOutlineRepresentationProxy_h
 #define __vtkSMOutlineRepresentationProxy_h
 
-#include "vtkSMDataRepresentationProxy.h"
+#include "vtkSMPropRepresentationProxy.h"
 
 class VTK_EXPORT vtkSMOutlineRepresentationProxy : 
-  public vtkSMDataRepresentationProxy
+  public vtkSMPropRepresentationProxy
 {
 public:
   static vtkSMOutlineRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMOutlineRepresentationProxy, vtkSMDataRepresentationProxy);
+  vtkTypeRevisionMacro(vtkSMOutlineRepresentationProxy, vtkSMPropRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Returns whether this representation shows selection.
-  // Overridden to turn off selection visibility if no "Selection" object is
-  // set.
-  virtual bool GetSelectionVisibility();
+  // Set the scalar coloring mode
+  void SetColorAttributeType(int type);
 
   // Description:
-  // Called to update the Representation. 
-  // Overridden to ensure that UpdateSelectionPropVisibility() is called.
-  virtual void Update(vtkSMViewProxy* view);
-  virtual void Update() { this->Superclass::Update(); };
+  // Set the scalar color array name. If array name is 0 or "" then scalar
+  // coloring is disabled.
+  void SetColorArrayName(const char* name);
 
 //BTX
 protected:
@@ -68,38 +65,10 @@ protected:
   // initialization.
   virtual bool EndCreateVTKObjects();
 
-  // Description:
-  // Called when a representation is added to a view. 
-  // Returns true on success.
-  // Currently a representation can be added to only one view.
-  virtual bool AddToView(vtkSMViewProxy* view);
-
-  // Description:
-  // Called to remove a representation from a view.
-  // Returns true on success.
-  // Currently a representation can be added to only one view.
-  virtual bool RemoveFromView(vtkSMViewProxy* view);
-
-  // Description:
-  // Updates selection prop visibility based on whether selection can actually
-  // be shown.
-  void UpdateSelectionPropVisibility();
-
   vtkSMSourceProxy* OutlineFilter;
   vtkSMProxy* Mapper;
   vtkSMProxy* Prop3D;
   vtkSMProxy* Property;
-
-  // TODO: provide mechanism to share ExtractSelection and
-  // SelectionGeometryFilter among representations.
-
-  // Proxies for the selection pipeline.
-  vtkSMSourceProxy* ExtractSelection;
-  vtkSMSourceProxy* SelectionGeometryFilter;
-  vtkSMProxy* SelectionMapper;
-  vtkSMProxy* SelectionLODMapper;
-  vtkSMProxy* SelectionProp3D;
-  vtkSMProxy* SelectionProperty;
 
 private:
   vtkSMOutlineRepresentationProxy(const vtkSMOutlineRepresentationProxy&); // Not implemented

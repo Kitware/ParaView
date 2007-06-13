@@ -643,6 +643,7 @@
         update_self="1">
         <ProxyGroupDomain name="groups">
           <Group name="rendermodules" />
+          <Group name="newviews" />
         </ProxyGroupDomain>
       </ProxyProperty>
       
@@ -740,6 +741,7 @@
         update_self="1">
         <ProxyGroupDomain name="groups">
           <Group name="rendermodules" />
+          <Group name="newviews" />
         </ProxyGroupDomain>
       </ProxyProperty>
       

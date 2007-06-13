@@ -80,7 +80,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.15");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 //-----------------------------------------------------------------------------
@@ -1143,17 +1143,57 @@ vtkSelection* vtkSMRenderViewProxy::NewSelectionForProp(
 }
 
 //-----------------------------------------------------------------------------
+static void vtkSMRenderViewProxyShrinkSelection(vtkSelection* sel)
+{
+  unsigned int numChildren = sel->GetNumberOfChildren();
+  unsigned int cc;
+  vtkSmartPointer<vtkSelection> preferredChild;
+  int maxPixels = -1;
+  for (cc=0; cc < numChildren; cc++)
+    {
+    vtkSelection* child = sel->GetChild(cc);
+    vtkInformation* properties = child->GetProperties();
+    if (properties->Has(vtkSelection::PIXEL_COUNT()))
+      {
+      int numPixels = properties->Get(vtkSelection::PIXEL_COUNT());
+      if (numPixels > maxPixels)
+        {
+        maxPixels = numPixels;
+        preferredChild = child;
+        }
+      }
+    }
+
+  if (preferredChild)
+    {
+    int i = int(numChildren)-1;
+    for (; i >=0; i--)
+      {
+      if (sel->GetChild(i) != preferredChild.GetPointer())
+        {
+        sel->RemoveChild(i);
+        }
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::SelectOnSurface(unsigned int x0, 
   unsigned int y0, unsigned int x1, unsigned int y1,
-  vtkCollection* selectedRepresentations/*=0*/)
+  vtkCollection* selectedRepresentations/*=0*/,
+  bool multiple_selections/*=true*/)
 {
   // 1) Create surface selection.
   //   Will returns a surface selection in terms of cells selected on the 
   //   visible props from all representations.
   vtkSelection* surfaceSel = this->SelectVisibleCells(x0, y0, x1, y1);
 
+  if (!multiple_selections)
+    {
+    vtkSMRenderViewProxyShrinkSelection(surfaceSel);
+    }
+
   // 2) Ask each representation to convert the selection.
-  
   vtkSmartPointer<vtkCollectionIterator> iter;
   iter.TakeReference(this->Representations->NewIterator());
 

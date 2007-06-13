@@ -30,20 +30,13 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMUniformGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMUniformGridVolumeRepresentationProxy::vtkSMUniformGridVolumeRepresentationProxy()
 {
   this->VolumeFixedPointRayCastMapper = 0;
   this->VolumeActor = 0;
   this->VolumeProperty = 0;
-
-  this->ExtractSelection = 0;
-  this->SelectionGeometryFilter = 0;
-  this->SelectionMapper = 0;
-  this->SelectionLODMapper = 0;
-  this->SelectionProp3D = 0;
-  this->SelectionProperty = 0;
 
   // This representation supports selection.
   this->SetSelectionSupported(true);
@@ -55,43 +48,6 @@ vtkSMUniformGridVolumeRepresentationProxy::~vtkSMUniformGridVolumeRepresentation
   this->VolumeFixedPointRayCastMapper = 0;
   this->VolumeActor = 0;
   this->VolumeProperty = 0;
-
-  this->ExtractSelection = 0;
-  this->SelectionGeometryFilter = 0;
-  this->SelectionMapper = 0;
-  this->SelectionLODMapper = 0;
-  this->SelectionProp3D = 0;
-  this->SelectionProperty = 0;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMUniformGridVolumeRepresentationProxy::GetSelectionVisibility()
-{
-  if (!this->Superclass::GetSelectionVisibility())
-    {
-    return false;
-    }
-
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->GetProperty("Selection"));
-  return (pp && pp->GetNumberOfProxies() > 0);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMUniformGridVolumeRepresentationProxy::UpdateSelectionPropVisibility()
-{
-  int visibility  = this->GetSelectionVisibility()? 1 : 0;
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->SelectionProp3D->GetProperty("Visibility"));
-  ivp->SetElement(0, visibility);
-  this->SelectionProp3D->UpdateProperty("Visibility");
-}
-
-//----------------------------------------------------------------------------
-void vtkSMUniformGridVolumeRepresentationProxy::Update(vtkSMViewProxy* view)
-{
-  this->UpdateSelectionPropVisibility();
-  this->Superclass::Update(view);
 }
 
 //----------------------------------------------------------------------------
@@ -110,10 +66,6 @@ bool vtkSMUniformGridVolumeRepresentationProxy::AddToView(vtkSMViewProxy* view)
     }
 
   renderView->AddPropToRenderer(this->VolumeActor);
-  if (this->GetSelectionSupported())
-    {
-    renderView->AddPropToRenderer(this->SelectionProp3D);
-    }
   return true;
 }
 
@@ -128,7 +80,6 @@ bool vtkSMUniformGridVolumeRepresentationProxy::RemoveFromView(vtkSMViewProxy* v
     }
 
   renderView->RemovePropFromRenderer(this->VolumeActor);
-  renderView->RemovePropFromRenderer(this->SelectionProp3D);
   return this->Superclass::RemoveFromView(view);
 }
 
@@ -159,25 +110,7 @@ bool vtkSMUniformGridVolumeRepresentationProxy::InitializeStrategy(vtkSMViewProx
   this->Connect(this->GetInputProxy(), strategy, "Input");
   this->Connect(strategy->GetOutput(), this->VolumeFixedPointRayCastMapper);
 
-  // Initialize strategy for the selection pipeline.
-  strategy.TakeReference(view->NewStrategy(VTK_POLY_DATA));
-  if (!strategy.GetPointer())
-    {
-    vtkErrorMacro("Could not create strategy for selection pipeline. Disabling selection.");
-    this->SetSelectionSupported(false);
-    }
-  else
-    {
-    this->AddStrategyForSelection(strategy);
-    strategy->SetEnableLOD(true);
-    strategy->UpdateVTKObjects();
-
-    strategy->SetInput(this->SelectionGeometryFilter);
-    this->Connect(strategy->GetOutput(), this->SelectionMapper);
-    this->Connect(strategy->GetLODOutput(), this->SelectionLODMapper);
-    }
-
-  return true;
+  return this->Superclass::InitializeStrategy(view);
 }
 
 //----------------------------------------------------------------------------
@@ -201,27 +134,6 @@ bool vtkSMUniformGridVolumeRepresentationProxy::BeginCreateVTKObjects()
   this->VolumeProperty->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
-  // Initialize selection pipeline subproxies.
-  this->ExtractSelection = 
-    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("ExtractSelection"));
-  this->SelectionGeometryFilter = vtkSMSourceProxy::SafeDownCast(
-    this->GetSubProxy("SelectionGeometryFilter"));
-  this->SelectionMapper = this->GetSubProxy("SelectionMapper");
-  this->SelectionLODMapper = this->GetSubProxy("SelectionLODMapper");
-  this->SelectionProp3D = this->GetSubProxy("SelectionProp3D");
-  this->SelectionProperty = this->GetSubProxy("SelectionProperty");
-
-  this->ExtractSelection->SetServers(vtkProcessModule::DATA_SERVER);
-  this->SelectionGeometryFilter->SetServers(vtkProcessModule::DATA_SERVER);
-  this->SelectionMapper->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  this->SelectionLODMapper->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  this->SelectionProp3D->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  this->SelectionProperty->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-
   return true;
 }
 
@@ -230,19 +142,6 @@ bool vtkSMUniformGridVolumeRepresentationProxy::EndCreateVTKObjects()
 {
   this->Connect(this->VolumeFixedPointRayCastMapper, this->VolumeActor, "Mapper");
   this->Connect(this->VolumeProperty, this->VolumeActor, "Property");
-
-  // Setup selection pipeline connections.
-  this->Connect(this->GetInputProxy(), this->ExtractSelection);
-  this->Connect(this->ExtractSelection, this->SelectionGeometryFilter);
-  this->Connect(this->SelectionMapper, this->SelectionProp3D, "Mapper");
-  this->Connect(this->SelectionLODMapper, this->SelectionProp3D, "LODMapper");
-  this->Connect(this->SelectionProperty, this->SelectionProp3D, "Property");
-
-  // Selection prop is not pickable.
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->SelectionProp3D->GetProperty("Pickable"));
-  ivp->SetElement(0, 0);
-  this->SelectionProp3D->UpdateProperty("Pickable");
 
   return this->Superclass::EndCreateVTKObjects();
 }

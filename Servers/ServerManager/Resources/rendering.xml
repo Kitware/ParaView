@@ -3986,6 +3986,70 @@
   </ProxyGroup>
 
   <ProxyGroup name="newviews">
+
+    <MultiViewFactory name="MultiViewFactory">
+      <Documentation>
+        Factory used to create mutiple render views.
+      </Documentation>
+      <ProxyProperty
+        name="RenderViews"
+        update_self="1"
+        command="AddRenderView"
+        remove_command="RemoveRenderView">
+      </ProxyProperty>
+    </MultiViewFactory>
+
+    <ViewProxy name="ElementInspectorView" >
+      <ProxyProperty
+        name="Representations"
+        command="AddRepresentation"
+        update_self="1"
+        remove_command="RemoveRepresentation">
+        <Documentation>
+          Add representations to be rendered by this view.
+        </Documentation>
+      </ProxyProperty>
+
+      <IntVectorProperty
+        name="ViewPosition"
+        command="SetViewPosition"
+        number_of_elements="2"
+        default_values="0 0"
+        update_self="1"
+        immediate_update="1">
+        <IntRangeDomain name="range" min="0 0" />
+        <Documentation>
+          Position of the view. This is useful in multiview configurations.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="GUISize"
+        command="SetGUISize"
+        number_of_elements="2"
+        default_values="0 0"
+        update_self="1"
+        immediate_update="1">
+        <IntRangeDomain name="range" min="1 1" />
+        <Documentation>
+          Total GUI size when using mutliple views. This includes the sizes of
+          all view modules.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="ViewTime"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The pipeline update time for this view.
+          This gets passed to all representations added to this view.
+        </Documentation>
+      </DoubleVectorProperty>
+      <!-- End of ElementInspectorView -->
+    </ViewProxy>
+
     <Proxy name="RenderViewBase">
       <Documentation>
         This defines the properties/subproxies common to all render view
@@ -4480,11 +4544,120 @@
   </ProxyGroup>
 
   <ProxyGroup name="representations">
+    <SelectionRepresentationProxy name="SelectionRepresentation">
+      <Documentation>
+        Proxy to show a selection as geometry.
+      </Documentation>
+
+      <InputProperty name="Input" 
+        command="NotUsed">
+        <InputArrayDomain name="input_array_any"
+          attribute_type="any">
+        </InputArrayDomain>
+      </InputProperty>
+
+      <ProxyProperty name="Selection"
+        command="SetSelection"
+        clean_command="CleanSelectionInput"
+        update_self="1">
+      </ProxyProperty>
+
+      <DoubleVectorProperty name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        is_internal="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <SubProxy>
+        <Proxy name="ExtractSelection"
+          proxygroup="filters" proxyname="ExtractSelection" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="EmptySelectionSource"
+          proxygroup="sources" proxyname="SelectionSource" />
+      </SubProxy>
+
+      <SubProxy>
+        <!-- GeometryFilter for selection pipeline -->
+        <Proxy name="GeometryFilter"
+          proxygroup="filters" proxyname="GeometryFilter" />
+      </SubProxy>
+
+      <SubProxy>
+        <!-- 
+          Mapper for selection 
+        -->
+        <Proxy name="Mapper" 
+          proxygroup="mappers" proxyname="PolyDataMapper" />
+      </SubProxy>
+
+      <SubProxy>
+        <!-- 
+          Mapper for low-res selection. It shares all its properties with the
+          high-res mapper (except input ofcourse).
+        -->
+        <Proxy name="LODMapper" 
+          proxygroup="mappers" proxyname="PolyDataMapper" />
+        <ShareProperties subproxy="Mapper" >
+          <Exception name="Input" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!--
+          SelectionProp3D that gets added to the 3D renderer 
+        -->
+        <Proxy name="Prop3D" proxygroup="props" proxyname="LODActor" />
+        <ExposedProperties>
+          <Property name="Orientation" />
+          <Property name="Origin" />
+          <Property name="Position" />
+          <Property name="RenderModuleHelper" exposed_name="ViewHelper" />
+          <Property name="Scale" />
+          <Property name="Visibility" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!--
+          Property for the vtkProp.
+        -->
+        <Proxy name="Property" proxygroup="properties" proxyname="Property" />
+        <ExposedProperties>
+          <Property name="Ambient" />
+          <Property name="AmbientColor" />
+          <Property name="Color"/> 
+          <Property name="Diffuse"/> 
+          <Property name="DiffuseColor"/> 
+          <Property name="Interpolation"/> 
+          <Property name="LineWidth"/> 
+          <Property name="Opacity"/> 
+          <Property name="PointSize"/> 
+          <Property name="Representation"/> 
+          <Property name="SpecularColor"/> 
+          <Property name="SpecularPower"/> 
+        </ExposedProperties>
+      </SubProxy>
+
+    <!-- End of SelectionRepresentation -->
+    </SelectionRepresentationProxy>
+
     <SurfaceRepresentationProxy name="SurfaceRepresentation">
+      <Documentation>
+        Representation to show surface.
+      </Documentation>
       
       <InputProperty name="Input" 
-        command="NotUsed"
-        />
+        command="NotUsed">
+        <InputArrayDomain name="input_array_any"
+          attribute_type="any">
+        </InputArrayDomain>
+      </InputProperty>
 
       <DoubleVectorProperty name="UpdateTime"
         command="SetUpdateTime"
@@ -4502,6 +4675,34 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="ColorAttributeType"
+        command="SetColorAttributeType"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="POINT_DATA" />
+          <Entry value="1" text="CELL_DATA" />
+          <Entry value="2" text="FIELD_DATA" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ColorArrayName"
+        command="SetColorArrayName"
+        number_of_elements="1"
+        default_values=""
+        update_self="1">
+        <Documentation>
+          Set the array name to color by. Set it to empty string to use solid
+          color.
+        </Documentation>
+        <ArrayListDomain name="array_list" attribute_type="Scalars"
+          input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
 
       <SubProxy>
         <!-- 
@@ -4524,14 +4725,11 @@
         <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper" />
         <ExposedProperties>
           <Property name="LookupTable" />
-          <Property name="ScalarVisibility" />
           <Property name="ColorMode" />
           <Property name="MapScalars" />
           <Property name="ImmediateModeRendering" />
           <Property name="InterpolateScalarsBeforeMapping" />
           <Property name="UseLookupTableScalarRange" />
-          <Property name="ScalarMode" />
-          <Property name="ColorArray" />
           <Property name="ClippingPlanes" />
           <Property name="NumberOfSubPieces" />
         </ExposedProperties>
@@ -4588,71 +4786,27 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="ExtractSelection"
-          proxygroup="filters" proxyname="ExtractSelection" />
+        <!-- This is the helper that assures that the material xml is provided
+          to the servers from the client, when needed. Note that this is 
+          a client only proxy -->
+        <MaterialLoaderProxy name="MaterialLoader" >
+          <StringVectorProperty name="Material"
+            command="LoadMaterial"
+            number_of_elements="1"
+            update_self="1">
+          </StringVectorProperty>
+        </MaterialLoaderProxy>
         <ExposedProperties>
-          <Property name="Selection" />
+          <Property name="Material" />
         </ExposedProperties>
       </SubProxy>
 
       <SubProxy>
-        <!-- GeometryFilter for selection pipeline -->
-        <Proxy name="SelectionGeometryFilter"
-          proxygroup="filters" proxyname="GeometryFilter" />
-        <ShareProperties subproxy="GeometryFilter">
-          <Exception name="Input" />
-        </ShareProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!-- 
-          Mapper for selection 
-        -->
-        <Proxy name="SelectionMapper" 
-          proxygroup="mappers" proxyname="PolyDataMapper" />
-      </SubProxy>
-
-      <SubProxy>
-        <!-- 
-          Mapper for low-res selection. It shares all its properties with the
-          high-res mapper (except input ofcourse).
-        -->
-        <Proxy name="SelectionLODMapper" 
-          proxygroup="mappers" proxyname="PolyDataMapper" />
-        <ShareProperties subproxy="SelectionMapper" >
-          <Exception name="Input" />
-        </ShareProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!--
-          SelectionProp3D that gets added to the 3D renderer 
-        -->
-        <Proxy name="SelectionProp3D" proxygroup="props" proxyname="LODActor" />
-        <ShareProperties subproxy="Prop3D">
-          <!-- 
-            We are simply linking RenderModuleHelper property.
-            All other properties are not shared 
-          -->
-          <Exception name="LODMapper" />
-          <Exception name="Mapper" />
-          <Exception name="Orientation" />
-          <Exception name="Origin" />
-          <Exception name="Pickable" />
-          <Exception name="Position" />
-          <Exception name="Property" />
-          <Exception name="Scale" />
-          <Exception name="Texture" />
-          <Exception name="Visibility" />
-        </ShareProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!--
-          Property for the vtkProp.
-        -->
-        <Proxy name="SelectionProperty" proxygroup="properties" proxyname="Property" />
+        <Proxy name="SelectionRepresentation" 
+          proxygroup="representations"
+          proxyname="SelectionRepresentation" />
         <ExposedProperties>
+          <Property name="Selection" />
           <Property name="Ambient" 
                     exposed_name="SelectionAmbient" />
           <Property name="AmbientColor" 
@@ -4673,28 +4827,10 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
-          <Property name="Shading" 
-                    exposed_name="SelectionShading" />
           <Property name="SpecularColor" 
                     exposed_name="SelectionSpecularColor" />
           <Property name="SpecularPower" 
                     exposed_name="SelectionSpecularPower" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!-- This is the helper that assures that the material xml is provided
-          to the servers from the client, when needed. Note that this is 
-          a client only proxy -->
-        <MaterialLoaderProxy name="MaterialLoader" >
-          <StringVectorProperty name="Material"
-            command="LoadMaterial"
-            number_of_elements="1"
-            update_self="1">
-          </StringVectorProperty>
-        </MaterialLoaderProxy>
-        <ExposedProperties>
-          <Property name="Material" />
         </ExposedProperties>
       </SubProxy>
 
@@ -4704,8 +4840,11 @@
     <OutlineRepresentationProxy name="OutlineRepresentation">
       
       <InputProperty name="Input" 
-        command="NotUsed"
-        />
+        command="NotUsed">
+        <InputArrayDomain name="input_array_any"
+          attribute_type="any">
+        </InputArrayDomain>
+      </InputProperty>
 
       <DoubleVectorProperty name="UpdateTime"
         command="SetUpdateTime"
@@ -4723,6 +4862,34 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="ColorAttributeType"
+        command="SetColorAttributeType"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="POINT_DATA" />
+          <Entry value="1" text="CELL_DATA" />
+          <Entry value="2" text="FIELD_DATA" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ColorArrayName"
+        command="SetColorArrayName"
+        number_of_elements="1"
+        default_values=""
+        update_self="1">
+        <Documentation>
+          Set the array name to color by. Set it to empty string to use solid
+          color.
+        </Documentation>
+        <ArrayListDomain name="array_list" attribute_type="Scalars"
+          input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
 
       <SubProxy>
         <!-- 
@@ -4739,14 +4906,11 @@
         <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper" />
         <ExposedProperties>
           <Property name="LookupTable" />
-          <Property name="ScalarVisibility" />
           <Property name="ColorMode" />
           <Property name="MapScalars" />
           <Property name="ImmediateModeRendering" />
           <Property name="InterpolateScalarsBeforeMapping" />
           <Property name="UseLookupTableScalarRange" />
-          <Property name="ScalarMode" />
-          <Property name="ColorArray" />
           <Property name="ClippingPlanes" />
           <Property name="NumberOfSubPieces" />
         </ExposedProperties>
@@ -4791,60 +4955,11 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="ExtractSelection"
-          proxygroup="filters" proxyname="ExtractSelection" />
+        <Proxy name="SelectionRepresentation" 
+          proxygroup="representations"
+          proxyname="SelectionRepresentation" />
         <ExposedProperties>
           <Property name="Selection" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!-- GeometryFilter for selection pipeline -->
-        <Proxy name="SelectionGeometryFilter"
-          proxygroup="filters" proxyname="GeometryFilter" />
-      </SubProxy>
-
-      <SubProxy>
-        <!-- 
-          Mapper for selection 
-        -->
-        <Proxy name="SelectionMapper" 
-          proxygroup="mappers" proxyname="PolyDataMapper" />
-      </SubProxy>
-
-
-      <SubProxy>
-        <!-- 
-          Mapper for low-res selection. It shares all its properties with the
-          high-res mapper (except input ofcourse).
-        -->
-        <Proxy name="SelectionLODMapper" 
-          proxygroup="mappers" proxyname="PolyDataMapper" />
-        <ShareProperties subproxy="SelectionMapper" >
-          <Exception name="Input" />
-        </ShareProperties>
-      </SubProxy>
-
- 
-     <SubProxy>
-        <!--
-          SelectionProp3D that gets added to the 3D renderer 
-        -->
-        <Proxy name="SelectionProp3D" proxygroup="props" proxyname="LODActor" />
-        <ExposedProperties>
-          <!-- FIXME 
-          <Property name="RenderModuleHelper" exposed_name="ViewHelper" />
-          -->
-          <Property name="Visibility" exposed_name="SelectionVisibility" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!--
-          Property for the vtkProp.
-        -->
-        <Proxy name="SelectionProperty" proxygroup="properties" proxyname="Property" />
-        <ExposedProperties>
           <Property name="Ambient" 
                     exposed_name="SelectionAmbient" />
           <Property name="AmbientColor" 
@@ -4865,8 +4980,6 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
-          <Property name="Shading" 
-                    exposed_name="SelectionShading" />
           <Property name="SpecularColor" 
                     exposed_name="SelectionSpecularColor" />
           <Property name="SpecularPower" 
@@ -4934,72 +5047,11 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="ExtractSelection"
-          proxygroup="filters" proxyname="ExtractSelection" />
+        <Proxy name="SelectionRepresentation" 
+          proxygroup="representations"
+          proxyname="SelectionRepresentation" />
         <ExposedProperties>
           <Property name="Selection" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!-- GeometryFilter for selection pipeline -->
-        <Proxy name="SelectionGeometryFilter"
-          proxygroup="filters" proxyname="GeometryFilter" />
-        <ExposedProperties>
-          <Property name="UseStrips" />
-          <Property name="ForceStrips" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!-- 
-          Mapper for selection 
-        -->
-        <Proxy name="SelectionMapper" 
-          proxygroup="mappers" proxyname="PolyDataMapper" />
-      </SubProxy>
-
-      <SubProxy>
-        <!-- 
-          Mapper for low-res selection. It shares all its properties with the
-          high-res mapper (except input ofcourse).
-        -->
-        <Proxy name="SelectionLODMapper" 
-          proxygroup="mappers" proxyname="PolyDataMapper" />
-        <ShareProperties subproxy="SelectionMapper" >
-          <Exception name="Input" />
-        </ShareProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!--
-          SelectionProp3D that gets added to the 3D renderer 
-        -->
-        <Proxy name="SelectionProp3D" proxygroup="props" proxyname="LODActor" />
-        <ShareProperties subproxy="VolumeActor">
-          <!-- 
-            We are simply linking RenderViewHelper property.
-            All other properties are not shared 
-          -->
-          <Exception name="LODMapper" />
-          <Exception name="Mapper" />
-          <Exception name="Orientation" />
-          <Exception name="Origin" />
-          <Exception name="Pickable" />
-          <Exception name="Position" />
-          <Exception name="Property" />
-          <Exception name="Scale" />
-          <Exception name="Texture" />
-          <Exception name="Visibility" />
-        </ShareProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!--
-          Property for the vtkProp.
-        -->
-        <Proxy name="SelectionProperty" proxygroup="properties" proxyname="Property" />
-        <ExposedProperties>
           <Property name="Ambient" 
                     exposed_name="SelectionAmbient" />
           <Property name="AmbientColor" 
@@ -5020,8 +5072,6 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
-          <Property name="Shading" 
-                    exposed_name="SelectionShading" />
           <Property name="SpecularColor" 
                     exposed_name="SelectionSpecularColor" />
           <Property name="SpecularPower" 
@@ -5053,86 +5103,6 @@
         default_values="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <SubProxy>
-        <Proxy name="ExtractSelection"
-          proxygroup="filters" proxyname="ExtractSelection" />
-        <ExposedProperties>
-          <Property name="Selection" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!-- GeometryFilter for selection pipeline -->
-        <Proxy name="SelectionGeometryFilter"
-          proxygroup="filters" proxyname="GeometryFilter" />
-        <ExposedProperties>
-          <Property name="UseStrips" />
-          <Property name="ForceStrips" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!-- 
-          Mapper for selection 
-        -->
-        <Proxy name="SelectionMapper"
-          proxygroup="mappers" proxyname="PolyDataMapper" />
-      </SubProxy>
-
-      <SubProxy>
-        <!-- 
-          Mapper for low-res selection. It shares all its properties with the
-          high-res mapper (except input ofcourse).
-        -->
-        <Proxy name="SelectionLODMapper"
-          proxygroup="mappers" proxyname="PolyDataMapper" />
-        <ShareProperties subproxy="SelectionMapper" >
-          <Exception name="Input" />
-        </ShareProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!--
-          SelectionProp3D that gets added to the 3D renderer 
-        -->
-        <Proxy name="SelectionProp3D" proxygroup="props" proxyname="LODActor" />
-      </SubProxy>
-
-      <SubProxy>
-        <!--
-          Property for the vtkProp.
-        -->
-        <Proxy name="SelectionProperty" proxygroup="properties" proxyname="Property" />
-        <ExposedProperties>
-          <Property name="Ambient"
-                    exposed_name="SelectionAmbient" />
-          <Property name="AmbientColor"
-                    exposed_name="SelectionAmbientColor" />
-          <Property name="Color"
-                    exposed_name="SelectionColor" />
-          <Property name="Diffuse"
-                    exposed_name="SelectionDiffuse" />
-          <Property name="DiffuseColor"
-                    exposed_name="SelectionDiffuseColor" />
-          <Property name="Interpolation"
-                    exposed_name="SelectionInterpolation" />
-          <Property name="LineWidth"
-                    exposed_name="SelectionLineWidth" />
-          <Property name="Opacity"
-                    exposed_name="SelectionOpacity" />
-          <Property name="PointSize"
-                    exposed_name="SelectionPointSize" />
-          <Property name="Representation"
-                    exposed_name="SelectionRepresentation" />
-          <Property name="Shading"
-                    exposed_name="SelectionShading" />
-          <Property name="SpecularColor"
-                    exposed_name="SelectionSpecularColor" />
-          <Property name="SpecularPower"
-                    exposed_name="SelectionSpecularPower" />
-        </ExposedProperties>
-      </SubProxy>
 
       <!-- Subproxies for Volume Pipeline -->
       <SubProxy>
@@ -5244,8 +5214,192 @@
         </ExposedProperties>
       </SubProxy>
 
+      <SubProxy>
+        <Proxy name="SelectionRepresentation" 
+          proxygroup="representations"
+          proxyname="SelectionRepresentation" />
+        <ExposedProperties>
+          <Property name="Selection" />
+          <Property name="Ambient" 
+                    exposed_name="SelectionAmbient" />
+          <Property name="AmbientColor" 
+                    exposed_name="SelectionAmbientColor" />
+          <Property name="Color" 
+                    exposed_name="SelectionColor" />
+          <Property name="Diffuse" 
+                    exposed_name="SelectionDiffuse" />
+          <Property name="DiffuseColor" 
+                    exposed_name="SelectionDiffuseColor" />
+          <Property name="Interpolation" 
+                    exposed_name="SelectionInterpolation" />
+          <Property name="LineWidth" 
+                    exposed_name="SelectionLineWidth" />
+          <Property name="Opacity" 
+                    exposed_name="SelectionOpacity" />
+          <Property name="PointSize" 
+                    exposed_name="SelectionPointSize" />
+          <Property name="Representation" 
+                    exposed_name="SelectionRepresentation" />
+          <Property name="SpecularColor" 
+                    exposed_name="SelectionSpecularColor" />
+          <Property name="SpecularPower" 
+                    exposed_name="SelectionSpecularPower" />
+        </ExposedProperties>
+      </SubProxy>
+
       <!-- End of UnstructuredGridVolumeRepresentation -->
     </UnstructuredGridVolumeRepresentationProxy>
+
+    <PVRepresentationProxy name="GeometryRepresentation">
+      <Documentation>
+        This representation is used to show geometry as
+        Surface/Outline/Points/Wireframe.
+      </Documentation>
+
+      <InputProperty 
+        name="Input"
+        command="NotUsed">
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for this representation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        is_internal="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty 
+        name="SelectionVisibility"
+        number_of_elements="1"
+        default_values="1" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for the selection, if any.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="Representation"
+        command="SetRepresentation"
+        number_of_elements="1"
+        default_values="2"
+        update_self="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="POINTS" />
+          <Entry value="1" text="WIREFRAME" />
+          <Entry value="2" text="SURFACE" />
+          <Entry value="3" text="OUTLINE" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="SurfaceRepresentation"
+          proxygroup="representations" proxyname="SurfaceRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ColorArrayName" />
+          <Property name="ColorAttributeType" />
+
+          <!-- Geometry Filter properties -->
+          <Property name="UseStrips" />
+          <Property name="ForceStrips" />
+
+          <!-- Mapper properties -->
+          <Property name="LookupTable" />
+          <Property name="MapScalars" />
+          <Property name="ImmediateModeRendering" />
+          <Property name="InterpolateScalarsBeforeMapping" />
+          <Property name="UseLookupTableScalarRange" />
+          <Property name="ClippingPlanes" />
+          <Property name="NumberOfSubPieces" />
+
+          <!-- Prop3D properties -->
+          <Property name="Orientation" />
+          <Property name="Origin" />
+          <Property name="Pickable" />
+          <Property name="Position" />
+          <Property name="ViewHelper" />
+          <Property name="Scale" />
+
+          <!-- Property properties -->
+          <Property name="Ambient" />
+          <Property name="AmbientColor" />
+          <Property name="Color" />
+          <Property name="Diffuse" />
+          <Property name="DiffuseColor" />
+          <Property name="Interpolation" />
+          <Property name="LineWidth" />
+          <Property name="Opacity" />
+          <Property name="PointSize" />
+          <Property name="Representation" />
+          <Property name="Shading" />
+          <Property name="SpecularColor" />
+          <Property name="SpecularPower" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="OutlineRepresentation"
+          proxygroup="representations" proxyname="OutlineRepresentation">
+        </Proxy>
+        <ShareProperties name="SurfaceRepresentation">
+          <Exception name="Input" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="SelectionRepresentation" 
+          proxygroup="representations"
+          proxyname="SelectionRepresentation" />
+        <ExposedProperties>
+          <Property name="Selection" />
+          <Property name="Ambient" 
+                    exposed_name="SelectionAmbient" />
+          <Property name="AmbientColor" 
+                    exposed_name="SelectionAmbientColor" />
+          <Property name="Color" 
+                    exposed_name="SelectionColor" />
+          <Property name="Diffuse" 
+                    exposed_name="SelectionDiffuse" />
+          <Property name="DiffuseColor" 
+                    exposed_name="SelectionDiffuseColor" />
+          <Property name="Interpolation" 
+                    exposed_name="SelectionInterpolation" />
+          <Property name="LineWidth" 
+                    exposed_name="SelectionLineWidth" />
+          <Property name="Opacity" 
+                    exposed_name="SelectionOpacity" />
+          <Property name="PointSize" 
+                    exposed_name="SelectionPointSize" />
+          <Property name="Representation" 
+                    exposed_name="SelectionRepresentation" />
+          <Property name="SpecularColor" 
+                    exposed_name="SelectionSpecularColor" />
+          <Property name="SpecularPower" 
+                    exposed_name="SelectionSpecularPower" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of GeometryRepresentation -->
+    </PVRepresentationProxy>
 
     <ClientDeliveryRepresentationProxy name="ClientDeliveryRepresentation">
       <InputProperty name="Input"
@@ -5254,11 +5408,8 @@
       
       <IntVectorProperty
         name="Visibility"
-        command="SetVisibility"
         number_of_elements="1"
-        default_values="1"
-        update_self="1"
-        animateable="1">
+        default_values="1" >
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
@@ -5306,6 +5457,12 @@
         </ExposedProperties>
       </SubProxy>
       <!-- End of ClientDeliveryRepresentation -->
+    </ClientDeliveryRepresentationProxy>
+
+    <ClientDeliveryRepresentationProxy name="ElementInspectorRepresentation"
+      base_proxygroup="representations"
+      base_proxyname="ClientDeliveryRepresentation">
+      <!-- End of ElementInspectorRepresentation -->
     </ClientDeliveryRepresentationProxy>
 
     <AxesRepresentationProxy name="AxesRepresentation" class="vtkAxes" >
@@ -5659,6 +5816,7 @@
 
 
 </ServerManagerConfiguration>
+
 
 
 

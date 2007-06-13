@@ -21,38 +21,22 @@
 #ifndef __vtkSMUnstructuredGridVolumeRepresentationProxy_h
 #define __vtkSMUnstructuredGridVolumeRepresentationProxy_h
 
-#include "vtkSMDataRepresentationProxy.h"
+#include "vtkSMPropRepresentationProxy.h"
 
 class VTK_EXPORT vtkSMUnstructuredGridVolumeRepresentationProxy : 
-  public vtkSMDataRepresentationProxy
+  public vtkSMPropRepresentationProxy
 {
 public:
   static vtkSMUnstructuredGridVolumeRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, vtkSMDataRepresentationProxy);
+  vtkTypeRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, 
+    vtkSMPropRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Returns whether this representation shows selection.
-  // Overridden to turn off selection visibility if no "Selection" object is
-  // set.
-  virtual bool GetSelectionVisibility();
-
-  // Description:
   // Called to update the Representation. 
-  // Overridden to ensure that UpdateSelectionPropVisibility() is called.
+  // Overridden to ensure to check for OpenGL extensions.
   virtual void Update(vtkSMViewProxy* view);
   virtual void Update() { this->Superclass::Update(); };
-
-  // Description:
-  // Views typically support a mechanism to create a selection in the view
-  // itself, eg. by click-and-dragging over a region in the view. The view
-  // passes this selection to each of the representations and asks them to
-  // convert it to a proxy for a selection which can be set on the view. 
-  // It a representation does not support selection creation, it should simply
-  // return NULL. This method returns a new vtkSMProxy instance which the 
-  // caller must free after use.
-  // This implementation converts a prop selection to a selection source.
-  virtual vtkSMProxy* ConvertSelection(vtkSelection* input);
 
   // Description:
   // Flag indicating if the display supports a volume rendering 
@@ -121,11 +105,6 @@ protected:
   // Currently a representation can be added to only one view.
   virtual bool RemoveFromView(vtkSMViewProxy* view);
 
-  // Description:
-  // Updates selection prop visibility based on whether selection can actually
-  // be shown.
-  virtual void UpdateSelectionPropVisibility();
-
   // Called to check if the display can support volume rendering.
   // Note that will will excute the input pipeline
   // if not already up-to-date.
@@ -139,13 +118,6 @@ protected:
   // Get information about extensions from the view.
   void UpdateRenderViewExtensions(vtkSMViewProxy*);
   
-  // Description:
-  // Given a surface selection for this representation, this returns a new
-  // vtkSelection for the selected cells/points in the input of this
-  // representation.
-  virtual void ConvertSurfaceSelectionToVolumeSelection(
-   vtkSelection* input, vtkSelection* output);
-
   // Unstructured volume rendering classes
   vtkSMProxy* VolumeFilter;
   vtkSMProxy* VolumePTMapper;
@@ -161,14 +133,6 @@ protected:
   int SupportsZSweepMapper;
   int SupportsBunykMapper;
   int RenderViewExtensionsTested;
-
-  // Proxies for the selection pipeline.
-  vtkSMSourceProxy* ExtractSelection;
-  vtkSMSourceProxy* SelectionGeometryFilter;
-  vtkSMProxy* SelectionMapper;
-  vtkSMProxy* SelectionLODMapper;
-  vtkSMProxy* SelectionProp3D;
-  vtkSMProxy* SelectionProperty;
 
 private:
   vtkSMUnstructuredGridVolumeRepresentationProxy(const vtkSMUnstructuredGridVolumeRepresentationProxy&); // Not implemented

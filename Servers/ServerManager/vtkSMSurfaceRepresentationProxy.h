@@ -23,27 +23,15 @@
 #ifndef __vtkSMSurfaceRepresentationProxy_h
 #define __vtkSMSurfaceRepresentationProxy_h
 
-#include "vtkSMDataRepresentationProxy.h"
+#include "vtkSMPropRepresentationProxy.h"
 
 class VTK_EXPORT vtkSMSurfaceRepresentationProxy : 
-  public vtkSMDataRepresentationProxy
+  public vtkSMPropRepresentationProxy
 {
 public:
   static vtkSMSurfaceRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMSurfaceRepresentationProxy, vtkSMDataRepresentationProxy);
+  vtkTypeRevisionMacro(vtkSMSurfaceRepresentationProxy, vtkSMPropRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Returns whether this representation shows selection.
-  // Overridden to turn off selection visibility if no "Selection" object is
-  // set.
-  virtual bool GetSelectionVisibility();
-
-  // Description:
-  // Called to update the Representation. 
-  // Overridden to ensure that UpdateSelectionPropVisibility() is called.
-  virtual void Update(vtkSMViewProxy* view);
-  virtual void Update() { this->Superclass::Update(); };
 
   // Description:
   // Views typically support a mechanism to create a selection in the view
@@ -59,6 +47,15 @@ public:
   // Description:
   // Returns true is opactity < 1.0
   virtual bool GetOrderedCompositingNeeded();
+
+  // Description:
+  // Set the scalar coloring mode
+  void SetColorAttributeType(int type);
+
+  // Description:
+  // Set the scalar color array name. If array name is 0 or "" then scalar
+  // coloring is disabled.
+  void SetColorArrayName(const char* name);
 
 //BTX
 protected:
@@ -84,23 +81,6 @@ protected:
   virtual bool EndCreateVTKObjects();
 
   // Description:
-  // Called when a representation is added to a view. 
-  // Returns true on success.
-  // Currently a representation can be added to only one view.
-  virtual bool AddToView(vtkSMViewProxy* view);
-
-  // Description:
-  // Called to remove a representation from a view.
-  // Returns true on success.
-  // Currently a representation can be added to only one view.
-  virtual bool RemoveFromView(vtkSMViewProxy* view);
-
-  // Description:
-  // Updates selection prop visibility based on whether selection can actually
-  // be shown.
-  void UpdateSelectionPropVisibility();
-
-  // Description:
   // Given a surface selection for this representation, this returns a new
   // vtkSelection for the selected cells/points in the input of this
   // representation.
@@ -113,17 +93,6 @@ protected:
   vtkSMProxy* LODMapper;
   vtkSMProxy* Prop3D;
   vtkSMProxy* Property;
-
-  // TODO: provide mechanism to share ExtractSelection and
-  // SelectionGeometryFilter among representations.
-
-  // Proxies for the selection pipeline.
-  vtkSMSourceProxy* ExtractSelection;
-  vtkSMSourceProxy* SelectionGeometryFilter;
-  vtkSMProxy* SelectionMapper;
-  vtkSMProxy* SelectionLODMapper;
-  vtkSMProxy* SelectionProp3D;
-  vtkSMProxy* SelectionProperty;
 
 private:
   vtkSMSurfaceRepresentationProxy(const vtkSMSurfaceRepresentationProxy&); // Not implemented

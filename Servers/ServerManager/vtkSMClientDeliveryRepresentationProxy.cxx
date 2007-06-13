@@ -26,9 +26,10 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
 {
@@ -56,7 +57,11 @@ vtkSMClientDeliveryRepresentationProxy::~vtkSMClientDeliveryRepresentationProxy(
 //----------------------------------------------------------------------------
 bool vtkSMClientDeliveryRepresentationProxy::SetupStrategy()
 {
-  this->StrategyProxy = vtkSMClientDeliveryStrategyProxy::New();
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+
+  this->StrategyProxy = vtkSMClientDeliveryStrategyProxy::SafeDownCast(
+    pxm->NewProxy("strategies", "ClientDeliveryStrategy"));
+
   if (!this->StrategyProxy)
     {
     vtkErrorMacro("Failed to create vtkSMClientDeliveryStrategyProxy.");

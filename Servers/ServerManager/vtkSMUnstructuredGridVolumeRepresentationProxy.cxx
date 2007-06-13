@@ -19,7 +19,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
-#include "vtkSelection.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDataTypeDomain.h"
 #include "vtkSMIntVectorProperty.h"
@@ -28,11 +27,10 @@
 #include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
-#include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepresentationProxy()
 {
@@ -43,13 +41,6 @@ vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepre
   this->VolumeZSweepMapper = 0;
   this->VolumeActor = 0;
   this->VolumeProperty = 0;
-
-  this->ExtractSelection = 0;
-  this->SelectionGeometryFilter = 0;
-  this->SelectionMapper = 0;
-  this->SelectionLODMapper = 0;
-  this->SelectionProp3D = 0;
-  this->SelectionProperty = 0;
 
   this->SupportsBunykMapper  = 0;
   this->SupportsZSweepMapper = 0;
@@ -71,41 +62,11 @@ vtkSMUnstructuredGridVolumeRepresentationProxy::~vtkSMUnstructuredGridVolumeRepr
   this->VolumeActor = 0;
   this->VolumeProperty = 0;
 
-  this->ExtractSelection = 0;
-  this->SelectionGeometryFilter = 0;
-  this->SelectionMapper = 0;
-  this->SelectionLODMapper = 0;
-  this->SelectionProp3D = 0;
-  this->SelectionProperty = 0;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMUnstructuredGridVolumeRepresentationProxy::GetSelectionVisibility()
-{
-  if (!this->Superclass::GetSelectionVisibility())
-    {
-    return false;
-    }
-
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->GetProperty("Selection"));
-  return (pp && pp->GetNumberOfProxies() > 0);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMUnstructuredGridVolumeRepresentationProxy::UpdateSelectionPropVisibility()
-{
-  int visibility  = this->GetSelectionVisibility()? 1 : 0;
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->SelectionProp3D->GetProperty("Visibility"));
-  ivp->SetElement(0, visibility);
-  this->SelectionProp3D->UpdateProperty("Visibility");
 }
 
 //----------------------------------------------------------------------------
 void vtkSMUnstructuredGridVolumeRepresentationProxy::Update(vtkSMViewProxy* view)
 {
-  this->UpdateSelectionPropVisibility();
   if (!this->RenderViewExtensionsTested)
     {
     this->UpdateRenderViewExtensions(view);
@@ -133,10 +94,6 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::AddToView(vtkSMViewProxy* v
     }
 
   renderView->AddPropToRenderer(this->VolumeActor);
-  if (this->GetSelectionSupported())
-    {
-    renderView->AddPropToRenderer(this->SelectionProp3D);
-    }
 
   // This will ensure that on update we'll check if the
   // view supports certain extensions.
@@ -159,7 +116,6 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::RemoveFromView(vtkSMViewPro
     }
 
   renderView->RemovePropFromRenderer(this->VolumeActor);
-  renderView->RemovePropFromRenderer(this->SelectionProp3D);
   return this->Superclass::RemoveFromView(view);
 }
 
@@ -191,26 +147,7 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::InitializeStrategy(vtkSMVie
   // (Look at vtkSMPipelineRepresentationProxy::AddToView()).
   this->Connect(this->VolumeFilter, strategy, "Input");
   
-  // Initialize strategy for the selection pipeline.
-  strategy.TakeReference(
-    view->NewStrategy(VTK_POLY_DATA));
-  if (!strategy.GetPointer())
-    {
-    vtkErrorMacro("Could not create strategy for selection pipeline. Disabling selection.");
-    this->SetSelectionSupported(false);
-    }
-  else
-    {
-    this->AddStrategyForSelection(strategy);
-    strategy->SetEnableLOD(true);
-    strategy->UpdateVTKObjects();
-
-    strategy->SetInput(this->SelectionGeometryFilter);
-    this->Connect(strategy->GetOutput(), this->SelectionMapper);
-    this->Connect(strategy->GetLODOutput(), this->SelectionLODMapper);
-    }
-
-  return true;
+  return this->Superclass::InitializeStrategy(view);
 }
 
 //----------------------------------------------------------------------------
@@ -246,27 +183,6 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::BeginCreateVTKObjects()
   this->VolumeProperty->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
-  // Initialize selection pipeline subproxies.
-  this->ExtractSelection = 
-    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("ExtractSelection"));
-  this->SelectionGeometryFilter = vtkSMSourceProxy::SafeDownCast(
-    this->GetSubProxy("SelectionGeometryFilter"));
-  this->SelectionMapper = this->GetSubProxy("SelectionMapper");
-  this->SelectionLODMapper = this->GetSubProxy("SelectionLODMapper");
-  this->SelectionProp3D = this->GetSubProxy("SelectionProp3D");
-  this->SelectionProperty = this->GetSubProxy("SelectionProperty");
-
-  this->ExtractSelection->SetServers(vtkProcessModule::DATA_SERVER);
-  this->SelectionGeometryFilter->SetServers(vtkProcessModule::DATA_SERVER);
-  this->SelectionMapper->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  this->SelectionLODMapper->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  this->SelectionProp3D->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  this->SelectionProperty->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-
   return true;
 }
 
@@ -280,81 +196,7 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::EndCreateVTKObjects()
   this->Connect(this->VolumeZSweepMapper, this->VolumeActor, "Mapper");
   this->Connect(this->VolumeProperty, this->VolumeActor, "Property");
 
-  // Setup selection pipeline connections.
-  this->Connect(this->GetInputProxy(), this->ExtractSelection);
-  this->Connect(this->ExtractSelection, this->SelectionGeometryFilter);
-  this->Connect(this->SelectionMapper, this->SelectionProp3D, "Mapper");
-  this->Connect(this->SelectionLODMapper, this->SelectionProp3D, "LODMapper");
-  this->Connect(this->SelectionProperty, this->SelectionProp3D, "Property");
-
-  // Selection prop is not pickable.
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->SelectionProp3D->GetProperty("Pickable"));
-  ivp->SetElement(0, 0);
-  this->SelectionProp3D->UpdateProperty("Pickable");
-
   return this->Superclass::EndCreateVTKObjects();
-}
-
-//----------------------------------------------------------------------------
-// TODO: 
-vtkSMProxy* vtkSMUnstructuredGridVolumeRepresentationProxy::ConvertSelection(
-  vtkSelection* surfaceSel)
-{
-  if (!this->GetVisibility())
-    {
-    return 0;
-    }
-
-  vtkSmartPointer<vtkSelection> mySelection = 
-    vtkSmartPointer<vtkSelection>::New();
-  mySelection->GetProperties()->Copy(surfaceSel->GetProperties(), 0);
-
-  unsigned int numChildren = surfaceSel->GetNumberOfChildren();
-  for (unsigned int cc=0; cc < numChildren; cc++)
-    {
-    vtkSelection* child = surfaceSel->GetChild(cc);
-    vtkInformation* properties = child->GetProperties();
-    if (!properties->Has(vtkSelection::PROP_ID()))
-      {
-      continue;
-      }
-    vtkClientServerID propId;
-    propId.ID = static_cast<vtkTypeUInt32>(properties->Get(
-        vtkSelection::PROP_ID()));
-    if (propId == this->VolumeActor->GetID())
-      {
-      vtkSelection* myChild = vtkSelection::New();
-      myChild->ShallowCopy(child);
-      mySelection->AddChild(myChild);
-      myChild->Delete();
-      }
-    }
-
-  if (mySelection->GetNumberOfChildren() == 0)
-    {
-    return 0;
-    }
-
-  // Convert surface selection to volume selection.
-  vtkSmartPointer<vtkSelection> volSelection = 
-    vtkSmartPointer<vtkSelection>::New();
-  this->ConvertSurfaceSelectionToVolumeSelection(surfaceSel, volSelection);
-
-  // Create a selection source for the selection.
-  vtkSMProxy* selectionSource = 
-    vtkSMSelectionHelper::NewSelectionSourceFromSelection(
-      this->ConnectionID, volSelection);
-  
-  return selectionSource;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMUnstructuredGridVolumeRepresentationProxy::ConvertSurfaceSelectionToVolumeSelection(
-  vtkSelection* input, vtkSelection* output)
-{
-  vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelection(
-    this->ConnectionID, input, output);
 }
 
 //-----------------------------------------------------------------------------

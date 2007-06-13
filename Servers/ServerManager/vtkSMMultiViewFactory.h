@@ -54,6 +54,14 @@ public:
   // so that the operation is undo/redo able.
   void AddRenderView(vtkSMProxy*);
   void RemoveRenderView(vtkSMProxy*);
+
+  // Description:
+  // Returns the total number of views known to this factory.
+  unsigned int GetNumberOfRenderViews();
+ 
+  // Description:
+  // Returns the view at the given index.
+  vtkSMProxy* GetRenderView(unsigned int i);
 //BTX
 protected:
   vtkSMMultiViewFactory();
@@ -69,6 +77,9 @@ protected:
 private:
   vtkSMMultiViewFactory(const vtkSMMultiViewFactory&); // Not implemented
   void operator=(const vtkSMMultiViewFactory&); // Not implemented
+
+  class vtkVector;
+  vtkVector* RenderViews;
 //ETX
 };
 
