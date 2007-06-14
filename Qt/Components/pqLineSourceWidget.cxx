@@ -71,7 +71,7 @@ public:
 /////////////////////////////////////////////////////////////////////////
 // pqLineSourceWidget
 
-pqLineSourceWidget::pqLineSourceWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p) :
+pqLineSourceWidget::pqLineSourceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
   Superclass(o, pxy, p),
   Implementation(new pqImplementation())
 {

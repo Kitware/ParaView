@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pq3DWidgetFactory.h"
 #include "pqApplicationCore.h"
+#include "pqServerManagerModel.h"
 #include "pqImplicitPlaneWidget.h"
 #include "pqRenderViewModule.h"
 #include "pqPipelineSource.h"
@@ -45,19 +46,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDoubleValidator>
 
 #include <vtkCamera.h>
-#include <vtkMemberFunctionCommand.h>
-#include <vtkImplicitPlaneRepresentation.h>
-#include <vtkProcessModule.h>
-#include <vtkPVDataInformation.h>
 #include <vtkRenderer.h>
+#include <vtkMemberFunctionCommand.h>
 #include <vtkSmartPointer.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMNew3DWidgetProxy.h>
-#include <vtkSMProxyManager.h>
 #include <vtkSMProxyProperty.h>
-#include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
+#include <vtkSMRenderModuleProxy.h>
+#include <vtkPVDataInformation.h>
 
 /////////////////////////////////////////////////////////////////////////
 // pqImplicitPlaneWidget::pqImplementation
@@ -92,7 +90,7 @@ public:
 /////////////////////////////////////////////////////////////////////////
 // pqImplicitPlaneWidget
 
-pqImplicitPlaneWidget::pqImplicitPlaneWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p) :
+pqImplicitPlaneWidget::pqImplicitPlaneWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
   Superclass(o, pxy, p),
   Implementation(new pqImplementation())
 {
@@ -162,7 +160,9 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(pqProxy* o, vtkSMProxy* pxy, QWidge
     SIGNAL(editingFinished()), 
     this, SLOT(render()), Qt::QueuedConnection);
 
-  this->createWidget(o->getServer());
+  pqServerManagerModel* m =
+    pqApplicationCore::instance()->getServerManagerModel();
+  this->createWidget(m->getServerForSource(o));
 }
 
 pqImplicitPlaneWidget::~pqImplicitPlaneWidget()

@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMCompoundProxy.h"
+#include "vtkSMInputProperty.h"
 
 // Qt includes.
 #include <QtDebug>
@@ -69,6 +70,7 @@ public:
   {
   }
     
+  vtkSmartPointer<vtkSMProxy> ReferenceProxy;
   vtkSmartPointer<vtkSMNew3DWidgetProxy> WidgetProxy;
   vtkSmartPointer<vtkCommand> ControlledPropertiesObserver;
   vtkSmartPointer<vtkPVXMLElement> Hints;
@@ -84,10 +86,12 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pq3DWidget::pq3DWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* _p) :
-  pqProxyPanel(o, pxy, _p),
+pq3DWidget::pq3DWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _p) :
+  pqProxyPanel(pxy, _p),
   Internal(new pq3DWidgetInternal())
 {
+  this->Internal->ReferenceProxy = refProxy;
+
   this->Internal->ControlledPropertiesObserver.TakeReference(
     vtkMakeMemberFunctionCommand(*this, 
       &pq3DWidget::onControlledPropertyChanged));
@@ -105,7 +109,7 @@ pq3DWidget::~pq3DWidget()
 }
 
 //-----------------------------------------------------------------------------
-QList<pq3DWidget*> pq3DWidget::createWidgets(pqProxy* o, vtkSMProxy* pxy)
+QList<pq3DWidget*> pq3DWidget::createWidgets(vtkSMProxy* refProxy, vtkSMProxy* pxy)
 {
   QList<pq3DWidget*> widgets;
 
@@ -120,23 +124,23 @@ QList<pq3DWidget*> pq3DWidget::createWidgets(pqProxy* o, vtkSMProxy* pxy)
       pq3DWidget *widget = 0;
       if (widgetType == "Plane")
         {
-        widget = new pqImplicitPlaneWidget(o, pxy, 0);
+        widget = new pqImplicitPlaneWidget(refProxy, pxy, 0);
         }
       else if (widgetType == "Handle")
         {
-        widget = new pqHandleWidget(o, pxy, 0);
+        widget = new pqHandleWidget(refProxy, pxy, 0);
         }
       else if (widgetType == "PointSource")
         {
-        widget = new pqPointSourceWidget(o, pxy, 0);
+        widget = new pqPointSourceWidget(refProxy, pxy, 0);
         }
       else if (widgetType == "LineSource")
         {
-        widget = new pqLineSourceWidget(o, pxy, 0);
+        widget = new pqLineSourceWidget(refProxy, pxy, 0);
         }
       else if (widgetType == "Line")
         {
-        widget = new pqLineWidget(o, pxy, 0);
+        widget = new pqLineWidget(refProxy, pxy, 0);
         }
 
       if (widget)
@@ -241,6 +245,12 @@ vtkSMNew3DWidgetProxy* pq3DWidget::getWidgetProxy() const
 vtkSMProxy* pq3DWidget::getControlledProxy() const
 {
   return this->proxy();
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* pq3DWidget::getReferenceProxy() const
+{
+  return this->Internal->ReferenceProxy;
 }
 
 //-----------------------------------------------------------------------------
@@ -417,17 +427,17 @@ void pq3DWidget::hideWidget()
 //-----------------------------------------------------------------------------
 int pq3DWidget::getReferenceInputBounds(double bounds[6]) const
 {
-  if (!this->referenceProxy())
+  if (!this->getReferenceProxy())
     {
     return 0;
     }
   
-  pqPipelineFilter* filter = NULL;
   vtkSMSourceProxy* input = NULL;
-  filter = qobject_cast<pqPipelineFilter*>(this->referenceProxy());
-  if(filter)
+  vtkSMInputProperty* ivp = vtkSMInputProperty::SafeDownCast(
+    this->getReferenceProxy()->GetProperty("Input"));
+  if(ivp->GetNumberOfProxies())
     {
-    vtkSMProxy* pxy = filter->getInput(0)->getProxy();
+    vtkSMProxy* pxy = ivp->GetProxy(0);
     input = vtkSMSourceProxy::SafeDownCast(pxy);
     vtkSMCompoundProxy* cp;
     cp = vtkSMCompoundProxy::SafeDownCast(pxy);

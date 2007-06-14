@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsExport.h"
 class QWidget;
+class QGridLayout;
 class pqPropertyManager;
 
 /** Links Qt widgets with server manager properties by name.
@@ -72,6 +73,9 @@ minimums/maximums will automatically updated.
 class PQCOMPONENTS_EXPORT pqNamedWidgets
 {
 public:
+  /// populate a grid layout with widgets to represent the properties
+  static void createWidgets(QGridLayout* l, vtkSMProxy* pxy);
+
   /// Link a collection of Qt child widgets with server manager properties by name
   static void link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager);
   /// Remove links between Qt widgets and server manager properties

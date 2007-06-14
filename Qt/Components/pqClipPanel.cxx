@@ -93,7 +93,7 @@ pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
     }
   
   this->Implementation->ImplicitPlaneWidget =
-    new pqImplicitPlaneWidget(this->referenceProxy(), controlled_proxy, NULL);
+    new pqImplicitPlaneWidget(this->proxy(), controlled_proxy, NULL);
 
   pqCollapsedGroup* const group1 = new pqCollapsedGroup(this);
   group1->setTitle(tr("Clip"));

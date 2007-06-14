@@ -32,11 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pq3DWidgetFactory.h"
 #include "pqApplicationCore.h"
+#include "pqServerManagerModel.h"
 #include "pqHandleWidget.h"
 #include "pqRenderViewModule.h"
-#include "pqPipelineDisplay.h"
-#include "pqPipelineSource.h"
-#include "pqPipelineFilter.h"
 #include "pqPropertyLinks.h"
 #include "pqSMSignalAdaptors.h"
 
@@ -44,19 +42,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDoubleValidator>
 
-#include <vtkCamera.h>
 #include <vtkMemberFunctionCommand.h>
-#include <vtkHandleRepresentation.h>
-#include <vtkProcessModule.h>
-#include <vtkPVDataInformation.h>
-#include <vtkRenderer.h>
 #include <vtkSMDoubleVectorProperty.h>
-#include <vtkSMIntVectorProperty.h>
 #include <vtkSMNew3DWidgetProxy.h>
-#include <vtkSMProxyManager.h>
-#include <vtkSMProxyProperty.h>
-#include <vtkSMRenderModuleProxy.h>
-#include <vtkSMSourceProxy.h>
 #include <vtkSmartPointer.h>
 
 /////////////////////////////////////////////////////////////////////////
@@ -88,7 +76,7 @@ public:
 /////////////////////////////////////////////////////////////////////////
 // pqHandleWidget
 
-pqHandleWidget::pqHandleWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p) :
+pqHandleWidget::pqHandleWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
   Superclass(o, pxy, p),
   Implementation(new pqImplementation())
 {
@@ -128,7 +116,10 @@ pqHandleWidget::pqHandleWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p) :
   QObject::connect(this->Implementation->UI->worldPositionZ,
     SIGNAL(editingFinished()), 
     this, SLOT(render()), Qt::QueuedConnection);
-  this->createWidget(o->getServer());
+  
+  pqServerManagerModel* m =
+    pqApplicationCore::instance()->getServerManagerModel();
+  this->createWidget(m->getServerForSource(o));
 }
 
 //-----------------------------------------------------------------------------

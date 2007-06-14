@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pq3DWidgetFactory.h"
 #include "pqApplicationCore.h"
+#include "pqServerManagerModel.h"
 #include "pqLineWidget.h"
 #include "pqPropertyLinks.h"
 #include "pqRenderViewModule.h"
@@ -81,7 +82,7 @@ public:
 /////////////////////////////////////////////////////////////////////////
 // pqLineWidget
 
-pqLineWidget::pqLineWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p) :
+pqLineWidget::pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
   Superclass(o, pxy, p),
   Implementation(new pqImplementation())
 {
@@ -136,7 +137,9 @@ pqLineWidget::pqLineWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p) :
     SIGNAL(editingFinished()), 
     this, SLOT(render()), Qt::QueuedConnection);
   
-  this->createWidget(o->getServer());
+  pqServerManagerModel* m =
+    pqApplicationCore::instance()->getServerManagerModel();
+  this->createWidget(m->getServerForSource(o));
 }
 
 //-----------------------------------------------------------------------------

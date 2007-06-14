@@ -50,7 +50,7 @@ class PQCOMPONENTS_EXPORT pqImplicitPlaneWidget : public pq3DWidget
   Q_OBJECT
   
 public:
-  pqImplicitPlaneWidget(pqProxy* o, vtkSMProxy* proxy, QWidget* p = 0);
+  pqImplicitPlaneWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* p = 0);
   ~pqImplicitPlaneWidget();
 
   /// A implicit plane widget can optionally have  a ScaleFactor/ScaleOrigin

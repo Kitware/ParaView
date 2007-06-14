@@ -50,15 +50,11 @@ class PQCOMPONENTS_EXPORT pqProxyPanel : public QWidget
   Q_OBJECT
 public:
   /// constructor
-  pqProxyPanel(pqProxy* referenceProxy, vtkSMProxy* proxy, QWidget* p);
+  pqProxyPanel(vtkSMProxy* proxy, QWidget* p);
   /// destructor
   ~pqProxyPanel();
 
   /// get the proxy for which properties are displayed
-  pqProxy* referenceProxy() const;
-  
-  /// get the proxy for which properties are displayed
-  /// this could be the same as referenceProxy, or it could be a sub proxy
   vtkSMProxy* proxy() const;
   
   /// get the render module that this object panel works with
@@ -93,8 +89,8 @@ public slots:
   virtual void setRenderModule(pqRenderViewModule*);
   
   /// Fires modified
-  void setModified();
-
+  virtual void setModified();
+  
 private slots:
   /// Called when the vtkSMProxy fires ModifiedEvent.
   /// It implies that the proxy information properties (and domains

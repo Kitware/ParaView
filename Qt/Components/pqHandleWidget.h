@@ -45,7 +45,7 @@ class PQCOMPONENTS_EXPORT pqHandleWidget : public pq3DWidget
 public:
   typedef pq3DWidget Superclass;
 
-  pqHandleWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p);
+  pqHandleWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* p);
   ~pqHandleWidget();
 
 

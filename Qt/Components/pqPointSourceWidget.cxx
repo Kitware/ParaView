@@ -69,7 +69,7 @@ public:
 /////////////////////////////////////////////////////////////////////////
 // pqPointSourceWidget
 
-pqPointSourceWidget::pqPointSourceWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p) :
+pqPointSourceWidget::pqPointSourceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
   Superclass(o, pxy, p),
   Implementation(new pqImplementation())
 {

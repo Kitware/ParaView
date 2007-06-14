@@ -146,7 +146,7 @@ pqParticleTracerPanel::pqParticleTracerPanel(pqProxy* object_proxy, QWidget* p) 
       source->UpdateVTKObjects();
 
       this->Implementation->PointSourceWidget = 
-        new pqPointSourceWidget(this->referenceProxy(), source, NULL);
+        new pqPointSourceWidget(this->proxy(), source, NULL);
 
       if(vtkPVXMLElement* const hints = source->GetHints())
         {
@@ -196,7 +196,7 @@ pqParticleTracerPanel::pqParticleTracerPanel(pqProxy* object_proxy, QWidget* p) 
       source->UpdateVTKObjects();
 
       this->Implementation->LineSourceWidget = 
-        new pqLineSourceWidget(this->referenceProxy(), source, NULL);
+        new pqLineSourceWidget(this->proxy(), source, NULL);
       
       vtkSMProperty* const point1 = source->GetProperty("Point1");
       vtkSMProperty* const point2 = source->GetProperty("Point2");

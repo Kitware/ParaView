@@ -50,12 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 
 // ParaView includes
-#include "pqServerManagerObserver.h"
-#include "pqPipelineDisplay.h"
-#include "pqPipelineModel.h"
-#include "pqPipelineSource.h"
 #include "pqPropertyManager.h"
-#include "pqServerManagerModel.h"
 #include "pqRenderViewModule.h"
 
 //-----------------------------------------------------------------------------
@@ -63,8 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqProxyPanel::pqImplementation
 {
 public:
-  pqImplementation(pqProxy* refProxy, vtkSMProxy* pxy) :
-    ReferenceProxy(refProxy), Proxy(pxy)
+  pqImplementation(vtkSMProxy* pxy) : Proxy(pxy)
   {
   this->RenderModule = NULL;
   this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
@@ -77,7 +71,6 @@ public:
     delete this->PropertyManager;
   }
   
-  pqProxy* ReferenceProxy;
   vtkSmartPointer<vtkSMProxy> Proxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   pqPropertyManager* PropertyManager;
@@ -94,9 +87,9 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqProxyPanel::pqProxyPanel(pqProxy* refProxy, vtkSMProxy* pxy, QWidget* p) :
+pqProxyPanel::pqProxyPanel(vtkSMProxy* pxy, QWidget* p) :
   QWidget(p),
-  Implementation(new pqImplementation(refProxy, pxy))
+  Implementation(new pqImplementation(pxy))
 {
   // Just make sure that the proxy is setup properly.
   this->Implementation->Proxy->UpdateVTKObjects();
@@ -123,12 +116,6 @@ pqProxyPanel::~pqProxyPanel()
 vtkSMProxy* pqProxyPanel::proxy() const
 {
   return this->Implementation->Proxy;
-}
-
-//-----------------------------------------------------------------------------
-pqProxy* pqProxyPanel::referenceProxy() const
-{
-  return this->Implementation->ReferenceProxy;
 }
 
 //-----------------------------------------------------------------------------
@@ -166,7 +153,6 @@ QSize pqProxyPanel::sizeHint() const
 void pqProxyPanel::accept()
 {
   this->Implementation->PropertyManager->accept();
-  this->Implementation->ReferenceProxy->setModifiedState(pqProxy::UNMODIFIED);
 
   if (this->Implementation->Selected)
     {
@@ -183,7 +169,6 @@ void pqProxyPanel::reset()
 {
   this->Implementation->Proxy->UpdatePropertyInformation();
   this->Implementation->PropertyManager->reject();
-  this->Implementation->ReferenceProxy->setModifiedState(pqProxy::UNMODIFIED);
   emit this->onreset();
 }
 
@@ -213,18 +198,6 @@ void pqProxyPanel::setRenderModule(pqRenderViewModule* rm)
 
   this->Implementation->RenderModule = rm;
   emit this->renderModuleChanged(this->Implementation->RenderModule);
-}
-
-//-----------------------------------------------------------------------------
-void pqProxyPanel::setModified()
-{
-  // don't change from UNINITIALIZED to MODIFIED
-  pqProxy* refProxy = this->referenceProxy();
-  if(refProxy->modifiedState() != pqProxy::UNINITIALIZED)
-    {
-    this->Implementation->ReferenceProxy->setModifiedState(pqProxy::MODIFIED);
-    emit this->modified();
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -285,3 +258,10 @@ void pqProxyPanel::updateInformationAndDomains()
     this->Implementation->InformationObsolete = false;
     }
 }
+
+//-----------------------------------------------------------------------------
+void pqProxyPanel::setModified()
+{
+  emit this->modified();
+}
+

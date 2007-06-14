@@ -150,7 +150,7 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
       source->UpdateVTKObjects();
 
       this->Implementation->PointSourceWidget = 
-        new pqPointSourceWidget(this->referenceProxy(), source, NULL);
+        new pqPointSourceWidget(this->proxy(), source, NULL);
       this->Implementation->PointSourceWidget->hideWidget();
 
       if(vtkPVXMLElement* const hints = source->GetHints())
@@ -182,7 +182,7 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
       source->UpdateVTKObjects();
 
       this->Implementation->LineSourceWidget =
-        new pqLineSourceWidget(this->referenceProxy(), source, NULL);
+        new pqLineSourceWidget(this->proxy(), source, NULL);
       this->Implementation->LineSourceWidget->hideWidget();
 
       if(vtkPVXMLElement* const hints = source->GetHints())

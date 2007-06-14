@@ -38,12 +38,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqObjectPanel::pqObjectPanel(pqProxy* object_proxy, QWidget* p) :
-  pqProxyPanel(object_proxy, object_proxy->getProxy(), p)
+  pqProxyPanel(object_proxy->getProxy(), p), ReferenceProxy(object_proxy)
 {
 }
 
 //-----------------------------------------------------------------------------
 pqObjectPanel::~pqObjectPanel()
 {
+}
+
+//-----------------------------------------------------------------------------
+pqProxy* pqObjectPanel::referenceProxy() const
+{
+  return this->ReferenceProxy;
+}
+
+void pqObjectPanel::accept()
+{
+  pqProxyPanel::accept();
+  this->ReferenceProxy->setModifiedState(pqProxy::UNMODIFIED);
+}
+
+void pqObjectPanel::reset()
+{
+  pqProxyPanel::reset();
+  this->ReferenceProxy->setModifiedState(pqProxy::UNMODIFIED);
+}
+
+//-----------------------------------------------------------------------------
+void pqObjectPanel::setModified()
+{
+  // don't change from UNINITIALIZED to MODIFIED
+  pqProxy* refProxy = this->referenceProxy();
+  if(refProxy->modifiedState() != pqProxy::UNINITIALIZED)
+    {
+    refProxy->setModifiedState(pqProxy::MODIFIED);
+    pqProxyPanel::setModified();
+    }
 }
 

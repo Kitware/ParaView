@@ -46,7 +46,7 @@ class PQCOMPONENTS_EXPORT pqLineWidget : public pq3DWidget
   Q_OBJECT
   
 public:
-  pqLineWidget(pqProxy* o, vtkSMProxy* pxy, QWidget* p = 0);
+  pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p = 0);
   ~pqLineWidget();
 
   /// Resets the bounds of the 3D widget to the reference proxy bounds.

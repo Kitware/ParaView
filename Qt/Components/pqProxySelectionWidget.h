@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include "pqSMProxy.h"
 
-class pqProxy;
+class vtkSMProxy;
 class vtkSMProperty;
 class pqRenderViewModule;
 
@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pqProxySelectionWidget : public QWidget
   Q_PROPERTY(pqSMProxy proxy READ proxy WRITE setProxy)
 public:
   /// constructor requires the proxy, property
-  pqProxySelectionWidget(pqProxy* proxy, const QString& property,
+  pqProxySelectionWidget(vtkSMProxy* proxy, const QString& property,
                     const QString& label = QString(), 
                     QWidget* parent = NULL);
   ~pqProxySelectionWidget();

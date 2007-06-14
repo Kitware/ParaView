@@ -49,6 +49,27 @@ public:
   /// destructor
   ~pqObjectPanel();
 
+  pqProxy* referenceProxy() const;
+  
+public slots:
+  /// Fires modified
+  virtual void setModified();
+  
+  /// accept the changes made to the properties
+  /// changes will be propogated down to the server manager
+  /// subclasses should only change properties when accept is called to work
+  /// properly with undo/redo
+  virtual void accept();
+  
+  /// reset the changes made
+  /// editor will query properties from the server manager
+  virtual void reset();
+
+protected:
+
+  pqProxy* ReferenceProxy;
+
 };
 
 #endif
+
