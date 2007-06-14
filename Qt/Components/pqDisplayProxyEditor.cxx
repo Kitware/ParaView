@@ -168,7 +168,6 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     "color", SIGNAL(colorChanged(const QVariant&)),
     reprProxy, reprProxy->GetProperty("DiffuseColor"));
 
-#if 0
   // setup for specular lighting
   QObject::connect(this->Internal->SpecularWhite, SIGNAL(toggled(bool)),
                    this, SIGNAL(specularColorChanged()));
@@ -193,7 +192,6 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
   QObject::connect(this->Internal->SpecularPower, SIGNAL(valueChanged(int)),
                    this, SLOT(updateAllViews()),
                    Qt::QueuedConnection);
-#endif
   
   // setup for interpolation
   this->Internal->StyleInterpolation->clear();
@@ -601,7 +599,7 @@ void pqDisplayProxyEditor::setSpecularColor(QVariant specColor)
     }
 }
 
-void pqDisplayProxyEditor::updateMaterial(int idx)
+void pqDisplayProxyEditor::updateMaterial(int vtkNotUsed(idx))
 {
   // FIXME: when we enable materials.
 #if 0   

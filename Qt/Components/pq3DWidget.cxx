@@ -37,10 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMNew3DWidgetProxy.h"
+#include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMCompoundProxy.h"
 
@@ -69,7 +69,7 @@ public:
   {
   }
     
-  vtkSmartPointer<vtkSMNew3DWidgetProxy> WidgetProxy;
+  vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> WidgetProxy;
   vtkSmartPointer<vtkCommand> ControlledPropertiesObserver;
   vtkSmartPointer<vtkPVXMLElement> Hints;
 
@@ -167,28 +167,24 @@ void pq3DWidget::setView(pqView* view)
   bool cur_visbility = this->widgetVisible();
   this->hideWidget();
 
-  /* FIXME: UDA
-  vtkSMDisplayProxy* widget = this->getWidgetProxy();
+  vtkSMRepresentationProxy* widget = this->getWidgetProxy();
   if (this->renderView() && widget)
     {
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    this->renderView()->getRenderViewProxy()->RemoveDisplay(widget);
+    this->renderView()->getRenderViewProxy()->RemoveRepresentation(widget);
     }
-    */
 
   this->Superclass::setView(view);
 
-  /* FIXME: UDA
   if (this->renderView() && widget)
     {
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    this->renderView()->getRenderModuleProxy()->AddDisplay(widget);
+    this->renderView()->getRenderViewProxy()->AddRepresentation(widget);
     }
-    */
 
   if (cur_visbility)
     {
@@ -218,36 +214,32 @@ void pq3DWidget::onControlledPropertyChanged()
 }
 
 //-----------------------------------------------------------------------------
-void pq3DWidget::setWidgetProxy(vtkSMNew3DWidgetProxy* pxy)
+void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
 {
- vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
+ vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
 
  if (this->renderView() && widget)
     {
-    /* FIXME:UDA
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    this->renderView()->getRenderModuleProxy()->RemoveDisplay(widget);
-    */
+    this->renderView()->getRenderViewProxy()->RemoveRepresentation(widget);
     this->renderView()->render();
     }
   this->Internal->WidgetProxy = pxy;
 
   if (this->renderView() && pxy)
     {
-    /* FIXME: UDA
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    this->renderView()->getRenderModuleProxy()->AddDisplay(widget);
-    */
+    this->renderView()->getRenderViewProxy()->AddRepresentation(widget);
     this->renderView()->render();
     }
 }
 
 //-----------------------------------------------------------------------------
-vtkSMNew3DWidgetProxy* pq3DWidget::getWidgetProxy() const
+vtkSMNewWidgetRepresentationProxy* pq3DWidget::getWidgetProxy() const
 {
   return this->Internal->WidgetProxy;
 }

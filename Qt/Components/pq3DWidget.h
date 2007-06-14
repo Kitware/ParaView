@@ -39,7 +39,7 @@ class pq3DWidgetInternal;
 class pqProxy;
 class pqRenderView;
 class vtkPVXMLElement;
-class vtkSMNew3DWidgetProxy;
+class vtkSMNewWidgetRepresentationProxy;
 class vtkSMProperty;
 
 /// pq3DWidget is the abstract superclass for all 3D widgets.
@@ -75,7 +75,7 @@ public:
   vtkPVXMLElement* getHints() const;
 
   /// Return the 3D Widget proxy.
-  vtkSMNew3DWidgetProxy* getWidgetProxy() const;
+  vtkSMNewWidgetRepresentationProxy* getWidgetProxy() const;
 
   /// Returns true if 3D widget visibility is enabled.
   /// Note: this *does not* indicate that the 3D widget is currently visible
@@ -148,7 +148,7 @@ protected:
   void setControlledProperty(vtkSMProperty* widget_property, vtkSMProperty* controlled_property);
 
   // Subclasses must set the widget proxy.
-  void setWidgetProxy(vtkSMNew3DWidgetProxy*);
+  void setWidgetProxy(vtkSMNewWidgetRepresentationProxy*);
 
   /// Called when one of the controlled properties change (e.g: by undo/redo)
   virtual void onControlledPropertyChanged();

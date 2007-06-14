@@ -51,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkRenderer.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMIntVectorProperty.h>
-#include <vtkSMNew3DWidgetProxy.h>
+#include <vtkSMNewWidgetRepresentationProxy.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMProxyProperty.h>
 #include <vtkSMRenderModuleProxy.h>
@@ -140,9 +140,9 @@ pqHandleWidget::~pqHandleWidget()
 //-----------------------------------------------------------------------------
 void pqHandleWidget::createWidget(pqServer* server)
 {
-  vtkSMNew3DWidgetProxy* widget =
+  vtkSMNewWidgetRepresentationProxy* widget =
     pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("PointSourceWidgetDisplay", server);
+    get3DWidget("PointSourceWidgetRepresentation", server);
   this->setWidgetProxy(widget);
   
   widget->UpdateVTKObjects();
@@ -179,7 +179,7 @@ void pqHandleWidget::createWidget(pqServer* server)
 void pqHandleWidget::cleanupWidget()
 {
   this->Implementation->Links.removeAllPropertyLinks();
-  vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
+  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   if(widget)
     {
     widget->RemoveObserver(
@@ -203,7 +203,7 @@ void pqHandleWidget::onWidgetVisibilityChanged(bool visible)
 //-----------------------------------------------------------------------------
 void pqHandleWidget::resetBounds()
 {
-  vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
+  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   double input_bounds[6];
   if(widget && this->getReferenceInputBounds(input_bounds))
     {

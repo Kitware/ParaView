@@ -133,6 +133,7 @@ vtkSMProxy* pqDisplayPolicy::newDisplayProxy(
     {
     p->SetConnectionID(view->getServer()->GetConnectionID());
     }
+
   return p; 
 }
 

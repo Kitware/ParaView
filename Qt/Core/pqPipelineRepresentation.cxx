@@ -249,7 +249,7 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
        dataSetType == VTK_GENERIC_DATA_SET)
       {
       pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
-        "SURFACE");
+        "Surface");
       }
     else if(dataSetType == VTK_RECTILINEAR_GRID ||
        dataSetType == VTK_STRUCTURED_GRID ||
@@ -259,18 +259,18 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
       if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
         {
         pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
-          "SURFACE");
+          "Surface");
         }
       else
         {
         pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
-          "OUTLINE");
+          "Outline");
         }
       }
     else
       {
       pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
-        "OUTLINE");
+        "Outline");
       }
     }
   

@@ -35,11 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModuleGUIHelper.h"
 #include "pqCoreExport.h" // needed for PQCORE_EXPORT macro.
 
-class QWidget;
-class vtkSMApplication;
+class pqApplicationCore;
+class pqTestUtility;
 class QApplication;
 class QString;
-class pqTestUtility;
+class QWidget;
+class vtkSMApplication;
 
 /*! \brief This is the GUI helper for ParaView.
  * This class provides GUI elements to the process module without forcing
@@ -107,6 +108,10 @@ private:
   /// subclasses can override this method to create their own
   /// subclass of pqMainWindow as the Main Window.
   virtual QWidget* CreateMainWindow() = 0;
+
+  /// Subclasses can override this to create a different subclass of
+  /// pqApplicationCore.
+  virtual pqApplicationCore* CreateApplicationCore();
   
   class pqImplementation;
   pqImplementation* const Implementation;

@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkSMProxyProperty.h>
 #include <vtkSMSourceProxy.h>
-#include <vtkSMNew3DWidgetProxy.h>
+#include <vtkSMNewWidgetRepresentationProxy.h>
 
 /////////////////////////////////////////////////////////////////////////
 // pqLineSourceWidget::pqImplementation
