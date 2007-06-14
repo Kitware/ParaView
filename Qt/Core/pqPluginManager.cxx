@@ -155,7 +155,6 @@ static QStringList getLibraries(const QString& path, pqServer* server)
 {
   QStringList libs;
   pqFileDialogModel model(server);
-  QString oldPath = model.getStartPath();
   model.setCurrentPath(path);
   int numfiles = model.rowCount(QModelIndex());
   for(int i=0; i<numfiles; i++)
@@ -169,8 +168,6 @@ static QStringList getLibraries(const QString& path, pqServer* server)
       libs.append(file);
       }
     }
-  // put path back  (TODO Fix pqFileDialogModel so it doesn't remember)
-  model.setCurrentPath(oldPath);
   return libs;
 }
 

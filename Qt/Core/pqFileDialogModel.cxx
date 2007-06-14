@@ -243,6 +243,10 @@ public:
       }
 
     this->FileInformation.TakeReference(vtkPVFileInformation::New());
+
+    // current path
+    vtkPVFileInformation* info = this->GetData(false, ".", false);
+    this->CurrentPath = info->GetFullPath();
   }
   
   ~pqImplementation()
@@ -410,12 +414,6 @@ public:
   /// Caches information about the set of files within the current path.
   QVector<pqFileDialogModelFileInfo> FileList;  // adjacent memory occupation for QModelIndex
 
-  /// The last path accessed by this file dialog model
-  /// used to remember paths across the session
-  /// TODO:  this will not work if going between multiple servers
-  static QString gLastLocalPath;
-  static QString gLastServerPath;
-
 private:   
   // server vs. local implementation private
   pqServer* Server;
@@ -425,14 +423,11 @@ private:
   vtkSmartPointer<vtkPVFileInformation> FileInformation;
 };
   
-QString pqFileDialogModel::pqImplementation::gLastLocalPath;
-QString pqFileDialogModel::pqImplementation::gLastServerPath;
-
 //////////////////////////////////////////////////////////////////////////
 // pqFileDialogModel
-pqFileDialogModel::pqFileDialogModel(pqServer* server, QObject* Parent) :
+pqFileDialogModel::pqFileDialogModel(pqServer* _server, QObject* Parent) :
   base(Parent),
-  Implementation(new pqImplementation(server))
+  Implementation(new pqImplementation(_server))
 {
 }
 
@@ -441,25 +436,9 @@ pqFileDialogModel::~pqFileDialogModel()
   delete this->Implementation;
 }
 
-QString pqFileDialogModel::getStartPath()
+pqServer* pqFileDialogModel::server() const
 {
-  QString* path = NULL;
-  if(this->Implementation->isRemote())
-    {
-    path = &this->Implementation->gLastServerPath;
-    }
-  else
-    {
-    path = &this->Implementation->gLastLocalPath;
-    }
-
-  if (path->isEmpty())
-    {
-    vtkPVFileInformation* info =
-      this->Implementation->GetData(false, ".", false);
-    *path = info->GetFullPath();
-    }
-  return *path;
+  return this->Implementation->getServer();
 }
 
 void pqFileDialogModel::setCurrentPath(const QString& Path)
@@ -468,21 +447,7 @@ void pqFileDialogModel::setCurrentPath(const QString& Path)
   vtkPVFileInformation* info;
   info = this->Implementation->GetData(true, cPath, false);
   this->Implementation->Update(cPath, info);
-  if(this->Implementation->isRemote())
-    {
-    this->Implementation->gLastServerPath = cPath;
-    }
-  else
-    {
-    this->Implementation->gLastLocalPath = cPath;
-    }
   this->reset();
-}
-
-void pqFileDialogModel::setParentPath()
-{
-  QFileInfo info(this->Implementation->CurrentPath);
-  this->setCurrentPath(info.path());
 }
 
 QString pqFileDialogModel::getCurrentPath()

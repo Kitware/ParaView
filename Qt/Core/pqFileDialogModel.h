@@ -61,19 +61,12 @@ public:
   pqFileDialogModel(pqServer* server, QObject* Parent = NULL);
   ~pqFileDialogModel();
 
-  /// Returns the path that will be automatically displayed when the file dialog is opened
-  QString getStartPath();
-  
   /// Sets the path that the file dialog will display
   void setCurrentPath(const QString&);
   
   /// Returns the path the the file dialog will display
   QString getCurrentPath();
   
-  /// Changes the current path to its immediate parent path (this is a no-op if
-  /// the current path is already at the root of the filesystem)
-  void setParentPath();
-
   /// Return true iff the given row is a directory
   bool isDir(const QModelIndex&);
 
@@ -105,6 +98,9 @@ public:
   /// (a row may represent one-to-many paths if grouping is implemented)
   /// this also resolved symlinks if necessary
   QStringList getFilePaths(const QModelIndex&);
+
+  /// Returns the server that this model is browsing
+  pqServer* server() const;
   
   // overloads for QAbstractItemModel
 

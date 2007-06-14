@@ -104,7 +104,7 @@ namespace {
 /////////////////////////////////////////////////////////////////////////////
 // pqFileDialog::pqImplementation
 
-class pqFileDialog::pqImplementation
+class pqFileDialog::pqImplementation : public QObject
 {
 public:
   pqFileDialogModel* const Model;
@@ -115,8 +115,13 @@ public:
   Ui::pqFileDialog Ui;
   QStringList SelectedFiles;
   QString TempFolderName;
+  
+  // remember the last locations we browsed
+  static QMap<QPointer<pqServer>, QString> ServerFilePaths;
+  static QString LocalFilePath;
 
-  pqImplementation(pqServer* server) :
+  pqImplementation(pqFileDialog* p, pqServer* server) : 
+    QObject(p),
     Model(new pqFileDialogModel(server, NULL)),
     FavoriteModel(new pqFileDialogFavoriteModel(server, NULL)),
     FileFilter(this->Model),
@@ -130,7 +135,40 @@ public:
     delete this->Model;
     delete this->FavoriteModel;
   }
+  
+  QString getStartPath()
+    {
+    pqServer* s = this->Model->server();
+    if(s)
+      {
+      QMap<QPointer<pqServer>,QString>::iterator iter;
+      iter = this->ServerFilePaths.find(this->Model->server());
+      if(iter != this->ServerFilePaths.end())
+        {
+        return *iter;
+        }
+      }
+    else if(!this->LocalFilePath.isEmpty())
+      {
+      return this->LocalFilePath;
+      }
+    return this->Model->getCurrentPath();
+    }
 
+  void setCurrentPath(const QString& p)
+    {
+    this->Model->setCurrentPath(p);
+    pqServer* s = this->Model->server();
+    if(s)
+      {
+      this->ServerFilePaths[s] = p;
+      }
+    else
+      {
+      this->LocalFilePath = p;
+      }
+    }
+  
   void addHistory(const QString& p)
     {
     this->BackHistory.append(p);
@@ -173,6 +211,9 @@ protected:
   QStringList ForwardHistory;
 
 };
+  
+QMap<QPointer<pqServer>, QString> pqFileDialog::pqImplementation::ServerFilePaths;
+QString pqFileDialog::pqImplementation::LocalFilePath;
 
 /////////////////////////////////////////////////////////////////////////////
 // pqFileDialog
@@ -184,7 +225,7 @@ pqFileDialog::pqFileDialog(
     const QString& startDirectory, 
     const QString& nameFilter) :
   Superclass(p),
-  Implementation(new pqImplementation(server))
+  Implementation(new pqImplementation(this, server))
 {
   this->Implementation->Ui.setupUi(this);
 
@@ -296,16 +337,15 @@ pqFileDialog::pqFileDialog(
   QString startPath = startDirectory;
   if(startPath.isEmpty())
     {
-    startPath = this->Implementation->Model->getStartPath();
+    startPath = this->Implementation->getStartPath();
     }
   this->Implementation->addHistory(startPath);
-  this->Implementation->Model->setCurrentPath(startPath);
+  this->Implementation->setCurrentPath(startPath);
 }
 
 //-----------------------------------------------------------------------------
 pqFileDialog::~pqFileDialog()
 {
-  delete this->Implementation;
 }
 
 
@@ -569,14 +609,15 @@ void pqFileDialog::onModelReset()
 void pqFileDialog::onNavigate(const QString& Path)
 {
   this->Implementation->addHistory(this->Implementation->Model->getCurrentPath());
-  this->Implementation->Model->setCurrentPath(Path);
+  this->Implementation->setCurrentPath(Path);
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onNavigateUp()
 {
   this->Implementation->addHistory(this->Implementation->Model->getCurrentPath());
-  this->Implementation->Model->setParentPath();
+  QFileInfo info(this->Implementation->Model->getCurrentPath());
+  this->Implementation->setCurrentPath(info.path());
 }
 
 //-----------------------------------------------------------------------------
@@ -591,21 +632,21 @@ void pqFileDialog::onNavigateDown(const QModelIndex& idx)
     return;
     
   this->Implementation->addHistory(this->Implementation->Model->getCurrentPath());
-  this->Implementation->Model->setCurrentPath(paths[0]);
+  this->Implementation->setCurrentPath(paths[0]);
 }
   
 //-----------------------------------------------------------------------------
 void pqFileDialog::onNavigateBack()
 {
   QString path = this->Implementation->backHistory();
-  this->Implementation->Model->setCurrentPath(path);
+  this->Implementation->setCurrentPath(path);
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onNavigateForward()
 {
   QString path = this->Implementation->forwardHistory();
-  this->Implementation->Model->setCurrentPath(path);
+  this->Implementation->setCurrentPath(path);
 }
 
 //-----------------------------------------------------------------------------
