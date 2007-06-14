@@ -197,7 +197,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.800.2.4");
+vtkCxxRevisionMacro(vtkPVWindow, "1.800.2.5");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -2901,13 +2901,15 @@ void vtkPVWindow::WriteData()
 
   vtkKWLoadSaveDialog* saveDialog = this->GetPVApplication()->NewLoadSaveDialog();
   
-  saveDialog->RetrieveLastPathFromRegistry("SaveDataFile");
   saveDialog->SaveDialogOn();
   saveDialog->SetParent(this);
   saveDialog->SetTitle(VTK_PV_SAVE_DATA_MENU_LABEL);
   saveDialog->SetFileTypes(types);
   delete [] types;
   saveDialog->Create();
+  // The "SaveDataPath" can only be retrieved after the dialog has been
+  // created.
+  saveDialog->RetrieveLastPathFromRegistry("SaveDataFile");
   // Ask the user for the filename.
 
   int enabled = this->GetEnabled();
