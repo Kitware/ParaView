@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
-vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.10");
+vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVDataSetAttributesInformation::vtkPVDataSetAttributesInformation()
@@ -112,11 +112,31 @@ vtkPVDataSetAttributesInformation
 //----------------------------------------------------------------------------
 void
 vtkPVDataSetAttributesInformation
+::CopyFromFieldData(vtkFieldData *da)
+{
+  // Copy Point Data
+  int num = da->GetNumberOfArrays();
+  for (int idx = 0; idx < num; ++idx)
+    {
+    vtkAbstractArray* const array = da->GetAbstractArray(idx);
+    if (array->GetName())
+      {
+      vtkPVArrayInformation *info = vtkPVArrayInformation::New();
+      info->CopyFromObject(array);
+      this->ArrayInformation->AddItem(info);
+      info->Delete();
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void
+vtkPVDataSetAttributesInformation
 ::CopyFromDataSetAttributes(vtkDataSetAttributes *da)
 {
   int idx;
   int num;
-  short infoArrayIndex;
+  int infoArrayIndex;
   int attribute;
 
   // Clear array information.

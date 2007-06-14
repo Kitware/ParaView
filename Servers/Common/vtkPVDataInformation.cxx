@@ -43,7 +43,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.27");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.28");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -394,13 +394,16 @@ void vtkPVDataInformation::CopyFromTable(vtkTable* data)
 {
   this->SetDataClassName(data->GetClassName());
   this->DataSetType = data->GetDataObjectType();
-  this->NumberOfDataSets = 0;
+  this->NumberOfDataSets = 1;
   this->Bounds[0] = this->Bounds[1] = this->Bounds[2] 
     = this->Bounds[3] = this->Bounds[4] = this->Bounds[5] = 0;
 
   this->MemorySize = data->GetActualMemorySize();
   this->NumberOfCells = data->GetNumberOfRows() * data->GetNumberOfColumns();
   this->NumberOfPoints = 0;
+
+  // Copy Point Data information
+  this->PointDataInformation->CopyFromFieldData(data->GetFieldData());
 }
 
 //----------------------------------------------------------------------------

@@ -28,6 +28,7 @@
 
 class vtkCollection;
 class vtkDataSetAttributes;
+class vtkFieldData;
 class vtkPVArrayInformation;
 class vtkGenericAttributeCollection;
 
@@ -43,6 +44,8 @@ public:
   // this object.
   void CopyFromDataSetAttributes(vtkDataSetAttributes* data);
   void DeepCopy(vtkPVDataSetAttributesInformation* info);
+
+  void CopyFromFieldData(vtkFieldData* data);
 
   void CopyFromGenericAttributesOnPoints(vtkGenericAttributeCollection *data);
   void CopyFromGenericAttributesOnCells(vtkGenericAttributeCollection *data);
