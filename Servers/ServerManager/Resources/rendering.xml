@@ -1837,7 +1837,7 @@
         command="SetUseImmediateMode"
         number_of_elements="1"
         update_self="1"
-        default_values="0">
+        default_values="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
@@ -4121,7 +4121,7 @@
         command="SetUseImmediateMode"
         number_of_elements="1"
         update_self="1"
-        default_values="0">
+        default_values="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
