@@ -59,8 +59,7 @@ pqPluginManager::pqPluginManager(QObject* p)
   pqServerManagerModel* sm =
     pqApplicationCore::instance()->getServerManagerModel();
   QObject::connect(sm, SIGNAL(serverAdded(pqServer*)),
-                   this, SLOT(onServerConnected(pqServer*)),
-                   Qt::QueuedConnection);
+                   this, SLOT(onServerConnected(pqServer*)));
   QObject::connect(sm, SIGNAL(serverRemoved(pqServer*)),
                    this, SLOT(onServerDisconnected(pqServer*)));
 }
