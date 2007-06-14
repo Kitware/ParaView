@@ -20,7 +20,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMRepresentationStrategy.h"
@@ -49,7 +51,7 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.8.4.1");
 //----------------------------------------------------------------------------
 vtkSMViewProxy::vtkSMViewProxy()
 {
@@ -68,6 +70,8 @@ vtkSMViewProxy::vtkSMViewProxy()
   this->FullResDataSizeValid = false;
 
   this->ForceRepresentationUpdate = false;
+
+  this->DefaultRepresentationName = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -78,6 +82,8 @@ vtkSMViewProxy::~vtkSMViewProxy()
 
   this->RemoveAllRepresentations();
   this->Representations->Delete();
+
+  this->SetDefaultRepresentationName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -113,6 +119,24 @@ void vtkSMViewProxy::CreateVTKObjects()
 vtkCommand* vtkSMViewProxy::GetObserver()
 {
   return this->Observer;
+}
+
+//----------------------------------------------------------------------------
+vtkSMRepresentationProxy* vtkSMViewProxy::CreateDefaultRepresentation(vtkSMProxy*)
+{
+  if (this->DefaultRepresentationName)
+    {
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    vtkSmartPointer<vtkSMProxy> p;
+    p.TakeReference(pxm->NewProxy("representations", this->DefaultRepresentationName));
+    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(p);
+    if (repr)
+      {
+      repr->Register(this);
+      return repr;
+      }
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -420,6 +444,24 @@ void vtkSMViewProxy::InvalidateDataSizes()
   this->FullResDataSizeValid = false;
   this->DisplayedDataSizeValid = false;
 }
+
+//----------------------------------------------------------------------------
+int vtkSMViewProxy::ReadXMLAttributes(
+  vtkSMProxyManager* pm, vtkPVXMLElement* element)
+{
+  if (!this->Superclass::ReadXMLAttributes(pm, element))
+    {
+    return 0;
+    }
+
+  const char* repr_name = element->GetAttribute("representation_name");
+  if (repr_name)
+    {
+    this->SetDefaultRepresentationName(repr_name);
+    }
+  return 1;
+}
+
 
 //----------------------------------------------------------------------------
 void vtkSMViewProxy::PrintSelf(ostream& os, vtkIndent indent)

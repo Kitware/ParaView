@@ -114,7 +114,12 @@ public:
   // representations irresepective of whether low resolution (LOD) data is
   // currently shown in the view.
   unsigned long GetVisibileFullResDataSize();
-  
+ 
+  // Description:
+  // Create a default representation for the given source proxy.
+  // Returns a new proxy.
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy*);
+
 //BTX
 protected:
   vtkSMViewProxy();
@@ -223,6 +228,12 @@ protected:
     { this->ForceRepresentationUpdate = b; }
   vtkGetMacro(ForceRepresentationUpdate, bool);
 
+  // Description:
+  // Read attributes from an XML element.
+  virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+
+  vtkSetStringMacro(DefaultRepresentationName);
+  char* DefaultRepresentationName;
 private:
   vtkSMViewProxy(const vtkSMViewProxy&); // Not implemented
   void operator=(const vtkSMViewProxy&); // Not implemented

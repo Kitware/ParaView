@@ -80,7 +80,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.15.2.1");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 //-----------------------------------------------------------------------------
@@ -1476,6 +1476,51 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
   vcsProxy->Delete();
 
   return selection;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
+  vtkSMProxy* source)
+{
+  if (!source)
+    {
+    return 0;
+    }
+
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+
+  // Choose which type of representation proxy to create.
+  vtkSMProxy* prototype = pxm->GetPrototypeProxy("representations", 
+    "UnstructuredGridRepresentation");
+
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    prototype->GetProperty("Input"));
+  pp->RemoveAllUncheckedProxies();
+  pp->AddUncheckedProxy(source);
+  bool usg = pp->IsInDomains();
+  pp->RemoveAllUncheckedProxies();
+  if (usg)
+    {
+    return vtkSMRepresentationProxy::SafeDownCast(
+      pxm->NewProxy("representations", "UnstructuredGridRepresentation"));
+    }
+
+  prototype = pxm->GetPrototypeProxy("representations",
+    "UniformGridRepresentation");
+  pp = vtkSMProxyProperty::SafeDownCast(
+    prototype->GetProperty("Input"));
+  pp->RemoveAllUncheckedProxies();
+  pp->AddUncheckedProxy(source);
+  bool sg = pp->IsInDomains();
+  pp->RemoveAllUncheckedProxies();
+  if (sg)
+    {
+    return vtkSMRepresentationProxy::SafeDownCast(
+      pxm->NewProxy("representations", "UniformGridRepresentation"));
+    }
+
+  return vtkSMRepresentationProxy::SafeDownCast(
+      pxm->NewProxy("representations", "GeometryRepresentation"));
 }
 
 //-----------------------------------------------------------------------------

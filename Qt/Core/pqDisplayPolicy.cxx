@@ -38,7 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMAbstractViewModuleProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMViewProxy.h"
 
 #include <QtDebug>
 #include <QString>
@@ -47,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataRepresentation.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
-#include "pqPlotViewModule.h"
+#include "pqPlotView.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
 
@@ -69,6 +71,7 @@ vtkSMProxy* pqDisplayPolicy::newDisplayProxy(
     {
     return NULL;
     }
+
   QString srcProxyName = source->getProxy()->GetXMLName();
   if ( (srcProxyName == "TextSource" || srcProxyName == "TimeToTextConvertor"
       || srcProxyName == "TimeToTextConvertorSource") && 
@@ -80,55 +83,8 @@ vtkSMProxy* pqDisplayPolicy::newDisplayProxy(
     return p;
     }
 
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  
-
-
-
-  vtkSMProxy* p =0;
-  if (view->getProxy()->IsA("vtkSMRenderViewProxy"))
-    {
-    bool usg = false;
-    bool sg = false;
-
-    // Choose which type of representation proxy to create.
-    vtkSMProxy* prototype = pxm->GetPrototypeProxy("representations", 
-      "UnstructuredGridRepresentation");
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      prototype->GetProperty("Input"));
-    pp->RemoveAllUncheckedProxies();
-    pp->AddUncheckedProxy(source->getProxy());
-    usg = pp->IsInDomains();
-    pp->RemoveAllUncheckedProxies();
-    if (!usg)
-      {
-      prototype = pxm->GetPrototypeProxy("representations",
-        "UniformGridRepresentation");
-      pp = vtkSMProxyProperty::SafeDownCast(
-        prototype->GetProperty("Input"));
-      pp->RemoveAllUncheckedProxies();
-      pp->AddUncheckedProxy(source->getProxy());
-      sg = pp->IsInDomains();
-      pp->RemoveAllUncheckedProxies();
-      }
-
-    if (usg)
-      {
-      p = pxm->NewProxy("representations", "UnstructuredGridRepresentation");
-      }
-    else if (sg)
-      {
-      p = pxm->NewProxy("representations", "UniformGridRepresentation");
-      }
-    else
-      {
-      p = pxm->NewProxy("representations", "GeometryRepresentation");
-      }
-    }
-  else if (view->getProxy()->GetXMLName() == QString("ElementInspectorView"))
-    {
-    p = pxm->NewProxy("representations", "ElementInspectorRepresentation");
-    }
+  vtkSMProxy* p = view->getViewProxy()->CreateDefaultRepresentation(
+    source->getProxy());
   if (p)
     {
     p->SetConnectionID(view->getServer()->GetConnectionID());
@@ -172,7 +128,7 @@ pqView* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
       if (non_zero_dims == 1 && cellDataInfo->GetNumberOfArrays() > 0)
         {
         // Has cell data, mostlikely this is a histogram.
-        view_type = pqPlotViewModule::barChartType();
+        view_type = pqPlotView::barChartType();
         }
       else if (
         (source->getProxy()->GetXMLName() == QString("ProbeLine") || 
@@ -182,14 +138,13 @@ pqView* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
         datainfo->GetNumberOfPoints() > 1)
         {
         // No cell data, but some point data -- may be a XY line plot.
-        view_type = pqPlotViewModule::XYPlotType();
+        view_type = pqPlotView::XYPlotType();
         }
       }
     }
   if (!view_type.isNull())
     {
     QString proxy_name = view_type;
-    proxy_name += "ViewModule";
     if (currentView && currentView->getProxy()->GetXMLName() == proxy_name)
       {
       // nothing to do, active view is preferred view.

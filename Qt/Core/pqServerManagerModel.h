@@ -43,7 +43,7 @@ class QVTKWidget;
 class pqConsumerDisplay;
 class pqDisplay;
 class pqGenericViewModule;
-class pqPipelineDisplay;
+//class pqPipelineDisplay;
 class pqPipelineSource;
 class pqProxy;
 class pqRenderViewModule;
@@ -145,7 +145,7 @@ public:
   QList<pqPipelineSource*> getSources(pqServer* server) const;
 
   /// Returns a list of render displays on the server.
-  QList<pqPipelineDisplay*> getPipelineDisplays(pqServer* server);
+//  QList<pqPipelineDisplay*> getPipelineDisplays(pqServer* server);
 
   /// returns a list of all displays on the server. This includes
   /// render displays as well as other consumer displays such as 

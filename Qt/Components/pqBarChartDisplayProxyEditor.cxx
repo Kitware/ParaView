@@ -111,9 +111,9 @@ void pqBarChartDisplayProxyEditor::setRepresentation(pqRepresentation* repr)
     return;
     }
   vtkSMProxy* proxy = repr->getProxy();
-  if (!proxy || proxy->GetXMLName() != QString("BarChartDisplay"))
+  if (!proxy || proxy->GetXMLName() != QString("BarChartRepresentation"))
     {
-    qCritical() << "Proxy is not a BarChartDisplay proxy. Cannot "
+    qCritical() << "Proxy is not a BarChartRepresentation proxy. Cannot "
       << " edit it in pqBarChartDisplayProxyEditor.";
     return;
     }

@@ -129,14 +129,11 @@ public:
   /// explore the ServerManager with ease by separating proxies based 
   /// on their functionality/type.
 private:
-  pqServerManagerModel* getServerManagerModel();
+  pqServerManagerModel* getServerManagerModel() {return 0;}
   friend class pqConsumerDisplay;
   friend class pqGenericViewModule;
   friend class pqPipelineDisplay;
 
-
-  friend class pqElementInspectorWidget;
-  friend class pqSelectionManager;
 public:
   pqServerManagerModel2* getServerManagerModel2();
 

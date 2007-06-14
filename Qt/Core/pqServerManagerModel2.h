@@ -89,6 +89,10 @@ public:
   /// Given a server resource, locates the pqServer instance for it, if any.
   pqServer* findServer(const pqServerResource& resource) const;
 
+  /// Book end events for removing a server.
+  void beginRemoveServer(pqServer *server);
+  void endRemoveServer();
+
   /// Given a proxy, locates a pqServerManagerModelItem subclass for the given 
   /// proxy.
   template<class T>
@@ -158,6 +162,12 @@ signals:
   /// Signals emitted when a pqServer instance is being destroyed.
   void preServerRemoved(pqServer*);
   void serverRemoved(pqServer*);
+
+  /// Fired when beginRemoveServer is called.
+  void aboutToRemoveServer(pqServer* server);
+
+  /// Fired when endRemoveServer is called.
+  void finishedRemovingServer();
 
   /// Signals emitted when any pqServerManagerModelItem subclass is created.
   void preItemAdded(pqServerManagerModelItem*);

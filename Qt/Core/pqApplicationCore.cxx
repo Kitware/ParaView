@@ -270,12 +270,6 @@ pqServerManagerObserver* pqApplicationCore::getServerManagerObserver()
 }
 
 //-----------------------------------------------------------------------------
-pqServerManagerModel* pqApplicationCore::getServerManagerModel()
-{
-  return this->Internal->ServerManagerModel;
-}
-
-//-----------------------------------------------------------------------------
 pqServerManagerModel2* pqApplicationCore::getServerManagerModel2()
 {
   return this->Internal->ServerManagerModel2;
@@ -364,10 +358,10 @@ void pqApplicationCore::removeServer(pqServer* server)
     return;
     }
 
-  this->getServerManagerModel()->beginRemoveServer(server);
+  this->getServerManagerModel2()->beginRemoveServer(server);
   this->getObjectBuilder()->destroyAllProxies(server);
   pqServer::disconnect(server);
-  this->getServerManagerModel()->endRemoveServer();
+  this->getServerManagerModel2()->endRemoveServer();
 }
 
 //-----------------------------------------------------------------------------
@@ -671,7 +665,7 @@ void pqApplicationCore::quit()
   // fired until the event loop exits, which doesn't happen until animation
   // stops playing.
   QList<pqAnimationScene*> scenes = 
-    this->getServerManagerModel()->findChildren<pqAnimationScene*>();
+    this->getServerManagerModel2()->findItems<pqAnimationScene*>();
   foreach (pqAnimationScene* scene, scenes)
     {
     scene->pause();

@@ -72,8 +72,8 @@ public:
 
     QString type = proxy->getProxy()->GetXMLName();
 
-    if(type == "BarChartDisplay" ||
-       type == "XYPlotDisplay2" ||
+    if(type == "BarChartRepresentation" ||
+       type == "XYPlotRepresentation" ||
        qobject_cast<pqTextRepresentation*>(proxy))
       {
       return true;
@@ -90,12 +90,12 @@ public:
       }
 
     QString type = proxy->getProxy()->GetXMLName();
-    if(type == QString("XYPlotDisplay2"))
+    if(type == QString("XYPlotRepresentation"))
       {
       return new pqXYPlotDisplayProxyEditor(proxy, p);
       }
     
-    if(type == QString("BarChartDisplay"))
+    if(type == QString("BarChartRepresentation"))
       {
       return new pqBarChartDisplayProxyEditor(proxy, p);
       }

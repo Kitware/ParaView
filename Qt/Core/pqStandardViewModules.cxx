@@ -34,10 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMProxyManager.h"
 
-#include "pqBarChartDisplay.h"
+#include "pqBarChartRepresentation.h"
 #include "pqElementInspectorView.h"
-#include "pqLineChartDisplay.h"
-#include "pqPlotViewModule.h"
+#include "pqLineChartRepresentation.h"
+#include "pqPlotView.h"
 #include "pqTableViewModule.h"
 #include "pqTextRepresentation.h"
 
@@ -53,29 +53,30 @@ pqStandardViewModules::~pqStandardViewModules()
 QStringList pqStandardViewModules::viewTypes() const
 {
   return QStringList() << 
-    pqPlotViewModule::barChartType() << 
-    pqPlotViewModule::XYPlotType() << 
+    pqPlotView::barChartType() << 
+    pqPlotView::XYPlotType() << 
     pqTableViewModule::tableType() <<
     pqElementInspectorView::eiViewType();
 }
 
 QStringList pqStandardViewModules::displayTypes() const
 {
-  return QStringList() << "BarChartDisplay"
-    << "XYPlotDisplay2"
+  return QStringList() 
+    << "BarChartRepresentation"
+    << "XYPlotRepresentation"
     << "ElementInspectorRepresentation"
     << "TextSourceRepresentation";
 }
 
 QString pqStandardViewModules::viewTypeName(const QString& type) const
 {
-  if(type == pqPlotViewModule::barChartType())
+  if(type == pqPlotView::barChartType())
     {
-    return pqPlotViewModule::barChartTypeName();
+    return pqPlotView::barChartTypeName();
     }
-  else if(type == pqPlotViewModule::XYPlotType())
+  else if(type == pqPlotView::XYPlotType())
     {
-    return pqPlotViewModule::XYPlotTypeName();
+    return pqPlotView::XYPlotTypeName();
     }
   else if(type == pqTableViewModule::tableType())
     {
@@ -97,13 +98,13 @@ bool pqStandardViewModules::canCreateView(const QString& viewtype) const
 vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype)
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  if(viewtype == pqPlotViewModule::barChartType())
+  if(viewtype == pqPlotView::barChartType())
     {
-    return pxm->NewProxy("plotmodules", "BarChartViewModule");
+    return pxm->NewProxy("newviews", "BarChartView");
     }
-  else if(viewtype == pqPlotViewModule::XYPlotType())
+  else if(viewtype == pqPlotView::XYPlotType())
     {
-    return pxm->NewProxy("plotmodules", "XYPlotViewModule");
+    return pxm->NewProxy("newviews", "XYPlotView");
     }
   else if(viewtype == pqTableViewModule::tableType())
     {
@@ -124,24 +125,21 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
                                                 pqServer* server,
                                                 QObject* p)
 {
-  /* FIXME:UDA
-  if(viewtype == "BarChart")
+  if(viewtype == pqPlotView::barChartType())
     {
-    return new pqPlotViewModule(pqPlotViewModule::barChartType(),
+    return new pqPlotView(pqPlotView::barChartType(),
                               group, viewname, viewmodule, server, p);
     }
-  else if(viewtype == "XYPlot")
+  else if(viewtype == pqPlotView::XYPlotType())
     {
-    return new pqPlotViewModule(pqPlotViewModule::XYPlotType(),
+    return new pqPlotView(pqPlotView::XYPlotType(),
                               group, viewname, viewmodule, server, p);
     }
   else if(viewtype == "TableView")
     {
-    return new pqTableViewModule(group, viewname, viewmodule, server, p);
+    // return new pqTableViewModule(group, viewname, viewmodule, server, p);
     }
-  else
-  */
-  if (viewtype == "ElementInspectorView")
+  else if (viewtype == "ElementInspectorView")
     {
     return new pqElementInspectorView(
       group, viewname, viewmodule, server, p);
@@ -157,18 +155,15 @@ pqDataRepresentation* pqStandardViewModules::createDisplay(const QString& displa
   pqServer* server,
   QObject* p)
 {
-  /* FIXME:UDA
-  if(display_type == "BarChartDisplay")
+  if(display_type == "BarChartRepresentation")
     {
-    return new pqBarChartDisplay(group, n, proxy, server, p);
+    return new pqBarChartRepresentation(group, n, proxy, server, p);
     }
-  else if (display_type == "XYPlotDisplay2")
+  else if (display_type == "XYPlotRepresentation")
     {
-    return new pqLineChartDisplay(group, n, proxy, server, p);
+    return new pqLineChartRepresentation(group, n, proxy, server, p);
     }
-    else
-    */
-  if (display_type == "ElementInspectorRepresentation")
+  else if (display_type == "ElementInspectorRepresentation")
     {
     return new pqDataRepresentation(group, n, proxy, server, p);
     }

@@ -62,7 +62,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqOutputWindow.h
   pqOutputWindowAdapter.h
   pqPendingDisplayManager.h
-  pqPipelineDisplay.h
   pqPipelineSource.h
   pqPipelineFilter.h
   pqPlotViewModule.h
@@ -102,6 +101,9 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineRepresentation.h
   pqElementInspectorView.h
   pqTextRepresentation.h
+  pqBarChartRepresentation.h
+  pqLineChartRepresentation.h
+  pqPlotView.h
   ${PYTHON_MOC_SRCS}
   )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
@@ -156,6 +158,12 @@ ADD_LIBRARY(pqCore
   pqElementInspectorView.cxx
   pqTextRepresentation.h
   pqTextRepresentation.cxx
+  pqBarChartRepresentation.h
+  pqBarChartRepresentation.cxx
+  pqLineChartRepresentation.h
+  pqLineChartRepresentation.cxx
+  pqPlotView.h
+  pqPlotView.cxx
 
   pq3DWidgetFactory.cxx
   pq3DWidgetFactory.h
@@ -236,8 +244,6 @@ ADD_LIBRARY(pqCore
   pqPendingDisplayManager.h
   pqPendingDisplayUndoElement.cxx
   pqPendingDisplayUndoElement.h
-  pqPipelineDisplay.cxx
-  pqPipelineDisplay.h
   pqPipelineFilter.cxx
   pqPipelineFilter.h
   pqPipelineSource.cxx

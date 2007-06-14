@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 
 #include "pqComboBoxDomain.h"
-#include "pqLineChartDisplay.h"
+#include "pqLineChartRepresentation.h"
 #include "pqPropertyLinks.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
@@ -73,7 +73,7 @@ public:
   pqSignalAdaptorComboBox* AttributeModeAdaptor;
   pqComboBoxDomain* XAxisArrayDomain;
 
-  QPointer<pqLineChartDisplay> Display;
+  QPointer<pqLineChartRepresentation> Display;
   QList<QPointer<pqTreeWidgetItemObject> > TreeItems;
 };
 
@@ -126,7 +126,7 @@ pqXYPlotDisplayProxyEditor::~pqXYPlotDisplayProxyEditor()
 //-----------------------------------------------------------------------------
 void pqXYPlotDisplayProxyEditor::setDisplay(pqRepresentation* disp)
 {
-  pqLineChartDisplay* display = qobject_cast<pqLineChartDisplay*>(disp);
+  pqLineChartRepresentation* display = qobject_cast<pqLineChartRepresentation*>(disp);
   if (this->Internal->Display == display)
     {
     return;
@@ -148,9 +148,9 @@ void pqXYPlotDisplayProxyEditor::setDisplay(pqRepresentation* disp)
     }
   vtkSMProxy* proxy = display->getProxy();
 
-  if (!proxy || proxy->GetXMLName() != QString("XYPlotDisplay2"))
+  if (!proxy || proxy->GetXMLName() != QString("XYPlotRepresentation"))
     {
-    qDebug() << "Proxy must be a XYPlotDisplay2 display to be editable in "
+    qDebug() << "Proxy must be a XYPlotRepresentation display to be editable in "
       "pqXYPlotDisplayProxyEditor.";
     return;
     }

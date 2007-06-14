@@ -52,7 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
 #include "pqNameCount.h"
-#include "pqPipelineDisplay.h"
+//#include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqPluginManager.h"
@@ -64,6 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "pqTextDisplay.h"
 #include "pqTimeKeeper.h"
 #include "pqViewModuleInterface.h"
+#include "pqConsumerDisplay.h"
 
 #include <QVTKWidget.h>
 
@@ -157,6 +158,7 @@ QList<pqServer*> pqServerManagerModel::getServers() const
   return list;
 }
 
+/*
 //-----------------------------------------------------------------------------
 QList<pqPipelineDisplay*> pqServerManagerModel::getPipelineDisplays(
   pqServer* server)
@@ -174,6 +176,7 @@ QList<pqPipelineDisplay*> pqServerManagerModel::getPipelineDisplays(
 
   return list;
 }
+*/
 
 //-----------------------------------------------------------------------------
 QList<pqConsumerDisplay*> pqServerManagerModel::getDisplays(pqServer* server)
@@ -384,7 +387,7 @@ void pqServerManagerModel::onAddDisplay(QString name,
   if (dProxy)
     {
     // 2) create a new pqConsumerDisplay;
-    display = new pqPipelineDisplay(name, dProxy, server, this);
+///    display = new pqPipelineDisplay(name, dProxy, server, this);
     }
   else if (xml_name == QString("TextDisplay"))
     {

@@ -416,3 +416,15 @@ void pqServerManagerModel2::onConnectionClosed(vtkIdType id)
   delete server;
 }
 
+//-----------------------------------------------------------------------------
+void pqServerManagerModel2::beginRemoveServer(pqServer *server)
+{
+  emit this->aboutToRemoveServer(server);
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerModel2::endRemoveServer()
+{
+  emit this->finishedRemovingServer();
+}
+
