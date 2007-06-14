@@ -56,6 +56,8 @@ protected slots:
   void applyDisplacements(int);
   void displChanged(bool);
 
+  void modeChanged(int);
+
   void updateDataRanges();
   void propertyChanged();
 
@@ -68,7 +70,7 @@ protected:
 
   enum PixmapType 
     {
-    PM_NONE = -1, PM_NODE, PM_ELEM, PM_SIDESET, PM_NODESET
+    PM_NONE = -1, PM_NODE, PM_ELEM, PM_SIDESET, PM_NODESET, PM_ELEMBLK, PM_FACEBLK, PM_EDGEBLK
     };
 
   void addSelectionsToTreeWidget(const QString& property, 
