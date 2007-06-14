@@ -281,6 +281,7 @@ IF(BUILD_TESTING)
     LoadState
     LoadSaveStateAnimation
     ObjectInspectorSphere
+    OrientationAxis
     Plot3DReader
     RectilinearFractal
     RepresentationSelector
