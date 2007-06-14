@@ -66,6 +66,18 @@ bool pqBasicWidgetEventPlayer::playEvent(QObject* Object,
       QCoreApplication::sendEvent(widget, &ku);
       return true;
       }
+    else if(Command == "keyEvent")
+      {
+      QStringList data = Arguments.split(':');
+      QKeyEvent ke(static_cast<QEvent::Type>(data[0].toInt()),
+                   data[1].toInt(),
+                   static_cast<Qt::KeyboardModifiers>(data[2].toInt()),
+                   data[3],
+                   !!data[4].toInt(),
+                   data[5].toInt());
+      QCoreApplication::sendEvent(widget, &ke);
+      return true;
+      }
     else
       {
       return false;
