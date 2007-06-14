@@ -29,7 +29,7 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
 {
@@ -266,7 +266,6 @@ vtkDataObject* vtkSMClientDeliveryRepresentationProxy::GetOutput()
     }
   else
     {
-    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
     if (pm && this->StrategyProxy && this->StrategyProxy->GetOutput())
       {
       dp = vtkAlgorithm::SafeDownCast(
