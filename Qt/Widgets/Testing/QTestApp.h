@@ -37,6 +37,9 @@ public:
 
   static void mouseClick(QWidget* w, QPoint pos, Qt::MouseButton btn, 
                          Qt::KeyboardModifiers mod, int ms);
+  
+  static void mouseDClick(QWidget* w, QPoint pos, Qt::MouseButton btn, 
+                         Qt::KeyboardModifiers mod, int ms);
 
 private:
   QApplication* App;

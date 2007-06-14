@@ -162,4 +162,14 @@ void QTestApp::mouseClick(QWidget* w, QPoint pos, Qt::MouseButton btn,
   mouseUp(w, pos, btn, mod, 0);
 }
 
+void QTestApp::mouseDClick(QWidget* w, QPoint pos, Qt::MouseButton btn, 
+                         Qt::KeyboardModifiers mod, int ms)
+{
+  delay(ms);
+  QMouseEvent e(QEvent::MouseButtonDblClick, pos, btn, btn, mod);
+  if(!simulateEvent(w, &e))
+    {
+    qWarning("mouseMove not handled\n");
+    }
+}
 

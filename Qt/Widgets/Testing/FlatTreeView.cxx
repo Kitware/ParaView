@@ -63,6 +63,12 @@ void FlatTreeViewTests(pqFlatTreeView* w)
   QTestApp::keyClick(w, Qt::Key_Up, 0, 20);
   QTestApp::keyClick(w, Qt::Key_Up, 0, 20);
   //VERIFY(w->getSelectionModel()->currentIndex() == w->getModel()->index(1, 0));
+  
+  QTestApp::keyClick(w, Qt::Key_Left, 0, 20);
+  QTestApp::keyClick(w, Qt::Key_Right, 0, 20);
+  
+  QTestApp::mouseDClick(w->viewport(), QPoint(31, 62), Qt::LeftButton, 0, 20);
+  QTestApp::mouseDClick(w->viewport(), QPoint(31, 62), Qt::LeftButton, 0, 20);
 
 }
 
