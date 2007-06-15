@@ -2,12 +2,14 @@
 #ifndef pqAnimationKeyFrame_h
 #define pqAnimationKeyFrame_h
 
+#include "QtWidgetsExport.h"
+
 #include <QObject>
 #include <QGraphicsItem>
 class pqAnimationTrack;
 
 // represents a key frame
-class pqAnimationKeyFrame : public QObject, public QGraphicsItem
+class QTWIDGETS_EXPORT pqAnimationKeyFrame : public QObject, public QGraphicsItem
 {
   Q_OBJECT
   Q_ENUMS(InterpolationType)

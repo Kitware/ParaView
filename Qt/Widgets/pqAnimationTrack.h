@@ -2,6 +2,8 @@
 #ifndef pqAnimationTrack_h
 #define pqAnimationTrack_h
 
+#include "QtWidgetsExport.h"
+
 #include <QObject>
 #include <QGraphicsItem>
 #include <QList>
@@ -9,7 +11,7 @@
 class pqAnimationKeyFrame;
 
 // represents a track
-class pqAnimationTrack : public QObject, public QGraphicsItem
+class QTWIDGETS_EXPORT pqAnimationTrack : public QObject, public QGraphicsItem
 {
   Q_OBJECT
   Q_PROPERTY(QVariant property READ property WRITE setProperty)

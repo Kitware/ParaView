@@ -2,6 +2,8 @@
 #ifndef pqAnimationModel_h
 #define pqAnimationModel_h
 
+#include "QtWidgetsExport.h"
+
 #include <QObject>
 #include <QGraphicsScene>
 #include <QStandardItemModel>
@@ -10,7 +12,7 @@ class pqAnimationTrack;
 class QGraphicsView;
 
 // represents a track
-class pqAnimationModel : public QGraphicsScene
+class QTWIDGETS_EXPORT pqAnimationModel : public QGraphicsScene
 {
   Q_OBJECT
   Q_ENUMS(ModeType)
