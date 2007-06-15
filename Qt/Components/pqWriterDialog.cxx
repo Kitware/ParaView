@@ -65,15 +65,15 @@ pqWriterDialog::pqWriterDialog(vtkSMProxy *proxy, QWidget *p) :
 {
   this->Implementation->UI.setupUi(this);
 
-  QGridLayout *layout = new QGridLayout(this->Implementation->UI.PropertyFrame);
+  QGridLayout *propertyFrameLayout = new QGridLayout(this->Implementation->UI.PropertyFrame);
   this->Implementation->Proxy = proxy;
 
   // This widget maintains the pqPropertyManager for us. 
   this->Implementation->ProxyPanel = new pqProxyPanel(
       this->Implementation->Proxy,this);
 
-  // Create the widgets inside "layout"
-  pqNamedWidgets::createWidgets(layout,this->Implementation->Proxy);
+  // Create the widgets inside "propertyFrameLayout"
+  pqNamedWidgets::createWidgets(propertyFrameLayout,this->Implementation->Proxy);
   pqNamedWidgets::link(this->Implementation->UI.PropertyFrame, 
                        this->Implementation->Proxy, 
                        this->Implementation->ProxyPanel->propertyManager());
