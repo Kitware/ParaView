@@ -75,6 +75,9 @@ pqPointSourceWidget::pqPointSourceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget
 {
   this->Implementation->Controls.setupUi(
     &this->Implementation->ControlsContainer);
+    
+  this->Implementation->Controls.Radius->
+    setValidator(new QDoubleValidator(this->Implementation->Controls.Radius));
 
   this->layout()->addWidget(&this->Implementation->ControlsContainer);
 
@@ -127,8 +130,8 @@ void pqPointSourceWidget::setControlledProperty(const char* function,
   else if (strcmp(function, "Radius") == 0)
     {
     this->Implementation->Links.addPropertyLink(
-      this->Implementation->Controls.Radius, "value", 
-      SIGNAL(valueChanged(double)),
+      this->Implementation->Controls.Radius, "text", 
+      SIGNAL(textChanged(QString)),
       this->getWidgetProxy(), this->getWidgetProxy()->GetProperty("Radius"));
     }
   this->Superclass::setControlledProperty(function, _property);

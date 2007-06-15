@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>pqPointSourceControls</class>
  <widget class="QWidget" name="pqPointSourceControls" >
   <property name="geometry" >
@@ -35,7 +32,7 @@
       <string>Number of Points</string>
      </property>
      <property name="wordWrap" >
-       <bool>true</bool>
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -50,15 +47,10 @@
     </widget>
    </item>
    <item row="1" column="1" >
-    <widget class="QDoubleSpinBox" name="Radius" >
-     <property name="maximum" >
-      <double>1e+10</double>
-     </property>
-    </widget>
+    <widget class="QLineEdit" name="Radius" />
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <resources/>
  <connections/>
 </ui>
