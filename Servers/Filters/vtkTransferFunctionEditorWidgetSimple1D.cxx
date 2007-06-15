@@ -29,7 +29,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.28");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.29");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -524,21 +524,14 @@ void vtkTransferFunctionEditorWidgetSimple1D::OnChar()
     }
 
   char keyCode = this->Interactor->GetKeyCode();
-  char *keySym = this->Interactor->GetKeySym();
 
-  if (strlen(keySym) == 1)
+  const char DelKey = 127;
+  const char BackSpaceKey = 8;
+
+  if(keyCode == 'd' || keyCode == 'D' ||
+     keyCode == DelKey || keyCode == BackSpaceKey)
     {
-    if (keyCode == 'D' || keyCode == 'd')
-      {
-      this->RemoveNode(rep->GetActiveHandle());
-      }
-    }
-  else
-    {
-    if (!strcmp(keySym, "Delete"))
-      {
-      this->RemoveNode(rep->GetActiveHandle());
-      }
+    this->RemoveNode(rep->GetActiveHandle());
     }
 }
 
