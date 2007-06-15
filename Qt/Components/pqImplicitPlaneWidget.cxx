@@ -140,26 +140,6 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWi
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(setModified()));
 
-  // Trigger a render when use explicitly edits the positions.
-  QObject::connect(this->Implementation->UI->originX, 
-    SIGNAL(editingFinished()), 
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI->originY, 
-    SIGNAL(editingFinished()), 
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI->originZ,
-    SIGNAL(editingFinished()), 
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI->normalX, 
-    SIGNAL(editingFinished()), 
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI->normalY, 
-    SIGNAL(editingFinished()), 
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI->normalZ,
-    SIGNAL(editingFinished()), 
-    this, SLOT(render()), Qt::QueuedConnection);
-
   pqServerManagerModel* m =
     pqApplicationCore::instance()->getServerManagerModel();
   this->createWidget(m->getServerForSource(o));

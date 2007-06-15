@@ -106,17 +106,6 @@ pqHandleWidget::pqHandleWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(setModified()));
 
-  // Trigger a render when use explicitly edits the positions.
-  QObject::connect(this->Implementation->UI->worldPositionX, 
-    SIGNAL(editingFinished()), 
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI->worldPositionY, 
-    SIGNAL(editingFinished()), 
-    this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI->worldPositionZ,
-    SIGNAL(editingFinished()), 
-    this, SLOT(render()), Qt::QueuedConnection);
-  
   pqServerManagerModel* m =
     pqApplicationCore::instance()->getServerManagerModel();
   this->createWidget(m->getServerForSource(o));
