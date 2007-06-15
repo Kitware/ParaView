@@ -14,7 +14,15 @@ ENDIF(NOT BUILD_SHARED_LIBS)
 SET(QtWidgets_SRCS
   QtWidgetsPlugin.cxx
   QtWidgetsPlugin.h
-
+  
+  pqAnimationKeyFrame.cxx
+  pqAnimationKeyFrame.h
+  pqAnimationModel.cxx
+  pqAnimationModel.h
+  pqAnimationTrack.cxx
+  pqAnimationTrack.h
+  pqAnimationWidget.cxx
+  pqAnimationWidget.h
   pqChartContextMenu.cxx
   pqChartContextMenu.h
   pqCollapsedGroup.cxx
@@ -76,6 +84,10 @@ SET(QtWidgets_SRCS
 QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   QtWidgetsPlugin.h
 
+  pqAnimationKeyFrame.h
+  pqAnimationModel.h
+  pqAnimationTrack.h
+  pqAnimationWidget.h
   pqChartContextMenu.h
   pqCollapsedGroup.h
   pqColorChooserButton.h

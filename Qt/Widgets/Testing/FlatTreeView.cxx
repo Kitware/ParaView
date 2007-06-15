@@ -94,11 +94,6 @@ int FlatTreeView(int argc, char* argv[])
 
   FlatTreeViewTests(&treeView);
   
-  if(QCoreApplication::arguments().contains("--exit"))
-    {
-    QTimer::singleShot(100, QApplication::instance(), SLOT(quit()));
-    }
-  
   int status = QTestApp::exec();
 
   return status;

@@ -3,6 +3,7 @@ PROJECT(pqWidgetsTest)
 
 SET(MyTests
   FlatTreeView
+  Animation
   )
 
 INCLUDE_DIRECTORIES(${QtWidgets_SOURCE_DIR} ${QtWidgets_BINARY_DIR})

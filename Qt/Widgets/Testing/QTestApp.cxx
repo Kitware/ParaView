@@ -34,6 +34,11 @@ QTestApp::~QTestApp()
 
 int QTestApp::exec()
 {
+  if(QCoreApplication::arguments().contains("--exit"))
+    {
+    QTimer::singleShot(100, QApplication::instance(), 
+                       SLOT(quit()));
+    }
   return Error + QApplication::exec();
 }
 
