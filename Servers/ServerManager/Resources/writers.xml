@@ -43,6 +43,7 @@
         command="SetFileName"
         number_of_elements="1">
       </StringVectorProperty>
+
     </Proxy>
 
     <Proxy name="DataWriterBase" class="not-used">
@@ -98,6 +99,10 @@
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
     </WriterProxy>
 
     <WriterProxy name="XMLPolyDataWriter" class="vtkXMLPolyDataWriter"
@@ -107,6 +112,10 @@
           <DataType value="vtkPolyData" />
         </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
     </WriterProxy>
 
     <WriterProxy name="XMLUnstructuredGridWriter" 
@@ -117,6 +126,10 @@
           <DataType value="vtkUnstructuredGrid" />
         </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
     </WriterProxy>
 
     <WriterProxy name="XMLStructuredGridWriter" 
@@ -127,6 +140,10 @@
           <DataType value="vtkStructuredGrid" />
         </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
     </WriterProxy>
 
     <WriterProxy name="XMLRectilinearGridWriter" 
@@ -137,6 +154,10 @@
           <DataType value="vtkRectilinearGrid" />
         </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
     </WriterProxy>
 
     <WriterProxy name="XMLImageDataWriter" 
@@ -147,6 +168,10 @@
           <DataType value="vtkImageData" />
         </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
     </WriterProxy>
 
     <WriterProxy name="XMLMultiGroupDataWriter"
@@ -157,6 +182,10 @@
           <DataType value="vtkMultiGroupDataSet" />
         </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
     </WriterProxy>
 
     <PWriterProxy name="XMLPPolyDataWriter"
@@ -167,6 +196,10 @@
           <DataType value="vtkPolyData" />
         </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
     </PWriterProxy>
 
     <PWriterProxy name="XMLPUnstructuredGridWriter"
@@ -177,6 +210,10 @@
           <DataType value="vtkUnstructuredGrid" />
         </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
     </PWriterProxy>
 
     <PWriterProxy name="XMLPStructuredGridWriter"
@@ -187,6 +224,10 @@
           <DataType value="vtkStructuredGrid" />
         </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
     </PWriterProxy>
 
     <PWriterProxy name="XMLPRectilinearGridWriter"
@@ -197,6 +238,10 @@
           <DataType value="vtkRectilinearGrid" />
         </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
     </PWriterProxy>
 
     <PWriterProxy name="XMLPImageDataWriter"
@@ -207,6 +252,10 @@
           <DataType value="vtkImageData" />
         </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
     </PWriterProxy>
 
     <PWriterProxy name="XMLPMultiGroupDataWriter"
@@ -217,6 +266,10 @@
           <DataType value="vtkMultiGroupDataSet" />
         </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
     </PWriterProxy>
 
     <WriterProxy name="DataSetWriter" class="vtkGenericDataObjectWriter"
@@ -226,6 +279,11 @@
           <DataType value="vtkDataObject" />
         </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+        <Property name="FileType" show="0"/>
+      </Hints>
     </WriterProxy>
 
 
@@ -240,6 +298,11 @@
           <DataType value="vtkPolyData"/>
         </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+        <Property name="FileType" show="0"/>
+      </Hints>
     </WriterProxy>
 
     <WriterProxy name="MetaImageWriter" class="vtkMetaImageWriter"
@@ -253,6 +316,11 @@
           <DataType value="vtkImageData"/>
         </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+        <Property name="FileType" show="0"/>
+      </Hints>
     </WriterProxy>
 
     <WriterProxy name="PNGWriter" class="vtkPNGWriter"
@@ -266,6 +334,11 @@
           <DataType value="vtkImageData"/>
         </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+        <Property name="FileType" show="0"/>
+      </Hints>
     </WriterProxy>
 
     <WriterProxy name="XdmfWriter" class="vtkXdmfWriter">
@@ -284,6 +357,10 @@
         command="SetFileName"
         number_of_elements="1">
       </StringVectorProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
     </WriterProxy>
 
     <PWriterProxy name="ExodusIIWriter" class="vtkExodusIIWriter"
@@ -297,6 +374,17 @@
           <DataType value="vtkUnstructuredGrid"/>
         </DataTypeDomain>
       </InputProperty>
+      <IntVectorProperty name="WriteAllTimeSteps"
+        command="SetWriteAllTimeSteps"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" /> 
+      </IntVectorProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+        <Property name="GhostLevel" show="0"/>
+      </Hints>
     </PWriterProxy>
 
     <PWriterProxy name="EnSightWriter" class="vtkEnSightWriter"
@@ -310,6 +398,10 @@
           <DataType value="vtkUnstructuredGrid"/>
         </DataTypeDomain>
       </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
     </PWriterProxy>
 
     <Proxy name="AnimationSceneImageWriter" class="vtkSMAnimationSceneImageWriter">
@@ -334,6 +426,11 @@
         number_of_elements="1"
         default_values="0">
       </DoubleVectorProperty>
+
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
     <!-- End of AnimationSceneImageWriter -->
     </Proxy>
 
@@ -382,6 +479,10 @@
         immediate_update="1">
       </Property>
 
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
     </XMLPVAnimationWriterProxy>
 
     <SummaryHelperProxy name="SummaryHelper" class="vtkPVSummaryHelper">
@@ -410,6 +511,11 @@
         command="SetFileName"
         number_of_elements="1">
       </StringVectorProperty>
+
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
       <!-- End of CSVWriter -->
     </WriterProxy>
   </ProxyGroup>

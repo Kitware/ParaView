@@ -159,6 +159,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqToolTipTrapper.h
   pqVCRController.h
   pqViewManager.h
+  pqWriterDialog.h
 #  pqXDMFPanel.h
   pqXYPlotDisplayProxyEditor.h
 )
@@ -219,6 +220,7 @@ SET(UI_FORMS
   Resources/UI/pqStreamTracerPanel.ui
   Resources/UI/pqTextDisplayPropertiesWidget.ui
   Resources/UI/pqTimerLogDisplay.ui
+  Resources/UI/pqWriterDialog.ui
 #  Resources/UI/pqXDMFPanel.ui
   Resources/UI/pqXYPlotDisplayEditor.ui
 )
@@ -523,6 +525,8 @@ ADD_LIBRARY(pqComponents
   pqVCRController.h
   pqViewManager.cxx
   pqViewManager.h
+  pqWriterDialog.cxx
+  pqWriterDialog.h
 #  pqXDMFPanel.cxx
 #  pqXDMFPanel.h
   pqXYPlotDisplayProxyEditor.cxx

@@ -128,6 +128,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqSetName.h>
 #include <pqCoreTestUtility.h>
 #include <pqUndoStack.h>
+#include <pqWriterDialog.h>
 #include "QtTestingConfigure.h"
 
 #ifdef PARAVIEW_ENABLE_PYTHON
@@ -1952,13 +1953,31 @@ void pqMainWindowCore::onFileSaveData(const QStringList& files)
     return;
     }
 
-  vtkSMStringVectorProperty::SafeDownCast(
-    writer->GetProperty("FileName"))->SetElement(0, files[0].toAscii().data());
+  // The "FileName" and "Input" properties of the writer are set here.
+  // All others will be editable from the properties dialog.
 
-  // TODO: We can popup a wizard or something for setting the properties
-  // on the writer.
-  vtkSMProxyProperty::SafeDownCast(writer->GetProperty("Input"))->AddProxy(
-    source->getProxy());
+  vtkSMStringVectorProperty *filenameProperty = 
+    vtkSMStringVectorProperty::SafeDownCast(writer->GetProperty("FileName"));
+  filenameProperty->SetElement(0, files[0].toAscii().data());
+
+  vtkSMProxyProperty *inputProperty = 
+    vtkSMProxyProperty::SafeDownCast(writer->GetProperty("Input"));
+  inputProperty->AddProxy(source->getProxy());
+
+  pqWriterDialog dialog(writer);
+
+  // Check to see if this writer has any properties that can be configured by 
+  // the user. If it does, display the dialog.
+  if(dialog.hasConfigurableProperties())
+    {
+    dialog.exec();
+    if(dialog.result() == QDialog::Rejected)
+      {
+      // The user pressed Cancel so don't write
+      return;
+      }
+    }
+
   writer->UpdateVTKObjects();
 
   writer->UpdatePipeline();
