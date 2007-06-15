@@ -129,6 +129,7 @@ SET(Kit_SRCS
   vtkSMSourceProxy.cxx
   vtkSMStateLoader.cxx
   vtkSMStateLoaderBase.cxx
+  vtkSMStringArrayHelper.cxx
   vtkSMStringListDomain.cxx
   vtkSMStringListRangeDomain.cxx
   vtkSMStringVectorProperty.cxx

@@ -79,6 +79,7 @@ SET(Filters_SRCS
   vtkPVServerObject.cxx
   vtkPVServerSelectTimeSet.cxx
   vtkPVServerTimeSteps.cxx
+  vtkPVStringArrayHelper.cxx
 #  vtkPVServerXDMFParameters.cxx
   vtkPVSummaryHelper.cxx
   vtkPVTextSource.cxx
@@ -121,7 +122,6 @@ SET(Filters_SRCS
   vtkXMLPVAnimationWriter.cxx
   vtkXMLPVDWriter.cxx
   vtkMultiViewManager.cxx
-  
   )
 
 SET_SOURCE_FILES_PROPERTIES(
