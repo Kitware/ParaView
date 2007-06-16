@@ -17,15 +17,16 @@
 #include "vtkObjectFactory.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMViewProxy.h"
 
 #include <vtksys/ios/sstream>
 #include <vtkstd/vector>
 
 class vtkSMMultiViewFactory::vtkVector: 
-  public vtkstd::vector<vtkSmartPointer<vtkSMProxy> > {};
+  public vtkstd::vector<vtkSmartPointer<vtkSMViewProxy> > {};
 
 vtkStandardNewMacro(vtkSMMultiViewFactory);
-vtkCxxRevisionMacro(vtkSMMultiViewFactory, "1.2");
+vtkCxxRevisionMacro(vtkSMMultiViewFactory, "1.2.2.1");
 //----------------------------------------------------------------------------
 vtkSMMultiViewFactory::vtkSMMultiViewFactory()
 {
@@ -59,7 +60,7 @@ void vtkSMMultiViewFactory::CreateVTKObjects()
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMMultiViewFactory::NewRenderView()
+vtkSMViewProxy* vtkSMMultiViewFactory::NewRenderView()
 {
   this->CreateVTKObjects();
 
@@ -68,8 +69,9 @@ vtkSMProxy* vtkSMMultiViewFactory::NewRenderView()
     return 0;
     }
 
-  vtkSMProxy* view = this->GetProxyManager()->NewProxy(
-    "newviews", this->RenderViewName);
+  vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(
+    this->GetProxyManager()->NewProxy("newviews", 
+      this->RenderViewName));
   if (view)
     {
     view->SetConnectionID(this->ConnectionID);
@@ -78,14 +80,20 @@ vtkSMProxy* vtkSMMultiViewFactory::NewRenderView()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMMultiViewFactory::AddRenderView(vtkSMProxy* view)
+void vtkSMMultiViewFactory::AddRenderView(vtkSMViewProxy* view)
 {
   // Set shared objects.
   this->RenderViews->push_back(view);
+
+  if (this->RenderViews->size() > 1 && view)
+    {
+    vtkSMViewProxy* root = this->RenderViews->front().GetPointer();
+    view->InitializeForMultiView(root);
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkSMMultiViewFactory::RemoveRenderView(vtkSMProxy* view)
+void vtkSMMultiViewFactory::RemoveRenderView(vtkSMViewProxy* view)
 {
   // Unset shared objects.
   
@@ -108,7 +116,7 @@ unsigned int vtkSMMultiViewFactory::GetNumberOfRenderViews()
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMMultiViewFactory::GetRenderView(unsigned int cc)
+vtkSMViewProxy* vtkSMMultiViewFactory::GetRenderView(unsigned int cc)
 {
   if (cc < this->RenderViews->size())
     {

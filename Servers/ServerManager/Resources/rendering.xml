@@ -3843,16 +3843,6 @@
         </Documentation>
       </ProxyProperty>
 
-      <ProxyProperty
-        name="ViewHelper"
-        command="SetViewHelperProxy"
-        update_self="1">
-        <Documentation>
-          The helper that gives the strategy information about critical view
-          properties without requiring a reference to the view proxy itself.
-        </Documentation>
-      </ProxyProperty>
-
       <SubProxy>
         <Proxy name="LODDecimator" 
           proxygroup="filters" proxyname="QuadricClustering" />
@@ -3908,6 +3898,9 @@
         <Proxy name="Distributor" proxygroup="filters"
           proxyname="OrderedCompositeDistributor">
         </Proxy>
+        <ExposedProperties>
+          <Property name="PKdTree" />
+        </ExposedProperties>
       </SubProxy>
 
       <SubProxy>
@@ -3931,6 +3924,9 @@
         <Proxy name="DistributorLOD" proxygroup="filters"
           proxyname="OrderedCompositeDistributor">
         </Proxy>
+        <ShareProperties subproxy="Distributor" >
+          <Exception name="Input" />
+        </ShareProperties>
       </SubProxy>
       
       <!-- End of PolyDataParallelStrategy -->
@@ -3956,28 +3952,141 @@
       <!-- End of ClientDeliveryStrategy -->
     </ClientDeliveryStrategyProxy>
 
-    <SimpleStrategy name="UnstructuredGridStrategy" 
-      base_proxygroup="strategies"
-      base_proxyname="PolyDataStrategy" >
+    <SimpleStrategy name="UnstructuredGridStrategy" >
       <Documentation>
-        Representation stragegy can be used for unstructured grid volume rendering.
+        Representation strategy can be used for unstructured grid volume rendering.
       </Documentation>
+
+      <ProxyProperty
+        name="Input"
+        command="SetInput"
+        update_self="1"
+        immediate_update="1">
+        <Documentation>
+          The input to the strategy.
+        </Documentation>
+      </ProxyProperty>
+
+      <SubProxy>
+        <Proxy name="LODDecimator" 
+          proxygroup="filters" proxyname="OutlineFilter" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="UpdateSuppressor"
+          proxygroup="filters" proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="UpdateTime" />
+          <Property name="RemoveAllCaches" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="UpdateSuppressorLOD"
+          proxygroup="filters" proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
+      </SubProxy>
+
       <!-- End of UnstructuredGridStrategy -->
     </SimpleStrategy>
 
-    <SimpleParallelStrategy name="UnstructuredGridParallelStrategy"
+    <UnstructuredGridParallelStrategy name="UnstructuredGridParallelStrategy"
       base_proxygroup="strategies" 
-      base_proxyname="PolyDataParallelStrategy">
-    </SimpleParallelStrategy>
+      base_proxyname="UnstructuredGridStrategy">
 
-    <SimpleStrategy name="UniformGridParallelStrategy" 
-      base_proxygroup="strategies"
-      base_proxyname="PolyDataStrategy" >
+      <SubProxy>
+        <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PreDistributorSuppressor" proxygroup="filters"
+          proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Distributor" proxygroup="filters"
+          proxyname="OrderedCompositeDistributor">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="PKdTree" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="CollectLOD" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PreDistributorSuppressorLOD" proxygroup="filters"
+          proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressorLOD" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="DistributorLOD" proxygroup="filters"
+          proxyname="OrderedCompositeDistributor">
+        </Proxy>
+        <ShareProperties subproxy="Distributor">
+          <Exception name="Input" /> 
+        </ShareProperties>
+      </SubProxy>
+      
+      <!-- End of UnstructuredGridParallelStrategy -->
+    </UnstructuredGridParallelStrategy>
+
+    <UniformGridParallelStrategy name="UniformGridParallelStrategy" >
       <Documentation>
-        Representation stragegy can be used for unstructured grid volume rendering.
+        Representation stragegy can be used for uniform grid volume rendering.
       </Documentation>
+
+      <ProxyProperty
+        name="Input"
+        command="SetInput"
+        update_self="1"
+        immediate_update="1">
+        <Documentation>
+          The input to the strategy.
+        </Documentation>
+      </ProxyProperty>
+
+      <SubProxy>
+        <Proxy name="UpdateSuppressor"
+          proxygroup="filters" proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="UpdateTime" />
+          <Property name="RemoveAllCaches" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
       <!-- End of UnstructuredGridStrategy -->
-    </SimpleStrategy>
+    </UniformGridParallelStrategy>
 
     <!-- End of strategies -->
   </ProxyGroup>
@@ -4202,54 +4311,6 @@
         </ExposedProperties>
       </SubProxy>
 
-      <SubProxy>
-        <Proxy name="ViewHelper" class="vtkPVRenderModuleHelper">
-          <IntVectorProperty
-            name="UseLOD"
-            command="SetLODFlag"
-            number_of_elements="1"
-            default_values="0">
-            <BooleanDomain name="bool" />
-          </IntVectorProperty>
-
-          <IntVectorProperty
-            name="UseCompositing"
-            number_of_elements="1"
-            default_values="0">
-            <BooleanDomain name="bool" />
-          </IntVectorProperty>
-
-          <IntVectorProperty
-            name="UseOrderedCompositing"
-            number_of_elements="1"
-            default_values="0">
-            <BooleanDomain name="bool" />
-          </IntVectorProperty>
-
-          <IntVectorProperty
-            name="UseCache"
-            command="SetCachingEnabled"
-            number_of_elements="1"
-            default_values="0">
-            <BooleanDomain name="bool" />
-          </IntVectorProperty>
-
-          <IntVectorProperty
-            name="LODResolution"
-            number_of_elements="1"
-            default_values="50" >
-            <IntRangeDomain name="range" min="10" />
-          </IntVectorProperty>
-          <!-- End of subproxy "ViewHelper" -->
-        </Proxy>
-
-        <ExposedProperties>
-          <Property name="UseCache" />
-          <Property name="LODResolution" />
-        </ExposedProperties>
-        <!-- End of SubProxy ViewHelper -->
-      </SubProxy>
-
       <!-- End of RenderViewBase -->
     </Proxy>
 
@@ -4271,6 +4332,18 @@
         </Documentation>
         <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="LODResolution"
+        command="SetLODResolution"
+        number_of_elements="1"
+        default_values="50"
+        update_self="1">
+        <IntRangeDomain name="range" min="0" />
+        <Documentation>
+          Set the LOD resolution.
+        </Documentation>
+      </IntVectorProperty>
 
       <SubProxy>
         <Proxy name="Renderer" proxyname="Renderer" proxygroup="renderers">
@@ -5274,7 +5347,7 @@
           <Property name="Scale" />
           <Property name="Orientation" />
           <Property name="Origin" />
-          <Property name="RenderModuleHelper" />
+          <Property name="RenderModuleHelper" exposed_name="ViewHelper"/>
           <Property name="Pickable" />
           <Property name="Visibility" />
         </ExposedProperties>
@@ -5290,6 +5363,18 @@
           <Property name="ColorTransferFunction" 
                     exposed_name="LookupTable" />
         </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!-- 
+          Mapper for low-res geometry. It shares all its properties with the
+          high-res mapper (except input ofcourse).
+        -->
+        <Proxy name="VolumeLODMapper" 
+          proxygroup="mappers" proxyname="PolyDataMapper" />
+        <ShareProperties subproxy="VolumeDummyMapper" >
+          <Exception name="Input" />
+        </ShareProperties>
       </SubProxy>
 
       <SubProxy>
@@ -5404,7 +5489,6 @@
           <Property name="LineWidth" />
           <Property name="Opacity" />
           <Property name="PointSize" />
-          <Property name="Representation" />
           <Property name="Shading" />
           <Property name="Specular" />
           <Property name="SpecularColor" />
@@ -5537,6 +5621,9 @@
           <Exception name="Input" />
           <Exception name="Visibility" />
         </ShareProperties>
+        <ExposedProperties>
+          <Property name="ScalarOpacityFunction" />
+        </ExposedProperties>
       </SubProxy>
 
       <!-- End of GeometryRepresentation -->

@@ -181,7 +181,9 @@ SET(Kit_SRCS
   vtkSMTextWidgetRepresentationProxy.cxx
   vtkSMUniformGridVolumeRepresentationProxy.cxx
   vtkSMUnstructuredGridVolumeRepresentationProxy.cxx
+  vtkSMUnstructuredGridParallelStrategy.cxx
   vtkSMViewProxy.cxx
+  vtkSMUniformGridParallelStrategy.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS

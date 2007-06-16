@@ -32,7 +32,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.4.2.1");
+vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.4.2.2");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepresentationProxy()
 {
@@ -44,6 +44,7 @@ vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepre
   this->VolumeActor = 0;
   this->VolumeProperty = 0;
   this->VolumeDummyMapper = 0;
+  this->VolumeLODMapper = 0;
 
   this->SupportsBunykMapper  = 0;
   this->SupportsZSweepMapper = 0;
@@ -65,6 +66,7 @@ vtkSMUnstructuredGridVolumeRepresentationProxy::~vtkSMUnstructuredGridVolumeRepr
   this->VolumeActor = 0;
   this->VolumeProperty = 0;
   this->VolumeDummyMapper = 0;
+  this->VolumeLODMapper = 0;
 
 }
 
@@ -77,8 +79,6 @@ void vtkSMUnstructuredGridVolumeRepresentationProxy::Update(vtkSMViewProxy* view
     }
 
   this->DetermineVolumeSupport();
-  this->SetupVolumePipeline();
-
   this->Superclass::Update(view);
 }
 
@@ -138,18 +138,22 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::InitializeStrategy(vtkSMVie
     return false;
     }
 
-  this->AddStrategy(strategy);
-
-  strategy->SetEnableLOD(false);
-
-  // Creates the strategy objects.
-  strategy->UpdateVTKObjects();
+  strategy->SetEnableLOD(true);
 
   // Now initialize the data pipelines involving this strategy.
   // Since representations are not added to views unless their input is set, we
   // can assume that the objects for this proxy have been created.
   // (Look at vtkSMPipelineRepresentationProxy::AddToView()).
   this->Connect(this->VolumeFilter, strategy, "Input");
+  strategy->UpdateVTKObjects();
+
+  this->Connect(strategy->GetOutput(), this->VolumeHAVSMapper);
+  this->Connect(strategy->GetOutput(), this->VolumeBunykMapper);
+  this->Connect(strategy->GetOutput(), this->VolumeZSweepMapper);
+  this->Connect(strategy->GetOutput(), this->VolumePTMapper);
+  this->Connect(strategy->GetLODOutput(), this->VolumeLODMapper);
+
+  this->AddStrategy(strategy);
   
   return this->Superclass::InitializeStrategy(view);
 }
@@ -173,6 +177,7 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::BeginCreateVTKObjects()
   this->VolumeActor = this->GetSubProxy("VolumeActor");
   this->VolumeProperty = this->GetSubProxy("VolumeProperty");
   this->VolumeDummyMapper = this->GetSubProxy("VolumeDummyMapper");
+  this->VolumeLODMapper = this->GetSubProxy("VolumeLODMapper");
 
   this->VolumeFilter->SetServers(vtkProcessModule::DATA_SERVER);
   this->VolumeBunykMapper->SetServers(
@@ -189,6 +194,8 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::BeginCreateVTKObjects()
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->VolumeDummyMapper->SetServers(
     vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  this->VolumeLODMapper->SetServers(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
   return true;
 }
@@ -197,11 +204,15 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::BeginCreateVTKObjects()
 bool vtkSMUnstructuredGridVolumeRepresentationProxy::EndCreateVTKObjects()
 {
   this->Connect(this->GetInputProxy(), this->VolumeFilter, "Input");
+  /*
   this->Connect(this->VolumeBunykMapper, this->VolumeActor, "Mapper");
   this->Connect(this->VolumeHAVSMapper, this->VolumeActor, "Mapper");
-  this->Connect(this->VolumePTMapper, this->VolumeActor, "Mapper");
   this->Connect(this->VolumeZSweepMapper, this->VolumeActor, "Mapper");
+  */
+  this->Connect(this->VolumePTMapper, this->VolumeActor, "Mapper");
+  this->Connect(this->VolumeLODMapper, this->VolumeActor, "LODMapper");
   this->Connect(this->VolumeProperty, this->VolumeActor, "Property");
+
 
   return this->Superclass::EndCreateVTKObjects();
 }
@@ -226,42 +237,6 @@ void vtkSMUnstructuredGridVolumeRepresentationProxy::DetermineVolumeSupport()
     
     // HAVS support is determined when the representation is added to a view
     }
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMUnstructuredGridVolumeRepresentationProxy::SetupVolumePipeline()
-{
-
-  vtkSMProxyProperty* pp;
-  pp = vtkSMProxyProperty::SafeDownCast(
-    this->VolumeActor->GetProperty("Mapper"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find property Mapper on VolumeActorProxy.");
-    return;
-    }
-  pp->RemoveAllProxies();
-  if (this->SupportsHAVSMapper)
-    {
-    this->Connect(this->RepresentationStrategies->front()->GetOutput(), this->VolumeHAVSMapper);
-    pp->AddProxy(this->VolumeHAVSMapper);
-    }
-  else if(this->SupportsBunykMapper)
-    {
-    this->Connect(this->RepresentationStrategies->front()->GetOutput(), this->VolumeBunykMapper);
-    pp->AddProxy(this->VolumeBunykMapper);
-    }
-  else if(this->SupportsZSweepMapper)
-    {
-    this->Connect(this->RepresentationStrategies->front()->GetOutput(), this->VolumeZSweepMapper);
-    pp->AddProxy(this->VolumeZSweepMapper);
-    }
-  else
-    {
-    this->Connect(this->RepresentationStrategies->front()->GetOutput(), this->VolumePTMapper);
-    pp->AddProxy(this->VolumePTMapper);
-    }
-  this->VolumeActor->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

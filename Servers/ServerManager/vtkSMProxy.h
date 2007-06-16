@@ -389,6 +389,15 @@ public:
   // method can be called only once on an uninitialized proxy
   // (CreateVTKObjects() also initialized a proxy)
   virtual void InitializeWithID(vtkClientServerID id);
+
+  // Description:
+  // Initializes this proxy with a new id referring to the same object on the
+  // server as of the given id already created server
+  // side object. Make sure to set Servers before calling this method.
+  // This method will call CreateVTKObjects() on all sub-proxies. This
+  // method can be called only once on an uninitialized proxy
+  // (CreateVTKObjects() also initialized a proxy)
+  virtual void InitializeAndCopyFromID(vtkClientServerID id);
 //ETX
 
 protected:
@@ -542,6 +551,7 @@ protected:
 
   // Description:
   // Remove a property from the list.
+  // If selfOnly is true, this method will not traverse into the subproxies.
   void RemoveProperty(const char* name);
 
   // Description:

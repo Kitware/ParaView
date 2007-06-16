@@ -15,21 +15,23 @@
 #include "vtkSMRepresentationStrategy.h"
 
 #include "vtkCommand.h"
+#include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVRenderModuleHelper.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkMemberFunctionCommand.h"
+#include "vtkSMRenderViewProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.8");
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.8.4.1");
 //----------------------------------------------------------------------------
 vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 {
   this->UseCache = false;
   this->UseLOD = false;
   this->Input = 0;
-  this->ViewHelperProxy = 0;
+  this->ViewInformation = 0;
   this->EnableLOD = false;
   this->EnableCaching = true;
  
@@ -42,6 +44,11 @@ vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
   this->Information = vtkPVDataInformation::New();
   this->InformationValid = false;
 
+  vtkMemberFunctionCommand<vtkSMRepresentationStrategy>* command =
+    vtkMemberFunctionCommand<vtkSMRepresentationStrategy>::New();
+  command->SetCallback(*this,
+    &vtkSMRepresentationStrategy::ProcessViewInformation);
+  this->Observer = command;
 
   this->SomethingCached = false;
 }
@@ -50,30 +57,37 @@ vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 vtkSMRepresentationStrategy::~vtkSMRepresentationStrategy()
 {
   this->SetInput(0);
-  this->SetViewHelperProxy(0);
+  this->SetViewInformation(0);
 
   this->LODInformation->Delete();
   this->Information->Delete();
+
+  this->Observer->Delete();
+  this->Observer = 0;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRepresentationStrategy::SetViewHelperProxy(vtkSMProxy* viewHelper)
+void vtkSMRepresentationStrategy::SetViewInformation(vtkInformation* info)
 {
-  vtkSetObjectBodyMacro(ViewHelperProxy, vtkSMProxy, viewHelper);
+  if (this->ViewInformation)
+    {
+    this->ViewInformation->RemoveObserver(this->Observer);
+    }
 
-  // Get the current values from the view helper.
-  this->ViewHelperModified();
+  vtkSetObjectBodyMacro(ViewInformation, vtkInformation, info);
+
+  if (info)
+    {
+    this->ViewInformation->AddObserver(vtkCommand::ModifiedEvent,
+      this->Observer);
+    // Get the current values from the view helper.
+    this->ProcessViewInformation();
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMRepresentationStrategy::MarkModified(vtkSMProxy* modifiedProxy)
 {
-  if (modifiedProxy == this->ViewHelperProxy)
-    {
-    this->ViewHelperModified();
-    return;
-    }
-
   // If properties on the strategy itself are modified, then we are assuming
   // that the pipeline inside the strategy will get affected.
   // This is generally the case since a strategy does not include any
@@ -229,8 +243,11 @@ void vtkSMRepresentationStrategy::SetInput(vtkSMSourceProxy* input)
 
   this->CreatePipeline(this->Input);
 
-  // LOD pipeline is created irrespective of if EnableLOD is true.
-  this->CreateLODPipeline(this->Input);
+  // LOD pipeline is created only if EnableLOD is true.
+  if (this->EnableLOD)
+    {
+    this->CreateLODPipeline(this->Input);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -271,33 +288,32 @@ void vtkSMRepresentationStrategy::Connect(vtkSMProxy* producer,
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRepresentationStrategy::ViewHelperModified()
+void vtkSMRepresentationStrategy::ProcessViewInformation()
 {
-  if (!this->ViewHelperProxy)
+  if (this->ViewInformation->Has(vtkSMRenderViewProxy::USE_LOD()))
     {
-    return;
+    this->SetUseLOD(
+      this->ViewInformation->Get(vtkSMRenderViewProxy::USE_LOD()));
+    }
+  else
+    {
+    vtkErrorMacro("Missing Key: USE_LOD()");
     }
 
-  vtkSMIntVectorProperty* ivp;
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ViewHelperProxy->GetProperty("UseLOD"));
-  if (ivp && ivp->GetNumberOfElements() == 1)
+  if (this->ViewInformation->Has(vtkSMRenderViewProxy::USE_CACHE()))
     {
-    this->SetUseLOD(ivp->GetElement(0) == 1);
+    this->SetUseCache(
+      this->ViewInformation->Get(vtkSMRenderViewProxy::USE_CACHE()));
+    }
+  else
+    {
+    vtkErrorMacro("Missing Key: USE_CACHE()");
     }
 
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ViewHelperProxy->GetProperty("UseCache"));
-  if (ivp && ivp->GetNumberOfElements() == 1)
+  if (this->ViewInformation->Has(vtkSMRenderViewProxy::LOD_RESOLUTION()))
     {
-    this->SetUseCache(ivp->GetElement(0) == 1);
-    }
-
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ViewHelperProxy->GetProperty("LODResolution"));
-  if (ivp && ivp->GetNumberOfElements() == 1)
-    {
-    this->SetLODResolution(ivp->GetElement(0));
+    this->SetLODResolution(
+      this->ViewInformation->Get(vtkSMRenderViewProxy::LOD_RESOLUTION()));
     }
 }
 
@@ -307,7 +323,6 @@ void vtkSMRepresentationStrategy::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "EnableLOD: " << this->EnableLOD << endl;
   os << indent << "EnableCaching: " << this->EnableCaching << endl;
-  os << indent << "ViewHelperProxy: " << this->ViewHelperProxy << endl;
 }
 
 

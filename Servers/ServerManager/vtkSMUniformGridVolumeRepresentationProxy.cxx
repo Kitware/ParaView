@@ -31,7 +31,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUniformGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.4.2.1");
+vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.4.2.2");
 //----------------------------------------------------------------------------
 vtkSMUniformGridVolumeRepresentationProxy::vtkSMUniformGridVolumeRepresentationProxy()
 {
@@ -96,20 +96,21 @@ bool vtkSMUniformGridVolumeRepresentationProxy::InitializeStrategy(vtkSMViewProx
     return false;
     }
 
-  this->AddStrategy(strategy);
 
-  strategy->SetEnableLOD(false);
-
-  // Creates the strategy objects.
-  strategy->UpdateVTKObjects();
 
   // Now initialize the data pipelines involving this strategy.
   // Since representations are not added to views unless their input is set, we
   // can assume that the objects for this proxy have been created.
   // (Look at vtkSMDataRepresentationProxy::AddToView()).
 
+  strategy->SetEnableLOD(false);
   this->Connect(this->GetInputProxy(), strategy, "Input");
   this->Connect(strategy->GetOutput(), this->VolumeFixedPointRayCastMapper);
+
+
+  // Creates the strategy objects.
+  strategy->UpdateVTKObjects();
+  this->AddStrategy(strategy);
 
   return this->Superclass::InitializeStrategy(view);
 }

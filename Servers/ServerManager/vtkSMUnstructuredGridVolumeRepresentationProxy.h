@@ -125,10 +125,6 @@ protected:
   virtual void DetermineVolumeSupport();
 
   // Description:
-  // Set up the vtkUnstructuredGrid (Volume) rendering pipeline.
-  virtual void SetupVolumePipeline();
-
-  // Description:
   // Get information about extensions from the view.
   void UpdateRenderViewExtensions(vtkSMViewProxy*);
   
@@ -139,6 +135,7 @@ protected:
   vtkSMProxy* VolumeBunykMapper;
   vtkSMProxy* VolumeZSweepMapper;
   vtkSMProxy* VolumeDummyMapper;
+  vtkSMProxy* VolumeLODMapper;
 
   // Common volume rendering classes
   vtkSMProxy* VolumeActor;

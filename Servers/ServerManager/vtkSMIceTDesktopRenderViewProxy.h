@@ -42,14 +42,6 @@ public:
   vtkGetMacro(SquirtLevel, int);
 
   // Description:
-  // In mutlview configurations, all the render views must share the same
-  // instance of the server-side render sync manager. 
-  // Use this method to set that shared
-  // instance. It must be set before calling CreateVTKObjects() on the view
-  // proxy.
-  void SetSharedServerRenderSyncManager(vtkSMProxy*);
-
-  // Description:
   // Overridden to pass the GUISize to the RenderSyncManager.
   virtual void SetGUISize(int x, int y);
 
@@ -57,6 +49,12 @@ public:
   // Overridden to pass the ViewPosition to the RenderSyncManager.
   virtual void SetViewPosition(int x, int y);
 
+  // Description:
+  // In multiview setups, some viewmodules may share certain objects with each
+  // other. This method is used in such cases to give such views an opportunity
+  // to share those objects.
+  // Default implementation is empty.
+  virtual void InitializeForMultiView(vtkSMViewProxy* otherView);
 //BTX
 protected:
   vtkSMIceTDesktopRenderViewProxy();
@@ -99,7 +97,7 @@ protected:
 
   // RenderManager managing client-server rendering.
   vtkSMProxy* RenderSyncManager;
-  vtkSMProxy* SharedServerRenderSyncManager;
+  vtkClientServerID SharedServerRenderSyncManagerID;
 
   int SquirtLevel;
 

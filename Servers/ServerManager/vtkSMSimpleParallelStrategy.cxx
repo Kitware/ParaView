@@ -15,10 +15,12 @@
 #include "vtkSMSimpleParallelStrategy.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkInformation.h"
 #include "vtkMPIMoveData.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMIceTCompositeViewProxy.h"
 #include "vtkSMSourceProxy.h"
 
 inline int vtkSMSimpleParallelStrategyGetInt(vtkSMProxy* proxy, 
@@ -37,7 +39,7 @@ inline int vtkSMSimpleParallelStrategyGetInt(vtkSMProxy* proxy,
 }
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.3");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.3.4.1");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
@@ -51,11 +53,14 @@ vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 
   this->UseCompositing = false;
   this->UseOrderedCompositing = false;
+
+  this->KdTree = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::~vtkSMSimpleParallelStrategy()
 {
+  this->SetKdTree(0);
 }
 
 //----------------------------------------------------------------------------
@@ -84,11 +89,27 @@ void vtkSMSimpleParallelStrategy::CreateVTKObjects()
   this->PreDistributorSuppressor->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
   this->Distributor->SetServers(vtkProcessModule::RENDER_SERVER);
 
-  this->CollectLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
-  this->PreDistributorSuppressorLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
-  this->DistributorLOD->SetServers(vtkProcessModule::RENDER_SERVER);
+  if (this->CollectLOD && this->PreDistributorSuppressorLOD &&
+    this->DistributorLOD)
+    {
+    this->CollectLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+    this->PreDistributorSuppressorLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+    this->DistributorLOD->SetServers(vtkProcessModule::RENDER_SERVER);
+    }
+  else
+    {
+    this->SetEnableLOD(false);
+    }
 
   this->Superclass::CreateVTKObjects();
+
+  this->UpdatePieceInformation(this->PreDistributorSuppressor);
+  if (this->GetEnableLOD())
+    {
+    this->UpdatePieceInformation(this->PreDistributorSuppressorLOD);
+    }
+
+  this->SetKdTree(this->KdTree);
 }
 
 //----------------------------------------------------------------------------
@@ -142,21 +163,10 @@ void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
   this->Connect(predistributorsuppressor, distributor);
 
   // On Render Server, the Distributor is connected to the input of the
-  // UpdateSuppressor. Since there are not distributors on the client
+  // UpdateSuppressor. Since there are no distributors on the client
   // (or data server), we directly connect the PreDistributorSuppressor to the
   // UpdateSuppressor on the client and data server.
-  stream  << vtkClientServerStream::Invoke
-          << distributor->GetID() 
-          << "GetOutputPort" << 0
-          << vtkClientServerStream::End;
-  stream  << vtkClientServerStream::Invoke
-          << updatesuppressor->GetID()
-          << "SetInputConnection" << 0 
-          << vtkClientServerStream::LastResult
-          << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
 
-  // Now send to the dataserver/client
   stream  << vtkClientServerStream::Invoke
           << predistributorsuppressor->GetID()
           << "GetOutputPort" << 0
@@ -168,6 +178,21 @@ void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID,
     vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
+
+  // Now send to the render server.
+  // This order of sending first to CLIENT|DATA_SERVER and then to render server
+  // ensures that the connections are set up correctly even when data server and
+  // render server are the same.
+  stream  << vtkClientServerStream::Invoke
+          << distributor->GetID() 
+          << "GetOutputPort" << 0
+          << vtkClientServerStream::End;
+  stream  << vtkClientServerStream::Invoke
+          << updatesuppressor->GetID()
+          << "SetInputConnection" << 0 
+          << vtkClientServerStream::LastResult
+          << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
 
   // Now we need to set up some default parameters on these filters.
 
@@ -321,29 +346,55 @@ void vtkSMSimpleParallelStrategy::SetUseCompositing(bool compositing)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleParallelStrategy::ViewHelperModified()
+void vtkSMSimpleParallelStrategy::SetKdTree(vtkSMProxy* proxy)
 {
-  if (!this->ViewHelperProxy)
+  vtkSetObjectBodyMacro(KdTree, vtkSMProxy, proxy);
+
+  if (this->Distributor)
     {
-    return;
+    this->Connect(proxy, this->Distributor, "PKdTree");
     }
 
-  vtkSMIntVectorProperty* ivp;
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ViewHelperProxy->GetProperty("UseCompositing"));
-  if (ivp && ivp->GetNumberOfElements() == 1)
+  if (this->DistributorLOD)
     {
-    this->SetUseCompositing(ivp->GetElement(0) == 1);
+    this->Connect(proxy, this->Distributor, "PKdTree");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSimpleParallelStrategy::ProcessViewInformation()
+{
+  if (this->ViewInformation->Has(vtkSMRenderViewProxy::USE_COMPOSITING()))
+    {
+    this->SetUseCompositing(
+      this->ViewInformation->Get(vtkSMRenderViewProxy::USE_COMPOSITING()));
+    }
+  else
+    {
+    vtkErrorMacro("Missing Key: USE_COMPOSITING()");
     }
 
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ViewHelperProxy->GetProperty("UseOrderedCompositing"));
-  if (ivp && ivp->GetNumberOfElements() == 1)
+ if (this->ViewInformation->Has(vtkSMRenderViewProxy::USE_ORDERED_COMPOSITING()))
     {
-    this->SetUseOrderedCompositing(ivp->GetElement(0) == 1);
+    this->SetUseOrderedCompositing(
+      this->ViewInformation->Get(vtkSMRenderViewProxy::USE_ORDERED_COMPOSITING()));
+    }
+  else
+    {
+    vtkErrorMacro("Missing Key: USE_ORDERED_COMPOSITING()");
     }
 
-  this->Superclass::ViewHelperModified();
+  if (this->ViewInformation->Has(vtkSMIceTCompositeViewProxy::KD_TREE()))
+    {
+    this->SetKdTree(vtkSMProxy::SafeDownCast(
+        this->ViewInformation->Get(vtkSMIceTCompositeViewProxy::KD_TREE())));
+    }
+  else
+    {
+    vtkErrorMacro("Missing Key: KD_TREE()");
+    }
+
+  this->Superclass::ProcessViewInformation();
 }
 
 //----------------------------------------------------------------------------

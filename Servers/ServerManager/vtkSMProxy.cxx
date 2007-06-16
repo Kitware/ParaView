@@ -37,7 +37,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.95");
+vtkCxxRevisionMacro(vtkSMProxy, "1.95.2.1");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -1072,6 +1072,25 @@ void vtkSMProxy::InitializeAndCopyFromProxy(vtkSMProxy* fromP)
   this->InitializeWithID(newid);
 }
 
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::InitializeAndCopyFromID(vtkClientServerID id)
+{
+  if (this->ObjectsCreated)
+    {
+    return;
+    }
+
+  vtkClientServerStream stream;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerID newid = pm->GetUniqueID();
+  stream  << vtkClientServerStream::Assign
+          << newid
+          << id
+          << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
+  this->InitializeWithID(newid);
+}
 
 //---------------------------------------------------------------------------
 void vtkSMProxy::CreateVTKObjects()

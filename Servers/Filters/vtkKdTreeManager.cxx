@@ -29,7 +29,7 @@ class vtkKdTreeManager::vtkAlgorithmSet :
   public vtkstd::set<vtkSmartPointer<vtkAlgorithm> > {};
 
 vtkStandardNewMacro(vtkKdTreeManager);
-vtkCxxRevisionMacro(vtkKdTreeManager, "1.2");
+vtkCxxRevisionMacro(vtkKdTreeManager, "1.2.4.1");
 vtkCxxSetObjectMacro(vtkKdTreeManager, StructuredProducer, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkKdTreeManager, KdTree, vtkPKdTree);
 //----------------------------------------------------------------------------
@@ -99,17 +99,6 @@ void vtkKdTreeManager::Update()
   // Update all inputs.
   for (iter = this->Producers->begin(); iter != this->Producers->end(); ++iter)
     {
-    /*
-    if (vtkPVUpdateSuppressor::SafeDownCast(iter->GetPointer()))
-      {
-      vtkPVUpdateSuppressor::SafeDownCast(iter->GetPointer())->ForceUpdate();
-      }
-    else
-      {
-      iter->GetPointer()->Update();
-      }
-      */
-
     vtkDataSet*output = vtkDataSet::SafeDownCast(
       iter->GetPointer()->GetOutputDataObject(0));
     if (output)
@@ -121,19 +110,13 @@ void vtkKdTreeManager::Update()
 
   if (this->StructuredProducer)
     {
-    /*
-    if (vtkPVUpdateSuppressor::SafeDownCast(this->StructuredProducer))
+    vtkDataSet* output = vtkDataSet::SafeDownCast(
+      this->StructuredProducer->GetOutputDataObject(0));
+    if (output)
       {
-      vtkPVUpdateSuppressor::SafeDownCast(this->StructuredProducer)->ForceUpdate();
+      outputs.push_back(output);
+      update_required |= (output->GetMTime() > this->UpdateTime);
       }
-    else
-      {
-      this->StructuredProducer->Update();
-      }
-      */
-    update_required |= (
-      this->StructuredProducer->GetOutputDataObject(0)->GetMTime() > 
-      this->UpdateTime);
     }
 
   if (!update_required)
@@ -147,6 +130,7 @@ void vtkKdTreeManager::Update()
     this->KdTree->AddDataSet(*dsIter);
     }
 
+  cout << "Building Locator: " ;
   if (this->StructuredProducer)
     {
     // Ask the vtkKdTreeGenerator to generate the cuts for the kd tree.
@@ -155,14 +139,15 @@ void vtkKdTreeManager::Update()
     generator->SetNumberOfPieces(this->NumberOfPieces);
     generator->BuildTree(this->StructuredProducer->GetOutputDataObject(0));
     generator->Delete();
+    cout << "Using vtkKdTreeGenerator" << endl;
     }
   else
     {
     // Ensure that the kdtree is not using predefined cuts.
     this->KdTree->SetCuts(0);
+    cout << endl;
     }
 
-  cout << "Building Locator: " << endl;
   this->KdTree->BuildLocator();
   this->UpdateTime.Modified();
 }

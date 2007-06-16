@@ -76,12 +76,12 @@ void pqServer::disconnect(pqServer* server)
   // For now, ensure that the render module is deleted before the connection is broken.
   // Eventually, the vtkSMProxyManager will support a close connection method
   // which will do proper connection proxy cleanup.
-  if (server->RenderModule)
+  if (server->MultiViewFactory)
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    pxm->UnRegisterProxy("multirendermodule", 
-      server->RenderModule->GetSelfIDAsString(), server->RenderModule);
-    server->RenderModule = NULL;
+    pxm->UnRegisterProxy("renderviewfactory", 
+      server->MultiViewFactory->GetSelfIDAsString(), server->MultiViewFactory);
+    server->MultiViewFactory= NULL;
     }
   vtkProcessModule::GetProcessModule()->Disconnect(
     server->GetConnectionID());
@@ -116,11 +116,11 @@ pqServer::~pqServer()
     }
     */
 
-  if (this->RenderModule)
+  if (this->MultiViewFactory)
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    pxm->UnRegisterProxy("multirendermodule", 
-      this->RenderModule->GetSelfIDAsString(), this->RenderModule);
+    pxm->UnRegisterProxy("renderviewfactory", 
+      this->MultiViewFactory->GetSelfIDAsString(), this->MultiViewFactory);
     }
   this->ConnectionID = vtkProcessModuleConnectionManager::GetNullConnectionID();
 
@@ -171,6 +171,7 @@ void pqServer::createMultiViewFactory()
  vtkSMMultiViewFactory* factory = vtkSMMultiViewFactory::SafeDownCast(
    pxm->NewProxy("newviews", "MultiViewFactory"));
   factory->SetConnectionID(this->ConnectionID);
+  pxm->RegisterProxy("renderviewfactory", factory->GetSelfIDAsString(), factory);
 
   const char* renderViewName = 0;
   if (!this->isRemote())

@@ -25,7 +25,7 @@
 #include "vtkSMProxyLink.h"
 
 vtkStandardNewMacro(vtkSMPropRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPropRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMPropRepresentationProxy, "1.3.2.1");
 //----------------------------------------------------------------------------
 vtkSMPropRepresentationProxy::vtkSMPropRepresentationProxy()
 {
@@ -166,7 +166,7 @@ void vtkSMPropRepresentationProxy::GetActiveStrategies(
   this->Superclass::GetActiveStrategies(activeStrategies);
   if (this->SelectionRepresentation && this->GetSelectionSupported())
     {
-    this->SelectionRepresentation->GetActiveStrategies(activeStrategies);
+    // this->SelectionRepresentation->GetActiveStrategies(activeStrategies);
     }
 }
 

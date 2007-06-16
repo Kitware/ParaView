@@ -5519,6 +5519,7 @@ The Level Scalars filter uses colors to show levels of a hierarchical dataset.
         <EnumerationDomain name="enum">
           <Entry value="0" text="PolyData" />
           <Entry value="4" text="Unstructured Grid" />
+          <Entry value="6" text="ImageData" />
         </EnumerationDomain>
         <Documentation>
           Specify the type of the dataset.

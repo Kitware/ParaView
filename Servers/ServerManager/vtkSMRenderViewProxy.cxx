@@ -54,6 +54,8 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtkInformation.h"
+#include "vtkInformationIntegerKey.h"
 
 #include "vtkSMClientServerRenderModuleProxy.h"
 
@@ -80,8 +82,14 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.15.2.1");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.15.2.2");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
+
+vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_LOD, Integer);
+vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_COMPOSITING, Integer);
+vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_ORDERED_COMPOSITING, Integer);
+vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_CACHE, Integer);
+vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
 
 //-----------------------------------------------------------------------------
 vtkSMRenderViewProxy::vtkSMRenderViewProxy()
@@ -114,6 +122,10 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
   this->LODThreshold = 0.0;
 
   this->OpenGLExtensionsInformation = 0;
+
+  this->SetUseLOD(false);
+  this->SetLODResolution(50);
+  this->Information->Set(USE_CACHE(), 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -394,32 +406,27 @@ void vtkSMRenderViewProxy::SetUseLight(int enable)
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::SetLODResolution(int res)
+{
+  this->Information->Set(LOD_RESOLUTION(), res);
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMRenderViewProxy::GetLODResolution()
+{
+  return this->Information->Get(LOD_RESOLUTION());
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::SetUseLOD(bool use_lod)
 {
-  if (this->ViewHelper)
-    {
-    SetIntVectorProperty(this->ViewHelper, "UseLOD", use_lod? 1 : 0);
-    this->ViewHelper->UpdateProperty("UseLOD");
-    }
+  this->Information->Set(USE_LOD(), use_lod);
 }
 
 //-----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::GetUseLOD()
 {
-  if (this->ViewHelper)
-    {
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->ViewHelper->GetProperty("UseLOD"));
-    if (!ivp)
-      {
-      vtkErrorMacro("Failed to find property UseLOD on ViewHelper.");
-      return false;
-      }
-
-    return (ivp->GetElement(0) > 0);
-    }
-
-  return false;
+  return this->Information->Get(USE_LOD());
 }
 
 //-----------------------------------------------------------------------------
@@ -437,7 +444,7 @@ void vtkSMRenderViewProxy::BeginInteractiveRender()
   bool using_lod = this->GetUseLOD();
 
   // Determine if we are using LOD or not.
-  if (this->ViewHelper && this->GetLODDecision())
+  if (this->GetLODDecision())
     {
     this->SetUseLOD(true);
     if (!using_lod)

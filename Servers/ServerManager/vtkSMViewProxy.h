@@ -32,6 +32,7 @@
 
 class vtkCollection;
 class vtkCommand;
+class vtkInformation;
 class vtkSMRepresentationProxy;
 class vtkSMRepresentationStrategy;
 
@@ -120,6 +121,13 @@ public:
   // Returns a new proxy.
   virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy*);
 
+  // Description:
+  // In multiview setups, some viewmodules may share certain objects with each
+  // other. This method is used in such cases to give such views an opportunity
+  // to share those objects.
+  // Default implementation is empty.
+  virtual void InitializeForMultiView(vtkSMViewProxy* vtkNotUsed(otherView)) {}
+
 //BTX
 protected:
   vtkSMViewProxy();
@@ -184,7 +192,7 @@ protected:
   vtkCommand* GetObserver();
 
   // Description:
-  // Initializes ViewHelper, if any.
+  // Called to create the vtk objects.
   virtual void CreateVTKObjects();
 
   // Description:
@@ -207,19 +215,12 @@ protected:
   // Collection of representation objects added to this view.
   vtkCollection* Representations;
 
+  // Information object used to keep rendering specific information.
+  // It is passed to the representations added to the view.
+  vtkInformation* Information;
+
   int GUISize[2];
   int ViewPosition[2];
-
-  // Description:
-  // View helper is used to pass certain view specific information to the
-  // representations added to the view. This may include things like whether LOD
-  // is current being used for rendering, whether caching is enabled etc etc.
-  // By default no ViewHelper is used, however subclasses can define a
-  // subproxy with name "ViewHelper" and it will be used as the view helper for
-  // this view. It will be passed to the strategies created by this view as
-  // well as to any representations added to this view (provided they have
-  // a proxy property name "ViewHelper").
-  vtkSMProxy* ViewHelper;
 
   // Can be set to true in BeginInteractiveRender() or BeginStillRender() is the
   // representations are modified by these methods. This flag is reset at the

@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODVolume);
-vtkCxxRevisionMacro(vtkPVLODVolume, "1.10");
+vtkCxxRevisionMacro(vtkPVLODVolume, "1.10.6.1");
 vtkCxxSetObjectMacro(vtkPVLODVolume, RenderModuleHelper, vtkPVRenderModuleHelper);
 
 //----------------------------------------------------------------------------
@@ -280,7 +280,7 @@ void vtkPVLODVolume::SetLODMapper(vtkMapper *mapper)
   if (mapper)
     {
     vtkProperty *property = vtkProperty::New();
-    property->SetOpacity(0.5);
+    //property->SetOpacity(0.5);
     this->LowLODId = this->LODProp->AddLOD(mapper, property, 0.0);
     property->Delete();
     this->UpdateLODProperty();

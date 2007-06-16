@@ -15,28 +15,30 @@
 #include "vtkSMIceTCompositeViewProxy.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkCollection.h"
+#include "vtkCollectionIterator.h"
+#include "vtkIceTRenderManager.h"
+#include "vtkInformation.h"
+#include "vtkInformationObjectBaseKey.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDisplayInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkRenderWindow.h"
+#include "vtkSMDataRepresentationProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSimpleParallelStrategy.h"
-#include "vtkCollectionIterator.h"
-#include "vtkCollection.h"
-#include "vtkSMRepresentationStrategyVector.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMRepresentationStrategyVector.h"
+#include "vtkSMSimpleParallelStrategy.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMDataRepresentationProxy.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.6");
-vtkCxxSetObjectMacro(vtkSMIceTCompositeViewProxy, SharedMultiViewManager, vtkSMProxy);
-vtkCxxSetObjectMacro(vtkSMIceTCompositeViewProxy, SharedParallelRenderManager, vtkSMProxy);
-vtkCxxSetObjectMacro(vtkSMIceTCompositeViewProxy, SharedRenderWindow, vtkSMProxy);
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.6.4.1");
+
+vtkInformationKeyMacro(vtkSMIceTCompositeViewProxy, KD_TREE, ObjectBase);
 //----------------------------------------------------------------------------
 vtkSMIceTCompositeViewProxy::vtkSMIceTCompositeViewProxy()
 {
@@ -48,27 +50,58 @@ vtkSMIceTCompositeViewProxy::vtkSMIceTCompositeViewProxy()
   this->ImageReductionFactor = 1;
   this->CompositeThreshold = 20.0;
 
-  this->SharedParallelRenderManager = 0;
-  this->SharedMultiViewManager = 0;
-  this->SharedRenderWindow = 0;
-
   this->DisableOrderedCompositing  = 0;
 
   this->TileDimensions[0] = this->TileDimensions[1] = 1;
   this->TileMullions[0] = this->TileMullions[1] = 0;
 
+  this->LastCompositingDecision = false;
+  this->LastOrderedCompositingDecision = false;
+
   this->ActiveStrategyVector = new vtkSMRepresentationStrategyVector();
+
+  this->Information->Set(KD_TREE(), 0);
 }
 
 //----------------------------------------------------------------------------
 vtkSMIceTCompositeViewProxy::~vtkSMIceTCompositeViewProxy()
 {
-  this->SetSharedMultiViewManager(0);
-  this->SetSharedParallelRenderManager(0);
-  this->SetSharedRenderWindow(0);
-
   delete this->ActiveStrategyVector;
   this->ActiveStrategyVector=0;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMIceTCompositeViewProxy::InitializeForMultiView(vtkSMViewProxy* view)
+{
+  vtkSMIceTCompositeViewProxy* otherView =
+    vtkSMIceTCompositeViewProxy::SafeDownCast(view);
+  if (!otherView)
+    {
+    vtkErrorMacro("Other view must be a vtkSMIceTCompositeViewProxy.");
+    return;
+    }
+
+  if (this->ObjectsCreated)
+    {
+    vtkErrorMacro("InitializeForMultiView must be called before CreateVTKObjects.");
+    return;
+    }
+
+  otherView->UpdateVTKObjects();
+
+  this->SharedParallelRenderManagerID = 
+    otherView->SharedParallelRenderManagerID.IsNull()?
+    otherView->ParallelRenderManager->GetID():
+    otherView->SharedParallelRenderManagerID; 
+
+  this->SharedMultiViewManagerID = otherView->SharedMultiViewManagerID.IsNull()?
+    (otherView->MultiViewManager? otherView->MultiViewManager->GetID() : 0) : 
+    otherView->SharedMultiViewManagerID; 
+
+  this->SharedRenderWindowID = otherView->SharedRenderWindowID.IsNull()?
+    otherView->RenderWindowProxy->GetID() : otherView->SharedRenderWindowID;
+
+  this->Superclass::InitializeForMultiView(view);
 }
 
 //----------------------------------------------------------------------------
@@ -79,10 +112,8 @@ bool vtkSMIceTCompositeViewProxy::BeginCreateVTKObjects()
     return false;
     }
 
-  this->MultiViewManager = this->SharedMultiViewManager?
-    this->SharedMultiViewManager : this->GetSubProxy("MultiViewManager");
-  this->ParallelRenderManager = this->SharedParallelRenderManager?
-    this->SharedParallelRenderManager: this->GetSubProxy("ParallelRenderManager");
+  this->MultiViewManager = this->GetSubProxy("MultiViewManager");
+  this->ParallelRenderManager = this->GetSubProxy("ParallelRenderManager");
 
   this->KdTree = this->GetSubProxy("KdTree");
   this->KdTreeManager = this->GetSubProxy("KdTreeManager");
@@ -119,16 +150,29 @@ bool vtkSMIceTCompositeViewProxy::BeginCreateVTKObjects()
   this->KdTree->SetServers(vtkProcessModule::RENDER_SERVER);
   this->KdTreeManager->SetServers(vtkProcessModule::RENDER_SERVER);
 
-  if (this->SharedRenderWindow && !this->RenderWindowProxy->GetObjectsCreated())
+  if (!this->SharedRenderWindowID.IsNull() && 
+    !this->RenderWindowProxy->GetObjectsCreated())
     {
-    // FIXME: can't simply replace the ptr, since we want the exposed properties
-    // to go the correct render window.
-
-    // This code simply replaces the render window to use the shared render
-    // window (which is the case w/o client-server. However subclasses may want to
-    // fix this to create a new render window instance on the client.
-    this->RenderWindowProxy = this->SharedRenderWindow;
+    // Share the render window.
+    this->RenderWindowProxy->InitializeAndCopyFromID(
+      this->SharedRenderWindowID);
     }
+
+  if (!this->SharedParallelRenderManagerID.IsNull() &&
+    !this->ParallelRenderManager->GetObjectsCreated())
+    {
+    this->ParallelRenderManager->InitializeAndCopyFromID(
+      this->SharedParallelRenderManagerID);
+    }
+
+  if (!this->SharedMultiViewManagerID.IsNull() &&
+    !this->MultiViewManager->GetObjectsCreated())
+    {
+    this->MultiViewManager->InitializeAndCopyFromID(
+      this->SharedMultiViewManagerID);
+    }
+
+  this->Information->Set(KD_TREE(), this->KdTree);
 
   return true;
 }
@@ -196,7 +240,7 @@ void vtkSMIceTCompositeViewProxy::EndCreateVTKObjects()
     }
   this->ParallelRenderManager->UpdateVTKObjects();
 
-  if (!this->SharedParallelRenderManager)
+  if (this->SharedParallelRenderManagerID.IsNull())
     {
     // If SharedParallelRenderManager is set, then we assume that the controller
     // on the parallel render manager has been initialized by the one who own
@@ -478,21 +522,9 @@ void vtkSMIceTCompositeViewProxy::SetUseCompositing(bool usecompositing)
     this->ParallelRenderManager->UpdateProperty("UseCompositing");
     } 
 
-  // We need to make all representation strategies aware of our compositing
-  // decision. To do that, we set it on the ViewHelper. All strategies use
-  // ViewHelper to get LOD or Compositing decisions made by the view.
-  if (this->ViewHelper)
-    {
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->ViewHelper->GetProperty("UseCompositing"));
-    if (!ivp)
-      {
-      vtkErrorMacro("Failed to find property CompositingFlag on ViewHelper.");
-      return;
-      }
-    ivp->SetElement(0, (usecompositing? 1 : 0));
-    this->ViewHelper->UpdateProperty("CompositingFlag");
-    }
+  // Update the view information so that all representations/strategies will be
+  // made aware of the new UseCompositing state.
+  this->Information->Set(USE_COMPOSITING(), usecompositing? 1: 0);
 }
 
 //----------------------------------------------------------------------------
@@ -519,6 +551,12 @@ void vtkSMIceTCompositeViewProxy::UpdateOrderedCompositingPipeline()
     }
   iter->Delete();
 
+  vtkSMProxyProperty* ppProducers = vtkSMProxyProperty::SafeDownCast(
+    this->KdTreeManager->GetProperty("Producers"));
+
+  vtkSMProxyProperty* ppStructuredProducer = vtkSMProxyProperty::SafeDownCast(
+    this->KdTreeManager->GetProperty("StructuredProducer"));
+
   // If ordered compositing is disabled or no representation requires ordered
   // compositing or if we are doing a local render we don't need ordered
   // compositing. Hence we tell all the strategies so.
@@ -529,18 +567,23 @@ void vtkSMIceTCompositeViewProxy::UpdateOrderedCompositingPipeline()
     // distributor.
     this->SetOrderedCompositingDecision(false);
     this->ActiveStrategyVector->clear();
+
+    // Clean references to strategy outputs kept by the KdTreeManager.
+    ppProducers->RemoveAllProxies();
+    if (ppStructuredProducer->GetNumberOfProxies() > 0 &&
+      ppStructuredProducer->GetProxy(0))
+      {
+      ppStructuredProducer->RemoveAllProxies();
+      ppStructuredProducer->AddProxy(0);
+      }
+    this->KdTreeManager->UpdateVTKObjects();
     return;
     }
 
   // We've decided that we need ordered compositing.
 
   // Update the data inputs to the KdTreeManager and ask it to update.
-  vtkSMProxyProperty* ppProducers = vtkSMProxyProperty::SafeDownCast(
-    this->KdTreeManager->GetProperty("Producers"));
   ppProducers->RemoveAllProxies();
-
-  vtkSMProxyProperty* ppStructuredProducer = vtkSMProxyProperty::SafeDownCast(
-    this->KdTreeManager->GetProperty("StructuredProducer"));
   ppStructuredProducer->RemoveAllProxies();
   ppStructuredProducer->AddProxy(0);
 
@@ -553,6 +596,10 @@ void vtkSMIceTCompositeViewProxy::UpdateOrderedCompositingPipeline()
       {
       ppStructuredProducer->RemoveAllProxies();
       ppStructuredProducer->AddProxy(strategyIter->GetPointer()->GetOutput());
+      
+      // Essential to update the representation, so that the
+      // KdTree generator gets the updated data to use when generating the
+      // KdTree.
       strategyIter->GetPointer()->Update();
       }
     else
@@ -576,11 +623,43 @@ void vtkSMIceTCompositeViewProxy::UpdateOrderedCompositingPipeline()
 //----------------------------------------------------------------------------
 void vtkSMIceTCompositeViewProxy::SetOrderedCompositingDecision(bool decision)
 {
-  // Iterate over all active strategies and pass the decision to them.
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ViewHelper->GetProperty("UseOrderedCompositing"));
-  ivp->SetElement(0, decision? 1 : 0);
-  this->ViewHelper->UpdateVTKObjects();
+  this->Information->Set(USE_ORDERED_COMPOSITING(), decision? 1 : 0);
+
+  if (this->LastOrderedCompositingDecision == decision)
+    {
+    return;
+    }
+  this->LastOrderedCompositingDecision = decision;
+
+  // Cannot do this with the server manager because this method only
+  // exists on the render server, not the client.
+  vtkClientServerStream stream;
+  stream  << vtkClientServerStream::Invoke << this->RendererProxy->GetID()
+          << "SetComposeOperation"
+          << (decision? vtkIceTRenderManager::ComposeOperationOver :
+            vtkIceTRenderManager::ComposeOperationClosest)
+          << vtkClientServerStream::End;
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMIceTCompositeViewProxy::RemoveRepresentationInternal(
+  vtkSMRepresentationProxy* repr)
+{
+  // Clean inputs going to the KdTreeManager so that we don't keep references to
+  // algorithms in the strategies used by the representation being removed.
+  vtkSMProxyProperty* ppProducers = vtkSMProxyProperty::SafeDownCast(
+    this->KdTreeManager->GetProperty("Producers"));
+  ppProducers->RemoveAllProxies();
+
+  vtkSMProxyProperty* ppStructuredProducer = vtkSMProxyProperty::SafeDownCast(
+    this->KdTreeManager->GetProperty("StructuredProducer"));
+  ppStructuredProducer->RemoveAllProxies();
+  ppStructuredProducer->AddProxy(0);
+  this->KdTreeManager->UpdateVTKObjects();
+
+  this->Superclass::RemoveRepresentationInternal(repr);
 }
 
 //----------------------------------------------------------------------------

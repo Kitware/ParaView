@@ -25,7 +25,7 @@
 #include "vtkSMViewProxy.h"
 
 vtkStandardNewMacro(vtkSMOutlineRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMOutlineRepresentationProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMOutlineRepresentationProxy, "1.4.2.1");
 //----------------------------------------------------------------------------
 vtkSMOutlineRepresentationProxy::vtkSMOutlineRepresentationProxy()
 {
@@ -56,12 +56,8 @@ bool vtkSMOutlineRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
     return false;
     }
 
-  this->AddStrategy(strategy);
 
   strategy->SetEnableLOD(false);
-
-  // Creates the strategy objects.
-  strategy->UpdateVTKObjects();
 
   // Now initialize the data pipelines involving this strategy.
   // Since representations are not added to views unless their input is set, we
@@ -70,6 +66,10 @@ bool vtkSMOutlineRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
 
   strategy->SetInput(this->OutlineFilter);
   this->Connect(strategy->GetOutput(), this->Mapper);
+  this->AddStrategy(strategy);
+
+  // Creates the strategy objects.
+  strategy->UpdateVTKObjects();
 
   return this->Superclass::InitializeStrategy(view);
 }

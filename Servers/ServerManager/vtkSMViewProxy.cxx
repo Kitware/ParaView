@@ -17,6 +17,7 @@
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
+#include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
@@ -51,14 +52,14 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.8.4.1");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.8.4.2");
 //----------------------------------------------------------------------------
 vtkSMViewProxy::vtkSMViewProxy()
 {
   this->Representations = vtkCollection::New();
   this->Observer = vtkSMViewProxy::Command::New();
   this->Observer->SetTarget(this);
-  this->ViewHelper = 0;
+  this->Information = vtkInformation::New();
 
   this->GUISize[0] = this->GUISize[1] = 300;
   this->ViewPosition[0] = this->ViewPosition[1] = 0;
@@ -84,6 +85,9 @@ vtkSMViewProxy::~vtkSMViewProxy()
   this->Representations->Delete();
 
   this->SetDefaultRepresentationName(0);
+
+  this->Information->Clear();
+  this->Information->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -92,17 +96,6 @@ void vtkSMViewProxy::CreateVTKObjects()
   if (this->ObjectsCreated)
     {
     return;
-    }
-
-  if (!this->ViewHelper)
-    {
-    this->ViewHelper = this->GetSubProxy("ViewHelper");
-    }
-
-  if (this->ViewHelper)
-    {
-    this->ViewHelper->SetServers(
-      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
     }
 
   if (!this->BeginCreateVTKObjects())
@@ -161,13 +154,11 @@ void vtkSMViewProxy::AddRepresentationInternal(vtkSMRepresentationProxy* repr)
 {
   this->InvalidateDataSizes();
 
-  if (this->ViewHelper && repr->GetProperty("ViewHelper"))
-    {
-    // Provide th representation with the helper if it needs it.
-    this->Connect(this->ViewHelper, repr, "ViewHelper");
-    }
+  // Pass the view information to the representation.
+  repr->SetViewInformation(this->Information);
 
   this->Representations->AddItem(repr);
+
   // If representation is modified, we invalidate the data information.
   repr->AddObserver(vtkCommand::ModifiedEvent, this->Observer);
 
@@ -192,18 +183,10 @@ void vtkSMViewProxy::RemoveRepresentationInternal(vtkSMRepresentationProxy* repr
 {
   this->InvalidateDataSizes();
 
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    repr->GetProperty("ViewHelper"));
-  if (pp)
-    {
-    pp->RemoveAllProxies();
-    repr->UpdateProperty("ViewHelper");
-    }
+  repr->SetViewInformation(0);
 
   this->Representations->RemoveItem(repr);
   repr->RemoveObserver(this->Observer);
-
-  // repr->RemoveObserver(this->Observer);
 }
 
 //----------------------------------------------------------------------------
@@ -368,11 +351,13 @@ vtkSMRepresentationStrategy* vtkSMViewProxy::NewStrategy(int dataType)
 {
   vtkSMRepresentationStrategy* strategy = 
     this->NewStrategyInternal(dataType);
-  if (strategy && this->ViewHelper)
+
+  if (strategy)
     {
-    // Pass the view helper to the strategy.
-    this->Connect(this->ViewHelper, strategy, "ViewHelper");
+    // Pass the view information to the strategy.
+    strategy->SetViewInformation(this->Information);
     }
+
   return strategy;
 }
 

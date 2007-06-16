@@ -24,6 +24,8 @@
 
 #include "vtkSMProxy.h"
 
+class vtkSMViewProxy;
+
 class VTK_EXPORT vtkSMMultiViewFactory : public vtkSMProxy
 {
 public:
@@ -43,7 +45,7 @@ public:
   // Returns a render view of the type appropriate for multiple views.
   // There is always one renderview per view. Only local rendering
   // and IceT supports this.
-  vtkSMProxy* NewRenderView();
+  vtkSMViewProxy* NewRenderView();
 
   // Description:
   // Don't use these methods directly,
@@ -52,8 +54,8 @@ public:
   // leads to a call to these methods to add/remove the proxy which gets 
   // added/removed as a subproxy. We have a property for the render views 
   // so that the operation is undo/redo able.
-  void AddRenderView(vtkSMProxy*);
-  void RemoveRenderView(vtkSMProxy*);
+  void AddRenderView(vtkSMViewProxy*);
+  void RemoveRenderView(vtkSMViewProxy*);
 
   // Description:
   // Returns the total number of views known to this factory.
@@ -61,7 +63,7 @@ public:
  
   // Description:
   // Returns the view at the given index.
-  vtkSMProxy* GetRenderView(unsigned int i);
+  vtkSMViewProxy* GetRenderView(unsigned int i);
 //BTX
 protected:
   vtkSMMultiViewFactory();

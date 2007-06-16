@@ -15,6 +15,7 @@
 #include "vtkSMIceTDesktopRenderViewProxy.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDisplayInformation.h"
@@ -23,21 +24,45 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.4");
-vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderViewProxy, 
-  SharedServerRenderSyncManager, vtkSMProxy);
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.4.4.1");
 //----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderViewProxy::vtkSMIceTDesktopRenderViewProxy()
 {
   this->RenderSyncManager = 0;
-  this->SharedServerRenderSyncManager = 0;
   this->SquirtLevel = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderViewProxy::~vtkSMIceTDesktopRenderViewProxy()
 {
-  this->SetSharedServerRenderSyncManager(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMIceTDesktopRenderViewProxy::InitializeForMultiView(
+  vtkSMViewProxy* view)
+{
+  vtkSMIceTDesktopRenderViewProxy* otherView =
+    vtkSMIceTDesktopRenderViewProxy::SafeDownCast(view);
+  if (!otherView)
+    {
+    vtkErrorMacro("Other view must be a vtkSMIceTDesktopRenderViewProxy.");
+    return;
+    }
+
+  if (this->ObjectsCreated)
+    {
+    vtkErrorMacro("InitializeForMultiView must be called before CreateVTKObjects.");
+    return;
+    }
+
+  otherView->UpdateVTKObjects();
+
+  this->SharedServerRenderSyncManagerID =
+    otherView->SharedServerRenderSyncManagerID.IsNull()?
+    otherView->RenderSyncManager->GetID():
+    otherView->SharedServerRenderSyncManagerID;
+
+  this->Superclass::InitializeForMultiView(view);
 }
 
 //----------------------------------------------------------------------------
@@ -50,7 +75,7 @@ bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects()
   // window directly, however, in client-server mode, we share the render
   // windows only on the server side. Hence we create client side instances for
   // the render window.
-  if (this->SharedRenderWindow)
+  if (!this->SharedRenderWindowID.IsNull())
     {
     this->RenderWindowProxy = this->GetSubProxy("RenderWindow");
     if (!this->RenderWindowProxy)
@@ -64,7 +89,7 @@ bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects()
 
     stream  << vtkClientServerStream::Assign
             << this->RenderWindowProxy->GetID()
-            << this->SharedRenderWindow->GetID()
+            << this->SharedRenderWindowID
             << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
 
@@ -86,7 +111,7 @@ bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects()
 
   // RenderSyncManager proxy represents vtkPVDesktopDeliveryClient on the client
   // side and vtkPVDesktopDeliveryServer on the server root.
-  // Additionally, if SharedServerRenderSyncManager is set, then the server side
+  // Additionally, if SharedServerRenderSyncManagerID is set, then the server side
   // vtkPVDesktopDeliveryServer instance is shared among all views.
   
   // XML Configuration defines the client side class for RenderSyncManager.
@@ -94,11 +119,11 @@ bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects()
   this->RenderSyncManager->UpdateVTKObjects();
   // This will create the client side  vtkPVDesktopDeliveryClient.
   
-  if (this->SharedServerRenderSyncManager)
+  if (!this->SharedServerRenderSyncManagerID.IsNull())
     {
-    stream  << vtkClientServerStream::Invoke
+    stream  << vtkClientServerStream::Assign
             << this->RenderSyncManager->GetID()
-            << this->SharedServerRenderSyncManager->GetID()
+            << this->SharedServerRenderSyncManagerID
             << vtkClientServerStream::End;
     }
   else
@@ -232,7 +257,7 @@ void vtkSMIceTDesktopRenderViewProxy::InitializeRenderSyncManager()
     vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
     pm->GatherInformation(this->ConnectionID,
       vtkProcessModule::RENDER_SERVER, di, pm->GetProcessModuleID());
-    if (!di->GetCanOpenDisplay())
+    if (di->GetCanOpenDisplay())
       {
       this->RenderSyncManager->InvokeCommand("InitializeOffScreen");
       }
@@ -329,21 +354,9 @@ void vtkSMIceTDesktopRenderViewProxy::SetUseCompositing(bool usecompositing)
     this->RenderSyncManager->UpdateProperty("UseCompositing");
     } 
 
-  // We need to make all representation strategies aware of our compositing
-  // decision. To do that, we set it on the ViewHelper. All strategies use
-  // ViewHelper to get LOD or Compositing decisions made by the view.
-  if (this->ViewHelper)
-    {
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->ViewHelper->GetProperty("UseCompositing"));
-    if (!ivp)
-      {
-      vtkErrorMacro("Failed to find property CompositingFlag on ViewHelper.");
-      return;
-      }
-    ivp->SetElement(0, (usecompositing? 1 : 0));
-    this->ViewHelper->UpdateProperty("CompositingFlag");
-    }
+  // Update the view information so that all representations/strategies will be
+  // made aware of the new UseCompositing state.
+  this->Information->Set(USE_COMPOSITING(), usecompositing? 1: 0);
 }
 
 //----------------------------------------------------------------------------

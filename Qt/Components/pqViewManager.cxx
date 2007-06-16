@@ -843,7 +843,7 @@ bool pqViewManager::eventFilter(QObject* caller, QEvent* e)
     }
   else if (e->type() == QEvent::Resize)
     {
-    // Update WindowPosition and GUISize properties on all view modules.
+    // Update ViewPosition and GUISize properties on all view modules.
     this->updateViewPositions(); 
     }
   return QObject::eventFilter(caller, e);
@@ -873,12 +873,12 @@ void pqViewManager::updateViewPositions()
     totalBounds |= bounds;
     }
 
-  /// GUISize and WindowPosition properties are managed
+  /// GUISize and ViewPosition properties are managed
   /// by the GUI, the undo/redo stack should not worry about 
   /// the changes made to them.
   emit this->beginNonUndoableChanges();
 
-  // Now we loop thorough all view modules and set the GUISize/WindowPosition.
+  // Now we loop thorough all view modules and set the GUISize/ViewPosition.
   foreach(pqView* view, this->Internal->Frames)
     {
     vtkSMIntVectorProperty* prop = 0;
@@ -893,7 +893,7 @@ void pqViewManager::updateViewPositions()
 
     // position relative to the bounds of all views
     prop = vtkSMIntVectorProperty::SafeDownCast(
-      view->getProxy()->GetProperty("WindowPosition"));
+      view->getProxy()->GetProperty("ViewPosition"));
     if(prop)
       {
       QPoint view_pos = view->getWidget()->mapToGlobal(QPoint(0,0));

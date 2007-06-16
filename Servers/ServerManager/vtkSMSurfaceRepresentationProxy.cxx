@@ -35,7 +35,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.11.2.1");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.11.2.2");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -80,21 +80,21 @@ bool vtkSMSurfaceRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
     return false;
     }
 
-  this->AddStrategy(strategy);
-
-  strategy->SetEnableLOD(true);
-
-  // Creates the strategy objects.
-  strategy->UpdateVTKObjects();
-
   // Now initialize the data pipelines involving this strategy.
   // Since representations are not added to views unless their input is set, we
   // can assume that the objects for this proxy have been created.
   // (Look at vtkSMDataRepresentationProxy::AddToView()).
 
+  strategy->SetEnableLOD(true);
+
   this->Connect(this->GeometryFilter, strategy);
   this->Connect(strategy->GetOutput(), this->Mapper);
   this->Connect(strategy->GetLODOutput(), this->LODMapper);
+
+  // Creates the strategy objects.
+  strategy->UpdateVTKObjects();
+
+  this->AddStrategy(strategy);
 
   return this->Superclass::InitializeStrategy(view);
 }

@@ -139,7 +139,7 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
       }
     }
 
-  qDebug() << "Could not determine pqProxy type: " << proxy->GetXMLName() << endl;
+  // qDebug() << "Could not determine pqProxy type: " << proxy->GetXMLName() << endl;
   return 0;
 }
 
