@@ -54,7 +54,7 @@ protected:
 };
 
 
-vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.4.2.1");
 vtkCxxSetObjectMacro(vtkSMDataRepresentationProxy, InputProxy, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMDataRepresentationProxy::vtkSMDataRepresentationProxy()
@@ -86,6 +86,12 @@ vtkSMDataRepresentationProxy::~vtkSMDataRepresentationProxy()
 
   this->Observer->SetTarget(0);
   this->Observer->Delete();
+}
+
+//----------------------------------------------------------------------------
+vtkCommand* vtkSMDataRepresentationProxy::GetObserver()
+{
+  return this->Observer;
 }
 
 //----------------------------------------------------------------------------

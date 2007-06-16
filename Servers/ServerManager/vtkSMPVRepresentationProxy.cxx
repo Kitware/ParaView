@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMPVRepresentationProxy.h"
 
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty.h"
 #include "vtkSMIntVectorProperty.h"
@@ -33,7 +34,7 @@ inline void vtkSMPVRepresentationProxySetInt(
 }
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.1.2.2");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -99,7 +100,21 @@ bool vtkSMPVRepresentationProxy::EndCreateVTKObjects()
     this->VolumeRepresentation->SetSelectionSupported(false);
     }
 
-  // TODO: Add observer to fire StartEvent/EndEvent.
+  // Fire start/end events fired by the representations so that the world knows
+  // that the representation has been updated,
+  vtkCommand* observer = this->GetObserver();
+  this->SurfaceRepresentation->AddObserver(vtkCommand::StartEvent, observer);
+  this->SurfaceRepresentation->AddObserver(vtkCommand::EndEvent, observer);
+
+  this->OutlineRepresentation->AddObserver(vtkCommand::StartEvent, observer);
+  this->OutlineRepresentation->AddObserver(vtkCommand::EndEvent, observer);
+
+  if (this->VolumeRepresentation)
+    {
+    this->VolumeRepresentation->AddObserver(vtkCommand::StartEvent, observer);
+    this->VolumeRepresentation->AddObserver(vtkCommand::EndEvent, observer);
+    }
+
 
   // Setup the ActiveRepresentation pointer.
   int repr = this->Representation;
