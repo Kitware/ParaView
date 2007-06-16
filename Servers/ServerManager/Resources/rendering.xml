@@ -1025,10 +1025,20 @@
           <Group name="mappers" />
         </ProxyGroupDomain>
       </ProxyProperty>
+
       <ProxyProperty name="RenderModuleHelper"
         command="SetRenderModuleHelper"
         is_internal="1">
+        <!-- Obsolete -->
       </ProxyProperty>
+
+      <IntVectorProperty name="EnableLOD"
+        command="SetEnableLOD"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <!-- End of LODActor -->
     </Proxy>
 
@@ -1043,6 +1053,13 @@
         command="SetRenderModuleHelper"
         is_internal="1">
       </ProxyProperty>
+
+      <IntVectorProperty name="EnableLOD"
+        command="SetEnableLOD"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <!-- End of LODVolume -->
     </Proxy>
 
@@ -4674,7 +4691,6 @@
           <Property name="Orientation" />
           <Property name="Origin" />
           <Property name="Position" />
-          <Property name="RenderModuleHelper" exposed_name="ViewHelper" />
           <Property name="Scale" />
           <Property name="Visibility" />
         </ExposedProperties>
@@ -4855,7 +4871,6 @@
           <Property name="Origin" />
           <Property name="Pickable" />
           <Property name="Position" />
-          <Property name="RenderModuleHelper" exposed_name="ViewHelper" />
           <Property name="Scale" />
           <Property name="Visibility" />
         </ExposedProperties>
@@ -5023,7 +5038,6 @@
           <Property name="Origin" />
           <Property name="Pickable" />
           <Property name="Position" />
-          <Property name="RenderModuleHelper" exposed_name="ViewHelper" />
           <Property name="Scale" />
           <Property name="Visibility" />
         </ExposedProperties>
@@ -5157,7 +5171,6 @@
           <Property name="Scale" />
           <Property name="Orientation" />
           <Property name="Origin" />
-          <Property name="RenderModuleHelper" />
           <Property name="Pickable" />
           <Property name="Visibility" />
         </ExposedProperties>
@@ -5347,7 +5360,6 @@
           <Property name="Scale" />
           <Property name="Orientation" />
           <Property name="Origin" />
-          <Property name="RenderModuleHelper" exposed_name="ViewHelper"/>
           <Property name="Pickable" />
           <Property name="Visibility" />
         </ExposedProperties>
@@ -5476,7 +5488,6 @@
           <Property name="Origin" />
           <Property name="Pickable" />
           <Property name="Position" />
-          <Property name="ViewHelper" />
           <Property name="Scale" />
 
           <!-- Property properties -->

@@ -34,7 +34,8 @@ public:
 
   // Description:
   // Called to update the Representation. 
-  // Overridden to ensure to check for OpenGL extensions.
+  // Overridden to ensure to check for OpenGL extensions,
+  // and also so update the EnableLOD flag on the prop based on ViewInformation.
   virtual void Update(vtkSMViewProxy* view);
   virtual void Update() { this->Superclass::Update(); };
 

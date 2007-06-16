@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODVolume);
-vtkCxxRevisionMacro(vtkPVLODVolume, "1.10.6.1");
+vtkCxxRevisionMacro(vtkPVLODVolume, "1.10.6.2");
 vtkCxxSetObjectMacro(vtkPVLODVolume, RenderModuleHelper, vtkPVRenderModuleHelper);
 
 //----------------------------------------------------------------------------
@@ -52,6 +52,7 @@ vtkPVLODVolume::vtkPVLODVolume()
   this->MapperBounds[3] = this->MapperBounds[4] = this->MapperBounds[5] = 0;
 
   this->RenderModuleHelper = 0;
+  this->EnableLOD = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -74,6 +75,11 @@ int vtkPVLODVolume::SelectLOD()
     }
 
   if (this->RenderModuleHelper && this->RenderModuleHelper->GetLODFlag())
+    {
+    return this->LowLODId;
+    }
+
+  if (this->EnableLOD)
     {
     return this->LowLODId;
     }
@@ -360,4 +366,5 @@ void vtkPVLODVolume::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
+  os << indent << "EnableLOD: " << this->EnableLOD << endl;
 }

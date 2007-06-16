@@ -17,6 +17,7 @@
 #include "vtkAbstractMapper.h"
 #include "vtkCollection.h"
 #include "vtkInformation.h"
+#include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
@@ -32,7 +33,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.4.2.2");
+vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.4.2.3");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepresentationProxy()
 {
@@ -80,6 +81,15 @@ void vtkSMUnstructuredGridVolumeRepresentationProxy::Update(vtkSMViewProxy* view
 
   this->DetermineVolumeSupport();
   this->Superclass::Update(view);
+
+  if (this->ViewInformation->Has(vtkSMRenderViewProxy::USE_LOD()))
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->VolumeActor->GetProperty("EnableLOD"));
+    ivp->SetElement(0, 
+      this->ViewInformation->Get(vtkSMRenderViewProxy::USE_LOD()));
+    this->VolumeActor->UpdateProperty("EnableLOD");
+    }
 }
 
 //----------------------------------------------------------------------------

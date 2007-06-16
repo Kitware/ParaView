@@ -83,6 +83,12 @@ public:
   // Get the bounds of the current mapper.
   double *GetBounds();
 
+  // Description:
+  // When set, LODMapper, if present it used, otherwise the regular mapper is
+  // used.
+  vtkSetMacro(EnableLOD, int);
+  vtkGetMacro(EnableLOD, int);
+
 protected:
   vtkPVLODActor();
   ~vtkPVLODActor();

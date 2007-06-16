@@ -29,7 +29,7 @@ class vtkKdTreeManager::vtkAlgorithmSet :
   public vtkstd::set<vtkSmartPointer<vtkAlgorithm> > {};
 
 vtkStandardNewMacro(vtkKdTreeManager);
-vtkCxxRevisionMacro(vtkKdTreeManager, "1.2.4.1");
+vtkCxxRevisionMacro(vtkKdTreeManager, "1.2.4.2");
 vtkCxxSetObjectMacro(vtkKdTreeManager, StructuredProducer, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkKdTreeManager, KdTree, vtkPKdTree);
 //----------------------------------------------------------------------------
@@ -127,7 +127,10 @@ void vtkKdTreeManager::Update()
   this->KdTree->RemoveAllDataSets();
   for (dsIter = outputs.begin(); dsIter != outputs.end(); ++dsIter)
     {
-    this->KdTree->AddDataSet(*dsIter);
+    if ((*dsIter)->GetNumberOfPoints() > 0)
+      {
+      this->KdTree->AddDataSet(*dsIter);
+      }
     }
 
   cout << "Building Locator: " ;

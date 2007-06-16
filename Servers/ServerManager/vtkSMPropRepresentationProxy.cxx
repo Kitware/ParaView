@@ -25,11 +25,15 @@
 #include "vtkSMProxyLink.h"
 
 vtkStandardNewMacro(vtkSMPropRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPropRepresentationProxy, "1.3.2.1");
+vtkCxxRevisionMacro(vtkSMPropRepresentationProxy, "1.3.2.2");
 //----------------------------------------------------------------------------
 vtkSMPropRepresentationProxy::vtkSMPropRepresentationProxy()
 {
   this->SelectionRepresentation = 0;
+
+  // This link is used to link the properties of the representation prop to the 
+  // properties of the selection prop so that they appear to be tranformed
+  // similarly.
   this->SelectionPropLink = vtkSMProxyLink::New();
   this->SelectionPropLink->AddException("LODMapper");
   this->SelectionPropLink->AddException("Mapper");
@@ -166,7 +170,7 @@ void vtkSMPropRepresentationProxy::GetActiveStrategies(
   this->Superclass::GetActiveStrategies(activeStrategies);
   if (this->SelectionRepresentation && this->GetSelectionSupported())
     {
-    // this->SelectionRepresentation->GetActiveStrategies(activeStrategies);
+    this->SelectionRepresentation->GetActiveStrategies(activeStrategies);
     }
 }
 

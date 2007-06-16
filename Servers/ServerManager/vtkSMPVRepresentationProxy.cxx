@@ -33,7 +33,7 @@ inline void vtkSMPVRepresentationProxySetInt(
 }
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.1.2.1");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -51,6 +51,26 @@ vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::~vtkSMPVRepresentationProxy()
 {
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPVRepresentationProxy::SetViewInformation(vtkInformation* info)
+{
+  this->Superclass::SetViewInformation(info);
+  if (this->SurfaceRepresentation)
+    {
+    this->SurfaceRepresentation->SetViewInformation(info);
+    }
+
+  if (this->OutlineRepresentation)
+    {
+    this->OutlineRepresentation->SetViewInformation(info);
+    }
+
+  if (this->VolumeRepresentation)
+    {
+    this->VolumeRepresentation->SetViewInformation(info);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -87,6 +107,10 @@ bool vtkSMPVRepresentationProxy::EndCreateVTKObjects()
   this->SetRepresentation(repr);
 
   this->LinkSelectionProp(this->SurfaceRepresentation);
+
+  // This will pass the ViewInformation to all the representations.
+  this->SetViewInformation(this->ViewInformation);
+
   return this->Superclass::EndCreateVTKObjects();
 }
 

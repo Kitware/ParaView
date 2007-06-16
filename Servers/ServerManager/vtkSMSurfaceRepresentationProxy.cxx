@@ -35,7 +35,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.11.2.2");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.11.2.3");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -139,6 +139,21 @@ bool vtkSMSurfaceRepresentationProxy::EndCreateVTKObjects()
   this->LinkSelectionProp(this->Prop3D);
 
   return this->Superclass::EndCreateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSurfaceRepresentationProxy::Update(vtkSMViewProxy* view)
+{
+  this->Superclass::Update(view);
+
+  if (this->ViewInformation->Has(vtkSMRenderViewProxy::USE_LOD()))
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->Prop3D->GetProperty("EnableLOD"));
+    ivp->SetElement(0, 
+      this->ViewInformation->Get(vtkSMRenderViewProxy::USE_LOD()));
+    this->Prop3D->UpdateProperty("EnableLOD");
+    }
 }
 
 //----------------------------------------------------------------------------

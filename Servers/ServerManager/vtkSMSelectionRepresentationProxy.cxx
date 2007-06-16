@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMSelectionRepresentationProxy.h"
 
+#include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
@@ -24,7 +25,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSelectionRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.1.2.2");
 //----------------------------------------------------------------------------
 vtkSMSelectionRepresentationProxy::vtkSMSelectionRepresentationProxy()
 {
@@ -164,6 +165,21 @@ bool vtkSMSelectionRepresentationProxy::EndCreateVTKObjects()
   this->Prop3D->UpdateProperty("Pickable");
 
   return this->Superclass::EndCreateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSelectionRepresentationProxy::Update(vtkSMViewProxy* view)
+{
+  this->Superclass::Update(view);
+
+  if (this->ViewInformation->Has(vtkSMRenderViewProxy::USE_LOD()))
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->Prop3D->GetProperty("EnableLOD"));
+    ivp->SetElement(0, 
+      this->ViewInformation->Get(vtkSMRenderViewProxy::USE_LOD()));
+    this->Prop3D->UpdateProperty("EnableLOD");
+    }
 }
 
 //----------------------------------------------------------------------------

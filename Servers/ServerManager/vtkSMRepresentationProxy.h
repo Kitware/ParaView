@@ -112,7 +112,7 @@ public:
   // Description:
   // Called to set the view information object.
   // Don't call this directly, it is called by the View.
-  void SetViewInformation(vtkInformation*);
+  virtual void SetViewInformation(vtkInformation*);
   vtkGetObjectMacro(ViewInformation, vtkInformation);
 protected:
   vtkSMRepresentationProxy();
