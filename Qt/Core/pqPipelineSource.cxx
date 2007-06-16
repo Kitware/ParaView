@@ -477,39 +477,6 @@ vtkPVDataInformation* pqPipelineSource::getDataInformation() const
 
   pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
   double time = timekeeper->getTime();
-
-
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-
-  vtkSmartPointer<vtkSMProxy> updateSuppressor;
-  updateSuppressor.TakeReference(pxm->NewProxy("filters", "UpdateSuppressor"));
-  updateSuppressor->SetConnectionID(proxy->GetConnectionID());
-  pqSMAdaptor::setProxyProperty(
-    updateSuppressor->GetProperty("Input"), proxy);
-  pqSMAdaptor::setElementProperty(
-    updateSuppressor->GetProperty("UpdateTime"), time);
-  updateSuppressor->UpdateVTKObjects();
-
-  /// Set number of pieces/piece no information on the update suppressor.
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
-         << vtkClientServerStream::End
-         << vtkClientServerStream::Invoke
-         << updateSuppressor->GetID() << "SetUpdateNumberOfPieces"
-         << vtkClientServerStream::LastResult
-         << vtkClientServerStream::End;
-  stream  << vtkClientServerStream::Invoke
-          << pm->GetProcessModuleID() << "GetPartitionId"
-          << vtkClientServerStream::End
-          << vtkClientServerStream::Invoke
-          << updateSuppressor->GetID() << "SetUpdatePiece"
-          << vtkClientServerStream::LastResult
-          << vtkClientServerStream::End;
-  pm->SendStream(updateSuppressor->GetConnectionID(),
-    updateSuppressor->GetServers(), stream);
-
-  updateSuppressor->InvokeCommand("ForceUpdate");
+  proxy->UpdatePipeline(time);
   return proxy->GetDataInformation();
 }

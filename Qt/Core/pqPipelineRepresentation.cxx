@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMSourceProxy.h"
 
 // Qt includes.
 #include <QList>
@@ -235,7 +236,15 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
   vtkPVDataSetAttributesInformation* attrInfo;
   vtkPVArrayInformation* arrayInfo;
 
+  // Get the time that this representation is going to use.
+  double time = pqSMAdaptor::getElementProperty(
+    repr->GetProperty("UpdateTime")).toDouble();
+
   vtkPVDataInformation* dataInfo = 0;
+  vtkSMSourceProxy* inputProxy = vtkSMSourceProxy::SafeDownCast(
+    this->getInput()->getProxy());
+  inputProxy->UpdatePipeline(time);
+
   dataInfo = this->getInput()->getDataInformation();
 
   // get data set type
@@ -273,7 +282,9 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
         "Outline");
       }
     }
-  
+
+  // Update the representation, so that we can obtain updated data information.
+  repr->Update();
   geomInfo = repr->GetFullResDataInformation();
 
   // Locate input display.
@@ -876,4 +887,6 @@ void pqPipelineRepresentation::onRepresentationChanged()
       }
     this->setColorField(colorFields[0]);
     }
+
+  this->updateLookupTableScalarRange();
 }
