@@ -282,6 +282,7 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
         "Outline");
       }
     }
+  repr->UpdateVTKObjects();
 
   // Update the representation, so that we can obtain updated data information.
   repr->Update();

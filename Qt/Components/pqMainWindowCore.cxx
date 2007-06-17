@@ -641,7 +641,6 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     SIGNAL(finishedAddingServer(pqServer*)),
     this, SLOT(onServerCreationFinished(pqServer*)));
 
-  // FIXME:UDA
   this->connect(core->getServerManagerModel2(),
       SIGNAL(aboutToRemoveServer(pqServer*)),
       this, SLOT(onRemovingServer(pqServer*)));
@@ -1624,8 +1623,7 @@ bool pqMainWindowCore::compareView(
   ostream& output,
   const QString& tempDirectory)
 {
-  /* FIXME:UDA -- make this generic enough to work with all views
-  pqRenderViewModule* renModule = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
+  pqRenderView* renModule = qobject_cast<pqRenderView*>(pqActiveView::instance().current());
 
   if (!renModule)
     {
@@ -1634,7 +1632,7 @@ bool pqMainWindowCore::compareView(
     }
 
   vtkRenderWindow* const render_window = 
-    renModule->getRenderModuleProxy()->GetRenderWindow();
+    renModule->getRenderViewProxy()->GetRenderWindow();
 
   if(!render_window)
     {
@@ -1650,8 +1648,6 @@ bool pqMainWindowCore::compareView(
   renModule->getWidget()->resize(cur_size);
   renModule->render();
   return ret;
-  */
-  return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -2112,12 +2108,10 @@ void pqMainWindowCore::onSaveGeometry(const QStringList& files)
     return;
     }
 
-  /* FIXME:UDA
   if (!mgr->saveGeometry(files[0], view))
     {
     qDebug() << "Animation save geometry failed!";
     }
-    */
 }
 
 //-----------------------------------------------------------------------------
@@ -3559,7 +3553,7 @@ void pqMainWindowCore::resetCenterOfRotationToCenterOfCurrentData()
     qDebug() << "No active source. Cannot reset center of rotation.";
     return;
     }
-  /// FIXME:UDA
+
   pqPipelineRepresentation* repr = qobject_cast<pqPipelineRepresentation*>(
     source->getRepresentation(rm));
   if (!repr)

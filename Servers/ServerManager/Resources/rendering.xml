@@ -5008,7 +5008,7 @@
           vtkOutlineFilter is used to conver non-polydata input to polydata.
         -->
         <Proxy name="OutlineFilter"
-          proxygroup="filters" proxyname="OutlineFilter" />
+          proxygroup="filters" proxyname="GeometryFilter" />
       </SubProxy>
   
       <SubProxy>

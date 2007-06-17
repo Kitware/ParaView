@@ -25,7 +25,7 @@
 #include "vtkSMViewProxy.h"
 
 vtkStandardNewMacro(vtkSMOutlineRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMOutlineRepresentationProxy, "1.4.2.1");
+vtkCxxRevisionMacro(vtkSMOutlineRepresentationProxy, "1.4.2.2");
 //----------------------------------------------------------------------------
 vtkSMOutlineRepresentationProxy::vtkSMOutlineRepresentationProxy()
 {
@@ -108,6 +108,15 @@ bool vtkSMOutlineRepresentationProxy::EndCreateVTKObjects()
   this->Connect(this->Property, this->Prop3D, "Property");
 
   this->LinkSelectionProp(this->Prop3D);
+
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->OutlineFilter->GetProperty("UseOutline"));
+  if (ivp)
+    {
+    ivp->SetElement(0, 1);
+    this->OutlineFilter->UpdateProperty("UseOutline");
+    }
+
 
   return this->Superclass::EndCreateVTKObjects();
 }

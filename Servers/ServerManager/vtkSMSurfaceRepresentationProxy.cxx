@@ -35,7 +35,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.11.2.3");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.11.2.4");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -279,6 +279,9 @@ void vtkSMSurfaceRepresentationProxy::SetColorArrayName(const char* name)
 
   this->Mapper->UpdateVTKObjects();
   this->LODMapper->UpdateVTKObjects();
+
+  // Update specularity.
+  this->UpdateShadingParameters();
 }
 
 //----------------------------------------------------------------------------
@@ -333,6 +336,16 @@ void vtkSMSurfaceRepresentationProxy::UpdateShadingParameters()
     diffuse = 0.0;
     ambient = 1.0;
     specular = 0.0;
+    }
+  else
+    {
+    // Disable specular highlighting is coloring by scalars.
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->Mapper->GetProperty("ScalarVisibility"));
+    if (ivp->GetElement(0))
+      {
+      specular = 0.0;
+      }
     }
 
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
