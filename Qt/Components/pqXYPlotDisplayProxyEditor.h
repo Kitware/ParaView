@@ -46,32 +46,35 @@ public:
   virtual ~pqXYPlotDisplayProxyEditor();
 
 public slots:
-
-  /// Forces a reload of the GUI elements that depend on
-  /// the display proxy.
-  void reloadGUI();
+  /// Reloads the series list from the display.
+  void reloadSeries();
 
 protected slots:
-  void yArraySelectionChanged();
+  /// \brief
+  ///   Sets the line series enabled state.
+  /// \param enabled True if the line series is enabled.
+  void setSeriesEnabled(bool enabled);
 
   /// Called when the attribute mode selection changes.
   void onAttributeModeChanged();
 
   /// Slot to listen to clicks for changing color.
   void onItemClicked(QTreeWidgetItem* item, int column);
+
+  /// \brief
+  ///   Updates the color for the given series index.
+  /// \param index The index of the line series.
+  /// \param color The new series color.
+  void updateItemColor(int index, const QColor &color);
+
 private:
-  
+  pqXYPlotDisplayProxyEditor(const pqXYPlotDisplayProxyEditor&); // Not implemented.
+  void operator=(const pqXYPlotDisplayProxyEditor&); // Not implemented.
+
   /// Set the display whose properties this editor is editing.
   /// This call will raise an error is the display is not
   /// a XYPlotDisplay2 proxy.
   void setDisplay(pqDisplay* display);
-
-
-  pqXYPlotDisplayProxyEditor(const pqXYPlotDisplayProxyEditor&); // Not implemented.
-  void operator=(const pqXYPlotDisplayProxyEditor&); // Not implemented.
-
-  // pushes the item's state to the SM property.
-  void updateSMState();
 
   class pqInternal;
   pqInternal* Internal;

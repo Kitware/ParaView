@@ -46,10 +46,10 @@ class PQCORE_EXPORT pqLineChartDisplay : public pqConsumerDisplay
 {
   Q_OBJECT
   typedef pqConsumerDisplay Superclass;
+
 public:
   pqLineChartDisplay(const QString& group, const QString& name,
-    vtkSMProxy* display, pqServer* server,
-    QObject* parent=0);
+    vtkSMProxy* display, pqServer* server, QObject* parent=0);
   virtual ~pqLineChartDisplay();
 
   /// Sets default values for the underlying proxy. 
@@ -71,32 +71,52 @@ public:
   /// Returns the array used for y axis at the given index.
   vtkDataArray* getYArray(int index);
 
-  /// Returns the number of y axis arrays.
-  int getNumberOfYArrays() const;
+  int getAttributeType() const;
 
-  /// Returns if the y axis array at a particular index is 
-  /// currently enabled for plotting.
-  bool getYArrayEnabled(int index) const;
+  int getNumberOfSeries() const;
 
-  /// Returns the user selected color for the Y array at the given index.
-  QColor getYColor(int index) const;
+  int getSeriesIndex(const QString &name) const;
 
-  /// Returns the enable state for array with the given name.
-  /// If status for such an array is not present on the property,
-  /// returns false.
-  bool getYArrayEnabled(const QString& arrayname) const;
+  bool isSeriesEnabled(int series) const;
+  void setSeriesEnabled(int series, bool enabled);
 
-  /// Returns the color for array with the given name. 
-  /// If no such array is present in the property
-  /// returns a random color.
-  QColor getYColor(const QString& arrayname) const;
+  void getSeriesName(int series, QString &name) const;
+  void setSeriesName(int series, const QString &name);
+
+  void getSeriesColor(int series, QColor &color) const;
+  void setSeriesColor(int series, const QColor &color);
+  bool isSeriesColorSet(int series) const;
+
+  void beginSeriesChanges();
+  void endSeriesChanges();
+
+public slots:
+  void updateSeries();
+  void setAttributeType(int attr);
+
+signals:
+  /// Emitted when the series list has changed.
+  void seriesListChanged();
+
+  /// \brief
+  ///   Emitted when the color for a series has changed.
+  /// \param series The index of the series.
+  void colorChanged(int series, const QColor &color);
+
 protected:
   /// method to set default values for the status property.
   void setStatusDefaults(vtkSMProperty* prop);
 
+private slots:
+  void changeSeriesList();
+
 private:
   pqLineChartDisplay(const pqLineChartDisplay&); // Not implemented.
   void operator=(const pqLineChartDisplay&); // Not implemented.
+
+  int isEnabledByDefault(const QString &arrayName) const;
+
+  void saveSeriesChanges();
 
   class pqInternals;
   pqInternals *Internals;

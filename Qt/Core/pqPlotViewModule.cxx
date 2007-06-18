@@ -67,6 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLineChartDisplay.h"
 #include "pqLineChartModel.h"
 #include "pqLineChartOptions.h"
+#include "pqLineChartSeriesOptions.h"
 #include "pqLineChartWidget.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
@@ -104,7 +105,8 @@ class pqPlotViewModuleLineChartSeries
 {
 public:
   pqPlotViewModuleLineChartSeries();
-  pqPlotViewModuleLineChartSeries(int display, pqVTKLineChartSeries *model);
+  pqPlotViewModuleLineChartSeries(const QString &display,
+      pqVTKLineChartSeries *model);
   pqPlotViewModuleLineChartSeries(
       const pqPlotViewModuleLineChartSeries &other);
   ~pqPlotViewModuleLineChartSeries() {}
@@ -114,8 +116,7 @@ public:
 
 public:
   pqVTKLineChartSeries *Model;
-  int ModelIndex;
-  int DisplayIndex;
+  QString DisplayName;
 };
 
 
@@ -126,12 +127,14 @@ public:
   ~pqPlotViewModuleLineChartItem() {}
 
   bool isUpdateNeeded();
+  bool setDataType(int dataType);
 
 public:
   QPointer<pqLineChartDisplay> Display;
   QList<pqPlotViewModuleLineChartSeries> Series;
   vtkTimeStamp LastUpdateTime;
   vtkTimeStamp ModifiedTime;
+  int DataType;
 };
 
 
@@ -261,34 +264,30 @@ bool pqPlotViewModuleHistogram::isUpdateNeeded()
 
 //----------------------------------------------------------------------------
 pqPlotViewModuleLineChartSeries::pqPlotViewModuleLineChartSeries()
+  : DisplayName()
 {
   this->Model = 0;
-  this->ModelIndex = -1;
-  this->DisplayIndex = -1;
 }
 
-pqPlotViewModuleLineChartSeries::pqPlotViewModuleLineChartSeries(int display,
-    pqVTKLineChartSeries *model)
+pqPlotViewModuleLineChartSeries::pqPlotViewModuleLineChartSeries(
+    const QString &display, pqVTKLineChartSeries *model)
+  : DisplayName(display)
 {
   this->Model = model;
-  this->ModelIndex = -1;
-  this->DisplayIndex = display;
 }
 
 pqPlotViewModuleLineChartSeries::pqPlotViewModuleLineChartSeries(
     const pqPlotViewModuleLineChartSeries &other)
+  : DisplayName(other.DisplayName)
 {
   this->Model = other.Model;
-  this->ModelIndex = other.ModelIndex;
-  this->DisplayIndex = other.DisplayIndex;
 }
 
 pqPlotViewModuleLineChartSeries &pqPlotViewModuleLineChartSeries::operator=(
     const pqPlotViewModuleLineChartSeries &other)
 {
   this->Model = other.Model;
-  this->ModelIndex = other.ModelIndex;
-  this->DisplayIndex = other.DisplayIndex;
+  this->DisplayName = other.DisplayName;
   return *this;
 }
 
@@ -298,18 +297,27 @@ pqPlotViewModuleLineChartItem::pqPlotViewModuleLineChartItem(
     pqLineChartDisplay *display)
   : Display(display), Series(), LastUpdateTime(), ModifiedTime()
 {
+  this->DataType = 0;
 }
 
 bool pqPlotViewModuleLineChartItem::isUpdateNeeded()
 {
-  bool force = false;
-  force = force || 
-      (this->LastUpdateTime <= this->ModifiedTime);
-  force = force || 
-      (this->Display->getClientSideData() &&
-      this->Display->getClientSideData()->GetMTime() > 
-      this->LastUpdateTime);
-  return force;
+  bool updateNeeded = this->LastUpdateTime <= this->ModifiedTime;
+  vtkRectilinearGrid *data = this->Display->getClientSideData();
+  updateNeeded = updateNeeded || (data &&
+      data->GetMTime() > this->LastUpdateTime);
+  return updateNeeded;
+}
+
+bool pqPlotViewModuleLineChartItem::setDataType(int dataType)
+{
+  if(this->DataType != dataType)
+    {
+    this->DataType = dataType;
+    return true;
+    }
+
+  return false;
 }
 
 
@@ -344,103 +352,155 @@ void pqPlotViewModuleLineChart::update(bool force)
     QMap<vtkSMProxy *, pqPlotViewModuleLineChartItem *>::Iterator jter;
     for(jter = this->Displays.begin(); jter != this->Displays.end(); ++jter)
       {
-      // Remove series from the model that are no longer enabled or
-      // visible.
+      if(!(*jter)->isUpdateNeeded() && !force)
+        {
+        continue;
+        }
+
+      // Update the display data.
+      (*jter)->Display->updateSeries();
+      bool typeChanged = (*jter)->setDataType(
+          (*jter)->Display->getAttributeType());
       bool isVisible = (*jter)->Display->isVisible();
-      int total = (*jter)->Display->getNumberOfYArrays();
+      vtkDataArray *yArray = 0;
+      vtkDataArray *xArray = (*jter)->Display->getXArray();
+      if(!xArray && isVisible)
+        {
+        qDebug() << "Failed to locate X array.";
+        }
+
+      // First, remove or update the current model series.
+      QStringList displayNames;
       QList<pqPlotViewModuleLineChartSeries>::Iterator series =
           (*jter)->Series.begin();
       while(series != (*jter)->Series.end())
         {
-        if(!isVisible || series->DisplayIndex >= total ||
-            !(*jter)->Display->getYArrayEnabled(series->DisplayIndex))
+        // Remove the series if the data type has changed, the display
+        // is not visible, or the series is not enabled.
+        int index = (*jter)->Display->getSeriesIndex(series->DisplayName);
+        if(typeChanged || !isVisible ||
+            !(*jter)->Display->isSeriesEnabled(index))
           {
-          // Remove the series from the line chart model.
           this->Model->removeSeries(series->Model);
           delete series->Model;
           series = (*jter)->Series.erase(series);
           }
         else
           {
-          ++series;
+          yArray = (*jter)->Display->getYArray(index);
+          if(!yArray)
+            {
+            qDebug() << "Failed to locate Y array.";
+            }
+
+          if(xArray && yArray)
+            {
+            // Update the arrays and options for the series.
+            series->Model->setDataArrays(xArray, yArray);
+            QColor color;
+            (*jter)->Display->getSeriesColor(index, color);
+            index = this->Model->getIndexOf(series->Model);
+            pqLineChartSeriesOptions *options =
+                this->Layer->getOptions()->getSeriesOptions(index);
+            options->setPen(QPen(color));
+
+            displayNames.append(series->DisplayName);
+            ++series;
+            }
+          else
+            {
+            // Remove the series if the x or y array are null.
+            this->Model->removeSeries(series->Model);
+            delete series->Model;
+            series = (*jter)->Series.erase(series);
+            }
           }
         }
 
-      if(isVisible && (force || (*jter)->isUpdateNeeded()))
+      // Next, add new series to the chart.
+      if(isVisible)
         {
-        (*jter)->LastUpdateTime.Modified();
-        vtkDataArray *xArray = (*jter)->Display->getXArray();
-        if(!xArray)
-          {
-          qDebug() << "Failed to locate X array.";
-          }
-
+        (*jter)->Display->beginSeriesChanges();
         series = (*jter)->Series.begin();
+        int total = (*jter)->Display->getNumberOfSeries();
         for(int i = 0; i < total; i++)
           {
-          if((*jter)->Display->getYArrayEnabled(i))
+          if((*jter)->Display->isSeriesEnabled(i))
             {
-            // The series list should be kept in array order.
-            while(series != (*jter)->Series.end() && series->DisplayIndex < i)
+            QString name;
+            (*jter)->Display->getSeriesName(i, name);
+            if(displayNames.contains(name))
+              {
+              continue;
+              }
+
+            yArray = (*jter)->Display->getYArray(i);
+            if(!xArray || !yArray)
+              {
+              if(!yArray)
+                {
+                qDebug() << "Failed to locate Y array.";
+                }
+
+              continue;
+              }
+
+            // The series list should be kept in alphabetical order.
+            while(series != (*jter)->Series.end() &&
+                series->DisplayName.compare(name) <= 0)
               {
               ++series;
               }
 
-            vtkDataArray *yArray = (*jter)->Display->getYArray(i);
-            if(!yArray)
+            pqPlotViewModuleLineChartSeries *plot = 0;
+            if(series == (*jter)->Series.end())
               {
-              qDebug() << "Failed to locate Y array.";
+              // Add the new or newly enabled series to the end.
+              (*jter)->Series.append(pqPlotViewModuleLineChartSeries(
+                  name, new pqVTKLineChartSeries()));
+              series = (*jter)->Series.end();
+              plot = &(*jter)->Series.last();
+              }
+            else
+              {
+              // Insert the series in the list.
+              series = (*jter)->Series.insert(series,
+                  pqPlotViewModuleLineChartSeries(name,
+                  new pqVTKLineChartSeries()));
+              plot = &(*series);
               }
 
-            if(xArray && yArray)
+            // Set the model arrays.
+            plot->Model->setDataArrays(xArray, yArray);
+
+            // Add the line chart series to the line chart model.
+            int index = this->Model->getNumberOfSeries();
+            this->Model->appendSeries(plot->Model);
+
+            // Update the series options.
+            pqLineChartSeriesOptions *options =
+                this->Layer->getOptions()->getSeriesOptions(index);
+            if((*jter)->Display->isSeriesColorSet(i))
               {
-              if(series == (*jter)->Series.end())
-                {
-                // Add the new or newly enabled series to the end.
-                (*jter)->Series.append(pqPlotViewModuleLineChartSeries(i,
-                    new pqVTKLineChartSeries()));
-                series = (*jter)->Series.end();
-                pqPlotViewModuleLineChartSeries &plot = (*jter)->Series.last();
-
-                // Set the model arrays.
-                plot.Model->setDataArrays(xArray, yArray);
-
-                // Add the line chart series to the line chart model.
-                plot.ModelIndex = this->Model->getNumberOfSeries();
-                this->Model->appendSeries(plot.Model);
-                }
-              else if(series->DisplayIndex == i)
-                {
-                // Update the arrays for the series.
-                series->Model->setDataArrays(xArray, yArray);
-                }
-              else
-                {
-                // Insert the series in the list.
-                series = (*jter)->Series.insert(series,
-                    pqPlotViewModuleLineChartSeries(i,
-                    new pqVTKLineChartSeries()));
-
-                // Set the model arrays.
-                series->Model->setDataArrays(xArray, yArray);
-
-                // Add the line chart series to the line chart model.
-                series->ModelIndex = this->Model->getNumberOfSeries();
-                this->Model->appendSeries(series->Model);
-                }
+              // Update the line color to match the set color.
+              QColor color;
+              (*jter)->Display->getSeriesColor(i, color);
+              options->setPen(QPen(color), 0);
               }
-            else if(series != (*jter)->Series.end() &&
-                series->DisplayIndex == i)
+            else
               {
-              // Remove the series from the line chart since the arrays
-              // are not valid.
-              this->Model->removeSeries(series->Model);
-              delete series->Model;
-              series = (*jter)->Series.erase(series);
+              // Assign the chart selected color to the property.
+              QPen seriesPen;
+              options->getPen(seriesPen);
+              (*jter)->Display->setSeriesColor(i, seriesPen.color());
               }
             }
           }
+
+        (*jter)->Display->endSeriesChanges();
         }
+
+      (*jter)->LastUpdateTime.Modified();
       }
     }
 }

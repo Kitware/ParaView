@@ -98,7 +98,7 @@ pqXYPlotDisplayProxyEditor::pqXYPlotDisplayProxyEditor(pqDisplay* display, QWidg
   this->Internal->AttributeModeAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->AttributeMode);
 
-  QObject::connect(this->Internal->UseYArrayIndex, SIGNAL(toggled(bool)), 
+  QObject::connect(this->Internal->UseArrayIndex, SIGNAL(toggled(bool)), 
     this, SLOT(updateAllViews()), Qt::QueuedConnection);
 
   QObject::connect(this->Internal->XAxisArrayAdaptor,
@@ -124,6 +124,53 @@ pqXYPlotDisplayProxyEditor::~pqXYPlotDisplayProxyEditor()
 }
 
 //-----------------------------------------------------------------------------
+void pqXYPlotDisplayProxyEditor::reloadSeries()
+{
+  this->Internal->YAxisArrays->clear();
+  this->Internal->TreeItems.clear();
+  if(!this->Internal->Display)
+    {
+    return;
+    }
+
+  int total = this->Internal->Display->getNumberOfSeries();
+  for(int i = 0; i < total; i++)
+    {
+    QString seriesName;
+    this->Internal->Display->getSeriesName(i, seriesName);
+    pqTreeWidgetItemObject *item = new pqTreeWidgetItemObject(
+        this->Internal->YAxisArrays, QStringList(seriesName));
+    item->setData(0, Qt::ToolTipRole, seriesName);
+    item->setChecked(this->Internal->Display->isSeriesEnabled(i));
+
+    // Add a column for the color.
+    QColor seriesColor;
+    this->Internal->Display->getSeriesColor(i, seriesColor);
+    QPixmap colorPixmap(16, 16);
+    colorPixmap.fill(seriesColor);
+    item->setData(1, Qt::DecorationRole, colorPixmap);
+    item->setData(1, Qt::UserRole, QVariant(seriesColor));
+    QObject::connect(item,  SIGNAL(checkedStateChanged(bool)),
+      this, SLOT(setSeriesEnabled(bool)));
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqXYPlotDisplayProxyEditor::setSeriesEnabled(bool enabled)
+{
+  // Get the tree widget item from the sender.
+  pqTreeWidgetItemObject *item =
+      qobject_cast<pqTreeWidgetItemObject *>(this->sender());
+  if(item)
+    {
+    int series = this->Internal->Display->getSeriesIndex(
+        item->data(0, Qt::DisplayRole).toString());
+    this->Internal->Display->setSeriesEnabled(series, enabled);
+    this->updateAllViews();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqXYPlotDisplayProxyEditor::setDisplay(pqDisplay* disp)
 {
   pqLineChartDisplay* display = qobject_cast<pqLineChartDisplay*>(disp);
@@ -139,6 +186,10 @@ void pqXYPlotDisplayProxyEditor::setDisplay(pqDisplay* disp)
   this->Internal->TreeItems.clear();
   delete this->Internal->XAxisArrayDomain;
   this->Internal->XAxisArrayDomain = 0;
+  if(this->Internal->Display)
+    {
+    this->disconnect(this->Internal->Display, 0, this, 0);
+    }
 
   this->Internal->Display = display;
   if (!this->Internal->Display)
@@ -162,8 +213,8 @@ void pqXYPlotDisplayProxyEditor::setDisplay(pqDisplay* disp)
     proxy, proxy->GetProperty("Visibility"));
 
   // Setup UseYArrayIndex links.
-  this->Internal->Links.addPropertyLink(this->Internal->UseYArrayIndex,
-    "checked", SIGNAL(stateChanged(int)),
+  this->Internal->Links.addPropertyLink(this->Internal->UseArrayIndex,
+    "checked", SIGNAL(toggled(bool)),
     proxy, proxy->GetProperty("UseYArrayIndex"));
 
   // Attribute mode.
@@ -184,71 +235,13 @@ void pqXYPlotDisplayProxyEditor::setDisplay(pqDisplay* disp)
     "currentText", SIGNAL(currentTextChanged(const QString&)),
     proxy, proxy->GetProperty("XArrayName"));
 
-  this->reloadGUI();
-}
+  this->connect(this->Internal->Display, SIGNAL(seriesListChanged()),
+      this, SLOT(reloadSeries()));
+  this->connect(
+      this->Internal->Display, SIGNAL(colorChanged(int, const QColor &)),
+      this, SLOT(updateItemColor(int, const QColor &)));
 
-//-----------------------------------------------------------------------------
-void pqXYPlotDisplayProxyEditor::reloadGUI()
-{
-  if (!this->Internal->Display)
-    {
-    return;
-    }
-  vtkSMProxy* proxy = this->Internal->Display->getProxy();
-  if (!proxy)
-    {
-    return;
-    }
-  this->Internal->YAxisArrays->clear();
-  this->Internal->TreeItems.clear();
-
-  proxy->GetProperty("Input")->UpdateDependentDomains();
-  proxy->UpdatePropertyInformation();
-  proxy->GetProperty("CellArrayInfo")->UpdateDependentDomains();
-  proxy->GetProperty("PointArrayInfo")->UpdateDependentDomains();
-
-  // Now, build check boxes for y axis array selections. 
-  int attribute_mode = pqSMAdaptor::getElementProperty(
-    proxy->GetProperty("AttributeType")).toInt();
-
-  QPixmap pixmap(attribute_mode == vtkDataObject::FIELD_ASSOCIATION_POINTS?
-    ":/pqWidgets/Icons/pqPointData16.png":":/pqWidgets/Icons/pqCellData16.png");
-
-  vtkSMProperty* smproperty  = proxy->GetProperty(
-    attribute_mode == vtkDataObject::FIELD_ASSOCIATION_POINTS?
-    "YPointArrayStatus" : "YCellArrayStatus");
-  vtkSMArraySelectionDomain* asd = vtkSMArraySelectionDomain::SafeDownCast(
-    smproperty->GetDomain("array_list"));
-
-  // Get the array names available from the domain, however, 
-  // their selection state and color is obtained from the property.
-  
-  int num_y_values = asd->GetNumberOfStrings();
-  for (int cc=0; cc < num_y_values; cc++)
-    {
-    QString arrayname = asd->GetString(cc);
-    QStringList strs;
-    strs.append(arrayname);
-    pqTreeWidgetItemObject* item = new pqTreeWidgetItemObject(
-      this->Internal->YAxisArrays, strs);
-    this->Internal->TreeItems.push_back(item);
-    item->setData(0, Qt::ToolTipRole, arrayname);
-    item->setChecked(this->Internal->Display->getYArrayEnabled(arrayname));
-    item->setData(0, Qt::DecorationRole, pixmap);
-    QColor color = this->Internal->Display->getYColor(arrayname);
-    QPixmap colorPixmap(16, 16);
-    colorPixmap.fill(color);
-    item->setData(1, Qt::DecorationRole, colorPixmap);
-    item->setData(1, Qt::UserRole, QVariant(color));
-    QObject::connect(item,  SIGNAL(checkedStateChanged(bool)),
-      this, SLOT(yArraySelectionChanged()));
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqXYPlotDisplayProxyEditor::yArraySelectionChanged()
-{
-  this->updateSMState();
+  this->reloadSeries();
 }
 
 //-----------------------------------------------------------------------------
@@ -262,60 +255,41 @@ void pqXYPlotDisplayProxyEditor::onAttributeModeChanged()
   at->SetUncheckedElement(0, at->GetElement(0));
   proxy->GetProperty("AttributeType")->UpdateDependentDomains();
 
-  this->reloadGUI();
-  this->updateAllViews();
-}
-
-//-----------------------------------------------------------------------------
-void pqXYPlotDisplayProxyEditor::updateSMState()
-{
-  vtkSMProxy* proxy = this->Internal->Display->getProxy();
-  int attribute_mode = pqSMAdaptor::getElementProperty(
-    proxy->GetProperty("AttributeType")).toInt();
-
-  vtkSMStringVectorProperty* smproperty  = vtkSMStringVectorProperty::SafeDownCast(
-    proxy->GetProperty(
-      attribute_mode == vtkDataObject::FIELD_ASSOCIATION_POINTS?
-      "YPointArrayStatus" : "YCellArrayStatus"));
-
-  QList<QVariant> values;
-  foreach(pqTreeWidgetItemObject* item, this->Internal->TreeItems)
-    {
-    QString arrayName = item->data(0, Qt::ToolTipRole).toString();
-    bool checked = item->isChecked();
-    QColor color = item->data(1, Qt::UserRole).value<QColor>();
-
-    values.push_back(color.redF());
-    values.push_back(color.greenF());
-    values.push_back(color.blueF());
-    values.push_back(checked);
-    values.push_back(arrayName);
-    }
-
-  smproperty->SetNumberOfElements(values.size());
-  pqSMAdaptor::setMultipleElementProperty(smproperty, values);
-  proxy->UpdateVTKObjects();
   this->updateAllViews();
 }
 
 //-----------------------------------------------------------------------------
 void pqXYPlotDisplayProxyEditor::onItemClicked(QTreeWidgetItem* item, int col)
 {
-  if (col != 1)
+  if(col != 1 || !this->Internal->Display)
     {
     // We are interested in clicks on the color swab alone.
     return;
     }
 
-  QColor color = item->data(1, Qt::UserRole).value<QColor>();
+  int series = this->Internal->Display->getSeriesIndex(
+      item->data(0, Qt::DisplayRole).toString());
+  QColor color;
+  this->Internal->Display->getSeriesColor(series, color);
   color = QColorDialog::getColor(color, this);
   if (color.isValid())
+    {
+    this->Internal->Display->setSeriesColor(series, color);
+    this->updateAllViews();
+    }
+}
+
+void pqXYPlotDisplayProxyEditor::updateItemColor(int index,
+    const QColor &color)
+{
+  // Get the item for the given index.
+  QTreeWidgetItem *item = this->Internal->YAxisArrays->topLevelItem(index);
+  if(item)
     {
     QPixmap colorPixmap(16, 16);
     colorPixmap.fill(color);
     item->setData(1, Qt::DecorationRole, colorPixmap);
     item->setData(1, Qt::UserRole, QVariant(color));
-    this->updateSMState();
     }
 }
 

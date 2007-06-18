@@ -31,8 +31,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqLineChartDisplay.h"
 
+#include "pqSMAdaptor.h"
+
+#include <QColor>
+#include <QVector>
+#include <QtDebug>
+
 #include "vtkCellData.h"
 #include "vtkDoubleArray.h"
+#include "vtkEventQtSlotConnect.h"
 #include "vtkMath.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
@@ -40,24 +47,79 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMGenericViewDisplayProxy.h"
 #include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
+#include "vtkSMStringVectorProperty.h"
 
-#include <QColor>
-#include <QtDebug>
 
-#include "pqSMAdaptor.h"
+class pqLineChartDisplayItem
+{
+public:
+  pqLineChartDisplayItem();
+  pqLineChartDisplayItem(const pqLineChartDisplayItem &other);
+  ~pqLineChartDisplayItem () {}
+
+  QString ArrayName;
+  QColor Color;
+  bool Enabled;
+  bool ColorSet;
+};
+
 
 class pqLineChartDisplay::pqInternals
 {
 public:
+  pqInternals();
+  ~pqInternals() {}
+
   vtkSmartPointer<vtkDoubleArray> YIndexArray;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  QVector<pqLineChartDisplayItem> PointSeries;
+  QVector<pqLineChartDisplayItem> CellSeries;
+  QVector<pqLineChartDisplayItem> *Series;
+  int ChangeCount;
+  bool InMultiChange;
 };
+
+
+//-----------------------------------------------------------------------------
+pqLineChartDisplayItem::pqLineChartDisplayItem()
+  : ArrayName(), Color(Qt::white)
+{
+  this->Enabled = false;
+  this->ColorSet = false;
+}
+
+pqLineChartDisplayItem::pqLineChartDisplayItem(
+    const pqLineChartDisplayItem &other)
+  : ArrayName(other.ArrayName), Color(other.Color)
+{
+  this->Enabled = other.Enabled;
+  this->ColorSet = other.ColorSet;
+}
+
+
+//-----------------------------------------------------------------------------
+pqLineChartDisplay::pqInternals::pqInternals()
+  : PointSeries(), CellSeries()
+{
+  this->YIndexArray = vtkSmartPointer<vtkDoubleArray>::New();
+  this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+  this->Series = &this->PointSeries;
+  this->ChangeCount = 0;
+  this->InMultiChange = false;
+}
+
+
 //-----------------------------------------------------------------------------
 pqLineChartDisplay::pqLineChartDisplay(const QString& group, const QString& name,
   vtkSMProxy* display, pqServer* server, QObject* _parent)
 : pqConsumerDisplay(group, name, display, server, _parent)
 {
   this->Internals = new pqInternals();
-  this->Internals->YIndexArray = vtkSmartPointer<vtkDoubleArray>::New();
+
+  // Listen to some property change events.
+  this->Internals->VTKConnect->Connect(display->GetProperty("AttributeType"),
+      vtkCommand::ModifiedEvent, this, SLOT(changeSeriesList()));
 }
 
 //-----------------------------------------------------------------------------
@@ -96,18 +158,16 @@ void pqLineChartDisplay::setStatusDefaults(vtkSMProperty* prop)
 
 
   unsigned int total_size = asd->GetNumberOfStrings();
-  double hue_step = (total_size > 1)?  (1.0 / total_size) : 1.0;
 
   // set point variables.
   for (unsigned int cc=0; cc < total_size; cc++)
     {
-    QColor qcolor;
-    qcolor.setHsvF(cc*hue_step, 1.0, 1.0);
-    values.push_back(QVariant(qcolor.redF()));
-    values.push_back(QVariant(qcolor.greenF()));
-    values.push_back(QVariant(qcolor.blueF()));
-    values.push_back(QVariant(1));
-    values.push_back(asd->GetString(cc));
+    QString arrayname = asd->GetString(cc);
+    values.push_back(QVariant((double)-1.0));
+    values.push_back(QVariant((double)-1.0));
+    values.push_back(QVariant((double)-1.0));
+    values.push_back(QVariant(this->isEnabledByDefault(arrayname)));
+    values.push_back(arrayname);
     }
 
   pqSMAdaptor::setMultipleElementProperty(prop, values);
@@ -172,65 +232,6 @@ vtkDataArray* pqLineChartDisplay::getXArray()
 }
 
 //-----------------------------------------------------------------------------
-int pqLineChartDisplay::getNumberOfYArrays() const
-{
-  vtkSMProxy* proxy = this->getProxy();
-  int attribute_type = pqSMAdaptor::getElementProperty(
-    proxy->GetProperty("AttributeType")).toInt();
-
-  vtkSMProperty* prop = proxy->GetProperty(
-    (attribute_type == vtkDataObject::FIELD_ASSOCIATION_POINTS)?
-    "YPointArrayStatus" : "YCellArrayStatus");
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(prop);
-  return (values.size()/5);
-}
-
-//-----------------------------------------------------------------------------
-bool pqLineChartDisplay::getYArrayEnabled(int index) const
-{
-  vtkSMProxy* proxy = this->getProxy();
-  int attribute_type = pqSMAdaptor::getElementProperty(
-    proxy->GetProperty("AttributeType")).toInt();
-
-  vtkSMProperty* prop = proxy->GetProperty(
-    (attribute_type == vtkDataObject::FIELD_ASSOCIATION_POINTS)?
-    "YPointArrayStatus" : "YCellArrayStatus");
-
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(prop);
-  int actual_index = (index*5 + 3);
-  if (actual_index >= values.size())
-    {
-    qDebug() << "Invalid index: " << index;
-    return 0;
-    }
-  return values[actual_index].toBool();
-}
-
-//-----------------------------------------------------------------------------
-QColor pqLineChartDisplay::getYColor(int index) const
-{
-  vtkSMProxy* proxy = this->getProxy();
-  int attribute_type = pqSMAdaptor::getElementProperty(
-    proxy->GetProperty("AttributeType")).toInt();
-
-  vtkSMProperty* prop = proxy->GetProperty(
-    (attribute_type == vtkDataObject::FIELD_ASSOCIATION_POINTS)?
-    "YPointArrayStatus" : "YCellArrayStatus");
-
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(prop);
-  if ((index*5 + 4) >= values.size())
-    {
-    qDebug() << "Invalid index: " << index;
-    return QColor();
-    }
-  QColor color;
-  color.setRedF(values[5*index+0].toDouble());
-  color.setGreenF(values[5*index+1].toDouble());
-  color.setBlueF(values[5*index+2].toDouble());
-  return color; 
-}
-
-//-----------------------------------------------------------------------------
 vtkDataArray* pqLineChartDisplay::getYArray(int index)
 {
   vtkRectilinearGrid* data = this->getClientSideData();
@@ -265,55 +266,327 @@ vtkDataArray* pqLineChartDisplay::getYArray(int index)
     yarrayname.toAscii().data()) : 0;
 }
 
-//-----------------------------------------------------------------------------
-bool pqLineChartDisplay::getYArrayEnabled(const QString& arrayname) const
+int pqLineChartDisplay::getAttributeType() const
 {
-  vtkSMProxy* proxy = this->getProxy();
-  int attribute_type = pqSMAdaptor::getElementProperty(
-    proxy->GetProperty("AttributeType")).toInt();
+  return pqSMAdaptor::getElementProperty(
+      this->getProxy()->GetProperty("AttributeType")).toInt();
+}
 
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    proxy->GetProperty(
-      (attribute_type == vtkDataObject::FIELD_ASSOCIATION_POINTS)?
-      "YPointArrayStatus" : "YCellArrayStatus"));
+int pqLineChartDisplay::getNumberOfSeries() const
+{
+  return this->Internals->Series->size();
+}
 
-  for (int cc=0; cc+4 < values.size(); cc++)
+int pqLineChartDisplay::getSeriesIndex(const QString &name) const
+{
+  QVector<pqLineChartDisplayItem>::ConstIterator iter =
+      this->Internals->Series->begin();
+  for(int i = 0; iter != this->Internals->Series->end(); ++iter, ++i)
     {
-    if (values[cc+4].toString() == arrayname)
+    if(name == iter->ArrayName)
       {
-      return values[cc+3].toBool();
+      return i;
       }
     }
+
+  return -1;
+}
+
+bool pqLineChartDisplay::isSeriesEnabled(int series) const
+{
+  if(series >= 0 && series < this->Internals->Series->size())
+    {
+    return this->Internals->Series->at(series).Enabled;
+    }
+
   return false;
 }
 
-//-----------------------------------------------------------------------------
-QColor pqLineChartDisplay::getYColor(const QString& arrayname) const
+void pqLineChartDisplay::setSeriesEnabled(int series, bool enabled)
 {
-  vtkSMProxy* proxy = this->getProxy();
-  int attribute_type = pqSMAdaptor::getElementProperty(
-    proxy->GetProperty("AttributeType")).toInt();
-
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    proxy->GetProperty(
-      (attribute_type == vtkDataObject::FIELD_ASSOCIATION_POINTS)?
-      "YPointArrayStatus" : "YCellArrayStatus"));
-
-  for (int cc=0; cc+4 < values.size(); cc++)
+  if(series >= 0 && series < this->Internals->Series->size())
     {
-    if (values[cc+4].toString() == arrayname)
+    pqLineChartDisplayItem *item = &(*this->Internals->Series)[series];
+    if(item->Enabled != enabled)
       {
-      QColor color;
-      color.setRedF(values[cc+0].toDouble());
-      color.setGreenF(values[cc+1].toDouble());
-      color.setBlueF(values[cc+2].toDouble());
-      return color;
+      item->Enabled = enabled;
+      this->Internals->ChangeCount++;
+      if(!item->Enabled && item->ColorSet)
+        {
+        item->ColorSet = false;
+        item->Color = Qt::white;
+        emit this->colorChanged(series, item->Color);
+        }
+
+      if(!this->Internals->InMultiChange)
+        {
+        this->saveSeriesChanges();
+        }
+      }
+    }
+}
+
+void pqLineChartDisplay::getSeriesName(int series, QString &name) const
+{
+  if(series >= 0 && series < this->Internals->Series->size())
+    {
+    name = this->Internals->Series->at(series).ArrayName;
+    }
+}
+
+void pqLineChartDisplay::setSeriesName(int series, const QString &name)
+{
+  if(series >= 0 && series < this->Internals->Series->size())
+    {
+    pqLineChartDisplayItem *item = &(*this->Internals->Series)[series];
+    if(item->ArrayName != name)
+      {
+      item->ArrayName = name;
+      this->Internals->ChangeCount++;
+      if(!this->Internals->InMultiChange)
+        {
+        this->saveSeriesChanges();
+        }
+      }
+    }
+}
+
+void pqLineChartDisplay::getSeriesColor(int series, QColor &color) const
+{
+  if(series >= 0 && series < this->Internals->Series->size())
+    {
+    color = this->Internals->Series->at(series).Color;
+    }
+}
+
+void pqLineChartDisplay::setSeriesColor(int series, const QColor &color)
+{
+  if(series >= 0 && series < this->Internals->Series->size())
+    {
+    pqLineChartDisplayItem *item = &(*this->Internals->Series)[series];
+    if(!item->ColorSet || item->Color != color)
+      {
+      item->ColorSet = true;
+      item->Color = color;
+      this->Internals->ChangeCount++;
+      emit this->colorChanged(series, color);
+      if(!this->Internals->InMultiChange)
+        {
+        this->saveSeriesChanges();
+        }
+      }
+    }
+}
+
+bool pqLineChartDisplay::isSeriesColorSet(int series) const
+{
+  if(series >= 0 && series < this->Internals->Series->size())
+    {
+    return this->Internals->Series->at(series).ColorSet;
+    }
+
+  return false;
+}
+
+void pqLineChartDisplay::beginSeriesChanges()
+{
+  this->Internals->InMultiChange = true;
+}
+
+void pqLineChartDisplay::endSeriesChanges()
+{
+  if(this->Internals->InMultiChange)
+    {
+    this->Internals->InMultiChange = false;
+    this->saveSeriesChanges();
+    }
+}
+
+void pqLineChartDisplay::updateSeries()
+{
+  // Update the domain information.
+  vtkSMProxy *proxy = this->getProxy();
+  proxy->GetProperty("Input")->UpdateDependentDomains();
+  proxy->UpdatePropertyInformation();
+  proxy->GetProperty("CellArrayInfo")->UpdateDependentDomains();
+  proxy->GetProperty("PointArrayInfo")->UpdateDependentDomains();
+
+  bool sendSignal = false;
+  const char *status_name[] = {"YPointArrayStatus", "YCellArrayStatus"};
+  QVector<pqLineChartDisplayItem> *series[] =
+      {&this->Internals->PointSeries, &this->Internals->CellSeries};
+  vtkSMStringVectorProperty *smProperty = 0;
+  vtkSMArraySelectionDomain *arrayDomain = 0;
+  for(int i = 0; i < 2; i++)
+    {
+    smProperty = vtkSMStringVectorProperty::SafeDownCast(
+        proxy->GetProperty(status_name[i]));
+    arrayDomain = vtkSMArraySelectionDomain::SafeDownCast(
+        smProperty->GetDomain("array_list"));
+
+    // Put the array names in a string list for convenience.
+    QStringList arrayNames;
+    int total = arrayDomain->GetNumberOfStrings();
+    for(int j = 0; j < total; j++)
+      {
+      arrayNames.append(arrayDomain->GetString(j));
+      }
+
+    // Get the current status array.
+    QList<QVariant> status =
+        pqSMAdaptor::getMultipleElementProperty(smProperty);
+
+    // Remove the array names not in the domain.
+    bool statusChanged = false;
+    QStringList statusNames;
+    QList<QVariant>::Iterator iter = status.begin();
+    while(iter != status.end())
+      {
+      QList<QVariant>::Iterator rowStart = iter;
+      iter += 4;
+      QString rowName = iter->toString();
+      if(arrayNames.contains(rowName))
+        {
+        statusNames.append(rowName);
+        ++iter;
+        }
+      else
+        {
+        statusChanged = true;
+        iter = status.erase(rowStart, iter + 1);
+        }
+      }
+
+    // Add status rows for the new array names. Make sure the status
+    // array order matches the domain array order.
+    QStringList::Iterator jter = arrayNames.begin();
+    for(int k = 0; jter != arrayNames.end(); ++jter, k += 5)
+      {
+      if(!statusNames.contains(*jter))
+        {
+        statusChanged = true;
+        status.insert(k, *jter);
+        status.insert(k, QVariant(this->isEnabledByDefault(*jter)));
+        status.insert(k, QVariant((double)-1.0));
+        status.insert(k, QVariant((double)-1.0));
+        status.insert(k, QVariant((double)-1.0));
+        }
+      }
+
+    // Save any changes to the status array.
+    if(statusChanged)
+      {
+      smProperty->SetNumberOfElements(status.size());
+      pqSMAdaptor::setMultipleElementProperty(smProperty, status);
+      proxy->UpdateVTKObjects();
+      }
+
+    if(statusChanged || series[i]->size() != arrayNames.size())
+      {
+      if(!sendSignal && series[i] == this->Internals->Series)
+        {
+        sendSignal = true;
+        }
+
+      // Build the series list using the status list. Clear the current
+      // items and make space for the new items.
+      series[i]->clear();
+      series[i]->resize(status.size() / 5);
+
+      // Initialize the item for each of the status rows.
+      QVector<pqLineChartDisplayItem>::Iterator kter = series[i]->begin();
+      for(int ii = 0; kter != series[i]->end(); ++kter, ii += 5)
+        {
+        kter->ArrayName = status[ii + 4].toString();
+        kter->Enabled = status[ii + 3].toInt() != 0;
+        double red = status[ii + 0].toDouble();
+        kter->ColorSet = red >= 0.0;
+        if(kter->ColorSet)
+          {
+          kter->Color.setRedF(red);
+          kter->Color.setGreenF(status[ii + 1].toDouble());
+          kter->Color.setBlueF(status[ii + 2].toDouble());
+          }
+        }
       }
     }
 
-  QColor color;
-  color.setRedF(vtkMath::Random(0,1));
-  color.setGreenF(vtkMath::Random(0,1));
-  color.setBlueF(vtkMath::Random(0,1));
-  return color;
+  if(sendSignal)
+    {
+    emit this->seriesListChanged();
+    }
 }
+
+void pqLineChartDisplay::setAttributeType(int attr)
+{
+  pqSMAdaptor::setElementProperty(
+      this->getProxy()->GetProperty("AttributeType"), QVariant(attr));
+}
+
+void pqLineChartDisplay::changeSeriesList()
+{
+  int attribute_type = pqSMAdaptor::getElementProperty(
+      this->getProxy()->GetProperty("AttributeType")).toInt();
+  QVector<pqLineChartDisplayItem> *newArray =
+      attribute_type == vtkDataObject::FIELD_ASSOCIATION_POINTS ?
+      &this->Internals->PointSeries : &this->Internals->CellSeries;
+  if(this->Internals->Series != newArray)
+    {
+    this->Internals->Series = newArray;
+    emit this->seriesListChanged();
+    }
+}
+
+int pqLineChartDisplay::isEnabledByDefault(const QString &arrayName) const
+{
+  if(arrayName == "BlockId" || arrayName == "GlobalElementId" ||
+      arrayName == "PedigreeElementId")
+    {
+    return 0;
+    }
+
+  return 1;
+}
+
+void pqLineChartDisplay::saveSeriesChanges()
+{
+  if(this->Internals->ChangeCount == 0)
+    {
+    return;
+    }
+
+  this->Internals->ChangeCount = 0;
+  vtkSMProxy *proxy = this->getProxy();
+  vtkSMStringVectorProperty *smProperty =
+      vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty(
+      this->Internals->Series == &this->Internals->PointSeries ?
+      "YPointArrayStatus" : "YCellArrayStatus"));
+
+  QList<QVariant> status;
+  QVector<pqLineChartDisplayItem>::Iterator iter =
+      this->Internals->Series->begin();
+  for( ; iter != this->Internals->Series->end(); ++iter)
+    {
+    if(iter->ColorSet)
+      {
+      status.push_back(QVariant(iter->Color.redF()));
+      status.push_back(QVariant(iter->Color.greenF()));
+      status.push_back(QVariant(iter->Color.blueF()));
+      }
+    else
+      {
+      status.push_back(QVariant((double)-1.0));
+      status.push_back(QVariant((double)-1.0));
+      status.push_back(QVariant((double)-1.0));
+      }
+
+    status.push_back(QVariant(iter->Enabled ? 1 : 0));
+    status.push_back(QVariant(iter->ArrayName));
+    }
+
+  smProperty->SetNumberOfElements(status.size());
+  pqSMAdaptor::setMultipleElementProperty(smProperty, status);
+  proxy->UpdateVTKObjects();
+}
+
+
