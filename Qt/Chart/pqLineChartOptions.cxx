@@ -207,7 +207,6 @@ void pqLineChartOptions::removeSeriesOptions(int first, int last)
     }
 
   // Remove the options from last to first.
-  int index = 0;
   pqLineChartSeriesOptions *options = 0;
   for( ; last >= first; last--)
     {
