@@ -44,6 +44,8 @@ SET(QtChart_SRCS
   pqChartPlugin.h
   pqChartSelectionHelper.cxx
   pqChartSelectionHelper.h
+  pqChartSeriesColorManager.cxx
+  pqChartSeriesColorManager.h
   pqChartSeriesOptionsGenerator.cxx
   pqChartSeriesOptionsGenerator.h
   pqChartTitle.cxx

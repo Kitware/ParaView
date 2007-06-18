@@ -104,10 +104,10 @@ int Histogram(int argc, char* argv[])
   pqCirclePointMarker circle(QSize(3, 3));
   pqLineChartSeriesOptions *options = lineView->getOptions()->getSeriesOptions(0);
   options->setSequenceDependent(true);
-  options->setPen(0, QPen(QColor(Qt::black), 1.0));
-  options->setPen(1, QPen(QColor(Qt::black), 0.5));
-  options->setBrush(1, QBrush(Qt::white));
-  options->setMarker(1, &circle);
+  options->setPen(QPen(QColor(Qt::black), 1.0), 0);
+  options->setPen(QPen(QColor(Qt::black), 0.5), 1);
+  options->setBrush(QBrush(Qt::white), 1);
+  options->setMarker(&circle, 1);
 
   chart->show();
 

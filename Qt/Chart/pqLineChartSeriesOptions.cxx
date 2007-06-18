@@ -103,7 +103,7 @@ pqLineChartSeriesOptions::pqLineChartSeriesOptions(
   this->Internal = new pqLineChartSeriesOptionsInternal();
   this->Internal->UseSameOptions = other.Internal->UseSameOptions;
 
-  // Copy the series options.
+  // Copy the sequence options.
   this->Internal->List.reserve(other.Internal->List.size());
   QVector<pqLineChartSeriesOptionsItem>::Iterator iter =
       other.Internal->List.begin();
@@ -133,7 +133,7 @@ void pqLineChartSeriesOptions::setSequenceDependent(bool dependent)
   this->Internal->UseSameOptions = !dependent;
   if(this->Internal->UseSameOptions && this->Internal->List.size() > 1)
     {
-    // Clean up the extra series options.
+    // Clean up the extra sequence options.
     QVector<pqLineChartSeriesOptionsItem>::Iterator iter =
         this->Internal->List.begin();
     this->Internal->List.erase(++iter, this->Internal->List.end());
@@ -143,97 +143,123 @@ void pqLineChartSeriesOptions::setSequenceDependent(bool dependent)
   emit this->optionsChanged();
 }
 
-void pqLineChartSeriesOptions::setPen(int series, const QPen &pen)
+void pqLineChartSeriesOptions::getPen(QPen &pen, int sequence) const
 {
   if(this->Internal->UseSameOptions)
     {
-    series = 0;
+    sequence = 0;
     }
 
-  if(series < 0)
+  if(sequence >= 0 && sequence < this->Internal->List.size())
+    {
+    pen = this->Internal->List[sequence].Pen;
+    }
+}
+
+void pqLineChartSeriesOptions::setPen(const QPen &pen, int sequence)
+{
+  if(this->Internal->UseSameOptions)
+    {
+    sequence = 0;
+    }
+
+  if(sequence < 0)
     {
     return;
     }
 
-  if(series >= this->Internal->List.size())
+  if(sequence >= this->Internal->List.size())
     {
-    this->Internal->List.resize(series + 1);
+    this->Internal->List.resize(sequence + 1);
     }
 
-  this->Internal->List[series].Pen = pen;
+  this->Internal->List[sequence].Pen = pen;
   emit this->optionsChanged();
 }
 
-void pqLineChartSeriesOptions::setBrush(int series, const QBrush &brush)
+void pqLineChartSeriesOptions::getBrush(QBrush &brush, int sequence) const
 {
   if(this->Internal->UseSameOptions)
     {
-    series = 0;
+    sequence = 0;
     }
 
-  if(series < 0)
+  if(sequence >= 0 && sequence < this->Internal->List.size())
+    {
+    brush = this->Internal->List[sequence].Brush;
+    }
+}
+
+void pqLineChartSeriesOptions::setBrush(const QBrush &brush, int sequence)
+{
+  if(this->Internal->UseSameOptions)
+    {
+    sequence = 0;
+    }
+
+  if(sequence < 0)
     {
     return;
     }
 
-  if(series >= this->Internal->List.size())
+  if(sequence >= this->Internal->List.size())
     {
-    this->Internal->List.resize(series + 1);
+    this->Internal->List.resize(sequence + 1);
     }
 
-  this->Internal->List[series].Brush = brush;
+  this->Internal->List[sequence].Brush = brush;
   emit this->optionsChanged();
 }
 
-void pqLineChartSeriesOptions::setMarker(int series, pqPointMarker *marker)
+pqPointMarker *pqLineChartSeriesOptions::getMarker(int sequence) const
 {
   if(this->Internal->UseSameOptions)
     {
-    series = 0;
+    sequence = 0;
     }
 
-  if(series < 0)
+  if(sequence >= 0 && sequence < this->Internal->List.size())
+    {
+    return this->Internal->List[sequence].Marker;
+    }
+
+  return 0;
+}
+
+void pqLineChartSeriesOptions::setMarker(pqPointMarker *marker, int sequence)
+{
+  if(this->Internal->UseSameOptions)
+    {
+    sequence = 0;
+    }
+
+  if(sequence < 0)
     {
     return;
     }
 
-  if(series >= this->Internal->List.size())
+  if(sequence >= this->Internal->List.size())
     {
-    this->Internal->List.resize(series + 1);
+    this->Internal->List.resize(sequence + 1);
     }
 
-  this->Internal->List[series].Marker = marker;
+  this->Internal->List[sequence].Marker = marker;
   emit this->optionsChanged();
 }
 
 void pqLineChartSeriesOptions::setupPainter(QPainter &painter,
-    int series) const
+    int sequence) const
 {
   if(this->Internal->UseSameOptions)
     {
-    series = 0;
+    sequence = 0;
     }
 
-  if(series >= 0 && series < this->Internal->List.size())
+  if(sequence >= 0 && sequence < this->Internal->List.size())
     {
-    painter.setPen(this->Internal->List[series].Pen);
-    painter.setBrush(this->Internal->List[series].Brush);
+    painter.setPen(this->Internal->List[sequence].Pen);
+    painter.setBrush(this->Internal->List[sequence].Brush);
     }
-}
-
-pqPointMarker *pqLineChartSeriesOptions::getMarker(int series) const
-{
-  if(this->Internal->UseSameOptions)
-    {
-    series = 0;
-    }
-
-  if(series >= 0 && series < this->Internal->List.size())
-    {
-    return this->Internal->List[series].Marker;
-    }
-
-  return 0;
 }
 
 pqLineChartSeriesOptions &pqLineChartSeriesOptions::operator=(
@@ -242,7 +268,7 @@ pqLineChartSeriesOptions &pqLineChartSeriesOptions::operator=(
   this->Internal->UseSameOptions = other.Internal->UseSameOptions;
   this->Internal->List.clear();
 
-  // Copy the series options.
+  // Copy the sequence options.
   this->Internal->List.reserve(other.Internal->List.size());
   QVector<pqLineChartSeriesOptionsItem>::Iterator iter =
       other.Internal->List.begin();

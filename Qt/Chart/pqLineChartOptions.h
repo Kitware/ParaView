@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QtChartExport.h"
 #include <QObject>
 
+class pqChartSeriesColorManager;
 class pqChartSeriesOptionsGenerator;
 class pqLineChartOptionsInternal;
 class pqLineChartSeriesOptions;
@@ -59,6 +60,17 @@ public:
   /// \param parent The parent object.
   pqLineChartOptions(QObject *parent=0);
   virtual ~pqLineChartOptions();
+
+  /// \brief
+  ///   Gets the series color manager.
+  /// \return
+  ///   A pointer to the series color manager.
+  pqChartSeriesColorManager *getSeriesColorManager();
+
+  /// \brief
+  ///   Sets the series color manager.
+  /// \param manager The new series color manager.
+  void setSeriesColorManager(pqChartSeriesColorManager *manager);
 
   /// \breif
   ///   Gets the options generator.
@@ -95,45 +107,45 @@ public slots:
   void clearSeriesOptions();
 
   /// \brief
-  ///   Inserts plot options for the given plots.
+  ///   Inserts options for the given line series.
   ///
-  /// When a new plot options object is added, the options generator
+  /// When a new series options object is added, the options generator
   /// is used to initialize the options. The \c optionsInserted
   /// signal is emitted for each of the new options objects. This
   /// signal can be used to initialize the new plot options object.
   ///
-  /// \param first The first index of the new plots.
-  /// \param last The last index of the new plots.
+  /// \param first The first index of the new line series.
+  /// \param last The last index of the new line series.
   void insertSeriesOptions(int first, int last);
 
   /// \brief
-  ///   Removes plot options for the given plots.
+  ///   Removes options for the given line series.
   ///
-  /// When an object is removed, its options generator index is saved
-  /// so it can be used when a new plot is added.
+  /// When an line series is removed, its options generator index is
+  /// saved so it can be used when a new series is added.
   ///
   /// \param first The first index of the options to remove.
   /// \param last The last index of the options to remove.
   void removeSeriesOptions(int first, int last);
 
   /// \brief
-  ///   Moves the given plot options to a new location.
-  /// \param current The known index of the plot options.
-  /// \param index The new index of the plot options.
+  ///   Moves the given series options to a new location.
+  /// \param current The known index of the series options.
+  /// \param index The new index of the series options.
   void moveSeriesOptions(int current, int index);
 
 signals:
-  /// Emitted when the drawing options for a plot change.
+  /// Emitted when the drawing options for a series change.
   void optionsChanged();
 
   /// \breif
-  ///   Emitted when generating new plot options.
+  ///   Emitted when generating new series options.
   ///
-  /// This signal gives the observer an opportunity to modify the plot
-  /// options when they are generated before being used.
+  /// This signal gives the observer an opportunity to modify the
+  /// series options when they are generated before being used.
   ///
-  /// \param index The index of the model's plot object.
-  /// \param options The newly created plot options.
+  /// \param index The index of the model's line series object.
+  /// \param options The newly created line series options.
   void optionsInserted(int index, pqLineChartSeriesOptions *options);
 
 private:

@@ -35,13 +35,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqLineChartOptions.h"
 
+#include "pqChartSeriesColorManager.h"
 #include "pqChartSeriesOptionsGenerator.h"
 #include "pqLineChartSeriesOptions.h"
 
 #include <QBrush>
 #include <QColor>
 #include <QList>
-#include <QMutableListIterator>
 #include <QPen>
 
 
@@ -51,25 +51,23 @@ public:
   pqLineChartOptionsInternal();
   ~pqLineChartOptionsInternal();
 
-  pqChartSeriesOptionsGenerator *Generator;
-  pqChartSeriesOptionsGenerator *DefaultGenerator;
+  pqChartSeriesColorManager *Colors;
+  pqChartSeriesColorManager *DefaultColors;
   QList<pqLineChartSeriesOptions *> Options;
-  QList<pqLineChartSeriesOptions *> Order;
-  QList<int> EmptySpots;
 };
 
 
 //----------------------------------------------------------------------------
 pqLineChartOptionsInternal::pqLineChartOptionsInternal()
-  : Options(), Order(), EmptySpots()
+  : Options()
 {
-  this->DefaultGenerator = new pqChartSeriesOptionsGenerator();
-  this->Generator = this->DefaultGenerator;
+  this->DefaultColors = new pqChartSeriesColorManager();
+  this->Colors = this->DefaultColors;
 }
 
 pqLineChartOptionsInternal::~pqLineChartOptionsInternal()
 {
-  delete this->DefaultGenerator;
+  delete this->DefaultColors;
 }
 
 
@@ -86,18 +84,29 @@ pqLineChartOptions::~pqLineChartOptions()
   delete this->Internal;
 }
 
+pqChartSeriesColorManager *pqLineChartOptions::getSeriesColorManager()
+{
+  return this->Internal->Colors;
+}
+
+void pqLineChartOptions::setSeriesColorManager(
+    pqChartSeriesColorManager *manager)
+{
+  this->Internal->Colors = manager;
+  if(this->Internal->Colors == 0)
+    {
+    this->Internal->Colors = this->Internal->DefaultColors;
+    }
+}
+
 pqChartSeriesOptionsGenerator *pqLineChartOptions::getGenerator()
 {
-  return this->Internal->Generator;
+  return this->Internal->Colors->getGenerator();
 }
 
 void pqLineChartOptions::setGenerator(pqChartSeriesOptionsGenerator *generator)
 {
-  this->Internal->Generator = generator;
-  if(this->Internal->Generator == 0)
-    {
-    this->Internal->Generator = this->Internal->DefaultGenerator;
-    }
+  this->Internal->Colors->setGenerator(generator);
 }
 
 int pqLineChartOptions::getNumberOfSeriesOptions() const
@@ -130,12 +139,11 @@ void pqLineChartOptions::clearSeriesOptions()
       this->Internal->Options.begin();
   for( ; iter != this->Internal->Options.end(); ++iter)
     {
+    this->Internal->Colors->removeSeriesOptions(*iter);
     delete *iter;
     }
 
   this->Internal->Options.clear();
-  this->Internal->Order.clear();
-  this->Internal->EmptySpots.clear();
 }
 
 void pqLineChartOptions::insertSeriesOptions(int first, int last)
@@ -156,30 +164,19 @@ void pqLineChartOptions::insertSeriesOptions(int first, int last)
   int start = first;
   pqLineChartSeriesOptions *options = 0;
   QList<pqLineChartSeriesOptions *> newOptions;
-  QList<int>::Iterator iter = this->Internal->EmptySpots.begin();
   while(start <= last)
     {
     options = new pqLineChartSeriesOptions(this);
     this->Internal->Options.insert(start, options);
     newOptions.append(options);
 
-    // Fill the empty spots first. Then, use the count to generate
-    // the new options.
-    if(iter != this->Internal->EmptySpots.end())
-      {
-      this->Internal->Generator->getSeriesPen(*iter, pen);
-      this->Internal->Order[*iter] = options;
-      iter = this->Internal->EmptySpots.erase(iter);
-      }
-    else
-      {
-      this->Internal->Generator->getSeriesPen(
-          this->Internal->Order.size(), pen);
-      this->Internal->Order.append(options);
-      }
+    // Use the series color manager to set up the pen.
+    int index = this->Internal->Colors->addSeriesOptions(options);
+    this->getGenerator()->getSeriesPen(index, pen);
 
-    options->setPen(0, pen);
-    options->setBrush(0, QBrush(Qt::white));
+    // Set up the line series options.
+    options->setPen(pen, 0);
+    options->setBrush(QBrush(Qt::white), 0);
     this->connect(options, SIGNAL(optionsChanged()),
         this, SIGNAL(optionsChanged()));
 
@@ -215,37 +212,8 @@ void pqLineChartOptions::removeSeriesOptions(int first, int last)
   for( ; last >= first; last--)
     {
     options = this->Internal->Options.takeAt(last);
-    index = this->Internal->Order.indexOf(options);
-    this->Internal->Order[index] = 0;
-    this->Internal->EmptySpots.append(index);
+    this->Internal->Colors->removeSeriesOptions(options);
     delete options;
-    }
-
-  // Clean up the end of the order list so the count can be reset.
-  QMutableListIterator<pqLineChartSeriesOptions *> cleaner(
-      this->Internal->Order);
-  cleaner.toBack();
-  while(cleaner.hasPrevious())
-    {
-    if(cleaner.previous())
-      {
-      break;
-      }
-    else
-      {
-      cleaner.remove();
-      }
-    }
-
-  int count = this->Internal->Order.size() - 1;
-  QMutableListIterator<int> iter(this->Internal->EmptySpots);
-  iter.toFront();
-  while(iter.hasNext())
-    {
-    if(iter.next() > count)
-      {
-      iter.remove();
-      }
     }
 }
 

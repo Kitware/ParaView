@@ -170,11 +170,11 @@ void pqChartSeriesOptionsGenerator::setColorScheme(
   else if(this->Scheme == pqChartSeriesOptionsGenerator::Cool)
     {
     this->Internal->Colors.append(QColor(117, 177, 1));
-    this->Internal->Colors.append(QColor(178, 186, 48));
-    this->Internal->Colors.append(QColor(29, 188, 160));
+    this->Internal->Colors.append(QColor(88, 128, 41));
+    this->Internal->Colors.append(QColor(80, 215, 191));
     this->Internal->Colors.append(QColor(28, 149, 205));
     this->Internal->Colors.append(QColor(59, 104, 171));
-    this->Internal->Colors.append(QColor(102, 62, 183));
+    this->Internal->Colors.append(QColor(154, 104, 255));
     this->Internal->Colors.append(QColor(95, 51, 128));
     }
   else if(this->Scheme == pqChartSeriesOptionsGenerator::Blues)

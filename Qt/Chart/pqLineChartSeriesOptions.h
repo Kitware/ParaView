@@ -82,22 +82,41 @@ public:
   void setSequenceDependent(bool dependent);
 
   /// \brief
-  ///   Sets the pen to use when drawing the point sequence.
+  ///   Gets the pen for a sequence.
+  /// \param pen Used to return the sequence pen.
   /// \param sequence The index of the sequence in the series.
+  void getPen(QPen &pen, int sequence=0) const;
+
+  /// \brief
+  ///   Sets the pen to use when drawing the point sequence.
   /// \param pen The pen to use when drawing the sequence.
-  void setPen(int sequence, const QPen &pen);
+  /// \param sequence The index of the sequence in the series.
+  void setPen(const QPen &pen, int sequence=0);
+
+  /// \brief
+  ///   Gets the brush for a sequence.
+  /// \param brush Used to return the sequence brush.
+  /// \param sequence The index of the sequence in the series.
+  void getBrush(QBrush &brush, int sequence=0) const;
 
   /// \brief
   ///   Sets the brush to use when filling sequence points.
-  /// \param sequence The index of the sequence in the series.
   /// \param brush The brush to use when filling sequence points.
-  void setBrush(int sequence, const QBrush &brush);
+  /// \param sequence The index of the sequence in the series.
+  void setBrush(const QBrush &brush, int sequence=0);
+
+  /// \brief
+  ///   Gets the point marker for a sequence.
+  /// \param sequence The index of the sequence in the series.
+  /// \return
+  ///   A pointer to the point marker for a sequence.
+  pqPointMarker *getMarker(int sequence=0) const;
 
   /// \brief
   ///   Sets the marker to use when drawing sequence points.
-  /// \param sequence The index of the sequence in the series.
   /// \param marker The marker to use when drawing sequence points.
-  void setMarker(int sequence, pqPointMarker *marker);
+  /// \param sequence The index of the sequence in the series.
+  void setMarker(pqPointMarker *marker, int sequence=0);
 
   /// \brief
   ///   Sets up the painter for drawing a point sequence.
@@ -107,13 +126,6 @@ public:
   /// \param painter The painter to set up.
   /// \param sequence The index of the sequence in the plot.
   void setupPainter(QPainter &painter, int sequence=0) const;
-
-  /// \brief
-  ///   Gets the point marker for a sequence.
-  /// \param sequence The index of the sequence in the series.
-  /// \return
-  ///   A pointer to the point marker for a sequence.
-  pqPointMarker *getMarker(int sequence=0) const;
 
   /// \brief
   ///   Copies the line plot options from another options object.

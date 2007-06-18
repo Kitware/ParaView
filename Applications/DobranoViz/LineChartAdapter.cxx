@@ -662,11 +662,11 @@ struct LineChartAdapter::pqImplementation
     // Set up the plot drawing parameters.
     pqLineChartSeriesOptions options;
     options.setSequenceDependent(true);
-    options.setPen(0, plot_pen);
-    options.setPen(1, whisker_pen);
-    options.setPen(2, QPen(plot_pen.color(), 0.5));
-    options.setBrush(2, QBrush(Qt::white));
-    options.setMarker(2, this->CircleMarker);
+    options.setPen(plot_pen, 0);
+    options.setPen(whisker_pen, 1);
+    options.setPen(QPen(plot_pen.color(), 0.5), 2);
+    options.setBrush(QBrush(Qt::white), 2);
+    options.setMarker(this->CircleMarker, 2);
     this->LineChart->getOptions()->setSeriesOptions(plotIndex, options);
 
     /*this->Chart.getLineChart().addData(
@@ -734,11 +734,11 @@ struct LineChartAdapter::pqImplementation
     // Set up the plot drawing parameters.
     pqLineChartSeriesOptions options;
     options.setSequenceDependent(true);
-    options.setPen(0, pen);
-    options.setPen(1, pen);
-    options.setPen(2, QPen(pen.color(), 0.5));
-    options.setBrush(2, QBrush(Qt::white));
-    options.setMarker(2, this->CircleMarker);
+    options.setPen(pen, 0);
+    options.setPen(pen, 1);
+    options.setPen(QPen(pen.color(), 0.5), 2);
+    options.setBrush(QBrush(Qt::white), 2);
+    options.setMarker(this->CircleMarker, 2);
     this->LineChart->getOptions()->setSeriesOptions(plotIndex, options);
 
     /*this->Chart.getLegend().addEntry(
@@ -840,11 +840,11 @@ struct LineChartAdapter::pqImplementation
     // Set up the plot drawing parameters.
     pqLineChartSeriesOptions options;
     options.setSequenceDependent(true);
-    options.setPen(0, QPen(Qt::gray));
-    options.setPen(1, QPen(Qt::gray));
-    options.setPen(2, QPen(Qt::gray, 0.5));
-    options.setBrush(2, QBrush(Qt::white));
-    options.setMarker(2, this->CircleMarker);
+    options.setPen(QPen(Qt::gray), 0);
+    options.setPen(QPen(Qt::gray), 1);
+    options.setPen(QPen(Qt::gray, 0.5), 2);
+    options.setBrush(QBrush(Qt::white), 2);
+    options.setMarker(this->CircleMarker, 2);
     this->LineChart->getOptions()->setSeriesOptions(plotIndex, options);
 
     /*this->Chart.getLegend().addEntry(
