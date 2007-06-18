@@ -1,3359 +1,1882 @@
 {
    <insert a suppression name here>
-   Memcheck:Param
-   writev(vector[...])
-   fun:do_writev
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_X11TransWritev
-   fun:_XSend
-   fun:__glXFlushRenderBuffer
-   fun:__indirect_glGenLists
-   fun:_ZN23vtkOpenGLPolyDataMapper11RenderPieceEP11vtkRendererP8vtkActor
-   fun:_ZN17vtkPolyDataMapper6RenderEP11vtkRendererP8vtkActor
-   fun:_ZN14vtkOpenGLActor6RenderEP11vtkRendererP9vtkMapper
-   fun:_ZN8vtkActor20RenderOpaqueGeometryEP11vtkViewport
-   fun:_ZN11vtkRenderer14UpdateGeometryEv
-   fun:_ZN17vtkOpenGLRenderer12DeviceRenderEv
-   fun:_ZN11vtkRenderer6RenderEv
-   fun:_ZN21vtkRendererCollection6RenderEv
-   fun:_ZN15vtkRenderWindow14DoStereoRenderEv
-   fun:_ZN15vtkRenderWindow10DoFDRenderEv
-   fun:_ZN15vtkRenderWindow10DoAARenderEv
-   fun:_ZN15vtkRenderWindow6RenderEv
-   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z32vtkXOpenGLRenderWindowCppCommandP22vtkXOpenGLRenderWindowP10Tcl_InterpiPPc
-   fun:_Z29vtkXOpenGLRenderWindowCommandPvP10Tcl_InterpiPPc
-   fun:TclInvokeStringCommand
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_TimeObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_EvalTokensStandard
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_EvalFile
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_XlcDefaultMapModifiers
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_XlcResolveLocaleName
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:driCreateDisplay
-   fun:__glXInitialize
-   fun:glXGetConfig
-   fun:glXChooseVisual
-   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiii
-   fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
-   fun:_ZN22vtkXOpenGLRenderWindow16WindowInitializeEv
-   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
-   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
-   fun:_ZN29vtkXRenderWindowTclInteractor10InitializeEv
-   fun:_ZN15vtkRenderWindow6RenderEv
-   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z32vtkXOpenGLRenderWindowCppCommandP22vtkXOpenGLRenderWindowP10Tcl_InterpiPPc
-   fun:_Z29vtkXOpenGLRenderWindowCommandPvP10Tcl_InterpiPPc
-   fun:TclInvokeStringCommand
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_TimeObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_EvalTokensStandard
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_EvalFile
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_XrmDefaultInitParseInfo
-   fun:_XrmInitParseInfo
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:XrmGetFileDatabase
-   fun:_XInitKeysymDB
-   fun:XStringToKeysym
-   fun:TkStringToKeysym
-   fun:ParseEventDescription
-   fun:FindSequence
-   fun:CreateVirtualEvent
-   fun:Tk_EventObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_SwitchObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_Eval
-   fun:TkpInit
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/X11/locale/common/ximcp.so.2
-   fun:_XimOpenIM
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:XOpenIM
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:XF86DRIGetClientDriverName
-   obj:/usr/X11R6/lib/libGL.so.1.2
-   fun:driCreateDisplay
-   fun:__glXInitialize
-   fun:glXGetConfig
-   fun:glXChooseVisual
-   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiii
-   fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
-   fun:_ZN22vtkXOpenGLRenderWindow16WindowInitializeEv
-   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
-   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
-   fun:_ZN29vtkXRenderWindowTclInteractor10InitializeEv
-   fun:_ZN15vtkRenderWindow6RenderEv
-   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z32vtkXOpenGLRenderWindowCppCommandP22vtkXOpenGLRenderWindowP10Tcl_InterpiPPc
-   fun:_Z29vtkXOpenGLRenderWindowCommandPvP10Tcl_InterpiPPc
-   fun:TclInvokeStringCommand
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_TimeObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_EvalTokensStandard
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_EvalFile
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:realloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:XextCreateExtension
-   obj:/usr/X11R6/lib/libGL.so.1.2
-   fun:__glXInitialize
-   fun:glXGetConfig
-   fun:glXChooseVisual
-   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiii
-   fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
-   fun:_ZN22vtkXOpenGLRenderWindow16WindowInitializeEv
-   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
-   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
-   fun:_ZN29vtkXRenderWindowTclInteractor10InitializeEv
-   fun:_ZN15vtkRenderWindow6RenderEv
-   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z32vtkXOpenGLRenderWindowCppCommandP22vtkXOpenGLRenderWindowP10Tcl_InterpiPPc
-   fun:_Z29vtkXOpenGLRenderWindowCommandPvP10Tcl_InterpiPPc
-   fun:TclInvokeStringCommand
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_TimeObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_EvalTokensStandard
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_EvalFile
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:driCreateDisplay
-   fun:__glXInitialize
-   fun:glXGetConfig
-   fun:glXChooseVisual
-   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiii
-   fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
-   fun:_ZN22vtkXOpenGLRenderWindow16WindowInitializeEv
-   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
-   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
-   fun:_ZN29vtkXRenderWindowTclInteractor10InitializeEv
-   fun:_ZN15vtkRenderWindow6RenderEv
-   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z32vtkXOpenGLRenderWindowCppCommandP22vtkXOpenGLRenderWindowP10Tcl_InterpiPPc
-   fun:_Z29vtkXOpenGLRenderWindowCommandPvP10Tcl_InterpiPPc
-   fun:TclInvokeStringCommand
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_TimeObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_EvalTokensStandard
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_EvalFile
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:XrmGetFileDatabase
-   fun:_XInitKeysymDB
-   fun:XStringToKeysym
-   fun:TkStringToKeysym
-   fun:ParseEventDescription
-   fun:FindSequence
-   fun:CreateVirtualEvent
-   fun:Tk_EventObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_SwitchObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_Eval
-   fun:TkpInit
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:XrmGetFileDatabase
-   fun:_XInitKeysymDB
-   fun:XStringToKeysym
-   fun:TkStringToKeysym
-   fun:ParseEventDescription
-   fun:FindSequence
-   fun:CreateVirtualEvent
-   fun:Tk_EventObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_SwitchObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_Eval
-   fun:TkpInit
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:_dlerror_run
-   fun:dlopen@@GLIBC_2.1
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_XlcCreateLocaleDataBase
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:XauFileName
-   fun:XauGetBestAuthByAddr
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_X11TransConnectDisplay
-   fun:XOpenDisplay
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_XlcAddCT
-   fun:_XlcInitCTInfo
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XrmInternalStringToQuark
-   fun:XrmStringToQuark
-   fun:_XlcGetCharSet
-   fun:_XlcAddCT
-   fun:_XlcInitCTInfo
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:realloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:XrmGetFileDatabase
-   fun:_XInitKeysymDB
-   fun:XStringToKeysym
-   fun:TkStringToKeysym
-   fun:ParseEventDescription
-   fun:FindSequence
-   fun:CreateVirtualEvent
-   fun:Tk_EventObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_SwitchObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_Eval
-   fun:TkpInit
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_dl_map_object_deps
-   fun:dl_open_worker
-   fun:_dl_catch_error
-   fun:__GI__dl_open
-   fun:dlopen_doit
-   fun:_dl_catch_error
-   fun:_dlerror_run
-   fun:dlopen@@GLIBC_2.1
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/lib/ld-2.3.2.so
-   obj:/lib/ld-2.3.2.so
-   fun:_dl_map_object
-   fun:dl_open_worker
-   fun:_dl_catch_error
-   fun:__GI__dl_open
-   fun:dlopen_doit
-   fun:_dl_catch_error
-   fun:_dlerror_run
-   fun:dlopen@@GLIBC_2.1
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_dl_map_object
-   fun:dl_open_worker
-   fun:_dl_catch_error
-   fun:__GI__dl_open
-   fun:dlopen_doit
-   fun:_dl_catch_error
-   fun:_dlerror_run
-   fun:dlopen@@GLIBC_2.1
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_IO_vasprintf
-   fun:__asprintf_internal
-   fun:dlerror
-   obj:/usr/X11R6/lib/libGL.so.1.2
-   obj:/usr/X11R6/lib/libGL.so.1.2
-   fun:driCreateDisplay
-   fun:__glXInitialize
-   fun:glXGetConfig
-   fun:glXChooseVisual
-   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiii
-   fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
-   fun:_ZN22vtkXOpenGLRenderWindow16WindowInitializeEv
-   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
-   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
-   fun:_ZN29vtkXRenderWindowTclInteractor10InitializeEv
-   fun:_ZN15vtkRenderWindow6RenderEv
-   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z32vtkXOpenGLRenderWindowCppCommandP22vtkXOpenGLRenderWindowP10Tcl_InterpiPPc
-   fun:_Z29vtkXOpenGLRenderWindowCommandPvP10Tcl_InterpiPPc
-   fun:TclInvokeStringCommand
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_TimeObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_EvalTokensStandard
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_EvalFile
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLocaleDataBase
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLocaleDataBase
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:_dl_check_map_versions
-   fun:dl_open_worker
-   fun:_dl_catch_error
-   fun:__GI__dl_open
-   fun:dlopen_doit
-   fun:_dl_catch_error
-   fun:_dlerror_run
-   fun:dlopen@@GLIBC_2.1
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:__GI___strdup
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLocaleDataBase
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLocaleDataBase
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_XlcCreateLocaleDataBase
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLocaleDataBase
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_XlcAddCharSet
-   fun:_XlcAddCT
-   fun:_XlcInitCTInfo
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:XrmGetFileDatabase
-   fun:_XInitKeysymDB
-   fun:XStringToKeysym
-   fun:TkStringToKeysym
-   fun:ParseEventDescription
-   fun:FindSequence
-   fun:CreateVirtualEvent
-   fun:Tk_EventObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_SwitchObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_Eval
-   fun:TkpInit
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:AllocFontFamily
-   fun:InitSubFont
-   fun:InitFont
-   fun:TkpGetFontFromAttributes
-   fun:Tk_AllocFontFromObj
-   fun:Tk_GetFont
-   fun:DoConfig
-   fun:Tk_ConfigureWidget
-   fun:ConfigureText
-   fun:Tk_TextCmd
-   fun:TclInvokeStringCommand
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_ForeachObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_CatchObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:Tcl_ExprObj
-   fun:Tcl_ExprBooleanObj
-   fun:Tcl_IfObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_Eval
-   fun:Tcl_GlobalEval
-   fun:Tcl_PkgRequireEx
-   fun:Tcl_PkgRequire
-   fun:Tcl_PackageObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_XlcCreateDefaultCharSet
-   fun:_XlcAddCT
-   fun:_XlcInitCTInfo
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_XlcSetConverter
-   fun:_XlcInitCTInfo
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_XlcCreateDefaultCharSet
-   fun:_XlcAddCT
-   fun:_XlcInitCTInfo
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   obj:/lib/ld-2.3.2.so
-   obj:/lib/ld-2.3.2.so
-   fun:_dl_map_object
-   fun:dl_open_worker
-   fun:_dl_catch_error
-   fun:__GI__dl_open
-   fun:dlopen_doit
-   fun:_dl_catch_error
-   fun:_dlerror_run
-   fun:dlopen@@GLIBC_2.1
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_XlcAddCT
-   fun:_XlcInitCTInfo
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLocaleDataBase
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:__glXNewIndirectAPI
-   fun:glXMakeCurrent
-   fun:_ZN22vtkXOpenGLRenderWindow11MakeCurrentEv
-   fun:_ZN22vtkXOpenGLRenderWindow16WindowInitializeEv
-   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
-   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
-   fun:_ZN29vtkXRenderWindowTclInteractor10InitializeEv
-   fun:_ZN15vtkRenderWindow6RenderEv
-   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z32vtkXOpenGLRenderWindowCppCommandP22vtkXOpenGLRenderWindowP10Tcl_InterpiPPc
-   fun:_Z29vtkXOpenGLRenderWindowCommandPvP10Tcl_InterpiPPc
-   fun:TclInvokeStringCommand
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_TimeObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_EvalTokensStandard
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_EvalFile
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_XlcCreateDefaultCharSet
-   fun:_XlcAddCT
-   fun:_XlcInitCTInfo
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XrmInternalStringToQuark
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:XrmGetFileDatabase
-   fun:_XInitKeysymDB
-   fun:XStringToKeysym
-   fun:TkStringToKeysym
-   fun:ParseEventDescription
-   fun:FindSequence
-   fun:CreateVirtualEvent
-   fun:Tk_EventObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_SwitchObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_Eval
-   fun:TkpInit
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:XrmGetFileDatabase
-   fun:_XInitKeysymDB
-   fun:XStringToKeysym
-   fun:TkStringToKeysym
-   fun:ParseEventDescription
-   fun:FindSequence
-   fun:CreateVirtualEvent
-   fun:Tk_EventObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_SwitchObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_Eval
-   fun:TkpInit
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XrmInternalStringToQuark
-   fun:XrmStringToQuark
-   fun:_XlcGetCharSet
-   fun:_XlcAddCT
-   fun:_XlcInitCTInfo
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcCreateLC
-   fun:_XlcDefaultLoader
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:realloc
-   fun:TclpRealloc
-   fun:Tcl_AttemptRealloc
-   fun:Tcl_AttemptSetObjLength
-   fun:AppendUtfToUtfRep
-   fun:Tcl_AppendToObj
-   fun:Tcl_EvalTokensStandard
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:NamespaceEvalCmd
-   fun:Tcl_NamespaceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:NamespaceEvalCmd
-   fun:Tcl_NamespaceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_IfObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:TclInitByteCodeObj
-   fun:TclSetByteCodeFromAny
-   fun:SetByteCodeFromAny
-   fun:TclProcCompileProc
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_EvalFile
-   fun:Tk_MainEx
-   fun:main
-}
-
-{
-   <insert a suppression name here>
-   core:PThread
-   fun:pthread_error
-   fun:pthread_attr_setscope
-   fun:_ZN16vtkMultiThreader19SingleMethodExecuteEv
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:TclCreateExecEnv
-   fun:Tcl_CreateInterp
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:Tcl_CreateNamespace
-   fun:NamespaceEvalCmd
-   fun:Tcl_NamespaceObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:NamespaceEvalCmd
-   fun:Tcl_NamespaceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:NamespaceEvalCmd
-   fun:Tcl_NamespaceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_IfObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:AllocStringEntry
-   fun:Tcl_CreateHashEntry 
-   fun:TclLookupSimpleVar 
-   fun:TclObjLookupVar 
-   fun:TclExecuteByteCode 
-   fun:TclCompEvalObj 
-   fun:Tcl_EvalObjEx 
-   fun:Tcl_ForObjCmd 
-   fun:TclEvalObjvInternal 
-   fun:Tcl_EvalEx 
-   fun:Tcl_FSEvalFile 
-   fun:Tcl_SourceObjCmd 
-   fun:TclEvalObjvInternal 
-   fun:TclExecuteByteCode 
-   fun:TclCompEvalObj 
-   fun:Tcl_EvalObjEx 
-   fun:Tcl_TimeObjCmd 
-   fun:TclEvalObjvInternal 
-   fun:Tcl_EvalEx 
-   fun:Tcl_EvalTokensStandard 
-   fun:Tcl_EvalEx 
-   fun:Tcl_FSEvalFile 
-   fun:Tcl_EvalFile 
-   fun:Tk_MainEx 
-   fun:main 
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:_Znwj
-   fun:_Z15vtkTclCreateNewP10Tcl_InterpPKcPFPvvEPFiS3_S0_iPPcE
-   fun:Vtkgraphicstcl_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
-   fun:main
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Overlap
-   fun:strcpy
-}
-
-{
-   <insert a suppression name here>
    Memcheck:Cond
-   fun:Tk_PhotoPutBlock
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:RebuildTable
-   fun:Tcl_CreateHashEntry
-   fun:Tk_Get3DBorder
-   fun:Tk_Alloc3DBorderFromObj
-   fun:DoObjConfig
-   fun:Tk_SetOptions
-   fun:ConfigureButton
-   fun:ButtonWidgetObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_Eval
-   fun:Tcl_GlobalEval
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:TclAllocateFreeObjects
-   fun:Tcl_NewListObj 
-   fun:GetConfigList 
-   fun:Tk_GetOptionInfo 
-   fun:ButtonWidgetObjCmd 
-   fun:TclEvalObjvInternal 
-   fun:Tcl_EvalEx 
-   fun:Tcl_Eval 
-   fun:Tcl_GlobalEval 
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:TclAllocateFreeObjects
-   fun:Tcl_NewObj 
-   fun:TclpInitLibraryPath 
-   fun:TclFindEncodings 
-   fun:Tcl_FindExecutable 
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:Tcl_NewStringObj
-   fun:Tcl_EvalTokensStandard
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:NamespaceEvalCmd
-   fun:Tcl_NamespaceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:NamespaceEvalCmd
-   fun:Tcl_NamespaceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_IfObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc 
-   fun:TclpAlloc 
-   fun:Tcl_Alloc 
-   fun:SetCmdNameFromAny 
-   fun:Tcl_GetCommandFromObj 
-   fun:TclEvalObjvInternal 
-   fun:Tcl_EvalEx 
-   fun:Tcl_FSEvalFile 
-   fun:Tcl_EvalFile 
-   fun:Tk_MainEx 
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:_Znwj_asjdfah
-   fun:_ZNSt24__default_alloc_templateILb1ELi0EE14_S_chunk_allocEjRi
-   fun:_ZNSt24__default_alloc_templateILb1ELi0EE9_S_refillEj
-   fun:_ZNSt24__default_alloc_templateILb1ELi0EE8allocateEj
-   fun:_ZNSt14__simple_allocISt13_Rb_tree_nodeISt4pairIKSsPFiP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS9_EEESt24__default_alloc_templateILb1ELi0EEE8allocateEj
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:TclCreateProc
-   fun:Tcl_ProcObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:NamespaceEvalCmd
-   fun:Tcl_NamespaceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:NamespaceEvalCmd
-   fun:Tcl_NamespaceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_IfObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:NewVar
-   fun:TclLookupSimpleVar
-   fun:TclObjLookupVar
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_IfObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_EvalFile
-   fun:Tk_MainEx
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyString_InternInPlace
+   fun:PyString_InternFromString
+   fun:PyType_Ready
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_InitializeEx
+   fun:Py_Initialize
+   fun:Py_Main
    fun:main
 }
 {
    <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:Tcl_CreateCommand
-   fun:Tk_DestroyWindow
-   fun:DeleteWindowsExitProc
-   fun:Tcl_Finalize
-   fun:Tcl_Exit
-   fun:Tcl_ExitObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_EvalFile
-   fun:Tk_MainEx
-   fun:main
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:TkCreateMenuCmd
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:realloc
-   fun:TclpRealloc
-   fun:Tcl_Realloc
-   fun:Tcl_SetObjLength
-   fun:TclpNativeJoinPath
-   fun:Tcl_FSJoinPath
-   fun:Tcl_FSJoinToPath
-   fun:SetFsPathFromAny
-   fun:Tcl_ConvertToType
-   fun:Tcl_FSConvertToPathType
-   fun:CheckAccess
-   fun:Tcl_FileObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_IfObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_EvalFile
-   fun:Tk_MainEx
-   fun:main
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:TclRegisterLiteral
-   fun:TclCompileScript
-   fun:TclSetByteCodeFromAny
-   fun:SetByteCodeFromAny
-   fun:TclProcCompileProc
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_ForeachObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_CatchObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:Tcl_ExprObj
-   fun:Tcl_ExprBooleanObj
-   fun:Tcl_IfObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_Eval
-   fun:Tcl_GlobalEval
-   fun:Tcl_PkgRequireEx
-   fun:Tcl_PkgRequire
-   fun:Tcl_PackageObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_EvalObjEx
-   fun:Tcl_EvalObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:SetFsPathFromAny
-   fun:Tcl_ConvertToType
-   fun:Tcl_FSConvertToPathType
-   fun:CheckAccess
-   fun:Tcl_FileObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_IfObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_EvalFile
-   fun:Tk_MainEx
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyString_InternInPlace
+   fun:PyString_InternFromString
+   fun:PyType_Ready
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_InitializeEx
+   fun:Py_Initialize
+   fun:Py_Main
    fun:main
 }
 {
    <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:Tcl_GetObjResult
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_IfObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_EvalFile
-   fun:Tk_MainEx
-   fun:main
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:SetStringFromAny
-   fun:Tcl_AppendToObj
-   fun:Tcl_EvalTokensStandard
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:NamespaceEvalCmd
-   fun:Tcl_NamespaceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:NamespaceEvalCmd
-   fun:Tcl_NamespaceObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_IfObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_SourceObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalObjv
-   fun:Tcl_EvalObjEx
-   fun:Tcl_UplevelObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_AttemptAlloc
-   fun:Tcl_AttemptSetObjLength
-   fun:AppendUtfToUtfRep
-   fun:Tcl_AppendToObj
-   fun:Tcl_TimeObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_EvalTokensStandard
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_EvalFile
-   fun:Tk_MainEx
-   fun:main
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:SetStringFromAny
-   fun:Tcl_SetObjLength
-   fun:TclpNativeJoinPath
-   fun:Tcl_FSJoinPath
-   fun:Tcl_FSJoinToPath
-   fun:SetFsPathFromAny
-   fun:Tcl_ConvertToType
-   fun:Tcl_FSConvertToPathType
-   fun:FSGetPathType
-   fun:Tcl_FSSplitPath
-   fun:TclFSNormalizeAbsolutePath
-   fun:Tcl_FSGetNormalizedPath
-   fun:TclFSEnsureEpochOk
-   fun:Tcl_FSGetFileSystemForPath
-   fun:Tcl_FSAccess
-   fun:CheckAccess
-   fun:Tcl_FileObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_IfObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_EvalFile
-   fun:Tk_MainEx
-   fun:main
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:UpdateStringOfDouble
-   fun:Tcl_GetStringFromObj
-   fun:Tcl_WriteObj
-   fun:Tcl_PutsObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_EvalFile
-   fun:Tk_MainEx
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyType_Ready
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_InitializeEx
+   fun:Py_Initialize
+   fun:Py_Main
    fun:main
 }
 {
    <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:TclpAlloc
-   fun:Tcl_Alloc
-   fun:SetWindowFromAny
-   fun:Tcl_ConvertToType
-   fun:TkGetWindowFromObj
-   fun:Tk_WmObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_TimeObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_EvalTokensStandard
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_EvalFile
-   fun:Tk_MainEx
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyType_Ready
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_InitializeEx
+   fun:Py_Initialize
+   fun:Py_Main
    fun:main
 }
 {
    <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:XCreateRegion
-   fun:_XtEventInitialize
-   fun:XtToolkitInitialize
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:__cxa_get_globals
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:_Znwj
-   fun:_Z15vtkTclCreateNewP10Tcl_InterpPKcPFPvvEPFiS3_S0_iPPcE
-   fun:Vtkcommontcl_Init
-   fun:Tcl_AppInit
-   fun:Tk_MainEx
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyType_Ready
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_InitializeEx
+   fun:Py_Initialize
+   fun:Py_Main
    fun:main
 }
 {
    <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_XlcSetConverter
-   fun:_XlcDefaultLoader
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyDict_SetItemString
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_InitializeEx
+   fun:Py_Initialize
+   fun:Py_Main
+   fun:main
 }
 {
    <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:XtMalloc
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:_PyExc_Init
+   fun:Py_InitializeEx
+   fun:Py_Initialize
+   fun:Py_Main
+   fun:main
 }
 {
    <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_Z12dice_yyallocj
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyString_InternInPlace
+   fun:PyDict_SetItemString
+   fun:Py_InitModule4
+   fun:initsignal
+   fun:PyOS_InitInterrupts
+   fun:Py_InitializeEx
+   fun:Py_Initialize
+   fun:Py_Main
+   fun:main
 }
 {
    <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:H5MM_calloc
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyMarshal_ReadLastObjectFromFile
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+   obj:/usr/bin/python2.4
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/bin/python2.4
 }
 {
    <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:H5MM_malloc
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyMarshal_ReadLastObjectFromFile
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
 }
 {
    <insert a suppression name here>
    Memcheck:Cond
-   fun:__stpcpy
-   obj:/lib/libc-2.3.3.so
-   fun:setlocale
-   fun:TclpSetInitialEncodings
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
 }
 {
    <insert a suppression name here>
-   Memcheck:Addr1
-   fun:strcmp
-   fun:_dl_map_object_internal
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyDict_SetItemString
+   fun:Py_InitModule4
+   fun:initposix
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyDict_SetItemString
+   obj:/usr/bin/python2.4
+   fun:initposix
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyObject_GC_Resize
+   fun:PyFrame_New
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
 }
 {
    <insert a suppression name here>
    Memcheck:Cond
-   fun:_dl_relocate_object_internal
-   obj:/lib/libc-2.3.3.so
-   fun:_dl_catch_error_internal
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyEval_EvalFrame
 }
 {
    <insert a suppression name here>
    Memcheck:Cond
-   fun:__stpcpy
-   obj:/lib/libc-2.3.3.so
-   fun:__pthread_once
+   fun:PyObject_Free
+   fun:PyGrammar_AddAccelerators
+   fun:PyParser_New
+   obj:/usr/bin/python2.4
+   fun:PyRun_StringFlags
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   fun:PyGrammar_AddAccelerators
+   fun:PyParser_New
+   obj:/usr/bin/python2.4
+   fun:PyRun_StringFlags
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyGrammar_AddAccelerators
+   fun:PyParser_New
+   obj:/usr/bin/python2.4
+   fun:PyRun_StringFlags
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyRun_StringFlags
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   obj:/usr/bin/python2.4
+   fun:PyRun_StringFlags
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyRun_StringFlags
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyRun_StringFlags
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyDict_DelItem
+   fun:PyDict_DelItemString
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
 }
 {
    <insert a suppression name here>
    Memcheck:Cond
-   fun:__stpcpy
-   fun:setlocale
-   fun:TclpSetInitialEncodings
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyRun_StringFlags
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
 }
 {
    <insert a suppression name here>
-   Memcheck:Param
-   writev(vector[...])
-   fun:vgAllRoadsLeadToRome_writev
-   fun:__writev
-}
-{
-   <insert a suppression name here>
-   Memcheck:Cond
-   fun:__stpcpy
-   obj:/lib/libc-2.3.3.so
-}
-{
-   <insert a suppression name here>
-   Memcheck:Overlap
-   fun:memcpy
-   obj:/usr/X11R6/lib/libXt.so.6.0
-   fun:_XtGetResources
-}
-{
-   <insert a suppression name here>
-   Memcheck:Cond
-   fun: strlen
-   obj:/lib/libc-2.3.3.so
-   fun:_dl_catch_error_internal
-}
-{
-   <insert a suppression name here>
-   Memcheck:Cond
-   fun:strchr
-   fun:__glXGetCurrentContext
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyRun_StringFlags
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
 }
 {
    <insert a suppression name here>
    Memcheck:Cond
-   fun:_dl_relocate_object_internal
-   obj:/lib/tls/libc-2.3.3.so
-   fun:_dl_catch_error_internal
-   fun:_dl_open
-   obj:/lib/libdl-2.3.3.so
-   fun:_dl_catch_error_internal
-   obj:/lib/libdl-2.3.3.so
-   fun:dlopen
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   obj:/usr/bin/python2.4
+   fun:PyRun_StringFlags
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
 }
 {
    <insert a suppression name here>
-   Memcheck:Param
-   writev(vector[...])
-   fun:writev
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_X11TransWritev
-   fun:_XSend
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:XPutImage
-   fun:DitherInstance
-   fun:Tk_DitherPhoto
-   fun:Tk_PhotoPutBlock
+   Memcheck:Value4
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   obj:/usr/bin/python2.4
+   fun:PyRun_StringFlags
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
 }
-
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyRun_StringFlags
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyRun_StringFlags
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyType_Ready
+   fun:PyObject_GenericGetAttr
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyType_Ready
+   fun:PyObject_GenericGetAttr
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyType_Ready
+   fun:PyObject_GenericGetAttr
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyType_Ready
+   fun:PyObject_GenericGetAttr
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+   obj:/usr/bin/python2.4
+   fun:PyObject_CallFunction
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+   obj:/usr/bin/python2.4
+   fun:PyObject_CallFunction
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyObject_GC_Resize
+   fun:PyFrame_New
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Realloc
+   fun:_PyObject_GC_Resize
+   fun:PyFrame_New
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Realloc
+   fun:_PyObject_GC_Resize
+   fun:PyFrame_New
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyArg_ParseTuple
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyMarshal_ReadLastObjectFromFile
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyMarshal_ReadLastObjectFromFile
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Realloc
+   fun:PyNode_AddChild
+   fun:PyParser_AddToken
+   obj:/usr/bin/python2.4
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Realloc
+   fun:PyNode_AddChild
+   fun:PyParser_AddToken
+   obj:/usr/bin/python2.4
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:PyNode_AddChild
+   fun:PyParser_AddToken
+   obj:/usr/bin/python2.4
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PySequence_DelItem
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PySequence_DelItem
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_InitializeEx
+   fun:Py_Initialize
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyRun_FileExFlags
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   obj:/usr/bin/python2.4
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyNode_Free
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyNode_Free
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyNode_Free
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyNode_Free
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyNode_Free
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyDict_SetItem
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyImport_ImportModuleEx
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyObject_CallObject
+   obj:/usr/bin/python2.4
+   fun:PyType_Ready
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyObject_CallFunction
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyObject_CallObject
+   obj:/usr/bin/python2.4
+   fun:PyType_Ready
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyObject_CallFunction
+   fun:PyEval_EvalFrame
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   fun:PyString_Format
+   obj:/usr/bin/python2.4
+   fun:PyNumber_Remainder
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Realloc
+   fun:_PyObject_GC_Resize
+   fun:PyFrame_New
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Realloc
+   fun:_PyObject_GC_Resize
+   fun:PyFrame_New
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyRun_FileEx
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyRun_FileEx
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyNode_Free
+   fun:PyRun_FileEx
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyRun_FileEx
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyRun_FileExFlags
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyDict_SetItem
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyRun_FileEx
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyRun_FileExFlags
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyDict_SetItem
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyRun_FileEx
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyRun_FileExFlags
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyDict_SetItem
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyRun_FileEx
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyRun_FileExFlags
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyRun_FileEx
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyRun_FileExFlags
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyRun_FileEx
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyArg_ParseTupleAndKeywords
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyObject_Call
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyRun_FileExFlags
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   obj:/usr/bin/python2.4
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyDict_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   obj:/usr/bin/python2.4
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:_PyImport_Fini
+   fun:Py_Finalize
+   obj:/usr/bin/python2.4
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:_PyImport_Fini
+   fun:Py_Finalize
+   obj:/usr/bin/python2.4
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:_PyImport_Fini
+   fun:Py_Finalize
+   obj:/usr/bin/python2.4
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:_PyImport_Fini
+   fun:Py_Finalize
+   obj:/usr/bin/python2.4
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyInterpreterState_Clear
+   fun:Py_Finalize
+   obj:/usr/bin/python2.4
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   fun:PyInterpreterState_Clear
+   fun:Py_Finalize
+   obj:/usr/bin/python2.4
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyFrame_Fini
+   fun:Py_Finalize
+   obj:/usr/bin/python2.4
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyInt_Fini
+   fun:Py_Finalize
+   obj:/usr/bin/python2.4
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:PyInt_Fini
+   fun:Py_Finalize
+   obj:/usr/bin/python2.4
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   fun:PyInt_Fini
+   fun:Py_Finalize
+   obj:/usr/bin/python2.4
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyGrammar_RemoveAccelerators
+   fun:Py_Finalize
+   obj:/usr/bin/python2.4
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
 {
    <insert a suppression name here>
    Memcheck:Param
    write(buf)
    fun:write
-   obj:/usr/X11R6/lib/libX11.so.6.2
    fun:_X11TransWrite
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XFlush (in /usr/X11R6/lib/libX11.so.6.2)
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:XPutImage
-   fun:DitherInstance
-   fun:ImgPhotoConfigureInstance
-   fun:ImgPhotoGet
-   fun:Tk_GetImage
-   fun:ConfigureButton
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:_XReply
+   fun:XInternAtom
+   fun:XSetWMProperties
+   fun:_ZN14QWidgetPrivate10create_sysEmbb
+   fun:_ZN7QWidget6createEmbb
+   fun:_ZN7QWidget10setVisibleEb
+   fun:_ZN7QWidget4showEv
+   fun:_Z20HistogramInteractioniPPc
+   fun:main
 }
-
-{
-   <insert a suppression name here>
-   Memcheck:Addr4
-   obj:/lib/tls/libc-2.3.3.so
-   obj:/lib/tls/libc-2.3.3.so
-   obj:/lib/tls/libc-2.3.3.so
-   obj:/lib/tls/libc-2.3.3.so
-   obj:/lib/tls/libc-2.3.3.so
-   fun:__libc_freeres
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/X11/locale/lib/common/ximcp.so.2
-   fun:_XimOpenIM
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:XOpenIM
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:get_dispatch
-   fun:glXChooseVisual
-   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiii
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libXcursor.so.1.0
-   fun:XcursorTryShapeCursor
-   fun:_XTryShapeCursor
-   fun:XCreateGlyphCursor
-   fun:TkGetCursorByName
-   fun:TkcGetCursor
-   fun:Tk_AllocCursorFromObj
-   fun:DoObjConfig
-   fun:Tk_InitOptions
-   fun:fun:MenuCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_Eval
-   fun:Tcl_GlobalEval
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   obj:/lib/libdl-2.3.3.so
-   fun:dlsym
-   fun:open64
-   fun:TclpOpenFileChannel
-   fun:Tcl_FSOpenFileChannel
-   fun:OpenEncodingFile
-   fun:LoadEncodingFile
-   fun:Tcl_GetEncoding
-   fun:Tcl_SetSystemEncoding
-   fun:TclpSetInitialEncodings
-   fun:TclFindEncodings
-   fun:Tcl_FindExecutable
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:open_path
-   fun:_dl_map_object_internal
-   obj:/lib/tls/libc-2.3.3.so
-   fun:_dl_catch_error_internal
-   fun:_dl_open
-   obj:/lib/libdl-2.3.3.so
-   fun:_dl_catch_error_internal
-   obj:/lib/libdl-2.3.3.so
-   fun:dlopen
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XNoticeCreateBitmap
-   fun:XCreatePixmap
-   fun:XCreateBitmapFromData
-   fun:GetBitmap
-   fun:Tk_GetBitmap
-   fun:TkButtonWorldChanged
-   fun:ConfigureButton
-   fun:ButtonCreate
-   fun:Tk_ButtonObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:NamespaceEvalCmd
-   fun:Tcl_NamespaceObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_Eval
-   fun:Tcl_GlobalEval
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:XQueryFont
-   obj:/usr/X11R6/lib/libXcursor.so.1.0
-   fun:XcursorTryShapeCursor
-   fun:_XTryShapeCursor
-   fun:XCreateGlyphCursor
-   fun:TkGetCursorByName
-   fun:TkcGetCursor
-   fun:Tk_AllocCursorFromObj
-   fun:DoObjConfig
-   fun:Tk_InitOptions
-   fun:MenuCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_Eval
-   fun:Tcl_GlobalEval
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:XShmCreateImage
-   fun:alloc_shm_back_buffer
-   fun:xmesa_alloc_back_buffer
-   fun:xmesa_resize_buffers
-   fun:_mesa_ResizeBuffersMESA
-   fun:_mesa_set_viewport
-   fun:_mesa_Viewport
-   fun:glViewport
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:XCreateImage
-   fun:initialize_visual_and_buffer
-   fun:XMesaCreateWindowBuffer2
-   fun:Fake_glXMakeContextCurrent
-   fun:Fake_glXMakeCurrent
-   fun:glXMakeCurrent
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_dl_map_object_internal
-   obj:/lib/tls/libc-2.3.3.so
-   fun:_dl_catch_error_internal
-   fun:_dl_open
-   obj:/lib/libdl-2.3.3.so
-   fun:_dl_catch_error_internal
-   obj:/lib/libdl-2.3.3.so
-   fun:dlopen
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_dl_map_object_deps_internal
-   obj:/lib/tls/libc-2.3.3.so
-   fun:_dl_catch_error_internal
-   fun:_dl_open
-   obj:/lib/libdl-2.3.3.so
-   fun:_dl_catch_error_internal
-   obj:/lib/libdl-2.3.3.so
-   fun:dlopen
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XNoticeCreateBitmap
-   fun:XCreatePixmap
-   fun:XCreateBitmapFromData
-   fun:GetBitmap
-   fun:Tk_GetBitmap
-   fun:TkButtonWorldChanged
-   fun:ConfigureButton
-   fun:ButtonCreate
-   fun:Tk_ButtonObjCmd
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:TclObjInterpProc
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:NamespaceEvalCmd
-   fun:Tcl_NamespaceObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_Eval
-   fun:Tcl_GlobalEval
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_dl_map_object_deps_internal
-   obj:/lib/tls/libc-2.3.3.so
-   fun:_dl_catch_error_internal
-   fun:_dl_open
-   obj:/lib/libdl-2.3.3.so
-   fun:_dl_catch_error_internal
-   obj:/lib/libdl-2.3.3.so
-   fun:dlopen
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_dl_new_object
-   fun:_dl_map_object_from_fd
-   fun:_dl_map_object_internal
-   obj:/lib/tls/libc-2.3.3.so
-   fun:_dl_catch_error_internal
-   fun:_dl_open
-   obj:/lib/libdl-2.3.3.so
-   fun:_dl_catch_error_internal
-   obj:/lib/libdl-2.3.3.so
-   fun:dlopen
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:strdup
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:_dl_check_map_versions_internal
-   obj:/lib/tls/libc-2.3.3.so
-   fun:_dl_catch_error_internal
-   fun:_dl_open
-   obj:/lib/libdl-2.3.3.so
-   fun:_dl_catch_error_internal
-   obj:/lib/libdl-2.3.3.so
-   fun:dlopen
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:XCreateGC
-   fun:initialize_visual_and_buffer
-   fun:XMesaCreateWindowBuffer2
-   fun:Fake_glXMakeContextCurrent
-   fun:Fake_glXMakeCurrent
-   fun:glXMakeCurrent
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:XGetVisualInfo
-   fun:get_visual
-   fun:choose_x_visual
-   fun:choose_visual
-   fun:Fake_glXChooseVisual
-   fun:glXChooseVisual
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_mesa_malloc
-   fun:_mesa_new_buffer_object
-   fun:_mesa_init_buffer_objects
-   fun:init_attrib_groups
-   fun:_mesa_initialize_context
-   fun:XMesaCreateContext
-   fun:Fake_glXCreateContext
-   fun:glXCreateContext
-}
-
 {
    <insert a suppression name here>
    Memcheck:Cond
-   fun:strchr
+   fun:_ZN15QPainterPrivate12updateMatrixEv
+   fun:_ZN8QPainter5beginEP12QPaintDevice
+   fun:_ZN8QPainterC1EP12QPaintDevice
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
+   fun:_Z19qt_syncBackingStoreP7QWidget
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN11pqChartArea5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
 }
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:_dl_new_object
-   fun:_dl_map_object_from_fd
-   fun:_dl_map_object_internal
-   obj:/lib/tls/libc-2.3.3.so
-   fun:_dl_catch_error_internal
-   fun:_dl_open
-   obj:/lib/libdl-2.3.3.so
-   fun:_dl_catch_error_internal
-   obj:/lib/libdl-2.3.3.so
-   fun:dlopen
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XlcCurrentLC
-   fun:XSetLocaleModifiers
-   fun:OpenIM
-   fun:TkpOpenDisplay
-   fun:GetScreen
-   fun:CreateTopLevelWindow
-   fun:TkCreateMainWindow
-   fun:CreateFrame
-   fun:TkCreateFrame
-   fun:Initialize
-   fun:Tk_Init
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:_mesa_calloc
-   fun:_mesa_alloc_program
-   fun:alloc_shared_state
-   fun:_mesa_initialize_context
-   fun:XMesaCreateContext
-   fun:Fake_glXCreateContext
-   fun:glXCreateContext
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_mesa_malloc
-   fun:alloc_vertex_store
-   fun:_tnl_NewList
-   fun:_mesa_NewList
-   fun:glNewList
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_mesa_malloc
-   fun:XMesaCreateVisual
-   fun:save_glx_visual
-   fun:choose_visual
-   fun:Fake_glXChooseVisual
-   fun:glXChooseVisual
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:_mesa_calloc
-   fun:XMesaCreateVisual
-   fun:save_glx_visual
-   fun:choose_visual
-   fun:Fake_glXChooseVisual
-   fun:glXChooseVisual
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:_mesa_calloc
-   fun:_mesa_NewHashTable
-   fun:_mesa_init_occlude
-   fun:init_attrib_groups
-   fun:_mesa_initialize_context
-   fun:XMesaCreateContext
-   fun:Fake_glXCreateContext
-   fun:glXCreateContext
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:_mesa_calloc
-   fun:Fake_glXCreateContext
-   fun:glXCreateContext
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_mesa_malloc
-   fun:_mesa_strdup
-   fun:_mesa_init_program
-   fun:init_attrib_groups
-   fun:_mesa_initialize_context
-   fun:XMesaCreateContext
-   fun:Fake_glXCreateContext
-   fun:glXCreateContext
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:_mesa_calloc
-   fun:_mesa_NewHashTable
-   fun:_mesa_init_depth
-   fun:init_attrib_groups
-   fun:_mesa_initialize_context
-   fun:XMesaCreateContext
-   fun:Fake_glXCreateContext
-   fun:glXCreateContext
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:_mesa_calloc
-   fun:_mesa_new_texture_object
-   fun:alloc_shared_state
-   fun:_mesa_initialize_context
-   fun:XMesaCreateContext
-   fun:Fake_glXCreateContext
-   fun:glXCreateContext
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_mesa_malloc
-   fun:alloc_prim_store
-   fun:_tnl_NewList
-   fun:_mesa_NewList
-   fun:glNewList
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_mesa_malloc
-   fun:alloc_vertex_store
-   fun:_save_compile_vertex_list
-   fun:_save_wrap_buffers
-   fun:_save_wrap_filled_vertex
-   fun:save_attrib_0_3
-   fun:_save_Vertex3fv
-   fun:glVertex3fv
-}
-
 {
    <insert a suppression name here>
    Memcheck:Cond
-   fun:strlen
-   obj:/lib/tls/libc-2.3.3.so
-   fun:_dl_catch_error_internal
-   fun:_dl_open
-   obj:/lib/libdl-2.3.3.so
-   fun:_dl_catch_error_internal
-   obj:/lib/libdl-2.3.3.so
-   fun:dlopen
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XlcDynamicLoad
-   fun:_XOpenLC
-   fun:_XrmInitParseInfo
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:XrmGetStringDatabase
-   obj:/usr/X11R6/lib/libXt.so.6.0
-   obj:/usr/X11R6/lib/libXt.so.6.0
-   fun:_XtDisplayInitialize
-   fun:XtDisplayInitialize
+   fun:_ZN15QPainterPrivate12updateMatrixEv
+   fun:_ZN8QPainter14setWorldMatrixERK7QMatrixb
+   fun:_ZN8QPainter9setMatrixERK7QMatrixb
+   fun:_ZN8QPainter9translateERK7QPointF
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
+   fun:_Z19qt_syncBackingStoreP7QWidget
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN11pqChartArea5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
 }
-
-{ 
+{
    <insert a suppression name here>
    Memcheck:Cond
-   fun:malloc
-   fun:open_path
-   fun:_dl_map_object_internal
-   fun:openaux
-   fun:_dl_catch_error_internal
-   fun:_dl_map_object_deps_internal
-   obj:/lib/tls/libc-2.3.3.so
-   fun:_dl_catch_error_internal
-   fun:_dl_open
-   obj:/lib/libdl-2.3.3.so
-   fun:_dl_catch_error_internal
-   obj:/lib/libdl-2.3.3.so
-   fun:dlopen
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_XNoticeCreateBitmap
-   fun:XCreatePixmap
-   fun:XCreateBitmapFromData
-   fun:GetBitmap
+   fun:_ZN15QPainterPrivate12updateMatrixEv
+   fun:_ZN8QPainter5beginEP12QPaintDevice
+   fun:_ZN8QPainterC1EP12QPaintDevice
+   fun:_ZN11pqChartArea10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN11pqChartArea5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
 }
-
 {
    <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_X11TransConnectDisplay
-   fun:XOpenDisplay
-   fun:_ZN22vtkXOpenGLRenderWindow12GetDisplayIdEv
+   Memcheck:Cond
+   fun:_ZN15QPainterPrivate12updateMatrixEv
+   fun:_ZN8QPainter5beginEP12QPaintDevice
+   fun:_ZN8QPainterC1EP12QPaintDevice
+   fun:_ZN11pqChartArea10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN11pqChartArea5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
 }
-
 {
    <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:XAddConnectionWatch
-   fun:_XtDisplayInitialize
-   fun:XtDisplayInitialize
+   Memcheck:Param
+   write(buf)
+   fun:write
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:_XEventsQueued
+   fun:XEventsQueued
+   fun:_Z22x11EventSourceDispatchP8_GSourcePFiPvES1_
+   fun:g_main_context_dispatch
+   obj:/usr/lib/libglib-2.0.so.0.1000.3
+   fun:g_main_context_iteration
+   fun:_ZN20QEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   fun:_ZN23QGuiEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   fun:_ZN10QEventLoop13processEventsE6QFlagsINS_17ProcessEventsFlagEE
 }
-
 {
    <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:XextAddDisplay
-   obj:/usr/X11R6/lib/libXext.so.6.4
-   fun:XShmQueryVersion
-   fun:check_for_xshm
-   fun:initialize_visual_and_buffer
-   fun:XMesaCreateWindowBuffer2
-   fun:Fake_glXMakeContextCurrent
-   fun:Fake_glXMakeCurrent
-   fun:glXMakeCurrent
+   Memcheck:Param
+   write(buf)
+   fun:write
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XFlush
+   fun:_ZN14QWidgetPrivate8hide_sysEv
+   fun:_ZN14QWidgetPrivate11hide_helperEv
+   fun:_ZN7QWidget10setVisibleEb
+   fun:_ZN7QWidgetD2Ev
+   fun:_ZN6QFrameD2Ev
+   fun:_ZN19QAbstractScrollAreaD2Ev
+   fun:_ZN13pqChartWidgetD0Ev
+   fun:_Z20HistogramInteractioniPPc
 }
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:XrmGetStringDatabase
-   obj:/usr/X11R6/lib/libXt.so.6.0
-   obj:/usr/X11R6/lib/libXt.so.6.0
-   fun:_XtDisplayInitialize
-   fun:XtDisplayInitialize
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   obj:/lib/libdl-2.3.3.so
-   fun:dlsym
-   fun:connect
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_X11TransConnect
-   fun:_X11TransConnectDisplay
-   fun:XOpenDisplay
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:_XcmsAddCmapRec
-   fun:XCreateColormap
-   fun:_ZN22vtkXOpenGLRenderWindow18GetDesiredColormapEv
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:XOpenDisplay
-   fun:_ZN22vtkXOpenGLRenderWindow12GetDisplayIdEv
-   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   obj:/usr/X11R6/lib/libX11.so.6.2
-   fun:_X11TransOpenCOTSClient
-   fun:_X11TransConnectDisplay
-   fun:XOpenDisplay
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:_XcmsInitScrnInfo
-   fun:XcmsDefaultCCC
-   fun:XcmsCreateCCC
-   fun:XcmsCCCOfColormap
-   fun:XAllocNamedColor
-   fun:XtCvtStringToPixel
-   obj:/usr/X11R6/lib/libXt.so.6.0
-   fun:_XtConvert
-   obj:/usr/X11R6/lib/libXt.so.6.0
-   fun:_XtGetResources
-   obj:/usr/X11R6/lib/libXt.so.6.0
-   fun:fun:_XtAppCreateShell
-   fun:XtVaAppCreateShell
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:XcmsCreateCCC
-   fun:XcmsCCCOfColormap
-   fun:XAllocNamedColor
-   fun:XtCvtStringToPixel
-   obj:/usr/X11R6/lib/libXt.so.6.0
-   fun:_XtConvert
-   obj:/usr/X11R6/lib/libXt.so.6.0
-   fun:_XtGetResources
-   obj:/usr/X11R6/lib/libXt.so.6.0
-   fun:_XtAppCreateShell
-   fun:XtVaAppCreateShell
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:_XcmsInitDefaultCCCs
-   fun:XcmsDefaultCCC
-   fun:XcmsCreateCCC
-   fun:XAllocNamedColor
-   fun:XtCvtStringToPixel
-   obj:/usr/X11R6/lib/libXt.so.6.0
-   fun:_XtConvert
-   obj:/usr/X11R6/lib/libXt.so.6.0
-   fun:_XtGetResources
-   obj:/usr/X11R6/lib/libXt.so.6.0
-   fun:_XtAppCreateShell
-   fun:XtVaAppCreateShell
-}
-
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:XkbUseExtension
-   fun:XOpenDisplay
-   fun:_ZN22vtkXOpenGLRenderWindow12GetDisplayIdEv
-}
-
