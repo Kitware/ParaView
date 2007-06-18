@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMProxy.h>
 
 #include "pqPropertyManager.h"
-#include "pqProxyPanel.h"
 #include "pqNamedWidgets.h"
 
 class pqWriterDialog::pqImplementation
@@ -52,10 +51,15 @@ public:
   pqImplementation()
   {
   }
+  ~pqImplementation()
+  {
+    delete this->PropertyManager;
+  }
   
   vtkSMProxy *Proxy;
-  pqProxyPanel *ProxyPanel;
   Ui::pqWriterDialog UI;
+  pqPropertyManager* PropertyManager;
+
 };
 
 //-----------------------------------------------------------------------------
@@ -65,18 +69,16 @@ pqWriterDialog::pqWriterDialog(vtkSMProxy *proxy, QWidget *p) :
 {
   this->Implementation->UI.setupUi(this);
 
+  this->Implementation->PropertyManager = new pqPropertyManager(this);
+
   QGridLayout *propertyFrameLayout = new QGridLayout(this->Implementation->UI.PropertyFrame);
   this->Implementation->Proxy = proxy;
-
-  // This widget maintains the pqPropertyManager for us. 
-  this->Implementation->ProxyPanel = new pqProxyPanel(
-      this->Implementation->Proxy,this);
 
   // Create the widgets inside "propertyFrameLayout"
   pqNamedWidgets::createWidgets(propertyFrameLayout,this->Implementation->Proxy);
   pqNamedWidgets::link(this->Implementation->UI.PropertyFrame, 
                        this->Implementation->Proxy, 
-                       this->Implementation->ProxyPanel->propertyManager());
+                       this->Implementation->PropertyManager);
 }
 
 //-----------------------------------------------------------------------------
@@ -84,7 +86,7 @@ pqWriterDialog::~pqWriterDialog()
 {
   pqNamedWidgets::unlink(this->Implementation->UI.PropertyFrame, 
                          this->Implementation->Proxy, 
-                         this->Implementation->ProxyPanel->propertyManager());
+                         this->Implementation->PropertyManager);
 
   delete this->Implementation;
 }
@@ -101,7 +103,7 @@ bool pqWriterDialog::hasConfigurableProperties()
 //-----------------------------------------------------------------------------
 void pqWriterDialog::accept()
 {
-  this->Implementation->ProxyPanel->accept();
+  this->Implementation->PropertyManager->accept();
 
   this->done(QDialog::Accepted);
 }
@@ -109,11 +111,11 @@ void pqWriterDialog::accept()
 //-----------------------------------------------------------------------------
 void pqWriterDialog::reject()
 {
-  this->Implementation->ProxyPanel->reset();
+  this->Implementation->PropertyManager->reject();
 
   pqNamedWidgets::unlink(this->Implementation->UI.PropertyFrame, 
                          this->Implementation->Proxy, 
-                         this->Implementation->ProxyPanel->propertyManager());
+                         this->Implementation->PropertyManager);
 
   this->done(QDialog::Rejected);
 }
