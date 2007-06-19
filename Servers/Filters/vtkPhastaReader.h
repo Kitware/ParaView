@@ -25,9 +25,6 @@
 #include "vtkUnstructuredGridAlgorithm.h"
 #include "vtkUnstructuredGrid.h"
 
-#include <vtkstd/string>
-#include <vtkstd/map>
-
 class vtkPoints;
 class vtkDataSetAttributes;
 class vtkInformationVector;
