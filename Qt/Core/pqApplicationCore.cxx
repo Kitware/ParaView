@@ -79,7 +79,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginManager.h"
 #include "pqProgressManager.h"
 #include "pqServer.h"
-#include "pqServerManagerModel.h"
 #include "pqServerManagerModel2.h"
 #include "pqServerManagerObserver.h"
 #include "pqServerManagerSelectionModel.h"
@@ -98,7 +97,6 @@ class pqApplicationCoreInternal
 {
 public:
   pqServerManagerObserver* ServerManagerObserver;
-  pqServerManagerModel* ServerManagerModel;
   pqServerManagerModel2* ServerManagerModel2;
   pqObjectBuilder* ObjectBuilder;
   pq3DWidgetFactory* WidgetFactory;
@@ -145,10 +143,6 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
 
   // *  Create pqServerManagerObserver first. This is the vtkSMProxyManager observer.
   this->Internal->ServerManagerObserver = new pqServerManagerObserver(this);
-
-  // *  Create pqServerManagerModel.
-  //    This is the representation builder for the ServerManager state.
-  this->Internal->ServerManagerModel = new pqServerManagerModel(this);
 
   // *  Make signal-slot connections between ServerManagerObserver and ServerManagerModel.
   //this->connect(this->Internal->ServerManagerObserver, this->Internal->ServerManagerModel);
@@ -200,37 +194,6 @@ pqApplicationCore::~pqApplicationCore()
   // Unregister all proxies registered with the proxy manager.
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   pxm->UnRegisterProxies();
-}
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::connect(pqServerManagerObserver* pdata, 
-  pqServerManagerModel* smModel)
-{
-  QObject::connect(pdata, SIGNAL(sourceRegistered(QString, vtkSMProxy*)),
-    smModel, SLOT(onAddSource(QString, vtkSMProxy*)));
-  QObject::connect(pdata, SIGNAL(sourceUnRegistered(QString, vtkSMProxy*)),
-    smModel, SLOT(onRemoveSource(QString, vtkSMProxy*)));
-  QObject::connect(pdata, SIGNAL(connectionCreated(vtkIdType)),
-    smModel, SLOT(onAddServer(vtkIdType)));
-  QObject::connect(pdata, SIGNAL(connectionClosed(vtkIdType)),
-    smModel, SLOT(onRemoveServer(vtkIdType)));
-  QObject::connect(pdata, SIGNAL(viewModuleRegistered(QString, 
-        vtkSMAbstractViewModuleProxy*)),
-    smModel, SLOT(onAddViewModule(QString, vtkSMAbstractViewModuleProxy*)));
-  QObject::connect(pdata, SIGNAL(viewModuleUnRegistered(vtkSMAbstractViewModuleProxy*)),
-    smModel, SLOT(onRemoveViewModule(vtkSMAbstractViewModuleProxy*)));
-  QObject::connect(pdata, 
-    SIGNAL(displayRegistered(QString, vtkSMProxy*)),
-    smModel, SLOT(onAddDisplay(QString, vtkSMProxy*)));
-  QObject::connect(pdata, SIGNAL(displayUnRegistered(vtkSMProxy*)),
-    smModel, SLOT(onRemoveDisplay(vtkSMProxy*)));
-  QObject::connect(
-    pdata, SIGNAL(proxyRegistered(QString, QString, vtkSMProxy*)),
-    smModel, SLOT(onProxyRegistered(QString, QString, vtkSMProxy*)));
-  QObject::connect(
-    pdata, SIGNAL(proxyUnRegistered(QString, QString, vtkSMProxy*)),
-    smModel, SLOT(onProxyUnRegistered(QString, QString, vtkSMProxy*)));
-      
 }
 
 //-----------------------------------------------------------------------------

@@ -48,7 +48,6 @@ class pqPluginManager;
 class pqProgressManager;
 class pqRenderViewModule;
 class pqServer;
-class pqServerManagerModel;
 class pqServerManagerModel2;
 class pqServerManagerObserver;
 class pqServerManagerSelectionModel;
@@ -123,18 +122,10 @@ public:
   /// etc. Returns the ServerManagerObserver used by the application.
   pqServerManagerObserver* getServerManagerObserver();
 
-
   /// ServerManagerModel is the representation of the ServerManager
   /// using pqServerManagerModelItem subclasses. It makes it possible to
   /// explore the ServerManager with ease by separating proxies based 
   /// on their functionality/type.
-private:
-  pqServerManagerModel* getServerManagerModel() {return 0;}
-  friend class pqConsumerDisplay;
-  friend class pqGenericViewModule;
-  friend class pqPipelineDisplay;
-
-public:
   pqServerManagerModel2* getServerManagerModel2();
 
   pq3DWidgetFactory* get3DWidgetFactory();
@@ -221,10 +212,6 @@ signals:
 
   /// Emitted after the core has finished creating a new server connection.
   void finishedAddingServer(pqServer *server);
-
-protected:
-  /// create signal/slot connections between pdata and smModel.
-  void connect(pqServerManagerObserver* pdata, pqServerManagerModel* smModel);
 
 protected:
 

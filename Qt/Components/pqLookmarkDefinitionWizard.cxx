@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqLookmarkDefinitionWizard.h"
 
 #include "pqApplicationCore.h"
-#include "pqConsumerDisplay.h"
 #include "pqDataRepresentation.h"
 #include "pqFlatTreeView.h"
 #include "pqImageUtil.h"
@@ -144,12 +143,12 @@ void pqLookmarkDefinitionWizard::createPipelinePreview()
   // Save visible displays and their sources, also any display/source pair upstream from a visible one in the pipeline:
   QList<pqRepresentation*> displays = this->ViewModule->getRepresentations();
   QList<pqRepresentation *>::Iterator iter;
-  pqConsumerDisplay *consDisp;
+  pqDataRepresentation *consDisp;
   vtkCollection *proxies = vtkCollection::New();
   for(iter = displays.begin(); iter != displays.end(); ++iter)
     {
     // if a display is visible, add it, its pipeline source, and all its upstream inputs to the collection of proxies
-    if( (consDisp = dynamic_cast<pqConsumerDisplay*>(*iter)))
+    if( (consDisp = dynamic_cast<pqDataRepresentation*>(*iter)))
       {
       if(consDisp->isVisible() )
         {
@@ -257,12 +256,12 @@ void pqLookmarkDefinitionWizard::createLookmark()
   // upstream from a visible one in the pipeline:
   QList<pqRepresentation*> displays = renderModule->getRepresentations();
   QList<pqRepresentation *>::Iterator iter;
-  pqConsumerDisplay *consDisp;
+  pqDataRepresentation *consDisp;
   for(iter = displays.begin(); iter != displays.end(); ++iter)
     {
     // if a display is visible, add it, its pipeline source, and all its 
     //  upstream inputs to the collection of proxies
-    if( (consDisp = dynamic_cast<pqConsumerDisplay*>(*iter)))
+    if( (consDisp = dynamic_cast<pqDataRepresentation*>(*iter)))
       {
       if(consDisp->isVisible() )
         {

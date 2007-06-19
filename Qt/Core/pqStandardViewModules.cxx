@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqElementInspectorView.h"
 #include "pqLineChartRepresentation.h"
 #include "pqPlotView.h"
-#include "pqTableViewModule.h"
+#include "pqTableView.h"
 #include "pqTextRepresentation.h"
 
 pqStandardViewModules::pqStandardViewModules(QObject* o)
@@ -55,7 +55,7 @@ QStringList pqStandardViewModules::viewTypes() const
   return QStringList() << 
     pqPlotView::barChartType() << 
     pqPlotView::XYPlotType() << 
-    pqTableViewModule::tableType() <<
+    pqTableView::tableType() <<
     pqElementInspectorView::eiViewType();
 }
 
@@ -78,9 +78,9 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
     {
     return pqPlotView::XYPlotTypeName();
     }
-  else if(type == pqTableViewModule::tableType())
+  else if(type == pqTableView::tableType())
     {
-    return pqTableViewModule::tableTypeName();
+    return pqTableView::tableTypeName();
     }
   else if (type == pqElementInspectorView::eiViewType())
     {
@@ -106,7 +106,7 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype)
     {
     return pxm->NewProxy("newviews", "XYPlotView");
     }
-  else if(viewtype == pqTableViewModule::tableType())
+  else if(viewtype == pqTableView::tableType())
     {
     return pxm->NewProxy("views", "TableView");
     }
@@ -137,7 +137,7 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     }
   else if(viewtype == "TableView")
     {
-    // return new pqTableViewModule(group, viewname, viewmodule, server, p);
+    // return new pqTableView(group, viewname, viewmodule, server, p);
     }
   else if (viewtype == "ElementInspectorView")
     {

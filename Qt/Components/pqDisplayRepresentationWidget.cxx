@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyLinks.h"
-#include "pqRenderViewModule.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"

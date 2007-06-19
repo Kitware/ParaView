@@ -46,7 +46,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // pqCore
 #include "pqApplicationCore.h"
-#include "pqRenderViewModule.h"
 #include "pqPipelineSource.h"
 
 // pqComponents

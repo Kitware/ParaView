@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QPair>
 #include <QPointer>
+#include <QRegExp>
 #include <QtDebug>
 
 // ParaView includes.
@@ -64,7 +65,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
-#include "pqRenderViewModule.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel2.h"

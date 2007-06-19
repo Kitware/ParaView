@@ -55,7 +55,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView
 #include "pqDataRepresentation.h"
-#include "pqGenericViewModule.h"
 #include "pqPipelineFilter.h"
 #include "pqServer.h"
 #include "pqSMAdaptor.h"

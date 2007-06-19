@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTableViewModule.h
+   Module:    pqTableView.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,22 +29,22 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqTableViewModule_h
-#define __pqTableViewModule_h
+#ifndef __pqTableView_h
+#define __pqTableView_h
 
-#include "pqGenericViewModule.h"
+#include "pqView.h"
 
-class PQCORE_EXPORT pqTableViewModule :
-  public pqGenericViewModule
+class PQCORE_EXPORT pqTableView :
+  public pqView
 {
-  typedef pqGenericViewModule Superclass;
+  typedef pqView Superclass;
 
   Q_OBJECT
 public:
-  pqTableViewModule(const QString& group, const QString& name, 
-    vtkSMAbstractViewModuleProxy* renModule, 
+  pqTableView(const QString& group, const QString& name, 
+    vtkSMViewProxy* renModule, 
     pqServer* server, QObject* parent=NULL);
-  ~pqTableViewModule();
+  ~pqTableView();
 
   static QString tableType() { return "TableView"; }
   static QString tableTypeName() { return "Table"; }
@@ -72,11 +72,11 @@ public:
   virtual bool canDisplaySource(pqPipelineSource* source) const;
 
 private slots:
-  void visibilityChanged(pqDisplay* disp);
+  void visibilityChanged(pqRepresentation* disp);
 
 private:
-  pqTableViewModule(const pqTableViewModule&); // Not implemented.
-  void operator=(const pqTableViewModule&); // Not implemented.
+  pqTableView(const pqTableView&); // Not implemented.
+  void operator=(const pqTableView&); // Not implemented.
 
   class pqImplementation;
   pqImplementation* const Implementation;

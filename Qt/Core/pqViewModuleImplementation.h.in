@@ -56,14 +56,14 @@ public:
   
   vtkSMProxy* createViewProxy(const QString& viewtype);
 
-  pqGenericViewModule* createView(const QString& viewtype,
+  pqView* createView(const QString& viewtype,
     const QString& group,
     const QString& name,
     vtkSMAbstractViewModuleProxy* viewmodule,
     pqServer* server,
     QObject* parent);
   
-  pqConsumerDisplay* createDisplay(const QString& display_type, 
+  pqDataRepresentation* createDisplay(const QString& display_type, 
     const QString& group,
     const QString& name,
     vtkSMProxy* proxy,

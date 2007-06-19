@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include <QModelIndex> // Needed for typedef
 
-class pqConsumerDisplay;
 class pqFlatTreeView;
 class pqPipelineBrowserInternal;
 class pqPipelineBrowserStateManager;

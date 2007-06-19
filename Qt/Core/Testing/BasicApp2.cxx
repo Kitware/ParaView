@@ -11,7 +11,6 @@
 #include "pqMain.h"
 #include "pqProcessModuleGUIHelper.h"
 #include "pqServer.h"
-#include "pqRenderViewModule.h"
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
 #include "pqCoreTestUtility.h"
@@ -162,7 +161,6 @@ public:
     interactorStyle->UpdateVTKObjects();
     }
   
-  QPointer<pqRenderViewModule> RenderModule;
   vtkSmartPointer<vtkSMRenderViewProxy> RenderView;
   vtkSmartPointer<vtkRVProxy> RVProxy;
 };

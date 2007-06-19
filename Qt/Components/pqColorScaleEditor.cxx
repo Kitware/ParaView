@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorMapWidget.h"
 #include "pqColorPresetManager.h"
 #include "pqColorPresetModel.h"
-#include "pqGenericViewModule.h"
 #include "pqLineEditNumberValidator.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineRepresentation.h"

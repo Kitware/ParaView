@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 
 class pqDataRepresentation;
-class pqGenericViewModule;
 class pqPipelineSourceInternal;
 class pqView;
 class vtkObject;

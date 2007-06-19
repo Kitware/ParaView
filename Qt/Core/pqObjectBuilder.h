@@ -35,9 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "pqCoreExport.h"
 
-class pqDisplay;
 class pqRepresentation;
-class pqGenericViewModule;
 class pqNameCount;
 class pqPipelineSource;
 class pqProxy;
@@ -226,19 +224,19 @@ signals:
   /// creates the source or when state is loaded or on undo/redo. 
   void proxyCreated(vtkSMProxy*);
 
-  /// Fired when destroy(pqGenericViewModule*) is called. 
+  /// Fired when destroy(pqView*) is called. 
   /// This signal is fired before the process for destruction of the object 
   /// begins. Remember that this signal is fired only when the destruction of 
   /// the object is requested by the GUI. It wont be triggered when the python 
   /// client unregisters the source or when state is loaded or on undo/redo. 
-  void destroying(pqGenericViewModule* view);
+  void destroying(pqView* view);
  
-  /// Fired when destroy(pqDisplay*) is called. 
+  /// Fired when destroy(pqRepresentation*) is called. 
   /// This signal is fired before the process for destruction of the object 
   /// begins. Remember that this signal is fired only when the destruction of 
   /// the object is requested by the GUI. It wont be triggered when the python 
   /// client unregisters the source or when state is loaded or on undo/redo. 
-  void destroying(pqDisplay* display);
+  void destroying(pqRepresentation* display);
 
   /// Fired when destroy(pqPipelineSource*) is called. 
   /// This signal is fired before the process for destruction of the object 

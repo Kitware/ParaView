@@ -49,7 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFileInfo>
 
 #include "pqApplicationCore.h"
-#include "pqConsumerDisplay.h"
 #include "pqDataRepresentation.h"
 #include "pqDisplayPolicy.h"
 #include "pqNameCount.h"
@@ -338,7 +337,7 @@ pqView* pqObjectBuilder::createView(const QString& type,
     }
   else
     {
-    qDebug() << "Cannot locate the pqGenericViewModule for the " 
+    qDebug() << "Cannot locate the pqView for the " 
       << "view module proxy.";
     }
 
@@ -361,7 +360,6 @@ void pqObjectBuilder::destroy(pqView* view)
 
   // Unregister the proxy....the rest of the GUI will(rather should) manage itself!
   QString name = view->getSMName();
-  vtkSMProxy* proxy = view->getProxy();
 
   this->destroyProxyInternal(view);
 

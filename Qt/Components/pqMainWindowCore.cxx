@@ -88,7 +88,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPipelineMenu.h"
 #include "pqPipelineSource.h"
-#include "pqPlotViewModule.h"
 #include "pqPluginDialog.h"
 #include "pqPluginManager.h"
 #include "pqPQLookupTableManager.h"
