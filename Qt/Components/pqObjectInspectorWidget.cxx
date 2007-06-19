@@ -64,7 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPluginManager.h"
 #include "pqPropertyManager.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqStreamTracerPanel.h"
 #include "pqExtractDataSetsPanel.h"
@@ -269,13 +269,13 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->DeleteButton->setEnabled(false);
 
 
-  this->connect(pqApplicationCore::instance()->getServerManagerModel2(),
+  this->connect(pqApplicationCore::instance()->getServerManagerModel(),
                 SIGNAL(sourceRemoved(pqPipelineSource*)),
                 SLOT(removeProxy(pqPipelineSource*)));
-  this->connect(pqApplicationCore::instance()->getServerManagerModel2(), 
+  this->connect(pqApplicationCore::instance()->getServerManagerModel(), 
       SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)),
       SLOT(handleConnectionChanged(pqPipelineSource*, pqPipelineSource*)));
-  this->connect(pqApplicationCore::instance()->getServerManagerModel2(), 
+  this->connect(pqApplicationCore::instance()->getServerManagerModel(), 
       SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*)),
       SLOT(handleConnectionChanged(pqPipelineSource*, pqPipelineSource*)));
 

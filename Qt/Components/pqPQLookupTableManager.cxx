@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineRepresentation.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
@@ -225,7 +225,7 @@ pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
 void pqPQLookupTableManager::updateLookupTableScalarRanges()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerManagerModel2* smmodel = core->getServerManagerModel2();
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
   
   QList<pqPipelineRepresentation*> reprs = 
     smmodel->findItems<pqPipelineRepresentation*>();

@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqLinksModel.h"
 #include "pqRenderView.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "QVTKWidget.h"
 
 //-----------------------------------------------------------------------------
@@ -109,8 +109,8 @@ bool pqLinkViewWidget::eventFilter(QObject* watched, QEvent* e)
   if(e->type() == QEvent::MouseButtonPress ||
      e->type() == QEvent::MouseButtonDblClick )
     {
-    pqServerManagerModel2* smModel =
-      pqApplicationCore::instance()->getServerManagerModel2();
+    pqServerManagerModel* smModel =
+      pqApplicationCore::instance()->getServerManagerModel();
 
     QMouseEvent* me = static_cast<QMouseEvent*>(e);
     QPoint globalpos(me->globalX(), me->globalY());

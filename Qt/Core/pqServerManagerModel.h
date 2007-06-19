@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqServerManagerModel2.h
+   Module:    pqServerManagerModel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqServerManagerModel2_h 
-#define __pqServerManagerModel2_h
+#ifndef __pqServerManagerModel_h 
+#define __pqServerManagerModel_h
 
 #include <QObject>
 #include <QList>
@@ -48,20 +48,20 @@ class pqView;
 class vtkSMProxy;
 
 //BTX
-class pqServerManagerModel2;
+class pqServerManagerModel;
 
 template <class T> inline QList<T> pqFindItems(
-  const pqServerManagerModel2* const model);
+  const pqServerManagerModel* const model);
 template <class T> inline QList<T> pqFindItems(
-  const pqServerManagerModel2* const model, pqServer* server);
+  const pqServerManagerModel* const model, pqServer* server);
 template <class T> inline T pqFindItem(
-  const pqServerManagerModel2* const model, const QString& name);
+  const pqServerManagerModel* const model, const QString& name);
 template <class T> inline T pqFindItem(
-  const pqServerManagerModel2* const model, vtkSMProxy* proxy);
+  const pqServerManagerModel* const model, vtkSMProxy* proxy);
 template <class T> inline int pqGetNumberOfItems(
-  const pqServerManagerModel2* const model);
+  const pqServerManagerModel* const model);
 template <class T> inline T pqGetItemAtIndex(
-  const pqServerManagerModel2* const model, int index);
+  const pqServerManagerModel* const model, int index);
 //ETX
 
 /// pqServerManagerModel is the model for the Server Manager.
@@ -70,7 +70,7 @@ template <class T> inline T pqGetItemAtIndex(
 /// This class collects that. This is merely representation of all the
 /// information available in the Server Manager in a more GUI friendly 
 /// way. Simplicity is the key here.
-class PQCORE_EXPORT pqServerManagerModel2 : public QObject
+class PQCORE_EXPORT pqServerManagerModel : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
@@ -78,9 +78,9 @@ public:
   /// Constructor:
   /// \c observer  :- instance of pqServerManagerObserver observing the server
   ///                 manager.
-  pqServerManagerModel2(pqServerManagerObserver* observer, 
+  pqServerManagerModel(pqServerManagerObserver* observer, 
     QObject* parent=0);
-  ~pqServerManagerModel2();
+  ~pqServerManagerModel();
 
   /// Given a connection Id, returns the pqServer instance for that connection,
   /// if any.
@@ -143,15 +143,15 @@ public:
       }
 
   /// Internal method.
-  static void findItemsHelper(const pqServerManagerModel2 * const model, 
+  static void findItemsHelper(const pqServerManagerModel * const model, 
     const QMetaObject &mo, QList<void *> *list, pqServer* server=0);
 
   /// Internal method.
-  static pqProxy* findItemHelper(const pqServerManagerModel2* const model, 
+  static pqProxy* findItemHelper(const pqServerManagerModel* const model, 
     const QMetaObject& mo, vtkSMProxy* proxy);
 
   /// Internal method.
-  static pqProxy* findItemHelper(const pqServerManagerModel2* const model, 
+  static pqProxy* findItemHelper(const pqServerManagerModel* const model, 
     const QMetaObject& mo, const QString& name);
 
 signals:
@@ -236,8 +236,8 @@ protected slots:
   virtual void onConnectionClosed(vtkIdType id);
 
 private:
-  pqServerManagerModel2(const pqServerManagerModel2&); // Not implemented.
-  void operator=(const pqServerManagerModel2&); // Not implemented.
+  pqServerManagerModel(const pqServerManagerModel&); // Not implemented.
+  void operator=(const pqServerManagerModel&); // Not implemented.
 
   class pqInternal;
   pqInternal* Internal;
@@ -246,52 +246,52 @@ private:
 
 //-----------------------------------------------------------------------------
 template <class T>
-inline QList<T> pqFindItems(const pqServerManagerModel2* const model)
+inline QList<T> pqFindItems(const pqServerManagerModel* const model)
 {
   QList<T> list;
-  pqServerManagerModel2::findItemsHelper(model, ((T)0)->staticMetaObject,
+  pqServerManagerModel::findItemsHelper(model, ((T)0)->staticMetaObject,
     reinterpret_cast<QList<void *>*>(&list), 0);
   return list;
 }
 
 //-----------------------------------------------------------------------------
 template <class T>
-inline QList<T> pqFindItems(const pqServerManagerModel2* const model,
+inline QList<T> pqFindItems(const pqServerManagerModel* const model,
   pqServer* server)
 {
   QList<T> list;
-  pqServerManagerModel2::findItemsHelper(model, ((T)0)->staticMetaObject,
+  pqServerManagerModel::findItemsHelper(model, ((T)0)->staticMetaObject,
     reinterpret_cast<QList<void *>*>(&list), server);
   return list;
 }
 
 //-----------------------------------------------------------------------------
 template <class T> 
-inline T pqFindItem(const pqServerManagerModel2* const model, vtkSMProxy* proxy)
+inline T pqFindItem(const pqServerManagerModel* const model, vtkSMProxy* proxy)
 {
   return qobject_cast<T>(
-    pqServerManagerModel2::findItemHelper(model, ((T)0)->staticMetaObject, proxy));
+    pqServerManagerModel::findItemHelper(model, ((T)0)->staticMetaObject, proxy));
 }
 
 //-----------------------------------------------------------------------------
 template <class T> 
-inline T pqFindItem(const pqServerManagerModel2* const model, 
+inline T pqFindItem(const pqServerManagerModel* const model, 
   const QString& name)
 {
   return qobject_cast<T>(
-    pqServerManagerModel2::findItemHelper(model, ((T)0)->staticMetaObject, name));
+    pqServerManagerModel::findItemHelper(model, ((T)0)->staticMetaObject, name));
 }
 
 //-----------------------------------------------------------------------------
 template <class T> 
-inline int pqGetNumberOfItems(const pqServerManagerModel2* const model)
+inline int pqGetNumberOfItems(const pqServerManagerModel* const model)
 {
   return pqFindItems<T>(model).size();
 }
 
 //-----------------------------------------------------------------------------
 template <class T> 
-inline T pqGetItemAtIndex(const pqServerManagerModel2* const model, int index)
+inline T pqGetItemAtIndex(const pqServerManagerModel* const model, int index)
 {
   QList<T> items = pqFindItems<T>(model);
   if (index < items.size())

@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineRepresentation.h"
 #include "pqRenderView.h"
 #include "pqScalarBarRepresentation.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 #include "vtkSMProperty.h"
 
@@ -138,7 +138,7 @@ bool pqScalarsToColors::getScalarRangeLock() const
 void pqScalarsToColors::hideUnusedScalarBars()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerManagerModel2* smmodel = core->getServerManagerModel2();
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
 
   QList<pqPipelineRepresentation*> displays = 
     smmodel->findItems<pqPipelineRepresentation*>(this->getServer());

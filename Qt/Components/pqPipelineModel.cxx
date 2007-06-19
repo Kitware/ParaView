@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqServerManagerModelItem.h"
 
 #include <QFont>
@@ -624,7 +624,7 @@ pqPipelineModel::pqPipelineModel(const pqPipelineModel &other,
     }
 }
 
-pqPipelineModel::pqPipelineModel(const pqServerManagerModel2 &other,
+pqPipelineModel::pqPipelineModel(const pqServerManagerModel &other,
     QObject *parentObject)
   : QAbstractItemModel(parentObject)
 {

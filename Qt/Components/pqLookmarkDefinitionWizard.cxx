@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqRepresentation.h"
 #include "pqServer.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqServerManagerModelItem.h"
 #include "pqView.h"
 
@@ -135,8 +135,8 @@ pqLookmarkDefinitionWizard::~pqLookmarkDefinitionWizard()
 void pqLookmarkDefinitionWizard::createPipelinePreview()
 {
   // Make a copy of the model for the user to select sources.
-  pqServerManagerModel2 *smModel =
-      pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel *smModel =
+      pqApplicationCore::instance()->getServerManagerModel();
   this->PipelineModel = new pqPipelineModel(*smModel);
   this->PipelineModel->setEditable(false);
 

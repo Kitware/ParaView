@@ -38,11 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPipelineSource.h"
 #include "pqApplicationCore.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqPendingDisplayManager.h"
 
 vtkStandardNewMacro(pqPendingDisplayUndoElement);
-vtkCxxRevisionMacro(pqPendingDisplayUndoElement, "1.6.4.1");
+vtkCxxRevisionMacro(pqPendingDisplayUndoElement, "1.6.4.2");
 //-----------------------------------------------------------------------------
 pqPendingDisplayUndoElement::pqPendingDisplayUndoElement()
 {
@@ -99,7 +99,7 @@ int pqPendingDisplayUndoElement::InternalUndoRedo(bool undo)
     }
 
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerManagerModel2* smModel = core->getServerManagerModel2();
+  pqServerManagerModel* smModel = core->getServerManagerModel();
   pqPendingDisplayManager* pdmanager = qobject_cast<pqPendingDisplayManager*>(
     core->manager("PENDING_DISPLAY_MANAGER"));
   if (!pdmanager)

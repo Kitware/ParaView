@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqOptions.h>
 #include <pqServer.h>
 #include <pqServerBrowser.h>
-#include <pqServerManagerModel2.h>
+#include <pqServerManagerModel.h>
 #include <pqServerResource.h>
 #include <pqServerStartupContext.h>
 #include <pqServerStartup.h>
@@ -204,7 +204,7 @@ void pqSimpleServerStartup::startServer(pqServerStartup& startup)
   if (this->IgnoreConnectIfAlreadyConnected)
     {
     if (pqServer* const existing_server =
-      pqApplicationCore::instance()->getServerManagerModel2()->findServer(
+      pqApplicationCore::instance()->getServerManagerModel()->findServer(
         this->Implementation->Server))
       {
       this->started(existing_server);
@@ -293,7 +293,7 @@ void pqSimpleServerStartup::startServer(
         {
         pqServerStartup* const startup = 
           server_startups.getStartup(startup_name);
-        if (pqApplicationCore::instance()->getServerManagerModel2()->findServer(
+        if (pqApplicationCore::instance()->getServerManagerModel()->findServer(
             startup->getServer()))
           {
           // we call startServer so it performs all the 
@@ -338,7 +338,7 @@ void pqSimpleServerStartup::reset()
 {
   this->Implementation->reset();
   QObject::disconnect(
-    pqApplicationCore::instance()->getServerManagerModel2(),
+    pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(serverAdded(pqServer*)),
     this,
     SLOT(finishReverseConnection(pqServer*)));
@@ -688,7 +688,7 @@ void pqSimpleServerStartup::forwardConnectServer()
 void pqSimpleServerStartup::disconnectAllServers()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerManagerModel2* smModel = core->getServerManagerModel2();
+  pqServerManagerModel* smModel = core->getServerManagerModel();
   while (smModel->getNumberOfItems<pqServer*>() > 0)
     {
     core->removeServer(smModel->getItemAtIndex<pqServer*>(0));
@@ -701,7 +701,7 @@ void pqSimpleServerStartup::startReverseConnection()
   vtkProcessModule* const process_module = vtkProcessModule::GetProcessModule();
   
   QObject::connect(
-    pqApplicationCore::instance()->getServerManagerModel2(),
+    pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(serverAdded(pqServer*)),
     this,
     SLOT(finishReverseConnection(pqServer*)));
@@ -796,7 +796,7 @@ void pqSimpleServerStartup::monitorReverseConnections()
 void pqSimpleServerStartup::finishReverseConnection(pqServer* server)
 {
   QObject::disconnect(
-    pqApplicationCore::instance()->getServerManagerModel2(),
+    pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(serverAdded(pqServer*)),
     this,
     SLOT(finishReverseConnection(pqServer*)));

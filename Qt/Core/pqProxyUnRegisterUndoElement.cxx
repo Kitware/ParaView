@@ -37,10 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqProxy.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 
 vtkStandardNewMacro(pqProxyUnRegisterUndoElement);
-vtkCxxRevisionMacro(pqProxyUnRegisterUndoElement, "1.1.6.1");
+vtkCxxRevisionMacro(pqProxyUnRegisterUndoElement, "1.1.6.2");
 //-----------------------------------------------------------------------------
 pqProxyUnRegisterUndoElement::pqProxyUnRegisterUndoElement()
 {
@@ -65,7 +65,7 @@ void pqProxyUnRegisterUndoElement::ProxyToUnRegister(
   this->Superclass::ProxyToUnRegister(groupname, proxyname, proxy);
 
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerManagerModel2* smmodel = core->getServerManagerModel2();
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
 
   pqProxy* pq_proxy = smmodel->findItem<pqProxy*>(proxy);
   if (!pq_proxy || !this->XMLElement)

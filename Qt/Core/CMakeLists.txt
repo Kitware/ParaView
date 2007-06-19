@@ -84,7 +84,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqRepresentation.h
   pqView.h
   pqRenderView.h
-  pqServerManagerModel2.h
+  pqServerManagerModel.h
   pqStandardServerManagerModelInterface.h
   pqScalarBarRepresentation.h
   pqDataRepresentation.h
@@ -135,8 +135,8 @@ ADD_LIBRARY(pqCore
   pqView.h
   pqRenderView.cxx
   pqRenderView.h
-  pqServerManagerModel2.cxx
-  pqServerManagerModel2.h
+  pqServerManagerModel.cxx
+  pqServerManagerModel.h
   pqStandardServerManagerModelInterface.cxx
   pqStandardServerManagerModelInterface.h
   pqScalarBarRepresentation.cxx

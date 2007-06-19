@@ -57,7 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProgressManager.h"
 #include "pqProxy.h"
 #include "pqServer.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 #include "pqView.h"
 
@@ -88,8 +88,8 @@ pqAnimationManager::pqAnimationManager(QObject* _parent/*=0*/)
 :QObject(_parent)
 {
   this->Internals = new pqAnimationManager::pqInternals();
-  pqServerManagerModel2* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
   QObject::connect(smmodel, SIGNAL(proxyAdded(pqProxy*)),
     this, SLOT(onProxyAdded(pqProxy*)));
   QObject::connect(smmodel, SIGNAL(proxyRemoved(pqProxy*)),
@@ -123,7 +123,7 @@ void pqAnimationManager::updateViewModules()
     }
 
   QList<pqView*> viewModules = 
-    pqApplicationCore::instance()->getServerManagerModel2()->
+    pqApplicationCore::instance()->getServerManagerModel()->
     findItems<pqView*>(this->Internals->ActiveServer);
   
   QList<pqSMProxy> viewList;

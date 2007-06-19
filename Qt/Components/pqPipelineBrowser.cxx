@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineModelSelectionAdaptor.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqView.h"
 //#include "pqSourceInfoIcons.h"
 //#include "pqSourceHistoryModel.h"
@@ -113,8 +113,8 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
   this->Model = new pqPipelineModel(this);
 
   // Connect the model to the ServerManager model.
-  pqServerManagerModel2 *smModel = 
-      pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel *smModel = 
+      pqApplicationCore::instance()->getServerManagerModel();
   
   this->connect(smModel, SIGNAL(serverAdded(pqServer*)),
       this->Model, SLOT(addServer(pqServer*)));
@@ -340,8 +340,8 @@ void pqPipelineBrowser::changeInput()
     {
     pqFilterInputDialog dialog(QApplication::activeWindow());
     dialog.setObjectName("ChangeInputDialog");
-    pqServerManagerModel2 *smModel =
-        pqApplicationCore::instance()->getServerManagerModel2();
+    pqServerManagerModel *smModel =
+        pqApplicationCore::instance()->getServerManagerModel();
     pqPipelineModel *model = new pqPipelineModel(*smModel);
     dialog.setModelAndFilter(model, filter);
     if(QDialog::Accepted == dialog.exec())

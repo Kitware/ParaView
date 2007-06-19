@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 
 #include <vtkstd/vector>
@@ -102,8 +102,8 @@ pqTimeKeeper::pqTimeKeeper( const QString& group, const QString& name,
   this->Internals->VTKConnect->Connect(timekeeper->GetProperty("Time"),
     vtkCommand::ModifiedEvent, this, SIGNAL(timeChanged()));
 
-  pqServerManagerModel2* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
 
   QObject::connect(smmodel, SIGNAL(sourceAdded(pqPipelineSource*)),
     this, SLOT(sourceAdded(pqPipelineSource*)));
@@ -238,8 +238,8 @@ void pqTimeKeeper::propertyModified(vtkObject* obj, unsigned long, void*, void* 
     return;
     }
 
-  pqServerManagerModel2* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
   pqPipelineSource* source = smmodel->findItem<pqPipelineSource*>(proxy);
   if (source)
     {

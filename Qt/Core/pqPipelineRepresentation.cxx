@@ -67,7 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 
 
@@ -463,7 +463,7 @@ void pqPipelineRepresentation::colorByArray(const char* arrayname, int fieldtype
     {
     // Locate pqScalarsToColors for the old LUT and update 
     // it's scalar bar visibility.
-    pqServerManagerModel2* smmodel = core->getServerManagerModel2();
+    pqServerManagerModel* smmodel = core->getServerManagerModel();
     old_stc = smmodel->findItem<pqScalarsToColors*>(oldlutProxy);
     }
   

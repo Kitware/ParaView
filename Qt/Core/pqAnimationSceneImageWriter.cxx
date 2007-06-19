@@ -35,11 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMViewProxy.h"
 
 #include "pqApplicationCore.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqView.h"
 
 vtkStandardNewMacro(pqAnimationSceneImageWriter);
-vtkCxxRevisionMacro(pqAnimationSceneImageWriter, "1.2.8.1");
+vtkCxxRevisionMacro(pqAnimationSceneImageWriter, "1.2.8.2");
 //-----------------------------------------------------------------------------
 pqAnimationSceneImageWriter::pqAnimationSceneImageWriter()
 {
@@ -55,7 +55,7 @@ vtkImageData* pqAnimationSceneImageWriter::CaptureViewImage(
     vtkSMViewProxy* view, int magnification)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerManagerModel2* smmodel = core->getServerManagerModel2();
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
 
   pqView* pq_view = smmodel->findItem<pqView*>(view);
   return (pq_view? pq_view->captureImage(magnification) : NULL);

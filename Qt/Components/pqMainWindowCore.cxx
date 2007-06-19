@@ -99,7 +99,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionManager.h"
 #include "pqSelectReaderDialog.h"
 #include "pqServer.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqServerStartupBrowser.h"
@@ -632,7 +632,7 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     &this->Implementation->PendingDisplayManager, SIGNAL(pendingDisplays(bool)),
     this, SLOT(onPendingDisplayChanged(bool)));
 
-  this->connect(core->getServerManagerModel2(), 
+  this->connect(core->getServerManagerModel(), 
     SIGNAL(serverAdded(pqServer*)),
     this, SLOT(onServerCreation(pqServer*)));
 
@@ -640,14 +640,14 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     SIGNAL(finishedAddingServer(pqServer*)),
     this, SLOT(onServerCreationFinished(pqServer*)));
 
-  this->connect(core->getServerManagerModel2(),
+  this->connect(core->getServerManagerModel(),
       SIGNAL(aboutToRemoveServer(pqServer*)),
       this, SLOT(onRemovingServer(pqServer*)));
-  this->connect(core->getServerManagerModel2(),
+  this->connect(core->getServerManagerModel(),
       SIGNAL(finishedRemovingServer()),
       this, SLOT(onSelectionChanged()));
 
-  this->connect(core->getServerManagerModel2(),
+  this->connect(core->getServerManagerModel(),
       SIGNAL(preSourceRemoved(pqPipelineSource*)),
       &this->Implementation->PendingDisplayManager, 
       SLOT(removePendingDisplayForSource(pqPipelineSource*)));
@@ -1685,7 +1685,7 @@ bool pqMainWindowCore::makeServerConnectionIfNoneExists()
     }
 
   pqApplicationCore* core = pqApplicationCore::instance();
-  if (core->getServerManagerModel2()->getNumberOfItems<pqServer*>() != 0)
+  if (core->getServerManagerModel()->getNumberOfItems<pqServer*>() != 0)
     {
     // cannot really happen, however, if no active server, yet
     // server connection exists, we don't try to make a new server connection.
@@ -1717,7 +1717,7 @@ void pqMainWindowCore::makeDefaultConnectionIfNoneExists()
     }
 
   pqApplicationCore* core = pqApplicationCore::instance();
-  if (core->getServerManagerModel2()->getNumberOfItems<pqServer*>() != 0)
+  if (core->getServerManagerModel()->getNumberOfItems<pqServer*>() != 0)
     {
     // cannot really happen, however, if no active server, yet
     // server connection exists, we don't try to make a new server connection.
@@ -1778,7 +1778,7 @@ void pqMainWindowCore::onFileLoadServerState()
 {
   this->makeServerConnectionIfNoneExists();
   pqApplicationCore* core = pqApplicationCore::instance();
-  int num_servers = core->getServerManagerModel2()->getNumberOfItems<pqServer*>();
+  int num_servers = core->getServerManagerModel()->getNumberOfItems<pqServer*>();
   if (num_servers > 0)
     {
     pqServer* server = this->getActiveServer();
@@ -2147,7 +2147,7 @@ void pqMainWindowCore::onServerConnect()
   pqServer* server = this->getActiveServer();
 
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerManagerModel2* smmodel = core->getServerManagerModel2();
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
 
   if (server && smmodel->findItems<pqPipelineSource*>(server).size() > 0)
     {
@@ -2737,7 +2737,7 @@ void pqMainWindowCore::onSelectionChanged()
   pqServer *server = this->getActiveServer();
 
   pqApplicationCore *core = pqApplicationCore::instance();
-  int numServers = core->getServerManagerModel2()->getNumberOfItems<pqServer*>();
+  int numServers = core->getServerManagerModel()->getNumberOfItems<pqServer*>();
   pqView* view = pqActiveView::instance().current();
   pqRenderView* renderView = qobject_cast<pqRenderView*>(view);
   bool pendingDisplays = 
@@ -2781,7 +2781,7 @@ void pqMainWindowCore::onPendingDisplayChanged(bool pendingDisplays)
   pqServer *server = this->getActiveServer(); 
 
   pqApplicationCore *core = pqApplicationCore::instance();
-  int numServers = core->getServerManagerModel2()->getNumberOfItems<pqServer*>();
+  int numServers = core->getServerManagerModel()->getNumberOfItems<pqServer*>();
   this->updatePendingActions(server, source, numServers, pendingDisplays);
 }
 
@@ -2947,7 +2947,7 @@ void pqMainWindowCore::onRemovingServer(pqServer *server)
   pqServerManagerSelectionModel *selection = core->getSelectionModel();
   toDeselect.append(server);
   QList<pqPipelineSource*> sources =
-      core->getServerManagerModel2()->findItems<pqPipelineSource*>(server);
+      core->getServerManagerModel()->findItems<pqPipelineSource*>(server);
   QList<pqPipelineSource*>::Iterator iter = sources.begin();
   for( ; iter != sources.end(); ++iter)
     {

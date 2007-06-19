@@ -48,7 +48,7 @@ class pqPipelineModelSource;
 class pqPipelineSource;
 class pqView;
 class pqServer;
-class pqServerManagerModel2;
+class pqServerManagerModel;
 class pqServerManagerModelItem;
 class QFont;
 class QPixmap;
@@ -102,7 +102,7 @@ public:
   ///   Creates a pipeline model from a server manager model.
   /// \param other Used to build a pipeline model.
   /// \param parent The parent object.
-  pqPipelineModel(const pqServerManagerModel2 &other, QObject *parent=0);
+  pqPipelineModel(const pqServerManagerModel &other, QObject *parent=0);
   virtual ~pqPipelineModel();
 
   /// \name QAbstractItemModel Methods

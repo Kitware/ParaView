@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
 #include "pqServer.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqApplicationCore.h"
 
 #include <QFrame>
@@ -204,7 +204,7 @@ void pqLookmarkSourceDialog::setModels(QStandardItemModel *lmkModel, pqPipelineM
   this->CurrentPipelineView->expandAll();
 
   // Find and select an initial source (so something is selected)
-  pqServerManagerModel2 *model = pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel *model = pqApplicationCore::instance()->getServerManagerModel();
   QList<pqPipelineSource*> sources = model->findItems<pqPipelineSource*>();
   foreach (pqPipelineSource* src, sources)
     {

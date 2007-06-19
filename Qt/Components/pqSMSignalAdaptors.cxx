@@ -52,7 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqSMProxy.h"
 
 pqSignalAdaptorProxy::pqSignalAdaptorProxy(QObject* p, 
@@ -81,7 +81,7 @@ void pqSignalAdaptorProxy::setProxy(const QVariant& var)
     if(p)
       {
       pqPipelineSource* o = 
-        pqApplicationCore::instance()->getServerManagerModel2()->
+        pqApplicationCore::instance()->getServerManagerModel()->
         findItem<pqPipelineSource*>(p);
       if(o)
         {

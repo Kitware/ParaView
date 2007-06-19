@@ -42,10 +42,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqProxy.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 
 vtkStandardNewMacro(pqHelperProxyRegisterUndoElement);
-vtkCxxRevisionMacro(pqHelperProxyRegisterUndoElement, "1.2.6.1");
+vtkCxxRevisionMacro(pqHelperProxyRegisterUndoElement, "1.2.6.2");
 //-----------------------------------------------------------------------------
 pqHelperProxyRegisterUndoElement::pqHelperProxyRegisterUndoElement()
 {
@@ -116,7 +116,7 @@ int pqHelperProxyRegisterUndoElement::Redo()
     }
 
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerManagerModel2* smModel = core->getServerManagerModel2();
+  pqServerManagerModel* smModel = core->getServerManagerModel();
 
   pqProxy* pq_proxy = smModel->findItem<pqProxy*>(proxy);
   if (!pq_proxy)

@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
 #include "pqServer.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
 #include "pqTimeKeeper.h"
@@ -214,8 +214,8 @@ QPair<double, double> pqAnimationScene::getClockTimeRange() const
 //-----------------------------------------------------------------------------
 void pqAnimationScene::onCuesChanged()
 {
-  pqServerManagerModel2* model = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* model = 
+    pqApplicationCore::instance()->getServerManagerModel();
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->getProxy()->GetProperty("Cues"));
@@ -303,7 +303,7 @@ pqAnimationCue* pqAnimationScene::createCueInternal(const QString& mtype,
   vtkSMProxy* proxy, const char* propertyname, int index) 
 {
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerManagerModel2* smmodel = core->getServerManagerModel2();
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
 
   pqObjectBuilder* builder = core->getObjectBuilder();
   vtkSMProxy* cueProxy = builder->createProxy("animation", "AnimationCue", 
@@ -337,8 +337,8 @@ pqAnimationCue* pqAnimationScene::createCueInternal(const QString& mtype,
 //-----------------------------------------------------------------------------
 void pqAnimationScene::removeCues(vtkSMProxy* animated_proxy)
 {
-  pqServerManagerModel2* model = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* model = 
+    pqApplicationCore::instance()->getServerManagerModel();
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->getProxy()->GetProperty("Cues"));

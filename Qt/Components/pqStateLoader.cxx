@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqMainWindowCore.h"
 #include "pqProxy.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqViewManager.h"
 
 //-----------------------------------------------------------------------------
@@ -60,7 +60,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqStateLoader);
-vtkCxxRevisionMacro(pqStateLoader, "1.8.6.1");
+vtkCxxRevisionMacro(pqStateLoader, "1.8.6.2");
 //-----------------------------------------------------------------------------
 pqStateLoader::pqStateLoader()
 {
@@ -239,8 +239,8 @@ int pqStateLoader::BuildProxyCollectionInformation(
 //-----------------------------------------------------------------------------
 void pqStateLoader::DiscoverHelperProxies()
 {
-  pqServerManagerModel2* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
   QRegExp helper_group_rx ("pq_helper_proxies.(\\d+)");
 
   foreach(vtkPVXMLElement* proxyCollection, 

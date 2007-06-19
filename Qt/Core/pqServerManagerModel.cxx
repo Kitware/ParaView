@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqServerManagerModel2.cxx
+   Module:    pqServerManagerModel.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 
 // Server Manager Includes.
 #include "vtkProcessModule.h"
@@ -56,7 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRepresentation.h"
 
 //-----------------------------------------------------------------------------
-class pqServerManagerModel2::pqInternal
+class pqServerManagerModel::pqInternal
 {
 public:
   typedef QMap<vtkIdType, QPointer<pqServer> > ServerMap;
@@ -69,12 +69,12 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqServerManagerModel2::pqServerManagerModel2(
+pqServerManagerModel::pqServerManagerModel(
     pqServerManagerObserver* observer,
     QObject* _parent /*=0*/) :
   QObject(_parent)
 {
-  this->Internal = new pqServerManagerModel2::pqInternal();
+  this->Internal = new pqServerManagerModel::pqInternal();
   QObject::connect(observer, 
     SIGNAL(proxyRegistered(const QString&, const QString&, vtkSMProxy*)),
     this, SLOT(onProxyRegistered(const QString&, const QString&, vtkSMProxy*)));
@@ -89,13 +89,13 @@ pqServerManagerModel2::pqServerManagerModel2(
 }
 
 //-----------------------------------------------------------------------------
-pqServerManagerModel2::~pqServerManagerModel2()
+pqServerManagerModel::~pqServerManagerModel()
 {
   delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
-pqServer* pqServerManagerModel2::findServer(vtkIdType cid) const
+pqServer* pqServerManagerModel::findServer(vtkIdType cid) const
 {
   pqInternal::ServerMap::iterator iter = this->Internal->Servers.find(cid);
   if (iter != this->Internal->Servers.end())
@@ -107,7 +107,7 @@ pqServer* pqServerManagerModel2::findServer(vtkIdType cid) const
 }
 
 //-----------------------------------------------------------------------------
-pqServer* pqServerManagerModel2::findServer(const pqServerResource& resource) const
+pqServer* pqServerManagerModel::findServer(const pqServerResource& resource) const
 {
   foreach(pqServer* server, this->Internal->Servers)
     {
@@ -120,8 +120,8 @@ pqServer* pqServerManagerModel2::findServer(const pqServerResource& resource) co
 }
 
 //-----------------------------------------------------------------------------
-pqProxy* pqServerManagerModel2::findItemHelper(
-  const pqServerManagerModel2* const model, const QMetaObject& vtkNotUsed(mo), 
+pqProxy* pqServerManagerModel::findItemHelper(
+  const pqServerManagerModel* const model, const QMetaObject& vtkNotUsed(mo), 
   vtkSMProxy* proxy)
 {
   pqInternal::ProxyMap::iterator iter = model->Internal->Proxies.find(proxy);
@@ -134,8 +134,8 @@ pqProxy* pqServerManagerModel2::findItemHelper(
 }
 
 //-----------------------------------------------------------------------------
-pqProxy* pqServerManagerModel2::findItemHelper(
-  const pqServerManagerModel2* const model, const QMetaObject& mo, 
+pqProxy* pqServerManagerModel::findItemHelper(
+  const pqServerManagerModel* const model, const QMetaObject& mo, 
   const QString& name)
 {
   foreach (pqServerManagerModelItem* item, model->Internal->ItemList)
@@ -154,7 +154,7 @@ pqProxy* pqServerManagerModel2::findItemHelper(
 }
 
 //-----------------------------------------------------------------------------
-void pqServerManagerModel2::findItemsHelper(const pqServerManagerModel2 *const model, 
+void pqServerManagerModel::findItemsHelper(const pqServerManagerModel *const model, 
   const QMetaObject &mo, QList<void *> *list, pqServer* server/*=0*/)
 {
   if (!model || !list)
@@ -180,7 +180,7 @@ void pqServerManagerModel2::findItemsHelper(const pqServerManagerModel2 *const m
 }
 
 //-----------------------------------------------------------------------------
-void pqServerManagerModel2::onProxyRegistered(const QString& group,
+void pqServerManagerModel::onProxyRegistered(const QString& group,
   const QString& name, vtkSMProxy* proxy)
 {
   if (group.endsWith("_prototypes"))
@@ -295,7 +295,7 @@ void pqServerManagerModel2::onProxyRegistered(const QString& group,
 }
 
 //-----------------------------------------------------------------------------
-void pqServerManagerModel2::onProxyUnRegistered(const QString& group,
+void pqServerManagerModel::onProxyUnRegistered(const QString& group,
   const QString& name, vtkSMProxy* proxy)
 {
   // TODO:UDA
@@ -368,7 +368,7 @@ void pqServerManagerModel2::onProxyUnRegistered(const QString& group,
 }
 
 //-----------------------------------------------------------------------------
-void pqServerManagerModel2::onConnectionCreated(vtkIdType id)
+void pqServerManagerModel::onConnectionCreated(vtkIdType id)
 {
   // Avoid duplicate server creations.
   if (this->findServer(id))
@@ -396,7 +396,7 @@ void pqServerManagerModel2::onConnectionCreated(vtkIdType id)
 }
 
 //-----------------------------------------------------------------------------
-void pqServerManagerModel2::onConnectionClosed(vtkIdType id)
+void pqServerManagerModel::onConnectionClosed(vtkIdType id)
 {
   pqServer* server = this->findServer(id);
   if (!server)
@@ -417,13 +417,13 @@ void pqServerManagerModel2::onConnectionClosed(vtkIdType id)
 }
 
 //-----------------------------------------------------------------------------
-void pqServerManagerModel2::beginRemoveServer(pqServer *server)
+void pqServerManagerModel::beginRemoveServer(pqServer *server)
 {
   emit this->aboutToRemoveServer(server);
 }
 
 //-----------------------------------------------------------------------------
-void pqServerManagerModel2::endRemoveServer()
+void pqServerManagerModel::endRemoveServer()
 {
   emit this->finishedRemovingServer();
 }

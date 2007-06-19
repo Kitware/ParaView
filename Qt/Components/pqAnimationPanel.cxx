@@ -61,7 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqSignalAdaptorKeyFrameTime.h"
 #include "pqSignalAdaptorKeyFrameType.h"
@@ -192,8 +192,8 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
     this->Internal->keyFrameIndex, SIGNAL(valueChanged(int)),
     this, SLOT(showKeyFrameCallback(int)));
 
-  pqServerManagerModel2* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
   QObject::connect(smmodel, SIGNAL(preSourceRemoved(pqPipelineSource*)),
     this, SLOT(onSourceRemoved(pqPipelineSource*)));
   QObject::connect(smmodel, SIGNAL(sourceAdded(pqPipelineSource*)),
@@ -608,7 +608,7 @@ void pqAnimationPanel::onCurrentSourceChanged(int index)
     else
       {
       src = pqApplicationCore::instance()->
-        getServerManagerModel2()->findItem<pqProxy*>(pname);
+        getServerManagerModel()->findItem<pqProxy*>(pname);
       }
     }
 #if 0

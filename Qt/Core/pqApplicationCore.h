@@ -48,7 +48,7 @@ class pqPluginManager;
 class pqProgressManager;
 class pqRenderViewModule;
 class pqServer;
-class pqServerManagerModel2;
+class pqServerManagerModel;
 class pqServerManagerObserver;
 class pqServerManagerSelectionModel;
 class pqServerResource;
@@ -126,7 +126,7 @@ public:
   /// using pqServerManagerModelItem subclasses. It makes it possible to
   /// explore the ServerManager with ease by separating proxies based 
   /// on their functionality/type.
-  pqServerManagerModel2* getServerManagerModel2();
+  pqServerManagerModel* getServerManagerModel();
 
   pq3DWidgetFactory* get3DWidgetFactory();
   pqLinksModel* getLinksModel();

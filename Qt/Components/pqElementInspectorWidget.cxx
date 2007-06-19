@@ -52,7 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqSelectionManager.h"
 #include "pqServer.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqSMAdaptor.h"
 
@@ -135,8 +135,8 @@ pqElementInspectorWidget::pqElementInspectorWidget(QWidget *p) :
     SIGNAL(currentChanged(pqServerManagerModelItem*)),
     this, SLOT(onCurrentChanged(pqServerManagerModelItem*)));
 
-  pqServerManagerModel2* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
   QObject::connect(smmodel, SIGNAL(preSourceRemoved(pqPipelineSource*)),
     this, SLOT(onSourceRemoved(pqPipelineSource*)));
 }
@@ -251,7 +251,7 @@ void pqElementInspectorWidget::updateGUI()
     else
       {
       pqDataRepresentation* cdisplay = 
-        pqApplicationCore::instance()->getServerManagerModel2()->
+        pqApplicationCore::instance()->getServerManagerModel()->
         findItem<pqDataRepresentation*>(visibleDisplay);
 
       pqPipelineSource* input = cdisplay->getInput();

@@ -79,7 +79,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginManager.h"
 #include "pqProgressManager.h"
 #include "pqServer.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqServerResources.h"
@@ -97,7 +97,7 @@ class pqApplicationCoreInternal
 {
 public:
   pqServerManagerObserver* ServerManagerObserver;
-  pqServerManagerModel2* ServerManagerModel2;
+  pqServerManagerModel* ServerManagerModel;
   pqObjectBuilder* ObjectBuilder;
   pq3DWidgetFactory* WidgetFactory;
   pqServerManagerSelectionModel* SelectionModel;
@@ -147,7 +147,7 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   // *  Make signal-slot connections between ServerManagerObserver and ServerManagerModel.
   //this->connect(this->Internal->ServerManagerObserver, this->Internal->ServerManagerModel);
 
-  this->Internal->ServerManagerModel2 = new pqServerManagerModel2(
+  this->Internal->ServerManagerModel = new pqServerManagerModel(
     this->Internal->ServerManagerObserver, this);
 
   // *  Create the pqObjectBuilder. This is used to create pipeline objects.
@@ -165,7 +165,7 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
 
   // * Setup the selection model.
   this->Internal->SelectionModel = new pqServerManagerSelectionModel(
-    this->Internal->ServerManagerModel2, this);
+    this->Internal->ServerManagerModel, this);
   
   this->Internal->DisplayPolicy = new pqDisplayPolicy(this);
 
@@ -233,9 +233,9 @@ pqServerManagerObserver* pqApplicationCore::getServerManagerObserver()
 }
 
 //-----------------------------------------------------------------------------
-pqServerManagerModel2* pqApplicationCore::getServerManagerModel2()
+pqServerManagerModel* pqApplicationCore::getServerManagerModel()
 {
-  return this->Internal->ServerManagerModel2;
+  return this->Internal->ServerManagerModel;
 }
 
 //-----------------------------------------------------------------------------
@@ -321,10 +321,10 @@ void pqApplicationCore::removeServer(pqServer* server)
     return;
     }
 
-  this->getServerManagerModel2()->beginRemoveServer(server);
+  this->getServerManagerModel()->beginRemoveServer(server);
   this->getObjectBuilder()->destroyAllProxies(server);
   pqServer::disconnect(server);
-  this->getServerManagerModel2()->endRemoveServer();
+  this->getServerManagerModel()->endRemoveServer();
 }
 
 //-----------------------------------------------------------------------------
@@ -379,7 +379,7 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
   if (pqLoader)
     {
     // tell the state loader to use the existing render modules before creating new ones
-    QList<pqRenderView*> renderViews = this->Internal->ServerManagerModel2->
+    QList<pqRenderView*> renderViews = this->Internal->ServerManagerModel->
       findItems<pqRenderView*>(server);
     foreach (pqRenderView* renderView, renderViews)
       {
@@ -516,7 +516,7 @@ pqServer* pqApplicationCore::createServer(const pqServerResource& resource)
   const pqServerResource server_resource = resource.schemeHostsPorts();
 
   // See if the server is already created.
-  pqServerManagerModel2 *smModel = this->getServerManagerModel2();
+  pqServerManagerModel *smModel = this->getServerManagerModel();
   pqServer *server = smModel->findServer(server_resource);
   if(!server)
     {
@@ -584,7 +584,7 @@ pqServer* pqApplicationCore::createServer(const pqServerResource& resource)
 void pqApplicationCore::render()
 {
   QList<pqView*> list = 
-    this->Internal->ServerManagerModel2->findItems<pqView*>();
+    this->Internal->ServerManagerModel->findItems<pqView*>();
   foreach(pqView* view, list)
     {
     view->render();
@@ -627,7 +627,7 @@ void pqApplicationCore::quit()
   // fired until the event loop exits, which doesn't happen until animation
   // stops playing.
   QList<pqAnimationScene*> scenes = 
-    this->getServerManagerModel2()->findItems<pqAnimationScene*>();
+    this->getServerManagerModel()->findItems<pqAnimationScene*>();
   foreach (pqAnimationScene* scene, scenes)
     {
     scene->pause();

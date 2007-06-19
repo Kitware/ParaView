@@ -51,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyListDomain.h"
 
 // pqCore includes
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqRenderView.h"
 #include "pqApplicationCore.h"
 #include "pqProxy.h"
@@ -499,8 +499,8 @@ void pqLinksModel::removeLink(const QString& name)
 pqProxy* pqLinksModel::representativeProxy(vtkSMProxy* pxy)
 {
   // assume internal proxies don't have pqProxy counterparts
-  pqServerManagerModel2* smModel =
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* smModel =
+    pqApplicationCore::instance()->getServerManagerModel();
   pqProxy* rep = smModel->findItem<pqProxy*>(pxy);
   
   if(!rep)

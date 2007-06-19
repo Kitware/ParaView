@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 #include "pqView.h"
 #include "pqViewModuleInterface.h"
@@ -86,7 +86,7 @@ pqPipelineSource* pqObjectBuilder::createSource(const QString& sm_group,
   if (proxy)
     {
     pqPipelineSource* source = pqApplicationCore::instance()->
-      getServerManagerModel2()->findItem<pqPipelineSource*>(proxy);
+      getServerManagerModel()->findItem<pqPipelineSource*>(proxy);
 
     // initialize the source.
     source->setDefaultPropertyValues();
@@ -141,7 +141,7 @@ pqPipelineSource* pqObjectBuilder::createFilter(const QString& sm_group,
     return 0;
     }
 
-  pqPipelineSource* filter = pqApplicationCore::instance()->getServerManagerModel2()->
+  pqPipelineSource* filter = pqApplicationCore::instance()->getServerManagerModel()->
     findItem<pqPipelineSource*>(proxy);
   if (!filter)
     {
@@ -178,7 +178,7 @@ pqPipelineSource* pqObjectBuilder::createCustomFilter(const QString& sm_name,
     }
 
   pqPipelineSource* filter = pqApplicationCore::instance()->
-    getServerManagerModel2()->findItem<pqPipelineSource*>(proxy);
+    getServerManagerModel()->findItem<pqPipelineSource*>(proxy);
   if (!filter)
     {
     qDebug() << "Failed to locate pqPipelineSource for the created custom filter proxy "
@@ -217,7 +217,7 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
     }
 
   pqPipelineSource* reader = pqApplicationCore::instance()->
-    getServerManagerModel2()->findItem<pqPipelineSource*>(proxy);
+    getServerManagerModel()->findItem<pqPipelineSource*>(proxy);
   if (!reader)
     {
     qDebug() << "Failed to locate pqPipelineSource for the created proxy "
@@ -325,8 +325,8 @@ pqView* pqObjectBuilder::createView(const QString& type,
   pxm->RegisterProxy("view_modules", name.toAscii().data(), proxy);
   proxy->Delete();
 
-  pqServerManagerModel2* model = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* model = 
+    pqApplicationCore::instance()->getServerManagerModel();
 
   pqView* view = model->findItem<pqView*>(proxy);
   if (view)
@@ -413,7 +413,7 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
     viewModuleProxy->GetProperty("Representations"), reprProxy);
   viewModuleProxy->UpdateVTKObjects();
 
-  pqDataRepresentation* repr = core->getServerManagerModel2()->
+  pqDataRepresentation* repr = core->getServerManagerModel()->
     findItem<pqDataRepresentation*>(reprProxy);
   if (repr)
     {
@@ -489,7 +489,7 @@ pqScalarBarRepresentation* pqObjectBuilder::createScalarBarDisplay(
     return 0;
     }
   pqScalarBarRepresentation* scalarBar = 
-    pqApplicationCore::instance()->getServerManagerModel2()->
+    pqApplicationCore::instance()->getServerManagerModel()->
     findItem<pqScalarBarRepresentation*>(scalarBarProxy);
   pqSMAdaptor::setProxyProperty(scalarBarProxy->GetProperty("LookupTable"),
     lookupTable->getProxy());
@@ -603,8 +603,8 @@ void pqObjectBuilder::destroy(pqProxy* proxy)
 //-----------------------------------------------------------------------------
 void pqObjectBuilder::destroySources(pqServer* server)
 {
-  pqServerManagerModel2* model = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* model = 
+    pqApplicationCore::instance()->getServerManagerModel();
   pqObjectBuilder* builder =
     pqApplicationCore::instance()->getObjectBuilder();
 
@@ -626,8 +626,8 @@ void pqObjectBuilder::destroySources(pqServer* server)
 //-----------------------------------------------------------------------------
 void pqObjectBuilder::destroySources()
 {
-  pqServerManagerModel2* model = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* model = 
+    pqApplicationCore::instance()->getServerManagerModel();
   QList<pqServer*> servers = model->findItems<pqServer*>();
   foreach(pqServer* server, servers)
     {

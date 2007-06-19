@@ -66,7 +66,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginManager.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqSplitViewUndoElement.h"
 #include "pqUndoStack.h"
 #include "pqViewModuleInterface.h"
@@ -127,8 +127,8 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
     this, SIGNAL(createLookmark(QWidget*)));
 
 
-  pqServerManagerModel2* smModel = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* smModel = 
+    pqApplicationCore::instance()->getServerManagerModel();
   if (!smModel)
     {
     qDebug() << "pqServerManagerModel instance must be created before "
@@ -254,7 +254,7 @@ void pqViewManager::updateConversionActions(pqMultiViewFrame* frame)
     to_exclude = this->Internal->Frames[frame]->getViewType();
     }
 
-  bool server_exists = (pqApplicationCore::instance()->getServerManagerModel2()->
+  bool server_exists = (pqApplicationCore::instance()->getServerManagerModel()->
     getNumberOfItems<pqServer*>() >= 1);
   foreach (QAction* action, this->Internal->ConvertMenu.actions())
     {
@@ -734,7 +734,7 @@ void pqViewManager::onConvertToTriggered(QAction* action)
 
   // FIXME: We may want to fix this to use the active server instead.
   pqServer* server= pqApplicationCore::instance()->
-    getServerManagerModel2()->getItemAtIndex<pqServer*>(0);
+    getServerManagerModel()->getItemAtIndex<pqServer*>(0);
   if (!server)
     {
     qDebug() << "No server present cannot convert view.";
@@ -990,7 +990,7 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
         return false;
         }
 
-      pqView* view = pqApplicationCore::instance()->getServerManagerModel2()->
+      pqView* view = pqApplicationCore::instance()->getServerManagerModel()->
         findItem<pqView*>(viewModule);
       pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(
         this->widgetOfIndex(index));

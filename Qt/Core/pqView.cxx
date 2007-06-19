@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqRepresentation.h"
 #include "pqServer.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqTimeKeeper.h"
 
 template<class T>
@@ -120,8 +120,8 @@ pqView::pqView( const QString& type,
     this, SLOT(forceRender()));
 
 
-  pqServerManagerModel2* smModel = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* smModel = 
+    pqApplicationCore::instance()->getServerManagerModel();
   QObject::connect(smModel, SIGNAL(representationAdded(pqRepresentation*)),
     this, SLOT(representationCreated(pqRepresentation*)));
 }
@@ -229,8 +229,8 @@ void pqView::onRepresentationsChanged()
   QList<QPointer<pqRepresentation> > currentReprs;
   vtkSMProxyProperty* prop = vtkSMProxyProperty::SafeDownCast(
     this->getProxy()->GetProperty("Representations"));
-  pqServerManagerModel2* smModel = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* smModel = 
+    pqApplicationCore::instance()->getServerManagerModel();
 
   unsigned int max = prop->GetNumberOfProxies();
   for (unsigned int cc=0; cc < max; ++cc)

@@ -70,7 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 #include "pqProxySelectionWidget.h"
 #include "pqTreeWidget.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqSignalAdaptorSelectionTreeWidget.h"
 #include "pqSignalAdaptors.h"
@@ -300,8 +300,8 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
     QComboBox* comboBox = qobject_cast<QComboBox*>(object);
     if(comboBox)
       {
-      pqServerManagerModel2* smmodel = 
-        pqApplicationCore::instance()->getServerManagerModel2();
+      pqServerManagerModel* smmodel = 
+        pqApplicationCore::instance()->getServerManagerModel();
       // TODO: use pqComboBoxDomain
       QList<pqSMProxy> propertyDomain = 
         pqSMAdaptor::getProxyPropertyDomain(SMProperty);

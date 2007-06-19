@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
 #include "pqScalarsToColors.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
@@ -115,8 +115,8 @@ void pqDataRepresentation::onInputChanged()
     }
   else if (new_proxes_count == 1)
     {
-    pqServerManagerModel2* smModel = 
-      pqApplicationCore::instance()->getServerManagerModel2();
+    pqServerManagerModel* smModel = 
+      pqApplicationCore::instance()->getServerManagerModel();
     removed = this->Internal->Input;
     this->Internal->Input = smModel->findItem<pqPipelineSource*>(ivp->GetProxy(0));
     added = this->Internal->Input;
@@ -176,8 +176,8 @@ vtkSMProxy* pqDataRepresentation::getLookupTableProxy()
 //-----------------------------------------------------------------------------
 pqScalarsToColors* pqDataRepresentation::getLookupTable()
 {
-  pqServerManagerModel2* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
   vtkSMProxy* lut = this->getLookupTableProxy();
 
   return (lut? smmodel->findItem<pqScalarsToColors*>(lut): 0);

@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqOptions.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqTimeKeeper.h"
 
 class pqServer::pqInternals
@@ -138,8 +138,8 @@ void pqServer::createTimeKeeper()
   pxm->RegisterProxy("timekeeper", "TimeKeeper", proxy);
   proxy->Delete();
 
-  pqServerManagerModel2* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
   this->Internals->TimeKeeper = smmodel->findItem<pqTimeKeeper*>(proxy);
 }
 

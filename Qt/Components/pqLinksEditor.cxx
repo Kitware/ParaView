@@ -54,7 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
 #include "pqRenderView.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 
 // pqComponents
 #include "pqLinksModel.h"
@@ -178,8 +178,8 @@ public:
       return 2;
       }
     QModelIndex pidx = this->parent(idx);
-    pqServerManagerModel2* smModel;
-    smModel = pqApplicationCore::instance()->getServerManagerModel2();
+    pqServerManagerModel* smModel;
+    smModel = pqApplicationCore::instance()->getServerManagerModel();
 
     if(!pidx.isValid())
       {
@@ -237,8 +237,8 @@ public:
       if(!ri.hasIndex)
         {
         vtkSMProxy* pxy = this->getProxy(idx);
-        pqServerManagerModel2* m;
-        m = pqApplicationCore::instance()->getServerManagerModel2();
+        pqServerManagerModel* m;
+        m = pqApplicationCore::instance()->getServerManagerModel();
         if(pxy)
           {
           return m->findItem<pqProxy*>(pxy)->getSMName();
@@ -326,8 +326,8 @@ public:
     if(pidx.isValid())
       {
       RowIndex ri = this->decodeIndex(idx.internalPointer());
-      pqServerManagerModel2* m;
-      m = pqApplicationCore::instance()->getServerManagerModel2();
+      pqServerManagerModel* m;
+      m = pqApplicationCore::instance()->getServerManagerModel();
       if(ri.type == 0)
         {
         return m->getItemAtIndex<pqRenderView*>(idx.row())->getProxy();

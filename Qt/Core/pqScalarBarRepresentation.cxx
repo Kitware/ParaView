@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineRepresentation.h"
 #include "pqProxy.h"
 #include "pqScalarsToColors.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
@@ -94,8 +94,8 @@ pqScalarsToColors* pqScalarBarRepresentation::getLookupTable() const
 //-----------------------------------------------------------------------------
 void pqScalarBarRepresentation::onLookupTableModified()
 {
-  pqServerManagerModel2* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
 
   vtkSMProxy* curLUTProxy = 
     pqSMAdaptor::getProxyProperty(this->getProxy()->GetProperty("LookupTable"));

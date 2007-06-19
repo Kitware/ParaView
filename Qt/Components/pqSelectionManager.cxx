@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqRenderView.h"
 #include "pqSMAdaptor.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 
 #include "vtkCollection.h"
 #include "vtkCommand.h"
@@ -165,7 +165,7 @@ pqSelectionManager::pqSelectionManager(QObject* _parent/*=null*/) :
 
   pqApplicationCore* core = pqApplicationCore::instance();
 
-  pqServerManagerModel2* model = core->getServerManagerModel2();
+  pqServerManagerModel* model = core->getServerManagerModel();
   // We need to clear selection when a source is removed. The source
   // that was deleted might have been selected.
   QObject::connect(
@@ -448,8 +448,8 @@ vtkSMClientDeliveryRepresentationProxy* pqSelectionManager::getClientSideDisplay
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqSelectionManager::getSelectedSource() const
 {
-  pqServerManagerModel2* model = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* model = 
+    pqApplicationCore::instance()->getServerManagerModel();
   if (this->Implementation->SelectedProxy)
     {
     return model->findItem<pqPipelineSource*>(this->Implementation->SelectedProxy);
@@ -585,8 +585,8 @@ void pqSelectionManager::selectOnSurface(int screenRectangle[4])
       SelectedRepresentation->GetProperty("Input"));
 
   // Update the SelectionModel with the selected sources.
-  pqServerManagerModel2* model = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel* model = 
+    pqApplicationCore::instance()->getServerManagerModel();
   pqServerManagerSelectionModel* selectionModel =
     pqApplicationCore::instance()->getSelectionModel();
   pqPipelineSource* pqSource = model->findItem<pqPipelineSource*>(

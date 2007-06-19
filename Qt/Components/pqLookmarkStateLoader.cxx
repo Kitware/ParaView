@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqApplicationCore.h"
 #include "pqServerManagerSelectionModel.h"
-#include "pqServerManagerModel2.h"
+#include "pqServerManagerModel.h"
 #include "pqLookmarkSourceDialog.h"
 #include "pqPipelineModel.h"
 #include "pqTimeKeeper.h"
@@ -74,7 +74,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.11.4.1");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.11.4.2");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
@@ -88,8 +88,8 @@ pqLookmarkStateLoader::pqLookmarkStateLoader()
   this->Internal->TimeKeeper = 0;
   this->Internal->SourceProxyCollectionLoaded = false;
 
-  pqServerManagerModel2 *model = 
-    pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel *model = 
+    pqApplicationCore::instance()->getServerManagerModel();
   this->Internal->PipelineModel = new pqPipelineModel(*model);
 }
 
@@ -174,7 +174,7 @@ void pqLookmarkStateLoader::AddChildItems(vtkPVXMLElement *elem, QStandardItem *
 //---------------------------------------------------------------------------
 int pqLookmarkStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*=0*/)
 {
-  pqServerManagerModel2 *model = pqApplicationCore::instance()->getServerManagerModel2();
+  pqServerManagerModel *model = pqApplicationCore::instance()->getServerManagerModel();
 
   if (!rootElement)
     {
@@ -435,7 +435,7 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
     //    and use its proxy instead
     if(strcmp(proxy->GetXMLGroup(), "filters")==0)
       {
-      pqServerManagerModel2 *model = pqApplicationCore::instance()->getServerManagerModel2();
+      pqServerManagerModel *model = pqApplicationCore::instance()->getServerManagerModel();
       pqPipelineFilter *filter = model->findItem<pqPipelineFilter*>(proxy);
       if(filter)
         {
