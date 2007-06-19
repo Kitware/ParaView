@@ -272,6 +272,7 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   QPalette acceptPalette = this->AcceptButton->palette();
   acceptPalette.setColor(QPalette::Active, QPalette::Button, QColor(161, 213, 135));
   this->AcceptButton->setPalette(acceptPalette);
+  this->AcceptButton->setDefault(true);
 
   this->connect(pqApplicationCore::instance()->getServerManagerModel(), 
                 SIGNAL(sourceRemoved(pqPipelineSource*)),
