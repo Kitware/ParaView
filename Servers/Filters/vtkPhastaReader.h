@@ -23,8 +23,8 @@
 #define __vtkPhastaReader_h
 
 #include "vtkUnstructuredGridAlgorithm.h"
-#include "vtkUnstructuredGrid.h"
 
+class vtkUnstructuredGrid;
 class vtkPoints;
 class vtkDataSetAttributes;
 class vtkInformationVector;

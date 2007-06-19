@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPointSet.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPhastaReader, "1.6");
+vtkCxxRevisionMacro(vtkPhastaReader, "1.7");
 vtkStandardNewMacro(vtkPhastaReader);
 
 #include <vtkstd/map>
@@ -38,11 +38,11 @@ struct vtkPhastaReaderInternal
 {
   struct FieldInfo
   {
-    vtkstd::string PhastaFieldTag;
     int StartIndexInPhastaArray;
     int NumberOfComponents;
     int DataDependency; // 0-nodal, 1-elemental
     vtkstd::string DataType; // "int" or "double"
+    vtkstd::string PhastaFieldTag;
 
     FieldInfo() : StartIndexInPhastaArray(-1), NumberOfComponents(-1), DataDependency(-1), DataType(""), PhastaFieldTag("")
       {
@@ -885,7 +885,7 @@ void vtkPhastaReader::ReadFieldFile(char* fieldFileName,
     }
   int array[10], expect;
 
-  int activeScalars = 0, activeVectors = 0, activeTensors = 0;
+  int activeScalars = 0, activeTensors = 0;
 
   vtkPhastaReaderInternal::FieldInfoMapType::iterator it = this->Internal->FieldInfoMap.begin();
   vtkPhastaReaderInternal::FieldInfoMapType::iterator itend = this->Internal->FieldInfoMap.end();
