@@ -29,7 +29,6 @@
 
 #include "vtkSMStateLoader.h"
 
-class vtkSMMultiViewFactory;
 class vtkSMRenderViewProxy;
 //BTX
 struct vtkSMPQStateLoaderInternals;
@@ -43,17 +42,17 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Get/Set the vtkSMMultiViewFactory proxy to use to
-  // create the render modules. This must be set before loading the state.
-  vtkGetObjectMacro(MultiViewFactory, vtkSMMultiViewFactory);
-  void SetMultiViewFactory(vtkSMMultiViewFactory*);
-
-  // Description:
   // For every request to create a render module, one from this list is used 
   // first, if possible
   virtual void AddPreferredRenderView(vtkSMRenderViewProxy*);
   void RemovePreferredRenderView(vtkSMRenderViewProxy*);
   void ClearPreferredRenderViews();
+
+  // Description:
+  // Set the name for the proxy to create when creating render views.
+  // This is required since the type of render view created usually depends on
+  // the type of connection/client etc.
+  vtkSetStringMacro(RenderViewXMLName);
 
 protected:
   vtkSMPQStateLoader();
@@ -68,7 +67,7 @@ protected:
   virtual void RegisterProxyInternal(const char* group, 
     const char* name, vtkSMProxy* proxy);
 
-  vtkSMMultiViewFactory* MultiViewFactory;
+  char* RenderViewXMLName;
 
   vtkSMPQStateLoaderInternals *PQInternal;
 private:

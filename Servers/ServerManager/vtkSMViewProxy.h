@@ -121,13 +121,6 @@ public:
   // Returns a new proxy.
   virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy*);
 
-  // Description:
-  // In multiview setups, some viewmodules may share certain objects with each
-  // other. This method is used in such cases to give such views an opportunity
-  // to share those objects.
-  // Default implementation is empty.
-  virtual void InitializeForMultiView(vtkSMViewProxy* vtkNotUsed(otherView)) {}
-
 //BTX
 protected:
   vtkSMViewProxy();
@@ -212,6 +205,13 @@ protected:
   // Marks all data size information as invalid.
   void InvalidateDataSizes();
 
+  // Description:
+  // In multiview setups, some viewmodules may share certain objects with each
+  // other. This method is used in such cases to give such views an opportunity
+  // to share those objects.
+  // Default implementation is empty.
+  virtual void InitializeForMultiView(vtkSMViewProxy* vtkNotUsed(otherView)) {}
+
   // Collection of representation objects added to this view.
   vtkCollection* Representations;
 
@@ -242,6 +242,28 @@ private:
   class Command;
   friend class Command;
   Command* Observer;
+
+  // Whenever user create multiple view modules on the same server connection,
+  // for each of the views to work, it may be necessary to share certain server
+  // side objects. This has to happen before CreateVTKObjects() irrespective of
+  // whether the views are registered with the proxy manager or not. For that
+  // purpose we use the MultiViewInitializer. 
+  // Before calling BeginCreateVTKObjects(), vtkSMViewProxy asks the
+  // MultiViewInitializer for any other view that may already have been created
+  // and then calls InitializeForMultiView(). InitializeForMultiView()
+  // implementations should share the all necessary objects. On successful proxy
+  // creation, the proxy is added to the list maintained by
+  // MultiViewInitializer. When the proxy is destroyed, it removes itself from
+  // this list.
+  // MultiViewInitializer does not use reference counting. MultiViewInitializer
+  // singleton is created when the view proxy is created, if not already
+  // present, and destroyed after the last view proxy in the list maintained by
+  // it is destroyed.
+  class vtkMultiViewInitializer;
+  friend class vtkMultiViewInitializer;
+  static vtkMultiViewInitializer* MultiViewInitializer;
+  static vtkMultiViewInitializer* GetMultiViewInitializer();
+  static void CleanMultiViewInitializer();
 
   unsigned long DisplayedDataSize;
   bool DisplayedDataSizeValid;

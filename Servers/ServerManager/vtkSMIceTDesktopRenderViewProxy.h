@@ -49,12 +49,6 @@ public:
   // Overridden to pass the ViewPosition to the RenderSyncManager.
   virtual void SetViewPosition(int x, int y);
 
-  // Description:
-  // In multiview setups, some viewmodules may share certain objects with each
-  // other. This method is used in such cases to give such views an opportunity
-  // to share those objects.
-  // Default implementation is empty.
-  virtual void InitializeForMultiView(vtkSMViewProxy* otherView);
 //BTX
 protected:
   vtkSMIceTDesktopRenderViewProxy();
@@ -75,6 +69,13 @@ protected:
   // Description:
   // Overridden to use user-specified squirt compression.
   virtual void BeginInteractiveRender();
+
+  // Description:
+  // In multiview setups, some viewmodules may share certain objects with each
+  // other. This method is used in such cases to give such views an opportunity
+  // to share those objects.
+  // Default implementation is empty.
+  virtual void InitializeForMultiView(vtkSMViewProxy* otherView);
 
   // Description:
   // Initialize the RenderSyncManager properties. Called in

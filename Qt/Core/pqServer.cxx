@@ -44,8 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPVServerInformation.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMRenderModuleProxy.h>
-#include <vtkSMMultiViewRenderModuleProxy.h>
-#include "vtkSMMultiViewFactory.h"
 #include "vtkSMRenderViewProxy.h"
 
 // Qt includes.
@@ -73,16 +71,6 @@ void pqServer::disconnect(pqServer* server)
   // disconnect on the process module. The event handling will
   // clean up the connection.
   
-  // For now, ensure that the render module is deleted before the connection is broken.
-  // Eventually, the vtkSMProxyManager will support a close connection method
-  // which will do proper connection proxy cleanup.
-  if (server->MultiViewFactory)
-    {
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    pxm->UnRegisterProxy("renderviewfactory", 
-      server->MultiViewFactory->GetSelfIDAsString(), server->MultiViewFactory);
-    server->MultiViewFactory= NULL;
-    }
   vtkProcessModule::GetProcessModule()->Disconnect(
     server->GetConnectionID());
 }
@@ -116,14 +104,7 @@ pqServer::~pqServer()
     }
     */
 
-  if (this->MultiViewFactory)
-    {
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    pxm->UnRegisterProxy("renderviewfactory", 
-      this->MultiViewFactory->GetSelfIDAsString(), this->MultiViewFactory);
-    }
   this->ConnectionID = vtkProcessModuleConnectionManager::GetNullConnectionID();
-
   delete this->Internals;
 }
 
@@ -136,7 +117,7 @@ void pqServer::initialize()
   // connection times together.
   this->createTimeKeeper();
 
-  this->createMultiViewFactory();
+  this->initializeRenderViewType();
 }
 
 //-----------------------------------------------------------------------------
@@ -163,15 +144,9 @@ void pqServer::createTimeKeeper()
 }
 
 //-----------------------------------------------------------------------------
-void pqServer::createMultiViewFactory()
+void pqServer::initializeRenderViewType()
 {
- vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
- vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-
- vtkSMMultiViewFactory* factory = vtkSMMultiViewFactory::SafeDownCast(
-   pxm->NewProxy("newviews", "MultiViewFactory"));
-  factory->SetConnectionID(this->ConnectionID);
-  pxm->RegisterProxy("renderviewfactory", factory->GetSelfIDAsString(), factory);
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   const char* renderViewName = 0;
   if (!this->isRemote())
@@ -214,29 +189,7 @@ void pqServer::createMultiViewFactory()
     renderViewName = "RenderView";
     }
 
-  factory->SetRenderViewName(renderViewName);
-  factory->UpdateVTKObjects();
-  this->MultiViewFactory.TakeReference(factory);
-}
-
-//-----------------------------------------------------------------------------
-vtkSMMultiViewRenderModuleProxy* pqServer::GetRenderModule()
-{
-  return this->RenderModule.GetPointer();
-}
-
-//-----------------------------------------------------------------------------
-vtkSMRenderModuleProxy* pqServer::newRenderModule()
-{
-  if (!this->RenderModule)
-    {
-    qDebug() << "No MultiDisplayRenderModule to create a new render module.";
-    return NULL;
-    }
-
-  vtkSMRenderModuleProxy* proxy = vtkSMRenderModuleProxy::SafeDownCast(
-    this->RenderModule->NewRenderModule());
-  return proxy;
+  this->RenderViewXMLName = renderViewName;
 }
 
 //-----------------------------------------------------------------------------
@@ -252,16 +205,11 @@ vtkIdType pqServer::GetConnectionID()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMMultiViewFactory* pqServer::getMultiViewFactory()
-{
-  return this->MultiViewFactory;
-}
-
-//-----------------------------------------------------------------------------
 vtkSMRenderViewProxy* pqServer::newRenderView()
 {
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   return vtkSMRenderViewProxy::SafeDownCast(
-    this->MultiViewFactory->NewRenderView());
+    pxm->NewProxy("newviews", this->RenderViewXMLName.toAscii().data()));
 }
 
 //-----------------------------------------------------------------------------
@@ -269,7 +217,6 @@ int pqServer::getNumberOfPartitions()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   return pm->GetNumberOfPartitions(this->ConnectionID);
-
 }
 
 //-----------------------------------------------------------------------------

@@ -164,7 +164,6 @@ SET(Kit_SRCS
   vtkSMDataRepresentationProxy.cxx
   vtkSMIceTCompositeViewProxy.cxx
   vtkSMIceTDesktopRenderViewProxy.cxx
-  vtkSMMultiViewFactory.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMOutlineRepresentationProxy.cxx
   vtkSMPropRepresentationProxy.cxx

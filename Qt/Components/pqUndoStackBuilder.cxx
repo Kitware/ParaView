@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyUnRegisterUndoElement.h"
 
 vtkStandardNewMacro(pqUndoStackBuilder);
-vtkCxxRevisionMacro(pqUndoStackBuilder, "1.2.4.3");
+vtkCxxRevisionMacro(pqUndoStackBuilder, "1.2.4.4");
 //-----------------------------------------------------------------------------
 pqUndoStackBuilder::pqUndoStackBuilder()
 {
@@ -204,7 +204,7 @@ void pqUndoStackBuilder::OnPropertyModified(vtkSMProxy* proxy,
   bool auto_element = this->GetEnableMonitoring()==0 && 
     !this->IgnoreIsolatedChanges && !this->UndoRedoing;
 
-  if (auto_element && proxy->IsA("vtkSMViewProxy"))
+  if (/*auto_element && */proxy->IsA("vtkSMViewProxy"))
     {
     // Ignore interaction changes.
     const char* names[] = {

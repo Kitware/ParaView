@@ -82,7 +82,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.15.2.2");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.15.2.3");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_LOD, Integer);
@@ -126,6 +126,8 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
   this->SetUseLOD(false);
   this->SetLODResolution(50);
   this->Information->Set(USE_CACHE(), 0);
+  this->Information->Set(USE_ORDERED_COMPOSITING(), 0);
+  this->Information->Set(USE_COMPOSITING(), 0);
 }
 
 //-----------------------------------------------------------------------------

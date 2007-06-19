@@ -71,12 +71,6 @@ public:
   vtkSetMacro(DisableOrderedCompositing, int);
   vtkGetMacro(DisableOrderedCompositing, int);
 
-  // Description:
-  // In multiview setups, some viewmodules may share certain objects with each
-  // other. This method is used in such cases to give such views an opportunity
-  // to share those objects.
-  // Default implementation is empty.
-  virtual void InitializeForMultiView(vtkSMViewProxy* otherView);
 //BTX
 protected:
   vtkSMIceTCompositeViewProxy();
@@ -111,6 +105,13 @@ protected:
   // Used to perform some every-interactive-render-setup actions.
   virtual void BeginInteractiveRender();
 
+  // Description:
+  // In multiview setups, some viewmodules may share certain objects with each
+  // other. This method is used in such cases to give such views an opportunity
+  // to share those objects.
+  // Default implementation is empty.
+  virtual void InitializeForMultiView(vtkSMViewProxy* otherView);
+
   // Indicates if we should render using compositing.
   // Returns true if compositing should be used, otherwise false.
   // Flag stillRender is set when this decision is to be made during StillRender
@@ -137,6 +138,7 @@ protected:
   // Description:
   // Pass ordered compositing decision to all strategies.
   void SetOrderedCompositingDecision(bool decision);
+
 
   // Manager used for multiview.
   vtkSMProxy* MultiViewManager;

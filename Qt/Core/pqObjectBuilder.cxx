@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMMultiViewFactory.h"
 #include "vtkSMMultiViewRenderModuleProxy.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
@@ -327,14 +326,6 @@ pqView* pqObjectBuilder::createView(const QString& type,
   pxm->RegisterProxy("view_modules", name.toAscii().data(), proxy);
   proxy->Delete();
 
-  if (type == pqRenderView::renderViewType())
-    {
-    vtkSMMultiViewFactory* factory = server->getMultiViewFactory();
-    pqSMAdaptor::addProxyProperty(factory->GetProperty("RenderViews"),
-      proxy);
-    factory->UpdateProperty("RenderViews");
-    }
-
   pqServerManagerModel2* model = 
     pqApplicationCore::instance()->getServerManagerModel2();
 
@@ -371,14 +362,6 @@ void pqObjectBuilder::destroy(pqView* view)
   // Unregister the proxy....the rest of the GUI will(rather should) manage itself!
   QString name = view->getSMName();
   vtkSMProxy* proxy = view->getProxy();
-
-  if (qobject_cast<pqRenderView*>(view))
-    {
-    // remove the render module from the multiview proxy.
-    vtkSMMultiViewFactory* factory = view->getServer()->getMultiViewFactory();  
-    pqSMAdaptor::removeProxyProperty(factory->GetProperty("RenderViews"), proxy);
-    factory->UpdateProperty("RenderViews");
-    }
 
   this->destroyProxyInternal(view);
 

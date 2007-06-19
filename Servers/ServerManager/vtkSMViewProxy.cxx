@@ -29,6 +29,8 @@
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkTimerLog.h"
 
+#include <vtkstd/vector>
+
 //----------------------------------------------------------------------------
 class vtkSMViewProxy::Command : public vtkCommand
 {
@@ -51,8 +53,75 @@ private:
   vtkSMViewProxy* Target;
 };
 
+//----------------------------------------------------------------------------
+class vtkSMViewProxy::vtkMultiViewInitializer : public vtkstd::vector<vtkSMViewProxy*>
+{
+public:
+  void InitializeForMultiView(vtkSMViewProxy* other)
+    {
+    const char* xmlgroup = other->GetXMLGroup();
+    const char* xmlname = other->GetXMLName();
+
+    vtkMultiViewInitializer::iterator iter = this->begin();
+    for (;iter != this->end(); ++iter)
+      {
+      if ( 
+        (*iter)->GetConnectionID() == other->GetConnectionID() &&
+        strcmp((*iter)->GetXMLGroup(), xmlgroup)==0 &&
+        strcmp((*iter)->GetXMLName(), xmlname) == 0 &&
+        (*iter)->IsA(other->GetClassName()))
+        {
+        other->InitializeForMultiView(*iter);
+        break;
+        }
+      }
+    }
+
+  void Add(vtkSMViewProxy* view)
+    {
+    this->push_back(view);
+    }
+
+  void Remove(vtkSMViewProxy* view)
+    {
+    vtkMultiViewInitializer::iterator iter = this->begin();
+    for (;iter != this->end(); ++iter)
+      {
+      if ((*iter) == view)
+        {
+        this->erase(iter);
+        break;
+        }
+      }
+    }
+};
+
+vtkSMViewProxy::vtkMultiViewInitializer* vtkSMViewProxy::MultiViewInitializer =0;
+
+//----------------------------------------------------------------------------
+vtkSMViewProxy::vtkMultiViewInitializer* vtkSMViewProxy::GetMultiViewInitializer()
+{
+  if (!vtkSMViewProxy::MultiViewInitializer)
+    {
+    vtkSMViewProxy::MultiViewInitializer = new vtkSMViewProxy::vtkMultiViewInitializer();
+    }
+
+  return vtkSMViewProxy::MultiViewInitializer;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewProxy::CleanMultiViewInitializer()
+{
+  if (vtkSMViewProxy::MultiViewInitializer &&
+    vtkSMViewProxy::MultiViewInitializer->size() == 0)
+    {
+    delete vtkSMViewProxy::MultiViewInitializer;
+    vtkSMViewProxy::MultiViewInitializer = 0;
+    }
+}
+
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.8.4.2");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.8.4.3");
 //----------------------------------------------------------------------------
 vtkSMViewProxy::vtkSMViewProxy()
 {
@@ -78,6 +147,9 @@ vtkSMViewProxy::vtkSMViewProxy()
 //----------------------------------------------------------------------------
 vtkSMViewProxy::~vtkSMViewProxy()
 {
+  vtkSMViewProxy::GetMultiViewInitializer()->Remove(this);
+  vtkSMViewProxy::CleanMultiViewInitializer();
+
   this->Observer->SetTarget(0);
   this->Observer->Delete();
 
@@ -98,6 +170,8 @@ void vtkSMViewProxy::CreateVTKObjects()
     return;
     }
 
+  vtkSMViewProxy::GetMultiViewInitializer()->InitializeForMultiView(this);
+
   if (!this->BeginCreateVTKObjects())
     {
     return;
@@ -106,6 +180,8 @@ void vtkSMViewProxy::CreateVTKObjects()
   this->Superclass::CreateVTKObjects();
 
   this->EndCreateVTKObjects();
+
+  vtkSMViewProxy::GetMultiViewInitializer()->Add(this);
 }
 
 //----------------------------------------------------------------------------

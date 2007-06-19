@@ -422,7 +422,9 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
       {
       pqLoader->AddPreferredRenderView(renderView->getRenderViewProxy());
       }
-    pqLoader->SetMultiViewFactory(server->getMultiViewFactory());
+    // Tell the state loader what type of render view subclass to create.
+    pqLoader->SetRenderViewXMLName(
+      server->getRenderViewXMLName().toAscii().data());
     }
 
   this->LoadingState = true;
@@ -437,9 +439,6 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
 
   if (pqLoader)
     {
-    // this is necessary to avoid unnecesary references to the render module,
-    // enabling the proxy to be cleaned up before server disconnect.
-    pqLoader->SetMultiViewFactory(0);
     // delete any unused rendermodules from state loader
     pqLoader->ClearPreferredRenderViews();
     }

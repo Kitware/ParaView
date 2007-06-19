@@ -16,7 +16,6 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMMultiViewFactory.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSmartPointer.h"
@@ -24,10 +23,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.16.6.1");
-vtkCxxSetObjectMacro(vtkSMPQStateLoader, MultiViewFactory, 
-  vtkSMMultiViewFactory);
-
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.16.6.2");
 
 struct vtkSMPQStateLoaderInternals
 {
@@ -39,13 +35,13 @@ struct vtkSMPQStateLoaderInternals
 vtkSMPQStateLoader::vtkSMPQStateLoader()
 {
   this->PQInternal = new vtkSMPQStateLoaderInternals;
-  this->MultiViewFactory = 0;
+  this->RenderViewXMLName = 0;
+  this->SetRenderViewXMLName("RenderView");
 }
 
 //-----------------------------------------------------------------------------
 vtkSMPQStateLoader::~vtkSMPQStateLoader()
 {
-  this->SetMultiViewFactory(0);
   delete this->PQInternal;
 }
 
@@ -53,50 +49,27 @@ vtkSMPQStateLoader::~vtkSMPQStateLoader()
 vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
   const char* xml_group, const char* xml_name)
 {
-  // Check if the proxy requested is a render module.
-  if (xml_group && xml_name && strcmp(xml_group, "rendermodules") == 0)
-    {
-    if (strcmp(xml_name, "MultiViewFactory") == 0)
-      {
-      if (this->MultiViewFactory)
-        {
-        this->MultiViewFactory->Register(this);
-        return this->MultiViewFactory;
-        }
-      vtkWarningMacro("MultiViewFactory is not set. "
-        "Creating MultiViewFactory from the state.");
-      }
-    else
-      {
-      // Create a rendermodule.
-      if (this->MultiViewFactory)
-        {
-        if (!this->PQInternal->PreferredRenderViews.empty())
-          {
-          vtkSMRenderViewProxy *renMod = this->PQInternal->PreferredRenderViews.front();
-          unsigned int i=0;
-          for(i=0; i<this->MultiViewFactory->GetNumberOfRenderViews(); i++)
-            {
-            if(this->MultiViewFactory->GetRenderView(i) == renMod)
-              {
-              break;
-              }
-            }
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
-          if(i<this->MultiViewFactory->GetNumberOfRenderViews())
-            {
-            renMod->Register(this);
-            this->PQInternal->PreferredRenderViews.pop_front();
-            return renMod;
-            }
-          this->PQInternal->PreferredRenderViews.pop_front();
-          }
-        // Can't use exiting module (none present, or all present are have
-        // already been used, hence we allocate a new one.
-        return this->MultiViewFactory->NewRenderView();
+  // Check if the proxy requested is a render module.
+  if (xml_group && xml_name && strcmp(xml_group, "newviews") == 0)
+    {
+    vtkSMProxy* prototype = pxm->GetPrototypeProxy(xml_group, xml_name);
+    if (prototype && prototype->IsA("vtkSMRenderViewProxy"))
+      {
+      if (!this->PQInternal->PreferredRenderViews.empty())
+        {
+        // Return a preferred render view if one exists.
+        vtkSMRenderViewProxy *renMod = this->PQInternal->PreferredRenderViews.front();
+        renMod->Register(this);
+        this->PQInternal->PreferredRenderViews.pop_front();
+        return renMod;
         }
-      vtkWarningMacro("MultiViewFactory is not set. "
-        "Creating MultiViewFactory from the state.");
+
+      // Can't use exiting module (none present, or all present are have
+      // already been used, hence we allocate a new one.
+      return this->Superclass::NewProxyInternal(xml_group, 
+        this->RenderViewXMLName);
       }
     }
   else if (xml_group && xml_name && strcmp(xml_group, "misc") == 0 
@@ -104,7 +77,6 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
     {
     // There is only one time keeper per connection, simply
     // load the state on the timekeeper.
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     vtkSMProxy* timekeeper = pxm->GetProxy("timekeeper", "TimeKeeper");
     if (timekeeper)
       {
@@ -146,13 +118,12 @@ void vtkSMPQStateLoader::ClearPreferredRenderViews()
   this->PQInternal->PreferredRenderViews.clear();
 }
 
-
 //---------------------------------------------------------------------------
 void vtkSMPQStateLoader::RegisterProxyInternal(const char* group,
   const char* name, vtkSMProxy* proxy)
 {
   if (proxy->GetXMLGroup() 
-    && strcmp(proxy->GetXMLGroup(), "rendermodules")==0)
+    && strcmp(proxy->GetXMLGroup(), "newviews")==0)
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     if (pxm->GetProxyName(group, proxy))
@@ -168,5 +139,4 @@ void vtkSMPQStateLoader::RegisterProxyInternal(const char* group,
 void vtkSMPQStateLoader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "MultiViewFactory: " << this->MultiViewFactory << endl;
 }

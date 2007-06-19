@@ -4214,6 +4214,31 @@
         subclasses.
       </Documentation>
 
+      <DoubleVectorProperty
+        name="LODThreshold"
+        command="SetLODThreshold"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <Documentation>
+          Set the memory size threshold above which LOD will be used while
+          rendering interactively.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="LODResolution"
+        command="SetLODResolution"
+        number_of_elements="1"
+        default_values="50"
+        update_self="1">
+        <IntRangeDomain name="range" min="0" />
+        <Documentation>
+          Set the LOD resolution.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty
         name="UseTriangleStrips"
         command="SetUseTriangleStrips"
@@ -4344,31 +4369,6 @@
         Simplest render view without compositing/client-server support.
       </Documentation>
 
-      <DoubleVectorProperty
-        name="LODThreshold"
-        command="SetLODThreshold"
-        number_of_elements="1"
-        default_values="0"
-        update_self="1">
-        <Documentation>
-          Set the memory size threshold above which LOD will be used while
-          rendering interactively.
-        </Documentation>
-        <DoubleRangeDomain name="range" min="0" />
-      </DoubleVectorProperty>
-
-      <IntVectorProperty
-        name="LODResolution"
-        command="SetLODResolution"
-        number_of_elements="1"
-        default_values="50"
-        update_self="1">
-        <IntRangeDomain name="range" min="0" />
-        <Documentation>
-          Set the LOD resolution.
-        </Documentation>
-      </IntVectorProperty>
-
       <SubProxy>
         <Proxy name="Renderer" proxyname="Renderer" proxygroup="renderers">
         </Proxy>
@@ -4395,19 +4395,6 @@
         IceT Render View with compositing which can be used when no
         client-server delivery is required.
       </Documentation>
-
-      <DoubleVectorProperty
-        name="LODThreshold"
-        command="SetLODThreshold"
-        number_of_elements="1"
-        default_values="0"
-        update_self="1">
-        <Documentation>
-          Set the memory size threshold above which LOD will be used while
-          rendering interactively.
-        </Documentation>
-        <DoubleRangeDomain name="range" min="0" />
-      </DoubleVectorProperty>
 
       <DoubleVectorProperty
         name="CompositeThreshold"
@@ -4510,19 +4497,6 @@
       <Documentation>
         IceT Render View with compositing and client delivery mechanisms.
       </Documentation>
-
-      <DoubleVectorProperty
-        name="LODThreshold"
-        command="SetLODThreshold"
-        number_of_elements="1"
-        default_values="0"
-        update_self="1">
-        <Documentation>
-          Set the memory size threshold above which LOD will be used while
-          rendering interactively.
-        </Documentation>
-        <DoubleRangeDomain name="range" min="0" />
-      </DoubleVectorProperty>
 
       <DoubleVectorProperty
         name="CompositeThreshold"
@@ -6355,17 +6329,4 @@
 
 
 </ServerManagerConfiguration>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
