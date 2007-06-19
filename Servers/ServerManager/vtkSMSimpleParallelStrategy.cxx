@@ -39,7 +39,7 @@ inline int vtkSMSimpleParallelStrategyGetInt(vtkSMProxy* proxy,
 }
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.3.4.1");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.3.4.2");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
@@ -64,12 +64,9 @@ vtkSMSimpleParallelStrategy::~vtkSMSimpleParallelStrategy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleParallelStrategy::CreateVTKObjects()
+void vtkSMSimpleParallelStrategy::BeginCreateVTKObjects()
 {
-  if (this->ObjectsCreated)
-    {
-    return;
-    }
+  this->Superclass::BeginCreateVTKObjects();
 
   this->Collect = 
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("Collect"));
@@ -100,8 +97,12 @@ void vtkSMSimpleParallelStrategy::CreateVTKObjects()
     {
     this->SetEnableLOD(false);
     }
+}
 
-  this->Superclass::CreateVTKObjects();
+//----------------------------------------------------------------------------
+void vtkSMSimpleParallelStrategy::EndCreateVTKObjects()
+{
+  this->Superclass::EndCreateVTKObjects();
 
   this->UpdatePieceInformation(this->PreDistributorSuppressor);
   if (this->GetEnableLOD())
@@ -294,6 +295,15 @@ void vtkSMSimpleParallelStrategy::UpdatePipeline()
     (usecompositing && this->UseOrderedCompositing)? 0 : 1);
   this->Distributor->UpdateProperty("PassThrough");
 
+  // It is essential to mark the Collect filter explicitly modified.
+  vtkClientServerStream stream;
+  stream  << vtkClientServerStream::Invoke
+          << this->Collect->GetID()
+          << "Modified"
+          << vtkClientServerStream::End;
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID, this->Collect->GetServers(), stream);
+
   this->Superclass::UpdatePipeline();
 }
 
@@ -316,6 +326,15 @@ void vtkSMSimpleParallelStrategy::UpdateLODPipeline()
   ivp->SetElement(0,
     (usecompositing && this->UseOrderedCompositing)? 0 : 1);
   this->DistributorLOD->UpdateProperty("PassThrough");
+
+  // It is essential to mark the Collect filter explicitly modified.
+  vtkClientServerStream stream;
+  stream  << vtkClientServerStream::Invoke
+          << this->CollectLOD->GetID()
+          << "Modified"
+          << vtkClientServerStream::End;
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID, this->CollectLOD->GetServers(), stream);
 
   this->Superclass::UpdateLODPipeline();
 }

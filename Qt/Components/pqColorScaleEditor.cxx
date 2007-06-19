@@ -1159,7 +1159,6 @@ void pqColorScaleEditor::setLegendVisibility(bool visible)
       {
       // Create a scalar bar in the current view. Use the display to
       // set up the title.
-      /* FIXME:UDA
       pqObjectBuilder *builder =
           pqApplicationCore::instance()->getObjectBuilder();
       pqRenderView *renderModule = qobject_cast<pqRenderView *>(
@@ -1168,7 +1167,6 @@ void pqColorScaleEditor::setLegendVisibility(bool visible)
         this->ColorMap, renderModule);
       legend->makeTitle(this->Display);
       this->setLegend(legend);
-      */
       }
     else
       {
@@ -1179,8 +1177,7 @@ void pqColorScaleEditor::setLegendVisibility(bool visible)
   if(this->Legend)
     {
     this->Legend->setVisible(visible);
-    // FIXME:UDA
-    //this->Legend->renderViewEventually();
+    this->Legend->renderViewEventually();
     }
 
   this->Form->ShowColorLegend->blockSignals(true);
@@ -1205,8 +1202,7 @@ void pqColorScaleEditor::setLegendTitle(const QString &name,
   if(this->Legend)
     {
     this->Legend->setTitle(name, component);
-    // FIXME:UDA
-    // this->Legend->renderViewEventually();
+    this->Legend->renderViewEventually();
     }
 }
 

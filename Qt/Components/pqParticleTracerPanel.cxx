@@ -228,9 +228,9 @@ pqParticleTracerPanel::pqParticleTracerPanel(pqProxy* object_proxy, QWidget* p) 
   
   QObject::connect(
     this,
-    SIGNAL(renderModuleChanged(pqRenderViewModule*)),
+    SIGNAL(viewChanged(pqRenderView*)),
     this,
-    SLOT(onRenderModuleChanged(pqRenderViewModule*)));
+    SLOT(onViewChanged(pqRenderView*)));
 
   QObject::connect(
     this->Implementation->PointSourceWidget, SIGNAL(modified()),
@@ -350,7 +350,7 @@ pqParticleTracerPanel::~pqParticleTracerPanel()
 }
 
 //-----------------------------------------------------------------------------
-void pqParticleTracerPanel::onRenderModuleChanged(pqRenderViewModule* render_module)
+void pqParticleTracerPanel::onViewChanged(pqRenderView* render_module)
 {
   this->Implementation->PointSourceWidget->setRenderModule(render_module);
   this->Implementation->LineSourceWidget->setRenderModule(render_module);

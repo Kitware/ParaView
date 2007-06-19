@@ -45,7 +45,8 @@ protected:
 
   // Description:
   // Overridden to set the servers correctly on all subproxies.
-  virtual void CreateVTKObjects();
+  virtual void BeginCreateVTKObjects();
+  virtual void EndCreateVTKObjects();
 
   // Description:
   // Create and initialize the data pipeline.

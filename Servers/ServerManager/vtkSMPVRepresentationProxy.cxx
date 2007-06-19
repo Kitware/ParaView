@@ -20,6 +20,7 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMSurfaceRepresentationProxy.h"
 
 inline void vtkSMPVRepresentationProxySetInt(
   vtkSMProxy* proxy, const char* pname, int val)
@@ -34,7 +35,7 @@ inline void vtkSMPVRepresentationProxySetInt(
 }
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.1.2.3");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.1.2.4");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -121,7 +122,8 @@ bool vtkSMPVRepresentationProxy::EndCreateVTKObjects()
   this->Representation = -1;
   this->SetRepresentation(repr);
 
-  this->LinkSelectionProp(this->SurfaceRepresentation);
+  this->LinkSelectionProp(vtkSMSurfaceRepresentationProxy::SafeDownCast(
+      this->SurfaceRepresentation)->GetProp3D());
 
   // This will pass the ViewInformation to all the representations.
   this->SetViewInformation(this->ViewInformation);

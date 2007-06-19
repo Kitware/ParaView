@@ -2150,7 +2150,7 @@ void pqMainWindowCore::onServerConnect()
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel2* smmodel = core->getServerManagerModel2();
 
-  if (server && smmodel->getNumberOfItems<pqServer*>() > 0)
+  if (server && smmodel->findItems<pqPipelineSource*>(server).size() > 0)
     {
     int ret = QMessageBox::warning(this->Implementation->Parent, 
       tr("Disconnect from current server?"),

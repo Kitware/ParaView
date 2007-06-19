@@ -22,7 +22,7 @@
 #include "vtkMPIMoveData.h"
 
 vtkStandardNewMacro(vtkSMUniformGridParallelStrategy);
-vtkCxxRevisionMacro(vtkSMUniformGridParallelStrategy, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMUniformGridParallelStrategy, "1.1.2.2");
 //----------------------------------------------------------------------------
 vtkSMUniformGridParallelStrategy::vtkSMUniformGridParallelStrategy()
 {
@@ -36,18 +36,19 @@ vtkSMUniformGridParallelStrategy::~vtkSMUniformGridParallelStrategy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMUniformGridParallelStrategy::CreateVTKObjects()
+void vtkSMUniformGridParallelStrategy::BeginCreateVTKObjects()
 {
-  if (this->ObjectsCreated)
-    {
-    return;
-    }
-
   this->Collect = 
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("Collect"));
   this->Collect->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
   
-  this->Superclass::CreateVTKObjects();
+  this->Superclass::BeginCreateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMUniformGridParallelStrategy::EndCreateVTKObjects()
+{
+  this->Superclass::EndCreateVTKObjects();
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;

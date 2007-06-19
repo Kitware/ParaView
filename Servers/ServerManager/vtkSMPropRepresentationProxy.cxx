@@ -18,14 +18,15 @@
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxyLink.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
+#include "vtkSMSelectionRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMProxyLink.h"
 
 vtkStandardNewMacro(vtkSMPropRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPropRepresentationProxy, "1.3.2.2");
+vtkCxxRevisionMacro(vtkSMPropRepresentationProxy, "1.3.2.3");
 //----------------------------------------------------------------------------
 vtkSMPropRepresentationProxy::vtkSMPropRepresentationProxy()
 {
@@ -157,7 +158,9 @@ bool vtkSMPropRepresentationProxy::EndCreateVTKObjects()
 
     // Link actor properties with the seleciton actor so that actor
     // transformations work.
-    this->SelectionPropLink->AddLinkedProxy(this->SelectionRepresentation,
+    this->SelectionPropLink->AddLinkedProxy(
+      vtkSMSelectionRepresentationProxy::SafeDownCast(
+        this->SelectionRepresentation)->GetProp3D(),
       vtkSMLink::OUTPUT);
     }
   return this->Superclass::EndCreateVTKObjects();

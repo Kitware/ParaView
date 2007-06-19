@@ -144,6 +144,19 @@ protected:
   ~vtkSMRepresentationStrategy();
 
   // Description:
+  // Overridden to call BeginCreateVTKObjects() and EndCreateVTKObjects()
+  // before creating the objects.
+  virtual void CreateVTKObjects();
+
+  // Description:
+  // Called before objects are created.
+  virtual void BeginCreateVTKObjects(){};
+
+  // Description:
+  // Called after objects are created.
+  virtual void EndCreateVTKObjects(){}
+
+  // Description:
   // Create and initialize the data pipeline.
   virtual void CreatePipeline(vtkSMSourceProxy* input) =0;
 

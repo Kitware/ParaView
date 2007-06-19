@@ -29,7 +29,7 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.6.2.1");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
 {
@@ -63,6 +63,8 @@ bool vtkSMClientDeliveryRepresentationProxy::SetupStrategy()
 
   this->StrategyProxy = vtkSMClientDeliveryStrategyProxy::SafeDownCast(
     pxm->NewProxy("strategies", "ClientDeliveryStrategy"));
+  this->StrategyProxy->SetServers(
+    vtkProcessModule::DATA_SERVER|vtkProcessModule::CLIENT);
 
   if (!this->StrategyProxy)
     {
@@ -303,6 +305,8 @@ void vtkSMClientDeliveryRepresentationProxy::Update(vtkSMViewProxy* view)
     return;
     }
 
+  this->Superclass::Update(view);
+
   if (this->PostProcessorProxy)
     {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -317,7 +321,6 @@ void vtkSMClientDeliveryRepresentationProxy::Update(vtkSMViewProxy* view)
       dp->Update();
       }
     }
-  this->Superclass::Update(view);
 }
 
 //----------------------------------------------------------------------------

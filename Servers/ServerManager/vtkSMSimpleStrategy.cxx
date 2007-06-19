@@ -22,7 +22,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.6.4.1");
+vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.6.4.2");
 //----------------------------------------------------------------------------
 vtkSMSimpleStrategy::vtkSMSimpleStrategy()
 {
@@ -39,12 +39,9 @@ vtkSMSimpleStrategy::~vtkSMSimpleStrategy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleStrategy::CreateVTKObjects()
+void vtkSMSimpleStrategy::BeginCreateVTKObjects()
 {
-  if (this->ObjectsCreated)
-    {
-    return;
-    }
+  this->Superclass::BeginCreateVTKObjects();
 
   this->LODDecimator = 
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("LODDecimator"));
@@ -65,7 +62,12 @@ void vtkSMSimpleStrategy::CreateVTKObjects()
     this->SetEnableLOD(false);
     }
 
-  this->Superclass::CreateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSimpleStrategy::EndCreateVTKObjects()
+{
+  this->Superclass::EndCreateVTKObjects();
 
   // Update piece information on each of the update suppressors.
   this->UpdatePieceInformation(this->UpdateSuppressor);

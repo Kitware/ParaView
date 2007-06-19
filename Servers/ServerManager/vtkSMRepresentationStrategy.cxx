@@ -24,7 +24,7 @@
 #include "vtkMemberFunctionCommand.h"
 #include "vtkSMRenderViewProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.8.4.1");
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.8.4.2");
 //----------------------------------------------------------------------------
 vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 {
@@ -247,6 +247,17 @@ void vtkSMRepresentationStrategy::SetInput(vtkSMSourceProxy* input)
   if (this->EnableLOD)
     {
     this->CreateLODPipeline(this->Input);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationStrategy::CreateVTKObjects()
+{
+  if (!this->ObjectsCreated)
+    {
+    this->BeginCreateVTKObjects();
+    this->Superclass::CreateVTKObjects();
+    this->EndCreateVTKObjects();
     }
 }
 

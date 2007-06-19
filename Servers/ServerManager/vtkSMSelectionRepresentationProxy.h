@@ -40,6 +40,10 @@ public:
   virtual void Update(vtkSMViewProxy* view);
   virtual void Update() { this->Superclass::Update(); }
 
+  // Description:
+  // Returns the proxy for the prop.
+  vtkGetObjectMacro(Prop3D, vtkSMProxy);
+
 //BTX
 protected:
   vtkSMSelectionRepresentationProxy();

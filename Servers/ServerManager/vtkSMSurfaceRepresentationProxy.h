@@ -107,6 +107,10 @@ public:
   // repr can be VTK_SURFACE or VTK_WIREFRAME or VTK_POINTS.
   void SetRepresentation(int repr);
 
+  // Description:
+  // Returns the proxy for the prop.
+  vtkGetObjectMacro(Prop3D, vtkSMProxy);
+
 //BTX
 protected:
   vtkSMSurfaceRepresentationProxy();

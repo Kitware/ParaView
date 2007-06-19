@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkSmartPointer.h" 
+#include "vtkSMCompoundProxy.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxyManager.h"
@@ -241,9 +242,14 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
     repr->GetProperty("UpdateTime")).toDouble();
 
   vtkPVDataInformation* dataInfo = 0;
-  vtkSMSourceProxy* inputProxy = vtkSMSourceProxy::SafeDownCast(
-    this->getInput()->getProxy());
-  inputProxy->UpdatePipeline(time);
+
+  vtkSMProxy* inputProxy = this->getInput()->getProxy();
+  if (inputProxy->IsA("vtkSMCompoundProxy"))
+    {
+    inputProxy = vtkSMCompoundProxy::SafeDownCast(inputProxy)->GetConsumableProxy();
+    }
+  vtkSMSourceProxy* inputSourceProxy = vtkSMSourceProxy::SafeDownCast(inputProxy);
+  inputSourceProxy->UpdatePipeline(time);
 
   dataInfo = this->getInput()->getDataInformation();
 
@@ -650,8 +656,7 @@ QList<QString> pqPipelineRepresentation::getColorFields()
   // get cell arrays (only when not in volume or outline mode.
   vtkPVDataSetAttributesInformation* cellinfo = 
     geomInfo->GetCellDataInformation();
-  if (cellinfo && representation != vtkSMPVRepresentationProxy::VOLUME &&
-    representation != vtkSMPVRepresentationProxy::OUTLINE)
+  if (cellinfo && representation != vtkSMPVRepresentationProxy::VOLUME)
     {
     for(int i=0; i<cellinfo->GetNumberOfArrays(); i++)
       {
