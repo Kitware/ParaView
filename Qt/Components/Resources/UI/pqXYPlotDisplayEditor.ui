@@ -18,6 +18,14 @@
    </property>
    <item row="3" column="0" colspan="2" >
     <widget class="QGroupBox" name="SeriesGroup" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>3</hsizetype>
+       <vsizetype>3</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title" >
       <string>Line Series</string>
      </property>
@@ -29,13 +37,7 @@
        <number>6</number>
       </property>
       <item row="0" column="0" >
-       <widget class="QTreeWidget" name="YAxisArrays" >
-        <property name="minimumSize" >
-         <size>
-          <width>0</width>
-          <height>100</height>
-         </size>
-        </property>
+       <widget class="pqTreeWidget" name="YAxisArrays" >
         <property name="whatsThis" >
          <string>This displays the list of line series. You can use the list to edit the series options.</string>
         </property>
@@ -147,6 +149,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>pqTreeWidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../pqComponents.qrc" />
  </resources>
