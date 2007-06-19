@@ -60,7 +60,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqStateLoader);
-vtkCxxRevisionMacro(pqStateLoader, "1.8.6.2");
+vtkCxxRevisionMacro(pqStateLoader, "1.8.6.3");
 //-----------------------------------------------------------------------------
 pqStateLoader::pqStateLoader()
 {
@@ -139,6 +139,20 @@ vtkSMProxy* pqStateLoader::NewProxyInternal(
       return proxy;
       }
     }
+  else if (xml_group && xml_name && strcmp(xml_group, "misc") == 0 
+    && strcmp(xml_name, "TimeKeeper") == 0)
+    {
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    // There is only one time keeper per connection, simply
+    // load the state on the timekeeper.
+    vtkSMProxy* timekeeper = pxm->GetProxy("timekeeper", "TimeKeeper");
+    if (timekeeper)
+      {
+      timekeeper->Register(this);
+      return timekeeper;
+      }
+    }
+
   return this->Superclass::NewProxyInternal(xml_group, xml_name);
 }
 

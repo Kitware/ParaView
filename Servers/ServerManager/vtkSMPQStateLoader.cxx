@@ -23,7 +23,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.16.6.2");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.16.6.3");
 
 struct vtkSMPQStateLoaderInternals
 {
@@ -49,11 +49,10 @@ vtkSMPQStateLoader::~vtkSMPQStateLoader()
 vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
   const char* xml_group, const char* xml_name)
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-
   // Check if the proxy requested is a render module.
   if (xml_group && xml_name && strcmp(xml_group, "newviews") == 0)
     {
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     vtkSMProxy* prototype = pxm->GetPrototypeProxy(xml_group, xml_name);
     if (prototype && prototype->IsA("vtkSMRenderViewProxy"))
       {
@@ -72,18 +71,7 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
         this->RenderViewXMLName);
       }
     }
-  else if (xml_group && xml_name && strcmp(xml_group, "misc") == 0 
-    && strcmp(xml_name, "TimeKeeper") == 0)
-    {
-    // There is only one time keeper per connection, simply
-    // load the state on the timekeeper.
-    vtkSMProxy* timekeeper = pxm->GetProxy("timekeeper", "TimeKeeper");
-    if (timekeeper)
-      {
-      timekeeper->Register(this);
-      return timekeeper;
-      }
-    }
+
   return this->Superclass::NewProxyInternal(xml_group, xml_name);
 }
 
