@@ -23,10 +23,18 @@
 #define __vtkPhastaReader_h
 
 #include "vtkUnstructuredGridAlgorithm.h"
+#include "vtkUnstructuredGrid.h"
+
+#include <vtkstd/string>
+#include <vtkstd/map>
 
 class vtkPoints;
 class vtkDataSetAttributes;
 class vtkInformationVector;
+
+//BTX
+struct vtkPhastaReaderInternal;
+//ETX
 
 class VTK_EXPORT vtkPhastaReader : public vtkUnstructuredGridAlgorithm
 {
@@ -45,6 +53,15 @@ public:
   vtkSetStringMacro(FieldFileName);
   vtkGetStringMacro(FieldFileName);
 
+  // Description:
+  // Clear/Set info. in FieldInfoMap for object of vtkPhastaReaderInternal
+  void ClearFieldInfo();
+  void SetFieldInfo(const char *paraviewFieldTag,
+                    const char* phastaFieldTag,
+                    int index,
+                    int numOfComps,
+                    int dataDependency,
+                    const char* dataType);
 protected:
   vtkPhastaReader();
   ~vtkPhastaReader();
@@ -56,11 +73,16 @@ protected:
   void ReadGeomFile(char *GeomFileName, 
                     int &firstVertexNo,
                     vtkPoints *points, 
-                    int &noOfNodes);
-  void ReadFieldFile(char *FieldFileName , 
+                    int &noOfNodes,
+                    int &noOfCells);
+  void ReadFieldFile(char *fieldFileName , 
                      int firstVertexNo, 
                      vtkDataSetAttributes *field, 
                      int &noOfNodes);
+  void ReadFieldFile(char *fieldFileName,
+                     int firstVertexNo,
+                     vtkUnstructuredGrid *output,
+                     int &noOfDatas);
 
 private:
   char *GeometryFileName;
@@ -102,6 +124,8 @@ private:
   
   
 private:
+  vtkPhastaReaderInternal *Internal;
+
   vtkPhastaReader(const vtkPhastaReader&); // Not implemented
   void operator=(const vtkPhastaReader&); // Not implemented
 };

@@ -46,7 +46,7 @@ struct vtkPPhastaReaderInternal
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPPhastaReader, "1.1");
+vtkCxxRevisionMacro(vtkPPhastaReader, "1.2");
 vtkStandardNewMacro(vtkPPhastaReader);
 
 //----------------------------------------------------------------------------
@@ -55,6 +55,7 @@ vtkPPhastaReader::vtkPPhastaReader()
   this->FileName = 0;
 
   this->TimeStepIndex = 0;
+  this->ActualTimeStep = 0;
 
   this->Reader = vtkPhastaReader::New();
 
@@ -91,7 +92,33 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
   vtkInformation *outInfo = 
     outputVector->GetInformationObject(0);
 
-  if (this->TimeStepIndex > this->TimeStepRange[1])
+  this->ActualTimeStep = this->TimeStepIndex;
+
+  int tsLength =
+    outInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  double* steps =
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    
+  // Check if a particular time was requested.
+  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
+    {
+    // Get the requested time step. We only supprt requests of a single time
+    // step in this reader right now
+    double *requestedTimeSteps = 
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
+    double timeValue = requestedTimeSteps[0];
+
+    // find the first time value larger than requested time value
+    // this logic could be improved
+    int cnt = 0;
+    while (cnt < tsLength-1 && steps[cnt] < timeValue)
+      {
+      cnt++;
+      }
+    this->ActualTimeStep = cnt;
+    }
+
+  if (this->ActualTimeStep > this->TimeStepRange[1])
     {
     vtkErrorMacro("Timestep index too large.");
     return 0;
@@ -182,7 +209,7 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
     {
     sprintf(geom_name, 
             geometryPattern, 
-            this->Internal->TimeStepInfoMap[this->TimeStepIndex].GeomIndex, 
+            this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex, 
             piece+1);
     }
   else if (geomHasPiece)
@@ -193,7 +220,7 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
     {
     sprintf(geom_name, 
             geometryPattern, 
-            this->Internal->TimeStepInfoMap[this->TimeStepIndex].GeomIndex);
+            this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex);
     }
   else
     {
@@ -204,7 +231,7 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
     {
     sprintf(field_name, 
             fieldPattern, 
-            this->Internal->TimeStepInfoMap[this->TimeStepIndex].FieldIndex,
+            this->Internal->TimeStepInfoMap[this->ActualTimeStep].FieldIndex,
             piece+1);
     }
   else if (fieldHasPiece)
@@ -215,7 +242,7 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
     {
     sprintf(field_name, 
             fieldPattern, 
-            this->Internal->TimeStepInfoMap[this->TimeStepIndex].FieldIndex);
+            this->Internal->TimeStepInfoMap[this->ActualTimeStep].FieldIndex);
     }
   else
     {
@@ -257,8 +284,11 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
   delete [] geom_name;
   delete [] field_name;
 
-  this->Parser->Delete();
-  this->Parser = 0;
+  if (steps)
+    {
+    output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(),
+                                  steps+this->ActualTimeStep, 1);
+    }
 
   return 1;
 }
@@ -269,7 +299,8 @@ int vtkPPhastaReader::RequestInformation(vtkInformation*,
                                        vtkInformationVector* outputVector)
 { 
   this->Internal->TimeStepInfoMap.clear();
-
+  this->Reader->ClearFieldInfo();
+  
   vtkInformation *outInfo = 
     outputVector->GetInformationObject(0);
 
@@ -281,7 +312,6 @@ int vtkPPhastaReader::RequestInformation(vtkInformation*,
 
   if (this->Parser)
     {
-    vtkWarningMacro("No parser should exist.");
     this->Parser->Delete();
     this->Parser = 0;
     }
@@ -339,6 +369,16 @@ int vtkPPhastaReader::RequestInformation(vtkInformation*,
         {
         startIndex = 0;
         }
+      double startValue = 0.;
+      double valueIncr = 1.*indexIncr;
+      if (nested->GetScalarAttribute("start_value", &startValue))
+        {
+        hasTimeValues = 1;
+        }
+      if (nested->GetScalarAttribute("increment_value_by", &valueIncr))
+        {
+        hasTimeValues = 1;
+        }
       if (autoGen)
         {
         for (int j=0; j<numTimeSteps; j++)
@@ -347,7 +387,9 @@ int vtkPPhastaReader::RequestInformation(vtkInformation*,
             this->Internal->TimeStepInfoMap[j];
           info.GeomIndex = startIndex;
           info.FieldIndex = startIndex;
+          info.TimeValue = startValue;
           startIndex += indexIncr;
+          startValue += valueIncr;
           }
         }
 
@@ -391,7 +433,87 @@ int vtkPPhastaReader::RequestInformation(vtkInformation*,
       break;
       }
     }
-  
+
+  int numberOfFields, numberOfFields2;
+  for (unsigned int i=0; i<numElements; i++)
+    {
+    vtkPVXMLElement* nested = rootElement->GetNestedElement(i);
+    if (strcmp("Fields", nested->GetName()) == 0)
+      {
+      if (!nested->GetScalarAttribute("number_of_fields", &numberOfFields))
+        {
+        numberOfFields = 1;
+        }
+
+      numberOfFields2 = 0;
+      unsigned int numElements2 = nested->GetNumberOfNestedElements();
+      for (unsigned int j=0; j<numElements2; j++)
+        {
+        vtkPVXMLElement* nested2 = nested->GetNestedElement(j);
+        if (strcmp("Field", nested2->GetName()) == 0)
+          {
+          numberOfFields2++;
+          vtkstd::string paraviewFieldTagStr, dataTypeStr;
+          const char* paraviewFieldTag = 0;
+          paraviewFieldTag = nested2->GetAttribute("paraview_field_tag");
+          if (!paraviewFieldTag)
+            {
+            ostrstream paraviewFieldTagStrStream;
+            paraviewFieldTagStrStream << "Field " << numberOfFields2 << ends;
+            paraviewFieldTagStr = paraviewFieldTagStrStream.str();
+            delete[] paraviewFieldTagStrStream.str();
+            paraviewFieldTag = paraviewFieldTagStr.c_str();
+            }
+          const char* phastaFieldTag = 0;
+          phastaFieldTag = nested2->GetAttribute("phasta_field_tag");
+          if (!phastaFieldTag) 
+            {
+            vtkErrorMacro("No phasta field tag was specified");
+            return 0;
+            }
+          int index; // 0 as default (for safety)
+          if (!nested2->GetScalarAttribute("start_index_in_phasta_array", &index))
+            {
+            index = 0;
+            }
+          int numOfComps; // 1 as default (for safety)
+          if (!nested2->GetScalarAttribute("number_of_components", &numOfComps))
+            {
+            numOfComps = 1;
+            }
+          int dataDependency; // nodal as default
+          if (!nested2->GetScalarAttribute("data_dependency", &dataDependency))
+            {
+            dataDependency = 0;
+            }
+          const char* dataType = 0;
+          dataType = nested2->GetAttribute("data_type");
+          if (!dataType) // "double" as default
+            {
+            dataTypeStr = "double";
+            dataType = dataTypeStr.c_str();
+            }
+
+          this->Reader->SetFieldInfo(paraviewFieldTag,phastaFieldTag,index,numOfComps,dataDependency,dataType);
+          }
+        }
+
+      if (numberOfFields<numberOfFields2)
+        {
+        numberOfFields = numberOfFields2;
+        }
+
+      break;
+      }
+    }
+
+  if (!numberOfFields2) // by default take "solution" with only flow variables
+    {
+    numberOfFields = 3;
+    this->Reader->SetFieldInfo("pressure","solution",0,1,0,"double");
+    this->Reader->SetFieldInfo("velocity","solution",1,3,0,"double");
+    this->Reader->SetFieldInfo("temperature","solution",4,1,0,"double");
+    }
 
   int tidx;
   // Make sure all indices are there
@@ -416,6 +538,11 @@ int vtkPPhastaReader::RequestInformation(vtkInformation*,
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), 
                  timeSteps, 
                  numTimeSteps);
+    double timeRange[2];
+    timeRange[0] = timeSteps[0];
+    timeRange[1] = timeSteps[numTimeSteps-1];
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), 
+                     timeRange, 2);
     delete[] timeSteps;
     }
 

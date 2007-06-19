@@ -16,24 +16,48 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkByteSwap.h"
 #include "vtkCellType.h"   //added for constants such as VTK_TETRA etc...
+#include "vtkDataArray.h"
+#include "vtkIntArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkCellData.h"
 #include "vtkPointSet.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPhastaReader, "1.5");
+vtkCxxRevisionMacro(vtkPhastaReader, "1.6");
 vtkStandardNewMacro(vtkPhastaReader);
-
-#define swap_char(A,B) { ucTmp = A; A = B ; B = ucTmp; }
-
-// Begin of copy from phastaIO
 
 #include <vtkstd/map>
 #include <vtkstd/vector>
 #include <vtkstd/string>
+
+struct vtkPhastaReaderInternal
+{
+  struct FieldInfo
+  {
+    vtkstd::string PhastaFieldTag;
+    int StartIndexInPhastaArray;
+    int NumberOfComponents;
+    int DataDependency; // 0-nodal, 1-elemental
+    vtkstd::string DataType; // "int" or "double"
+
+    FieldInfo() : StartIndexInPhastaArray(-1), NumberOfComponents(-1), DataDependency(-1), DataType(""), PhastaFieldTag("")
+      {
+      }
+  };
+
+  typedef vtkstd::map<vtkstd::string, FieldInfo> FieldInfoMapType;
+  FieldInfoMapType FieldInfoMap;
+};
+
+
+// Begin of copy from phastaIO
+
+
+#define swap_char(A,B) { ucTmp = A; A = B ; B = ucTmp; }
 
 vtkstd::map< int , char* > LastHeaderKey;
 vtkstd::vector< FILE* > fileArray;
@@ -45,9 +69,7 @@ int Wrong_Endian = 0 ;
 int Strict_Error = 0 ;
 int binary_format = 0;
 
-
 // the caller has the responsibility to delete the returned string 
-
 char* vtkPhastaReader::StringStripper( const char  istring[] ) 
 {
   int length = strlen( istring );
@@ -435,6 +457,7 @@ vtkPhastaReader::vtkPhastaReader()
   this->GeometryFileName = NULL;
   this->FieldFileName = NULL;
   this->SetNumberOfInputPorts(0);
+  this->Internal = new vtkPhastaReaderInternal;
 }
 
 vtkPhastaReader::~vtkPhastaReader()
@@ -447,6 +470,29 @@ vtkPhastaReader::~vtkPhastaReader()
     {
     delete [] this->FieldFileName;
     }
+  delete this->Internal;
+}
+
+void vtkPhastaReader::ClearFieldInfo()
+{
+  this->Internal->FieldInfoMap.clear();
+}
+
+void vtkPhastaReader::SetFieldInfo(const char* paraviewFieldTag,
+                                   const char* phastaFieldTag,
+                                   int index,
+                                   int numOfComps,
+                                   int dataDependency,
+                                   const char* dataType)
+{
+  vtkPhastaReaderInternal::FieldInfo &info =
+    this->Internal->FieldInfoMap[paraviewFieldTag];
+
+  info.PhastaFieldTag = phastaFieldTag;
+  info.StartIndexInPhastaArray = index;
+  info.NumberOfComponents = numOfComps;
+  info.DataDependency = dataDependency;
+  info.DataType = dataType;
 }
 
 int vtkPhastaReader::RequestData(vtkInformation*,
@@ -455,7 +501,7 @@ int vtkPhastaReader::RequestData(vtkInformation*,
 {
   int firstVertexNo = 0;
   int fvn = 0;
-  int noOfNodes;
+  int noOfNodes, noOfCells, noOfDatas;
 
   // get the data object
   vtkInformation *outInfo = 
@@ -483,8 +529,16 @@ int vtkPhastaReader::RequestData(vtkInformation*,
   vtkDebugMacro(<< "Field File : " << this->FieldFileName);
 
   fvn = firstVertexNo;
-  this->ReadGeomFile(this->GeometryFileName, firstVertexNo, points, noOfNodes);
-  this->ReadFieldFile(this->FieldFileName, fvn, field, noOfNodes);
+  this->ReadGeomFile(this->GeometryFileName, firstVertexNo, points, noOfNodes, noOfCells);
+
+ if (!this->Internal->FieldInfoMap.size())
+   {
+   this->ReadFieldFile(this->FieldFileName, fvn, field, noOfNodes);
+   }
+ else
+   {
+   this->ReadFieldFile(this->FieldFileName, fvn, output, noOfDatas);
+   }
 
   /* set the points over here, this is because vtkUnStructuredGrid 
      only insert points once, next insertion overwrites the previous one */
@@ -499,10 +553,11 @@ int vtkPhastaReader::RequestData(vtkInformation*,
    them into one, ReadGeomfile can then be called repeatedly from Execute with 
    firstVertexNo forming consecutive series of vertex numbers */
 
-void vtkPhastaReader::ReadGeomFile(char* geomFileName, 
-                                 int &firstVertexNo, 
-                                 vtkPoints *points,
-                                 int &num_nodes)
+void vtkPhastaReader::ReadGeomFile(char* geomFileName,
+                                   int &firstVertexNo,
+                                   vtkPoints *points,
+                                   int &num_nodes,
+                                   int &num_cells)
 {
 
   /* variables for vtk */
@@ -555,6 +610,7 @@ void vtkPhastaReader::ReadGeomFile(char* geomFileName,
              "integer",
              "binary");
   num_elems = array[0];
+  num_cells = array[0];
 
   /* read number of interior */
   readheader(&geomfile,
@@ -807,6 +863,175 @@ void vtkPhastaReader::ReadFieldFile(char* fieldFileName,
   closefile(&fieldfile,"read"); 
   delete [] data;
 
+} //closes ReadFieldFile
+
+void vtkPhastaReader::ReadFieldFile(char* fieldFileName, 
+                                    int, 
+                                    vtkUnstructuredGrid *output, 
+                                    int &noOfDatas)
+{
+
+  int i, j, numOfVars;
+  int item;
+  int fieldfile;
+
+  openfile(fieldFileName,"read",&fieldfile);
+  //fieldfile = fopen(FieldFileName,"rb");
+
+  if(!fieldfile)
+    {
+    vtkErrorMacro(<<"Cannot open file " << FieldFileName)
+      return;
+    }
+  int array[10], expect;
+
+  int activeScalars = 0, activeVectors = 0, activeTensors = 0;
+
+  vtkPhastaReaderInternal::FieldInfoMapType::iterator it = this->Internal->FieldInfoMap.begin();
+  vtkPhastaReaderInternal::FieldInfoMapType::iterator itend = this->Internal->FieldInfoMap.end();
+  for(; it!=itend; it++)
+    {
+    const char* paraviewFieldTag = it->first.c_str();
+    const char* phastaFieldTag = it->second.PhastaFieldTag.c_str();
+    int index = it->second.StartIndexInPhastaArray;
+    int numOfComps = it->second.NumberOfComponents;
+    int dataDependency = it->second.DataDependency;
+    const char* dataType = it->second.DataType.c_str();
+
+    vtkDataSetAttributes* field;
+    if(dataDependency)
+      field = output->GetCellData();
+    else
+      field = output->GetPointData();
+
+    double *data;
+    vtkDataArray *dataArray;
+    /* read the field data */
+    if(strcmp(dataType,"double")==0)
+      {
+      dataArray = vtkDoubleArray::New();
+      }
+    else
+      {
+      vtkErrorMacro("Data type [" << dataType <<"] NOT supported");
+      continue;
+      }
+
+    dataArray->SetName(paraviewFieldTag);
+    dataArray->SetNumberOfComponents(numOfComps);
+
+    expect = 3; 
+    readheader(&fieldfile,phastaFieldTag,array,&expect,"integer","binary");
+    noOfDatas = array[0];
+    this->NumberOfVariables = array[1];
+    numOfVars = array[1];
+    dataArray->SetNumberOfTuples(noOfDatas);
+
+    if(index<0 || index>numOfVars-1) 
+      {
+      vtkErrorMacro("index ["<<index<<"] is out of range [num. of vars.:"<<numOfVars<<"] for field [paraview field tag:"<<paraviewFieldTag<<", phasta field tag:"<<phastaFieldTag<<"]");
+
+      dataArray->Delete();
+      continue;
+      }
+
+    if(numOfComps<0 || index+numOfComps>numOfVars)
+      {
+      vtkErrorMacro("index ["<<index<<"] with num. of comps. ["<<numOfComps<<"] is out of range [num. of vars.:"<<numOfVars<<"] for field [paraview field tag:"<<paraviewFieldTag<<", phasta field tag:"<<phastaFieldTag<<"]");
+
+      dataArray->Delete();
+      continue;
+      }
+
+    item = numOfVars*noOfDatas;
+    data = new double[item];
+    if(data == NULL)
+      {
+      vtkErrorMacro(<<"Unable to allocate memory for field info");
+
+      dataArray->Delete();
+      continue;
+      }
+
+    readdatablock(&fieldfile,phastaFieldTag,data,&item,dataType,"binary");
+
+    switch(numOfComps)
+      {
+      case 1 :
+        {
+        int offset = index*noOfDatas;
+
+        if(!activeScalars)
+          field->SetActiveScalars(paraviewFieldTag);
+        else
+          activeScalars = 1;
+        for(i=0;i<noOfDatas;i++)
+          {
+          dataArray->SetTuple1(i, data[offset+i]);
+          }
+        }
+        break;
+      case 3 :
+        {
+        int offset[3];
+        for(j=0;j<3;j++)
+          offset[j] = (index+j)*noOfDatas;
+
+        if(!activeScalars)
+          field->SetActiveVectors(paraviewFieldTag);
+        else
+          activeScalars = 1;
+        for(i=0;i<noOfDatas;i++)
+          {
+          dataArray->SetTuple3(i, 
+                               data[offset[0]+i], 
+                               data[offset[1]+i],
+                               data[offset[2]+i]);
+          }
+        }
+        break;
+      case 9 :
+        {
+        int offset[9];
+        for(j=0;j<9;j++)
+          offset[j] = (index+j)*noOfDatas;
+
+        if(!activeTensors)
+          field->SetActiveTensors(paraviewFieldTag);
+        else
+          activeTensors = 1;
+        for(i=0;i<noOfDatas;i++)
+          {
+          dataArray->SetTuple9(i,
+                               data[offset[0]+i],
+                               data[offset[1]+i],
+                               data[offset[2]+i],
+                               data[offset[3]+i],
+                               data[offset[4]+i],
+                               data[offset[5]+i],
+                               data[offset[6]+i],
+                               data[offset[7]+i],
+                               data[offset[8]+i]);
+          }
+        }
+        break;
+      default:
+        vtkErrorMacro("number of components [" << numOfComps <<"] NOT supported");
+
+        dataArray->Delete();
+        delete [] data;
+        continue;
+      }
+
+    field->AddArray(dataArray);
+
+    // clean up
+    dataArray->Delete();
+    delete [] data;
+    }
+
+  // close up
+  closefile(&fieldfile,"read"); 
 
 }//closes ReadFieldFile
 

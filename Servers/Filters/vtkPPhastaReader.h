@@ -26,13 +26,27 @@
 //                         has_piece_entry="1"
 //                         has_time_entry="1"/>
 //
-//   <TimeSteps number_of_steps="3" 
+//   <TimeSteps number_of_steps="2" 
 //              auto_generate_indices="1"
 //              start_index="0"
-//              increment_index_by="20">
-//     <TimeStep index="0" geometry_index="" field_index="0" value="0.1"/>
-//     <TimeStep index="1" geometry_index="" field_index="20" value="0.2"/>
+//              increment_index_by="20"
+//              start_value="0."
+//              increment_value_by="20.">
+//     <TimeStep index="0" geometry_index="" field_index="0" value="0.0"/>
+//     <TimeStep index="1" geometry_index="" field_index="20" value="20.0"/>
 //   </TimeSteps>
+//   <Fields number_of_fields="2">
+//     <Field paraview_field_tag="velocity"
+//            phasta_field_tag="solution"
+//            start_index_in_phasta_array="1"
+//            number_of_componenets="3"
+//            datadependency="0"
+//            data_type="double"/>
+//     <Field paraview_field_tag="average speed"
+//            phasta_field_tag="ybar"
+//            start_index_in_phasta_array="4"
+//            number_of_componenets="1"/>
+//   </Fields>
 //</PhastaMetaFile>
 // @endverbatim
 // The GeometryFileNamePattern and FieldFileNamePattern elements have
@@ -63,12 +77,40 @@
 // entries. This is done with setting the (optional) auto_generate_indices
 // to 1. In this case, the reader will generate number_of_steps entries.
 // The geometry_index and field_index of these entries will start at
-// start_index and will be incremented by increment_index_by. 
+// start_index and will be incremented by increment_index_by.
+// The time value of these entries will start at start_value and
+// will be incremented by increment_value_by.
 // Note that it is possible to use a combination of both approaches.
 // Any values specified with the TimeStep elements will overwrite anything
 // automatically computed. A common use of this is to let the reader
 // compute all indices for field files and overwrite the geometry indices
 // with TimeStep elements.
+//
+// The Fields element contain number_of_fields Field sub-element. 
+// Each Field element specifies tag attribute to be used in paraview,
+// tag under which the field is stored in phasta files, start index of 
+// the array in phasta files, number of components of the field, data 
+// dependency, i.e., either 0 for nodal or 1 for elemental and 
+// data type, i.e., "double" (as of now supports only 1, 3 & 9 for number 
+// of components, i.e., scalars, vectors & tensors, and "double" for 
+// type of data).
+// In the example above, there are two fields to be visualized
+// one is velocity field stored under tag solution from index 1 to 3
+// in phasta files which is a vector field defined on nodes with 
+// double values, and the other field is average speed scalar field
+// stored under tag ybar at index 4 in phasta files
+// If any Field element is specified then default attribute values are :
+// (phasta_field_tag is mandatory)
+// paraview_field_tag = Field <number>
+// start_index_in_phasta_array = 0
+// number_of_components = 1
+// data_dependency = 0
+// data_type = double
+// If no Field(s) is/are specfied then the default is following 3 fields :
+// pressure (index 0 under solution),
+// velocity (index 1-3 under solution)
+// temperature (index 4 under soltuion)     
+//
 // .SECTION See Also
 // vtkPhastaReader
 
@@ -126,6 +168,8 @@ protected:
 
   vtkPhastaReader* Reader;
   vtkPVXMLParser* Parser;
+
+  int ActualTimeStep;
 
 private:
   vtkPPhastaReaderInternal* Internal;
