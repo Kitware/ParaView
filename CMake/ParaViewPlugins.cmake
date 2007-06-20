@@ -205,7 +205,7 @@ ENDMACRO(ADD_PARAVIEW_DISPLAY_PANEL)
 #  VIEW_TYPE = "MyView"
 #  VIEW_XML_GROUP = "plotmodules"
 #  VIEW_NAME is optional and gives a friendly name for the view type
-#  DISPLAY_TYPE is optional and defaults to pqConsumerDisplay
+#  DISPLAY_TYPE is optional and defaults to pqDataRepresentation
 #  DISPLAY_PANEL gives the name of the display panel
 #  DISPLAY_XML is the XML name of the display for this view and is required if
 #     DISPLAY_PANEL is set
@@ -249,7 +249,7 @@ MACRO(ADD_PARAVIEW_VIEW_MODULE OUTIFACES OUTSRCS)
   IF(ARG_DISPLAY_TYPE)
     SET(DISPLAY_TYPE ${ARG_DISPLAY_TYPE})
   ELSE(ARG_DISPLAY_TYPE)
-    SET(DISPLAY_TYPE "pqConsumerDisplay")
+    SET(DISPLAY_TYPE "pqDataRepresentation")
   ENDIF(ARG_DISPLAY_TYPE)
 
   CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Core/pqViewModuleImplementation.h.in

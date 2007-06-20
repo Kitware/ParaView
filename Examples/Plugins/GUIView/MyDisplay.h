@@ -11,7 +11,7 @@ class MyDisplay : public pqDisplayPanel
 public:
 
     /// constructor
-  MyDisplay(pqDisplay* display, QWidget* p = NULL);
+  MyDisplay(pqRepresentation* display, QWidget* p = NULL);
   ~MyDisplay();
 
 };

@@ -45,6 +45,8 @@ public:
 
   void CacheUpdateAllViews(int index, int max)
     {
+    (void) index;
+    (void) max;
     /* FIXME:UDA
     VectorOfViewModules::iterator iter = this->ViewModules.begin();
     for (; iter != this->ViewModules.end(); ++iter)
@@ -105,7 +107,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.42");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.43");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()

@@ -39,7 +39,7 @@ class vtkDataArray;
 class vtkRectilinearGrid;
 class QColor;
 
-/// pqLineChartRepresentation is a pqDisplay for "XYPlotDisplay2" proxy.
+/// pqLineChartRepresentation is a pqRepresentation for "XYPlotRepresentation" proxy.
 /// It adds logic to initialize default state as well as access
 /// get information about the plot parameters from the proxy.
 class PQCORE_EXPORT pqLineChartRepresentation : public pqDataRepresentation

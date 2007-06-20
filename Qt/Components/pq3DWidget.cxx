@@ -160,11 +160,11 @@ pqRenderView* pq3DWidget::renderView() const
 }
 
 //-----------------------------------------------------------------------------
-void pq3DWidget::setView(pqView* view)
+void pq3DWidget::setView(pqView* pqview)
 {
-  if (view == this->renderView())
+  if (pqview == this->renderView())
     {
-    this->Superclass::setView(view);
+    this->Superclass::setView(pqview);
     return;
     }
 
@@ -180,7 +180,7 @@ void pq3DWidget::setView(pqView* view)
     this->renderView()->getRenderViewProxy()->RemoveRepresentation(widget);
     }
 
-  this->Superclass::setView(view);
+  this->Superclass::setView(pqview);
 
   if (this->renderView() && widget)
     {

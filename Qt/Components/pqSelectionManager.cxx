@@ -598,9 +598,9 @@ void pqSelectionManager::selectOnSurface(int screenRectangle[4])
 }
 
 //-----------------------------------------------------------------------------
+#if 0
 void pqSelectionManager::selectOnSurfaceOld(int screenRectangle[4])
 {
-#if 0
   // Keep track of the render module that contains the previous
   // selection.
   pqRenderView* prevRvm = 0;
@@ -711,8 +711,8 @@ void pqSelectionManager::selectOnSurfaceOld(int screenRectangle[4])
   selectionSourceP->Delete();
   volumeSelection->Delete();
   extractFilterP->Delete();
-#endif
 }
+#endif
 
 //-----------------------------------------------------------------------------
 QList<QVariant> pqSelectionManager::getSelectedIndicesWithProcessIDs() const

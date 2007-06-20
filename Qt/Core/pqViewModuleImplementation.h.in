@@ -59,7 +59,7 @@ public:
   pqView* createView(const QString& viewtype,
     const QString& group,
     const QString& name,
-    vtkSMAbstractViewModuleProxy* viewmodule,
+    vtkSMViewProxy* viewmodule,
     pqServer* server,
     QObject* parent);
   

@@ -4,7 +4,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 
-MyDisplay::MyDisplay(pqDisplay* d, QWidget* p)
+MyDisplay::MyDisplay(pqRepresentation* d, QWidget* p)
   : pqDisplayPanel(d,p)
 {
   // just make a label that shows we made it in the GUI

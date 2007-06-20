@@ -4,27 +4,27 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <vtkSMProxy.h>
-#include <pqDisplay.h>
+#include <pqRepresentation.h>
 #include <pqServer.h>
 #include <pqPipelineSource.h>
 
 MyView::MyView(const QString& viewmoduletype, 
        const QString& group, 
        const QString& name, 
-       vtkSMAbstractViewModuleProxy* viewmodule, 
+       vtkSMViewProxy* viewmodule, 
        pqServer* server, 
        QObject* p)
- : pqGenericViewModule(viewmoduletype, group, name, viewmodule, server, p)
+ : pqView(viewmoduletype, group, name, viewmodule, server, p)
 {
   // our view is just a simple QWidget
   this->MyWidget = new QWidget;
   new QVBoxLayout(this->MyWidget);
 
   // connect to display creation so we can show them in our view
-  this->connect(this, SIGNAL(displayAdded(pqDisplay*)),
-    SLOT(onDisplayAdded(pqDisplay*)));
-  this->connect(this, SIGNAL(displayRemoved(pqDisplay*)),
-    SLOT(onDisplayRemoved(pqDisplay*)));
+  this->connect(this, SIGNAL(representationAdded(pqRepresentation*)),
+    SLOT(onRepresentationAdded(pqRepresentation*)));
+  this->connect(this, SIGNAL(representationRemoved(pqRepresentation*)),
+    SLOT(onRepresentationRemoved(pqRepresentation*)));
 }
 
 MyView::~MyView()
@@ -38,7 +38,7 @@ QWidget* MyView::getWidget()
   return this->MyWidget;
 }
 
-void MyView::onDisplayAdded(pqDisplay* d)
+void MyView::onRepresentationAdded(pqRepresentation* d)
 {
   // add a label with the display id
   QLabel* l = new QLabel(
@@ -48,7 +48,7 @@ void MyView::onDisplayAdded(pqDisplay* d)
   this->Labels.insert(d, l);
 }
 
-void MyView::onDisplayRemoved(pqDisplay* d)
+void MyView::onRepresentationRemoved(pqRepresentation* d)
 {
   // remove the label
   QLabel* l = this->Labels.take(d);

@@ -39,7 +39,7 @@ class vtkDataArray;
 class vtkRectilinearGrid;
 class vtkTimeStamp;
 
-/// pqBarChartRepresentation is a pqDisplay for "BarChartDisplay" proxy.
+/// pqBarChartRepresentation is a pqRepresentation for "BarChartDisplay" proxy.
 /// It adds logic to initialize the default state of the display proxy
 /// as well as managing lookuptable.
 class PQCORE_EXPORT pqBarChartRepresentation : public pqDataRepresentation

@@ -67,14 +67,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "@PANEL_NAME@Implementation.h"
 
 #include "vtkSMProxy.h"
-#include "pqDisplay.h"
+#include "pqRepresentation.h"
 
 @PANEL_NAME@Implementation::@PANEL_NAME@Implementation(QObject* p)
   : QObject(p)
 {
 }
 
-pqDisplayPanel* @PANEL_NAME@Implementation::createPanel(pqDisplay* display, QWidget* p)
+pqDisplayPanel* @PANEL_NAME@Implementation::createPanel(pqRepresentation* display, QWidget* p)
 {
   if(!this->canCreatePanel(display))
     {
@@ -84,7 +84,7 @@ pqDisplayPanel* @PANEL_NAME@Implementation::createPanel(pqDisplay* display, QWid
   return new @PANEL_NAME@(display, p);
 }
 
-bool @PANEL_NAME@Implementation::canCreatePanel(pqDisplay* display) const
+bool @PANEL_NAME@Implementation::canCreatePanel(pqRepresentation* display) const
 {
   if(!display || !display->getProxy())
     {

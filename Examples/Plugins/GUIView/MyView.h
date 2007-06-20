@@ -2,21 +2,21 @@
 #ifndef _MyView_h
 #define _MyView_h
 
-#include "pqGenericViewModule.h"
+#include "pqView.h"
 #include <QMap>
 class QLabel;
 
 /// a simple view that shows a QLabel with the display's name in the view
-class MyView : public pqGenericViewModule
+class MyView : public pqView
 {
   Q_OBJECT
 public:
     /// constructor takes a bunch of init stuff and must have this signature to 
-    /// satisfy pqGenericViewModule
+    /// satisfy pqView
   MyView(const QString& viewtypemodule, 
          const QString& group, 
          const QString& name, 
-         vtkSMAbstractViewModuleProxy* viewmodule, 
+         vtkSMViewProxy* viewmodule, 
          pqServer* server, 
          QObject* p);
   ~MyView();
@@ -33,13 +33,13 @@ public:
 
 protected slots:
   /// helper slots to create labels
-  void onDisplayAdded(pqDisplay*);
-  void onDisplayRemoved(pqDisplay*);
+  void onRepresentationAdded(pqRepresentation*);
+  void onRepresentationRemoved(pqRepresentation*);
 
 protected:
 
   QWidget* MyWidget;
-  QMap<pqDisplay*, QLabel*> Labels;
+  QMap<pqRepresentation*, QLabel*> Labels;
 
 };
 

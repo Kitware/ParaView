@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "@VIEW_TYPE@.h"
 
 #include "vtkSMProxyManager.h"
-#include "pqConsumerDisplay.h"
+#include "pqDataRepresentation.h"
 
 // configured with CMake
 // requires: VIEW_TYPE, VIEW_TYPE_NAME, DISPLAY_TYPE, VIEW_XML_GROUP
@@ -77,17 +77,17 @@ vtkSMProxy* @VIEW_TYPE@Implementation::createViewProxy(const QString& viewtype)
   return NULL;
 }
 
-pqGenericViewModule* @VIEW_TYPE@Implementation::createView(const QString& /*viewtype*/,
+pqView* @VIEW_TYPE@Implementation::createView(const QString& /*viewtype*/,
                                                 const QString& group,
                                                 const QString& viewname,
-                                                vtkSMAbstractViewModuleProxy* viewmodule,
+                                                vtkSMViewProxy* viewmodule,
                                                 pqServer* server,
                                                 QObject* p)
 {
   return new @VIEW_TYPE@("@VIEW_TYPE@", group, viewname, viewmodule, server, p);
 }
 
-pqConsumerDisplay* @VIEW_TYPE@Implementation::createDisplay(const QString& /*display_type*/, 
+pqDataRepresentation* @VIEW_TYPE@Implementation::createDisplay(const QString& /*display_type*/, 
   const QString& group,
   const QString& n,
   vtkSMProxy* proxy,

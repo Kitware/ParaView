@@ -142,7 +142,6 @@ private:
   void processEvents(unsigned long event);
   void createSelectionDisplayer(vtkSMProxy* input);
   void selectOnSurface(int screenRectange[4]);
-  void selectOnSurfaceOld(int screenRectange[4]);
 };
 #endif
 

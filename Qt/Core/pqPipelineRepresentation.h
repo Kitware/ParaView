@@ -49,7 +49,7 @@ class vtkPVDataSetAttributesInformation;
 class vtkPVDataSetAttributesInformation;
 class vtkSMPVRepresentationProxy;
 
-/// This is PQ representation for a single display. A pqDisplay represents
+/// This is PQ representation for a single display. A pqRepresentation represents
 /// a single vtkSMPVRepresentationProxy. The display can be added to
 /// only one render module or more (ofcouse on the same server, this class
 /// doesn't worry about that.

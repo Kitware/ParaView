@@ -57,8 +57,8 @@ class pqPipelineSource;
  *  The user may also add a description of the lookmark. 
  *
  *  A subset of the server manager state is saved on creation:
- *   - all pqConsumerDisplays that are visible in the given pqRenderViewModule
- *   - all pqConsumerDisplays that are invisible in the given pqRenderViewModule but "upstream" from a visible one in the pipeline 
+ *   - all pqDataRepresentations that are visible in the given pqRenderViewModule
+ *   - all pqDataRepresentations that are invisible in the given pqRenderViewModule but "upstream" from a visible one in the pipeline 
  *   - all pqPipelineSources associated with the displays being saved
  *   - all referred proxies of all saved display and source proxies. A referred proxy is one that is part of a proxy property of a saved proxy.
  *   - the vtkSMRenderModuleProxy state (but not its referred proxies)

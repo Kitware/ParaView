@@ -226,7 +226,7 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqRenderView* viewModule)
     {
     this->noServerSettingsLabel->setVisible(false);
     this->compositingParameters->setVisible(true);
-    double val = pqSMAdaptor::getElementProperty(
+    val = pqSMAdaptor::getElementProperty(
       proxy->GetProperty("CompositeThreshold")).toDouble();
     if (val >= VTK_LARGE_FLOAT)
       {
