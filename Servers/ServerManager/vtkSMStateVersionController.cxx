@@ -18,7 +18,7 @@
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkSMStateVersionController);
-vtkCxxRevisionMacro(vtkSMStateVersionController, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMStateVersionController, "1.1.2.2");
 //----------------------------------------------------------------------------
 vtkSMStateVersionController::vtkSMStateVersionController()
 {
@@ -58,13 +58,58 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* root)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMStateVersionControllerConvertRenderModulesToViews(
+bool ConvertViewModulesToViews(
   vtkPVXMLElement* root, void* callData)
 {
   vtkSMStateVersionController* self = reinterpret_cast<
     vtkSMStateVersionController*>(callData);
-  return self->ConvertRenderModulesToViews(root);
+  return self->ConvertViewModulesToViews(root);
 }
+
+//----------------------------------------------------------------------------
+// Called for every data-object display. We will update scalar color 
+// properties since those changed.
+bool ConvertScalarColoringForRepresentations(vtkPVXMLElement* root,
+  void* vtkNotUsed(callData))
+{
+  // ScalarMode --> ColorAttributeType
+  //  vals: 0/1/2/3 ---> 0 (point-data)
+  //      : 4       ---> 1 (cell-data)
+  // ColorArray --> ColorArrayName
+  //  val remains same.
+  unsigned int max = root->GetNumberOfNestedElements();
+  for (unsigned int cc=0; cc < max; cc++)
+    {
+    vtkPVXMLElement* child = root->GetNestedElement(cc);
+    if (child->GetName() && strcmp(child->GetName(), "Property")==0)
+      {
+      const char* pname = child->GetAttribute("name");
+      if (pname && strcmp(pname, "ColorArray")==0)
+        {
+        child->SetAttribute("name", "ColorArrayName");
+        }
+      else if (pname && strcmp(pname, "ScalarMode")==0)
+        {
+        child->SetAttribute("name", "ColorAttributeType");
+        vtkPVXMLElement* valueElement = 
+          child->FindNestedElementByName("Element");
+        if (valueElement)
+          {
+          int oldValue = 0;
+          valueElement->GetScalarAttribute("value", &oldValue);
+          int newValue = (oldValue<=3)? 0 : 1;
+          ostrstream valueStr;
+          valueStr << newValue << ends;
+          valueElement->SetAttribute("value", valueStr.str());
+          delete[] valueStr.str();
+          }
+        }
+      }
+    }
+
+  return true;
+}
+
 //----------------------------------------------------------------------------
 bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
 {
@@ -85,7 +130,7 @@ bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
       "group", "newviews",
       "type", "RenderView", 0};
     this->Select( root, "Proxy", attrs,
-      &vtkSMStateVersionControllerConvertRenderModulesToViews,
+      &::ConvertViewModulesToViews,
       this);
     this->SelectAndSetAttributes(root, "Proxy", attrs, newAttrs);
     }
@@ -99,7 +144,7 @@ bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
       "group", "newviews",
       "type", "BarChartView", 0};
     this->Select( root, "Proxy", attrs,
-      &vtkSMStateVersionControllerConvertRenderModulesToViews,
+      &::ConvertViewModulesToViews,
       this);
     this->SelectAndSetAttributes(root, "Proxy", attrs, newAttrs);
     }
@@ -113,7 +158,7 @@ bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
       "group", "newviews",
       "type", "XYPlotView", 0};
     this->Select( root, "Proxy", attrs,
-      &vtkSMStateVersionControllerConvertRenderModulesToViews,
+      &::ConvertViewModulesToViews,
       this);
     this->SelectAndSetAttributes(root, "Proxy", attrs, newAttrs);
     }
@@ -127,7 +172,7 @@ bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
       "group", "newviews",
       "type", "ElementInspectorView", 0};
     this->Select( root, "Proxy", attrs,
-      &vtkSMStateVersionControllerConvertRenderModulesToViews,
+      &::ConvertViewModulesToViews,
       this);
     this->SelectAndSetAttributes(root, "Proxy", attrs, newAttrs);
     }
@@ -144,12 +189,19 @@ bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
     const char* newAttrs[] = {
       "group", "representations",
       "type", "GeometryRepresentation", 0};
+
+    this->Select(root, "Proxy", lodAttrs,
+      &ConvertScalarColoringForRepresentations, this);
     this->SelectAndSetAttributes(
       root, "Proxy", lodAttrs, newAttrs);
 
+    this->Select(root, "Proxy", compositeAttrs,
+      &ConvertScalarColoringForRepresentations, this);
     this->SelectAndSetAttributes(
       root, "Proxy", compositeAttrs, newAttrs);
 
+    this->Select(root, "Proxy", multiAttrs,
+      &ConvertScalarColoringForRepresentations, this);
     this->SelectAndSetAttributes(
       root, "Proxy", multiAttrs, newAttrs);
     }
@@ -201,6 +253,17 @@ bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
     {
     // Convert all displays to representations.
     const char* attrs[] = {
+      "type", "ScalarBarWidget", 0};
+    const char* newAttrs[] = {
+      "group", "representations",
+      "type", "ScalarBarWidgetRepresentation", 0};
+    this->SelectAndSetAttributes(
+      root, "Proxy", attrs, newAttrs);
+    }
+
+    {
+    // Convert all displays to representations.
+    const char* attrs[] = {
       "type", "ElementInspectorDisplay", 0};
     const char* newAttrs[] = {
       "group", "representations",
@@ -213,7 +276,7 @@ bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMStateVersionController::ConvertRenderModulesToViews(
+bool vtkSMStateVersionController::ConvertViewModulesToViews(
   vtkPVXMLElement* parent)
 {
   const char* attrs[] = {

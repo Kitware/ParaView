@@ -40,7 +40,7 @@ public:
   bool Process_3_0_To_3_1(vtkPVXMLElement* root);
 
 //BTX
-  bool ConvertRenderModulesToViews(vtkPVXMLElement* parent);
+  bool ConvertViewModulesToViews(vtkPVXMLElement* parent);
 protected:
   vtkSMStateVersionController();
   ~vtkSMStateVersionController();
