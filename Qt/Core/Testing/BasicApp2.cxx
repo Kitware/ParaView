@@ -23,6 +23,10 @@
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkProcessModule.h"
 
+#include "vtkSMStateVersionController.h"
+#include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
+
 class vtkRVProxy : public vtkPVRenderViewProxy
 {
 public:
@@ -186,8 +190,17 @@ public:
 
 int main(int argc, char** argv)
 {
-  QApplication app(argc, argv);
-  return pqMain::Run(app, GUIHelper::New());
+  vtkPVXMLParser* parser = vtkPVXMLParser::New();
+  parser->SetFileName("/home/utkarsh/Kitware/ParaView3/ParaView3Bin/b.pvsm");
+  parser->Parse();
+
+  vtkSMStateVersionController* controller = vtkSMStateVersionController::New();
+  controller->Process(parser->GetRootElement()->GetNestedElement(0));
+  ofstream ofp("/tmp/out.xml");
+  parser->GetRootElement()->PrintXML(ofp, vtkIndent());
+
+  //QApplication app(argc, argv);
+  //return pqMain::Run(app, GUIHelper::New());
 }
 
 

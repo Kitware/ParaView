@@ -24,13 +24,14 @@
 #include "vtkSMCameraLink.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMStateVersionController.h"
 
 #include <vtkstd/map>
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.23");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.23.6.1");
 vtkCxxSetObjectMacro(vtkSMStateLoader, RootElement, vtkPVXMLElement);
 //---------------------------------------------------------------------------
 struct vtkSMStateLoaderRegistrationInfo
@@ -345,6 +346,15 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*
       return 0;
       }
     }
+  
+  vtkSMStateVersionController* convertor = vtkSMStateVersionController::New();
+  if (!convertor->Process(rootElement))
+    {
+    vtkWarningMacro("State convertor was not able to convert the state to current "
+      "version successfully");
+    }
+  convertor->Delete();
+
 
   this->SetRootElement(rootElement);
 

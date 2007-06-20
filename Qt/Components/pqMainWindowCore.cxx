@@ -760,14 +760,11 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
 
   core->setUndoStack(this->Implementation->UndoStack);
 
-
-
   // set up state loader.
   pqStateLoader* loader = pqStateLoader::New();
   loader->SetMainWindowCore(this);
   core->setStateLoader(loader);
   loader->Delete();
-
 
   // Set up a callback to before further intialization once the application
   // event loop starts.

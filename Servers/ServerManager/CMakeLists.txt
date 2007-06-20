@@ -183,6 +183,8 @@ SET(Kit_SRCS
   vtkSMUnstructuredGridParallelStrategy.cxx
   vtkSMViewProxy.cxx
   vtkSMUniformGridParallelStrategy.cxx
+  vtkSMStateVersionController.cxx
+  vtkSMStateVersionControllerBase.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS
@@ -217,6 +219,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMDataRepresentationProxy.cxx
   vtkSMRepresentationProxy.cxx
   vtkSMRepresentationStrategy.cxx
+  vtkSMStateVersionControllerBase.cxx
   ABSTRACT
   )
 
