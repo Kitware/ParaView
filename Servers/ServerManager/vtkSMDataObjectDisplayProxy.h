@@ -53,6 +53,11 @@ public:
                         vtkSMSourceProxy* input,
                         unsigned int outputPort,
                         const char* method);
+  virtual void AddInput(vtkSMSourceProxy* input,
+                        const char* method)
+  {
+    this->AddInput(0, input, 0, method);
+  }
 
   // Description:
   // Obtain the proxy for the algorithm that this displays the output of.
