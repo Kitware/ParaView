@@ -71,7 +71,7 @@ vtkSMProxy* @VIEW_TYPE@Implementation::createViewProxy(const QString& viewtype)
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   if(viewtype == "@VIEW_TYPE@")
     {
-    return pxm->NewProxy("@VIEW_XML_GROUP@", "@VIEW_TYPE@ViewModule");
+    return pxm->NewProxy("@VIEW_XML_GROUP@", "@VIEW_TYPE@");
     }
 
   return NULL;

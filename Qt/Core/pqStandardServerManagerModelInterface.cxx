@@ -126,6 +126,11 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
       return new pqPipelineRepresentation(group, name, 
         vtkSMPVRepresentationProxy::SafeDownCast(proxy), server, 0);
       }
+    if (proxy->IsA("vtkSMDataRepresentationProxy"))
+      {
+      // If everything fails, simply create a pqDataRepresentation object.
+      return new pqDataRepresentation(group, name, proxy, server, 0);
+      }
     }
   else if (group == "animation")
     {

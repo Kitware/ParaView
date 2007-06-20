@@ -196,10 +196,10 @@ ENDMACRO(ADD_PARAVIEW_DISPLAY_PANEL)
 #  </SourceProxy>
 #  ....
 # <ProxyGroup name="plotmodules">
-#  <ViewModuleProxy name="MyViewViewModule"
-#      base_proxygroup="rendermodules" base_proxyname="ViewModule"
-#      display_name="MyDisplay">
-#  </ViewModuleProxy>
+#  <ViewProxy name="MyView"
+#      base_proxygroup="newviews" base_proxyname="ViewBase"
+#      representation_name="MyDisplay">
+#  </ViewProxy>
 # </ProxyGroup>
 
 #  VIEW_TYPE = "MyView"
