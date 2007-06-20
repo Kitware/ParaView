@@ -25,7 +25,7 @@
 #include "vtkSMObject.h"
 
 class vtkTesting;
-class vtkSMRenderModuleProxy;
+class vtkSMRenderViewProxy;
 
 class VTK_EXPORT vtkSMTesting : public vtkSMObject
 {
@@ -36,8 +36,8 @@ public:
 
   // Description:
   // Set/get the render module proxy.
-  void SetRenderModuleProxy(vtkSMRenderModuleProxy* );
-  vtkGetObjectMacro(RenderModuleProxy, vtkSMRenderModuleProxy);
+  void SetRenderViewProxy(vtkSMRenderViewProxy* );
+  vtkGetObjectMacro(RenderViewProxy, vtkSMRenderViewProxy);
 
   // Description:
   // Add argument
@@ -52,7 +52,7 @@ protected:
   ~vtkSMTesting();
 
   vtkTesting* Testing;
-  vtkSMRenderModuleProxy* RenderModuleProxy;
+  vtkSMRenderViewProxy* RenderViewProxy;
 
 private:
   vtkSMTesting(const vtkSMTesting&); // Not implemented.

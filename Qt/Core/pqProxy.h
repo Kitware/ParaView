@@ -147,6 +147,11 @@ protected:
   /// nameChanged() signal.
   void setSMName(const QString& new_name);
 
+  // Use this method to initialize the pqObject state using the
+  // underlying vtkSMProxy. This needs to be done only once,
+  // after the object has been created. 
+  virtual void initialize() { };
+
 private:
   pqServer *Server;           ///< Stores the parent server.
   QString SMName;

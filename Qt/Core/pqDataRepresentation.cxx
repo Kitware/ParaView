@@ -72,9 +72,6 @@ pqDataRepresentation::pqDataRepresentation(const QString& group,
   this->Internal = new pqDataRepresentationInternal;
   this->Internal->VTKConnect->Connect(repr->GetProperty("Input"),
     vtkCommand::ModifiedEvent, this, SLOT(onInputChanged()));
-
-  // This will make sure that if the input is already set.
-  this->onInputChanged();
 }
 
 //-----------------------------------------------------------------------------

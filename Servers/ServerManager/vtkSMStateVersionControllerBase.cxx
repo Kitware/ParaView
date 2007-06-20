@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 
-vtkCxxRevisionMacro(vtkSMStateVersionControllerBase, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMStateVersionControllerBase, "1.1.2.2");
 //----------------------------------------------------------------------------
 vtkSMStateVersionControllerBase::vtkSMStateVersionControllerBase()
 {
@@ -46,38 +46,44 @@ void vtkSMStateVersionControllerBase::Select(vtkPVXMLElement* root,
   bool (*funcPtr)(vtkPVXMLElement*, void*),
   void* callData)
 {
-  unsigned int max = root->GetNumberOfNestedElements();
-  for (unsigned int cc=0; cc < max; cc++)
+  bool restart = true;
+  do
     {
-    vtkPVXMLElement* child = root->GetNestedElement(cc);
-    if (child->GetName() && (strcmp(child->GetName(), childName)==0))
+    restart = false;
+    unsigned int max = root->GetNumberOfNestedElements();
+    for (unsigned int cc=0; cc < max; cc++)
       {
-      // Does the child have all the attributes requested?
-      bool match=true;
-      if (childAttrs && childAttrs[0])
+      vtkPVXMLElement* child = root->GetNestedElement(cc);
+      if (child->GetName() && (strcmp(child->GetName(), childName)==0))
         {
-        int i=0;
-        while (childAttrs[i] && childAttrs[i+1])
+        // Does the child have all the attributes requested?
+        bool match=true;
+        if (childAttrs && childAttrs[0])
           {
-          const char* attrValue = child->GetAttribute(childAttrs[i]);
-          if (!attrValue || (strcmp(attrValue, childAttrs[i+1])!=0))
+          int i=0;
+          while (childAttrs[i] && childAttrs[i+1])
             {
-            match = false;
-            break;
+            const char* attrValue = child->GetAttribute(childAttrs[i]);
+            if (!attrValue || (strcmp(attrValue, childAttrs[i+1])!=0))
+              {
+              match = false;
+              break;
+              }
+            i+=2;
             }
-          i+=2;
-          }
 
-        if (match)
-          {
-          if (!(*funcPtr)(child, callData))
+          if (match)
             {
-            break;
+            if (!(*funcPtr)(child, callData))
+              {
+              restart = true;
+              break;
+              }
             }
           }
         }
       }
-    }
+    } while (restart);
 }
 
 //----------------------------------------------------------------------------

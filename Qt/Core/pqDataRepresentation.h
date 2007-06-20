@@ -80,6 +80,17 @@ protected slots:
   // (and when) the display is connected to a new proxy.
   virtual void onInputChanged();
 
+protected:
+  // Use this method to initialize the pqObject state using the
+  // underlying vtkSMProxy. This needs to be done only once,
+  // after the object has been created. 
+  virtual void initialize() 
+    {
+    this->Superclass::initialize();
+    this->onInputChanged();
+    }
+
+
 private:
   pqDataRepresentation(const pqDataRepresentation&); // Not implemented.
   void operator=(const pqDataRepresentation&); // Not implemented.

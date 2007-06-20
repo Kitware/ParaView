@@ -292,6 +292,11 @@ void pqServerManagerModel::onProxyRegistered(const QString& group,
     emit this->representationAdded(repr);
     }
 
+  // It is essential to let the world know of the addition of pqProxy
+  // before we start emitting signals as we update the initial state 
+  // of the pqProxy from its underlying proxy. Hence we emit this->proxyAdded()
+  // before we do a pqSource->initialize();
+  item->initialize();
 }
 
 //-----------------------------------------------------------------------------

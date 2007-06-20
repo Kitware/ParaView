@@ -83,11 +83,6 @@ public:
   // has representations added (the representations may not be visible).
   QList<pqView*> getViews() const;
 
-  // Use this method to initialize the pqObject state using the
-  // underlying vtkSMProxy. This needs to be done only once,
-  // after the object has been created. 
-  virtual void initialize() { };
-
   // This method updates all render modules to which all  
   // representations for this source belong, if force is true, it for an 
   // immediate render otherwise render on idle.
@@ -172,6 +167,12 @@ protected:
   
   /// Overridden to add the proxies to the domain as well.
   virtual void addHelperProxy(const QString& key, vtkSMProxy*);
+
+  // Use this method to initialize the pqObject state using the
+  // underlying vtkSMProxy. This needs to be done only once,
+  // after the object has been created. 
+  virtual void initialize() { };
+
 
 private:
   pqPipelineSourceInternal *Internal; ///< Stores the output connections.

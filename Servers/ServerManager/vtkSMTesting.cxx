@@ -17,22 +17,22 @@
 #include "vtkObjectFactory.h"
 #include "vtkTesting.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMRenderViewProxy.h"
 
 vtkStandardNewMacro(vtkSMTesting);
-vtkCxxRevisionMacro(vtkSMTesting, "1.1");
-vtkCxxSetObjectMacro(vtkSMTesting, RenderModuleProxy, vtkSMRenderModuleProxy);
+vtkCxxRevisionMacro(vtkSMTesting, "1.1.38.1");
+vtkCxxSetObjectMacro(vtkSMTesting, RenderViewProxy, vtkSMRenderViewProxy);
 //-----------------------------------------------------------------------------
 vtkSMTesting::vtkSMTesting()
 {
-  this->RenderModuleProxy = 0;
+  this->RenderViewProxy = 0;
   this->Testing = vtkTesting::New();
 }
 
 //-----------------------------------------------------------------------------
 vtkSMTesting::~vtkSMTesting()
 {
-  this->SetRenderModuleProxy(0);
+  this->SetRenderViewProxy(0);
   this->Testing->Delete();
 }
 
@@ -46,9 +46,9 @@ void vtkSMTesting::AddArgument(const char* arg)
 int vtkSMTesting::RegressionTest(float thresh)
 {
   int res = vtkTesting::FAILED;
-  if (this->RenderModuleProxy)
+  if (this->RenderViewProxy)
     {
-    this->Testing->SetRenderWindow(this->RenderModuleProxy->GetRenderWindow());
+    this->Testing->SetRenderWindow(this->RenderViewProxy->GetRenderWindow());
     res = this->Testing->RegressionTest(thresh);
     }
   return res;
@@ -58,5 +58,5 @@ int vtkSMTesting::RegressionTest(float thresh)
 void vtkSMTesting::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << "RenderModuleProxy: " << this->RenderModuleProxy << endl;
+  os << "RenderViewProxy: " << this->RenderViewProxy << endl;
 }

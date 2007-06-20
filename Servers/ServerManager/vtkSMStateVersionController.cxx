@@ -18,7 +18,7 @@
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkSMStateVersionController);
-vtkCxxRevisionMacro(vtkSMStateVersionController, "1.1.2.2");
+vtkCxxRevisionMacro(vtkSMStateVersionController, "1.1.2.3");
 //----------------------------------------------------------------------------
 vtkSMStateVersionController::vtkSMStateVersionController()
 {
@@ -44,11 +44,12 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* root)
 
   if (this->GetMajor(version) < 3)
     {
-    vtkErrorMacro("Cannot load state files from version less than 3.0.0");
-    return false;
+    vtkWarningMacro("State file version is less than 3.0.0, "
+      "these states may not work correctly.");
     }
 
-  if (this->GetMajor(version) == 3 && this->GetMinor(version)==0)
+  if (this->GetMajor(version) < 3  || 
+    (this->GetMajor(version)==3 && this->GetMinor(version)==0))
     {
     status = status && this->Process_3_0_To_3_1(root) ;
     version[1] = 1;
@@ -272,6 +273,29 @@ bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
       root, "Proxy", attrs, newAttrs);
     }
 
+    {
+    // Convert Axes to AxesRepresentation.
+    const char* attrs[] = {
+      "group", "axes", 
+      "type", "Axes", 0};
+    const char* newAttrs[] = {
+      "group", "representations",
+      "type", "AxesRepresentation", 0};
+    this->SelectAndSetAttributes(
+      root, "Proxy", attrs, newAttrs);
+    }
+
+    {
+    // Delete all obsolete display types.
+    const char* attrsCAD[] = {
+      "type", "CubeAxesDisplay",0};
+    const char* attrsPLD[] = {
+      "type", "PointLabelDisplay",0};
+
+    this->SelectAndRemove(root, "Proxy", attrsCAD);
+    this->SelectAndRemove(root, "Proxy", attrsPLD);
+    }
+
   return true;
 }
 
@@ -287,6 +311,16 @@ bool vtkSMStateVersionController::ConvertViewModulesToViews(
   this->SelectAndSetAttributes(
     parent,
     "Property", attrs, newAttrs);
+
+  // Convert property RenderWindowSize to ViewSize.
+  const char* propAttrs[] = {
+    "name", "RenderWindowSize", 0};
+  const char* propNewAttrs[] = {
+    "name", "ViewSize", 0};
+  this->SelectAndSetAttributes(
+    parent,
+    "Property", propAttrs, propNewAttrs);
+
   return true;
 }
 
