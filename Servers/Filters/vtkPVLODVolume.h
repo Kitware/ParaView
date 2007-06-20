@@ -80,6 +80,12 @@ public:
   // to query the LOD rendering decision made by the render module.
   vtkGetObjectMacro(RenderModuleHelper, vtkPVRenderModuleHelper);
   void SetRenderModuleHelper(vtkPVRenderModuleHelper*);
+
+  // Description:
+  // When set, LODMapper, if present it used, otherwise the regular mapper is
+  // used.
+  vtkSetMacro(EnableLOD, int);
+  vtkGetMacro(EnableLOD, int);
 protected:
   vtkPVLODVolume();
   ~vtkPVLODVolume();
@@ -87,6 +93,7 @@ protected:
   vtkLODProp3D *LODProp;
   int HighLODId;
   int LowLODId;
+  int EnableLOD;
 
   int SelectLOD();
 

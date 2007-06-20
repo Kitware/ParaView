@@ -42,14 +42,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayPanelInterface.h"
 #include "pqDisplayPolicy.h"
 #include "pqDisplayProxyEditor.h"
-#include "pqGenericViewModule.h"
-#include "pqPipelineDisplay.h"
+#include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
 #include "pqPluginManager.h"
 #include "pqPropertyLinks.h"
+#include "pqTextRepresentation.h"
 #include "pqTextDisplayPropertiesWidget.h"
-#include "pqTextDisplay.h"
 #include "pqUndoStack.h"
+#include "pqView.h"
 #include "pqXYPlotDisplayProxyEditor.h"
 
 /// standard display panels
@@ -63,7 +63,7 @@ public:
   virtual ~pqStandardDisplayPanels(){}
 
   /// Returns true if this panel can be created for the given the proxy.
-  virtual bool canCreatePanel(pqDisplay* proxy) const
+  virtual bool canCreatePanel(pqRepresentation* proxy) const
     {
     if(!proxy || !proxy->getProxy())
       {
@@ -72,9 +72,9 @@ public:
 
     QString type = proxy->getProxy()->GetXMLName();
 
-    if(type == "BarChartDisplay" ||
-       type == "XYPlotDisplay2" ||
-       qobject_cast<pqTextDisplay*>(proxy))
+    if(type == "BarChartRepresentation" ||
+       type == "XYPlotRepresentation" ||
+       qobject_cast<pqTextRepresentation*>(proxy))
       {
       return true;
       }
@@ -82,7 +82,7 @@ public:
     return false;
     }
   /// Creates a panel for the given proxy
-  virtual pqDisplayPanel* createPanel(pqDisplay* proxy, QWidget* p)
+  virtual pqDisplayPanel* createPanel(pqRepresentation* proxy, QWidget* p)
     {
     if(!proxy || !proxy->getProxy())
       {
@@ -90,17 +90,17 @@ public:
       }
 
     QString type = proxy->getProxy()->GetXMLName();
-    if(type == QString("XYPlotDisplay2"))
+    if(type == QString("XYPlotRepresentation"))
       {
       return new pqXYPlotDisplayProxyEditor(proxy, p);
       }
     
-    if(type == QString("BarChartDisplay"))
+    if(type == QString("BarChartRepresentation"))
       {
       return new pqBarChartDisplayProxyEditor(proxy, p);
       }
     
-    if (qobject_cast<pqTextDisplay*>(proxy))
+    if (qobject_cast<pqTextRepresentation*>(proxy))
       {
       return new pqTextDisplayPropertiesWidget(proxy, p);
       }
@@ -116,16 +116,16 @@ public:
   pqPropertyLinks Links;
 };
 
-pqDefaultDisplayPanel::pqDefaultDisplayPanel(pqDisplay* display, QWidget* p)
-  : pqDisplayPanel(display, p)
+pqDefaultDisplayPanel::pqDefaultDisplayPanel(pqRepresentation* repr, QWidget* p)
+  : pqDisplayPanel(repr, p)
 {
   this->Internal = new pqInternal;
   this->Internal->setupUi(this);
-  if(display)
+  if(repr)
     {
     this->Internal->Links.addPropertyLink(
       this->Internal->ViewData, "checked", SIGNAL(stateChanged(int)),
-      display->getProxy(), display->getProxy()->GetProperty("Visibility"));
+      repr->getProxy(), repr->getProxy()->GetProperty("Visibility"));
     }
   else
     {
@@ -147,12 +147,12 @@ void pqDefaultDisplayPanel::onStateChanged(int s)
 }
 
 
-class pqDisplayProxyEditorWidgetInternal
+class pqDisplayProxyEditorWidget::pqInternal
 {
 public:
   QPointer<pqPipelineSource> Source;
-  QPointer<pqGenericViewModule> View;
-  QPointer<pqDisplay> Display;
+  QPointer<pqView> View;
+  QPointer<pqRepresentation> Representation;
   QPointer<pqDisplayPanel> DisplayPanel;
   pqStandardDisplayPanels StandardPanels;
 };
@@ -163,7 +163,7 @@ pqDisplayProxyEditorWidget::pqDisplayProxyEditorWidget(QWidget* p /*=0*/)
 {
   QVBoxLayout* l = new QVBoxLayout(this);
   l->setMargin(0);
-  this->Internal = new pqDisplayProxyEditorWidgetInternal;
+  this->Internal = new pqDisplayProxyEditorWidget::pqInternal;
 
   this->Internal->DisplayPanel = new pqDefaultDisplayPanel(NULL, this);
   l->addWidget(this->Internal->DisplayPanel);
@@ -185,7 +185,7 @@ pqDisplayProxyEditorWidget::~pqDisplayProxyEditorWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplayProxyEditorWidget::setView(pqGenericViewModule* view)
+void pqDisplayProxyEditorWidget::setView(pqView* view)
 {
   this->Internal->View = view;
 }
@@ -197,9 +197,9 @@ void pqDisplayProxyEditorWidget::setSource(pqPipelineSource* source)
 }
 
 //-----------------------------------------------------------------------------
-pqDisplay* pqDisplayProxyEditorWidget::getDisplay() const
+pqRepresentation* pqDisplayProxyEditorWidget::getRepresentation() const
 {
-  return this->Internal->Display;
+  return this->Internal->Representation;
 }
 
 //-----------------------------------------------------------------------------
@@ -213,21 +213,21 @@ void pqDisplayProxyEditorWidget::onVisibilityChanged(bool state)
   emit this->beginUndo(QString("Change Visibility of %1").arg(
       this->Internal->Source->getSMName()));
   pqDisplayPolicy* policy = pqApplicationCore::instance()->getDisplayPolicy();
-  pqDisplay* disp = policy->setDisplayVisibility(this->Internal->Source, 
+  pqRepresentation* disp = policy->setDisplayVisibility(this->Internal->Source, 
     this->Internal->View, state);
   emit this->endUndo();
   
   if (disp)
     {
-    disp->renderAllViews();
+    disp->renderViewEventually();
     }
-  this->setDisplay(disp);
+  this->setRepresentation(disp);
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplayProxyEditorWidget::setDisplay(pqDisplay* display)
+void pqDisplayProxyEditorWidget::setRepresentation(pqRepresentation* repr)
 {
-  if(display && this->Internal->Display == display)
+  if(repr && this->Internal->Representation == repr)
     {
     return;
     }
@@ -237,7 +237,7 @@ void pqDisplayProxyEditorWidget::setDisplay(pqDisplay* display)
     delete this->Internal->DisplayPanel;
     }
   
-  this->Internal->Display = display;
+  this->Internal->Representation = repr;
   
   // search for a custom panels
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
@@ -246,30 +246,30 @@ void pqDisplayProxyEditorWidget::setDisplay(pqDisplay* display)
     {
     pqDisplayPanelInterface* piface =
       qobject_cast<pqDisplayPanelInterface*>(iface);
-    if (piface && piface->canCreatePanel(display))
+    if (piface && piface->canCreatePanel(repr))
       {
-      this->Internal->DisplayPanel = piface->createPanel(display, this);
+      this->Internal->DisplayPanel = piface->createPanel(repr, this);
       break;
       }
     }
 
   if (!this->Internal->DisplayPanel &&
-    this->Internal->StandardPanels.canCreatePanel(display))
+    this->Internal->StandardPanels.canCreatePanel(repr))
     {
     this->Internal->DisplayPanel =
-      this->Internal->StandardPanels.createPanel(display, this);
+      this->Internal->StandardPanels.createPanel(repr, this);
     }
 
-  pqPipelineDisplay* pd = qobject_cast<pqPipelineDisplay*>(display);
+  pqPipelineRepresentation* pd = qobject_cast<pqPipelineRepresentation*>(repr);
   if (!this->Internal->DisplayPanel && pd)
     {
     this->Internal->DisplayPanel = new pqDisplayProxyEditor(pd, this);
     }
   else if(!this->Internal->DisplayPanel)
     {
-    this->Internal->DisplayPanel = new pqDefaultDisplayPanel(display, this);
+    this->Internal->DisplayPanel = new pqDefaultDisplayPanel(repr, this);
     
-    if(this->Internal->Display || !this->Internal->View ||
+    if(this->Internal->Representation || !this->Internal->View ||
        this->Internal->View->canDisplaySource(this->Internal->Source))
       {
       // connect to visibility so we can create a view for it

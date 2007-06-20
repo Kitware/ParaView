@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
-#include "pqRenderViewModule.h"
+#include "pqRenderView.h"
 #include "pqSMAdaptor.h"
 #include "pqServerManagerModel.h"
 
@@ -50,12 +50,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkSelection.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMDataObjectDisplayProxy.h"
-#include "vtkSMGenericViewDisplayProxy.h"
+#include "vtkSMClientDeliveryRepresentationProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMSelectionHelper.h"
 
 // TODO:
@@ -97,7 +96,6 @@ public:
     SelectionObserver(0),
     Xs(0), Ys(0), Xe(0), Ye(0)
     {
-      this->SelectionDisplayer = 0;
       this->SelectionRenderModule = 0;
       this->ClientSideDisplayer = 0;
       this->SelectedProxy = 0;
@@ -128,11 +126,6 @@ public:
     this->SelectionSource = 0;
     this->GlobalIDSelectionSource = 0;
 
-    if (this->SelectionDisplayer)
-      {
-      this->SelectionDisplayer->Delete();
-      this->SelectionDisplayer = 0;
-      }
     if (this->ClientSideDisplayer)
       {
       this->ClientSideDisplayer->Delete();
@@ -145,14 +138,15 @@ public:
   // traverse selection and extract prop ids (unique)
   vtkInteractorStyleRubberBandPick* RubberBand;
   vtkInteractorObserver* SavedStyle;
-  pqRenderViewModule* RenderModule;
+  pqRenderView* RenderModule;
   vtkPQSelectionObserver* SelectionObserver;
-  vtkSMDataObjectDisplayProxy* SelectionDisplayer;
-  pqRenderViewModule* SelectionRenderModule;
-  vtkSMGenericViewDisplayProxy* ClientSideDisplayer;
+  pqRenderView* SelectionRenderModule;
+  vtkSMClientDeliveryRepresentationProxy* ClientSideDisplayer;
   vtkSMProxy* SelectedProxy;
 
+  vtkSmartPointer<vtkSMProxy> SelectedRepresentation;
   vtkSmartPointer<vtkSMProxy> SelectionSource;
+
   vtkSmartPointer<vtkSMProxy> GlobalIDSelectionSource;
 
   int Xs, Ys, Xe, Ye;
@@ -175,11 +169,11 @@ pqSelectionManager::pqSelectionManager(QObject* _parent/*=null*/) :
   // We need to clear selection when a source is removed. The source
   // that was deleted might have been selected.
   QObject::connect(
-    model, SIGNAL(sourceRemoved(pqPipelineSource*)),
+    model, SIGNAL(itemRemoved(pqServerManagerModelItem*)),
     this,  SLOT(clearSelection()));
   QObject::connect(
-    model, SIGNAL(viewModuleRemoved(pqGenericViewModule*)),
-    this, SLOT(viewModuleRemoved(pqGenericViewModule*)));
+    model, SIGNAL(viewRemoved(pqView*)),
+    this, SLOT(viewRemoved(pqView*)));
 
   // When server disconnects we must clean up the selection proxies
   // explicitly. This is needed since the internal selection proxies
@@ -251,9 +245,9 @@ void pqSelectionManager::switchToInteraction()
 }
 
 //-----------------------------------------------------------------------------
-int pqSelectionManager::setInteractorStyleToSelect(pqRenderViewModule* rm)
+int pqSelectionManager::setInteractorStyleToSelect(pqRenderView* rm)
 {
-  vtkSMRenderModuleProxy* rmp = rm->getRenderModuleProxy();
+  vtkSMRenderViewProxy* rmp = rm->getRenderViewProxy();
   if (!rmp)
     {
     qDebug("Selection is unavailable without visible data.");
@@ -283,9 +277,9 @@ int pqSelectionManager::setInteractorStyleToSelect(pqRenderViewModule* rm)
 }
 
 //-----------------------------------------------------------------------------
-int pqSelectionManager::setInteractorStyleToInteract(pqRenderViewModule* rm)
+int pqSelectionManager::setInteractorStyleToInteract(pqRenderView* rm)
 {
-  vtkSMRenderModuleProxy* rmp = rm->getRenderModuleProxy();
+  vtkSMRenderViewProxy* rmp = rm->getRenderViewProxy();
   if (!rmp)
     {
     //qDebug("No render module proxy specified. Cannot switch to interaction");
@@ -314,9 +308,9 @@ int pqSelectionManager::setInteractorStyleToInteract(pqRenderViewModule* rm)
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionManager::setActiveView(pqGenericViewModule* view)
+void pqSelectionManager::setActiveView(pqView* view)
 {
-  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(view);
+  pqRenderView* rm = qobject_cast<pqRenderView*>(view);
   if (!rm)
     {
     return;
@@ -337,7 +331,7 @@ void pqSelectionManager::setActiveView(pqGenericViewModule* view)
 
   this->Implementation->RenderModule = rm;
 
-  vtkSMRenderModuleProxy* rmp = rm->getRenderModuleProxy();
+  vtkSMRenderViewProxy* rmp = rm->getRenderViewProxy();
   if (!rmp)
     {
     qDebug("No render module proxy specified. Cannot create selection object");
@@ -348,14 +342,19 @@ void pqSelectionManager::setActiveView(pqGenericViewModule* view)
 //-----------------------------------------------------------------------------
 void pqSelectionManager::clearSelection()
 {
-  if (this->Implementation->SelectionDisplayer &&
-      this->Implementation->SelectionRenderModule)
+  if (this->Implementation->SelectedRepresentation.GetPointer())
     {
-    vtkSMRenderModuleProxy* renderModuleP = 
-      this->Implementation->SelectionRenderModule->getRenderModuleProxy();
-    renderModuleP->RemoveDisplay(this->Implementation->SelectionDisplayer);
-    renderModuleP->UpdateVTKObjects();
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      this->Implementation->SelectedRepresentation->GetProperty("Selection"));
+    if (pp)
+      {
+      pp->RemoveAllProxies();
+      this->Implementation->SelectedRepresentation->UpdateVTKObjects();
+      }
+    this->Implementation->SelectionRenderModule->render();
+    this->Implementation->SelectedRepresentation = 0;
     }
+
   this->Implementation->clearSelection();
 
   emit this->selectionChanged(this);
@@ -370,8 +369,8 @@ void pqSelectionManager::processEvents(unsigned long eventId)
     return;
     }
 
-  vtkSMRenderModuleProxy* rmp = 
-    this->Implementation->RenderModule->getRenderModuleProxy();
+  vtkSMRenderViewProxy* rmp = 
+    this->Implementation->RenderModule->getRenderViewProxy();
   if (!rmp)
     {
     qDebug("No render module proxy specified. Cannot switch to selection");
@@ -436,7 +435,7 @@ void pqSelectionManager::select()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMGenericViewDisplayProxy* pqSelectionManager::getClientSideDisplayer(
+vtkSMClientDeliveryRepresentationProxy* pqSelectionManager::getClientSideDisplayer(
   pqPipelineSource* source) const
 {
   if (this->Implementation->SelectedProxy == source->getProxy())
@@ -453,8 +452,9 @@ pqPipelineSource* pqSelectionManager::getSelectedSource() const
     pqApplicationCore::instance()->getServerManagerModel();
   if (this->Implementation->SelectedProxy)
     {
-    return model->getPQSource(this->Implementation->SelectedProxy);
+    return model->findItem<pqPipelineSource*>(this->Implementation->SelectedProxy);
     }
+  
   return 0;
 }
 
@@ -465,9 +465,9 @@ void pqSelectionManager::sourceRemoved(pqPipelineSource* vtkNotUsed(source))
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionManager::viewModuleRemoved(pqGenericViewModule* vm)
+void pqSelectionManager::viewRemoved(pqView* vm)
 {
-  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(vm);
+  pqRenderView* rm = qobject_cast<pqRenderView*>(vm);
   if (!rm)
     {
     return;
@@ -481,8 +481,9 @@ void pqSelectionManager::viewModuleRemoved(pqGenericViewModule* vm)
 //-----------------------------------------------------------------------------
 void pqSelectionManager::createSelectionDisplayer(vtkSMProxy* input)
 {
-  pqRenderViewModule* rvm = this->Implementation->RenderModule;
-  vtkSMRenderModuleProxy* renderModuleP = rvm->getRenderModuleProxy();
+#if 0
+  pqRenderView* rvm = this->Implementation->RenderModule;
+  vtkSMRenderViewProxy* renderModuleP = rvm->getRenderModuleProxy();
   vtkIdType connId = renderModuleP->GetConnectionID();
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
 
@@ -533,6 +534,7 @@ void pqSelectionManager::createSelectionDisplayer(vtkSMProxy* input)
   csDisplayer->UpdateVTKObjects();
   csDisplayer->Update();
   this->Implementation->ClientSideDisplayer = csDisplayer;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -548,18 +550,68 @@ static void pqSelectionManagerReorderBoundingBox(int src[4], int dest[4])
 
 //-----------------------------------------------------------------------------
 void pqSelectionManager::selectOnSurface(int screenRectangle[4])
-{ 
+{
+  this->clearSelection();
+
+  pqRenderView* rvm = this->Implementation->RenderModule;
+  vtkSMRenderViewProxy* renderModuleP = rvm->getRenderViewProxy();
+
+  // Make sure the selection rectangle is in the right order.
+  int displayRectangle[4];
+  pqSelectionManagerReorderBoundingBox(screenRectangle, displayRectangle);
+
+  // Perform the selection.
+  vtkSmartPointer<vtkCollection> selectedRepresentations = 
+    vtkSmartPointer<vtkCollection>::New();
+  if (!renderModuleP->SelectOnSurface(
+    displayRectangle[0], displayRectangle[1], displayRectangle[2],
+    displayRectangle[3], selectedRepresentations, false))
+    {
+    // nothing selected.
+    return;
+    }
+
+  rvm->render();
+  if (selectedRepresentations->GetNumberOfItems() <= 0)
+    {
+    return;
+    }
+
+  this->Implementation->SelectedRepresentation = 
+    vtkSMProxy::SafeDownCast(selectedRepresentations->GetItemAsObject(0));
+  this->Implementation->SelectionRenderModule = rvm;
+  this->Implementation->SelectedProxy = 
+    pqSMAdaptor::getProxyProperty(this->Implementation->
+      SelectedRepresentation->GetProperty("Input"));
+
+  // Update the SelectionModel with the selected sources.
+  pqServerManagerModel* model = 
+    pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerSelectionModel* selectionModel =
+    pqApplicationCore::instance()->getSelectionModel();
+  pqPipelineSource* pqSource = model->findItem<pqPipelineSource*>(
+    this->Implementation->SelectedProxy);
+  selectionModel->setCurrentItem(
+    pqSource, pqServerManagerSelectionModel::ClearAndSelect);
+
+  emit this->selectionChanged(this);
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionManager::selectOnSurfaceOld(int screenRectangle[4])
+{
+#if 0
   // Keep track of the render module that contains the previous
   // selection.
-  pqRenderViewModule* prevRvm = 0;
+  pqRenderView* prevRvm = 0;
   if (this->Implementation->SelectionRenderModule)
     {
     prevRvm = this->Implementation->SelectionRenderModule;
     }
   this->clearSelection();
 
-  pqRenderViewModule* rvm = this->Implementation->RenderModule;
-  vtkSMRenderModuleProxy* renderModuleP = rvm->getRenderModuleProxy();
+  pqRenderView* rvm = this->Implementation->RenderModule;
+  vtkSMRenderViewProxy* renderModuleP = rvm->getRenderModuleProxy();
 
   // Make sure the selection rectangle is in the right order.
   int displayRectangle[4];
@@ -659,6 +711,7 @@ void pqSelectionManager::selectOnSurface(int screenRectangle[4])
   selectionSourceP->Delete();
   volumeSelection->Delete();
   extractFilterP->Delete();
+#endif
 }
 
 //-----------------------------------------------------------------------------

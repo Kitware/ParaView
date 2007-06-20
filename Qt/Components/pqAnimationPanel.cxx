@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMVectorProperty.h"
 
 #include <QDoubleValidator>
@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqKeyFrameTimeValidator.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyLinks.h"
-#include "pqRenderViewModule.h"
+#include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerSelectionModel.h"
@@ -85,7 +85,7 @@ public:
   QPointer<pqSignalAdaptorKeyFrameTime> TimeAdaptor;
   QPointer<pqKeyFrameTimeValidator> KeyFrameTimeValidator;
   QPointer<pqAnimationScene> ActiveScene;
-  QPointer<pqRenderViewModule> ActiveRenderView;
+  QPointer<pqRenderView> ActiveRenderView;
 
   QPointer<QLineEdit> ToolbarCurrentTimeWidget;
   QPointer<QSpinBox> ToolbarCurrentTimeIndexWidget;
@@ -192,20 +192,19 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
     this->Internal->keyFrameIndex, SIGNAL(valueChanged(int)),
     this, SLOT(showKeyFrameCallback(int)));
 
-  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
-    SIGNAL(preSourceRemoved(pqPipelineSource*)),
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
+  QObject::connect(smmodel, SIGNAL(preSourceRemoved(pqPipelineSource*)),
     this, SLOT(onSourceRemoved(pqPipelineSource*)));
-  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
-    SIGNAL(sourceAdded(pqPipelineSource*)),
+  QObject::connect(smmodel, SIGNAL(sourceAdded(pqPipelineSource*)),
     this, SLOT(onSourceAdded(pqPipelineSource*)));
 
-  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
-    SIGNAL(nameChanged(pqServerManagerModelItem*)),
+  QObject::connect(smmodel, SIGNAL(nameChanged(pqServerManagerModelItem*)),
     this, SLOT(onNameChanged(pqServerManagerModelItem*)));
 
   QObject::connect(&pqActiveView::instance(),
-    SIGNAL(changed(pqGenericViewModule*)),
-    this, SLOT(onActiveViewChanged(pqGenericViewModule*)));
+    SIGNAL(changed(pqView*)),
+    this, SLOT(onActiveViewChanged(pqView*)));
 
   QObject::connect(this->Internal->useCurrent,
     SIGNAL(clicked(bool)), 
@@ -609,7 +608,7 @@ void pqAnimationPanel::onCurrentSourceChanged(int index)
     else
       {
       src = pqApplicationCore::instance()->
-        getServerManagerModel()-> getPQSource(pname);
+        getServerManagerModel()->findItem<pqProxy*>(pname);
       }
     }
 #if 0
@@ -624,9 +623,9 @@ void pqAnimationPanel::onCurrentSourceChanged(int index)
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationPanel::onActiveViewChanged(pqGenericViewModule* view)
+void pqAnimationPanel::onActiveViewChanged(pqView* view)
 {
-  pqRenderViewModule* rview = qobject_cast<pqRenderViewModule*>(view);
+  pqRenderView* rview = qobject_cast<pqRenderView*>(view);
   if (this->Internal->ActiveRenderView == rview)
     {
     return;
@@ -762,8 +761,8 @@ void pqAnimationPanel::onCurrentPropertyChanged(int index)
 //-----------------------------------------------------------------------------
 void pqAnimationPanel::resetCameraKeyFrameToCurrent()
 {
-  vtkSMRenderModuleProxy* src = 
-    this->Internal->ActiveRenderView->getRenderModuleProxy();
+  vtkSMRenderViewProxy* src = 
+    this->Internal->ActiveRenderView->getRenderViewProxy();
   src->SynchronizeCameraProperties();
 
   vtkSMProxy* dest = this->Internal->ActiveKeyFrame;

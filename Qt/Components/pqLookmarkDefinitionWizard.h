@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqLookmarkDefinitionWizardForm;
 class QModelIndex;
-class pqGenericViewModule;
+class pqView;
 class vtkCollection;
 class pqFlatTreeView;
 class pqPipelineModel;
@@ -73,7 +73,7 @@ public:
   ///   Creates a lookmark definition wizard.
   /// \param model The view module to create a lookmark from (currently only supports render views)
   /// \param parent The parent widget for the wizard.
-  pqLookmarkDefinitionWizard(pqLookmarkManagerModel *model, pqGenericViewModule *view, QWidget *parent=0);
+  pqLookmarkDefinitionWizard(pqLookmarkManagerModel *model, pqView *view, QWidget *parent=0);
   virtual ~pqLookmarkDefinitionWizard();
 
 public slots:
@@ -124,7 +124,7 @@ private slots:
 
 private:
   bool OverwriteOK;                         ///< Used with name validation.
-  pqGenericViewModule *ViewModule;
+  pqView *ViewModule;
   pqLookmarkDefinitionWizardForm *Form;
   pqFlatTreeView *PipelineView;
   pqPipelineModel *PipelineModel;

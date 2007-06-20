@@ -118,7 +118,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.20");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.21");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -203,7 +203,7 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
 int pqProcessModuleGUIHelper::InitializeApplication(int vtkNotUsed(argc), 
            char** vtkNotUsed(argv))
 {
-  this->Implementation->ApplicationCore = new pqApplicationCore();
+  this->Implementation->ApplicationCore = this->CreateApplicationCore();
   
   // Redirect VTK debug output to a Qt window ...
   this->Implementation->OutputWindow = new pqOutputWindow(0);
@@ -221,6 +221,12 @@ int pqProcessModuleGUIHelper::InitializeApplication(int vtkNotUsed(argc),
   this->Implementation->Window = this->CreateMainWindow();
 
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+pqApplicationCore* pqProcessModuleGUIHelper::CreateApplicationCore()
+{
+  return new pqApplicationCore();
 }
 
 //-----------------------------------------------------------------------------

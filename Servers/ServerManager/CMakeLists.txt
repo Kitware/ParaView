@@ -165,7 +165,6 @@ SET(Kit_SRCS
   vtkSMDataRepresentationProxy.cxx
   vtkSMIceTCompositeViewProxy.cxx
   vtkSMIceTDesktopRenderViewProxy.cxx
-  vtkSMMultiViewFactory.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMOutlineRepresentationProxy.cxx
   vtkSMPropRepresentationProxy.cxx
@@ -182,7 +181,11 @@ SET(Kit_SRCS
   vtkSMTextWidgetRepresentationProxy.cxx
   vtkSMUniformGridVolumeRepresentationProxy.cxx
   vtkSMUnstructuredGridVolumeRepresentationProxy.cxx
+  vtkSMUnstructuredGridParallelStrategy.cxx
   vtkSMViewProxy.cxx
+  vtkSMUniformGridParallelStrategy.cxx
+  vtkSMStateVersionController.cxx
+  vtkSMStateVersionControllerBase.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS
@@ -217,6 +220,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMDataRepresentationProxy.cxx
   vtkSMRepresentationProxy.cxx
   vtkSMRepresentationStrategy.cxx
+  vtkSMStateVersionControllerBase.cxx
   ABSTRACT
   )
 

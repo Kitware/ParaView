@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerObserver.h"
 
 #include "pqServer.h"
-#include "pqServerManagerModel.h"
 #include "pqXMLUtil.h"
 
 #include "QVTKWidget.h"
@@ -50,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMAbstractViewModuleProxy.h"
+#include "vtkSMViewProxy.h"
 #include "vtkSMSourceProxy.h"
 
 #include <QList>
@@ -111,32 +110,17 @@ void pqServerManagerObserver::proxyRegistered(vtkObject*, unsigned long, void*,
     return;
     }
 
-  if(info->IsCompoundProxyDefinition)
-    {
-    emit this->compoundProxyDefinitionRegistered(info->ProxyName);
-    }
-  else if(info->GroupName && strcmp(info->GroupName, "sources") == 0)
-    {
-    emit this->sourceRegistered(info->ProxyName, info->Proxy);
-    }
-  else if(info->GroupName && strcmp(info->GroupName, "displays") == 0)
-    {
-    emit this->displayRegistered(info->ProxyName, info->Proxy);
-    }
-  else if (info->GroupName && strcmp(info->GroupName, "view_modules")==0)
-    {
-    // A view module is registered. proxies in this group
-    // are vtkSMAbstractViewModuleProxy which are "alive" with a window and all,
-    // and not the vtkSMMultiViewRenderModuleProxy.
-    vtkSMAbstractViewModuleProxy* rm = vtkSMAbstractViewModuleProxy::SafeDownCast(
-      info->Proxy);
-    emit this->viewModuleRegistered(info->ProxyName, rm);
-    }
-  else
-    {
-    emit this->proxyRegistered(info->GroupName, info->ProxyName,
-      info->Proxy);
-    }
+
+
+    if(info->IsCompoundProxyDefinition)
+      {
+      emit this->compoundProxyDefinitionRegistered(info->ProxyName);
+      }
+    else if (!info->IsLink && info->Proxy)
+      {
+      emit this->proxyRegistered(info->GroupName, info->ProxyName,
+        info->Proxy);
+      }
 }
 
 //-----------------------------------------------------------------------------
@@ -152,24 +136,13 @@ void pqServerManagerObserver::proxyUnRegistered(vtkObject*, unsigned long, void*
     return;
     }
 
-  if(info->IsCompoundProxyDefinition)
-    {
-    emit this->compoundProxyDefinitionUnRegistered(info->ProxyName);
-    }
-  else if(info->GroupName && strcmp(info->GroupName, "sources") == 0 )
-    {
-    emit this->sourceUnRegistered(info->ProxyName, info->Proxy);
-    }
-  else if (info->GroupName && strcmp(info->GroupName, "displays") == 0)
-    {
-    emit this->displayUnRegistered(info->Proxy);
-    }
-  else if (info->GroupName && strcmp(info->GroupName, "view_modules") == 0)
-    {
-    emit this->viewModuleUnRegistered(
-      vtkSMAbstractViewModuleProxy::SafeDownCast(info->Proxy));
-    }
-  else
+    if(info->IsCompoundProxyDefinition)
+      {
+      emit this->compoundProxyDefinitionUnRegistered(info->ProxyName);
+      }
+    else
+
+  if (!info->IsLink && info->Proxy)
     {
     emit this->proxyUnRegistered(info->GroupName, info->ProxyName,
       info->Proxy);

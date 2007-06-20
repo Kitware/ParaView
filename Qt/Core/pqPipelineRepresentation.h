@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqPipelineDisplay.h
+   Module:    pqPipelineRepresentation.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,41 +30,53 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqPipelineDisplay.h
+/// \file pqPipelineRepresentation.h
 /// \date 4/24/2006
 
-#ifndef _pqPipelineDisplay_h
-#define _pqPipelineDisplay_h
+#ifndef _pqPipelineRepresentation_h
+#define _pqPipelineRepresentation_h
 
 
-#include "pqConsumerDisplay.h"
+#include "pqDataRepresentation.h"
 #include <QPair>
 
-class pqPipelineDisplayInternal;
+class pqPipelineRepresentationInternal;
 class pqPipelineSource;
 class pqRenderViewModule;
 class pqServer;
 class vtkPVArrayInformation;
 class vtkPVDataSetAttributesInformation;
 class vtkPVDataSetAttributesInformation;
-class vtkSMDataObjectDisplayProxy;
+class vtkSMPVRepresentationProxy;
 
 /// This is PQ representation for a single display. A pqDisplay represents
-/// a single vtkSMDataObjectDisplayProxy. The display can be added to
+/// a single vtkSMPVRepresentationProxy. The display can be added to
 /// only one render module or more (ofcouse on the same server, this class
 /// doesn't worry about that.
-class PQCORE_EXPORT pqPipelineDisplay : public pqConsumerDisplay
+class PQCORE_EXPORT pqPipelineRepresentation : public pqDataRepresentation
 {
   Q_OBJECT
-  typedef pqConsumerDisplay Superclass;
+  typedef pqDataRepresentation Superclass;
 public:
-  pqPipelineDisplay(const QString& name,
-    vtkSMDataObjectDisplayProxy* display, pqServer* server,
-    QObject* parent=NULL);
-  virtual ~pqPipelineDisplay();
+  // Constructor.
+  // \c group :- smgroup in which the proxy has been registered.
+  // \c name  :- smname as which the proxy has been registered.
+  // \c repr  :- the representation proxy.
+  // \c server:- server on which the proxy is created.
+  // \c parent:- QObject parent.
+  pqPipelineRepresentation( const QString& group, 
+                            const QString& name,
+                            vtkSMPVRepresentationProxy* repr, 
+                            pqServer* server,
+                            QObject* parent=NULL);
+  virtual ~pqPipelineRepresentation();
+
+  /// The field name used to indicate solid color.
+  static const char* solidColor() { return "Solid Color"; }
+
 
   // Get the internal display proxy.
-  vtkSMDataObjectDisplayProxy* getDisplayProxy() const;
+  vtkSMPVRepresentationProxy* getRepresentationProxy() const;
 
   // Sets the default color mapping for the display.
   // The rules are:
@@ -122,6 +134,13 @@ public:
   /// If representation is changed to volume, this method ensures that the
   /// scalar array is initialized.
   void setRepresentation(int type);
+
+  /// Returns the type of representation currently used i.e.
+  //SURFACE/POINTS/VOLUME etc.
+  int getRepresentationType() const;
+
+  /// Returns the opacity.
+  double getOpacity() const;
 signals:
   /// This is fire when any property that affects the color
   /// mode for the display changes.
@@ -154,7 +173,8 @@ protected:
   void createHelperProxies();
 
 private:
-  pqPipelineDisplayInternal *Internal; 
+  class pqInternal;
+  pqInternal* Internal; 
   static void getColorArray(
     vtkPVDataSetAttributesInformation* attrInfo,
     vtkPVDataSetAttributesInformation* inAttrInfo,

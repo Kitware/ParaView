@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 #include "pqApplicationCore.h"
-#include "pqPipelineDisplay.h"
+#include "pqPipelineRepresentation.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -227,10 +227,10 @@ void pqPQLookupTableManager::updateLookupTableScalarRanges()
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smmodel = core->getServerManagerModel();
   
-  QList<pqPipelineDisplay*> displays = smmodel->getPipelineDisplays(0);
-  foreach(pqPipelineDisplay* display, displays)
+  QList<pqPipelineRepresentation*> reprs = 
+    smmodel->findItems<pqPipelineRepresentation*>();
+  foreach(pqPipelineRepresentation* repr, reprs)
     {
-    display->updateLookupTableScalarRange();
+    repr->updateLookupTableScalarRange();
     }
-
 }

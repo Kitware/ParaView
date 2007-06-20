@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqLineChartDisplay.h
+   Module:    pqLineChartRepresentation.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,28 +29,28 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqLineChartDisplay_h
-#define __pqLineChartDisplay_h
+#ifndef __pqLineChartRepresentation_h
+#define __pqLineChartRepresentation_h
 
-#include "pqConsumerDisplay.h"
+#include "pqDataRepresentation.h"
 
 class vtkSMProperty;
 class vtkDataArray;
 class vtkRectilinearGrid;
 class QColor;
 
-/// pqLineChartDisplay is a pqDisplay for "XYPlotDisplay2" proxy.
+/// pqLineChartRepresentation is a pqDisplay for "XYPlotDisplay2" proxy.
 /// It adds logic to initialize default state as well as access
 /// get information about the plot parameters from the proxy.
-class PQCORE_EXPORT pqLineChartDisplay : public pqConsumerDisplay
+class PQCORE_EXPORT pqLineChartRepresentation : public pqDataRepresentation
 {
   Q_OBJECT
-  typedef pqConsumerDisplay Superclass;
+  typedef pqDataRepresentation Superclass;
 
 public:
-  pqLineChartDisplay(const QString& group, const QString& name,
+  pqLineChartRepresentation(const QString& group, const QString& name,
     vtkSMProxy* display, pqServer* server, QObject* parent=0);
-  virtual ~pqLineChartDisplay();
+  virtual ~pqLineChartRepresentation();
 
   /// Sets default values for the underlying proxy. 
   /// This is during the initialization stage of the pqProxy 
@@ -111,8 +111,8 @@ private slots:
   void changeSeriesList();
 
 private:
-  pqLineChartDisplay(const pqLineChartDisplay&); // Not implemented.
-  void operator=(const pqLineChartDisplay&); // Not implemented.
+  pqLineChartRepresentation(const pqLineChartRepresentation&); // Not implemented.
+  void operator=(const pqLineChartRepresentation&); // Not implemented.
 
   int isEnabledByDefault(const QString &arrayName) const;
 

@@ -36,30 +36,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLookmarkModel.h"
 
 // ParaView includes.
-
-#include "vtkSmartPointer.h"
-#include "pqApplicationCore.h"
-#include "pqServer.h"
-#include "pqDisplay.h"
-#include "pqGenericViewModule.h"
-#include "pqRenderViewModule.h"
-#include "vtkSMStateLoader.h"
-#include "vtkSMPQStateLoader.h"
-#include "pqLookmarkStateLoader.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
-#include "vtkSMRenderModuleProxy.h"
 #include "vtkSMAbstractDisplayProxy.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMPQStateLoader.h"
+#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMStateLoader.h"
+
+#include "pqApplicationCore.h"
+#include "pqRepresentation.h"
+#include "pqLookmarkStateLoader.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineFilter.h"
-#include "pqConsumerDisplay.h"
+#include "pqRenderView.h"
+#include "pqServer.h"
 
-#include <QtDebug>
-
-#include <QPixmap>
-#include <QImage>
-#include <QByteArray>
 #include <QBuffer>
+#include <QByteArray>
+#include <QImage>
+#include <QPixmap>
+#include <QtDebug>
 
 //-----------------------------------------------------------------------------
 pqLookmarkModel::pqLookmarkModel(QString name, const QString &state, QObject* _parent /*=null*/)
@@ -214,7 +211,7 @@ void pqLookmarkModel::setPipelineHierarchy(vtkPVXMLElement *pipeline)
 void pqLookmarkModel::load(
               pqServer *server, 
               QList<pqPipelineSource*> *sources, 
-              pqGenericViewModule *view,  
+              pqView *view,  
               vtkSMStateLoader *arg_loader)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
@@ -236,7 +233,7 @@ void pqLookmarkModel::load(
   if(view)
     {
     // remember to reset the camera later if the view has no displays visible
-    if(view->getVisibleDisplayCount()==0 && !this->RestoreCamera)
+    if(view->getNumberOfVisibleRepresentations()==0 && !this->RestoreCamera)
       {
       resetCamera = true;
       }
@@ -244,10 +241,10 @@ void pqLookmarkModel::load(
     // Now turn off visibility of all displays currently added to view.
     // We do this before the lookmark is loaded so that other sources
     // do not obstruct the view of the lookmark sources.
-    QList<pqDisplay*> displays = view->getDisplays();
+    QList<pqRepresentation*> displays = view->getRepresentations();
     for(int i=0; i<displays.count(); i++)
       {
-      pqDisplay *disp = displays[i];
+      pqRepresentation *disp = displays[i];
       disp->setVisible(0);
       }
     }
@@ -256,17 +253,17 @@ void pqLookmarkModel::load(
   // added to the beginning of the loader's preferred view list to ensure 
   // it is used before any others
   vtkSMPQStateLoader* smpqLoader = vtkSMPQStateLoader::SafeDownCast(loader);
-  pqRenderViewModule* renModule = NULL;
+  pqRenderView* renModule = NULL;
   if (smpqLoader && view)
     {
-    renModule = qobject_cast<pqRenderViewModule*>(view);
+    renModule = qobject_cast<pqRenderView*>(view);
     if(!renModule)
       {
-      renModule = qobject_cast<pqRenderViewModule*>(
+      renModule = qobject_cast<pqRenderView*>(
         core->getObjectBuilder()->createView(
-          pqRenderViewModule::renderViewType(), server));
+          pqRenderView::renderViewType(), server));
       }
-    smpqLoader->AddPreferredRenderModule(renModule->getRenderModuleProxy());
+    smpqLoader->AddPreferredRenderView(renModule->getRenderViewProxy());
     }
 
   // set some parameters specific to the lookmark state loader

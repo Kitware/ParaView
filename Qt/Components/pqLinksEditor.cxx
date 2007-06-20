@@ -51,10 +51,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 
 // pqCore
-#include "pqServerManagerModel.h"
 #include "pqApplicationCore.h"
-#include "pqRenderViewModule.h"
 #include "pqPipelineSource.h"
+#include "pqRenderView.h"
+#include "pqServerManagerModel.h"
 
 // pqComponents
 #include "pqLinksModel.h"
@@ -185,11 +185,11 @@ public:
       {
       if(idx.row() == 0)
         {
-        return smModel->getNumberOfRenderModules();
+        return smModel->getNumberOfItems<pqRenderView*>();
         }
       else if(idx.row() == 1)
         {
-        return smModel->getNumberOfSources();
+        return smModel->getNumberOfItems<pqPipelineSource*>();
         }
       }
     if(pidx.isValid() && pidx.row() == 1)
@@ -241,7 +241,7 @@ public:
         m = pqApplicationCore::instance()->getServerManagerModel();
         if(pxy)
           {
-          return m->getPQProxy(pxy)->getSMName();
+          return m->findItem<pqProxy*>(pxy)->getSMName();
           }
         }
       else
@@ -330,13 +330,13 @@ public:
       m = pqApplicationCore::instance()->getServerManagerModel();
       if(ri.type == 0)
         {
-        return m->getRenderModule(idx.row())->getProxy();
+        return m->getItemAtIndex<pqRenderView*>(idx.row())->getProxy();
         }
       else if(ri.type == 1)
         {
         if(!ri.hasIndex)
           {
-          return m->getPQSource(idx.row())->getProxy();
+          return m->getItemAtIndex<pqPipelineSource*>(idx.row())->getProxy();
           }
         else
           {

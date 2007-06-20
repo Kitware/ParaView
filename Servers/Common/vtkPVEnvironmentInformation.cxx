@@ -20,7 +20,7 @@
 #include "vtkPVEnvironmentInformationHelper.h"
 
 vtkStandardNewMacro(vtkPVEnvironmentInformation);
-vtkCxxRevisionMacro(vtkPVEnvironmentInformation, "1.1");
+vtkCxxRevisionMacro(vtkPVEnvironmentInformation, "1.2");
 
 //-----------------------------------------------------------------------------
 vtkPVEnvironmentInformation::vtkPVEnvironmentInformation()
@@ -72,5 +72,7 @@ void vtkPVEnvironmentInformation::CopyFromStream(const vtkClientServerStream* cs
 void vtkPVEnvironmentInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Variable: " 
+    << (this->Variable? this->Variable : "(none)") << endl;
 }
 

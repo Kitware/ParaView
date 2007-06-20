@@ -33,11 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCutPanel.h"
 #include "pqImplicitPlaneWidget.h"
-#include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPropertyManager.h"
 #include "pqSampleScalarWidget.h"
-#include "pqServerManagerModel.h"
 
 #include <pqCollapsedGroup.h>
 
@@ -111,10 +109,10 @@ pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
   panel_layout->addWidget(group2);
   panel_layout->addStretch();
   
-  QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderViewModule*)),
+  QObject::connect(this, SIGNAL(viewChanged(pqView*)),
                    this->Implementation->ImplicitPlaneWidget,
-                   SLOT(setRenderModule(pqRenderViewModule*)));
-  this->Implementation->ImplicitPlaneWidget->setRenderModule(this->renderModule());
+                   SLOT(setView(pqView*)));
+  this->Implementation->ImplicitPlaneWidget->setView(this->view());
 
   connect(
     this->Implementation->ImplicitPlaneWidget,

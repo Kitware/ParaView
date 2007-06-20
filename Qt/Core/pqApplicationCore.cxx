@@ -70,15 +70,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationScene.h"
 #include "pqCoreInit.h"
 #include "pqDisplayPolicy.h"
+#include "pqEventDispatcher.h"
 #include "pqLinksModel.h"
 #include "pqLookupTableManager.h"
 #include "pqObjectBuilder.h"
 #include "pqOptions.h"
-#include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPluginManager.h"
 #include "pqProgressManager.h"
-#include "pqRenderViewModule.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
@@ -87,10 +86,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerStartups.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
+#include "pqStandardServerManagerModelInterface.h"
 #include "pqStandardViewModules.h"
 #include "pqUndoStack.h"
 #include "pqXMLUtil.h"
-#include "pqEventDispatcher.h"
+#include "pqRenderView.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCoreInternal
@@ -144,13 +144,11 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   // *  Create pqServerManagerObserver first. This is the vtkSMProxyManager observer.
   this->Internal->ServerManagerObserver = new pqServerManagerObserver(this);
 
-  // *  Create pqServerManagerModel.
-  //    This is the representation builder for the ServerManager state.
-  this->Internal->ServerManagerModel = new pqServerManagerModel(this);
-
   // *  Make signal-slot connections between ServerManagerObserver and ServerManagerModel.
-  this->connect(this->Internal->ServerManagerObserver, this->Internal->ServerManagerModel);
+  //this->connect(this->Internal->ServerManagerObserver, this->Internal->ServerManagerModel);
 
+  this->Internal->ServerManagerModel = new pqServerManagerModel(
+    this->Internal->ServerManagerObserver, this);
 
   // *  Create the pqObjectBuilder. This is used to create pipeline objects.
   this->Internal->ObjectBuilder = new pqObjectBuilder(this);
@@ -177,6 +175,10 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   this->Internal->PluginManager->addInterface(
     new pqStandardViewModules(this->Internal->PluginManager));
 
+  // add standard server manager model interface
+  this->Internal->PluginManager->addInterface(
+    new pqStandardServerManagerModelInterface(this->Internal->PluginManager));
+
   this->LoadingState = false;
 }
 
@@ -188,37 +190,10 @@ pqApplicationCore::~pqApplicationCore()
     pqApplicationCore::Instance = 0;
     }
   delete this->Internal;
-}
 
-//-----------------------------------------------------------------------------
-void pqApplicationCore::connect(pqServerManagerObserver* pdata, 
-  pqServerManagerModel* smModel)
-{
-  QObject::connect(pdata, SIGNAL(sourceRegistered(QString, vtkSMProxy*)),
-    smModel, SLOT(onAddSource(QString, vtkSMProxy*)));
-  QObject::connect(pdata, SIGNAL(sourceUnRegistered(QString, vtkSMProxy*)),
-    smModel, SLOT(onRemoveSource(QString, vtkSMProxy*)));
-  QObject::connect(pdata, SIGNAL(connectionCreated(vtkIdType)),
-    smModel, SLOT(onAddServer(vtkIdType)));
-  QObject::connect(pdata, SIGNAL(connectionClosed(vtkIdType)),
-    smModel, SLOT(onRemoveServer(vtkIdType)));
-  QObject::connect(pdata, SIGNAL(viewModuleRegistered(QString, 
-        vtkSMAbstractViewModuleProxy*)),
-    smModel, SLOT(onAddViewModule(QString, vtkSMAbstractViewModuleProxy*)));
-  QObject::connect(pdata, SIGNAL(viewModuleUnRegistered(vtkSMAbstractViewModuleProxy*)),
-    smModel, SLOT(onRemoveViewModule(vtkSMAbstractViewModuleProxy*)));
-  QObject::connect(pdata, 
-    SIGNAL(displayRegistered(QString, vtkSMProxy*)),
-    smModel, SLOT(onAddDisplay(QString, vtkSMProxy*)));
-  QObject::connect(pdata, SIGNAL(displayUnRegistered(vtkSMProxy*)),
-    smModel, SLOT(onRemoveDisplay(vtkSMProxy*)));
-  QObject::connect(
-    pdata, SIGNAL(proxyRegistered(QString, QString, vtkSMProxy*)),
-    smModel, SLOT(onProxyRegistered(QString, QString, vtkSMProxy*)));
-  QObject::connect(
-    pdata, SIGNAL(proxyUnRegistered(QString, QString, vtkSMProxy*)),
-    smModel, SLOT(onProxyUnRegistered(QString, QString, vtkSMProxy*)));
-      
+  // Unregister all proxies registered with the proxy manager.
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  pxm->UnRegisterProxies();
 }
 
 //-----------------------------------------------------------------------------
@@ -339,6 +314,7 @@ QObject* pqApplicationCore::manager(const QString& function)
 //-----------------------------------------------------------------------------
 void pqApplicationCore::removeServer(pqServer* server)
 {
+  cout << "removeServer" << endl;
   if (!server)
     {
     qDebug() << "No server to remove.";
@@ -403,17 +379,15 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
   if (pqLoader)
     {
     // tell the state loader to use the existing render modules before creating new ones
-    vtkSMRenderModuleProxy *smRen;
-    for(unsigned int i=0; 
-      i<server->GetRenderModule()->GetNumberOfRenderModules(); i++)
+    QList<pqRenderView*> renderViews = this->Internal->ServerManagerModel->
+      findItems<pqRenderView*>(server);
+    foreach (pqRenderView* renderView, renderViews)
       {
-      if( (smRen = dynamic_cast<vtkSMRenderModuleProxy*>(
-            server->GetRenderModule()->GetRenderModule(i))) )
-        {
-        pqLoader->AddPreferredRenderModule(smRen);
-        }
+      pqLoader->AddPreferredRenderView(renderView->getRenderViewProxy());
       }
-    pqLoader->SetMultiViewRenderModuleProxy(server->GetRenderModule());
+    // Tell the state loader what type of render view subclass to create.
+    pqLoader->SetRenderViewXMLName(
+      server->getRenderViewXMLName().toAscii().data());
     }
 
   this->LoadingState = true;
@@ -428,11 +402,8 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
 
   if (pqLoader)
     {
-    // this is necessary to avoid unnecesary references to the render module,
-    // enabling the proxy to be cleaned up before server disconnect.
-    pqLoader->SetMultiViewRenderModuleProxy(0);
     // delete any unused rendermodules from state loader
-    pqLoader->ClearPreferredRenderModules();
+    pqLoader->ClearPreferredRenderViews();
     }
 
   pqEventDispatcher::processEventsAndWait(1);
@@ -546,14 +517,14 @@ pqServer* pqApplicationCore::createServer(const pqServerResource& resource)
 
   // See if the server is already created.
   pqServerManagerModel *smModel = this->getServerManagerModel();
-  pqServer *server = smModel->getServer(server_resource);
+  pqServer *server = smModel->findServer(server_resource);
   if(!server)
     {
     // TEMP: ParaView only allows one server connection. Remove this
     // code when it supports multiple server connections.
-    if(smModel->getNumberOfServers() > 0)
+    if(smModel->getNumberOfItems<pqServer*>() > 0)
       {
-      this->removeServer(smModel->getServerByIndex(0));
+      this->removeServer(smModel->getItemAtIndex<pqServer*>(0));
       }
 
     // Based on the server resource, create the correct type of server ...
@@ -600,7 +571,7 @@ pqServer* pqApplicationCore::createServer(const pqServerResource& resource)
         pm->SynchronizeServerClientOptions(id);
         }
 
-      server = smModel->getServer(id);
+      server = smModel->findServer(id);
       server->setResource(server_resource);
       emit this->finishedAddingServer(server);
       }
@@ -612,9 +583,9 @@ pqServer* pqApplicationCore::createServer(const pqServerResource& resource)
 //-----------------------------------------------------------------------------
 void pqApplicationCore::render()
 {
-  QList<pqGenericViewModule*> list = 
-    this->getServerManagerModel()->getViewModules(NULL);
-  foreach(pqGenericViewModule* view, list)
+  QList<pqView*> list = 
+    this->Internal->ServerManagerModel->findItems<pqView*>();
+  foreach(pqView* view, list)
     {
     view->render();
     }
@@ -656,7 +627,7 @@ void pqApplicationCore::quit()
   // fired until the event loop exits, which doesn't happen until animation
   // stops playing.
   QList<pqAnimationScene*> scenes = 
-    this->getServerManagerModel()->findChildren<pqAnimationScene*>();
+    this->getServerManagerModel()->findItems<pqAnimationScene*>();
   foreach (pqAnimationScene* scene, scenes)
     {
     scene->pause();

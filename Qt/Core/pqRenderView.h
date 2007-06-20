@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqRenderViewModule.h
+   Module:    pqRenderView.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -33,31 +33,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqRenderViewModule_h
 
 
-#include "pqGenericViewModule.h"
+#include "pqView.h"
 #include <QColor> // needed for return type.
 
-class pqDisplay;
-class pqRenderViewModuleInternal;
 class QAction;
 class QVTKWidget;
-class vtkInteractorStyle;
-class vtkObject;
-class vtkSMRenderModuleProxy;
+class vtkSMRenderViewProxy;
 
-// This is a PQ abstraction of a render module.
-class PQCORE_EXPORT pqRenderViewModule : public pqGenericViewModule
+// This is a PQ abstraction of a render view.
+class PQCORE_EXPORT pqRenderView : public pqView
 {
   Q_OBJECT
-  typedef pqGenericViewModule Superclass;
+  typedef pqView Superclass;
 public:
   static QString renderViewType() { return "RenderView"; }
+  static QString renderViewTypeName() { return "Render View"; }
 
-  pqRenderViewModule(const QString& name, vtkSMRenderModuleProxy* renModule, 
-    pqServer* server, QObject* parent=NULL);
-  virtual ~pqRenderViewModule();
+  // Constructor:
+  // \c group :- SManager registration group name.
+  // \c name  :- SManager registration name.
+  // \c view  :- RenderView proxy.
+  // \c server:- server on which the proxy is created.
+  // \c parent:- QObject parent.
+  pqRenderView( const QString& group,
+                const QString& name, 
+                vtkSMRenderViewProxy* renModule, 
+                pqServer* server, 
+                QObject* parent=NULL);
 
-  /// Returns the internal render Module proxy associated with this object.
-  vtkSMRenderModuleProxy* getRenderModuleProxy() const;
+  // Destructor.
+  virtual ~pqRenderView();
+
+  /// Returns the render view proxy associated with this object.
+  vtkSMRenderViewProxy* getRenderViewProxy() const;
 
   /// Returns the QVTKWidget for this render Window.
   virtual QWidget* getWidget();
@@ -144,8 +152,8 @@ public:
   /// For linking of interaction undo stacks.
   /// This method is used by pqLinksModel to link 
   /// interaction undo stack for linked render views.
-  void linkUndoStack(pqRenderViewModule* other);
-  void unlinkUndoStack(pqRenderViewModule* other);
+  void linkUndoStack(pqRenderView* other);
+  void unlinkUndoStack(pqRenderView* other);
 
   /// Clears interaction undo stack of this view
   /// (and all linked views, if any).
@@ -196,18 +204,18 @@ public slots:
   virtual void redo();
 
 private slots:
-  // Called when vtkSMRenderModuleProxy fires
+  // Called when vtkSMRenderViewProxy fires
   // ResetCameraEvent.
   void onResetCameraEvent();
 
   /// Setups up RenderModule and QVTKWidget binding.
-  /// This method is called for all pqRenderViewModule objects irrespective
+  /// This method is called for all pqRenderView objects irrespective
   /// of whether it is created from state/undo-redo/python or by the GUI. Hence
   /// don't change any render module properties here.
   void initializeWidgets();
 
   /// Called when undo stack changes. We fires appropriate 
-  /// undo signals as required by pqGenericViewModule.
+  /// undo signals as required by pqView.
   void onUndoStackChanged();
 protected:
   bool eventFilter(QObject* caller, QEvent* e);
@@ -239,7 +247,8 @@ protected:
   void fakeInteraction(bool start);
 
 private: 
-  pqRenderViewModuleInternal* Internal;
+  class pqInternal;
+  pqInternal* Internal;
 };
 
 #endif

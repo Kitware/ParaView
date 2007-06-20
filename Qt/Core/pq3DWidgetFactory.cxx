@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pq3DWidgetFactory.h"
 
 // ParaView Server Manager includes.
-#include "vtkSMNew3DWidgetProxy.h"
+#include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyManager.h"
 
@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pq3DWidgetFactoryInternal
 {
 public:
-  typedef QList<vtkSmartPointer<vtkSMNew3DWidgetProxy> > ListOfWidgetProxies;
+  typedef QList<vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> > ListOfWidgetProxies;
   ListOfWidgetProxies Widgets;
   ListOfWidgetProxies WidgetsInUse;
 };
@@ -71,14 +71,14 @@ pq3DWidgetFactory::~pq3DWidgetFactory()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMNew3DWidgetProxy* pq3DWidgetFactory::get3DWidget(const QString& name,
+vtkSMNewWidgetRepresentationProxy* pq3DWidgetFactory::get3DWidget(const QString& name,
     pqServer* server)
 {
   pq3DWidgetFactoryInternal::ListOfWidgetProxies::iterator iter =
     this->Internal->Widgets.begin();
   for (; iter != this->Internal->Widgets.end(); iter++)
     {
-    vtkSMNew3DWidgetProxy* proxy = iter->GetPointer();
+    vtkSMNewWidgetRepresentationProxy* proxy = iter->GetPointer();
     if (proxy && proxy->GetConnectionID() == server->GetConnectionID()
       && name == proxy->GetXMLName())
       {
@@ -93,8 +93,9 @@ vtkSMNew3DWidgetProxy* pq3DWidgetFactory::get3DWidget(const QString& name,
 
   // We register  the 3DWidget proxy under prototypes so that it
   // is never saved in state
-  vtkSMNew3DWidgetProxy* proxy = vtkSMNew3DWidgetProxy::SafeDownCast(
-    builder->createProxy("displays", name.toAscii().data(), server,
+  vtkSMNewWidgetRepresentationProxy* proxy = vtkSMNewWidgetRepresentationProxy::SafeDownCast(
+    builder->createProxy("representations", 
+      name.toAscii().data(), server,
       "3d_widgets_prototypes"));
   if (!proxy)
     {
@@ -106,13 +107,13 @@ vtkSMNew3DWidgetProxy* pq3DWidgetFactory::get3DWidget(const QString& name,
 }
 
 //-----------------------------------------------------------------------------
-void pq3DWidgetFactory::free3DWidget(vtkSMNew3DWidgetProxy* widget)
+void pq3DWidgetFactory::free3DWidget(vtkSMNewWidgetRepresentationProxy* widget)
 {
   pq3DWidgetFactoryInternal::ListOfWidgetProxies::iterator iter =
     this->Internal->WidgetsInUse.begin();
   for (; iter != this->Internal->WidgetsInUse.end(); iter++)
     {
-    vtkSMNew3DWidgetProxy* proxy = iter->GetPointer();
+    vtkSMNewWidgetRepresentationProxy* proxy = iter->GetPointer();
     if (proxy == widget)
       {
       this->Internal->Widgets.push_back(proxy);
@@ -128,9 +129,9 @@ void pq3DWidgetFactory::free3DWidget(vtkSMNew3DWidgetProxy* widget)
 void pq3DWidgetFactory::proxyUnRegistered(QString group, 
   QString vtkNotUsed(name), vtkSMProxy* proxy)
 {
-  vtkSMNew3DWidgetProxy* widget;
+  vtkSMNewWidgetRepresentationProxy* widget;
   if (group != "3d_widgets_prototypes" || 
-    (widget = vtkSMNew3DWidgetProxy::SafeDownCast(proxy)) == 0)
+    (widget = vtkSMNewWidgetRepresentationProxy::SafeDownCast(proxy)) == 0)
     {
     return;
     }

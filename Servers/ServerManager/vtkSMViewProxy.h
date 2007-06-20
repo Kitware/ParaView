@@ -32,6 +32,7 @@
 
 class vtkCollection;
 class vtkCommand;
+class vtkInformation;
 class vtkSMRepresentationProxy;
 class vtkSMRepresentationStrategy;
 
@@ -114,7 +115,12 @@ public:
   // representations irresepective of whether low resolution (LOD) data is
   // currently shown in the view.
   unsigned long GetVisibileFullResDataSize();
-  
+ 
+  // Description:
+  // Create a default representation for the given source proxy.
+  // Returns a new proxy.
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy*);
+
 //BTX
 protected:
   vtkSMViewProxy();
@@ -179,7 +185,7 @@ protected:
   vtkCommand* GetObserver();
 
   // Description:
-  // Initializes ViewHelper, if any.
+  // Called to create the vtk objects.
   virtual void CreateVTKObjects();
 
   // Description:
@@ -199,22 +205,22 @@ protected:
   // Marks all data size information as invalid.
   void InvalidateDataSizes();
 
+  // Description:
+  // In multiview setups, some viewmodules may share certain objects with each
+  // other. This method is used in such cases to give such views an opportunity
+  // to share those objects.
+  // Default implementation is empty.
+  virtual void InitializeForMultiView(vtkSMViewProxy* vtkNotUsed(otherView)) {}
+
   // Collection of representation objects added to this view.
   vtkCollection* Representations;
 
+  // Information object used to keep rendering specific information.
+  // It is passed to the representations added to the view.
+  vtkInformation* Information;
+
   int GUISize[2];
   int ViewPosition[2];
-
-  // Description:
-  // View helper is used to pass certain view specific information to the
-  // representations added to the view. This may include things like whether LOD
-  // is current being used for rendering, whether caching is enabled etc etc.
-  // By default no ViewHelper is used, however subclasses can define a
-  // subproxy with name "ViewHelper" and it will be used as the view helper for
-  // this view. It will be passed to the strategies created by this view as
-  // well as to any representations added to this view (provided they have
-  // a proxy property name "ViewHelper").
-  vtkSMProxy* ViewHelper;
 
   // Can be set to true in BeginInteractiveRender() or BeginStillRender() is the
   // representations are modified by these methods. This flag is reset at the
@@ -223,6 +229,12 @@ protected:
     { this->ForceRepresentationUpdate = b; }
   vtkGetMacro(ForceRepresentationUpdate, bool);
 
+  // Description:
+  // Read attributes from an XML element.
+  virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+
+  vtkSetStringMacro(DefaultRepresentationName);
+  char* DefaultRepresentationName;
 private:
   vtkSMViewProxy(const vtkSMViewProxy&); // Not implemented
   void operator=(const vtkSMViewProxy&); // Not implemented
@@ -230,6 +242,28 @@ private:
   class Command;
   friend class Command;
   Command* Observer;
+
+  // Whenever user create multiple view modules on the same server connection,
+  // for each of the views to work, it may be necessary to share certain server
+  // side objects. This has to happen before CreateVTKObjects() irrespective of
+  // whether the views are registered with the proxy manager or not. For that
+  // purpose we use the MultiViewInitializer. 
+  // Before calling BeginCreateVTKObjects(), vtkSMViewProxy asks the
+  // MultiViewInitializer for any other view that may already have been created
+  // and then calls InitializeForMultiView(). InitializeForMultiView()
+  // implementations should share the all necessary objects. On successful proxy
+  // creation, the proxy is added to the list maintained by
+  // MultiViewInitializer. When the proxy is destroyed, it removes itself from
+  // this list.
+  // MultiViewInitializer does not use reference counting. MultiViewInitializer
+  // singleton is created when the view proxy is created, if not already
+  // present, and destroyed after the last view proxy in the list maintained by
+  // it is destroyed.
+  class vtkMultiViewInitializer;
+  friend class vtkMultiViewInitializer;
+  static vtkMultiViewInitializer* MultiViewInitializer;
+  static vtkMultiViewInitializer* GetMultiViewInitializer();
+  static void CleanMultiViewInitializer();
 
   unsigned long DisplayedDataSize;
   bool DisplayedDataSizeValid;

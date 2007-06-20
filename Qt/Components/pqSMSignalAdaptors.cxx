@@ -48,12 +48,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager includes
 #include "pq3DWidget.h"
-#include "pqPipelineDisplay.h"
+#include "pqApplicationCore.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
-#include "pqServerManagerObserver.h"
 #include "pqSMProxy.h"
 
 pqSignalAdaptorProxy::pqSignalAdaptorProxy(QObject* p, 
@@ -81,7 +80,9 @@ void pqSignalAdaptorProxy::setProxy(const QVariant& var)
     pqSMProxy p = var.value<pqSMProxy>();
     if(p)
       {
-      pqPipelineSource* o = pqServerManagerModel::instance()->getPQSource(p);
+      pqPipelineSource* o = 
+        pqApplicationCore::instance()->getServerManagerModel()->
+        findItem<pqPipelineSource*>(p);
       if(o)
         {
         QString name = o->getSMName();

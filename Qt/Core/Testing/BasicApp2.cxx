@@ -11,7 +11,6 @@
 #include "pqMain.h"
 #include "pqProcessModuleGUIHelper.h"
 #include "pqServer.h"
-#include "pqRenderViewModule.h"
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
 #include "pqCoreTestUtility.h"
@@ -23,6 +22,10 @@
 #include "vtkPVRenderViewProxy.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkProcessModule.h"
+
+#include "vtkSMStateVersionController.h"
+#include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
 
 class vtkRVProxy : public vtkPVRenderViewProxy
 {
@@ -162,7 +165,6 @@ public:
     interactorStyle->UpdateVTKObjects();
     }
   
-  QPointer<pqRenderViewModule> RenderModule;
   vtkSmartPointer<vtkSMRenderViewProxy> RenderView;
   vtkSmartPointer<vtkRVProxy> RVProxy;
 };
@@ -188,8 +190,17 @@ public:
 
 int main(int argc, char** argv)
 {
-  QApplication app(argc, argv);
-  return pqMain::Run(app, GUIHelper::New());
+  vtkPVXMLParser* parser = vtkPVXMLParser::New();
+  parser->SetFileName("/home/utkarsh/Kitware/ParaView3/ParaView3Bin/b.pvsm");
+  parser->Parse();
+
+  vtkSMStateVersionController* controller = vtkSMStateVersionController::New();
+  controller->Process(parser->GetRootElement()->GetNestedElement(0));
+  ofstream ofp("/tmp/out.xml");
+  parser->GetRootElement()->PrintXML(ofp, vtkIndent());
+
+  //QApplication app(argc, argv);
+  //return pqMain::Run(app, GUIHelper::New());
 }
 
 

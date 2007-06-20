@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 #include <pqCoreExport.h>
-class pqRenderViewModule;
+class pqRenderView;
 class QLineEdit;
 
 /// a popup window that helps the user select another view
@@ -44,7 +44,7 @@ class PQCORE_EXPORT pqLinkViewWidget : public QWidget
   Q_OBJECT
 public:
   /// constructor takes the first view
-  pqLinkViewWidget(pqRenderViewModule* firstLink);
+  pqLinkViewWidget(pqRenderView* firstLink);
   /// destructor
   virtual ~pqLinkViewWidget();
 
@@ -55,7 +55,7 @@ protected:
   bool event(QEvent* e);
 
 private:
-  pqRenderViewModule* RenderView;
+  pqRenderView* RenderView;
   QLineEdit* LineEdit;
 };
 

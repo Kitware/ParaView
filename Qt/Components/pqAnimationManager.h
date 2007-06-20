@@ -39,7 +39,7 @@ class QSize;
 
 class pqAnimationCue;
 class pqAnimationScene;
-class pqGenericViewModule;
+class pqView;
 class pqProxy;
 class pqServer;
 class vtkSMProxy;
@@ -89,7 +89,7 @@ public:
 
   // Saves the animation geometry from the active scene
   // as visible in the given view.
-  bool saveGeometry(const QString& filename, pqGenericViewModule* view);
+  bool saveGeometry(const QString& filename, pqView* view);
 
 signals:
   /// emitted when the active scene changes (\c scene may be NULL).

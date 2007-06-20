@@ -54,8 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView
-#include "pqConsumerDisplay.h"
-#include "pqGenericViewModule.h"
+#include "pqDataRepresentation.h"
 #include "pqPipelineFilter.h"
 #include "pqServer.h"
 #include "pqSMAdaptor.h"
@@ -70,7 +69,8 @@ public:
 
   QString Name;
   QList<pqPipelineSource*> Consumers;
-  QList<pqConsumerDisplay*> Displays;
+  QList<pqDataRepresentation*> Representations;
+
   QList<vtkSmartPointer<vtkSMPropertyLink> > Links;
   QList<vtkSmartPointer<vtkSMProxy> > ProxyListDomainProxies;
 
@@ -88,6 +88,12 @@ pqPipelineSource::pqPipelineSource(const QString& name, vtkSMProxy* proxy,
 : pqProxy("sources", name, proxy, server, _parent)
 {
   this->Internal = new pqPipelineSourceInternal(name, proxy);
+  QObject::connect(this, SIGNAL(representationAdded(
+        pqPipelineSource*, pqDataRepresentation*)),
+    this, SIGNAL(visibilityChanged(pqPipelineSource*, pqDataRepresentation*)));
+  QObject::connect(this, SIGNAL(representationRemoved(
+        pqPipelineSource*, pqDataRepresentation*)),
+    this, SIGNAL(visibilityChanged(pqPipelineSource*, pqDataRepresentation*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -330,84 +336,88 @@ void pqPipelineSource::removeConsumer(pqPipelineSource* cons)
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineSource::addDisplay(pqConsumerDisplay* display)
+void pqPipelineSource::addRepresentation(pqDataRepresentation* repr)
 {
-  this->Internal->Displays.push_back(display);
-
-  emit this->displayAdded(this, display);
+  this->Internal->Representations.push_back(repr);
+  QObject::connect(repr, SIGNAL(visibilityChanged(bool)),
+    this, SLOT(onRepresentationVisibilityChanged()));
+  emit this->representationAdded(this, repr);
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineSource::removeDisplay(pqConsumerDisplay* display)
+void pqPipelineSource::removeRepresentation(pqDataRepresentation* repr)
 {
-  int index = this->Internal->Displays.indexOf(display);
-  if (index != -1)
+  this->Internal->Representations.removeAll(repr);
+  QObject::disconnect(repr, 0, this, 0);
+  emit this->representationRemoved(this, repr);
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineSource::onRepresentationVisibilityChanged()
+{
+  emit this->visibilityChanged(this, 
+    qobject_cast<pqDataRepresentation*>(this->sender()));
+}
+
+//-----------------------------------------------------------------------------
+pqDataRepresentation* pqPipelineSource::getRepresentation(pqView* view) const
+{
+  if (view)
     {
-    this->Internal->Displays.removeAt(index);
+    foreach (pqDataRepresentation* repr, this->Internal->Representations)
+      {
+      if (repr && (!view || repr->getView() == view))
+        {
+        return repr;
+        }
+      }
     }
-  emit this->displayRemoved(this, display);
-}
 
-//-----------------------------------------------------------------------------
-int pqPipelineSource::getDisplayCount() const
-{
-  return this->Internal->Displays.size();
-}
-
-//-----------------------------------------------------------------------------
-pqConsumerDisplay* pqPipelineSource::getDisplay(int index) const
-{
-  if (index >= 0 && index < this->Internal->Displays.size())
-    {
-    return this->Internal->Displays[index];
-    }
   return 0;
 }
 
 //-----------------------------------------------------------------------------
-pqConsumerDisplay* pqPipelineSource::getDisplay(
-  pqGenericViewModule* renderModule) const
+QList<pqDataRepresentation*> pqPipelineSource::getRepresentations(pqView* view) const
 {
-  foreach(pqConsumerDisplay* disp, this->Internal->Displays)
+  QList<pqDataRepresentation*> list;
+  foreach (pqDataRepresentation* repr, this->Internal->Representations)
     {
-    if (disp && disp->shownIn(renderModule))
+    if (repr && (!view || repr->getView() == view))
       {
-      return disp;
+      list.push_back(repr);
       }
     }
-  return NULL;
+
+  return list;
 }
 
 //-----------------------------------------------------------------------------
-QList<pqGenericViewModule*> pqPipelineSource::getViewModules() const
+QList<pqView*> pqPipelineSource::getViews() const
 {
-  QList<pqGenericViewModule*> renModules;
- foreach(pqConsumerDisplay* disp, this->Internal->Displays)
+  QList<pqView*> views;
+  foreach(pqDataRepresentation* repr, this->Internal->Representations)
     {
-    if (disp)
+    if (repr)
       {
-      unsigned int max = disp->getNumberOfViewModules();
-      for (unsigned int cc=0; cc < max; ++cc)
+      pqView* view= repr->getView();
+      if (view && !views.contains(view))
         {
-        pqGenericViewModule* ren = disp->getViewModule(cc);
-        if (ren && !renModules.contains(ren))
-          {
-          renModules.push_back(ren);
-          }
+        views.push_back(view);
         }
       }
     }
-  return renModules; 
+
+  return views; 
 }
 
 //-----------------------------------------------------------------------------
 void pqPipelineSource::renderAllViews(bool force /*=false*/)
 {
-  foreach(pqConsumerDisplay* disp, this->Internal->Displays)
+  foreach(pqDataRepresentation* disp, this->Internal->Representations)
     {
     if (disp)
       {
-      disp->renderAllViews(force);
+      disp->renderView(force);
       }
     }
 }
@@ -459,46 +469,13 @@ vtkPVDataInformation* pqPipelineSource::getDataInformation() const
     return 0;
     }
 
-  if (this->getDisplayCount() > 0 || proxy->GetDataInformationValid())
+  if (this->Internal->Representations.size() > 0 || proxy->GetDataInformationValid())
     {
     return proxy->GetDataInformation();
     }
 
   pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
   double time = timekeeper->getTime();
-
-
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-
-  vtkSmartPointer<vtkSMProxy> updateSuppressor;
-  updateSuppressor.TakeReference(pxm->NewProxy("filters", "UpdateSuppressor"));
-  updateSuppressor->SetConnectionID(proxy->GetConnectionID());
-  pqSMAdaptor::setProxyProperty(
-    updateSuppressor->GetProperty("Input"), proxy);
-  pqSMAdaptor::setElementProperty(
-    updateSuppressor->GetProperty("UpdateTime"), time);
-  updateSuppressor->UpdateVTKObjects();
-
-  /// Set number of pieces/piece no information on the update suppressor.
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
-         << vtkClientServerStream::End
-         << vtkClientServerStream::Invoke
-         << updateSuppressor->GetID() << "SetUpdateNumberOfPieces"
-         << vtkClientServerStream::LastResult
-         << vtkClientServerStream::End;
-  stream  << vtkClientServerStream::Invoke
-          << pm->GetProcessModuleID() << "GetPartitionId"
-          << vtkClientServerStream::End
-          << vtkClientServerStream::Invoke
-          << updateSuppressor->GetID() << "SetUpdatePiece"
-          << vtkClientServerStream::LastResult
-          << vtkClientServerStream::End;
-  pm->SendStream(updateSuppressor->GetConnectionID(),
-    updateSuppressor->GetServers(), stream);
-
-  updateSuppressor->InvokeCommand("ForceUpdate");
+  proxy->UpdatePipeline(time);
   return proxy->GetDataInformation();
 }

@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqAnimationCue;
 class pqAnimationManager;
 class pqAnimationScene;
-class pqGenericViewModule;
+class pqView;
 class pqPipelineSource;
 class pqProxy;
 class pqServerManagerModelItem;
@@ -137,7 +137,7 @@ protected slots:
   /// Called when the active view changes. We can only show the
   /// camera for the active view hence we need to know what's the
   /// active view.
-  void onActiveViewChanged(pqGenericViewModule* view);
+  void onActiveViewChanged(pqView* view);
 
   /// Called when the user presses the "Use Current" button
   /// when we reset the keyframe to use current camera.

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqLineChartDisplay.cxx
+   Module:    pqLineChartRepresentation.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqLineChartDisplay.h"
+#include "pqLineChartRepresentation.h"
 
 #include "pqSMAdaptor.h"
 
@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRectilinearGrid.h"
 #include "vtkSMArraySelectionDomain.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMGenericViewDisplayProxy.h"
+#include "vtkSMClientDeliveryRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
@@ -65,7 +65,7 @@ public:
 };
 
 
-class pqLineChartDisplay::pqInternals
+class pqLineChartRepresentation::pqInternals
 {
 public:
   pqInternals();
@@ -99,7 +99,7 @@ pqLineChartDisplayItem::pqLineChartDisplayItem(
 
 
 //-----------------------------------------------------------------------------
-pqLineChartDisplay::pqInternals::pqInternals()
+pqLineChartRepresentation::pqInternals::pqInternals()
   : PointSeries(), CellSeries()
 {
   this->YIndexArray = vtkSmartPointer<vtkDoubleArray>::New();
@@ -111,9 +111,9 @@ pqLineChartDisplay::pqInternals::pqInternals()
 
 
 //-----------------------------------------------------------------------------
-pqLineChartDisplay::pqLineChartDisplay(const QString& group, const QString& name,
+pqLineChartRepresentation::pqLineChartRepresentation(const QString& group, const QString& name,
   vtkSMProxy* display, pqServer* server, QObject* _parent)
-: pqConsumerDisplay(group, name, display, server, _parent)
+: Superclass(group, name, display, server, _parent)
 {
   this->Internals = new pqInternals();
 
@@ -123,13 +123,13 @@ pqLineChartDisplay::pqLineChartDisplay(const QString& group, const QString& name
 }
 
 //-----------------------------------------------------------------------------
-pqLineChartDisplay::~pqLineChartDisplay()
+pqLineChartRepresentation::~pqLineChartRepresentation()
 {
   delete this->Internals;
 }
 
 //-----------------------------------------------------------------------------
-void pqLineChartDisplay::setDefaultPropertyValues()
+void pqLineChartRepresentation::setDefaultPropertyValues()
 {
   this->Superclass::setDefaultPropertyValues();
 
@@ -149,7 +149,7 @@ void pqLineChartDisplay::setDefaultPropertyValues()
   proxy->UpdateVTKObjects();
 }
 //-----------------------------------------------------------------------------
-void pqLineChartDisplay::setStatusDefaults(vtkSMProperty* prop)
+void pqLineChartRepresentation::setStatusDefaults(vtkSMProperty* prop)
 {
   QList<QVariant> values;
 
@@ -174,10 +174,10 @@ void pqLineChartDisplay::setStatusDefaults(vtkSMProperty* prop)
 }
 
 //-----------------------------------------------------------------------------
-vtkRectilinearGrid* pqLineChartDisplay::getClientSideData() const
+vtkRectilinearGrid* pqLineChartRepresentation::getClientSideData() const
 {
-  vtkSMGenericViewDisplayProxy* proxy = 
-    vtkSMGenericViewDisplayProxy::SafeDownCast(this->getProxy());
+  vtkSMClientDeliveryRepresentationProxy* proxy = 
+    vtkSMClientDeliveryRepresentationProxy::SafeDownCast(this->getProxy());
   if (proxy)
     {
     return vtkRectilinearGrid::SafeDownCast(proxy->GetOutput());
@@ -186,7 +186,7 @@ vtkRectilinearGrid* pqLineChartDisplay::getClientSideData() const
 }
 
 //-----------------------------------------------------------------------------
-vtkDataArray* pqLineChartDisplay::getXArray()
+vtkDataArray* pqLineChartRepresentation::getXArray()
 {
   vtkRectilinearGrid* data = this->getClientSideData();
   if (!data)
@@ -232,7 +232,7 @@ vtkDataArray* pqLineChartDisplay::getXArray()
 }
 
 //-----------------------------------------------------------------------------
-vtkDataArray* pqLineChartDisplay::getYArray(int index)
+vtkDataArray* pqLineChartRepresentation::getYArray(int index)
 {
   vtkRectilinearGrid* data = this->getClientSideData();
   if (!data)
@@ -266,18 +266,18 @@ vtkDataArray* pqLineChartDisplay::getYArray(int index)
     yarrayname.toAscii().data()) : 0;
 }
 
-int pqLineChartDisplay::getAttributeType() const
+int pqLineChartRepresentation::getAttributeType() const
 {
   return pqSMAdaptor::getElementProperty(
       this->getProxy()->GetProperty("AttributeType")).toInt();
 }
 
-int pqLineChartDisplay::getNumberOfSeries() const
+int pqLineChartRepresentation::getNumberOfSeries() const
 {
   return this->Internals->Series->size();
 }
 
-int pqLineChartDisplay::getSeriesIndex(const QString &name) const
+int pqLineChartRepresentation::getSeriesIndex(const QString &name) const
 {
   QVector<pqLineChartDisplayItem>::ConstIterator iter =
       this->Internals->Series->begin();
@@ -292,7 +292,7 @@ int pqLineChartDisplay::getSeriesIndex(const QString &name) const
   return -1;
 }
 
-bool pqLineChartDisplay::isSeriesEnabled(int series) const
+bool pqLineChartRepresentation::isSeriesEnabled(int series) const
 {
   if(series >= 0 && series < this->Internals->Series->size())
     {
@@ -302,7 +302,7 @@ bool pqLineChartDisplay::isSeriesEnabled(int series) const
   return false;
 }
 
-void pqLineChartDisplay::setSeriesEnabled(int series, bool enabled)
+void pqLineChartRepresentation::setSeriesEnabled(int series, bool enabled)
 {
   if(series >= 0 && series < this->Internals->Series->size())
     {
@@ -326,7 +326,7 @@ void pqLineChartDisplay::setSeriesEnabled(int series, bool enabled)
     }
 }
 
-void pqLineChartDisplay::getSeriesName(int series, QString &name) const
+void pqLineChartRepresentation::getSeriesName(int series, QString &name) const
 {
   if(series >= 0 && series < this->Internals->Series->size())
     {
@@ -334,7 +334,7 @@ void pqLineChartDisplay::getSeriesName(int series, QString &name) const
     }
 }
 
-void pqLineChartDisplay::setSeriesName(int series, const QString &name)
+void pqLineChartRepresentation::setSeriesName(int series, const QString &name)
 {
   if(series >= 0 && series < this->Internals->Series->size())
     {
@@ -351,7 +351,7 @@ void pqLineChartDisplay::setSeriesName(int series, const QString &name)
     }
 }
 
-void pqLineChartDisplay::getSeriesColor(int series, QColor &color) const
+void pqLineChartRepresentation::getSeriesColor(int series, QColor &color) const
 {
   if(series >= 0 && series < this->Internals->Series->size())
     {
@@ -359,7 +359,7 @@ void pqLineChartDisplay::getSeriesColor(int series, QColor &color) const
     }
 }
 
-void pqLineChartDisplay::setSeriesColor(int series, const QColor &color)
+void pqLineChartRepresentation::setSeriesColor(int series, const QColor &color)
 {
   if(series >= 0 && series < this->Internals->Series->size())
     {
@@ -378,7 +378,7 @@ void pqLineChartDisplay::setSeriesColor(int series, const QColor &color)
     }
 }
 
-bool pqLineChartDisplay::isSeriesColorSet(int series) const
+bool pqLineChartRepresentation::isSeriesColorSet(int series) const
 {
   if(series >= 0 && series < this->Internals->Series->size())
     {
@@ -388,12 +388,12 @@ bool pqLineChartDisplay::isSeriesColorSet(int series) const
   return false;
 }
 
-void pqLineChartDisplay::beginSeriesChanges()
+void pqLineChartRepresentation::beginSeriesChanges()
 {
   this->Internals->InMultiChange = true;
 }
 
-void pqLineChartDisplay::endSeriesChanges()
+void pqLineChartRepresentation::endSeriesChanges()
 {
   if(this->Internals->InMultiChange)
     {
@@ -402,7 +402,7 @@ void pqLineChartDisplay::endSeriesChanges()
     }
 }
 
-void pqLineChartDisplay::updateSeries()
+void pqLineChartRepresentation::updateSeries()
 {
   // Update the domain information.
   vtkSMProxy *proxy = this->getProxy();
@@ -517,13 +517,13 @@ void pqLineChartDisplay::updateSeries()
     }
 }
 
-void pqLineChartDisplay::setAttributeType(int attr)
+void pqLineChartRepresentation::setAttributeType(int attr)
 {
   pqSMAdaptor::setElementProperty(
       this->getProxy()->GetProperty("AttributeType"), QVariant(attr));
 }
 
-void pqLineChartDisplay::changeSeriesList()
+void pqLineChartRepresentation::changeSeriesList()
 {
   int attribute_type = pqSMAdaptor::getElementProperty(
       this->getProxy()->GetProperty("AttributeType")).toInt();
@@ -537,7 +537,7 @@ void pqLineChartDisplay::changeSeriesList()
     }
 }
 
-int pqLineChartDisplay::isEnabledByDefault(const QString &arrayName) const
+int pqLineChartRepresentation::isEnabledByDefault(const QString &arrayName) const
 {
   if(arrayName == "BlockId" || arrayName == "GlobalElementId" ||
       arrayName == "PedigreeElementId")
@@ -548,7 +548,7 @@ int pqLineChartDisplay::isEnabledByDefault(const QString &arrayName) const
   return 1;
 }
 
-void pqLineChartDisplay::saveSeriesChanges()
+void pqLineChartRepresentation::saveSeriesChanges()
 {
   if(this->Internals->ChangeCount == 0)
     {

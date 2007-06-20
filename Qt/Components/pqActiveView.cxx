@@ -46,12 +46,12 @@ pqActiveView::~pqActiveView()
 {
 }
 
-pqGenericViewModule* pqActiveView::current()
+pqView* pqActiveView::current()
 {
   return this->ActiveView;
 }
 
-void pqActiveView::setCurrent(pqGenericViewModule* view)
+void pqActiveView::setCurrent(pqView* view)
 {
   if(this->ActiveView != view)
     {

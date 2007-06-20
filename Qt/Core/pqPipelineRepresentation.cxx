@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqPipelineDisplay.cxx
+   Module:    pqPipelineRepresentation.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,10 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqPipelineDisplay.cxx
+/// \file pqPipelineRepresentation.cxx
 /// \date 4/24/2006
 
-#include "pqPipelineDisplay.h"
+#include "pqPipelineRepresentation.h"
 
 
 // ParaView Server Manager includes.
@@ -44,15 +44,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkSmartPointer.h" 
+#include "vtkSMCompoundProxy.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMSourceProxy.h"
 
 // Qt includes.
 #include <QList>
 #include <QPair>
 #include <QPointer>
+#include <QRegExp>
 #include <QtDebug>
 
 // ParaView includes.
@@ -61,7 +65,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
-#include "pqRenderViewModule.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -69,13 +72,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 //-----------------------------------------------------------------------------
-class pqPipelineDisplayInternal
+class pqPipelineRepresentation::pqInternal
 {
 public:
-  vtkSmartPointer<vtkSMDataObjectDisplayProxy> DisplayProxy;
+  vtkSmartPointer<vtkSMPVRepresentationProxy> RepresentationProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 
-  pqPipelineDisplayInternal()
+  pqInternal()
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     }
@@ -84,28 +87,28 @@ public:
   vtkPVArrayInformation* getArrayInformation(
     const char* arrayname, int fieldType)
     {
-    if (!arrayname || !arrayname[0] || !this->DisplayProxy)
+    if (!arrayname || !arrayname[0] || !this->RepresentationProxy)
       {
       return 0; 
       }
-    vtkSMDataObjectDisplayProxy* displayProxy = this->DisplayProxy;
-    vtkPVDataInformation* geomInfo = displayProxy->GetDisplayedDataInformation();
-    if(!geomInfo)
+    vtkSMDataRepresentationProxy* repr = this->RepresentationProxy;
+    vtkPVDataInformation* dataInfo = repr->GetFullResDataInformation();
+    if(!dataInfo)
       {
       return 0;
       }
 
     vtkPVArrayInformation* info = NULL;
-    if(fieldType == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
+    if(fieldType == vtkSMDataRepresentationProxy::CELL_DATA)
       {
       vtkPVDataSetAttributesInformation* cellinfo = 
-        geomInfo->GetCellDataInformation();
+        dataInfo->GetCellDataInformation();
       info = cellinfo->GetArrayInformation(arrayname);
       }
     else
       {
       vtkPVDataSetAttributesInformation* pointinfo = 
-        geomInfo->GetPointDataInformation();
+        dataInfo->GetPointDataInformation();
       info = pointinfo->GetArrayInformation(arrayname);
       }
     return info;
@@ -113,19 +116,22 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqPipelineDisplay::pqPipelineDisplay(const QString& name,
-  vtkSMDataObjectDisplayProxy* display,
+pqPipelineRepresentation::pqPipelineRepresentation(
+  const QString& group,
+  const QString& name,
+  vtkSMPVRepresentationProxy* display,
   pqServer* server, QObject* p/*=null*/):
-  pqConsumerDisplay("displays", name, display, server, p)
+  Superclass(group, name, display, server, p)
 {
-  this->Internal = new pqPipelineDisplayInternal();
-  this->Internal->DisplayProxy = display;
+  this->Internal = new pqPipelineRepresentation::pqInternal();
+  this->Internal->RepresentationProxy = display;
 
+  // If any of these properties change, we know that the coloring for the
+  // representation has been affected.
   const char* properties[] = {
-    "ScalarVisibility",
     "LookupTable",
-    "ScalarMode",
-    "ColorArray", 
+    "ColorArrayName",
+    "ColorAttributeType",
     0};
 
   for (int cc=0; properties[cc]; cc++)
@@ -146,19 +152,19 @@ pqPipelineDisplay::pqPipelineDisplay(const QString& name,
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineDisplay::~pqPipelineDisplay()
+pqPipelineRepresentation::~pqPipelineRepresentation()
 {
   delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
-vtkSMDataObjectDisplayProxy* pqPipelineDisplay::getDisplayProxy() const
+vtkSMPVRepresentationProxy* pqPipelineRepresentation::getRepresentationProxy() const
 {
-  return this->Internal->DisplayProxy;
+  return this->Internal->RepresentationProxy;
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* pqPipelineDisplay::getScalarOpacityFunctionProxy() const
+vtkSMProxy* pqPipelineRepresentation::getScalarOpacityFunctionProxy() const
 {
   // We may want to create a new proxy is none exists.
   return pqSMAdaptor::getProxyProperty(
@@ -166,27 +172,31 @@ vtkSMProxy* pqPipelineDisplay::getScalarOpacityFunctionProxy() const
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineDisplay::createHelperProxies()
+void pqPipelineRepresentation::createHelperProxies()
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMProxy* opacityFunction = 
-    pxm->NewProxy("piecewise_functions", "PiecewiseFunction");
-  opacityFunction->SetConnectionID(this->getServer()->GetConnectionID());
-  opacityFunction->SetServers(
-    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  opacityFunction->UpdateVTKObjects();
+  vtkSMProxy* proxy = this->getProxy();
 
-  this->addHelperProxy("ScalarOpacityFunction", opacityFunction);
-  opacityFunction->Delete();
+  if (proxy->GetProperty("ScalarOpacityFunction"))
+    {
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMProxy* opacityFunction = 
+      pxm->NewProxy("piecewise_functions", "PiecewiseFunction");
+    opacityFunction->SetConnectionID(this->getServer()->GetConnectionID());
+    opacityFunction->SetServers(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    opacityFunction->UpdateVTKObjects();
 
-  pqSMAdaptor::setProxyProperty(
-    this->getProxy()->GetProperty("ScalarOpacityFunction"),
-    opacityFunction);
-  this->getProxy()->UpdateVTKObjects();
+    this->addHelperProxy("ScalarOpacityFunction", opacityFunction);
+    opacityFunction->Delete();
+
+    pqSMAdaptor::setProxyProperty(
+      proxy->GetProperty("ScalarOpacityFunction"), opacityFunction);
+    proxy->UpdateVTKObjects();
+    }
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineDisplay::setDefaultPropertyValues()
+void pqPipelineRepresentation::setDefaultPropertyValues()
 {
   // We deliberately don;t call superclass. For somereason,
   // its messing up with the scalar coloring.
@@ -200,11 +210,21 @@ void pqPipelineDisplay::setDefaultPropertyValues()
 
   this->createHelperProxies();
 
-  vtkSMDataObjectDisplayProxy* displayProxy = this->getDisplayProxy();
-  if (!displayProxy)
+  vtkSMPVRepresentationProxy* repr = this->getRepresentationProxy();
+  if (!repr)
     {
     return;
     }
+
+  pqSMAdaptor::setEnumerationProperty(repr->GetProperty("SelectionRepresentation"),
+    "Wireframe");
+  pqSMAdaptor::setMultipleElementProperty(repr->GetProperty("SelectionDiffuseColor"),
+    0, 1.0);
+  pqSMAdaptor::setMultipleElementProperty(repr->GetProperty("SelectionDiffuseColor"),
+    1, 0.0);
+  pqSMAdaptor::setMultipleElementProperty(repr->GetProperty("SelectionDiffuseColor"),
+    2, 1.0);
+  pqSMAdaptor::setElementProperty(repr->GetProperty("SelectionLineWidth"), 2);
 
   // if the source created a new point scalar, use it
   // else if the source created a new cell scalar, use it
@@ -217,7 +237,20 @@ void pqPipelineDisplay::setDefaultPropertyValues()
   vtkPVDataSetAttributesInformation* attrInfo;
   vtkPVArrayInformation* arrayInfo;
 
+  // Get the time that this representation is going to use.
+  double time = pqSMAdaptor::getElementProperty(
+    repr->GetProperty("UpdateTime")).toDouble();
+
   vtkPVDataInformation* dataInfo = 0;
+
+  vtkSMProxy* inputProxy = this->getInput()->getProxy();
+  if (inputProxy->IsA("vtkSMCompoundProxy"))
+    {
+    inputProxy = vtkSMCompoundProxy::SafeDownCast(inputProxy)->GetConsumableProxy();
+    }
+  vtkSMSourceProxy* inputSourceProxy = vtkSMSourceProxy::SafeDownCast(inputProxy);
+  inputSourceProxy->UpdatePipeline(time);
+
   dataInfo = this->getInput()->getDataInformation();
 
   // get data set type
@@ -230,7 +263,8 @@ void pqPipelineDisplay::setDefaultPropertyValues()
        dataSetType == VTK_HYPER_OCTREE ||
        dataSetType == VTK_GENERIC_DATA_SET)
       {
-      displayProxy->SetRepresentationCM(vtkSMDataObjectDisplayProxy::SURFACE);
+      pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
+        "Surface");
       }
     else if(dataSetType == VTK_RECTILINEAR_GRID ||
        dataSetType == VTK_STRUCTURED_GRID ||
@@ -239,32 +273,38 @@ void pqPipelineDisplay::setDefaultPropertyValues()
       int* ext = dataInfo->GetExtent();
       if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
         {
-        displayProxy->SetRepresentationCM(vtkSMDataObjectDisplayProxy::SURFACE);
+        pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
+          "Surface");
         }
       else
         {
-        displayProxy->SetRepresentationCM(vtkSMDataObjectDisplayProxy::OUTLINE);
+        pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
+          "Outline");
         }
       }
     else
       {
-      displayProxy->SetRepresentationCM(vtkSMDataObjectDisplayProxy::OUTLINE);
+      pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
+        "Outline");
       }
     }
-  
-  geomInfo = displayProxy->GetDisplayedDataInformation();
+  repr->UpdateVTKObjects();
+
+  // Update the representation, so that we can obtain updated data information.
+  repr->Update();
+  geomInfo = repr->GetFullResDataInformation();
 
   // Locate input display.
   pqPipelineFilter* myInput = qobject_cast<pqPipelineFilter*>(this->getInput());
-  pqPipelineDisplay* upstreamDisplay = 0;
+  pqPipelineRepresentation* upstreamDisplay = 0;
   if (myInput && myInput->getInputCount() > 0)
     {
     pqPipelineSource* myInputsInput = myInput->getInput(0);
-    upstreamDisplay = qobject_cast<pqPipelineDisplay*>(
-      myInputsInput->getDisplay(this->getViewModule(0)));
+    upstreamDisplay = qobject_cast<pqPipelineRepresentation*>(
+      myInputsInput->getRepresentation(this->getView()));
     if (upstreamDisplay)
       {
-      inGeomInfo = upstreamDisplay->getDisplayProxy()->GetDisplayedDataInformation();
+      inGeomInfo = upstreamDisplay->getRepresentationProxy()->GetFullResDataInformation();
       }
     }
 
@@ -275,11 +315,11 @@ void pqPipelineDisplay::setDefaultPropertyValues()
     {
     attrInfo = geomInfo->GetPointDataInformation();
     inAttrInfo = inGeomInfo? inGeomInfo->GetPointDataInformation() : 0;
-    pqPipelineDisplay::getColorArray(attrInfo, inAttrInfo, arrayInfo);
+    pqPipelineRepresentation::getColorArray(attrInfo, inAttrInfo, arrayInfo);
     if(arrayInfo)
       {
       this->colorByArray(arrayInfo->GetName(), 
-                         vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+                         vtkSMDataRepresentationProxy::POINT_DATA);
       return;
       }
     }
@@ -289,11 +329,11 @@ void pqPipelineDisplay::setDefaultPropertyValues()
     {
     attrInfo = geomInfo->GetCellDataInformation();
     inAttrInfo = inGeomInfo? inGeomInfo->GetCellDataInformation() : 0;
-    pqPipelineDisplay::getColorArray(attrInfo, inAttrInfo, arrayInfo);
+    pqPipelineRepresentation::getColorArray(attrInfo, inAttrInfo, arrayInfo);
     if(arrayInfo)
       {
       this->colorByArray(arrayInfo->GetName(), 
-                         vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+                         vtkSMDataRepresentationProxy::CELL_DATA);
       return;
       }
     }
@@ -306,7 +346,7 @@ void pqPipelineDisplay::setDefaultPropertyValues()
     if(arrayInfo)
       {
       this->colorByArray(arrayInfo->GetName(), 
-                         vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+                         vtkSMDataRepresentationProxy::POINT_DATA);
       return;
       }
     }
@@ -319,7 +359,7 @@ void pqPipelineDisplay::setDefaultPropertyValues()
     if(arrayInfo)
       {
       this->colorByArray(arrayInfo->GetName(), 
-                         vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+                         vtkSMDataRepresentationProxy::CELL_DATA);
       return;
       }
     }
@@ -328,9 +368,8 @@ void pqPipelineDisplay::setDefaultPropertyValues()
   if (upstreamDisplay)
     {
     // propagate solid color.
-    double rgb[3];
-    upstreamDisplay->getDisplayProxy()->GetColorCM(rgb);
-    displayProxy->SetColorCM(rgb);
+    repr->GetProperty("Color")->Copy(
+      upstreamDisplay->getProxy()->GetProperty("Color"));
 
     this->setColorField(upstreamDisplay->getColorField(false));
     return;
@@ -341,7 +380,7 @@ void pqPipelineDisplay::setDefaultPropertyValues()
 }
 
 //-----------------------------------------------------------------------------
-int pqPipelineDisplay::getNumberOfComponents(
+int pqPipelineRepresentation::getNumberOfComponents(
   const char* arrayname, int fieldtype)
 {
   vtkPVArrayInformation* info = this->Internal->getArrayInformation(
@@ -350,19 +389,19 @@ int pqPipelineDisplay::getNumberOfComponents(
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
+void pqPipelineRepresentation::colorByArray(const char* arrayname, int fieldtype)
 {
-  vtkSMDataObjectDisplayProxy* displayProxy = this->getDisplayProxy();
-  if (!displayProxy)
+  vtkSMPVRepresentationProxy* repr = this->getRepresentationProxy();
+  if (!repr)
     {
     return;
     }
 
-  if(arrayname == 0)
+  if(!arrayname || !arrayname[0])
     {
     pqSMAdaptor::setElementProperty(
-      displayProxy->GetProperty("ScalarVisibility"), 0);
-    displayProxy->UpdateVTKObjects();
+      repr->GetProperty("ColorArrayName"), "");
+    repr->UpdateVTKObjects();
     return;
     }
 
@@ -380,10 +419,11 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
     }
   else
     {
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      displayProxy->GetProperty("LookupTable"));
     // When lookup table manager is not available,
     // we simply create new lookup tables for each display.
+
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      repr->GetProperty("LookupTable"));
     if (pp->GetNumberOfProxies() == 0)
       {
       pqObjectBuilder* builder = core->getObjectBuilder();
@@ -411,59 +451,69 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
     {
     qDebug() << "Failed to create/locate Lookup Table.";
     pqSMAdaptor::setElementProperty(
-      displayProxy->GetProperty("ScalarVisibility"), 0);
-    displayProxy->UpdateVTKObjects();
+      repr->GetProperty("ColorArrayName"), "");
+    repr->UpdateVTKObjects();
     return;
     }
 
   vtkSMProxy* oldlutProxy = 
-    pqSMAdaptor::getProxyProperty(displayProxy->GetProperty("LookupTable"));
+    pqSMAdaptor::getProxyProperty(repr->GetProperty("LookupTable"));
   pqScalarsToColors* old_stc = 0;
   if (oldlutProxy != lut)
     {
-    // Localte pqScalarsToColors for the old LUT and update 
+    // Locate pqScalarsToColors for the old LUT and update 
     // it's scalar bar visibility.
     pqServerManagerModel* smmodel = core->getServerManagerModel();
-    old_stc = qobject_cast<pqScalarsToColors*>(
-      smmodel->getPQProxy(oldlutProxy));
+    old_stc = smmodel->findItem<pqScalarsToColors*>(oldlutProxy);
     }
   
   pqSMAdaptor::setProxyProperty(
-    displayProxy->GetProperty("LookupTable"), lut);
+    repr->GetProperty("LookupTable"), lut);
 
   // If old LUT was present update the visibility of the scalar bars
   if (old_stc)
       {
       old_stc->hideUnusedScalarBars();
       }
-  pqSMAdaptor::setElementProperty(
-    displayProxy->GetProperty("ScalarVisibility"), 1);
 
-
-  if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
+  if(fieldtype == vtkSMDataRepresentationProxy::CELL_DATA)
     {
     pqSMAdaptor::setEnumerationProperty(
-      displayProxy->GetProperty("ScalarMode"), "UseCellFieldData");
+      repr->GetProperty("ColorAttributeType"), "CELL_DATA");
     }
   else
     {
     pqSMAdaptor::setEnumerationProperty(
-      displayProxy->GetProperty("ScalarMode"), "UsePointFieldData");
+      repr->GetProperty("ColorAttributeType"), "POINT_DATA");
     }
   pqSMAdaptor::setElementProperty(
-    displayProxy->GetProperty("ColorArray"), arrayname);
+    repr->GetProperty("ColorArrayName"), arrayname);
   lut->UpdateVTKObjects();
-  displayProxy->UpdateVTKObjects();
+  repr->UpdateVTKObjects();
 
   this->updateLookupTableScalarRange();
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineDisplay::resetLookupTableScalarRange()
+int pqPipelineRepresentation::getRepresentationType() const
+{
+  return this->getRepresentationProxy()->GetRepresentation();
+}
+
+//-----------------------------------------------------------------------------
+double pqPipelineRepresentation::getOpacity() const
+{
+  vtkSMProperty* prop = this->getProxy()->GetProperty("Opacity");
+  return (prop? pqSMAdaptor::getElementProperty(prop).toDouble() : 1.0);
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineRepresentation::resetLookupTableScalarRange()
 {
   pqScalarsToColors* lut = this->getLookupTable();
   QString colorField = this->getColorField();
-  if (lut && colorField!= "" && colorField != "Solid Color")
+  if (lut && colorField != "" && 
+    colorField != pqPipelineRepresentation::solidColor())
     {
     QPair<double,double> range = this->getColorFieldRange();
     lut->setScalarRange(range.first, range.second);
@@ -474,7 +524,7 @@ void pqPipelineDisplay::resetLookupTableScalarRange()
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineDisplay::updateLookupTableScalarRange()
+void pqPipelineRepresentation::updateLookupTableScalarRange()
 {
   pqScalarsToColors* lut = this->getLookupTable();
   if (!lut || lut->getScalarRangeLock())
@@ -483,7 +533,7 @@ void pqPipelineDisplay::updateLookupTableScalarRange()
     }
 
   QString colorField = this->getColorField();
-  if (colorField == "" || colorField == "Solid Color")
+  if (colorField == "" || colorField == pqPipelineRepresentation::solidColor())
     {
     return;
     }
@@ -494,8 +544,7 @@ void pqPipelineDisplay::updateLookupTableScalarRange()
   // Adjust opacity function range.
   vtkSMProxy* opacityFunction = this->getScalarOpacityFunctionProxy();
   if (opacityFunction && !lut->getScalarRangeLock() &&
-    this->getDisplayProxy()->GetRepresentationCM() == 
-    vtkSMDataObjectDisplayProxy::VOLUME)
+    this->getRepresentationType() == vtkSMPVRepresentationProxy::VOLUME)
     {
     QPair<double, double> adjusted_range = lut->getScalarRange();
 
@@ -506,11 +555,16 @@ void pqPipelineDisplay::updateLookupTableScalarRange()
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineDisplay::setScalarOpacityRange(double min, double max)
+void pqPipelineRepresentation::setScalarOpacityRange(double min, double max)
 {
   // A far more better way would be to create a new pqProxy subclass for
   // the piecewise function.
   vtkSMProxy* opacityFunction = this->getScalarOpacityFunctionProxy();
+  if (!opacityFunction)
+    {
+    return;
+    }
+
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     opacityFunction->GetProperty("Points"));
 
@@ -545,7 +599,7 @@ void pqPipelineDisplay::setScalarOpacityRange(double min, double max)
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineDisplay::getColorArray(
+void pqPipelineRepresentation::getColorArray(
   vtkPVDataSetAttributesInformation* attrInfo,
   vtkPVDataSetAttributesInformation* inAttrInfo,
   vtkPVArrayInformation*& arrayInfo)
@@ -574,35 +628,35 @@ void pqPipelineDisplay::getColorArray(
 
 
 //-----------------------------------------------------------------------------
-QList<QString> pqPipelineDisplay::getColorFields()
+QList<QString> pqPipelineRepresentation::getColorFields()
 {
-  vtkSMDataObjectDisplayProxy* displayProxy = this->getDisplayProxy();
+  vtkSMPVRepresentationProxy* repr = this->getRepresentationProxy();
 
   QList<QString> ret;
-  if(!displayProxy)
+  if(!repr)
     {
     return ret;
     }
 
-  int representation = displayProxy->GetRepresentationCM();
+  int representation = this->getRepresentationType();
 
-  if (representation != vtkSMDataObjectDisplayProxy::VOLUME)
+  if (representation != vtkSMPVRepresentationProxy::VOLUME)
     {
     // Actor color is one way to color this part.
     // Not applicable when volume rendering.
-    ret.append("Solid Color");
+    ret.append(pqPipelineRepresentation::solidColor());
     }
 
-  vtkPVDataInformation* geomInfo = displayProxy->GetDisplayedDataInformation();
+  vtkPVDataInformation* geomInfo = repr->GetFullResDataInformation();
   if(!geomInfo)
     {
     return ret;
     }
 
-  // get cell arrays
+  // get cell arrays (only when not in volume or outline mode.
   vtkPVDataSetAttributesInformation* cellinfo = 
     geomInfo->GetCellDataInformation();
-  if(cellinfo && representation != vtkSMDataObjectDisplayProxy::VOLUME)
+  if (cellinfo && representation != vtkSMPVRepresentationProxy::VOLUME)
     {
     for(int i=0; i<cellinfo->GetNumberOfArrays(); i++)
       {
@@ -613,10 +667,10 @@ QList<QString> pqPipelineDisplay::getColorFields()
       }
     }
   
-  // get point arrays
+  // get point arrays (only when not in outline mode.
   vtkPVDataSetAttributesInformation* pointinfo = 
-    geomInfo->GetPointDataInformation();
-  if(pointinfo)
+     geomInfo->GetPointDataInformation();
+  if (pointinfo && representation != vtkSMPVRepresentationProxy::OUTLINE)
     {
     for(int i=0; i<pointinfo->GetNumberOfArrays(); i++)
       {
@@ -630,24 +684,24 @@ QList<QString> pqPipelineDisplay::getColorFields()
 }
 
 //-----------------------------------------------------------------------------
-int pqPipelineDisplay::getColorFieldNumberOfComponents(const QString& array)
+int pqPipelineRepresentation::getColorFieldNumberOfComponents(const QString& array)
 {
   QString field = array;
   int fieldType = vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA;
 
-  if(field == "Solid Color")
+  if(field == pqPipelineRepresentation::solidColor())
     {
     return 0;
     }
   if(field.right(strlen(" (cell)")) == " (cell)")
     {
     field.chop(strlen(" (cell)"));
-    fieldType = vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA;
+    fieldType = vtkSMDataRepresentationProxy::CELL_DATA;
     }
   else if(field.right(strlen(" (point)")) == " (point)")
     {
     field.chop(strlen(" (point)"));
-    fieldType = vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA;
+    fieldType = vtkSMDataRepresentationProxy::POINT_DATA;
     }
 
   return this->getNumberOfComponents(field.toAscii().data(),
@@ -656,26 +710,26 @@ int pqPipelineDisplay::getColorFieldNumberOfComponents(const QString& array)
 
 //-----------------------------------------------------------------------------
 QPair<double, double> 
-pqPipelineDisplay::getColorFieldRange(const QString& array, int component)
+pqPipelineRepresentation::getColorFieldRange(const QString& array, int component)
 {
   QPair<double,double>ret(0.0, 1.0);
 
   QString field = array;
-  int fieldType = vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA;
+  int fieldType = vtkSMDataRepresentationProxy::POINT_DATA;
 
-  if(field == "Solid Color")
+  if(field == pqPipelineRepresentation::solidColor())
     {
     return ret;
     }
   if(field.right(strlen(" (cell)")) == " (cell)")
     {
     field.chop(strlen(" (cell)"));
-    fieldType = vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA;
+    fieldType = vtkSMDataRepresentationProxy::CELL_DATA;
     }
   else if(field.right(strlen(" (point)")) == " (point)")
     {
     field.chop(strlen(" (point)"));
-    fieldType = vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA;
+    fieldType = vtkSMDataRepresentationProxy::POINT_DATA;
     }
 
   vtkPVArrayInformation* info = this->Internal->getArrayInformation(
@@ -693,11 +747,12 @@ pqPipelineDisplay::getColorFieldRange(const QString& array, int component)
 }
 
 //-----------------------------------------------------------------------------
-QPair<double, double> pqPipelineDisplay::getColorFieldRange()
+QPair<double, double> pqPipelineRepresentation::getColorFieldRange()
 {
   pqScalarsToColors* lut = this->getLookupTable();
   QString colorField = this->getColorField();
-  if (lut && colorField!= "" && colorField != "Solid Color")
+  if (lut && colorField!= "" && 
+    colorField != pqPipelineRepresentation::solidColor())
     {
     int component = pqSMAdaptor::getElementProperty(
       lut->getProxy()->GetProperty("VectorComponent")).toInt();
@@ -714,18 +769,18 @@ QPair<double, double> pqPipelineDisplay::getColorFieldRange()
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineDisplay::setColorField(const QString& value)
+void pqPipelineRepresentation::setColorField(const QString& value)
 {
-  vtkSMDisplayProxy* displayProxy = this->getDisplayProxy();
+  vtkSMPVRepresentationProxy* repr = this->getRepresentationProxy();
 
-  if(!displayProxy)
+  if(!repr)
     {
     return;
     }
 
   QString field = value;
 
-  if(field == "Solid Color")
+  if(field == pqPipelineRepresentation::solidColor())
     {
     this->colorByArray(0, 0);
     }
@@ -735,98 +790,97 @@ void pqPipelineDisplay::setColorField(const QString& value)
       {
       field.chop(strlen(" (cell)"));
       this->colorByArray(field.toAscii().data(), 
-                         vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+                         vtkSMDataRepresentationProxy::CELL_DATA);
       }
     else if(field.right(strlen(" (point)")) == " (point)")
       {
       field.chop(strlen(" (point)"));
       this->colorByArray(field.toAscii().data(), 
-                         vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+                         vtkSMDataRepresentationProxy::POINT_DATA);
       }
     }
 }
 
 
 //-----------------------------------------------------------------------------
-QString pqPipelineDisplay::getColorField(bool raw)
+QString pqPipelineRepresentation::getColorField(bool raw)
 {
-  vtkSMDisplayProxy* displayProxy = this->getDisplayProxy();
-  if (!displayProxy)
+  vtkSMPVRepresentationProxy* repr = this->getRepresentationProxy();
+  if (!repr)
     {
-    return "";
+    return pqPipelineRepresentation::solidColor();
     }
 
-  QVariant scalarColor = pqSMAdaptor::getElementProperty(
-    displayProxy->GetProperty("ScalarVisibility"));
-  if(scalarColor.toBool())
+  QVariant scalarMode = pqSMAdaptor::getEnumerationProperty(
+    repr->GetProperty("ColorAttributeType"));
+  QString scalarArray = pqSMAdaptor::getElementProperty(
+    repr->GetProperty("ColorArrayName")).toString();
+
+  if (scalarArray != "")
     {
-    QVariant scalarMode = pqSMAdaptor::getEnumerationProperty(
-      displayProxy->GetProperty("ScalarMode"));
-    QString scalarArray = pqSMAdaptor::getElementProperty(
-      displayProxy->GetProperty("ColorArray")).toString();
     if (raw)
       {
       return scalarArray;
       }
-    if(scalarMode == "UseCellFieldData")
+
+    if(scalarMode == "CELL_DATA")
       {
       return scalarArray + " (cell)";
       }
-    else if(scalarMode == "UsePointFieldData")
+    else if(scalarMode == "POINT_DATA")
       {
       return scalarArray + " (point)";
       }
     }
-  else
-    {
-    return "Solid Color";
-    }
-  return QString();
+
+  return pqPipelineRepresentation::solidColor();
 }
 
 //-----------------------------------------------------------------------------
-bool pqPipelineDisplay::getDataBounds(double bounds[6])
+bool pqPipelineRepresentation::getDataBounds(double bounds[6])
 {
-  vtkSMDataObjectDisplayProxy* display = 
-    this->getDisplayProxy();
+  vtkSMPVRepresentationProxy* repr = 
+    this->getRepresentationProxy();
 
-  if(!display || !display->GetDisplayedDataInformation())
+  if(!repr || !repr->GetFullResDataInformation())
     {
     return false;
     }
-  display->GetDisplayedDataInformation()->GetBounds(bounds);
+  repr->GetFullResDataInformation()->GetBounds(bounds);
   return true;
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineDisplay::setRepresentation(int representation)
+void pqPipelineRepresentation::setRepresentation(int representation)
 {
-  vtkSMDataObjectDisplayProxy* display = this->getDisplayProxy();
-  display->SetRepresentationCM(representation);
+  vtkSMPVRepresentationProxy* repr = this->getRepresentationProxy();
+  pqSMAdaptor::setElementProperty(
+    repr->GetProperty("Representation"), representation);
+  repr->UpdateVTKObjects();
   this->onRepresentationChanged();
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineDisplay::onRepresentationChanged()
+void pqPipelineRepresentation::onRepresentationChanged()
 {
- vtkSMDataObjectDisplayProxy* display = 
-    this->getDisplayProxy();
+ vtkSMPVRepresentationProxy* repr = this->getRepresentationProxy();
 
-  if(!display || 
-    display->GetRepresentationCM() != vtkSMDataObjectDisplayProxy::VOLUME)
+  if(!repr || 
+    this->getRepresentationType() != vtkSMPVRepresentationProxy::VOLUME)
     {
     // Nothing to do here.
     return;
     }
 
   // This is essential, since otherwise the geometry filter does not execute
-  // and we wont get the correct arrays available.
-  display->Update();
+  // and we won't get the correct arrays available.
+  repr->Update();
 
   // Representation is Volume, is color array set?
   QString colorField = this->getColorField(false);
   QRegExp regExpCell(" \\(cell\\)\\w*$");
-  if (colorField == "Solid Color" || regExpCell.indexIn(colorField) != -1)
+  if (colorField == pqPipelineRepresentation::solidColor() 
+    || regExpCell.indexIn(colorField) != -1)
     {
     // Current color field is not suitable for Volume rendering.
     // Change it.
@@ -834,9 +888,11 @@ void pqPipelineDisplay::onRepresentationChanged()
     if (colorFields.size() == 0)
       {
       qCritical() << "Cannot volume render since no point data available!";
-      display->SetRepresentationCM(vtkSMDataObjectDisplayProxy::OUTLINE);
+      this->setRepresentation(vtkSMPVRepresentationProxy::OUTLINE);
       return;
       }
     this->setColorField(colorFields[0]);
     }
+
+  this->updateLookupTableScalarRange();
 }

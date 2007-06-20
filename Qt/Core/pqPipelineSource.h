@@ -39,9 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 #include "pqProxy.h"
 
-class pqConsumerDisplay;
-class pqGenericViewModule;
+class pqDataRepresentation;
 class pqPipelineSourceInternal;
+class pqView;
 class vtkObject;
 class vtkPVDataInformation;
 
@@ -71,29 +71,21 @@ public:
   // Check if the object exists in the consumer set.
   bool hasConsumer(pqPipelineSource *) const;
 
-  /// Get the display at given index.
-  pqConsumerDisplay *getDisplay(int index) const;
+  /// Returns a list of representations for this source in the given view.
+  /// If view == NULL, returns all representations of this source.
+  QList<pqDataRepresentation*> getRepresentations(pqView* view) const;
 
-  // Get number of displays.
-  int getDisplayCount() const; 
-
-  // Get the display(if any) that is present in the \c renderModule. 
-  // NOTE: In case more than one display exists for this source
-  // added to the render module, this returns the first one.
-  pqConsumerDisplay* getDisplay(pqGenericViewModule* renderModule) const;
+  /// Returns the first representation for this source in the given view.
+  /// If view is NULL, returns 0.
+  pqDataRepresentation* getRepresentation(pqView* view) const;
 
   // Returns a list of render modules in which this source
-  // has displays added (the displays may not be visible).
-  QList<pqGenericViewModule*> getViewModules() const;
-
-  // Use this method to initialize the pqObject state using the
-  // underlying vtkSMProxy. This needs to be done only once,
-  // after the object has been created. 
-  virtual void initialize() { };
+  // has representations added (the representations may not be visible).
+  QList<pqView*> getViews() const;
 
   // This method updates all render modules to which all  
-  // displays for this source belong, if force is true, it for an immediate 
-  // render otherwise render on idle.
+  // representations for this source belong, if force is true, it for an 
+  // immediate render otherwise render on idle.
   void renderAllViews(bool force=false);
 
   /// Sets default values for the underlying proxy. 
@@ -112,7 +104,7 @@ public:
   int replaceInput() const;
 
   /// Before a source's output datainformation can be examined, we have
-  /// to make sure that the first update is called through a display
+  /// to make sure that the first update is called through a representation 
   /// with correctly set UpdateTime. If not, the source will
   /// be updated with incorrect time. Using this method,
   /// (instead of directly calling vtkSMSourceProxy::GetDataInformation())
@@ -128,20 +120,31 @@ signals:
   void connectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
   void preConnectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
 
-  /// fired when a display is added.
-  void displayAdded(pqPipelineSource* source, pqConsumerDisplay* display);
+  /// fired when a representation is added.
+  void representationAdded(pqPipelineSource* source, 
+    pqDataRepresentation* repr);
 
-  /// fired when a display is removed.
-  void displayRemoved(pqPipelineSource* source, pqConsumerDisplay* display);
+  /// fired when a representation is removed.
+  void representationRemoved(pqPipelineSource* source, 
+    pqDataRepresentation* repr);
+
+  /// Fired when the visbility of a representation for the source changes.
+  /// Also fired when representationAdded or representationRemoved is fired
+  /// since that too implies change in source visibility.
+  void visibilityChanged(pqPipelineSource* source, pqDataRepresentation* repr);
 
 protected slots:
   // process some change in the input property for the proxy--needed for subclass
   // pqPipelineFilter.
-  virtual void inputChanged() { ; }
+  virtual void inputChanged() { }
+
+  /// Called when the visibility of any representation for this source changes.
+  void onRepresentationVisibilityChanged();
 
 protected:
   friend class pqPipelineFilter;
-  friend class pqConsumerDisplay;
+  friend class pqDataRepresentation;
+
   /// For every source registered if it has any property that defines a proxy_list
   /// domain, we create and register proxies for every type of proxy indicated 
   /// in that domain. These are "internal proxies" for this pqProxy. Internal
@@ -156,14 +159,20 @@ protected:
   void removeConsumer(pqPipelineSource *);
   void addConsumer(pqPipelineSource*);
 
-  /// called by pqConsumerDisplay when the connections change.
-  void addDisplay(pqConsumerDisplay*);
-  void removeDisplay(pqConsumerDisplay*);
+  /// Called by pqDataRepresentation when the connections change.
+  void addRepresentation(pqDataRepresentation*);
+  void removeRepresentation(pqDataRepresentation*);
 
   void processProxyListHints(vtkSMProxy *proxy_list_proxy);
   
   /// Overridden to add the proxies to the domain as well.
   virtual void addHelperProxy(const QString& key, vtkSMProxy*);
+
+  // Use this method to initialize the pqObject state using the
+  // underlying vtkSMProxy. This needs to be done only once,
+  // after the object has been created. 
+  virtual void initialize() { };
+
 
 private:
   pqPipelineSourceInternal *Internal; ///< Stores the output connections.

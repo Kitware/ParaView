@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "pqComponentsExport.h"
 
-class pqGenericViewModule;
+class pqView;
 
 /// Provides a central location for managing an "active" view
 /// (note that a "view" could be a 3D render view, a plot, or
@@ -52,15 +52,15 @@ public:
   static pqActiveView& instance();
   
   /// Returns the currently-active view (could return NULL)
-  pqGenericViewModule* current();
+  pqView* current();
   
 signals:
   /// Signal emitted whenever the currently-active view changes
-  void changed(pqGenericViewModule* view);
+  void changed(pqView* view);
 
 public slots:
   /// Called to set the currently-active view
-  void setCurrent(pqGenericViewModule* view);
+  void setCurrent(pqView* view);
 
 private:
   pqActiveView();
@@ -68,7 +68,7 @@ private:
   void operator=(const pqActiveView&); // Not implemented.
   ~pqActiveView();
   
-  pqGenericViewModule* ActiveView;
+  pqView* ActiveView;
 };
 
 #endif

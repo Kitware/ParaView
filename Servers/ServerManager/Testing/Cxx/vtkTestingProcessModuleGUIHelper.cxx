@@ -22,7 +22,7 @@
 #include "vtkSMApplication.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMTesting.h"
 #include "vtkTesting.h"
@@ -84,7 +84,7 @@ vtkStandardNewMacro(vtkTestingOutputWindow);
 
 
 
-vtkCxxRevisionMacro(vtkTestingProcessModuleGUIHelper, "1.5");
+vtkCxxRevisionMacro(vtkTestingProcessModuleGUIHelper, "1.6");
 vtkStandardNewMacro(vtkTestingProcessModuleGUIHelper);
 
 //----------------------------------------------------------------------------
@@ -172,7 +172,7 @@ int vtkTestingProcessModuleGUIHelper::RunGUIStart(int , char **,
   pxm->UpdateRegisteredProxies("filters", 0);
   pxm->UpdateRegisteredProxies(0);
 
-  vtkSMRenderModuleProxy* rm = vtkSMRenderModuleProxy::SafeDownCast(
+  vtkSMRenderViewProxy* rm = vtkSMRenderViewProxy::SafeDownCast(
     pxm->GetProxy("rendermodules", "RenderModule0"));
   
   rm->StillRender();
@@ -184,13 +184,14 @@ int vtkTestingProcessModuleGUIHelper::RunGUIStart(int , char **,
     testing->AddArgument(options->GetBaselineImage());
     testing->AddArgument("-T");
     testing->AddArgument(options->GetTempDir());
-    testing->SetRenderModuleProxy(rm);
+    testing->SetRenderViewProxy(rm);
     if (testing->RegressionTest(options->GetThreshold()) != vtkTesting::PASSED)
       {
       vtkErrorMacro("Regression Test Failed!");
       res = 1;
       }
     testing->Delete();
+    pxm->SaveState("/tmp/foo.pvsm");
     }
   else
     {

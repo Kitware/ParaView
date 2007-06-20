@@ -19,10 +19,12 @@
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkProperty.h"
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMCompoundProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
@@ -33,7 +35,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.12");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -42,6 +44,10 @@ vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
   this->LODMapper = 0;
   this->Prop3D = 0;
   this->Property = 0;
+  this->Ambient = 0.0;
+  this->Diffuse = 1.0;
+  this->Specular = 0.1;
+  this->Representation = VTK_SURFACE;
 
   this->SetSelectionSupported(true);
 }
@@ -74,21 +80,21 @@ bool vtkSMSurfaceRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
     return false;
     }
 
-  this->AddStrategy(strategy);
-
-  strategy->SetEnableLOD(true);
-
-  // Creates the strategy objects.
-  strategy->UpdateVTKObjects();
-
   // Now initialize the data pipelines involving this strategy.
   // Since representations are not added to views unless their input is set, we
   // can assume that the objects for this proxy have been created.
   // (Look at vtkSMDataRepresentationProxy::AddToView()).
 
+  strategy->SetEnableLOD(true);
+
   this->Connect(this->GeometryFilter, strategy);
   this->Connect(strategy->GetOutput(), this->Mapper);
   this->Connect(strategy->GetLODOutput(), this->LODMapper);
+
+  // Creates the strategy objects.
+  strategy->UpdateVTKObjects();
+
+  this->AddStrategy(strategy);
 
   return this->Superclass::InitializeStrategy(view);
 }
@@ -133,6 +139,21 @@ bool vtkSMSurfaceRepresentationProxy::EndCreateVTKObjects()
   this->LinkSelectionProp(this->Prop3D);
 
   return this->Superclass::EndCreateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSurfaceRepresentationProxy::Update(vtkSMViewProxy* view)
+{
+  this->Superclass::Update(view);
+
+  if (this->ViewInformation->Has(vtkSMRenderViewProxy::USE_LOD()))
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->Prop3D->GetProperty("EnableLOD"));
+    ivp->SetElement(0, 
+      this->ViewInformation->Get(vtkSMRenderViewProxy::USE_LOD()));
+    this->Prop3D->UpdateProperty("EnableLOD");
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -258,6 +279,9 @@ void vtkSMSurfaceRepresentationProxy::SetColorArrayName(const char* name)
 
   this->Mapper->UpdateVTKObjects();
   this->LODMapper->UpdateVTKObjects();
+
+  // Update specularity.
+  this->UpdateShadingParameters();
 }
 
 //----------------------------------------------------------------------------
@@ -284,6 +308,56 @@ void vtkSMSurfaceRepresentationProxy::SetColorAttributeType(int type)
     }
   this->Mapper->UpdateVTKObjects();
   this->LODMapper->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSurfaceRepresentationProxy::SetRepresentation(int repr)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->Property->GetProperty("Representation"));
+  ivp->SetElement(0, repr);
+  this->Property->UpdateVTKObjects();
+
+  this->Representation = repr;
+
+  // Change shading off for that wireframe/points.
+  this->UpdateShadingParameters();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSurfaceRepresentationProxy::UpdateShadingParameters()
+{
+  double diffuse = this->Diffuse;
+  double specular = this->Specular;
+  double ambient = this->Ambient;
+
+  if (this->Representation != VTK_SURFACE)
+    {
+    diffuse = 0.0;
+    ambient = 1.0;
+    specular = 0.0;
+    }
+  else
+    {
+    // Disable specular highlighting is coloring by scalars.
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->Mapper->GetProperty("ScalarVisibility"));
+    if (ivp->GetElement(0))
+      {
+      specular = 0.0;
+      }
+    }
+
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->Property->GetProperty("Ambient"));
+  dvp->SetElement(0, ambient);
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->Property->GetProperty("Diffuse"));
+  dvp->SetElement(0, diffuse);
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->Property->GetProperty("Specular"));
+  dvp->SetElement(0, specular);
+  this->Property->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

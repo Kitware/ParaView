@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqElementInspectorViewModule.h
+   Module:    pqTableView.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -28,48 +28,60 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-========================================================================*/
-#ifndef __pqElementInspectorViewModule_h 
-#define __pqElementInspectorViewModule_h
+=========================================================================*/
+#ifndef __pqTableView_h
+#define __pqTableView_h
 
-#include "pqGenericViewModule.h"
+#include "pqView.h"
 
-class PQCORE_EXPORT pqElementInspectorViewModule : public pqGenericViewModule 
+class PQCORE_EXPORT pqTableView :
+  public pqView
 {
+  typedef pqView Superclass;
+
   Q_OBJECT
-  typedef pqGenericViewModule Superclass;
 public:
-  static QString eiViewType() { return "ElementInspectorView";}
-  static QString eiViewTypeName() { return "Element Inspector"; }
+  pqTableView(const QString& group, const QString& name, 
+    vtkSMViewProxy* renModule, 
+    pqServer* server, QObject* parent=NULL);
+  ~pqTableView();
 
-public:
- pqElementInspectorViewModule(const QString& group, const QString& name, 
-    vtkSMAbstractViewModuleProxy* viewModule, pqServer* server, 
-    QObject* parent=NULL);
-  virtual ~pqElementInspectorViewModule();
+  static QString tableType() { return "TableView"; }
+  static QString tableTypeName() { return "Table"; }
 
-  /// Return a widget associated with this view.
-  /// This view has no widget.
-  virtual QWidget* getWidget() 
-    { return 0; }
+  QWidget* getWidget();
 
-  /// This view does not support saving to image.
+  /// Save a screenshot for the render module. If width or height ==0,
+  /// the current window size is used.
   virtual bool saveImage(int /*width*/, int /*height*/, 
-    const QString& /*filename*/)
-    { return false; }
+    const QString& /*filename*/) 
+    {
+    // Not supported yet.
+    return false;
+    };
 
-  /// This view does not support image caprture, return 0;
-  virtual vtkImageData* captureImage(int /*magnification*/)
-    { return 0; }
-  
-  /// Currently, this view can show only Extraction filters.
+  /// Save image to vtkImageData. Not supported.
+  vtkImageData* captureImage(int /*magnification*/)
+    { return NULL; }
+
+  /// Forces an immediate render. Overridden since for plots
+  /// rendering actually happens on the GUI side, not merely
+  /// in the ServerManager.
+  virtual void forceRender();
+
   virtual bool canDisplaySource(pqPipelineSource* source) const;
 
+private slots:
+  void visibilityChanged(pqRepresentation* disp);
+
 private:
-  pqElementInspectorViewModule(const pqElementInspectorViewModule&); // Not implemented.
-  void operator=(const pqElementInspectorViewModule&); // Not implemented.
+  pqTableView(const pqTableView&); // Not implemented.
+  void operator=(const pqTableView&); // Not implemented.
+
+  class pqImplementation;
+  pqImplementation* const Implementation;
 };
 
-#endif
 
+#endif
 

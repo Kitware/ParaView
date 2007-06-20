@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 #include "pqComboBoxDomain.h"
-#include "pqDisplay.h"
+#include "pqRepresentation.h"
 #include "pqPropertyLinks.h"
 #include "pqSignalAdaptors.h"
 
@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqBarChartDisplayProxyEditor::pqInternal : public Ui::BarCharDisplayEditor
 {
 public:
-  QPointer<pqDisplay> Display;
+  QPointer<pqRepresentation> Representation;
   QPointer<pqComboBoxDomain> XDomain;
   QPointer<pqComboBoxDomain> YDomain;
   vtkEventQtSlotConnect* VTKConnect;
@@ -60,8 +60,8 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqBarChartDisplayProxyEditor::pqBarChartDisplayProxyEditor(pqDisplay* display, QWidget* _parent)
-  : pqDisplayPanel(display, _parent)
+pqBarChartDisplayProxyEditor::pqBarChartDisplayProxyEditor(pqRepresentation* repr, QWidget* _parent)
+  : pqDisplayPanel(repr, _parent)
 {
   this->Internal = new pqInternal;
   this->Internal->VTKConnect = vtkEventQtSlotConnect::New();
@@ -82,7 +82,7 @@ pqBarChartDisplayProxyEditor::pqBarChartDisplayProxyEditor(pqDisplay* display, Q
 
   this->Internal->UsePoints->setCheckState(Qt::Checked);
 
-  this->setDisplay(display);
+  this->setRepresentation(repr);
 }
 
 //-----------------------------------------------------------------------------
@@ -95,25 +95,25 @@ pqBarChartDisplayProxyEditor::~pqBarChartDisplayProxyEditor()
 }
 
 //-----------------------------------------------------------------------------
-void pqBarChartDisplayProxyEditor::setDisplay(pqDisplay* display) 
+void pqBarChartDisplayProxyEditor::setRepresentation(pqRepresentation* repr) 
 {
-  if (this->Internal->Display == display)
+  if (this->Internal->Representation == repr)
     {
     return;
     }
   this->setEnabled(false);
   this->cleanup();
 
-  this->Internal->Display = display;
-  if (!display)
+  this->Internal->Representation = repr;
+  if (!repr)
     {
-    // Null display, just return.
+    // Null repr, just return.
     return;
     }
-  vtkSMProxy* proxy = display->getProxy();
-  if (!proxy || proxy->GetXMLName() != QString("BarChartDisplay"))
+  vtkSMProxy* proxy = repr->getProxy();
+  if (!proxy || proxy->GetXMLName() != QString("BarChartRepresentation"))
     {
-    qCritical() << "Proxy is not a BarChartDisplay proxy. Cannot "
+    qCritical() << "Proxy is not a BarChartRepresentation proxy. Cannot "
       << " edit it in pqBarChartDisplayProxyEditor.";
     return;
     }
@@ -148,16 +148,16 @@ void pqBarChartDisplayProxyEditor::setDisplay(pqDisplay* display)
     proxy, proxy->GetProperty("XAxisUsePoints"));
 
   this->Internal->VTKConnect->Connect(proxy->GetProperty("XArrayName"),
-    vtkCommand::ModifiedEvent, display, SLOT(updateLookupTable()), 0, 0,
+    vtkCommand::ModifiedEvent, repr, SLOT(updateLookupTable()), 0, 0,
     Qt::QueuedConnection);
   this->Internal->VTKConnect->Connect(proxy->GetProperty("YArrayName"),
-    vtkCommand::ModifiedEvent, display, SLOT(updateLookupTable()), 0, 0,
+    vtkCommand::ModifiedEvent, repr, SLOT(updateLookupTable()), 0, 0,
     Qt::QueuedConnection);
   this->Internal->VTKConnect->Connect(proxy->GetProperty("XAxisUsePoints"),
-    vtkCommand::ModifiedEvent, display, SLOT(updateLookupTable()), 0, 0,
+    vtkCommand::ModifiedEvent, repr, SLOT(updateLookupTable()), 0, 0,
     Qt::QueuedConnection);
   this->Internal->VTKConnect->Connect(proxy->GetProperty("XAxisPointComponent"),
-    vtkCommand::ModifiedEvent, display, SLOT(updateLookupTable()), 0, 0,
+    vtkCommand::ModifiedEvent, repr, SLOT(updateLookupTable()), 0, 0,
     Qt::QueuedConnection);
 
   this->reloadGUI();
@@ -179,11 +179,11 @@ void pqBarChartDisplayProxyEditor::cleanup()
 //-----------------------------------------------------------------------------
 void pqBarChartDisplayProxyEditor::reloadGUI()
 {
-  if (!this->Internal->Display)
+  if (!this->Internal->Representation)
     {
     return;
     }
-  this->Internal->Display->getProxy()->GetProperty("Input")->
+  this->Internal->Representation->getProxy()->GetProperty("Input")->
     UpdateDependentDomains();
 }
 

@@ -48,8 +48,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDir>
 #include <QMainWindow>
 
-#include "pqActiveView.h"
+#include "pqActionGroupInterface.h"
 #include "pqActiveServer.h"
+#include "pqActiveView.h"
 #include "pqAnimationManager.h"
 #include "pqAnimationPanel.h"
 #include "pqApplicationCore.h"
@@ -69,10 +70,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLinksManager.h"
 #include "pqLookmarkBrowser.h"
 #include "pqLookmarkBrowserModel.h"
-#include "pqLookmarkManagerModel.h"
-#include "pqLookmarkModel.h"
 #include "pqLookmarkDefinitionWizard.h"
 #include "pqLookmarkInspector.h"
+#include "pqLookmarkManagerModel.h"
+#include "pqLookmarkModel.h"
 #include "pqLookmarkToolbar.h"
 #include "pqMainWindowCore.h"
 #include "pqMultiViewFrame.h"
@@ -83,42 +84,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOptions.h"
 #include "pqPendingDisplayManager.h"
 #include "pqPipelineBrowser.h"
-#include "pqPipelineDisplay.h"
+#include "pqPipelineRepresentation.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineMenu.h"
 #include "pqPipelineSource.h"
-#include "pqPlotViewModule.h"
+#include "pqPluginDialog.h"
+#include "pqPluginManager.h"
 #include "pqPQLookupTableManager.h"
 #include "pqProcessModuleGUIHelper.h"
 #include "pqProgressManager.h"
 #include "pqProxyTabWidget.h"
 #include "pqReaderFactory.h"
-#include "pqRenderViewModule.h"
-#include "pqViewManager.h"
+#include "pqRenderView.h"
 #include "pqSelectionManager.h"
 #include "pqSelectReaderDialog.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqServerManagerSelectionModel.h"
-#include "pqServerStartup.h"
 #include "pqServerStartupBrowser.h"
+#include "pqServerStartup.h"
 #include "pqServerStartups.h"
 #include "pqSettingsDialog.h"
 #include "pqSettings.h"
 #include "pqSimpleServerStartup.h"
 #include "pqSMAdaptor.h"
-#include "pqSMAdaptor.h"
+#include "pqSplitViewUndoElement.h"
 #include "pqStateLoader.h"
 #include "pqTimerLogDisplay.h"
 #include "pqToolTipTrapper.h"
-#include "pqVCRController.h"
-#include "pqWriterFactory.h"
-#include "pqPluginDialog.h"
-#include "pqPluginManager.h"
-#include "pqActionGroupInterface.h"
 #include "pqUndoStackBuilder.h"
-#include "pqSplitViewUndoElement.h"
+#include "pqVCRController.h"
+#include "pqView.h"
+#include "pqViewManager.h"
+#include "pqWriterFactory.h"
 
 #include <pqFileDialog.h>
 #include <pqObjectNaming.h>
@@ -151,7 +150,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMProxyIterator.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMProxyProperty.h>
-#include <vtkSMRenderModuleProxy.h>
+#include <vtkSMRenderViewProxy.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMStringVectorProperty.h>
 
@@ -558,17 +557,17 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
 
   // Connect the view manager to the pqActiveView.
   QObject::connect(&this->Implementation->MultiViewManager,
-    SIGNAL(activeViewModuleChanged(pqGenericViewModule*)),
-    &pqActiveView::instance(), SLOT(setCurrent(pqGenericViewModule*)));
+    SIGNAL(activeViewChanged(pqView*)),
+    &pqActiveView::instance(), SLOT(setCurrent(pqView*)));
 
   // Listen to the active render module changed signals.
   QObject::connect(
-    &pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
-    this, SLOT(onActiveViewChanged(pqGenericViewModule*)));
+    &pqActiveView::instance(), SIGNAL(changed(pqView*)),
+    this, SLOT(onActiveViewChanged(pqView*)));
 
   QObject::connect(
-    &pqActiveView::instance(), SIGNAL(changed(pqGenericViewModule*)),
-    &this->selectionManager(), SLOT(setActiveView(pqGenericViewModule*)));
+    &pqActiveView::instance(), SIGNAL(changed(pqView*)),
+    &this->selectionManager(), SLOT(setActiveView(pqView*)));
     
   // Listen for compound proxy register events.
   pqServerManagerObserver *observer =
@@ -762,14 +761,11 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
 
   core->setUndoStack(this->Implementation->UndoStack);
 
-
-
   // set up state loader.
   pqStateLoader* loader = pqStateLoader::New();
   loader->SetMainWindowCore(this);
   core->setStateLoader(loader);
   loader->Delete();
-
 
   // Set up a callback to before further intialization once the application
   // event loop starts.
@@ -1063,10 +1059,8 @@ void pqMainWindowCore::setupPipelineBrowser(QDockWidget* dock_widget)
   dock_widget->setWidget(this->Implementation->PipelineBrowser);
 
   QObject::connect(
-    &pqActiveView::instance(),
-    SIGNAL(changed(pqGenericViewModule*)),
-    this->Implementation->PipelineBrowser,
-    SLOT(setViewModule(pqGenericViewModule*)));
+    &pqActiveView::instance(), SIGNAL(changed(pqView*)),
+    this->Implementation->PipelineBrowser, SLOT(setView(pqView*)));
 
   // Connect undo/redo.
   QObject::connect(
@@ -1114,10 +1108,8 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
   pqObjectInspectorDriver *driver = this->getObjectInspectorDriver();
   QObject::connect(driver,     SIGNAL(sourceChanged(pqProxy *)),
                    proxyPanel, SLOT(setProxy(pqProxy *)));
-  QObject::connect(&pqActiveView::instance(),
-                   SIGNAL(changed(pqGenericViewModule*)),
-                   proxyPanel,
-                   SLOT(setView(pqGenericViewModule*)), 
+  QObject::connect(&pqActiveView::instance(), SIGNAL(changed(pqView*)),
+                   proxyPanel, SLOT(setView(pqView*)), 
                    Qt::QueuedConnection);
 
   return proxyPanel;
@@ -1151,10 +1143,8 @@ pqObjectInspectorWidget* pqMainWindowCore::setupObjectInspector(QDockWidget* doc
   pqObjectInspectorDriver *driver = this->getObjectInspectorDriver();
   QObject::connect(driver,           SIGNAL(sourceChanged(pqProxy *)),
                    object_inspector, SLOT(setProxy(pqProxy *)));
-    QObject::connect(&pqActiveView::instance(),
-                   SIGNAL(changed(pqGenericViewModule*)),
-                   object_inspector,
-                   SLOT(setView(pqGenericViewModule*)));
+    QObject::connect(&pqActiveView::instance(), SIGNAL(changed(pqView*)),
+                   object_inspector, SLOT(setView(pqView*)));
 
   return object_inspector;
 }
@@ -1316,9 +1306,9 @@ void pqMainWindowCore::setupVariableToolbar(QToolBar* toolbar)
   toolbar->addWidget(display_color);
 
   QObject::connect(this->getObjectInspectorDriver(),
-                   SIGNAL(displayChanged(pqConsumerDisplay*, pqGenericViewModule*)),
+                   SIGNAL(representationChanged(pqDataRepresentation*, pqView*)),
                    display_color, 
-                   SLOT(setDisplay(pqConsumerDisplay *)));
+                   SLOT(setRepresentation(pqDataRepresentation*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -1331,9 +1321,9 @@ pqObjectInspectorDriver* pqMainWindowCore::getObjectInspectorDriver()
     this->Implementation->ObjectInspectorDriver->setSelectionModel(
         pqApplicationCore::instance()->getSelectionModel());
     this->connect(&pqActiveView::instance(),
-                  SIGNAL(changed(pqGenericViewModule *)),
+                  SIGNAL(changed(pqView*)),
                   this->Implementation->ObjectInspectorDriver,
-                  SLOT(setActiveView(pqGenericViewModule *)));
+                  SLOT(setActiveView(pqView*)));
     }
 
   return this->Implementation->ObjectInspectorDriver;
@@ -1349,14 +1339,15 @@ void pqMainWindowCore::setupRepresentationToolbar(QToolBar* toolbar)
   toolbar->addWidget(display_representation);
 
   QObject::connect(this->getObjectInspectorDriver(),
-                   SIGNAL(displayChanged(pqConsumerDisplay *, pqGenericViewModule *)),
+                   SIGNAL(representationChanged(pqDataRepresentation*, pqView*)),
                    display_representation, 
-                   SLOT(setDisplay(pqConsumerDisplay *)));
+                   SLOT(setRepresentation(pqDataRepresentation*)));
 
   QObject::connect(this,                   SIGNAL(postAccept()),
                    display_representation, SLOT(reloadGUI()));
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::setupCommonFiltersToolbar(QToolBar* toolbar)
 {
   // use QActions from Filters -> Common
@@ -1580,10 +1571,10 @@ void pqMainWindowCore::onLoadLookmark(const QString &name)
     QString("Load Lookmark %1").arg(this->Implementation->CurrentToolbarLookmark));
 
   pqObjectBuilder* builder = core->getObjectBuilder();
-  pqGenericViewModule *view = pqActiveView::instance().current();
+  pqView *view = pqActiveView::instance().current();
   if (!view)
     {
-    view = builder->createView(pqRenderViewModule::renderViewType(), this->getActiveServer());
+    view = builder->createView(pqRenderView::renderViewType(), this->getActiveServer());
     }
 
   this->Implementation->LookmarkManagerModel->loadLookmark(this->getActiveServer(), 
@@ -1629,7 +1620,7 @@ bool pqMainWindowCore::compareView(
   ostream& output,
   const QString& tempDirectory)
 {
-  pqRenderViewModule* renModule = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
+  pqRenderView* renModule = qobject_cast<pqRenderView*>(pqActiveView::instance().current());
 
   if (!renModule)
     {
@@ -1638,7 +1629,7 @@ bool pqMainWindowCore::compareView(
     }
 
   vtkRenderWindow* const render_window = 
-    renModule->getRenderModuleProxy()->GetRenderWindow();
+    renModule->getRenderViewProxy()->GetRenderWindow();
 
   if(!render_window)
     {
@@ -1692,7 +1683,7 @@ bool pqMainWindowCore::makeServerConnectionIfNoneExists()
     }
 
   pqApplicationCore* core = pqApplicationCore::instance();
-  if (core->getServerManagerModel()->getNumberOfServers() != 0)
+  if (core->getServerManagerModel()->getNumberOfItems<pqServer*>() != 0)
     {
     // cannot really happen, however, if no active server, yet
     // server connection exists, we don't try to make a new server connection.
@@ -1724,7 +1715,7 @@ void pqMainWindowCore::makeDefaultConnectionIfNoneExists()
     }
 
   pqApplicationCore* core = pqApplicationCore::instance();
-  if (core->getServerManagerModel()->getNumberOfServers() != 0)
+  if (core->getServerManagerModel()->getNumberOfItems<pqServer*>() != 0)
     {
     // cannot really happen, however, if no active server, yet
     // server connection exists, we don't try to make a new server connection.
@@ -1785,7 +1776,7 @@ void pqMainWindowCore::onFileLoadServerState()
 {
   this->makeServerConnectionIfNoneExists();
   pqApplicationCore* core = pqApplicationCore::instance();
-  int num_servers = core->getServerManagerModel()->getNumberOfServers();
+  int num_servers = core->getServerManagerModel()->getNumberOfItems<pqServer*>();
   if (num_servers > 0)
     {
     pqServer* server = this->getActiveServer();
@@ -1986,7 +1977,7 @@ void pqMainWindowCore::onFileSaveData(const QStringList& files)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileSaveScreenshot()
 {
-  pqGenericViewModule* view = pqActiveView::instance().current();
+  pqView* view = pqActiveView::instance().current();
   if(!view)
     {
     qDebug() << "Cannnot save image. No active render module.";
@@ -2015,7 +2006,7 @@ void pqMainWindowCore::onFileSaveScreenshot()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileSaveScreenshot(const QStringList& files)
 {
-  pqGenericViewModule* view = pqActiveView::instance().current();
+  pqView* view = pqActiveView::instance().current();
   if(!view)
     {
     qDebug() << "Cannnot save image. No active view module.";
@@ -2093,7 +2084,7 @@ void pqMainWindowCore::onSaveGeometry()
     qDebug() << "Cannot save animation geometry since no active scene is present.";
     return;
     }
-  pqGenericViewModule* view = pqActiveView::instance().current();
+  pqView* view = pqActiveView::instance().current();
   if (!view)
     {
     qDebug() << "Cannot save animation geometry since no active view.";
@@ -2125,7 +2116,7 @@ void pqMainWindowCore::onSaveGeometry(const QStringList& files)
     qDebug() << "Cannot save animation since no active scene is present.";
     return;
     }
-  pqGenericViewModule* view = pqActiveView::instance().current();
+  pqView* view = pqActiveView::instance().current();
   if (!view)
     {
     qDebug() << "Cannot save animation geometry since no active view.";
@@ -2141,7 +2132,7 @@ void pqMainWindowCore::onSaveGeometry(const QStringList& files)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onEditCameraUndo()
 {
-  pqRenderViewModule* view = qobject_cast<pqRenderViewModule*>(
+  pqRenderView* view = qobject_cast<pqRenderView*>(
     pqActiveView::instance().current());
   if (!view)
     {
@@ -2155,7 +2146,7 @@ void pqMainWindowCore::onEditCameraUndo()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onEditCameraRedo()
 {
-  pqRenderViewModule* view = qobject_cast<pqRenderViewModule*>(
+  pqRenderView* view = qobject_cast<pqRenderView*>(
     pqActiveView::instance().current());
   if (!view)
     {
@@ -2174,7 +2165,7 @@ void pqMainWindowCore::onServerConnect()
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smmodel = core->getServerManagerModel();
 
-  if (server && smmodel->getNumberOfSources() > 0)
+  if (server && smmodel->findItems<pqPipelineSource*>(server).size() > 0)
     {
     int ret = QMessageBox::warning(this->Implementation->Parent, 
       tr("Disconnect from current server?"),
@@ -2285,35 +2276,30 @@ void pqMainWindowCore::onToolsCreateLookmark(QWidget* widget)
   pqMultiViewFrame* frame= qobject_cast<pqMultiViewFrame*>(widget);
   if(frame)
     {
-      QVTKWidget* w =qobject_cast<QVTKWidget*>(frame->mainWidget());
-      if(w)
-        {
-         pqRenderViewModule* rm = 
-         pqServerManagerModel::instance()->getRenderModule(w);
-
-         if(rm)
-           {
-           // Create a lookmark of the currently active view
-           this->onToolsCreateLookmark(rm);
-           }
-       }
+    pqRenderView* rm = qobject_cast<pqRenderView*>(
+      this->Implementation->MultiViewManager.getView(frame));
+    if (rm)
+      {
+      // Create a lookmark of the currently active view
+      this->onToolsCreateLookmark(
+        this->Implementation->MultiViewManager.getView(frame));
+      }
     }
 
 }
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::onToolsCreateLookmark(pqGenericViewModule *view)
+void pqMainWindowCore::onToolsCreateLookmark(pqView *view)
 {
   // right now we only support Lookmarks of render modules
-  pqRenderViewModule* const render_module = 
-    qobject_cast<pqRenderViewModule*>(view);
-  if(!render_module)
+  pqRenderView* const renderView= qobject_cast<pqRenderView*>(view);
+  if(!renderView)
     {
     qCritical() << "Cannnot create Lookmark. No active render module.";
     return;
     }
 
   pqLookmarkDefinitionWizard wizard(this->Implementation->LookmarkManagerModel, 
-                                    render_module, 
+                                    renderView, 
                                     this->Implementation->Parent);
   if(wizard.exec() == QDialog::Accepted)
     {
@@ -2371,7 +2357,7 @@ void pqMainWindowCore::onToolsRecordTest(const QStringList &fileNames)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsRecordTestScreenshot()
 {
-  if(!qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current()))
+  if(!qobject_cast<pqRenderView*>(pqActiveView::instance().current()))
     {
     qDebug() << "Cannnot save image. No active render module.";
     return;
@@ -2399,7 +2385,7 @@ void pqMainWindowCore::onToolsRecordTestScreenshot()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsRecordTestScreenshot(const QStringList &fileNames)
 {
-  pqRenderViewModule* const render_module = qobject_cast<pqRenderViewModule*>(
+  pqRenderView* const render_module = qobject_cast<pqRenderView*>(
     pqActiveView::instance().current());
   if(!render_module)
     {
@@ -2546,7 +2532,7 @@ void pqMainWindowCore::onHelpEnableTooltips(bool enabled)
 void pqMainWindowCore::onEditSettings()
 {
   pqSettingsDialog dialog(this->Implementation->Parent);
-  dialog.setRenderModule(qobject_cast<pqRenderViewModule*>(
+  dialog.setRenderView(qobject_cast<pqRenderView*>(
       pqActiveView::instance().current()));
   QObject::connect(&dialog, SIGNAL(beginUndo(const QString&)),
     this->Implementation->UndoStack, SLOT(beginUndoSet(const QString&)));
@@ -2767,9 +2753,9 @@ void pqMainWindowCore::onSelectionChanged()
   pqServer *server = this->getActiveServer();
 
   pqApplicationCore *core = pqApplicationCore::instance();
-  int numServers = core->getServerManagerModel()->getNumberOfServers();
-  pqGenericViewModule* view = pqActiveView::instance().current();
-  pqRenderViewModule *renderModule = qobject_cast<pqRenderViewModule *>(view);
+  int numServers = core->getServerManagerModel()->getNumberOfItems<pqServer*>();
+  pqView* view = pqActiveView::instance().current();
+  pqRenderView* renderView = qobject_cast<pqRenderView*>(view);
   bool pendingDisplays = 
     this->Implementation->PendingDisplayManager.getNumberOfPendingDisplays() > 0;
 
@@ -2789,7 +2775,7 @@ void pqMainWindowCore::onSelectionChanged()
   this->updatePendingActions(server, source, numServers, pendingDisplays);
 
   // Update the reset center action.
-  emit this->enableResetCenter(source != 0 && renderModule != 0);
+  emit this->enableResetCenter(source != 0 && renderView != 0);
 
   // Update the save screenshot action.
   emit this->enableFileSaveScreenshot(server != 0 && view != 0);
@@ -2811,17 +2797,17 @@ void pqMainWindowCore::onPendingDisplayChanged(bool pendingDisplays)
   pqServer *server = this->getActiveServer(); 
 
   pqApplicationCore *core = pqApplicationCore::instance();
-  int numServers = core->getServerManagerModel()->getNumberOfServers();
+  int numServers = core->getServerManagerModel()->getNumberOfItems<pqServer*>();
   this->updatePendingActions(server, source, numServers, pendingDisplays);
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::onActiveViewChanged(pqGenericViewModule *view)
+void pqMainWindowCore::onActiveViewChanged(pqView* view)
 {
-  pqRenderViewModule *renderModule = qobject_cast<pqRenderViewModule *>(view);
+  pqRenderView* renderView = qobject_cast<pqRenderView*>(view);
 
   // Update the selection toolbar.
-  emit this->enableSelectionToolbar(renderModule != 0);
+  emit this->enableSelectionToolbar(renderView != 0);
 
   // Get the active source and server.
   pqServerManagerModelItem *item = this->getActiveObject();
@@ -2829,10 +2815,10 @@ void pqMainWindowCore::onActiveViewChanged(pqGenericViewModule *view)
   pqServer *server = this->getActiveServer();
 
   // Update the reset center action.
-  emit this->enableResetCenter(source != 0 && renderModule != 0);
+  emit this->enableResetCenter(source != 0 && renderView != 0);
 
   // Update the show center axis action.
-  emit this->enableShowCenterAxis(renderModule != 0);
+  emit this->enableShowCenterAxis(renderView != 0);
 
   // Update the save screenshot action.
   emit this->enableFileSaveScreenshot(server != 0 && view != 0);
@@ -2842,15 +2828,15 @@ void pqMainWindowCore::onActiveViewChanged(pqGenericViewModule *view)
     {
     pqAnimationScene *scene =
         this->Implementation->AnimationManager->getActiveScene();
-    emit this->enableFileSaveGeometry(scene != 0 && renderModule != 0);
+    emit this->enableFileSaveGeometry(scene != 0 && renderView != 0);
     }
 
   // Update the view undo/redo state.
-  this->updateViewUndoRedo(renderModule);
-  if(renderModule)
+  this->updateViewUndoRedo(renderView);
+  if(renderView)
     {
     // Make sure the render module undo stack is connected.
-    this->connect(renderModule, SIGNAL(canUndoChanged(bool)),
+    this->connect(renderView, SIGNAL(canUndoChanged(bool)),
         this, SLOT(onActiveViewUndoChanged()));
     }
 }
@@ -2858,21 +2844,21 @@ void pqMainWindowCore::onActiveViewChanged(pqGenericViewModule *view)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onActiveViewUndoChanged()
 {
-  pqRenderViewModule *renderModule = qobject_cast<pqRenderViewModule *>(
+  pqRenderView* renderView = qobject_cast<pqRenderView*>(
       pqActiveView::instance().current());
-  if(renderModule && renderModule == this->sender())
+  if(renderView && renderView == this->sender())
     {
-    this->updateViewUndoRedo(renderModule);
+    this->updateViewUndoRedo(renderView);
     }
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onActiveSceneChanged(pqAnimationScene *scene)
 {
-  pqRenderViewModule *renderModule = qobject_cast<pqRenderViewModule *>(
+  pqRenderView* renderView = qobject_cast<pqRenderView*>(
       pqActiveView::instance().current());
   emit this->enableFileSaveAnimation(scene != 0);
-  emit this->enableFileSaveGeometry(scene != 0 && renderModule != 0);
+  emit this->enableFileSaveGeometry(scene != 0 && renderView != 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -2919,21 +2905,21 @@ void pqMainWindowCore::updatePendingActions(pqServer *server,
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::updateViewUndoRedo(pqRenderViewModule *renderModule)
+void pqMainWindowCore::updateViewUndoRedo(pqRenderView* renderView)
 {
   bool can_undo_camera = false;
   bool can_redo_camera = false;
   QString undo_camera_label;
   QString redo_camera_label;
 
-  if(renderModule)
+  if(renderView)
     {
-    if (renderModule->canUndo())
+    if (renderView->canUndo())
       {
       can_undo_camera = true;
       undo_camera_label = "Interaction";
       }
-    if (renderModule->canRedo())
+    if (renderView->canRedo())
       {
       can_redo_camera = true;
       redo_camera_label = "Interaction";
@@ -2952,10 +2938,10 @@ void pqMainWindowCore::onServerCreation(pqServer* server)
   pqApplicationCore* core = pqApplicationCore::instance();
   this->Implementation->ActiveServer.setCurrent(server);
 
-  // Create a render module.
-  core->getObjectBuilder()->createView(
-    pqRenderViewModule::renderViewType(), server);
-
+  // When a server is created, we create a new render view for it.
+  pqView* view = core->getObjectBuilder()->createView(
+    pqRenderView::renderViewType(), server);
+  view->render();
 }
 
 //-----------------------------------------------------------------------------
@@ -2977,7 +2963,7 @@ void pqMainWindowCore::onRemovingServer(pqServer *server)
   pqServerManagerSelectionModel *selection = core->getSelectionModel();
   toDeselect.append(server);
   QList<pqPipelineSource*> sources =
-      core->getServerManagerModel()->getSources(server);
+      core->getServerManagerModel()->findItems<pqPipelineSource*>(server);
   QList<pqPipelineSource*>::Iterator iter = sources.begin();
   for( ; iter != sources.end(); ++iter)
     {
@@ -3112,7 +3098,7 @@ void pqMainWindowCore::onRemovingSource(pqPipelineSource *source)
       }
     }
 
-  QList<pqGenericViewModule*> viewModules = source->getViewModules();
+  QList<pqView*> views = source->getViews();
 
   pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(source);
   if (filter)
@@ -3120,9 +3106,9 @@ void pqMainWindowCore::onRemovingSource(pqPipelineSource *source)
     // Make all inputs visible in views that the removed source
     // is currently visible.
     QList<pqPipelineSource*> inputs = filter->getInputs();
-    foreach(pqGenericViewModule* view, viewModules)
+    foreach(pqView* view, views)
       {
-      pqConsumerDisplay* src_disp = source->getDisplay(view);
+      pqDataRepresentation* src_disp = source->getRepresentation(view);
       if (!src_disp || !src_disp->isVisible())
         {
         continue;
@@ -3132,7 +3118,7 @@ void pqMainWindowCore::onRemovingSource(pqPipelineSource *source)
       for(int cc=0; cc < inputs.size(); ++cc)
         {
         pqPipelineSource* input = inputs[cc];
-        pqConsumerDisplay* input_disp = input->getDisplay(view);
+        pqDataRepresentation* input_disp = input->getRepresentation(view);
         if (input_disp && !input_disp->isVisible())
           {
           input_disp->setVisible(true);
@@ -3141,7 +3127,7 @@ void pqMainWindowCore::onRemovingSource(pqPipelineSource *source)
       }
     }
 
-  foreach (pqGenericViewModule* view, viewModules)
+  foreach (pqView* view, views)
     {
     // this triggers an eventually render call.
     view->render();
@@ -3356,26 +3342,28 @@ pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
   this->Implementation->UndoStack->beginUndoSet(
     QString("Create '%1'").arg(xmlname));
   pqPipelineSource* filter = builder->createFilter("filters", xmlname, inputs);
-
-  vtkSMProxy* proxy = filter->getProxy();
-  // If the GUI created a "ExtractCellSelection"
-  // filter, we need to copy the active selection over to the filter.
-  if (proxy->GetXMLName() == QString("ExtractCellSelection") ||
-      proxy->GetXMLName() == QString("ExtractCellsOverTime"))
+  if (filter)
     {
-    // If a selection exists on the input to this filter,
-    // we initialize the filter with that selection.
-    if (inputs.contains(
-        this->Implementation->SelectionManager.getSelectedSource()))
+    vtkSMProxy* proxy = filter->getProxy();
+    // If the GUI created a "ExtractCellSelection"
+    // filter, we need to copy the active selection over to the filter.
+    if (proxy->GetXMLName() == QString("ExtractCellSelection") ||
+      proxy->GetXMLName() == QString("ExtractCellsOverTime"))
       {
-      pqSMAdaptor::setMultipleElementProperty(
-        proxy->GetProperty("Indices"),
-        this->Implementation->SelectionManager.
-        getSelectedIndicesWithProcessIDs());
-      pqSMAdaptor::setMultipleElementProperty(
-        proxy->GetProperty("GlobalIDs"),
-        this->Implementation->SelectionManager.getSelectedGlobalIDs());
-      proxy->UpdateVTKObjects();
+      // If a selection exists on the input to this filter,
+      // we initialize the filter with that selection.
+      if (inputs.contains(
+          this->Implementation->SelectionManager.getSelectedSource()))
+        {
+        pqSMAdaptor::setMultipleElementProperty(
+          proxy->GetProperty("Indices"),
+          this->Implementation->SelectionManager.
+          getSelectedIndicesWithProcessIDs());
+        pqSMAdaptor::setMultipleElementProperty(
+          proxy->GetProperty("GlobalIDs"),
+          this->Implementation->SelectionManager.getSelectedGlobalIDs());
+        proxy->UpdateVTKObjects();
+        }
       }
     }
   this->Implementation->UndoStack->endUndoSet();
@@ -3462,14 +3450,14 @@ void pqMainWindowCore::disableAutomaticDisplays()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::createPendingDisplays()
 {
-  pqGenericViewModule* view = pqActiveView::instance().current();
+  pqView* view = pqActiveView::instance().current();
   this->Implementation->PendingDisplayManager.createPendingDisplays(view);
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::resetCamera()
 {
-  pqRenderViewModule* ren = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
+  pqRenderView* ren = qobject_cast<pqRenderView*>(pqActiveView::instance().current());
   if (ren)
     {
     ren->resetCamera();
@@ -3482,10 +3470,10 @@ void pqMainWindowCore::resetViewDirection(
     double look_x, double look_y, double look_z,
     double up_x, double up_y, double up_z)
 {
-  pqRenderViewModule* ren = qobject_cast<pqRenderViewModule*>(pqActiveView::instance().current());
+  pqRenderView* ren = qobject_cast<pqRenderView*>(pqActiveView::instance().current());
   if (ren)
     {
-    vtkSMRenderModuleProxy* proxy = ren->getRenderModuleProxy();
+    vtkSMRenderViewProxy* proxy = ren->getRenderViewProxy();
     proxy->SynchronizeCameraProperties();
  
     pqSMAdaptor::setMultipleElementProperty(
@@ -3567,7 +3555,7 @@ void pqMainWindowCore::setMaxRenderWindowSize(const QSize& size)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::resetCenterOfRotationToCenterOfCurrentData()
 {
-  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(
+  pqRenderView* rm = qobject_cast<pqRenderView*>(
     pqActiveView::instance().current());
   if (!rm)
     {
@@ -3580,15 +3568,17 @@ void pqMainWindowCore::resetCenterOfRotationToCenterOfCurrentData()
     qDebug() << "No active source. Cannot reset center of rotation.";
     return;
     }
-  pqPipelineDisplay* display = qobject_cast<pqPipelineDisplay*>(
-    source->getDisplay(rm));
-  if (!display)
+
+  pqPipelineRepresentation* repr = qobject_cast<pqPipelineRepresentation*>(
+    source->getRepresentation(rm));
+  if (!repr)
     {
     //qDebug() << "Active source not shown in active view. Cannot reset center.";
     return;
     }
+
   double bounds[6];
-  if (display->getDataBounds(bounds))
+  if (repr->getDataBounds(bounds))
     {
     double center[3];
     center[0] = (bounds[1]+bounds[0])/2.0;
@@ -3602,7 +3592,7 @@ void pqMainWindowCore::resetCenterOfRotationToCenterOfCurrentData()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::setCenterAxesVisibility(bool visible)
 {
-  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(
+  pqRenderView* rm = qobject_cast<pqRenderView*>(
     pqActiveView::instance().current());
   if (!rm)
     {

@@ -43,9 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView widget includes
 
 // ParaView core includes
-#include "pqConsumerDisplay.h"
-#include "pqGenericViewModule.h"
+#include "pqDataRepresentation.h"
 #include "pqPipelineSource.h"
+#include "pqView.h"
 
 // ParaView components includes
 #include "pqObjectInspectorWidget.h"
@@ -93,11 +93,11 @@ void pqProxyTabWidget::setProxy(pqProxy* proxy)
   if(this->Proxy)
     {
     QObject::disconnect(this->Proxy, 
-      SIGNAL(displayAdded(pqPipelineSource*, pqConsumerDisplay*)),
+      SIGNAL(representationAdded(pqPipelineSource*, pqDataRepresentation*)),
       this,
       SLOT(updateDisplayTab()));
     QObject::disconnect(this->Proxy, 
-      SIGNAL(displayRemoved(pqPipelineSource*, pqConsumerDisplay*)),
+      SIGNAL(representationRemoved(pqPipelineSource*, pqDataRepresentation*)),
       this,
       SLOT(updateDisplayTab()));
     }
@@ -107,12 +107,12 @@ void pqProxyTabWidget::setProxy(pqProxy* proxy)
   if(this->Proxy)
     {
     QObject::connect(this->Proxy, 
-      SIGNAL(displayAdded(pqPipelineSource*, pqConsumerDisplay*)),
+      SIGNAL(representationAdded(pqPipelineSource*, pqDataRepresentation*)),
       this,
       SLOT(updateDisplayTab()),
       Qt::QueuedConnection);
     QObject::connect(this->Proxy, 
-      SIGNAL(displayRemoved(pqPipelineSource*, pqConsumerDisplay*)),
+      SIGNAL(representationRemoved(pqPipelineSource*, pqDataRepresentation*)),
       this,
       SLOT(updateDisplayTab()));
     }
@@ -123,25 +123,26 @@ void pqProxyTabWidget::setProxy(pqProxy* proxy)
   this->updateDisplayTab();
 }
 
-void pqProxyTabWidget::setView(pqGenericViewModule* view) 
+void pqProxyTabWidget::setView(pqView* view) 
 {
   this->Inspector->setView(view);
-  this->ViewModule = view;
+  this->View = view;
   
   this->updateDisplayTab();
 }
 
 void pqProxyTabWidget::updateDisplayTab()
 {
-  pqDisplay* display = NULL;
+  pqRepresentation* display = NULL;
   pqPipelineSource* source = qobject_cast<pqPipelineSource*>(this->Proxy);
-  if(source && this->ViewModule)
+  if(source && this->View)
     {
-    display =  source->getDisplay(this->ViewModule);
+    display =  source->getRepresentation(this->View);
     }
+
   this->Display->setSource(source);
-  this->Display->setView(this->ViewModule);
-  this->Display->setDisplay(display);
+  this->Display->setView(this->View);
+  this->Display->setRepresentation(display);
 }
 
 //-----------------------------------------------------------------------------

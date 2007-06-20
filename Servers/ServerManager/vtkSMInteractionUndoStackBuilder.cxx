@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkSMPropertyModificationUndoElement.h"
-#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMUndoStack.h"
 #include "vtkUndoSet.h"
 
@@ -53,13 +53,13 @@ protected:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMInteractionUndoStackBuilder);
-vtkCxxRevisionMacro(vtkSMInteractionUndoStackBuilder, "1.3");
+vtkCxxRevisionMacro(vtkSMInteractionUndoStackBuilder, "1.4");
 vtkCxxSetObjectMacro(vtkSMInteractionUndoStackBuilder, UndoStack, vtkSMUndoStack);
 
 //-----------------------------------------------------------------------------
 vtkSMInteractionUndoStackBuilder::vtkSMInteractionUndoStackBuilder()
 {
-  this->RenderModule = 0;
+  this->RenderView = 0;
   this->UndoStack = 0;
 
   vtkSMInteractionUndoStackBuilderObserver * observer =
@@ -77,26 +77,26 @@ vtkSMInteractionUndoStackBuilder::~vtkSMInteractionUndoStackBuilder()
   this->Observer->SetTarget(0);
   this->Observer->Delete();
 
-  this->SetRenderModule(0);
+  this->SetRenderView(0);
   this->SetUndoStack(0);
   this->UndoSet->Delete();
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMInteractionUndoStackBuilder::SetRenderModule(
-  vtkSMRenderModuleProxy* renModule)
+void vtkSMInteractionUndoStackBuilder::SetRenderView(
+  vtkSMRenderViewProxy* renView)
 {
-  if (this->RenderModule)
+  if (this->RenderView)
     {
     // Remove old interactors.
-    vtkRenderWindowInteractor* interactor = this->RenderModule->GetInteractor();
+    vtkRenderWindowInteractor* interactor = this->RenderView->GetInteractor();
     interactor->RemoveObserver(this->Observer);
     }
 
-  vtkSetObjectBodyMacro(RenderModule, vtkSMRenderModuleProxy, renModule);
-  if (this->RenderModule)
+  vtkSetObjectBodyMacro(RenderView, vtkSMRenderViewProxy, renView);
+  if (this->RenderView)
     {
-    vtkRenderWindowInteractor* interactor = this->RenderModule->GetInteractor();
+    vtkRenderWindowInteractor* interactor = this->RenderView->GetInteractor();
     interactor->AddObserver(vtkCommand::StartInteractionEvent,
       this->Observer);
     interactor->AddObserver(vtkCommand::EndInteractionEvent,
@@ -124,7 +124,7 @@ void vtkSMInteractionUndoStackBuilder::ExecuteEvent(
 void vtkSMInteractionUndoStackBuilder::StartInteraction()
 {
   // Interaction began -- get camera properties and save them.
-  this->RenderModule->SynchronizeCameraProperties();
+  this->RenderView->SynchronizeCameraProperties();
   this->UndoSet->RemoveAllElements();
 
   this->PropertyModified("CameraPosition");
@@ -145,7 +145,7 @@ void vtkSMInteractionUndoStackBuilder::EndInteraction()
     return;
     }
 
-  this->RenderModule->SynchronizeCameraProperties();
+  this->RenderView->SynchronizeCameraProperties();
   this->PropertyModified("CameraPosition");
   this->PropertyModified("CameraFocalPoint");
   this->PropertyModified("CameraViewUp");
@@ -154,7 +154,7 @@ void vtkSMInteractionUndoStackBuilder::EndInteraction()
 
   if (this->UndoStack)
     {
-    this->UndoStack->Push(this->RenderModule->GetConnectionID(),
+    this->UndoStack->Push(this->RenderView->GetConnectionID(),
       "Interaction", this->UndoSet);
     }
   else
@@ -169,8 +169,8 @@ void vtkSMInteractionUndoStackBuilder::PropertyModified(const char* pname)
 {
   vtkSMPropertyModificationUndoElement* elem =
     vtkSMPropertyModificationUndoElement::New();
-  elem->SetConnectionID(this->RenderModule->GetConnectionID());
-  elem->ModifiedProperty(this->RenderModule, pname);
+  elem->SetConnectionID(this->RenderView->GetConnectionID());
+  elem->ModifiedProperty(this->RenderView, pname);
   this->UndoSet->AddElement(elem);
   elem->Delete();
 }
@@ -185,6 +185,6 @@ void vtkSMInteractionUndoStackBuilder::Clear()
 void vtkSMInteractionUndoStackBuilder::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "RenderModule: " << this->RenderModule << endl;
+  os << indent << "RenderView: " << this->RenderView << endl;
   os << indent << "UndoStack: " << this->UndoStack << endl;
 }

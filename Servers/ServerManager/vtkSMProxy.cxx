@@ -37,7 +37,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.95");
+vtkCxxRevisionMacro(vtkSMProxy, "1.96");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -1074,6 +1074,25 @@ void vtkSMProxy::InitializeAndCopyFromProxy(vtkSMProxy* fromP)
 
 
 //---------------------------------------------------------------------------
+void vtkSMProxy::InitializeAndCopyFromID(vtkClientServerID id)
+{
+  if (this->ObjectsCreated)
+    {
+    return;
+    }
+
+  vtkClientServerStream stream;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerID newid = pm->GetUniqueID();
+  stream  << vtkClientServerStream::Assign
+          << newid
+          << id
+          << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
+  this->InitializeWithID(newid);
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
@@ -1848,7 +1867,7 @@ int vtkSMProxy::LoadState(vtkPVXMLElement* proxyElement,
       vtkSMProperty* property = this->GetProperty(prop_name);
       if (!property)
         {
-        vtkErrorMacro("Property " << prop_name<< " does not exist.");
+        vtkDebugMacro("Property " << prop_name<< " does not exist.");
         continue;
         }
       if (!property->LoadState(currentElement, loader))

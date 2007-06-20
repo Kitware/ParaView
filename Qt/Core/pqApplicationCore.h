@@ -122,7 +122,6 @@ public:
   /// etc. Returns the ServerManagerObserver used by the application.
   pqServerManagerObserver* getServerManagerObserver();
 
-
   /// ServerManagerModel is the representation of the ServerManager
   /// using pqServerManagerModelItem subclasses. It makes it possible to
   /// explore the ServerManager with ease by separating proxies based 
@@ -213,10 +212,6 @@ signals:
 
   /// Emitted after the core has finished creating a new server connection.
   void finishedAddingServer(pqServer *server);
-
-protected:
-  /// create signal/slot connections between pdata and smModel.
-  void connect(pqServerManagerObserver* pdata, pqServerManagerModel* smModel);
 
 protected:
 

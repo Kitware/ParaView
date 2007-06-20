@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTableViewModule.cxx
+   Module:    pqTableView.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,9 +29,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqTableViewModule.h"
+#include "pqTableView.h"
 
-#include "pqDisplay.h"
+#include "pqRepresentation.h"
 #include "pqHistogramTableModel.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
 #include <vtkRectilinearGrid.h>
-#include <vtkSMGenericViewDisplayProxy.h>
+#include <vtkSMClientDeliveryRepresentationProxy.h>
 #include <vtkSMProxy.h>
 
 #include <QtDebug>
@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTableView>
 
 //-----------------------------------------------------------------------------
-class pqTableViewModule::pqImplementation
+class pqTableView::pqImplementation
 {
 public:
   pqImplementation() :
@@ -62,48 +62,48 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqTableViewModule::pqTableViewModule(
+pqTableView::pqTableView(
     const QString& group,
     const QString& name, 
-    vtkSMAbstractViewModuleProxy* renModule,
+    vtkSMViewProxy* renModule,
     pqServer* server,
     QObject* _parent) :
-  pqGenericViewModule(
+  pqView(
     tableType(), group, name, renModule, server, _parent),
   Implementation(new pqImplementation())
 {
 }
 
 //-----------------------------------------------------------------------------
-pqTableViewModule::~pqTableViewModule()
+pqTableView::~pqTableView()
 {
   delete this->Implementation;
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqTableViewModule::getWidget()
+QWidget* pqTableView::getWidget()
 {
   return this->Implementation->Table;
 }
 
 //-----------------------------------------------------------------------------
-void pqTableViewModule::visibilityChanged(pqDisplay* /*disp*/)
+void pqTableView::visibilityChanged(pqRepresentation* /*disp*/)
 {
 }
 
 //-----------------------------------------------------------------------------
-void pqTableViewModule::forceRender()
+void pqTableView::forceRender()
 {
   this->Superclass::forceRender();
 
-  const QList<pqDisplay*> pqdisplays = this->getDisplays();
-  foreach(pqDisplay* pqdisplay, pqdisplays)
+  const QList<pqRepresentation*> pqdisplays = this->getRepresentations();
+  foreach(pqRepresentation* pqRepresentation, pqdisplays)
     {
-    if(!pqdisplay->isVisible())
+    if(!pqRepresentation->isVisible())
       continue;
       
-    vtkSMGenericViewDisplayProxy* const display = 
-      vtkSMGenericViewDisplayProxy::SafeDownCast(pqdisplay->getProxy());
+    vtkSMClientDeliveryRepresentationProxy* const display = 
+      vtkSMClientDeliveryRepresentationProxy::SafeDownCast(pqRepresentation->getProxy());
       
     vtkDataObject* const data = display->GetOutput();
 
@@ -131,7 +131,7 @@ void pqTableViewModule::forceRender()
 }
   
 
-bool pqTableViewModule::canDisplaySource(pqPipelineSource* source) const
+bool pqTableView::canDisplaySource(pqPipelineSource* source) const
 {
   if(!source ||
      this->getServer()->GetConnectionID() !=

@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include "pqComponentsExport.h"
 class pqProxy;
-class pqRenderViewModule;
+class pqView;
 class pqPropertyManager;
 class vtkSMProxy;
 
@@ -57,8 +57,8 @@ public:
   /// get the proxy for which properties are displayed
   vtkSMProxy* proxy() const;
   
-  /// get the render module that this object panel works with
-  pqRenderViewModule* renderModule() const;
+  /// get the view that this object panel works with.
+  pqView* view() const;
   
   /// size hint for this widget
   QSize sizeHint() const;
@@ -85,8 +85,8 @@ public slots:
   /// nothing.
   virtual void deselect();
 
-  /// Set the render module that this panel works with
-  virtual void setRenderModule(pqRenderViewModule*);
+  /// Set the view that this panel works with
+  virtual void setView(pqView*);
   
   /// Fires modified
   virtual void setModified();
@@ -104,7 +104,7 @@ signals:
   void onreset();
   void onselect();
   void ondeselect();
-  void renderModuleChanged(pqRenderViewModule*);
+  void viewChanged(pqView*);
 
 protected:
   /// This method gets called to referesh all domains 

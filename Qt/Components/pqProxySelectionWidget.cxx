@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqComboBoxDomain.h"
 #include "pqSMAdaptor.h"
-#include "pqRenderViewModule.h"
+#include "pqView.h"
 #include "pq3DWidget.h"
 #include "pqNamedWidgets.h"
 #include "pqCollapsedGroup.h"
@@ -69,7 +69,7 @@ public:
   QString Property;
   pqComboBoxDomain* DomainObserver;
   pqProxyPanel* Widget;
-  QPointer<pqRenderViewModule> RenderModule;
+  QPointer<pqView> View;
   bool Selected;
 };
 
@@ -241,10 +241,10 @@ void pqProxySelectionWidget::initialize3DWidget()
                    this->Internal->Widget, SLOT(reset()));
   QObject::connect(this->Internal->Widget, SIGNAL(modified()), 
                    panel, SLOT(setModified()));
-  QObject::connect(panel, SIGNAL(renderModuleChanged(pqRenderViewModule*)),
-         this->Internal->Widget, SLOT(setRenderModule(pqRenderViewModule*)));
+  QObject::connect(panel, SIGNAL(viewChanged(pqView*)),
+                   this->Internal->Widget, SLOT(setView(pqView*)));
   
-  this->Internal->Widget->setRenderModule(this->Internal->RenderModule);
+  this->Internal->Widget->setView(this->Internal->View);
   if (this->Internal->Selected)
     {
     this->Internal->Widget->select();
@@ -292,12 +292,12 @@ void pqProxySelectionWidget::reset()
     }
 }
 
-void pqProxySelectionWidget::setRenderModule(pqRenderViewModule* rm)
+void pqProxySelectionWidget::setView(pqView* rm)
 {
-  this->Internal->RenderModule = rm;
+  this->Internal->View = rm;
   if(this->Internal->Widget)
     {
-    this->Internal->Widget->setRenderModule(rm);
+    this->Internal->Widget->setView(rm);
     }
 }
 

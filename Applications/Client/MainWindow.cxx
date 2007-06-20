@@ -49,10 +49,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqPipelineBrowserContextMenu.h>
 #include <pqPipelineBrowser.h>
 #include <pqPipelineMenu.h>
-#include <pqPlotViewModule.h>
 #include <pqProxyTabWidget.h>
 #include <pqRecentFilesMenu.h>
-#include <pqRenderViewModule.h>
+#include <pqRenderView.h>
 #include <pqScalarBarVisibilityAdaptor.h>
 #include <pqSelectionManager.h>
 #include <pqSetName.h>
@@ -654,8 +653,8 @@ MainWindow::MainWindow() :
   pqScalarBarVisibilityAdaptor* sbva = new pqScalarBarVisibilityAdaptor(
       this->Implementation->UI.actionScalarBarVisibility);
   QObject::connect(this->Implementation->Core.getObjectInspectorDriver(),
-    SIGNAL(displayChanged(pqConsumerDisplay *, pqGenericViewModule *)),
-    sbva, SLOT(setActiveDisplay(pqConsumerDisplay *, pqGenericViewModule *)));
+    SIGNAL(representationChanged(pqDataRepresentation*, pqView*)),
+    sbva, SLOT(setActiveRepresentation(pqDataRepresentation*)));
 
   // Set up Center Axes toolbar.
   QObject::connect(
@@ -695,7 +694,7 @@ void MainWindow::onShowCenterAxisChanged(bool enabled)
 {
   this->Implementation->UI.actionShowCenterAxes->setEnabled(enabled);
   this->Implementation->UI.actionShowCenterAxes->blockSignals(true);
-  pqRenderViewModule* renView = qobject_cast<pqRenderViewModule*>(
+  pqRenderView* renView = qobject_cast<pqRenderView*>(
     pqActiveView::instance().current());
   this->Implementation->UI.actionShowCenterAxes->setChecked(
     renView ? renView->getCenterAxesVisibility() : false);
@@ -1002,8 +1001,8 @@ void MainWindow::onPlaying(bool playing)
 //-----------------------------------------------------------------------------
 void MainWindow::onAddCameraLink()
 {
-  pqGenericViewModule* vm = pqActiveView::instance().current();
-  pqRenderViewModule* rm = qobject_cast<pqRenderViewModule*>(vm);
+  pqView* vm = pqActiveView::instance().current();
+  pqRenderView* rm = qobject_cast<pqRenderView*>(vm);
   if(rm)
     {
     rm->linkToOtherView();

@@ -34,11 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMProxyManager.h"
 
-#include "pqBarChartDisplay.h"
-#include "pqElementInspectorViewModule.h"
-#include "pqLineChartDisplay.h"
-#include "pqPlotViewModule.h"
-#include "pqTableViewModule.h"
+#include "pqBarChartRepresentation.h"
+#include "pqElementInspectorView.h"
+#include "pqLineChartRepresentation.h"
+#include "pqPlotView.h"
+#include "pqTableView.h"
+#include "pqTextRepresentation.h"
 
 pqStandardViewModules::pqStandardViewModules(QObject* o)
   : QObject(o)
@@ -52,35 +53,38 @@ pqStandardViewModules::~pqStandardViewModules()
 QStringList pqStandardViewModules::viewTypes() const
 {
   return QStringList() << 
-    pqPlotViewModule::barChartType() << 
-    pqPlotViewModule::XYPlotType() << 
-    pqTableViewModule::tableType() <<
-    pqElementInspectorViewModule::eiViewType();
+    pqPlotView::barChartType() << 
+    pqPlotView::XYPlotType() << 
+    pqTableView::tableType() <<
+    pqElementInspectorView::eiViewType();
 }
 
 QStringList pqStandardViewModules::displayTypes() const
 {
-  return QStringList() << "BarChartDisplay"
-    << "XYPlotDisplay2";
+  return QStringList() 
+    << "BarChartRepresentation"
+    << "XYPlotRepresentation"
+    << "ElementInspectorRepresentation"
+    << "TextSourceRepresentation";
 }
 
 QString pqStandardViewModules::viewTypeName(const QString& type) const
 {
-  if(type == pqPlotViewModule::barChartType())
+  if(type == pqPlotView::barChartType())
     {
-    return pqPlotViewModule::barChartTypeName();
+    return pqPlotView::barChartTypeName();
     }
-  else if(type == pqPlotViewModule::XYPlotType())
+  else if(type == pqPlotView::XYPlotType())
     {
-    return pqPlotViewModule::XYPlotTypeName();
+    return pqPlotView::XYPlotTypeName();
     }
-  else if(type == pqTableViewModule::tableType())
+  else if(type == pqTableView::tableType())
     {
-    return pqTableViewModule::tableTypeName();
+    return pqTableView::tableTypeName();
     }
-  else if (type == pqElementInspectorViewModule::eiViewType())
+  else if (type == pqElementInspectorView::eiViewType())
     {
-    return pqElementInspectorViewModule::eiViewTypeName();
+    return pqElementInspectorView::eiViewTypeName();
     }
 
   return QString();
@@ -94,71 +98,78 @@ bool pqStandardViewModules::canCreateView(const QString& viewtype) const
 vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype)
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  if(viewtype == pqPlotViewModule::barChartType())
+  if(viewtype == pqPlotView::barChartType())
     {
-    return pxm->NewProxy("plotmodules", "BarChartViewModule");
+    return pxm->NewProxy("newviews", "BarChartView");
     }
-  else if(viewtype == pqPlotViewModule::XYPlotType())
+  else if(viewtype == pqPlotView::XYPlotType())
     {
-    return pxm->NewProxy("plotmodules", "XYPlotViewModule");
+    return pxm->NewProxy("newviews", "XYPlotView");
     }
-  else if(viewtype == pqTableViewModule::tableType())
+  else if(viewtype == pqTableView::tableType())
     {
     return pxm->NewProxy("views", "TableView");
     }
-  else if (viewtype == pqElementInspectorViewModule::eiViewType())
+  else if (viewtype == pqElementInspectorView::eiViewType())
     {
-    return pxm->NewProxy("views", "ElementInspectorView");
+    return pxm->NewProxy("newviews", "ElementInspectorView");
     }
   return NULL;
 }
 
 
-pqGenericViewModule* pqStandardViewModules::createView(const QString& viewtype,
+pqView* pqStandardViewModules::createView(const QString& viewtype,
                                                 const QString& group,
                                                 const QString& viewname,
-                                                vtkSMAbstractViewModuleProxy* viewmodule,
+                                                vtkSMViewProxy* viewmodule,
                                                 pqServer* server,
                                                 QObject* p)
 {
-  if(viewtype == "BarChart")
+  if(viewtype == pqPlotView::barChartType())
     {
-    return new pqPlotViewModule(pqPlotViewModule::barChartType(),
+    return new pqPlotView(pqPlotView::barChartType(),
                               group, viewname, viewmodule, server, p);
     }
-  else if(viewtype == "XYPlot")
+  else if(viewtype == pqPlotView::XYPlotType())
     {
-    return new pqPlotViewModule(pqPlotViewModule::XYPlotType(),
+    return new pqPlotView(pqPlotView::XYPlotType(),
                               group, viewname, viewmodule, server, p);
     }
   else if(viewtype == "TableView")
     {
-    return new pqTableViewModule(group, viewname, viewmodule, server, p);
+    // return new pqTableView(group, viewname, viewmodule, server, p);
     }
   else if (viewtype == "ElementInspectorView")
     {
-    return new pqElementInspectorViewModule(
+    return new pqElementInspectorView(
       group, viewname, viewmodule, server, p);
     }
-
 
   return NULL;
 }
 
-pqConsumerDisplay* pqStandardViewModules::createDisplay(const QString& display_type, 
+pqDataRepresentation* pqStandardViewModules::createDisplay(const QString& display_type, 
   const QString& group,
   const QString& n,
   vtkSMProxy* proxy,
   pqServer* server,
   QObject* p)
 {
-  if(display_type == "BarChartDisplay")
+  if(display_type == "BarChartRepresentation")
     {
-    return new pqBarChartDisplay(group, n, proxy, server, p);
+    return new pqBarChartRepresentation(group, n, proxy, server, p);
     }
-  else if (display_type == "XYPlotDisplay2")
+  else if (display_type == "XYPlotRepresentation")
     {
-    return new pqLineChartDisplay(group, n, proxy, server, p);
+    return new pqLineChartRepresentation(group, n, proxy, server, p);
+    }
+  else if (display_type == "ElementInspectorRepresentation")
+    {
+    return new pqDataRepresentation(group, n, proxy, server, p);
+    }
+  else if (display_type == "TextSourceRepresentation")
+    {
+    return new pqTextRepresentation(group, n, proxy, server, p);
     }
 
   return NULL;

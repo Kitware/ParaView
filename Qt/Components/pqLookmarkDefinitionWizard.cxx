@@ -36,22 +36,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLookmarkDefinitionWizard.h"
 #include "ui_pqLookmarkDefinitionWizard.h"
 
+#include "pqApplicationCore.h"
+#include "pqDataRepresentation.h"
+#include "pqFlatTreeView.h"
+#include "pqImageUtil.h"
 #include "pqLookmarkManagerModel.h"
 #include "pqLookmarkModel.h"
-#include "pqPipelineSource.h"
-#include "pqRenderViewModule.h"
-#include "pqGenericViewModule.h"
-#include "pqPipelineFilter.h"
-#include "pqConsumerDisplay.h"
-#include "pqDisplay.h"
-#include "pqPipelineModel.h"
-#include "pqFlatTreeView.h"
-#include "pqApplicationCore.h"
 #include "pqPipelineBrowser.h"
+#include "pqPipelineFilter.h"
+#include "pqPipelineModel.h"
+#include "pqPipelineSource.h"
+#include "pqRenderView.h"
+#include "pqRepresentation.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerModelItem.h"
-#include "pqImageUtil.h"
+#include "pqView.h"
 
 #include <QMessageBox>
 #include <QModelIndex>
@@ -64,20 +64,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QScrollBar>
 #include <QtDebug>
 
-#include "vtkSMProxy.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMRenderModuleProxy.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMPropertyIterator.h"
-#include "vtkImageData.h"
-
-#include "vtkRenderWindow.h"
-#include "vtkSmartPointer.h"
+#include "QVTKWidget.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
-#include "QVTKWidget.h"
-#include "vtkPVXMLElement.h"
+#include "vtkImageData.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVXMLElement.h"
+#include "vtkRenderWindow.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
 
 #include "assert.h"
@@ -86,7 +85,7 @@ class pqLookmarkDefinitionWizardForm : public Ui::pqLookmarkDefinitionWizard{};
 
 
 pqLookmarkDefinitionWizard::pqLookmarkDefinitionWizard(pqLookmarkManagerModel *model,
-    pqGenericViewModule *viewModule, QWidget *widgetParent)
+    pqView *viewModule, QWidget *widgetParent)
   : QDialog(widgetParent)
 { 
   this->Model = model;
@@ -142,14 +141,14 @@ void pqLookmarkDefinitionWizard::createPipelinePreview()
   this->PipelineModel->setEditable(false);
 
   // Save visible displays and their sources, also any display/source pair upstream from a visible one in the pipeline:
-  QList<pqDisplay*> displays = this->ViewModule->getDisplays();
-  QList<pqDisplay *>::Iterator iter;
-  pqConsumerDisplay *consDisp;
+  QList<pqRepresentation*> displays = this->ViewModule->getRepresentations();
+  QList<pqRepresentation *>::Iterator iter;
+  pqDataRepresentation *consDisp;
   vtkCollection *proxies = vtkCollection::New();
   for(iter = displays.begin(); iter != displays.end(); ++iter)
     {
     // if a display is visible, add it, its pipeline source, and all its upstream inputs to the collection of proxies
-    if( (consDisp = dynamic_cast<pqConsumerDisplay*>(*iter)))
+    if( (consDisp = dynamic_cast<pqDataRepresentation*>(*iter)))
       {
       if(consDisp->isVisible() )
         {
@@ -158,10 +157,9 @@ void pqLookmarkDefinitionWizard::createPipelinePreview()
       }
     }
 
-  pqPipelineSource *src;
-  for(int i=smModel->getNumberOfSources()-1; i>=0; i--)
+  QList<pqPipelineSource*> sources = smModel->findItems<pqPipelineSource*>();
+  foreach (pqPipelineSource *src, sources)
     {
-    src = smModel->getPQSource(i);
     if( src )
       {
       if(!proxies->IsItemPresent(src->getProxy()))
@@ -172,7 +170,7 @@ void pqLookmarkDefinitionWizard::createPipelinePreview()
     }
 
   // assume there's only one server for now
-  pqServer *server = smModel->getServerByIndex(0);
+  pqServer *server = smModel->getItemAtIndex<pqServer*>(0);
   
   // Populate the xml elements with the name and type of each pipeline item
   this->addChildItems(this->PipelineModel->getIndexFor(server),this->PipelineHierarchy);
@@ -233,14 +231,14 @@ void pqLookmarkDefinitionWizard::createLookmark()
     return;
     }
 
-  pqRenderViewModule* renderModule = qobject_cast<pqRenderViewModule*>(this->ViewModule);
+  pqRenderView* renderModule = qobject_cast<pqRenderView*>(this->ViewModule);
   if(!renderModule)
     {
     qCritical() << "Can only create lookmarks of render views at this time.";
     return;
     }
 
-  vtkSMRenderModuleProxy *smRen = renderModule->getRenderModuleProxy();
+  vtkSMRenderViewProxy* smRen = renderModule->getRenderViewProxy();
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
 
   // Save a screenshot of the view to store with the lookmark
@@ -256,14 +254,14 @@ void pqLookmarkDefinitionWizard::createLookmark()
   vtkCollection *proxies = vtkCollection::New();
   // Save visible displays and their sources, also any display/source pair 
   // upstream from a visible one in the pipeline:
-  QList<pqDisplay*> displays = renderModule->getDisplays();
-  QList<pqDisplay *>::Iterator iter;
-  pqConsumerDisplay *consDisp;
+  QList<pqRepresentation*> displays = renderModule->getRepresentations();
+  QList<pqRepresentation *>::Iterator iter;
+  pqDataRepresentation *consDisp;
   for(iter = displays.begin(); iter != displays.end(); ++iter)
     {
     // if a display is visible, add it, its pipeline source, and all its 
     //  upstream inputs to the collection of proxies
-    if( (consDisp = dynamic_cast<pqConsumerDisplay*>(*iter)))
+    if( (consDisp = dynamic_cast<pqDataRepresentation*>(*iter)))
       {
       if(consDisp->isVisible() )
         {
@@ -342,36 +340,26 @@ void pqLookmarkDefinitionWizard::createLookmark()
 
 void pqLookmarkDefinitionWizard::addToProxyCollection(pqPipelineSource *src, vtkCollection *proxies)
 {
-  pqPipelineFilter *filter;
-  //pqPipelineSource *src;
-  pqPipelineSource *input;
-  pqConsumerDisplay *disp;
-
-//  if(!disp || !disp->getInput())
-//    {
-//    return;
-//    }
-
-  //src = disp->getInput();
-
   // Add this display/source's proxy to the list if it has not already been added
-
   if(!proxies->IsItemPresent(src->getProxy()))
     {
     // The source may or may not have a display in the view
-    if( (disp = src->getDisplay(this->ViewModule)) )
+    QList<pqDataRepresentation*> reprs = src->getRepresentations(this->ViewModule);
+    foreach (pqDataRepresentation* repr, reprs)
       {
-      proxies->AddItem(disp->getProxy());
+      proxies->AddItem(repr->getProxy());
       }
+
     proxies->AddItem(src->getProxy());
     }
 
   // If this is a filter, recurse on its inputs
+  pqPipelineFilter *filter;
   if( (filter = dynamic_cast<pqPipelineFilter*>(src)) )
     {
     for(int i=0; i<filter->getInputCount(); i++)
       {
-      input = filter->getInput(i);
+      pqPipelineSource *input = filter->getInput(i);
       this->addToProxyCollection(input,proxies);
       }
     }

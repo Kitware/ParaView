@@ -33,14 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqLineSourceWidget.h"
 #include "pqPropertyLinks.h"
-#include "pqRenderViewModule.h"
 #include "pqSMSignalAdaptors.h"
 
 #include "ui_pqLineSourceControls.h"
 
 #include <vtkSMProxyProperty.h>
 #include <vtkSMSourceProxy.h>
-#include <vtkSMNew3DWidgetProxy.h>
+#include <vtkSMNewWidgetRepresentationProxy.h>
 
 /////////////////////////////////////////////////////////////////////////
 // pqLineSourceWidget::pqImplementation

@@ -27,8 +27,9 @@
 
 #include "vtkSMProxy.h"
 
-class vtkSMSourceProxy;
+class vtkInformation;
 class vtkPVDataInformation;
+class vtkSMSourceProxy;
 
 class VTK_EXPORT vtkSMRepresentationStrategy : public vtkSMProxy
 {
@@ -49,7 +50,7 @@ public:
   virtual vtkSMSourceProxy* GetLODOutput()=0;
 
   // Description:
-  // Get the data information. If EnableLOD is true and ViewHelper
+  // Get the data information. If EnableLOD is true and ViewInformation 
   // indicates that the rendering decision was to use LOD, then
   // this method will return the data information for the 
   // LOD data displayed otherwise non-lod data information 
@@ -73,20 +74,36 @@ public:
   // Must be set if the representation makes use of the LOD pipeline provided 
   // by the strategy. false by default, implying that the representation only 
   // displays the high resolution data.
-  vtkSetMacro(EnableLOD, bool);
+  // This flag can only be changed before the objects are created. Changing it
+  // after that point will raise errors.
   vtkGetMacro(EnableLOD, bool);
+  virtual void SetEnableLOD(bool enable)
+    {
+    if (this->EnableLOD != enable)
+      {
+      if (this->ObjectsCreated )
+        {
+        vtkErrorMacro("Cannot change EnableLOD flag after objects have "
+          "been created");
+        }
+      else
+        {
+        this->EnableLOD = enable;
+        this->Modified();
+        }
+      }
+    }
 
   // Description:
   // Must be set if the representation wants the strategy to enable caching.
-  // When set to true the stratergy will use cache when the ViewHelperProxy
+  // When set to true the stratergy will use cache when the ViewInformation 
   // indicates so. true by default.
   vtkSetMacro(EnableCaching, bool);
   vtkGetMacro(EnableCaching, bool);
 
   // Description:
   // Helper is used to determine the current LOD decision.
-  void SetViewHelperProxy(vtkSMProxy*);
-  vtkGetObjectMacro(ViewHelperProxy, vtkSMProxy);
+  void SetViewInformation(vtkInformation*);
 
   // Description:
   // Returns if the strategy is not up-to-date. This happens
@@ -100,7 +117,7 @@ public:
   // Updates the displayed pipeline if update is required.
   // A representation always updates the full-res pipeline if it needs any
   // updating i.e. irrepective of if LOD is being used. On the other hand, LOD
-  // pipeline is updated only when the ViewHelperProxy indicates that LOD is
+  // pipeline is updated only when the ViewInformation indicates that LOD is
   // enabled.
   // When an update is required, this method invokes StartEvent and EndEvent to
   // mark the start and end of update request.
@@ -127,13 +144,26 @@ protected:
   ~vtkSMRepresentationStrategy();
 
   // Description:
+  // Overridden to call BeginCreateVTKObjects() and EndCreateVTKObjects()
+  // before creating the objects.
+  virtual void CreateVTKObjects();
+
+  // Description:
+  // Called before objects are created.
+  virtual void BeginCreateVTKObjects(){};
+
+  // Description:
+  // Called after objects are created.
+  virtual void EndCreateVTKObjects(){}
+
+  // Description:
   // Create and initialize the data pipeline.
   virtual void CreatePipeline(vtkSMSourceProxy* input) =0;
 
   // Description:
   // Create and initialize the LOD data pipeline.
-  // Note that this method is called irrespective of EnableLOD
-  // flag.
+  // Note that this method is called only if EnableLOD
+  // flag is true.
   virtual void CreateLODPipeline(vtkSMSourceProxy* input) =0;
 
   // Description:
@@ -179,23 +209,24 @@ protected:
     const char* propertyname="Input");
 
   // Description:
-  // Called when the view helper proxy is modified. The strategy must update
-  // its state based on the new state of the ViewHelperProxy.
-  virtual void ViewHelperModified();
+  // Called when ever the view information changes.
+  // The strategy should update it's state based on the current view information
+  // provided the information object.
+  virtual void ProcessViewInformation();
 
   // Description:
-  // Called when the ViewHelperProxy is modified to set whether 
+  // Called when the ViewInformation is modified to set whether 
   // the strategy should use LOD pipeline if
   // enabled. This does not invalidate any pipeline.
   vtkSetMacro(UseLOD, bool);
 
   // Description:
-  // Called when the ViewHelperProxy is modified to set whether the strategy 
+  // Called when the ViewInformation is modified to set whether the strategy 
   // should use cache if enabled. This does not invalidate any pipeline.
   vtkSetMacro(UseCache, bool);
 
   // Description:
-  // Called when the ViewHelperProxy is modified to set LOD resolution.
+  // Called when the ViewInformation is modified to set LOD resolution.
   // Set the LOD resolution. This invalidates the LOD pipeline if the resolution
   // has indeed changed.
   virtual void SetLODResolution(int resolution)
@@ -211,7 +242,6 @@ protected:
   bool UseLOD;
 
   vtkSMSourceProxy* Input;
-  bool EnableLOD;
   bool EnableCaching;
 
   bool LODDataValid;
@@ -228,10 +258,14 @@ protected:
   // server.
   bool SomethingCached;
 
-  vtkSMProxy* ViewHelperProxy;
+  vtkInformation* ViewInformation;
 private:
   vtkSMRepresentationStrategy(const vtkSMRepresentationStrategy&); // Not implemented
   void operator=(const vtkSMRepresentationStrategy&); // Not implemented
+
+  bool EnableLOD;
+
+  vtkCommand* Observer;
 
 //ETX
 };

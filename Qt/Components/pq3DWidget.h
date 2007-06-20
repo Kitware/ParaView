@@ -35,12 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include "pqProxyPanel.h"
 
-class vtkPVXMLElement;
-class vtkSMProperty;
-class pqProxy;
-class pqRenderViewModule;
-class vtkSMNew3DWidgetProxy;
 class pq3DWidgetInternal;
+class pqProxy;
+class pqRenderView;
+class vtkPVXMLElement;
+class vtkSMNewWidgetRepresentationProxy;
+class vtkSMProperty;
 
 /// pq3DWidget is the abstract superclass for all 3D widgets.
 /// This class represents a 3D Widget proxy as well as the GUI for the
@@ -48,7 +48,7 @@ class pq3DWidgetInternal;
 class PQCOMPONENTS_EXPORT pq3DWidget : public pqProxyPanel
 {
   Q_OBJECT
-
+  typedef pqProxyPanel Superclass;
 public:
   pq3DWidget(vtkSMProxy* referenceProxy, vtkSMProxy* proxy, QWidget* parent=0);
   virtual ~pq3DWidget();
@@ -77,12 +77,15 @@ public:
   vtkPVXMLElement* getHints() const;
 
   /// Return the 3D Widget proxy.
-  vtkSMNew3DWidgetProxy* getWidgetProxy() const;
+  vtkSMNewWidgetRepresentationProxy* getWidgetProxy() const;
 
   /// Returns true if 3D widget visibility is enabled.
   /// Note: this *does not* indicate that the 3D widget is currently visible
   /// in the display, since this widget's panel might not be visible.
   bool widgetVisible() const;
+
+  /// Returns the current render view.
+  pqRenderView* renderView() const;
 
 signals:
   /// Notifies observers that widget visibility has changed
@@ -120,8 +123,8 @@ public slots:
   /// associated with the controlled proxy.
   virtual void reset();
 
-  /// Set the render module that this widget works with
-  virtual void setRenderModule(pqRenderViewModule* rm);
+  /// Set the view that this panel works with
+  virtual void setView(pqView*);
 
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
   /// This typically calls PlaceWidget on the underlying 3D Widget 
@@ -147,7 +150,7 @@ protected:
   void setControlledProperty(vtkSMProperty* widget_property, vtkSMProperty* controlled_property);
 
   // Subclasses must set the widget proxy.
-  void setWidgetProxy(vtkSMNew3DWidgetProxy*);
+  void setWidgetProxy(vtkSMNewWidgetRepresentationProxy*);
 
   /// Called when one of the controlled properties change (e.g: by undo/redo)
   virtual void onControlledPropertyChanged();

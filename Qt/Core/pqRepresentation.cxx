@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqDisplay.cxx
+   Module:    pqRepresentation.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,127 +29,94 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-/// \file pqDisplay.cxx
-/// \date 4/24/2006
-
-#include "pqDisplay.h"
-
+#include "pqRepresentation.h"
 
 // ParaView Server Manager includes.
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
-#include "vtkSMAbstractDisplayProxy.h"
 #include "vtkSmartPointer.h" 
+#include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 
 // Qt includes.
 #include <QPointer>
-#include <QList>
-#include <QtDebug>
 
 // ParaView includes.
-#include "pqGenericViewModule.h"
-#include "pqServerManagerModel.h"
+#include "pqView.h"
 #include "pqSMAdaptor.h"
 
-
 //-----------------------------------------------------------------------------
-class pqDisplayInternal
+class pqRepresentation::pqInternal
 {
 public:
-  // Set of render modules showing this display. Typically,
-  // it will be 1, but theoretically there can be more.
-  QList<QPointer<pqGenericViewModule> > RenderModules;
+  QPointer<pqView> View;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 };
 
 //-----------------------------------------------------------------------------
-pqDisplay::pqDisplay(const QString& group, const QString& name,
-  vtkSMProxy* display,
-  pqServer* server, QObject* p/*=null*/):
-  pqProxy(group, name, display, server, p)
+pqRepresentation::pqRepresentation( const QString& group, 
+                                    const QString& name,
+                                    vtkSMProxy* repr,
+                                    pqServer* server, 
+                                    QObject* _parent/*=null*/):
+  pqProxy(group, name, repr, server, _parent)
 {
-  this->Internal = new pqDisplayInternal();
+  this->Internal = new pqRepresentation::pqInternal();
   this->Internal->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+
+  // vtkCommand::EndEvent is fired when the representation is updated.
   this->Internal->VTKConnect->Connect(
-    display, vtkSMAbstractDisplayProxy::ForceUpdateEvent,
-    this, SIGNAL(updated()));
+    repr, vtkCommand::EndEvent, this, SIGNAL(updated()));
+  if (repr->GetProperty("Visibility"))
+    {
+    this->Internal->VTKConnect->Connect(
+      repr->GetProperty("Visibility"), vtkCommand::ModifiedEvent,
+      this, SLOT(onVisibilityChanged()), 0, 0, Qt::QueuedConnection);
+    }
 }
 
 //-----------------------------------------------------------------------------
-pqDisplay::~pqDisplay()
+pqRepresentation::~pqRepresentation()
 {
   delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
-bool pqDisplay::shownIn(pqGenericViewModule* rm) const
+void pqRepresentation::setView(pqView* view)
 {
-  return this->Internal->RenderModules.contains(rm);
+  this->Internal->View = view;
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplay::addRenderModule(pqGenericViewModule* rm)
+pqView* pqRepresentation::getView() const
 {
-  if (!this->Internal->RenderModules.contains(rm))
+  return this->Internal->View;
+}
+
+//-----------------------------------------------------------------------------
+void pqRepresentation::renderView(bool force)
+{
+  if (this->Internal->View)
     {
-    this->Internal->RenderModules.push_back(rm);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqDisplay::removeRenderModule(pqGenericViewModule* rm)
-{
-  if (this->Internal->RenderModules.contains(rm))
-    {
-    this->Internal->RenderModules.removeAll(rm);
-    }
-}
-
-//-----------------------------------------------------------------------------
-unsigned int pqDisplay::getNumberOfViewModules() const
-{
-  return this->Internal->RenderModules.size();
-}
-
-//-----------------------------------------------------------------------------
-pqGenericViewModule* pqDisplay::getViewModule(unsigned int index) const
-{
-  if (index >= this->getNumberOfViewModules())
-    {
-    qDebug() << "Invalid index : " << index;
-    return NULL;
-    }
-  return this->Internal->RenderModules[index];
-}
-
-//-----------------------------------------------------------------------------
-void pqDisplay::renderAllViews(bool force /*=false*/)
-{
-  foreach(pqGenericViewModule* rm, this->Internal->RenderModules)
-    {
-    if (rm)
+    if (force)
       {
-      if (force)
-        {
-        rm->forceRender();
-        }
-      else
-        {
-        rm->render();
-        }
+      this->Internal->View->forceRender();
+      }
+    else
+      {
+      this->Internal->View->render();
       }
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplay::onVisibilityChanged()
+void pqRepresentation::onVisibilityChanged()
 {
   emit this->visibilityChanged(this->isVisible());
 }
 
 //-----------------------------------------------------------------------------
-bool pqDisplay::isVisible() const
+bool pqRepresentation::isVisible() const
 {
   int visible = pqSMAdaptor::getElementProperty(
     this->getProxy()->GetProperty("Visibility")).toInt();
@@ -157,7 +124,7 @@ bool pqDisplay::isVisible() const
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplay::setVisible(bool visible)
+void pqRepresentation::setVisible(bool visible)
 {
   pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("Visibility"),
     (visible? 1 : 0));

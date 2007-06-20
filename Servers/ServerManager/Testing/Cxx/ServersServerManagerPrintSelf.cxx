@@ -70,7 +70,6 @@
 #include "vtkSMKeyFrameProxy.h"
 #include "vtkSMLookupTableProxy.h"
 #include "vtkSMMaterialLoaderProxy.h"
-#include "vtkSMMultiViewFactory.h"
 #include "vtkSMMultiViewRenderModuleProxy.h"
 #include "vtkSMNew3DWidgetProxy.h"
 #include "vtkSMNullProxy.h"
@@ -235,7 +234,6 @@ int main(int , char *[])
   c = vtkSMKeyFrameProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMLookupTableProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMMaterialLoaderProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMMultiViewFactory::New(); c->Print( cout ); c->Delete();
   c = vtkSMMultiViewRenderModuleProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMNew3DWidgetProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMNullProxy::New(); c->Print( cout ); c->Delete();

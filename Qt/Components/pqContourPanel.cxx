@@ -33,11 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqContourPanel.h"
 #include "pqNamedWidgets.h"
-#include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPropertyManager.h"
 #include "pqSampleScalarWidget.h"
-#include "pqServerManagerModel.h"
 
 #include "ui_pqContourControls.h"
 

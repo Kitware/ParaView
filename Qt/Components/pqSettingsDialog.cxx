@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 
 // ParaView Client includes.
-#include "pqRenderViewModule.h"
+#include "pqRenderView.h"
 #include "pq3DViewPropertiesWidget.h"
 
 //-----------------------------------------------------------------------------
@@ -47,7 +47,7 @@ class pqSettingsDialogInternal : public Ui::pqSettingsDialog
 {
 public:
   pq3DViewPropertiesWidget* ViewProperties;
-  QPointer<pqRenderViewModule> RenderModule;
+  QPointer<pqRenderView> RenderView;
   pqSettingsDialogInternal()
     {
     this->ViewProperties = 0;
@@ -82,20 +82,20 @@ pqSettingsDialog::~pqSettingsDialog()
 }
 
 //-----------------------------------------------------------------------------
-void pqSettingsDialog::setRenderModule(pqRenderViewModule* ren)
+void pqSettingsDialog::setRenderView(pqRenderView* ren)
 {
-  this->Internal->RenderModule = ren;
+  this->Internal->RenderView = ren;
   this->setupGUI();
 }
 
 //-----------------------------------------------------------------------------
 void pqSettingsDialog::setupGUI()
 {
-  if (this->Internal->RenderModule)
+  if (this->Internal->RenderView)
     {
     // Add settings tab.
-    this->Internal->ViewProperties->setRenderModule(
-      this->Internal->RenderModule);
+    this->Internal->ViewProperties->setRenderView(
+      this->Internal->RenderView);
     this->Internal->tabWidget->addTab(
       this->Internal->ViewProperties, "Active View Properties");
     }

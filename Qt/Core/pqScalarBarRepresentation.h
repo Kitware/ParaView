@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqScalarBarDisplay.h
+   Module:    pqScalarBarRepresentation.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,25 +29,24 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqScalarBarDisplay_h
-#define __pqScalarBarDisplay_h
+#ifndef __pqScalarBarRepresentation_h
+#define __pqScalarBarRepresentation_h
 
-#include "pqDisplay.h"
+#include "pqRepresentation.h"
 
-class pqPipelineDisplay;
-class pqScalarBarDisplayInternal;
+class pqPipelineRepresentation;
 class pqScalarsToColors;
 
 // PQ object for a scalar bar. Keeps itself connected with the pqScalarsToColors
 // object, if any.
-class PQCORE_EXPORT pqScalarBarDisplay : public pqDisplay
+class PQCORE_EXPORT pqScalarBarRepresentation : public pqRepresentation
 {
   Q_OBJECT
 public:
-  pqScalarBarDisplay(const QString& group, const QString& name,
+  pqScalarBarRepresentation(const QString& group, const QString& name,
     vtkSMProxy* scalarbar, pqServer* server,
     QObject* parent=0);
-  virtual ~pqScalarBarDisplay();
+  virtual ~pqScalarBarRepresentation();
 
   // Get the lookup table this scalar bar shows, if any.
   pqScalarsToColors* getLookupTable() const;
@@ -56,7 +55,7 @@ public:
   // using the color by array name from the display.
   // The component used to color with is obtained from the 
   // LookupTable already stored by this object.
-  void makeTitle(pqPipelineDisplay* display);
+  void makeTitle(pqPipelineRepresentation* display);
 
   // A scalar bar title is divided into two parts (any of which can be empty).
   // Typically the first is the array name and the second is the component.
@@ -69,7 +68,8 @@ protected slots:
   void onLookupTableModified();
 
 private:
-  pqScalarBarDisplayInternal* Internal;
+  class pqInternal;
+  pqInternal* Internal;
 };
 
 

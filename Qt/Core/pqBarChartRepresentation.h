@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqConsumerDisplay.h
+   Module:    pqBarChartRepresentation.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,44 +29,28 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqConsumerDisplay_h
-#define __pqConsumerDisplay_h
+#ifndef __pqBarChartRepresentation_h
+#define __pqBarChartRepresentation_h
 
-#include "pqDisplay.h"
+#include "pqDataRepresentation.h"
 
-class pqConsumerDisplayInternal;
-class pqPipelineSource;
 class pqScalarsToColors;
+class vtkDataArray;
+class vtkRectilinearGrid;
+class vtkTimeStamp;
 
-// pqConsumerDisplay is the superclass for a display for a pqPiplineSource 
-// i.e. the input for this display proxy is a pqPiplineSource.
-// This class manages the linking between the pqPiplineSource 
-// and pqConsumerDisplay.
-class PQCORE_EXPORT pqConsumerDisplay : public pqDisplay
+/// pqBarChartRepresentation is a pqDisplay for "BarChartDisplay" proxy.
+/// It adds logic to initialize the default state of the display proxy
+/// as well as managing lookuptable.
+class PQCORE_EXPORT pqBarChartRepresentation : public pqDataRepresentation
 {
   Q_OBJECT
-  typedef pqDisplay Superclass;
+  typedef pqDataRepresentation Superclass;
 public:
-  pqConsumerDisplay(const QString& group, const QString& name,
+  pqBarChartRepresentation(const QString& group, const QString& name,
     vtkSMProxy* display, pqServer* server,
     QObject* parent=0);
-  virtual ~pqConsumerDisplay();
-
-  // Get the source/filter of which this is a display.
-  pqPipelineSource* getInput() const;
-
-
-  /// Returns the lookuptable proxy, if any.
-  /// Most consumer displays take a lookup table. This method 
-  /// provides access to the Lookup table, if one exists.
-  virtual vtkSMProxy* getLookupTableProxy();
-
-  /// Returns the pqScalarsToColors object for the lookup table
-  /// proxy if any.
-  /// Most consumer displays take a lookup table. This method 
-  /// provides access to the Lookup table, if one exists.
-  virtual pqScalarsToColors* getLookupTable();
-
+  virtual ~pqBarChartRepresentation();
 
   /// Sets default values for the underlying proxy. 
   /// This is during the initialization stage of the pqProxy 
@@ -76,17 +60,45 @@ public:
   /// The default implementation iterates over all properties
   /// of the proxy and sets them to default values. 
   virtual void setDefaultPropertyValues();
+
+  /// Sets up the looktable for the display. It requests the lookuptable
+  /// manager for a lookuptable for array with given name and 1 component.
+  pqScalarsToColors* setLookupTable(const char* arrayname);
+
+  /// Returns the client-side data array for the X axis
+  /// based on the properties set on the display proxy.
+  /// Note that this method does not update the pipeline.
+  vtkDataArray* getXArray();
+
+  /// Returns the client-side data array for the Y axis
+  /// based on the properties set on the display proxy.
+  /// Note that this method does not update the pipeline.
+  vtkDataArray* getYArray();
+
+  /// Returns the client-side rectilinear grid. 
+  /// Note that this method does not update the pipeline.
+  vtkRectilinearGrid* getClientSideData() const;
+
+  /// Returns the time when the underlying proxy changed
+  /// or the client side data (if any) changed.
+  vtkTimeStamp getMTime() const;
+
+public slots:
+  /// Updates the lookup table based on the current proxy values.
+  void updateLookupTable();
+
 protected slots:
-  // called when input property on display changes. We must detect if
-  // (and when) the display is connected to a new proxy.
-  virtual void onInputChanged();
+  /// updates MTime.
+  void markModified();
 
 private:
-  pqConsumerDisplay(const pqConsumerDisplay&); // Not implemented.
-  void operator=(const pqConsumerDisplay&); // Not implemented.
+  pqBarChartRepresentation(const pqBarChartRepresentation&); // Not implemented.
+  void operator=(const pqBarChartRepresentation&); // Not implemented.
 
-  pqConsumerDisplayInternal* Internal;
+  class pqInternals;
+  pqInternals* Internal;
 };
+
 
 #endif
 

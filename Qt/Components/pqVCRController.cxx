@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
-#include "pqRenderViewModule.h"
 #include "pqAnimationScene.h"
 #include "pqSMAdaptor.h"
 #include "pqEventDispatcher.h"

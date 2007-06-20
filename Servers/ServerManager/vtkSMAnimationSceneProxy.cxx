@@ -21,7 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMRenderViewProxy.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/vector>
@@ -30,7 +30,7 @@
 class vtkSMAnimationSceneProxyInternals
 {
 public:
-  typedef vtkstd::vector<vtkSmartPointer<vtkSMAbstractViewModuleProxy> > 
+  typedef vtkstd::vector<vtkSmartPointer<vtkSMViewProxy> > 
     VectorOfViewModules;
   VectorOfViewModules ViewModules;
 
@@ -45,29 +45,33 @@ public:
 
   void CacheUpdateAllViews(int index, int max)
     {
+    /* FIXME:UDA
     VectorOfViewModules::iterator iter = this->ViewModules.begin();
     for (; iter != this->ViewModules.end(); ++iter)
       {
-      vtkSMRenderModuleProxy* ren = vtkSMRenderModuleProxy::SafeDownCast(*iter);
+      vtkSMRenderViewProxy* ren = vtkSMRenderViewProxy::SafeDownCast(*iter);
       if (ren)
         {
         ren->CacheUpdate(index, max);
         }
       }
+      */
     }
 
   void CleanCacheAllViews()
     {
+    /* FIXME:UDA
     VectorOfViewModules::iterator iter = this->ViewModules.begin();
     for (; iter != this->ViewModules.end(); ++iter)
       {
-      vtkSMRenderModuleProxy* rm = vtkSMRenderModuleProxy::SafeDownCast(
+      vtkSMRenderViewProxy* rm = vtkSMRenderViewProxy::SafeDownCast(
         iter->GetPointer());
       if (rm)
         {
         rm->InvalidateAllGeometries();
         }
       }
+      */
     }
 
   void DisableInteractionAllViews()
@@ -75,7 +79,7 @@ public:
     VectorOfViewModules::iterator iter = this->ViewModules.begin();
     for (; iter != this->ViewModules.end(); ++iter)
       {
-      vtkSMRenderModuleProxy* rm = vtkSMRenderModuleProxy::SafeDownCast(
+      vtkSMRenderViewProxy* rm = vtkSMRenderViewProxy::SafeDownCast(
         iter->GetPointer());
       if (rm)
         {
@@ -89,7 +93,7 @@ public:
     VectorOfViewModules::iterator iter = this->ViewModules.begin();
     for (; iter != this->ViewModules.end(); ++iter)
       {
-      vtkSMRenderModuleProxy* rm = vtkSMRenderModuleProxy::SafeDownCast(
+      vtkSMRenderViewProxy* rm = vtkSMRenderViewProxy::SafeDownCast(
         iter->GetPointer());
       if (rm)
         {
@@ -101,7 +105,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.41");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.42");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
@@ -148,7 +152,7 @@ void vtkSMAnimationSceneProxy::InitializeObservers(vtkAnimationCue* cue)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMAnimationSceneProxy::AddViewModule(vtkSMAbstractViewModuleProxy* view)
+void vtkSMAnimationSceneProxy::AddViewModule(vtkSMViewProxy* view)
 {
   vtkSMAnimationSceneProxyInternals::VectorOfViewModules::iterator iter = 
     this->Internals->ViewModules.begin();
@@ -165,7 +169,7 @@ void vtkSMAnimationSceneProxy::AddViewModule(vtkSMAbstractViewModuleProxy* view)
 
 //----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::RemoveViewModule(
-  vtkSMAbstractViewModuleProxy* view)
+  vtkSMViewProxy* view)
 {
   vtkSMAnimationSceneProxyInternals::VectorOfViewModules::iterator iter = 
     this->Internals->ViewModules.begin();
@@ -450,7 +454,7 @@ unsigned int vtkSMAnimationSceneProxy::GetNumberOfViewModules()
 }
 
 //----------------------------------------------------------------------------
-vtkSMAbstractViewModuleProxy* vtkSMAnimationSceneProxy::GetViewModule(
+vtkSMViewProxy* vtkSMAnimationSceneProxy::GetViewModule(
   unsigned int cc)
 {
   if (cc < this->Internals->ViewModules.size())

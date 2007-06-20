@@ -72,7 +72,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileChooserWidget.h"
 #include "pqListWidgetItemObject.h"
 #include "pqObjectPanel.h"
-#include "pqPipelineDisplay.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyManager.h"
@@ -311,14 +310,15 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
     QComboBox* comboBox = qobject_cast<QComboBox*>(object);
     if(comboBox)
       {
+      pqServerManagerModel* smmodel = 
+        pqApplicationCore::instance()->getServerManagerModel();
       // TODO: use pqComboBoxDomain
       QList<pqSMProxy> propertyDomain = 
         pqSMAdaptor::getProxyPropertyDomain(SMProperty);
       comboBox->clear();
       foreach(pqSMProxy v, propertyDomain)
         {
-        pqPipelineSource* o = 
-          pqServerManagerModel::instance()->getPQSource(v);
+        pqPipelineSource* o = smmodel->findItem<pqPipelineSource*>(v);
         if(o)
           {
           comboBox->addItem(o->getSMName());
@@ -349,9 +349,9 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
       pqObjectPanel* object_panel = qobject_cast<pqObjectPanel*>(parent);
       if(object_panel)
         {
-        w->setRenderModule(object_panel->renderModule());
-        QObject::connect(parent, SIGNAL(renderModuleChanged(pqRenderViewModule*)),
-                         w, SLOT(setRenderModule(pqRenderViewModule*)));
+        w->setView(object_panel->view());
+        QObject::connect(parent, SIGNAL(viewChanged(pqView*)),
+                         w, SLOT(setView(pqView*)));
         QObject::connect(parent, SIGNAL(onaccept()), w, SLOT(accept()));
         QObject::connect(parent, SIGNAL(onreset()), w, SLOT(reset()));
         QObject::connect(parent, SIGNAL(onselect()), w, SLOT(select()));
@@ -945,9 +945,9 @@ static void processHints(QGridLayout* panelLayout,
     group->setLayout(new QVBoxLayout(group));
     group->setTitle(widget->getHints()->GetAttribute("label"));
     widget->setParent(group);
-    QObject::connect(panel, SIGNAL(renderModuleChanged(pqRenderViewModule*)),
-      widget,SLOT(setRenderModule(pqRenderViewModule*)));
-    widget->setRenderModule(panel->renderModule());
+    QObject::connect(panel, SIGNAL(viewChanged(pqView*)),
+      widget,SLOT(setView(pqView*)));
+    widget->setView(panel->view());
     widget->resetBounds();
     widget->reset();
     
@@ -1464,7 +1464,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
       chooser = new pqFileChooserWidget(panelLayout->parentWidget());
       pqServerManagerModel* m =
         pqApplicationCore::instance()->getServerManagerModel();
-      chooser->setServer(m->getServerForSource(pxy));
+      chooser->setServer(m->findServer(pxy->GetConnectionID()));
       chooser->setObjectName(propertyName);
       QLabel* label = createPanelLabel(panelLayout->parentWidget(),
                                        propertyLabel);

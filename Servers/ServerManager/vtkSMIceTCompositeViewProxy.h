@@ -23,6 +23,7 @@
 
 #include "vtkSMRenderViewProxy.h"
 
+class vtkInformationObjectBaseKey;
 class vtkSMRepresentationStrategyVector;
 
 class VTK_EXPORT vtkSMIceTCompositeViewProxy : public vtkSMRenderViewProxy
@@ -31,6 +32,10 @@ public:
   static vtkSMIceTCompositeViewProxy* New();
   vtkTypeRevisionMacro(vtkSMIceTCompositeViewProxy, vtkSMRenderViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Keys used to communicate information to representations/strategies.
+  static vtkInformationObjectBaseKey* KD_TREE();
 
   // Description:
   // Overridden to send the GUISize to the MultiViewManager.
@@ -66,28 +71,6 @@ public:
   vtkSetMacro(DisableOrderedCompositing, int);
   vtkGetMacro(DisableOrderedCompositing, int);
 
-  // Description:
-  // In multiview configurations, all the render views must share the same
-  // instance of the parallel render manager. Use this method to set that shared
-  // instance. It must be set before calling CreateVTKObjects() on the view
-  // proxy.
-  void SetSharedParallelRenderManager(vtkSMProxy*);
-
-  // Description:
-  // In mutlview configurations, all the render views must share the same
-  // instance of the multiview manager. Use this method to set that shared
-  // instance. It must be set before calling CreateVTKObjects() on the view
-  // proxy.
-  void SetSharedMultiViewManager(vtkSMProxy*);
-
-  // Description:
-  // In mutlview configurations, all the render views must share the same
-  // instance of the render window on the server side. 
-  // Use this method to set that shared
-  // instance. It must be set before calling CreateVTKObjects() on the view
-  // proxy.
-  void SetSharedRenderWindow(vtkSMProxy*);
-
 //BTX
 protected:
   vtkSMIceTCompositeViewProxy();
@@ -108,6 +91,11 @@ protected:
     int dataType);
 
   // Description:
+  // Called by RemoveRepresentation(). Subclasses can override to remove 
+  // observers etc.
+  virtual void RemoveRepresentationInternal(vtkSMRepresentationProxy* rep);
+
+  // Description:
   // Method called before Still Render is called.
   // Used to perform some every-still-render-setup actions.
   virtual void BeginStillRender();
@@ -116,6 +104,13 @@ protected:
   // Method called before Interactive Render.
   // Used to perform some every-interactive-render-setup actions.
   virtual void BeginInteractiveRender();
+
+  // Description:
+  // In multiview setups, some viewmodules may share certain objects with each
+  // other. This method is used in such cases to give such views an opportunity
+  // to share those objects.
+  // Default implementation is empty.
+  virtual void InitializeForMultiView(vtkSMViewProxy* otherView);
 
   // Indicates if we should render using compositing.
   // Returns true if compositing should be used, otherwise false.
@@ -144,13 +139,14 @@ protected:
   // Pass ordered compositing decision to all strategies.
   void SetOrderedCompositingDecision(bool decision);
 
+
   // Manager used for multiview.
   vtkSMProxy* MultiViewManager;
-  vtkSMProxy* SharedMultiViewManager;
+  vtkClientServerID SharedMultiViewManagerID;
 
   // Parallel render manager that manager rendering in parallel.
   vtkSMProxy* ParallelRenderManager;
-  vtkSMProxy* SharedParallelRenderManager;
+  vtkClientServerID SharedParallelRenderManagerID;
 
   // Used when ordered compositing is needed.
   vtkSMProxy* KdTree;
@@ -159,7 +155,7 @@ protected:
   vtkSMProxy* KdTreeManager;
 
   // Render window shared on the server side.
-  vtkSMProxy* SharedRenderWindow;
+  vtkClientServerID SharedRenderWindowID;
 
   // Reduction factor used for compositing when using interactive render.
   int ImageReductionFactor;
@@ -169,6 +165,7 @@ protected:
   double CompositeThreshold;
 
   bool LastCompositingDecision;
+  bool LastOrderedCompositingDecision;
 
   // These need to initialized for IceT rendering. However, this class does not
   // provide public API to change these, since this view does not support

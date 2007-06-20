@@ -28,174 +28,140 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
-#ifndef __pqServerManagerModel_h
+========================================================================*/
+#ifndef __pqServerManagerModel_h 
 #define __pqServerManagerModel_h
 
 #include <QObject>
+#include <QList>
 #include "pqCoreExport.h"
-#include "vtkType.h" // needed for vtkIdType.
+#include "vtkType.h" // for vtkIdType.
 
-class vtkSMProxy;
-class vtkSMAbstractViewModuleProxy;
-class QVTKWidget;
-
-class pqConsumerDisplay;
-class pqDisplay;
-class pqGenericViewModule;
-class pqPipelineDisplay;
 class pqPipelineSource;
 class pqProxy;
-class pqRenderViewModule;
+class pqRepresentation;
 class pqServer;
-class pqServerManagerModelInternal;
 class pqServerManagerModelItem;
+class pqServerManagerObserver;
 class pqServerResource;
+class pqView;
+class vtkSMProxy;
 
-// pqServerManagerModel is the model for the Server Manager.
-// All the pipelines in the Server Manager need a GUI representation
-// to obtain additional information about the connections etc etc.
-// This class collects that. This is merely representation of all the
-// information available in the Server Manager in a more GUI friendly 
-// way. Simplicity is the key here.
-// REFERENCE: This class takes functionality from older versions of pqPipelineModel
-// with the objective to separate the Model and the view-specific model.
-// NOTE: This class makes no distinction between a source and a filter
-// so when every we say a source, we mean source as well as a filter unless
-// otherwise stated.
+//BTX
+class pqServerManagerModel;
+
+template <class T> inline QList<T> pqFindItems(
+  const pqServerManagerModel* const model);
+template <class T> inline QList<T> pqFindItems(
+  const pqServerManagerModel* const model, pqServer* server);
+template <class T> inline T pqFindItem(
+  const pqServerManagerModel* const model, const QString& name);
+template <class T> inline T pqFindItem(
+  const pqServerManagerModel* const model, vtkSMProxy* proxy);
+template <class T> inline int pqGetNumberOfItems(
+  const pqServerManagerModel* const model);
+template <class T> inline T pqGetItemAtIndex(
+  const pqServerManagerModel* const model, int index);
+//ETX
+
+/// pqServerManagerModel is the model for the Server Manager.
+/// All the pipelines in the Server Manager need a GUI representation
+/// to obtain additional information about their connections etc.
+/// This class collects that. This is merely representation of all the
+/// information available in the Server Manager in a more GUI friendly 
+/// way. Simplicity is the key here.
 class PQCORE_EXPORT pqServerManagerModel : public QObject
 {
   Q_OBJECT
+  typedef QObject Superclass;
 public:
-  pqServerManagerModel(QObject* parent=NULL);
-  virtual ~pqServerManagerModel();
+  /// Constructor:
+  /// \c observer  :- instance of pqServerManagerObserver observing the server
+  ///                 manager.
+  pqServerManagerModel(pqServerManagerObserver* observer, 
+    QObject* parent=0);
+  ~pqServerManagerModel();
 
-  /// Avoid using this, this will be take out soon.
-  static pqServerManagerModel* instance();
+  /// Given a connection Id, returns the pqServer instance for that connection,
+  /// if any.
+  pqServer* findServer(vtkIdType cid) const;
 
-  /// Given a vtkSMProxy get the pqServer on which the proxy exists.
-  pqServer* getServerForSource(vtkSMProxy*);
-  pqServer* getServerForSource(pqPipelineSource*);
-
-  /// Given a process module ConnectionID, get pqServer for it.
-  pqServer* getServer(vtkIdType connectionId);
-
-  /// Given the server resource, find the pqServer.
-  pqServer* getServer(const pqServerResource& resource) const;
-
-  /// Given the server index, get the pqServer.
-  pqServer* getServerByIndex(unsigned int index) const;
-
-  /// Get the number of server connections available.
-  unsigned int getNumberOfServers();
-
-  /// Get the number of sources. Eventually, we may want this 
-  /// to take a server argument and returns the number of sources
-  /// on the server.
-  unsigned int getNumberOfSources();
-
-  /// Get the source at an index
-  pqPipelineSource* getPQSource(int index);
-
-  /// Given the name for a Source, get the pqServer on which the
-  //// source exists.
-  // pqServer* getServerForSource(QString name);
-
-  /// Given a vtkSMProxy get the pqServer representation for that proxy,
-  /// if one exists.
-  pqPipelineSource* getPQSource(vtkSMProxy*) const;
-
-  /// Given a name get the pqServer representation for that proxy,
-  /// if one exists.
-  pqPipelineSource* getPQSource(const QString &name) const;
-
-  
-  /// Given a vtkSMProxy for a display get the pqConsumerDisplay
-  /// object for it, if one exists.
-  pqConsumerDisplay* getPQDisplay(vtkSMProxy*);
-
-  /// Given a vtkSMProxy gets the pqProxy for it.
-  pqProxy* getPQProxy(vtkSMProxy*);
-
-  /// Returns the number of view modules
-  int getNumberOfViewModules() const;
-
-  /// Returns the number of render modules (<= this->getNumberOfViewModules()).
-  int getNumberOfRenderModules() const;
-
-  /// Returns the render module at the given index.
-  pqRenderViewModule* getRenderModule(int index) const;
-
-  /// Given an index, returns a view module.
-  pqGenericViewModule* getViewModule(int idx);
-
-  /// Given a view module proxy get the pqGenericViewModule representation
-  /// for it.
-  pqGenericViewModule* getViewModule(vtkSMProxy*);
-  pqRenderViewModule* getRenderModule(QVTKWidget*);
+  /// Given a server resource, locates the pqServer instance for it, if any.
+  pqServer* findServer(const pqServerResource& resource) const;
 
   /// Book end events for removing a server.
   void beginRemoveServer(pqServer *server);
   void endRemoveServer();
 
-  /// Returns a list of servers.
-  QList<pqServer*> getServers() const;
+  /// Given a proxy, locates a pqServerManagerModelItem subclass for the given 
+  /// proxy.
+  template<class T>
+    T findItem(vtkSMProxy* proxy) const
+      {
+      return ::pqFindItem<T>(this, proxy);
+      }
 
-  /// Returns a list of sources on the particular server.
-  QList<pqPipelineSource*> getSources(pqServer* server) const;
+  /// Returns a list of pqServerManagerModelItem of the given type.
+  template <class T>
+    QList<T> findItems() const
+      {
+      return ::pqFindItems<T>(this);
+      }
 
-  /// Returns a list of render displays on the server.
-  QList<pqPipelineDisplay*> getPipelineDisplays(pqServer* server);
+  /// Returns the number of items of the given type.
+  template <class T>
+    int getNumberOfItems() const
+      {
+      return ::pqGetNumberOfItems<T>(this);
+      }
 
-  /// returns a list of all displays on the server. This includes
-  /// render displays as well as other consumer displays such as 
-  /// plot displays.
-  QList<pqConsumerDisplay*> getDisplays(pqServer* server);
+  /// Returns the item of the given type and the given index.
+  /// The index is determined by collecting all the items of the given type in a
+  /// list (findItems()).
+  template <class T>
+    T getItemAtIndex(int index) const
+      {
+      return ::pqGetItemAtIndex<T>(this, index);
+      }
 
-  // Returns a list of views on the particular server.
-  // If server==NULL, returns all view modules. This includes
-  // render modules as well as plotting modules.
-  QList<pqGenericViewModule*> getViewModules(pqServer* server);
+  /// Same as findItems<T>() except that this returns only those items that are
+  /// on the indicated server. If server == 0, then all items are returned.
+  template <class T>
+    QList<T> findItems(pqServer* server) const
+      {
+      return ::pqFindItems<T>(this, server);
+      }
 
-public slots:
-  /// Call when a  new vtkSMProxy is registered with the proxy manager
-  /// under the "sources" group.
-  /// This will create a PQ representation for the proxy.
-  void onAddSource(QString name, vtkSMProxy* source);
+  /// Returns an item with the given name. The type can be pqProxy
+  /// subclass, since these are the ones that can have a name.
+  /// Note that since names need not be unique, using this method is not
+  /// recommended. This is provided for backwards compatibility alone.
+  template <class T>
+    T findItem(const QString& name) const
+      {
+      return ::pqFindItem<T>(this, name);
+      }
 
-  /// Call when a vtkSMProxy is unregistered from the "sources" group.
-  /// This will clean up the PQ representation for the proxy
-  /// and sever any connections to the proxy.
-  void onRemoveSource(QString name, vtkSMProxy*);
+  /// Internal method.
+  static void findItemsHelper(const pqServerManagerModel * const model, 
+    const QMetaObject &mo, QList<void *> *list, pqServer* server=0);
 
-  /// Call when a new connection is made. For now we pass
-  /// a pqServer as an argument. Would like this to be a vtkIdType.
-  void onAddServer(vtkIdType cid);
-  void onAddServer(pqServer*);
+  /// Internal method.
+  static pqProxy* findItemHelper(const pqServerManagerModel* const model, 
+    const QMetaObject& mo, vtkSMProxy* proxy);
 
-  /// Call when a new connection is closed/aborted. For now we pass
-  /// a pqServer as an argument. Would like this to be a vtkIdType.
-  void onRemoveServer(pqServer*);
-  void onRemoveServer(vtkIdType cid);
-
-  /// Call when a new render module is registered/unrgistered.
-  void onAddViewModule(QString name, vtkSMAbstractViewModuleProxy* rm);
-  void onRemoveViewModule(vtkSMAbstractViewModuleProxy* rm);
-
-  /// Call when a display proxy is registered/unregistered.
-  void onAddDisplay(QString name, vtkSMProxy* display);
-  void onRemoveDisplay(vtkSMProxy* display);
-
-  /// Call when a proxy is registered/unregistered. 
-  /// (other than sources/displays/render modules).
-  void onProxyRegistered(QString group, QString name, vtkSMProxy* proxy);
-  void onProxyUnRegistered(QString group, QString name, vtkSMProxy* proxy);
+  /// Internal method.
+  static pqProxy* findItemHelper(const pqServerManagerModel* const model, 
+    const QMetaObject& mo, const QString& name);
 
 signals:
-  // Fired when a new connection is created on the vtkProcessModule.
-  // a new pqServer encapsulator is created for it (thanks to
-  // onAddSource) and then this signal is emitted.
-  void serverAdded(pqServer* server);
+  /// Siganls emitted when a new pqServer object is created.
+  void preServerAdded(pqServer*);
+  void serverAdded(pqServer*);
+
+  /// Signals emitted when a pqServer instance is being destroyed.
+  void preServerRemoved(pqServer*);
+  void serverRemoved(pqServer*);
 
   /// Fired when beginRemoveServer is called.
   void aboutToRemoveServer(pqServer* server);
@@ -203,19 +169,47 @@ signals:
   /// Fired when endRemoveServer is called.
   void finishedRemovingServer();
 
-  // When a connection is disconneted on the vtkProcessModule,
-  // this event is fired before the pqServer object is destroyed.
-  // It is not safe to access the actual vtkProcessModule connection 
-  // in this event, since it is already closed and unavailable.
-  void serverRemoved(pqServer* server);
+  /// Signals emitted when any pqServerManagerModelItem subclass is created.
+  void preItemAdded(pqServerManagerModelItem*);
+  void itemAdded(pqServerManagerModelItem*); 
 
-  // Fired when a source/filter/compoundProxy is registered.
-  void sourceAdded(pqPipelineSource* source);
+  /// Signals emitted when any new pqServerManagerModelItem subclass is
+  /// being destroyed.
+  void preItemRemoved(pqServerManagerModelItem*);
+  void itemRemoved(pqServerManagerModelItem*);
+
+  void preProxyAdded(pqProxy*);
+  void proxyAdded(pqProxy*);
+
+  void preProxyRemoved(pqProxy*);
+  void proxyRemoved(pqProxy*);
+
+  /// Signals emitted when a source/filter is created.
   void preSourceAdded(pqPipelineSource* source);
+  void sourceAdded(pqPipelineSource* source);
 
-  // Fired when a source/filter/compoundproxy is unregistered.
-  void sourceRemoved(pqPipelineSource* source);
+  /// Signals emitted when a source/filter is destroyed.
   void preSourceRemoved(pqPipelineSource*);
+  void sourceRemoved(pqPipelineSource*);
+
+  /// Signals emitted when a view is created
+  void preViewAdded(pqView* view);
+  void viewAdded(pqView* view);
+
+  /// Signals emitted when a view is destroyed.
+  void preViewRemoved(pqView*);
+  void viewRemoved(pqView*);
+
+  /// Signals emitted when a representation is created.
+  void preRepresentationAdded(pqRepresentation* rep);
+  void representationAdded(pqRepresentation* rep);
+
+  /// Signals emitted when a representation is destroyed.
+  void preRepresentationRemoved(pqRepresentation*);
+  void representationRemoved(pqRepresentation*);
+  
+  /// Fired when the name of an item changes.
+  void nameChanged(pqServerManagerModelItem *item);
 
   /// Fired when a connection between two pqPipelineSources is created.
   void connectionAdded(pqPipelineSource* in, pqPipelineSource* out);
@@ -225,53 +219,89 @@ signals:
   void connectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
   void preConnectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
 
-  /// Fired when a view module becomes available.
-  void viewModuleAdded(pqGenericViewModule*);
-  void preViewModuleAdded(pqGenericViewModule*);
 
-  /// Fired when a view module is to be removed.
-  void viewModuleRemoved(pqGenericViewModule*);
-  void preViewModuleRemoved(pqGenericViewModule*);
+protected slots:
+  /// Called when a proxy is registered.
+  virtual void onProxyRegistered(const QString& group, const QString& name,
+    vtkSMProxy* proxy);
 
-  /// Fired when a pqProxy (or subclass) object is created for
-  /// any registered proxy which is not a 
-  /// source/filter/display/render module.
-  void preProxyAdded(pqProxy* proxy);
-  void proxyAdded(pqProxy* proxy);
+  /// Called when a proxy is unregistered.
+  virtual void onProxyUnRegistered(const QString& group, const QString& name,
+    vtkSMProxy* proxy);
+  
+  /// Called when a new server connection is created.
+  virtual void onConnectionCreated(vtkIdType id);
 
-  void preProxyRemoved(pqProxy*);
-  void proxyRemoved(pqProxy*);
-
-  /// Fired when the name of an item changes.
-  void nameChanged(pqServerManagerModelItem *item);
-
-  /// Fired when the displays for an item changes.
-  void sourceDisplayChanged(pqPipelineSource *source,
-      pqConsumerDisplay* display);
-
-  /// Fired whe a display is added.
-  void preDisplayAdded(pqDisplay*);
-  void displayAdded(pqDisplay*);
-
-  /// Fired whe a display is removed.
-  void preDisplayRemoved(pqDisplay*);
-  void displayRemoved(pqDisplay*);
-private slots:
-  /// Used to map a server name change to the name changed signal.
-  void updateServerName();
-
-  /// Used to map a view's display added/removed to signal to the
-  /// visibility changed signal.
-  void updateDisplayVisibility(pqDisplay*);
-
-  /// Used to map a display visibility change to the visibility
-  /// changed signal.
-  void updateDisplayVisibility(bool);
+  /// Called when a server connection is closed.
+  virtual void onConnectionClosed(vtkIdType id);
 
 private:
-  pqServerManagerModelInternal* Internal;
-  static pqServerManagerModel* Instance;
+  pqServerManagerModel(const pqServerManagerModel&); // Not implemented.
+  void operator=(const pqServerManagerModel&); // Not implemented.
+
+  class pqInternal;
+  pqInternal* Internal;
 };
 
+
+//-----------------------------------------------------------------------------
+template <class T>
+inline QList<T> pqFindItems(const pqServerManagerModel* const model)
+{
+  QList<T> list;
+  pqServerManagerModel::findItemsHelper(model, ((T)0)->staticMetaObject,
+    reinterpret_cast<QList<void *>*>(&list), 0);
+  return list;
+}
+
+//-----------------------------------------------------------------------------
+template <class T>
+inline QList<T> pqFindItems(const pqServerManagerModel* const model,
+  pqServer* server)
+{
+  QList<T> list;
+  pqServerManagerModel::findItemsHelper(model, ((T)0)->staticMetaObject,
+    reinterpret_cast<QList<void *>*>(&list), server);
+  return list;
+}
+
+//-----------------------------------------------------------------------------
+template <class T> 
+inline T pqFindItem(const pqServerManagerModel* const model, vtkSMProxy* proxy)
+{
+  return qobject_cast<T>(
+    pqServerManagerModel::findItemHelper(model, ((T)0)->staticMetaObject, proxy));
+}
+
+//-----------------------------------------------------------------------------
+template <class T> 
+inline T pqFindItem(const pqServerManagerModel* const model, 
+  const QString& name)
+{
+  return qobject_cast<T>(
+    pqServerManagerModel::findItemHelper(model, ((T)0)->staticMetaObject, name));
+}
+
+//-----------------------------------------------------------------------------
+template <class T> 
+inline int pqGetNumberOfItems(const pqServerManagerModel* const model)
+{
+  return pqFindItems<T>(model).size();
+}
+
+//-----------------------------------------------------------------------------
+template <class T> 
+inline T pqGetItemAtIndex(const pqServerManagerModel* const model, int index)
+{
+  QList<T> items = pqFindItems<T>(model);
+  if (index < items.size())
+    {
+    return items[index];
+    }
+
+  return 0;
+}
+
 #endif
+
 

@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxyProperty.h>
-#include <vtkSMNew3DWidgetProxy.h>
+#include <vtkSMNewWidgetRepresentationProxy.h>
 
 #include <QDoubleValidator>
 #include <QHBoxLayout>
@@ -99,7 +99,7 @@ void pqPointSourceWidget::resetBounds()
 {
   this->Superclass::resetBounds();
 
-  vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
+  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   double input_bounds[6];
   if(widget && this->getReferenceInputBounds(input_bounds))
     {

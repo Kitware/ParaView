@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTextDisplay.cxx
+   Module:    pqTextRepresentation.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,26 +29,26 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqTextDisplay.h"
+#include "pqTextRepresentation.h"
 
 #include "vtkSMProxy.h"
 #include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
-pqTextDisplay::pqTextDisplay(const QString& group, 
+pqTextRepresentation::pqTextRepresentation(const QString& group, 
   const QString& name, vtkSMProxy* display, pqServer* server,
     QObject* _parent): 
-  pqConsumerDisplay(group, name, display, server, _parent)
+  Superclass(group, name, display, server, _parent)
 {
 };
 
 //-----------------------------------------------------------------------------
-pqTextDisplay::~pqTextDisplay()
+pqTextRepresentation::~pqTextRepresentation()
 {
 }
 
 //-----------------------------------------------------------------------------
-void pqTextDisplay::setDefaultPropertyValues()
+void pqTextRepresentation::setDefaultPropertyValues()
 {
   this->Superclass::setDefaultPropertyValues();
   if (!this->isVisible())

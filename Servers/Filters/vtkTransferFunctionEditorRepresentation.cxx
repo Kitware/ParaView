@@ -22,7 +22,7 @@
 #include "vtkProperty2D.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation, "1.8");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation, "1.9");
 
 vtkCxxSetObjectMacro(vtkTransferFunctionEditorRepresentation,
                      ColorFunction, vtkColorTransferFunction);
@@ -179,4 +179,10 @@ void vtkTransferFunctionEditorRepresentation::PrintSelf(ostream& os, vtkIndent i
      << this->ColorElementsByColorFunction << endl;
   os << indent << "VisibleScalarRange: " << this->VisibleScalarRange[0] << " "
      << this->VisibleScalarRange[1] << endl;
+  os << indent << "ShowColorFunctionInHistogram: "
+     << this->ShowColorFunctionInHistogram << endl;
+  os << indent << "HistogramColor: " 
+    << this->HistogramColor[0] << ", "
+    << this->HistogramColor[1] << ", "
+    << this->HistogramColor[2] << endl;
 }

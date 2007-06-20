@@ -24,7 +24,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryStrategyProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryStrategyProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMClientDeliveryStrategyProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryStrategyProxy::vtkSMClientDeliveryStrategyProxy()
 {
@@ -40,12 +40,9 @@ vtkSMClientDeliveryStrategyProxy::~vtkSMClientDeliveryStrategyProxy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMClientDeliveryStrategyProxy::CreateVTKObjects()
+void vtkSMClientDeliveryStrategyProxy::BeginCreateVTKObjects()
 {
-  if (this->ObjectsCreated)
-    {
-    return;
-    }
+  this->Superclass::BeginCreateVTKObjects();
 
   this->CollectProxy = vtkSMSourceProxy::SafeDownCast(
     this->GetSubProxy("Collect"));
@@ -57,7 +54,15 @@ void vtkSMClientDeliveryStrategyProxy::CreateVTKObjects()
   this->CollectLODProxy->SetServers(
     this->Servers | vtkProcessModule::CLIENT);
 
-  this->Superclass::CreateVTKObjects();
+  this->UpdateSuppressor->SetServers(
+    this->Servers|vtkProcessModule::CLIENT);
+
+  if (this->LODDecimator && this->UpdateSuppressorLOD)
+    {
+    this->LODDecimator->SetServers(this->Servers);
+    this->UpdateSuppressorLOD->SetServers(
+      this->Servers | vtkProcessModule::CLIENT);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -199,7 +204,7 @@ void vtkSMClientDeliveryStrategyProxy::UpdatePipelineInternal(
     }
       
   updatesuppressor->InvokeCommand("ForceUpdate");
-  this->Superclass::Update();
+  // this->Superclass::Update();
 }
 //-----------------------------------------------------------------------------
 vtkSMSourceProxy* vtkSMClientDeliveryStrategyProxy::GetOutput()

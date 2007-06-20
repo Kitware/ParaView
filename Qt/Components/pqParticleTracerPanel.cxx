@@ -34,12 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqLineSourceWidget.h"
 #include "pqNamedWidgets.h"
-#include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPointSourceWidget.h"
 #include "pqPropertyManager.h"
-#include "pqServerManagerModel.h"
-#include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
 
@@ -231,9 +228,9 @@ pqParticleTracerPanel::pqParticleTracerPanel(pqProxy* object_proxy, QWidget* p) 
   
   QObject::connect(
     this,
-    SIGNAL(renderModuleChanged(pqRenderViewModule*)),
+    SIGNAL(viewChanged(pqRenderView*)),
     this,
-    SLOT(onRenderModuleChanged(pqRenderViewModule*)));
+    SLOT(onViewChanged(pqRenderView*)));
 
   QObject::connect(
     this->Implementation->PointSourceWidget, SIGNAL(modified()),
@@ -353,7 +350,7 @@ pqParticleTracerPanel::~pqParticleTracerPanel()
 }
 
 //-----------------------------------------------------------------------------
-void pqParticleTracerPanel::onRenderModuleChanged(pqRenderViewModule* render_module)
+void pqParticleTracerPanel::onViewChanged(pqRenderView* render_module)
 {
   this->Implementation->PointSourceWidget->setRenderModule(render_module);
   this->Implementation->LineSourceWidget->setRenderModule(render_module);

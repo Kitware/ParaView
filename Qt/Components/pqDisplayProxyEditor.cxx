@@ -46,16 +46,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKWidget.h"
 
 // ParaView Server Manager includes
+#include "vtkMaterialLibrary.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVGeometryInformation.h"
-#include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkPVDataInformation.h"
 #include "vtkSMLookupTableProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkMaterialLibrary.h"
 
 // ParaView widget includes
 #include "pqSignalAdaptors.h"
@@ -65,9 +65,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorScaleEditor.h"
 #include "pqSMAdaptor.h"
 #include "pqPropertyLinks.h"
-#include "pqPipelineDisplay.h"
+#include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
-#include "pqRenderViewModule.h"
+#include "pqRenderView.h"
 #include "pqFileDialog.h"
 #include "pqScalarsToColors.h"
 
@@ -90,8 +90,8 @@ public:
 
   pqPropertyLinks* Links;
 
-  // The display whose properties are being edited.
-  QPointer<pqPipelineDisplay> Display;
+  // The representaion whose properties are being edited.
+  QPointer<pqPipelineRepresentation> Representation;
   pqSignalAdaptorComboBox* InterpolationAdaptor;
   pqSignalAdaptorColor*    ColorAdaptor;
 
@@ -104,17 +104,17 @@ QMap<QString, QString> pqDisplayProxyEditorInternal::MaterialMap;
 
 //-----------------------------------------------------------------------------
 /// constructor
-pqDisplayProxyEditor::pqDisplayProxyEditor(pqPipelineDisplay* display, QWidget* p)
-  : pqDisplayPanel(display, p), DisableSlots(0)
+pqDisplayProxyEditor::pqDisplayProxyEditor(pqPipelineRepresentation* repr, QWidget* p)
+  : pqDisplayPanel(repr, p), DisableSlots(0)
 {
   this->Internal = new pqDisplayProxyEditorInternal;
   this->Internal->setupUi(this);
   this->setupGUIConnections();
 
-  // setting a display proxy will enable this
+  // setting a repr proxy will enable this
   this->setEnabled(false);
 
-  this->setDisplay(display);
+  this->setRepresentation(repr);
 }
 
 //-----------------------------------------------------------------------------
@@ -125,24 +125,23 @@ pqDisplayProxyEditor::~pqDisplayProxyEditor()
 }
 
 //-----------------------------------------------------------------------------
-/// set the proxy to display properties for
-void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display) 
+/// set the proxy to repr display properties for
+void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr) 
 {
-  if(this->Internal->Display == display)
+  if(this->Internal->Representation == repr)
     {
     return;
     }
 
-  vtkSMDataObjectDisplayProxy* displayProxy = 
-    (display)? display->getDisplayProxy() : NULL;
-  if(this->Internal->Display)
+  vtkSMProxy* reprProxy = (repr)? repr->getProxy() : NULL;
+  if(this->Internal->Representation)
     {
     // break all old links.
     this->Internal->Links->removeAllPropertyLinks();
     }
 
-  this->Internal->Display = display;
-  if (!display )
+  this->Internal->Representation = repr;
+  if (!repr )
     {
     this->setEnabled(false);
     return;
@@ -159,17 +158,16 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
   // setup for visibility
   this->Internal->Links->addPropertyLink(this->Internal->ViewData,
     "checked", SIGNAL(stateChanged(int)),
-    displayProxy, displayProxy->GetProperty("Visibility"));
+    reprProxy, reprProxy->GetProperty("Visibility"));
 
   // setup for choosing color
   this->Internal->Links->addPropertyLink(this->Internal->ColorAdaptor,
     "color", SIGNAL(colorChanged(const QVariant&)),
-    displayProxy, displayProxy->GetProperty("AmbientColor"));
+    reprProxy, reprProxy->GetProperty("AmbientColor"));
   this->Internal->Links->addPropertyLink(this->Internal->ColorAdaptor,
     "color", SIGNAL(colorChanged(const QVariant&)),
-    displayProxy, displayProxy->GetProperty("DiffuseColor"));
+    reprProxy, reprProxy->GetProperty("DiffuseColor"));
 
-#if 0
   // setup for specular lighting
   QObject::connect(this->Internal->SpecularWhite, SIGNAL(toggled(bool)),
                    this, SIGNAL(specularColorChanged()));
@@ -178,27 +176,26 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
                    this, SIGNAL(specularColorChanged()));
   this->Internal->Links->addPropertyLink(this->Internal->SpecularIntensity,
     "value", SIGNAL(valueChanged(double)),
-    displayProxy, displayProxy->GetProperty("Specular"));
+    reprProxy, reprProxy->GetProperty("Specular"));
   this->Internal->Links->addPropertyLink(this,
     "specularColor", SIGNAL(specularColorChanged()),
-    displayProxy, displayProxy->GetProperty("SpecularColor"));
+    reprProxy, reprProxy->GetProperty("SpecularColor"));
   this->Internal->Links->addPropertyLink(this->Internal->SpecularPower,
     "value", SIGNAL(valueChanged(int)),
-    displayProxy, displayProxy->GetProperty("SpecularPower"));
+    reprProxy, reprProxy->GetProperty("SpecularPower"));
   QObject::connect(this->Internal->SpecularIntensity, SIGNAL(valueChanged(double)),
-                   this, SLOT(updateView()),
+                   this, SLOT(updateAllViews()),
                    Qt::QueuedConnection);
   QObject::connect(this, SIGNAL(specularColorChanged()),
-                   this, SLOT(updateView()),
+                   this, SLOT(updateAllViews()),
                    Qt::QueuedConnection);
   QObject::connect(this->Internal->SpecularPower, SIGNAL(valueChanged(int)),
-                   this, SLOT(updateView()),
+                   this, SLOT(updateAllViews()),
                    Qt::QueuedConnection);
-#endif
   
   // setup for interpolation
   this->Internal->StyleInterpolation->clear();
-  vtkSMProperty* Property = displayProxy->GetProperty("Interpolation");
+  vtkSMProperty* Property = reprProxy->GetProperty("Interpolation");
   Property->UpdateDependentDomains();
   QList<QVariant> items = pqSMAdaptor::getEnumerationPropertyDomain(
     Property);
@@ -208,95 +205,96 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
     }
   this->Internal->Links->addPropertyLink(this->Internal->InterpolationAdaptor,
     "currentText", SIGNAL(currentTextChanged(const QString&)),
-    displayProxy, displayProxy->GetProperty("Interpolation"));
+    reprProxy, reprProxy->GetProperty("Interpolation"));
 
   // setup for point size
   this->Internal->Links->addPropertyLink(this->Internal->StylePointSize,
     "value", SIGNAL(valueChanged(double)),
-    displayProxy, displayProxy->GetProperty("PointSize"));
+    reprProxy, reprProxy->GetProperty("PointSize"));
 
   // setup for line width
   this->Internal->Links->addPropertyLink(this->Internal->StyleLineWidth,
     "value", SIGNAL(valueChanged(double)),
-    displayProxy, displayProxy->GetProperty("LineWidth"));
+    reprProxy, reprProxy->GetProperty("LineWidth"));
 
   // setup for translate
   this->Internal->Links->addPropertyLink(this->Internal->TranslateX,
     "value", SIGNAL(valueChanged(double)),
-    displayProxy, displayProxy->GetProperty("Position"), 0);
+    reprProxy, reprProxy->GetProperty("Position"), 0);
 
   this->Internal->Links->addPropertyLink(this->Internal->TranslateY,
     "value", SIGNAL(valueChanged(double)),
-    displayProxy, displayProxy->GetProperty("Position"), 1);
+    reprProxy, reprProxy->GetProperty("Position"), 1);
   
   this->Internal->Links->addPropertyLink(this->Internal->TranslateZ,
     "value", SIGNAL(valueChanged(double)),
-    displayProxy, displayProxy->GetProperty("Position"), 2);
+    reprProxy, reprProxy->GetProperty("Position"), 2);
 
   // setup for scale
   this->Internal->Links->addPropertyLink(this->Internal->ScaleX,
     "value", SIGNAL(valueChanged(double)),
-    displayProxy, displayProxy->GetProperty("Scale"), 0);
+    reprProxy, reprProxy->GetProperty("Scale"), 0);
 
   this->Internal->Links->addPropertyLink(this->Internal->ScaleY,
     "value", SIGNAL(valueChanged(double)),
-    displayProxy, displayProxy->GetProperty("Scale"), 1);
+    reprProxy, reprProxy->GetProperty("Scale"), 1);
 
   this->Internal->Links->addPropertyLink(this->Internal->ScaleZ,
     "value", SIGNAL(valueChanged(double)),
-    displayProxy, displayProxy->GetProperty("Scale"), 2);
+    reprProxy, reprProxy->GetProperty("Scale"), 2);
 
   // setup for orientation
   this->Internal->Links->addPropertyLink(this->Internal->OrientationX,
     "value", SIGNAL(valueChanged(double)),
-    displayProxy, displayProxy->GetProperty("Orientation"), 0);
+    reprProxy, reprProxy->GetProperty("Orientation"), 0);
 
   this->Internal->Links->addPropertyLink(this->Internal->OrientationY,
     "value", SIGNAL(valueChanged(double)),
-    displayProxy, displayProxy->GetProperty("Orientation"), 1);
+    reprProxy, reprProxy->GetProperty("Orientation"), 1);
 
   this->Internal->Links->addPropertyLink(this->Internal->OrientationZ,
     "value", SIGNAL(valueChanged(double)),
-    displayProxy, displayProxy->GetProperty("Orientation"), 2);
+    reprProxy, reprProxy->GetProperty("Orientation"), 2);
 
   // setup for origin
   this->Internal->Links->addPropertyLink(this->Internal->OriginX,
     "value", SIGNAL(valueChanged(double)),
-    displayProxy, displayProxy->GetProperty("Origin"), 0);
+    reprProxy, reprProxy->GetProperty("Origin"), 0);
 
   this->Internal->Links->addPropertyLink(this->Internal->OriginY,
     "value", SIGNAL(valueChanged(double)),
-    displayProxy, displayProxy->GetProperty("Origin"), 1);
+    reprProxy, reprProxy->GetProperty("Origin"), 1);
 
   this->Internal->Links->addPropertyLink(this->Internal->OriginZ,
     "value", SIGNAL(valueChanged(double)),
-    displayProxy, displayProxy->GetProperty("Origin"), 2);
+    reprProxy, reprProxy->GetProperty("Origin"), 2);
 
   // setup for opacity
   this->Internal->Links->addPropertyLink(this->Internal->Opacity,
     "value", SIGNAL(valueChanged(double)),
-    displayProxy, displayProxy->GetProperty("Opacity"));
+    reprProxy, reprProxy->GetProperty("Opacity"));
 
   // setup for map scalars
   this->Internal->Links->addPropertyLink(
     this->Internal->ColorMapScalars, "checked", SIGNAL(stateChanged(int)),
-    displayProxy, displayProxy->GetProperty("MapScalars"));
+    reprProxy, reprProxy->GetProperty("MapScalars"));
 
   // setup for InterpolateScalarsBeforeMapping
   this->Internal->Links->addPropertyLink(
     this->Internal->ColorInterpolateColors, "checked", SIGNAL(stateChanged(int)),
-    displayProxy, displayProxy->GetProperty("InterpolateScalarsBeforeMapping"));
+    reprProxy, reprProxy->GetProperty("InterpolateScalarsBeforeMapping"));
 
-  this->Internal->ColorBy->setDisplay(display);
+  this->Internal->ColorBy->setRepresentation(repr);
   QObject::connect(this->Internal->ColorBy,
     SIGNAL(modified()),
     this, SLOT(updateEnableState()));
 
-  this->Internal->StyleRepresentation->setDisplay(display);
+  this->Internal->StyleRepresentation->setRepresentation(repr);
   QObject::connect(this->Internal->StyleRepresentation,
     SIGNAL(currentTextChanged(const QString&)),
     this->Internal->ColorBy, SLOT(reloadGUI()));
 
+#if 0                                       //FIXME 
   // material
   this->Internal->StyleMaterial->blockSignals(true);
   this->Internal->StyleMaterial->clear();
@@ -305,7 +303,7 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
     this->Internal->StyleMaterial->addItem("None");
     this->Internal->StyleMaterial->addItem("Browse...");
     this->Internal->StyleMaterial->addItems(this->Internal->MaterialMap.keys());
-    const char* mat = this->Internal->Display->getDisplayProxy()->GetMaterialCM();
+    const char* mat = this->Internal->Representation->getDisplayProxy()->GetMaterialCM();
     if(mat)
       {
       QString filename = mat;
@@ -329,6 +327,7 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
     this->Internal->StyleMaterial->setEnabled(false);
     }
   this->Internal->StyleMaterial->blockSignals(false);
+#endif
 
   this->DisableSlots = 0;
   
@@ -336,90 +335,81 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplayProxyEditor::updateView()
-{
-  if (!this->DisableSlots && this->getDisplay())
-    {
-    this->getDisplay()->renderAllViews();
-    }
-}
-
-//-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::setupGUIConnections()
 {
   // We are usinging Queues slot execution where ever possible,
-  // This ensures that the updateView() slot is called 
+  // This ensures that the updateAllViews() slot is called 
   // only after the vtkSMProperty has been changed by the pqPropertyLinks.
   QObject::connect(
     this->Internal->ViewData, SIGNAL(stateChanged(int)),
-    this, SLOT(updateView()),
+    this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
     this->Internal->ColorInterpolateColors, SIGNAL(stateChanged(int)),
-    this, SLOT(updateView()),
+    this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
     this->Internal->ColorMapScalars, SIGNAL(stateChanged(int)),
-    this, SLOT(updateView()),
+    this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
     this->Internal->StylePointSize,  SIGNAL(valueChanged(double)), 
-    this, SLOT(updateView()));
+    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->StyleLineWidth, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),
+    this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
     this->Internal->TranslateX, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),
+    this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
     this->Internal->TranslateY, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),
+    this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
     this->Internal->TranslateZ, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),
+    this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
     this->Internal->ScaleX, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),
+    this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
     this->Internal->ScaleY, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),
+    this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
     this->Internal->ScaleZ, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),
+    this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
     this->Internal->OrientationX, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),
+    this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
     this->Internal->OrientationY, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),
+    this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
     this->Internal->OrientationZ, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),
+    this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
     this->Internal->OriginX, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),
+    this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
     this->Internal->OriginY, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),
+    this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
     this->Internal->OriginZ, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),
+    this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
     this->Internal->Opacity, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),
+    this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
     this->Internal->ViewZoomToData, SIGNAL(clicked(bool)), 
@@ -442,7 +432,7 @@ void pqDisplayProxyEditor::setupGUIConnections()
   this->Internal->InterpolationAdaptor->setObjectName(
     "StyleInterpolationAdapator");
   QObject::connect(this->Internal->InterpolationAdaptor, 
-    SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateView()),
+    SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
     
   this->Internal->ColorAdaptor = new pqSignalAdaptorColor(
@@ -451,7 +441,7 @@ void pqDisplayProxyEditor::setupGUIConnections()
                             SIGNAL(chosenColorChanged(const QColor&)), false);
   QObject::connect(
     this->Internal->ColorActorColor, SIGNAL(chosenColorChanged(const QColor&)),
-    this, SLOT(updateView()));
+    this, SLOT(updateAllViews()));
   
   QObject::connect(this->Internal->StyleMaterial, SIGNAL(currentIndexChanged(int)),
                    this, SLOT(updateMaterial(int)));
@@ -474,14 +464,15 @@ void pqDisplayProxyEditor::updateEnableState()
         this->Internal->ColorMapPage);
     }
 
-  vtkSMDataObjectDisplayProxy* display = 
-    this->Internal->Display->getDisplayProxy();
+  vtkSMDataRepresentationProxy* display = 
+    this->Internal->Representation->getRepresentationProxy();
   if (display)
     {
-    vtkPVGeometryInformation* geomInfo = display->GetDisplayedDataInformation();
+    QVariant scalarMode = pqSMAdaptor::getEnumerationProperty(
+      display->GetProperty("ColorAttributeType"));
+    vtkPVDataInformation* geomInfo = display->GetFullResDataInformation();
     vtkPVDataSetAttributesInformation* attrInfo;
-    if (display->GetScalarModeCM() == 
-        vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
+    if (scalarMode == "POINT_DATA")
       {
       attrInfo = geomInfo->GetPointDataInformation();
       }
@@ -490,7 +481,7 @@ void pqDisplayProxyEditor::updateEnableState()
       attrInfo = geomInfo->GetCellDataInformation();
       }
     vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(
-      this->Internal->Display->getColorField(true).toAscii().data());
+      this->Internal->Representation->getColorField(true).toAscii().data());
 
     if (arrayInfo && arrayInfo->GetDataType() == VTK_UNSIGNED_CHAR)
       {
@@ -511,35 +502,35 @@ void pqDisplayProxyEditor::updateEnableState()
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::openColorMapEditor()
 {
-  if(this->Internal->Display.isNull())
+  if(this->Internal->Representation.isNull())
     {
     return;
     }
 
   // Create a color map editor and set the display.
   pqColorScaleEditor colorScale(this);
-  colorScale.setDisplay(this->Internal->Display);
+  colorScale.setRepresentation(this->Internal->Representation);
   colorScale.exec();
 }
 
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::rescaleToDataRange()
 {
-  if(this->Internal->Display.isNull())
+  if(this->Internal->Representation.isNull())
     {
     return;
     }
 
-  this->Internal->Display->resetLookupTableScalarRange();
+  this->Internal->Representation->resetLookupTableScalarRange();
 
   // TODO: This method is too slow using the vtk tfe.
   // Use the color map editor to scale to the data range. This will
   // ensure that the log scale is updated appropriately.
   //pqColorScaleEditor colorScale(this);
-  //colorScale.setDisplay(this->Internal->Display);
+  //colorScale.setRepresentation(this->Internal->Representation);
   //colorScale.rescaleRange();
 
-  this->updateView();
+  this->updateAllViews();
 }
 
 //-----------------------------------------------------------------------------
@@ -550,31 +541,17 @@ void pqDisplayProxyEditor::zoomToData()
     return;
     }
 
-  vtkSMDataObjectDisplayProxy* display = 
-    this->Internal->Display->getDisplayProxy();
-
-  if(!display)
-    {
-    qDebug() << "Cannot zoom to data, failed to locate display proxy.";
-    return;
-    }
   double bounds[6];
-  display->GetDisplayedDataInformation()->GetBounds(bounds);
+  this->Internal->Representation->getDataBounds(bounds);
   if (bounds[0]<=bounds[1] && bounds[2]<=bounds[3] && bounds[4]<=bounds[5])
     {
-    unsigned int numRenModules;
-    numRenModules = this->Internal->Display->getNumberOfViewModules();
-    for(unsigned int i=0; i<numRenModules; i++)
+    pqRenderView* renModule = qobject_cast<pqRenderView*>(
+      this->Internal->Representation->getView());
+    if (renModule)
       {
-      pqRenderViewModule* renModule = qobject_cast<pqRenderViewModule*>(
-        this->Internal->Display->getViewModule(i));
-      if (renModule)
-        {
-        vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy();
-        rm->ResetCamera(bounds);
-        rm->ResetCameraClippingRange();
-        renModule->render();
-        }
+      vtkSMRenderViewProxy* rm = renModule->getRenderViewProxy();
+      rm->ResetCamera(bounds);
+      renModule->render();
       }
     }
 }
@@ -583,7 +560,7 @@ void pqDisplayProxyEditor::zoomToData()
 // arrays are added.
 void pqDisplayProxyEditor::reloadGUI()
 {
-  this->Internal->ColorBy->setDisplay(this->Internal->Display);
+  this->Internal->ColorBy->setRepresentation(this->Internal->Representation);
 }
 
 
@@ -598,7 +575,7 @@ QVariant pqDisplayProxyEditor::specularColor() const
     return ret;
     }
   
-  vtkSMProxy* proxy = this->Internal->Display->getDisplayProxy();
+  vtkSMProxy* proxy = this->Internal->Representation->getProxy();
   return pqSMAdaptor::getMultipleElementProperty(
        proxy->GetProperty("DiffuseColor"));
 }
@@ -622,12 +599,14 @@ void pqDisplayProxyEditor::setSpecularColor(QVariant specColor)
     }
 }
 
-void pqDisplayProxyEditor::updateMaterial(int idx)
+void pqDisplayProxyEditor::updateMaterial(int vtkNotUsed(idx))
 {
+  // FIXME: when we enable materials.
+#if 0   
   if(idx == 0)
     {
-    this->Internal->Display->getDisplayProxy()->SetMaterialCM(0);
-    this->updateView();
+    this->Internal->Representation->getDisplayProxy()->SetMaterialCM(0);
+    this->updateAllViews();
     }
   else if(idx == 1)
     {
@@ -659,9 +638,10 @@ void pqDisplayProxyEditor::updateMaterial(int idx)
   else
     {
     QString label = this->Internal->StyleMaterial->itemText(idx);
-    this->Internal->Display->getDisplayProxy()->SetMaterialCM(
+    this->Internal->Representation->getDisplayProxy()->SetMaterialCM(
       this->Internal->MaterialMap[label].toAscii().data());
-    this->updateView();
+    this->updateAllViews();
     }
+#endif
 }
 

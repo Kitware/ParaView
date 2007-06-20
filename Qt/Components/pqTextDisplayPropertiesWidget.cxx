@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 
 #include "pqPropertyLinks.h"
-#include "pqDisplay.h"
-#include "pqTextDisplay.h"
+#include "pqRepresentation.h"
+#include "pqTextRepresentation.h"
 #include "pqSignalAdaptors.h"
 
 class pqTextDisplayPropertiesWidget::pqInternal : 
@@ -51,7 +51,7 @@ public:
   pqInternal();
   ~pqInternal();
 
-  QPointer<pqDisplay> Display;
+  QPointer<pqRepresentation> Display;
   pqPropertyLinks Links;
 
   pqSignalAdaptorColor *ColorAdaptor;
@@ -77,7 +77,7 @@ pqTextDisplayPropertiesWidget::pqInternal::~pqInternal()
 }
 
 //-----------------------------------------------------------------------------
-pqTextDisplayPropertiesWidget::pqTextDisplayPropertiesWidget(pqDisplay* display, QWidget* p)
+pqTextDisplayPropertiesWidget::pqTextDisplayPropertiesWidget(pqRepresentation* display, QWidget* p)
   : pqDisplayPanel(display, p)
 {
   this->Internal = new pqInternal();
@@ -105,7 +105,7 @@ pqTextDisplayPropertiesWidget::~pqTextDisplayPropertiesWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqTextDisplayPropertiesWidget::setDisplay(pqDisplay* display)
+void pqTextDisplayPropertiesWidget::setDisplay(pqRepresentation* display)
 {
   if (this->Internal->Display == display)
     {
@@ -119,7 +119,7 @@ void pqTextDisplayPropertiesWidget::setDisplay(pqDisplay* display)
     QObject::disconnect(this->Internal->Display, 0, this, 0);
     }
 
-  this->Internal->Display = qobject_cast<pqTextDisplay*>(display);
+  this->Internal->Display = qobject_cast<pqTextRepresentation*>(display);
   if (!this->Internal->Display)
     {
     return;
@@ -257,6 +257,6 @@ void pqTextDisplayPropertiesWidget::onTextLocationChanged(bool checked)
       }
     }
 
-  this->Internal->Display->renderAllViews();
+  this->Internal->Display->renderViewEventually();
 
 }

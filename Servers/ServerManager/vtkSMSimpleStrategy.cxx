@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMSimpleStrategy.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
@@ -21,13 +22,14 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.6");
+vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMSimpleStrategy::vtkSMSimpleStrategy()
 {
   this->LODDecimator = 0;
   this->UpdateSuppressor = 0;
   this->UpdateSuppressorLOD = 0;
+  this->SetEnableLOD(true);
 }
 
 //----------------------------------------------------------------------------
@@ -37,12 +39,9 @@ vtkSMSimpleStrategy::~vtkSMSimpleStrategy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleStrategy::CreateVTKObjects()
+void vtkSMSimpleStrategy::BeginCreateVTKObjects()
 {
-  if (this->ObjectsCreated)
-    {
-    return;
-    }
+  this->Superclass::BeginCreateVTKObjects();
 
   this->LODDecimator = 
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("LODDecimator"));
@@ -51,11 +50,60 @@ void vtkSMSimpleStrategy::CreateVTKObjects()
   this->UpdateSuppressorLOD = 
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("UpdateSuppressorLOD"));
 
-  this->LODDecimator->SetServers(vtkProcessModule::DATA_SERVER);
   this->UpdateSuppressor->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
-  this->UpdateSuppressorLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
 
-  this->Superclass::CreateVTKObjects();
+  if (this->LODDecimator && this->UpdateSuppressorLOD)
+    {
+    this->LODDecimator->SetServers(vtkProcessModule::DATA_SERVER);
+    this->UpdateSuppressorLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+    }
+  else
+    {
+    this->SetEnableLOD(false);
+    }
+
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSimpleStrategy::EndCreateVTKObjects()
+{
+  this->Superclass::EndCreateVTKObjects();
+
+  // Update piece information on each of the update suppressors.
+  this->UpdatePieceInformation(this->UpdateSuppressor);
+  if (this->GetEnableLOD())
+    {
+    this->UpdatePieceInformation(this->UpdateSuppressorLOD);
+    }
+
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSimpleStrategy::UpdatePieceInformation(vtkSMSourceProxy* updateSuppressor)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+
+  // Init UpdateSuppressor properties.
+  // Seems like we can't use properties for this 
+  // to work properly.
+  stream
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << updateSuppressor->GetID() << "SetUpdateNumberOfPieces"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  stream
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetPartitionId"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << updateSuppressor->GetID() << "SetUpdatePiece"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, updateSuppressor->GetServers(), stream);
 }
 
 //----------------------------------------------------------------------------
@@ -118,10 +166,13 @@ void vtkSMSimpleStrategy::SetLODResolution(int resolution)
     {
     vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
       this->LODDecimator->GetProperty("NumberOfDivisions"));
-    ivp->SetElement(0, this->LODResolution);
-    ivp->SetElement(1, this->LODResolution);
-    ivp->SetElement(2, this->LODResolution);
-    this->LODDecimator->UpdateVTKObjects();
+    if (ivp)
+      {
+      ivp->SetElement(0, this->LODResolution);
+      ivp->SetElement(1, this->LODResolution);
+      ivp->SetElement(2, this->LODResolution);
+      this->LODDecimator->UpdateVTKObjects();
+      }
     }
 }
 

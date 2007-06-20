@@ -54,7 +54,7 @@ protected:
   // Default implementation can only handle vtkSMRenderModuleProxy subclasses.
   // Subclassess must override to handle other types of view modules.
   virtual vtkImageData* CaptureViewImage(
-    vtkSMAbstractViewModuleProxy*, int magnification);
+    vtkSMViewProxy*, int magnification);
 
 private:
   pqAnimationSceneImageWriter(const pqAnimationSceneImageWriter&); // Not implemented.

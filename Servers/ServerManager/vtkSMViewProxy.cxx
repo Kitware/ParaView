@@ -17,14 +17,19 @@
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
+#include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkTimerLog.h"
+
+#include <vtkstd/vector>
 
 //----------------------------------------------------------------------------
 class vtkSMViewProxy::Command : public vtkCommand
@@ -48,15 +53,82 @@ private:
   vtkSMViewProxy* Target;
 };
 
+//----------------------------------------------------------------------------
+class vtkSMViewProxy::vtkMultiViewInitializer : public vtkstd::vector<vtkSMViewProxy*>
+{
+public:
+  void InitializeForMultiView(vtkSMViewProxy* other)
+    {
+    const char* xmlgroup = other->GetXMLGroup();
+    const char* xmlname = other->GetXMLName();
+
+    vtkMultiViewInitializer::iterator iter = this->begin();
+    for (;iter != this->end(); ++iter)
+      {
+      if ( 
+        (*iter)->GetConnectionID() == other->GetConnectionID() &&
+        strcmp((*iter)->GetXMLGroup(), xmlgroup)==0 &&
+        strcmp((*iter)->GetXMLName(), xmlname) == 0 &&
+        (*iter)->IsA(other->GetClassName()))
+        {
+        other->InitializeForMultiView(*iter);
+        break;
+        }
+      }
+    }
+
+  void Add(vtkSMViewProxy* view)
+    {
+    this->push_back(view);
+    }
+
+  void Remove(vtkSMViewProxy* view)
+    {
+    vtkMultiViewInitializer::iterator iter = this->begin();
+    for (;iter != this->end(); ++iter)
+      {
+      if ((*iter) == view)
+        {
+        this->erase(iter);
+        break;
+        }
+      }
+    }
+};
+
+vtkSMViewProxy::vtkMultiViewInitializer* vtkSMViewProxy::MultiViewInitializer =0;
+
+//----------------------------------------------------------------------------
+vtkSMViewProxy::vtkMultiViewInitializer* vtkSMViewProxy::GetMultiViewInitializer()
+{
+  if (!vtkSMViewProxy::MultiViewInitializer)
+    {
+    vtkSMViewProxy::MultiViewInitializer = new vtkSMViewProxy::vtkMultiViewInitializer();
+    }
+
+  return vtkSMViewProxy::MultiViewInitializer;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewProxy::CleanMultiViewInitializer()
+{
+  if (vtkSMViewProxy::MultiViewInitializer &&
+    vtkSMViewProxy::MultiViewInitializer->size() == 0)
+    {
+    delete vtkSMViewProxy::MultiViewInitializer;
+    vtkSMViewProxy::MultiViewInitializer = 0;
+    }
+}
+
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMViewProxy::vtkSMViewProxy()
 {
   this->Representations = vtkCollection::New();
   this->Observer = vtkSMViewProxy::Command::New();
   this->Observer->SetTarget(this);
-  this->ViewHelper = 0;
+  this->Information = vtkInformation::New();
 
   this->GUISize[0] = this->GUISize[1] = 300;
   this->ViewPosition[0] = this->ViewPosition[1] = 0;
@@ -68,16 +140,26 @@ vtkSMViewProxy::vtkSMViewProxy()
   this->FullResDataSizeValid = false;
 
   this->ForceRepresentationUpdate = false;
+
+  this->DefaultRepresentationName = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMViewProxy::~vtkSMViewProxy()
 {
+  vtkSMViewProxy::GetMultiViewInitializer()->Remove(this);
+  vtkSMViewProxy::CleanMultiViewInitializer();
+
   this->Observer->SetTarget(0);
   this->Observer->Delete();
 
   this->RemoveAllRepresentations();
   this->Representations->Delete();
+
+  this->SetDefaultRepresentationName(0);
+
+  this->Information->Clear();
+  this->Information->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -88,16 +170,7 @@ void vtkSMViewProxy::CreateVTKObjects()
     return;
     }
 
-  if (!this->ViewHelper)
-    {
-    this->ViewHelper = this->GetSubProxy("ViewHelper");
-    }
-
-  if (this->ViewHelper)
-    {
-    this->ViewHelper->SetServers(
-      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-    }
+  vtkSMViewProxy::GetMultiViewInitializer()->InitializeForMultiView(this);
 
   if (!this->BeginCreateVTKObjects())
     {
@@ -107,12 +180,32 @@ void vtkSMViewProxy::CreateVTKObjects()
   this->Superclass::CreateVTKObjects();
 
   this->EndCreateVTKObjects();
+
+  vtkSMViewProxy::GetMultiViewInitializer()->Add(this);
 }
 
 //----------------------------------------------------------------------------
 vtkCommand* vtkSMViewProxy::GetObserver()
 {
   return this->Observer;
+}
+
+//----------------------------------------------------------------------------
+vtkSMRepresentationProxy* vtkSMViewProxy::CreateDefaultRepresentation(vtkSMProxy*)
+{
+  if (this->DefaultRepresentationName)
+    {
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    vtkSmartPointer<vtkSMProxy> p;
+    p.TakeReference(pxm->NewProxy("representations", this->DefaultRepresentationName));
+    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(p);
+    if (repr)
+      {
+      repr->Register(this);
+      return repr;
+      }
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -137,13 +230,11 @@ void vtkSMViewProxy::AddRepresentationInternal(vtkSMRepresentationProxy* repr)
 {
   this->InvalidateDataSizes();
 
-  if (this->ViewHelper && repr->GetProperty("ViewHelper"))
-    {
-    // Provide th representation with the helper if it needs it.
-    this->Connect(this->ViewHelper, repr, "ViewHelper");
-    }
+  // Pass the view information to the representation.
+  repr->SetViewInformation(this->Information);
 
   this->Representations->AddItem(repr);
+
   // If representation is modified, we invalidate the data information.
   repr->AddObserver(vtkCommand::ModifiedEvent, this->Observer);
 
@@ -168,18 +259,10 @@ void vtkSMViewProxy::RemoveRepresentationInternal(vtkSMRepresentationProxy* repr
 {
   this->InvalidateDataSizes();
 
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    repr->GetProperty("ViewHelper"));
-  if (pp)
-    {
-    pp->RemoveAllProxies();
-    repr->UpdateProperty("ViewHelper");
-    }
+  repr->SetViewInformation(0);
 
   this->Representations->RemoveItem(repr);
   repr->RemoveObserver(this->Observer);
-
-  // repr->RemoveObserver(this->Observer);
 }
 
 //----------------------------------------------------------------------------
@@ -344,11 +427,13 @@ vtkSMRepresentationStrategy* vtkSMViewProxy::NewStrategy(int dataType)
 {
   vtkSMRepresentationStrategy* strategy = 
     this->NewStrategyInternal(dataType);
-  if (strategy && this->ViewHelper)
+
+  if (strategy)
     {
-    // Pass the view helper to the strategy.
-    this->Connect(this->ViewHelper, strategy, "ViewHelper");
+    // Pass the view information to the strategy.
+    strategy->SetViewInformation(this->Information);
     }
+
   return strategy;
 }
 
@@ -420,6 +505,24 @@ void vtkSMViewProxy::InvalidateDataSizes()
   this->FullResDataSizeValid = false;
   this->DisplayedDataSizeValid = false;
 }
+
+//----------------------------------------------------------------------------
+int vtkSMViewProxy::ReadXMLAttributes(
+  vtkSMProxyManager* pm, vtkPVXMLElement* element)
+{
+  if (!this->Superclass::ReadXMLAttributes(pm, element))
+    {
+    return 0;
+    }
+
+  const char* repr_name = element->GetAttribute("representation_name");
+  if (repr_name)
+    {
+    this->SetDefaultRepresentationName(repr_name);
+    }
+  return 1;
+}
+
 
 //----------------------------------------------------------------------------
 void vtkSMViewProxy::PrintSelf(ostream& os, vtkIndent indent)

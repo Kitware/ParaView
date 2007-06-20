@@ -119,6 +119,11 @@ public:
   // return true for this method. Default implementation return false.
   virtual bool GetOrderedCompositingNeeded();
 
+  // Description:
+  // Overridden to pass the view information to all the internal
+  // representations.
+  virtual void SetViewInformation(vtkInformation*);
+
 //BTX
   enum RepresentationType
     {

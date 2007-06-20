@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPipelineModel.h"
 
-#include "pqConsumerDisplay.h"
-#include "pqGenericViewModule.h"
+#include "pqDataRepresentation.h"
+#include "pqView.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -165,7 +165,7 @@ public:
 
   QList<pqPipelineModelObject *> &getOutputs() {return this->Outputs;}
 
-  void setVisibleState(pqGenericViewModule *module);
+  void setVisibleState(pqView *module);
 
 private:
   pqPipelineSource *Source;
@@ -245,7 +245,7 @@ public:
 
   QList<pqPipelineModelServer *> Servers;
   QMap<pqServerManagerModelItem *, QPointer<pqPipelineModelItem> > ItemMap;
-  pqGenericViewModule *RenderModule;
+  pqView *RenderModule;
   pqServer *CleanupServer;
   QFont Modified;
 };
@@ -408,11 +408,13 @@ int pqPipelineModelSource::getChildIndex(pqPipelineModelItem *item) const
   return -1;
 }
 
+//-----------------------------------------------------------------------------
 pqPipelineModelItem *pqPipelineModelSource::getChild(int row) const
 {
   return this->Outputs[row];
 }
 
+//-----------------------------------------------------------------------------
 void pqPipelineModelSource::removeChild(pqPipelineModelItem *item)
 {
   pqPipelineModelObject *object = dynamic_cast<pqPipelineModelObject *>(item);
@@ -422,19 +424,20 @@ void pqPipelineModelSource::removeChild(pqPipelineModelItem *item)
     }
 }
 
-void pqPipelineModelSource::setVisibleState(pqGenericViewModule *module)
+//-----------------------------------------------------------------------------
+void pqPipelineModelSource::setVisibleState(pqView *view)
 {
-  // If no view module is preset, it implies that a suitable type
-  // of view module will be created.
+  // If no view view is preset, it implies that a suitable type
+  // of view view will be created.
   this->Eyeball = pqPipelineModelItem::NotVisible;
-  if(module)
+  if(view)
     {
-    pqConsumerDisplay *display = this->Source->getDisplay(module);
-    if(display && display->isVisible())
+    pqDataRepresentation *repr = this->Source->getRepresentation(view);
+    if(repr && repr->isVisible())
       {
       this->Eyeball = pqPipelineModelItem::Visible;
       }
-    else if(module->canDisplaySource(this->Source))
+    else if(view->canDisplaySource(this->Source))
       {
       this->Eyeball = pqPipelineModelItem::NotVisible;
       }
@@ -635,7 +638,7 @@ pqPipelineModel::pqPipelineModel(const pqServerManagerModel &other,
   // Build a pipeline model from the current server manager model.
   QList<pqPipelineSource *> sources;
   QList<pqPipelineSource *>::Iterator source;
-  QList<pqServer *> servers = other.getServers();
+  QList<pqServer *> servers = other.findItems<pqServer*>();
   QList<pqServer *>::Iterator server = servers.begin();
   for( ; server != servers.end(); ++server)
     {
@@ -643,7 +646,7 @@ pqPipelineModel::pqPipelineModel(const pqServerManagerModel &other,
     this->addServer(*server);
 
     // Add the sources for the server.
-    sources = other.getSources(*server);
+    sources = other.findItems<pqPipelineSource*>(*server);
     for(source = sources.begin(); source != sources.end(); ++source)
       {
       this->addSource(*source);
@@ -984,6 +987,7 @@ void pqPipelineModel::removeServer(pqServer *server)
   this->cleanPipelineMap();
 }
 
+//-----------------------------------------------------------------------------
 void pqPipelineModel::addSource(pqPipelineSource *source)
 {
   if(!source)
@@ -1040,6 +1044,10 @@ void pqPipelineModel::addSource(pqPipelineSource *source)
 
   if(item)
     {
+    QObject::connect(source, 
+      SIGNAL(visibilityChanged(pqPipelineSource*, pqDataRepresentation*)),
+      this, SLOT(updateRepresentations(pqPipelineSource*)), Qt::QueuedConnection);
+
     // Add the source to the map.
     this->Internal->ItemMap.insert(source, item);
 
@@ -1082,6 +1090,8 @@ void pqPipelineModel::removeSource(pqPipelineSource *source)
     qDebug() << "Source not found in the pipeline model.";
     return;
     }
+
+  QObject::disconnect(source, 0, this, 0);
 
   // The source should not have any outputs when it is deleted.
   int i = 0;
@@ -1205,6 +1215,7 @@ void pqPipelineModel::removeConnection(pqPipelineSource *source,
   this->removeConnection(sourceItem, sinkItem);
 }
 
+//-----------------------------------------------------------------------------
 void pqPipelineModel::updateItemName(pqServerManagerModelItem *item)
 {
   pqPipelineModelItem *modelItem = this->getModelItemFor(item);
@@ -1219,8 +1230,8 @@ void pqPipelineModel::updateItemName(pqServerManagerModelItem *item)
     }
 }
 
-void pqPipelineModel::updateDisplays(pqPipelineSource *source,
-    pqConsumerDisplay *)
+//-----------------------------------------------------------------------------
+void pqPipelineModel::updateRepresentations(pqPipelineSource *source)
 {
   pqPipelineModelSource *item = dynamic_cast<pqPipelineModelSource *>(
       this->getModelItemFor(source));
@@ -1237,7 +1248,8 @@ void pqPipelineModel::updateDisplays(pqPipelineSource *source,
     }
 }
 
-void pqPipelineModel::setViewModule(pqGenericViewModule *module)
+//-----------------------------------------------------------------------------
+void pqPipelineModel::setView(pqView *module)
 {
   if(module == this->Internal->RenderModule)
     {
@@ -1282,7 +1294,7 @@ void pqPipelineModel::setViewModule(pqGenericViewModule *module)
     }
   else
     {
-    pqGenericViewModule *oldModule = this->Internal->RenderModule;
+    pqView *oldModule = this->Internal->RenderModule;
     this->Internal->RenderModule = module;
     if(oldModule)
       {
@@ -1485,19 +1497,18 @@ void pqPipelineModel::removeConnection(pqPipelineModelSource *source,
     }
 }
 
-void pqPipelineModel::updateDisplays(pqGenericViewModule *module)
+void pqPipelineModel::updateDisplays(pqView *module)
 {
   QModelIndex changed;
-  pqPipelineModelSource *source = 0;
-  pqConsumerDisplay *display = 0;
-  int total = module->getDisplayCount();
-  for(int i = 0; i < total; i++)
+  QList<pqRepresentation*> reprs = module->getRepresentations();
+
+  foreach (pqRepresentation* repr, reprs)
     {
-    display = qobject_cast<pqConsumerDisplay *>(module->getDisplay(i));
-    if(display)
+    pqDataRepresentation* dataRepr = qobject_cast<pqDataRepresentation*>(repr);
+    if(dataRepr)
       {
-      source = dynamic_cast<pqPipelineModelSource *>(
-          this->getModelItemFor(display->getInput()));
+      pqPipelineModelSource *source = dynamic_cast<pqPipelineModelSource *>(
+        this->getModelItemFor(dataRepr->getInput()));
       if(source)
         {
         source->setVisibleState(this->Internal->RenderModule);

@@ -37,9 +37,9 @@ class pqTimeKeeper;
 class vtkProcessModule;
 class vtkPVOptions;
 class vtkSMApplication;
-class vtkSMMultiViewRenderModuleProxy;
 class vtkSMProxyManager;
 class vtkSMRenderModuleProxy;
+class vtkSMRenderViewProxy;
 
 #include "pqCoreExport.h"
 #include "pqServerManagerModelItem.h"
@@ -62,17 +62,19 @@ public:
   pqServer(vtkIdType connectionId, vtkPVOptions*, QObject* parent = NULL);
   virtual ~pqServer();
 
-  /// Returns the multi view manager proxy for this connection.
-  vtkSMMultiViewRenderModuleProxy* GetRenderModule();
-
   /// create a new render module on the server and returns it.
   /// A new render module is allocated and it is the responsibility of the caller
   /// to remove it.
   vtkSMRenderModuleProxy* newRenderModule();
 
+  /// Creates and returns a new render view. A new render view is created and
+  /// it's the responsibility of the caller to delete it.
+  vtkSMRenderViewProxy* newRenderView();
+
   const pqServerResource& getResource();
   void setResource(const pqServerResource &server_resource);
 
+  /// Returns the connection id for the server connection.
   vtkIdType GetConnectionID();
 
   /// Return the number of data server partitions on this 
@@ -99,25 +101,28 @@ public:
   /// can instantiate the proxies.
   void getSupportedProxies(const QString& xmlgroup, QList<QString>& names);
 
+  const QString& getRenderViewXMLName() const
+    { return this->RenderViewXMLName; }
 signals:
-  void nameChanged();
+  /// Fired when the name of the proxy is changed.
+  void nameChanged(pqServerManagerModelItem*);
 
 protected:
-  /// Creates vtkSMMultiViewRenderModuleProxy for this connection and 
-  /// initializes it to create render modules of correct type 
-  /// depending upon the connection.
-  void createRenderModule();
+  /// Decides which render view proxy subclass to create for this connection.
+  void initializeRenderViewType();
 
   // Creates the TimeKeeper proxy for this connection.
   void createTimeKeeper();
-  
+
 private:
   pqServer(const pqServer&);  // Not implemented.
   pqServer& operator=(const pqServer&); // Not implemented.
 
   pqServerResource Resource;
   vtkIdType ConnectionID;
-  vtkSmartPointer<vtkSMMultiViewRenderModuleProxy> RenderModule;
+
+  QString RenderViewXMLName;
+
   // TODO:
   // Each connection will eventually have a PVOptions object. 
   // For now, this is same as the vtkProcessModule::Options.

@@ -43,14 +43,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorMapWidget.h"
 #include "pqColorPresetManager.h"
 #include "pqColorPresetModel.h"
-#include "pqGenericViewModule.h"
 #include "pqLineEditNumberValidator.h"
 #include "pqObjectBuilder.h"
-#include "pqPipelineDisplay.h"
+#include "pqPipelineRepresentation.h"
 #include "pqPropertyLinks.h"
-#include "pqRenderViewModule.h"
+#include "pqRenderView.h"
 #include "pqRescaleRange.h"
-#include "pqScalarBarDisplay.h"
+#include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
@@ -71,7 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkColorTransferFunction.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPiecewiseFunction.h"
-#include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkTransferFunctionViewer.h"
@@ -296,7 +295,7 @@ pqColorScaleEditor::~pqColorScaleEditor()
   delete this->EditDelay;
 }
 
-void pqColorScaleEditor::setDisplay(pqPipelineDisplay *display)
+void pqColorScaleEditor::setRepresentation(pqPipelineRepresentation *display)
 {
   if(this->Display == display)
     {
@@ -329,7 +328,7 @@ void pqColorScaleEditor::setDisplay(pqPipelineDisplay *display)
     this->connect(this->Display, SIGNAL(destroyed(QObject *)),
         this, SLOT(cleanupDisplay()));
     this->connect(&this->Form->Links, SIGNAL(qtWidgetChanged()),
-        this->Display, SLOT(renderAllViews()));
+        this->Display, SLOT(renderViewEventually()));
 
     // Get the color map object for the display's lookup table.
     this->ColorMap = this->Display->getLookupTable();
@@ -348,8 +347,8 @@ void pqColorScaleEditor::setDisplay(pqPipelineDisplay *display)
   this->initColorScale();
   if(this->ColorMap)
     {
-    pqRenderViewModule *renderModule = qobject_cast<pqRenderViewModule *>(
-        this->Display->getViewModule(0));
+    pqRenderView *renderModule = qobject_cast<pqRenderView *>(
+        this->Display->getView());
     this->setLegend(this->ColorMap->getScalarBar(renderModule));
     }
 }
@@ -495,7 +494,7 @@ void pqColorScaleEditor::setColors()
 
   this->Form->InSetColors = false;
   lookupTable->UpdateVTKObjects();
-  this->Display->renderAllViews();
+  this->Display->renderViewEventually();
 }
 
 void pqColorScaleEditor::changeCurrentColor()
@@ -770,7 +769,7 @@ void pqColorScaleEditor::setColorSpace(int index)
         lookupTable->GetProperty("HSVWrap"), wrap);
     this->Form->InSetColors = false;
     lookupTable->UpdateVTKObjects();
-    this->Display->renderAllViews();
+    this->Display->renderViewEventually();
     }
 }
 
@@ -967,7 +966,7 @@ void pqColorScaleEditor::setComponent(int index)
     this->rescaleToDataRange();
     }
 
-  this->Display->renderAllViews();
+  this->Display->renderViewEventually();
 }
 
 void pqColorScaleEditor::setLogScale(bool on)
@@ -1002,7 +1001,7 @@ void pqColorScaleEditor::setLogScale(bool on)
 #endif
 
     lookupTable->UpdateVTKObjects();
-    this->Display->renderAllViews();
+    this->Display->renderViewEventually();
     }
 }
 
@@ -1069,7 +1068,7 @@ void pqColorScaleEditor::setUseDiscreteColors(bool on)
     pqSMAdaptor::setElementProperty(
         lookupTable->GetProperty("Discretize"), (on ? 1 : 0));
     lookupTable->UpdateVTKObjects();
-    this->Display->renderAllViews();
+    this->Display->renderViewEventually();
     }
 }
 
@@ -1114,7 +1113,7 @@ void pqColorScaleEditor::setTableSize(int tableSize)
     pqSMAdaptor::setElementProperty(
         lookupTable->GetProperty("NumberOfTableValues"), QVariant(tableSize));
     lookupTable->UpdateVTKObjects();
-    this->Display->renderAllViews();
+    this->Display->renderViewEventually();
     }
 }
 
@@ -1127,7 +1126,7 @@ void pqColorScaleEditor::setScalarRange(double min, double max)
 
   // Update the color map and the rendered views.
   this->ColorMap->setScalarRange(min, max);
-  this->Display->renderAllViews();
+  this->Display->renderViewEventually();
 }
 
 void pqColorScaleEditor::applyTextChanges()
@@ -1161,9 +1160,9 @@ void pqColorScaleEditor::setLegendVisibility(bool visible)
       // set up the title.
       pqObjectBuilder *builder =
           pqApplicationCore::instance()->getObjectBuilder();
-      pqRenderViewModule *renderModule = qobject_cast<pqRenderViewModule *>(
-          this->Display->getViewModule(0));
-      pqScalarBarDisplay *legend = builder->createScalarBarDisplay(
+      pqRenderView *renderModule = qobject_cast<pqRenderView *>(
+          this->Display->getView());
+      pqScalarBarRepresentation *legend = builder->createScalarBarDisplay(
         this->ColorMap, renderModule);
       legend->makeTitle(this->Display);
       this->setLegend(legend);
@@ -1177,7 +1176,7 @@ void pqColorScaleEditor::setLegendVisibility(bool visible)
   if(this->Legend)
     {
     this->Legend->setVisible(visible);
-    this->Legend->renderAllViews();
+    this->Legend->renderViewEventually();
     }
 
   this->Form->ShowColorLegend->blockSignals(true);
@@ -1202,13 +1201,13 @@ void pqColorScaleEditor::setLegendTitle(const QString &name,
   if(this->Legend)
     {
     this->Legend->setTitle(name, component);
-    this->Legend->renderAllViews();
+    this->Legend->renderViewEventually();
     }
 }
 
 void pqColorScaleEditor::cleanupDisplay()
 {
-  this->setDisplay(0);
+  this->setRepresentation(0);
 }
 
 void pqColorScaleEditor::cleanupLegend()
@@ -1360,8 +1359,8 @@ void pqColorScaleEditor::initColorScale()
   bool usingOpacity = this->Form->HasOpacity;
   if(this->Display)
     {
-    usingOpacity = this->Display->getDisplayProxy()->GetRepresentationCM() ==
-        vtkSMDataObjectDisplayProxy::VOLUME;
+    usingOpacity = this->Display->getRepresentationType() ==
+        vtkSMPVRepresentationProxy::VOLUME;
     }
 
   if(usingOpacity != this->Form->HasOpacity)
@@ -1587,7 +1586,7 @@ void pqColorScaleEditor::updateScalarRange(double min, double max)
     }
 }
 
-void pqColorScaleEditor::setLegend(pqScalarBarDisplay *legend)
+void pqColorScaleEditor::setLegend(pqScalarBarRepresentation *legend)
 {
   if(this->Legend == legend)
     {

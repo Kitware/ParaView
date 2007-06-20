@@ -205,11 +205,10 @@ void pqLookmarkSourceDialog::setModels(QStandardItemModel *lmkModel, pqPipelineM
 
   // Find and select an initial source (so something is selected)
   pqServerManagerModel *model = pqApplicationCore::instance()->getServerManagerModel();
-  pqPipelineSource *src;
-  for(unsigned int j=0; j<model->getNumberOfSources();j++)
+  QList<pqPipelineSource*> sources = model->findItems<pqPipelineSource*>();
+  foreach (pqPipelineSource* src, sources)
     {
-    src = model->getPQSource(j);
-    if(!dynamic_cast<pqPipelineFilter*>(src))
+    if(!qobject_cast<pqPipelineFilter*>(src))
       {
       this->CurrentPipelineView->setCurrentIndex(this->CurrentPipelineModel->getIndexFor(src));
       this->SelectedSource = src;

@@ -30,7 +30,7 @@
 #include "vtkUnstructuredGrid.h"
 
 vtkStandardNewMacro(vtkClientServerMoveData);
-vtkCxxRevisionMacro(vtkClientServerMoveData, "1.7");
+vtkCxxRevisionMacro(vtkClientServerMoveData, "1.8");
 vtkCxxSetObjectMacro(vtkClientServerMoveData, ProcessModuleConnection, 
   vtkProcessModuleConnection);
 
@@ -226,4 +226,12 @@ void vtkClientServerMoveData::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "ProcessModuleConnection: " << this->ProcessModuleConnection
     << endl;
+  os << indent << "WholeExtent: " 
+    << this->WholeExtent[0] << ", "
+    << this->WholeExtent[1] << ", "
+    << this->WholeExtent[2] << ", "
+    << this->WholeExtent[3] << ", "
+    << this->WholeExtent[4] << ", "
+    << this->WholeExtent[5] << endl;
+  os << indent << "OutputDataType: " << this->OutputDataType << endl;
 }

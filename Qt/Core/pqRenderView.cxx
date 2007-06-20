@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqRenderViewModule.cxx
+   Module:    pqRenderView.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqRenderViewModule.h"
+#include "pqRenderView.h"
 
 // ParaView Server Manager includes.
 #include "QVTKWidget.h"
@@ -42,14 +42,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballZoom.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMDisplayProxy.h"
+#include "vtkSMRepresentationProxy.h"
+#include "vtkSMInteractionUndoStackBuilder.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMRenderModuleProxy.h"
-#include "vtkTrackballPan.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMUndoStack.h"
-#include "vtkSMInteractionUndoStackBuilder.h"
+#include "vtkTrackballPan.h"
 
 // Qt includes.
 #include <QFileInfo>
@@ -65,7 +65,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqApplicationCore.h"
-#include "pqDisplay.h"
 #include "pqLinkViewWidget.h"
 #include "pqPipelineSource.h"
 #include "pqRenderViewProxy.h"
@@ -74,27 +73,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "vtkPVAxesWidget.h"
 
-class pqRenderViewModuleInternal
+class pqRenderView::pqInternal
 {
 public:
   QPointer<QVTKWidget> Viewport;
   QPoint MouseOrigin;
   vtkSmartPointer<pqRenderViewProxy> RenderViewProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
-  vtkSmartPointer<vtkSMRenderModuleProxy> RenderModuleProxy;
+  vtkSmartPointer<vtkSMRenderViewProxy> RenderModuleProxy;
   vtkSmartPointer<vtkPVAxesWidget> OrientationAxesWidget;
   vtkSmartPointer<vtkSMProxy> CenterAxesProxy;
 
   vtkSmartPointer<vtkSMUndoStack> InteractionUndoStack;
   vtkSmartPointer<vtkSMInteractionUndoStackBuilder> UndoStackBuilder;
 
-  QList<pqRenderViewModule* > LinkedUndoStacks;
+  QList<pqRenderView* > LinkedUndoStacks;
   bool UpdatingStack;
 
   int DefaultBackground[3];
   bool InitializedWidgets;
 
-  pqRenderViewModuleInternal()
+  pqInternal()
     {
     this->UpdatingStack = false;
     this->InitializedWidgets = false;
@@ -114,20 +113,22 @@ public:
       this->InteractionUndoStack);
     }
 
-  ~pqRenderViewModuleInternal()
+  ~pqInternal()
     {
-    this->RenderViewProxy->setRenderModule(0);
+    this->RenderViewProxy->setRenderView(0);
     }
 };
 
 //-----------------------------------------------------------------------------
-pqRenderViewModule::pqRenderViewModule(const QString& name, 
-  vtkSMRenderModuleProxy* renModule, pqServer* server, QObject* _parent/*=null*/)
-: pqGenericViewModule(
-  renderViewType(), "view_modules", name, renModule, server, _parent)
+pqRenderView::pqRenderView( const QString& group,
+                            const QString& name, 
+                            vtkSMRenderViewProxy* renModule, 
+                            pqServer* server, 
+                            QObject* _parent/*=null*/) : 
+  pqView(renderViewType(), group, name, renModule, server, _parent)
 {
-  this->Internal = new pqRenderViewModuleInternal();
-  this->Internal->RenderViewProxy->setRenderModule(this);
+  this->Internal = new pqRenderView::pqInternal();
+  this->Internal->RenderViewProxy->setRenderView(this);
   this->Internal->RenderModuleProxy = renModule;
 
   // we need to fire signals when undo stack changes.
@@ -190,7 +191,7 @@ pqRenderViewModule::pqRenderViewModule(const QString& name,
 }
 
 //-----------------------------------------------------------------------------
-pqRenderViewModule::~pqRenderViewModule()
+pqRenderView::~pqRenderView()
 {
 
   delete this->Internal->Viewport;
@@ -198,22 +199,22 @@ pqRenderViewModule::~pqRenderViewModule()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMRenderModuleProxy* pqRenderViewModule::getRenderModuleProxy() const
+vtkSMRenderViewProxy* pqRenderView::getRenderViewProxy() const
 {
   return this->Internal->RenderModuleProxy;
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqRenderViewModule::getWidget()
+QWidget* pqRenderView::getWidget()
 {
   return this->Internal->Viewport;
 }
 
 //-----------------------------------------------------------------------------
-// This method is called for all pqRenderViewModule objects irrespective
+// This method is called for all pqRenderView objects irrespective
 // of whether it is created from state/undo-redo/python or by the GUI. Hence
 // don't change any render module properties here.
-void pqRenderViewModule::initializeWidgets()
+void pqRenderView::initializeWidgets()
 {
   if (this->Internal->InitializedWidgets)
     {
@@ -225,7 +226,7 @@ void pqRenderViewModule::initializeWidgets()
   // this->Internal->VTKConnect->Disconnect(
   //   this->Internal->RenderModuleProxy, vtkCommand::UpdateEvent);
 
-  vtkSMRenderModuleProxy* renModule =
+  vtkSMRenderViewProxy* renModule =
     this->Internal->RenderModuleProxy;
 
   this->Internal->Viewport->SetRenderWindow(
@@ -250,7 +251,7 @@ void pqRenderViewModule::initializeWidgets()
   // setup the center axes.
   this->initializeCenterAxes();
 
-  this->Internal->UndoStackBuilder->SetRenderModule(renModule);
+  this->Internal->UndoStackBuilder->SetRenderView(renModule);
 }
 
 //-----------------------------------------------------------------------------
@@ -258,7 +259,7 @@ void pqRenderViewModule::initializeWidgets()
 // initialization stage of the pqProxy for proxies created by the GUI itself 
 // i.e. for proxies loaded through state or created by python client or 
 // undo/redo, this method won't be called. 
-void pqRenderViewModule::setDefaultPropertyValues()
+void pqRenderView::setDefaultPropertyValues()
 {
   this->Superclass::setDefaultPropertyValues();
 
@@ -267,7 +268,7 @@ void pqRenderViewModule::setDefaultPropertyValues()
   vtkSMProxy* proxy = this->getProxy();
   pqSMAdaptor::setElementProperty(proxy->GetProperty("LODResolution"), 50);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("LODThreshold"), 5);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("RemoteRenderThreshold"), 3);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("CompositeThreshold"), 3);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("SquirtLevel"), 3);
 
   vtkSMProperty* backgroundProperty;
@@ -290,7 +291,7 @@ void pqRenderViewModule::setDefaultPropertyValues()
 // python.
 // TODO: Python paraview modules createView() equivalent should make sure
 // that it sets up some default interactor.
-void pqRenderViewModule::createDefaultInteractors()
+void pqRenderView::createDefaultInteractors()
 {
   // Create the interactor style proxy:
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
@@ -419,7 +420,7 @@ void pqRenderViewModule::createDefaultInteractors()
 
 //-----------------------------------------------------------------------------
 // Create a center axes if one doesn't already exist.
-void pqRenderViewModule::initializeCenterAxes()
+void pqRenderView::initializeCenterAxes()
 {
   if (this->Internal->CenterAxesProxy.GetPointer())
     {
@@ -428,7 +429,7 @@ void pqRenderViewModule::initializeCenterAxes()
     }
 
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  vtkSMProxy* centerAxes = pxm->NewProxy("axes", "Axes");
+  vtkSMProxy* centerAxes = pxm->NewProxy("representations", "AxesRepresentation");
   centerAxes->SetConnectionID(this->getServer()->GetConnectionID());
   QList<QVariant> scaleValues;
   scaleValues << .25 << .25 << .25;
@@ -445,13 +446,13 @@ void pqRenderViewModule::initializeCenterAxes()
   
   // Add to render module without using properties. That way it does not
   // get saved in state.
-  this->Internal->RenderModuleProxy->AddDisplay(
-    vtkSMDisplayProxy::SafeDownCast(centerAxes));
+  this->Internal->RenderModuleProxy->AddRepresentation(
+    vtkSMRepresentationProxy::SafeDownCast(centerAxes));
   centerAxes->Delete();
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::render()
+void pqRenderView::render()
 {
   if (this->Internal->RenderModuleProxy && this->Internal->Viewport)
     {
@@ -460,7 +461,7 @@ void pqRenderViewModule::render()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::onResetCameraEvent()
+void pqRenderView::onResetCameraEvent()
 {
   if (this->ResetCenterWithCamera)
     {
@@ -473,7 +474,7 @@ void pqRenderViewModule::onResetCameraEvent()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::resetCamera()
+void pqRenderView::resetCamera()
 {
   if (this->Internal->RenderModuleProxy)
     {
@@ -487,7 +488,7 @@ void pqRenderViewModule::resetCamera()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::resetCenterOfRotation()
+void pqRenderView::resetCenterOfRotation()
 {
   // Update center of rotation.
   this->Internal->RenderModuleProxy->UpdatePropertyInformation();
@@ -499,13 +500,13 @@ void pqRenderViewModule::resetCenterOfRotation()
 }
 
 //-----------------------------------------------------------------------------
-vtkImageData* pqRenderViewModule::captureImage(int magnification)
+vtkImageData* pqRenderView::captureImage(int magnification)
 {
   return this->Internal->RenderModuleProxy->CaptureWindow(magnification);
 }
 
 //-----------------------------------------------------------------------------
-bool pqRenderViewModule::saveImage(int width, int height, const QString& filename)
+bool pqRenderView::saveImage(int width, int height, const QString& filename)
 {
   QSize cur_size = this->Internal->Viewport->size();
   if (width>0 && height>0)
@@ -574,7 +575,7 @@ bool pqRenderViewModule::saveImage(int width, int height, const QString& filenam
 }
 
 //-----------------------------------------------------------------------------
-int* pqRenderViewModule::defaultBackgroundColor()
+int* pqRenderView::defaultBackgroundColor()
 {
   return this->Internal->DefaultBackground;
 }
@@ -610,7 +611,7 @@ static const char* pqRenderViewModuleMiscSettings [] = {
   "LODThreshold",
   "LODResolution",
   "RenderInterruptsEnabled",
-  "RemoteRenderThreshold",
+  "CompositeThreshold",
   "ReductionFactor",
   "SquirtLevel",
   "OrderedCompositing",
@@ -643,7 +644,7 @@ static const char** pqRenderViewModuleSettingsMulti[] = {
 };
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::restoreSettings()
+void pqRenderView::restoreSettings()
 {
   vtkSMProxy* proxy = this->getProxy();
 
@@ -719,7 +720,7 @@ void pqRenderViewModule::restoreSettings()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::saveSettings()
+void pqRenderView::saveSettings()
 {
   vtkSMProxy* proxy = this->getProxy();
   pqSettings* settings = pqApplicationCore::instance()->settings();
@@ -772,38 +773,38 @@ void pqRenderViewModule::saveSettings()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::setOrientationAxesVisibility(bool visible)
+void pqRenderView::setOrientationAxesVisibility(bool visible)
 {
   this->Internal->OrientationAxesWidget->SetEnabled(visible? 1: 0);
 }
 
 //-----------------------------------------------------------------------------
-bool pqRenderViewModule::getOrientationAxesVisibility() const
+bool pqRenderView::getOrientationAxesVisibility() const
 {
   return this->Internal->OrientationAxesWidget->GetEnabled();
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::setOrientationAxesInteractivity(bool interactive)
+void pqRenderView::setOrientationAxesInteractivity(bool interactive)
 {
   this->Internal->OrientationAxesWidget->SetInteractive(interactive? 1: 0);
 }
 
 //-----------------------------------------------------------------------------
-bool pqRenderViewModule::getOrientationAxesInteractivity() const
+bool pqRenderView::getOrientationAxesInteractivity() const
 {
   return this->Internal->OrientationAxesWidget->GetInteractive();
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::setOrientationAxesOutlineColor(const QColor& color)
+void pqRenderView::setOrientationAxesOutlineColor(const QColor& color)
 {
   this->Internal->OrientationAxesWidget->SetOutlineColor(
     color.redF(), color.greenF(), color.blueF());
 }
 
 //-----------------------------------------------------------------------------
-QColor pqRenderViewModule::getOrientationAxesOutlineColor() const
+QColor pqRenderView::getOrientationAxesOutlineColor() const
 {
   QColor color;
   double* dcolor = this->Internal->OrientationAxesWidget->GetOutlineColor();
@@ -812,14 +813,14 @@ QColor pqRenderViewModule::getOrientationAxesOutlineColor() const
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::setOrientationAxesLabelColor(const QColor& color)
+void pqRenderView::setOrientationAxesLabelColor(const QColor& color)
 {
   this->Internal->OrientationAxesWidget->SetAxisLabelColor(
     color.redF(), color.greenF(), color.blueF());
 }
 
 //-----------------------------------------------------------------------------
-QColor pqRenderViewModule::getOrientationAxesLabelColor() const
+QColor pqRenderView::getOrientationAxesLabelColor() const
 {
   QColor color;
   double* dcolor = this->Internal->OrientationAxesWidget->GetAxisLabelColor();
@@ -829,7 +830,7 @@ QColor pqRenderViewModule::getOrientationAxesLabelColor() const
 
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::updateCenterAxes()
+void pqRenderView::updateCenterAxes()
 {
   if (!this->getCenterAxesVisibility())
     {
@@ -868,7 +869,7 @@ void pqRenderViewModule::updateCenterAxes()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::setCenterOfRotation(double x, double y, double z)
+void pqRenderView::setCenterOfRotation(double x, double y, double z)
 {
   QList<QVariant> positionValues;
   positionValues << x << y << z;
@@ -882,7 +883,7 @@ void pqRenderViewModule::setCenterOfRotation(double x, double y, double z)
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::getCenterOfRotation(double center[3]) const
+void pqRenderView::getCenterOfRotation(double center[3]) const
 {
   QList<QVariant> val =
     pqSMAdaptor::getMultipleElementProperty(
@@ -893,7 +894,7 @@ void pqRenderViewModule::getCenterOfRotation(double center[3]) const
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::setCenterAxesVisibility(bool visible)
+void pqRenderView::setCenterAxesVisibility(bool visible)
 {
   pqSMAdaptor::setElementProperty(
     this->Internal->CenterAxesProxy->GetProperty("Visibility"),
@@ -903,7 +904,7 @@ void pqRenderViewModule::setCenterAxesVisibility(bool visible)
 }
 
 //-----------------------------------------------------------------------------
-bool pqRenderViewModule::getCenterAxesVisibility() const
+bool pqRenderView::getCenterAxesVisibility() const
 {
   if (this->Internal->CenterAxesProxy.GetPointer()==0)
     {
@@ -915,7 +916,7 @@ bool pqRenderViewModule::getCenterAxesVisibility() const
 }
 
 //-----------------------------------------------------------------------------
-bool pqRenderViewModule::eventFilter(QObject* caller, QEvent* e)
+bool pqRenderView::eventFilter(QObject* caller, QEvent* e)
 {
   // TODO, apparently, this should watch for window position changes, not resizes
   
@@ -951,17 +952,20 @@ bool pqRenderViewModule::eventFilter(QObject* caller, QEvent* e)
   return QObject::eventFilter(caller, e);
 }
 
-void pqRenderViewModule::addMenuAction(QAction* a)
+//-----------------------------------------------------------------------------
+void pqRenderView::addMenuAction(QAction* a)
 {
   this->Internal->Viewport->addAction(a);
 }
 
-void pqRenderViewModule::removeMenuAction(QAction* a)
+//-----------------------------------------------------------------------------
+void pqRenderView::removeMenuAction(QAction* a)
 {
   this->Internal->Viewport->removeAction(a);
 }
 
-void pqRenderViewModule::restoreDefaultLightSettings()
+//-----------------------------------------------------------------------------
+void pqRenderView::restoreDefaultLightSettings()
 {
   vtkSMProxy* proxy = this->getProxy();
   const char** str;
@@ -984,8 +988,9 @@ void pqRenderViewModule::restoreDefaultLightSettings()
 }
   
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::linkToOtherView()
+void pqRenderView::linkToOtherView()
 {
+  // FIXME:UDA
   pqLinkViewWidget* linkWidget = new pqLinkViewWidget(this);
   linkWidget->setAttribute(Qt::WA_DeleteOnClose);
   QPoint pos = this->getWidget()->mapToGlobal(QPoint(2,2));
@@ -994,7 +999,7 @@ void pqRenderViewModule::linkToOtherView()
 }
   
 //-----------------------------------------------------------------------------
-bool pqRenderViewModule::canDisplaySource(pqPipelineSource* source) const
+bool pqRenderView::canDisplaySource(pqPipelineSource* source) const
 {
   if(!source ||
      this->getServer()->GetConnectionID() !=
@@ -1006,7 +1011,7 @@ bool pqRenderViewModule::canDisplaySource(pqPipelineSource* source) const
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::onUndoStackChanged()
+void pqRenderView::onUndoStackChanged()
 {
   bool can_undo = this->Internal->InteractionUndoStack->CanUndo();
   bool can_redo = this->Internal->InteractionUndoStack->CanRedo();
@@ -1016,19 +1021,19 @@ void pqRenderViewModule::onUndoStackChanged()
 }
 
 //-----------------------------------------------------------------------------
-bool pqRenderViewModule::canUndo() const
+bool pqRenderView::canUndo() const
 {
   return this->Internal->InteractionUndoStack->CanUndo();
 }
 
 //-----------------------------------------------------------------------------
-bool pqRenderViewModule::canRedo() const
+bool pqRenderView::canRedo() const
 {
   return this->Internal->InteractionUndoStack->CanRedo();
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::undo()
+void pqRenderView::undo()
 {
   this->Internal->InteractionUndoStack->Undo();
   this->Internal->RenderModuleProxy->UpdateVTKObjects();
@@ -1038,7 +1043,7 @@ void pqRenderViewModule::undo()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::redo()
+void pqRenderView::redo()
 {
   this->Internal->InteractionUndoStack->Redo();
   this->Internal->RenderModuleProxy->UpdateVTKObjects();
@@ -1048,7 +1053,7 @@ void pqRenderViewModule::redo()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::linkUndoStack(pqRenderViewModule* other)
+void pqRenderView::linkUndoStack(pqRenderView* other)
 {
   if (other == this)
     {
@@ -1063,7 +1068,7 @@ void pqRenderViewModule::linkUndoStack(pqRenderViewModule* other)
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::unlinkUndoStack(pqRenderViewModule* other)
+void pqRenderView::unlinkUndoStack(pqRenderView* other)
 {
   if (!other || other == this)
     {
@@ -1073,7 +1078,7 @@ void pqRenderViewModule::unlinkUndoStack(pqRenderViewModule* other)
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::clearUndoStack()
+void pqRenderView::clearUndoStack()
 {
   if (this->Internal->UpdatingStack)
     {
@@ -1081,7 +1086,7 @@ void pqRenderViewModule::clearUndoStack()
     }
   this->Internal->UpdatingStack = true;
   this->Internal->InteractionUndoStack->Clear();
-  foreach (pqRenderViewModule* other, this->Internal->LinkedUndoStacks)
+  foreach (pqRenderView* other, this->Internal->LinkedUndoStacks)
     {
     if (other)
       {
@@ -1092,7 +1097,7 @@ void pqRenderViewModule::clearUndoStack()
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::fakeUndoRedo(bool fake_redo, bool self)
+void pqRenderView::fakeUndoRedo(bool fake_redo, bool self)
 {
   if (this->Internal->UpdatingStack)
     {
@@ -1110,7 +1115,7 @@ void pqRenderViewModule::fakeUndoRedo(bool fake_redo, bool self)
       this->Internal->InteractionUndoStack->PopUndoStack();
       }
     }
-  foreach (pqRenderViewModule* other, this->Internal->LinkedUndoStacks)
+  foreach (pqRenderView* other, this->Internal->LinkedUndoStacks)
     {
     if (other)
       {
@@ -1121,7 +1126,7 @@ void pqRenderViewModule::fakeUndoRedo(bool fake_redo, bool self)
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderViewModule::fakeInteraction(bool start)
+void pqRenderView::fakeInteraction(bool start)
 {
   if (this->Internal->UpdatingStack)
     {
@@ -1139,7 +1144,7 @@ void pqRenderViewModule::fakeInteraction(bool start)
     this->Internal->UndoStackBuilder->EndInteraction();
     }
 
-  foreach (pqRenderViewModule* other, this->Internal->LinkedUndoStacks)
+  foreach (pqRenderView* other, this->Internal->LinkedUndoStacks)
     {
     other->fakeInteraction(start);
     }

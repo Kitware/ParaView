@@ -16,12 +16,12 @@
 // .SECTION Description
 // SMState file has render module states in it. Typically one can simply load 
 // back the SMState and create new rendermodules from that SMState, just like 
-// other proxies. However, when using MultiViewRenderModuleProxy, if a 
-// MultiViewRenderModuleProxy exists, it must be used to obtain the 
+// other proxies. However, when using MultiViewFactory, if a 
+// MultiViewFactory exists, it must be used to obtain the 
 // rendermodules, otherwise they will not work correctly. Hence, we provide 
-// this loader. Set the MultiViewRenderModuleProxy on this loader before 
+// this loader. Set the MultiViewFactory on this loader before 
 // loading the state. Then, when a render module is encountered in the state 
-// the MultiViewRenderModuleProxy is requested to return
+// the MultiViewFactory is requested to return
 // a render module and the state is loaded on that render module.
 
 #ifndef __vtkSMPQStateLoader_h
@@ -29,8 +29,7 @@
 
 #include "vtkSMStateLoader.h"
 
-class vtkSMMultiViewRenderModuleProxy;
-class vtkSMRenderModuleProxy;
+class vtkSMRenderViewProxy;
 //BTX
 struct vtkSMPQStateLoaderInternals;
 //ETX
@@ -43,16 +42,17 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Get/Set the vtkSMMultiViewRenderModuleProxy proxy to use to
-  // create the render modules. This must be set before loading the state.
-  vtkGetObjectMacro(MultiViewRenderModuleProxy, vtkSMMultiViewRenderModuleProxy);
-  void SetMultiViewRenderModuleProxy(vtkSMMultiViewRenderModuleProxy*);
+  // For every request to create a render module, one from this list is used 
+  // first, if possible
+  virtual void AddPreferredRenderView(vtkSMRenderViewProxy*);
+  void RemovePreferredRenderView(vtkSMRenderViewProxy*);
+  void ClearPreferredRenderViews();
 
   // Description:
-  // For every request to create a render module, one from this list is used first, if possible
-  virtual void AddPreferredRenderModule(vtkSMRenderModuleProxy*);
-  void RemovePreferredRenderModule(vtkSMRenderModuleProxy*);
-  void ClearPreferredRenderModules();
+  // Set the name for the proxy to create when creating render views.
+  // This is required since the type of render view created usually depends on
+  // the type of connection/client etc.
+  vtkSetStringMacro(RenderViewXMLName);
 
 protected:
   vtkSMPQStateLoader();
@@ -67,7 +67,7 @@ protected:
   virtual void RegisterProxyInternal(const char* group, 
     const char* name, vtkSMProxy* proxy);
 
-  vtkSMMultiViewRenderModuleProxy* MultiViewRenderModuleProxy;
+  char* RenderViewXMLName;
 
   vtkSMPQStateLoaderInternals *PQInternal;
 private:

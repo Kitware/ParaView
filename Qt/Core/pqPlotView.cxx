@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqPlotViewModule.cxx
+   Module:    pqPlotView.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqPlotViewModule.h"
+#include "pqPlotView.h"
 
 #include "vtkPVDataInformation.h"
 #include "vtkDataSet.h"
@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMAbstractViewModuleProxy.h"
-#include "vtkSMGenericViewDisplayProxy.h"
+#include "vtkSMViewProxy.h"
+#include "vtkSMClientDeliveryRepresentationProxy.h"
 #include "vtkSMProxy.h"
 #include "vtkTimeStamp.h"
 
@@ -53,18 +53,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QTimer>
 
-#include "pqBarChartDisplay.h"
+#include "pqBarChartRepresentation.h"
 #include "pqChartArea.h"
 #include "pqChartAxis.h"
 #include "pqChartInteractor.h"
 #include "pqChartSeriesOptionsGenerator.h"
 #include "pqChartWidget.h"
-#include "pqDisplay.h"
+#include "pqRepresentation.h"
 #include "pqHistogramChartOptions.h"
 #include "pqHistogramChart.h"
 #include "pqHistogramWidget.h"
 #include "pqLineChart.h"
-#include "pqLineChartDisplay.h"
+#include "pqLineChartRepresentation.h"
 #include "pqLineChartModel.h"
 #include "pqLineChartOptions.h"
 #include "pqLineChartSeriesOptions.h"
@@ -77,14 +77,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVTKLineChartSeries.h"
 
 
-class pqPlotViewModuleHistogram
+class pqPlotViewHistogram
 {
 public:
-  pqPlotViewModuleHistogram();
-  ~pqPlotViewModuleHistogram() {}
+  pqPlotViewHistogram();
+  ~pqPlotViewHistogram() {}
 
-  pqBarChartDisplay *getCurrentDisplay() const;
-  void setCurrentDisplay(pqBarChartDisplay *display);
+  pqBarChartRepresentation *getCurrentRepresentation() const;
+  void setCurrentRepresentation(pqBarChartRepresentation *display);
 
   void update(bool force=false);
   bool isUpdateNeeded();
@@ -96,91 +96,91 @@ public:
 
   vtkTimeStamp LastUpdateTime;
   vtkTimeStamp MTime;
-  QPointer<pqBarChartDisplay> LastUsedDisplay;
-  QList<QPointer<pqBarChartDisplay> > Displays;
+  QPointer<pqBarChartRepresentation> LastUsedRepresentation;
+  QList<QPointer<pqBarChartRepresentation> > Representations;
 };
 
 
-class pqPlotViewModuleLineChartSeries
+class pqPlotViewLineChartSeries
 {
 public:
-  pqPlotViewModuleLineChartSeries();
-  pqPlotViewModuleLineChartSeries(const QString &display,
+  pqPlotViewLineChartSeries();
+  pqPlotViewLineChartSeries(const QString &display,
       pqVTKLineChartSeries *model);
-  pqPlotViewModuleLineChartSeries(
-      const pqPlotViewModuleLineChartSeries &other);
-  ~pqPlotViewModuleLineChartSeries() {}
+  pqPlotViewLineChartSeries(
+      const pqPlotViewLineChartSeries &other);
+  ~pqPlotViewLineChartSeries() {}
 
-  pqPlotViewModuleLineChartSeries &operator=(
-      const pqPlotViewModuleLineChartSeries &other);
+  pqPlotViewLineChartSeries &operator=(
+      const pqPlotViewLineChartSeries &other);
 
 public:
   pqVTKLineChartSeries *Model;
-  QString DisplayName;
+  QString RepresentationName;
 };
 
 
-class pqPlotViewModuleLineChartItem
+class pqPlotViewLineChartItem
 {
 public:
-  pqPlotViewModuleLineChartItem(pqLineChartDisplay *display);
-  ~pqPlotViewModuleLineChartItem() {}
+  pqPlotViewLineChartItem(pqLineChartRepresentation *display);
+  ~pqPlotViewLineChartItem() {}
 
   bool isUpdateNeeded();
   bool setDataType(int dataType);
 
 public:
-  QPointer<pqLineChartDisplay> Display;
-  QList<pqPlotViewModuleLineChartSeries> Series;
+  QPointer<pqLineChartRepresentation> Representation;
+  QList<pqPlotViewLineChartSeries> Series;
   vtkTimeStamp LastUpdateTime;
   vtkTimeStamp ModifiedTime;
   int DataType;
 };
 
 
-class pqPlotViewModuleLineChart
+class pqPlotViewLineChart
 {
 public:
-  pqPlotViewModuleLineChart();
-  ~pqPlotViewModuleLineChart();
+  pqPlotViewLineChart();
+  ~pqPlotViewLineChart();
 
   void update(bool force=false);
 
 public:
   QPointer<pqLineChart> Layer;
   pqLineChartModel *Model;
-  QMap<vtkSMProxy *, pqPlotViewModuleLineChartItem *> Displays;
+  QMap<vtkSMProxy *, pqPlotViewLineChartItem *> Representations;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 };
 
 
-class pqPlotViewModuleInternal
+class pqPlotViewInternal
 {
 public:
-  pqPlotViewModuleInternal();
-  ~pqPlotViewModuleInternal();
+  pqPlotViewInternal();
+  ~pqPlotViewInternal();
 
   QPointer<pqChartWidget> Chart;
-  pqPlotViewModuleHistogram *Histogram;
-  pqPlotViewModuleLineChart *LineChart;
-  int MaxNumberOfVisibleDisplays;
+  pqPlotViewHistogram *Histogram;
+  pqPlotViewLineChart *LineChart;
+  int MaxNumberOfVisibleRepresentations;
   bool RenderRequestPending;
 };
 
 
 //----------------------------------------------------------------------------
-pqPlotViewModuleHistogram::pqPlotViewModuleHistogram()
-  : Layer(0), ColorScheme(), LastUpdateTime(), MTime(), LastUsedDisplay(0),
-    Displays()
+pqPlotViewHistogram::pqPlotViewHistogram()
+  : Layer(0), ColorScheme(), LastUpdateTime(), MTime(), LastUsedRepresentation(0),
+    Representations()
 {
   this->Model = 0;
 }
 
-pqBarChartDisplay *pqPlotViewModuleHistogram::getCurrentDisplay() const
+pqBarChartRepresentation *pqPlotViewHistogram::getCurrentRepresentation() const
 {
-  QList<QPointer<pqBarChartDisplay> >::ConstIterator display =
-      this->Displays.begin();
-  for( ; display != this->Displays.end(); ++display)
+  QList<QPointer<pqBarChartRepresentation> >::ConstIterator display =
+      this->Representations.begin();
+  for( ; display != this->Representations.end(); ++display)
     {
     if(!display->isNull() && (*display)->isVisible())
       {
@@ -191,7 +191,7 @@ pqBarChartDisplay *pqPlotViewModuleHistogram::getCurrentDisplay() const
   return 0;
 }
 
-void pqPlotViewModuleHistogram::setCurrentDisplay(pqBarChartDisplay *display)
+void pqPlotViewHistogram::setCurrentRepresentation(pqBarChartRepresentation *display)
 {
   // Update the lookup table.
   vtkSMProxy* lut = 0;
@@ -204,27 +204,27 @@ void pqPlotViewModuleHistogram::setCurrentDisplay(pqBarChartDisplay *display)
   this->ColorScheme.setMapIndexToColor(true);
   this->ColorScheme.setScalarsToColors(lut);
 
-  if(this->LastUsedDisplay == display)
+  if(this->LastUsedRepresentation == display)
     {
     return;
     }
 
-  this->LastUsedDisplay = display;
+  this->LastUsedRepresentation = display;
   this->MTime.Modified();
 }
 
-void pqPlotViewModuleHistogram::update(bool force)
+void pqPlotViewHistogram::update(bool force)
 {
-  this->setCurrentDisplay(this->getCurrentDisplay());
+  this->setCurrentRepresentation(this->getCurrentRepresentation());
 
   if(this->Model && (force || this->isUpdateNeeded()))
     {
     vtkDataArray *xarray = 0;
     vtkDataArray *yarray = 0;
-    if(!this->LastUsedDisplay.isNull())
+    if(!this->LastUsedRepresentation.isNull())
       {
-      xarray = this->LastUsedDisplay->getXArray();
-      yarray = this->LastUsedDisplay->getYArray();
+      xarray = this->LastUsedRepresentation->getXArray();
+      yarray = this->LastUsedRepresentation->getYArray();
       if(!xarray || !yarray)
         {
         qCritical() << "Failed to locate the data to plot on either axes.";
@@ -236,7 +236,7 @@ void pqPlotViewModuleHistogram::update(bool force)
     }
 }
 
-bool pqPlotViewModuleHistogram::isUpdateNeeded()
+bool pqPlotViewHistogram::isUpdateNeeded()
 {
   bool force = true; //FIXME: until we fix thses conditions to include LUT.
 
@@ -247,14 +247,14 @@ bool pqPlotViewModuleHistogram::isUpdateNeeded()
   force |= this->MTime > this->LastUpdateTime;
 
   // if the display has been modified since last update.
-  force |= (this->LastUsedDisplay) && 
-    (this->LastUsedDisplay->getProxy()->GetMTime() > 
+  force |= (this->LastUsedRepresentation) && 
+    (this->LastUsedRepresentation->getProxy()->GetMTime() > 
      this->LastUpdateTime); 
 
   // if the data object obtained from the display has been modified 
   // since last update.
-  vtkRectilinearGrid* data = this->LastUsedDisplay ?
-    this->LastUsedDisplay->getClientSideData() : 0; 
+  vtkRectilinearGrid* data = this->LastUsedRepresentation ?
+    this->LastUsedRepresentation->getClientSideData() : 0; 
   force |= (data) && (data->GetMTime() > this->LastUpdateTime);
   */
 
@@ -263,53 +263,53 @@ bool pqPlotViewModuleHistogram::isUpdateNeeded()
 
 
 //----------------------------------------------------------------------------
-pqPlotViewModuleLineChartSeries::pqPlotViewModuleLineChartSeries()
-  : DisplayName()
+pqPlotViewLineChartSeries::pqPlotViewLineChartSeries()
+  : RepresentationName()
 {
   this->Model = 0;
 }
 
-pqPlotViewModuleLineChartSeries::pqPlotViewModuleLineChartSeries(
+pqPlotViewLineChartSeries::pqPlotViewLineChartSeries(
     const QString &display, pqVTKLineChartSeries *model)
-  : DisplayName(display)
+  : RepresentationName(display)
 {
   this->Model = model;
 }
 
-pqPlotViewModuleLineChartSeries::pqPlotViewModuleLineChartSeries(
-    const pqPlotViewModuleLineChartSeries &other)
-  : DisplayName(other.DisplayName)
+pqPlotViewLineChartSeries::pqPlotViewLineChartSeries(
+    const pqPlotViewLineChartSeries &other)
+  : RepresentationName(other.RepresentationName)
 {
   this->Model = other.Model;
 }
 
-pqPlotViewModuleLineChartSeries &pqPlotViewModuleLineChartSeries::operator=(
-    const pqPlotViewModuleLineChartSeries &other)
+pqPlotViewLineChartSeries &pqPlotViewLineChartSeries::operator=(
+    const pqPlotViewLineChartSeries &other)
 {
   this->Model = other.Model;
-  this->DisplayName = other.DisplayName;
+  this->RepresentationName = other.RepresentationName;
   return *this;
 }
 
 
 //----------------------------------------------------------------------------
-pqPlotViewModuleLineChartItem::pqPlotViewModuleLineChartItem(
-    pqLineChartDisplay *display)
-  : Display(display), Series(), LastUpdateTime(), ModifiedTime()
+pqPlotViewLineChartItem::pqPlotViewLineChartItem(
+    pqLineChartRepresentation *display)
+  : Representation(display), Series(), LastUpdateTime(), ModifiedTime()
 {
   this->DataType = 0;
 }
 
-bool pqPlotViewModuleLineChartItem::isUpdateNeeded()
+bool pqPlotViewLineChartItem::isUpdateNeeded()
 {
   bool updateNeeded = this->LastUpdateTime <= this->ModifiedTime;
-  vtkRectilinearGrid *data = this->Display->getClientSideData();
+  vtkRectilinearGrid *data = this->Representation->getClientSideData();
   updateNeeded = updateNeeded || (data &&
       data->GetMTime() > this->LastUpdateTime);
   return updateNeeded;
 }
 
-bool pqPlotViewModuleLineChartItem::setDataType(int dataType)
+bool pqPlotViewLineChartItem::setDataType(int dataType)
 {
   if(this->DataType != dataType)
     {
@@ -322,19 +322,19 @@ bool pqPlotViewModuleLineChartItem::setDataType(int dataType)
 
 
 //----------------------------------------------------------------------------
-pqPlotViewModuleLineChart::pqPlotViewModuleLineChart()
-  : Layer(0), Displays()
+pqPlotViewLineChart::pqPlotViewLineChart()
+  : Layer(0), Representations()
 {
   this->Model = 0;
   this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
 }
 
-pqPlotViewModuleLineChart::~pqPlotViewModuleLineChart()
+pqPlotViewLineChart::~pqPlotViewLineChart()
 {
-  QMap<vtkSMProxy *, pqPlotViewModuleLineChartItem *>::Iterator iter;
-  for(iter = this->Displays.begin(); iter != this->Displays.end(); ++iter)
+  QMap<vtkSMProxy *, pqPlotViewLineChartItem *>::Iterator iter;
+  for(iter = this->Representations.begin(); iter != this->Representations.end(); ++iter)
     {
-    QList<pqPlotViewModuleLineChartSeries>::Iterator series =
+    QList<pqPlotViewLineChartSeries>::Iterator series =
         iter.value()->Series.begin();
     for(; series != iter.value()->Series.end(); ++series)
       {
@@ -345,12 +345,12 @@ pqPlotViewModuleLineChart::~pqPlotViewModuleLineChart()
     }
 }
 
-void pqPlotViewModuleLineChart::update(bool force)
+void pqPlotViewLineChart::update(bool force)
 {
   if(this->Model)
     {
-    QMap<vtkSMProxy *, pqPlotViewModuleLineChartItem *>::Iterator jter;
-    for(jter = this->Displays.begin(); jter != this->Displays.end(); ++jter)
+    QMap<vtkSMProxy *, pqPlotViewLineChartItem *>::Iterator jter;
+    for(jter = this->Representations.begin(); jter != this->Representations.end(); ++jter)
       {
       if(!(*jter)->isUpdateNeeded() && !force)
         {
@@ -358,12 +358,12 @@ void pqPlotViewModuleLineChart::update(bool force)
         }
 
       // Update the display data.
-      (*jter)->Display->updateSeries();
+      (*jter)->Representation->updateSeries();
       bool typeChanged = (*jter)->setDataType(
-          (*jter)->Display->getAttributeType());
-      bool isVisible = (*jter)->Display->isVisible();
+          (*jter)->Representation->getAttributeType());
+      bool isVisible = (*jter)->Representation->isVisible();
       vtkDataArray *yArray = 0;
-      vtkDataArray *xArray = (*jter)->Display->getXArray();
+      vtkDataArray *xArray = (*jter)->Representation->getXArray();
       if(!xArray && isVisible)
         {
         qDebug() << "Failed to locate X array.";
@@ -371,15 +371,15 @@ void pqPlotViewModuleLineChart::update(bool force)
 
       // First, remove or update the current model series.
       QStringList displayNames;
-      QList<pqPlotViewModuleLineChartSeries>::Iterator series =
+      QList<pqPlotViewLineChartSeries>::Iterator series =
           (*jter)->Series.begin();
       while(series != (*jter)->Series.end())
         {
         // Remove the series if the data type has changed, the display
         // is not visible, or the series is not enabled.
-        int index = (*jter)->Display->getSeriesIndex(series->DisplayName);
+        int index = (*jter)->Representation->getSeriesIndex(series->RepresentationName);
         if(typeChanged || !isVisible ||
-            !(*jter)->Display->isSeriesEnabled(index))
+            !(*jter)->Representation->isSeriesEnabled(index))
           {
           this->Model->removeSeries(series->Model);
           delete series->Model;
@@ -387,7 +387,7 @@ void pqPlotViewModuleLineChart::update(bool force)
           }
         else
           {
-          yArray = (*jter)->Display->getYArray(index);
+          yArray = (*jter)->Representation->getYArray(index);
           if(!yArray)
             {
             qDebug() << "Failed to locate Y array.";
@@ -398,13 +398,13 @@ void pqPlotViewModuleLineChart::update(bool force)
             // Update the arrays and options for the series.
             series->Model->setDataArrays(xArray, yArray);
             QColor color;
-            (*jter)->Display->getSeriesColor(index, color);
+            (*jter)->Representation->getSeriesColor(index, color);
             index = this->Model->getIndexOf(series->Model);
             pqLineChartSeriesOptions *options =
                 this->Layer->getOptions()->getSeriesOptions(index);
             options->setPen(QPen(color));
 
-            displayNames.append(series->DisplayName);
+            displayNames.append(series->RepresentationName);
             ++series;
             }
           else
@@ -420,21 +420,21 @@ void pqPlotViewModuleLineChart::update(bool force)
       // Next, add new series to the chart.
       if(isVisible)
         {
-        (*jter)->Display->beginSeriesChanges();
+        (*jter)->Representation->beginSeriesChanges();
         series = (*jter)->Series.begin();
-        int total = (*jter)->Display->getNumberOfSeries();
+        int total = (*jter)->Representation->getNumberOfSeries();
         for(int i = 0; i < total; i++)
           {
-          if((*jter)->Display->isSeriesEnabled(i))
+          if((*jter)->Representation->isSeriesEnabled(i))
             {
             QString name;
-            (*jter)->Display->getSeriesName(i, name);
+            (*jter)->Representation->getSeriesName(i, name);
             if(displayNames.contains(name))
               {
               continue;
               }
 
-            yArray = (*jter)->Display->getYArray(i);
+            yArray = (*jter)->Representation->getYArray(i);
             if(!xArray || !yArray)
               {
               if(!yArray)
@@ -447,16 +447,16 @@ void pqPlotViewModuleLineChart::update(bool force)
 
             // The series list should be kept in alphabetical order.
             while(series != (*jter)->Series.end() &&
-                series->DisplayName.compare(name) <= 0)
+                series->RepresentationName.compare(name) <= 0)
               {
               ++series;
               }
 
-            pqPlotViewModuleLineChartSeries *plot = 0;
+            pqPlotViewLineChartSeries *plot = 0;
             if(series == (*jter)->Series.end())
               {
               // Add the new or newly enabled series to the end.
-              (*jter)->Series.append(pqPlotViewModuleLineChartSeries(
+              (*jter)->Series.append(pqPlotViewLineChartSeries(
                   name, new pqVTKLineChartSeries()));
               series = (*jter)->Series.end();
               plot = &(*jter)->Series.last();
@@ -465,7 +465,7 @@ void pqPlotViewModuleLineChart::update(bool force)
               {
               // Insert the series in the list.
               series = (*jter)->Series.insert(series,
-                  pqPlotViewModuleLineChartSeries(name,
+                  pqPlotViewLineChartSeries(name,
                   new pqVTKLineChartSeries()));
               plot = &(*series);
               }
@@ -480,11 +480,11 @@ void pqPlotViewModuleLineChart::update(bool force)
             // Update the series options.
             pqLineChartSeriesOptions *options =
                 this->Layer->getOptions()->getSeriesOptions(index);
-            if((*jter)->Display->isSeriesColorSet(i))
+            if((*jter)->Representation->isSeriesColorSet(i))
               {
               // Update the line color to match the set color.
               QColor color;
-              (*jter)->Display->getSeriesColor(i, color);
+              (*jter)->Representation->getSeriesColor(i, color);
               options->setPen(QPen(color), 0);
               }
             else
@@ -492,12 +492,12 @@ void pqPlotViewModuleLineChart::update(bool force)
               // Assign the chart selected color to the property.
               QPen seriesPen;
               options->getPen(seriesPen);
-              (*jter)->Display->setSeriesColor(i, seriesPen.color());
+              (*jter)->Representation->setSeriesColor(i, seriesPen.color());
               }
             }
           }
 
-        (*jter)->Display->endSeriesChanges();
+        (*jter)->Representation->endSeriesChanges();
         }
 
       (*jter)->LastUpdateTime.Modified();
@@ -507,16 +507,16 @@ void pqPlotViewModuleLineChart::update(bool force)
 
 
 //----------------------------------------------------------------------------
-pqPlotViewModuleInternal::pqPlotViewModuleInternal()
+pqPlotViewInternal::pqPlotViewInternal()
   : Chart(0)
 {
   this->Histogram = 0;
   this->LineChart = 0;
-  this->MaxNumberOfVisibleDisplays = -1;
+  this->MaxNumberOfVisibleRepresentations = -1;
   this->RenderRequestPending = false;
 }
 
-pqPlotViewModuleInternal::~pqPlotViewModuleInternal()
+pqPlotViewInternal::~pqPlotViewInternal()
 {
   if(!this->Chart.isNull())
     {
@@ -536,18 +536,17 @@ pqPlotViewModuleInternal::~pqPlotViewModuleInternal()
 
 
 //----------------------------------------------------------------------------
-pqPlotViewModule::pqPlotViewModule(const QString& type,
+pqPlotView::pqPlotView(const QString& type,
   const QString& group, const QString& name, 
-  vtkSMAbstractViewModuleProxy* renModule, pqServer* server, QObject* _parent)
-: pqGenericViewModule(type, group, name, renModule, server, _parent)
+  vtkSMViewProxy* renModule, pqServer* server, QObject* _parent)
+: Superclass(type, group, name, renModule, server, _parent)
 {
-
-  this->Internal = new pqPlotViewModuleInternal();
+  this->Internal = new pqPlotViewInternal();
   if(type == this->barChartType())
     {
     pqHistogramChart *histogram = 0;
     this->Internal->Chart = pqHistogramWidget::createHistogram(0, &histogram);
-    this->Internal->Histogram = new pqPlotViewModuleHistogram();
+    this->Internal->Histogram = new pqPlotViewHistogram();
     this->Internal->Histogram->Layer = histogram;
     this->Internal->Histogram->Model = new pqVTKHistogramModel(this);
     this->Internal->Histogram->ColorScheme.setModel(
@@ -555,19 +554,19 @@ pqPlotViewModule::pqPlotViewModule(const QString& type,
     histogram->getOptions()->setColorScheme(
         &this->Internal->Histogram->ColorScheme);
     histogram->setModel(this->Internal->Histogram->Model);
-    this->Internal->MaxNumberOfVisibleDisplays = 1;
+    this->Internal->MaxNumberOfVisibleRepresentations = 1;
     }
   else if(type == this->XYPlotType())
     {
     pqLineChart *lineChart = 0;
     this->Internal->Chart = pqLineChartWidget::createLineChart(0, &lineChart);
-    this->Internal->LineChart = new pqPlotViewModuleLineChart();
+    this->Internal->LineChart = new pqPlotViewLineChart();
     this->Internal->LineChart->Layer = lineChart;
     lineChart->getOptions()->getGenerator()->setColorScheme(
         pqChartSeriesOptionsGenerator::Cool);
     this->Internal->LineChart->Model = new pqLineChartModel(this);
     lineChart->setModel(this->Internal->LineChart->Model);
-    this->Internal->MaxNumberOfVisibleDisplays = -1;
+    this->Internal->MaxNumberOfVisibleRepresentations = -1;
     }
   else
     {
@@ -579,46 +578,46 @@ pqPlotViewModule::pqPlotViewModule(const QString& type,
     this->Internal->Chart->setObjectName("PlotWidget");
     }
   
-  QObject::connect(this, SIGNAL(displayVisibilityChanged(pqDisplay*, bool)),
-    this, SLOT(visibilityChanged(pqDisplay*)));
-  QObject::connect(this, SIGNAL(displayAdded(pqDisplay*)),
-    this, SLOT(visibilityChanged(pqDisplay*)));
+  QObject::connect(this, SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)),
+    this, SLOT(visibilityChanged(pqRepresentation*)));
+  QObject::connect(this, SIGNAL(representationAdded(pqRepresentation*)),
+    this, SLOT(visibilityChanged(pqRepresentation*)));
 
   QObject::connect(this, SIGNAL(endRender()), this, SLOT(renderInternal()));
-  QObject::connect(this, SIGNAL(displayAdded(pqDisplay*)), 
-    this, SLOT(addDisplay(pqDisplay*)));
-  QObject::connect(this, SIGNAL(displayRemoved(pqDisplay*)), 
-    this, SLOT(removeDisplay(pqDisplay*)));
+  QObject::connect(this, SIGNAL(representationAdded(pqRepresentation*)), 
+    this, SLOT(addRepresentation(pqRepresentation*)));
+  QObject::connect(this, SIGNAL(representationRemoved(pqRepresentation*)), 
+    this, SLOT(removeRepresentation(pqRepresentation*)));
 
-  // Add the current displays to the chart.
-  QList<pqDisplay*> currentDisplays = this->getDisplays();
-  foreach(pqDisplay* display, currentDisplays)
+  // Add the current Representations to the chart.
+  QList<pqRepresentation*> currentRepresentations = this->getRepresentations();
+  foreach(pqRepresentation* display, currentRepresentations)
     {
-    this->addDisplay(display);
+    this->addRepresentation(display);
     }
 }
 
 //-----------------------------------------------------------------------------
-pqPlotViewModule::~pqPlotViewModule()
+pqPlotView::~pqPlotView()
 {
   delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqPlotViewModule::getWidget()
+QWidget* pqPlotView::getWidget()
 {
   return this->Internal->Chart;
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotViewModule::visibilityChanged(pqDisplay* disp)
+void pqPlotView::visibilityChanged(pqRepresentation* disp)
 {
   if (disp->isVisible())
     {
-    int max_visible = this->Internal->MaxNumberOfVisibleDisplays-1;
+    int max_visible = this->Internal->MaxNumberOfVisibleRepresentations-1;
     int cc=0;
-    QList<pqDisplay*> dislays = this->getDisplays();
-    foreach(pqDisplay* d, dislays)
+    QList<pqRepresentation*> dislays = this->getRepresentations();
+    foreach(pqRepresentation* d, dislays)
       {
       if (d != disp && d->isVisible())
         {
@@ -633,7 +632,7 @@ void pqPlotViewModule::visibilityChanged(pqDisplay* disp)
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotViewModule::render()
+void pqPlotView::render()
 {
   if (!this->Internal->RenderRequestPending)
     {
@@ -643,7 +642,7 @@ void pqPlotViewModule::render()
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotViewModule::delayedRender()
+void pqPlotView::delayedRender()
 {
   if (this->Internal->RenderRequestPending)
     {
@@ -652,13 +651,13 @@ void pqPlotViewModule::delayedRender()
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotViewModule::forceRender()
+void pqPlotView::forceRender()
 {
   this->Superclass::forceRender();
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotViewModule::renderInternal()
+void pqPlotView::renderInternal()
 {
   this->Internal->RenderRequestPending = false;
   if(this->Internal->Histogram)
@@ -673,7 +672,7 @@ void pqPlotViewModule::renderInternal()
 }
 
 //-----------------------------------------------------------------------------
-vtkImageData* pqPlotViewModule::captureImage(int magnification)
+vtkImageData* pqPlotView::captureImage(int magnification)
 {
   QPixmap grabbedPixMap = QPixmap::grabWidget(this->getWidget());
   grabbedPixMap = grabbedPixMap.scaled(grabbedPixMap.size().width()*magnification,
@@ -704,7 +703,7 @@ vtkImageData* pqPlotViewModule::captureImage(int magnification)
     }
 
   // Update image extents based on window position.
-  int *position = this->getViewModuleProxy()->GetWindowPosition();
+  int *position = this->getViewProxy()->GetViewPosition();
   int extents[6];
   vtkimage->GetExtent(extents);
   for (int cc=0; cc < 4; cc++)
@@ -717,7 +716,7 @@ vtkImageData* pqPlotViewModule::captureImage(int magnification)
 }
 
 //-----------------------------------------------------------------------------
-bool pqPlotViewModule::saveImage(int width, int height, 
+bool pqPlotView::saveImage(int width, int height, 
     const QString& filename)
 {
   if (width != 0 && height != 0)
@@ -762,7 +761,7 @@ bool pqPlotViewModule::saveImage(int width, int height,
 }
 
 //-----------------------------------------------------------------------------
-bool pqPlotViewModule::canDisplaySource(pqPipelineSource* source) const
+bool pqPlotView::canDisplaySource(pqPipelineSource* source) const
 {
   if(!source || 
      source->getServer()->GetConnectionID() !=
@@ -821,27 +820,27 @@ bool pqPlotViewModule::canDisplaySource(pqPipelineSource* source) const
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotViewModule::addDisplay(pqDisplay* display)
+void pqPlotView::addRepresentation(pqRepresentation* display)
 {
-  pqBarChartDisplay *histogram = qobject_cast<pqBarChartDisplay *>(display);
-  pqLineChartDisplay *lineChart = qobject_cast<pqLineChartDisplay *>(display);
+  pqBarChartRepresentation *histogram = qobject_cast<pqBarChartRepresentation *>(display);
+  pqLineChartRepresentation *lineChart = qobject_cast<pqLineChartRepresentation *>(display);
   if(histogram)
     {
     if(this->Internal->Histogram &&
-        !this->Internal->Histogram->Displays.contains(histogram))
+        !this->Internal->Histogram->Representations.contains(histogram))
       {
-      this->Internal->Histogram->Displays.push_back(histogram);
+      this->Internal->Histogram->Representations.push_back(histogram);
       }
     }
   else if(lineChart &&
-      lineChart->getProxy()->GetXMLName() == QString("XYPlotDisplay2"))
+      lineChart->getProxy()->GetXMLName() == QString("XYPlotRepresentation"))
     {
     if(this->Internal->LineChart &&
-        !this->Internal->LineChart->Displays.contains(lineChart->getProxy()))
+        !this->Internal->LineChart->Representations.contains(lineChart->getProxy()))
       {
-      pqPlotViewModuleLineChartItem *item =
-          new pqPlotViewModuleLineChartItem(lineChart);
-      this->Internal->LineChart->Displays[lineChart->getProxy()] = item;
+      pqPlotViewLineChartItem *item =
+          new pqPlotViewLineChartItem(lineChart);
+      this->Internal->LineChart->Representations[lineChart->getProxy()] = item;
       this->Internal->LineChart->VTKConnect->Connect(
           lineChart->getProxy(), vtkCommand::PropertyModifiedEvent,
           this, SLOT(markLineItemModified(vtkObject *)));
@@ -851,26 +850,26 @@ void pqPlotViewModule::addDisplay(pqDisplay* display)
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotViewModule::removeDisplay(pqDisplay* display)
+void pqPlotView::removeRepresentation(pqRepresentation* display)
 {
-  pqBarChartDisplay *histogram = qobject_cast<pqBarChartDisplay *>(display);
-  pqLineChartDisplay *lineChart = qobject_cast<pqLineChartDisplay *>(display);
+  pqBarChartRepresentation *histogram = qobject_cast<pqBarChartRepresentation *>(display);
+  pqLineChartRepresentation *lineChart = qobject_cast<pqLineChartRepresentation *>(display);
   if(histogram && this->Internal->Histogram)
     {
-    this->Internal->Histogram->Displays.removeAll(histogram);
-    if(histogram == this->Internal->Histogram->LastUsedDisplay)
+    this->Internal->Histogram->Representations.removeAll(histogram);
+    if(histogram == this->Internal->Histogram->LastUsedRepresentation)
       {
-      this->Internal->Histogram->setCurrentDisplay(0);
+      this->Internal->Histogram->setCurrentRepresentation(0);
       }
     }
   else if(lineChart && this->Internal->LineChart)
     {
-    if(this->Internal->LineChart->Displays.contains(lineChart->getProxy()))
+    if(this->Internal->LineChart->Representations.contains(lineChart->getProxy()))
       {
       this->Internal->LineChart->VTKConnect->Disconnect(lineChart->getProxy());
-      pqPlotViewModuleLineChartItem *item =
-          this->Internal->LineChart->Displays.take(lineChart->getProxy());
-      QList<pqPlotViewModuleLineChartSeries>::Iterator series;
+      pqPlotViewLineChartItem *item =
+          this->Internal->LineChart->Representations.take(lineChart->getProxy());
+      QList<pqPlotViewLineChartSeries>::Iterator series;
       for(series = item->Series.begin(); series != item->Series.end(); ++series)
         {
         this->Internal->LineChart->Model->removeSeries(series->Model);
@@ -883,23 +882,23 @@ void pqPlotViewModule::removeDisplay(pqDisplay* display)
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotViewModule::removeAllDisplays()
+void pqPlotView::removeAllRepresentations()
 {
   if(this->Internal->Histogram)
     {
-    this->Internal->Histogram->Displays.clear();
+    this->Internal->Histogram->Representations.clear();
     this->Internal->Histogram->MTime.Modified();
     }
 
   if(this->Internal->LineChart)
     {
     this->Internal->LineChart->Model->removeAll();
-    QMap<vtkSMProxy *, pqPlotViewModuleLineChartItem *>::Iterator iter =
-        this->Internal->LineChart->Displays.begin();
-    for( ; iter != this->Internal->LineChart->Displays.end(); ++iter)
+    QMap<vtkSMProxy *, pqPlotViewLineChartItem *>::Iterator iter =
+        this->Internal->LineChart->Representations.begin();
+    for( ; iter != this->Internal->LineChart->Representations.end(); ++iter)
       {
       this->Internal->LineChart->VTKConnect->Disconnect(iter.key());
-      QList<pqPlotViewModuleLineChartSeries>::Iterator series =
+      QList<pqPlotViewLineChartSeries>::Iterator series =
           iter.value()->Series.begin();
       for(; series != iter.value()->Series.end(); ++series)
         {
@@ -909,20 +908,20 @@ void pqPlotViewModule::removeAllDisplays()
       delete iter.value();
       }
 
-    this->Internal->LineChart->Displays.clear();
+    this->Internal->LineChart->Representations.clear();
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotViewModule::markLineItemModified(vtkObject *object)
+void pqPlotView::markLineItemModified(vtkObject *object)
 {
   if(this->Internal->LineChart)
     {
     // Look up the line chart item using the proxy.
     vtkSMProxy *proxy = vtkSMProxy::SafeDownCast(object);
-    QMap<vtkSMProxy *, pqPlotViewModuleLineChartItem *>::Iterator iter =
-        this->Internal->LineChart->Displays.find(proxy);
-    if(iter != this->Internal->LineChart->Displays.end())
+    QMap<vtkSMProxy *, pqPlotViewLineChartItem *>::Iterator iter =
+        this->Internal->LineChart->Representations.find(proxy);
+    if(iter != this->Internal->LineChart->Representations.end())
       {
       iter.value()->ModifiedTime.Modified();
       }

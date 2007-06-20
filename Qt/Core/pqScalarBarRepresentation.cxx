@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqScalarBarDisplay.cxx
+   Module:    pqScalarBarRepresentation.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqScalarBarDisplay.h"
+#include "pqScalarBarRepresentation.h"
 
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
@@ -41,14 +41,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QRegExp>
 
 #include "pqApplicationCore.h"
-#include "pqPipelineDisplay.h"
+#include "pqPipelineRepresentation.h"
 #include "pqProxy.h"
 #include "pqScalarsToColors.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
-class pqScalarBarDisplayInternal
+class pqScalarBarRepresentation::pqInternal
 {
 public:
   QPointer<pqScalarsToColors> LookupTable;
@@ -56,12 +56,12 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqScalarBarDisplay::pqScalarBarDisplay(const QString& group, const QString& name,
+pqScalarBarRepresentation::pqScalarBarRepresentation(const QString& group, const QString& name,
     vtkSMProxy* scalarbar, pqServer* server,
     QObject* _parent)
-: pqDisplay(group, name, scalarbar, server, _parent)
+: pqRepresentation(group, name, scalarbar, server, _parent)
 {
-  this->Internal = new pqScalarBarDisplayInternal;
+  this->Internal = new pqScalarBarRepresentation::pqInternal();
 
   this->Internal->VTKConnect = vtkEventQtSlotConnect::New();
   this->Internal->VTKConnect->Connect(scalarbar->GetProperty("LookupTable"),
@@ -72,11 +72,12 @@ pqScalarBarDisplay::pqScalarBarDisplay(const QString& group, const QString& name
 }
 
 //-----------------------------------------------------------------------------
-pqScalarBarDisplay::~pqScalarBarDisplay()
+pqScalarBarRepresentation::~pqScalarBarRepresentation()
 {
   if (this->Internal->LookupTable)
     {
     this->Internal->LookupTable->removeScalarBar(this);
+    this->Internal->LookupTable = 0;
     }
 
   this->Internal->VTKConnect->Disconnect();
@@ -85,20 +86,20 @@ pqScalarBarDisplay::~pqScalarBarDisplay()
 }
 
 //-----------------------------------------------------------------------------
-pqScalarsToColors* pqScalarBarDisplay::getLookupTable() const
+pqScalarsToColors* pqScalarBarRepresentation::getLookupTable() const
 {
   return this->Internal->LookupTable;
 }
 
 //-----------------------------------------------------------------------------
-void pqScalarBarDisplay::onLookupTableModified()
+void pqScalarBarRepresentation::onLookupTableModified()
 {
   pqServerManagerModel* smmodel = 
     pqApplicationCore::instance()->getServerManagerModel();
+
   vtkSMProxy* curLUTProxy = 
     pqSMAdaptor::getProxyProperty(this->getProxy()->GetProperty("LookupTable"));
-  pqScalarsToColors* curLUT = qobject_cast<pqScalarsToColors*>(
-    smmodel->getPQProxy(curLUTProxy));
+  pqScalarsToColors* curLUT = smmodel->findItem<pqScalarsToColors*>(curLUTProxy);
 
   if (curLUT == this->Internal->LookupTable)
     {
@@ -118,7 +119,7 @@ void pqScalarBarDisplay::onLookupTableModified()
 }
 
 //-----------------------------------------------------------------------------
-QPair<QString, QString> pqScalarBarDisplay::getTitle() const
+QPair<QString, QString> pqScalarBarRepresentation::getTitle() const
 {
   QString title = pqSMAdaptor::getElementProperty(
     this->getProxy()->GetProperty("Title")).toString();
@@ -131,7 +132,7 @@ QPair<QString, QString> pqScalarBarDisplay::getTitle() const
 }
 
 //-----------------------------------------------------------------------------
-void pqScalarBarDisplay::setTitle(const QString& name, const QString& comp)
+void pqScalarBarRepresentation::setTitle(const QString& name, const QString& comp)
 {
   if (QPair<QString, QString>(name, comp) == this->getTitle())
     {
@@ -144,7 +145,7 @@ void pqScalarBarDisplay::setTitle(const QString& name, const QString& comp)
 }
 
 //-----------------------------------------------------------------------------
-void pqScalarBarDisplay::makeTitle(pqPipelineDisplay* display)
+void pqScalarBarRepresentation::makeTitle(pqPipelineRepresentation* display)
 {
   if (!this->Internal->LookupTable)
     {

@@ -60,11 +60,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqApplicationCore.h"
-#include "pqElementInspectorViewModule.h"
+#include "pqElementInspectorView.h"
 #include "pqMultiViewFrame.h"
 #include "pqObjectBuilder.h"
 #include "pqPluginManager.h"
-#include "pqRenderViewModule.h"
+#include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSplitViewUndoElement.h"
@@ -90,17 +90,17 @@ class pqViewManager::pqInternals
 {
 public:
   QPointer<pqServer> ActiveServer;
-  QPointer<pqGenericViewModule> ActiveViewModule;
+  QPointer<pqView> ActiveView;
   QPointer<pqUndoStack> UndoStack;
   QMenu ConvertMenu;
   QSignalMapper* LookmarkSignalMapper;
 
 
-  typedef QMap<pqMultiViewFrame*, QPointer<pqGenericViewModule> > FrameMapType;
+  typedef QMap<pqMultiViewFrame*, QPointer<pqView> > FrameMapType;
   FrameMapType Frames;
 
   QList<QPointer<pqMultiViewFrame> > PendingFrames;
-  QList<QPointer<pqGenericViewModule> > PendingViews;
+  QList<QPointer<pqView> > PendingViews;
 
   QSize MaxWindowSize;
 
@@ -127,7 +127,8 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
     this, SIGNAL(createLookmark(QWidget*)));
 
 
-  pqServerManagerModel* smModel = pqServerManagerModel::instance();
+  pqServerManagerModel* smModel = 
+    pqApplicationCore::instance()->getServerManagerModel();
   if (!smModel)
     {
     qDebug() << "pqServerManagerModel instance must be created before "
@@ -136,10 +137,10 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
     }
 
   // We need to know when new view modules are added.
-  QObject::connect(smModel, SIGNAL(viewModuleAdded(pqGenericViewModule*)),
-    this, SLOT(onViewModuleAdded(pqGenericViewModule*)));
-  QObject::connect(smModel, SIGNAL(viewModuleRemoved(pqGenericViewModule*)),
-    this, SLOT(onViewModuleRemoved(pqGenericViewModule*)));
+  QObject::connect(smModel, SIGNAL(viewAdded(pqView*)),
+    this, SLOT(onViewAdded(pqView*)));
+  QObject::connect(smModel, SIGNAL(viewRemoved(pqView*)),
+    this, SLOT(onViewRemoved(pqView*)));
 
   // Record creation/removal of frames.
   QObject::connect(this, SIGNAL(frameAdded(pqMultiViewFrame*)), 
@@ -171,11 +172,6 @@ pqViewManager::~pqViewManager()
       this->onFrameRemovedInternal(frame);
       }
     }
-  pqServerManagerModel* smModel = pqServerManagerModel::instance();
-  if (smModel)
-    {
-    QObject::disconnect(smModel, 0, this, 0);
-    }
   delete this->Internal;
 }
 
@@ -185,7 +181,7 @@ void pqViewManager::buildConvertMenu()
   this->Internal->ConvertMenu.clear();
 
   QAction* view_action = new QAction("3D View", this);
-  view_action->setData(pqRenderViewModule::renderViewType());
+  view_action->setData(pqRenderView::renderViewType());
   this->Internal->ConvertMenu.addAction(view_action);
 
   // Create actions for converting view types.
@@ -220,9 +216,9 @@ void pqViewManager::setActiveServer(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-pqGenericViewModule* pqViewManager::getActiveViewModule() const
+pqView* pqViewManager::getActiveView() const
 {
-  return this->Internal->ActiveViewModule;
+  return this->Internal->ActiveView;
 }
 
 //-----------------------------------------------------------------------------
@@ -259,7 +255,7 @@ void pqViewManager::updateConversionActions(pqMultiViewFrame* frame)
     }
 
   bool server_exists = (pqApplicationCore::instance()->getServerManagerModel()->
-    getNumberOfServers() >= 1);
+    getNumberOfItems<pqServer*>() >= 1);
   foreach (QAction* action, this->Internal->ConvertMenu.actions())
     {
     action->setEnabled(server_exists && (to_exclude != action->data().toString()));
@@ -314,7 +310,7 @@ void pqViewManager::onFrameAdded(pqMultiViewFrame* frame)
   // PendingViews and we assign it to the frame here.
   if (this->Internal->PendingViews.size() > 0)
     {
-    pqGenericViewModule* view = this->Internal->PendingViews.takeAt(0);
+    pqView* view = this->Internal->PendingViews.takeAt(0);
     this->assignFrame(view);
     }
 
@@ -359,7 +355,7 @@ void pqViewManager::onFrameRemovedInternal(pqMultiViewFrame* frame)
     }
 
   // When a frame is removed, its render module is destroyed.
-  pqGenericViewModule* view = this->Internal->Frames.take(frame);
+  pqView* view = this->Internal->Frames.take(frame);
   this->disconnect(frame, view);
 
   this->Internal->PendingFrames.removeAll(frame);
@@ -425,7 +421,7 @@ void pqViewManager::onPreFrameRemoved(pqMultiViewFrame* frame)
 }
 
 //-----------------------------------------------------------------------------
-void pqViewManager::connect(pqMultiViewFrame* frame, pqGenericViewModule* view)
+void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
 {
   if (!frame || !view)
     {
@@ -447,8 +443,8 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqGenericViewModule* view)
     }
 
 
-  pqRenderViewModule* const render_module = 
-    qobject_cast<pqRenderViewModule*>(view);
+  pqRenderView* const render_module = 
+    qobject_cast<pqRenderView*>(view);
   if(render_module)
     {
     QAction* lookmarkAction = new QAction(QIcon(":/pqWidgets/Icons/pqLookmark16.png"), 
@@ -500,7 +496,7 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqGenericViewModule* view)
 }
 
 //-----------------------------------------------------------------------------
-void pqViewManager::disconnect(pqMultiViewFrame* frame, pqGenericViewModule* view)
+void pqViewManager::disconnect(pqMultiViewFrame* frame, pqView* view)
 {
   if (!frame || !view)
     {
@@ -518,8 +514,8 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqGenericViewModule* vie
   frame->setMainWidget(NULL);
 
 
-  pqRenderViewModule* const render_module = 
-    qobject_cast<pqRenderViewModule*>(view);
+  pqRenderView* const render_module = 
+    qobject_cast<pqRenderView*>(view);
   if(render_module)
     {
     QAction *lookmarkAction= frame->getAction("LookmarkButton");
@@ -556,9 +552,9 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqGenericViewModule* vie
 }
 
 //-----------------------------------------------------------------------------
-void pqViewManager::onViewModuleAdded(pqGenericViewModule* view)
+void pqViewManager::onViewAdded(pqView* view)
 {
-  if (qobject_cast<pqElementInspectorViewModule*>(view))
+  if (qobject_cast<pqElementInspectorView*>(view))
     {
     // Ignore element inspector view modules.
     return;
@@ -567,7 +563,7 @@ void pqViewManager::onViewModuleAdded(pqGenericViewModule* view)
 }
 
 //-----------------------------------------------------------------------------
-void pqViewManager::assignFrame(pqGenericViewModule* view)
+void pqViewManager::assignFrame(pqView* view)
 {
   pqMultiViewFrame* frame = 0;
   if (this->Internal->PendingFrames.size() == 0)
@@ -588,9 +584,9 @@ void pqViewManager::assignFrame(pqGenericViewModule* view)
     // Locate frame to split.
     // If there is an active view, use it.
     pqMultiViewFrame* oldFrame = 0;
-    if (this->Internal->ActiveViewModule)
+    if (this->Internal->ActiveView)
       {
-      oldFrame = this->getFrame(this->Internal->ActiveViewModule);
+      oldFrame = this->getFrame(this->Internal->ActiveView);
       }
     else if (this->Internal->Frames.size() > 0)
       {
@@ -654,15 +650,26 @@ void pqViewManager::assignFrame(pqGenericViewModule* view)
 }
 
 //-----------------------------------------------------------------------------
-pqMultiViewFrame* pqViewManager::getFrame(pqGenericViewModule* view) const
+pqMultiViewFrame* pqViewManager::getFrame(pqView* view) const
 {
   return qobject_cast<pqMultiViewFrame*>(view->getWidget()->parentWidget());
 }
 
 //-----------------------------------------------------------------------------
-void pqViewManager::onViewModuleRemoved(pqGenericViewModule* view)
+pqView* pqViewManager::getView(pqMultiViewFrame* frame) const
 {
-  if (qobject_cast<pqElementInspectorViewModule*>(view))
+  pqInternals::FrameMapType::iterator iter = this->Internal->Frames.find(frame);
+  if (iter != this->Internal->Frames.end())
+    {
+    return iter.value();
+    }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+void pqViewManager::onViewRemoved(pqView* view)
+{
+  if (qobject_cast<pqElementInspectorView*>(view))
     {
     // Ignore element inspector view modules.
     return;
@@ -727,7 +734,7 @@ void pqViewManager::onConvertToTriggered(QAction* action)
 
   // FIXME: We may want to fix this to use the active server instead.
   pqServer* server= pqApplicationCore::instance()->
-    getServerManagerModel()->getServerByIndex(0);
+    getServerManagerModel()->getItemAtIndex<pqServer*>(0);
   if (!server)
     {
     qDebug() << "No server present cannot convert view.";
@@ -738,9 +745,9 @@ void pqViewManager::onConvertToTriggered(QAction* action)
 
   pqObjectBuilder* builder = 
     pqApplicationCore::instance()-> getObjectBuilder();
-  if (this->Internal->ActiveViewModule)
+  if (this->Internal->ActiveView)
     {
-    builder->destroy(this->Internal->ActiveViewModule);
+    builder->destroy(this->Internal->ActiveView);
     }
 
   builder->createView(type, server);
@@ -765,8 +772,8 @@ void pqViewManager::onActivate(QWidget* obj)
 {
   if (!obj)
     {
-    this->Internal->ActiveViewModule = 0;
-    emit this->activeViewModuleChanged(this->Internal->ActiveViewModule);
+    this->Internal->ActiveView = 0;
+    emit this->activeViewChanged(this->Internal->ActiveView);
     return; 
     }
 
@@ -777,9 +784,9 @@ void pqViewManager::onActivate(QWidget* obj)
     }
 
 
-  pqGenericViewModule* view = this->Internal->Frames.value(frame);
+  pqView* view = this->Internal->Frames.value(frame);
   // If the frame does not have a view, view==NULL.
-  this->Internal->ActiveViewModule = view;
+  this->Internal->ActiveView = view;
 
   // Make sure no other frame is active.
   foreach (pqMultiViewFrame* fr, this->Internal->Frames.keys())
@@ -797,7 +804,7 @@ void pqViewManager::onActivate(QWidget* obj)
       }
     }
 
-  emit this->activeViewModuleChanged(this->Internal->ActiveViewModule);
+  emit this->activeViewChanged(this->Internal->ActiveView);
 }
 
 //-----------------------------------------------------------------------------
@@ -836,8 +843,8 @@ bool pqViewManager::eventFilter(QObject* caller, QEvent* e)
     }
   else if (e->type() == QEvent::Resize)
     {
-    // Update WindowPosition and GUISize properties on all view modules.
-    this->updateViewModulePositions(); 
+    // Update ViewPosition and GUISize properties on all view modules.
+    this->updateViewPositions(); 
     }
   return QObject::eventFilter(caller, e);
 }
@@ -854,25 +861,25 @@ void pqViewManager::setMaxViewWindowSize(const QSize& win_size)
 }
 
 //-----------------------------------------------------------------------------
-void pqViewManager::updateViewModulePositions()
+void pqViewManager::updateViewPositions()
 {
   // find a rectangle that bounds all views
   QRect totalBounds;
   
-  foreach(pqGenericViewModule* view, this->Internal->Frames)
+  foreach(pqView* view, this->Internal->Frames)
     {
     QRect bounds = view->getWidget()->rect();
     bounds.moveTo(view->getWidget()->mapToGlobal(QPoint(0,0)));
     totalBounds |= bounds;
     }
 
-  /// GUISize and WindowPosition properties are managed
+  /// GUISize and ViewPosition properties are managed
   /// by the GUI, the undo/redo stack should not worry about 
   /// the changes made to them.
   emit this->beginNonUndoableChanges();
 
-  // Now we loop thorough all view modules and set the GUISize/WindowPosition.
-  foreach(pqGenericViewModule* view, this->Internal->Frames)
+  // Now we loop thorough all view modules and set the GUISize/ViewPosition.
+  foreach(pqView* view, this->Internal->Frames)
     {
     vtkSMIntVectorProperty* prop = 0;
 
@@ -886,7 +893,7 @@ void pqViewManager::updateViewModulePositions()
 
     // position relative to the bounds of all views
     prop = vtkSMIntVectorProperty::SafeDownCast(
-      view->getProxy()->GetProperty("WindowPosition"));
+      view->getProxy()->GetProperty("ViewPosition"));
     if(prop)
       {
       QPoint view_pos = view->getWidget()->mapToGlobal(QPoint(0,0));
@@ -915,7 +922,7 @@ void pqViewManager::saveState(vtkPVXMLElement* root)
   for(; iter != this->Internal->Frames.end(); ++iter)
     {
     pqMultiViewFrame* frame = iter.key();
-    pqGenericViewModule* view = iter.value();
+    pqView* view = iter.value();
 
     pqMultiView::Index index = this->indexOf(frame);
     vtkPVXMLElement* frameElem = vtkPVXMLElement::New();
@@ -983,8 +990,8 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
         return false;
         }
 
-      pqGenericViewModule* view = qobject_cast<pqGenericViewModule*>(
-        pqApplicationCore::instance()->getServerManagerModel()->getPQProxy(viewModule));
+      pqView* view = pqApplicationCore::instance()->getServerManagerModel()->
+        findItem<pqView*>(viewModule);
       pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(
         this->widgetOfIndex(index));
       if (frame && view)
@@ -1120,7 +1127,7 @@ void pqViewManager::frameDrop(pqMultiViewFrame* acceptingFrame,
       originatingIndex=this->indexOf(tempFrame);
       this->replaceView(originatingIndex,acceptingFrame);
 
-      this->updateViewModulePositions();
+      this->updateViewPositions();
       delete tempFrame;
       
       this->show();

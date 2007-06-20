@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqObjectInspectorDriver.h"
 
-#include "pqGenericViewModule.h"
-#include "pqConsumerDisplay.h"
+#include "pqView.h"
+#include "pqDataRepresentation.h"
 #include "pqPipelineSource.h"
 #include "pqProxy.h"
 #include "pqServerManagerModel.h"
@@ -83,7 +83,7 @@ void pqObjectInspectorDriver::setSelectionModel(
     }
 }
 
-void pqObjectInspectorDriver::setActiveView(pqGenericViewModule *view)
+void pqObjectInspectorDriver::setActiveView(pqView *view)
 {
   if(view != this->View)
     {
@@ -107,21 +107,21 @@ void pqObjectInspectorDriver::checkSource(pqPipelineSource *source)
 
 void pqObjectInspectorDriver::checkForDisplay()
 {
-  pqConsumerDisplay *display = this->findDisplay();
+  pqDataRepresentation *display = this->findDisplay();
   if(display != this->Display)
     {
     this->Display = display;
-    emit this->displayChanged(this->Display, this->View);
+    emit this->representationChanged(this->Display, this->View);
     }
 }
 
 void pqObjectInspectorDriver::checkDisplay(pqPipelineSource *,
-    pqConsumerDisplay *display)
+    pqDataRepresentation *display)
 {
   if(display && display == this->Display)
     {
     this->Display = 0;
-    emit this->displayChanged(this->Display, this->View);
+    emit this->representationChanged(this->Display, this->View);
     }
 }
 
@@ -141,11 +141,11 @@ void pqObjectInspectorDriver::setActiveSource(pqPipelineSource *source)
   if(this->Source)
     {
     this->connect(this->Source,
-        SIGNAL(displayAdded(pqPipelineSource *, pqConsumerDisplay *)),
+        SIGNAL(representationAdded(pqPipelineSource *, pqDataRepresentation *)),
         this, SLOT(checkForDisplay()), Qt::QueuedConnection);
     this->connect(this->Source,
-        SIGNAL(displayRemoved(pqPipelineSource *, pqConsumerDisplay *)),
-        this, SLOT(checkDisplay(pqPipelineSource *, pqConsumerDisplay *)));
+        SIGNAL(representationRemoved(pqPipelineSource *, pqDataRepresentation *)),
+        this, SLOT(checkDisplay(pqPipelineSource *, pqDataRepresentation *)));
     }
 
   emit this->sourceChanged(this->Source);
@@ -174,11 +174,11 @@ pqPipelineSource *pqObjectInspectorDriver::findSource() const
   return dynamic_cast<pqPipelineSource *>(item);
 }
 
-pqConsumerDisplay *pqObjectInspectorDriver::findDisplay() const
+pqDataRepresentation *pqObjectInspectorDriver::findDisplay() const
 {
   if(this->Source && this->View)
     {
-    return this->Source->getDisplay(this->View);
+    return this->Source->getRepresentation(this->View);
     }
 
   return 0;

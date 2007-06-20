@@ -32,17 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayRepresentationWidget.h"
 #include "ui_pqDisplayRepresentationWidget.h"
 
-#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMIntVectorProperty.h"
 
 #include<QPointer>
 
 #include "pqApplicationCore.h"
-#include "pqPipelineDisplay.h"
+#include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyLinks.h"
-#include "pqRenderViewModule.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
@@ -51,7 +49,7 @@ class pqDisplayRepresentationWidgetInternal :
   public Ui::displayRepresentationWidget
 {
 public:
-  QPointer<pqPipelineDisplay> Display;
+  QPointer<pqPipelineRepresentation> Display;
   pqPropertyLinks Links;
   pqSignalAdaptorComboBox* Adaptor;
 };
@@ -97,11 +95,11 @@ pqDisplayRepresentationWidget::~pqDisplayRepresentationWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplayRepresentationWidget::setDisplay(pqConsumerDisplay* display)
+void pqDisplayRepresentationWidget::setRepresentation(pqDataRepresentation* display)
 {
   if(display != this->Internal->Display)
     {
-    this->Internal->Display = dynamic_cast<pqPipelineDisplay*>(display);
+    this->Internal->Display = qobject_cast<pqPipelineRepresentation*>(display);
     this->updateLinks();
     }
 }
@@ -120,21 +118,13 @@ void pqDisplayRepresentationWidget::updateLinks()
     return;
     }
 
-  vtkSMDataObjectDisplayProxy* displayProxy =
-      this->Internal->Display->getDisplayProxy();
+  vtkSMProxy* displayProxy = this->Internal->Display->getProxy();
   vtkSMProperty* repProperty =
       this->Internal->Display->getProxy()->GetProperty("Representation");
   repProperty->UpdateDependentDomains();
   QList<QVariant> items = pqSMAdaptor::getEnumerationPropertyDomain(repProperty);
   foreach(QVariant item, items)
     {
-    if(item == "Volume" &&
-        this->Internal->Display->getDisplayProxy()->GetVolumePipelineType() ==
-        vtkSMDataObjectDisplayProxy::NONE) 
-      {
-      continue; // add volume only if volume representation is supported.
-      }
-
     this->Internal->comboBox->addItem(item.toString());
     }
 
@@ -182,6 +172,6 @@ void pqDisplayRepresentationWidget::onCurrentTextChanged(const QString&)
 {
   if (this->Internal->Display)
     {
-    this->Internal->Display->renderAllViews();
+    this->Internal->Display->renderViewEventually();
     }
 }

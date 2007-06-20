@@ -542,7 +542,7 @@
         name="InterpolateScalarsBeforeMapping"
         command="SetInterpolateScalarsBeforeMapping"
         number_of_elements="1"
-        default_values="0"
+        default_values="1"
         animateable="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
@@ -726,6 +726,7 @@
           <DataType value="vtkUnstructuredGrid"/>
         </DataTypeDomain>
       </InputProperty>
+
       <IntVectorProperty
         name="ScalarMode"
         command="SetScalarMode"
@@ -740,6 +741,7 @@
           <Entry value="4" text="CellFieldData"/>
         </EnumerationDomain>
       </IntVectorProperty>
+
       <StringVectorProperty
         name="SelectScalarArray"
         command="SelectScalarArray"
@@ -751,6 +753,7 @@
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
+
       <ProxyProperty name="RayCastFunction" command="SetRayCastFunction">
         <ProxyGroupDomain name="groups">
           <Group name="ugrid_raycast_functions"/>
@@ -1022,10 +1025,20 @@
           <Group name="mappers" />
         </ProxyGroupDomain>
       </ProxyProperty>
+
       <ProxyProperty name="RenderModuleHelper"
         command="SetRenderModuleHelper"
         is_internal="1">
+        <!-- Obsolete -->
       </ProxyProperty>
+
+      <IntVectorProperty name="EnableLOD"
+        command="SetEnableLOD"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <!-- End of LODActor -->
     </Proxy>
 
@@ -1040,6 +1053,13 @@
         command="SetRenderModuleHelper"
         is_internal="1">
       </ProxyProperty>
+
+      <IntVectorProperty name="EnableLOD"
+        command="SetEnableLOD"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <!-- End of LODVolume -->
     </Proxy>
 
@@ -3840,16 +3860,6 @@
         </Documentation>
       </ProxyProperty>
 
-      <ProxyProperty
-        name="ViewHelper"
-        command="SetViewHelperProxy"
-        update_self="1">
-        <Documentation>
-          The helper that gives the strategy information about critical view
-          properties without requiring a reference to the view proxy itself.
-        </Documentation>
-      </ProxyProperty>
-
       <SubProxy>
         <Proxy name="LODDecimator" 
           proxygroup="filters" proxyname="QuadricClustering" />
@@ -3905,6 +3915,9 @@
         <Proxy name="Distributor" proxygroup="filters"
           proxyname="OrderedCompositeDistributor">
         </Proxy>
+        <ExposedProperties>
+          <Property name="PKdTree" />
+        </ExposedProperties>
       </SubProxy>
 
       <SubProxy>
@@ -3928,6 +3941,9 @@
         <Proxy name="DistributorLOD" proxygroup="filters"
           proxyname="OrderedCompositeDistributor">
         </Proxy>
+        <ShareProperties subproxy="Distributor" >
+          <Exception name="Input" />
+        </ShareProperties>
       </SubProxy>
       
       <!-- End of PolyDataParallelStrategy -->
@@ -3944,12 +3960,6 @@
           <Property name="OutputDataType" />
         </ExposedProperties>
       </SubProxy>
-      
-      <SubProxy>
-        <Proxy name="PostProcessor"
-          proxygroup="filters" proxyname="PolyLineToRectilinearGrid">
-        </Proxy>
-      </SubProxy>
 
       <SubProxy>
         <Proxy name="CollectLOD" proxygroup="filters" proxyname="ClientServerMoveData">
@@ -3959,28 +3969,141 @@
       <!-- End of ClientDeliveryStrategy -->
     </ClientDeliveryStrategyProxy>
 
-    <SimpleStrategy name="UnstructuredGridStrategy" 
-      base_proxygroup="strategies"
-      base_proxyname="PolyDataStrategy" >
+    <SimpleStrategy name="UnstructuredGridStrategy" >
       <Documentation>
-        Representation stragegy can be used for unstructured grid volume rendering.
+        Representation strategy can be used for unstructured grid volume rendering.
       </Documentation>
+
+      <ProxyProperty
+        name="Input"
+        command="SetInput"
+        update_self="1"
+        immediate_update="1">
+        <Documentation>
+          The input to the strategy.
+        </Documentation>
+      </ProxyProperty>
+
+      <SubProxy>
+        <Proxy name="LODDecimator" 
+          proxygroup="filters" proxyname="OutlineFilter" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="UpdateSuppressor"
+          proxygroup="filters" proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="UpdateTime" />
+          <Property name="RemoveAllCaches" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="UpdateSuppressorLOD"
+          proxygroup="filters" proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
+      </SubProxy>
+
       <!-- End of UnstructuredGridStrategy -->
     </SimpleStrategy>
 
-    <SimpleParallelStrategy name="UnstructuredGridParallelStrategy"
+    <UnstructuredGridParallelStrategy name="UnstructuredGridParallelStrategy"
       base_proxygroup="strategies" 
-      base_proxyname="PolyDataParallelStrategy">
-    </SimpleParallelStrategy>
+      base_proxyname="UnstructuredGridStrategy">
 
-    <SimpleStrategy name="UniformGridParallelStrategy" 
-      base_proxygroup="strategies"
-      base_proxyname="PolyDataStrategy" >
+      <SubProxy>
+        <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PreDistributorSuppressor" proxygroup="filters"
+          proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Distributor" proxygroup="filters"
+          proxyname="OrderedCompositeDistributor">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="PKdTree" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="CollectLOD" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PreDistributorSuppressorLOD" proxygroup="filters"
+          proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressorLOD" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="DistributorLOD" proxygroup="filters"
+          proxyname="OrderedCompositeDistributor">
+        </Proxy>
+        <ShareProperties subproxy="Distributor">
+          <Exception name="Input" /> 
+        </ShareProperties>
+      </SubProxy>
+      
+      <!-- End of UnstructuredGridParallelStrategy -->
+    </UnstructuredGridParallelStrategy>
+
+    <UniformGridParallelStrategy name="UniformGridParallelStrategy" >
       <Documentation>
-        Representation stragegy can be used for unstructured grid volume rendering.
+        Representation stragegy can be used for uniform grid volume rendering.
       </Documentation>
+
+      <ProxyProperty
+        name="Input"
+        command="SetInput"
+        update_self="1"
+        immediate_update="1">
+        <Documentation>
+          The input to the strategy.
+        </Documentation>
+      </ProxyProperty>
+
+      <SubProxy>
+        <Proxy name="UpdateSuppressor"
+          proxygroup="filters" proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="UpdateTime" />
+          <Property name="RemoveAllCaches" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
       <!-- End of UnstructuredGridStrategy -->
-    </SimpleStrategy>
+    </UniformGridParallelStrategy>
 
     <!-- End of strategies -->
   </ProxyGroup>
@@ -3999,61 +4122,9 @@
       </ProxyProperty>
     </MultiViewFactory>
 
-    <ViewProxy name="ElementInspectorView" >
-      <ProxyProperty
-        name="Representations"
-        command="AddRepresentation"
-        update_self="1"
-        remove_command="RemoveRepresentation">
-        <Documentation>
-          Add representations to be rendered by this view.
-        </Documentation>
-      </ProxyProperty>
-
-      <IntVectorProperty
-        name="ViewPosition"
-        command="SetViewPosition"
-        number_of_elements="2"
-        default_values="0 0"
-        update_self="1"
-        immediate_update="1">
-        <IntRangeDomain name="range" min="0 0" />
-        <Documentation>
-          Position of the view. This is useful in multiview configurations.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="GUISize"
-        command="SetGUISize"
-        number_of_elements="2"
-        default_values="0 0"
-        update_self="1"
-        immediate_update="1">
-        <IntRangeDomain name="range" min="1 1" />
-        <Documentation>
-          Total GUI size when using mutliple views. This includes the sizes of
-          all view modules.
-        </Documentation>
-      </IntVectorProperty>
-
-      <DoubleVectorProperty
-        name="ViewTime"
-        number_of_elements="1"
-        default_values="none">
-        <DoubleRangeDomain name="range"/>
-        <Documentation>
-          The pipeline update time for this view.
-          This gets passed to all representations added to this view.
-        </Documentation>
-      </DoubleVectorProperty>
-      <!-- End of ElementInspectorView -->
-    </ViewProxy>
-
-    <Proxy name="RenderViewBase">
+    <Proxy name="ViewBase">
       <Documentation>
-        This defines the properties/subproxies common to all render view
-        subclasses.
+        Defines common API for all views.
       </Documentation>
 
       <ProxyProperty
@@ -4103,6 +4174,70 @@
           This gets passed to all representations added to this view.
         </Documentation>
       </DoubleVectorProperty>
+      <!-- End of ViewBase -->
+    </Proxy>
+
+    <ViewProxy name="ElementInspectorView" 
+      base_proxygroup="newviews" 
+      base_proxyname="ViewBase">
+
+      <!-- End of ElementInspectorView -->
+    </ViewProxy>
+
+    <ViewProxy name="BarChartView" 
+      base_proxygroup="newviews" base_proxyname="ViewBase"
+      representation_name="BarChartRepresentation">
+      <Documentation>
+        View proxy for a bar char view.
+      </Documentation>
+
+      <!-- Add non-command properties that will help
+          keep client-only BarChart properties in SM such as colors etc etc -->
+      <!-- End of BarChartView -->
+    </ViewProxy>
+
+    <ViewProxy name="XYPlotView"
+      base_proxygroup="newviews" base_proxyname="ViewBase"
+      representation_name="XYPlotRepresentation" >
+      <Documentation>
+        View proxy used for XY line plots.
+      </Documentation>
+      <!-- Add non-command properties that will help
+          keep client-only BarChart properties in SM such as colors etc etc -->
+    </ViewProxy>
+
+    <Proxy name="RenderViewBase"
+      base_proxygroup="newviews" 
+      base_proxyname="ViewBase">
+      <Documentation>
+        This defines the properties/subproxies common to all render view
+        subclasses.
+      </Documentation>
+
+      <DoubleVectorProperty
+        name="LODThreshold"
+        command="SetLODThreshold"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <Documentation>
+          Set the memory size threshold above which LOD will be used while
+          rendering interactively.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="LODResolution"
+        command="SetLODResolution"
+        number_of_elements="1"
+        default_values="50"
+        update_self="1">
+        <IntRangeDomain name="range" min="0" />
+        <Documentation>
+          Set the LOD resolution.
+        </Documentation>
+      </IntVectorProperty>
 
       <IntVectorProperty
         name="UseTriangleStrips"
@@ -4141,6 +4276,13 @@
         default_values="0"
         update_self="1">
         <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="CacheLimit"
+        number_of_elements="1"
+        default_values="0">
+        <!-- Fix me -->
       </IntVectorProperty>
 
       <!-- 
@@ -4218,54 +4360,6 @@
         </ExposedProperties>
       </SubProxy>
 
-      <SubProxy>
-        <Proxy name="ViewHelper" class="vtkPVRenderModuleHelper">
-          <IntVectorProperty
-            name="UseLOD"
-            command="SetLODFlag"
-            number_of_elements="1"
-            default_values="0">
-            <BooleanDomain name="bool" />
-          </IntVectorProperty>
-
-          <IntVectorProperty
-            name="UseCompositing"
-            number_of_elements="1"
-            default_values="0">
-            <BooleanDomain name="bool" />
-          </IntVectorProperty>
-
-          <IntVectorProperty
-            name="UseOrderedCompositing"
-            number_of_elements="1"
-            default_values="0">
-            <BooleanDomain name="bool" />
-          </IntVectorProperty>
-
-          <IntVectorProperty
-            name="UseCache"
-            command="SetCachingEnabled"
-            number_of_elements="1"
-            default_values="0">
-            <BooleanDomain name="bool" />
-          </IntVectorProperty>
-
-          <IntVectorProperty
-            name="LODResolution"
-            number_of_elements="1"
-            default_values="50" >
-            <IntRangeDomain name="range" min="10" />
-          </IntVectorProperty>
-          <!-- End of subproxy "ViewHelper" -->
-        </Proxy>
-
-        <ExposedProperties>
-          <Property name="UseCache" />
-          <Property name="LODResolution" />
-        </ExposedProperties>
-        <!-- End of SubProxy ViewHelper -->
-      </SubProxy>
-
       <!-- End of RenderViewBase -->
     </Proxy>
 
@@ -4274,19 +4368,6 @@
       <Documentation>
         Simplest render view without compositing/client-server support.
       </Documentation>
-
-      <DoubleVectorProperty
-        name="LODThreshold"
-        command="SetLODThreshold"
-        number_of_elements="1"
-        default_values="0"
-        update_self="1">
-        <Documentation>
-          Set the memory size threshold above which LOD will be used while
-          rendering interactively.
-        </Documentation>
-        <DoubleRangeDomain name="range" min="0" />
-      </DoubleVectorProperty>
 
       <SubProxy>
         <Proxy name="Renderer" proxyname="Renderer" proxygroup="renderers">
@@ -4314,19 +4395,6 @@
         IceT Render View with compositing which can be used when no
         client-server delivery is required.
       </Documentation>
-
-      <DoubleVectorProperty
-        name="LODThreshold"
-        command="SetLODThreshold"
-        number_of_elements="1"
-        default_values="0"
-        update_self="1">
-        <Documentation>
-          Set the memory size threshold above which LOD will be used while
-          rendering interactively.
-        </Documentation>
-        <DoubleRangeDomain name="range" min="0" />
-      </DoubleVectorProperty>
 
       <DoubleVectorProperty
         name="CompositeThreshold"
@@ -4429,19 +4497,6 @@
       <Documentation>
         IceT Render View with compositing and client delivery mechanisms.
       </Documentation>
-
-      <DoubleVectorProperty
-        name="LODThreshold"
-        command="SetLODThreshold"
-        number_of_elements="1"
-        default_values="0"
-        update_self="1">
-        <Documentation>
-          Set the memory size threshold above which LOD will be used while
-          rendering interactively.
-        </Documentation>
-        <DoubleRangeDomain name="range" min="0" />
-      </DoubleVectorProperty>
 
       <DoubleVectorProperty
         name="CompositeThreshold"
@@ -4617,7 +4672,6 @@
           <Property name="Orientation" />
           <Property name="Origin" />
           <Property name="Position" />
-          <Property name="RenderModuleHelper" exposed_name="ViewHelper" />
           <Property name="Scale" />
           <Property name="Visibility" />
         </ExposedProperties>
@@ -4639,6 +4693,7 @@
           <Property name="Opacity"/> 
           <Property name="PointSize"/> 
           <Property name="Representation"/> 
+          <Property name="Specular"/> 
           <Property name="SpecularColor"/> 
           <Property name="SpecularPower"/> 
         </ExposedProperties>
@@ -4704,6 +4759,46 @@
         </ArrayListDomain>
       </StringVectorProperty>
 
+      <IntVectorProperty
+        name="Representation"
+        command="SetRepresentation"
+        number_of_elements="1"
+        default_values="2"
+        update_self="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Points" />
+          <Entry value="1" text="Wireframe" />
+          <Entry value="2" text="Surface" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="Ambient"
+        command="SetAmbient"
+        number_of_elements="1"
+        default_values="0.0"
+        update_self="1">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Diffuse"
+        command="SetDiffuse"
+        number_of_elements="1"
+        default_values="1.0"
+        update_self="1">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Specular"
+        command="SetSpecular"
+        number_of_elements="1"
+        default_values="0.1"
+        update_self="1">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
       <SubProxy>
         <!-- 
           Geometry filter is used to conver non-polydata input to polydata.
@@ -4757,7 +4852,6 @@
           <Property name="Origin" />
           <Property name="Pickable" />
           <Property name="Position" />
-          <Property name="RenderModuleHelper" exposed_name="ViewHelper" />
           <Property name="Scale" />
           <Property name="Visibility" />
         </ExposedProperties>
@@ -4769,16 +4863,13 @@
         -->
         <Proxy name="Property" proxygroup="properties" proxyname="Property" />
         <ExposedProperties>
-          <Property name="Ambient" />
           <Property name="AmbientColor" />
           <Property name="Color" />
-          <Property name="Diffuse" />
           <Property name="DiffuseColor" />
           <Property name="Interpolation" />
           <Property name="LineWidth" />
           <Property name="Opacity" />
           <Property name="PointSize" />
-          <Property name="Representation" />
           <Property name="Shading" />
           <Property name="SpecularColor" />
           <Property name="SpecularPower" />
@@ -4827,6 +4918,8 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
+          <Property name="Specular" 
+                    exposed_name="SelectionSpecular" />
           <Property name="SpecularColor" 
                     exposed_name="SelectionSpecularColor" />
           <Property name="SpecularPower" 
@@ -4896,7 +4989,7 @@
           vtkOutlineFilter is used to conver non-polydata input to polydata.
         -->
         <Proxy name="OutlineFilter"
-          proxygroup="filters" proxyname="OutlineFilter" />
+          proxygroup="filters" proxyname="GeometryFilter" />
       </SubProxy>
   
       <SubProxy>
@@ -4926,7 +5019,6 @@
           <Property name="Origin" />
           <Property name="Pickable" />
           <Property name="Position" />
-          <Property name="RenderModuleHelper" exposed_name="ViewHelper" />
           <Property name="Scale" />
           <Property name="Visibility" />
         </ExposedProperties>
@@ -4949,6 +5041,7 @@
           <Property name="PointSize" />
           <Property name="Representation" />
           <Property name="Shading" />
+          <Property name="Specular" />
           <Property name="SpecularColor" />
           <Property name="SpecularPower" />
         </ExposedProperties>
@@ -4980,6 +5073,8 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
+          <Property name="Specular" 
+                    exposed_name="SelectionSpecular" />
           <Property name="SpecularColor" 
                     exposed_name="SelectionSpecularColor" />
           <Property name="SpecularPower" 
@@ -5011,14 +5106,42 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="ColorAttributeType"
+        command="SetColorAttributeType"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="POINT_DATA" />
+          <Entry value="1" text="CELL_DATA" />
+          <Entry value="2" text="FIELD_DATA" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ColorArrayName"
+        command="SetColorArrayName"
+        number_of_elements="1"
+        default_values=""
+        update_self="1">
+        <Documentation>
+          Set the array name to color by. Set it to empty string to use solid
+          color.
+        </Documentation>
+        <ArrayListDomain name="array_list" attribute_type="Scalars"
+          input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
       <SubProxy>
         <Proxy name="VolumeFixedPointRayCastMapper" 
           proxygroup="mappers" 
           proxyname="FixedPointVolumeRayCastMapper">
         </Proxy>
         <ExposedProperties>
-          <Property name="ScalarMode" />
-          <Property name="SelectScalarArray" />
+          <Property name="LockSampleDistanceToInputSpacing" />
         </ExposedProperties>
       </SubProxy>
 
@@ -5029,7 +5152,6 @@
           <Property name="Scale" />
           <Property name="Orientation" />
           <Property name="Origin" />
-          <Property name="RenderModuleHelper" />
           <Property name="Pickable" />
           <Property name="Visibility" />
         </ExposedProperties>
@@ -5042,7 +5164,7 @@
         <ExposedProperties>
           <Property name="ScalarOpacityUnitDistance" />
           <Property name="ScalarOpacityFunction" />
-          <Property name="ColorTransferFunction" />
+          <Property name="ColorTransferFunction" exposed_name="LookupTable"/>
         </ExposedProperties>
       </SubProxy>
 
@@ -5072,6 +5194,8 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
+          <Property name="Specular" 
+                    exposed_name="SelectionSpecular" />
           <Property name="SpecularColor" 
                     exposed_name="SelectionSpecularColor" />
           <Property name="SpecularPower" 
@@ -5104,6 +5228,35 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="ColorAttributeType"
+        command="SetColorAttributeType"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="POINT_DATA" />
+          <Entry value="1" text="CELL_DATA" />
+          <Entry value="2" text="FIELD_DATA" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ColorArrayName"
+        command="SetColorArrayName"
+        number_of_elements="1"
+        default_values=""
+        update_self="1">
+        <Documentation>
+          Set the array name to color by. Set it to empty string to use solid
+          color.
+        </Documentation>
+        <ArrayListDomain name="array_list" attribute_type="Scalars"
+          input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
       <!-- Subproxies for Volume Pipeline -->
       <SubProxy>
         <SourceProxy name="VolumeFilter" class="vtkDataSetTriangleFilter" >
@@ -5122,7 +5275,7 @@
             </DataTypeDomain>
           </InputProperty>
           <IntVectorProperty
-            name="SetTetrahedraOnly"
+            name="TetrahedraOnly"
             command="SetTetrahedraOnly"
             number_of_elements="1"
             default_values="1" >
@@ -5136,15 +5289,9 @@
                proxygroup="mappers"
                proxyname="DummyVolumeMapper">
         </Proxy>
-        <!--
-          This property is linked with "ColorArray" property on
-          the PolyDataMapper. So, the volume rendering pipeline uses
-          the same scalar array as the polygonal pipeline.
-
         <ExposedProperties>
-          <Property name="SelectScalarArray" />
+          <Property name="RayCastFunction" />
         </ExposedProperties>
-        -->
       </SubProxy>
 
       <SubProxy>
@@ -5152,12 +5299,9 @@
           proxygroup="mappers"
           proxyname="UnstructuredGridVolumeRayCastMapper">
         </Proxy>
-        <ExposedProperties>
-          <Property name="ScalarMode" />
-          <Property name="SelectScalarArray" />
-          <Property name="ColorArray" />
-        </ExposedProperties>
-        <ShareProperties subproxy="VolumeDummyMapper"/>
+        <ShareProperties subproxy="VolumeDummyMapper">
+          <Exception name="Input" />
+        </ShareProperties>
       </SubProxy>
 
       <SubProxy>
@@ -5165,7 +5309,7 @@
           proxygroup="mappers"
           proxyname="UnstructuredGridVolumeZSweepMapper">
         </Proxy>
-        <ShareProperties subproxy="VolumeBunykMapper">
+        <ShareProperties subproxy="VolumeDummyMapper">
           <Exception name="Input"/>
         </ShareProperties>
       </SubProxy>
@@ -5175,7 +5319,7 @@
           proxygroup="mappers"
           proxyname="ProjectedTetrahedraMapper">
         </Proxy>
-        <ShareProperties subproxy="VolumeBunykMapper">
+        <ShareProperties subproxy="VolumeDummyMapper">
           <Exception name="Input"/>
         </ShareProperties>
       </SubProxy>
@@ -5185,7 +5329,7 @@
           proxygroup="mappers"
           proxyname="HAVSVolumeMapper">
         </Proxy>
-        <ShareProperties subproxy="VolumeBunykMapper">
+        <ShareProperties subproxy="VolumeDummyMapper">
           <Exception name="Input"/>
         </ShareProperties>
       </SubProxy>
@@ -5197,7 +5341,6 @@
           <Property name="Scale" />
           <Property name="Orientation" />
           <Property name="Origin" />
-          <Property name="RenderModuleHelper" />
           <Property name="Pickable" />
           <Property name="Visibility" />
         </ExposedProperties>
@@ -5210,8 +5353,21 @@
         <ExposedProperties>
           <Property name="ScalarOpacityUnitDistance" />
           <Property name="ScalarOpacityFunction" />
-          <Property name="ColorTransferFunction" />
+          <Property name="ColorTransferFunction" 
+                    exposed_name="LookupTable" />
         </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!-- 
+          Mapper for low-res geometry. It shares all its properties with the
+          high-res mapper (except input ofcourse).
+        -->
+        <Proxy name="VolumeLODMapper" 
+          proxygroup="mappers" proxyname="PolyDataMapper" />
+        <ShareProperties subproxy="VolumeDummyMapper" >
+          <Exception name="Input" />
+        </ShareProperties>
       </SubProxy>
 
       <SubProxy>
@@ -5240,6 +5396,8 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
+          <Property name="Specular" 
+                    exposed_name="SelectionSpecular" />
           <Property name="SpecularColor" 
                     exposed_name="SelectionSpecularColor" />
           <Property name="SpecularPower" 
@@ -5250,19 +5408,8 @@
       <!-- End of UnstructuredGridVolumeRepresentation -->
     </UnstructuredGridVolumeRepresentationProxy>
 
-    <PVRepresentationProxy name="GeometryRepresentation">
-      <Documentation>
-        This representation is used to show geometry as
-        Surface/Outline/Points/Wireframe.
-      </Documentation>
-
-      <InputProperty 
-        name="Input"
-        command="NotUsed">
-        <Documentation>
-          Set the input to the representation.
-        </Documentation>
-      </InputProperty>
+    <PVRepresentationProxy name="PVRepresentationBase">
+      <!-- End of PVRepresentationBase -->
 
       <IntVectorProperty
         name="Visibility"
@@ -5296,20 +5443,6 @@
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty
-        name="Representation"
-        command="SetRepresentation"
-        number_of_elements="1"
-        default_values="2"
-        update_self="1">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="POINTS" />
-          <Entry value="1" text="WIREFRAME" />
-          <Entry value="2" text="SURFACE" />
-          <Entry value="3" text="OUTLINE" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-
       <SubProxy>
         <Proxy name="SurfaceRepresentation"
           proxygroup="representations" proxyname="SurfaceRepresentation">
@@ -5336,7 +5469,6 @@
           <Property name="Origin" />
           <Property name="Pickable" />
           <Property name="Position" />
-          <Property name="ViewHelper" />
           <Property name="Scale" />
 
           <!-- Property properties -->
@@ -5349,8 +5481,8 @@
           <Property name="LineWidth" />
           <Property name="Opacity" />
           <Property name="PointSize" />
-          <Property name="Representation" />
           <Property name="Shading" />
+          <Property name="Specular" />
           <Property name="SpecularColor" />
           <Property name="SpecularPower" />
         </ExposedProperties>
@@ -5360,8 +5492,9 @@
         <Proxy name="OutlineRepresentation"
           proxygroup="representations" proxyname="OutlineRepresentation">
         </Proxy>
-        <ShareProperties name="SurfaceRepresentation">
+        <ShareProperties subproxy="SurfaceRepresentation">
           <Exception name="Input" />
+          <Exception name="Visibility" />
         </ShareProperties>
       </SubProxy>
 
@@ -5391,6 +5524,8 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
+          <Property name="Specular" 
+                    exposed_name="SelectionSpecular" />
           <Property name="SpecularColor" 
                     exposed_name="SelectionSpecularColor" />
           <Property name="SpecularPower" 
@@ -5398,14 +5533,153 @@
         </ExposedProperties>
       </SubProxy>
 
+    </PVRepresentationProxy>
+
+    <PVRepresentationProxy name="GeometryRepresentation"
+      base_proxygroup="representations" 
+      base_proxyname="PVRepresentationBase">
+      <Documentation>
+        This representation is used to show geometry as
+        Surface/Outline/Points/Wireframe.
+      </Documentation>
+
+      <InputProperty 
+        name="Input"
+        command="NotUsed">
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet"/>
+       </DataTypeDomain>
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty
+        name="Representation"
+        command="SetRepresentation"
+        number_of_elements="1"
+        default_values="2"
+        update_self="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Points" />
+          <Entry value="1" text="Wireframe" />
+          <Entry value="2" text="Surface" />
+          <Entry value="3" text="Outline" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <!-- End of GeometryRepresentation -->
     </PVRepresentationProxy>
 
-    <ClientDeliveryRepresentationProxy name="ClientDeliveryRepresentation">
-      <InputProperty name="Input"
-        command="NotUsed"
-        />
-      
+    <PVRepresentationProxy name="UnstructuredGridRepresentation"
+      base_proxygroup="representations" 
+      base_proxyname="PVRepresentationBase">
+      <Documentation>
+        This representation is used to show unstructured grid as
+        Surface/Outline/Points/Wireframe/Volume
+      </Documentation>
+
+      <InputProperty 
+        name="Input"
+        command="NotUsed">
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkUnstructuredGrid"/>
+       </DataTypeDomain>
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty
+        name="Representation"
+        command="SetRepresentation"
+        number_of_elements="1"
+        default_values="2"
+        update_self="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Points" />
+          <Entry value="1" text="Wireframe" />
+          <Entry value="2" text="Surface" />
+          <Entry value="3" text="Outline" />
+          <Entry value="4" text="Volume" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="VolumeRepresentation"
+          proxygroup="representations"
+          proxyname="UnstructuredGridVolumeRepresentation" />
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="ScalarOpacityFunction" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of GeometryRepresentation -->
+    </PVRepresentationProxy>
+
+    <PVRepresentationProxy name="UniformGridRepresentation"
+      base_proxygroup="representations" 
+      base_proxyname="PVRepresentationBase">
+      <Documentation>
+        This representation is used to show image data as
+        Surface/Outline/Points/Wireframe/Volume.
+      </Documentation>
+
+      <InputProperty 
+        name="Input"
+        command="NotUsed">
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkImageData"/>
+       </DataTypeDomain>
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty
+        name="Representation"
+        command="SetRepresentation"
+        number_of_elements="1"
+        default_values="2"
+        update_self="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Points" />
+          <Entry value="1" text="Wireframe" />
+          <Entry value="2" text="Surface" />
+          <Entry value="3" text="Outline" />
+          <Entry value="4" text="Volume" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="VolumeRepresentation"
+          proxygroup="representations"
+          proxyname="UniformGridVolumeRepresentation" />
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="LockSampleDistanceToInputSpacing" />
+          <Property name="ScalarOpacityUnitDistance" />
+          <Property name="ScalarOpacityFunction" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of GeometryRepresentation -->
+    </PVRepresentationProxy>
+
+    <ClientDeliveryRepresentationProxy 
+      name="ClientDeliveryRepresentationBase">
+      <Documentation>
+        This defines the common API used by all
+        ClientDeliveryRepresentation proxies. 
+      </Documentation>
+
       <IntVectorProperty
         name="Visibility"
         number_of_elements="1"
@@ -5456,13 +5730,256 @@
           <Property name="Selection" />
         </ExposedProperties>
       </SubProxy>
-      <!-- End of ClientDeliveryRepresentation -->
+
+      <!-- End of ClientDeliveryRepresentationBase -->
     </ClientDeliveryRepresentationProxy>
 
     <ClientDeliveryRepresentationProxy name="ElementInspectorRepresentation"
       base_proxygroup="representations"
-      base_proxyname="ClientDeliveryRepresentation">
+      base_proxyname="ClientDeliveryRepresentationBase">
+      <Documentation>
+        Representation used in element inspector view.
+      </Documentation>
+
+       <InputProperty name="Input"
+          command="SetInput-not-used"
+          update_self="1">
+      </InputProperty>
+
       <!-- End of ElementInspectorRepresentation -->
+    </ClientDeliveryRepresentationProxy>
+
+    <ClientDeliveryRepresentationProxy name="BarChartRepresentation"
+      base_proxygroup="representations"
+      base_proxyname="ClientDeliveryRepresentationBase">
+      <Documentation>
+        Representation used in BarChartView.
+      </Documentation>
+      <!-- All properties here are non-command properties, since
+        we don't have any special proxy for BarChartDisplay. 
+        We have properties which aid the GUI is "drawing" this display.
+      -->
+       <InputProperty
+        name="Input"
+        command="SetInput-not-used"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+          <Group name="glyph_sources" />
+        </ProxyGroupDomain>
+        <InputArrayDomain 
+          name="input_array_cell" 
+          attribute_type="cell"
+          number_of_components="1"/>
+        <InputArrayDomain 
+          name="input_array_point" 
+          attribute_type="point"
+          number_of_components="1"/>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkRectilinearGrid"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <ProxyProperty
+        name="LookupTable">
+        <!--
+        The lookup table proxy used to color the bar chart.
+        -->
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      
+      <StringVectorProperty name="XArrayName"
+         number_of_elements="1">
+         <!-- Set the array to use on X axis. This is used only if
+          XAxisUsePoints is 0. -->
+          <ArrayListDomain name="array_list" 
+            attribute_type="Scalars"
+            input_domain_name="input_array_point">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="YArrayName"
+         number_of_elements="1">
+         <!-- Set the array to use on X axis. -->
+          <ArrayListDomain name="array_list" 
+            attribute_type="Scalars"
+            input_domain_name="input_array_cell">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="XAxisPointComponent"
+        number_of_elements="1"
+        default_values="0">
+        <!-- Choose the point component for X axis.
+        Used only when XAxisUsePoints is 1 -->
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="X" />
+          <Entry value="1" text="Y" />
+          <Entry value="2" text="Z" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="XAxisUsePoints"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- End of BarChartRepresentation -->
+    </ClientDeliveryRepresentationProxy>
+
+    <ClientDeliveryRepresentationProxy name="XYPlotRepresentation"
+      base_proxygroup="representations" 
+      base_proxyname="ClientDeliveryRepresentationBase">
+      <Documentation>
+        Representation used by XYPlotView.
+      </Documentation>
+
+       <InputProperty name="Input"
+        command="SetInput-not-used"
+        update_self="1">
+
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+          <Group name="glyph_sources" />
+        </ProxyGroupDomain>
+
+        <InputArrayDomain name="input_array_selected"
+          number_of_components="1">
+          <RequiredProperties>
+            <Property name="AttributeType"
+              function="FieldDataSelection" />
+          </RequiredProperties>
+        </InputArrayDomain>
+
+        <InputArrayDomain name="input_array_cell"
+          attribute_type="cell"
+          number_of_components="1">
+        </InputArrayDomain>
+
+        <InputArrayDomain name="input_array_point"
+          attribute_type="point"
+          number_of_components="1">
+        </InputArrayDomain>
+
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkRectilinearGrid"/>
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty name="AttributeType"
+        number_of_elements="1"
+        default_values="0">
+        <!-- 
+          Indicates if we are plotting point data or cell data 
+          Although both YCellArrayStatus and YPointArrayStatus 
+          properties are present, only one will be active at a time
+          base on the value of this property.
+        -->
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Point Data" />
+          <Entry value="1" text="Cell Data" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="YCellArrayStatus"
+         repeat_command="1"
+         number_of_elements_per_command="5"
+         element_types="1 1 1 0 2" >
+         <!-- Set the cell array to use on Y axis (r,g,b, status, arrayname) -->
+          <ArraySelectionDomain name="array_list">
+            <RequiredProperties>
+              <Property name="CellArrayInfo" function="ArrayList" />
+            </RequiredProperties>
+          </ArraySelectionDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="YPointArrayStatus"
+         repeat_command="1"
+         number_of_elements_per_command="5"
+         element_types="1 1 1 0 2" >
+         <!-- Set the point array to use on Y axis (r,g,b, status, arrayname). -->
+          <ArraySelectionDomain name="array_list">
+            <RequiredProperties>
+              <Property name="PointArrayInfo" function="ArrayList" />
+            </RequiredProperties>
+          </ArraySelectionDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty 
+         name="CellArrayInfo"
+         number_of_elements_per_command="1"
+         element_types="2"
+         update_self="1"
+         information_only="1">
+
+         <ArrayListInformationHelper 
+           list_domain_name="array_list" />
+
+         <ArrayListDomain name="array_list" 
+           attribute_type="Scalars"
+           input_domain_name="input_array_cell">
+           <RequiredProperties>
+              <Property name="Input" function="Input"/>
+           </RequiredProperties>
+         </ArrayListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty 
+         name="PointArrayInfo"
+         update_self="1"
+         number_of_elements_per_command="1"
+         element_types="2"
+         information_only="1">
+
+         <ArrayListInformationHelper 
+           list_domain_name="array_list" />
+
+         <ArrayListDomain name="array_list" 
+           attribute_type="Scalars"
+           input_domain_name="input_array_point">
+           <RequiredProperties>
+              <Property name="Input" function="Input"/>
+           </RequiredProperties>
+         </ArrayListDomain>
+
+      </StringVectorProperty>
+
+      <StringVectorProperty name="XArrayName"
+         number_of_elements="1">
+         <!-- Set the array to use on X axis. This is used only if
+          UseYArrayIndex is set to 0 -->
+          <ArrayListDomain name="array_list" attribute_type="Scalars"
+            input_domain_name="input_array_selected">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="UseYArrayIndex" 
+         number_of_elements="1"
+         default_values="1">
+         <!-- When set array index is plotted on the X axis.
+         -->
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="PostProcessor" 
+          proxygroup="filters" proxyname="PolyLineToRectilinearGrid">
+        </Proxy>
+      </SubProxy>
+      <!-- End of XYPlotRepresentation -->
     </ClientDeliveryRepresentationProxy>
 
     <AxesRepresentationProxy name="AxesRepresentation" class="vtkAxes" >
@@ -5812,16 +6329,4 @@
 
 
 </ServerManagerConfiguration>
-
-
-
-
-
-
-
-
-
-
-
-
 

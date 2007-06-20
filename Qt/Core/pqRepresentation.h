@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqDisplay.h
+   Module:    pqRepresentation.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,66 +29,60 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-/// \file pqDisplay.h
-/// \date 4/24/2006
-
-#ifndef _pqDisplay_h
-#define _pqDisplay_h
+#ifndef _pqRepresentation_h
+#define _pqRepresentation_h
 
 
 #include "pqProxy.h"
 #include <QPair>
 
-class pqDisplayInternal;
-class pqGenericViewModule;
+class pqView;
 class pqServer;
 
-/// This is PQ representation for a single display. A pqDisplay represents
-/// a single vtkSMDisplayProxy. The display can be added to
-/// only one render module or more (ofcouse on the same server, this class
-/// doesn't worry about that.
-class PQCORE_EXPORT pqDisplay : public pqProxy
+/// This is PQ representation for a single representation.
+/// This class provides API for the Qt layer to access representations.
+
+class PQCORE_EXPORT pqRepresentation : public pqProxy
 {
   Q_OBJECT
 public:
-  pqDisplay(const QString& group, const QString& name, 
-    vtkSMProxy* display, pqServer* server,
-    QObject* parent=NULL);
-  virtual ~pqDisplay();
-
-  /// Returns if the display is shown in the given render module.
-  /// Note that for a display to be visible in a render module,
-  /// it must be \c shownIn that render modules as well as 
-  /// visibility must be set to 1.
-  bool shownIn(pqGenericViewModule* rm) const;
+  // Constructor.
+  // \c group :- smgroup in which the proxy has been registered.
+  // \c name  :- smname as which the proxy has been registered.
+  // \c repr  :- the representation proxy.
+  // \c server:- server on which the proxy is created.
+  // \c parent:- QObject parent.
+  pqRepresentation(const QString& group, 
+                   const QString& name, 
+                   vtkSMProxy* repr, 
+                   pqServer* server, 
+                   QObject* parent=NULL);
+  virtual ~pqRepresentation();
 
   /// Returns if the status of the visbility property of this display.
-  /// Note that for a display to be visible in a render module,
-  /// it must be \c shownIn that render modules as well as 
+  /// Note that for a display to be visible in a view,
+  /// it must be added to that view as well as 
   /// visibility must be set to 1.
   virtual bool isVisible() const;
 
   /// Set the visibility. Note that this affects the visibility of the
-  /// display in all render modules it is added to, and only in all the
-  /// render modules it is added to. This method does not call a re-render
-  /// on the render module, caller must call that explicitly.
+  /// display in the view it has been added to, if any. This method does not 
+  /// call a re-render on the view, caller must call that explicitly.
   virtual void setVisible(bool visible);
 
-  /// Get the number of render modules this display is present in.
-  unsigned int getNumberOfViewModules() const;
-
-  /// Get the render module this display is present in at the given 
-  /// index.
-  pqGenericViewModule* getViewModule(unsigned int index) const;
-
-  /// This method updates all render modules to which this 
-  /// display belongs, if force is true, it for an immediate render
-  /// otherwise render on idle.
-  void renderAllViews(bool force);
+  /// Returns the view to which this representation has been added, if any.
+  pqView* getView() const;
 
 public slots:
-  void renderAllViews() { this->renderAllViews(false); }
+
+  /// Renders the view to which this representation has been added if any.
+  /// If \c force is true, then the render is triggerred immediately, otherwise,
+  /// it will be called on idle.
+  void renderView(bool force);
+
+  /// Simply calls renderView(false);
+  void renderViewEventually()
+    { this->renderView(false); }
 
 signals:
   /// Fired when the visibility property of the underlying display changes.
@@ -105,12 +99,15 @@ protected slots:
   virtual void onVisibilityChanged();
 
 protected:
-  friend class pqGenericViewModule;
-  void addRenderModule(pqGenericViewModule* rm);
-  void removeRenderModule(pqGenericViewModule* rm);
+  friend class pqView;
+
+  /// Called by pqView when this representation gets added to / removed from the
+  /// view.
+  void setView(pqView*);
 
 private:
-  pqDisplayInternal *Internal; 
+  class pqInternal;
+  pqInternal *Internal; 
 };
 
 #endif

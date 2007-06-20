@@ -41,8 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 
 class pqColorScaleEditorForm;
-class pqPipelineDisplay;
-class pqScalarBarDisplay;
+class pqPipelineRepresentation;
+class pqScalarBarRepresentation;
 class pqScalarsToColors;
 class QHideEvent;
 class QShowEvent;
@@ -59,7 +59,7 @@ public:
   pqColorScaleEditor(QWidget *parent=0);
   virtual ~pqColorScaleEditor();
 
-  void setDisplay(pqPipelineDisplay *display);
+  void setRepresentation(pqPipelineRepresentation *display);
 
   void rescaleRange();
 
@@ -133,15 +133,15 @@ private:
   void enableRescaleControls(bool enable);
   void enableResolutionControls(bool enable);
   void updateScalarRange(double min, double max);
-  void setLegend(pqScalarBarDisplay *legend);
+  void setLegend(pqScalarBarRepresentation *legend);
   void enableLegendControls(bool enable);
 
 private:
   pqColorScaleEditorForm *Form;
   vtkTransferFunctionViewer *Viewer;
-  pqPipelineDisplay *Display;
+  pqPipelineRepresentation *Display;
   pqScalarsToColors *ColorMap;
-  pqScalarBarDisplay *Legend;
+  pqScalarBarRepresentation *Legend;
   QTimer *EditDelay;
 };
 

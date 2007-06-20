@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTextDisplay.h
+   Module:    pqTextRepresentation.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,31 +29,31 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqTextDisplay_h
-#define __pqTextDisplay_h
+#ifndef __pqTextRepresentation_h
+#define __pqTextRepresentation_h
 
-#include "pqConsumerDisplay.h"
+#include "pqDataRepresentation.h"
 
 /// This is a display representation for "TextDisplay" proxy.
 /// This class may soon be removed since there's no particular
 /// need for it. It was created when text source wasn't a
 /// true source.
-class PQCORE_EXPORT pqTextDisplay : public pqConsumerDisplay
+class PQCORE_EXPORT pqTextRepresentation : public pqDataRepresentation
 {
   Q_OBJECT
 
-  typedef pqConsumerDisplay Superclass;
+  typedef pqDataRepresentation Superclass;
 public:
-  pqTextDisplay(const QString& group, const QString& name,
+  pqTextRepresentation(const QString& group, const QString& name,
     vtkSMProxy* display, pqServer* server,
     QObject* parent=0);
-  virtual ~pqTextDisplay();
+  virtual ~pqTextRepresentation();
 
   virtual void setDefaultPropertyValues();
 
 private:
-  pqTextDisplay(const pqTextDisplay&); // Not implemented.
-  void operator=(const pqTextDisplay&); // Not implemented.
+  pqTextRepresentation(const pqTextRepresentation&); // Not implemented.
+  void operator=(const pqTextRepresentation&); // Not implemented.
 };
 
 #endif

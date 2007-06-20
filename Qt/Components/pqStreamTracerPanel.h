@@ -52,7 +52,6 @@ public:
   virtual void accept();
   
 private slots:
-  void onRenderModuleChanged(pqRenderViewModule*);
   void onSeedTypeChanged(int);
   void onIntegratorTypeChanged(int);
 

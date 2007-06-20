@@ -10,7 +10,7 @@
 #include "pqMain.h"
 #include "pqProcessModuleGUIHelper.h"
 #include "pqServer.h"
-#include "pqRenderViewModule.h"
+#include "pqRenderView.h"
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
 #include "pqCoreTestUtility.h"
@@ -28,9 +28,9 @@ public:
     pqServer* server = core->createServer(pqServerResource("builtin:"));
     
     // create a graphics window and put it in our main window
-    this->RenderModule = qobject_cast<pqRenderViewModule*>(
-      ob->createView(pqRenderViewModule::renderViewType(), server));
-    this->setCentralWidget(this->RenderModule->getWidget());
+    this->RenderView = qobject_cast<pqRenderView*>(
+      ob->createView(pqRenderView::renderViewType(), server));
+    this->setCentralWidget(this->RenderView->getWidget());
     
     // create source and elevation filter
     pqPipelineSource* source;
@@ -40,15 +40,15 @@ public:
     elevation = ob->createFilter("filters", "ElevationFilter", source);
     
     // put the elevation in the window
-    ob->createDataDisplay(elevation, this->RenderModule);
+    ob->createDataRepresentation(elevation, this->RenderView);
 
     // zoom to sphere
-    this->RenderModule->resetCamera();
+    this->RenderView->resetCamera();
     // make sure we update
-    this->RenderModule->render();
+    this->RenderView->render();
   }
   
-  QPointer<pqRenderViewModule> RenderModule;
+  QPointer<pqRenderView> RenderView;
 
 };
 
@@ -69,7 +69,7 @@ public:
   bool compareView(const QString& referenceImage, double threshold,
                    ostream& output, const QString& tempDirectory)
   {
-    pqRenderViewModule* renModule = Win->RenderModule;
+    pqRenderView* renModule = Win->RenderView;
 
     if (!renModule)
       {

@@ -34,7 +34,8 @@ public:
 
   // Description:
   // Called to update the Representation. 
-  // Overridden to ensure to check for OpenGL extensions.
+  // Overridden to ensure to check for OpenGL extensions,
+  // and also so update the EnableLOD flag on the prop based on ViewInformation.
   virtual void Update(vtkSMViewProxy* view);
   virtual void Update() { this->Superclass::Update(); };
 
@@ -69,6 +70,20 @@ public:
     UNKNOWN_VOLUME_MAPPER
   };
 //ETX
+
+  // Description:
+  // Set the scalar coloring mode
+  void SetColorAttributeType(int type);
+
+  // Description:
+  // Set the scalar color array name. If array name is 0 or "" then scalar
+  // coloring is disabled.
+  void SetColorArrayName(const char* name);
+
+  // Description:
+  // Volume rendering always need ordered compositing.
+  virtual bool GetOrderedCompositingNeeded()
+    { return true; }
 
 //BTX
 protected:
@@ -111,10 +126,6 @@ protected:
   virtual void DetermineVolumeSupport();
 
   // Description:
-  // Set up the vtkUnstructuredGrid (Volume) rendering pipeline.
-  virtual void SetupVolumePipeline();
-
-  // Description:
   // Get information about extensions from the view.
   void UpdateRenderViewExtensions(vtkSMViewProxy*);
   
@@ -124,6 +135,8 @@ protected:
   vtkSMProxy* VolumeHAVSMapper;
   vtkSMProxy* VolumeBunykMapper;
   vtkSMProxy* VolumeZSweepMapper;
+  vtkSMProxy* VolumeDummyMapper;
+  vtkSMProxy* VolumeLODMapper;
 
   // Common volume rendering classes
   vtkSMProxy* VolumeActor;

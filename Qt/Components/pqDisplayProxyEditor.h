@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayPanel.h"
 
 class pqDisplayProxyEditorInternal;
-class pqPipelineDisplay;
+class pqPipelineRepresentation;
 
 /// Widget which provides an editor for the properties of a display.
 class PQCOMPONENTS_EXPORT pqDisplayProxyEditor : public pqDisplayPanel
@@ -50,7 +50,7 @@ class PQCOMPONENTS_EXPORT pqDisplayProxyEditor : public pqDisplayPanel
                                     WRITE setSpecularColor)
 public:
   /// constructor
-  pqDisplayProxyEditor(pqPipelineDisplay* display, QWidget* p = NULL);
+  pqDisplayProxyEditor(pqPipelineRepresentation* display, QWidget* p = NULL);
   /// destructor
   ~pqDisplayProxyEditor();
 
@@ -63,7 +63,6 @@ signals:
 
 protected slots:
   /// internally used to update the graphics window when a property changes
-  void updateView();
   void openColorMapEditor();
   void rescaleToDataRange();
   void zoomToData();
@@ -73,7 +72,7 @@ protected slots:
 protected:
 
   /// Set the display whose properties we want to edit.
-  void setDisplay(pqPipelineDisplay* display);
+  void setRepresentation(pqPipelineRepresentation* display);
 
   pqDisplayProxyEditorInternal* Internal;
   void setupGUIConnections();

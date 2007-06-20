@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include <QObject>
 
-class pqGenericViewModule;
+class pqView;
 class pqServer;
 class pqLookmarkManagerModelInternal;
 class pqLookmarkManagerModelItem;
@@ -107,14 +107,21 @@ public slots:
   // Save the entire collection to the given files as XML
   void exportAllLookmarksToFiles(const QStringList &files);
   // Save the lookmarks in the given list to the given files as XML
-  void exportLookmarksToFiles(const QList<pqLookmarkModel*> &lookmarks, const QStringList &files);
-  // Save the entire collection of lookmarks to pqSettings. This is done automatically when the application closes
+  void exportLookmarksToFiles(const QList<pqLookmarkModel*> &lookmarks, 
+    const QStringList &files);
+  // Save the entire collection of lookmarks to pqSettings. This is done 
+  // automatically when the application closes
   void exportAllLookmarksToSettings();
 
-  // Load the state of the lookmark with the given name, on the given server, in the given view
-  void loadLookmark(pqServer *server, pqGenericViewModule* dest, QList<pqPipelineSource*> *sources, const QString &name);
-  // Load the state of the given lookmark, on the given server, in the given view
-  void loadLookmark(pqServer *server, pqGenericViewModule* dest, QList<pqPipelineSource*> *sources, pqLookmarkModel *lmk);
+  // Load the state of the lookmark with the given name, on the given server, 
+  // in the given view
+  void loadLookmark(pqServer *server, pqView* dest, 
+    QList<pqPipelineSource*> *sources, const QString &name);
+
+  // Load the state of the given lookmark, on the given server, 
+  // in the given view
+  void loadLookmark(pqServer *server, pqView* dest, 
+    QList<pqPipelineSource*> *sources, pqLookmarkModel *lmk);
 
 signals:
 

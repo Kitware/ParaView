@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqPlotViewModule.h
+   Module:    pqPlotView.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,30 +29,30 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqPlotViewModule_h
-#define __pqPlotViewModule_h
+#ifndef __pqPlotView_h
+#define __pqPlotView_h
 
-#include "pqGenericViewModule.h"
+#include "pqView.h"
 
-class pqPlotViewModuleInternal;
+class pqPlotViewInternal;
 class vtkObject;
 
 
-class PQCORE_EXPORT pqPlotViewModule : public pqGenericViewModule
+class PQCORE_EXPORT pqPlotView : public pqView
 {
   Q_OBJECT
 public:
-  typedef pqGenericViewModule Superclass;
+  typedef pqView Superclass;
 
-  static QString barChartType() { return "BarChart"; }
+  static QString barChartType() { return "BarChartView"; }
   static QString barChartTypeName() { return "Bar Chart"; }
-  static QString XYPlotType() { return "XYPlot"; }
+  static QString XYPlotType() { return "XYPlotView"; }
   static QString XYPlotTypeName() { return "XY Plot"; }
 
-  pqPlotViewModule(const QString& type, const QString& group, const QString& name, 
-    vtkSMAbstractViewModuleProxy* renModule, 
+  pqPlotView(const QString& type, const QString& group, const QString& name, 
+    vtkSMViewProxy* renModule, 
     pqServer* server, QObject* parent=NULL);
-  virtual ~pqPlotViewModule();
+  virtual ~pqPlotView();
 
   QWidget* getWidget();
 
@@ -73,21 +73,22 @@ public:
   /// Request a delayed forceRender().
   virtual void render();
 
+  /// Called to check if the given source can be shown in this view.
   virtual bool canDisplaySource(pqPipelineSource* source) const;
 
 public slots:
   /// Add display to the view. Although this model supports adding
   /// more than 1 display, it shows only 1 plot at a time.
-  void addDisplay(pqDisplay* display);
+  void addRepresentation(pqRepresentation* display);
 
   /// Remove a display.
-  void removeDisplay(pqDisplay* display);
+  void removeRepresentation(pqRepresentation* display);
 
   /// Remove all displays.
-  void removeAllDisplays();
+  void removeAllRepresentations();
 
 private slots:
-  void visibilityChanged(pqDisplay* disp);
+  void visibilityChanged(pqRepresentation* disp);
 
   // Called when render is called on the undelying proxy.
   // Since ServerManager does not really "render" for plots,
@@ -100,10 +101,10 @@ private slots:
   void markLineItemModified(vtkObject *object);
 
 private:
-  pqPlotViewModule(const pqPlotViewModule&); // Not implemented.
-  void operator=(const pqPlotViewModule&); // Not implemented.
+  pqPlotView(const pqPlotView&); // Not implemented.
+  void operator=(const pqPlotView&); // Not implemented.
 
-  pqPlotViewModuleInternal* Internal;
+  pqPlotViewInternal* Internal;
 };
 
 

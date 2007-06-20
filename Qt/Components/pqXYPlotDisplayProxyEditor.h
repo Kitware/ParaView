@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDisplayPanel.h"
 
-class pqDisplay;
+class pqRepresentation;
 class QTreeWidgetItem;
 
 /// Editor widget for XY plot displays.
@@ -42,7 +42,7 @@ class PQCOMPONENTS_EXPORT pqXYPlotDisplayProxyEditor : public pqDisplayPanel
 {
   Q_OBJECT
 public:
-  pqXYPlotDisplayProxyEditor(pqDisplay* display, QWidget* parent=0);
+  pqXYPlotDisplayProxyEditor(pqRepresentation* display, QWidget* parent=0);
   virtual ~pqXYPlotDisplayProxyEditor();
 
 public slots:
@@ -74,7 +74,7 @@ private:
   /// Set the display whose properties this editor is editing.
   /// This call will raise an error is the display is not
   /// a XYPlotDisplay2 proxy.
-  void setDisplay(pqDisplay* display);
+  void setDisplay(pqRepresentation* display);
 
   class pqInternal;
   pqInternal* Internal;

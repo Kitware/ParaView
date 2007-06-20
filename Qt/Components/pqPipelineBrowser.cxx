@@ -36,20 +36,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineBrowser.h"
 
 #include "pqApplicationCore.h"
+#include "pqDataRepresentation.h"
 #include "pqDisplayPolicy.h"
 #include "pqFilterInputDialog.h"
 #include "pqFlatTreeView.h"
-#include "pqGenericViewModule.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineBrowserStateManager.h"
-#include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineModelSelectionAdaptor.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqServerManagerObserver.h"
+#include "pqView.h"
 //#include "pqSourceInfoIcons.h"
 //#include "pqSourceHistoryModel.h"
 //#include "pqSourceInfoFilterModel.h"
@@ -82,7 +81,7 @@ public:
   // TODO: Add support for multiple servers.
   //pqSourceInfoModel *FilterModel;
   QString LastFilterGroup;
-  QPointer<pqGenericViewModule> ViewModule;
+  QPointer<pqView> View;
 };
 
 
@@ -91,7 +90,7 @@ pqPipelineBrowserInternal::pqPipelineBrowserInternal()
   : LastFilterGroup()
 {
   //this->FilterModel = 0;
-  this->ViewModule = 0;
+  this->View = 0;
 }
 
 
@@ -138,10 +137,6 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
 
   this->connect(smModel, SIGNAL(nameChanged(pqServerManagerModelItem *)),
       this->Model, SLOT(updateItemName(pqServerManagerModelItem *)));
-  this->connect(smModel,
-      SIGNAL(sourceDisplayChanged(pqPipelineSource *, pqConsumerDisplay*)),
-      this->Model,
-      SLOT(updateDisplays(pqPipelineSource *, pqConsumerDisplay*)));
   
   this->connect(
     this->Model, SIGNAL(rename(const QModelIndex&, const QString&)),
@@ -245,9 +240,9 @@ QItemSelectionModel *pqPipelineBrowser::getSelectionModel() const
 }
 
 //----------------------------------------------------------------------------
-pqGenericViewModule *pqPipelineBrowser::getViewModule() const
+pqView *pqPipelineBrowser::getView() const
 {
-  return this->Internal->ViewModule;
+  return this->Internal->View;
 }
 
 #if 0
@@ -381,14 +376,14 @@ void pqPipelineBrowser::changeInput()
 
       for(iter = toRemove.begin(); iter != toRemove.end(); ++iter)
         {
-        source = smModel->getPQSource(*iter);
+        source = smModel->findItem<pqPipelineSource*>(*iter);
         builder->removeConnection(source, filter);
         }
 
       // Add the new connections.
       for(iter = toAdd.begin(); iter != toAdd.end(); ++iter)
         {
-        source = smModel->getPQSource(*iter);
+        source = smModel->findItem<pqPipelineSource*>(*iter);
         builder->addConnection(source, filter);
         }
       emit this->endUndo();
@@ -442,10 +437,10 @@ void pqPipelineBrowser::onRename(const QModelIndex& index, const QString& name)
 }
 
 //----------------------------------------------------------------------------
-void pqPipelineBrowser::setViewModule(pqGenericViewModule *rm)
+void pqPipelineBrowser::setView(pqView *rm)
 {
-  this->Internal->ViewModule = rm;
-  this->Model->setViewModule(rm);
+  this->Internal->View= rm;
+  this->Model->setView(rm);
 }
 
 //----------------------------------------------------------------------------
@@ -460,8 +455,8 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
       {
       // If the column clicked is 1, the user clicked the visible icon.
       // Get the display object for the current window.
-      pqConsumerDisplay *display = source->getDisplay(
-          this->Internal->ViewModule);
+      pqDataRepresentation* display = source->getRepresentation(
+          this->Internal->View);
 
       bool visible = true;
       // If the display exists, toggle the display. Otherwise, create a
@@ -479,12 +474,12 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
       // Will create new display if needed. May also create new view 
       // as defined by the policy.
       display = dpolicy->setDisplayVisibility(
-        source, this->Internal->ViewModule, visible);
+        source, this->Internal->View, visible);
 
       emit this->endUndo();
       if(display)
         {
-        display->renderAllViews(false);
+        display->renderView(false);
         }
       }
     // TODO

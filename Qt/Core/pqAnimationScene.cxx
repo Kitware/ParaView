@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkProcessModule.h"
-#include "vtkSMAbstractViewModuleProxy.h"
+#include "vtkSMViewProxy.h"
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyLink.h"
@@ -224,8 +224,7 @@ void pqAnimationScene::onCuesChanged()
   for(unsigned int cc=0; cc < pp->GetNumberOfProxies(); cc++)
     {
     vtkSMProxy* proxy = pp->GetProxy(cc);
-    pqAnimationCue* cue  = qobject_cast<pqAnimationCue*>(
-      model->getPQProxy(proxy));
+    pqAnimationCue* cue = model->findItem<pqAnimationCue*>(proxy);
     if (cue && cue->getServer() == this->getServer())
       {
       currentCues.insert(cue);
@@ -310,8 +309,7 @@ pqAnimationCue* pqAnimationScene::createCueInternal(const QString& mtype,
   vtkSMProxy* cueProxy = builder->createProxy("animation", "AnimationCue", 
     this->getServer(), "animation");
   cueProxy->SetServers(vtkProcessModule::CLIENT);
-  pqAnimationCue* cue = qobject_cast<pqAnimationCue*>(
-    smmodel->getPQProxy(cueProxy));
+  pqAnimationCue* cue = smmodel->findItem<pqAnimationCue*>(cueProxy);
   if (!cue)
     {
     qDebug() << "Failed to create AnimationCue.";
@@ -352,8 +350,7 @@ void pqAnimationScene::removeCues(vtkSMProxy* animated_proxy)
     if (pqSMAdaptor::getProxyProperty(
         cueProxy->GetProperty("AnimatedProxy")) == animated_proxy)
       {
-      pqAnimationCue* pqCue  = qobject_cast<pqAnimationCue*>(
-        model->getPQProxy(cueProxy));
+      pqAnimationCue* pqCue  = model->findItem<pqAnimationCue*>(cueProxy);
       toRemove.push_back(pqCue);
       }
     }
@@ -388,7 +385,7 @@ QSize pqAnimationScene::getViewSize() const
   vtkSMAnimationSceneProxy* sceneProxy = this->getAnimationSceneProxy();
   if (sceneProxy->GetNumberOfViewModules() > 0)
     {
-    vtkSMAbstractViewModuleProxy* view = sceneProxy->GetViewModule(0);
+    vtkSMViewProxy* view = sceneProxy->GetViewModule(0);
     size.setWidth(view->GetGUISize()[0]);
     size.setHeight(view->GetGUISize()[1]);
 

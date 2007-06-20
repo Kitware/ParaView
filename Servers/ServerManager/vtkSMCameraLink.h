@@ -24,7 +24,6 @@
 #define __vtkSMCameraLink_h
 
 #include "vtkSMProxyLink.h"
-class vtkSMRenderModuleProxy;
 
 //BTX
 struct vtkSMCameraLinkInternals;

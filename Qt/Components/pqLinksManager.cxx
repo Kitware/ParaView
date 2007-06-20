@@ -45,9 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 
 // pqCore
-#include "pqServerManagerModel.h"
 #include "pqApplicationCore.h"
-#include "pqRenderViewModule.h"
 #include "pqPipelineSource.h"
 
 // pqComponents

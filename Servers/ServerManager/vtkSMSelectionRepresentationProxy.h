@@ -34,6 +34,16 @@ public:
   void SetSelection(vtkSMSourceProxy* selection);
   void CleanSelectionInput();
 
+  // Description:
+  // Called to update the Representation. 
+  // Overridden to EnableLOD on the prop based on the ViewInformation.
+  virtual void Update(vtkSMViewProxy* view);
+  virtual void Update() { this->Superclass::Update(); }
+
+  // Description:
+  // Returns the proxy for the prop.
+  vtkGetObjectMacro(Prop3D, vtkSMProxy);
+
 //BTX
 protected:
   vtkSMSelectionRepresentationProxy();

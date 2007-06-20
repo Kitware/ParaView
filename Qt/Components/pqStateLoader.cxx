@@ -60,7 +60,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqStateLoader);
-vtkCxxRevisionMacro(pqStateLoader, "1.8");
+vtkCxxRevisionMacro(pqStateLoader, "1.9");
 //-----------------------------------------------------------------------------
 pqStateLoader::pqStateLoader()
 {
@@ -139,6 +139,20 @@ vtkSMProxy* pqStateLoader::NewProxyInternal(
       return proxy;
       }
     }
+  else if (xml_group && xml_name && strcmp(xml_group, "misc") == 0 
+    && strcmp(xml_name, "TimeKeeper") == 0)
+    {
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    // There is only one time keeper per connection, simply
+    // load the state on the timekeeper.
+    vtkSMProxy* timekeeper = pxm->GetProxy("timekeeper", "TimeKeeper");
+    if (timekeeper)
+      {
+      timekeeper->Register(this);
+      return timekeeper;
+      }
+    }
+
   return this->Superclass::NewProxyInternal(xml_group, xml_name);
 }
 
@@ -254,7 +268,7 @@ void pqStateLoader::DiscoverHelperProxies()
     int proxyid = helper_group_rx.cap(1).toInt();
     vtkSmartPointer<vtkSMProxy> proxy;
     proxy.TakeReference(this->NewProxy(proxyid));
-    pqProxy *pq_proxy = smmodel->getPQProxy(proxy);
+    pqProxy *pq_proxy = smmodel->findItem<pqProxy*>(proxy);
     if (!pq_proxy)
       {
       continue;

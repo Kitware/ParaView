@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqServerManagerModel.h"
 #include "pqHandleWidget.h"
-#include "pqRenderViewModule.h"
 #include "pqPropertyLinks.h"
 #include "pqSMSignalAdaptors.h"
 
@@ -42,9 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDoubleValidator>
 
-#include <vtkMemberFunctionCommand.h>
 #include <vtkSMDoubleVectorProperty.h>
-#include <vtkSMNew3DWidgetProxy.h>
+#include <vtkMemberFunctionCommand.h>
+#include <vtkSMNewWidgetRepresentationProxy.h>
+#include <vtkSMProxyManager.h>
 #include <vtkSmartPointer.h>
 
 /////////////////////////////////////////////////////////////////////////
@@ -76,8 +76,8 @@ public:
 /////////////////////////////////////////////////////////////////////////
 // pqHandleWidget
 
-pqHandleWidget::pqHandleWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
-  Superclass(o, pxy, p),
+pqHandleWidget::pqHandleWidget(vtkSMProxy* _smproxy, vtkSMProxy* pxy, QWidget* p) :
+  Superclass(_smproxy, pxy, p),
   Implementation(new pqImplementation())
 {
   this->Implementation->StartDragObserver.TakeReference(
@@ -106,9 +106,9 @@ pqHandleWidget::pqHandleWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(setModified()));
 
-  pqServerManagerModel* m =
+  pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
-  this->createWidget(m->getServerForSource(o));
+  this->createWidget(smmodel->findServer(_smproxy->GetConnectionID()));
 }
 
 //-----------------------------------------------------------------------------
@@ -121,9 +121,9 @@ pqHandleWidget::~pqHandleWidget()
 //-----------------------------------------------------------------------------
 void pqHandleWidget::createWidget(pqServer* server)
 {
-  vtkSMNew3DWidgetProxy* widget =
+  vtkSMNewWidgetRepresentationProxy* widget =
     pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("PointSourceWidgetDisplay", server);
+    get3DWidget("PointSourceWidgetRepresentation", server);
   this->setWidgetProxy(widget);
   
   widget->UpdateVTKObjects();
@@ -160,7 +160,7 @@ void pqHandleWidget::createWidget(pqServer* server)
 void pqHandleWidget::cleanupWidget()
 {
   this->Implementation->Links.removeAllPropertyLinks();
-  vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
+  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   if(widget)
     {
     widget->RemoveObserver(
@@ -184,7 +184,7 @@ void pqHandleWidget::onWidgetVisibilityChanged(bool visible)
 //-----------------------------------------------------------------------------
 void pqHandleWidget::resetBounds()
 {
-  vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
+  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   double input_bounds[6];
   if(widget && this->getReferenceInputBounds(input_bounds))
     {

@@ -32,6 +32,7 @@
 
 class vtkSMViewProxy;
 class vtkPVDataInformation;
+class vtkInformation;
 
 class VTK_EXPORT vtkSMRepresentationProxy : public vtkSMProxy
 {
@@ -107,6 +108,12 @@ public:
   // Don't call this directly, it is called by the View.
   virtual bool RemoveFromView(vtkSMViewProxy* vtkNotUsed(view)) 
     { return true; }
+
+  // Description:
+  // Called to set the view information object.
+  // Don't call this directly, it is called by the View.
+  virtual void SetViewInformation(vtkInformation*);
+  vtkGetObjectMacro(ViewInformation, vtkInformation);
 protected:
   vtkSMRepresentationProxy();
   ~vtkSMRepresentationProxy();
@@ -139,6 +146,8 @@ protected:
   // Description:
   // Subclassess should set this to true if they support selection pipelines.
   vtkSetMacro(SelectionSupported, bool);
+
+  vtkInformation* ViewInformation;
 
   friend class vtkSMPVRepresentationProxy;
 private:

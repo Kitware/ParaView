@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqConsumerDisplay.cxx
+   Module:    pqDataRepresentation.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,11 +29,11 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqConsumerDisplay.h"
+#include "pqDataRepresentation.h"
 
 #include "vtkEventQtSlotConnect.h"
-#include "vtkSMAbstractDisplayProxy.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMRepresentationProxy.h"
 
 #include <QtDebug>
 #include <QPointer>
@@ -46,17 +46,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
-class pqConsumerDisplayInternal
+class pqDataRepresentationInternal
 {
 public:
   vtkEventQtSlotConnect* VTKConnect;
   QPointer<pqPipelineSource> Input;
 
-  pqConsumerDisplayInternal()
+  pqDataRepresentationInternal()
     {
     this->VTKConnect = vtkEventQtSlotConnect::New();;
     }
-  ~pqConsumerDisplayInternal()
+  ~pqDataRepresentationInternal()
     {
     this->VTKConnect->Delete();
     }
@@ -64,47 +64,43 @@ public:
 
 
 //-----------------------------------------------------------------------------
-pqConsumerDisplay::pqConsumerDisplay(const QString& group,
-  const QString& name, vtkSMProxy* display, pqServer* server,
+pqDataRepresentation::pqDataRepresentation(const QString& group,
+  const QString& name, vtkSMProxy* repr, pqServer* server,
   QObject *_p)
-: pqDisplay(group, name, display, server, _p)
+: pqRepresentation(group, name, repr, server, _p)
 {
-  this->Internal = new pqConsumerDisplayInternal;
-  this->Internal->VTKConnect->Connect(display->GetProperty("Input"),
+  this->Internal = new pqDataRepresentationInternal;
+  this->Internal->VTKConnect->Connect(repr->GetProperty("Input"),
     vtkCommand::ModifiedEvent, this, SLOT(onInputChanged()));
-  this->Internal->VTKConnect->Connect(display->GetProperty("Visibility"),
-    vtkCommand::ModifiedEvent, this, SLOT(onVisibilityChanged()));
-
-  // This will make sure that if the input is already set.
-  this->onInputChanged();
 }
 
 //-----------------------------------------------------------------------------
-pqConsumerDisplay::~pqConsumerDisplay()
+pqDataRepresentation::~pqDataRepresentation()
 {
   if (this->Internal->Input)
     {
-    this->Internal->Input->removeDisplay(this);
+    this->Internal->Input->removeRepresentation(this);
     }
   delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource* pqConsumerDisplay::getInput() const
+pqPipelineSource* pqDataRepresentation::getInput() const
 {
   return this->Internal->Input;
 }
 
 //-----------------------------------------------------------------------------
-void pqConsumerDisplay::onInputChanged()
+void pqDataRepresentation::onInputChanged()
 {
   vtkSMProxyProperty* ivp = vtkSMProxyProperty::SafeDownCast(
     this->getProxy()->GetProperty("Input"));
   if (!ivp)
     {
-    qDebug() << "Display proxy has no input property!";
+    qDebug() << "Representation proxy has no input property!";
     return;
     }
+
   pqPipelineSource* added = 0;
   pqPipelineSource* removed = 0;
 
@@ -116,45 +112,45 @@ void pqConsumerDisplay::onInputChanged()
     }
   else if (new_proxes_count == 1)
     {
-    pqServerManagerModel* model = 
+    pqServerManagerModel* smModel = 
       pqApplicationCore::instance()->getServerManagerModel();
     removed = this->Internal->Input;
-    this->Internal->Input = model->getPQSource(ivp->GetProxy(0));
+    this->Internal->Input = smModel->findItem<pqPipelineSource*>(ivp->GetProxy(0));
     added = this->Internal->Input;
     if (ivp->GetProxy(0) && !this->Internal->Input)
       {
-      qDebug() << "Display could not locate the pqPipelineSource object "
+      qDebug() << "Representation could not locate the pqPipelineSource object "
         << "for the input proxy.";
       }
     }
   else if (new_proxes_count > 1)
     {
-    qDebug() << "Displays with more than 1 input are not handled.";
+    qDebug() << "Representation with more than 1 input are not handled.";
     return;
     }
 
-  // Now tell the pqPipelineSource about the changes in the displays.
+  // Now tell the pqPipelineSource about the changes in the representations.
   if (removed)
     {
-    removed->removeDisplay(this);
+    removed->removeRepresentation(this);
     }
   if (added)
     {
-    added->addDisplay(this);
+    added->addRepresentation(this);
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqConsumerDisplay::setDefaultPropertyValues()
+void pqDataRepresentation::setDefaultPropertyValues()
 {
   if (!this->isVisible())
     {
-    // For any non-visible display, we don't set its defaults.
+    // For any non-visible representation, we don't set its defaults.
     return;
     }
 
   // Set default arrays and lookup table.
-  vtkSMAbstractDisplayProxy* proxy = vtkSMAbstractDisplayProxy::SafeDownCast(
+  vtkSMRepresentationProxy* proxy = vtkSMRepresentationProxy::SafeDownCast(
     this->getProxy());
   
   // setDefaultPropertyValues() can always call Update on the display. 
@@ -168,20 +164,19 @@ void pqConsumerDisplay::setDefaultPropertyValues()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* pqConsumerDisplay::getLookupTableProxy()
+vtkSMProxy* pqDataRepresentation::getLookupTableProxy()
 {
   return pqSMAdaptor::getProxyProperty(
     this->getProxy()->GetProperty("LookupTable"));
 }
 
 //-----------------------------------------------------------------------------
-pqScalarsToColors* pqConsumerDisplay::getLookupTable()
+pqScalarsToColors* pqDataRepresentation::getLookupTable()
 {
   pqServerManagerModel* smmodel = 
     pqApplicationCore::instance()->getServerManagerModel();
   vtkSMProxy* lut = this->getLookupTableProxy();
 
-  return (lut? qobject_cast<pqScalarsToColors*>(smmodel->getPQProxy(lut)): 0);
+  return (lut? smmodel->findItem<pqScalarsToColors*>(lut): 0);
 }
 
-//-----------------------------------------------------------------------------

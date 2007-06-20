@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqMultiView.h"
 
-class pqGenericViewModule;
+class pqView;
 class pqMultiViewFrame;
 class pqServer;
 class pqUndoStack;
@@ -57,7 +57,7 @@ public:
   virtual ~pqViewManager();
 
   /// returns the active view module.
-  pqGenericViewModule* getActiveViewModule() const;
+  pqView* getActiveView() const;
 
   /// Save the state of the view window manager.
   void saveState(vtkPVXMLElement* root);
@@ -73,14 +73,17 @@ public:
 
   /// Given a view module, get the frame in which the view is contained,
   /// if any.
-  pqMultiViewFrame* getFrame(pqGenericViewModule* view) const;
+  pqMultiViewFrame* getFrame(pqView* view) const;
+
+  /// Given a frame, returns the view, if any contained in it.
+  pqView* getView(pqMultiViewFrame* frame) const;
 
   /// Set the undo stack used for the application.
   void setUndoStack(pqUndoStack* stack);
 
 signals:
   /// Fired when the active view module changes.
-  void activeViewModuleChanged(pqGenericViewModule*);
+  void activeViewChanged(pqView*);
 
   /// Fired when the user pressed the lookmark button for one of the views
   void createLookmark(QWidget*);
@@ -116,14 +119,14 @@ private slots:
   /// When ever a new view module is noticed, the active 
   /// frame is split and the view module is shown in the new 
   /// split frame.
-  void onViewModuleAdded(pqGenericViewModule* rm);
+  void onViewAdded(pqView* rm);
 
   /// When ever a view module is removed, we also close
   /// the frame containing the view module.
-  void onViewModuleRemoved(pqGenericViewModule* rm);
+  void onViewRemoved(pqView* rm);
 
   /// Called when a frame becomes active. It will
-  /// inactivate all other frames and trigger activeViewModuleChanged().
+  /// inactivate all other frames and trigger activeViewChanged().
   void onActivate(QWidget* obj);
 
   /// Called when user requests conversion of view type.
@@ -163,12 +166,12 @@ protected:
   /// (if any, otherwise splits the first view)
   /// to create a new frame and add the view
   /// to it.
-  void assignFrame(pqGenericViewModule* view);
+  void assignFrame(pqView* view);
 
   // Create/disconnects appropriate signal/slot connections between
   // the view and the frame.
-  void connect(pqMultiViewFrame* frame, pqGenericViewModule* view);
-  void disconnect(pqMultiViewFrame* frame, pqGenericViewModule* view);
+  void connect(pqMultiViewFrame* frame, pqView* view);
+  void disconnect(pqMultiViewFrame* frame, pqView* view);
 
   /// Hiding superclasses loadState. Don't use this API
   /// since it is not aware of the loader which gives us 
@@ -177,7 +180,7 @@ protected:
 
   /// Update the GUISize/WindowPosition properties
   /// on all view modules.
-  void updateViewModulePositions();
+  void updateViewPositions();
 
   /// Updates the context menu.
   void updateConversionActions(pqMultiViewFrame* frame);

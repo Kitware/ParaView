@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqLineWidget.h"
 #include "pqPropertyLinks.h"
-#include "pqRenderViewModule.h"
+#include "pqProxy.h"
 #include "pqSMSignalAdaptors.h"
 
 #include "ui_pqLineWidget.h"
@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkMemberFunctionCommand.h>
 #include <vtkPVDataInformation.h>
 #include <vtkSMDoubleVectorProperty.h>
-#include <vtkSMNew3DWidgetProxy.h>
+#include <vtkSMNewWidgetRepresentationProxy.h>
 #include <vtkSMProxyProperty.h>
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
@@ -117,9 +117,9 @@ pqLineWidget::pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
   QObject::connect(&this->Implementation->Links, SIGNAL(smPropertyChanged()),
     this, SLOT(setModified()));
 
-  pqServerManagerModel* m =
+  pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
-  this->createWidget(m->getServerForSource(o));
+  this->createWidget(smmodel->findServer(o->GetConnectionID()));
 }
 
 //-----------------------------------------------------------------------------
@@ -127,7 +127,7 @@ pqLineWidget::~pqLineWidget()
 {
   this->Implementation->Links.removeAllPropertyLinks();
   
-  if(vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy())
+  if(vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy())
     {
     pqApplicationCore::instance()->get3DWidgetFactory()->
       free3DWidget(widget);
@@ -241,9 +241,9 @@ void pqLineWidget::onZAxis()
 //-----------------------------------------------------------------------------
 void pqLineWidget::createWidget(pqServer* server)
 {
-  vtkSMNew3DWidgetProxy* const widget =
+  vtkSMNewWidgetRepresentationProxy* const widget =
     pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("LineSourceWidgetDisplay", server);
+    get3DWidget("LineSourceWidgetRepresentation", server);
   this->setWidgetProxy(widget);
 
   widget->UpdateVTKObjects();
@@ -301,7 +301,7 @@ void pqLineWidget::createWidget(pqServer* server)
 //-----------------------------------------------------------------------------
 void pqLineWidget::resetBounds()
 {
-  vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
+  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   double bounds[6];
   if (!widget || !this->getReferenceInputBounds(bounds))
     {

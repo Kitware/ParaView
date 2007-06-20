@@ -36,10 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtPlugin>
 #include <QStringList>
 class vtkSMProxy;
-class vtkSMAbstractViewModuleProxy;
+class vtkSMViewProxy;
 class pqServer;
-class pqGenericViewModule;
-class pqConsumerDisplay;
+class pqView;
+class pqDataRepresentation;
 
 /// interface class for plugins that create view modules
 class pqViewModuleInterface
@@ -55,7 +55,7 @@ public:
   /// overload this if you have custom pqConsuerDisplay's
   virtual QStringList displayTypes() const { return QStringList(); }
  
-  // TODO: remove (make virtual function in pqGenericViewModule)
+  // TODO: remove (make virtual function in pqView)
   /// Return a friendly type name (e.g. "My Custom View" in place of
   /// "MyCustomView")
   virtual QString viewTypeName(const QString& viewtype) const = 0;
@@ -92,18 +92,18 @@ public:
   /// corresponds with,
   /// server is the server it was created on,
   /// parent is the QObject parent.
-  virtual pqGenericViewModule* createView(const QString& viewtypemodule,
+  virtual pqView* createView(const QString& viewtypemodule,
     const QString& group,
     const QString& name,
-    vtkSMAbstractViewModuleProxy* viewmodule,
+    vtkSMViewProxy* viewmodule,
     pqServer* server,
     QObject* parent) = 0;
 
-  /// Creates a pqConsumerDisplay that corresponds with the ViewModuleProxy's
+  /// Creates a pqDataRepresentation that corresponds with the ViewModuleProxy's
   /// display_name
-  /// this is optional and only needs to be implemented if the pqConsumerDisplay
+  /// this is optional and only needs to be implemented if the pqDataRepresentation
   /// needs to do something special
-  virtual pqConsumerDisplay* createDisplay(const QString& /*display_type*/, 
+  virtual pqDataRepresentation* createDisplay(const QString& /*display_type*/, 
     const QString& /*group*/,
     const QString& /*name*/,
     vtkSMProxy* /*proxy*/,

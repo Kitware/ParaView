@@ -41,15 +41,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include <QModelIndex> // Needed for typedef
 
+class pqFlatTreeView;
 class pqPipelineBrowserInternal;
 class pqPipelineBrowserStateManager;
-class pqConsumerDisplay;
-class pqFlatTreeView;
-class pqGenericViewModule;
 class pqPipelineModel;
 class pqPipelineSource;
 class pqServer;
 class pqServerManagerModelItem;
+class pqView;
 //class pqSourceHistoryModel;
 //class pqSourceInfoGroupMap;
 //class pqSourceInfoIcons;
@@ -111,7 +110,7 @@ public:
   //@}
   
   /// get the view module this pipeline browser works with
-  pqGenericViewModule *getViewModule() const;
+  pqView *getView() const;
 
 public slots:
   /// \name Model Modification Methods
@@ -127,7 +126,7 @@ public slots:
   /// \brief
   ///   Sets the current render module.
   /// \param rm The current render module.
-  void setViewModule(pqGenericViewModule* rm);
+  void setView(pqView* rm);
 
 signals:
   /// Fired when the browser begins performing an undoable change.

@@ -115,7 +115,8 @@ pqTimeKeeper::pqTimeKeeper( const QString& group, const QString& name,
   // (happens when loading state).
   // So we pretend that every one of the sources is getting
   // newly added.
-  QList<pqPipelineSource*> sources = smmodel->getSources(this->getServer());
+  QList<pqPipelineSource*> sources = smmodel->findItems<pqPipelineSource*>(
+    this->getServer());
   foreach(pqPipelineSource* src, sources)
     {
     this->sourceAdded(src);
@@ -237,8 +238,9 @@ void pqTimeKeeper::propertyModified(vtkObject* obj, unsigned long, void*, void* 
     return;
     }
 
-  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
-  pqPipelineSource* source = smmodel->getPQSource(proxy);
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
+  pqPipelineSource* source = smmodel->findItem<pqPipelineSource*>(proxy);
   if (source)
     {
     this->propertyModified(source);

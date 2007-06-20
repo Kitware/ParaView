@@ -41,9 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 #include "pqApplicationCore.h"
-#include "pqPipelineDisplay.h"
-#include "pqRenderViewModule.h"
-#include "pqScalarBarDisplay.h"
+#include "pqPipelineRepresentation.h"
+#include "pqRenderView.h"
+#include "pqScalarBarRepresentation.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 #include "vtkSMProperty.h"
@@ -52,7 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqScalarsToColorsInternal
 {
 public:
-  QList<QPointer<pqScalarBarDisplay> > ScalarBars;
+  QList<QPointer<pqScalarBarRepresentation> > ScalarBars;
   vtkEventQtSlotConnect* VTKConnect;
 
   pqScalarsToColorsInternal()
@@ -80,7 +80,7 @@ pqScalarsToColors::~pqScalarsToColors()
 }
 
 //-----------------------------------------------------------------------------
-void pqScalarsToColors::addScalarBar(pqScalarBarDisplay* sb)
+void pqScalarsToColors::addScalarBar(pqScalarBarRepresentation* sb)
 {
   if (this->Internal->ScalarBars.indexOf(sb) == -1)
     {
@@ -90,7 +90,7 @@ void pqScalarsToColors::addScalarBar(pqScalarBarDisplay* sb)
 }
 
 //-----------------------------------------------------------------------------
-void pqScalarsToColors::removeScalarBar(pqScalarBarDisplay* sb)
+void pqScalarsToColors::removeScalarBar(pqScalarBarRepresentation* sb)
 {
   if (this->Internal->ScalarBars.removeAll(sb) > 0)
     {
@@ -99,11 +99,11 @@ void pqScalarsToColors::removeScalarBar(pqScalarBarDisplay* sb)
 }
 
 //-----------------------------------------------------------------------------
-pqScalarBarDisplay* pqScalarsToColors::getScalarBar(pqRenderViewModule* ren) const
+pqScalarBarRepresentation* pqScalarsToColors::getScalarBar(pqRenderView* ren) const
 {
-  foreach(pqScalarBarDisplay* sb, this->Internal->ScalarBars)
+  foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
     {
-    if (sb && sb->shownIn(ren))
+    if (sb && (sb->getView() == ren))
       {
       return sb;
       }
@@ -140,14 +140,14 @@ void pqScalarsToColors::hideUnusedScalarBars()
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smmodel = core->getServerManagerModel();
 
-  QList<pqPipelineDisplay*> displays = smmodel->getPipelineDisplays(
-    this->getServer());
+  QList<pqPipelineRepresentation*> displays = 
+    smmodel->findItems<pqPipelineRepresentation*>(this->getServer());
 
   bool used_at_all = false;
-  foreach(pqPipelineDisplay* display, displays)
+  foreach(pqPipelineRepresentation* display, displays)
     {
-    if (display->getColorField(true) != "Solid Color" &&
-      display->getLookupTableProxy() == this->getProxy())
+    if (display->getColorField(true) != pqPipelineRepresentation::solidColor()
+      && display->getLookupTableProxy() == this->getProxy())
       {
       used_at_all = true;
       break;
@@ -155,10 +155,10 @@ void pqScalarsToColors::hideUnusedScalarBars()
     }
   if (!used_at_all)
     {
-    foreach(pqScalarBarDisplay* sb, this->Internal->ScalarBars)
+    foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
       {
       sb->setVisible(false);
-      sb->renderAllViews();
+      sb->renderViewEventually();
       }
     }
 }

@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPVServerInformation.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMRenderModuleProxy.h>
-#include <vtkSMMultiViewRenderModuleProxy.h>
+#include "vtkSMRenderViewProxy.h"
 
 // Qt includes.
 #include <QCoreApplication>
@@ -54,7 +54,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqOptions.h"
 #include "pqServerManagerModel.h"
-#include "pqServerManagerObserver.h"
 #include "pqTimeKeeper.h"
 
 class pqServer::pqInternals
@@ -72,16 +71,6 @@ void pqServer::disconnect(pqServer* server)
   // disconnect on the process module. The event handling will
   // clean up the connection.
   
-  // For now, ensure that the render module is deleted before the connection is broken.
-  // Eventually, the vtkSMProxyManager will support a close connection method
-  // which will do proper connection proxy cleanup.
-  if (server->RenderModule)
-    {
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    pxm->UnRegisterProxy("multirendermodule", 
-      server->RenderModule->GetSelfIDAsString(), server->RenderModule);
-    server->RenderModule = NULL;
-    }
   vtkProcessModule::GetProcessModule()->Disconnect(
     server->GetConnectionID());
 }
@@ -115,14 +104,7 @@ pqServer::~pqServer()
     }
     */
 
-  if (this->RenderModule)
-    {
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    pxm->UnRegisterProxy("multirendermodule", 
-      this->RenderModule->GetSelfIDAsString(), this->RenderModule);
-    }
   this->ConnectionID = vtkProcessModuleConnectionManager::GetNullConnectionID();
-
   delete this->Internals;
 }
 
@@ -135,7 +117,7 @@ void pqServer::initialize()
   // connection times together.
   this->createTimeKeeper();
 
-  this->createRenderModule();
+  this->initializeRenderViewType();
 }
 
 //-----------------------------------------------------------------------------
@@ -158,35 +140,26 @@ void pqServer::createTimeKeeper()
 
   pqServerManagerModel* smmodel = 
     pqApplicationCore::instance()->getServerManagerModel();
-  this->Internals->TimeKeeper = qobject_cast<pqTimeKeeper*>(smmodel->getPQProxy(proxy));
+  this->Internals->TimeKeeper = smmodel->findItem<pqTimeKeeper*>(proxy);
 }
 
 //-----------------------------------------------------------------------------
-void pqServer::createRenderModule()
+void pqServer::initializeRenderViewType()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkSMProxyManager* proxy_manager = vtkSMObject::GetProxyManager();
 
-  vtkSMMultiViewRenderModuleProxy* render_module = 
-    vtkSMMultiViewRenderModuleProxy::SafeDownCast(
-      proxy_manager->NewProxy("rendermodules", "MultiViewRenderModule"));
-  render_module->SetConnectionID(this->ConnectionID);
-
-  // we register under prototypes so it doesn't get saved in state files
-  // but undo/redo is possible.
-  proxy_manager->RegisterProxy("multirendermodule", 
-    render_module->GetSelfIDAsString(), render_module);
-
-  const char* renderModuleName = 0;
-  if (!pm->IsRemote(this->ConnectionID))
+  const char* renderViewName = 0;
+  if (!this->isRemote())
     {
-    renderModuleName = "LODRenderModule";
+    renderViewName = "RenderView";
     }
-  if (!renderModuleName)
+
+  if (!renderViewName)
     {
-    renderModuleName = this->Options->GetRenderModuleName();
+    renderViewName = this->Options->GetRenderModuleName();
     }
-  if (!renderModuleName)
+
+  if (!renderViewName)
     {
     vtkPVServerInformation* server_info = pm->GetServerInformation(
       this->ConnectionID);
@@ -194,61 +167,49 @@ void pqServer::createRenderModule()
       {
       if (this->Options->GetTileDimensions()[0] )
         {
-        renderModuleName = "IceTRenderModule";
+        renderViewName = "IceTRenderModule";
         }
       else if(this->Options->GetClientMode())
         {
-        renderModuleName = "IceTDesktopRenderModule";
+        renderViewName = "IceTDesktopRenderView";
         }
       } 
     else if(server_info) // && !server_info->GetUseIceT().
       {
+      /* FIXME No non-iceT client-server view.
       // This fallback render module does not handle parallel rendering or tile
       // display, but it will handle remote serial rendering and multiple views.
-      renderModuleName = "ClientServerRenderModule";
+      renderViewName = "ClientServerRenderModule";
+      */
       }
     }
-  if (!renderModuleName)
+  if (!renderViewName)
     {
     // Last resort.
-    renderModuleName = "LODRenderModule";
+    renderViewName = "RenderView";
     }
 
-  // this->Options->SetRenderModuleName(renderModuleName);
-  render_module->SetRenderModuleName(renderModuleName);
-  render_module->UpdateVTKObjects();
-  this->RenderModule = render_module;
-  render_module->Delete();
+  this->RenderViewXMLName = renderViewName;
 }
 
 //-----------------------------------------------------------------------------
-vtkSMMultiViewRenderModuleProxy* pqServer::GetRenderModule()
-{
-  return this->RenderModule.GetPointer();
-}
-
-//-----------------------------------------------------------------------------
-vtkSMRenderModuleProxy* pqServer::newRenderModule()
-{
-  if (!this->RenderModule)
-    {
-    qDebug() << "No MultiDisplayRenderModule to create a new render module.";
-    return NULL;
-    }
-
-  vtkSMRenderModuleProxy* proxy = vtkSMRenderModuleProxy::SafeDownCast(
-    this->RenderModule->NewRenderModule());
-  return proxy;
-}
-
 const pqServerResource& pqServer::getResource()
 {
   return this->Resource;
 }
 
+//-----------------------------------------------------------------------------
 vtkIdType pqServer::GetConnectionID()
 {
   return this->ConnectionID;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMRenderViewProxy* pqServer::newRenderView()
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  return vtkSMRenderViewProxy::SafeDownCast(
+    pxm->NewProxy("newviews", this->RenderViewXMLName.toAscii().data()));
 }
 
 //-----------------------------------------------------------------------------
@@ -256,7 +217,6 @@ int pqServer::getNumberOfPartitions()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   return pm->GetNumberOfPartitions(this->ConnectionID);
-
 }
 
 //-----------------------------------------------------------------------------
@@ -270,7 +230,7 @@ bool pqServer::isRemote() const
 void pqServer::setResource(const pqServerResource &server_resource)
 {
   this->Resource = server_resource;
-  emit this->nameChanged();
+  emit this->nameChanged(this);
 }
 
 //-----------------------------------------------------------------------------

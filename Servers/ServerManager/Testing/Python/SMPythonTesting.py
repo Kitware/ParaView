@@ -106,7 +106,7 @@ def DoRegressionTesting():
   #rmProxy.GetProperty("RenderWindowSize").SetElement(1, 300)
   #rmProxy.UpdateVTKObjects()
   rmProxy.StillRender()
-  testing.SetRenderModuleProxy(rmProxy)
+  testing.SetRenderViewProxy(rmProxy)
   if testing.RegressionTest(Threshold) == 1:
     return True
   return Error("Regression Test Failed!")

@@ -26,6 +26,7 @@
 class vtkCamera;
 class vtkCollection;
 class vtkImageData;
+class vtkInformationIntegerKey;
 class vtkPVClientServerIdCollectionInformation;
 class vtkPVGenericRenderWindowInteractor;
 class vtkPVOpenGLExtensionsInformation;
@@ -45,6 +46,14 @@ public:
   // Description:
   // Callback for the triangle strips check button
   void SetUseTriangleStrips(int val);
+
+  // Description:
+  // Keys used to specify view rendering requirements.
+  static vtkInformationIntegerKey* USE_LOD();
+  static vtkInformationIntegerKey* USE_COMPOSITING();
+  static vtkInformationIntegerKey* USE_ORDERED_COMPOSITING();
+  static vtkInformationIntegerKey* USE_CACHE();
+  static vtkInformationIntegerKey* LOD_RESOLUTION();
   
   // Description:
   // Callback for the immediate mode rendering check button
@@ -54,6 +63,11 @@ public:
   // Set the LOD Threshold.
   vtkSetMacro(LODThreshold, double);
   vtkGetMacro(LODThreshold, double);
+
+  // Description:
+  // Get/Set the LOD Resolution.
+  void SetLODResolution(int);
+  int GetLODResolution();
    
   // Description:
   // Access to the rendering-related objects for the GUI.
@@ -187,6 +201,12 @@ public:
   // Returns the information object for this render module can can provide information
   // about server-side extensions supported.
   vtkPVOpenGLExtensionsInformation* GetOpenGLExtensionsInformation();
+
+  // Description:
+  // Create a default representation for the given source proxy.
+  // Returns a new proxy.
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
+    vtkSMProxy*);
 
 //BTX
 protected:

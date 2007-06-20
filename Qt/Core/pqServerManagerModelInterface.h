@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqElementInspectorViewModule.cxx
+   Module:    pqServerManagerModelInterface.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,44 +29,28 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqElementInspectorViewModule.h"
+#ifndef __pqServerManagerModelInterface_h 
+#define __pqServerManagerModelInterface_h
 
-// Server Manager Includes.
-#include "vtkSMProxy.h"
+#include <QtPlugin>
 
-// Qt Includes.
+class vtkSMProxy;
+class pqServer;
+class pqProxy;
 
-// ParaView Includes.
-#include "pqPipelineSource.h"
-
-//-----------------------------------------------------------------------------
-pqElementInspectorViewModule::pqElementInspectorViewModule(
- const QString& group, const QString& name, 
-    vtkSMAbstractViewModuleProxy* viewModule, pqServer* server, 
-    QObject* _parent/*=NULL*/):
-   pqGenericViewModule(
-     eiViewType(), group, name, viewModule, server, _parent)
+class pqServerManagerModelInterface
 {
+public:
+  virtual ~pqServerManagerModelInterface() {}
 
-}
+  /// Creates a pqProxy subclass for the vtkSMProxy given the details for its
+  /// registration with the proxy manager.
+  virtual pqProxy* createPQProxy(const QString& group,
+    const QString& name, vtkSMProxy* proxy, pqServer* server) const = 0;
+};
 
-//-----------------------------------------------------------------------------
-pqElementInspectorViewModule::~pqElementInspectorViewModule()
-{
+Q_DECLARE_INTERFACE(pqServerManagerModelInterface, "com.kitware/paraview/servermanagermodel")
 
-}
+#endif
 
-//-----------------------------------------------------------------------------
-bool pqElementInspectorViewModule::canDisplaySource(pqPipelineSource* source) const
-{
-  if (source)
-    {
-    QString xmlname = source->getProxy()->GetXMLName();
-    if (xmlname == "ExtractCellSelection" || xmlname == "ExtractPointSelection")
-      {
-      return true;
-      }
-    }
 
-  return false;
-}

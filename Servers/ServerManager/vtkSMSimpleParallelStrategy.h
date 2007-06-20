@@ -14,7 +14,8 @@
 =========================================================================*/
 // .NAME vtkSMSimpleParallelStrategy
 // .SECTION Description
-//
+// vtkSMSimpleParallelStrategy is a representation used by parallel render
+// views.
 
 #ifndef __vtkSMSimpleParallelStrategy_h
 #define __vtkSMSimpleParallelStrategy_h
@@ -43,7 +44,8 @@ protected:
 
   // Description:
   // Overridden to set the servers correctly on all subproxies.
-  virtual void CreateVTKObjects();
+  virtual void BeginCreateVTKObjects();
+  virtual void EndCreateVTKObjects();
 
   // Description:
   // Create and initialize the data pipeline.
@@ -68,9 +70,10 @@ protected:
   virtual void UpdatePipeline();
 
   // Description:
-  // Called when the view helper proxy is modified. The strategy must update
-  // its state based on the new state of the ViewHelperProxy.
-  virtual void ViewHelperModified();
+  // Called when ever the view information changes.
+  // The strategy should update it's state based on the current view information
+  // provided the information object.
+  virtual void ProcessViewInformation();
 
   // Description:
   // Update the distributor to use ordered compositing.
@@ -80,9 +83,13 @@ protected:
 
   // Description:
   // Called by the view to make the strategy use compositing.
-  // Called in ViewHelperModified.
+  // Called in ProcessViewInformation.
   void SetUseCompositing(bool);
   vtkGetMacro(UseCompositing, bool);
+
+  // Description:
+  // Called to set the KdTree proxy on the distributor.
+  void SetKdTree(vtkSMProxy*);
 
   vtkSMSourceProxy* Collect;
   vtkSMSourceProxy* PreDistributorSuppressor;
@@ -91,6 +98,8 @@ protected:
   vtkSMSourceProxy* CollectLOD;
   vtkSMSourceProxy* PreDistributorSuppressorLOD;
   vtkSMSourceProxy* DistributorLOD;
+
+  vtkSMProxy* KdTree;
   
   bool UseOrderedCompositing;
   bool UseCompositing;

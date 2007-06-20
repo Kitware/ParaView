@@ -52,14 +52,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationScene.h"
 #include "pqAnimationSceneImageWriter.h"
 #include "pqApplicationCore.h"
+#include "pqEventDispatcher.h"
 #include "pqObjectBuilder.h"
 #include "pqProgressManager.h"
 #include "pqProxy.h"
-#include "pqRenderViewModule.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
-#include "pqEventDispatcher.h"
+#include "pqView.h"
 
 static inline int pqCeil(double val)
 {
@@ -95,9 +95,9 @@ pqAnimationManager::pqAnimationManager(QObject* _parent/*=0*/)
   QObject::connect(smmodel, SIGNAL(proxyRemoved(pqProxy*)),
     this, SLOT(onProxyRemoved(pqProxy*)));
 
-  QObject::connect(smmodel, SIGNAL(viewModuleAdded(pqGenericViewModule*)),
+  QObject::connect(smmodel, SIGNAL(viewAdded(pqView*)),
     this, SLOT(updateViewModules()));
-  QObject::connect(smmodel, SIGNAL(viewModuleRemoved(pqGenericViewModule*)),
+  QObject::connect(smmodel, SIGNAL(viewRemoved(pqView*)),
     this, SLOT(updateViewModules()));
 }
 
@@ -121,12 +121,13 @@ void pqAnimationManager::updateViewModules()
     {
     return;
     }
-  QList<pqGenericViewModule*> viewModules = 
-    pqApplicationCore::instance()->getServerManagerModel()->getViewModules(
-      this->Internals->ActiveServer);
+
+  QList<pqView*> viewModules = 
+    pqApplicationCore::instance()->getServerManagerModel()->
+    findItems<pqView*>(this->Internals->ActiveServer);
   
   QList<pqSMProxy> viewList;
-  foreach(pqGenericViewModule* view, viewModules)
+  foreach(pqView* view, viewModules)
     {
     viewList.push_back(pqSMProxy(view->getProxy()));
     } 
@@ -615,7 +616,7 @@ void pqAnimationManager::restoreViewSizes()
 
 //-----------------------------------------------------------------------------
 bool pqAnimationManager::saveGeometry(const QString& filename, 
-  pqGenericViewModule* view)
+  pqView* view)
 {
   if (!view)
     {

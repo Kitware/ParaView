@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtPlugin>
 #include "pqComponentsExport.h"
 class pqDisplayPanel;
-class pqDisplay;
+class pqRepresentation;
 class QWidget;
 
 /// interface class for plugins that create pqDisplayPanels
@@ -47,9 +47,9 @@ public:
   virtual ~pqDisplayPanelInterface() {}
 
   /// Returns true if this panel can be created for the given the proxy.
-  virtual bool canCreatePanel(pqDisplay* display) const = 0;
+  virtual bool canCreatePanel(pqRepresentation* display) const = 0;
   /// Creates a panel for the given proxy
-  virtual pqDisplayPanel* createPanel(pqDisplay* display, QWidget* parent) = 0;
+  virtual pqDisplayPanel* createPanel(pqRepresentation* display, QWidget* parent) = 0;
 };
 
 Q_DECLARE_INTERFACE(pqDisplayPanelInterface, "com.kitware/paraview/displaypanel")

@@ -40,7 +40,7 @@ class pqPipelineSource;
 class pqSelectionManager;
 class pqServer;
 class pqServerManagerModelItem;
-class vtkSMGenericViewDisplayProxy;
+class vtkSMClientDeliveryRepresentationProxy;
 class vtkUnstructuredGrid;
 
 /// Displays a collection of data set elements in a spreadsheet form.
@@ -98,7 +98,7 @@ protected:
 
   /// Tunrs visibility off for all displays except the one
   /// passed as argument, if any whose visibility is set to 1.
-  void showOnly(vtkSMGenericViewDisplayProxy* dislay);
+  void showOnly(vtkSMClientDeliveryRepresentationProxy* dislay);
 
 protected slots:
   void onCurrentTypeTextChanged(const QString& text);

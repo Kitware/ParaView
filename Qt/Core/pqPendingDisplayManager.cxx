@@ -39,19 +39,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Server Manager includes
 #include "vtkPVXMLElement.h"
-#include "vtkSMDataObjectDisplayProxy.h"
-#include "vtkSMProxy.h"
+#include "vtkSMPVRepresentationProxy.h"
 
 // pq includes
 #include "pqApplicationCore.h"
-#include "pqConsumerDisplay.h"
 #include "pqDisplayPolicy.h"
-#include "pqGenericViewModule.h"
 #include "pqPendingDisplayUndoElement.h"
-#include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
-#include "pqRenderViewModule.h"
-#include "pqServerManagerModel.h"
+#include "pqPipelineRepresentation.h"
+#include "pqRenderView.h"
 #include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
@@ -137,7 +133,7 @@ void pqPendingDisplayManager::removePendingDisplayForSource(pqPipelineSource* s)
 
 //-----------------------------------------------------------------------------
 void pqPendingDisplayManager::createPendingDisplays(
-  pqGenericViewModule* activeview)
+  pqView* activeview)
 {
   pqDisplayPolicy* displayPolicy = 
     pqApplicationCore::instance()->getDisplayPolicy();
@@ -154,16 +150,16 @@ void pqPendingDisplayManager::createPendingDisplays(
       continue;
       }
 
-    pqDisplay* display = displayPolicy->createPreferredDisplay(
+    pqDataRepresentation* repr = displayPolicy->createPreferredDisplay(
       source, activeview, false);
-    if (!display || display->getNumberOfViewModules() != 1)
+    if (!repr || !repr->getView())
       {
       continue;
       }
 
-    pqGenericViewModule* view = display->getViewModule(0); 
-    pqRenderViewModule* renModule = qobject_cast<pqRenderViewModule*>(view);
-    if (renModule && renModule->getDisplayCount() == 1)
+    pqView* view = repr->getView(); 
+    pqRenderView* renModule = qobject_cast<pqRenderView*>(view);
+    if (renModule && renModule->getNumberOfVisibleRepresentations() == 1)
       {
       renModule->resetCamera();
       renModule->resetCenterOfRotation();
@@ -180,24 +176,23 @@ void pqPendingDisplayManager::createPendingDisplays(
         for(int cc=0; cc < inputs.size(); ++cc)
           {
           pqPipelineSource* input_src = inputs[cc];
-          pqConsumerDisplay* disp = input_src->getDisplay(view);
-          if (disp)
+          pqDataRepresentation* inputRepr = input_src->getRepresentation(view);
+          if (inputRepr)
             {
-            pqPipelineDisplay *sourceDisp =
-                dynamic_cast<pqPipelineDisplay *>(disp);
+            pqPipelineRepresentation* sourceDisp =
+                qobject_cast<pqPipelineRepresentation*>(inputRepr);
             if (sourceDisp && replace_input == 2)
               {
               // Conditionaly turn off the input. The input should be turned
               // off if the representation is surface and the opacity is 1.
-              vtkSMDataObjectDisplayProxy *dodp = sourceDisp->getDisplayProxy();
-              if(dodp && (dodp->GetRepresentationCM() !=
-                  vtkSMDataObjectDisplayProxy::SURFACE ||
-                  dodp->GetOpacityCM() < 1.0))
+              if (sourceDisp->getRepresentationType() != 
+                vtkSMPVRepresentationProxy::SURFACE ||
+                sourceDisp->getOpacity() < 1.0)
                 {
                 continue;
                 }
               }
-            disp->setVisible(false);
+            inputRepr->setVisible(false);
             }
           }
         }
@@ -206,11 +201,11 @@ void pqPendingDisplayManager::createPendingDisplays(
 
     if (this->Internal->UndoStack)
       {
-      // For every pending display we create, we push an undoelement
-      // nothing the creation of the pending display. 
+      // For every pending repr we create, we push an undoelement
+      // nothing the creation of the pending repr. 
       // This ensures that when this step is undone, the source for
-      // which we created the pending display is once again marked as
-      // a source pending a display.
+      // which we created the pending repr is once again marked as
+      // a source pending a repr.
       pqPendingDisplayUndoElement* elem = pqPendingDisplayUndoElement::New();
       elem->PendingDisplay(source, false);
       this->Internal->UndoStack->addToActiveUndoSet(elem);

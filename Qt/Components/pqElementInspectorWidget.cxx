@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkSMAbstractViewModuleProxy.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMGenericViewDisplayProxy.h"
+#include "vtkSMClientDeliveryRepresentationProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
@@ -45,9 +45,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 #include "pqApplicationCore.h"
-#include "pqConsumerDisplay.h"
+#include "pqDataRepresentation.h"
 #include "pqDataSetModel.h"
-#include "pqElementInspectorViewModule.h"
+#include "pqElementInspectorView.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
 #include "pqSelectionManager.h"
@@ -98,10 +98,10 @@ public:
   QPointer<pqServer> Server;
 
   /// The ViewModule for that current server.
-  QPointer<pqElementInspectorViewModule> ViewModule;
+  QPointer<pqElementInspectorView> ViewModule;
 
   /// Displayer for the current selection.
-  vtkSmartPointer<vtkSMGenericViewDisplayProxy> SelectionDisplayer;
+  vtkSmartPointer<vtkSMClientDeliveryRepresentationProxy> SelectionDisplayer;
 
   /// Currently selected source.
   QPointer<pqPipelineSource> CurrentSource;
@@ -148,7 +148,7 @@ pqElementInspectorWidget::~pqElementInspectorWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqElementInspectorWidget::showOnly(vtkSMGenericViewDisplayProxy* display)
+void pqElementInspectorWidget::showOnly(vtkSMClientDeliveryRepresentationProxy* display)
 {
   if (!this->Implementation->ViewModule)
     {
@@ -158,7 +158,7 @@ void pqElementInspectorWidget::showOnly(vtkSMGenericViewDisplayProxy* display)
   emit this->beginNonUndoableChanges();
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->Implementation->ViewModule->getProxy()->GetProperty("Displays"));
+    this->Implementation->ViewModule->getProxy()->GetProperty("Representations"));
   for (unsigned int cc=0; cc < pp->GetNumberOfProxies(); cc++)
     {
     vtkSMProxy* disp = pp->GetProxy(cc);
@@ -196,8 +196,8 @@ void pqElementInspectorWidget::setServer(pqServer* server)
   // In future, we may want to locate an existsing one first.
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
 
-  pqElementInspectorViewModule* view = qobject_cast<pqElementInspectorViewModule*>(
-    builder->createView(pqElementInspectorViewModule::eiViewType(), server));
+  pqElementInspectorView* view = qobject_cast<pqElementInspectorView*>(
+    builder->createView(pqElementInspectorView::eiViewType(), server));
   this->Implementation->ViewModule = view;
   QObject::connect(view, SIGNAL(endRender()), this, SLOT(updateGUI()),
     Qt::QueuedConnection); 
@@ -214,18 +214,18 @@ void pqElementInspectorWidget::setServer(pqServer* server)
 // view module since that ensures that the displayes are updated as well.
 void pqElementInspectorWidget::updateGUI()
 {
-  vtkSMGenericViewDisplayProxy* visibleDisplay = 0;
+  vtkSMClientDeliveryRepresentationProxy* visibleDisplay = 0;
   if (this->Implementation->ViewModule)
     {
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      this->Implementation->ViewModule->getProxy()->GetProperty("Displays"));
+      this->Implementation->ViewModule->getProxy()->GetProperty("Representations"));
 
     for (unsigned int cc=0; cc < pp->GetNumberOfProxies(); cc++)
       {
-      vtkSMGenericViewDisplayProxy* cdisplay = 
-        vtkSMGenericViewDisplayProxy::SafeDownCast(pp->GetProxy(cc));
+      vtkSMClientDeliveryRepresentationProxy* cdisplay = 
+        vtkSMClientDeliveryRepresentationProxy::SafeDownCast(pp->GetProxy(cc));
 
-      if (cdisplay && cdisplay->GetVisibilityCM())
+      if (cdisplay && cdisplay->GetVisibility())
         {
         visibleDisplay = cdisplay;
         break;
@@ -250,9 +250,9 @@ void pqElementInspectorWidget::updateGUI()
       }
     else
       {
-      pqConsumerDisplay* cdisplay = 
+      pqDataRepresentation* cdisplay = 
         pqApplicationCore::instance()->getServerManagerModel()->
-        getPQDisplay(visibleDisplay);
+        findItem<pqDataRepresentation*>(visibleDisplay);
 
       pqPipelineSource* input = cdisplay->getInput();
       this->Implementation->SourceLabel->setText(
@@ -323,16 +323,15 @@ void pqElementInspectorWidget::inspect(pqPipelineSource* source)
     {
     // Does this source have any display in our view?
     // If not, we create one.
-    pqConsumerDisplay* srcDisplay = 
-      source->getDisplay(this->Implementation->ViewModule);
+    pqDataRepresentation* srcDisplay = 
+      source->getRepresentation(this->Implementation->ViewModule);
     if (!srcDisplay)
       {
       // create a new display for this source.
       // This will create a new display only if the source's
       // output can be displayed by the element inspector.
-      srcDisplay = 
-        pqApplicationCore::instance()->getObjectBuilder()->createDataDisplay(
-          source, this->Implementation->ViewModule);
+      srcDisplay = pqApplicationCore::instance()->getObjectBuilder()->
+        createDataRepresentation(source, this->Implementation->ViewModule);
       if (srcDisplay)
         {
         pqSMAdaptor::setEnumerationProperty(
@@ -353,8 +352,8 @@ void pqElementInspectorWidget::inspect(pqPipelineSource* source)
       }
     else
       {
-      vtkSMGenericViewDisplayProxy* displayProxy = (srcDisplay?  
-         vtkSMGenericViewDisplayProxy::SafeDownCast(srcDisplay->getProxy()):0);
+      vtkSMClientDeliveryRepresentationProxy* displayProxy = (srcDisplay?  
+         vtkSMClientDeliveryRepresentationProxy::SafeDownCast(srcDisplay->getProxy()):0);
       this->showOnly(displayProxy);
       }
     }
@@ -393,7 +392,7 @@ void pqElementInspectorWidget::onSelectionChanged()
     pqSMAdaptor::setElementProperty(
       this->Implementation->SelectionDisplayer->GetProperty("Visibility"), 0);
     pqSMAdaptor::removeProxyProperty(
-      this->Implementation->ViewModule->getProxy()->GetProperty("Displays"),
+      this->Implementation->ViewModule->getProxy()->GetProperty("Representations"),
       this->Implementation->SelectionDisplayer);
     this->Implementation->SelectionDisplayer->UpdateVTKObjects();
     this->Implementation->ViewModule->getProxy()->UpdateVTKObjects();
@@ -406,6 +405,9 @@ void pqElementInspectorWidget::onSelectionChanged()
   if (selectedSource)
     {
     emit this->beginNonUndoableChanges();
+    /* FIXME: For now, we won't show active selection in the Element Inspector.
+     * We'll fix that once we have spread sheet view */
+    /*
     this->Implementation->SelectionDisplayer = 
       this->Implementation->SelectionManager->getClientSideDisplayer(
         selectedSource);
@@ -413,9 +415,10 @@ void pqElementInspectorWidget::onSelectionChanged()
       this->Implementation->SelectionDisplayer->GetProperty("Visibility"), 0);
     this->Implementation->SelectionDisplayer->UpdateVTKObjects();
     pqSMAdaptor::addProxyProperty(
-      this->Implementation->ViewModule->getProxy()->GetProperty("Displays"),
+      this->Implementation->ViewModule->getProxy()->GetProperty("Representations"),
       this->Implementation->SelectionDisplayer);
     this->Implementation->ViewModule->getProxy()->UpdateVTKObjects();
+    */
     emit this->endNonUndoableChanges();
 
     this->inspect(selectedSource);
@@ -430,8 +433,8 @@ void pqElementInspectorWidget::onSelectionChanged()
 void pqElementInspectorWidget::onSourceRemoved(pqPipelineSource* source)
 {
   // Cleanup displays for the source.
-  pqConsumerDisplay* srcDisplay = 
-    source->getDisplay(this->Implementation->ViewModule);
+  pqDataRepresentation* srcDisplay = 
+    source->getRepresentation(this->Implementation->ViewModule);
   if (srcDisplay)
     {
     emit this->beginNonUndoableChanges();

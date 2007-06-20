@@ -204,7 +204,7 @@ void pqSimpleServerStartup::startServer(pqServerStartup& startup)
   if (this->IgnoreConnectIfAlreadyConnected)
     {
     if (pqServer* const existing_server =
-      pqApplicationCore::instance()->getServerManagerModel()->getServer(
+      pqApplicationCore::instance()->getServerManagerModel()->findServer(
         this->Implementation->Server))
       {
       this->started(existing_server);
@@ -293,7 +293,7 @@ void pqSimpleServerStartup::startServer(
         {
         pqServerStartup* const startup = 
           server_startups.getStartup(startup_name);
-        if (pqApplicationCore::instance()->getServerManagerModel()->getServer(
+        if (pqApplicationCore::instance()->getServerManagerModel()->findServer(
             startup->getServer()))
           {
           // we call startServer so it performs all the 
@@ -689,9 +689,9 @@ void pqSimpleServerStartup::disconnectAllServers()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smModel = core->getServerManagerModel();
-  while (smModel->getNumberOfServers() > 0)
+  while (smModel->getNumberOfItems<pqServer*>() > 0)
     {
-    core->removeServer(smModel->getServerByIndex(0));
+    core->removeServer(smModel->getItemAtIndex<pqServer*>(0));
     }
 }
 

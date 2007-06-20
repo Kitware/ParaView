@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBarChartDisplay.cxx
+   Module:    pqBarChartRepresentation.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqBarChartDisplay.h"
+#include "pqBarChartRepresentation.h"
 
 #include "vtkCellData.h"
 #include "vtkCommand.h"
@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMGenericViewDisplayProxy.h"
+#include "vtkSMClientDeliveryRepresentationProxy.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
-class pqBarChartDisplay::pqInternals
+class pqBarChartRepresentation::pqInternals
 {
 public:
   vtkTimeStamp MTime;
@@ -61,9 +61,9 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqBarChartDisplay::pqBarChartDisplay(const QString& group, const QString& name,
+pqBarChartRepresentation::pqBarChartRepresentation(const QString& group, const QString& name,
   vtkSMProxy* display, pqServer* server, QObject* _parent)
-: pqConsumerDisplay(group, name, display, server, _parent)
+: Superclass(group, name, display, server, _parent)
 {
   this->Internal = new pqInternals();
   this->Internal->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
@@ -72,19 +72,19 @@ pqBarChartDisplay::pqBarChartDisplay(const QString& group, const QString& name,
 }
 
 //-----------------------------------------------------------------------------
-pqBarChartDisplay::~pqBarChartDisplay()
+pqBarChartRepresentation::~pqBarChartRepresentation()
 {
   delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
-void pqBarChartDisplay::markModified()
+void pqBarChartRepresentation::markModified()
 {
   this->Internal->MTime.Modified();
 }
 
 //-----------------------------------------------------------------------------
-vtkTimeStamp pqBarChartDisplay::getMTime() const
+vtkTimeStamp pqBarChartRepresentation::getMTime() const
 {
   vtkRectilinearGrid* data = this->getClientSideData();
   if (data && data->GetMTime() > this->Internal->MTime)
@@ -96,7 +96,7 @@ vtkTimeStamp pqBarChartDisplay::getMTime() const
 }
 
 //-----------------------------------------------------------------------------
-pqScalarsToColors* pqBarChartDisplay::setLookupTable(const char* arrayname)
+pqScalarsToColors* pqBarChartRepresentation::setLookupTable(const char* arrayname)
 {
   // Now set up default lookup table.
   pqApplicationCore* core = pqApplicationCore::instance();
@@ -115,7 +115,7 @@ pqScalarsToColors* pqBarChartDisplay::setLookupTable(const char* arrayname)
 }
 
 //-----------------------------------------------------------------------------
-void pqBarChartDisplay::setDefaultPropertyValues()
+void pqBarChartRepresentation::setDefaultPropertyValues()
 {
   this->Superclass::setDefaultPropertyValues();
 
@@ -150,14 +150,14 @@ void pqBarChartDisplay::setDefaultPropertyValues()
   proxy->UpdateVTKObjects();
 
   // Need to update since we would have changed the reduction type.
-  vtkSMGenericViewDisplayProxy::SafeDownCast(proxy)->Update();
+  vtkSMClientDeliveryRepresentationProxy::SafeDownCast(proxy)->Update();
 
   // Now initialize the lookup table.
   this->updateLookupTable();
 }
 
 //-----------------------------------------------------------------------------
-void pqBarChartDisplay::updateLookupTable()
+void pqBarChartRepresentation::updateLookupTable()
 {
   bool use_points = pqSMAdaptor::getElementProperty(
     this->getProxy()->GetProperty("XAxisUsePoints")).toBool();
@@ -189,10 +189,10 @@ void pqBarChartDisplay::updateLookupTable()
 }
 
 //-----------------------------------------------------------------------------
-vtkRectilinearGrid* pqBarChartDisplay::getClientSideData() const
+vtkRectilinearGrid* pqBarChartRepresentation::getClientSideData() const
 {
-  vtkSMGenericViewDisplayProxy* proxy = 
-    vtkSMGenericViewDisplayProxy::SafeDownCast(this->getProxy());
+  vtkSMClientDeliveryRepresentationProxy* proxy = 
+    vtkSMClientDeliveryRepresentationProxy::SafeDownCast(this->getProxy());
   if (proxy)
     {
     return vtkRectilinearGrid::SafeDownCast(proxy->GetOutput());
@@ -201,7 +201,7 @@ vtkRectilinearGrid* pqBarChartDisplay::getClientSideData() const
 }
 
 //-----------------------------------------------------------------------------
-vtkDataArray* pqBarChartDisplay::getXArray()
+vtkDataArray* pqBarChartRepresentation::getXArray()
 {
   vtkSMProxy* proxy = this->getProxy();
   vtkRectilinearGrid* data = this->getClientSideData();
@@ -238,7 +238,7 @@ vtkDataArray* pqBarChartDisplay::getXArray()
 }
 
 //----------------------------------------------------------------------------
-vtkDataArray* pqBarChartDisplay::getYArray()
+vtkDataArray* pqBarChartRepresentation::getYArray()
 {
   vtkSMProxy* proxy = this->getProxy();
   vtkRectilinearGrid* data = this->getClientSideData();

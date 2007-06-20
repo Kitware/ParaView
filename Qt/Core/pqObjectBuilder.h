@@ -35,16 +35,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "pqCoreExport.h"
 
-class pqConsumerDisplay;
-class pqDisplay;
-class pqGenericViewModule;
+class pqRepresentation;
 class pqNameCount;
 class pqPipelineSource;
 class pqProxy;
-class pqScalarBarDisplay;
+class pqScalarBarRepresentation;
 class pqScalarsToColors;
 class pqServer;
 class vtkSMProxy;
+class pqView;
+class pqDataRepresentation;
 
 /// pqObjectBuilder is loosely based on the \c Builder design pattern.
 /// It is used to create as well as destroy complex objects such as 
@@ -101,27 +101,28 @@ public:
     const QString& sm_name, const QString& filename, pqServer* server);
 
   /// Creates a new view module of the given type on the given server.
-  virtual pqGenericViewModule* createView(const QString& type, pqServer* server);
+  virtual pqView* createView(const QString& type, 
+    pqServer* server);
 
   /// Destroys the view module. This destroys the view module
   /// as well as all the displays in the view module.
-  virtual void destroy(pqGenericViewModule* view);
+  virtual void destroy(pqView* view);
 
-  /// Creates a display to show the data from the given \c source
+  /// Creates a representation to show the data from the given \c source
   /// in the given \c view. This uses the pqDisplayPolicy provided
   /// by the application core to create the right kind of display
   /// for the (source, view) pair.
-  virtual pqConsumerDisplay* createDataDisplay(pqPipelineSource* source,
-    pqGenericViewModule* view);
+  virtual pqDataRepresentation* createDataRepresentation(
+    pqPipelineSource* source, pqView* view);
 
   /// Destroys the data display. It will remove the display from any 
   /// view modules it is added to and then unregister it.
-  virtual void destroy(pqDisplay* display);
+  virtual void destroy(pqRepresentation* repr);
 
   /// Creates a scalar bar display to show a lookup table
   /// in the view.
-  virtual pqScalarBarDisplay* createScalarBarDisplay(
-    pqScalarsToColors* lookupTable, pqGenericViewModule* view);
+  virtual pqScalarBarRepresentation* createScalarBarDisplay(
+    pqScalarsToColors* lookupTable, pqView* view);
 
   /// Convenience method to create a proxy of any type on the given server.
   /// One can alternatively use the vtkSMProxyManager to create new proxies 
@@ -197,22 +198,22 @@ signals:
   /// Remember that this signal is fired only when the creation of the object
   /// is requested by the GUI. It wont be triggered when the python client
   /// creates the source or when state is loaded or on undo/redo. 
-  void viewCreated(pqGenericViewModule*);
+  void viewCreated(pqView*);
 
-  /// Fired on successful completion of createDataDisplay().
+  /// Fired on successful completion of createDataRepresentation().
   /// Remember that this signal is fired only when the creation of the object
   /// is requested by the GUI. It wont be triggered when the python client
   /// creates the source or when state is loaded or on undo/redo. 
-  void dataDisplayCreated(pqConsumerDisplay*);
+  void dataRepresentationCreated(pqDataRepresentation*);
 
   /// Fired on successful completion of createScalarBarDisplay().
   /// Remember that this signal is fired only when the creation of the object
   /// is requested by the GUI. It wont be triggered when the python client
   /// creates the source or when state is loaded or on undo/redo. 
-  void scalarBarDisplayCreated(pqScalarBarDisplay*);
+  void scalarBarDisplayCreated(pqScalarBarRepresentation*);
 
   /// Fired on successful completion of any method that creates a pqProxy
-  /// or subclass including createScalarBarDisplay, createDataDisplay,
+  /// or subclass including createScalarBarDisplay, createDataRepresentation,
   /// createView, createCustomFilter, createFilter, createSource,
   /// createReader etc.
   void proxyCreated(pqProxy*);
@@ -223,19 +224,19 @@ signals:
   /// creates the source or when state is loaded or on undo/redo. 
   void proxyCreated(vtkSMProxy*);
 
-  /// Fired when destroy(pqGenericViewModule*) is called. 
+  /// Fired when destroy(pqView*) is called. 
   /// This signal is fired before the process for destruction of the object 
   /// begins. Remember that this signal is fired only when the destruction of 
   /// the object is requested by the GUI. It wont be triggered when the python 
   /// client unregisters the source or when state is loaded or on undo/redo. 
-  void destroying(pqGenericViewModule* view);
+  void destroying(pqView* view);
  
-  /// Fired when destroy(pqDisplay*) is called. 
+  /// Fired when destroy(pqRepresentation*) is called. 
   /// This signal is fired before the process for destruction of the object 
   /// begins. Remember that this signal is fired only when the destruction of 
   /// the object is requested by the GUI. It wont be triggered when the python 
   /// client unregisters the source or when state is loaded or on undo/redo. 
-  void destroying(pqDisplay* display);
+  void destroying(pqRepresentation* display);
 
   /// Fired when destroy(pqPipelineSource*) is called. 
   /// This signal is fired before the process for destruction of the object 

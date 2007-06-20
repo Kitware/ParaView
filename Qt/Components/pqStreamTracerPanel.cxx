@@ -34,12 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqLineSourceWidget.h"
 #include "pqNamedWidgets.h"
-#include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPointSourceWidget.h"
 #include "pqPropertyManager.h"
-#include "pqServerManagerModel.h"
-#include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
 
@@ -247,11 +244,10 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
     this, 
     SLOT(onSeedTypeChanged(int)));
 
-  QObject::connect(
-    this,
-    SIGNAL(renderModuleChanged(pqRenderViewModule*)),
-    this,
-    SLOT(onRenderModuleChanged(pqRenderViewModule*)));
+  QObject::connect(this, SIGNAL(viewChanged(pqView*)),
+    this->Implementation->PointSourceWidget, SLOT(setView(pqView*)));
+  QObject::connect(this, SIGNAL(viewChanged(pqView*)),
+    this->Implementation->LineSourceWidget, SLOT(setView(pqView*)));
 
   QObject::connect(
     this->Implementation->PointSourceWidget, SIGNAL(modified()),
@@ -288,13 +284,6 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
 pqStreamTracerPanel::~pqStreamTracerPanel()
 {
   delete this->Implementation;
-}
-
-//-----------------------------------------------------------------------------
-void pqStreamTracerPanel::onRenderModuleChanged(pqRenderViewModule* render_module)
-{
-  this->Implementation->PointSourceWidget->setRenderModule(render_module);
-  this->Implementation->LineSourceWidget->setRenderModule(render_module);
 }
 
 //-----------------------------------------------------------------------------

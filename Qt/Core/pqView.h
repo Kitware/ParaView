@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqGenericViewModule.h
+   Module:    pqView.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,34 +29,34 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqGenericViewModule_h
-#define __pqGenericViewModule_h
+#ifndef __pqView_h
+#define __pqView_h
 
 
 #include "pqProxy.h"
 
-class pqDisplay;
-class pqGenericViewModuleInternal;
+class pqRepresentation;
+class pqViewInternal;
 class pqPipelineSource;
 class pqServer;
 class pqUndoStack;
 class QWidget;
 class vtkImageData;
-class vtkSMAbstractViewModuleProxy;
+class vtkSMViewProxy;
 
 
 /// This is a PQ abstraction of a generic view module. Subclasses can be
 /// specific for different types of view such as render view, histogram view
 /// etc.
-class PQCORE_EXPORT pqGenericViewModule : public pqProxy
+class PQCORE_EXPORT pqView : public pqProxy
 {
   Q_OBJECT
 
 public:
-  virtual ~pqGenericViewModule();
+  virtual ~pqView();
 
   /// Returns the internal render Module proxy associated with this object.
-  vtkSMAbstractViewModuleProxy* getViewModuleProxy() const;
+  vtkSMViewProxy* getViewProxy() const;
 
   /// Return a widget associated with this view
   virtual QWidget* getWidget() = 0;
@@ -90,28 +90,28 @@ public slots:
 public:
   /// Save a screenshot for the render module. If width or height ==0,
   /// the current window size is used.
-  /// TODO:  pqGenericViewModule should probably report file types is supports
+  /// TODO:  pqView should probably report file types it supports
   virtual bool saveImage(int width, int height, const QString& filename) =0;
 
   /// Capture the view image into a new vtkImageData with the given magnification
   /// and returns it.
   virtual vtkImageData* captureImage(int magnification) =0;
 
-  /// This method checks if the display is one of the displays
-  /// rendered by this render module.
-  bool hasDisplay(pqDisplay* display);
+  /// This method checks if the representation is shown in this view.
+  bool hasRepresentation(pqRepresentation* repr) const;
 
-  /// Gets the number of displays in the render module.
-  int getDisplayCount() const;
+  /// Returns the number representations in the view.
+  int getNumberOfRepresentations() const;
 
-  // Gets the number of displays in this render module that are visible
-  int getVisibleDisplayCount() const;
+  // Returns the number of representations currently visibile in the view.
+  int getNumberOfVisibleRepresentations() const;
 
-  /// Gets the display for the specified index.
-  pqDisplay* getDisplay(int index) const;
+  /// Returns the representation for the specified index where
+  /// (index < getNumberOfRepresentations()).
+  pqRepresentation* getRepresentation(int index) const;
  
-  /// Returns a list of displays in this render module.
-  QList<pqDisplay*> getDisplays() const;
+  /// Returns a list of representations in this view.
+  QList<pqRepresentation*> getRepresentations() const;
 
   /// This method returns is any pqPipelineSource can be dislayed in this
   /// view. This is a convenience method, it gets
@@ -120,11 +120,11 @@ public:
   virtual bool canDisplaySource(pqPipelineSource* source) const = 0;
 
 signals:
-  /// Fired after a display has been added to this render module.
-  void displayAdded(pqDisplay*);
+  /// Fired after a representation has been added to this view.
+  void representationAdded(pqRepresentation*);
 
-  /// Fired after a display has been removed from this render module.
-  void displayRemoved(pqDisplay*);
+  /// Fired after a representation has been removed from this view.
+  void representationRemoved(pqRepresentation*);
 
   /// Fired when the render module fires a vtkCommand::StartEvent
   /// signalling the beginning of rendering. Subclasses must fire
@@ -136,8 +136,8 @@ signals:
   /// Subclasses must fire these signals at appropriate times.
   void endRender();
 
-  /// Fired when any displays visibility changes.
-  void displayVisibilityChanged(pqDisplay* display, bool visible);
+  /// Fired when any representation visibility changes.
+  void representationVisibilityChanged(pqRepresentation* repr, bool visible);
 
   /// Fired when interaction undo stack status changes.
   void canUndoChanged(bool);
@@ -146,26 +146,36 @@ signals:
   void canRedoChanged(bool);
 
 private slots:
-  /// Called when the "Displays" property changes.
-  void displaysChanged();
+  /// Called when the "Representations" property changes.
+  void onRepresentationsChanged();
 
-  void onDisplayVisibilityChanged(bool);
+  /// Called when the representation fires visibilityChanged() signal.
+  void onRepresentationVisibilityChanged(bool);
 
-  /// Called when a new display is registered by the ServerManagerModel.
-  /// We check if the display belongs to this render module.
-  void displayCreated(pqDisplay* display);
+  /// Called when a new representation is registered by the ServerManagerModel.
+  /// We check if the representation belongs to this view.
+  void representationCreated(pqRepresentation* repr);
 
 protected:
-  pqGenericViewModule(const QString& type,
-    const QString& group, const QString& name, 
-    vtkSMAbstractViewModuleProxy* renModule, 
-    pqServer* server, QObject* parent=NULL);
+  // Constructor:
+  // \c type  :- view type.
+  // \c group :- SManager registration group.
+  // \c name  :- SManager registration name.
+  // \c view  :- View proxy.
+  // \c server:- server on which the proxy is created.
+  // \c parent:- QObject parent.
+  pqView( const QString& type,
+          const QString& group, 
+          const QString& name, 
+          vtkSMViewProxy* view, 
+          pqServer* server, 
+          QObject* parent=NULL);
 
 private:
-  pqGenericViewModule(const pqGenericViewModule&); // Not implemented.
-  void operator=(const pqGenericViewModule&); // Not implemented.
+  pqView(const pqView&); // Not implemented.
+  void operator=(const pqView&); // Not implemented.
 
-  pqGenericViewModuleInternal* Internal;
+  pqViewInternal* Internal;
   QString ViewType;
 };
 

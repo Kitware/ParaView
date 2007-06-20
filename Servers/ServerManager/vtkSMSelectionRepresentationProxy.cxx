@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMSelectionRepresentationProxy.h"
 
+#include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
@@ -24,7 +25,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSelectionRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMSelectionRepresentationProxy::vtkSMSelectionRepresentationProxy()
 {
@@ -95,14 +96,16 @@ bool vtkSMSelectionRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
     }
   else
     {
-    this->AddStrategy(strategy);
-    strategy->SetEnableLOD(true);
-    strategy->SetEnableCaching(false); // no cache needed for selection.
-    strategy->UpdateVTKObjects();
 
     this->Connect(this->GeometryFilter, strategy);
     this->Connect(strategy->GetOutput(), this->Mapper);
     this->Connect(strategy->GetLODOutput(), this->LODMapper);
+
+    strategy->SetEnableLOD(true);
+    strategy->SetEnableCaching(false); // no cache needed for selection.
+    strategy->UpdateVTKObjects();
+
+    this->AddStrategy(strategy);
     }
 
   return true;
@@ -148,11 +151,12 @@ bool vtkSMSelectionRepresentationProxy::EndCreateVTKObjects()
 {
   // Setup selection pipeline connections.
   this->Connect(this->GetInputProxy(), this->ExtractSelection);
+  this->Connect(this->EmptySelectionSource, this->ExtractSelection, 
+    "Selection");
   this->Connect(this->ExtractSelection, this->GeometryFilter);
   this->Connect(this->Mapper, this->Prop3D, "Mapper");
   this->Connect(this->LODMapper, this->Prop3D, "LODMapper");
   this->Connect(this->Property, this->Prop3D, "Property");
-  this->Connect(this->EmptySelectionSource, this->ExtractSelection, "Selection");
 
   // Selection prop is not pickable.
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -161,6 +165,21 @@ bool vtkSMSelectionRepresentationProxy::EndCreateVTKObjects()
   this->Prop3D->UpdateProperty("Pickable");
 
   return this->Superclass::EndCreateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSelectionRepresentationProxy::Update(vtkSMViewProxy* view)
+{
+  this->Superclass::Update(view);
+
+  if (this->ViewInformation->Has(vtkSMRenderViewProxy::USE_LOD()))
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->Prop3D->GetProperty("EnableLOD"));
+    ivp->SetElement(0, 
+      this->ViewInformation->Get(vtkSMRenderViewProxy::USE_LOD()));
+    this->Prop3D->UpdateProperty("EnableLOD");
+    }
 }
 
 //----------------------------------------------------------------------------

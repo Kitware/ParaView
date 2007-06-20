@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pq3DWidgetFactoryInternal;
 class pqServer;
 
-class vtkSMNew3DWidgetProxy;
+class vtkSMNewWidgetRepresentationProxy;
 class vtkSMProxy;
 
 /// This is 3DWidget Factory. One can request a 3D widget of any type
@@ -58,12 +58,12 @@ public:
   /// a new one will be created on the server and returned. The caller
   /// can call free3DWidget() when it is done with the 3D Widget, that 
   /// way it can be used by others.
-  vtkSMNew3DWidgetProxy* get3DWidget(const QString& name,
+  vtkSMNewWidgetRepresentationProxy* get3DWidget(const QString& name,
     pqServer* server);
 
   /// Call this method when done with using a 3D widget, this makes
   /// the 3DWidget available for reuse.
-  void free3DWidget(vtkSMNew3DWidgetProxy* widget);
+  void free3DWidget(vtkSMNewWidgetRepresentationProxy* widget);
 
 private slots:
   /// When the 3D widget proxy is unregistered, we must release the internal

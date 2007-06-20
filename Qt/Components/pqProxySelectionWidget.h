@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMProxy;
 class vtkSMProperty;
-class pqRenderViewModule;
+class pqView;
 
 /// a widget that contains a combo box and child widget
 /// for represents a ProxyProperty with a ProxyListDomain
@@ -59,9 +59,6 @@ public:
   /// get the selected proxy
   pqSMProxy proxy() const;
   
-  /// Get the render module that this widget works with
-  pqRenderViewModule* getRenderModule() const;
-
 signals:
   /// signal the proxy changed (QVariant wrapped pqSMProxy)
   void proxyChanged(pqSMProxy);
@@ -90,7 +87,7 @@ public slots:
 
   /// Set the render module that this widget works with
   /// slot is forwarded to the sub panel
-  virtual void setRenderModule(pqRenderViewModule* rm);
+  virtual void setView(pqView* rm);
 
 protected slots:
   void handleProxyChanged();

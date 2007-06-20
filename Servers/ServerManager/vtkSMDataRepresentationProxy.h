@@ -221,6 +221,10 @@ protected:
   // from this representation and mark them modified.
   void MarkUpstreamModified();
 
+  // Description:
+  // Returns the observer.
+  vtkCommand* GetObserver();
+
   // These are the representation strategies used for data display. 
   vtkSMRepresentationStrategyVector* RepresentationStrategies;
 

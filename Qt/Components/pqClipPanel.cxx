@@ -33,10 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqClipPanel.h"
 #include "pqImplicitPlaneWidget.h"
-#include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPropertyManager.h"
-#include "pqServerManagerModel.h"
 
 #include <pqCollapsedGroup.h>
 
@@ -111,10 +109,9 @@ pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
   panel_layout->addWidget(group2);
   panel_layout->addStretch();
   
-  QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderViewModule*)),
-                   this->Implementation->ImplicitPlaneWidget,
-                   SLOT(setRenderModule(pqRenderViewModule*)));
-  this->Implementation->ImplicitPlaneWidget->setRenderModule(this->renderModule());
+  QObject::connect(this, SIGNAL(viewChanged(pqView*)),
+                   this->Implementation->ImplicitPlaneWidget, SLOT(setView(pqView*)));
+  this->Implementation->ImplicitPlaneWidget->setView(this->view());
 
   connect(this->Implementation->ImplicitPlaneWidget,
           SIGNAL(modified()),

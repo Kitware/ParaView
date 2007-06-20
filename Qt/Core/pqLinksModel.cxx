@@ -48,12 +48,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMRenderModuleProxy.h"
 #include "vtkSMProxyListDomain.h"
 
 // pqCore includes
 #include "pqServerManagerModel.h"
-#include "pqRenderViewModule.h"
+#include "pqRenderView.h"
 #include "pqApplicationCore.h"
 #include "pqProxy.h"
 
@@ -432,8 +431,8 @@ void pqLinksModel::addProxyLink(const QString& name,
 }
 
 void pqLinksModel::addCameraLink(const QString& name,
-                                 vtkSMRenderModuleProxy* inputProxy,
-                                 vtkSMRenderModuleProxy* outputProxy)
+                                 vtkSMProxy* inputProxy,
+                                 vtkSMProxy* outputProxy)
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMCameraLink* link = vtkSMCameraLink::New();
@@ -502,7 +501,7 @@ pqProxy* pqLinksModel::representativeProxy(vtkSMProxy* pxy)
   // assume internal proxies don't have pqProxy counterparts
   pqServerManagerModel* smModel =
     pqApplicationCore::instance()->getServerManagerModel();
-  pqProxy* rep = smModel->getPQProxy(pxy);
+  pqProxy* rep = smModel->findItem<pqProxy*>(pxy);
   
   if(!rep)
     {
@@ -511,7 +510,7 @@ pqProxy* pqLinksModel::representativeProxy(vtkSMProxy* pxy)
     for(int i=0; rep == NULL && i<numConsumers; i++)
       {
       vtkSMProxy* consumer = pxy->GetConsumerProxy(i);
-      rep = smModel->getPQProxy(consumer);
+      rep = smModel->findItem<pqProxy*>(consumer);
       }
     }
   return rep;
@@ -583,7 +582,7 @@ pqLinksModelObject::~pqLinksModelObject()
       {
       // For render module links, we have to ensure that we remove
       // the links between their interaction undo stacks as well.
-      pqRenderViewModule* ren = qobject_cast<pqRenderViewModule*>(p);
+      pqRenderView* ren = qobject_cast<pqRenderView*>(p);
       if (ren)
         {
         this->unlinkUndoStacks(ren);
@@ -633,12 +632,12 @@ void pqLinksModelObject::remove()
 }
 
 
-void pqLinksModelObject::unlinkUndoStacks(pqRenderViewModule* ren)
+void pqLinksModelObject::unlinkUndoStacks(pqRenderView* ren)
 {
   foreach (pqProxy* output, this->Internal->OutputProxies)
     {
     // assume all are render modules because some might be deleted already
-    pqRenderViewModule* other = static_cast<pqRenderViewModule*>(output);
+    pqRenderView* other = static_cast<pqRenderView*>(output);
     if (other && other != ren)
       {
       ren->unlinkUndoStack(other);
@@ -651,12 +650,12 @@ void pqLinksModelObject::linkUndoStacks()
 {
   foreach (pqProxy* proxy, this->Internal->InputProxies)
     {
-    pqRenderViewModule* src = qobject_cast<pqRenderViewModule*>(proxy);
+    pqRenderView* src = qobject_cast<pqRenderView*>(proxy);
     if (src)
       {
       for (int cc=0; cc < this->Internal->OutputProxies.size(); cc++)
         {
-        pqRenderViewModule* dest = qobject_cast<pqRenderViewModule*>(
+        pqRenderView* dest = qobject_cast<pqRenderView*>(
           this->Internal->OutputProxies[cc]);
         if (dest && src != dest)
           {
@@ -677,7 +676,7 @@ void pqLinksModelObject::refresh()
 
     // For render module links, we have to ensure that we remove
     // the links between their interaction undo stacks as well.
-    pqRenderViewModule* ren = qobject_cast<pqRenderViewModule*>(p);
+    pqRenderView* ren = qobject_cast<pqRenderView*>(p);
     if (ren)
       {
       this->unlinkUndoStacks(ren);
