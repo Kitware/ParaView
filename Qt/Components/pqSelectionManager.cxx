@@ -479,9 +479,9 @@ void pqSelectionManager::viewRemoved(pqView* vm)
 }
 
 //-----------------------------------------------------------------------------
+#if 0
 void pqSelectionManager::createSelectionDisplayer(vtkSMProxy* input)
 {
-#if 0
   pqRenderView* rvm = this->Implementation->RenderModule;
   vtkSMRenderViewProxy* renderModuleP = rvm->getRenderModuleProxy();
   vtkIdType connId = renderModuleP->GetConnectionID();
@@ -534,8 +534,8 @@ void pqSelectionManager::createSelectionDisplayer(vtkSMProxy* input)
   csDisplayer->UpdateVTKObjects();
   csDisplayer->Update();
   this->Implementation->ClientSideDisplayer = csDisplayer;
-#endif
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // These should go to a vtkSMSelectionHelper

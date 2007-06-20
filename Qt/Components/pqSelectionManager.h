@@ -140,7 +140,6 @@ private:
   int setInteractorStyleToSelect(pqRenderView*);
   int setInteractorStyleToInteract(pqRenderView*);
   void processEvents(unsigned long event);
-  void createSelectionDisplayer(vtkSMProxy* input);
   void selectOnSurface(int screenRectange[4]);
 };
 #endif
