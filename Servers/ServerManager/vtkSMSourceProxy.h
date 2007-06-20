@@ -64,19 +64,16 @@ public:
 
   // Description:
   // Connects filters/sinks to an input. If the filter(s) is not
-  // created, this will create it. If hasMultipleInputs is
-  // true,  only one filter is created, even if the input has
-  // multiple parts. All the inputs are added using the method
-  // name provided. If hasMultipleInputs is not true, one filter
-  // is created for each input. NOTE: The filter(s) is created
-  // when SetInput is called the first and if the it wasn't already
-  // created. If the filter has two inputs and one is multi-block
-  // whereas the other one is not, SetInput() should be called with
-  // the multi-block input first. Otherwise, it will create only
-  // one filter and can not apply to the multi-block input.
-  virtual void AddInput(vtkSMSourceProxy* input, 
-                const char* method,
-                int hasMultipleInputs);
+  // created, this will create it. 
+  virtual void AddInput(unsigned int inputPort,
+                        vtkSMSourceProxy* input,
+                        unsigned int outputPort,
+                        const char* method);
+  virtual void AddInput(vtkSMSourceProxy* input,
+                        const char* method)
+  {
+    this->AddInput(0, input, 0, method);
+  }
 
   // Description:
   // Calls method on all VTK sources. Used by the input property 
@@ -103,12 +100,13 @@ public:
 
   // Description:
   // DataInformation is used by the source proxy to obtain information
-  // on the output(s) from the server. The information contained in
-  // this object is also copied to the DataInformation automatically.
-  // The direct use of the data information object is low level and
-  // should be avoided if possible.
-  vtkPVDataInformation* GetDataInformation();
-
+  // on the output(s) from the server. 
+  vtkPVDataInformation* GetDataInformation()
+  {
+    return this->GetDataInformation(0);
+  }
+  vtkPVDataInformation* GetDataInformation(unsigned int outputIdx);
+    
   // Description:
   // Returns if the data information is currently valid.
   vtkGetMacro(DataInformationValid, int);
@@ -145,18 +143,11 @@ protected:
 
   int PartsCreated;
 
-
-  // Description:
-  // Obtain data information from server (does not check if the
-  // data information is valid)
-  void GatherDataInformation();
+  bool DataInformationValid;
 
   // Description:
   // Mark the data information as invalid.
   void InvalidateDataInformation();
-
-  vtkPVDataInformation *DataInformation;
-  int DataInformationValid;
 
   // Description:
   // Call superclass' and then assigns a new executive 

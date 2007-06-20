@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMXYPlotActorProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.11");
 vtkCxxSetObjectMacro(vtkSMXYPlotActorProxy, Input, vtkSMSourceProxy);
 
 class vtkSMXYPlotActorProxyInternals
@@ -41,6 +41,7 @@ public:
 vtkSMXYPlotActorProxy::vtkSMXYPlotActorProxy()
 {
   this->Input = 0;
+  this->OutputPort = 0;
   this->Internals = new vtkSMXYPlotActorProxyInternals;
   this->SetExecutiveName(0);
   this->Smart = 1;
@@ -123,8 +124,8 @@ void vtkSMXYPlotActorProxy::SetupInputs()
   vtkClientServerID sourceID = this->GetID();
 
   stream << vtkClientServerStream::Invoke
-    << sourceID << "RemoveAllInputs"
-    << vtkClientServerStream::End;
+         << sourceID << "RemoveAllInputs"
+         << vtkClientServerStream::End;
 
 
   int total_numArrays = this->Internals->ArrayNames.size();
@@ -135,11 +136,6 @@ void vtkSMXYPlotActorProxy::SetupInputs()
     return;
     }
 
-  if (this->Input->GetNumberOfParts() > 1)
-    {
-    vtkWarningMacro("Can only handle inputs with 1 part.");
-    }
-  
   // To assign unique plot color to each array.
   double color_step = 1.0 / total_numArrays;
   double color = 0;
@@ -151,7 +147,7 @@ void vtkSMXYPlotActorProxy::SetupInputs()
     iter != this->Internals->ArrayNames.end(); ++iter)
     {
     arrayname = (*iter).c_str();
-    vtkSMPart* part = this->Input->GetPart(0);
+    vtkSMPart* part = this->Input->GetPart(this->OutputPort);
     stream << vtkClientServerStream::Invoke
            << part->GetProducerID()
            << "GetOutputDataObject"
@@ -212,8 +208,10 @@ void vtkSMXYPlotActorProxy::SetupInputs()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMXYPlotActorProxy::AddInput(vtkSMSourceProxy* input,
-                                     const char*, int )
+void vtkSMXYPlotActorProxy::AddInput(unsigned int,
+                                     vtkSMSourceProxy* input,
+                                     unsigned int outputPort,
+                                     const char*)
 {
   if (!input)
     {
@@ -221,6 +219,7 @@ void vtkSMXYPlotActorProxy::AddInput(vtkSMSourceProxy* input,
     }
   input->CreateParts();
   this->SetInput(input);
+  this->OutputPort = outputPort;
   this->CreateVTKObjects();
   this->ArrayNamesModified = 1;
 }

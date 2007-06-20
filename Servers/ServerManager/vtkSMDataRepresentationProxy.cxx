@@ -54,7 +54,7 @@ protected:
 };
 
 
-vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.5");
 vtkCxxSetObjectMacro(vtkSMDataRepresentationProxy, InputProxy, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMDataRepresentationProxy::vtkSMDataRepresentationProxy()
@@ -71,6 +71,8 @@ vtkSMDataRepresentationProxy::vtkSMDataRepresentationProxy()
   this->Observer->SetTarget(this);
 
   this->ViewTimeLink = vtkSMPropertyLink::New();
+
+  this->OutputPort = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -156,8 +158,10 @@ bool vtkSMDataRepresentationProxy::EndCreateVTKObjects()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMDataRepresentationProxy::AddInput(vtkSMSourceProxy* input, 
-  const char* vtkNotUsed(method), int vtkNotUsed(hasMultipleInputs))
+ void vtkSMDataRepresentationProxy::AddInput(unsigned int,
+                                             vtkSMSourceProxy* input,
+                                             unsigned int outputPort,
+                                             const char*)
 {
   if (!input)
     {
@@ -175,6 +179,7 @@ void vtkSMDataRepresentationProxy::AddInput(vtkSMSourceProxy* input,
     }
 
   this->SetInputProxy(input);
+  this->OutputPort = outputPort;
   this->CreateVTKObjects();
 }
 

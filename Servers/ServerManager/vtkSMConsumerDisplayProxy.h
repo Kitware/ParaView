@@ -34,10 +34,17 @@ public:
   // Called when setting input using the Input property.
   // Subclasses must override this method to set the input 
   // to the display pipeline.
-  // Typically, none of the displays use method/hasMultipleInputs
-  // arguements.
-  virtual void AddInput(vtkSMSourceProxy* input, const char* method, 
-    int hasMultipleInputs) = 0;
+  // Typically, none of the displays use the method
+  // argument.
+  virtual void AddInput(unsigned int inputPort,
+                        vtkSMSourceProxy* input,
+                        unsigned int outputPort,
+                        const char* method) = 0;
+  virtual void AddInput(vtkSMSourceProxy* input,
+                        const char* method)
+  {
+    this->AddInput(0, input, 0, method);
+  }
 
   // Description:
   // Chains to superclass and calls InvalidateGeometryInternal(UseCache).

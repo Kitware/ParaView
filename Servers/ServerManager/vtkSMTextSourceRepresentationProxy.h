@@ -35,10 +35,10 @@ public:
   // Called when setting input using the Input property.
   // Subclasses must override this method to set the input 
   // to the display pipeline.
-  // Typically, none of the displays use method/hasMultipleInputs
-  // arguements.
-  virtual void AddInput(vtkSMSourceProxy* input, const char* method, 
-    int hasMultipleInputs);
+  virtual void AddInput(unsigned int inputPort,
+                        vtkSMSourceProxy* input,
+                        unsigned int outputPort,
+                        const char* method);
 
   // Description:
   // This method returns if the Update() or UpdateDistributedGeometry()

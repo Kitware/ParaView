@@ -54,14 +54,17 @@ vtkSMPointLabelDisplayProxy::~vtkSMPointLabelDisplayProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPointLabelDisplayProxy::AddInput(vtkSMSourceProxy* input,
-                                           const char*, int)
+void vtkSMPointLabelDisplayProxy::AddInput(unsigned int,
+                                           vtkSMSourceProxy* input,
+                                           unsigned int outputPort,
+                                           const char*)
 {
-  this->SetInput(input);
+  this->SetInput(input, outputPort);
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPointLabelDisplayProxy::SetInput(vtkSMSourceProxy* input)
+void vtkSMPointLabelDisplayProxy::SetInput(vtkSMSourceProxy* input,
+                                           unsigned int outputPort)
 {
   vtkPVDataInformation *di=input->GetDataInformation();
   if(!di->DataSetTypeIsA("vtkDataSet") || di->GetCompositeDataClassName())
@@ -83,9 +86,8 @@ void vtkSMPointLabelDisplayProxy::SetInput(vtkSMSourceProxy* input)
     return;
     }
   ip->RemoveAllProxies();
-  ip->AddProxy(input);
-
-
+  ip->AddInputConnection(input, outputPort);
+  this->CollectProxy->UpdateProperty("Input");
 }
 
 

@@ -40,7 +40,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.41");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.42");
 
 
 //-----------------------------------------------------------------------------
@@ -119,19 +119,21 @@ vtkSMDataObjectDisplayProxy::~vtkSMDataObjectDisplayProxy()
 }
 
 //-----------------------------------------------------------------------------
-bool vtkSMDataObjectDisplayProxy::Connect(vtkSMProxy* consumer, vtkSMProxy* producer)
+bool vtkSMDataObjectDisplayProxy::Connect(vtkSMProxy* consumer, 
+                                          vtkSMProxy* producer,
+                                          int outputPort)
 {
   if (!consumer)
     {
     return false;
     }
 
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
     consumer->GetProperty("Input"));
-  if (pp)
+  if (ip)
     {
-    pp->RemoveAllProxies();
-    pp->AddProxy(producer);
+    ip->RemoveAllProxies();
+    ip->AddInputConnection(producer, outputPort);
     consumer->UpdateProperty("Input");
     return true;
     }
@@ -225,14 +227,17 @@ void vtkSMDataObjectDisplayProxy::CreateVTKObjects()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDataObjectDisplayProxy::AddInput(
-  vtkSMSourceProxy* input, const char*, int)
+void vtkSMDataObjectDisplayProxy::AddInput(unsigned int,
+                                           vtkSMSourceProxy* input,
+                                           unsigned int outputPort,
+                                           const char*)
 {
-  this->SetInput(input);
+  this->SetInput(input, outputPort);
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDataObjectDisplayProxy::SetInput(vtkSMProxy* input)
+void vtkSMDataObjectDisplayProxy::SetInput(vtkSMProxy* input,
+                                           unsigned int outputPort)
 {
   if (input == NULL)
     {
@@ -240,7 +245,7 @@ void vtkSMDataObjectDisplayProxy::SetInput(vtkSMProxy* input)
     return;
     }
   //This is where the pipeline is setup.
-  this->SetInputInternal(vtkSMSourceProxy::SafeDownCast(input));
+  this->SetInputInternal(vtkSMSourceProxy::SafeDownCast(input), outputPort);
 }
 
 
@@ -258,7 +263,8 @@ vtkSMProxy * vtkSMDataObjectDisplayProxy::GetInput(int i)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDataObjectDisplayProxy::SetInputInternal(vtkSMSourceProxy* input)
+void vtkSMDataObjectDisplayProxy::SetInputInternal(vtkSMSourceProxy* input,
+                                                   unsigned int outputPort)
 {
   if (!input)
     {
@@ -282,7 +288,7 @@ void vtkSMDataObjectDisplayProxy::SetInputInternal(vtkSMSourceProxy* input)
   this->CreateVTKObjects();
 
   // We only set up the geometry pipeline.
-  this->Connect(this->GeometryFilterProxy, input);
+  this->Connect(this->GeometryFilterProxy, input, outputPort);
   // First, setup the pipeline.
   this->SetupPipeline();
   // Second, set default property values.
@@ -337,8 +343,8 @@ vtkSMProxy* vtkSMDataObjectDisplayProxy::GetTexture()
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::SetupPipeline()
 {
-  this->Connect(this->UpdateSuppressorProxy, this->GeometryFilterProxy);
-  this->Connect(this->MapperProxy, this->UpdateSuppressorProxy);
+  this->Connect(this->UpdateSuppressorProxy, this->GeometryFilterProxy, 0);
+  this->Connect(this->MapperProxy, this->UpdateSuppressorProxy, 0);
 
   vtkSMProxyProperty* pp = 0;
   pp = vtkSMProxyProperty::SafeDownCast(
@@ -509,12 +515,12 @@ void vtkSMDataObjectDisplayProxy::SetupVolumePipeline()
   vtkSMProxy* input = this->GetInput(0);
   if (this->VolumePipelineType == UNSTRUCTURED_GRID)
     {
-    this->Connect(this->VolumeFilterProxy, input);
-    this->Connect(this->VolumeUpdateSuppressorProxy, this->VolumeFilterProxy);
-    this->Connect(this->VolumePTMapperProxy, this->VolumeUpdateSuppressorProxy);
-    this->Connect(this->VolumeHAVSMapperProxy, this->VolumeUpdateSuppressorProxy);
-    this->Connect(this->VolumeBunykMapperProxy, this->VolumeUpdateSuppressorProxy);
-    this->Connect(this->VolumeZSweepMapperProxy, this->VolumeUpdateSuppressorProxy);
+    this->Connect(this->VolumeFilterProxy, input, 0);
+    this->Connect(this->VolumeUpdateSuppressorProxy, this->VolumeFilterProxy, 0);
+    this->Connect(this->VolumePTMapperProxy, this->VolumeUpdateSuppressorProxy, 0);
+    this->Connect(this->VolumeHAVSMapperProxy, this->VolumeUpdateSuppressorProxy, 0);
+    this->Connect(this->VolumeBunykMapperProxy, this->VolumeUpdateSuppressorProxy, 0);
+    this->Connect(this->VolumeZSweepMapperProxy, this->VolumeUpdateSuppressorProxy, 0);
 
     pp = vtkSMProxyProperty::SafeDownCast(
       this->VolumeActorProxy->GetProperty("Mapper"));
@@ -536,9 +542,9 @@ void vtkSMDataObjectDisplayProxy::SetupVolumePipeline()
     }
   else if (this->VolumePipelineType == IMAGE_DATA)
     {
-    this->Connect(this->VolumeUpdateSuppressorProxy, input);
+    this->Connect(this->VolumeUpdateSuppressorProxy, input, 0);
     this->Connect(this->VolumeFixedPointRayCastMapperProxy, 
-      this->VolumeUpdateSuppressorProxy);
+                  this->VolumeUpdateSuppressorProxy, 0);
 
     pp = vtkSMProxyProperty::SafeDownCast(
       this->VolumeActorProxy->GetProperty("Mapper"));

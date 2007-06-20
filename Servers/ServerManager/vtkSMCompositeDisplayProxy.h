@@ -95,7 +95,8 @@ protected:
   virtual void SetupVolumePipeline();
   virtual void SetupVolumeDefaults();
 
-  virtual void SetInputInternal(vtkSMSourceProxy* input);
+  virtual void SetInputInternal(vtkSMSourceProxy* input, 
+                                unsigned int outputPort);
 
 
   virtual void CreateVTKObjects();

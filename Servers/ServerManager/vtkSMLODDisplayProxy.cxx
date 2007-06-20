@@ -26,7 +26,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMLODDisplayProxy);
-vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.19");
+vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.20");
 //-----------------------------------------------------------------------------
 vtkSMLODDisplayProxy::vtkSMLODDisplayProxy()
 {
@@ -124,9 +124,9 @@ void vtkSMLODDisplayProxy::SetupPipeline()
 {
   this->Superclass::SetupPipeline();
   
-  this->Connect(this->LODDecimatorProxy, this->GeometryFilterProxy);
-  this->Connect(this->LODUpdateSuppressorProxy, this->LODDecimatorProxy);
-  this->Connect(this->LODMapperProxy, this->LODUpdateSuppressorProxy);
+  this->Connect(this->LODDecimatorProxy, this->GeometryFilterProxy, 0);
+  this->Connect(this->LODUpdateSuppressorProxy, this->LODDecimatorProxy, 0);
+  this->Connect(this->LODMapperProxy, this->LODUpdateSuppressorProxy, 0);
   
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->ActorProxy->GetProperty("LODMapper"));

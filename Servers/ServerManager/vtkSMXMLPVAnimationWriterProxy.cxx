@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMXMLPVAnimationWriterProxy);
-vtkCxxRevisionMacro(vtkSMXMLPVAnimationWriterProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMXMLPVAnimationWriterProxy, "1.7");
 //*****************************************************************************
 class vtkSMXMLPVAnimationWriterProxyInternals
 {
@@ -94,8 +94,10 @@ void vtkSMXMLPVAnimationWriterProxy::CreateVTKObjects()
   pm->SendStream(this->ConnectionID, this->Servers, stream);
 }
 //-----------------------------------------------------------------------------
-void vtkSMXMLPVAnimationWriterProxy::AddInput(vtkSMSourceProxy *input,
-                                              const char* method, int)
+void vtkSMXMLPVAnimationWriterProxy::AddInput(unsigned int,
+                                              vtkSMSourceProxy* input,
+                                              unsigned int outputPort,
+                                              const char* method)
 {
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -119,15 +121,16 @@ void vtkSMXMLPVAnimationWriterProxy::AddInput(vtkSMSourceProxy *input,
     this->Internals->IDs.push_back(ca_id);
 
     stream << vtkClientServerStream::Invoke
-           << input->GetID() << "GetOutput" 
+           << input->GetID() << "GetOutputPort" << outputPort
            << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
-           << ca_id << "SetInput" 
+           << ca_id << "SetInputConnection" 
            << vtkClientServerStream::LastResult
            << vtkClientServerStream::End;
     
     stream << vtkClientServerStream::Invoke
-           << ca_id << "GetOutput" << vtkClientServerStream::End;
+           << ca_id << "GetOutputPort"
+           << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
            << this->GetID() << method << vtkClientServerStream::LastResult
            << groupname_str.str() << vtkClientServerStream::End;
@@ -135,7 +138,8 @@ void vtkSMXMLPVAnimationWriterProxy::AddInput(vtkSMSourceProxy *input,
   else
     {
     stream << vtkClientServerStream::Invoke
-           << input->GetID() << "GetOutput" << vtkClientServerStream::End;
+           << input->GetID() << "GetOutput" << outputPort 
+           << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
            << this->GetID() << method << vtkClientServerStream::LastResult
            << vtkClientServerStream::End;

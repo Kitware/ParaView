@@ -131,7 +131,7 @@ private:
   vtkPVClassNameInformation* ClassNameInformation;
   int ClassNameInformationValid;
   vtkPVDataInformation* DataInformation;
-  int DataInformationValid;
+  bool DataInformationValid;
 //ETX
 
 };

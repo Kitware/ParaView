@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCubeAxesDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.13");
 
 
 //----------------------------------------------------------------------------
@@ -40,6 +40,7 @@ vtkSMCubeAxesDisplayProxy::vtkSMCubeAxesDisplayProxy()
   this->Visibility = 1;
   this->GeometryIsValid = 0;
   this->Input = 0;
+  this->OutputPort = 0;
   this->Caches = 0;
   this->NumberOfCaches = 0;
 
@@ -102,10 +103,13 @@ void vtkSMCubeAxesDisplayProxy::CreateVTKObjects()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMCubeAxesDisplayProxy::AddInput(vtkSMSourceProxy* input, const char*, 
-                                         int)
+void vtkSMCubeAxesDisplayProxy::AddInput(unsigned int,
+                                         vtkSMSourceProxy* input,
+                                         unsigned int outputPort,
+                                         const char*)
 {
   this->SetInput(input);
+  this->OutputPort = outputPort;
 }
 
 //----------------------------------------------------------------------------
@@ -238,7 +242,8 @@ void vtkSMCubeAxesDisplayProxy::Update(vtkSMAbstractViewModuleProxy*)
     }
 
   this->Input->UpdatePipeline();    
-  vtkPVDataInformation* dataInfo = this->Input->GetDataInformation();
+  vtkPVDataInformation* dataInfo = this->Input->GetDataInformation(
+    this->OutputPort);
   dataInfo->GetBounds(bounds);
   stream << vtkClientServerStream::Invoke 
          << this->CubeAxesProxy->GetID() << "SetBounds"
@@ -315,7 +320,8 @@ void vtkSMCubeAxesDisplayProxy::CacheUpdate(int idx, int total)
   if (this->Caches[idx] == 0)
     {
     this->Input->UpdatePipeline();
-    vtkPVDataInformation* info = this->Input->GetDataInformation();
+    vtkPVDataInformation* info = this->Input->GetDataInformation(
+      this->OutputPort);
     this->Caches[idx] = new double[6];
     info->GetBounds(this->Caches[idx]);
     }

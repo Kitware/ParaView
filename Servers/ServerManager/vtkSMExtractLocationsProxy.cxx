@@ -23,7 +23,7 @@
 #include "vtkDoubleArray.h"
 
 vtkStandardNewMacro(vtkSMExtractLocationsProxy);
-vtkCxxRevisionMacro(vtkSMExtractLocationsProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMExtractLocationsProxy, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMExtractLocationsProxy::vtkSMExtractLocationsProxy()
 {
@@ -83,7 +83,7 @@ void vtkSMExtractLocationsProxy::CreateVTKObjects()
     return;
     }
   
-  this->AddInput(selectionSource, "SetSelectionConnection", false);
+  this->AddInput(selectionSource, "SetSelectionConnection");
 }
 
 //-----------------------------------------------------------------------------

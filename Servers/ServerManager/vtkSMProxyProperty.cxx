@@ -32,7 +32,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.44");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.45");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -246,6 +246,22 @@ void vtkSMProxyProperty::AddPreviousProxy(vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
+unsigned int vtkSMProxyProperty::GetNumberOfPreviousProxies()
+{
+  return this->PPInternals->PreviousProxies.size();
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxyProperty::GetPreviousProxy(unsigned int idx)
+{
+  if (idx >= this->PPInternals->PreviousProxies.size())
+    {
+    return 0;
+    }
+  return this->PPInternals->PreviousProxies[idx];
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxyProperty::RemoveConsumerFromPreviousProxies(vtkSMProxy* cons)
 {
   vtkSMProxyPropertyInternals::VectorOfProxies& prevProxies =
@@ -269,11 +285,14 @@ void vtkSMProxyProperty::AddUncheckedProxy(vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyProperty::RemoveUncheckedProxy(vtkSMProxy* proxy)
+unsigned int vtkSMProxyProperty::RemoveUncheckedProxy(vtkSMProxy* proxy)
 {
   vtkstd::vector<vtkSMProxy* >::iterator it =
     this->PPInternals->UncheckedProxies.begin();
-  for (; it != this->PPInternals->UncheckedProxies.end(); it++)
+  unsigned int idx = 0;
+  for (; 
+       it != this->PPInternals->UncheckedProxies.end(); 
+       it++, idx++)
     {
     if (*it == proxy)
       {
@@ -281,6 +300,7 @@ void vtkSMProxyProperty::RemoveUncheckedProxy(vtkSMProxy* proxy)
       break;
       }
     }
+  return idx;
 }
 
 //---------------------------------------------------------------------------
@@ -347,11 +367,12 @@ void vtkSMProxyProperty::RemoveProxy(vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyProperty::RemoveProxy(vtkSMProxy* proxy, int modify)
+unsigned int vtkSMProxyProperty::RemoveProxy(vtkSMProxy* proxy, int modify)
 {
   vtkstd::vector<vtkSmartPointer<vtkSMProxy> >::iterator iter =   
     this->PPInternals->Proxies.begin();
-  for ( ; iter != this->PPInternals->Proxies.end() ; ++iter)
+  unsigned int idx = 0;
+  for ( ; iter != this->PPInternals->Proxies.end() ; ++iter, idx++)
     {
     if (*iter == proxy)
       {
@@ -363,6 +384,7 @@ void vtkSMProxyProperty::RemoveProxy(vtkSMProxy* proxy, int modify)
       break;
       }
     }
+  return idx;
 }
 
 //---------------------------------------------------------------------------
@@ -393,10 +415,13 @@ int vtkSMProxyProperty::AddProxy(vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyProperty::RemoveAllProxies()
+void vtkSMProxyProperty::RemoveAllProxies(int modify)
 {
   this->PPInternals->Proxies.clear();
-  this->Modified();
+  if (modify)
+    {
+    this->Modified();
+    }
 }
 
 //---------------------------------------------------------------------------

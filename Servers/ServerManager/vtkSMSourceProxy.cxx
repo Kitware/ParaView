@@ -35,7 +35,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.48");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.49");
 
 struct vtkSMSourceProxyInternals
 {
@@ -48,8 +48,7 @@ vtkSMSourceProxy::vtkSMSourceProxy()
   this->PInternals = new  vtkSMSourceProxyInternals;
   this->PartsCreated = 0;
 
-  this->DataInformation = vtkPVDataInformation::New();
-  this->DataInformationValid = 0;
+  this->DataInformationValid = false;
   this->ExecutiveName = 0;
   this->SetExecutiveName("vtkCompositeDataPipeline");
 
@@ -61,7 +60,6 @@ vtkSMSourceProxy::~vtkSMSourceProxy()
 {
   delete this->PInternals;
 
-  this->DataInformation->Delete();
   this->SetExecutiveName(0);
 }
 
@@ -334,9 +332,10 @@ void vtkSMSourceProxy::CleanInputs(const char* method)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSourceProxy::AddInput(vtkSMSourceProxy *input, 
-                                const char* method, 
-                                int hasMultipleInputs)
+void vtkSMSourceProxy::AddInput(unsigned int inputPort,
+                                vtkSMSourceProxy *input, 
+                                unsigned int outputPort,
+                                const char* method)
 {
 
   if (!input)
@@ -345,21 +344,12 @@ void vtkSMSourceProxy::AddInput(vtkSMSourceProxy *input,
     }
 
   input->CreateParts();
-  int numInputs = input->GetNumberOfParts();
-  if (numInputs < 1)
+  unsigned int numPorts = input->GetNumberOfParts();
+  if (outputPort >= numPorts)
     {
+    vtkErrorMacro("Specified output port (" << outputPort << ") does "
+                  "not exist. Cannot make connection");
     return;
-    }
-
-  if (numInputs > 1 && !hasMultipleInputs)
-    {
-    vtkErrorMacro("This algorithm (" 
-                  << (this->VTKClassName?this->VTKClassName:"(null)")
-                  << ") cannot handle multiple inputs (input is: "
-                  << (input->VTKClassName?input->VTKClassName:"(null)")
-                  << "). Only the first"
-                  " output of the input proxy will be used.");
-    numInputs = 1;
     }
 
   this->CreateVTKObjects();
@@ -367,13 +357,10 @@ void vtkSMSourceProxy::AddInput(vtkSMSourceProxy *input,
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   vtkClientServerID sourceID = this->GetID();
-  for (int partIdx = 0; partIdx < numInputs; ++partIdx)
-    {
-    vtkSMPart* part = input->GetPart(partIdx);
-    stream << vtkClientServerStream::Invoke 
-           << sourceID << method << part->GetID();
-    stream << vtkClientServerStream::End;
-    }
+  vtkSMPart* part = input->GetPart(outputPort);
+  stream << vtkClientServerStream::Invoke 
+         << sourceID << method << part->GetID();
+  stream << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, 
                  this->Servers & input->GetServers(), 
                  stream);
@@ -399,16 +386,22 @@ void vtkSMSourceProxy::UpdateSelfAndAllInputs()
 }
 
 //----------------------------------------------------------------------------
-vtkPVDataInformation* vtkSMSourceProxy::GetDataInformation()
+vtkPVDataInformation* vtkSMSourceProxy::GetDataInformation(unsigned int idx)
 {
-  if (this->DataInformationValid == 0)
+  this->CreateParts();
+  if (idx >= this->GetNumberOfParts())
+    {
+    return 0;
+    }
+
+  if (!this->DataInformationValid)
     {
     // Make sure the output filter is up-to-date before
     // getting information.
     this->UpdatePipeline();
-    this->GatherDataInformation();
+    this->DataInformationValid = true;
     }
-  return this->DataInformation;
+  return this->GetPart(idx)->GetDataInformation();
 }
 
 //----------------------------------------------------------------------------
@@ -433,7 +426,7 @@ void vtkSMSourceProxy::InvalidateDataInformation(int invalidateConsumers)
 //----------------------------------------------------------------------------
 void vtkSMSourceProxy::InvalidateDataInformation()
 {
-  this->DataInformationValid = 0;
+  this->DataInformationValid = false;
   vtkstd::vector<vtkSmartPointer<vtkSMPart> >::iterator it =
     this->PInternals->Parts.begin();
   for (; it != this->PInternals->Parts.end(); it++)
@@ -441,27 +434,6 @@ void vtkSMSourceProxy::InvalidateDataInformation()
     it->GetPointer()->InvalidateDataInformation();
     }
 }
-
-//----------------------------------------------------------------------------
-void vtkSMSourceProxy::GatherDataInformation()
-{
-
-  vtkProcessModule::GetProcessModule()->SendPrepareProgress(
-    this->ConnectionID);
-  this->DataInformation->Initialize();
-
-  vtkstd::vector<vtkSmartPointer<vtkSMPart> >::iterator it =
-    this->PInternals->Parts.begin();
-  for (; it != this->PInternals->Parts.end(); it++)
-    {
-    this->DataInformation->AddInformation(
-      it->GetPointer()->GetDataInformation(), 1);
-    }
-  this->DataInformationValid = 1;
-  vtkProcessModule::GetProcessModule()->SendCleanupPendingProgress(
-    this->ConnectionID);
-}
-
 
 //---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMSourceProxy::SaveRevivalState(vtkPVXMLElement* root)

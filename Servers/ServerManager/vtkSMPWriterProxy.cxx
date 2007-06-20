@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMPWriterProxy);
-vtkCxxRevisionMacro(vtkSMPWriterProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMPWriterProxy, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMPWriterProxy::vtkSMPWriterProxy()
 {
@@ -130,9 +130,10 @@ void vtkSMPWriterProxy::CreateVTKObjects()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPWriterProxy::AddInput(vtkSMSourceProxy* input, 
-                                 const char* method,
-                                 int hasMultipleInputs)
+void vtkSMPWriterProxy::AddInput(unsigned int inputPort,
+                                 vtkSMSourceProxy* input, 
+                                 unsigned int outputPort,
+                                 const char* method)
 {
 
   vtkSMSourceProxy* completeArrays = vtkSMSourceProxy::SafeDownCast(
@@ -149,7 +150,7 @@ void vtkSMPWriterProxy::AddInput(vtkSMSourceProxy* input,
     completeArrays->UpdateVTKObjects();
     }
 
-  this->Superclass::AddInput(input, method, hasMultipleInputs);
+  this->Superclass::AddInput(inputPort, input, outputPort, method);
 
   vtkSMProxy* sumHelper = this->GetSubProxy("SummaryHelper");
   if (sumHelper)

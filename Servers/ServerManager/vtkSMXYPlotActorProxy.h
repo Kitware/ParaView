@@ -35,8 +35,10 @@ public:
   // Sets the input dataset to Plot.
   // Note that all the arrays and all the components of each of the arrays 
   // in the input will be plotted. 
-  void AddInput(vtkSMSourceProxy* input, const char* method, 
-                int hasMultipleInputs);
+  virtual void AddInput(unsigned int inputPort,
+                        vtkSMSourceProxy* input,
+                        unsigned int outputPort,
+                        const char* method);
 
   // Description:
   // To remove the dataset for the Plot.
@@ -81,8 +83,9 @@ protected:
   // Called to build the XYActor inputs for the selected arrays.
   void SetupInputs();
 
-  // Description:
   int Smart;
+
+  unsigned int OutputPort;
 private:
   vtkSMXYPlotActorProxy(const vtkSMXYPlotActorProxy&); // Not implemented.
   void operator=(const vtkSMXYPlotActorProxy&); // Not implemented.

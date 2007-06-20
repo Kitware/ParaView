@@ -34,8 +34,10 @@ public:
   // Description:
   // Connects filters/sinks to an input. If the filter(s) is not
   // created, this will create it. 
-  void AddInput(vtkSMSourceProxy* input, 
-                const char* method, int ); 
+  virtual void AddInput(unsigned int inputPort,
+                        vtkSMSourceProxy* input,
+                        unsigned int outputPort,
+                        const char* method);
 
   void WriteTime(double time);
 

@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notice for more information.
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.33");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.34");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -338,8 +338,8 @@ void vtkSMCompositeDisplayProxy::SetupPipeline()
   vtkSMStringVectorProperty *svp = 0;
   vtkClientServerStream stream;
 
-  this->Connect(this->LODCollectProxy, this->LODDecimatorProxy);
-  this->Connect(this->CollectProxy, this->GeometryFilterProxy);
+  this->Connect(this->LODCollectProxy, this->LODDecimatorProxy, 0);
+  this->Connect(this->CollectProxy, this->GeometryFilterProxy, 0);
 
   this->LODCollectProxy->UpdateVTKObjects();
   this->CollectProxy->UpdateVTKObjects();
@@ -371,8 +371,8 @@ void vtkSMCompositeDisplayProxy::SetupPipeline()
     this->ConnectionID, vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
   // On the render server, insert a distributor.
-  this->Connect(this->DistributorProxy, this->UpdateSuppressorProxy);
-  this->Connect(this->LODDistributorProxy, this->LODUpdateSuppressorProxy);
+  this->Connect(this->DistributorProxy, this->UpdateSuppressorProxy, 0);
+  this->Connect(this->LODDistributorProxy, this->LODUpdateSuppressorProxy, 0);
 
   // On the render server, attach an update suppressor to the distributor.  On
   // the client side (since the distributor is not there) attach it to the other
@@ -415,8 +415,8 @@ void vtkSMCompositeDisplayProxy::SetupPipeline()
     this->ConnectionID,
     vtkProcessModule::RENDER_SERVER, stream);
 
-  this->Connect(this->MapperProxy, this->DistributorSuppressorProxy);
-  this->Connect(this->LODMapperProxy, this->LODDistributorSuppressorProxy);
+  this->Connect(this->MapperProxy, this->DistributorSuppressorProxy, 0);
+  this->Connect(this->LODMapperProxy, this->LODDistributorSuppressorProxy, 0);
 
   svp = vtkSMStringVectorProperty::SafeDownCast(
     this->DistributorProxy->GetProperty("OutputType"));
@@ -477,7 +477,7 @@ void vtkSMCompositeDisplayProxy::SetupVolumePipeline()
     }
   else if (this->VolumePipelineType == UNSTRUCTURED_GRID)
     {
-    this->Connect(this->VolumeCollectProxy, this->VolumeFilterProxy);
+    this->Connect(this->VolumeCollectProxy, this->VolumeFilterProxy, 0);
     
     stream
       << vtkClientServerStream::Invoke
@@ -498,7 +498,7 @@ void vtkSMCompositeDisplayProxy::SetupVolumePipeline()
       this->ConnectionID, vtkProcessModule::CLIENT_AND_SERVERS, stream);
     
     // On the render server, insert a distributor.
-    this->Connect(this->VolumeDistributorProxy, this->VolumeUpdateSuppressorProxy);
+    this->Connect(this->VolumeDistributorProxy, this->VolumeUpdateSuppressorProxy, 0);
     
     // On the render server, attach an update suppressor to the
     // distributor.  On the client side (since the distributor is not
@@ -529,13 +529,13 @@ void vtkSMCompositeDisplayProxy::SetupVolumePipeline()
       vtkProcessModule::RENDER_SERVER, stream);
 
     this->Connect(this->VolumePTMapperProxy, 
-                  this->VolumeDistributorSuppressorProxy);
+                  this->VolumeDistributorSuppressorProxy, 0);
     this->Connect(this->VolumeHAVSMapperProxy, 
-                  this->VolumeDistributorSuppressorProxy);
+                  this->VolumeDistributorSuppressorProxy, 0);
     this->Connect(this->VolumeBunykMapperProxy, 
-                  this->VolumeDistributorSuppressorProxy);
+                  this->VolumeDistributorSuppressorProxy, 0);
     this->Connect(this->VolumeZSweepMapperProxy, 
-                  this->VolumeDistributorSuppressorProxy);
+                  this->VolumeDistributorSuppressorProxy, 0);
     
     svp = vtkSMStringVectorProperty::SafeDownCast(
       this->VolumeDistributorProxy->GetProperty("OutputType"));
@@ -714,9 +714,10 @@ void vtkSMCompositeDisplayProxy::SetupCollectionFilter(vtkSMProxy* collectProxy)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMCompositeDisplayProxy::SetInputInternal(vtkSMSourceProxy *input)
+void vtkSMCompositeDisplayProxy::SetInputInternal(vtkSMSourceProxy *input,
+                                                  unsigned int outputPort)
 {
-  this->Superclass::SetInputInternal(input);
+  this->Superclass::SetInputInternal(input, outputPort);
 
   if (this->VolumePipelineType == UNSTRUCTURED_GRID)
     {
@@ -737,7 +738,8 @@ void vtkSMCompositeDisplayProxy::SetInputInternal(vtkSMSourceProxy *input)
       vtkErrorMacro("Could not get the size of the render server.");
       }
 
-    vtkIdType numCells = input->GetDataInformation()->GetNumberOfCells();
+    vtkIdType numCells = 
+      input->GetDataInformation(outputPort)->GetNumberOfCells();
     if (numCells/numRenderServerProcs < 1000000)
       {
       this->SupportsZSweepMapper = 1;

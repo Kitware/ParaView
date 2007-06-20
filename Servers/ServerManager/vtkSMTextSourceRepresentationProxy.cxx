@@ -19,6 +19,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMTextWidgetRepresentationProxy.h"
 #include "vtkSMProxyProperty.h"
@@ -31,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMTextSourceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMTextSourceRepresentationProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMTextSourceRepresentationProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMTextSourceRepresentationProxy::vtkSMTextSourceRepresentationProxy()
 {
@@ -138,21 +139,23 @@ bool vtkSMTextSourceRepresentationProxy::EndCreateVTKObjects()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMTextSourceRepresentationProxy::AddInput(vtkSMSourceProxy* input, 
-  const char* method, int hasMultipleInputs)
+void vtkSMTextSourceRepresentationProxy::AddInput(unsigned int inputPort,
+                                                  vtkSMSourceProxy* input,
+                                                  unsigned int outputPort,
+                                                  const char* method)
 {
-  this->Superclass::AddInput(input, method, hasMultipleInputs);
+  this->Superclass::AddInput(inputPort, input, outputPort, method);
 
-  vtkSMProxyProperty* pp;
-  pp = vtkSMProxyProperty::SafeDownCast(
+  vtkSMInputProperty* ip;
+  ip = vtkSMInputProperty::SafeDownCast(
     this->CollectProxy->GetProperty("Input"));
-  pp->RemoveAllProxies();
-  pp->AddProxy(input);
+  ip->RemoveAllProxies();
+  ip->AddInputConnection(input, outputPort);
 
-  pp = vtkSMProxyProperty::SafeDownCast(
+  ip = vtkSMInputProperty::SafeDownCast(
     this->UpdateSuppressorProxy->GetProperty("Input"));
-  pp->RemoveAllProxies();
-  pp->AddProxy(this->CollectProxy);
+  ip->RemoveAllProxies();
+  ip->AddProxy(this->CollectProxy);
   this->UpdateSuppressorProxy->UpdateVTKObjects();
 
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(

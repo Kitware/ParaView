@@ -19,6 +19,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMTextWidgetDisplayProxy.h"
 #include "vtkSMProxyProperty.h"
@@ -30,12 +31,10 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMTextDisplayProxy);
-vtkCxxRevisionMacro(vtkSMTextDisplayProxy, "1.6");
-vtkCxxSetObjectMacro(vtkSMTextDisplayProxy, Input, vtkSMSourceProxy);
+vtkCxxRevisionMacro(vtkSMTextDisplayProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMTextDisplayProxy::vtkSMTextDisplayProxy()
 {
-  this->Input = 0;
   this->Dirty = true;
   this->UpdateSuppressorProxy = 0;
   this->TextWidgetProxy = 0;
@@ -45,7 +44,6 @@ vtkSMTextDisplayProxy::vtkSMTextDisplayProxy()
 //----------------------------------------------------------------------------
 vtkSMTextDisplayProxy::~vtkSMTextDisplayProxy()
 {
-  this->SetInput(0);
   this->UpdateSuppressorProxy = 0;
   this->TextWidgetProxy = 0;
   this->CollectProxy = 0;
@@ -131,10 +129,11 @@ void vtkSMTextDisplayProxy::CreateVTKObjects()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMTextDisplayProxy::AddInput(vtkSMSourceProxy* input, 
-  const char* vtkNotUsed(method), int vtkNotUsed(hasMultipleInputs))
+void vtkSMTextDisplayProxy::AddInput(unsigned int,
+                                     vtkSMSourceProxy* input,
+                                     unsigned int outputPort,
+                                     const char*)
 {
-  this->SetInput(input);
   if (!input)
     {
     return;
@@ -143,16 +142,16 @@ void vtkSMTextDisplayProxy::AddInput(vtkSMSourceProxy* input,
   input->CreateParts();
   this->CreateVTKObjects();
 
-  vtkSMProxyProperty* pp;
-  pp = vtkSMProxyProperty::SafeDownCast(
+  vtkSMInputProperty* ip;
+  ip = vtkSMInputProperty::SafeDownCast(
     this->CollectProxy->GetProperty("Input"));
-  pp->RemoveAllProxies();
-  pp->AddProxy(input);
+  ip->RemoveAllProxies();
+  ip->AddInputConnection(input, outputPort);
 
-  pp = vtkSMProxyProperty::SafeDownCast(
+  ip = vtkSMInputProperty::SafeDownCast(
     this->UpdateSuppressorProxy->GetProperty("Input"));
-  pp->RemoveAllProxies();
-  pp->AddProxy(this->CollectProxy);
+  ip->RemoveAllProxies();
+  ip->AddProxy(this->CollectProxy);
   this->UpdateSuppressorProxy->UpdateVTKObjects();
 
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(

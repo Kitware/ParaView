@@ -47,7 +47,10 @@ public:
   // Description:
   // Called when setting input using the Input property.
   // Internally calls SetInput.
-  virtual void AddInput(vtkSMSourceProxy* input, const char*, int);
+  virtual void AddInput(unsigned int inputPort,
+                        vtkSMSourceProxy* input,
+                        unsigned int outputPort,
+                        const char* method);
 
   // Description:
   // Connects the parts data to the plot actor.
@@ -87,6 +90,7 @@ protected:
 
   int GeometryIsValid;
   int Visibility;
+  unsigned int OutputPort;
 
   vtkSMRenderModuleProxy* RenderModuleProxy;
   vtkSMProxy* CubeAxesProxy;

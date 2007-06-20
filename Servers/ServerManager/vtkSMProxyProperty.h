@@ -61,9 +61,9 @@ public:
   
   // Description:
   // Add a proxy to the list of proxies.
-  int AddProxy(vtkSMProxy* proxy);
-  void RemoveProxy(vtkSMProxy* proxy);
-  int SetProxy(unsigned int idx, vtkSMProxy* proxy);
+  virtual int AddProxy(vtkSMProxy* proxy);
+  virtual void RemoveProxy(vtkSMProxy* proxy);
+  virtual int SetProxy(unsigned int idx, vtkSMProxy* proxy);
 
   // Description:
   // Returns if the given proxy is already added to the property.
@@ -81,11 +81,13 @@ public:
   // is read only, returns 0.
   // All proxies added with AddProxy() will become "consumers" of
   // the proxy passed to AppendCommandToStream().
-  int AddProxy(vtkSMProxy* proxy, int modify);
+  virtual int AddProxy(vtkSMProxy* proxy, int modify);
 
   // Description:
   // Removes a proxy from the vector of added Proxies (added by AddProxy).
-  void RemoveProxy(vtkSMProxy* proxy, int modify);
+  // Returns the index of proxy removed. If the proxy was not found,
+  // returns NumberOfProxies.
+  virtual unsigned int RemoveProxy(vtkSMProxy* proxy, int modify);
   
   // Description:
   // Add an unchecked proxy. Does not modify the property.
@@ -97,17 +99,20 @@ public:
   // - AddUncheckedProxy(proxy)
   // - IsInDomains()
   // @endverbatim
-  void AddUncheckedProxy(vtkSMProxy* proxy);
-  void RemoveUncheckedProxy(vtkSMProxy* proxy);
-  void SetUncheckedProxy(unsigned int idx, vtkSMProxy* proxy);
+  virtual void AddUncheckedProxy(vtkSMProxy* proxy);
+  virtual unsigned int RemoveUncheckedProxy(vtkSMProxy* proxy);
+  virtual void SetUncheckedProxy(unsigned int idx, vtkSMProxy* proxy);
 
   // Description:
   // Removes all unchecked proxies.
-  void RemoveAllUncheckedProxies();
+  virtual void RemoveAllUncheckedProxies();
 
   // Description:
   // Remove all proxies from the list.
-  void RemoveAllProxies();
+  virtual void RemoveAllProxies()
+  {
+    this->RemoveAllProxies(1);
+  }
 
   // Description:
   // Returns the number of proxies.
@@ -140,6 +145,8 @@ protected:
   vtkSMProxyProperty();
   ~vtkSMProxyProperty();
 
+  virtual void RemoveAllProxies(int modify);
+
   //BTX
   // Description:
   // Description:
@@ -171,11 +178,13 @@ protected:
   virtual void ChildSaveState(vtkPVXMLElement* parent, int saveLastPushedValues);
 
   // Description:
-  // Previous proxies are used by the ProxyProperty internally. 
-  // This is a collection of proxies to whcih the owner proxy of this property
-  // get added as a consumer. This list helps is breaking this dependence when the
-  // property value changes.
+  // Previous proxies are used by the ProxyProperty internally.  This is a
+  // collection of proxies to whcih the owner proxy of this property get
+  // added as a consumer. This list helps is breaking this dependence when
+  // the property value changes.
   void AddPreviousProxy(vtkSMProxy* proxy);
+  unsigned int GetNumberOfPreviousProxies();
+  vtkSMProxy* GetPreviousProxy(unsigned int idx);
 
   // Description:
   // Removes all previous proxies.

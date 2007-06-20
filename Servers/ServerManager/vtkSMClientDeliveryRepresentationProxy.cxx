@@ -29,7 +29,7 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
 {
@@ -286,10 +286,12 @@ vtkDataObject* vtkSMClientDeliveryRepresentationProxy::GetOutput()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMClientDeliveryRepresentationProxy::AddInput(vtkSMSourceProxy* input, 
-  const char* method, int hasMultipleInputs)
+void vtkSMClientDeliveryRepresentationProxy::AddInput(unsigned int inputPort,
+                                                      vtkSMSourceProxy* input,
+                                                      unsigned int outputPort,
+                                                      const char* method)
 {
-  this->Superclass::AddInput(input, method, hasMultipleInputs);
+  this->Superclass::AddInput(inputPort, input, outputPort, method);
   this->SetInputInternal();
 }
 

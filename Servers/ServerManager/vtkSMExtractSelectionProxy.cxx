@@ -33,7 +33,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMExtractSelectionProxy);
-vtkCxxRevisionMacro(vtkSMExtractSelectionProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMExtractSelectionProxy, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMExtractSelectionProxy::vtkSMExtractSelectionProxy()
 {
@@ -98,7 +98,7 @@ void vtkSMExtractSelectionProxy::CreateVTKObjects()
     return;
     }
   
-  this->AddInput(selectionSource, "SetSelectionConnection", false);
+  this->AddInput(selectionSource, "SetSelectionConnection");
 }
 
 //-----------------------------------------------------------------------------

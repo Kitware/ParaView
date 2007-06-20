@@ -282,7 +282,6 @@
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
-        <Property name="FileType" show="0"/>
       </Hints>
     </WriterProxy>
 
@@ -437,7 +436,7 @@
     <XMLPVAnimationWriterProxy name="XMLPVAnimationWriter" class ="vtkXMLPVAnimationWriter">
       <InputProperty
         name="Input" 
-        command="AddInput"
+        command="AddInputConnection"
         clean_command="RemoveAllInputs">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>

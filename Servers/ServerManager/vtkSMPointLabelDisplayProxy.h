@@ -37,13 +37,17 @@ public:
 
   // Description:
   // Set the input. 
-  void SetInput (vtkSMSourceProxy* input);
+  void SetInput (vtkSMSourceProxy* input, unsigned int outputPort);
 
-  // Description:
-  // I have this funny looking AddInput instead of a simple
-  // SetInput as I want to have an InputProperty for the input (rather than
-  // a proxy property).
-  virtual void AddInput(vtkSMSourceProxy* input, const char*, int);
+  virtual void AddInput(unsigned int inputPort,
+                        vtkSMSourceProxy* input,
+                        unsigned int outputPort,
+                        const char* method);
+  virtual void AddInput(vtkSMSourceProxy* input,
+                        const char* method)
+  {
+    this->AddInput(0, input, 0, method);
+  }
 
   // Description:
   // This method updates the piece that has been assigned to this process.

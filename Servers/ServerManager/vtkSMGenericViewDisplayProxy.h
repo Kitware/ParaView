@@ -46,8 +46,15 @@ public:
   // Description:
   // Method gets called to set input when using Input property.
   // Internally leads to a call to SetInput.
-  virtual void AddInput(vtkSMSourceProxy* input, const char* method,
-    int hasMultipleInputs);
+  virtual void AddInput(unsigned int inputPort,
+                        vtkSMSourceProxy* input,
+                        unsigned int outputPort,
+                        const char* method);
+  virtual void AddInput(vtkSMSourceProxy* input,
+                        const char* method)
+  {
+    this->AddInput(0, input, 0, method);
+  }
 
   // Description:
   // Get the data that was collected to the client
@@ -98,7 +105,7 @@ protected:
 
   virtual void CreateVTKObjects();
 
-  void SetInput(vtkSMProxy* input);
+  void SetInput(vtkSMProxy* input, unsigned int outputPort);
 
   int UpdateRequiredFlag;
 

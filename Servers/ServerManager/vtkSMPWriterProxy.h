@@ -29,9 +29,10 @@ public:
   vtkTypeRevisionMacro(vtkSMPWriterProxy, vtkSMWriterProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  virtual void AddInput(vtkSMSourceProxy* input, 
-                const char* method,
-                int hasMultipleInputs);
+  virtual void AddInput(unsigned int inputPort,
+                        vtkSMSourceProxy* input, 
+                        unsigned int outputPort,
+                        const char* method);
 
   virtual void UpdatePipeline();
   virtual void UpdatePipeline(double time);

@@ -23,6 +23,10 @@
 #ifndef __vtkSMInputProperty_h
 #define __vtkSMInputProperty_h
 
+//BTX
+struct vtkSMInputPropertyInternals;
+//ETX
+
 #include "vtkSMProxyProperty.h"
 
 class VTK_EXPORT vtkSMInputProperty : public vtkSMProxyProperty
@@ -45,9 +49,68 @@ public:
   static int GetInputsUpdateImmediately();
   static void SetInputsUpdateImmediately(int up);
 
+  // Description:
+  // Add a proxy to the list of input proxies. The outputPort controls
+  // which outputPort will be used in connecting the pipeline.
+  // The proxy is added with corresponding Add and Set methods and
+  // can be removed with RemoveXXX() methods as usual.
+  int AddInputConnection(vtkSMProxy* proxy, 
+                         unsigned int outputPort,
+                         int modify);
+  int AddInputConnection(vtkSMProxy* proxy, 
+                         unsigned int outputPort)
+  {
+    return this->AddInputConnection(proxy, outputPort, 1);
+  }
+  int SetInputConnection(unsigned int idx, 
+                         vtkSMProxy* proxy, 
+                         unsigned int inputPort);
+  void AddUncheckedInputConnection(vtkSMProxy* proxy, 
+                                   unsigned int outputPort);
+  void SetUncheckedInputConnection(unsigned int idx, 
+                                   vtkSMProxy* proxy, 
+                                   unsigned int inputPort);
+
+  // Description:
+  // Overridden from superclass to also remove port. See superclass
+  // for documentation.
+  virtual void RemoveProxy(vtkSMProxy* proxy)
+  {
+    this->Superclass::RemoveProxy(proxy);
+  }
+  virtual unsigned int RemoveProxy(vtkSMProxy* proxy, int modify);
+  virtual unsigned int RemoveUncheckedProxy(vtkSMProxy* proxy);
+  virtual void RemoveAllUncheckedProxies();
+  virtual void RemoveAllProxies()
+  {
+    this->Superclass::RemoveAllProxies();
+  }
+
+  // Description:
+  // Given an index for a connection (proxy), returns which output port
+  // is used to connect the pipeline.
+  unsigned int GetOutputPortForConnection(unsigned int idx);
+  unsigned int GetUncheckedOutputPortForConnection(unsigned int idx);
+
 protected:
   vtkSMInputProperty();
   ~vtkSMInputProperty();
+
+  virtual void RemoveAllProxies(int modify);
+
+  unsigned int GetPreviousOutputPortForConnection(unsigned int idx);
+
+  // Description:
+  // Updates state from an XML element. Returns 0 on failure.
+  virtual int LoadState(vtkPVXMLElement* element, 
+    vtkSMStateLoaderBase* loader, int loadLastPushedValues=0);
+
+  // Description:
+  // Saves the state of the object in XML format. 
+  // if \c saveLastPushedValues is set, then the state includes
+  // the values that were last pushed on to the server. This is used for
+  // undo/redo state.
+  virtual void ChildSaveState(vtkPVXMLElement* parent, int saveLastPushedValues);
 
   //BTX
   // Description:
@@ -69,6 +132,8 @@ protected:
 
   int MultipleInput;
   int PortIndex;
+
+  vtkSMInputPropertyInternals* IPInternals;
   
   static int InputsUpdateImmediately;
 

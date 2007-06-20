@@ -26,7 +26,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.23");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.24");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -170,7 +170,8 @@ void vtkSMGenericViewDisplayProxy::SetReductionType(int type)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput)
+void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput, 
+                                            unsigned int outputPort)
 {
   vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(sinput);
   int num = 0;
@@ -206,7 +207,7 @@ void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput)
     ip = vtkSMInputProperty::SafeDownCast(
       this->ReduceProxy->GetProperty("Input"));
     ip->RemoveAllProxies();
-    ip->AddProxy(input);
+    ip->AddInputConnection(input, outputPort);
     this->ReduceProxy->UpdateVTKObjects();
 
     stream
@@ -231,7 +232,7 @@ void vtkSMGenericViewDisplayProxy::SetInput(vtkSMProxy* sinput)
     }
   else
     {
-    ip->AddProxy(input);
+    ip->AddInputConnection(input, outputPort);
     }
 
   this->CollectProxy->UpdateVTKObjects();
@@ -410,10 +411,12 @@ int vtkSMGenericViewDisplayProxy::UpdateRequired()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMGenericViewDisplayProxy::AddInput(vtkSMSourceProxy* input,
-  const char* vtkNotUsed(method), int vtkNotUsed(hasMultipleInputs))
+void  vtkSMGenericViewDisplayProxy::AddInput(unsigned int,
+                                             vtkSMSourceProxy* input,
+                                             unsigned int outputPort,
+                                             const char*)
 {
-  this->SetInput(input);
+  this->SetInput(input, outputPort);
 }
 //-----------------------------------------------------------------------------
 vtkDataObject* vtkSMGenericViewDisplayProxy::GetOutput()

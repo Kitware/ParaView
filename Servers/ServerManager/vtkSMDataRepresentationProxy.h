@@ -76,8 +76,15 @@ public:
   // vtkSMInputProperty requires that the consumer proxy support
   // AddInput() method. Hence, this method is defined. This method
   // sets up the input connection.
-  void AddInput(vtkSMSourceProxy* input, const char* method,
-    int hasMultipleInputs);
+  virtual void AddInput(unsigned int inputPort,
+                        vtkSMSourceProxy* input,
+                        unsigned int outputPort,
+                        const char* method);
+  virtual void AddInput(vtkSMSourceProxy* input,
+                        const char* method)
+  {
+    this->AddInput(0, input, 0, method);
+  }
 
   // Description:
   // Get the data information for the represented data.
@@ -222,6 +229,9 @@ protected:
   bool UseViewTimeForUpdate;
 
   vtkSMPropertyLink* ViewTimeLink;
+
+  unsigned int OutputPort;
+
 private:
   vtkSMDataRepresentationProxy(const vtkSMDataRepresentationProxy&); // Not implemented
   void operator=(const vtkSMDataRepresentationProxy&); // Not implemented

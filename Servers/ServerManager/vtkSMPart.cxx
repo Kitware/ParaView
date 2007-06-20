@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.31");
+vtkCxxRevisionMacro(vtkSMPart, "1.32");
 
 
 //----------------------------------------------------------------------------
@@ -36,7 +36,7 @@ vtkSMPart::vtkSMPart()
   this->ClassNameInformation = vtkPVClassNameInformation::New();
   this->DataInformation = vtkPVDataInformation::New();
   this->ClassNameInformationValid = 0;
-  this->DataInformationValid = 0;
+  this->DataInformationValid = false;
   this->PortIndex = 0;
 
   this->DataObjectProxy = 0;
@@ -121,7 +121,7 @@ vtkSMProxy* vtkSMPart::GetDataObjectProxy(int recheck)
 //----------------------------------------------------------------------------
 vtkPVDataInformation* vtkSMPart::GetDataInformation()
 {
-  if (this->DataInformationValid == 0)
+  if (!this->DataInformationValid)
     {
     this->GatherDataInformation();
     }
@@ -141,7 +141,7 @@ vtkPVClassNameInformation* vtkSMPart::GetClassNameInformation()
 //----------------------------------------------------------------------------
 void vtkSMPart::InvalidateDataInformation()
 {
-  this->DataInformationValid = 0;
+  this->DataInformationValid = false;
 }
 
 //----------------------------------------------------------------------------
@@ -155,14 +155,15 @@ void vtkSMPart::GatherDataInformation(int doUpdate)
     }
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
+  pm->SendPrepareProgress(this->ConnectionID);
+  this->DataInformation->Initialize();
   pm->GatherInformation(this->ConnectionID, this->Servers, 
                         this->DataInformation, this->GetID());
-
   if (doUpdate)
     {
-    this->DataInformationValid = 1;
+    this->DataInformationValid = true;
     }
+  pm->SendCleanupPendingProgress(this->ConnectionID);
 }
 
 //----------------------------------------------------------------------------

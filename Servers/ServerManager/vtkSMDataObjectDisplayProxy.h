@@ -49,7 +49,10 @@ public:
   // Description:
   // Method gets called to set input when using Input property.
   // Internally leads to a call to SetInput.
-  virtual void AddInput(vtkSMSourceProxy* input, const char*, int);
+  virtual void AddInput(unsigned int inputPort,
+                        vtkSMSourceProxy* input,
+                        unsigned int outputPort,
+                        const char* method);
 
   // Description:
   // Obtain the proxy for the algorithm that this displays the output of.
@@ -300,7 +303,8 @@ protected:
   vtkSMDataObjectDisplayProxy();
   ~vtkSMDataObjectDisplayProxy();
 
-  virtual void SetInputInternal(vtkSMSourceProxy* input);
+  virtual void SetInputInternal(vtkSMSourceProxy* input, 
+                                unsigned int outputPort);
 
   // Description:
   // Set up the PolyData rendering pipeline.
@@ -408,11 +412,11 @@ protected:
   void DetermineVolumeSupport();
 
   // convenience method to connect to proxies.
-  bool Connect(vtkSMProxy* consumer, vtkSMProxy* producer);
+  bool Connect(vtkSMProxy* consumer, vtkSMProxy* producer, int outputPort);
 
   // Description:
   // Connect the VTK data object to display pipeline.
-  void SetInput(vtkSMProxy* input);
+  void SetInput(vtkSMProxy* input, unsigned int outputPort);
 
   // Link used to link "ColorArray" from geometry mapper 
   // to "SelectScalarArray" on volume mappers.
