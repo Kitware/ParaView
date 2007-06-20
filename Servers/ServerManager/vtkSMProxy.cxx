@@ -37,7 +37,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.95.2.1");
+vtkCxxRevisionMacro(vtkSMProxy, "1.95.2.2");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -1867,7 +1867,7 @@ int vtkSMProxy::LoadState(vtkPVXMLElement* proxyElement,
       vtkSMProperty* property = this->GetProperty(prop_name);
       if (!property)
         {
-        vtkErrorMacro("Property " << prop_name<< " does not exist.");
+        vtkDebugMacro("Property " << prop_name<< " does not exist.");
         continue;
         }
       if (!property->LoadState(currentElement, loader))
