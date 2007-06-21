@@ -23,7 +23,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.18");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.19");
 
 struct vtkSMPQStateLoaderInternals
 {
@@ -42,6 +42,7 @@ vtkSMPQStateLoader::vtkSMPQStateLoader()
 //-----------------------------------------------------------------------------
 vtkSMPQStateLoader::~vtkSMPQStateLoader()
 {
+  this->SetRenderViewXMLName(0);
   delete this->PQInternal;
 }
 
