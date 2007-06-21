@@ -77,6 +77,7 @@ public:
   int DataSetTypeIsA(const char* type);
   vtkGetMacro(NumberOfPoints, vtkTypeInt64);
   vtkGetMacro(NumberOfCells, vtkTypeInt64);
+  vtkGetMacro(NumberOfRows, vtkTypeInt64);
   vtkGetMacro(MemorySize, int);
   vtkGetMacro(PolygonCount, int);
   vtkGetMacro(NumberOfDataSets, int);
@@ -147,6 +148,7 @@ protected:
   int            NumberOfDataSets;
   vtkTypeInt64   NumberOfPoints;
   vtkTypeInt64   NumberOfCells;
+  vtkTypeInt64   NumberOfRows;
   int            MemorySize;
   vtkIdType      PolygonCount;
   double         Bounds[6];
