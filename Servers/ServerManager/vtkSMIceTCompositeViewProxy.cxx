@@ -44,7 +44,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.9");
 
 vtkInformationKeyMacro(vtkSMIceTCompositeViewProxy, KD_TREE, ObjectBase);
 //----------------------------------------------------------------------------
@@ -56,7 +56,6 @@ vtkSMIceTCompositeViewProxy::vtkSMIceTCompositeViewProxy()
   this->KdTreeManager = 0;
 
   this->ImageReductionFactor = 1;
-  this->CompositeThreshold = 20.0;
 
   this->DisableOrderedCompositing  = 0;
 

@@ -35,8 +35,8 @@ public:
   // render with compositing.
   // NOTE: In client-server configurations, this implies remote-render
   // threshold.
-  vtkSetClampMacro(CompositeThreshold, double, 0, VTK_DOUBLE_MAX);
-  vtkGetMacro(CompositeThreshold, double);
+  vtkSetClampMacro(RemoteRenderThreshold, double, 0, VTK_DOUBLE_MAX);
+  vtkGetMacro(RemoteRenderThreshold, double);
 
 //BTX
 protected:
@@ -74,7 +74,7 @@ protected:
   // Render window shared on the server side.
   vtkClientServerID SharedRenderWindowID;
 
-  double CompositeThreshold;
+  double RemoteRenderThreshold;
   bool LastCompositingDecision;
 private:
   vtkSMMultiProcessRenderView(const vtkSMMultiProcessRenderView&); // Not implemented

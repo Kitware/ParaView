@@ -19,11 +19,11 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationStrategy.h"
 
-vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.1");
+vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.2");
 //----------------------------------------------------------------------------
 vtkSMMultiProcessRenderView::vtkSMMultiProcessRenderView()
 {
-  this->CompositeThreshold = 20.0;
+  this->RemoteRenderThreshold = 20.0;
   this->LastCompositingDecision = false;
 }
 
@@ -67,7 +67,7 @@ vtkSMRepresentationStrategy* vtkSMMultiProcessRenderView::NewStrategyInternal(
 bool vtkSMMultiProcessRenderView::GetCompositingDecision(
   unsigned long totalMemory, int vtkNotUsed(stillRender))
 {
-  if (static_cast<float>(totalMemory)/1000.0 < this->CompositeThreshold)
+  if (static_cast<float>(totalMemory)/1000.0 < this->RemoteRenderThreshold)
     {
     return false; // Local render.
     }
@@ -144,7 +144,7 @@ void vtkSMMultiProcessRenderView::SetUseCompositing(bool usecompositing)
 void vtkSMMultiProcessRenderView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "CompositeThreshold: " << this->CompositeThreshold << endl;
+  os << indent << "RemoteRenderThreshold: " << this->RemoteRenderThreshold << endl;
 }
 
 

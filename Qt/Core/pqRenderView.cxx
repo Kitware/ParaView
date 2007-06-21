@@ -268,7 +268,7 @@ void pqRenderView::setDefaultPropertyValues()
   vtkSMProxy* proxy = this->getProxy();
   pqSMAdaptor::setElementProperty(proxy->GetProperty("LODResolution"), 50);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("LODThreshold"), 5);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("CompositeThreshold"), 3);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("RemoteRenderThreshold"), 3);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("SquirtLevel"), 3);
 
   vtkSMProperty* backgroundProperty;
@@ -611,7 +611,7 @@ static const char* pqRenderViewModuleMiscSettings [] = {
   "LODThreshold",
   "LODResolution",
   "RenderInterruptsEnabled",
-  "CompositeThreshold",
+  "RemoteRenderThreshold",
   "ReductionFactor",
   "SquirtLevel",
   "OrderedCompositing",

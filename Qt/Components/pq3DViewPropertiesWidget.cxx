@@ -126,7 +126,7 @@ public:
 
   bool supportsCompositing(vtkSMProxy* proxy)
     {
-    return (proxy && proxy->GetProperty("CompositeThreshold"));
+    return (proxy && proxy->GetProperty("RemoteRenderThreshold"));
     }
 
   bool supportsClientServer(vtkSMProxy* proxy)
@@ -227,7 +227,7 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqRenderView* viewModule)
     this->noServerSettingsLabel->setVisible(false);
     this->compositingParameters->setVisible(true);
     val = pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("CompositeThreshold")).toDouble();
+      proxy->GetProperty("RemoteRenderThreshold")).toDouble();
     if (val >= VTK_LARGE_FLOAT)
       {
       this->enableCompositing->setCheckState(Qt::Unchecked);
@@ -389,13 +389,13 @@ void pq3DViewPropertiesWidgetInternal::accept()
     if (this->enableCompositing->checkState() == Qt::Checked)
       {
       pqSMAdaptor::setElementProperty(
-        renModule->GetProperty("CompositeThreshold"),
+        renModule->GetProperty("RemoteRenderThreshold"),
         this->compositeThreshold->value() / 10.0);
       }
     else
       {
       pqSMAdaptor::setElementProperty(
-        renModule->GetProperty("CompositeThreshold"), VTK_DOUBLE_MAX);
+        renModule->GetProperty("RemoteRenderThreshold"), VTK_DOUBLE_MAX);
       }
 
     if (renModule->GetProperty("DisableOrderedCompositing"))

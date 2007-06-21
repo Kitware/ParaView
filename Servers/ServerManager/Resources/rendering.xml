@@ -4387,8 +4387,8 @@
       </Documentation>
 
       <DoubleVectorProperty
-        name="CompositeThreshold"
-        command="SetCompositeThreshold"
+        name="RemoteRenderThreshold"
+        command="SetRemoteRenderThreshold"
         number_of_elements="1"
         default_values="20.0"
         update_self="1">
@@ -4489,8 +4489,8 @@
       </Documentation>
 
       <DoubleVectorProperty
-        name="CompositeThreshold"
-        command="SetCompositeThreshold"
+        name="RemoteRenderThreshold"
+        command="SetRemoteRenderThreshold"
         number_of_elements="1"
         default_values="20.0"
         update_self="1">
@@ -4593,8 +4593,8 @@
       </Documentation>
 
       <DoubleVectorProperty
-        name="CompositeThreshold"
-        command="SetCompositeThreshold"
+        name="RemoteRenderThreshold"
+        command="SetRemoteRenderThreshold"
         number_of_elements="1"
         default_values="20.0"
         update_self="1">
