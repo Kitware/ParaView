@@ -4943,6 +4943,7 @@
         </ExposedProperties>
       </SubProxy>
 
+      <!--
       <SubProxy>
         <Proxy name="SelectionRepresentation" 
           proxygroup="representations"
@@ -4977,6 +4978,7 @@
                     exposed_name="SelectionSpecularPower" />
         </ExposedProperties>
       </SubProxy>
+      -->
 
     <!-- End of SurfaceRepresentation -->
     </SurfaceRepresentationProxy>
@@ -5098,6 +5100,7 @@
         </ExposedProperties>
       </SubProxy>
 
+      <!--
       <SubProxy>
         <Proxy name="SelectionRepresentation" 
           proxygroup="representations"
@@ -5132,6 +5135,7 @@
                     exposed_name="SelectionSpecularPower" />
         </ExposedProperties>
       </SubProxy>
+      -->
 
     <!-- End of OutlineRepresentation -->
     </OutlineRepresentationProxy>
@@ -5219,6 +5223,7 @@
         </ExposedProperties>
       </SubProxy>
 
+      <!--
       <SubProxy>
         <Proxy name="SelectionRepresentation" 
           proxygroup="representations"
@@ -5253,7 +5258,7 @@
                     exposed_name="SelectionSpecularPower" />
         </ExposedProperties>
       </SubProxy>
-
+      -->
     <!-- End of UniformGridVolumeRepresentation -->
     </UniformGridVolumeRepresentationProxy>
 
@@ -5421,6 +5426,7 @@
         </ShareProperties>
       </SubProxy>
 
+      <!--
       <SubProxy>
         <Proxy name="SelectionRepresentation" 
           proxygroup="representations"
@@ -5455,6 +5461,7 @@
                     exposed_name="SelectionSpecularPower" />
         </ExposedProperties>
       </SubProxy>
+      -->
 
       <!-- End of UnstructuredGridVolumeRepresentation -->
     </UnstructuredGridVolumeRepresentationProxy>
