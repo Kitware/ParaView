@@ -26,7 +26,9 @@
 #include "vtkFloatArray.h"
 #include "vtkIdTypeArray.h"
 #include "vtkImageWriter.h"
+#include "vtkInformationDoubleKey.h"
 #include "vtkInformation.h"
+#include "vtkInformationIntegerKey.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModuleConnectionManager.h"
@@ -54,8 +56,6 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
-#include "vtkInformation.h"
-#include "vtkInformationIntegerKey.h"
 
 #include "vtkSMClientServerRenderModuleProxy.h"
 
@@ -82,7 +82,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.17");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_LOD, Integer);
@@ -90,6 +90,7 @@ vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_COMPOSITING, Integer);
 vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_ORDERED_COMPOSITING, Integer);
 vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_CACHE, Integer);
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
+vtkInformationKeyMacro(vtkSMRenderViewProxy, CACHE_TIME, Double);
 
 //-----------------------------------------------------------------------------
 vtkSMRenderViewProxy::vtkSMRenderViewProxy()
@@ -125,9 +126,10 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
 
   this->SetUseLOD(false);
   this->SetLODResolution(50);
-  this->Information->Set(USE_CACHE(), 0);
   this->Information->Set(USE_ORDERED_COMPOSITING(), 0);
   this->Information->Set(USE_COMPOSITING(), 0);
+  this->Information->Set(USE_CACHE(), 0);
+  this->Information->Set(CACHE_TIME(), 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -209,6 +211,18 @@ vtkSMRenderViewProxy::GetOpenGLExtensionsInformation()
     this->RenderWindowProxy->GetID());
     */
   return this->OpenGLExtensionsInformation;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::SetCacheTime(double time)
+{
+  this->Information->Set(CACHE_TIME(), time);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::SetEnableCache(int usecache)
+{
+  this->Information->Set(USE_CACHE(), usecache);
 }
 
 //-----------------------------------------------------------------------------

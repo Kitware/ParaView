@@ -18,6 +18,7 @@
 #include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
 #include "vtkInformation.h"
+#include "vtkInformationDoubleKey.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
@@ -121,7 +122,7 @@ void vtkSMViewProxy::CleanMultiViewInitializer()
 }
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMViewProxy::vtkSMViewProxy()
 {
@@ -142,6 +143,8 @@ vtkSMViewProxy::vtkSMViewProxy()
   this->ForceRepresentationUpdate = false;
 
   this->DefaultRepresentationName = 0;
+  this->ViewUpdateTime = 0;
+  this->ViewUpdateTimeInitialized = false;
 }
 
 //----------------------------------------------------------------------------
@@ -160,6 +163,30 @@ vtkSMViewProxy::~vtkSMViewProxy()
 
   this->Information->Clear();
   this->Information->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewProxy::SetViewUpdateTime(double time)
+{
+  if (!this->ViewUpdateTimeInitialized || this->ViewUpdateTime != time)
+    {
+    this->ViewUpdateTimeInitialized = true;
+    this->ViewUpdateTime = time;
+
+    // Send the view update time to all representations.
+    vtkSmartPointer<vtkCollectionIterator> iter;
+    iter.TakeReference(this->Representations->NewIterator());
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); 
+      iter->GoToNextItem())
+      {
+      vtkSMRepresentationProxy* repr = 
+        vtkSMRepresentationProxy::SafeDownCast(iter->GetCurrentObject());
+      if (repr)
+        {
+        repr->SetViewUpdateTime(time);
+        }
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -242,6 +269,12 @@ void vtkSMViewProxy::AddRepresentationInternal(vtkSMRepresentationProxy* repr)
   repr->AddObserver(vtkCommand::EndEvent, this->Observer);
 
   // repr->AddObserver(vtkCommand::SelectionChanged, this->Observer);
+
+  // Pass the view update time to the representation.
+  if (this->ViewUpdateTimeInitialized)
+    {
+    repr->SetViewUpdateTime(this->ViewUpdateTime);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -532,6 +565,7 @@ void vtkSMViewProxy::PrintSelf(ostream& os, vtkIndent indent)
     << this->GUISize[0] << ", " << this->GUISize[1] << endl;
   os << indent << "ViewPosition: " 
     << this->ViewPosition[0] << ", " << this->ViewPosition[1] << endl;
+  os << indent << "ViewUpdateTime: " << this->ViewUpdateTime << endl;
 }
 
 

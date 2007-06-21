@@ -114,6 +114,15 @@ public:
   // Don't call this directly, it is called by the View.
   virtual void SetViewInformation(vtkInformation*);
   vtkGetObjectMacro(ViewInformation, vtkInformation);
+
+  // Description:
+  // Called by the view to pass the view's update time to the representation.
+  virtual void SetViewUpdateTime(double time)
+    {
+    this->ViewUpdateTimeInitialized = true;
+    this->ViewUpdateTime = time;
+    }
+  vtkGetMacro(ViewUpdateTime, double);
 protected:
   vtkSMRepresentationProxy();
   ~vtkSMRepresentationProxy();
@@ -148,6 +157,8 @@ protected:
   vtkSetMacro(SelectionSupported, bool);
 
   vtkInformation* ViewInformation;
+  double ViewUpdateTime;
+  bool ViewUpdateTimeInitialized;
 
   friend class vtkSMPVRepresentationProxy;
 private:

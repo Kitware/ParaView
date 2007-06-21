@@ -54,7 +54,7 @@ protected:
 };
 
 
-vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.7");
 vtkCxxSetObjectMacro(vtkSMDataRepresentationProxy, InputProxy, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMDataRepresentationProxy::vtkSMDataRepresentationProxy()
@@ -65,12 +65,10 @@ vtkSMDataRepresentationProxy::vtkSMDataRepresentationProxy()
   this->UpdateTime = 0.0;
   this->UpdateTimeInitialized = false;
 
-  this->UseViewTimeForUpdate = false;
+  this->UseViewUpdateTime = true;
 
   this->Observer = vtkSMDataRepresentationProxyObserver::New();
   this->Observer->SetTarget(this);
-
-  this->ViewTimeLink = vtkSMPropertyLink::New();
 
   this->OutputPort = 0;
 }
@@ -78,9 +76,6 @@ vtkSMDataRepresentationProxy::vtkSMDataRepresentationProxy()
 //----------------------------------------------------------------------------
 vtkSMDataRepresentationProxy::~vtkSMDataRepresentationProxy()
 {
-  this->ViewTimeLink->RemoveAllLinks();
-  this->ViewTimeLink->Delete();
-
   this->SetInputProxy(0);
 
   delete this->RepresentationStrategies;
@@ -132,11 +127,6 @@ bool vtkSMDataRepresentationProxy::AddToView(vtkSMViewProxy* view)
     return false;
     }
 
-  // Link with view time.
-  if (vtkSMProperty* prop = view->GetProperty("ViewTime"))
-    {
-    this->ViewTimeLink->AddLinkedProperty(prop, vtkSMLink::INPUT);
-    }
   return true;
 }
 
@@ -155,11 +145,6 @@ bool vtkSMDataRepresentationProxy::BeginCreateVTKObjects()
 //----------------------------------------------------------------------------
 bool vtkSMDataRepresentationProxy::EndCreateVTKObjects()
 {
-  if (vtkSMProperty* prop = this->GetProperty("UpdateTime"))
-    {
-    this->ViewTimeLink->AddLinkedProperty(prop, vtkSMLink::OUTPUT);
-    }
-
   return this->Superclass::EndCreateVTKObjects();
 }
 
@@ -258,15 +243,29 @@ vtkPVDataInformation* vtkSMDataRepresentationProxy::GetFullResDataInformation()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMDataRepresentationProxy::SetUseViewTimeForUpdate(bool val)
+void vtkSMDataRepresentationProxy::SetUseViewUpdateTime(bool val)
 {
-  if (val == this->UseViewTimeForUpdate)
+  if (val == this->UseViewUpdateTime)
     {
     return;
     }
 
-  this->UseViewTimeForUpdate = val;
-  this->ViewTimeLink->SetEnabled(val);
+  this->UseViewUpdateTime = val;
+
+  if (this->ViewUpdateTimeInitialized)
+    {
+    this->SetUpdateTimeInternal(this->ViewUpdateTime);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMDataRepresentationProxy::SetViewUpdateTime(double time)
+{
+  this->Superclass::SetViewUpdateTime(time);
+  if (this->UseViewUpdateTime)
+    {
+    this->SetUpdateTimeInternal(this->ViewUpdateTime);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -274,7 +273,15 @@ void vtkSMDataRepresentationProxy::SetUpdateTime(double time)
 {
   this->UpdateTimeInitialized = true;
   this->UpdateTime = time;
+  if (!this->UseViewUpdateTime)
+    {
+    this->SetUpdateTimeInternal(time);
+    }
+}
 
+//----------------------------------------------------------------------------
+void vtkSMDataRepresentationProxy::SetUpdateTimeInternal(double time)
+{
   vtkSMRepresentationStrategyVector::iterator iter;
   for (iter = this->RepresentationStrategies->begin(); 
     iter != this->RepresentationStrategies->end(); ++iter)
@@ -323,6 +330,11 @@ void vtkSMDataRepresentationProxy::AddStrategy(
     // This will propagate the update time to the newly added strategy.
     this->SetUpdateTime(this->UpdateTime);
     }
+  if (this->ViewUpdateTimeInitialized)
+    {
+    // This will propagate the update time to the newly added strategy.
+    this->SetViewUpdateTime(this->ViewUpdateTime);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -347,7 +359,7 @@ void vtkSMDataRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)
 void vtkSMDataRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "UseViewTimeForUpdate: " << this->UseViewTimeForUpdate
+  os << indent << "UseViewUpdateTime: " << this->UseViewUpdateTime
     << endl;
 }
 

@@ -4109,19 +4109,6 @@
   </ProxyGroup>
 
   <ProxyGroup name="newviews">
-
-    <MultiViewFactory name="MultiViewFactory">
-      <Documentation>
-        Factory used to create mutiple render views.
-      </Documentation>
-      <ProxyProperty
-        name="RenderViews"
-        update_self="1"
-        command="AddRenderView"
-        remove_command="RemoveRenderView">
-      </ProxyProperty>
-    </MultiViewFactory>
-
     <Proxy name="ViewBase">
       <Documentation>
         Defines common API for all views.
@@ -4166,7 +4153,10 @@
 
       <DoubleVectorProperty
         name="ViewTime"
+        command="SetViewUpdateTime"
+        update_self="1"
         number_of_elements="1"
+        immediate_update="1"
         default_values="none">
         <DoubleRangeDomain name="range"/>
         <Documentation>
@@ -4594,6 +4584,67 @@
 
       <!-- End of IceTDesktopRenderView -->
     </IceTDesktopRenderViewProxy>
+
+    <ClientServerRenderViewProxy name="ClientServerRenderView"
+      base_proxygroup="newviews" base_proxyname="RenderViewBase">
+      <Documentation>
+        Render View with client delivery mechanism. Does not support paralle
+        rendering.
+      </Documentation>
+
+      <DoubleVectorProperty
+        name="CompositeThreshold"
+        command="SetCompositeThreshold"
+        number_of_elements="1"
+        default_values="20.0"
+        update_self="1">
+        <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+           The threshold used to determine if the compositing should be used
+           for rendering. This may alternatively thought as the remote render
+           threshold, since when ever we use compositing, we render on the
+           server.
+        </Documentation>
+      </DoubleVectorProperty>
+     
+      <IntVectorProperty
+        name="SquirtLevel"
+        command="SetSquirtLevel"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <IntRangeDomain name="range" min="0" max="7" />
+        <Documentation>
+          Set the level for squirt compression to use when delivering rendered
+          image to the client during interactive rendering.
+        </Documentation>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="Renderer" proxyname="Renderer" proxygroup="renderers">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Background" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="RenderWindow" proxyname="RenderWindow" proxygroup="renderwindow">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="RenderWindowSizeInfo" />
+          <Property name="RenderWindowSize" exposed_name="ViewSize" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="RenderSyncManager" proxygroup="composite_managers"
+          proxyname="DesktopDeliveryClient">
+        </Proxy>
+      </SubProxy>
+
+      <!-- End of ClientServerRenderView-->
+    </ClientServerRenderViewProxy>
 
     <!-- End if group "newviews" -->
   </ProxyGroup>

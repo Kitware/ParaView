@@ -125,14 +125,19 @@ public:
   // Set the time used during update requests.
   // Default implementation passes the time to the strategy, if any. If
   // subclasses don't use any stratgy, they may want to override this method.
+  // The representation should respect the update time set only when 
+  // UseViewUpdateTime is false. If UseViewUpdateTime is true, then the
+  // representation's UpdateTime is ignored, instead the ViewUpdateTime passed
+  // on by the view is used.
   virtual void SetUpdateTime(double time);
 
   // Description:
-  // When set to true, the UpdateTime for this representation is linked to the
-  // ViewTime for the view to which this representation is added (default
-  // behaviour). Otherwise the update time is independent of the ViewTime.
-  void SetUseViewTimeForUpdate(bool);
-  vtkGetMacro(UseViewTimeForUpdate, bool);
+  // When set to true, the view's ViewUpdateTime is used to determine the update
+  // time for the representation (default behaviour). If set to false,
+  // UpdateTime (set using SetUpdateTime()) is used.
+  // Default implementation passes the status of this flag to all strategies.
+  void SetUseViewUpdateTime(bool);
+  vtkGetMacro(UseViewUpdateTime, bool);
 
   // Description:
   // Overridden to make the Strategy modified as well.
@@ -180,6 +185,11 @@ public:
     CELL_DATA  =1,
     FIELD_DATA =2
     };
+
+  // Description:
+  // Called by the view to pass the view's update time to the representation.
+  virtual void SetViewUpdateTime(double time);
+
 protected:
   vtkSMDataRepresentationProxy();
   ~vtkSMDataRepresentationProxy();
@@ -225,14 +235,17 @@ protected:
   // Returns the observer.
   vtkCommand* GetObserver();
 
+  // Description:
+  // Pass the actual update time to use to all strategies.
+  virtual void SetUpdateTimeInternal(double time);
+
   // These are the representation strategies used for data display. 
   vtkSMRepresentationStrategyVector* RepresentationStrategies;
 
   double UpdateTime;
   bool UpdateTimeInitialized;
-  bool UseViewTimeForUpdate;
 
-  vtkSMPropertyLink* ViewTimeLink;
+  bool UseViewUpdateTime;
 
   unsigned int OutputPort;
 

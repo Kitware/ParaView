@@ -23,8 +23,11 @@
 #include "vtkPVServerInformation.h"
 #include "vtkSMIntVectorProperty.h"
 
+#ifndef PV_IMPLEMENT_CLIENT_SERVER_WO_ICET
 vtkStandardNewMacro(vtkSMIceTDesktopRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.6");
+#endif
+
 //----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderViewProxy::vtkSMIceTDesktopRenderViewProxy()
 {
@@ -139,10 +142,6 @@ bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects()
   this->RenderSyncManager->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER_ROOT);
 
-  // This class does not use a separate multi-view manager. That is done by
-  // RenderSyncManager itself.
-  this->MultiViewManager = 0;
-
   // We need to create vtkIceTRenderer on the server side and vtkRenderer on
   // the client.
   this->RendererProxy->SetServers(vtkProcessModule::CLIENT);
@@ -175,15 +174,18 @@ void vtkSMIceTDesktopRenderViewProxy::InitializeRenderSyncManager()
   vtkClientServerStream stream;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  // RenderSyncManager needs the parallel render manager on the server side to
-  // pass parameters to the parallel render manager.
-  stream  << vtkClientServerStream::Invoke
-          << this->RenderSyncManager->GetID()
-          << "SetParallelRenderManager"
-          << this->ParallelRenderManager->GetID()
-          << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, 
-    vtkProcessModule::RENDER_SERVER_ROOT, stream);
+  if (this->GetSubProxy("ParallelRenderManager"))
+    {
+    // RenderSyncManager needs the parallel render manager on the server side to
+    // pass parameters to the parallel render manager.
+    stream  << vtkClientServerStream::Invoke
+            << this->RenderSyncManager->GetID()
+            << "SetParallelRenderManager"
+            << this->GetSubProxy("ParallelRenderManager")->GetID()
+            << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, 
+      vtkProcessModule::RENDER_SERVER_ROOT, stream);
+    }
 
   // Synchronize the environment among all the render server nodes.
   vtkPVServerInformation* serverInfo = pm->GetServerInformation(this->ConnectionID);

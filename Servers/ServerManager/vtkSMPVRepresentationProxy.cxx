@@ -35,7 +35,7 @@ inline void vtkSMPVRepresentationProxySetInt(
 }
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -269,24 +269,40 @@ bool vtkSMPVRepresentationProxy::UpdateRequired()
 //----------------------------------------------------------------------------
 void vtkSMPVRepresentationProxy::SetUpdateTime(double time)
 {
-  if (this->ActiveRepresentation)
-    {
-    this->ActiveRepresentation->SetUpdateTime(time);
-    }
-
   this->Superclass::SetUpdateTime(time);
+  this->SurfaceRepresentation->SetUpdateTime(time);
+  this->OutlineRepresentation->SetUpdateTime(time);
+  if (this->VolumeRepresentation)
+    {
+    this->VolumeRepresentation->SetUpdateTime(time);
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPVRepresentationProxy::SetUseViewTimeForUpdate(bool use)
+void vtkSMPVRepresentationProxy::SetUseViewUpdateTime(bool use)
 {
-  if (this->ActiveRepresentation)
-    {
-    this->ActiveRepresentation->SetUseViewTimeForUpdate(use);
-    }
+  this->Superclass::SetUseViewUpdateTime(use);
 
-  this->Superclass::SetUseViewTimeForUpdate(use);
+  this->SurfaceRepresentation->SetUseViewUpdateTime(use);
+  this->OutlineRepresentation->SetUseViewUpdateTime(use);
+  if (this->VolumeRepresentation)
+    {
+    this->VolumeRepresentation->SetUseViewUpdateTime(use);
+    }
 }
+
+//----------------------------------------------------------------------------
+void vtkSMPVRepresentationProxy::SetViewUpdateTime(double time)
+{
+  this->Superclass::SetViewUpdateTime(time);
+  this->SurfaceRepresentation->SetViewUpdateTime(time);
+  this->OutlineRepresentation->SetViewUpdateTime(time);
+  if (this->VolumeRepresentation)
+    {
+    this->VolumeRepresentation->SetViewUpdateTime(time);
+    }
+}
+
 
 //----------------------------------------------------------------------------
 void vtkSMPVRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)

@@ -21,16 +21,16 @@
 #ifndef __vtkSMIceTCompositeViewProxy_h
 #define __vtkSMIceTCompositeViewProxy_h
 
-#include "vtkSMRenderViewProxy.h"
+#include "vtkSMMultiProcessRenderView.h"
 
 class vtkInformationObjectBaseKey;
 class vtkSMRepresentationStrategyVector;
 
-class VTK_EXPORT vtkSMIceTCompositeViewProxy : public vtkSMRenderViewProxy
+class VTK_EXPORT vtkSMIceTCompositeViewProxy : public vtkSMMultiProcessRenderView
 {
 public:
   static vtkSMIceTCompositeViewProxy* New();
-  vtkTypeRevisionMacro(vtkSMIceTCompositeViewProxy, vtkSMRenderViewProxy);
+  vtkTypeRevisionMacro(vtkSMIceTCompositeViewProxy, vtkSMMultiProcessRenderView);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -49,13 +49,6 @@ public:
   // Set the view size.
   // Default implementation passes the size to the MultiViewManager.
   virtual void SetViewSize(int width, int height);
-
-  // Description:
-  // Get/Set the threshold used to determine if the compositing should be used
-  // for rendering. In client-server views, this typically implies remote
-  // render with compositing.
-  vtkSetClampMacro(CompositeThreshold, double, 0, VTK_DOUBLE_MAX);
-  vtkGetMacro(CompositeThreshold, double);
 
   // Description:
   // Get/Set the image reduction factor used for compositing parallel images in
@@ -85,12 +78,6 @@ protected:
   virtual void EndCreateVTKObjects();
 
   // Description:
-  // Creates a new vtkSMRepresentationStrategy subclass based on the type
-  // requested.
-  virtual vtkSMRepresentationStrategy* NewStrategyInternal(
-    int dataType);
-
-  // Description:
   // Called by RemoveRepresentation(). Subclasses can override to remove 
   // observers etc.
   virtual void RemoveRepresentationInternal(vtkSMRepresentationProxy* rep);
@@ -112,13 +99,6 @@ protected:
   // Default implementation is empty.
   virtual void InitializeForMultiView(vtkSMViewProxy* otherView);
 
-  // Indicates if we should render using compositing.
-  // Returns true if compositing should be used, otherwise false.
-  // Flag stillRender is set when this decision is to be made during StillRender
-  // else it's 0 (for InteractiveRender);
-  virtual bool GetCompositingDecision(
-    unsigned long totalMemory, int stillRender);
-
   // Description:
   // Pass compositing decision to the parallel render manager and the view
   // helper.
@@ -139,7 +119,6 @@ protected:
   // Pass ordered compositing decision to all strategies.
   void SetOrderedCompositingDecision(bool decision);
 
-
   // Manager used for multiview.
   vtkSMProxy* MultiViewManager;
   vtkClientServerID SharedMultiViewManagerID;
@@ -154,17 +133,10 @@ protected:
   // Used to generate the KdTree.
   vtkSMProxy* KdTreeManager;
 
-  // Render window shared on the server side.
-  vtkClientServerID SharedRenderWindowID;
-
   // Reduction factor used for compositing when using interactive render.
   int ImageReductionFactor;
 
   int DisableOrderedCompositing;
-
-  double CompositeThreshold;
-
-  bool LastCompositingDecision;
   bool LastOrderedCompositingDecision;
 
   // These need to initialized for IceT rendering. However, this class does not

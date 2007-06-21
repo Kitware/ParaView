@@ -121,6 +121,13 @@ public:
   // Returns a new proxy.
   virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy*);
 
+  // Description:
+  // Every view has a update time i.e. a time to which all the representations
+  // in it will be updated to (ofcourse, every representation has flags on it
+  // to avoid using the view's update time).
+  void SetViewUpdateTime(double time);
+  vtkGetMacro(ViewUpdateTime, double);
+
 //BTX
 protected:
   vtkSMViewProxy();
@@ -272,6 +279,9 @@ private:
   bool FullResDataSizeValid;
 
   bool ForceRepresentationUpdate;
+
+  double ViewUpdateTime;
+  bool ViewUpdateTimeInitialized;
 //ETX
 };
 

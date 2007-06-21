@@ -26,6 +26,7 @@
 class vtkCamera;
 class vtkCollection;
 class vtkImageData;
+class vtkInformationDoubleKey;
 class vtkInformationIntegerKey;
 class vtkPVClientServerIdCollectionInformation;
 class vtkPVGenericRenderWindowInteractor;
@@ -50,10 +51,11 @@ public:
   // Description:
   // Keys used to specify view rendering requirements.
   static vtkInformationIntegerKey* USE_LOD();
+  static vtkInformationIntegerKey* LOD_RESOLUTION();
   static vtkInformationIntegerKey* USE_COMPOSITING();
   static vtkInformationIntegerKey* USE_ORDERED_COMPOSITING();
   static vtkInformationIntegerKey* USE_CACHE();
-  static vtkInformationIntegerKey* LOD_RESOLUTION();
+  static vtkInformationDoubleKey* CACHE_TIME();
   
   // Description:
   // Callback for the immediate mode rendering check button
@@ -189,6 +191,17 @@ public:
   vtkSetMacro(CacheLimit, int);
 
   // Description:
+  // When caching is enabled (typically, when playing animations,
+  // this time must be updated when each frame is changed.
+  void SetCacheTime(double time);
+  vtkGetMacro(CacheTime, double);
+
+  // Description:
+  // Set/get whether cached geometry should be used whenever possible.
+  void SetEnableCache(int);
+  vtkGetMacro(EnableCache, int);
+
+  // Description:
   // Methods called by Representation proxies to add/remove the
   // actor proxies to appropriate renderer.
   // Avoid calling these methods directly outside representation proxies.
@@ -321,7 +334,10 @@ protected:
   vtkIdType AveragePolygonsPerSecondCount;
   void CalculatePolygonsPerSecond(double time);
   int MeasurePolygonsPerSecond;
+
   int CacheLimit; // in KiloBytes.
+  double CacheTime;
+  int EnableCache;
 
   // Description:
   // Get the number of polygons this render module is rendering

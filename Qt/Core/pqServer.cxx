@@ -167,6 +167,8 @@ void pqServer::initializeRenderViewType()
       {
       if (this->Options->GetTileDimensions()[0] )
         {
+        // FIXME: 
+        qCritical() << "No render view proxy for tile displays yet!";
         renderViewName = "IceTRenderModule";
         }
       else if(this->Options->GetClientMode())
@@ -174,13 +176,11 @@ void pqServer::initializeRenderViewType()
         renderViewName = "IceTDesktopRenderView";
         }
       } 
-    else if(server_info) // && !server_info->GetUseIceT().
+    else if(server_info && !server_info->GetUseIceT())
       {
-      /* FIXME No non-iceT client-server view.
       // This fallback render module does not handle parallel rendering or tile
       // display, but it will handle remote serial rendering and multiple views.
-      renderViewName = "ClientServerRenderModule";
-      */
+      renderViewName = "ClientServerRenderView";
       }
     }
   if (!renderViewName)

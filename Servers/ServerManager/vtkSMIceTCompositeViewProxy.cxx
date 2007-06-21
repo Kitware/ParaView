@@ -17,7 +17,6 @@
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
-#include "vtkIceTRenderManager.h"
 #include "vtkInformation.h"
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkObjectFactory.h"
@@ -33,10 +32,19 @@
 #include "vtkSMSimpleParallelStrategy.h"
 #include "vtkSMSourceProxy.h"
 
+#include "vtkPVConfig.h" // for PARAVIEW_USE_ICE_T
+#include "vtkToolkits.h" // for VTK_USE_MPI
+
+#ifdef VTK_USE_MPI 
+# ifdef PARAVIEW_USE_ICE_T
+#   include "vtkIceTRenderManager.h"
+# endif
+#endif
+
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.8");
 
 vtkInformationKeyMacro(vtkSMIceTCompositeViewProxy, KD_TREE, ObjectBase);
 //----------------------------------------------------------------------------
@@ -387,79 +395,18 @@ void vtkSMIceTCompositeViewProxy::SetViewSize(int x, int y)
     }
 }
 
-//-----------------------------------------------------------------------------
-vtkSMRepresentationStrategy* vtkSMIceTCompositeViewProxy::NewStrategyInternal(
-  int dataType)
-{
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  vtkSMRepresentationStrategy* strategy = 0;
-
-  if (dataType == VTK_POLY_DATA)
-    {
-    strategy = vtkSMRepresentationStrategy::SafeDownCast(
-      pxm->NewProxy("strategies", "PolyDataParallelStrategy"));
-    }
-  else if (dataType == VTK_UNIFORM_GRID)
-    {
-    strategy = vtkSMRepresentationStrategy::SafeDownCast(
-      pxm->NewProxy("strategies", "UniformGridParallelStrategy"));
-    }
-  else if (dataType == VTK_UNSTRUCTURED_GRID)
-    {
-    strategy = vtkSMRepresentationStrategy::SafeDownCast(
-      pxm->NewProxy("strategies", "UnstructuredGridParallelStrategy"));
-    }
-  else
-    {
-    vtkWarningMacro("This view does not provide a suitable strategy for "
-      << dataType);
-    }
-
-  return strategy;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMIceTCompositeViewProxy::GetCompositingDecision(
-  unsigned long totalMemory, int vtkNotUsed(stillRender))
-{
-  if (static_cast<float>(totalMemory)/1000.0 < this->CompositeThreshold)
-    {
-    return false; // Local render.
-    }
-
-  return true;
-
-}
-
 //----------------------------------------------------------------------------
 void vtkSMIceTCompositeViewProxy::BeginStillRender()
 {
-  // When BeginStillRender() is called, we are assured that
-  // UpdateAllRepresentations() has been called ensuring that all representation
-  // pipelines are up-to-date. Since the representation strategies gurantee that
-  // the full-res pipelines are always updated, we don't have to worry about
-  // whether LOD is enabled when the UpdateAllRepresentations() was called.
- 
-  // Find out whether we are going to render with or without compositing.
-  // We use the full res data size for this decision.
-  this->LastCompositingDecision = 
-    this->GetCompositingDecision(this->GetVisibileFullResDataSize(), 1);
-
-  // If the collection decision has changed our representation pipelines may be
-  // out of date. Hence, we tell the superclass to update representations once
-  // again prior to performing the render.
-  // TODO: call this method only if the collection decision really changed.
-  this->SetForceRepresentationUpdate(true);
+  // Let the superclass decide if we are using compositing at all.
+  this->Superclass::BeginStillRender();
 
   // Turn off image reduction factor, since we don't use any image reduction
   // will doing still renders.
   this->SetImageReductionFactorInternal(1);
-  this->SetUseCompositing(this->LastCompositingDecision);
 
   // Update ordered compositing tree.
   this->UpdateOrderedCompositingPipeline();
-
-  this->Superclass::BeginStillRender();
 }
 
 //----------------------------------------------------------------------------
@@ -469,34 +416,14 @@ void vtkSMIceTCompositeViewProxy::BeginInteractiveRender()
   // UpdateAllRepresentations() has been called.
 
   // Give the superclass a chance to decide if it wants to use LOD or not.
+  // Let the superclass decide if we are using compositing at all.
   this->Superclass::BeginInteractiveRender();
-
-  // Update all representations prior to using their datasizes to determine if
-  // compositing should be used. This is necessary since if LOD decision changed
-  // from false to true, then, the LOD pipelines will be invalid and we need to
-  // use the LOD data information for the collection decision.
-  if (this->GetForceRepresentationUpdate())
-    {
-    this->SetForceRepresentationUpdate(false);
-    this->UpdateAllRepresentations();
-    }
-
-  this->LastCompositingDecision = 
-    this->GetCompositingDecision(this->GetVisibleDisplayedDataSize(), 0);
-
-  // If the collection decision has changed our representation pipelines may be
-  // out of date. Hence, we tell the superclass to update representations once
-  // again prior to performing the render.
-  // TODO: call this method only if the collection decision really changed.
-  this->SetForceRepresentationUpdate(true);
 
   if (this->LastCompositingDecision)
     {
     // Set the user-specified image reduction factor to use for compositing.
     this->SetImageReductionFactorInternal(this->ImageReductionFactor);
     }
-
-  this->SetUseCompositing(this->LastCompositingDecision);
 }
 
 //----------------------------------------------------------------------------
@@ -522,9 +449,7 @@ void vtkSMIceTCompositeViewProxy::SetUseCompositing(bool usecompositing)
     this->ParallelRenderManager->UpdateProperty("UseCompositing");
     } 
 
-  // Update the view information so that all representations/strategies will be
-  // made aware of the new UseCompositing state.
-  this->Information->Set(USE_COMPOSITING(), usecompositing? 1: 0);
+  this->Superclass::SetUseCompositing(usecompositing);
 }
 
 //----------------------------------------------------------------------------
@@ -631,6 +556,9 @@ void vtkSMIceTCompositeViewProxy::SetOrderedCompositingDecision(bool decision)
     }
   this->LastOrderedCompositingDecision = decision;
 
+
+#ifdef VTK_USE_MPI 
+# ifdef PARAVIEW_USE_ICE_T
   // Cannot do this with the server manager because this method only
   // exists on the render server, not the client.
   vtkClientServerStream stream;
@@ -641,6 +569,8 @@ void vtkSMIceTCompositeViewProxy::SetOrderedCompositingDecision(bool decision)
           << vtkClientServerStream::End;
   vtkProcessModule::GetProcessModule()->SendStream(
     this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
+# endif
+#endif
 }
 
 //----------------------------------------------------------------------------
