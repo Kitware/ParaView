@@ -35,7 +35,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.13");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -364,6 +364,7 @@ void vtkSMSurfaceRepresentationProxy::UpdateShadingParameters()
 void vtkSMSurfaceRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Prop3D: " << this->Prop3D << endl;
 }
 
 

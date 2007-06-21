@@ -44,7 +44,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.10");
 
 vtkInformationKeyMacro(vtkSMIceTCompositeViewProxy, KD_TREE, ObjectBase);
 //----------------------------------------------------------------------------
@@ -596,6 +596,8 @@ void vtkSMIceTCompositeViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "ImageReductionFactor: " << this->ImageReductionFactor << endl;
+  os << indent << "DisableOrderedCompositing: " 
+    << this->DisableOrderedCompositing << endl;
 }
 
 

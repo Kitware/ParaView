@@ -22,7 +22,7 @@
 #include <vtkstd/map>
 #include "vtkStdString.h"
 
-vtkCxxRevisionMacro(vtkSMDomain, "1.12");
+vtkCxxRevisionMacro(vtkSMDomain, "1.13");
 
 struct vtkSMDomainInternals
 {
@@ -178,4 +178,5 @@ void vtkSMDomain::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "XMLName: " << (this->XMLName ? this->XMLName : "(null)") 
      << endl;
+  os << indent << "IsOptional: " << this->IsOptional << endl;
 }

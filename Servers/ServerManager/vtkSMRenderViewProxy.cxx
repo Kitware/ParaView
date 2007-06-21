@@ -82,7 +82,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.18");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_LOD, Integer);
@@ -1552,11 +1552,17 @@ void vtkSMRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "RenderInterruptsEnabled: " << this->RenderInterruptsEnabled 
     << endl;
-  os << indent << "Renderer: " << this->Renderer << endl;
-  os << indent << "Renderer2D: " << this->Renderer2D << endl;
-  os << indent << "RenderWindow: " << this->RenderWindow << endl;
-  os << indent << "Interactor: " << this->Interactor << endl;
   os << indent << "ActiveCamera: " << this->ActiveCamera << endl;
+  os << indent << "CacheLimit: " << this->CacheLimit << endl;
+  os << indent << "CacheTime: " << this->CacheTime << endl;
+  os << indent << "EnableCache: " << this->EnableCache << endl;
+  os << indent << "InteractorProxy: " << this->InteractorProxy << endl;
+  os << indent << "Interactor: " << this->Interactor << endl;
+  os << indent << "Renderer2DProxy: " << this->Renderer2DProxy << endl;
+  os << indent << "Renderer2D: " << this->Renderer2D << endl;
+  os << indent << "RendererProxy: " << this->RendererProxy << endl;
+  os << indent << "Renderer: " << this->Renderer << endl;
+  os << indent << "RenderWindow: " << this->RenderWindow << endl;
   os << indent << "MeasurePolygonsPerSecond: " 
     << this->MeasurePolygonsPerSecond << endl;
   os << indent << "AveragePolygonsPerSecond: " 

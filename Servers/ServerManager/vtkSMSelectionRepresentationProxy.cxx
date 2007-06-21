@@ -25,7 +25,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSelectionRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMSelectionRepresentationProxy::vtkSMSelectionRepresentationProxy()
 {
@@ -198,6 +198,7 @@ void vtkSMSelectionRepresentationProxy::CleanSelectionInput()
 void vtkSMSelectionRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Prop3D: " << this->Prop3D << endl;
 }
 
 

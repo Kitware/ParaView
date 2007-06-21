@@ -23,7 +23,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.17");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.18");
 
 struct vtkSMPQStateLoaderInternals
 {
@@ -127,4 +127,7 @@ void vtkSMPQStateLoader::RegisterProxyInternal(const char* group,
 void vtkSMPQStateLoader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "RenderViewXMLName: " 
+    << (this->RenderViewXMLName? this->RenderViewXMLName : "(none)")
+    << endl;
 }

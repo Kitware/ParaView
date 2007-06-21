@@ -30,7 +30,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.9");
+vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.10");
 
 struct vtkSMArrayListDomainInternals
 {
@@ -263,6 +263,6 @@ int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop)
 void vtkSMArrayListDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
   os << indent << "DefaultElement: " << this->DefaultElement << endl;
+  os << indent << "AttributeType: " << this->AttributeType << endl;
 }

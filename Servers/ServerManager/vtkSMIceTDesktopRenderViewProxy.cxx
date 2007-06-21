@@ -22,7 +22,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.8");
 
 //----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderViewProxy::vtkSMIceTDesktopRenderViewProxy()
@@ -266,6 +266,7 @@ void vtkSMIceTDesktopRenderViewProxy::SetViewPosition(int x, int y)
 void vtkSMIceTDesktopRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "SquirtLevel: " << this->SquirtLevel << endl;
 }
 
 
