@@ -303,7 +303,6 @@ void pqServerManagerModel::onProxyRegistered(const QString& group,
 void pqServerManagerModel::onProxyUnRegistered(const QString& group,
   const QString& name, vtkSMProxy* proxy)
 {
-  // TODO:UDA
   // Handle proxy renaming.
   pqProxy* item = this->findItem<pqProxy*>(proxy);
   if (!item || item->getSMName() != name || item->getSMGroup() != group)

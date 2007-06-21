@@ -62,11 +62,6 @@ public:
   pqServer(vtkIdType connectionId, vtkPVOptions*, QObject* parent = NULL);
   virtual ~pqServer();
 
-  /// create a new render module on the server and returns it.
-  /// A new render module is allocated and it is the responsibility of the caller
-  /// to remove it.
-  vtkSMRenderModuleProxy* newRenderModule();
-
   /// Creates and returns a new render view. A new render view is created and
   /// it's the responsibility of the caller to delete it.
   vtkSMRenderViewProxy* newRenderView();
