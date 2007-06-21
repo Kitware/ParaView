@@ -27,6 +27,7 @@
 #include "vtkPVGeometryInformation.h"
 #include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkPVUpdateSuppressor.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMDataTypeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMInputProperty.h"
@@ -40,7 +41,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.39");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.39.2.1");
 
 
 //-----------------------------------------------------------------------------
@@ -1974,6 +1975,35 @@ const char* vtkSMDataObjectDisplayProxy::GetMaterialCM()
     return 0;
     }
   return svp->GetElement(0);
+}
+
+//-----------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMDataObjectDisplayProxy::SaveState(vtkPVXMLElement* root)
+{
+  vtkPVXMLElement* proxyElem = this->Superclass::SaveState(root);
+  if (proxyElem)
+    {
+    // Add hint about the volume rendering pipeline so that future revisions can
+    // convert the state correctly.
+    vtkPVXMLElement* volumePipelineHint = vtkPVXMLElement::New();
+    volumePipelineHint->SetName("VolumePipelineType");
+    switch (this->VolumePipelineType)
+      {
+    case UNSTRUCTURED_GRID:
+      volumePipelineHint->AddAttribute("type", "UNSTRUCTURED_GRID");
+      break;
+
+    case IMAGE_DATA:
+      volumePipelineHint->AddAttribute("type", "IMAGE_DATA");
+      break;
+
+    default:
+      volumePipelineHint->AddAttribute("type", "NONE");
+      }
+    proxyElem->AddNestedElement(volumePipelineHint);
+    volumePipelineHint->Delete();
+    }
+  return proxyElem;
 }
 
 //-----------------------------------------------------------------------------

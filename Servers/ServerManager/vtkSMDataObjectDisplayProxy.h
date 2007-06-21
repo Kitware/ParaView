@@ -369,6 +369,12 @@ protected:
   // Get information about extensions from the view module.
   void UpdateRenderModuleExtensions(vtkSMAbstractViewModuleProxy*);
 
+  // Description:
+  // Saves the state of the proxy.
+  // Overridden to add hint to the state about the volume pipeline so that
+  // future versions of state loader can convert the state correctly.
+  virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
+
   // IVars to avoid unnecessary setting of values.
   int Visibility;
   int Representation;
