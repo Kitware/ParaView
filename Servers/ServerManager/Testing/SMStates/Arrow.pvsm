@@ -1,4 +1,4 @@
-<ServerManagerState version="2.9.10">
+<ServerManagerState version="3.0.2">
   <Proxy group="sources" type="ArrowSource" id="37">
     <Property name="ShaftRadius" id="37.ShaftRadius" number_of_elements="1">
       <Element index="0" value="0.03"/>
