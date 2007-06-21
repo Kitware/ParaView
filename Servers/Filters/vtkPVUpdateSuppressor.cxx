@@ -49,7 +49,7 @@ public:
     }
 };
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.52");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.53");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 vtkCxxSetObjectMacro(vtkPVUpdateSuppressor, CacheSizeKeeper, vtkCacheSizeKeeper);
 //----------------------------------------------------------------------------
@@ -171,15 +171,11 @@ void vtkPVUpdateSuppressor::ForceUpdate()
     input->SetUpdateNumberOfPieces(this->UpdateNumberOfPieces);
     input->SetUpdateGhostLevel(0);
     }
-  /*
-  cout << "ForceUpdate " ;
+
   if (this->UpdateTimeInitialized)
     {
     info->Set(vtkCompositeDataPipeline::UPDATE_TIME_STEPS(), &this->UpdateTime, 1);
-    cout << this->UpdateTime;
     }
-  cout << endl;
-  */
 
   input->Update();
   // Input may have changed, we obtain the pointer again.
