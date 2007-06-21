@@ -57,7 +57,7 @@
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
 
-#include "vtkSMClientServerRenderModuleProxy.h"
+#include "vtkSMMultiProcessRenderView.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
@@ -82,7 +82,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.18");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.19");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_LOD, Integer);
@@ -1107,13 +1107,12 @@ void vtkSMRenderViewProxy::ResetPolygonsPerSecondResults()
 //-----------------------------------------------------------------------------
 int vtkSMRenderViewProxy::IsSelectionAvailable()
 { 
-  //FIXME:-- cannot use vtkSMClientServerRenderModuleProxy.
   //check if we are not supposed to turn compositing on (in parallel)
   //the paraview gui uses a big number to say never composite
   //it we are not supposed to turn it on, then disallow selections
   double compThresh = 0;
-  vtkSMClientServerRenderModuleProxy *me2 = 
-    vtkSMClientServerRenderModuleProxy::SafeDownCast(this);
+  vtkSMMultiProcessRenderView *me2 = 
+    vtkSMMultiProcessRenderView::SafeDownCast(this);
   if (me2 != NULL)
     {
     compThresh = me2->GetRemoteRenderThreshold();
@@ -1402,8 +1401,8 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
   //TODO: intelligently code dataserver rank into originalcellids to
   //make this ugly hack unecessary.
   double compThresh = 0.0;
-  vtkSMClientServerRenderModuleProxy *me2 = 
-    vtkSMClientServerRenderModuleProxy::SafeDownCast(this);
+  vtkSMMultiProcessRenderView *me2 = 
+    vtkSMMultiProcessRenderView::SafeDownCast(this);
   if (me2 != NULL)
     {
     compThresh = me2->GetRemoteRenderThreshold();
