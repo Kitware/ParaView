@@ -18,7 +18,7 @@
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkSMStateVersionController);
-vtkCxxRevisionMacro(vtkSMStateVersionController, "1.2");
+vtkCxxRevisionMacro(vtkSMStateVersionController, "1.3");
 //----------------------------------------------------------------------------
 vtkSMStateVersionController::vtkSMStateVersionController()
 {
@@ -46,13 +46,25 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* root)
     {
     vtkWarningMacro("State file version is less than 3.0.0, "
       "these states may not work correctly.");
+
+    int updated_version[3] = {3, 0, 0};
+    this->UpdateVersion(version, updated_version);
     }
 
-  if (this->GetMajor(version) < 3  || 
-    (this->GetMajor(version)==3 && this->GetMinor(version)==0))
+  if (this->GetMajor(version)==3 && this->GetMinor(version)==0)
     {
+    if (this->GetPatch(version) < 2)
+      {
+      vtkWarningMacro("Due to fundamental changes in the parallel rendering framework "
+        "it is not possible to load states with volume rendering correctly "
+        "for versions less than 3.0.2.");
+      }
     status = status && this->Process_3_0_To_3_1(root) ;
-    version[1] = 1;
+
+    // Since now the state file has been update to version 3.1.0, we must update
+    // the version number to reflect that.
+    int updated_version[3] = {3, 1, 0};
+    this->UpdateVersion(version, updated_version);
     }
 
   return true;
@@ -70,9 +82,30 @@ bool ConvertViewModulesToViews(
 //----------------------------------------------------------------------------
 // Called for every data-object display. We will update scalar color 
 // properties since those changed.
-bool ConvertScalarColoringForRepresentations(vtkPVXMLElement* root,
+bool ConvertDataDisplaysToRepresentations(vtkPVXMLElement* root,
   void* vtkNotUsed(callData))
 {
+  // Change proxy type based on the presence of "VolumePipelineType" hint.
+  vtkPVXMLElement* typeHint = root->FindNestedElementByName("VolumePipelineType");
+  const char* type = "GeometryRepresentation";
+  if (typeHint)
+    {
+    const char* hinttype = typeHint->GetAttribute("type");
+    if (hinttype)
+      {
+      if (strcmp(hinttype, "IMAGE_DATA")==0)
+        {
+        type = "UniformGridRepresentation";
+        }
+      else if (strcmp(hinttype, "UNSTRUCTURED_GRID")==0)
+        {
+        type ="UnstructuredGridRepresentation";
+        }
+      }
+    }
+  root->SetAttribute("type", type);
+  root->SetAttribute("group", "representations");
+
   // ScalarMode --> ColorAttributeType
   //  vals: 0/1/2/3 ---> 0 (point-data)
   //      : 4       ---> 1 (cell-data)
@@ -187,24 +220,12 @@ bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
     const char* multiAttrs[] = {
       "type", "MultiDisplay", 0};
 
-    const char* newAttrs[] = {
-      "group", "representations",
-      "type", "GeometryRepresentation", 0};
-
     this->Select(root, "Proxy", lodAttrs,
-      &ConvertScalarColoringForRepresentations, this);
-    this->SelectAndSetAttributes(
-      root, "Proxy", lodAttrs, newAttrs);
-
+      &ConvertDataDisplaysToRepresentations, this);
     this->Select(root, "Proxy", compositeAttrs,
-      &ConvertScalarColoringForRepresentations, this);
-    this->SelectAndSetAttributes(
-      root, "Proxy", compositeAttrs, newAttrs);
-
+      &ConvertDataDisplaysToRepresentations, this);
     this->Select(root, "Proxy", multiAttrs,
-      &ConvertScalarColoringForRepresentations, this);
-    this->SelectAndSetAttributes(
-      root, "Proxy", multiAttrs, newAttrs);
+      &ConvertDataDisplaysToRepresentations, this);
     }
 
     {

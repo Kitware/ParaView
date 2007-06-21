@@ -60,6 +60,23 @@ protected:
     { return version[2]; }
 
   // Description:
+  // Updates version to be atleast as big as minversion.
+  void UpdateVersion(int version[3], int minversion[3])
+    {
+    for (int cc=0; cc < 3; cc++)
+      {
+      if (version[cc] < minversion[cc])
+        {
+        for (int kk=cc; kk<3; kk++)
+          {
+          version[kk] = minversion[kk];
+          }
+        break;
+        }
+      }
+    }
+
+  // Description:
   // Select all 1-level deep children of root with name=childName and
   // with attributes specified in the childAttrs (if non-null)
   // and invoke the callback for all such matches.
