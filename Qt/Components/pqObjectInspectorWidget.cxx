@@ -592,10 +592,10 @@ void pqObjectInspectorWidget::updateAcceptState()
 }
 
 //-----------------------------------------------------------------------------
-void pqObjectInspectorWidget::setView(pqView* view)
+void pqObjectInspectorWidget::setView(pqView* _view)
 {
-  this->View = view;
-  emit this->viewChanged(view);
+  this->View = _view;
+  emit this->viewChanged(_view);
 }
 
 //-----------------------------------------------------------------------------
