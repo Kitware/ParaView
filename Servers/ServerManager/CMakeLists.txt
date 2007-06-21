@@ -188,6 +188,7 @@ SET(Kit_SRCS
   vtkSMStateVersionControllerBase.cxx
   vtkSMClientServerRenderViewProxy.cxx
   vtkSMMultiProcessRenderView.cxx
+  vtkSMClientServerRenderSyncManagerHelper.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS
@@ -224,6 +225,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMRepresentationStrategy.cxx
   vtkSMStateVersionControllerBase.cxx
   vtkSMMultiProcessRenderView.cxx
+  vtkSMClientServerRenderSyncManagerHelper.cxx
   ABSTRACT
   )
 

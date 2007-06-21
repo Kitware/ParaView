@@ -83,11 +83,6 @@ protected:
   virtual void InitializeRenderSyncManager();
 
   // Description:
-  // ImageReductionFactor needs to be set on the RenderSyncManager
-  // rather than the ParallelRenderManager.
-  virtual void SetImageReductionFactorInternal(int factor);
-
-  // Description:
   // Overridden to pass the UseCompositing state to the RenderSyncManager rather
   // than the ParallelRenderManager.
   virtual void SetUseCompositing(bool usecompositing);

@@ -18,15 +18,11 @@
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkPVDisplayInformation.h"
-#include "vtkPVOptions.h"
-#include "vtkPVServerInformation.h"
+#include "vtkSMClientServerRenderSyncManagerHelper.h"
 #include "vtkSMIntVectorProperty.h"
 
-#ifndef PV_IMPLEMENT_CLIENT_SERVER_WO_ICET
 vtkStandardNewMacro(vtkSMIceTDesktopRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.6");
-#endif
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.7");
 
 //----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderViewProxy::vtkSMIceTDesktopRenderViewProxy()
@@ -78,27 +74,15 @@ bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects()
   // window directly, however, in client-server mode, we share the render
   // windows only on the server side. Hence we create client side instances for
   // the render window.
-  if (!this->SharedRenderWindowID.IsNull())
+  this->RenderWindowProxy = this->GetSubProxy("RenderWindow");
+  if (!this->RenderWindowProxy)
     {
-    this->RenderWindowProxy = this->GetSubProxy("RenderWindow");
-    if (!this->RenderWindowProxy)
-      {
-      vtkErrorMacro("RenderWindow subproxy must be defined.");
-      return false;
-      }
-
-    this->RenderWindowProxy->SetServers(vtkProcessModule::CLIENT);
-    this->RenderWindowProxy->UpdateVTKObjects();
-
-    stream  << vtkClientServerStream::Assign
-            << this->RenderWindowProxy->GetID()
-            << this->SharedRenderWindowID
-            << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
-
-    this->RenderWindowProxy->SetServers(
-      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    vtkErrorMacro("RenderWindow subproxy must be defined.");
+    return false;
     }
+
+  vtkSMClientServerRenderSyncManagerHelper::CreateRenderWindow(
+    this->RenderWindowProxy, this->SharedRenderWindowID);
 
   if (!this->Superclass::BeginCreateVTKObjects())
     {
@@ -116,31 +100,10 @@ bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects()
   // side and vtkPVDesktopDeliveryServer on the server root.
   // Additionally, if SharedServerRenderSyncManagerID is set, then the server side
   // vtkPVDesktopDeliveryServer instance is shared among all views.
-  
-  // XML Configuration defines the client side class for RenderSyncManager.
-  this->RenderSyncManager->SetServers(vtkProcessModule::CLIENT);
-  this->RenderSyncManager->UpdateVTKObjects();
-  // This will create the client side  vtkPVDesktopDeliveryClient.
-  
-  if (!this->SharedServerRenderSyncManagerID.IsNull())
-    {
-    stream  << vtkClientServerStream::Assign
-            << this->RenderSyncManager->GetID()
-            << this->SharedServerRenderSyncManagerID
-            << vtkClientServerStream::End;
-    }
-  else
-    {
-    stream  << vtkClientServerStream::New
-            << "vtkPVDesktopDeliveryServer"
-            << this->RenderSyncManager->GetID()
-            << vtkClientServerStream::End;
-    }
-  pm->SendStream(this->ConnectionID, 
-    vtkProcessModule::RENDER_SERVER_ROOT, stream);
-
-  this->RenderSyncManager->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER_ROOT);
+ 
+  vtkSMClientServerRenderSyncManagerHelper::CreateRenderSyncManager(
+    this->RenderSyncManager, this->SharedServerRenderSyncManagerID,
+    "vtkPVDesktopDeliveryServer");
 
   // We need to create vtkIceTRenderer on the server side and vtkRenderer on
   // the client.
@@ -170,111 +133,21 @@ void vtkSMIceTDesktopRenderViewProxy::EndCreateVTKObjects()
 //----------------------------------------------------------------------------
 void vtkSMIceTDesktopRenderViewProxy::InitializeRenderSyncManager()
 {
-  vtkSMIntVectorProperty* ivp;
   vtkClientServerStream stream;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  if (this->GetSubProxy("ParallelRenderManager"))
-    {
-    // RenderSyncManager needs the parallel render manager on the server side to
-    // pass parameters to the parallel render manager.
-    stream  << vtkClientServerStream::Invoke
-            << this->RenderSyncManager->GetID()
-            << "SetParallelRenderManager"
-            << this->GetSubProxy("ParallelRenderManager")->GetID()
-            << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, 
-      vtkProcessModule::RENDER_SERVER_ROOT, stream);
-    }
-
-  // Synchronize the environment among all the render server nodes.
-  vtkPVServerInformation* serverInfo = pm->GetServerInformation(this->ConnectionID);
-  unsigned int idx;
-  unsigned int numMachines = serverInfo->GetNumberOfMachines();
-  for (idx = 0; idx < numMachines; idx++)
-    {
-    if (serverInfo->GetEnvironment(idx))
-      {
-      stream  << vtkClientServerStream::Invoke 
-              << pm->GetProcessModuleID() 
-              << "SetProcessEnvironmentVariable" 
-              << idx 
-              << serverInfo->GetEnvironment(idx)
-              << vtkClientServerStream::End;
-      }
-    }
-  pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, 
-    stream);
-
-  // RenderSyncManager needs access to the socket controller between the client 
-  // and the render server root. This is the socket connection that is used by
-  // the vtkPVDesktopDeliveryClient and vtkPVDesktopDeliveryServer to
-  // communicate. So, set that up.
-  stream  << vtkClientServerStream::Invoke 
-          << pm->GetProcessModuleID()
-          << "GetRenderServerSocketController"
-          << pm->GetConnectionClientServerID(this->ConnectionID)
-          << vtkClientServerStream::End;
-  stream  << vtkClientServerStream::Invoke 
+  // RenderSyncManager needs the parallel render manager on the server side to
+  // pass parameters to the parallel render manager.
+  stream  << vtkClientServerStream::Invoke
           << this->RenderSyncManager->GetID()
-          << "SetController" 
-          << vtkClientServerStream::LastResult
+          << "SetParallelRenderManager"
+          << this->ParallelRenderManager->GetID()
           << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID,
-    this->RenderSyncManager->GetServers(), stream);
+  pm->SendStream(this->ConnectionID, 
+    vtkProcessModule::RENDER_SERVER_ROOT, stream);
 
-  // In case we are using MultiView support, the server side RenderWindow may
-  // have more renderers than this view module has (since all view modules share
-  // the server side render windows). In that case, we don't want to sync the
-  // render window renderers.
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->RenderSyncManager->GetProperty("SyncRenderWindowRenderers"));
-  if (!ivp)
-    {
-    vtkErrorMacro("Falied to find property SyncRenderWindowRenderers");
-    return;
-    }
-  ivp->SetElement(0, 0);
-  this->RenderSyncManager->UpdateVTKObjects();
-
-  // Setup RMI callbacks. 
-  // FIXME: Make InitializeRMIs idempotent.
-  this->RenderSyncManager->InvokeCommand("InitializeRMIs");
-
-  this->Connect(this->RenderWindowProxy, this->RenderSyncManager, "RenderWindow");
-
-  // Update the server process so that the render window is set before
-  // we initialize offscreen rendering.
-  this->RenderSyncManager->UpdateVTKObjects();
-
-  if (getenv("PV_DISABLE_COMPOSITE_INTERRUPTS"))
-    {
-    // Does anything support EnableAbort right now?
-    this->RenderSyncManager->InvokeCommand("EnableAbort");
-    }
-
-  if (pm->GetOptions()->GetUseOffscreenRendering())
-    {
-    // Non-mesa, X offscreen rendering requires access to the display
-    vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
-    pm->GatherInformation(this->ConnectionID,
-      vtkProcessModule::RENDER_SERVER, di, pm->GetProcessModuleID());
-    if (di->GetCanOpenDisplay())
-      {
-      this->RenderSyncManager->InvokeCommand("InitializeOffScreen");
-      }
-    di->Delete();
-    }
-
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->RenderSyncManager->GetProperty("UseCompositing"));
-  if (ivp)
-    {
-    // So that the server window does not popup until needed.
-    ivp->SetElement(0, 0); 
-    }
-
-  this->RenderSyncManager->UpdateVTKObjects();
+  vtkSMClientServerRenderSyncManagerHelper::InitializeRenderSyncManager(
+    this->RenderSyncManager, this->RenderWindowProxy);
 
   // Make the render sync manager aware of our renderers.
   stream  << vtkClientServerStream::Invoke 
