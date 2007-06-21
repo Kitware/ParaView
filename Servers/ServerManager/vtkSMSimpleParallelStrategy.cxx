@@ -39,7 +39,7 @@ inline int vtkSMSimpleParallelStrategyGetInt(vtkSMProxy* proxy,
 }
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.5");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
@@ -386,7 +386,7 @@ void vtkSMSimpleParallelStrategy::ProcessViewInformation()
   if (this->ViewInformation->Has(vtkSMRenderViewProxy::USE_COMPOSITING()))
     {
     this->SetUseCompositing(
-      this->ViewInformation->Get(vtkSMRenderViewProxy::USE_COMPOSITING()));
+      this->ViewInformation->Get(vtkSMRenderViewProxy::USE_COMPOSITING())>0);
     }
   else
     {
@@ -396,7 +396,8 @@ void vtkSMSimpleParallelStrategy::ProcessViewInformation()
  if (this->ViewInformation->Has(vtkSMRenderViewProxy::USE_ORDERED_COMPOSITING()))
     {
     this->SetUseOrderedCompositing(
-      this->ViewInformation->Get(vtkSMRenderViewProxy::USE_ORDERED_COMPOSITING()));
+      this->ViewInformation->Get(
+        vtkSMRenderViewProxy::USE_ORDERED_COMPOSITING())>0);
     }
   else
     {

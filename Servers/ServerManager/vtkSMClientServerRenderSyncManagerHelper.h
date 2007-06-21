@@ -24,7 +24,7 @@
 #include "vtkSMObject.h"
 
 class vtkSMProxy;
-class vtkClientServerID;
+struct vtkClientServerID;
 class VTK_EXPORT vtkSMClientServerRenderSyncManagerHelper : public vtkSMObject
 {
 public:
