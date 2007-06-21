@@ -25,7 +25,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSelectionRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMSelectionRepresentationProxy::vtkSMSelectionRepresentationProxy()
 {
@@ -162,7 +162,11 @@ bool vtkSMSelectionRepresentationProxy::EndCreateVTKObjects()
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->Prop3D->GetProperty("Pickable"));
   ivp->SetElement(0, 0);
-  this->Prop3D->UpdateProperty("Pickable");
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->Mapper->GetProperty("ScalarVisibility"));
+  ivp->SetElement(0, 0);
+  this->Prop3D->UpdateVTKObjects();
 
   return this->Superclass::EndCreateVTKObjects();
 }

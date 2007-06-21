@@ -4720,10 +4720,6 @@
         -->
         <Proxy name="Prop3D" proxygroup="props" proxyname="LODActor" />
         <ExposedProperties>
-          <Property name="Orientation" />
-          <Property name="Origin" />
-          <Property name="Position" />
-          <Property name="Scale" />
           <Property name="Visibility" />
         </ExposedProperties>
       </SubProxy>
