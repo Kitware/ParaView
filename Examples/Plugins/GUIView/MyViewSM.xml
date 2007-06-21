@@ -1,15 +1,21 @@
 <ServerManagerConfiguration>
- <ProxyGroup name="displays">
-   <GenericViewDisplayProxy name="MyDisplay"
-     base_proxygroup="displays" base_proxyname="GenericViewDisplay">
-   </GenericViewDisplayProxy>
+ <ProxyGroup name="representations">
+   <ClientDeliveryRepresentationProxy name="MyDisplay"
+     base_proxygroup="representations" base_proxyname="ClientDeliveryRepresentationBase">
+      <InputProperty name="Input"
+          command="SetInput-not-used"
+          update_self="1">
+      </InputProperty>
+   </ClientDeliveryRepresentationProxy>
  </ProxyGroup>
+
  <ProxyGroup name="views">
-   <ViewModuleProxy name="MyViewViewModule"
-     base_proxygroup="rendermodules" base_proxyname="ViewModule"
-     display_name="MyDisplay">
-   </ViewModuleProxy>
+   <ViewProxy name="MyView"
+     base_proxygroup="newviews" base_proxyname="ViewBase"
+     representation_name="MyDisplay">
+   </ViewProxy>
  </ProxyGroup>
+
  <ProxyGroup name="filters">
    <SourceProxy name="MyExtractEdges" class="vtkExtractEdges"
      label="My Extract Edges">
