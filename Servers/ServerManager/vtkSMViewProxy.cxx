@@ -123,7 +123,7 @@ void vtkSMViewProxy::CleanMultiViewInitializer()
 }
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.14");
 
 vtkInformationKeyMacro(vtkSMViewProxy, USE_CACHE, Integer);
 vtkInformationKeyMacro(vtkSMViewProxy, CACHE_TIME, Double);
@@ -475,6 +475,8 @@ vtkSMRepresentationStrategy* vtkSMViewProxy::NewStrategy(int dataType)
 
   if (strategy)
     {
+    strategy->SetConnectionID(this->ConnectionID);
+
     // Pass the view information to the strategy.
     strategy->SetViewInformation(this->Information);
     }
