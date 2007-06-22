@@ -56,6 +56,7 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtkPVDisplayInformation.h"
 
 #include "vtkSMMultiProcessRenderView.h"
 
@@ -82,7 +83,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.21");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_LOD, Integer);
@@ -299,21 +300,21 @@ void vtkSMRenderViewProxy::EndCreateVTKObjects()
 {
   this->Superclass::EndCreateVTKObjects();
 
-  vtkProcessModule* pvm = vtkProcessModule::GetProcessModule();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   
   // Set all the client side pointers.
   this->Renderer = vtkRenderer::SafeDownCast(
-    pvm->GetObjectFromID(this->RendererProxy->GetID()));
+    pm->GetObjectFromID(this->RendererProxy->GetID()));
   this->Renderer2D = vtkRenderer::SafeDownCast(
-    pvm->GetObjectFromID(this->Renderer2DProxy->GetID()));
+    pm->GetObjectFromID(this->Renderer2DProxy->GetID()));
   this->RenderWindow = vtkRenderWindow::SafeDownCast(
-    pvm->GetObjectFromID(this->RenderWindowProxy->GetID()));
+    pm->GetObjectFromID(this->RenderWindowProxy->GetID()));
   this->Interactor = vtkPVGenericRenderWindowInteractor::SafeDownCast(
-    pvm->GetObjectFromID(this->InteractorProxy->GetID()));
+    pm->GetObjectFromID(this->InteractorProxy->GetID()));
   this->ActiveCamera = vtkCamera::SafeDownCast(
-    pvm->GetObjectFromID(this->ActiveCameraProxy->GetID()));
+    pm->GetObjectFromID(this->ActiveCameraProxy->GetID()));
  
-  if (pvm->GetOptions()->GetUseStereoRendering())
+  if (pm->GetOptions()->GetUseStereoRendering())
     {
     SetIntVectorProperty(this->RenderWindowProxy, "StereoCapableWindow", 1);
     SetIntVectorProperty(this->RenderWindowProxy, "StereoRender", 1);
@@ -350,6 +351,40 @@ void vtkSMRenderViewProxy::EndCreateVTKObjects()
   this->Renderer->AddObserver(vtkCommand::StartEvent, observer);
   this->RenderWindow->AddObserver(vtkCommand::AbortCheckEvent, 
     this->GetObserver());
+
+  // Initialize offscreen rendering.
+  // We don't go through the parallel render managers to initialize offscreen,
+  // this is because there are some complex interactions happening between the
+  // parallel render managers with respect to enabling offscreen rendering. It
+  // way simpler this way.
+  if (pm->GetOptions()->GetUseOffscreenRendering())
+    {
+    // Non-mesa, X offscreen rendering requires access to the display
+    vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
+    pm->GatherInformation(this->ConnectionID, 
+      vtkProcessModule::RENDER_SERVER, di, pm->GetProcessModuleID());
+    if (di->GetCanOpenDisplay())
+      {
+      vtkClientServerStream stream;
+      stream  << vtkClientServerStream::Invoke
+              << this->RenderWindowProxy->GetID()
+              << "SetOffScreenRendering"
+              << 1
+              << vtkClientServerStream::End;
+      pm->SendStream(this->ConnectionID, 
+        vtkProcessModule::RENDER_SERVER, stream);
+
+      // Ensure that the client always does onscreen rendering.
+      stream  << vtkClientServerStream::Invoke
+              << this->RenderWindowProxy->GetID()
+              << "SetOffScreenRendering"
+              << 0
+              << vtkClientServerStream::End;
+      pm->SendStream(this->ConnectionID, 
+        vtkProcessModule::CLIENT, stream);
+      }
+    di->Delete();
+    }
 }
 
 //-----------------------------------------------------------------------------

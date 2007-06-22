@@ -21,7 +21,6 @@
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkPVDisplayInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMDataRepresentationProxy.h"
@@ -44,7 +43,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.11");
 
 vtkInformationKeyMacro(vtkSMIceTCompositeViewProxy, KD_TREE, ObjectBase);
 //----------------------------------------------------------------------------
@@ -268,20 +267,6 @@ void vtkSMIceTCompositeViewProxy::EndCreateVTKObjects()
     pm->SendStream(this->ConnectionID, 
       this->ParallelRenderManager->GetServers(), stream);
     }
-
-  if (pm->GetOptions()->GetUseOffscreenRendering())
-    {
-    // Non-mesa, X offscreen rendering requires access to the display
-    vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
-    pm->GatherInformation(this->ConnectionID, 
-      vtkProcessModule::RENDER_SERVER, di, pm->GetProcessModuleID());
-    if (di->GetCanOpenDisplay())
-      {
-      this->ParallelRenderManager->InvokeCommand("InitializeOffScreen");
-      }
-    di->Delete();
-    }
-
 
   // Initialize the ordered compositing stuff.
   this->Connect(this->KdTree, this->KdTreeManager, "KdTree");

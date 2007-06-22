@@ -17,14 +17,12 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkPVDisplayInformation.h"
-#include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"
 
-vtkCxxRevisionMacro(vtkSMClientServerRenderSyncManagerHelper, "1.1");
+vtkCxxRevisionMacro(vtkSMClientServerRenderSyncManagerHelper, "1.2");
 //----------------------------------------------------------------------------
 vtkSMClientServerRenderSyncManagerHelper::vtkSMClientServerRenderSyncManagerHelper()
 {
@@ -188,19 +186,6 @@ void vtkSMClientServerRenderSyncManagerHelper::InitializeRenderSyncManager(
     {
     // Does anything support EnableAbort right now?
     rsmProxy->InvokeCommand("EnableAbort");
-    }
-
-  if (pm->GetOptions()->GetUseOffscreenRendering())
-    {
-    // Non-mesa, X offscreen rendering requires access to the display
-    vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
-    pm->GatherInformation(cid,
-      vtkProcessModule::RENDER_SERVER, di, pm->GetProcessModuleID());
-    if (di->GetCanOpenDisplay())
-      {
-      rsmProxy->InvokeCommand("InitializeOffScreen");
-      }
-    di->Delete();
     }
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
