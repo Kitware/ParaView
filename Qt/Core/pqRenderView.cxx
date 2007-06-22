@@ -281,7 +281,7 @@ void pqRenderView::setDefaultPropertyValues()
   proxy->UpdateVTKObjects();
 
   this->restoreSettings();
-  this->resetCamera();
+  this->Internal->RenderModuleProxy->ResetCamera();
   this->clearUndoStack();
 }
 
