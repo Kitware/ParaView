@@ -3440,7 +3440,96 @@ This filter extracts the portion of the input dataset that lies along the specif
    <!-- End Cut -->
    </SourceProxy>
 
-    <SourceProxy name="Clip" class="vtkPVClipDataSet">
+   <SourceProxy name="ExtractGeometry" class="vtkExtractGeometry" 
+                label="Extract Cells by Region">
+    <Documentation
+       long_help="This filter extracts cells that are inside/outside a region or at a region boundary."
+       short_help="Extract cells that are inside/outside a region or at a region boundary.">
+This filter extracts from its input dataset all cells that are either completely inside or outside of a specified region (implicit function). On output, the filter generates an unstructured grid.
+To use this filter you must specify a region  (implicit function). You must also specify whethter to extract cells lying inside or outside of the region. An option exists to extract cells that are neither inside or outside (i.e., boundary).
+    </Documentation>
+    <InputProperty
+       name="Input"
+       command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+          <Documentation>
+            This property specifies the input to the Slice filter.
+          </Documentation>
+     </InputProperty>
+
+     <ProxyProperty name="ImplicitFunction" command="SetImplicitFunction"
+                    label="Intersect With">
+           <ProxyGroupDomain name="groups">
+              <Group name="implicit_functions"/>
+           </ProxyGroupDomain>
+           <ProxyListDomain name="proxy_list">
+              <Proxy group="implicit_functions" name="Plane" />
+              <!--
+              <Proxy group="implicit_functions" name="Box" />
+              <Proxy group="implicit_functions" name="Sphere" />
+              -->
+           </ProxyListDomain>
+           <Documentation>
+             This property sets the region used to extract cells.
+           </Documentation>
+     </ProxyProperty>
+
+     <DoubleVectorProperty
+        name="InputBounds" information_only="1">
+       <BoundsDomain name="bounds">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </BoundsDomain>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        label="Extraction Side"
+        name="ExtractInside" 
+        command="SetExtractInside" 
+        number_of_elements="1"
+        default_values="1" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="outside"/>
+         <Entry value="1" text="inside"/>
+       </EnumerationDomain>
+       <Documentation>
+This parameter controls whether to extract cells that are inside or outside the region. 
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="Extract only intersected" 
+        command="SetExtractOnlyBoundaryCells" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+This parameter controls whether to extract only cells that are on the boundary of the region. If this parameter is set, the Extraction Side parameter is ignored. If Extract Intersected is off, this parameter has no effect.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="Extract intersected" 
+        command="SetExtractBoundaryCells" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+This parameter controls whether to extract cells that are on the boundary of the region. 
+       </Documentation>
+     </IntVectorProperty>
+
+   <!-- End ExtractGeometry -->
+   </SourceProxy>
+
+   <SourceProxy name="Clip" class="vtkPVClipDataSet">
     <Documentation
        long_help="Clip with an implicit plane. Clipping does not reduce the dimensionality of the data set. The output data type of this filter is always an unstructured grid."
        short_help="Clip with an implicit plane.">

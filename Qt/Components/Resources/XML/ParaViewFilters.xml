@@ -50,6 +50,7 @@
   <Filter name="ExtractCellSelection" />
   <Filter name="ExtractDataSets" />
   <Filter name="ExtractEdges" />
+  <Filter name="ExtractGeometry" />
   <Filter name="ExtractGrid" />
   <Filter name="ExtractHistogram" />
   <Filter name="ExtractLevel" />
