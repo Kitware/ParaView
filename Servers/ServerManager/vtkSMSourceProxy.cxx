@@ -35,7 +35,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.50");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.51");
 
 struct vtkSMSourceProxyInternals
 {
@@ -358,8 +358,15 @@ void vtkSMSourceProxy::AddInput(unsigned int inputPort,
   vtkClientServerStream stream;
   vtkClientServerID sourceID = this->GetID();
   vtkSMPart* part = input->GetPart(outputPort);
-  stream << vtkClientServerStream::Invoke 
-         << sourceID << method << part->GetID();
+  stream << vtkClientServerStream::Invoke;
+  if (inputPort > 0)
+    {
+    stream << sourceID << method << inputPort << part->GetID();
+    }
+  else
+    {
+    stream << sourceID << method << part->GetID();
+    }
   stream << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, 
                  this->Servers & input->GetServers(), 

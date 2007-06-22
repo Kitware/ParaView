@@ -27,7 +27,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMInputProperty);
-vtkCxxRevisionMacro(vtkSMInputProperty, "1.16");
+vtkCxxRevisionMacro(vtkSMInputProperty, "1.17");
 
 int vtkSMInputProperty::InputsUpdateImmediately = 1;
 
@@ -44,6 +44,7 @@ vtkSMInputProperty::vtkSMInputProperty()
   this->ImmediateUpdate = vtkSMInputProperty::InputsUpdateImmediately;
   this->UpdateSelf = 1;
   this->MultipleInput = 0;
+  this->PortIndex = 0;
 
   this->IPInternals = new vtkSMInputPropertyInternals;
 }
@@ -126,7 +127,7 @@ void vtkSMInputProperty::AppendCommandToStream(
       *str << vtkClientServerStream::Invoke 
            << objectId 
            << "AddInput" 
-           << 0 // input port
+           << this->PortIndex
            << actualProxy
            << this->GetOutputPortForConnection(i)
            << this->Command;
@@ -146,6 +147,13 @@ int vtkSMInputProperty::ReadXMLAttributes(vtkSMProxy* parent,
   if(retVal) 
     { 
     this->SetMultipleInput(multiple_input); 
+    }
+
+  int port_index;
+  retVal = element->GetScalarAttribute("port_index", &port_index);
+  if(retVal) 
+    { 
+    this->SetPortIndex(port_index); 
     }
 
   return 1;

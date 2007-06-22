@@ -17,6 +17,10 @@
 // vtkSMInputProperty is a concrete sub-class of vtkSMProperty representing
 // inputs to a filter (through vtkSMProxy). It is a special property that
 // always calls AddInput on a vtkSMSourceProxy.
+// The xml configuration for input proxy supports the following attributes:
+// multiple_input: For an input port that connects multiple connections 
+// such as the input of an append filter. port_index: The input port to
+// be used.
 // .SECTION See Also
 // vtkSMInputProperty vtkSMSourceProxy
 
@@ -92,6 +96,12 @@ public:
   unsigned int GetOutputPortForConnection(unsigned int idx);
   unsigned int GetUncheckedOutputPortForConnection(unsigned int idx);
 
+  // Description:
+  // Controls which input port this property uses when making connections.
+  // By default, this is 0.
+  vtkSetMacro(PortIndex, int);
+  vtkGetMacro(PortIndex, int);
+
 protected:
   vtkSMInputProperty();
   ~vtkSMInputProperty();
@@ -111,7 +121,6 @@ protected:
   // the values that were last pushed on to the server. This is used for
   // undo/redo state.
   virtual void ChildSaveState(vtkPVXMLElement* parent, int saveLastPushedValues);
-
   //BTX
   // Description:
   // Description:
