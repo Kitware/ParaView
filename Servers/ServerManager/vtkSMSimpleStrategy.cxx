@@ -18,11 +18,12 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.7");
+vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMSimpleStrategy::vtkSMSimpleStrategy()
 {
@@ -123,14 +124,14 @@ void vtkSMSimpleStrategy::CreateLODPipeline(vtkSMSourceProxy* input)
 void vtkSMSimpleStrategy::GatherInformation(vtkPVDataInformation* info)
 {
   info->AddInformation(
-    this->UpdateSuppressor->GetDataInformation());
+    this->UpdateSuppressor->GetDataInformation(0, false));
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSimpleStrategy::GatherLODInformation(vtkPVDataInformation* info)
 {
   info->AddInformation(
-    this->UpdateSuppressorLOD->GetDataInformation());
+    this->UpdateSuppressorLOD->GetDataInformation(0, false));
 }
 
 //----------------------------------------------------------------------------
@@ -139,7 +140,10 @@ void vtkSMSimpleStrategy::UpdatePipeline()
   if (this->GetUseCache())
     {
     this->SomethingCached = true;
-    this->UpdateSuppressorLOD->InvokeCommand("CacheUpdate");
+    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->UpdateSuppressor->GetProperty("CacheUpdate"));
+    dvp->SetElement(0, this->CacheTime);
+    this->UpdateSuppressor->UpdateProperty("CacheUpdate", 1);
     }
   else
     {

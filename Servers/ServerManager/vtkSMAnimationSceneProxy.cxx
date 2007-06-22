@@ -31,39 +31,40 @@ class vtkSMAnimationSceneProxyInternals
 {
 public:
   typedef vtkstd::vector<vtkSmartPointer<vtkSMViewProxy> > 
-    VectorOfViewModules;
-  VectorOfViewModules ViewModules;
+    VectorOfViews;
+  VectorOfViews ViewModules;
 
   void StillRenderAllViews()
     {
-    VectorOfViewModules::iterator iter = this->ViewModules.begin();
+    VectorOfViews::iterator iter = this->ViewModules.begin();
     for (; iter != this->ViewModules.end(); ++iter)
       {
       iter->GetPointer()->StillRender();
       }
     }
 
-  void CacheUpdateAllViews(int index, int max)
+  void PassCacheTime(double cachetime)
     {
-    (void) index;
-    (void) max;
-    /* FIXME:UDA
-    VectorOfViewModules::iterator iter = this->ViewModules.begin();
+    VectorOfViews::iterator iter = this->ViewModules.begin();
     for (; iter != this->ViewModules.end(); ++iter)
       {
-      vtkSMRenderViewProxy* ren = vtkSMRenderViewProxy::SafeDownCast(*iter);
-      if (ren)
-        {
-        ren->CacheUpdate(index, max);
-        }
+      (*iter)->SetCacheTime(cachetime);
       }
-      */
+    }
+
+  void PassUseCache(bool usecache)
+    {
+    VectorOfViews::iterator iter = this->ViewModules.begin();
+    for (; iter != this->ViewModules.end(); ++iter)
+      {
+      (*iter)->SetUseCache(usecache);
+      }
     }
 
   void CleanCacheAllViews()
     {
     /* FIXME:UDA
-    VectorOfViewModules::iterator iter = this->ViewModules.begin();
+    VectorOfViews::iterator iter = this->ViewModules.begin();
     for (; iter != this->ViewModules.end(); ++iter)
       {
       vtkSMRenderViewProxy* rm = vtkSMRenderViewProxy::SafeDownCast(
@@ -78,7 +79,7 @@ public:
 
   void DisableInteractionAllViews()
     {
-    VectorOfViewModules::iterator iter = this->ViewModules.begin();
+    VectorOfViews::iterator iter = this->ViewModules.begin();
     for (; iter != this->ViewModules.end(); ++iter)
       {
       vtkSMRenderViewProxy* rm = vtkSMRenderViewProxy::SafeDownCast(
@@ -92,7 +93,7 @@ public:
 
   void EnableInteractionAllViews()
     {
-    VectorOfViewModules::iterator iter = this->ViewModules.begin();
+    VectorOfViews::iterator iter = this->ViewModules.begin();
     for (; iter != this->ViewModules.end(); ++iter)
       {
       vtkSMRenderViewProxy* rm = vtkSMRenderViewProxy::SafeDownCast(
@@ -107,7 +108,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.43");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.44");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
@@ -156,7 +157,7 @@ void vtkSMAnimationSceneProxy::InitializeObservers(vtkAnimationCue* cue)
 //----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::AddViewModule(vtkSMViewProxy* view)
 {
-  vtkSMAnimationSceneProxyInternals::VectorOfViewModules::iterator iter = 
+  vtkSMAnimationSceneProxyInternals::VectorOfViews::iterator iter = 
     this->Internals->ViewModules.begin();
   for (; iter != this->Internals->ViewModules.end(); ++iter)
     {
@@ -173,7 +174,7 @@ void vtkSMAnimationSceneProxy::AddViewModule(vtkSMViewProxy* view)
 void vtkSMAnimationSceneProxy::RemoveViewModule(
   vtkSMViewProxy* view)
 {
-  vtkSMAnimationSceneProxyInternals::VectorOfViewModules::iterator iter = 
+  vtkSMAnimationSceneProxyInternals::VectorOfViews::iterator iter = 
     this->Internals->ViewModules.begin();
   for (; iter != this->Internals->ViewModules.end(); ++iter)
     {
@@ -215,7 +216,9 @@ void vtkSMAnimationSceneProxy::Play()
   if (scene)
     {
     this->Internals->DisableInteractionAllViews();
+    this->Internals->PassUseCache(this->GetCaching());
     scene->Play();
+    this->Internals->PassUseCache(false);
     this->Internals->EnableInteractionAllViews();
     }
 }
@@ -403,6 +406,7 @@ void vtkSMAnimationSceneProxy::EndCueInternal(void* info)
     this->Internals->StillRenderAllViews();
     }
   this->Superclass::EndCueInternal(info);
+
 }
 
 //----------------------------------------------------------------------------
@@ -416,16 +420,8 @@ void vtkSMAnimationSceneProxy::CacheUpdate(void* info)
   vtkAnimationCue::AnimationCueInfo *cueInfo = reinterpret_cast<
     vtkAnimationCue::AnimationCueInfo*>(info);
 
-  double etime = this->GetEndTime();
-  double stime = this->GetStartTime();
-
-  int index = 
-    static_cast<int>((cueInfo->AnimationTime - stime) * this->GetFrameRate());
-
-  int maxindex = 
-    static_cast<int>((etime - stime) * this->GetFrameRate()) + 1; 
-
-  this->Internals->CacheUpdateAllViews(index, maxindex);
+  double cachetime = cueInfo->AnimationTime;
+  this->Internals->PassCacheTime(cachetime);
   this->GeometryCached = 1;
 }
 
@@ -444,8 +440,10 @@ void vtkSMAnimationSceneProxy::SetAnimationTime(double time)
 {
   if (this->AnimationCue)
     {
+    this->Internals->PassUseCache(this->GetCaching());
     this->AnimationCue->Initialize();
     this->AnimationCue->Tick(time,0);
+    this->Internals->PassUseCache(false);
     }
 }
 

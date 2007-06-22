@@ -35,7 +35,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.14");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -141,6 +141,7 @@ bool vtkSMSurfaceRepresentationProxy::EndCreateVTKObjects()
   return this->Superclass::EndCreateVTKObjects();
 }
 
+#include "vtkClientServerStream.h"
 //----------------------------------------------------------------------------
 void vtkSMSurfaceRepresentationProxy::Update(vtkSMViewProxy* view)
 {
@@ -154,6 +155,18 @@ void vtkSMSurfaceRepresentationProxy::Update(vtkSMViewProxy* view)
       this->ViewInformation->Get(vtkSMRenderViewProxy::USE_LOD()));
     this->Prop3D->UpdateProperty("EnableLOD");
     }
+
+  // I don't like calling Modified directly, but I need the scalars to be
+  // remapped through the lookup table, and this causes that to happen.
+  // TODO: Must propertify this.....(or overcome it all together).
+  vtkClientServerStream stream;
+  stream  << vtkClientServerStream::Invoke
+          << this->Mapper->GetID() << "Modified"
+          << vtkClientServerStream::End;
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID,
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER, stream);
+
 }
 
 //----------------------------------------------------------------------------

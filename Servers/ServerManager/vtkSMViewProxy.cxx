@@ -17,8 +17,9 @@
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
-#include "vtkInformation.h"
 #include "vtkInformationDoubleKey.h"
+#include "vtkInformation.h"
+#include "vtkInformationIntegerKey.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
@@ -122,7 +123,11 @@ void vtkSMViewProxy::CleanMultiViewInitializer()
 }
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.12");
+
+vtkInformationKeyMacro(vtkSMViewProxy, USE_CACHE, Integer);
+vtkInformationKeyMacro(vtkSMViewProxy, CACHE_TIME, Double);
+
 //----------------------------------------------------------------------------
 vtkSMViewProxy::vtkSMViewProxy()
 {
@@ -145,6 +150,13 @@ vtkSMViewProxy::vtkSMViewProxy()
   this->DefaultRepresentationName = 0;
   this->ViewUpdateTime = 0;
   this->ViewUpdateTimeInitialized = false;
+
+  this->CacheLimit = 100*1024; // 100 MBs.
+  this->UseCache = false;
+  this->CacheTime = 0.0;
+
+  this->Information->Set(USE_CACHE(), this->UseCache);
+  this->Information->Set(CACHE_TIME(), this->CacheTime);
 }
 
 //----------------------------------------------------------------------------
@@ -557,6 +569,21 @@ int vtkSMViewProxy::ReadXMLAttributes(
   return 1;
 }
 
+//-----------------------------------------------------------------------------
+void vtkSMViewProxy::SetCacheTime(double time)
+{
+  this->Information->Set(CACHE_TIME(), time);
+  this->CacheTime = time;
+  this->Modified();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMViewProxy::SetUseCache(int usecache)
+{
+  this->Information->Set(USE_CACHE(), usecache);
+  this->UseCache = usecache;
+  this->Modified();
+}
 
 //----------------------------------------------------------------------------
 void vtkSMViewProxy::PrintSelf(ostream& os, vtkIndent indent)
@@ -567,6 +594,9 @@ void vtkSMViewProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ViewPosition: " 
     << this->ViewPosition[0] << ", " << this->ViewPosition[1] << endl;
   os << indent << "ViewUpdateTime: " << this->ViewUpdateTime << endl;
+  os << indent << "UseCache: " << this->UseCache << endl;
+  os << indent << "CacheTime: " << this->CacheTime << endl;
+  os << indent << "CacheLimit: " << this->CacheLimit << endl;
 }
 
 

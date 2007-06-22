@@ -5447,9 +5447,17 @@ The Level Scalars filter uses colors to show levels of a hierarchical dataset.
       </InputProperty>
 
       <Property name="ForceUpdate" command="ForceUpdate" />
-      <Property name="CacheUpdate" command="CacheUpdate" />
       <Property name="RemoveAllCaches" command="RemoveAllCaches" />
 
+      <DoubleVectorProperty
+        name="CacheUpdate"
+        command="CacheUpdate"
+        number_of_elements="1"
+        default_values="none"
+        is_internal="1" >
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      
       <IntVectorProperty
         name="SaveCacheOnCacheUpdate"
         command="SetSaveCacheOnCacheUpdate"

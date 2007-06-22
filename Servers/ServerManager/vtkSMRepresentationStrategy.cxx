@@ -24,7 +24,7 @@
 #include "vtkMemberFunctionCommand.h"
 #include "vtkSMRenderViewProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.9");
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 {
@@ -304,21 +304,31 @@ void vtkSMRepresentationStrategy::ProcessViewInformation()
   if (this->ViewInformation->Has(vtkSMRenderViewProxy::USE_LOD()))
     {
     this->SetUseLOD(
-      this->ViewInformation->Get(vtkSMRenderViewProxy::USE_LOD()));
+      this->ViewInformation->Get(vtkSMRenderViewProxy::USE_LOD())>0);
     }
   else
     {
     vtkErrorMacro("Missing Key: USE_LOD()");
     }
 
-  if (this->ViewInformation->Has(vtkSMRenderViewProxy::USE_CACHE()))
+  if (this->ViewInformation->Has(vtkSMViewProxy::USE_CACHE()))
     {
     this->SetUseCache(
-      this->ViewInformation->Get(vtkSMRenderViewProxy::USE_CACHE()));
+      this->ViewInformation->Get(vtkSMViewProxy::USE_CACHE())>0);
     }
   else
     {
     vtkErrorMacro("Missing Key: USE_CACHE()");
+    }
+
+  if (this->ViewInformation->Has(vtkSMViewProxy::CACHE_TIME()))
+    {
+    this->CacheTime = 
+      this->ViewInformation->Get(vtkSMViewProxy::CACHE_TIME());
+    }
+  else
+    {
+    vtkErrorMacro("Missing Key: CACHE_TIME()");
     }
 
   if (this->ViewInformation->Has(vtkSMRenderViewProxy::LOD_RESOLUTION()))

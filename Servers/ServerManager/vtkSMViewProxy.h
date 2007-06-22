@@ -33,6 +33,8 @@
 class vtkCollection;
 class vtkCommand;
 class vtkInformation;
+class vtkInformationDoubleKey;
+class vtkInformationIntegerKey;
 class vtkSMRepresentationProxy;
 class vtkSMRepresentationStrategy;
 
@@ -42,6 +44,11 @@ public:
   static vtkSMViewProxy* New();
   vtkTypeRevisionMacro(vtkSMViewProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Keys used to specify view rendering requirements.
+  static vtkInformationIntegerKey* USE_CACHE();
+  static vtkInformationDoubleKey* CACHE_TIME();
 
   // Description:
   // Adds a representation proxy to this view. 
@@ -127,6 +134,23 @@ public:
   // to avoid using the view's update time).
   void SetViewUpdateTime(double time);
   vtkGetMacro(ViewUpdateTime, double);
+
+  // Description:
+  // Get/Set the cache limit (in kilobytes) for each process. If cache size
+  // grows beyond the limit, no caching is done on any of the processes.
+  vtkGetMacro(CacheLimit, int);
+  vtkSetMacro(CacheLimit, int);
+
+  // Description:
+  // When caching is enabled (typically, when playing animations,
+  // this time must be updated when each frame is changed.
+  void SetCacheTime(double time);
+  vtkGetMacro(CacheTime, double);
+
+  // Description:
+  // Set/get whether cached geometry should be used whenever possible.
+  void SetUseCache(int);
+  vtkGetMacro(UseCache, int);
 
 //BTX
 protected:
@@ -282,6 +306,10 @@ private:
 
   double ViewUpdateTime;
   bool ViewUpdateTimeInitialized;
+
+  int CacheLimit; // in KiloBytes.
+  double CacheTime;
+  int UseCache;
 //ETX
 };
 

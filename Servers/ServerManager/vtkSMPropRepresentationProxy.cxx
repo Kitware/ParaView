@@ -26,7 +26,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMPropRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPropRepresentationProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMPropRepresentationProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMPropRepresentationProxy::vtkSMPropRepresentationProxy()
 {
@@ -36,13 +36,14 @@ vtkSMPropRepresentationProxy::vtkSMPropRepresentationProxy()
   // properties of the selection prop so that they appear to be tranformed
   // similarly.
   this->SelectionPropLink = vtkSMProxyLink::New();
+  this->SelectionPropLink->AddException("EnableLOD");
   this->SelectionPropLink->AddException("LODMapper");
   this->SelectionPropLink->AddException("Mapper");
   this->SelectionPropLink->AddException("Pickable");
   this->SelectionPropLink->AddException("Property");
+  this->SelectionPropLink->AddException("RenderModuleHelper");
   this->SelectionPropLink->AddException("Texture");
   this->SelectionPropLink->AddException("Visibility");
-
 }
 
 //----------------------------------------------------------------------------

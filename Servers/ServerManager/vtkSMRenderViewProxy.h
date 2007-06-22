@@ -26,8 +26,6 @@
 class vtkCamera;
 class vtkCollection;
 class vtkImageData;
-class vtkInformationDoubleKey;
-class vtkInformationIntegerKey;
 class vtkPVClientServerIdCollectionInformation;
 class vtkPVGenericRenderWindowInteractor;
 class vtkPVOpenGLExtensionsInformation;
@@ -54,8 +52,6 @@ public:
   static vtkInformationIntegerKey* LOD_RESOLUTION();
   static vtkInformationIntegerKey* USE_COMPOSITING();
   static vtkInformationIntegerKey* USE_ORDERED_COMPOSITING();
-  static vtkInformationIntegerKey* USE_CACHE();
-  static vtkInformationDoubleKey* CACHE_TIME();
   
   // Description:
   // Callback for the immediate mode rendering check button
@@ -183,23 +179,6 @@ public:
     unsigned int x1, unsigned int y1,
     vtkCollection* selectedRepresentations=0,
     bool multiple_selections=true);
-
-  // Description:
-  // Get/Set the cache limit (in kilobytes) for each process. If cache size
-  // grows beyond the limit, no caching is done on any of the processes.
-  vtkGetMacro(CacheLimit, int);
-  vtkSetMacro(CacheLimit, int);
-
-  // Description:
-  // When caching is enabled (typically, when playing animations,
-  // this time must be updated when each frame is changed.
-  void SetCacheTime(double time);
-  vtkGetMacro(CacheTime, double);
-
-  // Description:
-  // Set/get whether cached geometry should be used whenever possible.
-  void SetEnableCache(int);
-  vtkGetMacro(EnableCache, int);
 
   // Description:
   // Methods called by Representation proxies to add/remove the
@@ -334,10 +313,6 @@ protected:
   vtkIdType AveragePolygonsPerSecondCount;
   void CalculatePolygonsPerSecond(double time);
   int MeasurePolygonsPerSecond;
-
-  int CacheLimit; // in KiloBytes.
-  double CacheTime;
-  int EnableCache;
 
   // Description:
   // Get the number of polygons this render module is rendering

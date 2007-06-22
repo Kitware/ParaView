@@ -82,15 +82,13 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.19");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.20");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_LOD, Integer);
 vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_COMPOSITING, Integer);
 vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_ORDERED_COMPOSITING, Integer);
-vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_CACHE, Integer);
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
-vtkInformationKeyMacro(vtkSMRenderViewProxy, CACHE_TIME, Double);
 
 //-----------------------------------------------------------------------------
 vtkSMRenderViewProxy::vtkSMRenderViewProxy()
@@ -118,8 +116,6 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
   this->ResetPolygonsPerSecondResults();
   this->MeasurePolygonsPerSecond = 0;
 
-  this->CacheLimit = 100*1024; // 100 MBs.
-
   this->LODThreshold = 0.0;
 
   this->OpenGLExtensionsInformation = 0;
@@ -128,8 +124,6 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
   this->SetLODResolution(50);
   this->Information->Set(USE_ORDERED_COMPOSITING(), 0);
   this->Information->Set(USE_COMPOSITING(), 0);
-  this->Information->Set(USE_CACHE(), 0);
-  this->Information->Set(CACHE_TIME(), 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -211,18 +205,6 @@ vtkSMRenderViewProxy::GetOpenGLExtensionsInformation()
     this->RenderWindowProxy->GetID());
     */
   return this->OpenGLExtensionsInformation;
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::SetCacheTime(double time)
-{
-  this->Information->Set(CACHE_TIME(), time);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::SetEnableCache(int usecache)
-{
-  this->Information->Set(USE_CACHE(), usecache);
 }
 
 //-----------------------------------------------------------------------------
@@ -1533,7 +1515,7 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
     prototype->GetProperty("Input"));
   pp->RemoveAllUncheckedProxies();
   pp->AddUncheckedProxy(source);
-  bool sg = pp->IsInDomains();
+  bool sg = (pp->IsInDomains()>0);
   pp->RemoveAllUncheckedProxies();
   if (sg)
     {
@@ -1552,9 +1534,6 @@ void vtkSMRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RenderInterruptsEnabled: " << this->RenderInterruptsEnabled 
     << endl;
   os << indent << "ActiveCamera: " << this->ActiveCamera << endl;
-  os << indent << "CacheLimit: " << this->CacheLimit << endl;
-  os << indent << "CacheTime: " << this->CacheTime << endl;
-  os << indent << "EnableCache: " << this->EnableCache << endl;
   os << indent << "InteractorProxy: " << this->InteractorProxy << endl;
   os << indent << "Interactor: " << this->Interactor << endl;
   os << indent << "Renderer2DProxy: " << this->Renderer2DProxy << endl;

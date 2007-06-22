@@ -33,6 +33,14 @@
 
 #include <vtkstd/map>
 
+
+#ifdef MYDEBUG
+# define vtkMyDebug(x)\
+    cout << x;
+#else
+# define vtkMyDebug(x)
+#endif
+
 class vtkPVUpdateSuppressorCacheMap : 
   public vtkstd::map<double, vtkSmartPointer<vtkDataObject> >
 {
@@ -49,7 +57,7 @@ public:
     }
 };
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.53");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.54");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 vtkCxxSetObjectMacro(vtkPVUpdateSuppressor, CacheSizeKeeper, vtkCacheSizeKeeper);
 //----------------------------------------------------------------------------
@@ -60,9 +68,6 @@ vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
 
   this->UpdateTime = 0.0;
   this->UpdateTimeInitialized = false;
-
-  this->CachedGeometry = NULL;
-  this->CachedGeometryLength = 0;
 
   this->Cache = new vtkPVUpdateSuppressorCacheMap();
 
@@ -171,11 +176,13 @@ void vtkPVUpdateSuppressor::ForceUpdate()
     input->SetUpdateNumberOfPieces(this->UpdateNumberOfPieces);
     input->SetUpdateGhostLevel(0);
     }
-
+  vtkMyDebug("ForceUpdate ");
   if (this->UpdateTimeInitialized)
     {
     info->Set(vtkCompositeDataPipeline::UPDATE_TIME_STEPS(), &this->UpdateTime, 1);
+    vtkMyDebug(this->UpdateTime);
     }
+  vtkMyDebug(endl);
 
   input->Update();
   // Input may have changed, we obtain the pointer again.
@@ -188,62 +195,27 @@ void vtkPVUpdateSuppressor::ForceUpdate()
 //----------------------------------------------------------------------------
 void vtkPVUpdateSuppressor::RemoveAllCaches()
 {
-  int idx;
-
-  unsigned long freed_size = 0;
-  for (idx = 0; idx < this->CachedGeometryLength; ++idx)
-    {
-    if (this->CachedGeometry[idx])
-      {
-      freed_size += this->CachedGeometry[idx]->GetActualMemorySize();
-      this->CachedGeometry[idx]->Delete();
-      this->CachedGeometry[idx] = NULL;
-      }
-    }
-
-  if (this->CachedGeometry)
-    {
-    delete [] this->CachedGeometry;
-    this->CachedGeometry = NULL;
-    }
-  this->CachedGeometryLength = 0;
-
-  if (freed_size > 0 && this->CacheSizeKeeper)
-    {
-    this->CacheSizeKeeper->FreeCacheSize(freed_size);
-    }
-
-
-  // Clean new style cache.
-  freed_size = this->Cache->GetActualMemorySize();
+  unsigned long freed_size = this->Cache->GetActualMemorySize();
   this->Cache->clear();
   if (freed_size > 0 && this->CacheSizeKeeper)
     {
+    // Tell the cache size keeper about the newly freed memory size.
     this->CacheSizeKeeper->FreeCacheSize(freed_size);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVUpdateSuppressor::CacheUpdate()
+void vtkPVUpdateSuppressor::CacheUpdate(double cacheTime)
 {
-  if (this->UpdateTimeInitialized)
-    {
-    // No caching without update time.
-    this->ForceUpdate();
-    return;
-    }
-
-  vtkPVUpdateSuppressorCacheMap::iterator iter = this->Cache->find(
-    this->UpdateTime);
+  vtkPVUpdateSuppressorCacheMap::iterator iter = this->Cache->find(cacheTime);
+  vtkDataObject* output = this->GetOutput();
   if (iter == this->Cache->end())
     {
     // No cache present, force update.
-
     this->ForceUpdate();
   
     if (this->SaveCacheOnCacheUpdate)
       {
-      vtkDataObject* output = this->GetOutput();
       vtkSmartPointer<vtkDataObject> cache;
       cache.TakeReference(output->NewInstance());
       cache->ShallowCopy(output);
@@ -251,75 +223,25 @@ void vtkPVUpdateSuppressor::CacheUpdate()
       // FIXME: I am commenting this code as I don't know what it's doing.
       // // Compositing seems to update the input properly.
       // // But this update is needed when doing animation without compositing.
-      // cache->Update();
-      (*this->Cache)[this->UpdateTime] = cache;
+      cache->Update();
+      (*this->Cache)[cacheTime] = cache;
+      vtkMyDebug(this->UpdatePiece << " "
+        << "Cached data: " << cacheTime 
+        << " " << vtkDataSet::SafeDownCast(cache)->GetNumberOfPoints() << endl);
       }
     }
   else
     {
     // Using the cached data.
-    vtkDataObject* output = this->GetOutput();
     output->ShallowCopy(iter->second.GetPointer());
-    this->Modified();
+    vtkMyDebug( 
+      this->UpdatePiece << " "
+      << "Using cache: " << cacheTime 
+      << " " << vtkDataSet::SafeDownCast(output)->GetNumberOfPoints() << endl)
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVUpdateSuppressor::CacheUpdate(int idx, int num)
-{
-  vtkDataObject *pd;
-  vtkDataObject *output;
-  int j;
-
-  if (num == -1)
-    {
-    return;
-    }
-
-  if (idx < 0 || idx >= num)
-    {
-    vtkErrorMacro("Bad cache index: " << idx << " of " << num);
-    return;
-    }
-
-  if (num != this->CachedGeometryLength)
-    {
-    this->RemoveAllCaches();
-    this->CachedGeometry = new vtkDataObject*[num];
-    for (j = 0; j < num; ++j)
-      {
-      this->CachedGeometry[j] = NULL;
-      }
-    this->CachedGeometryLength = num;
-    }
-
-  output = this->GetOutput();
-  pd = this->CachedGeometry[idx];
-  if (pd == NULL)
-    { // we need to update and save.
-    this->ForceUpdate();
-
-    pd = output->NewInstance();
-    pd->ShallowCopy(output);
-    //  Compositing seems to update the input properly.
-    //  But this update is needed when doing animation without compositing.
-    pd->Update(); 
-    if (this->SaveCacheOnCacheUpdate)
-      {
-      this->CachedGeometry[idx] = pd;
-      if (this->CacheSizeKeeper)
-        {
-        this->CacheSizeKeeper->AddCacheSize(pd->GetActualMemorySize());
-        }
-      pd->Register(this);
-      }
-    pd->Delete();
-    }
-  else
-    { // Output generated previously.
-    output->ShallowCopy(pd);
-    this->Modified();
-    }
+  this->PipelineUpdateTime.Modified();
+  this->Modified();
+  output->Modified();
 }
 
 //----------------------------------------------------------------------------

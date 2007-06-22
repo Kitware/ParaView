@@ -240,6 +240,7 @@ protected:
 
   bool UseCache;
   bool UseLOD;
+  double CacheTime;
 
   vtkSMSourceProxy* Input;
   bool EnableCaching;

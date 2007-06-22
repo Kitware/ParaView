@@ -40,12 +40,10 @@ public:
   // "idx" is the time index, "total" is the number of time steps.
   void RemoveAllCaches();
 
-  // FIXME: deprecated -- to remove.
-  void CacheUpdate(int idx, int total);
-
   // Description:
-  // Force update with caching.
-  void CacheUpdate();
+  // Force update with caching, cacheTime is the key used to save/restore the
+  // cached data.
+  void CacheUpdate(double cacheTime);
 
   // Description:
   // Force update on the input.
@@ -105,9 +103,6 @@ protected:
 
   vtkCacheSizeKeeper* CacheSizeKeeper;
   vtkTimeStamp PipelineUpdateTime;
-
-  vtkDataObject** CachedGeometry;
-  int CachedGeometryLength;
 
   int SaveCacheOnCacheUpdate;
 
