@@ -158,6 +158,24 @@ public:
   /// Clears interaction undo stack of this view
   /// (and all linked views, if any).
   void clearUndoStack();
+
+  /// Get/set the camera manipulators
+  QList<vtkSMProxy*> getCameraManipulators() const;
+  virtual bool updateDefaultInteractors(QList<vtkSMProxy*> manipulators);
+
+  /// Create a CameraManipulatorProxy given the mouse, key and name.
+  /// Whoever calling this is reponsible for deleting the new proxy.
+  virtual vtkSMProxy* createCameraManipulator(
+    int mouse, int shift, int control, QString name);
+
+  /// Restore the default camera manipulators
+  QList<vtkSMProxy*> getDefaultCameraManipulators() const;
+
+  /// Reset camera view direction
+  void resetViewDirection(
+    double look_x, double look_y, double look_z,
+    double up_x, double up_y, double up_z);
+
 public slots:
   // Toggle the orientation axes visibility.
   void setOrientationAxesVisibility(bool visible);

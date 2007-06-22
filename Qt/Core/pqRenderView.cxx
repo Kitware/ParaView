@@ -92,7 +92,7 @@ public:
 
   int DefaultBackground[3];
   bool InitializedWidgets;
-
+  QList<vtkSMProxy* > DefaultCameraManipulators;
   pqInternal()
     {
     this->UpdatingStack = false;
@@ -116,6 +116,17 @@ public:
   ~pqInternal()
     {
     this->RenderViewProxy->setRenderView(0);
+    if(this->DefaultCameraManipulators.size()>0)
+      {
+      foreach(vtkSMProxy* manip, this->DefaultCameraManipulators)
+        {
+        if(manip)
+          {
+          manip->Delete();
+          }
+        }
+      this->DefaultCameraManipulators.clear();
+      }
     }
 };
 
@@ -264,11 +275,13 @@ void pqRenderView::setDefaultPropertyValues()
   this->Superclass::setDefaultPropertyValues();
 
   this->createDefaultInteractors();
+  this->updateDefaultInteractors(
+    this->Internal->DefaultCameraManipulators);
 
   vtkSMProxy* proxy = this->getProxy();
   pqSMAdaptor::setElementProperty(proxy->GetProperty("LODResolution"), 50);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("LODThreshold"), 5);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("RemoteRenderThreshold"), 3);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("CompositeThreshold"), 3);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("SquirtLevel"), 3);
 
   vtkSMProperty* backgroundProperty;
@@ -293,9 +306,80 @@ void pqRenderView::setDefaultPropertyValues()
 // that it sets up some default interactor.
 void pqRenderView::createDefaultInteractors()
 {
+  if(this->Internal->DefaultCameraManipulators.size()>0)
+    {
+    foreach(vtkSMProxy* manip, this->Internal->DefaultCameraManipulators)
+      {
+      if(manip)
+        {
+        manip->Delete();
+        }
+      }
+    this->Internal->DefaultCameraManipulators.clear();
+    }
+
+  // LeftButton -- Rotate
+  vtkSMProxy *manip = this->createCameraManipulator(1, 0, 0, "Rotate");
+  this->Internal->DefaultCameraManipulators.push_back(manip);
+
+  // Shift + LeftButton  -- Roll.
+  manip = this->createCameraManipulator(1, 1, 0, "Roll");
+  this->Internal->DefaultCameraManipulators.push_back(manip);
+
+/*
+  // Control + LeftButton -- Move
+  manip = this->createCameraManipulator(1, 0, 1, "Move");
+  this->Internal->DefaultCameraManipulators.push_back(manip);
+*/
+
+  // Control + LeftButton -- FlyIn
+  // manip = pxm->NewProxy("cameramanipulators", "JoystickFly2");
+  manip = this->createCameraManipulator(1, 0, 1, "Zoom");
+  // pqSMAdaptor::setElementProperty(manip->GetProperty("In"), 1);
+  this->Internal->DefaultCameraManipulators.push_back(manip);
+
+  // MiddleButton -- Pan
+  manip = this->createCameraManipulator(2, 0, 0, "Pan");
+  this->Internal->DefaultCameraManipulators.push_back(manip);
+
+  // Shift + MiddleButton -- Rotate
+  manip = this->createCameraManipulator(2, 1, 0, "Rotate");
+  this->Internal->DefaultCameraManipulators.push_back(manip);
+
+  // Control + MiddleButton -- Rotate
+  manip = this->createCameraManipulator(2, 0, 1, "Rotate");
+  this->Internal->DefaultCameraManipulators.push_back(manip);
+  
+  // RightButton -- Zoom
+  manip = this->createCameraManipulator(3, 0, 0, "Zoom");
+  this->Internal->DefaultCameraManipulators.push_back(manip);
+
+  // Shift + RightButton -- Pan
+  manip = this->createCameraManipulator(3, 1, 0, "Pan");
+  this->Internal->DefaultCameraManipulators.push_back(manip);
+  
+  // Control + RightButton -- FlyOut
+  // manip = pxm->NewProxy("cameramanipulators", "JoystickFly2");
+  manip = this->createCameraManipulator(3, 0, 1, "Zoom");
+  // pqSMAdaptor::setElementProperty(manip->GetProperty("In"), 0);
+  this->Internal->DefaultCameraManipulators.push_back(manip);
+
+}
+
+//-----------------------------------------------------------------------------
+bool pqRenderView::updateDefaultInteractors(
+  QList<vtkSMProxy*> manipulators)
+{
+  if(manipulators.size()<=0)
+    {
+    return false;
+    }
+
   // Create the interactor style proxy:
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkIdType cid = this->getServer()->GetConnectionID();
+
+  this->clearHelperProxies();
 
   vtkSMProxy* interactorStyle = 
     pxm->NewProxy("interactorstyles", "InteractorStyle");
@@ -307,107 +391,14 @@ void pqRenderView::createDefaultInteractors()
   vtkSMProperty *styleManips = 
     interactorStyle->GetProperty("CameraManipulators");
 
-  // Create and register manipulators, then add to interactor style
-
-  // LeftButton -- Rotate
-  vtkSMProxy *manip = pxm->NewProxy("cameramanipulators", "TrackballRotate");
-  manip->SetConnectionID(cid);
-  manip->SetServers(vtkProcessModule::CLIENT);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 1);
-  this->addHelperProxy("Manipulators",manip);
-  pqSMAdaptor::addProxyProperty(styleManips, manip);
-  manip->UpdateVTKObjects();
-  manip->Delete();
-
-  // Shift + LeftButton  -- Roll.
-  manip = pxm->NewProxy("cameramanipulators", "TrackballRoll");
-  manip->SetConnectionID(cid);
-  manip->SetServers(vtkProcessModule::CLIENT);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 1);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Shift"), 1);
-  this->addHelperProxy("Manipulators", manip);
-  pqSMAdaptor::addProxyProperty(styleManips, manip);
-  manip->UpdateVTKObjects();
-  manip->Delete();
-
-  // Control + LeftButton -- FlyIn
-  // manip = pxm->NewProxy("cameramanipulators", "JoystickFly2");
-  manip = pxm->NewProxy("cameramanipulators", "TrackballZoom");
-  manip->SetConnectionID(cid);
-  manip->SetServers(vtkProcessModule::CLIENT);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 1);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Control"), 1);
-  // pqSMAdaptor::setElementProperty(manip->GetProperty("In"), 1);
-  this->addHelperProxy("Manipulators", manip);
-  pqSMAdaptor::addProxyProperty(styleManips, manip);
-  manip->UpdateVTKObjects();
-  manip->Delete();
-
-  // MiddleButton -- Pan
-  manip = pxm->NewProxy("cameramanipulators", "TrackballPan1");
-  manip->SetConnectionID(cid);
-  manip->SetServers(vtkProcessModule::CLIENT);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 2);
-  this->addHelperProxy("Manipulators",manip);
-  pqSMAdaptor::addProxyProperty(styleManips, manip);
-  manip->UpdateVTKObjects();
-  manip->Delete();
-
-  // Shift + MiddleButton -- Rotate
-  manip = pxm->NewProxy("cameramanipulators", "TrackballRotate");
-  manip->SetConnectionID(cid);
-  manip->SetServers(vtkProcessModule::CLIENT);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 2);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Shift"), 1);
-  this->addHelperProxy("Manipulators",manip);
-  pqSMAdaptor::addProxyProperty(styleManips, manip);
-  manip->UpdateVTKObjects();
-  manip->Delete();
-
-  // Control + MiddleButton -- Rotate
-  manip = pxm->NewProxy("cameramanipulators", "TrackballRotate");
-  manip->SetConnectionID(cid);
-  manip->SetServers(vtkProcessModule::CLIENT);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 2);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Control"), 1);
-  this->addHelperProxy("Manipulators",manip);
-  pqSMAdaptor::addProxyProperty(styleManips, manip);
-  manip->UpdateVTKObjects();
-  manip->Delete();
-  
-  // RightButton -- Zoom
-  manip = pxm->NewProxy("cameramanipulators", "TrackballZoom");
-  manip->SetConnectionID(cid);
-  manip->SetServers(vtkProcessModule::CLIENT);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 3);
-  this->addHelperProxy("Manipulators",manip);
-  pqSMAdaptor::addProxyProperty(styleManips, manip);
-  manip->UpdateVTKObjects();
-  manip->Delete();
-
-  // Shift + RightButton -- Pan
-  manip = pxm->NewProxy("cameramanipulators", "TrackballPan1");
-  manip->SetConnectionID(cid);
-  manip->SetServers(vtkProcessModule::CLIENT);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 3);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Shift"), 1);
-  this->addHelperProxy("Manipulators",manip);
-  pqSMAdaptor::addProxyProperty(styleManips, manip);
-  manip->UpdateVTKObjects();
-  manip->Delete();
-  
-  // Control + RightButton -- FlyOut
-  // manip = pxm->NewProxy("cameramanipulators", "JoystickFly2");
-  manip = pxm->NewProxy("cameramanipulators", "TrackballZoom");
-  manip->SetConnectionID(cid);
-  manip->SetServers(vtkProcessModule::CLIENT);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), 3);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Control"), 1);
-  // pqSMAdaptor::setElementProperty(manip->GetProperty("In"), 0);
-  this->addHelperProxy("Manipulators", manip);
-  pqSMAdaptor::addProxyProperty(styleManips, manip);
-  manip->UpdateVTKObjects();
-  manip->Delete();
+  // Register manipulators, then add to interactor style
+ 
+  foreach(vtkSMProxy *manip, manipulators)
+    {
+    this->addHelperProxy("Manipulators",manip);
+    pqSMAdaptor::addProxyProperty(styleManips, manip);
+    manip->UpdateVTKObjects();
+    }
 
   interactorStyle->UpdateVTKObjects();
 
@@ -416,6 +407,55 @@ void pqRenderView::createDefaultInteractors()
     this->Internal->RenderModuleProxy->GetProperty("InteractorStyle"),
     interactorStyle);
   this->Internal->RenderModuleProxy->UpdateVTKObjects();
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* pqRenderView::createCameraManipulator(
+  int mouse, int shift, int control, QString name)
+{
+  QString strManipName;
+  if(name.compare("Rotate")==0)
+    {
+    strManipName = "TrackballRotate";
+    }
+  else if(name.compare("Roll")==0)
+    {
+    strManipName = "TrackballRoll";
+    }
+  else if(name.compare("Move")==0)
+    {
+    strManipName = "TrackballMoveActor";
+    }
+  else if(name.compare("Zoom")==0)
+    {
+    strManipName = "TrackballZoom";
+    }
+  else if(name.compare("Pan")==0)
+    {
+    strManipName = "TrackballPan1";
+    }
+  else
+    {
+    strManipName = "None";
+    }
+
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkIdType cid = this->getServer()->GetConnectionID();
+  vtkSMProxy *manip = pxm->NewProxy("cameramanipulators", 
+    strManipName.toAscii().data());
+  if(!manip)
+    {
+    return NULL;
+    }
+  manip->SetConnectionID(cid);
+  manip->SetServers(vtkProcessModule::CLIENT);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), mouse);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Shift"), shift);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("Control"), control);
+  pqSMAdaptor::setElementProperty(manip->GetProperty("ManipulatorName"), name);
+  //manip->UpdateVTKObjects();
+  return manip;
 }
 
 //-----------------------------------------------------------------------------
@@ -611,7 +651,7 @@ static const char* pqRenderViewModuleMiscSettings [] = {
   "LODThreshold",
   "LODResolution",
   "RenderInterruptsEnabled",
-  "RemoteRenderThreshold",
+  "CompositeThreshold",
   "ReductionFactor",
   "SquirtLevel",
   "OrderedCompositing",
@@ -717,6 +757,41 @@ void pqRenderView::restoreSettings()
     this->ResetCenterWithCamera =
       settings->value(key_prefix + "ResetCenterWithCamera").toBool();
     }
+
+  // Active Camera Manipulators
+  key_prefix = "renderModule/InteractorStyle/";
+  if (settings->contains(key_prefix + "CameraManipulators"))
+    {
+    QStringList qStrManipList = settings->value(
+      key_prefix + "CameraManipulators").toStringList();
+    int index, mouse, shift, control;
+    QString name;
+    char tmpName[20];
+    QList<vtkSMProxy*> smManipList;
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    foreach(QString strManip, qStrManipList)
+      {
+      sscanf(strManip.toAscii().data(), "Manipulator%dMouse%dShift%dControl%dName%s",
+        &index, &mouse, &shift, &control, tmpName);
+      name = tmpName;
+      vtkSMProxy* localManip = this->createCameraManipulator(
+        mouse, shift, control, name);
+      if(!localManip)
+        {
+        continue;
+        }
+      smManipList.push_back(localManip);
+      }
+    if(smManipList.size()>0)
+      {
+      this->updateDefaultInteractors(smManipList);
+      foreach(vtkSMProxy* localManip, smManipList)
+        {
+        localManip->Delete();
+        }
+      smManipList.clear();
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -770,6 +845,26 @@ void pqRenderView::saveSettings()
     this->getCenterAxesVisibility());
   settings->setValue(key_prefix + "ResetCenterWithCamera",
     this->ResetCenterWithCamera);
+
+  // Active Camera Manipulators
+ 
+  int cc=1;
+  int mouse, shift, control;
+  QStringList qStrManipList;
+  QString strManip, name;
+  foreach(vtkSMProxy* pProxy, this->getCameraManipulators())
+    {
+    mouse = pqSMAdaptor::getElementProperty(pProxy->GetProperty("Button")).toInt();
+    shift = pqSMAdaptor::getElementProperty(pProxy->GetProperty("Shift")).toInt();
+    control = pqSMAdaptor::getElementProperty(pProxy->GetProperty("Control")).toInt();
+    name = pqSMAdaptor::getElementProperty(pProxy->GetProperty("ManipulatorName")).toString();
+    strManip = QString("Manipulator%1Mouse%2Shift%3Control%4Name%5").arg(cc++).
+      arg(mouse).arg(shift).arg(control).arg(name);
+    qStrManipList.append(strManip);   
+    }
+  
+  key_prefix = "renderModule/InteractorStyle/";
+  settings->setValue(key_prefix + "CameraManipulators", qStrManipList);
 }
 
 //-----------------------------------------------------------------------------
@@ -913,6 +1008,18 @@ bool pqRenderView::getCenterAxesVisibility() const
 
   return pqSMAdaptor::getElementProperty(
     this->Internal->CenterAxesProxy->GetProperty("Visibility")).toBool();
+}
+
+//-----------------------------------------------------------------------------
+QList<vtkSMProxy*> pqRenderView::getCameraManipulators() const
+{
+  return this->getHelperProxies("Manipulators");
+}
+
+//-----------------------------------------------------------------------------
+ QList<vtkSMProxy*> pqRenderView::getDefaultCameraManipulators() const
+{
+  return this->Internal->DefaultCameraManipulators;
 }
 
 //-----------------------------------------------------------------------------
@@ -1149,4 +1256,38 @@ void pqRenderView::fakeInteraction(bool start)
     other->fakeInteraction(start);
     }
   this->Internal->UpdatingStack = false;
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::resetViewDirection(
+    double look_x, double look_y, double look_z,
+    double up_x, double up_y, double up_z)
+{
+  vtkSMRenderViewProxy* proxy = this->getRenderViewProxy();
+  proxy->SynchronizeCameraProperties();
+
+  pqSMAdaptor::setMultipleElementProperty(
+    proxy->GetProperty("CameraPosition"), 0, 0);
+  pqSMAdaptor::setMultipleElementProperty(
+    proxy->GetProperty("CameraPosition"), 1, 0);
+  pqSMAdaptor::setMultipleElementProperty(
+    proxy->GetProperty("CameraPosition"), 2, 0);
+
+  pqSMAdaptor::setMultipleElementProperty(
+    proxy->GetProperty("CameraFocalPoint"), 0, look_x);
+  pqSMAdaptor::setMultipleElementProperty(
+    proxy->GetProperty("CameraFocalPoint"), 1, look_y);
+  pqSMAdaptor::setMultipleElementProperty(
+    proxy->GetProperty("CameraFocalPoint"), 2, look_z);
+
+  pqSMAdaptor::setMultipleElementProperty(
+    proxy->GetProperty("CameraViewUp"), 0, up_x);
+  pqSMAdaptor::setMultipleElementProperty(
+    proxy->GetProperty("CameraViewUp"), 1, up_y);
+  pqSMAdaptor::setMultipleElementProperty(
+    proxy->GetProperty("CameraViewUp"), 2, up_z);
+  proxy->UpdateVTKObjects();
+
+  this->resetCamera();
+  this->render();
 }
