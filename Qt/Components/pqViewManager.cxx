@@ -458,6 +458,14 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
     QObject::connect(lookmarkAction, SIGNAL(triggered(bool)), 
       this->Internal->LookmarkSignalMapper, SLOT(map()));
 
+    QAction* cameraAction = new QAction(QIcon(":/pqWidgets/Icons/pqCamera16.png"), 
+      "Adjust Camera", 
+      this);
+    cameraAction->setObjectName("CameraButton");
+    frame->addTitlebarAction(cameraAction);
+    cameraAction->setEnabled(true);
+    QObject::connect(cameraAction, SIGNAL(triggered()), 
+      this, SLOT(onCameraTriggered()));
     }
 
   if (view->supportsUndo())
@@ -523,6 +531,12 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqView* view)
       {
       frame->removeTitlebarAction(lookmarkAction);
       delete lookmarkAction;
+      }
+    QAction *cameraAction= frame->getAction("CameraButton");
+    if(cameraAction)
+      {
+      frame->removeTitlebarAction(cameraAction);
+      delete cameraAction;
       }
     }
 
@@ -1154,8 +1168,11 @@ void pqViewManager::onSplittingView(const Index& index,
   emit this->endUndo();
 }
 
-
-
+//-----------------------------------------------------------------------------
+void pqViewManager::onCameraTriggered()
+{
+  emit this->triggerCameraAdjustment(this->Internal->ActiveView);
+}
 
 
 

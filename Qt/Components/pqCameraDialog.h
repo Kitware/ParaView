@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pq3DViewPropertiesWidget.h
+   Module:    pqCameraDialog.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,46 +29,57 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pq3DViewPropertiesWidget_h
-#define __pq3DViewPropertiesWidget_h
+#ifndef __pqCameraDialog_h
+#define __pqCameraDialog_h
 
-#include<QWidget>
-#include "pqComponentsExport.h"
+#include "pqDialog.h"
 
-class pq3DViewPropertiesWidgetInternal;
+class pqCameraDialogInternal;
 class pqRenderView;
 
-class PQCOMPONENTS_EXPORT pq3DViewPropertiesWidget : public QWidget
+class PQCOMPONENTS_EXPORT pqCameraDialog : public pqDialog 
 {
   Q_OBJECT
 public:
-  pq3DViewPropertiesWidget(QWidget* parent=0);
-  virtual ~pq3DViewPropertiesWidget();
+  pqCameraDialog(QWidget* parent=NULL, Qt::WFlags f=0);
+  virtual ~pqCameraDialog();
 
-  // Set the render module whose properties this widget is editing.
-  void setRenderView(pqRenderView*);
-
+  void SetCameraGroupsEnabled(bool enabled);
+  
 public slots:
-  // call to accept the changes in the widget.
-  void accept();
+  void setRenderModule(pqRenderView*);
 
 private slots:
-  void lodThresholdSliderChanged(int);
-  void lodResolutionSliderChanged(int);
-  void outlineThresholdSliderChanged(int);
-  void compositeThresholdSliderChanged(int);
-  void subsamplingRateSliderChanged(int);
-  void squirtLevelRateSliderChanged(int);
-  void stillRenderSubsampleRateSliderChanged(int);
-  void clientCollectSliderChanged(int);
-  void restoreDefaultBackground();
-  void resetLights();
-  void resetDefaultCameraManipulators();
+  void resetViewDirectionPosX();
+  void resetViewDirectionNegX();
+  void resetViewDirectionPosY();
+  void resetViewDirectionNegY();
+  void resetViewDirectionPosZ();
+  void resetViewDirectionNegZ();
+
+  void resetViewDirection(
+    double look_x, double look_y, double look_z,
+    double up_x, double up_y, double up_z);
+
+  void applyCameraRoll();
+  void applyCameraElevation();
+  void applyCameraAzimuth();
+
+protected:
+  void setupGUI();
 
 private:
-  pq3DViewPropertiesWidgetInternal* Internal;
+  pqCameraDialogInternal* Internal;
+  
+  enum CameraAdjustmentType
+    {
+    Roll=0,
+    Elevation,
+    Azimuth
+    };
+  void adjustCamera(CameraAdjustmentType enType, 
+    double angle);
 };
-
 
 #endif
 

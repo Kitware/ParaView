@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationManager.h"
 #include "pqAnimationPanel.h"
 #include "pqApplicationCore.h"
+#include "pqCameraDialog.h"
 #include "pqCloseViewUndoElement.h"
 #include "pqCustomFilterDefinitionModel.h"
 #include "pqCustomFilterDefinitionWizard.h"
@@ -195,7 +196,7 @@ public:
   this->PythonDialog = 0;
 #endif // PARAVIEW_ENABLE_PYTHON
   this->MultiViewManager.setObjectName("MultiViewManager");
-
+  this->CameraDialog = 0;
   }
 
   ~pqImplementation()
@@ -310,6 +311,8 @@ public:
   QList<QToolBar*> PluginToolBars;
   
   pqToolTipTrapper* ToolTipTrapper;
+  
+  QPointer<pqCameraDialog> CameraDialog;
 
   bool InCreateSource;
   
@@ -559,6 +562,11 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   QObject::connect(&this->Implementation->MultiViewManager,
     SIGNAL(activeViewChanged(pqView*)),
     &pqActiveView::instance(), SLOT(setCurrent(pqView*)));
+
+  // Connect the view manager's camera button.
+  QObject::connect(&this->Implementation->MultiViewManager,
+    SIGNAL(triggerCameraAdjustment(pqView*)),
+    this, SLOT(showCameraDialog(pqView*)));
 
   // Listen to the active render module changed signals.
   QObject::connect(
@@ -2839,6 +2847,11 @@ void pqMainWindowCore::onActiveViewChanged(pqView* view)
     this->connect(renderView, SIGNAL(canUndoChanged(bool)),
         this, SLOT(onActiveViewUndoChanged()));
     }
+
+  if(this->Implementation->CameraDialog)
+    {
+    this->showCameraDialog(view);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -3473,33 +3486,8 @@ void pqMainWindowCore::resetViewDirection(
   pqRenderView* ren = qobject_cast<pqRenderView*>(pqActiveView::instance().current());
   if (ren)
     {
-    vtkSMRenderViewProxy* proxy = ren->getRenderViewProxy();
-    proxy->SynchronizeCameraProperties();
- 
-    pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("CameraPosition"), 0, 0);
-    pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("CameraPosition"), 1, 0);
-    pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("CameraPosition"), 2, 0);
-
-    pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("CameraFocalPoint"), 0, look_x);
-    pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("CameraFocalPoint"), 1, look_y);
-    pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("CameraFocalPoint"), 2, look_z);
-
-    pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("CameraViewUp"), 0, up_x);
-    pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("CameraViewUp"), 1, up_y);
-    pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("CameraViewUp"), 2, up_z);
-    proxy->UpdateVTKObjects();
-
-    ren->resetCamera();
-    ren->render();
+    ren->resetViewDirection(look_x, look_y, look_z,
+      up_x, up_y, up_z);
     }
 }
 
@@ -3740,4 +3728,45 @@ void pqMainWindowCore::applicationInitialize()
       this->createReaderOnActiveServer(options->GetParaViewDataName());
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::showCameraDialog(pqView* view)
+{
+  if(!view)
+    {
+    if(this->Implementation->CameraDialog)
+      {
+      this->Implementation->CameraDialog->SetCameraGroupsEnabled(false);
+      }
+    return;
+    }
+  pqRenderView* renModule = qobject_cast<pqRenderView*>(view);
+
+  if (!renModule)
+    {
+    if(this->Implementation->CameraDialog)
+      {
+      this->Implementation->CameraDialog->SetCameraGroupsEnabled(false);
+      }
+    return;
+    }
+
+  if(!this->Implementation->CameraDialog)
+    {
+    this->Implementation->CameraDialog = new pqCameraDialog(
+      this->Implementation->Parent);
+    this->Implementation->CameraDialog->setWindowTitle("Adjust Camera");
+    this->Implementation->CameraDialog->setAttribute(Qt::WA_DeleteOnClose);
+    this->Implementation->CameraDialog->setRenderModule(renModule);
+    this->Implementation->CameraDialog->show();
+    }
+  else
+    {
+    this->Implementation->CameraDialog->SetCameraGroupsEnabled(true);
+    this->Implementation->CameraDialog->setRenderModule(renModule);
+    this->Implementation->CameraDialog->raise();
+    this->Implementation->CameraDialog->activateWindow();
+    }
+
 }

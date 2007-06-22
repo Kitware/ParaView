@@ -34,11 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager includes.
 #include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSmartPointer.h"
 
 // Qt includes.
 #include <QDoubleValidator>
+#include <QList>
+#include <QComboBox>
 
 // ParaView Client includes.
 #include "pqApplicationCore.h"
@@ -55,6 +58,8 @@ class pq3DViewPropertiesWidgetInternal : public Ui::pq3DViewProperties
 public:
   pqPropertyManager Links;
   pqSignalAdaptorColor *ColorAdaptor;
+  QList<QComboBox*> CameraControl3DComboBoxList;
+  QList<QString> CameraControl3DComboItemList;
   QPointer<pqRenderView> ViewModule;
 
   pq3DViewPropertiesWidgetInternal() 
@@ -65,6 +70,8 @@ public:
   ~pq3DViewPropertiesWidgetInternal()
     {
     delete this->ColorAdaptor;
+    this->CameraControl3DComboBoxList.clear();
+    this->CameraControl3DComboItemList.clear();
     }
 
   void updateLODThresholdLabel(int value)
@@ -124,6 +131,28 @@ public:
       QString("%1 MBytes").arg(value_in_mb));
     }
 
+  void initializeGUICameraManipulators()
+    {
+
+    this->CameraControl3DComboBoxList << this->comboBoxCamera3D
+    << this->comboBoxCamera3D_2 << this->comboBoxCamera3D_3
+    << this->comboBoxCamera3D_4 << this->comboBoxCamera3D_5
+    << this->comboBoxCamera3D_6 << this->comboBoxCamera3D_7
+    << this->comboBoxCamera3D_8 << this->comboBoxCamera3D_9;
+  
+    this->CameraControl3DComboItemList //<< "FlyIn" << "FlyOut" << "Move"
+       << "Pan" << "Roll" << "Rotate" << "Zoom";
+
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    for ( int cc = 0; cc < this->CameraControl3DComboBoxList.size(); cc++ )
+      {
+      foreach(QString name, this->CameraControl3DComboItemList)
+        {
+        this->CameraControl3DComboBoxList.at(cc)->addItem(name);
+        }
+      }
+    }
+
   bool supportsCompositing(vtkSMProxy* proxy)
     {
     return (proxy && proxy->GetProperty("RemoteRenderThreshold"));
@@ -137,6 +166,9 @@ public:
 
   void loadValues(pqRenderView* proxy);
   void accept();
+  void setGUICameraManipulators(QList<vtkSMProxy*> manipulators);
+  void updateCameraManipulators(pqRenderView* rm);
+  void resetCameraManipulators();
 };
 
 //-----------------------------------------------------------------------------
@@ -352,6 +384,59 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqRenderView* viewModule)
   this->CenterX->setText(QString::number(center[0],'g',3));
   this->CenterY->setText(QString::number(center[1],'g',3));
   this->CenterZ->setText(QString::number(center[2],'g',3));
+
+  if(this->ViewModule)
+    {
+    this->setGUICameraManipulators(this->ViewModule
+      ->getCameraManipulators());
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pq3DViewPropertiesWidgetInternal::setGUICameraManipulators(
+  QList<vtkSMProxy*> manipulators)
+{
+  if(manipulators.size()<=0)
+    {
+    return;
+    }
+
+  pqRenderView* rm = this->ViewModule;
+  int mouse, key, shift, control, pos, index;
+  QString name;
+if(rm->getCameraManipulators().size()>0)
+  {
+  foreach(vtkSMProxy* manip, manipulators)
+    {
+    key = 0;
+    mouse = pqSMAdaptor::getElementProperty(
+      manip->GetProperty("Button")).toInt();
+    shift = pqSMAdaptor::getElementProperty(
+      manip->GetProperty("Shift")).toInt();
+    control = pqSMAdaptor::getElementProperty(
+      manip->GetProperty("Control")).toInt();
+    name = pqSMAdaptor::getElementProperty(
+      manip->GetProperty("ManipulatorName")).toString();
+    
+    if(!this->CameraControl3DComboItemList.contains(name))
+      {
+      continue;
+      }
+
+    key = (shift==1) ? 1 : 0;
+    if(!key)
+      {
+      key = (control==1) ? 2 : 0;
+      }
+    pos = mouse + key*3;
+    if(pos<1 || pos > this->CameraControl3DComboBoxList.size())
+      {
+      continue;
+      }
+    index = this->CameraControl3DComboItemList.indexOf(name);
+    this->CameraControl3DComboBoxList[pos-1]->setCurrentIndex(index);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -482,7 +567,51 @@ void pq3DViewPropertiesWidgetInternal::accept()
     center[2] = this->CenterZ->text().toDouble();
     this->ViewModule->setCenterOfRotation(center);
     }
+  this->updateCameraManipulators(this->ViewModule);
   this->ViewModule->saveSettings();
+}
+
+//-----------------------------------------------------------------------------
+void pq3DViewPropertiesWidgetInternal::updateCameraManipulators(
+  pqRenderView* rm)
+{
+  int mouse, key, shift, control;
+  QString name;
+  QList<vtkSMProxy*> smManipList;
+  for ( int cc = 0; cc < this->CameraControl3DComboBoxList.size(); cc++ )
+    {
+    shift = 0;
+    control = 0;
+    mouse = cc % 3; //"mouse button" can only be 1, 2, 3.
+    key = static_cast<int>(cc / 3);
+    shift = (key == 1);
+    control = (key == 2); 
+    name = this->CameraControl3DComboBoxList[cc]->currentText();
+    vtkSMProxy* localManip = rm->createCameraManipulator(
+      mouse+1, shift, control, name);
+    smManipList.push_back(localManip);
+    }
+
+  if(smManipList.size()>0)
+    {
+    rm->updateDefaultInteractors(smManipList);
+    foreach(vtkSMProxy* localManip, smManipList)
+      {
+      localManip->Delete();
+      }
+    smManipList.clear();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pq3DViewPropertiesWidgetInternal::resetCameraManipulators()
+{
+  if(this->ViewModule)
+    {
+    this->setGUICameraManipulators(
+      this->ViewModule->getDefaultCameraManipulators());
+    }
+
 }
 
 //-----------------------------------------------------------------------------
@@ -491,6 +620,7 @@ pq3DViewPropertiesWidget::pq3DViewPropertiesWidget(QWidget* _parent):
 {
   this->Internal = new pq3DViewPropertiesWidgetInternal;
   this->Internal->setupUi(this);
+  this->Internal->initializeGUICameraManipulators();
 
   QDoubleValidator* dv = new QDoubleValidator(this);
   this->Internal->CenterX->setValidator(dv);
@@ -531,6 +661,9 @@ pq3DViewPropertiesWidget::pq3DViewPropertiesWidget(QWidget* _parent):
   QObject::connect(this->Internal->clientCollect,
     SIGNAL(valueChanged(int)),
     this, SLOT(clientCollectSliderChanged(int)));
+
+  QObject::connect(this->Internal->resetCameraDefault,
+    SIGNAL(clicked()), this, SLOT(resetDefaultCameraManipulators()));
   
 }
 
@@ -601,6 +734,12 @@ void pq3DViewPropertiesWidget::stillRenderSubsampleRateSliderChanged(int value)
 void pq3DViewPropertiesWidget::clientCollectSliderChanged(int value)
 {
   this->Internal->updateClientCollectLabel(static_cast<double>(value));
+}
+
+//-----------------------------------------------------------------------------
+void pq3DViewPropertiesWidget::resetDefaultCameraManipulators()
+{
+  this->Internal->resetCameraManipulators();
 }
 
 //-----------------------------------------------------------------------------

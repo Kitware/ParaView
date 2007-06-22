@@ -105,6 +105,9 @@ signals:
   /// should not get recorded on the undo stack.
   void endNonUndoableChanges();
 
+  /// Fired when the camera button is clicked.
+  void triggerCameraAdjustment(pqView*);
+
 private slots:
   /// This will create a view module to fill the frame.
   /// the render window is created on the active server
@@ -149,6 +152,9 @@ private slots:
   /// Called when a split frame request is made.
   /// We add an undo element to the stack to undo/redo the split.
   void onSplittingView(const Index&, Qt::Orientation, float, const Index&);
+
+  /// Called when the camera button is clicked
+  virtual void onCameraTriggered();
 
 public slots:
   /// Set the active server. This must be called whenever

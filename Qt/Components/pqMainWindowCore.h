@@ -416,6 +416,9 @@ private slots:
   /// such as --data, --server etc.
   void applicationInitialize();
 
+  /// Show the camera dialog for the active view module
+  void showCameraDialog(pqView*);
+
 private:
   pqServerManagerModelItem *getActiveObject() const;
   void updatePendingActions(pqServer *server, pqPipelineSource *source,
