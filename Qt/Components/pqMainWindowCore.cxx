@@ -139,6 +139,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVTKWidget.h>
 
 #include <vtkDataObject.h>
+#include <vtkImageData.h>
 #include <vtkProcessModule.h>
 #include <vtkPVOptions.h>
 #include <vtkPVXMLElement.h>
@@ -1628,30 +1629,43 @@ bool pqMainWindowCore::compareView(
   ostream& output,
   const QString& tempDirectory)
 {
-  pqRenderView* renModule = qobject_cast<pqRenderView*>(pqActiveView::instance().current());
+  pqView* curView = pqActiveView::instance().current();
 
-  if (!renModule)
+  if (!curView)
     {
-    output << "ERROR: Could not locate the render module." << endl;
-    return false;
-    }
-
-  vtkRenderWindow* const render_window = 
-    renModule->getRenderViewProxy()->GetRenderWindow();
-
-  if(!render_window)
-    {
-    output << "ERROR: Could not locate the Render Window." << endl;
+    output << "ERROR: Could not locate the active view." << endl;
     return false;
     }
 
   // All tests need a 300x300 render window size.
-  QSize cur_size = renModule->getWidget()->size();
-  renModule->getWidget()->resize(300,300);
-  bool ret = pqCoreTestUtility::CompareImage(render_window, referenceImage, 
+  QSize cur_size = curView->getWidget()->size();
+  curView->getWidget()->resize(300,300);
+  vtkImageData* test_image = curView->captureImage(1);
+
+  if (!test_image)
+    {
+    output << "ERROR: Failed to capture snapshot." << endl;
+    return false;
+    }
+
+  // The returned image will have extents translated to match the view position,
+  // we shift them back.
+  int viewPos[2];
+  curView->getViewProxy()->GetViewPosition(viewPos);
+  // Update image extents based on ViewPosition
+  int extents[6];
+  test_image->GetExtent(extents);
+  for (int cc=0; cc < 4; cc++)
+    {
+    extents[cc] -= viewPos[cc/2];
+    }
+  test_image->SetExtent(extents);
+
+  bool ret = pqCoreTestUtility::CompareImage(test_image, referenceImage, 
     threshold, output, tempDirectory);
-  renModule->getWidget()->resize(cur_size);
-  renModule->render();
+  test_image->Delete();
+  curView->getWidget()->resize(cur_size);
+  curView->render();
   return ret;
 }
 

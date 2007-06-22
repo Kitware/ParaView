@@ -43,6 +43,7 @@ class pqEventPlayer;
 class pqEventTranslator;
 class pqProcessModuleGUIHelper;
 class vtkRenderWindow;
+class vtkImageData;
 
 /// Provides ParaView-specific functionality for regression testing
 class PQCORE_EXPORT pqCoreTestUtility : public pqTestUtility
@@ -65,9 +66,18 @@ public:
   /// Saves the contents of a render window to a file for later use as a
   /// reference image
   static bool SaveScreenshot(vtkRenderWindow* RenderWindow, const QString& File);
+
   /// Compares the contents of a render window to a reference image,
   /// returning true iff the two match within a given threshold
   static bool CompareImage(vtkRenderWindow* RenderWindow, 
+                           const QString& ReferenceImage, 
+                           double Threshold, 
+                           ostream& Output, 
+                           const QString& TempDirectory);
+
+  /// Compares the test image to a reference image,
+  /// returning true iff the two match within a given threshold
+  static bool CompareImage(vtkImageData* testImage,
                            const QString& ReferenceImage, 
                            double Threshold, 
                            ostream& Output, 

@@ -187,6 +187,22 @@ bool pqCoreTestUtility::CompareImage(vtkRenderWindow* RenderWindow,
   return false;
 }
 
+bool pqCoreTestUtility::CompareImage(vtkImageData* testImage,
+  const QString& ReferenceImage, double Threshold, 
+  ostream& vtkNotUsed(Output), const QString& TempDirectory)
+{
+  vtkSmartPointer<vtkTesting> testing = vtkSmartPointer<vtkTesting>::New();
+  testing->AddArgument("-T");
+  testing->AddArgument(TempDirectory.toAscii().data());
+  testing->AddArgument("-V");
+  testing->AddArgument(ReferenceImage.toAscii().data());
+  if (testing->RegressionTest(testImage, Threshold) == vtkTesting::PASSED)
+    {
+    return true;
+    }
+  return false;
+}
+
 void pqCoreTestUtility::playTests(const QStringList& filenames)
 {
   this->TestFilenames = filenames;
