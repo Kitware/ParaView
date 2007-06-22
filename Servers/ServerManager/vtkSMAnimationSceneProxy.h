@@ -89,7 +89,8 @@ public:
   // Description:
   // Set if caching is enabled.
   // This method synchronizes the cahcing flag on every cue.
-  virtual void SetCaching(int enable); 
+  vtkSetMacro(Caching, int);
+  vtkGetMacro(Caching, int);
 
   // Description:
   // This method calls InvalidateAllGeometries on the vtkSMRenderViewProxy.
@@ -141,6 +142,7 @@ protected:
   vtkCollectionIterator* AnimationCueProxiesIterator;
 
   int PlayMode;
+  int Caching;
 
   //BTX
   friend class vtkSMAnimationSceneImageWriter;

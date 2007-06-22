@@ -25,7 +25,7 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.19");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.20");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
@@ -75,7 +75,6 @@ vtkSMAnimationCueProxy::vtkSMAnimationCueProxy()
   this->Manipulator = 0;
 
   this->AnimationCue = 0;
-  this->Caching = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -97,13 +96,6 @@ void vtkSMAnimationCueProxy::RemoveAnimatedProxy()
 {
   this->SetAnimatedProxy(0);
 }
-
-//----------------------------------------------------------------------------
-void vtkSMAnimationCueProxy::SetCaching(int enable)
-{
-  this->Caching = enable;
-}
-  
 
 //----------------------------------------------------------------------------
 void vtkSMAnimationCueProxy::CreateVTKObjects()
@@ -206,83 +198,42 @@ void vtkSMAnimationCueProxy::ExecuteEvent(vtkObject* obj, unsigned long event,
       break;
       }
     }
-  else if (manip)
-    {
-    switch (event)
-      {
-    case vtkSMAnimationCueManipulatorProxy::StateModifiedEvent:
-      /* No longer needed, since if the property changes, 
-       * MarkModified is indeed called on the proxy when the property 
-       * is pushed.
-      if (!this->Caching && this->AnimatedProxy)
-        {
-        this->AnimatedProxy->MarkModified(this);
-        }
-        */ 
-      break;
-      }
-    }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMAnimationCueProxy::StartCueInternal(
   void* info)
 {
-  // Tell the displays the update are calling from animation and
-  // that they should use their cache if possible.
-  int prev = vtkSMDataObjectDisplayProxy::GetUseCache();
-  if (this->Caching)
-    {
-    vtkSMDataObjectDisplayProxy::SetUseCache(1);
-    }
   if (this->Manipulator)
     {
     // let the manipulator know that the cue has been restarted.
     this->Manipulator->Initialize(this);
     }
   this->InvokeEvent(vtkCommand::StartAnimationCueEvent, info);
-  vtkSMDataObjectDisplayProxy::SetUseCache(prev);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMAnimationCueProxy::EndCueInternal(
   void* info)
 {
-  // Tell the displays the update are calling from animation and
-  // that they should use their cache if possible.
-  int prev = vtkSMDataObjectDisplayProxy::GetUseCache();
-  if (this->Caching)
-    {
-    vtkSMDataObjectDisplayProxy::SetUseCache(1);
-    }
   if (this->Manipulator)
     {
     // let the manipulator know that the cue has ended.
     this->Manipulator->Finalize(this);
     }
   this->InvokeEvent(vtkCommand::EndAnimationCueEvent, info);
-  vtkSMDataObjectDisplayProxy::SetUseCache(prev);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMAnimationCueProxy::TickInternal(
   void* info)
 {
-  // Tell the displays the update are calling from animation and
-  // that they should use their cache if possible.
-  int prev = vtkSMDataObjectDisplayProxy::GetUseCache();
-  if (this->Caching)
-    {
-    vtkSMDataObjectDisplayProxy::SetUseCache(1);
-    }
-
   // determine normalized  currenttime.
   vtkAnimationCue::AnimationCueInfo *cueInfo = 
     reinterpret_cast<vtkAnimationCue::AnimationCueInfo*>(info);
   if (!cueInfo)
     {
     vtkErrorMacro("Invalid object thrown by Tick event");
-    vtkSMDataObjectDisplayProxy::SetUseCache(prev);
     return;
     }
  
@@ -298,8 +249,6 @@ void vtkSMAnimationCueProxy::TickInternal(
     this->Manipulator->UpdateValue(ctime, this);
     }
   this->InvokeEvent(vtkCommand::AnimationCueTickEvent, info);
-  vtkSMDataObjectDisplayProxy::SetUseCache(prev);
-
 }
 
 //----------------------------------------------------------------------------
@@ -415,5 +364,4 @@ void vtkSMAnimationCueProxy::PrintSelf(ostream& os, vtkIndent indent)
     ((this->AnimatedDomainName)? this->AnimatedDomainName : "NULL") << endl;
   os << indent << "AnimationCue: " << this->AnimationCue << endl;
   os << indent << "Manipulator: " << this->Manipulator << endl;
-  os << indent << "Caching: " << this->Caching << endl;
 }

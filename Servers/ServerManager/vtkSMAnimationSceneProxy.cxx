@@ -108,7 +108,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.44");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.45");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
@@ -193,22 +193,6 @@ void vtkSMAnimationSceneProxy::RemoveAllViewModules()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMAnimationSceneProxy::SetCaching(int enable)
-{
-  this->Superclass::SetCaching(enable);
-  vtkCollectionIterator* iter = this->AnimationCueProxies->NewIterator();
-  
-  for (iter->InitTraversal();
-    !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
-    vtkSMAnimationCueProxy* cue = 
-      vtkSMAnimationCueProxy::SafeDownCast(iter->GetCurrentObject());
-    cue->SetCaching(enable);
-    }
-  iter->Delete();
-}
-
-//----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::Play()
 {
   vtkAnimationScene* scene = vtkAnimationScene::SafeDownCast(
@@ -216,7 +200,7 @@ void vtkSMAnimationSceneProxy::Play()
   if (scene)
     {
     this->Internals->DisableInteractionAllViews();
-    this->Internals->PassUseCache(this->GetCaching());
+    this->Internals->PassUseCache(this->GetCaching()>0);
     scene->Play();
     this->Internals->PassUseCache(false);
     this->Internals->EnableInteractionAllViews();
@@ -320,7 +304,6 @@ void vtkSMAnimationSceneProxy::AddCue(vtkSMProxy* proxy)
     }
   scene->AddCue(cue->GetAnimationCue());
   this->AnimationCueProxies->AddItem(cue);
-  cue->SetCaching(this->GetCaching());
 }
 
 //----------------------------------------------------------------------------
@@ -355,11 +338,6 @@ void vtkSMAnimationSceneProxy::SetPlayMode(int mode)
   // Caching is disabled when play mode is real time.
   if (mode == vtkAnimationScene::PLAYMODE_REALTIME && this->Caching)
     {
-    /*
-    vtkWarningMacro("Disabling caching. "
-      "Caching not available in Real Time mode.");
-    this->SetCaching(0);
-    */
     // We clean cache and hence forth, we dont call CacheUpdate()
     // this will make sure that cache is not used when playing in 
     // real time.
@@ -440,7 +418,7 @@ void vtkSMAnimationSceneProxy::SetAnimationTime(double time)
 {
   if (this->AnimationCue)
     {
-    this->Internals->PassUseCache(this->GetCaching());
+    this->Internals->PassUseCache(this->GetCaching()>0);
     this->AnimationCue->Initialize();
     this->AnimationCue->Tick(time,0);
     this->Internals->PassUseCache(false);

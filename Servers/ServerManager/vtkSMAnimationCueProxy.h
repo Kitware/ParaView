@@ -102,11 +102,6 @@ public:
 
   vtkGetObjectMacro(AnimationCue, vtkAnimationCue);
 
-  // Description:
-  // Get/Set if caching is enabled.
-  virtual void SetCaching(int enable);
-  vtkGetMacro(Caching, int);
-  
 //BTX
   // Description:
   // Simply returns the \c SelfID for this class. Legacy 
