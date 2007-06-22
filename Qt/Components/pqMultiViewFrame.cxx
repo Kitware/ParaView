@@ -263,6 +263,7 @@ void pqMultiViewFrame::setBorderColor(QColor c)
 //-----------------------------------------------------------------------------
 void pqMultiViewFrame::setMainWidget(QWidget* w)
 {
+  this->mainWidgetPreChange(this);
   QLayout* l;
   if(this->MenuHidden)
     {

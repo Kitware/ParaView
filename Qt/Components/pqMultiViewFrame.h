@@ -132,6 +132,8 @@ signals:
   void drop(pqMultiViewFrame*,QDropEvent*);
   /// fired before the context menu is shown for this frame.
   void contextMenuRequested();
+  // Signal emmited before the main widget gets changed for this frame
+  void mainWidgetPreChange(pqMultiViewFrame*);
   /// Signal emitted after the main widget has changed for this frame
   void mainWidgetChanged(pqMultiViewFrame*);
 
