@@ -18,11 +18,12 @@
 
 
 vtkStandardNewMacro(vtkCacheSizeKeeper);
-vtkCxxRevisionMacro(vtkCacheSizeKeeper, "1.1");
+vtkCxxRevisionMacro(vtkCacheSizeKeeper, "1.2");
 //-----------------------------------------------------------------------------
 vtkCacheSizeKeeper::vtkCacheSizeKeeper()
 {
   this->CacheSize = 0;
+  this->CacheFull = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -35,4 +36,5 @@ void vtkCacheSizeKeeper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "CacheSize: " << this->CacheSize << endl;
+  os << indent << "CacheFull: " << this->CacheFull << endl;
 }

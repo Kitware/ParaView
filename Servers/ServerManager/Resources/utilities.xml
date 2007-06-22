@@ -730,6 +730,15 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <IntVectorProperty
+        name="CacheLimit"
+        command="SetCacheLimit"
+        number_of_elements="1"
+        update_self="1"
+        default_values="102400">
+        <IntRangeDomain name="range" />
+      </IntVectorProperty>
+
     </AnimationSceneProxy>
 
     <PVAnimationSceneProxy name="PVAnimationScene" class="notused">
@@ -864,6 +873,15 @@
         immediate_update="1"
         is_internal="1">
       </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="CacheLimit"
+        command="SetCacheLimit"
+        number_of_elements="1"
+        update_self="1"
+        default_values="102400">
+        <IntRangeDomain name="range" />
+      </IntVectorProperty>
     <!-- End of PVAnimationScene -->
     </PVAnimationSceneProxy>
 

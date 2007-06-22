@@ -34,7 +34,14 @@ public:
   // Report increase in cache size (in kbytes).
   void AddCacheSize(unsigned long kbytes)
     {
-    this->CacheSize += kbytes;
+    if (this->CacheFull)
+      {
+      vtkErrorMacro("Cache is full. Cannot add more cached data.");
+      }
+    else
+      {
+      this->CacheSize += kbytes;
+      }
     }
 
   // Description:
@@ -48,11 +55,19 @@ public:
   // Description:
   // Get the size of cache reported to this keeper.
   vtkGetMacro(CacheSize, unsigned long);
+
+
+  // Description:
+  // Get/Set if the cache is full. 
+  vtkGetMacro(CacheFull, int);
+  vtkSetMacro(CacheFull, int);
+
 protected:
   vtkCacheSizeKeeper();
   ~vtkCacheSizeKeeper();
 
   unsigned long CacheSize;
+  int CacheFull;
 private:
   vtkCacheSizeKeeper(const vtkCacheSizeKeeper&); // Not implemented.
   void operator=(const vtkCacheSizeKeeper&); // Not implemented.

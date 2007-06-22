@@ -136,12 +136,6 @@ public:
   vtkGetMacro(ViewUpdateTime, double);
 
   // Description:
-  // Get/Set the cache limit (in kilobytes) for each process. If cache size
-  // grows beyond the limit, no caching is done on any of the processes.
-  vtkGetMacro(CacheLimit, int);
-  vtkSetMacro(CacheLimit, int);
-
-  // Description:
   // When caching is enabled (typically, when playing animations,
   // this time must be updated when each frame is changed.
   void SetCacheTime(double time);
@@ -149,6 +143,7 @@ public:
 
   // Description:
   // Set/get whether cached geometry should be used whenever possible.
+  // Called by vtkSMAnimationSceneProxy to enable caching.
   void SetUseCache(int);
   vtkGetMacro(UseCache, int);
 
@@ -307,7 +302,6 @@ private:
   double ViewUpdateTime;
   bool ViewUpdateTimeInitialized;
 
-  int CacheLimit; // in KiloBytes.
   double CacheTime;
   int UseCache;
 //ETX

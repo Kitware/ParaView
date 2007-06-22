@@ -5660,14 +5660,6 @@ The Level Scalars filter uses colors to show levels of a hierarchical dataset.
       </DoubleVectorProperty>
       
       <IntVectorProperty
-        name="SaveCacheOnCacheUpdate"
-        command="SetSaveCacheOnCacheUpdate"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-
-      <IntVectorProperty
         name="Enabled"
         command="SetEnabled"
         number_of_elements="1"

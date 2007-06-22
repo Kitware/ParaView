@@ -578,7 +578,6 @@ public:
   vtkSetMacro(SendStreamToClientOnly, int);
   vtkGetMacro(SendStreamToClientOnly, int);
   vtkBooleanMacro(SendStreamToClientOnly, int);
-//BTX
 
   // Description:
   // Get/Set the vtkCacheSizeKeeper objects that can
@@ -586,6 +585,7 @@ public:
   // To gather information about caches on all processes,
   // use vtkPVCacheSizeInformation.
   vtkGetObjectMacro(CacheSizeKeeper, vtkCacheSizeKeeper);
+//BTX
 protected:
   vtkProcessModule();
   ~vtkProcessModule();

@@ -15,10 +15,13 @@
 #include "vtkSMAnimationSceneProxy.h"
 
 #include "vtkAnimationScene.h"
+#include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
+#include "vtkPVCacheSizeInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMRenderViewProxy.h"
@@ -108,7 +111,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.45");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.46");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
@@ -119,6 +122,7 @@ vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
   this->OverrideStillRender = 0;
   this->Internals = new vtkSMAnimationSceneProxyInternals();
   this->PlayMode = SEQUENCE;
+  this->CacheLimit = 100*1024; // 100 MBs.
 }
 
 //----------------------------------------------------------------------------
@@ -387,6 +391,23 @@ void vtkSMAnimationSceneProxy::EndCueInternal(void* info)
 
 }
 
+//-----------------------------------------------------------------------------
+bool vtkSMAnimationSceneProxy::CheckCacheSizeWithinLimit()
+{
+  vtkSmartPointer<vtkPVCacheSizeInformation> info = 
+    vtkSmartPointer<vtkPVCacheSizeInformation>::New();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->GatherInformation(this->ConnectionID,
+    vtkProcessModule::RENDER_SERVER, info, pm->GetProcessModuleID());
+
+  vtkSmartPointer<vtkPVCacheSizeInformation> clientinfo = 
+    vtkSmartPointer<vtkPVCacheSizeInformation>::New();
+  clientinfo->CopyFromObject(pm);
+  clientinfo->AddInformation(info);
+
+  return (clientinfo->GetCacheSize() < static_cast<unsigned long>(this->CacheLimit));
+}
+
 //----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::CacheUpdate(void* info)
 {
@@ -395,6 +416,27 @@ void vtkSMAnimationSceneProxy::CacheUpdate(void* info)
     {
     return;
     }
+
+  // Check if the cache has overgrown the limit.
+  int cachefull = this->CheckCacheSizeWithinLimit()? 0 : 1;
+
+  // Update cache full status on the cache size keeper so that all update
+  // suppressors i.e. cache maintainer will be made aware.
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream; 
+  stream  << vtkClientServerStream::Invoke
+          << pm->GetProcessModuleID()
+          << "GetCacheSizeKeeper"
+          << vtkClientServerStream::End;
+  stream  << vtkClientServerStream::Invoke
+          << vtkClientServerStream::LastResult
+          << "SetCacheFull"
+          << cachefull
+          << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, 
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER,
+    stream);
+
   vtkAnimationCue::AnimationCueInfo *cueInfo = reinterpret_cast<
     vtkAnimationCue::AnimationCueInfo*>(info);
 
@@ -460,4 +502,5 @@ void vtkSMAnimationSceneProxy::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "PlayMode: "<< this->PlayMode << endl;
   os << indent << "OverrideStillRender: " << this->OverrideStillRender << endl;
+  os << indent << "CacheLimit: " << this->CacheLimit << endl;
 }

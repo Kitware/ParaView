@@ -143,7 +143,6 @@ public:
     this->CameraControl3DComboItemList //<< "FlyIn" << "FlyOut" << "Move"
        << "Pan" << "Roll" << "Rotate" << "Zoom";
 
-    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
     for ( int cc = 0; cc < this->CameraControl3DComboBoxList.size(); cc++ )
       {
       foreach(QString name, this->CameraControl3DComboItemList)
@@ -187,8 +186,6 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqRenderView* viewModule)
     SIGNAL(colorChanged(const QVariant&)),
     proxy, proxy->GetProperty("Background"));
 
-  this->Links.registerLink(this->cacheLimit, "value", SIGNAL(valueChanged(int)),
-    proxy, proxy->GetProperty("CacheLimit"));
   this->Links.registerLink(this->parallelProjection, "checked",
     SIGNAL(stateChanged(int)),
     proxy, proxy->GetProperty("CameraParallelProjection"));

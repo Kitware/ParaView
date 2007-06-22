@@ -76,11 +76,6 @@ public:
   void SetCacheSizeKeeper(vtkCacheSizeKeeper*);
   vtkGetObjectMacro(CacheSizeKeeper, vtkCacheSizeKeeper);
 
-  // Description:
-  // If not set, CacheUpdate() will use cache if available,
-  // but will not cache newly generated data.
-  vtkSetMacro(SaveCacheOnCacheUpdate, int);
-  vtkGetMacro(SaveCacheOnCacheUpdate, int);
 protected:
   vtkPVUpdateSuppressor();
   ~vtkPVUpdateSuppressor();

@@ -119,6 +119,12 @@ public:
   // at the indicated time.
   void SetAnimationTime(double time);
 
+  // Description:
+  // Get/Set the cache limit (in kilobytes) for each process. If cache size
+  // grows beyond the limit, no caching is done on any of the processes.
+  vtkGetMacro(CacheLimit, int);
+  vtkSetMacro(CacheLimit, int);
+
 protected:
   vtkSMAnimationSceneProxy();
   ~vtkSMAnimationSceneProxy();
@@ -137,7 +143,11 @@ protected:
   virtual void TickInternal(void* info);
   virtual void EndCueInternal(void* info);
   void CacheUpdate(void* info);
-  
+
+  // Description:
+  // Check if the current cache size on all processes is within limits.
+  bool CheckCacheSizeWithinLimit();
+
   vtkCollection* AnimationCueProxies;
   vtkCollectionIterator* AnimationCueProxiesIterator;
 
@@ -148,6 +158,8 @@ protected:
   friend class vtkSMAnimationSceneImageWriter;
   int OverrideStillRender;
   vtkSetMacro(OverrideStillRender, int);
+
+  int CacheLimit; // in KiloBytes.
   //ETX
 private:
   vtkSMAnimationSceneProxy(const vtkSMAnimationSceneProxy&); // Not implemented.

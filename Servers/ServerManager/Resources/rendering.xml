@@ -4268,13 +4268,6 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
-      <IntVectorProperty
-        name="CacheLimit"
-        number_of_elements="1"
-        default_values="0">
-        <!-- Fix me -->
-      </IntVectorProperty>
-
       <!-- 
         Some common subproxies that are not affected by the type of render
         view. Note the absence of such essential subproxies as RenderWindow,

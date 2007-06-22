@@ -33,7 +33,6 @@
 
 #include <vtkstd/map>
 
-
 #ifdef MYDEBUG
 # define vtkMyDebug(x)\
     cout << x;
@@ -57,7 +56,7 @@ public:
     }
 };
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.54");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.55");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 vtkCxxSetObjectMacro(vtkPVUpdateSuppressor, CacheSizeKeeper, vtkCacheSizeKeeper);
 //----------------------------------------------------------------------------
@@ -73,7 +72,6 @@ vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
 
   this->Enabled = 1;
 
-  this->SaveCacheOnCacheUpdate = 1;
   this->CacheSizeKeeper = 0;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
@@ -214,7 +212,7 @@ void vtkPVUpdateSuppressor::CacheUpdate(double cacheTime)
     // No cache present, force update.
     this->ForceUpdate();
   
-    if (this->SaveCacheOnCacheUpdate)
+    if (!this->CacheSizeKeeper  || !this->CacheSizeKeeper->GetCacheFull())
       {
       vtkSmartPointer<vtkDataObject> cache;
       cache.TakeReference(output->NewInstance());
@@ -225,9 +223,22 @@ void vtkPVUpdateSuppressor::CacheUpdate(double cacheTime)
       // // But this update is needed when doing animation without compositing.
       cache->Update();
       (*this->Cache)[cacheTime] = cache;
+
+      if (this->CacheSizeKeeper)
+        {
+        // Register used cache size.
+        this->CacheSizeKeeper->AddCacheSize(cache->GetActualMemorySize());
+        }
+
       vtkMyDebug(this->UpdatePiece << " "
         << "Cached data: " << cacheTime 
         << " " << vtkDataSet::SafeDownCast(cache)->GetNumberOfPoints() << endl);
+      }
+    else
+      {
+      vtkMyDebug(this->UpdatePiece << " "
+        << "Cached data: " << cacheTime 
+        << " -- not caching since cache full" << endl);
       }
     }
   else
@@ -341,6 +352,5 @@ void vtkPVUpdateSuppressor::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UpdateNumberOfPieces: " << this->UpdateNumberOfPieces << endl;
   os << indent << "Enabled: " << this->Enabled << endl;
   os << indent << "CacheSizeKeeper: " << this->CacheSizeKeeper << endl;
-  os << indent << "SaveCacheOnCacheUpdate: " << this->SaveCacheOnCacheUpdate << endl;
   os << indent << "UpdateTime: " << this->UpdateTime << endl;
 }

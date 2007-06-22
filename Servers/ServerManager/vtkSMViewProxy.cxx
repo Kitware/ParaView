@@ -123,7 +123,7 @@ void vtkSMViewProxy::CleanMultiViewInitializer()
 }
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.13");
 
 vtkInformationKeyMacro(vtkSMViewProxy, USE_CACHE, Integer);
 vtkInformationKeyMacro(vtkSMViewProxy, CACHE_TIME, Double);
@@ -151,7 +151,6 @@ vtkSMViewProxy::vtkSMViewProxy()
   this->ViewUpdateTime = 0;
   this->ViewUpdateTimeInitialized = false;
 
-  this->CacheLimit = 100*1024; // 100 MBs.
   this->UseCache = false;
   this->CacheTime = 0.0;
 
@@ -596,7 +595,6 @@ void vtkSMViewProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ViewUpdateTime: " << this->ViewUpdateTime << endl;
   os << indent << "UseCache: " << this->UseCache << endl;
   os << indent << "CacheTime: " << this->CacheTime << endl;
-  os << indent << "CacheLimit: " << this->CacheLimit << endl;
 }
 
 
