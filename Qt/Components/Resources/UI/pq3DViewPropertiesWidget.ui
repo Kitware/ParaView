@@ -1704,6 +1704,216 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tabCamera" >
+      <attribute name="title" >
+       <string>Camera</string>
+      </attribute>
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>9</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <widget class="QGroupBox" name="groupBox_8" >
+         <property name="title" >
+          <string>Control for 3D Movements</string>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>5</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item row="2" column="1" >
+           <widget class="QComboBox" name="comboBoxCamera3D_4" >
+            <property name="minimumContentsLength" >
+             <number>0</number>
+            </property>
+            <property name="duplicatesEnabled" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" >
+           <widget class="QComboBox" name="comboBoxCamera3D" >
+            <property name="minimumContentsLength" >
+             <number>0</number>
+            </property>
+            <property name="duplicatesEnabled" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1" >
+           <widget class="QComboBox" name="comboBoxCamera3D_7" >
+            <property name="minimumContentsLength" >
+             <number>0</number>
+            </property>
+            <property name="duplicatesEnabled" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" >
+           <widget class="QLabel" name="label_21" >
+            <property name="text" >
+             <string>Left Button</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3" >
+           <widget class="QLabel" name="label_18" >
+            <property name="text" >
+             <string>Right Button</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" >
+           <widget class="QLabel" name="label_20" >
+            <property name="text" >
+             <string>Middle Button</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2" >
+           <widget class="QComboBox" name="comboBoxCamera3D_8" >
+            <property name="minimumContentsLength" >
+             <number>0</number>
+            </property>
+            <property name="duplicatesEnabled" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2" >
+           <widget class="QComboBox" name="comboBoxCamera3D_5" >
+            <property name="minimumContentsLength" >
+             <number>0</number>
+            </property>
+            <property name="duplicatesEnabled" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2" >
+           <widget class="QComboBox" name="comboBoxCamera3D_2" >
+            <property name="minimumContentsLength" >
+             <number>0</number>
+            </property>
+            <property name="duplicatesEnabled" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="3" >
+           <widget class="QComboBox" name="comboBoxCamera3D_9" >
+            <property name="minimumContentsLength" >
+             <number>0</number>
+            </property>
+            <property name="duplicatesEnabled" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3" >
+           <widget class="QComboBox" name="comboBoxCamera3D_6" >
+            <property name="minimumContentsLength" >
+             <number>0</number>
+            </property>
+            <property name="duplicatesEnabled" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3" >
+           <widget class="QComboBox" name="comboBoxCamera3D_3" >
+            <property name="minimumContentsLength" >
+             <number>0</number>
+            </property>
+            <property name="duplicatesEnabled" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" >
+           <widget class="QLabel" name="label_19" >
+            <property name="text" >
+             <string>Control-Key ^</string>
+            </property>
+            <property name="alignment" >
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" >
+           <widget class="QLabel" name="label_22" >
+            <property name="text" >
+             <string>Shift-Key ^</string>
+            </property>
+            <property name="alignment" >
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item>
+          <spacer>
+           <property name="orientation" >
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" >
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="resetCameraDefault" >
+           <property name="sizePolicy" >
+            <sizepolicy>
+             <hsizetype>0</hsizetype>
+             <vsizetype>0</vsizetype>
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text" >
+            <string>Reset Defaults</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>

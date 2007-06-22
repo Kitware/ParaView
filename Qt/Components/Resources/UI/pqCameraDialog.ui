@@ -1,0 +1,493 @@
+<ui version="4.0" >
+ <class>pqCameraDialog</class>
+ <widget class="QDialog" name="pqCameraDialog" >
+  <property name="windowModality" >
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>303</width>
+    <height>450</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Adjusting Camera</string>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item row="3" column="0" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>201</width>
+       <height>27</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="3" column="1" >
+    <widget class="QPushButton" name="closeButton" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>0</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text" >
+      <string>Close</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2" >
+    <widget class="QGroupBox" name="orientationsGroup" >
+     <property name="title" >
+      <string>Camera Orientation</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="0" column="2" >
+       <widget class="QLabel" name="label_20" >
+        <property name="text" >
+         <string>degrees</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QPushButton" name="azimuthButton" >
+        <property name="text" >
+         <string>Azimuth</string>
+        </property>
+        <property name="icon" >
+         <iconset/>
+        </property>
+        <property name="iconSize" >
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QPushButton" name="elevationButton" >
+        <property name="text" >
+         <string>Elevation</string>
+        </property>
+        <property name="icon" >
+         <iconset/>
+        </property>
+        <property name="iconSize" >
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <widget class="QPushButton" name="rollButton" >
+        <property name="text" >
+         <string>Roll</string>
+        </property>
+        <property name="icon" >
+         <iconset/>
+        </property>
+        <property name="iconSize" >
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QDoubleSpinBox" name="azimuthAngle" >
+        <property name="maximum" >
+         <double>360.000000000000000</double>
+        </property>
+        <property name="minimum" >
+         <double>-360.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QDoubleSpinBox" name="elevationAngle" >
+        <property name="maximum" >
+         <double>360.000000000000000</double>
+        </property>
+        <property name="minimum" >
+         <double>-360.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QDoubleSpinBox" name="rollAngle" >
+        <property name="maximum" >
+         <double>360.000000000000000</double>
+        </property>
+        <property name="minimum" >
+         <double>-360.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" >
+       <widget class="QLabel" name="label_21" >
+        <property name="text" >
+         <string>degrees</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2" >
+       <widget class="QLabel" name="label_16" >
+        <property name="text" >
+         <string>degrees</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2" >
+    <widget class="pqCollapsedGroup" name="positionsGroup" >
+     <property name="title" >
+      <string>Camera Positions</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="3" column="1" >
+       <widget class="QDoubleSpinBox" name="viewAngle" >
+        <property name="maximum" >
+         <double>360.000000000000000</double>
+        </property>
+        <property name="minimum" >
+         <double>-360.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QDoubleSpinBox" name="viewUp0" >
+        <property name="maximum" >
+         <double>10000.000000000000000</double>
+        </property>
+        <property name="minimum" >
+         <double>-10000.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QDoubleSpinBox" name="focalPoint0" >
+        <property name="maximum" >
+         <double>10000.000000000000000</double>
+        </property>
+        <property name="minimum" >
+         <double>-10000.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" >
+       <widget class="QDoubleSpinBox" name="position1" >
+        <property name="maximum" >
+         <double>10000.000000000000000</double>
+        </property>
+        <property name="minimum" >
+         <double>-10000.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QDoubleSpinBox" name="position0" >
+        <property name="maximum" >
+         <double>10000.000000000000000</double>
+        </property>
+        <property name="minimum" >
+         <double>-10000.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2" >
+       <widget class="QDoubleSpinBox" name="viewUp1" >
+        <property name="maximum" >
+         <double>10000.000000000000000</double>
+        </property>
+        <property name="minimum" >
+         <double>-10000.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3" >
+       <widget class="QDoubleSpinBox" name="viewUp2" >
+        <property name="maximum" >
+         <double>10000.000000000000000</double>
+        </property>
+        <property name="minimum" >
+         <double>-10000.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_14" >
+        <property name="text" >
+         <string>View Up</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_17" >
+        <property name="text" >
+         <string>Focal Point</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_22" >
+        <property name="text" >
+         <string>Position</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="label_23" >
+        <property name="text" >
+         <string>View Angle</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" >
+       <widget class="QDoubleSpinBox" name="focalPoint1" >
+        <property name="maximum" >
+         <double>10000.000000000000000</double>
+        </property>
+        <property name="minimum" >
+         <double>-10000.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3" >
+       <widget class="QDoubleSpinBox" name="focalPoint2" >
+        <property name="maximum" >
+         <double>10000.000000000000000</double>
+        </property>
+        <property name="minimum" >
+         <double>-10000.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3" >
+       <widget class="QDoubleSpinBox" name="position2" >
+        <property name="maximum" >
+         <double>10000.000000000000000</double>
+        </property>
+        <property name="minimum" >
+         <double>-10000.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2" >
+    <widget class="pqCollapsedGroup" name="viewsGroup" >
+     <property name="title" >
+      <string>Standard Views</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="1" column="2" >
+       <widget class="QPushButton" name="viewZMinus" >
+        <property name="toolTip" >
+         <string>Looking down Z axis from (0, 0, -1)</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+        <property name="icon" >
+         <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqZMinus24.png</iconset>
+        </property>
+        <property name="iconSize" >
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QPushButton" name="viewYMinus" >
+        <property name="toolTip" >
+         <string>Looking down Y axis from (0, -1, 0)</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+        <property name="icon" >
+         <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqYMinus24.png</iconset>
+        </property>
+        <property name="iconSize" >
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QPushButton" name="viewXMinus" >
+        <property name="toolTip" >
+         <string>Looking down X axis from (-1, 0, 0)</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+        <property name="icon" >
+         <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqXMinus24.png</iconset>
+        </property>
+        <property name="iconSize" >
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" >
+       <widget class="QPushButton" name="viewZPlus" >
+        <property name="toolTip" >
+         <string>Looking down X axis from (0, 0, 1)</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+        <property name="icon" >
+         <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqZPlus24.png</iconset>
+        </property>
+        <property name="iconSize" >
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QPushButton" name="viewYPlus" >
+        <property name="toolTip" >
+         <string>Looking down Y axis from (0, 1, 0)</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+        <property name="icon" >
+         <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqYPlus24.png</iconset>
+        </property>
+        <property name="iconSize" >
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" >
+       <widget class="QPushButton" name="viewXPlus" >
+        <property name="toolTip" >
+         <string>Looking down X axis from (1, 0, 0)</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+        <property name="icon" >
+         <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqXPlus24.png</iconset>
+        </property>
+        <property name="iconSize" >
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqCollapsedGroup</class>
+   <extends>QGroupBox</extends>
+   <header>pqCollapsedGroup.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>viewXPlus</tabstop>
+  <tabstop>viewYPlus</tabstop>
+  <tabstop>viewZPlus</tabstop>
+  <tabstop>viewXMinus</tabstop>
+  <tabstop>viewYMinus</tabstop>
+  <tabstop>viewZMinus</tabstop>
+  <tabstop>position0</tabstop>
+  <tabstop>position1</tabstop>
+  <tabstop>position2</tabstop>
+  <tabstop>focalPoint0</tabstop>
+  <tabstop>focalPoint1</tabstop>
+  <tabstop>focalPoint2</tabstop>
+  <tabstop>viewUp0</tabstop>
+  <tabstop>viewUp1</tabstop>
+  <tabstop>viewUp2</tabstop>
+  <tabstop>viewAngle</tabstop>
+  <tabstop>rollButton</tabstop>
+  <tabstop>rollAngle</tabstop>
+  <tabstop>elevationButton</tabstop>
+  <tabstop>elevationAngle</tabstop>
+  <tabstop>azimuthButton</tabstop>
+  <tabstop>azimuthAngle</tabstop>
+  <tabstop>closeButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>closeButton</sender>
+   <signal>clicked()</signal>
+   <receiver>pqCameraDialog</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>230</x>
+     <y>428</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>185</x>
+     <y>443</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
