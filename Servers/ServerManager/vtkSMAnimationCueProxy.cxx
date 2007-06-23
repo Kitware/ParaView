@@ -25,7 +25,7 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.21");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
@@ -181,8 +181,6 @@ void vtkSMAnimationCueProxy::ExecuteEvent(vtkObject* obj, unsigned long event,
   void* calldata)
 {
   vtkAnimationCue* cue = vtkAnimationCue::SafeDownCast(obj);
-  vtkSMAnimationCueManipulatorProxy* manip = 
-    vtkSMAnimationCueManipulatorProxy::SafeDownCast(obj);
   if (cue)
     {
     switch (event)

@@ -768,7 +768,6 @@ void pqRenderView::restoreSettings()
     QString name;
     char tmpName[20];
     QList<vtkSMProxy*> smManipList;
-    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
     foreach(QString strManip, qStrManipList)
       {
       sscanf(strManip.toAscii().data(), "Manipulator%dMouse%dShift%dControl%dName%s",
