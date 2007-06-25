@@ -75,6 +75,7 @@ public:
   double endTime() const;
 
   QAbstractItemModel* header();
+  void setRowHeight(int);
   int rowHeight() const;
 
 public slots:
@@ -99,6 +100,7 @@ private:
   double CurrentTime;
   double StartTime;
   double EndTime;
+  int    RowHeight;
 
   QList<pqAnimationTrack*> Tracks;
 

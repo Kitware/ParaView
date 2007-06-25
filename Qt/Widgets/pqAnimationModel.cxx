@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPainter>
 #include <QGraphicsView>
 #include <QEvent>
+#include <QStyle>
 
 #include "pqAnimationTrack.h"
 
@@ -130,11 +131,15 @@ double pqAnimationModel::endTime() const
   return this->EndTime;
 }
 
+void pqAnimationModel::setRowHeight(int rh)
+{
+  this->RowHeight = rh;
+  this->resizeTracks();
+}
+
 int pqAnimationModel::rowHeight() const
 {
-  QGraphicsView* view = qobject_cast<QGraphicsView*>(this->parent());
-  QFontMetrics metrics(view->font());
-  return metrics.height() + 4;
+  return this->RowHeight;
 }
 
 void pqAnimationModel::setMode(pqAnimationModel::ModeType m)
@@ -228,9 +233,13 @@ bool pqAnimationModel::eventFilter(QObject* w, QEvent* e)
 
 void pqAnimationModel::trackNameChanged()
 {
+  QGraphicsView* view = qobject_cast<QGraphicsView*>(this->parent());
+  QFontMetrics metrics(view->font());
+
   for(int i=0; i<this->Tracks.size(); i++)
     {
-    this->Header.setHeaderData(i+1, Qt::Vertical, this->Tracks[i]->property(), Qt::DisplayRole);
+    this->Header.setHeaderData(i+1, Qt::Vertical, this->Tracks[i]->property(),
+                               Qt::DisplayRole);
     }
 }
 

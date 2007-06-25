@@ -40,28 +40,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationModel.h"
 
 pqAnimationWidget::pqAnimationWidget(QWidget* p) 
-  : QWidget(p) 
+  : QScrollArea(p) 
 {
-  QHBoxLayout* wlayout = new QHBoxLayout(this);
-  QFrame* frame = new QFrame(this);
-  frame->setFrameShape(QFrame::StyledPanel);
-  frame->setFrameShadow(QFrame::Sunken);
-  wlayout->addWidget(frame);
-  QHBoxLayout* l = new QHBoxLayout(frame);
-  this->View = new QGraphicsView(frame);
+  QWidget* cont = new QWidget();
+  cont->setSizePolicy(QSizePolicy::MinimumExpanding,
+                      QSizePolicy::MinimumExpanding);
+  QHBoxLayout* wlayout = new QHBoxLayout(cont);
+  wlayout->setSizeConstraint(QLayout::SetMinimumSize);
+  this->View = new QGraphicsView(cont);
+  this->View->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  this->View->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   this->View->setAlignment(Qt::AlignLeft | Qt::AlignTop);
   this->View->setFrameShape(QFrame::NoFrame);
   this->Model = new pqAnimationModel(this->View);
   this->View->setScene(this->Model);
-  QHeaderView* header = new QHeaderView(Qt::Vertical, frame);
-  header->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
-  header->setResizeMode(QHeaderView::Fixed);
-  header->setDefaultSectionSize(this->Model->rowHeight());
-  header->setModel(this->Model->header());
-  l->addWidget(header);
-  l->addWidget(this->View);
-  l->setMargin(0);
-  l->setSpacing(0);
+  this->View->setInteractive(false);
+  this->Header = new QHeaderView(Qt::Vertical, cont);
+  this->Header->setSizePolicy(QSizePolicy::Preferred,
+                              QSizePolicy::MinimumExpanding);
+  this->View->setSizePolicy(QSizePolicy::Preferred,
+                              QSizePolicy::MinimumExpanding);
+  this->Header->setResizeMode(QHeaderView::Interactive);
+  this->Header->setMinimumSectionSize(0);
+  this->Header->setModel(this->Model->header());
+  this->Model->setRowHeight(this->Header->sectionSize(0));
+  wlayout->addWidget(this->Header);
+  wlayout->addWidget(this->View);
+  wlayout->setMargin(0);
+  wlayout->setSpacing(0);
+  this->setWidget(cont);
+  this->setWidgetResizable(true);
+  QObject::connect(this->Header->model(),
+                   SIGNAL(rowsInserted(QModelIndex,int,int)),
+                   this, SLOT(updateSizes()));
+
 }
 
 pqAnimationWidget::~pqAnimationWidget()
@@ -72,4 +84,16 @@ pqAnimationModel* pqAnimationWidget::animationModel() const
 {
   return this->Model;
 }
+
+void pqAnimationWidget::updateSizes()
+{
+  int sz = 0;
+  for(int i=0; i<this->Header->count(); i++)
+    {
+    sz += this->Header->sectionSize(i);
+    }
+  this->widget()->setMinimumHeight(sz);
+  this->widget()->layout()->invalidate();
+}
+
 

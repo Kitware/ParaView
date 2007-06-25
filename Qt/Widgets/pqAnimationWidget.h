@@ -35,12 +35,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QtWidgetsExport.h"
 
-#include <QWidget>
+#include <QScrollArea>
 
 class QGraphicsView;
+class QHeaderView;
 class pqAnimationModel;
 
-class QTWIDGETS_EXPORT pqAnimationWidget : public QWidget
+class QTWIDGETS_EXPORT pqAnimationWidget : public QScrollArea
 {
   Q_OBJECT
 public:
@@ -49,8 +50,12 @@ public:
 
   pqAnimationModel* animationModel() const;
 
+protected slots:
+  void updateSizes();
+
 private:
   QGraphicsView* View;
+  QHeaderView* Header;
   pqAnimationModel* Model;
 
 };
