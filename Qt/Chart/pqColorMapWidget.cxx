@@ -731,6 +731,23 @@ void pqColorMapWidget::generateGradient()
             v = ((px - x1)*(next.value() - previous.value()))/w + previous.value();
             painter.setPen(QColor::fromHsv(h, s, v));
             }
+          else if (this->Model->getColorSpace() == pqColorMapModel::LabSpace)
+            {
+            double L_next, a_next, b_next, L_previous, a_previous, b_previous;
+            pqColorMapModel::RGBToLab(next.redF(), next.greenF(), next.blueF(),
+                                      &L_next, &a_next, &b_next);
+            pqColorMapModel::RGBToLab(
+                           previous.redF(), previous.greenF(), previous.blueF(),
+                           &L_previous, &a_previous, &b_previous);
+            double L = ((px - x1)*(L_next - L_previous))/w + L_previous;
+            double a = ((px - x1)*(a_next - a_previous))/w + a_previous;
+            double b = ((px - x1)*(b_next - b_previous))/w + b_previous;
+            double red, green, blue;
+            pqColorMapModel::LabToRGB(L, a, b, &red, &green, &blue);
+            QColor color;
+            color.setRgbF(red, green, blue);
+            painter.setPen(color);
+            }
 
           painter.drawLine(px, 0, px, imageHeight);
           }

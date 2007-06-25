@@ -206,6 +206,7 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->Form->ColorSpace->addItem("RGB");
   this->Form->ColorSpace->addItem("HSV");
   this->Form->ColorSpace->addItem("Wrapped HSV");
+  this->Form->ColorSpace->addItem("CIE-L*ab");
 
   // Add the color scale presets menu.
   this->loadBuiltinColorPresets();
@@ -756,9 +757,9 @@ void pqColorScaleEditor::setColorSpace(int index)
     {
     // Set the property on the lookup table.
     int wrap = index == 2 ? 1 : 0;
-    if(wrap == 1)
+    if(index >= 2)
       {
-      index = 1;
+      index--;
       }
 
     this->Form->InSetColors = true;
@@ -915,9 +916,9 @@ void pqColorScaleEditor::loadPreset()
         {
         // Set the property on the lookup table.
         int wrap = colorSpace == 2 ? 1 : 0;
-        if(wrap == 1)
+        if(colorSpace >= 2)
           {
-          colorSpace = 1;
+          colorSpace--;
           }
 
         this->Form->InSetColors = true;
@@ -1428,11 +1429,16 @@ void pqColorScaleEditor::initColorScale()
     int space = pqSMAdaptor::getElementProperty(
         lookupTable->GetProperty("ColorSpace")).toInt();
     this->Form->ColorSpace->blockSignals(true);
-    this->Form->ColorSpace->setCurrentIndex(space);
+    // Set the ColorSpace index, accounting for the fact that "HSVNoWrap" is
+    // a fake that is inserted at index 2.
     if(pqSMAdaptor::getElementProperty(
         lookupTable->GetProperty("HSVWrap")).toInt())
       {
       this->Form->ColorSpace->setCurrentIndex(2);
+      }
+    else if (space >= 2)
+      {
+      this->Form->ColorSpace->setCurrentIndex(space+1);
       }
     else
       {

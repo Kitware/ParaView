@@ -56,7 +56,8 @@ public:
     {
     RgbSpace,
     HsvSpace,
-    WrappedHsvSpace
+    WrappedHsvSpace,
+    LabSpace
     };
 
 public:
@@ -102,6 +103,11 @@ public:
   QPixmap generateGradient(const QSize &size) const;
 
   pqColorMapModel &operator=(const pqColorMapModel &other);
+
+  static void RGBToLab(double red, double green, double blue,
+                       double *L, double *a, double *b);
+  static void LabToRGB(double L, double a, double b,
+                       double *red, double *green, double *blue);
 
 signals:
   /// Emitted when the color space changes.

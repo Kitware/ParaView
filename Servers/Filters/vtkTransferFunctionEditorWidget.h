@@ -125,7 +125,8 @@ public:
   vtkGetObjectMacro(Histogram, vtkRectilinearGrid);
 
   // Description:
-  // Set the color space. (RGB = 0, HSV = 1, HSV with wrapping = 2)
+  // Set the color space. (RGB = 0, HSV = 1, HSV with wrapping = 2,
+  // CIE-L*ab = 3)
   virtual void SetColorSpace(int) {}
 
   // Description:

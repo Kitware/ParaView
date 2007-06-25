@@ -514,6 +514,10 @@ void pqColorPresetManager::importColorMap(vtkPVXMLElement *element)
     {
     colorMap.setColorSpace(pqColorMapModel::RgbSpace);
     }
+  else if(space == "Lab")
+    {
+    colorMap.setColorSpace(pqColorMapModel::LabSpace);
+    }
   else if(space == "Wrapped")
     {
     colorMap.setColorSpace(pqColorMapModel::WrappedHsvSpace);
@@ -603,7 +607,7 @@ void pqColorPresetManager::exportColorMap(const QModelIndex &index,
     }
 
   // Get the color space and points from the color map model.
-  const char *spaceNames[] = {"RGB", "HSV", "Wrapped"};
+  const char *spaceNames[] = {"RGB", "HSV", "Wrapped", "Lab"};
   const pqColorMapModel *colorMap = this->Model->getColorMap(index.row());
   if(colorMap)
     {

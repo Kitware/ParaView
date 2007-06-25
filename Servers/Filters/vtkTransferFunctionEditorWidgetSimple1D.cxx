@@ -29,7 +29,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.29");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.30");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -1266,7 +1266,7 @@ double vtkTransferFunctionEditorWidgetSimple1D::GetElementScalar(
 //----------------------------------------------------------------------------
 void vtkTransferFunctionEditorWidgetSimple1D::SetColorSpace(int space)
 {
-  if (space < 0 || space > 2)
+  if (space < 0 || space > 3)
     {
     return;
     }
@@ -1283,6 +1283,9 @@ void vtkTransferFunctionEditorWidgetSimple1D::SetColorSpace(int space)
     case 2:
       this->ColorFunction->SetColorSpaceToHSV();
       this->ColorFunction->HSVWrapOn();
+      break;
+    case 3:
+      this->ColorFunction->SetColorSpaceToLab();
       break;
     }
 }

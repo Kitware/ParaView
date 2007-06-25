@@ -184,17 +184,13 @@ QVariant pqColorPresetModel::data(const QModelIndex &idx, int role) const
           switch(item->Colors.getColorSpace())
             {
             case pqColorMapModel::RgbSpace:
-              {
               return QVariant("RGB");
-              }
             case pqColorMapModel::HsvSpace:
-              {
               return QVariant("HSV");
-              }
             case pqColorMapModel::WrappedHsvSpace:
-              {
               return QVariant("Wrapped HSV");
-              }
+            case pqColorMapModel::LabSpace:
+              return QVariant("CIE-L*ab");
             }
           }
 
