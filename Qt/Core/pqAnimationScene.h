@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqProxy.h"
 #include <QPair>
+#include <QSet>
 
 class pqAnimationCue;
 class QSize;
@@ -80,6 +81,10 @@ public:
 
   /// Get the clock time range set on the animation scene proxy.
   QPair<double, double> getClockTimeRange() const;
+
+  /// Get all the cues in this scene
+  QSet<pqAnimationCue*> getCues() const;
+
 signals:
   /// Fired before a new cue is added to the scene.
   void preAddedCue(pqAnimationCue*);

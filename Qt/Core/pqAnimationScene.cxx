@@ -261,6 +261,17 @@ bool pqAnimationScene::contains(pqAnimationCue* cue) const
 }
 
 //-----------------------------------------------------------------------------
+QSet<pqAnimationCue*> pqAnimationScene::getCues() const
+{
+  QSet<pqAnimationCue*> ret;
+  foreach(pqAnimationCue* cue, this->Internals->Cues)
+    {
+    ret.insert(cue);
+    }
+  return ret;
+}
+
+//-----------------------------------------------------------------------------
 pqAnimationCue* pqAnimationScene::getCue(vtkSMProxy* proxy, 
   const char* propertyname, int index) const
 {
