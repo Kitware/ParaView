@@ -240,16 +240,6 @@ void pqLookmarkModel::load(
       {
       resetCamera = true;
       }
-
-    // Now turn off visibility of all displays currently added to view.
-    // We do this before the lookmark is loaded so that other sources
-    // do not obstruct the view of the lookmark sources.
-    QList<pqDisplay*> displays = view->getDisplays();
-    for(int i=0; i<displays.count(); i++)
-      {
-      pqDisplay *disp = displays[i];
-      disp->setVisible(0);
-      }
     }
 
   // If this is a lookmark of a single view, the active view needs to be 
