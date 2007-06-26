@@ -60,7 +60,7 @@ protected:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMServerSideAnimationPlayer);
-vtkCxxRevisionMacro(vtkSMServerSideAnimationPlayer, "1.7");
+vtkCxxRevisionMacro(vtkSMServerSideAnimationPlayer, "1.8");
 vtkCxxSetObjectMacro(vtkSMServerSideAnimationPlayer, Writer, 
   vtkSMAnimationSceneImageWriter);
 //-----------------------------------------------------------------------------
@@ -118,7 +118,7 @@ void vtkSMServerSideAnimationPlayer::PerformActions()
     }
 
   pxm->UpdateRegisteredProxies(0);
-  pxm->SaveState("/tmp/serverstate.xml");
+  // pxm->SaveState("/tmp/serverstate.xml");
 
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
 
