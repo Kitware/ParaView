@@ -117,6 +117,26 @@ pqLineWidget::pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
   QObject::connect(&this->Implementation->Links, SIGNAL(smPropertyChanged()),
     this, SLOT(setModified()));
 
+  // Trigger a render when use explicitly edits the positions.
+  QObject::connect(this->Implementation->UI.point1X, 
+    SIGNAL(editingFinished()), 
+    this, SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI.point1Y, 
+    SIGNAL(editingFinished()), 
+    this, SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI.point1Z,
+    SIGNAL(editingFinished()), 
+    this, SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI.point2X, 
+    SIGNAL(editingFinished()), 
+    this, SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI.point2Y, 
+    SIGNAL(editingFinished()), 
+    this, SLOT(render()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->UI.point2Z,
+    SIGNAL(editingFinished()), 
+    this, SLOT(render()), Qt::QueuedConnection);
+  
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
   this->createWidget(smmodel->findServer(o->GetConnectionID()));
