@@ -652,7 +652,7 @@ static const char* pqRenderViewModuleMiscSettings [] = {
   "LODResolution",
   "RenderInterruptsEnabled",
   "RemoteRenderThreshold",
-  "ReductionFactor",
+  "ImageReductionFactor",
   "SquirtLevel",
   "OrderedCompositing",
   "CollectGeometryThreshold",
