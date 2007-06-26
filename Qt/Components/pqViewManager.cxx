@@ -923,7 +923,7 @@ void pqViewManager::updateViewPositions()
       QRect bounds = view->getWidget()->rect();
       prop->SetElements2(bounds.width(), bounds.height());
       }
-    view->getProxy()->UpdateVTKObjects();
+    view->getProxy()->UpdateProperty("ViewSize");
     }
 
   emit this->endNonUndoableChanges();
