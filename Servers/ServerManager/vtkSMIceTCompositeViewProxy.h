@@ -64,6 +64,11 @@ public:
   vtkSetMacro(DisableOrderedCompositing, int);
   vtkGetMacro(DisableOrderedCompositing, int);
 
+  // Description:
+  // Returns an image data that contains a "screenshot" of the window.
+  // It is the responsibility of the caller to delete the image data.
+  virtual vtkImageData* CaptureWindow(int magnification);
+
 //BTX
 protected:
   vtkSMIceTCompositeViewProxy();
@@ -119,6 +124,9 @@ protected:
   // Pass ordered compositing decision to all strategies.
   void SetOrderedCompositingDecision(bool decision);
 
+
+  void UpdateViewport();
+
   // Manager used for multiview.
   vtkSMProxy* MultiViewManager;
   vtkClientServerID SharedMultiViewManagerID;
@@ -144,6 +152,9 @@ protected:
   // tiling.
   int TileDimensions[2];
   int TileMullions[2];
+
+  int ViewSize[2];
+  bool ViewSizeInitialized;
 
   vtkSMRepresentationStrategyVector *ActiveStrategyVector;
 

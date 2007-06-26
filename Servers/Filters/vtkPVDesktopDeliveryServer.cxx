@@ -61,7 +61,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.7");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.8");
 vtkStandardNewMacro(vtkPVDesktopDeliveryServer);
 
 //----------------------------------------------------------------------------
@@ -77,6 +77,8 @@ vtkPVDesktopDeliveryServer::vtkPVDesktopDeliveryServer()
 
   this->Renderers->Delete();
   this->Renderers = NULL;
+
+  this->WindowIdRMIId = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -93,8 +95,8 @@ vtkPVDesktopDeliveryServer::~vtkPVDesktopDeliveryServer()
 
   if (this->Controller && this->AddedRMIs)
     {
-    this->Controller->RemoveFirstRMI(
-                                 vtkPVDesktopDeliveryServer::WINDOW_ID_RMI_TAG);
+    this->Controller->RemoveRMI(this->WindowIdRMIId);
+    this->WindowIdRMIId = 0;
     }
 }
 
@@ -231,10 +233,14 @@ void vtkPVDesktopDeliveryServer::SetRenderWindow(vtkRenderWindow *renWin)
 //-----------------------------------------------------------------------------
 void vtkPVDesktopDeliveryServer::InitializeRMIs()
 {
-  this->Superclass::InitializeRMIs();
+  if (!this->AddedRMIs)
+    {
+    this->Superclass::InitializeRMIs();
 
-  this->Controller->AddRMI(::UseRendererSet, this,
-                           vtkPVDesktopDeliveryServer::WINDOW_ID_RMI_TAG);
+    this->WindowIdRMIId = this->Controller->AddRMI(
+                             ::UseRendererSet, this,
+                             vtkPVDesktopDeliveryServer::WINDOW_ID_RMI_TAG);
+    }
 }
 
 //----------------------------------------------------------------------------

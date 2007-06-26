@@ -496,10 +496,17 @@ void pqAnimationPanel::setActiveCue(pqAnimationCue* cue)
 {
   if (this->Internal->ActiveCue == cue)
     {
+    if (!cue)
+      {
+      // ensure no keyframe is being shown.
+      this->showKeyFrame(-1);
+      }
     return;
     }
+
   // Clean up old keyframe stuff.
   this->showKeyFrame(-1);
+
 
   if (this->Internal->ActiveCue)
     {

@@ -17,12 +17,13 @@
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMAnimationSceneImageWriter.h"
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMProxyIterator.h"
-#include "vtkSMAnimationSceneImageWriter.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMRenderViewProxy.h"
 
 #include <vtkstd/string>
 
@@ -59,7 +60,7 @@ protected:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMServerSideAnimationPlayer);
-vtkCxxRevisionMacro(vtkSMServerSideAnimationPlayer, "1.6");
+vtkCxxRevisionMacro(vtkSMServerSideAnimationPlayer, "1.7");
 vtkCxxSetObjectMacro(vtkSMServerSideAnimationPlayer, Writer, 
   vtkSMAnimationSceneImageWriter);
 //-----------------------------------------------------------------------------
@@ -124,9 +125,11 @@ void vtkSMServerSideAnimationPlayer::PerformActions()
   // Render any views.
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
-    vtkSMRenderModuleProxy* ren = 
-      vtkSMRenderModuleProxy::SafeDownCast(iter->GetProxy());
-    if (ren)
+    vtkSMRenderViewProxy* ren = 
+      vtkSMRenderViewProxy::SafeDownCast(iter->GetProxy());
+    // We need to ensure that we skip prototypes.
+    if (ren && ren->GetConnectionID() 
+      != vtkProcessModuleConnectionManager::GetNullConnectionID())
       {
       ren->StillRender();
       }

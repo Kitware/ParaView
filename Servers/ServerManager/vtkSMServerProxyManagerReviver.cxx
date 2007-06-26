@@ -24,11 +24,11 @@
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMStateLoader.h"
+#include "vtkSMPQStateLoader.h"
 
 #include <vtksys/ios/sstream>
 vtkStandardNewMacro(vtkSMServerProxyManagerReviver);
-vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.3");
+vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMServerProxyManagerReviver::vtkSMServerProxyManagerReviver()
 {
@@ -56,7 +56,9 @@ int vtkSMServerProxyManagerReviver::ReviveRemoteServerManager(vtkIdType cid)
 
   vtkClientServerStream stream;
 
-  // hide server side objects from every proxy except displays/render modules.
+  // hide server side objects from every proxy except views/representations. 
+  // That way view/representations are totally cleaned up, but for all other
+  // proxies, the server side objects remain.
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
   iter->SetConnectionID(cid);
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
@@ -65,8 +67,8 @@ int vtkSMServerProxyManagerReviver::ReviveRemoteServerManager(vtkIdType cid)
     vtkstd::string proxy_name = iter->GetKey();
     vtkSMProxy* proxy = iter->GetProxy();
     if (proxy && 
-      strcmp(proxy->GetXMLGroup(), "displays") !=0 &&
-      strcmp(proxy->GetXMLGroup(), "rendermodules") !=0)
+      strcmp(proxy->GetXMLGroup(), "representations") !=0 &&
+      strcmp(proxy->GetXMLGroup(), "newviews") !=0)
       {
       proxy->SetServers(proxy->GetServers() & vtkProcessModule::CLIENT);
       vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(proxy);
@@ -90,9 +92,9 @@ int vtkSMServerProxyManagerReviver::ReviveRemoteServerManager(vtkIdType cid)
   vtksys_ios::ostringstream xml_stream;
   root->PrintXML(xml_stream, vtkIndent());
 
-  //ofstream file("/tmp/revive.xml");
-  //root->PrintXML(file, vtkIndent());
-  //file.close();
+  ofstream file("/tmp/revive.xml");
+  root->PrintXML(file, vtkIndent());
+  file.close();
 
   root->Delete();
 
@@ -131,11 +133,12 @@ int vtkSMServerProxyManagerReviver::ReviveServerServerManager(
     return 0;
     }
 
-  vtkSMStateLoader* loader = vtkSMStateLoader::New();
+  vtkSMPQStateLoader* loader = vtkSMPQStateLoader::New();
   // The state is loaded on the self connection.
   loader->SetConnectionID(
     vtkProcessModuleConnectionManager::GetSelfConnectionID());
   loader->SetReviveProxies(1);
+  loader->SetRenderViewXMLName("IceTCompositeView");
 
   // The process module on the client side keeps track of the unique IDs.
   // We need to synchornize the IDs on the client side, so that when new IDs
@@ -166,24 +169,12 @@ void vtkSMServerProxyManagerReviver::FilterStateXML(vtkPVXMLElement* root)
       {
       int remove_revival_state = 0;
       vtkstd::string group = element->GetAttribute("group");
-      vtkstd::string type = element->GetAttribute("type");
-      if (group == "rendermodules")
+      if (group == "newviews" || group == "representations")
         {
-        // All render modules we create on the server have to be MPIRenderModule.
-        element->SetAttribute("type", "MPIRenderModule");
+        // We create views/representations all over again on the server.
         remove_revival_state = 1;
         }
-      else if (group=="displays")
-        {
-        if (type == "LODDisplay" || type == "MultiDisplay" 
-          || type== "IceTMultiDisplay")
-          {
-          // All dataobject displays we create on the server have to be CompositeDisplay
-          // proxies.
-          element->SetAttribute("type", "CompositeDisplay");
-          }
-        remove_revival_state = 1;
-        }
+
       if (remove_revival_state)
         {
         unsigned int children_max = element->GetNumberOfNestedElements();

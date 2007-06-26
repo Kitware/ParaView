@@ -188,6 +188,7 @@ protected:
   int ImageResized;
 
   vtkUnsignedCharArray *SendImageBuffer;
+  unsigned long WindowIdRMIId;
 
 private:
   vtkPVDesktopDeliveryServer(const vtkPVDesktopDeliveryServer &); //Not implemented

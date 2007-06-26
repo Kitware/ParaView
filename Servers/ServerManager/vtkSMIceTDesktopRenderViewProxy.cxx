@@ -22,7 +22,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.9");
 
 //----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderViewProxy::vtkSMIceTDesktopRenderViewProxy()
@@ -237,6 +237,8 @@ void vtkSMIceTDesktopRenderViewProxy::SetUseCompositing(bool usecompositing)
 //----------------------------------------------------------------------------
 void vtkSMIceTDesktopRenderViewProxy::SetGUISize(int x, int y)
 {
+  // We skip the code in vtkSMIceTCompositeViewProxy which is applicable in
+  // non-client server modes alone.
   this->vtkSMRenderViewProxy::SetGUISize(x, y);
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -251,7 +253,9 @@ void vtkSMIceTDesktopRenderViewProxy::SetGUISize(int x, int y)
 //----------------------------------------------------------------------------
 void vtkSMIceTDesktopRenderViewProxy::SetViewPosition(int x, int y)
 {
-  this->Superclass::SetViewPosition(x, y);
+  // We skip the code in vtkSMIceTCompositeViewProxy which is applicable in
+  // non-client server modes alone.
+  this->vtkSMRenderViewProxy::SetViewPosition(x, y);
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
@@ -260,6 +264,14 @@ void vtkSMIceTDesktopRenderViewProxy::SetViewPosition(int x, int y)
           << "SetWindowPosition" << x << y
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
+}
+
+//----------------------------------------------------------------------------
+vtkImageData* vtkSMIceTDesktopRenderViewProxy::CaptureWindow(int magnification)
+{
+  // We skip the code in vtkSMIceTCompositeViewProxy which is applicable in
+  // non-client server modes alone.
+  return this->vtkSMRenderViewProxy::CaptureWindow(magnification);
 }
 
 //----------------------------------------------------------------------------

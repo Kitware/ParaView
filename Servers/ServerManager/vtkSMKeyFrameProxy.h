@@ -69,9 +69,6 @@ public:
   // this key frame and the next key frame.
   virtual void UpdateValue(double currenttime,
     vtkSMAnimationCueProxy* cueProxy, vtkSMKeyFrameProxy* next);
-//BTX
-  vtkClientServerID GetID() { return this->GetSelfID(); }
-//ETX
   
   // Description:
   // Overridden to call MarkAllPropertiesAsModified().
@@ -81,10 +78,19 @@ protected:
   vtkSMKeyFrameProxy();
   ~vtkSMKeyFrameProxy();
 
+  // Description:
+  // This method is complementary to CreateVTKObjects() when we want the
+  // proxy to reuse the VTK object ID are defined. When reviving a proxy
+  // on the client, this method creates new client-side objects and reuses
+  // the server side objects.  When reviving a proxy on the server, it
+  // reuses the server objects while creating new "client-only" objects on
+  // the server itself.
+  virtual void ReviveVTKObjects()
+    { this->CreateVTKObjects(); }
+
   double KeyTime;
   vtkSMKeyFrameProxyInternals* Internals;
 
-  virtual void CreateVTKObjects() { this->ObjectsCreated=1; }
 private:
   vtkSMKeyFrameProxy(const vtkSMKeyFrameProxy&); // Not implemented.
   void operator=(const vtkSMKeyFrameProxy&); // Not implemented.

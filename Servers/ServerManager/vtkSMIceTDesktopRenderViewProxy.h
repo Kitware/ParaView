@@ -49,6 +49,11 @@ public:
   // Overridden to pass the ViewPosition to the RenderSyncManager.
   virtual void SetViewPosition(int x, int y);
 
+  // Description:
+  // Returns an image data that contains a "screenshot" of the window.
+  // It is the responsibility of the caller to delete the image data.
+  virtual vtkImageData* CaptureWindow(int magnification);
+
 //BTX
 protected:
   vtkSMIceTDesktopRenderViewProxy();

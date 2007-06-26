@@ -133,7 +133,7 @@
    <item>
     <widget class="QCheckBox" name="checkBoxDisconnect" >
      <property name="enabled" >
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="toolTip" >
       <string>&lt;html>Disconnect from the server before saving animation. The server will save the animation and then exit.&lt;/html></string>

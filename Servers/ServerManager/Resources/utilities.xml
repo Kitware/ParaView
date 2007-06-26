@@ -436,7 +436,7 @@
   </ProxyGroup>
   
   <ProxyGroup name="3d_widgets">
-    <Proxy name="3DWidgetsBase" class="not_used">
+    <Proxy name="3DWidgetsBase">
       <DoubleVectorProperty
         name="PlaceFactor"
         command="SetPlaceFactor"
@@ -562,7 +562,7 @@
   </ProxyGroup>
 
   <ProxyGroup name="animation">
-    <AnimationCueProxy name="AnimationCue" class="notused">
+    <AnimationCueProxy name="AnimationCue">
       <!-- No server side objects created. All properties are updateself -->
       <IntVectorProperty
          name="TimeMode"
@@ -634,7 +634,7 @@
     </AnimationCueProxy>
 
     <!--Scene -->
-    <AnimationSceneProxy name="AnimationScene" class="notused">
+    <AnimationSceneProxy name="AnimationScene">
       <!-- No server side objects created. All properties are updateself -->
       <ProxyProperty
         name="ViewModules"
@@ -741,7 +741,7 @@
 
     </AnimationSceneProxy>
 
-    <PVAnimationSceneProxy name="PVAnimationScene" class="notused">
+    <PVAnimationSceneProxy name="PVAnimationScene">
       <!-- No server side objects created. All properties are updateself -->
       <ProxyProperty
         name="ViewModules"
@@ -892,8 +892,7 @@
     <SimpleAnimationCueManipulatorProxy name="SimpleAnimationCueManipulator">
     </SimpleAnimationCueManipulatorProxy>
 
-    <LinearAnimationCueManipulatorProxy name="LinearAnimationCueManipulator"
-      class="notused">
+    <LinearAnimationCueManipulatorProxy name="LinearAnimationCueManipulator">
       <DoubleVectorProperty
         name="StartValue"
         command="SetStartValue"
@@ -912,8 +911,7 @@
 
     </LinearAnimationCueManipulatorProxy>
 
-    <KeyFrameAnimationCueManipulatorProxy name="KeyFrameAnimationCueManipulator"
-      class="notused">
+    <KeyFrameAnimationCueManipulatorProxy name="KeyFrameAnimationCueManipulator">
       <ProxyProperty
         name="KeyFrames"
         command="AddKeyFrame"
@@ -941,7 +939,7 @@
   </ProxyGroup>
 
   <ProxyGroup name="animation_keyframes">
-    <KeyFrameProxy name="KeyFrame" class="notused">
+    <KeyFrameProxy name="KeyFrame">
       <DoubleVectorProperty
         name="KeyTime"
         command="SetKeyTime"

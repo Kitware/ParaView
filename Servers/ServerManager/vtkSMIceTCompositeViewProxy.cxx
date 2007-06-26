@@ -17,6 +17,8 @@
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
+#include "vtkImageClip.h"
+#include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkObjectFactory.h"
@@ -31,6 +33,7 @@
 #include "vtkSMSimpleParallelStrategy.h"
 #include "vtkSMSourceProxy.h"
 
+
 #include "vtkPVConfig.h" // for PARAVIEW_USE_ICE_T
 #include "vtkToolkits.h" // for VTK_USE_MPI
 
@@ -43,7 +46,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.12");
 
 vtkInformationKeyMacro(vtkSMIceTCompositeViewProxy, KD_TREE, ObjectBase);
 //----------------------------------------------------------------------------
@@ -67,6 +70,8 @@ vtkSMIceTCompositeViewProxy::vtkSMIceTCompositeViewProxy()
   this->ActiveStrategyVector = new vtkSMRepresentationStrategyVector();
 
   this->Information->Set(KD_TREE(), 0);
+
+  this->ViewSize[0] = this->ViewSize[1] = 400;
 }
 
 //----------------------------------------------------------------------------
@@ -324,18 +329,10 @@ void vtkSMIceTCompositeViewProxy::SetGUISize(int x, int y)
 {
   this->Superclass::SetGUISize(x, y);
 
-  if (this->MultiViewManager)
-    {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerStream stream;
-    stream  << vtkClientServerStream::Invoke 
-            << this->MultiViewManager->GetID()
-            << "SetGUISize" << x << y
-            << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, 
-      this->MultiViewManager->GetServers(), stream);
-    }
-
+  // NOTE: vtkSMIceTDesktopRenderViewProxy must not call this method.
+  // GUI Size is the render window size on all processes.
+  // For this to work correctly, the GUISize set on all view proxies must be
+  // same.
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->RenderWindowProxy->GetProperty("RenderWindowSize"));
   if (ivp)
@@ -349,22 +346,50 @@ void vtkSMIceTCompositeViewProxy::SetGUISize(int x, int y)
 void vtkSMIceTCompositeViewProxy::SetViewPosition(int x, int y)
 {
   this->Superclass::SetViewPosition(x, y);
-  
-  if (this->MultiViewManager)
-    {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerStream stream;
-    stream  << vtkClientServerStream::Invoke 
-            << this->MultiViewManager->GetID()
-            << "SetWindowPosition" << x << y
-            << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, 
-      this->MultiViewManager->GetServers(), stream);
-    }
+  // NOTE: vtkSMIceTDesktopRenderViewProxy must not call this method.
+  this->UpdateViewport();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMIceTCompositeViewProxy::SetViewSize(int x, int y)
+{
+  // NOTE: vtkSMIceTDesktopRenderViewProxy must not call this method.
+  this->ViewSize[0] = x;
+  this->ViewSize[1] = y;
+  this->UpdateViewport();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMIceTCompositeViewProxy::UpdateViewport()
+{
+  double viewport[4];
+  viewport[0] = this->ViewPosition[0]/(double)this->GUISize[0];
+  viewport[1] = this->ViewPosition[1]/(double)this->GUISize[1];
+  viewport[2] = (this->ViewPosition[0] + this->ViewSize[0])/
+    (double) this->GUISize[0];
+  viewport[3] = (this->ViewPosition[1] + this->ViewSize[1])/
+    (double) this->GUISize[1];
+ 
+  // Set the view port on all renders belonging to this view on all processes.
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  stream  << vtkClientServerStream::Invoke
+          << this->RendererProxy->GetID()
+          << "SetViewport"
+          << viewport[0] << viewport[1] << viewport[2] << viewport[3]
+          << vtkClientServerStream::End;
+  stream  << vtkClientServerStream::Invoke
+          << this->Renderer2DProxy->GetID()
+          << "SetViewport"
+          << viewport[0] << viewport[1] << viewport[2] << viewport[3]
+          << vtkClientServerStream::End;
+
+  pm->SendStream(this->ConnectionID, 
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMIceTCompositeViewProxy::BeginStillRender()
 {
   if (this->MultiViewManager)
     {
@@ -372,16 +397,12 @@ void vtkSMIceTCompositeViewProxy::SetViewSize(int x, int y)
     vtkClientServerStream stream;
     stream  << vtkClientServerStream::Invoke
             << this->MultiViewManager->GetID()
-            << "SetWindowSize" << x << y
+            << "SetActiveViewID"
+            << static_cast<int>(this->GetSelfID().ID)
             << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-      this->MultiViewManager->GetServers(), stream);
+    pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER_ROOT,
+      stream);
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMIceTCompositeViewProxy::BeginStillRender()
-{
   // Let the superclass decide if we are using compositing at all.
   this->Superclass::BeginStillRender();
 
@@ -396,6 +417,19 @@ void vtkSMIceTCompositeViewProxy::BeginStillRender()
 //----------------------------------------------------------------------------
 void vtkSMIceTCompositeViewProxy::BeginInteractiveRender()
 {
+  if (this->MultiViewManager)
+    {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkClientServerStream stream;
+    stream  << vtkClientServerStream::Invoke
+            << this->MultiViewManager->GetID()
+            << "SetActiveViewID"
+            << static_cast<int>(this->GetSelfID().ID)
+            << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER_ROOT,
+      stream);
+    }
+
   // When BeginInteractiveRender() is called we are assured that
   // UpdateAllRepresentations() has been called.
 
@@ -575,6 +609,40 @@ void vtkSMIceTCompositeViewProxy::RemoveRepresentationInternal(
 
   this->Superclass::RemoveRepresentationInternal(repr);
 }
+
+//----------------------------------------------------------------------------
+vtkImageData* vtkSMIceTCompositeViewProxy::CaptureWindow(int magnification)
+{
+  // NOTE: vtkSMIceTDesktopRenderViewProxy must not call this method.
+  vtkImageData* capture = this->Superclass::CaptureWindow(magnification);
+
+  // Move capture image back to origin.
+  int extents[6];
+  capture->GetExtent(extents);
+  for (int cc=0; cc < 4; cc++)
+    {
+    extents[cc] -= this->ViewPosition[cc/2]*magnification;
+    }
+  capture->SetExtent(extents);
+
+  // Clip captured image to the current viewport.
+  vtkImageClip* clip = vtkImageClip::New();
+  clip->SetInput(capture);
+  capture->Delete();
+  clip->SetOutputWholeExtent(this->ViewPosition[0], 
+    this->ViewPosition[0] + this->ViewSize[0] -1,
+    this->ViewPosition[1],
+    this->ViewPosition[1] + this->ViewSize[1] -1, 0, 0);
+  clip->SetClipData(1);
+  clip->Update();
+
+  capture = vtkImageData::New();
+  capture->ShallowCopy(clip->GetOutput());
+  clip->Delete();
+
+  return capture;
+}
+
 
 //----------------------------------------------------------------------------
 void vtkSMIceTCompositeViewProxy::PrintSelf(ostream& os, vtkIndent indent)

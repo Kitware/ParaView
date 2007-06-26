@@ -71,24 +71,6 @@ public:
   vtkRendererCollection* GetRenderers(int id);
 
   // Description:
-  // The size of the frame in which all the mutiview windows are enclosed in
-  // pixels.
-  vtkSetVector2Macro(GUISize, int);
-  vtkGetVector2Macro(GUISize, int);
-
-  // Description:
-  // The position of the view managed by this multiview manager in the frame
-  // that encloses all multiviews in pixels.
-  vtkSetVector2Macro(WindowPosition, int);
-  vtkGetVector2Macro(WindowPosition, int);
-
-  // Description:
-  // The width, height (in pixels) of the view managed by this multiview
-  // manager. WindowPosition+WindowSize <= GUISize.
-  vtkSetVector2Macro(WindowSize, int);
-  vtkGetVector2Macro(WindowSize, int);
-
-  // Description:
   // Before any render request, the view must make itself active.
   vtkSetMacro(ActiveViewID, int);
   vtkGetMacro(ActiveViewID, int);
@@ -101,10 +83,6 @@ protected:
 
   void StartRenderCallback();
   vtkRendererCollection* GetActiveRenderers();
-
-  int GUISize[2];
-  int WindowSize[2];
-  int WindowPosition[2];
 
   vtkRenderWindow* RenderWindow;
   vtkCommand* Observer;

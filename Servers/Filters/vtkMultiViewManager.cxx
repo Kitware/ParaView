@@ -30,15 +30,11 @@ class vtkMultiViewManager::vtkRendererMap :
 
 
 vtkStandardNewMacro(vtkMultiViewManager);
-vtkCxxRevisionMacro(vtkMultiViewManager, "1.1");
+vtkCxxRevisionMacro(vtkMultiViewManager, "1.2");
 //----------------------------------------------------------------------------
 vtkMultiViewManager::vtkMultiViewManager()
 {
-  this->GUISize[0] = this->GUISize[1] = 400;
-  this->WindowSize[0] = this->WindowSize[1] = 400;
-  this->WindowPosition[0] = this->WindowPosition[1] = 0;
   this->RenderWindow = 0;
-
   this->ActiveViewID = 0;
   this->RendererMap = new vtkRendererMap();
 
@@ -97,17 +93,18 @@ vtkRendererCollection* vtkMultiViewManager::GetRenderers(int id)
 //----------------------------------------------------------------------------
 void vtkMultiViewManager::StartRenderCallback()
 {
-  double viewport[4];
-  viewport[0] = this->WindowPosition[0]/(double)this->GUISize[0];
-  viewport[1] = this->WindowPosition[1]/(double)this->GUISize[1];
-  viewport[2] = (this->WindowPosition[0]+this->WindowSize[0])/
-    (double)this->GUISize[0];
-  viewport[3] = (this->WindowPosition[1]+this->WindowSize[1])/
-    (double)this->GUISize[1];
-
+  vtkRendererMap::iterator iter = this->RendererMap->begin();
+  for (; iter != this->RendererMap->end(); ++iter)
+    {
+    vtkRendererCollection* renderers = iter->second.GetPointer();
+    renderers->InitTraversal();
+    while (vtkRenderer* ren = renderers->GetNextItem())
+      {
+        ren->DrawOff();
+      }
+    }
  
   vtkRendererCollection* renderers = this->GetActiveRenderers();
-
   if (!renderers)
     {
     vtkErrorMacro("No active renderers selected!");
@@ -118,11 +115,7 @@ void vtkMultiViewManager::StartRenderCallback()
   while (vtkRenderer* ren = renderers->GetNextItem())
     {
     ren->DrawOn();
-    ren->SetViewport(viewport);
     }
-
-  // TODO: we may want to disable all other renders present in the render
-  // window.
 }
 
 //----------------------------------------------------------------------------
@@ -167,12 +160,6 @@ void vtkMultiViewManager::RemoveAllRenderers()
 void vtkMultiViewManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "GUISize: " 
-    << this->GUISize[0] << ", " << this->GUISize[1] << endl;
-  os << indent << "WindowPosition: " 
-    << this->WindowPosition[0] << ", " << this->WindowPosition[1] << endl;
-  os << indent << "WindowSize: " 
-    << this->WindowSize[0] << ", " << this->WindowSize[1] << endl;
 }
 
 

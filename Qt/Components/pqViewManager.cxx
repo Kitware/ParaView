@@ -887,7 +887,7 @@ void pqViewManager::updateViewPositions()
     totalBounds |= bounds;
     }
 
-  /// GUISize and ViewPosition properties are managed
+  /// GUISize, ViewSize and ViewPosition properties are managed
   /// by the GUI, the undo/redo stack should not worry about 
   /// the changes made to them.
   emit this->beginNonUndoableChanges();
@@ -914,6 +914,16 @@ void pqViewManager::updateViewPositions()
       view_pos -= totalBounds.topLeft();
       prop->SetElements2(view_pos.x(), view_pos.y());
       }
+
+    // size of each view.
+    prop = vtkSMIntVectorProperty::SafeDownCast(
+      view->getProxy()->GetProperty("ViewSize"));
+    if (prop)
+      {
+      QRect bounds = view->getWidget()->rect();
+      prop->SetElements2(bounds.width(), bounds.height());
+      }
+    view->getProxy()->UpdateVTKObjects();
     }
 
   emit this->endNonUndoableChanges();

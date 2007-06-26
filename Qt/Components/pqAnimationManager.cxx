@@ -320,11 +320,10 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
   this->Internals->AnimationSettingsDialog = &dialogUI;
   dialogUI.setupUi(&dialog);
 
-  // TODO: Until we fix IceT rendermodule to work without client
-  // one cannot disconnect if there is more than 1 view.
+  // Cannot disconnect and save animation unless connected to a remote server.
   dialogUI.checkBoxDisconnect->setEnabled(
-    this->Internals->ActiveServer->isRemote() 
-    && (sceneProxy->GetNumberOfViewModules()==1));
+    this->Internals->ActiveServer->isRemote());
+
   bool isMPEG = (extension == "mpg");
   if (isMPEG)
     {
