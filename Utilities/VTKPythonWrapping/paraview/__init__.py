@@ -768,13 +768,24 @@ def Fetch(input, arg=None):
   
     if arg == None:
         print "getting appended"
-        if input.GetDataInformation().GetDataClassName() == "vtkPolyData":
+        cdinfo = input.GetDataInformation().GetCompositeDataInformation()
+        if (cdinfo.GetDataIsComposite() or cdinfo.GetDataIsHierarchical()):
+            print "use composite data append"
+            gvd.SetReductionType(5)        
+
+        elif input.GetDataInformation().GetDataClassName() == "vtkPolyData":
             print "use append poly data filter"
-            gvd.SetReductionType(1)
-        else:
-            print "use append filter"
+            gvd.SetReductionType(1)        
+
+        elif input.GetDataInformation().GetDataClassName() == "vtkRectilinearGrid":
+            print "use append rectilinear grid filter"
+            gvd.SetReductionType(4)
+
+        elif input.GetDataInformation().IsA("vtkDataSet"):
+            print "use unstructured append filter"
             gvd.SetReductionType(2)
 
+        
     elif type(arg) is types.IntType:          
         print "getting node %d" % arg
         gvd.SetReductionType(3)   

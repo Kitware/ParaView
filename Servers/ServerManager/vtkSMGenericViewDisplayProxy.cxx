@@ -26,7 +26,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMGenericViewDisplayProxy);
-vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.24");
+vtkCxxRevisionMacro(vtkSMGenericViewDisplayProxy, "1.25");
 
 //-----------------------------------------------------------------------------
 vtkSMGenericViewDisplayProxy::vtkSMGenericViewDisplayProxy()
@@ -136,6 +136,10 @@ void vtkSMGenericViewDisplayProxy::SetReductionType(int type)
 
   case RECTILINEAR_GRID_APPEND:
     classname = "vtkAppendRectilinearGrid";
+    break;
+
+  case COMPOSITE_DATASET_APPEND:
+    classname = "vtkMultiGroupDataGroupFilter"; 
     break;
 
   default:

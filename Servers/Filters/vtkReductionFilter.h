@@ -75,6 +75,12 @@ public:
   vtkSetMacro(GenerateProcessIds, int);
   vtkGetMacro(GenerateProcessIds, int);
 
+  //BTX
+  enum Tags {
+    TRANSMIT_DATA_OBJECT = 23484
+  };
+  //ETX
+
 protected:
   vtkReductionFilter();
   ~vtkReductionFilter();

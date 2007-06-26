@@ -43,7 +43,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.14");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.15");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkReductionFilter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
@@ -269,53 +269,33 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
     this->PassThrough = -1;
     }
 
-  this->MarshallData(preOutput);
   if (myId == 0)
     {
-    int *data_lengths = new int[numProcs];
-    int *offsets = new int[numProcs];
-    int *extents = new int[numProcs*6];
-    int *extent_lengths = new int[numProcs];
-    int *extent_offsets = new int[numProcs];
-
-    // Collect data lengths from all satellites.
-    com->Gather(&this->DataLength, data_lengths, 1, 0);
-
-    // Compute total buffer size, and offsets to use while collecting data.
-    int total_size = 0;
-    int cc;
-    for (cc=0; cc < numProcs; ++cc)
-      {
-      offsets[cc] = total_size;
-      total_size += data_lengths[cc];
-
-      extent_offsets[cc] = cc*6;
-      extent_lengths[cc] = 6;
-      }
-    char* gathered_data = new char[total_size];
-    com->GatherV(this->RawData, gathered_data, this->DataLength,
-      data_lengths, offsets, 0);
-    com->GatherV(this->Extent, extents, 6, 
-      extent_lengths, extent_offsets, 0);
-
-
+    int cc = 0;
     // Form vtkDataObjects from collected data.
     // Meanwhile if the user wants to see only one node's data
     // then pass only that through
     vtkstd::vector<vtkSmartPointer<vtkDataObject> > data_sets;
     for (cc=0; cc < numProcs; ++cc)
       {
+      vtkDataObject* ds = NULL;
+      if (cc == 0)
+        {
+        ds = preOutput->NewInstance();
+        ds->ShallowCopy(preOutput);
+        }
+      else
+        {
+        ds = com->ReceiveDataObject(cc, vtkReductionFilter::TRANSMIT_DATA_OBJECT);
+        }
       if (this->PassThrough<0 || this->PassThrough==cc)
         {        
-        vtkDataObject* ds = vtkDataObject::SafeDownCast(this->Reconstruct(
-          gathered_data + offsets[cc], data_lengths[cc], &extents[cc*6]));
         data_sets.push_back(ds);
-        ds->Delete();
         }
+      ds->Delete();
       }
 
     // Now run the PostGatherHelper on the collected results from each node
-    // result goes into output
     if (!this->PostGatherHelper)
       {
       //allow a passthrough
@@ -325,7 +305,7 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
     else
       {
       this->PostGatherHelper->RemoveAllInputs();
-      //connect all (or just the selected selected) datasets to the reduction
+      //connect all (or just the selected) datasets to the reduction
       //algorithm
       if (this->PassThrough == -1)
         {
@@ -356,22 +336,11 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
         vtkErrorMacro("PostGatherHelper's output type is not same as the ReductionFilters's output type.");
         }
       }
-
-    delete[] data_lengths;
-    delete[] offsets;
-    delete[] gathered_data;
-    delete[] extents;
-    delete[] extent_offsets;
-    delete[] extent_lengths;
     }
   else
     {
-    // Send our data length to the root.
-    com->Gather(&this->DataLength, 0, 1, 0);
-    // Send the data to be gathered on the root.
-    com->GatherV(this->RawData, 0, this->DataLength, 0, 0, 0);
-    // Send the extents.
-    com->GatherV(this->Extent, 0, 6, 0, 0, 0);
+    com->Send(preOutput, 0, vtkReductionFilter::TRANSMIT_DATA_OBJECT);
+    
     output->ShallowCopy(preOutput);
     }
 

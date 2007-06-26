@@ -85,17 +85,10 @@ protected:
                                  vtkInformationVector* outputVector);
 
 
-  int SendData(vtkSocketController* controller, vtkDataObject* data);
-  vtkDataObject* ReceiveData(vtkSocketController* controller);
-
   vtkProcessModuleConnection* ProcessModuleConnection;
   //BTX
   enum Tags {
-    COMMUNICATION_TAG = 23483,
-    COMMUNICATION_CLASSNAME_LENGTH = 23484,
-    COMMUNICATION_CLASSNAME = 23485,
-    COMMUNICATION_DATA = 23486,
-    COMMUNICATION_DATA_LENGTH = 23487
+    TRANSMIT_DATA_OBJECT = 23483
   };
   //ETX
 

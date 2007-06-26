@@ -28,9 +28,10 @@
 #include "vtkSocketController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkMultiBlockDataSet.h"
 
 vtkStandardNewMacro(vtkClientServerMoveData);
-vtkCxxRevisionMacro(vtkClientServerMoveData, "1.8");
+vtkCxxRevisionMacro(vtkClientServerMoveData, "1.9");
 vtkCxxSetObjectMacro(vtkClientServerMoveData, ProcessModuleConnection, 
   vtkProcessModuleConnection);
 
@@ -136,13 +137,16 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
       {
       vtkDebugMacro("Server Root: Send input data to client.");
       // This is a server root node.
-      return this->SendData(controller, input);
+      return controller->Send(input, 1,
+                              vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
       }
     else if (this->ProcessModuleConnection->IsA("vtkServerConnection"))
       {
       vtkDebugMacro("Client: Get data from server and put it on the output.");
       // This is a client node.
-      vtkDataObject* data = this->ReceiveData(controller);
+      vtkDataObject* data = 
+        controller->ReceiveDataObject(
+          1, vtkClientServerMoveData::TRANSMIT_DATA_OBJECT); 
       if (data)
         {
         if (output->IsA(data->GetClassName()))
@@ -164,60 +168,6 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
   // act as a pass through filter.
   output->ShallowCopy(input);
   return 1;
-}
-
-//-----------------------------------------------------------------------------
-int vtkClientServerMoveData::SendData(vtkSocketController* controller,
-  vtkDataObject* in_data)
-{
-  vtkDataObject* data = in_data->NewInstance();
-  data->ShallowCopy(in_data);
-
-  vtkGenericDataObjectWriter* writer = vtkGenericDataObjectWriter::New();
-  writer->SetInput(data);
-  writer->SetFileTypeToBinary();
-  writer->WriteToOutputStringOn();
-  writer->Write();
-
-
-  int data_length = writer->GetOutputStringLength();
-  char* raw_data = writer->RegisterAndGetOutputString();
-  writer->Delete();
-  data->Delete();
-
-  controller->Send(&data_length, 1, 1, 
-    vtkClientServerMoveData::COMMUNICATION_DATA_LENGTH);
-  controller->Send(raw_data, data_length, 1, 
-    vtkClientServerMoveData::COMMUNICATION_DATA);
-  delete []raw_data;
-  return 1;
-}
-
-//-----------------------------------------------------------------------------
-vtkDataObject* vtkClientServerMoveData::ReceiveData(vtkSocketController* controller)
-{
-  int data_length = 0;
-  controller->Receive(&data_length, 1, 1, 
-    vtkClientServerMoveData::COMMUNICATION_DATA_LENGTH);
-  char* raw_data = new char[data_length + 10];
-  controller->Receive(raw_data, data_length, 1,
-    vtkClientServerMoveData::COMMUNICATION_DATA);
-
-  vtkGenericDataObjectReader* reader= vtkGenericDataObjectReader::New();
-  reader->ReadFromInputStringOn();
-  vtkCharArray* string_data = vtkCharArray::New();
-  string_data->SetArray(raw_data, data_length, 1);
-  reader->SetInputArray(string_data);
-  reader->Update();
-
-  vtkDataObject* output = reader->GetOutput()->NewInstance();
-  output->ShallowCopy(reader->GetOutput());
-
-  reader->Delete();
-  string_data->Delete();
-  delete []raw_data;
-
-  return output;
 }
 
 //-----------------------------------------------------------------------------
