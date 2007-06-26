@@ -98,19 +98,19 @@ void pqAnimationModel::resizeTracks()
   int i;
   int num = this->Tracks.size();
   QRectF rect = this->sceneRect();
-  double RowHeight = this->rowHeight();
-  double requiredHeight = RowHeight * (num+1);
+  double rh = this->rowHeight();
+  double requiredHeight = rh * (num+1);
   if(rect.height() < requiredHeight)
     {
     this->setSceneRect(rect.left(), rect.top(), rect.width(), requiredHeight);
     return;
     }
 
-  double h = RowHeight;
+  double h = rh;
   for(i=0; i<num; i++)
     {
-    this->Tracks[i]->setBoundingRect(QRectF(rect.left(), h, rect.width()-1, RowHeight));
-    h += RowHeight;
+    this->Tracks[i]->setBoundingRect(QRectF(rect.left(), h, rect.width()-1, rh));
+    h += rh;
     }
 }
 
@@ -164,40 +164,40 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF& )
   painter->save();
   
   QRectF sr = this->sceneRect();
-  int RowHeight = this->rowHeight();
+  int rh = this->rowHeight();
 
   //  // TODO: draw time labels (depends on mode)
   // TODO: make time its own track
 
   QGraphicsView* view = qobject_cast<QGraphicsView*>(this->parent());
-  QRectF labelRect = QRectF(sr.left(), sr.top(), sr.width(), RowHeight);
+  QRectF labelRect = QRectF(sr.left(), sr.top(), sr.width(), rh);
 
   QFontMetrics metrics(view->font());
   int num = qRound(labelRect.width() / (9 * metrics.maxWidth()));
   num = num == 0 ? 1 : num;
   double w = labelRect.width() / num;
 
-  painter->drawText(QRectF(labelRect.left(), labelRect.top(), w/2.0, RowHeight), 
+  painter->drawText(QRectF(labelRect.left(), labelRect.top(), w/2.0, rh), 
                     Qt::AlignLeft | Qt::AlignVCenter,
                     QString("%1").arg(this->StartTime, 5, 'e', 3));
-  painter->drawLine(QPointF(labelRect.left(), RowHeight), 
-                    QPointF(labelRect.left(), RowHeight - 2.0));
+  painter->drawLine(QPointF(labelRect.left(), rh), 
+                    QPointF(labelRect.left(), rh - 2.0));
 
   for(int i=1; i<num; i++)
     {
     double time = this->StartTime + (this->EndTime - this->StartTime) * (double)i/(double)num;
     double left = labelRect.left() + w / 2.0 + w * (i-1);
-    painter->drawText(QRectF(left, labelRect.top(), w, RowHeight), 
+    painter->drawText(QRectF(left, labelRect.top(), w, rh), 
                       Qt::AlignCenter, QString("%1").arg(time, 5, 'e', 3));
-    painter->drawLine(QPointF(left + w/2.0, RowHeight),
-                      QPointF(left + w/2.0, RowHeight - 2.0));
+    painter->drawLine(QPointF(left + w/2.0, rh),
+                      QPointF(left + w/2.0, rh - 2.0));
     }
   
-  painter->drawText(QRectF(labelRect.right() - w/2.0, labelRect.top(), w/2.0, RowHeight), 
+  painter->drawText(QRectF(labelRect.right() - w/2.0, labelRect.top(), w/2.0, rh), 
                     Qt::AlignRight | Qt::AlignVCenter,
                     QString("%1").arg(this->EndTime, 5, 'e', 3));
-  painter->drawLine(QPointF(labelRect.right(), RowHeight),
-                    QPointF(labelRect.right(), RowHeight - 2.0));
+  painter->drawLine(QPointF(labelRect.right(), rh),
+                    QPointF(labelRect.right(), rh - 2.0));
 
 
   
