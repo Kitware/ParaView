@@ -218,11 +218,11 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
 
   pqSMAdaptor::setEnumerationProperty(repr->GetProperty("SelectionRepresentation"),
     "Wireframe");
-  pqSMAdaptor::setMultipleElementProperty(repr->GetProperty("SelectionDiffuseColor"),
+  pqSMAdaptor::setMultipleElementProperty(repr->GetProperty("SelectionColor"),
     0, 1.0);
-  pqSMAdaptor::setMultipleElementProperty(repr->GetProperty("SelectionDiffuseColor"),
+  pqSMAdaptor::setMultipleElementProperty(repr->GetProperty("SelectionColor"),
     1, 0.0);
-  pqSMAdaptor::setMultipleElementProperty(repr->GetProperty("SelectionDiffuseColor"),
+  pqSMAdaptor::setMultipleElementProperty(repr->GetProperty("SelectionColor"),
     2, 1.0);
   pqSMAdaptor::setElementProperty(repr->GetProperty("SelectionLineWidth"), 2);
 

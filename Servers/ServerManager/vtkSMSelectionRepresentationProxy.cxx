@@ -18,6 +18,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
@@ -25,7 +26,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSelectionRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMSelectionRepresentationProxy::vtkSMSelectionRepresentationProxy()
 {
@@ -167,6 +168,17 @@ bool vtkSMSelectionRepresentationProxy::EndCreateVTKObjects()
     this->Mapper->GetProperty("ScalarVisibility"));
   ivp->SetElement(0, 0);
   this->Prop3D->UpdateVTKObjects();
+
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->Property->GetProperty("Ambient"));
+  dvp->SetElement(0, 1.0);
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->Property->GetProperty("Diffuse"));
+  dvp->SetElement(0, 0.0);
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->Property->GetProperty("Specular"));
+  dvp->SetElement(0, 0.0);
+  this->Property->UpdateVTKObjects();
 
   return this->Superclass::EndCreateVTKObjects();
 }

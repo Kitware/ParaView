@@ -4950,16 +4950,8 @@
           proxyname="SelectionRepresentation" />
         <ExposedProperties>
           <Property name="Selection" />
-          <Property name="Ambient" 
-                    exposed_name="SelectionAmbient" />
-          <Property name="AmbientColor" 
-                    exposed_name="SelectionAmbientColor" />
           <Property name="Color" 
                     exposed_name="SelectionColor" />
-          <Property name="Diffuse" 
-                    exposed_name="SelectionDiffuse" />
-          <Property name="DiffuseColor" 
-                    exposed_name="SelectionDiffuseColor" />
           <Property name="Interpolation" 
                     exposed_name="SelectionInterpolation" />
           <Property name="LineWidth" 
@@ -4970,12 +4962,6 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
-          <Property name="Specular" 
-                    exposed_name="SelectionSpecular" />
-          <Property name="SpecularColor" 
-                    exposed_name="SelectionSpecularColor" />
-          <Property name="SpecularPower" 
-                    exposed_name="SelectionSpecularPower" />
         </ExposedProperties>
       </SubProxy>
       -->
@@ -5118,16 +5104,8 @@
           proxyname="SelectionRepresentation" />
         <ExposedProperties>
           <Property name="Selection" />
-          <Property name="Ambient" 
-                    exposed_name="SelectionAmbient" />
-          <Property name="AmbientColor" 
-                    exposed_name="SelectionAmbientColor" />
           <Property name="Color" 
                     exposed_name="SelectionColor" />
-          <Property name="Diffuse" 
-                    exposed_name="SelectionDiffuse" />
-          <Property name="DiffuseColor" 
-                    exposed_name="SelectionDiffuseColor" />
           <Property name="Interpolation" 
                     exposed_name="SelectionInterpolation" />
           <Property name="LineWidth" 
@@ -5138,12 +5116,6 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
-          <Property name="Specular" 
-                    exposed_name="SelectionSpecular" />
-          <Property name="SpecularColor" 
-                    exposed_name="SelectionSpecularColor" />
-          <Property name="SpecularPower" 
-                    exposed_name="SelectionSpecularPower" />
         </ExposedProperties>
       </SubProxy>
       -->
@@ -5252,16 +5224,8 @@
           proxyname="SelectionRepresentation" />
         <ExposedProperties>
           <Property name="Selection" />
-          <Property name="Ambient" 
-                    exposed_name="SelectionAmbient" />
-          <Property name="AmbientColor" 
-                    exposed_name="SelectionAmbientColor" />
           <Property name="Color" 
                     exposed_name="SelectionColor" />
-          <Property name="Diffuse" 
-                    exposed_name="SelectionDiffuse" />
-          <Property name="DiffuseColor" 
-                    exposed_name="SelectionDiffuseColor" />
           <Property name="Interpolation" 
                     exposed_name="SelectionInterpolation" />
           <Property name="LineWidth" 
@@ -5272,12 +5236,6 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
-          <Property name="Specular" 
-                    exposed_name="SelectionSpecular" />
-          <Property name="SpecularColor" 
-                    exposed_name="SelectionSpecularColor" />
-          <Property name="SpecularPower" 
-                    exposed_name="SelectionSpecularPower" />
         </ExposedProperties>
       </SubProxy>
       -->
@@ -5466,16 +5424,8 @@
           proxyname="SelectionRepresentation" />
         <ExposedProperties>
           <Property name="Selection" />
-          <Property name="Ambient" 
-                    exposed_name="SelectionAmbient" />
-          <Property name="AmbientColor" 
-                    exposed_name="SelectionAmbientColor" />
           <Property name="Color" 
                     exposed_name="SelectionColor" />
-          <Property name="Diffuse" 
-                    exposed_name="SelectionDiffuse" />
-          <Property name="DiffuseColor" 
-                    exposed_name="SelectionDiffuseColor" />
           <Property name="Interpolation" 
                     exposed_name="SelectionInterpolation" />
           <Property name="LineWidth" 
@@ -5486,12 +5436,6 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
-          <Property name="Specular" 
-                    exposed_name="SelectionSpecular" />
-          <Property name="SpecularColor" 
-                    exposed_name="SelectionSpecularColor" />
-          <Property name="SpecularPower" 
-                    exposed_name="SelectionSpecularPower" />
         </ExposedProperties>
       </SubProxy>
       -->
@@ -5595,18 +5539,8 @@
           proxyname="SelectionRepresentation" />
         <ExposedProperties>
           <Property name="Selection" />
-          <Property name="Ambient" 
-                    exposed_name="SelectionAmbient" />
-          <Property name="AmbientColor" 
-                    exposed_name="SelectionAmbientColor" />
           <Property name="Color" 
                     exposed_name="SelectionColor" />
-          <Property name="Diffuse" 
-                    exposed_name="SelectionDiffuse" />
-          <Property name="DiffuseColor" 
-                    exposed_name="SelectionDiffuseColor" />
-          <Property name="Interpolation" 
-                    exposed_name="SelectionInterpolation" />
           <Property name="LineWidth" 
                     exposed_name="SelectionLineWidth" />
           <Property name="Opacity" 
@@ -5615,12 +5549,6 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
-          <Property name="Specular" 
-                    exposed_name="SelectionSpecular" />
-          <Property name="SpecularColor" 
-                    exposed_name="SelectionSpecularColor" />
-          <Property name="SpecularPower" 
-                    exposed_name="SelectionSpecularPower" />
         </ExposedProperties>
       </SubProxy>
 
