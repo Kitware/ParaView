@@ -583,6 +583,9 @@ void pqSelectionManager::selectOnSurface(int screenRectangle[4])
   this->Implementation->SelectedProxy = 
     pqSMAdaptor::getProxyProperty(this->Implementation->
       SelectedRepresentation->GetProperty("Input"));
+  this->Implementation->SelectionSource =
+    pqSMAdaptor::getProxyProperty(this->Implementation->
+      SelectedRepresentation->GetProperty("Selection"));
 
   // Update the SelectionModel with the selected sources.
   pqServerManagerModel* model = 
