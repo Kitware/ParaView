@@ -5629,7 +5629,8 @@
       <InputProperty 
         name="Input"
         command="NotUsed">
-       <DataTypeDomain name="input_type">
+       <DataTypeDomain name="input_type"
+          composite_data_supported="0">
          <DataType value="vtkUnstructuredGrid"/>
        </DataTypeDomain>
         <Documentation>
@@ -5679,7 +5680,8 @@
       <InputProperty 
         name="Input"
         command="NotUsed">
-       <DataTypeDomain name="input_type">
+       <DataTypeDomain name="input_type"
+          composite_data_supported="0">
          <DataType value="vtkImageData"/>
        </DataTypeDomain>
         <Documentation>
