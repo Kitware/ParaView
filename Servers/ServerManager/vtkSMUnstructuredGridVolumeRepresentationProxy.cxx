@@ -33,7 +33,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepresentationProxy()
 {
@@ -107,8 +107,6 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::AddToView(vtkSMViewProxy* v
     return false;
     }
 
-  renderView->AddPropToRenderer(this->VolumeActor);
-
   // This will ensure that on update we'll check if the
   // view supports certain extensions.
   this->RenderViewExtensionsTested = 0;
@@ -129,7 +127,6 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::RemoveFromView(vtkSMViewPro
     return false;
     }
 
-  renderView->RemovePropFromRenderer(this->VolumeActor);
   return this->Superclass::RemoveFromView(view);
 }
 
@@ -184,7 +181,7 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::BeginCreateVTKObjects()
   this->VolumeBunykMapper = this->GetSubProxy("VolumeBunykMapper");
   this->VolumeZSweepMapper = this->GetSubProxy("VolumeZSweepMapper");
   this->VolumeHAVSMapper = this->GetSubProxy("VolumeHAVSMapper");
-  this->VolumeActor = this->GetSubProxy("VolumeActor");
+  this->VolumeActor = this->GetSubProxy("Prop3D");
   this->VolumeProperty = this->GetSubProxy("VolumeProperty");
   this->VolumeDummyMapper = this->GetSubProxy("VolumeDummyMapper");
   this->VolumeLODMapper = this->GetSubProxy("VolumeLODMapper");

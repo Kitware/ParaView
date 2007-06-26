@@ -40,7 +40,9 @@ public:
   void SetRepresentation(int type);
   vtkGetMacro(Representation, int);
 
-  void SetVisibility(int visible);
+  // Description:
+  // Set the representation's visibility.
+  virtual void SetVisibility(int visible);
 
   // Description:
   // Get the data information for the represented data.

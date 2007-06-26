@@ -4764,6 +4764,18 @@
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
 
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for this representation.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="SelectionVisibility"
         number_of_elements="1"
         default_values="1">
@@ -4893,7 +4905,6 @@
           <Property name="Pickable" />
           <Property name="Position" />
           <Property name="Scale" />
-          <Property name="Visibility" />
         </ExposedProperties>
       </SubProxy>
 
@@ -4991,6 +5002,18 @@
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
 
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for this representation.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="SelectionVisibility"
         number_of_elements="1"
         default_values="1">
@@ -5062,7 +5085,6 @@
           <Property name="Pickable" />
           <Property name="Position" />
           <Property name="Scale" />
-          <Property name="Visibility" />
         </ExposedProperties>
       </SubProxy>
 
@@ -5144,6 +5166,18 @@
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
 
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for this representation.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="SelectionVisibility"
         number_of_elements="1"
         default_values="1">
@@ -5190,14 +5224,13 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="VolumeActor" proxygroup="props" proxyname="LODVolume" />
+        <Proxy name="Prop3D" proxygroup="props" proxyname="LODVolume" />
         <ExposedProperties>
           <Property name="Position" />
           <Property name="Scale" />
           <Property name="Orientation" />
           <Property name="Origin" />
           <Property name="Pickable" />
-          <Property name="Visibility" />
         </ExposedProperties>
       </SubProxy>
 
@@ -5266,6 +5299,18 @@
         default_values="none">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for this representation.
+        </Documentation>
+      </IntVectorProperty>
 
       <IntVectorProperty name="SelectionVisibility"
         number_of_elements="1"
@@ -5380,14 +5425,13 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="VolumeActor" proxygroup="props" proxyname="LODVolume" />
+        <Proxy name="Prop3D" proxygroup="props" proxyname="LODVolume" />
         <ExposedProperties>
           <Property name="Position" />
           <Property name="Scale" />
           <Property name="Orientation" />
           <Property name="Origin" />
           <Property name="Pickable" />
-          <Property name="Visibility" />
         </ExposedProperties>
       </SubProxy>
 

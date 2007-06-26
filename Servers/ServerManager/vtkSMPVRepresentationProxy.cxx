@@ -35,7 +35,7 @@ inline void vtkSMPVRepresentationProxySetInt(
 }
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -217,6 +217,7 @@ void vtkSMPVRepresentationProxy::SetVisibility(int visible)
     vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation, "Visibility", 
       visible);
     }
+  this->Superclass::SetVisibility(visible);
 }
 
 //----------------------------------------------------------------------------

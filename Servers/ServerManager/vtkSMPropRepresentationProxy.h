@@ -50,6 +50,10 @@ public:
   virtual void GetActiveStrategies(
     vtkSMRepresentationStrategyVector& activeStrategies);
 
+  // Description:
+  // Set the visibility for this representation.
+  // Implemented to turn off selection actor when visibility is turned off.
+  virtual void SetVisibility(int visible);
 //BTX
 protected:
   vtkSMPropRepresentationProxy();
