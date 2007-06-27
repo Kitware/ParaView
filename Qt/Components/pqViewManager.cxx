@@ -923,7 +923,8 @@ void pqViewManager::updateViewPositions()
       QRect bounds = view->getWidget()->rect();
       prop->SetElements2(bounds.width(), bounds.height());
       }
-    view->getProxy()->UpdateProperty("ViewSize");
+    // This is causing problems with tests.
+    // view->getProxy()->UpdateProperty("ViewSize");
     }
 
   emit this->endNonUndoableChanges();
