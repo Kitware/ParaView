@@ -66,6 +66,12 @@ public:
   // check if the input exists.
   bool hasInput(pqPipelineSource *input) const;
 
+  /// Returns if this proxy replaces input on creation.
+  /// This checks the "Hints" for the proxy, if any. If a <Visibility>
+  /// element is present with replace_input="0", then this method
+  /// returns false, otherwise true.
+  int replaceInput() const;
+
 protected slots:
   // process some change in the input property for the proxy.
   virtual void inputChanged();

@@ -97,12 +97,6 @@ public:
   /// of the proxy and sets them to default values. 
   void setDefaultPropertyValues();
 
-  /// Returns if this proxy replaces input on creation.
-  /// This checks the "Hints" for the proxy, if any. If a <Visibility>
-  /// element is present with replace_input="0", then this method
-  /// returns false, otherwise true.
-  int replaceInput() const;
-
   /// Before a source's output datainformation can be examined, we have
   /// to make sure that the first update is called through a representation 
   /// with correctly set UpdateTime. If not, the source will

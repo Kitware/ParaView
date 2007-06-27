@@ -423,39 +423,6 @@ void pqPipelineSource::renderAllViews(bool force /*=false*/)
 }
 
 //-----------------------------------------------------------------------------
-int pqPipelineSource::replaceInput() const
-{
-  vtkSMProxy* proxy = this->getProxy();
-  if (!proxy)
-    {
-    return 1;
-    }
-
-  vtkPVXMLElement* hints = proxy->GetHints();
-  if (!hints)
-    {
-    return 1;
-    }
-  for (unsigned int cc=0; cc < hints->GetNumberOfNestedElements(); cc++)
-    {
-    vtkPVXMLElement* child = hints->GetNestedElement(cc);
-    if (!child || !child->GetName() || 
-      strcmp(child->GetName(), "Visibility") != 0)
-      {
-      continue;
-      }
-    int replace_input = 1;
-    if (!child->GetScalarAttribute("replace_input", &replace_input))
-      {
-      continue;
-      }
-    return replace_input;
-    }
-  return 1; // default value.
-}
-
-
-//-----------------------------------------------------------------------------
 vtkPVDataInformation* pqPipelineSource::getDataInformation() const
 {
   vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(
