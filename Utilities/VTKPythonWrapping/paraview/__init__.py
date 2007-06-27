@@ -22,14 +22,14 @@ A simple example:
   # Creates a new built-in connection and makes it the active connection.
   paraview.ActiveConnection = paraview.Connect()
 
-  # Creates a new render module on the active connection.
-  renModule = paraview.CreateRenderWindow()
+  # Creates a new render view on the active connection.
+  renModule = paraview.CreateRenderView()
 
   # Create a new sphere proxy on the active connection.
   sphere = paraview.CreateProxy("sources", "SphereSource")
 
-  # Create a display for the sphere proxy and adds it to the render module.
-  display = paraview.CreateDisplay(sphere, renModule)
+  # Create a representation for the sphere proxy and adds it to the render module.
+  display = paraview.CreateRepresentation(sphere, renModule)
 
   renModule.ResetCamera()
   renModule.StillRender()
@@ -200,10 +200,6 @@ class pyProxy(object):
             return list 
         return []
       
-    def __CreateDisplayProxy(self):
-        "Overload RenderModule's CreateDisplayProxy() to return a pyProxy"
-        return pyProxy(self.SMProxy.CreateDisplayProxy())
-
     def __AddProxy(self, name, proxy):
         "Overload CompoundProxy's AddProxy()"
         if isinstance(proxy, pyProxy):
@@ -618,7 +614,7 @@ def connect_self():
     conn.SetHost("builtin", cid)
     return conn
 
-def Connect(ds_host=None, ds_port=None, rs_host=None, rs_port=None):
+def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     """
     Use this function call to create a new connection. On success,
     it returns a pyConnection object that abstracts the connection.
@@ -669,24 +665,24 @@ def CreateProxy(xml_group, xml_name, register_group=None, register_name=None, co
 def RegisterProxy(proxy, name, group = "sources"):
     pyProxyManager().RegisterProxy(group, name, proxy.SMProxy)
 
-def GetRenderModule():
-    """Return the render module in use.  If more than one render module is in use, return the first one."""
+def GetRenderView():
+    """Return the render view in use.  If more than one render view is in use, return the first one."""
     render_module = None
     for proxy in pyProxyManager().connection_iter(ActiveConnection):
-        if proxy.IsA("vtkSMRenderModuleProxy"):
+        if proxy.IsA("vtkSMRenderViewProxy"):
             render_module = proxy
             break
     return render_module
 
-def GetRenderModules():
-    """Returns the set of all render modules."""
+def GetRenderViews():
+    """Returns the set of all render views."""
     render_modules = []
     for proxy in pyProxyManager().connection_iter(ActiveConnection):
-        if proxy.IsA("vtkSMRenderModuleProxy"):
+        if proxy.IsA("vtkSMRenderViewProxy"):
             render_modules.append(proxy)
     return render_modules
 
-def CreateRenderWindow(connection=None):
+def CreateRenderView(connection=None):
     """Creates a render window on the particular connection. If connection is not specified,
     then the active connection is used, if available."""
     global ActiveConnection
@@ -695,22 +691,12 @@ def CreateRenderWindow(connection=None):
     if not connection:
         raise "Cannot create render window without connection."
     pxm = pyProxyManager()
-    multi_view_render_module = None
-    for proxy in pxm.connection_iter(connection):
-        if proxy.IsA("vtkSMMultiViewRenderModuleProxy"):
-            multi_view_render_module = proxy
-            break
-    if not multi_view_render_module:
-        multi_view_render_module = \
-            CreateProxy("rendermodules", "MultiViewRenderModule", 
-              "render_modules", None, connection)
-        if connection.IsRemote():
-            multi_view_render_module.SetRenderModuleName("IceTDesktopRenderModule")
-        else:
-            multi_view_render_module.SetRenderModuleName("LODRenderModule")
-    if not multi_view_render_module:
-        raise "Could not locate a MultiViewRenderModule for the connection."
-    ren_module = multi_view_render_module.NewRenderModule();
+    proxy_xml_name = None
+    if connection.IsRemote():
+        proxy_xml_name = "IceTDesktopRenderView"
+    else:
+        proxy_xml_name = "RenderView"
+    ren_module = pxm.NewProxy("newviews", proxy_xml_name)
     if not ren_module:
         return None
     ren_module.UnRegister(None)
@@ -718,13 +704,13 @@ def CreateRenderWindow(connection=None):
     ren_module.UpdateVTKObjects()
     return ren_module
 
-def CreateDisplay(proxy, renModule):
-    """Create a display for the proxy and adds it to the render module."""
+def CreateRepresentation(proxy, renModule):
+    """Creates a representation for the proxy and adds it to the render module."""
     if not proxy:
         raise "proxy argument cannot be None."
     if not renModule:
         raise "render module argument cannot be None."
-    display = renModule.CreateDisplayProxy()
+    display = renModule.CreateDefaultRepresentation(proxy)
     if not display:
         return None
     pxm = pyProxyManager()
@@ -732,7 +718,7 @@ def CreateDisplay(proxy, renModule):
     display.UnRegister(None)
     display.SetInput(proxy)
     display.UpdateVTKObjects()
-    renModule.AddToDisplays(display)
+    renModule.AddToRepresentations(display)
     renModule.UpdateVTKObjects()
     return display
 
