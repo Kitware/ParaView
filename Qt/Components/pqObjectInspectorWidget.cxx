@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTabWidget>
 #include <QApplication>
 #include <QStyle>
+#include <QStyleFactory>
 #include <QStyleOption>
 
 // vtk includes
@@ -267,6 +268,25 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->AcceptButton->setEnabled(false);
   this->ResetButton->setEnabled(false);
   this->DeleteButton->setEnabled(false);
+
+  // if XP Style is being used
+  // swap it out for cleanlooks which looks almost the same
+  // so we can have a green accept button
+  // make all the buttons the same
+  QString styleName = this->AcceptButton->style()->metaObject()->className();
+  if(styleName == "QWindowsXPStyle")
+     {
+     QStyle* st = QStyleFactory::create("cleanlooks");
+     st->setParent(this);
+     this->AcceptButton->setStyle(st);
+     this->ResetButton->setStyle(st);
+     this->DeleteButton->setStyle(st);
+     QPalette buttonPalette = this->AcceptButton->palette();
+     buttonPalette.setColor(QPalette::Button, QColor(244,246,244));
+     this->AcceptButton->setPalette(buttonPalette);
+     this->ResetButton->setPalette(buttonPalette);
+     this->DeleteButton->setPalette(buttonPalette);
+     }
 
   // Change the accept button palette so it is green when it is active.
   QPalette acceptPalette = this->AcceptButton->palette();
