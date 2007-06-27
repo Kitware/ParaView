@@ -15,12 +15,12 @@
 // .NAME vtkSMRepresentationStrategy - strategy for representation proxies that
 // encapsulates lod/parallel pipelines.
 // .SECTION Description
-// vtkSMRepresentationStrategy is an abstract superclass for representation
-// strategies that encapsulate the lod/parallel pipelines. 
-// Representation implementations don't need to implement pipeline for handling
-// parallel rendering instead, they simply ask for a strategy based on their
-// data type and mode of rendering (ie. surface/volume) from the view proxy to
-// which they are added.
+// vtkSMRepresentationStrategy is an abstract superclass that encapsulates the 
+// lod/parallel pipelines that make data visible to the user.
+// Because of this class representation implementations do not need to 
+// implement a pipeline for handling parallel rendering. Instead they simply
+// ask the view proxy to which they are added to create a strategy and it 
+// will create the correct strategy for the representation's data type.
 
 #ifndef __vtkSMRepresentationStrategy_h
 #define __vtkSMRepresentationStrategy_h
