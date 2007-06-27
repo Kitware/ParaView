@@ -30,7 +30,7 @@ ENDFOREACH(name)
 
 
 
-IF (VTK_USE_DISPLAY AND VTK_DATA_ROOT)
+IF (VTK_USE_DISPLAY AND VTK_DATA_ROOT AND PARAVIEW_DATA_ROOT)
   SET(ServersFiltersImage_SRCS
     TestTransferFunctionEditor
     TestTransferFunctionEditor2
