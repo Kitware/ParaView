@@ -699,7 +699,6 @@ def CreateRenderView(connection=None):
     ren_module = pxm.NewProxy("newviews", proxy_xml_name)
     if not ren_module:
         return None
-    ren_module.UnRegister(None)
     pxm.RegisterProxy("render_modules", ren_module.GetSelfIDAsString(), ren_module)
     ren_module.UpdateVTKObjects()
     return ren_module
@@ -715,7 +714,6 @@ def CreateRepresentation(proxy, renModule):
         return None
     pxm = pyProxyManager()
     pxm.RegisterProxy("displays", display.GetSelfIDAsString(), display)
-    display.UnRegister(None)
     display.SetInput(proxy)
     display.UpdateVTKObjects()
     renModule.AddToRepresentations(display)
