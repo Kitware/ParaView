@@ -31,7 +31,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPExtractHistogram);
-vtkCxxRevisionMacro(vtkPExtractHistogram, "1.3");
+vtkCxxRevisionMacro(vtkPExtractHistogram, "1.4");
 vtkCxxSetObjectMacro(vtkPExtractHistogram, Controller, vtkMultiProcessController);
 //-----------------------------------------------------------------------------
 vtkPExtractHistogram::vtkPExtractHistogram()
@@ -98,14 +98,14 @@ bool vtkPExtractHistogram::InitializeBinExtents(
 
   // Gather array name (since all processes may not have the array name,
   // we need to gather it.
-  int *arrayname_lengths = new int[num_processes];
-  int my_length = array_name.size() + 1; // gather null terminated strings.
+  vtkIdType *arrayname_lengths = new vtkIdType[num_processes];
+  vtkIdType my_length = array_name.size() + 1; //gather null terminated strings.
 
   // Collect name lengths.
   comm->AllGather(&my_length, arrayname_lengths, 1);
 
-  int total_size = 0;
-  int *offsets = new int[num_processes];
+  vtkIdType total_size = 0;
+  vtkIdType *offsets = new vtkIdType[num_processes];
   for (cc=0; cc < num_processes; cc++)
     {
     offsets[cc] = total_size;

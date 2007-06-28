@@ -101,7 +101,7 @@ protected:
   void Reduce(vtkDataObject* input, vtkDataObject* output);
 
   char* RawData;
-  int DataLength;
+  vtkIdType DataLength;
   int Extent[6];
   vtkAlgorithm* PreGatherHelper;
   vtkAlgorithm* PostGatherHelper;

@@ -40,7 +40,7 @@
 #include "vtkAllToNRedistributePolyData.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.13");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.14");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -446,14 +446,14 @@ void vtkMPIMoveData::DataServerGatherAll(vtkDataSet* input,
   // We will be responsiblefor deleting the buffer.
   // This assumes one buffer. MashalData will produce only one buffer
   // One data set, one buffer.
-  int inBufferLength = this->BufferTotalLength;
+  vtkIdType inBufferLength = this->BufferTotalLength;
   char *inBuffer = this->Buffers;
   this->Buffers = NULL;
   this->ClearBuffer();
 
   // Allocate arrays used by the AllGatherV call.
-  this->BufferLengths = new int[numProcs];
-  this->BufferOffsets = new int[numProcs];
+  this->BufferLengths = new vtkIdType[numProcs];
+  this->BufferOffsets = new vtkIdType[numProcs];
   
   // Compute the degenerate input offsets and lengths.
   // Broadcast our size to all other processes.
@@ -508,7 +508,7 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataSet* input,
   // We will be responsiblefor deleting the buffer.
   // This assumes one buffer. MashalData will produce only one buffer
   // One data set, one buffer.
-  int inBufferLength = this->BufferTotalLength;
+  vtkIdType inBufferLength = this->BufferTotalLength;
   char *inBuffer = this->Buffers;
   this->Buffers = NULL;
   this->ClearBuffer();
@@ -516,8 +516,8 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataSet* input,
   if (myId == 0)
     {
     // Allocate arrays used by the AllGatherV call.
-    this->BufferLengths = new int[numProcs];
-    this->BufferOffsets = new int[numProcs];
+    this->BufferLengths = new vtkIdType[numProcs];
+    this->BufferOffsets = new vtkIdType[numProcs];
     }
 
   // Compute the degenerate input offsets and lengths.
@@ -590,10 +590,10 @@ void vtkMPIMoveData::RenderServerReceiveFromDataServer(vtkDataSet* output)
 
   this->ClearBuffer();
   com->Receive(&(this->NumberOfBuffers), 1, 1, 23480);
-  this->BufferLengths = new int[this->NumberOfBuffers];
+  this->BufferLengths = new vtkIdType[this->NumberOfBuffers];
   com->Receive(this->BufferLengths, this->NumberOfBuffers, 1, 23481);
   // Compute additional buffer information.
-  this->BufferOffsets = new int[this->NumberOfBuffers];
+  this->BufferOffsets = new vtkIdType[this->NumberOfBuffers];
   this->BufferTotalLength = 0;
   for (int idx = 0; idx < this->NumberOfBuffers; ++idx)
     {
@@ -654,10 +654,10 @@ void vtkMPIMoveData::RenderServerZeroReceiveFromDataServerZero(vtkDataSet* data)
 
     this->ClearBuffer();
     com->Receive(&(this->NumberOfBuffers), 1, 1, 23480);
-    this->BufferLengths = new int[this->NumberOfBuffers];
+    this->BufferLengths = new vtkIdType[this->NumberOfBuffers];
     com->Receive(this->BufferLengths, this->NumberOfBuffers, 1, 23481);
     // Compute additional buffer information.
-    this->BufferOffsets = new int[this->NumberOfBuffers];
+    this->BufferOffsets = new vtkIdType[this->NumberOfBuffers];
     this->BufferTotalLength = 0;
     for (int idx = 0; idx < this->NumberOfBuffers; ++idx)
       {
@@ -705,11 +705,11 @@ void vtkMPIMoveData::ClientReceiveFromDataServer(vtkDataSet* output)
 
   this->ClearBuffer();
   com->Receive(&(this->NumberOfBuffers), 1, 1, 23490);
-  this->BufferLengths = new int[this->NumberOfBuffers];
+  this->BufferLengths = new vtkIdType[this->NumberOfBuffers];
   com->Receive(this->BufferLengths, this->NumberOfBuffers, 
                                   1, 23491);
   // Compute additional buffer information.
-  this->BufferOffsets = new int[this->NumberOfBuffers];
+  this->BufferOffsets = new vtkIdType[this->NumberOfBuffers];
   this->BufferTotalLength = 0;
   for (int idx = 0; idx < this->NumberOfBuffers; ++idx)
     {
@@ -761,9 +761,9 @@ void vtkMPIMoveData::RenderServerZeroBroadcast(vtkDataSet* data)
   if (myId != 0)
     {
     this->NumberOfBuffers = 1;
-    this->BufferLengths = new int[1];
+    this->BufferLengths = new vtkIdType[1];
     this->BufferLengths[0] = bufferLength;
-    this->BufferOffsets = new int[1];
+    this->BufferOffsets = new vtkIdType[1];
     this->BufferOffsets[0] = 0;
     this->BufferTotalLength = this->BufferLengths[0];
     this->Buffers = new char[bufferLength];
@@ -829,9 +829,9 @@ void vtkMPIMoveData::MarshalDataToBuffer(vtkDataSet* data)
   writer->Write();
   // Get string.
   this->NumberOfBuffers = 1;
-  this->BufferLengths = new int[1];
+  this->BufferLengths = new vtkIdType[1];
   this->BufferLengths[0] = writer->GetOutputStringLength();
-  this->BufferOffsets = new int[1];
+  this->BufferOffsets = new vtkIdType[1];
   this->BufferOffsets[0] = 0;
   this->BufferTotalLength = this->BufferLengths[0];
   this->Buffers = writer->RegisterAndGetOutputString();

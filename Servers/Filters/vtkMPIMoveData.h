@@ -131,11 +131,11 @@ protected:
   void DataServerSendToClient(vtkDataSet* output);
   void ClientReceiveFromDataServer(vtkDataSet* output);
 
-  int   NumberOfBuffers;
-  int*  BufferLengths;
-  int*  BufferOffsets;
-  char* Buffers;
-  int   BufferTotalLength;
+  int        NumberOfBuffers;
+  vtkIdType* BufferLengths;
+  vtkIdType* BufferOffsets;
+  char*      Buffers;
+  vtkIdType  BufferTotalLength;
 
   void ClearBuffer();
   void MarshalDataToBuffer(vtkDataSet* data);
