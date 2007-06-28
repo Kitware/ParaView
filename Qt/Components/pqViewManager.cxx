@@ -477,7 +477,7 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
       this);
     forwardAction->setObjectName("ForwardButton");
     frame->addTitlebarAction(forwardAction);
-    forwardAction->setEnabled(true);
+    forwardAction->setEnabled(false);
 
     QObject::connect(forwardAction, SIGNAL( triggered ()), 
       view, SLOT(redo()));
@@ -490,7 +490,7 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
       this);
     backAction->setObjectName("BackButton");
     frame->addTitlebarAction(backAction);
-    backAction->setEnabled(true);
+    backAction->setEnabled(false);
     
     QObject::connect(backAction, SIGNAL( triggered ()), 
       view, SLOT(undo()));

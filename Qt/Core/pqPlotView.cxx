@@ -56,7 +56,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqBarChartRepresentation.h"
 #include "pqChartArea.h"
 #include "pqChartAxis.h"
+#include "pqChartContentsSpace.h"
 #include "pqChartInteractor.h"
+#include "pqChartInteractorSetup.h"
+#include "pqChartMouseSelection.h"
 #include "pqChartSeriesOptionsGenerator.h"
 #include "pqChartWidget.h"
 #include "pqRepresentation.h"
@@ -161,6 +164,7 @@ public:
   ~pqPlotViewInternal();
 
   QPointer<pqChartWidget> Chart;
+  QPointer<pqChartMouseSelection> Selection;
   pqPlotViewHistogram *Histogram;
   pqPlotViewLineChart *LineChart;
   int MaxNumberOfVisibleRepresentations;
@@ -508,7 +512,7 @@ void pqPlotViewLineChart::update(bool force)
 
 //----------------------------------------------------------------------------
 pqPlotViewInternal::pqPlotViewInternal()
-  : Chart(0)
+  : Chart(0), Selection(0)
 {
   this->Histogram = 0;
   this->LineChart = 0;
@@ -576,6 +580,22 @@ pqPlotView::pqPlotView(const QString& type,
   if(this->Internal->Chart)
     {
     this->Internal->Chart->setObjectName("PlotWidget");
+    this->Internal->Selection = pqChartInteractorSetup::createSplitZoom(
+        this->Internal->Chart->getChartArea());
+    if(this->Internal->Histogram)
+      {
+      this->Internal->Selection->setHistogram(this->Internal->Histogram->Layer);
+      this->Internal->Selection->setSelectionMode("Histogram-Bin");
+      }
+
+    pqChartContentsSpace *contents =
+      this->Internal->Chart->getChartArea()->getInteractor()->getContentsSpace();
+    QObject::connect(
+        contents, SIGNAL(historyPreviousAvailabilityChanged(bool)),
+        this, SIGNAL(canUndoChanged(bool)));
+    QObject::connect(
+        contents, SIGNAL(historyNextAvailabilityChanged(bool)),
+        this, SIGNAL(canRedoChanged(bool)));
     }
   
   QObject::connect(this, SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)),
@@ -607,6 +627,13 @@ pqPlotView::~pqPlotView()
 QWidget* pqPlotView::getWidget()
 {
   return this->Internal->Chart;
+}
+
+//-----------------------------------------------------------------------------
+bool pqPlotView::supportsUndo() const
+{
+  return !this->Internal->Chart.isNull() &&
+      this->Internal->Chart->getChartArea()->getInteractor() != 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -758,6 +785,26 @@ bool pqPlotView::saveImage(int width, int height,
 
   QPixmap grabbedPixMap = QPixmap::grabWidget(this->getWidget());
   return grabbedPixMap.save(filename);
+}
+
+//-----------------------------------------------------------------------------
+void pqPlotView::undo()
+{
+  if(this->supportsUndo())
+    {
+    pqChartArea *area = this->Internal->Chart->getChartArea();
+    area->getInteractor()->getContentsSpace()->historyPrevious();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPlotView::redo()
+{
+  if(this->supportsUndo())
+    {
+    pqChartArea *area = this->Internal->Chart->getChartArea();
+    area->getInteractor()->getContentsSpace()->historyNext();
+    }
 }
 
 //-----------------------------------------------------------------------------

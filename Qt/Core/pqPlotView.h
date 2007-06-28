@@ -56,6 +56,8 @@ public:
 
   QWidget* getWidget();
 
+  virtual bool supportsUndo() const;
+
   /// Save a screenshot for the render module. If width or height ==0,
   /// the current window size is used.
   virtual bool saveImage(int /*width*/, int /*height*/, 
@@ -72,6 +74,12 @@ public:
 
   /// Request a delayed forceRender().
   virtual void render();
+
+  /// Called to undo interaction.
+  virtual void undo();
+
+  /// Called to redo interaction.
+  virtual void redo();
 
   /// Called to check if the given source can be shown in this view.
   virtual bool canDisplaySource(pqPipelineSource* source) const;

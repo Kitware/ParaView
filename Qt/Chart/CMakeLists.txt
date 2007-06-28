@@ -30,6 +30,8 @@ SET(QtChart_SRCS
   pqChartGridLayer.h
   pqChartInteractor.cxx
   pqChartInteractor.h
+  pqChartInteractorSetup.cxx
+  pqChartInteractorSetup.h
   pqChartLayer.cxx
   pqChartLayer.h
   pqChartLegend.cxx
@@ -38,12 +40,18 @@ SET(QtChart_SRCS
   pqChartLegendModel.h
   pqChartMouseBox.cxx
   pqChartMouseBox.h
+  pqChartMouseFunction.cxx
+  pqChartMouseFunction.h
+  pqChartMousePan.cxx
+  pqChartMousePan.h
+  pqChartMouseSelection.cxx
+  pqChartMouseSelection.h
+  pqChartMouseZoom.cxx
+  pqChartMouseZoom.h
   pqChartPixelScale.cxx
   pqChartPixelScale.h
   pqChartPlugin.cxx
   pqChartPlugin.h
-  pqChartSelectionHelper.cxx
-  pqChartSelectionHelper.h
   pqChartSeriesColorManager.cxx
   pqChartSeriesColorManager.h
   pqChartSeriesOptionsGenerator.cxx
@@ -74,8 +82,6 @@ SET(QtChart_SRCS
   pqHistogramModel.h
   pqHistogramSelection.cxx
   pqHistogramSelection.h
-  pqHistogramSelectionHelper.cxx
-  pqHistogramSelectionHelper.h
   pqHistogramSelectionModel.cxx
   pqHistogramSelectionModel.h
   pqHistogramWidget.cxx
@@ -117,8 +123,9 @@ QT4_WRAP_CPP(QtChart_MOC_SRCS
   pqChartLegend.h
   pqChartLegendModel.h
   pqChartLayer.h
+  pqChartMouseFunction.h
+  pqChartMouseSelection.h
   pqChartPlugin.h
-  pqChartSelectionHelper.h
   pqChartTitle.h
   pqChartWidget.h
   pqChartWidgetPlugin.h
@@ -129,7 +136,6 @@ QT4_WRAP_CPP(QtChart_MOC_SRCS
   pqHistogramChart.h
   pqHistogramChartOptions.h
   pqHistogramModel.h
-  pqHistogramSelectionHelper.h
   pqHistogramSelectionModel.h
   pqLineChart.h
   pqLineChartModel.h

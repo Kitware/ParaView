@@ -177,8 +177,6 @@ pqChartArea::pqChartArea(QWidget *widgetParent)
       this, SLOT(update()));
   this->connect(this->Contents, SIGNAL(maximumChanged(int, int)),
       this, SLOT(handleZoomChange()));
-  this->connect(this->Contents, SIGNAL(cursorChangeRequested(const QCursor &)),
-      this, SLOT(changeCursor(const QCursor &)));
 }
 
 pqChartArea::~pqChartArea()
@@ -415,7 +413,8 @@ void pqChartArea::setInteractor(pqChartInteractor *interactor)
         this, SLOT(update()));
     this->connect(this->Interactor, SIGNAL(repaintNeeded(const QRect &)),
         this, SLOT(updateArea(const QRect &)));
-    this->connect(this->Interactor, SIGNAL(cursorChangeNeeded(const QCursor &)),
+    this->connect(
+        this->Interactor, SIGNAL(cursorChangeRequested(const QCursor &)),
         this, SLOT(changeCursor(const QCursor &)));
     }
 }
@@ -794,12 +793,13 @@ void pqChartArea::paintEvent(QPaintEvent *e)
   this->drawChart(painter, area);
 
   // Draw the mouse box if it is valid.
-  if(this->MouseBox->Box.isValid())
+  if(this->MouseBox->isValid())
     {
+    this->MouseBox->getPaintRectangle(area);
+    this->Contents->translateFromContents(area);
     painter.setPen(Qt::black);
     painter.setPen(Qt::DotLine);
-    painter.drawRect(this->MouseBox->Box.x(), this->MouseBox->Box.y(),
-        this->MouseBox->Box.width() - 1, this->MouseBox->Box.height() - 1);
+    painter.drawRect(area);
     }
 }
 
@@ -828,9 +828,9 @@ void pqChartArea::mousePressEvent(QMouseEvent *e)
   this->Contents->translateToContents(point);
 
   // Save the necessary coordinates.
-  this->MouseBox->Last = point;
-  this->Contents->setStartingPosition(e->globalPos());
+  this->MouseBox->setStartingPosition(point);
 
+  // Let the interactor handle the rest of the event.
   if(this->Interactor)
     {
     this->Interactor->mousePressEvent(e);
@@ -864,7 +864,7 @@ void pqChartArea::mouseReleaseEvent(QMouseEvent *e)
     e->ignore();
     }
 
-  this->MouseBox->resetBox();
+  this->MouseBox->resetRectangle();
 }
 
 void pqChartArea::mouseDoubleClickEvent(QMouseEvent *e)

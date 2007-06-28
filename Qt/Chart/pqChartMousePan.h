@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqLineChartWidget.cxx
+   Module:    pqChartMousePan.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,41 +30,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqLineChartWidget.cxx
-/// \date 9/27/2005
+/// \file pqChartMousePan.h
+/// \date 6/25/2007
 
-#include "pqLineChartWidget.h"
-
-#include "pqChartArea.h"
-#include "pqChartAxis.h"
-#include "pqChartWidget.h"
-#include "pqLineChart.h"
-#include <QWidget>
+#ifndef _pqChartMousePan_h
+#define _pqChartMousePan_h
 
 
-pqChartWidget *pqLineChartWidget::createLineChart(QWidget *parent,
-    pqLineChart **layer)
+#include "QtChartExport.h"
+#include "pqChartMouseFunction.h"
+
+class pqChartContentsSpace;
+class pqChartMousePanInternal;
+class QMouseEvent;
+
+
+/// \class pqChartMousePan
+/// \brief
+///   The pqChartMousePan class pans the contents in response to
+///   mouse events.
+class QTCHART_EXPORT pqChartMousePan : public pqChartMouseFunction
 {
-  pqChartWidget *chart = new pqChartWidget(parent);
+public:
+  /// \brief
+  ///   Creates a mouse pan instance.
+  /// \param parent Te parent object.
+  pqChartMousePan(QObject *parent=0);
+  virtual ~pqChartMousePan();
 
-  // Get the chart area and set up the axes.
-  pqChartArea *chartArea = chart->getChartArea();
-  chartArea->createAxis(pqChartAxis::Left);
-  chartArea->createAxis(pqChartAxis::Bottom);
+  /// \name pqChartMouseFunction Methods
+  //@{
+  virtual void setMouseOwner(bool owns);
 
-  // Set up the line chart.
-  pqLineChart *lineChart = new pqLineChart(chartArea);
-  lineChart->setAxes(chartArea->getAxis(pqChartAxis::Bottom),
-      chartArea->getAxis(pqChartAxis::Left));
-  chartArea->addLayer(lineChart);
+  virtual bool mousePressEvent(QMouseEvent *e, pqChartContentsSpace *contents);
+  virtual bool mouseMoveEvent(QMouseEvent *e, pqChartContentsSpace *contents);
+  virtual bool mouseReleaseEvent(QMouseEvent *e,
+      pqChartContentsSpace *contents);
+  virtual bool mouseDoubleClickEvent(QMouseEvent *e,
+      pqChartContentsSpace *contents);
+  //@}
 
-  // Pass back a pointer to the line chart layer.
-  if(layer)
-    {
-    *layer = lineChart;
-    }
+private:
+  pqChartMousePanInternal *Internal; ///< Stores the last mouse position.
+};
 
-  return chart;
-}
-
-
+#endif

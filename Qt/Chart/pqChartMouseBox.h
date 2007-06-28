@@ -30,30 +30,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/*!
- * \file pqChartMouseBox.h
- *
- * \brief
- *   The pqChartMouseBox class stores the data for a mouse zoom or
- *   selection box.
- *
- * \author Mark Richardson
- * \date   September 28, 2005
- */
+/// \file pqChartMouseBox.h
+/// \date 9/28/2005
 
 #ifndef _pqChartMouseBox_h
 #define _pqChartMouseBox_h
 
 
 #include "QtChartExport.h"
-#include <QRect>  // Needed for QRect member.
-#include <QPoint> // Needed for QPoint member.
+
+class pqChartMouseBoxInternal;
+class QPoint;
+class QRect;
+
 
 /*!
  *  \class pqChartMouseBox
  *  \brief
- *    The pqChartMouseBox class stores the data for a mouse zoom or
- *    selection box.
+ *    The pqChartMouseBox class stores the data for a mouse box that
+ *    can be used for zooming or selection.
  * 
  *  To use the pqChartMouseBox, code needs to be added to several
  *  key methods. The drag box interaction starts in the mouse press
@@ -62,12 +57,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  intent (zoom, select, etc.).
  * 
  *  In the mouse press event, the mouse location needs to be saved.
- *  The coordinate system used to determine the mouse location must
- *  be the same coordinate system used to set up the box.
+ *  The coordinate system used to set the mouse press location must
+ *  be the same coordinate system used to adjust the box.
  *  \code
  *  void SomeClass::mousePressEvent(QMouseEvent *e)
  *  {
- *     this->mouseBox->Last = e->pos();
+ *     this->mouseBox->setStartingPosition(e->pos());
  *  }
  *  \endcode
  * 
@@ -78,15 +73,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  \code
  *  void SomeClass::mouseMoveEvent(QMouseEvent *e)
  *  {
- *     QRect area = this->mouseBox->Box;
- *     this->mouseBox->adjustBox(e->pos());
+ *     QRect area;
+ *     this->mouseBox->getRectangle(area);
+ *     this->mouseBox->adjustRectangle(e->pos());
  * 
- *     // Repaint the zoom box. Unite the previous area with the new
+ *     // Repaint the mouse box. Unite the previous area with the new
  *     // area to ensure all the changes get repainted.
- *     if(area.isValid())
- *        area = area.unite(this->mouseBox->Box);
- *     else
- *        area = this->mouseBox->Box;
+ *     this->mouseBox->getUnion(area);
  *     update(area);
  *  }
  *  \endcode
@@ -97,10 +90,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  \code
  *  void SomeClass::mouseReleaseEvent(QMouseEvent *e)
  *  {
- *     this->mouseBox->adjustBox(e->pos());
- *     QRect area = this->mouseBox->Box;
+ *     QRect area;
+ *     this->mouseBox->adjustRectangle(e->pos());
+ *     this->mouseBox->getRectangle(area);
  *     ...
- *     this->mouseBox->resetBox();
+ *     this->mouseBox->resetRectangle();
  *     update(area);
  *  }
  *  \endcode
@@ -113,12 +107,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  void SomeClass::paintEvent(QPaintEvent *e)
  *  {
  *     ...
- *     if(this->mouseBox->Box.isValid())
+ *     if(this->mouseBox->isValid())
  *     {
+ *        QRect box;
  *        painter->setPen(Qt::black);
  *        painter->setPen(Qt::DotLine);
- *        painter->drawRect(this->data->Box.x(), this->data->Box.y(),
- *           this->data->Box.width() - 1, this->data->Box.height() - 1);
+ *        this->mouseBox->getPaintRectangle(box);
+ *        painter->drawRect(box);
  *     }
  *     ...
  *  }
@@ -128,24 +123,62 @@ class QTCHART_EXPORT pqChartMouseBox
 {
 public:
   pqChartMouseBox();
-  ~pqChartMouseBox() {}
+  ~pqChartMouseBox();
 
   /// \brief
-  ///   Adjusts the boundary of the mouse drag box.
+  ///   Sets the mouse box starting position.
+  ///
+  /// The starting position should be set before calling
+  /// \c adjustRectangle. The starting position and adjustment
+  /// positions should be in the same coordinate space.
+  ///
+  /// \param start The original mouse press location.
+  /// \sa pqChartMouseBox::adjustRectangle(const QPoint &)
+  void setStartingPosition(const QPoint &start);
+
+  /// \brief
+  ///   Gets whether or not the rectangle is valid.
+  /// \return
+  ///   True if the rectangle is valid.
+  bool isValid() const;
+
+  /// \brief
+  ///   Gets the current mouse box.
+  /// \param area Used to return the mouse box.
+  void getRectangle(QRect &area) const;
+
+  /// \brief
+  ///   Gets the rectangle suitable for painting the mouse box.
+  /// \param area Used to return the painting rectangle.
+  void getPaintRectangle(QRect &area) const;
+
+  /// \brief
+  ///   Gets the union of the mouse box and the given area.
+  ///
+  /// If the mouse box is not valid, this method does nothing. If the
+  /// area passed in is not valid, the mouse box area will be returned,
+  /// which is equivalent to calling \c getRectangle.
+  ///
+  /// \param area The rectangle to union with the mouse box. The
+  ///   variable is also used to return the new rectangle.
+  void getUnion(QRect &area) const;
+
+  /// \brief
+  ///   Adjusts the boundary of the mouse box.
   ///
   /// The selection or zoom box should contain the original mouse
   /// down location and the current mouse location. This method
   /// is used to adjust the box based on the current mouse location.
   ///
   /// \param current The current position of the mouse.
-  void adjustBox(const QPoint &current);
+  /// \sa pqChartMouseBox::setStartingPosition(const QPoint &)
+  void adjustRectangle(const QPoint &current);
 
-  /// Resets the drag box to an invalid rectangle.
-  void resetBox();
+  /// Resets the mouse box to an invalid rectangle.
+  void resetRectangle();
 
-public:
-  QRect Box;   ///< Stores the mouse drag box.
-  QPoint Last; ///< Stores the last mouse location.
+private:
+  pqChartMouseBoxInternal *Internal; ///< Stores the mouse box data.
 };
 
 #endif

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqChartSelectionHelper.cxx
+   Module:    pqChartMouseFunction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,30 +30,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqChartSelectionHelper.cxx
-/// \date 11/8/2006
+/// \file pqChartMouseFunction.cxx
+/// \date 6/21/2007
 
-#include "pqChartSelectionHelper.h"
+#include "pqChartMouseFunction.h"
 
 #include "pqChartContentsSpace.h"
 #include "pqChartMouseBox.h"
 
+#include <QCursor>
+#include <QMouseEvent>
+#include <QRect>
 
-pqChartSelectionHelper::pqChartSelectionHelper(QObject *parentObject)
+
+pqChartMouseFunction::pqChartMouseFunction(QObject *parentObject)
   : QObject(parentObject)
 {
-  this->Mouse = 0;
-  this->Contents = 0;
+  this->OwnsMouse = false;
 }
 
-void pqChartSelectionHelper::setContentsSpace(pqChartContentsSpace *contents)
+void pqChartMouseFunction::setMouseBox(pqChartMouseBox *)
 {
-  this->Contents = contents;
-}
-
-void pqChartSelectionHelper::setMouseBox(pqChartMouseBox *mouse)
-{
-  this->Mouse = mouse;
 }
 
 

@@ -41,7 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 class pqChartContentsSpace;
+class pqChartInteractorInternal;
 class pqChartMouseBox;
+class pqChartMouseFunction;
 class QCursor;
 class QKeyEvent;
 class QMouseEvent;
@@ -75,7 +77,7 @@ class QWheelEvent;
  * 
  *  Based on the interaction mode, the histogram can highlight values
  *  or bins. When switching between selection modes, the current
- *  selection can be erased. This prevents errors when combining bin
+ *  selection will be erased. This prevents errors when combining bin
  *  and value selection. When calling any of the selection methods,
  *  the selection mode will be maintained. If you try to set a value
  *  selection during bin mode, it will be ignored.
@@ -86,7 +88,7 @@ class QTCHART_EXPORT pqChartInteractor : public QObject
 
 public:
   pqChartInteractor(QObject *parent=0);
-  virtual ~pqChartInteractor() {}
+  virtual ~pqChartInteractor();
 
   /// \name Setup Methods
   //@{
@@ -95,11 +97,21 @@ public:
 
   pqChartMouseBox *getMouseBox() const {return this->MouseBox;}
   void setMouseBox(pqChartMouseBox *box);
+  //@}
 
-  Qt::MouseButton getPanButton() const {return this->PanButton;}
-  void setPanButton(Qt::MouseButton button) {this->PanButton = button;}
-  Qt::MouseButton getZoomButton() const {return this->ZoomButton;}
-  void setZoomButton(Qt::MouseButton button) {this->ZoomButton = button;}
+  /// \name Configuration Methods
+  //@{
+  void setFunction(pqChartMouseFunction *function, Qt::MouseButton button,
+      Qt::KeyboardModifiers modifiers=Qt::NoModifier);
+  void addFunction(pqChartMouseFunction *function, Qt::MouseButton button,
+      Qt::KeyboardModifiers modifiers=Qt::NoModifier);
+  void removeFunction(pqChartMouseFunction *function);
+  void removeFunctions(Qt::MouseButton button);
+  void removeAllFunctions();
+
+  int getNumberOfModes(Qt::MouseButton button) const;
+  int getMode(Qt::MouseButton button) const;
+  void setMode(Qt::MouseButton button, int index);
   //@}
 
   /// \name Interaction Methods
@@ -115,32 +127,19 @@ public:
 signals:
   void repaintNeeded();
   void repaintNeeded(const QRect &area);
-  void cursorChangeNeeded(const QCursor &cursor);
+  void cursorChangeRequested(const QCursor &cursor);
 
-protected:
-  enum MouseMode
-    {
-    NoMode = 0,
-    Pan,
-    Zoom,
-    ZoomBox,
-    SelectBox,
-    MoveWait,
-    CustomMode
-    };
-
-  int getMouseMode() const {return this->Mode;}
-  void setMouseMode(int mode);
+private slots:
+  void beginState(pqChartMouseFunction *owner);
+  void endState(pqChartMouseFunction *owner);
 
 private:
-  pqChartContentsSpace *Contents;   ///< Stores the contents space.
-  pqChartMouseBox *MouseBox;        ///< Stores the mouse box.
-  int Mode;                         ///< Stores the mouse mode.
-  Qt::MouseButton PanButton;        ///< Stores the pan button.
-  Qt::MouseButton ZoomButton;       ///< Stores the zoom button.
-  Qt::KeyboardModifier BoxModifier; ///< Stores the zoom box modifier.
-  Qt::KeyboardModifier XModifier;   ///< Stores the zoom x-only modifier.
-  Qt::KeyboardModifier YModifier;   ///< Stores the zoom y-only modifier.
+  /// Stores the mouse function configuration.
+  pqChartInteractorInternal *Internal;
+  pqChartContentsSpace *Contents; ///< Stores the contents space.
+  pqChartMouseBox *MouseBox;      ///< Stores the mouse box.
+  Qt::KeyboardModifier XModifier; ///< Stores the zoom x-only modifier.
+  Qt::KeyboardModifier YModifier; ///< Stores the zoom y-only modifier.
 };
 
 #endif

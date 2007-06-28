@@ -50,9 +50,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///   a histogram chart.
 ///
 /// The default settings are as follows:
-///   - highlight style: \c Fill
-///   - outline style: \c Darker
-///   - selection background: \c LightBlue
+///   \li highlight style: \c Fill
+///   \li outline style: \c Darker
+///   \li selection background: \c LightBlue
 class QTCHART_EXPORT pqHistogramChartOptions : public QObject
 {
   Q_OBJECT

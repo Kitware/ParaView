@@ -30,60 +30,115 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/*!
- * \file pqChartMouseBox.cxx
- *
- * \brief
- *   The pqChartMouseBox class stores the data for a mouse zoom or
- *   selection box.
- *
- * \author Mark Richardson
- * \date   September 28, 2005
- */
+/// \file pqChartMouseBox.cxx
+/// \date 9/28/2005
 
 #include "pqChartMouseBox.h"
 
+#include <QRect>
+#include <QPoint>
 
-pqChartMouseBox::pqChartMouseBox()
+
+class pqChartMouseBoxInternal
+{
+public:
+  pqChartMouseBoxInternal();
+  ~pqChartMouseBoxInternal() {}
+
+  QRect Box;
+  QPoint Last;
+};
+
+
+//----------------------------------------------------------------------------
+pqChartMouseBoxInternal::pqChartMouseBoxInternal()
   : Box(), Last()
 {
 }
 
-void pqChartMouseBox::adjustBox(const QPoint &current)
+
+//----------------------------------------------------------------------------
+pqChartMouseBox::pqChartMouseBox()
 {
-  // Determine the new area. The last point should be kept as one
-  // of the corners.
-  if(current.x() < this->Last.x())
+  this->Internal = new pqChartMouseBoxInternal();
+}
+
+pqChartMouseBox::~pqChartMouseBox()
+{
+  delete this->Internal;
+}
+
+bool pqChartMouseBox::isValid() const
+{
+  return this->Internal->Box.isValid();
+}
+
+void pqChartMouseBox::setStartingPosition(const QPoint &start)
+{
+  this->Internal->Last = start;
+}
+
+void pqChartMouseBox::getRectangle(QRect &area) const
+{
+  area = this->Internal->Box;
+}
+
+void pqChartMouseBox::getPaintRectangle(QRect &area) const
+{
+  area.setRect(this->Internal->Box.x(), this->Internal->Box.y(),
+      this->Internal->Box.width() - 1, this->Internal->Box.height() - 1);
+}
+
+void pqChartMouseBox::getUnion(QRect &area) const
+{
+  if(this->Internal->Box.isValid())
     {
-    if(current.y() < this->Last.y())
+    if(area.isValid())
       {
-      this->Box.setTopLeft(current);
-      this->Box.setBottomRight(this->Last);
+      area = area.unite(this->Internal->Box);
       }
     else
       {
-      this->Box.setBottomLeft(current);
-      this->Box.setTopRight(this->Last);
-      }
-    }
-  else
-    {
-    if(current.y() < this->Last.y())
-      {
-      this->Box.setTopRight(current);
-      this->Box.setBottomLeft(this->Last);
-      }
-    else
-      {
-      this->Box.setBottomRight(current);
-      this->Box.setTopLeft(this->Last);
+      area = this->Internal->Box;
       }
     }
 }
 
-void pqChartMouseBox::resetBox()
+void pqChartMouseBox::adjustRectangle(const QPoint &current)
 {
-  this->Box = QRect();
+  // Determine the new area. The last point should be kept as one
+  // of the corners.
+  if(current.x() < this->Internal->Last.x())
+    {
+    if(current.y() < this->Internal->Last.y())
+      {
+      this->Internal->Box.setTopLeft(current);
+      this->Internal->Box.setBottomRight(this->Internal->Last);
+      }
+    else
+      {
+      this->Internal->Box.setBottomLeft(current);
+      this->Internal->Box.setTopRight(this->Internal->Last);
+      }
+    }
+  else
+    {
+    if(current.y() < this->Internal->Last.y())
+      {
+      this->Internal->Box.setTopRight(current);
+      this->Internal->Box.setBottomLeft(this->Internal->Last);
+      }
+    else
+      {
+      this->Internal->Box.setBottomRight(current);
+      this->Internal->Box.setTopLeft(this->Internal->Last);
+      }
+    }
+}
+
+void pqChartMouseBox::resetRectangle()
+{
+  this->Internal->Box = QRect();
 }
 
 

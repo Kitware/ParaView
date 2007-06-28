@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqChartArea.h"
 #include "pqChartAxis.h"
-#include "pqChartInteractor.h"
 #include "pqChartWidget.h"
 #include "pqHistogramChart.h"
 #include <QWidget>
@@ -52,9 +51,6 @@ pqChartWidget *pqHistogramWidget::createHistogram(QWidget *parent,
   pqChartArea *chartArea = chart->getChartArea();
   chartArea->createAxis(pqChartAxis::Left);
   chartArea->createAxis(pqChartAxis::Bottom);
-
-  // Add the default chart interactor.
-  chartArea->setInteractor(new pqChartInteractor(chartArea));
 
   // Set up the histogram layer.
   pqHistogramChart *histogram = new pqHistogramChart(chartArea);

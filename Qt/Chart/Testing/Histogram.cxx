@@ -4,6 +4,8 @@
 #include "pqChartAxisOptions.h"
 #include "pqChartCoordinate.h"
 #include "pqChartInteractor.h"
+#include "pqChartInteractorSetup.h"
+#include "pqChartMouseSelection.h"
 #include "pqChartSeriesOptionsGenerator.h"
 #include "pqChartValue.h"
 #include "pqChartWidget.h"
@@ -35,13 +37,18 @@ int Histogram(int argc, char* argv[])
   chartArea->createAxis(pqChartAxis::Left);
   chartArea->createAxis(pqChartAxis::Bottom);
   chartArea->createAxis(pqChartAxis::Right);
-  chartArea->setInteractor(new pqChartInteractor(chartArea));
+
+  // Set up the default interactor.
+  pqChartMouseSelection *selection =
+      pqChartInteractorSetup::createDefault(chartArea);
 
   // Set up the histogram.
   pqHistogramChart *histogram = new pqHistogramChart(chartArea);
   histogram->setAxes(chartArea->getAxis(pqChartAxis::Bottom),
       chartArea->getAxis(pqChartAxis::Left));
   chartArea->insertLayer(chartArea->getAxisLayerIndex(), histogram);
+  selection->setHistogram(histogram);
+  selection->setSelectionMode("Histogram-Bin");
 
   // Set up the histogram data.
   pqSimpleHistogramModel *model = new pqSimpleHistogramModel();

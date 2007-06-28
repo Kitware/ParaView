@@ -36,8 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartContentsSpace.h"
 
 #include "pqChartZoomHistory.h"
-#include <QCursor>
-#include <QPixmap>
 #include <QPoint>
 #include <QRect>
 
@@ -46,13 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // problems while zooming.
 #define MAX_ZOOM 1600
 
-// Set zoom/pan factors for key and wheel events.
-#define ZOOM_FACTOR 10
-#define PAN_FACTOR 15
-
-// Zoom cursor xpm.
-#include "zoom.xpm"
-
 
 class pqChartContentsSpaceInternal
 {
@@ -60,19 +51,24 @@ public:
   pqChartContentsSpaceInternal();
   ~pqChartContentsSpaceInternal() {}
 
-  QPoint Last;                ///< Stores the last mouse position.
   pqChartZoomHistory History; ///< Stores the viewport zoom history.
-  QCursor ZoomCursor;         ///< Stores the zoom cursor.
   bool InHistory;             ///< Used for zoom history processing.
+  bool InInteraction;         ///< Used for interactive zoom.
 };
 
 
 //----------------------------------------------------------------------------
 pqChartContentsSpaceInternal::pqChartContentsSpaceInternal()
-  : Last(), History(), ZoomCursor(QPixmap(zoom_xpm), 11, 11)
+  : History()
 {
   this->InHistory = false;
+  this->InInteraction = false;
 }
+
+
+//----------------------------------------------------------------------------
+int pqChartContentsSpace::ZoomFactorStep = 10;
+int pqChartContentsSpace::PanStep = 15;
 
 
 //----------------------------------------------------------------------------
@@ -80,7 +76,6 @@ pqChartContentsSpace::pqChartContentsSpace(QObject *parentObject)
   : QObject(parentObject)
 {
   this->Internal = new pqChartContentsSpaceInternal();
-  this->Current = pqChartContentsSpace::NoMode;
   this->OffsetX = 0;
   this->OffsetY = 0;
   this->MaximumX = 0;
@@ -223,7 +218,7 @@ void pqChartContentsSpace::zoomToPercent(int xPercent, int yPercent)
     this->ZoomFactorY = yPercent;
     if(this->Width != 0 || this->Height != 0)
       {
-      if(!this->Internal->InHistory)
+      if(!this->Internal->InHistory && !this->Internal->InInteraction)
         {
         // Add the new zoom location to the zoom history.
         this->Internal->History.addHistory(this->OffsetX, this->OffsetY,
@@ -339,12 +334,12 @@ void pqChartContentsSpace::zoomIn(pqChartContentsSpace::InteractFlags flags)
   int y = this->ZoomFactorY;
   if(changeInX)
     {
-    x += ZOOM_FACTOR;
+    x += pqChartContentsSpace::ZoomFactorStep;
     }
 
   if(changeInY)
     {
-    y += ZOOM_FACTOR;
+    y += pqChartContentsSpace::ZoomFactorStep;
     }
 
   this->zoomToPercent(x, y);
@@ -367,112 +362,45 @@ void pqChartContentsSpace::zoomOut(pqChartContentsSpace::InteractFlags flags)
   int y = this->ZoomFactorY;
   if(changeInX)
     {
-    x -= ZOOM_FACTOR;
+    x -= pqChartContentsSpace::ZoomFactorStep;
     }
 
   if(changeInY)
     {
-    y -= ZOOM_FACTOR;
+    y -= pqChartContentsSpace::ZoomFactorStep;
     }
 
   this->zoomToPercent(x, y);
 }
 
-const QCursor &pqChartContentsSpace::getZoomCursor() const
+void pqChartContentsSpace::startInteraction()
 {
-  return this->Internal->ZoomCursor;
-}
-
-void pqChartContentsSpace::setStartingPosition(const QPoint &pos)
-{
-    this->Internal->Last = pos;
-}
-
-void pqChartContentsSpace::startInteraction(
-    pqChartContentsSpace::InteractMode mode)
-{
-  if(this->Current == pqChartContentsSpace::NoMode)
-    {
-    this->Current = mode;
-    if(this->Current == pqChartContentsSpace::Zoom)
-      {
-      emit this->cursorChangeRequested(this->Internal->ZoomCursor);
-      }
-    else if(this->Current == pqChartContentsSpace::Pan)
-      {
-      emit this->cursorChangeRequested(QCursor(Qt::ClosedHandCursor));
-      }
-    }
+  this->Internal->InInteraction = true;
 }
 
 bool pqChartContentsSpace::isInInteraction() const
 {
-  return this->Current != pqChartContentsSpace::NoMode;
-}
-
-void pqChartContentsSpace::interact(const QPoint &pos,
-    pqChartContentsSpace::InteractFlags flags)
-{
-  if(this->Current == pqChartContentsSpace::Zoom)
-    {
-    // Zoom in or out based on the mouse movement up or down.
-    int delta = (this->Internal->Last.y() - pos.y())/4;
-    if(delta != 0)
-      {
-      bool changeInX = true;
-      bool changeInY = true;
-      if(flags == pqChartContentsSpace::ZoomXOnly)
-        {
-        changeInY = false;
-        }
-      else if(flags == pqChartContentsSpace::ZoomYOnly)
-        {
-        changeInX = false;
-        }
-
-      int x = this->ZoomFactorX;
-      int y = this->ZoomFactorY;
-      if(changeInX)
-        {
-        x += delta;
-        }
-
-      if(changeInY)
-        {
-        y += delta;
-        }
-
-      this->Internal->InHistory = true;
-      this->zoomToPercent(x, y);
-      this->Internal->InHistory = false;
-      this->Internal->Last = pos;
-      }
-    }
-  else if(this->Current == pqChartContentsSpace::Pan)
-    {
-    this->setXOffset(this->Internal->Last.x() - pos.x() + this->OffsetX);
-    this->setYOffset(this->Internal->Last.y() - pos.y() + this->OffsetY);
-    this->Internal->Last = pos;
-    }
+  return this->Internal->InInteraction;
 }
 
 void pqChartContentsSpace::finishInteraction()
 {
-  if(this->Current == pqChartContentsSpace::Zoom)
+  if(this->Internal->InInteraction)
     {
-    this->Current = pqChartContentsSpace::NoMode;
-    this->Internal->History.addHistory(this->OffsetX, this->OffsetY,
-        this->ZoomFactorX, this->ZoomFactorY);
-    emit this->cursorChangeRequested(QCursor(Qt::ArrowCursor));
-    emit this->historyPreviousAvailabilityChanged(
-        this->Internal->History.isPreviousAvailable());
-    emit this->historyNextAvailabilityChanged(
-        this->Internal->History.isNextAvailable());
-    }
-  else if(this->Current == pqChartContentsSpace::Pan)
-    {
-    this->Current = pqChartContentsSpace::NoMode;
-    emit this->cursorChangeRequested(QCursor(Qt::ArrowCursor));
+    this->Internal->InInteraction = false;
+
+    // If the zoom factors have changed, update the history.
+    const pqChartZoomViewport *current = this->Internal->History.getCurrent();
+    if(!current || (current->getXZoom() != this->ZoomFactorX ||
+        current->getYZoom() != this->ZoomFactorY))
+      {
+      this->Internal->History.addHistory(this->OffsetX, this->OffsetY,
+          this->ZoomFactorX, this->ZoomFactorY);
+      emit this->historyPreviousAvailabilityChanged(
+          this->Internal->History.isPreviousAvailable());
+      emit this->historyNextAvailabilityChanged(
+          this->Internal->History.isNextAvailable());
+      }
     }
 }
 
@@ -481,7 +409,7 @@ void pqChartContentsSpace::handleWheelZoom(int delta, const QPoint &pos,
 {
   // If the wheel event delta is positive, zoom in. Otherwise, zoom
   // out.
-  int factorChange = ZOOM_FACTOR;
+  int factorChange = pqChartContentsSpace::ZoomFactorStep;
   if(delta < 0)
     {
     factorChange *= -1;
@@ -639,22 +567,22 @@ void pqChartContentsSpace::setMaximumYOffset(int maximum)
 
 void pqChartContentsSpace::panUp()
 {
-  this->setYOffset(this->OffsetY - PAN_FACTOR);
+  this->setYOffset(this->OffsetY - pqChartContentsSpace::PanStep);
 }
 
 void pqChartContentsSpace::panDown()
 {
-  this->setYOffset(this->OffsetY + PAN_FACTOR);
+  this->setYOffset(this->OffsetY + pqChartContentsSpace::PanStep);
 }
 
 void pqChartContentsSpace::panLeft()
 {
-  this->setXOffset(this->OffsetX - PAN_FACTOR);
+  this->setXOffset(this->OffsetX - pqChartContentsSpace::PanStep);
 }
 
 void pqChartContentsSpace::panRight()
 {
-  this->setXOffset(this->OffsetX + PAN_FACTOR);
+  this->setXOffset(this->OffsetX + pqChartContentsSpace::PanStep);
 }
 
 void pqChartContentsSpace::resetZoom()
@@ -672,6 +600,11 @@ void pqChartContentsSpace::historyNext()
     this->setXOffset(zoom->getXPosition());
     this->setYOffset(zoom->getYPosition());
     this->Internal->InHistory = false;
+
+    emit this->historyPreviousAvailabilityChanged(
+        this->Internal->History.isPreviousAvailable());
+    emit this->historyNextAvailabilityChanged(
+        this->Internal->History.isNextAvailable());
     }
 }
 
@@ -685,7 +618,32 @@ void pqChartContentsSpace::historyPrevious()
     this->setXOffset(zoom->getXPosition());
     this->setYOffset(zoom->getYPosition());
     this->Internal->InHistory = false;
+
+    emit this->historyPreviousAvailabilityChanged(
+        this->Internal->History.isPreviousAvailable());
+    emit this->historyNextAvailabilityChanged(
+        this->Internal->History.isNextAvailable());
     }
+}
+
+int pqChartContentsSpace::getZoomFactorStep()
+{
+  return pqChartContentsSpace::ZoomFactorStep;
+}
+
+void pqChartContentsSpace::setZoomFactorStep(int step)
+{
+  pqChartContentsSpace::ZoomFactorStep = step;
+}
+
+int pqChartContentsSpace::getPanStep()
+{
+  return pqChartContentsSpace::PanStep;
+}
+
+void pqChartContentsSpace::setPanStep(int step)
+{
+  pqChartContentsSpace::PanStep = step;
 }
 
 

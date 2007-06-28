@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 class pqChartContentsSpaceInternal;
-class QCursor;
 class QPoint;
 class QRect;
 
@@ -51,12 +50,6 @@ class QTCHART_EXPORT pqChartContentsSpace : public QObject
   Q_OBJECT
 
 public:
-  enum InteractMode {
-    NoMode, ///< No interaction mode.
-    Zoom,   ///< Zoom interaction mode.
-    Pan     ///< Pan interaction mode.
-  };
-
   enum InteractFlags {
     NoFlags,   ///< No interaction flags.
     ZoomBoth,  ///< Zoom in both directions.
@@ -218,61 +211,26 @@ public:
   /// \name Mouse Interactions
   //@{
   /// \brief
-  ///   Gets the zoom cursor.
-  /// \return
-  ///   The zoom cursor.
-  const QCursor &getZoomCursor() const;
-
-  /// \brief
-  ///   Sets the starting mouse position for the interaction.
-  /// \param pos The current mouse position in global coordinates.
-  void setStartingPosition(const QPoint &pos);
-
-  /// \brief
   ///   Signals the start of a mouse move interaction.
   ///
-  /// When an interaction mode is started, no other interaction mode
-  /// can be used until the current mode is finished.
+  /// While an interaction is in progress, the zoom history will not
+  /// be updated. When \c finishInteraction is called, the history is
+  /// updated if the zoom factors have changed.
   ///
-  /// \param mode The interaction mode to begin.
-  /// \sa pqChartContentsSpace::finishInteraction(),
-  ///     pqChartContentsSpace::interact(const QPoint &, const QPoint &,
-  ///         InteractFlags)
-  void startInteraction(InteractMode mode);
+  /// \sa pqChartContentsSpace::finishInteraction()
+  void startInteraction();
 
   /// \brief
   ///   Gets whether or not an interaction is currently in progress.
   /// \return
   ///   True if an interaction is currently in progress.
-  /// \sa pqChartContentsSpace::startInteraction(InteractMode),
+  /// \sa pqChartContentsSpace::startInteraction(),
   ///     pqChartContentsSpace::finishInteraction()
   bool isInInteraction() const;
 
   /// \brief
-  ///   Used to incrementally modify the chart zoom and/or pan.
-  ///
-  /// The interaction is based on the current interaction mode. The
-  /// \c flags parameter can be used to modify the interaction, such
-  /// as zooming only in the horizontal or vertical directions. The
-  /// \c pos parameter should be passed in chart coordinates to
-  /// avoid repaint shake.
-  ///
-  /// \param pos The current mouse position in global coordinates.
-  /// \param flags Used to change the interaction slightly.
-  /// \sa pqChartContentsSpace::startInteraction(InteractMode),
-  ///     pqChartContentsSpace::finishInteraction()
-  void interact(const QPoint &pos, InteractFlags flags);
-
-  /// \brief
   ///   Signals the end of a mouse move interaction.
-  ///
-  /// The current interaction type will be cleared so another
-  /// interaction type can be started. If the interaction was a zoom
-  /// operation, the current viewport will be added to the history.
-  ///
-  /// \sa pqChartContentsSpace::startInteraction(InteractMode),
-  ///     pqChartContentsSpace::interact(const QPoint &, const QPoint &,
-  ///         InteractFlags)
+  /// \sa pqChartContentsSpace::startInteraction()
   void finishInteraction();
 
   /// \brief
@@ -325,6 +283,35 @@ public slots:
   /// Changes the view to the previous one in the history.
   void historyPrevious();
 
+public:
+  /// \brief
+  ///   Gets the zoom factor step.
+  /// \return
+  ///   The zoom factor step.
+  /// \sa pqChartContentsSpace::zoomIn(InteractFlags),
+  ///     pqChartContentsSpace::zoomOut(InteractFlags)
+  static int getZoomFactorStep();
+
+  /// \brief
+  ///   Sets the zoom factor step.
+  /// \param step The new zoom factor step.
+  static void setZoomFactorStep(int step);
+
+  /// \brief
+  ///   Gets the pan step.
+  /// \return
+  ///   The pan step.
+  /// \sa pqChartContentsSpace::panUp(),
+  ///     pqChartContentsSpace::panDown(),
+  ///     pqChartContentsSpace::panLeft(),
+  ///     pqChartContentsSpace::panRight(),
+  static int getPanStep();
+
+  /// \brief
+  ///   Sets the pan step.
+  /// \param step The new pan step.
+  static void setPanStep(int step);
+
 signals:
   /// \brief
   ///   Emitted when the x offset has changed.
@@ -358,23 +345,20 @@ signals:
   ///   after the current one.
   void historyNextAvailabilityChanged(bool available);
 
-  /// \brief
-  ///   Emitted when the mouse cursor needs to be changed.
-  /// \param cursor The cursor to use.
-  void cursorChangeRequested(const QCursor &cursor);
-
 private:
   /// Keeps track of mouse position and history.
   pqChartContentsSpaceInternal *Internal;
-  InteractMode Current; ///< Stores the current interact mode.
-  int OffsetX;          ///< Stores the x offset.
-  int OffsetY;          ///< Stores the y offset.
-  int MaximumX;         ///< Stores the maximum x offset.
-  int MaximumY;         ///< Stores the maximum y offset.
-  int Width;            ///< Stores the chart width.
-  int Height;           ///< Stores the chart height.
-  int ZoomFactorX;      ///< Stores the x-axis zoom factor.
-  int ZoomFactorY;      ///< Stores the y-axis zoom factor.
+  int OffsetX;     ///< Stores the x offset.
+  int OffsetY;     ///< Stores the y offset.
+  int MaximumX;    ///< Stores the maximum x offset.
+  int MaximumY;    ///< Stores the maximum y offset.
+  int Width;       ///< Stores the chart width.
+  int Height;      ///< Stores the chart height.
+  int ZoomFactorX; ///< Stores the x-axis zoom factor.
+  int ZoomFactorY; ///< Stores the y-axis zoom factor.
+
+  static int ZoomFactorStep; ///< Stores the zoom factor step.
+  static int PanStep;        ///< Stores the pan step.
 };
 
 #endif
