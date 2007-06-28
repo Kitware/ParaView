@@ -3488,6 +3488,7 @@
           <Entry value="2" text="UNSTRUCTURED_APPEND" />
           <Entry value="3" text="FIRST_NODE_ONLY" />
           <Entry value="4" text="RECTILINEAR_GRID_APPEND" />
+          <Entry value="5" text="COMPOSITE_DATASET_APPEND" />
         </EnumerationDomain>
       </IntVectorProperty>
 
@@ -5720,6 +5721,7 @@
           <Entry value="2" text="UNSTRUCTURED_APPEND" />
           <Entry value="3" text="FIRST_NODE_ONLY" />
           <Entry value="4" text="RECTILINEAR_GRID_APPEND" />
+          <Entry value="5" text="COMPOSITE_DATASET_APPEND" />
         </EnumerationDomain>
       </IntVectorProperty>
 
@@ -5762,7 +5764,7 @@
         Representation used in element inspector view.
       </Documentation>
 
-       <InputProperty name="Input"
+      <InputProperty name="Input"
           command="SetInput-not-used"
           update_self="1">
       </InputProperty>

@@ -29,7 +29,7 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
 {
@@ -98,6 +98,12 @@ bool vtkSMClientDeliveryRepresentationProxy::BeginCreateVTKObjects()
   if (!this->Superclass::BeginCreateVTKObjects())
     {
     return false;
+    }
+
+  this->ReduceProxy =  this->GetSubProxy("Reduce");
+  if (this->ReduceProxy)
+    {
+    this->ReduceProxy->SetServers(this->Servers);
     }
 
   this->PostProcessorProxy = vtkSMSourceProxy::SafeDownCast(
@@ -169,6 +175,10 @@ void vtkSMClientDeliveryRepresentationProxy::SetReductionType(int type)
 
   case RECTILINEAR_GRID_APPEND:
     classname = "vtkAppendRectilinearGrid";
+    break;
+
+  case COMPOSITE_DATASET_APPEND:
+    classname = "vtkMultiGroupDataGroupFilter"; 
     break;
 
   default:

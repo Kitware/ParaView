@@ -727,31 +727,36 @@ def Fetch(input, arg=None):
     The input argument is the name of the (proxy for a) source or filter
     whose output is needed on the client.
     
-    You can use fetch to do three things.
-    If arg is None (the default) then the output is brought to the client 
-    unmodified. In parallel runs the Append or AppenPolyData filters merges the
-    data on each processor into one dataset.
+    You can use Fetch to do three things:
+
+    If arg is None (the default) then all of the data is brought to the client.
+    In parallel runs an appropriate append Filter merges the
+    data on each processor into one data object. The filter chosen will be 
+    vtkAppendPolyData for vtkPolyData, vtkAppendRectilinearGrid for 
+    vtkRectilinearGrid, vtkMultiGroupDataGroupFilter for vtkCompositeData, 
+    and vtkAppendFilter for anything else.
     
     If arg is an integer then one particular processor's output is brought to
     the client. In serial runs the arg is ignored. If you have a filter that
     computes results in parallel and brings them to the root node, then set 
     arg to be 0.
     
-    If arg is an algorithm, for example vtkMinMax, the algorithm will be applied
-    to the data to obtain some result. In parallel runs the algorithm will be
-    run on each processor to make intermediate results and then again on the 
-    root processor over all of the intermediate results to create a 
+    If arg is an algorithm, for example vtkMinMax, the algorithm will be 
+    applied to the data to obtain some result. In parallel runs the algorithm 
+    will be run on each processor to make intermediate results and then again 
+    on the root processor over all of the intermediate results to create a 
     global result.
     """
 
     import types
 
     #create the pipeline that reduces and transmits the data
-    gvd = CreateProxy("displays", "GenericViewDisplay")
-    gvd.SetInput(input) 
+    gvd = CreateProxy("representations", "ClientDeliveryRepresentationBase")
+    gvd.AddInput(input, "DONTCARE") 
   
     if arg == None:
         print "getting appended"
+
         cdinfo = input.GetDataInformation().GetCompositeDataInformation()
         if (cdinfo.GetDataIsComposite() or cdinfo.GetDataIsHierarchical()):
             print "use composite data append"
