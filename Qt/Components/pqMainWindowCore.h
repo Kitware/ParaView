@@ -45,6 +45,7 @@ class pqActionGroupInterface;
 class pqActiveServer;
 class pqAnimationManager;
 class pqAnimationPanel;
+class pqAnimationViewWidget;
 class pqAnimationScene;
 class pqGenericViewModule;
 class pqLookmarkManagerModel;
@@ -125,6 +126,9 @@ public:
 
   /// Setup the animation panel, attaching it to the given dock.
   pqAnimationPanel* setupAnimationPanel(QDockWidget* parent);
+  
+  /// Setup the animation view, attaching it to the given dock.
+  pqAnimationViewWidget* setupAnimationView(QDockWidget* parent);
   
   /// Setup a variable-selection toolbar
   void setupVariableToolbar(QToolBar* parent);

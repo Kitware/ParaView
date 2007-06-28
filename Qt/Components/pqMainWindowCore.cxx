@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveView.h"
 #include "pqAnimationManager.h"
 #include "pqAnimationPanel.h"
+#include "pqAnimationViewWidget.h"
 #include "pqApplicationCore.h"
 #include "pqCameraDialog.h"
 #include "pqCloseViewUndoElement.h"
@@ -1180,6 +1181,19 @@ void pqMainWindowCore::setupStatisticsView(QDockWidget* dock_widget)
     QObject::connect(pqApplicationCore::instance(), SIGNAL(stateLoaded()),
                    statistics_view,               SLOT(refreshData()));
      
+}
+
+//-----------------------------------------------------------------------------
+pqAnimationViewWidget* pqMainWindowCore::setupAnimationView(QDockWidget* dock_widget)
+{
+  pqAnimationViewWidget* const animation_view =
+    new pqAnimationViewWidget(dock_widget)
+    << pqSetName("animationView");
+  
+  pqAnimationManager* mgr = this->getAnimationManager();
+  animation_view->setManager(mgr);
+  dock_widget->setWidget(animation_view);
+  return animation_view;
 }
 
 //-----------------------------------------------------------------------------
