@@ -57,6 +57,13 @@ public:
   virtual int HasTranslucentPolygonalGeometry();
 
   // Description:
+  // WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE
+  // Release any graphics resources that are being consumed by this widget
+  // representation. The parameter window could be used to determine which
+  // graphic resources to release.
+  virtual void ReleaseGraphicsResources(vtkWindow *window);
+
+  // Description:
   // Set/get the size of the display containing this representation.
   virtual void SetDisplaySize(int x, int y);
   virtual void SetDisplaySize(int size[2])

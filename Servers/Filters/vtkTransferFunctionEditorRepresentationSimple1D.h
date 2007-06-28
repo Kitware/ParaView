@@ -98,6 +98,13 @@ public:
   virtual int RenderOverlay(vtkViewport *viewport);
   virtual int HasTranslucentPolygonalGeometry();
 
+  // Description:
+  // WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE
+  // Release any graphics resources that are being consumed by this widget
+  // representation. The parameter window could be used to determine which
+  // graphic resources to release.
+  virtual void ReleaseGraphicsResources(vtkWindow *window);
+
 //BTX
   enum
   {

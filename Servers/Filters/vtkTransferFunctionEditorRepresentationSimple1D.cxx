@@ -34,7 +34,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.15");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.16");
 vtkStandardNewMacro(vtkTransferFunctionEditorRepresentationSimple1D);
 
 // The vtkHandleList is a PIMPLed list<T>.
@@ -204,6 +204,17 @@ int vtkTransferFunctionEditorRepresentationSimple1D::RenderOverlay(
     }
 
   return ret;
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentationSimple1D::ReleaseGraphicsResources(
+  vtkWindow *window)
+{
+  if (this->LinesActor)
+    {
+    this->LinesActor->ReleaseGraphicsResources(window);
+    }
+  this->Superclass::ReleaseGraphicsResources(window);
 }
 
 //----------------------------------------------------------------------------

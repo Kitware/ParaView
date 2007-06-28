@@ -22,7 +22,7 @@
 #include "vtkProperty2D.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation, "1.9");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation, "1.10");
 
 vtkCxxSetObjectMacro(vtkTransferFunctionEditorRepresentation,
                      ColorFunction, vtkColorTransferFunction);
@@ -117,6 +117,20 @@ int vtkTransferFunctionEditorRepresentation::RenderOverlay(
     }
 
   return ret;
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentation::ReleaseGraphicsResources(
+  vtkWindow *window)
+{
+  if (this->BackgroundActor)
+    {
+    this->BackgroundActor->ReleaseGraphicsResources(window);
+    }
+  if (this->HistogramActor)
+    {
+    this->HistogramActor->ReleaseGraphicsResources(window);
+    }
 }
 
 //----------------------------------------------------------------------------
