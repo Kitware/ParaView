@@ -111,10 +111,12 @@ void pqDisplayRepresentationWidget::updateLinks()
   this->Internal->Links.removeAllPropertyLinks();
 
   this->Internal->comboBox->setEnabled(this->Internal->Display != 0);
+  this->Internal->comboBox->blockSignals(true);
   this->Internal->comboBox->clear();
   if (!this->Internal->Display)
     {
     this->Internal->comboBox->addItem("Representation");
+    this->Internal->comboBox->blockSignals(false);
     return;
     }
 
@@ -132,6 +134,8 @@ void pqDisplayRepresentationWidget::updateLinks()
     this->Internal->Adaptor, "currentText",
     SIGNAL(currentTextChanged(const QString&)),
     displayProxy, repProperty);
+
+  this->Internal->comboBox->blockSignals(false);
 
 }
 
