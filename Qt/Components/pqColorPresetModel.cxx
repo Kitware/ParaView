@@ -190,7 +190,7 @@ QVariant pqColorPresetModel::data(const QModelIndex &idx, int role) const
             case pqColorMapModel::WrappedHsvSpace:
               return QVariant("Wrapped HSV");
             case pqColorMapModel::LabSpace:
-              return QVariant("CIE-L*ab");
+              return QVariant("CIELAB");
             }
           }
 
