@@ -12,9 +12,6 @@ ENDIF(NOT BUILD_SHARED_LIBS)
 
 ## Add the source (*.cxx,*.h) files here.
 SET(QtWidgets_SRCS
-  QtWidgetsPlugin.cxx
-  QtWidgetsPlugin.h
-  
   pqAnimationKeyFrame.cxx
   pqAnimationKeyFrame.h
   pqAnimationModel.cxx
@@ -76,6 +73,8 @@ SET(QtWidgets_SRCS
   pqWaitCursor.cxx
   pqWaitCursor.h
   QtWidgetsExport.h
+  QtWidgetsPlugin.cxx
+  QtWidgetsPlugin.h
 )
 
 ##########################################################################

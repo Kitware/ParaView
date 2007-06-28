@@ -38,9 +38,12 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqAnimationCue.h
   pqAnimationScene.h
   pqApplicationCore.h
+  pqBarChartRepresentation.h
   pqCommandServerStartup.h
   pqCoreTestUtility.h
+  pqDataRepresentation.h
   pqDisplayPolicy.h
+  pqElementInspectorView.h
   pqFileDialog.h
   pqFileDialogEventTranslator.h
   pqFileDialogFavoriteModel.h
@@ -49,6 +52,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqFlatTreeViewEventTranslator.h
   pqFormBuilder.h
   pqHistogramTableModel.h
+  pqLineChartRepresentation.h
   pqLinksModel.h
   pqLinkViewWidget.h
   pqLookupTableManager.h
@@ -58,6 +62,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPendingDisplayManager.h
   pqPipelineSource.h
   pqPipelineFilter.h
+  pqPipelineRepresentation.h
+  pqPlotView.h
   pqPluginManager.h
   pqProgressManager.h
   pqPropertyLinks.h
@@ -65,9 +71,13 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqProxy.h
   pqQVTKWidgetEventTranslator.h
   pqReaderFactory.h
+  pqRenderView.h
+  pqRepresentation.h
+  pqScalarBarRepresentation.h
   pqScalarBarVisibilityAdaptor.h
   pqScalarsToColors.h
   pqServer.h
+  pqServerManagerModel.h
   pqServerManagerModelItem.h
   pqServerManagerObserver.h
   pqServerManagerSelectionModel.h
@@ -75,26 +85,15 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerStartupContext.h
   pqServerStartups.h
   pqSettings.h
+  pqStandardServerManagerModelInterface.h
   pqStandardViewModules.h
+  pqTableView.h
+  pqTextRepresentation.h
   pqTimeKeeper.h
   pqUndoStack.h
+  pqView.h
   pqVTKHistogramModel.h
   pqWriterFactory.h
-
-  pqRepresentation.h
-  pqView.h
-  pqRenderView.h
-  pqServerManagerModel.h
-  pqStandardServerManagerModelInterface.h
-  pqScalarBarRepresentation.h
-  pqDataRepresentation.h
-  pqPipelineRepresentation.h
-  pqElementInspectorView.h
-  pqTextRepresentation.h
-  pqBarChartRepresentation.h
-  pqLineChartRepresentation.h
-  pqPlotView.h
-  pqTableView.h
   ${PYTHON_MOC_SRCS}
   )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
@@ -129,35 +128,6 @@ SOURCE_GROUP("Generated" FILES
 )
 
 ADD_LIBRARY(pqCore
-  pqRepresentation.cxx
-  pqRepresentation.h
-  pqView.cxx
-  pqView.h
-  pqRenderView.cxx
-  pqRenderView.h
-  pqServerManagerModel.cxx
-  pqServerManagerModel.h
-  pqStandardServerManagerModelInterface.cxx
-  pqStandardServerManagerModelInterface.h
-  pqScalarBarRepresentation.cxx
-  pqScalarBarRepresentation.h
-  pqDataRepresentation.cxx
-  pqDataRepresentation.h
-  pqPipelineRepresentation.cxx
-  pqPipelineRepresentation.h
-  pqElementInspectorView.h
-  pqElementInspectorView.cxx
-  pqTextRepresentation.h
-  pqTextRepresentation.cxx
-  pqBarChartRepresentation.h
-  pqBarChartRepresentation.cxx
-  pqLineChartRepresentation.h
-  pqLineChartRepresentation.cxx
-  pqPlotView.h
-  pqPlotView.cxx
-  pqTableView.h
-  pqTableView.cxx
-
   pq3DWidgetFactory.cxx
   pq3DWidgetFactory.h
   pqAnimationCue.cxx
@@ -168,6 +138,8 @@ ADD_LIBRARY(pqCore
   pqAnimationSceneImageWriter.h
   pqApplicationCore.cxx
   pqApplicationCore.h
+  pqBarChartRepresentation.cxx
+  pqBarChartRepresentation.h
   pqCommandServerStartup.cxx
   pqCommandServerStartup.h
   pqCoreExport.h
@@ -175,8 +147,12 @@ ADD_LIBRARY(pqCore
   pqCoreInit.h
   pqCoreTestUtility.cxx
   pqCoreTestUtility.h
+  pqDataRepresentation.cxx
+  pqDataRepresentation.h
   pqDisplayPolicy.cxx
   pqDisplayPolicy.h
+  pqElementInspectorView.cxx
+  pqElementInspectorView.h
   pqFileDialog.cxx
   pqFileDialog.h
   pqFileDialogEventPlayer.cxx
@@ -201,6 +177,8 @@ ADD_LIBRARY(pqCore
   pqHistogramTableModel.h
   pqImageUtil.cxx
   pqImageUtil.h
+  pqLineChartRepresentation.cxx
+  pqLineChartRepresentation.h
   pqLinksModel.cxx
   pqLinksModel.h
   pqLinkViewWidget.cxx
@@ -229,6 +207,10 @@ ADD_LIBRARY(pqCore
   pqPipelineFilter.h
   pqPipelineSource.cxx
   pqPipelineSource.h
+  pqPipelineRepresentation.cxx
+  pqPipelineRepresentation.h
+  pqPlotView.cxx
+  pqPlotView.h
   pqPluginManager.cxx
   pqPluginManager.h
   pqProcessModuleGUIHelper.cxx
@@ -249,8 +231,12 @@ ADD_LIBRARY(pqCore
   pqQVTKWidgetEventTranslator.h
   pqReaderFactory.cxx
   pqReaderFactory.h
+  pqRenderView.cxx
+  pqRenderView.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
+  pqRepresentation.cxx
+  pqRepresentation.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
   pqSMProxy.cxx
@@ -261,6 +247,8 @@ ADD_LIBRARY(pqCore
   pqScalarsToColors.h
   pqServer.cxx
   pqServer.h
+  pqServerManagerModel.cxx
+  pqServerManagerModel.h
   pqServerManagerModelItem.cxx
   pqServerManagerModelItem.h
   pqServerManagerObserver.cxx
@@ -278,12 +266,22 @@ ADD_LIBRARY(pqCore
   pqServerStartups.h
   pqSettings.cxx
   pqSettings.h
+  pqScalarBarRepresentation.cxx
+  pqScalarBarRepresentation.h
+  pqStandardServerManagerModelInterface.cxx
+  pqStandardServerManagerModelInterface.h
   pqStandardViewModules.cxx
   pqStandardViewModules.h
+  pqTableView.cxx
+  pqTableView.h
+  pqTextRepresentation.cxx
+  pqTextRepresentation.h
   pqTimeKeeper.cxx
   pqTimeKeeper.h
   pqUndoStack.cxx
   pqUndoStack.h
+  pqView.cxx
+  pqView.h
   pqVTKHistogramColor.cxx
   pqVTKHistogramColor.h
   pqVTKHistogramModel.cxx
