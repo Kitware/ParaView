@@ -72,7 +72,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.20");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.21");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -106,7 +106,7 @@ vtkConnectionIterator* vtkProcessModuleConnectionManager::NewIterator()
 
 //-----------------------------------------------------------------------------
 int vtkProcessModuleConnectionManager::Initialize(int argc, char** argv, 
-  int clientMode)
+  int clientMode, int *partitionId)
 {
   this->ClientMode = clientMode;
 
@@ -132,7 +132,7 @@ int vtkProcessModuleConnectionManager::Initialize(int argc, char** argv,
     sc);
   sc->Delete();
 
-  return sc->Initialize(argc, argv); 
+  return sc->Initialize(argc, argv, partitionId); 
   // sc->Initialize() blocks on Satellite nodes, but never blocks on
   // the Client or ServerRoot.
 }
@@ -685,7 +685,7 @@ vtkIdType vtkProcessModuleConnectionManager::CreateConnection(
         }
       }
 
-    if (rc->Initialize(0, 0)!=0) // 0 == SUCCESS.
+    if (rc->Initialize(0, 0, NULL)!=0) // 0 == SUCCESS.
       {
       vtkErrorMacro("Rejecting new connection.");
       rc->Delete();

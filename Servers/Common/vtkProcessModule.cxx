@@ -103,7 +103,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.68");
+vtkCxxRevisionMacro(vtkProcessModule, "1.69");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -278,15 +278,15 @@ int vtkProcessModule::Start(int argc, char** argv)
     this->Observer);
 
 
+  int myId;
   // This call blocks on the Satellite nodes (never on root node).
   if (this->ConnectionManager->Initialize(argc, argv, 
-      this->Options->GetClientMode()) != 0)
+      this->Options->GetClientMode(), &myId) != 0)
     {
     return 1;
     }
 
 
-  int myId = this->GetPartitionId();
   if (myId != 0)
     {
     // Satellite node. The control reaches here on a satellite node only on 

@@ -34,7 +34,7 @@ public:
   // Initializes the connection. This is essential to
   // intialize the controller associated with the connection etc etc.
   // This sets up the RMIs and returns. 
-  virtual int Initialize(int argc, char** argv); 
+  virtual int Initialize(int argc, char** argv, int *partitionId); 
  
   // Description:
   // Finalizes the connection.

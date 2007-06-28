@@ -53,7 +53,7 @@ public:
   // Description:
   // Initializes the connection. This is essential to
   // intialize the controller associated with the connection etc etc.
-  virtual int Initialize(int argc, char** argv) = 0;
+  virtual int Initialize(int argc, char** argv, int *partitionId) = 0;
 
   // Description:
   // Finalizes the connection.

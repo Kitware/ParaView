@@ -131,7 +131,9 @@ public:
   // Returns 1 on error; 0 on success.
   // clientMode must be set when vtkProcessModuleConnectionManager 
   // is being initialized on a client, else must be set to 0.
-  int Initialize(int argc, char** argv, int clientMode);
+  // The partitionId (which can be used to determined if we are a server
+  // satellite) is returned in the given pointer.
+  int Initialize(int argc, char** argv, int clientMode, int *partitionId);
  
   // Description:
   // Finalizes the manager. This will trigger closing of all the connections,

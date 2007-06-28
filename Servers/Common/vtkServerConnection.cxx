@@ -35,7 +35,7 @@
 
 
 vtkStandardNewMacro(vtkServerConnection);
-vtkCxxRevisionMacro(vtkServerConnection, "1.9");
+vtkCxxRevisionMacro(vtkServerConnection, "1.10");
 //-----------------------------------------------------------------------------
 vtkServerConnection::vtkServerConnection()
 {
@@ -353,7 +353,7 @@ void vtkServerConnection::GatherInformationFromController(vtkSocketController* c
 
 //-----------------------------------------------------------------------------
 int vtkServerConnection::Initialize(int vtkNotUsed(argc), 
-  char** vtkNotUsed(argv))
+  char** vtkNotUsed(argv), int *vtkNotUsed(partitionId))
 {
   // returns 0 on success, 1 on error.
 

@@ -61,12 +61,12 @@ private:
 };
 
 vtkStandardNewMacro(vtkSelfConnectionUndoSet);
-vtkCxxRevisionMacro(vtkSelfConnectionUndoSet, "1.3");
+vtkCxxRevisionMacro(vtkSelfConnectionUndoSet, "1.4");
 vtkCxxSetObjectMacro(vtkSelfConnectionUndoSet, XMLElement, vtkPVXMLElement);
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSelfConnection);
-vtkCxxRevisionMacro(vtkSelfConnection, "1.3");
+vtkCxxRevisionMacro(vtkSelfConnection, "1.4");
 //-----------------------------------------------------------------------------
 vtkSelfConnection::vtkSelfConnection()
 {
@@ -87,9 +87,10 @@ vtkSelfConnection::~vtkSelfConnection()
 }
 
 //-----------------------------------------------------------------------------
-int vtkSelfConnection::Initialize(int argc, char** argv)
+int vtkSelfConnection::Initialize(int argc, char** argv, int *partitionId)
 {
   this->Controller->Initialize(&argc, &argv, 1);
+  *partitionId = this->GetPartitionId();
   // Nothing to do here, really.
   // Just return success.
   return 0;

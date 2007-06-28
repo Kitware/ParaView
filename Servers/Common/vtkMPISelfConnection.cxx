@@ -51,7 +51,7 @@ void vtkMPISelfConnectionGatherInformationRMI(void *localArg,
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkMPISelfConnection);
-vtkCxxRevisionMacro(vtkMPISelfConnection, "1.2");
+vtkCxxRevisionMacro(vtkMPISelfConnection, "1.3");
 //-----------------------------------------------------------------------------
 vtkMPISelfConnection::vtkMPISelfConnection()
 {
@@ -75,7 +75,7 @@ vtkMPISelfConnection::~vtkMPISelfConnection()
 }
 
 //-----------------------------------------------------------------------------
-int vtkMPISelfConnection::Initialize(int argc, char** argv)
+int vtkMPISelfConnection::Initialize(int argc, char** argv, int *partitionId)
 {
   this->Controller->Initialize(&argc, &argv, 1);
   
@@ -90,8 +90,9 @@ int vtkMPISelfConnection::Initialize(int argc, char** argv)
 #endif
   
   int ret = 0;
-  
-  if (this->GetPartitionId() == 0)
+
+  *partitionId = this->GetPartitionId();
+  if (*partitionId == 0)
     {
     // Root process starts the GUI is there's any.
     ret = this->InitializeRoot(argc, argv);
