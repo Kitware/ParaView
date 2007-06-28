@@ -105,11 +105,11 @@ void pqAnimationModel::resizeTracks()
     this->setSceneRect(rect.left(), rect.top(), rect.width(), requiredHeight);
     return;
     }
-
+  
   double h = rh;
   for(i=0; i<num; i++)
     {
-    this->Tracks[i]->setBoundingRect(QRectF(rect.left(), h, rect.width()-1, rh));
+    this->Tracks[i]->setBoundingRect(QRectF(rect.left(), h, rect.width() - 1, rh));
     h += rh;
     }
 }
@@ -149,14 +149,17 @@ void pqAnimationModel::setMode(pqAnimationModel::ModeType m)
 void pqAnimationModel::setCurrentTime(double t)
 {
   this->CurrentTime = t;
+  this->update();
 }
 void pqAnimationModel::setStartTime(double t)
 {
   this->StartTime = t;
+  this->resizeTracks();
 }
 void pqAnimationModel::setEndTime(double t)
 {
   this->EndTime = t;
+  this->resizeTracks();
 }
 
 void pqAnimationModel::drawForeground(QPainter* painter, const QRectF& )

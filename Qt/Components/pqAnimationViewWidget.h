@@ -72,6 +72,11 @@ protected slots:
 
   /// called when keyframes change
   void keyFramesChanged(QObject*);
+
+  /// called when scene time range changes
+  void updateSceneTimeRange();
+  /// called when scene time changes
+  void updateSceneTime();
   
 private:
   pqAnimationViewWidget(const pqAnimationViewWidget&); // Not implemented.

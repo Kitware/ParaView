@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 pqAnimationTrack::pqAnimationTrack(QObject* p)
-  : QObject(p), StartTime(0), EndTime(1), Rect(0,0,1,1)
+  : QObject(p), /*StartTime(0), EndTime(1),*/ Rect(0,0,1,1)
 {
 }
 
@@ -115,25 +115,5 @@ void pqAnimationTrack::paint(QPainter* p,
   p->setPen(pen);
   p->drawRect(this->boundingRect());
   p->restore();
-}
-
-double pqAnimationTrack::startTime() const
-{
-  return this->StartTime;
-}
-double pqAnimationTrack::endTime() const
-{
-  return this->EndTime;
-}
-
-void pqAnimationTrack::setStartTime(double t)
-{
-  this->StartTime = t;
-  this->adjustKeyFrameRects();
-}
-void pqAnimationTrack::setEndTime(double t)
-{
-  this->EndTime = t;
-  this->adjustKeyFrameRects();
 }
 

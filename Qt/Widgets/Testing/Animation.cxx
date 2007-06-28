@@ -16,8 +16,8 @@ int Animation(int argc, char* argv[])
 
   pqAnimationModel* scene = view.animationModel();
 
-  scene->setStartTime(1.0);
-  scene->setEndTime(10.0);
+  scene->setStartTime(0.0);
+  scene->setEndTime(1.5);
   scene->setCurrentTime(5.0);
 
   pqAnimationTrack* track;

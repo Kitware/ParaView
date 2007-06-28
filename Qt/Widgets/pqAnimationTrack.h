@@ -46,8 +46,6 @@ class QTWIDGETS_EXPORT pqAnimationTrack : public QObject, public QGraphicsItem
 {
   Q_OBJECT
   Q_PROPERTY(QVariant property READ property WRITE setProperty)
-  Q_PROPERTY(double startTime READ startTime WRITE setStartTime)
-  Q_PROPERTY(double endTime READ endTime WRITE setEndTime)
 public:
 
   pqAnimationTrack(QObject* p = 0);
@@ -63,15 +61,9 @@ public:
   
   QRectF boundingRect() const;
   
-  double startTime() const;
-  double endTime() const;
-
 public slots:
   void setProperty(const QVariant& p);
 
-  void setStartTime(double t);
-  void setEndTime(double t);
-  
   void setBoundingRect(const QRectF& r);
 
 signals:
@@ -87,10 +79,6 @@ protected:
 
 
 private:
-
-  double StartTime;
-  double EndTime;
-
   QList<pqAnimationKeyFrame*> Frames;
   QVariant Property;
 

@@ -49,6 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationScene.h"
 #include "pqAnimationCue.h"
 #include "pqSMAdaptor.h"
+#include "pqTimeKeeper.h"
+#include "pqServer.h"
 
 //-----------------------------------------------------------------------------
 class pqAnimationViewWidget::pqInternals
@@ -144,18 +146,19 @@ void pqAnimationViewWidget::onActiveSceneChanged(pqAnimationScene* scene)
   if(this->Internal->ActiveScene)
     {
     QObject::disconnect(this->Internal->ActiveScene, 0, this, 0);
+    QObject::disconnect(this->Internal->ActiveScene->getServer()->getTimeKeeper(), 0, this, 0);
     }
   this->Internal->ActiveScene = scene;
   if(this->Internal->ActiveScene)
     {
-    pqAnimationModel* animModel =
-      this->Internal->AnimationWidget->animationModel();
-    QPair<double, double> timeRange = scene->getClockTimeRange();
-    animModel->setStartTime(timeRange.first);
-    animModel->setEndTime(timeRange.second);
-
     QObject::connect(scene, SIGNAL(cuesChanged()), 
       this, SLOT(onSceneCuesChanged()));
+    QObject::connect(scene, SIGNAL(clockTimeRangesChanged()),
+            this, SLOT(updateSceneTimeRange()));
+    QObject::connect(scene->getServer()->getTimeKeeper(), SIGNAL(timeChanged()),
+            this, SLOT(updateSceneTime()));
+    this->updateSceneTimeRange();
+    this->updateSceneTime();
     }
 }
 
@@ -223,16 +226,6 @@ void pqAnimationViewWidget::keyFramesChanged(QObject* cueObject)
     track->removeKeyFrame(track->keyFrame(0));
     }
 
-  if(keyFrames.count())
-    {
-    QVariant startTime =
-      pqSMAdaptor::getElementProperty(keyFrames.first()->GetProperty("KeyTime"));
-    QVariant endTime =
-      pqSMAdaptor::getElementProperty(keyFrames.last()->GetProperty("KeyTime"));
-    track->setStartTime(startTime.toDouble());
-    track->setEndTime(endTime.toDouble());
-    }
-
   for(int j=0; j<keyFrames.count()-1; j++)
     {
     QVariant startTime =
@@ -249,6 +242,24 @@ void pqAnimationViewWidget::keyFramesChanged(QObject* cueObject)
     newFrame->setStartValue(startValue);
     newFrame->setEndValue(endValue);
     }
+}
+
+void pqAnimationViewWidget::updateSceneTimeRange()
+{
+  pqAnimationModel* animModel =
+    this->Internal->AnimationWidget->animationModel();
+  QPair<double, double> timeRange = this->Internal->ActiveScene->getClockTimeRange();
+  animModel->setStartTime(timeRange.first);
+  animModel->setEndTime(timeRange.second);
+}
+
+void pqAnimationViewWidget::updateSceneTime()
+{
+  pqTimeKeeper* timekeeper = 
+    this->Internal->ActiveScene->getServer()->getTimeKeeper();
+  pqAnimationModel* animModel =
+    this->Internal->AnimationWidget->animationModel();
+  animModel->setCurrentTime(timekeeper->getTime());
 }
 
 
