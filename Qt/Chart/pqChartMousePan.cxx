@@ -122,7 +122,7 @@ bool pqChartMousePan::mouseMoveEvent(QMouseEvent *e,
 }
 
 bool pqChartMousePan::mouseReleaseEvent(QMouseEvent *,
-    pqChartContentsSpace *contents)
+    pqChartContentsSpace *)
 {
   if(this->isMouseOwner())
     {
