@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QItemSelectionModel>
 #include <QList>
 #include <QMenu>
+#include <QPointer>
 #include <QSpacerItem>
 #include <QString>
 #include <QtDebug>
@@ -94,6 +95,7 @@ public:
   vtkEventQtSlotConnect *Listener;
   pqColorMapWidget *Gradient;
   pqColorPresetManager *Presets;
+  QPointer<pqPipelineRepresentation> CurrentDisplay;
   int CurrentIndex;
   bool HasOpacity;
   bool ValueChanged;
@@ -101,12 +103,14 @@ public:
   bool SizeChanged;
   bool InSetColors;
   bool IgnoreEditor;
+  bool IsDormant;
+  bool MakingLegend;
 };
 
 
 //----------------------------------------------------------------------------
 pqColorScaleEditorForm::pqColorScaleEditorForm()
-  : Ui::pqColorScaleDialog(), Links()
+  : Ui::pqColorScaleDialog(), Links(), CurrentDisplay(0)
 {
   this->TitleColorAdaptor = 0;
   this->LabelColorAdaptor = 0;
@@ -122,6 +126,8 @@ pqColorScaleEditorForm::pqColorScaleEditorForm()
   this->SizeChanged = false;
   this->InSetColors = false;
   this->IgnoreEditor = false;
+  this->IsDormant = true;
+  this->MakingLegend = false;
 }
 
 
@@ -298,6 +304,12 @@ pqColorScaleEditor::~pqColorScaleEditor()
 
 void pqColorScaleEditor::setRepresentation(pqPipelineRepresentation *display)
 {
+  this->Form->CurrentDisplay = display;
+  if(this->Form->IsDormant)
+    {
+    return;
+    }
+
   if(this->Display == display)
     {
     return;
@@ -337,6 +349,8 @@ void pqColorScaleEditor::setRepresentation(pqPipelineRepresentation *display)
       {
       this->connect(this->ColorMap, SIGNAL(destroyed(QObject *)),
           this, SLOT(cleanupDisplay()));
+      this->connect(this->ColorMap, SIGNAL(scalarBarsChanged()),
+          this, SLOT(checkForLegend()));
       this->Form->Listener->Connect(
           this->ColorMap->getProxy()->GetProperty("RGBPoints"),
           vtkCommand::ModifiedEvent, this, SLOT(handlePointsChanged()));
@@ -354,15 +368,16 @@ void pqColorScaleEditor::setRepresentation(pqPipelineRepresentation *display)
     }
 }
 
-void pqColorScaleEditor::rescaleRange()
-{
-  this->rescaleToDataRange();
-}
-
 void pqColorScaleEditor::showEvent(QShowEvent *e)
 {
+  // Set up the display and view if the dialog has been dormant.
+  if(this->Form->IsDormant)
+    {
+    this->Form->IsDormant = false;
+    this->setRepresentation(this->Form->CurrentDisplay);
+    }
+
   QDialog::showEvent(e);
-  //this->Viewer->Render();
 }
 
 void pqColorScaleEditor::hideEvent(QHideEvent *e)
@@ -375,6 +390,12 @@ void pqColorScaleEditor::hideEvent(QHideEvent *e)
     }
 
   QDialog::hideEvent(e);
+
+  // Save the current display and view and go dormant.
+  pqPipelineRepresentation *display = this->Form->CurrentDisplay;
+  this->setRepresentation(0);
+  this->Form->IsDormant = true;
+  this->Form->CurrentDisplay = display;
 }
 
 void pqColorScaleEditor::handleEditorPointMoved()
@@ -1151,6 +1172,16 @@ void pqColorScaleEditor::applyTextChanges()
     }
 }
 
+void pqColorScaleEditor::checkForLegend()
+{
+  if(!this->Form->MakingLegend && this->ColorMap)
+    {
+    pqRenderView *view = qobject_cast<pqRenderView *>(
+        this->Display->getView());
+    this->setLegend(this->ColorMap->getScalarBar(view));
+    }
+}
+
 void pqColorScaleEditor::setLegendVisibility(bool visible)
 {
   if(visible && !this->Legend)
@@ -1159,14 +1190,16 @@ void pqColorScaleEditor::setLegendVisibility(bool visible)
       {
       // Create a scalar bar in the current view. Use the display to
       // set up the title.
+      this->Form->MakingLegend = true;
       pqObjectBuilder *builder =
           pqApplicationCore::instance()->getObjectBuilder();
       pqRenderView *renderModule = qobject_cast<pqRenderView *>(
           this->Display->getView());
       pqScalarBarRepresentation *legend = builder->createScalarBarDisplay(
-        this->ColorMap, renderModule);
+          this->ColorMap, renderModule);
       legend->makeTitle(this->Display);
       this->setLegend(legend);
+      this->Form->MakingLegend = false;
       }
     else
       {
@@ -1186,6 +1219,16 @@ void pqColorScaleEditor::setLegendVisibility(bool visible)
   this->enableLegendControls(this->Legend && visible);
 }
 
+void pqColorScaleEditor::updateLegendVisibility(bool visible)
+{
+  if(this->Legend)
+    {
+    this->Form->ShowColorLegend->blockSignals(true);
+    this->Form->ShowColorLegend->setChecked(visible);
+    this->Form->ShowColorLegend->blockSignals(false);
+    }
+}
+
 void pqColorScaleEditor::setLegendName(const QString &text)
 {
   this->setLegendTitle(text, this->Form->TitleComponent->text());
@@ -1203,6 +1246,21 @@ void pqColorScaleEditor::setLegendTitle(const QString &name,
     {
     this->Legend->setTitle(name, component);
     this->Legend->renderViewEventually();
+    }
+}
+
+void pqColorScaleEditor::updateLegendTitle()
+{
+  if(this->Legend)
+    {
+    QPair<QString, QString> title = this->Legend->getTitle();
+    this->Form->TitleName->blockSignals(true);
+    this->Form->TitleName->setText(title.first);
+    this->Form->TitleName->blockSignals(false);
+
+    this->Form->TitleComponent->blockSignals(true);
+    this->Form->TitleComponent->setText(title.second);
+    this->Form->TitleComponent->blockSignals(false);
     }
 }
 
@@ -1381,7 +1439,7 @@ void pqColorScaleEditor::initColorScale()
 #endif
 
   // See if the display supports opacity editing.
-  bool usingOpacity = this->Form->HasOpacity;
+  bool usingOpacity = false;
   if(this->Display)
     {
     usingOpacity = this->Display->getRepresentationType() ==
@@ -1453,6 +1511,7 @@ void pqColorScaleEditor::initColorScale()
     int space = pqSMAdaptor::getElementProperty(
         lookupTable->GetProperty("ColorSpace")).toInt();
     this->Form->ColorSpace->blockSignals(true);
+
     // Set the ColorSpace index, accounting for the fact that "HSVNoWrap" is
     // a fake that is inserted at index 2.
     if(pqSMAdaptor::getElementProperty(
@@ -1635,6 +1694,8 @@ void pqColorScaleEditor::setLegend(pqScalarBarRepresentation *legend)
     {
     this->connect(this->Legend, SIGNAL(destroyed(QObject *)),
         this, SLOT(cleanupLegend()));
+    this->connect(this->Legend, SIGNAL(visibilityChanged(bool)),
+        this, SLOT(updateLegendVisibility(bool)));
 
     // Connect the legend controls.
     vtkSMProxy *proxy = this->Legend->getProxy();
@@ -1684,14 +1745,7 @@ void pqColorScaleEditor::setLegend(pqScalarBarRepresentation *legend)
         proxy, proxy->GetProperty("NumberOfLabels"));
 
     // Update the legend title gui.
-    QPair<QString, QString> title = this->Legend->getTitle();
-    this->Form->TitleName->blockSignals(true);
-    this->Form->TitleName->setText(title.first);
-    this->Form->TitleName->blockSignals(false);
-
-    this->Form->TitleComponent->blockSignals(true);
-    this->Form->TitleComponent->setText(title.second);
-    this->Form->TitleComponent->blockSignals(false);
+    this->updateLegendTitle();
     }
 
   bool showing = this->Legend && this->Legend->isVisible();

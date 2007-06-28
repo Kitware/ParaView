@@ -59,9 +59,8 @@ public:
   pqColorScaleEditor(QWidget *parent=0);
   virtual ~pqColorScaleEditor();
 
+public slots:
   void setRepresentation(pqPipelineRepresentation *display);
-
-  void rescaleRange();
 
 protected:
   virtual void showEvent(QShowEvent *e);
@@ -112,10 +111,13 @@ private slots:
 
   /// \name Color Legend Methods
   //@{
+  void checkForLegend();
   void setLegendVisibility(bool visible);
+  void updateLegendVisibility(bool visible);
   void setLegendName(const QString &text);
   void setLegendComponent(const QString &text);
   void setLegendTitle(const QString &name, const QString &component);
+  void updateLegendTitle();
   //@}
 
   /// \name Cleanup Methods

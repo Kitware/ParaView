@@ -522,14 +522,6 @@ void pqDisplayProxyEditor::rescaleToDataRange()
     }
 
   this->Internal->Representation->resetLookupTableScalarRange();
-
-  // TODO: This method is too slow using the vtk tfe.
-  // Use the color map editor to scale to the data range. This will
-  // ensure that the log scale is updated appropriately.
-  //pqColorScaleEditor colorScale(this);
-  //colorScale.setRepresentation(this->Internal->Representation);
-  //colorScale.rescaleRange();
-
   this->updateAllViews();
 }
 
