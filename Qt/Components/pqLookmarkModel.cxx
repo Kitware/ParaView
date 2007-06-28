@@ -222,6 +222,12 @@ void pqLookmarkModel::load(
     return;
     }
 
+  if(!view)
+    {
+    qDebug() << "Cannot load lookmark without a render view";
+    return;
+    }
+
   // Now deal with the different types of possible state loaders:
   vtkSmartPointer<vtkSMStateLoader> loader = arg_loader;
   if (!loader)
@@ -230,13 +236,21 @@ void pqLookmarkModel::load(
     }
 
   bool resetCamera = false;
-  if(view)
+  // remember to reset the camera later if the view has no displays visible
+  if(view->getNumberOfVisibleRepresentations()==0 && !this->RestoreCamera)
     {
-    // remember to reset the camera later if the view has no displays visible
-    if(view->getNumberOfVisibleRepresentations()==0 && !this->RestoreCamera)
-      {
-      resetCamera = true;
-      }
+    resetCamera = true;
+    }
+
+
+  // Now turn off visibility of all displays currently added to view.
+  // We do this before the lookmark is loaded so that other sources
+  // do not obstruct the view of the lookmark sources.
+  QList<pqRepresentation*> displays = view->getRepresentations();
+  for(int i=0; i<displays.count(); i++)
+    {
+    pqRepresentation *disp = displays[i];
+    disp->setVisible(0);
     }
 
   // If this is a lookmark of a single view, the active view needs to be 
@@ -244,7 +258,7 @@ void pqLookmarkModel::load(
   // it is used before any others
   vtkSMPQStateLoader* smpqLoader = vtkSMPQStateLoader::SafeDownCast(loader);
   pqRenderView* renModule = NULL;
-  if (smpqLoader && view)
+  if (smpqLoader)
     {
     renModule = qobject_cast<pqRenderView*>(view);
     if(!renModule)
@@ -265,6 +279,7 @@ void pqLookmarkModel::load(
     pqLoader->SetRestoreTimeFlag(this->RestoreTime);
     pqLoader->SetPipelineHierarchy(this->PipelineHierarchy);
     pqLoader->SetTimeKeeper(server->getTimeKeeper());
+    pqLoader->SetView(view);
     }
 
   // convert the stored state from a qstring to a vtkPVXMLElement

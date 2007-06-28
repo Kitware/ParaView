@@ -287,7 +287,7 @@ void pqLookmarkDefinitionWizard::createLookmark()
     for (unsigned int cc=0; pp && (pp->GetNumberOfProxies() > cc); cc++)
       {
       vtkSMProxy* referredProxy = pp->GetProxy(cc);
-      if (referredProxy && QString::compare(referredProxy->GetXMLGroup(),"displays")!=0)
+      if (referredProxy && QString::compare(referredProxy->GetXMLGroup(),"representations")!=0)
         {
         proxies->AddItem(referredProxy);
         }

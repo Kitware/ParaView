@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QPointer>
 #include <QList>
+#include <QMap>
 #include <QString>
 #include <QMessageBox>
 #include <QStandardItemModel>
@@ -53,11 +54,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLookmarkSourceDialog.h"
 #include "pqPipelineModel.h"
 #include "pqTimeKeeper.h"
+#include "pqView.h"
+#include "pqDataRepresentation.h"
 
 //-----------------------------------------------------------------------------
 class pqLookmarkStateLoaderInternal
 {
 public:
+  int CurrentSourceID;
+  int CurrentDisplayID;
+  QMap<int, pqPipelineSource*> LookmarkSourceIdToExistingSourceMap;
+  QMap<int, int> DisplayIdToSourceIdMap;
   QList<pqPipelineSource*> *PreferredSources;
   QList<QStandardItem*> LookmarkSources;
   int NumberOfLookmarkSources;
@@ -69,12 +76,13 @@ public:
   vtkPVXMLElement *RootElement;
   QStringList IdsOfProxyElementsToIgnore;
   bool SourceProxyCollectionLoaded;
+  pqView *View;
 };
 
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.12");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.13");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
@@ -87,6 +95,7 @@ pqLookmarkStateLoader::pqLookmarkStateLoader()
   this->Internal->RestoreTime = false;
   this->Internal->TimeKeeper = 0;
   this->Internal->SourceProxyCollectionLoaded = false;
+  this->Internal->View = NULL;
 
   pqServerManagerModel *model = 
     pqApplicationCore::instance()->getServerManagerModel();
@@ -97,6 +106,12 @@ pqLookmarkStateLoader::pqLookmarkStateLoader()
 pqLookmarkStateLoader::~pqLookmarkStateLoader()
 {
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+void pqLookmarkStateLoader::SetView(pqView *lmkView)
+{
+  this->Internal->View = lmkView;
 }
 
 //-----------------------------------------------------------------------------
@@ -194,7 +209,16 @@ int pqLookmarkStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_prox
     return 0;
     }
 
-  return this->Superclass::LoadState(rootElement,keep_proxies);
+  // We do this because our superclass expects the "ServerManagerState" XML
+  // element to be a child of the root element, not the root element itself.
+  vtkPVXMLElement *newRootElement = vtkPVXMLElement::New();
+  newRootElement->AddNestedElement(rootElement);
+
+  int returnValue = this->Superclass::LoadState(newRootElement,keep_proxies);
+
+  newRootElement->Delete();
+
+  return returnValue;
 }
 
 
@@ -279,6 +303,7 @@ vtkSMProxy* pqLookmarkStateLoader::NewProxyFromElement(
       }
     if(strcmp(group,"sources")==0)
       {
+      this->Internal->CurrentSourceID = id;
       this->Internal->IdsOfProxyElementsToIgnore.push_back(
             QString(proxyElement->GetAttribute("id")));
 
@@ -292,7 +317,7 @@ vtkSMProxy* pqLookmarkStateLoader::NewProxyFromElement(
         const char* groupName = currentElement->GetAttribute("group");
         if (name && groupName)
           {
-          if (strcmp(name, "Proxy") == 0 && strcmp(groupName, "displays") == 0)
+          if (strcmp(name, "Proxy") == 0 && strcmp(groupName, "representations") == 0)
             {
             for (unsigned int j=0; j<currentElement->GetNumberOfNestedElements(); j++)
               {
@@ -308,6 +333,9 @@ vtkSMProxy* pqLookmarkStateLoader::NewProxyFromElement(
                     {
                     this->Internal->IdsOfProxyElementsToIgnore.push_back(
                           QString(currentElement->GetAttribute("id")));
+
+                    this->Internal->DisplayIdToSourceIdMap[
+                          QString(currentElement->GetAttribute("id")).toInt()] = id;
                     }
                   }
                 }
@@ -315,6 +343,10 @@ vtkSMProxy* pqLookmarkStateLoader::NewProxyFromElement(
             }
           }
         }
+      }
+    else if(strcmp(group,"representations")==0)
+      {
+      this->Internal->CurrentDisplayID = id;
       }
     }
 
@@ -332,7 +364,9 @@ vtkSMProxy* pqLookmarkStateLoader::NewProxyInternal(
     if(this->Internal->NumberOfLookmarkSources==1 && 
         this->Internal->PreferredSources->size()==1)
       {
-      vtkSMProxy *proxy = this->Internal->PreferredSources->at(0)->getProxy();
+      pqPipelineSource *src = this->Internal->PreferredSources->at(0);
+      this->Internal->LookmarkSourceIdToExistingSourceMap[this->Internal->CurrentSourceID] = src;
+      vtkSMProxy *proxy = src->getProxy();
       proxy->Register(this);
       return proxy;
       }
@@ -350,10 +384,43 @@ vtkSMProxy* pqLookmarkStateLoader::NewProxyInternal(
       pqPipelineSource *src = srcDialog->getSelectedSource();
       if(src)
         {
+        this->Internal->LookmarkSourceIdToExistingSourceMap[this->Internal->CurrentSourceID] = src;
         vtkSMProxy *proxy = src->getProxy();
         proxy->Register(this);
         return proxy;
         }
+      }
+    }
+  else if(xml_group && xml_name && (strcmp(xml_group, "representations")==0) )
+    {
+    if(this->Internal->DisplayIdToSourceIdMap.keys().contains(
+                                    this->Internal->CurrentDisplayID))
+      {
+      pqPipelineSource *src = this->Internal->LookmarkSourceIdToExistingSourceMap[
+                    this->Internal->DisplayIdToSourceIdMap[
+                          this->Internal->CurrentDisplayID]];
+
+      QList<pqRepresentation*> displays = this->Internal->View->getRepresentations();
+      vtkSMProxy *proxy = NULL;
+      for(int i=0; i<displays.count(); i++)
+        {
+        pqDataRepresentation *rep = dynamic_cast<pqDataRepresentation*>(displays[i]);
+        if(rep && rep->getInput() == src)
+          {
+          proxy = rep->getProxy();
+          break;
+          }
+        } 
+      if(proxy)
+        {
+        proxy->Register(this);
+        return proxy;
+        }
+
+      // If we get here that means the source has no 
+      //    representation in the given view
+      this->Internal->IdsOfProxyElementsToIgnore.removeAll(
+            QString::number(this->Internal->CurrentDisplayID));
       }
     }
 
@@ -451,7 +518,7 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
       }
     }
   else if (strcmp(proxyElement->GetName(), "Proxy")==0 && 
-      strcmp(proxyElement->GetAttribute("group"), "rendermodules")==0 )
+      strcmp(proxyElement->GetAttribute("type"), "RenderView")==0 )
     {
     unsigned int max = proxyElement->GetNumberOfNestedElements();
     QString name;
@@ -468,12 +535,8 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
         toRemove.push_back(element);
         }
       else if (element->GetName() == QString("Property") &&
-        element->GetAttribute("name") == QString("Displays"))
+        element->GetAttribute("name") == QString("Representations"))
         {
-        // This will ensure that when the state for Displays property is loaded
-        // all already present displays won't be cleared.
-        element->SetAttribute("clear", "0");
-
         // remove unused displays from the render module's displays proxyproperty
         QStringList ids = this->Internal->IdsOfProxyElementsToIgnore;
         displaysToRemove.clear();
@@ -500,11 +563,6 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
           }
         }
       else if (element->GetName() == QString("Property") &&
-        element->GetAttribute("name") == QString("RenderWindowSize"))
-        {
-        toRemove.push_back(element);
-        }
-      else if (element->GetName() == QString("Property") &&
         element->GetAttribute("name") == QString("ViewTime"))
         {
         if(this->Internal->RestoreTime)
@@ -529,14 +587,36 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
       }
     }
   else if (strcmp(proxyElement->GetName(), "Proxy")==0 && 
-      strcmp(proxyElement->GetAttribute("group"), "displays")==0 )
+      strcmp(proxyElement->GetAttribute("group"), "representations")==0 )
     {
-    // Ignore any displays that have been flagged (i.e. those that have a 
-    // non-filter as input)
+    // If a display has been flagged, then it has a non-filter input. 
+    // In this case, we are using the XML state to set up its existing
+    // representation proxy for this view. Therefore we do not need 
+    // to set the display's input and can remove the input property.
+    // Also, we remove any sub-proxies from the XML.
+
     QString id(proxyElement->GetAttribute("id"));
+    QList<vtkPVXMLElement*> toRemove;
+    QString name;
     if(this->Internal->IdsOfProxyElementsToIgnore.contains(id))
       {
-      return 1;
+      int count = proxyElement->GetNumberOfNestedElements();
+      for(int i=0; i<count; i++)
+        {
+        vtkPVXMLElement* element = proxyElement->GetNestedElement(i);
+        name = element->GetAttribute("name");
+        if (element->GetName() == QString("SubProxy") ||
+            (element->GetName() == QString("Property") && name == "Input") )
+          {
+          toRemove.push_back(element);
+          }
+        }
+      // Finally, remove those xml elements we flagged
+      QList<vtkPVXMLElement*>::iterator iter;
+      for(iter=toRemove.begin(); iter!=toRemove.end(); iter++)
+        {
+        proxyElement->RemoveNestedElement(*iter);
+        }
       }
     }
 

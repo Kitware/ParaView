@@ -35,7 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "pqComponentsExport.h"
-#include "vtkSMPQStateLoader.h"
+//#include "vtkSMPQStateLoader.h"
+#include "pqStateLoader.h"
 #include <QList>
 
 class pqLookmarkStateLoaderInternal;
@@ -43,16 +44,17 @@ class pqPipelineSource;
 class pqTimeKeeper;
 class QStandardItem;
 class pqGenericViewModule;
+class pqView;
 
 //
 // State loader for the lookmark state.
 //
 
-class PQCOMPONENTS_EXPORT pqLookmarkStateLoader : public vtkSMPQStateLoader
+class PQCOMPONENTS_EXPORT pqLookmarkStateLoader : public pqStateLoader
 {
 public:
   static pqLookmarkStateLoader* New();
-  vtkTypeRevisionMacro(pqLookmarkStateLoader, vtkSMPQStateLoader);
+  vtkTypeRevisionMacro(pqLookmarkStateLoader, pqStateLoader);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -87,6 +89,9 @@ public:
   // Set whether or not the lookmark's time/camera should be restored
   void SetRestoreCameraFlag(bool state);
   void SetRestoreTimeFlag(bool state);
+
+  // The view that this lookmark is being displayed in
+  void SetView(pqView*);
 
 protected:
   pqLookmarkStateLoader();
