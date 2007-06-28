@@ -60,7 +60,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqStateLoader);
-vtkCxxRevisionMacro(pqStateLoader, "1.9");
+vtkCxxRevisionMacro(pqStateLoader, "1.10");
 //-----------------------------------------------------------------------------
 pqStateLoader::pqStateLoader()
 {
@@ -173,7 +173,7 @@ void pqStateLoader::RegisterProxyInternal(const char* group,
     }
 
   if (proxy->GetXMLGroup()
-    && strcmp(proxy->GetXMLGroup(), "views") == 0 
+    && strcmp(proxy->GetXMLGroup(), "newviews") == 0 
     && strcmp(proxy->GetXMLName(), "ElementInspectorView") == 0)
     {
     // Don't register any element inspector views.
@@ -181,7 +181,7 @@ void pqStateLoader::RegisterProxyInternal(const char* group,
     }
 
   if (proxy->GetXMLGroup()
-    && strcmp(proxy->GetXMLGroup(), "displays") == 0 
+    && strcmp(proxy->GetXMLGroup(), "representations") == 0 
     && strcmp(proxy->GetXMLName(), "ElementInspectorDisplay") == 0)
     {
     // Don't register any element inspector displays.
@@ -196,7 +196,7 @@ void pqStateLoader::RegisterProxyInternal(const char* group,
 int pqStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement, 
   vtkSMProxy* proxy)
 {
-  if (strcmp(proxy->GetXMLGroup(), "rendermodules")==0)
+  if (strcmp(proxy->GetXMLGroup(), "newviews")==0)
     {
     unsigned int max = proxyElement->GetNumberOfNestedElements();
     vtkPVXMLElement* toRemove = 0;
@@ -204,14 +204,14 @@ int pqStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
       {
       vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
       if (element->GetName() == QString("Property") &&
-        element->GetAttribute("name") == QString("Displays"))
+        element->GetAttribute("name") == QString("Representations"))
         {
         element->SetAttribute("clear", "0");
         // This will ensure that when the state for Displays property is loaded
         // all already present displays won't be cleared.
         }
       else if (element->GetName() == QString("Property") &&
-        element->GetAttribute("name") == QString("RenderWindowSize"))
+        element->GetAttribute("name") == QString("ViewSize"))
         {
         toRemove = element;
         }
