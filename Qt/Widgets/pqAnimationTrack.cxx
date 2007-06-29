@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 pqAnimationTrack::pqAnimationTrack(QObject* p)
-  : QObject(p), /*StartTime(0), EndTime(1),*/ Rect(0,0,1,1)
+  : QObject(p), Rect(0,0,1,1)
 {
 }
 
@@ -67,6 +67,7 @@ void pqAnimationTrack::setBoundingRect(const QRectF& r)
   this->Rect = r;
   this->addToIndex();
   this->adjustKeyFrameRects();
+  this->update();
 }
 
 void pqAnimationTrack::adjustKeyFrameRects()
@@ -81,6 +82,7 @@ pqAnimationKeyFrame* pqAnimationTrack::addKeyFrame()
 {
   pqAnimationKeyFrame* frame = new pqAnimationKeyFrame(this, this->scene());
   this->Frames.append(frame);
+  this->update();
   return frame;
 }
 
@@ -88,6 +90,7 @@ void pqAnimationTrack::removeKeyFrame(pqAnimationKeyFrame* frame)
 {
   this->Frames.removeAll(frame);
   delete frame;
+  this->update();
 }
 
 
@@ -101,6 +104,7 @@ void pqAnimationTrack::setProperty(const QVariant& p)
 {
   this->Property = p;
   emit this->propertyChanged();
+  this->update();
 }
 
 void pqAnimationTrack::paint(QPainter* p,

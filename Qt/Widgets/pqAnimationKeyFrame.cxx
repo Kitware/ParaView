@@ -87,15 +87,20 @@ void pqAnimationKeyFrame::setEndTime(double t)
 void pqAnimationKeyFrame::setStartValue(const QVariant& v)
 {
   this->StartValue = v;
+  this->update();
 }
+
 void pqAnimationKeyFrame::setEndValue(const QVariant& v)
 {
   this->EndValue = v;
+  this->update();
 }
+
 void pqAnimationKeyFrame::setInterpolation(
   pqAnimationKeyFrame::InterpolationType i)
 {
   this->Interpolation = i;
+  this->update();
 }
   
 QRectF pqAnimationKeyFrame::boundingRect() const
@@ -108,6 +113,7 @@ void pqAnimationKeyFrame::setBoundingRect(const QRectF& r)
   this->removeFromIndex();
   this->Rect = r;
   this->addToIndex();
+  this->update();
 }
 
 void pqAnimationKeyFrame::adjustRect()
