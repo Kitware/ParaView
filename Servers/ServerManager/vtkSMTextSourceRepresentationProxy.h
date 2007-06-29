@@ -59,6 +59,13 @@ public:
   virtual void Update(vtkSMViewProxy* view);
 
   // Description:
+  // Overridden to make the Strategy modified as well.
+  // The strategy is not marked modified if the modifiedProxy == this, 
+  // thus if the changes to representation itself invalidates the data pipelines
+  // it must explicity mark the strategy invalid.
+  virtual void MarkModified(vtkSMProxy* modifiedProxy);
+
+  // Description:
   // Set the update time passed on to the update suppressor.
   void SetUpdateTime(double time);
 

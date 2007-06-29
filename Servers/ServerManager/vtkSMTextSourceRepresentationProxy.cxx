@@ -28,11 +28,12 @@
 #include "vtkSMViewProxy.h"
 #include "vtkTable.h"
 #include "vtkVariant.h"
+#include "vtkInformation.h"
 
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMTextSourceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMTextSourceRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMTextSourceRepresentationProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMTextSourceRepresentationProxy::vtkSMTextSourceRepresentationProxy()
 {
@@ -175,6 +176,23 @@ void vtkSMTextSourceRepresentationProxy::Update(vtkSMViewProxy* view)
     return;
     }
 
+  // check if we should UseCache
+
+  if (this->ViewInformation->Has(vtkSMViewProxy::USE_CACHE()))
+    {
+    if(this->ViewInformation->Get(vtkSMViewProxy::USE_CACHE())>0)
+      {
+      if (this->ViewInformation->Has(vtkSMViewProxy::CACHE_TIME()))
+        {
+        vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+          this->UpdateSuppressorProxy->GetProperty("CacheUpdate"));
+        dvp->SetElement(0, this->ViewInformation->Get(vtkSMViewProxy::CACHE_TIME()));
+        this->UpdateSuppressorProxy->UpdateProperty("CacheUpdate", 1);
+        return;
+        }
+      }
+    }
+
   if (!this->Dirty)
     {
     return;
@@ -202,6 +220,17 @@ void vtkSMTextSourceRepresentationProxy::Update(vtkSMViewProxy* view)
   this->TextWidgetProxy->UpdateProperty("Text");
 
  // this->InvokeEvent(vtkSMViewProxy::ForceUpdateEvent);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMTextSourceRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)
+{
+  if (modifiedProxy != this)
+    {
+    this->Dirty = true;
+    }
+
+  this->Superclass::MarkModified(modifiedProxy);
 }
 
 //-----------------------------------------------------------------------------
