@@ -31,7 +31,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPExtractHistogram);
-vtkCxxRevisionMacro(vtkPExtractHistogram, "1.4");
+vtkCxxRevisionMacro(vtkPExtractHistogram, "1.5");
 vtkCxxSetObjectMacro(vtkPExtractHistogram, Controller, vtkMultiProcessController);
 //-----------------------------------------------------------------------------
 vtkPExtractHistogram::vtkPExtractHistogram()
@@ -73,18 +73,16 @@ bool vtkPExtractHistogram::InitializeBinExtents(
   // We need to obtain the data array ranges from all processes.
   double data[3] = {0.0, 0.0, 0.0}; // 0--valid, (1,2) -- range.
   double *gathered_data= new double[3*num_processes];
-
   vtkstd::string array_name = "";
-  vtkDataArray* data_array = this->GetInputArrayToProcess(0, inputVector);
-  if (data_array)
+
+  //get local range and array name. if I don't have that array locally,
+  //then my contribution will be marked as invalid and ignored
+  if (this->Superclass::InitializeBinExtents(inputVector, bin_extents))
     {
-    if(this->Component >= 0 && 
-      this->Component < data_array->GetNumberOfComponents())
-      {
-      data[0] = 1.0;
-      data_array->GetRange(&data[1], this->Component);
-      array_name = data_array->GetName();
-      }
+    data[0] = 1.0;
+    data[1] = bin_extents->GetValue(0);
+    data[2] = bin_extents->GetValue(this->BinCount);
+    array_name = bin_extents->GetName();
     }
 
   // If the requested component is out-of-range for the input, we return an
@@ -96,8 +94,7 @@ bool vtkPExtractHistogram::InitializeBinExtents(
     return 0;
     }
 
-  // Gather array name (since all processes may not have the array name,
-  // we need to gather it.
+  // Gather array name (for when some process doesn't have it).
   vtkIdType *arrayname_lengths = new vtkIdType[num_processes];
   vtkIdType my_length = array_name.size() + 1; //gather null terminated strings.
 
@@ -124,6 +121,7 @@ bool vtkPExtractHistogram::InitializeBinExtents(
     if (arrayname_lengths[cc] > 1)
       {
       array_name = gathered_array_names + offsets[cc];
+      break;
       }
     }
 
@@ -133,7 +131,7 @@ bool vtkPExtractHistogram::InitializeBinExtents(
 
   bin_extents->SetName(array_name.c_str());
 
-  // Now all process compute the total range.
+  // Now compute the total range from all the local ranges.
   double range[2] = {VTK_DOUBLE_MAX, VTK_DOUBLE_MIN};
   for (cc=0; cc < num_processes; cc++)
     {

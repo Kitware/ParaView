@@ -19,6 +19,7 @@
 #include "vtkRectilinearGridAlgorithm.h"
 
 class vtkDoubleArray;
+class vtkIntArray;
 
 // .NAME vtkExtractHistogram - Extract histogram data (binned values) from any 
 // dataset
@@ -71,6 +72,8 @@ protected:
   // array.
   virtual bool InitializeBinExtents(
     vtkInformationVector** inputVector, vtkDoubleArray* bin_extents);
+
+  void BinAnArray(vtkDataArray *src, vtkIntArray *vals, vtkDoubleArray *exts);
 
   int Component;
   int BinCount;

@@ -26,9 +26,11 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkIntArray.h"
+#include "vtkCompositeDataSet.h"
+#include "vtkCompositeDataIterator.h"
 
 vtkStandardNewMacro(vtkExtractHistogram);
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.17");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.18");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),
@@ -131,32 +133,90 @@ bool vtkExtractHistogram::InitializeBinExtents(
   vtkInformationVector** inputVector,
   vtkDoubleArray* bin_extents)
 {
-  vtkDataArray* data_array = this->GetInputArrayToProcess(0, inputVector);
-  if (!data_array)
-    {
-    vtkErrorMacro("Failed to locate array to process.");
-    return false;
-    }
+  double range[2];
+  range[0] = VTK_DOUBLE_MAX;
+  range[1] = -VTK_DOUBLE_MAX;
 
-  // If the requested component is out-of-range for the input, we return an
-  // empty dataset
-  if(this->Component < 0 && 
-     this->Component >= data_array->GetNumberOfComponents())
-    {
-    vtkWarningMacro("Requested component " 
-      <<  this->Component << " is not available."); 
-    return true;
-    }
+  //obtain a pointer to the name of the vtkDataArray to bin up 
+  //and find the range of the data values within it
 
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+  vtkCompositeDataSet *cdin = vtkCompositeDataSet::SafeDownCast(input);
+  if (cdin)
+    {
+    //for composite datasets, visit each leaf data set and compute the total
+    //range
+    vtkCompositeDataIterator *cdit = cdin->NewIterator();
+    cdit->InitTraversal();
+    bool foundone = false;
+    while(!cdit->IsDoneWithTraversal())
+      {
+      vtkDataObject *dObj = cdit->GetCurrentDataObject();      
+      vtkDataArray* data_array = this->GetInputArrayToProcess(0, dObj);
+      if (
+        data_array &&
+        !(this->Component < 0 && 
+          this->Component >= data_array->GetNumberOfComponents())
+        )
+        {
+        if (!foundone)
+          {
+          bin_extents->SetName(data_array->GetName());
+          foundone = true;
+          }
+        double tRange[2];
+        data_array->GetRange(tRange, this->Component);
+        if (tRange[0] < range[0])
+          {
+          range[0] = tRange[0];
+          }
+        if (tRange[1] > range[1])
+          {
+          range[1] = tRange[1];
+          }
+        }
+      cdit->GoToNextItem();
+      }
+    cdit->Delete();
+
+    if (!foundone)
+      {
+      vtkErrorMacro("Failed to locate array to process in composite input.");
+      return false;
+      }
+    }
+  else
+    {
+    vtkDataArray* data_array = this->GetInputArrayToProcess(0, inputVector);
+    if (!data_array)
+      {
+      vtkErrorMacro("Failed to locate array to process.");
+      return false;
+      }
+    
+    // If the requested component is out-of-range for the input, we return an
+    // empty dataset
+    if(this->Component < 0 && 
+       this->Component >= data_array->GetNumberOfComponents())
+      {
+      vtkWarningMacro("Requested component " 
+                      <<  this->Component << " is not available."); 
+      return true;
+      }
+
+    data_array->GetRange(range, this->Component);
+
+    bin_extents->SetName(data_array->GetName());
+    }
+  
   // Calculate the extents of each bin, based on the range of values in the
   // input ...  
-  double range[2];
-  data_array->GetRange(range, this->Component);
   if (range[0] == range[1])
     {
     // Give it some width.
     range[1] = range[0]+1;
-    }
+    }    
 
   double bin_delta = (range[1] - range[0]) / this->BinCount;
   bin_extents->SetValue(0, range[0]);
@@ -165,89 +225,21 @@ bool vtkExtractHistogram::InitializeBinExtents(
     bin_extents->SetValue(i, range[0] + (i * bin_delta));
     }
   bin_extents->SetValue(this->BinCount, range[1]);
-  bin_extents->SetName(data_array->GetName());
   return true;
 }
 
 //-----------------------------------------------------------------------------
-int vtkExtractHistogram::RequestData(vtkInformation* /*request*/, 
-                                     vtkInformationVector** inputVector, 
-                                     vtkInformationVector* outputVector)
+void vtkExtractHistogram::BinAnArray(vtkDataArray *data_array, 
+                                     vtkIntArray *bin_values,
+                                     vtkDoubleArray *bin_extents)
 {
-  vtkDebugMacro(<< "Executing vtkExtractHistogram filter");
-
-  // Build an empty output grid in advance, so we can bail-out if we
-  // encounter any problems
-  vtkInformation* const output_info = outputVector->GetInformationObject(0);
-  vtkRectilinearGrid* const output_data = vtkRectilinearGrid::SafeDownCast(
-    output_info->Get(vtkDataObject::DATA_OBJECT()));
-  output_data->Initialize();
-  output_data->SetDimensions(this->BinCount+1, 1, 1);
-
-  vtkDoubleArray* const bin_extents = vtkDoubleArray::New();
-  bin_extents->SetNumberOfComponents(1);
-  bin_extents->SetNumberOfTuples(this->BinCount + 1);
-  bin_extents->SetName("bin_extents");
-  bin_extents->FillComponent(0, 0.0);
-  output_data->SetXCoordinates(bin_extents);
-  output_data->GetPointData()->AddArray(bin_extents);
-  bin_extents->Delete();
-
-  // Insert values into bins ...
-  vtkIntArray* const bin_values = vtkIntArray::New();
-  bin_values->SetNumberOfComponents(1);
-  bin_values->SetNumberOfTuples(this->BinCount);
-  bin_values->SetName("bin_values");
-  bin_values->FillComponent(0, 0.0);
-  output_data->GetCellData()->AddArray(bin_values);
-  bin_values->Delete();
-
-  vtkDoubleArray* const otherCoords = vtkDoubleArray::New();
-  otherCoords->SetNumberOfComponents(1);
-  otherCoords->SetNumberOfTuples(1);
-  otherCoords->SetTuple1(0, 0.0);
-  output_data->SetYCoordinates(otherCoords);
-  output_data->SetZCoordinates(otherCoords);
-  otherCoords->Delete();
-
-  // Initializes the bin_extents array.
-  if (!this->InitializeBinExtents(inputVector, bin_extents))
-    {
-    return 0;
-    }
-
-  // Find the field to process, if we can't find anything, we return an
-  // empty dataset
-  vtkDataArray* const data_array = this->GetInputArrayToProcess(0, inputVector);
-  /*
-   * Since it becomes tricky in the parallel version to determine if
-   * the data array is point or cell (since some processes may not have any data
-   * at all), we are not changing the name for bin_values based on type.
-   * If necessary, we'll have to perform additional communication
-   * in parallel version for this.
-  vtkDataSet *inputDS = vtkDataSet::SafeDownCast(this->GetInput(0));
-  if (data_array && inputDS)
-    {
-    // Try to assign the bin_values a name indicating if we are using point
-    // data or cell data.
-    if (inputDS->GetPointData()->GetArray(data_array->GetName()) == data_array)
-      {
-      bin_values->SetName("point_values");
-      }
-    else if (inputDS->GetCellData()->GetArray(data_array->GetName()) == data_array)
-      {
-      bin_values->SetName("cell_values");
-      }
-    }
-    */
-
   // If the requested component is out-of-range for the input,
   // the bin_values will be 0, so no need to do any actual counting.
   if(data_array == NULL || 
     this->Component < 0 || 
     this->Component >= data_array->GetNumberOfComponents())
     {
-    return 1;
+    return;
     }
 
   int num_of_tuples = data_array->GetNumberOfTuples();
@@ -275,5 +267,77 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
         }
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+int vtkExtractHistogram::RequestData(vtkInformation* /*request*/, 
+                                     vtkInformationVector** inputVector, 
+                                     vtkInformationVector* outputVector)
+{
+  // Build an empty output grid in advance, so we can bail-out if we
+  // encounter any problems
+  vtkInformation* const output_info = outputVector->GetInformationObject(0);
+  vtkRectilinearGrid* const output_data = vtkRectilinearGrid::SafeDownCast(
+    output_info->Get(vtkDataObject::DATA_OBJECT()));
+  output_data->Initialize();
+  output_data->SetDimensions(this->BinCount+1, 1, 1);
+
+  vtkDoubleArray* const bin_extents = vtkDoubleArray::New();
+  bin_extents->SetNumberOfComponents(1);
+  bin_extents->SetNumberOfTuples(this->BinCount + 1);
+  bin_extents->SetName("bin_extents");
+  bin_extents->FillComponent(0, 0.0);
+  output_data->SetXCoordinates(bin_extents);
+  output_data->GetPointData()->AddArray(bin_extents);
+
+  // Insert values into bins ...
+  vtkIntArray* const bin_values = vtkIntArray::New();
+  bin_values->SetNumberOfComponents(1);
+  bin_values->SetNumberOfTuples(this->BinCount);
+  bin_values->SetName("bin_values");
+  bin_values->FillComponent(0, 0.0);
+  output_data->GetCellData()->AddArray(bin_values);
+
+  vtkDoubleArray* const otherCoords = vtkDoubleArray::New();
+  otherCoords->SetNumberOfComponents(1);
+  otherCoords->SetNumberOfTuples(1);
+  otherCoords->SetTuple1(0, 0.0);
+  output_data->SetYCoordinates(otherCoords);
+  output_data->SetZCoordinates(otherCoords);
+  otherCoords->Delete();
+
+  // Initializes the bin_extents array.
+  if (!this->InitializeBinExtents(inputVector, bin_extents))
+    {
+    bin_values->Delete();
+    bin_extents->Delete();
+    return 0;
+    }
+
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+  vtkCompositeDataSet *cdin = vtkCompositeDataSet::SafeDownCast(input);
+  if (cdin)
+    {
+    //for composite datasets visit each leaf dataset and add in its counts
+    vtkCompositeDataIterator *cdit = cdin->NewIterator();
+    cdit->InitTraversal();
+    while(!cdit->IsDoneWithTraversal())
+      {
+      vtkDataObject *dObj = cdit->GetCurrentDataObject();      
+      vtkDataArray* data_array = this->GetInputArrayToProcess(0, dObj);
+      this->BinAnArray(data_array, bin_values, bin_extents);
+      cdit->GoToNextItem();
+      }
+    cdit->Delete();
+    }
+  else
+    {
+    vtkDataArray* data_array = this->GetInputArrayToProcess(0, inputVector);
+    this->BinAnArray(data_array, bin_values, bin_extents);
+    }
+  bin_values->Delete();
+  bin_extents->Delete();
+
   return 1;
 }
