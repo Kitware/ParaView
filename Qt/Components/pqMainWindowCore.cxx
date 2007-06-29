@@ -1615,7 +1615,6 @@ void pqMainWindowCore::setupProgressBar(QStatusBar* toolbar)
 {
   pqProgressWidget* const progress_bar = new pqProgressWidget(toolbar);
   toolbar->addPermanentWidget(progress_bar);
-  progress_bar->enableProgress(false);
 
   pqProgressManager* progress_manager = 
     pqApplicationCore::instance()->getProgressManager();

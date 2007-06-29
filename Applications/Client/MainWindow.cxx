@@ -750,14 +750,12 @@ void MainWindow::onCameraRedoLabel(const QString& label)
 //-----------------------------------------------------------------------------
 void MainWindow::onPreAccept()
 {
-  this->setEnabled(false);
   this->statusBar()->showMessage(tr("Updating..."));
 }
 
 //-----------------------------------------------------------------------------
 void MainWindow::onPostAccept()
 {
-  this->setEnabled(true);
   this->statusBar()->showMessage(tr("Ready"), 2000);
 }
 

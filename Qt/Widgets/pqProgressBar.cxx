@@ -88,6 +88,11 @@ public:
       }
     }
 
+  bool progressEnabled() const
+    {
+    return this->isVisible();
+    }
+
   QProgressBar* Progress;
   pqProgressBar* ParentProgress;
 };
@@ -123,6 +128,11 @@ public:
       }
     }
 
+  bool progressEnabled() const
+    {
+    return this->Progress->isEnabled();
+    }
+
   pqProgressBar* Progress;
 };
 
@@ -132,6 +142,7 @@ public:
 pqProgressBar::pqProgressBar(QWidget* _p) : QProgressBar(_p)
 {
   this->Helper = new pqProgressBarHelper(this);
+  this->Helper->enableProgress(false);
   this->CleanUp = false;
 }
 
@@ -144,22 +155,28 @@ pqProgressBar::~pqProgressBar()
 //-----------------------------------------------------------------------------
 void pqProgressBar::setProgress(const QString& message, int _value)
 {
-  this->Helper->setFormat(QString("%1: %p").arg(message));
-  this->Helper->setProgress(_value);
+  if(this->Helper->progressEnabled())
+    {
+    this->Helper->setFormat(QString("%1: %p").arg(message));
+    this->Helper->setProgress(_value);
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqProgressBar::enableProgress(bool e)
 {
-  if(e)
+  if(e && !this->Helper->progressEnabled())
     {
     this->Helper->enableProgress(true);
     }
-  else if(!this->CleanUp)
+  else if(!e && this->Helper->progressEnabled())
     {
     this->Helper->setProgress(100);
-    this->CleanUp = true;
-    QTimer::singleShot(0, this, SLOT(cleanup()));
+    if(!this->CleanUp)
+      {
+      this->CleanUp = true;
+      QTimer::singleShot(0, this, SLOT(cleanup()));
+      }
     }
 }
 
