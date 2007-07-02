@@ -41,6 +41,7 @@ class vtkPVArrayInformation;
 class vtkSMProperty;
 class QPixmap;
 class QTreeWidget;
+class QTreeWidgetItem;
 
 class PQCOMPONENTS_EXPORT pqExodusIIPanel :
   public pqNamedObjectPanel
@@ -52,6 +53,8 @@ public:
   /// destructor
   ~pqExodusIIPanel();
 
+  void reset();
+
 protected slots:
   void applyDisplacements(int);
   void displChanged(bool);
@@ -60,6 +63,13 @@ protected slots:
 
   void updateDataRanges();
   void propertyChanged();
+
+  // When a block, material, or hierarchy item is toggled, 
+  // these methods keep everything synced up.
+  void blockItemChanged(QTreeWidgetItem*);
+  void hierarchyItemChanged(QTreeWidgetItem*);
+  void materialItemChanged(QTreeWidgetItem*);
+  void selectionItemChanged(QTreeWidgetItem*, const QString&);
 
 protected:
   
