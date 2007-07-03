@@ -653,10 +653,17 @@ QList<QString> pqPipelineRepresentation::getColorFields()
     return ret;
     }
 
-  // get cell arrays (only when not in volume or outline mode.
+  // get data set type
+  vtkPVDataInformation* dataInfo = this->getInput()->getDataInformation();
+  int dataSetType = dataInfo->GetDataSetType();
+
+  // get cell arrays (only when not in certain data types).
   vtkPVDataSetAttributesInformation* cellinfo = 
     geomInfo->GetCellDataInformation();
-  if (cellinfo && representation != vtkSMPVRepresentationProxy::VOLUME)
+  if (cellinfo && //representation != vtkSMPVRepresentationProxy::VOLUME)
+     dataSetType != VTK_UNIFORM_GRID && 
+     dataSetType != VTK_STRUCTURED_POINTS &&
+     dataSetType != VTK_IMAGE_DATA)
     {
     for(int i=0; i<cellinfo->GetNumberOfArrays(); i++)
       {
