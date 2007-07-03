@@ -200,7 +200,8 @@ ENDIF (PARAVIEW_ENABLE_PYTHON)
 IF(NOT PV_INSTALL_NO_LIBRARIES)
   SET(temp_TO_INSTALL
     vtk${KIT}CS
-    vtk${KIT})
+    vtk${KIT}
+    vtkPVCommandOptions)
   IF (PARAVIEW_BUILD_GUI)
     SET (temp_TO_INSTALL
       ${temp_TO_INSTALL}
