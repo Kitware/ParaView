@@ -653,24 +653,33 @@ QList<QString> pqPipelineRepresentation::getColorFields()
     return ret;
     }
 
-  // get data set type
-  vtkPVDataInformation* dataInfo = this->getInput()->getDataInformation();
-  int dataSetType = dataInfo->GetDataSetType();
-
   // get cell arrays (only when not in certain data types).
   vtkPVDataSetAttributesInformation* cellinfo = 
     geomInfo->GetCellDataInformation();
-  if (cellinfo && //representation != vtkSMPVRepresentationProxy::VOLUME)
-     dataSetType != VTK_UNIFORM_GRID && 
-     dataSetType != VTK_STRUCTURED_POINTS &&
-     dataSetType != VTK_IMAGE_DATA)
+  if (cellinfo) //&& representation != vtkSMPVRepresentationProxy::VOLUME)
     {
-    for(int i=0; i<cellinfo->GetNumberOfArrays(); i++)
+    int dataSetType = -1;
+    vtkPVDataInformation* dataInfo = NULL;
+    if(this->getInput())
       {
-      vtkPVArrayInformation* info = cellinfo->GetArrayInformation(i);
-      QString name = info->GetName();
-      name += " (cell)";
-      ret.append(name);
+      dataInfo = this->getInput()->getDataInformation();
+      }
+    if(dataInfo)
+      {
+      dataSetType = dataInfo->GetDataSetType();// get data set type
+      }
+
+    if(dataSetType != VTK_UNIFORM_GRID && 
+       dataSetType != VTK_STRUCTURED_POINTS &&
+       dataSetType != VTK_IMAGE_DATA )
+      {
+      for(int i=0; i<cellinfo->GetNumberOfArrays(); i++)
+        {
+        vtkPVArrayInformation* info = cellinfo->GetArrayInformation(i);
+        QString name = info->GetName();
+        name += " (cell)";
+        ret.append(name);
+        }
       }
     }
   
