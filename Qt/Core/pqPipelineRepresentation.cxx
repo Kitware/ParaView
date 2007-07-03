@@ -884,20 +884,19 @@ void pqPipelineRepresentation::onRepresentationChanged()
   repr->Update();
 
   // Representation is Volume, is color array set?
+  QList<QString> colorFields = this->getColorFields();
+  if (colorFields.size() == 0)
+    {
+    qCritical() << "Cannot volume render since no point data available!";
+    this->setRepresentation(vtkSMPVRepresentationProxy::OUTLINE);
+    return;
+    }
+
   QString colorField = this->getColorField(false);
-  QRegExp regExpCell(" \\(cell\\)\\w*$");
-  if (colorField == pqPipelineRepresentation::solidColor() 
-    || regExpCell.indexIn(colorField) != -1)
+  if(!colorFields.contains(colorField))
     {
     // Current color field is not suitable for Volume rendering.
     // Change it.
-    QList<QString> colorFields = this->getColorFields();
-    if (colorFields.size() == 0)
-      {
-      qCritical() << "Cannot volume render since no point data available!";
-      this->setRepresentation(vtkSMPVRepresentationProxy::OUTLINE);
-      return;
-      }
     this->setColorField(colorFields[0]);
     }
 
