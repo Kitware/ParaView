@@ -35,7 +35,7 @@
 
 
 vtkStandardNewMacro(vtkServerConnection);
-vtkCxxRevisionMacro(vtkServerConnection, "1.10");
+vtkCxxRevisionMacro(vtkServerConnection, "1.11");
 //-----------------------------------------------------------------------------
 vtkServerConnection::vtkServerConnection()
 {
@@ -390,10 +390,20 @@ int vtkServerConnection::Initialize(int vtkNotUsed(argc),
     }
 
   // Collect and keep the server information.
+  vtkPVServerInformation* temp = vtkPVServerInformation::New();
   this->GatherInformation(
-    vtkProcessModule::RENDER_SERVER | vtkProcessModule::DATA_SERVER,
-    this->ServerInformation,
+    vtkProcessModule::RENDER_SERVER,
+    temp,
     pm->GetProcessModuleID());
+
+  this->ServerInformation->AddInformation(temp);
+
+  this->GatherInformation(
+    vtkProcessModule::DATA_SERVER,
+    temp,
+    pm->GetProcessModuleID());
+  this->ServerInformation->AddInformation(temp);
+  temp->Delete();
 
   return 0;
 }
