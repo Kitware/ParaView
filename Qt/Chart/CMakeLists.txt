@@ -1,10 +1,5 @@
 PROJECT(QtChart)
 
-# when you remove this, remove the moc workaround for include directories
-INCLUDE_DIRECTORIES(
-  ${VTK_INCLUDE_DIR}
-)
-
 INCLUDE_DIRECTORIES(${QT_QTDESIGNER_INCLUDE_DIR})
 
 IF(NOT BUILD_SHARED_LIBS)
@@ -107,12 +102,6 @@ SET(QtChart_SRCS
   QtChartExport.h
 )
 
-# Reduce the number of dirs that get included on moc command line
-# since it causes issues on Windows 2000.
-SET(MOC_INCLUDE_DIRS ${MOC_INCLUDE_DIRS} ${QT_QTDESIGNER_INCLUDE_DIR})
-GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
-SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
-
 QT4_WRAP_CPP(QtChart_MOC_SRCS
   pqChartArea.h
   pqChartAxis.h
@@ -144,8 +133,6 @@ QT4_WRAP_CPP(QtChart_MOC_SRCS
   pqLineChartSeriesOptions.h
   pqSimpleHistogramModel.h
 )
-
-SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
 SET(UI_RESOURCES
   pqChart.qrc
