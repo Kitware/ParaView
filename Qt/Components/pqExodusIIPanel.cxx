@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTreeWidget>
 #include <QVariant>
 #include <QVector>
+#include <QMap>
 
 // VTK includes
 
@@ -80,6 +81,7 @@ public:
   }
   vtkSmartPointer<vtkSMProxy> ExodusHelper;
   QVector<double> TimestepValues;
+  QMap<QTreeWidgetItem*, QString> TreeItemToPropMap;
 };
 
 pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
@@ -108,7 +110,9 @@ void pqExodusIIPanel::reset()
   // onto the vtkExodusReader, as the ExodusHelper
   // might have played with them
   vtkSMProxy* pxy = this->proxy();
+  pxy->UpdateProperty("EdgeBlockArrayStatus", 1);
   pxy->UpdateProperty("ElementBlockArrayStatus", 1);
+  pxy->UpdateProperty("FaceBlockArrayStatus", 1);
   pxy->UpdateProperty("MaterialArrayStatus", 1);
   pxy->UpdateProperty("HierarchyArrayStatus", 1);
 
@@ -169,6 +173,8 @@ void pqExodusIIPanel::addSelectionToTreeWidget(const QString& name,
                       "checked", 
                       SIGNAL(checkedStateChanged(bool)),
                       this->proxy(), SMProperty, propIdx);
+
+  this->UI->TreeItemToPropMap[item] = prop;
 }
 
 void pqExodusIIPanel::linkServerManagerProperties()
@@ -477,7 +483,13 @@ void pqExodusIIPanel::propertyChanged()
 
 void pqExodusIIPanel::blockItemChanged(QTreeWidgetItem* item)
 {
-  this->selectionItemChanged(item, "ElementBlockArrayStatus");
+  // Use our map to find which property name this tree item belongs to, 
+  // since there are multiple types of blocks (element, edge, face).
+  // Right now we only support element blocks.
+  if(this->UI->TreeItemToPropMap[item] == "ElementBlockArrayStatus")
+    {
+    this->selectionItemChanged(item, "ElementBlockArrayStatus");
+    }
 }
 
 void pqExodusIIPanel::hierarchyItemChanged(QTreeWidgetItem* item)
@@ -500,11 +512,15 @@ void pqExodusIIPanel::selectionItemChanged(QTreeWidgetItem* item,
   vtkSMProperty* blockStatus[3];
   int i;
   
+  //blockInfo[0] = pxy->GetProperty("EdgeBlockArrayInfo");
   blockInfo[0] = pxy->GetProperty("ElementBlockArrayInfo");
+  //blockInfo[2] = pxy->GetProperty("FaceBlockArrayInfo");
   blockInfo[1] = pxy->GetProperty("HierarchyArrayInfo");
   blockInfo[2] = pxy->GetProperty("MaterialArrayInfo");
   
+  //blockStatus[0] = pxy->GetProperty("EdgeBlockArrayStatus");
   blockStatus[0] = pxy->GetProperty("ElementBlockArrayStatus");
+  //blockStatus[2] = pxy->GetProperty("FaceBlockArrayStatus");
   blockStatus[1] = pxy->GetProperty("HierarchyArrayStatus");
   blockStatus[2] = pxy->GetProperty("MaterialArrayStatus");
 
