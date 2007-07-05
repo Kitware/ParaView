@@ -16,13 +16,13 @@
 
 #include "vtkColorTransferFunction.h"
 #include "vtkImageData.h"
-#include "vtkImageMapper.h"
 #include "vtkIntArray.h"
 #include "vtkMath.h"
 #include "vtkPointData.h"
+#include "vtkPolyDataMapper.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.10");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.11");
 
 vtkCxxSetObjectMacro(vtkTransferFunctionEditorRepresentation1D, Histogram,
                      vtkIntArray);
@@ -50,7 +50,14 @@ void vtkTransferFunctionEditorRepresentation1D::SetShowColorFunctionInHistogram(
 //----------------------------------------------------------------------------
 void vtkTransferFunctionEditorRepresentation1D::UpdateHistogramImage()
 {
-  if (!this->HistogramVisibility || !this->Histogram)
+  int upToDate = (this->HistogramImage->GetMTime() > this->GetMTime());
+  if (this->ShowColorFunctionInHistogram)
+    {
+    upToDate &=
+      (this->HistogramImage->GetMTime() > this->ColorFunction->GetMTime());
+    }
+
+  if (!this->HistogramVisibility || !this->Histogram || upToDate)
     {
     return;
     }
@@ -130,54 +137,20 @@ void vtkTransferFunctionEditorRepresentation1D::UpdateHistogramImage()
 }
 
 //----------------------------------------------------------------------------
-void vtkTransferFunctionEditorRepresentation1D::UpdateBackgroundImage()
-{
-  if (!this->ShowColorFunctionInBackground || !this->ColorFunction ||
-      this->VisibleScalarRange[0] > this->VisibleScalarRange[1])
-    {
-    return;
-    }
-
-  unsigned char* scalars = static_cast<unsigned char*>(
-    this->BackgroundImage->GetScalarPointer());
-  double stepSize =
-    (this->VisibleScalarRange[1]-this->VisibleScalarRange[0]) /
-    this->DisplaySize[0];
-
-  double rgb[3];
-  int i, j;
-
-  for (j = 0; j < this->DisplaySize[1]; j++)
-    {
-    for (i = 0; i < this->DisplaySize[0]; i++)
-      {
-      this->ColorFunction->GetColor(this->VisibleScalarRange[0] + i*stepSize,
-                                    rgb);
-      *scalars = static_cast<unsigned char>(rgb[0] * 255);
-      scalars++;
-      *scalars = static_cast<unsigned char>(rgb[1] * 255);
-      scalars++;
-      *scalars = static_cast<unsigned char>(rgb[2] * 255);
-      scalars++;
-      *scalars = 255;
-      scalars++;
-      }
-    }
-
-  this->BackgroundImage->Modified();
-}
-
-//----------------------------------------------------------------------------
 void vtkTransferFunctionEditorRepresentation1D::BuildRepresentation()
 {
   if (this->HistogramVisibility)
     {
     this->UpdateHistogramImage();
     }
-  if (this->ShowColorFunctionInBackground)
-    {
-    this->UpdateBackgroundImage();
-    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentation1D::SetColorFunction(
+  vtkColorTransferFunction *color)
+{
+  this->Superclass::SetColorFunction(color);
+  this->BackgroundMapper->SetLookupTable(color);
 }
 
 //----------------------------------------------------------------------------

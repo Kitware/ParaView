@@ -30,10 +30,12 @@
 
 #include "vtkWidgetRepresentation.h"
 
-class vtkActor2D;
+class vtkActor;
 class vtkColorTransferFunction;
 class vtkImageData;
-class vtkImageMapper;
+class vtkPolyData;
+class vtkPolyDataMapper;
+class vtkTexture;
 
 class VTK_EXPORT vtkTransferFunctionEditorRepresentation : public vtkWidgetRepresentation
 {
@@ -53,7 +55,8 @@ public:
 
   // Description:
   // Rendering methods
-  virtual int RenderOverlay(vtkViewport *viewport);
+  virtual int RenderOpaqueGeometry(vtkViewport *viewport);
+  virtual int RenderTranslucentPolygonalGeometry(vtkViewport *viewport);
   virtual int HasTranslucentPolygonalGeometry();
 
   // Description:
@@ -134,8 +137,10 @@ protected:
   ~vtkTransferFunctionEditorRepresentation();
 
   vtkImageData *HistogramImage;
-  vtkImageMapper *HistogramMapper;
-  vtkActor2D *HistogramActor;
+  vtkTexture *HistogramTexture;
+  vtkPolyData *HistogramGeometry;
+  vtkPolyDataMapper *HistogramMapper;
+  vtkActor *HistogramActor;
   int HistogramVisibility;
   int ColorElementsByColorFunction;
   double ElementsColor[3];
@@ -143,9 +148,9 @@ protected:
   int ScalarBinRange[2];
   double HistogramColor[3];
   vtkColorTransferFunction *ColorFunction;
-  vtkImageData *BackgroundImage;
-  vtkImageMapper *BackgroundMapper;
-  vtkActor2D *BackgroundActor;
+  vtkPolyData *BackgroundImage;
+  vtkPolyDataMapper *BackgroundMapper;
+  vtkActor *BackgroundActor;
   int ShowColorFunctionInBackground;
   int ShowColorFunctionInHistogram;
   double VisibleScalarRange[2];

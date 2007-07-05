@@ -14,15 +14,16 @@
 =========================================================================*/
 #include "vtkTransferFunctionEditorRepresentation.h"
 
-#include "vtkActor2D.h"
+#include "vtkActor.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkImageData.h"
-#include "vtkImageMapper.h"
 #include "vtkPointData.h"
-#include "vtkProperty2D.h"
+#include "vtkPolyData.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkTexture.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation, "1.10");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation, "1.11");
 
 vtkCxxSetObjectMacro(vtkTransferFunctionEditorRepresentation,
                      ColorFunction, vtkColorTransferFunction);
@@ -32,29 +33,21 @@ vtkTransferFunctionEditorRepresentation::vtkTransferFunctionEditorRepresentation
 {
   this->HistogramImage = vtkImageData::New();
   this->HistogramImage->SetScalarTypeToUnsignedChar();
-  this->HistogramMapper = vtkImageMapper::New();
-  this->HistogramMapper->SetInput(this->HistogramImage);
-  this->HistogramMapper->SetColorWindow(256);
-  this->HistogramMapper->SetColorLevel(128);
-  this->HistogramActor = vtkActor2D::New();
+  this->HistogramTexture = vtkTexture::New();
+  this->HistogramTexture->SetInput(this->HistogramImage);
+  this->HistogramGeometry = vtkPolyData::New();
+  this->HistogramMapper = vtkPolyDataMapper::New();
+  this->HistogramMapper->SetInput(this->HistogramGeometry);
+  this->HistogramActor = vtkActor::New();
+  this->HistogramActor->SetTexture(this->HistogramTexture);
   this->HistogramActor->SetMapper(this->HistogramMapper);
-  this->HistogramActor->SetPosition(0, 0);
-  this->HistogramActor->SetPosition2(1, 1);
-  this->HistogramActor->SetLayerNumber(0);
-  this->HistogramActor->GetProperty()->SetDisplayLocationToBackground();
 
-  this->BackgroundImage = vtkImageData::New();
-  this->BackgroundImage->SetScalarTypeToUnsignedChar();
-  this->BackgroundMapper = vtkImageMapper::New();
+  this->BackgroundImage = vtkPolyData::New();
+  this->BackgroundMapper = vtkPolyDataMapper::New();
   this->BackgroundMapper->SetInput(this->BackgroundImage);
-  this->BackgroundMapper->SetColorWindow(256);
-  this->BackgroundMapper->SetColorLevel(128);
-  this->BackgroundActor = vtkActor2D::New();
+  this->BackgroundMapper->InterpolateScalarsBeforeMappingOn();
+  this->BackgroundActor = vtkActor::New();
   this->BackgroundActor->SetMapper(this->BackgroundMapper);
-  this->BackgroundActor->SetPosition(0, 0);
-  this->BackgroundActor->SetPosition2(1, 1);
-  this->BackgroundActor->SetLayerNumber(1);
-  this->BackgroundActor->GetProperty()->SetDisplayLocationToBackground();
   
   this->HistogramVisibility = 1;
   this->ScalarBinRange[0] = 1;
@@ -78,6 +71,8 @@ vtkTransferFunctionEditorRepresentation::vtkTransferFunctionEditorRepresentation
 vtkTransferFunctionEditorRepresentation::~vtkTransferFunctionEditorRepresentation()
 {
   this->HistogramImage->Delete();
+  this->HistogramTexture->Delete();
+  this->HistogramGeometry->Delete();
   this->HistogramMapper->Delete();
   this->HistogramActor->Delete();
   this->SetColorFunction(NULL);
@@ -99,21 +94,30 @@ int vtkTransferFunctionEditorRepresentation::HasTranslucentPolygonalGeometry()
     ret |= this->BackgroundActor->HasTranslucentPolygonalGeometry();
     }
 
-  return 0;
+  return ret;
 }
 
 //----------------------------------------------------------------------------
-int vtkTransferFunctionEditorRepresentation::RenderOverlay(
+int vtkTransferFunctionEditorRepresentation::RenderOpaqueGeometry(
   vtkViewport *viewport)
 {
   int ret = 0;
   if (this->ShowColorFunctionInBackground)
     {
-    ret += this->BackgroundActor->RenderOverlay(viewport);
+    ret += this->BackgroundActor->RenderOpaqueGeometry(viewport);
     }
+
+  return ret;
+}
+
+//----------------------------------------------------------------------------
+int vtkTransferFunctionEditorRepresentation::RenderTranslucentPolygonalGeometry(
+  vtkViewport *viewport)
+{
+  int ret = 0;
   if (this->HistogramVisibility)
     {
-    ret += this->HistogramActor->RenderOverlay(viewport);
+    ret += this->HistogramActor->RenderTranslucentPolygonalGeometry(viewport);
     }
 
   return ret;
@@ -140,42 +144,30 @@ void vtkTransferFunctionEditorRepresentation::SetDisplaySize(int x, int y)
     {
     this->DisplaySize[0] = x;
     this->DisplaySize[1] = y;
-    this->Modified();
-    }
 
-  if (this->HistogramImage)
-    {
-    this->HistogramImage->Initialize();
-    this->HistogramImage->SetDimensions(this->DisplaySize[0],
-                                        this->DisplaySize[1], 1);
-    this->HistogramImage->SetNumberOfScalarComponents(4);
-    this->HistogramImage->AllocateScalars();
-    vtkUnsignedCharArray *array = vtkUnsignedCharArray::SafeDownCast(
-      this->HistogramImage->GetPointData()->GetScalars());
-    if (array)
+    if (this->HistogramImage)
       {
-      array->FillComponent(0, 0);
-      array->FillComponent(1, 0);
-      array->FillComponent(2, 0);
-      array->FillComponent(3, 0);
+      this->HistogramImage->Initialize();
+      this->HistogramImage->SetDimensions(this->DisplaySize[0],
+                                          this->DisplaySize[1], 1);
+      this->HistogramImage->SetNumberOfScalarComponents(4);
+      this->HistogramImage->AllocateScalars();
+      vtkUnsignedCharArray *array = vtkUnsignedCharArray::SafeDownCast(
+        this->HistogramImage->GetPointData()->GetScalars());
+      if (array)
+        {
+        array->FillComponent(0, 0);
+        array->FillComponent(1, 0);
+        array->FillComponent(2, 0);
+        array->FillComponent(3, 0);
+        }
+      this->HistogramGeometry->Initialize();
       }
-    }
-  if (this->BackgroundImage)
-    {
-    this->BackgroundImage->Initialize();
-    this->BackgroundImage->SetDimensions(this->DisplaySize[0],
-                                         this->DisplaySize[1], 1);
-    this->BackgroundImage->SetNumberOfScalarComponents(4);
-    this->BackgroundImage->AllocateScalars();
-    vtkUnsignedCharArray *array = vtkUnsignedCharArray::SafeDownCast(
-      this->BackgroundImage->GetPointData()->GetScalars());
-    if (array)
+    if (this->BackgroundImage)
       {
-      array->FillComponent(0, 0);
-      array->FillComponent(1, 0);
-      array->FillComponent(2, 0);
-      array->FillComponent(3, 0);
+      this->BackgroundImage->Initialize();
       }
+    this->Modified();
     }
 }
 

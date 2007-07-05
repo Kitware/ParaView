@@ -50,12 +50,15 @@ public:
   // Toggle whether to display the color function in the histogram.
   virtual void SetShowColorFunctionInHistogram(int color);
 
+  // Description:
+  // Set the color transfer function being modified.
+  virtual void SetColorFunction(vtkColorTransferFunction *color);
+
 protected:
   vtkTransferFunctionEditorRepresentation1D();
   ~vtkTransferFunctionEditorRepresentation1D();
 
   void UpdateHistogramImage();
-  void UpdateBackgroundImage();
 
   vtkIntArray *Histogram;
 

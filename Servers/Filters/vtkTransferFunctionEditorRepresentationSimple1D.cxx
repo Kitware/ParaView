@@ -19,6 +19,7 @@
 #include "vtkCommand.h"
 #include "vtkDoubleArray.h"
 #include "vtkMath.h"
+#include "vtkPlaneSource.h"
 #include "vtkPointData.h"
 #include "vtkPointHandleRepresentationSphere.h"
 #include "vtkPoints.h"
@@ -34,7 +35,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.16");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.17");
 vtkStandardNewMacro(vtkTransferFunctionEditorRepresentationSimple1D);
 
 // The vtkHandleList is a PIMPLed list<T>.
@@ -100,9 +101,37 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
 {
   this->Superclass::BuildRepresentation();
 
+  int bkndDepth = -12;
+  int histDepth = -10;
+  int linesDepth = -8;
+
   // Add lines between the handles if there is more than 1.
   if (this->Handles->size() > 1)
     {
+    vtkPlaneSource *plane = vtkPlaneSource::New();
+    plane->SetOrigin(0, 0, histDepth);
+    plane->SetPoint1(this->DisplaySize[0], 0, histDepth);
+    plane->SetPoint2(0, this->DisplaySize[1], histDepth);
+    plane->SetCenter(this->DisplaySize[0]*0.5, this->DisplaySize[1]*0.5,
+                     histDepth);
+    plane->Update();
+    this->HistogramGeometry->DeepCopy(plane->GetOutput());
+    plane->Delete();
+
+    this->BackgroundImage->Initialize();
+    this->BackgroundImage->Allocate();
+    vtkDoubleArray *bkndScalars = vtkDoubleArray::New();
+    bkndScalars->SetNumberOfComponents(1);
+    bkndScalars->SetNumberOfTuples(2*this->Handles->size()+4);
+    vtkPoints *bkndPts = vtkPoints::New();
+    bkndPts->InsertNextPoint(0, 0, bkndDepth);
+    bkndPts->InsertNextPoint(0, this->DisplaySize[1], bkndDepth);
+    bkndScalars->SetValue(0, this->VisibleScalarRange[0]);
+    bkndScalars->SetValue(1, this->VisibleScalarRange[0]);
+    vtkIdType *bkndIds = new vtkIdType[4];
+    bkndIds[0] = 1;
+    bkndIds[1] = 0;
+    
     this->Lines->Initialize();
     this->Lines->Allocate();
 
@@ -110,7 +139,9 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
     scalars->SetNumberOfComponents(1);
     scalars->SetNumberOfTuples(this->Handles->size());
 
+    double scalar;
     unsigned int i = 1;
+    unsigned int bi = 2;
     double lastPos[3], pos[3];
     vtkHandleListIterator hiter = this->Handles->begin();
     (*hiter)->GetDisplayPosition(lastPos);
@@ -118,11 +149,25 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
       vtkPointHandleRepresentationSphere::SafeDownCast(*hiter);
     if (rep)
       {
-      scalars->SetValue(0, rep->GetScalar());
+      scalar = rep->GetScalar();
+      scalars->SetValue(0, scalar);
+      if (scalar > this->VisibleScalarRange[0] &&
+          scalar < this->VisibleScalarRange[1])
+        {
+        bkndScalars->SetValue(2, scalar);
+        bkndScalars->SetValue(3, scalar);
+        bkndPts->InsertNextPoint(lastPos[0], 0, bkndDepth);
+        bkndPts->InsertNextPoint(lastPos[0], this->DisplaySize[1], bkndDepth);
+        bkndIds[2] = bi++;
+        bkndIds[3] = bi++;
+        this->BackgroundImage->InsertNextCell(VTK_QUAD, 4, bkndIds);
+        bkndIds[0] = bkndIds[3];
+        bkndIds[1] = bkndIds[2];
+        }
       }
     hiter++;
     vtkPoints *pts = vtkPoints::New();
-    lastPos[2] = -8;
+    lastPos[2] = linesDepth;
     pts->InsertNextPoint(lastPos);
     vtkIdType *ids = new vtkIdType[2];
 
@@ -134,9 +179,23 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
       rep = vtkPointHandleRepresentationSphere::SafeDownCast(*hiter);
       if (rep)
         {
-        scalars->SetValue(i, rep->GetScalar());
+        scalar = rep->GetScalar();
+        scalars->SetValue(i, scalar);
+        if (scalar > this->VisibleScalarRange[0] &&
+            scalar < this->VisibleScalarRange[1])
+          {
+          bkndIds[2] = bi++;
+          bkndIds[3] = bi++;
+          bkndScalars->SetValue(bkndIds[2], scalar);
+          bkndScalars->SetValue(bkndIds[3], scalar);
+          bkndPts->InsertNextPoint(pos[0], 0, bkndDepth);
+          bkndPts->InsertNextPoint(pos[0], this->DisplaySize[1], bkndDepth);
+          this->BackgroundImage->InsertNextCell(VTK_QUAD, 4, bkndIds);
+          bkndIds[0] = bkndIds[3];
+          bkndIds[1] = bkndIds[2];
+          }
         }
-      pos[2] = -8;
+      pos[2] = linesDepth;
       pts->InsertNextPoint(pos);
       this->Lines->InsertNextCell(VTK_LINE, 2, ids);
       lastPos[0] = pos[0];
@@ -145,9 +204,24 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
       }
     this->Lines->SetPoints(pts);
     this->Lines->GetPointData()->SetScalars(scalars);
+
+    bkndIds[2] = bi;
+    bkndIds[3] = bi+1;
+    bkndPts->InsertNextPoint(this->DisplaySize[0], 0, bkndDepth);
+    bkndPts->InsertNextPoint(this->DisplaySize[0], this->DisplaySize[1],
+                             bkndDepth);
+    bkndScalars->SetValue(bkndIds[2], this->VisibleScalarRange[1]);
+    bkndScalars->SetValue(bkndIds[3], this->VisibleScalarRange[1]);
+    this->BackgroundImage->InsertNextCell(VTK_QUAD, 4, bkndIds);
+    this->BackgroundImage->SetPoints(bkndPts);
+    this->BackgroundImage->GetPointData()->SetScalars(bkndScalars);
+
     pts->Delete();
     scalars->Delete();
+    bkndPts->Delete();
+    bkndScalars->Delete();
     delete [] ids;
+    delete [] bkndIds;
     }
 }
 
