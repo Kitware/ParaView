@@ -64,31 +64,120 @@ public:
     };
 
 public:
+  /// \brief
+  ///   Creates an options generator instance.
+  /// \param scheme The initial color scheme.
   pqChartSeriesOptionsGenerator(ColorScheme scheme=Spectrum);
   virtual ~pqChartSeriesOptionsGenerator();
 
+  /// \brief
+  ///   Gets the number of colors in the color list.
+  /// \return
+  ///   The number of colors in the color list.
   int getNumberOfColors() const;
+
+  /// \brief
+  ///   Gets the number of pen styles in the style list.
+  /// \return
+  ///   The number of pen styles in the style list.
   int getNumberOfStyles() const;
 
+  /// \brief
+  ///   Gets a color from the color list.
+  ///
+  /// This method provides access to the list of colors. The index
+  /// must be in the color list range in order to return a valid
+  /// color.
+  ///
+  /// \param index The list index for the color.
+  /// \param color Used to return the color.
+  /// \sa pqChartSeriesOptionsGenerator::getSeriesColor(int, QColor &)
   void getColor(int index, QColor &color) const;
+
+  /// \brief
+  ///   Gets a pen style from the pen styles list.
+  ///
+  /// This method provides access to the list of styles. If the index
+  /// is out of range, a default style will be returned.
+  ///
+  /// \param index The list index for the style.
+  /// \return
+  ///   The pen style for the given index.
+  /// \sa pqChartSeriesOptionsGenerator::getSeriesPen(int, QPen &)
   Qt::PenStyle getPenStyle(int index) const;
 
   virtual void getSeriesColor(int index, QColor &color) const;
   virtual void getSeriesPen(int index, QPen &pen) const;
 
+  /// \brief
+  ///   Gets the current color scheme.
+  /// \return
+  ///   The current color scheme.
   ColorScheme getColorScheme() const {return this->Scheme;}
+
+  /// \brief
+  ///   Sets the color scheme.
+  ///
+  /// The color scheme will automatically be changed to \c Custom if
+  /// the color or style lists are modified.
+  ///
+  /// \param scheme The new color scheme.
   void setColorScheme(ColorScheme scheme);
 
+  /// Clears the list of colors.
   void clearColors();
+
+  /// \brief
+  ///   Adds a color to the list of colors.
+  /// \param color The new color to add.
   void addColor(const QColor &color);
+
+  /// \brief
+  ///   Inserts a new color into the list of colors.
+  /// \param index Where to insert the new color.
+  /// \param color The new color to insert.
   void insertColor(int index, const QColor &color);
+
+  /// \brief
+  ///   Sets the color for the given index.
+  ///
+  /// This method does nothing if the index is out of range.
+  ///
+  /// \param index Which color to modify.
+  /// \param color The new color.
   void setColor(int index, const QColor &color);
+
+  /// \brief
+  ///   Removes the color for the given index.
+  /// \param index Which color to remove from the list.
   void removeColor(int index);
 
+  /// Clears the list of pen styles.
   void clearPenStyles();
+
+  /// \brief
+  ///   Adds a pen style to the list of pen style.
+  /// \param style The new pen style to add.
   void addPenStyle(Qt::PenStyle style);
+
+  /// \brief
+  ///   Inserts a new pen style into the list of pen style.
+  /// \param index Where to insert the new pen style.
+  /// \param style The new pen style to insert.
   void insertPenStyle(int index, Qt::PenStyle style);
+
+  /// \brief
+  ///   Sets the pen style for the given index.
+  ///
+  /// This method does nothing if the index is out of range.
+  ///
+  /// \param index Which pen style to modify.
+  /// \param style The new pen style.
   void setPenStyle(int index, Qt::PenStyle style);
+
+  /// \brief
+  ///   Removes the pen style for the given index.
+  /// \param index Which pen style to remove from the list.
   void removePenStyle(int index);
 
 private:

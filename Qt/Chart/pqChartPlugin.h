@@ -50,6 +50,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqChartWidgetPlugin;
 class pqColorMapWidgetPlugin;
 
+
+/// \class pqChartPlugin
+/// \brief
+///   The pqChartPlugin class contains the custom widgets for the
+///   charting package.
 class pqChartPlugin : public QObject,
     public QDesignerCustomWidgetCollectionInterface
 {
@@ -57,14 +62,21 @@ class pqChartPlugin : public QObject,
   Q_INTERFACES(QDesignerCustomWidgetCollectionInterface)
 
 public:
+  /// \brief
+  ///   Creates a chart plugin container.
+  /// \param parent The parent object.
   pqChartPlugin(QObject *parent=0);
   virtual ~pqChartPlugin();
 
+  /// \brief
+  ///   Gets the list of plugins for the charting package.
+  /// \return
+  ///   A list of plugins for the charting package.
   virtual QList<QDesignerCustomWidgetInterface*> customWidgets() const;
 
 private:
-  pqChartWidgetPlugin *Chart;
-  pqColorMapWidgetPlugin *ColorMap;
+  pqChartWidgetPlugin *Chart;       ///< Stores the chart plugin.
+  pqColorMapWidgetPlugin *ColorMap; ///< Stores the color map plugin.
 };
 
 #endif

@@ -51,6 +51,9 @@ class QPainter;
 class QRect;
 
 
+/// \class pqLineChart
+/// \brief
+///   The pqLineChart class is used to display a line chart.
 class QTCHART_EXPORT pqLineChart : public pqChartLayer
 {
   Q_OBJECT

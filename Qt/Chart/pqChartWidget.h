@@ -53,6 +53,17 @@ class QStringList;
 class QVBoxLayout;
 
 
+/// \class pqChartWidget
+/// \brief
+///   The pqChartWidget class is a container for the chart widgets.
+///
+/// The main charting widget is the chart area. It holds the chart
+/// layers. The title and legend widgets are arranged around the
+/// chart area. A title can be added for each axis as well as an
+/// overall title for the chart.
+///
+/// The main chart area is created and owned by the chart widget. The
+/// other widgets should be created and passed in.
 class QTCHART_EXPORT pqChartWidget : public QAbstractScrollArea
 {
   Q_OBJECT
@@ -64,15 +75,45 @@ public:
   pqChartWidget(QWidget *parent=0);
   virtual ~pqChartWidget();
 
+  /// \brief
+  ///   Gets the overall title for the chart.
+  /// \return
+  ///   A pointer to the overall title for the chart.
   pqChartTitle *getTitle() const {return this->Title;}
+
+  /// \brief
+  ///   Sets the overall title for the chart.
+  /// \param title The new chart title.
   void setTitle(pqChartTitle *title);
 
+  /// \brief
+  ///   Gets the chart legend.
+  /// \return
+  ///   A pointer to the chart legend.
   pqChartLegend *getLegend() const {return this->Legend;}
+
+  /// \brief
+  ///   Sets the chart legend.
+  /// \param legend The new chart legend.
   void setLegend(pqChartLegend *legend);
 
+  /// \brief
+  ///   Gets the main chart area.
+  /// \return
+  ///   A pointer to the main chart area.
   pqChartArea *getChartArea() const {return this->Charts;}
 
+  /// \brief
+  ///   Gets the title for the given axis location.
+  /// \param axis The axis location on the chart.
+  /// \return
+  ///   A pointer to the axis title.
   pqChartTitle *getAxisTitle(pqChartAxis::AxisLocation axis) const;
+
+  /// \brief
+  ///   Sets the title for the given axis location.
+  /// \param axis The axis location on the chart.
+  /// \param title The new axis title.
   void setAxisTitle(pqChartAxis::AxisLocation axis, pqChartTitle *title);
 
   /// \brief
@@ -82,10 +123,19 @@ public:
   virtual QSize sizeHint() const;
 
 public slots:
+  /// \brief
+  ///   Prints the chart using the given printer.
+  /// \param printer The printer to use.
   void printChart(QPrinter &printer);
 
+  /// \brief
+  ///   Saves a screenshot of the chart to the given files.
+  /// \param files The list of files to write.
   void saveChart(const QStringList &files);
 
+  /// \brief
+  ///   Saves a screenshot of the chart to the given file.
+  /// \param filename The name of the file to write.
   void saveChart(const QString &filename);
 
 private:

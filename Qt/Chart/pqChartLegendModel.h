@@ -126,13 +126,13 @@ public:
 
   /// \brief
   ///   Generates an icon for a line chart series.
-  /// \param marker The point marker to use.
   /// \param pen The pen to draw the line with.
+  /// \param marker The point marker to use.
+  /// \param pointPen The pen to draw the point with.
   /// \return
   ///   An icon for a line chart series.
   static QPixmap generateLineIcon(const QPen &pen, pqPointMarker *marker=0,
       const QPen *pointPen=0);
-
 
   /// \brief
   ///   Generates an icon for a solid color.

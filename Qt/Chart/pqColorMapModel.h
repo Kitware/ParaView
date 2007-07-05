@@ -149,7 +149,7 @@ signals:
   /// \brief
   ///   Emitted when the opacity of a point has been changed.
   /// \param index The index of the point.
-  /// \param value The new opacity for the point.
+  /// \param opacity The new opacity for the point.
   void opacityChanged(int index, const pqChartValue &opacity);
 
 private:

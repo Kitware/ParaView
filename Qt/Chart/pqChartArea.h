@@ -53,6 +53,9 @@ class QPrinter;
 class QRect;
 
 
+/// \class pqChartArea
+/// \brief
+///   The pqChartArea class manages the chart axes and layers.
 class QTCHART_EXPORT pqChartArea : public QWidget
 {
   Q_OBJECT
@@ -155,13 +158,33 @@ public:
 
   /// \name Interaction Methods
   //@{
+  /// \brief
+  ///   Gets the current chart interactor.
+  /// \return
+  ///   A pointer to the current chart interactor.
   pqChartInteractor *getInteractor() const {return this->Interactor;}
+
+  /// \brief
+  ///   Sets the chart interactor.
+  ///
+  /// This method sets up the interactor to work with the chart. The
+  /// contents space and mouse box are set on the interactor.
+  ///
+  /// \param interactor The new chart interactor.
   void setInteractor(pqChartInteractor *interactor);
   //@}
 
   /// \name Printing Methods
   //@{
+  /// \brief
+  ///   Prints the chart using the given printer.
+  /// \param printer The printer to use.
   void printChart(QPrinter &printer);
+
+  /// \brief
+  ///   Draws the chart axes and layers using the given painter.
+  /// \param painter The painter to use.
+  /// \param area The area that need painting.
   void drawChart(QPainter &painter, const QRect &area);
   //@}
 
@@ -189,16 +212,38 @@ protected:
 
   /// \name Interaction Methods
   //@{
+  /// \brief
+  ///   Handles the key press events for the chart.
+  ///
+  /// All the interaction events are forwarded to the pqChartInteractor.
+  /// It is up to the interactor object to accept or ignore the events.
+  ///
+  /// \param e Event specific information.
   virtual void keyPressEvent(QKeyEvent *e);
 
+  /// \brief
+  ///   Handles the mouse press events for the chart.
+  /// \param e Event specific information.
   virtual void mousePressEvent(QMouseEvent *e);
 
+  /// \brief
+  ///   Handles the mouse move events for the chart.
+  /// \param e Event specific information.
   virtual void mouseMoveEvent(QMouseEvent *e);
 
+  /// \brief
+  ///   Handles the mouse release events for the chart.
+  /// \param e Event specific information.
   virtual void mouseReleaseEvent(QMouseEvent *e);
 
+  /// \brief
+  ///   Handles the mouse double click events for the chart.
+  /// \param e Event specific information.
   virtual void mouseDoubleClickEvent(QMouseEvent *e);
 
+  /// \brief
+  ///   Handles the mouse wheel events for the chart.
+  /// \param e Event specific information.
   virtual void wheelEvent(QWheelEvent *e);
   //@}
 

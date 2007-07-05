@@ -128,7 +128,7 @@ public:
   ///   Gets the layer's contents space object.
   /// \return
   ///   A pointer to the layer's contents space object.
-  const pqChartContentsSpace *getContentsSpace() const {return this->ZoomPan;}
+  const pqChartContentsSpace *getContentsSpace() const {return this->Contents;}
 
   /// \brief
   ///   Sets the layer's contents space object.
@@ -157,7 +157,7 @@ protected:
   void sendRepaintSignal();
 
 private:
-  const pqChartContentsSpace *ZoomPan;
+  const pqChartContentsSpace *Contents; ///< Stores the contents space.
 };
 
 #endif

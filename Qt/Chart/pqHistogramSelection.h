@@ -59,9 +59,9 @@ class QTCHART_EXPORT pqHistogramSelection
 {
 public:
   enum SelectionType {
-    None,
-    Value,
-    Bin
+    None,  ///< No selection type has been defined.
+    Value, ///< The selection consists of values.
+    Bin    ///< The selection consists of bin indexes.
   };
 
 public:

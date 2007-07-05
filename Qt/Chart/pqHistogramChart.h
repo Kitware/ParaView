@@ -50,6 +50,9 @@ class pqHistogramModel;
 class QRect;
 
 
+/// \class pqHistogramChart
+/// \brief
+///   The pqHistogramChart class is used to display a histogram.
 class QTCHART_EXPORT pqHistogramChart : public pqChartLayer
 {
   Q_OBJECT

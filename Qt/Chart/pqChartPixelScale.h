@@ -42,6 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /// \class pqChartPixelScale
+/// \brief
+///   The pqChartPixelScale class maps chart values to pixel locations.
 class QTCHART_EXPORT pqChartPixelScale
 {
 public:

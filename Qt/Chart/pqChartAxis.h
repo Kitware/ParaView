@@ -67,7 +67,7 @@ class QRect;
 ///
 /// The axis labels can be displayed using a linear or logarithmic
 /// scale. The logarithmic scale can only be used if the axis range
-/// does not contain zero.
+/// is greater than zero.
 ///
 /// If the axis has too many labels to display in the provided space,
 /// some of the labels will not be drawn. Tick marks will still be

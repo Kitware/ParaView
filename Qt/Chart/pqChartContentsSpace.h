@@ -45,6 +45,10 @@ class QPoint;
 class QRect;
 
 
+/// \class pqChartContentsSpace
+/// \brief
+///   The pqChartContentsSpace class defines the contents space for a
+///   chart.
 class QTCHART_EXPORT pqChartContentsSpace : public QObject
 {
   Q_OBJECT

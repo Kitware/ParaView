@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqChartLayer::pqChartLayer(QObject *parentObject)
   : QObject(parentObject)
 {
-  this->ZoomPan = 0;
+  this->Contents = 0;
 }
 
 bool pqChartLayer::getAxisRange(const pqChartAxis *, pqChartValue &,
@@ -65,7 +65,7 @@ void pqChartLayer::drawBackground(QPainter &, const QRect &)
 
 void pqChartLayer::setContentsSpace(const pqChartContentsSpace *contents)
 {
-  this->ZoomPan = contents;
+  this->Contents = contents;
 }
 
 void pqChartLayer::sendLayoutSignal()

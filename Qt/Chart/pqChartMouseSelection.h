@@ -99,8 +99,25 @@ public:
 
   /// \name Configuration Methods
   //@{
+  /// \brief
+  ///   Gets the name of current selection mode.
+  /// \return
+  ///   The name of the current selection mode.
   const QString &getSelectionMode() const;
+
+  /// \brief
+  ///   Gets the entire list of selection modes.
+  /// \param list Used to return the list of modes.
   void getAllModes(QStringList &list) const;
+
+  /// \brief
+  ///   Gets the list of available selection modes.
+  ///
+  /// Some of the supported modes may not be available depending on
+  /// the setup. For example, if a histogram chart is not set, the
+  /// modes related to the histogram will not be available.
+  ///
+  /// \param list Used to return the available modes.
   void getAvailableModes(QStringList &list) const;
 
   /// \brief
@@ -126,6 +143,9 @@ public:
   //@}
 
 public slots:
+  /// \brief
+  ///   Sets the current selection mode.
+  /// \param mode The name of the new selection mode.
   void setSelectionMode(const QString &mode);
 
 signals:
@@ -134,20 +154,50 @@ signals:
 
   /// \brief
   ///   Emitted when the selection mode changes.
-  /// \param mode The new selection mode.
+  /// \param mode The name of the new selection mode.
   void selectionModeChanged(const QString &mode);
 
 private:
+  /// \brief
+  ///   Handles mouse press histogram bin selection.
+  /// \param model The histogram selection model.
+  /// \param point The mouse location in contents space.
+  /// \param modifiers Keyboard modifiers for the event.
   void mousePressHistogramBin(pqHistogramSelectionModel *model,
       const QPoint &point, Qt::KeyboardModifiers modifiers);
+
+  /// \brief
+  ///   Handles mouse press histogram value selection.
+  /// \param model The histogram selection model.
+  /// \param point The mouse location in contents space.
+  /// \param modifiers Keyboard modifiers for the event.
   void mousePressHistogramValue(pqHistogramSelectionModel *model,
       const QPoint &point, Qt::KeyboardModifiers modifiers);
+
+  /// \brief
+  ///   Handles histogram selection range picking.
+  /// \param point The mouse location in contents space.
   void mousePressHistogramMove(const QPoint &point);
 
+  /// \brief
+  ///   Selects histogram bins contained in a selection box.
+  /// \param contents The chart's contents space object.
+  /// \param point The mouse location in contents space.
+  /// \param modifiers Keyboard modifiers for the event.
   void mouseMoveSelectBox(pqChartContentsSpace *contents, const QPoint &point,
       Qt::KeyboardModifiers modifiers);
+
+  /// \brief
+  ///   Selects histogram values while dragging the mouse.
+  /// \param contents The chart's contents space object.
+  /// \param point The mouse location in contents space.
+  /// \param modifiers Keyboard modifiers for the event.
   void mouseMoveSelectDrag(pqChartContentsSpace *contents, const QPoint &point,
       Qt::KeyboardModifiers modifiers);
+
+  /// \brief
+  ///   Moves the histogram selection range.
+  /// \param point The mouse location in contents space.
   void mouseMoveDragMove(const QPoint &point);
 
 private:

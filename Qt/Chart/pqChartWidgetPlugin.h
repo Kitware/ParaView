@@ -37,6 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDesignerCustomWidgetInterface>
 
 
+/// \class pqChartWidgetPlugin
+/// \brief
+///   The pqChartWidgetPlugin class is an abstract interface used to
+///   create a chart widget.
 class pqChartWidgetPlugin : public QObject,
     public QDesignerCustomWidgetInterface
 {
@@ -44,17 +48,65 @@ class pqChartWidgetPlugin : public QObject,
   Q_INTERFACES(QDesignerCustomWidgetInterface)
 
 public:
+  /// \brief
+  ///   Creates an instance of the chart plugin.
+  /// \param parent The parent object.
   pqChartWidgetPlugin(QObject *parent=0);
   virtual ~pqChartWidgetPlugin() {}
 
+  /// \brief
+  ///   Creates a new chart widget with the given parent.
+  /// \param parent The parent object.
+  /// \return
+  ///   A pointer to a new chart widget.
   virtual QWidget *createWidget(QWidget *parent=0);
+
+  /// \brief
+  ///   Gets the xml string for the chart widget.
+  /// \return
+  ///   The xml string for the chart widget.
   virtual QString domXml() const;
+
+  /// \brief
+  ///   Gets the name of the widget's designer group.
+  /// \return
+  ///   The name of the widget's designer group.
   virtual QString group() const {return QLatin1String("ParaView Chart Widgets");}
+
+  /// \brief
+  ///   Gets the icon for the widget.
+  /// \return
+  ///   The icon for the widget.
   virtual QIcon icon() const;
+
+  /// \brief
+  ///   Gets the include file for the widget.
+  /// \return
+  ///   The include file for the widget.
   virtual QString includeFile() const;
+
+  /// \brief
+  ///   Gets wether or not the widget is a container.
+  /// \return
+  ///   True if the widget is a container.
   virtual bool isContainer() const {return false;}
+
+  /// \brief
+  ///   Gets the widget class name.
+  /// \return
+  ///   The widget class name.
   virtual QString name() const {return QLatin1String("pqChartWidget");}
+
+  /// \brief
+  ///   Gets the tool tip for the widget.
+  /// \return
+  ///   The tool tip for the widget.
   virtual QString toolTip() const;
+
+  /// \brief
+  ///   Gets the what's this tip for the widget.
+  /// \return
+  ///   The what's this tip for the widget.
   virtual QString whatsThis() const;
 };
 

@@ -47,6 +47,10 @@ class QCursor;
 class QMouseEvent;
 
 
+/// \class pqChartMouseZoom
+/// \brief
+///   The pqChartMouseZoom class zooms the contents in response to
+///   mouse events.
 class QTCHART_EXPORT pqChartMouseZoom : public pqChartMouseFunction
 {
 public:
@@ -94,6 +98,9 @@ private:
 };
 
 
+/// \class pqChartMouseZoomX
+/// \brief
+///   The pqChartMouseZoomX class zooms the contents in the x-direction.
 class QTCHART_EXPORT pqChartMouseZoomX : public pqChartMouseZoom
 {
 public:
@@ -105,6 +112,9 @@ public:
 };
 
 
+/// \class pqChartMouseZoomY
+/// \brief
+///   The pqChartMouseZoomY class zooms the contents in the y-direction.
 class QTCHART_EXPORT pqChartMouseZoomY : public pqChartMouseZoom
 {
 public:
@@ -116,6 +126,9 @@ public:
 };
 
 
+/// \class pqChartMouseZoomBox
+/// \brief
+///   The pqChartMouseZoomBox class zooms the contents to a rectangle.
 class QTCHART_EXPORT pqChartMouseZoomBox : public pqChartMouseFunction
 {
 public:

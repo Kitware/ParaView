@@ -55,8 +55,8 @@ class QTCHART_EXPORT pqChartAxisOptions : public QObject
 
 public:
   enum AxisGridColor {
-    Lighter,
-    Specified
+    Lighter,  ///< The grid color is based on the axis color.
+    Specified ///< The grid color is specified.
   };
 
 public:

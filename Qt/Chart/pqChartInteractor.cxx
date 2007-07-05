@@ -454,12 +454,9 @@ int pqChartInteractor::getMode(Qt::MouseButton button) const
 void pqChartInteractor::setMode(Qt::MouseButton button, int index)
 {
   pqChartInteractorModeList *list = this->Internal->getModeList(button);
-  if(list)
+  if(list && index >= 0 && index < list->Modes.size())
     {
-    if(index >= 0 && index < list->Modes.size())
-      {
-      list->CurrentMode = index;
-      }
+    list->CurrentMode = index;
     }
 }
 

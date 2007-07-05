@@ -52,13 +52,11 @@ class pqChartZoomHistoryInternal;
 
 /// \class pqChartZoomViewport
 /// \brief
-///   The pqChartZoomViewport class stores the position and zoom factors
-///   for a particular viewport.
+///   The pqChartZoomViewport class stores the position and zoom
+///   factors for a viewport.
 ///
 /// The position stores the top-left corner of the viewport in
-/// content coordinates. These coordinates are used to set the
-/// content's position in the scroll view. The zoom factors are
-/// stored as percentages.
+/// content coordinates. The zoom factors are stored as percentages.
 class QTCHART_EXPORT pqChartZoomViewport
 {
 public:

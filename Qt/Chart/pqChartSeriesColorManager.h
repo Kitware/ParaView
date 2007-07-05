@@ -44,13 +44,23 @@ class pqChartSeriesOptionsGenerator;
 class QObject;
 
 
+/// \class pqChartSeriesColorManager
+/// \brief
+///   The pqChartSeriesColorManager class allows several chart layers
+///   to share the same options generator.
+///
+/// Sharing an options generator keeps the series options from
+/// repeating. This is useful when several of the same type of chart
+/// layers are displayed in the same chart. For example, two line
+/// charts can share an options generator to make sure that none of
+/// the lines are the same color.
 class QTCHART_EXPORT pqChartSeriesColorManager
 {
 public:
   pqChartSeriesColorManager();
   virtual ~pqChartSeriesColorManager();
 
-  /// \breif
+  /// \brief
   ///   Gets the options generator.
   /// \return
   ///   A pointer to the options generator.
@@ -61,7 +71,25 @@ public:
   /// \param generator The new options generator.
   void setGenerator(pqChartSeriesOptionsGenerator *generator);
 
+  /// \brief
+  ///   Adds a series options object to the list.
+  ///
+  /// The index returned is the lowest index available. If there are
+  /// empty spots from removals, the index will come from the first
+  /// empty spot.
+  ///
+  /// \param options The options object to add.
+  /// \return
+  ///   The index for the series options generator.
   virtual int addSeriesOptions(const QObject *options);
+
+  /// \brief
+  ///   Removes a series options object from the list.
+  ///
+  /// When an object is removed, the empty spot is saved so it can be
+  /// used by the next object added.
+  ///
+  /// \param options The options object to remove.
   virtual void removeSeriesOptions(const QObject *options);
 
 private:

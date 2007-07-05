@@ -81,13 +81,47 @@ public:
 
   /// \name Setup Methods
   //@{
+  /// \brief
+  ///   Gets the legend model.
+  /// \return
+  ///   A pointer to the legend model.
   pqChartLegendModel *getModel() const {return this->Model;}
+
+  /// \brief
+  ///   Sets the legend model.
+  /// \param model The new legend model.
   void setModel(pqChartLegendModel *model);
 
+  /// \brief
+  ///   Gets the legend location.
+  /// \return
+  ///   The legend location.
   LegendLocation getLocation() const {return this->Location;}
+
+  /// \brief
+  ///   Sets the legend location.
+  ///
+  /// The chart uses the location to place the legend in the
+  /// appropriate place. The combination of location and flow
+  /// determine how the legend looks.
+  ///
+  /// \param location The new legend location.
   void setLocation(LegendLocation location);
 
+  /// \brief
+  ///   Gets the legend item flow.
+  /// \return
+  ///   The legend item flow.
   ItemFlow getFlow() const {return this->Flow;}
+
+  /// \brief
+  ///   Sets the legend item flow.
+  ///
+  /// The flow is used to determine the layout direction of the
+  /// legend entries. Depending on the location, the same flow type
+  /// can look different.
+  ///
+  /// \param flow The new item flow.
   void setFlow(ItemFlow flow);
   //@}
 
@@ -111,8 +145,19 @@ public slots:
   void reset();
 
 protected slots:
+  /// \brief
+  ///   Inserts a new entry in the legend.
+  /// \param index Where to insert the entry.
   void insertEntry(int index);
+
+  /// \brief
+  ///   Starts the entry removal process.
+  /// \param index The entry being removed.
   void startEntryRemoval(int index);
+
+  /// \brief
+  ///   Finishes the entry removal process.
+  /// \param index The entry that was removed.
   void finishEntryRemoval(int index);
 
 protected:

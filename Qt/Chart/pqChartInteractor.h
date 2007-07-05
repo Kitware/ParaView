@@ -54,12 +54,16 @@ class QWheelEvent;
 /*!
  *  \class pqChartInteractor
  *  \brief
- *    The pqChartInteractor class is used to interact with chart.
+ *    The pqChartInteractor class is used to interact with a chart.
+ *
+ *  The contents space and mouse box object used by the chart are
+ *  shared among the mouse functions. The contents space object is
+ *  used to convert widget coordinates to contents coordinates. It is
+ *  also used to pan and zoom the contents. The chart uses the mouse
+ *  box to draw a dashed rectangle on top of the chart. Mouse
+ *  functions can use this rectangle for selection or zooming.
  * 
- *  The chart can be zoomed in and out. The axes can be zoomed
- *  independently as well. The zoom factors and viewport location can
- *  be set programatically. The user can use the mouse and keyboard
- *  to zoom and pan. The keyboard shortcuts are as follows:
+ *  The keyboard shortcuts are as follows:
  *  \code
  *  Plus...................Zoom in.
  *  Minus..................Zoom out.
@@ -74,63 +78,174 @@ class QWheelEvent;
  *  Alt+Left...............Go to previous view in the history.
  *  Alt+Right..............Go to next view in the history.
  *  \endcode
- * 
- *  Based on the interaction mode, the histogram can highlight values
- *  or bins. When switching between selection modes, the current
- *  selection will be erased. This prevents errors when combining bin
- *  and value selection. When calling any of the selection methods,
- *  the selection mode will be maintained. If you try to set a value
- *  selection during bin mode, it will be ignored.
  */
 class QTCHART_EXPORT pqChartInteractor : public QObject
 {
   Q_OBJECT
 
 public:
+  /// \brief
+  ///   Creates a chart interactor instance.
+  /// \param parent The parent object.
   pqChartInteractor(QObject *parent=0);
   virtual ~pqChartInteractor();
 
   /// \name Setup Methods
   //@{
+  /// \brief
+  ///   Gets the chart's contents space object.
+  /// \return
+  ///   A pointer to the chart's contents space object.
   pqChartContentsSpace *getContentsSpace() const {return this->Contents;}
+
+  /// \brief
+  ///   Sets the contents space object used by the chart.
+  /// \param space The chart's contents space object.
   void setContentsSpace(pqChartContentsSpace *space);
 
+  /// \brief
+  ///   Gets the chart's mouse box object.
+  /// \return
+  ///   A pointer to the chart's mouse box object.
   pqChartMouseBox *getMouseBox() const {return this->MouseBox;}
+
+  /// \brief
+  ///   Sets the mouse box object used by the chart.
+  /// \param box The chart's mouse box object.
   void setMouseBox(pqChartMouseBox *box);
   //@}
 
   /// \name Configuration Methods
   //@{
+  /// \brief
+  ///   Sets the given function on the indicated mouse button.
+  ///
+  /// This method clears any functions currently assigned to the
+  /// given button before adding the new function.
+  ///
+  /// \param function The mouse function to add.
+  /// \param button The mouse button to assign the function to.
+  /// \param modifiers The keyboard modifiers used to activate the
+  ///   function.
   void setFunction(pqChartMouseFunction *function, Qt::MouseButton button,
       Qt::KeyboardModifiers modifiers=Qt::NoModifier);
+
+  /// \brief
+  ///   Adds the given function to the indicated mouse button.
+  ///
+  /// If the new function is not combinable, it will be added to its
+  /// own interaction mode. If the function is combinable, it is
+  /// added to the first mode that does not have the given modifiers.
+  ///
+  /// \param function The mouse function to add.
+  /// \param button The mouse button to assign the function to.
+  /// \param modifiers The keyboard modifiers used to activate the
+  ///   function.
   void addFunction(pqChartMouseFunction *function, Qt::MouseButton button,
       Qt::KeyboardModifiers modifiers=Qt::NoModifier);
+
+  /// \brief
+  ///   Removes the given function from its assigned button.
+  /// \param function The mouse function to remove.
   void removeFunction(pqChartMouseFunction *function);
+
+  /// \brief
+  ///   Removes all the functions assigned to the given button.
+  /// \param button The mouse button to clear.
   void removeFunctions(Qt::MouseButton button);
+
+  /// Removes all the functions from all the buttons.
   void removeAllFunctions();
 
+  /// \brief
+  ///   Gets the number of modes on a mouse button.
+  /// \param button The mouse button.
+  /// \return
+  ///   The number of modes on a mouse button.
   int getNumberOfModes(Qt::MouseButton button) const;
+
+  /// \brief
+  ///   Gets the current mode for the given button.
+  /// \param button The mouse button.
+  /// \return
+  ///   The current mode for the given button.
   int getMode(Qt::MouseButton button) const;
+
+  /// \brief
+  ///   Sets the current mode for the given button.
+  /// \param button The mouse button.
+  /// \param index The new interaction mode.
   void setMode(Qt::MouseButton button, int index);
   //@}
 
   /// \name Interaction Methods
   //@{
+  /// \brief
+  ///   Handles the key press events for the chart.
+  /// \param e Event specific information.
   virtual bool keyPressEvent(QKeyEvent *e);
+
+  /// \brief
+  ///   Calls the appropriate function to handle the mouse press.
+  ///
+  /// The mouse button and that button's current mode are used to
+  /// determine the function to call. If a function on another button
+  /// owns the mouse, the event will be ignored.
+  ///
+  /// \param e Event specific information.
   virtual void mousePressEvent(QMouseEvent *e);
+
+  /// \brief
+  ///   Calls the appropriate function to handle the mouse move.
+  /// \param e Event specific information.
   virtual void mouseMoveEvent(QMouseEvent *e);
+
+  /// \brief
+  ///   Calls the appropriate function to handle the mouse release.
+  /// \param e Event specific information.
   virtual void mouseReleaseEvent(QMouseEvent *e);
+
+  /// \brief
+  ///   Calls the appropriate function to handle the double click.
+  /// \param e Event specific information.
   virtual void mouseDoubleClickEvent(QMouseEvent *e);
+
+  /// \brief
+  ///   Handles the mouse wheel events for the chart.
+  /// \param e Event specific information.
   virtual void wheelEvent(QWheelEvent *e);
   //@}
 
 signals:
+  /// Emitted when the entire chart needs to be repainted.
   void repaintNeeded();
+
+  /// \brief
+  ///   Emitted when the chart needs to be repainted.
+  /// \param area The area that needs to be repainted. The area should
+  ///   be in widget coordinates.
   void repaintNeeded(const QRect &area);
+
+  /// \brief
+  ///   Emitted when the mouse cursor needs to be changed.
+  /// \param cursor The new cursor to use.
   void cursorChangeRequested(const QCursor &cursor);
 
 private slots:
+  /// \brief
+  ///   Called to begin a new mouse state.
+  ///
+  /// Only one mouse function can own the mouse at one time.
+  ///
+  /// \param owner The mouse function requesting the mouse state.
   void beginState(pqChartMouseFunction *owner);
+
+  /// \brief
+  ///   Called to end the current mouse state.
+  ///
+  /// Only the current owner should end the current state.
+  ///
+  /// \param owner The mouse function releasing the mouse state.
   void endState(pqChartMouseFunction *owner);
 
 private:

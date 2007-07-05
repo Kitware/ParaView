@@ -55,7 +55,7 @@ class QTCHART_EXPORT pqLineChartOptions : public QObject
   Q_OBJECT
 
 public:
-  /// \breif
+  /// \brief
   ///   Creates a line chart options instance.
   /// \param parent The parent object.
   pqLineChartOptions(QObject *parent=0);
@@ -72,7 +72,7 @@ public:
   /// \param manager The new series color manager.
   void setSeriesColorManager(pqChartSeriesColorManager *manager);
 
-  /// \breif
+  /// \brief
   ///   Gets the options generator.
   /// \return
   ///   A pointer to the options generator.
@@ -138,7 +138,7 @@ signals:
   /// Emitted when the drawing options for a series change.
   void optionsChanged();
 
-  /// \breif
+  /// \brief
   ///   Emitted when generating new series options.
   ///
   /// This signal gives the observer an opportunity to modify the
