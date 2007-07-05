@@ -65,6 +65,7 @@ SET(PY_TESTS_NO_BASELINE
   ProgrammableFilter
   ProxyManager
   SMPropertyAdaptor
+  VRMLSource
 )
 
 IF (PVServerManagerTestData)

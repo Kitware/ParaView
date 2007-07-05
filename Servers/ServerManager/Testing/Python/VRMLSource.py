@@ -1,0 +1,72 @@
+# Test the vtkVRMLSource and fetching multi-group data.
+
+import SMPythonTesting
+import os
+import os.path
+import sys
+import paraview
+
+SMPythonTesting.ProcessCommandLineArguments()
+
+paraview.ActiveConnection = paraview.Connect()
+
+file1 = os.path.join(SMPythonTesting.DataDir, "Data/bot2.wrl")
+reader = paraview.CreateProxy("sources", "vrmlreader")
+reader.GetProperty("FileName").SetElement(0, file1)
+reader.UpdateVTKObjects()
+readerOutput = paraview.Fetch(reader)
+if readerOutput.GetClassName() != "vtkMultiGroupDataSet":
+    print "ERROR: Wrong dataset type returned."
+    sys.exit(1)
+
+if readerOutput.GetNumberOfPoints() != 337:
+    print "ERROR: Wrong number of points returned."
+    sys.exit(1)
+
+if readerOutput.GetNumberOfGroups() != 1:
+    print "ERROR: Wrong number of groups returned."
+    sys.exit(1)
+
+if readerOutput.GetNumberOfDataSets(0) != 1:
+    print "ERROR: Wrong number of groups returned."
+    sys.exit(1)
+
+ds0 = readerOutput.GetDataSet(0,0)
+
+if ds0.GetClassName() != "vtkPolyData":
+    print "ERROR: Wrong dataset type returned for dataset (0, 0)."
+    sys.exit(1)
+
+if ds0.GetNumberOfPoints() != 337:
+    print "ERROR: Wrong number of points returned for dataset (0, 0)."
+    sys.exit(1)
+
+if ds0.GetNumberOfCells() != 486:
+    print "ERROR: Wrong number of cells returned for dataset (0, 0)."
+    sys.exit(1)
+
+colorArray = ds0.GetPointData().GetArray("VRMLColor")
+
+if colorArray.GetRange(0)[0] != 8.0:
+    print "ERROR: Wrong minimum value for component 0 of VRMLColor."
+    sys.exit(1)
+
+if colorArray.GetRange(0)[1] != 255.0:
+    print "ERROR: Wrong maximum value for component 0 of VRMLColor."
+    sys.exit(1)
+
+if colorArray.GetRange(1)[0] != 8.0:
+    print "ERROR: Wrong minimum value for component 1 of VRMLColor."
+    sys.exit(1)
+
+if colorArray.GetRange(1)[1] != 255.0:
+    print "ERROR: Wrong maximum value for component 1 of VRMLColor."
+    sys.exit(1)
+
+if colorArray.GetRange(2)[0] != 26.0:
+    print "ERROR: Wrong minimum value for component 2 of VRMLColor."
+    sys.exit(1)
+
+if colorArray.GetRange(2)[1] != 255.0:
+    print "ERROR: Wrong maximum value for component 2 of VRMLColor."
+    sys.exit(1)
