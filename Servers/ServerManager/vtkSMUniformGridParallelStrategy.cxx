@@ -22,7 +22,7 @@
 #include "vtkMPIMoveData.h"
 
 vtkStandardNewMacro(vtkSMUniformGridParallelStrategy);
-vtkCxxRevisionMacro(vtkSMUniformGridParallelStrategy, "1.3");
+vtkCxxRevisionMacro(vtkSMUniformGridParallelStrategy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMUniformGridParallelStrategy::vtkSMUniformGridParallelStrategy()
 {
@@ -78,7 +78,7 @@ void vtkSMUniformGridParallelStrategy::EndCreateVTKObjects()
           << vtkClientServerStream::LastResult
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, 
-    vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER_ROOT, stream);
+    vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
   // Collect filter needs the MPIMToNSocketConnection to communicate between
   // render server and data server nodes.

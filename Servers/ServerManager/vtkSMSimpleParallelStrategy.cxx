@@ -39,7 +39,7 @@ inline int vtkSMSimpleParallelStrategyGetInt(vtkSMProxy* proxy,
 }
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.8");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
@@ -212,7 +212,7 @@ void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
           << vtkClientServerStream::LastResult
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, 
-    vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER_ROOT, stream);
+    vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
   // Collect filter needs the MPIMToNSocketConnection to communicate between
   // render server and data server nodes.
@@ -418,6 +418,38 @@ void vtkSMSimpleParallelStrategy::ProcessViewInformation()
     }
 
   this->Superclass::ProcessViewInformation();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSimpleParallelStrategy::GatherInformation(vtkPVDataInformation* info)
+{
+  if (this->GetUseCompositing())
+    {
+    this->UpdateSuppressor->SetServers(vtkProcessModule::RENDER_SERVER);
+    }
+  
+  this->Superclass::GatherInformation(info);
+
+  if (this->GetUseCompositing())
+    {
+    this->UpdateSuppressor->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSimpleParallelStrategy::GatherLODInformation(vtkPVDataInformation* info)
+{
+  if (this->GetUseCompositing())
+    {
+    this->UpdateSuppressorLOD->SetServers(vtkProcessModule::RENDER_SERVER);
+    }
+
+  this->Superclass::GatherLODInformation(info);
+
+  if (this->GetUseCompositing())
+    {
+    this->UpdateSuppressorLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+    }
 }
 
 //----------------------------------------------------------------------------

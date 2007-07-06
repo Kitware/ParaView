@@ -16,7 +16,8 @@
 // .SECTION Description
 // This object collects information about the geometry filters
 // output.  It is almost the same as the superclass vtkPVDatainformation
-// but the geometry filter is passed in instead of the data object.
+// but the geometry filter (or update suppressor) 
+// is passed in instead of the data object.
 
 #ifndef __vtkPVGeometryInformation_h
 #define __vtkPVGeometryInformation_h

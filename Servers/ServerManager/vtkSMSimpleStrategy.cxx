@@ -23,7 +23,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.9");
+vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMSimpleStrategy::vtkSMSimpleStrategy()
 {
@@ -123,15 +123,21 @@ void vtkSMSimpleStrategy::CreateLODPipeline(vtkSMSourceProxy* input, int outputp
 //----------------------------------------------------------------------------
 void vtkSMSimpleStrategy::GatherInformation(vtkPVDataInformation* info)
 {
-  info->AddInformation(
-    this->UpdateSuppressor->GetDataInformation(0, false));
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->GatherInformation(this->ConnectionID,
+    this->UpdateSuppressor->GetServers(),
+    info,
+    this->UpdateSuppressor->GetID());
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSimpleStrategy::GatherLODInformation(vtkPVDataInformation* info)
 {
-  info->AddInformation(
-    this->UpdateSuppressorLOD->GetDataInformation(0, false));
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->GatherInformation(this->ConnectionID,
+    this->UpdateSuppressorLOD->GetServers(),
+    info,
+    this->UpdateSuppressorLOD->GetID());
 }
 
 //----------------------------------------------------------------------------

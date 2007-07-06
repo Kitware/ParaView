@@ -58,6 +58,16 @@ protected:
   virtual void CreateLODPipeline(vtkSMSourceProxy* input, int outputport);
 
   // Description:
+  // Gather the information of the displayed data
+  // for the current update state of the data pipeline (non-LOD).
+  virtual void GatherInformation(vtkPVDataInformation*);
+
+  // Description:
+  // Gather the information of the displayed data
+  // for the current update state of the LOD pipeline.
+  virtual void GatherLODInformation(vtkPVDataInformation*);
+
+  // Description:
   // Update the LOD pipeline.
   // Overridden to pass correct collection decision to the Collect filter
   // based on UseCompositing flag.

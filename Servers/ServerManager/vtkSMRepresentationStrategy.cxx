@@ -18,13 +18,13 @@
 #include "vtkInformation.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVDataInformation.h"
+#include "vtkPVGeometryInformation.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.11");
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.12");
 //----------------------------------------------------------------------------
 vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 {
@@ -36,12 +36,12 @@ vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
   this->EnableCaching = true;
  
   this->LODDataValid = false;
-  this->LODInformation = vtkPVDataInformation::New();;
+  this->LODInformation = vtkPVGeometryInformation::New();;
   this->LODInformationValid = false;
   this->LODResolution = 50;
 
   this->DataValid = false;
-  this->Information = vtkPVDataInformation::New();
+  this->Information = vtkPVGeometryInformation::New();
   this->InformationValid = false;
 
   vtkMemberFunctionCommand<vtkSMRepresentationStrategy>* command =
@@ -140,8 +140,7 @@ vtkPVDataInformation* vtkSMRepresentationStrategy::GetLODDataInformation()
   if (!this->LODInformationValid)
     {
     this->LODInformationValid = true;
-    this->LODInformation->Delete();
-    this->LODInformation = vtkPVDataInformation::New();
+    this->LODInformation->Initialize();
     this->GatherLODInformation(this->LODInformation);
     }
   return this->LODInformation;
@@ -153,8 +152,7 @@ vtkPVDataInformation* vtkSMRepresentationStrategy::GetFullResDataInformation()
   if (!this->InformationValid)
     {
     this->InformationValid = true;
-    this->Information->Delete();
-    this->Information = vtkPVDataInformation::New();
+    this->Information->Initialize();
     this->GatherInformation(this->Information);
     }
 

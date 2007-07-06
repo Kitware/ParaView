@@ -13,12 +13,14 @@
 
 =========================================================================*/
 #include "vtkPVGeometryInformation.h"
-#include "vtkPVGeometryFilter.h"
-#include "vtkPolyData.h"
+
 #include "vtkObjectFactory.h"
+#include "vtkPolyData.h"
+#include "vtkPVGeometryFilter.h"
+#include "vtkPVUpdateSuppressor.h"
 
 vtkStandardNewMacro(vtkPVGeometryInformation);
-vtkCxxRevisionMacro(vtkPVGeometryInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVGeometryInformation, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVGeometryInformation::vtkPVGeometryInformation()
@@ -45,6 +47,14 @@ void vtkPVGeometryInformation::CopyFromObject(vtkObject* object)
     this->Superclass::CopyFromObject(gf->GetOutput());
     return;
     }
+
+  vtkPVUpdateSuppressor* us = vtkPVUpdateSuppressor::SafeDownCast(object);
+  if (us)
+    {
+    this->Superclass::CopyFromObject(us->GetOutput());
+    return;
+    }
+
 
   vtkErrorMacro("Cound not cast object to geometry filter.");
 }
