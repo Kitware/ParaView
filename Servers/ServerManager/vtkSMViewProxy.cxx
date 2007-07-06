@@ -123,7 +123,7 @@ void vtkSMViewProxy::CleanMultiViewInitializer()
 }
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.16");
 
 vtkInformationKeyMacro(vtkSMViewProxy, USE_CACHE, Integer);
 vtkInformationKeyMacro(vtkSMViewProxy, CACHE_TIME, Double);
@@ -156,6 +156,8 @@ vtkSMViewProxy::vtkSMViewProxy()
 
   this->Information->Set(USE_CACHE(), this->UseCache);
   this->Information->Set(CACHE_TIME(), this->CacheTime);
+
+  this->InRender = false;
 }
 
 //----------------------------------------------------------------------------
@@ -361,6 +363,12 @@ void vtkSMViewProxy::EndInteractiveRender()
 //----------------------------------------------------------------------------
 void vtkSMViewProxy::StillRender()
 {
+  if (this->InRender)
+    {
+    return;
+    }
+
+  this->InRender = true;
   // Ensure that all representation pipelines are updated.
   this->UpdateAllRepresentations();
 
@@ -373,11 +381,18 @@ void vtkSMViewProxy::StillRender()
     }
   this->PerformRender();
   this->EndStillRender();
+  this->InRender = false;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMViewProxy::InteractiveRender()
 {
+  if (this->InRender)
+    {
+    return;
+    }
+
+  this->InRender = true;
   // Ensure that all representation pipelines are updated.
   this->UpdateAllRepresentations();
 
@@ -391,6 +406,7 @@ void vtkSMViewProxy::InteractiveRender()
     }
   this->PerformRender();
   this->EndInteractiveRender();
+  this->InRender = false;
 }
 
 //----------------------------------------------------------------------------

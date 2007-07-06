@@ -304,6 +304,8 @@ private:
 
   double CacheTime;
   int UseCache;
+
+  bool InRender; // used to avoid render call while a render is in progress.
 //ETX
 };
 

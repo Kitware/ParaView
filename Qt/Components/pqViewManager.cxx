@@ -558,8 +558,6 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqView* view)
       frame->removeTitlebarAction(backAction);
       delete backAction;
       }
-
-
     }
 
   this->Internal->PendingFrames.push_back(frame);
@@ -574,6 +572,7 @@ void pqViewManager::onViewAdded(pqView* view)
     return;
     }
   this->assignFrame(view);
+  this->updateViewPositions();
 }
 
 //-----------------------------------------------------------------------------
