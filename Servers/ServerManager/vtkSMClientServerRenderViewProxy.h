@@ -15,8 +15,7 @@
 // .NAME vtkSMClientServerRenderViewProxy
 // .SECTION Description
 // Render View that can be used in client server configurations.
-// Note that this class mirrors the API of vtkSMIceTDesktopRenderViewProxy. The
-// implementaion (i.e. cxx file) for both the classes is infact the same.
+// Note that this class mirrors the API of vtkSMIceTDesktopRenderViewProxy.
 
 
 #ifndef __vtkSMClientServerRenderViewProxy_h
