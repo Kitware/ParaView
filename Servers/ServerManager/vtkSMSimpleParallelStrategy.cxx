@@ -39,7 +39,7 @@ inline int vtkSMSimpleParallelStrategyGetInt(vtkSMProxy* proxy,
 }
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.9");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
@@ -423,6 +423,9 @@ void vtkSMSimpleParallelStrategy::ProcessViewInformation()
 //----------------------------------------------------------------------------
 void vtkSMSimpleParallelStrategy::GatherInformation(vtkPVDataInformation* info)
 {
+  // When compositing is enabled, data is available at the update suppressors on
+  // the render server (not the client), hence we change the server flag so that
+  // the data is gathered from the correct server.
   if (this->GetUseCompositing())
     {
     this->UpdateSuppressor->SetServers(vtkProcessModule::RENDER_SERVER);
@@ -439,6 +442,9 @@ void vtkSMSimpleParallelStrategy::GatherInformation(vtkPVDataInformation* info)
 //----------------------------------------------------------------------------
 void vtkSMSimpleParallelStrategy::GatherLODInformation(vtkPVDataInformation* info)
 {
+  // When compositing is enabled, data is available at the update suppressors on
+  // the render server (not the client), hence we change the server flag so that
+  // the data is gathered from the correct server.
   if (this->GetUseCompositing())
     {
     this->UpdateSuppressorLOD->SetServers(vtkProcessModule::RENDER_SERVER);

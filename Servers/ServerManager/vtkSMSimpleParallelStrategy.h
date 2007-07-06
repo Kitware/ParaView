@@ -60,11 +60,17 @@ protected:
   // Description:
   // Gather the information of the displayed data
   // for the current update state of the data pipeline (non-LOD).
+  // Overridden to update the server flag to ensure that the information is
+  // collected from  the update suppressor that has valid data depending upon
+  // the state of compositing flag.
   virtual void GatherInformation(vtkPVDataInformation*);
 
   // Description:
   // Gather the information of the displayed data
   // for the current update state of the LOD pipeline.
+  // Overridden to update the server flag to ensure that the information is
+  // collected from  the update suppressor that has valid data depending upon
+  // the state of compositing flag.
   virtual void GatherLODInformation(vtkPVDataInformation*);
 
   // Description:
