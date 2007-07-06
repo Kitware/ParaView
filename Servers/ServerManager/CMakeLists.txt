@@ -9,7 +9,6 @@ IF(NOT WIN32)
 ENDIF(NOT WIN32)
 
 SET(Kit_SRCS
-  vtkSMProxyManager.cxx
   vtkSMAbstractDisplayProxy.cxx
   vtkSMAbstractViewModuleProxy.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
@@ -25,6 +24,7 @@ SET(Kit_SRCS
   vtkSMArraySelectionDomain.cxx
   vtkSMArraySelectionInformationHelper.cxx
   vtkSMAxesProxy.cxx
+  vtkSMAxesRepresentationProxy.cxx
   vtkSMBooleanDomain.cxx
   vtkSMBooleanKeyFrameProxy.cxx
   vtkSMBoundsDomain.cxx
@@ -34,7 +34,11 @@ SET(Kit_SRCS
   vtkSMCameraManipulatorProxy.cxx
   vtkSMCameraProxy.cxx
   vtkSMCaveRenderModuleProxy.cxx
+  vtkSMClientDeliveryRepresentationProxy.cxx
+  vtkSMClientDeliveryStrategyProxy.cxx
   vtkSMClientServerRenderModuleProxy.cxx
+  vtkSMClientServerRenderSyncManagerHelper.cxx
+  vtkSMClientServerRenderViewProxy.cxx
   vtkSMCompositeDisplayProxy.cxx
   vtkSMCompositeKeyFrameProxy.cxx
   vtkSMCompositeRenderModuleProxy.cxx
@@ -42,7 +46,9 @@ SET(Kit_SRCS
   vtkSMCompoundProxyDefinitionLoader.cxx
   vtkSMConnectionCleanerProxy.cxx
   vtkSMConsumerDisplayProxy.cxx
+  vtkSMCubeAxesDisplayProxy.cxx
   vtkSMDataObjectDisplayProxy.cxx
+  vtkSMDataRepresentationProxy.cxx
   vtkSMDataTypeDomain.cxx
   vtkSMDisplayProxy.cxx
   vtkSMDocumentation.cxx
@@ -60,85 +66,106 @@ SET(Kit_SRCS
   vtkSMFileListDomain.cxx
   vtkSMFixedTypeDomain.cxx
   vtkSMGenericViewDisplayProxy.cxx
+  vtkSMIceTCompositeViewProxy.cxx
   vtkSMIceTDesktopRenderModuleProxy.cxx
+  vtkSMIceTDesktopRenderViewProxy.cxx
   vtkSMIceTMultiDisplayProxy.cxx
   vtkSMIceTRenderModuleProxy.cxx
   vtkSMIdTypeVectorProperty.cxx
   vtkSMImplicitPlaneProxy.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMInformationHelper.cxx
-  vtkSMInteractionUndoStackBuilder.cxx
   vtkSMInputArrayDomain.cxx
   vtkSMInputProperty.cxx
   vtkSMIntArrayInformationHelper.cxx
+  vtkSMInteractionUndoStackBuilder.cxx
   vtkSMIntRangeDomain.cxx
   vtkSMIntVectorProperty.cxx
-  vtkSMKeyFrameProxy.cxx
   vtkSMKeyFrameAnimationCueManipulatorProxy.cxx
+  vtkSMKeyFrameProxy.cxx
   vtkSMLinearAnimationCueManipulatorProxy.cxx
   vtkSMLink.cxx
-  vtkSMLookupTableProxy.cxx
   vtkSMLODDisplayProxy.cxx
   vtkSMLODRenderModuleProxy.cxx
+  vtkSMLookupTableProxy.cxx
   vtkSMMaterialLoaderProxy.cxx
   vtkSMMultiDisplayProxy.cxx
+  vtkSMMultiProcessRenderView.cxx
   vtkSMMultiViewRenderModuleProxy.cxx
   vtkSMNew3DWidgetProxy.cxx
+  vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMNullProxy.cxx
   vtkSMNumberOfGroupsDomain.cxx
   vtkSMNumberOfPartsDomain.cxx
   vtkSMObject.cxx
   vtkSMOrderedPropertyIterator.cxx
-  vtkSMPVDWriterProxy.cxx
+  vtkSMOutlineRepresentationProxy.cxx
   vtkSMPart.cxx
   vtkSMPluginLoader.cxx
-  vtkSMProperty.cxx
+  vtkSMPointLabelDisplayProxy.cxx
+  vtkSMPQStateLoader.cxx
   vtkSMPropertyAdaptor.cxx
+  vtkSMProperty.cxx
   vtkSMPropertyIterator.cxx
   vtkSMPropertyLink.cxx
   vtkSMPropertyModificationUndoElement.cxx
   vtkSMPropertyStatusManager.cxx
+  vtkSMPropRepresentationProxy.cxx
   vtkSMProxy.cxx
   vtkSMProxyDefinitionIterator.cxx
   vtkSMProxyGroupDomain.cxx
   vtkSMProxyIterator.cxx
   vtkSMProxyLink.cxx
   vtkSMProxyListDomain.cxx
+  vtkSMProxyManager.cxx
   vtkSMProxyManagerReviver.cxx
   vtkSMProxyProperty.cxx
   vtkSMProxyRegisterUndoElement.cxx
   vtkSMProxyUnRegisterUndoElement.cxx
-  vtkSMPVLookupTableProxy.cxx
-  vtkSMPQStateLoader.cxx
   vtkSMPVAnimationSceneProxy.cxx
+  vtkSMPVDWriterProxy.cxx
+  vtkSMPVLookupTableProxy.cxx
+  vtkSMPVRepresentationProxy.cxx
   vtkSMPWriterProxy.cxx
   vtkSMRampKeyFrameProxy.cxx
   vtkSMRenderModuleProxy.cxx
+  vtkSMRenderViewProxy.cxx
+  vtkSMRepresentationProxy.cxx
+  vtkSMRepresentationStrategy.cxx
   vtkSMScalarBarActorProxy.cxx
   vtkSMScalarBarWidgetProxy.cxx
+  vtkSMScalarBarWidgetRepresentationProxy.cxx
   vtkSMSelectionHelper.cxx
 #  vtkSMSelectionProxy.cxx
+  vtkSMSelectionRepresentationProxy.cxx
   vtkSMServerFileListingProxy.cxx
   vtkSMServerProxyManagerReviver.cxx
   vtkSMServerSideAnimationPlayer.cxx
-  vtkSMSimpleIntInformationHelper.cxx
-  vtkSMSinusoidKeyFrameProxy.cxx
   vtkSMSimpleDoubleInformationHelper.cxx
+  vtkSMSimpleIntInformationHelper.cxx
+  vtkSMSimpleParallelStrategy.cxx
   vtkSMSimpleRenderModuleProxy.cxx
+  vtkSMSimpleStrategy.cxx
   vtkSMSimpleStringInformationHelper.cxx
+  vtkSMSinusoidKeyFrameProxy.cxx
   vtkSMSourceProxy.cxx
-  vtkSMStateLoader.cxx
   vtkSMStateLoaderBase.cxx
+  vtkSMStateLoader.cxx
+  vtkSMStateVersionControllerBase.cxx
+  vtkSMStateVersionController.cxx
   vtkSMStringArrayHelper.cxx
   vtkSMStringListDomain.cxx
   vtkSMStringListRangeDomain.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMSubPropertyIterator.cxx
   vtkSMSummaryHelperProxy.cxx
+  vtkSMSurfaceRepresentationProxy.cxx
 #  vtkSMTemporalXYPlotDisplayProxy.cxx
   vtkSMTesting.cxx
   vtkSMTextDisplayProxy.cxx
+  vtkSMTextSourceRepresentationProxy.cxx
   vtkSMTextWidgetDisplayProxy.cxx
+  vtkSMTextWidgetRepresentationProxy.cxx
   vtkSMTimeRangeInformationHelper.cxx
   vtkSMTimeStepsInformationHelper.cxx
   vtkSMTransformProxy.cxx
@@ -146,49 +173,21 @@ SET(Kit_SRCS
   vtkSMUndoRedoStateLoader.cxx
   vtkSMUndoStackBuilder.cxx
   vtkSMUndoStack.cxx
+  vtkSMUniformGridParallelStrategy.cxx
+  vtkSMUniformGridVolumeRepresentationProxy.cxx
+  vtkSMUnstructuredGridParallelStrategy.cxx
+  vtkSMUnstructuredGridVolumeRepresentationProxy.cxx
   vtkSMUpdateInformationUndoElement.cxx
   vtkSMUpdateSuppressorProxy.cxx
-#  vtkSMXDMFInformationHelper.cxx
-#  vtkSMXDMFPropertyDomain.cxx
   vtkSMVectorProperty.cxx
   vtkSMViewModuleProxy.cxx
+  vtkSMViewProxy.cxx
   vtkSMWidgetRepresentationProxy.cxx
   vtkSMWriterProxy.cxx
-  vtkSMPointLabelDisplayProxy.cxx
-  vtkSMCubeAxesDisplayProxy.cxx
+#  vtkSMXDMFInformationHelper.cxx
+#  vtkSMXDMFPropertyDomain.cxx
   vtkSMXMLPVAnimationWriterProxy.cxx
   vtkSMXYPlotActorProxy.cxx
-
-  vtkSMAxesRepresentationProxy.cxx
-  vtkSMClientDeliveryRepresentationProxy.cxx
-  vtkSMClientDeliveryStrategyProxy.cxx
-  vtkSMDataRepresentationProxy.cxx
-  vtkSMIceTCompositeViewProxy.cxx
-  vtkSMIceTDesktopRenderViewProxy.cxx
-  vtkSMNewWidgetRepresentationProxy.cxx
-  vtkSMOutlineRepresentationProxy.cxx
-  vtkSMPropRepresentationProxy.cxx
-  vtkSMPVRepresentationProxy.cxx
-  vtkSMRenderViewProxy.cxx
-  vtkSMRepresentationProxy.cxx
-  vtkSMRepresentationStrategy.cxx
-  vtkSMScalarBarWidgetRepresentationProxy.cxx
-  vtkSMSelectionRepresentationProxy.cxx
-  vtkSMSimpleParallelStrategy.cxx
-  vtkSMSimpleStrategy.cxx
-  vtkSMSurfaceRepresentationProxy.cxx
-  vtkSMTextSourceRepresentationProxy.cxx
-  vtkSMTextWidgetRepresentationProxy.cxx
-  vtkSMUniformGridVolumeRepresentationProxy.cxx
-  vtkSMUnstructuredGridVolumeRepresentationProxy.cxx
-  vtkSMUnstructuredGridParallelStrategy.cxx
-  vtkSMViewProxy.cxx
-  vtkSMUniformGridParallelStrategy.cxx
-  vtkSMStateVersionController.cxx
-  vtkSMStateVersionControllerBase.cxx
-  vtkSMClientServerRenderViewProxy.cxx
-  vtkSMMultiProcessRenderView.cxx
-  vtkSMClientServerRenderSyncManagerHelper.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS

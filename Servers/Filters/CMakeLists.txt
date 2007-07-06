@@ -39,6 +39,7 @@ SET(Filters_SRCS
   vtkMinMax.cxx
   vtkMPICompositeManager.cxx
   vtkMPIMoveData.cxx
+  vtkMultiViewManager.cxx
   vtkNetworkImageSource.cxx
   vtkOrderedCompositeDistributor.cxx
   vtkPExtractHistogram.cxx
@@ -79,8 +80,8 @@ SET(Filters_SRCS
   vtkPVServerObject.cxx
   vtkPVServerSelectTimeSet.cxx
   vtkPVServerTimeSteps.cxx
-  vtkPVStringArrayHelper.cxx
 #  vtkPVServerXDMFParameters.cxx
+  vtkPVStringArrayHelper.cxx
   vtkPVSummaryHelper.cxx
   vtkPVTextSource.cxx
   vtkPVTrackballMoveActor.cxx
@@ -92,10 +93,10 @@ SET(Filters_SRCS
   vtkPVVisibleCellSelector.cxx
   vtkReductionFilter.cxx
 #  vtkSelectInputs.cxx
-  vtkSpyPlotReader.cxx
   vtkSpyPlotBlock.cxx
   vtkSpyPlotBlockIterator.cxx
   vtkSpyPlotIStream.cxx
+  vtkSpyPlotReader.cxx
   vtkSpyPlotReaderMap.cxx
   vtkSpyPlotUniReader.cxx
   vtkSquirtCompressor.cxx
@@ -105,13 +106,13 @@ SET(Filters_SRCS
 #  vtkTemporalProbeFilter.cxx
   vtkTimeToTextConvertor.cxx
   vtkTrackballPan.cxx
-  vtkTransferFunctionEditorRepresentation.cxx
   vtkTransferFunctionEditorRepresentation1D.cxx
+  vtkTransferFunctionEditorRepresentation.cxx
   vtkTransferFunctionEditorRepresentationShapes1D.cxx
   vtkTransferFunctionEditorRepresentationShapes2D.cxx
   vtkTransferFunctionEditorRepresentationSimple1D.cxx
-  vtkTransferFunctionEditorWidget.cxx
   vtkTransferFunctionEditorWidget1D.cxx
+  vtkTransferFunctionEditorWidget.cxx
   vtkTransferFunctionEditorWidgetShapes1D.cxx
   vtkTransferFunctionEditorWidgetShapes2D.cxx
   vtkTransferFunctionEditorWidgetSimple1D.cxx
@@ -121,7 +122,6 @@ SET(Filters_SRCS
   vtkXMLCollectionReader.cxx
   vtkXMLPVAnimationWriter.cxx
   vtkXMLPVDWriter.cxx
-  vtkMultiViewManager.cxx
   )
 
 SET_SOURCE_FILES_PROPERTIES(
