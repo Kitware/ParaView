@@ -21,7 +21,6 @@ At the same time it tests that the animation playing does not affect the undo st
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
-  <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
