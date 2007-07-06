@@ -83,7 +83,8 @@ public:
     Filter,
     CustomFilter,
     Link,
-    LastType = Link
+    SourceOutputPort,
+    LastType = SourceOutputPort
     };
 
 public:
@@ -276,7 +277,7 @@ public slots:
   /// \param sink The sink object being connected.
   /// \sa pqPipelineModel::addConnection(pqPipelineModelSource *,
   ///   pqPipelineModelFilter *)
-  void addConnection(pqPipelineSource *source, pqPipelineSource *sink);
+  void addConnection(pqPipelineSource *source, pqPipelineSource *sink, int srcOutputPort);
 
   /// \brief
   ///   Disconnects the source and sink.
@@ -284,7 +285,7 @@ public slots:
   /// \param sink The sink object being connected.
   /// \sa pqPipelineModel::removeConnection(pqPipelineModelSource *,
   ///   pqPipelineModelFilter *)
-  void removeConnection(pqPipelineSource *source, pqPipelineSource *sink);
+  void removeConnection(pqPipelineSource *source, pqPipelineSource *sink, int srcOutputPort);
   //@}
 
   /// \name Model Update Methods
@@ -374,7 +375,15 @@ private:
   /// \sa pqPipelineModel::removeConnection(pqPipelineModelSource *,
   ///   pqPipelineModelFilter *)
   void addConnection(pqPipelineModelSource *source,
-      pqPipelineModelFilter *sink);
+      pqPipelineModelFilter *sink, int srcOutputPort);
+
+  /// \brief adds the internal pipeline object to the model.
+  ///
+  /// Adds the source item under the server item to which the source belongs.
+  /// This assumes that the source has no input/output connections.
+  void addSource(pqPipelineModelSource* sourceItem);
+
+  void removeSource(pqPipelineModelSource* sourceItem);
 
   /// \brief
   ///   Removes the connection of the internal pipeline objects.
@@ -390,7 +399,7 @@ private:
   /// \sa pqPipelineModel::addConnection(pqPipelineModelSource *,
   ///   pqPipelineModelFilter *)
   void removeConnection(pqPipelineModelSource *source,
-      pqPipelineModelFilter *sink);
+      pqPipelineModelFilter *sink, int srcOutputPort);
 
   /// \brief
   ///   Updates the display columns for sources displayed in the
@@ -402,6 +411,11 @@ private:
   ///   Notifies the view that the input link items have changed.
   /// \param sink The modified item.
   void updateInputLinks(pqPipelineModelFilter *sink, int column=0);
+
+  /// \brief
+  ///   Notifies the view that the output port items have changed.
+  /// \param source The modified item.
+  void updateOutputPorts(pqPipelineModelSource* source, int column=0);
 
   /// \brief
   ///   Gets the pipeline model item for the server manager model item.

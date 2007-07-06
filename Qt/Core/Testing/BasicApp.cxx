@@ -7,13 +7,14 @@
 
 #include <QVTKWidget.h>
 
-#include "pqMain.h"
-#include "pqProcessModuleGUIHelper.h"
-#include "pqServer.h"
-#include "pqRenderView.h"
 #include "pqApplicationCore.h"
-#include "pqObjectBuilder.h"
 #include "pqCoreTestUtility.h"
+#include "pqMain.h"
+#include "pqObjectBuilder.h"
+#include "pqPipelineSource.h"
+#include "pqProcessModuleGUIHelper.h"
+#include "pqRenderView.h"
+#include "pqServer.h"
 
 
 // our main window
@@ -40,7 +41,7 @@ public:
     elevation = ob->createFilter("filters", "ElevationFilter", source);
     
     // put the elevation in the window
-    ob->createDataRepresentation(elevation, this->RenderView);
+    ob->createDataRepresentation(elevation->getOutputPort(0), this->RenderView);
 
     // zoom to sphere
     this->RenderView->resetCamera();

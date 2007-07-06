@@ -195,10 +195,10 @@ public:
   vtkPVOpenGLExtensionsInformation* GetOpenGLExtensionsInformation();
 
   // Description:
-  // Create a default representation for the given source proxy.
+  // Create a default representation for the given output port of source proxy.
   // Returns a new proxy.
   virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
-    vtkSMProxy*);
+    vtkSMProxy*, int opport);
 
 //BTX
 protected:

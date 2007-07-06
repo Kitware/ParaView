@@ -214,6 +214,37 @@ void pqSMAdaptor::removeProxyProperty(vtkSMProperty* Property, pqSMProxy Value)
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqSMAdaptor::addInputProperty(vtkSMProperty* Property, 
+                               pqSMProxy Value, int opport)
+{
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(Property);
+  if (ip)
+    {
+    ip->AddInputConnection(Value, opport);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqSMAdaptor::setInputProperty(vtkSMProperty* Property, 
+                                   pqSMProxy Value, int opport)
+{
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(Property);
+  if (ip)
+    {
+    if (ip->GetNumberOfProxies() == 1)
+      {
+      ip->SetInputConnection(0, Value, opport);
+      }
+    else
+      {
+      ip->RemoveAllProxies();
+      ip->AddInputConnection(Value, opport);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqSMAdaptor::addProxyProperty(vtkSMProperty* Property, 
                                    pqSMProxy Value)
 {
@@ -224,6 +255,7 @@ void pqSMAdaptor::addProxyProperty(vtkSMProperty* Property,
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqSMAdaptor::setProxyProperty(vtkSMProperty* Property, 
                                    pqSMProxy Value)
 {

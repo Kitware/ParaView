@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqDataInformationModel.h"
+#include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServerManagerSelectionModel.h"
 
@@ -67,7 +68,15 @@ QModelIndex pqDataInformationModelSelectionAdaptor::mapFromSMModel(
 {
   const pqDataInformationModel* pM = qobject_cast<const pqDataInformationModel*>(
     this->getQModel());
-  return pM->getIndexFor(qobject_cast<pqPipelineSource*>(item));
+  
+  pqOutputPort* outputPort = qobject_cast<pqOutputPort*>(item);
+  if (outputPort)
+    {
+    return pM->getIndexFor(outputPort);
+    }
+
+  pqPipelineSource* src = qobject_cast<pqPipelineSource*>(item);
+  return pM->getIndexFor(src? src->getOutputPort(0) : 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -80,11 +89,11 @@ pqServerManagerModelItem* pqDataInformationModelSelectionAdaptor::mapToSMModel(
 }
 
 //-----------------------------------------------------------------------------
-QItemSelectionModel::SelectionFlag pqDataInformationModelSelectionAdaptor::qtSelectionFlags() const
+QItemSelectionModel::SelectionFlag 
+pqDataInformationModelSelectionAdaptor::qtSelectionFlags() const
 {
   return QItemSelectionModel::Rows;
 }
 
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 

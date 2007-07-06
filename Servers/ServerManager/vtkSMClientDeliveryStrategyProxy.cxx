@@ -24,7 +24,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryStrategyProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryStrategyProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMClientDeliveryStrategyProxy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryStrategyProxy::vtkSMClientDeliveryStrategyProxy()
 {
@@ -66,32 +66,34 @@ void vtkSMClientDeliveryStrategyProxy::BeginCreateVTKObjects()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMClientDeliveryStrategyProxy::CreatePipeline(vtkSMSourceProxy* input)
+void vtkSMClientDeliveryStrategyProxy::CreatePipeline(vtkSMSourceProxy* input,
+  int outputport)
 {
-  this->CreatePipelineInternal(input,
+  this->CreatePipelineInternal(input, outputport,
                                this->CollectProxy, 
                                this->UpdateSuppressor);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMClientDeliveryStrategyProxy::CreateLODPipeline(vtkSMSourceProxy* input)
+void vtkSMClientDeliveryStrategyProxy::CreateLODPipeline(vtkSMSourceProxy* input,
+  int outputport)
 {
-  this->Connect(input, this->LODDecimator);
-  this->CreatePipelineInternal(this->LODDecimator,
+  this->Connect(input, this->LODDecimator, "Input", outputport);
+  this->CreatePipelineInternal(this->LODDecimator, 0,
                                this->CollectLODProxy, 
                                this->UpdateSuppressorLOD);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMClientDeliveryStrategyProxy::CreatePipelineInternal(
-  vtkSMSourceProxy* input,
+  vtkSMSourceProxy* input, int outputport,
   vtkSMSourceProxy* collect,
   vtkSMSourceProxy* updatesuppressor)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
 
-  this->Connect(input, collect);
+  this->Connect(input, collect, "Input", outputport);
 
   // Now we need to set up some default parameters on these filters.
 
@@ -175,7 +177,7 @@ void vtkSMClientDeliveryStrategyProxy::UpdatePipelineInternal(
   if (input)
     {
     input->UpdatePipeline();
-    vtkPVDataInformation* inputInfo = input->GetDataInformation();
+    vtkPVDataInformation* inputInfo = input->GetDataInformation(this->OutputPort);
     int dataType = inputInfo->GetDataSetType();
     int cDataType = inputInfo->GetCompositeDataSetType();
     if (cDataType > 0)

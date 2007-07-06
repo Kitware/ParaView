@@ -33,19 +33,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Method gets called to set input when using Input property.
-  // Internally leads to a call to SetInput.
-  virtual void AddInput(unsigned int inputPort,
-                        vtkSMSourceProxy* input,
-                        unsigned int outputPort,
-                        const char* method);
-  virtual void AddInput(vtkSMSourceProxy* input, 
-                        const char* method)
-  {
-    this->AddInput(0, input, 0, method);
-  }
-
-  // Description:
   // Get the data that was collected to the client
   virtual vtkDataObject* GetOutput();
 
@@ -91,7 +78,6 @@ protected:
   // initialization.
   virtual bool EndCreateVTKObjects();
 
-  void SetInputInternal();
   bool SetupStrategy();
 
   vtkSMProxy* ReduceProxy;

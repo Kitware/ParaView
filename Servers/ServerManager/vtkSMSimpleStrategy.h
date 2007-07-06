@@ -50,13 +50,13 @@ protected:
 
   // Description:
   // Create and initialize the data pipeline.
-  virtual void CreatePipeline(vtkSMSourceProxy* input);
+  virtual void CreatePipeline(vtkSMSourceProxy* input, int outputport);
 
   // Description:
   // Create and initialize the LOD data pipeline.
   // Note that this method is called irrespective of EnableLOD
   // flag.
-  virtual void CreateLODPipeline(vtkSMSourceProxy* input);
+  virtual void CreateLODPipeline(vtkSMSourceProxy* input, int outputport);
 
   // Description:
   // Gather the information of the displayed data

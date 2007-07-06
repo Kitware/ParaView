@@ -212,12 +212,16 @@ signals:
   void nameChanged(pqServerManagerModelItem *item);
 
   /// Fired when a connection between two pqPipelineSources is created.
-  void connectionAdded(pqPipelineSource* in, pqPipelineSource* out);
-  void preConnectionAdded(pqPipelineSource* in, pqPipelineSource* out);
+  void connectionAdded(pqPipelineSource* source, 
+    pqPipelineSource* consumer, int srcOutputPort);
+  void preConnectionAdded(pqPipelineSource* source, 
+    pqPipelineSource* consumer, int srcOutputPort);
 
   /// Fired when a connection between tow pqPipelineSources is broken.
-  void connectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
-  void preConnectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
+  void connectionRemoved(pqPipelineSource* source, 
+    pqPipelineSource* consumer, int srcOutputPort);
+  void preConnectionRemoved(pqPipelineSource* source, 
+    pqPipelineSource* consumer, int srcOutputPort);
 
 
 protected slots:

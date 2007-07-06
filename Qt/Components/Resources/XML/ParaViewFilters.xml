@@ -60,6 +60,7 @@
   -->
   <Filter name="FeatureEdges" />
   <Filter name="Glyph" />
+  <Filter name="ArbitrarySourceGlyph" />
   <Filter name="Gradient" />
   <Filter name="GradientMagnitude" />
   <Filter name="GroupDataSets" />

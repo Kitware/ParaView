@@ -27,7 +27,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMInputProperty);
-vtkCxxRevisionMacro(vtkSMInputProperty, "1.17");
+vtkCxxRevisionMacro(vtkSMInputProperty, "1.18");
 
 int vtkSMInputProperty::InputsUpdateImmediately = 1;
 
@@ -165,6 +165,19 @@ void vtkSMInputProperty::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "MultipleInput: " << this->MultipleInput << endl;
   os << indent << "PortIndex: " << this->PortIndex << endl;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMInputProperty::SetProxies(unsigned int numProxies,
+  vtkSMProxy* proxies[], unsigned int outputports[])
+{
+  this->IPInternals->OutputPorts.clear();
+  for (unsigned int cc=0; cc < numProxies; cc++)
+    {
+    this->IPInternals->OutputPorts.push_back(outputports[cc]);
+    }
+
+  this->Superclass::SetProxies(numProxies, proxies);
 }
 
 //---------------------------------------------------------------------------

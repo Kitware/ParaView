@@ -35,25 +35,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqObjectInspectorDriver.h"
 
-#include "pqView.h"
 #include "pqDataRepresentation.h"
+#include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqProxy.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerModelItem.h"
 #include "pqServerManagerSelectionModel.h"
+#include "pqView.h"
 
-
+//-----------------------------------------------------------------------------
 pqObjectInspectorDriver::pqObjectInspectorDriver(QObject *parentObject)
   : QObject(parentObject)
 {
   this->Selection = 0;
-  this->Source = 0;
   this->Display = 0;
   this->View = 0;
   this->ShowCurrent = true;
+
+  this->OutputPort = 0;
 }
 
+//-----------------------------------------------------------------------------
 void pqObjectInspectorDriver::setSelectionModel(
     pqServerManagerSelectionModel *model)
 {
@@ -77,12 +80,10 @@ void pqObjectInspectorDriver::setSelectionModel(
     this->connect(this->Selection,
         SIGNAL(selectionChanged(const pqServerManagerSelection &, const pqServerManagerSelection &)),
         this, SLOT(updateSource()));
-    this->connect(this->Selection->model(),
-        SIGNAL(preSourceRemoved(pqPipelineSource *)),
-        this, SLOT(checkSource(pqPipelineSource *)));
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqObjectInspectorDriver::setActiveView(pqView *view)
 {
   if(view != this->View)
@@ -92,19 +93,13 @@ void pqObjectInspectorDriver::setActiveView(pqView *view)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqObjectInspectorDriver::updateSource()
 {
   this->setActiveSource(this->findSource());
 }
 
-void pqObjectInspectorDriver::checkSource(pqPipelineSource *source)
-{
-  if(source && source == this->Source)
-    {
-    this->setActiveSource(source);
-    }
-}
-
+//-----------------------------------------------------------------------------
 void pqObjectInspectorDriver::checkForDisplay()
 {
   pqDataRepresentation *display = this->findDisplay();
@@ -115,46 +110,39 @@ void pqObjectInspectorDriver::checkForDisplay()
     }
 }
 
-void pqObjectInspectorDriver::checkDisplay(pqPipelineSource *,
-    pqDataRepresentation *display)
+//-----------------------------------------------------------------------------
+void pqObjectInspectorDriver::setActiveSource(pqOutputPort* opPort)
 {
-  if(display && display == this->Display)
-    {
-    this->Display = 0;
-    emit this->representationChanged(this->Display, this->View);
-    }
-}
-
-void pqObjectInspectorDriver::setActiveSource(pqPipelineSource *source)
-{
-  if(source == this->Source)
+  if(opPort == this->OutputPort)
     {
     return;
     }
 
-  if(this->Source)
+  if(this->OutputPort)
     {
-    this->disconnect(this->Source, 0, this, 0);
+    this->disconnect(this->OutputPort, 0, this, 0);
     }
 
-  this->Source = source;
-  if(this->Source)
+  this->OutputPort = opPort;
+  if(this->OutputPort)
     {
-    this->connect(this->Source,
-        SIGNAL(representationAdded(pqPipelineSource *, pqDataRepresentation *)),
+    this->connect(this->OutputPort,
+        SIGNAL(representationAdded(pqOutputPort*, pqDataRepresentation *)),
         this, SLOT(checkForDisplay()), Qt::QueuedConnection);
-    this->connect(this->Source,
-        SIGNAL(representationRemoved(pqPipelineSource *, pqDataRepresentation *)),
-        this, SLOT(checkDisplay(pqPipelineSource *, pqDataRepresentation *)));
+    this->connect(this->OutputPort,
+        SIGNAL(representationRemoved(pqOutputPort*, pqDataRepresentation *)),
+        this, SLOT(checkForDisplay()));
     }
 
-  emit this->sourceChanged(this->Source);
+  emit this->outputPortChanged(opPort);
+  emit this->sourceChanged(opPort? opPort->getSource() : 0);
 
   // Update the active display.
   this->checkForDisplay();
 }
 
-pqPipelineSource *pqObjectInspectorDriver::findSource() const
+//-----------------------------------------------------------------------------
+pqOutputPort* pqObjectInspectorDriver::findSource() 
 {
   pqServerManagerModelItem *item = 0;
   const pqServerManagerSelection *selected = this->Selection->selectedItems();
@@ -171,14 +159,26 @@ pqPipelineSource *pqObjectInspectorDriver::findSource() const
       }
     }
 
-  return dynamic_cast<pqPipelineSource *>(item);
+  pqOutputPort* opPort = qobject_cast<pqOutputPort*>(item); 
+  if (opPort) 
+    {
+    return opPort;
+    }
+
+  pqPipelineSource* source = qobject_cast<pqPipelineSource *>(item);
+  if (source && source->getNumberOfOutputPorts()>0)
+    {
+    return source->getOutputPort(0);
+    }
+  return 0;
 }
 
+//-----------------------------------------------------------------------------
 pqDataRepresentation *pqObjectInspectorDriver::findDisplay() const
 {
-  if(this->Source && this->View)
+  if (this->OutputPort && this->View)
     {
-    return this->Source->getRepresentation(this->View);
+    return this->OutputPort->getRepresentation(this->View);
     }
 
   return 0;

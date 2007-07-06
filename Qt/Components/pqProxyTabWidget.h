@@ -36,11 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include "pqComponentsExport.h"
 
-class pqProxy;
-class pqView;
-class pqObjectInspectorWidget;
+class pqDataRepresentation;
 class pqDisplayProxyEditorWidget;
+class pqObjectInspectorWidget;
+class pqOutputPort;
+class pqPipelineSource;
 class pqProxyInformationWidget;
+class pqView;
 
 /// Tabbed widget with 3 tabs (object inspector, display editor, information)
 class PQCOMPONENTS_EXPORT pqProxyTabWidget : public QTabWidget
@@ -58,30 +60,37 @@ public:
   /// get the display editor
   pqDisplayProxyEditorWidget* getDisplayEditor() const {return this->Display;}
   
-  /// get the proxy for which properties are displayed
-  pqProxy* getProxy();
-
   enum TabIndexes {
     PROPERTIES =0,
     DISPLAY=1,
     INFORMATION=2
   };
+
 public slots:
-  /// Set the display whose properties we want to edit. 
-  void setProxy(pqProxy* source);
-  
   /// set the current render module that these panels work on
   void setView(pqView* rm);
 
-protected slots:
-  void updateDisplayTab();
+  /// Set the output port whose information is to be shown in the 
+  /// information tab.
+  void setOutputPort(pqOutputPort* port);
+
+  /// Set the representation whose properties are to be shown in the
+  /// display tab.
+  void setRepresentation(pqDataRepresentation* repr);
+
+protected:
+  /// Set the display whose properties we want to edit. 
+  void setProxy(pqPipelineSource* source);
+
+  /// get the proxy for which properties are displayed
+  pqPipelineSource* getProxy();
 
 private:
   pqObjectInspectorWidget* Inspector;
   pqDisplayProxyEditorWidget* Display;
   pqProxyInformationWidget* Information;
   
-  QPointer<pqProxy> Proxy;
+  QPointer<pqOutputPort> OutputPort;
   QPointer<pqView> View;
 
 };

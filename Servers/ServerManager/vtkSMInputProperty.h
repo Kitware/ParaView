@@ -91,6 +91,17 @@ public:
   }
 
   // Description:
+  // Sets the value of the property to the list of proxies specified.
+  virtual void SetProxies(unsigned int numElements, 
+    vtkSMProxy* proxies[], unsigned int outputports[]);
+
+  virtual void SetProxies(unsigned int numElements, 
+    vtkSMProxy* proxies[])
+    {
+    this->Superclass::SetProxies(numElements, proxies);
+    }
+
+  // Description:
   // Given an index for a connection (proxy), returns which output port
   // is used to connect the pipeline.
   unsigned int GetOutputPortForConnection(unsigned int idx);

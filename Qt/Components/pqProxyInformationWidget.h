@@ -36,9 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include "pqComponentsExport.h"
 
-class pqProxy;
+class pqOutputPort;
 
-/// Widget which provides information about a source proxy
+/// Widget which provides information about an output port of a source proxy
 class PQCOMPONENTS_EXPORT pqProxyInformationWidget : public QWidget
 {
   Q_OBJECT
@@ -49,10 +49,10 @@ public:
   ~pqProxyInformationWidget();
 
   /// Set the display whose properties we want to edit. 
-  void setProxy(pqProxy* source);
+  void setOutputPort(pqOutputPort* outputport);
 
   /// get the proxy for which properties are displayed
-  pqProxy* getProxy();
+  pqOutputPort* getOutputPort();
 
 public slots:
   /// TODO: have this become automatic instead of relying on 
@@ -60,7 +60,7 @@ public slots:
   void updateInformation();
 
 private:
-  QPointer<pqProxy> Source;
+  QPointer<pqOutputPort> OutputPort;
   class pqUi;
   pqUi* Ui;
 };

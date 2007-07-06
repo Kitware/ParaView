@@ -3851,15 +3851,13 @@
         LOD. (Does not support client-server/parallel pipelines).
       </Documentation>
 
-      <ProxyProperty
+      <InputProperty
         name="Input"
-        command="SetInput"
-        update_self="1"
-        immediate_update="1">
+        command="not-used">
         <Documentation>
           The input to the strategy.
         </Documentation>
-      </ProxyProperty>
+      </InputProperty>
 
       <SubProxy>
         <Proxy name="LODDecimator" 
@@ -3975,15 +3973,13 @@
         Representation strategy can be used for unstructured grid volume rendering.
       </Documentation>
 
-      <ProxyProperty
+      <InputProperty
         name="Input"
-        command="SetInput"
-        update_self="1"
-        immediate_update="1">
+        command="not-used">
         <Documentation>
           The input to the strategy.
         </Documentation>
-      </ProxyProperty>
+      </InputProperty>
 
       <SubProxy>
         <Proxy name="LODDecimator" 
@@ -4079,15 +4075,13 @@
         Representation stragegy can be used for uniform grid volume rendering.
       </Documentation>
 
-      <ProxyProperty
+      <InputProperty
         name="Input"
-        command="SetInput"
-        update_self="1"
-        immediate_update="1">
+        command="not-used">
         <Documentation>
           The input to the strategy.
         </Documentation>
-      </ProxyProperty>
+      </InputProperty>
 
       <SubProxy>
         <Proxy name="UpdateSuppressor"

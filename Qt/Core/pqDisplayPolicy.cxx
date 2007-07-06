@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
 #include "pqObjectBuilder.h"
+#include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqPlotView.h"
 #include "pqRenderView.h"
@@ -64,51 +65,24 @@ pqDisplayPolicy::~pqDisplayPolicy()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* pqDisplayPolicy::newDisplayProxy(
-  pqPipelineSource* source, pqView* view) const
+pqView* pqDisplayPolicy::getPreferredView(
+  pqOutputPort* opPort, pqView* currentView) const
 {
-  if(view && !view->canDisplaySource(source))
-    {
-    return NULL;
-    }
-
-  QString srcProxyName = source->getProxy()->GetXMLName();
-  if ( (srcProxyName == "TextSource" || srcProxyName == "TimeToTextConvertor"
-      || srcProxyName == "TimeToTextConvertorSource") && 
-      qobject_cast<pqRenderView*>(view))
-    {
-    vtkSMProxy* p = vtkSMObject::GetProxyManager()->NewProxy(
-      "representations", "TextSourceRepresentation");
-    p->SetConnectionID(view->getServer()->GetConnectionID());
-    return p;
-    }
-
-  vtkSMProxy* p = view->getViewProxy()->CreateDefaultRepresentation(
-    source->getProxy());
-  if (p)
-    {
-    p->SetConnectionID(view->getServer()->GetConnectionID());
-    }
-
-  return p; 
-}
-
-//-----------------------------------------------------------------------------
-pqView* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
-  pqView* currentView) const
-{
+  pqPipelineSource* source = opPort->getSource();
+  
   pqObjectBuilder* builder = 
     pqApplicationCore::instance()->getObjectBuilder();
   vtkPVXMLElement* hints = source->getHints();
   vtkPVXMLElement* viewElement = hints? 
     hints->FindNestedElementByName("View") : 0;
-  QString view_type = viewElement ? QString(viewElement->GetAttribute("type")) : QString::null;
+  QString view_type = viewElement ? 
+    QString(viewElement->GetAttribute("type")) : QString::null;
 
   if (view_type.isNull())
     {
     // The proxy gives us no hint. In that case we try to determine the
     // preferred view by looking at the output from the source.
-    vtkPVDataInformation* datainfo = source->getDataInformation();
+    vtkPVDataInformation* datainfo = opPort->getDataInformation(false);
     if (datainfo && (
         datainfo->GetDataClassName() == QString("vtkRectilinearGrid")  ||
         source->getProxy()->GetXMLName() == QString("ProbeLine")))
@@ -153,7 +127,7 @@ pqView* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
       {
       // Create the preferred view only if the current one is not of the same type
       // as the preferred view.
-      currentView = builder->createView(view_type, source->getServer());
+      currentView = builder->createView(view_type, opPort->getServer());
       }
     }
 
@@ -162,7 +136,7 @@ pqView* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
     // The user has selected a frame that is empty or the source does not
     // recommend any view type. Hence we create a render view.
     currentView = builder->createView(pqRenderView::renderViewType(),
-      source->getServer());
+      opPort->getServer());
     }
 
   // No hints. We don't know what type of view is suitable
@@ -171,32 +145,23 @@ pqView* pqDisplayPolicy::getPreferredView(pqPipelineSource* source,
 }
 
 //-----------------------------------------------------------------------------
-pqDataRepresentation* pqDisplayPolicy::createPreferredDisplay(
-  pqPipelineSource* source, pqView* view,
-  bool dont_create_view) const
+pqDataRepresentation* pqDisplayPolicy::createPreferredRepresentation(
+  pqOutputPort* opPort, pqView* view, bool dont_create_view) const
 {
-  if (source)
-    {
-    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(source->getProxy());
-    if (sp)
-      {
-      // ensure parts are created.
-      sp->CreateParts();
-      }
-    }
+
   if (!view && dont_create_view)
     {
     return NULL;
     }
 
-  if (dont_create_view && (view && !view->canDisplaySource(source)))
+  if (dont_create_view && (view && !view->canDisplay(opPort)))
     {
     return NULL;
     }
 
   if (!dont_create_view) 
     {
-    view = this->getPreferredView(source, view); 
+    view = this->getPreferredView(opPort, view); 
     if (!view)
       {
       // Could not create a view suitable for this source.
@@ -207,9 +172,8 @@ pqDataRepresentation* pqDisplayPolicy::createPreferredDisplay(
 
   // Simply create a display for the view set up the connections and
   // return.
-  pqDataRepresentation* display = 
-    pqApplicationCore::instance()->getObjectBuilder()->
-    createDataRepresentation(source, view);
+  pqDataRepresentation* display = pqApplicationCore::instance()->
+    getObjectBuilder()->createDataRepresentation(opPort, view);
 
   // If this is the only source displayed in the view, reset the camera to make sure its visible
   if(view->getNumberOfVisibleRepresentations()==1)
@@ -218,7 +182,6 @@ pqDataRepresentation* pqDisplayPolicy::createPreferredDisplay(
     if (ren)
       {
       ren->resetCamera();
-      ren->render();
       }
     }
 
@@ -226,16 +189,16 @@ pqDataRepresentation* pqDisplayPolicy::createPreferredDisplay(
 }
 
 //-----------------------------------------------------------------------------
-pqDataRepresentation* pqDisplayPolicy::setDisplayVisibility(
-  pqPipelineSource* source, pqView* view, bool visible) 
+pqDataRepresentation* pqDisplayPolicy::setRepresentationVisibility(
+  pqOutputPort* opPort, pqView* view, bool visible) 
 {
-  if (!source)
+  if (!opPort)
     {
     // Cannot really repr a NULL source.
     return 0;
     }
 
-  pqDataRepresentation* repr = source->getRepresentation(view);
+  pqDataRepresentation* repr = opPort->getRepresentation(view);
 
   if (!repr && !visible)
     {
@@ -244,32 +207,33 @@ pqDataRepresentation* pqDisplayPolicy::setDisplayVisibility(
     }
   else if(!repr)
     {
-    // FIXME:UDA -- can't we simply use createPreferredDisplay?
+    // FIXME:UDA -- can't we simply use createPreferredRepresentation?
     // No repr exists for this view.
     // First check if the view exists. If not, we will create a "suitable" view.
     if (!view)
       {
-      view = this->getPreferredView(source, view);
+      view = this->getPreferredView(opPort, view);
       }
     if (view)
       {
       repr = pqApplicationCore::instance()->getObjectBuilder()->
-        createDataRepresentation(source, view);
+        createDataRepresentation(opPort, view);
       }
     }
 
   repr->setVisible(visible);
 
-  // If this is the only source displayed in the view, reset the camera to make sure its visible
-  // Only do so if a source is being turned ON. Otherwise when the next to last source is turned off, 
-  // the camera would be reset to fit the last remaining one which would be unexpected to the user (hence the conditional on "visible")
+  // If this is the only source displayed in the view, reset the camera to make 
+  // sure its visible. Only do so if a source is being turned ON. Otherwise when 
+  // the next to last source is turned off, the camera would be reset to fit the 
+  // last remaining one which would be unexpected to the user 
+  // (hence the conditional on "visible")
   if(view->getNumberOfVisibleRepresentations()==1 && visible)
     {
     pqRenderView* ren = qobject_cast<pqRenderView*>(view);
     if (ren)
       {
       ren->resetCamera();
-      ren->render();
       }
     }
 

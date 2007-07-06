@@ -22,14 +22,13 @@
 #include "vtkPVDataInformation.h"
 #include "vtkSMClientDeliveryStrategyProxy.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMInputProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.11");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
 {
@@ -63,14 +62,14 @@ bool vtkSMClientDeliveryRepresentationProxy::SetupStrategy()
 
   this->StrategyProxy = vtkSMClientDeliveryStrategyProxy::SafeDownCast(
     pxm->NewProxy("strategies", "ClientDeliveryStrategy"));
-  this->StrategyProxy->SetServers(
-    vtkProcessModule::DATA_SERVER|vtkProcessModule::CLIENT);
-
   if (!this->StrategyProxy)
     {
     vtkErrorMacro("Failed to create vtkSMClientDeliveryStrategyProxy.");
     return false;
     }
+
+  this->StrategyProxy->SetServers(
+    vtkProcessModule::DATA_SERVER|vtkProcessModule::CLIENT);
 
   this->AddStrategy(this->StrategyProxy);
 
@@ -86,7 +85,8 @@ bool vtkSMClientDeliveryRepresentationProxy::SetupStrategy()
     }
   else
     {
-    this->Connect(this->GetInputProxy(), this->StrategyProxy);
+    this->Connect(this->GetInputProxy(), this->StrategyProxy, 
+      "Input", this->OutputPort);
     }
 
   return true;
@@ -126,7 +126,51 @@ bool vtkSMClientDeliveryRepresentationProxy::BeginCreateVTKObjects()
 bool vtkSMClientDeliveryRepresentationProxy::EndCreateVTKObjects()
 {
   // Setup selection pipeline connections.
-  this->Connect(this->GetInputProxy(), this->ExtractSelection);
+  vtkSMSourceProxy* input = this->GetInputProxy();
+
+  this->Connect(input, this->ExtractSelection,
+    "Input", this->OutputPort);
+
+  vtkClientServerStream stream;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
+  if (this->ReduceProxy)
+    {
+    this->Connect(input, this->ReduceProxy, "Input", this->OutputPort);
+
+    stream
+      << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "GetController"
+      << vtkClientServerStream::End;
+    stream
+      << vtkClientServerStream::Invoke
+      << this->ReduceProxy->GetID() << "SetController"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+      pm->SendStream(this->ConnectionID, 
+        this->ReduceProxy->GetServers(), stream);
+    }
+
+  this->SetupStrategy();
+
+  if (this->PostProcessorProxy)
+    {
+    if(this->StrategyProxy && this->StrategyProxy->GetOutput())
+      {
+      this->Connect(this->StrategyProxy->GetOutput(), this->PostProcessorProxy);
+      }
+    else if(this->ReduceProxy)
+      {
+      this->Connect(this->StrategyProxy->GetOutput(), this->ReduceProxy);
+      }
+    else
+      {
+      this->Connect(this->StrategyProxy->GetOutput(), this->ReduceProxy,
+        "Input", this->OutputPort);
+      }
+
+    this->PostProcessorProxy->UpdateVTKObjects();
+    }
 
   return this->Superclass::EndCreateVTKObjects();
 }
@@ -213,60 +257,6 @@ void vtkSMClientDeliveryRepresentationProxy::SetReductionType(int type)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMClientDeliveryRepresentationProxy::SetInputInternal()
-{
-  vtkSMSourceProxy* input = this->GetInputProxy();
-  if(!input)
-    {
-    return;
-    }
-
-  vtkClientServerStream stream;
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-  if (this->ReduceProxy)
-    {
-    this->Connect(input, this->ReduceProxy);
-
-    stream
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetController"
-      << vtkClientServerStream::End;
-    stream
-      << vtkClientServerStream::Invoke
-      << this->ReduceProxy->GetID() << "SetController"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-      pm->SendStream(this->ConnectionID, 
-        this->ReduceProxy->GetServers(), stream);
-    }
-
-  this->SetupStrategy();
-
-  vtkSMInputProperty* ip = 0;
-  if (this->PostProcessorProxy)
-    {
-    ip = vtkSMInputProperty::SafeDownCast(
-      this->PostProcessorProxy->GetProperty("Input"));
-    ip->RemoveAllProxies();
-    if(this->StrategyProxy && this->StrategyProxy->GetOutput())
-      {
-      ip->AddProxy(this->StrategyProxy->GetOutput());
-      }
-    else if(this->ReduceProxy)
-      {
-      ip->AddProxy(this->ReduceProxy);
-      }
-    else
-      {
-      ip->AddProxy(input);
-      }
-
-    this->PostProcessorProxy->UpdateVTKObjects();
-    }
-}
-
-//-----------------------------------------------------------------------------
 vtkDataObject* vtkSMClientDeliveryRepresentationProxy::GetOutput()
 {
   vtkAlgorithm* dp;
@@ -295,16 +285,6 @@ vtkDataObject* vtkSMClientDeliveryRepresentationProxy::GetOutput()
     }
 
   return dp->GetOutputDataObject(0);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMClientDeliveryRepresentationProxy::AddInput(unsigned int inputPort,
-                                                      vtkSMSourceProxy* input,
-                                                      unsigned int outputPort,
-                                                      const char* method)
-{
-  this->Superclass::AddInput(inputPort, input, outputPort, method);
-  this->SetInputInternal();
 }
 
 //----------------------------------------------------------------------------

@@ -68,6 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEnterIdsDialog.h"
 #include "pqEnterPointsDialog.h"
 #include "pqEnterThresholdsDialog.h"
+#include "pqFilterInputDialog.h"
 #include "pqHelperProxyRegisterUndoElement.h"
 #include "pqLinksManager.h"
 #include "pqLookmarkBrowser.h"
@@ -84,12 +85,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectInspectorDriver.h"
 #include "pqObjectInspectorWidget.h"
 #include "pqOptions.h"
+#include "pqOutputPort.h"
 #include "pqPendingDisplayManager.h"
 #include "pqPipelineBrowser.h"
-#include "pqPipelineRepresentation.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineMenu.h"
-#include "pqPipelineSource.h"
+#include "pqPipelineModel.h"
+#include "pqPipelineRepresentation.h"
 #include "pqPluginDialog.h"
 #include "pqPluginManager.h"
 #include "pqPQLookupTableManager.h"
@@ -1116,8 +1118,10 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
   // Use the server manager selection model to determine which page
   // should be shown.
   pqObjectInspectorDriver *driver = this->getObjectInspectorDriver();
-  QObject::connect(driver,     SIGNAL(sourceChanged(pqProxy *)),
-                   proxyPanel, SLOT(setProxy(pqProxy *)));
+  QObject::connect(driver,     SIGNAL(outputPortChanged(pqOutputPort*)),
+                   proxyPanel, SLOT(setOutputPort(pqOutputPort*)));
+  QObject::connect(driver, SIGNAL(representationChanged(pqDataRepresentation*, pqView*)),
+                   proxyPanel, SLOT(setRepresentation(pqDataRepresentation*)));
   QObject::connect(&pqActiveView::instance(), SIGNAL(changed(pqView*)),
                    proxyPanel, SLOT(setView(pqView*)), 
                    Qt::QueuedConnection);
@@ -2613,7 +2617,8 @@ void pqMainWindowCore::onCreateFilter(QAction* action)
   // Custom filters cannot have the same name as an existing filter. 
   // If there is for some reason a filter and a custom filter of the same name,
   // revert to the regular filter.
-  if(proxyManager->GetCompoundProxyDefinition(filterName.toAscii().data()) && !proxyManager->GetProxy("filters_prototypes",filterName.toAscii().data()))
+  if(proxyManager->GetCompoundProxyDefinition(filterName.toAscii().data()) &&
+    !proxyManager->GetProxy("filters_prototypes",filterName.toAscii().data()))
     {
     if (!this->createCompoundSource(filterName))
       {
@@ -2784,7 +2789,9 @@ void pqMainWindowCore::pqImplementation::restoreRecentFilterMenu()
 void pqMainWindowCore::onSelectionChanged()
 {
   pqServerManagerModelItem *item = this->getActiveObject();
-  pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
+  pqOutputPort* opPort = qobject_cast<pqOutputPort*>(item);
+  pqPipelineSource *source = opPort? opPort->getSource() : 
+    qobject_cast<pqPipelineSource*>(item);
   pqServer *server = this->getActiveServer();
 
   pqApplicationCore *core = pqApplicationCore::instance();
@@ -3144,8 +3151,8 @@ void pqMainWindowCore::onRemovingSource(pqPipelineSource *source)
   if (filter)
     {
     // Make all inputs visible in views that the removed source
-    // is currently visible.
-    QList<pqPipelineSource*> inputs = filter->getInputs();
+    // is currently visible in.
+    QList<pqOutputPort*> inputs = filter->getInputs();
     foreach(pqView* view, views)
       {
       pqDataRepresentation* src_disp = source->getRepresentation(view);
@@ -3157,7 +3164,7 @@ void pqMainWindowCore::onRemovingSource(pqPipelineSource *source)
       // that the delete filter is visible, we make the input visible.
       for(int cc=0; cc < inputs.size(); ++cc)
         {
-        pqPipelineSource* input = inputs[cc];
+        pqPipelineSource* input = inputs[cc]->getSource();
         pqDataRepresentation* input_disp = input->getRepresentation(view);
         if (input_disp && !input_disp->isVisible())
           {
@@ -3197,25 +3204,26 @@ void pqMainWindowCore::updateFiltersMenu()
   const pqServerManagerSelection *selected =
       pqApplicationCore::instance()->getSelectionModel()->selectedItems();
   
-  QList<pqPipelineSource*> sources;
+  QList<pqOutputPort*> outputPorts;
   pqServerManagerModelItem* item = NULL;
   pqServerManagerSelection::ConstIterator iter = selected->begin();
   for( ; iter != selected->end(); ++iter)
     {
     item = *iter;
-    pqPipelineSource* source;
-    source = qobject_cast<pqPipelineSource *>(item);
-    if(source && source->getProxy())
+    pqPipelineSource* source = qobject_cast<pqPipelineSource *>(item);
+    pqOutputPort* port = source? source->getOutputPort(0) : 
+      qobject_cast<pqOutputPort*>(item);
+    if (port)
       {
-      sources.append(source);
+      outputPorts.append(port);
       }
     }
 
   // Get the list of available filters.
   QList<QString> supportedFilters;
-  if(sources.size())
+  if(outputPorts.size())
     {
-    sources[0]->getServer()->getSupportedProxies("filters", supportedFilters);
+    outputPorts[0]->getServer()->getSupportedProxies("filters", supportedFilters);
     }
 
   // Iterate over all filters in the menu and see if they can be
@@ -3268,9 +3276,10 @@ void pqMainWindowCore::updateFiltersMenu()
         }
 
       input->RemoveAllUncheckedProxies();
-      foreach(pqPipelineSource* source, sources)
+      foreach(pqOutputPort* port, outputPorts)
         {
-        input->AddUncheckedProxy(source->getProxy());
+        input->AddUncheckedInputConnection(
+          port->getSource()->getProxy(), port->getPortNumber());
         }
 
       if(input->IsInDomains())
@@ -3366,22 +3375,93 @@ pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
   pqApplicationCore* core = pqApplicationCore::instance();
   pqObjectBuilder* builder = core->getObjectBuilder();  
 
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxy* prototype = 
+    pxm->GetPrototypeProxy("filters", xmlname.toAscii().data());
+  if (!prototype)
+    {
+    qCritical() << "Unknown proxy type: " << xmlname;
+    return 0;
+    }
+
   // Get the list of selected sources.
   pqServerManagerSelection selected =
       *core->getSelectionModel()->selectedItems();
 
-  QList<pqPipelineSource*> inputs;
+  QList<const char*> inputPortNames = pqPipelineFilter::getInputPorts(prototype);
+
+  QMap<QString, QList<pqOutputPort*> > namedInputs;
+  QList<pqOutputPort*> allInputs;
+  QList<pqOutputPort*> selectedOutputPorts;
+
+  // Determine the list of selected output ports.
   foreach (pqServerManagerModelItem* item, selected)
     {
+    pqOutputPort* opPort = qobject_cast<pqOutputPort*>(item);
     pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
-    if (source)
+    if (opPort)
       {
-      inputs.push_back(source);
+      selectedOutputPorts.push_back(opPort);
+      }
+    else if (source)
+      {
+      selectedOutputPorts.push_back(source->getOutputPort(0));
       }
     }
+
+  namedInputs[inputPortNames[0]] = selectedOutputPorts;
+
+  // If the filter has more than 1 input ports, we are simply going to ask the 
+  // user to make selection for the inputs for each port. We may change that in 
+  // future to be smarter.
+  int numInputPorts = inputPortNames.size();
+  if (numInputPorts > 1)
+    {
+    vtkSmartPointer<vtkSMProxy> filterProxy;
+    filterProxy.TakeReference(pxm->NewProxy("filters", xmlname.toAscii().data()));
+    filterProxy->SetConnectionID(this->getActiveServer()->GetConnectionID());
+    filterProxy->SetServers(vtkProcessModule::CLIENT);
+
+    // Create a dummy pqPipelineFilter which we can use to
+    // pass on to the pqFilterInputDialog.
+    pqPipelineFilter* filter = new pqPipelineFilter(xmlname,
+      filterProxy, this->getActiveServer(), this);
+    
+    pqFilterInputDialog dialog(QApplication::activeWindow());
+    dialog.setObjectName("SelectInputDialog");
+
+    pqServerManagerModel *smModel =
+        pqApplicationCore::instance()->getServerManagerModel();
+    pqPipelineModel *model = new pqPipelineModel(*smModel);
+    model->addSource(filter);
+    dialog.setModelAndFilter(model, filter, namedInputs);
+    if (QDialog::Accepted != dialog.exec())
+      {
+      // User aborted creation.
+      delete model;
+      delete filter;
+      return 0; 
+      }
+
+    for (int cc=0; cc < numInputPorts; cc++)
+      {
+      QString portName = filter->getInputPortName(cc);
+      namedInputs[portName] = dialog.getFilterInputs(portName);
+      allInputs += namedInputs[portName];
+      }
+
+    delete model;
+    delete filter;
+    }
+  else if (numInputPorts == 1)
+    {
+    allInputs += selectedOutputPorts;
+    }
+
   this->Implementation->UndoStack->beginUndoSet(
     QString("Create '%1'").arg(xmlname));
-  pqPipelineSource* filter = builder->createFilter("filters", xmlname, inputs);
+  pqPipelineSource* filter = builder->createFilter("filters", xmlname, 
+    namedInputs, this->getActiveServer());
   if (filter)
     {
     vtkSMProxy* proxy = filter->getProxy();
@@ -3392,8 +3472,8 @@ pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
       {
       // If a selection exists on the input to this filter,
       // we initialize the filter with that selection.
-      if (inputs.contains(
-          this->Implementation->SelectionManager.getSelectedSource()))
+      if (allInputs.contains(
+          this->Implementation->SelectionManager.getSelectedPort()))
         {
         pqSMAdaptor::setMultipleElementProperty(
           proxy->GetProperty("Indices"),

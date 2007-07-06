@@ -60,7 +60,7 @@ protected:
 
   // Description:
   // Create and initialize the data pipeline.
-  virtual void CreatePipeline(vtkSMSourceProxy* input);
+  virtual void CreatePipeline(vtkSMSourceProxy* input, int outputport);
 
   vtkSMSourceProxy* Collect;
 private:

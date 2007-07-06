@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFilterInputDialog.h"
 #include "pqFlatTreeView.h"
 #include "pqObjectBuilder.h"
+#include "pqOutputPort.h"
 #include "pqPipelineBrowserStateManager.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
@@ -127,13 +128,13 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
   this->connect(smModel, SIGNAL(sourceRemoved(pqPipelineSource*)),
       this->Model, SLOT(removeSource(pqPipelineSource*)));
   this->connect(smModel,
-      SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*)),
+      SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*, int)),
       this->Model,
-      SLOT(addConnection(pqPipelineSource*, pqPipelineSource*)));
+      SLOT(addConnection(pqPipelineSource*, pqPipelineSource*, int)));
   this->connect(smModel,
-      SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)),
+      SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*, int)),
       this->Model,
-      SLOT(removeConnection(pqPipelineSource*, pqPipelineSource*)));
+      SLOT(removeConnection(pqPipelineSource*, pqPipelineSource*, int)));
 
   this->connect(smModel, SIGNAL(nameChanged(pqServerManagerModelItem *)),
       this->Model, SLOT(updateItemName(pqServerManagerModelItem *)));
@@ -343,49 +344,31 @@ void pqPipelineBrowser::changeInput()
     pqServerManagerModel *smModel =
         pqApplicationCore::instance()->getServerManagerModel();
     pqPipelineModel *model = new pqPipelineModel(*smModel);
-    dialog.setModelAndFilter(model, filter);
+    dialog.setModelAndFilter(model, filter, filter->getNamedInputs());
     if(QDialog::Accepted == dialog.exec())
       {
-      // TODO: Change the inputs for all input ports.
-      QStringList toAdd, toRemove;
-      dialog.getFilterInputs("Input", toAdd);
-      dialog.getCurrentFilterInputs("Input", toRemove);
-
-      // Remove the items that are in both lists.
-      QStringList::Iterator iter = toAdd.begin();
-      while(iter != toAdd.end())
-        {
-        if(toRemove.contains(*iter))
-          {
-          toRemove.removeAll(*iter);
-          iter = toAdd.erase(iter);
-          }
-        else
-          {
-          ++iter;
-          }
-        }
-
-      // Remove the old connections.
-      pqPipelineSource *source = 0;
-      pqObjectBuilder *builder =
-          pqApplicationCore::instance()->getObjectBuilder();
-
       emit this->beginUndo(QString("Change Input for %1").arg(
           filter->getSMName()));
-
-      for(iter = toRemove.begin(); iter != toRemove.end(); ++iter)
+      for (int cc=0; cc < filter->getNumberOfInputPorts(); cc++)
         {
-        source = smModel->findItem<pqPipelineSource*>(*iter);
-        builder->removeConnection(source, filter);
-        }
+        QString inputPortName = filter->getInputPortName(cc);
+        QList<pqOutputPort*> &inputs = dialog.getFilterInputs(inputPortName);
 
-      // Add the new connections.
-      for(iter = toAdd.begin(); iter != toAdd.end(); ++iter)
-        {
-        source = smModel->findItem<pqPipelineSource*>(*iter);
-        builder->addConnection(source, filter);
+        vtkstd::vector<vtkSMProxy*> inputPtrs;
+        vtkstd::vector<unsigned int> inputPorts;
+
+        foreach (pqOutputPort* opport, inputs)
+          {
+          inputPtrs.push_back(opport->getSource()->getProxy());
+          inputPorts.push_back(opport->getPortNumber());
+          }
+
+        vtkSMInputProperty* ip =vtkSMInputProperty::SafeDownCast(
+          filter->getProxy()->GetProperty(
+            inputPortName.toAscii().data()));
+        ip->SetProxies(inputPtrs.size(), &inputPtrs[0], &inputPorts[0]);
         }
+      filter->getProxy()->UpdateVTKObjects();
       emit this->endUndo();
       }
 
@@ -447,23 +430,27 @@ void pqPipelineBrowser::setView(pqView *rm)
 void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
 {
   // See if the index is associated with a source.
-  pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(
-      this->Model->getItemFor(index));
-  if(source)
+  pqServerManagerModelItem* smModelItem = this->Model->getItemFor(index);
+
+  pqPipelineSource *source = qobject_cast<pqPipelineSource*>(smModelItem);
+  pqOutputPort* port = source? source->getOutputPort(0) :
+    qobject_cast<pqOutputPort*>(smModelItem);
+  if(port)
     {
+    source = port->getSource();
+
     if(index.column() == 1)
       {
       // If the column clicked is 1, the user clicked the visible icon.
       // Get the display object for the current window.
-      pqDataRepresentation* display = source->getRepresentation(
-          this->Internal->View);
+      pqDataRepresentation* repr = port->getRepresentation(this->Internal->View);
 
       bool visible = true;
       // If the display exists, toggle the display. Otherwise, create a
       // display for the source in the current window.
-      if(display)
+      if(repr)
         {
-        visible = !display->isVisible();
+        visible = !repr->isVisible();
         }
 
       emit this->beginUndo(QString("Change Visibility of %1").arg(
@@ -473,13 +460,13 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
         pqApplicationCore::instance()->getDisplayPolicy();
       // Will create new display if needed. May also create new view 
       // as defined by the policy.
-      display = dpolicy->setDisplayVisibility(
-        source, this->Internal->View, visible);
+      repr = dpolicy->setRepresentationVisibility(
+        port, this->Internal->View, visible);
 
       emit this->endUndo();
-      if(display)
+      if(repr)
         {
-        display->renderView(false);
+        repr->renderView(false);
         }
       }
     // TODO

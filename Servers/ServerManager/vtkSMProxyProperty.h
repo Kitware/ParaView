@@ -66,6 +66,11 @@ public:
   virtual int SetProxy(unsigned int idx, vtkSMProxy* proxy);
 
   // Description:
+  // Sets the value of the property to the list of proxies specified.
+  virtual void SetProxies(unsigned int numElements, 
+    vtkSMProxy* proxies[]);
+
+  // Description:
   // Returns if the given proxy is already added to the property.
   bool IsProxyAdded(vtkSMProxy* proxy);
 

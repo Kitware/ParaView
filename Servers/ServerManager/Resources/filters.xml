@@ -4001,6 +4001,185 @@ The Glyph filter generates a glyph (i.e., an arrow, cone, cube, cylinder, line, 
    <!-- End Glyph -->
    </SourceProxy>
 
+   <SourceProxy name="ArbitrarySourceGlyph" class="vtkPVGlyphFilter"
+    label="Glyph (Custom Source)">
+    <Documentation
+       long_help="This filter generates a glyph at each point of the input data set.  The glyphs can be oriented and scaled by point attributes of the input dataset."
+       short_help="Generate a glyph symbol at each point of the input data set.">
+The Glyph filter generates a glyph at each point in the input dataset. The glyphs can be oriented and scaled by the input point-centered scalars and vectors. The Glyph filter operates on any type of data set. Its output is polygonal. This filter is available on the Toolbar.
+    </Documentation>
+    <InputProperty
+       name="Input"
+       command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+          <InputArrayDomain name="input_array1" attribute_type="point"
+                            number_of_components="1" optional="1"/>
+          <InputArrayDomain name="input_array2" attribute_type="point"
+                            number_of_components="3" optional="1"/>
+          <Documentation>
+            This property specifies the input to the Glyph filter. This is the dataset to which the glyphs will be applied.
+          </Documentation>
+     </InputProperty>
+
+     <InputProperty
+        name="Source"
+        command="SetSourceConnection"
+        label="Glyph Type">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="glyph_sources" />
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
+           <Documentation>
+             This property determines which type of glyph will be placed at the points in the input dataset.
+           </Documentation>
+      </InputProperty>
+
+
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        label="Scalars">
+          <ArrayListDomain name="array_list" attribute_type="Scalars" 
+               input_domain_name="input_array1">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            This property indicates the name of the scalar array on which to operate. The indicated array may be used for scaling the glyphs. (See the SetScaleMode property.)
+          </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="SelectInputVectors" 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        default_values="1" 
+        label="Vectors">  <!-- default value=1 so normals go to the right place -->
+          <ArrayListDomain name="array_list" attribute_type="Vectors"
+               input_domain_name="input_array2">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            This property indicates the name of the vector array on which to operate. The indicated array may be used for scaling and/or orienting the glyphs. (See the SetScaleMode and SetOrient properties.)
+          </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty 
+        label="Orient"
+        name="SetOrient" 
+        command="SetOrient" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is set to 1, the glyphs will be oriented based on the selected vector array.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        label="Scale Mode"
+        name="SetScaleMode" 
+        command="SetScaleMode" 
+        number_of_elements="1"
+        default_values="1" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="scalar"/>
+         <Entry value="1" text="vector"/>
+         <Entry value="2" text="vector_components"/>
+         <Entry value="3" text="off"/>
+       </EnumerationDomain>
+       <Documentation>
+         The value of this property specifies how/if the glyphs should be scaled based on the point-centered scalars/vectors in the input dataset.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="SetScaleFactor"
+        command="SetScaleFactor"
+        number_of_elements="1"
+        default_values="1.0" >
+       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="0.1">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </BoundsDomain>
+       <ArrayRangeDomain name="scalar_range">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="SelectInputScalars" function="ArraySelection"/>
+         </RequiredProperties>
+       </ArrayRangeDomain>
+       <ArrayRangeDomain name="vector_range">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="SelectInputVectors" function="ArraySelection"/>
+         </RequiredProperties>
+       </ArrayRangeDomain>
+       <Documentation>
+         The value of this property will be used as a multiplier for scaling the glyphs before adding them to the output.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="MaximumNumberOfPoints" 
+        command="SetMaximumNumberOfPoints" 
+        number_of_elements="1"
+        default_values="5000"
+        label="Maximum Number of Points">
+       <IntRangeDomain name="range" min="0"/>
+       <Documentation>
+         The value of this property specifies the maximum number of glyphs that should appear in the output dataset if the value of the UseMaskPoints property is 1. (See the UseMaskPoints property.)
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="UseMaskPoints" 
+        command="SetUseMaskPoints" 
+        number_of_elements="1"
+        default_values="1"
+        label="Mask Points"> 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If the value of this property is set to 1, limit the maximum number of glyphs to the value indicated by MaximumNumberOfPoints. (See the MaximumNumberOfPoints property.)
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="RandomMode" 
+        command="SetRandomMode" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If the value of this property is 1, then the points to glyph are chosen randomly. Otherwise the point ids chosen are evenly spaced.
+       </Documentation>
+     </IntVectorProperty>
+   <Hints>
+     <!-- Visibility Element can be used to suggest the GUI about
+          visibility of this filter (or its input) on creation.
+          replace_input="0" implies that the input visibility is not
+            changed on creation of this filter (defaults to "1")
+       -->
+     <Visibility replace_input="0" />
+   </Hints>
+   <!-- End Glyph -->
+   </SourceProxy>
+
    <SourceProxy name="ExtractGrid" class="vtkPVExtractVOI"
     label="Extract Subset">
     <Documentation

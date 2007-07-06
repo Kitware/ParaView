@@ -35,7 +35,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.51");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.52");
 
 struct vtkSMSourceProxyInternals
 {
@@ -409,8 +409,8 @@ vtkPVDataInformation* vtkSMSourceProxy::GetDataInformation(
       // Make sure the output filter is up-to-date before
       // getting information.
       this->UpdatePipeline();
+      this->DataInformationValid = true;
       }
-    this->DataInformationValid = true;
     }
   return this->GetPart(idx)->GetDataInformation();
 }

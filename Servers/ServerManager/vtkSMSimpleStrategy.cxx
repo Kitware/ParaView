@@ -23,7 +23,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.8");
+vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMSimpleStrategy::vtkSMSimpleStrategy()
 {
@@ -108,16 +108,16 @@ void vtkSMSimpleStrategy::UpdatePieceInformation(vtkSMSourceProxy* updateSuppres
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleStrategy::CreatePipeline(vtkSMSourceProxy* input)
+void vtkSMSimpleStrategy::CreatePipeline(vtkSMSourceProxy* input, int outputport)
 {
-  this->Connect(input, this->UpdateSuppressor);
+  this->Connect(input, this->UpdateSuppressor, "Input", outputport);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleStrategy::CreateLODPipeline(vtkSMSourceProxy* input)
+void vtkSMSimpleStrategy::CreateLODPipeline(vtkSMSourceProxy* input, int outputport)
 {
-  this->Connect(input, this->LODDecimator);
-  this->Connect(this->LODDecimator, this->UpdateSuppressorLOD);
+  this->Connect(input, this->LODDecimator, "Input", outputport);
+  this->Connect(this->LODDecimator, this->UpdateSuppressorLOD, "Input", 0);
 }
 
 //----------------------------------------------------------------------------

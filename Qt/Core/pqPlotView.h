@@ -82,7 +82,7 @@ public:
   virtual void redo();
 
   /// Called to check if the given source can be shown in this view.
-  virtual bool canDisplaySource(pqPipelineSource* source) const;
+  virtual bool canDisplay(pqOutputPort* opPort) const;
 
 public slots:
   /// Add display to the view. Although this model supports adding

@@ -41,8 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMMultiViewRenderModuleProxy.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMRenderModuleProxy.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
 
 #include <QtDebug>
@@ -50,8 +50,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
-#include "pqDisplayPolicy.h"
 #include "pqNameCount.h"
+#include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqPluginManager.h"
@@ -100,42 +100,25 @@ pqPipelineSource* pqObjectBuilder::createSource(const QString& sm_group,
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource* pqObjectBuilder::createFilter(const QString& sm_group,
-    const QString& sm_name, const QList<pqPipelineSource*> &inputs)
+pqPipelineSource* pqObjectBuilder::createFilter(
+  const QString& group, const QString& name, pqPipelineSource* input)
 {
-  pqPipelineSource* src0 = inputs[0];
-  this->blockSignals(true);
-  pqPipelineSource* filter = this->createFilter(sm_group, sm_name, src0);
-  this->blockSignals(false);
-  if (filter)
-    {
-    vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(
-      filter->getProxy()->GetProperty("Input"));
-    if (inputProp->GetMultipleInput())
-      {
-      for (int cc=1; cc< inputs.size(); cc++)
-        {
-        this->addConnection(inputs[cc], filter);
-        }
-      }
-    emit this->filterCreated(filter);
-    emit this->proxyCreated(filter);
-    }
-  return filter;
+  QMap<QString, QList<pqOutputPort*> > namedInputs;
+  QList<pqOutputPort*> inputs;
+  inputs.push_back(input->getOutputPort(0));
+  namedInputs["Input"] = inputs;
+
+  return this->createFilter(group, name, namedInputs, input->getServer());
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource* pqObjectBuilder::createFilter(const QString& sm_group,
-    const QString& sm_name, pqPipelineSource* input)
+pqPipelineSource* pqObjectBuilder::createFilter(
+  const QString& group, const QString& name,
+  QMap<QString, QList<pqOutputPort*> > namedInputs,
+  pqServer* server)
 {
-  if (!input)
-    {
-    qWarning() << "Cannot create filter with no input.";
-    return 0;
-    }
- 
   vtkSMProxy* proxy = 
-    this->createProxyInternal(sm_group, sm_name, input->getServer(), "sources");
+    this->createProxyInternal(group, name, server, "sources");
   if (!proxy)
     {
     return 0;
@@ -146,15 +129,32 @@ pqPipelineSource* pqObjectBuilder::createFilter(const QString& sm_group,
   if (!filter)
     {
     qDebug() << "Failed to locate pqPipelineSource for the created proxy "
-      << sm_group << ", " << sm_name;
+      << group << ", " << name;
     return 0;
     }
-  vtkSMProperty* inputProperty = proxy->GetProperty("Input");
-  if (inputProperty)
+
+  // Now for every input port, connect the inputs.
+  QMap<QString, QList<pqOutputPort*> >::iterator mapIter;
+  for (mapIter = namedInputs.begin(); mapIter != namedInputs.end(); ++mapIter)
     {
-    pqSMAdaptor::setProxyProperty(inputProperty, input->getProxy());
+    QString input_port_name = mapIter.key();
+    QList<pqOutputPort*> &inputs = mapIter.value();
+
+    vtkSMProperty* prop = proxy->GetProperty(input_port_name.toAscii().data());
+    if (!prop)
+      {
+      qCritical() << "Failed to locate input property "<< input_port_name;
+      continue;
+      }
+
+    foreach (pqOutputPort* opPort, inputs)
+      {
+      pqSMAdaptor::addInputProperty(prop, opPort->getSource()->getProxy(),
+        opPort->getPortNumber());
+      }
+
     proxy->UpdateVTKObjects();
-    inputProperty->UpdateDependentDomains();
+    prop->UpdateDependentDomains();
     }
 
   // Set default property values.
@@ -375,25 +375,48 @@ void pqObjectBuilder::destroy(pqView* view)
 
 //-----------------------------------------------------------------------------
 pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
-  pqPipelineSource* source, pqView* view)
+  pqOutputPort* opPort, pqView* view)
 {
-  if (!source|| !view)
+  if (!opPort || !view)
     {
     qCritical() <<"Missing required attribute.";
     return NULL;
     }
 
-  // FIXME: This class should not refer to any policies.
-  pqApplicationCore* core= pqApplicationCore::instance();
-  pqDisplayPolicy* policy = core->getDisplayPolicy();
-  vtkSMProxy* reprProxy = policy? policy->newDisplayProxy(source, view) : 0; 
+  if(!view->canDisplay(opPort))
+    {
+    // View cannot display this source, nothing to do here.
+    return NULL;
+    }
+
+  vtkSMProxy* reprProxy = 0; 
+
+  pqPipelineSource* source = opPort->getSource();
+
+  // HACK to create correct representation for text sources/filters.
+  QString srcProxyName = source->getProxy()->GetXMLName();
+  if ( (srcProxyName == "TextSource" || srcProxyName == "TimeToTextConvertor"
+      || srcProxyName == "TimeToTextConvertorSource") && 
+    qobject_cast<pqRenderView*>(view))
+    {
+    reprProxy = vtkSMObject::GetProxyManager()->NewProxy(
+      "representations", "TextSourceRepresentation");
+    }
+  else
+    {
+    reprProxy = view->getViewProxy()->CreateDefaultRepresentation(
+      source->getProxy(), opPort->getPortNumber());
+    }
+
+  // Could not determine representation proxy to create.
   if (!reprProxy)
     {
     return NULL;
     }
 
+  reprProxy->SetConnectionID(view->getServer()->GetConnectionID());
   
-  // (of undo/redo to work).
+  // (for undo/redo to work).
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
   QString name = QString("DataRepresentation%1").arg(
@@ -404,8 +427,8 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
   vtkSMProxy* viewModuleProxy = view->getProxy();
 
   // Set the reprProxy's input.
-  pqSMAdaptor::setProxyProperty(
-    reprProxy->GetProperty("Input"), source->getProxy());
+  pqSMAdaptor::setInputProperty(reprProxy->GetProperty("Input"), 
+    source->getProxy(), opPort->getPortNumber());
   reprProxy->UpdateVTKObjects();
 
   // Add the reprProxy to render module.
@@ -413,6 +436,7 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
     viewModuleProxy->GetProperty("Representations"), reprProxy);
   viewModuleProxy->UpdateVTKObjects();
 
+  pqApplicationCore* core= pqApplicationCore::instance();
   pqDataRepresentation* repr = core->getServerManagerModel()->
     findItem<pqDataRepresentation*>(reprProxy);
   if (repr)
@@ -503,79 +527,6 @@ pqScalarBarRepresentation* pqObjectBuilder::createScalarBarDisplay(
   emit this->scalarBarDisplayCreated(scalarBar);
   emit this->proxyCreated(scalarBar);
   return scalarBar;
-}
-
-//-----------------------------------------------------------------------------
-void pqObjectBuilder::addConnection(pqPipelineSource* source, 
-  pqPipelineSource* sink)
-{
-  if(!source || !sink)
-    {
-    qCritical() << "Cannot addConnection. source or sink missing.";
-    return;
-    }
-
-  vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(
-    sink->getProxy()->GetProperty("Input"));
-  if(inputProp)
-    {
-    // If the sink already has an input, the previous connection
-    // needs to be broken if it doesn't support multiple inputs.
-    if(!inputProp->GetMultipleInput() && inputProp->GetNumberOfProxies() > 0)
-      {
-      inputProp->RemoveAllProxies();
-      }
-
-    // Add the input to the proxy in the server manager.
-    inputProp->AddProxy(source->getProxy());
-    }
-  else
-    {
-    qCritical() << "Failed to locate property Input on proxy:" 
-      << source->getProxy()->GetXMLGroup() << ", " << source->getProxy()->GetXMLName();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqObjectBuilder::removeConnection(pqPipelineSource* pqsource,
-  pqPipelineSource* pqsink)
-{
-  vtkSMCompoundProxy *compoundProxy =
-    vtkSMCompoundProxy::SafeDownCast(pqsource->getProxy());
-
-  vtkSMProxy* source = pqsource->getProxy();
-  vtkSMProxy* sink = pqsink->getProxy();
-
-  if(compoundProxy)
-    {
-    // TODO: How to find the correct output proxy?
-    source = 0;
-    for(int i = compoundProxy->GetNumberOfProxies(); source == 0 && i > 0; i--)
-      {
-      source = vtkSMSourceProxy::SafeDownCast(compoundProxy->GetProxy(i-1));
-      }
-    }
-
-  compoundProxy = vtkSMCompoundProxy::SafeDownCast(sink);
-  if(compoundProxy)
-    {
-    // TODO: How to find the correct input proxy?
-    sink = compoundProxy->GetMainProxy();
-    }
-
-  if(!source || !sink)
-    {
-    qCritical() << "Cannot removeConnection. source or sink missing.";
-    return;
-    }
-
-  vtkSMProxyProperty* inputProp = vtkSMProxyProperty::SafeDownCast(
-    sink->GetProperty("Input"));
-  if(inputProp)
-    {
-    // Remove the input from the server manager.
-    inputProp->RemoveProxy(source);
-    }
 }
 
 //-----------------------------------------------------------------------------

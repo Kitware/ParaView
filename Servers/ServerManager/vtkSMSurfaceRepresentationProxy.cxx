@@ -35,7 +35,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.15");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -131,7 +131,8 @@ bool vtkSMSurfaceRepresentationProxy::BeginCreateVTKObjects()
 //----------------------------------------------------------------------------
 bool vtkSMSurfaceRepresentationProxy::EndCreateVTKObjects()
 {
-  this->Connect(this->GetInputProxy(), this->GeometryFilter, "Input");
+  this->Connect(this->GetInputProxy(), this->GeometryFilter, 
+    "Input", this->OutputPort);
   this->Connect(this->Mapper, this->Prop3D, "Mapper");
   this->Connect(this->LODMapper, this->Prop3D, "LODMapper");
   this->Connect(this->Property, this->Prop3D, "Property");

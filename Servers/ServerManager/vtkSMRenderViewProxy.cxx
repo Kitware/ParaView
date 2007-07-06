@@ -83,7 +83,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.22");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.23");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_LOD, Integer);
@@ -1519,7 +1519,7 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
 
 //-----------------------------------------------------------------------------
 vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
-  vtkSMProxy* source)
+  vtkSMProxy* source, int opport)
 {
   if (!source)
     {
@@ -1532,10 +1532,10 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
   vtkSMProxy* prototype = pxm->GetPrototypeProxy("representations", 
     "UnstructuredGridRepresentation");
 
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+  vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(
     prototype->GetProperty("Input"));
   pp->RemoveAllUncheckedProxies();
-  pp->AddUncheckedProxy(source);
+  pp->AddUncheckedInputConnection(source, opport);
   bool usg = (pp->IsInDomains()>0);
   pp->RemoveAllUncheckedProxies();
   if (usg)
@@ -1546,10 +1546,10 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
 
   prototype = pxm->GetPrototypeProxy("representations",
     "UniformGridRepresentation");
-  pp = vtkSMProxyProperty::SafeDownCast(
+  pp = vtkSMInputProperty::SafeDownCast(
     prototype->GetProperty("Input"));
   pp->RemoveAllUncheckedProxies();
-  pp->AddUncheckedProxy(source);
+  pp->AddUncheckedInputConnection(source, opport);
   bool sg = (pp->IsInDomains()>0);
   pp->RemoveAllUncheckedProxies();
   if (sg)

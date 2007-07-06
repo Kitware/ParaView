@@ -148,9 +148,9 @@ protected:
   // Description:
   // Creates a connection between the producer and the consumer
   // using "Input" property. Subclasses can use this to build
-  // pipelines.
+  // pipelines. OutputPort is applicable only to vtkSMIntVectorProperty.
   void Connect(vtkSMProxy* producer, vtkSMProxy* consumer,
-    const char* propertyname="Input");
+    const char* propertyname="Input", int outputport=0);
 
   // Description:
   // Subclassess should set this to true if they support selection pipelines.

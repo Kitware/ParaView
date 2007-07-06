@@ -37,10 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCursor>
 
 #include "pqApplicationCore.h"
+#include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqRenderView.h"
-#include "pqSMAdaptor.h"
 #include "pqServerManagerModel.h"
+#include "pqSMAdaptor.h"
 
 #include "vtkCollection.h"
 #include "vtkCommand.h"
@@ -51,9 +52,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSelection.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMClientDeliveryRepresentationProxy.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSelectionHelper.h"
 
@@ -94,6 +95,7 @@ public:
     SavedStyle(0),
     RenderModule(0),
     SelectionObserver(0),
+    SelectedOutputPort(0),
     Xs(0), Ys(0), Xe(0), Ye(0)
     {
       this->SelectionRenderModule = 0;
@@ -143,6 +145,7 @@ public:
   pqRenderView* SelectionRenderModule;
   vtkSMClientDeliveryRepresentationProxy* ClientSideDisplayer;
   vtkSMProxy* SelectedProxy;
+  int SelectedOutputPort;
 
   vtkSmartPointer<vtkSMProxy> SelectedRepresentation;
   vtkSmartPointer<vtkSMProxy> SelectionSource;
@@ -446,13 +449,15 @@ vtkSMClientDeliveryRepresentationProxy* pqSelectionManager::getClientSideDisplay
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource* pqSelectionManager::getSelectedSource() const
+pqOutputPort* pqSelectionManager::getSelectedPort() const
 {
   pqServerManagerModel* model = 
     pqApplicationCore::instance()->getServerManagerModel();
   if (this->Implementation->SelectedProxy)
     {
-    return model->findItem<pqPipelineSource*>(this->Implementation->SelectedProxy);
+    pqPipelineSource* src = model->findItem<pqPipelineSource*>(
+      this->Implementation->SelectedProxy);
+    return src? src->getOutputPort(this->Implementation->SelectedOutputPort) : 0;
     }
   
   return 0;
@@ -583,6 +588,11 @@ void pqSelectionManager::selectOnSurface(int screenRectangle[4])
   this->Implementation->SelectedProxy = 
     pqSMAdaptor::getProxyProperty(this->Implementation->
       SelectedRepresentation->GetProperty("Input"));
+  this->Implementation->SelectedOutputPort =
+    vtkSMInputProperty::SafeDownCast(
+      this->Implementation->SelectedRepresentation->GetProperty("Input"))->
+    GetOutputPortForConnection(0);
+
   this->Implementation->SelectionSource =
     pqSMAdaptor::getProxyProperty(this->Implementation->
       SelectedRepresentation->GetProperty("Selection"));
@@ -595,7 +605,8 @@ void pqSelectionManager::selectOnSurface(int screenRectangle[4])
   pqPipelineSource* pqSource = model->findItem<pqPipelineSource*>(
     this->Implementation->SelectedProxy);
   selectionModel->setCurrentItem(
-    pqSource, pqServerManagerSelectionModel::ClearAndSelect);
+    pqSource->getOutputPort(this->Implementation->SelectedOutputPort), 
+    pqServerManagerSelectionModel::ClearAndSelect);
 
   emit this->selectionChanged(this);
 }

@@ -249,17 +249,17 @@ void pqServerManagerModel::onProxyRegistered(const QString& group,
   else if (source)
     {
     QObject::connect(source, 
-      SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*)),
-      this, SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*)));
+      SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*, int)),
+      this, SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*, int)));
     QObject::connect(source, 
-      SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)),
-      this, SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)));
+      SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*, int)),
+      this, SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*, int)));
     QObject::connect(source, 
-      SIGNAL(preConnectionAdded(pqPipelineSource*, pqPipelineSource*)),
-      this, SIGNAL(preConnectionAdded(pqPipelineSource*, pqPipelineSource*)));
+      SIGNAL(preConnectionAdded(pqPipelineSource*, pqPipelineSource*, int)),
+      this, SIGNAL(preConnectionAdded(pqPipelineSource*, pqPipelineSource*, int)));
     QObject::connect(source, 
-      SIGNAL(preConnectionRemoved(pqPipelineSource*, pqPipelineSource*)),
-      this, SIGNAL(preConnectionRemoved(pqPipelineSource*, pqPipelineSource*)));
+      SIGNAL(preConnectionRemoved(pqPipelineSource*, pqPipelineSource*, int)),
+      this, SIGNAL(preConnectionRemoved(pqPipelineSource*, pqPipelineSource*, int)));
     QObject::connect(source, SIGNAL(nameChanged(pqServerManagerModelItem*)), 
       this, SIGNAL(nameChanged(pqServerManagerModelItem*)));
     QObject::connect(

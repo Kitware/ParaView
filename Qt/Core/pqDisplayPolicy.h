@@ -35,9 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "pqCoreExport.h" // Needed for PQCORE_EXPORT macro
 
+class pqDataRepresentation;
+class pqOutputPort;
 class pqPipelineSource;
 class pqView;
-class pqDataRepresentation;
 class vtkSMProxy;
 
 /// Display policy defines the application specific policy
@@ -51,19 +52,10 @@ class vtkSMProxy;
 class PQCORE_EXPORT pqDisplayPolicy : public QObject
 {
   Q_OBJECT
+  typedef QObject Superclass;
 public:
   pqDisplayPolicy(QObject* p);
   virtual ~pqDisplayPolicy();
-
-  /// FIXME: Move to pqObjectBuilder.
-  /// Creates a new display proxy for the (source, view) pair and returns it.
-  /// The caller must release the reference when it's done with the returned proxy.
-  /// Both view and source must be non-null. If source cannot be displayed in the
-  /// view, then this method will return NULL. This method should not bother
-  /// about preferred views for the source (use createPreferredDisplay instead). 
-  /// It should simply create the display for the given arguments.
-  virtual vtkSMProxy* newDisplayProxy(pqPipelineSource* source,
-    pqView* view) const;
 
   /// Returns a new display for the given (source,view) pair, or NULL 
   /// on failure. If the \c view is not a preferred view to display the source
@@ -92,9 +84,8 @@ public:
   /// or not of the type preferred by the source, it may create a new view and 
   /// add the displayto new view. \c dont_create_view can be used to 
   /// override this behaviour.
-  virtual pqDataRepresentation* createPreferredDisplay(
-    pqPipelineSource* source, pqView* view,
-    bool dont_create_view) const;
+  virtual pqDataRepresentation* createPreferredRepresentation(
+    pqOutputPort* port, pqView* view, bool dont_create_view) const;
 
   /// Set the visibility of the source in the given view. 
   /// Current implementation creates a new display for the source, if possible, 
@@ -102,15 +93,14 @@ public:
   /// be created for the source. Since custom applications may not necessarily
   /// create new views, we provide this as part of display policy which can 
   /// be easily overridden by creating a new subclass.
-  virtual pqDataRepresentation* setDisplayVisibility(
-    pqPipelineSource* source, pqView* view, bool visible);
+  virtual pqDataRepresentation* setRepresentationVisibility(
+    pqOutputPort* opPort, pqView* view, bool visible);
 
 protected:
   /// Determines the type of view that's preferred by the \c source. If \c view
   /// is of the preferred type, returns it. Otherwise a new view of the preferred 
   /// type may be created and returned.
-  virtual pqView* getPreferredView(pqPipelineSource* source,
-    pqView* view) const;
+  virtual pqView* getPreferredView(pqOutputPort* opPort, pqView* view) const;
 };
 
 #endif

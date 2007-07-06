@@ -52,7 +52,7 @@ public:
 
   // Description:
   // Returns true if all parts of the source proxy are in the domain.
-  int IsInDomain(vtkSMSourceProxy* proxy);
+  int IsInDomain(vtkSMSourceProxy* proxy, int outputport=0);
 
   // Description:
   // Returns the number of acceptable data types.

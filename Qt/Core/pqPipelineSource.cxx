@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkClientServerStream.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyIterator.h"
@@ -55,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView
 #include "pqDataRepresentation.h"
+#include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqServer.h"
 #include "pqSMAdaptor.h"
@@ -68,8 +70,7 @@ public:
   vtkSmartPointer<vtkSMProxy> Proxy;
 
   QString Name;
-  QList<pqPipelineSource*> Consumers;
-  QList<pqDataRepresentation*> Representations;
+  QList<pqOutputPort*> OutputPorts;
 
   QList<vtkSmartPointer<vtkSMPropertyLink> > Links;
   QList<vtkSmartPointer<vtkSMProxy> > ProxyListDomainProxies;
@@ -88,18 +89,114 @@ pqPipelineSource::pqPipelineSource(const QString& name, vtkSMProxy* proxy,
 : pqProxy("sources", name, proxy, server, _parent)
 {
   this->Internal = new pqPipelineSourceInternal(name, proxy);
-  QObject::connect(this, SIGNAL(representationAdded(
-        pqPipelineSource*, pqDataRepresentation*)),
-    this, SIGNAL(visibilityChanged(pqPipelineSource*, pqDataRepresentation*)));
-  QObject::connect(this, SIGNAL(representationRemoved(
-        pqPipelineSource*, pqDataRepresentation*)),
-    this, SIGNAL(visibilityChanged(pqPipelineSource*, pqDataRepresentation*)));
+  vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(this->getProxy());
+  if (source)
+    {
+    // Obtain information about number of output ports.
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkPVNumberOfOutputsInformation* info =
+      vtkPVNumberOfOutputsInformation::New();
+    vtkClientServerStream stream;
+    pm->GatherInformation(
+      source->GetConnectionID(), source->GetServers(), info, source->GetID());
+    int numports = info->GetNumberOfOutputs();
+    info->Delete();
+
+    for (int cc=0; cc < numports; cc++)
+      {
+      pqOutputPort* op = new pqOutputPort(this, cc);
+
+      // Relay all signals fired by the output ports
+      QObject::connect(
+        op, SIGNAL(connectionAdded(pqOutputPort*, pqPipelineSource*)),
+        this, SLOT(portConnectionAdded(pqOutputPort*, pqPipelineSource*)));
+      QObject::connect(
+        op, SIGNAL(preConnectionAdded(pqOutputPort*, pqPipelineSource*)),
+        this, SLOT(prePortConnectionAdded(pqOutputPort*, pqPipelineSource*)));
+      QObject::connect(
+        op, SIGNAL(connectionRemoved(pqOutputPort*, pqPipelineSource*)),
+        this, SLOT(portConnectionRemoved(pqOutputPort*, pqPipelineSource*)));
+      QObject::connect(
+        op, SIGNAL(preConnectionRemoved(pqOutputPort*, pqPipelineSource*)),
+        this, SLOT(prePortConnectionRemoved(pqOutputPort*, pqPipelineSource*)));
+
+      QObject::connect(
+        op, SIGNAL(representationAdded(pqOutputPort*, pqDataRepresentation*)),
+        this, SLOT(portRepresentationAdded(pqOutputPort*, pqDataRepresentation*)));
+      QObject::connect(
+        op, SIGNAL(representationRemoved(pqOutputPort*, pqDataRepresentation*)),
+        this, SLOT(portRepresentationRemoved(pqOutputPort*, pqDataRepresentation*)));
+      QObject::connect(
+        op, SIGNAL(visibilityChanged(pqOutputPort*, pqDataRepresentation*)),
+        this, SLOT(portVisibilityChanged(pqOutputPort*, pqDataRepresentation*)));
+
+      this->Internal->OutputPorts.push_back(op);
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
 pqPipelineSource::~pqPipelineSource()
 {
+  foreach (pqOutputPort* opport, this->Internal->OutputPorts)
+    {
+    delete opport;
+    }
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineSource::prePortConnectionAdded(
+  pqOutputPort* op, pqPipelineSource* cons)
+{
+  emit this->preConnectionAdded(this, cons, op->getPortNumber());
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineSource::portConnectionAdded(
+  pqOutputPort* op, pqPipelineSource* cons)
+{
+  emit this->connectionAdded(this, cons, op->getPortNumber());
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineSource::prePortConnectionRemoved(
+  pqOutputPort* op, pqPipelineSource* cons)
+{
+  emit this->preConnectionRemoved(this, cons, op->getPortNumber());
+}
+//-----------------------------------------------------------------------------
+void pqPipelineSource::portConnectionRemoved(
+  pqOutputPort* op, pqPipelineSource* cons)
+{
+  emit this->connectionRemoved(this, cons, op->getPortNumber());
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineSource::portRepresentationAdded(
+  pqOutputPort* op, pqDataRepresentation* cons)
+{
+  emit this->representationAdded(this, cons, op->getPortNumber());
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineSource::portRepresentationRemoved(
+  pqOutputPort* op, pqDataRepresentation* cons)
+{
+  emit this->representationRemoved(this, cons, op->getPortNumber());
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineSource::portVisibilityChanged(
+  pqOutputPort* vtkNotUsed(op), pqDataRepresentation* cons)
+{
+  emit this->visibilityChanged(this, cons);
+}
+
+//-----------------------------------------------------------------------------
+int pqPipelineSource::getNumberOfOutputPorts() const
+{
+  return this->Internal->OutputPorts.size();
 }
 
 //-----------------------------------------------------------------------------
@@ -269,87 +366,41 @@ void pqPipelineSource::setDefaultPropertyValues()
 }
 
 //-----------------------------------------------------------------------------
-int pqPipelineSource::getNumberOfConsumers() const
+pqOutputPort* pqPipelineSource::getOutputPort(int outputport) const
 {
-  return this->Internal->Consumers.size();
+  if (outputport < 0 || outputport >= this->Internal->OutputPorts.size())
+    {
+    qCritical() << "Invalid output port : " << outputport
+      << ". Available number of output ports: " 
+      << this->Internal->OutputPorts.size();
+    return NULL;
+    }
+  return this->Internal->OutputPorts[outputport];
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource *pqPipelineSource::getConsumer(int index) const
+int pqPipelineSource::getNumberOfConsumers(int outputport) const
 {
-  if(index >= 0 && index < this->Internal->Consumers.size())
+  if (outputport < 0 || outputport >= this->Internal->OutputPorts.size())
     {
-    return this->Internal->Consumers[index];
+    return 0;
     }
 
-  qCritical() << "Index " << index << " out of bounds.";
-  return 0;
+  return this->Internal->OutputPorts[outputport]->getNumberOfConsumers();
 }
 
 //-----------------------------------------------------------------------------
-int pqPipelineSource::getConsumerIndexFor(pqPipelineSource *consumer) const
+pqPipelineSource *pqPipelineSource::getConsumer(int outputport, int index) const
 {
-  int index = 0;
-  if(consumer)
+  if (outputport < 0 || outputport >= this->Internal->OutputPorts.size())
     {
-    foreach(pqPipelineSource *current, this->Internal->Consumers)
-      {
-      if(current == consumer)
-        {
-        return index;
-        }
-      index++;
-      }
+    qCritical() << "Invalid output port : " << outputport
+      << ". Available number of output ports: " 
+      << this->Internal->OutputPorts.size();
+    return NULL;
     }
-  return -1;
-}
 
-//-----------------------------------------------------------------------------
-bool pqPipelineSource::hasConsumer(pqPipelineSource *consumer) const
-{
-  return (this->getConsumerIndexFor(consumer) != -1);
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineSource::addConsumer(pqPipelineSource* cons)
-{
-  emit this->preConnectionAdded(this, cons);
-  this->Internal->Consumers.push_back(cons);
-
-  // raise signals to let the world know which connections were
-  // broken and which ones were made.
-  emit this->connectionAdded(this, cons);
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineSource::removeConsumer(pqPipelineSource* cons)
-{
-  int index = this->Internal->Consumers.indexOf(cons);
-  if (index != -1)
-    {
-    emit this->preConnectionRemoved(this, cons);
-    this->Internal->Consumers.removeAt(index);
-    // raise signals to let the world know which connections were
-    // broken and which ones were made.
-    emit this->connectionRemoved(this, cons);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineSource::addRepresentation(pqDataRepresentation* repr)
-{
-  this->Internal->Representations.push_back(repr);
-  QObject::connect(repr, SIGNAL(visibilityChanged(bool)),
-    this, SLOT(onRepresentationVisibilityChanged()));
-  emit this->representationAdded(this, repr);
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineSource::removeRepresentation(pqDataRepresentation* repr)
-{
-  this->Internal->Representations.removeAll(repr);
-  QObject::disconnect(repr, 0, this, 0);
-  emit this->representationRemoved(this, repr);
+  return this->Internal->OutputPorts[outputport]->getConsumer(index);
 }
 
 //-----------------------------------------------------------------------------
@@ -360,89 +411,54 @@ void pqPipelineSource::onRepresentationVisibilityChanged()
 }
 
 //-----------------------------------------------------------------------------
-pqDataRepresentation* pqPipelineSource::getRepresentation(pqView* view) const
+pqDataRepresentation* pqPipelineSource::getRepresentation(
+  int outputport, pqView* view) const
 {
-  if (view)
+  if (outputport < 0 || outputport >= this->Internal->OutputPorts.size())
     {
-    foreach (pqDataRepresentation* repr, this->Internal->Representations)
-      {
-      if (repr && (!view || repr->getView() == view))
-        {
-        return repr;
-        }
-      }
+    qCritical() << "Invalid output port : " << outputport
+      << ". Available number of output ports: " 
+      << this->Internal->OutputPorts.size();
+    return 0;
     }
-
-  return 0;
+  return this->Internal->OutputPorts[outputport]->getRepresentation(view);
 }
 
 //-----------------------------------------------------------------------------
-QList<pqDataRepresentation*> pqPipelineSource::getRepresentations(pqView* view) const
+QList<pqDataRepresentation*> pqPipelineSource::getRepresentations(
+  int outputport, pqView* view) const
 {
-  QList<pqDataRepresentation*> list;
-  foreach (pqDataRepresentation* repr, this->Internal->Representations)
+  if (outputport < 0 || outputport >= this->Internal->OutputPorts.size())
     {
-    if (repr && (!view || repr->getView() == view))
-      {
-      list.push_back(repr);
-      }
+    qCritical() << "Invalid output port : " << outputport
+      << ". Available number of output ports: " 
+      << this->Internal->OutputPorts.size();
+    return QList<pqDataRepresentation*>();
     }
 
-  return list;
+  return this->Internal->OutputPorts[outputport]->getRepresentations(view);
 }
 
 //-----------------------------------------------------------------------------
 QList<pqView*> pqPipelineSource::getViews() const
 {
-  QList<pqView*> views;
-  foreach(pqDataRepresentation* repr, this->Internal->Representations)
+  QSet<pqView*> views;
+
+  foreach (pqOutputPort* opPort, this->Internal->OutputPorts)
     {
-    if (repr)
-      {
-      pqView* view= repr->getView();
-      if (view && !views.contains(view))
-        {
-        views.push_back(view);
-        }
-      }
+    views.unite(QSet<pqView*>::fromList(
+        opPort->getViews()));
     }
 
-  return views; 
+  return QList<pqView*>::fromSet(views);
 }
 
 //-----------------------------------------------------------------------------
 void pqPipelineSource::renderAllViews(bool force /*=false*/)
 {
-  foreach(pqDataRepresentation* disp, this->Internal->Representations)
+  foreach (pqOutputPort* opPort, this->Internal->OutputPorts)
     {
-    if (disp)
-      {
-      disp->renderView(force);
-      }
+    opPort->renderAllViews(force);
     }
 }
 
-//-----------------------------------------------------------------------------
-vtkPVDataInformation* pqPipelineSource::getDataInformation() const
-{
-  vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(
-    this->getProxy());
-  // If parts haven't been created, it implies that the
-  // source has never been accepted. In that case
-  // forcing a pipeline update can raise errors, hence we dont 
-  // try to get any data information.
-  if (!proxy || proxy->GetNumberOfParts() == 0)
-    {
-    return 0;
-    }
-
-  if (this->Internal->Representations.size() > 0 || proxy->GetDataInformationValid())
-    {
-    return proxy->GetDataInformation();
-    }
-
-  pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
-  double time = timekeeper->getTime();
-  proxy->UpdatePipeline(time);
-  return proxy->GetDataInformation();
-}

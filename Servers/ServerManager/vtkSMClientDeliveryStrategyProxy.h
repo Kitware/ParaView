@@ -43,13 +43,13 @@ protected:
 
   // Description:
   // Create and initialize the data pipeline.
-  virtual void CreatePipeline(vtkSMSourceProxy* input);
+  virtual void CreatePipeline(vtkSMSourceProxy* input, int outputport);
 
   // Description:
   // Create and initialize the LOD data pipeline.
   // Note that this method is called irrespective of EnableLOD
   // flag.
-  virtual void CreateLODPipeline(vtkSMSourceProxy* input);
+  virtual void CreateLODPipeline(vtkSMSourceProxy* input, int outputport);
 
   // Description:
   // Update the LOD pipeline.
@@ -72,8 +72,8 @@ private:
 
   // Since LOD and full res pipeline have exactly the same setup, we have this
   // common method.
-  void CreatePipelineInternal(vtkSMSourceProxy* input, vtkSMSourceProxy* collect,
-    vtkSMSourceProxy* updatesuppressor);
+  void CreatePipelineInternal(vtkSMSourceProxy* input, int outputport, 
+    vtkSMSourceProxy* collect, vtkSMSourceProxy* updatesuppressor);
   void UpdatePipelineInternal(vtkSMSourceProxy* collect,
     vtkSMSourceProxy* updatesuppressor);
 

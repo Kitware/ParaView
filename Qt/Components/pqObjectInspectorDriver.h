@@ -41,10 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 class pqDataRepresentation;
-class pqView;
+class pqOutputPort;
 class pqPipelineSource;
 class pqProxy;
 class pqServerManagerSelectionModel;
+class pqView;
 
 
 /// \class pqObjectInspectorDriver
@@ -101,27 +102,17 @@ signals:
   /// \param view The view the display is in.
   void representationChanged(pqDataRepresentation *display, pqView *view);
 
+  /// \brief
+  ///   Emitted when the object/display panel to be shown changes.
+  /// \param port The output port that is currently selected.
+  void outputPortChanged(pqOutputPort* port);
+
 private slots:
   /// Determines the source to show and emits the signal.
   void updateSource();
 
-  /// \brief
-  ///   Checks if the source being removed is the active source.
-  ///
-  /// If the source being shown is being removed, the \c sourceChanged
-  /// signal is emitted.
-  ///
-  /// \param source The source being removed.
-  void checkSource(pqPipelineSource *source);
-
   /// Checks for a new display on the current source.
   void checkForDisplay();
-
-  /// \brief
-  ///   Checks whether or not the current display is being removed.
-  /// \param source The source owning the display.
-  /// \param display The display being removed.
-  void checkDisplay(pqPipelineSource *source, pqDataRepresentation *display);
 
 private:
   /// \brief
@@ -130,14 +121,14 @@ private:
   /// The current source is used to determine the active display. The
   /// source needs to be monitored for display changes.
   ///
-  /// \param source The new active source.
-  void setActiveSource(pqPipelineSource *source);
+  /// \param source The new active source's active output port.
+  void setActiveSource(pqOutputPort* sourcePort);
 
   /// \brief
   ///   Gets the source that should be shown in the object inspector.
   /// \return
-  ///   A pointer to the active source.
-  pqPipelineSource *findSource() const;
+  ///   A pointer to the active source's active output port.
+  pqOutputPort* findSource();
 
   /// \brief
   ///   Gets the display that should be shown in the display panel.
@@ -148,10 +139,11 @@ private:
 private:
   /// Used to find the selected item(s).
   pqServerManagerSelectionModel *Selection;
-  pqPipelineSource *Source;   ///< Stores the active source.
   pqDataRepresentation *Display; ///< Stores the active display.
   pqView *View;  ///< Stores the active view.
   bool ShowCurrent;           ///< True if the current is shown for multiple.
+
+  pqOutputPort* OutputPort;
 };
 
 #endif

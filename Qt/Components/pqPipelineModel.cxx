@@ -36,11 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineModel.h"
 
 #include "pqDataRepresentation.h"
-#include "pqView.h"
+#include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerModelItem.h"
+#include "pqView.h"
 
 #include <QFont>
 #include <QIcon>
@@ -165,12 +166,18 @@ public:
 
   QList<pqPipelineModelObject *> &getOutputs() {return this->Outputs;}
 
-  void setVisibleState(pqView *module);
+  virtual void setVisibleState(pqView *module);
+
+protected:
+  /// Determines the visibility state for the given port and view combination.
+  pqPipelineModelItem::VisibleState computeVisibilityState(
+    pqOutputPort* port, pqView* view);
+
+  pqPipelineModelItem::VisibleState Eyeball;
+  pqPipelineSource *Source;
 
 private:
-  pqPipelineSource *Source;
   QList<pqPipelineModelObject *> Outputs;
-  pqPipelineModelItem::VisibleState Eyeball;
   bool Selectable;
 };
 
@@ -191,6 +198,49 @@ public:
 
 private:
   QList<pqPipelineModelSource *> Inputs;
+};
+
+/// \class pqPipelineModelOutputPort
+/// \brief
+///   This is the object used for sources/filters that have more than 1 output
+///   port.
+class pqPipelineModelOutputPort : public pqPipelineModelFilter
+{
+public:
+  pqPipelineModelOutputPort(pqPipelineModelServer *server=0,
+    pqPipelineSource* source=0, int port=0, QObject *parent=0):
+    pqPipelineModelFilter(server, source, 
+      pqPipelineModel::SourceOutputPort, parent),
+    Port(port)
+  {
+  this->setType(pqPipelineModel::SourceOutputPort);
+  }
+  
+  virtual QString getName() const
+    {
+    return QString("Output%1").arg(this->Port);
+    }
+ 
+  // Output port's name can never be in a modified state.
+  virtual bool isModified() const
+    { return false; }
+
+  // Returns the ServerManagerModel item this object stands for.
+  // In case of output port, we returns the pqOutputPort object for this port.
+  virtual pqServerManagerModelItem *getObject() const 
+    {
+    pqPipelineSource *src = this->getSource();
+    return src? src->getOutputPort(this->Port) : 0;
+    }
+
+  /// Overridden to avoid update state of all children.
+  virtual void setVisibleState(pqView *view)
+    {
+    this->Eyeball = this->computeVisibilityState(
+      this->Source->getOutputPort(this->Port), view);
+    }
+private:
+  int Port;
 };
 
 
@@ -223,7 +273,6 @@ private:
   pqPipelineModelSource *Source;
   pqPipelineModelFilter *Sink;
 };
-
 
 /// \class pqPipelineModelInternal
 /// \brief
@@ -340,7 +389,6 @@ pqPipelineModelSource::pqPipelineModelSource(pqPipelineModelServer *server,
   this->Source = source;
   this->Eyeball = pqPipelineModelItem::NotAllowed;
   this->Selectable = true;
-
   this->setType(pqPipelineModel::Source);
 }
 
@@ -425,30 +473,53 @@ void pqPipelineModelSource::removeChild(pqPipelineModelItem *item)
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineModelSource::setVisibleState(pqView *view)
+pqPipelineModelItem::VisibleState pqPipelineModelSource::computeVisibilityState(
+  pqOutputPort* port, pqView* view)
 {
   // If no view view is preset, it implies that a suitable type
   // of view view will be created.
-  this->Eyeball = pqPipelineModelItem::NotVisible;
-  if(view)
+  pqPipelineModelItem::VisibleState eye = pqPipelineModelItem::NotVisible;
+  if (view)
     {
-    pqDataRepresentation *repr = this->Source->getRepresentation(view);
+    pqDataRepresentation* repr = port->getRepresentation(view);
     if(repr && repr->isVisible())
       {
-      this->Eyeball = pqPipelineModelItem::Visible;
+      eye = pqPipelineModelItem::Visible;
       }
-    else if(view->canDisplaySource(this->Source))
+    else if(repr || view->canDisplay(port))
       {
-      this->Eyeball = pqPipelineModelItem::NotVisible;
+      eye = pqPipelineModelItem::NotVisible;
       }
     else
       {
-      this->Eyeball = pqPipelineModelItem::NotAllowed;
+      eye = pqPipelineModelItem::NotAllowed;
       }
     }
-
+  return eye;
 }
 
+//-----------------------------------------------------------------------------
+void pqPipelineModelSource::setVisibleState(pqView *view)
+{
+  if (this->Source->getNumberOfOutputPorts() > 1)
+    {
+    // Source has output ports, update the visibility state of the output ports.
+    this->Eyeball = pqPipelineModelItem::NotAllowed;
+    foreach (pqPipelineModelObject* output, this->getOutputs())
+      {
+      pqPipelineModelOutputPort* opPort = 
+        dynamic_cast<pqPipelineModelOutputPort*>(output);
+      if (opPort)
+        {
+        opPort->setVisibleState(view);
+        }
+      }
+    }
+  else
+    {
+    this->Eyeball = this->computeVisibilityState(this->Source->getOutputPort(0), view);
+    }
+}
 
 //-----------------------------------------------------------------------------
 pqPipelineModelFilter::pqPipelineModelFilter(pqPipelineModelServer *server,
@@ -593,7 +664,8 @@ pqPipelineModel::pqPipelineModel(const pqPipelineModel &other,
     while(item)
       {
       source = dynamic_cast<pqPipelineModelSource *>(item);
-      if(source)
+      if(source && 
+        !dynamic_cast<pqPipelineModelOutputPort*>(item))
         {
         this->addSource(source->getSource());
         }
@@ -614,7 +686,7 @@ pqPipelineModel::pqPipelineModel(const pqPipelineModel &other,
               source->getChild(i)->getObject());
           if(sink)
             {
-            this->addConnection(source->getSource(), sink);
+            this->addConnection(source->getSource(), sink, -1); 
             }
           }
         }
@@ -655,9 +727,14 @@ pqPipelineModel::pqPipelineModel(const pqServerManagerModel &other,
     // Set up the pipeline connections.
     for(source = sources.begin(); source != sources.end(); ++source)
       {
-      for(int i = 0; i < (*source)->getNumberOfConsumers(); ++i)
+      int numOutputPorts = (*source)->getNumberOfOutputPorts();
+      for (int cc=0; cc < numOutputPorts; cc++)
         {
-        this->addConnection(*source, (*source)->getConsumer(i));
+        int numConsumers =  (*source)->getNumberOfConsumers();
+        for(int i = 0; i < numConsumers; ++i)
+          {
+          this->addConnection(*source, (*source)->getConsumer(cc, i), cc);
+          }
         }
       }
     }
@@ -1046,26 +1123,56 @@ void pqPipelineModel::addSource(pqPipelineSource *source)
     {
     QObject::connect(source, 
       SIGNAL(visibilityChanged(pqPipelineSource*, pqDataRepresentation*)),
-      this, SLOT(updateRepresentations(pqPipelineSource*)), Qt::QueuedConnection);
+      this, SLOT(updateRepresentations(pqPipelineSource*)));
 
     // Add the source to the map.
     this->Internal->ItemMap.insert(source, item);
 
-    // Set up the source visibility state.
-    item->setVisibleState(this->Internal->RenderModule);
+    this->addSource(item);
 
-    QModelIndex parentIndex = this->makeIndex(server);
-    int row = server->getChildCount();
-    this->beginInsertRows(parentIndex, row, row);
-    server->getSources().insert(row, item);
-    this->endInsertRows();
-    if(server->getChildCount() == 1)
+    // Now create and all items for the output ports 
+    // (if num of output ports > 1).
+    int numOutputPorts = source->getNumberOfOutputPorts();
+    for (int cc=0; numOutputPorts> 1 && cc < numOutputPorts; cc++)
       {
-      emit this->firstChildAdded(parentIndex);
+      pqPipelineModelOutputPort* port = 
+        new pqPipelineModelOutputPort(server, source, cc);
+
+      this->Internal->ItemMap.insert(port->getObject(), port);
+
+      this->addSource(port);
+      // The output port appears as a filter connected to the source.
+      this->addConnection(item, port, -1);
       }
+
+    // Set up the source visibility state.
+    // We update the visibility state after output ports have been setup.
+    item->setVisibleState(this->Internal->RenderModule);
+    }
+}
+//-----------------------------------------------------------------------------
+void pqPipelineModel::addSource(pqPipelineModelSource* item)
+{
+  // Find the source's parent model item.
+  pqPipelineModelServer *server = item->getServer();
+  if(!server)
+    {
+    qWarning() << "Source server not found in the pipeline model.";
+    return;
+    }
+
+  QModelIndex parentIndex = this->makeIndex(server);
+  int row = server->getChildCount();
+  this->beginInsertRows(parentIndex, row, row);
+  server->getSources().insert(row, item);
+  this->endInsertRows();
+  if(server->getChildCount() == 1)
+    {
+    emit this->firstChildAdded(parentIndex);
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqPipelineModel::removeSource(pqPipelineSource *source)
 {
   if(!source)
@@ -1093,12 +1200,34 @@ void pqPipelineModel::removeSource(pqPipelineSource *source)
 
   QObject::disconnect(source, 0, this, 0);
 
-  // The source should not have any outputs when it is deleted.
-  int i = 0;
+  // Clean output ports for the source, if any.
+  for (int i= sourceItem->getChildCount()-1; i>=0; --i)
+    {
+    pqPipelineModelOutputPort* port = dynamic_cast<pqPipelineModelOutputPort*>(
+      sourceItem->getOutputs().at(i));
+    if (port)
+      {
+      this->removeSource(port);
+      delete port;
+      }
+    }
+
+  this->removeSource(sourceItem);
+  delete sourceItem;
+
+  this->cleanPipelineMap();
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineModel::removeSource(pqPipelineModelSource* sourceItem)
+{
   pqPipelineModelObject *output = 0;
   pqPipelineModelFilter *filter = 0;
   pqPipelineModelLink *link = 0;
-  if(sourceItem->getChildCount())
+  int i = 0;
+
+  // The source should not have any outputs when it is deleted.
+  if (sourceItem->getChildCount())
     {
     qWarning() << "Source deleted with outputs attached.";
 
@@ -1123,7 +1252,7 @@ void pqPipelineModel::removeSource(pqPipelineSource *source)
 
       // Calling remove connection will modify the output list. Since
       // the loop counts from the end, this should not be a problem.
-      this->removeConnection(sourceItem, filter);
+      this->removeConnection(sourceItem, filter, -1);
       }
     }
 
@@ -1159,13 +1288,11 @@ void pqPipelineModel::removeSource(pqPipelineSource *source)
   this->beginRemoveRows(parentIndex, row, row);
   parentItem->removeChild(sourceItem);
   this->endRemoveRows();
-
-  delete sourceItem;
-  this->cleanPipelineMap();
 }
 
+//-----------------------------------------------------------------------------
 void pqPipelineModel::addConnection(pqPipelineSource *source,
-    pqPipelineSource *sink)
+    pqPipelineSource *sink, int srcOutputPort)
 {
   pqPipelineModelSource *sourceItem =
       dynamic_cast<pqPipelineModelSource *>(this->getModelItemFor(source));
@@ -1183,11 +1310,12 @@ void pqPipelineModel::addConnection(pqPipelineSource *source,
     return;
     }
 
-  this->addConnection(sourceItem, sinkItem);
+  this->addConnection(sourceItem, sinkItem, srcOutputPort);
 }
 
+//-----------------------------------------------------------------------------
 void pqPipelineModel::removeConnection(pqPipelineSource *source,
-    pqPipelineSource *sink)
+    pqPipelineSource *sink, int srcOutputPort)
 {
   // Ignore disconnect when cleaning up a server since it has already
   // been removed.
@@ -1212,7 +1340,7 @@ void pqPipelineModel::removeConnection(pqPipelineSource *source,
     return;
     }
 
-  this->removeConnection(sourceItem, sinkItem);
+  this->removeConnection(sourceItem, sinkItem, srcOutputPort);
 }
 
 //-----------------------------------------------------------------------------
@@ -1227,6 +1355,7 @@ void pqPipelineModel::updateItemName(pqServerManagerModelItem *item)
 
     // If the item is a fan in point, update the link items.
     this->updateInputLinks(dynamic_cast<pqPipelineModelFilter *>(modelItem));
+    this->updateOutputPorts(dynamic_cast<pqPipelineModelSource*>(modelItem), 1);
     }
 }
 
@@ -1245,6 +1374,7 @@ void pqPipelineModel::updateRepresentations(pqPipelineSource *source)
     // TODO: Update the column with the display list.
     // If the item is a fan in point, update the link items.
     this->updateInputLinks(dynamic_cast<pqPipelineModelFilter *>(item), 1);
+    this->updateOutputPorts(item, 1);
     }
 }
 
@@ -1287,6 +1417,7 @@ void pqPipelineModel::setView(pqView *module)
         // If the item is a fan in point, update the link items.
         this->updateInputLinks(
             dynamic_cast<pqPipelineModelFilter *>(source), 1);
+        this->updateOutputPorts(source, 1);
         }
 
       item = this->getNextModelItem(item);
@@ -1308,14 +1439,41 @@ void pqPipelineModel::setView(pqView *module)
     }
 }
 
+pqPipelineModelSource* getOutputPort(pqPipelineModelSource* source, int srcOutputPort) 
+{
+  if (srcOutputPort != -1)
+    {
+    // Locate the output port item for the source, if one exists,
+    // and add the sink to that.
+    int index = 0;
+    foreach (pqPipelineModelObject* op, source->getOutputs())
+      {
+      pqPipelineModelOutputPort* port = 
+        dynamic_cast<pqPipelineModelOutputPort*>(op);
+      if (port)
+        {
+        if (index == srcOutputPort)
+          {
+          return port;
+          }
+        index++;
+        }
+      }
+    }
+  return source;
+}
+
+//-----------------------------------------------------------------------------
 void pqPipelineModel::addConnection(pqPipelineModelSource *source,
-    pqPipelineModelFilter *sink)
+    pqPipelineModelFilter *sink, int srcOutputPort)
 {
   pqPipelineModelServer *server = source->getServer();
   if(!server)
     {
     return;
     }
+
+  source = ::getOutputPort(source, srcOutputPort);
 
   int row = 0;
   QModelIndex parentIndex;
@@ -1413,13 +1571,14 @@ void pqPipelineModel::addConnection(pqPipelineModelSource *source,
 }
 
 void pqPipelineModel::removeConnection(pqPipelineModelSource *source,
-    pqPipelineModelFilter *sink)
+    pqPipelineModelFilter *sink, int srcOutputPort)
 {
   pqPipelineModelServer *server = source->getServer();
   if(!server)
     {
     return;
     }
+  source = ::getOutputPort(source, srcOutputPort);
 
   int row = 0;
   QModelIndex parentIndex;
@@ -1518,6 +1677,7 @@ void pqPipelineModel::updateDisplays(pqView *module)
         // If the item is a fan in point, update the link items.
         this->updateInputLinks(
             dynamic_cast<pqPipelineModelFilter *>(source), 1);
+        this->updateOutputPorts(source, 1);
         }
       }
     }
@@ -1542,6 +1702,23 @@ void pqPipelineModel::updateInputLinks(pqPipelineModelFilter *sink, int column)
     }
 }
 
+void pqPipelineModel::updateOutputPorts(pqPipelineModelSource* source, int column)
+{
+  if (source && source->getSource()->getNumberOfOutputPorts() > 1)
+    {
+    foreach (pqPipelineModelObject* output, source->getOutputs())
+      {
+      pqPipelineModelOutputPort* opPort = dynamic_cast<pqPipelineModelOutputPort*>(
+        output);
+      if (opPort)
+        {
+        QModelIndex changed = this->makeIndex(opPort, column);
+        emit this->dataChanged(changed, changed);
+        }
+      }
+    }
+}
+
 pqPipelineModelItem *pqPipelineModel::getModelItemFor(
     pqServerManagerModelItem *item) const
 {
@@ -1550,6 +1727,12 @@ pqPipelineModelItem *pqPipelineModel::getModelItemFor(
   if(iter != this->Internal->ItemMap.end())
     {
     return *iter;
+    }
+
+  pqOutputPort* op = qobject_cast<pqOutputPort*>(item);
+  if (op && op->getPortNumber()==0)
+    {
+    return this->getModelItemFor(op->getSource());
     }
 
   return 0;

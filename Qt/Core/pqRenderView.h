@@ -142,7 +142,7 @@ public:
   virtual bool supportsUndo() const { return true; }
  
   // returns whether a source can be displayed in this view module 
-  virtual bool canDisplaySource(pqPipelineSource* source) const;
+  virtual bool canDisplay(pqOutputPort* opPort) const;
 
   /// Returns if the view module can undo/redo interaction
   /// given the current state of the interaction undo stack.

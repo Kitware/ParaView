@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView core includes
 #include "pqDataRepresentation.h"
+#include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqView.h"
 
@@ -88,70 +89,56 @@ pqProxyTabWidget::~pqProxyTabWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyTabWidget::setProxy(pqProxy* proxy) 
+void pqProxyTabWidget::setProxy(pqPipelineSource* proxy) 
 {
-  if(this->Proxy)
-    {
-    QObject::disconnect(this->Proxy, 
-      SIGNAL(representationAdded(pqPipelineSource*, pqDataRepresentation*)),
-      this,
-      SLOT(updateDisplayTab()));
-    QObject::disconnect(this->Proxy, 
-      SIGNAL(representationRemoved(pqPipelineSource*, pqDataRepresentation*)),
-      this,
-      SLOT(updateDisplayTab()));
-    }
-  
-  this->Proxy = proxy;
-  
-  if(this->Proxy)
-    {
-    QObject::connect(this->Proxy, 
-      SIGNAL(representationAdded(pqPipelineSource*, pqDataRepresentation*)),
-      this,
-      SLOT(updateDisplayTab()),
-      Qt::QueuedConnection);
-    QObject::connect(this->Proxy, 
-      SIGNAL(representationRemoved(pqPipelineSource*, pqDataRepresentation*)),
-      this,
-      SLOT(updateDisplayTab()));
-    }
-
   this->Inspector->setProxy(proxy);
-  this->Information->setProxy(proxy);
-
-  this->updateDisplayTab();
 }
 
+//-----------------------------------------------------------------------------
 void pqProxyTabWidget::setView(pqView* view) 
 {
-  this->Inspector->setView(view);
   this->View = view;
-  
-  this->updateDisplayTab();
+  this->Inspector->setView(view);
+  this->Display->setView(view);
 }
 
-void pqProxyTabWidget::updateDisplayTab()
+//-----------------------------------------------------------------------------
+void pqProxyTabWidget::setRepresentation(pqDataRepresentation* repr)
 {
-  pqRepresentation* display = NULL;
-  pqPipelineSource* source = qobject_cast<pqPipelineSource*>(this->Proxy);
-  if(source && this->View)
+  this->Display->setRepresentation(repr);
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyTabWidget::setOutputPort(pqOutputPort* port)
+{
+  if (this->OutputPort == port)
     {
-    display =  source->getRepresentation(this->View);
+    return;
     }
 
-  this->Display->setSource(source);
-  this->Display->setView(this->View);
-  this->Display->setRepresentation(display);
+  this->OutputPort = port;
+  this->Information->setOutputPort(port);
+  this->Display->setOutputPort(port);
+  if (!port)
+    {
+    this->setRepresentation(0);
+    this->setProxy(0);
+    }
+  else
+    {
+    this->setProxy(port->getSource());
+    this->setRepresentation(port->getRepresentation(this->View));
+    }
 }
 
 //-----------------------------------------------------------------------------
 /// get the proxy for which properties are displayed
-pqProxy* pqProxyTabWidget::getProxy()
+pqPipelineSource* pqProxyTabWidget::getProxy()
 {
-  return this->Information->getProxy();
+  return this->OutputPort? this->OutputPort->getSource() : 0;
 }
 
+//-----------------------------------------------------------------------------
 pqObjectInspectorWidget* pqProxyTabWidget::getObjectInspector()
 {
   return this->Inspector;

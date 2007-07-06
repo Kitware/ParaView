@@ -35,8 +35,8 @@ protected:
   vtkSMUnstructuredGridParallelStrategy();
   ~vtkSMUnstructuredGridParallelStrategy();
 
-  virtual void CreatePipeline(vtkSMSourceProxy* input);
-  virtual void CreateLODPipeline(vtkSMSourceProxy* input);
+  virtual void CreatePipeline(vtkSMSourceProxy* input, int outputport);
+  virtual void CreateLODPipeline(vtkSMSourceProxy* input, int outputport);
 
 private:
   vtkSMUnstructuredGridParallelStrategy(const vtkSMUnstructuredGridParallelStrategy&); // Not implemented

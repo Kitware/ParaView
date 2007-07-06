@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt Includes.
 
 // ParaView Includes.
+#include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 
 //-----------------------------------------------------------------------------
@@ -56,8 +57,9 @@ pqElementInspectorView::~pqElementInspectorView()
 }
 
 //-----------------------------------------------------------------------------
-bool pqElementInspectorView::canDisplaySource(pqPipelineSource* source) const
+bool pqElementInspectorView::canDisplay(pqOutputPort* opPort) const
 {
+  pqPipelineSource* source = opPort? opPort->getSource() : 0;
   if (source)
     {
     QString xmlname = source->getProxy()->GetXMLName();

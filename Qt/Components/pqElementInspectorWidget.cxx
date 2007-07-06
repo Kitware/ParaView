@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataSetModel.h"
 #include "pqElementInspectorView.h"
 #include "pqObjectBuilder.h"
+#include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqSelectionManager.h"
 #include "pqServer.h"
@@ -242,8 +243,9 @@ void pqElementInspectorWidget::updateGUI()
     if (visibleDisplay == this->Implementation->SelectionDisplayer)
       {
       // We are showing the selection, create the label accordingly.
-      pqPipelineSource* input = 
-        this->Implementation->SelectionManager->getSelectedSource();
+      pqOutputPort* port = 
+        this->Implementation->SelectionManager->getSelectedPort();
+      pqPipelineSource* input = port? port->getSource() : 0;
       this->Implementation->SourceLabel->setText(
         QString("%1 (Selection)").arg(input->getSMName()));
       model->setSubstitutePointCellIdNames(true);
@@ -331,7 +333,7 @@ void pqElementInspectorWidget::inspect(pqPipelineSource* source)
       // This will create a new display only if the source's
       // output can be displayed by the element inspector.
       srcDisplay = pqApplicationCore::instance()->getObjectBuilder()->
-        createDataRepresentation(source, this->Implementation->ViewModule);
+        createDataRepresentation(source->getOutputPort(0), this->Implementation->ViewModule);
       if (srcDisplay)
         {
         pqSMAdaptor::setEnumerationProperty(
@@ -345,8 +347,8 @@ void pqElementInspectorWidget::inspect(pqPipelineSource* source)
 
     // If there is an active selection for this source,
     // we always give it a preference.
-    if (this->Implementation->SelectionManager->getSelectedSource()
-      == source)
+    pqOutputPort* port = this->Implementation->SelectionManager->getSelectedPort();
+    if ( (port? port->getSource() : 0) == source)
       {
       this->showOnly(this->Implementation->SelectionDisplayer);
       }
@@ -399,15 +401,15 @@ void pqElementInspectorWidget::onSelectionChanged()
     this->Implementation->SelectionDisplayer = 0;
     emit this->endNonUndoableChanges();
     }
-
+  /* FIXME: For now, we won't show active selection in the Element Inspector.
+   * We'll fix that once we have spread sheet view */
+  /*
   pqPipelineSource* selectedSource = 
     this->Implementation->SelectionManager->getSelectedSource();
   if (selectedSource)
     {
     emit this->beginNonUndoableChanges();
-    /* FIXME: For now, we won't show active selection in the Element Inspector.
-     * We'll fix that once we have spread sheet view */
-    /*
+    
     this->Implementation->SelectionDisplayer = 
       this->Implementation->SelectionManager->getClientSideDisplayer(
         selectedSource);
@@ -418,12 +420,12 @@ void pqElementInspectorWidget::onSelectionChanged()
       this->Implementation->ViewModule->getProxy()->GetProperty("Representations"),
       this->Implementation->SelectionDisplayer);
     this->Implementation->ViewModule->getProxy()->UpdateVTKObjects();
-    */
     emit this->endNonUndoableChanges();
 
     this->inspect(selectedSource);
     }
   else
+  */
     {
     this->inspect(this->Implementation->CurrentSource);
     }

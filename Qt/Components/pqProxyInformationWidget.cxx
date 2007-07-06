@@ -50,12 +50,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMSourceProxy.h"
+#include "vtkSMProxy.h"
 
 // ParaView widget includes
 
 // ParaView core includes
-#include "pqProxy.h"
+#include "pqOutputPort.h"
+#include "pqPipelineSource.h"
 #include "pqSMAdaptor.h"
 
 // ParaView components includes
@@ -70,7 +71,7 @@ public:
 
 //-----------------------------------------------------------------------------
 pqProxyInformationWidget::pqProxyInformationWidget(QWidget* p)
-  : QWidget(p), Source(NULL)
+  : QWidget(p), OutputPort(NULL)
 {
   this->Ui = new pqUi(this);
   this->Ui->setupUi(this);
@@ -82,23 +83,23 @@ pqProxyInformationWidget::~pqProxyInformationWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyInformationWidget::setProxy(pqProxy* source) 
+void pqProxyInformationWidget::setOutputPort(pqOutputPort* source) 
 {
-  if(this->Source == source)
+  if(this->OutputPort == source)
     {
     return;
     }
 
-  this->Source = source;
+  this->OutputPort = source;
 
   this->updateInformation();
 }
 
 //-----------------------------------------------------------------------------
 /// get the proxy for which properties are displayed
-pqProxy* pqProxyInformationWidget::getProxy()
+pqOutputPort* pqProxyInformationWidget::getOutputPort()
 {
-  return this->Source;
+  return this->OutputPort;
 }
 
 //-----------------------------------------------------------------------------
@@ -122,17 +123,12 @@ void pqProxyInformationWidget::updateInformation()
   this->Ui->zRange->setText(tr("NA"));
 
   // in with the new
-  vtkSMSourceProxy* sourceProxy = NULL;
   vtkPVDataInformation* dataInformation = NULL;
-  if(this->Source)
+  pqPipelineSource* source = NULL;
+  if(this->OutputPort)
     {
-    sourceProxy = vtkSMSourceProxy::SafeDownCast(this->Source->getProxy());
-    }
-  // if source proxy, and if parts have been made 
-  // ( never force the creation of parts by getting data information)
-  if(sourceProxy && sourceProxy->GetNumberOfParts())
-    {
-    dataInformation = sourceProxy->GetDataInformation();
+    source = this->OutputPort->getSource();
+    dataInformation = this->OutputPort->getDataInformation(/*update=*/false);
     }
 
   if(dataInformation)
@@ -242,12 +238,12 @@ void pqProxyInformationWidget::updateInformation()
 
     }
 
-  if (sourceProxy)
+  if (source)
     {
     // Find the first property that has a vtkSMFileListDomain. Assume that
     // it is the property used to set the filename.
     vtkSmartPointer<vtkSMPropertyIterator> piter;
-    piter.TakeReference(sourceProxy->NewPropertyIterator());
+    piter.TakeReference(source->getProxy()->NewPropertyIterator());
     for (piter->Begin(); !piter->IsAtEnd(); piter->Next())
       {
       vtkSMProperty* prop = piter->GetProperty();
@@ -278,7 +274,7 @@ void pqProxyInformationWidget::updateInformation()
 
     // Check if there are timestep values. If yes, display them.
     vtkSMDoubleVectorProperty* tsv = vtkSMDoubleVectorProperty::SafeDownCast(
-      sourceProxy->GetProperty("TimestepValues"));
+      source->getProxy()->GetProperty("TimestepValues"));
     this->Ui->timeValues->clear();
     if (tsv)
       {

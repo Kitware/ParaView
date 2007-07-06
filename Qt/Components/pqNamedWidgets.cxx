@@ -63,7 +63,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCollection.h"
 
 // ParaView includes
+#include "pq3DWidget.h"
 #include "pqApplicationCore.h"
+#include "pqCollapsedGroup.h"
 #include "pqComboBoxDomain.h"
 #include "pqDoubleRangeWidgetDomain.h"
 #include "pqDoubleRangeWidget.h"
@@ -72,11 +74,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileChooserWidget.h"
 #include "pqListWidgetItemObject.h"
 #include "pqObjectPanel.h"
-#include "pqPipelineModel.h"
-#include "pqPipelineSource.h"
+#include "pqPipelineFilter.h"
 #include "pqPropertyManager.h"
 #include "pqProxySelectionWidget.h"
-#include "pqTreeWidget.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqSignalAdaptorSelectionTreeWidget.h"
@@ -86,10 +86,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMProxy.h"
 #include "pqSMSignalAdaptors.h"
 #include "pqSpinBoxDomain.h"
-#include "pqTreeWidgetItemObject.h"
-#include "pq3DWidget.h"
-#include "pqCollapsedGroup.h"
 #include "pqTreeWidgetCheckHelper.h"
+#include "pqTreeWidget.h"
+#include "pqTreeWidgetItemObject.h"
 
 void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager)
 {
@@ -895,6 +894,14 @@ static void processHints(QGridLayout* panelLayout,
                          QStringList& propertiesToHide,
                          QStringList& propertiesToShow)
 {
+  // Obtain the list of input ports, we don't show any widgets for input ports.
+  QList<const char*> inputPortNames = 
+    pqPipelineFilter::getInputPorts(smProxy);
+  foreach (const char* pname, inputPortNames)
+    {
+    propertiesToHide.push_back(pname);
+    }
+
   // Get the hints for this proxy.
   // The hints may contain stuff about property groupping/layout
   // etc etc.

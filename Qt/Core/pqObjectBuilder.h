@@ -34,17 +34,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include "pqCoreExport.h"
+#include <QMap>
 
-class pqRepresentation;
+class pqDataRepresentation;
 class pqNameCount;
+class pqOutputPort;
 class pqPipelineSource;
 class pqProxy;
+class pqRepresentation;
 class pqScalarBarRepresentation;
 class pqScalarsToColors;
 class pqServer;
-class vtkSMProxy;
 class pqView;
-class pqDataRepresentation;
+class vtkSMProxy;
 
 /// pqObjectBuilder is loosely based on the \c Builder design pattern.
 /// It is used to create as well as destroy complex objects such as 
@@ -75,17 +77,17 @@ public:
     const QString& sm_name, pqServer* server);
 
   /// Creates a filter with the given Server Manager group (\c sm_group) and
-  /// name (\c sm_name). The filter's input is set as \c input. The filter
-  /// is created on the same server as \c input.
-  virtual pqPipelineSource* createFilter(const QString& sm_group,
-    const QString& sm_name, pqPipelineSource* input);
-
-  /// Creates a filter with the given Server Manager group (\c sm_group) and
   /// name (\c sm_name). If the filter accepts multiple inputs, all the inputs
   /// provided in the list are set as input, instead only the first one
   /// is set as the input. All inputs must be on the same server.
-  virtual pqPipelineSource* createFilter(const QString& sm_group,
-    const QString& sm_name, const QList<pqPipelineSource*>& inputs);
+  virtual pqPipelineSource* createFilter(
+    const QString& group, const QString& name,
+    QMap<QString, QList<pqOutputPort*> > namedInputs, pqServer* server);
+
+  /// Convenience method that takes a single input source.
+  virtual pqPipelineSource* createFilter(
+    const QString& group, const QString& name,
+    pqPipelineSource* input);
 
   /// Creates a custom filter with the given Server Manager name (\c sm_name)
   /// on the given \c server. If the custom filter takes an input,
@@ -108,12 +110,10 @@ public:
   /// as well as all the displays in the view module.
   virtual void destroy(pqView* view);
 
-  /// Creates a representation to show the data from the given \c source
-  /// in the given \c view. This uses the pqDisplayPolicy provided
-  /// by the application core to create the right kind of display
-  /// for the (source, view) pair.
+  /// Creates a representation to show the data from the given output port of a
+  /// source in the given \c view.
   virtual pqDataRepresentation* createDataRepresentation(
-    pqPipelineSource* source, pqView* view);
+    pqOutputPort* source, pqView* view);
 
   /// Destroys the data display. It will remove the display from any 
   /// view modules it is added to and then unregister it.
@@ -155,14 +155,6 @@ public:
   /// or starting afresh.
   virtual void destroyAllProxies(pqServer* server);
 
-  /// Create a connection between a source and a sink. This method ensures
-  /// that the UndoState is recoreded. Remember this "connection" is not a 
-  /// server connection, but connection between two pipeline objects.
-  void addConnection(pqPipelineSource* source, pqPipelineSource* filter);
-
-  /// Removes a connection between a source and a sink. This method ensures that 
-  /// the UndoState is recorded.
-  void removeConnection(pqPipelineSource* source, pqPipelineSource* sink);
 
   /// This is a convenience method to return the name of the
   /// property on the proxy, if any, which can be used to set the filename.

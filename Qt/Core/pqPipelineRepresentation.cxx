@@ -63,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqLookupTableManager.h"
 #include "pqObjectBuilder.h"
+#include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqScalarsToColors.h"
@@ -251,7 +252,7 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
   vtkSMSourceProxy* inputSourceProxy = vtkSMSourceProxy::SafeDownCast(inputProxy);
   inputSourceProxy->UpdatePipeline(time);
 
-  dataInfo = this->getInput()->getDataInformation();
+  dataInfo = this->getOutputPortFromInput()->getDataInformation(true);
 
   // get data set type
   // and set the default representation
@@ -301,7 +302,7 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
     {
     pqPipelineSource* myInputsInput = myInput->getInput(0);
     upstreamDisplay = qobject_cast<pqPipelineRepresentation*>(
-      myInputsInput->getRepresentation(this->getView()));
+      myInputsInput->getRepresentation(0, this->getView()));
     if (upstreamDisplay)
       {
       inGeomInfo = upstreamDisplay->getRepresentationProxy()->GetFullResDataInformation();
@@ -662,7 +663,7 @@ QList<QString> pqPipelineRepresentation::getColorFields()
     vtkPVDataInformation* dataInfo = NULL;
     if(this->getInput())
       {
-      dataInfo = this->getInput()->getDataInformation();
+      dataInfo = this->getOutputPortFromInput()->getDataInformation(false);
       }
     if(dataInfo)
       {

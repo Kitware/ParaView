@@ -123,7 +123,7 @@ void vtkSMViewProxy::CleanMultiViewInitializer()
 }
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.15");
 
 vtkInformationKeyMacro(vtkSMViewProxy, USE_CACHE, Integer);
 vtkInformationKeyMacro(vtkSMViewProxy, CACHE_TIME, Double);
@@ -229,7 +229,8 @@ vtkCommand* vtkSMViewProxy::GetObserver()
 }
 
 //----------------------------------------------------------------------------
-vtkSMRepresentationProxy* vtkSMViewProxy::CreateDefaultRepresentation(vtkSMProxy*)
+vtkSMRepresentationProxy* vtkSMViewProxy::CreateDefaultRepresentation(
+  vtkSMProxy* vtkNotUsed(proxy), int vtkNotUsed(opport))
 {
   if (this->DefaultRepresentationName)
     {

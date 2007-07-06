@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRepresentation.h"
 
 class pqDataRepresentationInternal;
+class pqOutputPort;
 class pqPipelineSource;
 class pqScalarsToColors;
 
@@ -54,6 +55,10 @@ public:
 
   // Get the source/filter of which this is a display.
   pqPipelineSource* getInput() const;
+
+  /// Returns the input pqPipelineSource's output port to which this
+  /// representation is connected.
+  pqOutputPort* getOutputPortFromInput() const;
 
   /// Returns the lookuptable proxy, if any.
   /// Most consumer displays take a lookup table. This method 

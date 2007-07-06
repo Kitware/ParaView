@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // pq includes
 #include "pqApplicationCore.h"
 #include "pqDisplayPolicy.h"
+#include "pqOutputPort.h"
 #include "pqPendingDisplayUndoElement.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineRepresentation.h"
@@ -150,54 +151,52 @@ void pqPendingDisplayManager::createPendingDisplays(
       continue;
       }
 
-    pqDataRepresentation* repr = displayPolicy->createPreferredDisplay(
-      source, activeview, false);
-    if (!repr || !repr->getView())
+    // Create representations for all output ports.
+    for (int cc=0; cc < source->getNumberOfOutputPorts(); cc++)
       {
-      continue;
-      }
-
-    pqView* view = repr->getView(); 
-    pqRenderView* renModule = qobject_cast<pqRenderView*>(view);
-    if (renModule && renModule->getNumberOfVisibleRepresentations() == 1)
-      {
-      renModule->resetCamera();
-      renModule->resetCenterOfRotation();
-      }
-
-    pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(source);
-    if (filter)
-      {
-      int replace_input = filter->replaceInput();
-      if (replace_input > 0)
+      pqDataRepresentation* repr = displayPolicy->createPreferredRepresentation(
+        source->getOutputPort(cc), activeview, false);
+      if (!repr || !repr->getView())
         {
-        // hide input source.
-        QList<pqPipelineSource*> inputs = filter->getInputs();
-        for(int cc=0; cc < inputs.size(); ++cc)
+        continue;
+        }
+
+      pqView* view = repr->getView(); 
+      pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(source);
+      if (filter)
+        {
+        int replace_input = filter->replaceInput();
+        if (replace_input > 0)
           {
-          pqPipelineSource* input_src = inputs[cc];
-          pqDataRepresentation* inputRepr = input_src->getRepresentation(view);
-          if (inputRepr)
+          // hide input source.
+          QList<pqOutputPort*> inputs = filter->getInputs();
+          for(int cc=0; cc < inputs.size(); ++cc)
             {
-            pqPipelineRepresentation* sourceDisp =
-                qobject_cast<pqPipelineRepresentation*>(inputRepr);
-            if (sourceDisp && replace_input == 2)
+            pqOutputPort* input = inputs[cc];
+            pqDataRepresentation* inputRepr = input->getRepresentation(view);
+            if (inputRepr)
               {
-              // Conditionaly turn off the input. The input should be turned
-              // off if the representation is surface and the opacity is 1.
-              if (sourceDisp->getRepresentationType() != 
-                vtkSMPVRepresentationProxy::SURFACE ||
-                sourceDisp->getOpacity() < 1.0)
+              pqPipelineRepresentation* sourceDisp =
+                qobject_cast<pqPipelineRepresentation*>(inputRepr);
+              if (sourceDisp && replace_input == 2)
                 {
-                continue;
+                // Conditionaly turn off the input. The input should be turned
+                // off if the representation is surface and the opacity is 1.
+                if (sourceDisp->getRepresentationType() != 
+                  vtkSMPVRepresentationProxy::SURFACE ||
+                  sourceDisp->getOpacity() < 1.0)
+                  {
+                  continue;
+                  }
                 }
+              inputRepr->setVisible(false);
               }
-            inputRepr->setVisible(false);
             }
           }
         }
+
+      view->render(); // these renders are collapsed.
       }
-    view->render();
 
     if (this->Internal->UndoStack)
       {

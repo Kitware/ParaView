@@ -20,7 +20,7 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMCompoundProxy.h"
-#include "vtkSMProxyProperty.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkStdString.h"
 
@@ -28,7 +28,7 @@
 
 
 vtkStandardNewMacro(vtkSMDataTypeDomain);
-vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.12");
+vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.13");
 
 struct vtkSMDataTypeDomainInternals
 {
@@ -74,6 +74,7 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMProperty* property)
     }
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(property);
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
   if (pp)
     {
     unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
@@ -84,8 +85,9 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMProperty* property)
         {
         proxy = cp->GetConsumableProxy();
         }
+      int portno = ip? ip->GetUncheckedOutputPortForConnection(i) : 0;
       if (!this->IsInDomain( 
-            vtkSMSourceProxy::SafeDownCast(proxy) ) )
+            vtkSMSourceProxy::SafeDownCast(proxy), portno ) )
         {
         return 0;
         }
@@ -97,7 +99,8 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMProperty* property)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy)
+int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy, 
+  int outputport/*=0*/)
 {
   if (!proxy)
     {
@@ -112,7 +115,7 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy)
 
   // Make sure the outputs are created.
   proxy->CreateParts();
-  vtkPVDataInformation* info = proxy->GetDataInformation();
+  vtkPVDataInformation* info = proxy->GetDataInformation(outputport);
   if (!info)
     {
     return 0;

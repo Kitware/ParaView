@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqExodusPanel.h"
+#include "ui_pqExodusPanel.h"
 
 // Qt includes
 #include <QAction>
@@ -45,24 +45,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // VTK includes
 
 // ParaView Server Manager includes
-#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
-#include "vtkSMSourceProxy.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSourceProxy.h"
 
 // ParaView includes
+#include "pqOutputPort.h"
+#include "pqPipelineSource.h"
 #include "pqPropertyManager.h"
 #include "pqProxy.h"
-#include "pqPipelineSource.h"
+#include "pqServer.h"
 #include "pqSMAdaptor.h"
+#include "pqTimeKeeper.h"
 #include "pqTreeWidgetCheckHelper.h"
 #include "pqTreeWidgetItemObject.h"
-#include "ui_pqExodusPanel.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "pqServer.h"
-#include "pqTimeKeeper.h"
 
 class pqExodusPanel::pqUI : public QObject, public Ui::ExodusPanel 
 {
@@ -456,7 +456,7 @@ void pqExodusPanel::updateDataRanges()
   // update data information about loaded arrays
 
   vtkPVDataInformation* di = qobject_cast<pqPipelineSource*>
-    (this->referenceProxy())->getDataInformation();
+    (this->referenceProxy())->getOutputPort(0)->getDataInformation(false);
   vtkPVDataSetAttributesInformation* pdi = 0;
   vtkPVDataSetAttributesInformation* cdi = 0;
   if (di)

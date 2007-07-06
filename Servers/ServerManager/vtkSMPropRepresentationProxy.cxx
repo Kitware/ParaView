@@ -26,7 +26,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMPropRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPropRepresentationProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMPropRepresentationProxy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMPropRepresentationProxy::vtkSMPropRepresentationProxy()
 {
@@ -193,7 +193,8 @@ bool vtkSMPropRepresentationProxy::EndCreateVTKObjects()
   if (this->SelectionRepresentation)
     {
     // Setup selection pipeline connections.
-    this->Connect(this->GetInputProxy(), this->SelectionRepresentation);
+    this->Connect(this->GetInputProxy(), this->SelectionRepresentation, 
+      "Input", this->OutputPort);
 
     // Link actor properties with the seleciton actor so that actor
     // transformations work.

@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtDebug>
 
+#include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqPropertyManager.h"
 #include "pqProxy.h"
@@ -144,14 +145,15 @@ void pqExtractSelectionPanel::updateIDRanges()
     }
 
   // this filter can have at most 1 input.
-  pqPipelineSource* input = (filter->getInputCount()>0)?
-    filter->getInput(0):0;
+  pqOutputPort* input = filter->getInput(
+    filter->getInputPortName(0), 0);
+
   if (!input)
     {
     return;
     }
  
-  vtkPVDataInformation* dataInfo = input->getDataInformation();
+  vtkPVDataInformation* dataInfo = input->getDataInformation(false);
   if (!dataInfo)
     {
     return;
@@ -247,15 +249,16 @@ void pqExtractSelectionPanel::updateInformationAndDomains()
 
   pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(
     this->referenceProxy());
-  
-  pqPipelineSource* input = (filter->getInputCount() > 0)?
-    filter->getInput(0) : 0;
+ 
+  pqOutputPort* input = filter->getInput(
+    filter->getInputPortName(0), 0);
+
   if (!input)
     {
     return;
     }
 
-  vtkPVDataInformation* dataInfo = input->getDataInformation();
+  vtkPVDataInformation* dataInfo = input->getDataInformation(false);
   vtkSMExtractSelectionProxy* smproxy = vtkSMExtractSelectionProxy::SafeDownCast(
     filter->getProxy());
 

@@ -39,9 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsExport.h"
 #include <QDialog>
+#include <QList>
 
 class pqFilterInputDialogInternal;
 class pqFlatTreeView;
+class pqOutputPort;
 class pqPipelineBrowserStateManager;
 class pqPipelineFilter;
 class pqPipelineModel;
@@ -52,7 +54,6 @@ class QLabel;
 class QPushButton;
 class QScrollArea;
 class QString;
-class QStringList;
 
 
 class PQCOMPONENTS_EXPORT pqFilterInputDialog : public QDialog
@@ -65,14 +66,23 @@ public:
 
   pqPipelineModel *getModel() const {return this->Model;}
   pqPipelineFilter *getFilter() const {return this->Filter;}
-  void setModelAndFilter(pqPipelineModel *model, pqPipelineFilter *filter);
 
-  void getFilterInputPorts(QStringList &ports) const;
-  void getFilterInputs(const QString &port, QStringList &inputs) const;
-  void getCurrentFilterInputs(const QString &port, QStringList &inputs) const;
+  /// Set the original pipeline model, and the filter whose input this dialog is
+  /// going to change.
+  /// \c namedInputs is the map of input port name to the list of inputs on that
+  /// port. This is used as the current state of the selection for the filter
+  /// inputs.
+  void setModelAndFilter(pqPipelineModel *model, pqPipelineFilter *filter,
+    const QMap<QString, QList<pqOutputPort*> > &namedInputs);
 
+  /// Used to obtain the input of inputs for the given input port.
+  QList<pqOutputPort*>& getFilterInputs(const QString &port) const;
+
+  bool isInputAcceptable(pqOutputPort*) const;
 private slots:
+  /// Called when the user selection for the current input port changes.
   void changeCurrentInput(int id);
+
   void changeInput(const QItemSelection &selected,
       const QItemSelection &deselected);
 

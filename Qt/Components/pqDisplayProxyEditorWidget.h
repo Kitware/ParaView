@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include "pqDisplayPanel.h"
 
+class pqOutputPort;
 class pqPipelineSource;
 class pqRepresentation;
 class pqView;
@@ -54,8 +55,8 @@ public:
   /// Set the source and view. Source and view are used by this class
   /// only if representation is NULL. It is used to decide if a new
   /// representation can be created for the source at all.
-  void setSource(pqPipelineSource* source);
   void setView(pqView* view);
+  void setOutputPort(pqOutputPort* port);
 
   /// Set the representation to edit. If NULL, source and view must be set so
   /// that the widget can show a default GUI which allows the user to
@@ -83,6 +84,8 @@ private:
   class pqInternal;
   pqInternal* Internal;
   void showDefaultWidget();
+
+  void updatePanel();
 };
 
 

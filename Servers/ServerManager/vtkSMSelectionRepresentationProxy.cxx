@@ -26,7 +26,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSelectionRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMSelectionRepresentationProxy::vtkSMSelectionRepresentationProxy()
 {
@@ -151,7 +151,8 @@ bool vtkSMSelectionRepresentationProxy::BeginCreateVTKObjects()
 bool vtkSMSelectionRepresentationProxy::EndCreateVTKObjects()
 {
   // Setup selection pipeline connections.
-  this->Connect(this->GetInputProxy(), this->ExtractSelection);
+  this->Connect(this->GetInputProxy(), this->ExtractSelection, 
+    "Input", this->OutputPort);
   this->Connect(this->EmptySelectionSource, this->ExtractSelection, 
     "Selection");
   this->Connect(this->ExtractSelection, this->GeometryFilter);

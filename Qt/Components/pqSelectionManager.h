@@ -38,10 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "vtkType.h"
 
-class pqView;
+class pqOutputPort;
 class pqPipelineSource;
 class pqRenderView;
 class pqSelectionManagerImplementation;
+class pqView;
 class vtkDataObject;
 class vtkSMClientDeliveryRepresentationProxy;
 class vtkSMProxy;
@@ -69,7 +70,7 @@ public:
     pqPipelineSource* source) const;
 
   /// Returns the currently selected source, if any.
-  pqPipelineSource* getSelectedSource() const;
+  pqOutputPort* getSelectedPort() const;
   
   enum Modes
   {

@@ -69,7 +69,11 @@ public:
   /// in the ServerManager.
   virtual void forceRender();
 
-  virtual bool canDisplaySource(pqPipelineSource* source) const;
+  /// This method returns is any pqPipelineSource can be dislayed in this
+  /// view. This is a convenience method, it gets
+  /// the pqDisplayPolicy object from the pqApplicationCore
+  /// are queries it.
+  virtual bool canDisplay(pqOutputPort* opPort) const;
 
 private slots:
   void visibilityChanged(pqRepresentation* disp);

@@ -64,7 +64,7 @@ public:
     { return 0; }
   
   /// Currently, this view can show only Extraction filters.
-  virtual bool canDisplaySource(pqPipelineSource* source) const;
+  virtual bool canDisplay(pqOutputPort* opPort) const;
 
 private:
   pqElementInspectorView(const pqElementInspectorView&); // Not implemented.

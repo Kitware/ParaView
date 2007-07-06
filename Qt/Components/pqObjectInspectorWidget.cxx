@@ -298,10 +298,10 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
                 SIGNAL(sourceRemoved(pqPipelineSource*)),
                 SLOT(removeProxy(pqPipelineSource*)));
   this->connect(pqApplicationCore::instance()->getServerManagerModel(), 
-      SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)),
+      SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*, int)),
       SLOT(handleConnectionChanged(pqPipelineSource*, pqPipelineSource*)));
   this->connect(pqApplicationCore::instance()->getServerManagerModel(), 
-      SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*)),
+      SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*, int)),
       SLOT(handleConnectionChanged(pqPipelineSource*, pqPipelineSource*)));
 
 }

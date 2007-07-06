@@ -187,7 +187,8 @@ void pqSelectionAdaptor::currentChanged(const QModelIndex& current,
 
 //-----------------------------------------------------------------------------
 void pqSelectionAdaptor::selectionChanged(
-  const QItemSelection& selected, const QItemSelection& deselected)
+  const QItemSelection& /*selected*/, 
+  const QItemSelection& /*deselected*/)
 {
   if (this->Internal->IgnoreSignals)
     {
@@ -199,31 +200,25 @@ void pqSelectionAdaptor::selectionChanged(
     return;
     }
 
+  QItemSelectionModel* qModel = this->Internal->QSelectionModel;
+
   this->Internal->IgnoreSignals = true;
+  
+  pqServerManagerSelection newSMSelection;
+  const QModelIndexList &indexes = qModel->selection().indexes();
 
-  pqServerManagerSelection smSelected;
-  const QModelIndexList &sIndexes = selected.indexes();
-
-  foreach (const QModelIndex& index, sIndexes)
+  foreach (const QModelIndex& index, indexes)
     {
     pqServerManagerModelItem* smItem = this->mapToSMModel(
       this->mapToSource(index));
-    smSelected.push_back(smItem);
+    if (!newSMSelection.contains(smItem))
+      {
+      newSMSelection.push_back(smItem);
+      }
     }
 
-  pqServerManagerSelection smDeselected;
-  const QModelIndexList &dIndexes = deselected.indexes();
-  foreach (const QModelIndex& index, dIndexes)
-    {
-    pqServerManagerModelItem* smItem = this->mapToSMModel(
-      this->mapToSource(index));
-    smDeselected.push_back(smItem);
-    }
-
-  this->Internal->SMSelectionModel->select(smDeselected, 
-   pqServerManagerSelectionModel::Deselect);
-  this->Internal->SMSelectionModel->select(smSelected,
-   pqServerManagerSelectionModel::Select);
+  this->Internal->SMSelectionModel->select(newSMSelection,
+   pqServerManagerSelectionModel::ClearAndSelect);
   this->Internal->IgnoreSignals = false;
 }
 

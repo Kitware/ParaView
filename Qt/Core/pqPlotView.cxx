@@ -62,23 +62,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartMouseSelection.h"
 #include "pqChartSeriesOptionsGenerator.h"
 #include "pqChartWidget.h"
-#include "pqRepresentation.h"
-#include "pqHistogramChartOptions.h"
 #include "pqHistogramChart.h"
+#include "pqHistogramChartOptions.h"
 #include "pqHistogramWidget.h"
 #include "pqLineChart.h"
-#include "pqLineChartRepresentation.h"
 #include "pqLineChartModel.h"
 #include "pqLineChartOptions.h"
+#include "pqLineChartRepresentation.h"
 #include "pqLineChartSeriesOptions.h"
 #include "pqLineChartWidget.h"
+#include "pqOutputPort.h"
 #include "pqPipelineSource.h"
+#include "pqRepresentation.h"
 #include "pqServer.h"
 #include "pqSMAdaptor.h"
 #include "pqVTKHistogramColor.h"
 #include "pqVTKHistogramModel.h"
 #include "pqVTKLineChartSeries.h"
-
 
 class pqPlotViewHistogram
 {
@@ -808,10 +808,11 @@ void pqPlotView::redo()
 }
 
 //-----------------------------------------------------------------------------
-bool pqPlotView::canDisplaySource(pqPipelineSource* source) const
+bool pqPlotView::canDisplay(pqOutputPort* opPort) const
 {
-  if(!source || 
-     source->getServer()->GetConnectionID() !=
+  pqPipelineSource* source = opPort? opPort->getSource() :0;
+  if(!opPort|| !source ||
+     opPort->getServer()->GetConnectionID() !=
      this->getServer()->GetConnectionID())
     {
     return false;
@@ -821,7 +822,7 @@ bool pqPlotView::canDisplaySource(pqPipelineSource* source) const
 
   if(this->getViewType() == this->barChartType())
     {
-    vtkPVDataInformation* dataInfo = source->getDataInformation();
+    vtkPVDataInformation* dataInfo = opPort->getDataInformation(true);
     if (dataInfo)
       {
       int extent[6];
@@ -838,7 +839,7 @@ bool pqPlotView::canDisplaySource(pqPipelineSource* source) const
     }
   else if(this->getViewType() == this->XYPlotType())
     {
-    vtkPVDataInformation* dataInfo = source->getDataInformation();
+    vtkPVDataInformation* dataInfo = opPort->getDataInformation(true);
     if (dataInfo)
       {
       if (dataInfo->GetNumberOfPoints() <= 1)

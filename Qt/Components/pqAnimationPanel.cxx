@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqDoubleSpinBoxDomain.h"
 #include "pqKeyFrameTimeValidator.h"
+#include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyLinks.h"
 #include "pqRenderView.h"
@@ -556,7 +557,8 @@ void pqAnimationPanel::updateEnableState()
 // Called when the pipeline brower selection changes.
 void pqAnimationPanel::onCurrentChanged(pqServerManagerModelItem* current)
 {
-  pqProxy* src = qobject_cast<pqProxy*>(current);
+  pqOutputPort* opPort = qobject_cast<pqOutputPort*>(current);
+  pqProxy* src = opPort? opPort->getSource() : qobject_cast<pqProxy*>(current);
   if (!src)
     {
     // We don't change the selection if the request is to select nothing 

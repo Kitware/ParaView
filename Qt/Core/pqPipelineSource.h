@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 
 class pqDataRepresentation;
+class pqOutputPort;
 class pqPipelineSourceInternal;
 class pqView;
 class vtkObject;
@@ -59,33 +60,48 @@ public:
     QObject* parent=NULL);
   virtual ~pqPipelineSource();
 
-  // Get the number of consumers.
-  int getNumberOfConsumers() const;
+  /// A source may have multiple output ports. This method returns the number of
+  /// output ports supported by this source.
+  int getNumberOfOutputPorts() const;
 
-  // Get consumer at a particular index.
-  pqPipelineSource *getConsumer(int index) const;
+  /// Returns the pqOutputPort for the given output port.
+  pqOutputPort* getOutputPort(int outputport) const;
 
-  // Get index for a consumer.
-  int getConsumerIndexFor(pqPipelineSource *) const;
+  /// Returns the number of consumers connected to the given output port.
+  int getNumberOfConsumers(int outputport) const;
 
-  // Check if the object exists in the consumer set.
-  bool hasConsumer(pqPipelineSource *) const;
+  /// Get the number of consumers connected to output port 0.
+  /// Equivalent to calling getNumberOfConsumers(0);
+  int getNumberOfConsumers() const
+    { return this->getNumberOfConsumers(0); }
+
+  /// Get the consumer at a particulat index on a given output port.
+  pqPipelineSource* getConsumer(int outputport, int index) const;
+
+  /// Get consumer at a particular index on output port 0.
+  /// Equivalent to calling getConsumer(0, index);
+  pqPipelineSource *getConsumer(int index) const
+    { return this->getConsumer(0, index); }
 
   /// Returns a list of representations for this source in the given view.
   /// If view == NULL, returns all representations of this source.
-  QList<pqDataRepresentation*> getRepresentations(pqView* view) const;
+  QList<pqDataRepresentation*> getRepresentations(int outputport, pqView* view) const;
+  QList<pqDataRepresentation*> getRepresentations(pqView* view) const
+    { return this->getRepresentations(0, view); }
 
   /// Returns the first representation for this source in the given view.
   /// If view is NULL, returns 0.
-  pqDataRepresentation* getRepresentation(pqView* view) const;
+  pqDataRepresentation* getRepresentation(int outputport, pqView* view) const;
+  pqDataRepresentation* getRepresentation(pqView* view) const
+    {return this->getRepresentation(0, view); }
 
-  // Returns a list of render modules in which this source
-  // has representations added (the representations may not be visible).
+  /// Returns a list of render modules in which this source
+  /// has representations added (the representations may not be visible).
   QList<pqView*> getViews() const;
 
-  // This method updates all render modules to which all  
-  // representations for this source belong, if force is true, it for an 
-  // immediate render otherwise render on idle.
+  /// This method updates all render modules to which all  
+  /// representations for this source belong, if force is true, it for an 
+  /// immediate render otherwise render on idle.
   void renderAllViews(bool force=false);
 
   /// Sets default values for the underlying proxy. 
@@ -97,30 +113,26 @@ public:
   /// of the proxy and sets them to default values. 
   void setDefaultPropertyValues();
 
-  /// Before a source's output datainformation can be examined, we have
-  /// to make sure that the first update is called through a representation 
-  /// with correctly set UpdateTime. If not, the source will
-  /// be updated with incorrect time. Using this method,
-  /// (instead of directly calling vtkSMSourceProxy::GetDataInformation())
-  /// ensures this.
-  vtkPVDataInformation* getDataInformation() const;
-
 signals:
   /// fired when a connection is created between two pqPipelineSources.
-  void connectionAdded(pqPipelineSource* in, pqPipelineSource* out);
-  void preConnectionAdded(pqPipelineSource*, pqPipelineSource*);
+  void connectionAdded(pqPipelineSource* source, 
+    pqPipelineSource* consumer, int srcOutputPort);
+  void preConnectionAdded(pqPipelineSource* source, 
+    pqPipelineSource* consumer, int srcOutputPort);
 
   /// fired when a connection is broken between two pqPipelineSources.
-  void connectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
-  void preConnectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
+  void connectionRemoved(pqPipelineSource* source, pqPipelineSource* consumer,
+    int srcOutputPort);
+  void preConnectionRemoved(pqPipelineSource* source, 
+    pqPipelineSource* consumer, int srcOutputPort);
 
   /// fired when a representation is added.
   void representationAdded(pqPipelineSource* source, 
-    pqDataRepresentation* repr);
+    pqDataRepresentation* repr, int srcOutputPort);
 
   /// fired when a representation is removed.
   void representationRemoved(pqPipelineSource* source, 
-    pqDataRepresentation* repr);
+    pqDataRepresentation* repr, int srcOutputPort);
 
   /// Fired when the visbility of a representation for the source changes.
   /// Also fired when representationAdded or representationRemoved is fired
@@ -128,16 +140,22 @@ signals:
   void visibilityChanged(pqPipelineSource* source, pqDataRepresentation* repr);
 
 protected slots:
-  // process some change in the input property for the proxy--needed for subclass
-  // pqPipelineFilter.
-  virtual void inputChanged() { }
-
   /// Called when the visibility of any representation for this source changes.
   void onRepresentationVisibilityChanged();
 
+private slots:
+  /// Slots called when corresponding signals are fired from pqOutputPort.
+  /// These slots simply fire the appropriate signals.
+  void prePortConnectionAdded(pqOutputPort* op, pqPipelineSource* cons);
+  void portConnectionAdded(pqOutputPort* op, pqPipelineSource* cons);
+  void prePortConnectionRemoved(pqOutputPort* op, pqPipelineSource* cons);
+  void portConnectionRemoved(pqOutputPort* op, pqPipelineSource* cons);
+  void portRepresentationAdded(pqOutputPort* op, pqDataRepresentation* cons);
+  void portRepresentationRemoved(pqOutputPort* op, pqDataRepresentation* cons);
+  void portVisibilityChanged(pqOutputPort* op, pqDataRepresentation* cons);
+
 protected:
   friend class pqPipelineFilter;
-  friend class pqDataRepresentation;
 
   /// For every source registered if it has any property that defines a proxy_list
   /// domain, we create and register proxies for every type of proxy indicated 
@@ -148,25 +166,15 @@ protected:
   /// are used by pqSignalAdaptorProxyList to populate the combox box
   /// widget thru which the user can choose one of the available proxies.
   void createProxiesForProxyListDomains();
-
-  /// called by pqPipelineFilter when the connections change.
-  void removeConsumer(pqPipelineSource *);
-  void addConsumer(pqPipelineSource*);
-
-  /// Called by pqDataRepresentation when the connections change.
-  void addRepresentation(pqDataRepresentation*);
-  void removeRepresentation(pqDataRepresentation*);
-
-  void processProxyListHints(vtkSMProxy *proxy_list_proxy);
   
+  void processProxyListHints(vtkSMProxy *proxy_list_proxy);
+
   /// Overridden to add the proxies to the domain as well.
   virtual void addHelperProxy(const QString& key, vtkSMProxy*);
 
-  // Use this method to initialize the pqObject state using the
-  // underlying vtkSMProxy. This needs to be done only once,
-  // after the object has been created. 
-  virtual void initialize() { };
-
+  /// called by pqPipelineFilter when the connections change.
+  void removeConsumer(int outputport, pqPipelineSource *);
+  void addConsumer(int outputport, pqPipelineSource*);
 
 private:
   pqPipelineSourceInternal *Internal; ///< Stores the output connections.

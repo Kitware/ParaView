@@ -33,7 +33,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepresentationProxy()
 {
@@ -210,7 +210,8 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::BeginCreateVTKObjects()
 //----------------------------------------------------------------------------
 bool vtkSMUnstructuredGridVolumeRepresentationProxy::EndCreateVTKObjects()
 {
-  this->Connect(this->GetInputProxy(), this->VolumeFilter, "Input");
+  this->Connect(this->GetInputProxy(), this->VolumeFilter, 
+    "Input", this->OutputPort);
   /*
   this->Connect(this->VolumeBunykMapper, this->VolumeActor, "Mapper");
   this->Connect(this->VolumeHAVSMapper, this->VolumeActor, "Mapper");
@@ -229,7 +230,7 @@ void vtkSMUnstructuredGridVolumeRepresentationProxy::DetermineVolumeSupport()
 {
   vtkSMDataTypeDomain* domain = vtkSMDataTypeDomain::SafeDownCast(
     this->VolumeFilter->GetProperty("Input")->GetDomain("input_type"));
-  if (domain && domain->IsInDomain(this->GetInputProxy()))
+  if (domain && domain->IsInDomain(this->GetInputProxy(), this->OutputPort))
     {
 
     vtkPVDataInformation* datainfo = this->GetInputProxy()->GetDataInformation();

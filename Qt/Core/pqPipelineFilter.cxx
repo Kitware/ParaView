@@ -39,11 +39,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMDomain.h"
+#include "vtkSMDomainIterator.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 
 //Qt includes.
 #include <QList>
+#include <QMap>
 #include <QPointer>
 #include <QSet>
 #include <QtDebug>
@@ -51,142 +55,238 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqServerManagerModel.h"
+#include "pqOutputPort.h"
+
+uint qHash(QPair<QPointer<pqPipelineSource>, int> arg)
+{
+  return qHash(
+    static_cast<pqPipelineSource*>(arg.first))+qHash(arg.second);
+}
 
 //-----------------------------------------------------------------------------
-class pqPipelineFilterInternal
+class pqPipelineFilter::pqInternal
 {
 public:
+  typedef QList<QPointer<pqOutputPort> > InputList;
+  typedef QMap<QString, InputList> InputMap;
+  InputMap Inputs;
+
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
-  QList<QPointer<pqPipelineSource> > Inputs;
-  pqPipelineFilterInternal()
+  pqInternal()
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     }
 };
-
 
 //-----------------------------------------------------------------------------
 pqPipelineFilter::pqPipelineFilter(QString name, vtkSMProxy* proxy,
   pqServer* server, QObject* p/*=NULL*/) : 
   pqPipelineSource(name, proxy, server, p)
 {
-  this->Internal = new pqPipelineFilterInternal();
-  if (proxy)
+  this->Internal = new pqInternal();
+  QList<const char*> inputPortNames = pqPipelineFilter::getInputPorts(proxy);
+  foreach (const char* pname, inputPortNames)
     {
+    this->Internal->Inputs.insert(pname, pqInternal::InputList());
+   
+    vtkSMProperty* inputProp = proxy->GetProperty(pname);
+
     // Listen to proxy events to get input changes.
-    this->Internal->VTKConnect->Connect(proxy->GetProperty("Input"),
-      vtkCommand::ModifiedEvent, this, SLOT(inputChanged()));
+    this->Internal->VTKConnect->Connect(inputProp, vtkCommand::ModifiedEvent,
+      this, SLOT(inputChanged(vtkObject*,  unsigned long, void*)), 
+      const_cast<char*>(pname));
+    }
+}
+
+//-----------------------------------------------------------------------------
+QList<const char*> pqPipelineFilter::getInputPorts(vtkSMProxy* proxy)
+{
+  QList<const char*> list;
+
+  vtkSmartPointer<vtkSMPropertyIterator> propIter;
+  propIter.TakeReference(proxy->NewPropertyIterator());
+  for (propIter->Begin(); !propIter->IsAtEnd(); propIter->Next())
+    {
+    vtkSMInputProperty* inputProp = vtkSMInputProperty::SafeDownCast(
+      propIter->GetProperty());
+    if (inputProp)
+      {
+      bool has_plist_domain = false;
+
+      // Ensure that this property does not have a proxy list domain. If it
+      // does, we don't treat it as an input.
+      vtkSmartPointer<vtkSMDomainIterator> domainIter;
+      domainIter.TakeReference(inputProp->NewDomainIterator());
+      for (domainIter->Begin(); !domainIter->IsAtEnd(); domainIter->Next())
+        {
+        if (domainIter->GetDomain()->IsA("vtkSMProxyListDomain"))
+          {
+          has_plist_domain = true;
+          break;
+          }
+        }
+
+      if (has_plist_domain)
+        {
+        continue;
+        }
+
+      const char* pname = propIter->GetKey();
+      if (!list.contains(pname))
+        {
+        list.push_back(pname);
+        }
+      }
+    }
+
+  return list;
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineFilter::initialize()
+{
+  this->Superclass::initialize();
+
+  // Now update the input connections.
+  foreach (QString portname, this->Internal->Inputs.keys())
+    {
+    this->inputChanged(portname);
     }
 }
 
 //-----------------------------------------------------------------------------
 pqPipelineFilter::~pqPipelineFilter()
 {
-  foreach(pqPipelineSource* input, this->Internal->Inputs)
+  pqInternal::InputMap::iterator mapIter;
+  for (mapIter = this->Internal->Inputs.begin(); 
+    mapIter != this->Internal->Inputs.end(); ++mapIter)
     {
-    if (input)
+    foreach (pqOutputPort* opPort, mapIter.value())
       {
-      input->removeConsumer(this);
+      if (opPort)
+        {
+        opPort->removeConsumer(this);
+        }
       }
     }
+
   delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
-int pqPipelineFilter::getInputCount() const
+int pqPipelineFilter::getNumberOfInputPorts() const
 {
   return this->Internal->Inputs.size();
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource *pqPipelineFilter::getInput(int index) const
+QString pqPipelineFilter::getInputPortName(int index) const
 {
-  if(index >= 0 && index < this->Internal->Inputs.size())
+  if (index < 0 || index >= this->Internal->Inputs.size())
     {
-    return this->Internal->Inputs[index]; 
+    qCritical() << "Invalid input port index : " << index
+      << ". Available number of input ports : " 
+      << this->Internal->Inputs.size();
+    return QString();
     }
-  qCritical() << "Index " << index << "out of bound.";
-  return 0;
+
+  return this->Internal->Inputs.keys()[index];
 }
 
 //-----------------------------------------------------------------------------
-int pqPipelineFilter::getInputIndexFor(pqPipelineSource *input) const
+int pqPipelineFilter::getNumberOfInputs(const QString& portname) const
 {
-  return this->Internal->Inputs.indexOf(input);
-}
-
-//-----------------------------------------------------------------------------
-bool pqPipelineFilter::hasInput(pqPipelineSource *input) const
-{
-  return (this->getInputIndexFor(input) != -1);
-}
-
-//-----------------------------------------------------------------------------
-QList<pqPipelineSource*> pqPipelineFilter::getInputs() const
-{
-  QList<pqPipelineSource*> inputs;
-  foreach(pqPipelineSource* src, this->Internal->Inputs)
+  pqInternal::InputMap::iterator iter = this->Internal->Inputs.find(portname);
+  if (iter == this->Internal->Inputs.end())
     {
-    if (src)
+    qCritical() << "Invalid input port name: " << portname;
+    return 0;
+    }
+
+  return iter.value().size();
+}
+
+//-----------------------------------------------------------------------------
+QList<pqOutputPort*> pqPipelineFilter::getInputs(const QString& portname) const
+{
+  QList<pqOutputPort*> list;
+
+  pqInternal::InputMap::iterator iter = this->Internal->Inputs.find(portname);
+  if (iter == this->Internal->Inputs.end())
+    {
+    qCritical() << "Invalid input port name: " << portname;
+    return list;
+    }
+
+  foreach (pqOutputPort* port, iter.value())
+    {
+    if (port)
       {
-      inputs.push_back(src);
+      list.push_back(port);
       }
     }
-  return inputs;
+
+  return list;
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineFilter::inputChanged()
+QMap<QString, QList<pqOutputPort*> > pqPipelineFilter::getNamedInputs() const
 {
-  // We must determine what changed on the input property.
-  // Remember that all proxy that are added to the input property are
-  // must already have pqPipelineFilter associated with them. If not, the input proxy was not
-  // registered with the SM and as far as we are concerned, does not even exist :).
+  QMap<QString, QList<pqOutputPort*> > map;
 
-  QSet<pqPipelineSource *> oldInputs;
-  foreach(pqPipelineSource* obj, this->Internal->Inputs)
+  pqInternal::InputMap::iterator iter = this->Internal->Inputs.begin();
+  for (; iter != this->Internal->Inputs.end(); ++iter)
     {
-    oldInputs.insert(obj);
-    }
-    
-  QSet<pqPipelineSource*> currentInputs;
-  this->buildInputList(currentInputs);
+    QList<pqOutputPort*>& list = map[iter.key()];
 
-  QSet<pqPipelineSource*> removed = oldInputs - currentInputs;
-  QSet<pqPipelineSource*> added = currentInputs - oldInputs;
-
-  // To preserve the order, we do this funny computation to sync the inputs list.
-  foreach (pqPipelineSource* obj, removed)
-    {
-    this->Internal->Inputs.removeAt(this->Internal->Inputs.indexOf(obj));
+    foreach (pqOutputPort* port, iter.value())
+      {
+      if (port)
+        {
+        list.push_back(port);
+        }
+      }
     }
-  foreach (pqPipelineSource* obj, added)
-    {
-    this->Internal->Inputs.push_back(obj);
-    }
-
-  // Now tell pqPipelineSource in removed list that we are no longer their
-  // descendent.
-  foreach(pqPipelineSource* removedInput, removed)
-    {
-    removedInput->removeConsumer(this);
-    }
-
-  foreach(pqPipelineSource* addedInput, added)
-    {
-    addedInput->addConsumer(this);
-    }
-  // The pqPipelineSource whose consumer changes raises the events when the 
-  // consumer is removed added, so we don't need to raise any events here to 
-  // let the world know that connections were broken/created.
+  return map;
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineFilter::buildInputList(QSet<pqPipelineSource*> &set)
+pqOutputPort* pqPipelineFilter::getInput(const QString& portname, int index) const
 {
-  vtkSMInputProperty* ivp = vtkSMInputProperty::SafeDownCast(
-    this->getProxy()->GetProperty("Input"));
+  pqInternal::InputMap::iterator iter = this->Internal->Inputs.find(portname);
+  if (iter == this->Internal->Inputs.end())
+    {
+    qCritical() << "Invalid input port name: " << portname;
+    return 0;
+    }
 
+  if (index < 0 || index >= iter.value().size())
+    {
+    qCritical() << "Invalid index: " << index;
+    return 0;
+    }
+
+  return iter.value()[index];
+}
+
+//-----------------------------------------------------------------------------
+pqPipelineSource *pqPipelineFilter::getInput(int index) const
+{ 
+  pqOutputPort* op = this->getInput(this->getInputPortName(0), index);
+  return (op? op->getSource() : 0);
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineFilter::inputChanged(
+  vtkObject*, unsigned long, void* client_data)
+{
+  const char* pname = reinterpret_cast<const char*>(client_data);
+  this->inputChanged(pname);
+}
+
+//-----------------------------------------------------------------------------
+static void pqPipelineFilterBuildInputList(vtkSMInputProperty* ivp, QSet<pqOutputPort*> &set)
+{
   pqServerManagerModel* model = 
     pqApplicationCore::instance()->getServerManagerModel();
 
@@ -205,8 +305,71 @@ void pqPipelineFilter::buildInputList(QSet<pqPipelineSource*> &set)
         <<" Proxy Manager. This is not recommended.";
       continue;
       }
-    set.insert(pqSrc);
+    set.insert(pqSrc->getOutputPort(ivp->GetOutputPortForConnection(cc)));
     }
+}
+
+
+//-----------------------------------------------------------------------------
+void pqPipelineFilter::inputChanged(const QString& portname)
+{
+  pqInternal::InputMap::iterator iter = this->Internal->Inputs.find(portname);
+  if (iter == this->Internal->Inputs.end())
+    {
+    qCritical() << "Invalid input port name: " << portname;
+    return;
+    }
+
+  vtkSMInputProperty* ivp = vtkSMInputProperty::SafeDownCast(
+    this->getProxy()->GetProperty(portname.toAscii().data()));
+  if (!ivp)
+    {
+    qCritical() << "Failed to locate input property " << portname;
+    return;
+    }
+
+  // We must determine what changed on the input property.
+  // Remember that all proxy that are added to the input property are
+  // must already have pqPipelineFilter associated with them. If not, the input proxy was not
+  // registered with the SM and as far as we are concerned, does not even exist :).
+
+  QSet<pqOutputPort*> oldInputs;
+  foreach(pqOutputPort* obj, iter.value())
+    {
+    oldInputs.insert(obj);
+    }
+    
+  QSet<pqOutputPort*> currentInputs;
+  pqPipelineFilterBuildInputList(ivp, currentInputs);
+
+  QSet<pqOutputPort*> removed = oldInputs - currentInputs;
+  QSet<pqOutputPort*> added = currentInputs - oldInputs;
+
+  // To preserve the order, we do this funny computation to sync the inputs list.
+  foreach (pqOutputPort* obj, removed)
+    {
+    iter.value().removeAll(obj);
+    }
+  foreach (pqOutputPort* obj, added)
+    {
+    iter.value().push_back(obj);
+    }
+
+  // Now tell pqPipelineSource in removed list that we are no longer their
+  // descendent.
+  foreach (pqOutputPort* obj, removed)
+    {
+    obj->removeConsumer(this);
+    }
+
+  foreach (pqOutputPort* obj, added)
+    {
+    obj->addConsumer(this);
+    }
+
+  // The pqPipelineSource whose consumer changes raises the events when the 
+  // consumer is removed added, so we don't need to raise any events here to 
+  // let the world know that connections were broken/created.
 }
 
 //-----------------------------------------------------------------------------

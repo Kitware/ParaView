@@ -85,6 +85,7 @@ pqRepresentation::~pqRepresentation()
 void pqRepresentation::setView(pqView* view)
 {
   this->Internal->View = view;
+  emit this->visibilityChanged(false);
 }
 
 //-----------------------------------------------------------------------------

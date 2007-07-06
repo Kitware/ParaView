@@ -40,21 +40,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
 #include "pqServer.h"
+#include "pqOutputPort.h"
 
 #include <QButtonGroup>
 #include <QFrame>
 #include <QGridLayout>
-#include <QHeaderView>
 #include <QHBoxLayout>
-#include <QMap>
-#include <QPushButton>
+#include <QHeaderView>
 #include <QLabel>
 #include <QList>
 #include <QListWidget>
+#include <QMap>
+#include <QPushButton>
 #include <QRadioButton>
 #include <QScrollArea>
 #include <QSpacerItem>
 #include <QString>
+#include <QtDebug>
 #include <QVector>
 
 #include "vtkSMInputProperty.h"
@@ -70,8 +72,55 @@ public:
 
   QVector<QWidget *> Widgets;
   QMap<QString, pqPipelineSource *> SourceMap;
+
+  QMap<QString, QList<pqOutputPort*> > Inputs;
 };
 
+//----------------------------------------------------------------------------
+class pqFilterInputPipelineModel : public pqPipelineModel
+{
+  typedef pqPipelineModel Superclass;
+public:
+  /// \brief
+  ///   Makes a copy of a pipeline model.
+  /// \param other The pipeline model to copy.
+  /// \param parent The parent object.
+  pqFilterInputPipelineModel(const pqPipelineModel &other, pqFilterInputDialog *parent=0)
+    : Superclass(other, parent)
+    {
+    this->Dialog = parent;
+    }
+
+  /// Overridden to ensure that only those items are selectable which can be set
+  /// as the input to the filter i.e. their output data type  matches what is
+  /// expected at the input of the filter.
+  virtual Qt::ItemFlags flags(const QModelIndex &index) const
+    {
+    Qt::ItemFlags cur_flags = this->Superclass::flags(index);
+    if ( (cur_flags & Qt::ItemIsSelectable) > 0)
+      {
+      // Ensure that the source produces data as expected by the current input
+      // port.
+      pqServerManagerModelItem* item = this->getItemFor(index);
+      pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
+      pqOutputPort* opport = source? source->getOutputPort(0) :
+        qobject_cast<pqOutputPort*>(item);
+      if (opport)
+        {
+        if (!this->Dialog->isInputAcceptable(opport))
+          {
+          cur_flags &= ~Qt::ItemIsSelectable;
+          cur_flags &= ~Qt::ItemIsEnabled;
+          }
+        }
+      }
+    return cur_flags;
+    }
+
+protected:
+  pqFilterInputDialog* Dialog;
+
+};
 
 //----------------------------------------------------------------------------
 pqFilterInputDialogInternal::pqFilterInputDialogInternal()
@@ -179,8 +228,10 @@ pqFilterInputDialog::~pqFilterInputDialog()
   delete this->Internal;
 }
 
+//-----------------------------------------------------------------------------
 void pqFilterInputDialog::setModelAndFilter(pqPipelineModel *model,
-    pqPipelineFilter *filter)
+    pqPipelineFilter *filter,
+    const QMap<QString, QList<pqOutputPort*> >& namedInputs)
 {
   if(this->Model == model && this->Filter == filter)
     {
@@ -229,7 +280,8 @@ void pqFilterInputDialog::setModelAndFilter(pqPipelineModel *model,
         this->Preview, SLOT(expand(const QModelIndex &)));
 
     // Make a copy of the model for the user to select sources.
-    this->Pipeline = new pqPipelineModel(*this->Model, this);
+    this->Pipeline = new pqFilterInputPipelineModel(*this->Model, this);
+    
     this->Pipeline->setEditable(false);
     this->Sources->setModel(this->Pipeline);
     for(int i = 1; i < columns; ++i)
@@ -269,89 +321,81 @@ void pqFilterInputDialog::setModelAndFilter(pqPipelineModel *model,
     QGridLayout *frameLayout = new QGridLayout(frame);
     frameLayout->setMargin(0);
 
-    // Make a map of the sources.
-    pqPipelineSource *source = 0;
-    QMap<vtkSMProxy *, pqPipelineSource *> sourceMap;
-    QMap<vtkSMProxy *, pqPipelineSource *>::ConstIterator item;
-    for(int index = 0; index < this->Filter->getInputCount(); ++index)
+    // Add widgets for each of the filter input ports.
+    int num_input_ports = this->Filter->getNumberOfInputPorts();
+    vtkSMProxy* filterProxy = this->Filter->getProxy();
+    
+    for (int cc=0; cc < num_input_ports; cc++)
       {
-      source = this->Filter->getInput(index);
-      sourceMap.insert(source->getProxy(), source);
-      this->Internal->SourceMap.insert(source->getSMName(), source);
-      }
+      QString name = this->Filter->getInputPortName(cc);
 
-    // Add widgets for each of the filter inputs.
-    vtkSMInputProperty *input = 0;
-    vtkSMPropertyIterator *prop =
-        this->Filter->getProxy()->NewPropertyIterator();
-    int row = 0;
-    for(prop->Begin(); !prop->IsAtEnd(); prop->Next())
-      {
-      input = vtkSMInputProperty::SafeDownCast(prop->GetProperty());
-      if(input)
+      vtkSMInputProperty *input = vtkSMInputProperty::SafeDownCast(
+        filterProxy->GetProperty(name.toAscii().data()));
+      if(!input)
         {
-        // TODO: Add support for other input properties such as the
-        // 'source' input property of the glyph filter.
-        QString name = prop->GetKey();
-        if(name != "Input")
-          {
-          continue;
-          }
+        qCritical() << "Failed to locate property for input port "
+          << name;
+        continue;
+        }
 
-        QRadioButton *button = new QRadioButton(name, frame);
-        button->setObjectName(name);
-        button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-        this->InputGroup->addButton(button, row);
-        if(row == 0)
-          {
-          button->setChecked(true);
-          }
+      // What is the current state of the inputs for this port?
+      QMap<QString, QList<pqOutputPort*> >::const_iterator mapIter =
+        namedInputs.find(name);
+      const QList<pqOutputPort*> inputs = 
+        mapIter != namedInputs.end()? mapIter.value() : QList<pqOutputPort*>();
+      this->Internal->Inputs[name] = inputs;
 
-        if(input->GetMultipleInput())
-          {
-          QListWidget *list = new QListWidget(frame);
-          list->setSelectionMode(QAbstractItemView::NoSelection);
-          list->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-          frameLayout->addWidget(button, row, 0, Qt::AlignTop);
-          frameLayout->addWidget(list, row, 1);
-          this->Internal->Widgets.append(list);
-          for(unsigned int i = 0; i < input->GetNumberOfProxies(); ++i)
-            {
-            item = sourceMap.find(input->GetProxy(i));
-            if(item != sourceMap.end())
-              {
-              source = item.value();
-              list->addItem(source->getSMName());
-              }
-            }
-          }
-        else
-          {
-          QLabel *label = new QLabel(frame);
-          label->setFrameShape(QFrame::StyledPanel);
-          label->setFrameShadow(QFrame::Sunken);
-          label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-          label->setBackgroundRole(QPalette::Base);
-          label->setAutoFillBackground(true);
-          frameLayout->addWidget(button, row, 0);
-          frameLayout->addWidget(label, row, 1);
-          this->Internal->Widgets.append(label);
-          item = sourceMap.find(input->GetProxy(0));
-          if(item != sourceMap.end())
-            {
-            source = item.value();
-            label->setText(source->getSMName());
-            }
-          }
+      QRadioButton *button = new QRadioButton(name, frame);
+      button->setObjectName(name);
+      button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+      this->InputGroup->addButton(button, cc);
+      if(cc == 0)
+        {
+        button->setChecked(true);
+        }
 
-        row++;
+      if(input->GetMultipleInput())
+        {
+        QListWidget *list = new QListWidget(frame);
+        list->setSelectionMode(QAbstractItemView::NoSelection);
+        list->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        frameLayout->addWidget(button, cc, 0, Qt::AlignTop);
+        frameLayout->addWidget(list, cc, 1);
+        this->Internal->Widgets.append(list);
+        foreach (pqOutputPort* opport, inputs)
+          {
+          QModelIndex itemIndex = model->getIndexFor(opport);
+          QVariant label = model->data(itemIndex, Qt::DisplayRole); 
+          QListWidgetItem* lwItem = new QListWidgetItem(list);
+          lwItem->setText(label.toString());
+          lwItem->setData(Qt::UserRole, opport);
+          list->addItem(lwItem);
+          }
+        }
+      else
+        {
+        QLabel *label = new QLabel(frame);
+        label->setFrameShape(QFrame::StyledPanel);
+        label->setFrameShadow(QFrame::Sunken);
+        label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        label->setBackgroundRole(QPalette::Base);
+        label->setAutoFillBackground(true);
+        frameLayout->addWidget(button, cc, 0);
+        frameLayout->addWidget(label, cc, 1);
+        this->Internal->Widgets.append(label);
+
+        if (inputs.size() > 0)
+          {
+          QModelIndex itemIndex = model->getIndexFor(inputs[0]);
+          QVariant text = model->data(itemIndex, Qt::DisplayRole); 
+          label->setText(text.toString());
+          }
         }
       }
 
-    prop->Delete();
     frameLayout->addItem(
         new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding),
-        row, 0, 1, 2);
+        num_input_ports, 0, 1, 2);
     this->InputFrame->setWidget(frame);
 
     // Make sure the pipeline selection reflects the current input.
@@ -359,137 +403,69 @@ void pqFilterInputDialog::setModelAndFilter(pqPipelineModel *model,
     }
 }
 
-void pqFilterInputDialog::getFilterInputPorts(QStringList &ports) const
+//-----------------------------------------------------------------------------
+QList<pqOutputPort*>& pqFilterInputDialog::getFilterInputs(
+  const QString &port) const
 {
-  QList<QAbstractButton *> buttons = this->InputGroup->buttons();
-  QList<QAbstractButton *>::Iterator iter = buttons.begin();
-  for( ; iter != buttons.end(); ++iter)
-    {
-    ports.append((*iter)->text());
-    }
+  return this->Internal->Inputs[port];
 }
 
-void pqFilterInputDialog::getFilterInputs(const QString &port,
-    QStringList &inputs) const
+//-----------------------------------------------------------------------------
+void pqFilterInputDialog::changeCurrentInput(int id)
 {
-  QList<QAbstractButton *> buttons = this->InputGroup->buttons();
-  QList<QAbstractButton *>::Iterator iter = buttons.begin();
-  for( ; iter != buttons.end(); ++iter)
-    {
-    if(port == (*iter)->text())
-      {
-      QWidget *widget = this->Internal->Widgets[this->InputGroup->id(*iter)];
-      QListWidget *list = qobject_cast<QListWidget *>(widget);
-      QLabel *label = qobject_cast<QLabel *>(widget);
-      if(list)
-        {
-        for(int row = 0; row < list->count(); ++row)
-          {
-          inputs.append(list->item(row)->text());
-          }
-        }
-      else if(label)
-        {
-        inputs.append(label->text());
-        }
-
-      break;
-      }
-    }
-}
-
-void pqFilterInputDialog::getCurrentFilterInputs(const QString &port,
-    QStringList &inputs) const
-{
-  if(!this->Filter || port.isEmpty())
+  if (id<0 || id >= this->Filter->getNumberOfInputPorts() || 
+    id >= this->Internal->Widgets.size())
     {
     return;
     }
 
-  vtkSMInputProperty *input = vtkSMInputProperty::SafeDownCast(
-      this->Filter->getProxy()->GetProperty(port.toAscii().data()));
-  if(input)
-    {
-    // Make a map of the sources.
-    pqPipelineSource *source = 0;
-    QMap<vtkSMProxy *, pqPipelineSource *> sourceMap;
-    QMap<vtkSMProxy *, pqPipelineSource *>::ConstIterator item;
-    for(int index = 0; index < this->Filter->getInputCount(); ++index)
-      {
-      source = this->Filter->getInput(index);
-      sourceMap.insert(source->getProxy(), source);
-      }
+  // We update the selection in model (on which the user makes the selection for
+  // the input) to reflect the currently choosen inputs for the given port.
 
-    if(input->GetMultipleInput())
-      {
-      for(unsigned int i = 0; i < input->GetNumberOfProxies(); ++i)
-        {
-        item = sourceMap.find(input->GetProxy(i));
-        if(item != sourceMap.end())
-          {
-          source = item.value();
-          inputs.append(source->getSMName());
-          }
-        }
-      }
-    else
-      {
-      item = sourceMap.find(input->GetProxy(0));
-      if(item != sourceMap.end())
-        {
-        source = item.value();
-        inputs.append(source->getSMName());
-        }
-      }
+  QString inputPortName = this->Filter->getInputPortName(id);
+  QList<pqOutputPort*>& inputs = this->Internal->Inputs[inputPortName];
+
+  // Change the selection to match the new input(s).
+  this->InChangeInput = true;
+
+  QItemSelectionModel *model = this->Sources->getSelectionModel();
+  model->clear();
+
+  foreach (pqOutputPort* input, inputs)
+    {
+    model->setCurrentIndex(this->Pipeline->getIndexFor(input),
+      QItemSelectionModel::Select);
     }
+
+  QWidget *widget = this->Internal->Widgets[id];
+  QLabel *label = qobject_cast<QLabel *>(widget);
+  QListWidget *list = qobject_cast<QListWidget *>(widget);
+  if(list)
+    {
+    this->Sources->setSelectionMode(pqFlatTreeView::ExtendedSelection);
+    this->SourcesLabel->setText("Select Source(s)");
+    this->MultiHint->show();
+    }
+  else if(label)
+    {
+    this->Sources->setSelectionMode(pqFlatTreeView::SingleSelection);
+    this->SourcesLabel->setText("Select Source");
+    this->MultiHint->hide();
+    }
+
+  // Update selectability of all the sources in the Model based on the input
+  // port domain.
+  vtkSMInputProperty* ivp = 
+    vtkSMInputProperty::SafeDownCast(this->Filter->getProxy()->GetProperty(
+        inputPortName.toAscii().data()));
+  ivp->RemoveAllUncheckedProxies();
+  
+
+
+  this->InChangeInput = false;
 }
 
-void pqFilterInputDialog::changeCurrentInput(int id)
-{
-  if(id >= 0 && id < this->Internal->Widgets.size())
-    {
-    // Change the selection to match the new input(s).
-    this->InChangeInput = true;
-    QItemSelectionModel *model = this->Sources->getSelectionModel();
-    model->clear();
-
-    QMap<QString, pqPipelineSource *>::ConstIterator iter;
-    QWidget *widget = this->Internal->Widgets[id];
-    QLabel *label = qobject_cast<QLabel *>(widget);
-    QListWidget *list = qobject_cast<QListWidget *>(widget);
-    if(list)
-      {
-      this->Sources->setSelectionMode(pqFlatTreeView::ExtendedSelection);
-      this->SourcesLabel->setText("Select Source(s)");
-      this->MultiHint->show();
-      for(int row = 0; row < list->count(); ++row)
-        {
-        QListWidgetItem *item = list->item(row);
-        iter = this->Internal->SourceMap.find(item->text());
-        if(iter != this->Internal->SourceMap.end())
-          {
-          model->setCurrentIndex(this->Pipeline->getIndexFor(iter.value()),
-              QItemSelectionModel::Select);
-          }
-        }
-      }
-    else if(label)
-      {
-      this->Sources->setSelectionMode(pqFlatTreeView::SingleSelection);
-      this->SourcesLabel->setText("Select Source");
-      this->MultiHint->hide();
-      iter = this->Internal->SourceMap.find(label->text());
-      if(iter != this->Internal->SourceMap.end())
-        {
-        model->setCurrentIndex(this->Pipeline->getIndexFor(iter.value()),
-            QItemSelectionModel::Select);
-        }
-      }
-
-    this->InChangeInput = false;
-    }
-}
-
+//-----------------------------------------------------------------------------
 void pqFilterInputDialog::changeInput(const QItemSelection &selected,
     const QItemSelection &deselected)
 {
@@ -504,55 +480,102 @@ void pqFilterInputDialog::changeInput(const QItemSelection &selected,
     return;
     }
 
-  // get the current input display widget.
+  // Update the this->Internal->Inputs data structure to reflect the current
+  // choice of inputs.
+  QList<pqOutputPort*> & inputs = this->Internal->Inputs[
+    this->Filter->getInputPortName(id)];
+
+  QList<pqOutputPort*> added;
+  QList<pqOutputPort*> removed;
+
+  // Remove all deselected items from the inputs.
+  foreach (QModelIndex index, deselected.indexes())
+    {
+    pqServerManagerModelItem* smItem = this->Pipeline->getItemFor(index);
+    pqPipelineSource* source = qobject_cast<pqPipelineSource*>(smItem);
+    pqOutputPort* opPort = source? source->getOutputPort(0) : 
+      qobject_cast<pqOutputPort*>(smItem);
+    if (opPort && !removed.contains(opPort))
+      {
+      removed.push_back(opPort);
+      }
+    inputs.removeAll(opPort);
+    }
+
+  // Add newly selected items to the inputs.
+  foreach (QModelIndex index, selected.indexes())
+    {
+    pqServerManagerModelItem* smItem = this->Pipeline->getItemFor(index);
+    pqPipelineSource* source = qobject_cast<pqPipelineSource*>(smItem);
+    pqOutputPort* opPort = source? source->getOutputPort(0) : 
+      qobject_cast<pqOutputPort*>(smItem);
+    if (opPort && !added.contains(opPort))
+      {
+      added.push_back(opPort);
+      }
+    if (opPort && !inputs.contains(opPort))
+      {
+      inputs.push_back(opPort);
+      }
+    }
+
+  // Now update the "preview" model to reflect the new connections.
+  foreach (pqOutputPort* opport, removed)
+    {
+    this->Model->removeConnection(opport->getSource(), this->Filter,
+      opport->getPortNumber());
+    }
+
+  foreach (pqOutputPort* opport, added)
+    {
+    this->Model->addConnection(opport->getSource(), this->Filter,
+      opport->getPortNumber());
+    }
+
+  // Now update the widget that shows the current value of the input property.
   QWidget *widget = this->Internal->Widgets[id];
   QLabel *label = qobject_cast<QLabel *>(widget);
   QListWidget *list = qobject_cast<QListWidget *>(widget);
 
-  pqPipelineSource *source = 0;
-  QList<QListWidgetItem *> items;
-  QList<QListWidgetItem *>::Iterator item;
-  QModelIndexList indexes = deselected.indexes();
-  QModelIndexList::Iterator iter = indexes.begin();
-  for( ; iter != indexes.end(); ++iter)
+  if (list)
     {
-    // Remove the connections for the deselected items.
-    source = dynamic_cast<pqPipelineSource *>(
-        this->Pipeline->getItemFor(*iter));
-    this->Model->removeConnection(source, this->Filter);
-
-    // Since the label has only one item, only the list needs to clear
-    // the deselected items.
-    if(list)
+    list->clear();
+    foreach (pqOutputPort* opport, inputs)
       {
-      items = list->findItems(source->getSMName(), Qt::MatchExactly);
-      for(item = items.begin(); item != items.end(); ++item)
-        {
-        delete *item;
-        }
+      QModelIndex itemIndex = this->Pipeline->getIndexFor(opport);
+      QVariant label = this->Pipeline->data(itemIndex, Qt::DisplayRole); 
+      QListWidgetItem* lwItem = new QListWidgetItem(list);
+      lwItem->setText(label.toString());
+      lwItem->setData(Qt::UserRole, opport);
+      list->addItem(lwItem);
       }
     }
-
-  indexes = selected.indexes();
-  for(iter = indexes.begin(); iter != indexes.end(); ++iter)
+  else 
     {
-    // Add connections for the newly selected inputs.
-    source = dynamic_cast<pqPipelineSource *>(
-        this->Pipeline->getItemFor(*iter));
-    this->Model->addConnection(source, this->Filter);
-    this->Internal->SourceMap.insert(source->getSMName(), source);
-
-    // Add the selected item to the input display widget.
-    if(list)
-      {
-      list->addItem(source->getSMName());
-      }
-    else if(label)
-      {
-      // There should only be one selected item.
-      label->setText(source->getSMName());
-      }
+    QModelIndex itemIndex = this->Pipeline->getIndexFor(inputs[0]);
+    QVariant text = this->Pipeline->data(itemIndex, Qt::DisplayRole); 
+    label->setText(text.toString());
     }
+}
+
+//-----------------------------------------------------------------------------
+bool pqFilterInputDialog::isInputAcceptable(pqOutputPort* opport) const
+{
+  int id = this->InputGroup->checkedId();
+  QString ipPortName = this->Filter->getInputPortName(id);
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
+    this->Filter->getProxy()->GetProperty(ipPortName.toAscii().data()));
+  if (!ip)
+    {
+    return false;
+    }
+
+  ip->RemoveAllUncheckedProxies();
+  ip->AddUncheckedInputConnection(opport->getSource()->getProxy(),
+    opport->getPortNumber());
+  bool in_domains = (ip->IsInDomains()>0);
+  ip->RemoveAllUncheckedProxies();
+  return in_domains;
 }
 
 

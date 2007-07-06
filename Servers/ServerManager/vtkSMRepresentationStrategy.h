@@ -38,8 +38,16 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set the input to the strategy.
-  void SetInput(vtkSMSourceProxy* input);
+  // Connects filters/sinks to an input. 
+  virtual void AddInput(unsigned int inputPort,
+                        vtkSMSourceProxy* input,
+                        unsigned int outputPort,
+                        const char* method);
+  virtual void AddInput(vtkSMSourceProxy* input,
+                        const char* method)
+  {
+    this->AddInput(0, input, 0, method);
+  }
 
   // Description:
   // Get the output from the strategy.
@@ -158,13 +166,13 @@ protected:
 
   // Description:
   // Create and initialize the data pipeline.
-  virtual void CreatePipeline(vtkSMSourceProxy* input) =0;
+  virtual void CreatePipeline(vtkSMSourceProxy* input, int outputport) =0;
 
   // Description:
   // Create and initialize the LOD data pipeline.
   // Note that this method is called only if EnableLOD
   // flag is true.
-  virtual void CreateLODPipeline(vtkSMSourceProxy* input) =0;
+  virtual void CreateLODPipeline(vtkSMSourceProxy* input, int outputport) =0;
 
   // Description:
   // Gather the information of the displayed data
@@ -206,7 +214,7 @@ protected:
   // using "Input" property. Subclasses can use this to build
   // pipelines.
   void Connect(vtkSMProxy* producer, vtkSMProxy* consumer,
-    const char* propertyname="Input");
+    const char* propertyname="Input", int outputport=0);
 
   // Description:
   // Called when ever the view information changes.
@@ -238,11 +246,13 @@ protected:
       }
     }
 
+
+  vtkSMSourceProxy* Input;
+  int OutputPort;
+
   bool UseCache;
   bool UseLOD;
   double CacheTime;
-
-  vtkSMSourceProxy* Input;
   bool EnableCaching;
 
   bool LODDataValid;

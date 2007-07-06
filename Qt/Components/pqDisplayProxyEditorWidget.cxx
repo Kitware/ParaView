@@ -42,12 +42,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayPanelInterface.h"
 #include "pqDisplayPolicy.h"
 #include "pqDisplayProxyEditor.h"
+#include "pqOutputPort.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
 #include "pqPluginManager.h"
 #include "pqPropertyLinks.h"
-#include "pqTextRepresentation.h"
 #include "pqTextDisplayPropertiesWidget.h"
+#include "pqTextRepresentation.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
 #include "pqXYPlotDisplayProxyEditor.h"
@@ -150,6 +151,7 @@ void pqDefaultDisplayPanel::onStateChanged(int s)
 class pqDisplayProxyEditorWidget::pqInternal
 {
 public:
+  QPointer<pqOutputPort> OutputPort;
   QPointer<pqPipelineSource> Source;
   QPointer<pqView> View;
   QPointer<pqRepresentation> Representation;
@@ -188,12 +190,15 @@ pqDisplayProxyEditorWidget::~pqDisplayProxyEditorWidget()
 void pqDisplayProxyEditorWidget::setView(pqView* view)
 {
   this->Internal->View = view;
+  this->updatePanel();
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplayProxyEditorWidget::setSource(pqPipelineSource* source)
+void pqDisplayProxyEditorWidget::setOutputPort(pqOutputPort* port)
 {
-  this->Internal->Source = source;
+  this->Internal->OutputPort = port;
+  this->Internal->Source = (port? port->getSource() : 0);
+  this->updatePanel();
 }
 
 //-----------------------------------------------------------------------------
@@ -213,8 +218,8 @@ void pqDisplayProxyEditorWidget::onVisibilityChanged(bool state)
   emit this->beginUndo(QString("Change Visibility of %1").arg(
       this->Internal->Source->getSMName()));
   pqDisplayPolicy* policy = pqApplicationCore::instance()->getDisplayPolicy();
-  pqRepresentation* disp = policy->setDisplayVisibility(this->Internal->Source, 
-    this->Internal->View, state);
+  pqRepresentation* disp = policy->setRepresentationVisibility(
+    this->Internal->OutputPort, this->Internal->View, state);
   emit this->endUndo();
   
   if (disp)
@@ -232,12 +237,21 @@ void pqDisplayProxyEditorWidget::setRepresentation(pqRepresentation* repr)
     return;
     }
 
+  this->Internal->Representation = repr;
+  this->updatePanel();
+
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayProxyEditorWidget::updatePanel()
+{
   if(this->Internal->DisplayPanel)
     {
     delete this->Internal->DisplayPanel;
+    this->Internal->DisplayPanel = 0;
     }
-  
-  this->Internal->Representation = repr;
+
+  pqRepresentation* repr = this->Internal->Representation;
   
   // search for a custom panels
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
@@ -270,7 +284,7 @@ void pqDisplayProxyEditorWidget::setRepresentation(pqRepresentation* repr)
     this->Internal->DisplayPanel = new pqDefaultDisplayPanel(repr, this);
     
     if(this->Internal->Representation || !this->Internal->View ||
-       this->Internal->View->canDisplaySource(this->Internal->Source))
+       this->Internal->View->canDisplay(this->Internal->OutputPort))
       {
       // connect to visibility so we can create a view for it
       QObject::connect(this->Internal->DisplayPanel,

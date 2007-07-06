@@ -16,15 +16,15 @@
 
 #include "vtkCommand.h"
 #include "vtkInformation.h"
+#include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkMemberFunctionCommand.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMSourceProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.10");
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.11");
 //----------------------------------------------------------------------------
 vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 {
@@ -56,7 +56,7 @@ vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 //----------------------------------------------------------------------------
 vtkSMRepresentationStrategy::~vtkSMRepresentationStrategy()
 {
-  this->SetInput(0);
+  this->AddInput(0, 0, 0, 0);
   this->SetViewInformation(0);
 
   this->LODInformation->Delete();
@@ -229,9 +229,13 @@ void vtkSMRepresentationStrategy::Update()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRepresentationStrategy::SetInput(vtkSMSourceProxy* input)
+void vtkSMRepresentationStrategy::AddInput(unsigned int vtkNotUsed(inputPort),
+                                           vtkSMSourceProxy* input,
+                                           unsigned int outputPort,
+                                           const char* vtkNotUsed(method))
 {
   vtkSetObjectBodyMacro(Input, vtkSMSourceProxy, input);
+  this->OutputPort = outputPort;
   if (!this->Input)
     {
     return;
@@ -241,12 +245,12 @@ void vtkSMRepresentationStrategy::SetInput(vtkSMSourceProxy* input)
   // is going to disappear in near future.
   this->CreateVTKObjects();
 
-  this->CreatePipeline(this->Input);
+  this->CreatePipeline(this->Input, this->OutputPort);
 
   // LOD pipeline is created only if EnableLOD is true.
   if (this->EnableLOD)
     {
-    this->CreateLODPipeline(this->Input);
+    this->CreateLODPipeline(this->Input, this->OutputPort);
     }
 }
 
@@ -277,7 +281,8 @@ void vtkSMRepresentationStrategy::UpdateLODPipeline()
 
 //----------------------------------------------------------------------------
 void vtkSMRepresentationStrategy::Connect(vtkSMProxy* producer,
-  vtkSMProxy* consumer, const char* propertyname/*="Input"*/)
+  vtkSMProxy* consumer, const char* propertyname/*="Input"*/,
+  int outputport/*=0*/)
 {
   if (!propertyname)
     {
@@ -287,14 +292,23 @@ void vtkSMRepresentationStrategy::Connect(vtkSMProxy* producer,
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     consumer->GetProperty(propertyname));
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
   if (!pp)
     {
     vtkErrorMacro("Failed to locate property " << propertyname
       << " on the consumer " << consumer->GetXMLName());
     return;
     }
-  pp->RemoveAllProxies();
-  pp->AddProxy(producer);
+  if (ip)
+    {
+    ip->RemoveAllProxies();
+    ip->AddInputConnection(producer, outputport);
+    }
+  else
+    {
+    pp->RemoveAllProxies();
+    pp->AddProxy(producer);
+    }
   consumer->UpdateProperty(propertyname);
 }
 

@@ -35,8 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include <QAbstractTableModel>
 
-class pqPipelineSource;
 class pqDataInformationModelInternal;
+class pqOutputPort;
+class pqPipelineSource;
 
 class PQCOMPONENTS_EXPORT pqDataInformationModel : public QAbstractTableModel
 {
@@ -66,13 +67,13 @@ public:
   virtual QVariant headerData(int section, Qt::Orientation orientation, 
     int role = Qt::DisplayRole) const;
 
-  // Given a pqPipelineSource, get the index for it, if present in this model,
+  // Given a pqOutputPort, get the index for it, if present in this model,
   // otherwise returns invalid index.
-  QModelIndex getIndexFor(pqPipelineSource* item) const;
+  QModelIndex getIndexFor(pqOutputPort* item) const;
 
-  // Given a valid index, returns the pqPipelineSource item corresponding
+  // Given a valid index, returns the pqOutputPort item corresponding
   // to it.
-  pqPipelineSource* getItemFor(const QModelIndex& index) const;
+  pqOutputPort* getItemFor(const QModelIndex& index) const;
 
 public slots:
   // Called when a new source/filter is registered.

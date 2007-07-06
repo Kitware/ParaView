@@ -31,7 +31,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUniformGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMUniformGridVolumeRepresentationProxy::vtkSMUniformGridVolumeRepresentationProxy()
 {
@@ -71,7 +71,7 @@ bool vtkSMUniformGridVolumeRepresentationProxy::InitializeStrategy(vtkSMViewProx
   // (Look at vtkSMDataRepresentationProxy::AddToView()).
 
   strategy->SetEnableLOD(false);
-  this->Connect(this->GetInputProxy(), strategy, "Input");
+  this->Connect(this->GetInputProxy(), strategy, "Input", this->OutputPort);
   this->Connect(strategy->GetOutput(), this->VolumeFixedPointRayCastMapper);
 
 

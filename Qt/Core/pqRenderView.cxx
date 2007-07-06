@@ -66,6 +66,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqLinkViewWidget.h"
+#include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqRenderViewProxy.h"
 #include "pqServer.h"
@@ -1096,7 +1097,6 @@ void pqRenderView::restoreDefaultLightSettings()
 //-----------------------------------------------------------------------------
 void pqRenderView::linkToOtherView()
 {
-  // FIXME:UDA
   pqLinkViewWidget* linkWidget = new pqLinkViewWidget(this);
   linkWidget->setAttribute(Qt::WA_DeleteOnClose);
   QPoint pos = this->getWidget()->mapToGlobal(QPoint(2,2));
@@ -1105,8 +1105,9 @@ void pqRenderView::linkToOtherView()
 }
   
 //-----------------------------------------------------------------------------
-bool pqRenderView::canDisplaySource(pqPipelineSource* source) const
+bool pqRenderView::canDisplay(pqOutputPort* opPort) const
 {
+  pqPipelineSource* source = opPort? opPort->getSource():0;
   if(!source ||
      this->getServer()->GetConnectionID() !=
      source->getServer()->GetConnectionID())
@@ -1288,5 +1289,4 @@ void pqRenderView::resetViewDirection(
   proxy->UpdateVTKObjects();
 
   this->resetCamera();
-  this->render();
 }

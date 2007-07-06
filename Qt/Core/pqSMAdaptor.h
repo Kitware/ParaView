@@ -86,6 +86,10 @@ public:
                                pqSMProxy Value);
   static void setUncheckedProxyProperty(vtkSMProperty* Property, 
                                         pqSMProxy Value);
+  static void addInputProperty(vtkSMProperty* Property, 
+                               pqSMProxy Value, int opport);
+  static void setInputProperty(vtkSMProperty* Property, 
+                               pqSMProxy Value, int opport);
   
   /// get the list of proxies for a property
   /// for example, append filter accepts a list of proxies

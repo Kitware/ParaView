@@ -35,15 +35,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqProxy.h"
 
-class pqRepresentation;
-class pqViewInternal;
+class pqOutputPort;
 class pqPipelineSource;
+class pqRepresentation;
 class pqServer;
 class pqUndoStack;
+class pqViewInternal;
 class QWidget;
 class vtkImageData;
 class vtkSMViewProxy;
-
 
 /// This is a PQ abstraction of a generic view module. Subclasses can be
 /// specific for different types of view such as render view, histogram view
@@ -117,7 +117,8 @@ public:
   /// view. This is a convenience method, it gets
   /// the pqDisplayPolicy object from the pqApplicationCore
   /// are queries it.
-  virtual bool canDisplaySource(pqPipelineSource* source) const = 0;
+  bool canDisplaySource(pqPipelineSource* source) const;
+  virtual bool canDisplay(pqOutputPort* opPort) const =0;
 
 signals:
   /// Fired after a representation has been added to this view.

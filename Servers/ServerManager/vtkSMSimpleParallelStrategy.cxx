@@ -39,7 +39,7 @@ inline int vtkSMSimpleParallelStrategyGetInt(vtkSMProxy* proxy,
 }
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.7");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
@@ -125,9 +125,10 @@ void vtkSMSimpleParallelStrategy::UpdateDistributedData()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleParallelStrategy::CreatePipeline(vtkSMSourceProxy* input)
+void vtkSMSimpleParallelStrategy::CreatePipeline(vtkSMSourceProxy* input,
+  int outputport)
 {
-  this->CreatePipelineInternal(input,
+  this->CreatePipelineInternal(input, outputport,
                                this->Collect, 
                                this->PreDistributorSuppressor,
                                this->Distributor,
@@ -135,10 +136,11 @@ void vtkSMSimpleParallelStrategy::CreatePipeline(vtkSMSourceProxy* input)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleParallelStrategy::CreateLODPipeline(vtkSMSourceProxy* input)
+void vtkSMSimpleParallelStrategy::CreateLODPipeline(vtkSMSourceProxy* input, 
+  int outputport)
 {
-  this->Connect(input, this->LODDecimator);
-  this->CreatePipelineInternal(this->LODDecimator,
+  this->Connect(input, this->LODDecimator, "Input", outputport);
+  this->CreatePipelineInternal(this->LODDecimator, 0,
                                this->CollectLOD, 
                                this->PreDistributorSuppressorLOD,
                                this->DistributorLOD,
@@ -147,7 +149,7 @@ void vtkSMSimpleParallelStrategy::CreateLODPipeline(vtkSMSourceProxy* input)
 
 //----------------------------------------------------------------------------
 void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
-  vtkSMSourceProxy* input,
+  vtkSMSourceProxy* input, int outputport,
   vtkSMSourceProxy* collect,
   vtkSMSourceProxy* predistributorsuppressor,
   vtkSMSourceProxy* distributor,
@@ -156,7 +158,7 @@ void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
 
-  this->Connect(input, collect);
+  this->Connect(input, collect, "Input", outputport);
   this->Connect(collect, predistributorsuppressor);
 
   // This sets the connection on the render server (since Distributor::Servers =

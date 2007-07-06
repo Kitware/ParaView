@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataRepresentation.h"
 
 #include "vtkEventQtSlotConnect.h"
-#include "vtkSMProxyProperty.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMRepresentationProxy.h"
 
 #include <QtDebug>
@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QColor>
 
 #include "pqApplicationCore.h"
+#include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqScalarsToColors.h"
 #include "pqServerManagerModel.h"
@@ -50,7 +51,7 @@ class pqDataRepresentationInternal
 {
 public:
   vtkEventQtSlotConnect* VTKConnect;
-  QPointer<pqPipelineSource> Input;
+  QPointer<pqOutputPort> InputPort;
 
   pqDataRepresentationInternal()
     {
@@ -77,9 +78,9 @@ pqDataRepresentation::pqDataRepresentation(const QString& group,
 //-----------------------------------------------------------------------------
 pqDataRepresentation::~pqDataRepresentation()
 {
-  if (this->Internal->Input)
+  if (this->Internal->InputPort)
     {
-    this->Internal->Input->removeRepresentation(this);
+    this->Internal->InputPort->removeRepresentation(this);
     }
   delete this->Internal;
 }
@@ -87,13 +88,20 @@ pqDataRepresentation::~pqDataRepresentation()
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqDataRepresentation::getInput() const
 {
-  return this->Internal->Input;
+  return (this->Internal->InputPort?
+    this->Internal->InputPort->getSource() : 0);
+}
+
+//-----------------------------------------------------------------------------
+pqOutputPort* pqDataRepresentation::getOutputPortFromInput() const
+{
+  return this->Internal->InputPort;
 }
 
 //-----------------------------------------------------------------------------
 void pqDataRepresentation::onInputChanged()
 {
-  vtkSMProxyProperty* ivp = vtkSMProxyProperty::SafeDownCast(
+  vtkSMInputProperty* ivp = vtkSMInputProperty::SafeDownCast(
     this->getProxy()->GetProperty("Input"));
   if (!ivp)
     {
@@ -101,42 +109,46 @@ void pqDataRepresentation::onInputChanged()
     return;
     }
 
-  pqPipelineSource* added = 0;
-  pqPipelineSource* removed = 0;
+  pqOutputPort* oldValue = this->Internal->InputPort;
 
   int new_proxes_count = ivp->GetNumberOfProxies();
   if (new_proxes_count == 0)
     {
-    removed = this->Internal->Input;
-    this->Internal->Input = 0;
+    this->Internal->InputPort = 0;
     }
   else if (new_proxes_count == 1)
     {
     pqServerManagerModel* smModel = 
       pqApplicationCore::instance()->getServerManagerModel();
-    removed = this->Internal->Input;
-    this->Internal->Input = smModel->findItem<pqPipelineSource*>(ivp->GetProxy(0));
-    added = this->Internal->Input;
-    if (ivp->GetProxy(0) && !this->Internal->Input)
+    pqPipelineSource* input = smModel->findItem<pqPipelineSource*>(ivp->GetProxy(0));
+    if (ivp->GetProxy(0) && !input)
       {
       qDebug() << "Representation could not locate the pqPipelineSource object "
         << "for the input proxy.";
       }
+    else
+      {
+      int portnumber = ivp->GetOutputPortForConnection(0);
+      this->Internal->InputPort = input->getOutputPort(portnumber);
+      }
     }
   else if (new_proxes_count > 1)
     {
-    qDebug() << "Representation with more than 1 input are not handled.";
+    qDebug() << "Representations with more than 1 inputs are not handled.";
     return;
     }
 
-  // Now tell the pqPipelineSource about the changes in the representations.
-  if (removed)
+  if (oldValue != this->Internal->InputPort)
     {
-    removed->removeRepresentation(this);
-    }
-  if (added)
-    {
-    added->addRepresentation(this);
+    // Now tell the pqPipelineSource about the changes in the representations.
+    if (oldValue)
+      {
+      oldValue->removeRepresentation(this);
+      }
+    if (this->Internal->InputPort)
+      {
+      this->Internal->InputPort->addRepresentation(this);
+      }
     }
 }
 

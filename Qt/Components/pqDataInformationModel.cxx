@@ -44,11 +44,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView includes.
+#include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 
 struct pqSourceInfo
 {
-  QPointer<pqPipelineSource> Source;
+  QPointer<pqOutputPort> OutputPort;
   int DataType;
   quint64 NumberOfCells;
   quint64 NumberOfPoints;
@@ -63,15 +64,15 @@ struct pqSourceInfo
     this->Init();
     }
 
-  pqSourceInfo(pqPipelineSource* src)
+  pqSourceInfo(pqOutputPort* port)
     {
     this->Init();
-    this->Source = src;
+    this->OutputPort = port;
     }
 
-  operator pqPipelineSource*() const
+  operator pqOutputPort*() const
     {
-    return this->Source;
+    return this->OutputPort;
     }
 
   void Init()
@@ -83,6 +84,23 @@ struct pqSourceInfo
     this->MemorySize = 0;
     this->DataInformationValid = false;
     }
+
+  QVariant getName() const
+    {
+    if (this->OutputPort)
+      {
+      pqPipelineSource* source = this->OutputPort->getSource();
+      if (source->getNumberOfOutputPorts() > 1)
+        {
+        return QVariant(
+          QString("%1 (%2)").arg(source->getSMName()).
+          arg(this->OutputPort->getPortNumber()));
+        }
+      return QVariant(source->getSMName());
+      }
+    return QVariant("Unknown");
+    }
+
 
   QVariant getNumberOfCells() const
     {
@@ -196,6 +214,47 @@ class pqDataInformationModelInternal
 public:
   QList<pqSourceInfo > Sources;
   vtkTimeStamp UpdateTime;
+
+  bool contains(pqPipelineSource* src)
+    {
+    foreach (pqSourceInfo info, this->Sources)
+      {
+      if (info.OutputPort->getSource() == src)
+        {
+        return true;
+        }
+      }
+    return false;
+    }
+
+  int indexOf(pqPipelineSource* src)
+    {
+    int index = 0;
+    foreach (pqSourceInfo info, this->Sources)
+      {
+      if (info.OutputPort->getSource() == src)
+        {
+        return index;
+        }
+      ++index;
+      }
+
+    return -1;
+    }
+
+  int lastIndexOf(pqPipelineSource* src)
+    {
+    for(int cc=this->Sources.size()-1; cc >=0; --cc)
+      {
+      pqSourceInfo& info = this->Sources[cc];
+      if (info.OutputPort->getSource() == src)
+        {
+        return cc;
+        }
+      }
+
+    return -1;
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -247,7 +306,6 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     }
 
   pqSourceInfo &info = this->Internal->Sources[idx.row()];
-  pqPipelineSource* source = info.Source;
 
   switch (idx.column())
     {
@@ -256,7 +314,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     switch(role)
       {
     case Qt::DisplayRole:
-      return QVariant(source->getSMName());
+      return QVariant(info.getName());
       }
     break;
 
@@ -355,26 +413,36 @@ QVariant pqDataInformationModel::headerData(int section,
 //-----------------------------------------------------------------------------
 void pqDataInformationModel::addSource(pqPipelineSource* source)
 {
-  if (this->Internal->Sources.contains(source))
+  if (this->Internal->contains(source))
     {
     return;
     }
+
+  int numOutputPorts = source->getNumberOfOutputPorts();
   this->beginInsertRows(QModelIndex(), this->Internal->Sources.size(),
-    this->Internal->Sources.size());
+    this->Internal->Sources.size()+numOutputPorts-1);
 
-  this->Internal->Sources.push_back(source);
-
+  for (int cc=0; cc < numOutputPorts; cc++)
+    {
+    this->Internal->Sources.push_back(source->getOutputPort(cc));
+    }
   this->endInsertRows();
 }
 
 //-----------------------------------------------------------------------------
 void pqDataInformationModel::removeSource(pqPipelineSource* source)
 {
-  int idx = this->Internal->Sources.indexOf(source);
+  int idx = this->Internal->indexOf(source);
+
   if (idx != -1)
     {
-    this->beginRemoveRows(QModelIndex(), idx, idx);
-    this->Internal->Sources.removeAt(idx);
+    int lastIdx = this->Internal->lastIndexOf(source);
+
+    this->beginRemoveRows(QModelIndex(), idx, lastIdx);
+    for (int cc=lastIdx; cc >=idx; --cc)
+      {
+      this->Internal->Sources.removeAt(cc);
+      }
     this->endRemoveRows();
     }
 }
@@ -387,24 +455,27 @@ void pqDataInformationModel::refreshModifiedData()
   for (iter = this->Internal->Sources.begin(); 
     iter != this->Internal->Sources.end(); ++iter, row_no++)
     {
-    vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(
-      iter->Source->getProxy());
+    pqOutputPort* port = iter->OutputPort;
+    pqPipelineSource* source = port->getSource();
+
+    vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(source->getProxy());
     if (!proxy)
       {
-      vtkSMCompoundProxy* compound_proxy = vtkSMCompoundProxy::SafeDownCast(
-        iter->Source->getProxy());
+      vtkSMCompoundProxy* compound_proxy = 
+        vtkSMCompoundProxy::SafeDownCast(source->getProxy());
       if (compound_proxy)
         {
         proxy = vtkSMSourceProxy::SafeDownCast(
           compound_proxy->GetConsumableProxy());
         }
       }
+
     // Get data information only if the proxy has parts.
     if (!proxy || proxy->GetNumberOfParts() == 0)
       {
       continue;
       }
-    vtkPVDataInformation* dataInfo = proxy->GetDataInformation();
+    vtkPVDataInformation* dataInfo = port->getDataInformation(false);
     if (!iter->DataInformationValid || dataInfo->GetMTime() > iter->MTime)
       {
       iter->MTime = dataInfo->GetMTime();
@@ -427,7 +498,7 @@ void pqDataInformationModel::refreshModifiedData()
 }
 
 //-----------------------------------------------------------------------------
-QModelIndex pqDataInformationModel::getIndexFor(pqPipelineSource* item) const
+QModelIndex pqDataInformationModel::getIndexFor(pqOutputPort* item) const
 {
   if (!this->Internal->Sources.contains(item))
     {
@@ -437,7 +508,7 @@ QModelIndex pqDataInformationModel::getIndexFor(pqPipelineSource* item) const
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource* pqDataInformationModel::getItemFor(const QModelIndex& idx) const
+pqOutputPort* pqDataInformationModel::getItemFor(const QModelIndex& idx) const
 {
   if (!idx.isValid() && idx.model() != this)
     {
@@ -448,6 +519,6 @@ pqPipelineSource* pqDataInformationModel::getItemFor(const QModelIndex& idx) con
     qDebug() << "Index: " << idx.row() << " beyond range.";
     return NULL;
     }
-  return this->Internal->Sources[idx.row()];
+  return this->Internal->Sources[idx.row()].OutputPort;
 }
 

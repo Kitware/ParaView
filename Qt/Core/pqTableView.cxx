@@ -31,9 +31,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqTableView.h"
 
-#include "pqRepresentation.h"
 #include "pqHistogramTableModel.h"
+#include "pqOutputPort.h"
 #include "pqPipelineSource.h"
+#include "pqRepresentation.h"
 #include "pqServer.h"
 
 #include <vtkCellData.h>
@@ -131,8 +132,9 @@ void pqTableView::forceRender()
 }
   
 
-bool pqTableView::canDisplaySource(pqPipelineSource* source) const
+bool pqTableView::canDisplay(pqOutputPort* opPort) const
 {
+  pqPipelineSource* source = opPort? opPort->getSource() : 0;
   if(!source ||
      this->getServer()->GetConnectionID() !=
      source->getServer()->GetConnectionID())

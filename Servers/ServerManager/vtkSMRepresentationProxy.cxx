@@ -16,10 +16,10 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMProxyProperty.h"
+#include "vtkSMInputProperty.h"
 #include "vtkInformation.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMRepresentationProxy, "1.7");
 vtkCxxSetObjectMacro(vtkSMRepresentationProxy, ViewInformation, vtkInformation);
 //----------------------------------------------------------------------------
 vtkSMRepresentationProxy::vtkSMRepresentationProxy()
@@ -92,7 +92,8 @@ bool vtkSMRepresentationProxy::GetSelectionVisibility()
 
 //----------------------------------------------------------------------------
 void vtkSMRepresentationProxy::Connect(vtkSMProxy* producer,
-  vtkSMProxy* consumer, const char* propertyname/*="Input"*/)
+  vtkSMProxy* consumer, const char* propertyname/*="Input"*/,
+  int outputport/*=0*/)
 {
   if (!propertyname)
     {
@@ -102,14 +103,24 @@ void vtkSMRepresentationProxy::Connect(vtkSMProxy* producer,
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     consumer->GetProperty(propertyname));
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
   if (!pp)
     {
     vtkErrorMacro("Failed to locate property " << propertyname
       << " on the consumer " << consumer->GetXMLName());
     return;
     }
-  pp->RemoveAllProxies();
-  pp->AddProxy(producer);
+
+  if (ip)
+    {
+    ip->RemoveAllProxies();
+    ip->AddInputConnection(producer, outputport);
+    }
+  else
+    {
+    pp->RemoveAllProxies();
+    pp->AddProxy(producer);
+    }
   consumer->UpdateProperty(propertyname);
 }
 
