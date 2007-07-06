@@ -170,9 +170,9 @@ void pqPendingDisplayManager::createPendingDisplays(
           {
           // hide input source.
           QList<pqOutputPort*> inputs = filter->getInputs();
-          for(int cc=0; cc < inputs.size(); ++cc)
+          for(int kk=0; kk < inputs.size(); ++kk)
             {
-            pqOutputPort* input = inputs[cc];
+            pqOutputPort* input = inputs[kk];
             pqDataRepresentation* inputRepr = input->getRepresentation(view);
             if (inputRepr)
               {

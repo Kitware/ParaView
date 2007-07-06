@@ -94,14 +94,14 @@ public:
   /// Overridden to ensure that only those items are selectable which can be set
   /// as the input to the filter i.e. their output data type  matches what is
   /// expected at the input of the filter.
-  virtual Qt::ItemFlags flags(const QModelIndex &index) const
+  virtual Qt::ItemFlags flags(const QModelIndex &idx) const
     {
-    Qt::ItemFlags cur_flags = this->Superclass::flags(index);
+    Qt::ItemFlags cur_flags = this->Superclass::flags(idx);
     if ( (cur_flags & Qt::ItemIsSelectable) > 0)
       {
       // Ensure that the source produces data as expected by the current input
       // port.
-      pqServerManagerModelItem* item = this->getItemFor(index);
+      pqServerManagerModelItem* item = this->getItemFor(idx);
       pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
       pqOutputPort* opport = source? source->getOutputPort(0) :
         qobject_cast<pqOutputPort*>(item);
@@ -543,9 +543,9 @@ void pqFilterInputDialog::changeInput(const QItemSelection &selected,
     foreach (pqOutputPort* opport, inputs)
       {
       QModelIndex itemIndex = this->Pipeline->getIndexFor(opport);
-      QVariant label = this->Pipeline->data(itemIndex, Qt::DisplayRole); 
+      QVariant text = this->Pipeline->data(itemIndex, Qt::DisplayRole); 
       QListWidgetItem* lwItem = new QListWidgetItem(list);
-      lwItem->setText(label.toString());
+      lwItem->setText(text.toString());
       lwItem->setData(Qt::UserRole, opport);
       list->addItem(lwItem);
       }

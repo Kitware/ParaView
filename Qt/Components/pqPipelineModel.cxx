@@ -208,9 +208,9 @@ class pqPipelineModelOutputPort : public pqPipelineModelFilter
 {
 public:
   pqPipelineModelOutputPort(pqPipelineModelServer *server=0,
-    pqPipelineSource* source=0, int port=0, QObject *parent=0):
+    pqPipelineSource* source=0, int port=0, QObject *_parent=0):
     pqPipelineModelFilter(server, source, 
-      pqPipelineModel::SourceOutputPort, parent),
+      pqPipelineModel::SourceOutputPort, _parent),
     Port(port)
   {
   this->setType(pqPipelineModel::SourceOutputPort);
