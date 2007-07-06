@@ -32,8 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 
 // Server Manager Includes.
-#include "vtkSMSourceProxy.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSMCompoundProxy.h"
+#include "vtkSMSourceProxy.h"
 
 // Qt Includes.
 #include <QtDebug>
@@ -85,8 +86,13 @@ pqServer* pqOutputPort::getServer() const
 //-----------------------------------------------------------------------------
 vtkPVDataInformation* pqOutputPort::getDataInformation(bool update) const
 {
-  vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(
+  vtkSMCompoundProxy* compoundProxy = vtkSMCompoundProxy::SafeDownCast(
     this->getSource()->getProxy());
+
+  vtkSMSourceProxy* source = compoundProxy?
+    vtkSMSourceProxy::SafeDownCast(compoundProxy->GetConsumableProxy()):
+    vtkSMSourceProxy::SafeDownCast(this->getSource()->getProxy());
+
   if (!source)
     {
     return 0;

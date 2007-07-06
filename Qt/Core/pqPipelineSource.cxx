@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMCompoundProxy.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyListDomain.h"
@@ -89,7 +90,11 @@ pqPipelineSource::pqPipelineSource(const QString& name, vtkSMProxy* proxy,
 : pqProxy("sources", name, proxy, server, _parent)
 {
   this->Internal = new pqPipelineSourceInternal(name, proxy);
-  vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(this->getProxy());
+  vtkSMCompoundProxy* compoundProxy = vtkSMCompoundProxy::SafeDownCast(this->getProxy());
+
+  vtkSMSourceProxy* source = compoundProxy? 
+    vtkSMSourceProxy::SafeDownCast(compoundProxy->GetConsumableProxy()):
+    vtkSMSourceProxy::SafeDownCast(this->getProxy());
   if (source)
     {
     // Obtain information about number of output ports.
