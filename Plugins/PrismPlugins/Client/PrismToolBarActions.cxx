@@ -67,21 +67,23 @@ pqPipelineSource* PrismToolBarActions::createFilterForActiveSource(
   pqPipelineSource* filter = 0;
   pqServerManagerModelItem* item = 0;
   pqServerManagerSelection::ConstIterator iter = sels.begin();
-  if(iter != sels.end())
+
+  pqServer* server = 0;
+  QList<pqOutputPort*> inputs;
+  for( ; iter != sels.end(); ++iter)
     {
     item = *iter;
-    source = dynamic_cast<pqPipelineSource*>(item);
-    filter = builder->createFilter("filters",xmlname, source);
-    ++iter;
+    source = dynamic_cast<pqPipelineSource*>(item);   
+    inputs.push_back(source->getOutputPort(0));
+    if (!server)
+      {
+      server = source->getServer();
+      }
     }
 
-  for( ; filter && iter != sels.end(); ++iter)
-    {
-    item = *iter;
-    source = dynamic_cast<pqPipelineSource*>(item);
-    builder->addConnection(source, filter);
-    }
-
+  QMap<QString, QList<pqOutputPort*> > namedInputs;
+  namedInputs["Input"] = inputs;
+  filter = builder->createFilter("filters", xmlname, namedInputs, server);
   return filter;
 }
 

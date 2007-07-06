@@ -1,12 +1,15 @@
 
 #include "MyView.h"
-#include <QWidget>
+
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QWidget>
 #include <vtkSMProxy.h>
+
+#include <pqOutputPort.h>
+#include <pqPipelineSource.h>
 #include <pqRepresentation.h>
 #include <pqServer.h>
-#include <pqPipelineSource.h>
 
 MyView::MyView(const QString& viewmoduletype, 
        const QString& group, 
@@ -59,8 +62,9 @@ void MyView::onRepresentationRemoved(pqRepresentation* d)
     }
 }
 
-bool MyView::canDisplaySource(pqPipelineSource* source) const
+bool MyView::canDisplay(pqOutputPort* opPort) const
 {
+  pqPipelineSource* source = opPort? opPort->getSource() : 0;
   // check valid source and server connections
   if(!source ||
      this->getServer()->GetConnectionID() !=

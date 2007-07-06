@@ -29,7 +29,7 @@ public:
   QWidget* getWidget();
 
   /// returns whether this view can display the given source
-  bool canDisplaySource(pqPipelineSource* source) const;
+  bool canDisplay(pqOutputPort* opPort) const;
 
 protected slots:
   /// helper slots to create labels
