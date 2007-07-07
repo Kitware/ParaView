@@ -84,11 +84,12 @@ public:
   /// \brief
   ///   Makes a copy of a pipeline model.
   /// \param other The pipeline model to copy.
-  /// \param parent The parent object.
-  pqFilterInputPipelineModel(const pqPipelineModel &other, pqFilterInputDialog *parent=0)
-    : Superclass(other, parent)
+  /// \param _parent The parent object.
+  pqFilterInputPipelineModel(const pqPipelineModel &other, 
+      pqFilterInputDialog *_parent=0)
+    : Superclass(other, _parent)
     {
-    this->Dialog = parent;
+    this->Dialog = _parent;
     }
 
   /// Overridden to ensure that only those items are selectable which can be set
