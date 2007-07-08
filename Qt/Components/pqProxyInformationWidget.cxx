@@ -276,6 +276,11 @@ void pqProxyInformationWidget::updateInformation()
     vtkSMDoubleVectorProperty* tsv = vtkSMDoubleVectorProperty::SafeDownCast(
       source->getProxy()->GetProperty("TimestepValues"));
     this->Ui->timeValues->clear();
+    //
+    QAbstractItemModel *pModel = this->Ui->timeValues->model();
+    pModel->blockSignals(true);
+    this->Ui->timeValues->blockSignals(true);
+    //
     if (tsv)
       {
       unsigned int numElems = tsv->GetNumberOfElements();
@@ -287,6 +292,8 @@ void pqProxyInformationWidget::updateInformation()
         item->setData(1, Qt::ToolTipRole, tsv->GetElement(i));
         }
       }
+    this->Ui->timeValues->blockSignals(false);
+    pModel->blockSignals(false);
     }
 }
 
