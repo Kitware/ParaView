@@ -2105,7 +2105,7 @@ void pqMainWindowCore::onFileSaveAnimation(const QStringList& files)
     }
 
   // This is essential since we don't want the view frame
-  // decorations to apper in out animation.
+  // decorations to appear in our animation.
   this->multiViewManager().hideDecorations();
   if (!mgr->saveAnimation(files[0]))
     {
