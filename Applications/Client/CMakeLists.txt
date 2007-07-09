@@ -251,12 +251,11 @@ IF(BUILD_TESTING)
 # Now we add tests that use the pvTestDriver for running.
   SET(XML_TESTS_WITH_BASELINES
     3DWidgetInCustomFilter
-    CameraLink
-    ClipPlaneLink
-    Cut
     Calculator
+    CameraLink
     Clip
     ClipHidden
+    ClipPlaneLink
     ClipUndo
     ColorEditor1
     ColorEditor2
@@ -267,6 +266,7 @@ IF(BUILD_TESTING)
     CreateCustomFilter
     CreateSource
     CustomFilter
+    Cut
     CutMulti
     D3SmallCells
     DualSphereAnimation
@@ -277,13 +277,14 @@ IF(BUILD_TESTING)
     Fractal2D
     Fractal3D
     LinePlot
-    LoadState
     LoadSaveStateAnimation
+    LoadState
     ObjectInspectorSphere
     OrientationAxis
     Plot3DReader
     RectilinearFractal
     RepresentationSelector
+    SaveAnimationGeometry
     SelectReader
     StreamTracer
     StreamTracerUpdates
