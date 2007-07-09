@@ -74,7 +74,6 @@ undo for changes in the "Application Settings" dialog.
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
-  <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
