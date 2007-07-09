@@ -22,18 +22,31 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMClientServerRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMClientServerRenderViewProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMClientServerRenderViewProxy, "1.7");
 
 //----------------------------------------------------------------------------
 vtkSMClientServerRenderViewProxy::vtkSMClientServerRenderViewProxy()
 {
   this->RenderSyncManager = 0;
   this->SquirtLevel = 0;
+  this->RenderersID = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMClientServerRenderViewProxy::~vtkSMClientServerRenderViewProxy()
 {
+  if (this->RenderSyncManager && (this->RenderersID !=0))
+    {
+    // Remove renderers from the RenderSyncManager.
+    vtkClientServerStream stream;
+    stream  << vtkClientServerStream::Invoke
+      << this->RenderSyncManager->GetID()
+      << "RemoveAllRenderers" << this->RenderersID
+      << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID, 
+      vtkProcessModule::RENDER_SERVER_ROOT, stream);
+    this->RenderersID = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -123,10 +136,11 @@ void vtkSMClientServerRenderViewProxy::InitializeRenderSyncManager()
     this->RenderSyncManager, this->RenderWindowProxy);
 
   // Make the render sync manager aware of our renderers.
+  this->RenderersID = static_cast<int>(this->GetSelfID().ID);
   stream  << vtkClientServerStream::Invoke 
           << this->RenderSyncManager->GetID()
           << "AddRenderer" 
-          << (int)this->GetSelfID().ID
+          << this->RenderersID
           << this->RendererProxy->GetID() 
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID,
@@ -140,7 +154,7 @@ void vtkSMClientServerRenderViewProxy::InitializeRenderSyncManager()
   stream  << vtkClientServerStream::Invoke 
           << this->RenderSyncManager->GetID()
           << "SetId" 
-          << (int)this->GetSelfID().ID
+          << this->RenderersID
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
 }

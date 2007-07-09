@@ -46,7 +46,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.13");
 
 vtkInformationKeyMacro(vtkSMIceTCompositeViewProxy, KD_TREE, ObjectBase);
 //----------------------------------------------------------------------------
@@ -72,11 +72,27 @@ vtkSMIceTCompositeViewProxy::vtkSMIceTCompositeViewProxy()
   this->Information->Set(KD_TREE(), 0);
 
   this->ViewSize[0] = this->ViewSize[1] = 400;
+
+  this->RenderersID =0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMIceTCompositeViewProxy::~vtkSMIceTCompositeViewProxy()
 {
+  if (this->MultiViewManager && this->RenderersID)
+    {
+    // Remove renderers from the MultiViewManager.
+    vtkClientServerStream stream;
+    stream  << vtkClientServerStream::Invoke
+      << this->MultiViewManager->GetID()
+      << "RemoveAllRenderers" 
+      << this->RenderersID
+      << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID, 
+      vtkProcessModule::RENDER_SERVER_ROOT, stream);
+    this->RenderersID = 0;
+    }
+
   delete this->ActiveStrategyVector;
   this->ActiveStrategyVector=0;
 }
@@ -216,9 +232,11 @@ void vtkSMIceTCompositeViewProxy::EndCreateVTKObjects()
     this->Connect(this->RenderWindowProxy, this->MultiViewManager, "RenderWindow");
 
     // Make the multiview manager aware of our renderers.
+  this->RenderersID = static_cast<int>(this->GetSelfID().ID);
     stream  << vtkClientServerStream::Invoke
       << this->MultiViewManager->GetID()
-      << "AddRenderer" << (int)this->GetSelfID().ID
+      << "AddRenderer"
+      << this->RenderersID
       << this->RendererProxy->GetID()
       << vtkClientServerStream::End;
 
@@ -398,7 +416,7 @@ void vtkSMIceTCompositeViewProxy::BeginStillRender()
     stream  << vtkClientServerStream::Invoke
             << this->MultiViewManager->GetID()
             << "SetActiveViewID"
-            << static_cast<int>(this->GetSelfID().ID)
+            << this->RenderersID
             << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER_ROOT,
       stream);
@@ -424,7 +442,7 @@ void vtkSMIceTCompositeViewProxy::BeginInteractiveRender()
     stream  << vtkClientServerStream::Invoke
             << this->MultiViewManager->GetID()
             << "SetActiveViewID"
-            << static_cast<int>(this->GetSelfID().ID)
+            << this->RenderersID
             << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER_ROOT,
       stream);

@@ -96,6 +96,9 @@ protected:
 
   int SquirtLevel;
 
+  // ID used to identify renders with the MultiViewManager.
+  int RenderersID;
+
 private:
   vtkSMClientServerRenderViewProxy(const vtkSMClientServerRenderViewProxy&); // Not implemented
   void operator=(const vtkSMClientServerRenderViewProxy&); // Not implemented

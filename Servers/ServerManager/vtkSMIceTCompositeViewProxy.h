@@ -158,6 +158,9 @@ protected:
 
   vtkSMRepresentationStrategyVector *ActiveStrategyVector;
 
+  // ID used to identify renders with the MultiViewManager.
+  int RenderersID;
+
 private:
   vtkSMIceTCompositeViewProxy(const vtkSMIceTCompositeViewProxy&); // Not implemented
   void operator=(const vtkSMIceTCompositeViewProxy&); // Not implemented
