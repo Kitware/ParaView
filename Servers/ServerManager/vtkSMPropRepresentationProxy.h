@@ -35,6 +35,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Overridden to pass the view information to all the internal
+  // representations.
+  virtual void SetViewInformation(vtkInformation*);
+
+  // Description:
   // Called to update the Representation. 
   // Overridden to ensure that SelectionRepresentation visibility is updated
   // correctly.

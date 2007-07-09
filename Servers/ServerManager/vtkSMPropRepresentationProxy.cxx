@@ -26,7 +26,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMPropRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPropRepresentationProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMPropRepresentationProxy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMPropRepresentationProxy::vtkSMPropRepresentationProxy()
 {
@@ -50,6 +50,16 @@ vtkSMPropRepresentationProxy::vtkSMPropRepresentationProxy()
 vtkSMPropRepresentationProxy::~vtkSMPropRepresentationProxy()
 {
   this->SelectionPropLink->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPropRepresentationProxy::SetViewInformation(vtkInformation* info)
+{
+  this->Superclass::SetViewInformation(info);
+  if (this->SelectionRepresentation)
+    {
+    this->SelectionRepresentation->SetViewInformation(info);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -100,7 +110,8 @@ void vtkSMPropRepresentationProxy::Update(vtkSMViewProxy* view)
       this->SelectionRepresentation->GetProperty("Visibility"));
     ivp->SetElement(0, visible);
     this->SelectionRepresentation->UpdateProperty("Visibility");
-    }
+    this->SelectionRepresentation->Update(view);  
+  }
 
   this->Superclass::Update(view);
 }
