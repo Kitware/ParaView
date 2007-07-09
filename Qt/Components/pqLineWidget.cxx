@@ -47,7 +47,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMNewWidgetRepresentationProxy.h>
 #include <vtkSMProxyProperty.h>
-#include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
 
 /////////////////////////////////////////////////////////////////////////

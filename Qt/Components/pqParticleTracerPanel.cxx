@@ -47,7 +47,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkMemberFunctionCommand.h>
 #include <vtkPVDataInformation.h>
 #include <vtkPVXMLElement.h>
-#include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxyProperty.h>

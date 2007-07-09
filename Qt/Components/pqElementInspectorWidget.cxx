@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqElementInspectorWidget.h"
 
 #include "vtkProcessModule.h"
-#include "vtkSMAbstractViewModuleProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMClientDeliveryRepresentationProxy.h"
 #include "vtkSMProxyManager.h"

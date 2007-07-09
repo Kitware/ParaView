@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkProcessModuleConnectionManager.h>
 #include <vtkPVServerInformation.h>
 #include <vtkSMProxyManager.h>
-#include <vtkSMRenderModuleProxy.h>
 #include "vtkSMRenderViewProxy.h"
 
 // Qt includes.

@@ -45,7 +45,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVGeometryInformation.h"
 #include "vtkSmartPointer.h" 
 #include "vtkSMCompoundProxy.h"
-#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
@@ -706,7 +705,7 @@ QList<QString> pqPipelineRepresentation::getColorFields()
 int pqPipelineRepresentation::getColorFieldNumberOfComponents(const QString& array)
 {
   QString field = array;
-  int fieldType = vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA;
+  int fieldType = vtkSMDataRepresentationProxy::POINT_DATA;
 
   if(field == pqPipelineRepresentation::solidColor())
     {

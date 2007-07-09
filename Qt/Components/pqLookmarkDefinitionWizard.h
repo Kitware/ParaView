@@ -61,7 +61,7 @@ class pqPipelineSource;
  *   - all pqDataRepresentations that are invisible in the given pqRenderViewModule but "upstream" from a visible one in the pipeline 
  *   - all pqPipelineSources associated with the displays being saved
  *   - all referred proxies of all saved display and source proxies. A referred proxy is one that is part of a proxy property of a saved proxy.
- *   - the vtkSMRenderModuleProxy state (but not its referred proxies)
+ *   - the vtkSMViewProxy state (but not its referred proxies)
  *
  */
 class PQCOMPONENTS_EXPORT pqLookmarkDefinitionWizard : public QDialog

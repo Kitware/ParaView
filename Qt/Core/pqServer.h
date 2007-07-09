@@ -38,7 +38,6 @@ class vtkProcessModule;
 class vtkPVOptions;
 class vtkSMApplication;
 class vtkSMProxyManager;
-class vtkSMRenderModuleProxy;
 class vtkSMRenderViewProxy;
 
 #include "pqCoreExport.h"

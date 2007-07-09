@@ -39,9 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 
 // SM
-#include "vtkSMRenderModuleProxy.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyLink.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 
 // pqCore
@@ -87,14 +87,10 @@ void pqLinksManager::addLink()
       {
       vtkSMProxy* inP = editor.selectedProxy1();
       vtkSMProxy* outP = editor.selectedProxy2();
-      vtkSMRenderModuleProxy* inR;
-      inR = vtkSMRenderModuleProxy::SafeDownCast(inP);
-      vtkSMRenderModuleProxy* outR;
-      outR = vtkSMRenderModuleProxy::SafeDownCast(outP);
 
-      if(inR && outR)
+      if(inP->IsA("vtkSMRenderViewProxy") && outP->IsA("vtkSMRenderViewProxy"))
         {
-        model->addCameraLink(editor.linkName(), inR, outR);
+        model->addCameraLink(editor.linkName(), inP, outP);
         }
       else
         {
@@ -127,17 +123,13 @@ void pqLinksManager::editLink()
       {
       vtkSMProxy* inP = editor.selectedProxy1();
       vtkSMProxy* outP = editor.selectedProxy2();
-      vtkSMRenderModuleProxy* inR;
-      inR = vtkSMRenderModuleProxy::SafeDownCast(inP);
-      vtkSMRenderModuleProxy* outR;
-      outR = vtkSMRenderModuleProxy::SafeDownCast(outP);
 
-      if(inR && outR)
+      if(inP->IsA("vtkSMRenderViewProxy") && outP->IsA("vtkSMRenderViewProxy"))
         {
-        model->addCameraLink(editor.linkName(), inR, outR);
+        model->addCameraLink(editor.linkName(), inP, outP);
         }
       else
-        {
+        {      
         model->addProxyLink(editor.linkName(), inP, outP);
         }
       }

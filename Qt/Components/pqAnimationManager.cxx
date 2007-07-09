@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMAnimationSceneGeometryWriter.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMPVAnimationSceneProxy.h"
-#include "vtkSMRenderModuleProxy.h"
 #include "vtkSMServerProxyManagerReviver.h"
 
 #include <QCoreApplication>

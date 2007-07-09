@@ -38,10 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes.
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
-#include "vtkSMAbstractDisplayProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPQStateLoader.h"
-#include "vtkSMRenderModuleProxy.h"
 #include "vtkSMStateLoader.h"
 
 #include "pqApplicationCore.h"

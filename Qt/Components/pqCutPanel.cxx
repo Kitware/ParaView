@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqCollapsedGroup.h>
 
 #include <vtkPVXMLElement.h>
-#include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMProxyProperty.h>
 #include <vtkSMProxyListDomain.h>

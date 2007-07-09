@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 
 // SM
-#include "vtkSMRenderModuleProxy.h"
 #include "vtkSMPropertyLink.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMOrderedPropertyIterator.h"

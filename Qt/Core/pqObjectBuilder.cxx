@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMMultiViewRenderModuleProxy.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"

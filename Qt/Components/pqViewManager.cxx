@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMProxy.h"
 #include "vtkSMStateLoaderBase.h"
 
 // Qt includes.
