@@ -25,7 +25,6 @@
 #include "vtkSMArrayRangeDomain.h"
 #include "vtkSMArraySelectionDomain.h"
 #include "vtkSMArraySelectionInformationHelper.h"
-#include "vtkSMAxesProxy.h"
 #include "vtkSMBooleanKeyFrameProxy.h"
 #include "vtkSMBooleanDomain.h"
 #include "vtkSMBoundsDomain.h"
@@ -40,7 +39,6 @@
 #include "vtkSMCompoundProxyDefinitionLoader.h"
 #include "vtkSMConnectionCleanerProxy.h"
 #include "vtkSMDataTypeDomain.h"
-#include "vtkSMDisplayProxy.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
@@ -56,7 +54,6 @@
 #include "vtkSMIntArrayInformationHelper.h"
 #include "vtkSMFileListDomain.h"
 #include "vtkSMFixedTypeDomain.h"
-#include "vtkSMGenericViewDisplayProxy.h"
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMImplicitPlaneProxy.h"
 #include "vtkSMImplicitPlaneRepresentationProxy.h"
@@ -70,8 +67,6 @@
 #include "vtkSMKeyFrameProxy.h"
 #include "vtkSMLookupTableProxy.h"
 #include "vtkSMMaterialLoaderProxy.h"
-#include "vtkSMMultiViewRenderModuleProxy.h"
-#include "vtkSMNew3DWidgetProxy.h"
 #include "vtkSMNullProxy.h"
 #include "vtkSMNumberOfGroupsDomain.h"
 #include "vtkSMNumberOfPartsDomain.h"
@@ -79,7 +74,6 @@
 #include "vtkSMOrderedPropertyIterator.h"
 #include "vtkSMPart.h"
 #include "vtkSMPluginLoader.h"
-#include "vtkSMPointLabelDisplayProxy.h"
 #include "vtkSMPQStateLoader.h"
 #include "vtkSMPropertyAdaptor.h"
 #include "vtkSMProperty.h"
@@ -102,7 +96,6 @@
 #include "vtkSMPVLookupTableProxy.h"
 #include "vtkSMPWriterProxy.h"
 #include "vtkSMRampKeyFrameProxy.h"
-#include "vtkSMScalarBarWidgetProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMServerFileListingProxy.h"
 #include "vtkSMServerProxyManagerReviver.h"
@@ -121,8 +114,6 @@
 #include "vtkSMSubPropertyIterator.h"
 #include "vtkSMSummaryHelperProxy.h"
 #include "vtkSMTesting.h"
-#include "vtkSMTextDisplayProxy.h"
-#include "vtkSMTextWidgetDisplayProxy.h"
 #include "vtkSMTimeRangeInformationHelper.h"
 #include "vtkSMTimeStepsInformationHelper.h"
 #include "vtkSMTransformProxy.h"
@@ -132,7 +123,6 @@
 #include "vtkSMUpdateInformationUndoElement.h"
 #include "vtkSMUpdateSuppressorProxy.h"
 #include "vtkSMVectorProperty.h"
-#include "vtkSMViewModuleProxy.h"
 #include "vtkSMWidgetRepresentationProxy.h"
 #include "vtkSMWriterProxy.h"
 //#include "vtkSMXDMFInformationHelper.h"
@@ -141,11 +131,6 @@
 #include "vtkSMXMLPVAnimationWriterProxy.h"
 
 // Display Proxies
-#include "vtkSMCubeAxesDisplayProxy.h"
-#include "vtkSMDataObjectDisplayProxy.h"
-#include "vtkSMCompositeDisplayProxy.h"
-#include "vtkSMLODDisplayProxy.h"
-#include "vtkSMMultiDisplayProxy.h"
 #include "vtkSMXYPlotActorProxy.h"
 #include "vtkSMScalarBarActorProxy.h"
 
@@ -168,11 +153,8 @@
 #include "vtkSMPropertyInternals.h"
 #include "vtkSMProxyInternals.h"
 #include "vtkSMProxyManagerInternals.h"
-#include "vtkSMIceTDesktopRenderModuleProxy.h"
-#include "vtkSMIceTRenderModuleProxy.h"
 #include "vtkSMIceTCompositeViewProxy.h"
 #include "vtkSMIceTDesktopRenderViewProxy.h"
-#include "vtkSMIceTMultiDisplayProxy.h"
 
 #endif  //PARAVIEW_USE_ICE_T
 
@@ -184,7 +166,6 @@ int main(int , char *[])
   c = vtkSMAnimationSceneGeometryWriter::New(); c->Print( cout ); c->Delete();
   c = vtkSMAnimationSceneImageWriter::New(); c->Print( cout ); c->Delete();
   c = vtkSMAnimationSceneProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMAxesProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMApplication::New(); c->Print( cout ); c->Delete();
   c = vtkSMArrayListDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMArrayListInformationHelper::New(); c->Print( cout ); c->Delete();
@@ -205,7 +186,6 @@ int main(int , char *[])
   c = vtkSMClientDeliveryStrategyProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMConnectionCleanerProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMDataTypeDomain::New(); c->Print( cout ); c->Delete();
-  c = vtkSMDisplayProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMDocumentation::New(); c->Print( cout ); c->Delete();
   c = vtkSMDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMDomainIterator::New(); c->Print( cout ); c->Delete();
@@ -219,7 +199,6 @@ int main(int , char *[])
   c = vtkSMFieldDataDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMFileListDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMFixedTypeDomain::New(); c->Print( cout ); c->Delete();
-  c = vtkSMGenericViewDisplayProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMIdTypeVectorProperty::New(); c->Print( cout ); c->Delete();
   c = vtkSMImplicitPlaneProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMImplicitPlaneRepresentationProxy::New(); c->Print( cout ); c->Delete();
@@ -234,8 +213,6 @@ int main(int , char *[])
   c = vtkSMKeyFrameProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMLookupTableProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMMaterialLoaderProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMMultiViewRenderModuleProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMNew3DWidgetProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMNullProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMNumberOfGroupsDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMNumberOfPartsDomain::New(); c->Print( cout ); c->Delete();
@@ -243,7 +220,6 @@ int main(int , char *[])
   c = vtkSMOrderedPropertyIterator::New(); c->Print( cout ); c->Delete();
   c = vtkSMPart::New(); c->Print( cout ); c->Delete();
   c = vtkSMPluginLoader::New(); c->Print( cout ); c->Delete();
-  c = vtkSMPointLabelDisplayProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMPQStateLoader::New(); c->Print( cout ); c->Delete();
   c = vtkSMPropertyAdaptor::New(); c->Print( cout ); c->Delete();
   c = vtkSMProperty::New(); c->Print( cout ); c->Delete();
@@ -266,7 +242,6 @@ int main(int , char *[])
   c = vtkSMPVLookupTableProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMPWriterProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMRampKeyFrameProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMScalarBarWidgetProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMSelectionHelper::New(); c->Print( cout ); c->Delete();
   c = vtkSMServerFileListingProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMServerProxyManagerReviver::New(); c->Print( cout ); c->Delete();
@@ -285,8 +260,6 @@ int main(int , char *[])
   c = vtkSMSubPropertyIterator::New(); c->Print( cout ); c->Delete();
   c = vtkSMSummaryHelperProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMTesting::New(); c->Print( cout ); c->Delete();
-  c = vtkSMTextDisplayProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMTextWidgetDisplayProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMTimeRangeInformationHelper::New(); c->Print( cout ); c->Delete();
   c = vtkSMTimeStepsInformationHelper::New(); c->Print( cout ); c->Delete();
   c = vtkSMTransformProxy::New(); c->Print( cout ); c->Delete();
@@ -296,7 +269,6 @@ int main(int , char *[])
   c = vtkSMUpdateInformationUndoElement::New(); c->Print( cout ); c->Delete();
   c = vtkSMUpdateSuppressorProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMVectorProperty::New(); c->Print( cout ); c->Delete();
-  c = vtkSMViewModuleProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMWidgetRepresentationProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMWriterProxy::New(); c->Print( cout ); c->Delete();
 //  c = vtkSMXDMFInformationHelper::New(); c->Print( cout ); c->Delete();
@@ -304,11 +276,6 @@ int main(int , char *[])
   c = vtkSMXMLParser::New(); c->Print( cout ); c->Delete();
   c = vtkSMXMLPVAnimationWriterProxy::New(); c->Print( cout ); c->Delete();
 
-  c = vtkSMCubeAxesDisplayProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMDataObjectDisplayProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMCompositeDisplayProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMLODDisplayProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMMultiDisplayProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMXYPlotActorProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMScalarBarActorProxy::New(); c->Print( cout ); c->Delete();
 
@@ -331,11 +298,8 @@ int main(int , char *[])
   c = vtkSMPropertyInternals::New(); c->Print( cout ); c->Delete();
   c = vtkSMProxyInternals::New(); c->Print( cout ); c->Delete();
   c = vtkSMProxyManagerInternals::New(); c->Print( cout ); c->Delete();
-  c = vtkSMIceTDesktopRenderModuleProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMIceTRenderModuleProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMIceTCompositeViewProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMIceTDesktopRenderViewProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMIceTMultiDisplayProxy::New(); c->Print( cout ); c->Delete();
 #endif  //PARAVIEW_USE_ICE_T
 
   return 0;

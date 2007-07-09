@@ -16,11 +16,10 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationScene.h"
-#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPVAnimationSceneProxy);
-vtkCxxRevisionMacro(vtkSMPVAnimationSceneProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMPVAnimationSceneProxy, "1.9");
 vtkCxxSetObjectMacro(vtkSMPVAnimationSceneProxy, TimeKeeper, vtkSMProxy);
 //-----------------------------------------------------------------------------
 vtkSMPVAnimationSceneProxy::vtkSMPVAnimationSceneProxy()
@@ -277,12 +276,6 @@ void vtkSMPVAnimationSceneProxy::TickInternal(
     reinterpret_cast<vtkAnimationCue::AnimationCueInfo*>(info);
   if (this->TimeKeeper)
     {
-    int prev = vtkSMDataObjectDisplayProxy::GetUseCache();
-    if (this->Caching)
-      {
-      vtkSMDataObjectDisplayProxy::SetUseCache(1);
-      }
-
     vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
       this->TimeKeeper->GetProperty("Time"));
     if (this->PlayMode == SNAP_TO_TIMESTEPS)
@@ -299,7 +292,6 @@ void vtkSMPVAnimationSceneProxy::TickInternal(
       double current_time = this->ClockTimeRange[0] + (this->ClockTimeRange[1] -
         this->ClockTimeRange[0])*ntime;
       dvp->SetElement(0, current_time);
-      vtkSMDataObjectDisplayProxy::SetUseCache(prev);
       }
     }
 

@@ -176,27 +176,6 @@
     </PVLookupTableProxy>
   </ProxyGroup>
 
-  <ProxyGroup name="axes">
-    <AxesProxy name="Axes" class="vtkAxes" >
-      <SubProxy>
-        <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper">
-        </Proxy>
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="Prop" proxygroup="props" proxyname="Actor">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="Visibility" />
-          <Property name="Position" />
-          <Property name="Scale" />
-          <Property name="Origin" />
-          <Property name="Pickable" />
-        </ExposedProperties>
-      </SubProxy>
-    </AxesProxy>
-  </ProxyGroup>
-
   <ProxyGroup name="implicit_functions">
     <NullProxy name="None">
     </NullProxy>

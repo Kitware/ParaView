@@ -24,7 +24,6 @@
 
 class vtkCollection;
 class vtkSMProxy;
-class vtkSMRenderModuleProxy;
 class vtkSelection;
 
 class VTK_EXPORT vtkSMSelectionHelper : public vtkSMObject
@@ -38,12 +37,6 @@ public:
   // Given a selection object, creates a server side representation which
   // can be accessed using the given proxy.
   static void SendSelection(vtkSelection* sel, vtkSMProxy* proxy);
-
-  // Description:
-  // This method finds the source and geometry proxies corresponding to a
-  // prop id and puts their ids as properties in the selection.
-  static void AddSourceIDs(vtkSelection* sel,
-                           vtkSMRenderModuleProxy* rmp);
 
   // Description:
   // Convert a polydata selection on the surface to an unstructured
@@ -63,18 +56,6 @@ public:
   // converted selection is in terms on GlobalIDs.
   static void ConvertSurfaceSelectionToGlobalIDVolumeSelection(vtkIdType connectionID,
     vtkSelection* input, vtkSelection* output);
-
-  // Description:
-  // Given a render module proxy and a selection rectange (xmin, ymin,
-  // xmax, ymax), returns selected proxies and associated selection objects
-  // in selectedProxies and selections collections.  The two collections
-  // are guarenteed to be in sync (i.e. the proxies and selection objects
-  // are stored in the same order) so that you can traverse them in the
-  // same order.
-  static void SelectOnSurface(vtkSMRenderModuleProxy* rmP,
-                              int rectangle[4],
-                              vtkCollection* selectedProxies,
-                              vtkCollection* selections);
 
   // Description:
   // Given a selection, returns a proxy for a selection source that has

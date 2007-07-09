@@ -133,7 +133,6 @@ protected:
   ~vtkSMDoubleVectorProperty();
 
   //BTX
-  friend class vtkSMRenderModuleProxy;
   friend class vtkSMRenderViewProxy;
   //ETX
 

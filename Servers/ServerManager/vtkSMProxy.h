@@ -424,9 +424,7 @@ protected:
   // as such.
   friend class vtkSMCameraLink;
   friend class vtkSMCompoundProxy;
-  friend class vtkSMIceTDesktopRenderModuleProxy;
   friend class vtkSMInputProperty;
-  friend class vtkSMNew3DWidgetProxy;
   friend class vtkSMOrderedPropertyIterator;
   friend class vtkSMPart;
   friend class vtkSMProperty;
@@ -436,7 +434,6 @@ protected:
   friend class vtkSMProxyProperty;
   friend class vtkSMProxyRegisterUndoElement;
   friend class vtkSMProxyUnRegisterUndoElement;
-  friend class vtkSMRenderModuleProxy;
   friend class vtkSMSourceProxy;
   friend class vtkSMStateLoaderBase;
   // -- PVEE only

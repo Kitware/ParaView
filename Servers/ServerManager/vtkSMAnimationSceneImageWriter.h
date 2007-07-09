@@ -99,7 +99,7 @@ protected:
   // Description:
   // Captures the view from the given module and
   // returns a new Image data object. May return NULL.
-  // Default implementation can only handle vtkSMRenderModuleProxy subclasses.
+  // Default implementation can only handle vtkSMViewProxy subclasses.
   // Subclassess must override to handle other types of view modules.
   virtual vtkImageData* CaptureViewImage(
     vtkSMViewProxy*, int magnification);
