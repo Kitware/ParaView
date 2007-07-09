@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMXMLPVAnimationWriterProxy);
-vtkCxxRevisionMacro(vtkSMXMLPVAnimationWriterProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMXMLPVAnimationWriterProxy, "1.8");
 //*****************************************************************************
 class vtkSMXMLPVAnimationWriterProxyInternals
 {
@@ -106,11 +106,9 @@ void vtkSMXMLPVAnimationWriterProxy::AddInput(unsigned int,
  
   this->CreateVTKObjects();
 
-  // Since we don't have the PVSource name. To mimic that 
-  // we will just create unique names  here.
-  static int name_count = 0;
+  // Assign unique group name for each source.
   ostrstream groupname_str;
-  groupname_str << "source" << name_count++ << ends;
+  groupname_str << "source" << input->GetSelfIDAsString() << ends;
 
   // when numPartitions > 1, for the vtkXMLPVAnimationWriter to treat the
   // different parts as multiple parts of the same input, we
@@ -138,11 +136,11 @@ void vtkSMXMLPVAnimationWriterProxy::AddInput(unsigned int,
   else
     {
     stream << vtkClientServerStream::Invoke
-           << input->GetID() << "GetOutput" << outputPort 
+           << input->GetID() << "GetOutputPort" << outputPort 
            << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
            << this->GetID() << method << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
+           << groupname_str.str() << vtkClientServerStream::End;
     }
   groupname_str.rdbuf()->freeze(0);
   pm->SendStream(this->ConnectionID, this->Servers, stream);
@@ -229,6 +227,18 @@ void vtkSMXMLPVAnimationWriterProxy::Finish()
   pm->GetLastResult(this->ConnectionID,
     vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &retVal);
   this->ErrorCode = retVal;
+
+  if (this->SummaryHelperProxy)
+    {
+    // Break cyclic dependency.
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      this->SummaryHelperProxy->GetProperty("Writer"));
+    pp->RemoveAllProxies();
+    pp->AddProxy(0);
+    this->SummaryHelperProxy->UpdateVTKObjects();
+    this->SummaryHelperProxy->Delete();
+    this->SummaryHelperProxy = 0;
+    }
 }
 
 //-----------------------------------------------------------------------------

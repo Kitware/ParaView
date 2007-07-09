@@ -35,7 +35,7 @@ inline void vtkSMPVRepresentationProxySetInt(
 }
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -351,6 +351,17 @@ bool vtkSMPVRepresentationProxy::GetOrderedCompositingNeeded()
     }
 
   return this->Superclass::GetOrderedCompositingNeeded();
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkSMPVRepresentationProxy::GetProcessedConsumer()
+{
+  if (this->ActiveRepresentation)
+    {
+    return this->ActiveRepresentation->GetProcessedConsumer();
+    }
+
+  return this->Superclass::GetProcessedConsumer();
 }
 
 //----------------------------------------------------------------------------

@@ -129,6 +129,13 @@ public:
   // representations.
   virtual void SetViewInformation(vtkInformation*);
 
+  // Description:
+  // HACK: vtkSMAnimationSceneGeometryWriter needs acces to the processed data
+  // so save out. This method should return the proxy that goes in as the input
+  // to strategies (eg. in case of SurfaceRepresentation, it is the geometry
+  // filter).
+  virtual vtkSMProxy* GetProcessedConsumer();
+
 //BTX
   enum RepresentationType
     {

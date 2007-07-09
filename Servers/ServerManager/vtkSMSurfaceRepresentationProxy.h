@@ -111,6 +111,14 @@ public:
   // Returns the proxy for the prop.
   vtkGetObjectMacro(Prop3D, vtkSMProxy);
 
+  // Description:
+  // HACK: vtkSMAnimationSceneGeometryWriter needs acces to the processed data
+  // so save out. This method should return the proxy that goes in as the input
+  // to strategies (eg. in case of SurfaceRepresentation, it is the geometry
+  // filter).
+  virtual vtkSMProxy* GetProcessedConsumer()
+    { return (vtkSMProxy*)(this->GeometryFilter); }
+
 //BTX
 protected:
   vtkSMSurfaceRepresentationProxy();

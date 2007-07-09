@@ -437,7 +437,8 @@
       <InputProperty
         name="Input" 
         command="AddInputConnection"
-        clean_command="RemoveAllInputs">
+        clean_command="RemoveAllInputs"
+        multiple_input="1">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -445,14 +446,6 @@
       </InputProperty>
 
       <StringVectorProperty name="FileName" command="SetFileName" />
-      
-      <IntVectorProperty 
-        name="NumberOfPieces" 
-        command="SetNumberOfPieces"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="-1"/>
-      </IntVectorProperty>
       
       <Property
         name="Start"

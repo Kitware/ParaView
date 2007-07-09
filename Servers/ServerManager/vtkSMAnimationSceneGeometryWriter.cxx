@@ -15,6 +15,8 @@
 #include "vtkSMAnimationSceneGeometryWriter.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
+#include "vtkSMDataRepresentationProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
@@ -22,7 +24,7 @@
 #include "vtkSMXMLPVAnimationWriterProxy.h"
 
 vtkStandardNewMacro(vtkSMAnimationSceneGeometryWriter);
-vtkCxxRevisionMacro(vtkSMAnimationSceneGeometryWriter, "1.2");
+vtkCxxRevisionMacro(vtkSMAnimationSceneGeometryWriter, "1.3");
 vtkCxxSetObjectMacro(vtkSMAnimationSceneGeometryWriter, ViewModule, vtkSMProxy);
 
 //-----------------------------------------------------------------------------
@@ -56,6 +58,7 @@ bool vtkSMAnimationSceneGeometryWriter::SaveInitialize()
   this->GeometryWriter = vtkSMXMLPVAnimationWriterProxy::SafeDownCast(
     pxm->NewProxy("writers","XMLPVAnimationWriter"));
   this->GeometryWriter->SetConnectionID(this->ViewModule->GetConnectionID());
+  this->GeometryWriter->SetServers(vtkProcessModule::DATA_SERVER);
 
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GeometryWriter->GetProperty("FileName"));
@@ -63,17 +66,26 @@ bool vtkSMAnimationSceneGeometryWriter::SaveInitialize()
   this->GeometryWriter->UpdateVTKObjects();
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->ViewModule->GetProperty("Displays"));
-/*  for (unsigned int cc=0; cc < pp->GetNumberOfProxies(); ++cc)
+    this->ViewModule->GetProperty("Representations"));
+
+  vtkSMProxyProperty* gwInput = vtkSMProxyProperty::SafeDownCast(
+    this->GeometryWriter->GetProperty("Input"));
+  gwInput->RemoveAllProxies();
+
+  for (unsigned int cc=0; cc < pp->GetNumberOfProxies(); ++cc)
     {
-    vtkSMDataObjectDisplayProxy* display = 
-      vtkSMDataObjectDisplayProxy::SafeDownCast(
+    vtkSMDataRepresentationProxy* repr = 
+      vtkSMDataRepresentationProxy::SafeDownCast(
         pp->GetProxy(cc));
-    if (display && display->GetVisibilityCM())
+    if (repr && repr->GetVisibility())
       {
-      display->SetInputAsGeometryFilter(this->GeometryWriter);
+      vtkSMProxy* input =  repr->GetProcessedConsumer();
+      if (input)
+        {
+        gwInput->AddProxy(input);
+        }
       }
-      } */
+    }
   this->GeometryWriter->UpdateVTKObjects();
   this->GeometryWriter->InvokeCommand("Start");
   return true;
