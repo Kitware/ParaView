@@ -2001,6 +2001,7 @@
 
       <!-- End of ExodusReaderHelper -->
     </Proxy>
+
     <Proxy name="ExodusIIReaderHelper" class="">
       <!--        
         This proxy helps apps with the interaction of
@@ -2078,7 +2079,7 @@
 
       <!-- End of ExodusIIReaderHelper -->
     </Proxy>
-#if 0
+
     <Proxy name="XdmfReaderHelper" class="">
       <Documentation>
         This proxy helps apps with the interaction of
@@ -2196,9 +2197,9 @@
        </XDMFPropertyDomain>
      </StringVectorProperty>
      
-      <!-- End of ExodusReaderHelper -->
+      <!-- End of XDMFReaderHelper -->
     </Proxy>
-#endif
+
     <Proxy name="KdTreeManager" class="vtkKdTreeManager">
       <ProxyProperty  
         name="KdTree"

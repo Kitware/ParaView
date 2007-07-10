@@ -75,7 +75,7 @@ extern "C" void vtkWidgetsCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVServerCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
-//extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
+extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
 
 // This is the client-server wrapper for our own "custom" VTK components
 extern "C" void csServer_Initialize(vtkClientServerInterpreter *);

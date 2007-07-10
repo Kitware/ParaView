@@ -44,7 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Server Manager includes
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMProperty.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkSMArraySelectionDomain.h"
 
 // ParaView includes
 #include "pqProxy.h"
@@ -96,9 +97,9 @@ void pqXDMFPanel::accept()
                                     this->UI->DomainNames->currentText());
     this->setGridProperty(this->proxy());
 
-    //when the change later on the number of output ports of the server side
-    //object changes. If we can make paraview OK with that, then we should
-    //take this out and let the user change it dynamically.
+    //If we can make paraview OK with the server side changing the number 
+    //of output ports, then we should take this out and let the user change 
+    //the selected domain and grids dynamically.
     this->UI->DomainNames->setEnabled(false);
     this->UI->GridNames->setEnabled(false);
     }
@@ -236,6 +237,10 @@ void pqXDMFPanel::populateGridWidget()
     gridWidget->setEnabled(false);
     }
 
+  whichProxy->GetProperty("RemoveAllGrids")->Modified();
+  whichProxy->UpdateVTKObjects();
+  whichProxy->UpdatePropertyInformation();
+
   vtkSMProperty* GetNamesProperty = whichProxy->GetProperty("GetGridName");
   QList<QVariant> grids;
   grids = pqSMAdaptor::getMultipleElementProperty(GetNamesProperty);
@@ -268,14 +273,39 @@ void pqXDMFPanel::populateGridWidget()
 //----------------------------------------------------------------------------
 void pqXDMFPanel::resetArrays()
 {
-  //now copy the names and enabled status for the arrays
-  //from the input property to the output property
-  vtkSMProperty* prop = this->UI->XDMFHelper->GetProperty("PointArrayStatus");
-  prop->ResetToDefault();
-  prop->UpdateDependentDomains();
-  prop = this->UI->XDMFHelper->GetProperty("CellArrayStatus");
-  prop->ResetToDefault();
-  prop->UpdateDependentDomains();
+  //Get the names and state of the available arrays from the server.
+  //Copy them to the properties that the GUI shows that let the client control
+  //the server.
+  vtkSMStringVectorProperty* IProperty;
+  vtkSMStringVectorProperty* OProperty;
+  vtkSMArraySelectionDomain* ODomain;
+  
+  IProperty = vtkSMStringVectorProperty::SafeDownCast(
+    this->UI->XDMFHelper->GetProperty("PointArrayInfo")
+    );
+  OProperty = vtkSMStringVectorProperty::SafeDownCast(
+    this->UI->XDMFHelper->GetProperty("PointArrayStatus")
+    );
+  ODomain = vtkSMArraySelectionDomain::SafeDownCast(
+    OProperty->GetDomain("array_list")
+    );
+
+  OProperty->Copy(IProperty);
+  //ODomain->Update(IProperty);
+
+
+  IProperty = vtkSMStringVectorProperty::SafeDownCast(
+    this->UI->XDMFHelper->GetProperty("CellArrayInfo")
+    );
+  OProperty = vtkSMStringVectorProperty::SafeDownCast(
+    this->UI->XDMFHelper->GetProperty("CellArrayStatus")
+    );
+  ODomain = vtkSMArraySelectionDomain::SafeDownCast(
+    OProperty->GetDomain("array_list")
+    );
+
+  OProperty->Copy(IProperty);
+  //ODomain->Update(IProperty);
 }
 
 //---------------------------------------------------------------------------

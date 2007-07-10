@@ -156,8 +156,8 @@ SET(Kit_SRCS
   vtkSMViewProxy.cxx
   vtkSMWidgetRepresentationProxy.cxx
   vtkSMWriterProxy.cxx
-#  vtkSMXDMFInformationHelper.cxx
-#  vtkSMXDMFPropertyDomain.cxx
+  vtkSMXDMFInformationHelper.cxx
+  vtkSMXDMFPropertyDomain.cxx
   vtkSMXMLPVAnimationWriterProxy.cxx
   vtkSMXYPlotActorProxy.cxx
   )

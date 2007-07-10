@@ -80,7 +80,7 @@ SET(Filters_SRCS
   vtkPVServerObject.cxx
   vtkPVServerSelectTimeSet.cxx
   vtkPVServerTimeSteps.cxx
-#  vtkPVServerXDMFParameters.cxx
+  vtkPVServerXDMFParameters.cxx
   vtkPVStringArrayHelper.cxx
   vtkPVSummaryHelper.cxx
   vtkPVTextSource.cxx
@@ -184,7 +184,7 @@ INCLUDE_DIRECTORIES(
   ${HDF5_INCLUDE_DIR}
   ${SPCTH_INCLUDE_DIR}
   ${VTK_INCLUDE_DIR}
-#  ${XDMF_INCLUDE_DIRS}
+  ${XDMF_INCLUDE_DIRS}
   ${ExtraParaViewServerFiltersIncludes}
   )
 
@@ -252,7 +252,7 @@ ADD_LIBRARY(vtkPVFilters ${Filters_SRCS} ${FiltersInst_SRCS}
 TARGET_LINK_LIBRARIES(vtkPVFilters
   vtkPVServerCommon
   vtkPVServerCommonCS 
-#  vtkXdmfCS
+  vtkXdmfCS
   vtkHybridCS
   vtkParallelCS
   vtkVolumeRenderingCS

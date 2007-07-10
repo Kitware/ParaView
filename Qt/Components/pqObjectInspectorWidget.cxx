@@ -71,7 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExtractDataSetsPanel.h"
 #include "pqThresholdPanel.h"
 #include "pqUndoStack.h"
-//#include "pqXDMFPanel.h"
+#include "pqXDMFPanel.h"
 #include "pqExodusIIPanel.h"
 #include "pqView.h"
 
@@ -157,12 +157,10 @@ public:
         {
         return new pqExodusIIPanel(proxy, p);
         }
-/*
       if(QString("XdmfReader") == proxy->getProxy()->GetXMLName())
         {
         return new pqXDMFPanel(proxy, p);
         }
-*/
       }
     return NULL;
     }

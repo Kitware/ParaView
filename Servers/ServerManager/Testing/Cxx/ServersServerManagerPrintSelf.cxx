@@ -125,8 +125,8 @@
 #include "vtkSMVectorProperty.h"
 #include "vtkSMWidgetRepresentationProxy.h"
 #include "vtkSMWriterProxy.h"
-//#include "vtkSMXDMFInformationHelper.h"
-//#include "vtkSMXDMFPropertyDomain.h"
+#include "vtkSMXDMFInformationHelper.h"
+#include "vtkSMXDMFPropertyDomain.h"
 #include "vtkSMXMLParser.h"
 #include "vtkSMXMLPVAnimationWriterProxy.h"
 
@@ -271,8 +271,8 @@ int main(int , char *[])
   c = vtkSMVectorProperty::New(); c->Print( cout ); c->Delete();
   c = vtkSMWidgetRepresentationProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMWriterProxy::New(); c->Print( cout ); c->Delete();
-//  c = vtkSMXDMFInformationHelper::New(); c->Print( cout ); c->Delete();
-//  c = vtkSMXDMFPropertyDomain::New(); c->Print( cout ); c->Delete();
+  c = vtkSMXDMFInformationHelper::New(); c->Print( cout ); c->Delete();
+  c = vtkSMXDMFPropertyDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMXMLParser::New(); c->Print( cout ); c->Delete();
   c = vtkSMXMLPVAnimationWriterProxy::New(); c->Print( cout ); c->Delete();
 
