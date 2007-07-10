@@ -83,9 +83,22 @@ public:
   void getSeriesName(int series, QString &name) const;
   void setSeriesName(int series, const QString &name);
 
+  bool isSeriesInLegend(int series) const;
+  void setSeriesInLegend(int series, bool inLegend);
+
+  void getSeriesLabel(int series, QString &label) const;
+  void setSeriesLabel(int series, const QString &label);
+
   void getSeriesColor(int series, QColor &color) const;
   void setSeriesColor(int series, const QColor &color);
   bool isSeriesColorSet(int series) const;
+
+  Qt::PenStyle getSeriesStyle(int series) const;
+  void setSeriesStyle(int series, Qt::PenStyle style);
+  bool isSeriesStyleSet(int series) const;
+
+  int getSeriesThickness(int series) const;
+  void setSeriesThickness(int series, int thickness);
 
   void beginSeriesChanges();
   void endSeriesChanges();
@@ -99,9 +112,28 @@ signals:
   void seriesListChanged();
 
   /// \brief
+  ///   Emitted when the enabled state for a series has changed.
+  /// \param series The index of the series.
+  /// \param enabled True if the series is enabled.
+  void enabledStateChanged(int series, bool enabled);
+
+  /// \brief
+  ///   Emitted when the legend state for a series has changed.
+  /// \param series The index of the series.
+  /// \param inLegend True if the series is in the legend.
+  void legendStateChanged(int series, bool inLegend);
+
+  /// \brief
   ///   Emitted when the color for a series has changed.
   /// \param series The index of the series.
+  /// \param color The new color for the series.
   void colorChanged(int series, const QColor &color);
+
+  /// \brief
+  ///   Emitted when the style for a series has changed.
+  /// \param series The index of the series.
+  /// \param style The new line style for the series.
+  void styleChanged(int series, Qt::PenStyle style);
 
 protected:
   /// method to set default values for the status property.

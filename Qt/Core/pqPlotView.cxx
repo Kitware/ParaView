@@ -385,6 +385,7 @@ void pqPlotViewLineChart::update(bool force)
         if(typeChanged || !isVisible ||
             !(*jter)->Representation->isSeriesEnabled(index))
           {
+          // TODO: Remove the series from the legend if needed.
           this->Model->removeSeries(series->Model);
           delete series->Model;
           series = (*jter)->Series.erase(series);
@@ -401,12 +402,20 @@ void pqPlotViewLineChart::update(bool force)
             {
             // Update the arrays and options for the series.
             series->Model->setDataArrays(xArray, yArray);
+            pqLineChartSeriesOptions *options =
+                this->Layer->getOptions()->getSeriesOptions(
+                this->Model->getIndexOf(series->Model));
+            QPen seriesPen;
+            options->getPen(seriesPen);
             QColor color;
             (*jter)->Representation->getSeriesColor(index, color);
-            index = this->Model->getIndexOf(series->Model);
-            pqLineChartSeriesOptions *options =
-                this->Layer->getOptions()->getSeriesOptions(index);
-            options->setPen(QPen(color));
+            seriesPen.setColor(color);
+            seriesPen.setWidth(
+                (*jter)->Representation->getSeriesThickness(index));
+            seriesPen.setStyle((*jter)->Representation->getSeriesStyle(index));
+            options->setPen(seriesPen);
+
+            // TODO: Update the legend status for the series.
 
             displayNames.append(series->RepresentationName);
             ++series;
@@ -482,21 +491,47 @@ void pqPlotViewLineChart::update(bool force)
             this->Model->appendSeries(plot->Model);
 
             // Update the series options.
+            bool changedOptions = false;
             pqLineChartSeriesOptions *options =
                 this->Layer->getOptions()->getSeriesOptions(index);
+            QPen seriesPen;
+            options->getPen(seriesPen);
             if((*jter)->Representation->isSeriesColorSet(i))
               {
               // Update the line color to match the set color.
               QColor color;
               (*jter)->Representation->getSeriesColor(i, color);
-              options->setPen(QPen(color), 0);
+              seriesPen.setColor(color);
+              changedOptions = true;
               }
             else
               {
               // Assign the chart selected color to the property.
-              QPen seriesPen;
-              options->getPen(seriesPen);
               (*jter)->Representation->setSeriesColor(i, seriesPen.color());
+              }
+
+            if((*jter)->Representation->isSeriesStyleSet(i))
+              {
+              // Update the line style to match the set style.
+              seriesPen.setStyle((*jter)->Representation->getSeriesStyle(i));
+              changedOptions = true;
+              }
+            else
+              {
+              // Assign the chart selected style to the property.
+              (*jter)->Representation->setSeriesStyle(i, seriesPen.style());
+              }
+
+            int thickness = (*jter)->Representation->getSeriesThickness(i);
+            if(thickness != seriesPen.width())
+              {
+              seriesPen.setWidth(thickness);
+              changedOptions = true;
+              }
+
+            if(changedOptions)
+              {
+              options->setPen(seriesPen);
               }
             }
           }

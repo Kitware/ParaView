@@ -4279,9 +4279,9 @@
 
       <StringVectorProperty name="YCellArrayStatus"
          repeat_command="1"
-         number_of_elements_per_command="5"
-         element_types="1 1 1 0 2" >
-         <!-- Set the cell array to use on Y axis (r,g,b, status, arrayname) -->
+         number_of_elements_per_command="9"
+         element_types="2 2 0 0 1 1 1 0 0" >
+         <!-- Set the cell array to use on Y axis (arrayname, legendname, enabled, inlegend, r, g, b, thickness, linestyle) -->
           <ArraySelectionDomain name="array_list">
             <RequiredProperties>
               <Property name="CellArrayInfo" function="ArrayList" />
@@ -4291,9 +4291,9 @@
 
       <StringVectorProperty name="YPointArrayStatus"
          repeat_command="1"
-         number_of_elements_per_command="5"
-         element_types="1 1 1 0 2" >
-         <!-- Set the point array to use on Y axis (r,g,b, status, arrayname). -->
+         number_of_elements_per_command="9"
+         element_types="2 2 0 0 1 1 1 0 0" >
+         <!-- Set the cell array to use on Y axis (arrayname, legendname, enabled, inlegend, r, g, b, thickness, linestyle) -->
           <ArraySelectionDomain name="array_list">
             <RequiredProperties>
               <Property name="PointArrayInfo" function="ArrayList" />

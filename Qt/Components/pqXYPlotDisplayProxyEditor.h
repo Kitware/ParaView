@@ -59,13 +59,41 @@ protected slots:
   void onAttributeModeChanged();
 
   /// Slot to listen to clicks for changing color.
-  void onItemClicked(QTreeWidgetItem* item, int column);
+  void activateItem(QTreeWidgetItem *item, int column);
+
+  void updateOptionsWidgets();
+
+  void setCurrentSeriesEnabled(int state);
+
+  void setCurrentSeriesInLegend(int state);
+
+  void setCurrentSeriesColor(const QColor &color);
+
+  void setCurrentSeriesThickness(int thickness);
+
+  void setCurrentSeriesStyle(int listIndex);
+
+  /// \brief
+  ///   Updates the enabled state for the given series.
+  /// \param index The index of the line series.
+  void updateItemEnabled(int index);
+
+  /// \brief
+  ///   Updates the legend state for the given series.
+  /// \param index The index of the line series.
+  void updateItemLegend(int index);
 
   /// \brief
   ///   Updates the color for the given series index.
   /// \param index The index of the line series.
   /// \param color The new series color.
   void updateItemColor(int index, const QColor &color);
+
+  /// \brief
+  ///   Updates the style for the given series index.
+  /// \param index The index of the line series.
+  /// \param style The new series style.
+  void updateItemStyle(int index, Qt::PenStyle style);
 
 private:
   pqXYPlotDisplayProxyEditor(const pqXYPlotDisplayProxyEditor&); // Not implemented.
@@ -75,6 +103,9 @@ private:
   /// This call will raise an error is the display is not
   /// a XYPlotDisplay2 proxy.
   void setDisplay(pqRepresentation* display);
+
+  Qt::CheckState getEnabledState() const;
+  Qt::CheckState getInLegendState() const;
 
   class pqInternal;
   pqInternal* Internal;

@@ -50,6 +50,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
+#define STATUS_ROW_LENGTH 9
+
 
 class pqLineChartDisplayItem
 {
@@ -59,9 +61,14 @@ public:
   ~pqLineChartDisplayItem () {}
 
   QString ArrayName;
+  QString LegendName;
   QColor Color;
+  Qt::PenStyle Style;
+  int Thickness;
   bool Enabled;
+  bool InLegend;
   bool ColorSet;
+  bool StyleSet;
 };
 
 
@@ -83,18 +90,27 @@ public:
 
 //-----------------------------------------------------------------------------
 pqLineChartDisplayItem::pqLineChartDisplayItem()
-  : ArrayName(), Color(Qt::white)
+  : ArrayName(), LegendName(), Color(Qt::white)
 {
+  this->Style = Qt::SolidLine;
+  this->Thickness = 0;
   this->Enabled = false;
+  this->InLegend = false;
   this->ColorSet = false;
+  this->StyleSet = false;
 }
 
 pqLineChartDisplayItem::pqLineChartDisplayItem(
     const pqLineChartDisplayItem &other)
-  : ArrayName(other.ArrayName), Color(other.Color)
+  : ArrayName(other.ArrayName), LegendName(other.LegendName),
+    Color(other.Color)
 {
+  this->Style = other.Style;
+  this->Thickness = other.Thickness;
   this->Enabled = other.Enabled;
+  this->InLegend = other.InLegend;
   this->ColorSet = other.ColorSet;
+  this->StyleSet = other.StyleSet;
 }
 
 
@@ -162,12 +178,17 @@ void pqLineChartRepresentation::setStatusDefaults(vtkSMProperty* prop)
   // set point variables.
   for (unsigned int cc=0; cc < total_size; cc++)
     {
-    QString arrayname = asd->GetString(cc);
+    QString arrayName = asd->GetString(cc);
+    int arrayEnabled = this->isEnabledByDefault(arrayName);
+    values.push_back(arrayName);
+    values.push_back(arrayName);
+    values.push_back(QVariant(arrayEnabled));
+    values.push_back(QVariant(arrayEnabled));
     values.push_back(QVariant((double)-1.0));
     values.push_back(QVariant((double)-1.0));
     values.push_back(QVariant((double)-1.0));
-    values.push_back(QVariant(this->isEnabledByDefault(arrayname)));
-    values.push_back(arrayname);
+    values.push_back(QVariant((int)0));
+    values.push_back(QVariant((int)Qt::NoPen));
     }
 
   pqSMAdaptor::setMultipleElementProperty(prop, values);
@@ -249,7 +270,7 @@ vtkDataArray* pqLineChartRepresentation::getYArray(int index)
       (attribute_type == vtkDataObject::FIELD_ASSOCIATION_POINTS)?
       "YPointArrayStatus" : "YCellArrayStatus"));
 
-  int actual_index = (index*5 + 4);
+  int actual_index = (index * STATUS_ROW_LENGTH);
   if (actual_index >= values.size())
     {
     qDebug() << "Invalid index: " << index;
@@ -311,13 +332,30 @@ void pqLineChartRepresentation::setSeriesEnabled(int series, bool enabled)
       {
       item->Enabled = enabled;
       this->Internals->ChangeCount++;
-      if(!item->Enabled && item->ColorSet)
+      if(!item->Enabled)
         {
-        item->ColorSet = false;
-        item->Color = Qt::white;
-        emit this->colorChanged(series, item->Color);
+        if(item->InLegend)
+          {
+          item->InLegend = false;
+          emit this->legendStateChanged(series, false);
+          }
+
+        if(item->ColorSet)
+          {
+          item->ColorSet = false;
+          item->Color = Qt::white;
+          emit this->colorChanged(series, item->Color);
+          }
+
+        if(item->StyleSet)
+          {
+          item->StyleSet = false;
+          item->Style = Qt::SolidLine;
+          emit this->styleChanged(series, item->Style);
+          }
         }
 
+      emit this->enabledStateChanged(series, item->Enabled);
       if(!this->Internals->InMultiChange)
         {
         this->saveSeriesChanges();
@@ -342,6 +380,61 @@ void pqLineChartRepresentation::setSeriesName(int series, const QString &name)
     if(item->ArrayName != name)
       {
       item->ArrayName = name;
+      this->Internals->ChangeCount++;
+      if(!this->Internals->InMultiChange)
+        {
+        this->saveSeriesChanges();
+        }
+      }
+    }
+}
+
+bool pqLineChartRepresentation::isSeriesInLegend(int series) const
+{
+  if(series >= 0 && series < this->Internals->Series->size())
+    {
+    return this->Internals->Series->at(series).InLegend;
+    }
+
+  return false;
+}
+
+void pqLineChartRepresentation::setSeriesInLegend(int series, bool inLegend)
+{
+  if(series >= 0 && series < this->Internals->Series->size())
+    {
+    pqLineChartDisplayItem *item = &(*this->Internals->Series)[series];
+    if(item->InLegend != inLegend)
+      {
+      item->InLegend = inLegend;
+      this->Internals->ChangeCount++;
+      emit this->legendStateChanged(series, item->InLegend);
+      if(!this->Internals->InMultiChange)
+        {
+        this->saveSeriesChanges();
+        }
+      }
+    }
+}
+
+void pqLineChartRepresentation::getSeriesLabel(int series,
+    QString &label) const
+{
+  if(series >= 0 && series < this->Internals->Series->size())
+    {
+    label = this->Internals->Series->at(series).LegendName;
+    }
+}
+
+void pqLineChartRepresentation::setSeriesLabel(int series,
+    const QString &label)
+{
+  if(series >= 0 && series < this->Internals->Series->size())
+    {
+    pqLineChartDisplayItem *item = &(*this->Internals->Series)[series];
+    if(item->LegendName != label)
+      {
+      item->LegendName = label;
       this->Internals->ChangeCount++;
       if(!this->Internals->InMultiChange)
         {
@@ -386,6 +479,72 @@ bool pqLineChartRepresentation::isSeriesColorSet(int series) const
     }
 
   return false;
+}
+
+Qt::PenStyle pqLineChartRepresentation::getSeriesStyle(int series) const
+{
+  if(series >= 0 && series < this->Internals->Series->size())
+    {
+    return this->Internals->Series->at(series).Style;
+    }
+
+  return Qt::SolidLine;
+}
+
+void pqLineChartRepresentation::setSeriesStyle(int series, Qt::PenStyle style)
+{
+  if(series >= 0 && series < this->Internals->Series->size())
+    {
+    pqLineChartDisplayItem *item = &(*this->Internals->Series)[series];
+    if(!item->StyleSet || item->Style != style)
+      {
+      item->StyleSet = true;
+      item->Style = style;
+      this->Internals->ChangeCount++;
+      emit this->styleChanged(series, style);
+      if(!this->Internals->InMultiChange)
+        {
+        this->saveSeriesChanges();
+        }
+      }
+    }
+}
+
+bool pqLineChartRepresentation::isSeriesStyleSet(int series) const
+{
+  if(series >= 0 && series < this->Internals->Series->size())
+    {
+    return this->Internals->Series->at(series).StyleSet;
+    }
+
+  return false;
+}
+
+int pqLineChartRepresentation::getSeriesThickness(int series) const
+{
+  if(series >= 0 && series < this->Internals->Series->size())
+    {
+    return this->Internals->Series->at(series).Thickness;
+    }
+
+  return 0;
+}
+
+void pqLineChartRepresentation::setSeriesThickness(int series, int thickness)
+{
+  if(series >= 0 && series < this->Internals->Series->size())
+    {
+    pqLineChartDisplayItem *item = &(*this->Internals->Series)[series];
+    if(item->Thickness != thickness)
+      {
+      item->Thickness = thickness;
+      this->Internals->ChangeCount++;
+      if(!this->Internals->InMultiChange)
+        {
+        this->saveSeriesChanges();
+        }
+      }
+    }
 }
 
 void pqLineChartRepresentation::beginSeriesChanges()
@@ -442,34 +601,37 @@ void pqLineChartRepresentation::updateSeries()
     QList<QVariant>::Iterator iter = status.begin();
     while(iter != status.end())
       {
-      QList<QVariant>::Iterator rowStart = iter;
-      iter += 4;
       QString rowName = iter->toString();
       if(arrayNames.contains(rowName))
         {
         statusNames.append(rowName);
-        ++iter;
+        iter += STATUS_ROW_LENGTH;
         }
       else
         {
         statusChanged = true;
-        iter = status.erase(rowStart, iter + 1);
+        iter = status.erase(iter, iter + STATUS_ROW_LENGTH);
         }
       }
 
     // Add status rows for the new array names. Make sure the status
     // array order matches the domain array order.
     QStringList::Iterator jter = arrayNames.begin();
-    for(int k = 0; jter != arrayNames.end(); ++jter, k += 5)
+    for(int k = 0; jter != arrayNames.end(); ++jter, k += STATUS_ROW_LENGTH)
       {
       if(!statusNames.contains(*jter))
         {
         statusChanged = true;
+        int arrayEnabled = this->isEnabledByDefault(*jter);
         status.insert(k, *jter);
-        status.insert(k, QVariant(this->isEnabledByDefault(*jter)));
-        status.insert(k, QVariant((double)-1.0));
-        status.insert(k, QVariant((double)-1.0));
-        status.insert(k, QVariant((double)-1.0));
+        status.insert(k + 1, *jter);
+        status.insert(k + 2, QVariant(arrayEnabled));
+        status.insert(k + 3, QVariant(arrayEnabled));
+        status.insert(k + 4, QVariant((double)-1.0));
+        status.insert(k + 5, QVariant((double)-1.0));
+        status.insert(k + 6, QVariant((double)-1.0));
+        status.insert(k + 7, QVariant((int)0));
+        status.insert(k + 8, QVariant((int)Qt::NoPen));
         }
       }
 
@@ -491,21 +653,31 @@ void pqLineChartRepresentation::updateSeries()
       // Build the series list using the status list. Clear the current
       // items and make space for the new items.
       series[i]->clear();
-      series[i]->resize(status.size() / 5);
+      series[i]->resize(status.size() / STATUS_ROW_LENGTH);
 
       // Initialize the item for each of the status rows.
       QVector<pqLineChartDisplayItem>::Iterator kter = series[i]->begin();
-      for(int ii = 0; kter != series[i]->end(); ++kter, ii += 5)
+      for(int ii = 0; kter != series[i]->end(); ++kter, ii += STATUS_ROW_LENGTH)
         {
-        kter->ArrayName = status[ii + 4].toString();
-        kter->Enabled = status[ii + 3].toInt() != 0;
-        double red = status[ii + 0].toDouble();
+        kter->ArrayName = status[ii].toString();
+        kter->LegendName = status[ii + 1].toString();
+        kter->Enabled = status[ii + 2].toInt() != 0;
+        kter->InLegend = status[ii + 3].toInt() != 0;
+        double red = status[ii + 4].toDouble();
         kter->ColorSet = red >= 0.0;
         if(kter->ColorSet)
           {
           kter->Color.setRedF(red);
-          kter->Color.setGreenF(status[ii + 1].toDouble());
-          kter->Color.setBlueF(status[ii + 2].toDouble());
+          kter->Color.setGreenF(status[ii + 5].toDouble());
+          kter->Color.setBlueF(status[ii + 6].toDouble());
+          }
+
+        kter->Thickness = status[ii + 7].toInt();
+        int style = status[ii + 8].toInt();
+        kter->StyleSet = style > Qt::NoPen && style < Qt::CustomDashLine;
+        if(kter->StyleSet)
+          {
+          kter->Style = (Qt::PenStyle)style;
           }
         }
       }
@@ -567,6 +739,10 @@ void pqLineChartRepresentation::saveSeriesChanges()
       this->Internals->Series->begin();
   for( ; iter != this->Internals->Series->end(); ++iter)
     {
+    status.push_back(QVariant(iter->ArrayName));
+    status.push_back(QVariant(iter->LegendName));
+    status.push_back(QVariant(iter->Enabled ? 1 : 0));
+    status.push_back(QVariant(iter->InLegend ? 1 : 0));
     if(iter->ColorSet)
       {
       status.push_back(QVariant(iter->Color.redF()));
@@ -580,8 +756,15 @@ void pqLineChartRepresentation::saveSeriesChanges()
       status.push_back(QVariant((double)-1.0));
       }
 
-    status.push_back(QVariant(iter->Enabled ? 1 : 0));
-    status.push_back(QVariant(iter->ArrayName));
+    status.push_back(QVariant(iter->Thickness));
+    if(iter->StyleSet)
+      {
+      status.push_back(QVariant(iter->Style));
+      }
+    else
+      {
+      status.push_back(QVariant((int)Qt::NoPen));
+      }
     }
 
   smProperty->SetNumberOfElements(status.size());

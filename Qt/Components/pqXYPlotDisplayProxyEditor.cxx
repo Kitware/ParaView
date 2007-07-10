@@ -56,25 +56,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqXYPlotDisplayProxyEditor::pqInternal : public Ui::Form
 {
 public:
-  pqPropertyLinks Links;
   pqInternal()
     {
     this->XAxisArrayDomain = 0;
     this->XAxisArrayAdaptor = 0;
     this->AttributeModeAdaptor = 0;
+    this->InChange = false;
     }
+
   ~pqInternal()
     {
     delete this->XAxisArrayAdaptor;
     delete this->XAxisArrayDomain;
     delete this->AttributeModeAdaptor;
     }
+
+  pqPropertyLinks Links;
   pqSignalAdaptorComboBox* XAxisArrayAdaptor;
   pqSignalAdaptorComboBox* AttributeModeAdaptor;
   pqComboBoxDomain* XAxisArrayDomain;
 
   QPointer<pqLineChartRepresentation> Display;
   QList<QPointer<pqTreeWidgetItemObject> > TreeItems;
+
+  bool InChange;
 };
 
 //-----------------------------------------------------------------------------
@@ -89,8 +94,8 @@ pqXYPlotDisplayProxyEditor::pqXYPlotDisplayProxyEditor(pqRepresentation* display
   helper->setCheckMode(pqTreeWidgetCheckHelper::CLICK_IN_COLUMN);
 
   QObject::connect(this->Internal->YAxisArrays, 
-    SIGNAL(itemClicked(QTreeWidgetItem*, int)),
-    this, SLOT(onItemClicked(QTreeWidgetItem*, int)));
+    SIGNAL(itemActivated(QTreeWidgetItem *, int)),
+    this, SLOT(activateItem(QTreeWidgetItem *, int)));
 
   this->Internal->XAxisArrayAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->XAxisArray);
@@ -114,6 +119,24 @@ pqXYPlotDisplayProxyEditor::pqXYPlotDisplayProxyEditor(pqRepresentation* display
   QObject::connect(this->Internal->ViewData, SIGNAL(stateChanged(int)),
     this, SLOT(updateAllViews()), Qt::QueuedConnection);
 
+  QObject::connect(this->Internal->YAxisArrays, SIGNAL(itemSelectionChanged()),
+    this, SLOT(updateOptionsWidgets()));
+  QObject::connect(this->Internal->YAxisArrays,
+    SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
+    this, SLOT(updateOptionsWidgets()));
+
+  QObject::connect(this->Internal->SeriesEnabled, SIGNAL(stateChanged(int)),
+    this, SLOT(setCurrentSeriesEnabled(int)));
+  QObject::connect(this->Internal->ShowInLegend, SIGNAL(stateChanged(int)),
+    this, SLOT(setCurrentSeriesInLegend(int)));
+  QObject::connect(
+    this->Internal->ColorButton, SIGNAL(chosenColorChanged(const QColor &)),
+    this, SLOT(setCurrentSeriesColor(const QColor &)));
+  QObject::connect(this->Internal->Thickness, SIGNAL(valueChanged(int)),
+    this, SLOT(setCurrentSeriesThickness(int)));
+  QObject::connect(this->Internal->StyleList, SIGNAL(currentIndexChanged(int)),
+    this, SLOT(setCurrentSeriesStyle(int)));
+
   this->setDisplay(display);
 }
 
@@ -136,23 +159,27 @@ void pqXYPlotDisplayProxyEditor::reloadSeries()
   int total = this->Internal->Display->getNumberOfSeries();
   for(int i = 0; i < total; i++)
     {
-    QString seriesName;
+    QStringList columnData;
+    QString seriesName, seriesLabel;
     this->Internal->Display->getSeriesName(i, seriesName);
+    this->Internal->Display->getSeriesLabel(i, seriesLabel);
+    columnData << seriesName << seriesLabel;
     pqTreeWidgetItemObject *item = new pqTreeWidgetItemObject(
-        this->Internal->YAxisArrays, QStringList(seriesName));
+        this->Internal->YAxisArrays, columnData);
     item->setData(0, Qt::ToolTipRole, seriesName);
     item->setChecked(this->Internal->Display->isSeriesEnabled(i));
 
-    // Add a column for the color.
+    // Add a pixmap for the color.
     QColor seriesColor;
     this->Internal->Display->getSeriesColor(i, seriesColor);
     QPixmap colorPixmap(16, 16);
     colorPixmap.fill(seriesColor);
     item->setData(1, Qt::DecorationRole, colorPixmap);
-    item->setData(1, Qt::UserRole, QVariant(seriesColor));
     QObject::connect(item,  SIGNAL(checkedStateChanged(bool)),
       this, SLOT(setSeriesEnabled(bool)));
     }
+
+  this->updateOptionsWidgets();
 }
 
 //-----------------------------------------------------------------------------
@@ -238,8 +265,16 @@ void pqXYPlotDisplayProxyEditor::setDisplay(pqRepresentation* disp)
   this->connect(this->Internal->Display, SIGNAL(seriesListChanged()),
       this, SLOT(reloadSeries()));
   this->connect(
+      this->Internal->Display, SIGNAL(enabledStateChanged(int, bool)),
+      this, SLOT(updateItemEnabled(int)));
+  this->connect(this->Internal->Display, SIGNAL(legendStateChanged(int, bool)),
+      this, SLOT(updateItemLegend(int)));
+  this->connect(
       this->Internal->Display, SIGNAL(colorChanged(int, const QColor &)),
       this, SLOT(updateItemColor(int, const QColor &)));
+  this->connect(
+      this->Internal->Display, SIGNAL(styleChanged(int, Qt::PenStyle)),
+      this, SLOT(updateItemStyle(int, Qt::PenStyle)));
 
   this->reloadSeries();
 }
@@ -259,7 +294,7 @@ void pqXYPlotDisplayProxyEditor::onAttributeModeChanged()
 }
 
 //-----------------------------------------------------------------------------
-void pqXYPlotDisplayProxyEditor::onItemClicked(QTreeWidgetItem* item, int col)
+void pqXYPlotDisplayProxyEditor::activateItem(QTreeWidgetItem *item, int col)
 {
   if(col != 1 || !this->Internal->Display)
     {
@@ -279,17 +314,374 @@ void pqXYPlotDisplayProxyEditor::onItemClicked(QTreeWidgetItem* item, int col)
     }
 }
 
+void pqXYPlotDisplayProxyEditor::updateOptionsWidgets()
+{
+  QItemSelectionModel *model = this->Internal->YAxisArrays->selectionModel();
+  if(model)
+    {
+    // Use the selection list to determine the tri-state of the
+    // enabled and legend check boxes.
+    Qt::CheckState enabledState = this->getEnabledState();
+    this->Internal->SeriesEnabled->blockSignals(true);
+    this->Internal->ShowInLegend->blockSignals(true);
+    this->Internal->SeriesEnabled->setCheckState(enabledState);
+    this->Internal->ShowInLegend->setCheckState(this->getInLegendState());
+    this->Internal->SeriesEnabled->blockSignals(false);
+    this->Internal->ShowInLegend->blockSignals(false);
+
+    // Show the options for the current item.
+    QModelIndex current = model->currentIndex();
+    QModelIndexList indexes = model->selectedIndexes();
+    if((!current.isValid() || !model->isSelected(current)) &&
+        indexes.size() > 0)
+      {
+      current = indexes.last();
+      }
+
+    this->Internal->ColorButton->blockSignals(true);
+    this->Internal->Thickness->blockSignals(true);
+    this->Internal->StyleList->blockSignals(true);
+    if(current.isValid())
+      {
+      QColor color;
+      this->Internal->Display->getSeriesColor(current.row(), color);
+      this->Internal->ColorButton->setChosenColor(color);
+      this->Internal->Thickness->setValue(
+          this->Internal->Display->getSeriesThickness(current.row()));
+      this->Internal->StyleList->setCurrentIndex(
+          (int)this->Internal->Display->getSeriesStyle(current.row()) - 1);
+      }
+    else
+      {
+      this->Internal->ColorButton->setChosenColor(Qt::white);
+      this->Internal->Thickness->setValue(0);
+      this->Internal->StyleList->setCurrentIndex(0);
+      }
+
+    this->Internal->ColorButton->blockSignals(false);
+    this->Internal->Thickness->blockSignals(false);
+    this->Internal->StyleList->blockSignals(false);
+
+    // Disable the widgets if nothing is selected or current.
+    bool hasItems = indexes.size() > 0;
+    this->Internal->SeriesEnabled->setEnabled(hasItems);
+    this->Internal->ShowInLegend->setEnabled(hasItems &&
+        enabledState == Qt::Checked);
+    this->Internal->ColorButton->setEnabled(hasItems);
+    this->Internal->Thickness->setEnabled(hasItems);
+    this->Internal->StyleList->setEnabled(hasItems);
+    }
+}
+
+void pqXYPlotDisplayProxyEditor::setCurrentSeriesEnabled(int state)
+{
+  if(state == Qt::PartiallyChecked)
+    {
+    // Ignore changes to partially checked state.
+    return;
+    }
+
+  bool enabled = state == Qt::Checked;
+  this->Internal->SeriesEnabled->setTristate(false);
+  QItemSelectionModel *model = this->Internal->YAxisArrays->selectionModel();
+  if(model)
+    {
+    this->Internal->Display->beginSeriesChanges();
+    this->Internal->InChange = true;
+    pqTreeWidgetItemObject *item = 0;
+    QModelIndexList indexes = model->selectedIndexes();
+    QModelIndexList::Iterator iter = indexes.begin();
+    for( ; iter != indexes.end(); ++iter)
+      {
+      this->Internal->Display->setSeriesEnabled(iter->row(), enabled);
+      item = dynamic_cast<pqTreeWidgetItemObject *>(
+          this->Internal->YAxisArrays->topLevelItem(iter->row()));
+      if(item)
+        {
+        item->blockSignals(true);
+        item->setChecked(enabled);
+        item->blockSignals(false);
+        }
+      }
+
+    // Update the legend check box.
+    this->Internal->ShowInLegend->blockSignals(true);
+    this->Internal->ShowInLegend->setCheckState(this->getInLegendState());
+    this->Internal->ShowInLegend->blockSignals(false);
+    this->Internal->ShowInLegend->setEnabled(enabled &&
+        this->Internal->SeriesEnabled->isEnabled());
+    if(this->Internal->ShowInLegend->checkState() != Qt::PartiallyChecked)
+      {
+      this->Internal->ShowInLegend->setTristate(false);
+      }
+
+    this->Internal->InChange = false;
+    this->Internal->Display->endSeriesChanges();
+    this->updateAllViews();
+    }
+}
+
+void pqXYPlotDisplayProxyEditor::setCurrentSeriesInLegend(int state)
+{
+  if(state == Qt::PartiallyChecked)
+    {
+    // Ignore changes to partially checked state.
+    return;
+    }
+
+  bool inLegend = state == Qt::Checked;
+  this->Internal->ShowInLegend->setTristate(false);
+  QItemSelectionModel *model = this->Internal->YAxisArrays->selectionModel();
+  if(model)
+    {
+    this->Internal->Display->beginSeriesChanges();
+    this->Internal->InChange = true;
+    QModelIndexList indexes = model->selectedIndexes();
+    QModelIndexList::Iterator iter = indexes.begin();
+    for( ; iter != indexes.end(); ++iter)
+      {
+      this->Internal->Display->setSeriesInLegend(iter->row(), inLegend);
+      }
+
+    this->Internal->InChange = false;
+    this->Internal->Display->endSeriesChanges();
+    this->updateAllViews();
+    }
+}
+
+void pqXYPlotDisplayProxyEditor::setCurrentSeriesColor(const QColor &color)
+{
+  QItemSelectionModel *model = this->Internal->YAxisArrays->selectionModel();
+  if(model)
+    {
+    this->Internal->Display->beginSeriesChanges();
+    this->Internal->InChange = true;
+    QPixmap colorPixmap(16, 16);
+    colorPixmap.fill(color);
+    pqTreeWidgetItemObject *item = 0;
+    QModelIndexList indexes = model->selectedIndexes();
+    QModelIndexList::Iterator iter = indexes.begin();
+    for( ; iter != indexes.end(); ++iter)
+      {
+      this->Internal->Display->setSeriesColor(iter->row(), color);
+      item = dynamic_cast<pqTreeWidgetItemObject *>(
+          this->Internal->YAxisArrays->topLevelItem(iter->row()));
+      if(item)
+        {
+        item->setData(1, Qt::DecorationRole, colorPixmap);
+        }
+      }
+
+    this->Internal->InChange = false;
+    this->Internal->Display->endSeriesChanges();
+    this->updateAllViews();
+    }
+}
+
+void pqXYPlotDisplayProxyEditor::setCurrentSeriesThickness(int thickness)
+{
+  QItemSelectionModel *model = this->Internal->YAxisArrays->selectionModel();
+  if(model)
+    {
+    this->Internal->Display->beginSeriesChanges();
+    this->Internal->InChange = true;
+    QModelIndexList indexes = model->selectedIndexes();
+    QModelIndexList::Iterator iter = indexes.begin();
+    for( ; iter != indexes.end(); ++iter)
+      {
+      this->Internal->Display->setSeriesThickness(iter->row(), thickness);
+      }
+
+    this->Internal->InChange = false;
+    this->Internal->Display->endSeriesChanges();
+    this->updateAllViews();
+    }
+}
+
+void pqXYPlotDisplayProxyEditor::setCurrentSeriesStyle(int listIndex)
+{
+  QItemSelectionModel *model = this->Internal->YAxisArrays->selectionModel();
+  if(model)
+    {
+    this->Internal->Display->beginSeriesChanges();
+    this->Internal->InChange = true;
+    Qt::PenStyle style = (Qt::PenStyle)(listIndex + 1);
+    QModelIndexList indexes = model->selectedIndexes();
+    QModelIndexList::Iterator iter = indexes.begin();
+    for( ; iter != indexes.end(); ++iter)
+      {
+      this->Internal->Display->setSeriesStyle(iter->row(), style);
+      }
+
+    this->Internal->InChange = false;
+    this->Internal->Display->endSeriesChanges();
+    this->updateAllViews();
+    }
+}
+
+void pqXYPlotDisplayProxyEditor::updateItemEnabled(int index)
+{
+  if(this->Internal->InChange)
+    {
+    return;
+    }
+
+  // If the index is part of the selection, update the enabled check box.
+  QModelIndex changed = this->Internal->YAxisArrays->model()->index(index, 0);
+  QItemSelectionModel *model = this->Internal->YAxisArrays->selectionModel();
+  if(model && model->isSelected(changed))
+    {
+    Qt::CheckState enabledState = this->getEnabledState();
+    this->Internal->SeriesEnabled->blockSignals(true);
+    this->Internal->SeriesEnabled->setCheckState(enabledState);
+    this->Internal->SeriesEnabled->blockSignals(false);
+
+    // Update the enabled state of the legend chack box.
+    this->Internal->ShowInLegend->setEnabled(enabledState == Qt::Checked &&
+        this->Internal->SeriesEnabled->isEnabled());
+    }
+}
+
+void pqXYPlotDisplayProxyEditor::updateItemLegend(int index)
+{
+  if(this->Internal->InChange)
+    {
+    return;
+    }
+
+  // If the index is part of the selection, update the legend check box.
+  QModelIndex changed = this->Internal->YAxisArrays->model()->index(index, 0);
+  QItemSelectionModel *model = this->Internal->YAxisArrays->selectionModel();
+  if(model && model->isSelected(changed))
+    {
+    this->Internal->ShowInLegend->blockSignals(true);
+    this->Internal->ShowInLegend->setCheckState(this->getInLegendState());
+    this->Internal->ShowInLegend->blockSignals(false);
+    }
+}
+
 void pqXYPlotDisplayProxyEditor::updateItemColor(int index,
     const QColor &color)
 {
-  // Get the item for the given index.
+  if(this->Internal->InChange)
+    {
+    return;
+    }
+
+  // Update the pixmap for the item.
   QTreeWidgetItem *item = this->Internal->YAxisArrays->topLevelItem(index);
   if(item)
     {
     QPixmap colorPixmap(16, 16);
     colorPixmap.fill(color);
     item->setData(1, Qt::DecorationRole, colorPixmap);
-    item->setData(1, Qt::UserRole, QVariant(color));
+    }
+
+  // If the index is the 'current', update the color button.
+  QModelIndex changed = this->Internal->YAxisArrays->model()->index(index, 0);
+  QItemSelectionModel *model = this->Internal->YAxisArrays->selectionModel();
+  if(model && model->isSelected(changed))
+    {
+    QModelIndex current = model->currentIndex();
+    if(!current.isValid() || !model->isSelected(current))
+      {
+      current = model->selectedIndexes().last();
+      }
+
+    if(changed == current)
+      {
+      this->Internal->ColorButton->blockSignals(true);
+      this->Internal->ColorButton->setChosenColor(color);
+      this->Internal->ColorButton->blockSignals(false);
+      }
     }
 }
+
+void pqXYPlotDisplayProxyEditor::updateItemStyle(int index, Qt::PenStyle style)
+{
+  if(this->Internal->InChange)
+    {
+    return;
+    }
+
+  // If the index is the 'current', update the style combo box.
+  QModelIndex changed = this->Internal->YAxisArrays->model()->index(index, 0);
+  QItemSelectionModel *model = this->Internal->YAxisArrays->selectionModel();
+  if(model && model->isSelected(changed))
+    {
+    QModelIndex current = model->currentIndex();
+    if(!current.isValid() || !model->isSelected(current))
+      {
+      current = model->selectedIndexes().last();
+      }
+
+    if(changed == current)
+      {
+      this->Internal->StyleList->blockSignals(true);
+      this->Internal->StyleList->setCurrentIndex((int)style - 1);
+      this->Internal->StyleList->blockSignals(false);
+      }
+    }
+}
+
+Qt::CheckState pqXYPlotDisplayProxyEditor::getEnabledState() const
+{
+  Qt::CheckState enabledState = Qt::Unchecked;
+  QItemSelectionModel *model = this->Internal->YAxisArrays->selectionModel();
+  if(model)
+    {
+    // Use the selection list to determine the tri-state of the
+    // enabled check box.
+    bool enabled = false;
+    QModelIndexList indexes = model->selectedIndexes();
+    QModelIndexList::Iterator iter = indexes.begin();
+    for(int i = 0; iter != indexes.end(); ++iter, ++i)
+      {
+      enabled = this->Internal->Display->isSeriesEnabled(iter->row());
+      if(i == 0)
+        {
+        enabledState = enabled ? Qt::Checked : Qt::Unchecked;
+        }
+      else if((enabled && enabledState == Qt::Unchecked) ||
+          (!enabled && enabledState == Qt::Checked))
+        {
+        enabledState = Qt::PartiallyChecked;
+        break;
+        }
+      }
+    }
+
+  return enabledState;
+}
+
+Qt::CheckState pqXYPlotDisplayProxyEditor::getInLegendState() const
+{
+  Qt::CheckState inLegendState = Qt::Unchecked;
+  QItemSelectionModel *model = this->Internal->YAxisArrays->selectionModel();
+  if(model)
+    {
+    // Use the selection list to determine the tri-state of the
+    // legend check box.
+    bool inLegend = false;
+    QModelIndexList indexes = model->selectedIndexes();
+    QModelIndexList::Iterator iter = indexes.begin();
+    for(int i = 0; iter != indexes.end(); ++iter, ++i)
+      {
+      inLegend = this->Internal->Display->isSeriesInLegend(iter->row());
+      if(i == 0)
+        {
+        inLegendState = inLegend ? Qt::Checked : Qt::Unchecked;
+        }
+      else if((inLegend && inLegendState == Qt::Unchecked) ||
+          (!inLegend && inLegendState == Qt::Checked))
+        {
+        inLegendState = Qt::PartiallyChecked;
+        break;
+        }
+      }
+    }
+
+  return inLegendState;
+}
+
 
