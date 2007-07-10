@@ -269,7 +269,6 @@ public slots:
   void onFileSaveScreenshot(const QStringList& Files);
 
   void onFileSaveAnimation();
-  void onFileSaveAnimation(const QStringList& files);
 
   void onSaveGeometry();
   void onSaveGeometry(const QStringList& files);

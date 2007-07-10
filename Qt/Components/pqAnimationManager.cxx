@@ -38,8 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMPVAnimationSceneProxy.h"
 #include "vtkSMServerProxyManagerReviver.h"
+#include "vtkToolkits.h" // for VTK_USE_FFMPEG_ENCODER
 
-#include <QCoreApplication>
+#include <QApplication>
 #include <QFileInfo>
 #include <QMap>
 #include <QMessageBox>
@@ -52,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationSceneImageWriter.h"
 #include "pqApplicationCore.h"
 #include "pqEventDispatcher.h"
+#include "pqFileDialog.h"
 #include "pqObjectBuilder.h"
 #include "pqProgressManager.h"
 #include "pqProxy.h"
@@ -295,7 +297,7 @@ void pqAnimationManager::updateGUI()
 }
 
 //-----------------------------------------------------------------------------
-bool pqAnimationManager::saveAnimation(const QString& filename)
+bool pqAnimationManager::saveAnimation()
 {
   pqAnimationScene* scene = this->getActiveScene();
   if (!scene)
@@ -305,15 +307,6 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
   vtkSMPVAnimationSceneProxy* sceneProxy = 
     vtkSMPVAnimationSceneProxy::SafeDownCast(scene->getAnimationSceneProxy());
 
-  QFileInfo fileinfo(filename);
-  QString filePrefix = filename;
-  int dot_pos;
-  if ((dot_pos = filename.lastIndexOf(".")) != -1)
-    {
-    filePrefix = filename.left(dot_pos);
-    }
-  QString extension = fileinfo.suffix();
-
   QDialog dialog;
   Ui::Dialog dialogUI;
   this->Internals->AnimationSettingsDialog = &dialogUI;
@@ -322,24 +315,6 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
   // Cannot disconnect and save animation unless connected to a remote server.
   dialogUI.checkBoxDisconnect->setEnabled(
     this->Internals->ActiveServer->isRemote());
-
-  bool isMPEG = (extension == "mpg");
-  if (isMPEG)
-    {
-    // Size bounds for mpeg.
-    dialogUI.spinBoxWidth->setMaximum(1920);
-    dialogUI.spinBoxHeight->setMaximum(1080);
-
-    // Frame rate is fixed when using vtkMPIWriter.
-    dialogUI.frameRate->setValue(30);
-    dialogUI.frameRate->setEnabled(false);
-    }
-  else
-    {
-    // Size bounds for mpeg.
-    dialogUI.spinBoxWidth->setMaximum(8000);
-    dialogUI.spinBoxHeight->setMaximum(8000);
-    }
 
   // Set current size of the window.
   QSize viewSize = scene->getViewSize();
@@ -402,6 +377,45 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
     }
   this->Internals->AnimationSettingsDialog = 0;
 
+  // Now obtain filename for the animation.
+  QString filters = "";
+#ifdef _WIN32
+  filters += "AVI files (*.avi);;";
+#else
+# ifdef VTK_USE_FFMPEG_ENCODER
+  filters += "AVI files (*.avi);;";
+# endif
+#endif
+  filters +="JPEG images (*.jpg);;TIFF images (*.tif);;PNG images (*.png);;";
+  filters +="All files(*)";
+
+  // Create a server dialog is disconnect-and-save is true, else create a client
+  // dialog.
+  pqFileDialog *file_dialog = new pqFileDialog(
+    (dialogUI.checkBoxDisconnect->checkState() == Qt::Checked)?
+    scene->getServer() : 0,
+    QApplication::activeWindow(),
+    tr("Save Animation"), QString(), filters);
+  file_dialog.setObjectName("FileSaveAnimationDialog");
+  file_dialog.setFileMode(pqFileDialog::AnyFile);
+  if (file_dialog.exec() != QDialog::Accepted)
+    {
+    delete file_dialog;
+    return false;
+    }
+
+  QStringList files = file_dialog.getSelectedFiles();
+  // essential to destroy file dialog, before we disconnect from the server, if
+  // at all.
+  delete file_dialog;
+
+  if (files.size() == 0)
+    {
+    return false;
+    }
+
+  QString filename = files[0];
+
   // Update Scene properties based on user options. 
   double num_frames = sceneProxy->GetNumberOfFrames();
   //double duration = sceneProxy->GetDuration();
@@ -435,8 +449,8 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
   QSize newSize(dialogUI.spinBoxWidth->value(),
     dialogUI.spinBoxHeight->value());
 
-  // Enfore the multiple of 4 criteria.
-  int magnification = this->updateViewSizes(newSize, viewSize, isMPEG);
+  // Enforce any view size conditions (such a multiple of 4). 
+  int magnification = this->updateViewSizes(newSize, viewSize);
  
   if (dialogUI.checkBoxDisconnect->checkState() == Qt::Checked)
     {
@@ -526,44 +540,18 @@ bool pqAnimationManager::saveAnimation(const QString& filename)
 }
 
 //-----------------------------------------------------------------------------
-int pqAnimationManager::updateViewSizes(QSize newSize, QSize currentSize, bool isMPEG)
+int pqAnimationManager::updateViewSizes(QSize newSize, QSize currentSize)
 {
   QSize requested_newSize = newSize;
-  // Enforce requested size restrictions based on the choosen
-  // format.
-  if (isMPEG)
+  int &width = newSize.rwidth();
+  int &height = newSize.rheight();
+  if ((width % 4) > 0)
     {
-    int &width = newSize.rwidth();
-    int &height = newSize.rheight();
-    if ((width % 32) > 0)
-      {
-      width -= width % 32;
-      }
-    if ((height % 8) > 0)
-      {
-      height -= height % 8;
-      }
-    if (width > 1920)
-      {
-      width = 1920;
-      }
-    if (height > 1080)
-      {
-      height = 1080;
-      }
+    width -= width % 4;
     }
-  else
+  if ((height % 4) > 0)
     {
-    int &width = newSize.rwidth();
-    int &height = newSize.rheight();
-    if ((width % 4) > 0)
-      {
-      width -= width % 4;
-      }
-    if ((height % 4) > 0)
-      {
-      height -= height % 4;
-      }
+    height -= height % 4;
     }
 
   if (requested_newSize != newSize)

@@ -80,7 +80,7 @@ public:
   // Saves the animation from the active scene. The active scene
   // is determined using the active server.
   // Returns true if the save was successful.
-  bool saveAnimation(const QString& filename);
+  bool saveAnimation();
 
   // The the Widget that contains all the views.
   // This is required since the manager may need to change the view size
@@ -125,7 +125,7 @@ private:
   pqAnimationManager(const pqAnimationManager&); // Not implemented.
   void operator=(const pqAnimationManager&); // Not implemented.
 
-  int updateViewSizes(QSize requested_size, QSize current_size, bool is_Mpeg);
+  int updateViewSizes(QSize requested_size, QSize current_size);
   void restoreViewSizes();
 
   class pqInternals;

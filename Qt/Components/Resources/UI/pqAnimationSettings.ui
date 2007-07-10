@@ -45,8 +45,14 @@
        <property name="whatsThis" >
         <string>Sets the width (in pixles) to use while generating animation.</string>
        </property>
+       <property name="maximum" >
+        <number>8000</number>
+       </property>
        <property name="minimum" >
         <number>2</number>
+       </property>
+       <property name="singleStep" >
+        <number>10</number>
        </property>
       </widget>
      </item>
@@ -109,8 +115,14 @@
        <property name="whatsThis" >
         <string>Sets the height (in pixles) to use while generating animation.</string>
        </property>
+       <property name="maximum" >
+        <number>8000</number>
+       </property>
        <property name="minimum" >
         <number>2</number>
+       </property>
+       <property name="singleStep" >
+        <number>10</number>
        </property>
       </widget>
      </item>

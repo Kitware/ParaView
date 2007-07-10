@@ -2069,45 +2069,11 @@ void pqMainWindowCore::onFileSaveAnimation()
     qDebug() << "Cannot save animation since no active scene is present.";
     return;
     }
-  QString filters = "";
-
-#ifdef VTK_USE_MPEG2_ENCODER
-  filter += "MPEG files (*.mpg);;";
-#endif
-#ifdef _WIN32
-  filters += "AVI files (*.avi);;";
-#else
-# ifdef VTK_USE_FFMPEG_ENCODER
-  filters += "AVI files (*.avi);;";
-# endif
-#endif
-  filters +="JPEG images (*.jpg);;TIFF images (*.tif);;PNG images (*.png);;";
-  filters +="All files(*)";
-  pqFileDialog* const file_dialog = new pqFileDialog(NULL,
-    this->Implementation->Parent, tr("Save Animation:"), QString(), filters);
-  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
-  file_dialog->setObjectName("FileSaveAnimationDialog");
-  file_dialog->setFileMode(pqFileDialog::AnyFile);
-  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
-    this, SLOT(onFileSaveAnimation(const QStringList&)));
-  file_dialog->setModal(true);
-  file_dialog->show();
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::onFileSaveAnimation(const QStringList& files)
-{
-  pqAnimationManager* mgr = this->getAnimationManager();
-  if (!mgr || !mgr->getActiveScene())
-    {
-    qDebug() << "Cannot save animation since no active scene is present.";
-    return;
-    }
 
   // This is essential since we don't want the view frame
   // decorations to appear in our animation.
   this->multiViewManager().hideDecorations();
-  if (!mgr->saveAnimation(files[0]))
+  if (!mgr->saveAnimation())
     {
     // qDebug() << "Animation save failed!";
     }
