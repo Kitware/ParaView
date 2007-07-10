@@ -91,19 +91,6 @@ pqXDMFPanel::~pqXDMFPanel()
 //----------------------------------------------------------------------------
 void pqXDMFPanel::accept()
 {
-  if(vtkSMSourceProxy::SafeDownCast(this->proxy())->GetNumberOfParts() == 0)
-    {
-    pqSMAdaptor::setElementProperty(this->proxy()->GetProperty("SetDomainName"),
-                                    this->UI->DomainNames->currentText());
-    this->setGridProperty(this->proxy());
-
-    //If we can make paraview OK with the server side changing the number 
-    //of output ports, then we should take this out and let the user change 
-    //the selected domain and grids dynamically.
-    this->UI->DomainNames->setEnabled(false);
-    this->UI->GridNames->setEnabled(false);
-    }
-  
   // set the arrays
   vtkSMProperty* CellProperty = this->proxy()->GetProperty("CellArrayStatus");
   vtkSMProperty* PointProperty = this->proxy()->GetProperty("PointArrayStatus");
@@ -209,12 +196,6 @@ void pqXDMFPanel::populateDomainWidget()
     selectionWidget->setCurrentIndex(selectionWidget->findText(str.toString()));
     }
     
-  // if output has already been created, disable domain change
-  if(vtkSMSourceProxy::SafeDownCast(this->proxy())->GetNumberOfParts() != 0)
-    {
-    selectionWidget->setEnabled(false);
-    }
-  
   //watch for changes in the widget so that we can tell the proxy
   QObject::connect(selectionWidget, SIGNAL(currentIndexChanged(QString)), 
                    this, SLOT(setSelectedDomain(QString)));
@@ -229,37 +210,27 @@ void pqXDMFPanel::populateGridWidget()
                       this, SLOT(gridItemChanged(QTreeWidgetItem*, int)));
   gridWidget->clear();
 
-  vtkSMProxy* whichProxy = this->UI->XDMFHelper;
-  int parts = vtkSMSourceProxy::SafeDownCast(this->proxy())->GetNumberOfParts();
-  if(parts)
-    {
-    whichProxy = this->proxy();
-    gridWidget->setEnabled(false);
-    }
+  this->UI->XDMFHelper->GetProperty("RemoveAllGrids")->Modified();
+  this->UI->XDMFHelper->UpdateVTKObjects();
+  this->UI->XDMFHelper->UpdatePropertyInformation();
 
-  whichProxy->GetProperty("RemoveAllGrids")->Modified();
-  whichProxy->UpdateVTKObjects();
-  whichProxy->UpdatePropertyInformation();
-
-  vtkSMProperty* GetNamesProperty = whichProxy->GetProperty("GetGridName");
+  vtkSMProperty* GetNamesProperty = 
+    this->UI->XDMFHelper->GetProperty("GetGridName");
   QList<QVariant> grids;
   grids = pqSMAdaptor::getMultipleElementProperty(GetNamesProperty);
   QList<QVariant> enabledGrids;
   enabledGrids = pqSMAdaptor::getMultipleElementProperty(
-    whichProxy->GetProperty("EnableGrid"));
+    this->UI->XDMFHelper->GetProperty("EnableGrid"));
 
   foreach(QVariant v, grids)
     {
     pqTreeWidgetItemObject *anitem;
     anitem = new pqTreeWidgetItemObject(gridWidget, QStringList(v.toString()));
-    anitem->setChecked(parts ? enabledGrids.contains(v): true);
+    anitem->setChecked(enabledGrids.contains(v));
     }
-
-  if(!parts)
-    {
-    this->setGridProperty(this->UI->XDMFHelper);
-    this->UI->XDMFHelper->UpdatePropertyInformation();
-    }
+  
+  this->setGridProperty(this->UI->XDMFHelper);
+  this->UI->XDMFHelper->UpdatePropertyInformation();
 
   //whenever grid changes, update the available arrays
   this->populateArrayWidget();
