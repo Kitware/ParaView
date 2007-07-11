@@ -118,10 +118,10 @@ bool vtkSMDataLabelRepresentationProxy::AddToView(vtkSMViewProxy* view)
     return false;
     }
 
-  renderView->AddPropToRenderer(this->ActorProxy);
-  renderView->AddPropToRenderer(this->CellActorProxy);
-  //renderView->AddPropToRenderer2D(this->ActorProxy);
-  //renderView->AddPropToRenderer2D(this->CellActorProxy);
+  //renderView->AddPropToRenderer(this->ActorProxy);
+  //renderView->AddPropToRenderer(this->CellActorProxy);
+  renderView->AddPropToRenderer2D(this->ActorProxy);
+  renderView->AddPropToRenderer2D(this->CellActorProxy);
   return true;
 }
 
@@ -135,10 +135,10 @@ bool vtkSMDataLabelRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
     return false;
     }
 
-  renderView->RemovePropFromRenderer(this->ActorProxy);
-  renderView->RemovePropFromRenderer(this->CellActorProxy);
-  //renderView->RemovePropFromRenderer2D(this->ActorProxy);
-  //renderView->RemovePropFromRenderer2D(this->CellActorProxy);
+  //renderView->RemovePropFromRenderer(this->ActorProxy);
+  //renderView->RemovePropFromRenderer(this->CellActorProxy);
+  renderView->RemovePropFromRenderer2D(this->ActorProxy);
+  renderView->RemovePropFromRenderer2D(this->CellActorProxy);
   return this->Superclass::RemoveFromView(view);
 }
 
@@ -267,8 +267,8 @@ void vtkSMDataLabelRepresentationProxy::SetupPipeline()
   this->ActorProxy->UpdateVTKObjects();
 
   // Set up Cell Centers pipeline
-  //this->Connect(this->UpdateSuppressorProxy, this->CellCenterFilter);
-  //this->Connect(this->CellCenterFilter, this->CellMapperProxy);
+  this->Connect(this->UpdateSuppressorProxy, this->CellCenterFilter);
+  this->Connect(this->CellCenterFilter, this->CellMapperProxy);
 
   pp = vtkSMProxyProperty::SafeDownCast(
     this->CellMapperProxy->GetProperty("LabelTextProperty"));
