@@ -267,8 +267,8 @@ void vtkSMDataLabelRepresentationProxy::SetupPipeline()
   this->ActorProxy->UpdateVTKObjects();
 
   // Set up Cell Centers pipeline
-  this->Connect(this->UpdateSuppressorProxy, this->CellCenterFilter);
-  this->Connect(this->CellCenterFilter, this->CellMapperProxy);
+  //this->Connect(this->UpdateSuppressorProxy, this->CellCenterFilter);
+  //this->Connect(this->CellCenterFilter, this->CellMapperProxy);
 
   pp = vtkSMProxyProperty::SafeDownCast(
     this->CellMapperProxy->GetProperty("LabelTextProperty"));
