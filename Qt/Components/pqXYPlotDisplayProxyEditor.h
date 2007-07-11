@@ -92,8 +92,8 @@ protected slots:
   /// \brief
   ///   Updates the style for the given series index.
   /// \param index The index of the line series.
-  /// \param style The new series style.
-  void updateItemStyle(int index, Qt::PenStyle style);
+  /// \param lineStyle The new series style.
+  void updateItemStyle(int index, Qt::PenStyle lineStyle);
 
 private:
   pqXYPlotDisplayProxyEditor(const pqXYPlotDisplayProxyEditor&); // Not implemented.

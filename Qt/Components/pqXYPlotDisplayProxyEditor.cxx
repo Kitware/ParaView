@@ -505,12 +505,12 @@ void pqXYPlotDisplayProxyEditor::setCurrentSeriesStyle(int listIndex)
     {
     this->Internal->Display->beginSeriesChanges();
     this->Internal->InChange = true;
-    Qt::PenStyle style = (Qt::PenStyle)(listIndex + 1);
+    Qt::PenStyle lineStyle = (Qt::PenStyle)(listIndex + 1);
     QModelIndexList indexes = model->selectedIndexes();
     QModelIndexList::Iterator iter = indexes.begin();
     for( ; iter != indexes.end(); ++iter)
       {
-      this->Internal->Display->setSeriesStyle(iter->row(), style);
+      this->Internal->Display->setSeriesStyle(iter->row(), lineStyle);
       }
 
     this->Internal->InChange = false;
@@ -597,7 +597,8 @@ void pqXYPlotDisplayProxyEditor::updateItemColor(int index,
     }
 }
 
-void pqXYPlotDisplayProxyEditor::updateItemStyle(int index, Qt::PenStyle style)
+void pqXYPlotDisplayProxyEditor::updateItemStyle(int index,
+    Qt::PenStyle lineStyle)
 {
   if(this->Internal->InChange)
     {
@@ -618,7 +619,7 @@ void pqXYPlotDisplayProxyEditor::updateItemStyle(int index, Qt::PenStyle style)
     if(changed == current)
       {
       this->Internal->StyleList->blockSignals(true);
-      this->Internal->StyleList->setCurrentIndex((int)style - 1);
+      this->Internal->StyleList->setCurrentIndex((int)lineStyle - 1);
       this->Internal->StyleList->blockSignals(false);
       }
     }
