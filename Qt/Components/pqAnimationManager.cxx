@@ -396,15 +396,15 @@ bool pqAnimationManager::saveAnimation()
     scene->getServer() : 0,
     QApplication::activeWindow(),
     tr("Save Animation"), QString(), filters);
-  file_dialog.setObjectName("FileSaveAnimationDialog");
-  file_dialog.setFileMode(pqFileDialog::AnyFile);
-  if (file_dialog.exec() != QDialog::Accepted)
+  file_dialog->setObjectName("FileSaveAnimationDialog");
+  file_dialog->setFileMode(pqFileDialog::AnyFile);
+  if (file_dialog->exec() != QDialog::Accepted)
     {
     delete file_dialog;
     return false;
     }
 
-  QStringList files = file_dialog.getSelectedFiles();
+  QStringList files = file_dialog->getSelectedFiles();
   // essential to destroy file dialog, before we disconnect from the server, if
   // at all.
   delete file_dialog;
