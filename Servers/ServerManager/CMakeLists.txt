@@ -38,6 +38,7 @@ SET(Kit_SRCS
   vtkSMCompoundProxy.cxx
   vtkSMCompoundProxyDefinitionLoader.cxx
   vtkSMConnectionCleanerProxy.cxx
+  vtkSMDataLabelRepresentationProxy.cxx
   vtkSMDataRepresentationProxy.cxx
   vtkSMDataTypeDomain.cxx
   vtkSMDocumentation.cxx

@@ -4709,7 +4709,105 @@
       </SubProxy>
       <!-- End of TextSourceRepresentation -->
     </TextSourceRepresentationProxy>
+    
+    <DataLabelRepresentationProxy name="DataLabelRepresentation">
+      <InputProperty name="Input"
+        command="NotUsed">
+        <InputArrayDomain name="input_array_any"
+          attribute_type="any">
+        </InputArrayDomain>
+      </InputProperty>
+      <Property
+        name="Update"
+        command="Update"
+        update_self="1">
+        <!--        is_internal="1">  -->
+      </Property>
+      <Property
+        name="InvalidateGeometry"
+        command="InvalidateGeometry"
+        update_self="1">
+      </Property>
+      <SubProxy>
+        <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="UpdateSuppressor"
+          proxygroup="filters" proxyname="UpdateSuppressor">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="CacheUpdate" />
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Property"
+          proxygroup="properties" proxyname="TextProperty">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Color" exposed_name="PointColor" />
+          <Property name="Opacity" exposed_name="PointOpacity" />
+          <Property name="FontFamily" exposed_name="PointFontFamily" />
+          <Property name="Bold" exposed_name="PointBold" />
+          <Property name="Italic" exposed_name="PointItalic" />
+          <Property name="Shadow" exposed_name="PointShadow" />
+          <Property name="FontSize" exposed_name="PointFontSize" />
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Prop2D"
+          proxygroup="props" proxyname="Actor2D">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" exposed_name="PointLabelVisibility" />
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Mapper"
+          proxygroup="mappers" proxyname="LabeledDataMapper">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="LabelMode" exposed_name="PointLabelMode" />
+        </ExposedProperties>
+      </SubProxy>
+      <!-- For Cell Centers -->
+      <SubProxy>
+        <Proxy name="CellCentersFilter"
+          proxygroup="filters" proxyname="CellCenters" />
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="CellProperty"
+          proxygroup="properties" proxyname="TextProperty">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Color" exposed_name="CellColor" />
+          <Property name="Opacity" exposed_name="CellOpacity" />
+          <Property name="FontFamily" exposed_name="CellFontFamily" />
+          <Property name="Bold" exposed_name="CellBold" />
+          <Property name="Italic" exposed_name="CellItalic" />
+          <Property name="Shadow" exposed_name="CellShadow" />
+          <Property name="FontSize" exposed_name="CellFontSize" />
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="CellProp2D"
+          proxygroup="props" proxyname="Actor2D">
+          <ExposedProperties>
+            <Property name="Visibility" exposed_name="CellLabelVisibility" />
+          </ExposedProperties>
+        </Proxy>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="CellMapper"
+          proxygroup="mappers" proxyname="LabeledDataMapper">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="LabelMode" exposed_name="CellLabelMode" />
+        </ExposedProperties>
+      </SubProxy>
 
+    </DataLabelRepresentationProxy>
+    
   </ProxyGroup>
 
 
