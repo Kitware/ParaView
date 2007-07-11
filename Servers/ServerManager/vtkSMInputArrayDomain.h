@@ -59,16 +59,17 @@ public:
 
   // Description:
   // Returns true if input has one or more arrays that match the
-  // requirements.
-  int IsInDomain(vtkSMSourceProxy* proxy);
+  // requirements on  the given output port.
+  int IsInDomain(vtkSMSourceProxy* proxy, int outputport=0);
 
   // Description:
   // Returns 1 if the array represented by the array information is
   // a valid field. The attribute type (point or cell) as well as the 
   // number of components are checked for a match
-  int IsFieldValid(vtkSMSourceProxy* proxy, vtkPVArrayInformation* arrayInfo);
-  int IsFieldValid(
-    vtkSMSourceProxy* proxy, vtkPVArrayInformation* arrayInfo, int bypass);
+  int IsFieldValid(vtkSMSourceProxy* proxy, int outputport,
+    vtkPVArrayInformation* arrayInfo);
+  int IsFieldValid(vtkSMSourceProxy* proxy, int outputport,
+    vtkPVArrayInformation* arrayInfo, int bypass);
   
   // Description:
   // Set/get the attribute type. Valid values are: POINT, CELL, ANY.
@@ -106,6 +107,7 @@ protected:
   virtual void ChildSaveState(vtkPVXMLElement* domainElement);
 
   int AttributeInfoContainsArray(vtkSMSourceProxy* proxy,
+                                 int outputport,
                                  vtkPVDataSetAttributesInformation* attrInfo);
   int CheckForArray(vtkPVArrayInformation* arrayInfo, 
                     vtkPVDataSetAttributesInformation* attrInfo);

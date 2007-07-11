@@ -20,13 +20,13 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMInputArrayDomain);
-vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.13");
+vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.14");
 
 //---------------------------------------------------------------------------
 static const char* const vtkSMInputArrayDomainAttributeTypes[] = {
@@ -63,13 +63,15 @@ int vtkSMInputArrayDomain::IsInDomain(vtkSMProperty* property)
   unsigned int i;
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(property);
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(property);
   if (pp)
     {
     unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
     for (i=0; i<numProxs; i++)
       {
       if (!this->IsInDomain( 
-            vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i)) ) )
+            vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i)),
+            (ip? ip->GetUncheckedOutputPortForConnection(i):0)) )
         {
         return 0;
         }
@@ -81,7 +83,8 @@ int vtkSMInputArrayDomain::IsInDomain(vtkSMProperty* property)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMInputArrayDomain::IsInDomain(vtkSMSourceProxy* proxy)
+int vtkSMInputArrayDomain::IsInDomain(vtkSMSourceProxy* proxy, 
+                                      int outputport/*=0*/)
 {
   if (!proxy)
     {
@@ -90,7 +93,7 @@ int vtkSMInputArrayDomain::IsInDomain(vtkSMSourceProxy* proxy)
 
   // Make sure the outputs are created.
   proxy->CreateParts();
-  vtkPVDataInformation* info = proxy->GetDataInformation();
+  vtkPVDataInformation* info = proxy->GetDataInformation(outputport);
   if (!info)
     {
     return 0;
@@ -99,7 +102,8 @@ int vtkSMInputArrayDomain::IsInDomain(vtkSMSourceProxy* proxy)
   if (this->AttributeType == vtkSMInputArrayDomain::POINT ||
       this->AttributeType == vtkSMInputArrayDomain::ANY)
     {
-    if (this->AttributeInfoContainsArray(proxy, info->GetPointDataInformation()))
+    if (this->AttributeInfoContainsArray(proxy, outputport, 
+        info->GetPointDataInformation()))
       {
       return 1;
       }
@@ -108,7 +112,8 @@ int vtkSMInputArrayDomain::IsInDomain(vtkSMSourceProxy* proxy)
   if (this->AttributeType == vtkSMInputArrayDomain::CELL||
       this->AttributeType == vtkSMInputArrayDomain::ANY)
     {
-    if (this->AttributeInfoContainsArray(proxy, info->GetCellDataInformation()))
+    if (this->AttributeInfoContainsArray(proxy, outputport,
+        info->GetCellDataInformation()))
       {
       return 1;
       }
@@ -141,16 +146,17 @@ int vtkSMInputArrayDomain::CheckForArray(
 
 //----------------------------------------------------------------------------
 int vtkSMInputArrayDomain::IsFieldValid(
-  vtkSMSourceProxy* proxy, vtkPVArrayInformation* arrayInfo)
+  vtkSMSourceProxy* proxy, int outputport, vtkPVArrayInformation* arrayInfo)
 {
-  return this->IsFieldValid(proxy, arrayInfo, 0);
+  return this->IsFieldValid(proxy, outputport, arrayInfo, 0);
 }
 
 //----------------------------------------------------------------------------
 int vtkSMInputArrayDomain::IsFieldValid(
-  vtkSMSourceProxy* proxy, vtkPVArrayInformation* arrayInfo, int bypass)
+  vtkSMSourceProxy* proxy, int outputport, 
+  vtkPVArrayInformation* arrayInfo, int bypass)
 {
-  vtkPVDataInformation* info = proxy->GetDataInformation();
+  vtkPVDataInformation* info = proxy->GetDataInformation(outputport);
   if (!info)
     {
     return 0;
@@ -210,7 +216,9 @@ int vtkSMInputArrayDomain::IsFieldValid(
 
 //----------------------------------------------------------------------------
 int vtkSMInputArrayDomain::AttributeInfoContainsArray(
-  vtkSMSourceProxy* proxy, vtkPVDataSetAttributesInformation* attrInfo)
+  vtkSMSourceProxy* proxy, 
+  int outputport,
+  vtkPVDataSetAttributesInformation* attrInfo)
 {
   if (!attrInfo)
     {
@@ -221,7 +229,7 @@ int vtkSMInputArrayDomain::AttributeInfoContainsArray(
   for (int idx = 0; idx < num; ++idx)
     {
     vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(idx);
-    if (this->IsFieldValid(proxy, arrayInfo, 1))
+    if (this->IsFieldValid(proxy, outputport, arrayInfo, 1))
       {
       return 1;
       }

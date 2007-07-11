@@ -18,11 +18,11 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMProxyProperty.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMBoundsDomain);
-vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.13");
+vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.14");
 
 vtkCxxSetObjectMacro(vtkSMBoundsDomain,InputInformation,vtkPVDataInformation)
 
@@ -70,13 +70,15 @@ vtkPVDataInformation* vtkSMBoundsDomain::GetInputInformation()
     this->GetRequiredProperty("Input"));
   if (pp)
     {
+    vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
     if (pp->GetNumberOfUncheckedProxies() > 0)
       {
       vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(
         pp->GetUncheckedProxy(0));
       if (sp)
         {
-        return sp->GetDataInformation();
+        return sp->GetDataInformation(
+          (ip? ip->GetUncheckedOutputPortForConnection(0): 0));
         }
       }
     else if (pp->GetNumberOfProxies() > 0)
@@ -85,7 +87,8 @@ vtkPVDataInformation* vtkSMBoundsDomain::GetInputInformation()
         pp->GetProxy(0));
       if (sp)
         {
-        return sp->GetDataInformation();
+        return sp->GetDataInformation(
+          (ip? ip->GetOutputPortForConnection(0):0));
         }
       }
 
@@ -191,6 +194,7 @@ void vtkSMBoundsDomain::UpdateOriented()
 //---------------------------------------------------------------------------
 void vtkSMBoundsDomain::Update(vtkSMProxyProperty *pp)
 {
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
   unsigned int i, j;
   unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
   for (i=0; i<numProxs; i++)
@@ -199,7 +203,8 @@ void vtkSMBoundsDomain::Update(vtkSMProxyProperty *pp)
       vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i));
     if (sp)
       {
-      vtkPVDataInformation *info = sp->GetDataInformation();
+      vtkPVDataInformation *info = sp->GetDataInformation(
+        (ip? ip->GetUncheckedOutputPortForConnection(i):0));
       if (!info)
         {
         return;
@@ -244,7 +249,8 @@ void vtkSMBoundsDomain::Update(vtkSMProxyProperty *pp)
       vtkSMSourceProxy::SafeDownCast(pp->GetProxy(i));
     if (sp)
       {
-      vtkPVDataInformation *info = sp->GetDataInformation();
+      vtkPVDataInformation *info = sp->GetDataInformation(
+        (ip? ip->GetOutputPortForConnection(i): 0));
       if (!info)
         {
         return;

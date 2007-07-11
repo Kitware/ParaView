@@ -21,11 +21,11 @@
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInputArrayDomain.h"
-#include "vtkSMProxyProperty.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMFieldDataDomain);
-vtkCxxRevisionMacro(vtkSMFieldDataDomain, "1.5");
+vtkCxxRevisionMacro(vtkSMFieldDataDomain, "1.6");
 
 //---------------------------------------------------------------------------
 vtkSMFieldDataDomain::vtkSMFieldDataDomain()
@@ -39,14 +39,15 @@ vtkSMFieldDataDomain::~vtkSMFieldDataDomain()
 
 //---------------------------------------------------------------------------
 int vtkSMFieldDataDomain::CheckForArray(
-  vtkSMSourceProxy* sp, 
+  vtkSMSourceProxy* sp,
+  int outputport,
   vtkPVDataSetAttributesInformation* info, 
   vtkSMInputArrayDomain* iad)
 {
   int num = info->GetNumberOfArrays();
   for (int idx = 0; idx < num; ++idx)
     {
-    if ( iad->IsFieldValid(sp, info->GetArrayInformation(idx), 1) )
+    if ( iad->IsFieldValid(sp, outputport, info->GetArrayInformation(idx), 1) )
       {
       return 1;
       }
@@ -56,23 +57,24 @@ int vtkSMFieldDataDomain::CheckForArray(
 
 //---------------------------------------------------------------------------
 void vtkSMFieldDataDomain::Update(vtkSMSourceProxy* sp, 
-                                  vtkSMInputArrayDomain* iad)
+                                  vtkSMInputArrayDomain* iad,
+                                  int outputport)
 {
   // Make sure the outputs are created.
   sp->CreateParts();
-  vtkPVDataInformation* info = sp->GetDataInformation();
+  vtkPVDataInformation* info = sp->GetDataInformation(outputport);
 
   if (!info)
     {
     return;
     }
 
-  if (this->CheckForArray(sp, info->GetPointDataInformation(), iad))
+  if (this->CheckForArray(sp, outputport, info->GetPointDataInformation(), iad))
     {
     this->AddEntry("Point Data", vtkDataObject::FIELD_ASSOCIATION_POINTS);
     }
 
-  if (this->CheckForArray(sp, info->GetCellDataInformation(), iad))
+  if (this->CheckForArray(sp, outputport, info->GetCellDataInformation(), iad))
     {
     this->AddEntry("Cell Data",  vtkDataObject::FIELD_ASSOCIATION_CELLS);
     }
@@ -81,7 +83,9 @@ void vtkSMFieldDataDomain::Update(vtkSMSourceProxy* sp,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMFieldDataDomain::Update(vtkSMProxyProperty* pp, vtkSMSourceProxy* sp)
+void vtkSMFieldDataDomain::Update(vtkSMProxyProperty* pp, 
+                                  vtkSMSourceProxy* sp,
+                                  int outputport)
 {
   vtkSMDomainIterator* di = pp->NewDomainIterator();
   di->Begin();
@@ -91,7 +95,7 @@ void vtkSMFieldDataDomain::Update(vtkSMProxyProperty* pp, vtkSMSourceProxy* sp)
       di->GetDomain());
     if (iad)
       {
-      this->Update(sp, iad);
+      this->Update(sp, iad, outputport);
       break;
       }
     di->Next();
@@ -106,11 +110,11 @@ void vtkSMFieldDataDomain::Update(vtkSMProperty*)
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->GetRequiredProperty("Input"));
-
   if (!pp)
     {
     return;
     }
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
 
   unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
   unsigned int i;
@@ -121,7 +125,8 @@ void vtkSMFieldDataDomain::Update(vtkSMProperty*)
       vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i));
     if (sp)
       {
-      this->Update(pp, sp);
+      this->Update(pp, sp, 
+        (ip? ip->GetUncheckedOutputPortForConnection(i):0));
       return;
       }
     }
@@ -135,7 +140,8 @@ void vtkSMFieldDataDomain::Update(vtkSMProperty*)
       vtkSMSourceProxy::SafeDownCast(pp->GetProxy(i));
     if (sp)
       {
-      this->Update(pp, sp);
+      this->Update(pp, sp,
+        (ip? ip->GetOutputPortForConnection(i):0));
       return;
       }
     }

@@ -54,11 +54,11 @@ private:
 
   // Description:
   // Utility functions called by Update()
-  int CheckForArray(vtkSMSourceProxy* sp,
+  int CheckForArray(vtkSMSourceProxy* sp, int outputport,
                     vtkPVDataSetAttributesInformation* info, 
                     vtkSMInputArrayDomain* iad);
-  void Update(vtkSMSourceProxy* sp, vtkSMInputArrayDomain* iad);
-  void Update(vtkSMProxyProperty* pp, vtkSMSourceProxy* sp);
+  void Update(vtkSMSourceProxy* sp, vtkSMInputArrayDomain* iad, int outputport);
+  void Update(vtkSMProxyProperty* pp, vtkSMSourceProxy* sp, int outputport);
 
   vtkSMFieldDataDomain(const vtkSMFieldDataDomain&); // Not implemented
   void operator=(const vtkSMFieldDataDomain&); // Not implemented

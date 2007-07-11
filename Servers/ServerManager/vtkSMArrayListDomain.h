@@ -99,11 +99,12 @@ protected:
 
   // Description:
   // Utility functions called by Update()
-  void AddArrays(vtkSMSourceProxy* sp,
+  void AddArrays(vtkSMSourceProxy* sp, 
+                 int outputport,
                  vtkPVDataSetAttributesInformation* info, 
                  vtkSMInputArrayDomain* iad);
-  void Update(vtkSMSourceProxy* sp, vtkSMInputArrayDomain* iad);
-  void Update(vtkSMProxyProperty* pp, vtkSMSourceProxy* sp);
+  void Update(vtkSMSourceProxy* sp, vtkSMInputArrayDomain* iad, int outputport);
+  void Update(vtkSMProxyProperty* pp, vtkSMSourceProxy* sp, int outputport);
   void Update(vtkSMProxyProperty* pp);
 
   // Description:

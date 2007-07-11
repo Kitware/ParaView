@@ -61,10 +61,12 @@ protected:
 private:
   void Update(const char* arrayName,
               vtkSMProxyProperty* ip,
-              vtkSMSourceProxy* sp);
+              vtkSMSourceProxy* sp, 
+              int outputport);
   void Update(const char* arrayName,
               vtkSMSourceProxy* sp,
-              vtkSMInputArrayDomain* iad);
+              vtkSMInputArrayDomain* iad,
+              int outputport);
   void SetArrayRange(vtkPVDataSetAttributesInformation* info,
                      const char* arrayName);
 

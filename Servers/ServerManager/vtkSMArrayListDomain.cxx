@@ -22,7 +22,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInputArrayDomain.h"
-#include "vtkSMProxyProperty.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
@@ -30,7 +30,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.10");
+vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.11");
 
 struct vtkSMArrayListDomainInternals
 {
@@ -62,6 +62,7 @@ int vtkSMArrayListDomain::IsArrayPartial(unsigned int idx)
 
 //---------------------------------------------------------------------------
 void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
+                                     int outputport,
                                      vtkPVDataSetAttributesInformation* info, 
                                      vtkSMInputArrayDomain* iad)
 {
@@ -74,7 +75,7 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
   for (int idx = 0; idx < num; ++idx)
     {
     vtkPVArrayInformation* arrayInfo = info->GetArrayInformation(idx);
-    if ( iad->IsFieldValid(sp, info->GetArrayInformation(idx)) )
+    if ( iad->IsFieldValid(sp, outputport, info->GetArrayInformation(idx)) )
       {
       this->ALDInternals->PartialMap[arrayInfo->GetName()] = arrayInfo->GetIsPartial();
       unsigned int newidx = this->AddString(arrayInfo->GetName());
@@ -92,11 +93,12 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
 
 //---------------------------------------------------------------------------
 void vtkSMArrayListDomain::Update(vtkSMSourceProxy* sp, 
-                                  vtkSMInputArrayDomain* iad)
+                                  vtkSMInputArrayDomain* iad,
+                                  int outputport)
 {
   // Make sure the outputs are created.
   sp->CreateParts();
-  vtkPVDataInformation* info = sp->GetDataInformation();
+  vtkPVDataInformation* info = sp->GetDataInformation(outputport);
 
   if (!info)
     {
@@ -105,16 +107,16 @@ void vtkSMArrayListDomain::Update(vtkSMSourceProxy* sp,
 
   if ( iad->GetAttributeType() == vtkSMInputArrayDomain::ANY )
     {
-    this->AddArrays(sp, info->GetPointDataInformation(), iad);
-    this->AddArrays(sp, info->GetCellDataInformation(), iad);
+    this->AddArrays(sp, outputport, info->GetPointDataInformation(), iad);
+    this->AddArrays(sp, outputport, info->GetCellDataInformation(), iad);
     }
   else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::POINT )
     {
-    this->AddArrays(sp, info->GetPointDataInformation(), iad);
+    this->AddArrays(sp, outputport, info->GetPointDataInformation(), iad);
     }
   else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::CELL )
     {
-    this->AddArrays(sp, info->GetCellDataInformation(), iad);
+    this->AddArrays(sp, outputport, info->GetCellDataInformation(), iad);
     }
 
   this->InvokeModified();
@@ -122,7 +124,8 @@ void vtkSMArrayListDomain::Update(vtkSMSourceProxy* sp,
 
 //---------------------------------------------------------------------------
 void vtkSMArrayListDomain::Update(vtkSMProxyProperty* pp,
-                                  vtkSMSourceProxy* sp)
+                                  vtkSMSourceProxy* sp,
+                                  int outputport)
 {
   vtkSMInputArrayDomain* iad = 0;
   if (this->InputDomainName)
@@ -148,13 +151,15 @@ void vtkSMArrayListDomain::Update(vtkSMProxyProperty* pp,
 
   if (iad)
     {
-    this->Update(sp, iad);
+    this->Update(sp, iad, outputport);
     }
 }
 
 //---------------------------------------------------------------------------
 void vtkSMArrayListDomain::Update(vtkSMProxyProperty* pp)
 {
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
+
   unsigned int i;
   unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
   for (i=0; i<numProxs; i++)
@@ -163,7 +168,8 @@ void vtkSMArrayListDomain::Update(vtkSMProxyProperty* pp)
       vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i));
     if (sp)
       {
-      this->Update(pp, sp);
+      this->Update(pp, sp, 
+        (ip? ip->GetUncheckedOutputPortForConnection(i) : 0));
       return;
       }
     }
@@ -177,7 +183,8 @@ void vtkSMArrayListDomain::Update(vtkSMProxyProperty* pp)
       vtkSMSourceProxy::SafeDownCast(pp->GetProxy(i));
     if (sp)
       {
-      this->Update(pp, sp);
+      this->Update(pp, sp,
+        (ip? ip->GetOutputPortForConnection(i) : 0));
       return;
       }
     }

@@ -16,12 +16,12 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMExtentDomain);
-vtkCxxRevisionMacro(vtkSMExtentDomain, "1.6");
+vtkCxxRevisionMacro(vtkSMExtentDomain, "1.7");
 
 //---------------------------------------------------------------------------
 vtkSMExtentDomain::vtkSMExtentDomain()
@@ -51,6 +51,8 @@ void vtkSMExtentDomain::Update(vtkSMProperty*)
 //---------------------------------------------------------------------------
 void vtkSMExtentDomain::Update(vtkSMProxyProperty *pp)
 {
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
+
   unsigned int i, j;
   unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
   for (i = 0; i < numProxs; i++)
@@ -59,7 +61,8 @@ void vtkSMExtentDomain::Update(vtkSMProxyProperty *pp)
       vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i));
     if (sp)
       {
-      vtkPVDataInformation *info = sp->GetDataInformation();
+      vtkPVDataInformation *info = sp->GetDataInformation(
+        (ip? ip->GetUncheckedOutputPortForConnection(i):0));
       if (!info)
         {
         continue;
@@ -85,7 +88,8 @@ void vtkSMExtentDomain::Update(vtkSMProxyProperty *pp)
       vtkSMSourceProxy::SafeDownCast(pp->GetProxy(i));
     if (sp)
       {
-      vtkPVDataInformation *info = sp->GetDataInformation();
+      vtkPVDataInformation *info = sp->GetDataInformation(
+        (ip? ip->GetOutputPortForConnection(i):0));
       if (!info)
         {
         continue;

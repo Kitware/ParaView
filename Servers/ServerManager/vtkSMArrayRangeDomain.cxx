@@ -20,14 +20,14 @@
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDomainIterator.h"
-#include "vtkSMInputArrayDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMProxyProperty.h"
+#include "vtkSMInputArrayDomain.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArrayRangeDomain);
-vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.12");
+vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.13");
 
 //---------------------------------------------------------------------------
 vtkSMArrayRangeDomain::vtkSMArrayRangeDomain()
@@ -87,6 +87,7 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
     return;
     }
 
+  vtkSMInputProperty* inputProp = vtkSMInputProperty::SafeDownCast(ip);
   unsigned int i;
   unsigned int numProxs = ip->GetNumberOfUncheckedProxies();
   for (i=0; i<numProxs; i++)
@@ -96,7 +97,8 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
       vtkSMSourceProxy::SafeDownCast(ip->GetUncheckedProxy(i));
     if (source)
       {
-      this->Update(arrayName, ip, source);
+      this->Update(arrayName, ip, source,
+        (inputProp? inputProp->GetUncheckedOutputPortForConnection(i): 0));
       this->InvokeModified();
       return;
       }
@@ -111,7 +113,8 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
       vtkSMSourceProxy::SafeDownCast(ip->GetProxy(i));
     if (source)
       {
-      this->Update(arrayName, ip, source);
+      this->Update(arrayName, ip, source,
+        (inputProp? inputProp->GetOutputPortForConnection(i): 0));
       this->InvokeModified();
       return;
       }
@@ -123,7 +126,8 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
 //---------------------------------------------------------------------------
 void vtkSMArrayRangeDomain::Update(const char* arrayName,
                                    vtkSMProxyProperty* ip,
-                                   vtkSMSourceProxy* sp)
+                                   vtkSMSourceProxy* sp,
+                                   int outputport)
 {
   vtkSMDomainIterator* di = ip->NewDomainIterator();
   di->Begin();
@@ -135,7 +139,7 @@ void vtkSMArrayRangeDomain::Update(const char* arrayName,
       di->GetDomain());
     if (iad)
       {
-      this->Update(arrayName, sp, iad);
+      this->Update(arrayName, sp, iad, outputport);
       break;
       }
     di->Next();
@@ -146,11 +150,12 @@ void vtkSMArrayRangeDomain::Update(const char* arrayName,
 //---------------------------------------------------------------------------
 void vtkSMArrayRangeDomain::Update(const char* arrayName,
                                    vtkSMSourceProxy* sp,
-                                   vtkSMInputArrayDomain* iad)
+                                   vtkSMInputArrayDomain* iad,
+                                   int outputport)
 {
   // Make sure the outputs are created.
   sp->CreateParts();
-  vtkPVDataInformation* info = sp->GetDataInformation();
+  vtkPVDataInformation* info = sp->GetDataInformation(outputport);
 
   if (!info)
     {

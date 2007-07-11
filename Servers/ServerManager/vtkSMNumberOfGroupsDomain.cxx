@@ -18,11 +18,11 @@
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMProxyProperty.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMNumberOfGroupsDomain);
-vtkCxxRevisionMacro(vtkSMNumberOfGroupsDomain, "1.6");
+vtkCxxRevisionMacro(vtkSMNumberOfGroupsDomain, "1.7");
 
 //---------------------------------------------------------------------------
 vtkSMNumberOfGroupsDomain::vtkSMNumberOfGroupsDomain()
@@ -51,11 +51,13 @@ int vtkSMNumberOfGroupsDomain::IsInDomain(vtkSMProperty* property)
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(property);
   if (pp)
     {
+    vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
     unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
     for (unsigned int i=0; i<numProxs; i++)
       {
       if (!this->IsInDomain( 
-            vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i)) ) )
+            vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i)),
+            (ip? ip->GetUncheckedOutputPortForConnection(i):0)) )
         {
         return 0;
         }
@@ -67,7 +69,8 @@ int vtkSMNumberOfGroupsDomain::IsInDomain(vtkSMProperty* property)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMNumberOfGroupsDomain::IsInDomain(vtkSMSourceProxy* proxy)
+int vtkSMNumberOfGroupsDomain::IsInDomain(vtkSMSourceProxy* proxy,
+  int outputport /*=0*/)
 {
   if (this->IsOptional)
     {
@@ -79,7 +82,7 @@ int vtkSMNumberOfGroupsDomain::IsInDomain(vtkSMSourceProxy* proxy)
     return 0;
     }
 
-  vtkPVDataInformation* di = proxy->GetDataInformation();
+  vtkPVDataInformation* di = proxy->GetDataInformation(outputport);
   if (!di)
     {
     vtkErrorMacro("Input does not have associated data information. "
@@ -136,6 +139,7 @@ void vtkSMNumberOfGroupsDomain::Update(vtkSMProperty*)
 //---------------------------------------------------------------------------
 void vtkSMNumberOfGroupsDomain::Update(vtkSMProxyProperty *pp)
 {
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
   unsigned int i;
   unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
   for (i = 0; i < numProxs; i++)
@@ -144,7 +148,8 @@ void vtkSMNumberOfGroupsDomain::Update(vtkSMProxyProperty *pp)
       vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i));
     if (sp)
       {
-      vtkPVDataInformation *info = sp->GetDataInformation();
+      vtkPVDataInformation *info = sp->GetDataInformation(
+        (ip? ip->GetUncheckedOutputPortForConnection(i) : 0));
       if (!info)
         {
         continue;
@@ -174,7 +179,8 @@ void vtkSMNumberOfGroupsDomain::Update(vtkSMProxyProperty *pp)
       vtkSMSourceProxy::SafeDownCast(pp->GetProxy(i));
     if (sp)
       {
-      vtkPVDataInformation *info = sp->GetDataInformation();
+      vtkPVDataInformation *info = sp->GetDataInformation(
+        (ip? ip->GetOutputPortForConnection(i): 0));
       if (!info)
         {
         continue;

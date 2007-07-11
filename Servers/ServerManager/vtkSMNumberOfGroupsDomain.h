@@ -50,7 +50,7 @@ public:
   // If the number of groups contained by
   // the source matches the criteria set in the domain, returns 1.
   // Returns 0 otherwise.
-  int IsInDomain(vtkSMSourceProxy* proxy);
+  int IsInDomain(vtkSMSourceProxy* proxy, int outputport=0);
 
   // Description:
   // Update self checking the "unchecked" values of all required
