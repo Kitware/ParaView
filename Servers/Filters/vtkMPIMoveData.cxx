@@ -40,7 +40,7 @@
 #include "vtkAllToNRedistributePolyData.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.14");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.15");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -385,15 +385,15 @@ void vtkMPIMoveData::DataServerAllToN(vtkDataSet* inData,
     vtkWarningMacro("Too many render servers.");
     n = m;
     }
-  if (n == m)
-    {
-    output->ShallowCopy(input);
-    }
-
   if (input == 0 || output == 0)
     {
     vtkErrorMacro("All to N only works for poly data currently.");
     return;
+    }
+
+  if (n == m)
+    {
+    output->ShallowCopy(input);
     }
 
   // Perform the M to N operation.
