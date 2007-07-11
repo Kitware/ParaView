@@ -16,9 +16,10 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkSMStateVersionController);
-vtkCxxRevisionMacro(vtkSMStateVersionController, "1.3");
+vtkCxxRevisionMacro(vtkSMStateVersionController, "1.4");
 //----------------------------------------------------------------------------
 vtkSMStateVersionController::vtkSMStateVersionController()
 {
@@ -136,6 +137,131 @@ bool ConvertDataDisplaysToRepresentations(vtkPVXMLElement* root,
           valueStr << newValue << ends;
           valueElement->SetAttribute("value", valueStr.str());
           delete[] valueStr.str();
+          }
+        }
+      }
+    }
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
+// Called for every XYPlotDisplay2. The point and cell array status
+// arrays changed order and added elements.
+bool ConvertLineSeriesArrayStatus(vtkPVXMLElement* root,
+  void* vtkNotUsed(callData))
+{
+  // If there are less than 5 child elements, there is nothing to change.
+  unsigned int max = root->GetNumberOfNestedElements();
+  for(unsigned int i = 0; i < max; i++)
+    {
+    vtkPVXMLElement *child = root->GetNestedElement(i);
+    const char *name = child ? child->GetName() : 0;
+    if(!name || strcmp(name, "Property") != 0)
+      {
+      continue;
+      }
+
+    name = child->GetAttribute("name");
+    if(name && (strcmp(name, "YCellArrayStatus") == 0 ||
+        strcmp(name, "YPointArrayStatus") == 0))
+      {
+      unsigned int total = child->GetNumberOfNestedElements();
+      if(total <= 1)
+        {
+        continue;
+        }
+
+      // Find the domain element. It should be last.
+      vtkSmartPointer<vtkPVXMLElement> domainElement =
+          child->GetNestedElement(total - 1);
+      name = domainElement ? domainElement->GetName() : 0;
+      if(!name || strcmp(name, "Domain") != 0)
+        {
+        continue;
+        }
+
+      // Remove the domain element from the list.
+      child->RemoveNestedElement(domainElement);
+
+      // Add elements for the new array entries.
+      total -= 1;
+      unsigned int newTotal = total * 2; //(total / 5) * 10;
+      vtkPVXMLElement *elem = 0;
+      for(unsigned int index = total; index < newTotal; index++)
+        {
+        elem = vtkPVXMLElement::New();
+        elem->SetName("Element");
+        elem->AddAttribute("index", index);
+        elem->AddAttribute("value", "");
+        child->AddNestedElement(elem);
+        elem->Delete();
+        }
+
+      // Add the domain element back in.
+      child->AddNestedElement(domainElement);
+      domainElement = 0;
+
+      // Move original data at old index to new index:
+      // 0 --> 4
+      // 1 --> 5
+      // 2 --> 6
+      // 3 --> 2
+      // 3 --> 3
+      // 4 --> 0
+      // 4 --> 1
+      //
+      // Fill in the rest with new data:
+      // thickness(new index 7) = 0 (int)
+      // linestyle(new index 8) = 1 (int)
+      // axesindex(new index 9) = 0 (int)
+      //
+      // Start at the end where there is space.
+      int j = total - 5;
+      int k = newTotal - 10;
+      vtkPVXMLElement *elem2 = 0;
+      for(; j >= 0 && k >= 0; j -= 5, k -= 10)
+        {
+        // Fill in the new options.
+        elem = child->GetNestedElement(k + 7);
+        elem->SetAttribute("value", "0");
+        elem = child->GetNestedElement(k + 8);
+        elem->SetAttribute("value", "1");
+        elem = child->GetNestedElement(k + 9);
+        elem->SetAttribute("value", "0");
+
+        // Move the green and blue from 1,2 to 5,6.
+        elem = child->GetNestedElement(j + 1);
+        elem2 = child->GetNestedElement(k + 5);
+        elem2->SetAttribute("value", elem->GetAttribute("value"));
+        elem = child->GetNestedElement(j + 2);
+        elem2 = child->GetNestedElement(k + 6);
+        elem2->SetAttribute("value", elem->GetAttribute("value"));
+
+        // Move the array/legend name to from 4 to 1.
+        elem = child->GetNestedElement(j + 4);
+        elem2 = child->GetNestedElement(k + 1);
+        elem2->SetAttribute("value", elem->GetAttribute("value"));
+
+        // Move the red from 0 to 4.
+        elem = child->GetNestedElement(j + 0);
+        elem2 = child->GetNestedElement(k + 4);
+        elem2->SetAttribute("value", elem->GetAttribute("value"));
+
+        // Copy the array/legend name to 0.
+        elem = child->GetNestedElement(k + 1);
+        elem2 = child->GetNestedElement(k + 0);
+        elem2->SetAttribute("value", elem->GetAttribute("value"));
+
+        // Copy the enabled flag from 3 to 2.
+        elem = child->GetNestedElement(j + 3);
+        elem2 = child->GetNestedElement(k + 2);
+        elem2->SetAttribute("value", elem->GetAttribute("value"));
+        if(j != k)
+          {
+          // Copy the enabled flag from 3 to 3 if necessary.
+          elem2 = child->GetNestedElement(k + 3);
+          elem2->SetAttribute("value", elem->GetAttribute("value"));
           }
         }
       }
@@ -268,6 +394,8 @@ bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
     const char* newAttrs[] = {
       "group", "representations",
       "type", "XYPlotRepresentation", 0};
+    this->Select( root, "Proxy", attrs,
+      &::ConvertLineSeriesArrayStatus, this);
     this->SelectAndSetAttributes(
       root, "Proxy", attrs, newAttrs);
     }

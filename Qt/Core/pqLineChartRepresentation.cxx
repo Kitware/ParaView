@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
-#define STATUS_ROW_LENGTH 9
+#define STATUS_ROW_LENGTH 10
 
 
 class pqLineChartDisplayItem
@@ -189,6 +189,7 @@ void pqLineChartRepresentation::setStatusDefaults(vtkSMProperty* prop)
     values.push_back(QVariant((double)-1.0));
     values.push_back(QVariant((int)0));
     values.push_back(QVariant((int)Qt::NoPen));
+    values.push_back(QVariant((int)0));
     }
 
   pqSMAdaptor::setMultipleElementProperty(prop, values);
@@ -632,6 +633,7 @@ void pqLineChartRepresentation::updateSeries()
         status.insert(k + 6, QVariant((double)-1.0));
         status.insert(k + 7, QVariant((int)0));
         status.insert(k + 8, QVariant((int)Qt::NoPen));
+        status.insert(k + 9, QVariant((int)0));
         }
       }
 
@@ -765,6 +767,8 @@ void pqLineChartRepresentation::saveSeriesChanges()
       {
       status.push_back(QVariant((int)Qt::NoPen));
       }
+
+    status.push_back(QVariant((int)0));
     }
 
   smProperty->SetNumberOfElements(status.size());
