@@ -85,6 +85,7 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "warning: argument .+ might be clobbered by .longjmp. or .vfork."
   "Microsoft Visual Studio/VC98/include"
   ".include.qtcore"
+  "Xdmf2/libsrc"
   )
 
 SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
