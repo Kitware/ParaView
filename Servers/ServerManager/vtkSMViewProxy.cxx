@@ -123,7 +123,7 @@ void vtkSMViewProxy::CleanMultiViewInitializer()
 }
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.17");
 
 vtkInformationKeyMacro(vtkSMViewProxy, USE_CACHE, Integer);
 vtkInformationKeyMacro(vtkSMViewProxy, CACHE_TIME, Double);
@@ -555,7 +555,7 @@ unsigned long vtkSMViewProxy::GetVisibileFullResDataSize()
       vtkPVDataInformation* info = repr->GetFullResDataInformation();
       if (info)
         {
-        this->DisplayedDataSize += info->GetMemorySize();
+        this->FullResDataSize += info->GetMemorySize();
         }
       }
     }
