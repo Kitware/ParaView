@@ -13,15 +13,18 @@
 
 =========================================================================*/
 // .NAME vtkSMComparativeViewProxy - view for comparative visualization/
-// time-strips.
+// film-strips.
 // .SECTION Description
 // vtkSMComparativeViewProxy is the view used to generate/view comparative
-// visualizations/time strips.
+// visualizations/film-strips.
 
 #ifndef __vtkSMComparativeViewProxy_h
 #define __vtkSMComparativeViewProxy_h
 
 #include "vtkSMViewProxy.h"
+
+class vtkSMPVAnimationSceneProxy;
+class vtkCollection;
 
 class VTK_EXPORT vtkSMComparativeViewProxy : public vtkSMViewProxy
 {
@@ -72,6 +75,33 @@ public:
   // Overridden to forward the call to the internal root view proxy.
   virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy*);
 
+  // Description:
+  // Set the animation scene played along X-axis.
+  void SetAnimationSceneX(vtkSMPVAnimationSceneProxy*);
+  vtkGetObjectMacro(AnimationSceneX, vtkSMPVAnimationSceneProxy);
+
+  // Description:
+  // Set the animation scene played along Y axis. To create film-strip
+  // visualizations, this must be empty.
+  void SetAnimationSceneY(vtkSMPVAnimationSceneProxy*);
+  vtkGetObjectMacro(AnimationSceneY, vtkSMPVAnimationSceneProxy);
+
+  // Description:
+  // Get all the internal views. The views should only be used to be layed out
+  // by the GUI. It's not recommended to directly change the properties of the
+  // views.
+  void GetViews(vtkCollection* collection);
+
+  // Description:
+  // Returns the root view proxy.
+  vtkSMViewProxy* GetRootView();
+
+  // Description:
+  // FIXME: Make me protected
+  // Called on every still render. This checks if the comparative visualization
+  // needs to be regenerated (following changes to proxies involved in
+  // generating the comparative visualization)/tim
+  void UpdateVisualization();
 //BTX
 protected:
   vtkSMComparativeViewProxy();
@@ -91,12 +121,17 @@ protected:
   // Removes an internal view and all the representations in that view.
   void RemoveView(vtkSMViewProxy* remove);
 
+  void UpdateComparativeVisualization();
+  void UpdateFilmStripVisualization(vtkSMPVAnimationSceneProxy* scene);
 
   // Description:
-  // Returns the root view proxy.
-  vtkSMViewProxy* GetRootView();
+  // Called when playing the scene to generate film strips.
+  void FilmStripTick();
 
   int Dimensions[2];
+
+  vtkSMPVAnimationSceneProxy* AnimationSceneX;
+  vtkSMPVAnimationSceneProxy* AnimationSceneY;
 
 private:
   vtkSMComparativeViewProxy(const vtkSMComparativeViewProxy&); // Not implemented
@@ -104,6 +139,8 @@ private:
 
   class vtkInternal;
   vtkInternal* Internal;
+
+  vtkCommand* FilmStripObserver;
 
 //ETX
 };

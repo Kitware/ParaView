@@ -14,16 +14,17 @@
 =========================================================================*/
 #include "vtkSMComparativeViewProxy.h"
 
+#include "vtkCollection.h"
+#include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMPVAnimationSceneProxy.h"
 #include "vtkSMRepresentationProxy.h"
 
 #include <vtkstd/vector>
 #include <vtkstd/map>
-
-
 
 class vtkSMComparativeViewProxy::vtkInternal
 {
@@ -52,21 +53,37 @@ public:
     this->ViewLink = vtkSmartPointer<vtkSMProxyLink>::New();
     }
 
+  unsigned int ActiveIndexX;
+  unsigned int ActiveIndexY;
 };
 
+//----------------------------------------------------------------------------
+
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.2");
+vtkCxxSetObjectMacro(vtkSMComparativeViewProxy, AnimationSceneX, vtkSMPVAnimationSceneProxy);
+vtkCxxSetObjectMacro(vtkSMComparativeViewProxy, AnimationSceneY, vtkSMPVAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
 {
   this->Internal = new vtkInternal();
   this->Dimensions[0] = 0;
   this->Dimensions[1] = 0;
+  this->AnimationSceneX = 0;
+  this->AnimationSceneY = 0;
+
+  vtkMemberFunctionCommand<vtkSMComparativeViewProxy>* fsO = 
+    vtkMemberFunctionCommand<vtkSMComparativeViewProxy>::New();
+  fsO->SetCallback(*this, &vtkSMComparativeViewProxy::FilmStripTick);
+  this->FilmStripObserver = fsO;
 }
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::~vtkSMComparativeViewProxy()
 {
+  this->SetAnimationSceneX(0);
+  this->SetAnimationSceneY(0);
+  this->FilmStripObserver->Delete();
   delete this->Internal;
 }
 
@@ -152,10 +169,17 @@ void vtkSMComparativeViewProxy::AddNewView()
       "view cannot work.");
     return;
     }
-  
+ 
+
   this->Internal->Views.push_back(newView);
   this->Internal->ViewLink->AddLinkedProxy(newView, vtkSMLink::OUTPUT);
   newView->Delete();
+
+  // Ensure that views always use cache.
+  newView->SetUseCache(true);
+  newView->SetCacheTime(0); // cache time value is merely is place holder. 
+                            // All views cache only 1 time, hence this number is
+                            // immaterial.
 
   // Create clones for all currently added representation for the new view.
   vtkInternal::MapOfReprClones::iterator reprIter;
@@ -318,6 +342,11 @@ void vtkSMComparativeViewProxy::RemoveAllRepresentations()
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::StillRender()
 {
+  // Generate the CV if required.
+  // For starters, we wont update the vis automatically, let the user call
+  // UpdateComparativeVisualization explicitly.
+  // this->UpdateComparativeVisualization();
+
   vtkInternal::VectorOfViews::iterator iter;
   for (iter = this->Internal->Views.begin(); 
        iter != this->Internal->Views.end(); ++iter)
@@ -342,6 +371,78 @@ vtkSMRepresentationProxy* vtkSMComparativeViewProxy::CreateDefaultRepresentation
   vtkSMProxy* src)
 {
   return this->GetRootView()->CreateDefaultRepresentation(src);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeViewProxy::UpdateVisualization()
+{
+  if (!this->AnimationSceneX && !this->AnimationSceneY)
+    {
+    // no comparative vis.
+    return;
+    }
+
+  // Are we in generating a film-strip or a comparative vis?
+  if (this->AnimationSceneX && this->AnimationSceneY)
+    {
+    this->UpdateComparativeVisualization();
+    }
+  else
+    {
+    this->UpdateFilmStripVisualization(
+      this->AnimationSceneX? this->AnimationSceneX : this->AnimationSceneY);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeViewProxy::UpdateFilmStripVisualization(
+  vtkSMPVAnimationSceneProxy* scene)
+{
+  scene->SetPlayMode(vtkSMPVAnimationSceneProxy::SEQUENCE);
+  scene->SetNumberOfFrames(this->Dimensions[0]*this->Dimensions[1]);
+  scene->GoToFirst();
+  scene->SetLoop(0);
+
+  this->Internal->ActiveIndexX = 0;
+  this->Internal->ActiveIndexY = 0;
+
+  // Add observer to listen to all ticks.
+  scene->AddObserver(vtkCommand::AnimationCueTickEvent, this->FilmStripObserver);
+  scene->Play();
+  scene->RemoveObserver(this->FilmStripObserver);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeViewProxy::UpdateComparativeVisualization()
+{
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeViewProxy::FilmStripTick()
+{
+  if (this->Internal->ActiveIndexX >= this->Internal->Views.size())
+    {
+    vtkErrorMacro("Internal error.");
+    return;
+    }
+
+  vtkSMViewProxy* view = this->Internal->Views[this->Internal->ActiveIndexX];
+
+  // Make the view cache the current setup. 
+  view->StillRender();
+
+  this->Internal->ActiveIndexX++;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeViewProxy::GetViews(vtkCollection* collection)
+{
+  vtkInternal::VectorOfViews::iterator iter;
+  for (iter = this->Internal->Views.begin(); 
+       iter != this->Internal->Views.end(); ++iter)
+    {
+    collection->AddItem(iter->GetPointer());
+    }
 }
 
 //----------------------------------------------------------------------------
