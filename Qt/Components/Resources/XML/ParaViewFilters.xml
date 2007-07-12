@@ -92,6 +92,7 @@
   <Filter name="ShrinkFilter" />
   <Filter name="SmoothPolyDataFilter" />
   <Filter name="StreamTracer" />
+  <Filter name="ArbitrarySourceStreamTracer" />
   <Filter name="Stripper" />
   <Filter name="StructuredGridOutlineFilter" />
   <Filter name="Subdivide" />
