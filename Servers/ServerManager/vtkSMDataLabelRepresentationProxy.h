@@ -59,7 +59,7 @@ public:
   // This method updates the piece that has been assigned to this process.
   // Leads to a call to ForceUpdate on UpdateSuppressorProxy 
   // GeometryIsValid==0;
-  virtual void Update(vtkSMViewProxy* vtkNotUsed(view));
+  virtual void Update(vtkSMViewProxy* view);
   virtual void Update() { this->Update(0); }
 
   // Description:
@@ -84,6 +84,12 @@ public:
   // thus if the changes to representation itself invalidates the data pipelines
   // it must explicitly mark the strategy invalid.
   virtual void MarkModified(vtkSMProxy* modifiedProxy);
+
+  // Description:
+  // Get Visibility of the representation
+  // Return true, if both cell and point labels are invisible; 
+  //        false, if either is visible
+  virtual bool GetVisibility();
 
   // Description:
   // Set Visibility on Cell labels actor 
@@ -119,7 +125,7 @@ protected:
 
   void SetInputInternal (vtkSMSourceProxy* input, unsigned int outputPort);
 
-  vtkSMProxy* CollectProxy;
+  vtkSMSourceProxy* CollectProxy;
   vtkSMProxy* UpdateSuppressorProxy;
   vtkSMProxy* MapperProxy;
   vtkSMProxy* ActorProxy;

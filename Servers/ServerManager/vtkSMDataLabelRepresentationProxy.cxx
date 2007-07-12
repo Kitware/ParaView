@@ -31,6 +31,8 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkSMIntVectorProperty.h"
 
+//#include "vtkSMSimpleParallelStrategy.h"
+
 vtkStandardNewMacro(vtkSMDataLabelRepresentationProxy);
 vtkCxxRevisionMacro(vtkSMDataLabelRepresentationProxy, "Revision: 1.1$");
 
@@ -90,17 +92,20 @@ void vtkSMDataLabelRepresentationProxy::SetInputInternal(
 
   this->InvalidateGeometryInternal(0);
   this->CreateVTKObjects();
-  
-  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
-    this->CollectProxy->GetProperty("Input"));
-  if (!ip)
-    {
-    vtkErrorMacro("Failed to find property Input on UpdateSuppressorProxy.");
-    return;
-    }
-  ip->RemoveAllProxies();
-  ip->AddInputConnection(input, outputPort);
-  this->CollectProxy->UpdateProperty("Input");
+
+  this->Connect(input, this->CollectProxy, "Input", outputPort);
+  this->SetupPipeline();  
+
+  //vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
+  //  this->CollectProxy->GetProperty("Input"));
+  //if (!ip)
+  //  {
+  //  vtkErrorMacro("Failed to find property Input on UpdateSuppressorProxy.");
+  //  return;
+  //  }
+  //ip->RemoveAllProxies();
+  //ip->AddInputConnection(input, outputPort);
+  //this->CollectProxy->UpdateProperty("Input");
 }
 
 //----------------------------------------------------------------------------
@@ -150,7 +155,8 @@ bool vtkSMDataLabelRepresentationProxy::BeginCreateVTKObjects()
     return false;
     }
  
-  this->CollectProxy = this->GetSubProxy("Collect");
+  this->CollectProxy = vtkSMSourceProxy::SafeDownCast(
+    this->GetSubProxy("Collect"));
   this->UpdateSuppressorProxy = this->GetSubProxy("UpdateSuppressor");
   this->MapperProxy = this->GetSubProxy("Mapper");
   this->ActorProxy = this->GetSubProxy("Prop2D");
@@ -186,8 +192,7 @@ bool vtkSMDataLabelRepresentationProxy::BeginCreateVTKObjects()
   this->TextPropertyProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
-  this->CellCenterFilter->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->CellCenterFilter->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
   this->CellMapperProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->CellActorProxy->SetServers(
@@ -201,7 +206,7 @@ bool vtkSMDataLabelRepresentationProxy::BeginCreateVTKObjects()
 //----------------------------------------------------------------------------
 bool vtkSMDataLabelRepresentationProxy::EndCreateVTKObjects()
 {
-  this->SetupPipeline();
+  //this->SetupPipeline();
   this->SetupDefaults();
 
   return this->Superclass::EndCreateVTKObjects();
@@ -223,15 +228,31 @@ void vtkSMDataLabelRepresentationProxy::SetupPipeline()
     }
   
   stream << vtkClientServerStream::Invoke
-         << this->CollectProxy->GetID() << "GetOutputPort"
+         << this->CollectProxy->GetID() << "GetOutputPort" << 0
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
-         << this->UpdateSuppressorProxy->GetID() << "SetInputConnection"
+         << this->UpdateSuppressorProxy->GetID() << "SetInputConnection" << 0
          << vtkClientServerStream::LastResult
          << vtkClientServerStream::End;
   vtkProcessModule::GetProcessModule()->SendStream(
     this->ConnectionID,
-    this->UpdateSuppressorProxy->GetServers(), stream);
+    vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
+
+  // Now send to the render server.
+  // This order of sending first to CLIENT|DATA_SERVER and then to render server
+  // ensures that the connections are set up correctly even when data server and
+  // render server are the same.
+  stream  << vtkClientServerStream::Invoke
+    << this->CollectProxy->GetID() 
+    << "GetOutputPort" << 0
+    << vtkClientServerStream::End;
+  stream  << vtkClientServerStream::Invoke
+    << this->UpdateSuppressorProxy->GetID()
+    << "SetInputConnection" << 0 
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
 
   ip = vtkSMInputProperty::SafeDownCast(
     this->MapperProxy->GetProperty("Input"));
@@ -301,56 +322,66 @@ void vtkSMDataLabelRepresentationProxy::SetupDefaults()
   vtkClientServerStream stream;
   vtkSMIntVectorProperty* ivp;
 
-  // A rather complex mess to set the correct server variable 
-  // on all of the remote duplication filters.
-  if(pm->GetClientMode())
-    {
-    // We need this because the socket controller has no way of distinguishing
-    // between processes.
-    stream << vtkClientServerStream::Invoke
-           << this->CollectProxy->GetID() << "SetServerToClient"
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, 
-                   vtkProcessModule::CLIENT, stream);
-    }
-  // pm->ClientMode is only set when there is a server.
-  if(pm->GetClientMode())
-    {
-    stream << vtkClientServerStream::Invoke
-           << this->CollectProxy->GetID() << "SetServerToDataServer"
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-                   vtkProcessModule::DATA_SERVER, stream);
-    }
-  // if running in render server mode
-  if(pm->GetRenderClientMode(this->GetConnectionID()))
-    {
-    stream << vtkClientServerStream::Invoke
-           << this->CollectProxy->GetID() << "SetServerToRenderServer"
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-                   vtkProcessModule::RENDER_SERVER, stream);
-    }  
+  ////// ----------------- Copied from parallel strategy END -------------------
 
-  // Handle collection setup with client server.
-  stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID() << "GetSocketController"
-         << pm->GetConnectionClientServerID(this->ConnectionID)
-         << vtkClientServerStream::End
-         << vtkClientServerStream::Invoke
-         << this->CollectProxy->GetID() 
-         << "SetClientDataServerSocketController"
-         << vtkClientServerStream::LastResult
-         << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID,
-             vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
+  // Now we need to set up some default parameters on these filters.
 
-  stream << vtkClientServerStream::Invoke
-         << this->CollectProxy->GetID() << "SetMPIMToNSocketConnection" 
-         << pm->GetMPIMToNSocketConnectionID(this->ConnectionID)
-         << vtkClientServerStream::End;
+  // Collect filter needs the socket controller use to communicate between
+  // data-server root and the client.
+  stream  << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() 
+    << "GetSocketController"
+    << pm->GetConnectionClientServerID(this->ConnectionID)
+    << vtkClientServerStream::End;
+  stream  << vtkClientServerStream::Invoke
+    << this->CollectProxy->GetID()
+    << "SetSocketController"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, 
+    vtkProcessModule::CLIENT_AND_SERVERS, stream);
+
+  // Collect filter needs the MPIMToNSocketConnection to communicate between
+  // render server and data server nodes.
+  stream  << vtkClientServerStream::Invoke
+    << this->CollectProxy->GetID()
+    << "SetMPIMToNSocketConnection"
+    << pm->GetMPIMToNSocketConnectionID(this->ConnectionID)
+    << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID,
-       vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER, stream);
+    vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER, stream);
+
+  // Set the server flag on the collect filter to correctly identify each
+  // processes.
+  stream  << vtkClientServerStream::Invoke
+    << this->CollectProxy->GetID()
+    << "SetServerToRenderServer"
+    << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
+  stream  << vtkClientServerStream::Invoke
+    << this->CollectProxy->GetID()
+    << "SetServerToDataServer"
+    << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, vtkProcessModule::DATA_SERVER, stream);
+  stream  << vtkClientServerStream::Invoke
+    << this->CollectProxy->GetID()
+    << "SetServerToClient"
+    << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
+
+  // Set the MultiProcessController on the distributor.
+  //stream  << vtkClientServerStream::Invoke
+  //  << pm->GetProcessModuleID() 
+  //  << "GetController"
+  //  << vtkClientServerStream::End;
+  //stream  << vtkClientServerStream::Invoke
+  //  << this->CollectProxy->GetID()
+  //  << "SetController"
+  //  << vtkClientServerStream::LastResult
+  //  << vtkClientServerStream::End;
+  //pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
+
+  ////// ----------------- Copied from parallel strategy END -------------------
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->CollectProxy->GetProperty("MoveMode"));
@@ -362,7 +393,7 @@ void vtkSMDataLabelRepresentationProxy::SetupDefaults()
   ivp->SetElement(0, 2); // Clone mode.
   this->CollectProxy->UpdateVTKObjects();
 
-  // Tell the update suppressor to produce the correct partition.
+ //  Tell the update suppressor to produce the correct partition.
   stream << vtkClientServerStream::Invoke
          << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
          << vtkClientServerStream::End
@@ -379,6 +410,13 @@ void vtkSMDataLabelRepresentationProxy::SetupDefaults()
          << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID,
                  this->UpdateSuppressorProxy->GetServers(), stream);
+
+  //stream << vtkClientServerStream::Invoke
+  //  << this->CollectProxy->GetID() << "SetProcessModuleConnection"
+  //  << pm->GetConnectionClientServerID(this->GetConnectionID())
+  //  << vtkClientServerStream::End;
+  //pm->SendStream(this->ConnectionID, 
+  //  this->CollectProxy->GetServers(), stream);
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->TextPropertyProxy->GetProperty("FontSize"));
@@ -417,7 +455,7 @@ void vtkSMDataLabelRepresentationProxy::SetupDefaults()
 
 //-----------------------------------------------------------------------------
 void vtkSMDataLabelRepresentationProxy::Update(
-  vtkSMViewProxy* vtkNotUsed(view))
+  vtkSMViewProxy* view)
 {
   if (!this->ObjectsCreated)
     {
@@ -450,20 +488,27 @@ void vtkSMDataLabelRepresentationProxy::Update(
     return;
     }
 
-    vtkSMIntVectorProperty* ivp;
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->ActorProxy->GetProperty("Visibility"));
-    if (!ivp)
-      {
-      vtkErrorMacro("Failed to find property Visibility on ActorProxy.");
-      return;
-      }
-
-  vtkSMProperty* p = this->UpdateSuppressorProxy->GetProperty("ForceUpdate");
-  p->Modified();
-  this->UpdateSuppressorProxy->UpdateVTKObjects(); 
   this->GeometryIsValid = 1;
+  this->UpdateSuppressorProxy->InvokeCommand("ForceUpdate");
+  this->Superclass::Update(view);
 //  this->InvokeEvent(vtkSMViewProxy::ForceUpdateEvent);
+
+  //vtkProcessModule* pm  = vtkProcessModule::GetProcessModule();
+  //vtkAlgorithm* dp = vtkAlgorithm::SafeDownCast(
+  //  pm->GetObjectFromID(this->CollectProxy->GetID()));
+
+  //vtkTable* data = vtkTable::SafeDownCast(dp->GetOutputDataObject(0));
+  //vtkstd::string text = "";
+  //if (data->GetNumberOfRows() > 0 && data->GetNumberOfColumns() > 0)
+  //{
+  //  text = data->GetValue(0, 0).ToString();
+  //}
+
+  //// Now get the text from the Input and set it on the text widget display.
+  //vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+  //  this->TextWidgetProxy->GetProperty("Text"));
+  //svp->SetElement(0, text.c_str());
+  //this->TextWidgetProxy->UpdateProperty("Text");
 }
 
 //-----------------------------------------------------------------------------
@@ -561,6 +606,33 @@ int vtkSMDataLabelRepresentationProxy::GetFontSizeCM()
     return ivp->GetElement(0);
     }
   return 0;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMDataLabelRepresentationProxy::GetVisibility()
+{
+  vtkSMProxy* prop2D = this->GetSubProxy("Prop2D");
+  if (prop2D)
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      prop2D->GetProperty("Visibility"));
+    if(ivp->GetElement(0))
+      {
+      return true;
+      }
+    }
+
+  prop2D = this->GetSubProxy("CellProp2D");
+  if (prop2D)
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      prop2D->GetProperty("Visibility"));
+    if(ivp->GetElement(0))
+      {
+      return true;
+      }
+    }
+  return false;
 }
 
 //-----------------------------------------------------------------------------
