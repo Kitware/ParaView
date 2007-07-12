@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkProcessModule.h>
 #include <vtkProcessModuleConnectionManager.h>
 #include <vtkMath.h>
+#include <vtkTimerLog.h>
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -439,6 +440,11 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
             widget->setSingleStep(widget_step.toInt());
             if(widget_default == "random")
               {
+              vtkTimerLog* timerLog = vtkTimerLog::New();
+              unsigned long rseed = 
+                static_cast<unsigned long>(timerLog->GetUniversalTime()*1000);
+              vtkMath::RandomSeed(rseed);
+              timerLog->Delete();
               widget->setValue(static_cast<int>(
                 vtkMath::Random(widget_min.toInt(), widget_max.toInt())));
               }
