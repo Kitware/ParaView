@@ -80,7 +80,7 @@ pqView* pqDisplayPolicy::getPreferredView(
     {
     // The proxy gives us no hint. In that case we try to determine the
     // preferred view by looking at the output from the source.
-    vtkPVDataInformation* datainfo = opPort->getDataInformation(false);
+    vtkPVDataInformation* datainfo = opPort->getDataInformation(true);
     if (datainfo && (
         datainfo->GetDataClassName() == QString("vtkRectilinearGrid")  ||
         source->getProxy()->GetXMLName() == QString("ProbeLine")))
