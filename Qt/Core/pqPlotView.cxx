@@ -31,15 +31,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqPlotView.h"
 
-#include "vtkPVDataInformation.h"
 #include "vtkDataSet.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkImageData.h"
+#include "vtkPVDataInformation.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMViewProxy.h"
 #include "vtkSMClientDeliveryRepresentationProxy.h"
-#include "vtkSMProxy.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMViewProxy.h"
 #include "vtkTimeStamp.h"
 
 #include <QFileInfo>
@@ -846,9 +846,12 @@ void pqPlotView::redo()
 bool pqPlotView::canDisplay(pqOutputPort* opPort) const
 {
   pqPipelineSource* source = opPort? opPort->getSource() :0;
+  vtkSMSourceProxy* sourceProxy = source? 
+    vtkSMSourceProxy::SafeDownCast(source->getProxy()) : 0;
   if(!opPort|| !source ||
      opPort->getServer()->GetConnectionID() !=
-     this->getServer()->GetConnectionID())
+     this->getServer()->GetConnectionID() || !sourceProxy ||
+     sourceProxy->GetNumberOfParts()==0)
     {
     return false;
     }
