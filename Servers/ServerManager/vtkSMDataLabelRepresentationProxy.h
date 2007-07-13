@@ -75,8 +75,10 @@ public:
   
   // Description:
   // Accessors to the font size in the sub proxy.
-  void SetFontSizeCM(int size);
-  int GetFontSizeCM();
+  void SetPointFontSizeCM(int size);
+  int GetPointFontSizeCM();
+  void SetCellFontSizeCM(int size);
+  int GetCellFontSizeCM();
 
   // Description:
   // Overridden to make the Strategy modified as well.

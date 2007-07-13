@@ -31,8 +31,6 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkSMIntVectorProperty.h"
 
-//#include "vtkSMSimpleParallelStrategy.h"
-
 vtkStandardNewMacro(vtkSMDataLabelRepresentationProxy);
 vtkCxxRevisionMacro(vtkSMDataLabelRepresentationProxy, "Revision: 1.1$");
 
@@ -94,18 +92,6 @@ void vtkSMDataLabelRepresentationProxy::SetInputInternal(
   this->CreateVTKObjects();
 
   this->Connect(input, this->CollectProxy, "Input", outputPort);
-  this->SetupPipeline();  
-
-  //vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
-  //  this->CollectProxy->GetProperty("Input"));
-  //if (!ip)
-  //  {
-  //  vtkErrorMacro("Failed to find property Input on UpdateSuppressorProxy.");
-  //  return;
-  //  }
-  //ip->RemoveAllProxies();
-  //ip->AddInputConnection(input, outputPort);
-  //this->CollectProxy->UpdateProperty("Input");
 }
 
 //----------------------------------------------------------------------------
@@ -123,8 +109,10 @@ bool vtkSMDataLabelRepresentationProxy::AddToView(vtkSMViewProxy* view)
     return false;
     }
 
+  // TODO: Eventually we may want to put the label actors in Render3D
   //renderView->AddPropToRenderer(this->ActorProxy);
   //renderView->AddPropToRenderer(this->CellActorProxy);
+
   renderView->AddPropToRenderer2D(this->ActorProxy);
   renderView->AddPropToRenderer2D(this->CellActorProxy);
   return true;
@@ -206,7 +194,7 @@ bool vtkSMDataLabelRepresentationProxy::BeginCreateVTKObjects()
 //----------------------------------------------------------------------------
 bool vtkSMDataLabelRepresentationProxy::EndCreateVTKObjects()
 {
-  //this->SetupPipeline();
+  this->SetupPipeline();
   this->SetupDefaults();
 
   return this->Superclass::EndCreateVTKObjects();
@@ -322,10 +310,6 @@ void vtkSMDataLabelRepresentationProxy::SetupDefaults()
   vtkClientServerStream stream;
   vtkSMIntVectorProperty* ivp;
 
-  ////// ----------------- Copied from parallel strategy END -------------------
-
-  // Now we need to set up some default parameters on these filters.
-
   // Collect filter needs the socket controller use to communicate between
   // data-server root and the client.
   stream  << vtkClientServerStream::Invoke
@@ -369,20 +353,6 @@ void vtkSMDataLabelRepresentationProxy::SetupDefaults()
     << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
 
-  // Set the MultiProcessController on the distributor.
-  //stream  << vtkClientServerStream::Invoke
-  //  << pm->GetProcessModuleID() 
-  //  << "GetController"
-  //  << vtkClientServerStream::End;
-  //stream  << vtkClientServerStream::Invoke
-  //  << this->CollectProxy->GetID()
-  //  << "SetController"
-  //  << vtkClientServerStream::LastResult
-  //  << vtkClientServerStream::End;
-  //pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
-
-  ////// ----------------- Copied from parallel strategy END -------------------
-
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->CollectProxy->GetProperty("MoveMode"));
   if (!ivp)
@@ -410,13 +380,6 @@ void vtkSMDataLabelRepresentationProxy::SetupDefaults()
          << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID,
                  this->UpdateSuppressorProxy->GetServers(), stream);
-
-  //stream << vtkClientServerStream::Invoke
-  //  << this->CollectProxy->GetID() << "SetProcessModuleConnection"
-  //  << pm->GetConnectionClientServerID(this->GetConnectionID())
-  //  << vtkClientServerStream::End;
-  //pm->SendStream(this->ConnectionID, 
-  //  this->CollectProxy->GetServers(), stream);
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->TextPropertyProxy->GetProperty("FontSize"));
@@ -492,23 +455,6 @@ void vtkSMDataLabelRepresentationProxy::Update(
   this->UpdateSuppressorProxy->InvokeCommand("ForceUpdate");
   this->Superclass::Update(view);
 //  this->InvokeEvent(vtkSMViewProxy::ForceUpdateEvent);
-
-  //vtkProcessModule* pm  = vtkProcessModule::GetProcessModule();
-  //vtkAlgorithm* dp = vtkAlgorithm::SafeDownCast(
-  //  pm->GetObjectFromID(this->CollectProxy->GetID()));
-
-  //vtkTable* data = vtkTable::SafeDownCast(dp->GetOutputDataObject(0));
-  //vtkstd::string text = "";
-  //if (data->GetNumberOfRows() > 0 && data->GetNumberOfColumns() > 0)
-  //{
-  //  text = data->GetValue(0, 0).ToString();
-  //}
-
-  //// Now get the text from the Input and set it on the text widget display.
-  //vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
-  //  this->TextWidgetProxy->GetProperty("Text"));
-  //svp->SetElement(0, text.c_str());
-  //this->TextWidgetProxy->UpdateProperty("Text");
 }
 
 //-----------------------------------------------------------------------------
@@ -572,14 +518,14 @@ vtkUnstructuredGrid* vtkSMDataLabelRepresentationProxy::GetCollectedData()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMDataLabelRepresentationProxy::SetFontSizeCM(int size) 
+void vtkSMDataLabelRepresentationProxy::SetPointFontSizeCM(int size) 
 {
   if (this->TextPropertyProxy)
     {
     
     vtkSMIntVectorProperty* ivp;
     ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->TextPropertyProxy->GetProperty("PointFontSize"));
+      this->TextPropertyProxy->GetProperty("FontSize"));
     if (!ivp)
       {
       vtkErrorMacro("Failed to find property FontSize on TextPropertyProxy.");
@@ -591,13 +537,13 @@ void vtkSMDataLabelRepresentationProxy::SetFontSizeCM(int size)
 }
 
 //----------------------------------------------------------------------------
-int vtkSMDataLabelRepresentationProxy::GetFontSizeCM() 
+int vtkSMDataLabelRepresentationProxy::GetPointFontSizeCM() 
 {
   if (this->TextPropertyProxy)
     {    
     vtkSMIntVectorProperty* ivp;
     ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->TextPropertyProxy->GetProperty("PointFontSize"));
+      this->TextPropertyProxy->GetProperty("FontSize"));
     if (!ivp)
       {
       vtkErrorMacro("Failed to find property FontSize on TextPropertyProxy.");
@@ -605,6 +551,43 @@ int vtkSMDataLabelRepresentationProxy::GetFontSizeCM()
       }
     return ivp->GetElement(0);
     }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMDataLabelRepresentationProxy::SetCellFontSizeCM(int size) 
+{
+  if (this->CellTextPropertyProxy)
+  {
+
+    vtkSMIntVectorProperty* ivp;
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->CellTextPropertyProxy->GetProperty("FontSize"));
+    if (!ivp)
+    {
+      vtkErrorMacro("Failed to find property FontSize on TextPropertyProxy.");
+      return;
+    }
+    ivp->SetElement(0, size);
+    this->CellTextPropertyProxy->UpdateVTKObjects();
+  }
+}
+
+//----------------------------------------------------------------------------
+int vtkSMDataLabelRepresentationProxy::GetCellFontSizeCM() 
+{
+  if (this->CellTextPropertyProxy)
+  {    
+    vtkSMIntVectorProperty* ivp;
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->CellTextPropertyProxy->GetProperty("FontSize"));
+    if (!ivp)
+    {
+      vtkErrorMacro("Failed to find property FontSize on TextPropertyProxy.");
+      return 0;
+    }
+    return ivp->GetElement(0);
+  }
   return 0;
 }
 
