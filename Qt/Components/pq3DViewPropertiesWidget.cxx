@@ -163,6 +163,11 @@ public:
       proxy->GetProperty("SquirtLevel"));
     }
 
+  bool supportsTileDisplays(vtkSMProxy* proxy)
+    {
+    return proxy && proxy->GetProperty("StillRenderImageReductionFactor");
+    }
+
   void loadValues(pqRenderView* proxy);
   void accept();
   void setGUICameraManipulators(QList<vtkSMProxy*> manipulators);
@@ -323,13 +328,19 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqRenderView* viewModule)
     }
 
 
-  if (proxy->IsA("vtkSMIceTRenderModuleProxy"))
+  if (this->supportsTileDisplays(proxy))
     {
+    // Hide Remote render threshold, since is makes no sense of tile displays.
+    this->compositeThreshold->setVisible(false);
+    this->compositeThresholdLabel->setVisible(false);
+    this->compositeThresholdTitleLabel->setVisible(false);
+    this->enableCompositing->setVisible(false);
+
     // Only for tiledisplay render modules.
     this->noServerSettingsLabel->setVisible(false);
     this->tileDisplayParameters->setVisible(true);
     int ival = pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("StillReductionFactor")).toInt();
+      proxy->GetProperty("StillRenderImageReductionFactor")).toInt();
     if (ival == 1)
       {
       this->enableStillRenderSubsampleRate->setCheckState(Qt::Unchecked);
@@ -360,6 +371,10 @@ void pq3DViewPropertiesWidgetInternal::loadValues(pqRenderView* viewModule)
     }
   else
     {
+    this->compositeThreshold->setVisible(true);
+    this->compositeThresholdLabel->setVisible(true);
+    this->compositeThresholdTitleLabel->setVisible(true);
+    this->enableCompositing->setVisible(true);
     this->tileDisplayParameters->setVisible(false);
     }
 
@@ -468,16 +483,19 @@ void pq3DViewPropertiesWidgetInternal::accept()
 
   if (this->supportsCompositing(renModule))
     {
-    if (this->enableCompositing->checkState() == Qt::Checked)
+    if (!this->supportsTileDisplays(renModule))
       {
-      pqSMAdaptor::setElementProperty(
-        renModule->GetProperty("RemoteRenderThreshold"),
-        this->compositeThreshold->value() / 10.0);
-      }
-    else
-      {
-      pqSMAdaptor::setElementProperty(
-        renModule->GetProperty("RemoteRenderThreshold"), VTK_DOUBLE_MAX);
+      if (this->enableCompositing->checkState() == Qt::Checked)
+        {
+        pqSMAdaptor::setElementProperty(
+          renModule->GetProperty("RemoteRenderThreshold"),
+          this->compositeThreshold->value() / 10.0);
+        }
+      else
+        {
+        pqSMAdaptor::setElementProperty(
+          renModule->GetProperty("RemoteRenderThreshold"), VTK_DOUBLE_MAX);
+        }
       }
 
     if (renModule->GetProperty("DisableOrderedCompositing"))
@@ -515,18 +533,18 @@ void pq3DViewPropertiesWidgetInternal::accept()
       }
     }
 
-  if (renModule->IsA("vtkSMIceTRenderModuleProxy"))
+  if (this->supportsTileDisplays(renModule))
     {
     if (this->enableStillRenderSubsampleRate->checkState() == Qt::Checked)
       {
       pqSMAdaptor::setElementProperty(
-        renModule->GetProperty("StillReductionFactor"),
+        renModule->GetProperty("StillRenderImageReductionFactor"),
         this->stillRenderSubsampleRate->value());
       }
     else
       {
       pqSMAdaptor::setElementProperty(
-        renModule->GetProperty("StillReductionFactor"), VTK_DOUBLE_MAX);
+        renModule->GetProperty("StillRenderImageReductionFactor"), 1);
       }
 
     if (this->enableClientCollect->checkState() == Qt::Checked)

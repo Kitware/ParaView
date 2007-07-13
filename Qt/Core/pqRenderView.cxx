@@ -730,17 +730,17 @@ static const char* pqRenderViewModuleLightSettings [] = {
 static const char* pqRenderViewModuleMiscSettings [] = {
   "CacheLimit",
   "CameraParallelProjection",
-  "UseTriangleStrips",
-  "UseImmediateMode",
-  "LODThreshold",
-  "LODResolution",
-  "RenderInterruptsEnabled",
-  "RemoteRenderThreshold",
-  "ImageReductionFactor",
-  "SquirtLevel",
-  "OrderedCompositing",
   "CollectGeometryThreshold",
-  "StillReductionFactor",
+  "ImageReductionFactor",
+  "LODResolution",
+  "LODThreshold",
+  "OrderedCompositing",
+  "RemoteRenderThreshold",
+  "RenderInterruptsEnabled",
+  "SquirtLevel",
+  "StillRenderImageReductionFactor",
+  "UseImmediateMode",
+  "UseTriangleStrips",
   NULL
   };
 

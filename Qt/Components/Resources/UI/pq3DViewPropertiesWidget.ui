@@ -1381,7 +1381,7 @@
            </widget>
           </item>
           <item row="0" column="0" >
-           <widget class="QLabel" name="label_7" >
+           <widget class="QLabel" name="compositeThresholdTitleLabel" >
             <property name="text" >
              <string>Remote Render Threshold</string>
             </property>
@@ -1520,6 +1520,9 @@
             <property name="maximum" >
              <number>20</number>
             </property>
+            <property name="pageStep" >
+             <number>1</number>
+            </property>
             <property name="orientation" >
              <enum>Qt::Horizontal</enum>
             </property>
@@ -1600,6 +1603,9 @@
             </property>
             <property name="maximum" >
              <number>20</number>
+            </property>
+            <property name="pageStep" >
+             <number>1</number>
             </property>
             <property name="orientation" >
              <enum>Qt::Horizontal</enum>

@@ -3002,6 +3002,32 @@
       IceT Render View for tile displays.
       </Documentation>
 
+      <DoubleVectorProperty
+        name="CollectGeometryThreshold"
+        command="SetCollectGeometryThreshold"
+        update_self="1"
+        number_of_elements="1"
+        default_values="100.0">
+        <Documentation>
+          Select the threshold under which any geometry is collected on the client.
+          When the data size exceeds the threshold, the client shows outlines instead
+          of actual data. Size is in kilobytes.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0"/>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="StillRenderImageReductionFactor"
+        command="SetStillRenderImageReductionFactor"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <Documentation>
+          Set the reduction factor to use when still rendering.
+        </Documentation>
+        <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+
       <!-- End of IceTMultiDisplayRenderView -->
     </IceTMultiDisplayRenderViewProxy>
 
@@ -4949,5 +4975,6 @@
 
 
 </ServerManagerConfiguration>
+
 
 
