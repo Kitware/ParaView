@@ -84,7 +84,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.25");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.26");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -865,7 +865,7 @@ void vtkSMRenderViewProxy::ComputeVisiblePropBounds(double bds[6])
 
 
 //-----------------------------------------------------------------------------
-// We deliberately use streams for this addtion of actor proxies.
+// We deliberately use streams for this addition of actor proxies.
 // Using property (and clean_command) causes problems with
 // 3D widgets (since they get cleaned out when a source is added!).
 void vtkSMRenderViewProxy::AddPropToRenderer(vtkSMProxy* proxy)
@@ -926,22 +926,67 @@ void vtkSMRenderViewProxy::RemovePropFromRenderer2D(vtkSMProxy* proxy)
 //-----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::SynchronizeRenderers()
 {
-  // Synchronize the camera properties between the 3D and 2D renders.
-  if (this->Renderer && this->Renderer2D)
-    {
-    this->Renderer2D->GetActiveCamera()->SetClippingRange(
-      this->Renderer->GetActiveCamera()->GetClippingRange());
-    this->Renderer2D->GetActiveCamera()->SetPosition(
-      this->Renderer->GetActiveCamera()->GetPosition());
-    this->Renderer2D->GetActiveCamera()->SetFocalPoint(
-      this->Renderer->GetActiveCamera()->GetFocalPoint());
-    this->Renderer2D->GetActiveCamera()->SetViewUp(
-      this->Renderer->GetActiveCamera()->GetViewUp());
+  // Synchronize the camera properties between the 
+  // 3D and 2D renders on client and servers.
 
-    this->Renderer2D->GetActiveCamera()->SetParallelProjection(
-      this->Renderer->GetActiveCamera()->GetParallelProjection());
-    this->Renderer2D->GetActiveCamera()->SetParallelScale(
-      this->Renderer->GetActiveCamera()->GetParallelScale());
+  if (this->Renderer && this->RendererProxy && 
+    this->Renderer2D && this->Renderer2DProxy)
+    {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkClientServerStream stream;
+    vtkCamera* pCamera = this->Renderer->GetActiveCamera();
+    
+    double dArray[3];
+    vtkClientServerID renderID = this->Renderer2DProxy->GetID();  
+    stream << vtkClientServerStream::Invoke << renderID
+      << "GetActiveCamera" <<  vtkClientServerStream::End;
+    vtkClientServerID cameraID = pm->GetUniqueID();
+    stream << vtkClientServerStream::Assign << cameraID
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+
+    pCamera->GetClippingRange(dArray[0], dArray[1]);
+    stream << vtkClientServerStream::Invoke
+      << cameraID
+      << "SetClippingRange"
+      << dArray[0] << dArray[1] 
+      << vtkClientServerStream::End;
+
+    pCamera->GetPosition(dArray);
+    stream << vtkClientServerStream::Invoke
+      << cameraID
+      << "SetPosition"
+      << dArray[0] << dArray[1] << dArray[2]
+      << vtkClientServerStream::End;
+
+    pCamera->GetFocalPoint(dArray);
+    stream << vtkClientServerStream::Invoke
+      << cameraID
+      << "SetFocalPoint"
+      << dArray[0] << dArray[1] << dArray[2]
+      << vtkClientServerStream::End;
+
+   pCamera->GetViewUp(dArray);
+    stream << vtkClientServerStream::Invoke
+      << cameraID
+      << "SetViewUp"
+      << dArray[0] << dArray[1] << dArray[2]
+      << vtkClientServerStream::End;
+
+    stream << vtkClientServerStream::Invoke
+      << cameraID
+      << "SetParallelProjection"
+      << pCamera->GetParallelProjection()
+      << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+      << cameraID
+      << "SetParallelScale"
+      << pCamera->GetParallelScale()
+      << vtkClientServerStream::End;
+
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->RendererProxy->GetConnectionID(),
+      this->RendererProxy->GetServers(), stream);
     }
 }
 
