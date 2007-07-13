@@ -46,7 +46,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLinksModel.h"
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
-#include "QVTKWidget.h"
 
 //-----------------------------------------------------------------------------
 pqLinkViewWidget::pqLinkViewWidget(pqRenderView* firstLink)

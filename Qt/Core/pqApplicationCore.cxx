@@ -31,7 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqApplicationCore.h"
 
-#include "QVTKWidget.h"
 // ParaView Server Manager includes.
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"

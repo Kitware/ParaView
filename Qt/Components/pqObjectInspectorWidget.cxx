@@ -42,9 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStyleFactory>
 #include <QStyleOption>
 
-// vtk includes
-#include "QVTKWidget.h"
-
 // ParaView Server Manager includes
 #include <vtkSMProxy.h>
 

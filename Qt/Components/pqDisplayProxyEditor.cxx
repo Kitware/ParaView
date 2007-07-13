@@ -42,9 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QTimer>
 
-// VTK includes
-#include "QVTKWidget.h"
-
 // ParaView Server Manager includes
 #include "vtkMaterialLibrary.h"
 #include "vtkPVArrayInformation.h"

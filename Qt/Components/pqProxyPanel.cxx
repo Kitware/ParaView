@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStyleOption>
 
 // VTK includes
-#include "QVTKWidget.h"
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 

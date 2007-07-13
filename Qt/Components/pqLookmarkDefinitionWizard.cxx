@@ -64,7 +64,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QScrollBar>
 #include <QtDebug>
 
-#include "QVTKWidget.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkImageData.h"
