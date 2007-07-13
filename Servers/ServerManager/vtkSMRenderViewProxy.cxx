@@ -84,7 +84,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.26");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.27");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -407,6 +407,8 @@ void vtkSMRenderViewProxy::EndCreateVTKObjects()
       }
     di->Delete();
     }
+
+  this->Interactor->Enable();
 }
 
 //-----------------------------------------------------------------------------
