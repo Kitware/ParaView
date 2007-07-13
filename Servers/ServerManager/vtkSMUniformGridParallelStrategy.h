@@ -25,12 +25,6 @@
 // the outline of the original data to the client.
 // vtkSMUniformGridVolumeRepresentationProxy works with this to always use
 // LODOutput from the strategy when rendering on client.
-//
-// This strategy does not support any LOD pipeline.
-// For image data, LOD is managed by the mapper itself.
-// Another thing to note about this strategy is that it cannot deliver data to
-// client for rendering. Hence it does not worry about the UseCompositing flag
-// set by the view.
 
 #ifndef __vtkSMUniformGridParallelStrategy_h
 #define __vtkSMUniformGridParallelStrategy_h
