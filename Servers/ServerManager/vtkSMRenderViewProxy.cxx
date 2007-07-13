@@ -84,7 +84,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.27");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.28");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -352,6 +352,7 @@ void vtkSMRenderViewProxy::EndCreateVTKObjects()
   this->Connect(this->RenderWindowProxy, this->InteractorProxy, "RenderWindow");
   this->Connect(this->RendererProxy, this->InteractorProxy, "Renderer");
   this->Connect(this->LightProxy, this->RendererProxy, "Lights");
+  this->Connect(this->LightProxy, this->Renderer2DProxy, "Lights");
   this->Connect(this->InteractorStyleProxy, this->InteractorProxy, "InteractorStyle");
 
   // Set the active camera for the renderers.  We can't use the Proxy
@@ -945,13 +946,6 @@ void vtkSMRenderViewProxy::SynchronizeRenderers()
     vtkClientServerID cameraID = pm->GetUniqueID();
     stream << vtkClientServerStream::Assign << cameraID
       << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-
-    pCamera->GetClippingRange(dArray[0], dArray[1]);
-    stream << vtkClientServerStream::Invoke
-      << cameraID
-      << "SetClippingRange"
-      << dArray[0] << dArray[1] 
       << vtkClientServerStream::End;
 
     pCamera->GetPosition(dArray);

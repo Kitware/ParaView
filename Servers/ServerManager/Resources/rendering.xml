@@ -2763,6 +2763,7 @@
         </Proxy>
         <ExposedProperties>
           <Property name="Background" />
+          <Property name="DepthPeeling" />
         </ExposedProperties>
       </SubProxy>
 
@@ -4280,6 +4281,21 @@
       </SubProxy>
 
       <!-- End of ClientDeliveryRepresentationBase -->
+    </ClientDeliveryRepresentationProxy>
+
+    <ClientDeliveryRepresentationProxy name="ClientDeliveryRepresentation"
+      base_proxygroup="representations"
+      base_proxyname="ClientDeliveryRepresentationBase">
+      <Documentation>
+        A basic client delivery representation.
+      </Documentation>
+
+     <InputProperty
+       name="Input"
+       command="AddInput">
+     </InputProperty>
+
+      <!-- End of ElementInspectorRepresentation -->
     </ClientDeliveryRepresentationProxy>
 
     <ClientDeliveryRepresentationProxy name="ElementInspectorRepresentation"
