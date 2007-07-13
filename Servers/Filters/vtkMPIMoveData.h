@@ -94,6 +94,14 @@ public:
     {if(v){this->SetMoveModeToPassThrough();} else {this->SetMoveModeToClone();}}
   void SetSocketController(vtkSocketController* c) {this->SetClientDataServerSocketController(c);}
 
+  // Description:
+  // Sometimes, the data may be too huge to deliver to the client. In that case,
+  // the client can request that only the outline for the data may be delivered
+  // to the client. This is supported only for vtkPolyData.
+  // Off by default.
+  vtkSetMacro(DeliverOutlineToClient, int);
+  vtkGetMacro(DeliverOutlineToClient, int);
+
 //BTX
   enum MoveModes {
     PASS_THROUGH=0,
@@ -155,6 +163,7 @@ protected:
 //ETX
 
   int OutputDataType;
+  int DeliverOutlineToClient;
 
 private:
   int UpdateNumberOfPieces;

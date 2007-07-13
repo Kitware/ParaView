@@ -57,6 +57,7 @@ SET(Kit_SRCS
   vtkSMFixedTypeDomain.cxx
   vtkSMIceTCompositeViewProxy.cxx
   vtkSMIceTDesktopRenderViewProxy.cxx
+  vtkSMIceTMultiDisplayRenderViewProxy.cxx
   vtkSMIdTypeVectorProperty.cxx
   vtkSMImplicitPlaneProxy.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx

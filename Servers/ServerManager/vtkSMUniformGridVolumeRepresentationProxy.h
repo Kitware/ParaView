@@ -76,6 +76,7 @@ protected:
   // Common volume rendering classes
   vtkSMProxy* VolumeActor;
   vtkSMProxy* VolumeProperty;
+  vtkSMProxy* ClientMapper;
 
 private:
   vtkSMUniformGridVolumeRepresentationProxy(const vtkSMUniformGridVolumeRepresentationProxy&); // Not implemented

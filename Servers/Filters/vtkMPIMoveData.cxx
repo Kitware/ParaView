@@ -26,8 +26,10 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkOutlineFilter.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
+#include "vtkSmartPointer.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -40,7 +42,7 @@
 #include "vtkAllToNRedistributePolyData.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.15");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.16");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -75,6 +77,8 @@ vtkMPIMoveData::vtkMPIMoveData()
 
   this->UpdateNumberOfPieces = 0;
   this->UpdatePiece = 0;
+
+  this->DeliverOutlineToClient = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -680,8 +684,30 @@ void vtkMPIMoveData::DataServerSendToClient(vtkDataSet* output)
 
   if (myId == 0)
     {
+    vtkSmartPointer<vtkDataSet> tosend = output;
+    if (this->DeliverOutlineToClient)
+      {
+      // reduce data using outline filter.
+      if (output->IsA("vtkPolyData"))
+        {
+        vtkDataSet* clone = output->NewInstance();
+        clone->ShallowCopy(output);
+
+        vtkOutlineFilter* filter = vtkOutlineFilter::New();
+        filter->SetInput(clone);
+        filter->Update();
+        tosend = filter->GetOutput();
+        filter->Delete();
+        clone->Delete();
+        }
+      else
+        {
+        vtkErrorMacro("DeliverOutlineToClient can only be used for vtkPolyData.");
+        }
+      }
+
     this->ClearBuffer();
-    this->MarshalDataToBuffer(output);
+    this->MarshalDataToBuffer(tosend);
     this->ClientDataServerSocketController->Send(
                                      &(this->NumberOfBuffers), 1, 1, 23490);
     this->ClientDataServerSocketController->Send(this->BufferLengths, 
@@ -935,6 +961,8 @@ void vtkMPIMoveData::PrintSelf(ostream& os, vtkIndent indent)
      << this->DefineCollectAsClone << endl;
   os << indent << "Server: " << this->Server << endl;
   os << indent << "MoveMode: " << this->MoveMode << endl;
+  os << indent << "DeliverOutlineToClient : " 
+    << this->DeliverOutlineToClient << endl;
   os << indent << "OutputDataType: ";
   if (this->OutputDataType == VTK_POLY_DATA)
     {

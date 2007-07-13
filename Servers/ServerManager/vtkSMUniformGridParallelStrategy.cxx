@@ -22,12 +22,14 @@
 #include "vtkMPIMoveData.h"
 
 vtkStandardNewMacro(vtkSMUniformGridParallelStrategy);
-vtkCxxRevisionMacro(vtkSMUniformGridParallelStrategy, "1.4");
+vtkCxxRevisionMacro(vtkSMUniformGridParallelStrategy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMUniformGridParallelStrategy::vtkSMUniformGridParallelStrategy()
 {
   this->Collect = 0;
-  this->SetEnableLOD(false);
+  this->CollectLOD = 0;
+  this->SetEnableLOD(true);
+  this->SetKeepLODPipelineUpdated(true);
 }
 
 //----------------------------------------------------------------------------
@@ -42,6 +44,10 @@ void vtkSMUniformGridParallelStrategy::BeginCreateVTKObjects()
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("Collect"));
   this->Collect->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
   
+  this->CollectLOD =
+    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("CollectLOD"));
+  this->CollectLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+  
   this->Superclass::BeginCreateVTKObjects();
 }
 
@@ -49,9 +55,8 @@ void vtkSMUniformGridParallelStrategy::BeginCreateVTKObjects()
 void vtkSMUniformGridParallelStrategy::EndCreateVTKObjects()
 {
   this->Superclass::EndCreateVTKObjects();
-
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
+  this->InitializeCollectProxy(this->Collect);
+  this->InitializeCollectProxy(this->CollectLOD);
 
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->Collect->GetProperty("MoveMode"));
@@ -65,6 +70,24 @@ void vtkSMUniformGridParallelStrategy::EndCreateVTKObjects()
   ivp->SetElement(0, VTK_IMAGE_DATA);
   this->Collect->UpdateVTKObjects();
 
+  // CollectLOD on the other hand is used when rendering on the client side. 
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->CollectLOD->GetProperty("MoveMode"));
+  ivp->SetElement(0, vtkMPIMoveData::COLLECT);
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->CollectLOD->GetProperty("OutputDataType"));
+  ivp->SetElement(0, VTK_POLY_DATA);
+  this->CollectLOD->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMUniformGridParallelStrategy::InitializeCollectProxy(
+  vtkSMProxy* collectProxy)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+
   // Collect filter needs the socket controller use to communicate between
   // data-server root and the client.
   stream  << vtkClientServerStream::Invoke
@@ -73,7 +96,7 @@ void vtkSMUniformGridParallelStrategy::EndCreateVTKObjects()
           << pm->GetConnectionClientServerID(this->ConnectionID)
           << vtkClientServerStream::End;
   stream  << vtkClientServerStream::Invoke
-          << this->Collect->GetID()
+          << collectProxy->GetID()
           << "SetSocketController"
           << vtkClientServerStream::LastResult
           << vtkClientServerStream::End;
@@ -83,7 +106,7 @@ void vtkSMUniformGridParallelStrategy::EndCreateVTKObjects()
   // Collect filter needs the MPIMToNSocketConnection to communicate between
   // render server and data server nodes.
   stream  << vtkClientServerStream::Invoke
-          << this->Collect->GetID()
+          << collectProxy->GetID()
           << "SetMPIMToNSocketConnection"
           << pm->GetMPIMToNSocketConnectionID(this->ConnectionID)
           << vtkClientServerStream::End;
@@ -93,17 +116,17 @@ void vtkSMUniformGridParallelStrategy::EndCreateVTKObjects()
   // Set the server flag on the collect filter to correctly identify each
   // processes.
   stream  << vtkClientServerStream::Invoke
-          << this->Collect->GetID()
+          << collectProxy->GetID()
           << "SetServerToRenderServer"
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
   stream  << vtkClientServerStream::Invoke
-          << this->Collect->GetID()
+          << collectProxy->GetID()
           << "SetServerToDataServer"
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, vtkProcessModule::DATA_SERVER, stream);
   stream  << vtkClientServerStream::Invoke
-          << this->Collect->GetID()
+          << collectProxy->GetID()
           << "SetServerToClient"
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
@@ -115,6 +138,15 @@ void vtkSMUniformGridParallelStrategy::CreatePipeline(vtkSMSourceProxy* input,
 {
   this->Connect(input, this->Collect, "Input", outputport);
   this->Superclass::CreatePipeline(this->Collect, 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMUniformGridParallelStrategy::CreateLODPipeline(vtkSMSourceProxy* input, 
+  int outputport)
+{
+  this->Connect(input, this->LODDecimator, "Input", outputport);
+  this->Connect(this->LODDecimator, this->CollectLOD);
+  this->Connect(this->CollectLOD, this->UpdateSuppressorLOD);
 }
 
 //----------------------------------------------------------------------------

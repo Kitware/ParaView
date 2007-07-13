@@ -19,8 +19,8 @@
 #include "vtkMPIMoveData.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkSMIceTMultiDisplayRenderViewProxy.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMIceTCompositeViewProxy.h"
 #include "vtkSMSourceProxy.h"
 
 inline int vtkSMSimpleParallelStrategyGetInt(vtkSMProxy* proxy, 
@@ -39,7 +39,7 @@ inline int vtkSMSimpleParallelStrategyGetInt(vtkSMProxy* proxy,
 }
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.10");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.11");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
@@ -55,6 +55,8 @@ vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
   this->UseOrderedCompositing = false;
 
   this->KdTree = 0;
+  this->LODClientRender = false;
+  this->LODClientCollect = true;
 }
 
 //----------------------------------------------------------------------------
@@ -285,8 +287,20 @@ void vtkSMSimpleParallelStrategy::UpdatePipeline()
 
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->Collect->GetProperty("MoveMode"));
-  ivp->SetElement(0, 
-    usecompositing? vtkMPIMoveData::PASS_THROUGH : vtkMPIMoveData::COLLECT);
+
+  if (!this->GetEnableLOD())
+    {
+    // LOD pipeline not present, treat full res pipeline as LOD.
+    ivp->SetElement(0,
+      usecompositing? 
+      (this->LODClientRender? vtkMPIMoveData::CLONE: vtkMPIMoveData::PASS_THROUGH) : 
+      vtkMPIMoveData::COLLECT);
+    }
+  else
+    {
+    ivp->SetElement(0,
+      usecompositing? vtkMPIMoveData::PASS_THROUGH : vtkMPIMoveData::COLLECT);
+    }
   this->Collect->UpdateProperty("MoveMode");
 
   // cout << "use ordered compositing: " << (usecompositing && this->UseOrderedCompositing)
@@ -319,8 +333,10 @@ void vtkSMSimpleParallelStrategy::UpdateLODPipeline()
 
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->CollectLOD->GetProperty("MoveMode"));
-  ivp->SetElement(0, 
-    usecompositing? vtkMPIMoveData::PASS_THROUGH : vtkMPIMoveData::COLLECT);
+  ivp->SetElement(0,
+    usecompositing? 
+    (this->LODClientRender? vtkMPIMoveData::CLONE: vtkMPIMoveData::PASS_THROUGH) : 
+    vtkMPIMoveData::COLLECT);
   this->CollectLOD->UpdateProperty("MoveMode");
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -334,6 +350,14 @@ void vtkSMSimpleParallelStrategy::UpdateLODPipeline()
   stream  << vtkClientServerStream::Invoke
           << this->CollectLOD->GetID()
           << "Modified"
+          << vtkClientServerStream::End;
+
+  // If LODClientCollect is false, then we need to ensure that the collect
+  // filter does not deliver full data to the client. 
+  stream  << vtkClientServerStream::Invoke
+          << this->CollectLOD->GetID()
+          << "SetDeliverOutlineToClient"
+          << (this->LODClientCollect? 0 : 1)
           << vtkClientServerStream::End;
   vtkProcessModule::GetProcessModule()->SendStream(
     this->ConnectionID, this->CollectLOD->GetServers(), stream);
@@ -383,6 +407,26 @@ void vtkSMSimpleParallelStrategy::SetKdTree(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMSimpleParallelStrategy::SetLODClientCollect(bool collect)
+{
+  if (this->LODClientCollect != collect)
+    {
+    this->LODClientCollect = collect;
+    this->InvalidateLODPipeline();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSimpleParallelStrategy::SetLODClientRender(bool render)
+{
+  if (this->LODClientRender != render)
+    {
+    this->LODClientRender = render;
+    this->InvalidateLODPipeline();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkSMSimpleParallelStrategy::ProcessViewInformation()
 {
   if (this->ViewInformation->Has(vtkSMRenderViewProxy::USE_COMPOSITING()))
@@ -415,6 +459,28 @@ void vtkSMSimpleParallelStrategy::ProcessViewInformation()
     {
     // Don't warn if missing KD_TREE, since it's defined only by IceT views.
     //vtkErrorMacro("Missing Key: KD_TREE()");
+    }
+
+  if (this->ViewInformation->Has(
+      vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER()))
+    {
+    this->SetLODClientRender(this->ViewInformation->Get(
+        vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER())>0);
+    }
+  else
+    {
+    this->SetLODClientRender(false);
+    }
+
+  if (this->ViewInformation->Has(
+      vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_COLLECT()))
+    {
+    this->SetLODClientCollect(this->ViewInformation->Get(
+        vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_COLLECT())>0);
+    }
+  else
+    {
+    this->SetLODClientCollect(true);
     }
 
   this->Superclass::ProcessViewInformation();

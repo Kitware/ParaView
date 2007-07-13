@@ -15,7 +15,18 @@
 // .NAME vtkSMUniformGridParallelStrategy
 // .SECTION Description
 // vtkSMUniformGridParallelStrategy is used for rendering image data in
-// parallel. This strategy does not support any LOD pipeline.
+// parallel. 
+//
+// This strategy does not support LOD pipeline in the generic sense, LOD for
+// volume rendering is managed by the mapper itself.
+//
+// To support client side rendering of the data, this strategy overloads the LOD
+// pipeline. LOD pipeline now simply means a client-side pipeline that delivers
+// the outline of the original data to the client.
+// vtkSMUniformGridVolumeRepresentationProxy works with this to always use
+// LODOutput from the strategy when rendering on client.
+//
+// This strategy does not support any LOD pipeline.
 // For image data, LOD is managed by the mapper itself.
 // Another thing to note about this strategy is that it cannot deliver data to
 // client for rendering. Hence it does not worry about the UseCompositing flag
@@ -34,19 +45,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Overridden to raise error when someone tries to set it to true. This
-  // strategy does not support LOD.
-  virtual void SetEnableLOD(bool enable)
-    {
-    if (enable)
-      {
-      vtkErrorMacro("This strategy does not support LOD pipelines.");
-      }
-    else
-      {
-      this->Superclass::SetEnableLOD(enable);
-      }
-    }
+  // Returns if the strategy is currently using LOD 
+  // This strategy never uses LOD for level-of-detail. It is used as client side
+  // data when rendering locally.
+  bool GetUseLOD()
+    { return false; }
 
 //BTX
 protected:
@@ -61,8 +64,11 @@ protected:
   // Description:
   // Create and initialize the data pipeline.
   virtual void CreatePipeline(vtkSMSourceProxy* input, int outputport);
+  virtual void CreateLODPipeline(vtkSMSourceProxy* input, int outputport);
 
+  void InitializeCollectProxy(vtkSMProxy* collect);
   vtkSMSourceProxy* Collect;
+  vtkSMSourceProxy* CollectLOD;
 private:
   vtkSMUniformGridParallelStrategy(const vtkSMUniformGridParallelStrategy&); // Not implemented
   void operator=(const vtkSMUniformGridParallelStrategy&); // Not implemented

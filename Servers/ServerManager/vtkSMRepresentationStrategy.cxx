@@ -24,7 +24,7 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.12");
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.13");
 //----------------------------------------------------------------------------
 vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 {
@@ -51,6 +51,7 @@ vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
   this->Observer = command;
 
   this->SomethingCached = false;
+  this->KeepLODPipelineUpdated = false;
 }
 
 //----------------------------------------------------------------------------
@@ -197,7 +198,7 @@ bool vtkSMRepresentationStrategy::UpdateRequired()
 
   bool update_required = !this->DataValid;
 
-  if (this->GetUseLOD())
+  if (this->GetUseLOD() || (this->EnableLOD && this->KeepLODPipelineUpdated))
     {
     update_required |= !this->LODDataValid;
     }
@@ -217,7 +218,8 @@ void vtkSMRepresentationStrategy::Update()
       this->UpdatePipeline();
       }
 
-    if (this->GetUseLOD() && !this->LODDataValid)
+    if ( (this->GetUseLOD() || (this->EnableLOD && this->KeepLODPipelineUpdated)) 
+      && !this->LODDataValid)
       {
       this->UpdateLODPipeline();
       }
@@ -356,6 +358,8 @@ void vtkSMRepresentationStrategy::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "EnableLOD: " << this->EnableLOD << endl;
   os << indent << "EnableCaching: " << this->EnableCaching << endl;
+  os << indent << "KeepLODPipelineUpdated: " 
+    << this->KeepLODPipelineUpdated << endl;
 }
 
 

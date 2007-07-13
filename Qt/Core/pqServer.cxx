@@ -166,9 +166,7 @@ void pqServer::initializeRenderViewType()
       {
       if (this->Options->GetTileDimensions()[0] )
         {
-        // FIXME: 
-        qCritical() << "No render view proxy for tile displays yet!";
-        renderViewName = "IceTRenderModule";
+        renderViewName = "IceTMultiDisplayRenderView";
         }
       else if(this->Options->GetClientMode())
         {

@@ -568,16 +568,19 @@ void pqSelectionManager::selectOnSurface(int screenRectangle[4])
   // Perform the selection.
   vtkSmartPointer<vtkCollection> selectedRepresentations = 
     vtkSmartPointer<vtkCollection>::New();
+  vtkSmartPointer<vtkCollection> surfaceSelections = 
+    vtkSmartPointer<vtkCollection>::New();
   if (!renderModuleP->SelectOnSurface(
     displayRectangle[0], displayRectangle[1], displayRectangle[2],
-    displayRectangle[3], selectedRepresentations, false))
+    displayRectangle[3], selectedRepresentations, surfaceSelections, false))
     {
     // nothing selected.
     return;
     }
 
   rvm->render();
-  if (selectedRepresentations->GetNumberOfItems() <= 0)
+  if (selectedRepresentations->GetNumberOfItems() <= 0 ||
+    surfaceSelections->GetNumberOfItems() <=0)
     {
     return;
     }
@@ -593,9 +596,27 @@ void pqSelectionManager::selectOnSurface(int screenRectangle[4])
       this->Implementation->SelectedRepresentation->GetProperty("Input"))->
     GetOutputPortForConnection(0);
 
+  // The selection source is the source that is set as the "Selection" input on
+  // the representation.
   this->Implementation->SelectionSource =
     pqSMAdaptor::getProxyProperty(this->Implementation->
       SelectedRepresentation->GetProperty("Selection"));
+
+  // Obtain a global id selection as well.
+  vtkIdType connId = 
+    this->Implementation->SelectedProxy->GetConnectionID();
+  vtkSelection* volumeSelectionGI = vtkSelection::New();
+  vtkSMSelectionHelper::ConvertSurfaceSelectionToGlobalIDVolumeSelection(
+    connId,
+    vtkSelection::SafeDownCast(surfaceSelections->GetItemAsObject(0)), 
+    volumeSelectionGI);
+
+  vtkSMProxy* selectionSourceGI = 
+    vtkSMSelectionHelper::NewSelectionSourceFromSelection(connId,
+      volumeSelectionGI);
+  this->Implementation->GlobalIDSelectionSource = selectionSourceGI;
+  selectionSourceGI->Delete();
+  volumeSelectionGI->Delete();
 
   // Update the SelectionModel with the selected sources.
   pqServerManagerModel* model = 

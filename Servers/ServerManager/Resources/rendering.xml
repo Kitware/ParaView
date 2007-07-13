@@ -1035,7 +1035,8 @@
       <IntVectorProperty name="EnableLOD"
         command="SetEnableLOD"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        is_internal="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
@@ -1057,7 +1058,8 @@
       <IntVectorProperty name="EnableLOD"
         command="SetEnableLOD"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        is_internal="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <!-- End of LODVolume -->
@@ -2453,6 +2455,11 @@
       </InputProperty>
 
       <SubProxy>
+        <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
         <Proxy name="UpdateSuppressor"
           proxygroup="filters" proxyname="UpdateSuppressor2">
         </Proxy>
@@ -2463,8 +2470,26 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
+        <Proxy name="LODDecimator"  
+          proxygroup="filters" proxyname="OutlineFilter">
         </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="CollectLOD" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="UpdateSuppressorLOD"
+          proxygroup="filters" proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
       </SubProxy>
       <!-- End of UnstructuredGridStrategy -->
     </UniformGridParallelStrategy>
@@ -2917,6 +2942,16 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty
+        name="ViewSize"
+        number_of_elements="2"
+        default_values="400 400">
+        <IntRangeDomain name="range" min="1 1" />
+        <Documentation>
+          Set the view size for this view module.
+        </Documentation>
+      </IntVectorProperty>
+
       <SubProxy>
         <Proxy name="Renderer" proxyname="Renderer" proxygroup="renderers">
         </Proxy>
@@ -2929,8 +2964,10 @@
         <Proxy name="RenderWindow" proxyname="RenderWindow" proxygroup="renderwindow">
         </Proxy>
         <ExposedProperties>
+          <!--
           <Property name="RenderWindowSizeInfo" />
           <Property name="RenderWindowSize" exposed_name="ViewSize" />
+          -->
         </ExposedProperties>
       </SubProxy>
 
@@ -2958,6 +2995,15 @@
 
       <!-- End of IceTDesktopRenderView -->
     </IceTDesktopRenderViewProxy>
+
+    <IceTMultiDisplayRenderViewProxy name="IceTMultiDisplayRenderView"
+      base_proxygroup="newviews" base_proxyname="IceTDesktopRenderView">
+      <Documentation>
+      IceT Render View for tile displays.
+      </Documentation>
+
+      <!-- End of IceTMultiDisplayRenderView -->
+    </IceTMultiDisplayRenderViewProxy>
 
     <ClientServerRenderViewProxy name="ClientServerRenderView"
       base_proxygroup="newviews" base_proxyname="RenderViewBase">
@@ -3662,6 +3708,13 @@
           <Property name="ScalarOpacityFunction" />
           <Property name="ColorTransferFunction" exposed_name="LookupTable"/>
         </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!-- 
+          Mapper for client-side rendering.
+        -->
+        <Proxy name="LODMapper" proxygroup="mappers" proxyname="PolyDataMapper" />
       </SubProxy>
 
       <!--
@@ -4896,4 +4949,5 @@
 
 
 </ServerManagerConfiguration>
+
 

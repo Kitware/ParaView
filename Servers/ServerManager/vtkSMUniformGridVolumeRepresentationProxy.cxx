@@ -15,6 +15,7 @@
 #include "vtkSMUniformGridVolumeRepresentationProxy.h"
 
 #include "vtkAbstractMapper.h"
+#include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
@@ -31,13 +32,14 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUniformGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMUniformGridVolumeRepresentationProxy::vtkSMUniformGridVolumeRepresentationProxy()
 {
   this->VolumeFixedPointRayCastMapper = 0;
   this->VolumeActor = 0;
   this->VolumeProperty = 0;
+  this->ClientMapper = 0;
 
   // This representation supports selection.
   this->SetSelectionSupported(true);
@@ -70,10 +72,17 @@ bool vtkSMUniformGridVolumeRepresentationProxy::InitializeStrategy(vtkSMViewProx
   // can assume that the objects for this proxy have been created.
   // (Look at vtkSMDataRepresentationProxy::AddToView()).
 
-  strategy->SetEnableLOD(false);
+  // This representation interprets LOD to mean client-side data. Hence, LOD
+  // pipeline is enabled only when client-server are separate processes. 
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (!pm->IsRemote(this->ConnectionID))
+    {
+    strategy->SetEnableLOD(false);
+    }
+
   this->Connect(this->GetInputProxy(), strategy, "Input", this->OutputPort);
   this->Connect(strategy->GetOutput(), this->VolumeFixedPointRayCastMapper);
-
+  this->Connect(strategy->GetLODOutput(), this->ClientMapper);
 
   // Creates the strategy objects.
   strategy->UpdateVTKObjects();
@@ -95,6 +104,7 @@ bool vtkSMUniformGridVolumeRepresentationProxy::BeginCreateVTKObjects()
     "VolumeFixedPointRayCastMapper");
   this->VolumeActor = this->GetSubProxy("Prop3D");
   this->VolumeProperty = this->GetSubProxy("VolumeProperty");
+  this->ClientMapper = this->GetSubProxy("LODMapper");
 
   this->VolumeFixedPointRayCastMapper->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
@@ -102,6 +112,8 @@ bool vtkSMUniformGridVolumeRepresentationProxy::BeginCreateVTKObjects()
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->VolumeProperty->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->ClientMapper->SetServers(
+    vtkProcessModule::CLIENT);
 
   return true;
 }
@@ -111,6 +123,27 @@ bool vtkSMUniformGridVolumeRepresentationProxy::EndCreateVTKObjects()
 {
   this->Connect(this->VolumeFixedPointRayCastMapper, this->VolumeActor, "Mapper");
   this->Connect(this->VolumeProperty, this->VolumeActor, "Property");
+
+  // This representation interprets LOD to mean client-side data. Hence, LOD
+  // pipeline is enabled only when client-server are separate processes. 
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm->IsRemote(this->ConnectionID))
+    {
+    this->VolumeActor->UpdateVTKObjects();
+
+    vtkClientServerStream stream;
+    stream  << vtkClientServerStream::Invoke
+            << this->VolumeActor->GetID()
+            << "SetEnableLOD" << 1
+            << vtkClientServerStream::End;
+    stream  << vtkClientServerStream::Invoke
+            << this->VolumeActor->GetID()
+            << "SetLODMapper"
+            << this->ClientMapper->GetID()
+            << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID, vtkProcessModule::CLIENT, stream);   
+    }
 
   return this->Superclass::EndCreateVTKObjects();
 }

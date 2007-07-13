@@ -173,12 +173,15 @@ public:
   // Creates a surface selection. Returns if selection was successful.
   // selectedRepresentations (if non-null) is filled with the representations
   // that were selected in the process.
+  // surfaceSelection (if non-null) is filled with the client-side surface
+  // selection objects for the selected representations.
   // \c multiple_selections indicates if multiple representations can be
   // selected by this operation; if false, only the representation with the
   // maximum pixel count covered in the selection region will get selected.
   bool SelectOnSurface(unsigned int x0, unsigned int y0,
     unsigned int x1, unsigned int y1,
     vtkCollection* selectedRepresentations=0,
+    vtkCollection* surfaceSelection=0,
     bool multiple_selections=true);
 
   // Description:

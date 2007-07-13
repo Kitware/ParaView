@@ -84,13 +84,13 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.24");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.25");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
-vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_LOD, Integer);
-vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_COMPOSITING, Integer);
-vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_ORDERED_COMPOSITING, Integer);
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
+vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_COMPOSITING, Integer);
+vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_LOD, Integer);
+vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_ORDERED_COMPOSITING, Integer);
 
 //-----------------------------------------------------------------------------
 vtkSMRenderViewProxy::vtkSMRenderViewProxy()
@@ -1242,6 +1242,7 @@ static void vtkSMRenderViewProxyShrinkSelection(vtkSelection* sel)
 bool vtkSMRenderViewProxy::SelectOnSurface(unsigned int x0, 
   unsigned int y0, unsigned int x1, unsigned int y1,
   vtkCollection* selectedRepresentations/*=0*/,
+  vtkCollection* surfaceSelections/*=0*/,
   bool multiple_selections/*=true*/)
 {
   // 1) Create surface selection.
@@ -1284,6 +1285,10 @@ bool vtkSMRenderViewProxy::SelectOnSurface(unsigned int x0,
     if (selectedRepresentations)
       {
       selectedRepresentations->AddItem(repr);
+      }
+    if (surfaceSelections)
+      {
+      surfaceSelections->AddItem(surfaceSel);
       }
     selectionSource->Delete();
     }

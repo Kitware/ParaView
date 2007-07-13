@@ -14,19 +14,20 @@
 =========================================================================*/
 #include "vtkSMSelectionRepresentationProxy.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIceTMultiDisplayRenderViewProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSelectionRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMSelectionRepresentationProxy::vtkSMSelectionRepresentationProxy()
 {
@@ -196,6 +197,21 @@ void vtkSMSelectionRepresentationProxy::Update(vtkSMViewProxy* view)
     ivp->SetElement(0, 
       this->ViewInformation->Get(vtkSMRenderViewProxy::USE_LOD()));
     this->Prop3D->UpdateProperty("EnableLOD");
+    }
+
+  if (this->ViewInformation->Has(
+      vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER())
+    && this->ViewInformation->Get(
+      vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER())==1)
+    {
+    // We must use LOD on client side.
+    vtkClientServerStream stream;
+    stream  << vtkClientServerStream::Invoke
+            << this->Prop3D->GetID()
+            << "SetEnableLOD" << 1
+            << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID, vtkProcessModule::CLIENT, stream);   
     }
 }
 

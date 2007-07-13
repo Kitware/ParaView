@@ -15,6 +15,7 @@
 #include "vtkSMSurfaceRepresentationProxy.h"
 
 #include "vtkAbstractMapper.h"
+#include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
@@ -26,16 +27,16 @@
 #include "vtkSMCompoundProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIceTMultiDisplayRenderViewProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.16");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -142,7 +143,6 @@ bool vtkSMSurfaceRepresentationProxy::EndCreateVTKObjects()
   return this->Superclass::EndCreateVTKObjects();
 }
 
-#include "vtkClientServerStream.h"
 //----------------------------------------------------------------------------
 void vtkSMSurfaceRepresentationProxy::Update(vtkSMViewProxy* view)
 {
@@ -156,6 +156,22 @@ void vtkSMSurfaceRepresentationProxy::Update(vtkSMViewProxy* view)
       this->ViewInformation->Get(vtkSMRenderViewProxy::USE_LOD()));
     this->Prop3D->UpdateProperty("EnableLOD");
     }
+
+  if (this->ViewInformation->Has(
+      vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER())
+    && this->ViewInformation->Get(
+      vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER())==1)
+    {
+    // We must use LOD on client side.
+    vtkClientServerStream stream;
+    stream  << vtkClientServerStream::Invoke
+            << this->Prop3D->GetID()
+            << "SetEnableLOD" << 1
+            << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID, vtkProcessModule::CLIENT, stream);   
+    }
+
 
   // I don't like calling Modified directly, but I need the scalars to be
   // remapped through the lookup table, and this causes that to happen.

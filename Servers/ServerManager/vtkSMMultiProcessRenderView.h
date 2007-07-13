@@ -59,7 +59,8 @@ protected:
   // Used to perform some every-interactive-render-setup actions.
   virtual void BeginInteractiveRender();
 
-    // Indicates if we should render using compositing.
+  // Description:
+  // Indicates if we should render using compositing.
   // Returns true if compositing should be used, otherwise false.
   // Flag stillRender is set when this decision is to be made during StillRender
   // else it's 0 (for InteractiveRender);

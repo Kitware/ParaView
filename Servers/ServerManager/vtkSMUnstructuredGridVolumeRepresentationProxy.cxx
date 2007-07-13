@@ -15,6 +15,7 @@
 #include "vtkSMUnstructuredGridVolumeRepresentationProxy.h"
 
 #include "vtkAbstractMapper.h"
+#include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkInformation.h"
 #include "vtkInformation.h"
@@ -24,16 +25,16 @@
 #include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDataTypeDomain.h"
+#include "vtkSMIceTMultiDisplayRenderViewProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMRepresentationStrategyVector.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepresentationProxy()
 {
@@ -89,6 +90,21 @@ void vtkSMUnstructuredGridVolumeRepresentationProxy::Update(vtkSMViewProxy* view
     ivp->SetElement(0, 
       this->ViewInformation->Get(vtkSMRenderViewProxy::USE_LOD()));
     this->VolumeActor->UpdateProperty("EnableLOD");
+    }
+
+  if (this->ViewInformation->Has(
+      vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER())
+    && this->ViewInformation->Get(
+      vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER())==1)
+    {
+    // We must use LOD on client side.
+    vtkClientServerStream stream;
+    stream  << vtkClientServerStream::Invoke
+            << this->VolumeActor->GetID()
+            << "SetEnableLOD" << 1
+            << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID, vtkProcessModule::CLIENT, stream);   
     }
 }
 

@@ -119,7 +119,7 @@ public:
   // on the strategy's displayed pipeline.
   // Note that this reply may change if the decision to use
   // LOD changes.
-  bool UpdateRequired();
+  virtual bool UpdateRequired();
 
   // Description:
   // Updates the displayed pipeline if update is required.
@@ -129,7 +129,7 @@ public:
   // enabled.
   // When an update is required, this method invokes StartEvent and EndEvent to
   // mark the start and end of update request.
-  void Update();
+  virtual void Update();
 
   // Description:
   // Overridden to clear data valid flags.
@@ -140,11 +140,17 @@ public:
   // (UseLOD && EnableLOD && !this->GetUseCache()).
   bool GetUseLOD();
 
-
   // Description:
   // Returns if the strategy is currently using cache 
   // (UseCache && EnableCaching).
   bool GetUseCache();
+
+  // Description:
+  // When set to true, and EnableLOD is true, every Update() request will also
+  // update the LODPipeline irrespective of whether we are currently using LOD.
+  // Default value is false.
+  vtkSetMacro(KeepLODPipelineUpdated, bool);
+  vtkGetMacro(KeepLODPipelineUpdated, bool);
 
 //BTX
 protected:
@@ -268,6 +274,10 @@ protected:
   // Flag used to avoid unnecessary "RemoveAllCaches" requests being set to the
   // server.
   bool SomethingCached;
+
+  // When set to true, LODPipeline is always udpated with the full-res pipeline
+  // (unless EnableLOD is false).
+  bool KeepLODPipelineUpdated;
 
   vtkInformation* ViewInformation;
 private:

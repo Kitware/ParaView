@@ -107,6 +107,9 @@ protected:
   // Called to set the KdTree proxy on the distributor.
   void SetKdTree(vtkSMProxy*);
 
+  void SetLODClientCollect(bool);
+  void SetLODClientRender(bool);
+
   vtkSMSourceProxy* Collect;
   vtkSMSourceProxy* PreDistributorSuppressor;
   vtkSMSourceProxy* Distributor;
@@ -119,7 +122,11 @@ protected:
   
   bool UseOrderedCompositing;
   bool UseCompositing;
+  bool LODClientRender; // when set, indicates that data must be made available on client,
+                     // irrespective of UseCompositing flag.
 
+  bool LODClientCollect; // When set, the data delivered to client is outline of the data
+                      // not the whole data.
 private:
   vtkSMSimpleParallelStrategy(const vtkSMSimpleParallelStrategy&); // Not implemented
   void operator=(const vtkSMSimpleParallelStrategy&); // Not implemented
