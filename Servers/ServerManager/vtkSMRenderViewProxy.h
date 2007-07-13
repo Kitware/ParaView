@@ -32,6 +32,7 @@ class vtkPVOpenGLExtensionsInformation;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkSelection;
+class vtkSMRenderViewHelper;
 class vtkSMRepresentationProxy;
 class vtkTimerLog;
 
@@ -266,6 +267,7 @@ protected:
   // Collection of props added to the renderer2D.
   vtkCollection* Renderer2DProps;
  
+  vtkSMProxy* InteractorStyleProxy;
   vtkSMProxy* RendererProxy;
   vtkSMProxy* Renderer2DProxy;
   vtkSMProxy* ActiveCameraProxy;
@@ -281,6 +283,7 @@ protected:
   vtkRenderWindow* RenderWindow;
   vtkPVGenericRenderWindowInteractor* Interactor;
   vtkCamera* ActiveCamera;
+  vtkSMRenderViewHelper* RenderViewHelper;
   
   int RenderInterruptsEnabled;
   int UseTriangleStrips;

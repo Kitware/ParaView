@@ -84,7 +84,12 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
     if (proxy->IsA("vtkSMRenderViewProxy"))
       {
       return new pqRenderView(group, name, 
-        vtkSMRenderViewProxy::SafeDownCast(proxy), server, 0);
+        vtkSMViewProxy::SafeDownCast(proxy), server, 0);
+      }
+    if (xml_type == "ComparativeRenderView")
+      {
+      return new pqRenderView(group, name, 
+        vtkSMViewProxy::SafeDownCast(proxy), server, 0);
       }
     }
   else if (group == "sources")

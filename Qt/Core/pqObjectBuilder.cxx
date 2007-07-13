@@ -295,6 +295,7 @@ pqView* pqObjectBuilder::createView(const QString& type,
   if(type == pqRenderView::renderViewType())
     {
     proxy = server->newRenderView();
+    // proxy = pxm->NewProxy("newviews", "ComparativeRenderView");
     }
   else
     {

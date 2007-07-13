@@ -57,6 +57,7 @@
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkPVDisplayInformation.h"
+#include "vtkSMRenderViewHelper.h"
 
 #include "vtkSMMultiProcessRenderView.h"
 
@@ -83,7 +84,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.23");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.24");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_LOD, Integer);
@@ -100,6 +101,7 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
   this->ActiveCameraProxy = 0;
   this->RenderWindowProxy = 0;
   this->InteractorProxy = 0;
+  this->InteractorStyleProxy = 0;
   this->LightKitProxy = 0;
   this->RenderInterruptsEnabled = 1;
 
@@ -108,6 +110,9 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
   this->RenderWindow = 0;
   this->Interactor = 0;
   this->ActiveCamera = 0;
+
+  this->RenderViewHelper = vtkSMRenderViewHelper::New();
+  this->RenderViewHelper->SetRenderViewProxy(this); //not reference counted.
 
   this->UseTriangleStrips = 0;
   this->ForceTriStripUpdate = 0;
@@ -130,6 +135,9 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
 //-----------------------------------------------------------------------------
 vtkSMRenderViewProxy::~vtkSMRenderViewProxy()
 {
+  this->RenderViewHelper->SetRenderViewProxy(0);
+  this->RenderViewHelper->Delete();
+
   this->RemoveAllRepresentations();
 
   this->RendererProxy = 0;
@@ -218,6 +226,7 @@ bool vtkSMRenderViewProxy::BeginCreateVTKObjects()
   this->ActiveCameraProxy = this->GetSubProxy("ActiveCamera");
   this->RenderWindowProxy = this->GetSubProxy("RenderWindow");
   this->InteractorProxy = this->GetSubProxy("Interactor");
+  this->InteractorStyleProxy = this->GetSubProxy("InteractorStyle");
   this->LightKitProxy = this->GetSubProxy("LightKit");
   this->LightProxy = this->GetSubProxy("Light");
 
@@ -256,6 +265,13 @@ bool vtkSMRenderViewProxy::BeginCreateVTKObjects()
     return false;
     }
 
+  if (!this->InteractorStyleProxy)
+    {
+    vtkErrorMacro("InteractorStyleProxy subproxy must be defined in the configuration "
+                  "file.");
+    return false;
+    }
+
   if (!this->LightKitProxy)
     {
     vtkErrorMacro("LightKit subproxy must be defined in the configuration "
@@ -287,6 +303,8 @@ bool vtkSMRenderViewProxy::BeginCreateVTKObjects()
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->InteractorProxy->SetServers(
     vtkProcessModule::CLIENT); // | vtkProcessModule::RENDER_SERVER);
+  this->InteractorStyleProxy->SetServers(
+    vtkProcessModule::CLIENT); // | vtkProcessModule::RENDER_SERVER);
   this->LightKitProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->LightProxy->SetServers(
@@ -313,7 +331,10 @@ void vtkSMRenderViewProxy::EndCreateVTKObjects()
     pm->GetObjectFromID(this->InteractorProxy->GetID()));
   this->ActiveCamera = vtkCamera::SafeDownCast(
     pm->GetObjectFromID(this->ActiveCameraProxy->GetID()));
- 
+
+  // Set the helper for interaction.
+  this->Interactor->SetPVRenderView(this->RenderViewHelper);
+
   if (pm->GetOptions()->GetUseStereoRendering())
     {
     SetIntVectorProperty(this->RenderWindowProxy, "StereoCapableWindow", 1);
@@ -331,6 +352,7 @@ void vtkSMRenderViewProxy::EndCreateVTKObjects()
   this->Connect(this->RenderWindowProxy, this->InteractorProxy, "RenderWindow");
   this->Connect(this->RendererProxy, this->InteractorProxy, "Renderer");
   this->Connect(this->LightProxy, this->RendererProxy, "Lights");
+  this->Connect(this->InteractorStyleProxy, this->InteractorProxy, "InteractorStyle");
 
   // Set the active camera for the renderers.  We can't use the Proxy
   // Property since Camera is only create on the CLIENT.  Proxy properties

@@ -58,22 +58,22 @@ public:
   // Removes all added representations from this view.
   // Simply calls RemoveRepresentation() on all added representations 
   // one by one.
-  void RemoveAllRepresentations();
+  virtual void RemoveAllRepresentations();
 
   // Description:
   // Forwards the call to all internal views.
-  void StillRender();
+  virtual void StillRender();
 
   // Description:
   // Renders the view using lower resolution is possible.
   // Forwards the call to all internal views.
-  void InteractiveRender();
+  virtual void InteractiveRender();
 
   // Description:
   // Create a default representation for the given source proxy.
   // Returns a new proxy.
   // Overridden to forward the call to the internal root view proxy.
-  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy*);
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy*, int);
 
   // Description:
   // Set the animation scene played along X-axis.

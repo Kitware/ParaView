@@ -42,14 +42,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballZoom.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMRepresentationProxy.h"
+#include "vtkSMComparativeViewProxy.h"
 #include "vtkSMInteractionUndoStackBuilder.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMUndoStack.h"
 #include "vtkTrackballPan.h"
+#include "vtkCollection.h"
 
 // Qt includes.
 #include <QFileInfo>
@@ -62,13 +64,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSet>
 #include <QPrinter>
 #include <QPainter>
+#include <QGridLayout>
 
 // ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqLinkViewWidget.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
-#include "pqRenderViewProxy.h"
 #include "pqServer.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
@@ -77,16 +79,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqRenderView::pqInternal
 {
 public:
-  QPointer<QVTKWidget> Viewport;
+  QPointer<QWidget> Viewport;
   QPoint MouseOrigin;
-  vtkSmartPointer<pqRenderViewProxy> RenderViewProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
-  vtkSmartPointer<vtkSMRenderViewProxy> RenderModuleProxy;
   vtkSmartPointer<vtkPVAxesWidget> OrientationAxesWidget;
   vtkSmartPointer<vtkSMProxy> CenterAxesProxy;
 
   vtkSmartPointer<vtkSMUndoStack> InteractionUndoStack;
   vtkSmartPointer<vtkSMInteractionUndoStackBuilder> UndoStackBuilder;
+
+  QMap<vtkSMViewProxy*, QPointer<QVTKWidget> > RenderWidgets;
 
   QList<pqRenderView* > LinkedUndoStacks;
   bool UpdatingStack;
@@ -99,7 +101,6 @@ public:
     this->UpdatingStack = false;
     this->InitializedWidgets = false;
     this->Viewport = 0;
-    this->RenderViewProxy = vtkSmartPointer<pqRenderViewProxy>::New();
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     this->OrientationAxesWidget = vtkSmartPointer<vtkPVAxesWidget>::New();
     this->DefaultBackground[0] = 84;
@@ -116,7 +117,6 @@ public:
 
   ~pqInternal()
     {
-    this->RenderViewProxy->setRenderView(0);
     if(this->DefaultCameraManipulators.size()>0)
       {
       foreach(vtkSMProxy* manip, this->DefaultCameraManipulators)
@@ -134,49 +134,61 @@ public:
 //-----------------------------------------------------------------------------
 pqRenderView::pqRenderView( const QString& group,
                             const QString& name, 
-                            vtkSMRenderViewProxy* renModule, 
+                            vtkSMViewProxy* renModule, 
                             pqServer* server, 
                             QObject* _parent/*=null*/) : 
   pqView(renderViewType(), group, name, renModule, server, _parent)
 {
   this->Internal = new pqRenderView::pqInternal();
-  this->Internal->RenderViewProxy->setRenderView(this);
-  this->Internal->RenderModuleProxy = renModule;
 
   // we need to fire signals when undo stack changes.
   this->Internal->VTKConnect->Connect(this->Internal->InteractionUndoStack,
     vtkCommand::ModifiedEvent, this, SLOT(onUndoStackChanged()),
     0, 0, Qt::QueuedConnection);
 
-  this->Internal->Viewport = new QVTKWidget();
+  if (renModule->IsA("vtkSMComparativeViewProxy"))
+    {
+    this->Internal->Viewport = new QWidget();
+    this->Internal->VTKConnect->Connect(
+      renModule, vtkCommand::ConfigureEvent,
+      this, SLOT(onComparativeVisLayoutChanged()));
+    }
+  else
+    {
+    QVTKWidget* vtkwidget = new QVTKWidget();
+
+    // do image caching for performance
+    // For now, we are doing this only on Apple because it can render
+    // and capture a frame buffer even when it is obstructred by a
+    // window. This does not work as well on other platforms.
+#if defined(__APPLE__)
+    vtkwidget->setAutomaticImageCacheEnabled(true);
+#endif
+
+
+    // help the QVTKWidget know when to clear the cache
+    this->Internal->VTKConnect->Connect(
+      renModule, vtkCommand::ModifiedEvent,
+      vtkwidget, SLOT(markCachedImageAsDirty()));
+
+    this->Internal->Viewport = vtkwidget;
+    }
+
   this->Internal->Viewport->setObjectName("Viewport");
+
   // we manage the context menu ourself, so it doesn't interfere with
   // render window interactions
   this->Internal->Viewport->setContextMenuPolicy(Qt::NoContextMenu);
-  
+
+  this->Internal->Viewport->installEventFilter(this);
+
   // add a link view menu
   QAction* act = new QAction("Link Camera...", this);
   this->addMenuAction(act);
   QObject::connect(act, SIGNAL(triggered(bool)),
                    this, SLOT(linkToOtherView()));
 
-  // do image caching for performance
-  // For now, we are doing this only on Apple because it can render
-  // and capture a frame buffer even when it is obstructred by a
-  // window. This does not work as well on other platforms.
-#if defined(__APPLE__)
-  this->Internal->Viewport->setAutomaticImageCacheEnabled(true);
-#endif
-
-  this->Internal->Viewport->installEventFilter(this);
-
   this->ResetCenterWithCamera = true;
-
-  // help the QVTKWidget know when to clear the cache
-  this->Internal->VTKConnect->Connect(
-    renModule, vtkCommand::ModifiedEvent,
-    this->Internal->Viewport, SLOT(markCachedImageAsDirty()));  
-
   this->Internal->VTKConnect->Connect(
     renModule, vtkCommand::ResetCameraEvent,
     this, SLOT(onResetCameraEvent()));
@@ -205,6 +217,10 @@ pqRenderView::pqRenderView( const QString& group,
 //-----------------------------------------------------------------------------
 pqRenderView::~pqRenderView()
 {
+  foreach (QVTKWidget* widget, this->Internal->RenderWidgets.values())
+    {
+    delete widget;
+    }
 
   delete this->Internal->Viewport;
   delete this->Internal;
@@ -213,13 +229,85 @@ pqRenderView::~pqRenderView()
 //-----------------------------------------------------------------------------
 vtkSMRenderViewProxy* pqRenderView::getRenderViewProxy() const
 {
-  return this->Internal->RenderModuleProxy;
+  vtkSMComparativeViewProxy* cmpView = vtkSMComparativeViewProxy::SafeDownCast(
+    this->getProxy());
+  if (cmpView)
+    {
+    return vtkSMRenderViewProxy::SafeDownCast(cmpView->GetRootView());
+    }
+  return vtkSMRenderViewProxy::SafeDownCast(this->getViewProxy());
 }
 
 //-----------------------------------------------------------------------------
 QWidget* pqRenderView::getWidget()
 {
   return this->Internal->Viewport;
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::onComparativeVisLayoutChanged()
+{
+  // Create QVTKWidgets for new view modules and destroy old ones.
+  vtkCollection* currentViews =  vtkCollection::New();
+  
+  vtkSMComparativeViewProxy* compView = vtkSMComparativeViewProxy::SafeDownCast(
+    this->getProxy());
+  compView->GetViews(currentViews);
+
+  QSet<vtkSMViewProxy*> currentViewsSet;
+
+  currentViews->InitTraversal();
+  vtkSMViewProxy* temp = vtkSMViewProxy::SafeDownCast(
+    currentViews->GetNextItemAsObject());
+  for (; temp !=0; temp = vtkSMViewProxy::SafeDownCast(currentViews->GetNextItemAsObject()))
+    {
+    currentViewsSet.insert(temp);
+    }
+
+  QSet<vtkSMViewProxy*> oldViews = QSet<vtkSMViewProxy*>::fromList(
+    this->Internal->RenderWidgets.keys());
+  
+  QSet<vtkSMViewProxy*> removed = oldViews - currentViewsSet;
+  QSet<vtkSMViewProxy*> added = currentViewsSet - oldViews;
+
+  // Destroy old QVTKWidgets widgets.
+  foreach (vtkSMViewProxy* key, removed)
+    {
+    QVTKWidget* item = this->Internal->RenderWidgets.take(key);
+    delete item;
+    }
+
+  // Create QVTKWidgets for new ones.
+  foreach (vtkSMViewProxy* key, added)
+    {
+    vtkSMRenderViewProxy* renView = vtkSMRenderViewProxy::SafeDownCast(key);
+    QVTKWidget* widget = new QVTKWidget();
+    widget->SetRenderWindow(renView->GetRenderWindow());
+    widget->installEventFilter(this);
+    widget->setContextMenuPolicy(Qt::NoContextMenu);
+    this->Internal->RenderWidgets[key] = widget;
+    }
+
+  // Now layout the views.
+  int dimensions[2];
+  compView->GetDimensions(dimensions);
+
+  QGridLayout* layout = new QGridLayout();
+  for (int x=0; x < dimensions[0]; x++)
+    {
+    for (int y=0; y < dimensions[1]; y++)
+      {
+      int index = y*dimensions[0]+x;
+      vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(currentViews->GetItemAsObject(index));
+      QVTKWidget* widget = this->Internal->RenderWidgets[view];
+      widget->show(); // without this, I was getting problems when no. of windows was > 4.
+      layout->addWidget(widget, y, x);
+      }
+    }
+  delete this->Internal->Viewport->layout();
+  this->Internal->Viewport->setLayout(layout);
+
+  currentViews->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -238,27 +326,32 @@ void pqRenderView::initializeWidgets()
   // this->Internal->VTKConnect->Disconnect(
   //   this->Internal->RenderModuleProxy, vtkCommand::UpdateEvent);
 
-  vtkSMRenderViewProxy* renModule =
-    this->Internal->RenderModuleProxy;
+  vtkSMRenderViewProxy* renModule = this->getRenderViewProxy();
 
-  this->Internal->Viewport->SetRenderWindow(
-    renModule->GetRenderWindow());
+  QVTKWidget* vtkwidget = qobject_cast<QVTKWidget*>(
+    this->Internal->Viewport);
+  if (vtkwidget)
+    {
+    vtkwidget->SetRenderWindow(renModule->GetRenderWindow());
+    }
+  else
+    {
+    // Comparative vis view.
+    vtkSMComparativeViewProxy* cmpView = 
+      vtkSMComparativeViewProxy::SafeDownCast(this->getProxy());
+    cmpView->Build(3, 3);
+    }
 
-  // Enable interaction on this client.
-  vtkPVGenericRenderWindowInteractor* iren =
-    vtkPVGenericRenderWindowInteractor::SafeDownCast(
-      renModule->GetInteractor());
-  iren->SetPVRenderView(this->Internal->RenderViewProxy);
+  vtkPVGenericRenderWindowInteractor* iren = renModule->GetInteractor();
 
   // Init axes actor.
+  // FIXME: Convert OrientationAxesWidget to a first class representation.
   this->Internal->OrientationAxesWidget->SetParentRenderer(
     renModule->GetRenderer());
   this->Internal->OrientationAxesWidget->SetViewport(0, 0, 0.25, 0.25);
   this->Internal->OrientationAxesWidget->SetInteractor(iren);
   this->Internal->OrientationAxesWidget->SetEnabled(1);
   this->Internal->OrientationAxesWidget->SetInteractive(0);
-
-  iren->Enable();
 
   // setup the center axes.
   this->initializeCenterAxes();
@@ -295,7 +388,7 @@ void pqRenderView::setDefaultPropertyValues()
   proxy->UpdateVTKObjects();
 
   this->restoreSettings();
-  this->Internal->RenderModuleProxy->ResetCamera();
+  this->getRenderViewProxy()->ResetCamera();
   this->clearUndoStack();
 }
 
@@ -376,21 +469,12 @@ bool pqRenderView::updateDefaultInteractors(
     return false;
     }
 
-  // Create the interactor style proxy:
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkIdType cid = this->getServer()->GetConnectionID();
-
+  vtkSMProxy* viewproxy = this->getProxy();
+  
   this->clearHelperProxies();
-
-  vtkSMProxy* interactorStyle = 
-    pxm->NewProxy("interactorstyles", "InteractorStyle");
-  interactorStyle->SetConnectionID(cid);
-  interactorStyle->SetServers(vtkProcessModule::CLIENT);
-  this->addHelperProxy("InteractorStyles", interactorStyle);
-  interactorStyle->Delete();
-
-  vtkSMProperty *styleManips = 
-    interactorStyle->GetProperty("CameraManipulators");
+  vtkSMProxyProperty *styleManips = 
+    vtkSMProxyProperty::SafeDownCast(viewproxy->GetProperty("CameraManipulators"));
+  styleManips->RemoveAllProxies();
 
   // Register manipulators, then add to interactor style
  
@@ -401,13 +485,7 @@ bool pqRenderView::updateDefaultInteractors(
     manip->UpdateVTKObjects();
     }
 
-  interactorStyle->UpdateVTKObjects();
-
-  // Set interactor style on the render module.
-  pqSMAdaptor::setProxyProperty(
-    this->Internal->RenderModuleProxy->GetProperty("InteractorStyle"),
-    interactorStyle);
-  this->Internal->RenderModuleProxy->UpdateVTKObjects();
+  viewproxy->UpdateVTKObjects();
   return true;
 }
 
@@ -480,14 +558,16 @@ void pqRenderView::initializeCenterAxes()
   centerAxes->UpdateVTKObjects();
   this->Internal->CenterAxesProxy = centerAxes;
 
+  vtkSMViewProxy* renView = this->getViewProxy();
+
   // Update the center axes position whenever the center of rotation changes.
   this->Internal->VTKConnect->Connect(
-    this->Internal->RenderModuleProxy->GetProperty("CenterOfRotation"), 
+    renView->GetProperty("CenterOfRotation"), 
     vtkCommand::ModifiedEvent, this, SLOT(updateCenterAxes()));
   
   // Add to render module without using properties. That way it does not
   // get saved in state.
-  this->Internal->RenderModuleProxy->AddRepresentation(
+  renView->AddRepresentation(
     vtkSMRepresentationProxy::SafeDownCast(centerAxes));
   centerAxes->Delete();
 }
@@ -495,10 +575,15 @@ void pqRenderView::initializeCenterAxes()
 //-----------------------------------------------------------------------------
 void pqRenderView::render()
 {
+  /* Best to leave to superclass so that this works seamlessly with comparative
+   * viz views. 
   if (this->Internal->RenderModuleProxy && this->Internal->Viewport)
     {
     this->Internal->Viewport->update();
     }
+    */
+ 
+  this->Superclass::render();
 }
 
 //-----------------------------------------------------------------------------
@@ -517,25 +602,23 @@ void pqRenderView::onResetCameraEvent()
 //-----------------------------------------------------------------------------
 void pqRenderView::resetCamera()
 {
-  if (this->Internal->RenderModuleProxy)
-    {
-    this->fakeInteraction(true);
-    this->Internal->RenderModuleProxy->ResetCamera();
-    // This render is essential since vtkSMCameraLink does not 
-    // propagate changes to linked views until the render call.
-    this->forceRender();
-    this->fakeInteraction(false);
-    }
+  this->fakeInteraction(true);
+  this->getRenderViewProxy()->ResetCamera();
+  // This render is essential since vtkSMCameraLink does not 
+  // propagate changes to linked views until the render call.
+  this->forceRender();
+  this->fakeInteraction(false);
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderView::resetCenterOfRotation()
 {
   // Update center of rotation.
-  this->Internal->RenderModuleProxy->UpdatePropertyInformation();
+  vtkSMProxy* viewproxy = this->getProxy();
+  viewproxy->UpdatePropertyInformation();
   QList<QVariant> values = 
     pqSMAdaptor::getMultipleElementProperty(
-      this->Internal->RenderModuleProxy->GetProperty("CameraFocalPointInfo"));
+      viewproxy->GetProperty("CameraFocalPointInfo"));
   this->setCenterOfRotation(
     values[0].toDouble(), values[1].toDouble(), values[2].toDouble());
 }
@@ -543,7 +626,7 @@ void pqRenderView::resetCenterOfRotation()
 //-----------------------------------------------------------------------------
 vtkImageData* pqRenderView::captureImage(int magnification)
 {
-  return this->Internal->RenderModuleProxy->CaptureWindow(magnification);
+  return this->getRenderViewProxy()->CaptureWindow(magnification);
 }
 
 //-----------------------------------------------------------------------------
@@ -604,7 +687,7 @@ bool pqRenderView::saveImage(int width, int height, const QString& filename)
     return false;
     }
 
-  int ret = this->Internal->RenderModuleProxy->WriteImage(
+  int ret = this->getRenderViewProxy()->WriteImage(
     filename.toAscii().data(), writername);
   if (width>0 && height>0)
     {
@@ -935,7 +1018,7 @@ void pqRenderView::updateCenterAxes()
   double center[3];
   QList<QVariant> val =
     pqSMAdaptor::getMultipleElementProperty(
-      this->Internal->RenderModuleProxy->GetProperty("CenterOfRotation"));
+      this->getProxy()->GetProperty("CenterOfRotation"));
   center[0] = val[0].toDouble();
   center[1] = val[1].toDouble();
   center[2] = val[2].toDouble();
@@ -949,7 +1032,7 @@ void pqRenderView::updateCenterAxes()
 
   // Reset size of the axes.
   double bounds[6];
-  this->Internal->RenderModuleProxy->ComputeVisiblePropBounds(bounds);
+  this->getRenderViewProxy()->ComputeVisiblePropBounds(bounds);
 
   QList<QVariant> scaleValues;
   scaleValues << (bounds[1]-bounds[0])*0.25
@@ -971,10 +1054,11 @@ void pqRenderView::setCenterOfRotation(double x, double y, double z)
 
   // this modifies the CenterOfRotation property resulting to a call
   // to updateCenterAxes().
+  vtkSMProxy* viewproxy = this->getProxy();
   pqSMAdaptor::setMultipleElementProperty(
-    this->Internal->RenderModuleProxy->GetProperty("CenterOfRotation"),
+    viewproxy->GetProperty("CenterOfRotation"),
     positionValues);
-  this->Internal->RenderModuleProxy->UpdateVTKObjects();
+  viewproxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -982,7 +1066,7 @@ void pqRenderView::getCenterOfRotation(double center[3]) const
 {
   QList<QVariant> val =
     pqSMAdaptor::getMultipleElementProperty(
-      this->Internal->RenderModuleProxy->GetProperty("CenterOfRotation"));
+      this->getProxy()->GetProperty("CenterOfRotation"));
   center[0] = val[0].toDouble();
   center[1] = val[1].toDouble();
   center[2] = val[2].toDouble();
@@ -994,8 +1078,8 @@ void pqRenderView::setCenterAxesVisibility(bool visible)
   pqSMAdaptor::setElementProperty(
     this->Internal->CenterAxesProxy->GetProperty("Visibility"),
     visible? 1 : 0);
-  this->Internal->CenterAxesProxy->UpdateProperty("Visibility");
-  this->Internal->RenderModuleProxy->MarkModified(0);
+  this->Internal->CenterAxesProxy->UpdateVTKObjects();
+  this->getProxy()->MarkModified(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -1143,7 +1227,7 @@ bool pqRenderView::canRedo() const
 void pqRenderView::undo()
 {
   this->Internal->InteractionUndoStack->Undo();
-  this->Internal->RenderModuleProxy->UpdateVTKObjects();
+  this->getProxy()->UpdateVTKObjects();
   this->render();
 
   this->fakeUndoRedo(false, false);
@@ -1153,7 +1237,7 @@ void pqRenderView::undo()
 void pqRenderView::redo()
 {
   this->Internal->InteractionUndoStack->Redo();
-  this->Internal->RenderModuleProxy->UpdateVTKObjects();
+  this->getProxy()->UpdateVTKObjects();
   this->render();
   
   this->fakeUndoRedo(true, false);
@@ -1263,8 +1347,7 @@ void pqRenderView::resetViewDirection(
     double look_x, double look_y, double look_z,
     double up_x, double up_y, double up_z)
 {
-  vtkSMRenderViewProxy* proxy = this->getRenderViewProxy();
-  proxy->SynchronizeCameraProperties();
+  vtkSMProxy* proxy = this->getProxy();
 
   pqSMAdaptor::setMultipleElementProperty(
     proxy->GetProperty("CameraPosition"), 0, 0);

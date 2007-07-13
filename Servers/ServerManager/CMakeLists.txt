@@ -113,6 +113,8 @@ SET(Kit_SRCS
   vtkSMRepresentationStrategy.cxx
   vtkSMScalarBarActorProxy.cxx
   vtkSMScalarBarWidgetRepresentationProxy.cxx
+  vtkSMComparativeViewProxy.cxx
+  vtkSMRenderViewHelper.cxx
   vtkSMSelectionHelper.cxx
 #  vtkSMSelectionProxy.cxx
   vtkSMSelectionRepresentationProxy.cxx
@@ -179,22 +181,28 @@ SET( ServerManager_SRCS
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMAnimationSceneWriter.cxx
+  vtkSMClientServerRenderSyncManagerHelper.cxx
+  vtkSMDataRepresentationProxy.cxx
   vtkSMDomain.cxx
   vtkSMInformationHelper.cxx
   vtkSMLink.cxx
+  vtkSMMultiProcessRenderView.cxx
+  vtkSMMultiProcessRenderView.cxx
   vtkSMProxyManagerReviver.cxx
-  vtkSMStateLoaderBase.cxx
-  vtkSMUndoElement.cxx
-  vtkSMVectorProperty.cxx
-
-  vtkSMDataRepresentationProxy.cxx
   vtkSMRepresentationProxy.cxx
   vtkSMRepresentationStrategy.cxx
+  vtkSMStateLoaderBase.cxx
   vtkSMStateVersionControllerBase.cxx
-  vtkSMMultiProcessRenderView.cxx
-  vtkSMClientServerRenderSyncManagerHelper.cxx
+  vtkSMStateVersionControllerBase.cxx
+  vtkSMUndoElement.cxx
+  vtkSMVectorProperty.cxx
   ABSTRACT
   )
+
+SET_SOURCE_FILES_PROPERTIES(
+  vtkSMRenderViewHelper.cxx
+  WRAP_EXCLUDE)
+
 
 INCLUDE_DIRECTORIES(
   ${VTK_INCLUDE_DIR}

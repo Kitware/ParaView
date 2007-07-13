@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqXMLUtil.h"
 
-#include "QVTKWidget.h"
 #include "vtkObject.h"
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"

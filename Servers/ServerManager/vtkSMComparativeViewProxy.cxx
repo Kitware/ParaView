@@ -18,10 +18,13 @@
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMCameraLink.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMPVAnimationSceneProxy.h"
 #include "vtkSMRepresentationProxy.h"
+#include "vtkSMProperty.h"
 
 #include <vtkstd/vector>
 #include <vtkstd/map>
@@ -47,10 +50,12 @@ public:
   MapOfReprClones RepresentationClones;
 
   vtkSmartPointer<vtkSMProxyLink> ViewLink;
+  vtkSmartPointer<vtkSMCameraLink> ViewCameraLink;
 
   vtkInternal()
     {
     this->ViewLink = vtkSmartPointer<vtkSMProxyLink>::New();
+    this->ViewCameraLink = vtkSmartPointer<vtkSMCameraLink>::New();
     }
 
   unsigned int ActiveIndexX;
@@ -60,7 +65,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.3");
 vtkCxxSetObjectMacro(vtkSMComparativeViewProxy, AnimationSceneX, vtkSMPVAnimationSceneProxy);
 vtkCxxSetObjectMacro(vtkSMComparativeViewProxy, AnimationSceneY, vtkSMPVAnimationSceneProxy);
 //----------------------------------------------------------------------------
@@ -104,6 +109,8 @@ bool vtkSMComparativeViewProxy::BeginCreateVTKObjects()
   // Root view is the first view in the views list.
   this->Internal->Views.push_back(rootView);
 
+  this->Internal->ViewCameraLink->AddLinkedProxy(rootView, vtkSMLink::INPUT);
+  this->Internal->ViewCameraLink->AddLinkedProxy(rootView, vtkSMLink::OUTPUT);
   this->Internal->ViewLink->AddLinkedProxy(rootView, vtkSMLink::INPUT);
 
   // Every view keeps their own representations.
@@ -113,6 +120,15 @@ bool vtkSMComparativeViewProxy::BeginCreateVTKObjects()
   // layout.
   this->Internal->ViewLink->AddException("ViewSize");
   this->Internal->ViewLink->AddException("ViewPosition");
+
+  this->Internal->ViewLink->AddException("CameraPositionInfo");
+  this->Internal->ViewLink->AddException("CameraPosition");
+  this->Internal->ViewLink->AddException("CameraFocalPointInfo");
+  this->Internal->ViewLink->AddException("CameraFocalPoint");
+  this->Internal->ViewLink->AddException("CameraViewUpInfo");
+  this->Internal->ViewLink->AddException("CameraViewUp");
+  this->Internal->ViewLink->AddException("CameraClippingRangeInfo");
+  this->Internal->ViewLink->AddException("CameraClippingRange");
   return this->Superclass::BeginCreateVTKObjects();
 }
 
@@ -147,12 +163,32 @@ void vtkSMComparativeViewProxy::Build(int dx, int dy)
   this->Dimensions[1] = dy;
 
   // TODO: Update ViewSize ViewPosition for all internal views.
+
+  // Whenever the layout changes we'll fire the ConfigureEvent.
+  this->InvokeEvent(vtkCommand::ConfigureEvent);
 }
 
 //----------------------------------------------------------------------------
 vtkSMViewProxy* vtkSMComparativeViewProxy::GetRootView()
 {
   return this->Internal->Views[0];
+}
+
+//----------------------------------------------------------------------------
+static void vtkCopyClone(vtkSMProxy* source, vtkSMProxy* clone)
+{
+  vtkSmartPointer<vtkSMPropertyIterator> iterSource;
+  vtkSmartPointer<vtkSMPropertyIterator> iterDest;
+
+  iterSource.TakeReference(source->NewPropertyIterator());
+  iterDest.TakeReference(clone->NewPropertyIterator());
+
+  // Since source/clone are exact copies, the following is safe.
+  for (; !iterSource->IsAtEnd() && !iterDest->IsAtEnd();
+    iterSource->Next(), iterDest->Next())
+    {
+    iterDest->GetProperty()->Copy(iterSource->GetProperty());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -169,14 +205,17 @@ void vtkSMComparativeViewProxy::AddNewView()
       "view cannot work.");
     return;
     }
- 
+
+  newView->UpdateVTKObjects();
 
   this->Internal->Views.push_back(newView);
+  this->Internal->ViewCameraLink->AddLinkedProxy(newView, vtkSMLink::INPUT);
+  this->Internal->ViewCameraLink->AddLinkedProxy(newView, vtkSMLink::OUTPUT);
   this->Internal->ViewLink->AddLinkedProxy(newView, vtkSMLink::OUTPUT);
   newView->Delete();
 
   // Ensure that views always use cache.
-  newView->SetUseCache(true);
+  //newView->SetUseCache(true);
   newView->SetCacheTime(0); // cache time value is merely is place holder. 
                             // All views cache only 1 time, hence this number is
                             // immaterial.
@@ -191,7 +230,7 @@ void vtkSMComparativeViewProxy::AddNewView()
 
     vtkSMRepresentationProxy* newRepr = vtkSMRepresentationProxy::SafeDownCast(
       pxm->NewProxy(repr->GetXMLGroup(), repr->GetXMLName()));
-    newRepr->Copy(repr); // create a clone.
+    vtkCopyClone(repr, newRepr); // create a clone.
     newRepr->UpdateVTKObjects();
 
     data.Link->AddLinkedProxy(newRepr, vtkSMLink::OUTPUT);
@@ -231,6 +270,8 @@ void vtkSMComparativeViewProxy::RemoveView(vtkSMViewProxy* view)
     }
 
   this->Internal->ViewLink->RemoveLinkedProxy(view);
+  this->Internal->ViewCameraLink->RemoveLinkedProxy(view);
+
   vtkInternal::VectorOfViews::iterator iter;
   for (iter = this->Internal->Views.begin(); 
        iter != this->Internal->Views.end(); ++iter)
@@ -269,7 +310,7 @@ void vtkSMComparativeViewProxy::AddRepresentation(vtkSMRepresentationProxy* repr
       {
       vtkSMRepresentationProxy* newRepr = vtkSMRepresentationProxy::SafeDownCast(
         pxm->NewProxy(repr->GetXMLGroup(), repr->GetXMLName()));
-      newRepr->Copy(repr); // create a clone.
+      vtkCopyClone(repr, newRepr); // create a clone.
       newRepr->UpdateVTKObjects();
 
       reprLink->AddLinkedProxy(newRepr, vtkSMLink::OUTPUT);
@@ -368,9 +409,9 @@ void vtkSMComparativeViewProxy::InteractiveRender()
 
 //----------------------------------------------------------------------------
 vtkSMRepresentationProxy* vtkSMComparativeViewProxy::CreateDefaultRepresentation(
-  vtkSMProxy* src)
+  vtkSMProxy* src, int outputport)
 {
-  return this->GetRootView()->CreateDefaultRepresentation(src);
+  return this->GetRootView()->CreateDefaultRepresentation(src, outputport);
 }
 
 //----------------------------------------------------------------------------

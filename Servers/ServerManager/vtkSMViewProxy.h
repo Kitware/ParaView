@@ -62,7 +62,7 @@ public:
   // Removes all added representations from this view.
   // Simply calls RemoveRepresentation() on all added representations 
   // one by one.
-  void RemoveAllRepresentations();
+  virtual void RemoveAllRepresentations();
 
   // Description:
   // Updates the data pipelines for all visible representations.
@@ -76,7 +76,7 @@ public:
   // \li PerformRender()
   // \li EndStillRender() 
   // in that order.
-  void StillRender();
+  virtual void StillRender();
 
   // Description:
   // Renders the view using lower resolution is possible.
@@ -86,7 +86,7 @@ public:
   // \li PerformRender()
   // \li EndInteractiveRender() 
   // in that order.
-  void InteractiveRender();
+  virtual void InteractiveRender();
  
   // Description:
   // Creates a new vtkSMRepresentationStrategy subclass based on the type

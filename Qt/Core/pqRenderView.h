@@ -57,7 +57,7 @@ public:
   // \c parent:- QObject parent.
   pqRenderView( const QString& group,
                 const QString& name, 
-                vtkSMRenderViewProxy* renModule, 
+                vtkSMViewProxy* renModule, 
                 pqServer* server, 
                 QObject* parent=NULL);
 
@@ -235,6 +235,9 @@ private slots:
   /// Called when undo stack changes. We fires appropriate 
   /// undo signals as required by pqView.
   void onUndoStackChanged();
+
+  /// Called when the layout on the comparative vis changes.
+  void onComparativeVisLayoutChanged();
 protected:
   bool eventFilter(QObject* caller, QEvent* e);
 

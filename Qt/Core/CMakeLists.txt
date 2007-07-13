@@ -236,8 +236,6 @@ ADD_LIBRARY(pqCore
   pqReaderFactory.h
   pqRenderView.cxx
   pqRenderView.h
-  pqRenderViewProxy.cxx
-  pqRenderViewProxy.h
   pqRepresentation.cxx
   pqRepresentation.h
   pqSMAdaptor.cxx
