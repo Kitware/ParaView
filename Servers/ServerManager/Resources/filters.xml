@@ -5842,7 +5842,7 @@ Tessellate a higher-order dataset.
    <!-- End GenericTessellator -->
    </SourceProxy>
 
-   <SourceProxy name="GroupDataSets" class="vtkMultiGroupDataGroupFilter"
+   <SourceProxy name="GroupDataSets" class="vtkMultiBlockMergeFilter"
     label="Group Datasets">
     <Documentation
         long_help="Group data sets."

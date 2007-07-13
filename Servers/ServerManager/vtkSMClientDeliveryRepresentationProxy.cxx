@@ -28,7 +28,7 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.12");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
 {
@@ -222,7 +222,7 @@ void vtkSMClientDeliveryRepresentationProxy::SetReductionType(int type)
     break;
 
   case COMPOSITE_DATASET_APPEND:
-    classname = "vtkMultiGroupDataGroupFilter"; 
+    classname = "vtkMultiBlockMergeFilter"; 
     break;
 
   default:
