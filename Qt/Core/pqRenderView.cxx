@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballZoom.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMComparativeViewProxy.h"
 #include "vtkSMInteractionUndoStackBuilder.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
@@ -146,72 +145,10 @@ pqRenderView::pqRenderView( const QString& group,
     vtkCommand::ModifiedEvent, this, SLOT(onUndoStackChanged()),
     0, 0, Qt::QueuedConnection);
 
-  if (renModule->IsA("vtkSMComparativeViewProxy"))
-    {
-    this->Internal->Viewport = new QWidget();
-    this->Internal->VTKConnect->Connect(
-      renModule, vtkCommand::ConfigureEvent,
-      this, SLOT(onComparativeVisLayoutChanged()));
-    }
-  else
-    {
-    QVTKWidget* vtkwidget = new QVTKWidget();
-
-    // do image caching for performance
-    // For now, we are doing this only on Apple because it can render
-    // and capture a frame buffer even when it is obstructred by a
-    // window. This does not work as well on other platforms.
-#if defined(__APPLE__)
-    vtkwidget->setAutomaticImageCacheEnabled(true);
-#endif
-
-
-    // help the QVTKWidget know when to clear the cache
-    this->Internal->VTKConnect->Connect(
-      renModule, vtkCommand::ModifiedEvent,
-      vtkwidget, SLOT(markCachedImageAsDirty()));
-
-    this->Internal->Viewport = vtkwidget;
-    }
-
-  this->Internal->Viewport->setObjectName("Viewport");
-
-  // we manage the context menu ourself, so it doesn't interfere with
-  // render window interactions
-  this->Internal->Viewport->setContextMenuPolicy(Qt::NoContextMenu);
-
-  this->Internal->Viewport->installEventFilter(this);
-
-  // add a link view menu
-  QAction* act = new QAction("Link Camera...", this);
-  this->addMenuAction(act);
-  QObject::connect(act, SIGNAL(triggered(bool)),
-                   this, SLOT(linkToOtherView()));
-
   this->ResetCenterWithCamera = true;
   this->Internal->VTKConnect->Connect(
     renModule, vtkCommand::ResetCameraEvent,
     this, SLOT(onResetCameraEvent()));
-
-  // The render module needs to obtain client side objects
-  // for the RenderWindow etc. to initialize the QVTKWidget
-  // correctly. It cannot do this unless the underlying proxy
-  // has been created. Since any pqProxy should never call
-  // UpdateVTKObjects() on itself in the constructor, we 
-  // do the following.
-  if (!renModule->GetObjectsCreated())
-    {
-    // Wait till first UpdateVTKObjects() call on the render module.
-    // Under usual circumstances, after UpdateVTKObjects() the
-    // render module objects will be created.
-    this->Internal->VTKConnect->Connect(
-      renModule, vtkCommand::UpdateEvent,
-      this, SLOT(initializeWidgets()));
-    }
-  else
-    {
-    this->initializeWidgets();
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -229,85 +166,76 @@ pqRenderView::~pqRenderView()
 //-----------------------------------------------------------------------------
 vtkSMRenderViewProxy* pqRenderView::getRenderViewProxy() const
 {
-  vtkSMComparativeViewProxy* cmpView = vtkSMComparativeViewProxy::SafeDownCast(
-    this->getProxy());
-  if (cmpView)
-    {
-    return vtkSMRenderViewProxy::SafeDownCast(cmpView->GetRootView());
-    }
   return vtkSMRenderViewProxy::SafeDownCast(this->getViewProxy());
 }
 
 //-----------------------------------------------------------------------------
 QWidget* pqRenderView::getWidget()
 {
+  if (!this->Internal->Viewport)
+    {
+    this->Internal->Viewport = this->createWidget();
+    // we manage the context menu ourself, so it doesn't interfere with
+    // render window interactions
+    this->Internal->Viewport->setContextMenuPolicy(Qt::NoContextMenu);
+    this->Internal->Viewport->installEventFilter(this);
+    this->Internal->Viewport->setObjectName("Viewport");
+
+    // add a link view menu
+    QAction* act = new QAction("Link Camera...", this);
+    this->addMenuAction(act);
+    QObject::connect(act, SIGNAL(triggered(bool)),
+      this, SLOT(linkToOtherView()));
+    }
+
   return this->Internal->Viewport;
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderView::onComparativeVisLayoutChanged()
+QWidget* pqRenderView::createWidget() 
 {
-  // Create QVTKWidgets for new view modules and destroy old ones.
-  vtkCollection* currentViews =  vtkCollection::New();
-  
-  vtkSMComparativeViewProxy* compView = vtkSMComparativeViewProxy::SafeDownCast(
-    this->getProxy());
-  compView->GetViews(currentViews);
+  QVTKWidget* vtkwidget = new QVTKWidget();
 
-  QSet<vtkSMViewProxy*> currentViewsSet;
+  // do image caching for performance
+  // For now, we are doing this only on Apple because it can render
+  // and capture a frame buffer even when it is obstructred by a
+  // window. This does not work as well on other platforms.
+#if defined(__APPLE__)
+  vtkwidget->setAutomaticImageCacheEnabled(true);
+#endif
 
-  currentViews->InitTraversal();
-  vtkSMViewProxy* temp = vtkSMViewProxy::SafeDownCast(
-    currentViews->GetNextItemAsObject());
-  for (; temp !=0; temp = vtkSMViewProxy::SafeDownCast(currentViews->GetNextItemAsObject()))
+  // help the QVTKWidget know when to clear the cache
+  this->Internal->VTKConnect->Connect(
+    this->getProxy(), vtkCommand::ModifiedEvent,
+    vtkwidget, SLOT(markCachedImageAsDirty()));
+  return vtkwidget;
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::initialize()
+{
+  this->Superclass::initialize();
+
+  // The render module needs to obtain client side objects
+  // for the RenderWindow etc. to initialize the QVTKWidget
+  // correctly. It cannot do this unless the underlying proxy
+  // has been created. Since any pqProxy should never call
+  // UpdateVTKObjects() on itself in the constructor, we 
+  // do the following.
+  vtkSMProxy* renModule = this->getProxy();
+  if (!renModule->GetObjectsCreated())
     {
-    currentViewsSet.insert(temp);
+    // Wait till first UpdateVTKObjects() call on the render module.
+    // Under usual circumstances, after UpdateVTKObjects() the
+    // render module objects will be created.
+    this->Internal->VTKConnect->Connect(
+      renModule, vtkCommand::UpdateEvent,
+      this, SLOT(initializeWidgets()));
     }
-
-  QSet<vtkSMViewProxy*> oldViews = QSet<vtkSMViewProxy*>::fromList(
-    this->Internal->RenderWidgets.keys());
-  
-  QSet<vtkSMViewProxy*> removed = oldViews - currentViewsSet;
-  QSet<vtkSMViewProxy*> added = currentViewsSet - oldViews;
-
-  // Destroy old QVTKWidgets widgets.
-  foreach (vtkSMViewProxy* key, removed)
+  else
     {
-    QVTKWidget* item = this->Internal->RenderWidgets.take(key);
-    delete item;
+    this->initializeWidgets();
     }
-
-  // Create QVTKWidgets for new ones.
-  foreach (vtkSMViewProxy* key, added)
-    {
-    vtkSMRenderViewProxy* renView = vtkSMRenderViewProxy::SafeDownCast(key);
-    QVTKWidget* widget = new QVTKWidget();
-    widget->SetRenderWindow(renView->GetRenderWindow());
-    widget->installEventFilter(this);
-    widget->setContextMenuPolicy(Qt::NoContextMenu);
-    this->Internal->RenderWidgets[key] = widget;
-    }
-
-  // Now layout the views.
-  int dimensions[2];
-  compView->GetDimensions(dimensions);
-
-  QGridLayout* layout = new QGridLayout();
-  for (int x=0; x < dimensions[0]; x++)
-    {
-    for (int y=0; y < dimensions[1]; y++)
-      {
-      int index = y*dimensions[0]+x;
-      vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(currentViews->GetItemAsObject(index));
-      QVTKWidget* widget = this->Internal->RenderWidgets[view];
-      widget->show(); // without this, I was getting problems when no. of windows was > 4.
-      layout->addWidget(widget, y, x);
-      }
-    }
-  delete this->Internal->Viewport->layout();
-  this->Internal->Viewport->setLayout(layout);
-
-  currentViews->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -328,18 +256,10 @@ void pqRenderView::initializeWidgets()
 
   vtkSMRenderViewProxy* renModule = this->getRenderViewProxy();
 
-  QVTKWidget* vtkwidget = qobject_cast<QVTKWidget*>(
-    this->Internal->Viewport);
+  QVTKWidget* vtkwidget = qobject_cast<QVTKWidget*>(this->getWidget());
   if (vtkwidget)
     {
     vtkwidget->SetRenderWindow(renModule->GetRenderWindow());
-    }
-  else
-    {
-    // Comparative vis view.
-    vtkSMComparativeViewProxy* cmpView = 
-      vtkSMComparativeViewProxy::SafeDownCast(this->getProxy());
-    cmpView->Build(3, 3);
     }
 
   vtkPVGenericRenderWindowInteractor* iren = renModule->GetInteractor();

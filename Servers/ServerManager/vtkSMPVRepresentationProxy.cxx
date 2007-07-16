@@ -35,7 +35,7 @@ inline void vtkSMPVRepresentationProxySetInt(
 }
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -207,8 +207,6 @@ void vtkSMPVRepresentationProxy::SetRepresentation(int repr)
     vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation, "Visibility", 
       this->GetVisibility());
     this->Modified();
-    // TODO: Do we need to call MarkModified();
-    this->MarkModified(0);
     }
 }
 

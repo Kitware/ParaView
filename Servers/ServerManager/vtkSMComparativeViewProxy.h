@@ -96,12 +96,6 @@ public:
   // Returns the root view proxy.
   vtkSMViewProxy* GetRootView();
 
-  // Description:
-  // FIXME: Make me protected
-  // Called on every still render. This checks if the comparative visualization
-  // needs to be regenerated (following changes to proxies involved in
-  // generating the comparative visualization)/tim
-  void UpdateVisualization();
 //BTX
 protected:
   vtkSMComparativeViewProxy();
@@ -121,8 +115,22 @@ protected:
   // Removes an internal view and all the representations in that view.
   void RemoveView(vtkSMViewProxy* remove);
 
+  // Description:
+  // Called on every still render. This checks if the comparative visualization
+  // needs to be regenerated (following changes to proxies involved in
+  // generating the comparative visualization)/tim
+  void UpdateVisualization();
+
+  // Description:
+  // Update comparative scene.
   void UpdateComparativeVisualization();
+
+  // Description:
+  // Update timestrip scene.
   void UpdateFilmStripVisualization(vtkSMPVAnimationSceneProxy* scene);
+
+  void MarkSceneOutdated()
+    { this->SceneOutdated=true; }
 
   // Description:
   // Called when playing the scene to generate film strips.
@@ -133,6 +141,8 @@ protected:
   vtkSMPVAnimationSceneProxy* AnimationSceneX;
   vtkSMPVAnimationSceneProxy* AnimationSceneY;
 
+  bool SceneOutdated;
+
 private:
   vtkSMComparativeViewProxy(const vtkSMComparativeViewProxy&); // Not implemented
   void operator=(const vtkSMComparativeViewProxy&); // Not implemented
@@ -141,6 +151,7 @@ private:
   vtkInternal* Internal;
 
   vtkCommand* FilmStripObserver;
+  vtkCommand* SceneObserver;
 
 //ETX
 };

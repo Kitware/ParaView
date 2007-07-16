@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 
 #include "pqBarChartRepresentation.h"
+#include "pqComparativeRenderView.h"
 #include "pqElementInspectorView.h"
 #include "pqLineChartRepresentation.h"
 #include "pqPlotView.h"
@@ -56,7 +57,8 @@ QStringList pqStandardViewModules::viewTypes() const
     pqPlotView::barChartType() << 
     pqPlotView::XYPlotType() << 
     pqTableView::tableType() <<
-    pqElementInspectorView::eiViewType();
+    pqElementInspectorView::eiViewType() <<
+    pqComparativeRenderView::comparativeRenderViewType();
 }
 
 QStringList pqStandardViewModules::displayTypes() const
@@ -86,6 +88,10 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
     {
     return pqElementInspectorView::eiViewTypeName();
     }
+  else if (type == pqComparativeRenderView::comparativeRenderViewType())
+    {
+    return pqComparativeRenderView::comparativeRenderViewTypeName();
+    }
 
   return QString();
 }
@@ -113,6 +119,10 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype)
   else if (viewtype == pqElementInspectorView::eiViewType())
     {
     return pxm->NewProxy("newviews", "ElementInspectorView");
+    }
+  else if (viewtype == pqComparativeRenderView::comparativeRenderViewType())
+    {
+    return pxm->NewProxy("newviews", "ComparativeRenderView");
     }
   return NULL;
 }
@@ -142,6 +152,11 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
   else if (viewtype == "ElementInspectorView")
     {
     return new pqElementInspectorView(
+      group, viewname, viewmodule, server, p);
+    }
+  else if (viewtype == pqComparativeRenderView::comparativeRenderViewType())
+    {
+    return new pqComparativeRenderView(
       group, viewname, viewmodule, server, p);
     }
 

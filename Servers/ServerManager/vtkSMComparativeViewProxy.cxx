@@ -65,9 +65,8 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.3");
-vtkCxxSetObjectMacro(vtkSMComparativeViewProxy, AnimationSceneX, vtkSMPVAnimationSceneProxy);
-vtkCxxSetObjectMacro(vtkSMComparativeViewProxy, AnimationSceneY, vtkSMPVAnimationSceneProxy);
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.4");
+
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
 {
@@ -77,8 +76,14 @@ vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
   this->AnimationSceneX = 0;
   this->AnimationSceneY = 0;
 
+  this->SceneOutdated = true;
+
   vtkMemberFunctionCommand<vtkSMComparativeViewProxy>* fsO = 
     vtkMemberFunctionCommand<vtkSMComparativeViewProxy>::New();
+  fsO->SetCallback(*this, &vtkSMComparativeViewProxy::MarkSceneOutdated);
+  this->SceneObserver = fsO;
+
+  fsO = vtkMemberFunctionCommand<vtkSMComparativeViewProxy>::New();
   fsO->SetCallback(*this, &vtkSMComparativeViewProxy::FilmStripTick);
   this->FilmStripObserver = fsO;
 }
@@ -88,8 +93,54 @@ vtkSMComparativeViewProxy::~vtkSMComparativeViewProxy()
 {
   this->SetAnimationSceneX(0);
   this->SetAnimationSceneY(0);
-  this->FilmStripObserver->Delete();
   delete this->Internal;
+
+  this->FilmStripObserver->Delete();
+  this->SceneObserver->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeViewProxy::SetAnimationSceneX(
+  vtkSMPVAnimationSceneProxy* proxy)
+{
+  if (proxy != this->AnimationSceneX)
+    {
+    this->SceneOutdated = true;
+    }
+
+  if (this->AnimationSceneX)
+    {
+    this->AnimationSceneX->RemoveObserver(this->SceneObserver);
+    }
+
+  vtkSetObjectBodyMacro(AnimationSceneX, vtkSMPVAnimationSceneProxy, proxy);
+
+  if (this->AnimationSceneX)
+    {
+    this->AnimationSceneX->AddObserver(vtkCommand::ModifiedEvent, this->SceneObserver);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeViewProxy::SetAnimationSceneY(
+  vtkSMPVAnimationSceneProxy* proxy)
+{
+  if (proxy != this->AnimationSceneY)
+    {
+    this->SceneOutdated = true;
+    }
+
+  if (this->AnimationSceneY)
+    {
+    this->AnimationSceneY->RemoveObserver(this->SceneObserver);
+    }
+
+  vtkSetObjectBodyMacro(AnimationSceneY, vtkSMPVAnimationSceneProxy, proxy);
+
+  if (this->AnimationSceneY)
+    {
+    this->AnimationSceneY->AddObserver(vtkCommand::ModifiedEvent, this->SceneObserver);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -383,10 +434,19 @@ void vtkSMComparativeViewProxy::RemoveAllRepresentations()
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::StillRender()
 {
+  static bool in_still_render = false;
+  if (in_still_render)
+    {
+    return;
+    }
+  in_still_render = true;
+
+  this->Internal->ViewCameraLink->SetEnabled(false);
+
   // Generate the CV if required.
   // For starters, we wont update the vis automatically, let the user call
   // UpdateComparativeVisualization explicitly.
-  // this->UpdateComparativeVisualization();
+  this->UpdateVisualization();
 
   vtkInternal::VectorOfViews::iterator iter;
   for (iter = this->Internal->Views.begin(); 
@@ -394,17 +454,21 @@ void vtkSMComparativeViewProxy::StillRender()
     {
     iter->GetPointer()->StillRender();
     }
+  in_still_render = false;
+  this->Internal->ViewCameraLink->SetEnabled(true);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::InteractiveRender()
 {
+  this->Internal->ViewCameraLink->SetEnabled(false);
   vtkInternal::VectorOfViews::iterator iter;
   for (iter = this->Internal->Views.begin(); 
        iter != this->Internal->Views.end(); ++iter)
     {
     iter->GetPointer()->InteractiveRender();
     }
+  this->Internal->ViewCameraLink->SetEnabled(true);
 }
 
 //----------------------------------------------------------------------------
@@ -423,6 +487,19 @@ void vtkSMComparativeViewProxy::UpdateVisualization()
     return;
     }
 
+  if (!this->SceneOutdated)
+    {
+    // no need to rebuild.
+    return;
+    }
+
+  vtkInternal::VectorOfViews::iterator iter;
+  for (iter = this->Internal->Views.begin(); 
+       iter != this->Internal->Views.end(); ++iter)
+    {
+    iter->GetPointer()->SetUseCache(true);
+    }
+
   // Are we in generating a film-strip or a comparative vis?
   if (this->AnimationSceneX && this->AnimationSceneY)
     {
@@ -433,6 +510,17 @@ void vtkSMComparativeViewProxy::UpdateVisualization()
     this->UpdateFilmStripVisualization(
       this->AnimationSceneX? this->AnimationSceneX : this->AnimationSceneY);
     }
+
+  for (iter = this->Internal->Views.begin(); 
+       iter != this->Internal->Views.end(); ++iter)
+    {
+    // Mark all representations as updated; this won't cause any real updation
+    // since use cache is on.
+    iter->GetPointer()->UpdateAllRepresentations();
+    iter->GetPointer()->SetUseCache(false);
+    }
+
+  this->SceneOutdated = false;
 }
 
 //----------------------------------------------------------------------------

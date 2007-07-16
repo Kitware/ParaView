@@ -60,18 +60,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqApplicationCore.h"
+#include "pqCloseViewUndoElement.h"
+#include "pqComparativeRenderView.h"
 #include "pqElementInspectorView.h"
 #include "pqMultiViewFrame.h"
 #include "pqObjectBuilder.h"
 #include "pqPluginManager.h"
-#include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSplitViewUndoElement.h"
 #include "pqUndoStack.h"
 #include "pqViewModuleInterface.h"
 #include "pqXMLUtil.h"
-#include "pqCloseViewUndoElement.h"
 
 #if WIN32
 #include "process.h"
@@ -442,6 +442,18 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
     frame->setMainWidget(NULL);
     }
 
+  pqComparativeRenderView* cvRenderView = 
+    qobject_cast<pqComparativeRenderView*>(view);
+  if (cvRenderView)
+    {
+    QAction* editCV = new QAction(
+      QIcon(":/pqWidgets/Icons/pqComparativeVis16.png"),
+      "Edit Comparative Vis",
+      this);
+    editCV->setObjectName("EditComparativeVis");
+    frame->addTitlebarAction(editCV);
+    editCV->setEnabled(true);
+    }
 
   pqRenderView* const render_module = 
     qobject_cast<pqRenderView*>(view);
@@ -538,9 +550,13 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqView* view)
       frame->removeTitlebarAction(cameraAction);
       delete cameraAction;
       }
+    QAction *editCVAction = frame->getAction("EditComparativeVis");
+    if (editCVAction)
+      {
+      frame->removeTitlebarAction(editCVAction);
+      delete editCVAction;
+      }
     }
-
-
 
   if (view->supportsUndo())
     {

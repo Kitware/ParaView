@@ -65,7 +65,7 @@ public:
   virtual ~pqRenderView();
 
   /// Returns the render view proxy associated with this object.
-  vtkSMRenderViewProxy* getRenderViewProxy() const;
+  virtual vtkSMRenderViewProxy* getRenderViewProxy() const;
 
   /// Returns the QVTKWidget for this render Window.
   virtual QWidget* getWidget();
@@ -236,8 +236,6 @@ private slots:
   /// undo signals as required by pqView.
   void onUndoStackChanged();
 
-  /// Called when the layout on the comparative vis changes.
-  void onComparativeVisLayoutChanged();
 protected:
   bool eventFilter(QObject* caller, QEvent* e);
 
@@ -267,6 +265,14 @@ protected:
   /// change and with start=false after the change.
   void fakeInteraction(bool start);
 
+  /// Creates a new instance of the QWidget subclass to be used to show this
+  /// view. Default implementation creates a QVTKWidget.
+  virtual QWidget* createWidget();
+
+  // Use this method to initialize the pqObject state using the
+  // underlying vtkSMProxy. This needs to be done only once,
+  // after the object has been created. 
+  virtual void initialize();
 private: 
   class pqInternal;
   pqInternal* Internal;
