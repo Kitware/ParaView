@@ -237,7 +237,7 @@ protected:
   // Description:
   // Called when the ViewInformation is modified to set whether the strategy 
   // should use cache if enabled. This does not invalidate any pipeline.
-  vtkSetMacro(UseCache, bool);
+  void SetUseCache(bool);
 
   // Description:
   // Called when the ViewInformation is modified to set LOD resolution.

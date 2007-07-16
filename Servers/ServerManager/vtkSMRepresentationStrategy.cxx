@@ -24,7 +24,7 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.13");
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.14");
 //----------------------------------------------------------------------------
 vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 {
@@ -310,6 +310,20 @@ void vtkSMRepresentationStrategy::Connect(vtkSMProxy* producer,
     pp->AddProxy(producer);
     }
   consumer->UpdateProperty(propertyname);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationStrategy::SetUseCache(bool use_cache)
+{
+  if (this->UseCache != use_cache)
+    {
+    this->UseCache = use_cache;
+    if (this->UseCache)
+      {
+      // This ensures that the cache will be save at the first opportunity.
+      this->InvalidatePipeline();
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
