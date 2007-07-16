@@ -38,6 +38,7 @@ protected:
     {
     CLIENT,
     SERVER,
+    DATA_SERVER,
     RENDER_SERVER
     };
   void SeparateArguments(const char* str, 
@@ -119,6 +120,7 @@ private:
   int TestTiledDisplay;
   int ArgStart;
   int AllowErrorInOutput;
+  int TestRemoteRendering;
   
   // Specify if the -rc flag was passed or not
   int ReverseConnection;

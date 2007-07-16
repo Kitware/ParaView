@@ -42,6 +42,7 @@ pvTestDriver::pvTestDriver()
   this->TestServer = 0;
   this->TestTiledDisplay = 0;
   this->ReverseConnection = 0;
+  this->TestRemoteRendering = 0;
 }
 
 pvTestDriver::~pvTestDriver()
@@ -164,6 +165,12 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
   int i;
   for(i =1; i < argc - 1; ++i)
     {
+    if(strcmp(argv[i], "--test-remote-rendering") == 0)
+      {
+      this->ArgStart = i+1;
+      this->TestRemoteRendering = 1;
+      fprintf(stderr, "Test Render Server.\n");
+      }
     if(strcmp(argv[i], "--test-render-server") == 0)
       {
       this->ArgStart = i+1;
@@ -263,7 +270,7 @@ pvTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
         commandLine.push_back(this->MPIPreFlags[i].c_str());
         }
       // If there is specific flags for the server to pass to mpirun, add them
-      if( type == SERVER )
+      if( type == SERVER || type == DATA_SERVER )
         {
         for(unsigned int i = 0; i < this->MPIServerPreFlags.size(); ++i)
           {
@@ -274,7 +281,7 @@ pvTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
     else ///  When tile display is enabled.
       {
       // If there is specific flags for the server to pass to mpirun, add them
-      if( type == SERVER)
+      if( type == SERVER || type == DATA_SERVER)
         {
         for(unsigned int i = 0; i < this->TDServerPreFlags.size(); ++i)
           {
@@ -284,7 +291,7 @@ pvTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
       }
     }
 
-  if(this->PVSSHFlags.size() && type == SERVER)
+  if(this->PVSSHFlags.size() && (type == SERVER || type == DATA_SERVER))
     {
       {
       // First add the ssh command:
@@ -322,7 +329,7 @@ pvTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
         commandLine.push_back(MPIPostFlags[i].c_str());
         }
       // If there is specific flags for the server to pass to mpirun, add them
-      if( type == SERVER )
+      if( type == SERVER || type == DATA_SERVER )
         {
         for(unsigned int i = 0; i < this->MPIServerPostFlags.size(); ++i)
           {
@@ -333,7 +340,7 @@ pvTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
     else
       {
       // If there is specific flags for the server to pass to mpirun, add them
-      if( type == SERVER)
+      if( type == SERVER || type == DATA_SERVER )
         {
         for(unsigned int i = 0; i < this->TDServerPostFlags.size(); ++i)
           {
@@ -348,6 +355,12 @@ pvTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
       commandLine.push_back(argv[ii]);
       }
     }
+
+  if ( this->TestRemoteRendering && (type == SERVER || type == RENDER_SERVER) )
+    {
+    commandLine.push_back("--use-offscreen-rendering");
+    }
+
   commandLine.push_back(0);
 }
 
@@ -560,15 +573,17 @@ int pvTestDriver::Main(int argc, char* argv[])
   if(server)
     {
     const char* serverExe = this->ParaViewServer.c_str();
+    pvTestDriver::ProcessType serverType = SERVER;
     if(this->TestRenderServer)
       {
       serverExe = this->ParaViewDataServer.c_str();
+      serverType = DATA_SERVER;
       }
 
 
     this->CreateCommandLine(serverCommand,
                             serverExe,
-                            SERVER,
+                            serverType,
                             this->MPIServerNumProcessFlag.c_str());
     this->ReportCommand(&serverCommand[0], "server");
     vtksysProcess_SetCommand(server, &serverCommand[0]);
@@ -579,23 +594,51 @@ int pvTestDriver::Main(int argc, char* argv[])
   
   if (renderServer)
     {
-#ifdef CONNECT_TO_RS_DS_SCRIPT
-    vtkstd::string temp = CONNECT_TO_RS_DS_SCRIPT;
-    this->ClientPostFlags.push_back("--run-test-init=" + temp);
+    if (this->TestRemoteRendering)
+      {
+#ifdef CONNECT_TO_RS_DS_REMOTE_RENDER_SCRIPT
+      vtkstd::string temp = CONNECT_TO_RS_DS_REMOTE_RENDER_SCRIPT;
+      this->ClientPostFlags.push_back("--run-test-init=" + temp);    
 #else
-    cerr << "CONNECT_TO_RS_DS_SCRIPT must be specified." << endl;
-    return 1;
+      cerr << "CONNECT_TO_RS_DS_REMOTE_RENDER_SCRIPT must be specified."
+           << endl;
+      return 1;
 #endif
+      }
+    else
+      {
+#ifdef CONNECT_TO_RS_DS_SCRIPT
+      vtkstd::string temp = CONNECT_TO_RS_DS_SCRIPT;
+      this->ClientPostFlags.push_back("--run-test-init=" + temp);
+#else
+      cerr << "CONNECT_TO_RS_DS_SCRIPT must be specified." << endl;
+      return 1;
+#endif
+      }
     }
   else if (server)
     {
-#ifdef CONNECT_TO_SERVER_SCRIPT
-    vtkstd::string temp = CONNECT_TO_SERVER_SCRIPT;
-    this->ClientPostFlags.push_back("--run-test-init=" + temp);
+    if (this->TestRemoteRendering)
+      {
+#ifdef CONNECT_TO_SERVER_REMOTE_RENDER_SCRIPT
+      vtkstd::string temp = CONNECT_TO_SERVER_REMOTE_RENDER_SCRIPT;
+      this->ClientPostFlags.push_back("--run-test-init=" + temp);    
 #else
-    cerr << "CONNECT_TO_SERVER_SCRIPT must be specified." << endl;
-    return 1;
+      cerr << "CONNECT_TO_SERVER_REMOTE_RENDER_SCRIPT must be specified."
+           << endl;
+      return 1;
 #endif
+      }
+    else
+      {
+#ifdef CONNECT_TO_SERVER_SCRIPT
+      vtkstd::string temp = CONNECT_TO_SERVER_SCRIPT;
+      this->ClientPostFlags.push_back("--run-test-init=" + temp);
+#else
+      cerr << "CONNECT_TO_SERVER_SCRIPT must be specified." << endl;
+      return 1;
+#endif
+      }
     }
   else
     {

@@ -13,6 +13,8 @@ SET(ConnectionXMLs
   ManualConnectCS
   ManualConnectBuiltin
   ManualConnectCRSDS
+  ManualConnectCSRR
+  ManualConnectCRSDSRR
   )
 
 FOREACH(xml ${ConnectionXMLs})
@@ -30,6 +32,13 @@ SET(CONNECT_TO_BUILTIN_SCRIPT
 SET(CONNECT_TO_RS_DS_SCRIPT
   ${CMAKE_CURRENT_BINARY_DIR}/ManualConnectCRSDS.xml)
 
+# client / server with remote rendering
+SET(CONNECT_TO_SERVER_REMOTE_RENDER_SCRIPT
+  ${CMAKE_CURRENT_BINARY_DIR}/ManualConnectCSRR.xml)
+
+# client / data server / render server with remote rendering
+SET(CONNECT_TO_RS_DS_REMOTE_RENDER_SCRIPT
+  ${CMAKE_CURRENT_BINARY_DIR}/ManualConnectCRSDSRR.xml)
 
 SET (PARAVIEW_CLIENT paraview)
 SET (PARAVIEW_DATA_SERVER pvdataserver)

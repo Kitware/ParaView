@@ -308,6 +308,18 @@ IF(BUILD_TESTING)
 #    XdmfReadStructuredGridCollection
   )
 
+  # Test compositing for a few client server and client render server tests.
+  SET(COMPOSITING_XML_TESTS_WITH_BASELINES
+    Calculator
+    CameraLink
+    ColorEditor1
+    ContourRange
+    D3SmallCells
+    Fractal3D
+    StreamTracer
+    UndoRedo2
+    )
+
   SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/pvTestDriver)
 
   IF(PARAVIEW_DATA_ROOT)
@@ -335,6 +347,26 @@ IF(BUILD_TESTING)
       IF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
         ADD_TEST(pqClient${test}-ClientRenderServer
           ${TEST_BINARY} --test-render-server
+          --test-directory=${PARAVIEW_TEST_DIR}
+          -dr
+          --run-test=${TEST_XML}/${test}.xml
+          --compare-view=${TEST_IMAGE}/${test}.png
+          --exit)
+      ENDIF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
+    ENDFOREACH(test)
+
+    FOREACH(test ${COMPOSITING_XML_TESTS_WITH_BASELINES})
+      ADD_TEST(pqClient${test}-ClientServerRemoteRender
+        ${TEST_BINARY} --test-server --test-remote-rendering
+        --test-directory=${PARAVIEW_TEST_DIR}
+        -dr
+        --run-test=${TEST_XML}/${test}.xml
+        --compare-view=${TEST_IMAGE}/${test}.png
+        --exit)
+        
+      IF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
+        ADD_TEST(pqClient${test}-ClientRenderServerRemoteRender
+          ${TEST_BINARY} --test-render-server --test-remote-rendering
           --test-directory=${PARAVIEW_TEST_DIR}
           -dr
           --run-test=${TEST_XML}/${test}.xml
