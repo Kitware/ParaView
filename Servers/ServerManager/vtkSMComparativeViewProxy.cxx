@@ -28,6 +28,8 @@
 
 #include <vtkstd/vector>
 #include <vtkstd/map>
+#include <vtkstd/set>
+#include <vtkstd/string>
 
 class vtkSMComparativeViewProxy::vtkInternal
 {
@@ -65,7 +67,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.5");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -226,7 +228,8 @@ vtkSMViewProxy* vtkSMComparativeViewProxy::GetRootView()
 }
 
 //----------------------------------------------------------------------------
-static void vtkCopyClone(vtkSMProxy* source, vtkSMProxy* clone)
+static void vtkCopyClone(vtkSMProxy* source, vtkSMProxy* clone,
+  vtkstd::set<vtkstd::string> *exceptions=0)
 {
   vtkSmartPointer<vtkSMPropertyIterator> iterSource;
   vtkSmartPointer<vtkSMPropertyIterator> iterDest;
@@ -238,7 +241,17 @@ static void vtkCopyClone(vtkSMProxy* source, vtkSMProxy* clone)
   for (; !iterSource->IsAtEnd() && !iterDest->IsAtEnd();
     iterSource->Next(), iterDest->Next())
     {
-    iterDest->GetProperty()->Copy(iterSource->GetProperty());
+    if (exceptions && 
+      exceptions->find(iterSource->GetKey()) != exceptions->end())
+      {
+      continue;
+      }
+    vtkSMProperty* destProp = iterDest->GetProperty();
+    if (destProp->GetInformationOnly() || destProp->GetIsInternal())
+      {
+      continue;
+      }
+    destProp->Copy(iterSource->GetProperty());
     }
 }
 
@@ -258,6 +271,14 @@ void vtkSMComparativeViewProxy::AddNewView()
     }
 
   newView->UpdateVTKObjects();
+
+  // Copy current view properties over to this newly created view.
+  vtkstd::set<vtkstd::string> exceptions;
+  exceptions.insert("Representations");
+  exceptions.insert("ViewSize");
+  exceptions.insert("ViewPosition");
+  exceptions.insert("GUISize");
+  vtkCopyClone(rootView, newView, &exceptions);
 
   this->Internal->Views.push_back(newView);
   this->Internal->ViewCameraLink->AddLinkedProxy(newView, vtkSMLink::INPUT);
