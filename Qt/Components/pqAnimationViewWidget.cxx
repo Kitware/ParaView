@@ -45,7 +45,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqServerManagerModel.h"
-#include "pqAnimationManager.h"
 #include "pqAnimationScene.h"
 #include "pqAnimationCue.h"
 #include "pqSMAdaptor.h"
@@ -56,8 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqAnimationViewWidget::pqInternals
 {
 public:
-  QPointer<pqAnimationManager> Manager;
-  QPointer<pqAnimationScene> ActiveScene;
+  QPointer<pqAnimationScene> Scene;
   pqAnimationWidget* AnimationWidget;
   QSignalMapper KeyFramesChanged;
 
@@ -118,38 +116,15 @@ pqAnimationViewWidget::~pqAnimationViewWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationViewWidget::setManager(pqAnimationManager* mgr)
+void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
 {
-  if (this->Internal->Manager == mgr)
+  if(this->Internal->Scene)
     {
-    return;
+    QObject::disconnect(this->Internal->Scene, 0, this, 0);
+    QObject::disconnect(this->Internal->Scene->getServer()->getTimeKeeper(), 0, this, 0);
     }
-
-  if (this->Internal->Manager)
-    {
-    QObject::disconnect(this->Internal->Manager, 0, this, 0);
-    }
-
-  this->Internal->Manager = mgr;
-
-  if (this->Internal->Manager)
-    {
-    QObject::connect(this->Internal->Manager,
-      SIGNAL(activeSceneChanged(pqAnimationScene*)),
-      this, SLOT(onActiveSceneChanged(pqAnimationScene*)));
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationViewWidget::onActiveSceneChanged(pqAnimationScene* scene)
-{
-  if(this->Internal->ActiveScene)
-    {
-    QObject::disconnect(this->Internal->ActiveScene, 0, this, 0);
-    QObject::disconnect(this->Internal->ActiveScene->getServer()->getTimeKeeper(), 0, this, 0);
-    }
-  this->Internal->ActiveScene = scene;
-  if(this->Internal->ActiveScene)
+  this->Internal->Scene = scene;
+  if(this->Internal->Scene)
     {
     QObject::connect(scene, SIGNAL(cuesChanged()), 
       this, SLOT(onSceneCuesChanged()));
@@ -165,7 +140,7 @@ void pqAnimationViewWidget::onActiveSceneChanged(pqAnimationScene* scene)
 //-----------------------------------------------------------------------------
 void pqAnimationViewWidget::onSceneCuesChanged()
 {
-  QSet<pqAnimationCue*> cues = this->Internal->ActiveScene->getCues();
+  QSet<pqAnimationCue*> cues = this->Internal->Scene->getCues();
   pqAnimationModel* animModel =
     this->Internal->AnimationWidget->animationModel();
 
@@ -248,7 +223,7 @@ void pqAnimationViewWidget::updateSceneTimeRange()
 {
   pqAnimationModel* animModel =
     this->Internal->AnimationWidget->animationModel();
-  QPair<double, double> timeRange = this->Internal->ActiveScene->getClockTimeRange();
+  QPair<double, double> timeRange = this->Internal->Scene->getClockTimeRange();
   animModel->setStartTime(timeRange.first);
   animModel->setEndTime(timeRange.second);
 }
@@ -256,7 +231,7 @@ void pqAnimationViewWidget::updateSceneTimeRange()
 void pqAnimationViewWidget::updateSceneTime()
 {
   pqTimeKeeper* timekeeper = 
-    this->Internal->ActiveScene->getServer()->getTimeKeeper();
+    this->Internal->Scene->getServer()->getTimeKeeper();
   pqAnimationModel* animModel =
     this->Internal->AnimationWidget->animationModel();
   animModel->setCurrentTime(timekeeper->getTime());

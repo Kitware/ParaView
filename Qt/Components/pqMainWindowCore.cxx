@@ -1195,7 +1195,8 @@ pqAnimationViewWidget* pqMainWindowCore::setupAnimationView(QDockWidget* dock_wi
     << pqSetName("animationView");
   
   pqAnimationManager* mgr = this->getAnimationManager();
-  animation_view->setManager(mgr);
+  QObject::connect(mgr, SIGNAL(activeSceneChanged(pqAnimationScene*)), 
+                   animation_view, SLOT(setScene(pqAnimationScene*)));
   dock_widget->setWidget(animation_view);
   return animation_view;
 }

@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 
 class pqAnimationCue;
-class pqAnimationManager;
 class pqAnimationScene;
 class pqView;
 class pqPipelineSource;
@@ -51,20 +50,17 @@ class vtkSMProxy;
 class PQCOMPONENTS_EXPORT pqAnimationViewWidget : public QWidget
 {
   Q_OBJECT
+  typedef QWidget Superclass;
 public:
   pqAnimationViewWidget(QWidget* parent);
   virtual ~pqAnimationViewWidget();
 
-  typedef QWidget Superclass;
-  class pqInternals;
+public slots:
 
-  /// Set the animation manager to use.
-  void setManager(pqAnimationManager* mgr);
+  /// set the scene to view
+  void setScene(pqAnimationScene* scene);
 
 protected slots:
-  /// Called when the active scene changes.
-  void onActiveSceneChanged(pqAnimationScene* scene);
-
   /// The cues in the scene have changed, so we make sure
   /// that we are not displaying a removed or added cue, if so
   /// we update the GUI.
@@ -82,7 +78,7 @@ private:
   pqAnimationViewWidget(const pqAnimationViewWidget&); // Not implemented.
   void operator=(const pqAnimationViewWidget&); // Not implemented.
 
-  //void setActiveCue(pqAnimationCue*);
+  class pqInternals;
   pqInternals *Internal;
 };
 
