@@ -7,6 +7,3 @@
 [submodule "Xdmf"]
 	path = Utilities/Xdmf2
 	url = git://paraview.org/Xdmf.git
-[submodule "Xdmf1"]
-	path = Utilities/Xdmf
-	url = git://paraview.org/Xdmf.git
