@@ -65,6 +65,7 @@ public:
   QColor Color;
   Qt::PenStyle Style;
   int Thickness;
+  int AxesIndex;
   bool Enabled;
   bool InLegend;
   bool ColorSet;
@@ -94,6 +95,7 @@ pqLineChartDisplayItem::pqLineChartDisplayItem()
 {
   this->Style = Qt::SolidLine;
   this->Thickness = 0;
+  this->AxesIndex = 0;
   this->Enabled = false;
   this->InLegend = false;
   this->ColorSet = false;
@@ -107,6 +109,7 @@ pqLineChartDisplayItem::pqLineChartDisplayItem(
 {
   this->Style = other.Style;
   this->Thickness = other.Thickness;
+  this->AxesIndex = other.AxesIndex;
   this->Enabled = other.Enabled;
   this->InLegend = other.InLegend;
   this->ColorSet = other.ColorSet;
@@ -187,7 +190,7 @@ void pqLineChartRepresentation::setStatusDefaults(vtkSMProperty* prop)
     values.push_back(QVariant((double)-1.0));
     values.push_back(QVariant((double)-1.0));
     values.push_back(QVariant((double)-1.0));
-    values.push_back(QVariant((int)0));
+    values.push_back(QVariant((int)1));
     values.push_back(QVariant((int)Qt::NoPen));
     values.push_back(QVariant((int)0));
     }
@@ -482,6 +485,33 @@ bool pqLineChartRepresentation::isSeriesColorSet(int series) const
   return false;
 }
 
+int pqLineChartRepresentation::getSeriesThickness(int series) const
+{
+  if(series >= 0 && series < this->Internals->Series->size())
+    {
+    return this->Internals->Series->at(series).Thickness;
+    }
+
+  return 0;
+}
+
+void pqLineChartRepresentation::setSeriesThickness(int series, int thickness)
+{
+  if(series >= 0 && series < this->Internals->Series->size())
+    {
+    pqLineChartDisplayItem *item = &(*this->Internals->Series)[series];
+    if(item->Thickness != thickness)
+      {
+      item->Thickness = thickness;
+      this->Internals->ChangeCount++;
+      if(!this->Internals->InMultiChange)
+        {
+        this->saveSeriesChanges();
+        }
+      }
+    }
+}
+
 Qt::PenStyle pqLineChartRepresentation::getSeriesStyle(int series) const
 {
   if(series >= 0 && series < this->Internals->Series->size())
@@ -521,24 +551,24 @@ bool pqLineChartRepresentation::isSeriesStyleSet(int series) const
   return false;
 }
 
-int pqLineChartRepresentation::getSeriesThickness(int series) const
+int pqLineChartRepresentation::getSeriesAxesIndex(int series) const
 {
   if(series >= 0 && series < this->Internals->Series->size())
     {
-    return this->Internals->Series->at(series).Thickness;
+    return this->Internals->Series->at(series).AxesIndex;
     }
 
   return 0;
 }
 
-void pqLineChartRepresentation::setSeriesThickness(int series, int thickness)
+void pqLineChartRepresentation::setSeriesAxesIndex(int series, int index)
 {
   if(series >= 0 && series < this->Internals->Series->size())
     {
     pqLineChartDisplayItem *item = &(*this->Internals->Series)[series];
-    if(item->Thickness != thickness)
+    if(item->AxesIndex != index)
       {
-      item->Thickness = thickness;
+      item->AxesIndex = index;
       this->Internals->ChangeCount++;
       if(!this->Internals->InMultiChange)
         {
@@ -631,7 +661,7 @@ void pqLineChartRepresentation::updateSeries()
         status.insert(k + 4, QVariant((double)-1.0));
         status.insert(k + 5, QVariant((double)-1.0));
         status.insert(k + 6, QVariant((double)-1.0));
-        status.insert(k + 7, QVariant((int)0));
+        status.insert(k + 7, QVariant((int)1));
         status.insert(k + 8, QVariant((int)Qt::NoPen));
         status.insert(k + 9, QVariant((int)0));
         }
@@ -681,6 +711,8 @@ void pqLineChartRepresentation::updateSeries()
           {
           kter->Style = (Qt::PenStyle)style;
           }
+
+        kter->AxesIndex = status[ii + 9].toInt();
         }
       }
     }
@@ -768,7 +800,7 @@ void pqLineChartRepresentation::saveSeriesChanges()
       status.push_back(QVariant((int)Qt::NoPen));
       }
 
-    status.push_back(QVariant((int)0));
+    status.push_back(QVariant(iter->AxesIndex));
     }
 
   smProperty->SetNumberOfElements(status.size());

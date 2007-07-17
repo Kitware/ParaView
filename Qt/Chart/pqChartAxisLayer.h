@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartLayer.h"
 
 class pqChartAxis;
+class QRect;
 
 
 /// \class pqChartAxisLayer
@@ -53,7 +54,7 @@ public:
   ///   Builds a chart axis layer.
   /// \param parent The parent object.
   pqChartAxisLayer(QObject *parent=0);
-  virtual ~pqChartAxisLayer() {}
+  virtual ~pqChartAxisLayer();
 
   /// \name pqChartLayer Methods
   //@{
@@ -85,6 +86,7 @@ public:
   //@}
 
 private:
+  QRect *Bounds;                 ///< Stores the boundary.
   const pqChartAxis *LeftAxis;   ///< Stores the left axis.
   const pqChartAxis *TopAxis;    ///< Stores the top axis.
   const pqChartAxis *RightAxis;  ///< Stores the right axis.

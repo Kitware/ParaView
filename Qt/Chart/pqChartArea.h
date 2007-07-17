@@ -172,6 +172,12 @@ public:
   ///
   /// \param interactor The new chart interactor.
   void setInteractor(pqChartInteractor *interactor);
+
+  /// \brief
+  ///   Gets the contents space object.
+  /// \return
+  ///   A pointer to the contents space object.
+  pqChartContentsSpace *getContentsSpace() const {return this->Contents;}
   //@}
 
   /// \name Printing Methods

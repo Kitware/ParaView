@@ -96,8 +96,6 @@ public slots:
   void removeAllRepresentations();
 
 private slots:
-  void visibilityChanged(pqRepresentation* disp);
-
   // Called when render is called on the undelying proxy.
   // Since ServerManager does not really "render" for plots,
   // we catch the signal and render in the client.
@@ -105,8 +103,6 @@ private slots:
 
   /// Internal slot.
   void delayedRender();
-
-  void markLineItemModified(vtkObject *object);
 
 private:
   pqPlotView(const pqPlotView&); // Not implemented.

@@ -43,28 +43,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QRect>
 
 
-class pqChartGridLayerInternal
-{
-public:
-  pqChartGridLayerInternal();
-  ~pqChartGridLayerInternal() {}
-
-  QRect Bounds;
-};
-
-
-//----------------------------------------------------------------------------
-pqChartGridLayerInternal::pqChartGridLayerInternal()
-  : Bounds()
-{
-}
-
-
-//----------------------------------------------------------------------------
 pqChartGridLayer::pqChartGridLayer(QObject *parentObject)
   : pqChartLayer(parentObject)
 {
-  this->Internal = new pqChartGridLayerInternal();
+  this->Bounds = new QRect();
   this->LeftAxis = 0;
   this->TopAxis = 0;
   this->RightAxis = 0;
@@ -73,19 +55,19 @@ pqChartGridLayer::pqChartGridLayer(QObject *parentObject)
 
 pqChartGridLayer::~pqChartGridLayer()
 {
-  delete this->Internal;
+  delete this->Bounds;
 }
 
 void pqChartGridLayer::layoutChart(const QRect &area)
 {
   // Set the bounding rectangle for the grid.
-  this->Internal->Bounds = area;
+  *(this->Bounds) = area;
 }
 
 void pqChartGridLayer::drawChart(QPainter &painter, const QRect &area)
 {
   // Make sure the area intersects the bounds.
-  if(!this->Internal->Bounds.intersects(area))
+  if(!this->Bounds->intersects(area))
     {
     return;
     }
@@ -95,11 +77,6 @@ void pqChartGridLayer::drawChart(QPainter &painter, const QRect &area)
   this->drawAxisGrid(painter, this->RightAxis);
   this->drawAxisGrid(painter, this->BottomAxis);
   this->drawAxisGrid(painter, this->LeftAxis);
-
-  // Draw a border around the chart area.
-  painter.setPen(Qt::darkGray);
-  painter.drawRect(this->Internal->Bounds.x(), this->Internal->Bounds.y(),
-      this->Internal->Bounds.width() - 1, this->Internal->Bounds.height() - 1);
 }
 
 void pqChartGridLayer::setLeftAxis(const pqChartAxis *axis)
@@ -204,31 +181,31 @@ void pqChartGridLayer::drawAxisGrid(QPainter &painter, const pqChartAxis *axis)
     pixel = axis->getLabelLocation(i);
     if(vertical)
       {
-      if(pixel > this->Internal->Bounds.bottom())
+      if(pixel > this->Bounds->bottom())
         {
         continue;
         }
-      else if(pixel < this->Internal->Bounds.top())
+      else if(pixel < this->Bounds->top())
         {
         break;
         }
 
-      painter.drawLine(this->Internal->Bounds.left(), pixel,
-          this->Internal->Bounds.right(), pixel);
+      painter.drawLine(this->Bounds->left(), pixel,
+          this->Bounds->right(), pixel);
       }
     else
       {
-      if(pixel < this->Internal->Bounds.left())
+      if(pixel < this->Bounds->left())
         {
         continue;
         }
-      else if(pixel > this->Internal->Bounds.right())
+      else if(pixel > this->Bounds->right())
         {
         break;
         }
 
-      painter.drawLine(pixel, this->Internal->Bounds.top(),
-          pixel, this->Internal->Bounds.bottom());
+      painter.drawLine(pixel, this->Bounds->top(),
+          pixel, this->Bounds->bottom());
       }
     }
 }

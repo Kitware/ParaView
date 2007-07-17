@@ -19,7 +19,7 @@
 #include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkSMStateVersionController);
-vtkCxxRevisionMacro(vtkSMStateVersionController, "1.4");
+vtkCxxRevisionMacro(vtkSMStateVersionController, "1.5");
 //----------------------------------------------------------------------------
 vtkSMStateVersionController::vtkSMStateVersionController()
 {
@@ -212,7 +212,7 @@ bool ConvertLineSeriesArrayStatus(vtkPVXMLElement* root,
       // 4 --> 1
       //
       // Fill in the rest with new data:
-      // thickness(new index 7) = 0 (int)
+      // thickness(new index 7) = 1 (int)
       // linestyle(new index 8) = 1 (int)
       // axesindex(new index 9) = 0 (int)
       //
@@ -224,7 +224,7 @@ bool ConvertLineSeriesArrayStatus(vtkPVXMLElement* root,
         {
         // Fill in the new options.
         elem = child->GetNestedElement(k + 7);
-        elem->SetAttribute("value", "0");
+        elem->SetAttribute("value", "1");
         elem = child->GetNestedElement(k + 8);
         elem->SetAttribute("value", "1");
         elem = child->GetNestedElement(k + 9);

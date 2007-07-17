@@ -133,6 +133,7 @@ pqChartAxis::pqChartAxis(pqChartAxis::AxisLocation location,
   this->Scale = new pqChartPixelScale();
   this->AtMin = 0;
   this->AtMax = 0;
+  this->Across = 0;
   this->Zoom = 0;
   this->Location = location;
 
@@ -211,6 +212,11 @@ void pqChartAxis::setNeigbors(const pqChartAxis *atMin,
   // tick length for top and bottom axes.
   this->AtMin = atMin;
   this->AtMax = atMax;
+}
+
+void pqChartAxis::setParallelAxis(const pqChartAxis *across)
+{
+  this->Across = across;
 }
 
 void pqChartAxis::setContentsScpace(const pqChartContentsSpace *contents)
@@ -300,17 +306,17 @@ void pqChartAxis::layoutAxis(const QRect &area)
   // Use the total chart area and the neighboring axes to set the
   // bounding rectangle.
   int space = 0;
+  QRect neighbor;
   this->Internal->Bounds = area;
   if(this->Location == pqChartAxis::Top)
     {
-    QRect neighbor;
     int topDiff = 0;
     if(!this->Internal->SpaceTooSmall)
       {
       space = this->getPreferredSpace();
       }
 
-    if(this->AtMin)
+    if(this->AtMin && !this->AtMin->isSpaceTooSmall())
       {
       this->AtMin->getBounds(neighbor);
       if(neighbor.isValid())
@@ -323,7 +329,7 @@ void pqChartAxis::layoutAxis(const QRect &area)
         }
       }
 
-    if(this->AtMax)
+    if(this->AtMax && !this->AtMax->isSpaceTooSmall())
       {
       this->AtMax->getBounds(neighbor);
       if(neighbor.isValid())
@@ -340,14 +346,13 @@ void pqChartAxis::layoutAxis(const QRect &area)
     }
   else if(this->Location == pqChartAxis::Bottom)
     {
-    QRect neighbor;
     int bottomDiff = 0;
     if(!this->Internal->SpaceTooSmall)
       {
       space = this->getPreferredSpace();
       }
 
-    if(this->AtMin)
+    if(this->AtMin && !this->AtMin->isSpaceTooSmall())
       {
       this->AtMin->getBounds(neighbor);
       if(neighbor.isValid())
@@ -360,7 +365,7 @@ void pqChartAxis::layoutAxis(const QRect &area)
         }
       }
 
-    if(this->AtMax)
+    if(this->AtMax && !this->AtMax->isSpaceTooSmall())
       {
       this->AtMax->getBounds(neighbor);
       if(neighbor.isValid())
@@ -378,10 +383,18 @@ void pqChartAxis::layoutAxis(const QRect &area)
   else
     {
     int halfHeight = 0;
-    if(this->Options->isVisible() && this->Options->areLabelsVisible() &&
-        !this->Internal->SpaceTooSmall)
+    if(!this->Internal->SpaceTooSmall)
       {
-      halfHeight = this->Internal->FontHeight / 2;
+      halfHeight = this->getFontHeight() / 2;
+      }
+
+    if(this->Across && !this->Across->isSpaceTooSmall())
+      {
+      int otherHeight = this->Across->getFontHeight() / 2;
+      if(otherHeight > halfHeight)
+        {
+        halfHeight = otherHeight;
+        }
       }
 
     if(this->AtMin && !this->AtMin->isSpaceTooSmall())
@@ -480,26 +493,47 @@ void pqChartAxis::layoutAxis(const QRect &area)
   // Use the maximum label width to finish setting the bounds.
   if(this->Location == pqChartAxis::Left)
     {
-    space = this->Internal->SpaceTooSmall ? 0 : this->getPreferredSpace();
+    space = 0;
+    if(!this->Internal->SpaceTooSmall && this->Model &&
+        this->Model->getNumberOfLabels() > 1)
+      {
+      space = this->getPreferredSpace();
+      }
+
     this->Internal->Bounds.setRight(area.left() + space);
     }
   else if(this->Location == pqChartAxis::Right)
     {
-    space = this->Internal->SpaceTooSmall ? 0 : this->getPreferredSpace();
+    space = 0;
+    if(!this->Internal->SpaceTooSmall && this->Model &&
+        this->Model->getNumberOfLabels() > 1)
+      {
+      space = this->getPreferredSpace();
+      }
+
     this->Internal->Bounds.setLeft(area.right() - space);
     }
   else
     {
     int halfWidth = 0;
-    if(this->Options->isVisible() && this->Options->areLabelsVisible() &&
-        !this->Internal->SpaceTooSmall)
+    if(!this->Internal->SpaceTooSmall)
       {
-      halfWidth = this->Internal->MaxLabelWidth / 2;
+      halfWidth = this->getMaxLabelWidth() / 2;
+      }
+
+    if(this->Across && !this->Across->isSpaceTooSmall())
+      {
+      int otherWidth = this->Across->getMaxLabelWidth() / 2;
+      if(otherWidth > halfWidth)
+        {
+        halfWidth = otherWidth;
+        }
       }
 
     if(this->AtMin && !this->AtMin->isSpaceTooSmall())
       {
-      space = this->AtMin->getPreferredSpace();
+      this->AtMin->getBounds(neighbor);
+      space = neighbor.isValid() ? neighbor.width() : 0;
       if(halfWidth > space)
         {
         space = halfWidth;
@@ -514,7 +548,8 @@ void pqChartAxis::layoutAxis(const QRect &area)
     contents.setLeft(contents.left() + space);
     if(this->AtMax && !this->AtMax->isSpaceTooSmall())
       {
-      space = this->AtMax->getPreferredSpace();
+      this->AtMax->getBounds(neighbor);
+      space = neighbor.isValid() ? neighbor.width() : 0;
       if(halfWidth > space)
         {
         space = halfWidth;
@@ -680,9 +715,15 @@ void pqChartAxis::adjustAxisLayout()
 
 int pqChartAxis::getPreferredSpace() const
 {
-  if(this->Options->isVisible() && this->Options->areLabelsVisible() &&
-      this->Model && this->Model->getNumberOfLabels() > 1)
+  if(this->Model && this->Options->isVisible() &&
+      this->Options->areLabelsVisible())
     {
+    if(this->Internal->UsingBestFit && !this->Internal->DataAvailable &&
+        this->Internal->Minimum == this->Internal->Maximum)
+      {
+      return 0;
+      }
+
     if(this->Location == pqChartAxis::Top ||
       this->Location == pqChartAxis::Bottom)
       {
@@ -705,12 +746,41 @@ int pqChartAxis::getPreferredSpace() const
 
 int pqChartAxis::getFontHeight() const
 {
-  return this->Internal->FontHeight;
+  if(this->Model && this->Options->isVisible() &&
+      this->Options->areLabelsVisible())
+    {
+    if(this->Internal->UsingBestFit && !this->Internal->DataAvailable &&
+        this->Internal->Minimum == this->Internal->Maximum)
+      {
+      return 0;
+      }
+
+    return this->Internal->FontHeight;
+    }
+
+  return 0;
+}
+
+int pqChartAxis::getMaxLabelWidth() const
+{
+  if(this->Options->isVisible() && this->Options->areLabelsVisible())
+    {
+    return this->Internal->MaxLabelWidth;
+    }
+
+  return 0;
 }
 
 void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
 {
-  if(!painter.isActive() || !area.isValid() || !this->Options->isVisible())
+  if(!painter.isActive() || !area.isValid() || !this->Model ||
+      !this->Options->isVisible())
+    {
+    return;
+    }
+
+  // If the model is empty, there's nothing to paint.
+  if(this->Model->getNumberOfLabels() == 0)
     {
     return;
     }
@@ -766,8 +836,7 @@ void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
     }
 
   // Only draw the labels if they are visible.
-  if(!this->Options->areLabelsVisible() || !this->Model ||
-      this->Internal->SpaceTooSmall)
+  if(!this->Options->areLabelsVisible() || this->Internal->SpaceTooSmall)
     {
     return;
     }
@@ -1143,15 +1212,27 @@ void pqChartAxis::generateLabels(const QRect &contents)
     if(this->Location == pqChartAxis::Top ||
         this->Location == pqChartAxis::Bottom)
       {
-      // The contents width doesn't account for the label width or the
-      // neighbor width.
+      // The contents width doesn't account for the label width, the
+      // neighbor width, or the label width from the axis parallel to
+      // this one.
+      QRect neighbor;
       int labelWidth = this->getLabelWidthGuess();
       int halfWidth = labelWidth / 2;
+      if(this->Across && !this->Across->isSpaceTooSmall())
+        {
+        int otherWidth = this->Across->getMaxLabelWidth() / 2;
+        if(otherWidth > halfWidth)
+          {
+          halfWidth = otherWidth;
+          }
+        }
+
       int total = contents.width();
       int space = halfWidth;
       if(this->AtMin && !this->AtMin->isSpaceTooSmall())
         {
-        space = this->AtMin->getPreferredSpace();
+        this->AtMin->getBounds(neighbor);
+        space = neighbor.isValid() ? neighbor.width() : 0;
         if(space < halfWidth)
           {
           space = halfWidth;
@@ -1162,7 +1243,8 @@ void pqChartAxis::generateLabels(const QRect &contents)
       space = halfWidth;
       if(this->AtMax && !this->AtMax->isSpaceTooSmall())
         {
-        space = this->AtMax->getPreferredSpace();
+        this->AtMax->getBounds(neighbor);
+        space = neighbor.isValid() ? neighbor.width() : 0;
         if(space < halfWidth)
           {
           space = halfWidth;
@@ -1391,11 +1473,13 @@ void pqChartAxis::generateLogLabels(const QRect &contents)
 
       // The contents width doesn't account for the label width or the
       // neighbor width.
+      QRect neighbor;
       pixelRange = contents.width();
       int space = labelWidth;
       if(this->AtMin && !this->AtMin->isSpaceTooSmall())
         {
-        space = this->AtMin->getPreferredSpace();
+        this->AtMin->getBounds(neighbor);
+        space = neighbor.isValid() ? neighbor.width() : 0;
         if(space < labelWidth)
           {
           space = labelWidth;
@@ -1406,7 +1490,8 @@ void pqChartAxis::generateLogLabels(const QRect &contents)
       space = labelWidth;
       if(this->AtMax && !this->AtMax->isSpaceTooSmall())
         {
-        space = this->AtMax->getPreferredSpace();
+        this->AtMax->getBounds(neighbor);
+        space = neighbor.isValid() ? neighbor.width() : 0;
         if(space < labelWidth)
           {
           space = labelWidth;

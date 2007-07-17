@@ -73,6 +73,8 @@ protected slots:
 
   void setCurrentSeriesStyle(int listIndex);
 
+  void setCurrentSeriesAxes(int listIndex);
+
   /// \brief
   ///   Updates the enabled state for the given series.
   /// \param index The index of the line series.

@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeWidgetItemObject.h"
 
 //-----------------------------------------------------------------------------
-class pqXYPlotDisplayProxyEditor::pqInternal : public Ui::Form
+class pqXYPlotDisplayProxyEditor::pqInternal : public Ui::pqXYPlotDisplayEditor
 {
 public:
   pqInternal()
@@ -136,6 +136,8 @@ pqXYPlotDisplayProxyEditor::pqXYPlotDisplayProxyEditor(pqRepresentation* display
     this, SLOT(setCurrentSeriesThickness(int)));
   QObject::connect(this->Internal->StyleList, SIGNAL(currentIndexChanged(int)),
     this, SLOT(setCurrentSeriesStyle(int)));
+  QObject::connect(this->Internal->AxisList, SIGNAL(currentIndexChanged(int)),
+    this, SLOT(setCurrentSeriesAxes(int)));
 
   this->setDisplay(display);
 }
@@ -341,6 +343,7 @@ void pqXYPlotDisplayProxyEditor::updateOptionsWidgets()
     this->Internal->ColorButton->blockSignals(true);
     this->Internal->Thickness->blockSignals(true);
     this->Internal->StyleList->blockSignals(true);
+    this->Internal->AxisList->blockSignals(true);
     if(current.isValid())
       {
       QColor color;
@@ -350,17 +353,21 @@ void pqXYPlotDisplayProxyEditor::updateOptionsWidgets()
           this->Internal->Display->getSeriesThickness(current.row()));
       this->Internal->StyleList->setCurrentIndex(
           (int)this->Internal->Display->getSeriesStyle(current.row()) - 1);
+      this->Internal->AxisList->setCurrentIndex(
+          this->Internal->Display->getSeriesAxesIndex(current.row()));
       }
     else
       {
       this->Internal->ColorButton->setChosenColor(Qt::white);
-      this->Internal->Thickness->setValue(0);
+      this->Internal->Thickness->setValue(1);
       this->Internal->StyleList->setCurrentIndex(0);
+      this->Internal->AxisList->setCurrentIndex(0);
       }
 
     this->Internal->ColorButton->blockSignals(false);
     this->Internal->Thickness->blockSignals(false);
     this->Internal->StyleList->blockSignals(false);
+    this->Internal->AxisList->blockSignals(false);
 
     // Disable the widgets if nothing is selected or current.
     bool hasItems = indexes.size() > 0;
@@ -370,6 +377,7 @@ void pqXYPlotDisplayProxyEditor::updateOptionsWidgets()
     this->Internal->ColorButton->setEnabled(hasItems);
     this->Internal->Thickness->setEnabled(hasItems);
     this->Internal->StyleList->setEnabled(hasItems);
+    this->Internal->AxisList->setEnabled(hasItems);
     }
 }
 
@@ -511,6 +519,26 @@ void pqXYPlotDisplayProxyEditor::setCurrentSeriesStyle(int listIndex)
     for( ; iter != indexes.end(); ++iter)
       {
       this->Internal->Display->setSeriesStyle(iter->row(), lineStyle);
+      }
+
+    this->Internal->InChange = false;
+    this->Internal->Display->endSeriesChanges();
+    this->updateAllViews();
+    }
+}
+
+void pqXYPlotDisplayProxyEditor::setCurrentSeriesAxes(int listIndex)
+{
+  QItemSelectionModel *model = this->Internal->YAxisArrays->selectionModel();
+  if(model)
+    {
+    this->Internal->Display->beginSeriesChanges();
+    this->Internal->InChange = true;
+    QModelIndexList indexes = model->selectedIndexes();
+    QModelIndexList::Iterator iter = indexes.begin();
+    for( ; iter != indexes.end(); ++iter)
+      {
+      this->Internal->Display->setSeriesAxesIndex(iter->row(), listIndex);
       }
 
     this->Internal->InChange = false;

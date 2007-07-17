@@ -93,12 +93,15 @@ public:
   void setSeriesColor(int series, const QColor &color);
   bool isSeriesColorSet(int series) const;
 
+  int getSeriesThickness(int series) const;
+  void setSeriesThickness(int series, int thickness);
+
   Qt::PenStyle getSeriesStyle(int series) const;
   void setSeriesStyle(int series, Qt::PenStyle style);
   bool isSeriesStyleSet(int series) const;
 
-  int getSeriesThickness(int series) const;
-  void setSeriesThickness(int series, int thickness);
+  int getSeriesAxesIndex(int series) const;
+  void setSeriesAxesIndex(int series, int index);
 
   void beginSeriesChanges();
   void endSeriesChanges();

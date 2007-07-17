@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqChartAxisLayer.cxx
+   Module:    pqPlotViewHistogram.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,63 +30,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqChartAxisLayer.cxx
-/// \date 2/9/2007
+/// \file pqPlotViewHistogram.h
+/// \date 7/13/2007
 
-#include "pqChartAxisLayer.h"
-
-#include "pqChartAxis.h"
-#include <QPainter>
-#include <QRect>
+#ifndef _pqPlotViewHistogram_h
+#define _pqPlotViewHistogram_h
 
 
-pqChartAxisLayer::pqChartAxisLayer(QObject *parentObject)
-  : pqChartLayer(parentObject)
+#include "pqCoreExport.h"
+#include <QObject>
+
+class pqBarChartRepresentation;
+class pqChartArea;
+class pqHistogramChart;
+class pqPlotViewHistogramInternal;
+class pqRepresentation;
+
+
+class PQCORE_EXPORT pqPlotViewHistogram : public QObject
 {
-  this->Bounds = new QRect();
-  this->LeftAxis = 0;
-  this->TopAxis = 0;
-  this->RightAxis = 0;
-  this->BottomAxis = 0;
-}
+  Q_OBJECT
 
-pqChartAxisLayer::~pqChartAxisLayer()
-{
-  delete this->Bounds;
-}
+public:
+  pqPlotViewHistogram(QObject *parent=0);
+  virtual ~pqPlotViewHistogram();
 
-void pqChartAxisLayer::layoutChart(const QRect &area)
-{
-  *(this->Bounds) = area;
-}
+  void initialize(pqChartArea *chartArea);
 
-void pqChartAxisLayer::drawChart(QPainter &painter, const QRect &area)
-{
-  // Draw a border around the chart area.
-  painter.setPen(Qt::darkGray);
-  painter.drawRect(this->Bounds->x(), this->Bounds->y(),
-      this->Bounds->width() - 1, this->Bounds->height() - 1);
+  pqHistogramChart *getChartLayer() const;
 
-  // Draw each of the axes.
-  if(this->TopAxis)
-    {
-    this->TopAxis->drawAxis(painter, area);
-    }
+  pqBarChartRepresentation *getCurrentRepresentation() const;
+  void setCurrentRepresentation(pqBarChartRepresentation *display);
 
-  if(this->RightAxis)
-    {
-    this->RightAxis->drawAxis(painter, area);
-    }
+  void update(bool force=false);
+  bool isUpdateNeeded();
 
-  if(this->BottomAxis)
-    {
-    this->BottomAxis->drawAxis(painter, area);
-    }
+  void addRepresentation(pqBarChartRepresentation *histogram);
+  void removeRepresentation(pqBarChartRepresentation *histogram);
+  void removeAllRepresentations();
 
-  if(this->LeftAxis)
-    {
-    this->LeftAxis->drawAxis(painter, area);
-    }
-}
+private slots:
+  void updateVisibility(pqRepresentation* display);
 
+private:
+  pqPlotViewHistogramInternal *Internal;
+};
 
+#endif

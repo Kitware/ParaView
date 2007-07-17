@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartLayer.h"
 
 class pqChartAxis;
-class pqChartGridLayerInternal;
+class QRect;
 
 
 /// \class pqChartGridLayer
@@ -94,11 +94,11 @@ private:
   void drawAxisGrid(QPainter &painter, const pqChartAxis *axis);
 
 private:
-  pqChartGridLayerInternal *Internal; ///< Stores the grid bounds.
-  const pqChartAxis *LeftAxis;        ///< Stores the left axis.
-  const pqChartAxis *TopAxis;         ///< Stores the top axis.
-  const pqChartAxis *RightAxis;       ///< Stores the right axis.
-  const pqChartAxis *BottomAxis;      ///< Stores the bottom axis.
+  QRect *Bounds;                 ///< Stores the grid bounds.
+  const pqChartAxis *LeftAxis;   ///< Stores the left axis.
+  const pqChartAxis *TopAxis;    ///< Stores the top axis.
+  const pqChartAxis *RightAxis;  ///< Stores the right axis.
+  const pqChartAxis *BottomAxis; ///< Stores the bottom axis.
 };
 
 #endif

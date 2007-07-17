@@ -1,6 +1,6 @@
 <ui version="4.0" >
- <class>Form</class>
- <widget class="QWidget" name="Form" >
+ <class>pqXYPlotDisplayEditor</class>
+ <widget class="QWidget" name="pqXYPlotDisplayEditor" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -36,48 +36,31 @@
       <property name="spacing" >
        <number>6</number>
       </property>
-      <item row="2" column="0" colspan="2" >
-       <widget class="QCheckBox" name="ShowInLegend" >
+      <item row="6" column="1" >
+       <widget class="QComboBox" name="AxisList" >
         <property name="whatsThis" >
-         <string>Use this option to show/hide all the line series in the legend.</string>
+         <string>Select the chart axes for the line series.</string>
         </property>
-        <property name="text" >
-         <string>Show Line Series in Legend</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1" >
-       <widget class="pqColorChooserButton" name="ColorButton" >
-        <property name="whatsThis" >
-         <string>Press this button to choose a new color for the line.</string>
-        </property>
-        <property name="text" >
-         <string>Choose Color...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" >
-       <widget class="QLabel" name="label_2" >
-        <property name="text" >
-         <string>Line Color</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1" >
-       <widget class="QSpinBox" name="Thickness" >
-        <property name="whatsThis" >
-         <string>Enter the thickness for the line.</string>
-        </property>
-        <property name="maximum" >
-         <number>10</number>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" >
-       <widget class="QLabel" name="label_3" >
-        <property name="text" >
-         <string>Line Thickness</string>
-        </property>
+        <item>
+         <property name="text" >
+          <string>Bottom-Left</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Bottom-Right</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Top-Left</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Top-Right</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item row="5" column="1" >
@@ -112,10 +95,77 @@
         </item>
        </widget>
       </item>
+      <item row="6" column="0" >
+       <widget class="QLabel" name="label_5" >
+        <property name="text" >
+         <string>Chart Axes</string>
+        </property>
+       </widget>
+      </item>
       <item row="5" column="0" >
        <widget class="QLabel" name="label_4" >
         <property name="text" >
          <string>Line Style</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1" >
+       <widget class="QSpinBox" name="Thickness" >
+        <property name="whatsThis" >
+         <string>Enter the thickness for the line.</string>
+        </property>
+        <property name="maximum" >
+         <number>10</number>
+        </property>
+        <property name="minimum" >
+         <number>1</number>
+        </property>
+        <property name="value" >
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" >
+       <widget class="QLabel" name="label_3" >
+        <property name="text" >
+         <string>Line Thickness</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" >
+       <widget class="pqColorChooserButton" name="ColorButton" >
+        <property name="whatsThis" >
+         <string>Press this button to choose a new color for the line.</string>
+        </property>
+        <property name="text" >
+         <string>Choose Color...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>Line Color</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2" >
+       <widget class="QCheckBox" name="ShowInLegend" >
+        <property name="whatsThis" >
+         <string>Use this option to show/hide all the line series in the legend.</string>
+        </property>
+        <property name="text" >
+         <string>Show Line Series in Legend</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2" >
+       <widget class="QCheckBox" name="SeriesEnabled" >
+        <property name="whatsThis" >
+         <string>Use this option to show/hide the line series in the chart.</string>
+        </property>
+        <property name="text" >
+         <string>Enable Line Series</string>
         </property>
        </widget>
       </item>
@@ -156,17 +206,47 @@
         </column>
        </widget>
       </item>
-      <item row="1" column="0" colspan="2" >
-       <widget class="QCheckBox" name="SeriesEnabled" >
-        <property name="whatsThis" >
-         <string>Use this option to show/hide the line series in the chart.</string>
-        </property>
-        <property name="text" >
-         <string>Enable Line Series</string>
-        </property>
-       </widget>
-      </item>
      </layout>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2" >
+    <widget class="QCheckBox" name="ViewData" >
+     <property name="toolTip" >
+      <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle visibility of this dataset's geometry.&lt;/p>&lt;/body>&lt;/html></string>
+     </property>
+     <property name="whatsThis" >
+      <string>Use this option to show/hide all the line series in the chart.</string>
+     </property>
+     <property name="text" >
+      <string>Show Line Series in Chart</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" >
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>Attribute Mode</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" >
+    <widget class="QComboBox" name="AttributeMode" >
+     <item>
+      <property name="text" >
+       <string>Point Data</string>
+      </property>
+      <property name="icon" >
+       <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqPointData16.png</iconset>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Cell Data</string>
+      </property>
+      <property name="icon" >
+       <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqCellData16.png</iconset>
+      </property>
+     </item>
     </widget>
    </item>
    <item row="2" column="0" colspan="2" >
@@ -212,46 +292,6 @@
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item row="1" column="1" >
-    <widget class="QComboBox" name="AttributeMode" >
-     <item>
-      <property name="text" >
-       <string>Point Data</string>
-      </property>
-      <property name="icon" >
-       <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqPointData16.png</iconset>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Cell Data</string>
-      </property>
-      <property name="icon" >
-       <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqCellData16.png</iconset>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
-      <string>Attribute Mode</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0" colspan="2" >
-    <widget class="QCheckBox" name="ViewData" >
-     <property name="toolTip" >
-      <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle visibility of this dataset's geometry.&lt;/p>&lt;/body>&lt;/html></string>
-     </property>
-     <property name="whatsThis" >
-      <string>Use this option to show/hide all the line series in the chart.</string>
-     </property>
-     <property name="text" >
-      <string>Show Line Series in Chart</string>
-     </property>
     </widget>
    </item>
   </layout>

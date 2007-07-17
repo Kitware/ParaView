@@ -53,6 +53,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPrinter>
 #include <QRect>
 
+#define TOO_SMALL_WIDTH 40
+#define TOO_SMALL_HEIGHT 30
+
 
 class pqChartAreaAxisItem
 {
@@ -203,6 +206,7 @@ void pqChartArea::createAxis(pqChartAxis::AxisLocation location)
       }
 
     // Create the axis and a model for the axis.
+    pqChartAxis *across = 0;
     axis = new pqChartAxis(location, this);
     this->Internal->Axis[index] = axis;
     pqChartAxisModel *model = new pqChartAxisModel(this);
@@ -231,6 +235,7 @@ void pqChartArea::createAxis(pqChartAxis::AxisLocation location)
         {
         axis->setObjectName("TopAxis");
         model->setObjectName("TopAxisModel");
+        across = this->Internal->Axis[pqChartAreaInternal::BottomIndex];
 
         // Add the axis to the grid and axis layer.
         this->GridLayer->setTopAxis(axis);
@@ -240,6 +245,7 @@ void pqChartArea::createAxis(pqChartAxis::AxisLocation location)
         {
         axis->setObjectName("BottomAxis");
         model->setObjectName("BottomAxisModel");
+        across = this->Internal->Axis[pqChartAreaInternal::TopIndex];
 
         // Add the axis to the grid and axis layer.
         this->GridLayer->setBottomAxis(axis);
@@ -269,6 +275,7 @@ void pqChartArea::createAxis(pqChartAxis::AxisLocation location)
         {
         axis->setObjectName("LeftAxis");
         model->setObjectName("LeftAxisModel");
+        across = this->Internal->Axis[pqChartAreaInternal::RightIndex];
 
         // Add the axis to the grid and axis layer.
         this->GridLayer->setLeftAxis(axis);
@@ -278,11 +285,19 @@ void pqChartArea::createAxis(pqChartAxis::AxisLocation location)
         {
         axis->setObjectName("RightAxis");
         model->setObjectName("RightAxisModel");
+        across = this->Internal->Axis[pqChartAreaInternal::LeftIndex];
 
         // Add the axis to the grid and axis layer.
         this->GridLayer->setRightAxis(axis);
         this->AxisLayer->setRightAxis(axis);
         }
+      }
+
+    // Set the parallel axis.
+    if(across)
+      {
+      axis->setParallelAxis(across);
+      across->setParallelAxis(axis);
       }
 
     // Listen to the axis update signals.
@@ -596,7 +611,7 @@ void pqChartArea::layoutChart()
     }
 
   // Set the 'too small' flag on each of the axis objects.
-  bool tooSmall = bounds.height() - available < 10;
+  bool tooSmall = bounds.height() - available < TOO_SMALL_HEIGHT;
   for(i = 0; i < pqChartAreaInternal::AxisCount; i++)
     {
     if(this->Internal->Axis[i])
@@ -616,6 +631,7 @@ void pqChartArea::layoutChart()
     this->Internal->Axis[pqChartAreaInternal::RightIndex]->layoutAxis(bounds);
     }
 
+  QRect axisBounds;
   if(!tooSmall)
     {
     // Make sure there is enough horizontal space.
@@ -623,16 +639,18 @@ void pqChartArea::layoutChart()
     index = pqChartAreaInternal::LeftIndex;
     if(this->Internal->Axis[index])
       {
-      available -= this->Internal->Axis[index]->getPreferredSpace();
+      this->Internal->Axis[index]->getBounds(axisBounds);
+      available -= axisBounds.width();
       }
 
     index = pqChartAreaInternal::RightIndex;
     if(this->Internal->Axis[index])
       {
-      available -= this->Internal->Axis[index]->getPreferredSpace();
+      this->Internal->Axis[index]->getBounds(axisBounds);
+      available -= axisBounds.width();
       }
 
-    tooSmall = available < 10;
+    tooSmall = available < TOO_SMALL_WIDTH;
     if(tooSmall)
       {
       // Set the 'too small' flag on each of the axis objects.
@@ -669,24 +687,92 @@ void pqChartArea::layoutChart()
   if(this->Internal->Axis[pqChartAreaInternal::BottomIndex])
     {
     this->Internal->Axis[pqChartAreaInternal::BottomIndex]->layoutAxis(bounds);
+    if(this->Internal->Axis[pqChartAreaInternal::TopIndex])
+      {
+      // The top and bottom axes should have the same width. The top
+      // axis may need to be layed out again to account for the width
+      // of the bottom axis labels.
+      index = pqChartAreaInternal::BottomIndex;
+      this->Internal->Axis[index]->getBounds(axisBounds);
+      int bottomWidth = axisBounds.width();
+      index = pqChartAreaInternal::TopIndex;
+      this->Internal->Axis[index]->getBounds(axisBounds);
+      if(bottomWidth != axisBounds.width())
+        {
+        this->Internal->Axis[index]->layoutAxis(bounds);
+        }
+      }
     }
 
-  //if(!tooSmall)
-  //  {
-    // TODO: Check the horizontal space using the bounds from the top
-    // and bottom axes.
-  //  }
-
-  // Adjust the size of the left and right axes. The top and bottom
-  // axes may have needed more space.
-  if(this->Internal->Axis[pqChartAreaInternal::LeftIndex])
+  if(!tooSmall)
     {
-    this->Internal->Axis[pqChartAreaInternal::LeftIndex]->adjustAxisLayout();
-    }
+    // Check the horizontal space using the bounds from the top and
+    // bottom axes.
+    if(this->Internal->Axis[pqChartAreaInternal::TopIndex])
+      {
+      index = pqChartAreaInternal::TopIndex;
+      this->Internal->Axis[index]->getBounds(axisBounds);
+      tooSmall = axisBounds.width() < TOO_SMALL_WIDTH;
+      }
+    else if(this->Internal->Axis[pqChartAreaInternal::BottomIndex])
+      {
+      index = pqChartAreaInternal::BottomIndex;
+      this->Internal->Axis[index]->getBounds(axisBounds);
+      tooSmall = axisBounds.width() < TOO_SMALL_WIDTH;
+      }
 
-  if(this->Internal->Axis[pqChartAreaInternal::RightIndex])
-    {
-    this->Internal->Axis[pqChartAreaInternal::RightIndex]->adjustAxisLayout();
+    if(tooSmall)
+      {
+      // Set the 'too small' flag on each of the axis objects.
+      // Re-layout all of the axes.
+      for(i = 0; i < pqChartAreaInternal::AxisCount; i++)
+        {
+        if(this->Internal->Axis[i])
+          {
+          this->Internal->Axis[i]->setSpaceTooSmall(tooSmall);
+          }
+        }
+
+      index = pqChartAreaInternal::LeftIndex;
+      if(this->Internal->Axis[index])
+        {
+        this->Internal->Axis[index]->layoutAxis(bounds);
+        }
+
+      index = pqChartAreaInternal::RightIndex;
+      if(this->Internal->Axis[index])
+        {
+        this->Internal->Axis[index]->layoutAxis(bounds);
+        }
+
+      index = pqChartAreaInternal::TopIndex;
+      if(this->Internal->Axis[index])
+        {
+        this->Internal->Axis[index]->layoutAxis(bounds);
+        }
+
+      index = pqChartAreaInternal::BottomIndex;
+      if(this->Internal->Axis[index])
+        {
+        this->Internal->Axis[index]->layoutAxis(bounds);
+        }
+      }
+    else
+      {
+      // Adjust the size of the left and right axes. The top and bottom
+      // axes may have needed more space.
+      index = pqChartAreaInternal::LeftIndex;
+      if(this->Internal->Axis[index])
+        {
+        this->Internal->Axis[index]->adjustAxisLayout();
+        }
+
+      index = pqChartAreaInternal::RightIndex;
+      if(this->Internal->Axis[index])
+        {
+        this->Internal->Axis[index]->adjustAxisLayout();
+        }
+      }
     }
 
   // Calculate the area inside the axes.

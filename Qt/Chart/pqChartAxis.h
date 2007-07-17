@@ -122,6 +122,11 @@ public:
   void setNeigbors(const pqChartAxis *atMin, const pqChartAxis *atMax);
 
   /// \brief
+  ///   Sets the parallel axis.
+  /// \param across The axis parallel to this one.
+  void setParallelAxis(const pqChartAxis *across);
+
+  /// \brief
   ///   Sets the axis' contents space object.
   /// \param contents The new contents space object.
   void setContentsScpace(const pqChartContentsSpace *contents);
@@ -273,6 +278,15 @@ public:
   int getFontHeight() const;
 
   /// \brief
+  ///   Gets the maximum label width.
+  ///
+  /// The maximum label width is only valid after a layout.
+  ///
+  /// \return
+  ///   The maximum label width.
+  int getMaxLabelWidth() const;
+
+  /// \brief
   ///   Used to draw the chart axis.
   ///
   /// The axis needs to be layed out before it can be drawn.
@@ -379,6 +393,7 @@ private:
   pqChartPixelScale *Scale;         ///< Stores the pixel-value scale.
   const pqChartAxis *AtMin;         ///< Stores the axis at the min.
   const pqChartAxis *AtMax;         ///< Stores the axis at the max.
+  const pqChartAxis *Across;        ///< Stores the parallel axis.
   const pqChartContentsSpace *Zoom; ///< Stores the contents space.
   AxisLocation Location;            ///< Stores the axis location.
 };
