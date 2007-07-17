@@ -13,7 +13,7 @@
 #
 #==============================================================================
 r"""paraview.py is a Python module for using paraview server manager in Python.
-One can always directly use the server manager directly. However, this module
+One can always use the server manager directly. However, this module
 provides server utilty methods that assist in creating connections, proxies, 
 as well as introspection.
 
