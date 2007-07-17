@@ -6300,18 +6300,6 @@ This filter extracts a list of datasets from multigroup datasets.
    <!-- End ExtractDataSets -->
    </SourceProxy>
 
-   <ShrunkContoursProxy name="ShrunkContours" class="vtkContourFilter"
-        base_proxygroup="filters" base_proxyname="Contour">
-      <SubProxy>
-        <Proxy name="Shrink" proxygroup="filters" proxyname="ShrinkFilter" >
-        </Proxy>
-        <ExposedProperties>
-          <Property name="ShrinkFactor" />
-        </ExposedProperties>
-      </SubProxy>
-   <!-- End ShrunkContours -->
-   </ShrunkContoursProxy>
-
    <SourceProxy name="ExtractHistogram" class="vtkPExtractHistogram"
                 label="Histogram">
      <Documentation
