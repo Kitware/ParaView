@@ -145,13 +145,7 @@ ADD_LIBRARY(vtk${KIT}
   ${KitInstantiator_SRCS}
   )
 TARGET_LINK_LIBRARIES(vtk${KIT}
-  vtkInfovisCS vtkWidgetsCS 
-  vtkHybridCS vtkParallelCS 
-  vtkRenderingCS vtkIOCS 
-  vtkGenericFilteringCS
-  vtkGraphicsCS vtkImagingCS
-  vtkFilteringCS vtkCommonCS
-  KWCommon
+  vtkHybridCS vtkParallelCS vtkInfovisCS KWCommon vtksys
   ${PARAVIEW_HDF5_LIBRARIES}
   vtkClientServer
   vtkPVCommandOptions)
