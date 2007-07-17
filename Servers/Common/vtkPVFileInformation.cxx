@@ -38,6 +38,10 @@
 # include <stdlib.h>    // getenv
 # define vtkPVServerFileListingGetCWD getcwd
 #endif
+#if defined (__APPLE__)
+#include <ApplicationServices/ApplicationServices.h>
+#include <vtkstd/vector>
+#endif
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/RegularExpression.hxx>
@@ -45,7 +49,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.11");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.12");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -289,7 +293,112 @@ void vtkPVFileInformation::GetSpecialDirectories()
     }
 
 #else // _WIN32
+#if defined (__APPLE__ )
+    //-------- Get the List of Mounted Volumes from the System
+    int idx = 1;
+    HFSUniStr255 name;
+    FSRef ref;
+    while(noErr == FSGetVolumeInfo(kFSInvalidVolumeRefNum, idx++, NULL,
+                                   kFSVolInfoNone, NULL, &name, &ref))
+    {
+      CFURLRef resolvedUrl = CFURLCreateFromFSRef(NULL, &ref);
+      if(resolvedUrl)
+      {
+        CFStringRef url;
+        url = CFURLCopyFileSystemPath(resolvedUrl, kCFURLPOSIXPathStyle);
+        CFStringRef cfname = CFStringCreateWithCharacters(kCFAllocatorDefault,
+                                                          name.unicode, name.length);
 
+        CFIndex pathSize = CFStringGetLength(url)+1;
+        vtkstd::vector<char> pathChars(pathSize, 0);
+        OSStatus pathStatus = CFStringGetCString(url,&pathChars[0],pathSize, 
+                                                  kCFStringEncodingASCII);
+
+        pathSize = CFStringGetLength(cfname)+1;
+        vtkstd::vector<char> nameChars(pathSize, 0);
+        OSStatus nameStatus = CFStringGetCString(cfname, &nameChars[0], pathSize, 
+                                                  kCFStringEncodingASCII);
+
+        if (pathStatus && nameStatus)
+        {
+          vtkSmartPointer<vtkPVFileInformation> info = 
+                          vtkSmartPointer<vtkPVFileInformation>::New();
+          info->SetFullPath( &(pathChars.front() ) );
+          info->SetName( &(nameChars.front() ) );
+          info->Type = DRIVE;
+          this->Contents->AddItem(info);
+        }
+        CFRelease(cfname);
+        CFRelease(resolvedUrl);
+      }
+    }
+    //-- Read the com.apple.sidebar.plist file to get the user's list of directories
+    CFPropertyListRef p = CFPreferencesCopyAppValue(CFSTR("useritems"),
+                                                    CFSTR("com.apple.sidebarlists"));
+    if(p && CFDictionaryGetTypeID() == CFGetTypeID(p))
+    {
+      CFArrayRef r = (CFArrayRef)(CFDictionaryGetValue((CFDictionaryRef)p, CFSTR("CustomListItems")));
+      if(r && CFArrayGetTypeID() == CFGetTypeID(r))
+      {
+        int count = CFArrayGetCount(r);
+        for(int i=0; i<count; i++)
+        {
+          CFDictionaryRef dr = (CFDictionaryRef)CFArrayGetValueAtIndex(r, i);
+          if(dr && CFDictionaryGetTypeID() == CFGetTypeID(dr))
+          {
+            CFStringRef name;
+            CFStringRef url;
+            CFDataRef alias;
+            if(CFDictionaryGetValueIfPresent(dr, CFSTR("Name"), (const void**)&name) &&
+               CFDictionaryGetValueIfPresent(dr, CFSTR("Alias"), (const void**)&alias) &&
+               name && alias &&
+               CFStringGetTypeID() == CFGetTypeID(name) &&
+               CFDataGetTypeID() == CFGetTypeID(alias) )
+            {
+              CFIndex dataSize = CFDataGetLength(alias);
+              AliasHandle tAliasHdl = (AliasHandle) NewHandle( dataSize );
+              if(tAliasHdl)
+              {
+                CFDataGetBytes( alias, CFRangeMake( 0, dataSize ), ( UInt8*) *tAliasHdl );
+                FSRef tFSRef;
+                Boolean changed;
+                if(noErr == FSResolveAlias(NULL, tAliasHdl, &tFSRef, &changed))
+                {
+                  CFURLRef resolvedUrl = CFURLCreateFromFSRef(NULL, &tFSRef);
+                  if(resolvedUrl)
+                  {
+                    url = CFURLCopyFileSystemPath(resolvedUrl, kCFURLPOSIXPathStyle);
+                    CFRelease(resolvedUrl);
+                  }
+                }
+                DisposeHandle((Handle)tAliasHdl);
+              }
+              // now put the name and path into a FileInfo Object
+              CFIndex pathSize = CFStringGetLength(url)+1;
+              vtkstd::vector<char> pathChars(pathSize, 0);
+              OSStatus pathStatus = CFStringGetCString(url,&pathChars[0],pathSize, 
+                                                        kCFStringEncodingASCII);
+
+              pathSize = CFStringGetLength(name)+1;
+              vtkstd::vector<char> nameChars(pathSize, 0);
+              OSStatus nameStatus = CFStringGetCString(name, &nameChars[0], pathSize, 
+                                                        kCFStringEncodingASCII);
+
+              if (pathStatus && nameStatus)
+              {
+                vtkSmartPointer<vtkPVFileInformation> info = 
+                                vtkSmartPointer<vtkPVFileInformation>::New();
+                info->SetFullPath( &(pathChars.front() ) );
+                info->SetName( &(nameChars.front() ) );
+                info->Type = DIRECTORY;
+                this->Contents->AddItem(info);
+              }
+            }
+          }
+        }
+      }
+    }
+#else
   if(const char* home = getenv("HOME"))
     {
     vtkSmartPointer<vtkPVFileInformation> info =
@@ -299,7 +408,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
     info->Type = DIRECTORY;
     this->Contents->AddItem(info);
     }
-
+#endif
 #endif // !_WIN32  
 }
 
