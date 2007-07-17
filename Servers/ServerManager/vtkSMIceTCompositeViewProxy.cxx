@@ -32,6 +32,7 @@
 #include "vtkSMRepresentationStrategyVector.h"
 #include "vtkSMSimpleParallelStrategy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 
 
 #include "vtkPVConfig.h" // for PARAVIEW_USE_ICE_T
@@ -46,7 +47,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.15");
 
 vtkInformationKeyMacro(vtkSMIceTCompositeViewProxy, KD_TREE, ObjectBase);
 //----------------------------------------------------------------------------
@@ -247,6 +248,11 @@ void vtkSMIceTCompositeViewProxy::EndCreateVTKObjects()
       << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER_ROOT, stream);
     this->MultiViewManager->UpdateVTKObjects();
+
+    // HACK: If MultiViewManager exists, it implies that the view module is used on a
+    // MPI process, disable interaction.
+    this->Interactor->SetPVRenderView(0);
+    this->Interactor->Disable();
     }
 
 
