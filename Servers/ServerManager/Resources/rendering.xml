@@ -2507,7 +2507,8 @@
         name="Representations"
         command="AddRepresentation"
         update_self="1"
-        remove_command="RemoveRepresentation">
+        remove_command="RemoveRepresentation"
+        repeatable="1">
         <Documentation>
           Add representations to be rendered by this view.
         </Documentation>

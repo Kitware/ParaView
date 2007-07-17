@@ -32,7 +32,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.55");
+vtkCxxRevisionMacro(vtkSMProperty, "1.56");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -60,6 +60,7 @@ vtkSMProperty::vtkSMProperty()
   this->InformationProperty = 0;
   this->IsInternal = 1;
   this->Documentation = 0;
+  this->Repeatable = 0;
 
   this->Hints = 0;
 }
@@ -347,6 +348,13 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
     this->SetCommand(command); 
     }
 
+  int repeatable;
+  int retVal = element->GetScalarAttribute("repeatable", &repeatable);
+  if(retVal) 
+    { 
+    this->Repeatable = repeatable;
+    }
+
   const char* information_property = 
     element->GetAttribute("information_property");
   if(information_property) 
@@ -355,7 +363,7 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
     }
 
   int immediate_update;
-  int retVal = element->GetScalarAttribute("immediate_update", &immediate_update);
+  retVal = element->GetScalarAttribute("immediate_update", &immediate_update);
   if(retVal) 
     { 
     this->SetImmediateUpdate(immediate_update); 

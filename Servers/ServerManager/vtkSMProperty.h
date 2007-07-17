@@ -213,6 +213,12 @@ public:
   vtkGetStringMacro(XMLLabel);
 
   // Description:
+  // If repeatable, a property can have 1 or more values of the same kind.
+  // This ivar is configured when the xml file is read and is mainly useful
+  // for information (for example from python).
+  vtkGetMacro(Repeatable, int);
+
+  // Description:
   // The server manager configuration XML may define <Hints /> element for
   // a property. Hints are metadata associated with the property. The
   // Server Manager does not (and should not) interpret the hints. Hints
@@ -355,6 +361,8 @@ protected:
   // Subclass may override this if ResetToDefault can reset to default
   // value specified in the configuration file.
   virtual void ResetToDefaultInternal() {};
+
+  int Repeatable;
 
 private:
   vtkSMProperty(const vtkSMProperty&); // Not implemented
