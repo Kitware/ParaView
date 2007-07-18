@@ -50,6 +50,9 @@ public:
 
   pqAnimationModel* animationModel() const;
 
+  QHeaderView* header() const
+    { return this->Header; }
+
 protected slots:
   void updateSizes();
 
