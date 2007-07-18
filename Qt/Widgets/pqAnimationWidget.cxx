@@ -60,7 +60,7 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
                               QSizePolicy::MinimumExpanding);
   this->View->setSizePolicy(QSizePolicy::Preferred,
                               QSizePolicy::MinimumExpanding);
-  this->Header->setResizeMode(QHeaderView::Interactive);
+  this->Header->setResizeMode(QHeaderView::Fixed);
   this->Header->setMinimumSectionSize(0);
   this->Header->setModel(this->Model->header());
   this->Model->setRowHeight(this->Header->sectionSize(0));
