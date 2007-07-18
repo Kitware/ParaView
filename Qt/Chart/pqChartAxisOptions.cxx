@@ -47,6 +47,7 @@ pqChartAxisOptions::pqChartAxisOptions(QObject *parentObject)
   this->Precision = 2;
   this->Visible = true;
   this->ShowLabels = true;
+  this->ShowGrid = true;
 }
 
 pqChartAxisOptions::pqChartAxisOptions(const pqChartAxisOptions &other)
@@ -57,6 +58,7 @@ pqChartAxisOptions::pqChartAxisOptions(const pqChartAxisOptions &other)
   this->Precision = other.Precision;
   this->Visible = other.Visible;
   this->ShowLabels = other.ShowLabels;
+  this->ShowGrid = other.ShowGrid;
 }
 
 void pqChartAxisOptions::setVisible(bool visible)
