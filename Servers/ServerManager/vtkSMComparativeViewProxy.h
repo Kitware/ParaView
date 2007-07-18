@@ -33,6 +33,20 @@ public:
   vtkTypeRevisionMacro(vtkSMComparativeViewProxy, vtkSMViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  //BTX
+  enum Types
+    {
+    FILM_STRIP,
+    COMPARATIVE
+    };
+  //ETX
+  
+  // Description:
+  // Set the mode. In FILM_STRIP mode, AnimationSceneX is used while in
+  // COMPARATIVE mode AnimationSceneX as well as AnimationSceneY are used.
+  vtkSetMacro(Mode, int);
+  vtkGetMacro(Mode, int);
+
   // Description:
   // Builds the MxN views. This method simply creates the MxN internal view modules.
   // It does not generate the visualization i.e. play the animation scene(s).
@@ -136,6 +150,7 @@ protected:
   // Called when playing the scene to generate film strips.
   void FilmStripTick();
 
+  int Mode;
   int Dimensions[2];
 
   vtkSMPVAnimationSceneProxy* AnimationSceneX;

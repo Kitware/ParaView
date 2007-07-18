@@ -67,12 +67,13 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.6");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
 {
   this->Internal = new vtkInternal();
+  this->Mode = FILM_STRIP;
   this->Dimensions[0] = 0;
   this->Dimensions[1] = 0;
   this->AnimationSceneX = 0;
@@ -343,6 +344,7 @@ void vtkSMComparativeViewProxy::RemoveView(vtkSMViewProxy* view)
 
   this->Internal->ViewLink->RemoveLinkedProxy(view);
   this->Internal->ViewCameraLink->RemoveLinkedProxy(view);
+  this->Internal->ViewCameraLink->RemoveLinkedProxy(view);
 
   vtkInternal::VectorOfViews::iterator iter;
   for (iter = this->Internal->Views.begin(); 
@@ -522,14 +524,14 @@ void vtkSMComparativeViewProxy::UpdateVisualization()
     }
 
   // Are we in generating a film-strip or a comparative vis?
-  if (this->AnimationSceneX && this->AnimationSceneY)
+  if (this->AnimationSceneX && this->AnimationSceneY &&
+    this->Mode == COMPARATIVE)
     {
     this->UpdateComparativeVisualization();
     }
-  else
+  else if (this->Mode == FILM_STRIP && this->AnimationSceneX)
     {
-    this->UpdateFilmStripVisualization(
-      this->AnimationSceneX? this->AnimationSceneX : this->AnimationSceneY);
+    this->UpdateFilmStripVisualization(this->AnimationSceneX);
     }
 
   for (iter = this->Internal->Views.begin(); 
@@ -601,5 +603,6 @@ void vtkSMComparativeViewProxy::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Dimensions: " << this->Dimensions[0] 
     << ", " << this->Dimensions[1] << endl;
+  os << indent << "Mode: " << this->Mode << endl;
 }
 
