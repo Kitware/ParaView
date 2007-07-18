@@ -30,7 +30,7 @@ class vtkMultiViewManager::vtkRendererMap :
 
 
 vtkStandardNewMacro(vtkMultiViewManager);
-vtkCxxRevisionMacro(vtkMultiViewManager, "1.3");
+vtkCxxRevisionMacro(vtkMultiViewManager, "1.4");
 //----------------------------------------------------------------------------
 vtkMultiViewManager::vtkMultiViewManager()
 {
@@ -112,12 +112,12 @@ void vtkMultiViewManager::StartMagnificationFix()
   ren->GetViewport(this->OriginalViewport);
 
   int newSize[2];
-  newSize[0] = (this->OriginalViewport[2]-this->OriginalViewport[0])*size[0];
-  newSize[1] = (this->OriginalViewport[3]-this->OriginalViewport[1])*size[1];
+  newSize[0] = int((this->OriginalViewport[2]-this->OriginalViewport[0])*size[0] + 0.5);
+  newSize[1] = int((this->OriginalViewport[3]-this->OriginalViewport[1])*size[1]+0.5);
   this->RenderWindow->SetSize(newSize);
 
   renderers->InitTraversal();
-  while (vtkRenderer* ren = renderers->GetNextItem())
+  while ( (ren = renderers->GetNextItem()) != 0)
     {
     ren->SetViewport(0, 0, 1, 1);
     }
