@@ -1302,7 +1302,7 @@ pqAnimationManager* pqMainWindowCore::getAnimationManager()
                      SLOT(endNonUndoableChanges()));
 
     QObject::connect(this->Implementation->AnimationManager,
-                     SIGNAL(disconnectServer(pqServer*)),
+                     SIGNAL(disconnectServer()),
                      this, 
                      SLOT(onServerDisconnect()), 
                      Qt::QueuedConnection);
