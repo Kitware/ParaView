@@ -84,7 +84,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.28");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.29");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1066,7 +1066,7 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindow(int magnification)
 
 //-----------------------------------------------------------------------------
 int vtkSMRenderViewProxy::WriteImage(const char* filename,
-                                       const char* writerName)
+  const char* writerName, int magnification)
 {
   if (!filename || !writerName)
     {
@@ -1087,7 +1087,7 @@ int vtkSMRenderViewProxy::WriteImage(const char* filename,
     return vtkErrorCode::UnknownError;
     }
 
-  vtkImageData* shot = this->CaptureWindow(1);
+  vtkImageData* shot = this->CaptureWindow(magnification);
   writer->SetInput(shot);
   writer->SetFileName(filename);
   writer->Write();

@@ -121,7 +121,9 @@ public:
 
   // Description:
   // Generate a screenshot from the render window.
-  virtual int WriteImage(const char* filename, const char* writerName);
+  int WriteImage(const char* filename, const char* writerName, int magnification);
+  int WriteImage(const char* filename, const char* writerName)
+    { return this->WriteImage(filename, writerName, 1); }
 
   // Description:
   // Enable/Disable the LightKit.
