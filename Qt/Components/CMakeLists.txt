@@ -60,6 +60,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqColorPresetModel.h
   pqColorScaleEditor.h
   pqComboBoxDomain.h
+  pqComparativeVisPanel.h
   pqContourPanel.h
   pqCreateServerStartupDialog.h
   pqCustomFilterDefinitionWizard.h
@@ -178,6 +179,7 @@ SET(UI_FORMS
   Resources/UI/pqCameraDialog.ui
   Resources/UI/pqColorPresetDialog.ui
   Resources/UI/pqColorScaleDialog.ui
+  Resources/UI/pqComparativeVisPanel.ui
   Resources/UI/pqContourControls.ui
   Resources/UI/pqCreateServerStartupDialog.ui
   Resources/UI/pqCustomFilterDefinitionWizard.ui
@@ -312,6 +314,8 @@ ADD_LIBRARY(pqComponents
   pqColorScaleEditor.h
   pqComboBoxDomain.cxx
   pqComboBoxDomain.h
+  pqComparativeVisPanel.cxx
+  pqComparativeVisPanel.h
   pqComponentsExport.h
   pqComponentsInit.cxx
   pqComponentsInit.h
