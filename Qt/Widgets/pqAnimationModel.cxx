@@ -85,10 +85,15 @@ pqAnimationTrack* pqAnimationModel::addTrack()
 
 void pqAnimationModel::removeTrack(pqAnimationTrack* t)
 {
-  this->Tracks.removeAll(t);
-  this->removeItem(t);
-  delete t;
-  this->resizeTracks();
+  int idx = this->Tracks.indexOf(t);
+  if(idx != -1)
+    {
+    this->Tracks.removeAt(idx);
+    this->removeItem(t);
+    this->Header.removeRow(idx);
+    delete t;
+    this->resizeTracks();
+    }
 }
 
 void pqAnimationModel::resizeTracks()
