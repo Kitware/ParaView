@@ -111,7 +111,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.47");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.48");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
@@ -123,6 +123,7 @@ vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
   this->Internals = new vtkSMAnimationSceneProxyInternals();
   this->PlayMode = SEQUENCE;
   this->CacheLimit = 100*1024; // 100 MBs.
+  this->Caching = 0;
 }
 
 //----------------------------------------------------------------------------
