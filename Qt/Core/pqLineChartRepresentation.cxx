@@ -745,8 +745,9 @@ void pqLineChartRepresentation::changeSeriesList()
 
 int pqLineChartRepresentation::isEnabledByDefault(const QString &arrayName) const
 {
-  if(arrayName == "BlockId" || arrayName == "GlobalElementId" ||
-      arrayName == "PedigreeElementId")
+  if(arrayName == "BlockId" || arrayName == "Time" ||
+      arrayName == "GlobalElementId" || arrayName == "GlobalNodeId" ||
+      arrayName == "PedigreeElementId" || arrayName == "PedigreeNodeId")
     {
     return 0;
     }
