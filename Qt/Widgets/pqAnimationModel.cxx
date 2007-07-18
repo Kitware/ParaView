@@ -73,8 +73,8 @@ pqAnimationTrack* pqAnimationModel::addTrack()
 {
   pqAnimationTrack* t = new pqAnimationTrack(this);
   this->Tracks.append(t);
-  this->resizeTracks();
   this->addItem(t);
+  this->resizeTracks();
 
   this->Header.appendRow(new QStandardItem());
   QObject::connect(t, SIGNAL(propertyChanged()),
@@ -86,8 +86,8 @@ pqAnimationTrack* pqAnimationModel::addTrack()
 void pqAnimationModel::removeTrack(pqAnimationTrack* t)
 {
   this->Tracks.removeAll(t);
-  this->resizeTracks();
   this->removeItem(t);
+  this->resizeTracks();
 }
 
 void pqAnimationModel::resizeTracks()
@@ -169,7 +169,7 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF& )
   QRectF sr = this->sceneRect();
   int rh = this->rowHeight();
 
-  //  // TODO: draw time labels (depends on mode)
+  // TODO: draw time labels (depends on mode)
   // TODO: make time its own track
 
   QGraphicsView* view = qobject_cast<QGraphicsView*>(this->parent());
