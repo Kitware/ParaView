@@ -205,6 +205,8 @@ public:
   // Returns a new proxy.
   virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
     vtkSMProxy*, int opport);
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy* proxy)
+    { return this->Superclass::CreateDefaultRepresentation(proxy); }
 
 //BTX
 protected:

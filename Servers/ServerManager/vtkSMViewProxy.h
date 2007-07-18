@@ -127,6 +127,9 @@ public:
   // Create a default representation for the given output port of source proxy.
   // Returns a new proxy.
   virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy*, int opport);
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy* proxy)
+    { return this->CreateDefaultRepresentation(proxy, 0); }
+
 
   // Description:
   // Every view has a update time i.e. a time to which all the representations
