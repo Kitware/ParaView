@@ -4948,9 +4948,6 @@
         <Proxy name="UpdateSuppressor"
           proxygroup="filters" proxyname="UpdateSuppressor">
         </Proxy>
-        <ExposedProperties>
-          <Property name="CacheUpdate" />
-        </ExposedProperties>
       </SubProxy>
       <SubProxy>
         <Proxy name="Property"
