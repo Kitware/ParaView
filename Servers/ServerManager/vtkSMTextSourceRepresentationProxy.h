@@ -65,21 +65,12 @@ public:
   // it must explicity mark the strategy invalid.
   virtual void MarkModified(vtkSMProxy* modifiedProxy);
 
-  // Description:
-  // Set the update time passed on to the update suppressor.
-  void SetUpdateTime(double time);
-
 // BTX
 protected:
   vtkSMTextSourceRepresentationProxy();
   ~vtkSMTextSourceRepresentationProxy();
 
-  // Invalidate geometry. If useCache is true, do not invalidate
-  // cached geometry
-  virtual void InvalidateGeometryInternal(int /*useCache*/)
-    { this->Dirty = true; }
-
-    // Description:
+  // Description:
   // This method is called at the beginning of CreateVTKObjects().
   // This gives the subclasses an opportunity to set the servers flags
   // on the subproxies.
@@ -103,6 +94,12 @@ protected:
   // Returns true on success.
   // Currently a representation can be added to only one view.
   virtual bool RemoveFromView(vtkSMViewProxy* view);
+
+  // Description:
+  // Pass the actual update time to use to all strategies.
+  // When not using strategies, make sure that this method is overridden to pass
+  // the update time correctly.
+  virtual void SetUpdateTimeInternal(double time);
 
   vtkSMTextWidgetRepresentationProxy* TextWidgetProxy;
 

@@ -33,7 +33,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMTextSourceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMTextSourceRepresentationProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMTextSourceRepresentationProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMTextSourceRepresentationProxy::vtkSMTextSourceRepresentationProxy()
 {
@@ -234,21 +234,14 @@ void vtkSMTextSourceRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMTextSourceRepresentationProxy::SetUpdateTime(double time)
+void vtkSMTextSourceRepresentationProxy::SetUpdateTimeInternal(double time)
 {
-  if (!this->ObjectsCreated)
-    {
-    vtkErrorMacro("Objects not created!");
-    return;
-    }
-
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->UpdateSuppressorProxy->GetProperty("UpdateTime"));
   dvp->SetElement(0, time);
-  // UpdateTime is immediate update, so no need to update.
 
-  // Go upstream to the reader and mark it modified.
-  this->MarkUpstreamModified();
+  // Calls MarkUpstreamModified().
+  this->Superclass::SetUpdateTimeInternal(time);
 }
 
 //----------------------------------------------------------------------------

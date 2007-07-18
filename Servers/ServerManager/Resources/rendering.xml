@@ -2129,6 +2129,9 @@
         default_values="none"
         is_internal="1">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          This time is not used unless UseViewUpdateTime is off.
+        </Documentation>
       </DoubleVectorProperty>
 
       <SubProxy>
@@ -3101,6 +3104,28 @@
         for each panel in the comparative view grid.
       </Documentation>
 
+      <IntVectorProperty
+        name="Dimensions"
+        command="Build"
+        update_self="1"
+        immediate_update="1"
+        number_of_elements="2"
+        default_values="3 3">
+        <IntRangeDomain name="range" min="1 1" max="10 10" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="Mode"
+        command="SetMode"
+        update_self="1"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Film Strip" />
+          <Entry value="1" text="Comparative" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <SubProxy>
         <Proxy name="RootView" proxygroup="newviews" proxyname="RenderView">
         </Proxy>
@@ -3190,6 +3215,9 @@
         number_of_elements="1"
         default_values="none">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          This time is not used unless UseViewUpdateTime is off.
+        </Documentation>
       </DoubleVectorProperty>
 
       <SubProxy>
@@ -3283,6 +3311,9 @@
         number_of_elements="1"
         default_values="none">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          This time is not used unless UseViewUpdateTime is off.
+        </Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -3507,6 +3538,9 @@
         number_of_elements="1"
         default_values="none">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          This time is not used unless UseViewUpdateTime is off.
+        </Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -3657,6 +3691,9 @@
         number_of_elements="1"
         default_values="none">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          This time is not used unless UseViewUpdateTime is off.
+        </Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -3784,6 +3821,9 @@
         number_of_elements="1"
         default_values="none">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          This time is not used unless UseViewUpdateTime is off.
+        </Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -3994,6 +4034,9 @@
         number_of_elements="1"
         default_values="none">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          This time is not used unless UseViewUpdateTime is off.
+        </Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty 
@@ -4260,6 +4303,9 @@
         number_of_elements="1"
         default_values="none">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          This time is not used unless UseViewUpdateTime is off.
+        </Documentation>
       </DoubleVectorProperty>
 
       <SubProxy>
@@ -4819,18 +4865,12 @@
     </TextWidgetRepresentationProxy>
 
     <TextSourceRepresentationProxy name="TextSourceRepresentation">
+      <Documentation>
+        Representation proxy used to show text.
+      </Documentation>
       <InputProperty name="Input" 
                      command="NotUsed"
                      />
-      <Property name="Update"
-        command="Update"
-        update_self="1">
-      </Property>
-
-      <Property name="InvalidateGeometry"
-        command="InvalidateGeometry"
-        update_self="1">
-      </Property>
 
       <DoubleVectorProperty
         name="UpdateTime"
@@ -4841,15 +4881,15 @@
         number_of_elements="1"
         default_values="none">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          This time is not used unless UseViewUpdateTime is off.
+        </Documentation>
       </DoubleVectorProperty>
 
       <SubProxy>
         <Proxy name="UpdateSuppressor"
           proxygroup="filters" proxyname="UpdateSuppressor">
         </Proxy>
-        <ExposedProperties>
-          <Property name="CacheUpdate" />
-        </ExposedProperties>
       </SubProxy>
 
       <SubProxy>
