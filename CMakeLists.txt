@@ -123,12 +123,6 @@ IF (PARAVIEW_ENABLE_PYTHON)
 ENDIF (PARAVIEW_ENABLE_PYTHON)
 
 #########################################################################
-IF(BUILD_SHARED_LIBS)
-  ADD_DEFINITIONS(-DPARAVIEW_BUILD_SHARED_LIBS)
-ENDIF(BUILD_SHARED_LIBS)
-
-
-#########################################################################
 # Set the ServerManager test data dir,
 SET(PVServerManagerTestData ${PARAVIEW_DATA_ROOT})
 
@@ -234,8 +228,11 @@ SET(PARAVIEW_LIBRARY_DIRS
   ${LIBRARY_OUTPUT_PATH} ${PARAVIEW_EXTRA_LINK_DIRECTORIES})
 
 SET(PARAVIEW_GUI_INCLUDE_DIRS ${ParaView_SOURCE_DIR}/Qt/Widgets
+                              ${ParaView_BINARY_DIR}/Qt/Widgets
                               ${ParaView_SOURCE_DIR}/Qt/Core
-                              ${ParaView_SOURCE_DIR}/Qt/Components )
+                              ${ParaView_BINARY_DIR}/Qt/Core
+                              ${ParaView_SOURCE_DIR}/Qt/Components
+                              ${ParaView_BINARY_DIR}/Qt/Components )
 SET(PARAVIEW_KWSYS_INCLUDE_DIRS ${PARAVIEW_INCLUDE_DIRS})
 
 GET_TARGET_PROPERTY(PARAVIEW_GUI_CLIENT_EXECUTABLE paraview${PV_EXE_SUFFIX} LOCATION)

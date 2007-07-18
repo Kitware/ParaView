@@ -2,7 +2,9 @@ PROJECT(QtPython)
 
 INCLUDE_DIRECTORIES(
   ${pqCore_SOURCE_DIR}
+  ${pqCore_BINARY_DIR}
   ${QtWidgets_SOURCE_DIR}
+  ${QtWidgets_BINARY_DIR}
   ${QtPython_BINARY_DIR}
   ${VTK_INCLUDE_DIR}
   ${PYTHON_INCLUDE_PATH}

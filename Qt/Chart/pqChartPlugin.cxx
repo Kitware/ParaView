@@ -34,6 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # define QT_NO_DEBUG
 #endif
 
+#include "QtChartExport.h"
+#ifndef QTCHART_BUILD_SHARED_LIBS
+# define QT_STATICPLUGIN
+#endif
+
 #include "pqChartPlugin.h"
 #include "pqChartWidget.h"
 #include "pqChartWidgetPlugin.h"

@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _QtPythonExport_h
 #define _QtPythonExport_h
 
+#include "QtPythonConfig.h"
+
 #if defined(WIN32) && defined(PARAVIEW_BUILD_SHARED_LIBS)
 # if defined(QtPython_EXPORTS)
 #   define QTPYTHON_EXPORT __declspec(dllexport)
@@ -44,3 +46,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #endif // !_QtPythonExport_h
+

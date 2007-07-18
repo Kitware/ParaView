@@ -33,7 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _QtTestingExport_h
 #define _QtTestingExport_h
 
-#if defined(WIN32) && defined(PARAVIEW_BUILD_SHARED_LIBS)
+#include "QtTestingConfigure.h"
+
+#if defined(WIN32) && defined(QTTESTING_BUILD_SHARED_LIBS)
 # if defined(QtTesting_EXPORTS)
 #   define QTTESTING_EXPORT __declspec(dllexport)
 # else
@@ -44,3 +46,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #endif // !_QtTestingExport_h
+

@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _QtTestingConfigure_h
 #define _QtTestingConfigure_h
 
+#cmakedefine QTTESTING_BUILD_SHARED_LIBS
+
 #cmakedefine QT_TESTING_WITH_XML
 
 #cmakedefine QT_TESTING_WITH_PYTHON

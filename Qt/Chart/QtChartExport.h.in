@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    QtWidgetsExport.h
+   Module:    QtChartExport.h.in
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,17 +30,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _QtWidgetsExport_h
-#define _QtWidgetsExport_h
+/*!
+ * \file QtChartExport.h
+ * \brief
+ *   Used to switch between dll import and export on windows.
+ * \date August 19, 2005
+ */
 
-#if defined(WIN32) && defined(PARAVIEW_BUILD_SHARED_LIBS)
-# if defined(pqWidgets_EXPORTS)
-#   define QTWIDGETS_EXPORT __declspec(dllexport)
+#ifndef __QtChartExport_h
+#define __QtChartExport_h
+
+#cmakedefine QTCHART_BUILD_SHARED_LIBS
+
+#if defined(WIN32) && defined(QTCHART_BUILD_SHARED_LIBS)
+# if defined(QtChart_EXPORTS)
+#   define QTCHART_EXPORT __declspec(dllexport)
 # else
-#   define QTWIDGETS_EXPORT __declspec(dllimport)
+#   define QTCHART_EXPORT __declspec(dllimport) 
 # endif
 #else
-# define QTWIDGETS_EXPORT
+# define QTCHART_EXPORT
 #endif
 
-#endif // !_QtWidgetsExport_h
+#endif
+

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaView
-   Module:    pqCoreExport.h
+   Module:    pqCoreExport.h.in
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -33,6 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqCoreExport_h
 #define _pqCoreExport_h
 
+#ifndef PARAVIEW_BUILD_SHARED_LIBS
+#cmakedefine PARAVIEW_BUILD_SHARED_LIBS
+#endif
+
 #if defined(WIN32) && defined(PARAVIEW_BUILD_SHARED_LIBS)
 # if defined(pqCore_EXPORTS)
 #   define PQCORE_EXPORT __declspec(dllexport)
@@ -44,3 +48,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #endif // !_pqCoreExport_h
+
