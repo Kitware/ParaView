@@ -310,7 +310,6 @@ QObject* pqApplicationCore::manager(const QString& function)
 //-----------------------------------------------------------------------------
 void pqApplicationCore::removeServer(pqServer* server)
 {
-  cout << "removeServer" << endl;
   if (!server)
     {
     qDebug() << "No server to remove.";
