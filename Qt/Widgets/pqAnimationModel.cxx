@@ -90,7 +90,7 @@ void pqAnimationModel::removeTrack(pqAnimationTrack* t)
     {
     this->Tracks.removeAt(idx);
     this->removeItem(t);
-    this->Header.removeRow(idx);
+    this->Header.removeRow(idx+1);  // off by one for time header item
     delete t;
     this->resizeTracks();
     }
@@ -176,7 +176,6 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF& )
   int rh = this->rowHeight();
 
   // TODO: draw time labels (depends on mode)
-  // TODO: make time its own track
 
   QGraphicsView* view = qobject_cast<QGraphicsView*>(this->parent());
   QRectF labelRect = QRectF(sr.left(), sr.top(), sr.width(), rh);
