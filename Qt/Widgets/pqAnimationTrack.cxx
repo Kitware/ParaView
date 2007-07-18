@@ -44,6 +44,10 @@ pqAnimationTrack::pqAnimationTrack(QObject* p)
 
 pqAnimationTrack::~pqAnimationTrack()
 {
+  while(this->Frames.count())
+    {
+    this->removeKeyFrame(this->Frames[0]);
+    }
 }
 
 int pqAnimationTrack::count()

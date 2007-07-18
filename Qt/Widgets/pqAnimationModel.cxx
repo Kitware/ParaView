@@ -87,6 +87,7 @@ void pqAnimationModel::removeTrack(pqAnimationTrack* t)
 {
   this->Tracks.removeAll(t);
   this->removeItem(t);
+  delete t;
   this->resizeTracks();
 }
 
