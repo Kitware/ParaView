@@ -17,8 +17,6 @@
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
-#include "vtkImageClip.h"
-#include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkObjectFactory.h"
@@ -47,7 +45,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.16");
 
 vtkInformationKeyMacro(vtkSMIceTCompositeViewProxy, KD_TREE, ObjectBase);
 //----------------------------------------------------------------------------
@@ -638,33 +636,32 @@ void vtkSMIceTCompositeViewProxy::RemoveRepresentationInternal(
 vtkImageData* vtkSMIceTCompositeViewProxy::CaptureWindow(int magnification)
 {
   // NOTE: vtkSMIceTDesktopRenderViewProxy must not call this method.
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  if (this->MultiViewManager)
+    {
+    stream  << vtkClientServerStream::Invoke
+            << this->MultiViewManager->GetID()
+            << "SetActiveViewID"
+            << this->RenderersID
+            << vtkClientServerStream::End;
+    stream  << vtkClientServerStream::Invoke
+            << this->MultiViewManager->GetID()
+            << "StartMagnificationFix"
+            << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, this->MultiViewManager->GetServers(), stream);
+    }
+
   vtkImageData* capture = this->Superclass::CaptureWindow(magnification);
 
-  // Move capture image back to origin.
-  int extents[6];
-  capture->GetExtent(extents);
-  for (int cc=0; cc < 4; cc++)
+  if (this->MultiViewManager)
     {
-    extents[cc] -= this->ViewPosition[cc/2]*magnification;
+    stream  << vtkClientServerStream::Invoke
+            << this->MultiViewManager->GetID()
+            << "EndMagnificationFix"
+            << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, this->MultiViewManager->GetServers(), stream);
     }
-  capture->SetExtent(extents);
-
-  // Clip captured image to the current viewport.
-  vtkImageClip* clip = vtkImageClip::New();
-  clip->SetInput(capture);
-  capture->Delete();
-  clip->SetOutputWholeExtent(this->ViewPosition[0]*magnification, 
-    (this->ViewPosition[0] + this->ViewSize[0])*magnification -1,
-    this->ViewPosition[1]*magnification,
-    (this->ViewPosition[1] + this->ViewSize[1])*magnification -1, 
-    0, 0);
-  clip->SetClipData(1);
-  clip->Update();
-
-  capture = vtkImageData::New();
-  capture->ShallowCopy(clip->GetOutput());
-  clip->Delete();
-
   return capture;
 }
 

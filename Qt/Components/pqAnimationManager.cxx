@@ -484,8 +484,9 @@ bool pqAnimationManager::saveAnimation()
       vtkSMServerProxyManagerReviver::New();
     int status = reviver->ReviveRemoteServerManager(server->GetConnectionID());
     reviver->Delete();
+    this->restoreViewSizes();
     emit this->endNonUndoableChanges();
-    pqApplicationCore::instance()->removeServer(server);
+    emit this->disconnectServer(server);
     return status;
     }
 

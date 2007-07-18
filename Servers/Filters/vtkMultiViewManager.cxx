@@ -30,12 +30,13 @@ class vtkMultiViewManager::vtkRendererMap :
 
 
 vtkStandardNewMacro(vtkMultiViewManager);
-vtkCxxRevisionMacro(vtkMultiViewManager, "1.2");
+vtkCxxRevisionMacro(vtkMultiViewManager, "1.3");
 //----------------------------------------------------------------------------
 vtkMultiViewManager::vtkMultiViewManager()
 {
   this->RenderWindow = 0;
   this->ActiveViewID = 0;
+  this->FixViewport = false;
   this->RendererMap = new vtkRendererMap();
 
   vtkMemberFunctionCommand<vtkMultiViewManager>* obs = 
@@ -88,6 +89,56 @@ vtkRendererCollection* vtkMultiViewManager::GetRenderers(int id)
     return iter->second.GetPointer();
     }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkMultiViewManager::StartMagnificationFix()
+{
+  this->FixViewport = false;
+  
+  vtkRendererCollection* renderers = this->GetActiveRenderers();
+  if (!renderers)
+    {
+    vtkErrorMacro("No active renderers selected!");
+    return;
+    }
+
+  int *size = this->RenderWindow->GetSize();
+  this->OriginalRenderWindowSize[0] = size[0];
+  this->OriginalRenderWindowSize[1] = size[1];
+
+  renderers->InitTraversal();
+  vtkRenderer* ren = renderers->GetNextItem();
+  ren->GetViewport(this->OriginalViewport);
+
+  int newSize[2];
+  newSize[0] = (this->OriginalViewport[2]-this->OriginalViewport[0])*size[0];
+  newSize[1] = (this->OriginalViewport[3]-this->OriginalViewport[1])*size[1];
+  this->RenderWindow->SetSize(newSize);
+
+  renderers->InitTraversal();
+  while (vtkRenderer* ren = renderers->GetNextItem())
+    {
+    ren->SetViewport(0, 0, 1, 1);
+    }
+  this->FixViewport = true;
+}
+
+//----------------------------------------------------------------------------
+void vtkMultiViewManager::EndMagnificationFix()
+{
+  if (!this->FixViewport)
+    {
+    return;
+    }
+  vtkRendererCollection* renderers = this->GetActiveRenderers();
+  renderers->InitTraversal();
+  while (vtkRenderer* ren = renderers->GetNextItem())
+    {
+    ren->SetViewport(this->OriginalViewport);
+    }
+  this->FixViewport = false;
+  this->RenderWindow->SetSize(this->OriginalRenderWindowSize);
 }
 
 //----------------------------------------------------------------------------

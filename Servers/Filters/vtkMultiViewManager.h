@@ -75,6 +75,14 @@ public:
   vtkSetMacro(ActiveViewID, int);
   vtkGetMacro(ActiveViewID, int);
 
+
+  // Description:
+  // IceTRenderer does not work well with vtkWindowToImageFilter with
+  // magnification > 1 and there are multiple views. To solve the problem we
+  // hide all other views and only render the active renderers.
+  void StartMagnificationFix();
+  void EndMagnificationFix();
+
 //BTX
 protected:
   vtkMultiViewManager();
@@ -82,6 +90,7 @@ protected:
 
 
   void StartRenderCallback();
+
   vtkRendererCollection* GetActiveRenderers();
 
   vtkRenderWindow* RenderWindow;
@@ -91,6 +100,9 @@ protected:
   class vtkRendererMap;
   vtkRendererMap* RendererMap;
 
+  int OriginalRenderWindowSize[2];
+  double OriginalViewport[4];
+  bool FixViewport;
 private:
   vtkMultiViewManager(const vtkMultiViewManager&); // Not implemented
   void operator=(const vtkMultiViewManager&); // Not implemented

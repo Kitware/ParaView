@@ -106,6 +106,11 @@ signals:
   /// should not get recorded on the undo stack.
   void endNonUndoableChanges();
 
+  /// emitted to request the application to disconnect from the server
+  /// connection. This is done when the user requested to save animation after
+  /// disconnecting from the server.
+  void disconnectServer(pqServer*);
+
 public slots:
   // Called when the active server changes.
   void onActiveServerChanged(pqServer*);

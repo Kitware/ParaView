@@ -1300,6 +1300,12 @@ pqAnimationManager* pqMainWindowCore::getAnimationManager()
                      SIGNAL(endNonUndoableChanges()),
                      this->Implementation->UndoStack, 
                      SLOT(endNonUndoableChanges()));
+
+    QObject::connect(this->Implementation->AnimationManager,
+                     SIGNAL(disconnectServer(pqServer*)),
+                     this, 
+                     SLOT(onServerDisconnect()), 
+                     Qt::QueuedConnection);
     }
   return this->Implementation->AnimationManager;
 }
