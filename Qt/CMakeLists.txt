@@ -10,6 +10,14 @@ IF(NOT QT4_FOUND)
   MESSAGE(SEND_ERROR "Qt ${QT_MIN_VERSION} or greater not found.  Please check the QT_QMAKE_EXECUTABLE variable.")
 ELSE(NOT QT4_FOUND)
 
+# To make support of ParaView tractable, we only support a single version
+# of Qt at one time.  If you really want to use a newer version of Qt, you
+# can delete this check, but you are on your own.
+STRING(REGEX MATCH "^4\\.2\\.[0-9]+" qt_version_tmp "${QTVERSION}")
+IF (NOT qt_version_tmp)
+  MESSAGE(SEND_ERROR "Qt ${QTVERSION} not supported.  Please use Qt 4.2.")
+ENDIF (NOT qt_version_tmp)
+
 # help CMake fine QtUiTools on Mac (binary install)
 IF(APPLE AND QT4_FOUND AND QT_QTCORE_FOUND AND NOT QT_QTUITOOLS_FOUND)
   FIND_LIBRARY(QT_QTUITOOLS_LIBRARY_RELEASE NAMES QtUiTools PATHS ${QT_LIBRARY_DIR})
