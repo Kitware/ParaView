@@ -218,6 +218,7 @@ pqCustomFilterDefinitionModel::pqCustomFilterDefinitionModel(
 pqCustomFilterDefinitionModel::~pqCustomFilterDefinitionModel()
 {
   delete this->Root;
+  delete [] this->PixmapList;
 }
 
 int pqCustomFilterDefinitionModel::rowCount(
