@@ -4930,23 +4930,16 @@
     </TextSourceRepresentationProxy>
     
     <DataLabelRepresentationProxy name="DataLabelRepresentation">
+      <Documentation>
+        Representation used to add labels to points/cells of any dataset.
+      </Documentation>
       <InputProperty name="Input"
         command="NotUsed">
         <InputArrayDomain name="input_array_any"
           attribute_type="any">
         </InputArrayDomain>
       </InputProperty>
-      <Property
-        name="Update"
-        command="Update"
-        update_self="1">
-        <!--        is_internal="1">  -->
-      </Property>
-      <Property
-        name="InvalidateGeometry"
-        command="InvalidateGeometry"
-        update_self="1">
-      </Property>
+
       <SubProxy>
         <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
         </Proxy>
