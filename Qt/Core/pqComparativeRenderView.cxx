@@ -86,9 +86,16 @@ pqComparativeRenderView::~pqComparativeRenderView()
 }
 
 //-----------------------------------------------------------------------------
+void pqComparativeRenderView::initialize()
+{
+  this->Superclass::initialize();
+  this->onComparativeVisLayoutChanged();
+}
+
+//-----------------------------------------------------------------------------
 void pqComparativeRenderView::setDefaultPropertyValues()
 {
-  this->getComparativeRenderViewProxy()->Build(3, 3);
+  //this->getComparativeRenderViewProxy()->Build(3, 3);
   this->Superclass::setDefaultPropertyValues();
 }
 
@@ -149,6 +156,8 @@ void pqComparativeRenderView::onComparativeVisLayoutChanged()
   foreach (vtkSMViewProxy* key, added)
     {
     vtkSMRenderViewProxy* renView = vtkSMRenderViewProxy::SafeDownCast(key);
+    renView->UpdateVTKObjects();
+
     QVTKWidget* widget = new QVTKWidget();
     widget->SetRenderWindow(renView->GetRenderWindow());
     widget->installEventFilter(this);
@@ -160,7 +169,11 @@ void pqComparativeRenderView::onComparativeVisLayoutChanged()
   int dimensions[2];
   compView->GetDimensions(dimensions);
 
-  QGridLayout* layout = new QGridLayout();
+  // destroy the old layout and create a new one. 
+  QWidget* widget = this->getWidget();
+  delete widget->layout();
+
+  QGridLayout* layout = new QGridLayout(widget);
   layout->setSpacing(1);
   layout->setMargin(0);
   for (int x=0; x < dimensions[0]; x++)
@@ -173,10 +186,6 @@ void pqComparativeRenderView::onComparativeVisLayoutChanged()
       layout->addWidget(widget, y, x);
       }
     }
-
-  QWidget* widget = this->getWidget();
-  delete widget->layout();
-  widget->setLayout(layout);
-
+  
   currentViews->Delete();
 }
