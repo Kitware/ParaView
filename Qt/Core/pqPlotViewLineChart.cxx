@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPlotViewLineChart.h"
 
 #include "pqChartArea.h"
+#include "pqChartLegendModel.h"
 #include "pqChartSeriesColorManager.h"
 #include "pqChartSeriesOptionsGenerator.h"
 #include "pqLineChart.h"
@@ -63,7 +64,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPlotViewLineChartSeries
 {
 public:
-  pqPlotViewLineChartSeries();
   pqPlotViewLineChartSeries(const QString &display,
       pqVTKLineChartSeries *model);
   pqPlotViewLineChartSeries(
@@ -77,6 +77,7 @@ public:
   pqVTKLineChartSeries *Model;
   QString RepresentationName;
   int Chart;
+  unsigned int LegendId;
 };
 
 
@@ -108,23 +109,18 @@ public:
   pqLineChartModel *Model[4];
   QMap<vtkSMProxy *, pqPlotViewLineChartItem *> Representations;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  pqChartLegendModel *Legend;
 };
 
 
 //----------------------------------------------------------------------------
-pqPlotViewLineChartSeries::pqPlotViewLineChartSeries()
-  : RepresentationName()
-{
-  this->Model = 0;
-  this->Chart = -1;
-}
-
 pqPlotViewLineChartSeries::pqPlotViewLineChartSeries(
     const QString &display, pqVTKLineChartSeries *model)
   : RepresentationName(display)
 {
   this->Model = model;
   this->Chart = -1;
+  this->LegendId = 0;
 }
 
 pqPlotViewLineChartSeries::pqPlotViewLineChartSeries(
@@ -133,6 +129,7 @@ pqPlotViewLineChartSeries::pqPlotViewLineChartSeries(
 {
   this->Model = other.Model;
   this->Chart = other.Chart;
+  this->LegendId = other.LegendId;
 }
 
 pqPlotViewLineChartSeries &pqPlotViewLineChartSeries::operator=(
@@ -141,6 +138,7 @@ pqPlotViewLineChartSeries &pqPlotViewLineChartSeries::operator=(
   this->Model = other.Model;
   this->RepresentationName = other.RepresentationName;
   this->Chart = other.Chart;
+  this->LegendId = other.LegendId;
   return *this;
 }
 
@@ -187,6 +185,7 @@ pqPlotViewLineChartInternal::pqPlotViewLineChartInternal()
   this->Model[pqPlotViewLineChart::TopLeft] = 0;
   this->Model[pqPlotViewLineChart::TopRight] = 0;
   this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+  this->Legend = 0;
 }
 
 
@@ -216,12 +215,16 @@ pqPlotViewLineChart::~pqPlotViewLineChart()
   delete this->Internal;
 }
 
-void pqPlotViewLineChart::initialize(pqChartArea *chartArea)
+void pqPlotViewLineChart::initialize(pqChartArea *chartArea,
+    pqChartLegendModel *legend)
 {
   if(this->Internal->Model[pqPlotViewLineChart::BottomLeft])
     {
     return;
     }
+
+  // Save the legend model for later.
+  this->Internal->Legend = legend;
 
   // Add a line chart layer for each of the possible axes
   // configurations. Add the layers in reverse order to keep the
@@ -311,7 +314,14 @@ void pqPlotViewLineChart::update(bool force)
       if(typeChanged || !isVisible ||
           !(*jter)->Representation->isSeriesEnabled(index))
         {
-        // TODO: Remove the series from the legend if needed.
+        // Remove the series from the legend if needed.
+        if(series->LegendId != 0)
+          {
+          this->Internal->Legend->removeEntry(
+              this->Internal->Legend->getIndexForId(series->LegendId));
+          series->LegendId = 0;
+          }
+
         this->Internal->Model[series->Chart]->removeSeries(series->Model);
         delete series->Model;
         series = (*jter)->Series.erase(series);
@@ -350,7 +360,34 @@ void pqPlotViewLineChart::update(bool force)
           seriesPen.setStyle((*jter)->Representation->getSeriesStyle(index));
           options->setPen(seriesPen);
 
-          // TODO: Update the legend status for the series.
+          // Update the legend status for the series.
+          if((*jter)->Representation->isSeriesInLegend(index))
+            {
+            QString label;
+            (*jter)->Representation->getSeriesLabel(index, label);
+            if(series->LegendId == 0)
+              {
+              // Add the series to the legend.
+              series->LegendId = this->Internal->Legend->addEntry(
+                  pqChartLegendModel::generateLineIcon(seriesPen), label);
+              }
+            else
+              {
+              // Update the legend label and icon in case they changed.
+              int legendIndex = this->Internal->Legend->getIndexForId(
+                  series->LegendId);
+              this->Internal->Legend->setIcon(legendIndex,
+                  pqChartLegendModel::generateLineIcon(seriesPen));
+              this->Internal->Legend->setText(legendIndex, label);
+              }
+            }
+          else if(series->LegendId != 0)
+            {
+            // Remove the series from the legend.
+            this->Internal->Legend->removeEntry(
+                this->Internal->Legend->getIndexForId(series->LegendId));
+            series->LegendId = 0;
+            }
 
           displayNames.append(series->RepresentationName);
           ++series;
@@ -465,11 +502,17 @@ void pqPlotViewLineChart::update(bool force)
             changedOptions = true;
             }
 
-          // TODO: Add the series to the legend if needed.
-
           if(changedOptions)
             {
             options->setPen(seriesPen);
+            }
+
+          // Add the series to the legend if needed.
+          if((*jter)->Representation->isSeriesInLegend(i))
+            {
+            (*jter)->Representation->getSeriesLabel(i, name);
+            plot->LegendId = this->Internal->Legend->addEntry(
+                pqChartLegendModel::generateLineIcon(seriesPen), name);
             }
           }
         }

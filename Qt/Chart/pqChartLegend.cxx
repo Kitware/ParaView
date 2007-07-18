@@ -101,6 +101,10 @@ void pqChartLegend::setModel(pqChartLegendModel *model)
         this, SLOT(startEntryRemoval(int)));
     this->connect(this->Model, SIGNAL(entryRemoved(int)),
         this, SLOT(finishEntryRemoval(int)));
+    this->connect(this->Model, SIGNAL(iconChanged(int)),
+        this, SLOT(update()));
+    this->connect(this->Model, SIGNAL(textChanged(int)),
+        this, SLOT(updateEntryText(int)));
     }
 
   this->reset();
@@ -132,6 +136,7 @@ void pqChartLegend::setFlow(pqChartLegend::ItemFlow flow)
     {
     this->Flow = flow;
     this->calculateSize();
+    this->update();
     }
 }
 
@@ -258,12 +263,14 @@ void pqChartLegend::reset()
     }
 
   this->calculateSize();
+  this->update();
 }
 
 void pqChartLegend::insertEntry(int index)
 {
   this->Internal->Entries.insert(index, 0);
   this->calculateSize();
+  this->update();
 }
 
 void pqChartLegend::startEntryRemoval(int index)
@@ -274,6 +281,14 @@ void pqChartLegend::startEntryRemoval(int index)
 void pqChartLegend::finishEntryRemoval(int)
 {
   this->calculateSize();
+  this->update();
+}
+
+void pqChartLegend::updateEntryText(int index)
+{
+  this->Internal->Entries[index] = 0;
+  this->calculateSize();
+  this->update();
 }
 
 bool pqChartLegend::event(QEvent *e)
@@ -283,6 +298,7 @@ bool pqChartLegend::event(QEvent *e)
     this->Internal->FontChanged = true;
     this->calculateSize();
     this->Internal->FontChanged = false;
+    this->update();
     }
 
   return QWidget::event(e);

@@ -160,6 +160,11 @@ protected slots:
   /// \param index The entry that was removed.
   void finishEntryRemoval(int index);
 
+  /// \brief
+  ///   Updates the text for the given entry.
+  /// \param index The index of the modified entry.
+  void updateEntryText(int index);
+
 protected:
   /// \brief
   ///   Updates the layout when the font changes.

@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 class pqChartArea;
+class pqChartLegendModel;
 class pqLineChartRepresentation;
 class pqPlotViewLineChartInternal;
 class vtkObject;
@@ -64,7 +65,7 @@ public:
   pqPlotViewLineChart(QObject *parent=0);
   virtual ~pqPlotViewLineChart();
 
-  void initialize(pqChartArea *chartArea);
+  void initialize(pqChartArea *chartArea, pqChartLegendModel *legend);
 
   void update(bool force=false);
 

@@ -49,10 +49,19 @@ public:
 
   QPixmap Icon;
   QString Text;
+  unsigned int Id;
 };
 
 
-class pqChartLegendModelInternal : public QList<pqChartLegendModelItem *> {};
+class pqChartLegendModelInternal
+{
+public:
+  pqChartLegendModelInternal();
+  ~pqChartLegendModelInternal() {}
+
+  QList<pqChartLegendModelItem *> Entries;
+  unsigned int NextId;
+};
 
 
 //----------------------------------------------------------------------------
@@ -60,6 +69,15 @@ pqChartLegendModelItem::pqChartLegendModelItem(const QPixmap &icon,
     const QString &text)
   : Icon(icon), Text(text)
 {
+  this->Id = 0;
+}
+
+
+//----------------------------------------------------------------------------
+pqChartLegendModelInternal::pqChartLegendModelInternal()
+  : Entries()
+{
+  this->NextId = 1;
 }
 
 
@@ -73,8 +91,9 @@ pqChartLegendModel::pqChartLegendModel(QObject *parentObject)
 
 pqChartLegendModel::~pqChartLegendModel()
 {
-  QList<pqChartLegendModelItem *>::Iterator iter = this->Internal->begin();
-  for( ; iter != this->Internal->end(); ++iter)
+  QList<pqChartLegendModelItem *>::Iterator iter =
+      this->Internal->Entries.begin();
+  for( ; iter != this->Internal->Entries.end(); ++iter)
     {
     delete *iter;
     }
@@ -82,16 +101,12 @@ pqChartLegendModel::~pqChartLegendModel()
   delete this->Internal;
 }
 
-void pqChartLegendModel::addEntry(const QPixmap &icon, const QString &text)
+int pqChartLegendModel::addEntry(const QPixmap &icon, const QString &text)
 {
-  this->Internal->append(new pqChartLegendModelItem(icon, text));
-  if(!this->InModify)
-    {
-    emit this->entryInserted(this->Internal->size() - 1);
-    }
+  return this->insertEntry(this->Internal->Entries.size(), icon, text);
 }
 
-void pqChartLegendModel::insertEntry(int index, const QPixmap &icon,
+int pqChartLegendModel::insertEntry(int index, const QPixmap &icon,
     const QString &text)
 {
   if(index < 0)
@@ -99,30 +114,35 @@ void pqChartLegendModel::insertEntry(int index, const QPixmap &icon,
     index = 0;
     }
 
-  if(index < this->Internal->size())
+  pqChartLegendModelItem *item = new pqChartLegendModelItem(icon, text);
+  item->Id = this->Internal->NextId++;
+  if(index < this->Internal->Entries.size())
     {
-    this->Internal->insert(index, new pqChartLegendModelItem(icon, text));
-    if(!this->InModify)
-      {
-      emit this->entryInserted(index);
-      }
+    this->Internal->Entries.insert(index, item);
     }
   else
     {
-    this->addEntry(icon, text);
+    this->Internal->Entries.append(item);
     }
+
+  if(!this->InModify)
+    {
+    emit this->entryInserted(index);
+    }
+
+  return item->Id;
 }
 
 void pqChartLegendModel::removeEntry(int index)
 {
-  if(index >= 0 && index < this->Internal->size())
+  if(index >= 0 && index < this->Internal->Entries.size())
     {
     if(!this->InModify)
       {
       emit this->removingEntry(index);
       }
 
-    delete this->Internal->takeAt(index);
+    delete this->Internal->Entries.takeAt(index);
     if(!this->InModify)
       {
       emit this->entryRemoved(index);
@@ -132,15 +152,16 @@ void pqChartLegendModel::removeEntry(int index)
 
 void pqChartLegendModel::removeAllEntries()
 {
-  if(this->Internal->size() > 0)
+  if(this->Internal->Entries.size() > 0)
     {
-    QList<pqChartLegendModelItem *>::Iterator iter = this->Internal->begin();
-    for( ; iter != this->Internal->end(); ++iter)
+    QList<pqChartLegendModelItem *>::Iterator iter =
+        this->Internal->Entries.begin();
+    for( ; iter != this->Internal->Entries.end(); ++iter)
       {
       delete *iter;
       }
 
-    this->Internal->clear();
+    this->Internal->Entries.clear();
     if(!this->InModify)
       {
       emit this->entriesReset();
@@ -164,27 +185,61 @@ void pqChartLegendModel::finishModifyingData()
 
 int pqChartLegendModel::getNumberOfEntries() const
 {
-  return this->Internal->size();
+  return this->Internal->Entries.size();
+}
+
+int pqChartLegendModel::getIndexForId(unsigned int id) const
+{
+  QList<pqChartLegendModelItem *>::Iterator iter =
+      this->Internal->Entries.begin();
+  for(int index = 0; iter != this->Internal->Entries.end(); ++iter, ++index)
+    {
+    if((*iter)->Id == id)
+      {
+      return index;
+      }
+    }
+
+  return -1;
 }
 
 QPixmap pqChartLegendModel::getIcon(int index) const
 {
-  if(index >= 0 && index < this->Internal->size())
+  if(index >= 0 && index < this->Internal->Entries.size())
     {
-    return this->Internal->at(index)->Icon;
+    return this->Internal->Entries[index]->Icon;
     }
 
   return QPixmap();
 }
 
+void pqChartLegendModel::setIcon(int index, const QPixmap &icon)
+{
+  if(index >= 0 && index < this->Internal->Entries.size())
+    {
+    this->Internal->Entries[index]->Icon = icon;
+    emit this->iconChanged(index);
+    }
+}
+
 QString pqChartLegendModel::getText(int index) const
 {
-  if(index >= 0 && index < this->Internal->size())
+  if(index >= 0 && index < this->Internal->Entries.size())
     {
-    return this->Internal->at(index)->Text;
+    return this->Internal->Entries[index]->Text;
     }
 
   return QString();
+}
+
+void pqChartLegendModel::setText(int index, const QString &text)
+{
+  if(index >= 0 && index < this->Internal->Entries.size() &&
+    text != this->Internal->Entries[index]->Text)
+    {
+    this->Internal->Entries[index]->Text = text;
+    emit this->textChanged(index);
+    }
 }
 
 QPixmap pqChartLegendModel::generateLineIcon(const QPen &pen,
@@ -196,6 +251,7 @@ QPixmap pqChartLegendModel::generateLineIcon(const QPen &pen,
 
   // Draw a line on the pixmap.
   QPainter painter(&icon);
+  painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setPen(pen);
   painter.drawLine(1, 15, 14, 0);
 

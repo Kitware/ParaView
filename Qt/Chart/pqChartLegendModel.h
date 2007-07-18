@@ -65,14 +65,18 @@ public:
   ///   Adds an entry to the chart legend.
   /// \param icon The series identifying image.
   /// \param text The series label.
-  void addEntry(const QPixmap &icon, const QString &text);
+  /// \return
+  ///   The id for the inserted entry or zero for failure.
+  int addEntry(const QPixmap &icon, const QString &text);
 
   /// \brief
   ///   Inserts an entry into the chart legend.
   /// \param index Where to place the new entry.
   /// \param icon The series identifying image.
   /// \param text The series label.
-  void insertEntry(int index, const QPixmap &icon, const QString &text);
+  /// \return
+  ///   The id for the inserted entry or zero for failure.
+  int insertEntry(int index, const QPixmap &icon, const QString &text);
 
   /// \brief
   ///   Removes an entry from the chart legend.
@@ -109,6 +113,14 @@ public:
   int getNumberOfEntries() const;
 
   /// \brief
+  ///   Gets the index for the given id.
+  /// \param id The entry identifier.
+  /// \return
+  ///   The index for the entry that matches the id or -1 if there is
+  ///   no matching entry.
+  int getIndexForId(unsigned int id) const;
+
+  /// \brief
   ///   Gets the icon for the given index.
   /// \param index The index of the entry.
   /// \return
@@ -117,12 +129,24 @@ public:
   QPixmap getIcon(int index) const;
 
   /// \brief
+  ///   Sets the icon for the given index.
+  /// \param index The index of the entry.
+  /// \param icon The new series icon.
+  void setIcon(int index, const QPixmap &icon);
+
+  /// \brief
   ///   Gets the text for the given index.
   /// \param index The index of the entry.
   /// \return
   ///   The text for the given index or a null string if the index is
   ///   out of bounds.
   QString getText(int index) const;
+
+  /// \brief
+  ///   Sets the text for the given index.
+  /// \param index The index of the entry.
+  /// \param text The new series label.
+  void setText(int index, const QString &text);
 
   /// \brief
   ///   Generates an icon for a line chart series.
@@ -159,6 +183,16 @@ signals:
 
   /// Emitted when the legend entries are reset.
   void entriesReset();
+
+  /// \brief
+  ///   Emitted when the icon for an entry has changed.
+  /// \param index The index of the entry that changed.
+  void iconChanged(int index);
+
+  /// \brief
+  ///   Emitted when the text for an entry has changed.
+  /// \param index The index of the entry that changed.
+  void textChanged(int index);
 
 private:
   pqChartLegendModelInternal *Internal; ///< Stores the legend items.

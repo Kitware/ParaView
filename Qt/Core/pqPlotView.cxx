@@ -31,21 +31,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqPlotView.h"
 
-#include "vtkDataSet.h"
-#include "vtkEventQtSlotConnect.h"
 #include "vtkImageData.h"
 #include "vtkPVDataInformation.h"
-#include "vtkRectilinearGrid.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMClientDeliveryRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
-#include "vtkTimeStamp.h"
 
 #include <QFileInfo>
 #include <QImage>
-#include <QList>
-#include <QMap>
 #include <QPainter>
 #include <QPixmap>
 #include <QPointer>
@@ -59,29 +51,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartContentsSpace.h"
 #include "pqChartInteractor.h"
 #include "pqChartInteractorSetup.h"
+#include "pqChartLegend.h"
+#include "pqChartLegendModel.h"
 #include "pqChartMouseSelection.h"
-#include "pqChartSeriesColorManager.h"
-#include "pqChartSeriesOptionsGenerator.h"
 #include "pqChartWidget.h"
-#include "pqHistogramChart.h"
-#include "pqHistogramChartOptions.h"
-#include "pqHistogramWidget.h"
-#include "pqLineChart.h"
-#include "pqLineChartModel.h"
-#include "pqLineChartOptions.h"
 #include "pqLineChartRepresentation.h"
-#include "pqLineChartSeriesOptions.h"
-#include "pqLineChartWidget.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqPlotViewHistogram.h"
 #include "pqPlotViewLineChart.h"
 #include "pqRepresentation.h"
 #include "pqServer.h"
-#include "pqSMAdaptor.h"
-#include "pqVTKHistogramColor.h"
-#include "pqVTKHistogramModel.h"
-#include "pqVTKLineChartSeries.h"
 
 
 class pqPlotViewInternal
@@ -91,19 +71,22 @@ public:
   ~pqPlotViewInternal();
 
   QPointer<pqChartWidget> Chart;
+  QPointer<pqChartLegend> Legend;
   QPointer<pqChartMouseSelection> Selection;
   pqPlotViewHistogram *Histogram;
   pqPlotViewLineChart *LineChart;
+  pqChartLegendModel *LegendModel;
   bool RenderRequestPending;
 };
 
 
 //----------------------------------------------------------------------------
 pqPlotViewInternal::pqPlotViewInternal()
-  : Chart(0), Selection(0)
+  : Chart(0), Legend(0), Selection(0)
 {
   this->Histogram = 0;
   this->LineChart = 0;
+  this->LegendModel = 0;
   this->RenderRequestPending = false;
 }
 
@@ -114,14 +97,9 @@ pqPlotViewInternal::~pqPlotViewInternal()
     delete this->Chart;
     }
 
-  if(this->Histogram)
+  if(!this->Legend.isNull())
     {
-    delete this->Histogram;
-    }
-
-  if(this->LineChart)
-    {
-    delete this->LineChart;
+    delete this->Legend;
     }
 }
 
@@ -144,6 +122,11 @@ pqPlotView::pqPlotView(const QString& type,
   chartArea->createAxis(pqChartAxis::Right);
   chartArea->createAxis(pqChartAxis::Top);
 
+  // Set up the chart legend.
+  this->Internal->LegendModel = new pqChartLegendModel(this);
+  this->Internal->Legend = new pqChartLegend();
+  this->Internal->Legend->setModel(this->Internal->LegendModel);
+
   // Add the appropriate layers to the chart.
   if(type == this->barChartType())
     {
@@ -161,7 +144,8 @@ pqPlotView::pqPlotView(const QString& type,
   else if(type == this->XYPlotType())
     {
     this->Internal->LineChart = new pqPlotViewLineChart(this);
-    this->Internal->LineChart->initialize(chartArea);
+    this->Internal->LineChart->initialize(chartArea,
+        this->Internal->LegendModel);
     }
   else
     {
@@ -259,6 +243,19 @@ void pqPlotView::renderInternal()
   if(this->Internal->LineChart)
     {
     this->Internal->LineChart->update();
+    }
+
+  if(this->Internal->LegendModel->getNumberOfEntries() == 0 &&
+      this->Internal->Chart->getLegend() != 0)
+    {
+    // Remove the legend from the chart since it is not needed.
+    this->Internal->Chart->setLegend(0);
+    }
+  else if(this->Internal->LegendModel->getNumberOfEntries() > 0 &&
+      this->Internal->Chart->getLegend() == 0)
+    {
+    // Add the legend to the chart since it is needed.
+    this->Internal->Chart->setLegend(this->Internal->Legend);
     }
 }
 
