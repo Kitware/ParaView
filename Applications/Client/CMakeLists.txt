@@ -189,6 +189,10 @@ IF(BUILD_TESTING)
         #SaveAnimationMultiView   -- need to fix timing issue
 # VCRAnimation -- enable after PVD reader supports time.
         )
+
+      SET(PYTHON_TESTS_REMOTE_ONLY 
+        DisconnectAndSaveAnimation)
+
     ENDIF(PARAVIEW_DATA_ROOT)
   ENDIF(QT_TESTING_WITH_PYTHON)
 
@@ -215,7 +219,6 @@ IF(BUILD_TESTING)
       --test-directory=${PARAVIEW_TEST_DIR}
       --exit)
   ENDFOREACH(test) 
-
 
   # test the plugins
   IF(BUILD_SHARED_LIBS AND BUILD_EXAMPLES)
@@ -374,6 +377,25 @@ IF(BUILD_TESTING)
           --exit)
       ENDIF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
     ENDFOREACH(test)
+
+    FOREACH(test ${PYTHON_TESTS_REMOTE_ONLY})
+        ADD_TEST(pqClient${test}-ClientServer-Python
+          ${TEST_BINARY} --test-server
+          --test-directory=${PARAVIEW_TEST_DIR}
+          -dr
+          --run-test=${TEST_PYTHON}/${test}.py
+          --exit)
+
+     #FIXME
+     #IF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
+     #  ADD_TEST(pqClient${test}-ClientRenderServer-Python
+     #    ${TEST_BINARY} --test-render-server
+     #    --test-directory=${PARAVIEW_TEST_DIR}
+     #    -dr
+     #    --run-test=${TEST_PYTHON}/${test}.py
+     #    --exit)
+     #ENDIF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
+    ENDFOREACH(test) 
   ENDIF(PARAVIEW_DATA_ROOT)
 
   ADD_SUBDIRECTORY(Testing/Cxx)

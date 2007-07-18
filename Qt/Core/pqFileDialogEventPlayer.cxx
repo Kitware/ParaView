@@ -36,15 +36,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqEventDispatcher.h"
 
+#include <vtksys/SystemTools.hxx>
+
 #include <QApplication>
 #include <QtDebug>
 
+//-----------------------------------------------------------------------------
 pqFileDialogEventPlayer::pqFileDialogEventPlayer(QObject* p)
   : pqWidgetEventPlayer(p)
 {
 }
 
-bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
+//-----------------------------------------------------------------------------
+bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command, 
+  const QString& Arguments, bool& Error)
 {
   // Handle playback for pqFileDialog and all its children ...
   pqFileDialog* object = 0;
@@ -57,24 +62,24 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
   if(!object)
     return false;
 
+  const QString data_directory = pqCoreTestUtility::DataRoot();
+  if(data_directory.isEmpty())
+    {
+    qCritical() << "You must set the PARAVIEW_DATA_ROOT environment variable to play-back file selections.";
+    Error = true;
+    return true;
+    }
+
+  const QString test_directory = pqCoreTestUtility::TestDirectory();
+  if (test_directory.isEmpty())
+    {
+    qCritical() << "You must specify --test-directory in the command line options.";
+    Error = true;
+    return true;
+    }
+
   if(Command == "filesSelected")
     {
-    const QString data_directory = pqCoreTestUtility::DataRoot();
-    if(data_directory.isEmpty())
-      {
-      qCritical() << "You must set the PARAVIEW_DATA_ROOT environment variable to play-back file selections.";
-      Error = true;
-      return true;
-      }
-
-    const QString test_directory = pqCoreTestUtility::TestDirectory();
-    if (test_directory.isEmpty())
-      {
-      qCritical() << "You must specify --test-directory in the command line options.";
-      Error = true;
-      return true;
-      }
-    
     /** \todo Handle multiple files */
     QString file = Arguments;
     file.replace("$PARAVIEW_DATA_ROOT", data_directory);
@@ -92,6 +97,15 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
   if(Command == "cancelled")
     {
     object->reject();
+    return true;
+    }
+  if (Command == "remove")
+    {
+    // Delete the file.
+    QString file = Arguments;
+    file.replace("$PARAVIEW_DATA_ROOT", data_directory);
+    file.replace("$PARAVIEW_TEST_ROOT", test_directory);
+    vtksys::SystemTools::RemoveFile(file.toAscii().data()); 
     return true;
     }
 
