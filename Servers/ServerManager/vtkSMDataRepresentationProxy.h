@@ -38,7 +38,8 @@
 //
 // Subclasses are free to not use any strategies at all. In which case they have
 // to provide implementations for Update(), UpdateRequired(),
-// GetDisplayedDataInformation(), GetFullResDataInformation(), MarkModified(). 
+// GetDisplayedDataInformation(), GetFullResDataInformation(), MarkModified(),
+// SetUpdateTimeInternal().
 // This class provides default implementation for these methods for 
 // representations using a collection of strategies. If these startegies are
 // used conditionally, then the subclass must override the above mentioned
@@ -245,6 +246,8 @@ protected:
 
   // Description:
   // Pass the actual update time to use to all strategies.
+  // When not using strategies, make sure that this method is overridden to pass
+  // the update time correctly.
   virtual void SetUpdateTimeInternal(double time);
 
   // These are the representation strategies used for data display. 

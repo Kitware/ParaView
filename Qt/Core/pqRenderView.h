@@ -269,9 +269,9 @@ protected:
   /// view. Default implementation creates a QVTKWidget.
   virtual QWidget* createWidget();
 
-  // Use this method to initialize the pqObject state using the
-  // underlying vtkSMProxy. This needs to be done only once,
-  // after the object has been created. 
+  /// Use this method to initialize the pqObject state using the
+  /// underlying vtkSMProxy. This needs to be done only once,
+  /// after the object has been created. 
   virtual void initialize();
 private: 
   class pqInternal;
