@@ -55,37 +55,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqKeyFrameEditor.h"
 
 //-----------------------------------------------------------------------------
-class pqAnimationViewWidget::pqInternals
+class pqAnimationViewWidget::pqInternal
 {
 public:
   QPointer<pqAnimationScene> Scene;
   pqAnimationWidget* AnimationWidget;
   QSignalMapper KeyFramesChanged;
+  typedef QMap<QPointer<pqAnimationCue>, pqAnimationTrack*> TrackMapType;
+  TrackMapType TrackMap;
 
   pqAnimationTrack* findTrack(pqAnimationCue* cue)
     {
-    pqAnimationModel* animModel =
-      this->AnimationWidget->animationModel();
-    QString name = this->cueName(cue);
-    
-    for(int i=0; i<animModel->count(); i++)
+    TrackMapType::iterator iter;
+    iter = this->TrackMap.find(cue);
+    if(iter != this->TrackMap.end())
       {
-      pqAnimationTrack* t = animModel->track(i);
-      if(t->property() == name)
-        {
-        return t;
-        }
+      return iter.value();
       }
     return NULL;
     }
   pqAnimationCue* findCue(pqAnimationTrack* track)
     {
-    QSet<pqAnimationCue*> cues = this->Scene->getCues();
-    foreach(pqAnimationCue* cue, cues)
+    TrackMapType::iterator iter;
+    for(iter = this->TrackMap.begin(); iter != this->TrackMap.end(); ++iter)
       {
-      if(track->property() == this->cueName(cue))
+      if(iter.value() == track)
         {
-        return cue;
+        return iter.key();
         }
       }
     return NULL;
@@ -114,7 +110,7 @@ public:
 //-----------------------------------------------------------------------------
 pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent)
 {
-  this->Internal = new pqAnimationViewWidget::pqInternals();
+  this->Internal = new pqAnimationViewWidget::pqInternal();
   QVBoxLayout* vboxlayout = new QVBoxLayout(this);
 
   this->Internal->AnimationWidget = new pqAnimationWidget(this);
@@ -162,23 +158,21 @@ void pqAnimationViewWidget::onSceneCuesChanged()
   QSet<pqAnimationCue*> cues = this->Internal->Scene->getCues();
   pqAnimationModel* animModel =
     this->Internal->AnimationWidget->animationModel();
+    
+  pqInternal::TrackMapType oldCues = this->Internal->TrackMap;
+  pqInternal::TrackMapType::iterator iter;
 
-  // get all existing tracks
-  QList<QString> oldTracks;
-  for(int i=0; i<animModel->count(); i++)
-    {
-    pqAnimationTrack* t = animModel->track(i);
-    oldTracks.append(t->property().toString());
-    }
-  
   // add new tracks
   foreach(pqAnimationCue* cue, cues)
     {
     QString completeName = this->Internal->cueName(cue);
 
-    if(!oldTracks.contains(completeName))
+    iter = this->Internal->TrackMap.find(cue);
+
+    if(iter == this->Internal->TrackMap.end())
       {
       pqAnimationTrack* t = animModel->addTrack();
+      this->Internal->TrackMap.insert(cue, t);
       t->setProperty(completeName);
       this->Internal->KeyFramesChanged.setMapping(cue, cue);
       QObject::connect(cue, SIGNAL(keyframesModified()),
@@ -187,21 +181,20 @@ void pqAnimationViewWidget::onSceneCuesChanged()
       }
     else
       {
-      oldTracks.removeAll(completeName);
+      oldCues.remove(cue);
       }
     }
 
-  // remove dead tracks
-  foreach(QString s, oldTracks)
+  // remove old tracks
+  for(iter = oldCues.begin(); iter != oldCues.end(); iter++)
     {
-    for(int i=0; i<animModel->count(); i++)
+    animModel->removeTrack(iter.value());
+    this->Internal->TrackMap.remove(iter.key());
+    if(iter.key())
       {
-      pqAnimationTrack* t = animModel->track(i);
-      if(t->property() == s)
-        {
-        animModel->removeTrack(t);
-        break;
-        }
+      QObject::disconnect(iter.key(), SIGNAL(keyframesModified()),
+        &this->Internal->KeyFramesChanged,
+        SLOT(map()));
       }
     }
 

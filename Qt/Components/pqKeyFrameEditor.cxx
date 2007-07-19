@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAnimationCue.h"
 #include "pqSMAdaptor.h"
+#include "pqApplicationCore.h"
+#include "pqUndoStack.h"
 
 class pqKeyFrameEditor::pqInternal : public Ui::pqKeyFrameEditor
 {
@@ -111,7 +113,12 @@ void pqKeyFrameEditor::writeKeyFrameData()
   int oldNumber = this->Internal->Cue->getNumberOfKeyFrames();
   int newNumber = this->Internal->Model.rowCount();
 
-  // TODO  undo
+  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
+
+  if(stack)
+    {
+    stack->beginUndoSet("Edit Keyframes");
+    }
 
   for(int i=0; i<oldNumber-newNumber; i++)
     {
@@ -133,6 +140,12 @@ void pqKeyFrameEditor::writeKeyFrameData()
     idx = this->Internal->Model.index(i, 2);
     newData = this->Internal->Model.data(idx, Qt::DisplayRole);
     pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyValues"), newData);
+    keyFrame->UpdateVTKObjects();
+    }
+  
+  if(stack)
+    {
+    stack->endUndoSet();
     }
 }
 

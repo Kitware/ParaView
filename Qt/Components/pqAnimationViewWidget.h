@@ -75,8 +75,8 @@ private:
   pqAnimationViewWidget(const pqAnimationViewWidget&); // Not implemented.
   void operator=(const pqAnimationViewWidget&); // Not implemented.
 
-  class pqInternals;
-  pqInternals *Internal;
+  class pqInternal;
+  pqInternal *Internal;
 };
 
 #endif
