@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkSMDatasetSpreadRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMDatasetSpreadRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMDatasetSpreadRepresentationProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMDatasetSpreadRepresentationProxy::vtkSMDatasetSpreadRepresentationProxy()
 {
@@ -31,6 +31,8 @@ vtkSMDatasetSpreadRepresentationProxy::~vtkSMDatasetSpreadRepresentationProxy()
 //----------------------------------------------------------------------------
 bool vtkSMDatasetSpreadRepresentationProxy::EndCreateVTKObjects()
 {
+  // Create a strategy to provide data to the client. Ofcourse we need t
+  return this->Superclass::EndCreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
