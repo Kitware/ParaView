@@ -181,9 +181,10 @@ void pqComparativeRenderView::onComparativeVisLayoutChanged()
     for (int y=0; y < dimensions[1]; y++)
       {
       int index = y*dimensions[0]+x;
-      vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(currentViews->GetItemAsObject(index));
-      QVTKWidget* widget = this->Internal->RenderWidgets[view];
-      layout->addWidget(widget, y, x);
+      vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(
+        currentViews->GetItemAsObject(index));
+      QVTKWidget* vtkwidget = this->Internal->RenderWidgets[view];
+      layout->addWidget(vtkwidget, y, x);
       }
     }
   
