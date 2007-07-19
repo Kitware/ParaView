@@ -84,6 +84,10 @@ public slots:
   void setStartTime(double);
   void setEndTime(double);
 
+signals:
+  // emitted when a track is double clicked on
+  void trackSelected(pqAnimationTrack*);
+
 protected slots:
 
   void resizeTracks();
@@ -93,6 +97,8 @@ protected:
   void drawForeground(QPainter* painter, const QRectF& rect);
 
   bool eventFilter(QObject* w, QEvent* e);
+
+  void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent);
 
 private:
 

@@ -35,14 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include <QWidget>
 
-class pqAnimationCue;
 class pqAnimationScene;
-class pqView;
-class pqPipelineSource;
-class pqProxy;
-class pqServerManagerModelItem;
-class QToolBar;
-class vtkSMProxy;
+class pqAnimationTrack;
 
 /// This is the Animation panel widget. It controls the behaviour
 /// of the Animation panel which includes adding of key frames,
@@ -73,6 +67,9 @@ protected slots:
   void updateSceneTimeRange();
   /// called when scene time changes
   void updateSceneTime();
+
+  // called when track is double clicked
+  void trackSelected(pqAnimationTrack* track);
   
 private:
   pqAnimationViewWidget(const pqAnimationViewWidget&); // Not implemented.

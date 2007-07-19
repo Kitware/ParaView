@@ -95,6 +95,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqHandleWidget.h
   pqImageTip.h
   pqImplicitPlaneWidget.h
+  pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.h
   pqLineSourceWidget.h
   pqLineWidget.h
@@ -200,6 +201,7 @@ SET(UI_FORMS
   Resources/UI/pqExtractSelectionPanel.ui
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
+  Resources/UI/pqKeyFrameEditor.ui
   Resources/UI/pqLineSourceControls.ui
   Resources/UI/pqLineWidget.ui
   Resources/UI/pqLineSourceControls.ui
@@ -389,6 +391,8 @@ ADD_LIBRARY(pqComponents
   pqImageTip.h
   pqImplicitPlaneWidget.cxx
   pqImplicitPlaneWidget.h
+  pqKeyFrameEditor.cxx
+  pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.cxx
   pqKeyFrameTimeValidator.h
   pqLineSourceWidget.cxx

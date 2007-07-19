@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGraphicsView>
 #include <QEvent>
 #include <QStyle>
+#include <QGraphicsSceneMouseEvent>
 
 #include "pqAnimationTrack.h"
 
@@ -248,6 +249,23 @@ void pqAnimationModel::trackNameChanged()
     {
     this->Header.setHeaderData(i+1, Qt::Vertical, this->Tracks[i]->property(),
                                Qt::DisplayRole);
+    }
+}
+
+void pqAnimationModel::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent)
+{
+  if(mouseEvent->button() == Qt::LeftButton)
+    {
+    QPointF pos = mouseEvent->scenePos();
+    QList<QGraphicsItem*> hitItems = this->items(pos);
+    foreach(QGraphicsItem* i, hitItems)
+      {
+      if(this->Tracks.contains(static_cast<pqAnimationTrack*>(i)))
+        {
+        emit trackSelected(static_cast<pqAnimationTrack*>(i));
+        return;
+        }
+      }
     }
 }
 

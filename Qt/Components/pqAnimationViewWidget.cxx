@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include <QPointer>
 #include <QSignalMapper>
+#include <QDialog>
+#include <QDialogButtonBox>
 
 #include "pqAnimationWidget.h"
 #include "pqAnimationModel.h"
@@ -50,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqTimeKeeper.h"
 #include "pqServer.h"
+#include "pqKeyFrameEditor.h"
 
 //-----------------------------------------------------------------------------
 class pqAnimationViewWidget::pqInternals
@@ -71,6 +74,18 @@ public:
       if(t->property() == name)
         {
         return t;
+        }
+      }
+    return NULL;
+    }
+  pqAnimationCue* findCue(pqAnimationTrack* track)
+    {
+    QSet<pqAnimationCue*> cues = this->Scene->getCues();
+    foreach(pqAnimationCue* cue, cues)
+      {
+      if(track->property() == this->cueName(cue))
+        {
+        return cue;
         }
       }
     return NULL;
@@ -107,6 +122,10 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
 
   QObject::connect(&this->Internal->KeyFramesChanged, SIGNAL(mapped(QObject*)),
                    this, SLOT(keyFramesChanged(QObject*)));
+
+  QObject::connect(this->Internal->AnimationWidget->animationModel(),
+                   SIGNAL(trackSelected(pqAnimationTrack*)),
+                   this, SLOT(trackSelected(pqAnimationTrack*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -237,4 +256,28 @@ void pqAnimationViewWidget::updateSceneTime()
   animModel->setCurrentTime(timekeeper->getTime());
 }
 
+
+void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
+{
+  pqAnimationCue* cue = this->Internal->findCue(track);
+  if(!cue)
+    {
+    return;
+    }
+
+  QDialog dialog;
+  dialog.setWindowTitle(tr("Animation Keyframes"));
+  QVBoxLayout* l = new QVBoxLayout(&dialog);
+  pqKeyFrameEditor* editor = new pqKeyFrameEditor(cue, &dialog);
+  QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok
+                                              | QDialogButtonBox::Cancel);
+  l->addWidget(editor);
+  l->addWidget(buttons);
+
+  connect(&dialog, SIGNAL(accepted()), editor, SLOT(writeKeyFrameData()));
+  connect(buttons, SIGNAL(accepted()), &dialog, SLOT(accept()));
+  connect(buttons, SIGNAL(rejected()), &dialog, SLOT(reject()));
+
+  dialog.exec();
+}
 

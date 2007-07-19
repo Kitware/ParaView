@@ -54,7 +54,6 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
   this->View->setFrameShape(QFrame::NoFrame);
   this->Model = new pqAnimationModel(this->View);
   this->View->setScene(this->Model);
-  this->View->setInteractive(false);
   this->Header = new QHeaderView(Qt::Vertical, cont);
   this->Header->setSizePolicy(QSizePolicy::Preferred,
                               QSizePolicy::MinimumExpanding);
