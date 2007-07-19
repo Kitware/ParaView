@@ -54,6 +54,9 @@ public slots:
   /// Update the view using the current panel values.
   void updateView(); 
 
+  /// Update the scene parameter panel using current Qt widget settings.
+  void updateParameterPanel();
+
 private:
   pqComparativeVisPanel(const pqComparativeVisPanel&); // Not implemented.
   void operator=(const pqComparativeVisPanel&); // Not implemented.

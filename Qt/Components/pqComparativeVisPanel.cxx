@@ -41,6 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Includes.
 #include "pqActiveView.h"
+#include "pqAnimationKeyFrame.h"
+#include "pqAnimationModel.h"
+#include "pqAnimationTrack.h"
 #include "pqComparativeRenderView.h"
 #include "pqPropertyLinks.h"
 #include "pqSignalAdaptors.h"
@@ -62,7 +65,11 @@ pqComparativeVisPanel::pqComparativeVisPanel(QWidget* p):Superclass(p)
     new pqSignalAdaptorComboBox(this->Internal->Mode);
   this->Internal->Links.setUseUncheckedProperties(true);
 
-  this->Internal->AnimationWidget->header()->hide();
+  QObject::connect(&this->Internal->Links,
+    SIGNAL(qtWidgetChanged()),
+    this, SLOT(updateParameterPanel()), Qt::QueuedConnection);
+
+  //this->Internal->AnimationWidget->header()->hide();
 
   QObject::connect(this->Internal->Update, SIGNAL(clicked()),
     this, SLOT(updateView()), Qt::QueuedConnection);
@@ -115,8 +122,40 @@ void pqComparativeVisPanel::setView(pqView* view)
     this->Internal->ModeAdaptor, "currentText", 
     SIGNAL(currentTextChanged(const QString&)),
     viewProxy, viewProxy->GetProperty("Mode"));
+
+  this->updateParameterPanel();
 }
 
+
+//-----------------------------------------------------------------------------
+void pqComparativeVisPanel::updateParameterPanel()
+{
+  /*int dx = this->Internal->XFrames->value();
+  int dy = this->Internal->YFrames->value();*/
+  int mode = this->Internal->ModeAdaptor->currentIndex();
+
+  pqAnimationModel* model = this->Internal->AnimationWidget->animationModel();
+
+  // Remove old tracks.
+  while (model->count())
+    {
+    pqAnimationTrack* track = model->track(0);
+    model->removeTrack(track);
+    }
+
+  if (mode == vtkSMComparativeViewProxy::FILM_STRIP)
+    {
+    pqAnimationTrack* track = model->addTrack();
+    track->setProperty("Time Axis");
+    }
+  else
+    {
+    pqAnimationTrack* track = model->addTrack();
+    track->setProperty("X Axis");
+    track = model->addTrack();
+    track->setProperty("Y Axis");
+    }
+}
 
 //-----------------------------------------------------------------------------
 void pqComparativeVisPanel::updateView()
