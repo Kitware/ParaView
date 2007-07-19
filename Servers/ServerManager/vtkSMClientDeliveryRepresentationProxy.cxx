@@ -28,7 +28,7 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.13");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
 {
@@ -68,6 +68,7 @@ bool vtkSMClientDeliveryRepresentationProxy::SetupStrategy()
     return false;
     }
 
+  this->StrategyProxy->SetConnectionID(this->ConnectionID);
   this->StrategyProxy->SetServers(
     vtkProcessModule::DATA_SERVER|vtkProcessModule::CLIENT);
 
