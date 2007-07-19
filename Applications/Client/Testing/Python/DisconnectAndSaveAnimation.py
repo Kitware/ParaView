@@ -54,9 +54,8 @@ QtTesting.playCommand(object16, 'remove', '$PARAVIEW_TEST_ROOT/disconnectSave.00
 QtTesting.playCommand(object16, 'remove', '$PARAVIEW_TEST_ROOT/disconnectSave.0009.png')
 QtTesting.playCommand(object16, 'filesSelected', '$PARAVIEW_TEST_ROOT/disconnectSave.png')
 
-print "wait for 20 secs"
-for i in range(0, 20):
-  print "waiting..."
-  QtTesting.wait(1000);
+import time
+print "Wait for 20 secs"
+time.sleep(20);
 QtTestingImage.compareImage('$PARAVIEW_TEST_ROOT/disconnectSave.0005.png', 'DisconnectAndSaveAnimation.png');
 
