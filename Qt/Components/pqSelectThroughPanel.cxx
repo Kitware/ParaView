@@ -138,8 +138,8 @@ void pqSelectThroughPanel::startSelect()
     {
     //try to give the helper the active view to work on
     pqActiveView &aview = pqActiveView::instance();
-    pqView *view = aview.current();
-    pqRenderView* rm = qobject_cast<pqRenderView*>(view);
+    pqView *cview = aview.current();
+    pqRenderView* rm = qobject_cast<pqRenderView*>(cview);
     if (!rm)
       {
       return;
@@ -227,9 +227,9 @@ void pqSelectThroughPanel::endSelect()
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectThroughPanel::setActiveView(pqView* view)
+void pqSelectThroughPanel::setActiveView(pqView* aview)
 {
-  pqRenderView* rm = qobject_cast<pqRenderView*>(view);
+  pqRenderView* rm = qobject_cast<pqRenderView*>(aview);
   if (!rm)
     {
     return;
