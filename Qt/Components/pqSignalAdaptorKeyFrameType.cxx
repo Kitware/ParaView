@@ -51,18 +51,19 @@ public:
   vtkSmartPointer<vtkSMProxy> KeyFrameProxy;
   QPointer<QWidget> Frame;
   QPointer<QLabel> ValueLabel;
-  pqPropertyLinks Links;
+  QPointer<pqPropertyLinks> Links;
 };
 
 //-----------------------------------------------------------------------------
 pqSignalAdaptorKeyFrameType::pqSignalAdaptorKeyFrameType(QComboBox* combo,
-  QLabel* label, QWidget* frame)
+  QLabel* label, QWidget* frame, pqPropertyLinks* links)
 : pqSignalAdaptorComboBox(combo)
 {
   this->Internals = new pqInternals;
   this->Internals->Frame = frame;
   this->Internals->ValueLabel = label;
   this->Internals->Ui.setupUi(frame);
+  this->Internals->Links = links;
 
   this->Internals->Ui.exponentialGroup->hide();
   this->Internals->Ui.sinusoidGroup->hide();
@@ -73,6 +74,16 @@ pqSignalAdaptorKeyFrameType::pqSignalAdaptorKeyFrameType(QComboBox* combo,
   this->Internals->Ui.EndPower->setValidator(validator);
   this->Internals->Ui.Offset->setValidator(validator);
   this->Internals->Ui.Frequency->setValidator(validator);
+
+  combo->blockSignals(true);
+  combo->addItem(QIcon(":pqWidgets/Icons/pqRamp16.png"), "Ramp", "Ramp");
+  combo->addItem(QIcon(":pqWidgets/Icons/pqExponential16.png"), "Exponential", 
+    "Exponential");
+  combo->addItem(QIcon(":pqWidgets/Icons/pqSinusoidal16.png"), "Sinusoid", 
+    "Sinusoid");
+  combo->addItem(QIcon(":pqWidgets/Icons/pqStep16.png"), "Step", "Boolean");
+  combo->setCurrentIndex(-1);
+  combo->blockSignals(false);
 
   QObject::connect(combo, SIGNAL(currentIndexChanged(int)),
     this, SLOT(onTypeChanged()));
@@ -88,29 +99,41 @@ pqSignalAdaptorKeyFrameType::~pqSignalAdaptorKeyFrameType()
 //-----------------------------------------------------------------------------
 void pqSignalAdaptorKeyFrameType::setKeyFrameProxy(vtkSMProxy* proxy)
 {
-  this->Internals->Links.removeAllPropertyLinks();
   this->Internals->KeyFrameProxy = proxy;
+  
+  if(!this->Internals->Links)
+    {
+    return;
+    }
+
+  this->Internals->Links->removeAllPropertyLinks();
 
   if (proxy)
     {
+    // connect the combo box
+    this->Internals->Links->addPropertyLink(
+      this, "currentData",
+      SIGNAL(currentTextChanged(const QString&)),
+      proxy, proxy->GetProperty("Type"));
+
     // Connect the GUI and the properties.
-    this->Internals->Links.addPropertyLink(
+    this->Internals->Links->addPropertyLink(
       this->Internals->Ui.Base, "text", SIGNAL(textChanged(const QString&)),
       proxy, proxy->GetProperty("Base"));
-    this->Internals->Links.addPropertyLink(
+    this->Internals->Links->addPropertyLink(
       this->Internals->Ui.StartPower, "text", SIGNAL(textChanged(const QString&)),
       proxy, proxy->GetProperty("StartPower"));
-    this->Internals->Links.addPropertyLink(
+    this->Internals->Links->addPropertyLink(
       this->Internals->Ui.EndPower, "text", SIGNAL(textChanged(const QString&)),
       proxy, proxy->GetProperty("EndPower"));
 
-    this->Internals->Links.addPropertyLink(
+    this->Internals->Links->addPropertyLink(
       this->Internals->Ui.Offset, "text", SIGNAL(textChanged(const QString&)),
       proxy, proxy->GetProperty("Offset"));
-    this->Internals->Links.addPropertyLink(
+    this->Internals->Links->addPropertyLink(
       this->Internals->Ui.Frequency, "text", SIGNAL(textChanged(const QString&)),
       proxy, proxy->GetProperty("Frequency"));
-    this->Internals->Links.addPropertyLink(
+    this->Internals->Links->addPropertyLink(
       this->Internals->Ui.Phase, "value", SIGNAL(valueChanged(const QString&)),
       proxy, proxy->GetProperty("Phase"));
     }

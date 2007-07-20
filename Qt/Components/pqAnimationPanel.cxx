@@ -217,7 +217,8 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
   this->Internal->TypeAdaptor = new pqSignalAdaptorKeyFrameType(
     this->Internal->interpolationType, 
     this->Internal->valueLabel,
-    this->Internal->typeFrame);
+    this->Internal->typeFrame,
+    &this->Internal->KeyFrameLinks);
 
   this->Internal->TimeAdaptor = new pqSignalAdaptorKeyFrameTime(
     this->Internal->keyFrameTime, "text",
@@ -974,24 +975,6 @@ void pqAnimationPanel::showKeyFrame(int index)
     return;
     }
 
-  // So interpolation options only for composite key frames.
-  if (toShowKf->IsA("vtkSMCompositeKeyFrameProxy"))
-    {
-    this->Internal->interpolationType->blockSignals(true);
-    this->Internal->interpolationType->clear();
-    this->Internal->interpolationType->addItem(
-      QIcon(":pqWidgets/Icons/pqRamp16.png"), "Ramp", "Ramp");
-    this->Internal->interpolationType->addItem(
-      QIcon(":pqWidgets/Icons/pqExponential16.png"), "Exponential", 
-      "Exponential");
-    this->Internal->interpolationType->addItem(
-      QIcon(":pqWidgets/Icons/pqSinusoidal16.png"), "Sinusoid", "Sinusoid");
-    this->Internal->interpolationType->addItem(
-      QIcon(":pqWidgets/Icons/pqStep16.png"), "Step", "Boolean");
-    this->Internal->interpolationType->setCurrentIndex(-1);
-    this->Internal->interpolationType->blockSignals(false);
-    }
-
   this->Internal->ValueAdaptor->setAnimationCue(this->Internal->ActiveCue);
   this->Internal->TimeAdaptor->setAnimationCue(this->Internal->ActiveCue);
 
@@ -1010,10 +993,6 @@ void pqAnimationPanel::showKeyFrame(int index)
 
   // Update and connect the type adaptor
   this->Internal->TypeAdaptor->setKeyFrameProxy(toShowKf);
-  this->Internal->KeyFrameLinks.addPropertyLink(
-    this->Internal->TypeAdaptor, "currentData",
-    SIGNAL(currentTextChanged(const QString&)),
-    toShowKf, toShowKf->GetProperty("Type"));
 
   if (toShowKf->GetXMLName() == QString("CameraKeyFrame"))
     {

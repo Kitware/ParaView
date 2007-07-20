@@ -36,15 +36,151 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QStandardItemModel>
 #include <QHeaderView>
+#include <QLineEdit>
+#include <QDialog>
+#include <QItemDelegate>
+#include <QStandardItem>
+#include <QComboBox>
+#include <QGridLayout>
+#include <QDialogButtonBox>
 
 #include "pqAnimationCue.h"
 #include "pqSMAdaptor.h"
 #include "pqApplicationCore.h"
 #include "pqUndoStack.h"
+#include "pqSignalAdaptorKeyFrameType.h"
+#include "pqSMProxy.h"
+#include "pqPropertyLinks.h"
+
+
+// editor dialog that comes and goes for editing a single key frame
+// interpolation type
+class pqKeyFrameTypeDialog : public QDialog
+{
+public:
+  pqKeyFrameTypeDialog(QWidget* p, QWidget* child)
+    : QDialog(p)
+    {
+    this->Child = child;
+    this->setAttribute(Qt::WA_DeleteOnClose);
+    this->setWindowTitle(tr("Key Frame Interpolation"));
+    this->setModal(true);
+    QGridLayout* l = new QGridLayout(this);
+    l->addWidget(this->Child, 0,0);
+    QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok);
+    connect(buttons, SIGNAL(accepted()), this, SLOT(accept()));
+    connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
+
+    l->addWidget(buttons, 1, 0);
+    this->Child->show();
+    }
+  ~pqKeyFrameTypeDialog()
+    {
+    // disconnect child
+    this->Child->setParent(NULL);
+    this->Child->hide();
+    }
+  /*  doesn't work
+  void showEvent(QShowEvent* e)
+    {
+    QRect prect = this->parentWidget()->geometry();
+    int w = 300;
+    int h = 100;
+    QRect newRect(prect.center()-=QPoint(w/2,h/2), QSize(w, h));
+    this->setGeometry(newRect);
+    QDialog::showEvent(e);
+    }
+    */
+  QWidget* Child;
+};
+
+// widget for editing a single key frame interpolation type
+// this widget is persistent with the model
+class pqKeyFrameTypeWidget : public QWidget
+{
+public:
+  pqKeyFrameTypeWidget(vtkSMProxy* proxy)
+    {
+    QGridLayout* l = new QGridLayout(this);
+    l->setMargin(0);
+    QLabel* label = new QLabel(this);
+    label->setText(tr("Interpolation:"));
+    this->Combo = new QComboBox(this);
+    QWidget* widget = new QWidget(this);
+    l->addWidget(label, 0, 0);
+    l->addWidget(this->Combo, 0, 1);
+    l->addWidget(widget, 1, 0, 1, 2);
+    l->addItem(new
+      QSpacerItem(0,0,QSizePolicy::MinimumExpanding,QSizePolicy::MinimumExpanding), 2, 0, 1, 2);
+
+    this->Links.setUseUncheckedProperties(true);
+        
+    pqSignalAdaptorKeyFrameType* adaptor = 
+      new pqSignalAdaptorKeyFrameType(this->Combo, NULL, widget, &this->Links);
+      adaptor->setKeyFrameProxy(proxy);
+    }
+  
+  pqPropertyLinks Links;
+  QComboBox* Combo;
+
+};
+
+// item model for putting a key frame interpolation widget in the model
+class pqKeyFrameInterpolationItem : public QStandardItem
+{
+public:
+  pqKeyFrameInterpolationItem(vtkSMProxy* proxy)
+    : Widget(proxy)
+    {
+    }
+  // get data from combo box on key frame editor
+  QVariant data(int role) const
+    {
+    int idx = this->Widget.Combo->currentIndex();
+    QAbstractItemModel* comboModel = this->Widget.Combo->model();
+    return comboModel->data(comboModel->index(idx, 0), role);
+    }
+  pqKeyFrameTypeWidget Widget;
+};
+
+// delegate for creating editors for model items
+class pqKeyFrameEditorDelegate : public QItemDelegate
+{
+public:
+  pqKeyFrameEditorDelegate(QObject* p) : QItemDelegate(p) {}
+  QWidget* createEditor(QWidget* p, const QStyleOptionViewItem&, 
+                        const QModelIndex & index ) const
+    {
+    const QStandardItemModel* model = 
+      qobject_cast<const QStandardItemModel*>(index.model());
+
+    if(index.column() == 0)
+      {
+      return new QLineEdit(p);
+      }
+    else if(index.column() == 1)
+      {
+      pqKeyFrameInterpolationItem* item = 
+        static_cast<pqKeyFrameInterpolationItem*>(model->item(index.row(), 1));
+      return new pqKeyFrameTypeDialog(p, &item->Widget);
+      }
+    else if(index.column() == 2)
+      {
+      // TODO create the widget that auto panels would create?
+      // HMMM pqAnimationPanel doesn't do this, nor does it
+      //      support all property types.
+      return new QLineEdit(p);
+      }
+    return NULL;
+    }
+};
 
 class pqKeyFrameEditor::pqInternal : public Ui::pqKeyFrameEditor
 {
 public:
+  pqInternal()
+    {
+    }
   QPointer<pqAnimationCue> Cue;
   QStandardItemModel Model;
 };
@@ -58,6 +194,9 @@ pqKeyFrameEditor::pqKeyFrameEditor(pqAnimationCue* cue, QWidget* p)
 
   this->Internal->tableView->setModel(&this->Internal->Model);
   this->Internal->tableView->horizontalHeader()->setStretchLastSection(true);
+
+  this->Internal->tableView->setItemDelegate(
+    new pqKeyFrameEditorDelegate(this->Internal->tableView));
 
   this->readKeyFrameData();
 }
@@ -88,12 +227,20 @@ void pqKeyFrameEditor::readKeyFrameData()
 
   for(int i=0; i<numberKeyFrames; i++)
     {
-    vtkSMProxy* keyFrame = this->Internal->Cue->getKeyFrame(i);
+    pqSMProxy keyFrame = this->Internal->Cue->getKeyFrame(i);
     
     QModelIndex idx = this->Internal->Model.index(i, 0);
     this->Internal->Model.setData(idx,
       pqSMAdaptor::getElementProperty(keyFrame->GetProperty("KeyTime")),
       Qt::DisplayRole);
+    this->Internal->Model.setData(idx, QVariant::fromValue(keyFrame), Qt::UserRole);
+
+    if(i < numberKeyFrames-1)
+      {
+      pqKeyFrameInterpolationItem* item = new
+        pqKeyFrameInterpolationItem(keyFrame);
+      this->Internal->Model.setItem(i, 1, item);
+      }
     
     idx = this->Internal->Model.index(i, 2);
     this->Internal->Model.setData(idx,
@@ -136,6 +283,13 @@ void pqKeyFrameEditor::writeKeyFrameData()
     QModelIndex idx = this->Internal->Model.index(i, 0);
     QVariant newData = this->Internal->Model.data(idx, Qt::DisplayRole);
     pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyTime"), newData);
+      
+    pqKeyFrameInterpolationItem* item = 
+      static_cast<pqKeyFrameInterpolationItem*>(this->Internal->Model.item(i, 1));
+    if(item)
+      {
+      item->Widget.Links.accept();
+      }
     
     idx = this->Internal->Model.index(i, 2);
     newData = this->Internal->Model.data(idx, Qt::DisplayRole);
