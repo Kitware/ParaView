@@ -477,6 +477,17 @@
           <Entry value="6" text="FieldData" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <IntVectorProperty
+        name="FieldDataArrayIndex"
+        command="SetFieldDataArray"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+      <StringVectorProperty name="FieldDataArrayName"
+        command="SetFieldDataName"
+        number_of_elements="1">
+      </StringVectorProperty>
     </SourceProxy>
 
     <SourceProxy name="PolyDataMapper" class="vtkPolyDataMapper">
@@ -3194,6 +3205,18 @@
       <Documentation>
         Proxy to show a selection as geometry.
       </Documentation>
+      
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for this representation.
+        </Documentation>
+      </IntVectorProperty>
 
       <InputProperty name="Input" 
         command="NotUsed">
@@ -3262,9 +3285,12 @@
           SelectionProp3D that gets added to the 3D renderer 
         -->
         <Proxy name="Prop3D" proxygroup="props" proxyname="LODActor" />
+<!--  Need SetVisibility() at Representation level to pass along
+      Visibility to label Representation 
         <ExposedProperties>
           <Property name="Visibility" />
         </ExposedProperties>
+-->        
       </SubProxy>
 
       <SubProxy>
@@ -3287,6 +3313,41 @@
           <Property name="SpecularColor"/> 
           <Property name="SpecularPower"/> 
         </ExposedProperties>
+      </SubProxy>
+      
+      <SubProxy>
+        <Proxy name="LabelRepresentation" 
+          proxygroup="representations"
+          proxyname="DataLabelRepresentation" />
+        <ExposedProperties>
+          <Property name="PointLabelVisibility" />
+          <Property name="PointLabelMode" />
+          <Property name="PointLabelColor" />
+          <Property name="PointLabelOpacity" />
+          <Property name="PointLabelFontFamily" />
+          <Property name="PointLabelJustification" />
+          <Property name="PointLabelBold" />
+          <Property name="PointLabelItalic" />
+          <Property name="PointLabelShadow" />
+          <Property name="PointLabelFontSize" />
+          <Property name="PointFieldDataArrayIndex" />
+          <Property name="PointFieldDataArrayName" />
+          
+          <Property name="CellLabelVisibility" />
+          <Property name="CellLabelMode" />
+          <Property name="CellLabelColor" />
+          <Property name="CellLabelOpacity" />
+          <Property name="CellLabelFontFamily" />
+          <Property name="CellLabelJustification" />
+          <Property name="CellLabelBold" />
+          <Property name="CellLabelItalic" />
+          <Property name="CellLabelShadow" />
+          <Property name="CellLabelFontSize" />
+          <Property name="CellFieldDataArrayIndex" />
+          <Property name="CellFieldDataArrayName" />
+        </ExposedProperties>
+ 
+        
       </SubProxy>
 
     <!-- End of SelectionRepresentation -->
@@ -4121,6 +4182,36 @@
                     exposed_name="SelectionPointSize" />
           <Property name="Representation" 
                     exposed_name="SelectionRepresentation" />
+          <Property name="Interpolation"
+                    exposed_name="SelectionInterpolation" />
+          
+          <Property name="PointLabelVisibility" 
+                    exposed_name="SelectionPointLabelVisibility" />
+          <Property name="PointLabelMode" exposed_name="SelectionPointLabelMode" />
+          <Property name="PointLabelColor" exposed_name="SelectionPointLabelColor" />
+          <Property name="PointLabelOpacity" exposed_name="SelectionPointLabelOpacity" />
+          <Property name="PointLabelFontFamily" exposed_name="SelectionPointLabelFontFamily" />
+          <Property name="PointLabelBold" exposed_name="SelectionPointLabelBold" />
+          <Property name="PointLabelItalic" exposed_name="SelectionPointLabelItalic" />
+          <Property name="PointLabelShadow" exposed_name="SelectionPointLabelShadow" />
+          <Property name="PointLabelJustification" exposed_name="SelectionPointLabelJustification" />
+          <Property name="PointLabelFontSize" exposed_name="SelectionPointLabelFontSize" />
+          <Property name="PointFieldDataArrayIndex" exposed_name="SelectionPointFieldDataArrayIndex"/>
+          <Property name="PointFieldDataArrayName" exposed_name="SelectionPointFieldDataArrayName"/>
+
+          <Property name="CellLabelVisibility" 
+                    exposed_name="SelectionCellLabelVisibility" />
+          <Property name="CellLabelMode" exposed_name="SelectionCellLabelMode" />
+          <Property name="CellLabelColor" exposed_name="SelectionCellLabelColor" />
+          <Property name="CellLabelOpacity" exposed_name="SelectionCellLabelOpacity" />
+          <Property name="CellLabelFontFamily" exposed_name="SelectionCellLabelFontFamily" />
+          <Property name="CellLabelBold" exposed_name="SelectionCellLabelBold" />
+          <Property name="CellLabelItalic" exposed_name="SelectionCellLabelItalic" />
+          <Property name="CellLabelShadow" exposed_name="SelectionCellLabelShadow" />
+          <Property name="CellLabelJustification" exposed_name="SelectionCellLabelJustification" />
+          <Property name="CellLabelFontSize" exposed_name="SelectionCellLabelFontSize" />
+          <Property name="CellFieldDataArrayIndex" exposed_name="SelectionCellFieldDataArrayIndex" />
+          <Property name="CellFieldDataArrayName" exposed_name="SelectionCellFieldDataArrayName" />
         </ExposedProperties>
       </SubProxy>
 
@@ -4951,21 +5042,22 @@
         </Proxy>
       </SubProxy>
       <SubProxy>
-        <Proxy name="Property"
+        <Proxy name="PointLabelProperty"
           proxygroup="properties" proxyname="TextProperty">
         </Proxy>
         <ExposedProperties>
-          <Property name="Color" exposed_name="PointColor" />
-          <Property name="Opacity" exposed_name="PointOpacity" />
-          <Property name="FontFamily" exposed_name="PointFontFamily" />
-          <Property name="Bold" exposed_name="PointBold" />
-          <Property name="Italic" exposed_name="PointItalic" />
-          <Property name="Shadow" exposed_name="PointShadow" />
-          <Property name="FontSize" exposed_name="PointFontSize" />
+          <Property name="Color" exposed_name="PointLabelColor" />
+          <Property name="Opacity" exposed_name="PointLabelOpacity" />
+          <Property name="FontFamily" exposed_name="PointLabelFontFamily" />
+          <Property name="Bold" exposed_name="PointLabelBold" />
+          <Property name="Italic" exposed_name="PointLabelItalic" />
+          <Property name="Shadow" exposed_name="PointLabelShadow" />
+          <Property name="Justification" exposed_name="PointLabelJustification" />
+          <Property name="FontSize" exposed_name="PointLabelFontSize" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
-        <Proxy name="Prop2D"
+        <Proxy name="PointLabelProp2D"
           proxygroup="props" proxyname="Actor2D">
         </Proxy>
         <ExposedProperties>
@@ -4973,11 +5065,13 @@
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
-        <Proxy name="Mapper"
+        <Proxy name="PointLabelMapper"
           proxygroup="mappers" proxyname="LabeledDataMapper">
         </Proxy>
         <ExposedProperties>
           <Property name="LabelMode" exposed_name="PointLabelMode" />
+          <Property name="FieldDataArrayIndex" exposed_name="PointFieldDataArrayIndex" />
+          <Property name="FieldDataArrayName"  exposed_name="PointFieldDataArrayName"/>
         </ExposedProperties>
       </SubProxy>
       <!-- For Cell Centers -->
@@ -4986,33 +5080,35 @@
           proxygroup="filters" proxyname="CellCenters" />
       </SubProxy>
       <SubProxy>
-        <Proxy name="CellProperty"
+        <Proxy name="CellLabelProperty"
           proxygroup="properties" proxyname="TextProperty">
         </Proxy>
         <ExposedProperties>
-          <Property name="Color" exposed_name="CellColor" />
-          <Property name="Opacity" exposed_name="CellOpacity" />
-          <Property name="FontFamily" exposed_name="CellFontFamily" />
-          <Property name="Bold" exposed_name="CellBold" />
-          <Property name="Italic" exposed_name="CellItalic" />
-          <Property name="Shadow" exposed_name="CellShadow" />
-          <Property name="FontSize" exposed_name="CellFontSize" />
+          <Property name="Color" exposed_name="CellLabelColor" />
+          <Property name="Opacity" exposed_name="CellLabelOpacity" />
+          <Property name="FontFamily" exposed_name="CellLabelFontFamily" />
+          <Property name="Bold" exposed_name="CellLabelBold" />
+          <Property name="Italic" exposed_name="CellLabelItalic" />
+          <Property name="Shadow" exposed_name="CellLabelShadow" />
+          <Property name="Justification" exposed_name="CellLabelJustification" />
+          <Property name="FontSize" exposed_name="CellLabelFontSize" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
-        <Proxy name="CellProp2D"
-          proxygroup="props" proxyname="Actor2D">
-          <ExposedProperties>
-            <Property name="Visibility" exposed_name="CellLabelVisibility" />
-          </ExposedProperties>
-        </Proxy>
-      </SubProxy>
-      <SubProxy>
-        <Proxy name="CellMapper"
+        <Proxy name="CellLabelMapper"
           proxygroup="mappers" proxyname="LabeledDataMapper">
         </Proxy>
         <ExposedProperties>
           <Property name="LabelMode" exposed_name="CellLabelMode" />
+          <Property name="FieldDataArrayIndex" exposed_name="CellFieldDataArrayIndex" />
+          <Property name="FieldDataArrayName" exposed_name="CellFieldDataArrayName" />
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="CellLabelProp2D" proxygroup="props" proxyname="Actor2D">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" exposed_name="CellLabelVisibility" />
         </ExposedProperties>
       </SubProxy>
 
