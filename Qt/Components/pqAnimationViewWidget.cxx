@@ -259,6 +259,7 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
     }
 
   QDialog dialog;
+  dialog.resize(500, 400);
   dialog.setWindowTitle(tr("Animation Keyframes"));
   QVBoxLayout* l = new QVBoxLayout(&dialog);
   pqKeyFrameEditor* editor = new pqKeyFrameEditor(cue, &dialog);

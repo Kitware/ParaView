@@ -80,17 +80,6 @@ public:
     this->Child->setParent(NULL);
     this->Child->hide();
     }
-  /*  doesn't work
-  void showEvent(QShowEvent* e)
-    {
-    QRect prect = this->parentWidget()->geometry();
-    int w = 300;
-    int h = 100;
-    QRect newRect(prect.center()-=QPoint(w/2,h/2), QSize(w, h));
-    this->setGeometry(newRect);
-    QDialog::showEvent(e);
-    }
-    */
   QWidget* Child;
 };
 
@@ -162,7 +151,11 @@ public:
       {
       pqKeyFrameInterpolationItem* item = 
         static_cast<pqKeyFrameInterpolationItem*>(model->item(index.row(), 1));
-      return new pqKeyFrameTypeDialog(p, &item->Widget);
+      if(item)
+        {
+        return new pqKeyFrameTypeDialog(p, &item->Widget);
+        }
+      return NULL;
       }
     else if(index.column() == 2)
       {
@@ -172,6 +165,25 @@ public:
       return new QLineEdit(p);
       }
     return NULL;
+    }
+  void updateEditorGeometry(QWidget* editor, 
+                            const QStyleOptionViewItem& option,
+                            const QModelIndex & index) const
+    {
+    if(qobject_cast<pqKeyFrameTypeDialog*>(editor))
+      {
+      int w = 300;
+      int h = 100;
+      QWidget* p = editor->parentWidget();
+      QRect prect = p->geometry();
+      QRect newRect(p->mapToGlobal(prect.center()), QSize(w, h));
+      newRect.adjust(-w/2, -h, -w/2, -h);
+      editor->setGeometry(newRect);
+      }
+    else
+      {
+      QItemDelegate::updateEditorGeometry(editor, option, index);
+      }
     }
 };
 
