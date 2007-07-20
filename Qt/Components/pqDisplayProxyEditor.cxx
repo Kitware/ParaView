@@ -703,7 +703,10 @@ void pqDisplayProxyEditor::updateSelectionLabelModes()
     for(int i=0; i<attrInfo->GetNumberOfArrays(); i++)
       {
       QString arrayName = attrInfo->GetArrayInformation(i)->GetName();
-      this->Internal->comboLabelMode_Point->addItem(arrayName);
+      if(arrayName != "vtkOriginalPointIds") // "Point IDs"
+        {
+        this->Internal->comboLabelMode_Point->addItem(arrayName);
+        }
       }
 
     this->Internal->comboLabelMode_Cell->clear();
@@ -712,7 +715,10 @@ void pqDisplayProxyEditor::updateSelectionLabelModes()
     for(int i=0; i<attrInfo->GetNumberOfArrays(); i++)
       {
       QString arrayName = attrInfo->GetArrayInformation(i)->GetName();
-      this->Internal->comboLabelMode_Cell->addItem(arrayName);
+      if(arrayName != "vtkOriginalCellIds") // "Cell IDs"
+        {
+        this->Internal->comboLabelMode_Cell->addItem(arrayName);
+        }
       }      
     }
 }
