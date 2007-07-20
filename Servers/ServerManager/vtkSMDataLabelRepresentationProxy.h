@@ -65,14 +65,7 @@ public:
   // Description:
   // Set the update time passed on to the update suppressor.
   virtual void SetUpdateTime(double time);
-
-  //BTX
-  // Description:
-  // The Pick needs access to this to fill in the UI point values.
-  // TODO: I have to find a means to get rid of this!!
-  vtkUnstructuredGrid* GetCollectedData();
-  //ETX
-  
+ 
   // Description:
   // Accessors to the font size in the sub proxy.
   void SetPointFontSizeCM(int size);
@@ -92,14 +85,6 @@ public:
   // Return true, if both cell and point labels are invisible; 
   //        false, if either is visible
   virtual bool GetVisibility();
-
-  // Description:
-  // Set Visibility on Cell labels actor 
-  virtual void SetCellLabelVisibility(int);
-
-  // Description:
-  // Set Visibility on Point labels actor
-  virtual void SetPointLabelVisibility(int);
 
 protected:
   vtkSMDataLabelRepresentationProxy();

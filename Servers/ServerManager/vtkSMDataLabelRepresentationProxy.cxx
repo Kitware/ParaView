@@ -92,6 +92,7 @@ void vtkSMDataLabelRepresentationProxy::SetInputInternal(
   this->CreateVTKObjects();
 
   this->Connect(input, this->CollectProxy, "Input", outputPort);
+  this->Connect(input, this->CellCenterFilter, "Input", outputPort);
 }
 
 //----------------------------------------------------------------------------
@@ -146,9 +147,9 @@ bool vtkSMDataLabelRepresentationProxy::BeginCreateVTKObjects()
   this->CollectProxy = vtkSMSourceProxy::SafeDownCast(
     this->GetSubProxy("Collect"));
   this->UpdateSuppressorProxy = this->GetSubProxy("UpdateSuppressor");
-  this->MapperProxy = this->GetSubProxy("Mapper");
-  this->ActorProxy = this->GetSubProxy("Prop2D");
-  this->TextPropertyProxy =  this->GetSubProxy("Property");
+  this->MapperProxy = this->GetSubProxy("PointLabelMapper");
+  this->ActorProxy = this->GetSubProxy("PointLabelProp2D");
+  this->TextPropertyProxy =  this->GetSubProxy("PointLabelProperty");
 
   if (!this->CollectProxy || !this->UpdateSuppressorProxy || !this->MapperProxy
     || !this->ActorProxy || !this->TextPropertyProxy)
@@ -159,9 +160,9 @@ bool vtkSMDataLabelRepresentationProxy::BeginCreateVTKObjects()
 
   this->CellCenterFilter = vtkSMSourceProxy::SafeDownCast(
     this->GetSubProxy("CellCentersFilter"));
-  this->CellMapperProxy = this->GetSubProxy("CellMapper");
-  this->CellActorProxy = this->GetSubProxy("CellProp2D");
-  this->CellTextPropertyProxy =  this->GetSubProxy("CellProperty");
+  this->CellMapperProxy = this->GetSubProxy("CellLabelMapper");
+  this->CellActorProxy = this->GetSubProxy("CellLabelProp2D");
+  this->CellTextPropertyProxy =  this->GetSubProxy("CellLabelProperty");
 
   if (!this->CellCenterFilter || !this->CellMapperProxy
     || !this->CellActorProxy || !this->CellTextPropertyProxy)
@@ -203,7 +204,6 @@ bool vtkSMDataLabelRepresentationProxy::EndCreateVTKObjects()
 //-----------------------------------------------------------------------------
 void vtkSMDataLabelRepresentationProxy::SetupPipeline()
 {
-  vtkSMInputProperty* ip;
   vtkSMProxyProperty* pp;
 
   vtkClientServerStream stream;
@@ -216,10 +216,10 @@ void vtkSMDataLabelRepresentationProxy::SetupPipeline()
     }
   
   stream << vtkClientServerStream::Invoke
-         << this->CollectProxy->GetID() << "GetOutputPort" << 0
+         << this->CollectProxy->GetID() << "GetOutputPort" 
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
-         << this->UpdateSuppressorProxy->GetID() << "SetInputConnection" << 0
+         << this->UpdateSuppressorProxy->GetID() << "SetInputConnection" 
          << vtkClientServerStream::LastResult
          << vtkClientServerStream::End;
   vtkProcessModule::GetProcessModule()->SendStream(
@@ -232,25 +232,17 @@ void vtkSMDataLabelRepresentationProxy::SetupPipeline()
   // render server are the same.
   stream  << vtkClientServerStream::Invoke
     << this->CollectProxy->GetID() 
-    << "GetOutputPort" << 0
+    << "GetOutputPort" 
     << vtkClientServerStream::End;
   stream  << vtkClientServerStream::Invoke
     << this->UpdateSuppressorProxy->GetID()
-    << "SetInputConnection" << 0 
+    << "SetInputConnection"  
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
   vtkProcessModule::GetProcessModule()->SendStream(
     this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
 
-  ip = vtkSMInputProperty::SafeDownCast(
-    this->MapperProxy->GetProperty("Input"));
-  if (!ip)
-    {
-    vtkErrorMacro("Failed to find property Input on MapperProxy.");
-    return;
-    }
-  ip->RemoveAllProxies();
-  ip->AddProxy(this->UpdateSuppressorProxy);
+  this->Connect(this->UpdateSuppressorProxy, this->MapperProxy);
 
   pp = vtkSMProxyProperty::SafeDownCast(
     this->MapperProxy->GetProperty("LabelTextProperty"));
@@ -272,11 +264,10 @@ void vtkSMDataLabelRepresentationProxy::SetupPipeline()
     }
   pp->RemoveAllProxies();
   pp->AddProxy(this->MapperProxy);
-
   this->ActorProxy->UpdateVTKObjects();
 
   // Set up Cell Centers pipeline
-  this->Connect(this->UpdateSuppressorProxy, this->CellCenterFilter);
+  // this->Connect(this->UpdateSuppressorProxy, this->CellCenterFilter);
   this->Connect(this->CellCenterFilter, this->CellMapperProxy);
 
   pp = vtkSMProxyProperty::SafeDownCast(
@@ -363,24 +354,6 @@ void vtkSMDataLabelRepresentationProxy::SetupDefaults()
   ivp->SetElement(0, 2); // Clone mode.
   this->CollectProxy->UpdateVTKObjects();
 
- //  Tell the update suppressor to produce the correct partition.
-  stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
-         << vtkClientServerStream::End
-         << vtkClientServerStream::Invoke
-         << this->UpdateSuppressorProxy->GetID() << "SetUpdateNumberOfPieces"
-         << vtkClientServerStream::LastResult
-         << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID() << "GetPartitionId"
-         << vtkClientServerStream::End
-         << vtkClientServerStream::Invoke
-         << this->UpdateSuppressorProxy->GetID() << "SetUpdatePiece"
-         << vtkClientServerStream::LastResult
-         << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID,
-                 this->UpdateSuppressorProxy->GetServers(), stream);
-
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->TextPropertyProxy->GetProperty("FontSize"));
   if (!ivp)
@@ -389,9 +362,21 @@ void vtkSMDataLabelRepresentationProxy::SetupDefaults()
     return;
     }
   ivp->SetElement(0, 18);
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->TextPropertyProxy->GetProperty("Justification"));
+  if (!ivp)
+  {
+    vtkErrorMacro("Failed to find property Justification on CellTextPropertyProxy.");
+    return;
+  }
+  ivp->SetElement(0, 1); //Center justified
   this->TextPropertyProxy->UpdateVTKObjects();
 
-  this->SetCellLabelVisibility(0);
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("CellLabelVisibility"));
+  ivp->SetElement(0, 0);    
+  this->UpdateProperty("CellLabelVisibility");
 
   // Set default Cell Text property
   ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -402,6 +387,15 @@ void vtkSMDataLabelRepresentationProxy::SetupDefaults()
     return;
     }
   ivp->SetElement(0, 24);
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->CellTextPropertyProxy->GetProperty("Justification"));
+  if (!ivp)
+  {
+    vtkErrorMacro("Failed to find property Justification on CellTextPropertyProxy.");
+    return;
+  }
+  ivp->SetElement(0, 1); //Center justified
 
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->CellTextPropertyProxy->GetProperty("Color"));
@@ -423,6 +417,12 @@ void vtkSMDataLabelRepresentationProxy::Update(
   if (!this->ObjectsCreated)
     {
     vtkErrorMacro("Objects not created yet!");
+    return;
+    }
+
+  if (!this->GetInputProxy())
+    {
+    vtkErrorMacro("Input is not set yet!");
     return;
     }
 
@@ -502,21 +502,6 @@ void vtkSMDataLabelRepresentationProxy::InvalidateGeometryInternal(int useCache)
     }
 }
 
-//-----------------------------------------------------------------------------
-vtkUnstructuredGrid* vtkSMDataLabelRepresentationProxy::GetCollectedData()
-{
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-
-  vtkMPIMoveData* dp = vtkMPIMoveData::SafeDownCast(
-    pm->GetObjectFromID(this->CollectProxy->GetID()));
-  if (dp == NULL)
-    {
-    return NULL;
-    }
-
-  return dp->GetUnstructuredGridOutput();
-}
-
 //----------------------------------------------------------------------------
 void vtkSMDataLabelRepresentationProxy::SetPointFontSizeCM(int size) 
 {
@@ -594,56 +579,21 @@ int vtkSMDataLabelRepresentationProxy::GetCellFontSizeCM()
 //-----------------------------------------------------------------------------
 bool vtkSMDataLabelRepresentationProxy::GetVisibility()
 {
-  vtkSMProxy* prop2D = this->GetSubProxy("Prop2D");
-  if (prop2D)
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("PointLabelVisibility"));
+  if(ivp->GetElement(0))
     {
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      prop2D->GetProperty("Visibility"));
-    if(ivp->GetElement(0))
-      {
-      return true;
-      }
+    return true;
     }
 
-  prop2D = this->GetSubProxy("CellProp2D");
-  if (prop2D)
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("CellLabelVisibility"));
+  if(ivp->GetElement(0))
     {
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      prop2D->GetProperty("Visibility"));
-    if(ivp->GetElement(0))
-      {
-      return true;
-      }
+    return true;
     }
+
   return false;
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMDataLabelRepresentationProxy::SetPointLabelVisibility(int arg)
-{
-  vtkSMProxy* prop2D = this->GetSubProxy("Prop2D");
-
-  if (prop2D)
-    {
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      prop2D->GetProperty("Visibility"));
-    ivp->SetElement(0, arg);
-    prop2D->UpdateProperty("Visibility");
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMDataLabelRepresentationProxy::SetCellLabelVisibility(int arg)
-{
-  vtkSMProxy* prop2DCell = this->GetSubProxy("CellProp2D");
-
-  if (prop2DCell)
-    {
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      prop2DCell->GetProperty("Visibility"));
-    ivp->SetElement(0, arg);
-    prop2DCell->UpdateProperty("Visibility");
-    }
 }
 
 //-----------------------------------------------------------------------------

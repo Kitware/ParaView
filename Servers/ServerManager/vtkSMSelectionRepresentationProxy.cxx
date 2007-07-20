@@ -16,6 +16,7 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkInformation.h"
+#include "vtkLabeledDataMapper.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
@@ -24,10 +25,11 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationStrategy.h"
+#include "vtkSMDataLabelRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSelectionRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMSelectionRepresentationProxy::vtkSMSelectionRepresentationProxy()
 {
@@ -39,12 +41,25 @@ vtkSMSelectionRepresentationProxy::vtkSMSelectionRepresentationProxy()
   this->Property = 0;
   this->EmptySelectionSource = 0;
 
+  this->LabelRepresentation = 0;
+
   this->SetSelectionSupported(false);
 }
 
 //----------------------------------------------------------------------------
 vtkSMSelectionRepresentationProxy::~vtkSMSelectionRepresentationProxy()
 {
+  this->LabelRepresentation = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSelectionRepresentationProxy::SetViewInformation(vtkInformation* info)
+{
+  this->Superclass::SetViewInformation(info);
+  if (this->LabelRepresentation)
+    {
+    this->LabelRepresentation->SetViewInformation(info);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -63,6 +78,7 @@ bool vtkSMSelectionRepresentationProxy::AddToView(vtkSMViewProxy* view)
     }
 
   renderView->AddPropToRenderer(this->Prop3D);
+  this->LabelRepresentation->AddToView(view);
   return true;
 }
 
@@ -77,6 +93,7 @@ bool vtkSMSelectionRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
     }
 
   renderView->RemovePropFromRenderer(this->Prop3D);
+  this->LabelRepresentation->RemoveFromView(view);
   return this->Superclass::RemoveFromView(view);
 }
 
@@ -133,6 +150,9 @@ bool vtkSMSelectionRepresentationProxy::BeginCreateVTKObjects()
   this->Property = this->GetSubProxy("Property");
   this->EmptySelectionSource = this->GetSubProxy("EmptySelectionSource");
 
+  this->LabelRepresentation = vtkSMDataLabelRepresentationProxy::SafeDownCast(
+    this->GetSubProxy("LabelRepresentation"));
+
   this->ExtractSelection->SetServers(vtkProcessModule::DATA_SERVER);
   this->GeometryFilter->SetServers(vtkProcessModule::DATA_SERVER);
   this->Mapper->SetServers(
@@ -157,6 +177,9 @@ bool vtkSMSelectionRepresentationProxy::EndCreateVTKObjects()
   this->Connect(this->EmptySelectionSource, this->ExtractSelection, 
     "Selection");
   this->Connect(this->ExtractSelection, this->GeometryFilter);
+
+  this->Connect(this->ExtractSelection, this->LabelRepresentation);
+  
   this->Connect(this->Mapper, this->Prop3D, "Mapper");
   this->Connect(this->LODMapper, this->Prop3D, "LODMapper");
   this->Connect(this->Property, this->Prop3D, "Property");
@@ -182,6 +205,19 @@ bool vtkSMSelectionRepresentationProxy::EndCreateVTKObjects()
   dvp->SetElement(0, 0.0);
   this->Property->UpdateVTKObjects();
 
+  // Set LabelRepresentation LabelMode default to FieldData
+  if(this->LabelRepresentation)
+    {
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->LabelRepresentation->GetProperty("PointLabelMode"));
+    ivp->SetElement(0, VTK_LABEL_FIELD_DATA);
+
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->LabelRepresentation->GetProperty("CellLabelMode"));
+    ivp->SetElement(0, VTK_LABEL_FIELD_DATA);
+    this->LabelRepresentation->UpdateVTKObjects();
+    }
+
   return this->Superclass::EndCreateVTKObjects();
 }
 
@@ -197,6 +233,22 @@ void vtkSMSelectionRepresentationProxy::Update(vtkSMViewProxy* view)
     ivp->SetElement(0, 
       this->ViewInformation->Get(vtkSMRenderViewProxy::USE_LOD()));
     this->Prop3D->UpdateProperty("EnableLOD");
+    }
+
+  if(this->LabelRepresentation && 
+    this->LabelRepresentation->GetVisibility())
+  {
+  this->LabelRepresentation->Update(view);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSelectionRepresentationProxy::SetUpdateTime(double time)
+{
+  this->Superclass::SetUpdateTime(time);
+  if (this->LabelRepresentation)
+    {
+    this->LabelRepresentation->SetUpdateTime(time);
     }
 
   if (this->ViewInformation->Has(
@@ -225,6 +277,43 @@ void vtkSMSelectionRepresentationProxy::SetSelection(vtkSMSourceProxy* selection
 void vtkSMSelectionRepresentationProxy::CleanSelectionInput()
 {
   this->Connect(this->EmptySelectionSource, this->ExtractSelection, "Selection");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSelectionRepresentationProxy::SetVisibility(int visible)
+{
+  if (this->LabelRepresentation && !visible)
+    {
+    //this->SetPointLabelVisibility(visible);
+    //this->SetCellLabelVisibility(visible);
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->LabelRepresentation->GetProperty("PointLabelVisibility"));
+    ivp->SetElement(0, visible);
+    this->LabelRepresentation->UpdateProperty("PointLabelVisibility");
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->LabelRepresentation->GetProperty("CellLabelVisibility"));
+    ivp->SetElement(0, visible);    
+    this->LabelRepresentation->UpdateProperty("CellLabelVisibility");
+    }
+
+  vtkSMProxy* prop3D = this->GetSubProxy("Prop3D");
+  vtkSMProxy* prop2D = this->GetSubProxy("Prop2D");
+
+  if (prop3D)
+  {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      prop3D->GetProperty("Visibility"));
+    ivp->SetElement(0, visible);
+    prop3D->UpdateProperty("Visibility");
+  }
+
+  if (prop2D)
+  {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      prop2D->GetProperty("Visibility"));
+    ivp->SetElement(0, visible);
+    prop2D->UpdateProperty("Visibility");
+  }
 }
 
 //----------------------------------------------------------------------------

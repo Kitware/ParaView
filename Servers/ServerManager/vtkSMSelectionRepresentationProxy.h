@@ -22,12 +22,19 @@
 
 #include "vtkSMDataRepresentationProxy.h"
 
+class vtkSMDataLabelRepresentationProxy;
+
 class VTK_EXPORT vtkSMSelectionRepresentationProxy : public vtkSMDataRepresentationProxy
 {
 public:
   static vtkSMSelectionRepresentationProxy* New();
   vtkTypeRevisionMacro(vtkSMSelectionRepresentationProxy, vtkSMDataRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Overridden to pass the view information to all the internal
+  // representations.
+  virtual void SetViewInformation(vtkInformation*);
 
   // Description:
   // Set the input connection to the extract selection filter.
@@ -39,6 +46,15 @@ public:
   // Overridden to EnableLOD on the prop based on the ViewInformation.
   virtual void Update(vtkSMViewProxy* view);
   virtual void Update() { this->Superclass::Update(); }
+
+  // Description:
+  // Overridden to pass to LabelRepresentation.
+  virtual void SetUpdateTime(double time);
+
+  // Description:
+  // Set the visibility for this representation.
+  // Implemented to turn off label representation when visibility is turned off.
+  virtual void SetVisibility(int visible);
 
   // Description:
   // Returns the proxy for the prop.
@@ -87,6 +103,8 @@ protected:
   vtkSMProxy* Prop3D;
   vtkSMProxy* Property;
   vtkSMProxy* EmptySelectionSource;
+
+  vtkSMDataLabelRepresentationProxy* LabelRepresentation;
 
 private:
   vtkSMSelectionRepresentationProxy(const vtkSMSelectionRepresentationProxy&); // Not implemented
