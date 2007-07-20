@@ -25,17 +25,20 @@
 
 
 #include "vtkPVMain.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVOptions.h"
-#include "vtkProcessModuleGUIHelper.h"
 
-#include "vtkMultiProcessController.h"
-#include "vtkOutputWindow.h"
-#include "vtkPVCreateProcessModule.h"
-#include "vtkProcessModule.h"
-#include "vtkTimerLog.h"
 #include "vtkDynamicLoader.h"
+#include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
+#include "vtkOutputWindow.h"
+#include "vtkProcessModuleGUIHelper.h"
+#include "vtkProcessModule.h"
+#include "vtkPVCreateProcessModule.h"
+#include "vtkPVOptions.h"
+#include "vtkTimerLog.h"
+
 #include <vtksys/ios/sstream>
+#include <vtksys/SystemTools.hxx>
+#include <vtkstd/string>
 
 #if !defined(_WIN32) || defined(__CYGWIN__)
 # include <unistd.h> /* unlink */
@@ -44,7 +47,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.16");
+vtkCxxRevisionMacro(vtkPVMain, "1.17");
 
 int vtkPVMain::InitializeMPI = 1;
 
@@ -86,6 +89,10 @@ void vtkPVMain::Initialize(int* argc, char** argv[])
 #ifdef VTK_USE_MPI
   if (vtkPVMain::InitializeMPI)
     {
+    // MPICH changes the current working directory after MPI_Init. We fix that
+    // by changing the CWD back to the original one after MPI_Init.
+    vtkstd::string cwd = vtksys::SystemTools::GetCurrentWorkingDirectory(true);
+
     // This is here to avoid false leak messages from vtkDebugLeaks when
     // using mpich. It appears that the root process which spawns all the
     // main processes waits in MPI_Init() and calls exit() when
@@ -96,7 +103,10 @@ void vtkPVMain::Initialize(int* argc, char** argv[])
     // Might as well get our process ID here.  I use it to determine
     // Whether to initialize tk.  Once again, splitting Tk and Tcl 
     // initialization would clean things up.
-    MPI_Comm_rank(MPI_COMM_WORLD,&myId); 
+    MPI_Comm_rank(MPI_COMM_WORLD,&myId);
+
+    // restore CWD to what it was before the MPI intialization.
+    vtksys::SystemTools::ChangeDirectory(cwd.c_str());
     }
 #else
   (void)argc;
