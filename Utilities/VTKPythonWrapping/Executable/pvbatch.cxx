@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program:   ParaView
-Module:    vtkPythonAppInit.cxx
+Module:    pvbatch.cxx
 
 Copyright (c) Kitware, Inc.
 All rights reserved.
@@ -47,18 +47,19 @@ static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-  vtkPVMain::SetInitializeMPI(0); // don't use MPI even when available.
+  vtkPVMain::SetInitializeMPI(1); // don't use MPI even when available.
   vtkPVMain::Initialize(&argc, &argv); 
   vtkPVMain* pvmain = vtkPVMain::New();
   vtkPVPythonOptions* options = vtkPVPythonOptions::New();
-  options->SetProcessType(vtkPVOptions::PVCLIENT);
+  options->SetProcessType(vtkPVOptions::PVBATCH);
   vtkPVProcessModulePythonHelper* helper = vtkPVProcessModulePythonHelper::New();
+  helper->SetDisableConsole(true);
   int ret = pvmain->Initialize(options, helper, ParaViewInitializeInterpreter, argc, argv);
   if (!ret)
     {
     // Tell process module that we support Multiple connections.
     // This must be set before starting the event loop.
-    vtkProcessModule::GetProcessModule()->SupportMultipleConnectionsOn();
+    vtkProcessModule::GetProcessModule()->SupportMultipleConnectionsOff();
     ret = helper->Run(options);
     }
   helper->Delete();

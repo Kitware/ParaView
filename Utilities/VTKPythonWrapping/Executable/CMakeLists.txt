@@ -28,7 +28,12 @@ ADD_LIBRARY(vtkPVPythonInterpretor
   vtkPVPythonInterpretor.cxx)
 
 ADD_EXECUTABLE(pvpython${PV_EXE_SUFFIX}
-  vtkPythonAppInit.cxx
+  pvpython.cxx
+  vtkPVPythonOptions.cxx
+  vtkPVProcessModulePythonHelper.cxx)
+
+ADD_EXECUTABLE(pvbatch${PV_EXE_SUFFIX}
+  pvbatch.cxx
   vtkPVPythonOptions.cxx
   vtkPVProcessModulePythonHelper.cxx)
 
@@ -37,6 +42,8 @@ IF(CMAKE_SYSTEM_NAME MATCHES "AIX")
   GET_FILENAME_COMPONENT(CMAKE_PYTHON_LIB_PREFIX "${PYTHON_LIBRARY}" PATH)
   FIND_FILE(CMAKE_PYTHON_LIBRARY_EXPORT python.exp "${CMAKE_PYTHON_LIB_PREFIX}")
   SET_TARGET_PROPERTIES( pvpython${PV_EXE_SUFFIX} PROPERTIES LINK_FLAGS
+    "-Wl,-bE:${CMAKE_PYTHON_LIBRARY_EXPORT}")
+  SET_TARGET_PROPERTIES( pvbatch${PV_EXE_SUFFIX} PROPERTIES LINK_FLAGS
     "-Wl,-bE:${CMAKE_PYTHON_LIBRARY_EXPORT}")
 ENDIF(CMAKE_SYSTEM_NAME MATCHES "AIX")
 
@@ -49,6 +56,12 @@ IF(VTK_USE_CARBON)
       COMMAND ${VTK_APPLE_RESOURCE}
       ARGS Carbon.r -o ${pvpython_location}
       TARGET pvpython${PV_EXE_SUFFIX}
+      )
+    ADD_CUSTOM_COMMAND(
+      SOURCE pvbatch${PV_EXE_SUFFIX}
+      COMMAND ${VTK_APPLE_RESOURCE}
+      ARGS Carbon.r -o ${pvpython_location}
+      TARGET pvbatch${PV_EXE_SUFFIX}
       )
   ENDIF(VTK_APPLE_RESOURCE)
 ENDIF(VTK_USE_CARBON)
@@ -69,6 +82,7 @@ ENDIF(NOT APPLE)
 
 IF (APPLE)
   SET_TARGET_PROPERTIES(pvpython${PV_EXE_SUFFIX} PROPERTIES LINK_FLAGS "-flat_namespace -undefined suppress -u _PyMac_Error")
+  SET_TARGET_PROPERTIES(pvbatch${PV_EXE_SUFFIX} PROPERTIES LINK_FLAGS "-flat_namespace -undefined suppress -u _PyMac_Error")
 ENDIF (APPLE)
 
 TARGET_LINK_LIBRARIES(vtkPVPythonInterpretor
@@ -90,6 +104,21 @@ TARGET_LINK_LIBRARIES(pvpython${PV_EXE_SUFFIX}
   ${PYTHON_UTIL_LIBRARY_LIB})
 IF(VTK_WRAP_TCL)
   TARGET_LINK_LIBRARIES(pvpython${PV_EXE_SUFFIX} ${VTK_TK_LIBRARIES})
+ENDIF(VTK_WRAP_TCL)
+
+TARGET_LINK_LIBRARIES(pvbatch${PV_EXE_SUFFIX}
+  vtkPVServerManagerPythonD
+  vtkCommon 
+  vtkFiltering
+  vtkIO
+  vtkGraphics
+  vtkImaging
+  vtkPVPythonInterpretor
+  vtkPVServerManager
+  ${VTK_PYTHON_LIBRARIES}
+  ${PYTHON_UTIL_LIBRARY_LIB})
+IF(VTK_WRAP_TCL)
+  TARGET_LINK_LIBRARIES(pvbatch${PV_EXE_SUFFIX} ${VTK_TK_LIBRARIES})
 ENDIF(VTK_WRAP_TCL)
 
 IF(BORLAND)

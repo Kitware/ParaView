@@ -24,7 +24,7 @@
 
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.11");
+vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.12");
 vtkStandardNewMacro(vtkPVProcessModulePythonHelper);
 
 //----------------------------------------------------------------------------
@@ -34,6 +34,7 @@ vtkPVProcessModulePythonHelper::vtkPVProcessModulePythonHelper()
   this->ShowProgress = 0;
   this->Filter = 0;
   this->CurrentProgress = 0;
+  this->DisableConsole = false;
 }
 
 //----------------------------------------------------------------------------
@@ -48,6 +49,7 @@ vtkPVProcessModulePythonHelper::~vtkPVProcessModulePythonHelper()
 void vtkPVProcessModulePythonHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "DisableConsole: " << this->DisableConsole << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -82,7 +84,25 @@ int vtkPVProcessModulePythonHelper::RunGUIStart(int argc, char **argv, int numSe
     }
 
   vtkPVPythonInterpretor* interpretor = vtkPVPythonInterpretor::New();
-  res = interpretor->PyMain(vArg.size(), &*vArg.begin());
+  if (this->DisableConsole)
+    {
+    res = interpretor->InitializeSubInterpretor(vArg.size(), &*vArg.begin());
+    if (res)
+      {
+      if (!boptions->GetPythonScriptName())
+        {
+        vtkWarningMacro("No script specified");
+        }
+      else
+        {
+        interpretor->RunSimpleFile(boptions->GetPythonScriptName());
+        }
+      }
+    }
+  else
+    {
+    res = interpretor->PyMain(vArg.size(), &*vArg.begin());
+    }
   interpretor->Delete();
 
   vtkstd::vector<char*>::iterator it;

@@ -48,6 +48,13 @@ public:
   // Description:
   // Exit the application
   virtual void ExitApplication();
+
+  // Description:
+  // When set to true, the python interpretor's console won't be shown, instead
+  // we simply run the script provided as argument and exit. Set to false by
+  // default.
+  vtkSetMacro(DisableConsole, bool);
+  vtkGetMacro(DisableConsole, bool);
   
 protected:
   vtkPVProcessModulePythonHelper();
@@ -58,6 +65,8 @@ protected:
   vtkSetStringMacro(Filter);
   char* Filter;
   int CurrentProgress;
+
+  bool DisableConsole;
 
   void CloseCurrentProgress();
 private:
