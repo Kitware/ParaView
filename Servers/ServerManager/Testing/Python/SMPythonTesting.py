@@ -86,7 +86,7 @@ def LoadServerManagerState(filename):
     return True
   return Error("Failed to load state file %s" % filename)
 
-def DoRegressionTesting():
+def DoRegressionTesting(rmProxy=None):
   """Perform regression testing."""
   global TempDir
   global BaselineImage
@@ -99,8 +99,11 @@ def DoRegressionTesting():
   testing.AddArgument("-V")
   testing.AddArgument(BaselineImage)
 
-  pxm = paraview.vtkSMObject.GetProxyManager()
-  rmProxy = pxm.GetProxy("rendermodules","RenderModule0")
+  if not rmProxy:
+    pxm = paraview.vtkSMObject.GetProxyManager()
+    rmProxy = pxm.GetProxy("rendermodules","RenderModule0")
+  if not rmProxy:
+    raise "Failed to locate view to perform regression testing."
   #pyProxy(rmProxy).SetRenderWindowSize(300, 300);
   #rmProxy.GetProperty("RenderWindowSize").SetElement(0, 300)
   #rmProxy.GetProperty("RenderWindowSize").SetElement(1, 300)
