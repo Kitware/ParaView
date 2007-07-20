@@ -712,6 +712,7 @@ def CreateRepresentation(proxy, renModule):
     display = renModule.CreateDefaultRepresentation(proxy)
     if not display:
         return None
+    display.UnRegister(None)
     pxm = pyProxyManager()
     pxm.RegisterProxy("displays", display.GetSelfIDAsString(), display)
     display.SetInput(proxy)
