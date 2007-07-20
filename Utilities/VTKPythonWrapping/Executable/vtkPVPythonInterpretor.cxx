@@ -258,7 +258,7 @@ void vtkPVPythonInterpretor::SetMultithreadSupport(bool enable)
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.18");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.19");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
@@ -397,6 +397,24 @@ void vtkPVPythonInterpretor::RunSimpleString(const char* const script)
   // The cast is necessary because PyRun_SimpleString() hasn't always been const-correct
   PyRun_SimpleString(const_cast<char*>(buffer.c_str()));
 
+  this->ReleaseControl();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPythonInterpretor::RunSimpleFile(const char* const filename)
+{
+  this->MakeCurrent();
+
+  FILE* fp = fopen(filename, "r");
+  if (!fp)
+    {
+    vtkErrorMacro("Failed to open file " << filename);
+    return;
+    }
+ 
+  PyRun_SimpleFile(fp, filename);
+
+  fclose(fp);
   this->ReleaseControl();
 }
 

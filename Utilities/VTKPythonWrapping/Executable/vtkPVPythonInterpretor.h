@@ -69,6 +69,10 @@ public:
   void RunSimpleString(const char* const script);
 
   // Description:
+  // Helper function that calls execfile().
+  void RunSimpleFile(const char* const filename);
+
+  // Description:
   // Call in a subinterpretter to pause it and return control to the 
   // main interpretor. If MultithreadSupport is enabled, this method also
   // releases the global interpretor lock.
