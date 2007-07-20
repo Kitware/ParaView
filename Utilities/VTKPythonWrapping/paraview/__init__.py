@@ -561,6 +561,8 @@ class pyConnection(object):
         return
 
     def __repr__(self):
+        if not self.Hostname:
+          return "Connection (self)"
         if not self.RSHostname:
             return "Connection (%s:%d)" % (self.Hostname, self.Port)
         return "Connection data(%s:%d), render(%s:%d)" % \
@@ -572,10 +574,21 @@ class pyConnection(object):
             return True
         return False
 
+    def GetNumberOfDataPartitions(self):
+        """Returns the number of partitions on the data server for this
+           connection"""
+        pm = vtkProcessModule.GetProcessModule()
+        return pm.GetNumberOfPartitions(self.ID);
+
 
 # Users can set the active connection which will be used by API
 # to create proxies etc when no connection argument is passed.
 ActiveConnection = None
+
+# Initialize active connection to the RootServerConnectionID.
+ActiveConnection = \
+    pyConnection(vtkProcessModuleConnectionManager.GetRootServerConnectionID())
+
 
 ## These are method to create a new connection.
 ## One can connect to a server, (data-server,render-server)
@@ -695,7 +708,10 @@ def CreateRenderView(connection=None):
     if connection.IsRemote():
         proxy_xml_name = "IceTDesktopRenderView"
     else:
-        proxy_xml_name = "RenderView"
+        if connection.GetNumberOfDataPartitions() > 1:
+          proxy_xml_name = "IceTCompositeView"
+        else:
+          proxy_xml_name = "RenderView"
     ren_module = pxm.NewProxy("newviews", proxy_xml_name)
     if not ren_module:
         return None
