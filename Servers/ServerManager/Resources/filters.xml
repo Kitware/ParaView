@@ -6517,7 +6517,7 @@ This filter extracts a list of datasets from multigroup datasets.
      <Documentation>
        This filter extracts a given set of cells or points given a selection. 
        The selection can be obtained from a rubber-band selection 
-       (either point, cell, visible or in a frustrum) and passed to the filter 
+       (either point, cell, visible or in a frustum) and passed to the filter 
        or specified by providing an ID list.
      </Documentation>
      <InputProperty
@@ -6637,7 +6637,7 @@ This filter extracts a list of datasets from multigroup datasets.
         long_help="Extract selection by cell." >
        This filter extracts a set of cells given a selection. 
        The selection can be obtained from a rubber-band selection 
-       (either cell, visible or in a frustrum) and passed to the filter 
+       (either cell, visible or in a frustum) and passed to the filter 
        or specified by providing an ID list.
      </Documentation>
 
@@ -6738,6 +6738,100 @@ This filter extracts a list of datasets from multigroup datasets.
      </Hints>
 
    <!-- End of TimeToTextConvertor -->
+   </SourceProxy>
+
+   <SourceProxy name="SelectThrough" 
+    label="Select Through"
+    class="vtkExtractSelectedFrustum">
+    <Documentation
+       long_help="Draw a rubber band on the screen and select all cells behind it."
+       short_help="Select cells behind a region of the screen.">
+This extracts all cells within a frustum that is defined as the volume behind a chosen rectangular region of the screen.
+    </Documentation>
+
+     <InputProperty
+         name="Input"
+         command="SetInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet"/>
+       </DataTypeDomain>
+       <Documentation>
+         The input from which the selection is extracted.
+       </Documentation>
+     </InputProperty>
+
+     <IntVectorProperty 
+        name="PartiallyWithin" 
+        command="SetExactTest" 
+        number_of_elements="1"
+        default_values="1" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is set to 1 all cells that are at least partially within the frustum are found. If 0 then only cells that are completely within the frustum are found.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="PassThrough" 
+        command="SetPassThrough" 
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is set to 1 the output preserves the topology of its input and adds an insidedness array to mark which cells are inside or out. If 0 then the output is an unstructured grid which contains only the subset of cells that are inside.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ShowBounds" 
+        command="SetShowBounds" 
+        number_of_elements="1"
+        default_values="0">
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is set to 1 the output is the outline of the frustum instead of the contents of the input that lie within the frustum.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="InsideOut" 
+        command="SetInsideOut" 
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is set to 0, the filter will return that portion of the dataset that lies outside of the frustum instead of inside.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="CreateFrustum"
+        command="CreateFrustum"
+        number_of_elements="32"
+        argument_is_array="1"
+        is_internal="1"
+        default_values=
+        "0.0 0.0 1.0 0.0
+         0.0 0.0 0.0 0.0
+         0.0 1.0 1.0 0.0
+         0.0 1.0 0.0 0.0
+         1.0 0.0 1.0 0.0
+         1.0 0.0 0.0 0.0
+         1.0 1.0 1.0 0.0
+         1.0 1.0 0.0 0.0">
+       <Documentation>
+         Defines the eight corners of the frustum.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <Hints>
+       <Visibility replace_input="2" />
+     </Hints>
+   <!-- End SelectThrough -->
    </SourceProxy>
    
    </ProxyGroup>

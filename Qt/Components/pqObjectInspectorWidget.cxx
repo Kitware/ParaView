@@ -62,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPluginManager.h"
 #include "pqPropertyManager.h"
+#include "pqSelectThroughPanel.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqStreamTracerPanel.h"
@@ -129,12 +130,12 @@ public:
         {
         return new pqExtractSelectionPanel(proxy, p);
         }
-      if(QString("ProbeLocationOverTimePoint") == 
+      if(QString("ProbeLocationOverTimeCell") == 
          proxy->getProxy()->GetXMLName())
         {
         return new pqExtractLocationsPanel(proxy, p);
         }
-      if(QString("ProbeLocationOverTimeCell") == 
+      if(QString("ProbeLocationOverTimePoint") == 
          proxy->getProxy()->GetXMLName())
         {
         return new pqExtractLocationsPanel(proxy, p);
@@ -142,6 +143,10 @@ public:
       if(QString("Contour") == proxy->getProxy()->GetXMLName())
         {
         return new pqContourPanel(proxy, p);
+        }
+      if(QString("SelectThrough") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqSelectThroughPanel(proxy, p);
         }
       }
     if(QString("sources") == proxy->getProxy()->GetXMLGroup())
@@ -180,7 +185,8 @@ public:
          proxy->getProxy()->GetXMLName() ||
          QString("ProbeLocationOverTimeCell") == 
          proxy->getProxy()->GetXMLName() ||
-         QString("Contour") == proxy->getProxy()->GetXMLName())
+         QString("Contour") == proxy->getProxy()->GetXMLName() || 
+         QString("SelectThrough") == proxy->getProxy()->GetXMLName())
         {
         return true;
         }

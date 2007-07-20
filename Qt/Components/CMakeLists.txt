@@ -137,6 +137,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSampleScalarWidget.h
   pqScalarSetModel.h
   pqSelectReaderDialog.h
+  pqSelectThroughPanel.h
   pqSelectionAdaptor.h
   pqSelectionManager.h
   pqServerBrowser.h
@@ -479,6 +480,8 @@ ADD_LIBRARY(pqComponents
   pqScalarSetModel.h
   pqSelectReaderDialog.cxx
   pqSelectReaderDialog.h
+  pqSelectThroughPanel.cxx
+  pqSelectThroughPanel.h
   pqSelectionAdaptor.cxx
   pqSelectionAdaptor.h
   pqSelectionManager.cxx

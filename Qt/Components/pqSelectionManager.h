@@ -46,8 +46,10 @@ class pqView;
 class vtkDataObject;
 class vtkSMClientDeliveryRepresentationProxy;
 class vtkSMProxy;
+class pqRubberBandHelper;
 
-/// pqSelectionManager is the nexus for selection in paraview.
+/// pqSelectionManager is the nexus for introspective surface selection in 
+//  paraview. 
 /// It responds to UI events to tell the servermanager to setup for making
 /// selections. It watches the servermanager's state to see if the selection
 /// parameters are changed (either from the UI or from playback) and tells 
@@ -72,16 +74,6 @@ public:
   /// Returns the currently selected source, if any.
   pqOutputPort* getSelectedPort() const;
   
-  enum Modes
-  {
-    INTERACT,
-    SELECT, //aka suface selection
-    FRUSTUM,
-    IDS,
-    LOCATIONS,
-    THRESHOLDS
-  };
-
   friend class vtkPQSelectionObserver;
 
   /// Returns a list of indices currently selected.
@@ -91,6 +83,7 @@ public:
   /// Returns a list of global ids currently selected.
   /// This list does not include the process Ids.
   QList<QVariant> getSelectedGlobalIDs() const;
+
 signals:
   /// fired when the selection changes.
   void selectionChanged(pqSelectionManager*);
@@ -113,15 +106,14 @@ public slots:
   /// Change mode to surface selection
   void switchToSelection();
 
-  /// Change mode to frustum selection
-  void switchToSelectThrough();
-
   /// Clear all selections. Note that this does not clear
   /// the server manager model selection
   void clearSelection();
 
   /// Used to keep track of active render module
   void setActiveView(pqView*);
+
+  void select();
 
 private slots:
   /// Called when a source is removed from the pipeline browser
@@ -131,16 +123,14 @@ private slots:
   void viewRemoved(pqView* rm);
 
 protected:  
-  void select();
 
 private:
   pqSelectionManagerImplementation* Implementation;
+  pqRubberBandHelper *RubberBandHelper;
+
   int Mode;
 
   //helpers
-  int setInteractorStyleToSelect(pqRenderView*);
-  int setInteractorStyleToInteract(pqRenderView*);
-  void processEvents(unsigned long event);
   void selectOnSurface(int screenRectange[4]);
 };
 #endif

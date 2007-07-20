@@ -77,6 +77,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqReaderFactory.h
   pqRenderView.h
   pqRepresentation.h
+  pqRubberBandHelper.h
   pqScalarBarRepresentation.h
   pqScalarBarVisibilityAdaptor.h
   pqScalarsToColors.h
@@ -247,6 +248,8 @@ ADD_LIBRARY(pqCore
   pqRenderView.h
   pqRepresentation.cxx
   pqRepresentation.h
+  pqRubberBandHelper.cxx
+  pqRubberBandHelper.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
   pqSMProxy.cxx
