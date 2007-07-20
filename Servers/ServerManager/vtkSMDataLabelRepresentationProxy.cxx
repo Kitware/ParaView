@@ -92,7 +92,7 @@ void vtkSMDataLabelRepresentationProxy::SetInputInternal(
   this->CreateVTKObjects();
 
   this->Connect(input, this->CollectProxy, "Input", outputPort);
-  this->Connect(input, this->CellCenterFilter, "Input", outputPort);
+  //this->Connect(input, this->CellCenterFilter, "Input", outputPort);
 }
 
 //----------------------------------------------------------------------------
@@ -267,7 +267,7 @@ void vtkSMDataLabelRepresentationProxy::SetupPipeline()
   this->ActorProxy->UpdateVTKObjects();
 
   // Set up Cell Centers pipeline
-  // this->Connect(this->UpdateSuppressorProxy, this->CellCenterFilter);
+  this->Connect(this->UpdateSuppressorProxy, this->CellCenterFilter);
   this->Connect(this->CellCenterFilter, this->CellMapperProxy);
 
   pp = vtkSMProxyProperty::SafeDownCast(
