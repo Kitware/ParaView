@@ -43,10 +43,27 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkClientServerInterpreter.h"
 static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
 
+#include <vtksys/SystemTools.hxx>
+#include <vtkstd/vector>
+#include <vtkstd/string>
+
+#define vtkPVStrDup(x) \
+  strcpy(new char[ strlen(x) + 1], x)
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
+  // MPI initialization changes CWD which messes with the executable path,
+  // disrupting the paraview module location code. Hence, we change the
+  // executable path to absolute path prior to MPI intialization.
+  vtkstd::string fullExePath = vtksys::SystemTools::CollapseFullPath(argv[0]);
+  vtkstd::vector<char*> vArg;
+  vArg.push_back(vtkPVStrDup(fullExePath.c_str()));
+  for (int cc=1; cc <argc;++cc)
+    {
+    vArg.push_back(vtkPVStrDup(argv[cc]));
+    }
+
   vtkPVMain::SetInitializeMPI(1); // don't use MPI even when available.
   vtkPVMain::Initialize(&argc, &argv); 
   vtkPVMain* pvmain = vtkPVMain::New();
@@ -54,18 +71,25 @@ int main(int argc, char* argv[])
   options->SetProcessType(vtkPVOptions::PVBATCH);
   vtkPVProcessModulePythonHelper* helper = vtkPVProcessModulePythonHelper::New();
   helper->SetDisableConsole(true);
-  int ret = pvmain->Initialize(options, helper, ParaViewInitializeInterpreter, argc, argv);
+  int ret = pvmain->Initialize(options, helper, ParaViewInitializeInterpreter, argc,  &*vArg.begin());
   if (!ret)
     {
     // Tell process module that we support Multiple connections.
     // This must be set before starting the event loop.
     vtkProcessModule::GetProcessModule()->SupportMultipleConnectionsOff();
-    ret = helper->Run(options);
+    helper->Run(options);
     }
   helper->Delete();
   pvmain->Delete();
   options->Delete();
   vtkPVMain::Finalize();
+
+  vtkstd::vector<char*>::iterator it;
+  for ( it = vArg.begin(); it != vArg.end(); ++ it )
+    {
+    delete [] *it;
+    }
+
   return ret;
 }
 
