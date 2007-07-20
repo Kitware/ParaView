@@ -103,7 +103,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.69");
+vtkCxxRevisionMacro(vtkProcessModule, "1.70");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -137,6 +137,7 @@ vtkProcessModule::vtkProcessModule()
   this->ActiveRemoteConnection = 0 ;
 
   this->SupportMultipleConnections = 0;
+  this->DisableNewConnections = false;
   this->ExceptionRaised = 0;
   
   this->MemoryInformation = vtkKWProcessStatistics::New();
@@ -357,6 +358,10 @@ int vtkProcessModule::StartClient(int argc, char** argv)
           }
         }
       }
+
+    // Since we don't support mutiple connections, the connection must have been
+    // established by now. Disable any new connection requests.
+    this->DisableNewConnections=true;
     }
   // if the PM supports multiple connections, its the responsibility of the GUI
   // to connect to the server.
@@ -563,6 +568,11 @@ void vtkProcessModule::StopAcceptingConnections(int id)
 //-----------------------------------------------------------------------------
 vtkIdType vtkProcessModule::ConnectToRemote(const char* servername, int port)
 {
+  if (this->DisableNewConnections)
+    {
+    vtkErrorMacro("Cannot create new connections.");
+    return 0;
+    }
   return this->ConnectionManager->OpenConnection(servername, port);
 }
 
@@ -570,6 +580,11 @@ vtkIdType vtkProcessModule::ConnectToRemote(const char* servername, int port)
 vtkIdType vtkProcessModule::ConnectToRemote(const char* dataserver_host, 
   int dataserver_port, const char* renderserver_host, int renderserver_port)
 {
+  if (this->DisableNewConnections)
+    {
+    vtkErrorMacro("Cannot create new connections.");
+    return 0;
+    }
   return this->ConnectionManager->OpenConnection(
     dataserver_host, dataserver_port, renderserver_host, renderserver_port);
 }
@@ -577,6 +592,11 @@ vtkIdType vtkProcessModule::ConnectToRemote(const char* dataserver_host,
 //-----------------------------------------------------------------------------
 vtkIdType vtkProcessModule::ConnectToSelf()
 {
+  if (this->DisableNewConnections)
+    {
+    vtkErrorMacro("Cannot create new connections.");
+    return 0;
+    }
   return this->ConnectionManager->OpenSelfConnection();
 }
 

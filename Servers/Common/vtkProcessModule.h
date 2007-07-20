@@ -693,6 +693,13 @@ protected:
   // in client-server mode.
   int SupportMultipleConnections;
 
+  // Description:
+  // When SupportMultipleConnections is true, this flag is set to true after the
+  // connection has been established during the process module initialization.
+  // That way, any further requests to make new connections will raise errors
+  // and will be discarded.
+  bool DisableNewConnections;
+
   // This flag is set when ExceptionEvent method is called.
   // On the server, connections are no longer monitored once
   // ExceptionRaised is set.
