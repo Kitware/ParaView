@@ -18,9 +18,10 @@
 #include "vtkTesting.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkImageData.h"
 
 vtkStandardNewMacro(vtkSMTesting);
-vtkCxxRevisionMacro(vtkSMTesting, "1.2");
+vtkCxxRevisionMacro(vtkSMTesting, "1.3");
 vtkCxxSetObjectMacro(vtkSMTesting, RenderViewProxy, vtkSMRenderViewProxy);
 //-----------------------------------------------------------------------------
 vtkSMTesting::vtkSMTesting()
@@ -48,8 +49,9 @@ int vtkSMTesting::RegressionTest(float thresh)
   int res = vtkTesting::FAILED;
   if (this->RenderViewProxy)
     {
-    this->Testing->SetRenderWindow(this->RenderViewProxy->GetRenderWindow());
-    res = this->Testing->RegressionTest(thresh);
+    vtkImageData* image = this->RenderViewProxy->CaptureWindow(1);
+    res = this->Testing->RegressionTest(image, thresh);
+    image->Delete();
     }
   return res;
 }
