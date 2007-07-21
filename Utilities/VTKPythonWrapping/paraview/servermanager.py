@@ -115,6 +115,11 @@ class Proxy(object):
     def __iter__(self):
         return PropertyIterator(self)
 
+    def GetDataInformation(self, idx=0):
+        if self.SMProxy:
+            return DataInformation(self.SMProxy.GetDataInformation(idx, False), \
+                                   self.SMProxy, idx)
+        
     def SetPropertyWithName(self, pname, *args):
         """Generic method for setting the value of a property.
         Should not be directly called"""
@@ -185,7 +190,9 @@ class Proxy(object):
                         else:
                             return Proxy(proxy=aProxy)
         else:
-            if property.GetRepeatCommand() or  property.GetNumberOfElements() > 1:
+            if property.GetRepeatable() or \
+               property.GetRepeatCommand() or  \
+               property.GetNumberOfElements() > 1:
                 list = []
                 for i in range(0, property.GetNumberOfElements()):
                     list.append(property.GetElement(i))
@@ -243,6 +250,33 @@ class Proxy(object):
             pass
         return getattr(self.SMProxy, name)
 
+class DataInformation(object):
+    def __init__(self, dataInformation, proxy, idx):
+        self.DataInformation = dataInformation
+        self.Proxy = proxy
+        self.Idx = idx
+
+    def Update(self):
+        if self.Proxy:
+            self.Proxy.GetDataInformation(self.Idx, False)
+            
+    def GetDataSetType(self):
+        self.Update()
+        if not self.DataInformation:
+            raise exception.RuntimeError, "No data information is available"
+        if self.DataInformation.GetCompositeDataSetType() > -1:
+            return self.DataInformation.GetCompositeDataSetType()
+        return self.DataInformation.GetDataSetType()
+
+    def GetDataSetTypeAsString(self):
+        return vtkDataObjectTypes.GetClassNameFromTypeId(self.GetDataSetType())
+
+    def __getattr__(self, name):
+        if not self.DataInformation:
+            return getattr(self, name)
+        self.Update()
+        return getattr(self.DataInformation, name)
+    
 class OutputPort(object):
     def __init__(self, proxy=None, outputPort=0):
         self.Proxy = proxy
@@ -679,10 +713,9 @@ def CreateRenderView(connection=None):
         proxy_xml_name = "IceTDesktopRenderView"
     else:
         proxy_xml_name = "RenderView"
-    ren_module = pxm.NewProxy("newviews", proxy_xml_name)
+    ren_module = CreateProxy("newviews", proxy_xml_name, "view_modules")
     if not ren_module:
         return None
-    pxm.RegisterProxy("render_modules", ren_module.GetSelfIDAsString(), ren_module)
     proxy = rendering.__dict__[ren_module.GetXMLName()](proxy=ren_module)
     return proxy
 
@@ -693,13 +726,14 @@ def CreateRepresentation(aProxy, view):
         raise exceptions.RuntimeError, "proxy argument cannot be None."
     if not view:
         raise exceptions.RuntimeError, "render module argument cannot be None."
-    display = view.CreateDefaultRepresentation(aProxy, 0)
+    display = view.SMProxy.CreateDefaultRepresentation(aProxy.SMProxy, 0)
     if not display:
         return None
+    display.SetConnectionID(aProxy.GetConnectionID())
     display.UnRegister(None)
     pxm = ProxyManager()
     pxm.RegisterProxy("displays", display.GetSelfIDAsString(), display)
-    proxy = rendering.__dict__[display.GetXMLName()](proxy=display.SMProxy)
+    proxy = rendering.__dict__[display.GetXMLName()](proxy=display)
     proxy.Input = aProxy
     proxy.UpdateVTKObjects()
     view.Representations += [proxy]
@@ -840,15 +874,16 @@ filters = __createModule('filters')
 rendering = __createModule('representations')
 __createModule('newviews', rendering)
 
-ActiveConnection = Connect("localhost")
-ss = sources.SphereSource(Radius=2, ThetaResolution=32)
-shr = filters.ShrinkFilter(Input=OutputPort(ss,0))
-cs = sources.ConeSource()
-app = filters.Append()
-app.Input = [shr, cs]
-rv = CreateRenderView()
-rep = CreateRepresentation(app, rv)
-rv.ResetCamera()
-rv.StillRender()
-cf = filters.Contour()
-data = Fetch(ss)
+def test():
+#ActiveConnection = Connect()
+    ss = sources.SphereSource(Radius=2, ThetaResolution=32)
+    shr = filters.ShrinkFilter(Input=OutputPort(ss,0))
+    cs = sources.ConeSource()
+    app = filters.Append()
+    app.Input = [shr, cs]
+    rv = CreateRenderView()
+    rep = CreateRepresentation(app, rv)
+    rv.ResetCamera()
+    rv.StillRender()
+    cf = filters.Contour()
+    data = Fetch(ss)
