@@ -335,6 +335,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
   // ---------------Selection properties------------------------
 
   this->updateSelectionLabelEnableState();
+  this->updateSelectionLabelModes();
 
   // setup for line width
   this->Internal->Links->addPropertyLink(this->Internal->Sel_StyleLineWidth,
@@ -424,7 +425,6 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     this->Internal->spinBoxOpacity_Cell, "value", SIGNAL(valueChanged(double)),
     reprProxy, reprProxy->GetProperty("SelectionCellLabelOpacity"));
 
-  this->updateSelectionLabelModes();
 
   this->Internal->VTKConnect->Disconnect();
   this->Internal->VTKConnect->Connect(
