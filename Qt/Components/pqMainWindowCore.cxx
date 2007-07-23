@@ -3393,7 +3393,6 @@ pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
     vtkSmartPointer<vtkSMProxy> filterProxy;
     filterProxy.TakeReference(pxm->NewProxy("filters", xmlname.toAscii().data()));
     filterProxy->SetConnectionID(this->getActiveServer()->GetConnectionID());
-    filterProxy->SetServers(vtkProcessModule::CLIENT);
 
     // Create a dummy pqPipelineFilter which we can use to
     // pass on to the pqFilterInputDialog.
