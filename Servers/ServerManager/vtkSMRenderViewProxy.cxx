@@ -53,6 +53,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMSelectionHelper.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
@@ -84,7 +85,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.29");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.30");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1595,6 +1596,13 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
     }
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+
+  // Update with time to avoid domains updating without time later.
+  vtkSMSourceProxy* sproxy = vtkSMSourceProxy::SafeDownCast(source);
+  if (sproxy)
+    {
+    sproxy->UpdatePipeline(this->GetViewUpdateTime());
+    }
 
   // Choose which type of representation proxy to create.
   vtkSMProxy* prototype = pxm->GetPrototypeProxy("representations", 
