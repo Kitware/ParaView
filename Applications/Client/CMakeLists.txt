@@ -75,7 +75,9 @@ IF(Q_WS_MAC)
 ENDIF(Q_WS_MAC)
 
 # Add main server executables.
-SET(PV_EXE_LIST paraview)
+IF(NOT Q_WS_MAC)
+  SET(PV_EXE_LIST paraview)
+ENDIF(NOT Q_WS_MAC)
 # Add Qt assistant to the list of shared lib. forwarded executables.
 # If this is enabled, the build system will create an executable
 # call assistant. This executable will set the appropriate ld library
@@ -418,9 +420,11 @@ IF(PV_NEED_SHARED_FORWARD)
   ENDFOREACH(pvexe)
 ENDIF(PV_NEED_SHARED_FORWARD)
 
-INSTALL(TARGETS paraview${PV_EXE_SUFFIX}
-  DESTINATION ${PV_EXE_INSTALL_CM24}
-  COMPONENT Runtime)
+IF(NOT Q_WS_MAC)
+  INSTALL(TARGETS paraview${PV_EXE_SUFFIX}
+    DESTINATION ${PV_EXE_INSTALL_CM24}
+    COMPONENT Runtime)
+ENDIF(NOT Q_WS_MAC)
 
 # Install system libraries on Linux (will not work on any other Unix
 # yet)
@@ -448,24 +452,26 @@ ELSE (WIN32)
   SET (QTLIBLIST ${QTLIBLIST} QTASSISTANT)
 ENDIF (WIN32)
 
-FOREACH(qtlib ${QTLIBLIST})
-  IF (NOT WIN32)
-    #INSTALL(FILES ${QT_${qtlib}_LIBRARY_RELEASE} DESTINATION ${PV_INSTALL_LIB_DIR_CM24})
-    GET_FILENAME_COMPONENT(QT_LIB_DIR_tmp ${QT_${qtlib}_LIBRARY_RELEASE} PATH)
-    GET_FILENAME_COMPONENT(QT_LIB_NAME_tmp ${QT_${qtlib}_LIBRARY_RELEASE} NAME)
-    FILE(GLOB QT_LIB_LIST RELATIVE ${QT_LIB_DIR_tmp} "${QT_${qtlib}_LIBRARY_RELEASE}*")
-    INSTALL(CODE "
+IF(NOT Q_WS_MAC)
+  FOREACH(qtlib ${QTLIBLIST})
+    IF (NOT WIN32)
+      #INSTALL(FILES ${QT_${qtlib}_LIBRARY_RELEASE} DESTINATION ${PV_INSTALL_LIB_DIR_CM24})
+      GET_FILENAME_COMPONENT(QT_LIB_DIR_tmp ${QT_${qtlib}_LIBRARY_RELEASE} PATH)
+      GET_FILENAME_COMPONENT(QT_LIB_NAME_tmp ${QT_${qtlib}_LIBRARY_RELEASE} NAME)
+      FILE(GLOB QT_LIB_LIST RELATIVE ${QT_LIB_DIR_tmp} "${QT_${qtlib}_LIBRARY_RELEASE}*")
+      INSTALL(CODE "
 MESSAGE(STATUS \"Installing \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR_CM24}/${QT_LIB_NAME_tmp}\")
 EXECUTE_PROCESS (WORKING_DIRECTORY ${QT_LIB_DIR_tmp}
                  COMMAND tar c ${QT_LIB_LIST}
                  COMMAND tar -xC \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR_CM24})
         " COMPONENT Runtime)
-  ELSE (NOT WIN32)
-    GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
-    INSTALL(FILES ${QT_DLL_PATH_tmp}/${qtlib}4.dll DESTINATION ${PV_INSTALL_BIN_DIR_CM24} COMPONENT Runtime)
-  ENDIF (NOT WIN32)
-  
-ENDFOREACH(qtlib)
+    ELSE (NOT WIN32)
+      GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
+      INSTALL(FILES ${QT_DLL_PATH_tmp}/${qtlib}4.dll DESTINATION ${PV_INSTALL_BIN_DIR_CM24} COMPONENT Runtime)
+    ENDIF (NOT WIN32)
+    
+  ENDFOREACH(qtlib)
+ENDIF(NOT Q_WS_MAC)
 
 # Hard-coded install rules for anything left to install. These should
 # probably go to a local cmake file. Change to match the build system's
