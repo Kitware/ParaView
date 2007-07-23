@@ -25,6 +25,7 @@
     <Filter name="ProbePoint" />
     <Filter name="ProbePointOverTime" />
     <Filter name="Programmable Filter" />
+    <Filter name="SelectThrough" />
   </Category>
 
   <Filter name="Append" />
