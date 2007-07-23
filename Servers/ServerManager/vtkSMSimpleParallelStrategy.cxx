@@ -39,7 +39,7 @@ inline int vtkSMSimpleParallelStrategyGetInt(vtkSMProxy* proxy,
 }
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.11");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.12");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
@@ -402,7 +402,7 @@ void vtkSMSimpleParallelStrategy::SetKdTree(vtkSMProxy* proxy)
 
   if (this->DistributorLOD)
     {
-    this->Connect(proxy, this->Distributor, "PKdTree");
+    this->Connect(proxy, this->DistributorLOD, "PKdTree");
     }
 }
 
