@@ -15,7 +15,7 @@ reader = paraview.CreateProxy("sources", "vrmlreader")
 reader.GetProperty("FileName").SetElement(0, file1)
 reader.UpdateVTKObjects()
 readerOutput = paraview.Fetch(reader)
-if readerOutput.GetClassName() != "vtkMultiGroupDataSet":
+if readerOutput.GetClassName() != "vtkMultiBlockDataSet":
     print "ERROR: Wrong dataset type returned."
     sys.exit(1)
 
