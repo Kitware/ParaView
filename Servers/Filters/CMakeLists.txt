@@ -30,6 +30,7 @@ SET(Filters_SRCS
 #  vtkGroup.cxx
   vtkHierarchicalFractal.cxx
   vtkImageCompressor.cxx
+  vtkIndexBasedBlockFilter.cxx
   vtkIntegrateAttributes.cxx
   vtkIntegrateFlowThroughSurface.cxx
   vtkInteractorStyleTransferFunctionEditor.cxx
@@ -72,6 +73,7 @@ SET(Filters_SRCS
   vtkPVLODVolume.cxx
   vtkPVLookupTable.cxx
   vtkPVMain.cxx
+  vtkPVMergeTables.cxx
   vtkPVRenderModuleHelper.cxx
   vtkPVRenderViewProxy.cxx
   vtkPVServerArrayHelper.cxx
