@@ -54,6 +54,7 @@ SET(Kit_SRCS
   vtkSMExtentDomain.cxx
   vtkSMExtractLocationsProxy.cxx
   vtkSMExtractSelectionProxy.cxx
+#  vtkSMExtractThresholdsProxy.cxx
   vtkSMFieldDataDomain.cxx
   vtkSMFileListDomain.cxx
   vtkSMFixedTypeDomain.cxx

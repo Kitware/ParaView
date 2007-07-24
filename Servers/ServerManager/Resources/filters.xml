@@ -1,7 +1,7 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
 
-   <ExtractLocationsProxy name="ProbePointOverTime"
+   <ExtractLocationsProxy name="ProbeLocationOverTime"
                           class="vtkPExtractArraysOverTime"
                           label="Probe Location over Time">
      <Documentation> 
@@ -42,7 +42,7 @@ This filter extracts cell and point variables at a given location over time. The
           proxyname="SelectionSource">
         </Proxy>
      </SubProxy>
-     <!-- End ProbeLocationOverTime -->
+     <!-- End ProbePointOverTime -->
    </ExtractLocationsProxy>
     
    <ExtractSelectionProxy name="ExtractPointsOverTime"
@@ -6833,7 +6833,7 @@ This extracts all cells within a frustum that is defined as the volume behind a 
      </Hints>
    <!-- End SelectThrough -->
    </SourceProxy>
-   
+
    </ProxyGroup>
 
 </ServerManagerConfiguration>

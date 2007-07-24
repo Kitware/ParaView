@@ -21,9 +21,10 @@
     <Filter name="IntegrateAttributes" />
     <Filter name="ExtractCellsOverTime" />
     <Filter name="ExtractPointsOverTime" />
+<!--    <Filter name="ExtractThresholds" /> -->
     <Filter name="ProbeLine" />
     <Filter name="ProbePoint" />
-    <Filter name="ProbePointOverTime" />
+    <Filter name="ProbeLocationOverTime" />
     <Filter name="Programmable Filter" />
     <Filter name="SelectThrough" />
   </Category>
@@ -59,6 +60,7 @@
   <!--
   <Filter name="ExtractSelection" />
   -->
+<!--  <Filter name="ExtractThresholds" /> -->
   <Filter name="FeatureEdges" />
   <Filter name="Glyph" />
   <Filter name="ArbitrarySourceGlyph" />

@@ -81,9 +81,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDoubleSpinBoxDomain.h
   pqEditServerStartupDialog.h
   pqElementInspectorWidget.h
-  pqEnterIdsDialog.h
-  pqEnterPointsDialog.h
-  pqEnterThresholdsDialog.h
+#  pqExtractThresholdsPanel.h
   pqExodusIIPanel.h
   pqExodusPanel.h
   pqExtractDataSetsPanel.h  
@@ -192,9 +190,6 @@ SET(UI_FORMS
   Resources/UI/pqEditServerStartupDialog.ui
   Resources/UI/pqElementInspectorWidget.ui
   Resources/UI/pqEmptyView.ui
-  Resources/UI/pqEnterIdsDialog.ui
-  Resources/UI/pqEnterPointsDialog.ui
-  Resources/UI/pqEnterThresholdsDialog.ui
   Resources/UI/pqExodusIIPanel.ui
   Resources/UI/pqExodusPanel.ui
   Resources/UI/pqExtractDataSetsPanel.ui
@@ -364,12 +359,6 @@ ADD_LIBRARY(pqComponents
   pqEditServerStartupDialog.h
   pqElementInspectorWidget.cxx
   pqElementInspectorWidget.h
-  pqEnterIdsDialog.cxx
-  pqEnterIdsDialog.h
-  pqEnterPointsDialog.cxx
-  pqEnterPointsDialog.h
-  pqEnterThresholdsDialog.cxx
-  pqEnterThresholdsDialog.h
   pqExodusIIPanel.cxx
   pqExodusIIPanel.h
   pqExodusPanel.cxx
@@ -380,6 +369,8 @@ ADD_LIBRARY(pqComponents
   pqExtractLocationsPanel.h
   pqExtractSelectionPanel.cxx
   pqExtractSelectionPanel.h
+#  pqExtractThresholdsPanel.cxx
+#  pqExtractThresholdsPanel.h
   pqFileChooserWidget.cxx
   pqFileChooserWidget.h
   pqFilterInputDialog.cxx
