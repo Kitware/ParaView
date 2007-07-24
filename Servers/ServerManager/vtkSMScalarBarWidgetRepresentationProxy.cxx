@@ -34,7 +34,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy, "1.5");
 
 class vtkSMScalarBarWidgetRepresentationObserver : public vtkCommand
 {
@@ -202,7 +202,7 @@ void vtkSMScalarBarWidgetRepresentationProxy::SetVisibility(int visible)
     this->ActorProxy->GetProperty("Visibility"));
   if (!ivp)
     {
-    vtkErrorMacro("Failed to find property Visibility on XYPlotActorProxy.");
+    vtkErrorMacro("Failed to find property Visibility.");
     return;
     }
   ivp->SetElement(0, visible);

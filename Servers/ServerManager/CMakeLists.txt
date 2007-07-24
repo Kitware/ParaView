@@ -22,6 +22,7 @@ SET(Kit_SRCS
   vtkSMArraySelectionDomain.cxx
   vtkSMArraySelectionInformationHelper.cxx
   vtkSMAxesRepresentationProxy.cxx
+  vtkSMBlockDeliveryRepresentationProxy.cxx
   vtkSMBooleanDomain.cxx
   vtkSMBooleanKeyFrameProxy.cxx
   vtkSMBoundsDomain.cxx
@@ -34,13 +35,13 @@ SET(Kit_SRCS
   vtkSMClientDeliveryStrategyProxy.cxx
   vtkSMClientServerRenderSyncManagerHelper.cxx
   vtkSMClientServerRenderViewProxy.cxx
+  vtkSMComparativeViewProxy.cxx
   vtkSMCompositeKeyFrameProxy.cxx
   vtkSMCompoundProxy.cxx
   vtkSMCompoundProxyDefinitionLoader.cxx
   vtkSMConnectionCleanerProxy.cxx
   vtkSMDataLabelRepresentationProxy.cxx
   vtkSMDataRepresentationProxy.cxx
-  vtkSMDatasetSpreadRepresentationProxy.cxx
   vtkSMDataTypeDomain.cxx
   vtkSMDocumentation.cxx
   vtkSMDomain.cxx
@@ -110,13 +111,12 @@ SET(Kit_SRCS
   vtkSMPVRepresentationProxy.cxx
   vtkSMPWriterProxy.cxx
   vtkSMRampKeyFrameProxy.cxx
+  vtkSMRenderViewHelper.cxx
   vtkSMRenderViewProxy.cxx
   vtkSMRepresentationProxy.cxx
   vtkSMRepresentationStrategy.cxx
   vtkSMScalarBarActorProxy.cxx
   vtkSMScalarBarWidgetRepresentationProxy.cxx
-  vtkSMComparativeViewProxy.cxx
-  vtkSMRenderViewHelper.cxx
   vtkSMSelectionHelper.cxx
 #  vtkSMSelectionProxy.cxx
   vtkSMSelectionRepresentationProxy.cxx
@@ -164,7 +164,6 @@ SET(Kit_SRCS
   vtkSMXDMFInformationHelper.cxx
   vtkSMXDMFPropertyDomain.cxx
   vtkSMXMLPVAnimationWriterProxy.cxx
-  vtkSMXYPlotActorProxy.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS

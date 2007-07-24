@@ -4749,7 +4749,7 @@
       <!-- End of XYPlotRepresentation -->
     </ClientDeliveryRepresentationProxy>
 
-    <DatasetSpreadRepresentationProxy name="BlockClientDeliveryRepresentation">
+    <BlockDeliveryRepresentationProxy name="BlockDeliveryRepresentation">
       <Documentation>
         Representation used to deliver blocks of data to the client.
       </Documentation>
@@ -4824,7 +4824,7 @@
         <SourceProxy name="Reduction" class="vtkPVMergeTables">
         </SourceProxy>
       </SubProxy>
-    </DatasetSpreadRepresentationProxy>
+    </BlockDeliveryRepresentationProxy>
 
     <AxesRepresentationProxy name="AxesRepresentation" class="vtkAxes" >
       <SubProxy>

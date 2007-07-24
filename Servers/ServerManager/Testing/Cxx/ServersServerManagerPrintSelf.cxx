@@ -131,7 +131,6 @@
 #include "vtkSMXMLPVAnimationWriterProxy.h"
 
 // Display Proxies
-#include "vtkSMXYPlotActorProxy.h"
 #include "vtkSMScalarBarActorProxy.h"
 
 // View Proxies
@@ -276,7 +275,6 @@ int main(int , char *[])
   c = vtkSMXMLParser::New(); c->Print( cout ); c->Delete();
   c = vtkSMXMLPVAnimationWriterProxy::New(); c->Print( cout ); c->Delete();
 
-  c = vtkSMXYPlotActorProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMScalarBarActorProxy::New(); c->Print( cout ); c->Delete();
 
   // View Proxies

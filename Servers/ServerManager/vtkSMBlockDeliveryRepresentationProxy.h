@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMDatasetSpreadRepresentationProxy.h
+  Module:    vtkSMBlockDeliveryRepresentationProxy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,25 +12,25 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMDatasetSpreadRepresentationProxy
+// .NAME vtkSMBlockDeliveryRepresentationProxy
 // .SECTION Description
 // This is a representation proxy for spreadsheet view which can be used to show
 // output of algorithms  producing vtkDataObject or subclasses.
 
-#ifndef __vtkSMDatasetSpreadRepresentationProxy_h
-#define __vtkSMDatasetSpreadRepresentationProxy_h
+#ifndef __vtkSMBlockDeliveryRepresentationProxy_h
+#define __vtkSMBlockDeliveryRepresentationProxy_h
 
 #include "vtkSMClientDeliveryRepresentationProxy.h"
 
 class vtkSMSourceProxy;
 class vtkDataObject;
 
-class VTK_EXPORT vtkSMDatasetSpreadRepresentationProxy : 
+class VTK_EXPORT vtkSMBlockDeliveryRepresentationProxy : 
   public vtkSMClientDeliveryRepresentationProxy
 {
 public:
-  static vtkSMDatasetSpreadRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMDatasetSpreadRepresentationProxy, 
+  static vtkSMBlockDeliveryRepresentationProxy* New();
+  vtkTypeRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, 
     vtkSMClientDeliveryRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -87,8 +87,8 @@ public:
 
 //BTX
 protected:
-  vtkSMDatasetSpreadRepresentationProxy();
-  ~vtkSMDatasetSpreadRepresentationProxy();
+  vtkSMBlockDeliveryRepresentationProxy();
+  ~vtkSMBlockDeliveryRepresentationProxy();
 
   // Description:
   // Overridden to set the servers correctly on all subproxies.
@@ -111,8 +111,8 @@ protected:
 
   bool CleanCacheOnUpdate;
 private:
-  vtkSMDatasetSpreadRepresentationProxy(const vtkSMDatasetSpreadRepresentationProxy&); // Not implemented
-  void operator=(const vtkSMDatasetSpreadRepresentationProxy&); // Not implemented
+  vtkSMBlockDeliveryRepresentationProxy(const vtkSMBlockDeliveryRepresentationProxy&); // Not implemented
+  void operator=(const vtkSMBlockDeliveryRepresentationProxy&); // Not implemented
 
   class vtkInternal;
   vtkInternal* Internal;

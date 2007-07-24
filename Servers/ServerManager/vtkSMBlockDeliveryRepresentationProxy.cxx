@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMDatasetSpreadRepresentationProxy.cxx
+  Module:    vtkSMBlockDeliveryRepresentationProxy.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMDatasetSpreadRepresentationProxy.h"
+#include "vtkSMBlockDeliveryRepresentationProxy.h"
 
 #include "vtkAlgorithm.h"
 #include "vtkDataObject.h"
@@ -27,7 +27,7 @@
 #include <vtkstd/map>
 
 //----------------------------------------------------------------------------
-class vtkSMDatasetSpreadRepresentationProxy::vtkInternal
+class vtkSMBlockDeliveryRepresentationProxy::vtkInternal
 {
 public:
   class CacheInfo
@@ -70,10 +70,10 @@ public:
     }
 };
 
-vtkStandardNewMacro(vtkSMDatasetSpreadRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMDatasetSpreadRepresentationProxy, "1.3");
+vtkStandardNewMacro(vtkSMBlockDeliveryRepresentationProxy);
+vtkCxxRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, "1.1");
 //----------------------------------------------------------------------------
-vtkSMDatasetSpreadRepresentationProxy::vtkSMDatasetSpreadRepresentationProxy()
+vtkSMBlockDeliveryRepresentationProxy::vtkSMBlockDeliveryRepresentationProxy()
 {
   this->Block = 0;
   this->BlockFilter = 0;
@@ -84,13 +84,13 @@ vtkSMDatasetSpreadRepresentationProxy::vtkSMDatasetSpreadRepresentationProxy()
 }
 
 //----------------------------------------------------------------------------
-vtkSMDatasetSpreadRepresentationProxy::~vtkSMDatasetSpreadRepresentationProxy()
+vtkSMBlockDeliveryRepresentationProxy::~vtkSMBlockDeliveryRepresentationProxy()
 {
   delete this->Internal;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMDatasetSpreadRepresentationProxy::BeginCreateVTKObjects()
+bool vtkSMBlockDeliveryRepresentationProxy::BeginCreateVTKObjects()
 {
   if (!this->Superclass::BeginCreateVTKObjects())
     {
@@ -109,7 +109,7 @@ bool vtkSMDatasetSpreadRepresentationProxy::BeginCreateVTKObjects()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMDatasetSpreadRepresentationProxy::EndCreateVTKObjects()
+bool vtkSMBlockDeliveryRepresentationProxy::EndCreateVTKObjects()
 {
   if (!this->Superclass::EndCreateVTKObjects())
     {
@@ -124,7 +124,7 @@ bool vtkSMDatasetSpreadRepresentationProxy::EndCreateVTKObjects()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMDatasetSpreadRepresentationProxy::CreatePipeline(vtkSMSourceProxy* input,
+void vtkSMBlockDeliveryRepresentationProxy::CreatePipeline(vtkSMSourceProxy* input,
   int outputport)
 {
   this->Connect(input, this->BlockFilter, "Input", outputport);
@@ -132,7 +132,7 @@ void vtkSMDatasetSpreadRepresentationProxy::CreatePipeline(vtkSMSourceProxy* inp
 }
 
 //----------------------------------------------------------------------------
-void vtkSMDatasetSpreadRepresentationProxy::MarkModified(vtkSMProxy* proxy)
+void vtkSMBlockDeliveryRepresentationProxy::MarkModified(vtkSMProxy* proxy)
 {
   if (proxy !=  this)
     {
@@ -143,7 +143,7 @@ void vtkSMDatasetSpreadRepresentationProxy::MarkModified(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMDatasetSpreadRepresentationProxy::Update(vtkSMViewProxy* view)
+void vtkSMBlockDeliveryRepresentationProxy::Update(vtkSMViewProxy* view)
 {
   if (!this->UpdateRequired())
     {
@@ -187,7 +187,7 @@ void vtkSMDatasetSpreadRepresentationProxy::Update(vtkSMViewProxy* view)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMDatasetSpreadRepresentationProxy::UpdateRequired()
+bool vtkSMBlockDeliveryRepresentationProxy::UpdateRequired()
 {
   if (this->Internal->CachedBlocks.find(this->Block)
     == this->Internal->CachedBlocks.end())
@@ -199,13 +199,13 @@ bool vtkSMDatasetSpreadRepresentationProxy::UpdateRequired()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMDatasetSpreadRepresentationProxy::CleanCache()
+void vtkSMBlockDeliveryRepresentationProxy::CleanCache()
 {
   this->Internal->CachedBlocks.clear();
 }
 
 //----------------------------------------------------------------------------
-vtkDataObject* vtkSMDatasetSpreadRepresentationProxy::GetOutput()
+vtkDataObject* vtkSMBlockDeliveryRepresentationProxy::GetOutput()
 {
  vtkInternal::CacheType::iterator iter = this->Internal->CachedBlocks.find(this->Block);
   if (iter != this->Internal->CachedBlocks.end())
@@ -218,7 +218,7 @@ vtkDataObject* vtkSMDatasetSpreadRepresentationProxy::GetOutput()
 }
 
 //----------------------------------------------------------------------------
-vtkDataObject* vtkSMDatasetSpreadRepresentationProxy::GetBlockOutput()
+vtkDataObject* vtkSMBlockDeliveryRepresentationProxy::GetBlockOutput()
 {
   if (this->UpdateRequired())
     {
@@ -229,7 +229,7 @@ vtkDataObject* vtkSMDatasetSpreadRepresentationProxy::GetBlockOutput()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMDatasetSpreadRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMBlockDeliveryRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Block: " << this->Block << endl;
