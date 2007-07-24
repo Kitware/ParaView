@@ -43,7 +43,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.29");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.30");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -549,19 +549,8 @@ void vtkPVDataInformation::AddInformation(
   this->NumberOfPoints += info->GetNumberOfPoints();
   this->NumberOfCells += info->GetNumberOfCells();
   this->MemorySize += info->GetMemorySize();
-  if (this->NumberOfRows > 0)
-    {
-    if (info->GetNumberOfRows() > 0 &&
-        this->NumberOfRows != info->GetNumberOfRows())
-      {
-      vtkErrorMacro("Number of rows do not match. A table should be distributed"
-                  "in such a way that the number of rows match on all parts.");
-      }
-    }
-  else
-    {
-    this->NumberOfRows = info->GetNumberOfRows();
-    }
+  this->NumberOfRows += info->GetNumberOfRows();
+  
   switch ( this->DataSetType )
     {
     case VTK_POLY_DATA:
