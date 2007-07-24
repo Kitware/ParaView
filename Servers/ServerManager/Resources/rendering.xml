@@ -2336,20 +2336,24 @@
     <ClientDeliveryStrategyProxy name="ClientDeliveryStrategy"
       base_proxygroup="strategies"
       base_proxyname="PolyDataStrategy">
+      <Documentation>
+        Strategy used by ClientDeliverRepresentation.
+      </Documentation>
 
       <SubProxy>
         <Proxy name="Collect" proxygroup="filters" proxyname="ClientServerMoveData">
         </Proxy>
-        <ExposedProperties>
-          <Property name="OutputDataType" />
-        </ExposedProperties>
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="CollectLOD" proxygroup="filters" proxyname="ClientServerMoveData">
+        <Proxy name="Reduction" proxygroup="filters" proxyname="ReductionFilter">
         </Proxy>
+        <ExposedProperties>
+          <Property name="PassThrough" />
+          <Property name="GenerateProcessIds" />
+        </ExposedProperties>
       </SubProxy>
-      
+
       <!-- End of ClientDeliveryStrategy -->
     </ClientDeliveryStrategyProxy>
 
@@ -2545,7 +2549,7 @@
         name="GUISize"
         command="SetGUISize"
         number_of_elements="2"
-        default_values="0 0"
+        default_values="400 400"
         update_self="1"
         immediate_update="1">
         <IntRangeDomain name="range" min="1 1" />
@@ -3137,6 +3141,25 @@
           <Entry value="1" text="Comparative" />
         </EnumerationDomain>
       </IntVectorProperty>
+
+      <ProxyProperty
+        name="AnimationSceneX"
+        command="SetAnimationSceneX"
+        update_self="1">
+        <Documentation>
+          Set the animation scene to use along X axis.
+        </Documentation>
+      </ProxyProperty>
+
+      <ProxyProperty
+        name="AnimationSceneY"
+        command="SetAnimationSceneY"
+        update_self="1">
+        <Documentation>
+          Set the animation scene to use along Y axis (not used int FILM_STRIP
+          mode).
+        </Documentation>
+      </ProxyProperty>
 
       <SubProxy>
         <Proxy name="RootView" proxygroup="newviews" proxyname="RenderView">
@@ -4384,9 +4407,54 @@
           <Entry value="3" text="FIRST_NODE_ONLY" />
           <Entry value="4" text="RECTILINEAR_GRID_APPEND" />
           <Entry value="5" text="COMPOSITE_DATASET_APPEND" />
+          <Entry value="6" text="CUSTOM" />
         </EnumerationDomain>
       </IntVectorProperty>
 
+      <ProxyProperty
+        name="PostGatherHelper"
+        command="SetPostGatherHelper"
+        update_self="1">
+        <Documentation>
+          Used only when ReductionType is CUSTOM.
+        </Documentation>
+      </ProxyProperty>
+
+      <ProxyProperty
+        name="PreGatherHelper"
+        command="SetPreGatherHelper"
+        update_self="1">
+        <Documentation>
+          Used only when ReductionType is CUSTOM.
+        </Documentation>
+      </ProxyProperty>
+
+      <IntVectorProperty 
+         name="PassThrough" 
+         command="SetPassThrough" 
+         update_self="1"
+         number_of_elements="1"
+         default_values="-1"> 
+        <IntRangeDomain name="range" min="-1"/>
+        <Documentation>
+          If set to a non-negative value, then produce results using only 
+          the node Id specified.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="GenerateProcessIds"
+         command="SetGenerateProcessIds"
+         update_self="1"
+         number_of_elements="1"
+         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If true, the filter will generate vtkOriginalProcessIds arrays
+          indicating the process id on which the cell/point was generated.
+        </Documentation>
+      </IntVectorProperty>
+        
       <DoubleVectorProperty name="UpdateTime"
         command="SetUpdateTime"
         update_self="1"
@@ -4399,17 +4467,6 @@
           This time is not used unless UseViewUpdateTime is off.
         </Documentation>
       </DoubleVectorProperty>
-
-      <SubProxy>
-        <Proxy name="Reduce" proxygroup="filters" proxyname="ReductionFilter">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="PreGatherHelper" />
-          <Property name="PostGatherHelper" />
-          <Property name="PassThrough" />
-          <Property name="GenerateProcessIds" />
-        </ExposedProperties>
-      </SubProxy>
 
       <SubProxy>
         <Proxy name="ExtractSelection"
@@ -4598,7 +4655,11 @@
          repeat_command="1"
          number_of_elements_per_command="10"
          element_types="2 2 0 0 1 1 1 0 0 0" >
-         <!-- Set the cell array to use on Y axis (arrayname, legendname, enabled, inlegend, r, g, b, thickness, linestyle, axesindex) -->
+           <Documentation>
+             Set the cell array to use on Y axis (arrayname, 
+             legendname, enabled, inlegend, r, g, b, thickness, linestyle, 
+             axesindex)
+           </Documentation>
           <ArraySelectionDomain name="array_list">
             <RequiredProperties>
               <Property name="CellArrayInfo" function="ArrayList" />
@@ -4610,7 +4671,10 @@
          repeat_command="1"
          number_of_elements_per_command="10"
          element_types="2 2 0 0 1 1 1 0 0 0" >
-         <!-- Set the cell array to use on Y axis (arrayname, legendname, enabled, inlegend, r, g, b, thickness, linestyle, axesindex) -->
+          <Documentation>
+            Set the cell array to use on Y axis (arrayname, legendname, 
+            enabled, inlegend, r, g, b, thickness, linestyle, axesindex)
+          </Documentation>
           <ArraySelectionDomain name="array_list">
             <RequiredProperties>
               <Property name="PointArrayInfo" function="ArrayList" />
@@ -4684,6 +4748,83 @@
       </SubProxy>
       <!-- End of XYPlotRepresentation -->
     </ClientDeliveryRepresentationProxy>
+
+    <DatasetSpreadRepresentationProxy name="BlockClientDeliveryRepresentation">
+      <Documentation>
+        Representation used to deliver blocks of data to the client.
+      </Documentation>
+
+      <InputProperty name="Input"
+          command="SetInput-not-used"
+          update_self="1">
+      </InputProperty>
+
+      <IntVectorProperty name="Visibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IdTypeVectorProperty name="Block"
+        command="SetBlock"
+        update_self="1"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Set the active block number.
+        </Documentation>
+      </IdTypeVectorProperty>
+
+      <IdTypeVectorProperty name="CacheSize"
+        command="SetCacheSize"
+        update_self="1"
+        number_of_elements="1"
+        default_values="2">
+        <Documentation>
+          Set the maximum number of blocks to cache on the client.
+        </Documentation>
+      </IdTypeVectorProperty>
+
+      <SubProxy>
+        <SourceProxy name="BlockFilter" class="vtkIndexBasedBlockFilter">
+          <InputProperty name="Input" 
+            command="SetInputConnection">
+          </InputProperty>
+
+          <IdTypeVectorProperty name="BlockSize"
+            command="SetBlockSize"
+            number_of_elements="1"
+            default_values="1024" >
+          </IdTypeVectorProperty>
+
+          <IdTypeVectorProperty name="Block"
+            command="SetBlock"
+            number_of_elements="1"
+            default_values="0">
+          </IdTypeVectorProperty>
+
+          <IntVectorProperty name="FieldType"
+            command="SetFieldType"
+            number_of_elements="1"
+            default_values="1">
+            <EnumerationDomain name="enum">
+              <Entry value="0" text="FieldData" />
+              <Entry value="1" text="PointData" />
+              <Entry value="2" text="CellData" />
+            </EnumerationDomain>
+          </IntVectorProperty>
+        </SourceProxy>
+        <ExposedProperties>
+          <Property name="FieldType" />
+          <Property name="BlockSize" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <SourceProxy name="Reduction" class="vtkPVMergeTables">
+        </SourceProxy>
+      </SubProxy>
+    </DatasetSpreadRepresentationProxy>
 
     <AxesRepresentationProxy name="AxesRepresentation" class="vtkAxes" >
       <SubProxy>

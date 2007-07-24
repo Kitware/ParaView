@@ -14,31 +14,225 @@
 =========================================================================*/
 #include "vtkSMDatasetSpreadRepresentationProxy.h"
 
+#include "vtkAlgorithm.h"
+#include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMClientDeliveryStrategyProxy.h"
+#include "vtkSMIdTypeVectorProperty.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSourceProxy.h"
+
+#include <vtkstd/map>
+
+//----------------------------------------------------------------------------
+class vtkSMDatasetSpreadRepresentationProxy::vtkInternal
+{
+public:
+  class CacheInfo
+    {
+  public:
+    vtkSmartPointer<vtkDataObject> Dataobject;
+    vtkTimeStamp RecentUseTime;
+    };
+
+  typedef vtkstd::map<vtkIdType, CacheInfo> CacheType;
+  CacheType CachedBlocks;
+
+  void AddToCache(vtkIdType blockId, vtkDataObject* data, vtkIdType max)
+    {
+    CacheType::iterator iter = this->CachedBlocks.find(blockId);
+    if (iter != this->CachedBlocks.end())
+      {
+      this->CachedBlocks.erase(iter);
+      }
+
+    if (static_cast<vtkIdType>(this->CachedBlocks.size()) == max)
+      {
+      // remove least-recent-used block.
+      iter = this->CachedBlocks.begin();
+      CacheType::iterator iterToRemove = this->CachedBlocks.begin();
+      for (; iter != this->CachedBlocks.end(); ++iter)
+        {
+        if (iterToRemove->second.RecentUseTime > iter->second.RecentUseTime)
+          {
+          iterToRemove = iter;
+          }
+        }
+      this->CachedBlocks.erase(iterToRemove);
+      }
+
+    vtkInternal::CacheInfo info;
+    info.Dataobject = data;
+    info.RecentUseTime.Modified();
+    this->CachedBlocks[blockId] = info;
+    }
+};
 
 vtkStandardNewMacro(vtkSMDatasetSpreadRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMDatasetSpreadRepresentationProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMDatasetSpreadRepresentationProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMDatasetSpreadRepresentationProxy::vtkSMDatasetSpreadRepresentationProxy()
 {
+  this->Block = 0;
+  this->BlockFilter = 0;
+  this->Reduction = 0;
+  this->CacheSize = 2;
+  this->CleanCacheOnUpdate = true;
+  this->Internal = new vtkInternal();
 }
 
 //----------------------------------------------------------------------------
 vtkSMDatasetSpreadRepresentationProxy::~vtkSMDatasetSpreadRepresentationProxy()
 {
+  delete this->Internal;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMDatasetSpreadRepresentationProxy::BeginCreateVTKObjects()
+{
+  if (!this->Superclass::BeginCreateVTKObjects())
+    {
+    return false;
+    }
+
+  // Block filter is used to deliver only 1 block of data to the client.
+  this->BlockFilter = vtkSMSourceProxy::SafeDownCast(
+    this->GetSubProxy("BlockFilter"));
+  this->BlockFilter->SetServers(vtkProcessModule::DATA_SERVER);
+
+  this->Reduction = vtkSMSourceProxy::SafeDownCast(
+    this->GetSubProxy("Reduction"));
+  this->Reduction->SetServers(vtkProcessModule::DATA_SERVER);
+  return true;
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMDatasetSpreadRepresentationProxy::EndCreateVTKObjects()
 {
-  // Create a strategy to provide data to the client. Ofcourse we need t
-  return this->Superclass::EndCreateVTKObjects();
+  if (!this->Superclass::EndCreateVTKObjects())
+    {
+    return false;
+    }
+
+  // For now, block filter always produces unstructured grid as the output.
+  this->SetReductionType(CUSTOM);
+  this->SetPostGatherHelper(this->Reduction);
+  this->SetGenerateProcessIds(1);
+  return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMDatasetSpreadRepresentationProxy::CreatePipeline(vtkSMSourceProxy* input,
+  int outputport)
+{
+  this->Connect(input, this->BlockFilter, "Input", outputport);
+  return this->Superclass::CreatePipeline(this->BlockFilter, 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMDatasetSpreadRepresentationProxy::MarkModified(vtkSMProxy* proxy)
+{
+  if (proxy !=  this)
+    {
+    this->CleanCacheOnUpdate = true;
+    }
+
+  this->Superclass::MarkModified(proxy);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMDatasetSpreadRepresentationProxy::Update(vtkSMViewProxy* view)
+{
+  if (!this->UpdateRequired())
+    {
+    return;
+    }
+
+  if (this->CleanCacheOnUpdate)
+    {
+    this->CleanCache();
+    this->CleanCacheOnUpdate = false;
+    }
+
+  if (this->Internal->CachedBlocks.find(this->Block)
+    == this->Internal->CachedBlocks.end())
+    {
+    // Pass the block number to the BlockFilter.
+    vtkSMIdTypeVectorProperty* ivp = vtkSMIdTypeVectorProperty::SafeDownCast(
+      this->BlockFilter->GetProperty("Block"));
+    if (ivp)
+      {
+      ivp->SetElement(0, this->Block);
+      this->BlockFilter->UpdateProperty("Block", /*force=*/1);
+      }
+    }
+
+  this->Superclass::Update(view);
+
+  // Cache the data.
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkAlgorithm* algorithm = 
+    vtkAlgorithm::SafeDownCast(
+      pm->GetObjectFromID(this->StrategyProxy->GetOutput()->GetID()));
+
+  vtkDataObject* output = vtkDataObject::SafeDownCast(
+    algorithm->GetOutputDataObject(0));
+  vtkDataObject* clone = output->NewInstance();
+  clone->ShallowCopy(output);
+
+  this->Internal->AddToCache(this->Block, clone, this->CacheSize);
+  clone->Delete();
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMDatasetSpreadRepresentationProxy::UpdateRequired()
+{
+  if (this->Internal->CachedBlocks.find(this->Block)
+    == this->Internal->CachedBlocks.end())
+    {
+    return true;
+    }
+
+  return this->Superclass::UpdateRequired();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMDatasetSpreadRepresentationProxy::CleanCache()
+{
+  this->Internal->CachedBlocks.clear();
+}
+
+//----------------------------------------------------------------------------
+vtkDataObject* vtkSMDatasetSpreadRepresentationProxy::GetOutput()
+{
+ vtkInternal::CacheType::iterator iter = this->Internal->CachedBlocks.find(this->Block);
+  if (iter != this->Internal->CachedBlocks.end())
+    {
+    iter->second.RecentUseTime.Modified();
+    return iter->second.Dataobject.GetPointer();
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+vtkDataObject* vtkSMDatasetSpreadRepresentationProxy::GetBlockOutput()
+{
+  if (this->UpdateRequired())
+    {
+    this->Update(0);
+    }
+
+  return this->GetOutput();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMDatasetSpreadRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Block: " << this->Block << endl;
 }
 
 

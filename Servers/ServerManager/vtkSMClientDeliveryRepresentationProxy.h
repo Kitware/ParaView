@@ -22,7 +22,9 @@
 #define __vtkSMClientDeliveryRepresentationProxy_h
 
 #include "vtkSMDataRepresentationProxy.h"
+
 class vtkDataObject;
+class vtkSMClientDeliveryStrategyProxy;
 
 class VTK_EXPORT vtkSMClientDeliveryRepresentationProxy : 
   public vtkSMDataRepresentationProxy
@@ -51,7 +53,8 @@ public:
     UNSTRUCTURED_APPEND = 2,
     FIRST_NODE_ONLY = 3,
     RECTILINEAR_GRID_APPEND=4,
-    COMPOSITE_DATASET_APPEND=5
+    COMPOSITE_DATASET_APPEND=5,
+    CUSTOM=6
     };
   //ETX
 
@@ -59,6 +62,20 @@ public:
   // Set the reduction algorithm type. Cannot be called before
   // objects are created.
   void SetReductionType(int type);
+
+  // Description:
+  // Post/Pre gather helper proxy used when ReductionType is CUSTOM,
+  // otherwise the helper is automatically determined.
+  void SetPostGatherHelper(vtkSMProxy*);
+  void SetPreGatherHelper(vtkSMProxy*);
+
+  // Description:
+  // Forwards to the representation strategy (ReductionFilter).
+  void SetPassThrough(int);
+
+  // Description:
+  // Forwards to the representation strategy (ReductionFilter).
+  void SetGenerateProcessIds(int);
 
 //BTX
 protected:
@@ -78,11 +95,18 @@ protected:
   // initialization.
   virtual bool EndCreateVTKObjects();
 
-  bool SetupStrategy();
+  // Description;
+  // Create the strategy proxy.
+  virtual bool SetupStrategy(vtkSMSourceProxy* input, int outputport);
 
-  vtkSMProxy* ReduceProxy;
-  vtkSMRepresentationStrategy* StrategyProxy;
+  // Description:
+  // Create the data pipeline.
+  virtual void CreatePipeline(vtkSMSourceProxy* input, int outputport);
+
+  vtkSMClientDeliveryStrategyProxy* StrategyProxy;
   vtkSMSourceProxy* PostProcessorProxy;
+  vtkSMProxy* PreGatherHelper;
+  vtkSMProxy* PostGatherHelper;
 
   int ReductionType;
 

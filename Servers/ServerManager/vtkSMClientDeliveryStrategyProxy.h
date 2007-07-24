@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMClientDeliveryStrategyProxy
+// .NAME vtkSMClientDeliveryStrategyProxy - strategy used by client delivery
+// representation.
 // .SECTION Description
-//
+// This strategy delivers data to the client. It is possible to specficy the
+// reduction algorithm to use.
+// This strategy does not support LOD.
 
 #ifndef __vtkSMClientDeliveryStrategyProxy_h
 #define __vtkSMClientDeliveryStrategyProxy_h
@@ -29,9 +32,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Get the output from the strategy.
-  virtual vtkSMSourceProxy* GetOutput();
-
+  // The reduction filter collects data from all processes on the root node and
+  // then combines them together using the post gather reduction helper.
+  // This method is used to specify the class name for the algorithm to use for
+  // this purpose.
+  void SetPostGatherHelper(const char* classname);
+  void SetPostGatherHelper(vtkSMProxy* helper);
+  void SetPreGatherHelper(vtkSMProxy* helper);
 //BTX
 protected:
   vtkSMClientDeliveryStrategyProxy();
@@ -46,34 +53,20 @@ protected:
   virtual void CreatePipeline(vtkSMSourceProxy* input, int outputport);
 
   // Description:
-  // Create and initialize the LOD data pipeline.
-  // Note that this method is called irrespective of EnableLOD
-  // flag.
-  virtual void CreateLODPipeline(vtkSMSourceProxy* input, int outputport);
-
-  // Description:
-  // Update the LOD pipeline.
-  // Overridden to pass correct collection decision to the Collect filter
-  // based on UseCompositing() flag.
-  virtual void UpdateLODPipeline();
-
-  // Description:
   // Updates the data pipeline (non-LOD only).
   // Overridden to pass correct collection decision to the Collect filter
   // based on UseCompositing() flag.
   virtual void UpdatePipeline();
 
+  vtkSMSourceProxy* ReductionProxy;
   vtkSMSourceProxy* CollectProxy;
-  vtkSMSourceProxy* CollectLODProxy;
-  
+
 private:
   vtkSMClientDeliveryStrategyProxy(const vtkSMClientDeliveryStrategyProxy&); // Not implemented
   void operator=(const vtkSMClientDeliveryStrategyProxy&); // Not implemented
 
   // Since LOD and full res pipeline have exactly the same setup, we have this
   // common method.
-  void CreatePipelineInternal(vtkSMSourceProxy* input, int outputport, 
-    vtkSMSourceProxy* collect, vtkSMSourceProxy* updatesuppressor);
   void UpdatePipelineInternal(vtkSMSourceProxy* collect,
     vtkSMSourceProxy* updatesuppressor);
 

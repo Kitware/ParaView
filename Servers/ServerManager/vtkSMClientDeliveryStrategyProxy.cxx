@@ -24,21 +24,79 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryStrategyProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryStrategyProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMClientDeliveryStrategyProxy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryStrategyProxy::vtkSMClientDeliveryStrategyProxy()
 {
+  this->ReductionProxy = 0;
   this->CollectProxy = 0;
-  this->CollectLODProxy = 0;
+  this->SetEnableLOD(false);
 }
 
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryStrategyProxy::~vtkSMClientDeliveryStrategyProxy()
 {
   this->CollectProxy = 0;
-  this->CollectLODProxy = 0;
+  this->ReductionProxy = 0;
 }
 
+//----------------------------------------------------------------------------
+void vtkSMClientDeliveryStrategyProxy::SetPostGatherHelper(
+  const char* classname)
+{
+  if (this->ReductionProxy)
+    {
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      this->ReductionProxy->GetProperty("PostGatherHelper"));
+    pp->RemoveAllProxies();
+    pp = vtkSMProxyProperty::SafeDownCast(
+      this->ReductionProxy->GetProperty("PreGatherHelper"));
+    pp->RemoveAllProxies();
+    this->ReductionProxy->UpdateVTKObjects();
+
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkClientServerID rfid;
+    vtkClientServerStream stream;
+    if (classname && classname[0])
+      {
+      rfid = pm->NewStreamObject(classname, stream);
+      }
+
+    stream  << vtkClientServerStream::Invoke
+            << this->ReductionProxy->GetID() 
+            << "SetPostGatherHelper"
+            << rfid
+            << vtkClientServerStream::End;
+
+    if (!rfid.IsNull())
+      {
+      pm->DeleteStreamObject(rfid, stream);
+      }
+
+    pm->SendStream(this->ConnectionID, this->ReductionProxy->GetServers(),
+      stream);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMClientDeliveryStrategyProxy::SetPostGatherHelper(vtkSMProxy* helper)
+{
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->ReductionProxy->GetProperty("PostGatherHelper"));
+  pp->RemoveAllProxies();
+  pp->AddProxy(helper);
+  this->ReductionProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMClientDeliveryStrategyProxy::SetPreGatherHelper(vtkSMProxy* helper)
+{
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->ReductionProxy->GetProperty("PreGatherHelper"));
+  pp->RemoveAllProxies();
+  pp->AddProxy(helper);
+  this->ReductionProxy->UpdateVTKObjects();
+}
 //----------------------------------------------------------------------------
 void vtkSMClientDeliveryStrategyProxy::BeginCreateVTKObjects()
 {
@@ -46,88 +104,43 @@ void vtkSMClientDeliveryStrategyProxy::BeginCreateVTKObjects()
 
   this->CollectProxy = vtkSMSourceProxy::SafeDownCast(
     this->GetSubProxy("Collect"));
+  this->ReductionProxy = vtkSMSourceProxy::SafeDownCast(
+    this->GetSubProxy("Reduction"));
+
   this->CollectProxy->SetServers(
     this->Servers | vtkProcessModule::CLIENT);
+  this->ReductionProxy->SetServers(this->Servers);
 
-  this->CollectLODProxy = 
-    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("CollectLOD"));
-  this->CollectLODProxy->SetServers(
-    this->Servers | vtkProcessModule::CLIENT);
-
-  this->UpdateSuppressor->SetServers(
-    this->Servers|vtkProcessModule::CLIENT);
-
-  if (this->LODDecimator && this->UpdateSuppressorLOD)
-    {
-    this->LODDecimator->SetServers(this->Servers);
-    this->UpdateSuppressorLOD->SetServers(
-      this->Servers | vtkProcessModule::CLIENT);
-    }
+  this->UpdateSuppressor->SetServers(this->Servers|vtkProcessModule::CLIENT);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMClientDeliveryStrategyProxy::CreatePipeline(vtkSMSourceProxy* input,
   int outputport)
 {
-  this->CreatePipelineInternal(input, outputport,
-                               this->CollectProxy, 
-                               this->UpdateSuppressor);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMClientDeliveryStrategyProxy::CreateLODPipeline(vtkSMSourceProxy* input,
-  int outputport)
-{
-  this->Connect(input, this->LODDecimator, "Input", outputport);
-  this->CreatePipelineInternal(this->LODDecimator, 0,
-                               this->CollectLODProxy, 
-                               this->UpdateSuppressorLOD);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMClientDeliveryStrategyProxy::CreatePipelineInternal(
-  vtkSMSourceProxy* input, int outputport,
-  vtkSMSourceProxy* collect,
-  vtkSMSourceProxy* updatesuppressor)
-{
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
 
-  this->Connect(input, collect, "Input", outputport);
+  this->Connect(input, this->ReductionProxy, "Input", outputport);
+  this->Connect(this->ReductionProxy, this->CollectProxy);
+  this->Connect(this->CollectProxy, this->UpdateSuppressor);
 
   // Now we need to set up some default parameters on these filters.
+  stream << vtkClientServerStream::Invoke
+         << this->CollectProxy->GetID() 
+         << "SetProcessModuleConnection"
+         << pm->GetConnectionClientServerID(this->GetConnectionID())
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->CollectProxy->GetServers(), stream);
 
-  stream
-    << vtkClientServerStream::Invoke
-    << collect->GetID() << "SetProcessModuleConnection"
-    << pm->GetConnectionClientServerID(this->GetConnectionID())
-    << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, 
-                 collect->GetServers(), stream);
-
-  this->Connect(collect, updatesuppressor);
-
-  if ( vtkProcessModule::GetProcessModule()->IsRemote(this->GetConnectionID()))
-    {
-    vtkClientServerStream cmd;
-    cmd << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "LogStartEvent" << "Execute Collect"
-        << vtkClientServerStream::End;
-    stream
-      << vtkClientServerStream::Invoke
-      << collect->GetID() << "AddObserver" << "StartEvent" << cmd
-      << vtkClientServerStream::End;
-    cmd.Reset();
-    cmd << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID() << "LogEndEvent" << "Execute Collect"
-        << vtkClientServerStream::End;
-    stream
-      << vtkClientServerStream::Invoke
-      << collect->GetID() << "AddObserver" << "EndEvent" << cmd
-      << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, collect->GetServers(),
-                   stream);
-    }
+  stream  << vtkClientServerStream::Invoke
+          << pm->GetProcessModuleID() << "GetController"
+          << vtkClientServerStream::End;
+  stream  << vtkClientServerStream::Invoke
+          << this->ReductionProxy->GetID() << "SetController"
+          << vtkClientServerStream::LastResult
+          << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->ReductionProxy->GetServers(), stream);
 
   // Init UpdateSuppressor properties.
   // Seems like we can't use properties for this 
@@ -138,7 +151,8 @@ void vtkSMClientDeliveryStrategyProxy::CreatePipelineInternal(
     << "GetNumberOfLocalPartitions"
     << vtkClientServerStream::End
     << vtkClientServerStream::Invoke
-    << updatesuppressor->GetID() << "SetUpdateNumberOfPieces"
+    << this->UpdateSuppressor->GetID() 
+    << "SetUpdateNumberOfPieces"
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
   stream
@@ -147,12 +161,12 @@ void vtkSMClientDeliveryStrategyProxy::CreatePipelineInternal(
     << "GetPartitionId"
     << vtkClientServerStream::End
     << vtkClientServerStream::Invoke
-    << updatesuppressor->GetID() << "SetUpdatePiece"
+    << this->UpdateSuppressor->GetID() 
+    << "SetUpdatePiece"
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
-
   vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
-    updatesuppressor->GetServers(), stream);
+    this->UpdateSuppressor->GetServers(), stream);
 }
 
 //----------------------------------------------------------------------------
@@ -160,13 +174,6 @@ void vtkSMClientDeliveryStrategyProxy::UpdatePipeline()
 {
   this->UpdatePipelineInternal(this->CollectProxy, 
                                this->UpdateSuppressor);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMClientDeliveryStrategyProxy::UpdateLODPipeline()
-{
-  this->UpdatePipelineInternal(this->CollectLODProxy, 
-                               this->UpdateSuppressorLOD);
 }
 
 //----------------------------------------------------------------------------
@@ -208,14 +215,9 @@ void vtkSMClientDeliveryStrategyProxy::UpdatePipelineInternal(
       collect->GetServers(), 
       stream);
     }
-      
+
+  // TODO: Handle using of Cache.
   updatesuppressor->InvokeCommand("ForceUpdate");
-  // this->Superclass::Update();
-}
-//-----------------------------------------------------------------------------
-vtkSMSourceProxy* vtkSMClientDeliveryStrategyProxy::GetOutput()
-{
-  return this->CollectProxy;
 }
 
 //----------------------------------------------------------------------------
