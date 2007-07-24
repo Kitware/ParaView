@@ -24,7 +24,7 @@
 
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.12");
+vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.13");
 vtkStandardNewMacro(vtkPVProcessModulePythonHelper);
 
 //----------------------------------------------------------------------------
@@ -86,17 +86,13 @@ int vtkPVProcessModulePythonHelper::RunGUIStart(int argc, char **argv, int numSe
   vtkPVPythonInterpretor* interpretor = vtkPVPythonInterpretor::New();
   if (this->DisableConsole)
     {
-    res = interpretor->InitializeSubInterpretor(vArg.size(), &*vArg.begin());
-    if (res)
+    if (!boptions->GetPythonScriptName())
       {
-      if (!boptions->GetPythonScriptName())
-        {
-        vtkWarningMacro("No script specified");
-        }
-      else
-        {
-        interpretor->RunSimpleFile(boptions->GetPythonScriptName());
-        }
+      vtkErrorMacro("No script specified");
+      }
+    else
+      {
+      res = interpretor->PyMain(vArg.size(), &*vArg.begin());
       }
     }
   else
