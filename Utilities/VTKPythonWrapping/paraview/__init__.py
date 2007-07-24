@@ -768,8 +768,8 @@ def Fetch(input, arg=None):
     import types
 
     #create the pipeline that reduces and transmits the data
-    gvd = CreateProxy("representations", "ClientDeliveryRepresentationBase")
-    gvd.AddInput(input, "DONTCARE") 
+    gvd = CreateProxy("representations", "ClientDeliveryRepresentation")
+    gvd.AddToInput(input) 
   
     if arg == None:
         print "getting appended"
@@ -801,7 +801,7 @@ def Fetch(input, arg=None):
 
     else:
         print "applying operation"
-        gvd.SetReductionType(3)   
+        gvd.SetReductionType(6) # CUSTOM
         gvd.SetPreGatherHelper(arg)
         gvd.SetPostGatherHelper(arg)
         gvd.SetPassThrough(-1)
