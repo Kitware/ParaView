@@ -47,6 +47,10 @@ public:
   virtual vtkDataObject* GetBlockOutput();
 
   // Description:
+  // Indicates if the block is present in the cache.
+  bool IsCached(vtkIdType blockid);
+
+  // Description:
   // Get/Set the current block number.
   vtkSetMacro(Block, vtkIdType);
   vtkGetMacro(Block, vtkIdType);

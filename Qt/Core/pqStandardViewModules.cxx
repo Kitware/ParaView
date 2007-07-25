@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqElementInspectorView.h"
 #include "pqLineChartRepresentation.h"
 #include "pqPlotView.h"
+#include "pqSpreadSheetView.h"
 #include "pqTableView.h"
 #include "pqTextRepresentation.h"
 
@@ -58,7 +59,8 @@ QStringList pqStandardViewModules::viewTypes() const
     pqPlotView::XYPlotType() << 
     pqTableView::tableType() <<
     pqElementInspectorView::eiViewType() <<
-    pqComparativeRenderView::comparativeRenderViewType();
+    pqComparativeRenderView::comparativeRenderViewType() <<
+    pqSpreadSheetView::spreadsheetViewType();
 }
 
 QStringList pqStandardViewModules::displayTypes() const
@@ -92,6 +94,10 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
     {
     return pqComparativeRenderView::comparativeRenderViewTypeName();
     }
+  else if (type == pqSpreadSheetView::spreadsheetViewType())
+    {
+    return pqSpreadSheetView::spreadsheetViewTypeName();
+    }
 
   return QString();
 }
@@ -123,6 +129,10 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype)
   else if (viewtype == pqComparativeRenderView::comparativeRenderViewType())
     {
     return pxm->NewProxy("newviews", "ComparativeRenderView");
+    }
+  else if (viewtype == pqSpreadSheetView::spreadsheetViewType())
+    {
+    return pxm->NewProxy("newviews", "SpreadSheetView");
     }
   return NULL;
 }
@@ -157,6 +167,11 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
   else if (viewtype == pqComparativeRenderView::comparativeRenderViewType())
     {
     return new pqComparativeRenderView(
+      group, viewname, viewmodule, server, p);
+    }
+  else if (viewtype == pqSpreadSheetView::spreadsheetViewType())
+    {
+    return new pqSpreadSheetView(
       group, viewname, viewmodule, server, p);
     }
 

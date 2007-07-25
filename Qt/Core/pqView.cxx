@@ -146,14 +146,6 @@ vtkSMViewProxy* pqView::getViewProxy() const
   return vtkSMViewProxy::SafeDownCast(this->getProxy());
 }
 
-#include "pqOutputPort.h"
-#include "pqPipelineSource.h"
-//-----------------------------------------------------------------------------
-bool pqView::canDisplaySource(pqPipelineSource* source) const
-{
-  return this->canDisplay(source->getOutputPort(0));
-}
-
 //-----------------------------------------------------------------------------
 void pqView::render()
 {

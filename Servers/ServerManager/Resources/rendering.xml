@@ -2583,6 +2583,15 @@
       <!-- End of ElementInspectorView -->
     </ViewProxy>
 
+    <ViewProxy name="SpreadSheetView" 
+      base_proxygroup="newviews" 
+      base_proxyname="ViewBase"
+      representation_name="BlockDeliveryRepresentation">
+
+      <!-- End of SpreadSheetView -->
+    </ViewProxy>
+
+
     <ViewProxy name="BarChartView" 
       base_proxygroup="newviews" base_proxyname="ViewBase"
       representation_name="BarChartRepresentation">
@@ -4795,7 +4804,7 @@
           <IdTypeVectorProperty name="BlockSize"
             command="SetBlockSize"
             number_of_elements="1"
-            default_values="1024" >
+            default_values="20" >
           </IdTypeVectorProperty>
 
           <IdTypeVectorProperty name="Block"
@@ -5261,6 +5270,7 @@
 
 
 </ServerManagerConfiguration>
+
 
 
 

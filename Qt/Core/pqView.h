@@ -117,7 +117,6 @@ public:
   /// view. This is a convenience method, it gets
   /// the pqDisplayPolicy object from the pqApplicationCore
   /// are queries it.
-  bool canDisplaySource(pqPipelineSource* source) const;
   virtual bool canDisplay(pqOutputPort* opPort) const =0;
 
 signals:
