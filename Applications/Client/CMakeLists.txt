@@ -398,6 +398,22 @@ IF(BUILD_TESTING)
      #    --exit)
      #ENDIF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
     ENDFOREACH(test) 
+
+    ADD_TEST(StructuredVolumeRender-ClientServerRemoteRender
+      ${TEST_BINARY} --test-server --test-remote-rendering
+      --test-directory=${PARAVIEW_TEST_DIR}
+      -dr
+      --run-test=${TEST_XML}/StructuredVolumeRender.xml
+      --compare-view=${TEST_IMAGE}/StructuredVolumeRender.png
+      --exit)
+    ADD_TEST(UnstructuredVolumeRender-ClientServerRemoteRender
+      ${TEST_BINARY} --test-server --test-remote-rendering
+      --test-directory=${PARAVIEW_TEST_DIR}
+      -dr
+      --run-test=${TEST_XML}/UnstructuredVolumeRender.xml
+      --compare-view=${TEST_IMAGE}/UnstructuredVolumeRender.png
+      --exit)
+
   ENDIF(PARAVIEW_DATA_ROOT)
 
   ADD_SUBDIRECTORY(Testing/Cxx)
