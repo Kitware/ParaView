@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqView.h"
 
+/// View for spread-sheet view. It can show data from any source/filter on the
+/// client. 
 class PQCORE_EXPORT pqSpreadSheetView : public pqView
 {
   Q_OBJECT

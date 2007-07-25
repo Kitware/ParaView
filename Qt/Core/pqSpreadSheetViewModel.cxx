@@ -32,14 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpreadSheetViewModel.h"
 
 // Server Manager Includes.
+#include "vtkIndexBasedBlockFilter.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMBlockDeliveryRepresentationProxy.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkStdString.h"
 #include "vtkTable.h"
 #include "vtkVariant.h"
-#include "vtkSMSourceProxy.h"
 
 // Qt Includes.
 #include <QSet>
@@ -140,8 +141,8 @@ void pqSpreadSheetViewModel::forceUpdate()
   if (repr)
     {
     vtkTable* table = vtkTable::SafeDownCast(repr->GetOutput());
-    QString field_type = pqSMAdaptor::getEnumerationProperty(
-      repr->GetProperty("FieldType")).toString();
+    int field_type = pqSMAdaptor::getElementProperty(
+      repr->GetProperty("FieldType")).toInt();
 
     vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
       repr->GetProperty("Input"));
@@ -153,15 +154,15 @@ void pqSpreadSheetViewModel::forceUpdate()
       inputProxy->GetDataInformation(port) : 0;
     if (info)
       {
-      if (field_type == "FieldData")
+      if (field_type == vtkIndexBasedBlockFilter::DATA_OBJECT_FIELD)
         {
         // TODO:
         }
-      else if (field_type == "PointData")
+      else if (field_type == vtkIndexBasedBlockFilter::POINT_DATA_FIELD)
         {
         this->Internal->NumberOfRows = info->GetNumberOfPoints();
         }
-      else if (field_type == "CellData")
+      else if (field_type == vtkIndexBasedBlockFilter::CELL_DATA_FIELD)
         {
         this->Internal->NumberOfRows = info->GetNumberOfCells();
         }
@@ -240,7 +241,7 @@ QVariant pqSpreadSheetViewModel::data(
       {
       this->Internal->PendingBlocks.insert(blockNumber);
       this->Internal->Timer.start();
-      return QVariant("updating...");
+      return QVariant("...");
       }
 
     pqSMAdaptor::setElementProperty(repr->GetProperty("Block"), blockNumber);

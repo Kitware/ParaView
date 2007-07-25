@@ -36,9 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMBlockDeliveryRepresentationProxy.h"
 
 // Qt Includes.
-#include <QTableView>
-#include <QPointer>
+#include <QHeaderView>
 #include <QItemDelegate>
+#include <QPointer>
+#include <QTableView>
 
 // ParaView Includes.
 #include "pqOutputPort.h"
@@ -119,6 +120,7 @@ public:
   this->Table= table;
   this->Table->setModel(&this->Model);
   this->Table->setSelectionBehavior(QAbstractItemView::SelectRows);
+  this->Table->horizontalHeader()->setMovable(true);
   }
 
   ~pqInternal()

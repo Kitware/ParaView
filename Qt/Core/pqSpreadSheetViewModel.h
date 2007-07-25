@@ -35,6 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractTableModel>
 #include "pqCoreExport.h"
 
+/// This is the model used by SpreadSheetView to show the data. This model works
+/// with vtkSMBlockDeliveryRepresentationProxy to fetch blocks of data from the
+/// server and show them. It requires that vtkSMBlockDeliveryRepresentationProxy
+/// delivers vtkTable.
 class vtkSMBlockDeliveryRepresentationProxy;
 class PQCORE_EXPORT pqSpreadSheetViewModel : public QAbstractTableModel
 {
