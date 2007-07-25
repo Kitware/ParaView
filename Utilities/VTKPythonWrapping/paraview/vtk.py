@@ -1,10 +1,8 @@
 import os
 
 if os.name == "posix":
-    from libvtkPVServerCommonPython import *
     from libvtkCommonPython import *
 else:
-    from vtkPVServerCommonPython import *
     from vtkCommonPython import *
 
 def IntegrateCell(dataset, cellId):
