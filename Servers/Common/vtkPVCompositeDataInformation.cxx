@@ -23,8 +23,11 @@
 #include "vtkSmartPointer.h"
 #include <vtkstd/vector>
 
+#include "vtkAlgorithmOutput.h"
+#include "vtkAlgorithm.h"
+
 vtkStandardNewMacro(vtkPVCompositeDataInformation);
-vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.8");
+vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.9");
 
 struct vtkPVCompositeDataInformationInternals
 {
@@ -125,7 +128,7 @@ void vtkPVCompositeDataInformation::CopyFromObject(vtkObject* object)
     this->DataIsHierarchical = 1;
     }
 
-  vtkTimerLog::MarkStartEvent("Copying information from composite data");
+//  vtkTimerLog::MarkStartEvent("Copying information from composite data");
 
   this->DataIsComposite = 1;
 
@@ -139,8 +142,13 @@ void vtkPVCompositeDataInformation::CopyFromObject(vtkObject* object)
     ldata.resize(numDataSets);
     // If data is a vtkHierarchicalDataSet or sub-class, do not get the
     // information for sub-datasets. There may be a lot of them.
+    // Temprorarily disabling this. When an AMR dataset gets converted to
+    // a multi-group dataset due to filter application, this was causing
+    // large amount meta-data delivery to the client.
+    /*
     if (!this->DataIsHierarchical)
       {
+      vtkTimerLog::MarkStartEvent("Copying information from hierarchical data");
       for (unsigned int j=0; j<numDataSets; j++)
         {
         vtkDataObject* dobj = hds->GetDataSet(i, j);
@@ -160,10 +168,12 @@ void vtkPVCompositeDataInformation::CopyFromObject(vtkObject* object)
           dataInf->Delete();
           }
         }
+      vtkTimerLog::MarkEndEvent("Copying information from hierarchical data");
       }
+    */
     }
 
-  vtkTimerLog::MarkEndEvent("Copying information from composite data");
+//  vtkTimerLog::MarkEndEvent("Copying information from composite data");
 }
 
 //----------------------------------------------------------------------------
@@ -235,14 +245,14 @@ void vtkPVCompositeDataInformation::CopyToStream(
 {
   unsigned int i, j;
 
-  vtkTimerLog::MarkStartEvent("Copying composite information to stream");
+//  vtkTimerLog::MarkStartEvent("Copying composite information to stream");
   css->Reset();
   *css << vtkClientServerStream::Reply;
   *css << this->DataIsComposite;
   *css << this->DataIsHierarchical;
   if (!this->DataIsComposite)
     {
-    vtkTimerLog::MarkEndEvent("Copying composite information to stream");
+//    vtkTimerLog::MarkEndEvent("Copying composite information to stream");
     *css << vtkClientServerStream::End;
     return;
     }
@@ -285,7 +295,7 @@ void vtkPVCompositeDataInformation::CopyToStream(
     *css << numGroups;
     *css << vtkClientServerStream::End;
     }
-  vtkTimerLog::MarkEndEvent("Copying composite information to stream");
+//  vtkTimerLog::MarkEndEvent("Copying composite information to stream");
 }
 
 //----------------------------------------------------------------------------
