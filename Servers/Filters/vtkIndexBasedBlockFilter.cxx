@@ -28,7 +28,7 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.1");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.2");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -141,8 +141,7 @@ bool vtkIndexBasedBlockFilter::DetermineBlockIndices()
   if (numProcs<=1)
     {
     this->StartIndex = blockStartIndex;
-    this->EndIndex = (blockEndIndex < numFields)? blockEndIndex :
-      (numFields - this->StartIndex - 1);
+    this->EndIndex = (blockEndIndex < numFields)? blockEndIndex : numFields;
     // cout  << "Delivering : " << this->StartIndex << " --> " << this->EndIndex << endl;
     return true;
     }
