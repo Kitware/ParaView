@@ -18,34 +18,32 @@ provides server utilty methods that assist in creating connections,
 proxies, as well as introspection.
 
 A simple example:
-  from paraview import servermanager
+  from paraview.servermanager import *
   
   # Creates a new built-in connection and makes it the active connection.
-  servermanager.ActiveConnection = servermanager.Connect()
+  Connect()
 
   # Creates a new render view on the active connection.
-  renModule = servermanager.CreateRenderView()
+  renModule = CreateRenderView()
 
   # Create a new sphere proxy on the active connection and register it
   # in the sources group.
-  sphere = servermanager.sources.SphereSource(registrationGroup="sources", ThetaResolution=16, PhiResolution=32)
+  sphere = sources.SphereSource(registrationGroup="sources", ThetaResolution=16, PhiResolution=32)
 
   # Create a representation for the sphere proxy and adds it to the render
   # module.
-  display = servermanager.CreateRepresentation(sphere, renModule)
+  display = CreateRepresentation(sphere, renModule)
 
   renModule.ResetCamera()
   renModule.StillRender()
 """
-import re
-import os
-import new
-import exceptions
-from vtk import *
+import re, os, new, exceptions, vtk
 
 if os.name == "posix":
+    from libvtkPVServerCommonPython import *
     from libvtkPVServerManagerPython import *
 else:
+    from vtkPVServerCommonPython import *
     from vtkPVServerManagerPython import *
 
 class Proxy(object):
@@ -74,6 +72,7 @@ class Proxy(object):
           print property
     """
     def __init__(self, **args):
+        self.Observed = None
         if 'proxy' in args:
             self.InitializeFromProxy(args['proxy'])
             del args['proxy']
@@ -91,13 +90,18 @@ class Proxy(object):
         for key in args.keys():
             self.SetPropertyWithName(key, args[key])
         self.UpdateVTKObjects()
+
+    def __del__(self):
+        pass
+        # Make sure that we remove observers we added
+        if self.Observed:
+            observed = self.Observed
+            self.Observed = None
+            self.Observed.RemoveObserver("ModifiedEvent")
         
     def InitializeFromProxy(self, aProxy):
         "Constructor. Assigns proxy to self.SMProxy"
         self.SMProxy = aProxy
-        doc = aProxy.GetDocumentation().GetDescription()
-        if doc:
-            self.__doc__ = doc
         self.SMProxy.UpdateVTKObjects()
 
     def Initialize(self):
@@ -115,10 +119,11 @@ class Proxy(object):
     def __iter__(self):
         return PropertyIterator(self)
 
-    def GetDataInformation(self, idx=0):
+    def __GetDataInformation(self, idx=0):
         if self.SMProxy:
-            return DataInformation(self.SMProxy.GetDataInformation(idx, False), \
-                                   self.SMProxy, idx)
+            return DataInformation( \
+                self.SMProxy.GetDataInformation(idx, False), \
+                self.SMProxy, idx)
         
     def SetPropertyWithName(self, pname, *args):
         """Generic method for setting the value of a property.
@@ -234,11 +239,28 @@ class Proxy(object):
       else:
           return retVal
 
+    def __GetActiveCamera(self):
+        """ This method handles GetActiveCamera specially. It adds
+        an observer to the camera such that everything it is modified
+        the render view updated"""
+        c = self.SMProxy.GetActiveCamera()
+        if not c.HasObserver("ModifiedEvent"):
+            c.AddObserver("ModifiedEvent", _makeUpdateCameraMethod(self))
+            self.Observed = c.SMProxy
+        return c
+        
     def __getattr__(self, name):
         """With the exception of a few overloaded methods,
         returns the SMProxy method"""
         if not self.SMProxy:
             return getattr(self, name)
+        # Handle GetActiveCamera specially.
+        if name == "GetActiveCamera" and \
+           hasattr(self.SMProxy, "GetActiveCamera"):
+            return self.__GetActiveCamera
+        if name == "GetDataInformation" and \
+           hasattr(self.SMProxy, "GetDataInformation"):
+            return self.__GetDataInformation
         if name == "SaveDefinition" and hasattr(self.SMProxy, "SaveDefinition"):
             return self.__SaveDefinition
         # If not a property, see if SMProxy has the method
@@ -250,6 +272,13 @@ class Proxy(object):
             pass
         return getattr(self.SMProxy, name)
 
+def _makeUpdateCameraMethod(rv):
+    """ This internal method is used to create observer methods """
+    renderview = rv
+    def UpdateCamera(obj, string):
+        renderview.SynchronizeCameraProperties()
+    return UpdateCamera
+        
 class DataInformation(object):
     def __init__(self, dataInformation, proxy, idx):
         self.DataInformation = dataInformation
@@ -269,7 +298,7 @@ class DataInformation(object):
         return self.DataInformation.GetDataSetType()
 
     def GetDataSetTypeAsString(self):
-        return vtkDataObjectTypes.GetClassNameFromTypeId(self.GetDataSetType())
+        return vtk.vtkDataObjectTypes.GetClassNameFromTypeId(self.GetDataSetType())
 
     def __getattr__(self, name):
         if not self.DataInformation:
@@ -369,7 +398,7 @@ class ProxyManager(object):
         """Returns all proxies registered under the given group with the given name."""
         if not self.SMProxyManager:
             return []
-        collection = vtkCollection()
+        collection = vtk.vtkCollection()
         result = []
         self.SMProxyManager.GetProxies(groupname, proxyname, collection)
         for i in range(0, collection.GetNumberOfItems()):
@@ -645,17 +674,23 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
       creates a new connection to the data server on ds_host:ds_port and to the
       render server on rs_host: rs_port.
     """
+    global ActiveConnection
     if ds_host == None:
-        return connect_self()
-    if rs_host == None:
-        return connect_server(ds_host, ds_port)
-    return connect_ds_rs(ds_host, ds_port, rs_host, rs_port)
+        connectionId = connect_self()
+    elif rs_host == None:
+        connectionId = connect_server(ds_host, ds_port)
+    else:
+        connectionId = connect_ds_rs(ds_host, ds_port, rs_host, rs_port)
+    if not ActiveConnection:
+        ActiveConnection = connectionId
+    return connectionId
 
 def Disconnect(connection=None):
     """Disconnects the connection."""
     global ActiveConnection
     if not connection:
         connection = ActiveConnection
+        ActiveConnection = None
     pm =  vtkProcessModule.GetProcessModule()
     pm.Disconnect(connection.ID)
     return
@@ -667,7 +702,6 @@ def CreateProxy(xml_group, xml_name, register_group=None, register_name=None, co
        is used, is present. If register_group is non-None, but register_name is None,
        then the proxy's self id is used to create a new name.
     """
-    global ActiveConnection
     pxm = ProxyManager()
     aProxy = pxm.NewProxy(xml_group, xml_name)
     if not aProxy:
@@ -682,19 +716,23 @@ def CreateProxy(xml_group, xml_name, register_group=None, register_name=None, co
         pxm.RegisterProxy(register_group, register_name, aProxy)
     return aProxy
 
-def GetRenderView():
+def GetRenderView(connection=None):
     """Return the render view in use.  If more than one render view is in use, return the first one."""
+    if not connection:
+        connection = ActiveConnection
     render_module = None
-    for aProxy in ProxyManager().connection_iter(ActiveConnection):
+    for aProxy in ProxyManager().connection_iter(connection):
         if aProxy.IsA("vtkSMRenderViewProxy"):
             render_module = aProxy
             break
     return render_module
 
-def GetRenderViews():
+def GetRenderViews(connection=None):
     """Returns the set of all render views."""
+    if not connection:
+        connection = ActiveConnection
     render_modules = []
-    for aProxy in ProxyManager().connection_iter(ActiveConnection):
+    for aProxy in ProxyManager().connection_iter(connection):
         if aProxy.IsA("vtkSMRenderViewProxy"):
             render_modules.append(aProxy)
     return render_modules
@@ -702,7 +740,6 @@ def GetRenderViews():
 def CreateRenderView(connection=None):
     """Creates a render window on the particular connection. If connection is not specified,
     then the active connection is used, if available."""
-    global ActiveConnection
     if not connection:
         connection = ActiveConnection
     if not connection:
@@ -713,7 +750,7 @@ def CreateRenderView(connection=None):
         proxy_xml_name = "IceTDesktopRenderView"
     else:
         proxy_xml_name = "RenderView"
-    ren_module = CreateProxy("newviews", proxy_xml_name, "view_modules")
+    ren_module = CreateProxy("newviews", proxy_xml_name, "view_modules", None, connection)
     if not ren_module:
         return None
     proxy = rendering.__dict__[ren_module.GetXMLName()](proxy=ren_module)
@@ -816,11 +853,12 @@ def Fetch(input, arg=None):
 def __createInitialize(group, name):
     pgroup = group
     pname = name
-    def aInitialize(self):
-        global ActiveConnection
-        if not ActiveConnection:
+    def aInitialize(self, connection=None):
+        if not connection:
+            connection = ActiveConnection
+        if not connection:
             raise exceptions.RuntimeError, 'Cannot create a proxy without a connection.'
-        self.InitializeFromProxy(CreateProxy(pgroup, pname, pgroup))
+        self.InitializeFromProxy(CreateProxy(pgroup, pname, pgroup, None, connection))
     return aInitialize
 def __createGetProperty(pName):
     propName = pName
@@ -838,6 +876,8 @@ def FindClassForProxy(xmlName):
         return sources.__dict__[xmlName]
     elif xmlName in filters.__dict__:
         return filters.__dict__[xmlName]
+    elif xmlName in rendering.__dict__:
+        return rendering.__dict__[xmlName]
     else:
         return None
     
@@ -873,9 +913,143 @@ sources = __createModule('sources')
 filters = __createModule('filters')
 rendering = __createModule('representations')
 __createModule('newviews', rendering)
+__createModule("lookup_tables", rendering)
 
+def demo1():
+    if not ActiveConnection:
+        Connect()
+    # Create the exodus reader and specify a file name
+    reader = sources.ExodusIIReader(FileName="/Users/berk/Work/vtkSNL/Data/disk_out_ref.exo")
+    # Update information to force the reader to read the meta-data
+    # including the list of variables available
+    reader.UpdatePipelineInformation()
+    # Get the list of point arrays. This is a list of pairs; each pair
+    # contains the name of the array and whether that array is to be
+    # loaded
+    arrayList = reader.PointResultArrayInfo
+    print arrayList
+    # Flip the read flag of all arrays
+    for idx in range(1, len(arrayList), 2):
+        arrayList[idx] = "1"
+    # Assign the list to the property that determines which arrays are read.
+    # See the documentation for the exodus reader for details.
+    reader.PointResultArrayStatus = arrayList
+    # Next create a default render view appropriate for the connection type.
+    rv = CreateRenderView()
+    # Create the matching representation
+    rep = CreateRepresentation(reader, rv)
+    rep.Representation = 1 # Wireframe
+    # Black background is not pretty
+    rv.Background = [0.4, 0.4, 0.6]
+    rv.StillRender()
+    # Reset the camera to include the whole thing
+    rv.ResetCamera()
+    rv.StillRender()
+    # Change the elevation of the camera. See VTK documentation of vtkCamera
+    # for camera parameters.
+    c = rv.GetActiveCamera()
+    c.Elevation(45)
+    rv.StillRender()
+    # Now that the reader execute, let's get some information about it's
+    # output.
+    di = reader.GetDataInformation()
+    pdi = di.GetPointDataInformation()
+    # This prints a list of all read point data arrays as well as their
+    # value ranges.
+    print 'Number of point arrays:', pdi.GetNumberOfArrays()
+    for i in range(pdi.GetNumberOfArrays()):
+        ai = pdi.GetArrayInformation(i)
+        print "----------------"
+        print "Array:", i, ai.GetName(), ":"
+        numComps = ai.GetNumberOfComponents()
+        print "Number of components:", numComps
+        for j in range(numComps):
+            print "Range:", ai.GetComponentRange(j)
+    # White is boring. Let's color the geometry using a variable.
+    # First create a lookup table. This object controls how scalar
+    # values are mapped to colors. See VTK documentation for
+    # details.
+    lt = rendering.PVLookupTable()
+    # Assign it to the representation
+    rep.LookupTable = lt
+    # Color by point array called Pres
+    rep.ColorAttributeType = 0 # point data
+    rep.ColorArrayName = "Pres"
+    # Add to RGB points. These are tuples of 4 values. First one is
+    # the scalar values, the other 3 the RGB values. This list has
+    # 2 points: Pres: 0.00678, color: blue, Pres: 0.0288, color: red
+    lt.RGBPoints = [0.00678, 0, 0, 1, 0.0288, 1, 0, 0]
+    lt.ColorSpace = 1 # HSV
+    rv.StillRender()
+    return rv
+
+def demo2():
+    import paraview.numeric
+    import pylab
+    
+    if not ActiveConnection:
+        Connect()
+    # Create a synthetic data source
+    source = sources.RTAnalyticSource()
+    # Let's get some information about the data. First, for the
+    # source to execute
+    source.UpdatePipeline()
+
+    di = source.GetDataInformation()
+    print "Data type:", di.GetPrettyDataTypeString()
+    print "Extent:", di.GetExtent()
+    print "Array name:", \
+          di.GetPointDataInformation().GetArrayInformation(0).GetName()
+
+    rv = CreateRenderView()
+
+    rep1 = CreateRepresentation(source, rv)
+    rep1.Representation = 3 # outline
+
+    # Let's apply a contour filter
+    cf = filters.Contour(Input=source, ContourValues=[200])
+    # This is probably one of the most difficult properties to set.
+    # Look at the documentation of vtkAlgorithm::SetInputArrayToProcess()
+    # for details.
+    cf.SelectInputScalars = ['0', '0', '0', '0', 'RTData']
+
+    rep2 = CreateRepresentation(cf, rv)
+    
+    rv.Background = [0.4, 0.4, 0.6]
+    # Reset the camera to include the whole thing
+    rv.StillRender()
+    rv.ResetCamera()
+    rv.StillRender()
+
+    # Now, let's probe the data
+    probe = filters.Probe(Input=source)
+    # with a line
+    line = sources.LineSource(Resolution=60)
+    # that spans the dataset
+    bounds = di.GetBounds()
+    print "Bounds: ", bounds
+    line.Point1 = bounds[0:6:2]
+    line.Point2 = bounds[1:6:2]
+
+    probe.Source = line
+
+    # Render with the line
+    rep3 = CreateRepresentation(line, rv)
+    rv.StillRender()
+
+    # Now deliver it to the client. Remember, this is for small data.
+    data = Fetch(probe)
+    # Convert it to a numpy array
+    data = paraview.numeric.getarray(data.GetPointData().GetArray(0))
+    # Plot it using matplotlib
+    pylab.plot(data)
+    pylab.show()
+    
+    return data
+    
 def test():
-#ActiveConnection = Connect()
+    if not ActiveConnection:
+        Connect()
     ss = sources.SphereSource(Radius=2, ThetaResolution=32)
     shr = filters.ShrinkFilter(Input=OutputPort(ss,0))
     cs = sources.ConeSource()
