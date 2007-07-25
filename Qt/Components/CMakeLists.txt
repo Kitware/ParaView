@@ -155,6 +155,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   #pqSourceInfoIcons.h
   #pqSourceInfoModel.h
   pqSpinBoxDomain.h
+  pqSpreadSheetDisplayEditor.h
   pqStreamTracerPanel.h
   pqTextDisplayPropertiesWidget.h
   pqThresholdPanel.h
@@ -220,6 +221,7 @@ SET(UI_FORMS
   Resources/UI/pqSettingsDialog.ui
   Resources/UI/pqSignalAdaptorKeyFrameValue.ui
   Resources/UI/pqSignalAdaptorKeyFrameType.ui
+  Resources/UI/pqSpreadSheetDisplayEditor.ui
   Resources/UI/pqStreamTracerPanel.ui
   Resources/UI/pqTextDisplayPropertiesWidget.ui
   Resources/UI/pqTimerLogDisplay.ui
@@ -517,6 +519,8 @@ ADD_LIBRARY(pqComponents
   pqSplitViewUndoElement.h
   pqStateLoader.cxx
   pqStateLoader.h
+  pqSpreadSheetDisplayEditor.cxx
+  pqSpreadSheetDisplayEditor.h
   pqStreamTracerPanel.cxx
   pqStreamTracerPanel.h
   pqTextDisplayPropertiesWidget.cxx

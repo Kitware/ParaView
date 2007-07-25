@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPluginManager.h"
 #include "pqPropertyLinks.h"
+#include "pqSpreadSheetDisplayEditor.h"
 #include "pqTextDisplayPropertiesWidget.h"
 #include "pqTextRepresentation.h"
 #include "pqUndoStack.h"
@@ -75,6 +76,7 @@ public:
 
     if(type == "BarChartRepresentation" ||
        type == "XYPlotRepresentation" ||
+       type == "BlockDeliveryRepresentation" ||
        qobject_cast<pqTextRepresentation*>(proxy))
       {
       return true;
@@ -99,6 +101,11 @@ public:
     if(type == QString("BarChartRepresentation"))
       {
       return new pqBarChartDisplayProxyEditor(proxy, p);
+      }
+
+    if (type == "BlockDeliveryRepresentation")
+      {
+      return new pqSpreadSheetDisplayEditor(proxy, p);
       }
     
     if (qobject_cast<pqTextRepresentation*>(proxy))
