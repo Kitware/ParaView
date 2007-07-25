@@ -183,7 +183,7 @@ void pqSpreadSheetViewModel::delayedUpdate()
     vtkIdType blocksize = this->Internal->getBlockSize();
     foreach (vtkIdType blockNumber, this->Internal->PendingBlocks)
       {
-      cout << "Requesting : " << blockNumber << endl;
+      // cout << "Requesting : " << blockNumber << endl;
       pqSMAdaptor::setElementProperty(repr->GetProperty("Block"), blockNumber);
       repr->UpdateProperty("Block");
       repr->Update();
