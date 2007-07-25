@@ -35,7 +35,7 @@
 
 
 vtkStandardNewMacro(vtkServerConnection);
-vtkCxxRevisionMacro(vtkServerConnection, "1.11");
+vtkCxxRevisionMacro(vtkServerConnection, "1.12");
 //-----------------------------------------------------------------------------
 vtkServerConnection::vtkServerConnection()
 {
@@ -719,6 +719,7 @@ vtkPVXMLElement* vtkServerConnection::NewNextUndo()
   if (!parser->Parse(data))
     {
     vtkErrorMacro("Server Undo state response is invalid. Must be valid XML.");
+    delete [] data;
     return 0;
     }
   
@@ -726,6 +727,7 @@ vtkPVXMLElement* vtkServerConnection::NewNextUndo()
     strcmp(parser->GetRootElement()->GetName(), "ClientServerUndoRedo") != 0)
     {
     vtkErrorMacro("Invalid XML, expected ClientServerUndoRedo element.");
+    delete [] data;
     return 0;
     }
   
@@ -734,6 +736,7 @@ vtkPVXMLElement* vtkServerConnection::NewNextUndo()
     {
     undoelem->Register(this);
     }
+  delete [] data;
   return undoelem;
 }
 
@@ -760,6 +763,7 @@ vtkPVXMLElement* vtkServerConnection::NewNextRedo()
   if (!parser->Parse(data))
     {
     vtkErrorMacro("Server Undo state response is invalid. Must be valid XML.");
+    delete [] data;
     return 0;
     }
 
@@ -767,6 +771,7 @@ vtkPVXMLElement* vtkServerConnection::NewNextRedo()
     strcmp(parser->GetRootElement()->GetName(), "ClientServerUndoRedo") != 0)
     {
     vtkErrorMacro("Invalid XML, expected ClientServerUndoRedo element.");
+    delete [] data;
     return 0;
     }
 
@@ -775,6 +780,7 @@ vtkPVXMLElement* vtkServerConnection::NewNextRedo()
     {
     undoelem->Register(this);
     }
+  delete [] data;
   return undoelem;
 }
 
