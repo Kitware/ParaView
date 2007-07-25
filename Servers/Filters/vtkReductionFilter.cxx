@@ -34,6 +34,7 @@
 #include "vtkSocketController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGrid.h"
+#include "vtkTable.h"
 #include "vtkToolkits.h"
 
 #ifdef VTK_USE_MPI
@@ -43,7 +44,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.15");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.16");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkReductionFilter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
@@ -250,6 +251,20 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
     originalProcessIds->SetNumberOfTuples(dsPreOutput->GetNumberOfCells());
     originalProcessIds->FillComponent(0, controller->GetLocalProcessId());
     dsPreOutput->GetCellData()->AddArray(originalProcessIds);
+    originalProcessIds->Delete();
+    }
+
+  vtkTable* tablePreOutput = vtkTable::SafeDownCast(preOutput);
+  if (this->GenerateProcessIds && tablePreOutput)
+    {
+    // Note that preOutput is never the input directly (it is shallow copied at
+    // the least, hence we can add arrays to it.
+    vtkIdTypeArray* originalProcessIds = vtkIdTypeArray::New();
+    originalProcessIds->SetNumberOfComponents(1);
+    originalProcessIds->SetName("vtkOriginalProcessIds");
+    originalProcessIds->SetNumberOfTuples(tablePreOutput->GetNumberOfRows());
+    originalProcessIds->FillComponent(0, controller->GetLocalProcessId());
+    tablePreOutput->AddColumn(originalProcessIds);
     originalProcessIds->Delete();
     }
 
