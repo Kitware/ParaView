@@ -97,6 +97,8 @@ void pqComparativeRenderView::setDefaultPropertyValues()
 {
   //this->getComparativeRenderViewProxy()->Build(3, 3);
   this->Superclass::setDefaultPropertyValues();
+
+  // Create the default animation scenes.
 }
 
 //-----------------------------------------------------------------------------
