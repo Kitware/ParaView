@@ -61,7 +61,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.51");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.52");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -569,9 +569,6 @@ int vtkSpyPlotReader::RequestData(
 
   hb->Initialize(); // remove all previous blocks
   hb->SetMultiGroupDataInformation(compInfo);
-  hb->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(),
-                            steps+this->CurrentTimeStep, 1);
-  
   //int numFiles = this->Map->Files.size();
 
   // By setting SetMaximumNumberOfPieces(-1) 
@@ -609,6 +606,9 @@ int vtkSpyPlotReader::RequestData(
     {
     this->UpdateMetaData(request, outputVector);
     }
+
+  hb->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(),
+                            steps+this->CurrentTimeStep, 1);  
   
   // Tell all of the unireaders that they need to make to check to see
   // if they are current
