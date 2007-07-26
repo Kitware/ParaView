@@ -88,7 +88,7 @@ class pqSpreadSheetView::pqTableView : public QTableView
 {
   typedef QTableView Superclass;
 protected:
-  virtual void paintEvent (QPaintEvent* event)
+  virtual void paintEvent (QPaintEvent* pevent)
     {
     pqSpreadSheetView::pqDelegate* del =
       dynamic_cast<pqDelegate*>(this->itemDelegate());
@@ -98,7 +98,7 @@ protected:
       {
       del->beginPaint();
       }
-    this->Superclass::paintEvent(event);
+    this->Superclass::paintEvent(pevent);
     if (del)
       {
       del->endPaint();
