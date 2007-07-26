@@ -37,11 +37,6 @@ public:
   // If the object has not been created, it will be created first.
   virtual void UpdateVTKObjects();
 
-  // Description:
-  // Add a range to the selection.
-  void AddThreshold(double min, double max);
-  void RemoveAllValues();
-
 //BTX
 protected:
   vtkSMExtractThresholdsProxy();
@@ -52,8 +47,6 @@ protected:
 private:
   vtkSMExtractThresholdsProxy(const vtkSMExtractThresholdsProxy&); // Not implemented.
   void operator=(const vtkSMExtractThresholdsProxy&); // Not implemented.
-
-  vtkDoubleArray* Thresholds;
 //ETX
 };
 

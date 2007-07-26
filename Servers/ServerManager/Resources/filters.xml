@@ -6815,32 +6815,14 @@ This extracts all cells within a frustum that is defined as the volume behind a 
        </Documentation>
      </IntVectorProperty>
 -->
-     <DoubleVectorProperty 
-        name="Frustum"
-        command="SetFrustum" 
-        clean_command="RemoveAllValues"
-        number_of_elements="32"
-        argument_is_array="1"
-        update_self="1"
-        default_values=
-        "0.0 0.0 1.0 0.0
-         0.0 0.0 0.0 0.0
-         0.0 1.0 1.0 0.0
-         0.0 1.0 0.0 0.0
-         1.0 0.0 1.0 0.0
-         1.0 0.0 0.0 0.0
-         1.0 1.0 1.0 0.0
-         1.0 1.0 0.0 0.0"
-        label="Frustum">
-        <Documentation>
-          Vertices that define a frustum for the selection source.
-        </Documentation>
-     </DoubleVectorProperty> 
 
      <SubProxy>
         <Proxy name="SelectionSource" proxygroup="sources"
-          proxyname="SelectionSource">
+          proxyname="SelectionSource">                   
         </Proxy>
+        <ExposedProperties>
+          <Property name="Frustum" />
+        </ExposedProperties>
      </SubProxy>
 
      <Hints>
@@ -6870,24 +6852,13 @@ This filter extracts a set of thresholds of its input.
        </Documentation>
      </InputProperty>
 
-     <DoubleVectorProperty 
-        name="Thresholds"
-        command="AddThreshold" 
-        clean_command="RemoveAllValues"
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        number_of_elements="0"
-        update_self="1"
-        label="Thresholds">
-        <Documentation>
-          The list of thresholds that will be added to the selection produced by the selection source.
-        </Documentation>
-     </DoubleVectorProperty> 
-
      <SubProxy>
         <Proxy name="SelectionSource" proxygroup="sources"
           proxyname="SelectionSource">
         </Proxy>
+        <ExposedProperties>
+          <Property name="Thresholds" />
+        </ExposedProperties>
      </SubProxy>
      <!-- End ExtractThresholds -->
    </ExtractThresholdsProxy>

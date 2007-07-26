@@ -83,7 +83,9 @@ pqSelectThroughPanel::~pqSelectThroughPanel()
 {
   delete this->Implementation;
   delete this->RubberBandHelper;
+  delete[] this->Verts;
 }
+
 
 //----------------------------------------------------------------------------
 pqSelectThroughPanel::pqSelectThroughPanel(pqProxy* object_proxy, QWidget* p) :
@@ -138,6 +140,7 @@ pqSelectThroughPanel::pqSelectThroughPanel(pqProxy* object_proxy, QWidget* p) :
     this->RubberBandHelper, SIGNAL(selectionFinished()),
     this, SLOT(endSelect()));
 
+  this->Verts = new double[32];
 }
 
 //----------------------------------------------------------------------------
@@ -193,43 +196,37 @@ void pqSelectThroughPanel::endSelect()
   pqRenderView* rvm = this->RubberBandHelper->RenderModule;
   vtkRenderer *renderer = rvm->getRenderViewProxy()->GetRenderer();
 
-  double verts[32];
   renderer->SetDisplayPoint(displayRectangle[0], displayRectangle[1], 0);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&verts[0]);
+  renderer->GetWorldPoint(&this->Verts[0]);
 
   renderer->SetDisplayPoint(displayRectangle[0], displayRectangle[1], 1);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&verts[4]);
+  renderer->GetWorldPoint(&this->Verts[4]);
 
   renderer->SetDisplayPoint(displayRectangle[0], displayRectangle[3], 0);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&verts[8]);
+  renderer->GetWorldPoint(&this->Verts[8]);
 
   renderer->SetDisplayPoint(displayRectangle[0], displayRectangle[3], 1);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&verts[12]);
+  renderer->GetWorldPoint(&this->Verts[12]);
 
   renderer->SetDisplayPoint(displayRectangle[2], displayRectangle[1], 0);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&verts[16]);
+  renderer->GetWorldPoint(&this->Verts[16]);
 
   renderer->SetDisplayPoint(displayRectangle[2], displayRectangle[1], 1);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&verts[20]);
+  renderer->GetWorldPoint(&this->Verts[20]);
 
   renderer->SetDisplayPoint(displayRectangle[2], displayRectangle[3], 0);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&verts[24]);
+  renderer->GetWorldPoint(&this->Verts[24]);
   
   renderer->SetDisplayPoint(displayRectangle[2], displayRectangle[3], 1);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&verts[28]);    
-
-  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-  this->proxy()->GetProperty("Frustum"));
-  dvp->SetElements(verts);
-  this->proxy()->UpdateProperty("Frustum",1);
+  renderer->GetWorldPoint(&this->Verts[28]);    
 
   this->setModified();
 
@@ -255,4 +252,17 @@ void pqSelectThroughPanel::setActiveView(pqView* aview)
     }
 
   this->RubberBandHelper->RenderModule = rm;
+}
+
+//----------------------------------------------------------------------------
+void pqSelectThroughPanel::accept()
+{
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+  this->proxy()->GetProperty("Frustum"));
+  dvp->SetElements(this->Verts);
+  //this->proxy()->UpdateProperty("Frustum", 0);
+
+  this->proxy()->UpdateVTKObjects();
+
+  pqObjectPanel::accept();
 }

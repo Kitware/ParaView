@@ -23,42 +23,15 @@
 #include "vtkDoubleArray.h"
 
 vtkStandardNewMacro(vtkSMExtractFrustumProxy);
-vtkCxxRevisionMacro(vtkSMExtractFrustumProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMExtractFrustumProxy, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMExtractFrustumProxy::vtkSMExtractFrustumProxy()
 {
-  this->Frustum = NULL;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMExtractFrustumProxy::~vtkSMExtractFrustumProxy()
 {
-  if (this->Frustum)
-    {
-    this->Frustum->Delete();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMExtractFrustumProxy::SetFrustum(double *vertices)
-{
-  if (this->Frustum == NULL)
-    {
-    this->Frustum = vtkDoubleArray::New();
-    this->Frustum->SetNumberOfComponents(4);
-    this->Frustum->SetNumberOfTuples(8);
-    }
-  double *data = this->Frustum->GetPointer(0);
-  memcpy(data, vertices, 32*sizeof(double));
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMExtractFrustumProxy::RemoveAllValues()
-{
-  if (this->Frustum)
-    {
-    this->Frustum->Reset();
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -103,15 +76,6 @@ void vtkSMExtractFrustumProxy::UpdateVTKObjects()
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     selectionSource->GetProperty("ContentType"));
   ivp->SetElement(0, vtkSelection::FRUSTUM);
-  selectionSource->UpdateVTKObjects();
-
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    selectionSource->GetProperty("Frustum"));
-  if (this->Frustum)
-    {
-    dvp->SetNumberOfElements(32);
-    dvp->SetElements((double*)this->Frustum->GetVoidPointer(0));
-    }  
   selectionSource->UpdateVTKObjects();
 }
 

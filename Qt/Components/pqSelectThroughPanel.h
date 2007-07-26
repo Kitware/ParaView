@@ -55,12 +55,17 @@ public slots:
   void startSelect();
   void endSelect();
 
+  /// accept changes made by this panel overridden to push frustum values over
+  /// necessary because frustum is not yet tied to a widget
+  virtual void accept();
+
   /// Used to keep track of active render module
   void setActiveView(pqView*);
 
 private:
 
   int Mode;
+  double *Verts;
   class pqImplementation;
   pqImplementation* const Implementation;
   pqRubberBandHelper *RubberBandHelper;

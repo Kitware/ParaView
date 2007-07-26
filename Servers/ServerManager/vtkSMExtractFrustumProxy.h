@@ -37,11 +37,6 @@ public:
   // If the object has not been created, it will be created first.
   virtual void UpdateVTKObjects();
 
-  // Description:
-  // Add a range to the selection.
-  void SetFrustum(double *vertices);
-  void RemoveAllValues();
-
 //BTX
 protected:
   vtkSMExtractFrustumProxy();
@@ -52,9 +47,6 @@ protected:
 private:
   vtkSMExtractFrustumProxy(const vtkSMExtractFrustumProxy&); // Not implemented.
   void operator=(const vtkSMExtractFrustumProxy&); // Not implemented.
-
-  vtkDoubleArray* Frustum;
-
 //ETX
 };
 

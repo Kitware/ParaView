@@ -23,42 +23,17 @@
 #include "vtkDoubleArray.h"
 
 vtkStandardNewMacro(vtkSMExtractThresholdsProxy);
-vtkCxxRevisionMacro(vtkSMExtractThresholdsProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMExtractThresholdsProxy, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMExtractThresholdsProxy::vtkSMExtractThresholdsProxy()
 {
-  this->Thresholds = NULL;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMExtractThresholdsProxy::~vtkSMExtractThresholdsProxy()
 {
-  if (this->Thresholds)
-    {
-    this->Thresholds->Delete();
-    }
 }
 
-//-----------------------------------------------------------------------------
-void vtkSMExtractThresholdsProxy::AddThreshold(double min, double max)
-{
-  if (this->Thresholds == NULL)
-    {
-    this->Thresholds = vtkDoubleArray::New();
-    this->Thresholds->SetNumberOfComponents(2);
-    this->Thresholds->SetNumberOfTuples(0);
-    }
-  this->Thresholds->InsertNextTuple2(min,max);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMExtractThresholdsProxy::RemoveAllValues()
-{
-  if (this->Thresholds)
-    {
-    this->Thresholds->Reset();
-    }
-}
 
 //-----------------------------------------------------------------------------
 void vtkSMExtractThresholdsProxy::CreateVTKObjects()
@@ -96,19 +71,6 @@ void vtkSMExtractThresholdsProxy::UpdateVTKObjects()
     {
     vtkErrorMacro("Missing subproxy: SelectionSource");
     return;
-    }
-
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    selectionSource->GetProperty("Thresholds"));
-  int nvalues = 0;
-  if (this->Thresholds)
-    {
-    nvalues = this->Thresholds->GetNumberOfTuples();
-    }
-  dvp->SetNumberOfElements(nvalues*2);
-  if (nvalues)
-    {
-    dvp->SetElements((double*)this->Thresholds->GetVoidPointer(0));
     }
 
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
