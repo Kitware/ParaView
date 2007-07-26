@@ -32,18 +32,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set the input. 
-  virtual void AddInput(unsigned int inputPort,
-                        vtkSMSourceProxy* input,
-                        unsigned int outputPort,
-                        const char* method);
-  virtual void AddInput(vtkSMSourceProxy* input,
-                        const char* method)
-  {
-    this->AddInput(0, input, 0, method);
-  }
-
-  // Description:
   // Called when a representation is added to a view. 
   // Returns true on success.
   // Currently a representation can be added to only one view.
@@ -109,8 +97,6 @@ protected:
   // Description:
   // Marks for Update.
   virtual void InvalidateGeometryInternal(int useCache);
-
-  void SetInputInternal (vtkSMSourceProxy* input, unsigned int outputPort);
 
   vtkSMSourceProxy* CollectProxy;
   vtkSMProxy* UpdateSuppressorProxy;

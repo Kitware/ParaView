@@ -68,33 +68,6 @@ vtkSMDataLabelRepresentationProxy::~vtkSMDataLabelRepresentationProxy()
 
 }
 
-//-----------------------------------------------------------------------------
-void vtkSMDataLabelRepresentationProxy::AddInput(unsigned int inputPort,
-                                           vtkSMSourceProxy* input,
-                                           unsigned int outputPort,
-                                           const char* method)
-{
-  this->Superclass::AddInput(inputPort, input, outputPort, method);
-  this->SetInputInternal(input, outputPort);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMDataLabelRepresentationProxy::SetInputInternal(
-  vtkSMSourceProxy* input, unsigned int outputPort)
-{
-  vtkPVDataInformation *di=input->GetDataInformation();
-  if(!di->DataSetTypeIsA("vtkDataSet") || di->GetCompositeDataClassName())
-    {
-    return;
-    }
-
-  this->InvalidateGeometryInternal(0);
-  this->CreateVTKObjects();
-
-  this->Connect(input, this->CollectProxy, "Input", outputPort);
-  //this->Connect(input, this->CellCenterFilter, "Input", outputPort);
-}
-
 //----------------------------------------------------------------------------
 bool vtkSMDataLabelRepresentationProxy::AddToView(vtkSMViewProxy* view)
 {
@@ -195,6 +168,11 @@ bool vtkSMDataLabelRepresentationProxy::BeginCreateVTKObjects()
 //----------------------------------------------------------------------------
 bool vtkSMDataLabelRepresentationProxy::EndCreateVTKObjects()
 {
+  // There used to be a check to ensure that the data type of input is vtkDataSet.
+  // I've taken that out since it would cause excution of the extract selection
+  // filter. We can put that back if needed.
+  this->Connect(this->GetInputProxy(), this->CollectProxy, 
+    "Input", this->OutputPort);
   this->SetupPipeline();
   this->SetupDefaults();
 
