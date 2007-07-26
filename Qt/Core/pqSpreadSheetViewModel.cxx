@@ -224,12 +224,12 @@ void pqSpreadSheetViewModel::setActiveBlock(QModelIndex top, QModelIndex bottom)
 
 //-----------------------------------------------------------------------------
 QVariant pqSpreadSheetViewModel::data(
-  const QModelIndex& index, int role/*=Qt::DisplayRole*/) const
+  const QModelIndex& idx, int role/*=Qt::DisplayRole*/) const
 {
   vtkSMBlockDeliveryRepresentationProxy* repr = 
     this->Internal->Representation;
-  int row = index.row();
-  int column = index.column();
+  int row = idx.row();
+  int column = idx.column();
   if (role == Qt::DisplayRole && repr)
     {
     vtkIdType blockNumber = this->Internal->computeBlockNumber(row);
