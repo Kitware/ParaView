@@ -34,6 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # define QT_NO_DEBUG
 #endif
 
+#include "QtWidgetsExport.h"
+#ifndef QTWIDGETS_BUILD_SHARED_LIBS
+# define QT_STATICPLUGIN
+#endif
+
 #include "QtWidgetsPlugin.h"
 #include "pqCollapsedGroup.h"
 #include "pqDoubleRangeWidget.h"

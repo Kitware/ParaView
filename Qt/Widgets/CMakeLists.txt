@@ -6,10 +6,6 @@ INCLUDE_DIRECTORIES(
   ${QT_QTDESIGNER_INCLUDE_DIR}
 )
 
-IF(NOT BUILD_SHARED_LIBS)
-  ADD_DEFINITIONS(-DQT_STATICPLUGIN)
-ENDIF(NOT BUILD_SHARED_LIBS)
-
 ## Add the source (*.cxx,*.h) files here.
 SET(QtWidgets_SRCS
   pqAnimationKeyFrame.cxx
