@@ -33,7 +33,7 @@ This filter extracts cell and point variables at a given location over time. The
         label="Locations" 
         default_values="0 0 0">
         <Documentation>
-          The list of locations that will be added to the selection produced by the selection source. So far only a single location will actually be plotted.
+          The list of locations that will be added to the selection produced by the selection source. Only the first location is currently plotted.
         </Documentation>
      </DoubleVectorProperty> 
 
@@ -42,7 +42,14 @@ This filter extracts cell and point variables at a given location over time. The
           proxyname="SelectionSource">
         </Proxy>
      </SubProxy>
-     <!-- End ProbePointOverTime -->
+
+     <Hints>
+       <PropertyGroup type="Handle" label="Location Widget">
+         <Property function="WorldPosition" name="Locations" />
+       </PropertyGroup>
+     </Hints>
+
+     <!-- End ProbeLocationOverTime -->
    </ExtractLocationsProxy>
     
    <ExtractSelectionProxy name="ExtractPointsOverTime"
@@ -50,7 +57,7 @@ This filter extracts cell and point variables at a given location over time. The
                           label="Plot Point over Time"
                           selection_field_type="POINT">
      <Documentation>
-This filter extracts the variables associated with a point over time. The output is a 1D rectilinear grid where the x coordinates correspond to time (the same array is also copied to a point array named Time or TimeData (if Time exists in the input)).  The input point coordinates are copied to a point array named Point Coordinates or Points (if Point Coordinates exists in the input).
+This filter extracts the variables associated with a vertex over time. The output is a 1D rectilinear grid where the x coordinates correspond to time (the same array is also copied to a point array named Time or TimeData (if Time exists in the input)).  The input point coordinates are copied to a point array named Point Coordinates or Points (if Point Coordinates exists in the input).
      </Documentation>
      <InputProperty
          name="Input"
@@ -6740,9 +6747,9 @@ This filter extracts a list of datasets from multigroup datasets.
    <!-- End of TimeToTextConvertor -->
    </SourceProxy>
 
-   <SourceProxy name="SelectThrough" 
+   <ExtractFrustumProxy name="SelectThrough"
     label="Select Through"
-    class="vtkExtractSelectedFrustum">
+    class="vtkExtractSelection">
     <Documentation
        long_help="Draw a rubber band on the screen and select all cells behind it."
        short_help="Select cells behind a region of the screen.">
@@ -6763,7 +6770,7 @@ This extracts all cells within a frustum that is defined as the volume behind a 
          The input from which the selection is extracted.
        </Documentation>
      </InputProperty>
-
+<!--
      <IntVectorProperty 
         name="PartiallyWithin" 
         command="SetExactTest" 
@@ -6807,13 +6814,14 @@ This extracts all cells within a frustum that is defined as the volume behind a 
          If this property is set to 0, the filter will return that portion of the dataset that lies outside of the frustum instead of inside.
        </Documentation>
      </IntVectorProperty>
-
-     <DoubleVectorProperty
-        name="CreateFrustum"
-        command="CreateFrustum"
+-->
+     <DoubleVectorProperty 
+        name="Frustum"
+        command="SetFrustum" 
+        clean_command="RemoveAllValues"
         number_of_elements="32"
         argument_is_array="1"
-        is_internal="1"
+        update_self="1"
         default_values=
         "0.0 0.0 1.0 0.0
          0.0 0.0 0.0 0.0
@@ -6822,17 +6830,67 @@ This extracts all cells within a frustum that is defined as the volume behind a 
          1.0 0.0 1.0 0.0
          1.0 0.0 0.0 0.0
          1.0 1.0 1.0 0.0
-         1.0 1.0 0.0 0.0">
-       <Documentation>
-         Defines the eight corners of the frustum.
-       </Documentation>
-     </DoubleVectorProperty>
+         1.0 1.0 0.0 0.0"
+        label="Frustum">
+        <Documentation>
+          Vertices that define a frustum for the selection source.
+        </Documentation>
+     </DoubleVectorProperty> 
+
+     <SubProxy>
+        <Proxy name="SelectionSource" proxygroup="sources"
+          proxyname="SelectionSource">
+        </Proxy>
+     </SubProxy>
 
      <Hints>
        <Visibility replace_input="2" />
      </Hints>
    <!-- End SelectThrough -->
-   </SourceProxy>
+   </ExtractFrustumProxy>
+
+   <ExtractThresholdsProxy name="ExtractThresholds"
+                          class="vtkExtractSelection"
+                          label="Extract Thresholds">
+     <Documentation> 
+This filter extracts a set of thresholds of its input.
+     </Documentation>
+     <InputProperty
+         name="Input"
+         command="SetInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet"/>
+       </DataTypeDomain>
+       <Documentation>
+         The input from which the selection is extracted.
+       </Documentation>
+     </InputProperty>
+
+     <DoubleVectorProperty 
+        name="Thresholds"
+        command="AddThreshold" 
+        clean_command="RemoveAllValues"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        number_of_elements="0"
+        update_self="1"
+        label="Thresholds">
+        <Documentation>
+          The list of thresholds that will be added to the selection produced by the selection source.
+        </Documentation>
+     </DoubleVectorProperty> 
+
+     <SubProxy>
+        <Proxy name="SelectionSource" proxygroup="sources"
+          proxyname="SelectionSource">
+        </Proxy>
+     </SubProxy>
+     <!-- End ExtractThresholds -->
+   </ExtractThresholdsProxy>
 
    </ProxyGroup>
 

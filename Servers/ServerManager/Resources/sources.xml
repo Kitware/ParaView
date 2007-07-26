@@ -1256,6 +1256,41 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
         </Documentation>
      </DoubleVectorProperty> 
 
+     <DoubleVectorProperty 
+        name="Thresholds"
+        command="AddThreshold" 
+        clean_command="RemoveAllValues"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        number_of_elements="0"
+        label="Thresholds">
+        <Documentation>
+          The list of thresholds that will be added to the selection produced by the selection source.
+        </Documentation>
+     </DoubleVectorProperty> 
+
+     <DoubleVectorProperty 
+        name="Frustum"
+        command="SetFrustum" 
+        clean_command="RemoveAllValues"
+        repeat_command="0"
+        number_of_elements="32"
+        argument_is_array="1"
+        default_values=
+        "0.0 0.0 1.0 0.0
+         0.0 0.0 0.0 0.0
+         0.0 1.0 1.0 0.0
+         0.0 1.0 0.0 0.0
+         1.0 0.0 1.0 0.0
+         1.0 0.0 0.0 0.0
+         1.0 1.0 1.0 0.0
+         1.0 1.0 0.0 0.0"
+        label="Frustum">
+        <Documentation>
+          Vertices that define a frustum for the selection source.
+        </Documentation>
+     </DoubleVectorProperty> 
+
      <IntVectorProperty
         name="ContentType"
         command="SetContentType"

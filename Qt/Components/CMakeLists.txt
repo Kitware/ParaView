@@ -81,12 +81,12 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDoubleSpinBoxDomain.h
   pqEditServerStartupDialog.h
   pqElementInspectorWidget.h
-#  pqExtractThresholdsPanel.h
   pqExodusIIPanel.h
   pqExodusPanel.h
   pqExtractDataSetsPanel.h  
   pqExtractLocationsPanel.h  
   pqExtractSelectionPanel.h  
+  pqExtractThresholdsPanel.h  
   pqFileChooserWidget.h
   pqFilterInputDialog.h
   pqFieldSelectionAdaptor.h
@@ -196,6 +196,7 @@ SET(UI_FORMS
   Resources/UI/pqExtractDataSetsPanel.ui
   Resources/UI/pqExtractLocationsPanel.ui
   Resources/UI/pqExtractSelectionPanel.ui
+  Resources/UI/pqExtractThresholdsPanel.ui
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
   Resources/UI/pqKeyFrameEditor.ui
@@ -371,8 +372,8 @@ ADD_LIBRARY(pqComponents
   pqExtractLocationsPanel.h
   pqExtractSelectionPanel.cxx
   pqExtractSelectionPanel.h
-#  pqExtractThresholdsPanel.cxx
-#  pqExtractThresholdsPanel.h
+  pqExtractThresholdsPanel.cxx
+  pqExtractThresholdsPanel.h
   pqFileChooserWidget.cxx
   pqFileChooserWidget.h
   pqFilterInputDialog.cxx

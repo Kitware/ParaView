@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSelectThroughPanel.h
+   Module:    pqExtractThresholdsPanel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,41 +29,46 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#ifndef __pqExtractThresholdsPanel_h
+#define __pqExtractThresholdsPanel_h
 
-#ifndef _pqSelectThroughPanel_h
-#define _pqSelectThroughPanel_h
 
 #include "pqObjectPanel.h"
-class pqRubberBandHelper;
-class pqView;
 
-/// Custom panel for frustum selection.
-class PQCOMPONENTS_EXPORT pqSelectThroughPanel :
-  public pqObjectPanel
+/// pqExtractThresholdsPanel is a custom panel used to type in thresholds to
+// analyze in ParaView.
+class PQCOMPONENTS_EXPORT pqExtractThresholdsPanel : public pqObjectPanel
 {
-  typedef pqObjectPanel Superclass;
-
   Q_OBJECT
-
+  typedef pqObjectPanel Superclass;
 public:
-  pqSelectThroughPanel(pqProxy* proxy, QWidget* p);
-  ~pqSelectThroughPanel();
+  pqExtractThresholdsPanel(pqProxy* proxy, QWidget* parent=0);
+  ~pqExtractThresholdsPanel();
 
-public slots:
+  /// Called when the panel becomes active. 
+  virtual void select();
 
-  /// called when rubber band creation finished
-  void startSelect();
-  void endSelect();
+protected slots:
+  /// Deletes selected elements.
+  void deleteSelected();
 
-  /// Used to keep track of active render module
-  void setActiveView(pqView*);
+  /// Deletes all elements.
+  void deleteAll();
+
+  // Adds a new value.
+  void newValue();
+
+protected:
+  /// Creates links between the Qt widgets and the server manager properties.
+  void linkServerManagerProperties();
 
 private:
+  pqExtractThresholdsPanel(const pqExtractThresholdsPanel&); // Not implemented.
+  void operator=(const pqExtractThresholdsPanel&); // Not implemented.
 
-  int Mode;
-  class pqImplementation;
-  pqImplementation* const Implementation;
-  pqRubberBandHelper *RubberBandHelper;
+
+  class pqInternal;
+  pqInternal *Internal;
 };
 
 #endif

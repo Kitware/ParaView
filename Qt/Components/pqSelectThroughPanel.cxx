@@ -60,17 +60,21 @@ class pqSelectThroughPanel::pqImplementation
 {
 public:
   pqImplementation() :
+/*
     PartiallyWithinWidget(tr("Partially Within")),
     PassThroughWidget(tr("Preserve Topology")),
     ShowBoundsWidget(tr("Show Frustum")),
     InsideOutWidget(tr("Inside Out")),
+*/
     StartSelect(tr("Start Select"))
   {
   }
+/*
   QCheckBox PartiallyWithinWidget;
   QCheckBox PassThroughWidget;
   QCheckBox ShowBoundsWidget;
   QCheckBox InsideOutWidget;
+*/
   QPushButton StartSelect;
 };
 
@@ -88,14 +92,17 @@ pqSelectThroughPanel::pqSelectThroughPanel(pqProxy* object_proxy, QWidget* p) :
 {  
   QVBoxLayout* const panel_layout = new QVBoxLayout(this);
   panel_layout->addWidget(&this->Implementation->StartSelect);
+/*
   panel_layout->addWidget(&this->Implementation->PartiallyWithinWidget);
   panel_layout->addWidget(&this->Implementation->PassThroughWidget);
   panel_layout->addWidget(&this->Implementation->ShowBoundsWidget);
   panel_layout->addWidget(&this->Implementation->InsideOutWidget);
+*/
   panel_layout->addStretch();
 
   this->Mode = pqRubberBandHelper::INTERACT;
 
+/*
   this->propertyManager()->registerLink(
     &this->Implementation->PartiallyWithinWidget, "checked", SIGNAL(toggled(bool)),
     this->proxy(), 
@@ -115,6 +122,7 @@ pqSelectThroughPanel::pqSelectThroughPanel(pqProxy* object_proxy, QWidget* p) :
     &this->Implementation->InsideOutWidget, "checked", SIGNAL(toggled(bool)),
     this->proxy(), 
     this->proxy()->GetProperty("InsideOut"));
+*/
 
   this->RubberBandHelper = new pqRubberBandHelper;
 
@@ -129,6 +137,7 @@ pqSelectThroughPanel::pqSelectThroughPanel(pqProxy* object_proxy, QWidget* p) :
   QObject::connect(
     this->RubberBandHelper, SIGNAL(selectionFinished()),
     this, SLOT(endSelect()));
+
 }
 
 //----------------------------------------------------------------------------
@@ -185,7 +194,6 @@ void pqSelectThroughPanel::endSelect()
   vtkRenderer *renderer = rvm->getRenderViewProxy()->GetRenderer();
 
   double verts[32];
-
   renderer->SetDisplayPoint(displayRectangle[0], displayRectangle[1], 0);
   renderer->DisplayToWorld();
   renderer->GetWorldPoint(&verts[0]);
@@ -219,9 +227,11 @@ void pqSelectThroughPanel::endSelect()
   renderer->GetWorldPoint(&verts[28]);    
 
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-  this->proxy()->GetProperty("CreateFrustum"));
+  this->proxy()->GetProperty("Frustum"));
   dvp->SetElements(verts);
-  this->proxy()->UpdateProperty("CreateFrustum",1);
+  this->proxy()->UpdateProperty("Frustum",1);
+
+  this->setModified();
 
   this->RubberBandHelper->RenderModule->render();
 }
