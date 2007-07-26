@@ -3743,9 +3743,9 @@
    fun:_ZN15QPainterPrivate12updateMatrixEv
    fun:_ZN8QPainter5beginEP12QPaintDevice
    fun:_ZN8QPainterC1EP12QPaintDevice
-   fun:_ZN11pqChartArea10paintEventEP11QPaintEvent
+   fun:_ZN*10paintEventEP11QPaintEvent
    fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN11pqChartArea5eventEP6QEvent
+   fun:_ZN*5eventEP6QEvent
    fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
    fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
    fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
@@ -3790,7 +3790,6 @@
    fun:_ZN7QWidgetD2Ev
    fun:_ZN6QFrameD2Ev
    fun:_ZN19QAbstractScrollAreaD2Ev
-   fun:_ZN13pqChartWidgetD0Ev
 }
 {
    <insert a suppression name here>
@@ -5450,12 +5449,6 @@
    fun:_XSend
    obj:/usr/lib/libX11.so.6.2.0
    fun:XPutImage
-   fun:XCreateBitmapFromData
-   fun:_ZN7QBitmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
-   fun:_ZNK7QPixmap19createMaskFromColorERK6QColor
-   fun:_ZN22ProcessModuleGUIHelperC1Ev
-   fun:_ZN22ProcessModuleGUIHelper3NewEv
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -5498,21 +5491,6 @@
    fun:_ZN15QPainterPrivate11draw_helperERK12QPainterPathNS_13DrawOperationE
    fun:_ZN8QPainter9drawRectsEPK5QRecti
    fun:_ZN8QPainter8fillRectERK5QRectRK6QBrush
-   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZN12pqTreeWidgetC1EP7QWidget
-   fun:_ZN27Ui_pqProxyInformationWidget7setupUiEP7QWidget
-   fun:_ZN24pqProxyInformationWidgetC1EP7QWidget
-   fun:_ZN16pqProxyTabWidgetC1EP7QWidget
-   fun:_ZN16pqMainWindowCore19setupProxyTabWidgetEP11QDockWidget
-   fun:_ZN10MainWindowC1Ev
-   fun:_ZN22ProcessModuleGUIHelper16CreateMainWindowEv
-   fun:_ZN24pqProcessModuleGUIHelper21InitializeApplicationEiPPc
-   fun:_ZN24pqProcessModuleGUIHelper11RunGUIStartEiPPcii
-   fun:_ZN16vtkProcessModule11StartClientEiPPc
-   fun:_ZN16vtkProcessModule5StartEiPPc
-   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
-   fun:_ZN6pqMain3RunER12QApplicationP24pqProcessModuleGUIHelper
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -5523,21 +5501,6 @@
    fun:_ZN15QPainterPrivate11draw_helperERK12QPainterPathNS_13DrawOperationE
    fun:_ZN8QPainter9drawRectsEPK5QRecti
    fun:_ZN8QPainter8fillRectERK5QRectRK6QBrush
-   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZN12pqTreeWidgetC1EP7QWidget
-   fun:_ZN27Ui_pqProxyInformationWidget7setupUiEP7QWidget
-   fun:_ZN24pqProxyInformationWidgetC1EP7QWidget
-   fun:_ZN16pqProxyTabWidgetC1EP7QWidget
-   fun:_ZN16pqMainWindowCore19setupProxyTabWidgetEP11QDockWidget
-   fun:_ZN10MainWindowC1Ev
-   fun:_ZN22ProcessModuleGUIHelper16CreateMainWindowEv
-   fun:_ZN24pqProcessModuleGUIHelper21InitializeApplicationEiPPc
-   fun:_ZN24pqProcessModuleGUIHelper11RunGUIStartEiPPcii
-   fun:_ZN16vtkProcessModule11StartClientEiPPc
-   fun:_ZN16vtkProcessModule5StartEiPPc
-   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
-   fun:_ZN6pqMain3RunER12QApplicationP24pqProcessModuleGUIHelper
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -5549,21 +5512,6 @@
    fun:_ZN15QPainterPrivate11draw_helperERK12QPainterPathNS_13DrawOperationE
    fun:_ZN8QPainter9drawRectsEPK5QRecti
    fun:_ZN8QPainter8fillRectERK5QRectRK6QBrush
-   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZN12pqTreeWidgetC1EP7QWidget
-   fun:_ZN27Ui_pqProxyInformationWidget7setupUiEP7QWidget
-   fun:_ZN24pqProxyInformationWidgetC1EP7QWidget
-   fun:_ZN16pqProxyTabWidgetC1EP7QWidget
-   fun:_ZN16pqMainWindowCore19setupProxyTabWidgetEP11QDockWidget
-   fun:_ZN10MainWindowC1Ev
-   fun:_ZN22ProcessModuleGUIHelper16CreateMainWindowEv
-   fun:_ZN24pqProcessModuleGUIHelper21InitializeApplicationEiPPc
-   fun:_ZN24pqProcessModuleGUIHelper11RunGUIStartEiPPcii
-   fun:_ZN16vtkProcessModule11StartClientEiPPc
-   fun:_ZN16vtkProcessModule5StartEiPPc
-   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
-   fun:_ZN6pqMain3RunER12QApplicationP24pqProcessModuleGUIHelper
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -5832,69 +5780,9 @@
    Memcheck:Cond
    fun:_ZN15QPainterPrivate12updateMatrixEv
    fun:_ZN8QPainter5beginEP12QPaintDevice
-   fun:_ZN8QPainterC1EP12QPaintDevice
-   fun:_ZN10QStatusBar10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN10QStatusBar5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-}
-{
-   <insert a suppression name here>
-   Memcheck:Cond
-   fun:_ZN15QPainterPrivate12updateMatrixEv
-   fun:_ZN8QPainter5beginEP12QPaintDevice
-   fun:_ZN8QPainterC1EP12QPaintDevice
-   fun:_ZN9QSizeGrip10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN9QSizeGrip5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-}
-{
-   <insert a suppression name here>
-   Memcheck:Cond
-   fun:_ZN15QPainterPrivate12updateMatrixEv
-   fun:_ZN8QPainter5beginEP12QPaintDevice
    fun:_ZN12QProgressBar10paintEventEP11QPaintEvent
    fun:_ZN7QWidget5eventEP6QEvent
    fun:_ZN12QProgressBar5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-}
-{
-   <insert a suppression name here>
-   Memcheck:Cond
-   fun:_ZN15QPainterPrivate12updateMatrixEv
-   fun:_ZN8QPainter5beginEP12QPaintDevice
-   fun:_ZN8QPainterC1EP12QPaintDevice
-   fun:_ZN11QDockWidget10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN11QDockWidget5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-}
-{
-   <insert a suppression name here>
-   Memcheck:Cond
-   fun:_ZN15QPainterPrivate12updateMatrixEv
-   fun:_ZN8QPainter5beginEP12QPaintDevice
-   fun:_ZN8QPainterC1EP12QPaintDevice
-   fun:_ZN22QDockWidgetTitleButton10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN15QAbstractButton5eventEP6QEvent
    fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
    fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
    fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
@@ -5945,17 +5833,6 @@
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
    fun:_ZNK12QApplication12inputContextEv
    fun:_ZN7QWidget12inputContextEv
-   fun:_ZN7QWidget16updateMicroFocusEv
-   fun:_ZN16QLineEditPrivate12finishChangeEibb
-   fun:_ZN16QLineEditPrivate7setTextERK7QStringib
-   fun:_ZN9QLineEdit7setTextERK7QString
-   fun:_ZN9QLineEdit11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZNK13QMetaProperty5writeEP7QObjectRK8QVariant
-   fun:_ZN7QObject11setPropertyEPKcRK8QVariant
-   fun:_ZN25pqPropertyLinksConnection23smLinkedPropertyChangedEv
-   fun:_ZN15pqPropertyLinks15addPropertyLinkEP7QObjectPKcS3_P10vtkSMProxyP13vtkSMPropertyi
-   fun:_ZN16pqAnimationPanel20onActiveSceneChangedEP16pqAnimationScene
-   fun:_ZN16pqAnimationPanel11qt_metacallEN11QMetaObject4CallEiPPv
 }
 {
    <insert a suppression name here>
@@ -5967,23 +5844,6 @@
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
    fun:_ZNK12QApplication12inputContextEv
    fun:_ZN7QWidget12inputContextEv
-   fun:_ZN7QWidget16updateMicroFocusEv
-   fun:_ZN16QLineEditPrivate12finishChangeEibb
-   fun:_ZN16QLineEditPrivate7setTextERK7QStringib
-   fun:_ZN9QLineEdit7setTextERK7QString
-   fun:_ZN9QLineEdit11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZNK13QMetaProperty5writeEP7QObjectRK8QVariant
-   fun:_ZN7QObject11setPropertyEPKcRK8QVariant
-   fun:_ZN25pqPropertyLinksConnection23smLinkedPropertyChangedEv
-   fun:_ZN15pqPropertyLinks15addPropertyLinkEP7QObjectPKcS3_P10vtkSMProxyP13vtkSMPropertyi
-   fun:_ZN16pqAnimationPanel20onActiveSceneChangedEP16pqAnimationScene
-   fun:_ZN16pqAnimationPanel11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
-   fun:_ZN18pqAnimationManager18activeSceneChangedEP16pqAnimationScene
-   fun:_ZN18pqAnimationManager12onProxyAddedEP7pqProxy
-   fun:_ZN18pqAnimationManager11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
 }
 {
    <insert a suppression name here>
@@ -5998,20 +5858,6 @@
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
    fun:_ZNK12QApplication12inputContextEv
    fun:_ZN7QWidget12inputContextEv
-   fun:_ZN7QWidget16updateMicroFocusEv
-   fun:_ZN16QLineEditPrivate12finishChangeEibb
-   fun:_ZN16QLineEditPrivate7setTextERK7QStringib
-   fun:_ZN9QLineEdit7setTextERK7QString
-   fun:_ZN9QLineEdit11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZNK13QMetaProperty5writeEP7QObjectRK8QVariant
-   fun:_ZN7QObject11setPropertyEPKcRK8QVariant
-   fun:_ZN25pqPropertyLinksConnection23smLinkedPropertyChangedEv
-   fun:_ZN15pqPropertyLinks15addPropertyLinkEP7QObjectPKcS3_P10vtkSMProxyP13vtkSMPropertyi
-   fun:_ZN16pqAnimationPanel20onActiveSceneChangedEP16pqAnimationScene
-   fun:_ZN16pqAnimationPanel11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
-   fun:_ZN18pqAnimationManager18activeSceneChangedEP16pqAnimationScene
 }
 {
    <insert a suppression name here>
@@ -6041,7 +5887,6 @@
    fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
    fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
    fun:_ZN12QApplicationC1ERiPPci
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -6056,7 +5901,6 @@
    fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
    fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
    fun:_ZN12QApplicationC1ERiPPci
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -6097,14 +5941,6 @@
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
    fun:_ZNK12QApplication12inputContextEv
    fun:_ZN7QWidget12inputContextEv
-   fun:_ZN7QWidget16updateMicroFocusEv
-   fun:_ZN16QLineEditPrivate12finishChangeEibb
-   fun:_ZN16QLineEditPrivate7setTextERK7QStringib
-   fun:_ZN9QLineEdit7setTextERK7QString
-   fun:_ZN9QLineEdit11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZNK13QMetaProperty5writeEP7QObjectRK8QVariant
-   fun:_ZN7QObject11setPropertyEPKcRK8QVariant
-   fun:_ZN25pqPropertyLinksConnection23smLinkedPropertyChangedEv
 }
 {
    <insert a suppression name here>
@@ -6126,13 +5962,6 @@
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
    fun:_ZNK12QApplication12inputContextEv
    fun:_ZN7QWidget12inputContextEv
-   fun:_ZN7QWidget16updateMicroFocusEv
-   fun:_ZN16QLineEditPrivate12finishChangeEibb
-   fun:_ZN16QLineEditPrivate7setTextERK7QStringib
-   fun:_ZN9QLineEdit7setTextERK7QString
-   fun:_ZN9QLineEdit11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZNK13QMetaProperty5writeEP7QObjectRK8QVariant
-   fun:_ZN7QObject11setPropertyEPKcRK8QVariant
 }
 {
    <insert a suppression name here>
@@ -6180,15 +6009,6 @@
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
    fun:_ZNK12QApplication12inputContextEv
    fun:_ZN7QWidget12inputContextEv
-   fun:_ZN7QWidget16updateMicroFocusEv
-   fun:_ZN16QLineEditPrivate12finishChangeEibb
-   fun:_ZN16QLineEditPrivate7setTextERK7QStringib
-   fun:_ZN9QLineEdit7setTextERK7QString
-   fun:_ZN9QLineEdit11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZNK13QMetaProperty5writeEP7QObjectRK8QVariant
-   fun:_ZN7QObject11setPropertyEPKcRK8QVariant
-   fun:_ZN25pqPropertyLinksConnection23smLinkedPropertyChangedEv
-   fun:_ZN15pqPropertyLinks15addPropertyLinkEP7QObjectPKcS3_P10vtkSMProxyP13vtkSMPropertyi
 }
 {
    <insert a suppression name here>
@@ -6208,15 +6028,6 @@
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
    fun:_ZNK12QApplication12inputContextEv
    fun:_ZN7QWidget12inputContextEv
-   fun:_ZN7QWidget16updateMicroFocusEv
-   fun:_ZN16QLineEditPrivate12finishChangeEibb
-   fun:_ZN16QLineEditPrivate7setTextERK7QStringib
-   fun:_ZN9QLineEdit7setTextERK7QString
-   fun:_ZN9QLineEdit11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZNK13QMetaProperty5writeEP7QObjectRK8QVariant
-   fun:_ZN7QObject11setPropertyEPKcRK8QVariant
-   fun:_ZN25pqPropertyLinksConnection23smLinkedPropertyChangedEv
-   fun:_ZN15pqPropertyLinks15addPropertyLinkEP7QObjectPKcS3_P10vtkSMProxyP13vtkSMPropertyi
 }
 {
    <insert a suppression name here>
@@ -6237,7 +6048,6 @@
    fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
    fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
    fun:_ZN12QApplicationC1ERiPPci
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -6259,13 +6069,6 @@
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
    fun:_ZNK12QApplication12inputContextEv
    fun:_ZN7QWidget12inputContextEv
-   fun:_ZN7QWidget16updateMicroFocusEv
-   fun:_ZN16QLineEditPrivate12finishChangeEibb
-   fun:_ZN16QLineEditPrivate7setTextERK7QStringib
-   fun:_ZN9QLineEdit7setTextERK7QString
-   fun:_ZN9QLineEdit11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZNK13QMetaProperty5writeEP7QObjectRK8QVariant
-   fun:_ZN7QObject11setPropertyEPKcRK8QVariant
 }
 {
    <insert a suppression name here>
@@ -6387,15 +6190,6 @@
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
    fun:_ZNK12QApplication12inputContextEv
    fun:_ZN7QWidget12inputContextEv
-   fun:_ZN7QWidget16updateMicroFocusEv
-   fun:_ZN16QLineEditPrivate12finishChangeEibb
-   fun:_ZN16QLineEditPrivate7setTextERK7QStringib
-   fun:_ZN9QLineEdit7setTextERK7QString
-   fun:_ZN9QLineEdit11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZNK13QMetaProperty5writeEP7QObjectRK8QVariant
-   fun:_ZN7QObject11setPropertyEPKcRK8QVariant
-   fun:_ZN25pqPropertyLinksConnection23smLinkedPropertyChangedEv
-   fun:_ZN15pqPropertyLinks15addPropertyLinkEP7QObjectPKcS3_P10vtkSMProxyP13vtkSMPropertyi
 }
 {
    <insert a suppression name here>
@@ -6455,15 +6249,6 @@
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
    fun:_ZNK12QApplication12inputContextEv
    fun:_ZN7QWidget12inputContextEv
-   fun:_ZN7QWidget16updateMicroFocusEv
-   fun:_ZN16QLineEditPrivate12finishChangeEibb
-   fun:_ZN16QLineEditPrivate7setTextERK7QStringib
-   fun:_ZN9QLineEdit7setTextERK7QString
-   fun:_ZN9QLineEdit11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZNK13QMetaProperty5writeEP7QObjectRK8QVariant
-   fun:_ZN7QObject11setPropertyEPKcRK8QVariant
-   fun:_ZN25pqPropertyLinksConnection23smLinkedPropertyChangedEv
-   fun:_ZN15pqPropertyLinks15addPropertyLinkEP7QObjectPKcS3_P10vtkSMProxyP13vtkSMPropertyi
 }
 {
    <insert a suppression name here>
@@ -6557,11 +6342,11 @@
    fun:_ZN15QPainterPrivate12updateMatrixEv
    fun:_ZN8QPainter5beginEP12QPaintDevice
    fun:_ZN8QPainterC1EP12QPaintDevice
-   fun:_ZN14pqFlatTreeView10paintEventEP11QPaintEvent
+   fun:_ZN*10paintEventEP11QPaintEvent
    fun:_ZN7QWidget5eventEP6QEvent
    fun:_ZN6QFrame5eventEP6QEvent
    fun:_ZN19QAbstractScrollArea13viewportEventEP6QEvent
-   fun:_ZN14pqFlatTreeView13viewportEventEP6QEvent
+   fun:_ZN*View13viewportEventEP6QEvent
    fun:_ZN25QAbstractScrollAreaFilter11eventFilterEP7QObjectP6QEvent
    fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
    fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
@@ -6631,21 +6416,6 @@
    fun:_ZN15QPainterPrivate12updateMatrixEv
    fun:_ZN8QPainter5beginEP12QPaintDevice
    fun:_ZN8QPainterC1EP12QPaintDevice
-   fun:_ZN8QToolBar10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN8QToolBar5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-}
-{
-   <insert a suppression name here>
-   Memcheck:Cond
-   fun:_ZN15QPainterPrivate12updateMatrixEv
-   fun:_ZN8QPainter5beginEP12QPaintDevice
-   fun:_ZN8QPainterC1EP12QPaintDevice
    fun:_ZN14QToolBarHandle10paintEventEP11QPaintEvent
    fun:_ZN7QWidget5eventEP6QEvent
    fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
@@ -6662,21 +6432,6 @@
    fun:_ZN8QPainterC1EP12QPaintDevice
    fun:_ZN17QToolBarSeparator10paintEventEP11QPaintEvent
    fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-}
-{
-   <insert a suppression name here>
-   Memcheck:Cond
-   fun:_ZN15QPainterPrivate12updateMatrixEv
-   fun:_ZN8QPainter5beginEP12QPaintDevice
-   fun:_ZN8QPainterC1EP12QPaintDevice
-   fun:_ZN9QLineEdit10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN9QLineEdit5eventEP6QEvent
    fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
    fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
    fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
@@ -6707,24 +6462,6 @@
    fun:_ZN9QComboBox10paintEventEP11QPaintEvent
    fun:_ZN7QWidget5eventEP6QEvent
    fun:_ZN9QComboBox5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-}
-{
-   <insert a suppression name here>
-   Memcheck:Cond
-   fun:_ZN15QPainterPrivate12updateMatrixEv
-   fun:_ZN8QPainter5beginEP12QPaintDevice
-   fun:_ZN8QPainterC1EP12QPaintDevice
-   fun:_ZN9QListView10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN6QFrame5eventEP6QEvent
-   fun:_ZN19QAbstractScrollArea13viewportEventEP6QEvent
-   fun:_ZN17QAbstractItemView13viewportEventEP6QEvent
-   fun:_ZN25QAbstractScrollAreaFilter11eventFilterEP7QObjectP6QEvent
    fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
    fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
    fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
@@ -6771,7 +6508,7 @@
    fun:_ZN15QX11PaintEngine3endEv
    fun:_ZN8QPainter3endEv
    fun:_ZN8QPainterD2Ev
-   fun:_ZN11QToolButton10paintEventEP11QPaintEvent
+   fun:_ZN*10paintEventEP11QPaintEvent
    fun:_ZN7QWidget5eventEP6QEvent
    fun:_ZN15QAbstractButton5eventEP6QEvent
    fun:_ZN11QToolButton5eventEP6QEvent
@@ -6787,21 +6524,6 @@
    fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
    fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
    fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-}
-{
-   <insert a suppression name here>
-   Memcheck:Cond
-   fun:_ZN15QPainterPrivate12updateMatrixEv
-   fun:_ZN8QPainter5beginEP12QPaintDevice
-   fun:_ZN8QPainterC1EP12QPaintDevice
-   fun:_ZN7QSlider10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN7QSlider5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
    fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
 }
 {
@@ -7031,21 +6753,6 @@
    fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
    fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
    fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
-}
-{
-   <insert a suppression name here>
-   Memcheck:Cond
-   fun:_ZN15QPainterPrivate12updateMatrixEv
-   fun:_ZN8QPainter5beginEP12QPaintDevice
-   fun:_ZN8QPainterC1EP12QPaintDevice
-   fun:_ZN10QScrollBar10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN10QScrollBar5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
 }
 {
    <insert a suppression name here>
@@ -7560,43 +7267,6 @@
    fun:_ZN9QGroupBox10paintEventEP11QPaintEvent
    fun:_ZN7QWidget5eventEP6QEvent
    fun:_ZN9QGroupBox5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-}
-{
-   <insert a suppression name here>
-   Memcheck:Cond
-   fun:_ZN15QPainterPrivate12updateMatrixEv
-   fun:_ZN8QPainter5beginEP12QPaintDevice
-   fun:_ZN8QPainterC1EP12QPaintDevice
-   fun:_ZN9QTreeView10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN6QFrame5eventEP6QEvent
-   fun:_ZN19QAbstractScrollArea13viewportEventEP6QEvent
-   fun:_ZN17QAbstractItemView13viewportEventEP6QEvent
-   fun:_ZN25QAbstractScrollAreaFilter11eventFilterEP7QObjectP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-}
-{
-   <insert a suppression name here>
-   Memcheck:Cond
-   fun:_ZN15QPainterPrivate12updateMatrixEv
-   fun:_ZN8QPainter5beginEP12QPaintDevice
-   fun:_ZN8QPainterC1EP12QPaintDevice
-   fun:_ZN11QHeaderView10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN6QFrame5eventEP6QEvent
-   fun:_ZN19QAbstractScrollArea13viewportEventEP6QEvent
-   fun:_ZN17QAbstractItemView13viewportEventEP6QEvent
-   fun:_ZN11QHeaderView13viewportEventEP6QEvent
-   fun:_ZN25QAbstractScrollAreaFilter11eventFilterEP7QObjectP6QEvent
    fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
    fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
    fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
@@ -9655,20 +9325,6 @@
    fun:_ZNK11QTextEngine5shapeEi
    fun:_ZN9QTextLine13layout_helperEi
    fun:_ZN9QTextLine12setLineWidthEd
-   fun:_ZN26QTextDocumentLayoutPrivate11layoutBlockERK10QTextBlockP13QLayoutStructiiS2_
-   fun:_ZN26QTextDocumentLayoutPrivate10layoutFlowEN10QTextFrame8iteratorEP13QLayoutStructii
-   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameiidd
-   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameii
-   fun:_ZN19QTextDocumentLayout8doLayoutEiii
-   fun:_ZNK26QTextDocumentLayoutPrivate24ensureLayoutedByPositionEi
-   fun:_ZNK26QTextDocumentLayoutPrivate10layoutStepEv
-   fun:_ZN19QTextDocumentLayout15documentChangedEiii
-   fun:_ZN20QTextDocumentPrivate9setLayoutEP27QAbstractTextDocumentLayout
-   fun:_ZNK13QTextDocument14documentLayoutEv
-   fun:_ZNK13QLabelPrivate18ensureTextLayoutedEv
-   fun:_ZNK13QLabelPrivate12sizeForWidthEi
-   fun:_ZNK6QLabel15minimumSizeHintEv
-   fun:_Z13qSmartMaxSizePK11QWidgetItem6QFlagsIN2Qt13AlignmentFlagEE
 }
 {
    <insert a suppression name here>
@@ -11352,4 +11008,174 @@
    fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
    fun:_ZN23pqObjectInspectorDriver12updateSourceEv
    fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:_ZN15QPainterPrivate12updateMatrixEv
+   fun:_ZN8QPainter14setWorldMatrixERK7QMatrixb
+   fun:_ZN8QPainter9setMatrixERK7QMatrixb
+   fun:_ZN8QPainter9translateERK7QPointF
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
+   fun:_Z19qt_syncBackingStoreP7QWidget
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_ZN16QCoreApplication16sendPostedEventsEP7QObjecti
+   fun:_Z23postEventSourceDispatchP8_GSourcePFiPvES1_
+   fun:g_main_context_dispatch
+   obj:/usr/lib/libglib-2.0.so.0.1000.3
+   fun:g_main_context_iteration
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:_ZN15QPainterPrivate12updateMatrixEv
+   fun:_ZN8QPainter14setWorldMatrixERK7QMatrixb
+   fun:_ZN8QPainter9setMatrixERK7QMatrixb
+   fun:_ZN13QGraphicsView10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN6QFrame5eventEP6QEvent
+   fun:_ZN19QAbstractScrollArea13viewportEventEP6QEvent
+   fun:_ZN13QGraphicsView13viewportEventEP6QEvent
+   fun:_ZN25QAbstractScrollAreaFilter11eventFilterEP7QObjectP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
+   fun:_Z19qt_syncBackingStoreP7QWidget
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:_ZN15QPainterPrivate12updateMatrixEv
+   fun:_ZN8QPainter14setWorldMatrixERK7QMatrixb
+   fun:_ZN8QPainter9setMatrixERK7QMatrixb
+   fun:_ZN14QGraphicsScene9drawItemsEP8QPainteriPP13QGraphicsItemPK24QStyleOptionGraphicsItemP7QWidget
+   fun:_ZN13QGraphicsView9drawItemsEP8QPainteriPP13QGraphicsItemPK24QStyleOptionGraphicsItem
+   fun:_ZN13QGraphicsView10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN6QFrame5eventEP6QEvent
+   fun:_ZN19QAbstractScrollArea13viewportEventEP6QEvent
+   fun:_ZN13QGraphicsView13viewportEventEP6QEvent
+   fun:_ZN25QAbstractScrollAreaFilter11eventFilterEP7QObjectP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:FcObjectStaticName
+   fun:FcObjectSetAdd
+   fun:_Z14loadFontConfigv
+   fun:_Z12initializeDbv
+   fun:_ZN13QFontDatabase4loadEPK12QFontPrivatei
+   fun:_ZNK12QFontMetrics11lineSpacingEv
+   fun:_ZNK11QHeaderView18minimumSectionSizeEv
+   fun:_ZN11QHeaderViewC1EN2Qt11OrientationEP7QWidget
+   fun:_ZN17pqAnimationWidgetC1EP7QWidget
+   fun:_Z9AnimationiPPc
+   fun:main
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:_ZN15QPainterPrivate12updateMatrixEv
+   fun:_ZN8QPainter5beginEP12QPaintDevice
+   fun:_ZN8QPainterC1EP12QPaintDevice
+   fun:_ZN19QAbstractScrollArea5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:ex_conv_ini
+   fun:ex_open
+   fun:_ZN15vtkExodusReader11CanReadFileEPKc
+   fun:_Z22vtkExodusReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z23vtkPExodusReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
+   fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
+   fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_Z26vtkClientConnectionRootRMIPvS_ii
+   fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
+   fun:_ZN25vtkMultiProcessController11ProcessRMIsEii
+   fun:_ZN19vtkRemoteConnection20ProcessCommunicationEv
+   fun:_ZN33vtkProcessModuleConnectionManager18MonitorConnectionsEm
+   fun:_ZN16vtkProcessModule11StartServerEm
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN9vtkPVMain3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/libfreetype.so.6.3.10
+   fun:ft_mem_qalloc
+   fun:ft_mem_alloc
+   fun:ft_mem_qrealloc
+   fun:ft_mem_realloc
+   fun:FT_GlyphLoader_CheckPoints
+   obj:/usr/lib/libfreetype.so.6.3.10
+   obj:/usr/lib/libfreetype.so.6.3.10
+   obj:/usr/lib/libfreetype.so.6.3.10
+   fun:FT_Load_Glyph
+   fun:_ZNK13QFontEngineFT4Font9loadGlyphEPKS_jNS_11GlyphFormatE
+   fun:_ZNK13QFontEngineFT14recalcAdvancesEiP12QGlyphLayout6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_ZNK13QFontEngineFT12stringToCMapEPK5QChariP12QGlyphLayoutPi6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_ZNK16QFontEngineMulti12stringToCMapEPK5QChariP12QGlyphLayoutPi6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_Z11basic_shapeP11QShaperItem
+   fun:_ZNK11QTextEngine9shapeTextEi
+   fun:_ZNK11QTextEngine5shapeEi
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_Z14qt_format_textRK5QFontRK6QRectFiPK11QTextOptionRK7QStringPS2_iPiiP8QPainter
+   fun:_Z14qt_format_textRK5QFontRK6QRectFiRK7QStringPS2_iPiiP8QPainter
+   fun:_ZNK12QFontMetrics12boundingRectERK5QRectiRK7QStringiPi
+   fun:_ZNK12QFontMetrics4sizeEiRK7QStringiPi
 }
