@@ -424,7 +424,7 @@ QString pqExodusPanel::formatDataFor(vtkPVArrayInformation* ai)
         // display as reals
         double min = range[0];
         double max = range[1];
-        s = QString("%1 - %2").arg(min,0,'f',6).arg(max,0,'f',6);
+        s = QString("%1 - %2").arg(min).arg(max);
         }
       if(i > 0)
         {
