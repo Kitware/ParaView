@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqKeyFrameEditor_h
 
 #include <QWidget>
+#include <QDialog>
 #include "pqComponentsExport.h"
 
 class pqAnimationCue;
@@ -58,6 +59,17 @@ public slots:
 private:
   class pqInternal;
   pqInternal* Internal;
+};
+
+
+// internal class
+class pqKeyFrameTypeDialog : public QDialog
+{
+  Q_OBJECT
+public:
+  pqKeyFrameTypeDialog(QWidget* p, QWidget* child);
+  ~pqKeyFrameTypeDialog();
+  QWidget* Child;
 };
 
 #endif

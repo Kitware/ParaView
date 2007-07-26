@@ -55,33 +55,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // editor dialog that comes and goes for editing a single key frame
 // interpolation type
-class pqKeyFrameTypeDialog : public QDialog
+pqKeyFrameTypeDialog::pqKeyFrameTypeDialog(QWidget* p, QWidget* child)
+  : QDialog(p)
 {
-public:
-  pqKeyFrameTypeDialog(QWidget* p, QWidget* child)
-    : QDialog(p)
-    {
-    this->Child = child;
-    this->setAttribute(Qt::WA_DeleteOnClose);
-    this->setWindowTitle(tr("Key Frame Interpolation"));
-    this->setModal(true);
-    QGridLayout* l = new QGridLayout(this);
-    l->addWidget(this->Child, 0,0);
-    QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok);
-    connect(buttons, SIGNAL(accepted()), this, SLOT(accept()));
-    connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
+  this->Child = child;
+  this->setAttribute(Qt::WA_DeleteOnClose);
+  this->setWindowTitle(tr("Key Frame Interpolation"));
+  this->setModal(true);
+  QGridLayout* l = new QGridLayout(this);
+  l->addWidget(this->Child, 0,0);
+  QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok);
+  connect(buttons, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
 
-    l->addWidget(buttons, 1, 0);
-    this->Child->show();
-    }
-  ~pqKeyFrameTypeDialog()
-    {
-    // disconnect child
-    this->Child->setParent(NULL);
-    this->Child->hide();
-    }
-  QWidget* Child;
-};
+  l->addWidget(buttons, 1, 0);
+  this->Child->show();
+}
+
+pqKeyFrameTypeDialog::~pqKeyFrameTypeDialog()
+{
+  // disconnect child
+  this->Child->setParent(NULL);
+  this->Child->hide();
+}
 
 // widget for editing a single key frame interpolation type
 // this widget is persistent with the model
