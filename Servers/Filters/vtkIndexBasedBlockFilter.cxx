@@ -17,18 +17,22 @@
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
 #include "vtkCommunicator.h"
+#include "vtkDoubleArray.h"
 #include "vtkExecutive.h"
 #include "vtkIdTypeArray.h"
+#include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPointSet.h"
+#include "vtkPointSet.h"
 #include "vtkPoints.h"
+#include "vtkRectilinearGrid.h"
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.2");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.3");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -101,12 +105,60 @@ int vtkIndexBasedBlockFilter::RequestData(vtkInformation*,
   outFD->CopyStructure(inFD);
   outFD->SetNumberOfTuples(this->EndIndex-this->StartIndex+1);
 
+  vtkDoubleArray* points = 0; 
+  vtkIdTypeArray* ijk = 0;
+
+  vtkPointSet* psInput = vtkPointSet::SafeDownCast(input);
+  vtkRectilinearGrid* rgInput = vtkRectilinearGrid::SafeDownCast(input);
+  vtkImageData* idInput = vtkImageData::SafeDownCast(input);
+  int* dimensions = (rgInput? rgInput->GetDimensions() :
+    (idInput? idInput->GetDimensions() : 0));
   vtkIdType inIndex, outIndex;
   for (inIndex=this->StartIndex, outIndex=0; inIndex <= this->EndIndex; ++inIndex, ++outIndex)
     {
     outFD->SetTuple(outIndex, inIndex, inFD);
+    if (this->FieldType == POINT_DATA_FIELD)
+      {
+      if (psInput)
+        {
+        if (!points)
+          {
+          points = vtkDoubleArray::New();
+          points->SetName("Points");
+          points->SetNumberOfComponents(3);
+          points->SetNumberOfTuples(outFD->GetNumberOfTuples());
+          }
+        points->SetTuple(outIndex, psInput->GetPoint(inIndex));
+        }
+      else if (dimensions)
+        {
+        // Compute i,j,k from point id.
+        if (!ijk)
+          {
+          ijk = vtkIdTypeArray::New();
+          ijk->SetName("Structured Coordinates");
+          ijk->SetNumberOfComponents(3);
+          ijk->SetNumberOfTuples(outFD->GetNumberOfTuples());
+          }
+        vtkIdType tuple[3];
+        tuple[0] = (inIndex % dimensions[0]);
+        tuple[1] = (inIndex/dimensions[0]) % dimensions[1];
+        tuple[2] = (inIndex/(dimensions[0]*dimensions[1]));
+        ijk->SetTupleValue(outIndex, tuple);
+        }
+      }
     }
 
+  if (points)
+    {
+    outFD->AddArray(points);
+    points->Delete();
+    }
+  if (ijk)
+    {
+    outFD->AddArray(ijk);
+    ijk->Delete();
+    }
   output->SetFieldData(outFD);
   outFD->Delete();
   return 1;
@@ -183,7 +235,8 @@ bool vtkIndexBasedBlockFilter::DetermineBlockIndices()
     this->EndIndex = endIndex - mydataStartIndex;
     }
 
-  // cout << myId <<  ": Delivering : " << this->StartIndex << " --> " << this->EndIndex << endl;
+  // cout << myId <<  ": Delivering : " << this->StartIndex << " --> " 
+  // << this->EndIndex << endl;
   return true;
 }
 
