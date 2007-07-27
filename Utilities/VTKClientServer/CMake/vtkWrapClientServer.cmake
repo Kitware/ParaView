@@ -19,9 +19,14 @@ MACRO(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
     SET(VTK_WRAP_CS_CUSTOM_LIST)
   ENDIF(CMAKE_GENERATOR MATCHES "^Visual Studio 6$")
 
-  GET_TARGET_PROPERTY(VTK_WRAP_ClientServer_EXE vtkWrapClientServer LOCATION)
+  # if this is used from outside paraview (e.g. in a plugin, this
+  # should come from the ParaViewConfig.cmake file
   IF(NOT VTK_WRAP_ClientServer_EXE)
-    MESSAGE(FATAL_ERROR "did not found ClientServer for target: ${TARGET}")
+    GET_TARGET_PROPERTY(VTK_WRAP_ClientServer_EXE vtkWrapClientServer LOCATION)
+  ENDIF(NOT VTK_WRAP_ClientServer_EXE)
+  # still not found ?
+  IF(NOT VTK_WRAP_ClientServer_EXE)
+    MESSAGE(FATAL_ERROR "did not find ClientServer for target: ${TARGET}")
   ENDIF(NOT VTK_WRAP_ClientServer_EXE)
 
   # For each class
