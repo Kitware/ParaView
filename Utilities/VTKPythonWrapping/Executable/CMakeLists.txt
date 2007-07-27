@@ -91,7 +91,7 @@ TARGET_LINK_LIBRARIES(vtkPVPythonInterpretor
   ${PYTHON_UTIL_LIBRARY_LIB})
 
 # Link against all the kit wrappers.
-TARGET_LINK_LIBRARIES(pvpython${PV_EXE_SUFFIX}
+SET(_PVPYTHON_LINK_LIBS 
   vtkPVServerManagerPythonD
   vtkCommon 
   vtkFiltering
@@ -102,24 +102,14 @@ TARGET_LINK_LIBRARIES(pvpython${PV_EXE_SUFFIX}
   vtkPVServerManager
   ${VTK_PYTHON_LIBRARIES}
   ${PYTHON_UTIL_LIBRARY_LIB})
+
 IF(VTK_WRAP_TCL)
-  TARGET_LINK_LIBRARIES(pvpython${PV_EXE_SUFFIX} ${VTK_TK_LIBRARIES})
+  SET(_PVPYTHON_LINK_LIBS ${_PVPYTHON_LINK_LIBS}  ${VTK_TK_LIBRARIES})
 ENDIF(VTK_WRAP_TCL)
 
-TARGET_LINK_LIBRARIES(pvbatch${PV_EXE_SUFFIX}
-  vtkPVServerManagerPythonD
-  vtkCommon 
-  vtkFiltering
-  vtkIO
-  vtkGraphics
-  vtkImaging
-  vtkPVPythonInterpretor
-  vtkPVServerManager
-  ${VTK_PYTHON_LIBRARIES}
-  ${PYTHON_UTIL_LIBRARY_LIB})
-IF(VTK_WRAP_TCL)
-  TARGET_LINK_LIBRARIES(pvbatch${PV_EXE_SUFFIX} ${VTK_TK_LIBRARIES})
-ENDIF(VTK_WRAP_TCL)
+TARGET_LINK_LIBRARIES(pvpython${PV_EXE_SUFFIX} ${_PVPYTHON_LINK_LIBS})
+
+TARGET_LINK_LIBRARIES(pvbatch${PV_EXE_SUFFIX} ${_PVPYTHON_LINK_LIBS})
 
 IF(BORLAND)
   SET(KITS Common PVServerCommon PVServerManager)

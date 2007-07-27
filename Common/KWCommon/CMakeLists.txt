@@ -39,6 +39,13 @@ IF(NOT VTK_SOURCE_DIR)
 ENDIF(NOT VTK_SOURCE_DIR)
 
 # --------------------------------------------------------------------------
+# EXPORT() will be in cmake 2.6, add an empty macro so older cmake versions stil work
+IF(NOT COMMAND EXPORT)
+  MACRO(EXPORT)
+  ENDMACRO(EXPORT)
+ENDIF(NOT COMMAND EXPORT)
+
+# --------------------------------------------------------------------------
 # Output directories
 
 IF(NOT LIBRARY_OUTPUT_PATH)
@@ -216,6 +223,7 @@ IF(KWCOMMON_BUILD_PROCESSXML)
                      @ONLY IMMEDIATE)
       ADD_EXECUTABLE(kwProcessXML
                      ${CMAKE_CURRENT_BINARY_DIR}/ProcessXML-forward.c)
+      EXPORT(TARGETS kwProcessXML FILE ${EXPORT_EXECUTABLES_FILE} PREFIX ${EXPORT_EXECUTABLES_PREFIX} APPEND)
       IF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
         INSTALL_TARGETS(${KWCommon_INSTALL_BIN_DIR} kwProcessXML)
       ENDIF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)

@@ -1,16 +1,9 @@
+INCLUDE (${VTKCS_SOURCE_DIR}/CMake/vtkWrapClientServer.cmake)
+
 MACRO(CS_INITIALIZE_WRAP)
-  IF (COMMAND VTK_WRAP_ClientServer)
-  ELSE (COMMAND VTK_WRAP_ClientServer)
-    INCLUDE (${VTKCS_SOURCE_DIR}/CMake/vtkWrapClientServer.cmake)
-  ENDIF (COMMAND VTK_WRAP_ClientServer)
-  UTILITY_SOURCE(VTK_WRAP_ClientServer_EXE vtkWrapClientServer 
-    Wrapping vtkWrapClientServer.c)
-  SET(LIBRARY_OUTPUT_PATH ${VTKCS_BINARY_DIR}/bin CACHE PATH 
-    "Single output path for libraries")
-  SET(EXECUTABLE_OUTPUT_PATH ${VTKCS_BINARY_DIR}/bin CACHE PATH 
-    "Single output path for executable")
+  SET(LIBRARY_OUTPUT_PATH    ${VTKCS_BINARY_DIR}/bin CACHE PATH "Single output path for libraries")
+  SET(EXECUTABLE_OUTPUT_PATH ${VTKCS_BINARY_DIR}/bin CACHE PATH "Single output path for executable")
   SET(BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
-  MARK_AS_ADVANCED(VTK_WRAP_ClientServer_EXE)
 ENDMACRO(CS_INITIALIZE_WRAP)
 
 MACRO(PV_PRE_WRAP_VTK_CS libname kit ukit deps)
@@ -24,11 +17,9 @@ MACRO(PV_PRE_WRAP_VTK_CS libname kit ukit deps)
     ENDIF("${class}" MATCHES "^(\\/|.\\/|.\\\\|.:\\/|.:\\\\)")
     IF(NOT VTK_CLASS_WRAP_EXCLUDE_${class})
       IF(VTK_CLASS_ABSTRACT_${class})
-        SET_SOURCE_FILES_PROPERTIES(${full_name}
-          PROPERTIES ABSTRACT 1)
+        SET_SOURCE_FILES_PROPERTIES(${full_name} PROPERTIES ABSTRACT 1)
       ENDIF(VTK_CLASS_ABSTRACT_${class})
-        SET(vtk${kit}CS_HEADERS ${vtk${kit}CS_HEADERS}
-          ${full_name})
+      SET(vtk${kit}CS_HEADERS ${vtk${kit}CS_HEADERS} ${full_name})
     ENDIF(NOT VTK_CLASS_WRAP_EXCLUDE_${class})
   ENDFOREACH(class)
   VTK_WRAP_ClientServer("${libname}" "vtk${kit}CS_SRCS" "${vtk${kit}CS_HEADERS}")

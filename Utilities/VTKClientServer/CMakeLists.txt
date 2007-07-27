@@ -3,11 +3,9 @@ PROJECT(VTKCS)
 SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
 
 INCLUDE(${VTKCS_SOURCE_DIR}/vtkClientServer.cmake)
-IF(PARAVIEW_BINARY_DIR)
-ELSE(PARAVIEW_BINARY_DIR)
+IF(NOT PARAVIEW_BINARY_DIR)
   SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/VTK/Utilities")
-ENDIF(PARAVIEW_BINARY_DIR)
-CS_INITIALIZE_WRAP()
+ENDIF(NOT PARAVIEW_BINARY_DIR)
 
 # Configure the vtkClientServer library.
 SET(VTK_CLIENT_SERVER_BUILD_SHARED ${BUILD_SHARED_LIBS})
@@ -22,6 +20,7 @@ INCLUDE_DIRECTORIES(
   ${VTKCS_BINARY_DIR}
   ${VTK_INCLUDE_DIR}
   )
+
 
 # OpenGL include directories.
 IF(APPLE)
@@ -62,6 +61,11 @@ ENDIF(VTK_USE_MANGLED_MESA)
 
 INCLUDE_DIRECTORIES(${PVWRAP_OPEN_GL_DIRS})
 
+# Build the vtkClientServer wrapping utility first.
+ADD_SUBDIRECTORY(Wrapping)
+
+CS_INITIALIZE_WRAP()
+
 # Create vtkClientServer library.
 ADD_LIBRARY(vtkClientServer
   vtkClientServerID.h
@@ -81,20 +85,27 @@ IF(NOT PV_INSTALL_NO_DEVELOPMENT)
     )
 ENDIF(NOT PV_INSTALL_NO_DEVELOPMENT)
 
-# Build the vtkClientServer wrapping utility first.
-SUBDIRS(Wrapping)
-
 # Build vtkClientServer wrappers for VTK kits.
-SUBDIRS(Common Filtering GenericFiltering Imaging Graphics IO Rendering Hybrid Parallel VolumeRendering Widgets)
+ADD_SUBDIRECTORY(Common)
+ADD_SUBDIRECTORY(Filtering)
+ADD_SUBDIRECTORY(GenericFiltering)
+ADD_SUBDIRECTORY(Imaging)
+ADD_SUBDIRECTORY(Graphics)
+ADD_SUBDIRECTORY(IO)
+ADD_SUBDIRECTORY(Rendering)
+ADD_SUBDIRECTORY(Hybrid)
+ADD_SUBDIRECTORY(Parallel)
+ADD_SUBDIRECTORY(VolumeRendering)
+ADD_SUBDIRECTORY(Widgets)
 
 # Build vtkClientServer wrappers for Xdmf if it is available.
 IF(PARAVIEW_SOURCE_DIR OR ParaView_SOURCE_DIR)
-  SUBDIRS(Xdmf2)
+  ADD_SUBDIRECTORY(Xdmf2)
 ENDIF(PARAVIEW_SOURCE_DIR OR ParaView_SOURCE_DIR)
 
 # Build vtkClientServer wrappers for Infovis if it is enabled
 IF(VTK_USE_INFOVIS)
-  SUBDIRS(Infovis)
+  ADD_SUBDIRECTORY(Infovis)
 ENDIF(VTK_USE_INFOVIS)
 
 IF(NOT PV_INSTALL_NO_LIBRARIES)
