@@ -47,7 +47,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.17");
+vtkCxxRevisionMacro(vtkPVMain, "1.18");
 
 int vtkPVMain::InitializeMPI = 1;
 
@@ -154,9 +154,9 @@ void u_fpu_setup()
 
 //----------------------------------------------------------------------------
 int vtkPVMain::Initialize(vtkPVOptions* options,
-                   vtkProcessModuleGUIHelper* helper,
-                   INITIALIZE_INTERPRETER_FUNCTION initInterp, 
-                   int argc, char* argv[])
+                          vtkProcessModuleGUIHelper* helper,
+                          INITIALIZE_INTERPRETER_FUNCTION initInterp, 
+                          int argc, char* argv[])
 {
   // Avoid Ghost windows on windows XP
 #ifdef _WIN32
@@ -185,7 +185,7 @@ int vtkPVMain::Initialize(vtkPVOptions* options,
 
   int display_help = 0;
   vtksys_ios::ostringstream sscerr;
-  if ( !options->Parse(argc, argv) )
+  if (argv && !options->Parse(argc, argv) )
     {
     if ( options->GetUnknownArgument() )
       {
@@ -216,7 +216,9 @@ int vtkPVMain::Initialize(vtkPVOptions* options,
   // Create the process module for initializing the processes.
   // Only the root server processes args.
   
-  this->ProcessModule = vtkPVCreateProcessModule::CreateProcessModule(options);
+  this->ProcessModule = vtkProcessModule::New();
+  this->ProcessModule->SetOptions(options);
+  vtkProcessModule::SetProcessModule(this->ProcessModule);
   // PM can use MPI only if MPI was initialized.
   this->ProcessModule->SetUseMPI(vtkPVMain::InitializeMPI);
   if(helper)
