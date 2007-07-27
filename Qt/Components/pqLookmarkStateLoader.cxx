@@ -82,7 +82,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.13");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.14");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
@@ -105,6 +105,7 @@ pqLookmarkStateLoader::pqLookmarkStateLoader()
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::~pqLookmarkStateLoader()
 {
+  delete this->Internal->PipelineModel;
   delete this->Internal;
 }
 
