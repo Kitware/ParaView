@@ -20,10 +20,6 @@ ENDIF(VTK_USE_MPI)
 
 INCLUDE(${VTKCS_SOURCE_DIR}/vtkClientServer.cmake)
 
-IF (COMMAND VTK_WRAP_ClientServer)
-ELSE (COMMAND VTK_WRAP_ClientServer)
-  INCLUDE (${VTKCS_SOURCE_DIR}/CMake/vtkWrapClientServer.cmake)
-ENDIF (COMMAND VTK_WRAP_ClientServer)
 VTK_WRAP_ClientServer(csServer CLIENT_SERVER_SOURCES
   vtkCustomSource.h
 )
