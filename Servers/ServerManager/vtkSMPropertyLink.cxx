@@ -26,7 +26,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMPropertyLink);
-vtkCxxRevisionMacro(vtkSMPropertyLink, "1.15");
+vtkCxxRevisionMacro(vtkSMPropertyLink, "1.16");
 //-----------------------------------------------------------------------------
 class vtkSMPropertyLinkObserver : public vtkCommand
 {
@@ -280,6 +280,23 @@ void vtkSMPropertyLink::RemoveLinkedProperty(vtkSMProperty* property)
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMPropertyLink::RemoveLinkedProperty(vtkSMProxy* proxy,
+  const char* pname)
+{
+  vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
+    this->Internals->LinkedProperties.begin();
+  for (; iter != this->Internals->LinkedProperties.end(); ++iter)
+    {
+    if (iter->Proxy == proxy  && iter->PropertyName == pname)
+      {
+      this->Internals->LinkedProperties.erase(iter);
+      this->Modified();
+      break;
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 unsigned int vtkSMPropertyLink::GetNumberOfLinkedProperties()
 {
   return this->Internals->LinkedProperties.size();
@@ -390,7 +407,7 @@ void vtkSMPropertyLink::UpdateProperties(vtkSMProxy* fromProxy, const char* pnam
     {
     return;
     }
- 
+
   // Propagate the changes.
   for (iter = this->Internals->LinkedProperties.begin(); 
     iter != this->Internals->LinkedProperties.end(); ++iter)
@@ -406,7 +423,7 @@ void vtkSMPropertyLink::UpdateProperties(vtkSMProxy* fromProxy, const char* pnam
         {
         toProp = iter->Property;
         }
-      if (toProp)
+      if (toProp && (toProp != fromProp))
         {
         toProp->Copy(fromProp);
         }

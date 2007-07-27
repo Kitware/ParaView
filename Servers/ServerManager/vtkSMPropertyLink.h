@@ -47,6 +47,7 @@ public:
   void AddLinkedProperty(vtkSMProxy* proxy, 
                          const char* propertyname, 
                          int updateDir);
+  void RemoveLinkedProperty(vtkSMProxy* proxy, const char* propertyname);
 
   // Description:
   // Another API to add a property link. In this case. we don't provide
