@@ -152,6 +152,7 @@ IF(BUILD_TESTING)
     ColorEditor3
     CreateSourceWithoutConnect
     # flow crashes in SurfaceVectors in an mpi build in client/server mode
+    ExodusWriter
     Flow
 #    LoadStateSelection
     OpenFile
@@ -278,6 +279,7 @@ IF(BUILD_TESTING)
     ExodusIIPanel
     ExodusModeShapes
     ExodusPanel
+    ExodusWriter
     Flow2
     Fractal2D
     Fractal3D
