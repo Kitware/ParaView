@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QItemDelegate>
 #include <QStandardItem>
 #include <QComboBox>
-#include <QGridLayout>
+#include <QVBoxLayout>
 #include <QDialogButtonBox>
 
 #include "pqAnimationCue.h"
@@ -63,12 +63,13 @@ pqKeyFrameTypeDialog::pqKeyFrameTypeDialog(QWidget* p, QWidget* child)
   this->setAttribute(Qt::WA_DeleteOnClose);
   this->setWindowTitle(tr("Key Frame Interpolation"));
   this->setModal(true);
-  QGridLayout* l = new QGridLayout(this);
+  QVBoxLayout* l = new QVBoxLayout(this);
   l->addWidget(this->Child, 0,0);
   QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok);
   connect(buttons, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
 
+  l->addStretch();
   l->addWidget(buttons, 1, 0);
   this->Child->show();
 }
