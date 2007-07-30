@@ -162,11 +162,13 @@ void pqAnimationModel::setStartTime(double t)
 {
   this->StartTime = t;
   this->resizeTracks();
+  this->update();
 }
 void pqAnimationModel::setEndTime(double t)
 {
   this->EndTime = t;
   this->resizeTracks();
+  this->update();
 }
 
 void pqAnimationModel::drawForeground(QPainter* painter, const QRectF& )
