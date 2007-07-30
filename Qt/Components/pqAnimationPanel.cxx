@@ -530,7 +530,10 @@ void pqAnimationPanel::updateEnableState()
   this->Internal->deleteKeyFrame->setEnabled(has_keyframe);
 
   // Cannot change the interpolation type for the last keyframe.
-  if (num_keyframes == (this->Internal->keyFrameIndex->value()+1))
+  // or those keyframes without types
+  if ((this->Internal->CurrentProxy && 
+      !this->Internal->CurrentProxy->getProxy()->IsA("vtkSMCompositeKeyFrameProxy")) ||
+      num_keyframes == (this->Internal->keyFrameIndex->value()+1))
     {
     this->Internal->keyFrameWidget->setEnabled(false);
     }

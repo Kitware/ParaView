@@ -84,7 +84,7 @@ void pqSignalAdaptorKeyFrameType::setKeyFrameProxy(vtkSMProxy* proxy)
 
   this->Internals->Links->removeAllPropertyLinks();
 
-  if (proxy)
+  if (proxy && proxy->IsA("vtkSMCompositeKeyFrameProxy"))
     {
     // connect the combo box
     this->Internals->Links->addPropertyLink(
