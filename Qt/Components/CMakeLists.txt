@@ -96,6 +96,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqImplicitPlaneWidget.h
   pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.h
+  pqKeyFrameTypeWidget.h
   pqLineSourceWidget.h
   pqLineWidget.h
   pqLinksEditor.h
@@ -202,6 +203,7 @@ SET(UI_FORMS
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
   Resources/UI/pqKeyFrameEditor.ui
+  Resources/UI/pqKeyFrameTypeWidget.ui
   Resources/UI/pqLineSourceControls.ui
   Resources/UI/pqLineWidget.ui
   Resources/UI/pqLineSourceControls.ui
@@ -223,7 +225,6 @@ SET(UI_FORMS
   Resources/UI/pqServerStartupDialog.ui
   Resources/UI/pqSettingsDialog.ui
   Resources/UI/pqSignalAdaptorKeyFrameValue.ui
-  Resources/UI/pqSignalAdaptorKeyFrameType.ui
   Resources/UI/pqSpreadSheetDisplayEditor.ui
   Resources/UI/pqStreamTracerPanel.ui
   Resources/UI/pqTextDisplayPropertiesWidget.ui
@@ -394,6 +395,8 @@ ADD_LIBRARY(pqComponents
   pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.cxx
   pqKeyFrameTimeValidator.h
+  pqKeyFrameTypeWidget.cxx
+  pqKeyFrameTypeWidget.h
   pqLineSourceWidget.cxx
   pqLineSourceWidget.h
   pqLineWidget.cxx

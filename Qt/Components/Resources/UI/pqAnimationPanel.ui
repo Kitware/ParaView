@@ -5,21 +5,367 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>307</width>
-    <height>821</height>
+    <width>319</width>
+    <height>770</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QGridLayout" >
    <property name="margin" >
-    <number>4</number>
+    <number>9</number>
    </property>
    <property name="spacing" >
-    <number>2</number>
+    <number>6</number>
    </property>
-   <item>
+   <item row="2" column="0" >
+    <widget class="pqCollapsedGroup" name="keyFramePropertiesGroup" >
+     <property name="title" >
+      <string>Key Frame Editor</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="1" column="1" >
+       <widget class="QPushButton" name="deleteKeyFrame" >
+        <property name="text" >
+         <string>Delete Key Frame</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QPushButton" name="addKeyFrame" >
+        <property name="text" >
+         <string>Add Key Frame</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2" >
+       <widget class="QFrame" name="editorFrame" >
+        <property name="frameShape" >
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow" >
+         <enum>QFrame::Plain</enum>
+        </property>
+        <layout class="QGridLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item row="5" column="0" colspan="2" >
+          <widget class="pqKeyFrameTypeWidget" name="keyFrameWidget" />
+         </item>
+         <item row="4" column="0" colspan="2" >
+          <widget class="QFrame" name="cameraFrame" >
+           <property name="frameShape" >
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow" >
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QGridLayout" >
+            <property name="margin" >
+             <number>4</number>
+            </property>
+            <property name="spacing" >
+             <number>2</number>
+            </property>
+            <item row="2" column="0" >
+             <widget class="QLabel" name="label_13" >
+              <property name="text" >
+               <string>View Up</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" >
+             <widget class="QLabel" name="label_12" >
+              <property name="text" >
+               <string>Focal Point</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0" >
+             <widget class="QLabel" name="label_11" >
+              <property name="text" >
+               <string>View Angle</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0" colspan="4" >
+             <widget class="QPushButton" name="useCurrent" >
+              <property name="text" >
+               <string>Use Current</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0" >
+             <widget class="QLabel" name="label_10" >
+              <property name="text" >
+               <string>Position</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1" >
+             <widget class="QDoubleSpinBox" name="position0" >
+              <property name="maximum" >
+               <double>10000.000000000000000</double>
+              </property>
+              <property name="minimum" >
+               <double>-10000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2" >
+             <widget class="QDoubleSpinBox" name="position1" >
+              <property name="maximum" >
+               <double>10000.000000000000000</double>
+              </property>
+              <property name="minimum" >
+               <double>-10000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3" >
+             <widget class="QDoubleSpinBox" name="position2" >
+              <property name="maximum" >
+               <double>10000.000000000000000</double>
+              </property>
+              <property name="minimum" >
+               <double>-10000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1" >
+             <widget class="QDoubleSpinBox" name="focalPoint0" >
+              <property name="maximum" >
+               <double>10000.000000000000000</double>
+              </property>
+              <property name="minimum" >
+               <double>-10000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2" >
+             <widget class="QDoubleSpinBox" name="focalPoint1" >
+              <property name="maximum" >
+               <double>10000.000000000000000</double>
+              </property>
+              <property name="minimum" >
+               <double>-10000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3" >
+             <widget class="QDoubleSpinBox" name="focalPoint2" >
+              <property name="maximum" >
+               <double>10000.000000000000000</double>
+              </property>
+              <property name="minimum" >
+               <double>-10000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1" >
+             <widget class="QDoubleSpinBox" name="viewUp0" >
+              <property name="maximum" >
+               <double>10000.000000000000000</double>
+              </property>
+              <property name="minimum" >
+               <double>-10000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2" >
+             <widget class="QDoubleSpinBox" name="viewUp1" >
+              <property name="maximum" >
+               <double>10000.000000000000000</double>
+              </property>
+              <property name="minimum" >
+               <double>-10000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="3" >
+             <widget class="QDoubleSpinBox" name="viewUp2" >
+              <property name="maximum" >
+               <double>10000.000000000000000</double>
+              </property>
+              <property name="minimum" >
+               <double>-10000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1" >
+             <widget class="QDoubleSpinBox" name="viewAngle" >
+              <property name="maximum" >
+               <double>360.000000000000000</double>
+              </property>
+              <property name="minimum" >
+               <double>-360.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="2" column="0" >
+          <widget class="QLabel" name="valueLabel" >
+           <property name="text" >
+            <string>Key Frame Value:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1" >
+          <widget class="QLineEdit" name="keyFrameTime" >
+           <property name="sizePolicy" >
+            <sizepolicy>
+             <hsizetype>7</hsizetype>
+             <vsizetype>0</vsizetype>
+             <horstretch>1</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" >
+          <widget class="QLabel" name="label_5" >
+           <property name="text" >
+            <string>Key Frame Time:</string>
+           </property>
+           <property name="wordWrap" >
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0" >
+          <widget class="QLabel" name="label_4" >
+           <property name="text" >
+            <string>Key Frame Index:</string>
+           </property>
+           <property name="wordWrap" >
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" >
+          <widget class="QSpinBox" name="keyFrameIndex" >
+           <property name="sizePolicy" >
+            <sizepolicy>
+             <hsizetype>1</hsizetype>
+             <vsizetype>0</vsizetype>
+             <horstretch>1</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximum" >
+            <number>2147483647</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1" >
+          <widget class="QFrame" name="valueFrame" >
+           <property name="frameShape" >
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow" >
+            <enum>QFrame::Raised</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0" colspan="2" >
+          <widget class="QFrame" name="valueFrameLarge" >
+           <property name="sizePolicy" >
+            <sizepolicy>
+             <hsizetype>3</hsizetype>
+             <vsizetype>3</vsizetype>
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="frameShape" >
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow" >
+            <enum>QFrame::Raised</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="0" >
+    <widget class="pqCollapsedGroup" name="animationSettingsGroup" >
+     <property name="title" >
+      <string>Animation Settings</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>4</number>
+      </property>
+      <property name="spacing" >
+       <number>2</number>
+      </property>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_14" >
+        <property name="text" >
+         <string>Cache Limit (in KBs)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QSpinBox" name="cacheLimit" >
+        <property name="toolTip" >
+         <string>&lt;html>Set the cache limit (in KBs) per node. If while playing animations, the cache size on any node goes beyond this threshold, caching will automatically be disabled.&lt;/html></string>
+        </property>
+        <property name="maximum" >
+         <number>999999999</number>
+        </property>
+        <property name="minimum" >
+         <number>10</number>
+        </property>
+        <property name="singleStep" >
+         <number>100</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2" >
+       <widget class="QCheckBox" name="caching" >
+        <property name="toolTip" >
+         <string>Cache geometry during playback.</string>
+        </property>
+        <property name="text" >
+         <string>Cache Geometry</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="4" column="0" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>41</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="0" >
     <widget class="pqCollapsedGroup" name="playbackGroup" >
      <property name="title" >
       <string>Playback</string>
@@ -235,7 +581,7 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="1" column="0" >
     <widget class="pqCollapsedGroup" name="tracksGroup" >
      <property name="title" >
       <string>Track Selection</string>
@@ -297,365 +643,14 @@
      </layout>
     </widget>
    </item>
-   <item>
-    <widget class="pqCollapsedGroup" name="keyFramePropertiesGroup" >
-     <property name="title" >
-      <string>Key Frame Editor</string>
-     </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>4</number>
-      </property>
-      <property name="spacing" >
-       <number>2</number>
-      </property>
-      <item row="0" column="0" colspan="2" >
-       <widget class="QFrame" name="editorFrame" >
-        <property name="frameShape" >
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow" >
-         <enum>QFrame::Plain</enum>
-        </property>
-        <layout class="QGridLayout" >
-         <property name="margin" >
-          <number>0</number>
-         </property>
-         <property name="spacing" >
-          <number>2</number>
-         </property>
-         <item row="6" column="0" colspan="2" >
-          <widget class="QFrame" name="typeFrame" />
-         </item>
-         <item row="3" column="0" colspan="2" >
-          <widget class="QFrame" name="valueFrameLarge" >
-           <property name="sizePolicy" >
-            <sizepolicy>
-             <hsizetype>3</hsizetype>
-             <vsizetype>3</vsizetype>
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="frameShape" >
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow" >
-            <enum>QFrame::Raised</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1" >
-          <widget class="QFrame" name="valueFrame" >
-           <property name="frameShape" >
-            <enum>QFrame::NoFrame</enum>
-           </property>
-           <property name="frameShadow" >
-            <enum>QFrame::Raised</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1" >
-          <widget class="QSpinBox" name="keyFrameIndex" >
-           <property name="sizePolicy" >
-            <sizepolicy>
-             <hsizetype>1</hsizetype>
-             <vsizetype>0</vsizetype>
-             <horstretch>1</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximum" >
-            <number>2147483647</number>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0" >
-          <widget class="QLabel" name="label_4" >
-           <property name="text" >
-            <string>Key Frame Index:</string>
-           </property>
-           <property name="wordWrap" >
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0" >
-          <widget class="QLabel" name="label_5" >
-           <property name="text" >
-            <string>Key Frame Time:</string>
-           </property>
-           <property name="wordWrap" >
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1" >
-          <widget class="QLineEdit" name="keyFrameTime" >
-           <property name="sizePolicy" >
-            <sizepolicy>
-             <hsizetype>7</hsizetype>
-             <vsizetype>0</vsizetype>
-             <horstretch>1</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0" >
-          <widget class="QLabel" name="valueLabel" >
-           <property name="text" >
-            <string>Key Frame Value:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0" colspan="2" >
-          <widget class="QFrame" name="cameraFrame" >
-           <property name="frameShape" >
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow" >
-            <enum>QFrame::Raised</enum>
-           </property>
-           <layout class="QGridLayout" >
-            <property name="margin" >
-             <number>4</number>
-            </property>
-            <property name="spacing" >
-             <number>2</number>
-            </property>
-            <item row="2" column="0" >
-             <widget class="QLabel" name="label_13" >
-              <property name="text" >
-               <string>View Up</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0" >
-             <widget class="QLabel" name="label_12" >
-              <property name="text" >
-               <string>Focal Point</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0" >
-             <widget class="QLabel" name="label_11" >
-              <property name="text" >
-               <string>View Angle</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0" colspan="4" >
-             <widget class="QPushButton" name="useCurrent" >
-              <property name="text" >
-               <string>Use Current</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0" >
-             <widget class="QLabel" name="label_10" >
-              <property name="text" >
-               <string>Position</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1" >
-             <widget class="QDoubleSpinBox" name="position0" >
-              <property name="maximum" >
-               <double>10000.000000000000000</double>
-              </property>
-              <property name="minimum" >
-               <double>-10000.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="2" >
-             <widget class="QDoubleSpinBox" name="position1" >
-              <property name="maximum" >
-               <double>10000.000000000000000</double>
-              </property>
-              <property name="minimum" >
-               <double>-10000.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="3" >
-             <widget class="QDoubleSpinBox" name="position2" >
-              <property name="maximum" >
-               <double>10000.000000000000000</double>
-              </property>
-              <property name="minimum" >
-               <double>-10000.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1" >
-             <widget class="QDoubleSpinBox" name="focalPoint0" >
-              <property name="maximum" >
-               <double>10000.000000000000000</double>
-              </property>
-              <property name="minimum" >
-               <double>-10000.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="2" >
-             <widget class="QDoubleSpinBox" name="focalPoint1" >
-              <property name="maximum" >
-               <double>10000.000000000000000</double>
-              </property>
-              <property name="minimum" >
-               <double>-10000.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="3" >
-             <widget class="QDoubleSpinBox" name="focalPoint2" >
-              <property name="maximum" >
-               <double>10000.000000000000000</double>
-              </property>
-              <property name="minimum" >
-               <double>-10000.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1" >
-             <widget class="QDoubleSpinBox" name="viewUp0" >
-              <property name="maximum" >
-               <double>10000.000000000000000</double>
-              </property>
-              <property name="minimum" >
-               <double>-10000.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="2" >
-             <widget class="QDoubleSpinBox" name="viewUp1" >
-              <property name="maximum" >
-               <double>10000.000000000000000</double>
-              </property>
-              <property name="minimum" >
-               <double>-10000.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="3" >
-             <widget class="QDoubleSpinBox" name="viewUp2" >
-              <property name="maximum" >
-               <double>10000.000000000000000</double>
-              </property>
-              <property name="minimum" >
-               <double>-10000.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1" >
-             <widget class="QDoubleSpinBox" name="viewAngle" >
-              <property name="maximum" >
-               <double>360.000000000000000</double>
-              </property>
-              <property name="minimum" >
-               <double>-360.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="5" column="1" >
-          <widget class="QComboBox" name="interpolationType" />
-         </item>
-         <item row="5" column="0" >
-          <widget class="QLabel" name="label_2" >
-           <property name="text" >
-            <string>Interpolation:</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QPushButton" name="addKeyFrame" >
-        <property name="text" >
-         <string>Add Key Frame</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QPushButton" name="deleteKeyFrame" >
-        <property name="text" >
-         <string>Delete Key Frame</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="pqCollapsedGroup" name="animationSettingsGroup" >
-     <property name="title" >
-      <string>Animation Settings</string>
-     </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>4</number>
-      </property>
-      <property name="spacing" >
-       <number>2</number>
-      </property>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_14" >
-        <property name="text" >
-         <string>Cache Limit (in KBs)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QSpinBox" name="cacheLimit" >
-        <property name="toolTip" >
-         <string>&lt;html>Set the cache limit (in KBs) per node. If while playing animations, the cache size on any node goes beyond this threshold, caching will automatically be disabled.&lt;/html></string>
-        </property>
-        <property name="maximum" >
-         <number>999999999</number>
-        </property>
-        <property name="minimum" >
-         <number>10</number>
-        </property>
-        <property name="singleStep" >
-         <number>100</number>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" colspan="2" >
-       <widget class="QCheckBox" name="caching" >
-        <property name="toolTip" >
-         <string>Cache geometry during playback.</string>
-        </property>
-        <property name="text" >
-         <string>Cache Geometry</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>20</width>
-       <height>41</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>pqAnimatablePropertiesComboBox</class>
+   <extends>QComboBox</extends>
+   <header>pqAnimatablePropertiesComboBox.h</header>
+  </customwidget>
   <customwidget>
    <class>pqCollapsedGroup</class>
    <extends>QGroupBox</extends>
@@ -668,16 +663,15 @@
    <header>pqSpinBox.h</header>
   </customwidget>
   <customwidget>
-   <class>pqAnimatablePropertiesComboBox</class>
-   <extends>QComboBox</extends>
-   <header>pqAnimatablePropertiesComboBox.h</header>
+   <class>pqKeyFrameTypeWidget</class>
+   <extends>QFrame</extends>
+   <header>pqKeyFrameTypeWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>sourceName</tabstop>
   <tabstop>propertyName</tabstop>
   <tabstop>keyFrameIndex</tabstop>
-  <tabstop>interpolationType</tabstop>
   <tabstop>addKeyFrame</tabstop>
   <tabstop>deleteKeyFrame</tabstop>
   <tabstop>playMode</tabstop>

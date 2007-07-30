@@ -1,12 +1,12 @@
 <ui version="4.0" >
- <class>pqSignalAdaptorKeyFrameType</class>
- <widget class="QWidget" name="pqSignalAdaptorKeyFrameType" >
+ <class>pqKeyFrameTypeWidget</class>
+ <widget class="QWidget" name="pqKeyFrameTypeWidget" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>254</width>
-    <height>278</height>
+    <width>251</width>
+    <height>316</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -20,14 +20,24 @@
   <property name="windowTitle" >
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QGridLayout" >
    <property name="margin" >
     <number>0</number>
    </property>
    <property name="spacing" >
-    <number>0</number>
+    <number>6</number>
    </property>
-   <item>
+   <item row="0" column="1" >
+    <widget class="QComboBox" name="Type" />
+   </item>
+   <item row="0" column="0" >
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>Interpolation:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2" >
     <widget class="QGroupBox" name="exponentialGroup" >
      <property name="title" >
       <string>Exponential</string>
@@ -72,7 +82,23 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="3" column="0" colspan="2" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Minimum</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="0" colspan="2" >
     <widget class="QGroupBox" name="sinusoidGroup" >
      <property name="title" >
       <string>Sinusoid</string>
@@ -123,19 +149,6 @@
       </item>
      </layout>
     </widget>
-   </item>
-   <item>
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

@@ -29,65 +29,41 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+
 #include "pqSignalAdaptorKeyFrameType.h"
-#include "ui_pqSignalAdaptorKeyFrameType.h"
+
+#include <QLabel>
+#include <QPointer>
+#include <QDebug>
 
 #include "vtkSMCompositeKeyFrameProxy.h"
 #include "vtkSmartPointer.h"
 
-#include <QComboBox>
-#include <QDoubleValidator>
-#include <QLabel>
-#include <QPointer>
-#include <QtDebug>
-#include <QWidget>
-
 #include "pqPropertyLinks.h"
+#include "pqKeyFrameTypeWidget.h"
 
 class pqSignalAdaptorKeyFrameType::pqInternals
 {
 public:
-  Ui::pqSignalAdaptorKeyFrameType Ui;
   vtkSmartPointer<vtkSMProxy> KeyFrameProxy;
-  QPointer<QWidget> Frame;
   QPointer<QLabel> ValueLabel;
   QPointer<pqPropertyLinks> Links;
+  QPointer<pqKeyFrameTypeWidget> Widget;
 };
 
 //-----------------------------------------------------------------------------
-pqSignalAdaptorKeyFrameType::pqSignalAdaptorKeyFrameType(QComboBox* combo,
-  QLabel* label, QWidget* frame, pqPropertyLinks* links)
-: pqSignalAdaptorComboBox(combo)
+pqSignalAdaptorKeyFrameType::pqSignalAdaptorKeyFrameType(
+  pqKeyFrameTypeWidget* widget, pqPropertyLinks* links,
+  QLabel* label)
+: pqSignalAdaptorComboBox(widget->typeComboBox())
 {
   this->Internals = new pqInternals;
-  this->Internals->Frame = frame;
+  this->Internals->Widget = widget;
   this->Internals->ValueLabel = label;
-  this->Internals->Ui.setupUi(frame);
   this->Internals->Links = links;
 
-  this->Internals->Ui.exponentialGroup->hide();
-  this->Internals->Ui.sinusoidGroup->hide();
-
-  QDoubleValidator * validator = new QDoubleValidator(this);
-  this->Internals->Ui.Base->setValidator(validator);
-  this->Internals->Ui.StartPower->setValidator(validator);
-  this->Internals->Ui.EndPower->setValidator(validator);
-  this->Internals->Ui.Offset->setValidator(validator);
-  this->Internals->Ui.Frequency->setValidator(validator);
-
-  combo->blockSignals(true);
-  combo->addItem(QIcon(":pqWidgets/Icons/pqRamp16.png"), "Ramp", "Ramp");
-  combo->addItem(QIcon(":pqWidgets/Icons/pqExponential16.png"), "Exponential", 
-    "Exponential");
-  combo->addItem(QIcon(":pqWidgets/Icons/pqSinusoidal16.png"), "Sinusoid", 
-    "Sinusoid");
-  combo->addItem(QIcon(":pqWidgets/Icons/pqStep16.png"), "Step", "Boolean");
-  combo->setCurrentIndex(-1);
-  combo->blockSignals(false);
-
-  QObject::connect(combo, SIGNAL(currentIndexChanged(int)),
+  QObject::connect(widget, SIGNAL(typeChanged(const QString&)),
     this, SLOT(onTypeChanged()));
-  frame->hide();
 }
 
 //-----------------------------------------------------------------------------
@@ -112,29 +88,29 @@ void pqSignalAdaptorKeyFrameType::setKeyFrameProxy(vtkSMProxy* proxy)
     {
     // connect the combo box
     this->Internals->Links->addPropertyLink(
-      this, "currentData",
-      SIGNAL(currentTextChanged(const QString&)),
+      this->Internals->Widget, "type",
+      SIGNAL(typeChanged(const QString&)),
       proxy, proxy->GetProperty("Type"));
 
     // Connect the GUI and the properties.
     this->Internals->Links->addPropertyLink(
-      this->Internals->Ui.Base, "text", SIGNAL(textChanged(const QString&)),
+      this->Internals->Widget, "base", SIGNAL(baseChanged(const QString&)),
       proxy, proxy->GetProperty("Base"));
     this->Internals->Links->addPropertyLink(
-      this->Internals->Ui.StartPower, "text", SIGNAL(textChanged(const QString&)),
+      this->Internals->Widget, "startPower", SIGNAL(startPowerChanged(const QString&)),
       proxy, proxy->GetProperty("StartPower"));
     this->Internals->Links->addPropertyLink(
-      this->Internals->Ui.EndPower, "text", SIGNAL(textChanged(const QString&)),
+      this->Internals->Widget, "endPower", SIGNAL(endPowerChanged(const QString&)),
       proxy, proxy->GetProperty("EndPower"));
 
     this->Internals->Links->addPropertyLink(
-      this->Internals->Ui.Offset, "text", SIGNAL(textChanged(const QString&)),
+      this->Internals->Widget, "offset", SIGNAL(offsetChanged(const QString&)),
       proxy, proxy->GetProperty("Offset"));
     this->Internals->Links->addPropertyLink(
-      this->Internals->Ui.Frequency, "text", SIGNAL(textChanged(const QString&)),
+      this->Internals->Widget, "frequency", SIGNAL(frequencyChanged(const QString&)),
       proxy, proxy->GetProperty("Frequency"));
     this->Internals->Links->addPropertyLink(
-      this->Internals->Ui.Phase, "value", SIGNAL(valueChanged(const QString&)),
+      this->Internals->Widget, "phase", SIGNAL(phaseChanged(double)),
       proxy, proxy->GetProperty("Phase"));
     }
 }
@@ -154,22 +130,6 @@ void pqSignalAdaptorKeyFrameType::onTypeChanged()
     {
     qDebug() << "Unknown type choosen in the combox: " << text;
     return;
-    }
-
-  // Hide all
-  this->Internals->Frame->hide();
-  this->Internals->Ui.exponentialGroup->hide();
-  this->Internals->Ui.sinusoidGroup->hide();
-
-  if (type == vtkSMCompositeKeyFrameProxy::EXPONENTIAL)
-    {
-    this->Internals->Ui.exponentialGroup->show();
-    this->Internals->Frame->show();
-    }
-  else if (type == vtkSMCompositeKeyFrameProxy::SINUSOID)
-    {
-    this->Internals->Ui.sinusoidGroup->show();
-    this->Internals->Frame->show();
     }
 
   if (type == vtkSMCompositeKeyFrameProxy::SINUSOID && this->Internals->ValueLabel)

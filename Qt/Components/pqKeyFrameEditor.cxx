@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqApplicationCore.h"
 #include "pqUndoStack.h"
+#include "pqKeyFrameTypeWidget.h"
 #include "pqSignalAdaptorKeyFrameType.h"
 #include "pqSMProxy.h"
 #include "pqPropertyLinks.h"
@@ -79,50 +80,18 @@ pqKeyFrameTypeDialog::~pqKeyFrameTypeDialog()
   this->Child->hide();
 }
 
-// widget for editing a single key frame interpolation type
-// this widget is persistent with the model
-class pqKeyFrameTypeWidget : public QWidget
-{
-public:
-  pqKeyFrameTypeWidget(vtkSMProxy* proxy)
-    {
-    QGridLayout* l = new QGridLayout(this);
-    l->setMargin(0);
-    QLabel* label = new QLabel(this);
-    label->setText(tr("Interpolation:"));
-    this->Combo = new QComboBox(this);
-    QWidget* widget = new QWidget(this);
-    l->addWidget(label, 0, 0);
-    l->addWidget(this->Combo, 0, 1);
-    l->addWidget(widget, 1, 0, 1, 2);
-    l->addItem(new
-      QSpacerItem(0,0,QSizePolicy::MinimumExpanding,QSizePolicy::MinimumExpanding), 2, 0, 1, 2);
-
-    this->Links.setUseUncheckedProperties(true);
-        
-    pqSignalAdaptorKeyFrameType* adaptor = 
-      new pqSignalAdaptorKeyFrameType(this->Combo, NULL, widget, &this->Links);
-      adaptor->setKeyFrameProxy(proxy);
-    }
-  
-  pqPropertyLinks Links;
-  QComboBox* Combo;
-
-};
-
 // item model for putting a key frame interpolation widget in the model
 class pqKeyFrameInterpolationItem : public QStandardItem
 {
 public:
-  pqKeyFrameInterpolationItem(vtkSMProxy* proxy)
-    : Widget(proxy)
+  pqKeyFrameInterpolationItem() : Widget()
     {
     }
   // get data from combo box on key frame editor
   QVariant data(int role) const
     {
-    int idx = this->Widget.Combo->currentIndex();
-    QAbstractItemModel* comboModel = this->Widget.Combo->model();
+    int idx = this->Widget.typeComboBox()->currentIndex();
+    QAbstractItemModel* comboModel = this->Widget.typeComboBox()->model();
     return comboModel->data(comboModel->index(idx, 0), role);
     }
   pqKeyFrameTypeWidget Widget;
@@ -245,9 +214,13 @@ void pqKeyFrameEditor::readKeyFrameData()
 
     if(i < numberKeyFrames-1)
       {
-      pqKeyFrameInterpolationItem* item = new
-        pqKeyFrameInterpolationItem(keyFrame);
+      pqKeyFrameInterpolationItem* item = new pqKeyFrameInterpolationItem();
       this->Internal->Model.setItem(i, 1, item);
+      
+      // intialize gui with adaptor
+      pqPropertyLinks links;
+      pqSignalAdaptorKeyFrameType adaptor(&item->Widget, &links);
+      adaptor.setKeyFrameProxy(keyFrame);
       }
     
     idx = this->Internal->Model.index(i, 2);
@@ -296,7 +269,20 @@ void pqKeyFrameEditor::writeKeyFrameData()
       static_cast<pqKeyFrameInterpolationItem*>(this->Internal->Model.item(i, 1));
     if(item)
       {
-      item->Widget.Links.accept();
+      pqSMAdaptor::setEnumerationProperty(keyFrame->GetProperty("Type"),
+        item->Widget.type());
+      pqSMAdaptor::setElementProperty(keyFrame->GetProperty("Base"),
+        item->Widget.base());
+      pqSMAdaptor::setElementProperty(keyFrame->GetProperty("StartPower"),
+        item->Widget.startPower());
+      pqSMAdaptor::setElementProperty(keyFrame->GetProperty("EndPower"),
+        item->Widget.endPower());
+      pqSMAdaptor::setElementProperty(keyFrame->GetProperty("Phase"),
+        item->Widget.phase());
+      pqSMAdaptor::setElementProperty(keyFrame->GetProperty("Offset"),
+        item->Widget.offset());
+      pqSMAdaptor::setElementProperty(keyFrame->GetProperty("Frequency"),
+        item->Widget.frequency());
       }
     
     idx = this->Internal->Model.index(i, 2);

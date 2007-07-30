@@ -204,10 +204,9 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
     this->Internal->valueFrameLarge, this->Internal->valueFrame);
 
   this->Internal->TypeAdaptor = new pqSignalAdaptorKeyFrameType(
-    this->Internal->interpolationType, 
-    this->Internal->valueLabel,
-    this->Internal->typeFrame,
-    &this->Internal->KeyFrameLinks);
+    this->Internal->keyFrameWidget, 
+    &this->Internal->KeyFrameLinks,
+    this->Internal->valueLabel);
 
   this->Internal->TimeAdaptor = new pqSignalAdaptorKeyFrameTime(
     this->Internal->keyFrameTime, "text",
@@ -533,13 +532,11 @@ void pqAnimationPanel::updateEnableState()
   // Cannot change the interpolation type for the last keyframe.
   if (num_keyframes == (this->Internal->keyFrameIndex->value()+1))
     {
-    this->Internal->interpolationType->setEnabled(false);
-    this->Internal->typeFrame->setEnabled(false);
+    this->Internal->keyFrameWidget->setEnabled(false);
     }
   else
     {
-    this->Internal->interpolationType->setEnabled(true);
-    this->Internal->typeFrame->setEnabled(true);
+    this->Internal->keyFrameWidget->setEnabled(true);
     }
 }
 
