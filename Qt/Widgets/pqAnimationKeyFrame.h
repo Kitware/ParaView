@@ -44,11 +44,15 @@ class pqAnimationTrack;
 class QTWIDGETS_EXPORT pqAnimationKeyFrame : public QObject, public QGraphicsItem
 {
   Q_OBJECT
-  Q_ENUMS(InterpolationType)
+  /// the time as a fraction of scene time that this keyframe starts at
   Q_PROPERTY(double startTime READ startTime WRITE setStartTime)
+  /// the time as a fraction of scene time that this keyframe ends at
   Q_PROPERTY(double endTime READ endTime WRITE setEndTime)
+  /// the value at the start of the keyframe
   Q_PROPERTY(QVariant startValue READ startValue WRITE setStartValue)
+  /// the value at the end of the keyframe
   Q_PROPERTY(QVariant endValue READ endValue WRITE setEndValue)
+  /// an icon to help describe the keyframe
   Q_PROPERTY(QIcon icon READ icon WRITE setIcon)
 
 public:

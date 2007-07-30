@@ -45,16 +45,21 @@ class pqAnimationKeyFrame;
 class QTWIDGETS_EXPORT pqAnimationTrack : public QObject, public QGraphicsItem
 {
   Q_OBJECT
+  /// the property animated in this track
   Q_PROPERTY(QVariant property READ property WRITE setProperty)
 public:
 
   pqAnimationTrack(QObject* p = 0);
   ~pqAnimationTrack();
   
+  /// number of keyframes
   int count();
+  /// get a keyframe
   pqAnimationKeyFrame* keyFrame(int);
 
+  /// add a keyframe
   pqAnimationKeyFrame* addKeyFrame();
+  /// remove a keyframe
   void removeKeyFrame(pqAnimationKeyFrame* frame);
 
   QVariant property() const;
