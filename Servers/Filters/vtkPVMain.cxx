@@ -26,7 +26,9 @@
 
 #include "vtkPVMain.h"
 
+#ifdef _WIN32
 #include "vtkDynamicLoader.h"
+#endif
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
@@ -47,7 +49,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.18");
+vtkCxxRevisionMacro(vtkPVMain, "1.19");
 
 int vtkPVMain::InitializeMPI = 1;
 
