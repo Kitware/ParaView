@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include "pqCoreExport.h"
 #include "vtkType.h" // for vtkIdType.
+#include "vtkClientServerID.h" // for vtkClientServerID
 
 class pqPipelineSource;
 class pqProxy;
@@ -58,6 +59,8 @@ template <class T> inline T pqFindItem(
   const pqServerManagerModel* const model, const QString& name);
 template <class T> inline T pqFindItem(
   const pqServerManagerModel* const model, vtkSMProxy* proxy);
+template <class T> inline T pqFindItem(
+  const pqServerManagerModel* const model, vtkClientServerID id);
 template <class T> inline int pqGetNumberOfItems(
   const pqServerManagerModel* const model);
 template <class T> inline T pqGetItemAtIndex(
@@ -99,6 +102,14 @@ public:
     T findItem(vtkSMProxy* proxy) const
       {
       return ::pqFindItem<T>(this, proxy);
+      }
+  
+  /// Given a self id for a proxy, 
+  /// locates a pqServerManagerModelItem subclass for the proxy.
+  template<class T>
+    T findItem(vtkClientServerID id) const
+      {
+      return ::pqFindItem<T>(this, id);
       }
 
   /// Returns a list of pqServerManagerModelItem of the given type.
@@ -149,6 +160,10 @@ public:
   /// Internal method.
   static pqProxy* findItemHelper(const pqServerManagerModel* const model, 
     const QMetaObject& mo, vtkSMProxy* proxy);
+
+  /// Internal method.
+  static pqProxy* findItemHelper(const pqServerManagerModel* const model, 
+    const QMetaObject& mo, vtkClientServerID id);
 
   /// Internal method.
   static pqProxy* findItemHelper(const pqServerManagerModel* const model, 
@@ -275,6 +290,15 @@ inline T pqFindItem(const pqServerManagerModel* const model, vtkSMProxy* proxy)
 {
   return qobject_cast<T>(
     pqServerManagerModel::findItemHelper(model, ((T)0)->staticMetaObject, proxy));
+}
+
+//-----------------------------------------------------------------------------
+template <class T> 
+inline T pqFindItem(const pqServerManagerModel* const model, 
+  vtkClientServerID id)
+{
+  return qobject_cast<T>(
+    pqServerManagerModel::findItemHelper(model, ((T)0)->staticMetaObject, id));
 }
 
 //-----------------------------------------------------------------------------

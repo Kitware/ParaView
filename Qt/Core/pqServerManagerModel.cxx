@@ -136,6 +136,23 @@ pqProxy* pqServerManagerModel::findItemHelper(
 //-----------------------------------------------------------------------------
 pqProxy* pqServerManagerModel::findItemHelper(
   const pqServerManagerModel* const model, const QMetaObject& mo, 
+  vtkClientServerID id)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(
+    pm->GetObjectFromID(id));
+  if (proxy)
+    {
+    return pqServerManagerModel::findItemHelper(
+      model, mo, proxy);
+    }
+
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+pqProxy* pqServerManagerModel::findItemHelper(
+  const pqServerManagerModel* const model, const QMetaObject& mo, 
   const QString& name)
 {
   foreach (pqServerManagerModelItem* item, model->Internal->ItemList)
