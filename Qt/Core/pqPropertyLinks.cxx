@@ -224,14 +224,28 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
       break;
     case pqSMAdaptor::SELECTION:
         {
-        QList<QVariant> sel;
-        sel = pqSMAdaptor::getSelectionProperty(this->Internal->Property, 
-          this->Internal->Index);
-
-        if(sel.size() == 2 && sel[1] != old)
+        if(this->Internal->Index == -1)
           {
-          this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
-            sel[1]);
+          QList<QList<QVariant> > newVal =
+            pqSMAdaptor::getSelectionProperty(this->Internal->Property);
+          if(newVal != old.value<QList<QList<QVariant> > >())
+            {
+            prop.setValue(newVal);
+            this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
+              prop);
+            }
+          }
+        else
+          {
+          QList<QVariant> sel;
+          sel = pqSMAdaptor::getSelectionProperty(this->Internal->Property, 
+            this->Internal->Index);
+
+          if(sel.size() == 2 && sel[1] != old)
+            {
+            this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
+              sel[1]);
+            }
           }
         }
       break;
@@ -383,25 +397,46 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
       break;
     case pqSMAdaptor::SELECTION:
         {
-        QList<QVariant> domain;
-        domain = pqSMAdaptor::getSelectionPropertyDomain(
-          this->Internal->Property);
-        QList<QVariant> selection;
-        selection.append(domain[this->Internal->Index]);
-        selection.append(prop);
-
-        if(this->Internal->UseUncheckedProperties)
+        if(this->Internal->Index == -1)
           {
-          pqSMAdaptor::setUncheckedSelectionProperty(
-            this->Internal->Property, selection);
+          QList<QList<QVariant> > theProp = prop.value<QList<QList<QVariant> > >();
+          if(this->Internal->UseUncheckedProperties)
+            {
+            pqSMAdaptor::setUncheckedSelectionProperty(
+              this->Internal->Property, theProp);
+            }
+          else
+            {
+            pqSMAdaptor::setSelectionProperty(
+              this->Internal->Property, theProp);
+            if(this->Internal->AutoUpdate)
+              {
+              this->Internal->Proxy->UpdateVTKObjects();
+              }
+            }
           }
         else
           {
-          pqSMAdaptor::setSelectionProperty(
-            this->Internal->Property, selection);
-          if(this->Internal->AutoUpdate)
+          QList<QVariant> domain;
+          domain = pqSMAdaptor::getSelectionPropertyDomain(
+            this->Internal->Property);
+          QList<QVariant> selection;
+          selection.append(domain[this->Internal->Index]);
+          selection.append(prop);
+
+          if(this->Internal->UseUncheckedProperties)
             {
-            this->Internal->Proxy->UpdateVTKObjects();
+            pqSMAdaptor::setUncheckedSelectionProperty(
+              this->Internal->Property, selection);
+            }
+          else
+            {
+            pqSMAdaptor::setSelectionProperty(
+              this->Internal->Property, selection);
+            if(this->Internal->AutoUpdate)
+              {
+              this->Internal->Proxy->UpdateVTKObjects();
+              }
             }
           }
         }

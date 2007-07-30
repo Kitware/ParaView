@@ -236,44 +236,18 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
       }
     else if (treeWidget)
       {
-      vtkSMDomain* array_list = SMProperty->GetDomain("array_list");
-      vtkSMStringListDomain* sld = vtkSMStringListDomain::SafeDownCast(
-        array_list);
-      vtkSMEnumerationDomain* ed = vtkSMEnumerationDomain::SafeDownCast(
-        array_list);
-
-      pqSignalAdaptorSelectionTreeWidget* adaptor = 0;
-      if (sld)
-        {
-        adaptor = new pqSignalAdaptorSelectionTreeWidget(sld, treeWidget);
-        }
-      else if (ed)
-        {
-        adaptor = new pqSignalAdaptorSelectionTreeWidget(ed, treeWidget);
-        }
-      if (adaptor)
-        {
-        adaptor->setObjectName("TreeWidgetAdaptor");
-        property_manager->registerLink(
-          adaptor, "values", SIGNAL(valuesChanged()),
-          proxy, SMProperty);
-        }
-      else
-        {
-        qDebug() << "Cannot create adaptor for property : " 
-          << SMProperty->GetXMLLabel();
-        }
+      Q_ASSERT("invalid tree widget for enumeration\n" == 0);
       }
     }
   else if(pt == pqSMAdaptor::SELECTION)
     {
-    // selections can be list widgets
-    // for now, we're assuming selection domains don't change
-    // if they do, we need to observe those changes
+    // selections can be list or tree widgets
     QListWidget* listWidget = qobject_cast<QListWidget*>(object);
     QTreeWidget* treeWidget = qobject_cast<QTreeWidget*>(object);
     if(listWidget)
       {
+      // for now, we're assuming selection domains don't change
+      // if they do, we need to observe those changes
       listWidget->clear();
       QList<QVariant> sel_domain = 
         pqSMAdaptor::getSelectionPropertyDomain(SMProperty);
@@ -288,20 +262,12 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
       }
     else if(treeWidget)
       {
-      treeWidget->clear();
-      QList<QVariant> sel_domain;
-      sel_domain = pqSMAdaptor::getSelectionPropertyDomain(SMProperty);
-      for(int j=0; j<sel_domain.size(); j++)
-        {
-        QList<QString> str;
-        str.append(sel_domain[j].toString());
-        pqTreeWidgetItemObject* item;
-        item = new pqTreeWidgetItemObject(treeWidget, str);
-        property_manager->registerLink(item, 
-                                          "checked", 
-                                          SIGNAL(checkedStateChanged(bool)),
-                                          proxy, SMProperty, j);
-        }
+      pqSignalAdaptorSelectionTreeWidget* adaptor = 
+        new pqSignalAdaptorSelectionTreeWidget(treeWidget, SMProperty);
+      adaptor->setObjectName("SelectionTreeWidgetAdaptor");
+      property_manager->registerLink(
+        adaptor, "values", SIGNAL(valuesChanged()),
+        proxy, SMProperty);
       }
     }
   else if(pt == pqSMAdaptor::PROXY)
@@ -669,15 +635,7 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
       }
     else if (treeWidget)
       {
-      pqSignalAdaptorSelectionTreeWidget* adaptor = 
-        comboBox->findChild<pqSignalAdaptorSelectionTreeWidget*>("TreeWidgetAdaptor");
-      if (adaptor)
-        {
-        property_manager->unregisterLink(
-          adaptor, "values", SIGNAL(valuesChanged()),
-          proxy, SMProperty);
-        delete adaptor;
-        }
+      Q_ASSERT("invalid tree widget for enumeration\n" == 0);
       }
     }
   else if(pt == pqSMAdaptor::SELECTION)
@@ -699,16 +657,12 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
       }
     if(treeWidget)
       {
-      for(int ii=0; ii<treeWidget->topLevelItemCount(); ii++)
-        {
-        pqTreeWidgetItemObject* item;
-        item = 
-          static_cast<pqTreeWidgetItemObject*>(treeWidget->topLevelItem(ii));
-        property_manager->unregisterLink(
-          item, "checked", SIGNAL(checkedStateChanged(bool)),
-          proxy, SMProperty, ii);
-        }
-      treeWidget->clear();
+      QObject* adaptor = 
+        treeWidget->findChild<pqSignalAdaptorComboBox*>("SelectionTreeWidgetAdaptor");
+      property_manager->unregisterLink(
+        adaptor, "values", SIGNAL(valuesChanged()),
+        proxy, SMProperty);
+      delete adaptor;
       }
     }
   else if(pt == pqSMAdaptor::PROXY)

@@ -39,55 +39,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class QTreeWidget;
-class vtkSMEnumerationDomain;
-class vtkSMStringListDomain;
+class vtkSMProperty;
 
 /// pqSignalAdaptorSelectionTreeWidget has two roles.
-/// \li It can be used to connect a vtkSMStringVectorProperty with a
-/// QTreeWidget (typically pqSelectionTreeWidget) where the SMProperty
-/// must have the values of only the selected items in the tree widget.
-/// Alternatively, it can be used to connect a vtkSMIntVectorProperty
-/// having a vtkSMEnumerationDomain with a QTreeWidget 
-/// (typically pqSelectionTreeWidget). Here too the vtkSMIntVectorProperty
-/// is an expandable property which is filled with values for all
-/// the selected items.
-/// \li Since the SMProperty contanis only the selected item, this adaptor
-/// requires a vtkSMStringListDomain (or vtkSMEnumerationDomain) from which 
-/// it can get the list of possible values. 
+/// \li It is used to connect a selection property with a
+/// QTreeWidget (typically pqTreeWidget)
 /// It also updates the list of available values every time
 /// the domain changes.
 /// Example use of this adaptor is to connect :
 /// \li "AddVolumeArrayName" property of a CTHPart filter to a 
-///     pqSelectionTreeWidget widget.
-/// \li "Functions" property of "P3DReader" with a pqSelectionTreeWidget.
+///     pqTreeWidget widget.
+/// \li "Functions" property of "P3DReader" with a pqTreeWidget.
 
 
 class PQCOMPONENTS_EXPORT pqSignalAdaptorSelectionTreeWidget : public QObject
 {
   Q_OBJECT
-  Q_PROPERTY(QList<QVariant> values READ values WRITE setValues)
-  Q_PROPERTY(QList<QVariant> DUMMY READ values WRITE setValues)
+  Q_PROPERTY(QList<QList<QVariant> > values READ values WRITE setValues)
 public:
   /// Constructor.
   /// \param domain The StringListDomain from which the adaptor
   ///        can obtain the list of possible values for this widget.
   /// \param treeWidget The QTreeWidget controlled by this adaptor.
-  pqSignalAdaptorSelectionTreeWidget(vtkSMStringListDomain* domain,
-    QTreeWidget* treeWidget);
-
-  /// Constructor.
-  /// \param domain The EnumerationDomain from which the adaptor
-  ///        can obtain the list of possible values for this widget.
-  /// \param treeWidget The QTreeWidget controlled by this adaptor.
-  pqSignalAdaptorSelectionTreeWidget(vtkSMEnumerationDomain* domain,
-    QTreeWidget* treeWidget);
+  pqSignalAdaptorSelectionTreeWidget(QTreeWidget* treeWidget,
+                                     vtkSMProperty* property);
 
   virtual ~pqSignalAdaptorSelectionTreeWidget();
 
   /// Returns a list of strings which  correspond to the currently
   /// selected values. i.e. only the strings for items currently
   /// selected by the user are returned.
-  QList<QVariant> values() const;
+  QList<QList<QVariant> > values() const;
 
 signals:
   /// Fired whenever the values change.
@@ -98,7 +80,7 @@ public slots:
   /// \values are set as selected in the tree widget.
   /// If a string is present that is not in the domain, it will
   /// be ignored.
-  void setValues(const QList<QVariant>& values);
+  void setValues(const QList<QList<QVariant> >& values);
 
 private slots:
   /// Called when vtkSMStringListDomain changes. We update the

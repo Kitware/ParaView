@@ -44,6 +44,8 @@ class QWidget;
 #include <QList>
 #include "pqSMProxy.h"
 
+Q_DECLARE_METATYPE(QList<QList<QVariant> >)
+
 /// Translates server manager events into Qt-compatible slots and signals
 class PQCORE_EXPORT pqSMAdaptor
 {
