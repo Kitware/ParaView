@@ -54,6 +54,12 @@ public:
   vtkSMProxy* getCurrentProxy() const;
   QString getCurrentPropertyName() const;
   int getCurrentIndex() const;
+
+  /// Sometimes, we want the combo to show a empty field that does not represent
+  /// any property. Set this to true to use such a field.
+  void setUseBlankEntry(bool b)
+    { this->UseBlankEntry = b;}
+
 public slots:
   /// Set the source whose properties this widget should list. If source is
   /// null, the widget gets disabled.
@@ -77,6 +83,8 @@ private:
   void buildPropertyListInternal(vtkSMProxy* proxy, const QString& labelPrefix);
   void addSMPropertyInternal(const QString& label, 
     vtkSMProxy* proxy, const QString& propertyname, int index);
+
+  bool UseBlankEntry;
 public:
   class pqInternal;
 private:

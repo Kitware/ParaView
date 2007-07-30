@@ -72,6 +72,7 @@ pqAnimatablePropertiesComboBox::pqAnimatablePropertiesComboBox(QWidget* _parent)
   :Superclass(_parent)
 {
   this->Internal = new pqInternal();
+  this->UseBlankEntry = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -115,6 +116,10 @@ void pqAnimatablePropertiesComboBox::buildPropertyList()
   if (!this->Internal->Source.GetPointer())
     {
     return;
+    }
+  if (this->UseBlankEntry)
+    {
+    this->addSMPropertyInternal("<select>", 0, QString(), -1);
     }
   this->buildPropertyListInternal(this->Internal->Source, QString());
 }
@@ -203,8 +208,8 @@ vtkSMProxy* pqAnimatablePropertiesComboBox::getCurrentProxy() const
   int index = this->currentIndex();
   if (index != -1)
     {
-    QVariant data = this->itemData(index);
-    pqInternal::PropertyInfo info = data.value<pqInternal::PropertyInfo>();
+    QVariant _data = this->itemData(index);
+    pqInternal::PropertyInfo info = _data.value<pqInternal::PropertyInfo>();
     return info.Proxy;
     }
   return 0;
@@ -216,8 +221,8 @@ QString pqAnimatablePropertiesComboBox::getCurrentPropertyName() const
   int index = this->currentIndex();
   if (index != -1)
     {
-    QVariant data = this->itemData(index);
-    pqInternal::PropertyInfo info = data.value<pqInternal::PropertyInfo>();
+    QVariant _data = this->itemData(index);
+    pqInternal::PropertyInfo info = _data.value<pqInternal::PropertyInfo>();
     return info.Name;
     }
   return QString();
