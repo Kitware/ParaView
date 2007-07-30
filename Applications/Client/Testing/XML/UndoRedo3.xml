@@ -153,4 +153,5 @@ cut/clip filters i.e. filters that need 3d widgets and have "helper" proxies.
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0/0|0" />
+  <pqevent object="MainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="ObjectId" /> 
 </pqevents>
