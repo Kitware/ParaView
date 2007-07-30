@@ -223,11 +223,20 @@ void pqAnimationViewWidget::keyFramesChanged(QObject* cueObject)
       pqSMAdaptor::getElementProperty(keyFrames[j]->GetProperty("KeyValues"));
     QVariant endValue =
       pqSMAdaptor::getElementProperty(keyFrames[j+1]->GetProperty("KeyValues"));
+    QVariant interpolation =
+      pqSMAdaptor::getEnumerationProperty(keyFrames[j]->GetProperty("Type"));
+    if(interpolation == "Boolean")
+      interpolation = "Step";
+    else if(interpolation == "Sinusoid")
+      interpolation = "Sinusoidal";
     pqAnimationKeyFrame* newFrame = track->addKeyFrame();
     newFrame->setStartTime(startTime.toDouble());
     newFrame->setEndTime(endTime.toDouble());
     newFrame->setStartValue(startValue);
     newFrame->setEndValue(endValue);
+    QString icon =
+      QString(":pqWidgets/Icons/pq%1%2.png").arg(interpolation.toString()).arg(16);
+    newFrame->setIcon(QIcon(icon));
     }
 }
 

@@ -48,6 +48,7 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
   QHBoxLayout* wlayout = new QHBoxLayout(cont);
   wlayout->setSizeConstraint(QLayout::SetMinimumSize);
   this->View = new QGraphicsView(cont);
+  this->View->setBackgroundRole(QPalette::Window);
   this->View->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   this->View->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   this->View->setAlignment(Qt::AlignLeft | Qt::AlignTop);

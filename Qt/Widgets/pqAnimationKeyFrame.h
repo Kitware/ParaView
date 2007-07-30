@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include <QGraphicsItem>
+#include <QIcon>
 class pqAnimationTrack;
 
 // represents a key frame
@@ -48,14 +49,9 @@ class QTWIDGETS_EXPORT pqAnimationKeyFrame : public QObject, public QGraphicsIte
   Q_PROPERTY(double endTime READ endTime WRITE setEndTime)
   Q_PROPERTY(QVariant startValue READ startValue WRITE setStartValue)
   Q_PROPERTY(QVariant endValue READ endValue WRITE setEndValue)
-  Q_PROPERTY(InterpolationType interpolation READ interpolation
-                                             WRITE setInterpolation)
-public:
+  Q_PROPERTY(QIcon icon READ icon WRITE setIcon)
 
-  enum InterpolationType
-  {
-    Linear
-  };
+public:
 
   pqAnimationKeyFrame(pqAnimationTrack* p, QGraphicsScene* s);
   ~pqAnimationKeyFrame();
@@ -64,7 +60,7 @@ public:
   double endTime() const;
   QVariant startValue() const;
   QVariant endValue() const;
-  InterpolationType interpolation() const;
+  QIcon icon() const;
   
   QRectF boundingRect() const;
 
@@ -73,14 +69,14 @@ public slots:
   void setEndTime(double t);
   void setStartValue(const QVariant&);
   void setEndValue(const QVariant&);
-  void setInterpolation(InterpolationType);
+  void setIcon(const QIcon& icon);
   void setBoundingRect(const QRectF& r);
   void adjustRect();
 
 signals:
   void startValueChanged();
   void endValueChanged();
-  void interpolationChanged();
+  void iconChanged();
 
 protected:
 
@@ -94,7 +90,7 @@ private:
   double EndTime;
   QVariant StartValue;
   QVariant EndValue;
-  InterpolationType Interpolation;
+  QIcon Icon;
 
   QRectF Rect;
 

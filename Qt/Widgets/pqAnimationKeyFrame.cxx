@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqAnimationKeyFrame::pqAnimationKeyFrame(pqAnimationTrack* p, QGraphicsScene* s)
   : QObject(p), QGraphicsItem(p,s),
   StartTime(0), EndTime(1),
-  Interpolation(Linear), Rect(0,0,1,1)
+  Rect(0,0,1,1)
 {
 }
 
@@ -59,10 +59,9 @@ QVariant pqAnimationKeyFrame::endValue() const
   return this->EndValue;
 }
 
-pqAnimationKeyFrame::InterpolationType 
-pqAnimationKeyFrame::interpolation() const
+QIcon pqAnimationKeyFrame::icon() const
 {
-  return this->Interpolation;
+  return this->Icon;
 }
 
 double pqAnimationKeyFrame::startTime() const
@@ -96,10 +95,9 @@ void pqAnimationKeyFrame::setEndValue(const QVariant& v)
   this->update();
 }
 
-void pqAnimationKeyFrame::setInterpolation(
-  pqAnimationKeyFrame::InterpolationType i)
+void pqAnimationKeyFrame::setIcon(const QIcon& i)
 {
-  this->Interpolation = i;
+  this->Icon = i;
   this->update();
 }
   
@@ -146,19 +144,28 @@ void pqAnimationKeyFrame::paint(QPainter* p,
 
   QFontMetrics metrics(widget->font());
   double halfWidth = keyFrameRect.width()/2.0 - 5;
+
+  double iconWidth = keyFrameRect.width();
   
   QString label = metrics.elidedText(startValue().toString(), Qt::ElideRight,
     qRound(halfWidth));
   QPointF pt(keyFrameRect.left()+3.0, 
             keyFrameRect.top() + 0.5*keyFrameRect.height() + metrics.height() / 2.0 - 1.0);
   p->drawText(pt, label);
+  iconWidth -= metrics.width(label);
   
   label = metrics.elidedText(endValue().toString(), Qt::ElideRight,
     qRound(halfWidth));
   pt = QPointF(keyFrameRect.right() - metrics.width(label) - 3.0, 
             keyFrameRect.top() + 0.5*keyFrameRect.height() + metrics.height() / 2.0 - 1.0);
-  
   p->drawText(pt, label);
+  iconWidth -= metrics.width(label);
+
+  if(iconWidth >= 16)
+    {
+    QPixmap pix = this->Icon.pixmap(16);
+    p->drawPixmap(keyFrameRect.center() - QPointF(8.0,8.0), pix);
+    }
 
   p->restore();
 }

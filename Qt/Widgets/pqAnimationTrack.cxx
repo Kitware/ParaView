@@ -117,7 +117,7 @@ void pqAnimationTrack::paint(QPainter* p,
 {
   // draw border for this track
   p->save();
-  p->setBrush(QBrush(QColor(220,220,220)));
+  p->setBrush(QBrush());
   QPen pen(QColor(0,0,0));
   pen.setWidth(0);
   p->setPen(pen);

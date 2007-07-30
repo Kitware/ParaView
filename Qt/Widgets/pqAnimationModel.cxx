@@ -181,6 +181,13 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF& )
   QGraphicsView* view = qobject_cast<QGraphicsView*>(this->parent());
   QRectF labelRect = QRectF(sr.left(), sr.top(), sr.width(), rh);
 
+  // make background for time labels white
+  painter->save();
+  painter->setBrush(QColor(255,255,255));
+  painter->setPen(QColor());
+  painter->drawRect(labelRect);
+  painter->restore();
+
   QFontMetrics metrics(view->font());
   int num = qRound(labelRect.width() / (9 * metrics.maxWidth()));
   num = num == 0 ? 1 : num;
@@ -211,13 +218,28 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF& )
 
   
   // draw current time bar
-  double fraction = this->CurrentTime / (this->EndTime - this->StartTime);
-  QPointF pt1(fraction * sr.width() + sr.left(), 0.0);
-  QPointF pt2(pt1.x(), sr.height() + sr.top());
-  
   QPen pen = painter->pen();
+  pen.setJoinStyle(Qt::MiterJoin);
   pen.setWidth(2);
   painter->setPen(pen);
+
+  const double triSize = 6.0;
+
+  double fraction = this->CurrentTime / (this->EndTime - this->StartTime);
+  QVector<QPointF> polyPoints;
+  polyPoints.append(QPointF(fraction * sr.width() + sr.left(), rh));
+  polyPoints.append(QPointF(fraction * sr.width() + sr.left() + triSize,
+                            rh - triSize));
+  polyPoints.append(QPointF(fraction * sr.width() + sr.left() - triSize,
+                            rh - triSize));
+  QPolygonF poly(polyPoints);
+  painter->drawPolygon(poly);
+  
+  pen.setWidth(3);
+  painter->setPen(pen);
+
+  QPointF pt1(fraction * sr.width() + sr.left(), rh);
+  QPointF pt2(pt1.x(), sr.height() + sr.top());
   painter->drawLine(pt1, pt2);
 
 
