@@ -92,17 +92,6 @@ public:
     { return this->Superclass::CreateDefaultRepresentation(proxy); }
 
   // Description:
-  // Set the animation scene played along X-axis.
-  void SetAnimationSceneX(vtkSMPVAnimationSceneProxy*);
-  vtkGetObjectMacro(AnimationSceneX, vtkSMPVAnimationSceneProxy);
-
-  // Description:
-  // Set the animation scene played along Y axis. To create film-strip
-  // visualizations, this must be empty.
-  void SetAnimationSceneY(vtkSMPVAnimationSceneProxy*);
-  vtkGetObjectMacro(AnimationSceneY, vtkSMPVAnimationSceneProxy);
-
-  // Description:
   // Get all the internal views. The views should only be used to be layed out
   // by the GUI. It's not recommended to directly change the properties of the
   // views.

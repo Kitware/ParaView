@@ -67,7 +67,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.7");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -94,56 +94,19 @@ vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::~vtkSMComparativeViewProxy()
 {
-  this->SetAnimationSceneX(0);
-  this->SetAnimationSceneY(0);
-  delete this->Internal;
-
-  this->FilmStripObserver->Delete();
-  this->SceneObserver->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::SetAnimationSceneX(
-  vtkSMPVAnimationSceneProxy* proxy)
-{
-  if (proxy != this->AnimationSceneX)
-    {
-    this->SceneOutdated = true;
-    }
-
   if (this->AnimationSceneX)
     {
     this->AnimationSceneX->RemoveObserver(this->SceneObserver);
     }
-
-  vtkSetObjectBodyMacro(AnimationSceneX, vtkSMPVAnimationSceneProxy, proxy);
-
-  if (this->AnimationSceneX)
-    {
-    this->AnimationSceneX->AddObserver(vtkCommand::ModifiedEvent, this->SceneObserver);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::SetAnimationSceneY(
-  vtkSMPVAnimationSceneProxy* proxy)
-{
-  if (proxy != this->AnimationSceneY)
-    {
-    this->SceneOutdated = true;
-    }
-
   if (this->AnimationSceneY)
     {
     this->AnimationSceneY->RemoveObserver(this->SceneObserver);
     }
 
-  vtkSetObjectBodyMacro(AnimationSceneY, vtkSMPVAnimationSceneProxy, proxy);
+  delete this->Internal;
 
-  if (this->AnimationSceneY)
-    {
-    this->AnimationSceneY->AddObserver(vtkCommand::ModifiedEvent, this->SceneObserver);
-    }
+  this->FilmStripObserver->Delete();
+  this->SceneObserver->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -183,6 +146,17 @@ bool vtkSMComparativeViewProxy::BeginCreateVTKObjects()
   this->Internal->ViewLink->AddException("CameraViewUp");
   this->Internal->ViewLink->AddException("CameraClippingRangeInfo");
   this->Internal->ViewLink->AddException("CameraClippingRange");
+
+  this->AnimationSceneX  = vtkSMPVAnimationSceneProxy::SafeDownCast(
+    this->GetSubProxy("AnimationSceneX"));
+  this->AnimationSceneY = vtkSMPVAnimationSceneProxy::SafeDownCast(
+    this->GetSubProxy("AnimationSceneY"));
+
+  this->AnimationSceneX->AddObserver(vtkCommand::ModifiedEvent, 
+    this->SceneObserver);
+  this->AnimationSceneY->AddObserver(vtkCommand::ModifiedEvent, 
+    this->SceneObserver);
+
   return this->Superclass::BeginCreateVTKObjects();
 }
 

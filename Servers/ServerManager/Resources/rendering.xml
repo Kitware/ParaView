@@ -3152,24 +3152,23 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
-      <ProxyProperty
-        name="AnimationSceneX"
-        command="SetAnimationSceneX"
-        update_self="1">
-        <Documentation>
-          Set the animation scene to use along X axis.
-        </Documentation>
-      </ProxyProperty>
+      <SubProxy>
+        <Proxy name="AnimationSceneX" proxygroup="animation"
+          proxyname="PVAnimationScene">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Cues" exposed_name="XCues" />
+        </ExposedProperties>
+      </SubProxy>
 
-      <ProxyProperty
-        name="AnimationSceneY"
-        command="SetAnimationSceneY"
-        update_self="1">
-        <Documentation>
-          Set the animation scene to use along Y axis (not used int FILM_STRIP
-          mode).
-        </Documentation>
-      </ProxyProperty>
+      <SubProxy>
+        <Proxy name="AnimationSceneY" proxygroup="animation"
+          proxyname="PVAnimationScene">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Cues" exposed_name="YCues" />
+        </ExposedProperties>
+      </SubProxy>
 
       <SubProxy>
         <Proxy name="RootView" proxygroup="newviews" proxyname="RenderView">
