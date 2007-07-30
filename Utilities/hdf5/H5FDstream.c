@@ -13,7 +13,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /*
- * Copyright © 2000 The author.
+ * Copyright ï¿½ 2000 The author.
  * The author prefers this code not be used for military purposes.
  *
  *
@@ -496,9 +496,11 @@ H5FD_stream_open_socket (const char *filename, int o_flags,
       } else if (setsockopt (sock, IPPROTO_TCP, TCP_NODELAY, (const char *) &on,
                            sizeof(on)) < 0) {
         HGOTO_ERROR(H5E_RESOURCE,H5E_NOSPACE,H5FD_STREAM_INVALID_SOCKET,"unable to set socket option TCP_NODELAY")
+#ifdef HAVE_SO_REUSEADDR
       } else if (setsockopt (sock, SOL_SOCKET, SO_REUSEADDR, (const char *) &on,
                            sizeof(on)) < 0) {
         HGOTO_ERROR(H5E_RESOURCE,H5E_NOSPACE,H5FD_STREAM_INVALID_SOCKET,"unable to set socket option SO_REUSEADDR")
+#endif
       } else {
         /* Try to bind the socket to the given port.
            If maxhunt is given try some successive ports also. */

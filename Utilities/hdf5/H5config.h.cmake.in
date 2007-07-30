@@ -235,6 +235,9 @@
 /* Define if `socklen_t' is defined */
 #cmakedefine HAVE_SOCKLEN_T ${HAVE_SOCKLEN_T}
 
+/* Define if SO_REUSEADDR is defined */
+#cmakedefine HAVE_SO_REUSEADDR ${HAVE_SO_REUSEADDR}
+
 /* Define if the SRB is defined */
 #cmakedefine HAVE_SRB ${HAVE_SRB}
 

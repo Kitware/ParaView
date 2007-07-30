@@ -246,6 +246,9 @@ CHECK_FUNCTION_EXISTS(frexpl            HAVE_FREXPL)
 
 CHECK_SYMBOL_EXISTS(TIOCGWINSZ "sys/ioctl.h" HAVE_TIOCGWINSZ)
 CHECK_SYMBOL_EXISTS(TIOCGETD   "sys/ioctl.h" HAVE_TIOCGETD)
+# e.g. IBM BlueGene/L doesn't have SO_REUSEADDR, because "setsockopt is not needed for
+# BlueGene/L applications" according to the BlueGene/L Application Development handbook
+CHECK_SYMBOL_EXISTS(SO_REUSEADDR "sys/types.h;sys/socket.h" HAVE_SO_REUSEADDR)
 
 IF(HDF5_STREAM_VFD)
   CHECK_INCLUDE_FILE_CONCAT("netdb.h" HAVE_NETDB_H)
