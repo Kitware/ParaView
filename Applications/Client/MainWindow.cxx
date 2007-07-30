@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqActiveView.h>
 #include <pqApplicationCore.h>
 #include <pqAnimationPanel.h>
+#include <pqAnimationViewWidget.h>
 //#include <pqLookmarkToolbar.h>
 #include <pqMainWindowCore.h>
 #include <pqObjectBuilder.h>
@@ -536,6 +537,9 @@ MainWindow::MainWindow() :
     this->Implementation->UI.animationPanelDock);
   animation_panel->setCurrentTimeToolbar(
     this->Implementation->UI.currentTimeToolbar);
+
+  this->Implementation->Core.setupAnimationView(
+    this->Implementation->UI.animationViewDock);
   
   // Setup the view menu ...
   this->Implementation->ToolbarsMenu->addWidget(
@@ -586,6 +590,10 @@ MainWindow::MainWindow() :
   this->Implementation->ViewMenu->addWidget(
     this->Implementation->UI.animationPanelDock,
     this->Implementation->UI.animationPanelDock->windowTitle());
+  
+  this->Implementation->ViewMenu->addWidget(
+    this->Implementation->UI.animationViewDock,
+    this->Implementation->UI.animationViewDock->windowTitle());
 
   this->Implementation->ViewMenu->addWidget(
     this->Implementation->UI.elementInspectorDock,
@@ -627,6 +635,7 @@ MainWindow::MainWindow() :
   this->Implementation->UI.lookmarkInspectorDock->hide();
   this->Implementation->UI.statisticsViewDock->hide();
   this->Implementation->UI.animationPanelDock->hide();
+  this->Implementation->UI.animationViewDock->hide();
 
   // Fix the toolbar layouts from designer.
   this->Implementation->UI.mainToolBar->layout()->setSpacing(0);

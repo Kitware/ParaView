@@ -426,6 +426,15 @@
     <number>4</number>
    </attribute>
   </widget>
+  <widget class="QDockWidget" name="animationViewDock" >
+   <property name="windowTitle" >
+    <string>Animation View</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_9" />
+  </widget>
   <action name="actionFileOpen" >
    <property name="icon" >
     <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqOpen24.png</iconset>
