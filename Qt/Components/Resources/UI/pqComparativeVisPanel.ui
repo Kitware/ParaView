@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>232</width>
-    <height>228</height>
+    <width>202</width>
+    <height>383</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -14,29 +14,85 @@
   </property>
   <layout class="QGridLayout" >
    <property name="margin" >
-    <number>4</number>
+    <number>9</number>
    </property>
    <property name="spacing" >
-    <number>2</number>
+    <number>6</number>
    </property>
-   <item row="2" column="0" >
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
+   <item row="1" column="0" colspan="2" >
+    <widget class="QGroupBox" name="XAxisGroup" >
+     <property name="title" >
+      <string>Animated Source (X Axis)</string>
      </property>
-     <property name="sizeHint" >
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="2" column="1" >
+       <widget class="pqAnimatablePropertiesComboBox" name="XProperty" />
+      </item>
+      <item rowspan="2" row="0" column="1" >
+       <widget class="pqSourceComboBox" name="XObject" />
+      </item>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_4" >
+        <property name="text" >
+         <string>Selected Object</string>
+        </property>
+       </widget>
+      </item>
+      <item rowspan="2" row="1" column="0" >
+       <widget class="QLabel" name="label_5" >
+        <property name="text" >
+         <string>Property to Animate</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
-   <item row="2" column="1" >
-    <widget class="QPushButton" name="Update" >
-     <property name="text" >
-      <string>&amp;Update</string>
+   <item row="2" column="0" colspan="2" >
+    <widget class="QGroupBox" name="YAxisGroup" >
+     <property name="title" >
+      <string>Animated Source (Y Axis)</string>
      </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="2" column="1" >
+       <widget class="pqAnimatablePropertiesComboBox" name="YProperty" />
+      </item>
+      <item rowspan="2" row="0" column="1" >
+       <widget class="pqSourceComboBox" name="YObject" />
+      </item>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_6" >
+        <property name="text" >
+         <string>Selected Object</string>
+        </property>
+       </widget>
+      </item>
+      <item rowspan="2" row="1" column="0" >
+       <widget class="QLabel" name="label_7" >
+        <property name="text" >
+         <string>Property to Animate</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item row="0" column="0" colspan="2" >
@@ -77,12 +133,18 @@
         <property name="text" >
          <string>Number of X Frames</string>
         </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item row="2" column="0" >
        <widget class="QLabel" name="label_2" >
         <property name="text" >
          <string>Number of Y Frames</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -112,7 +174,27 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2" >
+   <item row="4" column="1" >
+    <widget class="QPushButton" name="Update" >
+     <property name="text" >
+      <string>&amp;Update</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="3" column="0" colspan="2" >
     <widget class="pqAnimationWidget" native="1" name="AnimationWidget" >
      <property name="minimumSize" >
       <size>
@@ -129,6 +211,16 @@
    <class>pqAnimationWidget</class>
    <extends>QWidget</extends>
    <header>pqAnimationWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqSourceComboBox</class>
+   <extends>QComboBox</extends>
+   <header>pqSourceComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqAnimatablePropertiesComboBox</class>
+   <extends>QComboBox</extends>
+   <header>pqAnimatablePropertiesComboBox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

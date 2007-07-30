@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqAnimationPanel.h"
 
 #include "vtkClientServerID.h"
-#include "vtkEventQtSlotConnect.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMPropertyIterator.h"
@@ -91,26 +90,16 @@ public:
   QPointer<QLineEdit> ToolbarCurrentTimeWidget;
   QPointer<QSpinBox> ToolbarCurrentTimeIndexWidget;
 
-  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   pqSignalAdaptorComboBox* PlayModeAdaptor;
   pqPropertyLinks KeyFrameLinks;
   pqPropertyLinks SceneLinks;
   pqPropertyLinks CurrentTimeLink;
-  struct PropertyInfo
-    {
-    vtkSmartPointer<vtkSMProxy> Proxy;
-    QString Name;
-    int Index;
-    };
 
   pqInternals()
     {
-    this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     this->CurrentTimeLink.setUseUncheckedProperties(true);
     }
 };
-
-Q_DECLARE_METATYPE(pqAnimationPanel::pqInternals::PropertyInfo);
 
 //-----------------------------------------------------------------------------
 pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
@@ -580,8 +569,7 @@ void pqAnimationPanel::onCurrentChanged(pqProxy* src)
     }
 
   // clear property listing.
-  this->Internal->VTKConnect->Disconnect();
-  this->Internal->propertyName->clear();
+  this->Internal->propertyName->setSource(0);
   this->setActiveCue(0);
 
   this->Internal->CurrentProxy = src;
@@ -660,8 +648,6 @@ void pqAnimationPanel::onActiveViewChanged(pqView* view)
 //-----------------------------------------------------------------------------
 void pqAnimationPanel::buildPropertyList()
 {
-  this->Internal->VTKConnect->Disconnect();
-  this->Internal->propertyName->clear();
   if (!this->Internal->CurrentProxy)
     {
     return;
@@ -670,83 +656,18 @@ void pqAnimationPanel::buildPropertyList()
   if (this->Internal->CurrentProxy == this->Internal->ActiveRenderView)
     {
     // Render modules are never actulally animated, we animate their camera.
-    pqAnimationPanel::pqInternals::PropertyInfo info;
-    info.Proxy = this->Internal->CurrentProxy->getProxy();
-    info.Name = "Camera";
-    info.Index =  -1;
-    this->Internal->propertyName->addItem("Camera", QVariant::fromValue(info));
+    this->Internal->propertyName->setSourceWithoutProperties(
+      this->Internal->CurrentProxy->getProxy());
+    this->Internal->propertyName->addSMProperty("Camera", "Camera", -1);
     return;
     }
 
-  this->buildPropertyList(this->Internal->CurrentProxy->getProxy(), QString());
-
+  this->Internal->propertyName->setSource(
+    this->Internal->CurrentProxy->getProxy());
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationPanel::buildPropertyList(vtkSMProxy* proxy, 
-  const QString& labelPrefix)
-{
-  if (!proxy)
-    {
-    return;
-    }
-
-  vtkSmartPointer<vtkSMPropertyIterator> iter;
-  iter.TakeReference(proxy->NewPropertyIterator());
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    vtkSMVectorProperty* smproperty = 
-      vtkSMVectorProperty::SafeDownCast(iter->GetProperty());
-    if (!smproperty || !smproperty->GetAnimateable() || 
-      smproperty->GetInformationOnly())
-      {
-      continue;
-      }
-    unsigned int num_elems = smproperty->GetNumberOfElements();
-    if (smproperty->GetRepeatCommand())
-      {
-      num_elems = 1;
-      }
-    for (unsigned int cc=0; cc < num_elems; cc++)
-      {
-      pqAnimationPanel::pqInternals::PropertyInfo info;
-      info.Proxy = proxy;
-      info.Name = iter->GetKey();
-      info.Index = smproperty->GetRepeatCommand()? -1 : static_cast<int>(cc);
-
-      QString label = labelPrefix.isEmpty()? "" : labelPrefix + " - ";
-      label += iter->GetProperty()->GetXMLLabel();
-      label = (num_elems>1) ? label + " (" + QString::number(cc) + ")" 
-        : label;
-      this->Internal->propertyName->addItem(label, 
-        QVariant::fromValue(info));
-      }
-    }
-
-  // Now add properties of all proxies in properties that have
-  // proxy lists.
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    vtkSMProxyProperty* smproperty = 
-      vtkSMProxyProperty::SafeDownCast(iter->GetProperty());
-    if (smproperty && 
-      pqSMAdaptor::getPropertyType(smproperty) == pqSMAdaptor::PROXYSELECTION)
-      {
-      vtkSMProxy* child_proxy = pqSMAdaptor::getProxyProperty(smproperty);
-      QString newPrefix = labelPrefix.isEmpty()? "" : labelPrefix + ":";
-      newPrefix += smproperty->GetXMLLabel();
-      this->buildPropertyList(child_proxy, newPrefix);
-
-      // if this property's value changes, we'll have to rebuild
-      // the property names menu.
-      this->Internal->VTKConnect->Connect(smproperty, vtkCommand::ModifiedEvent,
-        this, SLOT(buildPropertyList()), 0, 0, Qt::QueuedConnection);
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationPanel::onCurrentPropertyChanged(int index)
+void pqAnimationPanel::onCurrentPropertyChanged(int vtkNotUsed(index))
 {
   pqAnimationManager* mgr = this->Internal->Manager;
   pqAnimationScene* scene = mgr->getActiveScene();
@@ -754,12 +675,10 @@ void pqAnimationPanel::onCurrentPropertyChanged(int index)
 
   if (scene)
     {
-    pqAnimationPanel::pqInternals::PropertyInfo info =
-      this->Internal->propertyName->itemData(index).value<
-      pqAnimationPanel::pqInternals::PropertyInfo>();
-
-    cue = mgr->getCue(scene, info.Proxy, 
-      info.Name.toAscii().data(), info.Index);
+    cue = mgr->getCue(scene,
+      this->Internal->propertyName->getCurrentProxy(),
+      this->Internal->propertyName->getCurrentPropertyName().toAscii().data(),
+      this->Internal->propertyName->getCurrentIndex());
     }
 
   this->setActiveCue(cue); 
@@ -878,22 +797,21 @@ void pqAnimationPanel::insertKeyFrame(int index)
   if (!cue)
     {
     // Need to create new cue for this property.
-    pqAnimationPanel::pqInternals::PropertyInfo info =
-      this->Internal->propertyName->itemData(
-        this->Internal->propertyName->currentIndex()).value<
-      pqAnimationPanel::pqInternals::PropertyInfo>();
+    vtkSMProxy* curProxy = this->Internal->propertyName->getCurrentProxy();
+    QString pname = this->Internal->propertyName->getCurrentPropertyName();
+    int index = this->Internal->propertyName->getCurrentIndex();
+
     // Check is we are creating a camera cue or a regular cue.
     if (this->Internal->ActiveRenderView && 
-      info.Proxy == this->Internal->ActiveRenderView->getProxy())
+      curProxy == this->Internal->ActiveRenderView->getProxy())
       {
-      cue = scene->createCue(info.Proxy,
-        info.Name.toAscii().data(), info.Index, "CameraManipulator");
+      cue = scene->createCue(curProxy,
+        pname.toAscii().data(), index, "CameraManipulator");
       cue->setKeyFrameType("CameraKeyFrame");
       }
     else
       {
-      cue = scene->createCue(info.Proxy,
-        info.Name.toAscii().data(), info.Index);
+      cue = scene->createCue(curProxy, pname.toAscii().data(), index);
       }
     this->setActiveCue(cue);
     }

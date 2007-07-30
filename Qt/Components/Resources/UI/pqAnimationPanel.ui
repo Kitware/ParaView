@@ -268,7 +268,7 @@
        </widget>
       </item>
       <item row="1" column="1" >
-       <widget class="QComboBox" name="propertyName" >
+       <widget class="pqAnimatablePropertiesComboBox" name="propertyName" >
         <property name="sizePolicy" >
          <sizepolicy>
           <hsizetype>5</hsizetype>
@@ -666,6 +666,11 @@
    <class>pqSpinBox</class>
    <extends>QSpinBox</extends>
    <header>pqSpinBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqAnimatablePropertiesComboBox</class>
+   <extends>QComboBox</extends>
+   <header>pqAnimatablePropertiesComboBox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

@@ -178,8 +178,6 @@ protected slots:
   /// current time spin box.
   void currentTimeIndexEdited();
 protected:
-  void buildPropertyList(vtkSMProxy* proxy, const QString& labelPrefix);
-
   /// Actual implementation for source changed.
   void onCurrentChanged(pqProxy*);
 private:

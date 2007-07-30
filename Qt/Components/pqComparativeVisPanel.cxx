@@ -38,14 +38,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt Includes.
 #include <QHeaderView>
 #include <QPointer>
+#include <QScrollArea>
 
 // ParaView Includes.
 #include "pqActiveView.h"
 #include "pqAnimationKeyFrame.h"
 #include "pqAnimationModel.h"
 #include "pqAnimationTrack.h"
+#include "pqApplicationCore.h"
 #include "pqComparativeRenderView.h"
 #include "pqPropertyLinks.h"
+#include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
 
 class pqComparativeVisPanel::pqInternal : public Ui::ComparativeView
@@ -60,6 +63,29 @@ public:
 pqComparativeVisPanel::pqComparativeVisPanel(QWidget* p):Superclass(p)
 {
   this->Internal = new pqInternal();
+
+  /*
+  QVBoxLayout* vboxlayout = new QVBoxLayout(this);
+  vboxlayout->setSpacing(0);
+  vboxlayout->setMargin(0);
+  vboxlayout->setObjectName("vboxLayout");
+
+  QWidget* container = new QWidget(this);
+  container->setObjectName("scrollWidget");
+  container->setSizePolicy(QSizePolicy::MinimumExpanding,
+    QSizePolicy::MinimumExpanding);
+
+  QScrollArea* s = new QScrollArea(this);
+  s->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  s->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  s->setWidgetResizable(true);
+  s->setObjectName("scrollArea");
+  s->setFrameShape(QFrame::NoFrame);
+  s->setWidget(container);
+  vboxlayout->addWidget(s);
+  this->Internal->setupUi(container);
+  */
+
   this->Internal->setupUi(this);
   this->Internal->ModeAdaptor = 
     new pqSignalAdaptorComboBox(this->Internal->Mode);
@@ -69,7 +95,11 @@ pqComparativeVisPanel::pqComparativeVisPanel(QWidget* p):Superclass(p)
     SIGNAL(qtWidgetChanged()),
     this, SLOT(updateParameterPanel()), Qt::QueuedConnection);
 
-  //this->Internal->AnimationWidget->header()->hide();
+  QHeaderView* header = this->Internal->AnimationWidget->header();
+  header->setClickable(true);
+  QObject::connect(header,
+    SIGNAL(sectionClicked(int)),
+    this, SLOT(editPropertyToAnimate(int)), Qt::QueuedConnection);
 
   QObject::connect(this->Internal->Update, SIGNAL(clicked()),
     this, SLOT(updateView()), Qt::QueuedConnection);
@@ -78,6 +108,27 @@ pqComparativeVisPanel::pqComparativeVisPanel(QWidget* p):Superclass(p)
   QObject::connect(&pqActiveView::instance(), SIGNAL(changed(pqView*)),
     this, SLOT(setView(pqView*)));
 
+  this->Internal->XObject->setUpdateCurrentWithSelection(true);
+  this->Internal->YObject->setUpdateCurrentWithSelection(true);
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
+
+  QObject::connect(smmodel, SIGNAL(sourceAdded(pqPipelineSource*)),
+    this->Internal->XObject, SLOT(addSource(pqPipelineSource*)));
+  QObject::connect(smmodel, SIGNAL(preSourceRemoved(pqPipelineSource*)),
+    this->Internal->XObject, SLOT(removeSource(pqPipelineSource*)));
+
+  QObject::connect(smmodel, SIGNAL(sourceAdded(pqPipelineSource*)),
+    this->Internal->YObject, SLOT(addSource(pqPipelineSource*)));
+  QObject::connect(smmodel, SIGNAL(preSourceRemoved(pqPipelineSource*)),
+    this->Internal->YObject, SLOT(removeSource(pqPipelineSource*)));
+
+  QObject::connect(
+    this->Internal->XObject, SIGNAL(currentIndexChanged(vtkSMProxy*)),
+    this->Internal->XProperty, SLOT(setSource(vtkSMProxy*)));
+  QObject::connect(
+    this->Internal->YObject, SIGNAL(currentIndexChanged(vtkSMProxy*)),
+    this->Internal->YProperty, SLOT(setSource(vtkSMProxy*)));
 
   this->setEnabled(false);
 }
@@ -142,18 +193,44 @@ void pqComparativeVisPanel::updateParameterPanel()
     pqAnimationTrack* track = model->track(0);
     model->removeTrack(track);
     }
+  model->setStartTime(0);
+  model->setEndTime(1);
 
   if (mode == vtkSMComparativeViewProxy::FILM_STRIP)
     {
     pqAnimationTrack* track = model->addTrack();
     track->setProperty("Time Axis");
+    pqAnimationKeyFrame* kf = track->addKeyFrame();
+    kf->setStartTime(0);
+    kf->setEndTime(1);
+    kf->setStartValue(0);
+    kf->setEndValue(1);
+
+    this->Internal->XAxisGroup->setEnabled(true);
+    this->Internal->XAxisGroup->setTitle("Animated Source");
+    this->Internal->YAxisGroup->setVisible(false);
     }
   else
     {
     pqAnimationTrack* track = model->addTrack();
     track->setProperty("X Axis");
+    pqAnimationKeyFrame* kf = track->addKeyFrame();
+    kf->setStartTime(0);
+    kf->setEndTime(1);
+    kf->setStartValue(0);
+    kf->setEndValue(1);
+
     track = model->addTrack();
     track->setProperty("Y Axis");
+    kf = track->addKeyFrame();
+    kf->setStartTime(0);
+    kf->setEndTime(1);
+    kf->setStartValue(0);
+    kf->setEndValue(1);
+
+    this->Internal->XAxisGroup->setEnabled(true);
+    this->Internal->XAxisGroup->setTitle("Animated Source (X Axis)");
+    this->Internal->YAxisGroup->setVisible(true);
     }
 }
 
@@ -165,4 +242,14 @@ void pqComparativeVisPanel::updateView()
     this->Internal->Links.accept();
     this->Internal->View->render();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqComparativeVisPanel::editPropertyToAnimate(int index)
+{
+  if (index <= 0)
+    {
+    return;
+    }
+  
 }

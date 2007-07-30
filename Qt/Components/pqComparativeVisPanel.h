@@ -57,6 +57,10 @@ public slots:
   /// Update the scene parameter panel using current Qt widget settings.
   void updateParameterPanel();
 
+protected slots:
+  /// Called when user clicks on the track title.
+  void editPropertyToAnimate(int index);
+
 private:
   pqComparativeVisPanel(const pqComparativeVisPanel&); // Not implemented.
   void operator=(const pqComparativeVisPanel&); // Not implemented.

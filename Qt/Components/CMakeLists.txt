@@ -48,6 +48,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqActiveView.h
   pqActiveServer.h
   #pqAddSourceDialog.h
+  pqAnimatablePropertiesComboBox.h
   pqAnimationManager.h
   pqAnimationPanel.h
   pqAnimationViewWidget.h
@@ -149,6 +150,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSignalAdaptorTreeWidget.h
   pqSimpleServerStartup.h
   pqSliderDomain.h
+  pqSourceComboBox.h
   #pqSourceHistoryModel.h
   #pqSourceInfoFilterModel.h
   #pqSourceInfoGroupMap.h
@@ -289,6 +291,8 @@ ADD_LIBRARY(pqComponents
   pqActiveServer.h
   #pqAddSourceDialog.cxx
   #pqAddSourceDialog.h
+  pqAnimatablePropertiesComboBox.cxx
+  pqAnimatablePropertiesComboBox.h
   pqAnimationManager.cxx
   pqAnimationManager.h
   pqAnimationPanel.cxx
@@ -502,6 +506,8 @@ ADD_LIBRARY(pqComponents
   pqSimpleServerStartup.h
   pqSliderDomain.cxx
   pqSliderDomain.h
+  pqSourceComboBox.cxx
+  pqSourceComboBox.h
   #pqSourceHistoryModel.cxx
   #pqSourceHistoryModel.h
   #pqSourceInfoFilterModel.cxx
