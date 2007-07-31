@@ -17,23 +17,42 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSelection.h"
-#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkDoubleArray.h"
 
 vtkStandardNewMacro(vtkSMExtractThresholdsProxy);
-vtkCxxRevisionMacro(vtkSMExtractThresholdsProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMExtractThresholdsProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMExtractThresholdsProxy::vtkSMExtractThresholdsProxy()
 {
+this->ArrayName = NULL;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMExtractThresholdsProxy::~vtkSMExtractThresholdsProxy()
 {
+if (this->ArrayName)
+  {
+  delete[] this->ArrayName;
+  }
 }
 
+//-----------------------------------------------------------------------------
+void vtkSMExtractThresholdsProxy::SetScalarArray(int, int, int, int field, const char *name)
+{
+  this->Field = field;
+  //cerr << "field = " << field << endl;
+  if (this->ArrayName)
+    {
+    delete[] this->ArrayName;
+    }
+  int len = strlen(name)+1;
+  this->ArrayName = new char[len];
+  strcpy(this->ArrayName, name);
+  //cerr << "ArrayName = " << this->ArrayName << endl;
+}
 
 //-----------------------------------------------------------------------------
 void vtkSMExtractThresholdsProxy::CreateVTKObjects()
@@ -80,6 +99,17 @@ void vtkSMExtractThresholdsProxy::UpdateVTKObjects()
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     selectionSource->GetProperty("ContentType"));
   ivp->SetElement(0, vtkSelection::THRESHOLDS);
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    selectionSource->GetProperty("FieldType"));
+  ivp->SetElement(0, this->Field);
+
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    selectionSource->GetProperty("ArrayName"));
+  if (this->ArrayName && strlen(this->ArrayName))
+    {
+    svp->SetElement(0, this->ArrayName);
+    }
 
   selectionSource->UpdateVTKObjects();
 }

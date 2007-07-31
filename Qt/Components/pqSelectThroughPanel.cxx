@@ -60,21 +60,17 @@ class pqSelectThroughPanel::pqImplementation
 {
 public:
   pqImplementation() :
-/*
     PartiallyWithinWidget(tr("Partially Within")),
     PassThroughWidget(tr("Preserve Topology")),
     ShowBoundsWidget(tr("Show Frustum")),
     InsideOutWidget(tr("Inside Out")),
-*/
     StartSelect(tr("Start Select"))
   {
   }
-/*
   QCheckBox PartiallyWithinWidget;
   QCheckBox PassThroughWidget;
   QCheckBox ShowBoundsWidget;
   QCheckBox InsideOutWidget;
-*/
   QPushButton StartSelect;
 };
 
@@ -94,17 +90,14 @@ pqSelectThroughPanel::pqSelectThroughPanel(pqProxy* object_proxy, QWidget* p) :
 {  
   QVBoxLayout* const panel_layout = new QVBoxLayout(this);
   panel_layout->addWidget(&this->Implementation->StartSelect);
-/*
   panel_layout->addWidget(&this->Implementation->PartiallyWithinWidget);
   panel_layout->addWidget(&this->Implementation->PassThroughWidget);
   panel_layout->addWidget(&this->Implementation->ShowBoundsWidget);
   panel_layout->addWidget(&this->Implementation->InsideOutWidget);
-*/
   panel_layout->addStretch();
 
   this->Mode = pqRubberBandHelper::INTERACT;
 
-/*
   this->propertyManager()->registerLink(
     &this->Implementation->PartiallyWithinWidget, "checked", SIGNAL(toggled(bool)),
     this->proxy(), 
@@ -113,7 +106,7 @@ pqSelectThroughPanel::pqSelectThroughPanel(pqProxy* object_proxy, QWidget* p) :
   this->propertyManager()->registerLink(
     &this->Implementation->PassThroughWidget, "checked", SIGNAL(toggled(bool)),
     this->proxy(), 
-    this->proxy()->GetProperty("PassThrough"));
+    this->proxy()->GetProperty("PreserveTopology"));
 
   this->propertyManager()->registerLink(
     &this->Implementation->ShowBoundsWidget, "checked", SIGNAL(toggled(bool)),
@@ -124,7 +117,6 @@ pqSelectThroughPanel::pqSelectThroughPanel(pqProxy* object_proxy, QWidget* p) :
     &this->Implementation->InsideOutWidget, "checked", SIGNAL(toggled(bool)),
     this->proxy(), 
     this->proxy()->GetProperty("InsideOut"));
-*/
 
   this->RubberBandHelper = new pqRubberBandHelper;
 
@@ -260,7 +252,6 @@ void pqSelectThroughPanel::accept()
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
   this->proxy()->GetProperty("Frustum"));
   dvp->SetElements(this->Verts);
-  //this->proxy()->UpdateProperty("Frustum", 0);
 
   this->proxy()->UpdateVTKObjects();
 

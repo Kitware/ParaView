@@ -6770,58 +6770,17 @@ This extracts all cells within a frustum that is defined as the volume behind a 
          The input from which the selection is extracted.
        </Documentation>
      </InputProperty>
-<!--
-     <IntVectorProperty 
-        name="PartiallyWithin" 
-        command="SetExactTest" 
-        number_of_elements="1"
-        default_values="1" >
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         If this property is set to 1 all cells that are at least partially within the frustum are found. If 0 then only cells that are completely within the frustum are found.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="PassThrough" 
-        command="SetPassThrough" 
-        number_of_elements="1"
-        default_values="0" >
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         If this property is set to 1 the output preserves the topology of its input and adds an insidedness array to mark which cells are inside or out. If 0 then the output is an unstructured grid which contains only the subset of cells that are inside.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="ShowBounds" 
-        command="SetShowBounds" 
-        number_of_elements="1"
-        default_values="0">
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         If this property is set to 1 the output is the outline of the frustum instead of the contents of the input that lie within the frustum.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="InsideOut" 
-        command="SetInsideOut" 
-        number_of_elements="1"
-        default_values="0" >
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         If this property is set to 0, the filter will return that portion of the dataset that lies outside of the frustum instead of inside.
-       </Documentation>
-     </IntVectorProperty>
--->
 
      <SubProxy>
         <Proxy name="SelectionSource" proxygroup="sources"
           proxyname="SelectionSource">                   
         </Proxy>
         <ExposedProperties>
-          <Property name="Frustum" />
+          <Property name="Frustum" /> 
+          <Property name="PartiallyWithin" />
+          <Property name="ShowBounds" />
+          <Property name="InsideOut" />
+          <Property name="PreserveTopology" />
         </ExposedProperties>
      </SubProxy>
 
@@ -6852,12 +6811,38 @@ This filter extracts a set of thresholds of its input.
        </Documentation>
      </InputProperty>
 
+     <StringVectorProperty
+         name="ScalarsArray" 
+         command="SetScalarArray" 
+         number_of_elements="5" 
+         element_types="0 0 0 0 2" 
+         update_self="1"
+         animateable="0"> 
+         <ArrayListDomain name="array_list" 
+                          attribute_type="Scalars">
+           <RequiredProperties>
+              <Property name="Input" function="Input"/>
+           </RequiredProperties>
+         </ArrayListDomain>
+         <FieldDataDomain name="field_list">
+           <RequiredProperties>
+              <Property name="Input" function="Input"/>
+           </RequiredProperties>
+         </FieldDataDomain>
+         <Documentation>
+           This property indicates the name of the array from which to threshold.
+         </Documentation>
+     </StringVectorProperty>
+
      <SubProxy>
         <Proxy name="SelectionSource" proxygroup="sources"
           proxyname="SelectionSource">
         </Proxy>
         <ExposedProperties>
           <Property name="Thresholds" />
+          <Property name="InsideOut" />
+          <Property name="PreserveTopology" />
+          <Property name="ContainingCells" />
         </ExposedProperties>
      </SubProxy>
      <!-- End ExtractThresholds -->

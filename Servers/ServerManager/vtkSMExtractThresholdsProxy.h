@@ -37,6 +37,9 @@ public:
   // If the object has not been created, it will be created first.
   virtual void UpdateVTKObjects();
 
+  void SetScalarArray(int idx, int port, int conn,
+                      int field, const char *name);
+
 //BTX
 protected:
   vtkSMExtractThresholdsProxy();
@@ -44,6 +47,8 @@ protected:
 
   virtual void CreateVTKObjects();
 
+  int Field;
+  char *ArrayName;
 private:
   vtkSMExtractThresholdsProxy(const vtkSMExtractThresholdsProxy&); // Not implemented.
   void operator=(const vtkSMExtractThresholdsProxy&); // Not implemented.

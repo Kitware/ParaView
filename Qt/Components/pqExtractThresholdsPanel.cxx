@@ -50,7 +50,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSignalAdaptorTreeWidget.h"
 #include "pqTreeWidgetItemObject.h"
 
-class pqExtractThresholdsPanel::pqInternal : public Ui::ExtractThresholdsPanel
+class pqExtractThresholdsPanel::pqInternal
+  : public Ui::ExtractThresholdsPanel
 {
 public:
   pqSignalAdaptorTreeWidget* ThresholdsAdaptor;
@@ -58,7 +59,7 @@ public:
 
 //-----------------------------------------------------------------------------
 pqExtractThresholdsPanel::pqExtractThresholdsPanel(pqProxy* _proxy, QWidget* _parent)
-  : pqObjectPanel(_proxy, _parent)
+  : pqNamedObjectPanel(_proxy, _parent)
 {
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
@@ -91,6 +92,21 @@ void pqExtractThresholdsPanel::linkServerManagerProperties()
   pmanager->registerLink(
     this->Internal->ThresholdsAdaptor, "values", SIGNAL(valuesChanged()),
     smproxy, smproxy->GetProperty("Thresholds"));
+
+  pmanager->registerLink(
+    this->Internal->InsideOut, "checked", SIGNAL(toggled(bool)),
+    smproxy, smproxy->GetProperty("InsideOut"));
+
+  pmanager->registerLink(
+    this->Internal->PreserveTopology, "checked", SIGNAL(toggled(bool)),
+    smproxy, smproxy->GetProperty("PreserveTopology"));
+
+  pmanager->registerLink(
+    this->Internal->ContainingCells, "checked", SIGNAL(toggled(bool)),
+    smproxy, smproxy->GetProperty("ContainingCells"));
+
+  // parent class hooks up some of our widgets in the ui
+  pqNamedObjectPanel::linkServerManagerProperties();
 }
 
 //-----------------------------------------------------------------------------

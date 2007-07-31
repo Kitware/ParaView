@@ -33,14 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqExtractThresholdsPanel_h
 
 
-#include "pqObjectPanel.h"
+#include "pqNamedObjectPanel.h"
 
 /// pqExtractThresholdsPanel is a custom panel used to type in thresholds to
 // analyze in ParaView.
-class PQCOMPONENTS_EXPORT pqExtractThresholdsPanel : public pqObjectPanel
+class PQCOMPONENTS_EXPORT pqExtractThresholdsPanel : public pqNamedObjectPanel
 {
   Q_OBJECT
-  typedef pqObjectPanel Superclass;
+  typedef pqNamedObjectPanel Superclass;
 public:
   pqExtractThresholdsPanel(pqProxy* proxy, QWidget* parent=0);
   ~pqExtractThresholdsPanel();
