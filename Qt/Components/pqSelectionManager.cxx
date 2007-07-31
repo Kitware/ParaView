@@ -182,6 +182,8 @@ void pqSelectionManager::setActiveView(pqView* view)
 //-----------------------------------------------------------------------------
 void pqSelectionManager::clearSelection()
 {
+  pqOutputPort* opport = this->getSelectedPort();
+
   if (this->Implementation->SelectedRepresentation.GetPointer())
     {
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
@@ -191,11 +193,15 @@ void pqSelectionManager::clearSelection()
       pp->RemoveAllProxies();
       this->Implementation->SelectedRepresentation->UpdateVTKObjects();
       }
-    this->Implementation->SelectionRenderModule->render();
     this->Implementation->SelectedRepresentation = 0;
     }
 
   this->Implementation->clearSelection();
+
+  if (opport)
+    {
+    opport->renderAllViews(false);
+    }
 
   emit this->selectionChanged(this);
 }
@@ -292,7 +298,7 @@ void pqSelectionManager::selectOnSurface(int screenRectangle[4])
     return;
     }
 
-  rvm->render();
+  //rvm->render();
   if (selectedRepresentations->GetNumberOfItems() <= 0 ||
     surfaceSelections->GetNumberOfItems() <=0)
     {
@@ -343,6 +349,11 @@ void pqSelectionManager::selectOnSurface(int screenRectangle[4])
     pqSource->getOutputPort(this->Implementation->SelectedOutputPort), 
     pqServerManagerSelectionModel::ClearAndSelect);
 
+  pqOutputPort* opport = this->getSelectedPort();
+  if (opport)
+    {
+    opport->renderAllViews(false);
+    }
   emit this->selectionChanged(this);
 }
 

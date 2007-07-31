@@ -195,7 +195,7 @@
     </spacer>
    </item>
    <item row="3" column="0" colspan="2" >
-    <widget class="pqAnimationWidget" native="1" name="AnimationWidget" >
+    <widget class="pqComparativeTracksWidget" native="1" name="AnimationWidget" >
      <property name="minimumSize" >
       <size>
        <width>0</width>
@@ -208,9 +208,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqAnimationWidget</class>
+   <class>pqComparativeTracksWidget</class>
    <extends>QWidget</extends>
-   <header>pqAnimationWidget.h</header>
+   <header>pqComparativeTracksWidget.h</header>
   </customwidget>
   <customwidget>
    <class>pqSourceComboBox</class>

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqComparativeVisPanel.h
+   Module:    pqSelectionLinksManager.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,40 +29,44 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqComparativeVisPanel_h 
-#define __pqComparativeVisPanel_h
+#ifndef __pqSelectionLinksManager_h 
+#define __pqSelectionLinksManager_h
 
-#include <QWidget>
+#include <QObject>
 #include "pqComponentsExport.h"
 
-class pqView;
+class pqPipelineSource;
+class pqOutputPort;
+class pqDataRepresentation;
 
-class PQCOMPONENTS_EXPORT pqComparativeVisPanel : public QWidget
+/// pqSelectionLinksManager is used to create and manage selection links 
+/// between different representations of a source (rather an output port 
+/// of a source).
+class PQCOMPONENTS_EXPORT pqSelectionLinksManager : public QObject
 {
   Q_OBJECT
-  typedef QWidget Superclass;
+  typedef QObject Superclass;
 public:
-  pqComparativeVisPanel(QWidget* parent=0);
-  ~pqComparativeVisPanel();
-
-public slots:
-  /// Set the view to shown in this panel. If the view is not a comparative view
-  /// then the panel will be disabled, otherwise, it shows the properties of the
-  /// view.
-  void setView(pqView*);
-
-  /// Update the view using the current panel values.
-  void updateView(); 
+  pqSelectionLinksManager();
+  ~pqSelectionLinksManager();
 
 protected slots:
-  /// Called when user clicks on the track title.
-  void editPropertyToAnimate(int index);
+  /// Called when a source is created.
+  /// We initialize observers to know when representations are added to the
+  /// source.
+  void sourceAdded(pqPipelineSource*);
 
-  void xpropertyChanged(const QString& text);
-  void ypropertyChanged(const QString& text);
+  /// Called when a source is removed.
+  void sourceRemoved(pqPipelineSource*);
+
+  /// Called when a representation is added.
+  void representationAdded(pqOutputPort*, pqDataRepresentation*);
+
+  /// Called when a representation is removed.
+  void representationRemoved(pqOutputPort*, pqDataRepresentation*);
 private:
-  pqComparativeVisPanel(const pqComparativeVisPanel&); // Not implemented.
-  void operator=(const pqComparativeVisPanel&); // Not implemented.
+  pqSelectionLinksManager(const pqSelectionLinksManager&); // Not implemented.
+  void operator=(const pqSelectionLinksManager&); // Not implemented.
 
   class pqInternal;
   pqInternal* Internal;

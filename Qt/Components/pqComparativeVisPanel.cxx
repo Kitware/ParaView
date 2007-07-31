@@ -89,17 +89,7 @@ pqComparativeVisPanel::pqComparativeVisPanel(QWidget* p):Superclass(p)
   this->Internal->setupUi(this);
   this->Internal->ModeAdaptor = 
     new pqSignalAdaptorComboBox(this->Internal->Mode);
-  this->Internal->Links.setUseUncheckedProperties(true);
-
-  QObject::connect(&this->Internal->Links,
-    SIGNAL(qtWidgetChanged()),
-    this, SLOT(updateParameterPanel()), Qt::QueuedConnection);
-
-  QHeaderView* header = this->Internal->AnimationWidget->header();
-  header->setClickable(true);
-  QObject::connect(header,
-    SIGNAL(sectionClicked(int)),
-    this, SLOT(editPropertyToAnimate(int)), Qt::QueuedConnection);
+  this->Internal->Links.setUseUncheckedProperties(false);
 
   QObject::connect(this->Internal->Update, SIGNAL(clicked()),
     this, SLOT(updateView()), Qt::QueuedConnection);
@@ -108,8 +98,8 @@ pqComparativeVisPanel::pqComparativeVisPanel(QWidget* p):Superclass(p)
   QObject::connect(&pqActiveView::instance(), SIGNAL(changed(pqView*)),
     this, SLOT(setView(pqView*)));
 
-  this->Internal->XObject->setUpdateCurrentWithSelection(true);
-  this->Internal->YObject->setUpdateCurrentWithSelection(true);
+  //this->Internal->XObject->setUpdateCurrentWithSelection(true);
+  //this->Internal->YObject->setUpdateCurrentWithSelection(true);
   pqServerManagerModel* smmodel = 
     pqApplicationCore::instance()->getServerManagerModel();
 
@@ -130,6 +120,15 @@ pqComparativeVisPanel::pqComparativeVisPanel(QWidget* p):Superclass(p)
     this->Internal->YObject, SIGNAL(currentIndexChanged(vtkSMProxy*)),
     this->Internal->YProperty, SLOT(setSource(vtkSMProxy*)));
 
+  QObject::connect(
+    this->Internal->XProperty, SIGNAL(currentIndexChanged(const QString&)),
+    this, SLOT(xpropertyChanged(const QString&)));
+  QObject::connect(
+    this->Internal->YProperty, SIGNAL(currentIndexChanged(const QString&)),
+    this, SLOT(ypropertyChanged(const QString&)));
+
+  this->Internal->XProperty->setUseBlankEntry(true);
+  this->Internal->YProperty->setUseBlankEntry(true);
   this->setEnabled(false);
 }
 
@@ -151,6 +150,7 @@ void pqComparativeVisPanel::setView(pqView* view)
 
   this->Internal->Links.removeAllPropertyLinks();
   this->Internal->View = cvView;
+  this->Internal->AnimationWidget->setComparativeView(view->getProxy());
   if (!cvView)
     {
     this->setEnabled(false);
@@ -173,65 +173,6 @@ void pqComparativeVisPanel::setView(pqView* view)
     this->Internal->ModeAdaptor, "currentText", 
     SIGNAL(currentTextChanged(const QString&)),
     viewProxy, viewProxy->GetProperty("Mode"));
-
-  this->updateParameterPanel();
-}
-
-
-//-----------------------------------------------------------------------------
-void pqComparativeVisPanel::updateParameterPanel()
-{
-  /*int dx = this->Internal->XFrames->value();
-  int dy = this->Internal->YFrames->value();*/
-  int mode = this->Internal->ModeAdaptor->currentIndex();
-
-  pqAnimationModel* model = this->Internal->AnimationWidget->animationModel();
-
-  // Remove old tracks.
-  while (model->count())
-    {
-    pqAnimationTrack* track = model->track(0);
-    model->removeTrack(track);
-    }
-  model->setStartTime(0);
-  model->setEndTime(1);
-
-  if (mode == vtkSMComparativeViewProxy::FILM_STRIP)
-    {
-    pqAnimationTrack* track = model->addTrack();
-    track->setProperty("Time Axis");
-    pqAnimationKeyFrame* kf = track->addKeyFrame();
-    kf->setStartTime(0);
-    kf->setEndTime(1);
-    kf->setStartValue(0);
-    kf->setEndValue(1);
-
-    this->Internal->XAxisGroup->setEnabled(true);
-    this->Internal->XAxisGroup->setTitle("Animated Source");
-    this->Internal->YAxisGroup->setVisible(false);
-    }
-  else
-    {
-    pqAnimationTrack* track = model->addTrack();
-    track->setProperty("X Axis");
-    pqAnimationKeyFrame* kf = track->addKeyFrame();
-    kf->setStartTime(0);
-    kf->setEndTime(1);
-    kf->setStartValue(0);
-    kf->setEndValue(1);
-
-    track = model->addTrack();
-    track->setProperty("Y Axis");
-    kf = track->addKeyFrame();
-    kf->setStartTime(0);
-    kf->setEndTime(1);
-    kf->setStartValue(0);
-    kf->setEndValue(1);
-
-    this->Internal->XAxisGroup->setEnabled(true);
-    this->Internal->XAxisGroup->setTitle("Animated Source (X Axis)");
-    this->Internal->YAxisGroup->setVisible(true);
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -242,6 +183,20 @@ void pqComparativeVisPanel::updateView()
     this->Internal->Links.accept();
     this->Internal->View->render();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqComparativeVisPanel::xpropertyChanged(const QString& vtkNotUsed(text))
+{
+  // Locate the X animation cue for this property (if none exists, a new one will
+  // be created) and make it the only enabled cue in the XCues property.
+}
+
+//-----------------------------------------------------------------------------
+void pqComparativeVisPanel::ypropertyChanged(const QString& vtkNotUsed(text))
+{
+  // Locate the Y animation cue for this property (if none exists, a new one will
+  // be created) and make it the only enabled cue in the YCues property.
 }
 
 //-----------------------------------------------------------------------------

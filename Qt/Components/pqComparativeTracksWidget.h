@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqComparativeVisPanel.h
+   Module:    pqComparativeTracksWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,40 +29,39 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqComparativeVisPanel_h 
-#define __pqComparativeVisPanel_h
+#ifndef __pqComparativeTracksWidget_h 
+#define __pqComparativeTracksWidget_h
 
-#include <QWidget>
 #include "pqComponentsExport.h"
+#include <QWidget>
 
-class pqView;
+class vtkSMProxy;
+class vtkSMProperty;
 
-class PQCOMPONENTS_EXPORT pqComparativeVisPanel : public QWidget
+/// Widget for showing the comparative vis parameters.
+class PQCOMPONENTS_EXPORT pqComparativeTracksWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
 public:
-  pqComparativeVisPanel(QWidget* parent=0);
-  ~pqComparativeVisPanel();
+  pqComparativeTracksWidget(QWidget* parent);
+  virtual ~pqComparativeTracksWidget();
 
-public slots:
-  /// Set the view to shown in this panel. If the view is not a comparative view
-  /// then the panel will be disabled, otherwise, it shows the properties of the
-  /// view.
-  void setView(pqView*);
-
-  /// Update the view using the current panel values.
-  void updateView(); 
+  /// Set the comparative view proxy.
+  void setComparativeView(vtkSMProxy* comparativeViewProxy);
 
 protected slots:
-  /// Called when user clicks on the track title.
-  void editPropertyToAnimate(int index);
+  void updateSceneCallback();
+  void updateScene();
 
-  void xpropertyChanged(const QString& text);
-  void ypropertyChanged(const QString& text);
+protected:
+  // update the animation track at the given index using the given "Cues" property
+  // from the CVProxy.
+  void updateTrack(int index, vtkSMProperty* property);
+
 private:
-  pqComparativeVisPanel(const pqComparativeVisPanel&); // Not implemented.
-  void operator=(const pqComparativeVisPanel&); // Not implemented.
+  pqComparativeTracksWidget(const pqComparativeTracksWidget&); // Not implemented.
+  void operator=(const pqComparativeTracksWidget&); // Not implemented.
 
   class pqInternal;
   pqInternal* Internal;

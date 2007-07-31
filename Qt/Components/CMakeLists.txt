@@ -61,6 +61,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqColorPresetModel.h
   pqColorScaleEditor.h
   pqComboBoxDomain.h
+  pqComparativeTracksWidget.h
   pqComparativeVisPanel.h
   pqContourPanel.h
   pqCreateServerStartupDialog.h
@@ -139,6 +140,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSelectReaderDialog.h
   pqSelectThroughPanel.h
   pqSelectionAdaptor.h
+  pqSelectionLinksManager.h
   pqSelectionManager.h
   pqServerBrowser.h
   pqServerStartupBrowser.h
@@ -320,6 +322,8 @@ ADD_LIBRARY(pqComponents
   pqColorScaleEditor.h
   pqComboBoxDomain.cxx
   pqComboBoxDomain.h
+  pqComparativeTracksWidget.cxx
+  pqComparativeTracksWidget.h
   pqComparativeVisPanel.cxx
   pqComparativeVisPanel.h
   pqComponentsExport.h
@@ -485,6 +489,8 @@ ADD_LIBRARY(pqComponents
   pqSelectThroughPanel.h
   pqSelectionAdaptor.cxx
   pqSelectionAdaptor.h
+  pqSelectionLinksManager.cxx
+  pqSelectionLinksManager.h
   pqSelectionManager.cxx
   pqSelectionManager.h
   pqServerBrowser.cxx
