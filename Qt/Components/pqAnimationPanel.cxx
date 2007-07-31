@@ -799,19 +799,19 @@ void pqAnimationPanel::insertKeyFrame(int index)
     // Need to create new cue for this property.
     vtkSMProxy* curProxy = this->Internal->propertyName->getCurrentProxy();
     QString pname = this->Internal->propertyName->getCurrentPropertyName();
-    int index = this->Internal->propertyName->getCurrentIndex();
+    int pindex = this->Internal->propertyName->getCurrentIndex();
 
     // Check is we are creating a camera cue or a regular cue.
     if (this->Internal->ActiveRenderView && 
       curProxy == this->Internal->ActiveRenderView->getProxy())
       {
       cue = scene->createCue(curProxy,
-        pname.toAscii().data(), index, "CameraManipulator");
+        pname.toAscii().data(), pindex, "CameraManipulator");
       cue->setKeyFrameType("CameraKeyFrame");
       }
     else
       {
-      cue = scene->createCue(curProxy, pname.toAscii().data(), index);
+      cue = scene->createCue(curProxy, pname.toAscii().data(), pindex);
       }
     this->setActiveCue(cue);
     }
