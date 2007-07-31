@@ -37,7 +37,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.97");
+vtkCxxRevisionMacro(vtkSMProxy, "1.98");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -671,6 +671,9 @@ void vtkSMProxy::UpdateProperty(const char* name, int force)
       vtkClientServerStream str;
       prop->AppendCommandToStream(this, &str, this->GetSelfID());
       pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, str);
+
+      // Fire event to let everyone know that a property has been updated.
+      this->InvokeEvent(vtkCommand::UpdatePropertyEvent, (void*)name);
       this->MarkModified(this);
       }
     else
@@ -688,6 +691,9 @@ void vtkSMProxy::UpdateProperty(const char* name, int force)
         if (str.GetNumberOfMessages() > 0)
           {
           pm->SendStream(this->ConnectionID, this->Servers, str);
+
+          // Fire event to let everyone know that a property has been updated.
+          this->InvokeEvent(vtkCommand::UpdatePropertyEvent, (void*)name);
           this->MarkModified(this);
           }
         }
@@ -1270,6 +1276,7 @@ void vtkSMProxy::AddSubProxy(const char* name, vtkSMProxy* proxy)
   proxy->AddObserver(vtkCommand::ModifiedEvent, this->SubProxyObserver);
   proxy->AddObserver(vtkCommand::PropertyModifiedEvent, 
     this->SubProxyObserver);
+  proxy->AddObserver(vtkCommand::UpdatePropertyEvent, this->SubProxyObserver);
 }
 
 //---------------------------------------------------------------------------
@@ -1336,7 +1343,9 @@ void vtkSMProxy::RemoveSubProxy(const char* name)
 void vtkSMProxy::ExecuteSubProxyEvent(vtkSMProxy* subproxy, 
   unsigned long event, void* data)
 {
-  if (subproxy && event == vtkCommand::PropertyModifiedEvent)
+  if (subproxy && 
+    (event == vtkCommand::PropertyModifiedEvent ||
+     event == vtkCommand::UpdatePropertyEvent))
     {
     // A Subproxy has been modified.
     const char* name = reinterpret_cast<const char*>(data);
@@ -1375,11 +1384,20 @@ void vtkSMProxy::ExecuteSubProxyEvent(vtkSMProxy* subproxy,
           }
         }
       }
-    // Let the world know that one of the subproxies of this proxy has 
-    // been modified. If the subproxy exposed the modified property, we
-    // provide the name of the property. Otherwise, 0, indicating
-    // some internal property has changed.
-    this->InvokeEvent(vtkCommand::PropertyModifiedEvent, (void*)exposed_name);
+
+    if (event == vtkCommand::PropertyModifiedEvent)
+      {
+      // Let the world know that one of the subproxies of this proxy has 
+      // been modified. If the subproxy exposed the modified property, we
+      // provide the name of the property. Otherwise, 0, indicating
+      // some internal property has changed.
+      this->InvokeEvent(vtkCommand::PropertyModifiedEvent, (void*)exposed_name);
+      }
+    else if (exposed_name && event == vtkCommand::UpdatePropertyEvent)
+      {
+      // UpdatePropertyEvent is fired only for exposed properties.
+      this->InvokeEvent(vtkCommand::UpdatePropertyEvent, (void*)exposed_name);
+      }
     }
   else if (subproxy && event == vtkCommand::ModifiedEvent)
     {

@@ -60,21 +60,27 @@ protected:
   // Description:
   // Called when an input proxy is updated (UpdateVTKObjects). 
   // Argument is the input proxy.
-  virtual void UpdateVTKObjects(vtkSMProxy* proxy){}
+  virtual void UpdateVTKObjects(vtkSMProxy* ){}
 
   // Description:
   // Called when a property of an input proxy is modified.
   // caller:- the input proxy.
   // pname:- name of the property being modified.
-  virtual void UpdateProperties(vtkSMProxy* proxy, const char* pname){}
+  virtual void PropertyModified(vtkSMProxy* , const char* ){}
+
+  // Description:
+  // Called when a property is pushed.
+  // caller :- the input proxy.
+  // pname :- name of property that was pushed.
+  virtual void UpdateProperty(vtkSMProxy*, const char*) {}
 
   // Description:
   // Save the state of the link.
-  virtual void SaveState(const char* linkname, vtkPVXMLElement* parent){};
+  virtual void SaveState(const char* linkname, vtkPVXMLElement* parent);
 
   // Description:
   // Load the link state.
-  virtual int LoadState(vtkPVXMLElement* linkElement, vtkSMStateLoader* loader){};
+  virtual int LoadState(vtkPVXMLElement* linkElement, vtkSMStateLoader* loader);
 
   vtkSMPropertyLink* PropertyLink;
 

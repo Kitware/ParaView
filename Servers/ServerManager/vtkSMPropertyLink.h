@@ -99,6 +99,7 @@ protected:
 //BTX
   friend struct vtkSMPropertyLinkInternals;
   friend class vtkSMPropertyLinkObserver;
+  friend class vtkSMSelectionLink;
 //ETX
 
   // Description:
@@ -110,8 +111,9 @@ protected:
   virtual void SaveState(const char* linkname, vtkPVXMLElement* parent);
   
   virtual void UpdateVTKObjects(vtkSMProxy* caller);
-  virtual void UpdateProperties(vtkSMProxy* caller, const char* pname);
-  void UpdateProperties(vtkSMProperty* property);
+  virtual void PropertyModified(vtkSMProxy* caller, const char* pname);
+  virtual void UpdateProperty(vtkSMProxy* caller, const char* pname);
+  void PropertyModified(vtkSMProperty* property);
 private:
   vtkSMPropertyLinkInternals* Internals;
 

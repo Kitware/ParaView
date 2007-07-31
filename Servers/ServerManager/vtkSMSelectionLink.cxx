@@ -16,9 +16,10 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkSMPropertyLink.h"
+#include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkSMSelectionLink);
-vtkCxxRevisionMacro(vtkSMSelectionLink, "1.1");
+vtkCxxRevisionMacro(vtkSMSelectionLink, "1.2");
 //----------------------------------------------------------------------------
 vtkSMSelectionLink::vtkSMSelectionLink()
 {
@@ -49,6 +50,26 @@ void vtkSMSelectionLink::RemoveSelectionLink(vtkSMProxy* proxy,
   const char* pname)
 {
   this->PropertyLink->RemoveLinkedProperty(proxy, pname);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSelectionLink::SaveState(const char* linkname, vtkPVXMLElement* parent)
+{
+  // Simply save state from the internal property link.
+  vtkPVXMLElement* root = vtkPVXMLElement::New();
+  this->PropertyLink->SaveState(linkname, root);
+
+  vtkPVXMLElement* childRoot = root->GetNestedElement(0);
+  childRoot->SetName("SelectionLink");
+  parent->AddNestedElement(childRoot);
+  root->Delete();
+}
+
+//----------------------------------------------------------------------------
+int vtkSMSelectionLink::LoadState(vtkPVXMLElement* linkElement,
+  vtkSMStateLoader* loader)
+{
+  return this->PropertyLink->LoadState(linkElement, loader);
 }
 
 //----------------------------------------------------------------------------

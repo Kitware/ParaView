@@ -128,6 +128,11 @@ public:
   // to the difference in time between the current tick and the last tick.
   double GetDeltaTime();
 
+  // Description:
+  // Enable/Disable this cue.
+  vtkSetMacro(Enabled, int);
+  vtkGetMacro(Enabled, int);
+
 protected:
   vtkSMAnimationCueProxy();
   ~vtkSMAnimationCueProxy();
@@ -164,6 +169,8 @@ protected:
   int AnimatedElement;
   char *AnimatedPropertyName;
   char *AnimatedDomainName;
+
+  int Enabled;
 
   vtkAnimationCue *AnimationCue;
   vtkSMAnimationCueManipulatorProxy* Manipulator;

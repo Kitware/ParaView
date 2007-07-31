@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxyLink);
-vtkCxxRevisionMacro(vtkSMProxyLink, "1.10");
+vtkCxxRevisionMacro(vtkSMProxyLink, "1.11");
 
 //---------------------------------------------------------------------------
 struct vtkSMProxyLinkInternals
@@ -188,7 +188,7 @@ void vtkSMProxyLink::RemoveException(const char* propertyname)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyLink::UpdateProperties(vtkSMProxy* fromProxy, const char* pname)
+void vtkSMProxyLink::PropertyModified(vtkSMProxy* fromProxy, const char* pname)
 {
   if (pname && this->Internals->ExceptionProperties.find(pname) !=
     this->Internals->ExceptionProperties.end())
@@ -219,6 +219,22 @@ void vtkSMProxyLink::UpdateProperties(vtkSMProxy* fromProxy, const char* pname)
         {
         toProp->Copy(fromProp);
         }
+      }
+    }
+}
+
+
+//---------------------------------------------------------------------------
+void vtkSMProxyLink::UpdateProperty(vtkSMProxy* caller, const char* pname)
+{
+  vtkSMProxyLinkInternals::LinkedProxiesType::iterator iter =
+    this->Internals->LinkedProxies.begin();
+  for(; iter != this->Internals->LinkedProxies.end(); iter++)
+    {
+    if ((iter->Proxy.GetPointer() != caller) && 
+        (iter->UpdateDirection & OUTPUT))
+      {
+      iter->Proxy->UpdateProperty(pname);
       }
     }
 }

@@ -75,8 +75,22 @@ protected:
   vtkSMProxyLink();
   ~vtkSMProxyLink();
 
-  virtual void UpdateVTKObjects(vtkSMProxy* caller);
-  virtual void UpdateProperties(vtkSMProxy* caller, const char* pname);
+  // Description:
+  // Called when an input proxy is updated (UpdateVTKObjects). 
+  // Argument is the input proxy.
+  virtual void UpdateVTKObjects(vtkSMProxy* proxy);
+
+  // Description:
+  // Called when a property of an input proxy is modified.
+  // caller:- the input proxy.
+  // pname:- name of the property being modified.
+  virtual void PropertyModified(vtkSMProxy* proxy, const char* pname);
+
+  // Description:
+  // Called when a property is pushed.
+  // caller :- the input proxy.
+  // pname :- name of property that was pushed.
+  virtual void UpdateProperty(vtkSMProxy* caller, const char* pname);
 
   // Description:
   // Save the state of the link.

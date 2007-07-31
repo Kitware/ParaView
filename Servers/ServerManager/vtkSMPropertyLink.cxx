@@ -26,7 +26,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMPropertyLink);
-vtkCxxRevisionMacro(vtkSMPropertyLink, "1.16");
+vtkCxxRevisionMacro(vtkSMPropertyLink, "1.17");
 //-----------------------------------------------------------------------------
 class vtkSMPropertyLinkObserver : public vtkCommand
 {
@@ -45,7 +45,7 @@ public:
     vtkSMProperty* caller = vtkSMProperty::SafeDownCast(c);
     if (this->Target && caller && this->Target->GetEnabled())
       {
-      this->Target->UpdateProperties(caller);
+      this->Target->PropertyModified(caller);
       }
     }
 
@@ -245,11 +245,11 @@ void vtkSMPropertyLink::Synchronize()
       {
       if (iter->Property)
         {
-        this->UpdateProperties(iter->Property);
+        this->PropertyModified(iter->Property);
         }
       else if (iter->Proxy)
         {
-        this->UpdateProperties(iter->Proxy, iter->PropertyName);
+        this->PropertyModified(iter->Proxy, iter->PropertyName);
         }
       break;
       }
@@ -375,7 +375,7 @@ int vtkSMPropertyLink::GetLinkedPropertyDirection(int index)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPropertyLink::UpdateProperties(vtkSMProxy* fromProxy, const char* pname)
+void vtkSMPropertyLink::PropertyModified(vtkSMProxy* fromProxy, const char* pname)
 {
   if (!fromProxy)
     {
@@ -432,7 +432,7 @@ void vtkSMPropertyLink::UpdateProperties(vtkSMProxy* fromProxy, const char* pnam
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPropertyLink::UpdateProperties(vtkSMProperty* fromProp)
+void vtkSMPropertyLink::PropertyModified(vtkSMProperty* fromProp)
 {
   // First verify that the property that triggerred this call is indeed
   // an input property.
@@ -471,6 +471,40 @@ void vtkSMPropertyLink::UpdateProperties(vtkSMProperty* fromProp)
       if (toProp)
         {
         toProp->Copy(fromProp);
+        }
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMPropertyLink::UpdateProperty(vtkSMProxy* caller, const char* pname)
+{
+  vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter;
+  
+  // First check if pname is indeed an input property.
+  bool is_input = false;
+  iter = this->Internals->LinkedProperties.begin();
+  for(; iter != this->Internals->LinkedProperties.end(); ++iter)
+    {
+    if ((iter->Proxy.GetPointer() == caller) && 
+      (iter->PropertyName == pname) && (iter->UpdateDirection & INPUT))
+      {
+      is_input = true;
+      break;
+      }
+    }
+
+  // Update all output properties.
+  if (is_input)
+    {
+    iter = this->Internals->LinkedProperties.begin();
+    for(; iter != this->Internals->LinkedProperties.end(); ++iter)
+      {
+      if ((iter->Proxy.GetPointer() != caller) && 
+        (iter->UpdateDirection & OUTPUT))
+        {
+        iter->Proxy.GetPointer()->UpdateProperty(
+          iter->PropertyName.c_str());
         }
       }
     }

@@ -73,7 +73,13 @@ protected:
   // Called when a property of an input proxy is modified.
   // caller:- the input proxy.
   // pname:- name of the property being modified.
-  virtual void UpdateProperties(vtkSMProxy* proxy, const char* pname)=0;
+  virtual void PropertyModified(vtkSMProxy* proxy, const char* pname)=0;
+
+  // Description:
+  // Called when a property is pushed.
+  // caller :- the input proxy.
+  // pname :- name of property that was pushed.
+  virtual void UpdateProperty(vtkSMProxy* caller, const char* pname)=0;
 
   // Description:
   // Subclasses call this method to observer events on a INPUT proxy.

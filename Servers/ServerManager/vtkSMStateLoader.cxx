@@ -19,6 +19,7 @@
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkSMCompoundProxy.h"
 #include "vtkSMPropertyLink.h"
+#include "vtkSMSelectionLink.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLink.h"
 #include "vtkSMCameraLink.h"
@@ -31,7 +32,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.24");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.25");
 vtkCxxSetObjectMacro(vtkSMStateLoader, RootElement, vtkPVXMLElement);
 //---------------------------------------------------------------------------
 struct vtkSMStateLoaderRegistrationInfo
@@ -292,6 +293,16 @@ int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
           pxm->RegisterLink(linkname, link);
           link->Delete();
           }       
+        }
+      if (strcmp(name, "SelectionLink") == 0)
+        {
+        link = pxm->GetRegisteredLink(linkname);
+        if (!link)
+          {
+          link = vtkSMSelectionLink::New();
+          pxm->RegisterLink(linkname, link);
+          link->Delete();
+          }
         }
       if (link)
         {

@@ -123,6 +123,7 @@ SET(Kit_SRCS
   vtkSMScalarBarActorProxy.cxx
   vtkSMScalarBarWidgetRepresentationProxy.cxx
   vtkSMSelectionHelper.cxx
+  vtkSMSelectionLink.cxx
 #  vtkSMSelectionProxy.cxx
   vtkSMSelectionRepresentationProxy.cxx
   vtkSMServerFileListingProxy.cxx

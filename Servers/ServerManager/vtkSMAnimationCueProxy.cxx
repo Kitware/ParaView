@@ -24,7 +24,7 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.22");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.23");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
@@ -74,6 +74,7 @@ vtkSMAnimationCueProxy::vtkSMAnimationCueProxy()
   this->Manipulator = 0;
 
   this->AnimationCue = 0;
+  this->Enabled = true;
 }
 
 //----------------------------------------------------------------------------
@@ -179,6 +180,12 @@ vtkSMDomain* vtkSMAnimationCueProxy::GetAnimatedDomain()
 void vtkSMAnimationCueProxy::ExecuteEvent(vtkObject* obj, unsigned long event,
   void* calldata)
 {
+  if (!this->Enabled)
+    {
+    // Ignore all animation events if the cue has been disabled.
+    return;
+    }
+
   vtkAnimationCue* cue = vtkAnimationCue::SafeDownCast(obj);
   if (cue)
     {
