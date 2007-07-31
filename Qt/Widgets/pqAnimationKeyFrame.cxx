@@ -121,7 +121,6 @@ void pqAnimationKeyFrame::adjustRect()
   QRectF trackRect = track->boundingRect();
 
   double w = trackRect.width();
-  double totalTime = model->endTime() - model->startTime();
 
   double left = trackRect.left() + w * (this->startTime() - model->startTime());
   double width = trackRect.width() * (this->endTime() - this->startTime());
