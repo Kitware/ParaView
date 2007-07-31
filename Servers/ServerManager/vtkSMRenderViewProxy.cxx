@@ -85,7 +85,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.30");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.31");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -902,29 +902,35 @@ void vtkSMRenderViewProxy::AddPropToRenderer2D(vtkSMProxy* proxy)
 //-----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::RemovePropFromRenderer(vtkSMProxy* proxy)
 {
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << this->RendererProxy->GetID()
-         << "RemoveViewProp"
-         << proxy->GetID()
-         << vtkClientServerStream::End;
-  vtkProcessModule::GetProcessModule()->SendStream(
-    this->RendererProxy->GetConnectionID(),
-    this->RendererProxy->GetServers(), stream);
+  if (vtkProcessModule::GetProcessModule())
+    {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->RendererProxy->GetID()
+           << "RemoveViewProp"
+           << proxy->GetID()
+           << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->RendererProxy->GetConnectionID(),
+      this->RendererProxy->GetServers(), stream);
+    }
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::RemovePropFromRenderer2D(vtkSMProxy* proxy)
 {
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << this->Renderer2DProxy->GetID()
-         << "RemoveViewProp"
-         << proxy->GetID()
-         << vtkClientServerStream::End;
-  vtkProcessModule::GetProcessModule()->SendStream(
-    this->RendererProxy->GetConnectionID(),
-    this->RendererProxy->GetServers(), stream);
+  if (vtkProcessModule::GetProcessModule())
+    {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->Renderer2DProxy->GetID()
+           << "RemoveViewProp"
+           << proxy->GetID()
+           << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->RendererProxy->GetConnectionID(),
+      this->RendererProxy->GetServers(), stream);
+    }
 }
 
 //-----------------------------------------------------------------------------
