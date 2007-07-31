@@ -37,7 +37,7 @@ A simple example:
   renModule.ResetCamera()
   renModule.StillRender()
 """
-import re, os, new, exceptions, vtk
+import re, os, new, exceptions, sys, vtk
 
 if os.name == "posix":
     from libvtkPVServerCommonPython import *
@@ -92,12 +92,11 @@ class Proxy(object):
         self.UpdateVTKObjects()
 
     def __del__(self):
-        pass
         # Make sure that we remove observers we added
         if self.Observed:
             observed = self.Observed
             self.Observed = None
-            self.Observed.RemoveObserver("ModifiedEvent")
+            observed.RemoveObservers("ModifiedEvent")
         
     def InitializeFromProxy(self, aProxy):
         "Constructor. Assigns proxy to self.SMProxy"
@@ -243,10 +242,12 @@ class Proxy(object):
         """ This method handles GetActiveCamera specially. It adds
         an observer to the camera such that everything it is modified
         the render view updated"""
+        import weakref
         c = self.SMProxy.GetActiveCamera()
         if not c.HasObserver("ModifiedEvent"):
-            c.AddObserver("ModifiedEvent", _makeUpdateCameraMethod(self))
-            self.Observed = c.SMProxy
+            c.AddObserver("ModifiedEvent", \
+                          _makeUpdateCameraMethod(weakref.ref(self)))
+            self.Observed = c
         return c
         
     def __getattr__(self, name):
@@ -274,9 +275,9 @@ class Proxy(object):
 
 def _makeUpdateCameraMethod(rv):
     """ This internal method is used to create observer methods """
-    renderview = rv
+    rvref = rv
     def UpdateCamera(obj, string):
-        renderview.SynchronizeCameraProperties()
+        rvref().SynchronizeCameraProperties()
     return UpdateCamera
         
 class DataInformation(object):
@@ -909,6 +910,12 @@ def __createModule(groupName, mdl=None):
         mdl.__dict__[pname] = cobj
     return mdl
 
+def Finalize():
+    vtkInitializationHelper.Finalize()
+    
+if not vtkSMObject.GetProxyManager():
+    vtkInitializationHelper.Initialize(sys.executable)
+    
 sources = __createModule('sources')
 filters = __createModule('filters')
 rendering = __createModule('representations')
@@ -1047,7 +1054,7 @@ def demo2():
     
     return data
     
-def test():
+def demo3():
     if not ActiveConnection:
         Connect()
     ss = sources.SphereSource(Radius=2, ThetaResolution=32)
