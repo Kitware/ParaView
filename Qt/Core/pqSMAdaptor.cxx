@@ -568,12 +568,10 @@ void pqSMAdaptor::setSelectionProperty(vtkSMProperty* Property,
 void pqSMAdaptor::setUncheckedSelectionProperty(vtkSMProperty* Property,
                                   QList<QList<QVariant> > Value)
 {
-  /*
   foreach(QList<QVariant> l, Value)
     {
     pqSMAdaptor::setUncheckedSelectionProperty(Property, l);
     }
-    */
 }
 
 void pqSMAdaptor::setSelectionProperty(vtkSMProperty* Property, 
@@ -759,7 +757,6 @@ void pqSMAdaptor::setUncheckedSelectionProperty(vtkSMProperty* Property,
     }
   else if(EnumerationDomain)
     {
-    /*
     QList<QVariant> domainStrings =
       pqSMAdaptor::getEnumerationPropertyDomain(VectorProperty);
     int idx = domainStrings.indexOf(Value[0]);
@@ -769,11 +766,9 @@ void pqSMAdaptor::setUncheckedSelectionProperty(vtkSMProperty* Property,
                                               VectorProperty->GetNumberOfElements(),
                                               EnumerationDomain->GetEntryValue(idx));
       }
-      */
     }
   else if(StringListDomain)
     {
-    /*
     QList<QVariant> values =
       pqSMAdaptor::getMultipleElementProperty(Property);
     if(Value[1].toInt() && !values.contains(Value[0]))
@@ -781,7 +776,6 @@ void pqSMAdaptor::setUncheckedSelectionProperty(vtkSMProperty* Property,
       pqSMAdaptor::setUncheckedMultipleElementProperty(Property, values.size(),
                                               Value[0]);
       }
-      */
     }
 }
 
@@ -892,62 +886,25 @@ QVariant pqSMAdaptor::getEnumerationProperty(vtkSMProperty* Property)
     }
   else if(EnumerationDomain && ivp && ivp->GetNumberOfElements() > 0)
     {
-    // Some vtkSMIntVectorProperty with enumeration domains
-    // may have repeat_command="1". In which case the value
-    // is expected to be a list of values.
-    // TODO: move to selection
-    if (ivp->GetRepeatCommand())
+    int val = ivp->GetElement(0);
+    for (unsigned int i=0; i<EnumerationDomain->GetNumberOfEntries(); i++)
       {
-       Q_ASSERT("repeat property with enumeration domain" == 0);
-       QList<QVariant> list = pqSMAdaptor::getMultipleElementProperty(ivp);
-       QList<QVariant> values;
-       foreach (QVariant value, list)
-         {
-         int val = value.toInt();
-         for (unsigned int i=0; i<EnumerationDomain->GetNumberOfEntries(); i++)
-           {
-           if (EnumerationDomain->GetEntryValue(i) == val)
-             {
-             values.push_back(EnumerationDomain->GetEntryText(i));
-             break;
-             }
-           }
-         }
-       var = values;
-      }
-    else
-      {
-      int val = ivp->GetElement(0);
-      for (unsigned int i=0; i<EnumerationDomain->GetNumberOfEntries(); i++)
+      if (EnumerationDomain->GetEntryValue(i) == val)
         {
-        if (EnumerationDomain->GetEntryValue(i) == val)
-          {
-          var = EnumerationDomain->GetEntryText(i);
-          break;
-          }
+        var = EnumerationDomain->GetEntryText(i);
+        break;
         }
       }
     }
   else if(StringListDomain && svp)
     {
-    // If repeat command is set, then a value is a list of QVariants
-    // and each QVariant is added to the property.
-    // TODO: move to selection
-    if (svp->GetRepeatCommand())
+    unsigned int nos = svp->GetNumberOfElements();
+    for (unsigned int i=0; i < nos ; i++)
       {
-      Q_ASSERT("repeat property with string list domain" == 0);
-      var = pqSMAdaptor::getMultipleElementProperty(svp);
-      }
-    else
-      {
-      unsigned int nos = svp->GetNumberOfElements();
-      for (unsigned int i=0; i < nos ; i++)
+      if (svp->GetElementType(i) == vtkSMStringVectorProperty::STRING)
         {
-        if (svp->GetElementType(i) == vtkSMStringVectorProperty::STRING)
-          {
-          var = svp->GetElement(i);
-          break;
-          }
+        var = svp->GetElement(i);
+        break;
         }
       }
     }
@@ -1012,58 +969,24 @@ void pqSMAdaptor::setEnumerationProperty(vtkSMProperty* Property,
     }
   else if(EnumerationDomain && ivp)
     {
-    // Some vtkSMIntVectorProperty with enumeration domains
-    // may have repeat_command="1". In which case the value
-    // is expected to be a list of values.
-    // TODO: move to selection
-    if (ivp->GetRepeatCommand())
+    QString str = Value.toString();
+    unsigned int numEntries = EnumerationDomain->GetNumberOfEntries();
+    for(unsigned int i=0; i<numEntries; i++)
       {
-      Q_ASSERT("repeat property with enumeration domain" == 0);
-      QList<QVariant> values = Value.toList();
-      QList<QVariant> domainStrings = pqSMAdaptor::getEnumerationPropertyDomain(ivp);
-      QList<QVariant> actualValues;
-      foreach (QVariant val, values)
+      if(str == EnumerationDomain->GetEntryText(i))
         {
-        int index = domainStrings.indexOf(val);
-        if (index != -1)
-          {
-          actualValues << EnumerationDomain->GetEntryValue(index);
-          }
-        }
-      pqSMAdaptor::setMultipleElementProperty(Property, actualValues);
-      }
-    else
-      {
-      QString str = Value.toString();
-      unsigned int numEntries = EnumerationDomain->GetNumberOfEntries();
-      for(unsigned int i=0; i<numEntries; i++)
-        {
-        if(str == EnumerationDomain->GetEntryText(i))
-          {
-          ivp->SetElement(0, EnumerationDomain->GetEntryValue(i));
-          }
+        ivp->SetElement(0, EnumerationDomain->GetEntryValue(i));
         }
       }
     }
   else if(StringListDomain && svp)
     {
-    // If repeat command is set, then a value is a list of QVariants
-    // and each QVariant is added to the property.
-    // TODO: move to selection
-    if (svp->GetRepeatCommand())
+    unsigned int nos = svp->GetNumberOfElements();
+    for (unsigned int i=0; i < nos ; i++)
       {
-      Q_ASSERT("repeat property with string list domain" == 0);
-      pqSMAdaptor::setMultipleElementProperty(svp, Value.toList());
-      }
-    else
-      {
-      unsigned int nos = svp->GetNumberOfElements();
-      for (unsigned int i=0; i < nos ; i++)
+      if (svp->GetElementType(i) == vtkSMStringVectorProperty::STRING)
         {
-        if (svp->GetElementType(i) == vtkSMStringVectorProperty::STRING)
-          {
-          svp->SetElement(i, Value.toString().toAscii().data());
-          }
+        svp->SetElement(i, Value.toString().toAscii().data());
         }
       }
     }
@@ -1148,26 +1071,15 @@ void pqSMAdaptor::setUncheckedEnumerationProperty(vtkSMProperty* Property,
     }
   else if(StringListDomain && svp)
     {
-    // If repeat command is set, then a value is a list of QVariants
-    // and each QVariant is added to the property.
-    // TODO: move to selection
-    if (svp->GetRepeatCommand())
+    unsigned int nos = svp->GetNumberOfElements();
+    for (unsigned int i=0; i < nos ; i++)
       {
-      Q_ASSERT("repeat property with string list domain" == 0);
-      pqSMAdaptor::setUncheckedMultipleElementProperty(svp, Value.toList());
-      }
-    else
-      {
-      unsigned int nos = svp->GetNumberOfElements();
-      for (unsigned int i=0; i < nos ; i++)
+      if (svp->GetElementType(i) == vtkSMStringVectorProperty::STRING)
         {
-        if (svp->GetElementType(i) == vtkSMStringVectorProperty::STRING)
-          {
-          svp->SetUncheckedElement(i, Value.toString().toAscii().data());
-          }
+        svp->SetUncheckedElement(i, Value.toString().toAscii().data());
         }
-      Property->UpdateDependentDomains();
       }
+    Property->UpdateDependentDomains();
     }
   else if (ProxyGroupDomain && pp)
     {
