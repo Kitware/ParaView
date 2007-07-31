@@ -212,6 +212,7 @@ public:
 
   void AcquireLock()
     {
+#ifndef VTK_NO_PYTHON_THREADS
     if (vtkPVPythonInterpretorInternal::MultithreadSupport)
       {
       if (vtkPVPythonInterpretorInternal::GILByPVPythonInterpretor == 0)
@@ -220,10 +221,12 @@ public:
         }
       vtkPVPythonInterpretorInternal::GILByPVPythonInterpretor++;
       }
+#endif
     }
 
   void ReleaseLock()
     {
+#ifndef VTK_NO_PYTHON_THREADS
     if (vtkPVPythonInterpretorInternal::MultithreadSupport)
       {
       vtkPVPythonInterpretorInternal::GILByPVPythonInterpretor--;
@@ -237,6 +240,7 @@ public:
         vtkGenericWarningMacro("Unmatched ReleaseLock.");
         }
       }
+#endif
     }
 };
 
@@ -258,7 +262,7 @@ void vtkPVPythonInterpretor::SetMultithreadSupport(bool enable)
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.19");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.20");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
@@ -317,22 +321,26 @@ int vtkPVPythonInterpretor::InitializeSubInterpretor(int vtkNotUsed(argc),
     Py_SetProgramName(argv[0]);
     Py_Initialize();
 
+#ifndef VTK_NO_PYTHON_THREADS
     if (this->GetMultithreadSupport())
       {
       PyEval_InitThreads();
       }
-    
+#endif
+
     this->Internal->MainThreadState = PyThreadState_Get();
 #ifdef SIGINT
     signal(SIGINT, SIG_DFL);
 #endif
 
+#ifndef VTK_NO_PYTHON_THREADS
     if (this->GetMultithreadSupport())
       {
       // Since PyEval_InitThreads acquires the lock for this thread,
       // we release it.
       PyEval_ReleaseLock();
       }
+#endif
     }
 
   this->Internal->AcquireLock();
