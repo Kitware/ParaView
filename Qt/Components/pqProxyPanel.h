@@ -106,7 +106,7 @@ signals:
   void ondeselect();
   void viewChanged(pqView*);
 
-protected:
+protected slots:
   /// This method gets called to referesh all domains 
   /// and information properties. Subclassess can override
   /// this to update any domain related entities.

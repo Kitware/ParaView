@@ -50,6 +50,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes
 #include "pqPropertyManager.h"
+#include "pqApplicationCore.h"
+#include "pqUndoStack.h"
 #include "pqView.h"
 
 //-----------------------------------------------------------------------------
@@ -102,6 +104,16 @@ pqProxyPanel::pqProxyPanel(vtkSMProxy* pxy, QWidget* p) :
   this->Implementation->VTKConnect->Connect(
     this->Implementation->Proxy, vtkCommand::ModifiedEvent,
     this, SLOT(proxyModifiedEvent()));
+
+  // update domains when undo/redo happens
+  pqUndoStack* undoStack = pqApplicationCore::instance()->getUndoStack();
+  if(undoStack)
+    {
+    connect(undoStack, SIGNAL(undone()), this,
+      SLOT(updateInformationAndDomains()));
+    connect(undoStack, SIGNAL(redone()), this,
+      SLOT(updateInformationAndDomains()));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -151,6 +163,7 @@ QSize pqProxyPanel::sizeHint() const
 void pqProxyPanel::accept()
 {
   this->Implementation->PropertyManager->accept();
+  this->Implementation->Proxy->UpdateVTKObjects();
 
   if (this->Implementation->Selected)
     {
