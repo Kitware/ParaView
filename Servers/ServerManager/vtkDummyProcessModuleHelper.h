@@ -36,7 +36,7 @@ public:
 
   // Description: 
   // Does nothing.
-  virtual int RunGUIStart(int , char **, int , int ) {}
+  virtual int RunGUIStart(int , char **, int , int ) { return 0; }
 
   // Description:
   // Open a connection dialog GUI.
