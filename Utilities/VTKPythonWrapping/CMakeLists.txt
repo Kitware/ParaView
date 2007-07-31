@@ -19,6 +19,7 @@ INCLUDE_DIRECTORIES(
   ${VTK_SOURCE_DIR}/IO
   ${VTK_SOURCE_DIR}/Filtering
   ${VTK_SOURCE_DIR}/Graphics
+  ${VTK_SOURCE_DIR}/Rendering
   ${VTK_BINARY_DIR}/Rendering
   ${PYTHON_INCLUDE_PATH}
   )
@@ -105,14 +106,11 @@ SET(VTK_COMMON_SOURCES
   ${VTK_SOURCE_DIR}/Common/vtkBitArrayIterator.cxx
   ${VTK_SOURCE_DIR}/Common/vtkBoundingBox.cxx
   ${VTK_SOURCE_DIR}/Common/vtkBox.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkByteSwap.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkCallbackCommand.cxx
   ${VTK_SOURCE_DIR}/Common/vtkCharArray.cxx
   ${VTK_SOURCE_DIR}/Common/vtkCollection.cxx
   ${VTK_SOURCE_DIR}/Common/vtkCollectionIterator.cxx
   ${VTK_SOURCE_DIR}/Common/vtkCommand.cxx
   ${VTK_SOURCE_DIR}/Common/vtkContourValues.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkCriticalSection.cxx
   ${VTK_SOURCE_DIR}/Common/vtkCylindricalTransform.cxx
   ${VTK_SOURCE_DIR}/Common/vtkDataArray.cxx
   ${VTK_SOURCE_DIR}/Common/vtkDataArrayCollection.cxx
@@ -122,30 +120,23 @@ SET(VTK_COMMON_SOURCES
   ${VTK_SOURCE_DIR}/Common/vtkDebugLeaksManager.cxx
   ${VTK_SOURCE_DIR}/Common/vtkDirectory.cxx
   ${VTK_SOURCE_DIR}/Common/vtkDoubleArray.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkDynamicLoader.cxx
   ${VTK_SOURCE_DIR}/Common/vtkEdgeTable.cxx
   ${VTK_SOURCE_DIR}/Common/vtkErrorCode.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkEventForwarderCommand.cxx
   ${VTK_SOURCE_DIR}/Common/vtkExtentSplitter.cxx
   ${VTK_SOURCE_DIR}/Common/vtkExtentTranslator.cxx
   ${VTK_SOURCE_DIR}/Common/vtkFastNumericConversion.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkFileOutputWindow.cxx
   ${VTK_SOURCE_DIR}/Common/vtkFloatArray.cxx
   ${VTK_SOURCE_DIR}/Common/vtkFunctionParser.cxx
   ${VTK_SOURCE_DIR}/Common/vtkFunctionSet.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkGarbageCollector.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkGarbageCollectorManager.cxx
   ${VTK_SOURCE_DIR}/Common/vtkGeneralTransform.cxx
   ${VTK_SOURCE_DIR}/Common/vtkHeap.cxx
   ${VTK_SOURCE_DIR}/Common/vtkHomogeneousTransform.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkIOStream.cxx
   ${VTK_SOURCE_DIR}/Common/vtkIdList.cxx
   ${VTK_SOURCE_DIR}/Common/vtkIdListCollection.cxx
   ${VTK_SOURCE_DIR}/Common/vtkIdTypeArray.cxx
   ${VTK_SOURCE_DIR}/Common/vtkIdentityTransform.cxx
   ${VTK_SOURCE_DIR}/Common/vtkImplicitFunction.cxx
   ${VTK_SOURCE_DIR}/Common/vtkImplicitFunctionCollection.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkIndent.cxx
   ${VTK_SOURCE_DIR}/Common/vtkInitialValueProblemSolver.cxx
   ${VTK_SOURCE_DIR}/Common/vtkInstantiator.cxx
   ${VTK_SOURCE_DIR}/Common/vtkIntArray.cxx
@@ -159,14 +150,8 @@ SET(VTK_COMMON_SOURCES
   ${VTK_SOURCE_DIR}/Common/vtkMatrixToHomogeneousTransform.cxx
   ${VTK_SOURCE_DIR}/Common/vtkMatrixToLinearTransform.cxx
   ${VTK_SOURCE_DIR}/Common/vtkMultiThreader.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkMutexLock.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkOStrStreamWrapper.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkOStreamWrapper.cxx
   ${VTK_SOURCE_DIR}/Common/vtkObject.cxx
   ${VTK_SOURCE_DIR}/Common/vtkObjectBase.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkObjectFactory.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkObjectFactoryCollection.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkOldStyleCallbackCommand.cxx
   ${VTK_SOURCE_DIR}/Common/vtkOutputWindow.cxx
   ${VTK_SOURCE_DIR}/Common/vtkOverrideInformation.cxx
   ${VTK_SOURCE_DIR}/Common/vtkOverrideInformationCollection.cxx
@@ -195,7 +180,6 @@ SET(VTK_COMMON_SOURCES
   ${VTK_SOURCE_DIR}/Common/vtkPropCollection.cxx
   ${VTK_SOURCE_DIR}/Common/vtkProperty2D.cxx
   ${VTK_SOURCE_DIR}/Common/vtkQuadric.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkReferenceCount.cxx
   ${VTK_SOURCE_DIR}/Common/vtkRungeKutta2.cxx
   ${VTK_SOURCE_DIR}/Common/vtkRungeKutta4.cxx
   ${VTK_SOURCE_DIR}/Common/vtkRungeKutta45.cxx
@@ -208,9 +192,7 @@ SET(VTK_COMMON_SOURCES
   ${VTK_SOURCE_DIR}/Common/vtkStringArray.cxx
   ${VTK_SOURCE_DIR}/Common/vtkStructuredData.cxx
   ${VTK_SOURCE_DIR}/Common/vtkStructuredVisibilityConstraint.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkTableExtentTranslator.cxx
   ${VTK_SOURCE_DIR}/Common/vtkTensor.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkThreadMessager.cxx
   ${VTK_SOURCE_DIR}/Common/vtkTimeStamp.cxx
   ${VTK_SOURCE_DIR}/Common/vtkTimerLog.cxx
   ${VTK_SOURCE_DIR}/Common/vtkTransform.cxx
@@ -226,7 +208,7 @@ SET(VTK_COMMON_SOURCES
   ${VTK_SOURCE_DIR}/Common/vtkWarpTransform.cxx
   ${VTK_SOURCE_DIR}/Common/vtkWindow.cxx
   ${VTK_SOURCE_DIR}/Common/vtkWindowLevelLookupTable.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkXMLFileOutputWindow.cxx
+  ${VTK_SOURCE_DIR}/Rendering/vtkCamera.cxx
   )
 
 SET(VTK_FILTERS_SOURCES
@@ -654,6 +636,8 @@ IF (PARAVIEW_ENABLE_PYTHON)
   # All files paraview/*.py included in the paraview module.
   SET(PV_PYTHON_FILES
     __init__
+    servermanager
+    vtk
     numeric
     util
     )
