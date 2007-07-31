@@ -9,6 +9,8 @@ IF(NOT WIN32)
 ENDIF(NOT WIN32)
 
 SET(Kit_SRCS
+  vtkDummyProcessModuleHelper.cxx
+  vtkInitializationHelper.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMAnimationCueProxy.cxx
   vtkSMAnimationSceneGeometryWriter.cxx
@@ -58,6 +60,7 @@ SET(Kit_SRCS
   vtkSMExtractThresholdsProxy.cxx
   vtkSMFieldDataDomain.cxx
   vtkSMFileListDomain.cxx
+#  vtkSMFileSeriesReaderProxy.cxx
   vtkSMFixedTypeDomain.cxx
   vtkSMIceTCompositeViewProxy.cxx
   vtkSMIceTDesktopRenderViewProxy.cxx
@@ -182,6 +185,7 @@ SET( ServerManager_SRCS
 
 # Abstract and Wrap exclude
 SET_SOURCE_FILES_PROPERTIES(
+  vtkInitializationHelper.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMAnimationSceneWriter.cxx
   vtkSMClientServerRenderSyncManagerHelper.cxx
@@ -214,6 +218,8 @@ INCLUDE_DIRECTORIES(
   ${ParaView_SOURCE_DIR}/Servers/Common
   ${ParaView_SOURCE_DIR}/Servers/ServerManager
   ${ParaView_BINARY_DIR}/Servers/ServerManager
+  ${ParaView_BINARY_DIR}/Servers/Common
+  ${ParaView_BINARY_DIR}/Servers/Filters
   ${KWCommon_INCLUDE_PATH}
 
   )
