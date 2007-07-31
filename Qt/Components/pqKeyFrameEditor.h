@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class pqAnimationCue;
+class pqAnimationScene;
 
 /// editor for editing animation key frames
 class PQCOMPONENTS_EXPORT pqKeyFrameEditor : public QWidget
@@ -47,7 +48,7 @@ class PQCOMPONENTS_EXPORT pqKeyFrameEditor : public QWidget
   Q_OBJECT
 
 public:
-  pqKeyFrameEditor(pqAnimationCue* cue, QWidget* p);
+  pqKeyFrameEditor(pqAnimationScene* scene, pqAnimationCue* cue, QWidget* p);
   ~pqKeyFrameEditor();
 
 public slots:
@@ -55,6 +56,11 @@ public slots:
   void readKeyFrameData();
   /// write the key frame data as edited by the user to the server manager
   void writeKeyFrameData();
+
+private slots:
+  void newKeyFrame();
+  void deleteKeyFrame();
+  void deleteAllKeyFrames();
 
 private:
   class pqInternal;

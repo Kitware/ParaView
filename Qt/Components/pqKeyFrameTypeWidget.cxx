@@ -59,7 +59,6 @@ pqKeyFrameTypeWidget::pqKeyFrameTypeWidget(QWidget* p)
   this->Internal->Type->addItem(QIcon(":pqWidgets/Icons/pqSinusoidal16.png"), "Sinusoid", 
     "Sinusoid");
   this->Internal->Type->addItem(QIcon(":pqWidgets/Icons/pqStep16.png"), "Step", "Boolean");
-  this->Internal->Type->setCurrentIndex(-1);
 
   QObject::connect(this->Internal->Type, SIGNAL(currentIndexChanged(int)),
     this, SLOT(onTypeChanged()));

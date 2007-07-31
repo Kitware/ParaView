@@ -271,7 +271,8 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
   dialog.resize(500, 400);
   dialog.setWindowTitle(tr("Animation Keyframes"));
   QVBoxLayout* l = new QVBoxLayout(&dialog);
-  pqKeyFrameEditor* editor = new pqKeyFrameEditor(cue, &dialog);
+  pqKeyFrameEditor* editor = new pqKeyFrameEditor(this->Internal->Scene,
+                                                  cue, &dialog);
   QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok
                                               | QDialogButtonBox::Cancel);
   l->addWidget(editor);

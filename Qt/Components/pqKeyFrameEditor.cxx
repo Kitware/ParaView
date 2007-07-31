@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialogButtonBox>
 
 #include "pqAnimationCue.h"
+#include "pqAnimationScene.h"
 #include "pqSMAdaptor.h"
 #include "pqApplicationCore.h"
 #include "pqUndoStack.h"
@@ -160,15 +161,71 @@ public:
     {
     }
   QPointer<pqAnimationCue> Cue;
+  QPointer<pqAnimationScene> Scene;
   QStandardItemModel Model;
+  QPair<double,double> TimeRange;
+
+  double normalizedTime(double t)
+    {
+    // zero span?
+    double span = this->TimeRange.second - this->TimeRange.first;
+    return (t - this->TimeRange.first) / span;
+    }
+  double realTime(double t)
+    {
+    double span = this->TimeRange.second - this->TimeRange.first;
+    return t * span + this->TimeRange.first;
+    }
+
+  QStandardItem* newTimeItem(int row)
+    {
+    QStandardItem* item = new QStandardItem();
+    int count = this->Model.rowCount();
+    
+    QVariant time = this->TimeRange.first;
+    if(count == row && row != 0)
+      {
+      time = this->TimeRange.second;
+      }
+    else if(row > 0)
+      {
+      // average time between rows
+      QModelIndex tidx = this->Model.index(row,0);
+      time = this->Model.data(tidx).toDouble();
+      tidx = this->Model.index(row-1,0);
+      time = time.toDouble() - this->Model.data(tidx).toDouble();
+      time = time.toDouble()/2.0;
+      }
+    item->setData(time, Qt::DisplayRole);
+    return item;
+    }
+  QStandardItem* newInterpolationItem(int row)
+    {
+    QStandardItem* item = NULL;
+    int count = this->Model.rowCount();
+    if(count != row || row == 0)
+      {
+      item = new pqKeyFrameInterpolationItem();
+      }
+    return item;
+    }
+  QStandardItem* newValueItem(int /*row*/)
+    {
+    QStandardItem* item = new QStandardItem();
+    // TODO initialize  -- would like to share code with pqAnimationPanel...
+    return item;
+    }
 };
 
-pqKeyFrameEditor::pqKeyFrameEditor(pqAnimationCue* cue, QWidget* p)
+pqKeyFrameEditor::pqKeyFrameEditor(pqAnimationScene* scene, 
+                                   pqAnimationCue* cue, QWidget* p)
   : QWidget(p)
 {
   this->Internal = new pqInternal;
   this->Internal->setupUi(this);
+  this->Internal->Scene = scene;
   this->Internal->Cue = cue;
+  this->Internal->TimeRange = scene->getClockTimeRange();
 
   this->Internal->tableView->setModel(&this->Internal->Model);
   this->Internal->tableView->horizontalHeader()->setStretchLastSection(true);
@@ -177,6 +234,14 @@ pqKeyFrameEditor::pqKeyFrameEditor(pqAnimationCue* cue, QWidget* p)
     new pqKeyFrameEditorDelegate(this->Internal->tableView));
 
   this->readKeyFrameData();
+
+  connect(this->Internal->pbNew, SIGNAL(clicked(bool)),
+          this, SLOT(newKeyFrame()));
+  connect(this->Internal->pbDelete, SIGNAL(clicked(bool)),
+          this, SLOT(deleteKeyFrame()));
+  connect(this->Internal->pbDeleteAll, SIGNAL(clicked(bool)),
+          this, SLOT(deleteAllKeyFrames()));
+
 }
 
 pqKeyFrameEditor::~pqKeyFrameEditor()
@@ -208,10 +273,10 @@ void pqKeyFrameEditor::readKeyFrameData()
     pqSMProxy keyFrame = this->Internal->Cue->getKeyFrame(i);
     
     QModelIndex idx = this->Internal->Model.index(i, 0);
-    this->Internal->Model.setData(idx,
-      pqSMAdaptor::getElementProperty(keyFrame->GetProperty("KeyTime")),
-      Qt::DisplayRole);
-    this->Internal->Model.setData(idx, QVariant::fromValue(keyFrame), Qt::UserRole);
+    QVariant keyTime =
+      pqSMAdaptor::getElementProperty(keyFrame->GetProperty("KeyTime"));
+    double realKeyTime = this->Internal->realTime(keyTime.toDouble());
+    this->Internal->Model.setData(idx, realKeyTime, Qt::DisplayRole);
 
     if(i < numberKeyFrames-1)
       {
@@ -264,7 +329,8 @@ void pqKeyFrameEditor::writeKeyFrameData()
 
     QModelIndex idx = this->Internal->Model.index(i, 0);
     QVariant newData = this->Internal->Model.data(idx, Qt::DisplayRole);
-    pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyTime"), newData);
+    double nTime = this->Internal->normalizedTime(newData.toDouble());
+    pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyTime"), nTime);
       
     pqKeyFrameInterpolationItem* item = 
       static_cast<pqKeyFrameInterpolationItem*>(this->Internal->Model.item(i, 1));
@@ -297,4 +363,55 @@ void pqKeyFrameEditor::writeKeyFrameData()
     stack->endUndoSet();
     }
 }
+
+void pqKeyFrameEditor::newKeyFrame()
+{
+  // insert before selection, or insert 2nd to last
+  int row = 0;
+  int count = this->Internal->Model.rowCount();
+
+  QModelIndex idx = 
+    this->Internal->tableView->selectionModel()->currentIndex();
+  if(idx.isValid())
+    {
+    row = idx.row();
+    }
+  else
+    {
+    row = count != 0 ? count-1 : 0;
+    }
+
+  QList<QStandardItem*> items;
+  items.append(this->Internal->newTimeItem(row));
+  items.append(this->Internal->newInterpolationItem(row));
+  items.append(this->Internal->newValueItem(row));
+  this->Internal->Model.insertRow(row, items);
+  
+  // add one more
+  if(count == 0)
+    {
+    items.clear();
+    items.append(this->Internal->newTimeItem(1));
+    items.append(this->Internal->newInterpolationItem(1));
+    items.append(this->Internal->newValueItem(1));
+    this->Internal->Model.insertRow(1, items);
+    }
+}
+
+void pqKeyFrameEditor::deleteKeyFrame()
+{
+  QModelIndex idx = 
+    this->Internal->tableView->selectionModel()->currentIndex();
+  if(idx.isValid())
+    {
+    this->Internal->Model.removeRow(idx.row());
+    }
+}
+
+void pqKeyFrameEditor::deleteAllKeyFrames()
+{
+  // remove all rows
+  this->Internal->Model.removeRows(0, this->Internal->Model.rowCount());
+}
+
 
