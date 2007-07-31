@@ -163,7 +163,6 @@ QSize pqProxyPanel::sizeHint() const
 void pqProxyPanel::accept()
 {
   this->Implementation->PropertyManager->accept();
-  this->Implementation->Proxy->UpdateVTKObjects();
 
   if (this->Implementation->Selected)
     {
