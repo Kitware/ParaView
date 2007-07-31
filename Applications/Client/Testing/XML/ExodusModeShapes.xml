@@ -11,4 +11,5 @@
   <pqevent object="MainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
   <pqevent object="MainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
   <pqevent object="MainWindow/cameraToolbar/1QToolButton3" command="activate" arguments="" />
+  <pqevent object="MainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="ObjectId" /> 
 </pqevents>
