@@ -37,13 +37,16 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVServerManagerInstantiator.h"
 #include "vtkClientServerInterpreter.h"
 
+#include "vtkDummyProcessModuleHelper.h"
 #include "vtkPVMain.h"
 #include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
 #include "vtkSMApplication.h"
 #include "vtkSMProperty.h"
 
-vtkCxxRevisionMacro(vtkInitializationHelper, "1.1");
+#include <vtkstd/string>
+
+vtkCxxRevisionMacro(vtkInitializationHelper, "1.2");
 
 static void vtkInitializationHelperInit(vtkProcessModule* pm);
 
@@ -65,18 +68,69 @@ extern "C" void vtkPVServerCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
 
-void vtkInitializationHelper::Initialize()
+vtkDummyProcessModuleHelper* vtkInitializationHelper::Helper = 0;
+vtkPVMain* vtkInitializationHelper::PVMain = 0;
+vtkPVOptions* vtkInitializationHelper::Options = 0;
+vtkSMApplication* vtkInitializationHelper::Application = 0;
+
+//----------------------------------------------------------------------------
+void vtkInitializationHelper::Initialize(const char* executable)
 {
+  if (!executable)
+    {
+    vtkGenericWarningMacro("Executable name has to be defined.");
+    return;
+    }
+  if (PVMain)
+    {
+    vtkGenericWarningMacro("Python module already initialize. Skipping.");
+    return;
+    }
   vtkPVMain::SetInitializeMPI(0); // don't use MPI even when available.
-  vtkPVMain* pvmain = vtkPVMain::New();
-  vtkPVOptions* options = vtkPVOptions::New();
-  options->SetProcessType(vtkPVOptions::PVCLIENT);
-  pvmain->Initialize(options, 0, vtkInitializationHelperInit, 0, 0);
-  vtkSMApplication* app = vtkSMApplication::New();
-  app->Initialize();
+  PVMain = vtkPVMain::New();
+  Options = vtkPVOptions::New();
+  Options->SetProcessType(vtkPVOptions::PVCLIENT);
+  // This process module does nothing
+  Helper = vtkDummyProcessModuleHelper::New();
+  // Pass the program name to make option parser happier
+  char* argv = new char[strlen(executable)+1];
+  strcpy(argv, executable);
+  // First initialization
+  PVMain->Initialize(Options, Helper, vtkInitializationHelperInit, 1, &argv);
+  Application = vtkSMApplication::New();
+  Application->Initialize();
   vtkSMProperty::SetCheckDomains(0);
-  //pvmain->Delete();
-  //options->Delete();
+  vtkProcessModule::GetProcessModule()->SupportMultipleConnectionsOn();
+  // Initialize everything else
+  PVMain->Run(Options);
+  delete[] argv;
+}
+
+//----------------------------------------------------------------------------
+void vtkInitializationHelper::Finalize()
+{
+  vtkSMObject::SetProxyManager(0);
+  if (PVMain)
+    {
+    PVMain->Delete();
+    PVMain = 0;
+    }
+  if (Application)
+    {
+    Application->Delete();
+    Application = 0;
+    }
+  if (Helper)
+    {
+    Helper->Delete();
+    Helper = 0;
+    }
+  if (Options)
+    {
+    Options->Delete();
+    Options = 0;
+    }
+  vtkProcessModule::SetProcessModule(0);
 }
 
 //----------------------------------------------------------------------------

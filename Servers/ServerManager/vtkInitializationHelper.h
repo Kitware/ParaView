@@ -1,3 +1,4 @@
+
 /*=========================================================================
 
   Program:   ParaView
@@ -12,24 +13,45 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkInitializationHelper
+// .NAME vtkInitializationHelper - help class for python modules
 // .SECTION Description
+// This class is used by the python modules when they are loaded from
+// python (as opposed to pvpython). It simply initializes the server
+// manager so that it can be used.
 
 #ifndef __vtkInitializationHelper_h
 #define __vtkInitializationHelper_h
 
 #include "vtkObject.h"
 
+class vtkDummyProcessModuleHelper;
+class vtkPVMain;
+class vtkPVOptions;
+class vtkSMApplication;
+
 class VTK_EXPORT vtkInitializationHelper : public vtkObject
 {
 public: 
   vtkTypeRevisionMacro(vtkInitializationHelper,vtkObject);
 
-  static void Initialize();
+  // Description:
+  // Initializes the server manager. Do not use the server manager
+  // before calling this.
+  static void Initialize(const char* executable);
+
+  // Description:
+  // Finalizes the server manager. Do not use the server manager
+  // after calling this.
+  static void Finalize();
 
 protected:
   vtkInitializationHelper() {};
   virtual ~vtkInitializationHelper() {};
+
+  static vtkPVMain* PVMain;
+  static vtkSMApplication* Application;
+  static vtkPVOptions* Options;
+  static vtkDummyProcessModuleHelper* Helper;
 
 private:
 
