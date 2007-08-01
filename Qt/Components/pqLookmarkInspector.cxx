@@ -69,10 +69,10 @@ pqLookmarkInspector::pqLookmarkInspector(pqLookmarkManagerModel *model, QWidget 
   this->Form->PropertiesFrame->hide();
   this->Form->ControlsFrame->hide();
   this->CurrentLookmark = NULL;
-  this->PipelineModel = new QStandardItemModel();
+  //this->PipelineModel = new QStandardItemModel();
   this->Form->PipelineView->getHeader()->hide();
   this->Form->PipelineView->setSelectionMode(pqFlatTreeView::NoSelection);
-  this->Form->PipelineView->setModel(this->PipelineModel);
+  //this->Form->PipelineView->setModel(new QStandardItemModel());
 
   this->connect(this->Form->SaveButton, SIGNAL(clicked()), SLOT(save()));
   this->connect(this->Form->LoadButton, SIGNAL(clicked()), SLOT(load()));
@@ -115,7 +115,9 @@ pqLookmarkInspector::pqLookmarkInspector(pqLookmarkManagerModel *model, QWidget 
 //-----------------------------------------------------------------------------
 pqLookmarkInspector::~pqLookmarkInspector()
 {
-  delete this->PipelineModel;
+  //delete this->PipelineModel;
+  //delete this->Form->PipelineView->getModel();
+
   delete this->Form;
 }
 
@@ -258,10 +260,14 @@ void pqLookmarkInspector::generatePipelineView()
     return;
     }
 
-  this->PipelineModel->clear();
+  //delete this->Form->PipelineView->getModel();
+
+  //this->PipelineModel->clear();
+  QStandardItemModel *pipelineModel = new QStandardItemModel();
   this->addChildItems(this->CurrentLookmark->getPipelineHierarchy(),
-                      this->PipelineModel->invisibleRootItem());
-  this->Form->PipelineView->reset();
+                      pipelineModel->invisibleRootItem());
+  this->Form->PipelineView->setModel(pipelineModel);
+  //this->Form->PipelineView->reset();
   this->Form->PipelineView->expandAll();
   this->Form->PipelineView->show();
 }
@@ -290,7 +296,7 @@ void pqLookmarkInspector::addChildItems(vtkPVXMLElement *elem, QStandardItem *it
 */
     QStandardItem *childItem = new QStandardItem(QIcon(":/pqWidgets/Icons/pqBundle32.png"),QString(childElem->GetAttribute("Name")));
     item->setChild(i,0,childItem);
-    childItem->setRowCount(childElem->GetNumberOfNestedElements());
+    //childItem->setRowCount(childElem->GetNumberOfNestedElements());
     this->addChildItems(childElem,childItem);
     }
 }
