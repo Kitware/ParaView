@@ -69,10 +69,10 @@ pqLookmarkInspector::pqLookmarkInspector(pqLookmarkManagerModel *model, QWidget 
   this->Form->PropertiesFrame->hide();
   this->Form->ControlsFrame->hide();
   this->CurrentLookmark = NULL;
-  //this->PipelineModel = new QStandardItemModel();
+  this->PipelineModel = new QStandardItemModel();
   this->Form->PipelineView->getHeader()->hide();
   this->Form->PipelineView->setSelectionMode(pqFlatTreeView::NoSelection);
-  //this->Form->PipelineView->setModel(this->PipelineModel);
+  this->Form->PipelineView->setModel(this->PipelineModel);
 
   this->connect(this->Form->SaveButton, SIGNAL(clicked()), SLOT(save()));
   this->connect(this->Form->LoadButton, SIGNAL(clicked()), SLOT(load()));
@@ -82,8 +82,9 @@ pqLookmarkInspector::pqLookmarkInspector(pqLookmarkManagerModel *model, QWidget 
   this->Form->LoadButton->setEnabled(false);
   this->Form->DeleteButton->setEnabled(false);
 
-  // Disable the restore data button until a fix can be made for the crash that's ocurring as ParaView closes when a lookmark that has this option turned off has been loaded.
-  //this->Form->RestoreData->setEnabled(false);
+  // Disable the restore data button until a fix can be made for the crash 
+  // that's ocurring as ParaView closes when a lookmark that has this option 
+  // turned off has been loaded.
 
   //this->connect(this->Form->RestoreData, 
   //              SIGNAL(stateChanged(int)),
@@ -114,7 +115,7 @@ pqLookmarkInspector::pqLookmarkInspector(pqLookmarkManagerModel *model, QWidget 
 //-----------------------------------------------------------------------------
 pqLookmarkInspector::~pqLookmarkInspector()
 {
-  //delete this->PipelineModel;
+  delete this->PipelineModel;
   delete this->Form;
 }
 
@@ -130,12 +131,12 @@ void pqLookmarkInspector::load()
 //-----------------------------------------------------------------------------
 void pqLookmarkInspector::remove()
 { 
-  if(this->SelectedLookmarks.count()==1) //this->CurrentSelection.at(0).isValid())
+  // this should change the selection in the browser model 
+  //  which will call this->onLookmarkSelectionChanged()
+  if(this->SelectedLookmarks.count()==1) 
     {
-    emit this->removeLookmark(this->SelectedLookmarks.at(0)); //this->BrowserModel->getLookmarkName(this->CurrentSelection.at(0)));
+    emit this->removeLookmark(this->SelectedLookmarks.at(0)); 
     }
-
-  // this should change the selection in the browser model which will call this->onLookmarkSelectionChanged()
 }
 
 
@@ -223,11 +224,9 @@ void pqLookmarkInspector::onLookmarkSelectionChanged(const QStringList &selected
     }  
   else if(selected.count()==1)
     {
-    //this->CurrentSelection = selected.indexes();
     this->CurrentLookmark = this->Model->getLookmark(selected.at(0));
 
     this->Form->LookmarkName->setText(this->CurrentLookmark->getName());
-  //  this->Form->LookmarkData->setText(this->BrowserModel->getLookmarkDataName(this->CurrentSelection.at(0)));
     this->Form->LookmarkComments->setText(this->CurrentLookmark->getDescription());
     QImage img;
     img = this->CurrentLookmark->getIcon();
@@ -259,36 +258,12 @@ void pqLookmarkInspector::generatePipelineView()
     return;
     }
 
-  //this->PipelineModel->clear();
-  //delete this->PipelineModel;
-  QStandardItemModel *pipelineModel = new QStandardItemModel();
-  //QStandardItem *root = new QStandardItem("server");
-  //this->PipelineModel->setItem(0,root);
-  this->addChildItems(this->CurrentLookmark->getPipelineHierarchy(),pipelineModel->invisibleRootItem());
-  this->Form->PipelineView->setModel(pipelineModel);
+  this->PipelineModel->clear();
+  this->addChildItems(this->CurrentLookmark->getPipelineHierarchy(),
+                      this->PipelineModel->invisibleRootItem());
+  this->Form->PipelineView->reset();
   this->Form->PipelineView->expandAll();
   this->Form->PipelineView->show();
-/*
-  // Hide all but the first column.
-  int columns = this->PipelineModel->columnCount();
-  for(int i = 1; i < columns; ++i)
-    {
-    this->Form->PipelineView->getHeader()->hideSection(i);
-    }
-*/
-/*
-  if(!this->PipelineView)
-    {
-    this->PipelineView = new pqFlatTreeView(this);
-    }
-  this->PipelineView->setObjectName("PipelinePreview");
-  this->PipelineView->getHeader()->hide();
-  this->PipelineView->setSelectionMode(pqFlatTreeView::NoSelection);
-  this->PipelineView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  baseLayout->addWidget(this->PipelineView);
-*/
-
-  //delete model;
 }
 
 
@@ -315,6 +290,7 @@ void pqLookmarkInspector::addChildItems(vtkPVXMLElement *elem, QStandardItem *it
 */
     QStandardItem *childItem = new QStandardItem(QIcon(":/pqWidgets/Icons/pqBundle32.png"),QString(childElem->GetAttribute("Name")));
     item->setChild(i,0,childItem);
+    childItem->setRowCount(childElem->GetNumberOfNestedElements());
     this->addChildItems(childElem,childItem);
     }
 }

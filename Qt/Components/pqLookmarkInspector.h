@@ -49,7 +49,7 @@ class pqLookmarkInspectorForm;
 class pqLookmarkModel;
 class vtkPVXMLElement;
 class QStandardItem;
-//class QStandardItemModel;
+class QStandardItemModel;
 class pqLookmarkManagerModel;
 
 /// \class pqLookmarkInspector
@@ -98,7 +98,7 @@ private:
   QList<QString> SelectedLookmarks;
   pqLookmarkModel *CurrentLookmark;
   pqLookmarkManagerModel *Model;
-  //QStandardItemModel *PipelineModel;
+  QStandardItemModel *PipelineModel;
   pqLookmarkInspectorForm *Form;   ///< Defines the gui layout.
 };
 

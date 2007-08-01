@@ -61,6 +61,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqLookmarkStateLoaderInternal
 {
 public:
+
+  pqLookmarkStateLoaderInternal::pqLookmarkStateLoaderInternal()
+    {
+    this->NumberOfLookmarkSources = 0;
+    this->PreferredSources = 0;
+    this->PipelineModel = 0;
+    this->RestoreCamera = false;
+    this->RestoreTime = false;
+    this->TimeKeeper = 0;
+    this->SourceProxyCollectionLoaded = false;
+    this->View = NULL;
+
+    pqServerManagerModel *model = 
+      pqApplicationCore::instance()->getServerManagerModel();
+    this->PipelineModel = new pqPipelineModel(*model);
+    }
+
+  pqLookmarkStateLoaderInternal::~pqLookmarkStateLoaderInternal()
+    {
+    delete this->PipelineModel;
+    }
+
   int CurrentSourceID;
   int CurrentDisplayID;
   QMap<int, pqPipelineSource*> LookmarkSourceIdToExistingSourceMap;
@@ -68,7 +90,7 @@ public:
   QList<pqPipelineSource*> *PreferredSources;
   QList<QStandardItem*> LookmarkSources;
   int NumberOfLookmarkSources;
-  QStandardItemModel *LookmarkPipelineModel;
+  QStandardItemModel LookmarkPipelineModel;
   pqPipelineModel *PipelineModel;
   bool RestoreCamera;
   bool RestoreTime;
@@ -82,24 +104,11 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.14");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.15");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
   this->Internal = new pqLookmarkStateLoaderInternal;
-  this->Internal->NumberOfLookmarkSources = 0;
-  this->Internal->PreferredSources = 0;
-  this->Internal->LookmarkPipelineModel = 0;
-  this->Internal->PipelineModel = 0;
-  this->Internal->RestoreCamera = false;
-  this->Internal->RestoreTime = false;
-  this->Internal->TimeKeeper = 0;
-  this->Internal->SourceProxyCollectionLoaded = false;
-  this->Internal->View = NULL;
-
-  pqServerManagerModel *model = 
-    pqApplicationCore::instance()->getServerManagerModel();
-  this->Internal->PipelineModel = new pqPipelineModel(*model);
 }
 
 //-----------------------------------------------------------------------------
@@ -163,8 +172,7 @@ void pqLookmarkStateLoader::SetPipelineHierarchy(vtkPVXMLElement *lookmarkPipeli
 
   // Set up the pipeline model for this lookmak's state
   this->Internal->LookmarkSources.clear();
-  this->Internal->LookmarkPipelineModel = new QStandardItemModel();
-  this->AddChildItems(lookmarkPipeline,this->Internal->LookmarkPipelineModel->invisibleRootItem());
+  this->AddChildItems(lookmarkPipeline,this->Internal->LookmarkPipelineModel.invisibleRootItem());
 }
 
 void pqLookmarkStateLoader::AddChildItems(vtkPVXMLElement *elem, QStandardItem *item)
@@ -377,7 +385,7 @@ vtkSMProxy* pqLookmarkStateLoader::NewProxyInternal(
     //  OR there are no selections
     //  prompt the user.
     pqLookmarkSourceDialog *srcDialog = new pqLookmarkSourceDialog(
-      this->Internal->LookmarkPipelineModel,this->Internal->PipelineModel);
+      &this->Internal->LookmarkPipelineModel,this->Internal->PipelineModel);
     srcDialog->setLookmarkSource(this->Internal->LookmarkSources.takeFirst());
     if(srcDialog->exec() == QDialog::Accepted)
       {
