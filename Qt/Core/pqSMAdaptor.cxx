@@ -366,6 +366,11 @@ QList<pqSMProxy> pqSMAdaptor::getProxyPropertyDomain(vtkSMProperty* Property)
 QList<QList<QVariant> > pqSMAdaptor::getSelectionProperty(vtkSMProperty* Property)
 {
   QList<QList<QVariant> > ret;
+
+  if(!Property)
+    {
+    return ret;
+    }
   
   vtkSMStringListRangeDomain* StringDomain = NULL;
   vtkSMStringListDomain* StringListDomain = NULL;
@@ -422,6 +427,11 @@ QList<QVariant> pqSMAdaptor::getSelectionProperty(vtkSMProperty* Property,
                                                   unsigned int Index)
 {
   QList<QVariant> ret;
+  
+  if(!Property)
+    {
+    return ret;
+    }
   
   vtkSMStringListRangeDomain* StringDomain = NULL;
   vtkSMStringListDomain* StringListDomain = NULL;
@@ -539,6 +549,11 @@ QList<QVariant> pqSMAdaptor::getSelectionProperty(vtkSMProperty* Property,
 void pqSMAdaptor::setSelectionProperty(vtkSMProperty* Property, 
                                    QList<QList<QVariant> > Value)
 {
+  if(!Property)
+    {
+    return;
+    }
+
   vtkSMVectorProperty* VectorProperty;
   VectorProperty = vtkSMVectorProperty::SafeDownCast(Property);
   
@@ -568,6 +583,11 @@ void pqSMAdaptor::setSelectionProperty(vtkSMProperty* Property,
 void pqSMAdaptor::setUncheckedSelectionProperty(vtkSMProperty* Property,
                                   QList<QList<QVariant> > Value)
 {
+  if(!Property)
+    {
+    return;
+    }
+
   foreach(QList<QVariant> l, Value)
     {
     pqSMAdaptor::setUncheckedSelectionProperty(Property, l);
@@ -577,7 +597,8 @@ void pqSMAdaptor::setUncheckedSelectionProperty(vtkSMProperty* Property,
 void pqSMAdaptor::setSelectionProperty(vtkSMProperty* Property, 
                                        QList<QVariant> Value)
 {
-  if(Value.size() != 2)
+
+  if(!Property || Value.size() != 2)
     {
     return;
     }
@@ -678,7 +699,7 @@ void pqSMAdaptor::setSelectionProperty(vtkSMProperty* Property,
 void pqSMAdaptor::setUncheckedSelectionProperty(vtkSMProperty* Property,
                                                 QList<QVariant> Value)
 {
-  if(Value.size() != 2)
+  if(!Property || Value.size() != 2)
     {
     return;
     }
@@ -782,6 +803,10 @@ void pqSMAdaptor::setUncheckedSelectionProperty(vtkSMProperty* Property,
 QList<QVariant> pqSMAdaptor::getSelectionPropertyDomain(vtkSMProperty* Property)
 {
   QList<QVariant> ret;
+  if(!Property)
+    {
+    return ret;
+    }
 
   vtkSMVectorProperty* VProperty = vtkSMVectorProperty::SafeDownCast(Property);
 
@@ -841,6 +866,10 @@ QList<QVariant> pqSMAdaptor::getSelectionPropertyDomain(vtkSMProperty* Property)
 QVariant pqSMAdaptor::getEnumerationProperty(vtkSMProperty* Property)
 {
   QVariant var;
+  if(!Property)
+    {
+    return var;
+    }
 
   vtkSMBooleanDomain* BooleanDomain = NULL;
   vtkSMEnumerationDomain* EnumerationDomain = NULL;
@@ -920,6 +949,11 @@ QVariant pqSMAdaptor::getEnumerationProperty(vtkSMProperty* Property)
 void pqSMAdaptor::setEnumerationProperty(vtkSMProperty* Property,
                                          QVariant Value)
 {
+  if(!Property)
+    {
+    return;
+    }
+
   vtkSMBooleanDomain* BooleanDomain = NULL;
   vtkSMEnumerationDomain* EnumerationDomain = NULL;
   vtkSMStringListDomain* StringListDomain = NULL;
@@ -1008,6 +1042,11 @@ void pqSMAdaptor::setEnumerationProperty(vtkSMProperty* Property,
 void pqSMAdaptor::setUncheckedEnumerationProperty(vtkSMProperty* Property,
                                                   QVariant Value)
 {
+  if(!Property)
+    {
+    return;
+    }
+
   vtkSMBooleanDomain* BooleanDomain = NULL;
   vtkSMEnumerationDomain* EnumerationDomain = NULL;
   vtkSMStringListDomain* StringListDomain = NULL;
@@ -1103,6 +1142,10 @@ QList<QVariant> pqSMAdaptor::getEnumerationPropertyDomain(
                                           vtkSMProperty* Property)
 {
   QList<QVariant> enumerations;
+  if(!Property)
+    {
+    return enumerations;
+    }
 
   vtkSMBooleanDomain* BooleanDomain = NULL;
   vtkSMEnumerationDomain* EnumerationDomain = NULL;
@@ -1380,6 +1423,10 @@ QList<QList<QVariant> > pqSMAdaptor::getMultipleElementPropertyDomain(
                            vtkSMProperty* Property)
 {
   QList< QList<QVariant> > domains;
+  if(!Property)
+    {
+    return domains;
+    }
   
   vtkSMDoubleRangeDomain* DoubleDomain = NULL;
   vtkSMIntRangeDomain* IntDomain = NULL;
@@ -1615,6 +1662,10 @@ QList<QVariant> pqSMAdaptor::getMultipleElementPropertyDomain(
                         vtkSMProperty* Property, unsigned int Index)
 {
   QList<QVariant> domain;
+  if(!Property)
+    {
+    return domain;
+    }
   
   vtkSMDoubleRangeDomain* DoubleDomain = NULL;
   vtkSMIntRangeDomain* IntDomain = NULL;
@@ -1763,6 +1814,10 @@ void pqSMAdaptor::setFieldSelectionMode(vtkSMProperty* prop,
 void pqSMAdaptor::setUncheckedFieldSelectionMode(vtkSMProperty* prop, 
                                              const QString& val)
 {
+  if(!prop)
+    {
+    return;
+    }
   vtkSMStringVectorProperty* Property =
     vtkSMStringVectorProperty::SafeDownCast(prop);
   vtkSMEnumerationDomain* domain =
@@ -1787,6 +1842,10 @@ void pqSMAdaptor::setUncheckedFieldSelectionMode(vtkSMProperty* prop,
 QList<QString> pqSMAdaptor::getFieldSelectionModeDomain(vtkSMProperty* prop)
 {
   QList<QString> types;
+  if(!prop)
+    {
+    return types;
+    }
 
   vtkSMStringVectorProperty* Property =
     vtkSMStringVectorProperty::SafeDownCast(prop);
@@ -1846,6 +1905,10 @@ void pqSMAdaptor::setUncheckedFieldSelectionScalar(vtkSMProperty* prop,
 QList<QString> pqSMAdaptor::getFieldSelectionScalarDomain(vtkSMProperty* prop)
 {
   QList<QString> types;
+  if(!prop)
+    {
+    return types;
+    }
 
   vtkSMStringVectorProperty* Property =
     vtkSMStringVectorProperty::SafeDownCast(prop);
@@ -1867,19 +1930,21 @@ QList<QString> pqSMAdaptor::getFieldSelectionScalarDomain(vtkSMProperty* prop)
 QList<QString> pqSMAdaptor::getDomainTypes(vtkSMProperty* property)
 {
   QList<QString> types;
-  if (property)
+  if(!property)
     {
-    vtkSMDomainIterator* iter = property->NewDomainIterator();
-    for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-      {
-      vtkSMDomain* d = iter->GetDomain();
-      QString classname = d->GetClassName();
-      if (!types.contains(classname))
-        {
-        types.push_back(classname);
-        }
-      }
-    iter->Delete();
+    return types;
     }
+  
+  vtkSMDomainIterator* iter = property->NewDomainIterator();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMDomain* d = iter->GetDomain();
+    QString classname = d->GetClassName();
+    if (!types.contains(classname))
+      {
+      types.push_back(classname);
+      }
+    }
+  iter->Delete();
   return types;
 }
