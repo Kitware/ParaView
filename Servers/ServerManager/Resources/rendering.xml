@@ -9,7 +9,8 @@
       <!-- see vtkPVRenderView -->
       <ProxyProperty name="Renderers" 
                      command="AddLightsToRenderer"
-                     remove_command="RemoveLightsFromRenderer">
+                     remove_command="RemoveLightsFromRenderer"
+                     repeatable="1">
         <ProxyGroupDomain name="groups">
           <Group name="renderers"/>
         </ProxyGroupDomain>
@@ -136,7 +137,8 @@
       <ProxyProperty 
         name="ViewProps" 
         command="AddViewProp"
-        clean_command="RemoveAllViewProps">
+        clean_command="RemoveAllViewProps"
+        repeatable="1">
         <ProxyGroupDomain name="groups">
           <Group name="props" />
           <Group name="annotations" />
@@ -194,7 +196,8 @@
 
       <ProxyProperty name="Lights" 
                      command="AddLight"
-                     remove_command="RemoveLight">
+                     remove_command="RemoveLight"
+                     repeatable="1">
         <ProxyGroupDomain name="groups">
           <Group name="lights"/>
         </ProxyGroupDomain>
@@ -372,7 +375,7 @@
   <ProxyGroup name="renderwindow">
     <!-- Proxy for renderwindow -->
     <Proxy name="RenderWindow" class="vtkRenderWindow">
-      <ProxyProperty name="Renderer" command="AddRenderer">
+      <ProxyProperty name="Renderer" command="AddRenderer" repeatable="1">
         <ProxyGroupDomain name="groups">
           <Group name="renderers"/>
         </ProxyGroupDomain>
@@ -592,7 +595,8 @@
       </StringVectorProperty>
       <ProxyProperty name="ClippingPlanes" 
                      command="AddClippingPlane"
-                     repeat_command="1">
+                     repeat_command="1"
+                     repeatable="1">
          <ProxyGroupDomain name="groups">
           <Group name="implicit_functions"/>
          </ProxyGroupDomain>
@@ -1814,7 +1818,8 @@
     <Proxy name="InteractorStyle" class="vtkPVInteractorStyle">
       <ProxyProperty
         name="CameraManipulators"
-        command="AddManipulator">
+        command="AddManipulator"
+        repeatable="1">
         <ProxyGroupDomain name="groups">
           <Group name="cameramanipulators" />
         </ProxyGroupDomain>
@@ -1945,7 +1950,8 @@
       <ProxyProperty name="Renderers"
                      command="AddRenderer"
                      remove_command="RemoveRenderer"
-                     clean_command="RemoveAllRenderers">
+                     clean_command="RemoveAllRenderers"
+                     repeatable="1">
         <ProxyGroupDomain name="groups">
           <Group name="renderers"/>
         </ProxyGroupDomain>
@@ -2045,7 +2051,8 @@
       <ProxyProperty name="Renderers"
         command="AddRenderer"
         remove_command="RemoveRenderer"
-        clean_command="RemoveAllRenderers">
+        clean_command="RemoveAllRenderers"
+        repeatable="1">
         <ProxyGroupDomain name="groups">
           <Group name="renderers"/>
         </ProxyGroupDomain>
@@ -4788,7 +4795,7 @@
         command="SetCacheSize"
         update_self="1"
         number_of_elements="1"
-        default_values="2">
+        default_values="16">
         <Documentation>
           Set the maximum number of blocks to cache on the client.
         </Documentation>
@@ -4803,7 +4810,7 @@
           <IdTypeVectorProperty name="BlockSize"
             command="SetBlockSize"
             number_of_elements="1"
-            default_values="20" >
+            default_values="1024" >
           </IdTypeVectorProperty>
 
           <IdTypeVectorProperty name="Block"
