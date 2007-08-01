@@ -155,6 +155,7 @@ void pqXDMFPanel::linkServerManagerProperties()
 {
   this->populateDomainWidget();
   this->populateGridWidget();
+  
   this->populateParameterWidget();
   
   // parent class hooks up some of our widgets in the ui
@@ -218,15 +219,12 @@ void pqXDMFPanel::populateGridWidget()
     this->UI->XDMFHelper->GetProperty("GetGridName");
   QList<QVariant> grids;
   grids = pqSMAdaptor::getMultipleElementProperty(GetNamesProperty);
-  QList<QVariant> enabledGrids;
-  enabledGrids = pqSMAdaptor::getMultipleElementProperty(
-    this->UI->XDMFHelper->GetProperty("EnableGrid"));
 
   foreach(QVariant v, grids)
     {
     pqTreeWidgetItemObject *anitem;
     anitem = new pqTreeWidgetItemObject(gridWidget, QStringList(v.toString()));
-    anitem->setChecked(enabledGrids.contains(v));
+    anitem->setChecked(1);
     }
   
   this->setGridProperty(this->UI->XDMFHelper);

@@ -306,13 +306,13 @@ IF(BUILD_TESTING)
     UndoRedo5
     UndoRedo6
     UndoRedo7
-#    XdmfRead
-#    XdmfReadImageData
-#    XdmfReadImageDataCollection
-#    XdmfReadRectilinearGrid
-#    XdmfReadRectilinearGridCollection
-#    XdmfReadStructuredGrid
-#    XdmfReadStructuredGridCollection
+    XdmfRead
+    #XdmfReadImageData
+    XdmfReadImageDataCollection
+    #XdmfReadRectilinearGrid
+    XdmfReadRectilinearGridCollection
+    #XdmfReadStructuredGrid
+    XdmfReadStructuredGridCollection
   )
 
   # Test compositing for a few client server and client render server tests.
