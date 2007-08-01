@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqProxy.h"
 #include "pqSMSignalAdaptors.h"
+#include "vtkEventQtSlotConnect.h"
 
 #include "ui_pqLineWidget.h"
 
@@ -61,10 +62,12 @@ public:
   {
     this->Links.setUseUncheckedProperties(false);
     this->Links.setAutoUpdateVTKObjects(true);
+    this->Observer = vtkEventQtSlotConnect::New();
   }
   
   ~pqImplementation()
   {
+    this->Observer->Delete();
   }
   
   /// Stores the Qt widgets
@@ -76,6 +79,7 @@ public:
   
   /// Maps Qt widgets to the 3D widget
   pqPropertyLinks Links;
+  vtkEventQtSlotConnect* Observer;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -110,12 +114,6 @@ pqLineWidget::pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
   QObject::connect(this->Implementation->UI.zAxis,
     SIGNAL(clicked()), this, SLOT(onZAxis()));
 
-  QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
-    this, SLOT(setModified()));
-
-  QObject::connect(&this->Implementation->Links, SIGNAL(smPropertyChanged()),
-    this, SLOT(setModified()));
-
   // Trigger a render when use explicitly edits the positions.
   QObject::connect(this->Implementation->UI.point1X, 
     SIGNAL(editingFinished()), 
@@ -138,7 +136,16 @@ pqLineWidget::pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
   
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
+  
   this->createWidget(smmodel->findServer(o->GetConnectionID()));
+  
+  QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
+    this, SLOT(setModified()));
+
+  this->Implementation->Observer->Connect(this->getWidgetProxy(),
+    vtkCommand::StartInteractionEvent,
+    this, SLOT(setModified()));
+  
 }
 
 //-----------------------------------------------------------------------------

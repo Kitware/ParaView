@@ -200,17 +200,6 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
       }
     }
   
-  pqSMProxy current = pqSMAdaptor::getProxyProperty(source_property);
-
-  int idx = sources.indexOf(current);
-  this->Implementation->UI.seedType->setCurrentIndex(idx);
-  this->onSeedTypeChanged(idx);
-  
-  this->Implementation->LineSourceWidget->resetBounds();
-  this->Implementation->PointSourceWidget->resetBounds();
-  this->Implementation->LineSourceWidget->reset();
-  this->Implementation->PointSourceWidget->reset();
-
 
   QVBoxLayout* const panel_layout = new QVBoxLayout(this);
   panel_layout->setMargin(0);
@@ -230,8 +219,30 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
   l->addWidget(this->Implementation->LineSourceWidget);
   l->addStretch();
 
-  this->Implementation->UI.stackedWidget->setCurrentWidget(
-    this->Implementation->UI.pointSource);
+  pqSMProxy current = pqSMAdaptor::getProxyProperty(source_property);
+
+  int idx = sources.indexOf(current);
+  this->Implementation->UI.seedType->setCurrentIndex(idx);
+  if(idx == 0)
+    {
+    this->Implementation->UI.stackedWidget->setCurrentWidget(
+                    this->Implementation->UI.pointSource);
+    this->Implementation->LineSourceWidget->setWidgetVisible(false);
+    this->Implementation->PointSourceWidget->setWidgetVisible(true);
+    }
+  else
+    {
+    this->Implementation->UI.stackedWidget->setCurrentWidget(
+                    this->Implementation->UI.lineSource);
+    this->Implementation->PointSourceWidget->setWidgetVisible(false);
+    this->Implementation->LineSourceWidget->setWidgetVisible(true);
+    }
+  
+  this->Implementation->LineSourceWidget->resetBounds();
+  this->Implementation->PointSourceWidget->resetBounds();
+  this->Implementation->LineSourceWidget->reset();
+  this->Implementation->PointSourceWidget->reset();
+
 
   QObject::connect(this->Implementation->UI.IntegratorType, 
     SIGNAL(currentIndexChanged(int)), 
