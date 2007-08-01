@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxyLink);
-vtkCxxRevisionMacro(vtkSMProxyLink, "1.11");
+vtkCxxRevisionMacro(vtkSMProxyLink, "1.12");
 
 //---------------------------------------------------------------------------
 struct vtkSMProxyLinkInternals
@@ -227,6 +227,13 @@ void vtkSMProxyLink::PropertyModified(vtkSMProxy* fromProxy, const char* pname)
 //---------------------------------------------------------------------------
 void vtkSMProxyLink::UpdateProperty(vtkSMProxy* caller, const char* pname)
 {
+  if (pname && this->Internals->ExceptionProperties.find(pname) !=
+    this->Internals->ExceptionProperties.end())
+    {
+    // Property is in exception list.
+    return;
+    }
+
   vtkSMProxyLinkInternals::LinkedProxiesType::iterator iter =
     this->Internals->LinkedProxies.begin();
   for(; iter != this->Internals->LinkedProxies.end(); iter++)
