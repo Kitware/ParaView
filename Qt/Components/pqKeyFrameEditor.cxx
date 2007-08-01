@@ -164,6 +164,7 @@ public:
   QPointer<pqAnimationScene> Scene;
   QStandardItemModel Model;
   QPair<double,double> TimeRange;
+  QPair<QVariant,QVariant> ValueRange;
 
   double normalizedTime(double t)
     {
@@ -193,7 +194,7 @@ public:
       QModelIndex tidx = this->Model.index(row,0);
       time = this->Model.data(tidx).toDouble();
       tidx = this->Model.index(row-1,0);
-      time = time.toDouble() - this->Model.data(tidx).toDouble();
+      time = time.toDouble() + this->Model.data(tidx).toDouble();
       time = time.toDouble()/2.0;
       }
     item->setData(time, Qt::DisplayRole);
@@ -209,10 +210,26 @@ public:
       }
     return item;
     }
-  QStandardItem* newValueItem(int /*row*/)
+  QStandardItem* newValueItem(int row)
     {
     QStandardItem* item = new QStandardItem();
-    // TODO initialize  -- would like to share code with pqAnimationPanel...
+    int count = this->Model.rowCount();
+    
+    QVariant value = this->ValueRange.first;
+    if(count == row && row != 0)
+      {
+      value = this->ValueRange.second;
+      }
+    else if(row > 0)
+      {
+      // average value between rows
+      QModelIndex tidx = this->Model.index(row,2);
+      value = this->Model.data(tidx).toDouble();
+      tidx = this->Model.index(row-1,2);
+      value = value.toDouble() + this->Model.data(tidx).toDouble();
+      value = value.toDouble()/2.0;
+      }
+    item->setData(value, Qt::DisplayRole);
     return item;
     }
 };
@@ -226,6 +243,18 @@ pqKeyFrameEditor::pqKeyFrameEditor(pqAnimationScene* scene,
   this->Internal->Scene = scene;
   this->Internal->Cue = cue;
   this->Internal->TimeRange = scene->getClockTimeRange();
+  QList<QVariant> domain = pqSMAdaptor::getMultipleElementPropertyDomain(
+    cue->getAnimatedProperty(), cue->getAnimatedPropertyIndex());
+  if(domain.size())
+    {
+    this->Internal->ValueRange.first = domain[0];
+    this->Internal->ValueRange.second = domain[1];
+    }
+  else
+    {
+    this->Internal->ValueRange.first = 0;
+    this->Internal->ValueRange.second = 0;
+    }
 
   this->Internal->tableView->setModel(&this->Internal->Model);
   this->Internal->tableView->horizontalHeader()->setStretchLastSection(true);
