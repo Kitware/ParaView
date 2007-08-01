@@ -98,10 +98,6 @@ SIMPLE_TEST(struct stat sb; sb.st_blocks=0);
 
 #ifdef PRINTF_LL_WIDTH
 
-
-#define TO_STRING0(x) #x
-#define TO_STRING(x) TO_STRING0(x)
-
 #ifdef HAVE_LONG_LONG
 #  define LL_TYPE long long
 #else /* HAVE_LONG_LONG */
@@ -111,12 +107,25 @@ SIMPLE_TEST(struct stat sb; sb.st_blocks=0);
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 int main(void)
 {
+  char *llwidthArgs[] = { "l64", "l", "L", "q", "ll", NULL };
   char *s = malloc(128);
+  char **currentArg = NULL;
   LL_TYPE x = (LL_TYPE)1048576 * (LL_TYPE)1048576;
-  sprintf(s,"%" TO_STRING(PRINTF_LL_WIDTH) "d",x);
-  exit(strcmp(s,"1099511627776"));
+  for (currentArg = llwidthArgs; *currentArg != NULL; currentArg++)
+    {
+    char formatString[64];
+    sprintf(formatString, "%%%sd", *currentArg);
+    sprintf(s, formatString, x);
+    if (strcmp(s, "1099511627776") == 0)
+      {
+      printf("PRINTF_LL_WIDTH=[%s]\n", *currentArg);
+      exit(0);
+      }
+    }
+  exit(1);
 }
 
 #endif /* PRINTF_LL_WIDTH */
