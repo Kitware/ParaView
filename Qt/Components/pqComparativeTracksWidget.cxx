@@ -174,7 +174,7 @@ void pqComparativeTracksWidget::updateScene()
 
 
 //-----------------------------------------------------------------------------
-void pqComparativeTracksWidget::updateTrack(int index, vtkSMProperty* property)
+void pqComparativeTracksWidget::updateTrack(int index, vtkSMProperty* smproperty)
 {
   pqAnimationModel* model = this->Internal->model();
   while (model->count() <= index)
@@ -190,7 +190,7 @@ void pqComparativeTracksWidget::updateTrack(int index, vtkSMProperty* property)
 
   // Find the first enabled cue.
   vtkSMAnimationCueProxy* cueProxy = 0;
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(property);
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(smproperty);
   for (unsigned int cc=0; cc < pp->GetNumberOfProxies(); cc++)
     {
     cueProxy = vtkSMAnimationCueProxy::SafeDownCast(pp->GetProxy(cc));
