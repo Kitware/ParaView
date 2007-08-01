@@ -316,11 +316,11 @@ void pqKeyFrameEditor::writeKeyFrameData()
 
   for(int i=0; i<oldNumber-newNumber; i++)
     {
-    this->Internal->Cue->insertKeyFrame(0);
+    this->Internal->Cue->deleteKeyFrame(0);
     }
   for(int i=0; i<newNumber-oldNumber; i++)
     {
-    this->Internal->Cue->deleteKeyFrame(0);
+    this->Internal->Cue->insertKeyFrame(0);
     }
 
   for(int i=0; i<newNumber; i++)
