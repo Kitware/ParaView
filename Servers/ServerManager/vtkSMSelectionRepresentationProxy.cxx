@@ -29,7 +29,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSelectionRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMSelectionRepresentationProxy::vtkSMSelectionRepresentationProxy()
 {
@@ -276,7 +276,10 @@ void vtkSMSelectionRepresentationProxy::SetSelection(vtkSMSourceProxy* selection
 //----------------------------------------------------------------------------
 void vtkSMSelectionRepresentationProxy::CleanSelectionInput()
 {
-  this->Connect(this->EmptySelectionSource, this->ExtractSelection, "Selection");
+  if (this->EmptySelectionSource && this->ExtractSelection)
+    {
+    this->Connect(this->EmptySelectionSource, this->ExtractSelection, "Selection");
+    }
 }
 
 //----------------------------------------------------------------------------
