@@ -172,7 +172,6 @@ IF(BUILD_TESTING)
     SET (TESTS_WITHOUT_BASELINES
       ${TESTS_WITHOUT_BASELINES}
       LoadStateHistogram
-      ElementInspector
       )
   ENDIF(PARAVIEW_DATA_ROOT)
 

@@ -195,7 +195,7 @@ void pqViewManager::buildConvertMenu()
       QStringList::iterator iter;
       for(iter = viewtypes.begin(); iter != viewtypes.end(); ++iter)
         {
-        if ((*iter) == "TableView" || (*iter) == "ElementInspectorView")
+        if ((*iter) == "TableView")
           {
           // Ignore these views for now.
           continue;
