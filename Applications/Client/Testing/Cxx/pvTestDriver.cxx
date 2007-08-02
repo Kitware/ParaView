@@ -356,10 +356,12 @@ pvTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
       }
     }
 
+#if !defined(__APPLE__)
   if ( this->TestRemoteRendering && (type == SERVER || type == RENDER_SERVER) )
     {
     commandLine.push_back("--use-offscreen-rendering");
     }
+#endif
 
   commandLine.push_back(0);
 }
