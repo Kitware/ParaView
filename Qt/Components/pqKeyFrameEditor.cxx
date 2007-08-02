@@ -435,6 +435,15 @@ void pqKeyFrameEditor::deleteKeyFrame()
     {
     this->Internal->Model.removeRow(idx.row());
     }
+  // if one row left, remove interpolation type
+  if(this->Internal->Model.rowCount() == 1)
+    {
+    QStandardItem* item = this->Internal->Model.takeItem(0,1);
+    if(item)
+      {
+      delete item;
+      }
+    }
 }
 
 void pqKeyFrameEditor::deleteAllKeyFrames()

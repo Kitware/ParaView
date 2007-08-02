@@ -100,6 +100,9 @@ pqAnimationScene::pqAnimationScene(const QString& group, const QString& name,
   this->Internals->VTKConnect->Connect(
     proxy->GetProperty("Loop"), vtkCommand::ModifiedEvent,
     this, SIGNAL(loopChanged()));
+  this->Internals->VTKConnect->Connect(
+    proxy->GetProperty("NumberOfFrames"), vtkCommand::ModifiedEvent,
+    this, SIGNAL(frameCountChanged()));
 
   this->Internals->VTKConnect->Connect(
     proxy->GetProperty("ClockTimeRange"), vtkCommand::ModifiedEvent,

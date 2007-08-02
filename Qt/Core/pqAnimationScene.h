@@ -121,6 +121,9 @@ signals:
   /// Argument is the percent of play completed.
   void tick(int percentCompleted);
 
+  /// Emitted when the number of frames changes
+  void frameCountChanged();
+
 public slots:
   /// Play animation.
   void play();

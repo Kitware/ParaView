@@ -43,9 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationTrack.h"
 #include "pqAnimationKeyFrame.h"
 
-#include "vtkEventQtSlotConnect.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProperty.h"
 #include "vtkSMPVAnimationSceneProxy.h"
 
 #include "pqApplicationCore.h"
@@ -63,11 +61,9 @@ class pqAnimationViewWidget::pqInternal
 public:
   pqInternal()
     {
-    this->Connections = vtkEventQtSlotConnect::New();
     }
   ~pqInternal()
     {
-    this->Connections->Delete();
     }
 
   QPointer<pqAnimationScene> Scene;
@@ -75,7 +71,6 @@ public:
   QSignalMapper KeyFramesChanged;
   typedef QMap<QPointer<pqAnimationCue>, pqAnimationTrack*> TrackMapType;
   TrackMapType TrackMap;
-  vtkEventQtSlotConnect* Connections;
 
   pqAnimationTrack* findTrack(pqAnimationCue* cue)
     {
@@ -150,11 +145,6 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
     {
     QObject::disconnect(this->Internal->Scene, 0, this, 0);
     QObject::disconnect(this->Internal->Scene->getServer()->getTimeKeeper(), 0, this, 0);
-    this->Internal->Connections->Disconnect(
-      scene->getProxy()->GetProperty("NumberOfFrames"),
-      vtkCommand::ModifiedEvent,
-      this,
-      SLOT(updateFrames()));
     }
   this->Internal->Scene = scene;
   if(this->Internal->Scene)
@@ -163,13 +153,10 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
       this, SLOT(onSceneCuesChanged()));
     QObject::connect(scene, SIGNAL(clockTimeRangesChanged()),
             this, SLOT(updateSceneTimeRange()));
+    QObject::connect(scene, SIGNAL(frameCountChanged()),
+            this, SLOT(updateFrames()));
     QObject::connect(scene->getServer()->getTimeKeeper(), SIGNAL(timeChanged()),
             this, SLOT(updateSceneTime()));
-    this->Internal->Connections->Connect(
-      scene->getProxy()->GetProperty("NumberOfFrames"),
-      vtkCommand::ModifiedEvent,
-      this,
-      SLOT(updateFrames()));
     QObject::connect(scene, SIGNAL(playModeChanged()), 
       this, SLOT(updatePlayMode()));
     this->updateSceneTimeRange();

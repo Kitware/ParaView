@@ -61,7 +61,14 @@
     </widget>
    </item>
    <item rowspan="4" row="1" column="0" >
-    <widget class="QTableView" name="tableView" />
+    <widget class="QTableView" name="tableView" >
+     <property name="selectionMode" >
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior" >
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
