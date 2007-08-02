@@ -28,18 +28,21 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIdTypeVectorProperty.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPart.h"
-#include "vtkSMProperty.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
 #include <vtkstd/vector>
 
+//---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.53");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.54");
 
 struct vtkSMSourceProxyInternals
 {
   vtkstd::vector<vtkSmartPointer<vtkSMPart> > Parts;
+  vtkstd::vector<vtkSmartPointer<vtkSMSourceProxy> > SelectionProxies;
 };
 
 //---------------------------------------------------------------------------
@@ -53,6 +56,7 @@ vtkSMSourceProxy::vtkSMSourceProxy()
   this->SetExecutiveName("vtkCompositeDataPipeline");
 
   this->DoInsertExtractPieces = 1;
+  this->SelectionProxiesCreated = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -497,6 +501,138 @@ int vtkSMSourceProxy::LoadRevivalState(vtkPVXMLElement* revivalElem,
     }
   this->PartsCreated = 1;
   return 1;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMSourceProxy::CreateSelectionProxies()
+{
+  if (this->SelectionProxiesCreated)
+    {
+    return;
+    }
+  this->CreateParts();
+
+  vtkClientServerStream stream;
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  unsigned int numParts = this->GetNumberOfParts(); 
+  for (unsigned int cc=0; cc < numParts; cc++)
+    {
+    vtkSmartPointer<vtkSMSourceProxy> esProxy;
+    esProxy.TakeReference(vtkSMSourceProxy::SafeDownCast(
+        pxm->NewProxy("filters", "ExtractSelection")));
+    if (esProxy)
+      {
+      esProxy->SetServers(this->Servers);
+      esProxy->SetConnectionID(this->ConnectionID);
+      esProxy->SelectionProxiesCreated = 1;
+      esProxy->UpdateVTKObjects();
+
+      // We don't use input property since that leads to reference loop cycles
+      // and I don't feel like doing the garbage collection thing right now. 
+      stream << vtkClientServerStream::Invoke
+             << this->GetID()
+             << "GetOutputPort"
+             << cc
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke             
+             << esProxy->GetID()
+             << "SetInputConnection"
+             << vtkClientServerStream::LastResult
+             << vtkClientServerStream::End;
+      }
+
+    this->PInternals->SelectionProxies.push_back(esProxy);
+    }
+
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID, this->Servers, stream);
+
+  this->SelectionProxiesCreated = 1;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMSourceProxy::SetSelectionInput(unsigned int portIndex,
+  vtkSMSourceProxy* input, unsigned int outputport)
+{
+  if (this->PInternals->SelectionProxies.size() <= portIndex)
+    {
+    return;
+    }
+  vtkSMSourceProxy* esProxy = this->PInternals->SelectionProxies[portIndex];
+  if (esProxy)
+    {
+    vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(
+      esProxy->GetProperty("Selection"));
+    pp->RemoveAllProxies();
+    pp->AddInputConnection(input, outputport);
+    esProxy->UpdateVTKObjects();
+    }
+}
+
+//---------------------------------------------------------------------------
+vtkSMSourceProxy* vtkSMSourceProxy::GetSelectionInput(unsigned int portIndex)
+{
+  if (this->PInternals->SelectionProxies.size() > portIndex)
+    {
+    vtkSMSourceProxy* esProxy = this->PInternals->SelectionProxies[portIndex];
+    if (esProxy)
+      {
+      vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(
+        esProxy->GetProperty("Selection"));
+      if (pp->GetNumberOfProxies() == 1)
+        {
+        return vtkSMSourceProxy::SafeDownCast(pp->GetProxy(0));
+        }
+      }
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMSourceProxy::GetSelectionInputPort(unsigned int portIndex)
+{
+  if (this->PInternals->SelectionProxies.size() > portIndex)
+    {
+    vtkSMSourceProxy* esProxy = this->PInternals->SelectionProxies[portIndex];
+    if (esProxy)
+      {
+      vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(
+        esProxy->GetProperty("Selection"));
+      if (pp->GetNumberOfProxies() == 1)
+        {
+        return pp->GetOutputPortForConnection(portIndex);
+        }
+      }
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMSourceProxy::CleanSelectionInputs(unsigned int portIndex)
+{
+  if (this->PInternals->SelectionProxies.size() <= portIndex)
+    {
+    return;
+    }
+  vtkSMSourceProxy* esProxy = this->PInternals->SelectionProxies[portIndex];
+  if (esProxy)
+    {
+    vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(
+      esProxy->GetProperty("Selection"));
+    pp->RemoveAllProxies();
+    esProxy->UpdateVTKObjects();
+    }
+}
+
+//---------------------------------------------------------------------------
+vtkSMSourceProxy* vtkSMSourceProxy::GetSelectionOutput(unsigned int portIndex)
+{
+  if (this->PInternals->SelectionProxies.size() > portIndex)
+    {
+    return this->PInternals->SelectionProxies[portIndex];
+    }
+
+  return 0;
 }
 
 //---------------------------------------------------------------------------

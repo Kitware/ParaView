@@ -62,7 +62,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCloseViewUndoElement.h"
 #include "pqComparativeRenderView.h"
-#include "pqElementInspectorView.h"
 #include "pqMultiViewFrame.h"
 #include "pqObjectBuilder.h"
 #include "pqPluginManager.h"
@@ -582,11 +581,6 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqView* view)
 //-----------------------------------------------------------------------------
 void pqViewManager::onViewAdded(pqView* view)
 {
-  if (qobject_cast<pqElementInspectorView*>(view))
-    {
-    // Ignore element inspector view modules.
-    return;
-    }
   this->assignFrame(view);
   this->updateViewPositions();
 }
@@ -698,12 +692,6 @@ pqView* pqViewManager::getView(pqMultiViewFrame* frame) const
 //-----------------------------------------------------------------------------
 void pqViewManager::onViewRemoved(pqView* view)
 {
-  if (qobject_cast<pqElementInspectorView*>(view))
-    {
-    // Ignore element inspector view modules.
-    return;
-    }
-
   pqMultiViewFrame* frame = this->getFrame(view);
   if (frame)
     {

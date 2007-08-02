@@ -38,9 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_MainWindow.h"
 
 #include <pqActiveView.h>
-#include <pqApplicationCore.h>
+#include <pqAnimationPanel.h>
 #include <pqAnimationPanel.h>
 #include <pqAnimationViewWidget.h>
+#include <pqApplicationCore.h>
+#include <pqComparativeVisPanel.h>
 //#include <pqLookmarkToolbar.h>
 #include <pqMainWindowCore.h>
 #include <pqObjectBuilder.h>
@@ -53,8 +55,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqProxyTabWidget.h>
 #include <pqRecentFilesMenu.h>
 #include <pqRenderView.h>
+#include <pqRubberBandHelper.h>
 #include <pqScalarBarVisibilityAdaptor.h>
-#include <pqSelectionManager.h>
 #include <pqSetName.h>
 #include <pqSettings.h>
 #include <pqUndoStack.h>
@@ -369,23 +371,10 @@ MainWindow::MainWindow() :
     this->Implementation->UI.actionVCRPause, SLOT(setEnabled(bool)));
   this->Implementation->UI.actionVCRPause->setVisible(false);
   
-  connect(this->Implementation->UI.actionMoveMode, 
-    SIGNAL(triggered()), &this->Implementation->Core.selectionManager(), SLOT(switchToInteraction()));
-    
-  connect(this->Implementation->UI.actionSelectionMode, 
-    SIGNAL(triggered()), &this->Implementation->Core.selectionManager(), SLOT(switchToSelection()));
-
   // Create Selection Shortcut.
   QShortcut *s=new QShortcut(QKeySequence(tr("S")),&this->Implementation->Core.multiViewManager());
-  QObject::connect(
-    s, 
-    SIGNAL(activated()),
-    this, 
-    SLOT(onSelectionShortcut()));
-
-  connect(&this->Implementation->Core.selectionManager(), 
-    SIGNAL(selectionMarked()), 
-    this, SLOT(onSelectionShortcutFinished()));
+  QObject::connect(s, SIGNAL(activated()),
+    this, SLOT(onSelectionShortcut()));
 
   connect(
     &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
@@ -457,18 +446,6 @@ MainWindow::MainWindow() :
       a, SLOT(setEnabled(bool)));
     }
 
-  connect(
-    &this->Implementation->Core,
-    SIGNAL(enableSelectionToolbar(bool)),
-    this->Implementation->UI.selectionToolbar,
-    SLOT(setEnabled(bool)));
-
-  connect(
-    &this->Implementation->Core,
-    SIGNAL(enableSelectionToolbar(bool)),
-    this->Implementation->UI.actionSelectionMode,
-    SLOT(setEnabled(bool)));
-
   this->Implementation->Core.setupCommonFiltersToolbar(
     this->Implementation->UI.commonFilters);
 
@@ -523,9 +500,6 @@ MainWindow::MainWindow() :
   this->Implementation->Core.setupStatisticsView(
     this->Implementation->UI.statisticsViewDock);
     
-  this->Implementation->Core.setupElementInspector(
-    this->Implementation->UI.elementInspectorDock);
-
   this->Implementation->Core.setupLookmarkBrowser(
     this->Implementation->UI.lookmarkBrowserDock);
 
@@ -537,6 +511,11 @@ MainWindow::MainWindow() :
     this->Implementation->UI.animationPanelDock);
   animation_panel->setCurrentTimeToolbar(
     this->Implementation->UI.currentTimeToolbar);
+
+  pqComparativeVisPanel* cv_panel = 
+    new pqComparativeVisPanel(
+    this->Implementation->UI.comparativePanelDock);
+  this->Implementation->UI.comparativePanelDock->setWidget(cv_panel);
 
   this->Implementation->Core.setupAnimationView(
     this->Implementation->UI.animationViewDock);
@@ -596,8 +575,8 @@ MainWindow::MainWindow() :
     this->Implementation->UI.animationViewDock->windowTitle());
 
   this->Implementation->ViewMenu->addWidget(
-    this->Implementation->UI.elementInspectorDock,
-    this->Implementation->UI.elementInspectorDock->windowTitle());
+    this->Implementation->UI.comparativePanelDock,
+    this->Implementation->UI.comparativePanelDock->windowTitle());
 
   this->Implementation->ViewMenu->addWidget(
     this->Implementation->UI.lookmarkBrowserDock,
@@ -630,11 +609,11 @@ MainWindow::MainWindow() :
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
   // Setup the default dock configuration ...
-  this->Implementation->UI.elementInspectorDock->hide();
   this->Implementation->UI.lookmarkBrowserDock->hide();
   this->Implementation->UI.lookmarkInspectorDock->hide();
   this->Implementation->UI.statisticsViewDock->hide();
   this->Implementation->UI.animationPanelDock->hide();
+  this->Implementation->UI.comparativePanelDock->hide();
   this->Implementation->UI.animationViewDock->hide();
 
   // Fix the toolbar layouts from designer.
@@ -683,6 +662,38 @@ MainWindow::MainWindow() :
   
   connect(this->Implementation->UI.actionManage_Plugins,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onManagePlugins()));
+
+
+  // Set up selection buttons.
+  
+  // Selection mode is available only for 3D views.
+  QObject::connect(
+    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)), 
+    this->Implementation->UI.actionSelectionMode, SLOT(setEnabled(bool)));
+
+  QObject::connect(
+    this->Implementation->UI.actionMoveMode, SIGNAL(triggered()),
+    this->Implementation->Core.renderViewSelectionHelper(), SLOT(endSelection()));
+    
+  QObject::connect(
+    this->Implementation->UI.actionSelectionMode, SIGNAL(triggered()), 
+    this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginSelection()));
+
+  QObject::connect(
+    this->Implementation->Core.renderViewSelectionHelper(), 
+    SIGNAL(selectionModeChanged(bool)),
+    this->Implementation->UI.actionSelectionMode, SLOT(setChecked(bool)));
+
+  QObject::connect(
+    this->Implementation->Core.renderViewSelectionHelper(), 
+    SIGNAL(interactionModeChanged(bool)),
+    this->Implementation->UI.actionMoveMode, SLOT(setChecked(bool)));
+
+  // When a selection is marked, we revert to interaction mode.
+  QObject::connect(
+    this->Implementation->Core.renderViewSelectionHelper(),
+    SIGNAL(selectionFinished(int, int, int, int)),
+    this->Implementation->Core.renderViewSelectionHelper(), SLOT(endSelection()));
 
   // Restore the state of the window ...
   pqApplicationCore::instance()->settings()->restoreState("MainWindow", *this);
@@ -914,36 +925,7 @@ void MainWindow::assistantError(const QString& error)
 //-----------------------------------------------------------------------------
 void MainWindow::onSelectionShortcut()
 {
-  if (!this->Implementation->UI.selectionToolbar->isEnabled())
-  {
-    return;
-  }
-
-  if(this->Implementation->UI.actionSelectionMode->isVisible())
-  {
-    this->Implementation->UI.actionSelectionMode->trigger();
-  }
-  else
-  {
-    this->Implementation->UI.actionSelectionMode->setChecked(true);
-    this->Implementation->Core.selectionManager().switchToSelection();
-  }
-}
-
-//-----------------------------------------------------------------------------
-void MainWindow::onSelectionShortcutFinished()
-{
-  // At end of each selection, we want to switch back to the normal interaction mode. 
- if(this->Implementation->UI.actionMoveMode->isVisible())
-  {
-    this->Implementation->UI.actionMoveMode->trigger();
-  }
-  else
-  {
-    this->Implementation->UI.actionMoveMode->setChecked(true);
-    this->Implementation->Core.selectionManager().switchToInteraction();
-  }
-
+  this->Implementation->Core.renderViewSelectionHelper()->beginSelection();
 }
 
 //-----------------------------------------------------------------------------

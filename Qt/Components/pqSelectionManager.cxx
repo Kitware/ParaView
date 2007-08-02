@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
-#include "pqRubberBandHelper.h"
 
 #include "vtkCollection.h"
 #include "vtkProcessModule.h"
@@ -51,18 +50,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMInputProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSelectionHelper.h"
+#include "vtkSMSourceProxy.h"
 
 //-----------------------------------------------------------------------------
 class pqSelectionManagerImplementation
 {
 public:
-  pqSelectionManagerImplementation() : 
-    SelectedOutputPort(0)
+  pqSelectionManagerImplementation()
     {
-      this->ClientSideDisplayer = 0;
-      this->SelectedProxy = 0;
-      this->SelectionRenderModule = 0;
-
     }
 
   ~pqSelectionManagerImplementation() 
@@ -72,28 +67,31 @@ public:
 
   void clearSelection()
     {
-    this->SelectionSource = 0;
-    this->GlobalIDSelectionSource = 0;
-
-    if (this->ClientSideDisplayer)
+    if (this->SelectedPort)
       {
-      this->ClientSideDisplayer->Delete();
-      this->ClientSideDisplayer = 0;
+      vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(
+        this->SelectedPort->getSource()->getProxy());
+      src->CleanSelectionInputs(this->SelectedPort->getPortNumber());
       }
-    this->SelectedProxy = 0;
+    this->SelectedPort = 0;
+    this->GlobalIDSelectionSource = 0;
     }
 
-  vtkSMClientDeliveryRepresentationProxy* ClientSideDisplayer;
-  vtkSMProxy* SelectedProxy;
-  int SelectedOutputPort;
+  vtkSMProxy* getSelectionSourceProxy()
+    {
+    if (this->SelectedPort)
+      {
+      vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(
+        this->SelectedPort->getSource()->getProxy());
+      return src->GetSelectionInput(this->SelectedPort->getPortNumber());
+      }
+    return 0;
+    }
 
-  vtkSmartPointer<vtkSMProxy> SelectedRepresentation;
+  QPointer<pqOutputPort> SelectedPort;
+  QPointer<pqView> ActiveView;
 
-  vtkSmartPointer<vtkSMProxy> SelectionSource;
   vtkSmartPointer<vtkSMProxy> GlobalIDSelectionSource;
-
-  pqRenderView* SelectionRenderModule;
-
 };
 
 //-----------------------------------------------------------------------------
@@ -101,14 +99,6 @@ pqSelectionManager::pqSelectionManager(QObject* _parent/*=null*/) :
   QObject(_parent)
 {
   this->Implementation = new pqSelectionManagerImplementation;
-  this->RubberBandHelper = new pqRubberBandHelper;
-
-  QObject::connect(
-    this->RubberBandHelper, SIGNAL(selectionFinished()),
-    this, SLOT(select()));
-
-  this->Mode = pqRubberBandHelper::INTERACT;
-
   pqApplicationCore* core = pqApplicationCore::instance();
 
   pqServerManagerModel* model = core->getServerManagerModel();
@@ -117,9 +107,6 @@ pqSelectionManager::pqSelectionManager(QObject* _parent/*=null*/) :
   QObject::connect(
     model, SIGNAL(itemRemoved(pqServerManagerModelItem*)),
     this,  SLOT(clearSelection()));
-  QObject::connect(
-    model, SIGNAL(viewRemoved(pqView*)),
-    this, SLOT(viewRemoved(pqView*)));
 
   // When server disconnects we must clean up the selection proxies
   // explicitly. This is needed since the internal selection proxies
@@ -137,67 +124,31 @@ pqSelectionManager::~pqSelectionManager()
 {
   this->clearSelection();
   delete this->Implementation;
-  delete this->RubberBandHelper;
-}
-
-//-----------------------------------------------------------------------------
-void pqSelectionManager::switchToSelection()
-{
-  if (this->RubberBandHelper->setRubberBandOn())
-    {
-    this->Mode = pqRubberBandHelper::SELECT;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqSelectionManager::switchToInteraction()
-  {
-  if (this->RubberBandHelper->setRubberBandOff())
-    {
-    this->Mode = pqRubberBandHelper::INTERACT;
-    }
 }
 
 //-----------------------------------------------------------------------------
 void pqSelectionManager::setActiveView(pqView* view)
 {
-  pqRenderView* rm = qobject_cast<pqRenderView*>(view);
-  if (!rm)
+  if (this->Implementation->ActiveView)
     {
-    return;
+    QObject::disconnect(this->Implementation->ActiveView, 0, this, 0);
     }
-  
-  // make sure the active render module has the right interactor
-  if (this->Mode == pqRubberBandHelper::SELECT)
+  this->Implementation->ActiveView = view;
+  if (view)
     {
-    // the previous view should revert to the previous interactor,
-    this->RubberBandHelper->setRubberBandOff();
-    // the current view then starts using the select interactor
-    this->RubberBandHelper->setRubberBandOn(rm);
+    QObject::connect(view, SIGNAL(selected(pqOutputPort*)), 
+      this, SLOT(onSelected(pqOutputPort*)));
     }
-
-  this->RubberBandHelper->RenderModule = rm;
 }
 
 //-----------------------------------------------------------------------------
 void pqSelectionManager::clearSelection()
 {
+  // Actual cleaning is done by internal method,
+  // this method additionally triggers renders and fires selection changed
+  // event.
   pqOutputPort* opport = this->getSelectedPort();
-
-  if (this->Implementation->SelectedRepresentation.GetPointer())
-    {
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      this->Implementation->SelectedRepresentation->GetProperty("Selection"));
-    if (pp)
-      {
-      pp->RemoveAllProxies();
-      this->Implementation->SelectedRepresentation->UpdateVTKObjects();
-      }
-    this->Implementation->SelectedRepresentation = 0;
-    }
-
   this->Implementation->clearSelection();
-
   if (opport)
     {
     opport->renderAllViews(false);
@@ -207,48 +158,9 @@ void pqSelectionManager::clearSelection()
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionManager::select()
-{
-  int rectangle[4];
-
-  rectangle[0] = this->RubberBandHelper->Xs;
-  rectangle[1] = this->RubberBandHelper->Ys;
-  rectangle[2] = this->RubberBandHelper->Xe;
-  rectangle[3] = this->RubberBandHelper->Ye;
-
-  emit this->beginNonUndoableChanges();
-
-  this->selectOnSurface(rectangle);
-
-  emit this->endNonUndoableChanges();
-
-  emit this->selectionMarked();
-}
-
-//-----------------------------------------------------------------------------
-vtkSMClientDeliveryRepresentationProxy* pqSelectionManager::getClientSideDisplayer(
-  pqPipelineSource* source) const
-{
-  if (this->Implementation->SelectedProxy == source->getProxy())
-    {
-    return this->Implementation->ClientSideDisplayer;
-    }
-  return 0;
-}
-
-//-----------------------------------------------------------------------------
 pqOutputPort* pqSelectionManager::getSelectedPort() const
 {
-  pqServerManagerModel* model = 
-    pqApplicationCore::instance()->getServerManagerModel();
-  if (this->Implementation->SelectedProxy)
-    {
-    pqPipelineSource* src = model->findItem<pqPipelineSource*>(
-      this->Implementation->SelectedProxy);
-    return src? src->getOutputPort(this->Implementation->SelectedOutputPort) : 0;
-    }
-  
-  return 0;
+  return this->Implementation->SelectedPort;
 }
 
 //-----------------------------------------------------------------------------
@@ -258,114 +170,35 @@ void pqSelectionManager::sourceRemoved(pqPipelineSource* vtkNotUsed(source))
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionManager::viewRemoved(pqView* vm)
+void pqSelectionManager::onSelected(pqOutputPort* selectedPort)
 {
-  pqRenderView* rm = qobject_cast<pqRenderView*>(vm);
-  if (!rm)
+  // The active view is reporting that it made a selection, we update our state.
+  if (this->Implementation->SelectedPort != selectedPort)
     {
-    return;
-    }
-  if (rm == this->Implementation->SelectionRenderModule)
-    {
+    // Clear previous selection.
     this->clearSelection();
     }
-}
 
-//-----------------------------------------------------------------------------
-void pqSelectionManager::selectOnSurface(int screenRectangle[4])
-{
-  this->clearSelection();
-
-  pqRenderView* rvm = this->RubberBandHelper->RenderModule;
-  vtkSMRenderViewProxy* renderModuleP = rvm->getRenderViewProxy();
-
-  // Make sure the selection rectangle is in the right order.
-  int displayRectangle[4];
-  pqRubberBandHelper::ReorderBoundingBox(
-    screenRectangle, 
-    displayRectangle);
-
-  // Perform the selection.
-  vtkSmartPointer<vtkCollection> selectedRepresentations = 
-    vtkSmartPointer<vtkCollection>::New();
-  vtkSmartPointer<vtkCollection> surfaceSelections = 
-    vtkSmartPointer<vtkCollection>::New();
-  if (!renderModuleP->SelectOnSurface(
-    displayRectangle[0], displayRectangle[1], displayRectangle[2],
-    displayRectangle[3], selectedRepresentations, surfaceSelections, false))
+  this->Implementation->SelectedPort = selectedPort;
+  if (selectedPort)
     {
-    // nothing selected.
-    return;
+    selectedPort->renderAllViews(false);
     }
 
-  //rvm->render();
-  if (selectedRepresentations->GetNumberOfItems() <= 0 ||
-    surfaceSelections->GetNumberOfItems() <=0)
-    {
-    return;
-    }
-
-  this->Implementation->SelectedRepresentation = 
-    vtkSMProxy::SafeDownCast(selectedRepresentations->GetItemAsObject(0));
-  this->Implementation->SelectionRenderModule = rvm;
-  this->Implementation->SelectedProxy = 
-    pqSMAdaptor::getProxyProperty(this->Implementation->
-      SelectedRepresentation->GetProperty("Input"));
-  this->Implementation->SelectedOutputPort =
-    vtkSMInputProperty::SafeDownCast(
-      this->Implementation->SelectedRepresentation->GetProperty("Input"))->
-    GetOutputPortForConnection(0);
-
-  // The selection source is the source that is set as the "Selection" input on
-  // the representation.
-  this->Implementation->SelectionSource =
-    pqSMAdaptor::getProxyProperty(this->Implementation->
-      SelectedRepresentation->GetProperty("Selection"));
-
-  // Obtain a global id selection as well.
-  vtkIdType connId = 
-    this->Implementation->SelectedProxy->GetConnectionID();
-  vtkSelection* volumeSelectionGI = vtkSelection::New();
-  vtkSMSelectionHelper::ConvertSurfaceSelectionToGlobalIDVolumeSelection(
-    connId,
-    vtkSelection::SafeDownCast(surfaceSelections->GetItemAsObject(0)), 
-    volumeSelectionGI);
-
-  vtkSMProxy* selectionSourceGI = 
-    vtkSMSelectionHelper::NewSelectionSourceFromSelection(connId,
-      volumeSelectionGI);
-  this->Implementation->GlobalIDSelectionSource = selectionSourceGI;
-  selectionSourceGI->Delete();
-  volumeSelectionGI->Delete();
-
-  // Update the SelectionModel with the selected sources.
-  pqServerManagerModel* model = 
-    pqApplicationCore::instance()->getServerManagerModel();
-  pqServerManagerSelectionModel* selectionModel =
-    pqApplicationCore::instance()->getSelectionModel();
-  pqPipelineSource* pqSource = model->findItem<pqPipelineSource*>(
-    this->Implementation->SelectedProxy);
-  selectionModel->setCurrentItem(
-    pqSource->getOutputPort(this->Implementation->SelectedOutputPort), 
-    pqServerManagerSelectionModel::ClearAndSelect);
-
-  pqOutputPort* opport = this->getSelectedPort();
-  if (opport)
-    {
-    opport->renderAllViews(false);
-    }
   emit this->selectionChanged(this);
 }
 
 //-----------------------------------------------------------------------------
 QList<QVariant> pqSelectionManager::getSelectedIndicesWithProcessIDs() const
 {
-  if (!this->Implementation->SelectionSource.GetPointer())
+  vtkSMProxy* selectionSource = this->Implementation->getSelectionSourceProxy();
+  if (!selectionSource)
     {
     return QList<QVariant>();
     }
+
   return pqSMAdaptor::getMultipleElementProperty(
-    this->Implementation->SelectionSource->GetProperty("IDs"));
+    selectionSource->GetProperty("IDs"));
 }
 
 //-----------------------------------------------------------------------------

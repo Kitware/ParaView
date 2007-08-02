@@ -35,7 +35,7 @@ inline void vtkSMPVRepresentationProxySetInt(
 }
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -46,8 +46,6 @@ vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 
   this->ActiveRepresentation = 0;
   this->SelectionVisibility = 1;
-
-  this->SetSelectionSupported(true);
 }
 
 //----------------------------------------------------------------------------
@@ -93,15 +91,11 @@ bool vtkSMPVRepresentationProxy::EndCreateVTKObjects()
   vtkSMPVRepresentationProxySetInt(this->SurfaceRepresentation, "Visibility", 0);
   vtkSMPVRepresentationProxySetInt(this->OutlineRepresentation, "Visibility", 0);
 
-
-  this->SurfaceRepresentation->SetSelectionSupported(false);
-  this->OutlineRepresentation->SetSelectionSupported(false);
   if (this->VolumeRepresentation)
     {
     this->Connect(this->GetInputProxy(), this->VolumeRepresentation,
       "Input", this->OutputPort);
     vtkSMPVRepresentationProxySetInt(this->VolumeRepresentation, "Visibility", 0);
-    this->VolumeRepresentation->SetSelectionSupported(false);
     }
 
   // Fire start/end events fired by the representations so that the world knows

@@ -150,7 +150,8 @@ void pqComparativeVisPanel::setView(pqView* view)
 
   this->Internal->Links.removeAllPropertyLinks();
   this->Internal->View = cvView;
-  this->Internal->AnimationWidget->setComparativeView(view->getProxy());
+  this->Internal->AnimationWidget->setComparativeView(
+    view? view->getProxy() : 0);
   if (!cvView)
     {
     this->setEnabled(false);

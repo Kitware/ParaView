@@ -37,11 +37,6 @@ public:
   virtual void SetViewInformation(vtkInformation*);
 
   // Description:
-  // Set the input connection to the extract selection filter.
-  void SetSelection(vtkSMSourceProxy* selection);
-  void CleanSelectionInput();
-
-  // Description:
   // Called to update the Representation. 
   // Overridden to EnableLOD on the prop based on the ViewInformation.
   virtual void Update(vtkSMViewProxy* view);
@@ -56,6 +51,23 @@ public:
   // Implemented to turn off label representation when visibility is turned off.
   virtual void SetVisibility(int visible);
 
+  // Description:
+  // Returns true if this representation is visible.
+  // This returns the actual representation visibility which may be different
+  // from the one set using SetVisibility() based on whether a selection source
+  // has been set on the input proxy.
+  virtual bool GetVisibility();
+
+  // Description:
+  // Set the visibility for point labels. The "Visibility" overrides this flag,
+  // i.e. when Visibility is false, point labels are also not shown.
+  vtkSetMacro(PointLabelVisibility, int);
+
+  // Description:
+  // Set the visibility for cell labels. The "Visibility" overrides this flag,
+  // i.e. when Visibility is false, cell labels are also not shown.
+  vtkSetMacro(CellLabelVisibility, int);
+  
   // Description:
   // Returns the proxy for the prop.
   vtkGetObjectMacro(Prop3D, vtkSMProxy);
@@ -95,17 +107,23 @@ protected:
   // Currently a representation can be added to only one view.
   virtual bool RemoveFromView(vtkSMViewProxy* view);
 
+  // Description:
+  // The actual visibility of props is function of whether the user enabled the
+  // visibility of this representation and whether the selection input is set.
+  void UpdateVisibility();
+
   // Proxies for the selection pipeline.
-  vtkSMSourceProxy* ExtractSelection;
   vtkSMSourceProxy* GeometryFilter;
   vtkSMProxy* Mapper;
   vtkSMProxy* LODMapper;
   vtkSMProxy* Prop3D;
   vtkSMProxy* Property;
-  vtkSMProxy* EmptySelectionSource;
 
   vtkSMDataLabelRepresentationProxy* LabelRepresentation;
 
+  bool UserRequestedVisibility;
+  int PointLabelVisibility;
+  int CellLabelVisibility;
 private:
   vtkSMSelectionRepresentationProxy(const vtkSMSelectionRepresentationProxy&); // Not implemented
   void operator=(const vtkSMSelectionRepresentationProxy&); // Not implemented

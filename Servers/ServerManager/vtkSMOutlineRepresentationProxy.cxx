@@ -25,7 +25,7 @@
 #include "vtkSMViewProxy.h"
 
 vtkStandardNewMacro(vtkSMOutlineRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMOutlineRepresentationProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMOutlineRepresentationProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMOutlineRepresentationProxy::vtkSMOutlineRepresentationProxy()
 {
@@ -33,7 +33,6 @@ vtkSMOutlineRepresentationProxy::vtkSMOutlineRepresentationProxy()
   this->Mapper = 0;
   this->Prop3D = 0;
   this->Property = 0;
-  this->SetSelectionSupported(true);
 }
 
 //----------------------------------------------------------------------------

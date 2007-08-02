@@ -64,17 +64,6 @@ public:
   virtual bool GetVisibility();
 
   // Description:
-  // Returns whether this representation shows selection.
-  // This is always false if GetVisibility() is false or GetSelectionSupported()
-  // is false. If both are true, then default implementation
-  // returns the state of "SelectionVisibility" property, if any.
-  virtual bool GetSelectionVisibility();
-
-  // Description:
-  // Returns if this representation supports selection.
-  vtkGetMacro(SelectionSupported, bool);
-
-  // Description:
   // Get the data information for the represented data.
   // Representations that do not have significatant data representations such as
   // 3D widgets, text annotations may return NULL. Default implementation
@@ -152,10 +141,6 @@ protected:
   void Connect(vtkSMProxy* producer, vtkSMProxy* consumer,
     const char* propertyname="Input", int outputport=0);
 
-  // Description:
-  // Subclassess should set this to true if they support selection pipelines.
-  vtkSetMacro(SelectionSupported, bool);
-
   vtkInformation* ViewInformation;
   double ViewUpdateTime;
   bool ViewUpdateTimeInitialized;
@@ -165,7 +150,6 @@ private:
   vtkSMRepresentationProxy(const vtkSMRepresentationProxy&); // Not implemented
   void operator=(const vtkSMRepresentationProxy&); // Not implemented
 
-  bool SelectionSupported;
 //ETX
 };
 

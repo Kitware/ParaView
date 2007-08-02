@@ -19,12 +19,11 @@
 #include "vtkSMInputProperty.h"
 #include "vtkInformation.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMRepresentationProxy, "1.8");
 vtkCxxSetObjectMacro(vtkSMRepresentationProxy, ViewInformation, vtkInformation);
 //----------------------------------------------------------------------------
 vtkSMRepresentationProxy::vtkSMRepresentationProxy()
 {
-  this->SelectionSupported = false;
   this->ViewInformation = 0;
   this->ViewUpdateTime = 0;
   this->ViewUpdateTimeInitialized = false;
@@ -72,25 +71,6 @@ bool vtkSMRepresentationProxy::GetVisibility()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRepresentationProxy::GetSelectionVisibility()
-{
-  if (!this->GetVisibility() || !this->GetSelectionSupported())
-    {
-    return false;
-    }
-
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->GetProperty("SelectionVisibility"));
-  if (ivp && ivp->GetNumberOfElements()== 1 && ivp->GetElement(0))
-    {
-    return true;
-    }
-
-  return false;
-}
-
-
-//----------------------------------------------------------------------------
 void vtkSMRepresentationProxy::Connect(vtkSMProxy* producer,
   vtkSMProxy* consumer, const char* propertyname/*="Input"*/,
   int outputport/*=0*/)
@@ -128,7 +108,6 @@ void vtkSMRepresentationProxy::Connect(vtkSMProxy* producer,
 void vtkSMRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "SelectionSupported : " << this->SelectionSupported << endl;
   os << indent << "ViewUpdateTime: " << this->ViewUpdateTime << endl;
   os << indent << "ViewInformation: " << this->ViewInformation << endl;
 }

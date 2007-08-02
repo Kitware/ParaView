@@ -304,11 +304,6 @@ MainWindow::MainWindow() :
   this->Implementation->ViewMenu->addWidget(this->Implementation->UI.statisticsViewDock,
     this->Implementation->UI.statisticsViewDock->windowTitle());
     
-  this->Implementation->Core.setupElementInspector(
-    this->Implementation->UI.elementInspectorDock);
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.elementInspectorDock,
-    this->Implementation->UI.elementInspectorDock->windowTitle());
-
   // Add the line plot dock window.
   QDockWidget* const line_chart_dock = new QDockWidget("Line Chart View", this);
   line_chart_dock->setObjectName("LineChartDock");
@@ -413,7 +408,6 @@ MainWindow::MainWindow() :
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
   // Setup the default dock configuration ...
-  this->Implementation->UI.elementInspectorDock->hide();
   this->Implementation->UI.statisticsViewDock->hide();
 
   // Now that we're ready, initialize everything ...

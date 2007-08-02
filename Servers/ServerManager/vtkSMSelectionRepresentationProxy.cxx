@@ -29,21 +29,21 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSelectionRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMSelectionRepresentationProxy::vtkSMSelectionRepresentationProxy()
 {
-  this->ExtractSelection = 0;
+  this->UserRequestedVisibility = true;
+  this->PointLabelVisibility = 1;
+  this->CellLabelVisibility = 1;
+
   this->GeometryFilter = 0;
   this->Mapper = 0;
   this->LODMapper = 0;
   this->Prop3D = 0;
   this->Property = 0;
-  this->EmptySelectionSource = 0;
 
   this->LabelRepresentation = 0;
-
-  this->SetSelectionSupported(false);
 }
 
 //----------------------------------------------------------------------------
@@ -110,8 +110,8 @@ bool vtkSMSelectionRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
     view->NewStrategy(VTK_POLY_DATA));
   if (!strategy.GetPointer())
     {
-    vtkErrorMacro("Could not create strategy for selection pipeline. Disabling selection.");
-    this->SetSelectionSupported(false);
+    vtkErrorMacro("Could not create strategy for selection pipeline.");
+    return false;
     }
   else
     {
@@ -140,20 +140,16 @@ bool vtkSMSelectionRepresentationProxy::BeginCreateVTKObjects()
     }
 
   // Initialize selection pipeline subproxies.
-  this->ExtractSelection = 
-    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("ExtractSelection"));
   this->GeometryFilter = vtkSMSourceProxy::SafeDownCast(
     this->GetSubProxy("GeometryFilter"));
   this->Mapper = this->GetSubProxy("Mapper");
   this->LODMapper = this->GetSubProxy("LODMapper");
   this->Prop3D = this->GetSubProxy("Prop3D");
   this->Property = this->GetSubProxy("Property");
-  this->EmptySelectionSource = this->GetSubProxy("EmptySelectionSource");
 
   this->LabelRepresentation = vtkSMDataLabelRepresentationProxy::SafeDownCast(
     this->GetSubProxy("LabelRepresentation"));
 
-  this->ExtractSelection->SetServers(vtkProcessModule::DATA_SERVER);
   this->GeometryFilter->SetServers(vtkProcessModule::DATA_SERVER);
   this->Mapper->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
@@ -163,7 +159,6 @@ bool vtkSMSelectionRepresentationProxy::BeginCreateVTKObjects()
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->Property->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  this->EmptySelectionSource->SetServers(vtkProcessModule::DATA_SERVER);
 
   return true;
 }
@@ -172,13 +167,20 @@ bool vtkSMSelectionRepresentationProxy::BeginCreateVTKObjects()
 bool vtkSMSelectionRepresentationProxy::EndCreateVTKObjects()
 {
   // Setup selection pipeline connections.
-  this->Connect(this->GetInputProxy(), this->ExtractSelection, 
-    "Input", this->OutputPort);
-  this->Connect(this->EmptySelectionSource, this->ExtractSelection, 
-    "Selection");
-  this->Connect(this->ExtractSelection, this->GeometryFilter);
+  vtkSMSourceProxy* input = this->GetInputProxy();
+  // Ensure that the source proxy has created extract selection filters.
+  input->CreateSelectionProxies();
 
-  this->Connect(this->ExtractSelection, this->LabelRepresentation);
+  vtkSMSourceProxy* esProxy = input->GetSelectionOutput(this->OutputPort);
+  if (!esProxy)
+    {
+    vtkErrorMacro("Input proxy does not support selection extraction.");
+    return false;
+    }
+
+  this->Connect(esProxy, this->GeometryFilter);
+
+  this->Connect(esProxy, this->LabelRepresentation);
   
   this->Connect(this->Mapper, this->Prop3D, "Mapper");
   this->Connect(this->LODMapper, this->Prop3D, "LODMapper");
@@ -224,6 +226,8 @@ bool vtkSMSelectionRepresentationProxy::EndCreateVTKObjects()
 //----------------------------------------------------------------------------
 void vtkSMSelectionRepresentationProxy::Update(vtkSMViewProxy* view)
 {
+  this->UpdateVisibility();
+
   this->Superclass::Update(view);
 
   if (this->ViewInformation->Has(vtkSMRenderViewProxy::USE_LOD()))
@@ -235,11 +239,10 @@ void vtkSMSelectionRepresentationProxy::Update(vtkSMViewProxy* view)
     this->Prop3D->UpdateProperty("EnableLOD");
     }
 
-  if(this->LabelRepresentation && 
-    this->LabelRepresentation->GetVisibility())
-  {
-  this->LabelRepresentation->Update(view);
-  }
+  if(this->LabelRepresentation && this->LabelRepresentation->GetVisibility())
+    {
+    this->LabelRepresentation->Update(view);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -268,62 +271,48 @@ void vtkSMSelectionRepresentationProxy::SetUpdateTime(double time)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSelectionRepresentationProxy::SetSelection(vtkSMSourceProxy* selection)
-{
-  this->Connect(selection, this->ExtractSelection, "Selection");
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSelectionRepresentationProxy::CleanSelectionInput()
-{
-  if (this->EmptySelectionSource && this->ExtractSelection)
-    {
-    this->Connect(this->EmptySelectionSource, this->ExtractSelection, "Selection");
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkSMSelectionRepresentationProxy::SetVisibility(int visible)
 {
-  if (this->LabelRepresentation && !visible)
+  // Selection visibility if a function of the user requested visibility and
+  // whether any selection input is available.
+  this->UserRequestedVisibility = visible;
+  this->UpdateVisibility();
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSelectionRepresentationProxy::GetVisibility()
+{
+  vtkSMSourceProxy* input = this->GetInputProxy();
+  return (this->UserRequestedVisibility && input != 0 && input->GetSelectionInput(
+      this->OutputPort) != 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSelectionRepresentationProxy::UpdateVisibility()
+{
+  bool visible = this->GetVisibility();
+  if (this->LabelRepresentation)
     {
-    //this->SetPointLabelVisibility(visible);
-    //this->SetCellLabelVisibility(visible);
     vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
       this->LabelRepresentation->GetProperty("PointLabelVisibility"));
-    ivp->SetElement(0, visible);
+    ivp->SetElement(0, ((visible && this->PointLabelVisibility)? 1 : 0));
     this->LabelRepresentation->UpdateProperty("PointLabelVisibility");
     ivp = vtkSMIntVectorProperty::SafeDownCast(
       this->LabelRepresentation->GetProperty("CellLabelVisibility"));
-    ivp->SetElement(0, visible);    
+    ivp->SetElement(0, ((visible && this->CellLabelVisibility)? 1 : 0));
     this->LabelRepresentation->UpdateProperty("CellLabelVisibility");
     }
 
-  vtkSMProxy* prop3D = this->GetSubProxy("Prop3D");
-  vtkSMProxy* prop2D = this->GetSubProxy("Prop2D");
-
-  if (prop3D)
-  {
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      prop3D->GetProperty("Visibility"));
-    ivp->SetElement(0, visible);
-    prop3D->UpdateProperty("Visibility");
-  }
-
-  if (prop2D)
-  {
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      prop2D->GetProperty("Visibility"));
-    ivp->SetElement(0, visible);
-    prop2D->UpdateProperty("Visibility");
-  }
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->Prop3D->GetProperty("Visibility"));
+  ivp->SetElement(0, visible? 1 : 0);
+  this->Prop3D->UpdateProperty("Visibility");
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSelectionRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Prop3D: " << this->Prop3D << endl;
 }
 
 

@@ -44,7 +44,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCoreTestUtility.h
   pqDataRepresentation.h
   pqDisplayPolicy.h
-  pqElementInspectorView.h
   pqFileDialog.h
   pqFileDialogEventTranslator.h
   pqFileDialogFavoriteModel.h
@@ -160,8 +159,6 @@ ADD_LIBRARY(pqCore
   pqDataRepresentation.h
   pqDisplayPolicy.cxx
   pqDisplayPolicy.h
-  pqElementInspectorView.cxx
-  pqElementInspectorView.h
   pqFileDialog.cxx
   pqFileDialog.h
   pqFileDialogEventPlayer.cxx

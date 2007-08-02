@@ -45,8 +45,8 @@ class pqActionGroupInterface;
 class pqActiveServer;
 class pqAnimationManager;
 class pqAnimationPanel;
-class pqAnimationViewWidget;
 class pqAnimationScene;
+class pqAnimationViewWidget;
 class pqGenericViewModule;
 class pqLookmarkManagerModel;
 class pqMultiView;
@@ -59,6 +59,7 @@ class pqPlotViewModule;
 class pqProxy;
 class pqProxyTabWidget;
 class pqRenderView;
+class pqRubberBandHelper;
 class pqSelectionManager;
 class pqServer;
 class pqServerManagerModelItem;
@@ -100,6 +101,9 @@ public:
   pqSelectionManager& selectionManager();
   /// Returns the VCR controller, which can control animation playback
   pqVCRController& VCRController();
+
+  /// Returns the selection helper used for 3D views.
+  pqRubberBandHelper* renderViewSelectionHelper() const;
   
   /// Assigns a menu to be populated with sources
   void setSourceMenu(QMenu* menu);
@@ -117,8 +121,6 @@ public:
   pqObjectInspectorWidget* setupObjectInspector(QDockWidget* parent);
   /// Setup a statistics view, attaching it to the given dock
   void setupStatisticsView(QDockWidget* parent);
-  /// Setup an element inspector, attaching it to the given dock
-  void setupElementInspector(QDockWidget* parent);
   /// Setup lookmark browser, attaching it to the given dock
   void setupLookmarkBrowser(QDockWidget* parent);
   /// Setup lookmark inspector, attaching it to the given dock
@@ -239,7 +241,6 @@ signals:
   void enableSourceCreate(bool);
   void enableFilterCreate(bool);
   void enableVariableToolbar(bool);
-  void enableSelectionToolbar(bool);
   void enableResetCenter(bool);
   void enableShowCenterAxis(bool);
   

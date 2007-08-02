@@ -36,16 +36,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 #include <QObject>
 
-class pqRubberBandHelperInternal;
 class pqRenderView;
-class vtkInteractorStyleRubberBandPick;
-class vtkPQSelectionObserver;
-class vtkInteractorObserver;
+class pqView;
 
 /*! \brief Utility to switch interactor styles in 3D views.
  *
  * pqRubberBandHelper standardizes the mechanism by which 3D views
  * are switched between interaction and rubber band modes.
+ * TODO: We may want to extend this class to create different type of selections
+ * i.e. surface/frustrum.
  */
 class PQCORE_EXPORT pqRubberBandHelper : public QObject
 {
@@ -54,11 +53,46 @@ public:
   pqRubberBandHelper(QObject* parent=NULL);
   virtual ~pqRubberBandHelper();
 
-  int setRubberBandOn(pqRenderView* view=0);
-  int setRubberBandOff(pqRenderView* view=0);
+  static void ReorderBoundingBox(int src[4], int dest[4]);
 
-  pqRenderView* RenderModule;
+  //for internal use only, this is how mouse press and release events
+  //are processed internally
+  void processEvents(unsigned long event);
 
+  /// Returns the currently selected render view.
+  pqRenderView* getRenderView() const;
+public slots:
+  /// Set active view. If a view has been set previously, this method ensures
+  /// that it is not in selection mode.
+  void setView(pqView*);
+
+  /// Begin rubber band selection on the view. 
+  /// Has any effect only if active view is a render view.
+  void beginSelection();
+
+  /// End rubber band selection.
+  /// Has any effect only if active view is a render view.
+  void endSelection();
+
+signals:
+  /// fired after mouse up in selection mode
+  void selectionFinished(int xmin, int ymin, int xmax, int ymax);
+
+  /// Fired to indicate whether the selection can be create on the currently set
+  /// view.
+  void enabled(bool enable);
+
+  /// Fired with selection mode changes. \c selectable is true when entering selection
+  /// mode, and false when leaving it.
+  void selectionModeChanged(bool selectable);
+
+  /// This is inverse of selectionModeChanged signal, provided for convenience.
+  void interactionModeChanged(bool notselectable);
+
+protected:
+  int setRubberBandOn();
+  int setRubberBandOff();
+  int Mode;
   int Xs, Ys, Xe, Ye;
 
   enum Modes
@@ -67,24 +101,12 @@ public:
     SELECT
   };
 
-  static void ReorderBoundingBox(int src[4], int dest[4]);
 
-  //for internal use only, this is how mouse press and release events
-  //are processed internally
-  void processEvents(unsigned long event);
+private:
+  class pqInternal;
+  class vtkPQSelectionObserver;
 
-signals:
-  /// fired after mouse up in selection mode
-  void selectionFinished();
-
-protected:
-
-  //the style I use to draw the rubber band
-  vtkInteractorStyleRubberBandPick* RubberBandStyle;
-  //saved style to return to after rubber band finishes
-  vtkInteractorObserver* SavedStyle;
-
-  vtkPQSelectionObserver* SelectionObserver;
+  pqInternal* Internal;
 };
 
 #endif

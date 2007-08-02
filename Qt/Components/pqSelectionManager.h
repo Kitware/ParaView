@@ -46,7 +46,6 @@ class pqView;
 class vtkDataObject;
 class vtkSMClientDeliveryRepresentationProxy;
 class vtkSMProxy;
-class pqRubberBandHelper;
 
 /// pqSelectionManager is the nexus for introspective surface selection in 
 //  paraview. 
@@ -66,11 +65,6 @@ public:
   pqSelectionManager(QObject* parent=NULL);
   virtual ~pqSelectionManager();
 
-  /// Returns the client side selection displayer for the source,
-  /// if the source is currently selected, otherwise return 0;
-  vtkSMClientDeliveryRepresentationProxy* getClientSideDisplayer(
-    pqPipelineSource* source) const;
-
   /// Returns the currently selected source, if any.
   pqOutputPort* getSelectedPort() const;
   
@@ -88,24 +82,7 @@ signals:
   /// fired when the selection changes.
   void selectionChanged(pqSelectionManager*);
 
-  /// emitted when the user has marked a selection i.e.
-  /// on mouse up in selection mode.
-  void selectionMarked();
-
-  /// emitted before performing non-undoable server manager changes.
-  void beginNonUndoableChanges();
-
-  /// emitted after having performed non-undoable server
-  /// manager changes.
-  void endNonUndoableChanges();
-
 public slots:
-  /// Change mode to INTERACT
-  void switchToInteraction();
-
-  /// Change mode to surface selection
-  void switchToSelection();
-
   /// Clear all selections. Note that this does not clear
   /// the server manager model selection
   void clearSelection();
@@ -113,22 +90,17 @@ public slots:
   /// Used to keep track of active render module
   void setActiveView(pqView*);
 
-  void select();
-
 private slots:
   /// Called when a source is removed from the pipeline browser
   void sourceRemoved(pqPipelineSource*);
 
-  /// Called when a view is deleted
-  void viewRemoved(pqView* rm);
+  /// Called when the view fires signal indicating that is has made a selection.
+  void onSelected(pqOutputPort*);
 
 protected:  
 
 private:
   pqSelectionManagerImplementation* Implementation;
-  pqRubberBandHelper *RubberBandHelper;
-
-  int Mode;
 
   //helpers
   void selectOnSurface(int screenRectange[4]);

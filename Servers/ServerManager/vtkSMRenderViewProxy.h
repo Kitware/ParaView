@@ -182,7 +182,8 @@ public:
   // maximum pixel count covered in the selection region will get selected.
   bool SelectOnSurface(unsigned int x0, unsigned int y0,
     unsigned int x1, unsigned int y1,
-    vtkCollection* selectedRepresentations=0,
+    vtkCollection* selectedRepresentations,
+    vtkCollection* selectionSources,
     vtkCollection* surfaceSelection=0,
     bool multiple_selections=true);
 

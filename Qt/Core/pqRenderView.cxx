@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager includes.
 #include "QVTKWidget.h"
+#include "vtkCollection.h"
 #include "vtkErrorCode.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkProcessModule.h"
@@ -48,9 +49,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMUndoStack.h"
 #include "vtkTrackballPan.h"
-#include "vtkCollection.h"
 
 // Qt includes.
 #include <QFileInfo>
@@ -67,10 +68,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqApplicationCore.h"
+#include "pqDataRepresentation.h"
 #include "pqLinkViewWidget.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
+#include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "vtkPVAxesWidget.h"
@@ -1292,4 +1295,54 @@ void pqRenderView::resetViewDirection(
   proxy->UpdateVTKObjects();
 
   this->resetCamera();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::selectOnSurface(int rect[4])
+{
+  vtkSMRenderViewProxy* renderModuleP = this->getRenderViewProxy();
+
+  vtkSmartPointer<vtkCollection> selectedRepresentations = 
+    vtkSmartPointer<vtkCollection>::New();
+  vtkSmartPointer<vtkCollection> surfaceSelections = 
+    vtkSmartPointer<vtkCollection>::New();
+  vtkSmartPointer<vtkCollection> selectionSources = 
+    vtkSmartPointer<vtkCollection>::New();
+  if (!renderModuleP->SelectOnSurface(rect[0], rect[1], rect[2], rect[3], 
+      selectedRepresentations, selectionSources, surfaceSelections, false))
+    {
+    emit this->selected(0);
+    return;
+    }
+
+  if (selectedRepresentations->GetNumberOfItems()<=0)
+    {
+    emit this->selected(0);
+    return;
+    }
+
+  vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
+    selectedRepresentations->GetItemAsObject(0));
+  vtkSMSourceProxy* selectionSource = vtkSMSourceProxy::SafeDownCast(
+    selectionSources->GetItemAsObject(0));
+
+  pqServerManagerModel* smmodel = 
+    pqApplicationCore::instance()->getServerManagerModel();
+  pqDataRepresentation* pqRepr = smmodel->findItem<pqDataRepresentation*>(repr);
+  if (!repr)
+    {
+    // No data display was selected (or none that is registered).
+    emit this->selected(0);
+    return;
+    }
+
+  pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
+  vtkSMSourceProxy* selectedSource = vtkSMSourceProxy::SafeDownCast(
+    opPort->getSource()->getProxy());
+  selectedSource->SetSelectionInput(opPort->getPortNumber(),
+    selectionSource, 0);
+
+  // Fire selection event to let the world know that this view selected
+  // something.
+  emit this->selected(opPort);
 }

@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqBarChartRepresentation.h"
 #include "pqComparativeRenderView.h"
-#include "pqElementInspectorView.h"
 #include "pqLineChartRepresentation.h"
 #include "pqPlotView.h"
 #include "pqSpreadSheetView.h"
@@ -58,7 +57,6 @@ QStringList pqStandardViewModules::viewTypes() const
     pqPlotView::barChartType() << 
     pqPlotView::XYPlotType() << 
     pqTableView::tableType() <<
-    pqElementInspectorView::eiViewType() <<
     pqComparativeRenderView::comparativeRenderViewType() <<
     pqSpreadSheetView::spreadsheetViewType();
 }
@@ -68,7 +66,6 @@ QStringList pqStandardViewModules::displayTypes() const
   return QStringList() 
     << "BarChartRepresentation"
     << "XYPlotRepresentation"
-    << "ElementInspectorRepresentation"
     << "TextSourceRepresentation";
 }
 
@@ -85,10 +82,6 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
   else if(type == pqTableView::tableType())
     {
     return pqTableView::tableTypeName();
-    }
-  else if (type == pqElementInspectorView::eiViewType())
-    {
-    return pqElementInspectorView::eiViewTypeName();
     }
   else if (type == pqComparativeRenderView::comparativeRenderViewType())
     {
@@ -121,10 +114,6 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype)
   else if(viewtype == pqTableView::tableType())
     {
     return pxm->NewProxy("views", "TableView");
-    }
-  else if (viewtype == pqElementInspectorView::eiViewType())
-    {
-    return pxm->NewProxy("newviews", "ElementInspectorView");
     }
   else if (viewtype == pqComparativeRenderView::comparativeRenderViewType())
     {
@@ -159,11 +148,6 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     {
     // return new pqTableView(group, viewname, viewmodule, server, p);
     }
-  else if (viewtype == "ElementInspectorView")
-    {
-    return new pqElementInspectorView(
-      group, viewname, viewmodule, server, p);
-    }
   else if (viewtype == pqComparativeRenderView::comparativeRenderViewType())
     {
     return new pqComparativeRenderView(
@@ -192,10 +176,6 @@ pqDataRepresentation* pqStandardViewModules::createDisplay(const QString& displa
   else if (display_type == "XYPlotRepresentation")
     {
     return new pqLineChartRepresentation(group, n, proxy, server, p);
-    }
-  else if (display_type == "ElementInspectorRepresentation")
-    {
-    return new pqDataRepresentation(group, n, proxy, server, p);
     }
   else if (display_type == "TextSourceRepresentation")
     {

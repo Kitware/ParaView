@@ -26,11 +26,12 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMPropRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPropRepresentationProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMPropRepresentationProxy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMPropRepresentationProxy::vtkSMPropRepresentationProxy()
 {
   this->SelectionRepresentation = 0;
+  this->SelectionVisibility = 0;
 
   // This link is used to link the properties of the representation prop to the 
   // properties of the selection prop so that they appear to be tranformed
@@ -98,20 +99,17 @@ void vtkSMPropRepresentationProxy::Update(vtkSMViewProxy* view)
 {
   if (this->SelectionRepresentation)
     {
-    int visible = this->GetSelectionVisibility();
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      this->GetProperty("Selection"));
-    if (pp && pp->GetNumberOfProxies() == 0)
-      {
-      visible = false;
-      }
-
+    // First update the selection representation visibility.
+    int sel_visibility = (this->GetVisibility() && this->SelectionVisibility);
+   
     vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
       this->SelectionRepresentation->GetProperty("Visibility"));
-    ivp->SetElement(0, visible);
+    ivp->SetElement(0, sel_visibility);
     this->SelectionRepresentation->UpdateProperty("Visibility");
+
+    // Now update the selection representation.
     this->SelectionRepresentation->Update(view);  
-  }
+    }
 
   this->Superclass::Update(view);
 }
@@ -140,7 +138,7 @@ bool vtkSMPropRepresentationProxy::AddToView(vtkSMViewProxy* view)
     renderView->AddPropToRenderer(this->GetSubProxy("Prop2D"));
     }
 
-  if (this->GetSelectionSupported() && this->SelectionRepresentation)
+  if (this->SelectionRepresentation)
     {
     this->SelectionRepresentation->AddToView(view);
     }
@@ -222,7 +220,7 @@ void vtkSMPropRepresentationProxy::GetActiveStrategies(
   vtkSMRepresentationStrategyVector& activeStrategies)
 {
   this->Superclass::GetActiveStrategies(activeStrategies);
-  if (this->SelectionRepresentation && this->GetSelectionSupported())
+  if (this->SelectionRepresentation)
     {
     this->SelectionRepresentation->GetActiveStrategies(activeStrategies);
     }
@@ -232,7 +230,7 @@ void vtkSMPropRepresentationProxy::GetActiveStrategies(
 void vtkSMPropRepresentationProxy::SetUpdateTime(double time)
 {
   this->Superclass::SetUpdateTime(time);
-  if (this->SelectionRepresentation && this->GetSelectionSupported())
+  if (this->SelectionRepresentation)
     {
     this->SelectionRepresentation->SetUpdateTime(time);
     }

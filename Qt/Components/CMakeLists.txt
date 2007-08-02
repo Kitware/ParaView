@@ -72,7 +72,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDataInformationModel.h
   pqDataInformationModelSelectionAdaptor.h
   pqDataInformationWidget.h
-  pqDataSetModel.h
   pqDialog.h
   pqDisplayColorWidget.h
   pqDisplayPanel.h
@@ -82,7 +81,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDoubleRangeWidgetDomain.h
   pqDoubleSpinBoxDomain.h
   pqEditServerStartupDialog.h
-  pqElementInspectorWidget.h
   pqExodusIIPanel.h
   pqExodusPanel.h
   pqExtractDataSetsPanel.h  
@@ -140,7 +138,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSelectReaderDialog.h
   pqSelectThroughPanel.h
   pqSelectionAdaptor.h
-  pqSelectionLinksManager.h
   pqSelectionManager.h
   pqServerBrowser.h
   pqServerStartupBrowser.h
@@ -194,7 +191,6 @@ SET(UI_FORMS
   Resources/UI/pqDisplayProxyEditorWidget.ui
   Resources/UI/pqDisplayRepresentationWidget.ui
   Resources/UI/pqEditServerStartupDialog.ui
-  Resources/UI/pqElementInspectorWidget.ui
   Resources/UI/pqEmptyView.ui
   Resources/UI/pqExodusIIPanel.ui
   Resources/UI/pqExodusPanel.ui
@@ -349,8 +345,6 @@ ADD_LIBRARY(pqComponents
   pqDataInformationModelSelectionAdaptor.h
   pqDataInformationWidget.cxx
   pqDataInformationWidget.h
-  pqDataSetModel.cxx
-  pqDataSetModel.h
   pqDialog.cxx
   pqDialog.h
   pqDisplayColorWidget.cxx
@@ -369,8 +363,6 @@ ADD_LIBRARY(pqComponents
   pqDoubleSpinBoxDomain.h
   pqEditServerStartupDialog.cxx
   pqEditServerStartupDialog.h
-  pqElementInspectorWidget.cxx
-  pqElementInspectorWidget.h
   pqExodusIIPanel.cxx
   pqExodusIIPanel.h
   pqExodusPanel.cxx
@@ -489,8 +481,6 @@ ADD_LIBRARY(pqComponents
   pqSelectThroughPanel.h
   pqSelectionAdaptor.cxx
   pqSelectionAdaptor.h
-  pqSelectionLinksManager.cxx
-  pqSelectionLinksManager.h
   pqSelectionManager.cxx
   pqSelectionManager.h
   pqServerBrowser.cxx

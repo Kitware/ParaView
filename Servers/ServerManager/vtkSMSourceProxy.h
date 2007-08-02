@@ -135,13 +135,39 @@ public:
   virtual vtkPVXMLElement* SaveRevivalState(vtkPVXMLElement* root);
   virtual int LoadRevivalState(vtkPVXMLElement* revivalElement, 
     vtkSMStateLoaderBase* loader);
+
+  // Description:
+  // Creates extract selection proxies for each output port if not already
+  // created.
+  void CreateSelectionProxies();
+
+  // Description:
+  // Set/Get the selection input. This is used to set the selection input to the
+  // extarction proxy for the output port identified by \c portIndex.
+  // If no extraction proxies are present, this method has no effect.
+  void SetSelectionInput(unsigned int portIndex, vtkSMSourceProxy* input,
+    unsigned int outputPort);
+  
+  // Description:
+  // API to query selection input set using SetSelectionInput.
+  vtkSMSourceProxy* GetSelectionInput(unsigned int portIndex);
+  unsigned int GetSelectionInputPort(unsigned int portIndex);
+
+  // Description:
+  // Clean all selection inputs for the given port.
+  void CleanSelectionInputs(unsigned int portIndex);
+
+  // Description:
+  // Returns the source proxy which provides the selected data from the given
+  // output port.
+  vtkSMSourceProxy* GetSelectionOutput(unsigned int portIndex);
+
+//BTX
 protected:
   vtkSMSourceProxy();
   ~vtkSMSourceProxy();
 
-//BTX
   friend class vtkSMInputProperty;
-//ETX
 
   int PartsCreated;
 
@@ -168,12 +194,14 @@ protected:
   void CreatePartsInternal(vtkSMProxy* op);
 
   int DoInsertExtractPieces;
+  int SelectionProxiesCreated;
 
 private:
   vtkSMSourceProxyInternals* PInternals;
 
   vtkSMSourceProxy(const vtkSMSourceProxy&); // Not implemented
   void operator=(const vtkSMSourceProxy&); // Not implemented
+//ETX
 };
 
 #endif

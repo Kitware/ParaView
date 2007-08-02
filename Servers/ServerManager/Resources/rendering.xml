@@ -2154,7 +2154,7 @@
 
       <SubProxy>
         <Proxy name="UpdateSuppressor" 
-          proxygroup="filters" proxyname="UpdateSuppressor" />
+          proxygroup="filters" proxyname="UpdateSuppressor2" />
       </SubProxy>
 
       <SubProxy>
@@ -2581,14 +2581,6 @@
       </DoubleVectorProperty>
       <!-- End of ViewBase -->
     </Proxy>
-
-    <ViewProxy name="ElementInspectorView" 
-      base_proxygroup="newviews" 
-      base_proxyname="ViewBase"
-      representation_name="ClientDeliveryRepresentation">
-
-      <!-- End of ElementInspectorView -->
-    </ViewProxy>
 
     <ViewProxy name="SpreadSheetView" 
       base_proxygroup="newviews" 
@@ -3244,6 +3236,13 @@
       <Documentation>
         Proxy to show a selection as geometry.
       </Documentation>
+
+      <InputProperty name="Input" 
+        command="NotUsed">
+        <InputArrayDomain name="input_array_any"
+          attribute_type="any">
+        </InputArrayDomain>
+      </InputProperty>
       
       <IntVectorProperty
         name="Visibility"
@@ -3257,18 +3256,31 @@
         </Documentation>
       </IntVectorProperty>
 
-      <InputProperty name="Input" 
-        command="NotUsed">
-        <InputArrayDomain name="input_array_any"
-          attribute_type="any">
-        </InputArrayDomain>
-      </InputProperty>
-
-      <ProxyProperty name="Selection"
-        command="SetSelection"
-        clean_command="CleanSelectionInput"
+      <IntVectorProperty
+        name="PointLabelVisibility"
+        command="SetPointLabelVisibility"
+        number_of_elements="1"
+        default_values="0"
         update_self="1">
-      </ProxyProperty>
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility of the cell labels for this representation. 
+          This is ignored if Visibility is 0.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="CellLabelVisibility"
+        command="SetCellLabelVisibility"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for this representation.
+          This is ignored if Visibility is 0.
+        </Documentation>
+      </IntVectorProperty>
 
       <DoubleVectorProperty name="UpdateTime"
         command="SetUpdateTime"
@@ -3282,16 +3294,6 @@
           This time is not used unless UseViewUpdateTime is off.
         </Documentation>
       </DoubleVectorProperty>
-
-      <SubProxy>
-        <Proxy name="ExtractSelection"
-          proxygroup="filters" proxyname="ExtractSelection" />
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="EmptySelectionSource"
-          proxygroup="sources" proxyname="SelectionSource" />
-      </SubProxy>
 
       <SubProxy>
         <!-- GeometryFilter for selection pipeline -->
@@ -3324,12 +3326,6 @@
           SelectionProp3D that gets added to the 3D renderer 
         -->
         <Proxy name="Prop3D" proxygroup="props" proxyname="LODActor" />
-<!--  Need SetVisibility() at Representation level to pass along
-      Visibility to label Representation 
-        <ExposedProperties>
-          <Property name="Visibility" />
-        </ExposedProperties>
--->        
       </SubProxy>
 
       <SubProxy>
@@ -3359,7 +3355,6 @@
           proxygroup="representations"
           proxyname="DataLabelRepresentation" />
         <ExposedProperties>
-          <Property name="PointLabelVisibility" />
           <Property name="PointLabelMode" />
           <Property name="PointLabelColor" />
           <Property name="PointLabelOpacity" />
@@ -3372,7 +3367,6 @@
           <Property name="PointFieldDataArrayIndex" />
           <Property name="PointFieldDataArrayName" />
           
-          <Property name="CellLabelVisibility" />
           <Property name="CellLabelMode" />
           <Property name="CellLabelColor" />
           <Property name="CellLabelOpacity" />
@@ -3385,8 +3379,6 @@
           <Property name="CellFieldDataArrayIndex" />
           <Property name="CellFieldDataArrayName" />
         </ExposedProperties>
- 
-        
       </SubProxy>
 
     <!-- End of SelectionRepresentation -->
@@ -3427,12 +3419,6 @@
         <Documentation>
           Set the visibility for this representation.
         </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="SelectionVisibility"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
       </IntVectorProperty>
 
       <IntVectorProperty name="ColorAttributeType"
@@ -3596,29 +3582,6 @@
         </ExposedProperties>
       </SubProxy>
 
-      <!--
-      <SubProxy>
-        <Proxy name="SelectionRepresentation" 
-          proxygroup="representations"
-          proxyname="SelectionRepresentation" />
-        <ExposedProperties>
-          <Property name="Selection" />
-          <Property name="Color" 
-                    exposed_name="SelectionColor" />
-          <Property name="Interpolation" 
-                    exposed_name="SelectionInterpolation" />
-          <Property name="LineWidth" 
-                    exposed_name="SelectionLineWidth" />
-          <Property name="Opacity" 
-                    exposed_name="SelectionOpacity" />
-          <Property name="PointSize" 
-                    exposed_name="SelectionPointSize" />
-          <Property name="Representation" 
-                    exposed_name="SelectionRepresentation" />
-        </ExposedProperties>
-      </SubProxy>
-      -->
-
     <!-- End of SurfaceRepresentation -->
     </SurfaceRepresentationProxy>
 
@@ -3654,12 +3617,6 @@
         <Documentation>
           Set the visibility for this representation.
         </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="SelectionVisibility"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
       </IntVectorProperty>
 
       <IntVectorProperty name="ColorAttributeType"
@@ -3753,29 +3710,6 @@
         </ExposedProperties>
       </SubProxy>
 
-      <!--
-      <SubProxy>
-        <Proxy name="SelectionRepresentation" 
-          proxygroup="representations"
-          proxyname="SelectionRepresentation" />
-        <ExposedProperties>
-          <Property name="Selection" />
-          <Property name="Color" 
-                    exposed_name="SelectionColor" />
-          <Property name="Interpolation" 
-                    exposed_name="SelectionInterpolation" />
-          <Property name="LineWidth" 
-                    exposed_name="SelectionLineWidth" />
-          <Property name="Opacity" 
-                    exposed_name="SelectionOpacity" />
-          <Property name="PointSize" 
-                    exposed_name="SelectionPointSize" />
-          <Property name="Representation" 
-                    exposed_name="SelectionRepresentation" />
-        </ExposedProperties>
-      </SubProxy>
-      -->
-
     <!-- End of OutlineRepresentation -->
     </OutlineRepresentationProxy>
 
@@ -3807,12 +3741,6 @@
         <Documentation>
           Set the visibility for this representation.
         </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="SelectionVisibility"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
       </IntVectorProperty>
 
       <IntVectorProperty name="ColorAttributeType"
@@ -3883,28 +3811,6 @@
         <Proxy name="LODMapper" proxygroup="mappers" proxyname="PolyDataMapper" />
       </SubProxy>
 
-      <!--
-      <SubProxy>
-        <Proxy name="SelectionRepresentation" 
-          proxygroup="representations"
-          proxyname="SelectionRepresentation" />
-        <ExposedProperties>
-          <Property name="Selection" />
-          <Property name="Color" 
-                    exposed_name="SelectionColor" />
-          <Property name="Interpolation" 
-                    exposed_name="SelectionInterpolation" />
-          <Property name="LineWidth" 
-                    exposed_name="SelectionLineWidth" />
-          <Property name="Opacity" 
-                    exposed_name="SelectionOpacity" />
-          <Property name="PointSize" 
-                    exposed_name="SelectionPointSize" />
-          <Property name="Representation" 
-                    exposed_name="SelectionRepresentation" />
-        </ExposedProperties>
-      </SubProxy>
-      -->
     <!-- End of UniformGridVolumeRepresentation -->
     </UniformGridVolumeRepresentationProxy>
 
@@ -3937,12 +3843,6 @@
         <Documentation>
           Set the visibility for this representation.
         </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="SelectionVisibility"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
       </IntVectorProperty>
 
       <IntVectorProperty name="ColorAttributeType"
@@ -4086,29 +3986,6 @@
         </ShareProperties>
       </SubProxy>
 
-      <!--
-      <SubProxy>
-        <Proxy name="SelectionRepresentation" 
-          proxygroup="representations"
-          proxyname="SelectionRepresentation" />
-        <ExposedProperties>
-          <Property name="Selection" />
-          <Property name="Color" 
-                    exposed_name="SelectionColor" />
-          <Property name="Interpolation" 
-                    exposed_name="SelectionInterpolation" />
-          <Property name="LineWidth" 
-                    exposed_name="SelectionLineWidth" />
-          <Property name="Opacity" 
-                    exposed_name="SelectionOpacity" />
-          <Property name="PointSize" 
-                    exposed_name="SelectionPointSize" />
-          <Property name="Representation" 
-                    exposed_name="SelectionRepresentation" />
-        </ExposedProperties>
-      </SubProxy>
-      -->
-
       <!-- End of UnstructuredGridVolumeRepresentation -->
     </UnstructuredGridVolumeRepresentationProxy>
 
@@ -4140,9 +4017,10 @@
         </Documentation>
       </DoubleVectorProperty>
 
-      <IntVectorProperty 
-        name="SelectionVisibility"
+      <IntVectorProperty name="SelectionVisibility"
+        command="SetSelectionVisibility"
         number_of_elements="1"
+        update_self="1"
         default_values="1" >
         <BooleanDomain name="bool" />
         <Documentation>
@@ -4210,7 +4088,6 @@
           proxygroup="representations"
           proxyname="SelectionRepresentation" />
         <ExposedProperties>
-          <Property name="Selection" />
           <Property name="Color" 
                     exposed_name="SelectionColor" />
           <Property name="LineWidth" 
@@ -4253,7 +4130,7 @@
           <Property name="CellFieldDataArrayName" exposed_name="SelectionCellFieldDataArrayName" />
         </ExposedProperties>
       </SubProxy>
-
+    <!-- End of PVRepresentationBase -->
     </PVRepresentationProxy>
 
     <PVRepresentationProxy name="GeometryRepresentation"
@@ -4340,7 +4217,7 @@
         </ExposedProperties>
       </SubProxy>
 
-      <!-- End of GeometryRepresentation -->
+      <!-- End of UnstructuredGridRepresentation -->
     </PVRepresentationProxy>
 
     <PVRepresentationProxy name="UniformGridRepresentation"
@@ -4393,7 +4270,7 @@
         </ExposedProperties>
       </SubProxy>
 
-      <!-- End of GeometryRepresentation -->
+      <!-- End of UniformGridRepresentation -->
     </PVRepresentationProxy>
 
     <ClientDeliveryRepresentationProxy 
@@ -4484,14 +4361,6 @@
         </Documentation>
       </DoubleVectorProperty>
 
-      <SubProxy>
-        <Proxy name="ExtractSelection"
-          proxygroup="filters" proxyname="ExtractSelection" />
-        <ExposedProperties>
-          <Property name="Selection" />
-        </ExposedProperties>
-      </SubProxy>
-
       <!-- End of ClientDeliveryRepresentationBase -->
     </ClientDeliveryRepresentationProxy>
 
@@ -4507,22 +4376,7 @@
        command="AddInput">
      </InputProperty>
 
-      <!-- End of ElementInspectorRepresentation -->
-    </ClientDeliveryRepresentationProxy>
-
-    <ClientDeliveryRepresentationProxy name="ElementInspectorRepresentation"
-      base_proxygroup="representations"
-      base_proxyname="ClientDeliveryRepresentationBase">
-      <Documentation>
-        Representation used in element inspector view.
-      </Documentation>
-
-      <InputProperty name="Input"
-          command="SetInput-not-used"
-          update_self="1">
-      </InputProperty>
-
-      <!-- End of ElementInspectorRepresentation -->
+      <!-- End of ClientDeliveryRepresentation -->
     </ClientDeliveryRepresentationProxy>
 
     <ClientDeliveryRepresentationProxy name="BarChartRepresentation"
@@ -5137,7 +4991,7 @@
 
       <SubProxy>
         <Proxy name="UpdateSuppressor"
-          proxygroup="filters" proxyname="UpdateSuppressor">
+          proxygroup="filters" proxyname="UpdateSuppressor2">
         </Proxy>
       </SubProxy>
 
@@ -5195,7 +5049,7 @@
       </SubProxy>
       <SubProxy>
         <Proxy name="UpdateSuppressor"
-          proxygroup="filters" proxyname="UpdateSuppressor">
+          proxygroup="filters" proxyname="UpdateSuppressor2">
         </Proxy>
       </SubProxy>
       <SubProxy>
@@ -5276,6 +5130,7 @@
 
 
 </ServerManagerConfiguration>
+
 
 
 

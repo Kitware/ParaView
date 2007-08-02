@@ -48,8 +48,6 @@ vtkSMDataLabelRepresentationProxy::vtkSMDataLabelRepresentationProxy()
   this->CellActorProxy = 0;
   this->CellMapperProxy = 0;
   this->CellTextPropertyProxy = 0;
-
-  this->SetSelectionSupported(false);
 }
 
 //-----------------------------------------------------------------------------

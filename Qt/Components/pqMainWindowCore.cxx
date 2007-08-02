@@ -64,7 +64,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataInformationWidget.h"
 #include "pqDisplayColorWidget.h"
 #include "pqDisplayRepresentationWidget.h"
-#include "pqElementInspectorWidget.h"
 #include "pqFilterInputDialog.h"
 #include "pqHelperProxyRegisterUndoElement.h"
 #include "pqLinksManager.h"
@@ -97,7 +96,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyTabWidget.h"
 #include "pqReaderFactory.h"
 #include "pqRenderView.h"
-#include "pqSelectionLinksManager.h"
+#include "pqRubberBandHelper.h"
 #include "pqSelectionManager.h"
 #include "pqSelectReaderDialog.h"
 #include "pqServer.h"
@@ -286,7 +285,6 @@ public:
   pqViewManager MultiViewManager;
   pqVCRController VCRController;
   pqSelectionManager SelectionManager;
-  pqSelectionLinksManager SelectionLinksManager;
   pqLookmarkManagerModel* LookmarkManagerModel;
   pqLookmarkBrowser* LookmarkBrowser;
   pqLookmarkInspector* LookmarkInspector;
@@ -299,6 +297,7 @@ public:
   pqReaderFactory ReaderFactory;
   pqWriterFactory WriterFactory;
   pqPendingDisplayManager PendingDisplayManager;
+  pqRubberBandHelper RenderViewSelectionHelper;
   QPointer<pqUndoStack> UndoStack;
  
   QPointer<QMenu> RecentFiltersMenu; 
@@ -594,6 +593,11 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   // Now that the connections are set up, import custom filters from settings
   this->Implementation->CustomFilters->importCustomFiltersFromSettings();
 
+  // Set up connection with selection helpers for all views.
+  QObject::connect(
+    &pqActiveView::instance(), SIGNAL(changed(pqView*)),
+    &this->Implementation->RenderViewSelectionHelper, SLOT(setView(pqView*)));
+
   // Connect up the pqLookmarkManagerModel and pqLookmarkBrowserModel
   this->Implementation->LookmarkManagerModel = new pqLookmarkManagerModel(this);
 
@@ -763,12 +767,6 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   QObject::connect(
     &this->Implementation->VCRController, SIGNAL(endNonUndoableChanges()),
     this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
-  QObject::connect(
-    &this->Implementation->SelectionManager, SIGNAL(beginNonUndoableChanges()),
-    this->Implementation->UndoStack, SLOT(beginNonUndoableChanges()));
-  QObject::connect(
-    &this->Implementation->SelectionManager, SIGNAL(endNonUndoableChanges()),
-    this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
 
   core->setUndoStack(this->Implementation->UndoStack);
 
@@ -795,21 +793,31 @@ pqMainWindowCore::~pqMainWindowCore()
   delete Implementation;
 }
 
+//-----------------------------------------------------------------------------
 pqViewManager& pqMainWindowCore::multiViewManager()
 {
   return this->Implementation->MultiViewManager;
 }
 
+//-----------------------------------------------------------------------------
 pqSelectionManager& pqMainWindowCore::selectionManager()
 {
   return this->Implementation->SelectionManager;
 }
 
+//-----------------------------------------------------------------------------
 pqVCRController& pqMainWindowCore::VCRController()
 {
   return this->Implementation->VCRController;
 }
 
+//-----------------------------------------------------------------------------
+pqRubberBandHelper* pqMainWindowCore::renderViewSelectionHelper() const
+{
+  return &this->Implementation->RenderViewSelectionHelper;
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::setSourceMenu(QMenu* menu)
 {
   if(this->Implementation->SourceMenu)
@@ -1198,31 +1206,6 @@ pqAnimationViewWidget* pqMainWindowCore::setupAnimationView(QDockWidget* dock_wi
                    animation_view, SLOT(setScene(pqAnimationScene*)));
   dock_widget->setWidget(animation_view);
   return animation_view;
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::setupElementInspector(QDockWidget* dock_widget)
-{
-  pqElementInspectorWidget* const element_inspector = 
-    new pqElementInspectorWidget(dock_widget);
-
-  element_inspector->setSelectionManager(
-    &this->Implementation->SelectionManager);
-
-  pqApplicationCore* core = pqApplicationCore::instance();
-
-  QObject::connect(this, SIGNAL(postAccept()),
-    element_inspector, SLOT(refresh()));
-
-  QObject::connect(core, SIGNAL(finishedAddingServer(pqServer*)),
-    element_inspector, SLOT(setServer(pqServer*)));
-
-  QObject::connect(element_inspector, SIGNAL(beginNonUndoableChanges()),
-    this->Implementation->UndoStack, SLOT(beginNonUndoableChanges()));
-  QObject::connect(element_inspector, SIGNAL(endNonUndoableChanges()),
-    this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
-
-  dock_widget->setWidget(element_inspector);
 }
 
 //-----------------------------------------------------------------------------
@@ -1711,7 +1694,6 @@ void pqMainWindowCore::initializeStates()
   emit this->enableFilterCreate(false);
 
   emit this->enableVariableToolbar(false);
-  emit this->enableSelectionToolbar(false);
 
   emit this->enableCameraUndo(false);
   emit this->enableCameraRedo(false);
@@ -2819,9 +2801,6 @@ void pqMainWindowCore::onPendingDisplayChanged(bool pendingDisplays)
 void pqMainWindowCore::onActiveViewChanged(pqView* view)
 {
   pqRenderView* renderView = qobject_cast<pqRenderView*>(view);
-
-  // Update the selection toolbar.
-  emit this->enableSelectionToolbar(renderView != 0);
 
   // Get the active source and server.
   pqServerManagerModelItem *item = this->getActiveObject();

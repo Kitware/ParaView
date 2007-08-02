@@ -110,9 +110,6 @@ protected:
 
   int ReductionType;
 
-  // Proxies for the selection pipeline.
-  vtkSMSourceProxy* ExtractSelection;
-
 private:
   vtkSMClientDeliveryRepresentationProxy(const vtkSMClientDeliveryRepresentationProxy&); // Not implemented
   void operator=(const vtkSMClientDeliveryRepresentationProxy&); // Not implemented

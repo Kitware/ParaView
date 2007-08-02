@@ -69,7 +69,6 @@ private slots:
   void onHelpHelp();
 
   void onSelectionShortcut();
-  void onSelectionShortcutFinished();
 
   void assistantError(const QString& err);
 

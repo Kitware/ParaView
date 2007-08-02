@@ -59,6 +59,11 @@ public:
   // Set the visibility for this representation.
   // Implemented to turn off selection actor when visibility is turned off.
   virtual void SetVisibility(int visible);
+
+  // Description:
+  // Set the selection visibility. This flag is treated as false if this proxy does have a
+  // SelectionRepresentation sub proxy or when Visibility is off.
+  vtkSetMacro(SelectionVisibility, int);
 //BTX
 protected:
   vtkSMPropRepresentationProxy();
@@ -97,6 +102,8 @@ protected:
   // Selection Representation.
   vtkSMDataRepresentationProxy* SelectionRepresentation;
   vtkSMProxyLink* SelectionPropLink;
+
+  int SelectionVisibility;
 
 private:
   vtkSMPropRepresentationProxy(const vtkSMPropRepresentationProxy&); // Not implemented

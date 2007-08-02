@@ -32,12 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRubberBandHelper.h"
 
 // ParaView Server Manager includes.
-
 #include "pqRenderView.h"
 
 // Qt Includes.
 #include <QWidget>
 #include <QCursor>
+#include <QPointer>
 
 
 // ParaView includes.
@@ -47,10 +47,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkInteractorStyleRubberBandPick.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkSmartPointer.h"
 
 //---------------------------------------------------------------------------
 // Observer for the start and end interaction events
-class vtkPQSelectionObserver : public vtkCommand
+class pqRubberBandHelper::vtkPQSelectionObserver : public vtkCommand
 {
 public:
   static vtkPQSelectionObserver *New() 
@@ -80,45 +81,77 @@ void pqRubberBandHelper::ReorderBoundingBox(int src[4], int dest[4])
   dest[3] = (src[1] < src[3])? src[3] : src[1];
 }
 
+//---------------------------------------------------------------------------
+class pqRubberBandHelper::pqInternal
+{
+public:
+  //the style I use to draw the rubber band
+  vtkSmartPointer<vtkInteractorStyleRubberBandPick> RubberBandStyle;
+
+  // Saved style to return to after rubber band finishes
+  vtkSmartPointer<vtkInteractorObserver> SavedStyle;
+
+  // Observer for mouse clicks.
+  vtkSmartPointer<vtkPQSelectionObserver> SelectionObserver;
+
+  // Current render view.
+  QPointer<pqRenderView> RenderView;
+
+  pqInternal(pqRubberBandHelper* parent)
+    {
+    this->RubberBandStyle = 
+      vtkSmartPointer<vtkInteractorStyleRubberBandPick>::New();
+    this->SelectionObserver = 
+      vtkSmartPointer<vtkPQSelectionObserver>::New();
+    this->SelectionObserver->RubberBandHelper = parent;
+    }
+  
+  ~pqInternal()
+    {
+    this->SelectionObserver->RubberBandHelper = 0;
+    }
+};
+
 //-----------------------------------------------------------------------------
 pqRubberBandHelper::pqRubberBandHelper(QObject* _parent/*=null*/)
 : QObject(_parent)
 {
-  this->RubberBandStyle = vtkInteractorStyleRubberBandPick::New();
-  this->SelectionObserver = vtkPQSelectionObserver::New();
-  this->SelectionObserver->RubberBandHelper = this;
-  this->SavedStyle = NULL;
-  this->RenderModule = NULL;
+  this->Internal = new pqInternal(this);
+  this->Mode = INTERACT;
 }
 
 //-----------------------------------------------------------------------------
 pqRubberBandHelper::~pqRubberBandHelper()
 {
-  if (this->RubberBandStyle)
-    {
-    this->RubberBandStyle->Delete();
-    this->RubberBandStyle = 0;
-    }
-  if (this->SavedStyle)
-    {
-    this->SavedStyle->Delete();
-    this->SavedStyle = 0;
-    }
-  if (this->SelectionObserver)
-    {
-    this->SelectionObserver->Delete();
-    this->SelectionObserver = 0;
-    }
+  delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
-int pqRubberBandHelper::setRubberBandOn(pqRenderView* rm)
+void pqRubberBandHelper::setView(pqView* view)
 {
-  if (rm == 0)
+  pqRenderView* renView = qobject_cast<pqRenderView*>(view);
+  if (renView == this->Internal->RenderView)
     {
-    rm = this->RenderModule;
+    // nothing to do.
+    return;
     }
-  if (rm == 0) 
+
+  if (this->Internal->RenderView && this->Mode == SELECT)
+    {
+    // Ensure that we are not currently in selection mode.
+    this->setRubberBandOff();
+    }
+
+  this->Internal->RenderView = renView;
+  this->Mode = INTERACT;
+  emit this->enabled(renView!=0);
+}
+
+//-----------------------------------------------------------------------------
+int pqRubberBandHelper::setRubberBandOn()
+{
+  pqRenderView* rm = this->Internal->RenderView;
+  if (rm == 0 || this->Mode == SELECT)
     {
     return 0;
     }
@@ -138,30 +171,29 @@ int pqRubberBandHelper::setRubberBandOn(pqRenderView* rm)
     }
 
   //start watching left mouse actions to get a begin and end pixel
-  this->SavedStyle = rwi->GetInteractorStyle();
-  this->SavedStyle->Register(0);
-  rwi->SetInteractorStyle(this->RubberBandStyle);
+  this->Internal->SavedStyle = rwi->GetInteractorStyle();
+  rwi->SetInteractorStyle(this->Internal->RubberBandStyle);
   
   rwi->AddObserver(vtkCommand::LeftButtonPressEvent, 
-                   this->SelectionObserver);
+                   this->Internal->SelectionObserver);
   rwi->AddObserver(vtkCommand::LeftButtonReleaseEvent, 
-                   this->SelectionObserver);
+                   this->Internal->SelectionObserver);
 
-  this->RubberBandStyle->StartSelect();
+  this->Internal->RubberBandStyle->StartSelect();
 
-  this->RenderModule->getWidget()->setCursor(Qt::CrossCursor);
+  this->Internal->RenderView->getWidget()->setCursor(Qt::CrossCursor);
 
+  this->Mode = SELECT;
+  emit this->selectionModeChanged(true);
+  emit this->interactionModeChanged(false);
   return 1;
 }
 
 //-----------------------------------------------------------------------------
-int pqRubberBandHelper::setRubberBandOff(pqRenderView* rm)
+int pqRubberBandHelper::setRubberBandOff()
 {
-  if (rm == 0)
-    {
-    rm = this->RenderModule;
-    }
-  if (rm == 0) 
+  pqRenderView* rm = this->Internal->RenderView;
+  if (rm == 0 || this->Mode == INTERACT)
     {
     return 0;
     }
@@ -180,34 +212,53 @@ int pqRubberBandHelper::setRubberBandOff(pqRenderView* rm)
     return 0;
     }
 
-  if (!this->SavedStyle)
+  if (!this->Internal->SavedStyle)
     {
     qDebug("No previous style defined. Cannot switch to interaction.");
     return 0;
     }
 
-  rwi->SetInteractorStyle(this->SavedStyle);
-  rwi->RemoveObserver(this->SelectionObserver);
-  this->SavedStyle->UnRegister(0);
-  this->SavedStyle = 0;
+  rwi->SetInteractorStyle(this->Internal->SavedStyle);
+  rwi->RemoveObserver(this->Internal->SelectionObserver);
+  this->Internal->SavedStyle = 0;
 
   // set the interaction cursor
-  this->RenderModule->getWidget()->setCursor(QCursor());
-
+  this->Internal->RenderView->getWidget()->setCursor(QCursor());
+  this->Mode = INTERACT;
+  emit this->selectionModeChanged(false);
+  emit this->interactionModeChanged(true);
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+pqRenderView* pqRubberBandHelper::getRenderView() const
+{
+  return this->Internal->RenderView;
+}
+
+//-----------------------------------------------------------------------------
+void pqRubberBandHelper::beginSelection()
+{
+  this->setRubberBandOn();
+}
+
+//-----------------------------------------------------------------------------
+void pqRubberBandHelper::endSelection()
+{
+  this->setRubberBandOff();
 }
 
 //-----------------------------------------------------------------------------
 void pqRubberBandHelper::processEvents(unsigned long eventId)
 {
-  if (!this->RenderModule)
+  if (!this->Internal->RenderView)
     {
     //qDebug("Selection is unavailable without visible data.");
     return;
     }
 
   vtkSMRenderViewProxy* rmp = 
-    this->RenderModule->getRenderViewProxy();
+    this->Internal->RenderView->getRenderViewProxy();
   if (!rmp)
     {
     qDebug("No render module proxy specified. Cannot switch to selection");
@@ -247,8 +298,15 @@ void pqRubberBandHelper::processEvents(unsigned long eventId)
         {
         this->Ye = 0;
         }
-
-      emit this->selectionFinished();
+  
+      int rect[4] = {this->Xs, this->Ys, this->Xe, this->Ye};
+      int rectOut[4];
+      this->ReorderBoundingBox(rect, rectOut);
+      if (this->Internal->RenderView && this->Mode == SELECT)
+        {
+        this->Internal->RenderView->selectOnSurface(rectOut);
+        }
+      emit this->selectionFinished(rectOut[0], rectOut[1], rectOut[2], rectOut[3]);
       break;
     }
 }

@@ -24,8 +24,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>940</width>
-     <height>22</height>
+     <width>970</width>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp" >
@@ -85,25 +85,6 @@
     <addaction name="separator" />
     <addaction name="actionToolsPythonShell" />
    </widget>
-   <widget class="QMenu" name="menuEdit" >
-    <property name="title" >
-     <string>&amp;Edit</string>
-    </property>
-    <addaction name="actionEditUndo" />
-    <addaction name="actionEditRedo" />
-    <addaction name="separator" />
-    <addaction name="actionEditCameraUndo" />
-    <addaction name="actionEditCameraRedo" />
-    <addaction name="separator" />
-    <addaction name="actionChangeInput" />
-    <addaction name="actionDelete" />
-    <addaction name="actionDelete_All" />
-    <addaction name="separator" />
-    <addaction name="actionMoveMode" />
-    <addaction name="actionSelectionMode" />
-    <addaction name="separator" />
-    <addaction name="actionEditSettings" />
-   </widget>
    <widget class="QMenu" name="menuSources" >
     <property name="title" >
      <string>&amp;Sources</string>
@@ -155,6 +136,25 @@
     <addaction name="separator" />
     <addaction name="menuToolbars" />
     <addaction name="separator" />
+   </widget>
+   <widget class="QMenu" name="menuEdit" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="actionEditUndo" />
+    <addaction name="actionEditRedo" />
+    <addaction name="separator" />
+    <addaction name="actionEditCameraUndo" />
+    <addaction name="actionEditCameraRedo" />
+    <addaction name="separator" />
+    <addaction name="actionChangeInput" />
+    <addaction name="actionDelete" />
+    <addaction name="actionDelete_All" />
+    <addaction name="separator" />
+    <addaction name="actionMoveMode" />
+    <addaction name="actionSelectionMode" />
+    <addaction name="separator" />
+    <addaction name="actionEditSettings" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -208,18 +208,6 @@
     <number>8</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_4" />
-  </widget>
-  <widget class="QDockWidget" name="elementInspectorDock" >
-   <property name="allowedAreas" >
-    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::NoDockWidgetArea|Qt::RightDockWidgetArea</set>
-   </property>
-   <property name="windowTitle" >
-    <string>Element Inspector</string>
-   </property>
-   <attribute name="dockWidgetArea" >
-    <number>8</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_5" />
   </widget>
   <widget class="QToolBar" name="mainToolBar" >
    <property name="windowTitle" >
@@ -420,11 +408,20 @@
     <string>Common Filters</string>
    </property>
    <property name="orientation" >
-    <enum>Qt::Vertical</enum>
+    <enum>Qt::Horizontal</enum>
    </property>
    <attribute name="toolBarArea" >
     <number>4</number>
    </attribute>
+  </widget>
+  <widget class="QDockWidget" name="comparativePanelDock" >
+   <property name="windowTitle" >
+    <string>Comparative View Inspector</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_11" />
   </widget>
   <widget class="QDockWidget" name="animationViewDock" >
    <property name="windowTitle" >
@@ -636,6 +633,9 @@
   <action name="actionSelectionMode" >
    <property name="checkable" >
     <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
    </property>
    <property name="icon" >
     <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqSelect24.png</iconset>

@@ -221,6 +221,10 @@ public slots:
   /// View modules supporting interaction undo must override this method.
   virtual void redo();
 
+  /// Creates a new surface selection given the rectangle in display
+  /// coordinates.
+  void selectOnSurface(int rectangle[4]);
+
 private slots:
   // Called when vtkSMRenderViewProxy fires
   // ResetCameraEvent.

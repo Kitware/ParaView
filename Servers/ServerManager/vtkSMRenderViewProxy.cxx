@@ -85,7 +85,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.31");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.32");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1289,8 +1289,9 @@ static void vtkSMRenderViewProxyShrinkSelection(vtkSelection* sel)
 //-----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::SelectOnSurface(unsigned int x0, 
   unsigned int y0, unsigned int x1, unsigned int y1,
-  vtkCollection* selectedRepresentations/*=0*/,
-  vtkCollection* surfaceSelections/*=0*/,
+  vtkCollection* selectedRepresentations,
+  vtkCollection* selectionSources,
+  vtkCollection* surfaceSelections,
   bool multiple_selections/*=true*/)
 {
   // 1) Create surface selection.
@@ -1321,23 +1322,13 @@ bool vtkSMRenderViewProxy::SelectOnSurface(unsigned int x0,
       continue;
       }
 
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      repr->GetProperty("Selection"));
-    if (pp)
-      {
-      pp->RemoveAllProxies();
-      pp->AddProxy(selectionSource);
-      }
-    repr->UpdateProperty("Selection");
-
-    if (selectedRepresentations)
-      {
-      selectedRepresentations->AddItem(repr);
-      }
     if (surfaceSelections)
       {
       surfaceSelections->AddItem(surfaceSel);
       }
+    selectionSources->AddItem(selectionSource);
+    selectedRepresentations->AddItem(repr);
+
     selectionSource->Delete();
     }
 

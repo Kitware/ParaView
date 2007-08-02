@@ -36,7 +36,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.17");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -49,8 +49,6 @@ vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
   this->Diffuse = 1.0;
   this->Specular = 0.1;
   this->Representation = VTK_SURFACE;
-
-  this->SetSelectionSupported(true);
 }
 
 //----------------------------------------------------------------------------

@@ -28,7 +28,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.15");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
 {
@@ -36,11 +36,9 @@ vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
   this->PostProcessorProxy = 0;
 
   this->ReductionType = 0;
-  this->ExtractSelection = 0;
 
   this->PreGatherHelper = 0;
   this->PostGatherHelper = 0;
-  this->SetSelectionSupported(false);
 }
 
 //----------------------------------------------------------------------------
@@ -53,7 +51,6 @@ vtkSMClientDeliveryRepresentationProxy::~vtkSMClientDeliveryRepresentationProxy(
   this->StrategyProxy = 0;
   this->PostProcessorProxy = 0;
 
-  this->ExtractSelection = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -101,14 +98,6 @@ bool vtkSMClientDeliveryRepresentationProxy::BeginCreateVTKObjects()
     this->PostProcessorProxy->SetServers(vtkProcessModule::CLIENT);
     }
 
-  /*
-  // Initialize selection pipeline subproxies.
-  this->ExtractSelection = 
-    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("ExtractSelection"));
-
-  this->ExtractSelection->SetServers(vtkProcessModule::DATA_SERVER);
-  */
-
   return true;
 }
 
@@ -133,8 +122,6 @@ void vtkSMClientDeliveryRepresentationProxy::CreatePipeline(vtkSMSourceProxy* in
     this->Connect(this->StrategyProxy->GetOutput(), this->PostProcessorProxy);
     this->PostProcessorProxy->UpdateVTKObjects();
     }
-
-  //this->Connect(input, this->ExtractSelection, "Input", outputport);
 }
 
 //-----------------------------------------------------------------------------

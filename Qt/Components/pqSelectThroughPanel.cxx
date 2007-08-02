@@ -96,7 +96,7 @@ pqSelectThroughPanel::pqSelectThroughPanel(pqProxy* object_proxy, QWidget* p) :
   panel_layout->addWidget(&this->Implementation->InsideOutWidget);
   panel_layout->addStretch();
 
-  this->Mode = pqRubberBandHelper::INTERACT;
+//  this->Mode = pqRubberBandHelper::INTERACT;
 
   this->propertyManager()->registerLink(
     &this->Implementation->PartiallyWithinWidget, "checked", SIGNAL(toggled(bool)),
@@ -138,6 +138,7 @@ pqSelectThroughPanel::pqSelectThroughPanel(pqProxy* object_proxy, QWidget* p) :
 //----------------------------------------------------------------------------
 void pqSelectThroughPanel::startSelect()
 {
+#if 0
   if (!this->RubberBandHelper->RenderModule)
     {
     //try to give the helper the active view to work on
@@ -155,11 +156,13 @@ void pqSelectThroughPanel::startSelect()
     {
     this->Mode = pqRubberBandHelper::SELECT;
     }
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqSelectThroughPanel::endSelect()
   {
+#if 0
   if (!this->RubberBandHelper->setRubberBandOff())
     {
     return;
@@ -223,11 +226,14 @@ void pqSelectThroughPanel::endSelect()
   this->setModified();
 
   this->RubberBandHelper->RenderModule->render();
+#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqSelectThroughPanel::setActiveView(pqView* aview)
 {
+  (void)aview;
+#if 0
   pqRenderView* rm = qobject_cast<pqRenderView*>(aview);
   if (!rm)
     {
@@ -244,6 +250,7 @@ void pqSelectThroughPanel::setActiveView(pqView* aview)
     }
 
   this->RubberBandHelper->RenderModule = rm;
+#endif 
 }
 
 //----------------------------------------------------------------------------

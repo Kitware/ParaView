@@ -427,12 +427,16 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
 
 
   this->Internal->VTKConnect->Disconnect();
+  /* I am disabling this since Yumin is working on moving this to a new
+   * selection panel and we don't support selection property on representation
+   * anymore.
   this->Internal->VTKConnect->Connect(
     reprProxy->GetProperty("Selection"),
     vtkCommand::ModifiedEvent, this, 
     SLOT(updateSelectionLabelEnableState()),
     NULL, 0.0,
     Qt::QueuedConnection);
+    */
 
 #if 0                                       //FIXME 
   // material
@@ -932,7 +936,7 @@ void pqDisplayProxyEditor::updateSelectionLabelEnableState()
     vtkSMProxyProperty *selectionProperty = 
       vtkSMProxyProperty::SafeDownCast(pvRep->GetProperty("Selection"));
 
-    if(selectionProperty->GetNumberOfProxies()>0)
+    if(selectionProperty && selectionProperty->GetNumberOfProxies()>0)
       {
       this->Internal->groupBoxSelectionLabels->setEnabled(true);
       if(this->Internal->checkBoxLabelCells->isChecked())

@@ -145,6 +145,12 @@ signals:
   /// Fired when interaction undo stack status changes.
   void canRedoChanged(bool);
 
+  /// Fired when a selection is made in this view. 
+  /// \c opport is the output port for the source that got selected.
+  ///    the selection input on the source proxy for the opport must already
+  ///    have been initialized to a selection source.
+  void selected(pqOutputPort* opport);
+
 private slots:
   /// Called when the "Representations" property changes.
   void onRepresentationsChanged();
