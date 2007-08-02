@@ -43,7 +43,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationTrack.h"
 #include "pqAnimationKeyFrame.h"
 
+#include "vtkEventQtSlotConnect.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPVAnimationSceneProxy.h"
 
 #include "pqApplicationCore.h"
 #include "pqServerManagerModel.h"
@@ -58,11 +61,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqAnimationViewWidget::pqInternal
 {
 public:
+  pqInternal()
+    {
+    this->Connections = vtkEventQtSlotConnect::New();
+    }
+  ~pqInternal()
+    {
+    this->Connections->Delete();
+    }
+
   QPointer<pqAnimationScene> Scene;
   pqAnimationWidget* AnimationWidget;
   QSignalMapper KeyFramesChanged;
   typedef QMap<QPointer<pqAnimationCue>, pqAnimationTrack*> TrackMapType;
   TrackMapType TrackMap;
+  vtkEventQtSlotConnect* Connections;
 
   pqAnimationTrack* findTrack(pqAnimationCue* cue)
     {
@@ -137,6 +150,11 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
     {
     QObject::disconnect(this->Internal->Scene, 0, this, 0);
     QObject::disconnect(this->Internal->Scene->getServer()->getTimeKeeper(), 0, this, 0);
+    this->Internal->Connections->Disconnect(
+      scene->getProxy()->GetProperty("NumberOfFrames"),
+      vtkCommand::ModifiedEvent,
+      this,
+      SLOT(updateFrames()));
     }
   this->Internal->Scene = scene;
   if(this->Internal->Scene)
@@ -147,8 +165,17 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
             this, SLOT(updateSceneTimeRange()));
     QObject::connect(scene->getServer()->getTimeKeeper(), SIGNAL(timeChanged()),
             this, SLOT(updateSceneTime()));
+    this->Internal->Connections->Connect(
+      scene->getProxy()->GetProperty("NumberOfFrames"),
+      vtkCommand::ModifiedEvent,
+      this,
+      SLOT(updateFrames()));
+    QObject::connect(scene, SIGNAL(playModeChanged()), 
+      this, SLOT(updatePlayMode()));
     this->updateSceneTimeRange();
     this->updateSceneTime();
+    this->updatePlayMode();
+    this->updateFrames();
     }
 }
 
@@ -284,4 +311,42 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
 
   dialog.exec();
 }
+  
+void pqAnimationViewWidget::updatePlayMode()
+{
+  pqAnimationModel* animModel =
+    this->Internal->AnimationWidget->animationModel();
+  vtkSMProxy* pxy = this->Internal->Scene->getAnimationSceneProxy();
+  int mode =
+    pqSMAdaptor::getElementProperty(pxy->GetProperty("PlayMode")).toInt();
+
+  if(mode == vtkSMPVAnimationSceneProxy::REALTIME)
+    {
+    animModel->setMode(pqAnimationModel::Real);
+    }
+  else if(mode == vtkSMPVAnimationSceneProxy::SEQUENCE)
+    {
+    animModel->setMode(pqAnimationModel::Sequence);
+    }
+  else if(mode == vtkSMPVAnimationSceneProxy::SNAP_TO_TIMESTEPS)
+    {
+    }
+  else
+    {
+    qWarning("Unrecognized play mode");
+    }
+
+}
+  
+void pqAnimationViewWidget::updateFrames()
+{
+  pqAnimationModel* animModel =
+    this->Internal->AnimationWidget->animationModel();
+  vtkSMProxy* pxy = this->Internal->Scene->getProxy();
+  QVariant num =
+    pqSMAdaptor::getElementProperty(pxy->GetProperty("NumberOfFrames"));
+  animModel->setFrames(num.toInt());
+}
+
+
 

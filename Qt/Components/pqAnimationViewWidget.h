@@ -67,9 +67,14 @@ protected slots:
   void updateSceneTimeRange();
   /// called when scene time changes
   void updateSceneTime();
+  /// called when time steps changes
+  void updateFrames();
 
   // called when track is double clicked
   void trackSelected(pqAnimationTrack* track);
+
+  // called when play mode changes
+  void updatePlayMode();
   
 private:
   pqAnimationViewWidget(const pqAnimationViewWidget&); // Not implemented.

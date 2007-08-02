@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 pqAnimationModel::pqAnimationModel(QGraphicsView* p)
   : QGraphicsScene(QRectF(0,0,400,16*6), p),
-  Mode(Real), CurrentTime(0), StartTime(0), EndTime(1)
+  Mode(Real), Frames(10), CurrentTime(0), StartTime(0), EndTime(1)
 {
   QObject::connect(this, SIGNAL(sceneRectChanged(QRectF)),
                    this, SLOT(resizeTracks()));
@@ -125,6 +125,10 @@ pqAnimationModel::ModeType pqAnimationModel::mode() const
 {
   return this->Mode;
 }
+int pqAnimationModel::frames() const
+{
+  return this->Frames;
+}
 double pqAnimationModel::currentTime() const
 {
   return this->CurrentTime;
@@ -152,6 +156,12 @@ int pqAnimationModel::rowHeight() const
 void pqAnimationModel::setMode(pqAnimationModel::ModeType m)
 {
   this->Mode = m;
+  this->update();
+}
+void pqAnimationModel::setFrames(int f)
+{
+  this->Frames = f;
+  this->update();
 }
 void pqAnimationModel::setCurrentTime(double t)
 {
@@ -178,10 +188,9 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF& )
   QRectF sr = this->sceneRect();
   int rh = this->rowHeight();
 
-  // TODO: draw time labels (depends on mode)
 
   QGraphicsView* view = qobject_cast<QGraphicsView*>(this->parent());
-  QRectF labelRect = QRectF(sr.left(), sr.top(), sr.width(), rh);
+  const QRectF labelRect = QRectF(sr.left(), sr.top(), sr.width()-1, rh);
 
   // make background for time labels white
   painter->save();
@@ -189,7 +198,8 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF& )
   painter->setPen(QColor());
   painter->drawRect(labelRect);
   painter->restore();
-
+  
+  // show rough time labels for all time modes
   QFontMetrics metrics(view->font());
   int num = qRound(labelRect.width() / (9 * metrics.maxWidth()));
   num = num == 0 ? 1 : num;
@@ -198,8 +208,6 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF& )
   painter->drawText(QRectF(labelRect.left(), labelRect.top(), w/2.0, rh), 
                     Qt::AlignLeft | Qt::AlignVCenter,
                     QString("%1").arg(this->StartTime, 5, 'e', 3));
-  painter->drawLine(QPointF(labelRect.left(), rh), 
-                    QPointF(labelRect.left(), rh - 2.0));
 
   for(int i=1; i<num; i++)
     {
@@ -207,17 +215,25 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF& )
     double left = labelRect.left() + w / 2.0 + w * (i-1);
     painter->drawText(QRectF(left, labelRect.top(), w, rh), 
                       Qt::AlignCenter, QString("%1").arg(time, 5, 'e', 3));
-    painter->drawLine(QPointF(left + w/2.0, rh),
-                      QPointF(left + w/2.0, rh - 2.0));
     }
   
   painter->drawText(QRectF(labelRect.right() - w/2.0, labelRect.top(), w/2.0, rh), 
                     Qt::AlignRight | Qt::AlignVCenter,
                     QString("%1").arg(this->EndTime, 5, 'e', 3));
-  painter->drawLine(QPointF(labelRect.right(), rh),
-                    QPointF(labelRect.right(), rh - 2.0));
 
-
+  
+  // if sequence, draw a tick mark for each frame
+  if(this->mode() == Sequence && this->Frames > 1)
+    {
+    double spacing = labelRect.width() / ((double)this->Frames-1);
+    QLineF line(labelRect.left(), labelRect.height(),
+                labelRect.left(), labelRect.height()-3.0);
+    for(int i=0; i<this->Frames; i++)
+      {
+      painter->drawLine(line);
+      line.translate(spacing, 0);
+      }
+    }
   
   // draw current time bar
   QPen pen = painter->pen();

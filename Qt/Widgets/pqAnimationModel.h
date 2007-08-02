@@ -48,6 +48,7 @@ class QTWIDGETS_EXPORT pqAnimationModel : public QGraphicsScene
   Q_OBJECT
   Q_ENUMS(ModeType)
   Q_PROPERTY(ModeType mode READ mode WRITE setMode)
+  Q_PROPERTY(int frames READ frames WRITE setFrames)
   Q_PROPERTY(double currentTime READ currentTime WRITE setCurrentTime)
   Q_PROPERTY(double startTime READ startTime WRITE setStartTime)
   Q_PROPERTY(double endTime READ endTime WRITE setEndTime)
@@ -70,6 +71,7 @@ public:
   void removeTrack(pqAnimationTrack* track);
 
   ModeType mode() const;
+  int frames() const;
   double currentTime() const;
   double startTime() const;
   double endTime() const;
@@ -80,6 +82,7 @@ public:
 
 public slots:
   void setMode(ModeType);
+  void setFrames(int);
   void setCurrentTime(double);
   void setStartTime(double);
   void setEndTime(double);
@@ -103,6 +106,7 @@ protected:
 private:
 
   ModeType Mode;
+  int    Frames;
   double CurrentTime;
   double StartTime;
   double EndTime;
