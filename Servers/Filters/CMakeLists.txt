@@ -289,7 +289,7 @@ CS_INITIALIZE_WRAP()
 INCLUDE_DIRECTORIES(${VTKCLIENTSERVER_INCLUDE_DIR})
 
 # Wrap PVFilters
-SET(KIT_WRAP_DEPS Parallel Hybrid Rendering VolumeRendering)
+SET(KIT_WRAP_DEPS Parallel Hybrid Rendering VolumeRendering Widgets)
 SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/Servers/Filters/Utilities")
 PV_WRAP_VTK_CS(PVFilters PVFILTERS "${KIT_WRAP_DEPS}")
 

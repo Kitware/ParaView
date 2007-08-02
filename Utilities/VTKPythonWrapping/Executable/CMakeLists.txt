@@ -49,20 +49,19 @@ ENDIF(CMAKE_SYSTEM_NAME MATCHES "AIX")
 
 IF(VTK_USE_CARBON)
   GET_TARGET_PROPERTY(pvpython_location pvpython${PV_EXE_SUFFIX} LOCATION)
+  GET_TARGET_PROPERTY(pvbatch_location pvbatch${PV_EXE_SUFFIX} LOCATION)
   FIND_PROGRAM(VTK_APPLE_RESOURCE Rez /Developer/Tools)
   IF(VTK_APPLE_RESOURCE)
     ADD_CUSTOM_COMMAND(
-      SOURCE pvpython${PV_EXE_SUFFIX}
-      COMMAND ${VTK_APPLE_RESOURCE}
-      ARGS Carbon.r -o ${pvpython_location}
+      TARGET pvpython${PV_EXE_SUFFIX} POST_BUILD
+      COMMAND ${VTK_APPLE_RESOURCE} Carbon.r -o ${pvpython_location}
       TARGET pvpython${PV_EXE_SUFFIX}
       )
     ADD_CUSTOM_COMMAND(
-      SOURCE pvbatch${PV_EXE_SUFFIX}
-      COMMAND ${VTK_APPLE_RESOURCE}
-      ARGS Carbon.r -o ${pvpython_location}
-      TARGET pvbatch${PV_EXE_SUFFIX}
+      TARGET pvbatch${PV_EXE_SUFFIX} POST_BUILD
+      COMMAND ${VTK_APPLE_RESOURCE} Carbon.r -o ${pvbatch_location}
       )
+
   ENDIF(VTK_APPLE_RESOURCE)
 ENDIF(VTK_USE_CARBON)
 
@@ -85,6 +84,16 @@ IF (APPLE)
   SET_TARGET_PROPERTIES(pvbatch${PV_EXE_SUFFIX} PROPERTIES LINK_FLAGS "-flat_namespace -undefined suppress -u _PyMac_Error")
 ENDIF (APPLE)
 
+IF(UNIX)
+  SET(PYTHON_MODULE_PREFIX "lib")
+ELSE(UNIX)
+  SET(PYTHON_MODULE_PREFIX "")
+ENDIF(UNIX)
+PYTHON_WRITE_MODULES_HEADER(${CMAKE_CURRENT_BINARY_DIR}/pvpythonmodules.h)
+IF(PY_STATIC_MODULES_LIST)
+  TARGET_LINK_LIBRARIES(vtkPVPythonInterpretor ${PY_STATIC_MODULES_LIST})
+ENDIF(PY_STATIC_MODULES_LIST)
+
 TARGET_LINK_LIBRARIES(vtkPVPythonInterpretor
   vtkCommon
   ${VTK_PYTHON_LIBRARIES}
@@ -99,7 +108,7 @@ SET(_PVPYTHON_LINK_LIBS
   vtkGraphics
   vtkImaging
   vtkPVPythonInterpretor
-  vtkPVServerManager
+#  vtkPVServerManager   # dont add this one here, because then cmake doesn't add the automatic dependencies of this lib (if linked static)
   ${VTK_PYTHON_LIBRARIES}
   ${PYTHON_UTIL_LIBRARY_LIB})
 

@@ -20,6 +20,8 @@
 #include "vtkPythonAppInitConfigure.h"
 #include "vtkWindows.h"
 
+#include "pvpythonmodules.h"
+
 #include <vtksys/SystemTools.hxx>
 
 #include <vtkstd/algorithm>
@@ -262,7 +264,7 @@ void vtkPVPythonInterpretor::SetMultithreadSupport(bool enable)
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.20");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.21");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
@@ -372,6 +374,9 @@ int vtkPVPythonInterpretor::PyMain(int argc, char** argv)
   // Set the program name, so that we can ask python to provide us
   // full path.
   Py_SetProgramName(argv[0]);
+
+  // initialize the statically linked modules
+  CMakeLoadAllPythonModules();
 
   // Initialize interpreter.
   Py_Initialize();

@@ -247,7 +247,7 @@ INCLUDE(${VTK_CMAKE_DIR}/vtkExportKit.cmake)
 VTK_EXPORT_KIT("${KIT}" "${KIT_UPCASE}" "${Kit_SRCS};${ServerManagerCS_SRCS};${ExtraParaViewServerManagerNonWrapped_SRCS}")
 SET(VTK_BINARY_DIR "${_VTK_BINARY_DIR}")
 
-# Wrap PVServerCommon
+# Wrap PVServerManager
 SET(KIT_WRAP_DEPS "")
 SET(VTK_KITS_DIR "${CMAKE_CURRENT_BINARY_DIR}/Utilities")
 PV_PRE_WRAP_VTK_CS("vtk${KIT}" "${KIT}" "${KIT_UPCASE}" "${KIT_WRAP_DEPS}")
@@ -262,7 +262,8 @@ ADD_LIBRARY(vtk${KIT}
 TARGET_LINK_LIBRARIES(vtk${KIT}
   vtkPVFiltersCS 
   vtkClientServer
-  ${KWCommon_LIBRARIES})
+  ${KWCommon_LIBRARIES}
+  vtkXdmfCS vtkXdmf)
 
 # Create Tcl wrappers for classes.
 IF (PARAVIEW_BUILD_GUI)
