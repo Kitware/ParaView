@@ -160,7 +160,8 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->Viewer->SetLockEndPoints(1);
   this->Viewer->SetShowColorFunctionInBackground(1);
   this->Viewer->SetShowColorFunctionOnLines(0);
-  this->Viewer->SetBackgroundColor(1.0, 1.0, 1.0);
+  QColor col = this->palette().color(QPalette::Window);
+  this->Viewer->SetBackgroundColor(col.redF(), col.greenF(), col.blueF());
   this->Viewer->SetLinesColor(0.0, 0.0, 0.0);
 
   this->Form->Listener->Connect(this->Viewer, vtkCommand::PickEvent,
