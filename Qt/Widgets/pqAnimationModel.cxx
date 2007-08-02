@@ -244,19 +244,19 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF& )
   double fraction = this->CurrentTime / (this->EndTime - this->StartTime);
   double pos = fraction * sr.width() + sr.left();
   QVector<QPointF> polyPoints;
-  polyPoints.append(QPointF(pos, rh));
-  polyPoints.append(QPointF(pos + 4, rh - 3));
-  polyPoints.append(QPointF(pos + 4, rh - 6));
-  polyPoints.append(QPointF(pos - 4, rh - 6));
-  polyPoints.append(QPointF(pos - 4, rh - 3));
+  polyPoints.append(QPointF(pos, rh-1));
+  polyPoints.append(QPointF(pos + 4, rh - 4));
+  polyPoints.append(QPointF(pos + 4, rh - 7));
+  polyPoints.append(QPointF(pos - 4, rh - 7));
+  polyPoints.append(QPointF(pos - 4, rh - 4));
   QPolygonF poly(polyPoints);
   painter->drawPolygon(poly);
   
   pen.setWidth(3);
   painter->setPen(pen);
 
-  QPointF pt1(pos, rh);
-  QPointF pt2(pos, sr.height() + sr.top());
+  QPointF pt1(pos, rh-1);
+  QPointF pt2(pos, sr.height() + sr.top()-1);
   painter->drawLine(pt1, pt2);
 
 
