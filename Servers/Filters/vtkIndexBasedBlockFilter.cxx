@@ -32,7 +32,7 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.3");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.4");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -108,6 +108,11 @@ int vtkIndexBasedBlockFilter::RequestData(vtkInformation*,
   vtkDoubleArray* points = 0; 
   vtkIdTypeArray* ijk = 0;
 
+  vtkIdTypeArray* originalIds = vtkIdTypeArray::New();
+  originalIds->SetName("vtkOriginalIndices");
+  originalIds->SetNumberOfComponents(1);
+  originalIds->SetNumberOfTuples(outFD->GetNumberOfTuples());
+
   vtkPointSet* psInput = vtkPointSet::SafeDownCast(input);
   vtkRectilinearGrid* rgInput = vtkRectilinearGrid::SafeDownCast(input);
   vtkImageData* idInput = vtkImageData::SafeDownCast(input);
@@ -116,6 +121,7 @@ int vtkIndexBasedBlockFilter::RequestData(vtkInformation*,
   vtkIdType inIndex, outIndex;
   for (inIndex=this->StartIndex, outIndex=0; inIndex <= this->EndIndex; ++inIndex, ++outIndex)
     {
+    originalIds->SetTupleValue(outIndex, &inIndex);
     outFD->SetTuple(outIndex, inIndex, inFD);
     if (this->FieldType == POINT_DATA_FIELD)
       {
@@ -154,11 +160,15 @@ int vtkIndexBasedBlockFilter::RequestData(vtkInformation*,
     outFD->AddArray(points);
     points->Delete();
     }
+
   if (ijk)
     {
     outFD->AddArray(ijk);
     ijk->Delete();
     }
+  outFD->AddArray(originalIds);
+  originalIds->Delete();
+
   output->SetFieldData(outFD);
   outFD->Delete();
   return 1;
