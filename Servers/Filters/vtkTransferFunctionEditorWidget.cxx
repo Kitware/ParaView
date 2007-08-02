@@ -24,7 +24,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkTransferFunctionEditorRepresentation.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.15");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.16");
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidget::vtkTransferFunctionEditorWidget()
@@ -45,6 +45,7 @@ vtkTransferFunctionEditorWidget::vtkTransferFunctionEditorWidget()
   this->OpacityMTime = 0;
   this->ColorMTime = 0;
   this->AllowInteriorElements = 1;
+  this->BorderWidth = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -259,6 +260,33 @@ void vtkTransferFunctionEditorWidget::OnChar()
   else if (!strcmp(keySym, "Right"))
     {
     this->MoveToNextElement();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorWidget::CreateDefaultRepresentation()
+{
+  vtkTransferFunctionEditorRepresentation *rep =
+    vtkTransferFunctionEditorRepresentation::SafeDownCast(this->WidgetRep);
+  if (rep)
+    {
+    rep->SetBorderWidth(this->BorderWidth);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorWidget::SetBorderWidth(int width)
+{
+  if (this->BorderWidth != width)
+    {
+    this->BorderWidth = width;
+    vtkTransferFunctionEditorRepresentation *rep =
+      vtkTransferFunctionEditorRepresentation::SafeDownCast(this->WidgetRep);
+    if (rep)
+      {
+      rep->SetBorderWidth(width);
+      }
+    this->Modified();
     }
 }
 

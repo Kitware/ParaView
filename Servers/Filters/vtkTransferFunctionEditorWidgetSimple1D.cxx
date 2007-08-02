@@ -29,7 +29,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.30");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.31");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -48,6 +48,7 @@ vtkTransferFunctionEditorWidgetSimple1D::vtkTransferFunctionEditorWidgetSimple1D
   this->LockEndPoints = 0;
   this->LeftClickEventPosition[0] = this->LeftClickEventPosition[1] = 0;
   this->LeftClickCount = 0;
+  this->BorderWidth = 8;
 
   this->CallbackMapper->SetCallbackMethod(
     vtkCommand::LeftButtonPressEvent,
@@ -119,6 +120,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::CreateDefaultRepresentation()
       {
       rep->SetColorLinesByScalar(0);
       }
+    this->Superclass::CreateDefaultRepresentation();
     }
 }
 
@@ -292,7 +294,10 @@ void vtkTransferFunctionEditorWidgetSimple1D::ClampToWholeRange(
              scalar));
   pos[0] = this->ComputePositionFromScalar(scalar, size[0]);
 
-  pos[1] = (pos[1] < 0 ? 0 : (pos[1] > size[1] ? size[1] : pos[1]));
+  pos[1] =
+    (pos[1] < this->BorderWidth ? this->BorderWidth :
+     (pos[1] > size[1] - this->BorderWidth ? size[1] - this->BorderWidth :
+      pos[1]));
 }
 
 //-------------------------------------------------------------------------
@@ -315,7 +320,8 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNewNode(double scalar)
   if (this->ModificationType != COLOR)
     {
     opacity = this->OpacityFunction->GetValue(scalar);
-    displayPos[1] = displaySize[1] * opacity;
+    displayPos[1] = (displaySize[1] - 2*this->BorderWidth) * opacity
+      + this->BorderWidth;
     }
   else
     {
@@ -830,10 +836,10 @@ void vtkTransferFunctionEditorWidgetSimple1D::RecomputeNodePositions(
 
 //----------------------------------------------------------------------------
 void vtkTransferFunctionEditorWidgetSimple1D::RecomputeNodePositions(
-  int oldSize[2], int newSize[2])
+  int oldSize[2], int newSize[2], int changeBorder, int oldWidth, int newWidth)
 {
   // recompute transfer function node positions based on a change
-  // in renderer size
+  // in renderer size or border width
   vtkTransferFunctionEditorRepresentationSimple1D *rep =
     reinterpret_cast<vtkTransferFunctionEditorRepresentationSimple1D*>
     (this->WidgetRep);
@@ -851,12 +857,39 @@ void vtkTransferFunctionEditorWidgetSimple1D::RecomputeNodePositions(
     {
     handle = rep->GetHandleRepresentation(i);
     handle->GetDisplayPosition(oldPos);
-    displayPctX = oldPos[0] / (double)(oldSize[0]);
-    displayPctY = oldPos[1] / (double)(oldSize[1]);
-    newPos[0] = displayPctX * newSize[0];
-    newPos[1] = displayPctY * newSize[1];
+    if (changeBorder)
+      {
+      displayPctX = (oldPos[0] - oldWidth) / (double)(oldSize[0] - 2*oldWidth);
+      displayPctY = (oldPos[1] - oldWidth) / (double)(oldSize[1] - 2*oldWidth);
+      newPos[0] = displayPctX * (newSize[0]-2*newWidth) + newWidth;
+      newPos[1] = displayPctY * (newSize[1]-2*newWidth) + newWidth;
+      }
+    else
+      {
+      displayPctX = oldPos[0] / (double)(oldSize[0]);
+      displayPctY = oldPos[1] / (double)(oldSize[1]);
+      newPos[0] = displayPctX * newSize[0];
+      newPos[1] = displayPctY * newSize[1];
+      }
+
     newPos[2] = oldPos[2];
     handle->SetDisplayPosition(newPos);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorWidgetSimple1D::SetBorderWidth(int width)
+{
+  int oldWidth = this->BorderWidth;
+  this->Superclass::SetBorderWidth(width);
+  int displaySize[2];
+  vtkTransferFunctionEditorRepresentationSimple1D *rep =
+    vtkTransferFunctionEditorRepresentationSimple1D::SafeDownCast(
+      this->WidgetRep);
+  if (oldWidth != this->BorderWidth && rep)
+    {
+    rep->GetDisplaySize(displaySize);
+    this->RecomputeNodePositions(displaySize, displaySize, 1, oldWidth, width);
     }
 }
 
@@ -896,7 +929,8 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddOpacityPoint(double x,
   double opacity, newScalar;
 
   rep->GetDisplaySize(windowSize);
-  opacity = y / (double)(windowSize[1]);
+  opacity =
+    (y - this->BorderWidth) / (double)(windowSize[1] - 2*this->BorderWidth);
   newScalar = this->ComputeScalar(x, windowSize[0]);
   
   this->OpacityFunction->AddPoint(newScalar, opacity);
@@ -1020,7 +1054,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::SetElementOpacity(
   rep->GetHandleDisplayPosition(idx, pos);
   int size[2];
   rep->GetDisplaySize(size);
-  pos[1] = opacity * size[1];
+  pos[1] = opacity * (size[1] - 2*this->BorderWidth) + this->BorderWidth;
   rep->SetHandleDisplayPosition(
     idx, pos, this->ComputeScalar(pos[0], size[0]));
 }

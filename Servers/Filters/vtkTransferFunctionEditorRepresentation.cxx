@@ -23,7 +23,7 @@
 #include "vtkTexture.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation, "1.11");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation, "1.12");
 
 vtkCxxSetObjectMacro(vtkTransferFunctionEditorRepresentation,
                      ColorFunction, vtkColorTransferFunction);
@@ -65,6 +65,8 @@ vtkTransferFunctionEditorRepresentation::vtkTransferFunctionEditorRepresentation
 
   this->VisibleScalarRange[0] = 1;
   this->VisibleScalarRange[1] = 0;
+
+  this->BorderWidth = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -147,20 +149,7 @@ void vtkTransferFunctionEditorRepresentation::SetDisplaySize(int x, int y)
 
     if (this->HistogramImage)
       {
-      this->HistogramImage->Initialize();
-      this->HistogramImage->SetDimensions(this->DisplaySize[0],
-                                          this->DisplaySize[1], 1);
-      this->HistogramImage->SetNumberOfScalarComponents(4);
-      this->HistogramImage->AllocateScalars();
-      vtkUnsignedCharArray *array = vtkUnsignedCharArray::SafeDownCast(
-        this->HistogramImage->GetPointData()->GetScalars());
-      if (array)
-        {
-        array->FillComponent(0, 0);
-        array->FillComponent(1, 0);
-        array->FillComponent(2, 0);
-        array->FillComponent(3, 0);
-        }
+      this->InitializeImage(this->HistogramImage);
       this->HistogramGeometry->Initialize();
       }
     if (this->BackgroundImage)
@@ -168,6 +157,44 @@ void vtkTransferFunctionEditorRepresentation::SetDisplaySize(int x, int y)
       this->BackgroundImage->Initialize();
       }
     this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentation::SetBorderWidth(int width)
+{
+  if (this->BorderWidth != width)
+    {
+    this->BorderWidth = width;
+    if (this->DisplaySize[0] > 0 && this->DisplaySize[1] > 0)
+      {
+      this->InitializeImage(this->HistogramImage);
+      }
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentation::InitializeImage(
+  vtkImageData *image)
+{
+  if (image)
+    {
+    image->Initialize();
+    image->SetDimensions(
+      this->DisplaySize[0] - 2*this->BorderWidth,
+      this->DisplaySize[1] - 2*this->BorderWidth, 1);
+    image->SetNumberOfScalarComponents(4);
+    image->AllocateScalars();
+    vtkUnsignedCharArray *array = vtkUnsignedCharArray::SafeDownCast(
+      image->GetPointData()->GetScalars());
+    if (array)
+      {
+      array->FillComponent(0, 0);
+      array->FillComponent(1, 0);
+      array->FillComponent(2, 0);
+      array->FillComponent(3, 0);
+      }
     }
 }
 

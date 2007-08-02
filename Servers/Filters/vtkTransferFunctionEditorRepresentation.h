@@ -132,6 +132,11 @@ public:
   // Set the lighting parameters for the transfer function editor elements.
   virtual void SetElementLighting(double, double, double, double) {}
 
+  // Description:
+  // Set the border width (in pixels) so the histogram and background images
+  // may be sized accordingly.
+  virtual void SetBorderWidth(int width);
+
 protected:
   vtkTransferFunctionEditorRepresentation();
   ~vtkTransferFunctionEditorRepresentation();
@@ -154,6 +159,10 @@ protected:
   int ShowColorFunctionInBackground;
   int ShowColorFunctionInHistogram;
   double VisibleScalarRange[2];
+  int BorderWidth;
+
+  void InitializeImage(vtkImageData *image);
+  void UpdateActorSize(vtkActor *actor);
 
 private:
   vtkTransferFunctionEditorRepresentation(const vtkTransferFunctionEditorRepresentation&); // Not implemented.

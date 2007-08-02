@@ -32,7 +32,7 @@
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.23");
+vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.24");
 vtkStandardNewMacro(vtkTransferFunctionViewer);
 
 //----------------------------------------------------------------------------
@@ -413,6 +413,15 @@ int* vtkTransferFunctionViewer::GetSize()
       }
     }
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionViewer::SetBorderWidth(int width)
+{
+  if (this->EditorWidget)
+    {
+    this->EditorWidget->SetBorderWidth(width);
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -15,10 +15,12 @@
 #include "vtkTransferFunctionEditorRepresentationSimple1D.h"
 
 #include "vtkActor.h"
+#include "vtkClipPolyData.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkCommand.h"
 #include "vtkDoubleArray.h"
 #include "vtkMath.h"
+#include "vtkPlane.h"
 #include "vtkPlaneSource.h"
 #include "vtkPointData.h"
 #include "vtkPointHandleRepresentationSphere.h"
@@ -35,7 +37,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.17");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.18");
 vtkStandardNewMacro(vtkTransferFunctionEditorRepresentationSimple1D);
 
 // The vtkHandleList is a PIMPLed list<T>.
@@ -108,10 +110,15 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
   // Add lines between the handles if there is more than 1.
   if (this->Handles->size() > 1)
     {
+    int minX = this->BorderWidth;
+    int maxX = this->DisplaySize[0] - this->BorderWidth;
+    int minY = this->BorderWidth;
+    int maxY = this->DisplaySize[1] - this->BorderWidth;
+
     vtkPlaneSource *plane = vtkPlaneSource::New();
-    plane->SetOrigin(0, 0, histDepth);
-    plane->SetPoint1(this->DisplaySize[0], 0, histDepth);
-    plane->SetPoint2(0, this->DisplaySize[1], histDepth);
+    plane->SetOrigin(minX, minY, histDepth);
+    plane->SetPoint1(maxX, minY, histDepth);
+    plane->SetPoint2(minX, maxY, histDepth);
     plane->SetCenter(this->DisplaySize[0]*0.5, this->DisplaySize[1]*0.5,
                      histDepth);
     plane->Update();
@@ -124,8 +131,8 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
     bkndScalars->SetNumberOfComponents(1);
     bkndScalars->SetNumberOfTuples(2*this->Handles->size()+4);
     vtkPoints *bkndPts = vtkPoints::New();
-    bkndPts->InsertNextPoint(0, 0, bkndDepth);
-    bkndPts->InsertNextPoint(0, this->DisplaySize[1], bkndDepth);
+    bkndPts->InsertNextPoint(minX, minY, bkndDepth);
+    bkndPts->InsertNextPoint(minX, maxY, bkndDepth);
     bkndScalars->SetValue(0, this->VisibleScalarRange[0]);
     bkndScalars->SetValue(1, this->VisibleScalarRange[0]);
     vtkIdType *bkndIds = new vtkIdType[4];
@@ -150,20 +157,29 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
     if (rep)
       {
       scalar = rep->GetScalar();
-      scalars->SetValue(0, scalar);
-      if (scalar > this->VisibleScalarRange[0] &&
-          scalar < this->VisibleScalarRange[1])
+      if (scalar < this->VisibleScalarRange[0] ||
+          scalar > this->VisibleScalarRange[1])
         {
-        bkndScalars->SetValue(2, scalar);
-        bkndScalars->SetValue(3, scalar);
-        bkndPts->InsertNextPoint(lastPos[0], 0, bkndDepth);
-        bkndPts->InsertNextPoint(lastPos[0], this->DisplaySize[1], bkndDepth);
-        bkndIds[2] = bi++;
-        bkndIds[3] = bi++;
-        this->BackgroundImage->InsertNextCell(VTK_QUAD, 4, bkndIds);
-        bkndIds[0] = bkndIds[3];
-        bkndIds[1] = bkndIds[2];
+        rep->VisibilityOff();
         }
+      else
+        {
+        rep->VisibilityOn();
+        if (scalar > this->VisibleScalarRange[0] &&
+            scalar < this->VisibleScalarRange[1])
+          {
+          bkndScalars->SetValue(2, scalar);
+          bkndScalars->SetValue(3, scalar);
+          bkndPts->InsertNextPoint(lastPos[0], minY, bkndDepth);
+          bkndPts->InsertNextPoint(lastPos[0], maxY, bkndDepth);
+          bkndIds[2] = bi++;
+          bkndIds[3] = bi++;
+          this->BackgroundImage->InsertNextCell(VTK_QUAD, 4, bkndIds);
+          bkndIds[0] = bkndIds[3];
+          bkndIds[1] = bkndIds[2];
+          }
+        }
+      scalars->SetValue(0, rep->GetScalar());
       }
     hiter++;
     vtkPoints *pts = vtkPoints::New();
@@ -180,20 +196,29 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
       if (rep)
         {
         scalar = rep->GetScalar();
-        scalars->SetValue(i, scalar);
-        if (scalar > this->VisibleScalarRange[0] &&
-            scalar < this->VisibleScalarRange[1])
+        if (scalar < this->VisibleScalarRange[0] ||
+            scalar > this->VisibleScalarRange[1])
           {
-          bkndIds[2] = bi++;
-          bkndIds[3] = bi++;
-          bkndScalars->SetValue(bkndIds[2], scalar);
-          bkndScalars->SetValue(bkndIds[3], scalar);
-          bkndPts->InsertNextPoint(pos[0], 0, bkndDepth);
-          bkndPts->InsertNextPoint(pos[0], this->DisplaySize[1], bkndDepth);
-          this->BackgroundImage->InsertNextCell(VTK_QUAD, 4, bkndIds);
-          bkndIds[0] = bkndIds[3];
-          bkndIds[1] = bkndIds[2];
+          rep->VisibilityOff();
           }
+        else
+          {
+          rep->VisibilityOn();
+          if (scalar > this->VisibleScalarRange[0] &&
+              scalar < this->VisibleScalarRange[1])
+            {
+            bkndIds[2] = bi++;
+            bkndIds[3] = bi++;
+            bkndScalars->SetValue(bkndIds[2], scalar);
+            bkndScalars->SetValue(bkndIds[3], scalar);
+            bkndPts->InsertNextPoint(pos[0], minY, bkndDepth);
+            bkndPts->InsertNextPoint(pos[0], maxY, bkndDepth);
+            this->BackgroundImage->InsertNextCell(VTK_QUAD, 4, bkndIds);
+            bkndIds[0] = bkndIds[3];
+            bkndIds[1] = bkndIds[2];
+            }
+          }
+        scalars->SetValue(i, scalar);
         }
       pos[2] = linesDepth;
       pts->InsertNextPoint(pos);
@@ -205,11 +230,30 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
     this->Lines->SetPoints(pts);
     this->Lines->GetPointData()->SetScalars(scalars);
 
+    // Clip the Lines so they don't run into the border.
+    // X minimum
+    vtkPlane *minXPlane = vtkPlane::New();
+    minXPlane->SetOrigin(minX, 0, 0);
+    minXPlane->SetNormal(1, 0, 0);
+
+    vtkClipPolyData *minXClip = vtkClipPolyData::New();
+    minXClip->SetInput(this->Lines);
+    minXClip->SetClipFunction(minXPlane);
+    
+    // X maximum
+    vtkPlane *maxXPlane = vtkPlane::New();
+    maxXPlane->SetOrigin(maxX, 0, 0);
+    maxXPlane->SetNormal(-1, 0, 0);
+
+    vtkClipPolyData *maxXClip = vtkClipPolyData::New();
+    maxXClip->SetInputConnection(minXClip->GetOutputPort());
+    maxXClip->SetClipFunction(maxXPlane);
+    this->LinesMapper->SetInputConnection(maxXClip->GetOutputPort());
+
     bkndIds[2] = bi;
     bkndIds[3] = bi+1;
-    bkndPts->InsertNextPoint(this->DisplaySize[0], 0, bkndDepth);
-    bkndPts->InsertNextPoint(this->DisplaySize[0], this->DisplaySize[1],
-                             bkndDepth);
+    bkndPts->InsertNextPoint(maxX, minY, bkndDepth);
+    bkndPts->InsertNextPoint(maxX, maxY, bkndDepth);
     bkndScalars->SetValue(bkndIds[2], this->VisibleScalarRange[1]);
     bkndScalars->SetValue(bkndIds[3], this->VisibleScalarRange[1]);
     this->BackgroundImage->InsertNextCell(VTK_QUAD, 4, bkndIds);
@@ -222,6 +266,10 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
     bkndScalars->Delete();
     delete [] ids;
     delete [] bkndIds;
+    minXPlane->Delete();
+    minXClip->Delete();
+    maxXPlane->Delete();
+    maxXClip->Delete();
     }
 }
 

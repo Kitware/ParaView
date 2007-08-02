@@ -148,6 +148,16 @@ public:
   // Update this widget based on changes to the transfer functions.
   virtual void UpdateFromTransferFunctions() {}
 
+  // Description:
+  // Create a default representation for this widget,
+  // vtkTransferFunctionEditorRepresentationSimple1D in this case.
+  virtual void CreateDefaultRepresentation();
+
+  // Description:
+  // Set the width (in pixels) of the border around the transfer function
+  // editor.
+  virtual void SetBorderWidth(int width);
+
 protected:
   vtkTransferFunctionEditorWidget();
   ~vtkTransferFunctionEditorWidget();
@@ -162,6 +172,7 @@ protected:
   unsigned long ColorMTime;
   unsigned long OpacityMTime;
   int AllowInteriorElements;
+  int BorderWidth;
 
   virtual void UpdateTransferFunctionMTime();
 

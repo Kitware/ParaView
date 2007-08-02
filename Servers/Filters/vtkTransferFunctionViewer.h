@@ -80,6 +80,11 @@ public:
   int* GetSize();
 
   // Description:
+  // Set the width (in pixels) of the border around the transfer function
+  // editor.
+  void SetBorderWidth(int width);
+  
+  // Description:
   // Render the transfer function editor.
   void Render();
 

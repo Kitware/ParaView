@@ -98,6 +98,11 @@ public:
   // and/or be deleted. By default moving and deleting are allowed.
   vtkSetMacro(LockEndPoints, int);
 
+  // Description:
+  // Set the width (in pixels) of the border around the transfer function
+  // editor.
+  virtual void SetBorderWidth(int width);
+
 protected:
   vtkTransferFunctionEditorWidgetSimple1D();
   ~vtkTransferFunctionEditorWidgetSimple1D();
@@ -148,7 +153,9 @@ protected:
     unsigned int currentHandleNumber);
 
   void RecomputeNodePositions(double oldRange[2], double newRange[2]);
-  void RecomputeNodePositions(int oldSize[2], int newSize[2]);
+  void RecomputeNodePositions(int oldSize[2], int newSize[2],
+                              int changeBorder = 0,
+                              int oldWidth = 0, int newWidth = 0);
 
   void RemoveNode(unsigned int id);
 
