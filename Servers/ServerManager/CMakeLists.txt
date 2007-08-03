@@ -218,6 +218,8 @@ INCLUDE_DIRECTORIES(
   ${ParaView_SOURCE_DIR}/Servers/Filters
   ${ParaView_SOURCE_DIR}/Servers/Common
   ${ParaView_SOURCE_DIR}/Servers/ServerManager
+  ${ParaView_BINARY_DIR}/Servers/Common
+  ${ParaView_BINARY_DIR}/Servers/Filters
   ${ParaView_BINARY_DIR}/Servers/ServerManager
   ${ParaView_BINARY_DIR}/Servers/Common
   ${ParaView_BINARY_DIR}/Servers/Filters
