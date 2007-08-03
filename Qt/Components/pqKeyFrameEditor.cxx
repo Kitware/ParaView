@@ -262,14 +262,11 @@ public:
       }
     return item;
     }
-  QStandardItem* newCameraItem(int row)
+  QStandardItem* newCameraItem(int)
     {
     QStandardItem* item = NULL;
-    int count = this->Model.rowCount();
-    if(count != row || row == 0)
-      {
-      item = new pqCameraKeyFrameItem();
-      }
+    // TODO make good defaults
+    item = new pqCameraKeyFrameItem();
     return item;
     }
   QStandardItem* newValueItem(int row)
