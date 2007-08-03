@@ -279,6 +279,17 @@ def _makeUpdateCameraMethod(rv):
     def UpdateCamera(obj, string):
         rvref().SynchronizeCameraProperties()
     return UpdateCamera
+
+class Property(object):
+    def __init__(self, smproperty):
+        try:
+            if not smproperty.IsA("vtkSMProperty"):
+                raise exceptions.TypeError, \
+                      "Unexcepted argument, expected a vtkSMProperty"
+            self.SMProperty = smproperty
+        except:
+            raise exceptions.TypeError, \
+                  "Unexcepted argument, expected a vtkSMProperty"
         
 class DataInformation(object):
     def __init__(self, dataInformation, proxy, idx):
@@ -293,7 +304,7 @@ class DataInformation(object):
     def GetDataSetType(self):
         self.Update()
         if not self.DataInformation:
-            raise exception.RuntimeError, "No data information is available"
+            raise exceptions.RuntimeError, "No data information is available"
         if self.DataInformation.GetCompositeDataSetType() > -1:
             return self.DataInformation.GetCompositeDataSetType()
         return self.DataInformation.GetDataSetType()
@@ -619,6 +630,12 @@ class Connection(object):
             return True
         return False
 
+    def GetNumberOfDataPartitions(self):
+        """Returns the number of partitions on the data server for this
+           connection"""
+        pm = vtkProcessModule.GetProcessModule()
+        return pm.GetNumberOfPartitions(self.ID);
+
 
 # Users can set the active connection which will be used by API
 # to create proxies etc when no connection argument is passed.
@@ -654,6 +671,9 @@ def connect_ds_rs(ds_host, ds_port, rs_host, rs_port):
 def connect_self():
     """Creates a new self connection."""
     pm =  vtkProcessModule.GetProcessModule()
+    pmOptions = pm.GetOptions()
+    if pmOptions.GetProcessType() == 0x40: # PVBATCH
+        return Connection(vtkProcessModuleConnectionManager.GetRootServerConnectionID())        
     cid = pm.ConnectToSelf()
     if not cid:
         return None
@@ -744,13 +764,16 @@ def CreateRenderView(connection=None):
     if not connection:
         connection = ActiveConnection
     if not connection:
-        raise exception.RuntimeError, "Cannot create render window without connection."
+        raise exceptions.RuntimeError, "Cannot create render window without connection."
     pxm = ProxyManager()
     proxy_xml_name = None
     if connection.IsRemote():
         proxy_xml_name = "IceTDesktopRenderView"
     else:
-        proxy_xml_name = "RenderView"
+        if connection.GetNumberOfDataPartitions() > 1:
+            proxy_xml_name = "IceTCompositeView"
+        else:
+            proxy_xml_name = "RenderView"
     ren_module = CreateProxy("newviews", proxy_xml_name, "view_modules", None, connection)
     if not ren_module:
         return None
