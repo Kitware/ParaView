@@ -42,7 +42,7 @@
 #include "vtkAllToNRedistributePolyData.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.16");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.17");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -58,8 +58,7 @@ vtkMPIMoveData::vtkMPIMoveData()
 
   this->SetController(vtkMultiProcessController::GetGlobalController());
 
-  this->MoveMode = 0;/*vtkMPIMoveData::PASS_THROUGH;*/
-  this->DefineCollectAsClone = 0;
+  this->MoveMode = vtkMPIMoveData::PASS_THROUGH;
   // This tells which server/client this object is on.
   this->Server = -1;
 
@@ -227,12 +226,6 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
   this->UpdateNumberOfPieces = outInfo->Get(
     vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
 
-  // A hack to implement an onld API.
-  if (this->DefineCollectAsClone && this->MoveMode == vtkMPIMoveData::COLLECT)
-    {
-    this->MoveMode = vtkMPIMoveData::CLONE;
-    }
-
   // This case deals with everything running as one MPI group
   // Client, Data and render server are all the same program.
   // This covers single process mode too, although this filter 
@@ -265,7 +258,7 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
   // PassThrough with no RenderServer. (Distributed rendering on data server).
   // Data server copy input to output. 
   // Render server and client will not have an input.
-  if (this->MoveMode == 0/*vtkMPIMoveData::PASS_THROUGH*/ && 
+  if (this->MoveMode == vtkMPIMoveData::PASS_THROUGH && 
       this->MPIMToNSocketConnection == 0)
     {
     if (input)
@@ -278,10 +271,10 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
   // Passthrough and RenderServer (Distributed rendering on render server).
   // Data server MtoN
   // Move data from N data server processes to N render server processes.
-  if (this->MoveMode == 0/*vtkMPIMoveData::PASS_THROUGH*/ && 
+  if (this->MoveMode == vtkMPIMoveData::PASS_THROUGH && 
       this->MPIMToNSocketConnection)
     {
-    if (this->Server == 1/*vtkMPIMoveData::DATA_SERVER*/)
+    if (this->Server == vtkMPIMoveData::DATA_SERVER)
       {
       this->DataServerAllToN(input,output, 
                       this->MPIMToNSocketConnection->GetNumberOfConnections());
@@ -289,7 +282,7 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
       output->Initialize();
       return 1;
       }
-    if (this->Server == 2/*vtkMPIMoveData::RENDER_SERVER*/)
+    if (this->Server == vtkMPIMoveData::RENDER_SERVER)
       {
       this->RenderServerReceiveFromDataServer(output);
       return 1;
@@ -301,16 +294,16 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
   // Duplicate with no RenderServer.(Tile rendering on data server and client).
   // GatherAll on data server.
   // Data server process 0 sends data to client.
-  if (this->MoveMode == 2/*vtkMPIMoveData::DUPLICATE*/ && 
+  if (this->MoveMode == vtkMPIMoveData::CLONE && 
       this->MPIMToNSocketConnection ==0)
     {
-    if (this->Server == 1/*vtkMPIMoveData::DATA_SERVER*/)
+    if (this->Server == vtkMPIMoveData::DATA_SERVER)
       {
       this->DataServerGatherAll(input, output);
       this->DataServerSendToClient(output);
       return 1;
       }
-    if (this->Server == 0/*vtkMPIMoveData::CLIENT*/)
+    if (this->Server == vtkMPIMoveData::CLIENT)
       {
       this->ClientReceiveFromDataServer(output);
       return 1;
@@ -322,22 +315,22 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
   // Data server process 0 sends to client
   // Data server process 0 sends to render server 0
   // Render server process 0 broad casts to all render server processes.
-  if (this->MoveMode == 2/*vtkMPIMoveData::DUPLICATE*/ && 
+  if (this->MoveMode == vtkMPIMoveData::CLONE && 
       this->MPIMToNSocketConnection)
     {
-    if (this->Server == 1/*vtkMPIMoveData::DATA_SERVER*/)
+    if (this->Server == vtkMPIMoveData::DATA_SERVER)
       {
       this->DataServerGatherToZero(input, output);
       this->DataServerSendToClient(output);
       this->DataServerZeroSendToRenderServerZero(output);
       return 1;
       }
-    if (this->Server == 0/*vtkMPIMoveData::CLIENT*/)
+    if (this->Server == vtkMPIMoveData::CLIENT)
       {
       this->ClientReceiveFromDataServer(output);
       return 1;
       }
-    if (this->Server == 2/*vtkMPIMoveData::RENDER_SERVER*/)
+    if (this->Server == vtkMPIMoveData::RENDER_SERVER)
       {
       this->RenderServerZeroReceiveFromDataServerZero(output);
       this->RenderServerZeroBroadcast(output);
@@ -347,15 +340,15 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
   // Collect and data server or render server (client rendering).
   // GatherToZero on data server.
   // Data server process 0 sends data to client.
-  if (this->MoveMode == 1/*vtkMPIMoveData::COLLECT*/)
+  if (this->MoveMode == vtkMPIMoveData::COLLECT)
     {
-    if (this->Server == 1/*vtkMPIMoveData::DATA_SERVER*/)
+    if (this->Server == vtkMPIMoveData::DATA_SERVER)
       {
       this->DataServerGatherToZero(input, output);
       this->DataServerSendToClient(output);
       return 1;
       }
-    if (this->Server == 0/*vtkMPIMoveData::CLIENT*/)
+    if (this->Server == vtkMPIMoveData::CLIENT)
       {
       this->ClientReceiveFromDataServer(output);
       return 1;
@@ -494,6 +487,8 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataSet* input,
     return;
     }
 
+    vtkTimerLog::MarkStartEvent("Dataserver gathering to 0");
+
 #ifdef VTK_USE_MPI
   int idx;
   int myId= this->Controller->GetLocalProcessId();
@@ -555,6 +550,8 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataSet* input,
   delete [] inBuffer;
   inBuffer = NULL;
 #endif
+
+  vtkTimerLog::MarkEndEvent("Dataserver gathering to 0");
 }
 
 //-----------------------------------------------------------------------------
@@ -684,6 +681,8 @@ void vtkMPIMoveData::DataServerSendToClient(vtkDataSet* output)
 
   if (myId == 0)
     {
+    vtkTimerLog::MarkStartEvent("Dataserver sending to client");
+
     vtkSmartPointer<vtkDataSet> tosend = output;
     if (this->DeliverOutlineToClient)
       {
@@ -715,6 +714,7 @@ void vtkMPIMoveData::DataServerSendToClient(vtkDataSet* output)
     this->ClientDataServerSocketController->Send(this->Buffers, 
                                      this->BufferTotalLength, 1, 23492);
     this->ClearBuffer();
+    vtkTimerLog::MarkEndEvent("Dataserver sending to client");
     }
 }
 
@@ -957,8 +957,6 @@ void vtkMPIMoveData::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "NumberOfBuffers: " << this->NumberOfBuffers << endl;
-  os << indent << "DefineCollectAsClone: " 
-     << this->DefineCollectAsClone << endl;
   os << indent << "Server: " << this->Server << endl;
   os << indent << "MoveMode: " << this->MoveMode << endl;
   os << indent << "DeliverOutlineToClient : " 

@@ -69,14 +69,6 @@ public:
   vtkSetClampMacro(MoveMode, int, vtkMPIMoveData::PASS_THROUGH, vtkMPIMoveData::CLONE);
 
   // Description:
-  // The old classes cloned when mode was collect.  It is easier (and cleaner)
-  // to support this than change the part display superclasses method
-  // "SetCollectionDecision".
-  vtkSetMacro(DefineCollectAsClone,int);
-  vtkGetMacro(DefineCollectAsClone,int);
-  vtkBooleanMacro(DefineCollectAsClone,int);
-
-  // Description:
   // Controls the output type. This is required because processes receiving
   // data cannot know their output type in RequestDataObject without
   // communicating with other processes. Since communicating with other
@@ -151,8 +143,6 @@ protected:
 
   int MoveMode;
   int Server;
-
-  int DefineCollectAsClone;
 
 //BTX
   enum Servers {
