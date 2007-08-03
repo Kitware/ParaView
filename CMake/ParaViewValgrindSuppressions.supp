@@ -857,6 +857,60 @@
    Memcheck:Cond
    fun:PyObject_Free
    obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalFrame
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
    fun:PyEval_EvalFrame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
@@ -3514,6 +3568,42 @@
    fun:PyObject_Free
    obj:/usr/bin/python2.4
    obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   obj:/usr/bin/python2.4
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   obj:/usr/bin/python2.4
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
    fun:PyDict_SetItem
    fun:_PyModule_Clear
    fun:PyImport_Cleanup
@@ -5581,22 +5671,6 @@
    fun:_ZN15QX11PaintEngine20updateClipRegion_devERK7QRegionN2Qt13ClipOperationE
    fun:_ZN15QX11PaintEngine11updateStateERK17QPaintEngineState
    fun:_ZN15QPainterPrivate11updateStateEP13QPainterState
-   fun:_ZN8QPainter10drawPixmapERK6QRectFRK7QPixmapS2_
-   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZN12pqTreeWidgetC1EP7QWidget
-   fun:_ZN27Ui_pqProxyInformationWidget7setupUiEP7QWidget
-   fun:_ZN24pqProxyInformationWidgetC1EP7QWidget
-   fun:_ZN16pqProxyTabWidgetC1EP7QWidget
-   fun:_ZN16pqMainWindowCore19setupProxyTabWidgetEP11QDockWidget
-   fun:_ZN10MainWindowC1Ev
-   fun:_ZN22ProcessModuleGUIHelper16CreateMainWindowEv
-   fun:_ZN24pqProcessModuleGUIHelper21InitializeApplicationEiPPc
-   fun:_ZN24pqProcessModuleGUIHelper11RunGUIStartEiPPcii
-   fun:_ZN16vtkProcessModule11StartClientEiPPc
-   fun:_ZN16vtkProcessModule5StartEiPPc
-   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
-   fun:_ZN6pqMain3RunER12QApplicationP24pqProcessModuleGUIHelper
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -5610,22 +5684,6 @@
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN15QX11PaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN8QPainter9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
-   fun:_Z24qt_plastique_draw_handleP8QPainterPK12QStyleOptionRK5QRectN2Qt11OrientationEPK7QWidget
-   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_Z8paintSepP8QPainterP7QWidgetRK5QRectN2Qt11OrientationEb
-   fun:_ZNK19QDockAreaLayoutInfo15paintSeparatorsEP8QPainterP7QWidgetRK7QRegionRK6QPoint
-   fun:_ZNK17QDockWidgetLayout15paintSeparatorsEP8QPainterP7QWidgetRK7QRegionRK6QPoint
-   fun:_ZN11QMainWindow5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
-   fun:_Z19qt_syncBackingStoreP7QWidget
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN6QFrame5eventEP6QEvent
-   fun:_ZN6QLabel5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
 }
 {
    <insert a suppression name here>
@@ -5972,24 +6030,6 @@
    fun:_ZN7QVectorIP10QEventLoopE6resizeEi
    fun:_ZN10QEventLoop4execE6QFlagsINS_17ProcessEventsFlagEE
    fun:_ZN7QDialog4execEv
-   fun:_ZN16pqMainWindowCore20makeServerConnectionEv
-   fun:_ZN16pqMainWindowCore15onServerConnectEv
-   fun:_ZN16pqMainWindowCore11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iiPPv
-   fun:_ZN7QAction9triggeredEb
-   fun:_ZN7QAction8activateENS_11ActionEventE
-   fun:_ZN12QMenuPrivate14activateActionEP7QActionNS0_11ActionEventE
-   fun:_ZN5QMenu13keyPressEventEP9QKeyEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN5QMenu5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_ZN16QCoreApplication9sendEventEP7QObjectP6QEvent
-   fun:_ZN29pqAbstractActivateEventPlayer9playEventEP7QObjectRK7QStringS4_Rb
-   fun:_ZN13pqEventPlayer9playEventERK7QStringS2_S2_Rb
-   fun:_ZN17pqEventDispatcher13playNextEventEv
-   fun:_ZN17pqEventDispatcher11qt_metacallEN11QMetaObject4CallEiPPv
 }
 {
    <insert a suppression name here>
@@ -6154,23 +6194,6 @@
    fun:_ZN25vtkOpenGLExtensionManager20ReadOpenGLExtensionsEv
    fun:_ZN25vtkOpenGLExtensionManager6UpdateEv
    fun:_ZN25vtkOpenGLExtensionManager18ExtensionSupportedEPKc
-   fun:_ZN21vtkOpenGLRenderWindow29CreateHardwareOffScreenWindowEii
-   fun:_ZN22vtkXOpenGLRenderWindow21CreateOffScreenWindowEii
-   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
-   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
-   fun:_ZN15vtkRenderWindow14DoStereoRenderEv
-   fun:_ZN15vtkRenderWindow10DoFDRenderEv
-   fun:_ZN15vtkRenderWindow10DoAARenderEv
-   fun:_ZN15vtkRenderWindow6RenderEv
-   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
-   fun:_ZN14vtkSMViewProxy11StillRenderEv
-   fun:_ZN20vtkSMRenderViewProxy13CaptureWindowEi
-   fun:_ZN12pqRenderView12captureImageEi
-   fun:_ZN16pqMainWindowCore11compareViewERK7QStringdRSoS2_
-   fun:_ZN10MainWindow11compareViewERK7QStringdRSoS2_
-   fun:_ZN22ProcessModuleGUIHelper11compareViewERK7QStringdRSoS2_
-   fun:_ZN17pqCoreTestUtility13testSucceededEv
 }
 {
    <insert a suppression name here>
@@ -6221,15 +6244,6 @@
    fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
    fun:_ZN14vtkSMViewProxy11StillRenderEv
    fun:_ZN20vtkSMRenderViewProxy13CaptureWindowEi
-   fun:_ZN12pqRenderView12captureImageEi
-   fun:_ZN16pqMainWindowCore11compareViewERK7QStringdRSoS2_
-   fun:_ZN10MainWindow11compareViewERK7QStringdRSoS2_
-   fun:_ZN22ProcessModuleGUIHelper11compareViewERK7QStringdRSoS2_
-   fun:_ZN17pqCoreTestUtility13testSucceededEv
-   fun:_ZN13pqTestUtility11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN17pqCoreTestUtility11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
 }
 {
    <insert a suppression name here>
@@ -6289,12 +6303,6 @@
    fun:_ZN16QLineEditPrivate12finishChangeEibb
    fun:_ZN16QLineEditPrivate7setTextERK7QStringib
    fun:_ZN9QLineEdit7setTextERK7QString
-   fun:_ZN9QLineEdit11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZNK13QMetaProperty5writeEP7QObjectRK8QVariant
-   fun:_ZN7QObject11setPropertyEPKcRK8QVariant
-   fun:_ZN25pqPropertyLinksConnection23smLinkedPropertyChangedEv
-   fun:_ZN15pqPropertyLinks15addPropertyLinkEP7QObjectPKcS3_P10vtkSMProxyP13vtkSMPropertyi
-   fun:_ZN16pqAnimationPanel20onActiveSceneChangedEP16pqAnimationScene
 }
 {
    <insert a suppression name here>
@@ -6347,12 +6355,6 @@
    fun:_ZN6QFrame5eventEP6QEvent
    fun:_ZN19QAbstractScrollArea13viewportEventEP6QEvent
    fun:_ZN*View13viewportEventEP6QEvent
-   fun:_ZN25QAbstractScrollAreaFilter11eventFilterEP7QObjectP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
 }
 {
    <insert a suppression name here>
@@ -6507,24 +6509,7 @@
    fun:XRenderChangePicture
    fun:_ZN15QX11PaintEngine3endEv
    fun:_ZN8QPainter3endEv
-   fun:_ZN8QPainterD2Ev
-   fun:_ZN*10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN15QAbstractButton5eventEP6QEvent
-   fun:_ZN11QToolButton5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN8QPainterD*Ev
 }
 {
    <insert a suppression name here>
@@ -6882,13 +6867,6 @@
    fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
    fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
    fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
-   fun:_ZN23pqObjectInspectorDriver21representationChangedEP20pqDataRepresentationP6pqView
-   fun:_ZN23pqObjectInspectorDriver15checkForDisplayEv
-   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN7QObject5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_ZN16QCoreApplication16sendPostedEventsEP7QObjecti
 }
 {
    <insert a suppression name here>
@@ -6912,7 +6890,6 @@
    fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
    fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
    fun:_ZN12QApplicationC1ERiPPci
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -6936,8 +6913,8 @@
    fun:XRenderFreePicture
    fun:_ZN7QWidget7destroyEbb
    fun:_ZN7QWidgetD2Ev
-   fun:_ZN15QAbstractButtonD2Ev
-   fun:_ZN9QCheckBoxD0Ev
+   fun:_ZN*D2Ev
+   fun:_ZN*D0Ev
    fun:_ZN14QObjectPrivate14deleteChildrenEv
    fun:_ZN7QWidgetD2Ev
    fun:_ZN9QGroupBoxD0Ev
@@ -6995,22 +6972,6 @@
    fun:_ZN15QX11PaintEngine9updatePenERK4QPen
    fun:_ZN15QX11PaintEngine11updateStateERK17QPaintEngineState
    fun:_ZN15QPainterPrivate11updateStateEP13QPainterState
-   fun:_ZN8QPainter9drawRectsEPK5QRecti
-   fun:_ZN8QPainter8fillRectERK5QRectRK6QBrush
-   fun:_ZNK15QPlastiqueStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZNK12QCommonStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZNK13QWindowsStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZNK15QPlastiqueStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZN12QProgressBar10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN12QProgressBar5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
 }
 {
    <insert a suppression name here>
@@ -7246,18 +7207,6 @@
    fun:_ZN7QWidget9setParentEPS_6QFlagsIN2Qt10WindowTypeEE
    fun:_ZN14QWidgetPrivate4initEP7QWidget6QFlagsIN2Qt10WindowTypeEE
    fun:_ZN7QWidgetC2ER14QWidgetPrivatePS_6QFlagsIN2Qt10WindowTypeEE
-   fun:_ZN9QGroupBoxC1EP7QWidget
-   fun:_ZN27Ui_DisplayProxyEditorWidget7setupUiEP7QWidget
-   fun:_ZN21pqDefaultDisplayPanelC1EP16pqRepresentationP7QWidget
-   fun:_ZN26pqDisplayProxyEditorWidget11updatePanelEv
-   fun:_ZN26pqDisplayProxyEditorWidget13setOutputPortEP12pqOutputPort
-   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
-   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
-   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
-   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
-   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
 }
 {
    <insert a suppression name here>
@@ -7329,35 +7278,6 @@
    fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
    fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
    fun:_Z19timerSourceDispatchP8_GSourcePFiPvES1_
-}
-{
-   <insert a suppression name here>
-   Memcheck:Param
-   write(buf)
-   fun:__write_nocancel
-   fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libXrender.so.1.3.0
-   fun:XRenderSetPictureClipRectangles
-   fun:_ZN15QX11PaintEngine9updatePenERK4QPen
-   fun:_ZN15QX11PaintEngine11updateStateERK17QPaintEngineState
-   fun:_ZN15QPainterPrivate11updateStateEP13QPainterState
-   fun:_ZN8QPainter4saveEv
-   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZN10QTabWidget10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN10QTabWidget5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
 }
 {
    <insert a suppression name here>
@@ -7481,20 +7401,6 @@
    fun:XDrawLine
    fun:_ZN15QX11PaintEngine9drawLinesEPK5QLinei
    fun:_ZN8QPainter9drawLinesEPK5QLinei
-   fun:_Z28qt_plastique_drawShadedPanelP8QPainterPK12QStyleOptionbPK7QWidget
-   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZNK12QCommonStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
-   fun:_ZNK13QWindowsStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
-   fun:_ZNK15QPlastiqueStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
-   fun:_ZN11QToolButton10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN15QAbstractButton5eventEP6QEvent
-   fun:_ZN11QToolButton5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
 }
 {
    <insert a suppression name here>
@@ -7867,34 +7773,6 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libGL.so.1.2
-   fun:__glXGetClientExtensions
-   fun:glXGetClientString
-   fun:_ZN25vtkOpenGLExtensionManager20ReadOpenGLExtensionsEv
-   fun:_ZN25vtkOpenGLExtensionManager6UpdateEv
-   fun:_ZN25vtkOpenGLExtensionManager18ExtensionSupportedEPKc
-   fun:_ZN21vtkOpenGLRenderWindow29CreateHardwareOffScreenWindowEii
-   fun:_ZN22vtkXOpenGLRenderWindow21CreateOffScreenWindowEii
-   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
-   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
-   fun:_ZN15vtkRenderWindow14DoStereoRenderEv
-   fun:_ZN15vtkRenderWindow10DoFDRenderEv
-   fun:_ZN15vtkRenderWindow10DoAARenderEv
-   fun:_ZN15vtkRenderWindow6RenderEv
-   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_ZN24vtkParallelRenderManager9RenderRMIEv
-   fun:_Z9RenderRMIPvS_ii
-   fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
-   fun:_ZN25vtkMultiProcessController11ProcessRMIsEii
-   fun:_ZN19vtkRemoteConnection20ProcessCommunicationEv
-   fun:_ZN33vtkProcessModuleConnectionManager18MonitorConnectionsEm
-   fun:_ZN16vtkProcessModule11StartServerEm
-   fun:_ZN16vtkProcessModule5StartEiPPc
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
    fun:__glXGetStringFromServer
    fun:__glXInitialize
    fun:glXQueryVersion
@@ -8012,25 +7890,6 @@
    obj:/usr/lib/libX11.so.6.2.0
    fun:_XSetClipRectangles
    fun:XSetClipRectangles
-   fun:_ZN15QX11PaintEngine20updateClipRegion_devERK7QRegionN2Qt13ClipOperationE
-   fun:_ZN15QX11PaintEngine11updateStateERK17QPaintEngineState
-   fun:_ZN15QPainterPrivate11updateStateEP13QPainterState
-   fun:_ZN8QPainter10drawPixmapERK6QRectFRK7QPixmapS2_
-   fun:_Z26qt_plastique_draw_gradientP8QPainterRK5QRectRK6QColorS6_
-   fun:_Z28qt_plastique_drawShadedPanelP8QPainterPK12QStyleOptionbPK7QWidget
-   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZNK12QCommonStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
-   fun:_ZNK13QWindowsStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
-   fun:_ZNK15QPlastiqueStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
-   fun:_ZN11QToolButton10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN15QAbstractButton5eventEP6QEvent
-   fun:_ZN11QToolButton5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
 }
 {
    <insert a suppression name here>
@@ -8049,17 +7908,6 @@
    fun:_ZN14QWidgetPrivate24setUpdatesEnabled_helperEb
    fun:_ZN14QWidgetPrivate24setUpdatesEnabled_helperEb
    fun:_ZN14QWidgetPrivate24setUpdatesEnabled_helperEb
-   fun:_ZN7QWidget17setUpdatesEnabledEb
-   fun:_ZN14QStackedLayout15setCurrentIndexEi
-   fun:_ZN14QStackedWidget15setCurrentIndexEi
-   fun:_ZN17QTabWidgetPrivate10_q_showTabEi
-   fun:_ZN10QTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
-   fun:_ZN7QTabBar14currentChangedEi
-   fun:_ZN7QTabBar15setCurrentIndexEi
-   fun:_ZN10QTabWidget15setCurrentIndexEi
 }
 {
    <insert a suppression name here>
@@ -8152,35 +8000,6 @@
    fun:__write_nocancel
    fun:_X11TransWrite
    obj:/usr/lib/libX11.so.6.2.0
-   fun:XDrawLine
-   fun:_ZN15QX11PaintEngine9drawLinesEPK5QLinei
-   fun:_ZN8QPainter9drawLinesEPK5QLinei
-   fun:_Z28qt_plastique_drawShadedPanelP8QPainterPK12QStyleOptionbPK7QWidget
-   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZNK12QCommonStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
-   fun:_ZNK13QWindowsStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
-   fun:_ZNK15QPlastiqueStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
-   fun:_ZN11QToolButton10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN15QAbstractButton5eventEP6QEvent
-   fun:_ZN11QToolButton5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-}
-{
-   <insert a suppression name here>
-   Memcheck:Param
-   write(buf)
-   fun:__write_nocancel
-   fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
    fun:XSetWindowBackgroundPixmap
    fun:_ZN14QWidgetPrivate8show_sysEv
    fun:_ZN14QWidgetPrivate11show_helperEv
@@ -8231,35 +8050,6 @@
    fun:_ZN16pqMainWindowCore14onEditSettingsEv
    fun:_ZN16pqMainWindowCore11qt_metacallEN11QMetaObject4CallEiPPv
    fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-}
-{
-   <insert a suppression name here>
-   Memcheck:Param
-   write(buf)
-   fun:__write_nocancel
-   fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libXrender.so.1.3.0
-   fun:XRenderSetPictureClipRectangles
-   fun:_ZN15QX11PaintEngine9updatePenERK4QPen
-   fun:_ZN15QX11PaintEngine11updateStateERK17QPaintEngineState
-   fun:_ZN15QPainterPrivate11updateStateEP13QPainterState
-   fun:_ZN8QPainter9drawLinesEPK5QLinei
-   fun:_Z28qt_plastique_drawShadedPanelP8QPainterPK12QStyleOptionbPK7QWidget
-   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZNK12QCommonStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
-   fun:_ZNK13QWindowsStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
-   fun:_ZNK15QPlastiqueStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
-   fun:_ZN11QToolButton10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN15QAbstractButton5eventEP6QEvent
-   fun:_ZN11QToolButton5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
 }
 {
    <insert a suppression name here>
@@ -8331,19 +8121,6 @@
    fun:_ZN7QWidget9setParentEPS_6QFlagsIN2Qt10WindowTypeEE
    fun:_ZN14QWidgetPrivate4initEP7QWidget6QFlagsIN2Qt10WindowTypeEE
    fun:_ZN7QWidgetC2ER14QWidgetPrivatePS_6QFlagsIN2Qt10WindowTypeEE
-   fun:_ZN9QGroupBoxC1EP7QWidget
-   fun:_ZN27Ui_DisplayProxyEditorWidget7setupUiEP7QWidget
-   fun:_ZN21pqDefaultDisplayPanelC1EP16pqRepresentationP7QWidget
-   fun:_ZN26pqDisplayProxyEditorWidget11updatePanelEv
-   fun:_ZN26pqDisplayProxyEditorWidget13setOutputPortEP12pqOutputPort
-   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
-   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
-   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
-   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
-   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
-   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
 }
 {
    <insert a suppression name here>
@@ -8427,35 +8204,6 @@
    fun:_ZN16vtkProcessModule5StartEiPPc
    fun:_ZN9vtkPVMain3RunEP12vtkPVOptions
    fun:main
-}
-{
-   <insert a suppression name here>
-   Memcheck:Param
-   write(buf)
-   fun:__write_nocancel
-   fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
-   fun:_XSetClipRectangles
-   fun:XSetClipRectangles
-   fun:_ZN15QX11PaintEngine9updatePenERK4QPen
-   fun:_ZN15QX11PaintEngine11updateStateERK17QPaintEngineState
-   fun:_ZN15QPainterPrivate11updateStateEP13QPainterState
-   fun:_ZN8QPainter10drawPixmapERK6QRectFRK7QPixmapS2_
-   fun:_Z26qt_plastique_draw_gradientP8QPainterRK5QRectRK6QColorS6_
-   fun:_Z28qt_plastique_drawShadedPanelP8QPainterPK12QStyleOptionbPK7QWidget
-   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZNK12QCommonStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
-   fun:_ZNK13QWindowsStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
-   fun:_ZNK15QPlastiqueStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
-   fun:_ZN11QToolButton10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN15QAbstractButton5eventEP6QEvent
-   fun:_ZN11QToolButton5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
 }
 {
    <insert a suppression name here>
@@ -8560,34 +8308,6 @@
    fun:_ZN7QWidget10setVisibleEb
    fun:_ZN14QWidgetPrivate12showChildrenEb
    fun:_ZN14QWidgetPrivate11show_helperEv
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/lib/libGL.so.1.2
-   fun:__glXGetClientExtensions
-   fun:glXGetClientString
-   fun:_ZN25vtkOpenGLExtensionManager20ReadOpenGLExtensionsEv
-   fun:_ZN25vtkOpenGLExtensionManager6UpdateEv
-   fun:_ZN25vtkOpenGLExtensionManager18ExtensionSupportedEPKc
-   fun:_ZN17vtkOpenGLRenderer40DeviceRenderTranslucentPolygonalGeometryEv
-   fun:_ZN11vtkRenderer14UpdateGeometryEv
-   fun:_ZN17vtkOpenGLRenderer12DeviceRenderEv
-   fun:_ZN11vtkRenderer6RenderEv
-   fun:_ZN21vtkRendererCollection6RenderEv
-   fun:_ZN15vtkRenderWindow14DoStereoRenderEv
-   fun:_ZN15vtkRenderWindow10DoFDRenderEv
-   fun:_ZN15vtkRenderWindow10DoAARenderEv
-   fun:_ZN15vtkRenderWindow6RenderEv
-   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
-   fun:_ZN14vtkSMViewProxy11StillRenderEv
-   fun:_ZN21vtkSMRenderViewHelper16EventuallyRenderEv
-   fun:_ZN34vtkPVGenericRenderWindowInteractor6RenderEv
-   fun:_ZN17vtkAbstractWidget10SetEnabledEi
-   fun:_Z24vtkAbstractWidgetCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
-   fun:_Z30vtkImplicitPlaneWidget2CommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
 }
 {
    <insert a suppression name here>
@@ -8933,20 +8653,6 @@
    fun:_Z11basic_shapeP11QShaperItem
    fun:_ZNK11QTextEngine9shapeTextEi
    fun:_ZNK11QTextEngine5shapeEi
-   fun:_ZN9QTextLine13layout_helperEi
-   fun:_ZN9QTextLine12setLineWidthEd
-   fun:_Z14qt_format_textRK5QFontRK6QRectFiPK11QTextOptionRK7QStringPS2_iPiiP8QPainter
-   fun:_Z14qt_format_textRK5QFontRK6QRectFiRK7QStringPS2_iPiiP8QPainter
-   fun:_ZNK12QFontMetrics12boundingRectERK5QRectiRK7QStringiPi
-   fun:_ZNK12QFontMetrics4sizeEiRK7QStringiPi
-   fun:_ZNK11QPushButton8sizeHintEv
-   fun:_Z13qSmartMaxSizePK11QWidgetItem6QFlagsIN2Qt13AlignmentFlagEE
-   fun:_ZNK11QWidgetItem11maximumSizeEv
-   fun:_ZN17QBoxLayoutPrivate9setupGeomEv
-   fun:_ZNK10QBoxLayout8sizeHintEv
-   fun:_ZN18QGridLayoutPrivate15setupLayoutDataEi
-   fun:_ZNK18QGridLayoutPrivate8findSizeEM13QLayoutStructii
-   fun:_ZNK18QGridLayoutPrivate11minimumSizeEi
 }
 {
    <insert a suppression name here>
@@ -9315,20 +9021,6 @@
 {
    <insert a suppression name here>
    Memcheck:Leak
-   fun:_Znwj
-   fun:_ZNK13QFontEngineFT4Font9loadGlyphEPKS_jNS_11GlyphFormatE
-   fun:_ZNK13QFontEngineFT14recalcAdvancesEiP12QGlyphLayout6QFlagsIN11QTextEngine10ShaperFlagEE
-   fun:_ZNK13QFontEngineFT12stringToCMapEPK5QChariP12QGlyphLayoutPi6QFlagsIN11QTextEngine10ShaperFlagEE
-   fun:_ZNK16QFontEngineMulti12stringToCMapEPK5QChariP12QGlyphLayoutPi6QFlagsIN11QTextEngine10ShaperFlagEE
-   fun:_Z11basic_shapeP11QShaperItem
-   fun:_ZNK11QTextEngine9shapeTextEi
-   fun:_ZNK11QTextEngine5shapeEi
-   fun:_ZN9QTextLine13layout_helperEi
-   fun:_ZN9QTextLine12setLineWidthEd
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
    fun:malloc
    fun:_ZN9QHashData12allocateNodeEv
    fun:_ZNK13QFontEngineFT4Font9loadGlyphEPKS_jNS_11GlyphFormatE
@@ -9338,21 +9030,6 @@
    fun:_Z11basic_shapeP11QShaperItem
    fun:_ZNK11QTextEngine9shapeTextEi
    fun:_ZNK11QTextEngine5shapeEi
-   fun:_ZN9QTextLine13layout_helperEi
-   fun:_ZN9QTextLine12setLineWidthEd
-   fun:_ZN26QTextDocumentLayoutPrivate11layoutBlockERK10QTextBlockP13QLayoutStructiiS2_
-   fun:_ZN26QTextDocumentLayoutPrivate10layoutFlowEN10QTextFrame8iteratorEP13QLayoutStructii
-   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameiidd
-   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameii
-   fun:_ZN19QTextDocumentLayout8doLayoutEiii
-   fun:_ZNK26QTextDocumentLayoutPrivate24ensureLayoutedByPositionEi
-   fun:_ZNK26QTextDocumentLayoutPrivate10layoutStepEv
-   fun:_ZN19QTextDocumentLayout15documentChangedEiii
-   fun:_ZN20QTextDocumentPrivate9setLayoutEP27QAbstractTextDocumentLayout
-   fun:_ZNK13QTextDocument14documentLayoutEv
-   fun:_ZNK13QLabelPrivate18ensureTextLayoutedEv
-   fun:_ZNK13QLabelPrivate12sizeForWidthEi
-   fun:_ZNK6QLabel15minimumSizeHintEv
 }
 {
    <insert a suppression name here>
@@ -9423,22 +9100,6 @@
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN15QX11PaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN8QPainter9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
-   fun:_ZNK15QPlastiqueStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZN11QDockWidget10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN11QDockWidget5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
 }
 {
    <insert a suppression name here>
@@ -9586,8 +9247,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9601,8 +9260,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9624,8 +9281,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9641,8 +9296,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9654,8 +9307,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9673,8 +9324,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9686,8 +9335,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9703,8 +9350,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9738,8 +9383,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9762,8 +9405,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9778,8 +9419,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9793,8 +9432,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9805,8 +9442,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9818,8 +9453,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9846,8 +9479,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9858,8 +9489,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9871,8 +9500,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9887,8 +9514,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9910,8 +9535,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9943,8 +9566,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9964,8 +9585,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -9987,8 +9606,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -10003,8 +9620,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -10016,8 +9631,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -10029,8 +9642,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -10079,8 +9690,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -10112,8 +9721,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -10147,8 +9754,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -10161,8 +9766,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -10181,8 +9784,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -10270,15 +9871,6 @@
    obj:/usr/lib/libXt.so.6.0.0
    obj:/usr/lib/libXt.so.6.0.0
    obj:/usr/lib/libXt.so.6.0.0
-   fun:XtInitializeWidgetClass
-   fun:XtInitializeWidgetClass
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   fun:_XtAppCreateShell
-   fun:XtVaAppCreateShell
-   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
-   fun:_ZN15vtkRenderWindow6RenderEv
-   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
 }
 {
    <insert a suppression name here>
@@ -10290,8 +9882,6 @@
    fun:_XtPopupInitialize
    fun:XtCreateApplicationContext
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
-   fun:_Z23TestImplicitPlaneWidgetiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -10337,19 +9927,6 @@
    fun:_ZN8QPainter9drawLinesEPK5QLinei
    fun:_Z23qt_plastique_draw_frameP8QPainterRK5QRectPK12QStyleOptionN6QFrame6ShadowE
    fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZNK12QCommonStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZNK13QWindowsStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZNK15QPlastiqueStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZNK12QCommonStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZNK13QWindowsStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZNK15QPlastiqueStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZN11QPushButton10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN15QAbstractButton5eventEP6QEvent
-   fun:_ZN11QPushButton5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
 }
 {
    <insert a suppression name here>
@@ -10379,35 +9956,6 @@
    fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
    fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
    fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-}
-{
-   <insert a suppression name here>
-   Memcheck:Param
-   write(buf)
-   fun:__write_nocancel
-   fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
-   fun:_XSetClipRectangles
-   fun:XSetClipRectangles
-   fun:_ZN15QX11PaintEngine9updatePenERK4QPen
-   fun:_ZN15QX11PaintEngine11updateStateERK17QPaintEngineState
-   fun:_ZN15QPainterPrivate11updateStateEP13QPainterState
-   fun:_ZN8QPainter10drawPixmapERK6QRectFRK7QPixmapS2_
-   fun:_ZNK6QStyle14drawItemPixmapEP8QPainterRK5QRectiRK7QPixmap
-   fun:_ZNK12QCommonStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZNK13QWindowsStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZNK15QPlastiqueStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZNK12QCommonStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
-   fun:_ZNK13QWindowsStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
-   fun:_ZNK15QPlastiqueStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
-   fun:_ZN11QToolButton10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN15QAbstractButton5eventEP6QEvent
-   fun:_ZN11QToolButton5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
 }
 {
    <insert a suppression name here>
@@ -10452,20 +10000,6 @@
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN15QX11PaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN8QPainter9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
-   fun:_ZNK15QPlastiqueStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
-   fun:_ZN11QDockWidget10paintEventEP11QPaintEvent
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN11QDockWidget5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
 }
 {
    <insert a suppression name here>
@@ -10855,8 +10389,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -10889,8 +10421,6 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -10938,18 +10468,6 @@
    fun:_ZN14QWidgetPrivate13setWSGeometryEb
    fun:_ZN14QWidgetPrivate15setGeometry_sysEiiiib
    fun:_ZN7QWidget11setGeometryERK5QRect
-   fun:_ZN11QWidgetItem11setGeometryERK5QRect
-   fun:_ZN10QBoxLayout11setGeometryERK5QRect
-   fun:_ZN14QLayoutPrivate8doResizeERK5QSize
-   fun:_ZN7QLayout8activateEv
-   fun:_ZN7QWidget10setVisibleEb
-   fun:_ZN14QWidgetPrivate12showChildrenEb
-   fun:_ZN14QWidgetPrivate11show_helperEv
-   fun:_ZN7QWidget10setVisibleEb
-   fun:_ZN7QWidget11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QDockWidget11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iiPPv
 }
 {
    <insert a suppression name here>
@@ -10969,16 +10487,6 @@
    fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
    fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
    fun:_Z19qt_syncBackingStoreP7QWidget
-   fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN15QAbstractButton5eventEP6QEvent
-   fun:_ZN11QToolButton5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_ZN16QCoreApplication16sendPostedEventsEP7QObjecti
-   fun:_Z23postEventSourceDispatchP8_GSourcePFiPvES1_
-   fun:g_main_context_dispatch
-   obj:/usr/lib/libglib-2.0.so.0.1000.3
-   fun:g_main_context_iteration
 }
 {
    <insert a suppression name here>
@@ -11178,4 +10686,2162 @@
    fun:_Z14qt_format_textRK5QFontRK6QRectFiRK7QStringPS2_iPiiP8QPainter
    fun:_ZNK12QFontMetrics12boundingRectERK5QRectiRK7QStringiPi
    fun:_ZNK12QFontMetrics4sizeEiRK7QStringiPi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XDestroyWindow
+   fun:_Z17qt_XDestroyWindowPK7QWidgetP9_XDisplaym
+   fun:_ZN7QWidget7destroyEbb
+   fun:_ZN7QWidgetD2Ev
+   fun:_ZN14pqDisplayPanelD2Ev
+   fun:_ZN21pqDefaultDisplayPanelD0Ev
+   fun:_ZN26pqDisplayProxyEditorWidget11updatePanelEv
+   fun:_ZN26pqDisplayProxyEditorWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
+   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN29pqServerManagerSelectionModel16selectionChangedERK24pqServerManagerSelectionS2_
+   fun:_ZN29pqServerManagerSelectionModel6selectERK24pqServerManagerSelection6QFlagsINS_13SelectionFlagEE
+   fun:_ZN29pqServerManagerSelectionModel6selectEP24pqServerManagerModelItem6QFlagsINS_13SelectionFlagEE
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XRenderCompositeText32
+   fun:_ZN15QX11PaintEngine12drawFreetypeERK7QPointFRK12QTextItemInt
+   fun:_ZN15QX11PaintEngine12drawTextItemERK7QPointFRK9QTextItem
+   fun:_ZN8QPainter12drawTextItemERK7QPointFRK9QTextItem
+   fun:_ZNK9QTextLine4drawEP8QPainterRK7QPointFPKN11QTextLayout11FormatRangeE
+   fun:_Z14qt_format_textRK5QFontRK6QRectFiPK11QTextOptionRK7QStringPS2_iPiiP8QPainter
+   fun:_ZN8QPainter8drawTextERK6QRectFRK7QStringRK11QTextOption
+   fun:_ZNK15QPlastiqueStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK12QCommonStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK13QWindowsStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK15QPlastiqueStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZN12QProgressBar10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN12QProgressBar5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN15QtWidgetsPluginC1EP7QObject
+   fun:qt_plugin_instance
+   fun:_ZN13QPluginLoader8instanceEv
+   fun:_ZN13QFormInternal12QFormBuilder19updateCustomWidgetsEv
+   fun:_ZN13QFormInternal12QFormBuilder13addPluginPathERK7QString
+   fun:_ZN9QUiLoader13addPluginPathERK7QString
+   fun:_ZN13pqFormBuilderC1EP7QObject
+   fun:_ZN23pqLoadedFormObjectPanelC2E7QStringP7pqProxyP7QWidget
+   fun:_ZN16pqThresholdPanelC1EP7pqProxyP7QWidget
+   fun:_ZN22pqStandardCustomPanels11createPanelEP7pqProxyP7QWidget
+   fun:_ZN23pqObjectInspectorWidget8setProxyEP7pqProxy
+   fun:_ZN16pqProxyTabWidget8setProxyEP16pqPipelineSource
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
+   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN29pqServerManagerSelectionModel16selectionChangedERK24pqServerManagerSelectionS2_
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN10QVTKPluginC1Ev
+   fun:qt_plugin_instance
+   fun:_ZN13QPluginLoader8instanceEv
+   fun:_ZN13QFormInternal12QFormBuilder19updateCustomWidgetsEv
+   fun:_ZN13QFormInternal12QFormBuilder13addPluginPathERK7QString
+   fun:_ZN9QUiLoader13addPluginPathERK7QString
+   fun:_ZN13pqFormBuilderC1EP7QObject
+   fun:_ZN23pqLoadedFormObjectPanelC2E7QStringP7pqProxyP7QWidget
+   fun:_ZN16pqThresholdPanelC1EP7pqProxyP7QWidget
+   fun:_ZN22pqStandardCustomPanels11createPanelEP7pqProxyP7QWidget
+   fun:_ZN23pqObjectInspectorWidget8setProxyEP7pqProxy
+   fun:_ZN16pqProxyTabWidget8setProxyEP16pqPipelineSource
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
+   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN29pqServerManagerSelectionModel16selectionChangedERK24pqServerManagerSelectionS2_
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN13pqChartPluginC1EP7QObject
+   fun:qt_plugin_instance
+   fun:_ZN13QPluginLoader8instanceEv
+   fun:_ZN13QFormInternal12QFormBuilder19updateCustomWidgetsEv
+   fun:_ZN13QFormInternal12QFormBuilder13addPluginPathERK7QString
+   fun:_ZN9QUiLoader13addPluginPathERK7QString
+   fun:_ZN13pqFormBuilderC1EP7QObject
+   fun:_ZN23pqLoadedFormObjectPanelC2E7QStringP7pqProxyP7QWidget
+   fun:_ZN16pqThresholdPanelC1EP7pqProxyP7QWidget
+   fun:_ZN22pqStandardCustomPanels11createPanelEP7pqProxyP7QWidget
+   fun:_ZN23pqObjectInspectorWidget8setProxyEP7pqProxy
+   fun:_ZN16pqProxyTabWidget8setProxyEP16pqPipelineSource
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
+   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN29pqServerManagerSelectionModel16selectionChangedERK24pqServerManagerSelectionS2_
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN23PrismClientPluginPluginC1Ev
+   fun:qt_plugin_instance
+   fun:_ZN13QPluginLoader8instanceEv
+   fun:_ZN13QFormInternal12QFormBuilder19updateCustomWidgetsEv
+   fun:_ZN13QFormInternal12QFormBuilder13addPluginPathERK7QString
+   fun:_ZN9QUiLoader13addPluginPathERK7QString
+   fun:_ZN13pqFormBuilderC1EP7QObject
+   fun:_ZN23pqLoadedFormObjectPanelC2E7QStringP7pqProxyP7QWidget
+   fun:_ZN16pqThresholdPanelC1EP7pqProxyP7QWidget
+   fun:_ZN22pqStandardCustomPanels11createPanelEP7pqProxyP7QWidget
+   fun:_ZN23pqObjectInspectorWidget8setProxyEP7pqProxy
+   fun:_ZN16pqProxyTabWidget8setProxyEP16pqPipelineSource
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
+   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN29pqServerManagerSelectionModel16selectionChangedERK24pqServerManagerSelectionS2_
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN33PrismToolBarActionsImplementationC1EP7QObject
+   fun:_ZN23PrismClientPluginPluginC1Ev
+   fun:qt_plugin_instance
+   fun:_ZN13QPluginLoader8instanceEv
+   fun:_ZN13QFormInternal12QFormBuilder19updateCustomWidgetsEv
+   fun:_ZN13QFormInternal12QFormBuilder13addPluginPathERK7QString
+   fun:_ZN9QUiLoader13addPluginPathERK7QString
+   fun:_ZN13pqFormBuilderC1EP7QObject
+   fun:_ZN23pqLoadedFormObjectPanelC2E7QStringP7pqProxyP7QWidget
+   fun:_ZN16pqThresholdPanelC1EP7pqProxyP7QWidget
+   fun:_ZN22pqStandardCustomPanels11createPanelEP7pqProxyP7QWidget
+   fun:_ZN23pqObjectInspectorWidget8setProxyEP7pqProxy
+   fun:_ZN16pqProxyTabWidget8setProxyEP16pqPipelineSource
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
+   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:realloc
+   fun:_Z8qReallocPvj
+   fun:_ZN9QListData7reallocEi
+   fun:_ZN9QListData6appendEv
+   fun:_ZN5QListIP7QObjectE6appendERKS1_
+   fun:_ZN14QObjectPrivate16setParent_helperEP7QObject
+   fun:_ZN7QObject9setParentEPS_
+   fun:_ZN7QObjectC2EPS_
+   fun:_ZN33PrismToolBarActionsImplementationC1EP7QObject
+   fun:_ZN23PrismClientPluginPluginC1Ev
+   fun:qt_plugin_instance
+   fun:_ZN13QPluginLoader8instanceEv
+   fun:_ZN13QFormInternal12QFormBuilder19updateCustomWidgetsEv
+   fun:_ZN13QFormInternal12QFormBuilder13addPluginPathERK7QString
+   fun:_ZN9QUiLoader13addPluginPathERK7QString
+   fun:_ZN13pqFormBuilderC1EP7QObject
+   fun:_ZN23pqLoadedFormObjectPanelC2E7QStringP7pqProxyP7QWidget
+   fun:_ZN16pqThresholdPanelC1EP7pqProxyP7QWidget
+   fun:_ZN22pqStandardCustomPanels11createPanelEP7pqProxyP7QWidget
+   fun:_ZN23pqObjectInspectorWidget8setProxyEP7pqProxy
+   fun:_ZN16pqProxyTabWidget8setProxyEP16pqPipelineSource
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN7QPixmap4initEiiNS_4TypeE
+   fun:_ZN7QPixmapC1Ev
+   fun:_ZN7QPixmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZN7QPixmap4loadERK7QStringPKc6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZN7QPixmapC1ERK7QStringPKc6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZN17QPixmapIconEngine9bestMatchERK5QSizeN5QIcon4ModeENS3_5StateEb
+   fun:_ZN17QPixmapIconEngine6pixmapERK5QSizeN5QIcon4ModeENS3_5StateE
+   fun:_ZNK5QIcon6pixmapERK5QSizeNS_4ModeENS_5StateE
+   fun:_ZN14pqFlatTreeView14drawDecorationER8QPainteriiRK11QModelIndexRK20QStyleOptionViewItemi
+   fun:_ZN14pqFlatTreeView10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN6QFrame5eventEP6QEvent
+   fun:_ZN19QAbstractScrollArea13viewportEventEP6QEvent
+   fun:_ZN14pqFlatTreeView13viewportEventEP6QEvent
+   fun:_ZN25QAbstractScrollAreaFilter11eventFilterEP7QObjectP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN19PrismToolBarActionsC1EP7QObject
+   fun:_ZN33PrismToolBarActionsImplementationC1EP7QObject
+   fun:_ZN23PrismClientPluginPluginC1Ev
+   fun:qt_plugin_instance
+   fun:_ZN13QPluginLoader8instanceEv
+   fun:_ZN13QFormInternal12QFormBuilder19updateCustomWidgetsEv
+   fun:_ZN13QFormInternal12QFormBuilder13addPluginPathERK7QString
+   fun:_ZN9QUiLoader13addPluginPathERK7QString
+   fun:_ZN13pqFormBuilderC1EP7QObject
+   fun:_ZN23pqLoadedFormObjectPanelC2E7QStringP7pqProxyP7QWidget
+   fun:_ZN16pqThresholdPanelC1EP7pqProxyP7QWidget
+   fun:_ZN22pqStandardCustomPanels11createPanelEP7pqProxyP7QWidget
+   fun:_ZN23pqObjectInspectorWidget8setProxyEP7pqProxy
+   fun:_ZN16pqProxyTabWidget8setProxyEP16pqPipelineSource
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
+   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN9QHashData13detach_helperEPFvPNS_4NodeEPvEi
+   fun:_ZN5QHashIN11QFontEngine6FaceIdEP13QFreetypeFaceE13detach_helperEv
+   fun:_ZN13QFreetypeFace7getFaceERKN11QFontEngine6FaceIdE
+   fun:_ZN13QFontEngineFTC1EP10_FcPatternRK8QFontDefi
+   fun:_Z14tryPatternLoadP10_FcPatterniRK8QFontDefi
+   fun:_ZN13QFontDatabase4loadEPK12QFontPrivatei
+   fun:_ZN11QScriptLine16setDefaultHeightEP11QTextEngine
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutBlockERK10QTextBlockP13QLayoutStructiiS2_
+   fun:_ZN26QTextDocumentLayoutPrivate10layoutFlowEN10QTextFrame8iteratorEP13QLayoutStructii
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameiidd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameii
+   fun:_ZN19QTextDocumentLayout8doLayoutEiii
+   fun:_ZNK26QTextDocumentLayoutPrivate24ensureLayoutedByPositionEi
+   fun:_ZNK26QTextDocumentLayoutPrivate10layoutStepEv
+   fun:_ZN19QTextDocumentLayout15documentChangedEiii
+   fun:_ZN20QTextDocumentPrivate9setLayoutEP27QAbstractTextDocumentLayout
+   fun:_ZNK13QTextDocument14documentLayoutEv
+   fun:_ZN19QTextControlPrivate10setContentEN2Qt10TextFormatERK7QStringP13QTextDocument
+   fun:_ZN12QTextControlC2EP7QObject
+   fun:_ZN16QTextEditPrivate4initERK7QString
+   fun:_ZN9QTextEditC2EP7QWidget
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_XUpdateAtomCache
+   fun:XInternAtom
+   fun:XScreenResourceString
+   fun:XtScreenDatabase
+   fun:_XtDisplayInitialize
+   fun:XtDisplayInitialize
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+   fun:_Z29TestDijkstraGraphGeodesicPathiPPc
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyDict_SetItem
+   fun:PyObject_SetAttr
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyDict_SetItem
+   fun:PyObject_SetAttr
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyDict_SetItem
+   fun:PyObject_SetAttr
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyDict_SetItem
+   fun:PyDict_SetItemString
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   obj:/usr/bin/python2.4
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyDict_SetItem
+   fun:PyDict_SetItemString
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   obj:/usr/bin/python2.4
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   obj:/usr/bin/python2.4
+   fun:PyDict_SetItem
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   obj:/usr/bin/python2.4
+   fun:PyErr_PrintEx
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   writev(vector[...])
+   fun:writev
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:_X11TransWritev
+   fun:_XSend
+   fun:__glXFlushRenderBuffer
+   fun:__glXSetupForCommand
+   fun:glXSwapBuffers
+   fun:_ZN22vtkXOpenGLRenderWindow5FrameEv
+   fun:_ZN15vtkRenderWindow15CopyResultFrameEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcAddUtf8Converters
+   fun:_XlcDefaultLoader
+   fun:_XlcDynamicLoad
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XrmGetStringDatabase
+   obj:/usr/lib/libXt.so.6.0.0
+   fun:_XtDisplayInitialize
+   fun:XtDisplayInitialize
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_XEnq
+   fun:_XReply
+   fun:XInternAtom
+   fun:XSetWMProperties
+   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/lib/libXt.so.6.0.0
+   fun:XtRealizeWidget
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XtMalloc
+   fun:XtCreateApplicationContext
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:realloc
+   fun:_Z8qReallocPvj
+   fun:_ZN7QVectorIP10QEventLoopE7reallocEii
+   fun:_ZN7QVectorIP10QEventLoopE6resizeEi
+   fun:_ZN10QEventLoop4execE6QFlagsINS_17ProcessEventsFlagEE
+   fun:_ZN5QMenu4execERK6QPointP7QAction
+   fun:_ZN18QPushButtonPrivate15_q_popupPressedEv
+   fun:_ZN11QPushButton11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN15QAbstractButton7pressedEv
+   fun:_ZN22QAbstractButtonPrivate11emitPressedEv
+   fun:_ZN15QAbstractButton5clickEv
+   fun:_ZN29pqAbstractActivateEventPlayer9playEventEP7QObjectRK7QStringS4_Rb
+   fun:_ZN13pqEventPlayer9playEventERK7QStringS2_S2_Rb
+   fun:_ZN17pqEventDispatcher13playNextEventEv
+   fun:_ZN17pqEventDispatcher11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN17pqEventDispatcher18readyPlayNextEventEv
+   fun:_ZN17pqEventDispatcher18checkPlayNextEventEv
+   fun:_ZN17pqEventDispatcher11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z23createQTextCodecCleanupv
+   fun:_Z5setupv
+   fun:_ZN10QTextCodec14codecForLocaleEv
+   fun:_ZNK7QString11toLocal8BitEv
+   fun:_Z13locale_encodeRK7QString
+   fun:_ZN5QFile10encodeNameERK7QString
+   fun:_ZNK20QFSFileEnginePrivate6doStatEv
+   fun:_ZNK13QFSFileEngine9fileFlagsE6QFlagsIN19QAbstractFileEngine8FileFlagEE
+   fun:_ZNK16QFileInfoPrivate12getFileFlagsE6QFlagsIN19QAbstractFileEngine8FileFlagEE
+   fun:_ZNK9QFileInfo6existsEv
+   fun:_ZN16QCoreApplication19applicationFilePathEv
+   fun:_ZN16QCoreApplication18applicationDirPathEv
+   fun:_ZN19QLibraryInfoPrivate17findConfigurationEv
+   fun:_ZN16QLibrarySettingsC1Ev
+   fun:_ZN12QLibraryInfo8locationENS_15LibraryLocationE
+   fun:_ZN16QCoreApplication12libraryPathsEv
+   fun:_ZN16QCoreApplication4initEv
+   fun:_ZN16QCoreApplicationC2ER23QCoreApplicationPrivate
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:_X11TransConnectDisplay
+   fun:XOpenDisplay
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN7QWidget13setWindowIconERK5QIcon
+   fun:_ZN13Ui_MainWindow7setupUiEP11QMainWindow
+   fun:_ZN10MainWindowC1Ev
+   fun:_ZN22ProcessModuleGUIHelper16CreateMainWindowEv
+   fun:_ZN24pqProcessModuleGUIHelper21InitializeApplicationEiPPc
+   fun:_ZN24pqProcessModuleGUIHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:_ZN6pqMain3RunER12QApplicationP24pqProcessModuleGUIHelper
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z19resourceSearchPathsv
+   fun:_ZNK16QResourcePrivate17ensureInitializedEv
+   fun:_ZNK9QResource12isCompressedEv
+   fun:_ZN19QResourceFileEngineC1ERK7QString
+   fun:_ZNK26QResourceFileEngineHandler6createERK7QString
+   fun:_ZN19QAbstractFileEngine6createERK7QString
+   fun:_ZN16QFileInfoPrivate14initFileEngineERK7QString
+   fun:_ZN9QFileInfoC1ERK7QString
+   fun:_ZN5QIconC1ERK7QString
+   fun:_ZN20pqKeyFrameTypeWidgetC1EP7QWidget
+   fun:_ZN17Ui_AnimationPanel7setupUiEP7QWidget
+   fun:_ZN16pqAnimationPanelC1EP7QWidget
+   fun:_ZN16pqMainWindowCore19setupAnimationPanelEP11QDockWidget
+   fun:_ZN10MainWindowC1Ev
+   fun:_ZN22ProcessModuleGUIHelper16CreateMainWindowEv
+   fun:_ZN24pqProcessModuleGUIHelper21InitializeApplicationEiPPc
+   fun:_ZN24pqProcessModuleGUIHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:_ZN6pqMain3RunER12QApplicationP24pqProcessModuleGUIHelper
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z5mutexv
+   fun:_Z13prepareEngineP14QRegExpPrivate
+   fun:_ZN7QRegExpaSERKS_
+   fun:_ZN7QRegExpC1ERKS_
+   fun:_ZN5QListI7QRegExpE6appendERKS0_
+   fun:_ZNK13QFSFileEngine9entryListE6QFlagsIN4QDir6FilterEERK11QStringList
+   fun:_ZNK4QDir9entryListERK11QStringList6QFlagsINS_6FilterEES3_INS_8SortFlagEE
+   fun:_ZNK4QDir9entryListE6QFlagsINS_6FilterEES0_INS_8SortFlagEE
+   fun:_ZN14QFactoryLoaderC1EPKcRK11QStringListRK7QStringN2Qt15CaseSensitivityE
+   fun:_Z6loaderv
+   fun:_ZN20QInputContextFactory4keysEv
+   fun:_ZN19QApplicationPrivate18x11_apply_settingsEv
+   fun:_Z20qt_set_x11_resourcesPKcS0_S0_S0_
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z12globalModifsv
+   fun:_ZN19QKeySequencePrivate12decodeStringERK7QStringN12QKeySequence14SequenceFormatE
+   fun:_ZN12QKeySequence12decodeStringERK7QString
+   fun:_ZN12QKeySequence6assignERK7QString
+   fun:_ZN12QKeySequenceC1ERK7QString
+   fun:_ZN13Ui_MainWindow13retranslateUiEP11QMainWindow
+   fun:_ZN13Ui_MainWindow7setupUiEP11QMainWindow
+   fun:_ZN10MainWindowC1Ev
+   fun:_ZN22ProcessModuleGUIHelper16CreateMainWindowEv
+   fun:_ZN24pqProcessModuleGUIHelper21InitializeApplicationEiPPc
+   fun:_ZN24pqProcessModuleGUIHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:_ZN6pqMain3RunER12QApplicationP24pqProcessModuleGUIHelper
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z12usedHashFuncv
+   fun:_ZN9QConfFile8fromNameERK7QStringb
+   fun:_ZN24QConfFileSettingsPrivateC1EN9QSettings6FormatENS0_5ScopeERK7QStringS5_
+   fun:_ZN16QSettingsPrivate6createEN9QSettings6FormatENS0_5ScopeERK7QStringS5_
+   fun:_ZN9QSettingsC1ENS_5ScopeERK7QStringS3_P7QObject
+   fun:_ZN19QApplicationPrivate18x11_apply_settingsEv
+   fun:_Z20qt_set_x11_resourcesPKcS0_S0_S0_
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z12pathHashFuncv
+   fun:_Z7getPathN9QSettings6FormatENS_5ScopeE
+   fun:_ZN24QConfFileSettingsPrivateC1EN9QSettings6FormatENS0_5ScopeERK7QStringS5_
+   fun:_ZN16QSettingsPrivate6createEN9QSettings6FormatENS0_5ScopeERK7QStringS5_
+   fun:_ZN9QSettingsC1ENS_5ScopeERK7QStringS3_P7QObject
+   fun:_ZN19QApplicationPrivate18x11_apply_settingsEv
+   fun:_Z20qt_set_x11_resourcesPKcS0_S0_S0_
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_XrmDefaultInitParseInfo
+   fun:_XrmInitParseInfo
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XrmGetStringDatabase
+   fun:XGetDefault
+   fun:_Z11getXDefaultPKcS0_Pi
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN14QDesktopWidget6screenEi
+   fun:_ZNK7QWidget11mapToGlobalERK6QPoint
+   fun:_Z20qt_sizegrip_atBottomP7QWidget
+   fun:_ZN16QSizeGripPrivate4initEv
+   fun:_ZN9QSizeGripC1EP7QWidget
+   fun:_ZN10QStatusBar18setSizeGripEnabledEb
+   fun:_ZN10QStatusBarC1EP7QWidget
+   fun:_ZN13Ui_MainWindow7setupUiEP11QMainWindow
+   fun:_ZN10MainWindowC1Ev
+   fun:_ZN22ProcessModuleGUIHelper16CreateMainWindowEv
+   fun:_ZN24pqProcessModuleGUIHelper21InitializeApplicationEiPPc
+   fun:_ZN24pqProcessModuleGUIHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:_ZN6pqMain3RunER12QApplicationP24pqProcessModuleGUIHelper
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z12fallBackHashv
+   fun:_Z23qt_fallback_font_familyi
+   fun:_ZN13QFontDatabase4loadEPK12QFontPrivatei
+   fun:_ZN11QScriptLine16setDefaultHeightEP11QTextEngine
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutBlockERK10QTextBlockP13QLayoutStructiiS2_
+   fun:_ZN26QTextDocumentLayoutPrivate10layoutFlowEN10QTextFrame8iteratorEP13QLayoutStructii
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameiidd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameii
+   fun:_ZN19QTextDocumentLayout8doLayoutEiii
+   fun:_ZNK26QTextDocumentLayoutPrivate24ensureLayoutedByPositionEi
+   fun:_ZNK26QTextDocumentLayoutPrivate10layoutStepEv
+   fun:_ZN19QTextDocumentLayout15documentChangedEiii
+   fun:_ZN20QTextDocumentPrivate9setLayoutEP27QAbstractTextDocumentLayout
+   fun:_ZNK13QTextDocument14documentLayoutEv
+   fun:_ZN19QTextControlPrivate10setContentEN2Qt10TextFormatERK7QStringP13QTextDocument
+   fun:_ZN12QTextControlC2EP7QObject
+   fun:_ZN16QTextEditPrivate4initERK7QString
+   fun:_ZN9QTextEditC2EP7QWidget
+   fun:_ZN15pqConsoleWidget16pqImplementationC1ERS_
+   fun:_ZN15pqConsoleWidgetC1EP7QWidget
+   fun:_ZN17Ui_pqOutputWindow7setupUiEP7QDialog
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z15globalFontSubstv
+   fun:_Z13initFontSubstv
+   fun:_ZN5QFont11substitutesERK7QString
+   fun:_Z10familyListRK8QFontDef
+   fun:_ZN13QFontDatabase4loadEPK12QFontPrivatei
+   fun:_ZN11QScriptLine16setDefaultHeightEP11QTextEngine
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutBlockERK10QTextBlockP13QLayoutStructiiS2_
+   fun:_ZN26QTextDocumentLayoutPrivate10layoutFlowEN10QTextFrame8iteratorEP13QLayoutStructii
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameiidd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameii
+   fun:_ZN19QTextDocumentLayout8doLayoutEiii
+   fun:_ZNK26QTextDocumentLayoutPrivate24ensureLayoutedByPositionEi
+   fun:_ZNK26QTextDocumentLayoutPrivate10layoutStepEv
+   fun:_ZN19QTextDocumentLayout15documentChangedEiii
+   fun:_ZN20QTextDocumentPrivate9setLayoutEP27QAbstractTextDocumentLayout
+   fun:_ZNK13QTextDocument14documentLayoutEv
+   fun:_ZN19QTextControlPrivate10setContentEN2Qt10TextFormatERK7QStringP13QTextDocument
+   fun:_ZN12QTextControlC2EP7QObject
+   fun:_ZN16QTextEditPrivate4initERK7QString
+   fun:_ZN9QTextEditC2EP7QWidget
+   fun:_ZN15pqConsoleWidget16pqImplementationC1ERS_
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z17qt_gradient_cachev
+   fun:_ZN9QSpanData5setupERK6QBrushi
+   fun:_ZN18QRasterPaintEngine11updateStateERK17QPaintEngineState
+   fun:_ZN15QPainterPrivate11updateStateEP13QPainterState
+   fun:_ZN8QPainter8drawPathERK12QPainterPath
+   fun:_ZN15QPainterPrivate11draw_helperERK12QPainterPathNS_13DrawOperationE
+   fun:_ZN8QPainter9drawRectsEPK5QRecti
+   fun:_ZN8QPainter8fillRectERK5QRectRK6QBrush
+   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZN12pqTreeWidgetC1EP7QWidget
+   fun:_ZN27Ui_pqProxyInformationWidget7setupUiEP7QWidget
+   fun:_ZN24pqProxyInformationWidgetC1EP7QWidget
+   fun:_ZN16pqProxyTabWidgetC1EP7QWidget
+   fun:_ZN16pqMainWindowCore19setupProxyTabWidgetEP11QDockWidget
+   fun:_ZN10MainWindowC1Ev
+   fun:_ZN22ProcessModuleGUIHelper16CreateMainWindowEv
+   fun:_ZN24pqProcessModuleGUIHelper21InitializeApplicationEiPPc
+   fun:_ZN24pqProcessModuleGUIHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:_ZN6pqMain3RunER12QApplicationP24pqProcessModuleGUIHelper
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z12idnWhitelistv
+   fun:_Z11qt_from_ACERK7QString
+   fun:_ZNK11QUrlPrivate5parseENS_12ParseOptionsE
+   fun:_ZNK4QUrl6schemeEv
+   fun:_ZN16pqServerResource16pqImplementationC1ERK7QString
+   fun:_ZN16pqServerResourceC1ERK7QString
+   fun:_ZN15pqServerBrowser11onAddServerEv
+   fun:_ZN15pqServerBrowser11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN22pqServerStartupBrowser11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iiPPv
+   fun:_ZN15QAbstractButton7clickedEb
+   fun:_ZN22QAbstractButtonPrivate11emitClickedEv
+   fun:_ZN15QAbstractButton5clickEv
+   fun:_ZN29pqAbstractActivateEventPlayer9playEventEP7QObjectRK7QStringS4_Rb
+   fun:_ZN13pqEventPlayer9playEventERK7QStringS2_S2_Rb
+   fun:_ZN17pqEventDispatcher13playNextEventEv
+   fun:_ZN17pqEventDispatcher11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN17pqEventDispatcher18readyPlayNextEventEv
+   fun:_ZN17pqEventDispatcher18checkPlayNextEventEv
+   fun:_ZN17pqEventDispatcher11qt_metacallEN11QMetaObject4CallEiPPv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z23globalRedirectionsMutexv
+   fun:_Z28qt_painter_removePaintDeviceP12QPaintDevice
+   fun:_ZN12QPaintDeviceD2Ev
+   fun:_ZN6QImageD1Ev
+   fun:_ZN18QPngHandlerPrivate12readPngImageEP6QImage
+   fun:_ZN11QPngHandler4readEP6QImage
+   fun:_ZN12QImageReader4readEP6QImage
+   fun:_ZN12QImageReader4readEv
+   fun:_ZN7QPixmap4loadERK7QStringPKc6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZN7QPixmapC1ERK7QStringPKc6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZN22ProcessModuleGUIHelperC1Ev
+   fun:_ZN22ProcessModuleGUIHelper3NewEv
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z18globalRedirectionsv
+   fun:_Z28qt_painter_removePaintDeviceP12QPaintDevice
+   fun:_ZN12QPaintDeviceD2Ev
+   fun:_ZN6QImageD1Ev
+   fun:_ZN18QPngHandlerPrivate12readPngImageEP6QImage
+   fun:_ZN11QPngHandler4readEP6QImage
+   fun:_ZN12QImageReader4readEP6QImage
+   fun:_ZN12QImageReader4readEv
+   fun:_ZN7QPixmap4loadERK7QStringPKc6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZN7QPixmapC1ERK7QStringPKc6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZN22ProcessModuleGUIHelperC1Ev
+   fun:_ZN22ProcessModuleGUIHelper3NewEv
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN15QWidgetAnimatorC1EP7QObject
+   fun:_ZN17QMainWindowLayoutC1EP11QMainWindow
+   fun:_ZN18QMainWindowPrivate4initEv
+   fun:_ZN11QMainWindowC2EP7QWidget6QFlagsIN2Qt10WindowTypeEE
+   fun:_ZN10MainWindowC1Ev
+   fun:_ZN22ProcessModuleGUIHelper16CreateMainWindowEv
+   fun:_ZN24pqProcessModuleGUIHelper21InitializeApplicationEiPPc
+   fun:_ZN24pqProcessModuleGUIHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:_ZN6pqMain3RunER12QApplicationP24pqProcessModuleGUIHelper
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN19QApplicationPrivate10initializeEv
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z9app_fontsv
+   fun:_ZN12QApplication7setFontERK5QFontPKc
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z12app_palettesv
+   fun:_ZN19QApplicationPrivate17setPalette_helperERK8QPalettePKcb
+   fun:_ZN12QApplication10setPaletteERK8QPalettePKc
+   fun:_ZN19QApplicationPrivate16setSystemPaletteERK8QPalette
+   fun:_ZN12QApplication5styleEv
+   fun:_Z20qt_set_x11_resourcesPKcS0_S0_S0_
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z26staticInstanceFunctionListv
+   fun:_ZN13QPluginLoader15staticInstancesEv
+   fun:_ZNK14QFactoryLoader4keysEv
+   fun:_ZN20QInputContextFactory4keysEv
+   fun:_ZN19QApplicationPrivate18x11_apply_settingsEv
+   fun:_Z20qt_set_x11_resourcesPKcS0_S0_S0_
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/libICE.so.6.3.0
+   fun:_IceProcessCoreMessage
+   fun:IceProcessMessages
+   fun:IceOpenConnection
+   fun:SmcOpenConnection
+   fun:_ZN15QSessionManagerC1EP12QApplicationR7QStringS3_
+   fun:_ZN19QApplicationPrivate10initializeEv
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/libICE.so.6.3.0
+   fun:_IceProcessCoreMessage
+   fun:IceProcessMessages
+   fun:IceProtocolSetup
+   fun:SmcOpenConnection
+   fun:_ZN15QSessionManagerC1EP12QApplicationR7QStringS3_
+   fun:_ZN19QApplicationPrivate10initializeEv
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z13guardHashLockv
+   fun:_ZN14QObjectPrivate11clearGuardsEP7QObject
+   fun:_ZN7QObjectD2Ev
+   fun:_ZN9QIODeviceD2Ev
+   fun:_ZN7QBufferD1Ev
+   fun:_Z20qt_get_net_supportedv
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z9guardHashv
+   fun:_ZN14QObjectPrivate11clearGuardsEP7QObject
+   fun:_ZN7QObjectD2Ev
+   fun:_ZN9QIODeviceD2Ev
+   fun:_ZN7QBufferD1Ev
+   fun:_Z20qt_get_net_supportedv
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN9QColormap10initializeEv
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z7bridgesv
+   fun:_ZN11QAccessible19updateAccessibilityEP7QObjectiNS_5EventE
+   fun:_ZN14QWidgetPrivate11show_helperEv
+   fun:_ZN7QWidget10setVisibleEb
+   fun:_ZN7QWidget4showEv
+   fun:_ZN22ProcessModuleGUIHelperC1Ev
+   fun:_ZN22ProcessModuleGUIHelper3NewEv
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z10libraryMapv
+   fun:_ZN15QLibraryPrivate12findOrCreateERK7QStringi
+   fun:_ZN14QFactoryLoaderC1EPKcRK11QStringListRK7QStringN2Qt15CaseSensitivityE
+   fun:_Z6loaderv
+   fun:_ZN20QInputContextFactory4keysEv
+   fun:_ZN19QApplicationPrivate18x11_apply_settingsEv
+   fun:_Z20qt_set_x11_resourcesPKcS0_S0_S0_
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z9postRListv
+   fun:_Z15qAddPostRoutinePFvvE
+   fun:_ZN16QLibrarySettingsC1Ev
+   fun:_ZN12QLibraryInfo8locationENS_15LibraryLocationE
+   fun:_ZN16QCoreApplication12libraryPathsEv
+   fun:_ZN16QCoreApplication4initEv
+   fun:_ZN16QCoreApplicationC2ER23QCoreApplicationPrivate
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z16qt_library_mutexv
+   fun:_ZN15QLibraryPrivate12findOrCreateERK7QStringi
+   fun:_ZN14QFactoryLoaderC1EPKcRK11QStringListRK7QStringN2Qt15CaseSensitivityE
+   fun:_Z6loaderv
+   fun:_ZN20QInputContextFactory4keysEv
+   fun:_ZN19QApplicationPrivate18x11_apply_settingsEv
+   fun:_Z20qt_set_x11_resourcesPKcS0_S0_S0_
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z5setupv
+   fun:_ZN10QTextCodec14codecForLocaleEv
+   fun:_ZNK7QString11toLocal8BitEv
+   fun:_Z13locale_encodeRK7QString
+   fun:_ZN5QFile10encodeNameERK7QString
+   fun:_ZNK20QFSFileEnginePrivate6doStatEv
+   fun:_ZNK13QFSFileEngine9fileFlagsE6QFlagsIN19QAbstractFileEngine8FileFlagEE
+   fun:_ZNK16QFileInfoPrivate12getFileFlagsE6QFlagsIN19QAbstractFileEngine8FileFlagEE
+   fun:_ZNK9QFileInfo6existsEv
+   fun:_ZN16QCoreApplication19applicationFilePathEv
+   fun:_ZN16QCoreApplication18applicationDirPathEv
+   fun:_ZN19QLibraryInfoPrivate17findConfigurationEv
+   fun:_ZN16QLibrarySettingsC1Ev
+   fun:_ZN12QLibraryInfo8locationENS_15LibraryLocationE
+   fun:_ZN16QCoreApplication12libraryPathsEv
+   fun:_ZN16QCoreApplication4initEv
+   fun:_ZN16QCoreApplicationC2ER23QCoreApplicationPrivate
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN10QMutexPool3getEPKv
+   fun:_Z5setupv
+   fun:_ZN10QTextCodec14codecForLocaleEv
+   fun:_ZNK7QString11toLocal8BitEv
+   fun:_Z13locale_encodeRK7QString
+   fun:_ZN5QFile10encodeNameERK7QString
+   fun:_ZNK20QFSFileEnginePrivate6doStatEv
+   fun:_ZNK13QFSFileEngine9fileFlagsE6QFlagsIN19QAbstractFileEngine8FileFlagEE
+   fun:_ZNK16QFileInfoPrivate12getFileFlagsE6QFlagsIN19QAbstractFileEngine8FileFlagEE
+   fun:_ZNK9QFileInfo6existsEv
+   fun:_ZN16QCoreApplication19applicationFilePathEv
+   fun:_ZN16QCoreApplication18applicationDirPathEv
+   fun:_ZN19QLibraryInfoPrivate17findConfigurationEv
+   fun:_ZN16QLibrarySettingsC1Ev
+   fun:_ZN12QLibraryInfo8locationENS_15LibraryLocationE
+   fun:_ZN16QCoreApplication12libraryPathsEv
+   fun:_ZN16QCoreApplication4initEv
+   fun:_ZN16QCoreApplicationC2ER23QCoreApplicationPrivate
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN12QLibraryInfo8locationENS_15LibraryLocationE
+   fun:_ZN16QCoreApplication12libraryPathsEv
+   fun:_ZN16QCoreApplication4initEv
+   fun:_ZN16QCoreApplicationC2ER23QCoreApplicationPrivate
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN16QCoreApplication12libraryPathsEv
+   fun:_ZN16QCoreApplication4initEv
+   fun:_ZN16QCoreApplicationC2ER23QCoreApplicationPrivate
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z16libraryPathMutexv
+   fun:_ZN16QCoreApplication12libraryPathsEv
+   fun:_ZN16QCoreApplication4initEv
+   fun:_ZN16QCoreApplicationC2ER23QCoreApplicationPrivate
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z10allObjectsv
+   fun:qt_addObject
+   fun:_ZN7QObjectC2ER14QObjectPrivatePS_
+   fun:_ZN7QThreadC2ER14QThreadPrivateP7QObject
+   fun:_ZN14QAdoptedThreadC1EP11QThreadData
+   fun:_ZN11QThreadData7currentEv
+   fun:_ZN7QThread13currentThreadEv
+   fun:_ZN23QCoreApplicationPrivateC2ERiPPc
+   fun:_ZN19QApplicationPrivateC1ERiPPcN12QApplication4TypeE
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z25qt_object_read_write_lockv
+   fun:qt_addObject
+   fun:_ZN7QObjectC2ER14QObjectPrivatePS_
+   fun:_ZN7QThreadC2ER14QThreadPrivateP7QObject
+   fun:_ZN14QAdoptedThreadC1EP11QThreadData
+   fun:_ZN11QThreadData7currentEv
+   fun:_ZN7QThread13currentThreadEv
+   fun:_ZN23QCoreApplicationPrivateC2ERiPPc
+   fun:_ZN19QApplicationPrivateC1ERiPPcN12QApplication4TypeE
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z21global_callback_tablev
+   fun:_ZN9QInternal17activateCallbacksENS_8CallbackEPPv
+   fun:_ZN11QThreadData7currentEv
+   fun:_ZN7QThread13currentThreadEv
+   fun:_ZN23QCoreApplicationPrivateC2ERiPPc
+   fun:_ZN19QApplicationPrivateC1ERiPPcN12QApplication4TypeE
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z15customTypesLockv
+   fun:_ZN9QMetaType12registerTypeEPKcPFvPvEPFS2_PKvE
+   fun:_Z17qRegisterMetaTypeI24pqServerManagerSelectionEiPKcPT_
+   fun:_Z41__static_initialization_and_destruction_0ii
+   fun:_GLOBAL__I__ZN29pqServerManagerSelectionModelC2EP20pqServerManagerModelP7QObject
+   obj:/projects/Dashboards/MyTests/ParaView3-gcc40/bin/libpqCore.so
+   obj:/projects/Dashboards/MyTests/ParaView3-gcc40/bin/libpqCore.so
+   fun:call_init
+   fun:_dl_init
+   obj:/lib/ld-2.3.6.so
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z12resourceListv
+   fun:_Z21qRegisterResourceDataiPKhS0_S0_
+   fun:_Z21qInitResources_qstylev
+   fun:_Z41__static_initialization_and_destruction_0ii
+   obj:/usr/local/Trolltech/Qt-4.2.3/lib/libQtGui.so.4.2.3
+   obj:/usr/local/Trolltech/Qt-4.2.3/lib/libQtGui.so.4.2.3
+   fun:call_init
+   fun:_dl_init
+   obj:/lib/ld-2.3.6.so
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z13resourceMutexv
+   fun:_Z21qRegisterResourceDataiPKhS0_S0_
+   fun:_Z21qInitResources_qstylev
+   fun:_Z41__static_initialization_and_destruction_0ii
+   obj:/usr/local/Trolltech/Qt-4.2.3/lib/libQtGui.so.4.2.3
+   obj:/usr/local/Trolltech/Qt-4.2.3/lib/libQtGui.so.4.2.3
+   fun:call_init
+   fun:_dl_init
+   obj:/lib/ld-2.3.6.so
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z5mutexv
+   fun:_ZN18QThreadStorageDataC1EPFvPvE
+   fun:_Z41__static_initialization_and_destruction_0ii
+   obj:/usr/local/Trolltech/Qt-4.2.3/lib/libQtCore.so.4.2.3
+   obj:/usr/local/Trolltech/Qt-4.2.3/lib/libQtCore.so.4.2.3
+   fun:call_init
+   fun:_dl_init
+   obj:/lib/ld-2.3.6.so
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z18fileEngineHandlersv
+   fun:_ZN26QAbstractFileEngineHandlerC2Ev
+   fun:_Z21resource_file_handlerv
+   fun:_Z22qt_force_resource_initv
+   fun:_Z41__static_initialization_and_destruction_0ii
+   obj:/usr/local/Trolltech/Qt-4.2.3/lib/libQtCore.so.4.2.3
+   obj:/usr/local/Trolltech/Qt-4.2.3/lib/libQtCore.so.4.2.3
+   fun:call_init
+   fun:_dl_init
+   obj:/lib/ld-2.3.6.so
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z22fileEngineHandlerMutexv
+   fun:_ZN26QAbstractFileEngineHandlerC2Ev
+   fun:_Z21resource_file_handlerv
+   fun:_Z22qt_force_resource_initv
+   fun:_Z41__static_initialization_and_destruction_0ii
+   obj:/usr/local/Trolltech/Qt-4.2.3/lib/libQtCore.so.4.2.3
+   obj:/usr/local/Trolltech/Qt-4.2.3/lib/libQtCore.so.4.2.3
+   fun:call_init
+   fun:_dl_init
+   obj:/lib/ld-2.3.6.so
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z22fileEngineHandlerMutexv
+   fun:_ZN26QAbstractFileEngineHandlerC2Ev
+   fun:_Z21resource_file_handlerv
+   fun:_Z22qt_force_resource_initv
+   fun:_Z41__static_initialization_and_destruction_0ii
+   obj:/usr/local/Trolltech/Qt-4.2.3/lib/libQtCore.so.4.2.3
+   obj:/usr/local/Trolltech/Qt-4.2.3/lib/libQtCore.so.4.2.3
+   fun:call_init
+   fun:_dl_init
+   obj:/lib/ld-2.3.6.so
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z21resource_file_handlerv
+   fun:_Z22qt_force_resource_initv
+   fun:_Z41__static_initialization_and_destruction_0ii
+   obj:/usr/local/Trolltech/Qt-4.2.3/lib/libQtCore.so.4.2.3
+   obj:/usr/local/Trolltech/Qt-4.2.3/lib/libQtCore.so.4.2.3
+   fun:call_init
+   fun:_dl_init
+   obj:/lib/ld-2.3.6.so
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z14tablet_devicesv
+   fun:_ZN14QWidgetPrivate10create_sysEmbb
+   fun:_ZN7QWidget6createEmbb
+   fun:_ZN7QWidget10setVisibleEb
+   fun:_ZN7QWidget4showEv
+   fun:_ZN22ProcessModuleGUIHelperC1Ev
+   fun:_ZN22ProcessModuleGUIHelper3NewEv
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_X11TransConnectDisplay
+   fun:XOpenDisplay
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_XomGenericOpenOM
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XOpenOM
+   fun:XCreateFontSet
+   fun:_Z10getFontSetRK5QFont
+   fun:_ZN16QXIMInputContext12createICDataEP7QWidget
+   fun:_ZN16QXIMInputContext14setFocusWidgetEP7QWidget
+   fun:_ZN19QApplicationPrivate14setFocusWidgetEP7QWidgetN2Qt11FocusReasonE
+   fun:_ZN7QWidget8setFocusEN2Qt11FocusReasonE
+   fun:_ZN12QApplication15setActiveWindowEP7QWidget
+   fun:_ZN12QApplication15x11ProcessEventEP7_XEvent
+   fun:_Z22x11EventSourceDispatchP8_GSourcePFiPvES1_
+   fun:g_main_context_dispatch
+   obj:/usr/lib/libglib-2.0.so.0.1000.3
+   fun:g_main_context_iteration
+   fun:_ZN20QEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   fun:_ZN23QGuiEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   fun:_ZN10QEventLoop13processEventsE6QFlagsINS_17ProcessEventsFlagEE
+   fun:_ZN10QEventLoop4execE6QFlagsINS_17ProcessEventsFlagEE
+   fun:_ZN17pqEventDispatcher20processEventsAndWaitEi
+   fun:_ZN17pqEventDispatcher18checkPlayNextEventEv
+   fun:_ZN17pqEventDispatcher11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z15tooltip_palettev
+   fun:_ZN8QToolTip7paletteEv
+   fun:_ZN9QTipLabelC1ERK7QStringP7QWidget
+   fun:_ZN8QToolTip8showTextERK6QPointRK7QStringP7QWidgetRK5QRect
+   fun:_ZN8QToolTip8showTextERK6QPointRK7QStringP7QWidget
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN15QAbstractButton5eventEP6QEvent
+   fun:_ZN11QToolButton5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_ZN12QApplication5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z19timerSourceDispatchP8_GSourcePFiPvES1_
+   fun:g_main_context_dispatch
+   obj:/usr/lib/libglib-2.0.so.0.1000.3
+   fun:g_main_context_iteration
+   fun:_ZN20QEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   fun:_ZN23QGuiEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   fun:_ZN10QEventLoop13processEventsE6QFlagsINS_17ProcessEventsFlagEE
+   fun:_ZN10QEventLoop4execE6QFlagsINS_17ProcessEventsFlagEE
+   fun:_ZN16QCoreApplication4execEv
+   fun:_ZN24pqProcessModuleGUIHelper11RunGUIStartEiPPcii
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/X11/locale/common/xomGeneric.so.2.0.0
+   fun:XCreateOC
+   fun:XCreateFontSet
+   fun:_Z10getFontSetRK5QFont
+   fun:_ZN16QXIMInputContext12createICDataEP7QWidget
+   fun:_ZN16QXIMInputContext14setFocusWidgetEP7QWidget
+   fun:_ZN19QApplicationPrivate14setFocusWidgetEP7QWidgetN2Qt11FocusReasonE
+   fun:_ZN7QWidget8setFocusEN2Qt11FocusReasonE
+   fun:_ZN12QApplication15setActiveWindowEP7QWidget
+   fun:_ZN12QApplication15x11ProcessEventEP7_XEvent
+   fun:_Z22x11EventSourceDispatchP8_GSourcePFiPvES1_
+   fun:g_main_context_dispatch
+   obj:/usr/lib/libglib-2.0.so.0.1000.3
+   fun:g_main_context_iteration
+   fun:_ZN20QEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   fun:_ZN23QGuiEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   fun:_ZN10QEventLoop13processEventsE6QFlagsINS_17ProcessEventsFlagEE
+   fun:_ZN10QEventLoop4execE6QFlagsINS_17ProcessEventsFlagEE
+   fun:_ZN17pqEventDispatcher20processEventsAndWaitEi
+   fun:_ZN17pqEventDispatcher18checkPlayNextEventEv
+   fun:_ZN17pqEventDispatcher11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z6loaderv
+   fun:_ZN20QInputContextFactory4keysEv
+   fun:_ZN19QApplicationPrivate18x11_apply_settingsEv
+   fun:_Z20qt_set_x11_resourcesPKcS0_S0_S0_
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN12QApplication4fontEv
+   fun:_ZN19QApplicationPrivate18x11_apply_settingsEv
+   fun:_Z20qt_set_x11_resourcesPKcS0_S0_S0_
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN5QListI8QPointerI7QObjectEE14node_constructEPNS3_4NodeERKS2_
+   fun:_ZN5QListI8QPointerI7QObjectEE6appendERKS2_
+   fun:_ZN5QListI8QPointerI7QObjectEE9push_backERKS2_
+   fun:_ZN17pqProgressManager21addNonBlockableObjectEP7QObject
+   fun:_ZN16pqMainWindowCore16setupProgressBarEP10QStatusBar
+   fun:_ZN10MainWindowC1Ev
+   fun:_ZN22ProcessModuleGUIHelper16CreateMainWindowEv
+   fun:_ZN24pqProcessModuleGUIHelper21InitializeApplicationEiPPc
+   fun:_ZN24pqProcessModuleGUIHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:_ZN6pqMain3RunER12QApplicationP24pqProcessModuleGUIHelper
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z9keymapperv
+   fun:_ZN10QKeyMapper14changeKeyboardEv
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_XcursorGetDisplayInfo
+   fun:XcursorSupportsARGB
+   fun:XcursorNoticeCreateBitmap
+   fun:_XNoticeCreateBitmap
+   fun:XCreatePixmap
+   fun:XCreateBitmapFromData
+   fun:_ZN7QBitmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZNK7QPixmap19createMaskFromColorERK6QColor
+   fun:_ZN22ProcessModuleGUIHelperC1Ev
+   fun:_ZN22ProcessModuleGUIHelper3NewEv
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN19QAbstractFileEngine6createERK7QString
+   fun:_ZN11QDirPrivate14initFileEngineERK7QString
+   fun:_ZN4QDir2cdERK7QString
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z6loaderv
+   fun:_Z17createReadHandlerP9QIODeviceRK10QByteArray
+   fun:_ZN19QImageReaderPrivate11initHandlerEv
+   fun:_ZN12QImageReader4readEP6QImage
+   fun:_ZN12QImageReader4readEv
+   fun:_ZN7QPixmap4loadERK7QStringPKc6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZN7QPixmapC1ERK7QStringPKc6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZN22ProcessModuleGUIHelperC1Ev
+   fun:_ZN22ProcessModuleGUIHelper3NewEv
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_XiGetExtensionVersion
+   fun:_XiCheckExtInit
+   fun:_XiGetExtensionVersion
+   fun:XGetExtensionVersion
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN19QApplicationPrivate16setSystemPaletteERK8QPalette
+   fun:_ZN12QApplication5styleEv
+   fun:_Z20qt_set_x11_resourcesPKcS0_S0_S0_
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN12QApplication7paletteEv
+   fun:_ZN8QPaletteC1Ev
+   fun:_ZNK15QPlastiqueStyle15standardPaletteEv
+   fun:_ZN12QApplication5styleEv
+   fun:_Z20qt_set_x11_resourcesPKcS0_S0_S0_
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN15QSessionManagerC1EP12QApplicationR7QStringS3_
+   fun:_ZN19QApplicationPrivate10initializeEv
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN19QApplicationPrivate21createEventDispatcherEv
+   fun:_ZN16QCoreApplication4initEv
+   fun:_ZN16QCoreApplicationC2ER23QCoreApplicationPrivate
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_Z7qstrdupPKc
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XmbTextListToTextProperty
+   fun:_Z14qstring_to_xtpRK7QString
+   fun:_ZN14QWidgetPrivate18setWindowTitle_sysERK7QString
+   fun:_ZN14QWidgetPrivate21setWindowTitle_helperERK7QString
+   fun:_ZN7QWidget14setWindowTitleERK7QString
+   fun:_ZN23Ui_pqRescaleRangeDialog13retranslateUiEP7QDialog
+   fun:_ZN23Ui_pqRescaleRangeDialog7setupUiEP7QDialog
+   fun:_ZN14pqRescaleRangeC1EP7QWidget
+   fun:_ZN18pqColorScaleEditor17rescaleToNewRangeEv
+   fun:_ZN18pqColorScaleEditor11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iiPPv
+   fun:_ZN15QAbstractButton7clickedEb
+   fun:_ZN22QAbstractButtonPrivate11emitClickedEv
+   fun:_ZN15QAbstractButton5clickEv
+   fun:_ZN29pqAbstractActivateEventPlayer9playEventEP7QObjectRK7QStringS4_Rb
+   fun:_ZN13pqEventPlayer9playEventERK7QStringS2_S2_Rb
+   fun:_ZN17pqEventDispatcher13playNextEventEv
+   fun:_ZN17pqEventDispatcher11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN17pqEventDispatcher18readyPlayNextEventEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN7QWidget14updateGeometryEv
+   fun:_ZN14QTabBarPrivate7refreshEv
+   fun:_ZN7QTabBar11changeEventEP6QEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN7QTabBar5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate17setEnabled_helperEb
+   fun:_ZN14QWidgetPrivate17setEnabled_helperEb
+   fun:_ZN7QWidget10setEnabledEb
+   fun:_ZN18pqColorScaleEditor17setRepresentationEP24pqPipelineRepresentation
+   fun:_ZN18pqColorScaleEditor9hideEventEP10QHideEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate11hide_helperEv
+   fun:_ZN7QWidget10setVisibleEb
+   fun:_ZN7QDialog10setVisibleEb
+   fun:_ZN7QDialog4doneEi
+   fun:_ZN7QDialog6acceptEv
+   fun:_ZN7QDialog11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN18pqColorScaleEditor11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN20QEventDispatcherGlib22registerSocketNotifierEP15QSocketNotifier
+   fun:_ZN15QSocketNotifierC1EiNS_4TypeEP7QObject
+   fun:_ZN15QSessionManagerC1EP12QApplicationR7QStringS3_
+   fun:_ZN19QApplicationPrivate10initializeEv
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN7QLayout6updateEv
+   fun:_ZN7QLayout10invalidateEv
+   fun:_ZN11QGridLayout10invalidateEv
+   fun:_ZN7QWidget14updateGeometryEv
+   fun:_ZN13QLabelPrivate11updateLabelEv
+   fun:_ZN6QLabel7setTextERK7QString
+   fun:_ZN18pqColorScaleEditor15loadColorPointsEv
+   fun:_ZN18pqColorScaleEditor14initColorScaleEv
+   fun:_ZN18pqColorScaleEditor17setRepresentationEP24pqPipelineRepresentation
+   fun:_ZN18pqColorScaleEditor9hideEventEP10QHideEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate11hide_helperEv
+   fun:_ZN7QWidget10setVisibleEb
+   fun:_ZN7QDialog10setVisibleEb
+   fun:_ZN7QDialog4doneEi
+   fun:_ZN7QDialog6acceptEv
+   fun:_ZN7QDialog11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN18pqColorScaleEditor11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iiPPv
+   fun:_ZN15QAbstractButton7clickedEb
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:__glXInitialize
+   obj:/usr/lib/libGL.so.1.2
+   fun:glXChooseVisual
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiii
+   fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
+   fun:_ZN10QVTKWidget16x11_setup_windowEv
+   fun:_ZN10QVTKWidget15SetRenderWindowEP15vtkRenderWindow
+   fun:_ZN12pqRenderView17initializeWidgetsEv
+   fun:_ZN12pqRenderView10initializeEv
+   fun:_ZN20pqServerManagerModel17onProxyRegisteredERK7QStringS2_P10vtkSMProxy
+   fun:_ZN20pqServerManagerModel11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN23pqServerManagerObserver15proxyRegisteredERK7QStringS2_P10vtkSMProxy
+   fun:_ZN23pqServerManagerObserver15proxyRegisteredEP9vtkObjectmPvS2_P10vtkCommand
+   fun:_ZN23pqServerManagerObserver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN15vtkQtConnection11EmitExecuteEP9vtkObjectmPvS2_P10vtkCommand
+   fun:_ZN15vtkQtConnection7ExecuteEP9vtkObjectmPv
+   fun:_ZN15vtkQtConnection10DoCallbackEP9vtkObjectmPvS2_
+   fun:_ZN18vtkCallbackCommand7ExecuteEP9vtkObjectmPv
+   fun:_ZN16vtkSubjectHelper11InvokeEventEmPvP9vtkObject
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XrmGetStringDatabase
+   fun:XGetDefault
+   fun:_Z11getXDefaultPKcS0_Pi
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XrmGetStringDatabase
+   fun:XGetDefault
+   fun:_Z11getXDefaultPKcS0_Pi
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_ZN8QMapData11node_createEPPNS_4NodeEi
+   fun:_ZN13QRegExpEngine10addAnchorsEiii
+   fun:_ZNK13QRegExpEngine3Box18addAnchorsToEngineERKS0_
+   fun:_ZN13QRegExpEngine3Box3catERKS0_
+   fun:_ZN13QRegExpEngine9parseTermEPNS_3BoxE
+   fun:_ZN13QRegExpEngine15parseExpressionEPNS_3BoxE
+   fun:_ZN13QRegExpEngine5parseEPK5QChari
+   fun:_ZN13QRegExpEngineC1ERK16QRegExpEngineKey
+   fun:_Z13prepareEngineP14QRegExpPrivate
+   fun:_Z21prepareEngineForMatchP14QRegExpPrivateRK7QString
+   fun:_ZNK7QRegExp7indexInERK7QStringiNS_9CaretModeE
+   fun:_ZN23pqQVTKWidgetEventPlayer9playEventEP7QObjectRK7QStringS4_Rb
+   fun:_ZN13pqEventPlayer9playEventERK7QStringS2_S2_Rb
+   fun:_ZN17pqEventDispatcher13playNextEventEv
+   fun:_ZN17pqEventDispatcher11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN17pqEventDispatcher18readyPlayNextEventEv
+   fun:_ZN17pqEventDispatcher18checkPlayNextEventEv
+   fun:_ZN17pqEventDispatcher11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN6QTimer7timeoutEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XRenderFindDisplay
+   fun:XRenderQueryExtension
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN13QStyleFactory6createERK7QString
+   fun:_ZN19QApplicationPrivate20x11_initialize_styleEv
+   fun:_ZN12QApplication5styleEv
+   fun:_Z20qt_set_x11_resourcesPKcS0_S0_S0_
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z14processManagerv
+   fun:_ZN16QCoreApplication4initEv
+   fun:_ZN16QCoreApplicationC2ER23QCoreApplicationPrivate
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z11coreappdatav
+   fun:_ZN16QCoreApplication4initEv
+   fun:_ZN16QCoreApplicationC2ER23QCoreApplicationPrivate
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN7QThread10initializeEv
+   fun:_ZN16QCoreApplication4initEv
+   fun:_ZN16QCoreApplicationC2ER23QCoreApplicationPrivate
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:v1h_get_NC_attrarray
+   fun:vtk_netcdf_nc_get_NC
+   fun:vtk_netcdf_nc__open_mp
+   fun:vtk_netcdf_nc__open
+   fun:vtk_netcdf_nc_open
+   fun:vtk_netcdf_ncopen
+   fun:ex_open
+   fun:_ZN15vtkExodusReader11CanReadFileEPKc
+   fun:_Z22vtkExodusReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z23vtkPExodusReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
+   fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
+   fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_Z26vtkClientConnectionRootRMIPvS_ii
+   fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
+   fun:_ZN25vtkMultiProcessController11ProcessRMIsEii
+   fun:_ZN19vtkRemoteConnection20ProcessCommunicationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:realloc
+   fun:_Z8qReallocPvj
+   fun:_ZN9QListData7reallocEi
+   fun:_ZN9QListData6appendEv
+   fun:_ZN5QListIP7QActionE6appendERKS1_
+   fun:_ZN12QActionGroup9addActionEP7QAction
+   fun:_ZN7QActionC1ERK7QStringP7QObject
+   fun:_ZN19PrismToolBarActionsC1EP7QObject
+   fun:_ZN33PrismToolBarActionsImplementationC1EP7QObject
+   fun:_ZN23PrismClientPluginPluginC1Ev
+   fun:qt_plugin_instance
+   fun:_ZN13QPluginLoader8instanceEv
+   fun:_ZN13QFormInternal12QFormBuilder19updateCustomWidgetsEv
+   fun:_ZN13QFormInternal12QFormBuilder13addPluginPathERK7QString
+   fun:_ZN9QUiLoader13addPluginPathERK7QString
+   fun:_ZN13pqFormBuilderC1EP7QObject
+   fun:_ZN23pqLoadedFormObjectPanelC2E7QStringP7pqProxyP7QWidget
+   fun:_ZN16pqThresholdPanelC1EP7pqProxyP7QWidget
+   fun:_ZN22pqStandardCustomPanels11createPanelEP7pqProxyP7QWidget
+   fun:_ZN23pqObjectInspectorWidget8setProxyEP7pqProxy
+   fun:_ZN16pqProxyTabWidget8setProxyEP16pqPipelineSource
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN9QHashData6rehashEi
+   fun:_ZN13QFreetypeFace7getFaceERKN11QFontEngine6FaceIdE
+   fun:_ZN13QFontEngineFTC1EP10_FcPatternRK8QFontDefi
+   fun:_Z14tryPatternLoadP10_FcPatterniRK8QFontDefi
+   fun:_ZN13QFontDatabase4loadEPK12QFontPrivatei
+   fun:_ZN11QScriptLine16setDefaultHeightEP11QTextEngine
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutBlockERK10QTextBlockP13QLayoutStructiiS2_
+   fun:_ZN26QTextDocumentLayoutPrivate10layoutFlowEN10QTextFrame8iteratorEP13QLayoutStructii
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameiidd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameii
+   fun:_ZN19QTextDocumentLayout8doLayoutEiii
+   fun:_ZNK26QTextDocumentLayoutPrivate24ensureLayoutedByPositionEi
+   fun:_ZNK26QTextDocumentLayoutPrivate10layoutStepEv
+   fun:_ZN19QTextDocumentLayout15documentChangedEiii
+   fun:_ZN20QTextDocumentPrivate9setLayoutEP27QAbstractTextDocumentLayout
+   fun:_ZNK13QTextDocument14documentLayoutEv
+   fun:_ZN19QTextControlPrivate10setContentEN2Qt10TextFormatERK7QStringP13QTextDocument
+   fun:_ZN12QTextControlC2EP7QObject
+   fun:_ZN16QTextEditPrivate4initERK7QString
+   fun:_ZN9QTextEditC2EP7QWidget
+   fun:_ZN15pqConsoleWidget16pqImplementationC1ERS_
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:v1h_get_NC_vararray
+   fun:vtk_netcdf_nc_get_NC
+   fun:vtk_netcdf_nc__open_mp
+   fun:vtk_netcdf_nc__open
+   fun:vtk_netcdf_nc_open
+   fun:vtk_netcdf_ncopen
+   fun:ex_open
+   fun:_ZN15vtkExodusReader11CanReadFileEPKc
+   fun:_Z22vtkExodusReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z23vtkPExodusReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
+   fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
+   fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_Z26vtkClientConnectionRootRMIPvS_ii
+   fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
+   fun:_ZN25vtkMultiProcessController11ProcessRMIsEii
+   fun:_ZN19vtkRemoteConnection20ProcessCommunicationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:vtk_netcdf_new_x_NC_dim
+   fun:v1h_get_NC_dim
+   fun:v1h_get_NC_dimarray
+   fun:vtk_netcdf_nc_get_NC
+   fun:vtk_netcdf_nc__open_mp
+   fun:vtk_netcdf_nc__open
+   fun:vtk_netcdf_nc_open
+   fun:vtk_netcdf_ncopen
+   fun:ex_open
+   fun:_ZN15vtkExodusReader11CanReadFileEPKc
+   fun:_Z22vtkExodusReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z23vtkPExodusReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
+   fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
+   fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_Z26vtkClientConnectionRootRMIPvS_ii
+   fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:vtk_netcdf_new_x_NC_attr
+   fun:v1h_get_NC_attr
+   fun:v1h_get_NC_attrarray
+   fun:vtk_netcdf_nc_get_NC
+   fun:vtk_netcdf_nc__open_mp
+   fun:vtk_netcdf_nc__open
+   fun:vtk_netcdf_nc_open
+   fun:vtk_netcdf_ncopen
+   fun:ex_open
+   fun:_ZN15vtkExodusReader11CanReadFileEPKc
+   fun:_Z22vtkExodusReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z23vtkPExodusReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
+   fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
+   fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_Z26vtkClientConnectionRootRMIPvS_ii
+   fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:vtk_netcdf_new_NC_string
+   fun:v1h_get_NC_string
+   fun:v1h_get_NC_dim
+   fun:v1h_get_NC_dimarray
+   fun:vtk_netcdf_nc_get_NC
+   fun:vtk_netcdf_nc__open_mp
+   fun:vtk_netcdf_nc__open
+   fun:vtk_netcdf_nc_open
+   fun:vtk_netcdf_ncopen
+   fun:ex_open
+   fun:_ZN15vtkExodusReader11CanReadFileEPKc
+   fun:_Z22vtkExodusReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z23vtkPExodusReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
+   fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
+   fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_Z26vtkClientConnectionRootRMIPvS_ii
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:vtk_netcdf_new_x_NC_var
+   fun:v1h_get_NC_var
+   fun:v1h_get_NC_vararray
+   fun:vtk_netcdf_nc_get_NC
+   fun:vtk_netcdf_nc__open_mp
+   fun:vtk_netcdf_nc__open
+   fun:vtk_netcdf_nc_open
+   fun:vtk_netcdf_ncopen
+   fun:ex_open
+   fun:_ZN15vtkExodusReader11CanReadFileEPKc
+   fun:_Z22vtkExodusReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z23vtkPExodusReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
+   fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
+   fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_Z26vtkClientConnectionRootRMIPvS_ii
+   fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:ncio_spx_init2
+   fun:vtk_netcdf_ncio_open
+   fun:vtk_netcdf_nc__open_mp
+   fun:vtk_netcdf_nc__open
+   fun:vtk_netcdf_nc_open
+   fun:vtk_netcdf_ncopen
+   fun:ex_open
+   fun:_ZN15vtkExodusReader11CanReadFileEPKc
+   fun:_Z22vtkExodusReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z23vtkPExodusReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
+   fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
+   fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_Z26vtkClientConnectionRootRMIPvS_ii
+   fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
+   fun:_ZN25vtkMultiProcessController11ProcessRMIsEii
+   fun:_ZN19vtkRemoteConnection20ProcessCommunicationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN7QObjectC2EPS_
+   fun:_ZN22pqColorMapWidgetPluginC1EP7QObject
+   fun:_ZN13pqChartPluginC1EP7QObject
+   fun:qt_plugin_instance
+   fun:_ZN13QPluginLoader8instanceEv
+   fun:_ZN13QFormInternal12QFormBuilder19updateCustomWidgetsEv
+   fun:_ZN13QFormInternal12QFormBuilder13addPluginPathERK7QString
+   fun:_ZN9QUiLoader13addPluginPathERK7QString
+   fun:_ZN13pqFormBuilderC1EP7QObject
+   fun:_ZN23pqLoadedFormObjectPanelC2E7QStringP7pqProxyP7QWidget
+   fun:_ZN16pqThresholdPanelC1EP7pqProxyP7QWidget
+   fun:_ZN22pqStandardCustomPanels11createPanelEP7pqProxyP7QWidget
+   fun:_ZN23pqObjectInspectorWidget8setProxyEP7pqProxy
+   fun:_ZN16pqProxyTabWidget8setProxyEP16pqPipelineSource
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
+   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZNK13QFontEngineFT4Font9loadGlyphEPKS_jNS_11GlyphFormatE
+   fun:_ZNK13QFontEngineFT14recalcAdvancesEiP12QGlyphLayout6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_ZNK13QFontEngineFT12stringToCMapEPK5QChariP12QGlyphLayoutPi6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_ZNK16QFontEngineMulti12stringToCMapEPK5QChariP12QGlyphLayoutPi6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_Z11basic_shapeP11QShaperItem
+   fun:_ZNK11QTextEngine9shapeTextEi
+   fun:_ZNK11QTextEngine5shapeEi
+   fun:_ZNK11QTextEngine5widthEii
+   fun:_ZNK12QFontMetrics5widthERK7QStringi
+   fun:_ZNK16QAbstractSpinBox8sizeHintEv
+   fun:_ZNK11QWidgetItem8sizeHintEv
+   fun:_ZN18QGridLayoutPrivate15setupLayoutDataEi
+   fun:_ZNK18QGridLayoutPrivate8findSizeEM13QLayoutStructii
+   fun:_ZNK18QGridLayoutPrivate11minimumSizeEi
+   fun:_ZNK11QGridLayout11minimumSizeEv
+   fun:_ZNK7QLayout16totalMinimumSizeEv
+   fun:_ZNK7QWidget15minimumSizeHintEv
+   fun:_ZNK11QWidgetItem8sizeHintEv
+   fun:_ZN18QGridLayoutPrivate15setupLayoutDataEi
+   fun:_ZNK18QGridLayoutPrivate8findSizeEM13QLayoutStructii
+   fun:_ZNK18QGridLayoutPrivate11minimumSizeEi
+   fun:_ZNK11QGridLayout11minimumSizeEv
+   fun:_ZNK7QLayout16totalMinimumSizeEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:realloc
+   obj:/usr/lib/libfreetype.so.6.3.10
+   fun:ft_mem_qrealloc
+   fun:ft_mem_realloc
+   fun:FT_CMap_New
+   obj:/usr/lib/libfreetype.so.6.3.10
+   obj:/usr/lib/libfreetype.so.6.3.10
+   obj:/usr/lib/libfreetype.so.6.3.10
+   obj:/usr/lib/libfreetype.so.6.3.10
+   fun:FT_Open_Face
+   fun:FT_New_Face
+   fun:_ZN13QFreetypeFace7getFaceERKN11QFontEngine6FaceIdE
+   fun:_ZN13QFontEngineFTC1EP10_FcPatternRK8QFontDefi
+   fun:_Z14tryPatternLoadP10_FcPatterniRK8QFontDefi
+   fun:_ZN13QFontDatabase4loadEPK12QFontPrivatei
+   fun:_ZN11QScriptLine16setDefaultHeightEP11QTextEngine
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutBlockERK10QTextBlockP13QLayoutStructiiS2_
+   fun:_ZN26QTextDocumentLayoutPrivate10layoutFlowEN10QTextFrame8iteratorEP13QLayoutStructii
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameiidd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameii
+   fun:_ZN19QTextDocumentLayout8doLayoutEiii
+   fun:_ZNK26QTextDocumentLayoutPrivate24ensureLayoutedByPositionEi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z11globalMutexv
+   fun:_Z7getPathN9QSettings6FormatENS_5ScopeE
+   fun:_ZN24QConfFileSettingsPrivateC1EN9QSettings6FormatENS0_5ScopeERK7QStringS5_
+   fun:_ZN16QSettingsPrivate6createEN9QSettings6FormatENS0_5ScopeERK7QStringS5_
+   fun:_ZN9QSettingsC1ENS_5ScopeERK7QStringS3_P7QObject
+   fun:_ZN19QApplicationPrivate18x11_apply_settingsEv
+   fun:_Z20qt_set_x11_resourcesPKcS0_S0_S0_
+   fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
+   fun:_ZN19QApplicationPrivate9constructEP9_XDisplaymm
+   fun:_ZN12QApplicationC1ERiPPci
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN4QDirC1ERK7QString
+   fun:main
 }
