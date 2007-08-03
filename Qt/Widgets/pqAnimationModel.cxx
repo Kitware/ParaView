@@ -113,6 +113,7 @@ void pqAnimationModel::resizeTracks()
     return;
     }
   
+  rh = (requiredHeight -1)/double(num+1);
   double h = rh;
   for(i=0; i<num; i++)
     {
@@ -200,6 +201,9 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF& )
   painter->restore();
   
   // show rough time labels for all time modes
+  // TODO  would be nice to improve the time labels
+  //       match them with ticks in sequence mode
+  //       don't draw labels in 'e' mode, if its simpler or more compact
   QFontMetrics metrics(view->font());
   int num = qRound(labelRect.width() / (9 * metrics.maxWidth()));
   num = num == 0 ? 1 : num;
@@ -256,7 +260,7 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF& )
   painter->setPen(pen);
 
   QPointF pt1(pos, rh-1);
-  QPointF pt2(pos, sr.height() + sr.top()-1);
+  QPointF pt2(pos, sr.height() + sr.top()-2);
   painter->drawLine(pt1, pt2);
 
 
