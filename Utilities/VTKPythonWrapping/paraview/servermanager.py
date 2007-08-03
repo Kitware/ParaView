@@ -97,7 +97,7 @@ class Proxy(object):
             observed = self.Observed
             self.Observed = None
             observed.RemoveObservers("ModifiedEvent")
-        
+
     def InitializeFromProxy(self, aProxy):
         "Constructor. Assigns proxy to self.SMProxy"
         self.SMProxy = aProxy
@@ -281,15 +281,26 @@ def _makeUpdateCameraMethod(rv):
     return UpdateCamera
 
 class Property(object):
-    def __init__(self, smproperty):
+    def __init__(self, smproperty, smproxy):
         try:
-            if not smproperty.IsA("vtkSMProperty"):
+            if not smproperty.IsA("vtkSMProperty") or \
+               not smproperty.IsA("vtkSMProxy"):
                 raise exceptions.TypeError, \
                       "Unexcepted argument, expected a vtkSMProperty"
             self.SMProperty = smproperty
+            self.SMProxy = smproxy
         except:
             raise exceptions.TypeError, \
                   "Unexcepted argument, expected a vtkSMProperty"
+
+class VectorProperty(Property):
+    pass
+
+class ProxyProperty(Property):
+    pass
+
+class InputProperty(ProxyProperty):
+    pass
         
 class DataInformation(object):
     def __init__(self, dataInformation, proxy, idx):
