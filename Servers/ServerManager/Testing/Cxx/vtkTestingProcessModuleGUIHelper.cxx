@@ -84,7 +84,7 @@ vtkStandardNewMacro(vtkTestingOutputWindow);
 
 
 
-vtkCxxRevisionMacro(vtkTestingProcessModuleGUIHelper, "1.6");
+vtkCxxRevisionMacro(vtkTestingProcessModuleGUIHelper, "1.7");
 vtkStandardNewMacro(vtkTestingProcessModuleGUIHelper);
 
 //----------------------------------------------------------------------------
@@ -133,7 +133,6 @@ int vtkTestingProcessModuleGUIHelper::RunGUIStart(int , char **,
   if (!options->GetSMStateXMLName())
     {
     vtkErrorMacro("No state to load.");
-    this->ProcessModule->Exit();
     return 1;
     }
 
@@ -201,7 +200,6 @@ int vtkTestingProcessModuleGUIHelper::RunGUIStart(int , char **,
     char c;
     cin >> c;
     }
-  this->ProcessModule->Exit();
   
   // Exiting:  CLean up.
   return res;
