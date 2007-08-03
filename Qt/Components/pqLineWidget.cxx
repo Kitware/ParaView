@@ -217,6 +217,7 @@ void pqLineWidget::onXAxis()
   
     this->getWidgetProxy()->UpdateVTKObjects();
     pqApplicationCore::instance()->render();
+    this->setModified();
     }
 }
 
@@ -239,6 +240,7 @@ void pqLineWidget::onYAxis()
   
     this->getWidgetProxy()->UpdateVTKObjects();
     pqApplicationCore::instance()->render();
+    this->setModified();
     }
 }
 
@@ -261,6 +263,7 @@ void pqLineWidget::onZAxis()
   
     this->getWidgetProxy()->UpdateVTKObjects();
     pqApplicationCore::instance()->render();
+    this->setModified();
     }
 }
 
