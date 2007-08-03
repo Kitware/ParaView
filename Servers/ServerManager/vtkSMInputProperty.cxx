@@ -27,7 +27,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMInputProperty);
-vtkCxxRevisionMacro(vtkSMInputProperty, "1.18");
+vtkCxxRevisionMacro(vtkSMInputProperty, "1.19");
 
 int vtkSMInputProperty::InputsUpdateImmediately = 1;
 
@@ -147,6 +147,7 @@ int vtkSMInputProperty::ReadXMLAttributes(vtkSMProxy* parent,
   if(retVal) 
     { 
     this->SetMultipleInput(multiple_input); 
+    this->Repeatable = multiple_input;
     }
 
   int port_index;
