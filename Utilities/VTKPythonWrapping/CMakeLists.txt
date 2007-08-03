@@ -635,6 +635,8 @@ IF (PARAVIEW_ENABLE_PYTHON)
   # List all python source files.
   # All files paraview/*.py included in the paraview module.
   SET(PV_PYTHON_FILES
+    vtk
+    servermanager
     __init__
     servermanager
     vtk
