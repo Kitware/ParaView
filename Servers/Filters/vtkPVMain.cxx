@@ -34,7 +34,6 @@
 #include "vtkOutputWindow.h"
 #include "vtkProcessModuleGUIHelper.h"
 #include "vtkProcessModule.h"
-#include "vtkPVCreateProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkTimerLog.h"
 
@@ -49,7 +48,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.19");
+vtkCxxRevisionMacro(vtkPVMain, "1.20");
 
 int vtkPVMain::InitializeMPI = 1;
 
