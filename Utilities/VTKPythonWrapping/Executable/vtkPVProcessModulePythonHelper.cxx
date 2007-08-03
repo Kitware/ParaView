@@ -24,7 +24,7 @@
 
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.13");
+vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.14");
 vtkStandardNewMacro(vtkPVProcessModulePythonHelper);
 
 //----------------------------------------------------------------------------
@@ -106,8 +106,6 @@ int vtkPVProcessModulePythonHelper::RunGUIStart(int argc, char **argv, int numSe
     {
     delete [] *it;
     }
-
-  this->ProcessModule->Exit();
 
   // Exiting:  CLean up.
   return res;
