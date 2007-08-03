@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSignalAdaptorKeyFrameType.h"
 #include "pqSMProxy.h"
 #include "pqPropertyLinks.h"
+#include "pqCameraWidget.h"
 
 
 // editor dialog that comes and goes for editing a single key frame
@@ -99,6 +100,28 @@ public:
   pqKeyFrameTypeWidget Widget;
 };
 
+// item model for putting a key frame interpolation widget in the model
+class pqCameraKeyFrameItem : public QStandardItem
+{
+public:
+  pqCameraKeyFrameItem() : Widget()
+    {
+    }
+  // get data from widget
+  QVariant data(int role) const
+    {
+    QVariant d;
+    if(role == Qt::DisplayRole)
+      {
+      QList<QVariant> pos = this->Widget.position();
+      d = QString("Position(%1,%2,%3), ...").
+          arg(pos[0].toString()).arg(pos[1].toString()).arg(pos[2].toString());
+      }
+    return d;
+    }
+  pqCameraWidget Widget;
+};
+
 // delegate for creating editors for model items
 class pqKeyFrameEditorDelegate : public QItemDelegate
 {
@@ -114,22 +137,35 @@ public:
       {
       return new QLineEdit(p);
       }
-    else if(index.column() == 1)
+    else if(index.model()->columnCount() == 3)
       {
-      pqKeyFrameInterpolationItem* item = 
-        static_cast<pqKeyFrameInterpolationItem*>(model->item(index.row(), 1));
-      if(item)
+      if(index.column() == 1)
         {
-        return new pqKeyFrameTypeDialog(p, &item->Widget);
+        pqKeyFrameInterpolationItem* item = 
+          static_cast<pqKeyFrameInterpolationItem*>(model->item(index.row(), 1));
+        if(item)
+          {
+          return new pqKeyFrameTypeDialog(p, &item->Widget);
+          }
+        return NULL;
         }
-      return NULL;
+      else if(index.column() == 2)
+        {
+        return new QLineEdit(p);
+        }
       }
-    else if(index.column() == 2)
+    else
       {
-      // TODO create the widget that auto panels would create?
-      // HMMM pqAnimationPanel doesn't do this, nor does it
-      //      support all property types.
-      return new QLineEdit(p);
+      if(index.column() == 1)
+        {
+        pqCameraKeyFrameItem* item = 
+          static_cast<pqCameraKeyFrameItem*>(model->item(index.row(), 1));
+        if(item)
+          {
+          return new pqKeyFrameTypeDialog(p, &item->Widget);
+          }
+        return NULL;
+        }
       }
     return NULL;
     }
@@ -178,6 +214,22 @@ public:
     return t * span + this->TimeRange.first;
     }
 
+  QList<QStandardItem*> newRow(int row)
+    {
+    QList<QStandardItem*> items;
+    items.append(this->newTimeItem(row));
+    if(this->cameraCue())
+      {
+      items.append(this->newCameraItem(row));
+      }
+    else
+      {
+      items.append(this->newInterpolationItem(row));
+      items.append(this->newValueItem(row));
+      }
+    return items;
+    }
+
   QStandardItem* newTimeItem(int row)
     {
     QStandardItem* item = new QStandardItem();
@@ -210,6 +262,16 @@ public:
       }
     return item;
     }
+  QStandardItem* newCameraItem(int row)
+    {
+    QStandardItem* item = NULL;
+    int count = this->Model.rowCount();
+    if(count != row || row == 0)
+      {
+      item = new pqCameraKeyFrameItem();
+      }
+    return item;
+    }
   QStandardItem* newValueItem(int row)
     {
     QStandardItem* item = new QStandardItem();
@@ -231,6 +293,15 @@ public:
       }
     item->setData(value, Qt::DisplayRole);
     return item;
+    }
+  bool cameraCue()
+    {
+    vtkSMProxy* manip = this->Cue->getManipulatorProxy();
+    if(manip->IsA("vtkSMCameraManipulatorProxy"))
+      {
+      return true;
+      }
+    return false;
     }
 };
 
@@ -288,13 +359,22 @@ void pqKeyFrameEditor::readKeyFrameData()
     }
 
   int numberKeyFrames = this->Internal->Cue->getNumberOfKeyFrames();
-
-  this->Internal->Model.setColumnCount(3);
   this->Internal->Model.setRowCount(numberKeyFrames);
+  QStringList headerLabels;
+  bool camera = this->Internal->cameraCue();
+
+  if(camera)
+    {
+    this->Internal->Model.setColumnCount(2);
+    headerLabels << tr("Time") << tr("Camera Values");
+    }
+  else
+    {
+    this->Internal->Model.setColumnCount(3);
+    headerLabels << tr("Time") << tr("Interpolation") << tr("Value");
+    }
 
   // set the header data
-  QStringList headerLabels;
-  headerLabels << tr("Time") << tr("Interpolation") << tr("Value");
   this->Internal->Model.setHorizontalHeaderLabels(headerLabels);
 
   for(int i=0; i<numberKeyFrames; i++)
@@ -307,21 +387,41 @@ void pqKeyFrameEditor::readKeyFrameData()
     double realKeyTime = this->Internal->realTime(keyTime.toDouble());
     this->Internal->Model.setData(idx, realKeyTime, Qt::DisplayRole);
 
-    if(i < numberKeyFrames-1)
+    if(camera)
       {
-      pqKeyFrameInterpolationItem* item = new pqKeyFrameInterpolationItem();
+      pqCameraKeyFrameItem* item = new pqCameraKeyFrameItem();
+      item->Widget.setPosition(
+        pqSMAdaptor::getMultipleElementProperty(
+          keyFrame->GetProperty("Position")));
+      item->Widget.setFocalPoint(
+        pqSMAdaptor::getMultipleElementProperty(
+          keyFrame->GetProperty("FocalPoint")));
+      item->Widget.setViewUp(
+        pqSMAdaptor::getMultipleElementProperty(
+          keyFrame->GetProperty("ViewUp")));
+      item->Widget.setViewAngle(
+        pqSMAdaptor::getElementProperty(
+          keyFrame->GetProperty("ViewAngle")));
       this->Internal->Model.setItem(i, 1, item);
-      
-      // intialize gui with adaptor
-      pqPropertyLinks links;
-      pqSignalAdaptorKeyFrameType adaptor(&item->Widget, &links);
-      adaptor.setKeyFrameProxy(keyFrame);
       }
-    
-    idx = this->Internal->Model.index(i, 2);
-    this->Internal->Model.setData(idx,
-      pqSMAdaptor::getElementProperty(keyFrame->GetProperty("KeyValues")),
-      Qt::DisplayRole);
+    else
+      {
+      if(i < numberKeyFrames-1)
+        {
+        pqKeyFrameInterpolationItem* item = new pqKeyFrameInterpolationItem();
+        this->Internal->Model.setItem(i, 1, item);
+        
+        // intialize gui with adaptor
+        pqPropertyLinks links;
+        pqSignalAdaptorKeyFrameType adaptor(&item->Widget, &links);
+        adaptor.setKeyFrameProxy(keyFrame);
+        }
+      
+      idx = this->Internal->Model.index(i, 2);
+      this->Internal->Model.setData(idx,
+        pqSMAdaptor::getElementProperty(keyFrame->GetProperty("KeyValues")),
+        Qt::DisplayRole);
+      }
     }
 
 }
@@ -332,6 +432,8 @@ void pqKeyFrameEditor::writeKeyFrameData()
     {
     return;
     }
+
+  bool camera = this->Internal->cameraCue();
 
   int oldNumber = this->Internal->Cue->getNumberOfKeyFrames();
   int newNumber = this->Internal->Model.rowCount();
@@ -360,30 +462,49 @@ void pqKeyFrameEditor::writeKeyFrameData()
     QVariant newData = this->Internal->Model.data(idx, Qt::DisplayRole);
     double nTime = this->Internal->normalizedTime(newData.toDouble());
     pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyTime"), nTime);
-      
-    pqKeyFrameInterpolationItem* item = 
-      static_cast<pqKeyFrameInterpolationItem*>(this->Internal->Model.item(i, 1));
-    if(item)
+
+    if(camera)
       {
-      pqSMAdaptor::setEnumerationProperty(keyFrame->GetProperty("Type"),
-        item->Widget.type());
-      pqSMAdaptor::setElementProperty(keyFrame->GetProperty("Base"),
-        item->Widget.base());
-      pqSMAdaptor::setElementProperty(keyFrame->GetProperty("StartPower"),
-        item->Widget.startPower());
-      pqSMAdaptor::setElementProperty(keyFrame->GetProperty("EndPower"),
-        item->Widget.endPower());
-      pqSMAdaptor::setElementProperty(keyFrame->GetProperty("Phase"),
-        item->Widget.phase());
-      pqSMAdaptor::setElementProperty(keyFrame->GetProperty("Offset"),
-        item->Widget.offset());
-      pqSMAdaptor::setElementProperty(keyFrame->GetProperty("Frequency"),
-        item->Widget.frequency());
+      pqCameraKeyFrameItem* item = 
+        static_cast<pqCameraKeyFrameItem*>(this->Internal->Model.item(i, 1));
+      if(item)
+        {
+        pqSMAdaptor::setMultipleElementProperty(keyFrame->GetProperty("Position"),
+          item->Widget.position());
+        pqSMAdaptor::setMultipleElementProperty(keyFrame->GetProperty("FocalPoint"),
+          item->Widget.focalPoint());
+        pqSMAdaptor::setMultipleElementProperty(keyFrame->GetProperty("ViewUp"),
+          item->Widget.viewUp());
+        pqSMAdaptor::setElementProperty(keyFrame->GetProperty("ViewAngle"),
+          item->Widget.viewAngle());
+        }
       }
-    
-    idx = this->Internal->Model.index(i, 2);
-    newData = this->Internal->Model.data(idx, Qt::DisplayRole);
-    pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyValues"), newData);
+    else
+      {
+      pqKeyFrameInterpolationItem* item = 
+        static_cast<pqKeyFrameInterpolationItem*>(this->Internal->Model.item(i, 1));
+      if(item)
+        {
+        pqSMAdaptor::setEnumerationProperty(keyFrame->GetProperty("Type"),
+          item->Widget.type());
+        pqSMAdaptor::setElementProperty(keyFrame->GetProperty("Base"),
+          item->Widget.base());
+        pqSMAdaptor::setElementProperty(keyFrame->GetProperty("StartPower"),
+          item->Widget.startPower());
+        pqSMAdaptor::setElementProperty(keyFrame->GetProperty("EndPower"),
+          item->Widget.endPower());
+        pqSMAdaptor::setElementProperty(keyFrame->GetProperty("Phase"),
+          item->Widget.phase());
+        pqSMAdaptor::setElementProperty(keyFrame->GetProperty("Offset"),
+          item->Widget.offset());
+        pqSMAdaptor::setElementProperty(keyFrame->GetProperty("Frequency"),
+          item->Widget.frequency());
+        }
+      
+      idx = this->Internal->Model.index(i, 2);
+      newData = this->Internal->Model.data(idx, Qt::DisplayRole);
+      pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyValues"), newData);
+      }
     keyFrame->UpdateVTKObjects();
     }
   
@@ -410,20 +531,12 @@ void pqKeyFrameEditor::newKeyFrame()
     row = count != 0 ? count-1 : 0;
     }
 
-  QList<QStandardItem*> items;
-  items.append(this->Internal->newTimeItem(row));
-  items.append(this->Internal->newInterpolationItem(row));
-  items.append(this->Internal->newValueItem(row));
-  this->Internal->Model.insertRow(row, items);
+  this->Internal->Model.insertRow(row, this->Internal->newRow(row));
   
   // add one more
   if(count == 0)
     {
-    items.clear();
-    items.append(this->Internal->newTimeItem(1));
-    items.append(this->Internal->newInterpolationItem(1));
-    items.append(this->Internal->newValueItem(1));
-    this->Internal->Model.insertRow(1, items);
+    this->Internal->Model.insertRow(1, this->Internal->newRow(1));
     }
 }
 

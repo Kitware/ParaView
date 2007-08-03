@@ -1,0 +1,154 @@
+<ui version="4.0" >
+ <class>pqCameraWidget</class>
+ <widget class="QWidget" name="pqCameraWidget" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>342</width>
+    <height>118</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="margin" >
+    <number>0</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item row="0" column="1" >
+    <widget class="QDoubleSpinBox" name="position0" >
+     <property name="maximum" >
+      <double>10000.000000000000000</double>
+     </property>
+     <property name="minimum" >
+      <double>-10000.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" >
+    <widget class="QDoubleSpinBox" name="viewUp0" >
+     <property name="maximum" >
+      <double>10000.000000000000000</double>
+     </property>
+     <property name="minimum" >
+      <double>-10000.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3" >
+    <widget class="QDoubleSpinBox" name="focalPoint2" >
+     <property name="maximum" >
+      <double>10000.000000000000000</double>
+     </property>
+     <property name="minimum" >
+      <double>-10000.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" >
+    <widget class="QLabel" name="label_13" >
+     <property name="text" >
+      <string>View Up</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3" >
+    <widget class="QDoubleSpinBox" name="position2" >
+     <property name="maximum" >
+      <double>10000.000000000000000</double>
+     </property>
+     <property name="minimum" >
+      <double>-10000.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2" >
+    <widget class="QDoubleSpinBox" name="focalPoint1" >
+     <property name="maximum" >
+      <double>10000.000000000000000</double>
+     </property>
+     <property name="minimum" >
+      <double>-10000.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2" >
+    <widget class="QDoubleSpinBox" name="viewUp1" >
+     <property name="maximum" >
+      <double>10000.000000000000000</double>
+     </property>
+     <property name="minimum" >
+      <double>-10000.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" >
+    <widget class="QLabel" name="label_10" >
+     <property name="text" >
+      <string>Position</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2" >
+    <widget class="QDoubleSpinBox" name="position1" >
+     <property name="maximum" >
+      <double>10000.000000000000000</double>
+     </property>
+     <property name="minimum" >
+      <double>-10000.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" >
+    <widget class="QLabel" name="label_11" >
+     <property name="text" >
+      <string>View Angle</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" >
+    <widget class="QLabel" name="label_12" >
+     <property name="text" >
+      <string>Focal Point</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" >
+    <widget class="QDoubleSpinBox" name="focalPoint0" >
+     <property name="maximum" >
+      <double>10000.000000000000000</double>
+     </property>
+     <property name="minimum" >
+      <double>-10000.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1" >
+    <widget class="QDoubleSpinBox" name="viewAngle" >
+     <property name="maximum" >
+      <double>360.000000000000000</double>
+     </property>
+     <property name="minimum" >
+      <double>-360.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3" >
+    <widget class="QDoubleSpinBox" name="viewUp2" >
+     <property name="maximum" >
+      <double>10000.000000000000000</double>
+     </property>
+     <property name="minimum" >
+      <double>-10000.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

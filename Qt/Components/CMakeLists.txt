@@ -56,6 +56,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqBarChartDisplayProxyEditor.h
   pqCalculatorPanel.h
   pqCameraDialog.h
+  pqCameraWidget.h
   pqClipPanel.h
   pqColorPresetManager.h
   pqColorPresetModel.h
@@ -180,6 +181,7 @@ SET(UI_FORMS
   Resources/UI/pqBarChartDisplayEditor.ui
   Resources/UI/pqCalculatorPanel.ui
   Resources/UI/pqCameraDialog.ui
+  Resources/UI/pqCameraWidget.ui
   Resources/UI/pqColorPresetDialog.ui
   Resources/UI/pqColorScaleDialog.ui
   Resources/UI/pqComparativeVisPanel.ui
@@ -306,6 +308,8 @@ ADD_LIBRARY(pqComponents
   pqCalculatorPanel.h
   pqCameraDialog.cxx
   pqCameraDialog.h
+  pqCameraWidget.cxx
+  pqCameraWidget.h
   pqClipPanel.cxx
   pqClipPanel.h
   pqCloseViewUndoElement.cxx

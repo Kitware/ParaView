@@ -916,38 +916,20 @@ void pqAnimationPanel::showKeyFrame(int index)
     {
     this->Internal->cameraFrame->show();
     this->Internal->KeyFrameLinks.addPropertyLink(
-      this->Internal->position0, "value", SIGNAL(valueChanged(double)),
-      toShowKf, toShowKf->GetProperty("Position"), 0);
-    this->Internal->KeyFrameLinks.addPropertyLink(
-      this->Internal->position1, "value", SIGNAL(valueChanged(double)),
-      toShowKf, toShowKf->GetProperty("Position"), 1);
-    this->Internal->KeyFrameLinks.addPropertyLink(
-      this->Internal->position2, "value", SIGNAL(valueChanged(double)),
-      toShowKf, toShowKf->GetProperty("Position"), 2);
+      this->Internal->cameraWidget, "position", SIGNAL(positionChanged()),
+      toShowKf, toShowKf->GetProperty("Position"));
 
     this->Internal->KeyFrameLinks.addPropertyLink(
-      this->Internal->focalPoint0, "value", SIGNAL(valueChanged(double)),
-      toShowKf, toShowKf->GetProperty("FocalPoint"), 0);
-    this->Internal->KeyFrameLinks.addPropertyLink(
-      this->Internal->focalPoint1, "value", SIGNAL(valueChanged(double)),
-      toShowKf, toShowKf->GetProperty("FocalPoint"), 1);
-    this->Internal->KeyFrameLinks.addPropertyLink(
-      this->Internal->focalPoint2, "value", SIGNAL(valueChanged(double)),
-      toShowKf, toShowKf->GetProperty("FocalPoint"), 2);
+      this->Internal->cameraWidget, "focalPoint", SIGNAL(focalPointChanged()),
+      toShowKf, toShowKf->GetProperty("FocalPoint"));
 
     this->Internal->KeyFrameLinks.addPropertyLink(
-      this->Internal->viewUp0, "value", SIGNAL(valueChanged(double)),
-      toShowKf, toShowKf->GetProperty("ViewUp"), 0);
-    this->Internal->KeyFrameLinks.addPropertyLink(
-      this->Internal->viewUp1, "value", SIGNAL(valueChanged(double)),
-      toShowKf, toShowKf->GetProperty("ViewUp"), 1);  
-    this->Internal->KeyFrameLinks.addPropertyLink(
-      this->Internal->viewUp2, "value", SIGNAL(valueChanged(double)),
-      toShowKf, toShowKf->GetProperty("ViewUp"), 2);
+      this->Internal->cameraWidget, "viewUp", SIGNAL(viewUpChanged()),
+      toShowKf, toShowKf->GetProperty("ViewUp"));
 
     this->Internal->KeyFrameLinks.addPropertyLink(
-      this->Internal->viewAngle, "value", SIGNAL(valueChanged(double)),
-      toShowKf, toShowKf->GetProperty("ViewAngle"), 0);
+      this->Internal->cameraWidget, "viewAngle", SIGNAL(viewAngleChanged()),
+      toShowKf, toShowKf->GetProperty("ViewAngle"));
     }
   else
     {

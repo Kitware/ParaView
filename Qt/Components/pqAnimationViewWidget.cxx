@@ -71,6 +71,7 @@ public:
   QSignalMapper KeyFramesChanged;
   typedef QMap<QPointer<pqAnimationCue>, pqAnimationTrack*> TrackMapType;
   TrackMapType TrackMap;
+  QPointer<QDialog> Editor;
 
   pqAnimationTrack* findTrack(pqAnimationCue* cue)
     {
@@ -97,21 +98,38 @@ public:
   QString cueName(pqAnimationCue* cue)
     {
     QString name;
-    pqServerManagerModel* model = 
-      pqApplicationCore::instance()-> getServerManagerModel();
-    pqProxy* pxy = model->findItem<pqProxy*>(cue->getAnimatedProxy());
-    vtkSMProperty* pty = cue->getAnimatedProperty();
-    if(pxy && pty)
+    if(this->cameraCue(cue))
       {
-      QString n = pxy->getSMName();
-      QString p = pxy->getProxy()->GetPropertyName(pty);
-      if(pqSMAdaptor::getPropertyType(pty) == pqSMAdaptor::MULTIPLE_ELEMENTS)
+      name = "Camera";
+      }
+    else
+      {
+      pqServerManagerModel* model = 
+        pqApplicationCore::instance()-> getServerManagerModel();
+      pqProxy* pxy = model->findItem<pqProxy*>(cue->getAnimatedProxy());
+      vtkSMProperty* pty = cue->getAnimatedProperty();
+      if(pxy && pty)
         {
-        p = QString("%1 (%2)").arg(p).arg(cue->getAnimatedPropertyIndex());
+        QString n = pxy->getSMName();
+        QString p = pxy->getProxy()->GetPropertyName(pty);
+        if(pqSMAdaptor::getPropertyType(pty) == pqSMAdaptor::MULTIPLE_ELEMENTS)
+          {
+          p = QString("%1 (%2)").arg(p).arg(cue->getAnimatedPropertyIndex());
+          }
+        name = QString("%1 - %2").arg(n).arg(p);
         }
-      name = QString("%1 - %2").arg(n).arg(p);
       }
     return name;
+    }
+  // returns if this is a cue for animating a camera
+  bool cameraCue(pqAnimationCue* cue)
+    {
+    vtkSMProxy* manip = cue->getManipulatorProxy();
+    if(manip->IsA("vtkSMCameraManipulatorProxy"))
+      {
+      return true;
+      }
+    return false;
     }
 };
 
@@ -221,6 +239,8 @@ void pqAnimationViewWidget::keyFramesChanged(QObject* cueObject)
 
   QList<vtkSMProxy*> keyFrames = cue->getKeyFrames();
 
+  bool camera = this->Internal->cameraCue(cue);
+
   // clean out old ones
   while(track->count())
     {
@@ -229,27 +249,38 @@ void pqAnimationViewWidget::keyFramesChanged(QObject* cueObject)
 
   for(int j=0; j<keyFrames.count()-1; j++)
     {
+    QIcon icon;
+    QVariant startValue;
+    QVariant endValue;
+      
     QVariant startTime =
       pqSMAdaptor::getElementProperty(keyFrames[j]->GetProperty("KeyTime"));
     QVariant endTime =
       pqSMAdaptor::getElementProperty(keyFrames[j+1]->GetProperty("KeyTime"));
-    QVariant startValue =
-      pqSMAdaptor::getElementProperty(keyFrames[j]->GetProperty("KeyValues"));
-    QVariant endValue =
-      pqSMAdaptor::getElementProperty(keyFrames[j+1]->GetProperty("KeyValues"));
-    QVariant interpolation =
-      pqSMAdaptor::getEnumerationProperty(keyFrames[j]->GetProperty("Type"));
-    if(interpolation == "Boolean")
-      interpolation = "Step";
-    else if(interpolation == "Sinusoid")
-      interpolation = "Sinusoidal";
+
+    if(!camera)
+      {
+      QVariant interpolation =
+        pqSMAdaptor::getEnumerationProperty(keyFrames[j]->GetProperty("Type"));
+      if(interpolation == "Boolean")
+        interpolation = "Step";
+      else if(interpolation == "Sinusoid")
+        interpolation = "Sinusoidal";
+      QString iconstr =
+        QString(":pqWidgets/Icons/pq%1%2.png").arg(interpolation.toString()).arg(16);
+      icon = QIcon(iconstr);
+      
+      startValue =
+        pqSMAdaptor::getElementProperty(keyFrames[j]->GetProperty("KeyValues"));
+      endValue =
+        pqSMAdaptor::getElementProperty(keyFrames[j+1]->GetProperty("KeyValues"));
+      }
+
     pqAnimationKeyFrame* newFrame = track->addKeyFrame();
     newFrame->setStartTime(startTime.toDouble());
     newFrame->setEndTime(endTime.toDouble());
     newFrame->setStartValue(startValue);
     newFrame->setEndValue(endValue);
-    QString icon =
-      QString(":pqWidgets/Icons/pq%1%2.png").arg(interpolation.toString()).arg(16);
     newFrame->setIcon(QIcon(icon));
     }
 }
@@ -281,22 +312,32 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
     return;
     }
 
-  QDialog dialog;
-  dialog.resize(500, 400);
-  dialog.setWindowTitle(tr("Animation Keyframes"));
-  QVBoxLayout* l = new QVBoxLayout(&dialog);
+  if(this->Internal->Editor)
+    {
+    this->Internal->Editor->raise();
+    return;
+    }
+
+  this->Internal->Editor = new QDialog;
+  this->Internal->Editor->setAttribute(Qt::WA_DeleteOnClose);
+  this->Internal->Editor->resize(500, 400);
+  this->Internal->Editor->setWindowTitle(tr("Animation Keyframes"));
+  QVBoxLayout* l = new QVBoxLayout(this->Internal->Editor);
   pqKeyFrameEditor* editor = new pqKeyFrameEditor(this->Internal->Scene,
-                                                  cue, &dialog);
+                                                  cue, this->Internal->Editor);
   QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok
                                               | QDialogButtonBox::Cancel);
   l->addWidget(editor);
   l->addWidget(buttons);
 
-  connect(&dialog, SIGNAL(accepted()), editor, SLOT(writeKeyFrameData()));
-  connect(buttons, SIGNAL(accepted()), &dialog, SLOT(accept()));
-  connect(buttons, SIGNAL(rejected()), &dialog, SLOT(reject()));
+  connect(this->Internal->Editor, SIGNAL(accepted()), 
+          editor, SLOT(writeKeyFrameData()));
+  connect(buttons, SIGNAL(accepted()), 
+          this->Internal->Editor, SLOT(accept()));
+  connect(buttons, SIGNAL(rejected()), 
+          this->Internal->Editor, SLOT(reject()));
 
-  dialog.exec();
+  this->Internal->Editor->show();
 }
   
 void pqAnimationViewWidget::updatePlayMode()
