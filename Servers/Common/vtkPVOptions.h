@@ -29,6 +29,7 @@ class vtkPVOptionsInternal;
 class VTK_EXPORT vtkPVOptions : public vtkCommandOptions
 {
 public:
+//BTX
   enum ProcessTypeEnum
   {
     PARAVIEW = 0x2,
@@ -39,6 +40,7 @@ public:
     PVBATCH = 0x40,
     ALLPROCESS = PARAVIEW | PVCLIENT | PVSERVER | PVRENDER_SERVER | PVDATA_SERVER
   };
+//ETX
   
   static vtkPVOptions* New();
   vtkTypeRevisionMacro(vtkPVOptions,vtkCommandOptions);
@@ -101,6 +103,7 @@ public:
   vtkGetMacro(TellVersion, int);
 
 protected:
+//BTX
   // Description:
   // Default constructor.
   vtkPVOptions();
@@ -183,6 +186,7 @@ private:
   char* GroupFileName;
 
   int TellVersion;
+//ETX
 private:
   vtkPVOptions(const vtkPVOptions&); // Not implemented
   void operator=(const vtkPVOptions&); // Not implemented

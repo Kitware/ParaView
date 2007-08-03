@@ -103,7 +103,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.70");
+vtkCxxRevisionMacro(vtkProcessModule, "1.71");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -300,7 +300,6 @@ int vtkProcessModule::Start(int argc, char** argv)
   if (!ret)
     {
     // Failed.
-    this->Exit();
     return 1;
     }
 
@@ -321,7 +320,6 @@ int vtkProcessModule::StartClient(int argc, char** argv)
   if (!this->GUIHelper)
     {
     vtkErrorMacro("GUIHelper must be set on the client.");
-    this->Exit();
     return 1;
     }  
 
@@ -339,7 +337,6 @@ int vtkProcessModule::StartClient(int argc, char** argv)
         if (!this->ClientWaitForConnection())
           {
           vtkErrorMacro("Could not connect to server(s). Exiting.");
-          this->Exit();
           return 1;
           }
         // Now, we dont want the client to receive any more connections,
@@ -353,7 +350,6 @@ int vtkProcessModule::StartClient(int argc, char** argv)
         if (!this->ConnectToRemote())
           {
           // failed!
-          this->Exit();
           return 1;
           }
         }
@@ -392,7 +388,6 @@ int vtkProcessModule::StartServer(unsigned long msec)
       {
       // failed -- in reverse connect mode, the client must be 
       // up and running before the server tries to connect.
-      this->Exit();
       return 1;
       }
     support_multiple_connections = 0;
@@ -424,19 +419,9 @@ int vtkProcessModule::StartServer(unsigned long msec)
       }
     }
 
-  // We have to call exit explicitly on the Server since there is no
-  // GUIHelper that would call it (as is the case with the client).
-  this->Exit(); 
   return (ret==-1)? 1 : 0;
 }
 
-
-//-----------------------------------------------------------------------------
-void vtkProcessModule::Exit()
-{
-  // Tell the connection manager to close all connections.
-  this->ConnectionManager->Finalize();
-}
 
 //-----------------------------------------------------------------------------
 int vtkProcessModule::InitializeConnections()
@@ -873,6 +858,12 @@ void vtkProcessModule::Initialize()
 void vtkProcessModule::Finalize()
 {
   this->SetGUIHelper(0);
+  if (this->ConnectionManager)
+    {
+    // Tell the connection manager to close all connections.
+    // This will clean up the communicators.
+    this->ConnectionManager->Finalize();
+    }
   this->FinalizeInterpreter();
 }
 

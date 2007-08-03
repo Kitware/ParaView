@@ -51,7 +51,7 @@ void vtkMPISelfConnectionGatherInformationRMI(void *localArg,
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkMPISelfConnection);
-vtkCxxRevisionMacro(vtkMPISelfConnection, "1.3");
+vtkCxxRevisionMacro(vtkMPISelfConnection, "1.4");
 //-----------------------------------------------------------------------------
 vtkMPISelfConnection::vtkMPISelfConnection()
 {
@@ -101,12 +101,6 @@ int vtkMPISelfConnection::Initialize(int argc, char** argv, int *partitionId)
     {
     // Called for every satellite.
     ret = this->InitializeSatellite(argc, argv);
-    // It's essential to call finalize on the satellites here explicitly,
-    // the reason being as follows:
-    // Since vtkProcessModule::Exit() only gets called on the root node,
-    // vtkMPISelfConnection::Finalize() never gets called on the satellites,
-    // leaving the Controller unfinalized on the satellites, which is bad.
-    this->Finalize();
     }
 
   return ret;

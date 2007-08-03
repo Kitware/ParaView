@@ -38,7 +38,6 @@ SET(Kit_SRCS
   vtkPVClassNameInformation.cxx
   vtkPVClientServerIdCollectionInformation.cxx
   vtkPVCompositeDataInformation.cxx
-  vtkPVCreateProcessModule.cxx
   vtkPVDataInformation.cxx
   vtkPVDataSetAttributesInformation.cxx
   vtkPVDisplayInformation.cxx
@@ -80,12 +79,10 @@ SET_SOURCE_FILES_PROPERTIES(
   ABSTRACT
   )
 SET_SOURCE_FILES_PROPERTIES(
-  vtkCommandOptions.cxx
   vtkCommandOptionsXMLParser.cxx
   vtkConnectionIterator.cxx
   vtkPVProgressHandler.cxx
   vtkStringList.cxx
-  vtkPVOptions.cxx
   vtkPVOptionsXMLParser.cxx
   vtkPVServerOptions.cxx
   vtkPVServerSocket.cxx

@@ -148,10 +148,6 @@ public:
   // and start the event loop. Returns 0 on success.
   virtual int Start(int argc, char** argv);
 
-  // Description:
-  // Breaks the event loops and cleans up.
-  virtual void Exit();
-
 //BTX
   // Description:
   // These methods append commands to the given vtkClientServerStream

@@ -29,7 +29,6 @@
 #include "vtkPVClassNameInformation.h"
 #include "vtkPVClientServerIdCollectionInformation.h"
 #include "vtkPVCompositeDataInformation.h"
-#include "vtkPVCreateProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVDisplayInformation.h"
@@ -96,7 +95,6 @@ int main(int, char * [])
   c = vtkPVOpenGLExtensionsInformation::New(); c->Print(cout); c->Delete();
   c = vtkPVSelectionInformation::New(); c->Print(cout); c->Delete();
   c = vtkPVCompositeDataInformation::New(); c->Print(cout); c->Delete();
-  c = vtkPVCreateProcessModule::New(); c->Print(cout); c->Delete();
 
   c = vtkCommandOptions::New(); c->Print(cout); c->Delete();
   c = vtkCommandOptionsXMLParser::New(); c->Print(cout); c->Delete();
