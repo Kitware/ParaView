@@ -55,7 +55,6 @@ IF(VTK_USE_CARBON)
     ADD_CUSTOM_COMMAND(
       TARGET pvpython${PV_EXE_SUFFIX} POST_BUILD
       COMMAND ${VTK_APPLE_RESOURCE} Carbon.r -o ${pvpython_location}
-      TARGET pvpython${PV_EXE_SUFFIX}
       )
     ADD_CUSTOM_COMMAND(
       TARGET pvbatch${PV_EXE_SUFFIX} POST_BUILD
@@ -69,7 +68,6 @@ ENDIF(VTK_USE_CARBON)
 IF(NOT APPLE)
   FIND_LIBRARY(PYTHON_UTIL_LIBRARY
     NAMES util
-    PATHS /usr/lib
     DOC "Utility library needed for pvpython"
     )
   MARK_AS_ADVANCED(PYTHON_UTIL_LIBRARY)
