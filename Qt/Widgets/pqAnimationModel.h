@@ -42,38 +42,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqAnimationTrack;
 class QGraphicsView;
 
-// represents a track
+// a model that represents a collection of animation tracks
 class QTWIDGETS_EXPORT pqAnimationModel : public QGraphicsScene
 {
   Q_OBJECT
   Q_ENUMS(ModeType)
   Q_PROPERTY(ModeType mode READ mode WRITE setMode)
-  Q_PROPERTY(int frames READ frames WRITE setFrames)
+  Q_PROPERTY(int ticks READ ticks WRITE setTicks)
   Q_PROPERTY(double currentTime READ currentTime WRITE setCurrentTime)
   Q_PROPERTY(double startTime READ startTime WRITE setStartTime)
   Q_PROPERTY(double endTime READ endTime WRITE setEndTime)
 public:
 
+  /// Real or Sequence mode
+  /// Real mode shows no tick marks for timesteps
+  /// Sequence mode shows evenly spaced ticks for teach timestep
+  ///  where the number of ticks can be controled by the ticks property
   enum ModeType
     {
     Real,
-    Sequence,
-    TimeSteps
+    Sequence
     };
 
   pqAnimationModel(QGraphicsView* p = 0);
   ~pqAnimationModel();
   
+  /// the number of tracks
   int count();
+  /// get a track at an index
   pqAnimationTrack* track(int);
 
+  /// add a track
   pqAnimationTrack* addTrack();
+  /// remove a track
   void removeTrack(pqAnimationTrack* track);
 
+  /// get the animation mode
   ModeType mode() const;
-  int frames() const;
+  /// get the number of ticks
+  int ticks() const;
+  /// get the current time
   double currentTime() const;
+  /// get the start time
   double startTime() const;
+  /// get the end time
   double endTime() const;
 
   QAbstractItemModel* header();
@@ -81,10 +93,16 @@ public:
   int rowHeight() const;
 
 public slots:
+
+  /// set the animation mode
   void setMode(ModeType);
-  void setFrames(int);
+  /// set the number of ticks
+  void setTicks(int);
+  /// set the current time
   void setCurrentTime(double);
+  /// set the start time
   void setStartTime(double);
+  /// set the end time
   void setEndTime(double);
 
 signals:
@@ -106,7 +124,7 @@ protected:
 private:
 
   ModeType Mode;
-  int    Frames;
+  int    Ticks;
   double CurrentTime;
   double StartTime;
   double EndTime;

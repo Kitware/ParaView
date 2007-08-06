@@ -68,7 +68,7 @@ protected slots:
   /// called when scene time changes
   void updateSceneTime();
   /// called when time steps changes
-  void updateFrames();
+  void updateTicks();
 
   // called when track is double clicked
   void trackSelected(pqAnimationTrack* track);

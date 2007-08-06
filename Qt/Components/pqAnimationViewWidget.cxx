@@ -131,6 +131,48 @@ public:
       }
     return false;
     }
+
+  int numberOfTicks()
+    {
+    vtkSMProxy* pxy = this->Scene->getProxy();
+    int mode =
+      pqSMAdaptor::getElementProperty(pxy->GetProperty("PlayMode")).toInt();
+
+    int num = 0;
+    
+    if(mode == vtkSMPVAnimationSceneProxy::SEQUENCE)
+      {
+      num = 
+        pqSMAdaptor::getElementProperty(
+          pxy->GetProperty("NumberOfFrames")).toInt();
+      }
+    else if(mode == vtkSMPVAnimationSceneProxy::SNAP_TO_TIMESTEPS)
+      {
+      pqTimeKeeper* tk = this->Scene->getServer()->getTimeKeeper();
+      num = tk->getNumberOfTimeStepValues();
+      }
+    return num;
+    }
+  double getAnimationWidgetTime(double time)
+    {
+    vtkSMProxy* pxy = this->Scene->getProxy();
+    int mode =
+      pqSMAdaptor::getElementProperty(pxy->GetProperty("PlayMode")).toInt();
+    
+    // we show equi-distant tick points for snap to timestep mode
+    // regardless of spacing in time
+    if(mode == vtkSMPVAnimationSceneProxy::SNAP_TO_TIMESTEPS)
+      {
+      pqTimeKeeper* timekeeper = 
+        this->Scene->getServer()->getTimeKeeper();
+
+      QPair<double, double> range = timekeeper->getTimeRange();
+      double num = timekeeper->getNumberOfTimeStepValues() - 1;
+      time = timekeeper->getTimeStepValueIndex(time)/num;
+      time = time * (range.second - range.first);
+      }
+    return time;
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -171,16 +213,23 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
       this, SLOT(onSceneCuesChanged()));
     QObject::connect(scene, SIGNAL(clockTimeRangesChanged()),
             this, SLOT(updateSceneTimeRange()));
+    QObject::connect(scene->getServer()->getTimeKeeper(),
+      SIGNAL(timeStepsChanged()),
+            this, SLOT(updateTicks()));
     QObject::connect(scene, SIGNAL(frameCountChanged()),
-            this, SLOT(updateFrames()));
+            this, SLOT(updateTicks()));
     QObject::connect(scene->getServer()->getTimeKeeper(), SIGNAL(timeChanged()),
             this, SLOT(updateSceneTime()));
     QObject::connect(scene, SIGNAL(playModeChanged()), 
       this, SLOT(updatePlayMode()));
+    QObject::connect(scene, SIGNAL(playModeChanged()), 
+      this, SLOT(updateTicks()));
+    QObject::connect(scene, SIGNAL(playModeChanged()), 
+      this, SLOT(updateSceneTime()));
     this->updateSceneTimeRange();
     this->updateSceneTime();
     this->updatePlayMode();
-    this->updateFrames();
+    this->updateTicks();
     }
 }
 
@@ -253,10 +302,10 @@ void pqAnimationViewWidget::keyFramesChanged(QObject* cueObject)
     QVariant startValue;
     QVariant endValue;
       
-    QVariant startTime =
-      pqSMAdaptor::getElementProperty(keyFrames[j]->GetProperty("KeyTime"));
-    QVariant endTime =
-      pqSMAdaptor::getElementProperty(keyFrames[j+1]->GetProperty("KeyTime"));
+    double startTime =
+      pqSMAdaptor::getElementProperty(keyFrames[j]->GetProperty("KeyTime")).toDouble();
+    double endTime =
+      pqSMAdaptor::getElementProperty(keyFrames[j+1]->GetProperty("KeyTime")).toDouble();
 
     if(!camera)
       {
@@ -277,8 +326,8 @@ void pqAnimationViewWidget::keyFramesChanged(QObject* cueObject)
       }
 
     pqAnimationKeyFrame* newFrame = track->addKeyFrame();
-    newFrame->setStartTime(startTime.toDouble());
-    newFrame->setEndTime(endTime.toDouble());
+    newFrame->setStartTime(startTime);
+    newFrame->setEndTime(endTime);
     newFrame->setStartValue(startValue);
     newFrame->setEndValue(endValue);
     newFrame->setIcon(QIcon(icon));
@@ -298,9 +347,13 @@ void pqAnimationViewWidget::updateSceneTime()
 {
   pqTimeKeeper* timekeeper = 
     this->Internal->Scene->getServer()->getTimeKeeper();
+
+  double time = timekeeper->getTime();
+  time = this->Internal->getAnimationWidgetTime(time);
+
   pqAnimationModel* animModel =
     this->Internal->AnimationWidget->animationModel();
-  animModel->setCurrentTime(timekeeper->getTime());
+  animModel->setCurrentTime(time);
 }
 
 
@@ -358,6 +411,7 @@ void pqAnimationViewWidget::updatePlayMode()
     }
   else if(mode == vtkSMPVAnimationSceneProxy::SNAP_TO_TIMESTEPS)
     {
+    animModel->setMode(pqAnimationModel::Sequence);
     }
   else
     {
@@ -366,14 +420,12 @@ void pqAnimationViewWidget::updatePlayMode()
 
 }
   
-void pqAnimationViewWidget::updateFrames()
+void pqAnimationViewWidget::updateTicks()
 {
   pqAnimationModel* animModel =
     this->Internal->AnimationWidget->animationModel();
-  vtkSMProxy* pxy = this->Internal->Scene->getProxy();
-  QVariant num =
-    pqSMAdaptor::getElementProperty(pxy->GetProperty("NumberOfFrames"));
-  animModel->setFrames(num.toInt());
+  int num = this->Internal->numberOfTicks();
+  animModel->setTicks(num);
 }
 
 

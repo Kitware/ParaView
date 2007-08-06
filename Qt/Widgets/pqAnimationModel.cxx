@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 pqAnimationModel::pqAnimationModel(QGraphicsView* p)
   : QGraphicsScene(QRectF(0,0,400,16*6), p),
-  Mode(Real), Frames(10), CurrentTime(0), StartTime(0), EndTime(1)
+  Mode(Real), Ticks(10), CurrentTime(0), StartTime(0), EndTime(1)
 {
   QObject::connect(this, SIGNAL(sceneRectChanged(QRectF)),
                    this, SLOT(resizeTracks()));
@@ -126,9 +126,9 @@ pqAnimationModel::ModeType pqAnimationModel::mode() const
 {
   return this->Mode;
 }
-int pqAnimationModel::frames() const
+int pqAnimationModel::ticks() const
 {
-  return this->Frames;
+  return this->Ticks;
 }
 double pqAnimationModel::currentTime() const
 {
@@ -159,9 +159,9 @@ void pqAnimationModel::setMode(pqAnimationModel::ModeType m)
   this->Mode = m;
   this->update();
 }
-void pqAnimationModel::setFrames(int f)
+void pqAnimationModel::setTicks(int f)
 {
-  this->Frames = f;
+  this->Ticks = f;
   this->update();
 }
 void pqAnimationModel::setCurrentTime(double t)
@@ -227,12 +227,12 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF& )
 
   
   // if sequence, draw a tick mark for each frame
-  if(this->mode() == Sequence && this->Frames > 1)
+  if(this->mode() == Sequence && this->Ticks > 1)
     {
-    double spacing = labelRect.width() / ((double)this->Frames-1);
+    double spacing = labelRect.width() / ((double)this->Ticks-1);
     QLineF line(labelRect.left(), labelRect.height(),
                 labelRect.left(), labelRect.height()-3.0);
-    for(int i=0; i<this->Frames; i++)
+    for(int i=0; i<this->Ticks; i++)
       {
       painter->drawLine(line);
       line.translate(spacing, 0);
