@@ -264,9 +264,24 @@ public:
     }
   QStandardItem* newCameraItem(int)
     {
-    QStandardItem* item = NULL;
-    // TODO make good defaults
+    pqCameraKeyFrameItem* item = NULL;
+    // default to current view
+    vtkSMProxy* pxy = this->Cue->getAnimatedProxy();
     item = new pqCameraKeyFrameItem();
+    
+    item->Widget.setPosition(
+      pqSMAdaptor::getMultipleElementProperty(
+        pxy->GetProperty("CameraPosition")));
+    item->Widget.setFocalPoint(
+      pqSMAdaptor::getMultipleElementProperty(
+        pxy->GetProperty("CameraFocalPoint")));
+    item->Widget.setViewUp(
+      pqSMAdaptor::getMultipleElementProperty(
+        pxy->GetProperty("CameraViewUp")));
+    item->Widget.setViewAngle(
+      pqSMAdaptor::getElementProperty(
+        pxy->GetProperty("CameraViewAngle")));
+
     return item;
     }
   QStandardItem* newValueItem(int row)
