@@ -242,7 +242,7 @@ QSize pqTreeWidget::sizeHint() const
   // that a caller has access to
   int maxItemHint = 10;
   // for no items, let's give a space of X pixels
-  int minItemHeight = 50;
+  int minItemHeight = 20;
 
   int num = this->topLevelItemCount();
   num = qMin(num, maxItemHint);
@@ -251,7 +251,7 @@ QSize pqTreeWidget::sizeHint() const
 
   if(num)
     {
-    pix = this->sizeHintForRow(0) * num;
+    pix = qMax(pix, this->sizeHintForRow(0) * num);
     }
 
   int margin[4];
