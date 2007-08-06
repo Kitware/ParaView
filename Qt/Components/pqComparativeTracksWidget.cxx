@@ -175,6 +175,10 @@ void pqComparativeTracksWidget::updateSceneCallback()
 //-----------------------------------------------------------------------------
 void pqComparativeTracksWidget::updateScene()
 {
+  if (!this->Internal->CVProxy)
+    {
+    return;
+    }
   int mode = pqSMAdaptor::getElementProperty(
     this->Internal->CVProxy->GetProperty("Mode")).toInt();
 
