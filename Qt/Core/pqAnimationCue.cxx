@@ -65,9 +65,12 @@ pqAnimationCue::pqAnimationCue(const QString& group, const QString& name,
 
   this->Internal = new pqAnimationCue::pqInternals();
 
-  this->Internal->VTKConnect->Connect(
-    proxy->GetProperty("Manipulator"), vtkCommand::ModifiedEvent,
-    this, SLOT(onManipulatorModified()));
+  if (proxy->GetProperty("Manipulator"))
+    {
+    this->Internal->VTKConnect->Connect(
+      proxy->GetProperty("Manipulator"), vtkCommand::ModifiedEvent,
+      this, SLOT(onManipulatorModified()));
+    }
 
   this->Internal->VTKConnect->Connect(
     proxy->GetProperty("AnimatedProxy"), vtkCommand::ModifiedEvent,
@@ -156,6 +159,14 @@ void pqAnimationCue::setDefaultPropertyValues()
 //-----------------------------------------------------------------------------
 void pqAnimationCue::onManipulatorModified()
 {
+  vtkSMProxy* myproxy = this->getProxy();
+  if (!myproxy->GetProperty("Manipulator") && myproxy->GetProperty("KeyFrames"))
+    {
+    // Manipulator is an internal subproxy of this cue.
+    this->Internal->Manipulator = myproxy;
+    return;
+    }
+
   vtkSMProxy *manip = pqSMAdaptor::getProxyProperty(
     this->getProxy()->GetProperty("Manipulator"));
 
