@@ -771,12 +771,20 @@ void MainWindow::onCameraRedoLabel(const QString& label)
 void MainWindow::onPreAccept()
 {
   this->statusBar()->showMessage(tr("Updating..."));
+  QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 }
 
 //-----------------------------------------------------------------------------
 void MainWindow::onPostAccept()
 {
   this->statusBar()->showMessage(tr("Ready"), 2000);
+  QTimer::singleShot(0, this, SLOT(endWaitCursor()));
+}
+
+//-----------------------------------------------------------------------------
+void MainWindow::endWaitCursor()
+{
+  QApplication::restoreOverrideCursor();
 }
 
 //-----------------------------------------------------------------------------

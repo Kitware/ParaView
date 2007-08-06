@@ -64,6 +64,7 @@ private slots:
 
   void onPreAccept();
   void onPostAccept();
+  void endWaitCursor();
 
   void onHelpAbout();
   void onHelpHelp();
