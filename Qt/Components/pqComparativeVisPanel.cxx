@@ -218,33 +218,39 @@ void pqComparativeVisPanel::modeChanged(const QString& mode)
 //-----------------------------------------------------------------------------
 void pqComparativeVisPanel::xpropertyChanged()
 {
-  // Locate the X animation cue for this property (if none exists, a new one will
-  // be created) and make it the only enabled cue in the XCues property.
-  vtkSMProxy* proxy = this->Internal->XProperty->getCurrentProxy();
-  QString pname = this->Internal->XProperty->getCurrentPropertyName();
-  int index = this->Internal->XProperty->getCurrentIndex();
+  if (this->Internal->View)
+    {
+    // Locate the X animation cue for this property (if none exists, a new one will
+    // be created) and make it the only enabled cue in the XCues property.
+    vtkSMProxy* proxy = this->Internal->XProperty->getCurrentProxy();
+    QString pname = this->Internal->XProperty->getCurrentPropertyName();
+    int index = this->Internal->XProperty->getCurrentIndex();
 
-  // Locate cue for the selected property.
-  this->activateCue(
-    this->Internal->View->getProxy()->GetProperty("XCues"),
-    proxy, pname, index);
-  this->Internal->View->getProxy()->UpdateVTKObjects();
+    // Locate cue for the selected property.
+    this->activateCue(
+      this->Internal->View->getProxy()->GetProperty("XCues"),
+      proxy, pname, index);
+    this->Internal->View->getProxy()->UpdateVTKObjects();
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqComparativeVisPanel::ypropertyChanged()
 {
-  // Locate the Y animation cue for this property (if none exists, a new one will
-  // be created) and make it the only enabled cue in the YCues property.
-  vtkSMProxy* proxy = this->Internal->YProperty->getCurrentProxy();
-  QString pname = this->Internal->YProperty->getCurrentPropertyName();
-  int index = this->Internal->YProperty->getCurrentIndex();
+  if (this->Internal->View)
+    {
+    // Locate the Y animation cue for this property (if none exists, a new one will
+    // be created) and make it the only enabled cue in the YCues property.
+    vtkSMProxy* proxy = this->Internal->YProperty->getCurrentProxy();
+    QString pname = this->Internal->YProperty->getCurrentPropertyName();
+    int index = this->Internal->YProperty->getCurrentIndex();
 
-  // Locate cue for the selected property.
-  this->activateCue(
-    this->Internal->View->getProxy()->GetProperty("YCues"),
-    proxy, pname, index);
-  this->Internal->View->getProxy()->UpdateVTKObjects();
+    // Locate cue for the selected property.
+    this->activateCue(
+      this->Internal->View->getProxy()->GetProperty("YCues"),
+      proxy, pname, index);
+    this->Internal->View->getProxy()->UpdateVTKObjects();
+    }
 }
 
 //-----------------------------------------------------------------------------
