@@ -541,7 +541,10 @@
   </ProxyGroup>
 
   <ProxyGroup name="animation">
-    <AnimationCueProxy name="AnimationCue">
+    <Proxy name="AnimationCueBase">
+      <Documentation>
+        Internal base interface for all animation cues.
+      </Documentation>
       <!-- No server side objects created. All properties are updateself -->
       <IntVectorProperty
          name="TimeMode"
@@ -603,6 +606,30 @@
         default_values="0">
       </IntVectorProperty>
 
+      <IntVectorProperty
+        name="Enabled"
+        command="SetEnabled"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enables this animation cue.
+        </Documentation>
+      </IntVectorProperty>
+
+      <!-- End of AnimationCueBase -->
+    </Proxy>
+
+    <AnimationCueProxy name="AnimationCue"
+      base_proxygroup="animation" base_proxyname="AnimationCueBase">
+      <Documentation>
+        This is old style animation cue, this must be replaced by
+        KeyframeAnimationCue or CameraAnimationCue as the case may be.
+        This may be used when using other types of manipulators.
+      </Documentation>
+
+      <!-- No server side objects created. All properties are updateself -->
       <ProxyProperty name="Manipulator"
         command="SetManipulator"
         update_self="1">
@@ -610,6 +637,46 @@
           <Group name="animation_manipulators" />
         </ProxyGroupDomain>
       </ProxyProperty>
+      <!-- End of AnimationCue -->
+    </AnimationCueProxy>
+
+    <AnimationCueProxy name="KeyframeAnimationCue"
+      base_proxygroup="animation" base_proxyname="AnimationCueBase">
+      <Documentation>
+        Animation cue with keyframes.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="Manipulator"
+          proxygroup="animation_manipulators"
+          proxyname="KeyFrameAnimationCueManipulator">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="KeyFrames" />
+          <Property name="LastAddedKeyFrameIndex" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of KeyframeAnimationCue -->
+    </AnimationCueProxy>
+
+    <AnimationCueProxy name="CameraAnimationCue"
+      base_proxygroup="animation" base_proxyname="AnimationCueBase">
+      <Documentation>
+        Animation cue which can be used for animating Camera using keyframes.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="Manipulator"
+          proxygroup="animation_manipulators"
+          proxyname="CameraManipulator">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="KeyFrames" />
+          <Property name="LastAddedKeyFrameIndex" />
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of CameraAnimationCue -->
     </AnimationCueProxy>
 
     <!--Scene -->

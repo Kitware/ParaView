@@ -132,6 +132,7 @@ public:
   // Enable/Disable this cue.
   vtkSetMacro(Enabled, int);
   vtkGetMacro(Enabled, int);
+  vtkBooleanMacro(Enabled, int);
 
 protected:
   vtkSMAnimationCueProxy();
@@ -156,7 +157,7 @@ protected:
   // override this method to simply call CreateVTKObjects().
   virtual void ReviveVTKObjects()
     { this->CreateVTKObjects(); }
-  
+
 //BTX
   vtkCommand* Observer;
   friend class vtkSMAnimationCueProxyObserver;

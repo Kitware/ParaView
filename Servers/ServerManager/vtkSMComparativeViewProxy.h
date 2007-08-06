@@ -101,6 +101,12 @@ public:
   // Returns the root view proxy.
   vtkSMViewProxy* GetRootView();
 
+  // Description:
+  // Called on every still render. This checks if the comparative visualization
+  // needs to be regenerated (following changes to proxies involved in
+  // generating the comparative visualization)/tim
+  void UpdateVisualization();
+
 //BTX
 protected:
   vtkSMComparativeViewProxy();
@@ -120,11 +126,7 @@ protected:
   // Removes an internal view and all the representations in that view.
   void RemoveView(vtkSMViewProxy* remove);
 
-  // Description:
-  // Called on every still render. This checks if the comparative visualization
-  // needs to be regenerated (following changes to proxies involved in
-  // generating the comparative visualization)/tim
-  void UpdateVisualization();
+
 
   // Description:
   // Update comparative scene.
