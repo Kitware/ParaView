@@ -634,9 +634,11 @@ void pqDisplayProxyEditor::updateEnableState()
     this->Internal->ColorInterpolateColors->setEnabled(false);
     this->Internal->ColorButtonStack->setCurrentWidget(
         this->Internal->SolidColorPage);
+    this->Internal->LightingGroup->setEnabled(true);
     }
   else
     {
+    this->Internal->LightingGroup->setEnabled(false);
     this->Internal->ColorInterpolateColors->setEnabled(true);
     this->Internal->ColorButtonStack->setCurrentWidget(
         this->Internal->ColorMapPage);
