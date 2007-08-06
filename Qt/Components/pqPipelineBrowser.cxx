@@ -439,7 +439,7 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
     {
     source = port->getSource();
 
-    if(index.column() == 1)
+    if(index.column() == 1 && source->modifiedState() != pqProxy::UNINITIALIZED)
       {
       // If the column clicked is 1, the user clicked the visible icon.
       // Get the display object for the current window.
