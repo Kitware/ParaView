@@ -802,7 +802,7 @@ void pqAnimationPanel::insertKeyFrame(int index)
     int pindex = this->Internal->propertyName->getCurrentIndex();
 
     // Check is we are creating a camera cue or a regular cue.
-    if (this->Internal->ActiveRenderView && 
+    if (this->Internal->ActiveRenderView &&
       curProxy == this->Internal->ActiveRenderView->getProxy())
       {
       cue = scene->createCue(curProxy,
@@ -852,6 +852,10 @@ void pqAnimationPanel::deleteKeyFrame(int index)
   if (cue)
     {
     cue->deleteKeyFrame(index);
+    }
+  if(cue->getNumberOfKeyFrames() == 0)
+    {
+    scene->removeCue(cue);
     }
   emit this->endUndo();
 }
