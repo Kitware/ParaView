@@ -873,7 +873,7 @@
    fun:PyEval_EvalFrame
    fun:PyEval_EvalFrame
    fun:PyEval_EvalCodeEx
-   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCode
    fun:PyRun_FileExFlags
    fun:PyRun_SimpleFileExFlags
    fun:Py_Main
@@ -900,7 +900,7 @@
    fun:PyEval_EvalFrame
    fun:PyEval_EvalFrame
    fun:PyEval_EvalCodeEx
-   fun:PyEval_EvalFrame
+   fun:PyEval_EvalCode
    fun:PyRun_FileExFlags
    fun:PyRun_SimpleFileExFlags
    fun:Py_Main
