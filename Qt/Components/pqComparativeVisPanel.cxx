@@ -33,7 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqComparativeVisPanel.h"
 
 // Server Manager Includes.
+#include "vtkProcessModule.h"
+#include "vtkSMAnimationCueProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMComparativeViewProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
 
 // Qt Includes.
 #include <QHeaderView>
@@ -50,6 +55,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
+#include "pqSMAdaptor.h"
+#include "pqAnimationCue.h"
 
 class pqComparativeVisPanel::pqInternal : public Ui::ComparativeView
 {
@@ -64,7 +71,7 @@ pqComparativeVisPanel::pqComparativeVisPanel(QWidget* p):Superclass(p)
 {
   this->Internal = new pqInternal();
 
-  /*
+  /* TODO: Why does this never work for me :( ?
   QVBoxLayout* vboxlayout = new QVBoxLayout(this);
   vboxlayout->setSpacing(0);
   vboxlayout->setMargin(0);
@@ -90,6 +97,12 @@ pqComparativeVisPanel::pqComparativeVisPanel(QWidget* p):Superclass(p)
   this->Internal->ModeAdaptor = 
     new pqSignalAdaptorComboBox(this->Internal->Mode);
   this->Internal->Links.setUseUncheckedProperties(false);
+
+  // When mode changes we want to hide the non-related GUI components.
+  QObject::connect(
+    this->Internal->ModeAdaptor, SIGNAL(currentTextChanged(const QString&)),
+    this, SLOT(modeChanged(const QString&)), Qt::QueuedConnection);
+  this->Internal->YAxisGroup->setVisible(false);
 
   QObject::connect(this->Internal->Update, SIGNAL(clicked()),
     this, SLOT(updateView()), Qt::QueuedConnection);
@@ -122,10 +135,10 @@ pqComparativeVisPanel::pqComparativeVisPanel(QWidget* p):Superclass(p)
 
   QObject::connect(
     this->Internal->XProperty, SIGNAL(currentIndexChanged(const QString&)),
-    this, SLOT(xpropertyChanged(const QString&)));
+    this, SLOT(xpropertyChanged()));
   QObject::connect(
     this->Internal->YProperty, SIGNAL(currentIndexChanged(const QString&)),
-    this, SLOT(ypropertyChanged(const QString&)));
+    this, SLOT(ypropertyChanged()));
 
   this->Internal->XProperty->setUseBlankEntry(true);
   this->Internal->YProperty->setUseBlankEntry(true);
@@ -182,30 +195,120 @@ void pqComparativeVisPanel::updateView()
   if (this->Internal->View)
     {
     this->Internal->Links.accept();
+    vtkSMComparativeViewProxy* viewProxy = this->Internal->View->getComparativeRenderViewProxy();
+    viewProxy->UpdateVisualization();
     this->Internal->View->render();
     }
 }
 
+
 //-----------------------------------------------------------------------------
-void pqComparativeVisPanel::xpropertyChanged(const QString& vtkNotUsed(text))
+void pqComparativeVisPanel::modeChanged(const QString& mode)
+{
+  if (mode == "Film Strip")
+    {
+    this->Internal->YAxisGroup->setVisible(false);
+    }
+  else
+    {
+    this->Internal->YAxisGroup->setVisible(true);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqComparativeVisPanel::xpropertyChanged()
 {
   // Locate the X animation cue for this property (if none exists, a new one will
   // be created) and make it the only enabled cue in the XCues property.
+  vtkSMProxy* proxy = this->Internal->XProperty->getCurrentProxy();
+  QString pname = this->Internal->XProperty->getCurrentPropertyName();
+  int index = this->Internal->XProperty->getCurrentIndex();
+
+  // Locate cue for the selected property.
+  this->activateCue(
+    this->Internal->View->getProxy()->GetProperty("XCues"),
+    proxy, pname, index);
+  this->Internal->View->getProxy()->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
-void pqComparativeVisPanel::ypropertyChanged(const QString& vtkNotUsed(text))
+void pqComparativeVisPanel::ypropertyChanged()
 {
   // Locate the Y animation cue for this property (if none exists, a new one will
   // be created) and make it the only enabled cue in the YCues property.
+  vtkSMProxy* proxy = this->Internal->YProperty->getCurrentProxy();
+  QString pname = this->Internal->YProperty->getCurrentPropertyName();
+  int index = this->Internal->YProperty->getCurrentIndex();
+
+  // Locate cue for the selected property.
+  this->activateCue(
+    this->Internal->View->getProxy()->GetProperty("YCues"),
+    proxy, pname, index);
+  this->Internal->View->getProxy()->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
-void pqComparativeVisPanel::editPropertyToAnimate(int index)
+void pqComparativeVisPanel::activateCue(
+  vtkSMProperty* cuesProperty, 
+  vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex)
 {
-  if (index <= 0)
+  if (!cuesProperty || !animatedProxy || animatedPName.isEmpty())
     {
     return;
     }
-  
+
+  // Try to locate the cue, if already present.
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(cuesProperty);
+  vtkSmartPointer<vtkSMAnimationCueProxy> cueProxy;
+
+  for (unsigned int cc=0; cc < pp->GetNumberOfProxies(); ++cc)
+    {
+    vtkSMAnimationCueProxy* cur = vtkSMAnimationCueProxy::SafeDownCast(
+      pp->GetProxy(cc));
+    if (cur && cur->GetAnimatedProxy() == animatedProxy &&
+      cur->GetAnimatedPropertyName() == animatedPName &&
+      cur->GetAnimatedElement() == animatedIndex)
+      {
+      cueProxy = cur;
+      }
+    else if (cur)
+      {
+      pqSMAdaptor::setElementProperty(cur->GetProperty("Enabled"), 0);
+      cur->UpdateVTKObjects();
+      }
+    }
+
+  if (!cueProxy)
+    {
+    vtkSMProxyManager *pxm = vtkSMProxyManager::GetProxyManager();
+
+    // Create a new cueProxy.
+    cueProxy.TakeReference(
+      vtkSMAnimationCueProxy::SafeDownCast(pxm->NewProxy("animation", "KeyframeAnimationCue")));
+    cueProxy->SetServers(vtkProcessModule::CLIENT);
+    cueProxy->SetConnectionID(this->Internal->View->getProxy()->GetConnectionID());
+
+    pqSMAdaptor::setElementProperty(cueProxy->GetProperty("AnimatedPropertyName"),
+      animatedPName);
+    pqSMAdaptor::setElementProperty(cueProxy->GetProperty("AnimatedElement"), 
+      animatedIndex);
+    pqSMAdaptor::setProxyProperty(cueProxy->GetProperty("AnimatedProxy"),
+        animatedProxy);
+
+    // This cueProxy must be registered so that state works fine. For that
+    // purpose we just make it an helper of the view.
+    this->Internal->View->addHelperProxy("AnimationCues", cueProxy);
+
+    // We want to add default keyframes to this cue.
+    pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
+    pqAnimationCue* pqcue = smmodel->findItem<pqAnimationCue*>(cueProxy);
+    pqcue->insertKeyFrame(0);
+    pqcue->insertKeyFrame(1);
+    }
+
+  pqSMAdaptor::addProxyProperty(cuesProperty, cueProxy);
+  pqSMAdaptor::setElementProperty(cueProxy->GetProperty("Enabled"), 1);
+  cueProxy->UpdateVTKObjects();
+
+
 }

@@ -35,8 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include <QWidget>
 
-class vtkSMProxy;
+class pqAnimationTrack;
 class vtkSMProperty;
+class vtkSMProxy;
 
 /// Widget for showing the comparative vis parameters.
 class PQCOMPONENTS_EXPORT pqComparativeTracksWidget : public QWidget
@@ -53,6 +54,9 @@ public:
 protected slots:
   void updateSceneCallback();
   void updateScene();
+
+  /// called when track is double clicked
+  void trackSelected(pqAnimationTrack* track);
 
 protected:
   // update the animation track at the given index using the given "Cues" property

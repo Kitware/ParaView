@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class pqView;
+class vtkSMProxy;
+class vtkSMProperty;
 
 class PQCOMPONENTS_EXPORT pqComparativeVisPanel : public QWidget
 {
@@ -54,12 +56,17 @@ public slots:
   /// Update the view using the current panel values.
   void updateView(); 
 
+  void modeChanged(const QString&);
 protected slots:
-  /// Called when user clicks on the track title.
-  void editPropertyToAnimate(int index);
+  /// When the selection of the property to animate on X axis changes.
+  void xpropertyChanged();
+  
+  /// When the selection of the property to animate on Y axis changes.
+  void ypropertyChanged();
 
-  void xpropertyChanged(const QString& text);
-  void ypropertyChanged(const QString& text);
+protected:
+  void activateCue(vtkSMProperty* cuesProperty, 
+  vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex);
 private:
   pqComparativeVisPanel(const pqComparativeVisPanel&); // Not implemented.
   void operator=(const pqComparativeVisPanel&); // Not implemented.

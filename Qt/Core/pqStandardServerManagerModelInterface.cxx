@@ -149,6 +149,13 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
       }
     }
 
+  if (proxy->IsA("vtkSMAnimationCueProxy"))
+    {
+    // pqAnimationCue is created for all cues (even internal ones that get
+    // created for comparative vis).
+    return new pqAnimationCue(group, name, proxy, server, 0);
+    }
+
   // qDebug() << "Could not determine pqProxy type: " << proxy->GetXMLName() << endl;
   return 0;
 }

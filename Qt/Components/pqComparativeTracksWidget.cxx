@@ -39,14 +39,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyProperty.h"
 
 // Qt Includes.
-#include <QVBoxLayout>
+#include <QDialog>
+#include <QDialogButtonBox>
 #include <QTimer>
+#include <QVBoxLayout>
 
 // ParaView Includes.
-#include "pqAnimationWidget.h"
+#include "pqAnimationCue.h"
+#include "pqAnimationKeyFrame.h"
 #include "pqAnimationModel.h"
 #include "pqAnimationTrack.h"
-#include "pqAnimationKeyFrame.h"
+#include "pqAnimationWidget.h"
+#include "pqApplicationCore.h"
+#include "pqKeyFrameEditor.h"
+#include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 
 class pqComparativeTracksWidget::pqInternal
@@ -56,6 +62,7 @@ public:
   vtkEventQtSlotConnect* VTKConnect;
   vtkSmartPointer<vtkSMProxy> CVProxy;
   QTimer Timer;
+  QMap<pqAnimationTrack*, vtkSmartPointer<vtkSMAnimationCueProxy> > TrackMap;
 
   pqInternal(QWidget* parent)
     {
@@ -91,6 +98,16 @@ public:
     return name;
     }
 
+  pqAnimationCue* findCue(pqAnimationTrack* track)
+    {
+    if (!this->TrackMap.contains(track))
+      {
+      return false;
+      }
+
+    pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
+    return smmodel->findItem<pqAnimationCue*>(this->TrackMap[track]);
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -104,6 +121,10 @@ pqComparativeTracksWidget::pqComparativeTracksWidget(QWidget* _parent)
 
   QVBoxLayout* vboxlayout = new QVBoxLayout(this);
   vboxlayout->addWidget(this->Internal->AnimationWidget);
+
+  QObject::connect(this->Internal->AnimationWidget->animationModel(),
+    SIGNAL(trackSelected(pqAnimationTrack*)),
+    this, SLOT(trackSelected(pqAnimationTrack*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -158,6 +179,7 @@ void pqComparativeTracksWidget::updateScene()
     this->Internal->CVProxy->GetProperty("Mode")).toInt();
 
   // Clean all tracks.
+  this->Internal->TrackMap.clear();
   pqAnimationModel* model = this->Internal->model();
   while (model->count())
     {
@@ -208,10 +230,11 @@ void pqComparativeTracksWidget::updateTrack(int index, vtkSMProperty* smproperty
     return;
     }
 
+  this->Internal->TrackMap[track] = cueProxy;
   track->setProperty(this->Internal->cueName(cueProxy));
   pp = vtkSMProxyProperty::SafeDownCast(cueProxy->GetProperty("KeyFrames"));
 
-  if (pp->GetNumberOfProxies() == 2)
+  if (pp && pp->GetNumberOfProxies() == 2)
     {
     // Update keyframes from this cue. For now, there can only be 1 keyframes in
     // each cue.
@@ -225,5 +248,42 @@ void pqComparativeTracksWidget::updateTrack(int index, vtkSMProperty* smproperty
     newFrame->setEndTime(1);
     newFrame->setStartValue(startValue);
     newFrame->setEndValue(endValue);
+
+    QVariant interpolation =
+      pqSMAdaptor::getEnumerationProperty(pp->GetProxy(0)->GetProperty("Type"));
+    if(interpolation == "Boolean")
+      interpolation = "Step";
+    else if(interpolation == "Sinusoid")
+      interpolation = "Sinusoidal";
+    QString icon =
+      QString(":pqWidgets/Icons/pq%1%2.png").arg(interpolation.toString()).arg(16);
+    newFrame->setIcon(QIcon(icon));
     }
 }
+
+//-----------------------------------------------------------------------------
+void pqComparativeTracksWidget::trackSelected(pqAnimationTrack* track)
+{
+  pqAnimationCue* cue = this->Internal->findCue(track);
+  if(!cue)
+    {
+    return;
+    }
+
+  QDialog dialog;
+  dialog.resize(500, 400);
+  dialog.setWindowTitle(tr("Comparative Visualization Keyframes"));
+  QVBoxLayout* l = new QVBoxLayout(&dialog);
+  pqKeyFrameEditor* editor = new pqKeyFrameEditor(0, cue, &dialog);
+  QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok
+                                              | QDialogButtonBox::Cancel);
+  l->addWidget(editor);
+  l->addWidget(buttons);
+
+  connect(&dialog, SIGNAL(accepted()), editor, SLOT(writeKeyFrameData()));
+  connect(buttons, SIGNAL(accepted()), &dialog, SLOT(accept()));
+  connect(buttons, SIGNAL(rejected()), &dialog, SLOT(reject()));
+
+  dialog.exec();
+}
+  
