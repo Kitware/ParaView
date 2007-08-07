@@ -496,15 +496,12 @@ QList<QVariant> pqSMAdaptor::getSelectionProperty(vtkSMProperty* Property,
     }
   else if(StringListDomain)
     {
-    QList<QVariant> domain =
-      pqSMAdaptor::getEnumerationPropertyDomain(Property);
-    
     QList<QVariant> values =
       pqSMAdaptor::getMultipleElementProperty(Property);
     
-    if(domain.size() > (int)Index)
+    if(Index < StringListDomain->GetNumberOfStrings())
       {
-      QVariant whichDomain = domain[Index];
+      QVariant whichDomain = StringListDomain->GetString(Index);
       ret.append(whichDomain);
       if(values.contains(whichDomain))
         {
