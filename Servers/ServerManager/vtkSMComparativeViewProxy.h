@@ -126,11 +126,10 @@ protected:
   // Removes an internal view and all the representations in that view.
   void RemoveView(vtkSMViewProxy* remove);
 
-
-
   // Description:
   // Update comparative scene.
-  void UpdateComparativeVisualization();
+  void UpdateComparativeVisualization(vtkSMPVAnimationSceneProxy* sceneX,
+    vtkSMPVAnimationSceneProxy* sceneY);
 
   // Description:
   // Update timestrip scene.

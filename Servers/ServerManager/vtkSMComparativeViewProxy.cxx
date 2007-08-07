@@ -67,7 +67,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.10");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -497,7 +497,8 @@ void vtkSMComparativeViewProxy::UpdateVisualization()
   if (this->AnimationSceneX && this->AnimationSceneY &&
     this->Mode == COMPARATIVE)
     {
-    this->UpdateComparativeVisualization();
+    this->UpdateComparativeVisualization(
+      this->AnimationSceneX, this->AnimationSceneY);
     }
   else if (this->Mode == FILM_STRIP && this->AnimationSceneX)
     {
@@ -535,8 +536,35 @@ void vtkSMComparativeViewProxy::UpdateFilmStripVisualization(
 }
 
 //----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::UpdateComparativeVisualization()
+void vtkSMComparativeViewProxy::UpdateComparativeVisualization(
+  vtkSMPVAnimationSceneProxy* sceneX, vtkSMPVAnimationSceneProxy* sceneY)
 {
+  sceneX->SetPlayMode(vtkSMPVAnimationSceneProxy::SEQUENCE);
+  sceneX->SetNumberOfFrames(this->Dimensions[0]);
+
+  sceneY->SetPlayMode(vtkSMPVAnimationSceneProxy::SEQUENCE);
+  sceneY->SetNumberOfFrames(this->Dimensions[1]);
+
+  int view_index=0;
+  for (int y=0; y < this->Dimensions[1]; y++)
+    {
+    sceneY->SetAnimationTime(y);
+    for (int x=0; x < this->Dimensions[0]; x++)
+      {
+      sceneX->SetAnimationTime(x);
+      vtkSMViewProxy* view = this->Internal->Views[view_index];
+
+      // HACK: This ensure that obsolete cache is never used when the CV is being
+      // generated.
+      view->SetCacheTime(view->GetCacheTime()+1.0);
+
+      // Make the view cache the current setup. 
+      // We do interactive render so that both the full-res as well as low-res cache
+      // is updated.
+      view->InteractiveRender();
+      view_index++;
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
