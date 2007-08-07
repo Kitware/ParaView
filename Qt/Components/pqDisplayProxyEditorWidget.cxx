@@ -290,8 +290,11 @@ void pqDisplayProxyEditorWidget::updatePanel()
     {
     this->Internal->DisplayPanel = new pqDefaultDisplayPanel(repr, this);
     
-    if(this->Internal->Representation || !this->Internal->View ||
-       this->Internal->View->canDisplay(this->Internal->OutputPort))
+    if((this->Internal->Representation || !this->Internal->View ||
+       this->Internal->View->canDisplay(this->Internal->OutputPort)) &&
+      (this->Internal->OutputPort &&
+       this->Internal->OutputPort->getSource()->modifiedState() !=
+       pqProxy::UNINITIALIZED) )
       {
       // connect to visibility so we can create a view for it
       QObject::connect(this->Internal->DisplayPanel,
