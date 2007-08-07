@@ -5679,6 +5679,18 @@
    fun:__write_nocancel
    fun:_X11TransWrite
    obj:/usr/lib/libX11.so.6.2.0
+   fun:_XFlushGCCache
+   fun:XDrawLine
+   fun:_ZN15QX11PaintEngine9drawLinesEPK5QLinei
+   fun:_ZN8QPainter9drawLinesEPK5QLinei
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
    fun:XFreeGC
    fun:_ZN7QPixmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -6137,6 +6149,28 @@
    fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
    fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
    fun:_ZN16QCoreApplication16sendPostedEventsEP7QObjecti
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_Z6Balloci
+   fun:_Z3i2bi
+   fun:_Z8pow5multP6Biginti
+   fun:_ZNK14QLocalePrivate14doubleToStringEdiNS_10DoubleFormEij
+   fun:_ZN7QString6setNumEdci
+   fun:_ZN7QString6numberEdci
+   fun:_ZNK21QDoubleSpinBoxPrivate5roundEd
+   fun:_ZN14QDoubleSpinBox10setMaximumEd
+   fun:_ZN23Ui_pqDisplayProxyEditor7setupUiEP7QWidget
+   fun:_ZN20pqDisplayProxyEditorC1EP24pqPipelineRepresentationP7QWidget
+   fun:_ZN26pqDisplayProxyEditorWidget11updatePanelEv
+   fun:_ZN26pqDisplayProxyEditorWidget17setRepresentationEP16pqRepresentation
+   fun:_ZN16pqProxyTabWidget17setRepresentationEP20pqDataRepresentation
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
 }
 {
    <insert a suppression name here>
@@ -8658,6 +8692,18 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:_Znwj
+   fun:_ZNK13QFontEngineFT4Font9loadGlyphEPKS_jNS_11GlyphFormatE
+   fun:_ZNK13QFontEngineFT14recalcAdvancesEiP12QGlyphLayout6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_ZNK13QFontEngineFT12stringToCMapEPK5QChariP12QGlyphLayoutPi6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_ZNK16QFontEngineMulti12stringToCMapEPK5QChariP12QGlyphLayoutPi6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_Z11basic_shapeP11QShaperItem
+   fun:_ZNK11QTextEngine9shapeTextEi
+   fun:_ZNK11QTextEngine5shapeEi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
    fun:_ZN12QActionGroupC2EP7QObject
    fun:_ZN19PrismToolBarActionsC1EP7QObject
    fun:_ZN33PrismToolBarActionsImplementationC1EP7QObject
@@ -10168,6 +10214,37 @@
    fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
    fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
    fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/libfreetype.so.6.3.10
+   fun:ft_mem_qalloc
+   fun:ft_mem_alloc
+   fun:FT_New_Library
+   fun:FT_Init_FreeType
+   fun:_ZN13QFreetypeFace7getFaceERKN11QFontEngine6FaceIdE
+   fun:_ZN13QFontEngineFTC1EP10_FcPatternRK8QFontDefi
+   fun:_Z14tryPatternLoadP10_FcPatterniRK8QFontDefi
+   fun:_ZN13QFontDatabase4loadEPK12QFontPrivatei
+   fun:_ZN11QScriptLine16setDefaultHeightEP11QTextEngine
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutBlockERK10QTextBlockP13QLayoutStructiiS2_
+   fun:_ZN26QTextDocumentLayoutPrivate10layoutFlowEN10QTextFrame8iteratorEP13QLayoutStructii
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameiidd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameii
+   fun:_ZN19QTextDocumentLayout8doLayoutEiii
+   fun:_ZNK26QTextDocumentLayoutPrivate24ensureLayoutedByPositionEi
+   fun:_ZNK26QTextDocumentLayoutPrivate10layoutStepEv
+   fun:_ZN19QTextDocumentLayout15documentChangedEiii
+   fun:_ZN20QTextDocumentPrivate9setLayoutEP27QAbstractTextDocumentLayout
+   fun:_ZNK13QTextDocument14documentLayoutEv
+   fun:_ZN19QTextControlPrivate10setContentEN2Qt10TextFormatERK7QStringP13QTextDocument
+   fun:_ZN12QTextControlC2EP7QObject
+   fun:_ZN16QTextEditPrivate4initERK7QString
+   fun:_ZN9QTextEditC2EP7QWidget
 }
 {
    <insert a suppression name here>
