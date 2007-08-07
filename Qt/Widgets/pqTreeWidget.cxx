@@ -115,6 +115,8 @@ pqTreeWidget::pqTreeWidget(QWidget* p)
                    this, SLOT(invalidateLayout()));
   QObject::connect(this->model(), SIGNAL(rowsRemoved(QModelIndex, int, int)),
                    this, SLOT(invalidateLayout()));
+  QObject::connect(this->model(), SIGNAL(modelReset()),
+                   this, SLOT(invalidateLayout()));
 }
 
 pqTreeWidget::~pqTreeWidget()
@@ -269,8 +271,9 @@ void pqTreeWidget::invalidateLayout()
 {
   // sizeHint is dynamic, so we need to invalidate parent layouts
   // when items are added or removed
-  QWidget* w = this->parentWidget();
-  if(w && w->layout())
+  for(QWidget* w = this->parentWidget();
+      w && w->layout();
+      w = w->parentWidget())
     {
     w->layout()->invalidate();
     }
