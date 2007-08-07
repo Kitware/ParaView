@@ -137,7 +137,7 @@ public:
 
   // Description:
   // Returns if the strategy is currently using LOD 
-  // (UseLOD && EnableLOD && !this->GetUseCache()).
+  // i.e. (UseLOD && EnableLOD).
   bool GetUseLOD();
 
   // Description:
@@ -270,10 +270,6 @@ protected:
   vtkPVDataInformation* Information;
 
   int LODResolution;
-
-  // Flag used to avoid unnecessary "RemoveAllCaches" requests being set to the
-  // server.
-  bool SomethingCached;
 
   // When set to true, LODPipeline is always udpated with the full-res pipeline
   // (unless EnableLOD is false).

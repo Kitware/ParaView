@@ -67,7 +67,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.9");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -555,7 +555,9 @@ void vtkSMComparativeViewProxy::FilmStripTick()
   view->SetCacheTime(view->GetCacheTime()+1.0);
 
   // Make the view cache the current setup. 
-  view->StillRender();
+  // We do interactive render so that both the full-res as well as low-res cache
+  // is updated.
+  view->InteractiveRender();
 
   this->Internal->ActiveIndexX++;
 }

@@ -23,7 +23,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.10");
+vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.11");
 //----------------------------------------------------------------------------
 vtkSMSimpleStrategy::vtkSMSimpleStrategy()
 {
@@ -31,6 +31,8 @@ vtkSMSimpleStrategy::vtkSMSimpleStrategy()
   this->UpdateSuppressor = 0;
   this->UpdateSuppressorLOD = 0;
   this->SetEnableLOD(true);
+  this->SomethingCached = false;
+  this->SomethingCachedLOD = false;
 }
 
 //----------------------------------------------------------------------------
@@ -161,10 +163,46 @@ void vtkSMSimpleStrategy::UpdatePipeline()
 //----------------------------------------------------------------------------
 void vtkSMSimpleStrategy::UpdateLODPipeline()
 {
-  // LODPipeline is never used when caching, hence we don't
-  // need to check if caching is enabled.
-  this->UpdateSuppressorLOD->InvokeCommand("ForceUpdate");
+  if (this->GetUseCache())
+    {
+    this->SomethingCachedLOD = true;
+    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->UpdateSuppressorLOD->GetProperty("CacheUpdate"));
+    dvp->SetElement(0, this->CacheTime);
+    this->UpdateSuppressorLOD->UpdateProperty("CacheUpdate", 1);
+    }
+  else
+    {
+    this->UpdateSuppressorLOD->InvokeCommand("ForceUpdate");
+    }
+
   this->Superclass::UpdateLODPipeline();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSimpleStrategy::InvalidatePipeline()
+{
+  // Cache is cleaned up whenever something changes and caching is not currently
+  // enabled.
+  if (this->SomethingCached && !this->GetUseCache())
+    {
+    this->SomethingCached = false;
+    this->UpdateSuppressor->InvokeCommand("RemoveAllCaches");
+    }
+
+  this->Superclass::InvalidatePipeline();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSimpleStrategy::InvalidateLODPipeline()
+{
+  if (this->SomethingCachedLOD && !this->GetUseCache())
+    {
+    this->SomethingCachedLOD = false;
+    this->UpdateSuppressorLOD->InvokeCommand("RemoveAllCaches");
+    }
+
+  this->Superclass::InvalidateLODPipeline();
 }
 
 //----------------------------------------------------------------------------

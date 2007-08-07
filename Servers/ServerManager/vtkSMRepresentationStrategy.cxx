@@ -24,7 +24,7 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.14");
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.15");
 //----------------------------------------------------------------------------
 vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 {
@@ -50,7 +50,6 @@ vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
     &vtkSMRepresentationStrategy::ProcessViewInformation);
   this->Observer = command;
 
-  this->SomethingCached = false;
   this->KeepLODPipelineUpdated = false;
 }
 
@@ -108,14 +107,6 @@ void vtkSMRepresentationStrategy::MarkModified(vtkSMProxy* modifiedProxy)
 void vtkSMRepresentationStrategy::InvalidatePipeline()
 {
   this->DataValid = false;
-
-  // Cache is cleaned up whenever something changes and caching is not currently
-  // enabled.
-  if (this->SomethingCached && !this->GetUseCache())
-    {
-    this->SomethingCached = false;
-    this->InvokeCommand("RemoveAllCaches");
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -179,7 +170,7 @@ inline int vtkSMRepresentationStrategyGetInt(vtkSMProxy* proxy,
 //----------------------------------------------------------------------------
 bool vtkSMRepresentationStrategy::GetUseLOD()
 {
-  return (this->EnableLOD && !this->GetUseCache() && this->UseLOD);
+  return (this->EnableLOD && this->UseLOD);
 ;
 }
 
