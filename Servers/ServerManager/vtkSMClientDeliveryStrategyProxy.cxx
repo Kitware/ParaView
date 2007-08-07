@@ -24,7 +24,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryStrategyProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryStrategyProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMClientDeliveryStrategyProxy, "1.12");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryStrategyProxy::vtkSMClientDeliveryStrategyProxy()
 {
@@ -186,13 +186,15 @@ void vtkSMClientDeliveryStrategyProxy::UpdatePipelineInternal(
     {
     input->UpdatePipeline();
     vtkPVDataInformation* inputInfo = input->GetDataInformation(this->OutputPort);
-    int dataType = inputInfo->GetDataSetType();
-    int cDataType = inputInfo->GetCompositeDataSetType();
+
+    vtkPVDataInformation* outputInfo = this->ReductionProxy->GetDataInformation(0,1);
+    int dataType = outputInfo->GetDataSetType();
+    int cDataType = outputInfo->GetCompositeDataSetType();
     if (cDataType > 0)
       {
       dataType = cDataType;
       }
-    
+
     vtkClientServerStream stream;
 
     stream << vtkClientServerStream::Invoke

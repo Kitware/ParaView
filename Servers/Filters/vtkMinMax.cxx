@@ -25,11 +25,13 @@
 #include "vtkDataArray.h"
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
+#include "vtkCompositeDataSet.h"
+#include "vtkCompositeDataIterator.h"
 
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkMinMax);
-vtkCxxRevisionMacro(vtkMinMax, "1.6");
+vtkCxxRevisionMacro(vtkMinMax, "1.7");
 
 template <class T>
 void vtkMinMaxExecute(
@@ -90,7 +92,7 @@ int vtkMinMax::FillInputPortInformation(int port, vtkInformation *info)
     }
   if(port==0)
     {
-    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
     info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(),1);
     }
   return 1;
@@ -103,6 +105,7 @@ int vtkMinMax::RequestData(vtkInformation* vtkNotUsed(reqInfo),
 {
   int numInputs;
   int idx, numArrays;
+  vtkCompositeDataSet *cdobj = NULL;
 
   //get hold of input, output
   vtkPolyData* output = vtkPolyData::SafeDownCast(
@@ -112,6 +115,26 @@ int vtkMinMax::RequestData(vtkInformation* vtkNotUsed(reqInfo),
   vtkDataSet* input0 = vtkDataSet::SafeDownCast(
     inputVector[0]->GetInformationObject(0)->Get(
         vtkDataObject::DATA_OBJECT()));
+
+  //if input0 is a composite dataset, use first leaf node to 
+  //setup output attribute arrays
+  if (!input0)
+    {  
+    cdobj = vtkCompositeDataSet::SafeDownCast(
+      inputVector[0]->GetInformationObject(0)->Get(
+        vtkDataObject::DATA_OBJECT()));
+    if (cdobj)
+      { 
+      vtkCompositeDataIterator *cdit = cdobj->NewIterator();
+      input0 = vtkDataSet::SafeDownCast(cdit->GetCurrentDataObject()); 
+      cdit->Delete();
+      }
+    }
+  if (!input0)
+    {
+    vtkErrorMacro("Can't find a dataset to get attribute shape from.");
+    return 0;
+    }
 
   //make output arrays of same type and width as input, but make them just one 
   //element long
@@ -171,27 +194,55 @@ int vtkMinMax::RequestData(vtkInformation* vtkNotUsed(reqInfo),
   //keep a flag in case someone cares about data not lining up exactly
   this->MismatchOccurred = 0;
 
+  
   //go through each input and perform the operation on all of its data
   //we accumulate the results into the output arrays, so there is no need for
   //a second pass over the per input results
   numInputs = this->GetNumberOfInputConnections(0);
   vtkInformation *inInfo;
   vtkDataSet *inputN;
+
   for (idx = 0; idx < numInputs; ++idx)
     {
     inInfo = inputVector[0]->GetInformationObject(idx);
-    inputN = vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+    if (!cdobj)
+      {
+      inputN = 
+        vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-    //set first pass flags to point to cell data 
-    this->ComponentIdx = 0;
-    this->FlagsForCells();
-    //operate on the cell data
-    this->OperateOnField(inputN->GetCellData(), ocd);
+      //set first pass flags to point to cell data 
+      this->ComponentIdx = 0;
+      this->FlagsForCells();
+      //operate on the cell data
+      this->OperateOnField(inputN->GetCellData(), ocd);
+      
+      //ditto for point data
+      this->ComponentIdx = 0;
+      this->FlagsForPoints();
+      this->OperateOnField(inputN->GetPointData(), opd);      
+      }
+    else
+      {
+      //with composite data, we need an "innest" loop to go over sub datasets
+      cdobj = vtkCompositeDataSet::SafeDownCast(
+        inInfo->Get(vtkDataObject::DATA_OBJECT()));
+      vtkCompositeDataIterator *cdit = cdobj->NewIterator();
+      while (!cdit->IsDoneWithTraversal())
+        {
+        inputN = vtkDataSet::SafeDownCast(cdit->GetCurrentDataObject()); 
 
-    //ditto for point data
-    this->ComponentIdx = 0;
-    this->FlagsForPoints();
-    this->OperateOnField(inputN->GetPointData(), opd);      
+        this->ComponentIdx = 0;
+        this->FlagsForCells();
+        this->OperateOnField(inputN->GetCellData(), ocd);
+        
+        this->ComponentIdx = 0;
+        this->FlagsForPoints();
+        this->OperateOnField(inputN->GetPointData(), opd);      
+
+        cdit->GoToNextItem();
+        }
+      cdit->Delete();
+      }
     }
 
   return 1;
