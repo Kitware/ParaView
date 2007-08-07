@@ -51,6 +51,13 @@ public:
   pqKeyFrameEditor(pqAnimationScene* scene, pqAnimationCue* cue, QWidget* p);
   ~pqKeyFrameEditor();
 
+  /// The keyframe editor can be set in a mode where the user can only edit the
+  /// key frame values or keyframe interpolation and not add/delete keyframes
+  /// or change key time. To enable this mode, set this to true (false by
+  /// default).
+  void setValuesOnly(bool);
+  bool valuesOnly() const
+    { return this->ValuesOnly; }
 public slots:
   /// read the key frame data and display it
   void readKeyFrameData();
@@ -65,6 +72,7 @@ private slots:
 private:
   class pqInternal;
   pqInternal* Internal;
+  bool ValuesOnly;
 };
 
 

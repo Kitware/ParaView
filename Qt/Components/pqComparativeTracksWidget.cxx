@@ -279,6 +279,7 @@ void pqComparativeTracksWidget::trackSelected(pqAnimationTrack* track)
   dialog.setWindowTitle(tr("Comparative Visualization Keyframes"));
   QVBoxLayout* l = new QVBoxLayout(&dialog);
   pqKeyFrameEditor* editor = new pqKeyFrameEditor(0, cue, &dialog);
+  editor->setValuesOnly(true);
   QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok
                                               | QDialogButtonBox::Cancel);
   l->addWidget(editor);
