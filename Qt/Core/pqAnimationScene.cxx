@@ -349,6 +349,21 @@ pqAnimationCue* pqAnimationScene::createCueInternal(const QString& mtype,
 }
 
 //-----------------------------------------------------------------------------
+void pqAnimationScene::removeCue(pqAnimationCue* cue)
+{
+  pqObjectBuilder* builder = 
+    pqApplicationCore::instance()->getObjectBuilder();
+  
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->getProxy()->GetProperty("Cues"));
+
+  pp->RemoveProxy(cue->getProxy());
+  this->getProxy()->UpdateVTKObjects();
+    
+  builder->destroy(cue);
+}
+
+//-----------------------------------------------------------------------------
 void pqAnimationScene::removeCues(vtkSMProxy* animated_proxy)
 {
   pqServerManagerModel* model = 

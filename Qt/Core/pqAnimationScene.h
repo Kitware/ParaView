@@ -71,6 +71,9 @@ public:
 
   /// Removes all cues which animate the indicated proxy, if any.
   void removeCues(vtkSMProxy* proxy);
+  
+  /// Removes cue
+  void removeCue(pqAnimationCue* cue);
 
   /// returns true is the cue is present in this scene.
   bool contains(pqAnimationCue*) const;

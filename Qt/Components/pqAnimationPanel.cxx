@@ -855,7 +855,7 @@ void pqAnimationPanel::deleteKeyFrame(int index)
     }
   if(cue->getNumberOfKeyFrames() == 0)
     {
-    //scene->removeCue(cue);
+    scene->removeCue(cue);
     }
   emit this->endUndo();
 }
