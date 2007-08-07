@@ -92,9 +92,12 @@ pqAnimationKeyFrame* pqAnimationTrack::addKeyFrame()
 
 void pqAnimationTrack::removeKeyFrame(pqAnimationKeyFrame* frame)
 {
-  this->Frames.removeAll(frame);
-  delete frame;
-  this->update();
+  int idx = this->Frames.indexOf(frame);
+  if(idx >= 0)
+    {
+    delete this->Frames.takeAt(idx);
+    this->update();
+    }
 }
 
 

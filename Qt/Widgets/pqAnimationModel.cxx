@@ -54,6 +54,10 @@ pqAnimationModel::pqAnimationModel(QGraphicsView* p)
 
 pqAnimationModel::~pqAnimationModel()
 {
+  while(this->Tracks.size())
+    {
+    this->removeTrack(this->Tracks[0]);
+    }
 }
 
 QAbstractItemModel* pqAnimationModel::header()
