@@ -159,20 +159,35 @@ void pqSignalAdaptorSelectionTreeWidget::domainChanged()
 {
   // when domain changes, we need to update the property with
   // new default values
-  // TODO: this should be fixed so the server manager gets the new values
-  //       correctly without doing it here being reset.
-  //       Also, undo/redo doesn't work correctly (possibly because we have to
-  //       do this).
-  this->Internal->Property->ResetToDefault();
-
-  QList<QList<QVariant> > newValues =
-    pqSMAdaptor::getSelectionProperty(this->Internal->Property);
+  QList<QVariant> newDomain =
+    pqSMAdaptor::getSelectionPropertyDomain(this->Internal->Property);
   QList<QList<QVariant> > oldValues = this->values();
 
-  if(oldValues == newValues)
+  bool equal = true;
+  if(oldValues.size() == newDomain.size())
+    {
+    for(int i=0; equal && i<oldValues.size(); i++)
+      {
+      if(oldValues[i][0] != newDomain[i])
+        {
+        equal = false;
+        }
+      }
+    }
+  else
+    {
+    equal = false;
+    }
+
+  if(equal)
     {
     return;
     }
+  
+  this->Internal->Property->ResetToDefault();
+  
+  QList<QList<QVariant> > newValues =
+    pqSMAdaptor::getSelectionProperty(this->Internal->Property);
 
   // Now update the tree widget. We hide any elements no longer in the domain.
   this->Internal->TreeWidget->clear();
