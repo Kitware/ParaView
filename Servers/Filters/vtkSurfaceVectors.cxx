@@ -26,7 +26,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTriangle.h"
 
-vtkCxxRevisionMacro(vtkSurfaceVectors, "1.2");
+vtkCxxRevisionMacro(vtkSurfaceVectors, "1.3");
 vtkStandardNewMacro(vtkSurfaceVectors);
 
 //-----------------------------------------------------------------------------
@@ -97,19 +97,22 @@ int vtkSurfaceVectors::RequestData(vtkInformation *vtkNotUsed(request),
   int cellType;
 
   // We could generate both ...
-  if (this->ConstraintMode == vtkSurfaceVectors::PerpendicularScale)
+  if(numPoints)
     {
-    newScalars = vtkDoubleArray::New();
-    newScalars->SetNumberOfComponents(1);
-    newScalars->SetNumberOfTuples(numPoints);
-    newScalars->SetName("Perpendicular Scale");
-    }
-  else
-    {
-    newVectors = inVectors->NewInstance();
-    newVectors->SetNumberOfComponents(3);
-    newVectors->SetNumberOfTuples(numPoints);
-    newVectors->SetName(inVectors->GetName());
+    if (this->ConstraintMode == vtkSurfaceVectors::PerpendicularScale)
+      {
+      newScalars = vtkDoubleArray::New();
+      newScalars->SetNumberOfComponents(1);
+      newScalars->SetNumberOfTuples(numPoints);
+      newScalars->SetName("Perpendicular Scale");
+      }
+    else
+      {
+      newVectors = inVectors->NewInstance();
+      newVectors->SetNumberOfComponents(3);
+      newVectors->SetNumberOfTuples(numPoints);
+      newVectors->SetName(inVectors->GetName());
+      }
     }
     
   for (pointId = 0; pointId < numPoints; ++pointId)
