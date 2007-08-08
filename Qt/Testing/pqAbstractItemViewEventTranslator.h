@@ -34,10 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqAbstractItemViewEventTranslator_h
 
 #include "pqWidgetEventTranslator.h"
-
-class QAbstractItemView;
-class QModelIndex;
-class QPoint;
+#include <QPoint>
 
 /**
 Translates low-level Qt events into high-level ParaView events that can be recorded as test cases.
@@ -54,15 +51,14 @@ public:
   pqAbstractItemViewEventTranslator(QObject* p=0);
   
   virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
+ 
+protected: 
+  QPoint LastPos;
 
 private:
   pqAbstractItemViewEventTranslator(const pqAbstractItemViewEventTranslator&);
   pqAbstractItemViewEventTranslator& operator=(const pqAbstractItemViewEventTranslator&);
 
-  QAbstractItemView* CurrentObject;
-  
-private slots:
-  void onCurrentChanged(const QModelIndex&, const QModelIndex&);
 };
 
 #endif // !_pqAbstractItemViewEventTranslator_h
