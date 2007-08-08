@@ -10242,9 +10242,6 @@
    fun:_ZN20QTextDocumentPrivate9setLayoutEP27QAbstractTextDocumentLayout
    fun:_ZNK13QTextDocument14documentLayoutEv
    fun:_ZN19QTextControlPrivate10setContentEN2Qt10TextFormatERK7QStringP13QTextDocument
-   fun:_ZN12QTextControlC2EP7QObject
-   fun:_ZN16QTextEditPrivate4initERK7QString
-   fun:_ZN9QTextEditC2EP7QWidget
 }
 {
    <insert a suppression name here>
