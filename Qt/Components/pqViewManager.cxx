@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSignalMapper>
 #include <QtDebug>
 #include <QUuid>
+#include <QApplication>
 
 
 // ParaView includes.
@@ -158,6 +159,10 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
 
   // Creates the default empty frame.
   this->init();
+
+  QObject::connect(QCoreApplication::instance(),
+    SIGNAL(focusChanged(QWidget*, QWidget*)),
+    this, SLOT(onFocusChanged(QWidget*, QWidget*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -270,6 +275,8 @@ void pqViewManager::onFrameAdded(pqMultiViewFrame* frame)
   QObject::connect(frame, SIGNAL(drop(pqMultiViewFrame*,QDropEvent*)),
     this, SLOT(frameDrop(pqMultiViewFrame*,QDropEvent*)));
 
+  // We need to know when the frame is resized, so that we can update view size
+  // related properties on the view proxy.
   frame->installEventFilter(this);
   frame->MaximizeButton->show();
   frame->CloseButton->show();
@@ -429,7 +436,6 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
     {
     viewWidget->setParent(frame);
     frame->setMainWidget(viewWidget);
-    viewWidget->installEventFilter(this);
     viewWidget->setMaximumSize(this->Internal->MaxWindowSize);
     }
   else
@@ -821,44 +827,36 @@ void pqViewManager::onActivate(QWidget* obj)
 }
 
 //-----------------------------------------------------------------------------
-bool pqViewManager::eventFilter(QObject* caller, QEvent* e)
+void pqViewManager::onFocusChanged(QWidget*, QWidget* now)
 {
-  if(e->type() == QEvent::MouseButtonPress)
+  // If the new widget that is getting the focus is a child widget of any of the
+  // frames, then the frame should be made active.
+  QList<pqMultiViewFrame*> frames = this->Internal->Frames.keys();
+  foreach (pqMultiViewFrame* frame, this->Internal->PendingFrames)
     {
-    QVTKWidget* view = qobject_cast<QVTKWidget*>(caller);
-    if (view)
-      {
-      pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(
-        view->parentWidget());
-      if (frame)
-        {
-        frame->setActive(true);
-        }
-      }
-    pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(caller);
-    if (frame)
+    frames.push_back(frame);
+    }
+
+  foreach (pqMultiViewFrame* frame, frames)
+    {
+    if (frame->isAncestorOf(now))
       {
       frame->setActive(true);
+      break;
       }
     }
-  else if (e->type() == QEvent::FocusIn)
-    {
-    QWidget* wdg = qobject_cast<QWidget*>(caller);
-    if (wdg)
-      {
-      pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(
-        wdg->parentWidget());
-      if (frame)
-        {
-        frame->setActive(true);
-        }
-      }
-    }
-  else if (e->type() == QEvent::Resize)
+}
+
+
+//-----------------------------------------------------------------------------
+bool pqViewManager::eventFilter(QObject* caller, QEvent* e)
+{
+  if (e->type() == QEvent::Resize)
     {
     // Update ViewPosition and GUISize properties on all view modules.
     this->updateViewPositions(); 
     }
+
   return QObject::eventFilter(caller, e);
 }
 
