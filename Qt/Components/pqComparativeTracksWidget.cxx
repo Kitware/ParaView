@@ -60,7 +60,7 @@ class pqComparativeTracksWidget::pqInternal
 public:
   pqAnimationWidget* AnimationWidget;
   vtkEventQtSlotConnect* VTKConnect;
-  vtkSmartPointer<vtkSMProxy> CVProxy;
+  vtkSmartPointer<vtkSMComparativeViewProxy> CVProxy;
   QTimer Timer;
   QMap<pqAnimationTrack*, vtkSmartPointer<vtkSMAnimationCueProxy> > TrackMap;
 
@@ -136,7 +136,7 @@ pqComparativeTracksWidget::~pqComparativeTracksWidget()
 //-----------------------------------------------------------------------------
 void pqComparativeTracksWidget::setComparativeView(vtkSMProxy* cvProxy)
 {
-  if (this->Internal->CVProxy == cvProxy)
+  if (this->Internal->CVProxy.GetPointer() == cvProxy)
     {
     return;
     }
@@ -151,8 +151,9 @@ void pqComparativeTracksWidget::setComparativeView(vtkSMProxy* cvProxy)
     model->removeTrack(model->track(0));
     }
 
-  this->Internal->CVProxy = cvProxy;
-  if (!cvProxy)
+
+  this->Internal->CVProxy = vtkSMComparativeViewProxy::SafeDownCast(cvProxy);
+  if (!this->Internal->CVProxy)
     {
     return;
     }
