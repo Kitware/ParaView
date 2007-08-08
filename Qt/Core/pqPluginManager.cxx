@@ -199,7 +199,29 @@ void pqPluginManager::loadPlugins(pqServer* server)
     helper->UnRegister(NULL);
     }
   
-  QStringList plugin_paths = pv_plugin_path.split(QRegExp("\\;|\\:"), QString::SkipEmptyParts);
+  // trim any whitespace before or after the path delimiters
+  // note, shouldn't be a problem with drive letters on Windows "c:\"
+  pv_plugin_path = pv_plugin_path.trimmed();
+  pv_plugin_path = pv_plugin_path.replace(QRegExp("(\\;|\\:)\\s+"), ";");
+  pv_plugin_path = pv_plugin_path.replace(QRegExp("\\s+(\\;|\\:)"), ";");
+
+  // pre-parse the string replacing ':' with ';', watching out for windows drive letters
+  // assumes ';' is not used as part of a directory name
+  for(int index=0; index < pv_plugin_path.size(); index++)
+    {
+    QChar c = pv_plugin_path.at(index);
+    if(c == ':')
+      {
+      bool prevIsChar = index > 0 && pv_plugin_path.at(index-1).isLetter();
+      bool prevPrevIsDelim = index == 1 || (index > 1 && pv_plugin_path.at(index-2) == ';');
+      if(!(prevIsChar && prevPrevIsDelim))
+        {
+        pv_plugin_path.replace(index, 1, ';');
+        }
+      }
+    }
+
+  QStringList plugin_paths = pv_plugin_path.split(';', QString::SkipEmptyParts);
   if(plugin_paths.isEmpty())
     {
     return;
