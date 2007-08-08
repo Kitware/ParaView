@@ -276,16 +276,6 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
   QObject::connect(
     this, SIGNAL(onreset()), this->Implementation->LineSourceWidget, SLOT(reset()));
   
-  QObject::connect(this, SIGNAL(onselect()), 
-                   this->Implementation->PointSourceWidget, SLOT(select()));
-  QObject::connect(this, SIGNAL(onselect()), 
-                   this->Implementation->LineSourceWidget, SLOT(select()));
-  QObject::connect(this, SIGNAL(ondeselect()), 
-                   this->Implementation->PointSourceWidget, SLOT(deselect()));
-  QObject::connect(this, SIGNAL(ondeselect()), 
-                   this->Implementation->LineSourceWidget, SLOT(deselect()));
-
-
   pqNamedWidgets::link(this, this->proxy(), 
     this->propertyManager());
 }
@@ -324,8 +314,13 @@ void pqStreamTracerPanel::onUsePointSource()
         {
         this->Implementation->UI.stackedWidget->setCurrentWidget(
                         this->Implementation->UI.pointSource);
-        this->Implementation->LineSourceWidget->setWidgetVisible(false);
+        if(this->selected())
+          {
+          this->Implementation->PointSourceWidget->select();
+          this->Implementation->LineSourceWidget->deselect();
+          }
         this->Implementation->PointSourceWidget->setWidgetVisible(true);
+        this->Implementation->LineSourceWidget->setWidgetVisible(false);
         pqSMAdaptor::setUncheckedProxyProperty(source_property, source);
         this->setModified();
         break;
@@ -348,6 +343,11 @@ void pqStreamTracerPanel::onUseLineSource()
         {
         this->Implementation->UI.stackedWidget->setCurrentWidget(
                         this->Implementation->UI.lineSource);
+        if(this->selected())
+          {
+          this->Implementation->PointSourceWidget->deselect();
+          this->Implementation->LineSourceWidget->select();
+          }
         this->Implementation->PointSourceWidget->setWidgetVisible(false);
         this->Implementation->LineSourceWidget->setWidgetVisible(true);
         pqSMAdaptor::setUncheckedProxyProperty(source_property, source);
@@ -414,4 +414,31 @@ void pqStreamTracerPanel::onIntegratorTypeChanged(int index)
   this->Implementation->UI.MaximumIntegrationStep->setEnabled(enabled);
   this->Implementation->UI.MaximumError->setEnabled(enabled);
 }
+  
+void pqStreamTracerPanel::select()
+{
+  pqObjectPanel::select();
+  if(this->Implementation->UI.seedType->currentIndex() == 0)
+    {
+    this->Implementation->PointSourceWidget->select();
+    }
+  else
+    {
+    this->Implementation->LineSourceWidget->select();
+    }
+}
+
+void pqStreamTracerPanel::deselect()
+{
+  pqObjectPanel::deselect();
+  if(this->Implementation->UI.seedType->currentIndex() == 0)
+    {
+    this->Implementation->PointSourceWidget->deselect();
+    }
+  else
+    {
+    this->Implementation->LineSourceWidget->deselect();
+    }
+}
+
 

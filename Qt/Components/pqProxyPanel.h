@@ -66,6 +66,9 @@ public:
   /// property manager belongs to this panel
   pqPropertyManager* propertyManager();
 
+  /// returns whether selected
+  bool selected() const;
+
 public slots:
   /// accept the changes made to the properties
   /// changes will be propogated down to the server manager

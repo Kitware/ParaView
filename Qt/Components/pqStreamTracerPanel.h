@@ -50,6 +50,8 @@ public:
   ~pqStreamTracerPanel();
 
   virtual void accept();
+  virtual void select();
+  virtual void deselect();
   
 private slots:
   void onSeedTypeChanged(int);

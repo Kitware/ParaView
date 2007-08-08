@@ -187,6 +187,7 @@ void pq3DWidget::setView(pqView* pqview)
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
+    this->updateWidgetVisibility();
     this->renderView()->getRenderViewProxy()->AddRepresentation(widget);
     }
 
@@ -237,6 +238,7 @@ void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
+    this->updateWidgetVisibility();
     this->renderView()->getRenderViewProxy()->AddRepresentation(widget);
     this->renderView()->render();
     }

@@ -158,6 +158,12 @@ QSize pqProxyPanel::sizeHint() const
 }
 
 //-----------------------------------------------------------------------------
+bool pqProxyPanel::selected() const
+{
+  return this->Implementation->Selected;
+}
+
+//-----------------------------------------------------------------------------
 /// accept the changes made to the properties
 /// changes will be propogated down to the server manager
 void pqProxyPanel::accept()
