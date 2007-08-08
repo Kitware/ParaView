@@ -64,7 +64,6 @@
 #include "vtkPVJoystickFlyOut.h"
 #include "vtkPVLinearExtrusionFilter.h"
 #include "vtkPVLODActor.h"
-#include "vtkPVLODPartDisplayInformation.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVLookupTable.h"
 #include "vtkPVMain.h"
@@ -180,7 +179,6 @@ int main(int , char *[])
   c = vtkPVJoystickFlyOut::New(); c->Print(cout); c->Delete();
   c = vtkPVLinearExtrusionFilter::New(); c->Print(cout); c->Delete();
   c = vtkPVLODActor::New(); c->Print(cout); c->Delete();
-  c = vtkPVLODPartDisplayInformation::New(); c->Print(cout); c->Delete();
   c = vtkPVLODVolume::New(); c->Print(cout); c->Delete();
   c = vtkPVLookupTable::New(); c->Print(cout); c->Delete();
   c = vtkPVMain::New(); c->Print(cout); c->Delete();
