@@ -7472,6 +7472,30 @@
    fun:__write_nocancel
    fun:_X11TransWrite
    obj:/usr/lib/libX11.so.6.2.0
+   fun:XRenderComposite
+   fun:_ZN15QX11PaintEngine10drawPixmapERK6QRectFRK7QPixmapS2_
+   fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZN15QX11PaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZN15QPainterPrivate11draw_helperERK12QPainterPathNS_13DrawOperationE
+   fun:_ZN8QPainter9drawLinesEPK5QLinei
+   fun:_ZNK15QPlastiqueStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
+   fun:_ZN16QAbstractSpinBox10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN16QAbstractSpinBox5eventEP6QEvent
+   fun:_ZN8QSpinBox5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
    fun:XCreateGC
    fun:_ZN7QPixmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -7734,12 +7758,6 @@
    fun:_ZN24vtkPainterPolyDataMapper11RenderPieceEP11vtkRendererP8vtkActor
    fun:_ZN17vtkPolyDataMapper6RenderEP11vtkRendererP8vtkActor
    fun:_ZN14vtkOpenGLActor6RenderEP11vtkRendererP9vtkMapper
-   fun:_ZN8vtkActor20RenderOpaqueGeometryEP11vtkViewport
-   fun:_ZN11vtkRenderer14UpdateGeometryEv
-   fun:_ZN17vtkOpenGLRenderer12DeviceRenderEv
-   fun:_ZN11vtkRenderer6RenderEv
-   fun:_ZN21vtkRendererCollection6RenderEv
-   fun:_ZN15vtkRenderWindow14DoStereoRenderEv
 }
 {
    <insert a suppression name here>
@@ -7830,6 +7848,25 @@
    fun:_ZN33vtkProcessModuleConnectionManager18MonitorConnectionsEm
    fun:_ZN16vtkProcessModule11StartServerEm
    fun:_ZN16vtkProcessModule5StartEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:__glXGetStringFromServer
+   fun:__glXInitialize
+   fun:glXQueryVersion
+   fun:_ZN22vtkXOpenGLRenderWindow21CreateOffScreenWindowEii
+   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
+   fun:_ZN15vtkRenderWindow14DoStereoRenderEv
+   fun:_ZN15vtkRenderWindow10DoFDRenderEv
+   fun:_ZN15vtkRenderWindow10DoAARenderEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
+   fun:_ZN14vtkSMViewProxy11StillRenderEv
+   fun:_ZN20vtkSMRenderViewProxy13CaptureWindowEi
 }
 {
    <insert a suppression name here>
@@ -8363,13 +8400,6 @@
    fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
    fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
    fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
    fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
 }
 {
@@ -9887,6 +9917,32 @@
    fun:_ZN13vtkObjectBase6DeleteEv
    fun:_Z29TestDijkstraGraphGeodesicPathiPPc
    fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XtMalloc
+   fun:__XtMalloc
+   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/lib/libXt.so.6.0.0
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/lib/libXt.so.6.0.0
+   fun:_XtAppCreateShell
+   fun:XtVaAppCreateShell
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
 }
 {
    <insert a suppression name here>
