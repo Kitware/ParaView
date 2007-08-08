@@ -38,7 +38,6 @@
 #include "vtkPVFileInformationHelper.h"
 #include "vtkPVGenericAttributeInformation.h"
 #include "vtkPVInformation.h"
-#include "vtkPVLODPartDisplayInformation.h"
 #include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkPVOptions.h"
@@ -68,7 +67,6 @@ int main(int, char * [])
   c = vtkPVCacheSizeInformation::New(); c->Print(cout); c->Delete();
   c = vtkPVClassNameInformation::New(); c->Print(cout); c->Delete();
   c = vtkPVClientServerIdCollectionInformation::New(); c->Print(cout); c->Delete();
-  c = vtkPVLODPartDisplayInformation::New(); c->Print(cout); c->Delete();
   c = vtkMPIMToNSocketConnectionPortInformation::New(); c->Print(cout); c->Delete();
   c = vtkPVServerInformation::New(); c->Print(cout); c->Delete();
   c = vtkPVServerOptions::New(); c->Print(cout); c->Delete();

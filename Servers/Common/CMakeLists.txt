@@ -47,7 +47,6 @@ SET(Kit_SRCS
   vtkPVFileInformationHelper.cxx
   vtkPVGenericAttributeInformation.cxx
   vtkPVInformation.cxx
-  vtkPVLODPartDisplayInformation.cxx
   vtkPVNumberOfOutputsInformation.cxx
   vtkPVOpenGLExtensionsInformation.cxx
   vtkPVProgressHandler.cxx
