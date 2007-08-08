@@ -372,6 +372,7 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
     }
 
   this->Internal->Editor = new QDialog;
+  this->Internal->Editor->setAttribute(Qt::WA_QuitOnClose, false);
   this->Internal->Editor->setAttribute(Qt::WA_DeleteOnClose);
   this->Internal->Editor->resize(500, 400);
   this->Internal->Editor->setWindowTitle(tr("Animation Keyframes"));
