@@ -179,10 +179,6 @@ void pqViewManager::buildConvertMenu()
 {
   this->Internal->ConvertMenu.clear();
 
-  QAction* view_action = new QAction("3D View", this);
-  view_action->setData(pqRenderView::renderViewType());
-  this->Internal->ConvertMenu.addAction(view_action);
-
   // Create actions for converting view types.
   QObjectList ifaces =
     pqApplicationCore::instance()->getPluginManager()->interfaces();
@@ -200,7 +196,7 @@ void pqViewManager::buildConvertMenu()
           // Ignore these views for now.
           continue;
           }
-        view_action = new QAction(vi->viewTypeName(*iter), this);
+        QAction* view_action = new QAction(vi->viewTypeName(*iter), this);
         view_action->setData(*iter);
         this->Internal->ConvertMenu.addAction(view_action);
         }

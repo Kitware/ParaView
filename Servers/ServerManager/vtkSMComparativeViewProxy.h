@@ -107,6 +107,38 @@ public:
   // generating the comparative visualization)/tim
   void UpdateVisualization();
 
+  // Description:
+  // ViewSize, ViewPosition need to split up among all the component
+  // views correctly.
+  virtual void SetViewSize(int x, int y)
+    {
+    this->ViewSize[0] = x;
+    this->ViewSize[1] = y;
+    this->UpdateViewLayout();
+    }
+
+  // Description:
+  // ViewSize, ViewPosition need to split up among all the component
+  // views correctly.
+  virtual void SetViewPosition(int x, int y)
+    {
+    this->Superclass::SetViewPosition(x, y);
+    this->UpdateViewLayout();
+    }
+
+  // Description:
+  // ViewSize, ViewPosition need to split up among all the component
+  // views correctly.
+  virtual void SetGUISize(int x, int y)
+    {
+    this->Superclass::SetGUISize(x, y);
+    this->UpdateViewLayout();
+    }
+
+  // Description:
+  // Set spacing between views. 
+  vtkSetVector2Macro(Spacing, int);
+  vtkGetVector2Macro(Spacing, int);
 //BTX
 protected:
   vtkSMComparativeViewProxy();
@@ -135,6 +167,9 @@ protected:
   // Update timestrip scene.
   void UpdateFilmStripVisualization(vtkSMPVAnimationSceneProxy* scene);
 
+  // Description:
+  // Marks the view dirty i.e. on next StillRender it needs to regenerate the
+  // comparative vis by replaying the animation(s).
   void MarkSceneOutdated()
     { this->SceneOutdated=true; }
 
@@ -142,8 +177,14 @@ protected:
   // Called when playing the scene to generate film strips.
   void FilmStripTick();
 
+  // Description:
+  // Update layout for internal views.
+  void UpdateViewLayout();
+
   int Mode;
   int Dimensions[2];
+  int ViewSize[2];
+  int Spacing[2];
 
   vtkSMPVAnimationSceneProxy* AnimationSceneX;
   vtkSMPVAnimationSceneProxy* AnimationSceneY;

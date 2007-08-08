@@ -75,21 +75,15 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
     foreach(QObject* iface, ifaces)
       {
       pqViewModuleInterface* vmi = qobject_cast<pqViewModuleInterface*>(iface);
-      if(vmi && vmi->viewTypes().contains(xml_type))
+      if (vmi)
         {
-        return vmi->createView(xml_type, group, name, 
+        pqView* pqview = vmi->createView(xml_type, group, name, 
           vtkSMViewProxy::SafeDownCast(proxy), server, 0);
+        if (pqview)
+          {
+          return pqview;
+          }
         }
-      }
-    if (proxy->IsA("vtkSMRenderViewProxy"))
-      {
-      return new pqRenderView(group, name, 
-        vtkSMViewProxy::SafeDownCast(proxy), server, 0);
-      }
-    if (xml_type == "ComparativeRenderView")
-      {
-      return new pqRenderView(group, name, 
-        vtkSMViewProxy::SafeDownCast(proxy), server, 0);
       }
     }
   else if (group == "sources")

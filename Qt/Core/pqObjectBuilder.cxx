@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFileInfo>
 
 #include "pqApplicationCore.h"
+#include "pqComparativeRenderView.h"
 #include "pqDataRepresentation.h"
 #include "pqNameCount.h"
 #include "pqOutputPort.h"
@@ -295,6 +296,12 @@ pqView* pqObjectBuilder::createView(const QString& type,
   if(type == pqRenderView::renderViewType())
     {
     proxy = server->newRenderView();
+    }
+  else if (type == pqComparativeRenderView::comparativeRenderViewType())
+    {
+    QString xmlname = server->getRenderViewXMLName();
+    xmlname = "Comparative" + xmlname;
+    proxy = pxm->NewProxy("newviews", xmlname.toAscii().data());
     }
   else
     {

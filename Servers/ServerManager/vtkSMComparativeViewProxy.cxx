@@ -19,12 +19,13 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMCameraLink.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMPVAnimationSceneProxy.h"
 #include "vtkSMRepresentationProxy.h"
-#include "vtkSMProperty.h"
 
 #include <vtkstd/vector>
 #include <vtkstd/map>
@@ -67,7 +68,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.11");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -76,6 +77,9 @@ vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
   this->Mode = FILM_STRIP;
   this->Dimensions[0] = 0;
   this->Dimensions[1] = 0;
+  this->ViewSize[0] = 400;
+  this->ViewSize[1] = 400;
+  this->Spacing[0] = this->Spacing[1] = 1;
   this->AnimationSceneX = 0;
   this->AnimationSceneY = 0;
 
@@ -190,11 +194,48 @@ void vtkSMComparativeViewProxy::Build(int dx, int dy)
   this->Dimensions[0] = dx;
   this->Dimensions[1] = dy;
 
-  // TODO: Update ViewSize ViewPosition for all internal views.
+  this->UpdateViewLayout();
 
   // Whenever the layout changes we'll fire the ConfigureEvent.
   this->InvokeEvent(vtkCommand::ConfigureEvent);
 }
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeViewProxy::UpdateViewLayout()
+{
+  int width = 
+    (this->ViewSize[0] - (this->Dimensions[0]-1)*this->Spacing[0])/this->Dimensions[0];
+  int height = 
+    (this->ViewSize[1] - (this->Dimensions[1]-1)*this->Spacing[1])/this->Dimensions[1];
+
+  int view_index = 0;
+  for (int y=0; y < this->Dimensions[1]; ++y)
+    {
+    for (int x=0; x < this->Dimensions[0]; ++x, view_index++)
+      {
+      vtkSMViewProxy* view = this->Internal->Views[view_index];
+      int view_pos[2];
+      view_pos[0] = this->ViewPosition[0] + width * x;
+      view_pos[1] = this->ViewPosition[1] + height * y;
+
+      vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+        view->GetProperty("ViewPosition"));
+      ivp->SetElements(view_pos);
+
+      ivp = vtkSMIntVectorProperty::SafeDownCast(
+        view->GetProperty("ViewSize"));
+      ivp->SetElement(0, width);
+      ivp->SetElement(1, height);
+
+      ivp = vtkSMIntVectorProperty::SafeDownCast(
+        view->GetProperty("GUISize"));
+      ivp->SetElements(this->GUISize);
+      view->UpdateVTKObjects();
+      }
+    }
+
+}
+
 
 //----------------------------------------------------------------------------
 vtkSMViewProxy* vtkSMComparativeViewProxy::GetRootView()
@@ -245,6 +286,7 @@ void vtkSMComparativeViewProxy::AddNewView()
     return;
     }
 
+  newView->SetConnectionID(this->ConnectionID);
   newView->UpdateVTKObjects();
 
   // Copy current view properties over to this newly created view.
@@ -252,7 +294,6 @@ void vtkSMComparativeViewProxy::AddNewView()
   exceptions.insert("Representations");
   exceptions.insert("ViewSize");
   exceptions.insert("ViewPosition");
-  exceptions.insert("GUISize");
   vtkCopyClone(rootView, newView, &exceptions);
 
   this->Internal->Views.push_back(newView);

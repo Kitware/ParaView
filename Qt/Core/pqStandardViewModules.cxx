@@ -33,11 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardViewModules.h"
 
 #include "vtkSMProxyManager.h"
+#include "vtkSMViewProxy.h"
 
 #include "pqBarChartRepresentation.h"
 #include "pqComparativeRenderView.h"
 #include "pqLineChartRepresentation.h"
 #include "pqPlotView.h"
+#include "pqRenderView.h"
 #include "pqSpreadSheetView.h"
 #include "pqTableView.h"
 #include "pqTextRepresentation.h"
@@ -54,6 +56,7 @@ pqStandardViewModules::~pqStandardViewModules()
 QStringList pqStandardViewModules::viewTypes() const
 {
   return QStringList() << 
+    pqRenderView::renderViewType() << 
     pqPlotView::barChartType() << 
     pqPlotView::XYPlotType() << 
     pqTableView::tableType() <<
@@ -71,7 +74,11 @@ QStringList pqStandardViewModules::displayTypes() const
 
 QString pqStandardViewModules::viewTypeName(const QString& type) const
 {
-  if(type == pqPlotView::barChartType())
+  if (type == pqRenderView::renderViewType())
+    {
+    return pqRenderView::renderViewTypeName();
+    }
+  else if(type == pqPlotView::barChartType())
     {
     return pqPlotView::barChartTypeName();
     }
@@ -115,14 +122,11 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype)
     {
     return pxm->NewProxy("views", "TableView");
     }
-  else if (viewtype == pqComparativeRenderView::comparativeRenderViewType())
-    {
-    return pxm->NewProxy("newviews", "ComparativeRenderView");
-    }
   else if (viewtype == pqSpreadSheetView::spreadsheetViewType())
     {
     return pxm->NewProxy("newviews", "SpreadSheetView");
     }
+  // Handle creation of RenderView and ComparativeRenderView.
   return NULL;
 }
 
@@ -148,14 +152,20 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     {
     // return new pqTableView(group, viewname, viewmodule, server, p);
     }
-  else if (viewtype == pqComparativeRenderView::comparativeRenderViewType())
-    {
-    return new pqComparativeRenderView(
-      group, viewname, viewmodule, server, p);
-    }
+
   else if (viewtype == pqSpreadSheetView::spreadsheetViewType())
     {
     return new pqSpreadSheetView(
+      group, viewname, viewmodule, server, p);
+    }
+  else if (viewmodule->IsA("vtkSMRenderViewProxy"))
+    {
+    return new pqRenderView(group, viewname, viewmodule, server, p);
+    }
+  else if (viewmodule->IsA("vtkSMComparativeViewProxy"))
+    {
+    // Currently we only handle comparative render views.
+    return new pqComparativeRenderView(
       group, viewname, viewmodule, server, p);
     }
 

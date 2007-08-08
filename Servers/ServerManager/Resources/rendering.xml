@@ -2920,7 +2920,7 @@
         name="RemoteRenderThreshold"
         command="SetRemoteRenderThreshold"
         number_of_elements="1"
-        default_values="20.0"
+        default_values="0.0"
         update_self="1">
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
@@ -3122,11 +3122,11 @@
       <!-- End of ClientServerRenderView-->
     </ClientServerRenderViewProxy>
 
-    <ComparativeViewProxy name="ComparativeRenderView"
+    <Proxy name="ComparativeViewBase"
       base_proxygroup="newviews" base_proxyname="ViewBase">
       <Documentation>
-        The is comparative view comprising of individual "RenderView" proxies
-        for each panel in the comparative view grid.
+        Base interface for the ComparativeView. It has all the properties except
+        the RootView subproxy.
       </Documentation>
 
       <IntVectorProperty
@@ -3135,8 +3135,29 @@
         update_self="1"
         immediate_update="1"
         number_of_elements="2"
-        default_values="3 3">
+        default_values="1 1">
         <IntRangeDomain name="range" min="1 1" max="10 10" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="Spacing"
+        command="SetSpacing"
+        update_self="1"
+        number_of_elements="2"
+        default_values="1 1">
+        <IntRangeDomain name="range" min="0 0" max="10 10" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ViewSize"
+        command="SetViewSize"
+        number_of_elements="2"
+        update_self="1"
+        default_values="400 400">
+        <IntRangeDomain name="range" min="1 1" />
+        <Documentation>
+          Set the view size for this view module.
+        </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -3168,6 +3189,15 @@
           <Property name="Cues" exposed_name="YCues" />
         </ExposedProperties>
       </SubProxy>
+      <!-- End of ComparativeViewBase -->
+    </Proxy>
+
+    <ComparativeViewProxy name="ComparativeRenderView"
+      base_proxygroup="newviews" base_proxyname="ComparativeViewBase">
+      <Documentation>
+        The is comparative view comprising of individual "RenderView" proxies
+        for each panel in the comparative view grid.
+      </Documentation>
 
       <SubProxy>
         <Proxy name="RootView" proxygroup="newviews" proxyname="RenderView">
@@ -3220,12 +3250,145 @@
           <!-- Renderer -->
           <Property name="Background" />
           <!-- RenderWindow -->
-          <Property name="RenderWindowSizeInfo" />
         </ExposedProperties>
         <!-- End of "RootView" subproxy -->
       </SubProxy>
 
       <!-- End of ComparativeRenderView -->
+    </ComparativeViewProxy>
+
+    <ComparativeViewProxy name="ComparativeIceTDesktopRenderView"
+      base_proxygroup="newviews" base_proxyname="ComparativeViewBase">
+      <Documentation>
+        The is comparative view comprising of individual 
+        "IceTDesktopRenderView" proxies
+        for each panel in the comparative view grid.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="RootView" 
+          proxygroup="newviews" proxyname="IceTDesktopRenderView">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="LODThreshold" />
+          <Property name="LODResolution" />
+          <Property name="UseTriangleStrips" />
+          <Property name="UseImmediateMode" />
+          <Property name="RenderInterruptsEnabled" />
+          <Property name="ResetCamera" />
+          <Property name="UseLight" />
+          <!-- Light -->
+          <Property name="LightAmbientColor" />
+          <Property name="LightSpecularColor" />
+          <Property name="LightIntensity" />
+          <Property name="LightSwitch" />
+          <!-- LightKit -->
+          <Property name="KeyLightWarmth" />
+          <Property name="KeyLightIntensity" />
+          <Property name="KeyLightElevation" />
+          <Property name="KeyLightAzimuth" />
+          <Property name="FillLightWarmth" />
+          <Property name="FillLightK:F Ratio" />
+          <Property name="FillLightElevation" />
+          <Property name="FillLightAzimuth" />
+          <Property name="BackLightWarmth" />
+          <Property name="BackLightK:B Ratio" />
+          <Property name="BackLightElevation" />
+          <Property name="BackLightAzimuth" />
+          <Property name="HeadLightWarmth" />
+          <Property name="HeadLightK:H Ratio" />
+          <Property name="MaintainLuminance" />
+          <!-- ActiveCamera -->
+          <Property name="CameraPositionInfo" />
+          <Property name="CameraPosition" />
+          <Property name="CameraFocalPointInfo" />
+          <Property name="CameraFocalPoint" />
+          <Property name="CameraViewUpInfo" />
+          <Property name="CameraViewUp" />
+          <Property name="CameraViewAngle" />
+          <Property name="CameraClippingRangeInfo" />
+          <Property name="CameraClippingRange" />
+          <Property name="CameraParallelScale" />
+          <Property name="CameraParallelProjection" />
+          <Property name="EyeAngle" />
+          <!-- Interactor -->
+          <Property name="CameraManipulators" />
+          <Property name="CenterOfRotation" />
+          <!-- Renderer -->
+          <Property name="Background" />
+          <!-- RenderWindow -->
+        </ExposedProperties>
+        <!-- End of "RootView" subproxy -->
+      </SubProxy>
+
+      <!-- End of ComparativeIceTDesktopRenderView -->
+    </ComparativeViewProxy>
+
+    <ComparativeViewProxy name="ComparativeClientServerRenderView"
+      base_proxygroup="newviews" base_proxyname="ComparativeViewBase">
+      <Documentation>
+        The is comparative view comprising of individual 
+        "ClientServerRenderView" proxies
+        for each panel in the comparative view grid.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="RootView" 
+          proxygroup="newviews" proxyname="ClientServerRenderView">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="LODThreshold" />
+          <Property name="LODResolution" />
+          <Property name="UseTriangleStrips" />
+          <Property name="UseImmediateMode" />
+          <Property name="RenderInterruptsEnabled" />
+          <Property name="ResetCamera" />
+          <Property name="UseLight" />
+          <!-- Light -->
+          <Property name="LightAmbientColor" />
+          <Property name="LightSpecularColor" />
+          <Property name="LightIntensity" />
+          <Property name="LightSwitch" />
+          <!-- LightKit -->
+          <Property name="KeyLightWarmth" />
+          <Property name="KeyLightIntensity" />
+          <Property name="KeyLightElevation" />
+          <Property name="KeyLightAzimuth" />
+          <Property name="FillLightWarmth" />
+          <Property name="FillLightK:F Ratio" />
+          <Property name="FillLightElevation" />
+          <Property name="FillLightAzimuth" />
+          <Property name="BackLightWarmth" />
+          <Property name="BackLightK:B Ratio" />
+          <Property name="BackLightElevation" />
+          <Property name="BackLightAzimuth" />
+          <Property name="HeadLightWarmth" />
+          <Property name="HeadLightK:H Ratio" />
+          <Property name="MaintainLuminance" />
+          <!-- ActiveCamera -->
+          <Property name="CameraPositionInfo" />
+          <Property name="CameraPosition" />
+          <Property name="CameraFocalPointInfo" />
+          <Property name="CameraFocalPoint" />
+          <Property name="CameraViewUpInfo" />
+          <Property name="CameraViewUp" />
+          <Property name="CameraViewAngle" />
+          <Property name="CameraClippingRangeInfo" />
+          <Property name="CameraClippingRange" />
+          <Property name="CameraParallelScale" />
+          <Property name="CameraParallelProjection" />
+          <Property name="EyeAngle" />
+          <!-- Interactor -->
+          <Property name="CameraManipulators" />
+          <Property name="CenterOfRotation" />
+          <!-- Renderer -->
+          <Property name="Background" />
+          <!-- RenderWindow -->
+        </ExposedProperties>
+        <!-- End of "RootView" subproxy -->
+      </SubProxy>
+
+      <!-- End of ComparativeClientServerRenderView -->
     </ComparativeViewProxy>
 
     <!-- End if group "newviews" -->
