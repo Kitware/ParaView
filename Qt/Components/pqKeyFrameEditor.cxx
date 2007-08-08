@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationScene.h"
 #include "pqSMAdaptor.h"
 #include "pqApplicationCore.h"
+#include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 #include "pqKeyFrameTypeWidget.h"
 #include "pqSignalAdaptorKeyFrameType.h"
@@ -372,6 +373,26 @@ pqKeyFrameEditor::pqKeyFrameEditor(pqAnimationScene* scene,
           this, SLOT(deleteKeyFrame()));
   connect(this->Internal->pbDeleteAll, SIGNAL(clicked(bool)),
           this, SLOT(deleteAllKeyFrames()));
+  
+  QString label;
+  pqServerManagerModel* sm =
+    pqApplicationCore::instance()->getServerManagerModel();
+  vtkSMProxy* pxy = cue->getAnimatedProxy();
+  pqProxy* animatedProxy = sm->findItem<pqProxy*>(pxy);
+  if(animatedProxy)
+    {
+    vtkSMProperty* animatedProperty = cue->getAnimatedProperty();
+    label = QString("%1 %2");
+    label = label.arg(animatedProxy->getSMName());
+    label = label.arg(pxy->GetPropertyName(animatedProperty));
+    int idx = cue->getAnimatedPropertyIndex();
+    if(idx != -1)
+      {
+      label += QString("(%1)").arg(idx);
+      }
+    }
+
+  this->Internal->label->setText(QString("Editing keyframes for ") + label);
 
 }
 
