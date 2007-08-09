@@ -118,18 +118,21 @@ bool pqAbstractItemViewEventPlayer::playEvent(QObject* Object, const QString& Co
   else if(Command.startsWith("mouse"))
     {
     QStringList args = Arguments.split(',');
-    if(args.size() == 4)
+    if(args.size() == 6)
       {
       Qt::MouseButton button = static_cast<Qt::MouseButton>(args[0].toInt());
       Qt::MouseButtons buttons = static_cast<Qt::MouseButton>(args[1].toInt());
       Qt::KeyboardModifiers keym = static_cast<Qt::KeyboardModifier>(args[2].toInt());
-      QModelIndex idx = GetIndex(object, args[3]);
+      int x = args[3].toInt();
+      int y = args[4].toInt();
+      QModelIndex idx = GetIndex(object, args[5]);
       QRect r = object->visualRect(idx);
+      QPoint pt = r.topLeft() + QPoint(x,y);
       QEvent::Type type = QEvent::MouseButtonPress;
       type = Command == "mouseMove" ? QEvent::MouseMove : type;
       type = Command == "mouseRelease" ? QEvent::MouseButtonRelease : type;
       type = Command == "mouseDblClick" ? QEvent::MouseButtonDblClick : type;
-      QMouseEvent e(type, r.center(), button, buttons, keym);
+      QMouseEvent e(type, pt, button, buttons, keym);
       QCoreApplication::sendEvent(object->viewport(), &e);
       pqEventDispatcher::processEventsAndWait(1);
       return true;

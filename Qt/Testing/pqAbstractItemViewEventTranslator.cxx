@@ -83,41 +83,7 @@ bool pqAbstractItemViewEventTranslator::translateEvent(QObject* Object, QEvent* 
       return true;
       }
     case QEvent::MouseButtonPress:
-      {
-      if(Object == object)
-        {
-        return false;
-        }
-      QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(Event);
-      this->LastPos = mouseEvent->pos();
-      QModelIndex idx = object->indexAt(mouseEvent->pos());
-      QString idxStr = toIndexStr(idx);
-      QString info = QString("%1,%2,%3,%4")
-        .arg(mouseEvent->button())
-        .arg(mouseEvent->buttons())
-        .arg(mouseEvent->modifiers())
-        .arg(idxStr);
-      emit recordEvent(object, "mousePress", info);
-      return true;
-      }
     case QEvent::MouseButtonDblClick:
-      {
-      if(Object == object)
-        {
-        return false;
-        }
-      QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(Event);
-      this->LastPos = mouseEvent->pos();
-      QModelIndex idx = object->indexAt(mouseEvent->pos());
-      QString idxStr = toIndexStr(idx);
-      QString info = QString("%1,%2,%3,%4")
-        .arg(mouseEvent->button())
-        .arg(mouseEvent->buttons())
-        .arg(mouseEvent->modifiers())
-        .arg(idxStr);
-      emit recordEvent(object, "mouseDblClick", info);
-      return true;
-      }
     case QEvent::MouseButtonRelease:
       {
       if(Object == object)
@@ -125,18 +91,37 @@ bool pqAbstractItemViewEventTranslator::translateEvent(QObject* Object, QEvent* 
         return false;
         }
       QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(Event);
+      if(Event->type() != QEvent::MouseButtonRelease)
+        {
+        this->LastPos = mouseEvent->pos();
+        }
       QModelIndex idx = object->indexAt(mouseEvent->pos());
       QString idxStr = toIndexStr(idx);
-      QString info = QString("%1,%2,%3,%4")
+      QRect r = object->visualRect(idx);
+      QPoint relPt = mouseEvent->pos() - r.topLeft();
+      QString info = QString("%1,%2,%3,%4,%5,%6")
         .arg(mouseEvent->button())
         .arg(mouseEvent->buttons())
         .arg(mouseEvent->modifiers())
+        .arg(relPt.x())
+        .arg(relPt.y())
         .arg(idxStr);
-      if(this->LastPos != mouseEvent->pos())
+      if(Event->type() == QEvent::MouseButtonPress)
         {
-        emit recordEvent(object, "mouseMove", info);
+        emit recordEvent(object, "mousePress", info);
         }
-      emit recordEvent(object, "mouseRelease", info);
+      else if(Event->type() == QEvent::MouseButtonDblClick)
+        {
+        emit recordEvent(object, "mouseDblClick", info);
+        }
+      else if(Event->type() == QEvent::MouseButtonRelease)
+        {
+        if(this->LastPos != mouseEvent->pos())
+          {
+          emit recordEvent(object, "mouseMove", info);
+          }
+        emit recordEvent(object, "mouseRelease", info);
+        }
       return true;
       }
     default:
