@@ -1041,6 +1041,9 @@ bool pqRenderView::eventFilter(QObject* caller, QEvent* e)
       {
       this->Internal->MouseOrigin = me->pos();
       }
+
+    // Ensure that the view has focus before we start interacting with the view.
+    emit this->focused(this);
     }
   else if(e->type() == QEvent::MouseButtonRelease)
     {

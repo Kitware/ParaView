@@ -151,6 +151,12 @@ signals:
   ///    have been initialized to a selection source.
   void selected(pqOutputPort* opport);
 
+  /// Fired when the view gets the focus i.e. user start interacting with the
+  /// view. Subclasses must fire this signal when the user begins interaction
+  /// with the view. This signal may be fired even if the view already has the
+  /// focus. \c view is the pointer to the view getting the focus i.e. \c this.
+  void focused(pqView* view);
+
 private slots:
   /// Called when the "Representations" property changes.
   void onRepresentationsChanged();

@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqEmptyView.h"
 
 // VTK includes.
-#include "QVTKWidget.h"
 #include "vtkPVConfig.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
@@ -61,10 +60,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqCloseViewUndoElement.h"
-#include "pqComparativeRenderView.h"
 #include "pqMultiViewFrame.h"
 #include "pqObjectBuilder.h"
 #include "pqPluginManager.h"
+#include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSplitViewUndoElement.h"
@@ -429,7 +428,6 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
     {
     viewWidget->setParent(frame);
     frame->setMainWidget(viewWidget);
-    viewWidget->installEventFilter(this);
     viewWidget->setMaximumSize(this->Internal->MaxWindowSize);
     }
   else
@@ -437,18 +435,8 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
     frame->setMainWidget(NULL);
     }
 
-  pqComparativeRenderView* cvRenderView = 
-    qobject_cast<pqComparativeRenderView*>(view);
-  if (cvRenderView)
-    {
-    QAction* editCV = new QAction(
-      QIcon(":/pqWidgets/Icons/pqComparativeVis16.png"),
-      "Edit Comparative Vis",
-      this);
-    editCV->setObjectName("EditComparativeVis");
-    frame->addTitlebarAction(editCV);
-    editCV->setEnabled(true);
-    }
+  QObject::connect(view, SIGNAL(focused(pqView*)), 
+    this, SLOT(onViewFocused(pqView*)));
 
   pqRenderView* const render_module = 
     qobject_cast<pqRenderView*>(view);
@@ -821,37 +809,26 @@ void pqViewManager::onActivate(QWidget* obj)
 }
 
 //-----------------------------------------------------------------------------
+void pqViewManager::onViewFocused(pqView* view)
+{
+  // When a view indicates it has the focus, we activate the frame for the view.
+  pqMultiViewFrame* frame = this->getFrame(view);
+  if (frame)
+    {
+    frame->setActive(true);
+    }
+}
+
+//-----------------------------------------------------------------------------
 bool pqViewManager::eventFilter(QObject* caller, QEvent* e)
 {
   if(e->type() == QEvent::MouseButtonPress)
     {
-    QVTKWidget* view = qobject_cast<QVTKWidget*>(caller);
-    if (view)
-      {
-      pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(
-        view->parentWidget());
-      if (frame)
-        {
-        frame->setActive(true);
-        }
-      }
+    // When user presses on the frame, we make it active.
     pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(caller);
     if (frame)
       {
       frame->setActive(true);
-      }
-    }
-  else if (e->type() == QEvent::FocusIn)
-    {
-    QWidget* wdg = qobject_cast<QWidget*>(caller);
-    if (wdg)
-      {
-      pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(
-        wdg->parentWidget());
-      if (frame)
-        {
-        frame->setActive(true);
-        }
       }
     }
   else if (e->type() == QEvent::Resize)
@@ -859,6 +836,7 @@ bool pqViewManager::eventFilter(QObject* caller, QEvent* e)
     // Update ViewPosition and GUISize properties on all view modules.
     this->updateViewPositions(); 
     }
+
   return QObject::eventFilter(caller, e);
 }
 

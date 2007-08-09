@@ -77,6 +77,10 @@ protected slots:
   /// Called at end of every render. We update the table view.
   void onEndRender();
 
+protected:
+  /// Event filter callback.
+  bool eventFilter(QObject* caller, QEvent* e);
+
 private:
   pqSpreadSheetView(const pqSpreadSheetView&); // Not implemented.
   void operator=(const pqSpreadSheetView&); // Not implemented.

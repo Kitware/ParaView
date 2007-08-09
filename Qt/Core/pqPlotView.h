@@ -41,8 +41,8 @@ class vtkObject;
 class PQCORE_EXPORT pqPlotView : public pqView
 {
   Q_OBJECT
-public:
   typedef pqView Superclass;
+public:
 
   static QString barChartType() { return "BarChartView"; }
   static QString barChartTypeName() { return "Bar Chart"; }
@@ -103,6 +103,10 @@ private slots:
 
   /// Internal slot.
   void delayedRender();
+
+protected:
+  /// Event filter callback.
+  bool eventFilter(QObject* caller, QEvent* e);
 
 private:
   pqPlotView(const pqPlotView&); // Not implemented.
