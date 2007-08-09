@@ -185,7 +185,6 @@ IF(BUILD_TESTING)
     IF(PARAVIEW_DATA_ROOT)
       SET(PYTHON_TESTS ${PYTHON_TESTS}
         #HistogramChart
-        ExodusXML
         LoadStateMultiView
         #SaveAnimationMultiView   -- need to fix timing issue
 # VCRAnimation -- enable after PVD reader supports time.
@@ -278,6 +277,7 @@ IF(BUILD_TESTING)
     ExodusModeShapes
     ExodusPanel
     ExodusWriter
+    ExodusXML
     Flow
     Flow2
     Fractal2D
