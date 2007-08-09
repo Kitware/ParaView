@@ -136,6 +136,10 @@ public:
   // filter).
   virtual vtkSMProxy* GetProcessedConsumer();
 
+  // Description:
+  // Check if this representation has the prop by checking its vtkClientServerID
+  virtual bool HasVisibleProp3D(vtkProp3D* prop);
+
 //BTX
   enum RepresentationType
     {

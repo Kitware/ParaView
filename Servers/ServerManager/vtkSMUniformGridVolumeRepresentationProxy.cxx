@@ -20,6 +20,7 @@
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkProp3D.h"
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
 #include "vtkSmartPointer.h"
@@ -32,7 +33,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUniformGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMUniformGridVolumeRepresentationProxy::vtkSMUniformGridVolumeRepresentationProxy()
 {
@@ -189,6 +190,29 @@ void vtkSMUniformGridVolumeRepresentationProxy::SetColorAttributeType(
     }
 
   this->VolumeFixedPointRayCastMapper->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMUniformGridVolumeRepresentationProxy::HasVisibleProp3D(vtkProp3D* prop)
+{
+  if(!prop)
+  {
+    return false;
+  }
+
+  if(this->Superclass::HasVisibleProp3D(prop))
+  {
+    return true;
+  }
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
+  if (this->GetVisibility() && 
+    pm->GetIDFromObject(prop) == this->VolumeActor->GetID())
+  {
+    return true;
+  }
+
+  return false;
 }
 
 //----------------------------------------------------------------------------

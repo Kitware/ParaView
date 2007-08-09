@@ -188,6 +188,15 @@ public:
     bool multiple_selections=true);
 
   // Description:
+  // Creates a frustum selection. Returns if selection was successful.
+  bool SelectFrustum(unsigned int x0, unsigned int y0,
+    unsigned int x1, unsigned int y1,
+    vtkCollection* selectedRepresentations,
+    vtkCollection* selectionSources,
+    vtkCollection* frustumSelection=0,
+    bool multiple_selections=true);
+
+  // Description:
   // Methods called by Representation proxies to add/remove the
   // actor proxies to appropriate renderer.
   // Avoid calling these methods directly outside representation proxies.

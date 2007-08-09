@@ -16,6 +16,8 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
+#include "vtkProp3D.h"
 #include "vtkProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
@@ -35,7 +37,7 @@ inline void vtkSMPVRepresentationProxySetInt(
 }
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -354,6 +356,29 @@ vtkSMProxy* vtkSMPVRepresentationProxy::GetProcessedConsumer()
     }
 
   return this->Superclass::GetProcessedConsumer();
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPVRepresentationProxy::HasVisibleProp3D(vtkProp3D* prop)
+{
+  if(!prop)
+  {
+    return false;
+  }
+
+  if(this->Superclass::HasVisibleProp3D(prop))
+  {
+    return true;
+  }
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
+  if (this->GetVisibility() && this->ActiveRepresentation &&
+    this->ActiveRepresentation->HasVisibleProp3D(prop))
+  {
+    return true;
+  }
+
+  return false;
 }
 
 //----------------------------------------------------------------------------

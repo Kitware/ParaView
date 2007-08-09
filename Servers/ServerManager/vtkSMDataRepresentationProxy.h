@@ -64,6 +64,7 @@ class vtkSMPropertyLink;
 class vtkSMRepresentationStrategy;
 class vtkSMRepresentationStrategyVector;
 class vtkSMSourceProxy;
+class vtkProp3D;
 
 class VTK_EXPORT vtkSMDataRepresentationProxy : 
   public vtkSMRepresentationProxy
@@ -198,6 +199,10 @@ public:
   // filter).
   virtual vtkSMProxy* GetProcessedConsumer()
     { return 0; }
+
+  // Description:
+  // Check if this representation has the prop by checking its vtkClientServerID
+  virtual bool HasVisibleProp3D(vtkProp3D*) {return false;}
 
 protected:
   vtkSMDataRepresentationProxy();

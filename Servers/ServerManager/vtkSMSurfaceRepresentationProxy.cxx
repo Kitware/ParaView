@@ -20,6 +20,7 @@
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkProp3D.h"
 #include "vtkProperty.h"
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
@@ -36,7 +37,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.18");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -284,6 +285,29 @@ vtkSMProxy* vtkSMSurfaceRepresentationProxy::ConvertSelection(
       this->ConnectionID, volSelection);
   
   return selectionSource;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSurfaceRepresentationProxy::HasVisibleProp3D(vtkProp3D* prop)
+{
+  if(!prop)
+    {
+    return false;
+    }
+
+  if(this->Superclass::HasVisibleProp3D(prop))
+    {
+    return true;
+    }
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
+  if (this->GetVisibility() && 
+    pm->GetIDFromObject(prop) == this->Prop3D->GetID())
+    {
+    return true;
+    }
+
+  return false;
 }
 
 //----------------------------------------------------------------------------
