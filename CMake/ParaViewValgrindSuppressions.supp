@@ -5699,6 +5699,27 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XFreeGC
+   fun:_ZN15QX11PaintEngine3endEv
+   fun:_ZN8QPainter3endEv
+   fun:_ZN8QPainterD2Ev
+   fun:_ZN11QToolButton10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN15QAbstractButton5eventEP6QEvent
+   fun:_ZN11QToolButton5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+}
+{
+   <insert a suppression name here>
    Memcheck:Cond
    fun:_ZN15QPainterPrivate12updateMatrixEv
    fun:_ZN8QPainter5beginEP12QPaintDevice
@@ -7831,23 +7852,6 @@
    fun:_ZN22vtkXOpenGLRenderWindow21CreateOffScreenWindowEii
    fun:_ZN22vtkXOpenGLRenderWindow21ResizeOffScreenWindowEii
    fun:_ZN22vtkXOpenGLRenderWindow7SetSizeEii
-   fun:_ZN24vtkParallelRenderManager19SetRenderWindowSizeEv
-   fun:_ZN26vtkPVDesktopDeliveryServer19SetRenderWindowSizeEv
-   fun:_ZN24vtkParallelRenderManager20SatelliteStartRenderEv
-   fun:_Z20SatelliteStartRenderP9vtkObjectmPvS1_
-   fun:_ZN18vtkCallbackCommand7ExecuteEP9vtkObjectmPv
-   fun:_ZN16vtkSubjectHelper11InvokeEventEmPvP9vtkObject
-   fun:_ZN9vtkObject11InvokeEventEmPv
-   fun:_ZN15vtkRenderWindow6RenderEv
-   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_ZN24vtkParallelRenderManager9RenderRMIEv
-   fun:_Z9RenderRMIPvS_ii
-   fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
-   fun:_ZN25vtkMultiProcessController11ProcessRMIsEii
-   fun:_ZN19vtkRemoteConnection20ProcessCommunicationEv
-   fun:_ZN33vtkProcessModuleConnectionManager18MonitorConnectionsEm
-   fun:_ZN16vtkProcessModule11StartServerEm
-   fun:_ZN16vtkProcessModule5StartEiPPc
 }
 {
    <insert a suppression name here>
@@ -10066,6 +10070,35 @@
    fun:__write_nocancel
    fun:_X11TransWrite
    obj:/usr/lib/libX11.so.6.2.0
+   fun:XRenderChangePicture
+   fun:_ZN15QX11PaintEngine11updateBrushERK6QBrushRK7QPointF
+   fun:_ZN15QX11PaintEngine11updateStateERK17QPaintEngineState
+   fun:_ZN15QPainterPrivate11updateStateEP13QPainterState
+   fun:_ZN8QPainter9drawLinesEPK5QLinei
+   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZN12pqTreeWidgetC1EP7QWidget
+   fun:_ZN12Ui_XDMFPanel7setupUiEP7QWidget
+   fun:_ZN11pqXDMFPanelC1EP7pqProxyP7QWidget
+   fun:_ZN22pqStandardCustomPanels11createPanelEP7pqProxyP7QWidget
+   fun:_ZN23pqObjectInspectorWidget8setProxyEP7pqProxy
+   fun:_ZN16pqProxyTabWidget8setProxyEP16pqPipelineSource
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
+   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
    fun:XChangeWindowAttributes
    fun:_ZN14QWidgetPrivate10create_sysEmbb
    fun:_ZN7QWidget6createEmbb
@@ -10617,6 +10650,35 @@
    fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
    fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
    fun:_Z19qt_syncBackingStoreP7QWidget
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XCreateGC
+   fun:_ZN15QX11PaintEngine5beginEP12QPaintDevice
+   fun:_ZN8QPainter5beginEP12QPaintDevice
+   fun:_ZN8QPainterC1EP12QPaintDevice
+   fun:_ZN7QWidget10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN11QMainWindow5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
+   fun:_ZN7QWidget7repaintERK7QRegion
+   fun:_ZN7QWidget7repaintERK5QRect
+   fun:_ZN7QWidget7repaintEv
+   fun:_ZN12QProgressBar8setValueEi
+   fun:_ZN19pqProgressBarHelper11setProgressEi
+   fun:_ZN13pqProgressBar11setProgressERK7QStringi
+   fun:_ZN16pqProgressWidget11setProgressERK7QStringi
+   fun:_ZN16pqProgressWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
 }
 {
    <insert a suppression name here>
@@ -12974,4 +13036,1069 @@
    fun:_Znwj
    fun:_ZN4QDirC1ERK7QString
    fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XCopyArea
+   fun:_ZN17QX11WindowSurface5flushEP7QWidgetRK7QRegionRK6QPoint
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
+   fun:_Z19qt_syncBackingStoreP7QWidget
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN15QAbstractButton5eventEP6QEvent
+   fun:_ZN11QToolButton5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_ZN16QCoreApplication16sendPostedEventsEP7QObjecti
+   fun:_Z23postEventSourceDispatchP8_GSourcePFiPvES1_
+   fun:g_main_context_dispatch
+   obj:/usr/lib/libglib-2.0.so.0.1000.3
+   fun:g_main_context_iteration
+   fun:_ZN20QEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   fun:_ZN23QGuiEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN13XdmfLightData19SetWorkingDirectoryEPKc
+   fun:_ZN13XdmfLightDataC2Ev
+   fun:_ZN7XdmfDOMC1Ev
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection18SendStreamToClientER21vtkClientServerStream
+   fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN16vtkSMSourceProxy25UpdatePipelineInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_ZN8XdmfGridC1Ev
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:realloc
+   fun:_ZN8XdmfGrid17UpdateInformationEv
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN13XdmfLightData19SetWorkingDirectoryEPKc
+   fun:_ZN13XdmfLightDataC2Ev
+   fun:_ZN11XdmfElementC2Ev
+   fun:_ZN13XdmfAttributeC1Ev
+   fun:_ZN8XdmfGrid17UpdateInformationEv
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN18XdmfArrayListClass8InstanceEv
+   fun:_ZN9XdmfArray14AddArrayToListEv
+   fun:_ZN9XdmfArrayC1Ev
+   fun:_ZN12XdmfDataItemC1Ev
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection18SendStreamToClientER21vtkClientServerStream
+   fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN9__gnu_cxx13new_allocatorISt13_Rb_tree_nodeISt4pairIKSsP17vtkXdmfReaderGridEEE8allocateEjPKv
+   fun:_ZNSt8_Rb_treeISsSt4pairIKSsP17vtkXdmfReaderGridESt10_Select1stIS4_ESt4lessISsESaIS4_EE11_M_get_nodeEv
+   fun:_ZNSt8_Rb_treeISsSt4pairIKSsP17vtkXdmfReaderGridESt10_Select1stIS4_ESt4lessISsESaIS4_EE14_M_create_nodeERKS4_
+   fun:_ZNSt8_Rb_treeISsSt4pairIKSsP17vtkXdmfReaderGridESt10_Select1stIS4_ESt4lessISsESaIS4_EE9_M_insertEPSt18_Rb_tree_node_baseSC_RKS4_
+   fun:_ZNSt8_Rb_treeISsSt4pairIKSsP17vtkXdmfReaderGridESt10_Select1stIS4_ESt4lessISsESaIS4_EE13insert_uniqueERKS4_
+   fun:_ZNSt8_Rb_treeISsSt4pairIKSsP17vtkXdmfReaderGridESt10_Select1stIS4_ESt4lessISsESaIS4_EE13insert_uniqueESt17_Rb_tree_iteratorIS4_ERKS4_
+   fun:_ZNSt3mapISsP17vtkXdmfReaderGridSt4lessISsESaISt4pairIKSsS1_EEE6insertESt17_Rb_tree_iteratorIS6_ERKS6_
+   fun:_ZNSt3mapISsP17vtkXdmfReaderGridSt4lessISsESaISt4pairIKSsS1_EEEixERS5_
+   fun:_ZN27vtkXdmfReaderGridCollection11GetXdmfGridEPKci
+   fun:_ZN21vtkXdmfReaderInternal11GetXdmfGridEPKcS1_S1_
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN11XdmfElement14SetElementNameEPKc
+   fun:_ZN13XdmfAttributeC1Ev
+   fun:_ZN8XdmfGrid17UpdateInformationEv
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection18SendStreamToClientER21vtkClientServerStream
+   fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN11XdmfElement18SetReferenceObjectEP8_xmlNodePv
+   fun:_ZN11XdmfElement10SetElementEP8_xmlNode
+   fun:_ZN8XdmfGrid17UpdateInformationEv
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection18SendStreamToClientER21vtkClientServerStream
+   fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN13XdmfLightData11SetFileNameEPKc
+   fun:_ZN13XdmfLightDataC2Ev
+   fun:_ZN11XdmfElementC2Ev
+   fun:_ZN13XdmfAttributeC1Ev
+   fun:_ZN8XdmfGrid17UpdateInformationEv
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection18SendStreamToClientER21vtkClientServerStream
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN12XdmfDataItem19SetHeavyDataSetNameEPKc
+   fun:_ZN12XdmfDataItem6UpdateEv
+   fun:_ZN21vtkXdmfReaderInternal21RequestSingleGridDataEPKcP17vtkXdmfReaderGridP14vtkInformationP13vtkDataObjecti
+   fun:_ZN21vtkXdmfReaderInternal21RequestActualGridDataEPKcP23vtkXdmfReaderActualGridiiP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader11RequestDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN13vtkDataReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN32vtkStreamingDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline10UpdateDataEi
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEi
+   fun:_ZN12vtkExecutive6UpdateEv
+   fun:_ZN23vtkDemandDrivenPipeline6UpdateEv
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEv
+   fun:_ZN12vtkAlgorithm6UpdateEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:realloc
+   fun:_ZN9XdmfArray8AllocateEv
+   fun:_ZN9XdmfArray9CopyShapeEP12XdmfDataDesc
+   fun:_ZN12XdmfDataItem6UpdateEv
+   fun:_ZN12XdmfGeometry6UpdateEv
+   fun:_ZN8XdmfGrid6UpdateEv
+   fun:_ZN21vtkXdmfReaderInternal21RequestSingleGridDataEPKcP17vtkXdmfReaderGridP14vtkInformationP13vtkDataObjecti
+   fun:_ZN21vtkXdmfReaderInternal21RequestActualGridDataEPKcP23vtkXdmfReaderActualGridiiP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader11RequestDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN13vtkDataReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN32vtkStreamingDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline10UpdateDataEi
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEi
+   fun:_ZN12vtkExecutive6UpdateEv
+   fun:_ZN23vtkDemandDrivenPipeline6UpdateEv
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEv
+   fun:_ZN12vtkAlgorithm6UpdateEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:vtk_libxml2_xmlStrndup
+   fun:vtk_libxml2_xmlStrdup
+   fun:vtk_libxml2_xmlNewCharEncodingHandler
+   fun:vtk_libxml2_xmlInitCharEncodingHandlers
+   fun:vtk_libxml2_xmlGetCharEncodingHandler
+   fun:vtk_libxml2_xmlAllocParserInputBuffer
+   fun:vtk_libxml2___xmlParserInputBufferCreateFilename
+   fun:vtk_libxml2_xmlParserInputBufferCreateFilename
+   fun:vtk_libxml2_xmlNewInputFromFile
+   fun:xmlDefaultExternalEntityLoader
+   fun:vtk_libxml2_xmlNoNetExternalEntityLoader
+   fun:xmlDefaultExternalEntityLoader
+   fun:vtk_libxml2_xmlLoadExternalEntity
+   fun:vtk_libxml2_xmlCreateURLParserCtxt
+   fun:vtk_libxml2_xmlReadFile
+   fun:_ZN7XdmfDOM7__ParseEPKcPP7_xmlDoc
+   fun:_ZN7XdmfDOM5ParseEPKc
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:vtk_libxml2_xmlStrndup
+   fun:vtk_libxml2_xmlStrdup
+   fun:xmlGetPropNodeValueInternal
+   fun:vtk_libxml2_xmlGetProp
+   fun:_ZN7XdmfDOM12GetAttributeEP8_xmlNodePKc
+   fun:_ZN7XdmfDOM3GetEP8_xmlNodePKc
+   fun:_ZN11XdmfElement3GetEPKc
+   fun:_ZN12XdmfDataItem24UpdateInformationUniformEv
+   fun:_ZN12XdmfDataItem17UpdateInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN27vtkXdmfReaderGridCollection11GetXdmfGridEPKci
+   fun:_ZN21vtkXdmfReaderInternal11GetXdmfGridEPKcS1_S1_
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZNSs4_Rep9_S_createEjjRKSaIcE
+   obj:/usr/lib/libstdc++.so.6.0.8
+   fun:_ZNSsC1EPKcRKSaIcE
+   fun:_ZN27vtkXdmfReaderGridCollection11GetXdmfGridEPKci
+   fun:_ZN21vtkXdmfReaderInternal11GetXdmfGridEPKcS1_S1_
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN21vtkXdmfReaderInternal13GetCollectionEPKc
+   fun:_ZN21vtkXdmfReaderInternal11GetXdmfGridEPKcS1_S1_
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:vtk_libxml2_xmlNewMutex
+   fun:vtk_libxml2_xmlInitGlobals
+   fun:vtk_libxml2_xmlInitParser
+   fun:vtk_libxml2_xmlParseDocument
+   fun:xmlDoRead
+   fun:vtk_libxml2_xmlReadFile
+   fun:_ZN7XdmfDOM7__ParseEPKcPP7_xmlDoc
+   fun:_ZN7XdmfDOM5ParseEPKc
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:vtk_libxml2_xmlNewRMutex
+   fun:xmlInitializeDict
+   fun:vtk_libxml2_xmlDictCreate
+   fun:vtk_libxml2_xmlInitParserCtxt
+   fun:vtk_libxml2_xmlNewParserCtxt
+   fun:vtk_libxml2_xmlCreateURLParserCtxt
+   fun:vtk_libxml2_xmlReadFile
+   fun:_ZN7XdmfDOM7__ParseEPKcPP7_xmlDoc
+   fun:_ZN7XdmfDOM5ParseEPKc
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN13XdmfLightData7SetNameEPKc
+   fun:_ZN*Xdmf*17UpdateInformationEv
+   fun:_ZN8XdmfGrid17UpdateInformationEv
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:vtk_libxml2_xmlInitCharEncodingHandlers
+   fun:vtk_libxml2_xmlGetCharEncodingHandler
+   fun:vtk_libxml2_xmlAllocParserInputBuffer
+   fun:vtk_libxml2___xmlParserInputBufferCreateFilename
+   fun:vtk_libxml2_xmlParserInputBufferCreateFilename
+   fun:vtk_libxml2_xmlNewInputFromFile
+   fun:xmlDefaultExternalEntityLoader
+   fun:vtk_libxml2_xmlNoNetExternalEntityLoader
+   fun:xmlDefaultExternalEntityLoader
+   fun:vtk_libxml2_xmlLoadExternalEntity
+   fun:vtk_libxml2_xmlCreateURLParserCtxt
+   fun:vtk_libxml2_xmlReadFile
+   fun:_ZN7XdmfDOM7__ParseEPKcPP7_xmlDoc
+   fun:_ZN7XdmfDOM5ParseEPKc
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:vtk_libxml2_xmlNewCharEncodingHandler
+   fun:xmlRegisterCharEncodingHandlersISO8859x
+   fun:vtk_libxml2_xmlInitCharEncodingHandlers
+   fun:vtk_libxml2_xmlGetCharEncodingHandler
+   fun:vtk_libxml2_xmlAllocParserInputBuffer
+   fun:vtk_libxml2___xmlParserInputBufferCreateFilename
+   fun:vtk_libxml2_xmlParserInputBufferCreateFilename
+   fun:vtk_libxml2_xmlNewInputFromFile
+   fun:xmlDefaultExternalEntityLoader
+   fun:vtk_libxml2_xmlNoNetExternalEntityLoader
+   fun:xmlDefaultExternalEntityLoader
+   fun:vtk_libxml2_xmlLoadExternalEntity
+   fun:vtk_libxml2_xmlCreateURLParserCtxt
+   fun:vtk_libxml2_xmlReadFile
+   fun:_ZN7XdmfDOM7__ParseEPKcPP7_xmlDoc
+   fun:_ZN7XdmfDOM5ParseEPKc
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN12XdmfDataItemC1Ev
+   fun:_ZN12XdmfGeometry6UpdateEv
+   fun:_ZN8XdmfGrid6UpdateEv
+   fun:_ZN21vtkXdmfReaderInternal21RequestSingleGridDataEPKcP17vtkXdmfReaderGridP14vtkInformationP13vtkDataObjecti
+   fun:_ZN21vtkXdmfReaderInternal21RequestActualGridDataEPKcP23vtkXdmfReaderActualGridiiP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader11RequestDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN13vtkDataReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN32vtkStreamingDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline10UpdateDataEi
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEi
+   fun:_ZN12vtkExecutive6UpdateEv
+   fun:_ZN23vtkDemandDrivenPipeline6UpdateEv
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEv
+   fun:_ZN12vtkAlgorithm6UpdateEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN18XdmfArrayListClass8AddArrayEv
+   fun:_ZN9XdmfArray14AddArrayToListEv
+   fun:_ZN9XdmfArrayC1Ev
+   fun:_ZN12XdmfDataItemC1Ev
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection18SendStreamToClientER21vtkClientServerStream
+   fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN12XdmfTopologyC1Ev
+   fun:_ZN8XdmfGridC1Ev
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN13XdmfAttributeC1Ev
+   fun:_ZN8XdmfGrid17UpdateInformationEv
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN8XdmfGridC1Ev
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN11XdmfElement18SetReferenceObjectEP8_xmlNodePv
+   fun:_ZN11XdmfElement10SetElementEP8_xmlNode
+   fun:_ZN12XdmfGeometry6UpdateEv
+   fun:_ZN8XdmfGrid6UpdateEv
+   fun:_ZN21vtkXdmfReaderInternal21RequestSingleGridDataEPKcP17vtkXdmfReaderGridP14vtkInformationP13vtkDataObjecti
+   fun:_ZN21vtkXdmfReaderInternal21RequestActualGridDataEPKcP23vtkXdmfReaderActualGridiiP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader11RequestDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN13vtkDataReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN32vtkStreamingDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline10UpdateDataEi
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEi
+   fun:_ZN12vtkExecutive6UpdateEv
+   fun:_ZN23vtkDemandDrivenPipeline6UpdateEv
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEv
+   fun:_ZN12vtkAlgorithm6UpdateEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN12XdmfDataItem19SetHeavyDataSetNameEPKc
+   fun:_ZN12XdmfDataItem6UpdateEv
+   fun:_ZN12Xdmf*6UpdateEv
+   fun:_ZN8XdmfGrid6UpdateEv
+   fun:_ZN21vtkXdmfReaderInternal21RequestSingleGridDataEPKcP17vtkXdmfReaderGridP14vtkInformationP13vtkDataObjecti
+   fun:_ZN21vtkXdmfReaderInternal21RequestActualGridDataEPKcP23vtkXdmfReaderActualGridiiP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader11RequestDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN13vtkDataReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN32vtkStreamingDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline10UpdateDataEi
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEi
+   fun:_ZN12vtkExecutive6UpdateEv
+   fun:_ZN23vtkDemandDrivenPipeline6UpdateEv
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEv
+   fun:_ZN12vtkAlgorithm6UpdateEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:vtk_libxml2_xmlStrndup
+   fun:vtk_libxml2_xmlStrdup
+   fun:xmlGetPropNodeValueInternal
+   fun:vtk_libxml2_xmlGetProp
+   fun:_ZN7XdmfDOM12GetAttributeEP8_xmlNodePKc
+   fun:_ZN7XdmfDOM3GetEP8_xmlNodePKc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection18SendStreamToClientER21vtkClientServerStream
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:vtk_libxml2_xmlNewCharEncodingHandler
+   fun:vtk_libxml2_xmlInitCharEncodingHandlers
+   fun:vtk_libxml2_xmlGetCharEncodingHandler
+   fun:vtk_libxml2_xmlAllocParserInputBuffer
+   fun:vtk_libxml2___xmlParserInputBufferCreateFilename
+   fun:vtk_libxml2_xmlParserInputBufferCreateFilename
+   fun:vtk_libxml2_xmlNewInputFromFile
+   fun:xmlDefaultExternalEntityLoader
+   fun:vtk_libxml2_xmlNoNetExternalEntityLoader
+   fun:xmlDefaultExternalEntityLoader
+   fun:vtk_libxml2_xmlLoadExternalEntity
+   fun:vtk_libxml2_xmlCreateURLParserCtxt
+   fun:vtk_libxml2_xmlReadFile
+   fun:_ZN7XdmfDOM7__ParseEPKcPP7_xmlDoc
+   fun:_ZN7XdmfDOM5ParseEPKc
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN13XdmfLightData19SetWorkingDirectoryEPKc
+   fun:_ZN13XdmfLightDataC2Ev
+   fun:_ZN11XdmfElementC2Ev
+   fun:_ZN8XdmfGridC1Ev
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection18SendStreamToClientER21vtkClientServerStream
+   fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN11XdmfElement18SetReferenceObjectEP8_xmlNodePv
+   fun:_ZN11XdmfElement10SetElementEP8_xmlNode
+   fun:_ZN21vtkXdmfReaderInternal21RequestSingleGridDataEPKcP17vtkXdmfReaderGridP14vtkInformationP13vtkDataObjecti
+   fun:_ZN21vtkXdmfReaderInternal21RequestActualGridDataEPKcP23vtkXdmfReaderActualGridiiP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader11RequestDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN13vtkDataReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN32vtkStreamingDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline10UpdateDataEi
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEi
+   fun:_ZN12vtkExecutive6UpdateEv
+   fun:_ZN23vtkDemandDrivenPipeline6UpdateEv
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEv
+   fun:_ZN12vtkAlgorithm6UpdateEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:vtk_libxml2_xmlStrndup
+   fun:vtk_libxml2_xmlStrdup
+   fun:vtk_libxml2_xmlNewCharEncodingHandler
+   fun:xmlRegisterCharEncodingHandlersISO8859x
+   fun:vtk_libxml2_xmlInitCharEncodingHandlers
+   fun:vtk_libxml2_xmlGetCharEncodingHandler
+   fun:vtk_libxml2_xmlAllocParserInputBuffer
+   fun:vtk_libxml2___xmlParserInputBufferCreateFilename
+   fun:vtk_libxml2_xmlParserInputBufferCreateFilename
+   fun:vtk_libxml2_xmlNewInputFromFile
+   fun:xmlDefaultExternalEntityLoader
+   fun:vtk_libxml2_xmlNoNetExternalEntityLoader
+   fun:xmlDefaultExternalEntityLoader
+   fun:vtk_libxml2_xmlLoadExternalEntity
+   fun:vtk_libxml2_xmlCreateURLParserCtxt
+   fun:vtk_libxml2_xmlReadFile
+   fun:_ZN7XdmfDOM7__ParseEPKcPP7_xmlDoc
+   fun:_ZN7XdmfDOM5ParseEPKc
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN11XdmfElement14SetElementNameEPKc
+   fun:_ZN8XdmfGridC1Ev
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection18SendStreamToClientER21vtkClientServerStream
+   fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN13XdmfLightData11SetFileNameEPKc
+   fun:_ZN13XdmfLightDataC2Ev
+   fun:_ZN11XdmfElementC2Ev
+   fun:_ZN8XdmfGridC1Ev
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN13XdmfLightData19SetWorkingDirectoryEPKc
+   fun:_ZN13XdmfLightDataC2Ev
+   fun:_ZN11XdmfElementC2Ev
+   fun:_ZN12Xdmf*C1Ev
+   fun:_ZN8XdmfGridC1Ev
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection18SendStreamToClientER21vtkClientServerStream
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN13XdmfLightData11SetFileNameEPKc
+   fun:_ZN13XdmfLightDataC2Ev
+   fun:_ZN11XdmfElementC2Ev
+   fun:_ZN12XdmfGeometryC1Ev
+   fun:_ZN8XdmfGridC1Ev
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection18SendStreamToClientER21vtkClientServerStream
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN12XdmfDataItem19SetHeavyDataSetNameEPKc
+   fun:_ZN12XdmfDataItem6UpdateEv
+   fun:_ZN12XdmfGeometry6UpdateEv
+   fun:_ZN8XdmfGrid6UpdateEv
+   fun:_ZN21vtkXdmfReaderInternal21RequestSingleGridDataEPKcP17vtkXdmfReaderGridP14vtkInformationP13vtkDataObjecti
+   fun:_ZN21vtkXdmfReaderInternal21RequestActualGridDataEPKcP23vtkXdmfReaderActualGridiiP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader11RequestDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN13vtkDataReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN32vtkStreamingDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline10UpdateDataEi
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEi
+   fun:_ZN12vtkExecutive6UpdateEv
+   fun:_ZN23vtkDemandDrivenPipeline6UpdateEv
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEv
+   fun:_ZN12vtkAlgorithm6UpdateEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN8XdmfGrid17UpdateInformationEv
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN11XdmfElement14SetElementNameEPKc
+   fun:_ZN12Xdmf*C1Ev
+   fun:_ZN8XdmfGridC1Ev
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:vtk_libxml2_xmlNewMutex
+   fun:vtk_libxml2_xmlInitMemory
+   fun:vtk_libxml2_xmlInitParser
+   fun:vtk_libxml2_xmlParseDocument
+   fun:xmlDoRead
+   fun:vtk_libxml2_xmlReadFile
+   fun:_ZN7XdmfDOM7__ParseEPKcPP7_xmlDoc
+   fun:_ZN7XdmfDOM5ParseEPKc
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN13XdmfLightData7SetNameEPKc
+   fun:_ZN11XdmfElement17UpdateInformationEv
+   fun:_ZN13XdmfAttribute17UpdateInformationEv
+   fun:_ZN8XdmfGrid17UpdateInformationEv
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
+   fun:_ZN17vtkSelfConnection18SendStreamToClientER21vtkClientServerStream
+   fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
 }
