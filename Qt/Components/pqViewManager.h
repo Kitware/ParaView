@@ -156,10 +156,6 @@ private slots:
   /// Called when the camera button is clicked
   virtual void onCameraTriggered();
 
-  /// Called when the application focus changes. If any of the widgets within
-  /// any of the multi-view frames becomes active, we make that multiview frame
-  /// active.
-  void onFocusChanged(QWidget* old, QWidget* now);
 public slots:
   /// Set the active server. This must be called whenever
   /// active server changes. The active server is used to 
