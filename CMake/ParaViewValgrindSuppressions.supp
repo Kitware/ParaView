@@ -5691,6 +5691,33 @@
    fun:__write_nocancel
    fun:_X11TransWrite
    obj:/usr/lib/libX11.so.6.2.0
+   fun:_XFlushGCCache
+   fun:XCopyArea
+   fun:_ZN15QX11PaintEngine10drawPixmapERK6QRectFRK7QPixmapS2_
+   fun:_ZN8QPainter10drawPixmapERK6QRectFRK7QPixmapS2_
+   fun:_Z26qt_plastique_draw_gradientP8QPainterRK5QRectRK6QColorS6_
+   fun:_Z28qt_plastique_drawShadedPanelP8QPainterPK12QStyleOptionbPK7QWidget
+   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK12QCommonStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
+   fun:_ZNK13QWindowsStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
+   fun:_ZNK15QPlastiqueStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
+   fun:_ZN11QToolButton10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN15QAbstractButton5eventEP6QEvent
+   fun:_ZN11QToolButton5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
    fun:XFreeGC
    fun:_ZN7QPixmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -13068,6 +13095,35 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XCopyArea
+   fun:_ZN17QX11WindowSurface5flushEP7QWidgetRK7QRegionRK6QPoint
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
+   fun:_Z19qt_syncBackingStoreP7QWidget
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN11QMainWindow5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_ZN16QCoreApplication16sendPostedEventsEP7QObjecti
+   fun:_Z23postEventSourceDispatchP8_GSourcePFiPvES1_
+   fun:g_main_context_dispatch
+   obj:/usr/lib/libglib-2.0.so.0.1000.3
+   fun:g_main_context_iteration
+   fun:_ZN20QEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   fun:_ZN23QGuiEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   fun:_ZN10QEventLoop13processEventsE6QFlagsINS_17ProcessEventsFlagEE
+   fun:_ZN10QEventLoop4execE6QFlagsINS_17ProcessEventsFlagEE
+   fun:_ZN17pqEventDispatcher20processEventsAndWaitEi
+}
+{
+   <insert a suppression name here>
    Memcheck:Leak
    fun:_Znaj
    fun:_ZN13XdmfLightData19SetWorkingDirectoryEPKc
@@ -13202,6 +13258,34 @@
 {
    <insert a suppression name here>
    Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN9__gnu_cxx13new_allocatorISt13_Rb_tree_nodeISt4pairIKSsP17vtkXdmfReaderGridEEE8allocateEjPKv
+   fun:_ZNSt8_Rb_treeISsSt4pairIKSsP17vtkXdmfReaderGridESt10_Select1stIS4_ESt4lessISsESaIS4_EE11_M_get_nodeEv
+   fun:_ZNSt8_Rb_treeISsSt4pairIKSsP17vtkXdmfReaderGridESt10_Select1stIS4_ESt4lessISsESaIS4_EE14_M_create_nodeERKS4_
+   fun:_ZNSt8_Rb_treeISsSt4pairIKSsP17vtkXdmfReaderGridESt10_Select1stIS4_ESt4lessISsESaIS4_EE9_M_insertEPSt18_Rb_tree_node_baseSC_RKS4_
+   fun:_ZNSt8_Rb_treeISsSt4pairIKSsP17vtkXdmfReaderGridESt10_Select1stIS4_ESt4lessISsESaIS4_EE13insert_uniqueESt17_Rb_tree_iteratorIS4_ERKS4_
+   fun:_ZNSt3mapISsP17vtkXdmfReaderGridSt4lessISsESaISt4pairIKSsS1_EEE6insertESt17_Rb_tree_iteratorIS6_ERKS6_
+   fun:_ZNSt3mapISsP17vtkXdmfReaderGridSt4lessISsESaISt4pairIKSsS1_EEEixERS5_
+   fun:_ZN27vtkXdmfReaderGridCollection11GetXdmfGridEPKci
+   fun:_ZN21vtkXdmfReaderInternal11GetXdmfGridEPKcS1_S1_
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+   fun:_ZN13vtkXdmfReader14RemoveAllGridsEv
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
+   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
    fun:_Znaj
    fun:_ZN11XdmfElement14SetElementNameEPKc
    fun:_ZN13XdmfAttributeC1Ev
@@ -13216,16 +13300,6 @@
    fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
    fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
    fun:_ZN12vtkAlgorithm17UpdateInformationEv
-   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
-   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
-   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
-   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
-   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
-   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
-   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
-   fun:_ZN17vtkSelfConnection18SendStreamToClientER21vtkClientServerStream
-   fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
-   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
 }
 {
    <insert a suppression name here>
@@ -13274,14 +13348,6 @@
    fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
    fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
    fun:_ZN12vtkAlgorithm17UpdateInformationEv
-   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
-   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
-   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
-   fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
-   fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
-   fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
-   fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
-   fun:_ZN17vtkSelfConnection18SendStreamToClientER21vtkClientServerStream
 }
 {
    <insert a suppression name here>
@@ -13393,8 +13459,6 @@
    fun:_ZN7XdmfDOM12GetAttributeEP8_xmlNodePKc
    fun:_ZN7XdmfDOM3GetEP8_xmlNodePKc
    fun:_ZN11XdmfElement3GetEPKc
-   fun:_ZN12XdmfDataItem24UpdateInformationUniformEv
-   fun:_ZN12XdmfDataItem17UpdateInformationEv
 }
 {
    <insert a suppression name here>
@@ -13960,10 +14024,10 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:_Znaj
-   fun:_ZN13XdmfLightData11SetFileNameEPKc
+   fun:_ZN13XdmfLightData19SetWorkingDirectoryEPKc
    fun:_ZN13XdmfLightDataC2Ev
    fun:_ZN11XdmfElementC2Ev
-   fun:_ZN12XdmfGeometryC1Ev
+   fun:_ZN12XdmfTopologyC1Ev
    fun:_ZN8XdmfGridC1Ev
    fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
    fun:_ZN13vtkXdmfReader11UpdateGridsEv
@@ -13975,14 +14039,34 @@
    fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
    fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
    fun:_ZN12vtkAlgorithm17UpdateInformationEv
-   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
-   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_ZN13vtkXdmfReader14RemoveAllGridsEv
    fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
    fun:_ZN26vtkClientServerInterpreter20ProcessCommandInvokeERK21vtkClientServerStreami
    fun:_ZN26vtkClientServerInterpreter17ProcessOneMessageERK21vtkClientServerStreami
    fun:_ZN26vtkClientServerInterpreter13ProcessStreamERK21vtkClientServerStream
    fun:_ZN17vtkSelfConnection20ProcessStreamLocallyER21vtkClientServerStream
    fun:_ZN17vtkSelfConnection18SendStreamToClientER21vtkClientServerStream
+   fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN13XdmfLightData11SetFileNameEPKc
+   fun:_ZN13XdmfLightDataC2Ev
+   fun:_ZN11XdmfElementC2Ev
+   fun:_ZN12Xdmf*C1Ev
+   fun:_ZN8XdmfGridC1Ev
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
 }
 {
    <insert a suppression name here>
@@ -14011,6 +14095,34 @@
    fun:_ZN12vtkAlgorithm6UpdateEv
    fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
    fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znaj
+   fun:_ZN12XdmfDataItem19SetHeavyDataSetNameEPKc
+   fun:_ZN13XdmfValuesHDF4ReadEP9XdmfArray
+   fun:_ZN12XdmfDataItem6UpdateEv
+   fun:_ZN21vtkXdmfReaderInternal21RequestSingleGridDataEPKcP17vtkXdmfReaderGridP14vtkInformationP13vtkDataObjecti
+   fun:_ZN21vtkXdmfReaderInternal21RequestActualGridDataEPKcP23vtkXdmfReaderActualGridiiP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader11RequestDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN13vtkDataReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN32vtkStreamingDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline10UpdateDataEi
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEi
+   fun:_ZN12vtkExecutive6UpdateEv
+   fun:_ZN23vtkDemandDrivenPipeline6UpdateEv
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEv
+   fun:_ZN12vtkAlgorithm6UpdateEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkXdmfReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
 }
 {
    <insert a suppression name here>
