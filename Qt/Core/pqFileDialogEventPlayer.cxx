@@ -61,9 +61,12 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
     }
   if(!object)
     return false;
+  
+  /** \todo Handle multiple files */
+  QString file = Arguments;
 
   const QString data_directory = pqCoreTestUtility::DataRoot();
-  if(data_directory.isEmpty())
+  if(file.contains("PARAVIEW_DATA_ROOT") && data_directory.isEmpty())
     {
     qCritical() << "You must set the PARAVIEW_DATA_ROOT environment variable to play-back file selections.";
     Error = true;
@@ -71,7 +74,7 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
     }
 
   const QString test_directory = pqCoreTestUtility::TestDirectory();
-  if (test_directory.isEmpty())
+  if (file.contains("PARAVIEW_TEST_ROOT") && test_directory.isEmpty())
     {
     qCritical() << "You must specify --test-directory in the command line options.";
     Error = true;
@@ -80,8 +83,6 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
 
   if(Command == "filesSelected")
     {
-    /** \todo Handle multiple files */
-    QString file = Arguments;
     file.replace("$PARAVIEW_DATA_ROOT", data_directory);
     file.replace("$PARAVIEW_TEST_ROOT", test_directory);
 
@@ -102,7 +103,6 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
   if (Command == "remove")
     {
     // Delete the file.
-    QString file = Arguments;
     file.replace("$PARAVIEW_DATA_ROOT", data_directory);
     file.replace("$PARAVIEW_TEST_ROOT", test_directory);
     vtksys::SystemTools::RemoveFile(file.toAscii().data()); 
