@@ -14,227 +14,143 @@
 =========================================================================*/
 #include "vtkPVExtractSelection.h"
 
-#include "vtkAlgorithm.h"
-#include "vtkCellData.h"
-#include "vtkDemandDrivenPipeline.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkCompositeDataPipeline.h"
-#include "vtkDataSet.h"
-#include "vtkExecutive.h"
-#include "vtkExtractSelection.h"
-#include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
-#include "vtkProp.h"
 #include "vtkSelection.h"
-#include "vtkSelectionSerializer.h"
-#include "vtkSignedCharArray.h"
-#include "vtkDoubleArray.h"
-#include "vtkUnstructuredGrid.h"
+#include "vtkDataObjectTypes.h"
+#include "vtkDataSet.h"
+#include "vtkIdTypeArray.h"
+#include "vtkCellData.h"
+#include "vtkPointData.h"
 
-#include "vtkSmartPointer.h"
-#include <vtkstd/vector>
-
-vtkCxxRevisionMacro(vtkPVExtractSelection, "1.4");
+vtkCxxRevisionMacro(vtkPVExtractSelection, "1.5");
 vtkStandardNewMacro(vtkPVExtractSelection);
-
-vtkCxxSetObjectMacro(vtkPVExtractSelection, OutputSelection, vtkSelection);
-vtkCxxSetObjectMacro(vtkPVExtractSelection, InputSelection, vtkSelection);
-
-struct vtkPVExtractSelectionInternals
-{
-  vtkstd::vector<vtkSmartPointer<vtkProp> > Props;
-  vtkstd::vector<vtkSmartPointer<vtkAlgorithm> > OriginalSources;
-};
 
 //----------------------------------------------------------------------------
 vtkPVExtractSelection::vtkPVExtractSelection()
 {
-  this->selType = 0;
-  this->AtomExtractor = vtkExtractSelection::New();
-
-  // Make sure that the extractor filter has the right executive and
-  // that it requests the right piece and number of pieces.
-  vtkCompositeDataPipeline* cdp = vtkCompositeDataPipeline::New();
-  //vtkDemandDrivenPipeline* cdp = vtkDemandDrivenPipeline::New();
-
-  this->AtomExtractor->SetExecutive(cdp);
-  vtkInformation* outInfo = 
-    cdp->GetOutputInformation()->GetInformationObject(0);
-  vtkProcessModule* processModule = vtkProcessModule::GetProcessModule();
-  cdp->SetUpdateNumberOfPieces(outInfo, processModule->GetNumberOfPartitions());
-  cdp->SetUpdatePiece(outInfo, processModule->GetPartitionId());
-  cdp->SetUpdateGhostLevel(outInfo, 0);
-  cdp->Delete();
-  this->Internal = new vtkPVExtractSelectionInternals;
-  this->InputSelection = vtkSelection::New();
-  this->OutputSelection = vtkSelection::New();
-
+  this->SetNumberOfOutputPorts(2);
 }
 
 //----------------------------------------------------------------------------
 vtkPVExtractSelection::~vtkPVExtractSelection()
 {
-  this->AtomExtractor->Delete();
-  delete this->Internal;
-  if (this->OutputSelection)
-    {
-    this->OutputSelection->Delete();
-    }
-  if (this->InputSelection)
-    {
-    this->InputSelection->Delete();
-    }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVExtractSelection::Select()
-{ 
-  if (!this->InputSelection)
+int vtkPVExtractSelection::FillOutputPortInformation(
+  int port, vtkInformation* info)
+{
+  if (port==0)
     {
-    vtkErrorMacro("PV Extract Selection must be given parameters to select something.");
-    return;
+    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataSet");
+    }
+  else
+    {
+    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkSelection");
+    }
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVExtractSelection::RequestDataObject(
+  vtkInformation* request,
+  vtkInformationVector** inputVector ,
+  vtkInformationVector* outputVector)
+{
+  if (!this->Superclass::RequestDataObject(request, inputVector, outputVector))
+    {
+    return 0;
     }
 
-  if (!this->OutputSelection)
+  vtkInformation* info = outputVector->GetInformationObject(1);
+  vtkSelection *selOut = vtkSelection::SafeDownCast(
+    info->Get(vtkDataObject::DATA_OBJECT()));
+  if (!selOut || !selOut->IsA("vtkSelection")) 
     {
-    this->OutputSelection = vtkSelection::New();
-    }
-
-  this->OutputSelection->Clear();
-  this->OutputSelection->GetProperties()->Set(
-    vtkSelection::CONTENT_TYPE(), vtkSelection::SELECTIONS);
-
-  vtkProcessModule* processModule = vtkProcessModule::GetProcessModule();
-  
-  //run the cell/point extractor on each dataset
-  unsigned int numDataSets = this->Internal->OriginalSources.size();
-  for (unsigned int i = 0; i < numDataSets; i++)
-    {
-    vtkSelection* selection = NULL;
-    vtkDataSet* ds = vtkDataSet::SafeDownCast(
-      this->Internal->OriginalSources[i]->GetOutputDataObject(0));
-    if (ds)
+    vtkDataObject* newOutput = 
+      vtkDataObjectTypes::NewDataObject("vtkSelection");
+    if (!newOutput)
       {
-      // We make a copy of the dataset so that we are not connected 
-      // to the ParaView pipeline
-      vtkDataSet* newDS = ds->NewInstance();
-      newDS->ShallowCopy(ds);       
-      this->AtomExtractor->SetInput(0,newDS);
-      this->AtomExtractor->SetInput(1,this->InputSelection);
-      newDS->Delete();
-      this->AtomExtractor->Update();
-      
-      vtkDataSet* output = this->AtomExtractor->GetOutput();
-      vtkIdTypeArray *origIds = vtkIdTypeArray::SafeDownCast(output->GetCellData()->GetArray("vtkOriginalCellIds"));
-      if (origIds == NULL || origIds->GetNumberOfTuples() == 0)
-        {
-        this->AtomExtractor->SetInput(0,(vtkSelection*)0);
-        this->AtomExtractor->SetInput(1,(vtkDataSet*)0);
-        continue;
-        }
-      
-      // Create and add a selection node to our output
-      selection = vtkSelection::New();
-      this->OutputSelection->AddChild(selection);
-        
-      // For now, we only support cell ids
-      selection->GetProperties()->Set(
-        vtkSelection::CONTENT_TYPE(), vtkSelection::IDS);
-      selection->GetProperties()->Set(
-        vtkSelection::FIELD_TYPE(), vtkSelection::CELL);
-
-      //copy over the ids we found into the new node
-      selection->SetSelectionList(origIds);
-        
-      // Make sure that the input is released
-      this->AtomExtractor->SetInput(0,(vtkSelection*)0);
-      this->AtomExtractor->SetInput(1,(vtkDataSet*)0);
-
-      vtkClientServerID pid = processModule->GetIDFromObject(
-        this->Internal->OriginalSources[i]);
-      selection->GetProperties()->Set(
-        vtkSelection::SOURCE_ID(), pid.ID);
-      
-      if (this->Internal->Props.size() > i)
-        {
-        vtkClientServerID ppid = processModule->GetIDFromObject(
-          this->Internal->Props[i]);
-        selection->GetProperties()->Set(
-          vtkSelection::PROP_ID(), ppid.ID);
-        }
-      
-      //Record the process id of the node that is running this code too
-      if (processModule->GetPartitionId() >= 0)
-        {
-        selection->GetProperties()->Set(
-          vtkSelection::PROCESS_ID(), processModule->GetPartitionId());
-        }
-      
-      selection->Delete();      
+      vtkErrorMacro("Could not create vtkSelectionOutput");
+      return 0;
       }
+    newOutput->SetPipelineInformation(info);
+    this->GetOutputPortInformation(1)->Set(
+      vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
+    newOutput->Delete();
     }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVExtractSelection::ClearOriginalSources()
+int vtkPVExtractSelection::RequestData(
+  vtkInformation* request,
+  vtkInformationVector** inputVector ,
+  vtkInformationVector* outputVector)
 {
-  this->Internal->OriginalSources.clear();
-}
+  if (!this->Superclass::RequestData(request, inputVector, outputVector))
+    {
+    return 0;
+    }
 
-//----------------------------------------------------------------------------
-void vtkPVExtractSelection::ClearProps()
-{
-  this->Internal->Props.clear();
-}
+  
+  vtkSelection *sel = vtkSelection::SafeDownCast(
+    inputVector[1]->GetInformationObject(0)->Get(
+      vtkDataObject::DATA_OBJECT()));
 
-//----------------------------------------------------------------------------
-void vtkPVExtractSelection::Initialize()
-{
-  this->ClearProps();
-  this->ClearOriginalSources();
-  this->OutputSelection->Clear();
-  this->Modified();
-}
+  vtkDataSet *geomOutput = vtkDataSet::SafeDownCast(
+    outputVector->GetInformationObject(0)->Get(vtkDataObject::DATA_OBJECT()));
 
-//----------------------------------------------------------------------------
-void vtkPVExtractSelection::AddOriginalSource(vtkAlgorithm* source)
-{
-  this->Internal->OriginalSources.push_back(source);
-  this->Modified();
-}
 
-//----------------------------------------------------------------------------
-void vtkPVExtractSelection::AddProp(vtkProp* prop)
-{
-  this->Internal->Props.push_back(prop);
-  this->Modified();
+  //make an ids selection for the second output
+  //we can do this because all of the extractSelectedX filters produce 
+  //arrays called "vtkOriginalXIds" that record what input cells produced 
+  //each output cell, at least as long as PRESERVE_TOPOLOGY is off
+  //when we start allowing PreserveTopology, this will have to instead run 
+  //through the vtkInsidedNess arrays, and for every on entry, record the
+  //entries index
+  vtkSelection *output = vtkSelection::SafeDownCast(
+    outputVector->GetInformationObject(1)->Get(vtkDataObject::DATA_OBJECT()));
+
+  output->Clear();
+  output->SetContentType(vtkSelection::INDICES);
+  int ft = vtkSelection::CELL;
+  if (!sel->GetProperties()->Has(vtkSelection::FIELD_TYPE()))
+    {
+    ft = sel->GetProperties()->Get(vtkSelection::FIELD_TYPE());
+    }
+  output->GetProperties()->Set(vtkSelection::FIELD_TYPE(), ft);
+  int inv = 0;
+  if (!sel->GetProperties()->Has(vtkSelection::INVERSE()))
+    {
+    inv = sel->GetProperties()->Get(vtkSelection::INVERSE());
+    }
+  output->GetProperties()->Set(vtkSelection::INVERSE(), inv);
+  vtkIdTypeArray *oids;
+  if (ft == vtkSelection::CELL)
+    {
+    oids = vtkIdTypeArray::SafeDownCast(
+      geomOutput->GetCellData()->GetArray("vtkOriginalCellIds"));
+    }
+  else
+    {
+    oids = vtkIdTypeArray::SafeDownCast(
+      geomOutput->GetPointData()->GetArray("vtkOriginalPointIds"));
+    }
+  if (oids)
+    {
+    output->SetSelectionList(oids);
+    }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVExtractSelection::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "AtomExtractor: " << this->AtomExtractor << endl;
-  os << indent << "InputSelection: ";
-  if (this->InputSelection)
-    {
-    this->InputSelection->PrintSelf(os, indent.GetNextIndent());
-    }
-  else
-    {
-    os << "(none)" << endl;
-    }
-  os << indent << "OutputSelection: ";
-  if (this->OutputSelection)
-    {
-    this->OutputSelection->PrintSelf(os, indent.GetNextIndent());
-    }
-  else
-    {
-    os << "(none)" << endl;
-    }
 }
 

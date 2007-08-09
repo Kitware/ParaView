@@ -6520,7 +6520,7 @@ This filter extracts a list of datasets from multigroup datasets.
    </SourceProxy>
 
    <SourceProxy name="ExtractSelection" label="Extract Selection" 
-                class="vtkExtractSelection">
+                class="vtkPVExtractSelection">
      <Documentation>
        This filter extracts a given set of cells or points given a selection. 
        The selection can be obtained from a rubber-band selection 
