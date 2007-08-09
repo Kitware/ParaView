@@ -772,12 +772,22 @@ def Fetch(input, arg=None):
     gvd.AddToInput(input) 
   
     if arg == None:
-        print "getting appended"
+        print "getting entire data set"
 
-        cdinfo = input.GetDataInformation().GetCompositeDataInformation()
-        if (cdinfo.GetDataIsComposite() or cdinfo.GetDataIsHierarchical()):
-            print "use composite data append"
-            gvd.SetReductionType(5)        
+        if input.GetDataInformation().GetCompositeDataClassName() == \
+           "vtkMultiBlockDataSet":
+           print "use multiblock merge"
+           gvd.SetReductionType(7)        
+
+        elif input.GetDataInformation().GetCompositeDataInformation().\
+             GetDataIsComposite():
+           print "use generic composite data append"       
+           gvd.SetReductionType(5)        
+
+        elif input.GetDataInformation().GetCompositeDataInformation().\
+             GetDataIsHierarchical():
+           print "use generic hierarchical data append"       
+           gvd.SetReductionType(5)        
 
         elif input.GetDataInformation().GetDataClassName() == "vtkPolyData":
             print "use append poly data filter"
@@ -793,14 +803,14 @@ def Fetch(input, arg=None):
 
         
     elif type(arg) is types.IntType:          
-        print "getting node %d" % arg
+        print "getting node %d's portion of the dataset" % arg
         gvd.SetReductionType(3)   
         gvd.SetPreGatherHelper(None)
         gvd.SetPostGatherHelper(None)
         gvd.SetPassThrough(arg)
 
     else:
-        print "applying operation"
+        print "applying reduction operation and fetching the output"
         gvd.SetReductionType(6) # CUSTOM
         gvd.SetPreGatherHelper(arg)
         gvd.SetPostGatherHelper(arg)

@@ -4464,6 +4464,7 @@
           <Entry value="4" text="RECTILINEAR_GRID_APPEND" />
           <Entry value="5" text="COMPOSITE_DATASET_APPEND" />
           <Entry value="6" text="CUSTOM" />
+          <Entry value="7" text="MULTIBLOCK_MERGE" />
         </EnumerationDomain>
       </IntVectorProperty>
 
