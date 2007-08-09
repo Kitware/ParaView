@@ -26,6 +26,7 @@
 #include "vtkSMDataRepresentationProxy.h"
 
 class vtkSMProxyLink;
+class vtkProp3D;
 
 class VTK_EXPORT vtkSMPropRepresentationProxy : public vtkSMDataRepresentationProxy
 {
@@ -64,6 +65,11 @@ public:
   // Set the selection visibility. This flag is treated as false if this proxy does have a
   // SelectionRepresentation sub proxy or when Visibility is off.
   vtkSetMacro(SelectionVisibility, int);
+
+  // Description:
+  // Check if this representation has the prop by checking its vtkClientServerID
+  virtual bool HasVisibleProp3D(vtkProp3D*) {return false;}
+
 //BTX
 protected:
   vtkSMPropRepresentationProxy();

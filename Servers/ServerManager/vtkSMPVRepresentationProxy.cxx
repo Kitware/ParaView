@@ -37,7 +37,7 @@ inline void vtkSMPVRepresentationProxySetInt(
 }
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.11");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -372,11 +372,15 @@ bool vtkSMPVRepresentationProxy::HasVisibleProp3D(vtkProp3D* prop)
   }
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  if (this->GetVisibility() && this->ActiveRepresentation &&
-    this->ActiveRepresentation->HasVisibleProp3D(prop))
-  {
-    return true;
-  }
+  if (this->GetVisibility() && this->ActiveRepresentation)
+    {
+    vtkSMPropRepresentationProxy* repr = 
+      vtkSMPropRepresentationProxy::SafeDownCast(this->ActiveRepresentation);
+    if (repr && repr->HasVisibleProp3D(prop))
+      {
+      return true;
+      }
+    }
 
   return false;
 }

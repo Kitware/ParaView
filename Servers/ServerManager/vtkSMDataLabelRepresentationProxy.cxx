@@ -573,30 +573,6 @@ bool vtkSMDataLabelRepresentationProxy::GetVisibility()
   return false;
 }
 
-//----------------------------------------------------------------------------
-bool vtkSMDataLabelRepresentationProxy::HasVisibleProp3D(vtkProp3D* prop)
-{
-  if(!prop)
-  {
-    return false;
-  }
-
-  if(this->Superclass::HasVisibleProp3D(prop))
-  {
-    return true;
-  }
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-  if (this->GetVisibility() && 
-    (pm->GetIDFromObject(prop) == this->ActorProxy->GetID() ||
-    pm->GetIDFromObject(prop) == this->CellActorProxy->GetID()))
-  {
-    return true;
-  }
-
-  return false;
-}
-
 //-----------------------------------------------------------------------------
 void vtkSMDataLabelRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {

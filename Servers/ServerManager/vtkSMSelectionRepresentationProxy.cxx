@@ -30,7 +30,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSelectionRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.13");
 //----------------------------------------------------------------------------
 vtkSMSelectionRepresentationProxy::vtkSMSelectionRepresentationProxy()
 {
@@ -308,29 +308,6 @@ void vtkSMSelectionRepresentationProxy::UpdateVisibility()
     this->Prop3D->GetProperty("Visibility"));
   ivp->SetElement(0, visible? 1 : 0);
   this->Prop3D->UpdateProperty("Visibility");
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMSelectionRepresentationProxy::HasVisibleProp3D(vtkProp3D* prop)
-{
-  if(!prop)
-  {
-    return false;
-  }
-
-  if(this->Superclass::HasVisibleProp3D(prop))
-  {
-    return true;
-  }
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-  if (this->GetVisibility() && 
-    pm->GetIDFromObject(prop) == this->Prop3D->GetID())
-  {
-    return true;
-  }
-
-  return false;
 }
 
 //----------------------------------------------------------------------------

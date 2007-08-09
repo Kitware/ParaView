@@ -51,6 +51,7 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMPropRepresentationProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMSelectionHelper.h"
@@ -87,7 +88,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.33");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.34");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1436,8 +1437,8 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
       for (reprIter->InitTraversal(); 
         !reprIter->IsDoneWithTraversal(); reprIter->GoToNextItem())
         {
-        vtkSMDataRepresentationProxy* repr = 
-          vtkSMDataRepresentationProxy::SafeDownCast(reprIter->GetCurrentObject());
+        vtkSMPropRepresentationProxy* repr = 
+          vtkSMPropRepresentationProxy::SafeDownCast(reprIter->GetCurrentObject());
         if (!repr)
           {
           continue;

@@ -72,10 +72,6 @@ public:
   // Returns the proxy for the prop.
   vtkGetObjectMacro(Prop3D, vtkSMProxy);
 
-  // Description:
-  // Check if this representation has the prop by checking its vtkClientServerID
-  virtual bool HasVisibleProp3D(vtkProp3D* prop);
-
 //BTX
 protected:
   vtkSMSelectionRepresentationProxy();

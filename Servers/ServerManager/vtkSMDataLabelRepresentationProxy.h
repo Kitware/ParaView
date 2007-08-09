@@ -74,10 +74,6 @@ public:
   //        false, if either is visible
   virtual bool GetVisibility();
 
-  // Description:
-  // Check if this representation has the prop by checking its vtkClientServerID
-  virtual bool HasVisibleProp3D(vtkProp3D* prop);
-
 protected:
   vtkSMDataLabelRepresentationProxy();
   ~vtkSMDataLabelRepresentationProxy();
