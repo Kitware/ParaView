@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QItemDelegate>
 #include <QPointer>
 #include <QTableView>
-#include <QEvent>
 
 // ParaView Includes.
 #include "pqOutputPort.h"
@@ -142,8 +141,6 @@ pqSpreadSheetView::pqSpreadSheetView(
    pqView(spreadsheetViewType(), group, name, viewModule, server, _parent)
 {
   this->Internal = new pqInternal();
-  this->Internal->Table->installEventFilter(this);
-
   QObject::connect(this, SIGNAL(representationAdded(pqRepresentation*)),
     this, SLOT(onAddRepresentation(pqRepresentation*)));
   QObject::connect(this, SIGNAL(representationRemoved(pqRepresentation*)),
@@ -219,15 +216,4 @@ bool pqSpreadSheetView::canDisplay(pqOutputPort* opPort) const
 {
   return (opPort && opPort->getServer()->GetConnectionID() == 
     this->getServer()->GetConnectionID());
-}
-
-//-----------------------------------------------------------------------------
-bool pqSpreadSheetView::eventFilter(QObject* caller, QEvent* e)
-{
-  if (e->type() == QEvent::MouseButtonPress || e->type() == QEvent::FocusIn)
-    {
-    emit this->focused(this);
-    }
-
-  return this->Superclass::eventFilter(caller, e);
 }

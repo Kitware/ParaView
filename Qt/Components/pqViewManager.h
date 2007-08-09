@@ -156,9 +156,6 @@ private slots:
   /// Called when the camera button is clicked
   virtual void onCameraTriggered();
 
-  /// Called when a view gets the focus.
-  void onViewFocused(pqView*);
-
 public slots:
   /// Set the active server. This must be called whenever
   /// active server changes. The active server is used to 

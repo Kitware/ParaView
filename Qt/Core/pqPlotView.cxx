@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
 
-#include <QEvent>
 #include <QFileInfo>
 #include <QImage>
 #include <QPainter>
@@ -115,7 +114,6 @@ pqPlotView::pqPlotView(const QString& type,
 
   // Create the chart widget.
   this->Internal->Chart = new pqChartWidget();
-  this->Internal->Chart->installEventFilter(this);
 
   // Get the chart area and set up the axes.
   pqChartArea *chartArea = this->Internal->Chart->getChartArea();
@@ -482,13 +480,3 @@ void pqPlotView::removeAllRepresentations()
     }
 }
 
-//-----------------------------------------------------------------------------
-bool pqPlotView::eventFilter(QObject* caller, QEvent* e)
-{
-  if (e->type() == QEvent::MouseButtonPress || e->type() == QEvent::FocusIn)
-    {
-    emit this->focused(this);
-    }
-
-  return this->Superclass::eventFilter(caller, e);
-}
