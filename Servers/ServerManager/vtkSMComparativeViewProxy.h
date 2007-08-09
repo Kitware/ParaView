@@ -174,10 +174,6 @@ protected:
     { this->SceneOutdated=true; }
 
   // Description:
-  // Called when playing the scene to generate film strips.
-  void FilmStripTick();
-
-  // Description:
   // Update layout for internal views.
   void UpdateViewLayout();
 
@@ -197,8 +193,6 @@ private:
 
   class vtkInternal;
   vtkInternal* Internal;
-
-  vtkCommand* FilmStripObserver;
   vtkCommand* SceneObserver;
 
 //ETX

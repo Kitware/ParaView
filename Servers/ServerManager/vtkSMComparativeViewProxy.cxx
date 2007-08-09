@@ -68,7 +68,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.12");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -89,10 +89,6 @@ vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
     vtkMemberFunctionCommand<vtkSMComparativeViewProxy>::New();
   fsO->SetCallback(*this, &vtkSMComparativeViewProxy::MarkSceneOutdated);
   this->SceneObserver = fsO;
-
-  fsO = vtkMemberFunctionCommand<vtkSMComparativeViewProxy>::New();
-  fsO->SetCallback(*this, &vtkSMComparativeViewProxy::FilmStripTick);
-  this->FilmStripObserver = fsO;
 }
 
 //----------------------------------------------------------------------------
@@ -109,7 +105,6 @@ vtkSMComparativeViewProxy::~vtkSMComparativeViewProxy()
 
   delete this->Internal;
 
-  this->FilmStripObserver->Delete();
   this->SceneObserver->Delete();
 }
 
@@ -564,16 +559,27 @@ void vtkSMComparativeViewProxy::UpdateFilmStripVisualization(
 {
   scene->SetPlayMode(vtkSMPVAnimationSceneProxy::SEQUENCE);
   scene->SetNumberOfFrames(this->Dimensions[0]*this->Dimensions[1]);
-  scene->GoToFirst();
   scene->SetLoop(0);
 
   this->Internal->ActiveIndexX = 0;
   this->Internal->ActiveIndexY = 0;
 
-  // Add observer to listen to all ticks.
-  scene->AddObserver(vtkCommand::AnimationCueTickEvent, this->FilmStripObserver);
-  scene->Play();
-  scene->RemoveObserver(this->FilmStripObserver);
+  for (int view_index=0; 
+    view_index < this->Dimensions[0]*this->Dimensions[1]; ++view_index)
+    {
+    scene->SetAnimationTime(view_index);
+
+    vtkSMViewProxy* view = this->Internal->Views[view_index];
+
+    // HACK: This ensure that obsolete cache is never used when the CV is being
+    // generated.
+    view->SetCacheTime(view->GetCacheTime()+1.0);
+
+    // Make the view cache the current setup. 
+    // We do interactive render so that both the full-res as well as low-res cache
+    // is updated.
+    view->InteractiveRender();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -606,29 +612,6 @@ void vtkSMComparativeViewProxy::UpdateComparativeVisualization(
       view_index++;
       }
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::FilmStripTick()
-{
-  if (this->Internal->ActiveIndexX >= this->Internal->Views.size())
-    {
-    vtkErrorMacro("Internal error.");
-    return;
-    }
-
-  vtkSMViewProxy* view = this->Internal->Views[this->Internal->ActiveIndexX];
-
-  // HACK: This ensure that obsolete cache is never used when the CV is being
-  // generated.
-  view->SetCacheTime(view->GetCacheTime()+1.0);
-
-  // Make the view cache the current setup. 
-  // We do interactive render so that both the full-res as well as low-res cache
-  // is updated.
-  view->InteractiveRender();
-
-  this->Internal->ActiveIndexX++;
 }
 
 //----------------------------------------------------------------------------
