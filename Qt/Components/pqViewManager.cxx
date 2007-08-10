@@ -205,6 +205,10 @@ void pqViewManager::buildConvertMenu()
         }
       }
     }
+    
+  QAction* view_action = new QAction("None", this);
+  view_action->setData("None");
+  this->Internal->ConvertMenu.addAction(view_action);
 }
 
 //-----------------------------------------------------------------------------
@@ -767,7 +771,10 @@ void pqViewManager::onConvertToTriggered(QAction* action)
     builder->destroy(this->Internal->ActiveView);
     }
 
-  builder->createView(type, server);
+  if(type != "None")
+    {
+    builder->createView(type, server);
+    }
 
   emit this->endUndo();
 }
