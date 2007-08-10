@@ -43,7 +43,6 @@ PrismToolBarActions::PrismToolBarActions(QObject* p)
 PrismToolBarActions::~PrismToolBarActions()
 {
   this->createFilterForActiveSource("PrismSurfaceFilter");
-
 }
 
 void PrismToolBarActions::onGeometryFileOpen()
@@ -60,9 +59,8 @@ pqPipelineSource* PrismToolBarActions::createFilterForActiveSource(
 {
   // Get the list of selected sources.
   pqApplicationCore* core = pqApplicationCore::instance();
- pqObjectBuilder* builder = core->getObjectBuilder();
-   pqServerManagerSelection sels =
-      *core->getSelectionModel()->selectedItems();
+  pqObjectBuilder* builder = core->getObjectBuilder();
+  pqServerManagerSelection sels = *core->getSelectionModel()->selectedItems();
   pqPipelineSource* source = 0;
   pqPipelineSource* filter = 0;
   pqServerManagerModelItem* item = 0;
@@ -91,7 +89,7 @@ void PrismToolBarActions::onSelectionChanged()
 {
   pqServerManagerModelItem *item = this->getActiveObject();
   pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
-  pqServer* server = dynamic_cast<pqServer*>(item);
+  //pqServer* server = dynamic_cast<pqServer*>(item);
   if (source)
     {
     QString name=source->getProxy()->GetXMLName();
@@ -100,7 +98,7 @@ void PrismToolBarActions::onSelectionChanged()
       this->GeometryViewAction->setEnabled(false);
       this->SesameViewAction->setEnabled(true);
       }
-    else if(name=="ExodusReader")
+    else if(name=="ExodusReader" || name == "ExodusIIReader")
       {
       this->GeometryViewAction->setEnabled(true);
       this->SesameViewAction->setEnabled(false);
@@ -111,17 +109,20 @@ void PrismToolBarActions::onSelectionChanged()
       this->SesameViewAction->setEnabled(false);
       }
     }
+  /*
   else if(server)
     {
       this->GeometryViewAction->setEnabled(true);
       this->SesameViewAction->setEnabled(true);
     }
+  */
   else
     {
     this->GeometryViewAction->setEnabled(false);
-    this->SesameViewAction->setEnabled(true);
+    this->SesameViewAction->setEnabled(false);
     }
 }
+
 pqServerManagerModelItem *PrismToolBarActions::getActiveObject() const
 {
   pqServerManagerModelItem *item = 0;
