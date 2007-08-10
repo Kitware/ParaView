@@ -23,6 +23,7 @@
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
+#include "vtkDoubleArray.h"
 #include "vtkErrorCode.h"
 #include "vtkFloatArray.h"
 #include "vtkIdTypeArray.h"
@@ -88,7 +89,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.34");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.35");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1345,74 +1346,62 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
                                            unsigned int y0, unsigned int x1, unsigned int y1,
                                            vtkCollection* selectedRepresentations,
                                            vtkCollection* selectionSources,
-                                           vtkCollection* frustumSelection,
-                                           bool multiple_selections/*=true*/)
+                                           vtkCollection* frustumSelections,
+                                           bool vtkNotUsed(multiple_selections))
 {
   int displayRectangle[4] = {x0, y0, x1, y1};
   if (displayRectangle[0] == displayRectangle[2])
-  {
+    {
     displayRectangle[2] += 1;
-  }
+    }
   if (displayRectangle[1] == displayRectangle[3])
-  {
+    {
     displayRectangle[3] += 1;
-  }
-  double Verts[32];
+    }
+
+  // 1) Create frustum selection 
+  vtkDoubleArray *frustcorners = vtkDoubleArray::New();
+  frustcorners->SetNumberOfComponents(4);
+  frustcorners->SetNumberOfTuples(8);
   //convert screen rectangle to world frustum
   vtkRenderer *renderer = this->GetRenderer();
 
   renderer->SetDisplayPoint(displayRectangle[0], displayRectangle[1], 0);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&Verts[0]);
-
+  frustcorners->SetTuple(0,  renderer->GetWorldPoint());
   renderer->SetDisplayPoint(displayRectangle[0], displayRectangle[1], 1);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&Verts[4]);
-
+  frustcorners->SetTuple(1,  renderer->GetWorldPoint());
   renderer->SetDisplayPoint(displayRectangle[0], displayRectangle[3], 0);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&Verts[8]);
-
+  frustcorners->SetTuple(2,  renderer->GetWorldPoint());
   renderer->SetDisplayPoint(displayRectangle[0], displayRectangle[3], 1);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&Verts[12]);
-
+  frustcorners->SetTuple(3,  renderer->GetWorldPoint());
   renderer->SetDisplayPoint(displayRectangle[2], displayRectangle[1], 0);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&Verts[16]);
-
+  frustcorners->SetTuple(4,  renderer->GetWorldPoint());
   renderer->SetDisplayPoint(displayRectangle[2], displayRectangle[1], 1);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&Verts[20]);
-
+  frustcorners->SetTuple(5,  renderer->GetWorldPoint());
   renderer->SetDisplayPoint(displayRectangle[2], displayRectangle[3], 0);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&Verts[24]);
-
+  frustcorners->SetTuple(6,  renderer->GetWorldPoint());
   renderer->SetDisplayPoint(displayRectangle[2], displayRectangle[3], 1);
   renderer->DisplayToWorld();
-  renderer->GetWorldPoint(&Verts[28]);    
+  frustcorners->SetTuple(7,  renderer->GetWorldPoint());
 
-  // 1) Create frustum selection source
-  
-  vtkSMProxyManager* proxyManager = vtkSMObject::GetProxyManager();  
-  vtkSMProxy *selSrcProxy = proxyManager->NewProxy("sources", "SelectionSource");
-  selSrcProxy->SetConnectionID(this->ConnectionID);
-  selSrcProxy->SetServers(vtkProcessModule::DATA_SERVER);
+  vtkSelection* frustumSel = vtkSelection::New();
+  frustumSel->GetProperties()->Set(
+    vtkSelection::CONTENT_TYPE(), vtkSelection::FRUSTUM);
+  frustumSel->SetSelectionList(frustcorners);
+  frustcorners->Delete();
 
-  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
-    selSrcProxy->GetProperty("ContentType"));
-  ivp->SetElement(0, vtkSelection::FRUSTUM);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    selSrcProxy->GetProperty("ShowBounds"));
-  ivp->SetElement(0, 1);
-
-  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    selSrcProxy->GetProperty("Frustum"));
-  dvp->SetElements(Verts);
-  
-  selectionSources->AddItem(selSrcProxy);
-  selSrcProxy->Delete();
+  vtkSelection* frustumParent = vtkSelection::New();
+  frustumParent->GetProperties()->Set(
+    vtkSelection::CONTENT_TYPE(), vtkSelection::FRUSTUM);
+  frustumParent->SetSelectionList(frustcorners);
+  frustumParent->AddChild(frustumSel);
 
   // 2) Figure out which representation is "selected".
   vtkAreaPicker* areaPicker = vtkAreaPicker::New();
@@ -1429,31 +1418,51 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
         {
         continue;
         }
+      vtkInformation* properties = frustumSel->GetProperties();
+      properties->Set(vtkSelection::PROP(), prop);
+
       // Now we just use the first selected representation,
       // until we have other mechanisms to select one.
       vtkSmartPointer<vtkCollectionIterator> reprIter;
       reprIter.TakeReference(this->Representations->NewIterator());
-
+      bool foundRepr = false;
       for (reprIter->InitTraversal(); 
         !reprIter->IsDoneWithTraversal(); reprIter->GoToNextItem())
         {
-        vtkSMPropRepresentationProxy* repr = 
-          vtkSMPropRepresentationProxy::SafeDownCast(reprIter->GetCurrentObject());
+        vtkSMDataRepresentationProxy* repr = 
+          vtkSMDataRepresentationProxy::SafeDownCast(reprIter->GetCurrentObject());
         if (!repr)
           {
           continue;
           }
-        if (!repr->HasVisibleProp3D(prop))
+        vtkSMProxy* selectionSource = repr->ConvertSelection(frustumParent);
+        if (!selectionSource)
           {
           continue;
           }
+        vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+          selectionSource->GetProperty("ShowBounds"));
+        ivp->SetElement(0, 1);
+        selectionSources->AddItem(selectionSource);
+        
+        if (frustumSelections)
+          {
+          frustumSelections->AddItem(frustumSel);
+          }
         // Add the found repr, and exit for loop
         selectedRepresentations->AddItem(repr);
+
+        selectionSource->Delete();
+        foundRepr = true;
+        }// for each repr
+      if(foundRepr)
+        {
         break;
         }
-      }
+      }//for each prop
     }
-
+  frustumSel->Delete();
+  frustumParent->Delete();
   return true;
 }
 
