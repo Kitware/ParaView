@@ -196,7 +196,7 @@ public:
     }
   QString forwardHistory()
     {
-    QString path = this->ForwardHistory.takeFirst();
+    QString path = this->ForwardHistory.takeLast();
     this->BackHistory.append(this->Model->getCurrentPath());
     this->Ui.NavigateBack->setEnabled(true);
     if(this->ForwardHistory.size() == 0)
