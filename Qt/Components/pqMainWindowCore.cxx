@@ -452,7 +452,7 @@ void pqMainWindowCore::pqImplementation::updateFiltersFromXML()
     }
   vtkstd::sort(filters.begin(), filters.end(), pqImplementation::proxyLessThan);
   pqImplementation::ProxyVector::iterator newEnd =
-    unique(filters.begin(), filters.end(), pqImplementation::proxySame);
+    vtkstd::unique(filters.begin(), filters.end(), pqImplementation::proxySame);
 
   this->AlphabeticalFilters.clear();
   pqImplementation::ProxyVector::iterator filterIter = filters.begin();
