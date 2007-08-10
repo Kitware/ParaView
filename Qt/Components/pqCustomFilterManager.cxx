@@ -253,15 +253,18 @@ void pqCustomFilterManager::exportSelected()
 void pqCustomFilterManager::removeSelected()
 {
   // Get the selected custom filters from the list.
-  QString filter;
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
   QModelIndexList selection =
       this->Form->CustomFilterList->selectionModel()->selectedIndexes();
   QModelIndexList::Iterator iter = selection.begin();
+  QStringList filters;
   for( ; iter != selection.end(); ++iter)
     {
+    filters.append(this->Model->getCustomFilterName(*iter));
+    }
+  foreach(QString filter, filters)
+    {
     // Unregister the custom filter from the server manager.
-    filter = this->Model->getCustomFilterName(*iter);
     proxyManager->UnRegisterCompoundProxyDefinition(filter.toAscii().data());
     }
 }
