@@ -28,9 +28,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSelection.h"
+#include "vtkStringArray.h"
 
 vtkStandardNewMacro(vtkSelectionSerializer);
-vtkCxxRevisionMacro(vtkSelectionSerializer, "1.10");
+vtkCxxRevisionMacro(vtkSelectionSerializer, "1.11");
 
 vtkInformationKeyMacro(vtkSelectionSerializer,ORIGINAL_SOURCE_ID,Integer);
 
@@ -153,6 +154,30 @@ void vtkSelectionSerializer::WriteSelectionList(
           os, indent,
           numTuples*numComps, (VTK_TT*)(dataPtr)
           ));
+      }
+    os << indent << "</SelectionList>" << endl;
+    }
+  else if (vtkStringArray::SafeDownCast(selection->GetSelectionList()))
+    {
+    vtkStringArray* stringList = vtkStringArray::SafeDownCast(
+      selection->GetSelectionList());
+    vtkIdType numTuples = stringList->GetNumberOfTuples();
+    vtkIdType numComps  = stringList->GetNumberOfComponents();
+    os << indent 
+       << "<SelectionList classname=\""
+       << stringList->GetClassName()
+       << "\" number_of_tuples=\""
+       << numTuples
+       << "\" number_of_components=\""
+       << numComps
+       << "\">"
+       << endl;
+    vtkIndent ni = indent.GetNextIndent();
+    for (vtkIdType i = 0; i < numTuples*numComps; i++)
+      {
+      os << ni << "<String>";
+      os << stringList->GetValue(i);
+      os << "</String>" << endl;
       }
     os << indent << "</SelectionList>" << endl;
     }
@@ -306,9 +331,11 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
       {
       if (elem->GetAttribute("classname"))
         {
-        vtkDataArray* dataArray = 
-          vtkDataArray::SafeDownCast(
+        vtkAbstractArray* arr = 
+          vtkAbstractArray::SafeDownCast(
             vtkInstantiator::CreateInstance(elem->GetAttribute("classname")));
+        vtkDataArray* dataArray = 
+          vtkDataArray::SafeDownCast(arr);
         if (dataArray)
           {
           vtkIdType numTuples;
@@ -334,6 +361,27 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
             }
           node->SetSelectionList(dataArray);
           dataArray->Delete();
+          }
+        else if (vtkStringArray::SafeDownCast(arr))
+          {
+          vtkStringArray* stringArray = 
+            vtkStringArray::SafeDownCast(arr);
+          vtkIdType numTuples;
+          int numComps;
+          if (elem->GetScalarAttribute("number_of_tuples", &numTuples) &&
+              elem->GetScalarAttribute("number_of_components", &numComps))
+            {
+            stringArray->SetNumberOfComponents(numComps);
+            stringArray->SetNumberOfTuples(numTuples);
+            unsigned int numNested = elem->GetNumberOfNestedElements();
+            for (unsigned int i=0; i<numNested; i++)
+              {
+              vtkPVXMLElement* strElem = elem->GetNestedElement(i);
+              stringArray->SetValue(i, strElem->GetCharacterData());
+              }            
+            }
+          node->SetSelectionList(stringArray);
+          stringArray->Delete();
           }
         }
       }

@@ -1226,6 +1226,17 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
    <!-- End of TextSource -->
    </SourceProxy>
 
+   <SelectionLinkProxy name="SelectionLink" class="vtkSelectionLink">
+     <ProxyProperty
+       name="Selection" 
+       command="SetSelection" 
+       update_self="1">
+       <ProxyGroupDomain name="groups">
+         <Group name="selection_helpers"/>
+       </ProxyGroupDomain>
+     </ProxyProperty>
+   </SelectionLinkProxy>
+
    <SourceProxy name="SelectionSource" class="vtkSelectionSource">
      <Documentation>
        This produces a selection object that is given to vtkExtractSelection to do general data subsetting operations.

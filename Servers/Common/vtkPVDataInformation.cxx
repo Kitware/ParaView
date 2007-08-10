@@ -35,6 +35,7 @@
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkSelection.h"
 #include "vtkSource.h"
 #include "vtkStructuredGrid.h"
 #include "vtkTable.h"
@@ -43,7 +44,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.30");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.31");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -394,6 +395,23 @@ void vtkPVDataInformation::CopyFromGenericDataSet(vtkGenericDataSet *data)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVDataInformation::CopyFromSelection(vtkSelection* data)
+{
+  this->SetDataClassName(data->GetClassName());
+  this->DataSetType = data->GetDataObjectType();
+  this->NumberOfDataSets = 1;
+  this->Bounds[0] = this->Bounds[1] = this->Bounds[2] 
+    = this->Bounds[3] = this->Bounds[4] = this->Bounds[5] = 0;
+
+  this->MemorySize = data->GetActualMemorySize();
+  this->NumberOfCells = 0;
+  this->NumberOfPoints = 0;
+
+  // Copy Point Data information
+  this->PointDataInformation->CopyFromFieldData(data->GetFieldData());
+}
+
+//----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromTable(vtkTable* data)
 {
   this->SetDataClassName(data->GetClassName());
@@ -460,6 +478,13 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if (table)
     {
     this->CopyFromTable(table);
+    return;
+    }
+
+  vtkSelection* selection = vtkSelection::SafeDownCast(dobj);
+  if (selection)
+    {
+    this->CopyFromSelection(selection);
     return;
     }
 
