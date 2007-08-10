@@ -77,23 +77,31 @@ vtkSMProxy* @VIEW_TYPE@Implementation::createViewProxy(const QString& viewtype)
   return NULL;
 }
 
-pqView* @VIEW_TYPE@Implementation::createView(const QString& /*viewtype*/,
+pqView* @VIEW_TYPE@Implementation::createView(const QString& viewtype,
                                                 const QString& group,
                                                 const QString& viewname,
                                                 vtkSMViewProxy* viewmodule,
                                                 pqServer* server,
                                                 QObject* p)
 {
-  return new @VIEW_TYPE@("@VIEW_TYPE@", group, viewname, viewmodule, server, p);
+  if(viewtype == "@VIEW_TYPE@")
+    {
+    return new @VIEW_TYPE@("@VIEW_TYPE@", group, viewname, viewmodule, server, p);
+    }
+  return NULL;
 }
 
-pqDataRepresentation* @VIEW_TYPE@Implementation::createDisplay(const QString& /*display_type*/, 
+pqDataRepresentation* @VIEW_TYPE@Implementation::createDisplay(const QString& display_type, 
   const QString& group,
   const QString& n,
   vtkSMProxy* proxy,
   pqServer* server,
   QObject* p)
 {
-  return new @DISPLAY_TYPE@(group, n, proxy, server, p);
+  if(display_type == "@DISPLAY_TYPE@")
+    {
+    return new @DISPLAY_TYPE@(group, n, proxy, server, p);
+    }
+  return NULL;
 }
 
