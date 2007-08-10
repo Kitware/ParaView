@@ -96,6 +96,8 @@ pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
                    this, SLOT(propertyChanged()));
 
   this->DataUpdateInProgress = false;
+
+  this->UI->XMLFileName->setServer(this->referenceProxy()->getServer());
   
   this->linkServerManagerProperties();
 }
@@ -206,8 +208,20 @@ void pqExodusIIPanel::linkServerManagerProperties()
   // do the edge variables
   this->addSelectionsToTreeWidget("EdgeResultArrayStatus",
                                   this->UI->Variables, PM_EDGEBLK);
+
+  // do the set results variables
+  this->addSelectionsToTreeWidget("SideSetResultArrayStatus",
+                                  this->UI->Variables, PM_SIDESET);
+  this->addSelectionsToTreeWidget("NodeSetResultArrayStatus",
+                                  this->UI->Variables, PM_NODESET);
+  this->addSelectionsToTreeWidget("FaceSetResultArrayStatus",
+                                  this->UI->Variables, PM_ELEM);
+  this->addSelectionsToTreeWidget("EdgeSetResultArrayStatus",
+                                  this->UI->Variables, PM_ELEM);
+  this->addSelectionsToTreeWidget("ElementSetResultArrayStatus",
+                                  this->UI->Variables, PM_ELEM);
   
-  
+    
   this->addSelectionToTreeWidget("Global Node Ids", "GlobalNodeId", this->UI->Variables,
                    PM_NODE, "GenerateGlobalNodeIdArray");
 
@@ -273,19 +287,7 @@ void pqExodusIIPanel::linkServerManagerProperties()
                                   this->UI->Sets, PM_ELEM);
   this->addSelectionsToTreeWidget("ElementSetArrayStatus",
                                   this->UI->Sets, PM_ELEM);
-  
-  // set results
-  this->addSelectionsToTreeWidget("SideSetResultArrayStatus",
-                                  this->UI->SetResults, PM_SIDESET);
-  this->addSelectionsToTreeWidget("NodeSetResultArrayStatus",
-                                  this->UI->SetResults, PM_NODESET);
-  this->addSelectionsToTreeWidget("FaceSetResultArrayStatus",
-                                  this->UI->SetResults, PM_ELEM);
-  this->addSelectionsToTreeWidget("EdgeSetResultArrayStatus",
-                                  this->UI->SetResults, PM_ELEM);
-  this->addSelectionsToTreeWidget("ElementSetResultArrayStatus",
-                                  this->UI->SetResults, PM_ELEM);
-  
+
   // maps
   this->addSelectionsToTreeWidget("NodeMapArrayStatus",
                                   this->UI->Maps, PM_NONE);

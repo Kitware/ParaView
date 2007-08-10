@@ -2486,6 +2486,29 @@
        </Documentation>
      </IntVectorProperty>
 
+     <StringVectorProperty 
+        name="XMLFileNameInfo"
+        command="GetXMLFileName"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="XMLFileName"
+        command="SetXMLFileName"
+        number_of_elements="1"
+        animateable="0"
+        label="XML File Name">
+       <FileListDomain name="default_value" optional="1">
+          <RequiredProperties>
+             <Property name="XMLFileNameInfo" function="XMLFileName"/>
+          </RequiredProperties>
+       </FileListDomain>
+       <Documentation>
+         This property specifies the name of an XML file containing part and material descriptions and a mapping to element blocks.
+       </Documentation>
+     </StringVectorProperty>
+
      <IntVectorProperty name="HasModeShapes"
                         command="SetHasModeShapes"
                         number_of_elements="1"

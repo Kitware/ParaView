@@ -181,24 +181,6 @@
     </widget>
    </item>
    <item>
-    <widget class="pqTreeWidget" name="SetResults" >
-     <property name="minimumSize" >
-      <size>
-       <width>0</width>
-       <height>100</height>
-      </size>
-     </property>
-     <property name="rootIsDecorated" >
-      <bool>false</bool>
-     </property>
-     <column>
-      <property name="text" >
-       <string>Set Results</string>
-      </property>
-     </column>
-    </widget>
-   </item>
-   <item>
     <widget class="pqCollapsedGroup" name="modeShapesGroup" >
      <property name="title" >
       <string>Mode Shapes</string>
@@ -457,7 +439,37 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0" colspan="2" >
+      <item row="4" column="1" >
+       <widget class="pqFileChooserWidget" native="1" name="XMLFileName" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>7</hsizetype>
+          <vsizetype>0</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" >
+       <widget class="QLabel" name="XMLFileNameLabel" >
+        <property name="sizePolicy" >
+         <sizepolicy>
+          <hsizetype>5</hsizetype>
+          <vsizetype>5</vsizetype>
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text" >
+         <string>XML File</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" colspan="2" >
        <widget class="QCheckBox" name="ExodusModelMetadata" >
         <property name="text" >
          <string>Meta Data</string>
@@ -480,6 +492,11 @@
    <extends>QGroupBox</extends>
    <header>pqCollapsedGroup.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqFileChooserWidget</class>
+   <extends>QWidget</extends>
+   <header>pqFileChooserWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
