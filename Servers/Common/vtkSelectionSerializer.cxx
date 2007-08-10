@@ -31,7 +31,7 @@
 #include "vtkStringArray.h"
 
 vtkStandardNewMacro(vtkSelectionSerializer);
-vtkCxxRevisionMacro(vtkSelectionSerializer, "1.11");
+vtkCxxRevisionMacro(vtkSelectionSerializer, "1.12");
 
 vtkInformationKeyMacro(vtkSelectionSerializer,ORIGINAL_SOURCE_ID,Integer);
 
@@ -373,11 +373,11 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
             {
             stringArray->SetNumberOfComponents(numComps);
             stringArray->SetNumberOfTuples(numTuples);
-            unsigned int numNested = elem->GetNumberOfNestedElements();
-            for (unsigned int i=0; i<numNested; i++)
+            unsigned int numNestedStr = elem->GetNumberOfNestedElements();
+            for (unsigned int ind=0; ind<numNestedStr; ind++)
               {
-              vtkPVXMLElement* strElem = elem->GetNestedElement(i);
-              stringArray->SetValue(i, strElem->GetCharacterData());
+              vtkPVXMLElement* strElem = elem->GetNestedElement(ind);
+              stringArray->SetValue(ind, strElem->GetCharacterData());
               }            
             }
           node->SetSelectionList(stringArray);

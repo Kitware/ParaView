@@ -55,7 +55,7 @@ protected:
 };
 
 vtkStandardNewMacro(vtkSMSelectionLinkProxy);
-vtkCxxRevisionMacro(vtkSMSelectionLinkProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMSelectionLinkProxy, "1.2");
 //---------------------------------------------------------------------------
 vtkSMSelectionLinkProxy::vtkSMSelectionLinkProxy()
 {
@@ -129,6 +129,7 @@ void vtkSMSelectionLinkProxy::ClientSelectionChanged()
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm->IsRemote(this->ConnectionID))
     {
+    this->MarkModified(this);
     return;
     }
   if (this->SettingClientSelection)
@@ -146,8 +147,8 @@ void vtkSMSelectionLinkProxy::ClientSelectionChanged()
   selectionProxy->SetServers(vtkProcessModule::DATA_SERVER);
   selectionProxy->UpdateVTKObjects();
   vtkSMSelectionHelper::SendSelection(selection, selectionProxy);
-  
   this->SetSelection(selectionProxy);
+  selectionProxy->Delete();
   
   this->MostRecentSelectionOnClient = true;
 }
@@ -193,4 +194,9 @@ void vtkSMSelectionLinkProxy::ClientRequestData()
 //-----------------------------------------------------------------------------
 void vtkSMSelectionLinkProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "MostRecentSelectionOnClient: " 
+     << (this->MostRecentSelectionOnClient ? "yes" : "no") << endl;
+  os << indent << "SettingClientSelection: " 
+     << (this->SettingClientSelection ? "yes" : "no") << endl;
 }
