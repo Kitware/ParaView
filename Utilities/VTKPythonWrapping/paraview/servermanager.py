@@ -54,15 +54,17 @@ class Proxy(object):
      proxy.GetProperty("Foo").SetElement(0, 2)
     you can do:
      proxy.Foo = (1,2)
+    or
+     proxy.Foo.SetData((1,2))
     Instead of:
       proxy.GetPropery("Foo").GetElements()
     you can do:
-      proxy.Foo
+      proxy.Foo.GetData()
       it returns a list of all values of the property.
-    For proxy properties, you can use +=:
+    For proxy properties, you can use append:
      proxy.GetProperty("Bar").AddProxy(foo)
     you can do:
-     proxy.Bar += [foo]
+     proxy.Bar.append(foo)
 
     This class also provides an iterator which can be used to iterate
     over all properties.
@@ -73,6 +75,8 @@ class Proxy(object):
     """
     def __init__(self, **args):
         self.Observed = None
+        self.__Properties = {}
+
         if 'proxy' in args:
             self.InitializeFromProxy(args['proxy'])
             del args['proxy']
@@ -86,7 +90,7 @@ class Proxy(object):
                 registrationName = args['registrationName']
                 del args['registrationName']
             pxm = ProxyManager()
-            pxm.RegisterProxy(registrationGroup, registrationGroup, self.SMProxy)
+            pxm.RegisterProxy(registrationGroup, registrationName, self.SMProxy)
         for key in args.keys():
             self.SetPropertyWithName(key, args[key])
         self.UpdateVTKObjects()
@@ -97,11 +101,15 @@ class Proxy(object):
             observed = self.Observed
             self.Observed = None
             observed.RemoveObservers("ModifiedEvent")
+        if self.SMProxy in _pyproxies:
+            del _pyproxies[self.SMProxy]
 
     def InitializeFromProxy(self, aProxy):
         "Constructor. Assigns proxy to self.SMProxy"
+        import weakref
         self.SMProxy = aProxy
         self.SMProxy.UpdateVTKObjects()
+        _pyproxies[self.SMProxy] = weakref.ref(self)
 
     def Initialize(self):
         "Overridden by the subclass"
@@ -124,87 +132,10 @@ class Proxy(object):
                 self.SMProxy.GetDataInformation(idx, False), \
                 self.SMProxy, idx)
         
-    def SetPropertyWithName(self, pname, *args):
-        """Generic method for setting the value of a property.
-        Should not be directly called"""
-        # If we have 1 argument and it is a list, treat it as the list
-        # of arguments
-        value = None
-        if len(args):
-            value = args[0]
-        if not isinstance(value, tuple) and \
-           not isinstance(value, list):
-            value = (value,)
-        property = self.SMProxy.GetProperty(pname)
-        if not property:
-            raise exceptions.RuntimeError, "Property %s not found. Cannot set." % pname
-        if property.IsA("vtkSMInputProperty"):
-            property.RemoveAllProxies()
-            for i in range(len(value)):
-                arg = value[i]
-                idx = 0
-                if isinstance(arg, OutputPort):
-                    idx = arg.PortIdx
-                    arg = arg.Proxy
-                if isinstance(arg, Proxy):
-                    value_proxy = arg.SMProxy
-                else:
-                    value_proxy = arg
-                property.AddInputConnection(value_proxy, idx)
-        elif property.IsA("vtkSMProxyProperty"):
-            property.RemoveAllProxies()
-            for i in range(len(value)):
-                if isinstance(value[i], Proxy):
-                    value_proxy = value[i].SMProxy
-                else:
-                    value_proxy = value[i]
-                property.AddProxy(value_proxy)
-        else:
-            for i in range(len(value)):
-                property.SetElement(i, value[i])
-        self.SMProxy.UpdateProperty(pname, 0)
-
-    def GetPropertyWithName(self, name):
-        """Generic method for getting the value of a property.
-           Should not be directly called."""
-        property = self.SMProxy.GetProperty(name)
-        if not property:
-            raise exceptions.RuntimeError, "Property %s not found. Cannot set" % name
-        if property.IsA("vtkSMProxyProperty"):
-            if property.GetRepeatable() or property.GetNumberOfProxies() > 1:
-                list = []
-                for i in range(0, property.GetNumberOfProxies()):
-                    aProxy = property.GetProxy(i)
-                    if aProxy:
-                        classForProxy = FindClassForProxy(aProxy.GetXMLName())
-                        if classForProxy:
-                            list.append(classForProxy(proxy=aProxy))
-                        else:
-                            list.append(Proxy(proxy=aProxy))
-                    else:
-                        list.append(None)
-                return list
-            else:
-                if property.GetNumberOfProxies() > 0:
-                    aProxy = property.GetProxy(0)
-                    if aProxy:
-                        classForProxy = FindClassForProxy(aProxy.GetXMLName())
-                        if classForProxy:
-                            return classForProxy(proxy=aProxy)
-                        else:
-                            return Proxy(proxy=aProxy)
-        else:
-            if property.GetRepeatable() or \
-               property.GetRepeatCommand() or  \
-               property.GetNumberOfElements() > 1:
-                list = []
-                for i in range(0, property.GetNumberOfElements()):
-                    list.append(property.GetElement(i))
-                return list
-            elif property.GetNumberOfElements() == 1:
-                return property.GetElement(0)
-        return None
-        
+    def SetPropertyWithName(self, pname, arg):
+        """Generic method for setting the value of a property."""
+        self.GetProperty(pname).SetData(arg)
+         
     def __SaveDefinition(self, root=None):
         "Overload for CompoundProxy's SaveDefinition."
         defn = self.SMProxy.SaveDefinition(root)
@@ -212,6 +143,23 @@ class Proxy(object):
             defn.UnRegister(None)
         return defn
 
+    def GetProperty(self, name):
+        if name in self.__Properties:
+            return self.__Properties[name]
+        smproperty = self.SMProxy.GetProperty(name)
+        if smproperty:
+            property = None
+            if smproperty.IsA("vtkSMVectorProperty"):
+                property = VectorProperty(self, smproperty)
+            elif smproperty.IsA("vtkSMInputProperty"):
+                property = InputProperty(self, smproperty)
+            elif smproperty.IsA("vtkSMProxyProperty"):
+                property = ProxyProperty(self, smproperty)
+            if property is not None:
+                self.__Properties[name] = property
+            return property
+        return None
+            
     def ListProperties(self):
         """Returns a list of all properties on this proxy."""
         property_list = []
@@ -230,11 +178,17 @@ class Proxy(object):
       func = getattr(self.SMProxy, self.__LastAttrName)
       retVal = func(*newArgs)
       if type(retVal) is type(self.SMProxy) and retVal.IsA("vtkSMProxy"):
-          classForProxy = FindClassForProxy(retVal.GetXMLName())
-          if classForProxy:
-              return classForProxy(proxy=retVal)
+          return _getPyProxy(retVal)
+      elif type(retVal) is type(self.SMProxy) and retVal.IsA("vtkSMProperty"):
+          property = retVal
+          if property.IsA("vtkSMVectorProperty"):
+              return VectorProperty(self, property)
+          elif property.IsA("vtkSMInputProperty"):
+              return InputProperty(self, property)
+          elif property.IsA("vtkSMProxyProperty"):
+              return ProxyProperty(self, property)
           else:
-              return Proxy(proxy=retVal)
+              return None
       else:
           return retVal
 
@@ -273,34 +227,218 @@ class Proxy(object):
             pass
         return getattr(self.SMProxy, name)
 
-def _makeUpdateCameraMethod(rv):
-    """ This internal method is used to create observer methods """
-    rvref = rv
-    def UpdateCamera(obj, string):
-        rvref().SynchronizeCameraProperties()
-    return UpdateCamera
-
 class Property(object):
-    def __init__(self, smproperty, smproxy):
-        try:
-            if not smproperty.IsA("vtkSMProperty") or \
-               not smproperty.IsA("vtkSMProxy"):
-                raise exceptions.TypeError, \
-                      "Unexcepted argument, expected a vtkSMProperty"
-            self.SMProperty = smproperty
-            self.SMProxy = smproxy
-        except:
-            raise exceptions.TypeError, \
-                  "Unexcepted argument, expected a vtkSMProperty"
+    def __init__(self, proxy, smproperty):
+        import weakref
+        self.SMProperty = smproperty
+        self.Proxy = weakref.ref(proxy)
+
+    def __repr__(self):
+        if self.GetData():
+            return self.GetData().__repr__()
+        return object.__repr__(self)
+
+    def _FindPropertyName(self):
+        iter = self.Proxy().NewPropertyIterator()
+        iter.UnRegister(None)
+        while not iter.IsAtEnd():
+            if iter.GetProperty() is self.SMProperty:
+                return iter.GetKey()
+            iter.Next()
+        return None    
 
 class VectorProperty(Property):
-    pass
+    def __len__(self):
+        return self.SMProperty.GetNumberOfElements()
+
+    def __getitem__(self, idx):
+        if idx >= len(self):
+            raise exceptions.IndexError
+        return self.SMProperty.GetElement(idx)
+
+    def __setitem__(self, idx, value):
+        self.SMProperty.SetElement(idx, value)
+        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+
+    def __getslice__(self, min, max):
+        if min < 0 or min > len(self) or max < 0 or max > len(self):
+            raise exceptions.IndexError
+        retval = []
+        for i in range(min, max):
+            retval.append(self.SMProperty.GetElement(i))
+        return retval
+
+    def __setslice__(self, min, max, values):
+        if min < 0 or min > len(self) or max < 0 or max > len(self):
+            raise exceptions.IndexError
+        for i in range(min, max):
+            self.SMProperty.SetElement(i, values[i-min])
+        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+
+    def __getattr__(self, name):
+        return getattr(self.SMProperty, name)
+
+    def GetData(self):
+        property = self.SMProperty
+        if property.GetRepeatable() or \
+           property.GetRepeatCommand() or  \
+           property.GetNumberOfElements() > 1:
+            return self.__getslice__(0, len(self))
+        elif property.GetNumberOfElements() == 1:
+            return property.GetElement(0)
+
+    def SetData(self, values):
+        if not isinstance(values, tuple) and \
+           not isinstance(values, list):
+            values = (values,)
+        for i in range(len(values)):
+            self.SMProperty.SetElement(i, values[i])
+        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+
+    def Clear(self):
+        self.SMProperty().SetNumberOfElements(0)
+        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
 
 class ProxyProperty(Property):
-    pass
+    def __len__(self):
+        return self.SMProperty.GetNumberOfProxies()
+
+    def __getitem__(self, idx):
+        if idx >= len(self):
+            raise exceptions.IndexError
+        return _getPyProxy(self.SMProperty.GetProxy(idx))
+
+    def __setitem__(self, idx, value):
+        self.SMProperty.SetProxy(idx, value.SMProxy)
+        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+
+    def __delitem__(self, idx):
+        proxy = self[idx].SMProxy
+        self.SMProperty.RemoveProxy(proxy.SMProxy)
+        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+
+    def __getslice__(self, min, max):
+        if min < 0 or min > len(self) or max < 0 or max > len(self):
+            raise exceptions.IndexError
+        retval = []
+        for i in range(min, max):
+            proxy = _getPyProxy(self.SMProperty.GetProxy(i))
+            retval.append(proxy)
+        return retval
+
+    def __setslice__(self, min, max, values):
+        if min < 0 or min > len(self) or max < 0 or max > len(self):
+            raise exceptions.IndexError
+        for i in range(min, max):
+            self.SMProperty.SetProxy(i, values[i-min].SMProxy)
+        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+
+    def __delslice__(self, min, max):
+        proxies = []
+        for i in range(min, max):
+            proxies.append(self[i])
+        for i in proxies:
+            self.SMProperty.RemoveProxy(i)
+        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+
+    def __getattr__(self, name):
+        return getattr(self.SMProperty, name)
+
+    def append(self, proxy):
+        self.SMProperty.AddProxy(proxy.SMProxy)
+        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+        
+    def GetData(self):
+        property = self.SMProperty
+        if property.GetRepeatable() or property.GetNumberOfProxies() > 1:
+            return self.__getslice__(0, len(self))
+        else:
+            if property.GetNumberOfProxies() > 0:
+                return _getPyProxy(property.GetProxy(0))
+        return None
+
+    def SetData(self, values):
+        if not isinstance(values, tuple) and \
+           not isinstance(values, list):
+            values = (values,)
+        self.SMProperty.RemoveAllProxies()
+        for value in values:
+            if isinstance(value, Proxy):
+                value_proxy = value.SMProxy
+            else:
+                value_proxy = value
+            self.SMProperty.AddProxy(value_proxy)
+        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+
+    def Clear(self):
+        self.SMProperty.RemoveAllProxies()
+        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
 
 class InputProperty(ProxyProperty):
-    pass
+    def __getitem__(self, idx):
+        if idx >= len(self):
+            raise exceptions.IndexError
+        return OutputPort(_getPyProxy(self.SMProperty.GetProxy(idx)),\
+                          self.SMProperty.GetOutputPortForConnection(idx))
+
+    def __getOutputPort(self, value):
+        portidx = 0
+        if isinstance(value, OutputPort):
+            portidx = value.Port
+            value = value.Proxy
+        if isinstance(value, Proxy):
+            value_proxy = value.SMProxy
+        else:
+            value_proxy = value
+        return OutputPort(value_proxy, portidx)
+        
+    def __setitem__(self, idx, value):
+        op = self.__getOutputPort(value)
+        self.SMProperty.SetInputConnection(idx, op.Proxy, op.Port)
+        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+
+    def __getslice__(self, min, max):
+        if min < 0 or min > len(self) or max < 0 or max > len(self):
+            raise exceptions.IndexError
+        retval = []
+        for i in range(min, max):
+            port = OutputPort(_getPyProxy(self.SMProperty.GetProxy(i)),\
+                              self.SMProperty.GetOutputPortForConnection(i))
+            retval.append(port)
+        return retval
+
+    def __setslice__(self, min, max, values):
+        if min < 0 or min > len(self) or max < 0 or max > len(self):
+            raise exceptions.IndexError
+        for i in range(min, max):
+            op = self.__getOutputPort(value[i-min])
+            self.SMProperty.SetInputConnection(i, op.Proxy, op.Port)
+        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+
+    def append(self, value):
+        op = self.__getOutputPort(value)
+        self.SMProperty.AddInputConnection(op.Proxy, op.Port)
+        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+        
+    def GetData(self):
+        property = self.SMProperty
+        if property.GetRepeatable() or property.GetNumberOfProxies() > 1:
+            return self.__getslice__(0, len(self))
+        else:
+            if property.GetNumberOfProxies() > 0:
+                return OutputPort(_getPyProxy(property.GetProxy(0)),\
+                                  self.SMProperty.GetOutputPortForConnection(0))
+        return None
+
+    def SetData(self, values):
+        if not isinstance(values, tuple) and \
+           not isinstance(values, list):
+            values = (values,)
+        self.SMProperty.RemoveAllProxies()
+        for value in values:
+            op = self.__getOutputPort(value)
+            self.SMProperty.AddInputConnection(op.Proxy, op.Port)
+        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
         
 class DataInformation(object):
     def __init__(self, dataInformation, proxy, idx):
@@ -332,7 +470,14 @@ class DataInformation(object):
 class OutputPort(object):
     def __init__(self, proxy=None, outputPort=0):
         self.Proxy = proxy
-        self.PortIdx = outputPort
+        self.Port = outputPort
+
+    def __repr__(self):
+        import exceptions
+        try:
+            return self.Proxy.__repr__() + ":%d" % self.Port
+        except exceptions.AttributeError:
+            return object.__repr__(self)
         
 class ProxyManager(object):
     "Proxy manager wrapper"
@@ -369,11 +514,7 @@ class ProxyManager(object):
         aProxy = self.SMProxyManager.GetProxy(group, name)
         if not aProxy:
             return None
-        classForProxy = FindClassForProxy(aProxy.GetXMLName())
-        if classForProxy:
-            return classForProxy(proxy=aProxy)
-        else:
-            return Proxy(proxy=aProxy)
+        return _getPyProxy(aProxy)
 
     def GetPrototypeProxy(self, group, name):
         """Returns a proxy wrapper for a proxy"""
@@ -388,7 +529,7 @@ class ProxyManager(object):
         """Returns a map of proxies registered with the proxy manager
            on the particular connection."""
         proxy_groups = {}
-        iter = self.connection_iter(connection) 
+        iter = self.NewConnectionIterator(connection) 
         for proxy in iter:
             if not proxy_groups.has_key(iter.GetGroup()):
                 proxy_groups[iter.GetGroup()] = {}
@@ -403,7 +544,7 @@ class ProxyManager(object):
          are returned.
         """
         proxies = {}
-        iter = self.group_iter(groupname) 
+        iter = self.NewGroupIterator(groupname) 
         for aProxy in iter:
             proxies[iter.GetKey()] = aProxy;
         return proxies
@@ -425,14 +566,10 @@ class ProxyManager(object):
         result = []
         self.SMProxyManager.GetProxies(groupname, proxyname, collection)
         for i in range(0, collection.GetNumberOfItems()):
-            aProxy = collection.GetItemAsObject(i)
+            aProxy = _getPyProxy(collection.GetItemAsObject(i))
             if aProxy:
-                classForProxy = FindClassForProxy(aProxy.GetXMLName())
-                if classForProxy:
-                    aProxy = classForProxy(proxy=aProxy)
-                else:
-                    aProxy = Proxy(proxy=aProxy)
-            result.append(aProxy)
+                result.append(proxy)
+                
         return result
         
     def __getattr__(self, name):
@@ -442,7 +579,7 @@ class ProxyManager(object):
     def __iter__(self):
         return ProxyIterator()
 
-    def group_iter(self, group_name, connection=None):
+    def NewGroupIterator(self, group_name, connection=None):
         iter = self.__iter__()
         if connection:
             iter.SetConnectionID(connection.ID)
@@ -450,14 +587,14 @@ class ProxyManager(object):
         iter.Begin(group_name)
         return iter
 
-    def connection_iter(self, connection):
+    def NewConnectionIterator(self, connection):
         iter = self.__iter__()
         if connection:
             iter.SetConnectionID(connection.ID)
         iter.Begin()
         return iter
 
-    def definition_iter(self, groupname=None):
+    def NewDefinitionIterator(self, groupname=None):
         """Returns an iterator that can be used to iterate over
            all groups and types of proxies that the proxy manager
            can create."""
@@ -579,13 +716,7 @@ class ProxyIterator(object):
             self.Key = None
             raise StopIteration
             return None
-        self.AProxy = self.SMIterator.GetProxy()
-        if self.AProxy:
-            classForProxy = FindClassForProxy(self.AProxy.GetXMLName())
-            if classForProxy:
-                self.AProxy = classForProxy(proxy=self.AProxy)
-            else:
-                self.AProxy = Proxy(proxy=self.AProxy)
+        self.AProxy = _getPyProxy(self.SMIterator.GetProxy())
         self.Group = self.SMIterator.GetGroup()
         self.Key = self.SMIterator.GetKey()
         self.SMIterator.Next()
@@ -655,7 +786,7 @@ ActiveConnection = None
 ## These are method to create a new connection.
 ## One can connect to a server, (data-server,render-server)
 ## or simply create a built-in connection.
-def connect_server(host, port):
+def _connectServer(host, port):
     """Connect to a host:port. Returns the connection object if successfully
     connected with the server."""
     pm =  vtkProcessModule.GetProcessModule()
@@ -666,7 +797,7 @@ def connect_server(host, port):
     conn.SetHost(host, port)
     return conn 
 
-def connect_ds_rs(ds_host, ds_port, rs_host, rs_port):
+def _connectDsRs(ds_host, ds_port, rs_host, rs_port):
     """Connect to a dataserver at (ds_host:ds_port) and to a render server
     at (rs_host:rs_port). 
     Returns the connection object if successfully connected 
@@ -679,7 +810,7 @@ def connect_ds_rs(ds_host, ds_port, rs_host, rs_port):
     conn.SetHost(ds_host, ds_port, rs_host, rs_port)
     return conn 
 
-def connect_self():
+def _connectSelf():
     """Creates a new self connection."""
     pm =  vtkProcessModule.GetProcessModule()
     pmOptions = pm.GetOptions()
@@ -708,11 +839,11 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     """
     global ActiveConnection
     if ds_host == None:
-        connectionId = connect_self()
+        connectionId = _connectSelf()
     elif rs_host == None:
-        connectionId = connect_server(ds_host, ds_port)
+        connectionId = _connectServer(ds_host, ds_port)
     else:
-        connectionId = connect_ds_rs(ds_host, ds_port, rs_host, rs_port)
+        connectionId = _connectDsRs(ds_host, ds_port, rs_host, rs_port)
     if not ActiveConnection:
         ActiveConnection = connectionId
     return connectionId
@@ -727,7 +858,7 @@ def Disconnect(connection=None):
     pm.Disconnect(connection.ID)
     return
 
-def CreateProxy(xml_group, xml_name, register_group=None, register_name=None, connection=None):
+def CreateProxy(xml_group, xml_name, connection=None):
     """Creates a proxy. If register_group is non-None, then the created
        proxy is registered under that group. If connection is set, the proxy's
        connection ID is set accordingly. If connection is None, ActiveConnection
@@ -742,10 +873,6 @@ def CreateProxy(xml_group, xml_name, register_group=None, register_name=None, co
         connection = ActiveConnection
     if connection:
         aProxy.SetConnectionID(connection.ID)
-    if register_group:
-        if not register_name:
-            register_name = aProxy.GetSelfIDAsString()
-        pxm.RegisterProxy(register_group, register_name, aProxy)
     return aProxy
 
 def GetRenderView(connection=None):
@@ -753,7 +880,7 @@ def GetRenderView(connection=None):
     if not connection:
         connection = ActiveConnection
     render_module = None
-    for aProxy in ProxyManager().connection_iter(connection):
+    for aProxy in ProxyManager().NewConnectionIterator(connection):
         if aProxy.IsA("vtkSMRenderViewProxy"):
             render_module = aProxy
             break
@@ -764,12 +891,12 @@ def GetRenderViews(connection=None):
     if not connection:
         connection = ActiveConnection
     render_modules = []
-    for aProxy in ProxyManager().connection_iter(connection):
+    for aProxy in ProxyManager().NewConnectionIterator(connection):
         if aProxy.IsA("vtkSMRenderViewProxy"):
             render_modules.append(aProxy)
     return render_modules
 
-def CreateRenderView(connection=None):
+def CreateRenderView(connection=None, **extraArgs):
     """Creates a render window on the particular connection. If connection is not specified,
     then the active connection is used, if available."""
     if not connection:
@@ -785,13 +912,14 @@ def CreateRenderView(connection=None):
             proxy_xml_name = "IceTCompositeView"
         else:
             proxy_xml_name = "RenderView"
-    ren_module = CreateProxy("newviews", proxy_xml_name, "view_modules", None, connection)
+    ren_module = CreateProxy("newviews", proxy_xml_name, connection)
     if not ren_module:
         return None
-    proxy = rendering.__dict__[ren_module.GetXMLName()](proxy=ren_module)
+    extraArgs['proxy'] = ren_module
+    proxy = rendering.__dict__[ren_module.GetXMLName()](**extraArgs)
     return proxy
 
-def CreateRepresentation(aProxy, view):
+def CreateRepresentation(aProxy, view, **extraArgs):
     """Creates a representation for the proxy and adds it to the render module."""
     global rendering
     if not aProxy:
@@ -803,12 +931,11 @@ def CreateRepresentation(aProxy, view):
         return None
     display.SetConnectionID(aProxy.GetConnectionID())
     display.UnRegister(None)
-    pxm = ProxyManager()
-    pxm.RegisterProxy("displays", display.GetSelfIDAsString(), display)
-    proxy = rendering.__dict__[display.GetXMLName()](proxy=display)
+    extraArgs['proxy'] = display
+    proxy = rendering.__dict__[display.GetXMLName()](**extraArgs)
     proxy.Input = aProxy
     proxy.UpdateVTKObjects()
-    view.Representations += [proxy]
+    view.Representations.append(proxy)
     return proxy
 
 def Fetch(input, arg=None):
@@ -885,27 +1012,59 @@ def Fetch(input, arg=None):
     gvd.Update()   
     return gvd.GetOutput()
 
-def __createInitialize(group, name):
+def Finalize():
+    vtkInitializationHelper.Finalize()
+    
+# Internal methods
+
+def _getPyProxy(smproxy):
+    if not smproxy:
+        return None
+    if smproxy in _pyproxies:
+        retVal = _pyproxies[smproxy]()
+        if retVal:
+            return retVal
+    
+    classForProxy = _findClassForProxy(smproxy.GetXMLName())
+    if classForProxy:
+        retVal = classForProxy(proxy=smproxy)
+    else:
+        retVal = Proxy(proxy=smproxy)
+    return retVal
+    
+def _makeUpdateCameraMethod(rv):
+    """ This internal method is used to create observer methods """
+    rvref = rv
+    def UpdateCamera(obj, string):
+        rvref().SynchronizeCameraProperties()
+    return UpdateCamera
+
+def _createInitialize(group, name):
     pgroup = group
     pname = name
     def aInitialize(self, connection=None):
         if not connection:
             connection = ActiveConnection
         if not connection:
-            raise exceptions.RuntimeError, 'Cannot create a proxy without a connection.'
-        self.InitializeFromProxy(CreateProxy(pgroup, pname, pgroup, None, connection))
+            raise exceptions.RuntimeError,\
+                  'Cannot create a proxy without a connection.'
+        self.InitializeFromProxy(\
+            CreateProxy(pgroup, pname, connection))
     return aInitialize
-def __createGetProperty(pName):
+
+def _createGetProperty(pName):
     propName = pName
     def getProperty(self):
-        return self.GetPropertyWithName(propName)
+        return self.GetProperty(propName)
     return getProperty
-def __createSetProperty(pName):
+
+def _createSetProperty(pName):
     propName = pName
     def setProperty(self, value):
         return self.SetPropertyWithName(propName, value)
     return setProperty
-def FindClassForProxy(xmlName):
+
+def _findClassForProxy(xmlName):
     global sources, filters
     if xmlName in sources.__dict__:
         return sources.__dict__[xmlName]
@@ -915,8 +1074,8 @@ def FindClassForProxy(xmlName):
         return rendering.__dict__[xmlName]
     else:
         return None
-    
-def __createModule(groupName, mdl=None):
+
+def _createModule(groupName, mdl=None):
     pxm = vtkSMObject.GetProxyManager()
     pxm.InstantiateGroupPrototypes(groupName)
 
@@ -926,35 +1085,36 @@ def __createModule(groupName, mdl=None):
     for i in range(numProxies):
         pname = pxm.GetXMLProxyName(groupName, i)
         cdict = {}
-        cdict['Initialize'] = __createInitialize(groupName, pname)
+        cdict['Initialize'] = _createInitialize(groupName, pname)
         proto = pxm.GetPrototypeProxy(groupName, pname)
         iter = PropertyIterator(proto)
         for prop in iter:
-            propName = iter.GetKey()
-            propDoc = None
-            if prop.GetDocumentation():
-                propDoc = prop.GetDocumentation().GetDescription()
-            cdict[propName] = property(__createGetProperty(propName),
-                                       __createSetProperty(propName),
-                                       None,
-                                       propDoc)
+            if prop.IsA("vtkSMVectorProperty") or \
+               prop.IsA("vtkSMProxyProperty"):
+                propName = iter.GetKey()
+                propDoc = None
+                if prop.GetDocumentation():
+                    propDoc = prop.GetDocumentation().GetDescription()
+                cdict[propName] = property(_createGetProperty(propName),
+                                           _createSetProperty(propName),
+                                           None,
+                                           propDoc)
         if proto.GetDocumentation():
             cdict['__doc__'] = proto.GetDocumentation().GetDescription()
         cobj = type(pname, (Proxy,), cdict)
         mdl.__dict__[pname] = cobj
     return mdl
 
-def Finalize():
-    vtkInitializationHelper.Finalize()
-    
 if not vtkSMObject.GetProxyManager():
     vtkInitializationHelper.Initialize(sys.executable)
-    
-sources = __createModule('sources')
-filters = __createModule('filters')
-rendering = __createModule('representations')
-__createModule('newviews', rendering)
-__createModule("lookup_tables", rendering)
+
+_pyproxies = {}
+
+sources = _createModule('sources')
+filters = _createModule('filters')
+rendering = _createModule('representations')
+_createModule('newviews', rendering)
+_createModule("lookup_tables", rendering)
 
 def demo1():
     if not ActiveConnection:
@@ -968,13 +1128,15 @@ def demo1():
     # contains the name of the array and whether that array is to be
     # loaded
     arrayList = reader.PointResultArrayInfo
-    print arrayList
-    # Flip the read flag of all arrays
-    for idx in range(1, len(arrayList), 2):
-        arrayList[idx] = "1"
+    print arrayList.GetData()
     # Assign the list to the property that determines which arrays are read.
     # See the documentation for the exodus reader for details.
-    reader.PointResultArrayStatus = arrayList
+    reader.PointResultArrayStatus = arrayList.GetData()
+    arraystatus = reader.PointResultArrayStatus
+    # Flip the read flag of all arrays
+    for idx in range(1, len(arraystatus), 2):
+        arraystatus[idx] = "1"
+    print arraystatus.GetData()
     # Next create a default render view appropriate for the connection type.
     rv = CreateRenderView()
     # Create the matching representation
@@ -1056,7 +1218,7 @@ def demo2():
 
     rep2 = CreateRepresentation(cf, rv)
     
-    rv.Background = [0.4, 0.4, 0.6]
+    rv.Background = (0.4, 0.4, 0.6)
     # Reset the camera to include the whole thing
     rv.StillRender()
     rv.ResetCamera()
@@ -1086,7 +1248,7 @@ def demo2():
     pylab.plot(data)
     pylab.show()
     
-    return data
+    return (data, rv)
     
 def demo3():
     if not ActiveConnection:
@@ -1102,3 +1264,5 @@ def demo3():
     rv.StillRender()
     cf = filters.Contour()
     data = Fetch(ss)
+
+    return (data, rv)
