@@ -14,10 +14,11 @@
 =========================================================================*/
 #include "vtkSMAnimationSceneWriter.h"
 
-#include "vtkAnimationScene.h"
+#include "vtkAnimationCue.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMAnimationSceneProxy.h"
+#include "vtkSMIntVectorProperty.h"
 
 //-----------------------------------------------------------------------------
 class vtkSMAnimationSceneWriterObserver : public vtkCommand
@@ -50,7 +51,7 @@ protected:
   vtkSMAnimationSceneWriter* Target;
 };
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneWriter, "1.5");
+vtkCxxRevisionMacro(vtkSMAnimationSceneWriter, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMAnimationSceneWriter::vtkSMAnimationSceneWriter()
 {
@@ -109,7 +110,7 @@ void vtkSMAnimationSceneWriter::ExecuteEvent(vtkObject* vtkNotUsed(caller),
     if (!this->SaveFrame(cueInfo->AnimationTime))
       {
       // Save failed, abort.
-      this->AnimationScene->Stop();
+      this->AnimationScene->InvokeCommand("Stop");
       this->SaveFailed = true;
       }
     }
@@ -138,9 +139,9 @@ bool vtkSMAnimationSceneWriter::Save()
     }
 
   // Take the animation scene to the beginning.
-  double start_time =  this->AnimationScene->GetStartTime();
-  this->AnimationScene->SetAnimationTime(start_time);
+  this->AnimationScene->InvokeCommand("GoToFirst");
 
+  /*
   int play_mode = this->AnimationScene->GetPlayMode();
 
   // If play mode is real time, we switch it to sequence.
@@ -150,10 +151,17 @@ bool vtkSMAnimationSceneWriter::Save()
     {
     this->AnimationScene->SetPlayMode(vtkAnimationScene::PLAYMODE_SEQUENCE);
     }
+    */
 
   // Disable looping.
-  int loop = this->AnimationScene->GetLoop();
-  this->AnimationScene->SetLoop(0);
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->AnimationScene->GetProperty("Loop"));
+  int loop = ivp? ivp->GetElement(0) : 0;
+  if (ivp)
+    {
+    ivp->SetElement(0, 0);
+    this->AnimationScene->UpdateProperty("Loop");
+    }
 
   bool status = this->SaveInitialize();
   int caching = this->AnimationScene->GetCaching();
@@ -163,18 +171,26 @@ bool vtkSMAnimationSceneWriter::Save()
     {
     this->Saving = true;
     this->SaveFailed = false;
-    this->AnimationScene->Play();
+    this->AnimationScene->InvokeCommand("Play");
     this->Saving = false;
     }
 
   status = this->SaveFinalize() && status;
 
+  /*
   // Restore scene parameters, if changed.
   if (play_mode == vtkAnimationScene::PLAYMODE_REALTIME)
     {
     this->AnimationScene->SetPlayMode(play_mode);
     }
-  this->AnimationScene->SetLoop(loop);
+    */
+
+   if (ivp)
+    {
+    ivp->SetElement(0, loop);
+    this->AnimationScene->UpdateProperty("Loop");
+    }
+
   this->AnimationScene->SetCaching(caching);
 
   return status && (!this->SaveFailed);

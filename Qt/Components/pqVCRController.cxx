@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVCRController.h"
 
 // ParaView Server Manager includes.
-#include "vtkSMPVAnimationSceneProxy.h"
+#include "vtkSMProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMIntRangeDomain.h"
 
@@ -107,9 +107,9 @@ void pqVCRController::onPlay()
     return;
     }
 
-  vtkSMAnimationSceneProxy* scene = this->Scene->getAnimationSceneProxy();
-  scene->Play(); // NOTE: This is a blocking call, returns only after the
-                 // the animation has stopped.
+ this->Scene->getProxy()->InvokeCommand("Play");
+                       // NOTE: This is a blocking call, returns only after the
+                       // the animation has stopped.
 
   pqApplicationCore::instance()->render();
 }
@@ -155,7 +155,7 @@ void pqVCRController::onLoopPropertyChanged()
 //-----------------------------------------------------------------------------
 void pqVCRController::onLoop(bool checked)
 {
-  vtkSMAnimationSceneProxy* scene = this->Scene->getAnimationSceneProxy();
+  vtkSMProxy* scene = this->Scene->getProxy();
   pqSMAdaptor::setElementProperty(scene->GetProperty("Loop"),checked);
   scene->UpdateProperty("Loop");
 }
@@ -168,20 +168,14 @@ void pqVCRController::onPause()
     qDebug() << "No active scene. Cannot play.";
     return;
     }
-  vtkSMAnimationSceneProxy* scene = this->Scene->getAnimationSceneProxy();
-  scene->Stop();
+  this->Scene->getProxy()->InvokeCommand("Stop");
 }
   
 //-----------------------------------------------------------------------------
 void pqVCRController::onFirstFrame()
 {
   emit this->beginNonUndoableChanges();
-  vtkSMPVAnimationSceneProxy* scene = vtkSMPVAnimationSceneProxy::SafeDownCast(
-    this->Scene->getProxy());
-  if (scene)
-    {
-    scene->GoToFirst();
-    }
+  this->Scene->getProxy()->InvokeCommand("GoToFirst");
   emit this->endNonUndoableChanges();
 }
 
@@ -189,12 +183,7 @@ void pqVCRController::onFirstFrame()
 void pqVCRController::onPreviousFrame()
 {
   emit this->beginNonUndoableChanges();
-  vtkSMPVAnimationSceneProxy* scene = vtkSMPVAnimationSceneProxy::SafeDownCast(
-    this->Scene->getProxy());
-  if (scene)
-    {
-    scene->GoToPrevious();
-    }
+  this->Scene->getProxy()->InvokeCommand("GoToPrevious");
   emit this->endNonUndoableChanges();
 }
 
@@ -202,12 +191,7 @@ void pqVCRController::onPreviousFrame()
 void pqVCRController::onNextFrame()
 {
   emit this->beginNonUndoableChanges();
-  vtkSMPVAnimationSceneProxy* scene = vtkSMPVAnimationSceneProxy::SafeDownCast(
-    this->Scene->getProxy());
-  if (scene)
-    {
-    scene->GoToNext();
-    }
+  this->Scene->getProxy()->InvokeCommand("GoToNext");
   emit this->endNonUndoableChanges();
 }
 
@@ -215,12 +199,7 @@ void pqVCRController::onNextFrame()
 void pqVCRController::onLastFrame()
 {
   emit this->beginNonUndoableChanges();
-  vtkSMPVAnimationSceneProxy* scene = vtkSMPVAnimationSceneProxy::SafeDownCast(
-    this->Scene->getProxy());
-  if (scene)
-    {
-    scene->GoToLast();
-    }
+  this->Scene->getProxy()->InvokeCommand("GoToLast");
   emit this->endNonUndoableChanges();
 }
 

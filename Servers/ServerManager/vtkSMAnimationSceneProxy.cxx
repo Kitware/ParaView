@@ -14,10 +14,8 @@
 =========================================================================*/
 #include "vtkSMAnimationSceneProxy.h"
 
-#include "vtkAnimationScene.h"
+#include "vtkPVAnimationScene.h"
 #include "vtkClientServerStream.h"
-#include "vtkCollection.h"
-#include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -30,7 +28,7 @@
 #include <vtkstd/vector>
 
 //----------------------------------------------------------------------------
-class vtkSMAnimationSceneProxyInternals
+class vtkSMAnimationSceneProxy::vtkInternals
 {
 public:
   typedef vtkstd::vector<vtkSmartPointer<vtkSMViewProxy> > 
@@ -64,22 +62,6 @@ public:
       }
     }
 
-  void CleanCacheAllViews()
-    {
-    /* FIXME:UDA
-    VectorOfViews::iterator iter = this->ViewModules.begin();
-    for (; iter != this->ViewModules.end(); ++iter)
-      {
-      vtkSMRenderViewProxy* rm = vtkSMRenderViewProxy::SafeDownCast(
-        iter->GetPointer());
-      if (rm)
-        {
-        rm->InvalidateAllGeometries();
-        }
-      }
-      */
-    }
-
   void DisableInteractionAllViews()
     {
     VectorOfViews::iterator iter = this->ViewModules.begin();
@@ -110,59 +92,73 @@ public:
 
 };
 
+class vtkSMAnimationSceneProxy::vtkPlayerObserver : public vtkCommand
+{
+public:
+  static vtkPlayerObserver* New()
+    {
+    return new vtkPlayerObserver();
+    }
+  virtual void Execute(vtkObject*, unsigned long event, void* data)
+    {
+    if (this->Target)
+      {
+      if (event == vtkCommand::StartEvent)
+        {
+        this->Target->OnStartPlay(); 
+        }
+      else if (event == vtkCommand::EndEvent)
+        {
+        this->Target->OnEndPlay();
+        }
+      this->Target->InvokeEvent(event, data);
+      }
+    }
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.48");
+  void SetTarget(vtkSMAnimationSceneProxy* t)
+    {
+    this->Target = t;
+    }
+
+private:
+  vtkPlayerObserver()
+    {
+    this->Target = 0;
+    }
+  vtkSMAnimationSceneProxy* Target;
+};
+
+
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.49");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
 {
-  this->AnimationCueProxies = vtkCollection::New();
-  this->AnimationCueProxiesIterator = this->AnimationCueProxies->NewIterator();
-  this->GeometryCached = 0;
   this->OverrideStillRender = 0;
-  this->Internals = new vtkSMAnimationSceneProxyInternals();
-  this->PlayMode = SEQUENCE;
+  this->Internals = new vtkInternals();
   this->CacheLimit = 100*1024; // 100 MBs.
   this->Caching = 0;
+  this->AnimationPlayer = 0;
+  this->PlayerObserver = vtkPlayerObserver::New();
+  this->PlayerObserver->SetTarget(this);
 }
 
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::~vtkSMAnimationSceneProxy()
 {
-  this->AnimationCueProxies->Delete();
-  this->AnimationCueProxiesIterator->Delete();
+  if (this->AnimationPlayer)
+    {
+    this->AnimationPlayer->RemoveObserver(this->PlayerObserver);
+    }
+  this->PlayerObserver->SetTarget(0);
+  this->PlayerObserver->Delete();
   delete this->Internals;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMAnimationSceneProxy::CreateVTKObjects()
-{
-  if (this->ObjectsCreated)
-    {
-    return;
-    }
-  this->AnimationCue = vtkAnimationScene::New();
-  this->InitializeObservers(this->AnimationCue);
-  this->ObjectsCreated = 1;
-
-  this->Superclass::CreateVTKObjects();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMAnimationSceneProxy::InitializeObservers(vtkAnimationCue* cue)
-{
-  this->Superclass::InitializeObservers(cue);
-  if (cue)
-    {
-    cue->AddObserver(vtkCommand::StartEvent, this->Observer);
-    cue->AddObserver(vtkCommand::EndEvent, this->Observer);
-    }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::AddViewModule(vtkSMViewProxy* view)
 {
-  vtkSMAnimationSceneProxyInternals::VectorOfViews::iterator iter = 
+  vtkInternals::VectorOfViews::iterator iter = 
     this->Internals->ViewModules.begin();
   for (; iter != this->Internals->ViewModules.end(); ++iter)
     {
@@ -179,7 +175,7 @@ void vtkSMAnimationSceneProxy::AddViewModule(vtkSMViewProxy* view)
 void vtkSMAnimationSceneProxy::RemoveViewModule(
   vtkSMViewProxy* view)
 {
-  vtkSMAnimationSceneProxyInternals::VectorOfViews::iterator iter = 
+  vtkInternals::VectorOfViews::iterator iter = 
     this->Internals->ViewModules.begin();
   for (; iter != this->Internals->ViewModules.end(); ++iter)
     {
@@ -198,165 +194,59 @@ void vtkSMAnimationSceneProxy::RemoveAllViewModules()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMAnimationSceneProxy::Play()
+unsigned int vtkSMAnimationSceneProxy::GetNumberOfViewModules()
 {
-  vtkAnimationScene* scene = vtkAnimationScene::SafeDownCast(
-    this->AnimationCue);
-  if (scene)
-    {
-    this->Internals->DisableInteractionAllViews();
-    this->Internals->PassUseCache(this->GetCaching()>0);
-    scene->Play();
-    this->Internals->PassUseCache(false);
-    this->Internals->EnableInteractionAllViews();
-    }
+  return this->Internals->ViewModules.size();
 }
 
 //----------------------------------------------------------------------------
-int vtkSMAnimationSceneProxy::IsInPlay()
+vtkSMViewProxy* vtkSMAnimationSceneProxy::GetViewModule(
+  unsigned int cc)
 {
-  vtkAnimationScene* scene = vtkAnimationScene::SafeDownCast(
-    this->AnimationCue);
-  if (scene)
+  if (cc < this->Internals->ViewModules.size())
     {
-    return scene->IsInPlay();
+    return this->Internals->ViewModules[cc];
     }
   return 0;
 }
 
-//----------------------------------------------------------------------------
-void vtkSMAnimationSceneProxy::Stop()
-{
-  vtkAnimationScene* scene = vtkAnimationScene::SafeDownCast(
-    this->AnimationCue);
-  if (scene)
-    {
-    scene->Stop();
-    }
-
-}
 
 //----------------------------------------------------------------------------
-void vtkSMAnimationSceneProxy::SetLoop(int loop)
+void vtkSMAnimationSceneProxy::CreateVTKObjects()
 {
-  vtkAnimationScene* scene = vtkAnimationScene::SafeDownCast(
-    this->AnimationCue);
-  if (scene)
-    {
-    scene->SetLoop(loop);
-    }
-}
-
-//----------------------------------------------------------------------------
-int vtkSMAnimationSceneProxy::GetLoop()
-{
-  vtkAnimationScene* scene = vtkAnimationScene::SafeDownCast(
-    this->AnimationCue);
-  if (scene)
-    {
-    return scene->GetLoop();
-    }
-  vtkErrorMacro("VTK object not created yet");
-  return 0;
-}
-//----------------------------------------------------------------------------
-void vtkSMAnimationSceneProxy::SetFrameRate(double framerate)
-{
-  vtkAnimationScene* scene = vtkAnimationScene::SafeDownCast(
-    this->AnimationCue);
-  if (scene)
-    {
-    scene->SetFrameRate(framerate);
-    }
-}
-
-//----------------------------------------------------------------------------
-double vtkSMAnimationSceneProxy::GetFrameRate()
-{
-  vtkAnimationScene* scene = vtkAnimationScene::SafeDownCast(
-    this->AnimationCue);
-  if (scene)
-    {
-    return scene->GetFrameRate();
-    }
-  vtkErrorMacro("VTK object not created yet");
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMAnimationSceneProxy::AddCue(vtkSMProxy* proxy)
-{
-  vtkSMAnimationCueProxy* cue = vtkSMAnimationCueProxy::SafeDownCast(proxy);
-  if (!cue)
+  if (this->ObjectsCreated)
     {
     return;
     }
-  vtkAnimationScene* scene = vtkAnimationScene::SafeDownCast(
-    this->AnimationCue);
-  if (!scene)
+
+  this->AnimationPlayer = this->GetSubProxy("AnimationPlayer");
+  if (!this->AnimationPlayer)
+    {
+    vtkErrorMacro("Missing animation player subproxy");
+    return;
+    }
+
+  this->Superclass::CreateVTKObjects();
+
+  if (!this->ObjectsCreated)
     {
     return;
     }
-  if (this->AnimationCueProxies->IsItemPresent(cue))
-    {
-    vtkErrorMacro("Animation cue already present in the scene");
-    return;
-    }
-  // ensure that Cue objects have been created.
-  if (!cue->GetObjectsCreated())
-    {
-    cue->UpdateVTKObjects();
-    }
-  scene->AddCue(cue->GetAnimationCue());
-  this->AnimationCueProxies->AddItem(cue);
 
-  // since scene is a consumer of the cue, when cue gets modified, the scene's
-  // MarkModified() will be called.
-}
+  // Fire events from the player.
+  this->AnimationPlayer->AddObserver(vtkCommand::StartEvent, this->PlayerObserver);
+  this->AnimationPlayer->AddObserver(vtkCommand::EndEvent, this->PlayerObserver);
+  this->AnimationPlayer->AddObserver(vtkCommand::ProgressEvent, this->PlayerObserver);
 
-//----------------------------------------------------------------------------
-void vtkSMAnimationSceneProxy::RemoveCue(vtkSMProxy* proxy)
-{
-  vtkSMAnimationCueProxy* smCue = vtkSMAnimationCueProxy::SafeDownCast(proxy);
-  vtkAnimationScene* scene = vtkAnimationScene::SafeDownCast(
-    this->AnimationCue);
-  if (!smCue || !scene)
-    {
-    return;
-    }
-  if (!this->AnimationCueProxies->IsItemPresent(smCue))
-    {
-    return;
-    }
-  scene->RemoveCue(smCue->GetAnimationCue());
-  this->AnimationCueProxies->RemoveItem(smCue);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMAnimationSceneProxy::SetPlayMode(int mode)
-{
-  vtkAnimationScene* scene = vtkAnimationScene::SafeDownCast(
-    this->AnimationCue);
-
-  this->PlayMode = mode;
-  if (scene)
-    {
-    scene->SetPlayMode(mode);
-    }
-  // Caching is disabled when play mode is real time.
-  if (mode == vtkAnimationScene::PLAYMODE_REALTIME && this->Caching)
-    {
-    // We clean cache and hence forth, we dont call CacheUpdate()
-    // this will make sure that cache is not used when playing in 
-    // real time.
-    this->CleanCache();
-    }
-}
-
-//----------------------------------------------------------------------------
-int vtkSMAnimationSceneProxy::GetPlayMode()
-{
-  return this->PlayMode;
+  // Set the animation scene pointer on the player.
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  stream  << vtkClientServerStream::Invoke
+          << this->AnimationPlayer->GetID()
+          << "SetAnimationScene"
+          << this->GetID()
+          << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
 }
 
 //----------------------------------------------------------------------------
@@ -396,6 +286,20 @@ void vtkSMAnimationSceneProxy::EndCueInternal(void* info)
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMAnimationSceneProxy::OnStartPlay()
+{
+  this->Internals->DisableInteractionAllViews();
+  this->Internals->PassUseCache(this->GetCaching()>0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMAnimationSceneProxy::OnEndPlay()
+{
+  this->Internals->PassUseCache(false);
+  this->Internals->EnableInteractionAllViews();
+}
+
+//-----------------------------------------------------------------------------
 bool vtkSMAnimationSceneProxy::CheckCacheSizeWithinLimit()
 {
   vtkSmartPointer<vtkPVCacheSizeInformation> info = 
@@ -415,8 +319,7 @@ bool vtkSMAnimationSceneProxy::CheckCacheSizeWithinLimit()
 //----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::CacheUpdate(void* info)
 {
-  if (!this->GetCaching() || 
-      this->GetPlayMode() == vtkAnimationScene::PLAYMODE_REALTIME)
+  if (!this->GetCaching())
     {
     return;
     }
@@ -446,65 +349,25 @@ void vtkSMAnimationSceneProxy::CacheUpdate(void* info)
 
   double cachetime = cueInfo->AnimationTime;
   this->Internals->PassCacheTime(cachetime);
-  this->GeometryCached = 1;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMAnimationSceneProxy::CleanCache()
-{
-  if (this->GeometryCached)
-    {    
-    this->Internals->CleanCacheAllViews();
-    this->GeometryCached = 0;
-    }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::SetAnimationTime(double time)
 {
-  if (this->AnimationCue)
+  vtkPVAnimationScene* scene = 
+    vtkPVAnimationScene::SafeDownCast(this->AnimationCue);
+  if (scene)
     {
     this->Internals->PassUseCache(this->GetCaching()>0);
-    this->AnimationCue->Initialize();
-    this->AnimationCue->Tick(time,0);
+    scene->SetCurrentTime(time);
     this->Internals->PassUseCache(false);
     }
-}
-
-//----------------------------------------------------------------------------
-unsigned int vtkSMAnimationSceneProxy::GetNumberOfViewModules()
-{
-  return this->Internals->ViewModules.size();
-}
-
-//----------------------------------------------------------------------------
-vtkSMViewProxy* vtkSMAnimationSceneProxy::GetViewModule(
-  unsigned int cc)
-{
-  if (cc < this->Internals->ViewModules.size())
-    {
-    return this->Internals->ViewModules[cc];
-    }
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMAnimationSceneProxy::ExecuteEvent(
-  vtkObject* wdg, unsigned long event, void* calldata)
-{
-  if (event == vtkCommand::StartEvent || event == vtkCommand::EndEvent)
-    {
-    this->InvokeEvent(event);
-    return;
-    }
-  this->Superclass::ExecuteEvent(wdg, event, calldata);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "PlayMode: "<< this->PlayMode << endl;
   os << indent << "OverrideStillRender: " << this->OverrideStillRender << endl;
   os << indent << "CacheLimit: " << this->CacheLimit << endl;
 }

@@ -10,6 +10,7 @@ ENDIF(PARAVIEW_ENABLE_PYTHON)
 
 
 SET(Filters_SRCS
+  vtkAnimationPlayer.cxx
   vtkAppendRectilinearGrid.cxx
   vtkAttributeDataReductionFilter.cxx
   vtkCameraManipulator.cxx
@@ -124,6 +125,11 @@ SET(Filters_SRCS
   vtkXMLCollectionReader.cxx
   vtkXMLPVAnimationWriter.cxx
   vtkXMLPVDWriter.cxx
+
+  vtkRealtimeAnimationPlayer.cxx
+  vtkTimestepsAnimationPlayer.cxx
+  vtkSequenceAnimationPlayer.cxx
+  vtkCompositeAnimationPlayer.cxx
   )
 
 SET_SOURCE_FILES_PROPERTIES(
@@ -135,7 +141,8 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSpyPlotReaderMap.cxx
   WRAP_EXCLUDE)
 
-SET_SOURCE_FILES_PROPERTIES( 
+SET_SOURCE_FILES_PROPERTIES(
+  vtkAnimationPlayer.cxx
   vtkCameraManipulatorGUIHelper.cxx
   vtkImageCompressor.cxx
   vtkPVRenderViewProxy.cxx

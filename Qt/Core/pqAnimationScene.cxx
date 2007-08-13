@@ -105,7 +105,10 @@ pqAnimationScene::pqAnimationScene(const QString& group, const QString& name,
     this, SIGNAL(frameCountChanged()));
 
   this->Internals->VTKConnect->Connect(
-    proxy->GetProperty("ClockTimeRange"), vtkCommand::ModifiedEvent,
+    proxy->GetProperty("StartTime"), vtkCommand::ModifiedEvent,
+    this, SIGNAL(clockTimeRangesChanged()));
+  this->Internals->VTKConnect->Connect(
+    proxy->GetProperty("EndTime"), vtkCommand::ModifiedEvent,
     this, SIGNAL(clockTimeRangesChanged()));
   this->onCuesChanged();
 
@@ -124,6 +127,17 @@ pqAnimationScene::~pqAnimationScene()
 vtkSMAnimationSceneProxy* pqAnimationScene::getAnimationSceneProxy() const
 {
   return vtkSMAnimationSceneProxy::SafeDownCast(this->getProxy());
+}
+
+//-----------------------------------------------------------------------------
+void  pqAnimationScene::setDefaultPropertyValues()
+{
+  this->Superclass::setDefaultPropertyValues();
+
+  // Create an animation cue for the pipeline time.
+  this->createCueInternal("TimeAnimationCue",
+    this->getServer()->getTimeKeeper()->getProxy(),
+    "Time", 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -152,7 +166,7 @@ void pqAnimationScene::setupTimeTrack()
   this->Internals->TimeLink->AddLinkedProperty(
     timekeeper->getProxy(), "Time", vtkSMLink::INPUT);
   this->Internals->TimeLink->AddLinkedProperty(
-    this->getProxy(), "ClockTime", vtkSMLink::OUTPUT);
+    this->getProxy(), "AnimationTime", vtkSMLink::OUTPUT);
   timekeeper->getProxy()->GetProperty("Time")->Modified();
 
   this->updateTimeRanges();
@@ -179,13 +193,13 @@ void pqAnimationScene::updateTimeRanges()
                                 sceneProxy->GetProperty("ClockTimeRangeLocks"));
     if (!locks[0].toBool())
       {
-      pqSMAdaptor::setMultipleElementProperty(
-                     sceneProxy->GetProperty("ClockTimeRange"), 0, range.first);
+      pqSMAdaptor::setElementProperty(
+                     sceneProxy->GetProperty("StartTime"), range.first);
       }
     if (!locks[1].toBool())
       {
-      pqSMAdaptor::setMultipleElementProperty(
-                    sceneProxy->GetProperty("ClockTimeRange"), 1, range.second);
+      pqSMAdaptor::setElementProperty(
+                    sceneProxy->GetProperty("EndTime"), range.second);
       }
     }
 
@@ -193,7 +207,7 @@ void pqAnimationScene::updateTimeRanges()
   vtkSMProperty *playModeProperty = sceneProxy->GetProperty("PlayMode");
   if (timekeeper->getNumberOfTimeStepValues() == 0)
     {
-    if (   pqSMAdaptor::getEnumerationProperty(playModeProperty)
+    if (pqSMAdaptor::getEnumerationProperty(playModeProperty)
         == "Snap To TimeSteps" )
       {
       pqSMAdaptor::setEnumerationProperty(playModeProperty, "Sequence");
@@ -209,9 +223,11 @@ void pqAnimationScene::updateTimeRanges()
 //-----------------------------------------------------------------------------
 QPair<double, double> pqAnimationScene::getClockTimeRange() const
 {
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("ClockTimeRange"));
-  return QPair<double,double>(values[0].toDouble(), values[1].toDouble());
+  double start = pqSMAdaptor::getElementProperty(
+    this->getProxy()->GetProperty("StartTime")).toDouble();
+  double end = pqSMAdaptor::getElementProperty(
+    this->getProxy()->GetProperty("EndTime")).toDouble();
+  return QPair<double,double>(start, end);
 }
 
 //-----------------------------------------------------------------------------
@@ -300,28 +316,28 @@ pqAnimationCue* pqAnimationScene::getCue(vtkSMProxy* proxy,
 pqAnimationCue* pqAnimationScene::createCue(vtkSMProxy* proxy, 
   const char* propertyname, int index) 
 {
-  return this->createCueInternal("KeyFrameAnimationCueManipulator",
+  return this->createCueInternal("KeyFrameAnimationCue",
     proxy, propertyname, index);
 }
 
 //-----------------------------------------------------------------------------
 pqAnimationCue* pqAnimationScene::createCue(vtkSMProxy* proxy, 
-  const char* propertyname, int index, const QString& manip_type) 
+  const char* propertyname, int index, const QString& cuetype) 
 {
-  return this->createCueInternal(manip_type,
+  return this->createCueInternal(cuetype,
     proxy, propertyname, index);
 }
 
 //-----------------------------------------------------------------------------
-pqAnimationCue* pqAnimationScene::createCueInternal(const QString& mtype,
+pqAnimationCue* pqAnimationScene::createCueInternal(const QString& cuetype,
   vtkSMProxy* proxy, const char* propertyname, int index) 
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smmodel = core->getServerManagerModel();
 
   pqObjectBuilder* builder = core->getObjectBuilder();
-  vtkSMProxy* cueProxy = builder->createProxy("animation", "AnimationCue", 
-    this->getServer(), "animation");
+  vtkSMProxy* cueProxy = builder->createProxy(
+    "animation", cuetype.toAscii().data(), this->getServer(), "animation");
   cueProxy->SetServers(vtkProcessModule::CLIENT);
   pqAnimationCue* cue = smmodel->findItem<pqAnimationCue*>(cueProxy);
   if (!cue)
@@ -329,7 +345,6 @@ pqAnimationCue* pqAnimationScene::createCueInternal(const QString& mtype,
     qDebug() << "Failed to create AnimationCue.";
     return 0;
     }
-  cue->setManipulatorType(mtype);
   cue->setDefaultPropertyValues();
 
   pqSMAdaptor::setProxyProperty(cueProxy->GetProperty("AnimatedProxy"), proxy);
@@ -344,7 +359,6 @@ pqAnimationCue* pqAnimationScene::createCueInternal(const QString& mtype,
 
   // We don't directly add this cue to the internal Cues, it will get added
   // as a side effect of the change in the "Cues" property.
-
   return cue;
 }
 
@@ -425,13 +439,13 @@ QSize pqAnimationScene::getViewSize() const
 //-----------------------------------------------------------------------------
 void pqAnimationScene::play()
 {
-  this->getAnimationSceneProxy()->Play();
+  this->getProxy()->InvokeCommand("Play");
 }
 
 //-----------------------------------------------------------------------------
 void pqAnimationScene::pause()
 {
-  this->getAnimationSceneProxy()->Stop();
+  this->getProxy()->InvokeCommand("Stop");
 }
 
 //-----------------------------------------------------------------------------

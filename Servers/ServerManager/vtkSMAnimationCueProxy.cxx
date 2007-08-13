@@ -15,16 +15,16 @@
 #include "vtkSMAnimationCueProxy.h"
 
 #include "vtkAnimationCue.h"
-#include "vtkObjectFactory.h"
 #include "vtkCommand.h"
+#include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
+#include "vtkSMAnimationCueManipulatorProxy.h"
 #include "vtkSMDomain.h"
+#include "vtkSMDomainIterator.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMAnimationCueManipulatorProxy.h"
-#include "vtkSMDomainIterator.h"
-#include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.24");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.25");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
@@ -80,13 +80,10 @@ vtkSMAnimationCueProxy::vtkSMAnimationCueProxy()
 //----------------------------------------------------------------------------
 vtkSMAnimationCueProxy::~vtkSMAnimationCueProxy()
 {
+  this->AnimationCue = 0;
   this->Observer->Delete();
   this->SetAnimatedProxy(0);
   this->SetManipulator(0);
-  if (this->AnimationCue)
-    {
-    this->AnimationCue->Delete();
-    }
   this->SetAnimatedPropertyName(0);
   this->SetAnimatedDomainName(0);
 }
@@ -105,11 +102,15 @@ void vtkSMAnimationCueProxy::CreateVTKObjects()
     return;
     }
 
-  this->AnimationCue = vtkAnimationCue::New();
+  // Ensure that all vtk objects are created only on the client side.
+  this->SetServers(vtkProcessModule::CLIENT);
+
+  this->Superclass::CreateVTKObjects();
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  this->AnimationCue = vtkAnimationCue::SafeDownCast(
+    pm->GetObjectFromID(this->GetID()));
   this->InitializeObservers(this->AnimationCue);
-  this->ObjectsCreated = 1; //since we don't have any serverside-vtkobjects
-  //we set the objects created flag so that vtkSMProxy does not
-  //attempt to create objects.
 
   // If Manipulator subproxy is defined, the manipulator is set the xml
   // configuration.
@@ -120,8 +121,6 @@ void vtkSMAnimationCueProxy::CreateVTKObjects()
     {
     this->SetManipulator(manip);
     }
-
-  this->Superclass::CreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -206,9 +205,11 @@ void vtkSMAnimationCueProxy::ExecuteEvent(vtkObject* obj, unsigned long event,
     case vtkCommand::StartAnimationCueEvent:
       this->StartCueInternal(calldata);
       break;
+
     case vtkCommand::EndAnimationCueEvent:
       this->EndCueInternal(calldata);
       break;
+
     case vtkCommand::AnimationCueTickEvent:
       this->TickInternal(calldata);
       break;
@@ -279,60 +280,10 @@ double vtkSMAnimationCueProxy::GetDeltaTime()
   return (this->AnimationCue)? this->AnimationCue->GetDeltaTime() : 0.0;
 }
 
-
 //----------------------------------------------------------------------------
-void vtkSMAnimationCueProxy::SetTimeMode(int mode)
+double vtkSMAnimationCueProxy::GetClockTime()
 {
-  if (!this->ObjectsCreated)
-    {
-    vtkErrorMacro("Not created yet.")
-    return ;
-    }
-  this->AnimationCue->SetTimeMode(mode);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMAnimationCueProxy::SetStartTime(double time)
-{
-  if (!this->ObjectsCreated)
-    {
-    vtkErrorMacro("Not created yet.")
-    return ;
-    }
-  this->AnimationCue->SetStartTime(time);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMAnimationCueProxy::SetEndTime(double time)
-{
-  if (!this->ObjectsCreated)
-    {
-    vtkErrorMacro("Not created yet.")
-    return ;
-    }
-  this->AnimationCue->SetEndTime(time);
-}
-
-//----------------------------------------------------------------------------
-double vtkSMAnimationCueProxy::GetEndTime()
-{
-  if (!this->ObjectsCreated)
-    {
-    vtkErrorMacro("Not created yet.")
-    return 0;
-    }
-  return this->AnimationCue->GetEndTime();
-}
-
-//----------------------------------------------------------------------------
-double vtkSMAnimationCueProxy::GetStartTime()
-{
-  if (!this->ObjectsCreated)
-    {
-    vtkErrorMacro("Not created yet.")
-    return 0;
-    }
-  return this->AnimationCue->GetStartTime();
+  return (this->AnimationCue)? this->AnimationCue->GetClockTime() : 0.0;
 }
 
 //----------------------------------------------------------------------------

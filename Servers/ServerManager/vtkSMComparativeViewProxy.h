@@ -23,7 +23,7 @@
 
 #include "vtkSMViewProxy.h"
 
-class vtkSMPVAnimationSceneProxy;
+class vtkSMAnimationSceneProxy;
 class vtkCollection;
 
 class VTK_EXPORT vtkSMComparativeViewProxy : public vtkSMViewProxy
@@ -160,12 +160,12 @@ protected:
 
   // Description:
   // Update comparative scene.
-  void UpdateComparativeVisualization(vtkSMPVAnimationSceneProxy* sceneX,
-    vtkSMPVAnimationSceneProxy* sceneY);
+  void UpdateComparativeVisualization(vtkSMAnimationSceneProxy* sceneX,
+    vtkSMAnimationSceneProxy* sceneY);
 
   // Description:
   // Update timestrip scene.
-  void UpdateFilmStripVisualization(vtkSMPVAnimationSceneProxy* scene);
+  void UpdateFilmStripVisualization(vtkSMAnimationSceneProxy* scene);
 
   // Description:
   // Marks the view dirty i.e. on next StillRender it needs to regenerate the
@@ -182,8 +182,8 @@ protected:
   int ViewSize[2];
   int Spacing[2];
 
-  vtkSMPVAnimationSceneProxy* AnimationSceneX;
-  vtkSMPVAnimationSceneProxy* AnimationSceneY;
+  vtkSMAnimationSceneProxy* AnimationSceneX;
+  vtkSMAnimationSceneProxy* AnimationSceneY;
 
   bool SceneOutdated;
 

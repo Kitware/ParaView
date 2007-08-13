@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationKeyFrame.h"
 
 #include "vtkSMProxy.h"
-#include "vtkSMPVAnimationSceneProxy.h"
 
 #include "pqApplicationCore.h"
 #include "pqServerManagerModel.h"
@@ -135,33 +134,34 @@ public:
   int numberOfTicks()
     {
     vtkSMProxy* pxy = this->Scene->getProxy();
-    int mode =
-      pqSMAdaptor::getElementProperty(pxy->GetProperty("PlayMode")).toInt();
+    QString mode =
+      pqSMAdaptor::getEnumerationProperty(pxy->GetProperty("PlayMode")).toString();
 
     int num = 0;
     
-    if(mode == vtkSMPVAnimationSceneProxy::SEQUENCE)
+    if(mode == "Sequence")
       {
       num = 
         pqSMAdaptor::getElementProperty(
           pxy->GetProperty("NumberOfFrames")).toInt();
       }
-    else if(mode == vtkSMPVAnimationSceneProxy::SNAP_TO_TIMESTEPS)
+    else if(mode == "Snap To TimeSteps")
       {
       pqTimeKeeper* tk = this->Scene->getServer()->getTimeKeeper();
       num = tk->getNumberOfTimeStepValues();
       }
     return num;
     }
+
   double getAnimationWidgetTime(double time)
     {
     vtkSMProxy* pxy = this->Scene->getProxy();
-    int mode =
-      pqSMAdaptor::getElementProperty(pxy->GetProperty("PlayMode")).toInt();
-    
+    QString mode =
+      pqSMAdaptor::getEnumerationProperty(pxy->GetProperty("PlayMode")).toString();
+
     // we show equi-distant tick points for snap to timestep mode
     // regardless of spacing in time
-    if(mode == vtkSMPVAnimationSceneProxy::SNAP_TO_TIMESTEPS)
+    if(mode == "Snap To TimeSteps")
       {
       pqTimeKeeper* timekeeper = 
         this->Scene->getServer()->getTimeKeeper();
@@ -398,19 +398,20 @@ void pqAnimationViewWidget::updatePlayMode()
 {
   pqAnimationModel* animModel =
     this->Internal->AnimationWidget->animationModel();
-  vtkSMProxy* pxy = this->Internal->Scene->getAnimationSceneProxy();
-  int mode =
-    pqSMAdaptor::getElementProperty(pxy->GetProperty("PlayMode")).toInt();
+  vtkSMProxy* pxy = this->Internal->Scene->getProxy();
 
-  if(mode == vtkSMPVAnimationSceneProxy::REALTIME)
+  QString mode = pqSMAdaptor::getEnumerationProperty(
+    pxy->GetProperty("PlayMode")).toString();
+
+  if(mode == "Realtime")
     {
     animModel->setMode(pqAnimationModel::Real);
     }
-  else if(mode == vtkSMPVAnimationSceneProxy::SEQUENCE)
+  else if(mode == "Sequence")
     {
     animModel->setMode(pqAnimationModel::Sequence);
     }
-  else if(mode == vtkSMPVAnimationSceneProxy::SNAP_TO_TIMESTEPS)
+  else if(mode == "Snap To TimeSteps")
     {
     animModel->setMode(pqAnimationModel::Sequence);
     }

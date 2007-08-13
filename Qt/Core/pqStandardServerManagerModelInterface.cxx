@@ -133,7 +133,7 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
     }
   else if (group == "animation")
     {
-    if (proxy->IsA("vtkSMPVAnimationSceneProxy"))
+    if (proxy->IsA("vtkSMAnimationSceneProxy"))
       {
       return new pqAnimationScene(group, name, proxy, server, 0);
       }

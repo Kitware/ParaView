@@ -15,7 +15,7 @@
 // .NAME vtkSMAnimationCueProxy - proxy for vtkAnimationCue.
 // .SECTION Description
 // This is a proxy for vtkAnimationCue. All animation proxies are client 
-// side proxies, i.e. they don't create any VTK objects on the server.
+// side proxies.
 // This class needs a vtkSMAnimationCueManipulatorProxy. The \b Manipulator
 // performs the actual interpolation.
 // .SECTION See Also
@@ -84,32 +84,13 @@ public:
   vtkGetObjectMacro(Manipulator, vtkSMAnimationCueManipulatorProxy);
 
   // Description:
-  // Set's the vtkAnimationCue time mode.
-  void SetTimeMode(int mode);
-
-  // Description:
-  // Set's the vtkAnimationCue start time.
-  void SetStartTime(double time);
-  double GetStartTime();
-  
-  // Description:
-  // Set's the vtkAnimationCue's end time.
-  void SetEndTime(double time);
-  double GetEndTime();
-
+  // Get the property being animated.
   vtkSMProperty* GetAnimatedProperty();
+
+  // Description:
+  // Get the domain being animated.
   vtkSMDomain* GetAnimatedDomain();
 
-  vtkGetObjectMacro(AnimationCue, vtkAnimationCue);
-
-//BTX
-  // Description:
-  // Simply returns the \c SelfID for this class. Legacy 
-  // from the days when \c GetSelfID was not public. Will
-  // eventually be deprecated in favour of \c GetSelfID().
-  vtkClientServerID GetID() { return this->GetSelfID(); }
-//ETX
- 
   // Description:
   // This copies a clone of the AnimationCue. The AnimatedProxy
   // is shallow copied, while the Manipulator, and the keyframes
@@ -127,6 +108,13 @@ public:
   // Before firing the event the animation cue sets the DeltaTime
   // to the difference in time between the current tick and the last tick.
   double GetDeltaTime();
+
+  // Description:
+  // This is valid only in a AnimationCueTickEvent handler. 
+  // Before firing the event the animation cue sets the ClockTime to
+  // the time of the tick. ClockTime is directly the time from the animation
+  // scene neither normalized nor offsetted to the start of the scene.
+  double GetClockTime();
 
   // Description:
   // Enable/Disable this cue.

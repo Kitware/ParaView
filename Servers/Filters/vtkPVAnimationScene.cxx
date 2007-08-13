@@ -1,11 +1,11 @@
 /*=========================================================================
 
-  Program:   ParaView
+  Program:   Visualization Toolkit
   Module:    vtkPVAnimationScene.cxx
 
-  Copyright (c) Kitware, Inc.
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
-  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
      This software is distributed WITHOUT ANY WARRANTY; without even
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
@@ -14,175 +14,139 @@
 =========================================================================*/
 #include "vtkPVAnimationScene.h"
 
+#include "vtkCollection.h"
+#include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkTimerLog.h"
 
-#include <vtkstd/set>
-
-class vtkPVAnimationSceneSetOfDouble : public vtkstd::set<double> {};
-
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.5");
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.4");
-//-----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
 vtkPVAnimationScene::vtkPVAnimationScene()
 {
-  this->TimeSteps = new vtkPVAnimationSceneSetOfDouble;
-  this->FramesPerTimestep = 1;
+  this->AnimationCues = vtkCollection::New();
+  this->AnimationCuesIterator = this->AnimationCues->NewIterator();
+  this->CurrentTime = 0;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkPVAnimationScene::~vtkPVAnimationScene()
 {
-  delete this->TimeSteps;
+  this->AnimationCuesIterator->Delete();
+  this->AnimationCues->Delete();
 }
 
-
-//-----------------------------------------------------------------------------
-void vtkPVAnimationScene::AddTimeStep(double time)
+//----------------------------------------------------------------------------
+void vtkPVAnimationScene::AddCue(vtkAnimationCue* cue)
 {
-  this->TimeSteps->insert(time);
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVAnimationScene::RemoveTimeStep(double time)
-{
-  vtkPVAnimationSceneSetOfDouble::iterator iter =
-    this->TimeSteps->find(time);
-  if (iter != this->TimeSteps->end())
+  if (this->AnimationCues->IsItemPresent(cue))
     {
-    this->TimeSteps->erase(iter);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVAnimationScene::RemoveAllTimeSteps()
-{
-  this->TimeSteps->clear();
-}
-
-//-----------------------------------------------------------------------------
-unsigned int vtkPVAnimationScene::GetNumberOfTimeSteps()
-{
-  return static_cast<unsigned int>(this->TimeSteps->size());
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVAnimationScene::Play()
-{
-  if (this->PlayMode != PLAYMODE_TIMESTEPS)
-    {
-    this->Superclass::Play();
+    vtkErrorMacro("Animation cue already present in the scene");
     return;
     }
 
-  if (this->InPlay)
+  this->AnimationCues->AddItem(cue);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationScene::RemoveCue(vtkAnimationCue* cue)
+{
+  this->AnimationCues->RemoveItem(cue);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationScene::RemoveAllCues()
+{  
+  this->AnimationCues->RemoveAllItems();
+}
+//----------------------------------------------------------------------------
+int vtkPVAnimationScene::GetNumberOfCues()
+{
+  return this->AnimationCues->GetNumberOfItems();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationScene::InitializeChildren()
+{
+  // run thr all the cues and init them.
+  vtkCollectionIterator *it = this->AnimationCuesIterator;
+  for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
     {
-    return;
-    }
-
-  if (this->TimeMode == vtkAnimationCue::TIMEMODE_NORMALIZED)
-    {
-    vtkErrorMacro("Cannot play a scene with normalized time mode");
-    return;
-    }
-  if (this->EndTime <= this->StartTime)
-    {
-    vtkErrorMacro("Scene start and end times are not suitable for playing");
-    return;
-    }
-
-  this->InvokeEvent(vtkCommand::StartEvent);
-
-  this->InPlay = 1;
-  this->StopPlay = 0;
-
-  double frame_count = this->FramesPerTimestep>1? this->FramesPerTimestep: 1.0;
- 
-  double cycle_start_time = this->AnimationTime;
-  // adjust cycle_start_time to a valid time.
-  cycle_start_time = (cycle_start_time < this->StartTime || cycle_start_time >= this->EndTime)?
-    this->StartTime : cycle_start_time;
-  do
-    {
-    this->Initialize(); // Set the Scene in unintialized mode.
-
-    vtkPVAnimationSceneSetOfDouble::iterator iter = this->TimeSteps->lower_bound(cycle_start_time);
-    if (iter == this->TimeSteps->end())
+    vtkAnimationCue* cue = 
+      vtkAnimationCue::SafeDownCast(it->GetCurrentObject());
+    if (cue)
       {
-      break;
+      cue->Initialize();
       }
-    double deltatime = 0.0;
-    do
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationScene::FinalizeChildren()
+{
+  vtkCollectionIterator *it = this->AnimationCuesIterator;
+  for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
+    {
+    vtkAnimationCue* cue = 
+      vtkAnimationCue::SafeDownCast(it->GetCurrentObject());
+    if (cue)
       {
-      this->Tick((*iter), deltatime);
+      cue->Finalize();
+      }
+    }
+}
 
-      // needed to compute delta times.
-      double previous_tick_time = (*iter);
-      iter++;
+//----------------------------------------------------------------------------
+void vtkPVAnimationScene::StartCueInternal()
+{
+  this->Superclass::StartCueInternal();
+  this->InitializeChildren();
+}
 
-      if (iter == this->TimeSteps->end())
+//----------------------------------------------------------------------------
+void vtkPVAnimationScene::TickInternal(
+  double currenttime, double deltatime, double clocktime)
+{
+  this->CurrentTime = currenttime;
+
+  vtkCollectionIterator* iter = this->AnimationCuesIterator;
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    vtkAnimationCue* cue = vtkAnimationCue::SafeDownCast(
+      iter->GetCurrentObject());
+    if (cue)
+      {
+      switch(cue->GetTimeMode())
         {
+      case vtkAnimationCue::TIMEMODE_RELATIVE:
+        cue->Tick(currenttime - this->StartTime, deltatime, clocktime);
         break;
+
+      case vtkAnimationCue::TIMEMODE_NORMALIZED:
+        cue->Tick( (currenttime - this->StartTime) / (this->EndTime - this->StartTime),
+          deltatime / (this->EndTime - this->StartTime), clocktime);
+        break;
+
+      default:
+        vtkErrorMacro("Invalid cue time mode");
         }
-
-      if (frame_count> 1)
-        {
-        double increment = ((*iter)-previous_tick_time)/frame_count;
-        double itime = previous_tick_time+increment;
-        for (int cc=0; cc < frame_count-1; cc++)
-          {
-          this->Tick(itime, increment);
-          previous_tick_time = itime;
-          itime += increment;
-          }
-        }
-
-      deltatime = (*iter) - previous_tick_time;
-      deltatime = (deltatime < 0)? -1*deltatime : deltatime;
-      } while (!this->StopPlay && this->CueState != vtkAnimationCue::INACTIVE);
-
-    // End of loop for 1 cycle.
-    cycle_start_time = this->StartTime;
-    } while (this->Loop && !this->StopPlay);
-
-  this->StopPlay = 0;
-  this->InPlay = 0;
-
-  this->InvokeEvent(vtkCommand::EndEvent);
-}
-
-
-//-----------------------------------------------------------------------------
-double vtkPVAnimationScene::GetNextTimeStep(double timestep)
-{
-  vtkPVAnimationSceneSetOfDouble::iterator iter = 
-    this->TimeSteps->upper_bound(timestep);
-  if (iter == this->TimeSteps->end())
-    {
-    return timestep;
-    }
-  return (*iter);
-}
-
-//-----------------------------------------------------------------------------
-double vtkPVAnimationScene::GetPreviousTimeStep(double timestep)
-{
-  double value = timestep;
-  vtkPVAnimationSceneSetOfDouble::iterator iter = this->TimeSteps->begin();
-  for (;iter != this->TimeSteps->end(); ++iter)
-    {
-    if ((*iter) >= timestep)
-      {
-      return value;
       }
-    value = (*iter);
     }
-  return value;
+
+  this->Superclass::TickInternal(currenttime, deltatime, clocktime);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+void vtkPVAnimationScene::EndCueInternal()
+{
+  this->FinalizeChildren();
+  this->Superclass::EndCueInternal();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVAnimationScene::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "FramesPerTimestep: " << this->FramesPerTimestep << endl;
 }

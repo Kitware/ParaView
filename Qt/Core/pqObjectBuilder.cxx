@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QFileInfo>
 
+#include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
 #include "pqComparativeRenderView.h"
 #include "pqDataRepresentation.h"
@@ -533,6 +534,28 @@ pqScalarBarRepresentation* pqObjectBuilder::createScalarBarDisplay(
   emit this->scalarBarDisplayCreated(scalarBar);
   emit this->proxyCreated(scalarBar);
   return scalarBar;
+}
+
+//-----------------------------------------------------------------------------
+pqAnimationScene* pqObjectBuilder::createAnimationScene(pqServer* server)
+{
+  vtkSMProxy* proxy = 
+    this->createProxyInternal("animation", "AnimationScene", server, "animation");
+  if (proxy)
+    {
+    proxy->SetServers(vtkProcessModule::CLIENT);
+    proxy->UpdateVTKObjects();
+
+    pqAnimationScene* scene = pqApplicationCore::instance()->
+      getServerManagerModel()->findItem<pqAnimationScene*>(proxy);
+
+    // initialize the scene.
+    scene->setDefaultPropertyValues();
+    emit this->proxyCreated(scene);
+    return scene;
+    }
+
+  return 0;
 }
 
 //-----------------------------------------------------------------------------

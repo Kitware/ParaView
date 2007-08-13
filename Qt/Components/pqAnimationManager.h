@@ -71,12 +71,6 @@ public:
   pqAnimationCue* getCue(pqAnimationScene* scene, 
     vtkSMProxy* proxy, const char* propertyname, int index) const;
 
-  // Creates a cue and adds it to the scene. Intializes the cue
-  // so that it animates the \c index'th element of 
-  // given \c property on the \c proxy.
-  pqAnimationCue* createCue(pqAnimationScene* scene, 
-    vtkSMProxy* proxy, const char* propertyname, int index);
-
   // Saves the animation from the active scene. The active scene
   // is determined using the active server.
   // Returns true if the save was successful.

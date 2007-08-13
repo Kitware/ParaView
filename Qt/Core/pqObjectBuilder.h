@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 #include <QMap>
 
+class pqAnimationScene;
 class pqDataRepresentation;
 class pqNameCount;
 class pqOutputPort;
@@ -123,6 +124,10 @@ public:
   /// in the view.
   virtual pqScalarBarRepresentation* createScalarBarDisplay(
     pqScalarsToColors* lookupTable, pqView* view);
+
+
+  /// Creates an animation scene on the given server connection.
+  virtual pqAnimationScene* createAnimationScene(pqServer* server);
 
   /// Convenience method to create a proxy of any type on the given server.
   /// One can alternatively use the vtkSMProxyManager to create new proxies 

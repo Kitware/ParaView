@@ -1,89 +1,85 @@
 /*=========================================================================
 
-  Program:   ParaView
+  Program:   Visualization Toolkit
   Module:    vtkPVAnimationScene.h
 
-  Copyright (c) Kitware, Inc.
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
-  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
      This software is distributed WITHOUT ANY WARRANTY; without even
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVAnimationScene - vtkAnimationScene subclass
-// that adds a new play mode to play through available timesteps.
+// .NAME vtkPVAnimationScene - the animation scene manager.
 // .SECTION Description
-// vtkAnimationScene subclass
-// that adds a new play mode to play through available timesteps. 
-// Note that when playing in PLAYMODE_TIMESTEPS mode, the frame-rate
-// is not used at all, instead FramesPerTimestep is
-// used to imply number of frames per timestep.
+// vtkAnimationCue and vtkPVAnimationScene provide the framework to support
+// animations in VTK. vtkAnimationCue represents an entity that changes/
+// animates with time, while vtkPVAnimationScene represents scene or setup 
+// for the animation, which consists of individual cues or other scenes.
+//
+// A scene can be played in real time mode, or as a seqence of frames
+// 1/frame rate apart in time.
+// .SECTION See Also
+// vtkAnimationCue
 
 #ifndef __vtkPVAnimationScene_h
 #define __vtkPVAnimationScene_h
 
-#include "vtkAnimationScene.h"
+#include "vtkAnimationCue.h"
 
-class vtkPVAnimationSceneSetOfDouble;
+class vtkAnimationCue;
+class vtkCollection;
+class vtkCollectionIterator;
+class vtkTimerLog;
 
-class VTK_EXPORT vtkPVAnimationScene : public vtkAnimationScene
+class VTK_COMMON_EXPORT vtkPVAnimationScene: public vtkAnimationCue
 {
 public:
-  static vtkPVAnimationScene* New();
-  vtkTypeRevisionMacro(vtkPVAnimationScene, vtkAnimationScene);
+  vtkTypeRevisionMacro(vtkPVAnimationScene, vtkAnimationCue);
   void PrintSelf(ostream& os, vtkIndent indent);
+  static vtkPVAnimationScene* New();
 
   // Description:
-  // Add/Remove timesteps. 
-  void AddTimeStep(double time);
-  void RemoveTimeStep(double time);
-  void RemoveAllTimeSteps();
-
+  // Add/Remove an AnimationCue to/from the Scene.
+  // It's an error to add a cue twice to the Scene.
+  void AddCue(vtkAnimationCue* cue);
+  void RemoveCue(vtkAnimationCue* cue);
+  void RemoveAllCues();
+  int  GetNumberOfCues();
+ 
   // Description:
-  // Get number of timesteps.
-  unsigned int GetNumberOfTimeSteps();
+  // Sets the current animation time.
+  void SetCurrentTime(double time)
+    { 
+    this->Initialize();
+    this->Tick(time, 0, time); 
+    }
 
-  // Description:
-  // Play the animation.
-  virtual void Play();
-
-  // Description:
-  // Returns the timestep value after the given timestep.
-  // If no value exists, returns the argument \c time itself.
-  double GetNextTimeStep(double time);
-
-  // Description:
-  // Returns the timestep value before the given timestep.
-  // If no value exists, returns the argument \c time itself.
-  double GetPreviousTimeStep(double time);
-
-  //BTX
-  enum 
-    {
-    PLAYMODE_TIMESTEPS = PLAYMODE_REALTIME+1
-    };
-  //ETX
-
-  // Description:
-  // Get/Set the number of frames per timstep. Used only when 
-  // play mode is PLAYMODE_TIMESTEPS. Note that this replaces
-  // the FrameRate when playing in PLAYMODE_TIMESTEPS mode.
-  vtkSetMacro(FramesPerTimestep, int);
-  vtkGetMacro(FramesPerTimestep, int);
+  // Get the time of the most recent tick.
+  vtkGetMacro(CurrentTime, double);
 protected:
   vtkPVAnimationScene();
   ~vtkPVAnimationScene();
 
-  int FramesPerTimestep;
+  // Description:
+  // Called on every valid tick.
+  // Calls ticks on all the contained cues.
+  virtual void StartCueInternal();
+  virtual void TickInternal(double currenttime, double deltatime, double clocktime);
+  virtual void EndCueInternal();
+
+  void InitializeChildren();
+  void FinalizeChildren();
+  
+  vtkCollection* AnimationCues;
+  vtkCollectionIterator* AnimationCuesIterator;
+ 
+  double CurrentTime;
 private:
   vtkPVAnimationScene(const vtkPVAnimationScene&); // Not implemented.
   void operator=(const vtkPVAnimationScene&); // Not implemented.
-
-  vtkPVAnimationSceneSetOfDouble* TimeSteps;
 };
 
 #endif
-
-

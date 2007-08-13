@@ -87,7 +87,6 @@ public slots:
   // Called when timeranges change.
   void onTimeRangesChanged();
 
-public slots:
   // Connect these signals to appropriate VCR buttons.
   void onFirstFrame();
   void onPreviousFrame();

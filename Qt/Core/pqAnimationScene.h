@@ -46,6 +46,7 @@ class vtkSMAnimationSceneProxy;
 class PQCORE_EXPORT pqAnimationScene : public pqProxy
 {
   Q_OBJECT
+  typedef pqProxy Superclass;
 public:
   pqAnimationScene(const QString& group, const QString& name,
     vtkSMProxy* proxy, pqServer* server, QObject* parent=NULL);
@@ -67,7 +68,7 @@ public:
   pqAnimationCue* createCue(vtkSMProxy* proxy, const char* propertyname,
     int index);
   pqAnimationCue* createCue(vtkSMProxy* proxy, const char* propertyname,
-    int index, const QString& manip_type);
+    int index, const QString& cuetype);
 
   /// Removes all cues which animate the indicated proxy, if any.
   void removeCues(vtkSMProxy* proxy);
@@ -87,6 +88,10 @@ public:
 
   /// Get all the cues in this scene
   QSet<pqAnimationCue*> getCues() const;
+
+  /// set default property values.
+  /// Overridden to create the default pipeline time animation cue.
+  virtual void setDefaultPropertyValues();
 
 signals:
   /// Fired before a new cue is added to the scene.
@@ -154,7 +159,7 @@ private:
   pqInternals* Internals;
 
   void setupTimeTrack();
-  pqAnimationCue* createCueInternal(const QString& mtype,
+  pqAnimationCue* createCueInternal(const QString& cuetype,
     vtkSMProxy* proxy, const char* propertyname, int index);
 };
 

@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkProcessModule.h"
 #include "vtkSMAnimationSceneGeometryWriter.h"
+#include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMPVAnimationSceneProxy.h"
 #include "vtkSMServerProxyManagerReviver.h"
 #include "vtkToolkits.h" // for VTK_USE_FFMPEG_ENCODER
 
@@ -64,12 +64,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static inline int pqCeil(double val)
 {
-  if (val == static_cast<int>(val))
-    {
-    return static_cast<int>(val);
-    }
-  return static_cast<int>(val+1.0);
+  return static_cast<int>(val+0.5);
 }
+
+#define SEQUENCE 0
+#define REALTIME 1
+#define SNAP_TO_TIMESTEPS 2
+
 //-----------------------------------------------------------------------------
 class pqAnimationManager::pqInternals
 {
@@ -205,16 +206,15 @@ pqAnimationScene* pqAnimationManager::createActiveScene()
     {
     pqObjectBuilder* builder = 
       pqApplicationCore::instance()->getObjectBuilder();
-    vtkSMProxy *scene = builder->createProxy("animation", "PVAnimationScene", 
-      this->Internals->ActiveServer, "animation");
-    scene->SetServers(vtkProcessModule::CLIENT);
+    pqAnimationScene* scene = builder->createAnimationScene(
+      this->Internals->ActiveServer);
+    
     // this will result in a call to onProxyAdded() and proper
     // signals will be emitted.
     if (!scene)
       {
       qDebug() << "Failed to create scene proxy.";
       }
-   
     this->updateViewModules();
     return this->getActiveScene();
     }
@@ -230,21 +230,8 @@ pqAnimationCue* pqAnimationManager::getCue(
   return (scene? scene->getCue(proxy, propertyname, index) : 0);
 }
 
-
 //-----------------------------------------------------------------------------
-pqAnimationCue* pqAnimationManager::createCue(pqAnimationScene* scene, 
-    vtkSMProxy* proxy, const char* propertyname, int index) 
-{
-  if (!scene)
-    {
-    qDebug() << "Cannot create cue without scene.";
-    return 0;
-    }
-
-  return scene->createCue(proxy, propertyname, index);
-}
-
-//-----------------------------------------------------------------------------
+// Called when user changes some property on the save animation dialog.
 void pqAnimationManager::updateGUI()
 {
   double framerate =
@@ -256,27 +243,26 @@ void pqAnimationManager::updateGUI()
   int frames_per_timestep =
     this->Internals->AnimationSettingsDialog->spinBoxFramesPerTimestep->value();
 
-  switch (this->getActiveScene()->getAnimationSceneProxy()->GetPlayMode())
-    {
-  case vtkSMPVAnimationSceneProxy::SNAP_TO_TIMESTEPS:
-      {
-      // get original number of frames.
-      pqAnimationScene* scene = this->getActiveScene();
-      vtkSMPVAnimationSceneProxy* sceneProxy = 
-        vtkSMPVAnimationSceneProxy::SafeDownCast(
-          scene->getAnimationSceneProxy());
-      num_frames = sceneProxy->GetNumberOfTimeSteps();
-        num_frames = frames_per_timestep*num_frames;
-      this->Internals->AnimationSettingsDialog->spinBoxNumberOfFrames->
-        blockSignals(true);
-      this->Internals->AnimationSettingsDialog->spinBoxNumberOfFrames->
-        setValue(num_frames);
-      this->Internals->AnimationSettingsDialog->spinBoxNumberOfFrames->
-        blockSignals(false);
-      }
-    // Don't break. let it fall thru to sequence.
+  vtkSMProxy* sceneProxy = this->getActiveScene()->getProxy();
+  int playMode = pqSMAdaptor::getElementProperty(
+    sceneProxy->GetProperty("PlayMode")).toInt();
 
-  case vtkSMPVAnimationSceneProxy::SEQUENCE:
+  switch (playMode)
+    {
+  case SNAP_TO_TIMESTEPS:
+    // get original number of frames.
+    num_frames = pqSMAdaptor::getMultipleElementProperty(
+      sceneProxy->GetProperty("TimeSteps")).size();
+    num_frames = frames_per_timestep*num_frames;
+    this->Internals->AnimationSettingsDialog->spinBoxNumberOfFrames->
+      blockSignals(true);
+    this->Internals->AnimationSettingsDialog->spinBoxNumberOfFrames->
+      setValue(num_frames);
+    this->Internals->AnimationSettingsDialog->spinBoxNumberOfFrames->
+      blockSignals(false);
+    // don't break, let it fall through to SEQUENCE.
+
+  case SEQUENCE:
     this->Internals->AnimationSettingsDialog->animationDuration->
       blockSignals(true);
     this->Internals->AnimationSettingsDialog->animationDuration->setValue(
@@ -285,7 +271,7 @@ void pqAnimationManager::updateGUI()
       blockSignals(false);
     break;
 
-  case vtkSMPVAnimationSceneProxy::REALTIME:
+  case REALTIME:
     this->Internals->AnimationSettingsDialog->spinBoxNumberOfFrames->
       blockSignals(true);
     this->Internals->AnimationSettingsDialog->spinBoxNumberOfFrames->setValue(
@@ -304,8 +290,7 @@ bool pqAnimationManager::saveAnimation()
     {
     return false;
     }
-  vtkSMPVAnimationSceneProxy* sceneProxy = 
-    vtkSMPVAnimationSceneProxy::SafeDownCast(scene->getAnimationSceneProxy());
+  vtkSMAnimationSceneProxy* sceneProxy = scene->getAnimationSceneProxy();
 
   QDialog dialog;
   Ui::Dialog dialogUI;
@@ -326,33 +311,43 @@ bool pqAnimationManager::saveAnimation()
   dialogUI.spinBoxFramesPerTimestep->hide();
   dialogUI.labelFramesPerTimestep->hide();
 
+  int playMode = pqSMAdaptor::getElementProperty(
+    sceneProxy->GetProperty("PlayMode")).toInt();
+
   // Set current duration/frame rate/no. of. frames.
   double frame_rate = dialogUI.frameRate->value();
-  switch (sceneProxy->GetPlayMode())
+  // Save the current player property values.
+  int num_frames = pqSMAdaptor::getElementProperty(
+    sceneProxy->GetProperty("NumberOfFrames")).toInt();
+  int duration = pqSMAdaptor::getElementProperty(
+    sceneProxy->GetProperty("Duration")).toInt();
+  int num_steps = pqSMAdaptor::getMultipleElementProperty(
+    sceneProxy->GetProperty("TimeSteps")).size();
+  int frames_per_timestep = pqSMAdaptor::getElementProperty(
+    sceneProxy->GetProperty("FramesPerTimestep")).toInt();
+
+  switch (playMode)
     {
-  case vtkSMPVAnimationSceneProxy::SEQUENCE:
-    dialogUI.spinBoxNumberOfFrames->setValue(
-      sceneProxy->GetNumberOfFrames());
+  case SEQUENCE:
+    dialogUI.spinBoxNumberOfFrames->setValue(num_frames);
     dialogUI.animationDuration->setEnabled(false);
-    dialogUI.animationDuration->setValue(
-      sceneProxy->GetNumberOfFrames()/frame_rate);
+    dialogUI.animationDuration->setValue(num_frames/frame_rate);
     break;
 
-  case vtkSMPVAnimationSceneProxy::REALTIME:
-    dialogUI.animationDuration->setValue(sceneProxy->GetDuration());
+  case REALTIME:
+    dialogUI.animationDuration->setValue(duration);
     dialogUI.spinBoxNumberOfFrames->setValue(
-      static_cast<int>(sceneProxy->GetDuration()*frame_rate));
+      static_cast<int>(duration*frame_rate));
     dialogUI.spinBoxNumberOfFrames->setEnabled(false);
     break;
 
-  case vtkSMPVAnimationSceneProxy::SNAP_TO_TIMESTEPS:
-    dialogUI.spinBoxNumberOfFrames->setValue(
-      sceneProxy->GetNumberOfTimeSteps());
-    dialogUI.animationDuration->setValue(
-      sceneProxy->GetNumberOfTimeSteps()*frame_rate);
+  case SNAP_TO_TIMESTEPS:
+    dialogUI.spinBoxNumberOfFrames->setValue(num_steps);
+    dialogUI.animationDuration->setValue(num_steps*frame_rate);
     dialogUI.spinBoxNumberOfFrames->setEnabled(false);
     dialogUI.animationDuration->setEnabled(false);
     dialogUI.spinBoxFramesPerTimestep->show();
+    dialogUI.spinBoxFramesPerTimestep->setValue(num_frames);
     dialogUI.labelFramesPerTimestep->show();
     break;
     }
@@ -417,33 +412,32 @@ bool pqAnimationManager::saveAnimation()
   QString filename = files[0];
 
   // Update Scene properties based on user options. 
-  double num_frames = sceneProxy->GetNumberOfFrames();
-  //double duration = sceneProxy->GetDuration();
-  double frames_per_timestep = sceneProxy->GetFramesPerTimestep();
-
   emit this->beginNonUndoableChanges();
 
-  switch (sceneProxy->GetPlayMode())
+  switch (playMode)
     {
-  case vtkSMPVAnimationSceneProxy::SEQUENCE:
-    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("NumberOfFrames"), 
+  case SEQUENCE:
+    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("NumberOfFrames"),
       dialogUI.spinBoxNumberOfFrames->value());
     break;
 
-  case vtkSMPVAnimationSceneProxy::REALTIME:
+  case REALTIME:
     // Since even in real-time mode, while saving animation, it is played back 
     // in sequence mode, we change the NumberOfFrames instead of changing the
     // Duration. The spinBoxNumberOfFrames is updated to satisfy
     // duration * frame rate = number of frames.
     pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("NumberOfFrames"),
       dialogUI.spinBoxNumberOfFrames->value());
+    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("PlayMode"),
+      SEQUENCE);
     break;
 
-  case vtkSMPVAnimationSceneProxy::SNAP_TO_TIMESTEPS:
+  case SNAP_TO_TIMESTEPS:
     pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("FramesPerTimestep"),
       dialogUI.spinBoxFramesPerTimestep->value());
     break;
     }
+
   sceneProxy->UpdateVTKObjects();
 
   QSize newSize(dialogUI.spinBoxWidth->value(),
@@ -517,19 +511,21 @@ bool pqAnimationManager::saveAnimation()
   writer->Delete();
 
   // Restore, duration and number of frames.
-  switch (sceneProxy->GetPlayMode())
+  switch (playMode)
     {
-  case vtkSMPVAnimationSceneProxy::SEQUENCE:
+  case SEQUENCE:
     pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("NumberOfFrames"), 
       num_frames);
     break;
 
-  case vtkSMPVAnimationSceneProxy::REALTIME:
+  case REALTIME:
     pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("NumberOfFrames"),
       num_frames);
+    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("PlayMode"),
+      REALTIME);
     break;
 
-  case vtkSMPVAnimationSceneProxy::SNAP_TO_TIMESTEPS:
+  case SNAP_TO_TIMESTEPS:
     pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("FramesPerTimestep"),
       frames_per_timestep);
     break;

@@ -545,12 +545,11 @@
       <Documentation>
         Internal base interface for all animation cues.
       </Documentation>
-      <!-- No server side objects created. All properties are updateself -->
+
       <IntVectorProperty
          name="TimeMode"
          command="SetTimeMode"
          number_of_elements="1" 
-         update_self="1"
          default_values="0">
         <EnumerationDomain name="enum">
           <Entry value="0" text="Normalized" />
@@ -562,7 +561,6 @@
         name="StartTime"
         command="SetStartTime"
         number_of_elements="1"
-        update_self="1"
         default_values="0">
       </DoubleVectorProperty>
 
@@ -570,7 +568,6 @@
         name="EndTime"
         command="SetEndTime"
         number_of_elements="1"
-        update_self="1"
         default_values="1">
       </DoubleVectorProperty>
       
@@ -621,11 +618,11 @@
       <!-- End of AnimationCueBase -->
     </Proxy>
 
-    <AnimationCueProxy name="AnimationCue"
+    <AnimationCueProxy name="AnimationCue" class="vtkAnimationCue"
       base_proxygroup="animation" base_proxyname="AnimationCueBase">
       <Documentation>
         This is old style animation cue, this must be replaced by
-        KeyframeAnimationCue or CameraAnimationCue as the case may be.
+        KeyFrameAnimationCue or CameraAnimationCue as the case may be.
         This may be used when using other types of manipulators.
       </Documentation>
 
@@ -640,7 +637,7 @@
       <!-- End of AnimationCue -->
     </AnimationCueProxy>
 
-    <AnimationCueProxy name="KeyframeAnimationCue"
+    <AnimationCueProxy name="KeyFrameAnimationCue" class="vtkAnimationCue"
       base_proxygroup="animation" base_proxyname="AnimationCueBase">
       <Documentation>
         Animation cue with keyframes.
@@ -657,10 +654,10 @@
         </ExposedProperties>
       </SubProxy>
 
-      <!-- End of KeyframeAnimationCue -->
+      <!-- End of KeyFrameAnimationCue -->
     </AnimationCueProxy>
 
-    <AnimationCueProxy name="CameraAnimationCue"
+    <AnimationCueProxy name="CameraAnimationCue" class="vtkAnimationCue"
       base_proxygroup="animation" base_proxyname="AnimationCueBase">
       <Documentation>
         Animation cue which can be used for animating Camera using keyframes.
@@ -679,225 +676,90 @@
       <!-- End of CameraAnimationCue -->
     </AnimationCueProxy>
 
+    <TimeAnimationCueProxy name="TimeAnimationCue" class="vtkAnimationCue"
+      base_proxygroup="animation" base_proxyname="KeyFrameAnimationCue">
+      <Documentation>
+        This is same as KeyFrameAnimationCue except that it has a new property 
+        "UseAnimationTime" which when set overrides the keyframes all together
+        and directly uses the animation clock time to update the animated
+        property.
+      </Documentation>
+      
+      <IntVectorProperty name="UseAnimationTime"
+        command="SetUseAnimationTime"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, the animated property is directly updated with the value 
+          of the Animation clock. Default value it true.
+        </Documentation>
+      </IntVectorProperty>
+        
+      <!-- end of TimeAnimationCue -->
+    </TimeAnimationCueProxy>
+
     <!--Scene -->
-    <AnimationSceneProxy name="AnimationScene">
-      <!-- No server side objects created. All properties are updateself -->
-      <ProxyProperty
-        name="ViewModules"
+    <AnimationSceneProxy name="AnimationScene" class="vtkPVAnimationScene">
+      <Documentation>
+        Proxy for animation scene. 
+      </Documentation>
+
+      <ProxyProperty name="ViewModules"
         command="AddViewModule"
         clean_command="RemoveAllViewModules"
         update_self="1">
         <ProxyGroupDomain name="groups">
-          <Group name="rendermodules" />
           <Group name="newviews" />
         </ProxyGroupDomain>
+        <Documentation>
+          Add views to this scene. These are all the views that need to be
+          updated when playing the animation.
+        </Documentation>
+      </ProxyProperty>
+
+      <ProxyProperty name="Cues"
+        command="AddCue"
+        remove_command="RemoveCue">
+        <ProxyGroupDomain name="groups">
+          <Group name="animation" />
+        </ProxyGroupDomain>
+        <Documentation>
+          Add cues to this scene.
+        </Documentation>
       </ProxyProperty>
       
-      <IntVectorProperty
-         name="TimeMode"
-         command="SetTimeMode"
-         number_of_elements="1" 
-         update_self="1"
-         default_values="1">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Normalized" />
-          <Entry value="1" text="Relative" />
-        </EnumerationDomain>
-      </IntVectorProperty>
+      <DoubleVectorProperty
+        name="AnimationTime"
+        command="SetAnimationTime"
+        update_self="1"
+        number_of_elements="1"
+        default_values="none"
+        is_internal="1">
+        <Documentation>
+          Set the current animation time.
+        </Documentation>
+      </DoubleVectorProperty>
 
       <DoubleVectorProperty
         name="StartTime"
         command="SetStartTime"
         number_of_elements="1"
-        update_self="1"
         default_values="0">
+        <Documentation>
+          Set the start time for the animation scene.
+        </Documentation>
       </DoubleVectorProperty>
-    
+
       <DoubleVectorProperty
         name="EndTime"
         command="SetEndTime"
         number_of_elements="1"
-        update_self="1"
-        default_values="200">
-      </DoubleVectorProperty>
-      
-      <IntVectorProperty
-        name="Loop"
-        command="SetLoop"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0">
-      </IntVectorProperty>
-
-      <DoubleVectorProperty
-        name="FrameRate"
-        command="SetFrameRate"
-        number_of_elements="1"
-        update_self="1"
-        default_values="10">
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="CurrentTime"
-        command="SetAnimationTime"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0"
-        is_internal="1">
-      </DoubleVectorProperty>
-
-      <ProxyProperty name="Cues"
-        command="AddCue"
-        update_self="1"
-        remove_command="RemoveCue">
-        <ProxyGroupDomain name="groups">
-          <Group name="animation" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
-      
-      <IntVectorProperty
-        name="PlayMode"
-        command="SetPlayMode"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Sequence" />
-          <Entry value="1" text="Real Time" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="Caching"
-        command="SetCaching"
-        number_of_elements="1"
-        default_values="0"
-        update_self="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="CacheLimit"
-        command="SetCacheLimit"
-        number_of_elements="1"
-        update_self="1"
-        default_values="102400">
-        <IntRangeDomain name="range" />
-      </IntVectorProperty>
-
-    </AnimationSceneProxy>
-
-    <PVAnimationSceneProxy name="PVAnimationScene">
-      <!-- No server side objects created. All properties are updateself -->
-      <ProxyProperty
-        name="ViewModules"
-        command="AddViewModule"
-        clean_command="RemoveAllViewModules"
-        update_self="1">
-        <ProxyGroupDomain name="groups">
-          <Group name="rendermodules" />
-          <Group name="newviews" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
-      
-      <IntVectorProperty
-        name="Loop"
-        command="SetLoop"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0">
-      </IntVectorProperty>
-
-      <DoubleVectorProperty
-        name="CurrentTime"
-        command="SetAnimationTime"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0"
-        is_internal="1">
-      </DoubleVectorProperty>
-
-      <ProxyProperty name="Cues"
-        command="AddCue"
-        update_self="1"
-        remove_command="RemoveCue">
-        <ProxyGroupDomain name="groups">
-          <Group name="animation" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
-      
-      <IntVectorProperty
-        name="PlayMode"
-        command="SetPlayMode"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Sequence" />
-          <Entry value="1" text="Real Time" />
-          <Entry value="2" text="Snap To TimeSteps" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="NumberOfFrames"
-        command="SetNumberOfFrames"
-        label="No. Of Frames"
-        number_of_elements="1"
-        default_values="10"
-        update_self="1">
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="Duration"
-        command="SetDuration"
-        number_of_elements="1"
-        default_values="10"
-        update_self="1">
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="FramesPerTimestep"
-        command="SetFramesPerTimestep"
-        number_of_elements="1"
-        default_values="1"
-        update_self="1">
-        <IntRangeDomain name="range" min="1" />
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="Caching"
-        command="SetCaching"
-        label="Cache Geometry"
-        number_of_elements="1"
-        default_values="0"
-        update_self="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-
-      <ProxyProperty
-        name="TimeKeeper"
-        command="SetTimeKeeper"
-        update_self="1">
-      </ProxyProperty>
-
-      <DoubleVectorProperty
-        name="TimeSteps"
-        command="AddTimeStep"
-        update_self="1"
-        repeat_command="1"
-        number_of_elements_per_command="1"
-        clean_command="RemoveAllTimeSteps">
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="ClockTimeRange"
-        command="SetClockTimeRange"
-        label="Animation Start/End Time"
-        number_of_elements="2"
-        default_values="0 1"
-        update_self="1">
-        <DoubleRangeDomain name="range" />
+        default_values="1">
+        <Documentation>
+          Set the end time for the animation scene.
+        </Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -905,20 +767,23 @@
         label="Lock Animation Start/End Time"
         number_of_elements="2"
         default_values="0 0">
-        <!-- This is a "no-command" property. Has not effect 
-        on the proxy, but used by the GUI to keep the range lock state.
-        -->
+        <Documentation>
+          This is a "no-command" property, has not effect 
+          on the proxy, but used by the GUI to keep the range lock state.
+        </Documentation>
       </IntVectorProperty>
 
-      <DoubleVectorProperty
-        name="ClockTime"
-        command="SetClockTime"
+      <IntVectorProperty
+        name="Caching"
+        command="SetCaching"
         number_of_elements="1"
-        update_self="1"
         default_values="0"
-        immediate_update="1"
-        is_internal="1">
-      </DoubleVectorProperty>
+        update_self="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Indicates if cache is to be used while playing the animation.
+        </Documentation>
+      </IntVectorProperty>
 
       <IntVectorProperty
         name="CacheLimit"
@@ -927,11 +792,195 @@
         update_self="1"
         default_values="102400">
         <IntRangeDomain name="range" />
+        <Documentation>
+          Cache limit used to limit cache size. 
+        </Documentation>
       </IntVectorProperty>
-    <!-- End of PVAnimationScene -->
-    </PVAnimationSceneProxy>
+
+      <SubProxy>
+        <Proxy name="AnimationPlayer"
+          proxygroup="animation_players" proxyname="AnimationPlayer">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Loop" />
+          <Property name="Play" />
+          <Property name="Stop" />
+          <Property name="GoToNext" />
+          <Property name="GoToPrevious" />
+          <Property name="GoToFirst" />
+          <Property name="GoToLast" />
+          <Property name="PlayMode" />
+          <Property name="NumberOfFrames" />
+          <Property name="Duration" />
+          <Property name="TimeSteps" />
+          <Property name="FramesPerTimestep" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of AnimationScene -->
+    </AnimationSceneProxy>
 
   <!-- End of animation -->
+  </ProxyGroup>
+
+  <ProxyGroup name="animation_players">
+    <!-- 
+    Group for animation players which are used to play an animation scene
+    -->
+    <Proxy name="AnimationPlayerBase">
+      <Documentation>
+        base interface for all animation players.
+      </Documentation>
+
+      <ProxyProperty name="AnimationScene"
+        command="SetAnimationScene">
+        <Documentation>
+          Set the animation scene to play.
+        </Documentation>
+      </ProxyProperty>
+
+      <IntVectorProperty name="Loop"
+        command="SetLoop"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set to true to play the animation in a loop.
+        </Documentation>
+      </IntVectorProperty>
+
+      <Property name="Play" command="Play" />
+      <Property name="Stop" command="Stop" />
+      <Property name="GoToNext" command="GoToNext" />
+      <Property name="GoToPrevious" command="GoToPrevious" />
+      <Property name="GoToFirst" command="GoToFirst" />
+      <Property name="GoToLast" command="GoToLast" />
+
+      <!-- End of AnimationPlayerBase -->
+    </Proxy>
+
+    <AnimationPlayerProxy name="SequenceAnimationPlayer" class="vtkSequenceAnimationPlayer"
+      base_proxygroup="animation_players" base_proxyname="AnimationPlayerBase">
+      <Documentation>
+        Plays the animation in a fixed number of frames. The time is evenly
+        distributed among all the frames.
+      </Documentation>
+     
+      <IntVectorProperty  name="NumberOfFrames"
+        command="SetNumberOfFrames"
+        number_of_elements="1"
+        default_values="10">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Set the number of frames in which to play the animation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <!-- End of SequenceAnimationPlayer -->
+    </AnimationPlayerProxy>
+
+    <AnimationPlayerProxy name="RealtimeAnimationPlayer" class="vtkRealtimeAnimationPlayer"
+      base_proxygroup="animation_players" base_proxyname="AnimationPlayerBase">
+      <Documentation>
+        Realtime animation player which plays the animation in real time i.e. in
+        a fixed number of seconds.
+      </Documentation>
+
+      <IntVectorProperty name="Duration"
+        command="SetDuration"
+        number_of_elements="1"
+        default_values="10">
+        <Documentation>
+          Set the duration for playing the animation in seconds.
+        </Documentation>
+      </IntVectorProperty>
+
+      <!-- End of RealtimeAnimationPlayer -->
+    </AnimationPlayerProxy>
+
+    <AnimationPlayerProxy name="TimestepsAnimationPlayer" class="vtkTimestepsAnimationPlayer"
+      base_proxygroup="animation_players" base_proxyname="AnimationPlayerBase">
+      <Documentation>
+        Player to play an animation scene through a discrete set of time values.
+        FramesPerTimestep controls how many frames are generated for each time value.
+      </Documentation>
+
+      <DoubleVectorProperty name="TimeSteps"
+        command="AddTimeStep"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        clean_command="RemoveAllTimeSteps">
+        <Documentation>
+          The discrete timesteps to play the animation in. Irrespective of order
+          of the time values in this property, the player always plays in the
+          animation in sorted order of the time step values.
+        </Documentation>
+      </DoubleVectorProperty>
+      
+      <IntVectorProperty name="FramesPerTimestep"
+        command="SetFramesPerTimestep"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          The number of frames per timestep. 
+        </Documentation>
+      </IntVectorProperty>
+
+      <!-- End of TimestepsAnimationPlayer -->
+    </AnimationPlayerProxy>
+
+    <AnimationPlayerProxy 
+      name="AnimationPlayer" class="vtkCompositeAnimationPlayer"
+      base_proxygroup="animation_players" base_proxyname="AnimationPlayerBase">
+      <Documentation>
+        Composite player that combines 3 animation players: sequence, realtime
+        and timesteps.
+      </Documentation>
+
+      <IntVectorProperty
+        name="PlayMode"
+        command="SetActive"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Sequence" />
+          <Entry value="1" text="Realtime" />
+          <Entry value="2" text="Snap To TimeSteps" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="SequenceAnimationPlayer" 
+          proxygroup="animation_players" proxyname="SequenceAnimationPlayer">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="NumberOfFrames" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="RealtimeAnimationPlayer" 
+          proxygroup="animation_players" proxyname="RealtimeAnimationPlayer">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Duration" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="TimestepsAnimationPlayer"
+          proxygroup="animation_players" proxyname="TimestepsAnimationPlayer">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="TimeSteps" />
+          <Property name="FramesPerTimestep" />
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of AnimationPlayer -->
+    </AnimationPlayerProxy>
+
+    <!-- End of "animation_players" -->
   </ProxyGroup>
 
   <ProxyGroup name="animation_manipulators">

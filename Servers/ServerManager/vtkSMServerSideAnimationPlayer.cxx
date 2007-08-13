@@ -60,7 +60,7 @@ protected:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMServerSideAnimationPlayer);
-vtkCxxRevisionMacro(vtkSMServerSideAnimationPlayer, "1.8");
+vtkCxxRevisionMacro(vtkSMServerSideAnimationPlayer, "1.9");
 vtkCxxSetObjectMacro(vtkSMServerSideAnimationPlayer, Writer, 
   vtkSMAnimationSceneImageWriter);
 //-----------------------------------------------------------------------------
@@ -144,7 +144,7 @@ void vtkSMServerSideAnimationPlayer::PerformActions()
       {
       if (!this->Writer)
         {
-        scene->Play();
+        scene->InvokeCommand("Play");
         }
       else
         {

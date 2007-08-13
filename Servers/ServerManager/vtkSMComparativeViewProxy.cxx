@@ -24,7 +24,7 @@
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMPVAnimationSceneProxy.h"
+#include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMRepresentationProxy.h"
 
 #include <vtkstd/vector>
@@ -68,7 +68,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.13");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -146,9 +146,9 @@ bool vtkSMComparativeViewProxy::BeginCreateVTKObjects()
   this->Internal->ViewLink->AddException("CameraClippingRangeInfo");
   this->Internal->ViewLink->AddException("CameraClippingRange");
 
-  this->AnimationSceneX  = vtkSMPVAnimationSceneProxy::SafeDownCast(
+  this->AnimationSceneX  = vtkSMAnimationSceneProxy::SafeDownCast(
     this->GetSubProxy("AnimationSceneX"));
-  this->AnimationSceneY = vtkSMPVAnimationSceneProxy::SafeDownCast(
+  this->AnimationSceneY = vtkSMAnimationSceneProxy::SafeDownCast(
     this->GetSubProxy("AnimationSceneY"));
 
   this->AnimationSceneX->AddObserver(vtkCommand::ModifiedEvent, 
@@ -555,11 +555,11 @@ void vtkSMComparativeViewProxy::UpdateVisualization()
 
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::UpdateFilmStripVisualization(
-  vtkSMPVAnimationSceneProxy* scene)
+  vtkSMAnimationSceneProxy* scene)
 {
-  scene->SetPlayMode(vtkSMPVAnimationSceneProxy::SEQUENCE);
-  scene->SetNumberOfFrames(this->Dimensions[0]*this->Dimensions[1]);
-  scene->SetLoop(0);
+  //scene->SetPlayMode(vtkSMAnimationSceneProxy::SEQUENCE);
+  //scene->SetNumberOfFrames(this->Dimensions[0]*this->Dimensions[1]);
+  //scene->SetLoop(0);
 
   this->Internal->ActiveIndexX = 0;
   this->Internal->ActiveIndexY = 0;
@@ -584,13 +584,13 @@ void vtkSMComparativeViewProxy::UpdateFilmStripVisualization(
 
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::UpdateComparativeVisualization(
-  vtkSMPVAnimationSceneProxy* sceneX, vtkSMPVAnimationSceneProxy* sceneY)
+  vtkSMAnimationSceneProxy* sceneX, vtkSMAnimationSceneProxy* sceneY)
 {
-  sceneX->SetPlayMode(vtkSMPVAnimationSceneProxy::SEQUENCE);
-  sceneX->SetNumberOfFrames(this->Dimensions[0]);
+  //sceneX->SetPlayMode(vtkSMAnimationSceneProxy::SEQUENCE);
+  //sceneX->SetNumberOfFrames(this->Dimensions[0]);
 
-  sceneY->SetPlayMode(vtkSMPVAnimationSceneProxy::SEQUENCE);
-  sceneY->SetNumberOfFrames(this->Dimensions[1]);
+  //sceneY->SetPlayMode(vtkSMAnimationSceneProxy::SEQUENCE);
+  //sceneY->SetNumberOfFrames(this->Dimensions[1]);
 
   int view_index=0;
   for (int y=0; y < this->Dimensions[1]; y++)

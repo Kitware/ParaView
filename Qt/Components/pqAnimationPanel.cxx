@@ -329,17 +329,17 @@ void pqAnimationPanel::onActiveSceneChanged(pqAnimationScene* scene)
 
   /*this->Internal->SceneLinks.addPropertyLink(
     this->Internal->currentTime, "text", SIGNAL(textChanged(const QString&)),
-    sceneProxy, sceneProxy->GetProperty("ClockTime"));
+    sceneProxy, sceneProxy->GetProperty("AnimationTime"));
     */
   this->Internal->CurrentTimeLink.addPropertyLink(
     this->Internal->currentTime, "text", SIGNAL(textChanged(const QString&)),
-    sceneProxy, sceneProxy->GetProperty("ClockTime"));
+    sceneProxy, sceneProxy->GetProperty("AnimationTime"));
   this->Internal->SceneLinks.addPropertyLink(
     this->Internal->startTime, "text", SIGNAL(textChanged(const QString&)),
-    sceneProxy, sceneProxy->GetProperty("ClockTimeRange"), 0);
+    sceneProxy, sceneProxy->GetProperty("StartTime"));
   this->Internal->SceneLinks.addPropertyLink(
     this->Internal->endTime, "text", SIGNAL(textChanged(const QString&)),
-    sceneProxy, sceneProxy->GetProperty("ClockTimeRange"), 1);
+    sceneProxy, sceneProxy->GetProperty("EndTime"));
   this->Internal->SceneLinks.addPropertyLink(
     this->Internal->startTimeLock, "checked", SIGNAL(toggled(bool)),
     sceneProxy, sceneProxy->GetProperty("ClockTimeRangeLocks"), 0);
@@ -806,12 +806,13 @@ void pqAnimationPanel::insertKeyFrame(int index)
       curProxy == this->Internal->ActiveRenderView->getProxy())
       {
       cue = scene->createCue(curProxy,
-        pname.toAscii().data(), pindex, "CameraManipulator");
+        pname.toAscii().data(), pindex, "CameraAnimationCue");
       cue->setKeyFrameType("CameraKeyFrame");
       }
     else
       {
-      cue = scene->createCue(curProxy, pname.toAscii().data(), pindex);
+      cue = scene->createCue(curProxy, 
+        pname.toAscii().data(), pindex, "KeyFrameAnimationCue");
       }
     this->setActiveCue(cue);
     }
@@ -978,8 +979,8 @@ void pqAnimationPanel::setStartTimeByIndex(int index)
 
   double time = timekeeper->getTimeStepValue(index);
   vtkSMProxy* proxy = this->Internal->ActiveScene->getProxy();
-  pqSMAdaptor::setMultipleElementProperty(
-    proxy->GetProperty("ClockTimeRange"), 0, time);
+  pqSMAdaptor::setElementProperty(
+    proxy->GetProperty("StartTime"), time);
   proxy->UpdateVTKObjects();
 }
 
@@ -995,8 +996,8 @@ void pqAnimationPanel::setEndTimeByIndex(int index)
     this->Internal->ActiveScene->getServer()->getTimeKeeper();
   double time = timekeeper->getTimeStepValue(index);
   vtkSMProxy* proxy = this->Internal->ActiveScene->getProxy();
-  pqSMAdaptor::setMultipleElementProperty(
-    proxy->GetProperty("ClockTimeRange"), 1, time);
+  pqSMAdaptor::setElementProperty(
+    proxy->GetProperty("EndTime"), time);
   proxy->UpdateVTKObjects();
 }
 

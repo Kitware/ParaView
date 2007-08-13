@@ -13,6 +13,7 @@ SET(Kit_SRCS
   vtkInitializationHelper.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMAnimationCueProxy.cxx
+  vtkSMAnimationPlayerProxy.cxx
   vtkSMAnimationSceneGeometryWriter.cxx
   vtkSMAnimationSceneImageWriter.cxx
   vtkSMAnimationSceneProxy.cxx
@@ -110,7 +111,7 @@ SET(Kit_SRCS
   vtkSMProxyProperty.cxx
   vtkSMProxyRegisterUndoElement.cxx
   vtkSMProxyUnRegisterUndoElement.cxx
-  vtkSMPVAnimationSceneProxy.cxx
+#vtkSMPVAnimationSceneProxy.cxx
   vtkSMPVDWriterProxy.cxx
   vtkSMPVLookupTableProxy.cxx
   vtkSMPVRepresentationProxy.cxx
@@ -151,6 +152,7 @@ SET(Kit_SRCS
   vtkSMTesting.cxx
   vtkSMTextSourceRepresentationProxy.cxx
   vtkSMTextWidgetRepresentationProxy.cxx
+  vtkSMTimeAnimationCueProxy.cxx
   vtkSMTimeRangeInformationHelper.cxx
   vtkSMTimeStepsInformationHelper.cxx
   vtkSMTransformProxy.cxx
