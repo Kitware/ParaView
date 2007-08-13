@@ -3174,7 +3174,7 @@
 
       <SubProxy>
         <Proxy name="AnimationSceneX" proxygroup="animation"
-          proxyname="PVAnimationScene">
+          proxyname="AnimationScene">
         </Proxy>
         <ExposedProperties>
           <Property name="Cues" exposed_name="XCues" />
@@ -3183,7 +3183,7 @@
 
       <SubProxy>
         <Proxy name="AnimationSceneY" proxygroup="animation"
-          proxyname="PVAnimationScene">
+          proxyname="AnimationScene">
         </Proxy>
         <ExposedProperties>
           <Property name="Cues" exposed_name="YCues" />
