@@ -17,14 +17,14 @@
 #include "vtkCollection.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMAnimationSceneProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMCameraLink.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMRepresentationProxy.h"
 
 #include <vtkstd/vector>
@@ -68,7 +68,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.14");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -557,9 +557,10 @@ void vtkSMComparativeViewProxy::UpdateVisualization()
 void vtkSMComparativeViewProxy::UpdateFilmStripVisualization(
   vtkSMAnimationSceneProxy* scene)
 {
-  //scene->SetPlayMode(vtkSMAnimationSceneProxy::SEQUENCE);
-  //scene->SetNumberOfFrames(this->Dimensions[0]*this->Dimensions[1]);
-  //scene->SetLoop(0);
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    scene->GetProperty("EndTime"));
+  dvp->SetElement(0, this->Dimensions[0]*this->Dimensions[1]-1);
+  scene->UpdateVTKObjects();
 
   this->Internal->ActiveIndexX = 0;
   this->Internal->ActiveIndexY = 0;
@@ -586,11 +587,15 @@ void vtkSMComparativeViewProxy::UpdateFilmStripVisualization(
 void vtkSMComparativeViewProxy::UpdateComparativeVisualization(
   vtkSMAnimationSceneProxy* sceneX, vtkSMAnimationSceneProxy* sceneY)
 {
-  //sceneX->SetPlayMode(vtkSMAnimationSceneProxy::SEQUENCE);
-  //sceneX->SetNumberOfFrames(this->Dimensions[0]);
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    sceneX->GetProperty("EndTime"));
+  dvp->SetElement(0, this->Dimensions[0]-1);
+  sceneX->UpdateVTKObjects();
 
-  //sceneY->SetPlayMode(vtkSMAnimationSceneProxy::SEQUENCE);
-  //sceneY->SetNumberOfFrames(this->Dimensions[1]);
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    sceneY->GetProperty("EndTime"));
+  dvp->SetElement(0, this->Dimensions[1]-1);
+  sceneY->UpdateVTKObjects();
 
   int view_index=0;
   for (int y=0; y < this->Dimensions[1]; y++)
