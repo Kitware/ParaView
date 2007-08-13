@@ -249,7 +249,8 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF& )
   painter->setPen(pen);
   painter->setBrush(QColor(0,0,0));
 
-  double fraction = this->CurrentTime / (this->EndTime - this->StartTime);
+  double fraction = (this->CurrentTime - this->StartTime) /
+                    (this->EndTime - this->StartTime);
   double pos = fraction * (sr.width()-1) + sr.left();
   QVector<QPointF> polyPoints;
   polyPoints.append(QPointF(pos, rh-1));
