@@ -169,7 +169,7 @@ public:
       QPair<double, double> range = timekeeper->getTimeRange();
       double num = timekeeper->getNumberOfTimeStepValues() - 1;
       time = timekeeper->getTimeStepValueIndex(time)/num;
-      time = time * (range.second - range.first);
+      time = range.first + time * (range.second - range.first);
       }
     return time;
     }
@@ -427,7 +427,7 @@ void pqAnimationViewWidget::updateTicks()
   pqAnimationModel* animModel =
     this->Internal->AnimationWidget->animationModel();
   int num = this->Internal->numberOfTicks();
-  animModel->setTicks(num+1);
+  animModel->setTicks(num);
 }
 
 
