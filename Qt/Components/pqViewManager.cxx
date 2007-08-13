@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqEmptyView.h"
 
 // VTK includes.
-#include "QVTKWidget.h"
 #include "vtkPVConfig.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
