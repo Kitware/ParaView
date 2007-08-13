@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkPVConfig.h"
 
 #include <vtksys/SystemTools.hxx>
 
@@ -56,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QDomDocument>
 #include <QFile>
+#include <QDir>
 #include <QMap>
 #include <QPointer>
 #include <QSize>
@@ -426,23 +428,30 @@ pqServerStartups& pqApplicationCore::serverStartups()
   if(!this->Internal->ServerStartups)
     {
     this->Internal->ServerStartups = new pqServerStartups(this);
+    QStringList dirs;
+    dirs << QApplication::applicationDirPath();
+    dirs << QString("/usr/share/paraview-%1").arg(PARAVIEW_VERSION);
+    dirs << QDir::homePath() + QString("/.paraview-%1").arg(PARAVIEW_VERSION);
     
     // Load default settings ...
-    QFile file(QApplication::applicationDirPath() + "/default_servers.pvsc");
-    if(file.exists())
+    foreach(QString dir, dirs)
       {
-      QDomDocument xml;
-      QString error_message;
-      int error_line = 0;
-      int error_column = 0;
-      if(xml.setContent(&file, false, &error_message, &error_line, &error_column))
+      QFile file(dir + "/default_servers.pvsc");
+      if(file.exists())
         {
-        this->Internal->ServerStartups->load(xml);
-        }
-      else
-        {
-        qWarning() << "Error loading default_servers.pvsc: " << error_message 
-          << " line: " << error_line << " column: " << error_column;
+        QDomDocument xml;
+        QString error_message;
+        int error_line = 0;
+        int error_column = 0;
+        if(xml.setContent(&file, false, &error_message, &error_line, &error_column))
+          {
+          this->Internal->ServerStartups->load(xml);
+          }
+        else
+          {
+          qWarning() << "Error loading default_servers.pvsc: " << error_message 
+            << " line: " << error_line << " column: " << error_column;
+          }
         }
       }
     
