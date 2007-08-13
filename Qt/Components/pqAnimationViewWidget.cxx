@@ -427,7 +427,7 @@ void pqAnimationViewWidget::updateTicks()
   pqAnimationModel* animModel =
     this->Internal->AnimationWidget->animationModel();
   int num = this->Internal->numberOfTicks();
-  animModel->setTicks(num);
+  animModel->setTicks(num+1);
 }
 
 
