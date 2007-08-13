@@ -403,7 +403,7 @@ void pqAnimationViewWidget::updatePlayMode()
   QString mode = pqSMAdaptor::getEnumerationProperty(
     pxy->GetProperty("PlayMode")).toString();
 
-  if(mode == "Realtime")
+  if(mode == "Real Time")
     {
     animModel->setMode(pqAnimationModel::Real);
     }
