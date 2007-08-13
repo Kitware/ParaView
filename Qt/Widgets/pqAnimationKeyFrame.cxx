@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include <QGraphicsView>
 #include "pqAnimationTrack.h"
-#include "pqAnimationModel.h"
 
 pqAnimationKeyFrame::pqAnimationKeyFrame(pqAnimationTrack* p, QGraphicsScene* s)
   : QObject(p), QGraphicsItem(p,s),
@@ -117,15 +116,14 @@ void pqAnimationKeyFrame::setBoundingRect(const QRectF& r)
 void pqAnimationKeyFrame::adjustRect()
 {
   pqAnimationTrack* track = qobject_cast<pqAnimationTrack*>(this->parent());
-  pqAnimationModel* model = qobject_cast<pqAnimationModel*>(track->parent());
   QRectF trackRect = track->boundingRect();
 
   double w = trackRect.width();
 
-  double left = trackRect.left() + w * (this->startTime() - model->startTime());
-  double width = trackRect.width() * (this->endTime() - this->startTime());
+  double left = trackRect.left() + w * this->startTime();
+  double right = trackRect.left() + w * this->endTime();
 
-  this->setBoundingRect(QRectF(left, trackRect.top(), width, trackRect.height()));
+  this->setBoundingRect(QRectF(left, trackRect.top(), right-left, trackRect.height()));
 }
 
 
