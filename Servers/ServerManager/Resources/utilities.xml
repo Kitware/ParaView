@@ -720,8 +720,9 @@
       </ProxyProperty>
 
       <ProxyProperty name="Cues"
-        command="AddCue"
-        remove_command="RemoveCue">
+        update_self="1"
+        command="AddCueProxy"
+        remove_command="RemoveCueProxy">
         <ProxyGroupDomain name="groups">
           <Group name="animation" />
         </ProxyGroupDomain>

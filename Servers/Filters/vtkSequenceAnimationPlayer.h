@@ -46,9 +46,10 @@ protected:
   virtual double GoToNext(double start, double end, double currenttime);
   virtual double GoToPrevious(double start, double end, double currenttime);
 
-
   int NumberOfFrames;
-  double Delta;
+  double StartTime;
+  double EndTime;
+  int FrameNo;
 private:
   vtkSequenceAnimationPlayer(const vtkSequenceAnimationPlayer&); // Not implemented
   void operator=(const vtkSequenceAnimationPlayer&); // Not implemented

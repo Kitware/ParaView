@@ -17,12 +17,12 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkSequenceAnimationPlayer);
-vtkCxxRevisionMacro(vtkSequenceAnimationPlayer, "1.1");
+vtkCxxRevisionMacro(vtkSequenceAnimationPlayer, "1.2");
 //----------------------------------------------------------------------------
 vtkSequenceAnimationPlayer::vtkSequenceAnimationPlayer()
 {
   this->NumberOfFrames = 10;
-  this->Delta = 0;
+  this->FrameNo = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -33,26 +33,31 @@ vtkSequenceAnimationPlayer::~vtkSequenceAnimationPlayer()
 //----------------------------------------------------------------------------
 void vtkSequenceAnimationPlayer::StartLoop(double starttime, double endtime)
 {
-  this->Delta = static_cast<double>(endtime-starttime)/(this->NumberOfFrames-1);
+  this->FrameNo = 0;
+  this->StartTime = starttime;
+  this->EndTime = endtime;
 }
 
 //----------------------------------------------------------------------------
-double vtkSequenceAnimationPlayer::GetNextTime(double curtime)
+double vtkSequenceAnimationPlayer::GetNextTime(double vtkNotUsed(curtime))
 {
-  return (curtime + this->Delta);
+  double time = this->StartTime + 
+    ((this->EndTime - this->StartTime)*this->FrameNo)/(this->NumberOfFrames-1);
+  this->FrameNo++;
+  return time;
 }
 
 //----------------------------------------------------------------------------
 double vtkSequenceAnimationPlayer::GoToNext(double start, double end, double curtime)
 {
-  double delta = static_cast<double>(end-start)/this->NumberOfFrames;
+  double delta = static_cast<double>(end-start)/(this->NumberOfFrames-1);
   return (curtime + delta);
 }
 
 //----------------------------------------------------------------------------
 double vtkSequenceAnimationPlayer::GoToPrevious(double start, double end, double curtime)
 {
-  double delta = static_cast<double>(end-start)/this->NumberOfFrames;
+  double delta = static_cast<double>(end-start)/(this->NumberOfFrames-1);
   return (curtime - delta);
 }
 

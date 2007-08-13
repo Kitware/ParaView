@@ -67,6 +67,11 @@ public:
   vtkSetMacro(Caching, int);
   vtkGetMacro(Caching, int);
 
+  // Description:
+  // Add/Remove animation cue proxy.
+  void AddCueProxy(vtkSMAnimationCueProxy*);
+  void RemoveCueProxy(vtkSMAnimationCueProxy*);
+
 //BTX
 protected:
   vtkSMAnimationSceneProxy();
