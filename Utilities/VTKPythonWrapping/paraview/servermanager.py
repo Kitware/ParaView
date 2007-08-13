@@ -13,9 +13,13 @@
 #
 #==============================================================================
 r"""servermanager is a module for using paraview server manager in Python.
-One can always use the server manager directly. However, this module
-provides server utilty methods that assist in creating connections,
-proxies, as well as introspection.
+One can always use the server manager API directly. However, this module
+provides an interface easier to use from Python by wrapping several VTK
+classes around Python classes.
+
+Note that, upon load, this module will create several sub-modules: sources,
+filters and renderind. These modules can be used to instantiate specific
+proxy types. For a list, try "dir(servermanager.sources)"
 
 A simple example:
   from paraview.servermanager import *
@@ -34,7 +38,6 @@ A simple example:
   # module.
   display = CreateRepresentation(sphere, renModule)
 
-  renModule.ResetCamera()
   renModule.StillRender()
 """
 import re, os, new, exceptions, sys, vtk
@@ -48,7 +51,7 @@ else:
 
 class Proxy(object):
     """
-    Proxy wrapper. Makes it easier to set properties on a proxy.
+    Proxy wrapper. Makes it easier to set/get properties on a proxy.
     Instead of:
      proxy.GetProperty("Foo").SetElement(0, 1)
      proxy.GetProperty("Foo").SetElement(0, 2)
@@ -56,15 +59,20 @@ class Proxy(object):
      proxy.Foo = (1,2)
     or
      proxy.Foo.SetData((1,2))
+    or
+     proxy.Foo[0:2] = (1,2)
     Instead of:
-      proxy.GetPropery("Foo").GetElements()
+      proxy.GetPropery("Foo").GetElement(0)
     you can do:
-      proxy.Foo.GetData()
-      it returns a list of all values of the property.
+      proxy.Foo.GetData()[0]
+    or
+      proxy.Foo[0]
     For proxy properties, you can use append:
      proxy.GetProperty("Bar").AddProxy(foo)
     you can do:
      proxy.Bar.append(foo)
+    Properties support most of the list API. See VectorProperty and
+    ProxyProperty documentation for details.
 
     This class also provides an iterator which can be used to iterate
     over all properties.
@@ -72,8 +80,19 @@ class Proxy(object):
       proxy = Proxy(proxy=smproxy)
       for property in proxy:
           print property
+
+    Please note that some of the methods accessible through the Proxy
+    class are not listed by help() because the Proxy objects forward
+    unresolved attributes to the underlying object. To get the full list,
+    see also dir(proxy.SMProxy). See also the doxygen based documentation
+    of the vtkSMProxy C++ class.
     """
     def __init__(self, **args):
+        """ Default constructor. It can be used to initialize properties
+        by passing keyword arguments where the key is the name of the
+        property. In addition registrationGroup and registrationName (optional)
+        can be specified (as keyword arguments) to automatically register
+        the proxy with the proxy manager. """
         self.Observed = None
         self.__Properties = {}
 
@@ -96,6 +115,8 @@ class Proxy(object):
         self.UpdateVTKObjects()
 
     def __del__(self):
+        """Destructor. Cleans up all observers as well as remove
+        the proxy for the _pyproxies dictionary"""
         # Make sure that we remove observers we added
         if self.Observed:
             observed = self.Observed
@@ -105,28 +126,34 @@ class Proxy(object):
             del _pyproxies[self.SMProxy]
 
     def InitializeFromProxy(self, aProxy):
-        "Constructor. Assigns proxy to self.SMProxy"
+        """Constructor. Assigns proxy to self.SMProxy, updates the server
+        object as well as register the proxy in _pyproxies dictionary."""
         import weakref
         self.SMProxy = aProxy
         self.SMProxy.UpdateVTKObjects()
         _pyproxies[self.SMProxy] = weakref.ref(self)
 
     def Initialize(self):
-        "Overridden by the subclass"
+        "Overridden by the subclass created automatically"
         pass
     
     def __eq__(self, other):
+        "Returns true if the underlying SMProxies are the same."
         if isinstance(other, Proxy):
             return self.SMProxy == other.SMProxy
         return self.SMProxy == other
 
     def __ne__(self, other):
+        "Returns false if the underlying SMProxies are the same."
         return not self.__eq__(other)
 
     def __iter__(self):
+        "Creates an iterator for the properties."
         return PropertyIterator(self)
 
     def __GetDataInformation(self, idx=0):
+        """Internal method that returns a DataInformation wrapper
+        around a vtkPVDataInformation"""
         if self.SMProxy:
             return DataInformation( \
                 self.SMProxy.GetDataInformation(idx, False), \
@@ -136,14 +163,8 @@ class Proxy(object):
         """Generic method for setting the value of a property."""
         self.GetProperty(pname).SetData(arg)
          
-    def __SaveDefinition(self, root=None):
-        "Overload for CompoundProxy's SaveDefinition."
-        defn = self.SMProxy.SaveDefinition(root)
-        if defn:
-            defn.UnRegister(None)
-        return defn
-
     def GetProperty(self, name):
+        """Given a property name, returns the property object."""
         if name in self.__Properties:
             return self.__Properties[name]
         smproperty = self.SMProxy.GetProperty(name)
@@ -161,7 +182,7 @@ class Proxy(object):
         return None
             
     def ListProperties(self):
-        """Returns a list of all properties on this proxy."""
+        """Returns a list of all property names on this proxy."""
         property_list = []
         iter = self.__iter__()
         for property in iter:
@@ -228,39 +249,72 @@ class Proxy(object):
         return getattr(self.SMProxy, name)
 
 class Property(object):
+    """Python wrapper around a vtkSMProperty with a simple interface.
+    In addition to all method provided by vtkSMProperty (obtained by
+    forwarding unknown attributes requests to the underlying SMProxy),
+    Property and sub-class provide a list API.
+
+    Please note that some of the methods accessible through the Property
+    class are not listed by help() because the Property objects forward
+    unresolved attributes to the underlying object. To get the full list,
+    see also dir(proxy.SMProperty). See also the doxygen based documentation
+    of the vtkSMProperty C++ class.
+    """
     def __init__(self, proxy, smproperty):
+        """Default constructor. Stores a weakref to the proxy. Note
+        that Property objects will not function if the proxy they
+        are referring to goes away."""
         import weakref
         self.SMProperty = smproperty
         self.Proxy = weakref.ref(proxy)
 
     def __repr__(self):
-        if self.GetData():
-            return self.GetData().__repr__()
-        return object.__repr__(self)
+        """Returns a string representation containing property name
+        and value"""
+        repr = "Property name= "
+        name = self.Proxy().GetPropertyName(self.SMProperty)
+        if name:
+            repr += name
+        else:
+            repr += "Unknown"
+        repr += " value = "
+        if self.GetData() is not None:
+            repr += self.GetData().__repr__()
+        else:
+            repr += "None"
+        return repr
 
     def _FindPropertyName(self):
-        iter = self.Proxy().NewPropertyIterator()
-        iter.UnRegister(None)
-        while not iter.IsAtEnd():
-            if iter.GetProperty() is self.SMProperty:
-                return iter.GetKey()
-            iter.Next()
-        return None    
+        "Returns the name of this property."
+        return self.Proxy().GetPropertyName(self.SMProperty)
 
 class VectorProperty(Property):
+    """Python wrapper for vtkSMVectorProperty and sub-classes.
+    In addition to vtkSMVectorProperty methods, this class provides
+    a list interface, allowing things like:
+    val = property[2]
+    property[1:3] = (1, 2)
+    """
+    
     def __len__(self):
+        """Returns the number of elements."""
         return self.SMProperty.GetNumberOfElements()
 
     def __getitem__(self, idx):
+        """Given an index, return an element. Raises an IndexError
+        exception if the argument is out of bounds."""
         if idx >= len(self):
             raise exceptions.IndexError
         return self.SMProperty.GetElement(idx)
 
     def __setitem__(self, idx, value):
+        """Given an index and a value, sets an element."""
         self.SMProperty.SetElement(idx, value)
         self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
 
     def __getslice__(self, min, max):
+        """Returns the range [min, max) of elements. Raises an IndexError
+        exception if an argument is out of bounds."""
         if min < 0 or min > len(self) or max < 0 or max > len(self):
             raise exceptions.IndexError
         retval = []
@@ -269,6 +323,7 @@ class VectorProperty(Property):
         return retval
 
     def __setslice__(self, min, max, values):
+        "Given a list or tuple of values, sets a slice of values [min, max)."
         if min < 0 or min > len(self) or max < 0 or max > len(self):
             raise exceptions.IndexError
         for i in range(min, max):
@@ -276,9 +331,11 @@ class VectorProperty(Property):
         self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
 
     def __getattr__(self, name):
+        "Unknown attribute requests get forwarded to SMProperty."
         return getattr(self.SMProperty, name)
 
     def GetData(self):
+        "Returns all elements as either a list or a single value."
         property = self.SMProperty
         if property.GetRepeatable() or \
            property.GetRepeatCommand() or  \
@@ -288,6 +345,8 @@ class VectorProperty(Property):
             return property.GetElement(0)
 
     def SetData(self, values):
+        """Allows setting of all values at once. Requires a single value,
+        a tuple or list."""
         if not isinstance(values, tuple) and \
            not isinstance(values, list):
             values = (values,)
@@ -296,28 +355,44 @@ class VectorProperty(Property):
         self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
 
     def Clear(self):
+        "Removes all elements."
         self.SMProperty().SetNumberOfElements(0)
         self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
 
 class ProxyProperty(Property):
+    """Python wrapper for vtkSMProxyProperty.
+    In addition to vtkSMProxyProperty methods, this class provides
+    a list interface, allowing things like:
+    proxy = property[2]
+    property[1:3] = (px1, px2)
+    property.append(proxy)
+    del property[1]
+    """
     def __len__(self):
+        """Returns the number of elements."""
         return self.SMProperty.GetNumberOfProxies()
 
     def __getitem__(self, idx):
+        """Given an index, return an element. Raises an IndexError
+        exception if the argument is out of bounds."""
         if idx >= len(self):
             raise exceptions.IndexError
         return _getPyProxy(self.SMProperty.GetProxy(idx))
 
     def __setitem__(self, idx, value):
+        """Given an index and a value, sets an element."""
         self.SMProperty.SetProxy(idx, value.SMProxy)
         self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
 
     def __delitem__(self, idx):
+        """Removes the element idx"""
         proxy = self[idx].SMProxy
         self.SMProperty.RemoveProxy(proxy.SMProxy)
         self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
 
     def __getslice__(self, min, max):
+        """Returns the range [min, max) of elements. Raises an IndexError
+        exception if an argument is out of bounds."""
         if min < 0 or min > len(self) or max < 0 or max > len(self):
             raise exceptions.IndexError
         retval = []
@@ -327,6 +402,7 @@ class ProxyProperty(Property):
         return retval
 
     def __setslice__(self, min, max, values):
+        "Given a list or tuple of values, sets a slice of values [min, max)."
         if min < 0 or min > len(self) or max < 0 or max > len(self):
             raise exceptions.IndexError
         for i in range(min, max):
@@ -334,6 +410,7 @@ class ProxyProperty(Property):
         self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
 
     def __delslice__(self, min, max):
+        """Removes elements [min, max)"""
         proxies = []
         for i in range(min, max):
             proxies.append(self[i])
@@ -342,13 +419,16 @@ class ProxyProperty(Property):
         self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
 
     def __getattr__(self, name):
+        "Unknown attribute requests get forwarded to SMProperty."
         return getattr(self.SMProperty, name)
 
     def append(self, proxy):
+        "Appends the given proxy to the property values."
         self.SMProperty.AddProxy(proxy.SMProxy)
         self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
         
     def GetData(self):
+        "Returns all elements as either a list or a single value."
         property = self.SMProperty
         if property.GetRepeatable() or property.GetNumberOfProxies() > 1:
             return self.__getslice__(0, len(self))
@@ -358,6 +438,8 @@ class ProxyProperty(Property):
         return None
 
     def SetData(self, values):
+        """Allows setting of all values at once. Requires a single value,
+        a tuple or list."""
         if not isinstance(values, tuple) and \
            not isinstance(values, list):
             values = (values,)
@@ -371,11 +453,25 @@ class ProxyProperty(Property):
         self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
 
     def Clear(self):
+        "Removes all elements."
         self.SMProperty.RemoveAllProxies()
         self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
 
 class InputProperty(ProxyProperty):
+    """Python wrapper for vtkSMInputProperty.
+    In addition to vtkSMInputProperty methods, this class provides
+    a list interface, allowing things like:
+    outputport = property[2]
+    property[0] = proxy
+     or
+    property[0] = OuputPort(proxy, 1)
+    property.append(OutputPort(proxy, 0))
+    del property[1]
+    """
+
     def __getitem__(self, idx):
+        """Given an index, return an element as an OutputPort object.
+        Raises an IndexError exception if the argument is out of bounds."""
         if idx >= len(self):
             raise exceptions.IndexError
         return OutputPort(_getPyProxy(self.SMProperty.GetProxy(idx)),\
@@ -393,11 +489,16 @@ class InputProperty(ProxyProperty):
         return OutputPort(value_proxy, portidx)
         
     def __setitem__(self, idx, value):
+        """Given an index and a value, sets an element. Accepts Proxy or
+        OutputPort objects."""
         op = self.__getOutputPort(value)
         self.SMProperty.SetInputConnection(idx, op.Proxy, op.Port)
         self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
 
     def __getslice__(self, min, max):
+        """Returns the range [min, max) of elements as a list of OutputPort
+        objects. Raises an IndexError exception if an argument is out of
+        bounds."""
         if min < 0 or min > len(self) or max < 0 or max > len(self):
             raise exceptions.IndexError
         retval = []
@@ -408,6 +509,8 @@ class InputProperty(ProxyProperty):
         return retval
 
     def __setslice__(self, min, max, values):
+        """Given a list or tuple of values, sets a slice of values [min, max).
+        Accepts Proxy or OutputPort objects."""
         if min < 0 or min > len(self) or max < 0 or max > len(self):
             raise exceptions.IndexError
         for i in range(min, max):
@@ -416,11 +519,15 @@ class InputProperty(ProxyProperty):
         self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
 
     def append(self, value):
+        """Appends the given proxy to the property values.
+        Accepts Proxy or OutputPort objects."""
         op = self.__getOutputPort(value)
         self.SMProperty.AddInputConnection(op.Proxy, op.Port)
         self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
         
     def GetData(self):
+        """Returns all elements as either a list of OutputPort objects or
+        a single OutputPort object."""
         property = self.SMProperty
         if property.GetRepeatable() or property.GetNumberOfProxies() > 1:
             return self.__getslice__(0, len(self))
@@ -431,6 +538,8 @@ class InputProperty(ProxyProperty):
         return None
 
     def SetData(self, values):
+        """Allows setting of all values at once. Requires a single value,
+        a tuple or list. Accepts Proxy or OutputPort objects."""
         if not isinstance(values, tuple) and \
            not isinstance(values, list):
             values = (values,)
@@ -441,16 +550,33 @@ class InputProperty(ProxyProperty):
         self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
         
 class DataInformation(object):
+    """Python wrapper around a vtkPVDataInformation. In addition to
+    proving all methods of a vtkPVDataInformation, it provides a
+    few convenience methods.
+
+    Please note that some of the methods accessible through the DataInformation
+    class are not listed by help() because the DataInformation objects forward
+    unresolved attributes to the underlying object. To get the full list,
+    see also dir(proxy.DataInformation).
+    See also the doxygen based documentation of the vtkPVDataInformation C++
+    class.
+    """
     def __init__(self, dataInformation, proxy, idx):
+        """Default constructor. Requires a vtkPVDataInformation, a source proxy
+        and an output port id."""
         self.DataInformation = dataInformation
         self.Proxy = proxy
         self.Idx = idx
 
     def Update(self):
+        """Update the data information if necessary. Note that this
+        does not cause execution of the underlying object. In certain
+        cases, you may have to call UpdatePipeline() on the proxy."""
         if self.Proxy:
             self.Proxy.GetDataInformation(self.Idx, False)
             
     def GetDataSetType(self):
+        """Returns the dataset type as defined in vtkDataObjectTypes."""
         self.Update()
         if not self.DataInformation:
             raise exceptions.RuntimeError, "No data information is available"
@@ -459,20 +585,30 @@ class DataInformation(object):
         return self.DataInformation.GetDataSetType()
 
     def GetDataSetTypeAsString(self):
+        """Returns the dataset type as a user-friendly string. This is
+        not the same as the enumaration used by VTK"""
         return vtk.vtkDataObjectTypes.GetClassNameFromTypeId(self.GetDataSetType())
 
     def __getattr__(self, name):
+        """Forwards unknown attribute requests to the underlying
+        vtkPVInformation."""
         if not self.DataInformation:
             return getattr(self, name)
         self.Update()
         return getattr(self.DataInformation, name)
     
 class OutputPort(object):
-    def __init__(self, proxy=None, outputPort=0):
+    """Helper class to store a reference to an output port. Used to
+    set pipeline connections."""
+    
+    def __init__(self, proxy, outputPort=0):
+        """Default constructor. It takes a Proxy and an optional port
+        index."""
         self.Proxy = proxy
         self.Port = outputPort
 
     def __repr__(self):
+        """Returns a user-friendly representation string."""
         import exceptions
         try:
             return self.Proxy.__repr__() + ":%d" % self.Port
@@ -480,12 +616,34 @@ class OutputPort(object):
             return object.__repr__(self)
         
 class ProxyManager(object):
-    "Proxy manager wrapper"
+    """Python wrapper for vtkSMProxyManager. Note that the underlying
+    vtkSMProxyManager is a singleton. All instances of this class will
+    refer to the same object. In addition to all methods provided by
+    vtkSMProxyManager (all unknown attribute requests are forwarded
+    to the vtkSMProxyManager), this class provides several convenience
+    methods.
+
+    When running scripts from the python shell in the ParaView application,
+    registering proxies with the proxy manager is the ony mechanism to
+    notify the graphical user interface (GUI) that a proxy
+    exists. Therefore, unless a proxy is registered, it will not show up in
+    the user interface. Also, the proxy manager is the only way to get
+    access to proxies created using the GUI. Proxies created using the GUI
+    are automatically registered under an appropriate group (sources,
+    filters, representations and views). To get access to these objects,
+    you can use proxyManager.GetProxy(group, name). The name is the same
+    as the name shown in the pipeline browser.
+
+    Please note that some of the methods accessible through the ProxyManager
+    class are not listed by help() because the ProxyManager objects forwards
+    unresolved attributes to the underlying object. To get the full list,
+    see also dir(proxy.SMProxyManager). See also the doxygen based documentation
+    of the vtkSMProxyManager C++ class.
+    """
 
     def __init__(self):
         """Constructor. Assigned self.SMProxyManager to
-        vtkSMObject.GetPropertyManager(). Make sure to initialize
-        server manager before creating a ProxyManager"""
+        vtkSMObject.GetPropertyManager()."""
         self.SMProxyManager = vtkSMObject.GetProxyManager()
 
     def RegisterProxy(self, group, name, aProxy):
@@ -497,8 +655,10 @@ class ProxyManager(object):
             self.SMProxyManager.RegisterProxy(group, name, aProxy)
 
     def NewProxy(self, group, name):
-        """Creates a new proxy of given group and name and returns a proxy
-        wrapper"""
+        """Creates a new proxy of given group and name and returns an SMProxy.
+        Note that this is a server manager object. You should normally create
+        proxies using the class objects. For example:
+        obj = servermanager.sources.SphereSource()"""
         if not self.SMProxyManager:
             return None
         aProxy = self.SMProxyManager.NewProxy(group, name)
@@ -508,7 +668,7 @@ class ProxyManager(object):
         return aProxy
 
     def GetProxy(self, group, name):
-        """Returns a proxy wrapper for a proxy"""
+        """Returns a Proxy registered under a group and name"""
         if not self.SMProxyManager:
             return None
         aProxy = self.SMProxyManager.GetProxy(group, name)
@@ -517,7 +677,9 @@ class ProxyManager(object):
         return _getPyProxy(aProxy)
 
     def GetPrototypeProxy(self, group, name):
-        """Returns a proxy wrapper for a proxy"""
+        """Returns a prototype proxy given a group and name. This is an
+        SMProxy. This is a low-level method. You should not normally
+        have to call it."""
         if not self.SMProxyManager:
             return None
         aProxy = self.SMProxyManager.GetPrototypeProxy(group, name)
@@ -559,7 +721,12 @@ class ProxyManager(object):
             self.SMProxyManager.UnRegisterProxy(groupname, proxyname, aProxy)
 
     def GetProxies(self, groupname, proxyname):
-        """Returns all proxies registered under the given group with the given name."""
+        """Returns all proxies registered under the given group with the
+        given name. Note that it is possible to register more than one
+        proxy with the same name in the same group. Because the proxies
+        are different, there is no conflict. Use this method instead of
+        GetProxy() if you know that there are more than one proxy registered
+        with this name."""
         if not self.SMProxyManager:
             return []
         collection = vtk.vtkCollection()
@@ -572,23 +739,29 @@ class ProxyManager(object):
                 
         return result
         
-    def __getattr__(self, name):
-        """Returns attribute from the ProxyManager"""
-        return getattr(self.SMProxyManager, name)
-
     def __iter__(self):
+        """Returns a new ProxyIterator."""
         return ProxyIterator()
 
     def NewGroupIterator(self, group_name, connection=None):
+        """Returns a ProxyIterator for a group. The resulting object
+        can be used to traverse the proxies that are in the given
+        group."""
         iter = self.__iter__()
+        if not connection:
+            connection = ActiveConnection
         if connection:
             iter.SetConnectionID(connection.ID)
         iter.SetModeToOneGroup()
         iter.Begin(group_name)
         return iter
 
-    def NewConnectionIterator(self, connection):
+    def NewConnectionIterator(self, connection=None):
+        """Returns a ProxyIterator for a given connection. This can be
+        used to travers ALL proxies managed by the proxy manager."""
         iter = self.__iter__()
+        if not connection:
+            connection = ActiveConnection
         if connection:
             iter.SetConnectionID(connection.ID)
         iter.Begin()
@@ -610,19 +783,58 @@ class ProxyManager(object):
         aProxy = self.GetPrototypeProxy(groupname, proxyname)
         if aProxy:
             return aProxy.ListProperties()
+
+    def __ConvertArgumentsAndCall(self, *args):
+      newArgs = []
+      for arg in args:
+          if issubclass(type(arg), Proxy) or isinstance(arg, Proxy):
+              newArgs.append(arg.SMProxy)
+          else:
+              newArgs.append(arg)
+      func = getattr(self.SMProxyManager, self.__LastAttrName)
+      retVal = func(*newArgs)
+      if type(retVal) is type(self.SMProxyManager) and retVal.IsA("vtkSMProxy"):
+          return _getPyProxy(retVal)
+      elif type(retVal) is type(self.SMProxyManager) and retVal.IsA("vtkSMProperty"):
+          property = retVal
+          if property.IsA("vtkSMVectorProperty"):
+              return VectorProperty(self, property)
+          elif property.IsA("vtkSMInputProperty"):
+              return InputProperty(self, property)
+          elif property.IsA("vtkSMProxyProperty"):
+              return ProxyProperty(self, property)
+          else:
+              return None
+      else:
+          return retVal
+
+    def __getattr__(self, name):
+        """Returns attribute from the ProxyManager"""
+        try:
+            pmAttr = getattr(self.SMProxyManager, name)
+            self.__LastAttrName = name
+            return self.__ConvertArgumentsAndCall
+        except:
+            pass
+        return getattr(self.SMProxyManager, name)
         
 
 class PropertyIterator(object):
     """Wrapper for a vtkSMPropertyIterator class to satisfy
-       the python iterator protocol."""
+       the python iterator protocol. Note that the list of
+       properties can also be obtained from the class object's
+       dictionary.
+       See the doxygen documentation for vtkSMPropertyIterator C++
+       class for details.
+       """
+    
     def __init__(self, aProxy):
         self.SMIterator = aProxy.NewPropertyIterator()
 	if self.SMIterator:
             self.SMIterator.UnRegister(None)
             self.SMIterator.Begin()
         self.Key = None
-        self.Property = None
-        self.Proxy = None
+        self.Proxy = aProxy
 
     def __iter__(self):
         return self
@@ -633,14 +845,10 @@ class PropertyIterator(object):
 
         if self.SMIterator.IsAtEnd():
             self.Key = None
-            self.Property = None
-            self.Proxy = None
             raise StopIteration
-        self.Proxy = self.SMIterator.GetProxy()
         self.Key = self.SMIterator.GetKey()
-        self.Property = self.SMIterator.GetProperty()
         self.SMIterator.Next()
-        return self.Property
+        return self.Proxy.GetProperty(self.Key)
 
     def GetProxy(self):
         """Returns the proxy for the property last returned by the call to
@@ -654,7 +862,7 @@ class PropertyIterator(object):
 
     def GetProperty(self):
         """Returns the property last returned by the call to 'next()' """
-        return self.Property
+        return self.Proxy.GetProperty(self.Key)
 
     def __getattr__(self, name):
         """returns attributes from the vtkSMProxyIterator."""
@@ -662,7 +870,9 @@ class PropertyIterator(object):
 
 class ProxyDefinitionIterator(object):
     """Wrapper for a vtkSMProxyDefinitionIterator class to satisfy
-       the python iterator protocol."""
+       the python iterator protocol.
+       See the doxygen documentation of the vtkSMProxyDefinitionIterator
+       C++ class for more information."""
     def __init__(self):
         self.SMIterator = vtkSMProxyDefinitionIterator()
         self.Group = None
@@ -698,7 +908,10 @@ class ProxyDefinitionIterator(object):
 
 class ProxyIterator(object):
     """Wrapper for a vtkSMProxyIterator class to satisfy the
-     python iterator protocol."""
+     python iterator protocol.
+     See the doxygen documentation of vtkSMProxyIterator C++ class for
+     more information.
+     """
     def __init__(self):
         self.SMIterator = vtkSMProxyIterator()
         self.SMIterator.Begin()
@@ -742,10 +955,11 @@ class ProxyIterator(object):
 
 class Connection(object):
     """
-      This is a representation for a connection on in the python client.
-      Eventually,  this may move to the server manager itself.
+      This is a python representation for a connection.
     """
     def __init__(self, connectionId):
+        """Default constructor. Creates a Connection with the given
+        ID, all other data members initialized to None."""
         self.ID = connectionId
         self.Hostname = ""
         self.Port = 0
@@ -754,6 +968,7 @@ class Connection(object):
         return
 
     def SetHost(self, ds_host, ds_port, rs_host=None, rs_port=None):
+        """Set the hostname of a given connection. Used by Connect()."""
         self.Hostname = ds_host 
         self.Port = ds_port
         self.RSHostname = rs_host
@@ -761,12 +976,15 @@ class Connection(object):
         return
 
     def __repr__(self):
+        """User friendly string representation"""
         if not self.RSHostname:
             return "Connection (%s:%d)" % (self.Hostname, self.Port)
         return "Connection data(%s:%d), render(%s:%d)" % \
             (self.Hostname, self.Port, self.RSHostname, self.RSPort)
 
     def IsRemote(self):
+        """Returns True if the connection to a remote server, False if
+        it is local (built-in)"""
         pm = vtkProcessModule.GetProcessModule()
         if pm.IsRemote(self.ID):
             return True
@@ -781,14 +999,16 @@ class Connection(object):
 
 # Users can set the active connection which will be used by API
 # to create proxies etc when no connection argument is passed.
+# Connect() automatically sets this if it is not already set.
 ActiveConnection = None
 
-## These are method to create a new connection.
+## These are methods to create a new connection.
 ## One can connect to a server, (data-server,render-server)
 ## or simply create a built-in connection.
+## Note: these are internal methods. Use Connect() instead.
 def _connectServer(host, port):
     """Connect to a host:port. Returns the connection object if successfully
-    connected with the server."""
+    connected with the server. Internal method, use Connect() instead."""
     pm =  vtkProcessModule.GetProcessModule()
     cid = pm.ConnectToRemote(host, port)
     if not cid:
@@ -801,7 +1021,7 @@ def _connectDsRs(ds_host, ds_port, rs_host, rs_port):
     """Connect to a dataserver at (ds_host:ds_port) and to a render server
     at (rs_host:rs_port). 
     Returns the connection object if successfully connected 
-    with the server."""
+    with the server. Internal method, use Connect() instead."""
     pm =  vtkProcessModule.GetProcessModule()
     cid = pm.ConnectToRemote(ds_host, ds_port, rs_host, rs_port)
     if not cid:
@@ -811,7 +1031,7 @@ def _connectDsRs(ds_host, ds_port, rs_host, rs_port):
     return conn 
 
 def _connectSelf():
-    """Creates a new self connection."""
+    """Creates a new self connection.Internal method, use Connect() instead."""
     pm =  vtkProcessModule.GetProcessModule()
     pmOptions = pm.GetOptions()
     if pmOptions.GetProcessType() == 0x40: # PVBATCH
@@ -849,7 +1069,8 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     return connectionId
 
 def Disconnect(connection=None):
-    """Disconnects the connection."""
+    """Disconnects the connection. Make sure to clear the proxy manager
+    first."""
     global ActiveConnection
     if not connection:
         connection = ActiveConnection
@@ -859,12 +1080,12 @@ def Disconnect(connection=None):
     return
 
 def CreateProxy(xml_group, xml_name, connection=None):
-    """Creates a proxy. If register_group is non-None, then the created
-       proxy is registered under that group. If connection is set, the proxy's
-       connection ID is set accordingly. If connection is None, ActiveConnection
-       is used, is present. If register_group is non-None, but register_name is None,
-       then the proxy's self id is used to create a new name.
-    """
+    """Creates a proxy. If connection is set, the proxy's connection ID is
+    set accordingly. If connection is None, ActiveConnection is used, if
+    present. You should not have to use method normally. Instantiate the
+    appropriate class from the appropriate module, for example:
+    sph = servermanager.sources.SphereSource()"""
+
     pxm = ProxyManager()
     aProxy = pxm.NewProxy(xml_group, xml_name)
     if not aProxy:
@@ -876,7 +1097,9 @@ def CreateProxy(xml_group, xml_name, connection=None):
     return aProxy
 
 def GetRenderView(connection=None):
-    """Return the render view in use.  If more than one render view is in use, return the first one."""
+    """Return the render view in use.  If more than one render view is in
+    use, return the first one."""
+
     if not connection:
         connection = ActiveConnection
     render_module = None
@@ -888,6 +1111,7 @@ def GetRenderView(connection=None):
 
 def GetRenderViews(connection=None):
     """Returns the set of all render views."""
+    
     if not connection:
         connection = ActiveConnection
     render_modules = []
@@ -897,8 +1121,15 @@ def GetRenderViews(connection=None):
     return render_modules
 
 def CreateRenderView(connection=None, **extraArgs):
-    """Creates a render window on the particular connection. If connection is not specified,
-    then the active connection is used, if available."""
+    """Creates a render window on the particular connection. If connection
+    is not specified, then the active connection is used, if available.
+
+    This method can also be used to initialize properties by passing
+    keyword arguments where the key is the name of the property.In addition
+    registrationGroup and registrationName (optional) can be specified (as
+    keyword arguments) to automatically register the proxy with the proxy
+    manager."""
+
     if not connection:
         connection = ActiveConnection
     if not connection:
@@ -920,7 +1151,15 @@ def CreateRenderView(connection=None, **extraArgs):
     return proxy
 
 def CreateRepresentation(aProxy, view, **extraArgs):
-    """Creates a representation for the proxy and adds it to the render module."""
+    """Creates a representation for the proxy and adds it to the render
+    module.
+
+    This method can also be used to initialize properties by passing
+    keyword arguments where the key is the name of the property.In addition
+    registrationGroup and registrationName (optional) can be specified (as
+    keyword arguments) to automatically register the proxy with the proxy
+    manager."""
+
     global rendering
     if not aProxy:
         raise exceptions.RuntimeError, "proxy argument cannot be None."
@@ -1013,11 +1252,16 @@ def Fetch(input, arg=None):
     return gvd.GetOutput()
 
 def Finalize():
+    """Although not required, this can be called at exit to cleanup."""
     vtkInitializationHelper.Finalize()
     
 # Internal methods
 
 def _getPyProxy(smproxy):
+    """Returns a python wrapper for a server manager proxy. This method
+    first checks if there is already such an object by looking in the
+    _pyproxies group and returns it if found. Otherwise, it creates a
+    new one. Proxies register themselves in _pyproxies upon creation."""
     if not smproxy:
         return None
     if smproxy in _pyproxies:
@@ -1040,6 +1284,8 @@ def _makeUpdateCameraMethod(rv):
     return UpdateCamera
 
 def _createInitialize(group, name):
+    """Internal method to create an Initialize() method for the sub-classes
+    of Proxy"""
     pgroup = group
     pname = name
     def aInitialize(self, connection=None):
@@ -1053,18 +1299,22 @@ def _createInitialize(group, name):
     return aInitialize
 
 def _createGetProperty(pName):
+    """Internal method to create a GetXXX() method where XXX == pName."""
     propName = pName
     def getProperty(self):
         return self.GetProperty(propName)
     return getProperty
 
 def _createSetProperty(pName):
+    """Internal method to create a SetXXX() method where XXX == pName."""
     propName = pName
     def setProperty(self, value):
         return self.SetPropertyWithName(propName, value)
     return setProperty
 
 def _findClassForProxy(xmlName):
+    """Given the xmlName for a proxy, returns a Proxy class. Note
+    that if there are duplicates, the first one is returned."""
     global sources, filters
     if xmlName in sources.__dict__:
         return sources.__dict__[xmlName]
@@ -1076,7 +1326,10 @@ def _findClassForProxy(xmlName):
         return None
 
 def _createModule(groupName, mdl=None):
+    """Populates a module with proxy classes defined in the given group.
+    If mdl is not specified, it also creates the module"""
     pxm = vtkSMObject.GetProxyManager()
+    # Use prototypes to find all proxy types.
     pxm.InstantiateGroupPrototypes(groupName)
 
     if not mdl:
@@ -1085,9 +1338,11 @@ def _createModule(groupName, mdl=None):
     for i in range(numProxies):
         pname = pxm.GetXMLProxyName(groupName, i)
         cdict = {}
+        # Create an Initialize() method for this sub-class.
         cdict['Initialize'] = _createInitialize(groupName, pname)
         proto = pxm.GetPrototypeProxy(groupName, pname)
         iter = PropertyIterator(proto)
+        # Add all properties as python properties.
         for prop in iter:
             if prop.IsA("vtkSMVectorProperty") or \
                prop.IsA("vtkSMProxyProperty"):
@@ -1099,17 +1354,27 @@ def _createModule(groupName, mdl=None):
                                            _createSetProperty(propName),
                                            None,
                                            propDoc)
-        if proto.GetDocumentation():
-            cdict['__doc__'] = proto.GetDocumentation().GetDescription()
+        # Add the documentation as the class __doc__
+        if proto.GetDocumentation() and \
+           proto.GetDocumentation().GetDescription():
+            doc = proto.GetDocumentation().GetDescription()
+        else:
+            doc = Proxy.__doc__
+        cdict['__doc__'] = doc
+        # Create the new type
         cobj = type(pname, (Proxy,), cdict)
+        # Add it to the modules dictionary
         mdl.__dict__[pname] = cobj
     return mdl
 
+# Needs to be called when paraview module is loaded from python instead
+# of pvpython, pvbatch or GUI.
 if not vtkSMObject.GetProxyManager():
     vtkInitializationHelper.Initialize(sys.executable)
 
 _pyproxies = {}
 
+# Create needed sub-modules
 sources = _createModule('sources')
 filters = _createModule('filters')
 rendering = _createModule('representations')
@@ -1117,10 +1382,35 @@ _createModule('newviews', rendering)
 _createModule("lookup_tables", rendering)
 
 def demo1():
+    """This simple demonstration creates a sphere, renders it and delivers
+    it to the client using Fetch. It returns a tuple of (data, render
+    view)"""
+    if not ActiveConnection:
+        Connect()
+    ss = sources.SphereSource(Radius=2, ThetaResolution=32)
+    shr = filters.ShrinkFilter(Input=OutputPort(ss,0))
+    cs = sources.ConeSource()
+    app = filters.Append()
+    app.Input = [shr, cs]
+    rv = CreateRenderView()
+    rep = CreateRepresentation(app, rv)
+    rv.ResetCamera()
+    rv.StillRender()
+    cf = filters.Contour()
+    data = Fetch(ss)
+
+    return (data, rv)
+
+def demo2(fname="/Users/berk/Work/ParaViewData/Data/disk_out_ref.ex2"):
+    """This method demonstrates the user of a reader, representation and
+    view. It also demonstrates how meta-data can be obtained using proxies.
+    Make sure to pass the full path to an exodus file. Also note that certain
+    parameters are hard-coded for disk_out_ref.ex2 which can be found
+    in ParaViewData. This method returns the render view."""
     if not ActiveConnection:
         Connect()
     # Create the exodus reader and specify a file name
-    reader = sources.ExodusIIReader(FileName="/Users/berk/Work/vtkSNL/Data/disk_out_ref.exo")
+    reader = sources.ExodusIIReader(FileName=fname)
     # Update information to force the reader to read the meta-data
     # including the list of variables available
     reader.UpdatePipelineInformation()
@@ -1186,7 +1476,12 @@ def demo1():
     rv.StillRender()
     return rv
 
-def demo2():
+def demo3():
+    """This method demonstrates the use of servermanager with numpy as
+    well as pylab for plotting. It creates an artificial data sources,
+    probes it with a line, delivers the result to the client using Fetch
+    and plots it using pylab. This demo requires numpy and pylab installed.
+    It returns a tuple of (data, render view)."""
     import paraview.numeric
     import pylab
     
@@ -1250,19 +1545,3 @@ def demo2():
     
     return (data, rv)
     
-def demo3():
-    if not ActiveConnection:
-        Connect()
-    ss = sources.SphereSource(Radius=2, ThetaResolution=32)
-    shr = filters.ShrinkFilter(Input=OutputPort(ss,0))
-    cs = sources.ConeSource()
-    app = filters.Append()
-    app.Input = [shr, cs]
-    rv = CreateRenderView()
-    rep = CreateRepresentation(app, rv)
-    rv.ResetCamera()
-    rv.StillRender()
-    cf = filters.Contour()
-    data = Fetch(ss)
-
-    return (data, rv)
