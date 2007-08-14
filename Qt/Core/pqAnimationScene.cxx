@@ -461,5 +461,6 @@ void pqAnimationScene::onTick(vtkObject*, unsigned long, void*, void* info)
     (cueInfo->AnimationTime - cueInfo->StartTime)*100/
     (cueInfo->EndTime - cueInfo->StartTime));
 
+  emit this->animationTime(cueInfo->ClockTime);
   emit this->tick(progress);
 }

@@ -129,6 +129,10 @@ signals:
   /// Argument is the percent of play completed.
   void tick(int percentCompleted);
 
+  /// Emitted when playing (or when animation time for the scene is set). 
+  /// \c time is the animation clock time.
+  void animationTime(double time);
+
   /// Emitted when the number of frames changes
   void frameCountChanged();
 
