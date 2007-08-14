@@ -1453,9 +1453,11 @@
 
   <ProxyGroup name="locators">
     <Proxy name="PKdTree" class="vtkPKdTree">
+    <!--
       <ProxyProperty name="DataSets"
                      command="AddDataSet"
                      remove_command="RemoveDataSet"/>
+                     -->
       <IntVectorProperty name="MinCells" command="SetMinCells"
                          number_of_elements="1"
                          default_values="0"/>
@@ -2080,7 +2082,7 @@
       <ProxyProperty
         name="Producers"
         command="AddProducer"
-        remove_command="RemoveProducer" >
+        clean_command="RemoveAllProducers" >
         <Documentation>
           Producers/algorithms producing data that needs to be distributed.
         </Documentation>
