@@ -708,23 +708,17 @@ void pqChartOptionsEditor::setAxisLabelNotation(
 {
   int i = this->Form->getIndexForLocation(location);
   int index = 3;
-  switch(notation)
+  if(notation == pqChartValue::Standard)
     {
-    case pqChartValue::Standard:
-      {
-      index = 0;
-      break;
-      }
-    case pqChartValue::Exponential:
-      {
-      index = 1;
-      break;
-      }
-    case pqChartValue::Engineering:
-      {
-      index = 2;
-      break;
-      }
+    index = 0;
+    }
+  else if(notation == pqChartValue::Exponential)
+    {
+    index = 1;
+    }
+  else if(notation == pqChartValue::Engineering)
+    {
+    index = 2;
     }
 
   if(this->Form->AxisData[i]->Notation != index)
