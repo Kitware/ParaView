@@ -1261,10 +1261,11 @@ void pqChartOptionsEditor::updateAxisLabels()
     else
       {
       // Make sure the label is in order.
+      int row = 0;
       double current = text.toDouble();
       QStringList labels = axis->Labels.stringList();
       QStringList::Iterator iter = labels.begin();
-      for(int row = 0; iter != labels.end(); ++iter, ++row)
+      for( ; iter != labels.end(); ++iter, ++row)
         {
         if(row == index.row())
           {
