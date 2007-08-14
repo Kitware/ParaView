@@ -143,7 +143,7 @@ private:
 };
 
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.50");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.51");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
@@ -400,6 +400,18 @@ void vtkSMAnimationSceneProxy::SetAnimationTime(double time)
     scene->SetCurrentTime(time);
     this->Internals->PassUseCache(false);
     }
+}
+
+//----------------------------------------------------------------------------
+double vtkSMAnimationSceneProxy::GetAnimationTime()
+{
+  vtkPVAnimationScene* scene = 
+    vtkPVAnimationScene::SafeDownCast(this->AnimationCue);
+  if (scene)
+    {
+    return scene->GetCurrentTime();
+    }
+  return 0.0;
 }
 
 //----------------------------------------------------------------------------

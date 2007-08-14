@@ -56,6 +56,10 @@ public:
   void SetAnimationTime(double time);
 
   // Description:
+  // Returns the current animation time.
+  double GetAnimationTime();
+
+  // Description:
   // Get/Set the cache limit (in kilobytes) for each process. If cache size
   // grows beyond the limit, no caching is done on any of the processes.
   vtkGetMacro(CacheLimit, int);
