@@ -55,21 +55,6 @@ SET( SHARED_LIBRARY_PATH_TYPE__SHARED_LIBRARY_PATH_INFO_COMPILED__TRYRUN_OUTPUT
      CACHE STRING "Output from TRY_RUN" FORCE )
 
 
-# CMAKE_WORDS_BIGENDIAN
-# indicates whether the executable would have been able to run if it was
-# executed on its target platform. If it would have been able to run, set it to
-# the exit code (in many cases 0 for success). If not, enter "FAILED_TO_RUN".
-# 
-# Source file: /gpfs/gpfs0/home/gevecb/inst-alex/share/cmake-2.5/Modules/TestBigEndian.c
-# Run arguments: 
-#    Called from: [2]   /gpfs/gpfs0/home/gevecb/alex/paraview/src/ParaView3/VTK/CMake/CMakeBackwardCompatibilityC.cmake
-#                 [1]   /gpfs/gpfs0/home/gevecb/alex/paraview/src/ParaView3/VTK/CMakeLists.txt
-
-SET( CMAKE_WORDS_BIGENDIAN 
-     "1"
-     CACHE STRING "Result from TRY_RUN" FORCE )
-
-
 # VTK_TYPE_CHAR_IS_SIGNED
 # indicates whether the executable would have been able to run if it was
 # executed on its target platform. If it would have been able to run, set it to
@@ -116,7 +101,7 @@ SET( VTK_ANSI_STREAM_EOF_RESULT
 #    Called from: [1]   /gpfs/gpfs0/home/gevecb/alex/paraview/src/ParaView3/VTK/Utilities/kwsys/CMakeLists.txt
 
 SET( KWSYS_LFS_WORKS 
-     "*"
+     "0"
      CACHE STRING "Result from TRY_RUN" FORCE )
 
 SET( KWSYS_LFS_WORKS__KWSYS_LFS_WORKS_COMPILED__TRYRUN_OUTPUT 
