@@ -347,7 +347,12 @@ pqKeyFrameEditor::pqKeyFrameEditor(pqAnimationScene* scene,
     QPair<double, double>(0, 1);
   QList<QVariant> domain = pqSMAdaptor::getMultipleElementPropertyDomain(
     cue->getAnimatedProperty(), cue->getAnimatedPropertyIndex());
-  if(domain.size())
+  if(cue->getProxy()->IsA("vtkSMTimeAnimationCueProxy"))
+    {
+    this->Internal->ValueRange.first = this->Internal->TimeRange.first;
+    this->Internal->ValueRange.second = this->Internal->TimeRange.second;
+    }
+  else if(domain.size())
     {
     this->Internal->ValueRange.first = domain[0];
     this->Internal->ValueRange.second = domain[1];
@@ -529,6 +534,16 @@ void pqKeyFrameEditor::writeKeyFrameData()
   for(int i=0; i<newNumber-oldNumber; i++)
     {
     this->Internal->Cue->insertKeyFrame(0);
+    }
+
+  // if this was a time cue, tell the scene to use it if we have enough
+  // keyframes
+  if(this->Internal->Cue->getProxy()->IsA("vtkSMTimeAnimationCueProxy"))
+    {
+    vtkSMProperty* prop =
+      this->Internal->Cue->getProxy()->GetProperty("UseAnimationTime");
+    pqSMAdaptor::setElementProperty(prop, !(newNumber > 1));
+    this->Internal->Cue->getProxy()->UpdateVTKObjects();
     }
 
   for(int i=0; i<newNumber; i++)

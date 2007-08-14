@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationKeyFrame.h"
 
 #include "vtkSMProxy.h"
+#include "vtkSMAnimationSceneProxy.h"
 
 #include "pqApplicationCore.h"
 #include "pqServerManagerModel.h"
@@ -218,7 +219,7 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
             this, SLOT(updateTicks()));
     QObject::connect(scene, SIGNAL(frameCountChanged()),
             this, SLOT(updateTicks()));
-    QObject::connect(scene->getServer()->getTimeKeeper(), SIGNAL(timeChanged()),
+    QObject::connect(scene, SIGNAL(animationTime(double)),
             this, SLOT(updateSceneTime()));
     QObject::connect(scene, SIGNAL(playModeChanged()), 
       this, SLOT(updatePlayMode()));
@@ -345,10 +346,9 @@ void pqAnimationViewWidget::updateSceneTimeRange()
 
 void pqAnimationViewWidget::updateSceneTime()
 {
-  pqTimeKeeper* timekeeper = 
-    this->Internal->Scene->getServer()->getTimeKeeper();
+  double time =
+    this->Internal->Scene->getAnimationSceneProxy()->GetAnimationTime();
 
-  double time = timekeeper->getTime();
   time = this->Internal->getAnimationWidgetTime(time);
 
   pqAnimationModel* animModel =
