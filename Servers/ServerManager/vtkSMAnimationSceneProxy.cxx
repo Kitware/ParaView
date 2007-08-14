@@ -143,7 +143,7 @@ private:
 };
 
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.51");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.52");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
@@ -397,7 +397,7 @@ void vtkSMAnimationSceneProxy::SetAnimationTime(double time)
   if (scene)
     {
     this->Internals->PassUseCache(this->GetCaching()>0);
-    scene->SetCurrentTime(time);
+    scene->SetSceneTime(time);
     this->Internals->PassUseCache(false);
     }
 }
@@ -409,7 +409,7 @@ double vtkSMAnimationSceneProxy::GetAnimationTime()
     vtkPVAnimationScene::SafeDownCast(this->AnimationCue);
   if (scene)
     {
-    return scene->GetCurrentTime();
+    return scene->GetSceneTime();
     }
   return 0.0;
 }

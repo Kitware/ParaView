@@ -51,14 +51,18 @@ public:
  
   // Description:
   // Sets the current animation time.
-  void SetCurrentTime(double time)
+  void SetSceneTime(double time)
     { 
     this->Initialize();
     this->Tick(time, 0, time); 
     }
 
   // Get the time of the most recent tick.
-  vtkGetMacro(CurrentTime, double);
+  // The only difference between this and AnimationTime (or ClockTime) defined
+  // in the superclass is that, unlike the latter this is defined even outside
+  // AnimationCueTickEvent handlers.
+  vtkGetMacro(SceneTime, double);
+
 protected:
   vtkPVAnimationScene();
   ~vtkPVAnimationScene();
@@ -76,7 +80,7 @@ protected:
   vtkCollection* AnimationCues;
   vtkCollectionIterator* AnimationCuesIterator;
  
-  double CurrentTime;
+  double SceneTime;
 private:
   vtkPVAnimationScene(const vtkPVAnimationScene&); // Not implemented.
   void operator=(const vtkPVAnimationScene&); // Not implemented.

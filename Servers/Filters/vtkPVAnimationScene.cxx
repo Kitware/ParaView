@@ -20,7 +20,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.5");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.6");
 vtkStandardNewMacro(vtkPVAnimationScene);
 
 //----------------------------------------------------------------------------
@@ -28,7 +28,7 @@ vtkPVAnimationScene::vtkPVAnimationScene()
 {
   this->AnimationCues = vtkCollection::New();
   this->AnimationCuesIterator = this->AnimationCues->NewIterator();
-  this->CurrentTime = 0;
+  this->SceneTime = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -109,7 +109,7 @@ void vtkPVAnimationScene::StartCueInternal()
 void vtkPVAnimationScene::TickInternal(
   double currenttime, double deltatime, double clocktime)
 {
-  this->CurrentTime = currenttime;
+  this->SceneTime = currenttime;
 
   vtkCollectionIterator* iter = this->AnimationCuesIterator;
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())

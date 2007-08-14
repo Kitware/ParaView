@@ -18,7 +18,7 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkAnimationPlayer, "1.1");
+vtkCxxRevisionMacro(vtkAnimationPlayer, "1.2");
 vtkCxxSetObjectMacro(vtkAnimationPlayer, AnimationScene, vtkPVAnimationScene);
 //----------------------------------------------------------------------------
 vtkAnimationPlayer::vtkAnimationPlayer()
@@ -56,7 +56,7 @@ void vtkAnimationPlayer::Play()
   double starttime = this->AnimationScene->GetStartTime();
   double endtime = this->AnimationScene->GetEndTime();
 
-  this->CurrentTime = this->AnimationScene->GetCurrentTime();
+  this->CurrentTime = this->AnimationScene->GetSceneTime();
   this->CurrentTime = (this->CurrentTime < starttime || 
     this->CurrentTime >= endtime)? starttime : this->CurrentTime;
  
@@ -110,7 +110,7 @@ void vtkAnimationPlayer::GoToFirst()
 {
   if (this->AnimationScene)
     {
-    this->AnimationScene->SetCurrentTime(
+    this->AnimationScene->SetSceneTime(
       this->AnimationScene->GetStartTime());
     }
 }
@@ -120,7 +120,7 @@ void vtkAnimationPlayer::GoToLast()
 {
   if (this->AnimationScene)
     {
-    this->AnimationScene->SetCurrentTime(
+    this->AnimationScene->SetSceneTime(
       this->AnimationScene->GetEndTime());
     }
 }
@@ -132,15 +132,15 @@ void vtkAnimationPlayer::GoToNext()
   double starttime = this->AnimationScene->GetStartTime();
   double endtime = this->AnimationScene->GetEndTime();
   double time = this->GoToNext(starttime, endtime, 
-    this->AnimationScene->GetCurrentTime());
+    this->AnimationScene->GetSceneTime());
 
   if (time >= starttime && time < endtime)
     {
-    this->AnimationScene->SetCurrentTime(time);
+    this->AnimationScene->SetSceneTime(time);
     }
   else 
     {
-    this->AnimationScene->SetCurrentTime(endtime);
+    this->AnimationScene->SetSceneTime(endtime);
     }
 }
 
@@ -150,15 +150,15 @@ void vtkAnimationPlayer::GoToPrevious()
   double starttime = this->AnimationScene->GetStartTime();
   double endtime = this->AnimationScene->GetEndTime();
   double time = this->GoToPrevious(starttime, endtime, 
-    this->AnimationScene->GetCurrentTime());
+    this->AnimationScene->GetSceneTime());
 
   if (time >= starttime && time < endtime)
     {
-    this->AnimationScene->SetCurrentTime(time);
+    this->AnimationScene->SetSceneTime(time);
     }
   else 
     {
-    this->AnimationScene->SetCurrentTime(starttime);
+    this->AnimationScene->SetSceneTime(starttime);
     }
 }
 
