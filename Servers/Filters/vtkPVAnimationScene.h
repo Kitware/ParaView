@@ -34,7 +34,7 @@ class vtkCollection;
 class vtkCollectionIterator;
 class vtkTimerLog;
 
-class VTK_COMMON_EXPORT vtkPVAnimationScene: public vtkAnimationCue
+class VTK_EXPORT vtkPVAnimationScene: public vtkAnimationCue
 {
 public:
   vtkTypeRevisionMacro(vtkPVAnimationScene, vtkAnimationCue);
