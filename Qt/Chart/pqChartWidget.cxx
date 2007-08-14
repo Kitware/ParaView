@@ -96,6 +96,7 @@ void pqChartWidget::setTitle(pqChartTitle *title)
     if(this->Title)
       {
       // Remove the current title from the layout.
+      this->Title->hide();
       this->TitleLayout->removeWidget(this->Title);
       }
 
@@ -106,6 +107,7 @@ void pqChartWidget::setTitle(pqChartTitle *title)
       // the new title in the layout.
       this->Title->setParent(this->viewport());
       this->TitleLayout->insertWidget(0, this->Title);
+      this->Title->show();
       }
     }
 }
@@ -117,6 +119,8 @@ void pqChartWidget::setLegend(pqChartLegend *legend)
     if(this->Legend)
       {
       // Remove the current legend from the layout.
+      this->disconnect(this->Legend, 0, this, 0);
+      this->Legend->hide();
       this->LegendLayout->removeWidget(this->Legend);
       }
 
@@ -140,6 +144,10 @@ void pqChartWidget::setLegend(pqChartLegend *legend)
         {
         this->LegendLayout->addWidget(this->Legend, 3, 1);
         }
+
+      this->connect(this->Legend, SIGNAL(locationChanged()),
+          this, SLOT(changeLegendLocation()));
+      this->Legend->show();
       }
     }
 }
@@ -173,6 +181,7 @@ void pqChartWidget::setAxisTitle(pqChartAxis::AxisLocation axis,
       {
       if(this->LeftTitle)
         {
+        this->LeftTitle->hide();
         this->ChartLayout->removeWidget(this->LeftTitle);
         }
 
@@ -182,6 +191,7 @@ void pqChartWidget::setAxisTitle(pqChartAxis::AxisLocation axis,
         this->LeftTitle->setParent(this->viewport());
         this->LeftTitle->setOrientation(Qt::Vertical);
         this->ChartLayout->insertWidget(0, this->LeftTitle);
+        this->LeftTitle->show();
         }
       }
     }
@@ -191,6 +201,7 @@ void pqChartWidget::setAxisTitle(pqChartAxis::AxisLocation axis,
       {
       if(this->TopTitle)
         {
+        this->TopTitle->hide();
         this->TopLayout->removeWidget(this->TopTitle);
         }
 
@@ -200,6 +211,7 @@ void pqChartWidget::setAxisTitle(pqChartAxis::AxisLocation axis,
         this->TopTitle->setParent(this->viewport());
         this->TopTitle->setOrientation(Qt::Horizontal);
         this->TopLayout->insertWidget(0, this->TopTitle);
+        this->TopTitle->show();
         }
       }
     }
@@ -209,6 +221,7 @@ void pqChartWidget::setAxisTitle(pqChartAxis::AxisLocation axis,
       {
       if(this->RightTitle)
         {
+        this->RightTitle->hide();
         this->ChartLayout->removeWidget(this->RightTitle);
         }
 
@@ -218,6 +231,7 @@ void pqChartWidget::setAxisTitle(pqChartAxis::AxisLocation axis,
         this->RightTitle->setParent(this->viewport());
         this->RightTitle->setOrientation(Qt::Vertical);
         this->ChartLayout->addWidget(this->RightTitle);
+        this->RightTitle->show();
         }
       }
     }
@@ -225,6 +239,7 @@ void pqChartWidget::setAxisTitle(pqChartAxis::AxisLocation axis,
     {
     if(this->BottomTitle)
       {
+      this->BottomTitle->hide();
       this->TopLayout->removeWidget(this->BottomTitle);
       }
 
@@ -234,6 +249,7 @@ void pqChartWidget::setAxisTitle(pqChartAxis::AxisLocation axis,
       this->BottomTitle->setParent(this->viewport());
       this->BottomTitle->setOrientation(Qt::Horizontal);
       this->TopLayout->addWidget(this->BottomTitle);
+      this->BottomTitle->show();
       }
     }
 }
@@ -330,6 +346,30 @@ void pqChartWidget::saveChart(const QString &filename)
     {
     QPixmap grab = QPixmap::grabWidget(this);
     grab.save(filename);
+    }
+}
+
+void pqChartWidget::changeLegendLocation()
+{
+  // Remove the legend from its current location.
+  this->LegendLayout->removeWidget(this->Legend);
+
+  // Put the legend back in the appropriate spot.
+  if(this->Legend->getLocation() == pqChartLegend::Left)
+    {
+    this->LegendLayout->addWidget(this->Legend, 1, 0);
+    }
+  else if(this->Legend->getLocation() == pqChartLegend::Top)
+    {
+    this->LegendLayout->addWidget(this->Legend, 0, 1);
+    }
+  else if(this->Legend->getLocation() == pqChartLegend::Right)
+    {
+    this->LegendLayout->addWidget(this->Legend, 1, 2);
+    }
+  else if(this->Legend->getLocation() == pqChartLegend::Bottom)
+    {
+    this->LegendLayout->addWidget(this->Legend, 3, 1);
     }
 }
 

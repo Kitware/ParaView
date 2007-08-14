@@ -56,6 +56,8 @@ public:
 
   QWidget* getWidget();
 
+  virtual void setDefaultPropertyValues();
+
   virtual bool supportsUndo() const;
 
   /// Save a screenshot for the render module. If width or height ==0,
@@ -107,6 +109,10 @@ private slots:
 private:
   pqPlotView(const pqPlotView&); // Not implemented.
   void operator=(const pqPlotView&); // Not implemented.
+
+  void updateTitles();
+  void updateAxisLayout();
+  void updateAxisOptions();
 
   pqPlotViewInternal* Internal;
 };

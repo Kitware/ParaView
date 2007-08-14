@@ -70,7 +70,7 @@ public:
   };
 
   enum NotationType {
-    Standard,
+    Standard = 0,
     Exponential,
     Engineering,
     StandardOrExponential

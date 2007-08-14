@@ -60,16 +60,16 @@ class QTCHART_EXPORT pqChartLegend : public QWidget
 public:
   enum LegendLocation
     {
-    Left,  ///< Place the legend on the left of the chart.
-    Top,   ///< Place the legend on the top of the chart.
-    Right, ///< Place the legend on the right of the chart.
-    Bottom ///< Place the legend on the bottom of the chart.
+    Left = 0,  ///< Place the legend on the left of the chart.
+    Top,       ///< Place the legend on the top of the chart.
+    Right,     ///< Place the legend on the right of the chart.
+    Bottom     ///< Place the legend on the bottom of the chart.
     };
 
   enum ItemFlow
     {
-    LeftToRight, ///< Items are arranged left to right.
-    TopToBottom  ///< Items are arranged top to bottom.
+    LeftToRight = 0, ///< Items are arranged left to right.
+    TopToBottom      ///< Items are arranged top to bottom.
     };
 
 public:

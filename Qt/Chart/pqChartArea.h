@@ -63,9 +63,9 @@ class QTCHART_EXPORT pqChartArea : public QWidget
 public:
   enum AxisBehavior
     {
-    ChartSelect,  ///< The axis labels are determined by the charts.
-    BestFit,      ///< The axis labels are determined by space.
-    FixedInterval ///< The axis labels are fixed.
+    ChartSelect = 0, ///< The axis labels are determined by the charts.
+    BestFit,         ///< The axis labels are determined by space.
+    FixedInterval    ///< The axis labels are fixed.
     };
 
 public:

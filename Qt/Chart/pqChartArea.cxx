@@ -64,6 +64,7 @@ public:
   ~pqChartAreaAxisItem() {}
 
   pqChartArea::AxisBehavior Behavior;
+  bool Modified;
 };
 
 
@@ -97,6 +98,7 @@ public:
 pqChartAreaAxisItem::pqChartAreaAxisItem()
 {
   this->Behavior = pqChartArea::ChartSelect;
+  this->Modified = true;
 }
 
 
@@ -333,9 +335,10 @@ void pqChartArea::setAxisBehavior(pqChartAxis::AxisLocation location,
     pqChartArea::AxisBehavior behavior)
 {
   int index = this->Internal->convertEnum(location);
-  if(index != -1)
+  if(index != -1 && this->Internal->Option[index].Behavior != behavior)
     {
     this->Internal->Option[index].Behavior = behavior;
+    this->Internal->Option[index].Modified = true;
     }
 }
 
@@ -478,7 +481,7 @@ void pqChartArea::layoutChart()
       continue;
       }
 
-    if(this->Internal->RangeChanged &&
+    if((this->Internal->RangeChanged || this->Internal->Option[i].Modified) &&
         this->Internal->Option[i].Behavior == pqChartArea::ChartSelect)
       {
       // See if any of the layers can generate the axis labels. If
@@ -564,6 +567,13 @@ void pqChartArea::layoutChart()
         this->Internal->Axis[i]->setBestFitRange(min, max);
         }
       }
+    else if(this->Internal->Option[i].Modified)
+      {
+      this->Internal->Axis[i]->setBestFitGenerated(
+          this->Internal->Option[i].Behavior == pqChartArea::BestFit);
+      }
+
+    this->Internal->Option[i].Modified = false;
     }
 
   this->Internal->RangeChanged = false;

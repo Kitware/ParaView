@@ -84,11 +84,6 @@ public:
     Bottom ///< The axis is on the bottom of the chart.
   };
 
-  enum AxisScale {
-    Linear,     ///< The axis uses a linear scale.
-    Logarithmic ///< The axis uses a logarithmic scale.
-  };
-
 public:
   /// \brief
   ///   Creates a chart axis view.

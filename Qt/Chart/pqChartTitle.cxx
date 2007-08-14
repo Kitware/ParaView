@@ -48,7 +48,14 @@ pqChartTitle::pqChartTitle(Qt::Orientation orient, QWidget *widgetParent)
   this->Align = Qt::AlignCenter;
 
   // Set up the default size policy.
-  this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  if(this->Orient == Qt::Horizontal)
+    {
+    this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    }
+  else
+    {
+    this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    }
 }
 
 void pqChartTitle::setOrientation(Qt::Orientation orient)

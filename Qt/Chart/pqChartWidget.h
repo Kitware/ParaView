@@ -138,6 +138,10 @@ public slots:
   /// \param filename The name of the file to write.
   void saveChart(const QString &filename);
 
+private slots:
+  /// Moves the legend when the location changes.
+  void changeLegendLocation();
+
 private:
   pqChartTitle *Title;       ///< Stores the chart title.
   pqChartLegend *Legend;     ///< Stores the chart legend.

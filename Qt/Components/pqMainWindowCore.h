@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqActionGroupInterface;
 class pqActiveServer;
+class pqActiveViewOptionsManager;
 class pqAnimationManager;
 class pqAnimationPanel;
 class pqAnimationScene;
@@ -210,6 +211,10 @@ public:
   // Returns the object inspector driver. If the driver is not
   // created, a new one will be created and returned.
   pqObjectInspectorDriver* getObjectInspectorDriver();
+
+  // Returns the active view options manager. If the manager is not
+  // created, a new one will be created and returned.
+  pqActiveViewOptionsManager* getActiveViewOptionsManager();
 
   void removePluginToolBars();
 

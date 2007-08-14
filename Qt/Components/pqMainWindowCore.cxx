@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActionGroupInterface.h"
 #include "pqActiveServer.h"
 #include "pqActiveView.h"
+#include "pqActiveViewOptionsManager.h"
 #include "pqAnimationManager.h"
 #include "pqAnimationPanel.h"
 #include "pqAnimationViewWidget.h"
@@ -181,6 +182,7 @@ public:
     CustomFilterManager(0),
     LookupTableManager(new pqPQLookupTableManager(parent)),
     ObjectInspectorDriver(0),
+    ActiveViewOptions(0),
     RecentFiltersMenu(0),
     SourceMenu(0),
     FilterMenu(0),
@@ -294,6 +296,7 @@ public:
   pqCustomFilterManager* CustomFilterManager;
   pqPQLookupTableManager* LookupTableManager;
   pqObjectInspectorDriver* ObjectInspectorDriver;
+  pqActiveViewOptionsManager *ActiveViewOptions;
   pqReaderFactory ReaderFactory;
   pqWriterFactory WriterFactory;
   pqPendingDisplayManager PendingDisplayManager;
@@ -1343,6 +1346,24 @@ pqObjectInspectorDriver* pqMainWindowCore::getObjectInspectorDriver()
     }
 
   return this->Implementation->ObjectInspectorDriver;
+}
+
+//-----------------------------------------------------------------------------
+pqActiveViewOptionsManager* pqMainWindowCore::getActiveViewOptionsManager()
+{
+  if(!this->Implementation->ActiveViewOptions)
+    {
+    this->Implementation->ActiveViewOptions =
+        new pqActiveViewOptionsManager(this);
+    this->Implementation->ActiveViewOptions->setMainWindow(
+        this->Implementation->Parent);
+    this->Implementation->ActiveViewOptions->setActiveView(
+        pqActiveView::instance().current());
+    this->connect(&pqActiveView::instance(), SIGNAL(changed(pqView *)),
+        this->Implementation->ActiveViewOptions, SLOT(setActiveView(pqView *)));
+    }
+
+  return this->Implementation->ActiveViewOptions;
 }
 
 //-----------------------------------------------------------------------------
@@ -2524,15 +2545,8 @@ void pqMainWindowCore::onHelpEnableTooltips(bool enabled)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onEditSettings()
 {
-  pqSettingsDialog dialog(this->Implementation->Parent);
-  dialog.setRenderView(qobject_cast<pqRenderView*>(
-      pqActiveView::instance().current()));
-  QObject::connect(&dialog, SIGNAL(beginUndo(const QString&)),
-    this->Implementation->UndoStack, SLOT(beginUndoSet(const QString&)));
-  QObject::connect(&dialog, SIGNAL(endUndo()),
-    this->Implementation->UndoStack, SLOT(endUndoSet()));
-
-  dialog.exec();
+  pqActiveViewOptionsManager *manager = this->getActiveViewOptionsManager();
+  manager->showOptions();
 }
 
 //-----------------------------------------------------------------------------

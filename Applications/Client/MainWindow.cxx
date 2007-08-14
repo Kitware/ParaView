@@ -37,7 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_MainWindow.h"
 
+#include <pqActiveChartOptions.h>
+#include <pqActiveRenderViewOptions.h>
 #include <pqActiveView.h>
+#include <pqActiveViewOptionsManager.h>
 #include <pqAnimationPanel.h>
 #include <pqAnimationPanel.h>
 #include <pqAnimationViewWidget.h>
@@ -52,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqPipelineBrowserContextMenu.h>
 #include <pqPipelineBrowser.h>
 #include <pqPipelineMenu.h>
+#include <pqPlotView.h>
 #include <pqProxyTabWidget.h>
 #include <pqRecentFilesMenu.h>
 #include <pqRenderView.h>
@@ -205,8 +209,16 @@ MainWindow::MainWindow() :
   connect(undoStack,
     SIGNAL(undoLabelChanged(const QString&)), this, SLOT(onUndoLabel(const QString&)));
 
+  pqActiveViewOptionsManager *activeViewOptions = 
+    this->Implementation->Core.getActiveViewOptionsManager();
+  activeViewOptions->setRenderViewOptions(new pqActiveRenderViewOptions(
+    activeViewOptions));
+  pqActiveChartOptions *chartOptions = new pqActiveChartOptions(
+    activeViewOptions);
+  activeViewOptions->registerOptions(pqPlotView::barChartType(), chartOptions);
+  activeViewOptions->registerOptions(pqPlotView::XYPlotType(), chartOptions);
   connect(this->Implementation->UI.actionEditSettings,
-    SIGNAL(triggered()), &this->Implementation->Core, SLOT(onEditSettings()));
+    SIGNAL(triggered()), activeViewOptions, SLOT(showOptions()));
     
   connect(this->Implementation->UI.actionEditRedo,
     SIGNAL(triggered()), undoStack, SLOT(redo()));

@@ -45,8 +45,12 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pq3DViewPropertiesWidget.h
   pq3DWidget.h
-  pqActiveView.h
+  pqActiveChartOptions.h
+  pqActiveRenderViewOptions.h
   pqActiveServer.h
+  pqActiveView.h
+  pqActiveViewOptions.h
+  pqActiveViewOptionsManager.h
   #pqAddSourceDialog.h
   pqAnimatablePropertiesComboBox.h
   pqAnimationManager.h
@@ -57,6 +61,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCalculatorPanel.h
   pqCameraDialog.h
   pqCameraWidget.h
+  pqChartOptionsEditor.h
   pqClipPanel.h
   pqColorPresetManager.h
   pqColorPresetModel.h
@@ -116,6 +121,9 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqObjectInspectorDriver.h
   pqObjectInspectorWidget.h
   pqObjectPanel.h
+  pqOptionsContainer.h
+  pqOptionsDialog.h
+  pqOptionsPage.h
 #  pqParticleTracerPanel.h
   pqPQLookupTableManager.h
   pqPipelineBrowser.h
@@ -182,6 +190,7 @@ SET(UI_FORMS
   Resources/UI/pqCalculatorPanel.ui
   Resources/UI/pqCameraDialog.ui
   Resources/UI/pqCameraWidget.ui
+  Resources/UI/pqChartOptionsWidget.ui
   Resources/UI/pqColorPresetDialog.ui
   Resources/UI/pqColorScaleDialog.ui
   Resources/UI/pqComparativeVisPanel.ui
@@ -213,6 +222,7 @@ SET(UI_FORMS
   Resources/UI/pqLookmarkBrowser.ui
   Resources/UI/pqLookmarkInspector.ui
   Resources/UI/pqMultiViewFrameMenu.ui
+  Resources/UI/pqOptionsDialog.ui
 #  Resources/UI/pqParticleTracerPanel.ui
   Resources/UI/pqPluginDialog.ui
   Resources/UI/pqPointSourceControls.ui
@@ -286,10 +296,18 @@ ADD_LIBRARY(pqComponents
   pq3DViewPropertiesWidget.h
   pq3DWidget.cxx
   pq3DWidget.h
-  pqActiveView.cxx
-  pqActiveView.h
+  pqActiveChartOptions.cxx
+  pqActiveChartOptions.h
+  pqActiveRenderViewOptions.cxx
+  pqActiveRenderViewOptions.h
   pqActiveServer.cxx
   pqActiveServer.h
+  pqActiveView.cxx
+  pqActiveView.h
+  pqActiveViewOptions.cxx
+  pqActiveViewOptions.h
+  pqActiveViewOptionsManager.cxx
+  pqActiveViewOptionsManager.h
   #pqAddSourceDialog.cxx
   #pqAddSourceDialog.h
   pqAnimatablePropertiesComboBox.cxx
@@ -310,6 +328,8 @@ ADD_LIBRARY(pqComponents
   pqCameraDialog.h
   pqCameraWidget.cxx
   pqCameraWidget.h
+  pqChartOptionsEditor.cxx
+  pqChartOptionsEditor.h
   pqClipPanel.cxx
   pqClipPanel.h
   pqCloseViewUndoElement.cxx
@@ -439,6 +459,12 @@ ADD_LIBRARY(pqComponents
   pqObjectInspectorWidget.h
   pqObjectPanel.cxx
   pqObjectPanel.h
+  pqOptionsContainer.cxx
+  pqOptionsContainer.h
+  pqOptionsDialog.cxx
+  pqOptionsDialog.h
+  pqOptionsPage.cxx
+  pqOptionsPage.h
   pqPQLookupTableManager.cxx
   pqPQLookupTableManager.h
 #  pqParticleTracerPanel.cxx
