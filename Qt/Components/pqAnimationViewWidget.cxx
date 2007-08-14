@@ -51,7 +51,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationScene.h"
 #include "pqAnimationCue.h"
 #include "pqSMAdaptor.h"
-#include "pqTimeKeeper.h"
 #include "pqServer.h"
 #include "pqKeyFrameEditor.h"
 
@@ -148,31 +147,11 @@ public:
       }
     else if(mode == "Snap To TimeSteps")
       {
-      pqTimeKeeper* tk = this->Scene->getServer()->getTimeKeeper();
-      num = tk->getNumberOfTimeStepValues();
+      num = 
+        pqSMAdaptor::getMultipleElementProperty(
+          pxy->GetProperty("TimeSteps")).size();
       }
     return num;
-    }
-
-  double getAnimationWidgetTime(double time)
-    {
-    vtkSMProxy* pxy = this->Scene->getProxy();
-    QString mode =
-      pqSMAdaptor::getEnumerationProperty(pxy->GetProperty("PlayMode")).toString();
-
-    // we show equi-distant tick points for snap to timestep mode
-    // regardless of spacing in time
-    if(mode == "Snap To TimeSteps")
-      {
-      pqTimeKeeper* timekeeper = 
-        this->Scene->getServer()->getTimeKeeper();
-
-      QPair<double, double> range = timekeeper->getTimeRange();
-      double num = timekeeper->getNumberOfTimeStepValues() - 1;
-      time = timekeeper->getTimeStepValueIndex(time)/num;
-      time = range.first + time * (range.second - range.first);
-      }
-    return time;
     }
 };
 
@@ -205,7 +184,6 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
   if(this->Internal->Scene)
     {
     QObject::disconnect(this->Internal->Scene, 0, this, 0);
-    QObject::disconnect(this->Internal->Scene->getServer()->getTimeKeeper(), 0, this, 0);
     }
   this->Internal->Scene = scene;
   if(this->Internal->Scene)
@@ -214,8 +192,7 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
       this, SLOT(onSceneCuesChanged()));
     QObject::connect(scene, SIGNAL(clockTimeRangesChanged()),
             this, SLOT(updateSceneTimeRange()));
-    QObject::connect(scene->getServer()->getTimeKeeper(),
-      SIGNAL(timeStepsChanged()),
+    QObject::connect(scene, SIGNAL(timeStepsChanged()),
             this, SLOT(updateTicks()));
     QObject::connect(scene, SIGNAL(frameCountChanged()),
             this, SLOT(updateTicks()));
@@ -349,8 +326,6 @@ void pqAnimationViewWidget::updateSceneTime()
   double time =
     this->Internal->Scene->getAnimationSceneProxy()->GetAnimationTime();
 
-  time = this->Internal->getAnimationWidgetTime(time);
-
   pqAnimationModel* animModel =
     this->Internal->AnimationWidget->animationModel();
   animModel->setCurrentTime(time);
@@ -429,6 +404,5 @@ void pqAnimationViewWidget::updateTicks()
   int num = this->Internal->numberOfTicks();
   animModel->setTicks(num);
 }
-
 
 

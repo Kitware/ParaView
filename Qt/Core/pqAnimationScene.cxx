@@ -103,6 +103,9 @@ pqAnimationScene::pqAnimationScene(const QString& group, const QString& name,
   this->Internals->VTKConnect->Connect(
     proxy->GetProperty("NumberOfFrames"), vtkCommand::ModifiedEvent,
     this, SIGNAL(frameCountChanged()));
+  this->Internals->VTKConnect->Connect(
+    proxy->GetProperty("TimeSteps"), vtkCommand::ModifiedEvent,
+    this, SIGNAL(timeStepsChanged()));
 
   this->Internals->VTKConnect->Connect(
     proxy->GetProperty("StartTime"), vtkCommand::ModifiedEvent,

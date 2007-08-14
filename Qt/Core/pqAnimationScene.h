@@ -135,6 +135,9 @@ signals:
 
   /// Emitted when the number of frames changes
   void frameCountChanged();
+  
+  /// Emitted when the number of timesteps changes
+  void timeStepsChanged();
 
 public slots:
   /// Play animation.
