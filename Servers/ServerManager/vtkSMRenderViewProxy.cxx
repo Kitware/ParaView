@@ -89,7 +89,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.35");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.36");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -453,19 +453,16 @@ void vtkSMRenderViewProxy::SetUseLight(int enable)
     vtkErrorMacro("Proxies not created yet!");
     return;
     }
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->LightKitProxy->GetProperty("Renderers"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find property Renderers on LightKitProxy.");
-    return;
-    }
-  pp->RemoveAllProxies();
-  if (enable)
-    {
-    pp->AddProxy(this->RendererProxy);
-    }
-  this->LightKitProxy->UpdateVTKObjects();
+
+  vtkClientServerStream stream;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  stream  << vtkClientServerStream::Invoke
+          << this->LightKitProxy->GetID()
+          << (enable? "AddLightsToRenderer" : "RemoveLightsFromRenderer")
+          << this->RendererProxy->GetID()
+          << vtkClientServerStream::End;
+  pm->SendStream(this->GetConnectionID(),
+    this->LightKitProxy->GetServers(), stream);
 }
 
 //-----------------------------------------------------------------------------

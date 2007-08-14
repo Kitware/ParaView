@@ -32,7 +32,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.47");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.48");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -501,6 +501,13 @@ int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent,
   if (element->GetScalarAttribute("add_consumer", & add_consumer))
     {
     this->SetAddConsumer(add_consumer);
+    }
+
+  if (this->RemoveCommand && !this->GetUpdateSelf())
+    {
+    vtkErrorMacro("Due to reference counting issue, remove command can "
+      "only be used for update self properties. " << endl <<
+      "Offending property: " << this->XMLName);
     }
   return ret;
 }

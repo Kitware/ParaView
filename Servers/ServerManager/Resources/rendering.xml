@@ -5,16 +5,6 @@
     <!-- New proxy for modifying the lights in ParaView -->
     <!-- All the default domains/values where taken from the documention of LightKit -->
     <Proxy name="LightKit" class="vtkLightKit">
-      <!-- Leave the ProxyProperty here, eventhough it is not used right now, -->
-      <!-- see vtkPVRenderView -->
-      <ProxyProperty name="Renderers" 
-                     command="AddLightsToRenderer"
-                     remove_command="RemoveLightsFromRenderer"
-                     repeatable="1">
-        <ProxyGroupDomain name="groups">
-          <Group name="renderers"/>
-        </ProxyGroupDomain>
-      </ProxyProperty>
       <!-- Key Light -->
       <DoubleVectorProperty
         name="KeyLightWarmth"
@@ -196,7 +186,7 @@
 
       <ProxyProperty name="Lights" 
                      command="AddLight"
-                     remove_command="RemoveLight"
+                     clean_command="RemoveAllLights"
                      repeatable="1">
         <ProxyGroupDomain name="groups">
           <Group name="lights"/>
@@ -1949,7 +1939,6 @@
       </IntVectorProperty>
       <ProxyProperty name="Renderers"
                      command="AddRenderer"
-                     remove_command="RemoveRenderer"
                      clean_command="RemoveAllRenderers"
                      repeatable="1">
         <ProxyGroupDomain name="groups">
