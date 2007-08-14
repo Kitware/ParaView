@@ -160,7 +160,7 @@ protected slots:
   void currentTimeIndexChanged(int index);
 
   /// Called when the pqTimeKeeper signals that the current time changed.
-  void onTimeChanged();
+  void onTimeChanged(double animationtime);
 
   /// Called to update the Current time line edit on the panel
   /// when the time line edit in the toolbar changes.

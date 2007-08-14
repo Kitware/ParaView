@@ -123,6 +123,9 @@ private:
 
   // Called when player is done with playing animation.
   void OnEndPlay();
+
+  // Used to prevent calls SetAnimationTime() during an animation tick.
+  bool InTick;
 //ETX
 };
 

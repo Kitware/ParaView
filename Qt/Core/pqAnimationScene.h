@@ -146,6 +146,9 @@ public slots:
   /// Pause animation.
   void pause();
 
+  /// Set the animation time.
+  void setAnimationTime(double time);
+
 private slots:
   /// Called when the "Cues" property on the AnimationScene proxy
   /// is changed. Updates the internal datastructure to reflect the current

@@ -327,10 +327,6 @@ void pqAnimationPanel::onActiveSceneChanged(pqAnimationScene* scene)
   // update domain to currentFrame before creating the link.
   this->onScenePlayModeChanged();
 
-  /*this->Internal->SceneLinks.addPropertyLink(
-    this->Internal->currentTime, "text", SIGNAL(textChanged(const QString&)),
-    sceneProxy, sceneProxy->GetProperty("AnimationTime"));
-    */
   this->Internal->CurrentTimeLink.addPropertyLink(
     this->Internal->currentTime, "text", SIGNAL(textChanged(const QString&)),
     sceneProxy, sceneProxy->GetProperty("AnimationTime"));
@@ -369,14 +365,14 @@ void pqAnimationPanel::onActiveSceneChanged(pqAnimationScene* scene)
     this, SLOT(onScenePlayModeChanged()));
   QObject::connect(scene, SIGNAL(cuesChanged()), 
     this, SLOT(onSceneCuesChanged()));
+  QObject::connect(scene, SIGNAL(animationTime(double)),
+    this, SLOT(onTimeChanged(double)));
 
   // Whenever timesteps change, we want to update the ranges for the spin boxes
   // which show the timestep index.
   pqTimeKeeper* timekeeper = scene->getServer()->getTimeKeeper();
   QObject::connect(timekeeper, SIGNAL(timeStepsChanged()),
     this, SLOT(onTimeStepsChanged()));
-  QObject::connect(timekeeper, SIGNAL(timeChanged()),
-    this, SLOT(onTimeChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -1033,23 +1029,23 @@ void pqAnimationPanel::setCurrentTimeByIndex(int index)
     this->Internal->ActiveScene->getServer()->getTimeKeeper();
 
   double time = timekeeper->getTimeStepValue(index);
-  timekeeper->setTime(time);
+
+  this->Internal->ActiveScene->setAnimationTime(time);
+  //timekeeper->setTime(time);
   // This will trigger onTimeChanged() which should update the two
   // widgets showing current time index.
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationPanel::onTimeChanged()
+void pqAnimationPanel::onTimeChanged(double current_time)
 {
   if (!this->Internal->ActiveScene)
     {
     return;
     }
 
-
   pqTimeKeeper* timekeeper = 
     this->Internal->ActiveScene->getServer()->getTimeKeeper();
-  double current_time = timekeeper->getTime();
 
   vtkSMProxy* proxy = this->Internal->ActiveScene->getProxy();
   QString playmode = pqSMAdaptor::getEnumerationProperty(

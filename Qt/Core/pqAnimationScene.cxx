@@ -67,14 +67,12 @@ class pqAnimationScene::pqInternals
 public:
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   vtkSmartPointer<vtkSMPropertyLink> TimestepValuesLink;
-  vtkSmartPointer<vtkSMPropertyLink> TimeLink;
   QSet<QPointer<pqAnimationCue> > Cues;
   QPointer<pqAnimationCue> GlobalTimeCue;
   pqInternals()
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     this->TimestepValuesLink = vtkSmartPointer<vtkSMPropertyLink>::New();
-    this->TimeLink = vtkSmartPointer<vtkSMPropertyLink>::New();
     }
 };
 
@@ -165,13 +163,6 @@ void pqAnimationScene::setupTimeTrack()
   this->Internals->TimestepValuesLink->AddLinkedProperty(
     this->getProxy(), "TimeSteps", vtkSMLink::OUTPUT);
   timekeeper->getProxy()->GetProperty("TimestepValues")->Modified();
-
-  this->Internals->TimeLink->AddLinkedProperty(
-    timekeeper->getProxy(), "Time", vtkSMLink::INPUT);
-  this->Internals->TimeLink->AddLinkedProperty(
-    this->getProxy(), "AnimationTime", vtkSMLink::OUTPUT);
-  timekeeper->getProxy()->GetProperty("Time")->Modified();
-
   this->updateTimeRanges();
 }
 
@@ -452,6 +443,19 @@ void pqAnimationScene::pause()
 }
 
 //-----------------------------------------------------------------------------
+void pqAnimationScene::setAnimationTime(double time)
+{
+  // It's safe to call this method in a tick callback, since vtkSMProxy ensures
+  // that SetAnimationTime() will be ignored within a tick callback.
+
+  // update the "AnimationTime" property on the scene proxy.
+  pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("AnimationTime"),
+    time);
+  this->getProxy()->UpdateProperty("AnimationTime");
+}
+
+
+//-----------------------------------------------------------------------------
 void pqAnimationScene::onTick(vtkObject*, unsigned long, void*, void* info)
 {
   vtkAnimationCue::AnimationCueInfo *cueInfo = 
@@ -464,6 +468,7 @@ void pqAnimationScene::onTick(vtkObject*, unsigned long, void*, void* info)
     (cueInfo->AnimationTime - cueInfo->StartTime)*100/
     (cueInfo->EndTime - cueInfo->StartTime));
 
-  emit this->animationTime(cueInfo->ClockTime);
+  this->setAnimationTime(cueInfo->AnimationTime);
+  emit this->animationTime(cueInfo->AnimationTime);
   emit this->tick(progress);
 }
