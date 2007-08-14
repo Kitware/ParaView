@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
-vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.32");
+vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.33");
 
 struct vtkSMIntVectorPropertyInternals
 {
@@ -471,10 +471,16 @@ void vtkSMIntVectorProperty::Copy(vtkSMProperty* src)
     this->ImmediateUpdate = 0;
     this->SetNumberOfElements(dsrc->GetNumberOfElements());
     this->SetNumberOfUncheckedElements(dsrc->GetNumberOfUncheckedElements());
-    this->SetElements(&dsrc->Internals->Values[0]);
-    memcpy(&this->Internals->UncheckedValues[0], 
-           &dsrc->Internals->UncheckedValues[0], 
-           this->GetNumberOfUncheckedElements()*sizeof(int));
+    if (this->GetNumberOfElements() > 0)
+      {
+      this->SetElements(&dsrc->Internals->Values[0]);
+      }
+    if (this->GetNumberOfUncheckedElements() > 0)
+      {
+      memcpy(&this->Internals->UncheckedValues[0], 
+             &dsrc->Internals->UncheckedValues[0], 
+             this->GetNumberOfUncheckedElements()*sizeof(int));
+      }
     this->ImmediateUpdate = imUpdate;
     this->Modified();
     }
