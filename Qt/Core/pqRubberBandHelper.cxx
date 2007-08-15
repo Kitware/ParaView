@@ -136,7 +136,8 @@ void pqRubberBandHelper::setView(pqView* view)
     return;
     }
 
-  if (this->Internal->RenderView && this->Mode == SELECT)
+  if (this->Internal->RenderView && 
+    (this->Mode == SELECT || this->Mode == FRUSTUM))
     {
     // Ensure that we are not currently in selection mode.
     this->setRubberBandOff();
@@ -148,12 +149,17 @@ void pqRubberBandHelper::setView(pqView* view)
 }
 
 //-----------------------------------------------------------------------------
-int pqRubberBandHelper::setRubberBandOn()
+int pqRubberBandHelper::setRubberBandOn(int selectionMode)
 {
   pqRenderView* rm = this->Internal->RenderView;
-  if (rm == 0 || this->Mode == SELECT)
+  if (rm == 0 || this->Mode == selectionMode)
     {
     return 0;
+    }
+  // Ensure that it is not already in a selection mode
+  if(this->Mode != INTERACT)
+    {
+    this->setRubberBandOff();
     }
 
   vtkSMRenderViewProxy* rmp = rm->getRenderViewProxy();
@@ -183,8 +189,8 @@ int pqRubberBandHelper::setRubberBandOn()
 
   this->Internal->RenderView->getWidget()->setCursor(Qt::CrossCursor);
 
-  this->Mode = SELECT;
-  emit this->selectionModeChanged(true);
+  this->Mode = selectionMode;
+  emit this->selectionModeChanged(this->Mode);
   emit this->interactionModeChanged(false);
   return 1;
 }
@@ -225,7 +231,7 @@ int pqRubberBandHelper::setRubberBandOff()
   // set the interaction cursor
   this->Internal->RenderView->getWidget()->setCursor(QCursor());
   this->Mode = INTERACT;
-  emit this->selectionModeChanged(false);
+  emit this->selectionModeChanged(this->Mode);
   emit this->interactionModeChanged(true);
   return 1;
 }
@@ -239,7 +245,13 @@ pqRenderView* pqRubberBandHelper::getRenderView() const
 //-----------------------------------------------------------------------------
 void pqRubberBandHelper::beginSelection()
 {
-  this->setRubberBandOn();
+  this->setRubberBandOn(SELECT);
+}
+
+//-----------------------------------------------------------------------------
+void pqRubberBandHelper::beginFrustumSelection()
+{
+  this->setRubberBandOn(FRUSTUM);
 }
 
 //-----------------------------------------------------------------------------
@@ -302,9 +314,16 @@ void pqRubberBandHelper::processEvents(unsigned long eventId)
       int rect[4] = {this->Xs, this->Ys, this->Xe, this->Ye};
       int rectOut[4];
       this->ReorderBoundingBox(rect, rectOut);
-      if (this->Internal->RenderView && this->Mode == SELECT)
+      if (this->Internal->RenderView) 
         {
-        this->Internal->RenderView->selectOnSurface(rectOut);
+        if(this->Mode == SELECT)
+          {
+          this->Internal->RenderView->selectOnSurface(rectOut);
+          }
+        else if(this->Mode == FRUSTUM)
+          {
+          this->Internal->RenderView->selectFrustum(rectOut);
+          }
         }
       emit this->selectionFinished(rectOut[0], rectOut[1], rectOut[2], rectOut[3]);
       break;

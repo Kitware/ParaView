@@ -225,6 +225,10 @@ public slots:
   /// coordinates.
   void selectOnSurface(int rectangle[4]);
 
+  /// Creates a new frustum selection given the rectangle in display
+  /// coordinates.
+  void selectFrustum(int rectangle[4]);
+
 private slots:
   // Called when vtkSMRenderViewProxy fires
   // ResetCameraEvent.

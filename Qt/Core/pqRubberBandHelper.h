@@ -61,14 +61,28 @@ public:
 
   /// Returns the currently selected render view.
   pqRenderView* getRenderView() const;
+
+  //BTX
+  enum Modes
+  {
+    INTERACT,
+    SELECT, //aka, Surface selection
+    FRUSTUM
+  };
+  //ETX
+
 public slots:
   /// Set active view. If a view has been set previously, this method ensures
   /// that it is not in selection mode.
   void setView(pqView*);
 
-  /// Begin rubber band selection on the view. 
+  /// Begin rubber band surface selection on the view. 
   /// Has any effect only if active view is a render view.
   void beginSelection();
+
+  /// Begin rubber band frustum selection on the view. 
+  /// Has any effect only if active view is a render view.
+  void beginFrustumSelection();
 
   /// End rubber band selection.
   /// Has any effect only if active view is a render view.
@@ -82,25 +96,18 @@ signals:
   /// view.
   void enabled(bool enable);
 
-  /// Fired with selection mode changes. \c selectable is true when entering selection
-  /// mode, and false when leaving it.
-  void selectionModeChanged(bool selectable);
+  /// Fired with selection mode changes. 
+  /// \c selectionMode is enum Modes{...}.
+  void selectionModeChanged(int selectionMode);
 
   /// This is inverse of selectionModeChanged signal, provided for convenience.
   void interactionModeChanged(bool notselectable);
 
 protected:
-  int setRubberBandOn();
+  int setRubberBandOn(int mode);
   int setRubberBandOff();
   int Mode;
   int Xs, Ys, Xe, Ye;
-
-  enum Modes
-  {
-    INTERACT,
-    SELECT
-  };
-
 
 private:
   class pqInternal;
