@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOptions.h"
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
+#include "vtksys/ios/sstream"
 
 AboutDialog::AboutDialog(QWidget* Parent) :
   QDialog(Parent),
@@ -49,12 +50,11 @@ AboutDialog::AboutDialog(QWidget* Parent) :
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pqOptions* opts = pqOptions::SafeDownCast(pm->GetOptions());
 
-  ostrstream str;
+  vtksys_ios::ostringstream str;
   vtkIndent indent;
   opts->PrintSelf(str, indent.GetNextIndent());
   str << ends;
-  QString info = str.str();
-  str.rdbuf()->freeze(0);
+  QString info = str.str().c_str();
   int idx = info.indexOf("Runtime information:");
   info = info.remove(0, idx);
   this->Ui->Information->append("<a href=\"http://www.paraview.org\">www.paraview.org</a>");
