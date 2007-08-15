@@ -17,11 +17,12 @@
 #include "vtkObjectFactory.h"
 
 #include <vtksys/SystemTools.hxx>
+#include <vtksys/ios/sstream>
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkTestingOptions);
-vtkCxxRevisionMacro(vtkTestingOptions, "1.1");
+vtkCxxRevisionMacro(vtkTestingOptions, "1.2");
 
 //----------------------------------------------------------------------------
 vtkTestingOptions::vtkTestingOptions()
@@ -63,10 +64,9 @@ int vtkTestingOptions::PostProcess(int argc, const char* const* argv)
   if ( this->SMStateXMLName && 
     vtksys::SystemTools::GetFilenameLastExtension(this->SMStateXMLName) != ".pvsm")
     {
-    ostrstream str;
+    vtksys_ios::ostringstream str;
     str << "Wrong state xml name: " << this->SMStateXMLName << ends;
-    this->SetErrorMessage(str.str());
-    str.rdbuf()->freeze(0);
+    this->SetErrorMessage(str.str().c_str());
     return 0;
     }
   return this->Superclass::PostProcess(argc, argv);

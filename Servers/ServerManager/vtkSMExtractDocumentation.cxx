@@ -665,7 +665,7 @@ void ExtractProxyNames(vtkPVXMLElement *elem, vtkStringPairList *proxyNameList)
       return;
       }
     elemName[0] = tolower(elemName[0]);
-    ostrstream groupName;
+    vtksys_ios::ostringstream groupName;
     if (!strcmp(elemName, "reader"))
       {
       groupName << "sources" << ends;
@@ -677,7 +677,6 @@ void ExtractProxyNames(vtkPVXMLElement *elem, vtkStringPairList *proxyNameList)
     const char *xmlProxyName = elem->GetAttribute("name");
     vtkstd::pair<vtkstd::string, vtkstd::string> namePair(xmlProxyName, groupName.str());
     proxyNameList->insert(proxyNameList->end(), namePair);
-    groupName.rdbuf()->freeze(0);
     }
   else
     {
@@ -848,10 +847,9 @@ void WriteProxies(vtkStringPairList *stringList, vtkStringPairList *labelList,
       return;
       }
 
-    ostrstream filename;
+    vtksys_ios::ostringstream filename;
     filename << filePath << "/" << (*iter).first.c_str() << ".html" << ends;
-    docFile.open(filename.str());
-    filename.rdbuf()->freeze(0);
+    docFile.open(filename.str().c_str());
 
 
     char *label = proxy->GetXMLLabel();
@@ -951,10 +949,9 @@ int main(int argc, char *argv[])
   int pos = ext - baseName;
   baseName[pos] = '\0';
   ofstream baseFile;
-  ostrstream baseFileName;
+  vtksys_ios::ostringstream baseFileName;
   baseFileName << argv[1] << "/" << baseName << ".html" << ends;
-  baseFile.open(baseFileName.str());
-  baseFileName.rdbuf()->freeze(0);
+  baseFile.open(baseFileName.str().c_str());
 
   char* proxyTypeName = strchr(baseName, 'w');
   proxyTypeName++;
