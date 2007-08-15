@@ -484,6 +484,10 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
     fprintf(fp,"#include \"vtkClientServerProgressObserver.h\"\n\n");
     }
 #endif
+  if (!strcmp("vtkObjectBase",data->ClassName))
+    {
+    fprintf(fp,"#include <vtksys/ios/sstream>\n");
+    }
   if (data->IsConcrete)
     {
     fprintf(fp,"\nvtkObjectBase *%sClientServerNewCommand()\n{\n",data->ClassName);
@@ -557,14 +561,12 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
     fprintf(fp,
             "  if (!strcmp(\"Print\",method) && msg.GetNumberOfArguments(0) == 2)\n"
             "    {\n"
-            "    ostrstream buf_with_warning_C4701;\n"
+            "    vtksys_ios::ostringstream buf_with_warning_C4701;\n"
             "    op->Print(buf_with_warning_C4701);\n"
-            "    buf_with_warning_C4701.put('\\0');\n"
             "    resultStream.Reset();\n"
             "    resultStream << vtkClientServerStream::Reply\n"
-            "                 << buf_with_warning_C4701.str()\n"
+            "                 << buf_with_warning_C4701.str().c_str()\n"
             "                 << vtkClientServerStream::End;\n"
-            "    buf_with_warning_C4701.rdbuf()->freeze(0);\n"
             "    return 1;\n"
             "    }\n");
     }

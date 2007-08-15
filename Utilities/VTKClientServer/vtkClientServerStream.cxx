@@ -20,6 +20,7 @@
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
+#include <vtksys/ios/sstream>
 
 //----------------------------------------------------------------------------
 // Portability of typename keyword.
@@ -2158,18 +2159,9 @@ void vtkClientServerStream::PrintArgumentInternal(ostream& os, int message,
 //----------------------------------------------------------------------------
 const char* vtkClientServerStream::StreamToString() const
 {
-  ostrstream ostr;
+  vtksys_ios::ostringstream ostr;
   this->StreamToString(ostr);
-  ostr << ends;
-  if (ostr.str())
-    {
-    this->Internal->String = ostr.str();
-    }
-  else
-    {
-    this->Internal->String = "";
-    }
-  ostr.rdbuf()->freeze(0);
+  this->Internal->String = ostr.str();
   return this->Internal->String.c_str();
 }
 

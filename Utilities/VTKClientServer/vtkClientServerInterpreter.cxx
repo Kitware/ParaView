@@ -22,10 +22,11 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 #include <vtkstd/vector>
+#include <vtksys/ios/sstream>
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.16");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.17");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals
@@ -218,15 +219,14 @@ vtkClientServerInterpreter::ProcessOneMessage(const vtkClientServerStream& css,
     default:
       {
       // Command is not known.
-      ostrstream error;
+      vtksys_ios::ostringstream error;
       error << "Message with type "
             << vtkClientServerStream::GetStringFromCommand(cmd)
             << " cannot be executed." << ends;
       this->LastResultMessage->Reset();
       *this->LastResultMessage
-        << vtkClientServerStream::Error << error.str()
+        << vtkClientServerStream::Error << error.str().c_str()
         << vtkClientServerStream::End;
-      error.rdbuf()->freeze(0);
       } break;
     }
 
@@ -293,13 +293,12 @@ vtkClientServerInterpreter
     if(this->Internal->IDToMessageMap.find(id.ID) !=
        this->Internal->IDToMessageMap.end())
       {
-      ostrstream error;
+      vtksys_ios::ostringstream error;
       error << "Attempt to create object with existing ID " << id.ID << "."
             << ends;
       *this->LastResultMessage
-        << vtkClientServerStream::Error << error.str()
+        << vtkClientServerStream::Error << error.str().c_str()
         << vtkClientServerStream::End;
-      error.rdbuf()->freeze(0);
       return 0;
       }
 
@@ -327,12 +326,11 @@ vtkClientServerInterpreter
     else
       {
       // Object was not created.
-      ostrstream error;
+      vtksys_ios::ostringstream error;
       error << "Cannot create object of type \"" << cname << "\"." << ends;
       *this->LastResultMessage
-        << vtkClientServerStream::Error << error.str()
+        << vtkClientServerStream::Error << error.str().c_str()
         << vtkClientServerStream::End;
-      error.rdbuf()->freeze(0);
       }
     }
   else
@@ -391,14 +389,13 @@ vtkClientServerInterpreter
     else
       {
       // Command function was not found for the class.
-      ostrstream error;
+      vtksys_ios::ostringstream error;
       const char* cname = obj? obj->GetClassName():"(vtk object is NULL)";
       error << "Wrapper function not found for class \"" << cname << "\"."
             << ends;
       *this->LastResultMessage
-        << vtkClientServerStream::Error << error.str()
+        << vtkClientServerStream::Error << error.str().c_str()
         << vtkClientServerStream::End;
-      error.rdbuf()->freeze(0);
       }
     }
   else
@@ -516,12 +513,11 @@ vtkClientServerInterpreter
     if(this->Internal->IDToMessageMap.find(id.ID) !=
        this->Internal->IDToMessageMap.end())
       {
-      ostrstream error;
+      vtksys_ios::ostringstream error;
       error << "Attempt to assign existing ID " << id.ID << "." << ends;
       *this->LastResultMessage
-        << vtkClientServerStream::Error << error.str()
+        << vtkClientServerStream::Error << error.str().c_str()
         << vtkClientServerStream::End;
-      error.rdbuf()->freeze(0);
       return 0;
       }
 
@@ -563,13 +559,13 @@ int vtkClientServerInterpreter::ExpandMessage(const vtkClientServerStream& in,
   out.Reset();
   if(inIndex < 0 || inIndex >= in.GetNumberOfMessages())
     {
-    ostrstream error;
+    vtksys_ios::ostringstream error;
     error << "ExpandMessage called to expand message index " << inIndex
           << " in a stream with " << in.GetNumberOfMessages()
           << " messages." << ends;
     this->LastResultMessage->Reset();
     *this->LastResultMessage
-      << vtkClientServerStream::Error << error.str()
+      << vtkClientServerStream::Error << error.str().c_str()
       << vtkClientServerStream::End;
     return 0;
     }
