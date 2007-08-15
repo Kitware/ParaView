@@ -192,6 +192,7 @@ void pqTestUtility::recordTests(const QString& filename)
                                           *observer,
                                           filename,
                                           QApplication::activeWindow());
+  dialog->setAttribute(Qt::WA_QuitOnClose, false);
   dialog->show();
 }
 

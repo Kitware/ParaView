@@ -79,6 +79,7 @@ pqRecordEventsDialog::pqRecordEventsDialog(pqEventTranslator& Translator,
   this->Implementation->Ui.label->setText(QString(tr("Recording User Input to %1")).arg(Path));
 
   this->Implementation->Translator.ignoreObject(this->Implementation->Ui.stopButton);
+  this->Implementation->Translator.ignoreObject(this);
   
   this->setWindowTitle(tr("Recording User Input"));
   this->setObjectName("");
