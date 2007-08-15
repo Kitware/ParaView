@@ -43,31 +43,34 @@ pqComboBoxEventTranslator::pqComboBoxEventTranslator(QObject* p)
 
 bool pqComboBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& /*Error*/)
 {
-  QComboBox* const object = qobject_cast<QComboBox*>(Object);
-  if(!object)
-    return false;
-    
-  switch(Event->type())
+  QComboBox* combo = NULL;
+  for(QObject* test = Object; combo == NULL && test != NULL; test = test->parent())
     {
-    case QEvent::Enter:
-      if(this->CurrentObject != Object)
-        {
-        if(this->CurrentObject)
-          {
-          disconnect(this->CurrentObject, 0, this, 0);
-          }
-        
-        this->CurrentObject = Object;
-        connect(object, SIGNAL(destroyed(QObject*)), this, SLOT(onDestroyed(QObject*)));
-        connect(object, SIGNAL(activated(const QString&)), this, SLOT(onStateChanged(const QString&)));
-        connect(object, SIGNAL(editTextChanged(const QString&)), this, SLOT(onStateChanged(const QString&)));
-        }
-      break;
-      
-    default:
-      break;
+    combo = qobject_cast<QComboBox*>(test);
     }
 
+  if(!combo)
+    {
+    // not for me
+    return false;
+    }
+
+  if(Event->type() == QEvent::Enter && Object == combo)
+    {
+    if(this->CurrentObject != Object)
+      {
+      if(this->CurrentObject)
+        {
+        disconnect(this->CurrentObject, 0, this, 0);
+        }
+      
+      this->CurrentObject = Object;
+      connect(combo, SIGNAL(destroyed(QObject*)), this, SLOT(onDestroyed(QObject*)));
+      connect(combo, SIGNAL(activated(const QString&)), this, SLOT(onStateChanged(const QString&)));
+      connect(combo, SIGNAL(editTextChanged(const QString&)), this, SLOT(onStateChanged(const QString&)));
+      }
+    }
+  
   return true;
 }
 
