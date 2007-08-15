@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMPQStateLoader.h"
 #include "vtkSMStateLoader.h"
+#include "vtksys/ios/sstream"
 
 #include "pqApplicationCore.h"
 #include "pqRepresentation.h"
@@ -99,11 +100,10 @@ void pqLookmarkModel::initializeState(vtkPVXMLElement *lookmark)
     return;
     }
   // convert state xml to a qstring
-  ostrstream stateStream;
+  vtksys_ios::ostringstream stateStream;
   stateRoot->PrintXML(stateStream, vtkIndent(0));
   stateStream << ends;
-  stateStream.freeze();
-  this->State = stateStream.str();
+  this->State = stateStream.str().c_str();
 
   // OPTIONAL PROPERTIES: 
 

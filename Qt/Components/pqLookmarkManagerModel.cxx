@@ -43,9 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtksys/ios/sstream"
 #include "pqLookmarkModel.h"
-
-#include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
 class pqLookmarkManagerModelInternal 
@@ -181,24 +180,8 @@ void pqLookmarkManagerModel::importLookmarksFromSettings()
     return;
     }
 
-  char *charArray = new char[state.size()];
-  const QChar *ptr = state.unicode();
-  int j;
-  // This is a hack for converting the QString to a char*. None of qstring's conversion methods were working.
-  for(j=0; j<state.size(); j++)
-    {
-    charArray[j] = (char)ptr->toAscii();
-    ptr++;
-    if(ptr->isNull())
-      {
-      break;
-      }
-    }
-  istrstream *is = new istrstream(charArray,j+1);
-
   vtkPVXMLParser *parser = vtkPVXMLParser::New();
-  parser->SetStream(is);
-  parser->Parse();
+  parser->Parse(state.toAscii().data());
   vtkPVXMLElement *root = parser->GetRootElement();
   if(root)
     {
@@ -213,8 +196,6 @@ void pqLookmarkManagerModel::importLookmarksFromSettings()
     }
 
   parser->Delete();
-  delete [] charArray;
-  delete is;
 }
 
 //-----------------------------------------------------------------------------

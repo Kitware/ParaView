@@ -114,34 +114,32 @@ pqExtractDataSetsPanel::pqExtractDataSetsPanel(pqProxy* object_proxy, QWidget* p
         // If there are more than one group, add a label showing
         // the group number before listing the blocks for that
         // group. Store the index of this item to be used later.
-        ostrstream groupStr;
-        groupStr << "Group " << G << ":" << ends;
+        QString groupStr = QString("Group %1:").arg(G);
         strings.clear();
-        strings.append(groupStr.str());          
+        strings.append(groupStr);
         groupitem = new pqTreeWidgetItemObject(this->UI->DataSetsList, strings);
-        groupitem->setData(0, Qt::ToolTipRole, groupStr.str());
+        groupitem->setData(0, Qt::ToolTipRole, groupStr);
         groupitem->setData(0, Qt::UserRole, -1);
         groupitem->setChecked(0);
-        delete[] groupStr.str();
 
         // loop over datasets
         unsigned int numDataSets = cdi->GetNumberOfDataSets(G);
         for (unsigned int i=0; i<numDataSets; i++)
           {
           vtkPVDataInformation* dataInfo = cdi->GetDataInformation(G, i);
-          ostrstream dataStr;
+          QString dataStr;
           if (dataInfo)
             {
-            dataStr << "  " << dataInfo->GetName() << ends;
+            dataStr = QString("  %1").arg(dataInfo->GetName());
             }
           else
             {
-            dataStr << "  block " << i << ends;
+            dataStr = QString("  block %1").arg(i);
             }
           strings.clear();
-          strings.append(dataStr.str());
+          strings.append(dataStr);
           pqTreeWidgetItemObject *dataitem = new pqTreeWidgetItemObject(groupitem, strings);
-          dataitem->setData(0, Qt::ToolTipRole, dataStr.str());
+          dataitem->setData(0, Qt::ToolTipRole, dataStr);
           dataitem->setData(0, Qt::UserRole, G);  //group number
           if (firstTime)
             {
@@ -158,7 +156,6 @@ pqExtractDataSetsPanel::pqExtractDataSetsPanel(pqProxy* object_proxy, QWidget* p
               vtkstd::pair< GroupIndex, StateItem>
               (GroupIndex(G,i), StateItem(Qt::Unchecked,dataitem)));
             }
-          delete[] dataStr.str();
           }
         if (firstTime)
           {

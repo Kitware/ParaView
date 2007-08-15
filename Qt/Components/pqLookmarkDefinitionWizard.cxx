@@ -77,6 +77,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtksys/ios/sstream"
 
 #include "assert.h"
 
@@ -313,12 +314,11 @@ void pqLookmarkDefinitionWizard::createLookmark()
     }
   childElement->Delete();
 
-  ostrstream stateString;
+  vtksys_ios::ostringstream stateString;
   stateElement->PrintXML(stateString,vtkIndent(1));
   stateString << ends;
-  stateString.freeze();
 
-  QString lmkState = stateString.str();
+  QString lmkState = stateString.str().c_str();
 
   // Create a lookmark with the given name, image, and state
   pqLookmarkModel *lmkModel = new pqLookmarkModel(this->Form->LookmarkName->text(), lmkState);

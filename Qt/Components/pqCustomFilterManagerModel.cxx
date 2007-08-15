@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "pqApplicationCore.h"
 #include "vtkSMProxyManager.h"
+#include "vtksys/ios/sstream"
 
 class pqCustomFilterManagerModelInternal : public QList<QString> {};
 
@@ -209,32 +210,12 @@ void pqCustomFilterManagerModel::importCustomFiltersFromSettings()
     return;
     }
 
-  char *charArray = new char[state.size()];
-  const QChar *ptr = state.unicode();
-  int j;
-  // This is a hack for converting the QString to a char*. None of qstring's conversion methods were working.
-  for(j=0; j<state.size(); j++)
-    {
-    charArray[j] = (char)ptr->toAscii();
-    ptr++;
-    if(ptr->isNull())
-      {
-      break;
-      }
-    }
-
-  //istrstream *is = new istrstream(state.toAscii().data(),state.size()); //j+1);
-  istrstream *is = new istrstream(charArray,j+1);
-
   vtkPVXMLParser *parser = vtkPVXMLParser::New();
-  parser->SetStream(is);
-  parser->Parse();
+  parser->Parse(state.toAscii().data());
 
   proxyManager->LoadCompoundProxyDefinitions(parser->GetRootElement());
 
   parser->Delete();
-  delete [] charArray;
-  delete is;
 }
 
 
@@ -254,11 +235,10 @@ void pqCustomFilterManagerModel::exportCustomFiltersToSettings()
     root->AddNestedElement(cf);
     }
 */
-  ostrstream os;
+  vtksys_ios::ostringstream os;
   root->PrintXML(os,vtkIndent(0));
   os << ends;
-  QString state = os.str();
-  os.rdbuf()->freeze(0);
+  QString state = os.str().c_str();
   root->Delete();
 
   pqApplicationCore::instance()->settings()->setValue("CustomFilters", state);
