@@ -234,7 +234,6 @@ void pqChartPixelScale::getValueFor(int pixel, pqChartValue &value) const
   // If using a log scale, the values should be in exponents in
   // order to get a linear mapping.
   pqChartValue v1;
-  bool reversed = false;
   if(this->Internal->Scale == pqChartPixelScale::Logarithmic &&
       this->Internal->LogAvailable)
     {
