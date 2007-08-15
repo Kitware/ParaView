@@ -437,6 +437,8 @@ MainWindow::MainWindow() :
   QActionGroup *modeGroup = new QActionGroup(this);
   modeGroup->addAction(this->Implementation->UI.actionMoveMode);
   modeGroup->addAction(this->Implementation->UI.actionSelectionMode);
+ // modeGroup->addAction(this->Implementation->UI.actionSelect_Thresholds);
+  modeGroup->addAction(this->Implementation->UI.actionSelect_Frustum);
 
   this->Implementation->Core.setupVariableToolbar(
     this->Implementation->UI.variableToolbar);
@@ -511,6 +513,10 @@ MainWindow::MainWindow() :
 
   this->Implementation->Core.setupStatisticsView(
     this->Implementation->UI.statisticsViewDock);
+    
+
+  this->Implementation->Core.setupSelectionInspector(
+    this->Implementation->UI.selectionInspectorDock);
     
   this->Implementation->Core.setupLookmarkBrowser(
     this->Implementation->UI.lookmarkBrowserDock);
@@ -591,6 +597,10 @@ MainWindow::MainWindow() :
     this->Implementation->UI.comparativePanelDock->windowTitle());
 
   this->Implementation->ViewMenu->addWidget(
+    this->Implementation->UI.selectionInspectorDock,
+    this->Implementation->UI.selectionInspectorDock->windowTitle());
+
+  this->Implementation->ViewMenu->addWidget(
     this->Implementation->UI.lookmarkBrowserDock,
     this->Implementation->UI.lookmarkBrowserDock->windowTitle());
 
@@ -627,6 +637,7 @@ MainWindow::MainWindow() :
   this->Implementation->UI.animationPanelDock->hide();
   this->Implementation->UI.comparativePanelDock->hide();
   this->Implementation->UI.animationViewDock->hide();
+  this->Implementation->UI.selectionInspectorDock->hide();
 
   // Fix the toolbar layouts from designer.
   this->Implementation->UI.mainToolBar->layout()->setSpacing(0);
@@ -677,29 +688,34 @@ MainWindow::MainWindow() :
 
 
   // Set up selection buttons.
-  
-  // Selection mode is available only for 3D views.
-  QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)), 
-    this->Implementation->UI.actionSelectionMode, SLOT(setEnabled(bool)));
-
   QObject::connect(
     this->Implementation->UI.actionMoveMode, SIGNAL(triggered()),
     this->Implementation->Core.renderViewSelectionHelper(), SLOT(endSelection()));
-    
+  
+  // Surface Selection mode is available only for 3D views.
+  QObject::connect(
+    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)), 
+    this->Implementation->UI.actionSelectionMode, SLOT(setEnabled(bool)));
   QObject::connect(
     this->Implementation->UI.actionSelectionMode, SIGNAL(triggered()), 
     this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginSelection()));
 
   QObject::connect(
     this->Implementation->Core.renderViewSelectionHelper(), 
-    SIGNAL(selectionModeChanged(bool)),
-    this->Implementation->UI.actionSelectionMode, SLOT(setChecked(bool)));
-
+    SIGNAL(selectionModeChanged(int)),
+    this, SLOT(onSelectionModeChanged(int)));
   QObject::connect(
     this->Implementation->Core.renderViewSelectionHelper(), 
     SIGNAL(interactionModeChanged(bool)),
     this->Implementation->UI.actionMoveMode, SLOT(setChecked(bool)));
+  
+  // Frustum Selection mode is available only for 3D views.
+  QObject::connect(
+    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)), 
+    this->Implementation->UI.actionSelect_Frustum, SLOT(setEnabled(bool)));
+  QObject::connect(
+    this->Implementation->UI.actionSelect_Frustum, SIGNAL(triggered()), 
+    this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginFrustumSelection()));
 
   // When a selection is marked, we revert to interaction mode.
   QObject::connect(
@@ -947,6 +963,26 @@ void MainWindow::onSelectionShortcut()
 {
   this->Implementation->Core.renderViewSelectionHelper()->beginSelection();
 }
+
+//-----------------------------------------------------------------------------
+void MainWindow::onSelectionModeChanged(int mode)
+{
+  if(this->Implementation->UI.selectionToolbar->isEnabled())
+    {
+    if(mode == pqRubberBandHelper::SELECT) //surface selection
+      {
+      this->Implementation->UI.actionSelectionMode->setChecked(true);
+      }
+    else if(mode == pqRubberBandHelper::FRUSTUM)
+      {
+      this->Implementation->UI.actionSelect_Frustum->setChecked(true);
+      }
+    else // INTERACT
+      {
+      this->Implementation->UI.actionMoveMode->setChecked(true);
+      }
+    }
+  }
 
 //-----------------------------------------------------------------------------
 QVariant MainWindow::findToolBarActionsNotInMenus()

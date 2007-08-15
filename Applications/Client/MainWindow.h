@@ -83,6 +83,8 @@ private slots:
   
   void onDeleteAll();
 
+  void onSelectionModeChanged(int mode);
+
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

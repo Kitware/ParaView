@@ -97,6 +97,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyTabWidget.h"
 #include "pqReaderFactory.h"
 #include "pqRenderView.h"
+
+#include "pqSelectionInspectorPanel.h"
+
 #include "pqRubberBandHelper.h"
 #include "pqSelectionManager.h"
 #include "pqSelectReaderDialog.h"
@@ -1110,10 +1113,10 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
   QObject::connect(object_inspector, SIGNAL(preaccept()),
                    undoStack,        SLOT(accept()));
     
-  QObject::connect(object_inspector, 
-                   SIGNAL(preaccept()),
-                   &this->Implementation->SelectionManager, 
-                   SLOT(clearSelection()));
+  //QObject::connect(object_inspector, 
+  //                 SIGNAL(preaccept()),
+  //                 &this->Implementation->SelectionManager, 
+  //                 SLOT(clearSelection()));
   QObject::connect(object_inspector, 
                    SIGNAL(accepted()),
                    this->Implementation->LookupTableManager, 
@@ -1151,10 +1154,10 @@ pqObjectInspectorWidget* pqMainWindowCore::setupObjectInspector(QDockWidget* doc
   // Connect Accept/reset signals.
   QObject::connect(object_inspector, SIGNAL(preaccept()),
                    undoStack,        SLOT(accept()));
-  QObject::connect(object_inspector,
-                   SIGNAL(preaccept()),
-                   &this->Implementation->SelectionManager,
-                   SLOT(clearSelection()));
+  //QObject::connect(object_inspector,
+  //                 SIGNAL(preaccept()),
+  //                 &this->Implementation->SelectionManager,
+  //                 SLOT(clearSelection()));
   QObject::connect(object_inspector, SIGNAL(postaccept()),
                    undoStack,        SLOT(endUndoSet()));
   QObject::connect(object_inspector, SIGNAL(postaccept()),
@@ -1209,6 +1212,31 @@ pqAnimationViewWidget* pqMainWindowCore::setupAnimationView(QDockWidget* dock_wi
                    animation_view, SLOT(setScene(pqAnimationScene*)));
   dock_widget->setWidget(animation_view);
   return animation_view;
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::setupSelectionInspector(QDockWidget* dock_widget)
+{
+  pqSelectionInspectorPanel* const selection_inspector = 
+    new pqSelectionInspectorPanel(dock_widget);
+
+  selection_inspector->setRubberBandHelper(
+    this->renderViewSelectionHelper());
+
+  pqApplicationCore* core = pqApplicationCore::instance();
+
+  //QObject::connect(this, SIGNAL(postAccept()),
+  //  selection_inspector, SLOT(refresh()));
+
+  //QObject::connect(core, SIGNAL(finishedAddingServer(pqServer*)),
+  //  selection_inspector, SLOT(setServer(pqServer*)));
+
+  //QObject::connect(selection_inspector, SIGNAL(beginNonUndoableChanges()),
+  //  this->Implementation->UndoStack, SLOT(beginNonUndoableChanges()));
+  //QObject::connect(selection_inspector, SIGNAL(endNonUndoableChanges()),
+  //  this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
+
+  dock_widget->setWidget(selection_inspector);
 }
 
 //-----------------------------------------------------------------------------

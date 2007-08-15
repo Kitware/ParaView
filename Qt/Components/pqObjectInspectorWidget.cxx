@@ -55,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExodusPanel.h"
 #include "pqExtractLocationsPanel.h"
 #include "pqExtractSelectionPanel.h"
+#include "pqExtractSelectionsPanel.h"
 #include "pqExtractThresholdsPanel.h"
 #include "pqLoadedFormObjectPanel.h"
 #include "pqObjectBuilder.h"
@@ -117,11 +118,15 @@ public:
         }
       if(QString("ExtractPointSelection") == proxy->getProxy()->GetXMLName())
         {
-        return new pqExtractSelectionPanel(proxy, p);
+        return new pqExtractSelectionsPanel(proxy, p);
         }
       if(QString("ExtractCellSelection") == proxy->getProxy()->GetXMLName())
         {
-        return new pqExtractSelectionPanel(proxy, p);
+        return new pqExtractSelectionsPanel(proxy, p);
+        }
+      if(QString("ExtractSelections") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqExtractSelectionsPanel(proxy, p);
         }
       if(QString("ExtractPointsOverTime") == proxy->getProxy()->GetXMLName())
         {
@@ -144,7 +149,8 @@ public:
         }
       if(QString("SelectThrough") == proxy->getProxy()->GetXMLName())
         {
-        return new pqSelectThroughPanel(proxy, p);
+        return new pqExtractSelectionsPanel(proxy, p);
+        //return new pqSelectThroughPanel(proxy, p);
         }
       if(QString("ExtractThresholds") == proxy->getProxy()->GetXMLName())
         {
@@ -182,6 +188,7 @@ public:
          QString("Threshold") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractPointSelection") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractCellSelection") == proxy->getProxy()->GetXMLName() ||
+         QString("ExtractSelections") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractPointsOverTime") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractCellsOverTime") == proxy->getProxy()->GetXMLName() ||
 //         QString("ProbeLocationOverTime") == proxy->getProxy()->GetXMLName() ||

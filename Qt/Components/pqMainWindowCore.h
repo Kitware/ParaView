@@ -122,6 +122,8 @@ public:
   pqObjectInspectorWidget* setupObjectInspector(QDockWidget* parent);
   /// Setup a statistics view, attaching it to the given dock
   void setupStatisticsView(QDockWidget* parent);
+  /// Setup a selection inspector, attaching it to the given dock
+  void setupSelectionInspector(QDockWidget* parent);
   /// Setup lookmark browser, attaching it to the given dock
   void setupLookmarkBrowser(QDockWidget* parent);
   /// Setup lookmark inspector, attaching it to the given dock

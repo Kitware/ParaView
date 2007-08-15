@@ -69,9 +69,6 @@ protected slots:
   void updateEnableState();
   void updateMaterial(int idx);
    
-  void updatePointLabelMode(const QString&);
-  void updateCellLabelMode(const QString&);
-  void updateSelectionLabelEnableState();
 protected:
 
   /// Set the display whose properties we want to edit.

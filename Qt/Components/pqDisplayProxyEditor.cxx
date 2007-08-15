@@ -79,35 +79,12 @@ public:
     this->Links = new pqPropertyLinks;
     this->InterpolationAdaptor = 0;
     this->ColorAdaptor = 0;
-
-    // Selection Labels Properties
-    this->SelectionColorAdaptor = 0;
-    this->PointColorAdaptor = 0;
-    this->PointFontFamilyAdaptor = 0;
-    this->PointLabelModeAdaptor = 0;
-    this->PointLabelAlignmentAdaptor = 0;
-    this->CellColorAdaptor = 0;
-    this->CellFontFamilyAdaptor = 0;
-    this->CellLabelModeAdaptor = 0;
-    this->CellLabelAlignmentAdaptor = 0;
-    this->VTKConnect = vtkEventQtSlotConnect::New();
     }
 
   ~pqDisplayProxyEditorInternal()
     {
     delete this->Links;
     delete this->InterpolationAdaptor;
-
-    delete this->SelectionColorAdaptor;
-    delete this->PointColorAdaptor;
-    delete this->PointFontFamilyAdaptor;
-    delete this->PointLabelModeAdaptor;
-    delete this->PointLabelAlignmentAdaptor;
-    delete this->CellColorAdaptor;
-    delete this->CellFontFamilyAdaptor;
-    delete this->CellLabelModeAdaptor;
-    delete this->CellLabelAlignmentAdaptor;
-    this->VTKConnect->Delete();
     }
 
   pqPropertyLinks* Links;
@@ -119,21 +96,7 @@ public:
 
   // map of <material labels, material files>
   static QMap<QString, QString> MaterialMap;
- 
-  // Selection Labels Properties
-  vtkEventQtSlotConnect* VTKConnect;
-
-  pqSignalAdaptorColor* SelectionColorAdaptor;
-  pqSignalAdaptorColor *PointColorAdaptor;
-  pqSignalAdaptorComboBox *PointFontFamilyAdaptor;
-  pqSignalAdaptorComboBox *PointLabelModeAdaptor;
-  pqSignalAdaptorComboBox *PointLabelAlignmentAdaptor;
-
-  pqSignalAdaptorColor *CellColorAdaptor;
-  pqSignalAdaptorComboBox *CellFontFamilyAdaptor;
-  pqSignalAdaptorComboBox *CellLabelModeAdaptor;
-  pqSignalAdaptorComboBox *CellLabelAlignmentAdaptor;
-};
+ };
 
 QMap<QString, QString> pqDisplayProxyEditorInternal::MaterialMap;
 
@@ -332,112 +295,6 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     SIGNAL(currentTextChanged(const QString&)),
     this->Internal->ColorBy, SLOT(reloadGUI()));
 
-  // ---------------Selection properties------------------------
-
-  this->updateSelectionLabelEnableState();
-  this->updateSelectionLabelModes();
-
-  // setup for line width
-  this->Internal->Links->addPropertyLink(this->Internal->Sel_StyleLineWidth,
-    "value", SIGNAL(valueChanged(double)),
-    reprProxy, reprProxy->GetProperty("SelectionLineWidth"));
-  // setup for opacity
-  this->Internal->Links->addPropertyLink(this->Internal->Sel_StyleOpacity,
-    "value", SIGNAL(valueChanged(double)),
-    reprProxy, reprProxy->GetProperty("SelectionOpacity"));
-  // setup for choosing color
-  this->Internal->Links->addPropertyLink(this->Internal->SelectionColorAdaptor,
-    "color", SIGNAL(colorChanged(const QVariant&)),
-    reprProxy, reprProxy->GetProperty("SelectionColor"));
-
-  // Selection Label Properties
-  // Point labels properties
-  this->Internal->Links->addPropertyLink(
-    this->Internal->checkBoxLabelPoints, "checked", SIGNAL(stateChanged(int)),
-    reprProxy, reprProxy->GetProperty("SelectionPointLabelVisibility"));
-
-  QObject::connect(this->Internal->PointLabelModeAdaptor, SIGNAL(currentTextChanged(const QString&)),
-    this, SLOT(updatePointLabelMode(const QString&)),
-    Qt::QueuedConnection);
-
-  this->Internal->Links->addPropertyLink(
-    this->Internal->toolButtonBold_Point, "checked", SIGNAL(toggled(bool)),
-    reprProxy, reprProxy->GetProperty("SelectionPointLabelBold"), 1);
-  this->Internal->Links->addPropertyLink(
-    this->Internal->toolButtonItalic_Point, "checked", SIGNAL(toggled(bool)),
-    reprProxy, reprProxy->GetProperty("SelectionPointLabelItalic"), 1);
-  this->Internal->Links->addPropertyLink(
-    this->Internal->toolButtonShadow_Point, "checked", SIGNAL(toggled(bool)),
-    reprProxy, reprProxy->GetProperty("SelectionPointLabelShadow"), 1);
-
-  this->Internal->Links->addPropertyLink(this->Internal->PointColorAdaptor, 
-    "color", SIGNAL(colorChanged(const QVariant&)),
-    reprProxy, reprProxy->GetProperty("SelectionPointLabelColor"));
-  this->Internal->Links->addPropertyLink(this->Internal->PointFontFamilyAdaptor,
-    "currentText", SIGNAL(currentTextChanged(const QString&)),
-    reprProxy, reprProxy->GetProperty("SelectionPointLabelFontFamily"));
-  this->Internal->Links->addPropertyLink(this->Internal->PointLabelAlignmentAdaptor,
-    "currentText", SIGNAL(currentTextChanged(const QString&)),
-    reprProxy, reprProxy->GetProperty("SelectionPointLabelJustification"));
-
-  this->Internal->Links->addPropertyLink(
-    this->Internal->spinBoxSize_Point, "value", SIGNAL(valueChanged(int)),
-    reprProxy, reprProxy->GetProperty("SelectionPointLabelFontSize"), 1);
-
-  this->Internal->Links->addPropertyLink(
-    this->Internal->spinBoxOpacity_Point, "value", SIGNAL(valueChanged(double)),
-    reprProxy, reprProxy->GetProperty("SelectionPointLabelOpacity"));
-
-  // Cell Labels properties
-  this->Internal->Links->addPropertyLink(
-    this->Internal->checkBoxLabelCells, "checked", SIGNAL(stateChanged(int)),
-    reprProxy, reprProxy->GetProperty("SelectionCellLabelVisibility"));
-
-  QObject::connect(this->Internal->CellLabelModeAdaptor, SIGNAL(currentTextChanged(const QString&)),
-    this, SLOT(updateCellLabelMode(const QString&)),
-    Qt::QueuedConnection);
-
-  this->Internal->Links->addPropertyLink(
-    this->Internal->toolButtonBold_Cell, "checked", SIGNAL(toggled(bool)),
-    reprProxy, reprProxy->GetProperty("SelectionCellLabelBold"), 1);
-  this->Internal->Links->addPropertyLink(
-    this->Internal->toolButtonItalic_Cell, "checked", SIGNAL(toggled(bool)),
-    reprProxy, reprProxy->GetProperty("SelectionCellLabelItalic"), 1);
-  this->Internal->Links->addPropertyLink(
-    this->Internal->toolButtonShadow_Cell, "checked", SIGNAL(toggled(bool)),
-    reprProxy, reprProxy->GetProperty("SelectionCellLabelShadow"), 1);
-
-  this->Internal->Links->addPropertyLink(this->Internal->CellColorAdaptor, 
-    "color", SIGNAL(colorChanged(const QVariant&)),
-    reprProxy, reprProxy->GetProperty("SelectionCellLabelColor"));
-  this->Internal->Links->addPropertyLink(this->Internal->CellFontFamilyAdaptor,
-    "currentText", SIGNAL(currentTextChanged(const QString&)),
-    reprProxy, reprProxy->GetProperty("SelectionCellLabelFontFamily"));
-  this->Internal->Links->addPropertyLink(this->Internal->CellLabelAlignmentAdaptor,
-    "currentText", SIGNAL(currentTextChanged(const QString&)),
-    reprProxy, reprProxy->GetProperty("SelectionCellLabelJustification"));
-
-  this->Internal->Links->addPropertyLink(
-    this->Internal->spinBoxSize_Cell, "value", SIGNAL(valueChanged(int)),
-    reprProxy, reprProxy->GetProperty("SelectionCellLabelFontSize"), 1);
-
-  this->Internal->Links->addPropertyLink(
-    this->Internal->spinBoxOpacity_Cell, "value", SIGNAL(valueChanged(double)),
-    reprProxy, reprProxy->GetProperty("SelectionCellLabelOpacity"));
-
-
-  this->Internal->VTKConnect->Disconnect();
-  /* I am disabling this since Yumin is working on moving this to a new
-   * selection panel and we don't support selection property on representation
-   * anymore.
-  this->Internal->VTKConnect->Connect(
-    reprProxy->GetProperty("Selection"),
-    vtkCommand::ModifiedEvent, this, 
-    SLOT(updateSelectionLabelEnableState()),
-    NULL, 0.0,
-    Qt::QueuedConnection);
-    */
-
 #if 0                                       //FIXME 
   // material
   this->Internal->StyleMaterial->blockSignals(true);
@@ -564,12 +421,6 @@ void pqDisplayProxyEditor::setupGUIConnections()
   QObject::connect(
     this->Internal->RescaleButton, SIGNAL(clicked()),
     this, SLOT(rescaleToDataRange()));
-  QObject::connect(
-    this->Internal->checkBoxLabelPoints, SIGNAL(clicked()),
-    this, SLOT(updateAllViews()));
-  QObject::connect(
-    this->Internal->checkBoxLabelCells, SIGNAL(clicked()),
-    this, SLOT(updateAllViews()));
 
   // Create an connect signal adapters.
   if (!QMetaType::isRegistered(QMetaType::type("QVariant")))
@@ -596,34 +447,6 @@ void pqDisplayProxyEditor::setupGUIConnections()
   QObject::connect(this->Internal->StyleMaterial, SIGNAL(currentIndexChanged(int)),
                    this, SLOT(updateMaterial(int)));
 
-  // Selection Labels properties
-  this->Internal->SelectionColorAdaptor = new pqSignalAdaptorColor(
-    this->Internal->Sel_buttonColor,
-    "chosenColor",
-    SIGNAL(chosenColorChanged(const QColor&)), false);
-  this->Internal->PointColorAdaptor = new pqSignalAdaptorColor(
-    this->Internal->buttonColor_Point, "chosenColor", 
-    SIGNAL(chosenColorChanged(const QColor&)), false);
-  this->Internal->PointFontFamilyAdaptor = new pqSignalAdaptorComboBox(
-    this->Internal->comboFontFamily_Point);
-  this->Internal->PointLabelModeAdaptor = new pqSignalAdaptorComboBox(
-    this->Internal->comboLabelMode_Point);
-  this->Internal->PointLabelAlignmentAdaptor = new pqSignalAdaptorComboBox(
-    this->Internal->comboTextAlign_Point);
-  QObject::connect(this->Internal->PointLabelModeAdaptor, 
-    SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateAllViews()));
-
-  this->Internal->CellColorAdaptor = new pqSignalAdaptorColor(
-    this->Internal->buttonColor_Cell, "chosenColor", 
-    SIGNAL(chosenColorChanged(const QColor&)), false);
-  this->Internal->CellFontFamilyAdaptor = new pqSignalAdaptorComboBox(
-    this->Internal->comboFontFamily_Cell);
-  this->Internal->CellLabelModeAdaptor = new pqSignalAdaptorComboBox(
-    this->Internal->comboLabelMode_Cell);
-  this->Internal->CellLabelAlignmentAdaptor = new pqSignalAdaptorComboBox(
-    this->Internal->comboTextAlign_Cell);
-  QObject::connect(this->Internal->CellLabelModeAdaptor, 
-    SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateAllViews()));
 }
 
 //-----------------------------------------------------------------------------
@@ -679,55 +502,6 @@ void pqDisplayProxyEditor::updateEnableState()
   this->Internal->ColorMapScalars->setEnabled(false);
 }
 
-//-----------------------------------------------------------------------------
-void pqDisplayProxyEditor::updateSelectionLabelModes()
-{
-  if(this->Internal->Representation.isNull())
-    {
-    return;
-    }
-
-  vtkSMPVRepresentationProxy* pvRep = 
-    this->Internal->Representation->getRepresentationProxy();
-
-  if (pvRep)
-    {
-    vtkSMProxyProperty *inputProperty = 
-      vtkSMProxyProperty::SafeDownCast(pvRep->GetProperty("Input"));
-    vtkSMSourceProxy* sourceProxy = vtkSMSourceProxy::SafeDownCast(inputProperty->GetProxy(0));
-    if(!sourceProxy)
-      {
-      return;
-      }
-    vtkPVDataInformation* geomInfo = sourceProxy->GetDataInformation();
-
-    vtkPVDataSetAttributesInformation* attrInfo;
-
-    this->Internal->comboLabelMode_Point->clear();
-    this->Internal->comboLabelMode_Point->addItem("Point IDs");
-    attrInfo = geomInfo->GetPointDataInformation();
-    for(int i=0; i<attrInfo->GetNumberOfArrays(); i++)
-      {
-      QString arrayName = attrInfo->GetArrayInformation(i)->GetName();
-      if(arrayName != "vtkOriginalPointIds") // "Point IDs"
-        {
-        this->Internal->comboLabelMode_Point->addItem(arrayName);
-        }
-      }
-
-    this->Internal->comboLabelMode_Cell->clear();
-    this->Internal->comboLabelMode_Cell->addItem("Cell IDs");
-    attrInfo = geomInfo->GetCellDataInformation();
-    for(int i=0; i<attrInfo->GetNumberOfArrays(); i++)
-      {
-      QString arrayName = attrInfo->GetArrayInformation(i)->GetName();
-      if(arrayName != "vtkOriginalCellIds") // "Cell IDs"
-        {
-        this->Internal->comboLabelMode_Cell->addItem(arrayName);
-        }
-      }      
-    }
-}
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::openColorMapEditor()
 {
@@ -864,107 +638,4 @@ void pqDisplayProxyEditor::updateMaterial(int vtkNotUsed(idx))
     this->updateAllViews();
     }
 #endif
-}
-
-//-----------------------------------------------------------------------------
-void pqDisplayProxyEditor::updatePointLabelMode(const QString& text)
-{
-  if(text.isEmpty())
-    {
-    return;
-    }
-  if(!this->Internal->Representation)
-    {
-    return;
-    }
-  vtkSMProxy* reprProxy = this->Internal->Representation->getProxy();
-  if(!reprProxy)
-    {
-    return;
-    }
-  if(text == "Point IDs")
-    {
-    pqSMAdaptor::setElementProperty(
-      reprProxy->GetProperty("SelectionPointFieldDataArrayName"),"vtkOriginalPointIds");
-    }
-  else
-    {
-    pqSMAdaptor::setElementProperty(
-      reprProxy->GetProperty("SelectionPointFieldDataArrayName"),text);
-    }
-   reprProxy->UpdateVTKObjects();
-} 
-
-//-----------------------------------------------------------------------------
-void pqDisplayProxyEditor::updateCellLabelMode(const QString& text)
-{
-  if(text.isEmpty())
-  {
-    return;
-  }
-  if(!this->Internal->Representation)
-    {
-    return;
-    }
-  vtkSMProxy* reprProxy = this->Internal->Representation->getProxy();
-  if(!reprProxy)
-    {
-    return;
-    }
-
-  if(text == "Cell IDs")
-    {
-    pqSMAdaptor::setElementProperty(
-      reprProxy->GetProperty("SelectionCellFieldDataArrayName"),"vtkOriginalCellIds");
-    }
-  else
-    {
-    pqSMAdaptor::setElementProperty(
-      reprProxy->GetProperty("SelectionCellFieldDataArrayName"),text);
-    }
-
-  reprProxy->UpdateVTKObjects();
-}
-
-//-----------------------------------------------------------------------------
-void pqDisplayProxyEditor::updateSelectionLabelEnableState()
-{
-
-  vtkSMPVRepresentationProxy* pvRep = 
-    this->Internal->Representation->getRepresentationProxy();
-
-  if (pvRep)
-    {
-    vtkSMProxyProperty *selectionProperty = 
-      vtkSMProxyProperty::SafeDownCast(pvRep->GetProperty("Selection"));
-
-    if(selectionProperty && selectionProperty->GetNumberOfProxies()>0)
-      {
-      this->Internal->groupBoxSelectionLabels->setEnabled(true);
-      if(this->Internal->checkBoxLabelCells->isChecked())
-        {
-        this->Internal->groupBox_CellLabelStyle->setEnabled(true);
-        }
-      else
-        {
-        this->Internal->groupBox_CellLabelStyle->setEnabled(false);
-        }
-      if(this->Internal->checkBoxLabelPoints->isChecked())
-        {
-        this->Internal->groupBox_PointLabelStyle->setEnabled(true);
-        }
-      else
-        {
-        this->Internal->groupBox_PointLabelStyle->setEnabled(false);
-        }
-      }
-    else
-      {
-      this->Internal->groupBoxSelectionLabels->setEnabled(false);
-      }
-    }
-  else
-    { 
-    this->Internal->groupBoxSelectionLabels->setEnabled(false);
-    }
 }

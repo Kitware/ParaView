@@ -117,6 +117,8 @@ pqSelectionManager::pqSelectionManager(QObject* _parent/*=null*/) :
   QObject::connect(
     model, SIGNAL(serverRemoved(pqServer*)),
     this, SLOT(clearSelection()));
+
+  pqApplicationCore::instance()->registerManager("SelectionManager", this);
 }
 
 //-----------------------------------------------------------------------------
@@ -124,6 +126,7 @@ pqSelectionManager::~pqSelectionManager()
 {
   this->clearSelection();
   delete this->Implementation;
+  pqApplicationCore::instance()->unRegisterManager("SelectionManager");
 }
 
 //-----------------------------------------------------------------------------

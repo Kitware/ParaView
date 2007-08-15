@@ -92,6 +92,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqExtractDataSetsPanel.h  
   pqExtractLocationsPanel.h  
   pqExtractSelectionPanel.h  
+  pqExtractSelectionsPanel.h  
   pqExtractThresholdsPanel.h  
   pqFileChooserWidget.h
   pqFilterInputDialog.h
@@ -144,6 +145,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSampleScalarAddRangeDialog.h
   pqSampleScalarWidget.h
   pqScalarSetModel.h
+  pqSelectionInspectorPanel.h
   pqSelectReaderDialog.h
   pqSelectThroughPanel.h
   pqSelectionAdaptor.h
@@ -208,6 +210,7 @@ SET(UI_FORMS
   Resources/UI/pqExtractDataSetsPanel.ui
   Resources/UI/pqExtractLocationsPanel.ui
   Resources/UI/pqExtractSelectionPanel.ui
+  Resources/UI/pqExtractSelectionsPanel.ui
   Resources/UI/pqExtractThresholdsPanel.ui
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
@@ -230,6 +233,7 @@ SET(UI_FORMS
   Resources/UI/pqRescaleRangeDialog.ui
   Resources/UI/pqSampleScalarAddRangeDialog.ui
   Resources/UI/pqSampleScalarWidget.ui
+  Resources/UI/pqSelectionInspectorPanel.ui
   Resources/UI/pqSelectReaderDialog.ui
   Resources/UI/pqServerBrowser.ui
   Resources/UI/pqServerStartupDialog.ui
@@ -397,6 +401,8 @@ ADD_LIBRARY(pqComponents
   pqExtractLocationsPanel.h
   pqExtractSelectionPanel.cxx
   pqExtractSelectionPanel.h
+  pqExtractSelectionsPanel.cxx
+  pqExtractSelectionsPanel.h
   pqExtractThresholdsPanel.cxx
   pqExtractThresholdsPanel.h
   pqFileChooserWidget.cxx
@@ -505,6 +511,8 @@ ADD_LIBRARY(pqComponents
   pqSampleScalarWidget.h
   pqScalarSetModel.cxx
   pqScalarSetModel.h
+  pqSelectionInspectorPanel.cxx
+  pqSelectionInspectorPanel.h
   pqSelectReaderDialog.cxx
   pqSelectReaderDialog.h
   pqSelectThroughPanel.cxx

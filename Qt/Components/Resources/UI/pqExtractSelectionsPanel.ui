@@ -1,0 +1,82 @@
+<ui version="4.0" >
+ <class>ExtractSelectionsPanel</class>
+ <widget class="QWidget" name="ExtractSelectionsPanel" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>270</width>
+    <height>207</height>
+   </rect>
+  </property>
+  <property name="font" >
+   <font>
+    <pointsize>8</pointsize>
+    <weight>75</weight>
+    <bold>true</bold>
+   </font>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QPushButton" name="pushButtonCopySelection" >
+     <property name="font" >
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text" >
+      <string>Copy Active Selection</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>5</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font" >
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="frameShape" >
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="text" >
+      <string>Copied Selection</string>
+     </property>
+     <property name="textFormat" >
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="margin" >
+      <number>10</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTextBrowser" name="textBrowser" />
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
