@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <QMenu>
+#include <QMenuBar>
 
 pqMenuEventTranslator::pqMenuEventTranslator(QObject* p)
   : pqWidgetEventTranslator(p)
@@ -50,8 +51,16 @@ bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event,
                                            bool& /*Error*/)
 {
   QMenu* const menu = qobject_cast<QMenu*>(Object);
-  if(!menu)
+  QMenuBar* const menubar = qobject_cast<QMenuBar*>(Object);
+  if(!menu && !menubar)
+    {
     return false;
+    }
+
+  if(menubar)
+    {
+    return true;
+    }
 
   if(Event->type() == QEvent::KeyPress)
     {
@@ -67,7 +76,6 @@ bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event,
           which = action->text();
           }
         emit recordEvent(menu, "activate", which);
-        return true;
         }
       }
     }
@@ -86,11 +94,10 @@ bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event,
           which = action->text();
           }
         emit recordEvent(menu, "activate", which);
-        return true;
         }
       }
     }
     
-  return false;
+  return true;
 }
 

@@ -90,7 +90,7 @@ bool pqAbstractItemViewEventTranslator::translateEvent(QObject* Object, QEvent* 
         {
         return false;
         }
-      QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(Event);
+      QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(Event);
       if(Event->type() != QEvent::MouseButtonRelease)
         {
         this->LastPos = mouseEvent->pos();
@@ -122,13 +122,12 @@ bool pqAbstractItemViewEventTranslator::translateEvent(QObject* Object, QEvent* 
           }
         emit recordEvent(object, "mouseRelease", info);
         }
-      return true;
       }
     default:
       break;
     }
 
-  return false;
+  return true;
 }
 
 
