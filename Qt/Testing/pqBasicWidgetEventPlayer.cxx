@@ -78,6 +78,26 @@ bool pqBasicWidgetEventPlayer::playEvent(QObject* Object,
       QCoreApplication::sendEvent(widget, &ke);
       return true;
       }
+    else if(Command.startsWith("mouse"))
+      {
+      QStringList args = Arguments.split(',');
+      if(args.size() == 5)
+        {
+        Qt::MouseButton button = static_cast<Qt::MouseButton>(args[0].toInt());
+        Qt::MouseButtons buttons = static_cast<Qt::MouseButton>(args[1].toInt());
+        Qt::KeyboardModifiers keym = static_cast<Qt::KeyboardModifier>(args[2].toInt());
+        int x = args[3].toInt();
+        int y = args[4].toInt();
+        QPoint pt(x,y);
+        QEvent::Type type = QEvent::MouseButtonPress;
+        type = Command == "mouseMove" ? QEvent::MouseMove : type;
+        type = Command == "mouseRelease" ? QEvent::MouseButtonRelease : type;
+        type = Command == "mouseDblClick" ? QEvent::MouseButtonDblClick : type;
+        QMouseEvent e(type, pt, button, buttons, keym);
+        QCoreApplication::sendEvent(widget, &e);
+        return true;
+        }
+      }
     else
       {
       return false;

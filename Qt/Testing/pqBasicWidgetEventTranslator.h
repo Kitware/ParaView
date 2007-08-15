@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqBasicWidgetEventTranslator_h
 
 #include "pqWidgetEventTranslator.h"
+#include <QPointer>
+#include <QWidget>
 
 /**
 Translates low-level Qt events into high-level ParaView events that can be recorded as test cases.
@@ -51,6 +53,10 @@ public:
   ~pqBasicWidgetEventTranslator();
   
   virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
+
+protected:
+  QList<QPointer<QWidget> > Parents;
+  QPoint LastPos;
 
 private:
   pqBasicWidgetEventTranslator(const pqBasicWidgetEventTranslator&);

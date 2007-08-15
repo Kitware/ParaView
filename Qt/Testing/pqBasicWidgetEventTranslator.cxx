@@ -52,12 +52,69 @@ bool pqBasicWidgetEventTranslator::translateEvent(QObject* Object,
   QWidget* const object = qobject_cast<QWidget*>(Object);
   if(!object)
     return false;
-    
+
   switch(Event->type())
     {
     case QEvent::ContextMenu:
       {
       emit recordEvent(Object, "contextMenu", "");
+      }
+      break;
+    case QEvent::MouseButtonPress:
+    case QEvent::MouseButtonDblClick:
+    case QEvent::MouseButtonRelease:
+      {
+      bool consumeThisEvent = false;
+      QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(Event);
+      if(!this->Parents.empty() && this->Parents.first() == object)
+        {
+        // right on track
+        consumeThisEvent = true;
+        this->Parents.removeFirst();
+        }
+
+      if(!consumeThisEvent)
+        {
+        // find the chain of parent that will get this mouse event
+        this->Parents.clear();
+        for(QWidget* w = object->parentWidget(); w; w = w->parentWidget())
+          {
+          this->Parents.append(w);
+          if(w->isWindow() || w->testAttribute(Qt::WA_NoMousePropagation))
+            {
+            break;
+            }
+          }
+
+        QString info = QString("%1,%2,%3,%4,%5")
+          .arg(mouseEvent->button())
+          .arg(mouseEvent->buttons())
+          .arg(mouseEvent->modifiers())
+          .arg(mouseEvent->x())
+          .arg(mouseEvent->y());
+
+        if(Event->type() != QEvent::MouseButtonRelease)
+          {
+          this->LastPos = mouseEvent->pos();
+          }
+
+        if(Event->type() == QEvent::MouseButtonPress)
+          {
+          emit recordEvent(object, "mousePress", info);
+          }
+        if(Event->type() == QEvent::MouseButtonDblClick)
+          {
+            emit recordEvent(object, "mouseDblClick", info);
+          }
+        else if(Event->type() == QEvent::MouseButtonRelease)
+          {
+          if(this->LastPos != mouseEvent->pos())
+            {
+            emit recordEvent(object, "mouseMove", info);
+            }
+          emit recordEvent(object, "mouseRelease", info);
+          }
+        }
       }
       break;
     default:
