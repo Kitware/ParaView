@@ -26,6 +26,7 @@
 #include "vtkSMGeneratedModules.h"
 
 #include <vtkstd/vector>
+#include <vtksys/ios/sstream>
 
 #include "vtkStdString.h"
 
@@ -41,7 +42,7 @@ struct vtkSMApplicationInternals
 };
 
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.17");
+vtkCxxRevisionMacro(vtkSMApplication, "1.18");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()
@@ -156,11 +157,10 @@ int vtkSMApplication::ParseConfigurationFile(const char* fname, const char* dir)
     return 0;
     }
 
-  ostrstream tmppath;
+  vtksys_ios::ostringstream tmppath;
   tmppath << dir << "/" << fname << ends;
   vtkSMXMLParser* parser = vtkSMXMLParser::New();
-  parser->SetFileName(tmppath.str());
-  delete[] tmppath.str();
+  parser->SetFileName(tmppath.str().c_str());
   int res = parser->Parse();
   parser->ProcessConfiguration(proxyM);
   parser->Delete();

@@ -17,9 +17,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtksys/ios/sstream"
 
 vtkStandardNewMacro(vtkSMStateVersionController);
-vtkCxxRevisionMacro(vtkSMStateVersionController, "1.5");
+vtkCxxRevisionMacro(vtkSMStateVersionController, "1.6");
 //----------------------------------------------------------------------------
 vtkSMStateVersionController::vtkSMStateVersionController()
 {
@@ -133,10 +134,9 @@ bool ConvertDataDisplaysToRepresentations(vtkPVXMLElement* root,
           int oldValue = 0;
           valueElement->GetScalarAttribute("value", &oldValue);
           int newValue = (oldValue<=3)? 0 : 1;
-          ostrstream valueStr;
+          vtksys_ios::ostringstream valueStr;
           valueStr << newValue << ends;
-          valueElement->SetAttribute("value", valueStr.str());
-          delete[] valueStr.str();
+          valueElement->SetAttribute("value", valueStr.str().c_str());
           }
         }
       }

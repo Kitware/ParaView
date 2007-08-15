@@ -28,11 +28,12 @@
 #include "vtkSMSubPropertyIterator.h"
 
 #include <vtkstd/vector>
+#include <vtksys/ios/sstream>
 
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.56");
+vtkCxxRevisionMacro(vtkSMProperty, "1.57");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -418,9 +419,9 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
 
     // Everything else is assumed to be a domain element.
     vtkObject* object = 0;
-    ostrstream name;
+    vtksys_ios::ostringstream name;
     name << "vtkSM" << domainEl->GetName() << ends;
-    object = vtkInstantiator::CreateInstance(name.str());
+    object = vtkInstantiator::CreateInstance(name.str().c_str());
     if (object)
       {
       vtkSMDomain* domain = vtkSMDomain::SafeDownCast(object);
@@ -446,17 +447,16 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
         }
       else
         {
-        vtkErrorMacro("Object created (type: " << name.str()
+        vtkErrorMacro("Object created (type: " << name.str().c_str()
                       << ") is not of a recognized type.");
         }
       object->Delete();
       }
     else
       {
-      vtkErrorMacro("Could not create object of type: " << name.str()
+      vtkErrorMacro("Could not create object of type: " << name.str().c_str()
                     << ". Did you specify wrong xml element?");
       }
-    delete[] name.str();
     }
 
   this->SetProxy(0);
@@ -522,10 +522,10 @@ void vtkSMProperty::SaveDomainState(vtkPVXMLElement* propertyElement,
   this->DomainIterator->Begin();
   while(!this->DomainIterator->IsAtEnd())
     {
-    ostrstream dname;
+    vtksys_ios::ostringstream dname;
     dname << uid << "." << this->DomainIterator->GetKey() << ends;
-    this->DomainIterator->GetDomain()->SaveState(propertyElement, dname.str());
-    delete[] dname.str();
+    this->DomainIterator->GetDomain()->SaveState(propertyElement,
+      dname.str().c_str());
     this->DomainIterator->Next();
     }
 }

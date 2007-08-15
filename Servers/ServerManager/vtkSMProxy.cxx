@@ -35,9 +35,10 @@
 #include <vtkstd/algorithm>
 #include <vtkstd/set>
 #include <vtkstd/string>
+#include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.98");
+vtkCxxRevisionMacro(vtkSMProxy, "1.99");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -227,10 +228,9 @@ void vtkSMProxy::RegisterSelfID()
 
   if (!this->Name) 
     {
-    ostrstream str;
+    vtksys_ios::ostringstream str;
     str << this->SelfID << ends;
-    this->SetName(str.str());
-    delete[] str.str();
+    this->SetName(str.str().c_str());
     }
 }
 
@@ -1570,10 +1570,9 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name,
     }
 
   vtkObject* object = 0;
-  ostrstream cname;
+  vtksys_ios::ostringstream cname;
   cname << "vtkSM" << propElement->GetName() << ends;
-  object = vtkInstantiator::CreateInstance(cname.str());
-  delete[] cname.str();
+  object = vtkInstantiator::CreateInstance(cname.str().c_str());
 
   property = vtkSMProperty::SafeDownCast(object);
   if (property)
@@ -2014,10 +2013,10 @@ vtkPVXMLElement* vtkSMProxy::SaveState(vtkPVXMLElement* root)
     {
     if (!iter->GetProperty()->GetIsInternal())
       {
-      ostrstream propID;
+      vtksys_ios::ostringstream propID;
       propID << this->GetSelfIDAsString() << "." << iter->GetKey() << ends;
-      iter->GetProperty()->SaveState(proxyElement, iter->GetKey(), propID.str());
-      delete [] propID.str();
+      iter->GetProperty()->SaveState(proxyElement, iter->GetKey(),
+        propID.str().c_str());
       }
     iter->Next();
     }

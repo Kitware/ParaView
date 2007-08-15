@@ -34,10 +34,11 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
 #include <vtkstd/vector>
+#include <vtksys/ios/sstream>
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.54");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.55");
 
 struct vtkSMSourceProxyInternals
 {
@@ -209,18 +210,17 @@ void vtkSMSourceProxy::CreateVTKObjects()
     }
 
   // Keep track of how long each filter takes to execute.
-  ostrstream filterName_with_warning_C4701;
+  vtksys_ios::ostringstream filterName_with_warning_C4701;
   filterName_with_warning_C4701 << "Execute " << this->VTKClassName
                                 << " id: " << sourceID.ID << ends;
   vtkClientServerStream start;
   start << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
-        << "LogStartEvent" << filterName_with_warning_C4701.str()
+        << "LogStartEvent" << filterName_with_warning_C4701.str().c_str()
         << vtkClientServerStream::End;
   vtkClientServerStream end;
   end << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
-      << "LogEndEvent" << filterName_with_warning_C4701.str()
+      << "LogEndEvent" << filterName_with_warning_C4701.str().c_str()
       << vtkClientServerStream::End;
-  delete[] filterName_with_warning_C4701.str();
   
   stream << vtkClientServerStream::Invoke 
          << sourceID << "AddObserver" << "StartEvent" << start

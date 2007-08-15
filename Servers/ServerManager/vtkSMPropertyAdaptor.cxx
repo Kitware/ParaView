@@ -31,9 +31,10 @@
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtksys/ios/sstream"
 
 vtkStandardNewMacro(vtkSMPropertyAdaptor);
-vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.20");
+vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.21");
 
 //---------------------------------------------------------------------------
 vtkSMPropertyAdaptor::vtkSMPropertyAdaptor()
@@ -332,14 +333,16 @@ const char* vtkSMPropertyAdaptor::GetRangeValue(unsigned int idx)
     }
   if (this->IdTypeVectorProperty)
     {
-    ostrstream elemV(this->ElemValue, 128);
+    vtksys_ios::ostringstream elemV;
     elemV << this->IdTypeVectorProperty->GetElement(idx) << ends;
+    strncpy(this->ElemValue, elemV.str().c_str(), 128);
     return this->ElemValue;
     }
   if (this->IntVectorProperty)
     {
-    ostrstream elemV(this->ElemValue, 128);
+    vtksys_ios::ostringstream elemV;
     elemV << this->IntVectorProperty->GetElement(idx) << ends;
+    strncpy(this->ElemValue, elemV.str().c_str(), 128);
     return this->ElemValue;
     }
   if (this->StringVectorProperty)

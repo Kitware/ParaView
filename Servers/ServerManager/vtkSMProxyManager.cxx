@@ -93,7 +93,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.64");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.65");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -144,7 +144,7 @@ void vtkSMProxyManager::InstantiateGroupPrototypes(const char* groupName)
     return;
     }
 
-  ostrstream newgroupname;
+  vtksys_ios::ostringstream newgroupname;
   newgroupname << groupName << "_prototypes" << ends;
   // Find the XML elements from which the proxies can be instantiated and
   // initialized
@@ -158,21 +158,20 @@ void vtkSMProxyManager::InstantiateGroupPrototypes(const char* groupName)
     for(; it2 != it->second.end(); it2++)
       {
       vtkPVXMLElement* element = it2->second.GetPointer();
-      if (!this->GetProxy(newgroupname.str(), it2->first.c_str()))
+      if (!this->GetProxy(newgroupname.str().c_str(), it2->first.c_str()))
         {
         vtkSMProxy* proxy = this->NewProxy(element, groupName);
         if (proxy)
           {
           proxy->SetConnectionID(
             vtkProcessModuleConnectionManager::GetNullConnectionID());
-          this->RegisterProxy(newgroupname.str(), it2->first.c_str(), proxy);
+          this->RegisterProxy(newgroupname.str().c_str(), it2->first.c_str(), proxy);
           proxy->Delete();
           }
         }
       }
 
     }
-  delete[] newgroupname.str();
 }
 
 //----------------------------------------------------------------------------
@@ -220,10 +219,9 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement,
                                         const char* groupname)
 {
   vtkObject* object = 0;
-  ostrstream cname;
+  vtksys_ios::ostringstream cname;
   cname << "vtkSM" << pelement->GetName() << ends;
-  object = vtkInstantiator::CreateInstance(cname.str());
-  delete[] cname.str();
+  object = vtkInstantiator::CreateInstance(cname.str().c_str());
 
   vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(object);
   if (proxy)

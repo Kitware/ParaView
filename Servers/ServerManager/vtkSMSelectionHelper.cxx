@@ -32,9 +32,10 @@
 #include "vtkSMProxyManager.h"
 
 #include <vtkstd/set>
+#include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.6");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.7");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -47,21 +48,20 @@ void vtkSMSelectionHelper::SendSelection(vtkSelection* sel, vtkSMProxy* proxy)
 {
   vtkProcessModule* processModule = vtkProcessModule::GetProcessModule();
 
-  ostrstream res;
+  vtksys_ios::ostringstream res;
   vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, sel);
   res << ends;
   vtkClientServerStream stream;
   vtkClientServerID parserID =
     processModule->NewStreamObject("vtkSelectionSerializer", stream);
   stream << vtkClientServerStream::Invoke
-         << parserID << "Parse" << res.str() << proxy->GetID()
+         << parserID << "Parse" << res.str().c_str() << proxy->GetID()
          << vtkClientServerStream::End;
   processModule->DeleteStreamObject(parserID, stream);
 
   processModule->SendStream(proxy->GetConnectionID(), 
     proxy->GetServers(), 
     stream);
-  delete[] res.str();
 }
 
 //-----------------------------------------------------------------------------

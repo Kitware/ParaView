@@ -23,9 +23,10 @@
 #include "vtkSMProperty.h"
 
 #include <vtkstd/vector>
+#include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMXMLPVAnimationWriterProxy);
-vtkCxxRevisionMacro(vtkSMXMLPVAnimationWriterProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMXMLPVAnimationWriterProxy, "1.9");
 //*****************************************************************************
 class vtkSMXMLPVAnimationWriterProxyInternals
 {
@@ -107,7 +108,7 @@ void vtkSMXMLPVAnimationWriterProxy::AddInput(unsigned int,
   this->CreateVTKObjects();
 
   // Assign unique group name for each source.
-  ostrstream groupname_str;
+  vtksys_ios::ostringstream groupname_str;
   groupname_str << "source" << input->GetSelfIDAsString() << ends;
 
   // when numPartitions > 1, for the vtkXMLPVAnimationWriter to treat the
@@ -131,7 +132,7 @@ void vtkSMXMLPVAnimationWriterProxy::AddInput(unsigned int,
            << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
            << this->GetID() << method << vtkClientServerStream::LastResult
-           << groupname_str.str() << vtkClientServerStream::End;
+           << groupname_str.str().c_str() << vtkClientServerStream::End;
     }
   else
     {
@@ -140,9 +141,8 @@ void vtkSMXMLPVAnimationWriterProxy::AddInput(unsigned int,
            << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
            << this->GetID() << method << vtkClientServerStream::LastResult
-           << groupname_str.str() << vtkClientServerStream::End;
+           << groupname_str.str().c_str() << vtkClientServerStream::End;
     }
-  groupname_str.rdbuf()->freeze(0);
   pm->SendStream(this->ConnectionID, this->Servers, stream);
 }
 
