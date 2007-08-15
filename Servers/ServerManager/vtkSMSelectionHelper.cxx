@@ -16,6 +16,7 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
+#include "vtkDoubleArray.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
@@ -24,6 +25,7 @@
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
 #include "vtkSMCompoundProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
@@ -32,7 +34,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.5");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.6");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -141,6 +143,10 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelection(
   vtkIdType connectionID,
   vtkSelection* selection)
 {
+  if(selection->GetNumberOfChildren() == 0)
+  {
+    return 0;
+  }
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
 
   // Now pass the selection ids to a selection source.
@@ -148,45 +154,77 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelection(
   selectionSourceP->SetConnectionID(connectionID);
   selectionSourceP->SetServers(vtkProcessModule::DATA_SERVER);
 
-  unsigned int numChildren = selection->GetNumberOfChildren();
-  unsigned int childId;
-  vtkIdType numIDs=0;
+  int contentType = selection->GetChild(0)->GetProperties()->Get(
+    vtkSelection::CONTENT_TYPE());
+
+  if(contentType == vtkSelection::FRUSTUM)
+    {
+    vtkSelection* child = selection->GetChild(0);
+    if(!child)
+      {
+      return 0;
+      }
+
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      selectionSourceP->GetProperty("ContentType"));
+    ivp->SetElement(0, contentType);
+
+    // Set the selection ids, which is the frustum vertex.
+    vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    selectionSourceP->GetProperty("Frustum"));
+
+    vtkDoubleArray* verts = vtkDoubleArray::SafeDownCast(
+      child->GetSelectionList());
+    double data[32]; 
+    for(int i=0; i<8; i++)
+      {
+      memcpy(&data[i*4], verts->GetTuple(i), 4*sizeof(double));
+      }
+    dvp->SetElements(data);
+    }
+  else
+    {
+    unsigned int numChildren = selection->GetNumberOfChildren();
+    unsigned int childId;
+    vtkIdType numIDs=0;
 
   // Count the total number of ids over. all children
-  for(childId=0; childId< numChildren; childId++)
-    {
-    vtkSelection* child = selection->GetChild(childId);
-    vtkIdTypeArray* idList = vtkIdTypeArray::SafeDownCast(
-      child->GetSelectionList());
-    if (idList)
+    for(childId=0; childId< numChildren; childId++)
       {
-      numIDs += idList->GetNumberOfTuples();
-      }
-    }
-
-  // Add the selection proc ids and cell ids to the IDs property.
-  vtkSMIdTypeVectorProperty* ids = vtkSMIdTypeVectorProperty::SafeDownCast(
-    selectionSourceP->GetProperty("IDs"));
-  ids->SetNumberOfElements(numIDs*2);
-
-  vtkIdType counter = 0;
-  for(childId=0; childId< numChildren; childId++)
-    {
-    vtkSelection* child = selection->GetChild(childId);
-    int procID = 0;
-    if (child->GetProperties()->Has(vtkSelection::PROCESS_ID()))
-      {
-      procID = child->GetProperties()->Get(vtkSelection::PROCESS_ID());
-      }
-    vtkIdTypeArray* idList = vtkIdTypeArray::SafeDownCast(
-      child->GetSelectionList());
-    if (idList)
-      {
-      vtkIdType numValues = idList->GetNumberOfTuples();
-      for (vtkIdType idx=0; idx<numValues; idx++)
+      vtkSelection* child = selection->GetChild(childId);
+      vtkIdTypeArray* idList = vtkIdTypeArray::SafeDownCast(
+        child->GetSelectionList());
+      if (idList)
         {
-        ids->SetElement(counter++, procID);
-        ids->SetElement(counter++, idList->GetValue(idx));
+        numIDs += idList->GetNumberOfTuples();
+        }
+      }
+
+    // Add the selection proc ids and cell ids to the IDs property.
+    vtkSMIdTypeVectorProperty* ids = vtkSMIdTypeVectorProperty::SafeDownCast(
+      selectionSourceP->GetProperty("IDs"));
+    ids->SetNumberOfElements(numIDs*2);
+
+    vtkIdType counter = 0;
+    for(childId=0; childId< numChildren; childId++)
+      {
+
+      vtkSelection* child = selection->GetChild(childId);
+      int procID = 0;
+      if (child->GetProperties()->Has(vtkSelection::PROCESS_ID()))
+        {
+        procID = child->GetProperties()->Get(vtkSelection::PROCESS_ID());
+        }
+      vtkIdTypeArray* idList = vtkIdTypeArray::SafeDownCast(
+        child->GetSelectionList());
+      if (idList)
+        {
+        vtkIdType numValues = idList->GetNumberOfTuples();
+        for (vtkIdType idx=0; idx<numValues; idx++)
+          {
+          ids->SetElement(counter++, procID);
+          ids->SetElement(counter++, idList->GetValue(idx));
+          }
         }
       }
     }

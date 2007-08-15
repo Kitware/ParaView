@@ -51,6 +51,17 @@ public:
   // Check if this representation has the prop by checking its vtkClientServerID
   virtual bool HasVisibleProp3D(vtkProp3D* prop);
 
+  // Description:
+  // Views typically support a mechanism to create a selection in the view
+  // itself, e.g. by click-and-dragging over a region in the view. The view
+  // passes this selection to each of the representations and asks them to
+  // convert it to a proxy for a selection which can be set on the view. 
+  // Its representation does not support selection creation, it should simply
+  // return NULL. This method returns a new vtkSMProxy instance which the 
+  // caller must free after use.
+  // This implementation converts a prop selection to a selection source.
+  virtual vtkSMProxy* ConvertSelection(vtkSelection* input);
+
 //BTX
 protected:
   vtkSMUniformGridVolumeRepresentationProxy();

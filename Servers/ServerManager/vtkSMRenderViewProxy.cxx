@@ -15,7 +15,6 @@
 
 #include "vtkSMRenderViewProxy.h"
 
-#include "vtkAreaPicker.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCamera.h"
 #include "vtkClientServerID.h"
@@ -25,6 +24,7 @@
 #include "vtkCommand.h"
 #include "vtkDoubleArray.h"
 #include "vtkErrorCode.h"
+#include "vtkExtractSelectedFrustum.h"
 #include "vtkFloatArray.h"
 #include "vtkIdTypeArray.h"
 #include "vtkImageWriter.h"
@@ -89,7 +89,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.36");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.37");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1362,31 +1362,55 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
   frustcorners->SetNumberOfTuples(8);
   //convert screen rectangle to world frustum
   vtkRenderer *renderer = this->GetRenderer();
-
+  double worldP[32]; 
+  int index=0;
   renderer->SetDisplayPoint(displayRectangle[0], displayRectangle[1], 0);
   renderer->DisplayToWorld();
-  frustcorners->SetTuple(0,  renderer->GetWorldPoint());
+  renderer->GetWorldPoint(&worldP[index*4]);
+  frustcorners->SetTuple4(index,  worldP[index*4], worldP[index*4+1], 
+    worldP[index*4+2], worldP[index*4+3]);
+  index++;
   renderer->SetDisplayPoint(displayRectangle[0], displayRectangle[1], 1);
   renderer->DisplayToWorld();
-  frustcorners->SetTuple(1,  renderer->GetWorldPoint());
+  renderer->GetWorldPoint(&worldP[index*4]);
+  frustcorners->SetTuple4(index,  worldP[index*4], worldP[index*4+1], 
+    worldP[index*4+2], worldP[index*4+3]);
+  index++;
   renderer->SetDisplayPoint(displayRectangle[0], displayRectangle[3], 0);
   renderer->DisplayToWorld();
-  frustcorners->SetTuple(2,  renderer->GetWorldPoint());
+  renderer->GetWorldPoint(&worldP[index*4]);
+  frustcorners->SetTuple4(index,  worldP[index*4], worldP[index*4+1], 
+    worldP[index*4+2], worldP[index*4+3]);
+  index++;
   renderer->SetDisplayPoint(displayRectangle[0], displayRectangle[3], 1);
   renderer->DisplayToWorld();
-  frustcorners->SetTuple(3,  renderer->GetWorldPoint());
+  renderer->GetWorldPoint(&worldP[index*4]);
+  frustcorners->SetTuple4(index,  worldP[index*4], worldP[index*4+1], 
+    worldP[index*4+2], worldP[index*4+3]);
+  index++;
   renderer->SetDisplayPoint(displayRectangle[2], displayRectangle[1], 0);
   renderer->DisplayToWorld();
-  frustcorners->SetTuple(4,  renderer->GetWorldPoint());
+  renderer->GetWorldPoint(&worldP[index*4]);
+  frustcorners->SetTuple4(index,  worldP[index*4], worldP[index*4+1], 
+    worldP[index*4+2], worldP[index*4+3]);
+  index++;
   renderer->SetDisplayPoint(displayRectangle[2], displayRectangle[1], 1);
   renderer->DisplayToWorld();
-  frustcorners->SetTuple(5,  renderer->GetWorldPoint());
+  renderer->GetWorldPoint(&worldP[index*4]);
+  frustcorners->SetTuple4(index,  worldP[index*4], worldP[index*4+1], 
+    worldP[index*4+2], worldP[index*4+3]);
+  index++;
   renderer->SetDisplayPoint(displayRectangle[2], displayRectangle[3], 0);
   renderer->DisplayToWorld();
-  frustcorners->SetTuple(6,  renderer->GetWorldPoint());
+  renderer->GetWorldPoint(&worldP[index*4]);
+  frustcorners->SetTuple4(index,  worldP[index*4], worldP[index*4+1], 
+    worldP[index*4+2], worldP[index*4+3]);
+  index++;
   renderer->SetDisplayPoint(displayRectangle[2], displayRectangle[3], 1);
   renderer->DisplayToWorld();
-  frustcorners->SetTuple(7,  renderer->GetWorldPoint());
+  renderer->GetWorldPoint(&worldP[index*4]);
+  frustcorners->SetTuple4(index,  worldP[index*4], worldP[index*4+1], 
+    worldP[index*4+2], worldP[index*4+3]);
 
   vtkSelection* frustumSel = vtkSelection::New();
   frustumSel->GetProperties()->Set(
@@ -1394,72 +1418,65 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
   frustumSel->SetSelectionList(frustcorners);
   frustcorners->Delete();
 
+  // 2) Figure out which representation is "selected".
+  vtkExtractSelectedFrustum* FrustumExtractor = 
+    vtkExtractSelectedFrustum::New();
+  FrustumExtractor->CreateFrustum(worldP);
+  double bounds[6];
+
   vtkSelection* frustumParent = vtkSelection::New();
   frustumParent->GetProperties()->Set(
-    vtkSelection::CONTENT_TYPE(), vtkSelection::FRUSTUM);
-  frustumParent->SetSelectionList(frustcorners);
-  frustumParent->AddChild(frustumSel);
+    vtkSelection::CONTENT_TYPE(), vtkSelection::SELECTIONS);
 
-  // 2) Figure out which representation is "selected".
-  vtkAreaPicker* areaPicker = vtkAreaPicker::New();
-  vtkSmartPointer<vtkCollectionIterator> iter;
-  if(areaPicker->AreaPick(x0, y0, x1, y1, renderer))
+  // Now we just use the first selected representation,
+  // until we have other mechanisms to select one.
+  vtkSmartPointer<vtkCollectionIterator> reprIter;
+  reprIter.TakeReference(this->Representations->NewIterator());
+  bool foundRepr = false;
+
+  for (reprIter->InitTraversal(); 
+    !reprIter->IsDoneWithTraversal(); reprIter->GoToNextItem())
     {
-    iter.TakeReference(areaPicker->GetProp3Ds()->NewIterator());
-
-    for (iter->InitTraversal(); 
-      !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    vtkSMDataRepresentationProxy* repr = 
+      vtkSMDataRepresentationProxy::SafeDownCast(reprIter->GetCurrentObject());
+    if (!repr || !repr->GetVisibility())
       {
-      vtkProp3D* prop = vtkProp3D::SafeDownCast(iter->GetCurrentObject());
-      if (!prop || !prop->GetVisibility())
+      continue;
+      }
+    vtkPVDataInformation* datainfo = repr->GetDisplayedDataInformation();
+    if (!datainfo)
+      {
+      continue;
+      }
+    datainfo->GetBounds(bounds);
+
+    if(FrustumExtractor->OverallBoundsTest(bounds))
+      {
+      vtkInformation* properties = frustumSel->GetProperties();
+      frustumParent->AddChild(frustumSel);
+
+      vtkSMProxy* selectionSource = repr->ConvertSelection(frustumParent);
+      if (!selectionSource)
         {
         continue;
         }
-      vtkInformation* properties = frustumSel->GetProperties();
-      properties->Set(vtkSelection::PROP(), prop);
-
-      // Now we just use the first selected representation,
-      // until we have other mechanisms to select one.
-      vtkSmartPointer<vtkCollectionIterator> reprIter;
-      reprIter.TakeReference(this->Representations->NewIterator());
-      bool foundRepr = false;
-      for (reprIter->InitTraversal(); 
-        !reprIter->IsDoneWithTraversal(); reprIter->GoToNextItem())
-        {
-        vtkSMDataRepresentationProxy* repr = 
-          vtkSMDataRepresentationProxy::SafeDownCast(reprIter->GetCurrentObject());
-        if (!repr)
-          {
-          continue;
-          }
-        vtkSMProxy* selectionSource = repr->ConvertSelection(frustumParent);
-        if (!selectionSource)
-          {
-          continue;
-          }
-        vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
-          selectionSource->GetProperty("ShowBounds"));
-        ivp->SetElement(0, 1);
-        selectionSources->AddItem(selectionSource);
+      selectionSources->AddItem(selectionSource);
         
-        if (frustumSelections)
-          {
-          frustumSelections->AddItem(frustumSel);
-          }
-        // Add the found repr, and exit for loop
-        selectedRepresentations->AddItem(repr);
-
-        selectionSource->Delete();
-        foundRepr = true;
-        }// for each repr
-      if(foundRepr)
+      if (frustumSelections)
         {
-        break;
+        frustumSelections->AddItem(frustumSel);
         }
-      }//for each prop
+      // Add the found repr, and exit for loop
+      selectedRepresentations->AddItem(repr);
+
+      selectionSource->Delete();
+      break;
+      }
     }
+
   frustumSel->Delete();
   frustumParent->Delete();
+  FrustumExtractor->Delete();
   return true;
 }
 

@@ -6557,7 +6557,7 @@ This filter extracts a list of datasets from multigroup datasets.
      </InputProperty>
      <!-- End ExtractSelection -->
    </SourceProxy>
-
+<!--
    <ExtractSelectionProxy name="ExtractPointSelection" 
       label="Extract Selection (point)"
       class="vtkExtractSelection"
@@ -6632,7 +6632,6 @@ This filter extracts a list of datasets from multigroup datasets.
           proxyname="SelectionSource">
         </Proxy>
      </SubProxy>
-    <!-- End of ExtractPointSelection -->
    </ExtractSelectionProxy>
 
    <ExtractSelectionProxy name="ExtractCellSelection" 
@@ -6710,9 +6709,8 @@ This filter extracts a list of datasets from multigroup datasets.
           proxyname="SelectionSource">
         </Proxy>
      </SubProxy>
-    <!-- End of ExtractCellSelection -->
    </ExtractSelectionProxy>
-
+-->
    <SourceProxy name="TimeToTextConvertor" class="vtkTimeToTextConvertor"
      label="Annotate Time" >
      <Documentation
@@ -6847,7 +6845,57 @@ This filter extracts a set of thresholds of its input.
      </SubProxy>
      <!-- End ExtractThresholds -->
    </ExtractThresholdsProxy>
+    
+   <ExtractSelectionsProxy name="ExtractSelections"
+      label="Extract Selections"
+      class="vtkExtractSelection"
+      selection_field_type="CELL" >
+      <Documentation
+         short_help="Extract different type of selections."
+         long_help="Extract different type of selections." >
+        This filter extracts a set of cells/points given a selection.
+        The selection can be obtained from a rubber-band selection
+        (either cell, visible or in a frustum) or threshold selection
+        and passed to the filter or specified by providing an ID list.
+      </Documentation>
 
-   </ProxyGroup>
+      <InputProperty
+          name="Input"
+          command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input from which the selection is extracted.
+        </Documentation>
+      </InputProperty>
+
+      <SubProxy>
+        <Proxy name="SelectionSource" proxygroup="sources"
+          proxyname="SelectionSource">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ContentType" />
+          <Property name="FieldType" />
+          <Property name="ContainingCells" />
+          <Property name="PreserveTopology" />
+          <Property name="InsideOut" />
+          <Property name="IDs" />
+          <Property name="Locations" />
+          <Property name="Thresholds" />
+          <Property name="ArrayName" />
+          <Property name="Frustum" />
+          <Property name="PartiallyWithin" />
+          <Property name="ShowBounds" />
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of ExtractSelections -->
+    </ExtractSelectionsProxy>
+
+  </ProxyGroup>
 
 </ServerManagerConfiguration>

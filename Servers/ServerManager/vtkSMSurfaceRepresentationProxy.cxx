@@ -37,7 +37,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.18");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.19");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -253,14 +253,32 @@ vtkSMProxy* vtkSMSurfaceRepresentationProxy::ConvertSelection(
     {
     vtkSelection* child = surfaceSel->GetChild(cc);
     vtkInformation* properties = child->GetProperties();
-    if (!properties->Has(vtkSelection::PROP_ID()))
+    // If there is no PROP_ID or PROP key set, we assume the selection
+    // is valid on all representations
+    bool hasProp = true;
+    if (properties->Has(vtkSelection::PROP_ID()))
       {
-      continue;
-      }
-    vtkClientServerID propId;
-    propId.ID = static_cast<vtkTypeUInt32>(properties->Get(
+      hasProp = false;
+      vtkClientServerID propId;
+
+      propId.ID = static_cast<vtkTypeUInt32>(properties->Get(
         vtkSelection::PROP_ID()));
-    if (propId == this->Prop3D->GetID())
+      if (propId == this->Prop3D->GetID())
+        {
+        hasProp = true;
+        }
+      }
+    else if(properties->Has(vtkSelection::PROP()))
+      {
+      hasProp = false;
+      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+      if (properties->Get(vtkSelection::PROP()) == 
+        pm->GetObjectFromID(this->Prop3D->GetID()))
+        {
+        hasProp = true;
+        }
+      }
+    if(hasProp)
       {
       vtkSelection* myChild = vtkSelection::New();
       myChild->ShallowCopy(child);
@@ -274,16 +292,26 @@ vtkSMProxy* vtkSMSurfaceRepresentationProxy::ConvertSelection(
     return 0;
     }
 
-  // Convert surface selection to volume selection.
-  vtkSmartPointer<vtkSelection> volSelection = 
-    vtkSmartPointer<vtkSelection>::New();
-  this->ConvertSurfaceSelectionToVolumeSelection(mySelection, volSelection);
+  vtkSMProxy* selectionSource = NULL;
+  if(mySelection->GetChild(0)->GetContentType() == vtkSelection::FRUSTUM)
+    {
+    // Create a selection source for the selection.
+    selectionSource = 
+      vtkSMSelectionHelper::NewSelectionSourceFromSelection(
+        this->ConnectionID, mySelection);
+    }
+  else
+    {
+    // Convert surface selection to volume selection.
+    vtkSmartPointer<vtkSelection> volSelection = vtkSmartPointer<vtkSelection>::New();
+    this->ConvertSurfaceSelectionToVolumeSelection(mySelection, volSelection);
 
-  // Create a selection source for the selection.
-  vtkSMProxy* selectionSource = 
-    vtkSMSelectionHelper::NewSelectionSourceFromSelection(
-      this->ConnectionID, volSelection);
-  
+    // Create a selection source for the selection.
+    selectionSource = 
+      vtkSMSelectionHelper::NewSelectionSourceFromSelection(
+        this->ConnectionID, volSelection);
+    }
+
   return selectionSource;
 }
 

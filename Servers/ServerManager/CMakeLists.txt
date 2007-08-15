@@ -58,6 +58,7 @@ SET(Kit_SRCS
   vtkSMExtractFrustumProxy.cxx
   vtkSMExtractLocationsProxy.cxx
   vtkSMExtractSelectionProxy.cxx
+  vtkSMExtractSelectionsProxy.cxx
   vtkSMExtractThresholdsProxy.cxx
   vtkSMFieldDataDomain.cxx
   vtkSMFileListDomain.cxx

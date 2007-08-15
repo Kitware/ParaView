@@ -15,18 +15,21 @@
 #include "vtkSMOutlineRepresentationProxy.h"
 
 #include "vtkAbstractMapper.h"
+#include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkProp3D.h"
+#include "vtkSelection.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMRepresentationStrategy.h"
+#include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMViewProxy.h"
 
 vtkStandardNewMacro(vtkSMOutlineRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMOutlineRepresentationProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMOutlineRepresentationProxy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMOutlineRepresentationProxy::vtkSMOutlineRepresentationProxy()
 {
@@ -190,6 +193,71 @@ bool vtkSMOutlineRepresentationProxy::HasVisibleProp3D(vtkProp3D* prop)
   }
 
   return false;
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkSMOutlineRepresentationProxy::ConvertSelection(
+  vtkSelection* userSel)
+{
+  if (!this->GetVisibility())
+    {
+    return 0;
+    }
+
+  vtkSmartPointer<vtkSelection> mySelection = 
+    vtkSmartPointer<vtkSelection>::New();
+  mySelection->GetProperties()->Copy(userSel->GetProperties(), 0);
+
+  unsigned int numChildren = userSel->GetNumberOfChildren();
+  for (unsigned int cc=0; cc < numChildren; cc++)
+    {
+    vtkSelection* child = userSel->GetChild(cc);
+    vtkInformation* properties = child->GetProperties();
+    // If there is no PROP_ID or PROP key set, we assume the selection
+    // is valid on all representations
+    bool hasProp = true;
+    if (properties->Has(vtkSelection::PROP_ID()))
+      {
+      hasProp = false;
+      vtkClientServerID propId;
+
+      propId.ID = static_cast<vtkTypeUInt32>(properties->Get(
+        vtkSelection::PROP_ID()));
+      if (propId == this->Prop3D->GetID())
+        {
+        hasProp = true;
+        }
+      }
+    else if(properties->Has(vtkSelection::PROP()))
+      {
+      hasProp = false;
+      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+      if (properties->Get(vtkSelection::PROP()) == 
+        pm->GetObjectFromID(this->Prop3D->GetID()))
+        {
+        hasProp = true;
+        }
+      }
+    if(hasProp)
+      {
+      vtkSelection* myChild = vtkSelection::New();
+      myChild->ShallowCopy(child);
+      mySelection->AddChild(myChild);
+      myChild->Delete();
+      }
+    }
+
+  if (mySelection->GetNumberOfChildren() == 0)
+    {
+    return 0;
+    }
+
+  // Create a selection source for the selection.
+  vtkSMProxy* selectionSource = 
+    vtkSMSelectionHelper::NewSelectionSourceFromSelection(
+      this->ConnectionID, mySelection);
+  
+  return selectionSource;
 }
 
 //----------------------------------------------------------------------------
