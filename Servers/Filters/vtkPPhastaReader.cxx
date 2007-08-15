@@ -27,6 +27,7 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <vtkstd/map>
+#include <vtksys/ios/sstream>
 
 struct vtkPPhastaReaderInternal
 {
@@ -46,7 +47,7 @@ struct vtkPPhastaReaderInternal
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPPhastaReader, "1.3");
+vtkCxxRevisionMacro(vtkPPhastaReader, "1.4");
 vtkStandardNewMacro(vtkPPhastaReader);
 
 //----------------------------------------------------------------------------
@@ -249,7 +250,7 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
     strcpy(geom_name, fieldPattern);
     }
 
-  ostrstream geomFName;
+  vtksys_ios::ostringstream geomFName;
   vtkstd::string gpath = vtksys::SystemTools::GetFilenamePath(geom_name);
   if (gpath.empty() || !vtksys::SystemTools::FileIsFullPath(gpath.c_str()))
     {
@@ -260,10 +261,9 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
       }
     }
   geomFName << geom_name << ends;
-  this->Reader->SetGeometryFileName(geomFName.str());
-  delete[] geomFName.str();
+  this->Reader->SetGeometryFileName(geomFName.str().c_str());
 
-  ostrstream fieldFName;
+  vtksys_ios::ostringstream fieldFName;
   vtkstd::string fpath = vtksys::SystemTools::GetFilenamePath(field_name);
   if (fpath.empty() || !vtksys::SystemTools::FileIsFullPath(fpath.c_str()))
     {
@@ -274,8 +274,7 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
       }
     }
   fieldFName << field_name << ends;
-  this->Reader->SetFieldFileName(fieldFName.str());
-  delete[] fieldFName.str();
+  this->Reader->SetFieldFileName(fieldFName.str().c_str());
 
   this->Reader->Update();
 
@@ -458,10 +457,9 @@ int vtkPPhastaReader::RequestInformation(vtkInformation*,
           paraviewFieldTag = nested2->GetAttribute("paraview_field_tag");
           if (!paraviewFieldTag)
             {
-            ostrstream paraviewFieldTagStrStream;
+            vtksys_ios::ostringstream paraviewFieldTagStrStream;
             paraviewFieldTagStrStream << "Field " << numberOfFields2 << ends;
             paraviewFieldTagStr = paraviewFieldTagStrStream.str();
-            delete[] paraviewFieldTagStrStream.str();
             paraviewFieldTag = paraviewFieldTagStr.c_str();
             }
           const char* phastaFieldTag = 0;

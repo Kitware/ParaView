@@ -41,13 +41,14 @@
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkXMLWriter.h"
 #include <vtksys/SystemTools.hxx>
+#include <vtksys/ios/sstream>
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVDWriter);
-vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.15");
+vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.16");
 
 class vtkXMLPVDWriterInternals
 {
@@ -207,12 +208,11 @@ int vtkXMLPVDWriter::RequestData(vtkInformation* request,
       w->RemoveObserver(this->ProgressObserver);
       
       // Create the entry for the collection file.
-      ostrstream entry_with_warning_C4701;
+      vtksys_ios::ostringstream entry_with_warning_C4701;
       entry_with_warning_C4701
         << "<DataSet part=\"" << i
         << "\" file=\"" << fname.c_str() << "\"/>" << ends;
-      this->AppendEntry(entry_with_warning_C4701.str());
-      entry_with_warning_C4701.rdbuf()->freeze(0);
+      this->AppendEntry(entry_with_warning_C4701.str().c_str());
       
       if (w->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
         {
@@ -615,13 +615,12 @@ void vtkXMLPVDWriter::DeleteAllEntries()
 vtkstd::string vtkXMLPVDWriterInternals::CreatePieceFileName(int index)
 {
   vtkstd::string fname;
-  ostrstream fn_with_warning_C4701;
+  vtksys_ios::ostringstream fn_with_warning_C4701;
   fn_with_warning_C4701
     << this->FilePrefix.c_str() << "/"
     << this->FilePrefix.c_str() << "_" << index << "."
     << this->Writers[index]->GetDefaultFileExtension() << ends;
   fname = fn_with_warning_C4701.str();
-  fn_with_warning_C4701.rdbuf()->freeze(0);
   return fname;
 }
 

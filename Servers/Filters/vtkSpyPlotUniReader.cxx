@@ -8,10 +8,11 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkByteSwap.h"
 #include <vtkstd/vector>
+#include <vtksys/ios/sstream>
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.6");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.7");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -355,12 +356,11 @@ int vtkSpyPlotUniReader::ReadInformation()
         }
       if ( variable->Index >= 0 )
         {
-        ostrstream ostr;
+        vtksys_ios::ostringstream ostr;
         ostr << this->MaterialFields[variable->Material].Comment << " - " 
              << variable->Index << ends;
-        variable->Name = new char[strlen(ostr.str()) + 1];
-        strcpy(variable->Name, ostr.str());
-        ostr.rdbuf()->freeze(0);
+        variable->Name = new char[ostr.str().size() + 1];
+        strcpy(variable->Name, ostr.str().c_str());
         }
       else
         {

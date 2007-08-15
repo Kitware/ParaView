@@ -27,12 +27,13 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPointSet.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPhastaReader, "1.7");
+vtkCxxRevisionMacro(vtkPhastaReader, "1.8");
 vtkStandardNewMacro(vtkPhastaReader);
 
 #include <vtkstd/map>
 #include <vtkstd/vector>
 #include <vtkstd/string>
+#include <vtksys/ios/sstream>
 
 struct vtkPhastaReaderInternal
 {
@@ -819,10 +820,9 @@ void vtkPhastaReader::ReadFieldFile(char* fieldFileName,
     {
     int idx=i-5;
     sArrays[idx] = vtkDoubleArray::New();
-    ostrstream aName;
+    vtksys_ios::ostringstream aName;
     aName << "s" << idx+1 << ends;
-    sArrays[idx]->SetName(aName.str());
-    delete[] aName.str();
+    sArrays[idx]->SetName(aName.str().c_str());
     sArrays[idx]->SetNumberOfTuples(noOfNodes);
     }
 

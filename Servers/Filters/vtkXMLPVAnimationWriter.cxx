@@ -24,10 +24,11 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 #include <vtkstd/vector>
+#include <vtksys/ios/sstream>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVAnimationWriter);
-vtkCxxRevisionMacro(vtkXMLPVAnimationWriter, "1.8");
+vtkCxxRevisionMacro(vtkXMLPVAnimationWriter, "1.9");
 
 //----------------------------------------------------------------------------
 class vtkXMLPVAnimationWriterInternals
@@ -234,15 +235,14 @@ void vtkXMLPVAnimationWriter::WriteTime(double time)
     vtkstd::string fname =
       this->Internal->CreateFileName(i, this->GetFilePrefix(),
                                      writer->GetDefaultFileExtension());
-    ostrstream entry_with_warning_C4701;
+    vtksys_ios::ostringstream entry_with_warning_C4701;
     entry_with_warning_C4701
       << "<DataSet timestep=\"" << time
       << "\" group=\"" << this->Internal->InputGroupNames[i].c_str()
       << "\" part=\"" << this->Internal->InputPartNumbers[i]
       << "\" file=\"" << fname.c_str()
       << "\"/>" << ends;
-    this->AppendEntry(entry_with_warning_C4701.str());
-    entry_with_warning_C4701.rdbuf()->freeze(0);
+    this->AppendEntry(entry_with_warning_C4701.str().c_str());
     
     // Write this step's file if its input has changed.
     if(changed)
@@ -309,7 +309,7 @@ vtkXMLPVAnimationWriterInternals::CreateFileName(int index,
                                                  const char* ext)
 { 
   // Start with the directory and file name prefix.
-  ostrstream fn_with_warning_C4701;
+  vtksys_ios::ostringstream fn_with_warning_C4701;
   fn_with_warning_C4701 << prefix << "/" << prefix << "_";
   
   // Add the group name.
@@ -335,7 +335,6 @@ vtkXMLPVAnimationWriterInternals::CreateFileName(int index,
   
   // Return the result.
   vtkstd::string fname = fn_with_warning_C4701.str();
-  fn_with_warning_C4701.rdbuf()->freeze(0);
   return fname;
 }
 

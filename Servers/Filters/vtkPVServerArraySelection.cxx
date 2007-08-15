@@ -21,10 +21,11 @@
 #include "vtkClientServerStream.h"
 
 #include <vtkstd/string>
+#include <vtksys/ios/sstream>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerArraySelection);
-vtkCxxRevisionMacro(vtkPVServerArraySelection, "1.5");
+vtkCxxRevisionMacro(vtkPVServerArraySelection, "1.6");
 
 //----------------------------------------------------------------------------
 class vtkPVServerArraySelectionInternals
@@ -71,14 +72,14 @@ vtkPVServerArraySelection
     vtkClientServerID readerID = interp->GetIDFromObject(source);
     if(readerID.ID)
       {
-      ostrstream aname;
+      vtksys_ios::ostringstream aname;
       aname << "GetNumberOf" << arrayname << "Arrays" << ends;
 
       // Get the number of arrays.
       vtkClientServerStream stream;
       stream << vtkClientServerStream::Invoke
              << readerID
-             << aname.str()
+             << aname.str().c_str()
              << vtkClientServerStream::End;
       interp->ProcessStream(stream);
       stream.Reset();
@@ -88,17 +89,16 @@ vtkPVServerArraySelection
         vtkErrorMacro("Error getting number of arrays from reader.");
         }
 
-      delete[] aname.str();
       // For each array, get its name and status.
       for(int i=0; i < numArrays; ++i)
         {
-        ostrstream naname;
+        vtksys_ios::ostringstream naname;
         naname << "Get" << arrayname << "ArrayName" << ends;
 
         // Get the array name.
         stream << vtkClientServerStream::Invoke
                << readerID
-               << naname.str()
+               << naname.str().c_str()
                << i
                << vtkClientServerStream::End;
         if(!interp->ProcessStream(stream))
@@ -106,7 +106,6 @@ vtkPVServerArraySelection
           break;
           }
         stream.Reset();
-        delete[] naname.str();
         const char* pname;
         if(!interp->GetLastResult().GetArgument(0, 0, &pname))
           {
@@ -121,12 +120,12 @@ vtkPVServerArraySelection
           }
         vtkstd::string name = pname;
 
-        ostrstream saname;
+        vtksys_ios::ostringstream saname;
         saname << "Get" << arrayname << "ArrayStatus" << ends;
         // Get the array status.
         stream << vtkClientServerStream::Invoke
           << readerID
-          << saname.str()
+          << saname.str().c_str()
           << name.c_str()
           << vtkClientServerStream::End;
         if(!interp->ProcessStream(stream))
@@ -134,7 +133,6 @@ vtkPVServerArraySelection
           break;
           }
         stream.Reset();
-        delete[] saname.str();
         int status = 0;
         if(!interp->GetLastResult().GetArgument(0, 0, &status))
           {

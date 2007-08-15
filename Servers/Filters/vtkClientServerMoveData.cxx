@@ -31,9 +31,10 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtksys/ios/sstream"
 
 vtkStandardNewMacro(vtkClientServerMoveData);
-vtkCxxRevisionMacro(vtkClientServerMoveData, "1.10");
+vtkCxxRevisionMacro(vtkClientServerMoveData, "1.11");
 vtkCxxSetObjectMacro(vtkClientServerMoveData, ProcessModuleConnection, 
   vtkProcessModuleConnection);
 
@@ -145,15 +146,15 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
         {
         // Convert to XML.
         vtkSelection* sel = vtkSelection::SafeDownCast(input);
-        ostrstream res;
+        vtksys_ios::ostringstream res;
         vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, sel);
         res << ends;
         // Send the size of the string.
-        int size = res.pcount();
+        int size = res.tellp();
         controller->Send(&size, 1, 1, 
                          vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
         // Send the XML string.
-        return controller->Send(res.str(), size, 1, 
+        return controller->Send(res.str().c_str(), size, 1, 
                                 vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
         }
       else
