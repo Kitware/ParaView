@@ -38,7 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "QtChartExport.h"
-#include "pqChartValue.h" // Needed for min, max members.
+
+class pqChartPixelScaleInternal;
+class pqChartValue;
 
 
 /// \class pqChartPixelScale
@@ -54,7 +56,7 @@ public:
 
 public:
   pqChartPixelScale();
-  ~pqChartPixelScale() {}
+  ~pqChartPixelScale();
 
   /// \name Value Parameters
   //@{
@@ -68,9 +70,9 @@ public:
 
   /// \brief
   ///   Gets the value range.
-  /// \return 
-  ///   The difference between the minimum and maximum values.
-  pqChartValue getValueRange() const;
+  /// \param range Used to return the difference between the minimum
+  ///   and maximum values.
+  void getValueRange(pqChartValue &range) const;
 
   /// \brief
   ///   Sets the minimum value.
@@ -83,7 +85,7 @@ public:
   ///   Gets the minimum value.
   /// \return
   ///   The minimum value.
-  const pqChartValue &getMinValue() const {return this->ValueMin;}
+  const pqChartValue &getMinValue() const;
 
   /// \brief
   ///   Sets the maximum value.
@@ -96,7 +98,7 @@ public:
   ///   Gets the maximum value.
   /// \return
   ///   The maximum value.
-  const pqChartValue &getMaxValue() const {return this->ValueMax;}
+  const pqChartValue &getMaxValue() const;
   //@}
 
   /// \name Pixel Parameters
@@ -123,26 +125,26 @@ public:
   /// \param min The minimum pixel location.
   /// \return
   ///   True if the pixel-value scale changed.
-  bool setMinPixel(int min) {return this->setPixelRange(min, this->PixelMin);}
+  bool setMinPixel(int min);
 
   /// \brief
   ///   Gets the minimum pixel location.
   /// \return
   ///   The minimum pixel location.
-  int getMinPixel() const {return this->PixelMin;}
+  int getMinPixel() const;
 
   /// \brief
   ///   Sets the maximum pixel location.
   /// \param max The maximum pixel location.
   /// \return
   ///   True if the pixel-value scale changed.
-  bool setMaxPixel(int max) {return this->setPixelRange(this->PixelMin, max);}
+  bool setMaxPixel(int max);
 
   /// \brief
   ///   Gets the maximum pixel location.
   /// \return
   ///   The maximum pixel location.
-  int getMaxPixel() const {return this->PixelMax;}
+  int getMaxPixel() const;
   //@}
 
   /// \name Pixel to Value Mapping
@@ -159,11 +161,11 @@ public:
   /// \brief
   ///   Maps a pixel to a value.
   /// \param pixel The pixel location.
-  /// \return
-  ///   The value equivalent to the pixel location.
+  /// \param value Used to return the value equivalent to the pixel
+  ///   location.
   /// \sa pqChartPixelScale::isValid(),
   ///     pqChartPixelScale::getPixelFor(const pqChartValue &)
-  pqChartValue getValueFor(int pixel) const;
+  void getValueFor(int pixel, pqChartValue &value) const;
 
   /// \brief
   ///   Used to determine if the pixel/value mapping is valid.
@@ -180,24 +182,30 @@ public:
   /// \brief
   ///   Sets the scale type.
   /// \param scale The new scale type.
-  void setScaleType(ValueScale scale) {this->Scale = scale;}
+  void setScaleType(ValueScale scale);
 
   /// \brief
   ///   Gets the scale type.
   /// \return
   ///   The current scale type.
-  ValueScale getScaleType() const {return this->Scale;}
+  ValueScale getScaleType() const;
+
+  /// \brief
+  ///   Gets wether or not logarithmic scale can be used.
+  /// \return
+  ///   True if logarithmic scale can be used.
+  bool isLogScaleAvailable() const;
   //@}
 
 public:
-  static const double MinLogValue; ///< Stores the log scale minimum.
+  static bool isLogScaleValid(const pqChartValue &min,
+      const pqChartValue &max);
+
+public:
+  static const double MinLogValue;     ///< Stores the log scale minimum.
 
 private:
-  ValueScale Scale;      ///< Stores the scale type (linear or log10).
-  pqChartValue ValueMin; ///< Stores the minimum value.
-  pqChartValue ValueMax; ///< Stores the maximum value.
-  int PixelMin;          ///< Stores the minimum pixel.
-  int PixelMax;          ///< Stores the maximum pixel.
+  pqChartPixelScaleInternal *Internal; ///< Stores the pixel/range mapping.
 };
 
 #endif

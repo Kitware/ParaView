@@ -212,7 +212,8 @@ bool pqHistogramChart::getValueAt(int x, int y, pqChartValue &value) const
   if(this->Internal->Contents.isValid() && scale->isValid() &&
       this->Internal->Contents.contains(x, y))
     {
-    pqChartValue range = scale->getValueRange();
+    pqChartValue range;
+    scale->getValueRange(range);
     if(range.getType() == pqChartValue::IntValue)
       {
       // Adjust the pick location if the pixel to value ratio is
@@ -234,7 +235,7 @@ bool pqHistogramChart::getValueAt(int x, int y, pqChartValue &value) const
         }
       }
 
-    value = scale->getValueFor(x);
+    scale->getValueFor(x, value);
     return true;
     }
 
@@ -256,8 +257,9 @@ bool pqHistogramChart::getValueRangeAt(int x, int y,
     // Make sure the selection type is 'Value'.
     if(this->Selection->getType() == pqHistogramSelection::Value)
       {
+      pqChartValue diff;
       const pqHistogramSelectionList &list = this->Selection->getSelection();
-      pqChartValue diff = scale->getValueRange();
+      scale->getValueRange(diff);
       if(diff.getType() == pqChartValue::IntValue)
         {
         // Adjust the pick location if the pixel to value ratio is
@@ -278,7 +280,8 @@ bool pqHistogramChart::getValueRangeAt(int x, int y,
         }
 
       // Search through the current selection list.
-      pqChartValue value = scale->getValueFor(x);
+      pqChartValue value;
+      scale->getValueFor(x, value);
       pqHistogramSelectionList::ConstIterator iter = list.begin();
       for( ; iter != list.end(); ++iter)
         {

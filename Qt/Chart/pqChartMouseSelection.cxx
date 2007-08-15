@@ -645,10 +645,12 @@ void pqChartMouseSelection::mouseMoveDragMove(const QPoint &point)
         point.y(), range))
       {
       // Get the value offset.
+      pqChartValue offset, offset2;
       pqChartAxis *xAxis = this->Histogram->Chart->getXAxis();
       const pqChartPixelScale *xScale = xAxis->getPixelValueScale();
-      pqChartValue offset = xScale->getValueFor(point.x());
-      offset -= xScale->getValueFor(this->Histogram->LastValueX);
+      xScale->getValueFor(point.x(), offset);
+      xScale->getValueFor(this->Histogram->LastValueX, offset2);
+      offset -= offset2;
       if(offset != 0)
         {
         // Save the last position and move the selection.

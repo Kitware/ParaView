@@ -367,7 +367,8 @@ void pqColorMapWidget::mouseMoveEvent(QMouseEvent *e)
         this->Internal->LastPoint.rx() += delta;
         this->Internal->PointMoved = true;
 
-        pqChartValue value = this->Internal->PixelMap.getValueFor(pixel);
+        pqChartValue value;
+        this->Internal->PixelMap.getValueFor(pixel, value);
         this->Model->setPointValue(this->Internal->PointIndex, value);
 
         this->generateGradient();
@@ -427,7 +428,8 @@ void pqColorMapWidget::mouseReleaseEvent(QMouseEvent *e)
       {
       // Add a point to the list. Use the mouse position to determine
       // the value and color.
-      pqChartValue value = this->Internal->PixelMap.getValueFor(e->x());
+      pqChartValue value;
+      this->Internal->PixelMap.getValueFor(e->x(), value);
       QImage image = this->DisplayImage->toImage();
       QColor color = image.pixel(e->x() - this->Internal->ImageArea.left(), 0);
       this->Model->addPoint(value, color);

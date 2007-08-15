@@ -35,98 +35,100 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqChartPixelScale.h"
 
+#include "pqChartValue.h"
 #include <math.h>
+
+
+class pqChartPixelScaleInternal
+{
+public:
+  pqChartPixelScaleInternal();
+  ~pqChartPixelScaleInternal() {}
+
+  /// Stores the scale type (linear or log10).
+  pqChartPixelScale::ValueScale Scale;
+  pqChartValue ValueMin; ///< Stores the minimum value.
+  pqChartValue ValueMax; ///< Stores the maximum value.
+  int PixelMin;          ///< Stores the minimum pixel.
+  int PixelMax;          ///< Stores the maximum pixel.
+  bool LogAvailable;     ///< True if log10 scale is valid.
+};
 
 
 static double MinIntLogPower = -1;
 const double pqChartPixelScale::MinLogValue = 0.0001;
 
 
-pqChartPixelScale::pqChartPixelScale()
+//----------------------------------------------------------------------------
+pqChartPixelScaleInternal::pqChartPixelScaleInternal()
   : ValueMin(), ValueMax()
 {
   this->Scale = pqChartPixelScale::Linear;
   this->PixelMin = 0;
   this->PixelMax = 0;
+  this->LogAvailable = false;
+}
+
+
+//----------------------------------------------------------------------------
+pqChartPixelScale::pqChartPixelScale()
+{
+  this->Internal = new pqChartPixelScaleInternal();
+}
+
+pqChartPixelScale::~pqChartPixelScale()
+{
+  delete this->Internal;
 }
 
 bool pqChartPixelScale::setValueRange(const pqChartValue &min,
     const pqChartValue &max)
 {
-  pqChartValue prevMin = this->ValueMin;
-  pqChartValue prevMax = this->ValueMax;
-  this->ValueMin = min;
-  this->ValueMax = max;
-  if(this->Scale == pqChartPixelScale::Logarithmic)
+  if(min != this->Internal->ValueMin || max != this->Internal->ValueMax)
     {
-    // A logarithmic scale axis cannot contain zero because it is
-    // undefined. If the range includes zero, set the scale to linear.
-    if((min < 0 && max > 0) || (max < 0 && min > 0))
-      {
-      this->Scale = pqChartPixelScale::Linear;
-      }
+    this->Internal->ValueMin = min;
+    this->Internal->ValueMax = max;
+
+    // If the value range changed, determine if log scale can be used.
+    this->Internal->LogAvailable = pqChartPixelScale::isLogScaleValid(
+        this->Internal->ValueMin, this->Internal->ValueMax);
+    return true;
     }
 
-  if(this->Scale == pqChartPixelScale::Logarithmic)
-    {
-    if(max < min)
-      {
-      this->ValueMin = max;
-      this->ValueMax = min;
-      }
-
-    // Adjust the values that are close to zero if they are
-    // below the minimum log value.
-    if(this->ValueMin < 0)
-      {
-      if(this->ValueMax.getType() != pqChartValue::IntValue &&
-          this->ValueMax > -pqChartPixelScale::MinLogValue)
-        {
-        this->ValueMax = -pqChartPixelScale::MinLogValue;
-        if(this->ValueMin.getType() != pqChartValue::DoubleValue)
-          {
-          this->ValueMax.convertTo(pqChartValue::FloatValue);
-          }
-        }
-      }
-    else
-      {
-      if(this->ValueMin.getType() != pqChartValue::IntValue &&
-          this->ValueMin < pqChartPixelScale::MinLogValue)
-        {
-        this->ValueMin = pqChartPixelScale::MinLogValue;
-        if(this->ValueMax.getType() != pqChartValue::DoubleValue)
-          {
-          this->ValueMin.convertTo(pqChartValue::FloatValue);
-          }
-        }
-      }
-    }
-
-  return prevMin != this->ValueMin || prevMax != this->ValueMax;
+  return false;
 }
 
-pqChartValue pqChartPixelScale::getValueRange() const
+void pqChartPixelScale::getValueRange(pqChartValue &range) const
 {
-  return this->ValueMax - this->ValueMin;
+  range = this->Internal->ValueMax - this->Internal->ValueMin;
 }
 
 bool pqChartPixelScale::setMinValue(const pqChartValue &min)
 {
-  return this->setValueRange(min, this->ValueMax);
+  return this->setValueRange(min, this->Internal->ValueMax);
+}
+
+const pqChartValue &pqChartPixelScale::getMinValue() const
+{
+  return this->Internal->ValueMin;
 }
 
 bool pqChartPixelScale::setMaxValue(const pqChartValue &max)
 {
-  return this->setValueRange(this->ValueMin, max);
+  return this->setValueRange(this->Internal->ValueMin, max);
+}
+
+const pqChartValue &pqChartPixelScale::getMaxValue() const
+{
+  return this->Internal->ValueMax;
 }
 
 bool pqChartPixelScale::setPixelRange(int min, int max)
 {
-  if(this->PixelMin != min || this->PixelMax != max)
+  if(this->Internal->PixelMin != min || this->Internal->PixelMax != max)
     {
-    this->PixelMin = min;
-    this->PixelMax = max;
+    this->Internal->PixelMin = min;
+    this->Internal->PixelMax = max;
     return true;
     }
 
@@ -136,14 +138,34 @@ bool pqChartPixelScale::setPixelRange(int min, int max)
 int pqChartPixelScale::getPixelRange() const
 {
   // TODO: Is the true (max - min) ever needed?
-  if(this->PixelMax > this->PixelMin)
+  if(this->Internal->PixelMax > this->Internal->PixelMin)
     {
-    return this->PixelMax - this->PixelMin;
+    return this->Internal->PixelMax - this->Internal->PixelMin;
     }
   else
     {
-    return this->PixelMin - this->PixelMax;
+    return this->Internal->PixelMin - this->Internal->PixelMax;
     }
+}
+
+bool pqChartPixelScale::setMinPixel(int min)
+{
+  return this->setPixelRange(min, this->Internal->PixelMin);
+}
+
+int pqChartPixelScale::getMinPixel() const
+{
+  return this->Internal->PixelMin;
+}
+
+bool pqChartPixelScale::setMaxPixel(int max)
+{
+  return this->setPixelRange(this->Internal->PixelMin, max);
+}
+
+int pqChartPixelScale::getMaxPixel() const
+{
+  return this->Internal->PixelMax;
 }
 
 int pqChartPixelScale::getPixelFor(const pqChartValue &value) const
@@ -154,183 +176,163 @@ int pqChartPixelScale::getPixelFor(const pqChartValue &value) const
   // order to get a linear mapping.
   pqChartValue result;
   pqChartValue valueRange;
-  if(this->Scale == pqChartPixelScale::Logarithmic)
+  if(this->Internal->Scale == pqChartPixelScale::Logarithmic &&
+      this->Internal->LogAvailable)
     {
-    // If the value is less than the minimum log number, return
-    // the minimum pixel value.
-    bool reversed = this->ValueMin < 0;
-    if(reversed)
+    // If the value is too small, return the minimum pixel.
+    if(value <= pqChartPixelScale::MinLogValue)
       {
-      if(value >= -pqChartPixelScale::MinLogValue)
-        {
-        return this->PixelMax;
-        }
-      }
-    else
-      {
-      if(value <= pqChartPixelScale::MinLogValue)
-        {
-        return this->PixelMin;
-        }
+      return this->Internal->PixelMin;
       }
 
     // If the log scale uses integers, the first value may be zero.
     // In that case, use -1 instead of taking the log of zero.
     pqChartValue v1;
-    if(this->ValueMin.getType() == pqChartValue::IntValue &&
-        this->ValueMin == 0)
+    if(this->Internal->ValueMin.getType() == pqChartValue::IntValue &&
+        this->Internal->ValueMin == 0)
       {
       v1 = MinIntLogPower;
       }
     else
       {
-      if(reversed)
-        {
-        v1 = log10(-this->ValueMin.getDoubleValue());
-        }
-      else
-        {
-        v1 = log10(this->ValueMin.getDoubleValue());
-        }
+      v1 = log10(this->Internal->ValueMin.getDoubleValue());
       }
 
-    if(this->ValueMin.getType() == pqChartValue::IntValue &&
-        this->ValueMax == 0)
+    if(this->Internal->ValueMin.getType() == pqChartValue::IntValue &&
+        this->Internal->ValueMax == 0)
       {
       valueRange = MinIntLogPower;
       }
     else
       {
-      if(reversed)
-        {
-        valueRange = log10(-this->ValueMax.getDoubleValue());
-        }
-      else
-        {
-        valueRange = log10(this->ValueMax.getDoubleValue());
-        }
+      valueRange = log10(this->Internal->ValueMax.getDoubleValue());
       }
 
-    if(reversed)
-      {
-      result = log10(-value.getDoubleValue());
-      }
-    else
-      {
-      result = log10(value.getDoubleValue());
-      }
-
+    result = log10(value.getDoubleValue());
     result -= v1;
     valueRange -= v1;
     }
   else
     {
-    result = value - this->ValueMin;
-    valueRange = this->ValueMax - this->ValueMin;
+    result = value - this->Internal->ValueMin;
+    valueRange = this->Internal->ValueMax - this->Internal->ValueMin;
     }
 
-  result *= this->PixelMax - this->PixelMin;
+  result *= this->Internal->PixelMax - this->Internal->PixelMin;
   if(valueRange != 0)
     {
     result /= valueRange;
     }
 
-  return result.getIntValue() + this->PixelMin;
+  return result.getIntValue() + this->Internal->PixelMin;
 }
 
-pqChartValue pqChartPixelScale::getValueFor(int pixel) const
+void pqChartPixelScale::getValueFor(int pixel, pqChartValue &value) const
 {
   // Convert the pixel location to a value using:
   // vx = ((px - p1)*(v2 - v1))/(p2 - p1) + v1
   // If using a log scale, the values should be in exponents in
   // order to get a linear mapping.
   pqChartValue v1;
-  pqChartValue result;
   bool reversed = false;
-  if(this->Scale == pqChartPixelScale::Logarithmic)
+  if(this->Internal->Scale == pqChartPixelScale::Logarithmic &&
+      this->Internal->LogAvailable)
     {
     // If the log scale uses integers, the first value may be zero.
     // In that case, use -1 instead of taking the log of zero.
-    reversed = this->ValueMin < 0;
-    if(this->ValueMin.getType() == pqChartValue::IntValue &&
-        this->ValueMin == 0)
+    if(this->Internal->ValueMin.getType() == pqChartValue::IntValue &&
+        this->Internal->ValueMin == 0)
       {
       v1 = MinIntLogPower;
       }
     else
       {
-      if(reversed)
-        {
-        v1 = log10(-this->ValueMin.getDoubleValue());
-        }
-      else
-        {
-        v1 = log10(this->ValueMin.getDoubleValue());
-        }
+      v1 = log10(this->Internal->ValueMin.getDoubleValue());
       }
 
-    if(this->ValueMin.getType() == pqChartValue::IntValue &&
-        this->ValueMax == 0)
+    if(this->Internal->ValueMin.getType() == pqChartValue::IntValue &&
+        this->Internal->ValueMax == 0)
       {
-      result = MinIntLogPower;
+      value = MinIntLogPower;
       }
     else
       {
-      if(reversed)
-        {
-        result = log10(-this->ValueMax.getDoubleValue());
-        }
-      else
-        {
-        result = log10(this->ValueMax.getDoubleValue());
-        }
+      value = log10(this->Internal->ValueMax.getDoubleValue());
       }
 
-    result -= v1;
+    value -= v1;
     }
   else
     {
-    v1 = this->ValueMin;
-    result = this->ValueMax - this->ValueMin;
+    v1 = this->Internal->ValueMin;
+    value = this->Internal->ValueMax - this->Internal->ValueMin;
     }
 
-  result *= pixel - this->PixelMin;
-  int pixelRange = this->PixelMax - this->PixelMin;
+  value *= pixel - this->Internal->PixelMin;
+  int pixelRange = this->Internal->PixelMax - this->Internal->PixelMin;
   if(pixelRange != 0)
     {
-    result /= pixelRange;
+    value /= pixelRange;
     }
 
-  result += v1;
-  if(this->Scale == pqChartPixelScale::Logarithmic)
+  value += v1;
+  if(this->Internal->Scale == pqChartPixelScale::Logarithmic &&
+      this->Internal->LogAvailable)
     {
-    result = pow((double)10.0, result.getDoubleValue());
-    if(reversed)
+    value = pow((double)10.0, value.getDoubleValue());
+    if(this->Internal->ValueMin.getType() != pqChartValue::DoubleValue)
       {
-      result *= -1;
-      }
-    if(this->ValueMin.getType() != pqChartValue::DoubleValue)
-      {
-      result.convertTo(pqChartValue::FloatValue);
+      value.convertTo(pqChartValue::FloatValue);
       }
     }
-
-  return result;
 }
 
 bool pqChartPixelScale::isValid() const
 {
-  if(this->ValueMax == this->ValueMin)
+  if(this->Internal->ValueMax == this->Internal->ValueMin)
+    {
     return false;
-  if(this->PixelMax == this->PixelMin)
+    }
+
+  if(this->Internal->PixelMax == this->Internal->PixelMin)
+    {
     return false;
+    }
+
   return true;
 }
 
 bool pqChartPixelScale::isZeroInRange() const
 {
-  return (this->ValueMax >= 0 && this->ValueMin <= 0) ||
-      (this->ValueMax <= 0 && this->ValueMin >= 0);
+  return (this->Internal->ValueMax >= 0 && this->Internal->ValueMin <= 0) ||
+      (this->Internal->ValueMax <= 0 && this->Internal->ValueMin >= 0);
+}
+
+void pqChartPixelScale::setScaleType(pqChartPixelScale::ValueScale scale)
+{
+  this->Internal->Scale = scale;
+}
+
+pqChartPixelScale::ValueScale pqChartPixelScale::getScaleType() const
+{
+  return this->Internal->Scale;
+}
+
+bool pqChartPixelScale::isLogScaleAvailable() const
+{
+  return this->Internal->LogAvailable;
+}
+
+bool pqChartPixelScale::isLogScaleValid(const pqChartValue &min,
+    const pqChartValue &max)
+{
+  bool available = min > 0 && max > 0;
+  if(!available && max.getType() == pqChartValue::IntValue)
+    {
+    available = (min == 0 && min < max) || (max == 0 && max < min);
+    }
+
+  return available;
 }
 
 

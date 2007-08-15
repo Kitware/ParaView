@@ -82,6 +82,7 @@ public:
   bool ExtraMinPadding;
   bool ExtraMaxPadding;
   bool SpaceTooSmall;
+  bool ScaleChanged;
 };
 
 
@@ -119,6 +120,7 @@ pqChartAxisInternal::pqChartAxisInternal()
   this->ExtraMinPadding = false;
   this->ExtraMaxPadding = false;
   this->SpaceTooSmall = false;
+  this->ScaleChanged = false;
 }
 
 
@@ -229,6 +231,7 @@ void pqChartAxis::setScaleType(pqChartPixelScale::ValueScale scale)
   if(this->Scale->getScaleType() != scale)
     {
     this->Scale->setScaleType(scale);
+    this->Internal->ScaleChanged = true;
     this->clearLabelWidthCache();
     }
 }
@@ -258,8 +261,16 @@ void pqChartAxis::getBestFitRange(pqChartValue &min,
 void pqChartAxis::setBestFitRange(const pqChartValue &min,
     const pqChartValue &max)
 {
-  this->Internal->Minimum = min;
-  this->Internal->Maximum = max;
+  if(max < min)
+    {
+    this->Internal->Minimum = max;
+    this->Internal->Maximum = min;
+    }
+  else
+    {
+    this->Internal->Minimum = min;
+    this->Internal->Maximum = max;
+    }
 }
 
 bool pqChartAxis::isMaxExtraPadded() const
@@ -611,13 +622,21 @@ void pqChartAxis::layoutAxis(const QRect &area)
     valueChanged = this->Scale->setValueRange(pqChartValue(), pqChartValue());
     }
 
+  if((valueChanged || this->Internal->ScaleChanged) &&
+      this->Scale->getScaleType() == pqChartPixelScale::Logarithmic &&
+      !this->Scale->isLogScaleAvailable())
+    {
+    qWarning() << "Warning: Invalid range for a logarithmic scale.";
+    }
+
   // Signal the chart layers if the pixel-value map changed.
-  if(pixelChanged || valueChanged)
+  if(pixelChanged || valueChanged || this->Internal->ScaleChanged)
     {
     emit this->pixelScaleChanged();
     }
 
   // Calculate the pixel location for each label.
+  this->Internal->ScaleChanged = false;
   this->Internal->Skip = 1;
   if(this->Scale->isValid() && this->Options->isVisible() &&
       this->Options->areLabelsVisible())
@@ -1451,10 +1470,10 @@ void pqChartAxis::generateLogLabels(const QRect &contents)
     }
 
   // Make sure the range is valid for log scale.
-  if((this->Internal->Maximum >= 0 && this->Internal->Minimum <= 0) ||
-      (this->Internal->Maximum <= 0 && this->Internal->Minimum >= 0))
+  if(!pqChartPixelScale::isLogScaleValid(this->Internal->Minimum,
+        this->Internal->Maximum))
     {
-    qCritical() << "Error: Invalid range for a logarithmic scale.";
+    this->generateLabels(contents);
     return;
     }
 
@@ -1510,34 +1529,22 @@ void pqChartAxis::generateLogLabels(const QRect &contents)
     int maxExp = -1;
     int minExp = -1;
     double logValue = 0.0;
-    bool reversed = this->Internal->Minimum < 0;
-    if(reversed)
-      {
-      logValue = log10(-this->Internal->Minimum.getDoubleValue());
-      }
-    else
+    if(!(this->Internal->Maximum.getType() == pqChartValue::IntValue &&
+        this->Internal->Maximum == 0))
       {
       logValue = log10(this->Internal->Maximum.getDoubleValue());
-      }
-
-    maxExp = (int)logValue;
-    if(logValue > (double)maxExp)
-      {
-      maxExp++;
+      maxExp = (int)logValue;
+      if(this->Internal->Maximum > this->Internal->Minimum &&
+          logValue > (double)maxExp)
+        {
+        maxExp++;
+        }
       }
 
     if(!(this->Internal->Minimum.getType() == pqChartValue::IntValue &&
-        ((reversed && this->Internal->Maximum == 0) ||
-        this->Internal->Minimum == 0)))
+        this->Internal->Minimum == 0))
       {
-      if(reversed)
-        {
-        logValue = log10(-this->Internal->Maximum.getDoubleValue());
-        }
-      else
-        {
-        logValue = log10(this->Internal->Minimum.getDoubleValue());
-        }
+      logValue = log10(this->Internal->Minimum.getDoubleValue());
 
       // The log10 result can be off for certain values so adjust
       // the result to get a better integer exponent.
@@ -1551,21 +1558,18 @@ void pqChartAxis::generateLogLabels(const QRect &contents)
         }
 
       minExp = (int)logValue;
+      if(this->Internal->Minimum > this->Internal->Maximum &&
+          logValue > (double)minExp)
+        {
+        minExp++;
+        }
       }
 
     int allowed = pixelRange / needed;
     int subInterval = 0;
     int intervals = maxExp - minExp;
     pqChartValue value;
-    if(reversed)
-      {
-      value = -pow((double)10.0, (double)minExp);
-      }
-    else
-      {
-      value = pow((double)10.0, (double)minExp);
-      }
-
+    value = pow((double)10.0, (double)minExp);
     value.convertTo(this->Internal->Minimum.getType());
     if(allowed > intervals)
       {
@@ -1608,11 +1612,6 @@ void pqChartAxis::generateLogLabels(const QRect &contents)
         }
 
       value = pow((double)10.0, (double)(minExp + i));
-      if(reversed)
-        {
-        value *= -1;
-        }
-
       value.convertTo(this->Internal->Minimum.getType());
       this->Model->addLabel(value);
       }
@@ -1621,32 +1620,13 @@ void pqChartAxis::generateLogLabels(const QRect &contents)
     {
     // The best fit range is zero, but there is data available. Find
     // the closest power of ten around the value.
-    int logValue = 0;
-    bool reversed = this->Internal->Minimum < 0;
-    if(reversed)
-      {
-      logValue = (int)log10(-this->Internal->Minimum.getDoubleValue());
-      }
-    else
-      {
-      logValue = (int)log10(this->Internal->Maximum.getDoubleValue());
-      }
-
+    int logValue = (int)log10(this->Internal->Maximum.getDoubleValue());
     pqChartValue value = pow((double)10.0, (double)logValue);
-    if(reversed)
-      {
-      value *= -1;
-      }
-
     value.convertTo(this->Internal->Minimum.getType());
     this->Model->addLabel(value);
+
     logValue += 1;
     value = pow((double)10.0, (double)logValue);
-    if(reversed)
-      {
-      value *= -1;
-      }
-
     value.convertTo(this->Internal->Minimum.getType());
     this->Model->addLabel(value);
     }
