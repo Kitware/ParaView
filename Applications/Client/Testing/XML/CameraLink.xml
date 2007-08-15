@@ -12,6 +12,12 @@
   <pqevent object="MainWindow/pqLinksManager/pqLinksEditor/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/pqLinksManager/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
+  <pqevent object="MainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageLinks" />
+  <pqevent object="MainWindow/pqLinksManager/treeView" command="mousePress" arguments="1,1,0,78,9,/0:2" />
+  <pqevent object="MainWindow/pqLinksManager/treeView" command="mouseRelease" arguments="1,0,0,78,9,/0:2" />
+  <pqevent object="MainWindow/pqLinksManager/editButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/pqLinksManager/pqLinksEditor/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="MainWindow/pqLinksManager/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.58885,0.376667,1,1,0)" />
   <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.421603,0.503333,1,0,0)" />
   <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.421603,0.503333,1,0,0)" />
