@@ -20,10 +20,11 @@
 #include "vtkTimerLog.h"
 #include "vtkProcessModule.h"
 #include "vtkClientServerStream.h"
+#include "vtksys/ios/sstream"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTimerInformation);
-vtkCxxRevisionMacro(vtkPVTimerInformation, "1.3");
+vtkCxxRevisionMacro(vtkPVTimerInformation, "1.4");
 
 
 
@@ -59,7 +60,7 @@ vtkPVTimerInformation::~vtkPVTimerInformation()
 
 
 //----------------------------------------------------------------------------
-void vtkPVTimerInformation::InsertLog(int id, char* log)
+void vtkPVTimerInformation::InsertLog(int id, const char* log)
 {
   if (id >= this->NumberOfLogs)
     {
@@ -70,7 +71,10 @@ void vtkPVTimerInformation::InsertLog(int id, char* log)
     delete [] this->Logs[id];
     this->Logs[id] = NULL;
     }
-  this->Logs[id] = log;
+  int len = strlen(log);
+  char* str = new char[len+1];
+  strcpy(str, log);
+  this->Logs[id] = str;
 }
 
 //----------------------------------------------------------------------------
@@ -119,9 +123,7 @@ void vtkPVTimerInformation::Reallocate(int num)
 // This ignores the object, and gets the log from the timer.
 void vtkPVTimerInformation::CopyFromObject(vtkObject* o)
 {
-  ostrstream *fptr;
   int length;
-  char *str;
   vtkProcessModule* pm;
   float threshold = 0.001;
 
@@ -134,26 +136,11 @@ void vtkPVTimerInformation::CopyFromObject(vtkObject* o)
   length = vtkTimerLog::GetNumberOfEvents() * 40;
   if (length > 0)
     {
-    str = new char [length];
-    fptr = new ostrstream(str, length);
-
-    if (fptr->fail())
-      {
-      vtkErrorMacro(<< "Unable to string stream");
-      return;
-      }
-    else
-      {
-      //*fptr << "Hello world !!!\n ()";
-      vtkTimerLog::DumpLogWithIndents(fptr, threshold);
-
-      length = fptr->pcount();
-      str[length] = '\0';
-
-      delete fptr;
-      
-      }
-    this->InsertLog(0, str);
+    vtksys_ios::ostringstream fptr;
+    //*fptr << "Hello world !!!\n ()";
+    vtkTimerLog::DumpLogWithIndents(&fptr, threshold);
+    fptr << ends;
+    this->InsertLog(0, fptr.str().c_str());
     }  
 }
 

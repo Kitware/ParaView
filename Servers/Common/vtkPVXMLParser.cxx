@@ -15,8 +15,9 @@
 #include "vtkPVXMLParser.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtksys/ios/sstream"
 
-vtkCxxRevisionMacro(vtkPVXMLParser, "1.1");
+vtkCxxRevisionMacro(vtkPVXMLParser, "1.2");
 vtkStandardNewMacro(vtkPVXMLParser);
 
 //----------------------------------------------------------------------------
@@ -68,10 +69,9 @@ void vtkPVXMLParser::StartElement(const char* name, const char** atts)
     }
   else
     {
-    ostrstream idstr;
+    vtksys_ios::ostringstream idstr;
     idstr << this->ElementIdIndex++ << ends;
-    element->SetId(idstr.str());
-    idstr.rdbuf()->freeze(0);
+    element->SetId(idstr.str().c_str());
     }
   this->PushOpenElement(element);
 }

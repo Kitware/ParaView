@@ -18,11 +18,12 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.18");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.19");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
+#include <vtksys/ios/sstream>
 
 struct vtkPVXMLElementInternals
 {
@@ -72,39 +73,35 @@ void vtkPVXMLElement::PrintSelf(ostream& os, vtkIndent indent)
 void vtkPVXMLElement::AddAttribute(const char* attrName, 
                                    unsigned int attrValue)
 {
-  ostrstream valueStr;
+  vtksys_ios::ostringstream valueStr;
   valueStr << attrValue << ends;
-  this->AddAttribute(attrName, valueStr.str());
-  delete[] valueStr.str();
+  this->AddAttribute(attrName, valueStr.str().c_str());
 }
 
 //----------------------------------------------------------------------------
 void vtkPVXMLElement::AddAttribute(const char* attrName, int attrValue)
 {
-  ostrstream valueStr;
+  vtksys_ios::ostringstream valueStr;
   valueStr << attrValue << ends;
-  this->AddAttribute(attrName, valueStr.str());
-  delete[] valueStr.str();
+  this->AddAttribute(attrName, valueStr.str().c_str());
 }
 
 #if defined(VTK_USE_64BIT_IDS)
 //----------------------------------------------------------------------------
 void vtkPVXMLElement::AddAttribute(const char* attrName, vtkIdType attrValue)
 {
-  ostrstream valueStr;
+  vtksys_ios::ostringstream valueStr;
   valueStr << attrValue << ends;
-  this->AddAttribute(attrName, valueStr.str());
-  delete[] valueStr.str();
+  this->AddAttribute(attrName, valueStr.str().c_str());
 }
 #endif
 
 //----------------------------------------------------------------------------
 void vtkPVXMLElement::AddAttribute(const char* attrName, double attrValue)
 {
-  ostrstream valueStr;
+  vtksys_ios::ostringstream valueStr;
   valueStr << attrValue << ends;
-  this->AddAttribute(attrName, valueStr.str());
-  delete[] valueStr.str();
+  this->AddAttribute(attrName, valueStr.str().c_str());
 }
 
 //----------------------------------------------------------------------------
@@ -509,7 +506,7 @@ template <class T>
 int vtkPVXMLVectorAttributeParse(const char* str, int length, T* data)
 {
   if(!str || !length) { return 0; }
-  strstream vstr;
+  vtksys_ios::stringstream vstr;
   vstr << str << ends;
   int i;
   for(i=0;i < length;++i)

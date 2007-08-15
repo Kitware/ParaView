@@ -51,6 +51,7 @@
 
 #include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
+#include <vtksys/ios/sstream>
 
 vtkProcessModule* vtkProcessModule::ProcessModule = 0;
 
@@ -103,7 +104,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.71");
+vtkCxxRevisionMacro(vtkProcessModule, "1.72");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -975,12 +976,11 @@ void vtkProcessModule::InterpreterCallback(unsigned long, void* pinfo)
     (last.GetCommand(0) == vtkClientServerStream::Error) &&
     last.GetArgument(0, 0, &errorMessage))
     {
-    ostrstream error;
+    vtksys_ios::ostringstream error;
     error << "\nwhile processing\n";
     info->css->PrintMessage(error, info->message);
     error << ends;
-    vtkErrorMacro(<< errorMessage << error.str());
-    error.rdbuf()->freeze(0);
+    vtkErrorMacro(<< errorMessage << error.str().c_str());
     vtkErrorMacro("Aborting execution for debugging purposes.");
     abort();
     }
@@ -1283,7 +1283,7 @@ void vtkProcessModule::CreateLogFile()
     return;
     }
   
-  ostrstream fileName;
+  vtksys_ios::ostringstream fileName;
   fileName << prefix << this->GetPartitionId() << ".txt"
     << ends;
   if (this->LogFile)
@@ -1291,8 +1291,7 @@ void vtkProcessModule::CreateLogFile()
     this->LogFile->close();
     delete this->LogFile;
     }
-  this->LogFile = new ofstream(fileName.str(), ios::out);
-  fileName.rdbuf()->freeze(0);
+  this->LogFile = new ofstream(fileName.str().c_str(), ios::out);
   if (this->LogFile->fail())
     {
     delete this->LogFile;

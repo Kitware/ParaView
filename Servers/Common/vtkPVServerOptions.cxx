@@ -14,10 +14,11 @@
 #include "vtkPVServerOptions.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVServerOptionsInternals.h"
+#include "vtksys/ios/sstream"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerOptions);
-vtkCxxRevisionMacro(vtkPVServerOptions, "1.4");
+vtkCxxRevisionMacro(vtkPVServerOptions, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVServerOptions::vtkPVServerOptions()
@@ -57,7 +58,7 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
     else if(key == "LowerLeft")
       {
       caveBounds++;
-      istrstream str(const_cast<char *>(value.c_str()));
+      vtksys_ios::istringstream str(const_cast<char *>(value.c_str()));
       for(int j =0; j < 3; j++)
         {
         str >> info.LowerLeft[j];
@@ -66,7 +67,7 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
     else if(key == "LowerRight")
       {
       caveBounds++;
-      istrstream str(const_cast<char *>(value.c_str()));
+      vtksys_ios::istringstream str(const_cast<char *>(value.c_str()));
       for(int j =0; j < 3; j++)
         {
         str >> info.LowerRight[j];
@@ -75,7 +76,7 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
     else if(key == "UpperLeft")
       {
       caveBounds++;
-      istrstream str(const_cast<char *>(value.c_str()));
+      vtksys_ios::istringstream str(const_cast<char *>(value.c_str()));
       for(int j =0; j < 3; j++)
         {
         str >> info.UpperLeft[j];

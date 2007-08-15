@@ -20,9 +20,10 @@
 #include "vtkPVXMLParser.h"
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
+#include "vtksys/ios/sstream"
 
 vtkStandardNewMacro(vtkPVSelectionInformation);
-vtkCxxRevisionMacro(vtkPVSelectionInformation, "1.5");
+vtkCxxRevisionMacro(vtkPVSelectionInformation, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVSelectionInformation::vtkPVSelectionInformation()
@@ -91,11 +92,10 @@ void vtkPVSelectionInformation::CopyToStream(vtkClientServerStream* css)
   css->Reset();
   *css << vtkClientServerStream::Reply;
 
-  ostrstream res;
+  vtksys_ios::ostringstream res;
   vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, this->Selection);
   res << ends;
-  *css << res.str();
-  delete[] res.str();
+  *css << res.str().c_str();
 
   *css << vtkClientServerStream::End;
 }
