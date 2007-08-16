@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqServerBrowser.h>
 #include <pqServerManagerModel.h>
 #include <pqServerResource.h>
-#include <pqServerStartupContext.h>
 #include <pqServerStartup.h>
 #include <pqServerStartups.h>
 
@@ -75,7 +74,6 @@ class pqSimpleServerStartup::pqImplementation
 public:
   pqImplementation() :
     Startup(0),
-    StartupContext(0),
     StartupDialog(0),
     PortID(0),
     DataServerPortID(0),
@@ -94,9 +92,6 @@ public:
   {
     this->Startup = 0;
     this->Timer.stop();
-
-    delete this->StartupContext;
-    this->StartupContext = 0;
 
     delete this->StartupDialog;
     this->StartupDialog = 0;
@@ -128,8 +123,6 @@ public:
   pqServerStartup* Startup;
   /// Used to check the reverse-connection status periodically
   QTimer Timer;
-  /// Used to track the progress of a startup as it executes
-  pqServerStartupContext* StartupContext;
   /// Modal dialog used to display progress during startup
   pqServerStartupDialog* StartupDialog;
   /// Listening port identifier returned by the server manager during reverse-connection startup
@@ -622,32 +615,30 @@ void pqSimpleServerStartup::startBuiltinConnection()
 //-----------------------------------------------------------------------------
 void pqSimpleServerStartup::startForwardConnection()
 {
-  this->Implementation->StartupContext = new pqServerStartupContext();
-  
   this->Implementation->StartupDialog =
     new pqServerStartupDialog(this->Implementation->Server, false);
   this->Implementation->StartupDialog->show();
   
   QObject::connect(
-    this->Implementation->StartupContext,
+    this->Implementation->Startup,
     SIGNAL(succeeded()),
     this,
     SLOT(forwardConnectServer()));
     
   QObject::connect(
-    this->Implementation->StartupContext,
+    this->Implementation->Startup,
     SIGNAL(succeeded()),
     this->Implementation->StartupDialog,
     SLOT(hide()));
     
   QObject::connect(
-    this->Implementation->StartupContext,
+    this->Implementation->Startup,
     SIGNAL(failed()),
     this,
     SLOT(failed()));
   
   QObject::connect(
-    this->Implementation->StartupContext,
+    this->Implementation->Startup,
     SIGNAL(failed()),
     this->Implementation->StartupDialog,
     SLOT(hide()));
@@ -671,9 +662,7 @@ void pqSimpleServerStartup::startForwardConnection()
       }
     }
   
-  this->Implementation->Startup->execute(
-    this->Implementation->Options,
-    *this->Implementation->StartupContext);
+  this->Implementation->Startup->execute(this->Implementation->Options);
 }
 
 //-----------------------------------------------------------------------------
@@ -726,8 +715,6 @@ void pqSimpleServerStartup::startReverseConnection()
       this->Implementation->RenderServerPortID);
     }
     
-  this->Implementation->StartupContext = new pqServerStartupContext();
-
   this->Implementation->StartupDialog =
     new pqServerStartupDialog(this->Implementation->Server, true);
   this->Implementation->StartupDialog->show();
@@ -739,25 +726,25 @@ void pqSimpleServerStartup::startReverseConnection()
     SLOT(cancelled()));
 
   QObject::connect(
-    this->Implementation->StartupContext,
+    this->Implementation->Startup,
     SIGNAL(succeeded()),
     &this->Implementation->Timer,
     SLOT(start()));
     
   QObject::connect(
-    this->Implementation->StartupContext,
+    this->Implementation->Startup,
     SIGNAL(failed()),
     this,
     SLOT(failed()));
   
   QObject::connect(
-    this->Implementation->StartupContext,
+    this->Implementation->Startup,
     SIGNAL(failed()),
     this->Implementation->StartupDialog,
     SLOT(hide()));
 
   QObject::connect(
-    this->Implementation->StartupContext,
+    this->Implementation->Startup,
     SIGNAL(failed()),
     &this->Implementation->Timer,
     SLOT(stop()));
@@ -781,9 +768,7 @@ void pqSimpleServerStartup::startReverseConnection()
       }
     }
   
-  this->Implementation->Startup->execute(
-    this->Implementation->Options,
-    *this->Implementation->StartupContext);
+  this->Implementation->Startup->execute(this->Implementation->Options);
 }
 
 //-----------------------------------------------------------------------------

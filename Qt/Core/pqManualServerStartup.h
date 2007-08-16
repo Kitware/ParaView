@@ -56,7 +56,7 @@ public:
   const pqServerResource getServer();
   const QString getOwner();
   const QDomDocument getConfiguration();
-  void execute(const OptionsT& options, pqServerStartupContext& context);
+  void execute(const OptionsT& options);
   
 private:
   const QString Name;

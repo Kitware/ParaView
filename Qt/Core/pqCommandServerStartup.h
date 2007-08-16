@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class PQCORE_EXPORT pqCommandServerStartup :
   public pqServerStartup
 {
+  Q_OBJECT
 public:
   pqCommandServerStartup(
     const QString& name,
@@ -58,29 +59,12 @@ public:
   const QString getOwner();
   const QDomDocument getConfiguration();
   
-  void execute(const OptionsT& options, pqServerStartupContext& context);
+  void execute(const OptionsT& options);
 
   const QString getExecutable();
   double getTimeout();
   double getDelay();
   const QStringList getArguments();
-
-private:
-  const QString Name;
-  const pqServerResource Server;
-  const QString Owner;
-  const QDomDocument Configuration;
-};
-
-/// Private implementation detail ... pretend you didn't see this
-class pqCommandServerStartupContextHelper :
-  public QObject
-{
-  Q_OBJECT
-  
-signals:
-  void succeeded();
-  void failed();
 
 private slots:
   void onReadyReadStandardOutput();
@@ -88,14 +72,14 @@ private slots:
   void onStarted();
   void onError(QProcess::ProcessError error);
   void onDelayComplete();
-  
+
 private:
-  pqCommandServerStartupContextHelper(QProcess* process, double delay, QObject* parent);
-  
-  friend class pqCommandServerStartup;
-  
-  QProcess* const Process;
-  const double Delay;
+  const QString Name;
+  const pqServerResource Server;
+  const QString Owner;
+  const QDomDocument Configuration;
+  QProcess* Process;
 };
 
 #endif // !_pqCommandServerStartup
+

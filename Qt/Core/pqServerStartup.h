@@ -36,17 +36,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerResource.h"
 #include "pqCoreExport.h"
 
+#include <QObject>
 #include <QDomDocument>
 #include <QMap>
-
-class pqServerStartupContext;
 
 /////////////////////////////////////////////////////////////////////////////
 // pqServerStartup
 
 /// Abstract interface for an object that can start a remote server
-class PQCORE_EXPORT pqServerStartup
+class PQCORE_EXPORT pqServerStartup : public QObject
 {
+  Q_OBJECT
 public:
   virtual ~pqServerStartup() {}
 
@@ -63,16 +63,19 @@ public:
   /// set by the user prior to server startup
   typedef QMap<QString, QString> OptionsT;
     
-  /** Begins (asynchronous) execution of the startup procedure.  Callers should
-  create a pqServerStartupContext object to pass to this method, and connect
-  to its startupSucceed() and startupFailed() signals to receive notification
-  that the startup procedure has been completed. */
-  virtual void execute(const OptionsT& options, pqServerStartupContext& context) = 0;
+  /** Begins (asynchronous) execution of the startup procedure.
+  Callers should connect to success() and failure() signals to receive 
+  notification that the startup procedure has been completed. */
+  virtual void execute(const OptionsT& options) = 0;
+
+signals:
+  void succeeded();
+  void failed();
   
 protected:
   pqServerStartup() {}
-  pqServerStartup(const pqServerStartup&) {}
-  pqServerStartup& operator=(const pqServerStartup&) { return *this; }
+  pqServerStartup(const pqServerStartup&);  // not implemented
+  pqServerStartup& operator=(const pqServerStartup&);  //  not implemented
 };
 
 #endif // !_pqServerStartup_h

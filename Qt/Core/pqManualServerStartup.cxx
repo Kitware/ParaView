@@ -31,7 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqManualServerStartup.h"
-#include "pqServerStartupContext.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // pqManualServerStartup
@@ -68,7 +67,8 @@ const QDomDocument pqManualServerStartup::getConfiguration()
   return this->Configuration;
 }
 
-void pqManualServerStartup::execute(const OptionsT& /*options*/, pqServerStartupContext& context)
+void pqManualServerStartup::execute(const OptionsT& /*options*/)
 {
-  context.onSucceeded();
+  emit this->succeeded();
 }
+

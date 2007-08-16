@@ -31,96 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqServerResource.h"
-#include "pqServerStartupContext.h"
 #include "pqCommandServerStartup.h"
 
 #include <QtNetwork/QHostInfo>
-#include <QProcess>
 #include <QTimer>
 #include <QtDebug>
 
-/////////////////////////////////////////////////////////////////////////////
-// pqCommandServerStartupContextHelper
-
-pqCommandServerStartupContextHelper::pqCommandServerStartupContextHelper(
-    QProcess* process, double delay, QObject* object_parent) :
-  QObject(object_parent),
-  Process(process),
-  Delay(delay)
-{
-  QObject::connect(
-    this->Process,
-    SIGNAL(readyReadStandardError()),
-    this,
-    SLOT(onReadyReadStandardError()));
-    
-  QObject::connect(
-    this->Process,
-    SIGNAL(readyReadStandardOutput()),
-    this,
-    SLOT(onReadyReadStandardOutput()));
-    
-  QObject::connect(
-    this->Process,
-    SIGNAL(error(QProcess::ProcessError)),
-    this,
-    SLOT(onError(QProcess::ProcessError)));
-
-  QObject::connect(
-    this->Process,
-    SIGNAL(started()),
-    this,
-    SLOT(onStarted()));
-}
-
-void pqCommandServerStartupContextHelper::onReadyReadStandardOutput()
-{
-  qDebug() << this->Process->readAllStandardOutput().data();
-}
-
-void pqCommandServerStartupContextHelper::onReadyReadStandardError()
-{
-  qWarning() << this->Process->readAllStandardError().data();
-}
-
-void pqCommandServerStartupContextHelper::onStarted()
-{
-  QTimer::singleShot(
-    static_cast<int>(this->Delay * 1000), this, SLOT(onDelayComplete()));
-}
-
-void pqCommandServerStartupContextHelper::onError(
-  QProcess::ProcessError error)
-{
-  switch(error)
-    {
-    case QProcess::FailedToStart:
-      qWarning() << "The startup command failed to start ... "
-        "check your PATH and file permissions";
-      break;
-    case QProcess::Crashed:
-      qWarning() << "The startup command crashed";
-      break;
-    default:
-      qWarning() << "Unknown error running startup command";
-      break;
-    }
-  
-  emit this->failed();
-}
-
-void pqCommandServerStartupContextHelper::onDelayComplete()
-{
-  if(this->Process->state() == QProcess::NotRunning)
-    {
-    if(this->Process->exitStatus() == QProcess::CrashExit)
-      {
-      qWarning() << "The startup command crashed";
-      emit this->failed();
-      }
-    }
-  emit this->succeeded();
-}
 
 /////////////////////////////////////////////////////////////////////////////
 // pqCommandServerStartup
@@ -133,7 +49,8 @@ pqCommandServerStartup::pqCommandServerStartup(
   Name(name),
   Server(server.schemeHosts()),
   Owner(owner),
-  Configuration(configuration)
+  Configuration(configuration),
+  Process(NULL)
 {
 }
 
@@ -157,8 +74,7 @@ const QDomDocument pqCommandServerStartup::getConfiguration()
   return this->Configuration;
 }
 
-void pqCommandServerStartup::execute(const OptionsT& user_options,
-  pqServerStartupContext& context)
+void pqCommandServerStartup::execute(const OptionsT& user_options)
 {
   // Generate predefined variables ...
   OptionsT options;
@@ -206,7 +122,6 @@ void pqCommandServerStartup::execute(const OptionsT& user_options,
   // Setup the process arguments ...
   const QString executable = this->getExecutable();
   // const double timeout = this->getTimeout();
-  const double delay = this->getDelay();
   QStringList arguments = this->getArguments();
 
   // Do string-substitution on the process arguments ...
@@ -232,25 +147,29 @@ void pqCommandServerStartup::execute(const OptionsT& user_options,
       }
     }
 
-  QProcess* const process = new QProcess();
-  process->setEnvironment(environment);
+  this->Process = new QProcess;
+  QObject::connect(this->Process, SIGNAL(finished(int, QProcess::ExitStatus)),
+                   this->Process, SLOT(deleteLater()));
 
-  pqCommandServerStartupContextHelper* const helper =
-    new pqCommandServerStartupContextHelper(process, delay, &context);
+  this->Process->setEnvironment(environment);
+
+  QObject::connect(
+    this->Process, SIGNAL(readyReadStandardError()),
+    this, SLOT(onReadyReadStandardError()));
     
   QObject::connect(
-    helper,
-    SIGNAL(succeeded()),
-    &context,
-    SLOT(onSucceeded()));
+    this->Process, SIGNAL(readyReadStandardOutput()),
+    this, SLOT(onReadyReadStandardOutput()));
+    
+  QObject::connect(
+    this->Process, SIGNAL(error(QProcess::ProcessError)),
+    this, SLOT(onError(QProcess::ProcessError)));
 
   QObject::connect(
-    helper,
-    SIGNAL(failed()),
-    &context,
-    SLOT(onFailed()));  
-  
-  process->start(executable, arguments);
+    this->Process, SIGNAL(started()),
+    this, SLOT(onStarted()));
+    
+  this->Process->start(executable, arguments);
 }
 
 const QString pqCommandServerStartup::getExecutable()
@@ -339,3 +258,53 @@ const QStringList pqCommandServerStartup::getArguments()
     
   return results;
 }
+
+void pqCommandServerStartup::onReadyReadStandardOutput()
+{
+  qDebug() << this->Process->readAllStandardOutput().data();
+}
+
+void pqCommandServerStartup::onReadyReadStandardError()
+{
+  qWarning() << this->Process->readAllStandardError().data();
+}
+
+void pqCommandServerStartup::onStarted()
+{
+  QTimer::singleShot(
+    static_cast<int>(this->getDelay() * 1000), this, SLOT(onDelayComplete()));
+}
+
+void pqCommandServerStartup::onError(
+  QProcess::ProcessError error)
+{
+  switch(error)
+    {
+    case QProcess::FailedToStart:
+      qWarning() << "The startup command failed to start ... "
+        "check your PATH and file permissions";
+      break;
+    case QProcess::Crashed:
+      qWarning() << "The startup command crashed";
+      break;
+    default:
+      qWarning() << "Unknown error running startup command";
+      break;
+    }
+  
+  emit this->failed();
+}
+
+void pqCommandServerStartup::onDelayComplete()
+{
+  if(this->Process->state() == QProcess::NotRunning)
+    {
+    if(this->Process->exitStatus() == QProcess::CrashExit)
+      {
+      qWarning() << "The startup command crashed";
+      emit this->failed();
+      }
+    }
+  emit this->succeeded();
+}
+

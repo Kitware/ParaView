@@ -86,7 +86,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerManagerObserver.h
   pqServerManagerSelectionModel.h
   pqServerResources.h
-  pqServerStartupContext.h
+  pqServerStartup.h
   pqServerStartups.h
   pqSettings.h
   pqSpreadSheetView.h
@@ -272,8 +272,6 @@ ADD_LIBRARY(pqCore
   pqServerResources.cxx
   pqServerResources.h
   pqServerStartup.h
-  pqServerStartupContext.cxx
-  pqServerStartupContext.h
   pqServerStartups.cxx
   pqServerStartups.h
   pqSettings.cxx
