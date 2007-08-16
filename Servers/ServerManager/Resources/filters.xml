@@ -4911,7 +4911,12 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
    <!-- End StreamTracer -->
    </SourceProxy>
 
-    <SourceProxy name="TemporalDataSetCache" class="vtkTemporalDataSetCache">
+    <SourceProxy name="TemporalCache" class="vtkTemporalDataSetCache"
+                 label="Temporal Cache">
+      <Documentation short_help="Caches data per time step."
+                     long_help="Saves a copy of the data set for a fixed number of time steps.">
+        The Temporal Cache can be used to save multiple copies of a data set at different time steps to prevent thrashing in the pipeline caused by downstream filters that adjust the requested time step.  For example, assume that there is a downstream Temporal Interpolator filter.  This filter will (usually) request two time steps from the upstream filters, which in turn (usually) causes the upstream filters to run twice, once for each time step.  The next time the interpolator requests the same two time steps, they might force the upstream filters to re-evaluate the same two time steps.  The Temporal Cache can keep copies of both of these time steps and provide the requested data without having to run upstream filters.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -4920,6 +4925,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataObject"/>
         </DataTypeDomain>
+        <Documentation>
+          This property specifies the input of the Temporal Cache filter.
+        </Documentation>
       </InputProperty>
 
       <IntVectorProperty 
@@ -4928,6 +4936,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
          number_of_elements="1"
          default_values="2" >
         <IntRangeDomain name="range" min="2" max="10"/>
+        <Documentation>
+          The cache size determines the number of time steps that can be cached at one time.  The maximum number is 10.  The minimum is 2 (since it makes little sense to cache less than that).
+        </Documentation>
       </IntVectorProperty>
 
       <DoubleVectorProperty 
@@ -4936,10 +4947,15 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
         <TimeStepsInformationHelper/>
       </DoubleVectorProperty>
 
-      <!-- End TemporalDataSetCache -->
+      <!-- End TemporalCache -->
     </SourceProxy>
 
-    <SourceProxy name="TemporalInterpolator" class="vtkTemporalInterpolator">
+    <SourceProxy name="TemporalInterpolator" class="vtkTemporalInterpolator"
+                 label="Temporal Interpolator">
+      <Documentation short_help="Interpolate between time steps."
+                     long_help="Interpolate between time steps.">
+        The Temporal Interpolator converts data that is defined at discrete time steps to one that is defined over a continuum of time by linearly interpolating the data's field data between two adjacent time steps.  The interpolated values are a simple approximation and should not be interpreted as anything more.  The Temporal Interpolator assumes that the topology between adjacent time steps does not change.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -4948,6 +4964,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataObject"/>
         </DataTypeDomain>
+        <Documentation>
+          This property specifies the input of the Temporal Interpolator.
+        </Documentation>
       </InputProperty>
 
       <DoubleVectorProperty
@@ -4956,6 +4975,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
          number_of_elements="1"
          default_values="0.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          If Discrete Time Step Interval is set to 0, then the Temporal Interpolator will provide a continuous region of time on its output.  If set to anything else, then the output will define a finite set of time points on its output, each spaced by the Discrete Time Step Interval.  The output will have (time range)/(discrete time step interval) time steps.  (Note that the time range is defined by the time range of the data of the input filter, which may be different from other pipeline objects or the range defined in the animation inspector.)  This is a useful option to use if you have a dataset with one missing time step and wish to 'file-in' the missing data with an interpolated value from the steps on either side.
+        </Documentation>
       </DoubleVectorProperty>      
 
       <DoubleVectorProperty 
@@ -4964,7 +4986,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
         <TimeStepsInformationHelper/>
       </DoubleVectorProperty>
 
-      <!-- End TemporalDataSetCache -->
+      <!-- End TemporalInterpolator -->
     </SourceProxy>
 
     <SourceProxy name="TemporalSnapToTimeStep" class="vtkTemporalSnapToTimeStep">
@@ -5002,7 +5024,12 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
       <!-- End TemporalSnapToTimeStep -->
     </SourceProxy>
 
-    <SourceProxy name="TemporalShiftScale" class="vtkTemporalShiftScale">
+    <SourceProxy name="TemporalShiftScale" class="vtkTemporalShiftScale"
+                 label="Temporal Shift Scale">
+      <Documentation short_help="Shift and scale time values."
+                     long_help="Shift and scale time values.">
+        The Temporal Shift Scale filter linearly transforms the time values of a pipeline object by applying a shift and then scale.  Given a data at time t on the input, it will be transformed to time t*Shift + Scale on the output.  Inversely, if this filter has a request for time t, it will request time (t-Shift)/Scale on its input.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -5011,6 +5038,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataObject"/>
         </DataTypeDomain>
+        <Documentation>
+          The input to the Temporal Shift Scale filter.
+        </Documentation>
       </InputProperty>
 
       <DoubleVectorProperty
@@ -5019,6 +5049,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
          number_of_elements="1"
          default_values="0.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The amount of time the input is shifted.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -5027,6 +5060,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
          number_of_elements="1"
          default_values="1.0" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The factor by which the input time is scaled.
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty 

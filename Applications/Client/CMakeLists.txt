@@ -295,6 +295,8 @@ IF(BUILD_TESTING)
     SelectReader
     StreamTracer
     StreamTracerUpdates
+    TemporalInterpolator
+    TemporalShiftScale
     Tessellate
     TextWidget
     Threshold

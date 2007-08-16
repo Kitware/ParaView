@@ -24,7 +24,7 @@
     <Filter name="IntegrateAttributes" />
     <Filter name="ExtractCellsOverTime" />
     <Filter name="ExtractPointsOverTime" />
-    <Filter name="ExtractThresholds" /> -->
+    <Filter name="ExtractThresholds" />
     <Filter name="ProbeLine" />
     <Filter name="ProbePoint" />
     <Filter name="ProbeLocationOverTime" />
@@ -114,6 +114,9 @@
   <Filter name="StructuredGridOutlineFilter" />
   <Filter name="Subdivide" />
   <Filter name="SurfaceVectors" />
+  <Filter name="TemporalCache" />
+  <Filter name="TemporalInterpolator" />
+  <Filter name="TemporalShiftScale" />
   <Filter name="TessellatorFilter" />
   <!--
   <Filter name="TextureMapToCylinder" />
