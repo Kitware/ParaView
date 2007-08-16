@@ -62,7 +62,7 @@ SET(Kit_SRCS
   vtkSMExtractThresholdsProxy.cxx
   vtkSMFieldDataDomain.cxx
   vtkSMFileListDomain.cxx
-#  vtkSMFileSeriesReaderProxy.cxx
+  vtkSMFileSeriesReaderProxy.cxx
   vtkSMFixedTypeDomain.cxx
   vtkSMIceTCompositeViewProxy.cxx
   vtkSMIceTDesktopRenderViewProxy.cxx
