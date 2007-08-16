@@ -28,6 +28,7 @@ SET(Filters_SRCS
   vtkDesktopDeliveryServer.cxx
   vtkExtractHistogram.cxx
   vtkExtractScatterPlot.cxx
+  vtkFileSeriesReader.cxx
 #  vtkGroup.cxx
   vtkHierarchicalFractal.cxx
   vtkImageCompressor.cxx
