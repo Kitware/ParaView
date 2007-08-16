@@ -44,7 +44,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.33");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.34");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -62,8 +62,7 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_LARGE_INTEGER;
   this->PointDataInformation = vtkPVDataSetAttributesInformation::New();
   this->CellDataInformation = vtkPVDataSetAttributesInformation::New();
-  this->FieldDataInformation = vtkPVDataSetAttributesInformation::New();
-  //this->FieldDataInformation = NULL;
+  this->FieldDataInformation = NULL;
 
   this->CompositeDataInformation = vtkPVCompositeDataInformation::New();
 
@@ -363,16 +362,6 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
 
   // Copy Global Data information, if any
   vtkFieldData *fd = data->GetFieldData();
-  if(!fd || fd->GetNumberOfArrays() == 0)
-    {
-    this->FieldDataInformation->Delete();
-    this->FieldDataInformation = NULL;
-    }
-  else
-    {
-    this->FieldDataInformation->CopyFromFieldData(data->GetFieldData());
-    }
-/*
   if(fd && fd->GetNumberOfArrays()>0)
     {
     if(!this->FieldDataInformation)
@@ -382,7 +371,7 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
       }
     this->FieldDataInformation->CopyFromFieldData(data->GetFieldData());
     }
-*/
+
 }
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromGenericDataSet(vtkGenericDataSet *data)
