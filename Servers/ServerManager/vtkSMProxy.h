@@ -223,6 +223,15 @@ public:
   // Description:
   // Overloaded also for garbage collection.
   virtual void Register(vtkObjectBase* obj);
+
+  // Description:
+  // Returns the id of a server object.
+  int GetIDAsInt()
+  {
+    vtkClientServerID id = this->GetID();
+    return id.ID;
+  }
+
 //BTX
   // Description:
   // Returns the id of a server object.
