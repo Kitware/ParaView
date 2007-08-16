@@ -148,6 +148,15 @@ public:
   // and start the event loop. Returns 0 on success.
   virtual int Start(int argc, char** argv);
 
+  // Description:
+  // Return the vtk object associated with the given id for the
+  // client.  If the id is for an object on another node then 0 is
+  // returned.
+  virtual vtkObjectBase* GetObjectFromID(int id)
+  {
+    return this->GetObjectFromID(vtkClientServerID(id));
+  }
+
 //BTX
   // Description:
   // These methods append commands to the given vtkClientServerStream
