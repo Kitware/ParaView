@@ -1,7 +1,9 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
 
-    <SourceProxy name="ProgrammableFilter" class="vtkPythonProgrammableFilter">
+    <SourceProxy name="ProgrammableFilter" 
+                 class="vtkPythonProgrammableFilter"
+                 label="Programmable Filter">
       <Documentation
          long_help="Executes a user supplied python script on its input dataset to produce an output dataset."
          short_help="Executes a python script to produce data.">
@@ -196,6 +198,94 @@ Interpretor, a python interpretor to run the script upon the first
      </StringVectorProperty>
 
     <!-- End PythonScript -->
+    </SourceProxy>
+
+  </ProxyGroup>
+
+  <ProxyGroup name="sources">
+
+    <SourceProxy name="ProgrammableSource" 
+                 class="vtkPythonProgrammableFilter"
+                 label="Programmable Source">
+      <Documentation
+         long_help="Executes a user supplied python script to produce an output dataset."
+         short_help="Executes a python script to produce data.">
+This source will execute a python script to produce an output dataset.
+The source keeps a copy of the python script in Script, and creates 
+Interpretor, a python interpretor to run the script upon the first 
+ execution.
+      </Documentation>
+
+     <IntVectorProperty 
+        name="OutputDataSetType" 
+        command="SetOutputDataSetType" 
+        number_of_elements="1"
+        default_values="0"> 
+       <EnumerationDomain name="enum">
+         <!-- Values come from vtkType.h-->
+         <Entry value="8" text="Same as Input"/> <!-- text="vtkDataSet" -->
+         <Entry value="0" text="vtkPolyData"/>
+         <!-- <Entry value="1" text="vtkStructuredPoints"/> -->
+         <Entry value="2" text="vtkStructuredGrid"/>
+         <Entry value="3" text="vtkRectilinearGrid"/>
+         <Entry value="4" text="vtkUnstructuredGrid"/>
+         <!-- <Entry value="5" text="vtkPiecewiseFunction"/> -->
+         <Entry value="6" text="vtkImageData"/>
+         <!-- <Entry value="7" text="vtkDataObject"/> -->
+         <!-- <Entry value="9" text="vtkPointSet"/> -->
+         <!-- <Entry value="10" text="vtkUniformGrid"/> -->
+         <!-- <Entry value="11" text="vtkCompositeDataSet"/> -->
+         <!-- <Entry value="12" text="vtkMultigroupDataSet"/> -->
+         <!-- <Entry value="13" text="vtkMultiblockDataSet"/> -->
+         <!-- <Entry value="14" text="vtkHierarchicalDataSet"/> -->
+         <!-- <Entry value="15" text="vtkHierarchical_BoxDataSet"/> -->
+         <!-- <Entry value="16" text="vtkGenericDataSet"/> -->
+         <!-- <Entry value="17" text="vtkHyperOctree"/> -->
+         <!-- <Entry value="18" text="vtkTemporalDataSet"/> -->
+         <!-- <Entry value="19" text="vtkTable"/> -->
+         <!-- <Entry value="20" text="vtkGraph"/> -->
+         <!-- <Entry value="21" text="vtkTree"/> -->
+       </EnumerationDomain>
+       <Documentation>
+         The value of this property determines the dataset type for the output of the programmable source.
+       </Documentation>
+     </IntVectorProperty>
+
+     <StringVectorProperty 
+        name="Script" 
+        command="SetScript"
+        number_of_elements="1">
+       <Hints>
+         <Widget type="multi_line"/>
+       </Hints>
+       <Documentation>
+         This property contains the text of a python program that the programmable source runs.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="InformationScript" 
+        command="SetInformationScript"
+        label="Script (RequestInformation)"
+        number_of_elements="1">
+       <Hints>
+         <Widget type="multi_line"/>
+       </Hints>
+       <Documentation>
+         This property is a python script that is executed during the RequestInformation pipeline pass. Use this to provide information such as WHOLE_EXTENT to the pipeline downstream.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+       name="Parameters"
+       command="SetParameter"
+       repeat_command="1"
+       number_of_elements_per_command="2"
+       clean_command="ClearParameters"
+       animateable="0">
+     </StringVectorProperty>
+
+    <!-- End ProgrammableSource -->
     </SourceProxy>
 
   </ProxyGroup>
