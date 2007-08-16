@@ -123,8 +123,7 @@ public:
   // returns if this is a cue for animating a camera
   bool cameraCue(pqAnimationCue* cue)
     {
-    vtkSMProxy* manip = cue->getManipulatorProxy();
-    if(manip->IsA("vtkSMCameraManipulatorProxy"))
+    if(QString("CameraAnimationCue") == cue->getProxy()->GetXMLName())
       {
       return true;
       }

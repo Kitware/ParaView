@@ -324,8 +324,7 @@ public:
     }
   bool cameraCue()
     {
-    vtkSMProxy* manip = this->Cue->getManipulatorProxy();
-    if(manip->IsA("vtkSMCameraManipulatorProxy"))
+    if(QString("CameraAnimationCue") == this->Cue->getProxy()->GetXMLName())
       {
       return true;
       }
