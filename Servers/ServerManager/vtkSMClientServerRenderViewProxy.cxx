@@ -22,7 +22,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMClientServerRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMClientServerRenderViewProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMClientServerRenderViewProxy, "1.8");
 
 //----------------------------------------------------------------------------
 vtkSMClientServerRenderViewProxy::vtkSMClientServerRenderViewProxy()
@@ -164,8 +164,8 @@ void vtkSMClientServerRenderViewProxy::BeginStillRender()
 {
   this->Superclass::BeginStillRender();
 
-  // Disable squirt compression.
-  this->SetSquirtLevelInternal(0);
+  // Make squirt compression loss-less, if enabled.
+  this->SetSquirtLevelInternal(this->SquirtLevel ? 1 : 0);
 }
 
 //----------------------------------------------------------------------------
