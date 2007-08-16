@@ -44,7 +44,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.35");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.36");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -361,16 +361,16 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
   this->CellDataInformation->CopyFromDataSetAttributes(data->GetCellData());
 
   // Copy Field Data information, if any
-  vtkFieldData *fd = data->GetFieldData();
-  if(fd && fd->GetNumberOfArrays()>0)
-    {
-    if(!this->FieldDataInformation)
-      {
-      this->FieldDataInformation = vtkPVDataSetAttributesInformation::New();
-      this->FieldDataInformation->Initialize();
-      }
-    this->FieldDataInformation->CopyFromFieldData(fd);
-    }
+  //vtkFieldData *fd = data->GetFieldData();
+  //if(fd && fd->GetNumberOfArrays()>0)
+  //  {
+  //  if(!this->FieldDataInformation)
+  //    {
+  //    this->FieldDataInformation = vtkPVDataSetAttributesInformation::New();
+  //    this->FieldDataInformation->Initialize();
+  //    }
+  //  this->FieldDataInformation->CopyFromFieldData(fd);
+  //  }
 }
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromGenericDataSet(vtkGenericDataSet *data)
@@ -989,15 +989,6 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
   dcss.GetData(&data, &length);
   *css << vtkClientServerStream::InsertArray(data, length);
 
-  if(this->FieldDataInformation)
-    {
-    dcss.Reset();
-
-    this->FieldDataInformation->CopyToStream(&dcss);
-    dcss.GetData(&data, &length);
-    *css << vtkClientServerStream::InsertArray(data, length);
-    }
-
   *css << vtkClientServerStream::End;
 }
 
@@ -1147,23 +1138,5 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
   else
     {
     this->CompositeDataInformation->Initialize();
-    }
-
-  // Field data array information.
-  if(this->FieldDataInformation)
-    {
-    if(!css->GetArgumentLength(0, 17, &length))
-      {
-      vtkErrorMacro("Error parsing length of field data information.");
-      return;
-      }
-    data.resize(length);
-    if(!css->GetArgument(0, 17, &*data.begin(), length))
-      {
-      vtkErrorMacro("Error parsing field data information.");
-      return;
-      }
-    dcss.SetData(&*data.begin(), length);
-    this->FieldDataInformation->CopyFromStream(&dcss);
     }
 }
