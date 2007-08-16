@@ -111,7 +111,7 @@ void pqAnimationModel::resizeTracks()
   QRectF rect = this->sceneRect();
   double rh = this->rowHeight();
   double requiredHeight = rh * (num+1);
-  if(rect.height() < requiredHeight)
+  if(rect.height() != requiredHeight)
     {
     this->setSceneRect(rect.left(), rect.top(), rect.width(), requiredHeight);
     return;
