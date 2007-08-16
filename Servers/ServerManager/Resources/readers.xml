@@ -1,4 +1,28 @@
 <ServerManagerConfiguration>
+
+  <ProxyGroup name="internal_sources">
+   <SourceProxy name="legacyreader" 
+                class="vtkPDataSetReader"
+                label="Legacy VTK reader">
+     <Documentation
+       short_help="Read legacy VTK files."
+       long_help="Read files stored in VTK's legacy file format.">
+       The Legacy VTK reader loads files stored in VTK's legacy file format (before VTK 4.2, although still supported). The expected file extension is .vtk. The type of the dataset may be structured grid, uniform rectilinear grid (image/volume), non-uniform rectiinear grid, unstructured grid, or polygonal.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the Legacy VTK reader.
+        </Documentation>
+     </StringVectorProperty>
+   <!-- End legacyreader -->
+   </SourceProxy>
+  </ProxyGroup>
+
   <ProxyGroup name="sources">
 
    <SourceProxy name="DEMReader" 
@@ -900,26 +924,44 @@
    <!-- End XMLPRectilinearGridReader -->
    </SourceProxy>
 
-   <SourceProxy name="legacyreader" 
-                class="vtkPDataSetReader"
-                label="Legacy VTK reader">
+   <FileSeriesReaderProxy name="LegacyVTKFileReader"
+                          class="vtkFileSeriesReader"
+                          label="Legacy VTK reader"
+                          file_name_method="SetFileName">
      <Documentation
        short_help="Read legacy VTK files."
        long_help="Read files stored in VTK's legacy file format.">
-       The Legacy VTK reader loads files stored in VTK's legacy file format (before VTK 4.2, although still supported). The expected file extension is .vtk. The type of the dataset may be structured grid, uniform rectilinear grid (image/volume), non-uniform rectiinear grid, unstructured grid, or polygonal.
+       The Legacy VTK reader loads files stored in VTK's legacy file format (before VTK 4.2, although still supported). The expected file extension is .vtk. The type of the dataset may be structured grid, uniform rectilinear grid (image/volume), non-uniform rectiinear grid, unstructured grid, or polygonal. This reader also supports file series.
      </Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+          proxygroup="internal_sources" proxyname="legacyreader">
+        </Proxy>
+      </SubProxy>
+
      <StringVectorProperty
-        name="FileName"
+        name="FileNames"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
         animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="0" 
+        repeat_command="1">
         <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the Legacy VTK reader.
-        </Documentation>
+       <Documentation>
+         The list of files to be read by the reader. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+       </Documentation>
      </StringVectorProperty>
-   <!-- End legacyreader -->
-   </SourceProxy>
+
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+     <!-- End legacyreader_t -->
+   </FileSeriesReaderProxy>
 
    <SourceProxy name="pvtkfile" 
                 class="vtkPDataSetReader"

@@ -71,7 +71,7 @@
           extensions="vtm vthb"
           file_description="VTK Hierarchical Box Data Files">
   </Reader>
-  <Reader name="legacyreader"
+  <Reader name="LegacyVTKFileReader"
           extensions="vtk"
           file_description="Legacy VTK files">
   </Reader>
