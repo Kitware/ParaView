@@ -32,7 +32,7 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.4");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.5");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -72,7 +72,7 @@ int vtkIndexBasedBlockFilter::RequestData(vtkInformation*,
     return 0;
     }
 
-  if (this->StartIndex < 0 || this->EndIndex < 0)
+  if (this->StartIndex < 0 || this->EndIndex < 0 || this->EndIndex < this->StartIndex)
     {
     // Nothing to do, the output must be empty since this process does not have
     // the requested block of data.
@@ -187,7 +187,7 @@ bool vtkIndexBasedBlockFilter::DetermineBlockIndices()
   switch (this->FieldType)
     {
   case CELL_DATA_FIELD:
-    numFields = input->GetNumberOfCells();
+    numFields = input->GetCellData()->GetNumberOfTuples();
     break;
 
   case DATA_OBJECT_FIELD:
@@ -196,14 +196,14 @@ bool vtkIndexBasedBlockFilter::DetermineBlockIndices()
 
   case POINT_DATA_FIELD:
   default:
-    numFields = input->GetNumberOfPoints();
+    numFields = input->GetPointData()->GetNumberOfTuples();
     }
 
   int numProcs = this->Controller? this->Controller->GetNumberOfProcesses():1;
   if (numProcs<=1)
     {
     this->StartIndex = blockStartIndex;
-    this->EndIndex = (blockEndIndex < numFields)? blockEndIndex : numFields;
+    this->EndIndex = (blockEndIndex < numFields)? blockEndIndex : (numFields-1);
     // cout  << "Delivering : " << this->StartIndex << " --> " << this->EndIndex << endl;
     return true;
     }
