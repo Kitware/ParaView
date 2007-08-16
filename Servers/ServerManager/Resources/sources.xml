@@ -783,7 +783,7 @@ The Plane source can be used to add a polygonal parallelogram to the 3D scene. U
    <!-- End Plane -->
    </SourceProxy>
 
-   <SourceProxy name="PointSource" class="vtkPointSource">
+   <SourceProxy name="PointSource" class="vtkPointSource" label="Point Source">
       <Documentation long_help="Create a point cloud of a certain size, radius, and center."
                      short_help="Create a point cloud">
 The point source creates a specified number of points within a given radius about a specified center point. 
@@ -1426,7 +1426,7 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
    </SourceProxy>
 
    <SourceProxy name="TimeSource" class="vtkTimeSourceExample"
-                label="TimeSource">
+                label="Time Source">
       <Documentation
         long_help="Produces a single cell uniform grid with data values that vary over a sin(t) wave from t=0 to t=1 (radian)."
         short_help="Produces a sine wave over time">
