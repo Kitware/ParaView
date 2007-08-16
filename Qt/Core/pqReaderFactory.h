@@ -73,10 +73,11 @@ public:
   void addFileType(const QString& description, const QList<QString>& extensions,
     vtkSMProxy* prototype);
 
-  /// Create a reader given by name on the given server to read the given file.
-  /// File types must be registered before a file of the given type can be read.
-  /// This method creates and registers the reader proxy that can read
-  pqPipelineSource* createReader(const QString& filename,
+  /// Create a reader given by name on the given server to read the given
+  /// file(s).  File types must be registered before a file of the given
+  /// type can be read.  This method creates and registers the reader proxy
+  /// that can read
+  pqPipelineSource* createReader(const QStringList& files,
     const QString& readerName, pqServer* server);
 
   /// Returns a list of file types suitable for use with file dialog.

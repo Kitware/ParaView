@@ -101,7 +101,7 @@ public:
   /// name (\c sm_name) on the given \c server. On success, returns the
   /// pqPipelineSource for the created proxy.
   virtual pqPipelineSource* createReader(const QString& sm_group,
-    const QString& sm_name, const QString& filename, pqServer* server);
+    const QString& sm_name, const QStringList& files, pqServer* server);
 
   /// Creates a new view module of the given type on the given server.
   virtual pqView* createView(const QString& type, 

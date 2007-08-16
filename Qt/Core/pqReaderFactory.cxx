@@ -121,22 +121,26 @@ struct pqReaderInfo
     // if CanReadFile does not exist.
     int canRead = 1;
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerID tmpID = 
-      pm->NewStreamObject(this->PrototypeProxy->GetVTKClassName(), stream);
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMProxy* proxy = 
+      pxm->NewProxy("sources", this->PrototypeProxy->GetXMLName());
+    proxy->SetConnectionID(cid);
+    proxy->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
+    proxy->UpdateVTKObjects();
     stream << vtkClientServerStream::Invoke
            << pm->GetProcessModuleID() << "SetReportInterpreterErrors" << 0
            << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
-           << tmpID << "CanReadFile" << filename.toAscii().data()
+           << proxy->GetID() << "CanReadFile" << filename.toAscii().data()
            << vtkClientServerStream::End;
-    pm->SendStream( cid, vtkProcessModule::DATA_SERVER_ROOT, stream);
+    pm->SendStream(cid, vtkProcessModule::DATA_SERVER_ROOT, stream);
     pm->GetLastResult(cid,
       vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &canRead);
-    pm->DeleteStreamObject(tmpID, stream);
     stream << vtkClientServerStream::Invoke
            << pm->GetProcessModuleID() << "SetReportInterpreterErrors" << 1
            << vtkClientServerStream::End;
     pm->SendStream(cid, vtkProcessModule::DATA_SERVER_ROOT, stream);
+    proxy->Delete();
     return canRead;
     }
 };
@@ -301,7 +305,7 @@ bool pqReaderFactory::checkIfFileIsReadable(const QString& filename,
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource* pqReaderFactory::createReader(const QString& filename,
+pqPipelineSource* pqReaderFactory::createReader(const QStringList& files,
   const QString& readerName, pqServer* server)
 {
   foreach(const pqReaderInfo &info, this->Internal->ReaderList)
@@ -312,7 +316,7 @@ pqPipelineSource* pqReaderFactory::createReader(const QString& filename,
         pqApplicationCore::instance()->getObjectBuilder();
       pqPipelineSource* source = 
         builder->createReader("sources",      // TODO: support other groups
-          info.PrototypeProxy->GetXMLName(), filename, server);
+          info.PrototypeProxy->GetXMLName(), files, server);
       return source;
       }
     }

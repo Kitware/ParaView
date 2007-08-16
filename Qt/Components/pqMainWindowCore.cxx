@@ -1839,10 +1839,7 @@ void pqMainWindowCore::onFileOpen(pqServer* server)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileOpen(const QStringList& files)
 {
-  for(int i = 0; i != files.size(); ++i)
-    {
-    this->createReaderOnActiveServer(files[i]);
-    }
+  this->createReaderOnActiveServer(files);
 }
 
 //-----------------------------------------------------------------------------
@@ -2540,6 +2537,11 @@ void pqMainWindowCore::onToolsPythonShell()
                                 "paraview.ActiveConnection = paraview.pyConnection(%1)\n"
                                 "paraview.ActiveConnection.SetHost(\"%2\", 0)\n").arg(cid)
                           .arg(activeServer->getResource().toURI());
+/*
+      QString initStr = QString(
+        "from paraview import servermanager\n"
+        "servermanager.ActiveConnection = servermanager.Connection(%1)\n"
+        "servermanager.ActiveConnection.SetHost(\"%2\", 0)\n").arg(cid).arg(activeServer->getResource().toURI());*/
       this->Implementation->PythonDialog->runString(initStr);
       }
 
@@ -3506,8 +3508,13 @@ pqPipelineSource* pqMainWindowCore::createCompoundSource(
 
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqMainWindowCore::createReaderOnActiveServer(
-  const QString& filename)
+  const QStringList& files)
 {
+  if (files.empty())
+    {
+    return 0;
+    }
+
   pqServer* server = this->getActiveServer();
   if (!server)
     {
@@ -3516,12 +3523,19 @@ pqPipelineSource* pqMainWindowCore::createReaderOnActiveServer(
     }
 
   pqReaderFactory *readerFactory = &this->Implementation->ReaderFactory;
-  if (!readerFactory->checkIfFileIsReadable(filename, server))
+  // For performance, only check if the first file is readable.
+  for (int i=0; i < 1 /*files.size()*/; i++)
     {
-    qWarning() << "File '" << filename << "' cannot be read.";
-    return 0;
+    if (!readerFactory->checkIfFileIsReadable(files[i], server))
+      {
+      qWarning() << "File '" << files[i] << "' cannot be read.";
+      return 0;
+      }
     }
 
+  // Determine reader type based on first file. For now, we are relying
+  // on the user to avoid mixing file types.
+  QString filename = files[0];
   QString readerType = readerFactory->getReaderType(filename, server);
   if (readerType.isEmpty())
     {
@@ -3543,7 +3557,7 @@ pqPipelineSource* pqMainWindowCore::createReaderOnActiveServer(
   this->Implementation->UndoStack->beginUndoSet(
     QString("Create 'Reader'")); /// FIXME
   pqPipelineSource* reader = readerFactory->createReader(
-    filename, readerType, server);
+    files, readerType, server);
   this->Implementation->UndoStack->endUndoSet();
 
   return reader;
@@ -3822,7 +3836,9 @@ void pqMainWindowCore::applicationInitialize()
     {
     if (this->makeServerConnectionIfNoneExists())
       {
-      this->createReaderOnActiveServer(options->GetParaViewDataName());
+      QStringList files;
+      files.push_back(options->GetParaViewDataName());
+      this->createReaderOnActiveServer(files);
       }
     }
 }

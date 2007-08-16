@@ -192,8 +192,10 @@ void pqServerResources::open(pqServer* server, const pqServerResource& resource)
           {
           ustack->beginUndoSet("Create Reader");
           }
+        QStringList files;
+        files.push_back(resource.path());
         reader = builder->createReader(
-          readerGroup, readerName, resource.path(), server);
+          readerGroup, readerName, files, server);
         if (ustack)
           {
           ustack->endUndoSet();

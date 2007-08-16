@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 
 #include <QtDebug>
 #include <QFileInfo>
@@ -205,9 +206,14 @@ pqPipelineSource* pqObjectBuilder::createCustomFilter(const QString& sm_name,
 
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
-    const QString& sm_name, const QString& filename, pqServer* server)
+    const QString& sm_name, const QStringList& files, pqServer* server)
 {
-  QFileInfo fileInfo(filename);
+  if (files.empty())
+    {
+    return 0;
+    }
+
+  QFileInfo fileInfo(files[0]);
 
   vtkSMProxy* proxy = 
     this->createProxyInternal(sm_group, sm_name, server, "sources", 
@@ -229,15 +235,42 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
   QString pname = this->getFileNamePropertyName(proxy);
   if (!pname.isEmpty())
     {
-    vtkSMProperty* prop = proxy->GetProperty(pname.toAscii().data());
-    pqSMAdaptor::setElementProperty(prop, filename);
+    vtkSMStringVectorProperty* prop = 
+      vtkSMStringVectorProperty::SafeDownCast(
+        proxy->GetProperty(pname.toAscii().data()));
+    if (!prop)
+      {
+      return 0;
+      }
+    unsigned int numElems = files.size();
+    if (numElems == 1)
+      {
+      pqSMAdaptor::setElementProperty(prop, files[0]);
+      }
+    else
+      {
+      // The property can handle multiple file names. This is a file
+      // series reader.
+      if (prop->GetRepeatCommand())
+        {
+        prop->SetNumberOfElements(files.size());
+        for (unsigned int i=0; i<numElems; i++) 
+          {
+          prop->SetElement(i, files[i].toAscii().data());
+          }
+        }
+      else
+        {
+        pqSMAdaptor::setElementProperty(prop, files[0]);
+        }
+      }
     proxy->UpdateVTKObjects();
     prop->UpdateDependentDomains();
     }
   reader->setDefaultPropertyValues();
   reader->setModifiedState(pqProxy::UNINITIALIZED);
 
-  emit this->readerCreated(reader, filename);
+  emit this->readerCreated(reader, files[0]);
   emit this->proxyCreated(reader);
   return reader;
 }

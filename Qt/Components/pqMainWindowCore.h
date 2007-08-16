@@ -197,9 +197,9 @@ public:
   // source will be used as the input. 
   pqPipelineSource* createCompoundSource(const QString& name);
 
-  // Utility function to create a reader that reads the file on the 
+  // Utility function to create a reader that reads the file(s) on the 
   // active server. 
-  pqPipelineSource* createReaderOnActiveServer( const QString& filename);
+  pqPipelineSource* createReaderOnActiveServer(const QStringList& filename);
   
   /** By default, whenever a new source/filter is added to the pipeline,
   pqMainWindowCore will attach a display.  Clients that wish to manage
