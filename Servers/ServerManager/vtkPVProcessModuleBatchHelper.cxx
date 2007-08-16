@@ -25,8 +25,9 @@
 #include "vtkWindows.h"
 
 #include <vtksys/SystemTools.hxx>
+#include <vtksys/ios/sstream>
 
-vtkCxxRevisionMacro(vtkPVProcessModuleBatchHelper, "1.12");
+vtkCxxRevisionMacro(vtkPVProcessModuleBatchHelper, "1.13");
 vtkStandardNewMacro(vtkPVProcessModuleBatchHelper);
 
 EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
@@ -123,22 +124,19 @@ void vtkPVProcessModuleBatchHelper::PrintSelf(ostream& os, vtkIndent indent)
 int vtkPVProcessModuleBatchHelper::RunGUIStart(int argc, char **argv, int numServerProcs, int myId)
 {
   (void)myId;
-  ostrstream err;
+  vtksys_ios::ostringstream err;
   Tcl_Interp *interp = vtkPVProcessModuleBatchHelperInitializeTcl(argc, argv, &err);
-  err << ends;
   if (!interp)
     {
 #ifdef _WIN32
-    ::MessageBox(0, err.str(), 
+    ::MessageBox(0, err.str().c_str(),
                  "ParaView error: InitializeTcl failed", MB_ICONERROR|MB_OK);
 #else
     cerr << "ParaView error: InitializeTcl failed" << endl 
-         << err.str() << endl;
+         << err.str().c_str() << endl;
 #endif
-    err.rdbuf()->freeze(0);
     return 1;
     }
-  err.rdbuf()->freeze(0);
   (void)numServerProcs;
 
   this->SMApplication->Initialize();

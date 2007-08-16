@@ -40,6 +40,7 @@
 #include <vtkstd/algorithm>
 #include <vtkstd/list>
 #include <vtkstd/vector>
+#include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
 static void vtkSMSelectionProxyReorderBoundingBox(int src[4], int dest[4])
@@ -72,7 +73,7 @@ static void vtkSMSelectionProxyExtractPropIds(
 }
 
 vtkStandardNewMacro(vtkSMSelectionProxy);
-vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMSelectionProxy, "1.16");
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, RenderModule, vtkSMRenderModuleProxy);
 vtkCxxSetObjectMacro(vtkSMSelectionProxy, ClientSideSelection, vtkSelection);
 //-----------------------------------------------------------------------------
@@ -320,21 +321,19 @@ void vtkSMSelectionProxy::SendSelection(vtkSelection* sel, vtkSMProxy* proxy)
 {
   vtkProcessModule* processModule = vtkProcessModule::GetProcessModule();
 
-  ostrstream res;
+  vtksys_ios::ostringstream res;
   vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, sel);
-  res << ends;
   vtkClientServerStream stream;
   vtkClientServerID parserID =
     processModule->NewStreamObject("vtkSelectionSerializer", stream);
   stream << vtkClientServerStream::Invoke
-    << parserID << "Parse" << res.str() << proxy->GetID(0)
+    << parserID << "Parse" << res.str().c_str() << proxy->GetID(0)
     << vtkClientServerStream::End;
   processModule->DeleteStreamObject(parserID, stream);
 
   processModule->SendStream(proxy->GetConnectionID(), 
     proxy->GetServers(), 
     stream);
-  delete[] res.str();
 }
 
 //-----------------------------------------------------------------------------

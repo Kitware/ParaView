@@ -16,9 +16,11 @@
 #include "vtkPVServerOptionsInternals.h"
 #include "vtksys/ios/sstream"
 
+#include <vtksys/ios/sstream>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerOptions);
-vtkCxxRevisionMacro(vtkPVServerOptions, "1.5");
+vtkCxxRevisionMacro(vtkPVServerOptions, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVServerOptions::vtkPVServerOptions()

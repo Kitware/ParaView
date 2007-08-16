@@ -35,7 +35,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.7");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.8");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -50,7 +50,6 @@ void vtkSMSelectionHelper::SendSelection(vtkSelection* sel, vtkSMProxy* proxy)
 
   vtksys_ios::ostringstream res;
   vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, sel);
-  res << ends;
   vtkClientServerStream stream;
   vtkClientServerID parserID =
     processModule->NewStreamObject("vtkSelectionSerializer", stream);
