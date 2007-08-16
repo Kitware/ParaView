@@ -41,6 +41,7 @@ public:
 
 //BTX
   bool ConvertViewModulesToViews(vtkPVXMLElement* parent);
+  bool ConvertLegacyReader(vtkPVXMLElement* parent);
 protected:
   vtkSMStateVersionController();
   ~vtkSMStateVersionController();
