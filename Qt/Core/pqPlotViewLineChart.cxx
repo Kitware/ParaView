@@ -266,7 +266,8 @@ void pqPlotViewLineChart::initialize(pqChartArea *chartArea,
   // share the same series color manager.
   pqChartSeriesColorManager *manager =
       this->Internal->Layer[0]->getOptions()->getSeriesColorManager();
-  manager->getGenerator()->setColorScheme(pqChartSeriesOptionsGenerator::Cool);
+  manager->getGenerator()->setColorScheme(
+      pqChartSeriesOptionsGenerator::Spectrum);
   for(i = 1; i < 4; i++)
     {
     this->Internal->Layer[i]->getOptions()->setSeriesColorManager(manager);

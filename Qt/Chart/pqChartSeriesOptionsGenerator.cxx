@@ -149,14 +149,14 @@ void pqChartSeriesOptionsGenerator::setColorScheme(
   this->Scheme = scheme;
   if(this->Scheme == pqChartSeriesOptionsGenerator::Spectrum)
     {
-    this->Internal->Colors.append(QColor(215, 0, 0));
-    this->Internal->Colors.append(QColor(255, 156, 0));
-    this->Internal->Colors.append(QColor(229, 194, 0));
-    this->Internal->Colors.append(QColor(117, 177, 1));
-    this->Internal->Colors.append(QColor(0, 171, 186));
-    this->Internal->Colors.append(QColor(56, 104, 201));
-    this->Internal->Colors.append(QColor(123, 4, 215));
-    this->Internal->Colors.append(QColor(207, 11, 205));
+    this->Internal->Colors.append(QColor(0, 0, 0));
+    this->Internal->Colors.append(QColor(228, 26, 28));
+    this->Internal->Colors.append(QColor(55, 126, 184));
+    this->Internal->Colors.append(QColor(77, 175, 74));
+    this->Internal->Colors.append(QColor(152, 78, 163));
+    this->Internal->Colors.append(QColor(255, 127, 0));
+    this->Internal->Colors.append(QColor(166, 86, 40));
+    this->Internal->Colors.append(QColor(247, 129, 191));
     }
   else if(this->Scheme == pqChartSeriesOptionsGenerator::Warm)
     {
