@@ -1,5 +1,4 @@
 <ParaViewSources>
-  <Source name="TimeSource" />
   <Source name="TimeToTextConvertorSource" />
   <Source name="GlyphSource2D" />
   <Source name="VectorText" />
@@ -15,8 +14,10 @@
   <Source name="OutlineSource" />
   <Source name="PlaneSource" />
   <Source name="PointSource" />
+  <Source name="ProgrammableSource" />
   <Source name="SphereSource" />
   <Source name="SuperquadricSource" />
   <Source name="TextSource" />
+  <Source name="TimeSource" />
   <Source name="RTAnalyticSource" />
 </ParaViewSources>
