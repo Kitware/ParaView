@@ -74,6 +74,8 @@ signals:
   
 protected:
   pqServerStartup() {}
+
+private:
   pqServerStartup(const pqServerStartup&);  // not implemented
   pqServerStartup& operator=(const pqServerStartup&);  //  not implemented
 };

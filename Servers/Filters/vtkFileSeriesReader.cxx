@@ -28,7 +28,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkFileSeriesReader);
-vtkCxxRevisionMacro(vtkFileSeriesReader, "1.1");
+vtkCxxRevisionMacro(vtkFileSeriesReader, "1.2");
 
 vtkCxxSetObjectMacro(vtkFileSeriesReader,Reader,vtkAlgorithm);
 
@@ -204,7 +204,10 @@ int vtkFileSeriesReader::RequestInformation(vtkInformation* request,
     timeRange[1] = numTimeSteps - 1;
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), 
                  timeRange, 2);
+    return 1;
     }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -240,6 +243,7 @@ int vtkFileSeriesReader::RequestUpdateExtent(vtkInformation* request,
     }
   
   this->SetReaderFileName(fname);
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
