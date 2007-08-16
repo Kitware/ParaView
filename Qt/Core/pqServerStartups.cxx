@@ -35,10 +35,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerStartups.h"
 #include "pqSettings.h"
 #include "pqCommandServerStartup.h"
+#include "pqOptions.h"
+#include "pqApplicationCore.h"
 
 #include <QDomDocument>
+#include <QApplication>
+#include <QDir>
+#include <QFile>
 #include <QtDebug>
 
+#include <vtkProcessModule.h>
 #include <vtkstd/map>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -92,37 +98,31 @@ public:
     xml_server_resource.setValue(startup.getServer().toURI());
     xml_server.setAttributeNode(xml_server_resource);
 
-    QDomAttr xml_server_owner = xml.createAttribute("owner");
-    xml_server_owner.setValue(startup.getOwner());
-    xml_server.setAttributeNode(xml_server_owner);
-
     xml_server.appendChild(xml.importNode(startup.getConfiguration().documentElement(), true));
     
     return xml_server;
   }
-  
-  static pqServerStartup* load(QDomElement xml_server)
+
+  static pqServerStartup* load(QDomElement xml_server, bool save)
   {
     const QString name = xml_server.toElement().attribute("name");
   
     const pqServerResource server =
       pqServerResource(xml_server.toElement().attribute("resource"));
       
-    const QString owner = xml_server.toElement().attribute("owner");
-
     for(QDomNode xml_startup = xml_server.firstChild(); !xml_startup.isNull(); xml_startup = xml_startup.nextSibling())
       {
       if(xml_startup.isElement() && xml_startup.toElement().tagName() == "ManualStartup")
         {
         QDomDocument xml;
         xml.appendChild(xml.importNode(xml_startup, true));
-        return new pqManualServerStartup(name, server, owner, xml);
+        return new pqManualServerStartup(name, server, save, xml);
         }
       else if(xml_startup.isElement() && xml_startup.toElement().tagName() == "CommandStartup")
         {
         QDomDocument xml;
         xml.appendChild(xml.importNode(xml_startup, true));
-        return new pqCommandServerStartup(name, server, owner, xml);
+        return new pqCommandServerStartup(name, server, save, xml);
         }
       }
 
@@ -136,13 +136,48 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 // pqServerStartups
 
+static QString userSettings()
+{
+  QString settingsRoot;
+#if defined(Q_OS_WIN)
+  settingsRoot = QString::fromLocal8Bit(getenv("APPDATA"));
+#else
+  settingsRoot = QString::fromLocal8Bit(getenv("HOME")) + 
+                 QDir::separator() + QString::fromLocal8Bit(".config");
+#endif
+  QString settingsPath = QString("%2%1%3%1%4");
+  settingsPath = settingsPath.arg(QDir::separator());
+  settingsPath = settingsPath.arg(settingsRoot);
+  QString orgName;
+  settingsPath = settingsPath.arg(QApplication::organizationName());
+  settingsPath = settingsPath.arg("servers.pvsc");
+  return settingsPath;
+}
+
 pqServerStartups::pqServerStartups(QObject* p) :
   QObject(p), Implementation(new pqImplementation())
 {
+  pqOptions* options = pqOptions::SafeDownCast(
+    vtkProcessModule::GetProcessModule()->GetOptions());
+  if(!options || !options->GetDisableRegistry())
+    {
+    this->load(QApplication::applicationDirPath() + QDir::separator() +
+               "default_servers.pvsc", false);
+    this->load(pqApplicationCore::instance()->settings());
+    this->load(userSettings(), true);
+    }
 }
 
 pqServerStartups::~pqServerStartups()
 {
+  pqOptions* options = pqOptions::SafeDownCast(
+    vtkProcessModule::GetProcessModule()->GetOptions());
+  if(!options || !options->GetDisableRegistry())
+    {
+    this->save(userSettings(),true);
+    }
+  // remove so they don't clobber with new saved settings
+  pqApplicationCore::instance()->settings()->remove("Servers");
   delete this->Implementation;
 }
 
@@ -188,22 +223,20 @@ pqServerStartup* pqServerStartups::getStartup(const QString& startup) const
 
 void pqServerStartups::setManualStartup(
   const QString& name,
-  const pqServerResource& server,
-  const QString& owner)
+  const pqServerResource& server)
 {
   QDomDocument configuration;
   configuration.setContent(QString("<ManualStartup/>"));
   
   this->Implementation->deleteStartup(name);
   this->Implementation->Startups.insert(
-    vtkstd::make_pair(name, new pqManualServerStartup(name, server, owner, configuration)));
+    vtkstd::make_pair(name, new pqManualServerStartup(name, server, true, configuration)));
   emit this->changed();
 }
 
 void pqServerStartups::setCommandStartup(
   const QString& name,
   const pqServerResource& server,
-  const QString& owner,
   const QString& executable,
   double timeout,
   double delay,
@@ -243,7 +276,7 @@ void pqServerStartups::setCommandStartup(
 
   this->Implementation->deleteStartup(name);
   this->Implementation->Startups.insert(vtkstd::make_pair(
-    name, new pqCommandServerStartup(name, server, owner, xml)));
+    name, new pqCommandServerStartup(name, server, true, xml)));
   emit this->changed();
 }
 
@@ -260,31 +293,7 @@ void pqServerStartups::deleteStartups(const StartupsT& startups)
   emit this->changed();
 }
 
-void pqServerStartups::save(pqSettings& settings) const
-{
-  settings.remove("Servers");
-
-  for(
-    pqImplementation::StartupsT::iterator i = this->Implementation->Startups.begin();
-    i != this->Implementation->Startups.end();
-    ++i)
-    {
-    const QString name = i->first;
-    const QString owner = i->second->getOwner();
-    pqServerStartup* const startup = i->second;
-
-    if(owner != "user")
-      continue;
-
-    QDomDocument xml;
-    xml.appendChild(pqImplementation::save(xml, name, *startup));
-
-    const QString server_key = "Servers/" + name;
-    settings.setValue(server_key, xml.toByteArray().data());
-    }
-}
-
-void pqServerStartups::save(QDomDocument& xml) const
+void pqServerStartups::save(QDomDocument& xml, bool saveOnly) const
 {
   QDomElement xml_servers = xml.createElement("Servers");
   xml.appendChild(xml_servers);
@@ -296,33 +305,55 @@ void pqServerStartups::save(QDomDocument& xml) const
     {
     const QString startup_name = startup->first;
     pqServerStartup* const startup_command = startup->second;
+    if(saveOnly && !startup_command->shouldSave())
+      continue;
     
     xml_servers.appendChild(pqImplementation::save(xml, startup_name, *startup_command));
     }
 }
 
-void pqServerStartups::load(pqSettings& settings)
+void pqServerStartups::save(const QString& path, bool saveOnly) const
 {
-  settings.beginGroup("Servers");
-  const QStringList startups = settings.childKeys();
+  QDomDocument xml;
+  this->save(xml, saveOnly);
+  
+  QFile file(path);
+  if(file.open(QIODevice::WriteOnly))
+    {
+    file.write(xml.toByteArray());
+    }
+  else
+    {
+    qCritical() << "Error opening " << path << "for writing";
+    }
+}
+
+// only here to provide migration from old QSettings to XML file
+// read QSettings, and contents will be saved in XML file
+// when the app quits
+void pqServerStartups::load(pqSettings* settings)
+{
+  settings->beginGroup("Servers");
+  const QStringList startups = settings->childKeys();
   for(int i = 0; i != startups.size(); ++i)
     {
     const QString name = startups[i];
-    const QString value = settings.value(name).toString();
+    const QString value = settings->value(name).toString();
     
     QDomDocument xml_server;
     QString error_message;
     xml_server.setContent(value, &error_message);
-    if(pqServerStartup* const startup = pqImplementation::load(xml_server.documentElement()))
+    if(pqServerStartup* const startup =
+      pqImplementation::load(xml_server.documentElement(), true))
       {
       this->Implementation->deleteStartup(name);
       this->Implementation->Startups.insert(vtkstd::make_pair(name, startup));
       }
     }
-  settings.endGroup();
+  settings->endGroup();
 }
 
-void pqServerStartups::load(QDomDocument& xml_document)
+void pqServerStartups::load(QDomDocument& xml_document, bool s)
 {
   QDomElement xml_servers = xml_document.documentElement();
   if(xml_servers.nodeName() != "Servers")
@@ -336,7 +367,7 @@ void pqServerStartups::load(QDomDocument& xml_document)
     if(xml_server.isElement() && xml_server.toElement().tagName() == "Server")
       {
       const QString name = xml_server.toElement().attribute("name");
-      if(pqServerStartup* const startup = pqImplementation::load(xml_server.toElement()))
+      if(pqServerStartup* const startup = pqImplementation::load(xml_server.toElement(), s))
         {
         this->Implementation->deleteStartup(name);
         this->Implementation->Startups.insert(vtkstd::make_pair(name, startup));
@@ -346,3 +377,24 @@ void pqServerStartups::load(QDomDocument& xml_document)
 
   emit this->changed();
 }
+
+void pqServerStartups::load(const QString& path, bool s)
+{
+  QFile file(path);
+  if(file.exists())
+    {
+    QDomDocument xml;
+    QString error_message;
+    int error_line = 0;
+    int error_column = 0;
+    if(xml.setContent(&file, false, &error_message, &error_line, &error_column))
+      {
+      this->load(xml, s);
+      }
+    else
+      {
+      qWarning() << "Error parsing " << path;
+      }
+    }
+}
+

@@ -168,7 +168,7 @@ void pqServerBrowser::onCurrentItemChanged(QListWidgetItem* current, QListWidget
     editable_count += 1;
     
     pqServerStartup* const startup = this->Implementation->Startups.getStartup(current->text());
-    if(startup && startup->getOwner() == "user")
+    if(startup && startup->shouldSave())
       {
       deletable_count += 1;
       }
@@ -202,10 +202,7 @@ void pqServerBrowser::onAddServer()
       this->Implementation->Startups,
       create_server_dialog.getName(),
       create_server_dialog.getServer());
-    if(QDialog::Accepted == edit_server_dialog.exec())
-      {
-      this->Implementation->Startups.save(this->Implementation->Settings);
-      }
+    edit_server_dialog.exec();
     }
 }
 
@@ -223,10 +220,7 @@ void pqServerBrowser::onEditServer()
           this->Implementation->Startups,
           startup->getName(),
           startup->getServer());
-        if(QDialog::Accepted == dialog.exec())
-          {
-          this->Implementation->Startups.save(this->Implementation->Settings);
-          }
+        dialog.exec();
         }
       }
     }
@@ -246,7 +240,6 @@ void pqServerBrowser::onDeleteServer()
     }
     
   this->Implementation->Startups.deleteStartups(startups);
-  this->Implementation->Startups.save(this->Implementation->Settings);
 }
 
 //-----------------------------------------------------------------------------
@@ -269,17 +262,9 @@ void pqServerBrowser::onSave()
 //-----------------------------------------------------------------------------
 void pqServerBrowser::onSave(const QStringList& files)
 {
-  QDomDocument xml;
-  this->Implementation->Startups.save(xml);
-
   for(int i = 0; i != files.size(); ++i)
     {
-    QFile file(files[i]);
-    if(!file.open(QIODevice::WriteOnly))
-      {
-      qCritical() << "Error opening " << files[i] << "for writing";
-      }
-    file.write(xml.toByteArray());
+    this->Implementation->Startups.save(files[0], false);
     }
 }
 
@@ -305,16 +290,7 @@ void pqServerBrowser::onLoad(const QStringList& files)
 {
   for(int i = 0; i != files.size(); ++i)
     {
-    QFile file(files[i]);
-    QDomDocument xml;
-    if(xml.setContent(&file, false))
-      {
-      this->Implementation->Startups.load(xml);
-      }
-    else
-      {
-      qCritical() << "Error parsing " << files[i] << ": not a valid XML document";
-      }
+    this->Implementation->Startups.load(files[i], true);
     }
 }
 

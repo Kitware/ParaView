@@ -48,16 +48,18 @@ class PQCORE_EXPORT pqServerStartup : public QObject
 {
   Q_OBJECT
 public:
+  pqServerStartup(bool save, QObject* p=NULL)
+    : QObject(p), ShouldSave(save) {}
   virtual ~pqServerStartup() {}
 
   /// Returns the name of this startup
   virtual const QString getName() = 0;
   /// Returns the server for this startup
   virtual const pqServerResource getServer() = 0;
-  /// Returns the user who owns this startup
-  virtual const QString getOwner() = 0;
   /// Returns an XML description of the configuration for this startup
   virtual const QDomDocument getConfiguration() = 0;
+  /// Returns whether the startup can be saved
+  virtual bool shouldSave() { return ShouldSave; }
   
   /// Defines a generic collection of name-value-pair "options" that will be
   /// set by the user prior to server startup
@@ -71,10 +73,10 @@ public:
 signals:
   void succeeded();
   void failed();
-  
-protected:
-  pqServerStartup() {}
 
+protected:
+  bool ShouldSave;
+  
 private:
   pqServerStartup(const pqServerStartup&);  // not implemented
   pqServerStartup& operator=(const pqServerStartup&);  //  not implemented

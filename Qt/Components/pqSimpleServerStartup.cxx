@@ -257,7 +257,6 @@ void pqSimpleServerStartup::startServer(
         create_server_dialog.getServer());
       if(QDialog::Accepted == edit_server_dialog.exec())
         {
-        server_startups.save(settings);
         if(pqServerStartup* const startup = server_startups.getStartup(
           create_server_dialog.getName()))
           {
@@ -365,13 +364,6 @@ void pqSimpleServerStartup::started(pqServer* server)
 //-----------------------------------------------------------------------------
 bool pqSimpleServerStartup::promptRuntimeArguments()
 {
-  // Never prompt for the builtin server
-  const pqServerResource& server = this->Implementation->Server;
-  if(server.scheme() == "builtin")
-    {
-    return true;
-    }
-
   // See whether we need to prompt the user, if not we're done ...
   QDomDocument xml = this->Implementation->Startup->getConfiguration();
   QDomElement xml_startup_type = xml.firstChildElement();

@@ -54,8 +54,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes.
 #include <QApplication>
-#include <QDomDocument>
-#include <QFile>
 #include <QMap>
 #include <QPointer>
 #include <QSize>
@@ -108,8 +106,6 @@ public:
 
   QMap<QString, QPointer<QObject> > RegisteredManagers;
 
-  QString OrganizationName;
-  QString ApplicationName;
   QPointer<pqServerResources> ServerResources;
   QPointer<pqServerStartups> ServerStartups;
   QPointer<pqSettings> Settings;
@@ -134,8 +130,8 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
 
   this->Internal = new pqApplicationCoreInternal();
 
-  this->Internal->ApplicationName = "ParaViewBasedApplication";
-  this->Internal->OrganizationName = "Humanity";
+  this->setApplicationName("ParaViewBasedApplication");
+  this->setOrganizationName("Humanity");
 
   // *  Create pqServerManagerObserver first. This is the vtkSMProxyManager observer.
   this->Internal->ServerManagerObserver = new pqServerManagerObserver(this);
@@ -181,6 +177,9 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
 //-----------------------------------------------------------------------------
 pqApplicationCore::~pqApplicationCore()
 {
+  // give chance to save before pqApplicationCore is gone
+  delete this->Internal->ServerStartups;
+
   if (pqApplicationCore::Instance == this)
     {
     pqApplicationCore::Instance = 0;
@@ -426,30 +425,7 @@ pqServerStartups& pqApplicationCore::serverStartups()
   if(!this->Internal->ServerStartups)
     {
     this->Internal->ServerStartups = new pqServerStartups(this);
-    
-    // Load default settings ...
-    QFile file(QApplication::applicationDirPath() + "/default_servers.pvsc");
-    if(file.exists())
-      {
-      QDomDocument xml;
-      QString error_message;
-      int error_line = 0;
-      int error_column = 0;
-      if(xml.setContent(&file, false, &error_message, &error_line, &error_column))
-        {
-        this->Internal->ServerStartups->load(xml);
-        }
-      else
-        {
-        qWarning() << "Error loading default_servers.pvsc: " << error_message 
-          << " line: " << error_line << " column: " << error_column;
-        }
-      }
-    
-    // Load user settings ...
-    this->Internal->ServerStartups->load(*this->settings());
     }
-    
   return *this->Internal->ServerStartups;
 }
 
@@ -458,23 +434,18 @@ pqSettings* pqApplicationCore::settings()
 {
   if ( !this->Internal->Settings )
     {
-    if ( this->Internal->OrganizationName.isEmpty() ||
-      this->Internal->ApplicationName.isEmpty() )
-      {
-      return 0;
-      }
     pqOptions* options = pqOptions::SafeDownCast(
       vtkProcessModule::GetProcessModule()->GetOptions());
     if (options && options->GetDisableRegistry())
       {
-      this->Internal->Settings = new pqSettings(this->Internal->OrganizationName,
-        this->Internal->ApplicationName + ".DisabledRegistry", this);
+      this->Internal->Settings = new pqSettings(QApplication::organizationName(),
+        QApplication::applicationName() + ".DisabledRegistry", this);
       this->Internal->Settings->clear();
       }
     else
       {
-      this->Internal->Settings = new pqSettings(this->Internal->OrganizationName,
-        this->Internal->ApplicationName, this);
+      this->Internal->Settings = new pqSettings(QApplication::organizationName(),
+        QApplication::applicationName(), this);
       }
     }
   return this->Internal->Settings;
@@ -483,30 +454,34 @@ pqSettings* pqApplicationCore::settings()
 //-----------------------------------------------------------------------------
 void pqApplicationCore::setApplicationName(const QString& an)
 {
-  this->Internal->ApplicationName = an;
+  QApplication::setApplicationName(an);
 }
 
 //-----------------------------------------------------------------------------
 QString pqApplicationCore::applicationName()
 {
-  return this->Internal->ApplicationName;
+  return QApplication::applicationName();
 }
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::setOrganizationName(const QString& on)
 {
-  this->Internal->OrganizationName = on;
+  QApplication::setOrganizationName(on);
 }
 
 //-----------------------------------------------------------------------------
 QString pqApplicationCore::organizationName()
 {
-  return this->Internal->OrganizationName;
+  return QApplication::organizationName();
 }
 
 //-----------------------------------------------------------------------------
 pqServer* pqApplicationCore::createServer(const pqServerResource& resource)
 {
+
+  // TODO: we should have code to make all kinds of server connections in one
+  // place.  Right now its split between here and pqComponents.
+
   // Create a modified version of the resource that only contains server information
   const pqServerResource server_resource = resource.schemeHostsPorts();
 

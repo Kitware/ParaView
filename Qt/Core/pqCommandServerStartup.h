@@ -51,12 +51,11 @@ public:
   pqCommandServerStartup(
     const QString& name,
     const pqServerResource& server,
-    const QString& owner,
+    bool shouldSave,
     const QDomDocument& configuration);
 
   const QString getName();
   const pqServerResource getServer();  
-  const QString getOwner();
   const QDomDocument getConfiguration();
   
   void execute(const OptionsT& options);
@@ -76,7 +75,6 @@ private slots:
 private:
   const QString Name;
   const pqServerResource Server;
-  const QString Owner;
   const QDomDocument Configuration;
   QProcess* Process;
 };

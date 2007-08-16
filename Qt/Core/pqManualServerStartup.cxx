@@ -38,11 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqManualServerStartup::pqManualServerStartup(
     const QString& name, 
     const pqServerResource& server,
-    const QString& owner,
+    bool save,
     const QDomDocument& configuration) :
+  pqServerStartup(save),
   Name(name),
   Server(server.schemeHosts()),
-  Owner(owner),
   Configuration(configuration)
 {
 }
@@ -55,11 +55,6 @@ const QString pqManualServerStartup::getName()
 const pqServerResource pqManualServerStartup::getServer()
 {
   return this->Server;
-}
-
-const QString pqManualServerStartup::getOwner()
-{
-  return this->Owner;
 }
 
 const QDomDocument pqManualServerStartup::getConfiguration()

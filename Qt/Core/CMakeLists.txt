@@ -56,6 +56,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLinksModel.h
   pqLinkViewWidget.h
   pqLookupTableManager.h
+  pqManualServerStartup.h
   pqObjectBuilder.h
   pqOutputWindow.h
   pqOutputWindowAdapter.h

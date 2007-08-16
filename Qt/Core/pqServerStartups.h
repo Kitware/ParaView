@@ -66,14 +66,12 @@ public:
   /// Configures the given startup for manual (i.e do nothing) startup.
   void setManualStartup(
     const QString& name,
-    const pqServerResource& server,
-    const QString& owner);
+    const pqServerResource& server);
   /** Configures the given startup for command startup - the given command
   will be executed whenever the server needs to be started. */
   void setCommandStartup(
     const QString& name,
     const pqServerResource& server,
-    const QString& owner,
     const QString& binary,
     double timeout,
     double delay,
@@ -83,19 +81,19 @@ public:
   void deleteStartups(const StartupsT& startups);
   
   /// Saves startup configurations to user preferences
-  void save(pqSettings&) const;
-  /// Saves startup configurations to an XML document
-  void save(QDomDocument&) const;
+  void save(const QString& file, bool userPrefs) const;
   /// Loads startup configurations from user preferences
-  void load(pqSettings&);
-  /// Loads startup configurations from an XML document
-  void load(QDomDocument&);
+  void load(const QString& file, bool userPrefs);
 
 signals:
   /// Signal emitted whenever the collection changes
   void changed();
 
 private:
+  void save(QDomDocument&, bool) const;
+  void load(QDomDocument&, bool save);
+  void load(pqSettings*);
+
   pqServerStartups(const pqServerStartups&);
   pqServerStartups& operator=(const pqServerStartups&);
   

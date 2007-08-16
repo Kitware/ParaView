@@ -87,7 +87,7 @@ pqEditServerStartupDialog::pqEditServerStartupDialog(
   
   if(pqServerStartup* const startup = startups.getStartup(name))
     {
-      if(startup->getOwner() != "user")
+      if(!startup->shouldSave())
         {
         this->Implementation->UI.message->setText(
           QString(tr("%1 (%2) configuration")).arg(name).arg(
@@ -101,7 +101,7 @@ pqEditServerStartupDialog::pqEditServerStartupDialog(
         }
     
       if(pqCommandServerStartup* const command_startup =
-          dynamic_cast<pqCommandServerStartup*>(startup))
+          qobject_cast<pqCommandServerStartup*>(startup))
         {
         this->Implementation->UI.type->setCurrentIndex(0);
         this->Implementation->UI.stackedWidget->setCurrentIndex(0);
@@ -110,7 +110,7 @@ pqEditServerStartupDialog::pqEditServerStartupDialog(
           command_startup->getExecutable() + " " + command_startup->getArguments().join(" "));
         this->Implementation->UI.delay->setValue(command_startup->getDelay());
         }
-      else if(dynamic_cast<pqManualServerStartup*>(startup))
+      else if(qobject_cast<pqManualServerStartup*>(startup))
         {
         this->Implementation->UI.type->setCurrentIndex(1);
         this->Implementation->UI.stackedWidget->setCurrentIndex(1);
@@ -175,7 +175,6 @@ void pqEditServerStartupDialog::accept()
       startups.setCommandStartup(
         this->Implementation->Name,
         this->Implementation->Server,
-        "user",
         executable,
         0,
         this->Implementation->UI.delay->value(),
@@ -185,8 +184,7 @@ void pqEditServerStartupDialog::accept()
     case 1:
       startups.setManualStartup(
         this->Implementation->Name,
-        this->Implementation->Server,
-        "user");
+        this->Implementation->Server);
       break;
     default:
       qWarning() << "Unknown server startup type";

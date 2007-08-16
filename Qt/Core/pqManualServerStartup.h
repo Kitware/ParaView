@@ -45,23 +45,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class PQCORE_EXPORT pqManualServerStartup :
   public pqServerStartup
 {
+  Q_OBJECT
 public:
   pqManualServerStartup(
     const QString& name,
     const pqServerResource& server,
-    const QString& owner,
+    bool shouldSave,
     const QDomDocument& configuration);
 
   const QString getName();
   const pqServerResource getServer();
-  const QString getOwner();
   const QDomDocument getConfiguration();
   void execute(const OptionsT& options);
   
 private:
   const QString Name;
   const pqServerResource Server;
-  const QString Owner;
   const QDomDocument Configuration;
 };
 
