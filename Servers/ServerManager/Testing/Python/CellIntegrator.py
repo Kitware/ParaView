@@ -70,8 +70,8 @@ if paraview.IntegrateCell(reader2Output, 0) != 1.0:
     sys.exit(1)
 
 file3 = os.path.join(SMPythonTesting.DataDir, "Data/blow.vtk")
-reader3 = paraview.CreateProxy("sources", "legacyreader")
-reader3.GetProperty("FileName").SetElement(0, file3)
+reader3 = paraview.CreateProxy("sources", "LegacyVTKFileReader")
+reader3.GetProperty("FileNames").SetElement(0, file3)
 reader3.UpdateVTKObjects()
 reader3Output = paraview.Fetch(reader3)
 
