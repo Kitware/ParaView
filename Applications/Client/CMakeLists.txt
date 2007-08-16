@@ -255,6 +255,7 @@ IF(BUILD_TESTING)
   SET(XML_TESTS_WITH_BASELINES
     3DWidgetInCustomFilter
     AnimatePipelineTime
+    CalcParens
     Calculator
     CameraLink
     Clip
