@@ -96,9 +96,10 @@ protected:
                           vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);
 
-  void MarshallData(vtkDataObject* input);
-  vtkDataObject* Reconstruct(char* raw_data, int data_length, int *extent);
   void Reduce(vtkDataObject* input, vtkDataObject* output);
+
+  void Send(int receiver, vtkDataObject*);
+  vtkDataObject* Receive(int receiver, int dataobjectType);
 
   char* RawData;
   vtkIdType DataLength;

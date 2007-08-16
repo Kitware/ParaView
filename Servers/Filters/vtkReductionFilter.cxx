@@ -36,15 +36,18 @@
 #include "vtkStructuredGrid.h"
 #include "vtkTable.h"
 #include "vtkToolkits.h"
+#include "vtkSelection.h"
+#include "vtkSelectionSerializer.h"
 
 #ifdef VTK_USE_MPI
 #include "vtkMPICommunicator.h"
 #endif
 
+#include <vtksys/ios/sstream>
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.16");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.17");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkReductionFilter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
@@ -301,7 +304,7 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
         }
       else
         {
-        ds = com->ReceiveDataObject(cc, vtkReductionFilter::TRANSMIT_DATA_OBJECT);
+        ds = this->Receive(cc, output->GetDataObjectType());
         }
       if (this->PassThrough<0 || this->PassThrough==cc)
         {        
@@ -354,7 +357,7 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
     }
   else
     {
-    com->Send(preOutput, 0, vtkReductionFilter::TRANSMIT_DATA_OBJECT);
+    this->Send(0, preOutput);
     
     output->ShallowCopy(preOutput);
     }
@@ -367,81 +370,50 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
 }
 
 //-----------------------------------------------------------------------------
-void vtkReductionFilter::MarshallData(vtkDataObject* input)
+void vtkReductionFilter::Send(int receiver, vtkDataObject* data)
 {
-  vtkDataObject* data = input->NewInstance();
-  data->ShallowCopy(input);
-
-  vtkGenericDataObjectWriter* writer = vtkGenericDataObjectWriter::New();
-  writer->SetFileTypeToBinary();
-  writer->WriteToOutputStringOn();
-  writer->SetInput(data);
-  writer->Write();
-
-  delete []this->RawData;
-  this->DataLength = writer->GetOutputStringLength();
-  this->RawData = writer->RegisterAndGetOutputString();
-  this->Extent[0] = this->Extent[1] = this->Extent[2] = 
-    this->Extent[3] = this->Extent[4] = this->Extent[5] = 0;
-  if (data->GetExtentType() == VTK_3D_EXTENT)
+  if (data->IsA("vtkSelection"))
     {
-    vtkRectilinearGrid* rg = vtkRectilinearGrid::SafeDownCast(data);
-    vtkStructuredGrid* sg = vtkStructuredGrid::SafeDownCast(data);
-    vtkImageData* id = vtkImageData::SafeDownCast(data);
-    if (rg)
-      {
-      rg->GetExtent(this->Extent);
-      }
-    else if (sg)
-      {
-      sg->GetExtent(this->Extent);
-      }
-    else if (id)
-      {
-      id->GetExtent(this->Extent);
-      }
+    // Convert to XML.
+    vtkSelection* sel = vtkSelection::SafeDownCast(data);
+    vtksys_ios::ostringstream res;
+    vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, sel);
+    res << ends;
+    // Send the size of the string.
+    int size = res.str().size();
+    this->Controller->Send(&size, 1, receiver, 
+      vtkReductionFilter::TRANSMIT_DATA_OBJECT);
+    // Send the XML string.
+    this->Controller->Send(res.str().c_str(), size, receiver, 
+      vtkReductionFilter::TRANSMIT_DATA_OBJECT);
     }
-  writer->Delete();
-  data->Delete();
+  else
+    {
+    this->Controller->Send(data, receiver, vtkReductionFilter::TRANSMIT_DATA_OBJECT);
+    }
 }
 
 //-----------------------------------------------------------------------------
-vtkDataObject* vtkReductionFilter::Reconstruct(char* raw_data, int data_length,
-  int *extent)
+vtkDataObject* vtkReductionFilter::Receive(int sender, int dataType)
 {
-  vtkGenericDataObjectReader* reader= vtkGenericDataObjectReader::New();
-  reader->ReadFromInputStringOn();
-  vtkCharArray* string_data = vtkCharArray::New();
-  string_data->SetArray(raw_data, data_length, 1);
-  reader->SetInputArray(string_data);
-  reader->Update();
-
-  vtkDataObject* output = reader->GetOutput()->NewInstance();
-  output->ShallowCopy(reader->GetOutput());
-
-  // Set the extents if the dataobject supports it.
-  if (output->GetExtentType() == VTK_3D_EXTENT)
+  if (dataType == VTK_SELECTION)
     {
-    vtkRectilinearGrid* rg = vtkRectilinearGrid::SafeDownCast(output);
-    vtkStructuredGrid* sg = vtkStructuredGrid::SafeDownCast(output);
-    vtkImageData* id = vtkImageData::SafeDownCast(output);
-    if (rg)
-      {
-      rg->SetExtent(extent);
-      }
-    else if (sg)
-      {
-      sg->SetExtent(extent);
-      }
-    else if (id)
-      {
-      id->SetExtent(extent);
-      }
+    // Get the size of the string.
+    int size = 0;
+    this->Controller->Receive(&size, 1, sender,
+      vtkReductionFilter::TRANSMIT_DATA_OBJECT);
+    char* xml = new char[size];
+    // Get the string itself.
+    this->Controller->Receive(xml, size, sender,
+      vtkReductionFilter::TRANSMIT_DATA_OBJECT);
+    // Parse the XML.
+    vtkSelection* sel = vtkSelection::New();
+    vtkSelectionSerializer::Parse(xml, sel);
+    delete[] xml;
+    return sel;
     }
-
-  reader->Delete();
-  string_data->Delete();
-  return output;
+  return this->Controller->ReceiveDataObject(sender, 
+    vtkReductionFilter::TRANSMIT_DATA_OBJECT);
 }
 
 //-----------------------------------------------------------------------------
