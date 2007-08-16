@@ -1223,8 +1223,6 @@ void pqMainWindowCore::setupSelectionInspector(QDockWidget* dock_widget)
   selection_inspector->setRubberBandHelper(
     this->renderViewSelectionHelper());
 
-  pqApplicationCore* core = pqApplicationCore::instance();
-
   //QObject::connect(this, SIGNAL(postAccept()),
   //  selection_inspector, SLOT(refresh()));
 

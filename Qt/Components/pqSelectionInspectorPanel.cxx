@@ -310,7 +310,7 @@ void pqSelectionInspectorPanel::onSelectionChanged()
 
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::setInputSource(
-  pqPipelineSource* input, int portnum) 
+  pqPipelineSource* input, int vtkNotUsed(portnum)) 
 {
   if(this->Implementation->InputSource == input)
   {

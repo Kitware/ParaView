@@ -89,7 +89,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.37");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.38");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1432,7 +1432,6 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
   // until we have other mechanisms to select one.
   vtkSmartPointer<vtkCollectionIterator> reprIter;
   reprIter.TakeReference(this->Representations->NewIterator());
-  bool foundRepr = false;
 
   for (reprIter->InitTraversal(); 
     !reprIter->IsDoneWithTraversal(); reprIter->GoToNextItem())
@@ -1452,7 +1451,6 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
 
     if(FrustumExtractor->OverallBoundsTest(bounds))
       {
-      vtkInformation* properties = frustumSel->GetProperties();
       frustumParent->AddChild(frustumSel);
 
       vtkSMProxy* selectionSource = repr->ConvertSelection(frustumParent);

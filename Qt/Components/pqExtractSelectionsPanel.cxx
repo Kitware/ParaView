@@ -89,8 +89,6 @@ pqExtractSelectionsPanel::~pqExtractSelectionsPanel()
 //-----------------------------------------------------------------------------
 void pqExtractSelectionsPanel::linkServerManagerProperties()
 {
-  pqPropertyManager* pmanager = this->propertyManager();
-
   vtkSMProxyManager* pm = vtkSMProxy::GetProxyManager();
   this->Internal->SelectionSource.TakeReference(
     vtkSMSourceProxy::SafeDownCast(
