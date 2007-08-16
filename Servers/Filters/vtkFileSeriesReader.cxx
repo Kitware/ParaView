@@ -28,7 +28,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkFileSeriesReader);
-vtkCxxRevisionMacro(vtkFileSeriesReader, "1.3");
+vtkCxxRevisionMacro(vtkFileSeriesReader, "1.4");
 
 vtkCxxSetObjectMacro(vtkFileSeriesReader,Reader,vtkAlgorithm);
 
@@ -183,7 +183,7 @@ int vtkFileSeriesReader::ProcessRequest(vtkInformation* request,
 }
 
 //----------------------------------------------------------------------------
-int vtkFileSeriesReader::RequestInformation(vtkInformation* request,
+int vtkFileSeriesReader::RequestInformation(vtkInformation* vtkNotUsed(request),
                                             vtkInformationVector** inputVector,
                                             vtkInformationVector* outputVector)
 {
@@ -215,7 +215,7 @@ int vtkFileSeriesReader::RequestInformation(vtkInformation* request,
 }
 
 //----------------------------------------------------------------------------
-int vtkFileSeriesReader::RequestUpdateExtent(vtkInformation* request,
+int vtkFileSeriesReader::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),
                                              vtkInformationVector** inputVector,
                                              vtkInformationVector* outputVector)
 {
