@@ -29,7 +29,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.21");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.22");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -69,7 +69,7 @@ vtkPythonProgrammableFilter::vtkPythonProgrammableFilter() :
 {
   this->Script = NULL;
   this->InformationScript = NULL;
-  this->OutputDataSetType = VTK_DATA_SET;
+  this->OutputDataSetType = VTK_POLY_DATA;
 }
 
 //----------------------------------------------------------------------------
@@ -300,7 +300,8 @@ int vtkPythonProgrammableFilter::FillInputPortInformation(
   if(port==0)
     {
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
-    info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(),1);
+    info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
+    info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
     }
   return 1;
 }
