@@ -44,7 +44,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.31");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.32");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -62,6 +62,7 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_LARGE_INTEGER;
   this->PointDataInformation = vtkPVDataSetAttributesInformation::New();
   this->CellDataInformation = vtkPVDataSetAttributesInformation::New();
+  this->FieldDataInformation = NULL;
 
   this->CompositeDataInformation = vtkPVCompositeDataInformation::New();
 
@@ -81,6 +82,11 @@ vtkPVDataInformation::~vtkPVDataInformation()
   this->PointDataInformation = NULL;
   this->CellDataInformation->Delete();
   this->CellDataInformation = NULL;
+  if(this->FieldDataInformation)
+    {
+    this->FieldDataInformation->Delete();
+    this->FieldDataInformation = NULL;
+    }
   this->CompositeDataInformation->Delete();
   this->CompositeDataInformation = NULL;
   this->PointArrayInformation->Delete();
@@ -115,6 +121,11 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   this->PointDataInformation->PrintSelf(os, i2);
   os << indent << "CellDataInformation " << endl;
   this->CellDataInformation->PrintSelf(os, i2);
+  if(this->FieldDataInformation)
+    {
+    os << indent << "FieldDataInformation " << endl;
+    this->FieldDataInformation->PrintSelf(os, i2);
+    }
   os << indent << "CompositeDataInformation " << endl;
   this->CompositeDataInformation->PrintSelf(os, i2);
   os << indent << "PointArrayInformation " << endl;
@@ -152,6 +163,10 @@ void vtkPVDataInformation::Initialize()
   this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_LARGE_INTEGER;
   this->PointDataInformation->Initialize();
   this->CellDataInformation->Initialize();
+  if(this->FieldDataInformation)
+    {
+    this->FieldDataInformation->Initialize();
+    }
   this->CompositeDataInformation->Initialize();
   this->PointArrayInformation->Initialize();
   
@@ -194,6 +209,10 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
   // Copy attribute information.
   this->PointDataInformation->DeepCopy(dataInfo->GetPointDataInformation());
   this->CellDataInformation->DeepCopy(dataInfo->GetCellDataInformation());
+  if(this->FieldDataInformation)
+    {
+    this->FieldDataInformation->DeepCopy(dataInfo->GetFieldDataInformation());
+    }
   this->CompositeDataInformation->AddInformation(
     dataInfo->GetCompositeDataInformation());
   this->PointArrayInformation->AddInformation(
@@ -341,6 +360,17 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
   // Copy Cell Data information
   this->CellDataInformation->CopyFromDataSetAttributes(data->GetCellData());
 
+  // Copy Global Data information, if any
+  vtkFieldData *fd =data->GetFieldData();
+  if(fd && fd->GetNumberOfArrays()>0)
+    {
+    if(!this->FieldDataInformation)
+      {
+      this->FieldDataInformation = vtkPVDataSetAttributesInformation::New();
+      this->FieldDataInformation->Initialize();
+      }
+    this->FieldDataInformation->CopyFromFieldData(data->GetFieldData());
+    }
 }
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromGenericDataSet(vtkGenericDataSet *data)
@@ -638,6 +668,10 @@ void vtkPVDataInformation::AddInformation(
   this->PointArrayInformation->AddInformation(info->GetPointArrayInformation());
   this->PointDataInformation->AddInformation(info->GetPointDataInformation());
   this->CellDataInformation->AddInformation(info->GetCellDataInformation());
+  if(this->FieldDataInformation)
+    {
+    this->FieldDataInformation->AddInformation(info->GetFieldDataInformation());
+    }
 //  this->GenericAttributesInformation->AddInformation(info->GetGenericAttributesInformation());
 
   if (this->Name == NULL)
@@ -946,6 +980,15 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
   dcss.GetData(&data, &length);
   *css << vtkClientServerStream::InsertArray(data, length);
 
+  dcss.Reset();
+
+  if(this->FieldDataInformation)
+    {
+    this->FieldDataInformation->CopyToStream(&dcss);
+    dcss.GetData(&data, &length);
+    *css << vtkClientServerStream::InsertArray(data, length);
+    }
+
   *css << this->CompositeDataClassName;
   *css << this->CompositeDataSetType;
 
@@ -1104,5 +1147,23 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
   else
     {
     this->CompositeDataInformation->Initialize();
+    }
+
+  // Global data array information.
+  if(this->FieldDataInformation)
+    {
+    if(!css->GetArgumentLength(0, 17, &length))
+      {
+      vtkErrorMacro("Error parsing length of global data information.");
+      return;
+      }
+    data.resize(length);
+    if(!css->GetArgument(0, 17, &*data.begin(), length))
+      {
+      vtkErrorMacro("Error parsing global data information.");
+      return;
+      }
+    dcss.SetData(&*data.begin(), length);
+    this->FieldDataInformation->CopyFromStream(&dcss);
     }
 }

@@ -105,6 +105,10 @@ public:
   vtkGetObjectMacro(CellDataInformation,vtkPVDataSetAttributesInformation);
 
   // Description:
+  // Accesse to information about field data, if any.
+  vtkGetObjectMacro(FieldDataInformation,vtkPVDataSetAttributesInformation);
+
+  // Description:
   // If data is composite, this provides information specific to
   // composite datasets.
   vtkGetObjectMacro(CompositeDataInformation,vtkPVCompositeDataInformation);
@@ -166,6 +170,7 @@ protected:
 
   vtkPVDataSetAttributesInformation* PointDataInformation;
   vtkPVDataSetAttributesInformation* CellDataInformation;
+  vtkPVDataSetAttributesInformation* FieldDataInformation;
 
   vtkPVCompositeDataInformation* CompositeDataInformation;
 

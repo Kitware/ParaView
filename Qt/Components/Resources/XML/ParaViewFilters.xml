@@ -24,7 +24,8 @@
     <Filter name="IntegrateAttributes" />
     <Filter name="ExtractCellsOverTime" />
     <Filter name="ExtractPointsOverTime" />
-    <Filter name="ExtractThresholds" />
+    <Filter name="ExtractGlobalDataOverTime" />
+    <Filter name="ExtractThresholds" /> 
     <Filter name="ProbeLine" />
     <Filter name="ProbePoint" />
     <Filter name="ProbeLocationOverTime" />

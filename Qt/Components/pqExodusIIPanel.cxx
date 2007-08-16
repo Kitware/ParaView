@@ -189,7 +189,7 @@ void pqExodusIIPanel::linkServerManagerProperties()
 
   // we hook up the node/element variables
   new pqTreeWidgetCheckHelper(this->UI->Variables, 0, this);
-  
+
   // do block id, global element id
   this->addSelectionToTreeWidget("Object Ids", "ObjectId", this->UI->Variables,
                    PM_ELEM, "GenerateObjectIdCellArray");
@@ -262,6 +262,10 @@ void pqExodusIIPanel::linkServerManagerProperties()
     this->applyDisplacements(Qt::Unchecked);
     ApplyDisp->setEnabled(false);
     }
+
+  // do the global variables
+  this->addSelectionsToTreeWidget("GlobalResultArrayStatus",
+                                  this->UI->Variables, PM_NONE);
 
   // we hook up the sideset/nodeset 
   QTreeWidget* SetsTree = this->UI->Sets;
@@ -434,11 +438,13 @@ void pqExodusIIPanel::updateDataRanges()
     vtkSMSourceProxy::SafeDownCast(this->proxy());
   vtkPVDataSetAttributesInformation* pdi = 0;
   vtkPVDataSetAttributesInformation* cdi = 0;
+  vtkPVDataSetAttributesInformation* gdi = 0;
   if (sp->GetNumberOfParts() > 0)
     {
     vtkPVDataInformation* di = sp->GetDataInformation();
     pdi = di->GetPointDataInformation();
     cdi = di->GetCellDataInformation();
+    gdi = di->GetFieldDataInformation();
     }
   vtkPVArrayInformation* ai;
   
@@ -464,6 +470,10 @@ void pqExodusIIPanel::updateDataRanges()
     else if (which == PM_NODE && cdi)
       {
       ai = pdi->GetArrayInformation(var.toAscii().data());
+      }
+    else if (which == PM_NONE && gdi)
+      {
+      ai = gdi->GetArrayInformation(var.toAscii().data());
       }
     
     dataString = this->formatDataFor(ai);
