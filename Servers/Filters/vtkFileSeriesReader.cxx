@@ -28,7 +28,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkFileSeriesReader);
-vtkCxxRevisionMacro(vtkFileSeriesReader, "1.2");
+vtkCxxRevisionMacro(vtkFileSeriesReader, "1.3");
 
 vtkCxxSetObjectMacro(vtkFileSeriesReader,Reader,vtkAlgorithm);
 
@@ -204,10 +204,14 @@ int vtkFileSeriesReader::RequestInformation(vtkInformation* request,
     timeRange[1] = numTimeSteps - 1;
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), 
                  timeRange, 2);
-    return 1;
+    }
+  else if (numTimeSteps == 0)
+    {
+    vtkErrorMacro("Expecting at least 1 file. Cannot proceed.");
+    return 0;
     }
 
-  return 0;
+  return 1;
 }
 
 //----------------------------------------------------------------------------
