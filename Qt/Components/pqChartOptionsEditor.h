@@ -61,6 +61,8 @@ public:
   pqChartOptionsEditor(QWidget *parent=0);
   virtual ~pqChartOptionsEditor();
 
+  virtual bool eventFilter(QObject *object, QEvent *e);
+
   /// \name pqOptionsContainer Methods
   //@{
   virtual void setPage(const QString &page);
@@ -252,7 +254,10 @@ private slots:
   void setAxisMaximum(const QString &text);
   void addAxisLabel();
   void updateAxisLabels();
+  void updateRemoveButton();
   void removeSelectedLabels();
+  void showRangeDialog();
+  void generateAxisLabels();
   void setAxisTitle(const QString &text);
   void pickAxisTitleFont();
   void setAxisTitleColor(const QColor &color);

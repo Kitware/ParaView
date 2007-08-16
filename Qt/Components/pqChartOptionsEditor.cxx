@@ -36,14 +36,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartOptionsEditor.h"
 #include "ui_pqChartOptionsWidget.h"
 
+#include "pqSampleScalarAddRangeDialog.h"
+
 #include <QAbstractItemDelegate>
 #include <QColor>
 #include <QFont>
 #include <QFontDialog>
 #include <QItemSelectionModel>
+#include <QKeyEvent>
 #include <QString>
 #include <QStringList>
 #include <QStringListModel>
+
+#include <math.h>
 
 
 class pqChartOptionsEditorAxis
@@ -88,6 +93,7 @@ public:
   pqChartOptionsEditorAxis *AxisData[4];
   pqChartAxis::AxisLocation CurrentAxis;
   int AxisIndex;
+  pqSampleScalarAddRangeDialog *RangeDialog;
 };
 
 
@@ -115,6 +121,7 @@ pqChartOptionsEditorForm::pqChartOptionsEditorForm()
 {
   this->CurrentAxis = pqChartAxis::Left;
   this->AxisIndex = -1;
+  this->RangeDialog = 0;
 
   // Create the axis data objects.
   for(int i = 0; i < 4; i++)
@@ -259,7 +266,8 @@ pqChartOptionsEditor::pqChartOptionsEditor(QWidget *widgetParent)
       this, SLOT(addAxisLabel()));
   this->connect(this->Form->RemoveButton, SIGNAL(clicked()),
       this, SLOT(removeSelectedLabels()));
-  // TODO: add the rest of the label list signal/slot connections.
+  this->connect(this->Form->GenerateButton, SIGNAL(clicked()),
+      this, SLOT(showRangeDialog()));
   QAbstractItemDelegate *delegate = this->Form->LabelList->itemDelegate();
   this->connect(delegate, SIGNAL(closeEditor(QWidget *)),
       this, SLOT(updateAxisLabels()), Qt::QueuedConnection);
@@ -275,11 +283,27 @@ pqChartOptionsEditor::pqChartOptionsEditor(QWidget *widgetParent)
   this->connect(
       this->Form->AxisTitleAlignment, SIGNAL(currentIndexChanged(int)),
       this, SLOT(setAxisTitleAlignment(int)));
+
+  this->Form->LabelList->installEventFilter(this);
 }
 
 pqChartOptionsEditor::~pqChartOptionsEditor()
 {
   delete this->Form;
+}
+
+bool pqChartOptionsEditor::eventFilter(QObject *object, QEvent *e)
+{
+  if(object == this->Form->LabelList && e->type() == QEvent::KeyPress)
+    {
+    QKeyEvent *ke = static_cast<QKeyEvent *>(e);
+    if(ke->key() == Qt::Key_Delete || ke->key() == Qt::Key_Backspace)
+      {
+      this->removeSelectedLabels();
+      }
+    }
+
+  return false;
 }
 
 void pqChartOptionsEditor::setPage(const QString &page)
@@ -1295,6 +1319,15 @@ void pqChartOptionsEditor::updateAxisLabels()
     }
 }
 
+void pqChartOptionsEditor::updateRemoveButton()
+{
+  if(this->Form->AxisIndex != -1)
+    {
+    QItemSelectionModel *model = this->Form->LabelList->selectionModel();
+    this->Form->RemoveButton->setEnabled(model->hasSelection());
+    }
+}
+
 void pqChartOptionsEditor::removeSelectedLabels()
 {
   if(this->Form->AxisIndex != -1)
@@ -1320,8 +1353,83 @@ void pqChartOptionsEditor::removeSelectedLabels()
         axis->Labels.removeRow(jter->row());
         }
 
+      this->Form->RemoveButton->setEnabled(false);
       emit this->axisLabelsChanged(this->Form->CurrentAxis,
           axis->Labels.stringList());
+      }
+    }
+}
+
+void pqChartOptionsEditor::showRangeDialog()
+{
+  if(this->Form->AxisIndex != -1)
+    {
+    if(this->Form->RangeDialog)
+      {
+      this->Form->RangeDialog->setResult(0);
+      this->Form->RangeDialog->setLogarithmic(
+          this->Form->AxisData[this->Form->AxisIndex]->UseLogScale);
+      }
+    else
+      {
+      this->Form->RangeDialog = new pqSampleScalarAddRangeDialog(0.0, 1.0, 10,
+          this->Form->AxisData[this->Form->AxisIndex]->UseLogScale, this);
+      this->Form->RangeDialog->setLogRangeStrict(true);
+      this->Form->RangeDialog->setWindowTitle("Generate Axis Labels");
+      this->connect(this->Form->RangeDialog, SIGNAL(accepted()),
+          this, SLOT(generateAxisLabels()));
+      }
+
+    this->Form->RangeDialog->show();
+    }
+}
+
+void pqChartOptionsEditor::generateAxisLabels()
+{
+  if(this->Form->AxisIndex != -1 && this->Form->RangeDialog)
+    {
+    double minimum = this->Form->RangeDialog->from();
+    double maximum = this->Form->RangeDialog->to();
+    if(minimum != maximum)
+      {
+      QStringList list;
+      unsigned long total = this->Form->RangeDialog->steps();
+      double interval = 0.0;
+      double exponent = 0.0;
+      bool useLog = this->Form->RangeDialog->logarithmic();
+      if(useLog)
+        {
+        exponent = log10(minimum);
+        double maxExp = log10(maximum);
+        interval = (maxExp - exponent) / (double)total;
+        }
+      else
+        {
+        interval = (maximum - minimum) / (double)total;
+        }
+
+      pqChartOptionsEditorAxis *axis =
+          this->Form->AxisData[this->Form->AxisIndex];
+      list.append(QString::number(minimum, 'f', axis->Precision));
+      for(unsigned long i = 1; i < total; i++)
+        {
+        if(useLog)
+          {
+          exponent += interval;
+          minimum = pow((double)10.0, exponent);
+          }
+        else
+          {
+          minimum += interval;
+          }
+
+        list.append(QString::number(minimum, 'f', axis->Precision));
+        }
+
+      list.append(QString::number(maximum, 'f', axis->Precision));
+      axis->Labels.setStringList(list);
+
+      emit this->axisLabelsChanged(this->Form->CurrentAxis, list);
       }
     }
 }
@@ -1439,7 +1547,17 @@ void pqChartOptionsEditor::loadAxisLayoutPage()
   this->blockSignals(false);
   this->Form->AxisMinimum->setText(axis->Minimum);
   this->Form->AxisMaximum->setText(axis->Maximum);
+  QItemSelectionModel *model = this->Form->LabelList->selectionModel();
+  if(model)
+    {
+    this->disconnect(model, 0, this, 0);
+    }
+
   this->Form->LabelList->setModel(&axis->Labels);
+  this->connect(this->Form->LabelList->selectionModel(),
+      SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+      this, SLOT(updateRemoveButton()));
+  this->updateRemoveButton();
 
   this->Form->UseLogScale->blockSignals(false);
   this->Form->UseChartSelect->blockSignals(false);

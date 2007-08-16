@@ -44,6 +44,7 @@ class pqSampleScalarAddRangeDialog::pqImplementation
 {
 public:
   Ui::pqSampleScalarAddRangeDialog Ui;
+  bool StrictLog;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -58,21 +59,22 @@ pqSampleScalarAddRangeDialog::pqSampleScalarAddRangeDialog(
   Superclass(Parent),
   Implementation(new pqImplementation())
 {
+  this->Implementation->StrictLog = false;
   this->Implementation->Ui.setupUi(this);
   
   this->Implementation->Ui.from->setValidator(
     new QDoubleValidator(this->Implementation->Ui.from));
-  this->Implementation->Ui.from->setText(QString::number(default_from));
+  this->setFrom(default_from);
     
   this->Implementation->Ui.to->setValidator(
     new QDoubleValidator(this->Implementation->Ui.to));
-  this->Implementation->Ui.to->setText(QString::number(default_to));
+  this->setTo(default_to);
   
   this->Implementation->Ui.steps->setValidator(
     new QIntValidator(2, 9999, this->Implementation->Ui.steps));
-  this->Implementation->Ui.steps->setText(QString::number(default_steps));
+  this->setSteps(default_steps);
   
-  this->Implementation->Ui.log->setChecked(default_logarithmic);
+  this->setLogarithmic(default_logarithmic);
   
   QObject::connect(
     this->Implementation->Ui.from,
@@ -99,9 +101,19 @@ const double pqSampleScalarAddRangeDialog::from() const
   return this->Implementation->Ui.from->text().toDouble();
 }
 
+void pqSampleScalarAddRangeDialog::setFrom(double value)
+{
+  this->Implementation->Ui.from->setText(QString::number(value));
+}
+
 const double pqSampleScalarAddRangeDialog::to() const
 {
   return this->Implementation->Ui.to->text().toDouble();
+}
+
+void pqSampleScalarAddRangeDialog::setTo(double value)
+{
+  this->Implementation->Ui.to->setText(QString::number(value));
 }
 
 const unsigned long pqSampleScalarAddRangeDialog::steps() const
@@ -109,22 +121,68 @@ const unsigned long pqSampleScalarAddRangeDialog::steps() const
   return this->Implementation->Ui.steps->text().toInt();
 }
 
+void pqSampleScalarAddRangeDialog::setSteps(unsigned long number)
+{
+  this->Implementation->Ui.steps->setText(QString::number(number));
+}
+
 const bool pqSampleScalarAddRangeDialog::logarithmic() const
 {
   return this->Implementation->Ui.log->isChecked();
+}
+
+void pqSampleScalarAddRangeDialog::setLogarithmic(bool useLog)
+{
+  this->Implementation->Ui.log->setChecked(useLog);
+}
+
+void pqSampleScalarAddRangeDialog::setLogRangeStrict(bool on)
+{
+  if(on != this->Implementation->StrictLog)
+    {
+    this->Implementation->StrictLog = on;
+    if(this->Implementation->StrictLog)
+      {
+      this->Implementation->Ui.logWarning->setText(
+          "The range must be greater than zero to use logarithmic scale.");
+      }
+    else
+      {
+      this->Implementation->Ui.logWarning->setText(
+          "Can't use logarithmic scale when zero is in the range.");
+      }
+    }
+}
+
+bool pqSampleScalarAddRangeDialog::isLogRangeStrict() const
+{
+  return this->Implementation->StrictLog;
 }
 
 void pqSampleScalarAddRangeDialog::onRangeChanged()
 {
   double from_value = this->from();
   double to_value = this->to();
-  if(to_value < from_value)
-    vtkstd::swap(from_value, to_value);
-  const bool signs_differ = from_value < 0 && to_value > 0;
+  bool logOk = false;
+  if(this->Implementation->StrictLog)
+    {
+    logOk = from_value > 0.0 && to_value > 0.0;
+    }
+  else
+    {
+    if(to_value < from_value)
+      {
+      vtkstd::swap(from_value, to_value);
+      }
+
+    logOk = !(from_value < 0.0 && to_value > 0.0);
+    }
   
-  if(signs_differ)
+  if(!logOk)
+    {
     this->Implementation->Ui.log->setChecked(false);
+    }
     
-  this->Implementation->Ui.log->setVisible(!signs_differ);
-  this->Implementation->Ui.logWarning->setVisible(signs_differ);
+  this->Implementation->Ui.log->setEnabled(logOk);
+  this->Implementation->Ui.logWarning->setVisible(!logOk);
 }

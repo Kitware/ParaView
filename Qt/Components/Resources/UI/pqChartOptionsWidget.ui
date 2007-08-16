@@ -740,7 +740,7 @@
            <property name="spacing" >
             <number>6</number>
            </property>
-           <item row="2" column="1" >
+           <item row="3" column="1" >
             <spacer>
              <property name="orientation" >
               <enum>Qt::Vertical</enum>
@@ -752,6 +752,13 @@
               </size>
              </property>
             </spacer>
+           </item>
+           <item row="2" column="1" >
+            <widget class="QPushButton" name="GenerateButton" >
+             <property name="text" >
+              <string>&amp;Generate</string>
+             </property>
+            </widget>
            </item>
            <item row="1" column="1" >
             <widget class="QPushButton" name="RemoveButton" >
@@ -767,7 +774,7 @@
              </property>
             </widget>
            </item>
-           <item rowspan="3" row="0" column="0" >
+           <item rowspan="4" row="0" column="0" >
             <widget class="QListView" name="LabelList" >
              <property name="editTriggers" >
               <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::NoEditTriggers|QAbstractItemView::SelectedClicked</set>
@@ -1051,6 +1058,7 @@
   <tabstop>LabelList</tabstop>
   <tabstop>AddButton</tabstop>
   <tabstop>RemoveButton</tabstop>
+  <tabstop>GenerateButton</tabstop>
   <tabstop>AxisTitleText</tabstop>
   <tabstop>AxisTitleFontButton</tabstop>
   <tabstop>AxisTitleAlignment</tabstop>

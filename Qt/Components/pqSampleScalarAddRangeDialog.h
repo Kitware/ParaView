@@ -56,9 +56,16 @@ public:
   ~pqSampleScalarAddRangeDialog();
 
   const double from() const;
+  void setFrom(double value);
   const double to() const;
-  const unsigned long steps()  const;
+  void setTo(double value);
+  const unsigned long steps() const;
+  void setSteps(unsigned long number);
   const bool logarithmic() const;
+  void setLogarithmic(bool useLog);
+
+  void setLogRangeStrict(bool on);
+  bool isLogRangeStrict() const;
 
 private slots:
   void onRangeChanged();
