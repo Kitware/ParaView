@@ -6876,35 +6876,6 @@
    fun:__write_nocancel
    fun:_X11TransWrite
    obj:/usr/lib/libX11.so.6.2.0
-   fun:XDestroyWindow
-   fun:_Z17qt_XDestroyWindowPK7QWidgetP9_XDisplaym
-   fun:_ZN7QWidget7destroyEbb
-   fun:_ZN7QWidgetD2Ev
-   fun:_ZN9QGroupBoxD0Ev
-   fun:_ZN14QObjectPrivate14deleteChildrenEv
-   fun:_ZN7QWidgetD2Ev
-   fun:_ZN14pqDisplayPanelD2Ev
-   fun:_ZN21pqDefaultDisplayPanelD0Ev
-   fun:_ZN26pqDisplayProxyEditorWidget11updatePanelEv
-   fun:_ZN26pqDisplayProxyEditorWidget13setOutputPortEP12pqOutputPort
-   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
-   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
-   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
-   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
-   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
-   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
-}
-{
-   <insert a suppression name here>
-   Memcheck:Param
-   write(buf)
-   fun:__write_nocancel
-   fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
    fun:XRenderFreePicture
    fun:_ZN7QWidget7destroyEbb
    fun:_ZN7QWidgetD2Ev
@@ -8558,6 +8529,33 @@
    fun:__write_nocancel
    fun:_X11TransWrite
    obj:/usr/lib/libX11.so.6.2.0
+   fun:XRenderCreatePicture
+   fun:_ZN7QPixmap4initEiiNS_4TypeE
+   fun:_ZN7QPixmapC1Ev
+   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK12QCommonStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK13QWindowsStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK15QPlastiqueStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK12QCommonStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK13QWindowsStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK15QPlastiqueStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZN11QPushButton10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN15QAbstractButton5eventEP6QEvent
+   fun:_ZN11QPushButton5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
    fun:XCopyArea
    fun:_ZN15QX11PaintEngine10drawPixmapERK6QRectFRK7QPixmapS2_
    fun:_ZN8QPainter10drawPixmapERK6QRectFRK7QPixmapS2_
@@ -9667,6 +9665,17 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
+   fun:XCreateRegion
+   obj:/usr/lib/libXt.so.6.0.0
+   fun:XtDisplayInitialize
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
    obj:/usr/lib/libX11.so.6.2.0
    fun:XrmGetStringDatabase
    obj:/usr/lib/libXt.so.6.0.0
@@ -10036,6 +10045,18 @@
    Memcheck:Leak
    fun:calloc
    fun:XtCalloc
+   fun:__XtCalloc
+   obj:/usr/lib/libXt.so.6.0.0
+   fun:XtDisplayInitialize
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:XtCalloc
    obj:/usr/lib/libXt.so.6.0.0
    fun:XtDisplayInitialize
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -10249,8 +10270,6 @@
    fun:_ZN15QX11PaintEngine8drawPathERK12QPainterPath
    fun:_ZN15QX11PaintEngine9drawLinesEPK5QLinei
    fun:_ZN8QPainter9drawLinesEPK5QLinei
-   fun:_Z23qt_plastique_draw_frameP8QPainterRK5QRectPK12QStyleOptionN6QFrame6ShadowE
-   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
 }
 {
    <insert a suppression name here>
@@ -10364,7 +10383,6 @@
    fun:_ZN7QPixmapD1Ev
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN15QX11PaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
-   fun:_ZN8QPainter9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
 }
 {
    <insert a suppression name here>
@@ -11090,23 +11108,6 @@
    fun:_Z17qt_XDestroyWindowPK7QWidgetP9_XDisplaym
    fun:_ZN7QWidget7destroyEbb
    fun:_ZN7QWidgetD2Ev
-   fun:_ZN14pqDisplayPanelD2Ev
-   fun:_ZN21pqDefaultDisplayPanelD0Ev
-   fun:_ZN26pqDisplayProxyEditorWidget11updatePanelEv
-   fun:_ZN26pqDisplayProxyEditorWidget13setOutputPortEP12pqOutputPort
-   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
-   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
-   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
-   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
-   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
-   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
-   fun:_ZN29pqServerManagerSelectionModel16selectionChangedERK24pqServerManagerSelectionS2_
-   fun:_ZN29pqServerManagerSelectionModel6selectERK24pqServerManagerSelection6QFlagsINS_13SelectionFlagEE
-   fun:_ZN29pqServerManagerSelectionModel6selectEP24pqServerManagerModelItem6QFlagsINS_13SelectionFlagEE
 }
 {
    <insert a suppression name here>
@@ -12668,6 +12669,18 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XChangeProperty
+   fun:_ZN14QWidgetPrivate18setWindowTitle_sysERK7QString
+   fun:_ZN14QWidgetPrivate21setWindowTitle_helperERK7QString
+   fun:_ZN7QWidget14setWindowTitleERK7QString
+}
+{
+   <insert a suppression name here>
    Memcheck:Leak
    fun:_Znwj
    fun:_ZN7QWidget14updateGeometryEv
@@ -13257,6 +13270,35 @@
    fun:g_main_context_iteration
    fun:_ZN20QEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
    fun:_ZN23QGuiEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XCopyArea
+   fun:_ZN17QX11WindowSurface5flushEP7QWidgetRK7QRegionRK6QPoint
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
+   fun:_Z19qt_syncBackingStoreP7QWidget
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN10QScrollBar5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_ZN16QCoreApplication16sendPostedEventsEP7QObjecti
+   fun:_Z23postEventSourceDispatchP8_GSourcePFiPvES1_
+   fun:g_main_context_dispatch
+   obj:/usr/lib/libglib-2.0.so.0.1000.3
+   fun:g_main_context_iteration
+   fun:_ZN20QEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
 }
 {
    <insert a suppression name here>
@@ -13889,6 +13931,41 @@
    fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
    fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
    fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN13XdmfLightData19SetWorkingDirectoryEPKc
+   fun:_ZN13XdmfLightDataC2Ev
+   fun:_ZN11XdmfElementC2Ev
+   fun:_ZN12XdmfTopologyC1Ev
+   fun:_ZN8XdmfGridC1Ev
+   fun:_ZN13vtkXdmfReader17UpdateUniformGridEPvPc
+   fun:_ZN13vtkXdmfReader11UpdateGridsEv
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN13XdmfLightData19SetWorkingDirectoryEPKc
+   fun:_ZN13XdmfLightDataC2Ev
+   fun:_ZN7XdmfDOMC1Ev
+   fun:_ZN13vtkXdmfReader17RequestDataObjectEP20vtkInformationVector
+   fun:_ZN13vtkXdmfReader14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline17ExecuteDataObjectEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline16UpdateDataObjectEv
+   fun:_ZN23vtkDemandDrivenPipeline17UpdateInformationEv
+   fun:_ZN12vtkAlgorithm17UpdateInformationEv
+   fun:_Z19vtkAlgorithmCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
+   fun:_Z20vtkDataReaderCommandP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS5_
 }
 {
    <insert a suppression name here>
