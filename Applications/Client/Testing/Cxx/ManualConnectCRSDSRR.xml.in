@@ -11,7 +11,7 @@
   <pqevent object="pqEditServerStartupDialog/okButton" command="activate" arguments="" />
   <pqevent object="MainWindow/ServerStartupBrowser/startups" command="currentChanged" arguments="/0|0" />
   <pqevent object="MainWindow/ServerStartupBrowser/connect" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuEdit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="MainWindow/menubar/menuEdit" command="activate" arguments="actionEditView" />
   <pqevent object="MainWindow/pqSettingsDialog/tabWidget/qt_tabwidget_stackedwidget/pq3DViewProperties/tabWidget/qt_tabwidget_tabbar" command="set_tab" arguments="4" />
   <pqevent object="MainWindow/pqSettingsDialog/tabWidget/qt_tabwidget_stackedwidget/pq3DViewProperties/tabWidget/qt_tabwidget_stackedwidget/tab_4/compositingParameters/compositeThreshold" command="set_int" arguments="0" />
   <pqevent object="MainWindow/pqSettingsDialog/okButton" command="activate" arguments="" />
