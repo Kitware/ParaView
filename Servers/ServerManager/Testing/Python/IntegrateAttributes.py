@@ -49,7 +49,7 @@ if val < 3.33 or val > 3.34:
     sys.exit(1)
 
 file3 = os.path.join(SMPythonTesting.DataDir, "Data/blow.vtk")
-reader3 = paraview.CreateProxy("sources", "legacyreader")
+reader3 = paraview.CreateProxy("sources", "LegacyVTKFileReader")
 reader3.GetProperty("FileName").SetElement(0, file3)
 reader3.UpdateVTKObjects()
 
