@@ -288,6 +288,17 @@ class Property(object):
         "Returns the name of this property."
         return self.Proxy().GetPropertyName(self.SMProperty)
 
+    def _UpdateProperty(self):
+        "Pushes the value of this property to the server."
+        # For now, we are updating all properties. This is due to an
+        # issue with the representations. Their VTK objects are not
+        # created until Input is set; therefore, updating a property
+        # has no effect. Updating all properties everytime one is
+        # updated has the effect of pushing values set before Input
+        # when Input is updated.
+        # self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+        self.Proxy().SMProxy.UpdateVTKObjects()
+
 class VectorProperty(Property):
     """Python wrapper for vtkSMVectorProperty and sub-classes.
     In addition to vtkSMVectorProperty methods, this class provides
@@ -310,7 +321,7 @@ class VectorProperty(Property):
     def __setitem__(self, idx, value):
         """Given an index and a value, sets an element."""
         self.SMProperty.SetElement(idx, value)
-        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+        self._UpdateProperty()
 
     def __getslice__(self, min, max):
         """Returns the range [min, max) of elements. Raises an IndexError
@@ -328,7 +339,7 @@ class VectorProperty(Property):
             raise exceptions.IndexError
         for i in range(min, max):
             self.SMProperty.SetElement(i, values[i-min])
-        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+        self._UpdateProperty()
 
     def __getattr__(self, name):
         "Unknown attribute requests get forwarded to SMProperty."
@@ -352,12 +363,12 @@ class VectorProperty(Property):
             values = (values,)
         for i in range(len(values)):
             self.SMProperty.SetElement(i, values[i])
-        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+        self._UpdateProperty()
 
     def Clear(self):
         "Removes all elements."
         self.SMProperty().SetNumberOfElements(0)
-        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+        self._UpdateProperty()
 
 class ProxyProperty(Property):
     """Python wrapper for vtkSMProxyProperty.
@@ -382,13 +393,13 @@ class ProxyProperty(Property):
     def __setitem__(self, idx, value):
         """Given an index and a value, sets an element."""
         self.SMProperty.SetProxy(idx, value.SMProxy)
-        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+        self._UpdateProperty()
 
     def __delitem__(self, idx):
         """Removes the element idx"""
         proxy = self[idx].SMProxy
         self.SMProperty.RemoveProxy(proxy.SMProxy)
-        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+        self._UpdateProperty()
 
     def __getslice__(self, min, max):
         """Returns the range [min, max) of elements. Raises an IndexError
@@ -407,7 +418,7 @@ class ProxyProperty(Property):
             raise exceptions.IndexError
         for i in range(min, max):
             self.SMProperty.SetProxy(i, values[i-min].SMProxy)
-        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+        self._UpdateProperty()
 
     def __delslice__(self, min, max):
         """Removes elements [min, max)"""
@@ -416,7 +427,7 @@ class ProxyProperty(Property):
             proxies.append(self[i])
         for i in proxies:
             self.SMProperty.RemoveProxy(i)
-        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+        self._UpdateProperty()
 
     def __getattr__(self, name):
         "Unknown attribute requests get forwarded to SMProperty."
@@ -425,7 +436,7 @@ class ProxyProperty(Property):
     def append(self, proxy):
         "Appends the given proxy to the property values."
         self.SMProperty.AddProxy(proxy.SMProxy)
-        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+        self._UpdateProperty()
         
     def GetData(self):
         "Returns all elements as either a list or a single value."
@@ -450,12 +461,12 @@ class ProxyProperty(Property):
             else:
                 value_proxy = value
             self.SMProperty.AddProxy(value_proxy)
-        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+        self._UpdateProperty()
 
     def Clear(self):
         "Removes all elements."
         self.SMProperty.RemoveAllProxies()
-        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+        self._UpdateProperty()
 
 class InputProperty(ProxyProperty):
     """Python wrapper for vtkSMInputProperty.
@@ -493,7 +504,7 @@ class InputProperty(ProxyProperty):
         OutputPort objects."""
         op = self.__getOutputPort(value)
         self.SMProperty.SetInputConnection(idx, op.Proxy, op.Port)
-        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+        self._UpdateProperty()
 
     def __getslice__(self, min, max):
         """Returns the range [min, max) of elements as a list of OutputPort
@@ -516,14 +527,14 @@ class InputProperty(ProxyProperty):
         for i in range(min, max):
             op = self.__getOutputPort(value[i-min])
             self.SMProperty.SetInputConnection(i, op.Proxy, op.Port)
-        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+        self._UpdateProperty()
 
     def append(self, value):
         """Appends the given proxy to the property values.
         Accepts Proxy or OutputPort objects."""
         op = self.__getOutputPort(value)
         self.SMProperty.AddInputConnection(op.Proxy, op.Port)
-        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+        self._UpdateProperty()
         
     def GetData(self):
         """Returns all elements as either a list of OutputPort objects or
@@ -547,7 +558,7 @@ class InputProperty(ProxyProperty):
         for value in values:
             op = self.__getOutputPort(value)
             self.SMProperty.AddInputConnection(op.Proxy, op.Port)
-        self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
+        self._UpdateProperty()
         
 class DataInformation(object):
     """Python wrapper around a vtkPVDataInformation. In addition to
