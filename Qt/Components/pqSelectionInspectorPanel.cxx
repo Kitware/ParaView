@@ -1342,5 +1342,21 @@ void pqSelectionInspectorPanel::onActiveViewChanged()
   else
     {
     this->Implementation->groupSelectionLabel->setEnabled(true);
+    pqOutputPort* port = 
+      this->Implementation->SelectionManager->getSelectedPort();
+    pqPipelineSource* input = port? port->getSource() : 0;
+
+    pqRenderView* view = qobject_cast<pqRenderView*>(
+      pqActiveView::instance().current());
+    if (view)
+      {
+      pqDataRepresentation *repr = NULL;
+      if(input)
+        {
+        repr = input->getRepresentation(pqActiveView::instance().current());
+        }
+
+      this->setRepresentation(repr);
+      }
     }
 }
