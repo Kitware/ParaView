@@ -28,7 +28,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkFileSeriesReader);
-vtkCxxRevisionMacro(vtkFileSeriesReader, "1.4");
+vtkCxxRevisionMacro(vtkFileSeriesReader, "1.5");
 
 vtkCxxSetObjectMacro(vtkFileSeriesReader,Reader,vtkAlgorithm);
 
@@ -183,9 +183,10 @@ int vtkFileSeriesReader::ProcessRequest(vtkInformation* request,
 }
 
 //----------------------------------------------------------------------------
-int vtkFileSeriesReader::RequestInformation(vtkInformation* vtkNotUsed(request),
-                                            vtkInformationVector** inputVector,
-                                            vtkInformationVector* outputVector)
+int vtkFileSeriesReader::RequestInformation(
+  vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** vtkNotUsed(inputVector),
+  vtkInformationVector* outputVector)
 {
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   unsigned int numTimeSteps = this->Internal->FileNames.size();
@@ -215,9 +216,10 @@ int vtkFileSeriesReader::RequestInformation(vtkInformation* vtkNotUsed(request),
 }
 
 //----------------------------------------------------------------------------
-int vtkFileSeriesReader::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),
-                                             vtkInformationVector** inputVector,
-                                             vtkInformationVector* outputVector)
+int vtkFileSeriesReader::RequestUpdateExtent(
+  vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** vtkNotUsed(inputVector),
+  vtkInformationVector* outputVector)
 {
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
