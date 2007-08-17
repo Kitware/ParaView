@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QGraphicsView;
 class QHeaderView;
 class pqAnimationModel;
+class pqAnimationTrack;
 
 class QTWIDGETS_EXPORT pqAnimationWidget : public QScrollArea
 {
@@ -53,8 +54,13 @@ public:
   QHeaderView* header() const
     { return this->Header; }
 
+signals:
+  // emitted when a track is double clicked on
+  void trackSelected(pqAnimationTrack*);
+
 protected slots:
   void updateSizes();
+  void headerDblClicked(int);
 
 private:
   QGraphicsView* View;

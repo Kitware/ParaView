@@ -73,7 +73,12 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
   QObject::connect(this->Header->model(),
                    SIGNAL(rowsInserted(QModelIndex,int,int)),
                    this, SLOT(updateSizes()));
-
+  QObject::connect(this->Header,
+                   SIGNAL(sectionDoubleClicked(int)),
+                   this, SLOT(headerDblClicked(int)));
+  QObject::connect(this->Model,
+                   SIGNAL(trackSelected(pqAnimationTrack*)),
+                   this, SIGNAL(trackSelected(pqAnimationTrack*)));
 }
 
 pqAnimationWidget::~pqAnimationWidget()
@@ -96,4 +101,12 @@ void pqAnimationWidget::updateSizes()
   this->widget()->layout()->invalidate();
 }
 
+  
+void pqAnimationWidget::headerDblClicked(int which)
+{
+  if(which > 0)
+    {
+    emit this->trackSelected(this->Model->track(which-1));
+    }
+}
 

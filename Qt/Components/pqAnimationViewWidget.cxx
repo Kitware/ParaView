@@ -166,7 +166,7 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
   QObject::connect(&this->Internal->KeyFramesChanged, SIGNAL(mapped(QObject*)),
                    this, SLOT(keyFramesChanged(QObject*)));
 
-  QObject::connect(this->Internal->AnimationWidget->animationModel(),
+  QObject::connect(this->Internal->AnimationWidget,
                    SIGNAL(trackSelected(pqAnimationTrack*)),
                    this, SLOT(trackSelected(pqAnimationTrack*)));
 }
