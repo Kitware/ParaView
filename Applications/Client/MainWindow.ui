@@ -25,7 +25,7 @@
      <x>0</x>
      <y>0</y>
      <width>970</width>
-     <height>25</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp" >
@@ -36,36 +36,6 @@
     <addaction name="actionHelpHelp" />
     <addaction name="separator" />
     <addaction name="actionHelpEnableTooltips" />
-   </widget>
-   <widget class="QMenu" name="menuView" >
-    <property name="title" >
-     <string>&amp;View</string>
-    </property>
-    <widget class="QMenu" name="menuToolbars" >
-     <property name="title" >
-      <string>Toolbars</string>
-     </property>
-    </widget>
-    <widget class="QMenu" name="menuCamera" >
-     <property name="title" >
-      <string>Camera</string>
-     </property>
-     <addaction name="actionResetCamera" />
-     <addaction name="actionPositiveX" />
-     <addaction name="actionNegativeX" />
-     <addaction name="actionPositiveY" />
-     <addaction name="actionNegativeY" />
-     <addaction name="actionPositiveZ" />
-     <addaction name="actionNegativeZ" />
-    </widget>
-    <addaction name="menuCamera" />
-    <addaction name="separator" />
-    <addaction name="actionShowCenterAxes" />
-    <addaction name="actionResetCenter" />
-    <addaction name="actionScalarBarVisibility" />
-    <addaction name="separator" />
-    <addaction name="menuToolbars" />
-    <addaction name="separator" />
    </widget>
    <widget class="QMenu" name="menuFile" >
     <property name="title" >
@@ -137,6 +107,36 @@
     <addaction name="separator" />
     <addaction name="actionToolsPythonShell" />
    </widget>
+   <widget class="QMenu" name="menuView" >
+    <property name="title" >
+     <string>&amp;View</string>
+    </property>
+    <widget class="QMenu" name="menuToolbars" >
+     <property name="title" >
+      <string>Toolbars</string>
+     </property>
+    </widget>
+    <widget class="QMenu" name="menuCamera" >
+     <property name="title" >
+      <string>Camera</string>
+     </property>
+     <addaction name="actionResetCamera" />
+     <addaction name="actionPositiveX" />
+     <addaction name="actionNegativeX" />
+     <addaction name="actionPositiveY" />
+     <addaction name="actionNegativeY" />
+     <addaction name="actionPositiveZ" />
+     <addaction name="actionNegativeZ" />
+    </widget>
+    <addaction name="menuCamera" />
+    <addaction name="separator" />
+    <addaction name="actionShowCenterAxes" />
+    <addaction name="actionResetCenter" />
+    <addaction name="actionScalarBarVisibility" />
+    <addaction name="separator" />
+    <addaction name="menuToolbars" />
+    <addaction name="separator" />
+   </widget>
    <widget class="QMenu" name="menuEdit" >
     <property name="title" >
      <string>&amp;Edit</string>
@@ -155,7 +155,7 @@
     <addaction name="actionSelectionMode" />
     <addaction name="actionSelect_Frustum" />
     <addaction name="separator" />
-    <addaction name="actionEditSettings" />
+    <addaction name="actionEditView" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -780,9 +780,18 @@
     <string>Play Test</string>
    </property>
   </action>
-  <action name="actionEditSettings" >
+  <action name="actionEditView" >
    <property name="text" >
-    <string>&amp;Settings</string>
+    <string>&amp;Active View</string>
+   </property>
+   <property name="iconText" >
+    <string>Active View</string>
+   </property>
+   <property name="toolTip" >
+    <string>Active View Options</string>
+   </property>
+   <property name="statusTip" >
+    <string>Edit the options for the active view.</string>
    </property>
   </action>
   <action name="actionResetCamera" >

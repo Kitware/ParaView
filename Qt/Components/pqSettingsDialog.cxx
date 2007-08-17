@@ -101,8 +101,8 @@ void pqSettingsDialog::setupGUI()
     }
 
   // Add a place holder for application settings.
-  this->Internal->tabWidget->addTab(
-    new QWidget(), "Application Settings");
+  //this->Internal->tabWidget->addTab(
+  //  new QWidget(), "Application Settings");
 }
 
 //-----------------------------------------------------------------------------
