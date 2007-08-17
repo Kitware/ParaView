@@ -64,6 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPropertyLinks.h"
 #include "pqProxy.h"
+#include "pqRenderView.h"
 #include "pqRubberBandHelper.h"
 #include "pqSelectionManager.h"
 #include "pqServer.h"
@@ -217,6 +218,11 @@ pqSelectionInspectorPanel::pqSelectionInspectorPanel(QWidget *p) :
   pqApplicationCore* core = pqApplicationCore::instance();
   this->setSelectionManager((pqSelectionManager*)(core->manager("SelectionManager")));
 
+  // Connect the view manager to the pqActiveView.
+  QObject::connect(&pqActiveView::instance(),
+    SIGNAL(changed(pqView*)),
+    this, SLOT(onActiveViewChanged()));
+
   this->setEnabled(false);
 
   }
@@ -242,11 +248,6 @@ void pqSelectionInspectorPanel::setSelectionManager(pqSelectionManager* selMan)
     QObject::connect(selMan, SIGNAL(selectionChanged(pqSelectionManager*)),
       this, SLOT(onSelectionChanged()));
     }
-
-  //if(!this->isEnabled())
-  //  {
-  //  this->setEnabled(true);
-  //  }
 }
 
 
@@ -278,13 +279,18 @@ void pqSelectionInspectorPanel::onSelectionChanged()
   int portnum = port? port->getPortNumber(): -1;
   this->setInputSource(input, portnum);
 
-  pqDataRepresentation *repr = NULL;
-  if(input)
+  pqRenderView* view = qobject_cast<pqRenderView*>(
+    pqActiveView::instance().current());
+  if (view)
     {
-    repr = input->getRepresentation(pqActiveView::instance().current());
-    }
+    pqDataRepresentation *repr = NULL;
+    if(input)
+      {
+      repr = input->getRepresentation(pqActiveView::instance().current());
+      }
 
-  this->setRepresentation(repr);
+    this->setRepresentation(repr);
+    }
 
   if(input)
     {
@@ -302,10 +308,6 @@ void pqSelectionInspectorPanel::onSelectionChanged()
       NULL, 0.0,
       Qt::QueuedConnection);
     }
-    //inputsrc->SetSelectionInput(portnum, 
-    //  vtkSMSourceProxy::SafeDownCast(
-    //  this->Implementation->SelectionSource.GetPointer()), 0);
-
 }
 
 //-----------------------------------------------------------------------------
@@ -357,19 +359,19 @@ void pqSelectionInspectorPanel::setRepresentation(
   pqDataRepresentation* repr) 
 {
   if(this->Implementation->Representation == repr)
-  {
+    {
     return;
-  }
+    }
 
   if(this->Implementation->Representation)
-  {
+    {
     // break all old links.
     this->Implementation->RepLinks->removeAllPropertyLinks();
-  }
+    }
   if (this->Implementation->Representation)
-  {
+    {
     QObject::disconnect(this->Implementation->Representation, 0, this, 0);
-  }
+    }
 
   this->Implementation->Representation = repr;
 
@@ -439,9 +441,9 @@ void pqSelectionInspectorPanel::setupGUI()
   this->setupSelelectionLabelGUI();
 
   QObject::connect(this->Implementation->SourceLinks, SIGNAL(qtWidgetChanged()),
-    this, SLOT(updateAllViews()));
+    this, SLOT(updateAllSelectionViews()));
   QObject::connect(this->Implementation->RepLinks, SIGNAL(qtWidgetChanged()),
-    this, SLOT(updateAllViews()));
+    this, SLOT(updateRepresentationViews()));
   //this->updateSelectionContentType("Surface");
 
   //this->Implementation->comboSelectionType->setEnabled(false);
@@ -551,10 +553,6 @@ void pqSelectionInspectorPanel::updateSelectionRepGUI()
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::updateSelectionSource()
 {
-  //vtkSMProxyManager* pm = vtkSMProxy::GetProxyManager();
-  //this->Implementation->SelectionSource.TakeReference(
-  //  pm->NewProxy("sources", "SelectionSource"));
-
   pqOutputPort* port = 
     this->Implementation->SelectionManager->getSelectedPort();
 
@@ -591,7 +589,7 @@ void pqSelectionInspectorPanel::updateSelectionSourceGUI()
   vtkSMProxy* selectionSource = this->Implementation->SelectionSource.GetPointer();
 
   this->Implementation->SourceLinks->addPropertyLink(
-    this->Implementation->comboFieldType, "currentIndex", SIGNAL(currentIndexChanged(int)),
+    this->Implementation->FieldTypeAdaptor, "currentIndex", SIGNAL(currentIndexChanged(int)),
     selectionSource, selectionSource->GetProperty("FieldType"));
 
   //this->Implementation->SourceLinks->addPropertyLink(
@@ -651,10 +649,10 @@ void pqSelectionInspectorPanel::updateThreholdDataArrays()
   this->Implementation->ThresholdScalarArray->clear();
   if(!this->Implementation->InputSource || 
     !this->Implementation->InputSource->getProxy())
-  {
+    {
     //this->Implementation->stackedWidget->
     return;
-  }
+    }
   vtkSMSourceProxy* sourceProxy = vtkSMSourceProxy::SafeDownCast(
     this->Implementation->InputSource->getProxy());
   vtkPVDataInformation* geomInfo = sourceProxy->GetDataInformation();
@@ -662,22 +660,22 @@ void pqSelectionInspectorPanel::updateThreholdDataArrays()
   vtkPVDataSetAttributesInformation* attrInfo;
 
   if (this->Implementation->comboFieldType->currentText() == QString("POINT"))
-  {
+    {
     attrInfo = geomInfo->GetPointDataInformation();
-  }
+    }
   else
-  {
+    {
     attrInfo = geomInfo->GetCellDataInformation();
-  }
+    }
 
   for(int i=0; i<attrInfo->GetNumberOfArrays(); i++)
-  {
-    if(attrInfo->IsArrayAnAttribute(i) == vtkDataSetAttributes::SCALARS)
     {
+    if(attrInfo->IsArrayAnAttribute(i) == vtkDataSetAttributes::SCALARS)
+      {
       this->Implementation->ThresholdScalarArray->addItem(
         attrInfo->GetArrayInformation(i)->GetName());
+      }
     }
-  }
 }
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::setupSelelectionLabelGUI()
@@ -697,7 +695,7 @@ void pqSelectionInspectorPanel::setupSelelectionLabelGUI()
   this->Implementation->PointLabelAlignmentAdaptor = new pqSignalAdaptorComboBox(
     this->Implementation->comboTextAlign_Point);
   QObject::connect(this->Implementation->PointLabelModeAdaptor, 
-    SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateAllViews()));
+    SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateRepresentationViews()));
 
   this->Implementation->CellColorAdaptor = new pqSignalAdaptorColor(
     this->Implementation->buttonColor_Cell, "chosenColor", 
@@ -709,35 +707,35 @@ void pqSelectionInspectorPanel::setupSelelectionLabelGUI()
   this->Implementation->CellLabelAlignmentAdaptor = new pqSignalAdaptorComboBox(
     this->Implementation->comboTextAlign_Cell);
   QObject::connect(this->Implementation->CellLabelModeAdaptor, 
-    SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateAllViews()));
+    SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateRepresentationViews()));
 }
 
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::updatePointLabelMode(const QString& text)
 {
   if(text.isEmpty())
-  {
+    {
     return;
-  }
+    }
   if(!this->Implementation->Representation)
-  {
+    {
     return;
-  }
+    }
   vtkSMProxy* reprProxy = this->Implementation->Representation->getProxy();
   if(!reprProxy)
-  {
+    {
     return;
-  }
+    }
   if(text == "Point IDs")
-  {
+    {
     pqSMAdaptor::setElementProperty(
       reprProxy->GetProperty("SelectionPointFieldDataArrayName"),"vtkOriginalPointIds");
-  }
+    }
   else
-  {
+    {
     pqSMAdaptor::setElementProperty(
       reprProxy->GetProperty("SelectionPointFieldDataArrayName"),text);
-  }
+    }
   reprProxy->UpdateVTKObjects();
 } 
 
@@ -745,29 +743,29 @@ void pqSelectionInspectorPanel::updatePointLabelMode(const QString& text)
 void pqSelectionInspectorPanel::updateCellLabelMode(const QString& text)
 {
   if(text.isEmpty())
-  {
+    {
     return;
-  }
+    }
   if(!this->Implementation->Representation)
-  {
+    {
     return;
-  }
+    }
   vtkSMProxy* reprProxy = this->Implementation->Representation->getProxy();
   if(!reprProxy)
-  {
+    {
     return;
-  }
+    }
 
   if(text == "Cell IDs")
-  {
+    {
     pqSMAdaptor::setElementProperty(
       reprProxy->GetProperty("SelectionCellFieldDataArrayName"),"vtkOriginalCellIds");
-  }
+    }
   else
-  {
+    {
     pqSMAdaptor::setElementProperty(
       reprProxy->GetProperty("SelectionCellFieldDataArrayName"),text);
-  }
+    }
 
   reprProxy->UpdateVTKObjects();
 }
@@ -779,39 +777,29 @@ void pqSelectionInspectorPanel::updateSelectionLabelEnableState()
   vtkSMProxy* input = this->Implementation->InputSource->getProxy();
 
   if (input)
-  {
-    //vtkSMProxyProperty *selectionProperty = 
-    //  vtkSMProxyProperty::SafeDownCast(input->GetProperty("Selection"));
-
-    //if(selectionProperty->GetNumberOfProxies()>0)
-    //{
-      this->Implementation->groupSelectionLabel->setEnabled(true);
-      if(this->Implementation->checkBoxLabelCells->isChecked())
+    {
+    this->Implementation->groupSelectionLabel->setEnabled(true);
+    if(this->Implementation->checkBoxLabelCells->isChecked())
       {
-        this->Implementation->groupBox_CellLabelStyle->setEnabled(true);
+      this->Implementation->groupBox_CellLabelStyle->setEnabled(true);
       }
-      else
+    else
       {
-        this->Implementation->groupBox_CellLabelStyle->setEnabled(false);
+      this->Implementation->groupBox_CellLabelStyle->setEnabled(false);
       }
-      if(this->Implementation->checkBoxLabelPoints->isChecked())
+    if(this->Implementation->checkBoxLabelPoints->isChecked())
       {
-        this->Implementation->groupBox_PointLabelStyle->setEnabled(true);
+      this->Implementation->groupBox_PointLabelStyle->setEnabled(true);
       }
-      else
+    else
       {
-        this->Implementation->groupBox_PointLabelStyle->setEnabled(false);
+      this->Implementation->groupBox_PointLabelStyle->setEnabled(false);
       }
-    //}
-    //else
-    //{
-    //  this->Implementation->groupSelectionLabel->setEnabled(false);
-    //}
-  }
+    }
   else
-  { 
+    { 
     this->Implementation->groupSelectionLabel->setEnabled(false);
-  }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1288,43 +1276,39 @@ void pqSelectionInspectorPanel::updateSurfaceSelectionView()
   vtkSMProperty* idvp = selectionSource->GetProperty("IDs");
 
   if(this->Implementation->UseGlobalIDs->isChecked())
-  {
-    //if(this->Implementation->GlobalIDsAdaptor->values().size()>0)
-    //{
+    {
     pqSMAdaptor::setMultipleElementProperty(
       idvp, this->Implementation->GlobalIDsAdaptor->values());
     selectionSource->UpdateVTKObjects();
-    //}
-    //else
-    //{
-    //this->setEmptySelectionSource();
-    //}
-  }
+    }
   else
-  {
-    //if(this->Implementation->IndicesAdaptor->values().size()>0)
-    //{
-    //  this->Implementation->NewValue->setEnabled(true);
-      pqSMAdaptor::setMultipleElementProperty(
-        idvp, this->Implementation->IndicesAdaptor->values());
-      selectionSource->UpdateVTKObjects();
-    //}
-    //else
-    //{
-    //  this->Implementation->NewValue->setEnabled(false);
-    //  this->setEmptySelectionSource();
-    //}
-  }
+    {
+    pqSMAdaptor::setMultipleElementProperty(
+      idvp, this->Implementation->IndicesAdaptor->values());
+    selectionSource->UpdateVTKObjects();
+    }
 
-  this->updateAllViews();
+  this->updateAllSelectionViews();
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionInspectorPanel::updateAllViews()
+void pqSelectionInspectorPanel::updateRepresentationViews()
 {
   if (this->Implementation->Representation)
     {
     this->Implementation->Representation->renderViewEventually();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::updateAllSelectionViews()
+{
+  pqOutputPort* port = 
+    this->Implementation->SelectionManager->getSelectedPort();
+
+  if (port)
+    {
+    port->renderAllViews();
     }
 }
 
@@ -1342,5 +1326,21 @@ void pqSelectionInspectorPanel::onSelectionModeChanged(int selMode)
   else 
     {
     //this->Implementation->SelectionTypeAdaptor->setCurrentText("None");
+    }
+}
+
+
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::onActiveViewChanged()
+{
+  pqRenderView* view = qobject_cast<pqRenderView*>(
+    pqActiveView::instance().current());
+  if (!view)
+    {
+    this->Implementation->groupSelectionLabel->setEnabled(false);
+    }
+  else
+    {
+    this->Implementation->groupSelectionLabel->setEnabled(true);
     }
 }

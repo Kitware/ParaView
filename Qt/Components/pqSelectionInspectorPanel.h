@@ -72,10 +72,6 @@ public slots:
   /// Called when user creates a new surface selection (or old 
   /// surface selection is cleared).
   void onSelectionChanged();
-  /// Requests update on all views the
-  /// Representation is visible in.
-  virtual void updateAllViews();
-
 
 protected:
 
@@ -125,6 +121,12 @@ protected slots:
   void updateSelectionSource();
 
   virtual void onSelectionModeChanged(int mode);
+  virtual void onActiveViewChanged();
+  /// Requests update on all views the
+  /// Representation is visible in.
+  virtual void updateRepresentationViews();
+
+  virtual void updateAllSelectionViews();
 
 private:
   /// Set the display whose properties we want to edit.
