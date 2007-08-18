@@ -433,7 +433,7 @@ void pqSelectionInspectorPanel::setupGUI()
     this->Implementation->comboFieldType);
   QObject::connect(this->Implementation->FieldTypeAdaptor, 
     SIGNAL(currentTextChanged(const QString&)),
-    this, SLOT(updateSelectionFieldType(const QString&)));
+    this, SLOT(updateSelectionFieldType(const QString&)), Qt::QueuedConnection);
 
   this->setupSurfaceSelectionGUI();
   this->setupFrustumSelectionGUI();
@@ -589,7 +589,8 @@ void pqSelectionInspectorPanel::updateSelectionSourceGUI()
   vtkSMProxy* selectionSource = this->Implementation->SelectionSource.GetPointer();
 
   this->Implementation->SourceLinks->addPropertyLink(
-    this->Implementation->FieldTypeAdaptor, "currentIndex", SIGNAL(currentIndexChanged(int)),
+    this->Implementation->FieldTypeAdaptor, "currentText", 
+    SIGNAL(currentTextChanged(const QString&)),
     selectionSource, selectionSource->GetProperty("FieldType"));
 
   //this->Implementation->SourceLinks->addPropertyLink(
@@ -1087,13 +1088,13 @@ void pqSelectionInspectorPanel::updateSelectionContentType(const QString& type)
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::updateSelectionFieldType(const QString& type)
 {
-  if(type == QString("Point"))
+  if(type == QString("POINT"))
     {
-    this->Implementation->checkboxContainCell->setEnabled(false);
+    this->Implementation->checkboxContainCell->setEnabled(true);
     }
   else 
     {
-    this->Implementation->checkboxContainCell->setEnabled(true);
+    this->Implementation->checkboxContainCell->setEnabled(false);
     }
 
   // Set up selection connections
@@ -1109,12 +1110,12 @@ void pqSelectionInspectorPanel::updateSelectionFieldType(const QString& type)
   return;
   }
   
-  if(type == QString("Cell"))
+  if(type == QString("CELL"))
     {
     pqSMAdaptor::setElementProperty(
       idvp, vtkSelection::CELL);
     }
-  else if(type == QString("Point"))
+  else if(type == QString("POINT"))
     {
     pqSMAdaptor::setElementProperty(
       idvp, vtkSelection::POINT);
