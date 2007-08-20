@@ -102,7 +102,7 @@ public:
   int computeRowIndex(vtkIdType blockOffset)
     {
     vtkIdType blocksize = this->getBlockSize(); 
-    vtkIdType blockNumber = this->getBlockNumber(); 
+    vtkIdType blockNumber = this->ActiveBlockNumber; 
     return (blocksize*blockNumber + blockOffset);
     }
 
@@ -110,11 +110,6 @@ public:
     {
     return pqSMAdaptor::getElementProperty(
       this->Representation->GetProperty("FieldType")).toInt();
-    }
-
-  vtkIdType getBlockNumber()
-    {
-    return this->ActiveBlockNumber;
     }
 
   QTimer Timer;
@@ -130,18 +125,13 @@ pqSpreadSheetViewModel::pqSpreadSheetViewModel()
   this->Internal = new pqInternal(this);
   
   this->Internal->Timer.setSingleShot(true);
-  this->Internal->Timer.setInterval(100);//milliseconds.
+  this->Internal->Timer.setInterval(500);//milliseconds.
   QObject::connect(&this->Internal->Timer, SIGNAL(timeout()),
     this, SLOT(delayedUpdate()));
 
   this->Internal->SelectionTimer.setSingleShot(true);
   this->Internal->SelectionTimer.setInterval(100);//milliseconds.
   QObject::connect(&this->Internal->SelectionTimer, SIGNAL(timeout()),
-    this, SLOT(delayedSelectionUpdate()));
-
-  this->Internal->Timer.setSingleShot(true);
-  this->Internal->Timer.setInterval(100);//milliseconds.
-  QObject::connect(&this->Internal->Timer, SIGNAL(timeout()),
     this, SLOT(delayedSelectionUpdate()));
 }
 
@@ -215,6 +205,9 @@ void pqSpreadSheetViewModel::forceUpdate()
 {
   // Note that this method is called after the representation has already been
   // updated.
+  int old_rows = this->Internal->NumberOfRows;
+  int old_columns = this->Internal->NumberOfColumns;
+
   this->Internal->NumberOfRows = 0;
   this->Internal->NumberOfColumns = 0;
   vtkSMSpreadSheetRepresentationProxy* repr = this->Internal->Representation;
@@ -258,15 +251,23 @@ void pqSpreadSheetViewModel::forceUpdate()
     }
 
   this->Internal->SelectionModel.clear();
-  this->reset();
+  if (old_rows == this->Internal->NumberOfColumns &&
+    old_columns == this->Internal->NumberOfColumns)
+    {
+    this->Internal->SelectionTimer.start();
+    this->Internal->Timer.start();
+    }
+  else
+    {
+    this->reset();
+    }
   
   // We do not fetch any data just yet. All data fetches happen when we want to
   // show the data on the GUI.
 }
 
 //-----------------------------------------------------------------------------
-void pqSpreadSheetViewModel::updateSelectionForBlock(
-  vtkIdType blockNumber)
+void pqSpreadSheetViewModel::updateSelectionForBlock(vtkIdType blockNumber)
 {
   vtkSMSpreadSheetRepresentationProxy* repr = this->Internal->Representation;
   if (repr && 
@@ -314,7 +315,6 @@ void pqSpreadSheetViewModel::delayedUpdate()
       this->headerDataChanged(Qt::Horizontal, 0, this->columnCount()-1);
       }
     }
-  this->Internal->PendingBlocks.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -327,11 +327,10 @@ void pqSpreadSheetViewModel::delayedSelectionUpdate()
     foreach (vtkIdType blockNumber, this->Internal->PendingSelectionBlocks)
       {
       // we grow the current selection.
+      this->Internal->ActiveBlockNumber = blockNumber;
       this->updateSelectionForBlock(blockNumber);
       }
     }
-
-  this->Internal->PendingSelectionBlocks.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -480,6 +479,7 @@ QItemSelection pqSpreadSheetViewModel::convertToQtSelection(vtkSelection* vtksel
     for (vtkIdType cc=0; indices && cc < indices->GetNumberOfTuples(); cc++)
       {
       vtkIdType index = indices->GetValue(cc);
+      // cout << "Selection (" << pid << ", " << index << ") " << endl;
       QModelIndex qtIndex = this->indexFor(pid, index);
       if (qtIndex.isValid())
         {

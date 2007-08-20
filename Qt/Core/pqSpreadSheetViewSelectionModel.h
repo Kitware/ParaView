@@ -46,6 +46,10 @@ class vtkSMSourceProxy;
 ///     current selection.
 /// \li When vtkSelection changes, is updated the selection in the view
 ///     accordingly.
+/// When the model is updated by the Qt View, we intercept the select() calls
+/// and don't update the QItemSelectionModel, instead the updates are pushed on
+/// to the vtkSelection for the source. The Qt model is updated only when the
+/// vtkSelection delivered to the client changes.
 class PQCORE_EXPORT pqSpreadSheetViewSelectionModel : public QItemSelectionModel
 {
   Q_OBJECT
