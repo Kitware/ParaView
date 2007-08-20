@@ -566,9 +566,9 @@ void pqFileDialog::accept()
       {
       QModelIndex sidx = m->mapToSource(idx);
       QStringList sel_files = this->Implementation->Model->getFilePaths(sidx);
-      for(int i=0; i<sel_files.count();i++)
+      for(int j=0; j<sel_files.count();j++)
         {
-        files.push_back(sel_files.at(i));
+        files.push_back(sel_files.at(j));
         }
       break;
       }
