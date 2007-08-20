@@ -2,20 +2,20 @@
 <pqevents>
   <pqevent object="MainWindow/menubar/menuFile" command="activate" arguments="actionFileOpen" />
   <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/can.ex2" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mousePress" arguments="1,1,0,10,13," />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mouseRelease" arguments="1,0,0,10,13," />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.512744,0.678,1,1,0)" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.518741,0.426,1,0,0)" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.518741,0.426,1,0,0)" />
+  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.524738,0.608,1,1,0)" />
+  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.526237,0.36,1,0,0)" />
+  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.526237,0.36,1,0,0)" />
   <pqevent object="MainWindow/menubar/menuView" command="activate" arguments="Animation View" />
-  <pqevent object="MainWindow/animationViewDock/animationView/1pqAnimationWidget0/qt_scrollarea_viewport/1QWidget0/1QGraphicsView0/1QWidget0" command="mousePress" arguments="1,1,0,139,44" />
-  <pqevent object="MainWindow/animationViewDock/animationView/1pqAnimationWidget0/qt_scrollarea_viewport/1QWidget0/1QGraphicsView0/1QWidget0" command="mouseRelease" arguments="1,0,0,139,44" />
-  <pqevent object="MainWindow/animationViewDock/animationView/1pqAnimationWidget0/qt_scrollarea_viewport/1QWidget0/1QGraphicsView0/1QWidget0" command="mouseDblClick" arguments="1,1,0,139,44" />
-  <pqevent object="MainWindow/animationViewDock/animationView/1pqAnimationWidget0/qt_scrollarea_viewport/1QWidget0/1QGraphicsView0/1QWidget0" command="mouseRelease" arguments="1,0,0,139,44" />
+  <pqevent object="MainWindow/animationViewDock/animationView/1pqAnimationWidget0/qt_scrollarea_viewport/1QWidget0/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,1" />
+  <pqevent object="MainWindow/animationViewDock/animationView/1pqAnimationWidget0/qt_scrollarea_viewport/1QWidget0/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,1" />
+  <pqevent object="MainWindow/animationViewDock/animationView/1pqAnimationWidget0/qt_scrollarea_viewport/1QWidget0/1QHeaderView0" command="mouseDblClick" arguments="1,1,0,0,0,1" />
+  <pqevent object="MainWindow/animationViewDock/animationView/1pqAnimationWidget0/qt_scrollarea_viewport/1QWidget0/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,1" />
   <pqevent object="1QDialog0/pqKeyFrameEditor/pbNew" command="activate" arguments="" />
-  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="mousePress" arguments="1,1,0,75,19,/1:2" />
-  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="mouseRelease" arguments="1,0,0,75,19,/1:2" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="mousePress" arguments="1,1,0,52,19,/1:2" />
+  <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="mouseRelease" arguments="1,0,0,52,19,/1:2" />
   <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="keyEvent" arguments="6,48,536870912,0,0,1" />
   <pqevent object="1QDialog0/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1QLineEdit0" command="set_string" arguments="0" />
   <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="keyEvent" arguments="7,48,536870912,0,0,1" />
