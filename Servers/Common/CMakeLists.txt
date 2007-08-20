@@ -90,7 +90,6 @@ SET_SOURCE_FILES_PROPERTIES(
   )
 
 INCLUDE_DIRECTORIES(
-  ${TCL_INCLUDE_PATH}
   ${PVServerCommon_BINARY_DIR}
   ${PVServerCommon_SOURCE_DIR}
   ${HDF5_INCLUDE_DIR}
@@ -146,22 +145,6 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
   vtkClientServer
   vtkPVCommandOptions)
 
-# Create Tcl wrappers for classes.
-IF (PARAVIEW_BUILD_GUI)
-  SET(VTK_WRAP_TCL_EXE ${PARAVIEW_VTK_WRAP_TCL_EXE})
-  SET(VTK_WRAP_TCL_INIT_EXE ${PARAVIEW_VTK_WRAP_TCL_INIT_EXE})
-  INCLUDE("${VTK_CMAKE_DIR}/vtkWrapTcl.cmake")
-  VTK_WRAP_TCL3(
-    vtk${KIT}TCL 
-    KitTCL_SRCS 
-    "${Kit_SRCS}"
-    ""
-    )
-  ADD_LIBRARY(vtk${KIT}TCL ${KitTCL_SRCS}
-    )
-  TARGET_LINK_LIBRARIES (vtk${KIT}TCL vtk${KIT} vtkCommonTCL)
-ENDIF (PARAVIEW_BUILD_GUI)
-
 IF (PARAVIEW_ENABLE_PYTHON)
   SET(Kit_PYTHON_EXTRA_SRCS)
 
@@ -195,11 +178,6 @@ IF(NOT PV_INSTALL_NO_LIBRARIES)
     vtk${KIT}CS
     vtk${KIT}
     vtkPVCommandOptions)
-  IF (PARAVIEW_BUILD_GUI)
-    SET (temp_TO_INSTALL
-      ${temp_TO_INSTALL}
-      vtk${KIT}TCL)
-  ENDIF(PARAVIEW_BUILD_GUI)
   IF (PARAVIEW_ENABLE_PYTHON)
     SET (temp_TO_INSTALL 
       ${temp_TO_INSTALL}
