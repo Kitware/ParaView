@@ -488,6 +488,11 @@ void pqKeyFrameEditor::readKeyFrameData()
 
 }
 
+static bool timeSort(const QPair<int, double>& a, const QPair<int, double>& b)
+{
+  return a.second < b.second;
+}
+
 //-----------------------------------------------------------------------------
 void pqKeyFrameEditor::writeKeyFrameData()
 {
@@ -527,11 +532,22 @@ void pqKeyFrameEditor::writeKeyFrameData()
     this->Internal->Cue->getProxy()->UpdateVTKObjects();
     }
 
+  QList<QPair<int, double> > sortedKeyFrames;
+  for(int i=0; i<newNumber; i++)
+    {
+    QModelIndex idx = this->Internal->Model.index(i, 0);
+    QVariant newData = this->Internal->Model.data(idx, Qt::DisplayRole);
+    double nTime = this->Internal->normalizedTime(newData.toDouble());
+    sortedKeyFrames.append(QPair<int,double>(i, nTime));
+    }
+  qSort(sortedKeyFrames.begin(), sortedKeyFrames.end(), timeSort);
+
   for(int i=0; i<newNumber; i++)
     {
     vtkSMProxy* keyFrame = this->Internal->Cue->getKeyFrame(i);
+    int j = sortedKeyFrames[i].first;
 
-    QModelIndex idx = this->Internal->Model.index(i, 0);
+    QModelIndex idx = this->Internal->Model.index(j, 0);
     QVariant newData = this->Internal->Model.data(idx, Qt::DisplayRole);
     double nTime = this->Internal->normalizedTime(newData.toDouble());
     if (!this->ValuesOnly)
@@ -542,7 +558,7 @@ void pqKeyFrameEditor::writeKeyFrameData()
     if(camera)
       {
       pqCameraKeyFrameItem* item = static_cast<pqCameraKeyFrameItem*>(
-        this->Internal->Model.item(i, this->ValuesOnly? 0 : 1));
+        this->Internal->Model.item(j, this->ValuesOnly? 0 : 1));
       if(item)
         {
         pqSMAdaptor::setMultipleElementProperty(keyFrame->GetProperty("Position"),
@@ -559,7 +575,7 @@ void pqKeyFrameEditor::writeKeyFrameData()
       {
       pqKeyFrameInterpolationItem* item = 
         static_cast<pqKeyFrameInterpolationItem*>(
-          this->Internal->Model.item(i, this->ValuesOnly? 0 :1));
+          this->Internal->Model.item(j, this->ValuesOnly? 0 :1));
       if(item)
         {
         pqSMAdaptor::setEnumerationProperty(keyFrame->GetProperty("Type"),
@@ -578,7 +594,7 @@ void pqKeyFrameEditor::writeKeyFrameData()
           item->Widget.frequency());
         }
       
-      idx = this->Internal->Model.index(i, this->ValuesOnly? 1: 2);
+      idx = this->Internal->Model.index(j, this->ValuesOnly? 1: 2);
       newData = this->Internal->Model.data(idx, Qt::DisplayRole);
       pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyValues"), newData);
       }
