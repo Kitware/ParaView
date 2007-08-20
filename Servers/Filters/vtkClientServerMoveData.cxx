@@ -34,7 +34,7 @@
 #include "vtksys/ios/sstream"
 
 vtkStandardNewMacro(vtkClientServerMoveData);
-vtkCxxRevisionMacro(vtkClientServerMoveData, "1.12");
+vtkCxxRevisionMacro(vtkClientServerMoveData, "1.13");
 vtkCxxSetObjectMacro(vtkClientServerMoveData, ProcessModuleConnection, 
   vtkProcessModuleConnection);
 
@@ -148,6 +148,7 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
         vtkSelection* sel = vtkSelection::SafeDownCast(input);
         vtksys_ios::ostringstream res;
         vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, sel);
+
         // Send the size of the string.
         int size = res.str().size();
         controller->Send(&size, 1, 1, 
@@ -175,10 +176,12 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
         int size = 0;
         controller->Receive(&size, 1, 1,
                             vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
-        char* xml = new char[size];
+        char* xml = new char[size+1];
         // Get the string itself.
         controller->Receive(xml, size, 1,
                             vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
+        xml[size] = 0;
+
         // Parse the XML.
         vtkSelection* sel = vtkSelection::New();
         vtkSelectionSerializer::Parse(xml, sel);
