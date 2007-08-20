@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <pqevents>
   <pqevent object="MainWindow/menubar/menuFile" command="activate" arguments="actionFileOpen" />
-  <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/dualSphereAnimation.pvd" />
+  <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/singleSphereAnimation.pvd" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTimeIndex" command="set_int" arguments="1" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTimeIndex" command="set_int" arguments="2" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTimeIndex" command="set_int" arguments="3" />
@@ -15,30 +15,30 @@
   <pqevent object="MainWindow/menubar/menuView" command="activate" arguments="Animation Inspector" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/playbackGroup/playMode" command="set_string" arguments="Real Time" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="46" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="4.2" />
+  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="0.2" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="4.4" />
+  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="0.4" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="4.6" />
+  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="0.6" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="4.8" />
+  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="0.8" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="5" />
+  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="1.0" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="46" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="5.0" />
+  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="1.0" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="5.2" />
+  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="1.2" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="5.4" />
+  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="1.4" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
   <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="5.5" />
+  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="1.5" />
 </pqevents>
