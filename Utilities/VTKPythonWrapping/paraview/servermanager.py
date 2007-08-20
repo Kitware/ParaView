@@ -1187,6 +1187,33 @@ def CreateRepresentation(aProxy, view, **extraArgs):
     view.Representations.append(proxy)
     return proxy
 
+def LoadPlugin(filename, connection=None):
+    """ Given a filename and a connection (optional, otherwise uses
+    ActiveConnection), loads a plugin. It then updates the sources,
+    filters and rendering modules."""
+    
+    if not connection:
+        connection = ActiveConnection
+    if not connection:
+        raise exceptions.RuntimeError, "Cannot load a plugin without a connection."
+    
+    pxm=ProxyManager()
+    pld = pxm.NewProxy("misc", "PluginLoader")
+    pld.GetProperty("FileName").SetElement(0, filename)
+    pld.UpdateVTKObjects()
+    pld.UpdatePropertyInformation()
+    # Make sure that the plugin was loaded successfully
+    if pld.GetProperty("Loaded").GetElement(0):
+        # Get the XML, parse it and load it
+        xmlstring = pld.GetProperty("ServerManagerXML").GetElement(0)
+        if xmlstring:
+            parser = vtkSMXMLParser()
+            parser.Parse(xmlstring)
+            parser.ProcessConfiguration(vtkSMObject.GetProxyManager())
+            # Update the modules
+            _updateModules()
+            
+
 def Fetch(input, arg=None):
     """ 
     A convenience method that moves data from the server to the client, 
@@ -1335,6 +1362,24 @@ def _findClassForProxy(xmlName):
     else:
         return None
 
+def _updateModules():
+    global sources, filters, rendering
+
+    _createModule("sources", sources)
+    _createModule("filters", filters)
+    _createModule("representations", rendering)
+    _createModule("newviews", rendering)
+    _createModule("lookup_tables", rendering)
+    
+def _createModules():
+    global sources, filters, rendering
+
+    sources = _createModule('sources')
+    filters = _createModule('filters')
+    rendering = _createModule('representations')
+    _createModule('newviews', rendering)
+    _createModule("lookup_tables", rendering)
+    
 def _createModule(groupName, mdl=None):
     """Populates a module with proxy classes defined in the given group.
     If mdl is not specified, it also creates the module"""
@@ -1342,11 +1387,15 @@ def _createModule(groupName, mdl=None):
     # Use prototypes to find all proxy types.
     pxm.InstantiateGroupPrototypes(groupName)
 
+    debug = False
     if not mdl:
+        debug = True
         mdl = new.module(groupName)
     numProxies = pxm.GetNumberOfXMLProxies(groupName)
     for i in range(numProxies):
         pname = pxm.GetXMLProxyName(groupName, i)
+        if pname in mdl.__dict__:
+            continue
         cdict = {}
         # Create an Initialize() method for this sub-class.
         cdict['Initialize'] = _createInitialize(groupName, pname)
@@ -1385,11 +1434,7 @@ if not vtkSMObject.GetProxyManager():
 _pyproxies = {}
 
 # Create needed sub-modules
-sources = _createModule('sources')
-filters = _createModule('filters')
-rendering = _createModule('representations')
-_createModule('newviews', rendering)
-_createModule("lookup_tables", rendering)
+_createModules()
 
 def demo1():
     """This simple demonstration creates a sphere, renders it and delivers
