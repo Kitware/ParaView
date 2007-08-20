@@ -509,10 +509,14 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
       break;
     case ExistingFiles:
         {
+        // Currently, we can only support limited series files, 
+        // so SingleSelection mode is used here, and when a *group*
+        // file is selected, we internally get all series files in
+        // this group, and pass them along.
         this->Implementation->Ui.Files->setSelectionMode(
-             QAbstractItemView::ExtendedSelection);
+          QAbstractItemView::SingleSelection);
         this->Implementation->Ui.Favorites->setSelectionMode(
-             QAbstractItemView::ExtendedSelection);
+          QAbstractItemView::ExtendedSelection);
         }
     }
 }
@@ -550,28 +554,32 @@ void pqFileDialog::accept()
   filename = filename.trimmed();
   
   // TODO: if it is a group, we're getting the first file instead
+  // This is changed to pass along all files in the group, since now
+  // we can handle a file-series dataset.
   QAbstractProxyModel* m = &this->Implementation->FileFilter;
+  QStringList files;
   int numrows = m->rowCount(QModelIndex());
-  bool found = false;
   for(int i=0; i<numrows; i++)
     {
     QModelIndex idx = m->index(i, 0, QModelIndex());
     if(filename == m->data(idx, Qt::DisplayRole))
       {
       QModelIndex sidx = m->mapToSource(idx);
-      filename = this->Implementation->Model->getFilePaths(sidx)[0];
-      found = true;
+      QStringList sel_files = this->Implementation->Model->getFilePaths(sidx);
+      for(int i=0; i<sel_files.count();i++)
+        {
+        files.push_back(sel_files.at(i));
+        }
       break;
       }
     }
 
-  if(!found)
+  if(files.empty())
     {
     filename = this->Implementation->Model->absoluteFilePath(filename);
+    files.append(filename);
     }
 
-  QStringList files;
-  files.append(filename);
   this->acceptInternal(files);
 }
 
@@ -789,8 +797,7 @@ void pqFileDialog::acceptInternal(QStringList& selected_files)
         // TODO: we need to verify that all selected files are indeed
         // "existing".
         // User chose an existing file-or-files, we're done
-        QStringList files;
-        files.append(file);
+        QStringList files(selected_files);
         this->emitFilesSelected(files);
         }
         return;

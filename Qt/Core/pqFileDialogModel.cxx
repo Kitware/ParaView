@@ -381,7 +381,17 @@ public:
     else if(Index.row() < this->FileList.size())
       { 
       pqFileDialogModelFileInfo& file = this->FileList[Index.row()];
-      results.push_back(file.filePath());
+      if (file.isGroup() && file.group().count()>0)
+        {
+        for (int i=0; i<file.group().count();i++)
+          {
+          results.push_back(file.group().at(i).filePath());
+          }
+        }
+      else
+        {
+        results.push_back(file.filePath());
+        }
       }
 
     return results;
