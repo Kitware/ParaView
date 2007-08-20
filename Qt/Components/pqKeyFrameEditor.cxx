@@ -334,7 +334,8 @@ public:
 
 //-----------------------------------------------------------------------------
 pqKeyFrameEditor::pqKeyFrameEditor(pqAnimationScene* scene, 
-                                   pqAnimationCue* cue, QWidget* p)
+                                   pqAnimationCue* cue, QWidget* p,
+                                   const QString& label)
   : QWidget(p)
 {
   this->Internal = new pqInternal;
@@ -378,26 +379,7 @@ pqKeyFrameEditor::pqKeyFrameEditor(pqAnimationScene* scene,
   connect(this->Internal->pbDeleteAll, SIGNAL(clicked(bool)),
           this, SLOT(deleteAllKeyFrames()));
   
-  QString label;
-  pqServerManagerModel* sm =
-    pqApplicationCore::instance()->getServerManagerModel();
-  vtkSMProxy* pxy = cue->getAnimatedProxy();
-  pqProxy* animatedProxy = sm->findItem<pqProxy*>(pxy);
-  if(animatedProxy)
-    {
-    vtkSMProperty* animatedProperty = cue->getAnimatedProperty();
-    label = QString("%1 %2");
-    label = label.arg(animatedProxy->getSMName());
-    label = label.arg(pxy->GetPropertyName(animatedProperty));
-    int idx = cue->getAnimatedPropertyIndex();
-    if(idx != -1)
-      {
-      label += QString("(%1)").arg(idx);
-      }
-    }
-
-  this->Internal->label->setText(QString("Editing keyframes for ") + label);
-
+  this->Internal->label->setText(label);
 }
 
 //-----------------------------------------------------------------------------

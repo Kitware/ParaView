@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationKeyFrame.h"
 
 #include "vtkSMProxy.h"
+#include "vtkSMProperty.h"
 #include "vtkSMAnimationSceneProxy.h"
 
 #include "pqApplicationCore.h"
@@ -105,17 +106,40 @@ public:
       {
       pqServerManagerModel* model = 
         pqApplicationCore::instance()-> getServerManagerModel();
-      pqProxy* pxy = model->findItem<pqProxy*>(cue->getAnimatedProxy());
+      
+      vtkSMProxy* pxy = cue->getAnimatedProxy();
       vtkSMProperty* pty = cue->getAnimatedProperty();
-      if(pxy && pty)
+      QString p = pty->GetXMLLabel();
+      if(pqSMAdaptor::getPropertyType(pty) == pqSMAdaptor::MULTIPLE_ELEMENTS)
         {
-        QString n = pxy->getSMName();
-        QString p = pxy->getProxy()->GetPropertyName(pty);
-        if(pqSMAdaptor::getPropertyType(pty) == pqSMAdaptor::MULTIPLE_ELEMENTS)
+        p = QString("%1 (%2)").arg(p).arg(cue->getAnimatedPropertyIndex());
+        }
+      
+      QList<pqProxy*> pxys = model->findItems<pqProxy*>();
+      for(int i=0; i<pxys.size(); i++)
+        {
+        if(pxys[i]->getProxy() == pxy)
           {
-          p = QString("%1 (%2)").arg(p).arg(cue->getAnimatedPropertyIndex());
+          QString n = pxys[i]->getSMName();
+          name = QString("%1 - %2").arg(n).arg(p);
           }
-        name = QString("%1 - %2").arg(n).arg(p);
+        }
+      
+      // could be a helper proxy
+      for(int i=0; i<pxys.size(); i++)
+        {
+        pqProxy* pqproxy = pxys[i];
+        QList<vtkSMProxy*> helpers = pqproxy->getHelperProxies();
+        int idx = helpers.indexOf(pxy);
+        if(idx != -1)
+          {
+          QString key = pqproxy->getHelperKeys()[idx];
+          vtkSMProperty* prop =
+            pqproxy->getProxy()->GetProperty(key.toAscii().data());
+          QString pp = prop->GetXMLLabel();
+          QString n = pqproxy->getSMName();
+          name = QString("%1 - %2 - %3").arg(n).arg(pp).arg(p);
+          }
         }
       }
     return name;
@@ -352,7 +376,8 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
   this->Internal->Editor->setWindowTitle(tr("Animation Keyframes"));
   QVBoxLayout* l = new QVBoxLayout(this->Internal->Editor);
   pqKeyFrameEditor* editor = new pqKeyFrameEditor(this->Internal->Scene,
-                                                  cue, this->Internal->Editor);
+                      cue, this->Internal->Editor,
+                      QString("Editing ") + this->Internal->cueName(cue));
   QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok
                                               | QDialogButtonBox::Cancel);
   l->addWidget(editor);

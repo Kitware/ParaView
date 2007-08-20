@@ -48,7 +48,8 @@ class PQCOMPONENTS_EXPORT pqKeyFrameEditor : public QWidget
   Q_OBJECT
 
 public:
-  pqKeyFrameEditor(pqAnimationScene* scene, pqAnimationCue* cue, QWidget* p);
+  pqKeyFrameEditor(pqAnimationScene* scene, pqAnimationCue* cue,
+                   QWidget* p, const QString& label);
   ~pqKeyFrameEditor();
 
   /// The keyframe editor can be set in a mode where the user can only edit the
