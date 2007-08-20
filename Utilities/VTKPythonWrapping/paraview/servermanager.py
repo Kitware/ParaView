@@ -165,8 +165,8 @@ class Proxy(object):
          
     def GetProperty(self, name):
         """Given a property name, returns the property object."""
-        if name in self.__Properties:
-            return self.__Properties[name]
+        if name in self.__Properties and self.__Properties[name]():
+            return self.__Properties[name]()
         smproperty = self.SMProxy.GetProperty(name)
         if smproperty:
             property = None
@@ -177,7 +177,8 @@ class Proxy(object):
             elif smproperty.IsA("vtkSMProxyProperty"):
                 property = ProxyProperty(self, smproperty)
             if property is not None:
-                self.__Properties[name] = property
+                import weakref
+                self.__Properties[name] = weakref.ref(property)
             return property
         return None
             
@@ -261,18 +262,16 @@ class Property(object):
     of the vtkSMProperty C++ class.
     """
     def __init__(self, proxy, smproperty):
-        """Default constructor. Stores a weakref to the proxy. Note
-        that Property objects will not function if the proxy they
-        are referring to goes away."""
+        """Default constructor. Stores a reference to the proxy."""
         import weakref
         self.SMProperty = smproperty
-        self.Proxy = weakref.ref(proxy)
+        self.Proxy = proxy
 
     def __repr__(self):
         """Returns a string representation containing property name
         and value"""
         repr = "Property name= "
-        name = self.Proxy().GetPropertyName(self.SMProperty)
+        name = self.Proxy.GetPropertyName(self.SMProperty)
         if name:
             repr += name
         else:
@@ -286,7 +285,7 @@ class Property(object):
 
     def _FindPropertyName(self):
         "Returns the name of this property."
-        return self.Proxy().GetPropertyName(self.SMProperty)
+        return self.Proxy.GetPropertyName(self.SMProperty)
 
     def _UpdateProperty(self):
         "Pushes the value of this property to the server."
@@ -296,8 +295,8 @@ class Property(object):
         # has no effect. Updating all properties everytime one is
         # updated has the effect of pushing values set before Input
         # when Input is updated.
-        # self.Proxy().SMProxy.UpdateProperty(self._FindPropertyName())
-        self.Proxy().SMProxy.UpdateVTKObjects()
+        # self.Proxy.SMProxy.UpdateProperty(self._FindPropertyName())
+        self.Proxy.SMProxy.UpdateVTKObjects()
 
 class VectorProperty(Property):
     """Python wrapper for vtkSMVectorProperty and sub-classes.
@@ -398,7 +397,7 @@ class ProxyProperty(Property):
     def __delitem__(self, idx):
         """Removes the element idx"""
         proxy = self[idx].SMProxy
-        self.SMProperty.RemoveProxy(proxy.SMProxy)
+        self.SMProperty.RemoveProxy(proxy)
         self._UpdateProperty()
 
     def __getslice__(self, min, max):
@@ -424,7 +423,7 @@ class ProxyProperty(Property):
         """Removes elements [min, max)"""
         proxies = []
         for i in range(min, max):
-            proxies.append(self[i])
+            proxies.append(self[i].SMProxy)
         for i in proxies:
             self.SMProperty.RemoveProxy(i)
         self._UpdateProperty()
