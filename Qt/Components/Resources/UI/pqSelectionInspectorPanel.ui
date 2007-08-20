@@ -45,12 +45,12 @@
        </property>
        <item>
         <property name="text" >
-         <string>Cell</string>
+         <string>CELL</string>
         </property>
        </item>
        <item>
         <property name="text" >
-         <string>Point</string>
+         <string>POINT</string>
         </property>
        </item>
       </widget>
@@ -1434,12 +1434,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqCollapsedGroup</class>
-   <extends>QGroupBox</extends>
-   <header>pqCollapsedGroup.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>pqDoubleRangeWidget</class>
    <extends>QWidget</extends>
    <header>pqDoubleRangeWidget.h</header>
@@ -1448,6 +1442,12 @@
    <class>pqColorChooserButton</class>
    <extends>QPushButton</extends>
    <header>pqColorChooserButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqCollapsedGroup</class>
+   <extends>QGroupBox</extends>
+   <header>pqCollapsedGroup.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
@@ -1491,11 +1491,11 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>80</x>
+     <x>84</x>
      <y>444</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>88</x>
+     <x>92</x>
      <y>444</y>
     </hint>
    </hints>
