@@ -272,7 +272,7 @@ void pqSignalAdaptorKeyFrameValue::onDomainChanged()
   if (this->Internals->ActiveWidgetType == pqInternals::LINEEDIT && index != -1)
     {
     this->Internals->MinValue.clear();
-    this->Internals->MinValue.clear();
+    this->Internals->MaxValue.clear();
 
     // decide min/max visibility.
     bool min_visible = false;
