@@ -93,13 +93,13 @@ void pqSpreadSheetViewSelectionModel::serverSelectionChanged()
 }
 
 //-----------------------------------------------------------------------------
-void pqSpreadSheetViewSelectionModel::select(const QItemSelection& selection, 
+void pqSpreadSheetViewSelectionModel::select(const QItemSelection& sel, 
     QItemSelectionModel::SelectionFlags command)
 {
   if (!this->UpdatingSelection && command != QItemSelectionModel::NoUpdate)
     {
     // Update VTK Selection.
-    // * Obtain the currently set selection on the selected source (if none, a
+    // * Obtain the currently set sel on the selected source (if none, a
     //    new one is created).
     // * We then update the ids selected on the
     vtkSmartPointer<vtkSMSourceProxy> selSource ;
@@ -120,7 +120,7 @@ void pqSpreadSheetViewSelectionModel::select(const QItemSelection& selection,
         // Get the (process id, index) pairs for the indices indicated in the 
         // selection.
         QSet<QPair<vtkIdType, vtkIdType> > vtkIndices 
-          = this->Internal->Model->getVTKIndices(selection.indexes());
+          = this->Internal->Model->getVTKIndices(sel.indexes());
 
         QSet<QPair<vtkIdType, vtkIdType> > curIndices;
         for (int cc=0; cc < ids.size()/2; cc++)
@@ -170,7 +170,7 @@ void pqSpreadSheetViewSelectionModel::select(const QItemSelection& selection,
     }
   else
     {
-    this->Superclass::select(selection, command);
+    this->Superclass::select(sel, command);
     }
 }
 

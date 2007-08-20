@@ -478,9 +478,9 @@ QItemSelection pqSpreadSheetViewModel::convertToQtSelection(vtkSelection* vtksel
       vtkselection->GetSelectionList());
     for (vtkIdType cc=0; indices && cc < indices->GetNumberOfTuples(); cc++)
       {
-      vtkIdType index = indices->GetValue(cc);
+      vtkIdType idx = indices->GetValue(cc);
       // cout << "Selection (" << pid << ", " << index << ") " << endl;
-      QModelIndex qtIndex = this->indexFor(pid, index);
+      QModelIndex qtIndex = this->indexFor(pid, idx);
       if (qtIndex.isValid())
         {
         // cout << "Selecting: " << qtIndex.row() << endl;
@@ -504,9 +504,9 @@ QSet<QPair<vtkIdType, vtkIdType> > pqSpreadSheetViewModel::getVTKIndices(
     this->getRepresentationProxy();
   if (repr)
     {
-    foreach (QModelIndex index, indexes)
+    foreach (QModelIndex idx, indexes)
       {
-      int row = index.row();
+      int row = idx.row();
       vtkIdType blockNumber = this->Internal->computeBlockNumber(row);
       vtkIdType blockOffset = this->Internal->computeBlockOffset(row);
 
@@ -515,9 +515,9 @@ QSet<QPair<vtkIdType, vtkIdType> > pqSpreadSheetViewModel::getVTKIndices(
       if (table)
         {
         vtkVariant processId = table->GetValueByName(blockOffset, "vtkOriginalProcessIds");
-        vtkVariant index = table->GetValueByName(blockOffset, "vtkOriginalIndices");
+        vtkVariant vtkindex = table->GetValueByName(blockOffset, "vtkOriginalIndices");
         int pid = processId.IsValid()? processId.ToInt() : 0;
-        vtkindices.insert(QPair<vtkIdType, vtkIdType>(pid, index.ToLong()));
+        vtkindices.insert(QPair<vtkIdType, vtkIdType>(pid, vtkindex.ToLong()));
         }
       }
     }
