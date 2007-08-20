@@ -217,7 +217,7 @@ MainWindow::MainWindow() :
     activeViewOptions);
   activeViewOptions->registerOptions(pqPlotView::barChartType(), chartOptions);
   activeViewOptions->registerOptions(pqPlotView::XYPlotType(), chartOptions);
-  connect(this->Implementation->UI.actionEditSettings,
+  connect(this->Implementation->UI.actionEditView,
     SIGNAL(triggered()), activeViewOptions, SLOT(showOptions()));
     
   connect(this->Implementation->UI.actionEditRedo,
