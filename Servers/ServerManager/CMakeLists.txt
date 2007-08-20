@@ -219,7 +219,6 @@ SET_SOURCE_FILES_PROPERTIES(
 
 INCLUDE_DIRECTORIES(
   ${VTK_INCLUDE_DIR}
-  ${TCL_INCLUDE_PATH}
   ${ParaView_SOURCE_DIR}/Servers/Filters
   ${ParaView_SOURCE_DIR}/Servers/Common
   ${ParaView_SOURCE_DIR}/Servers/ServerManager
@@ -272,30 +271,12 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
   ${KWCommon_LIBRARIES}
   vtkXdmfCS vtkXdmf)
 
-# Create Tcl wrappers for classes.
-IF (PARAVIEW_BUILD_GUI)
-  SET(VTK_WRAP_TCL_EXE ${PARAVIEW_VTK_WRAP_TCL_EXE})
-  SET(VTK_WRAP_TCL_INIT_EXE ${PARAVIEW_VTK_WRAP_TCL_INIT_EXE})
-  INCLUDE("${VTK_CMAKE_DIR}/vtkWrapTcl.cmake")
-  VTK_WRAP_TCL3(
-    vtk${KIT}TCL 
-    KitTCL_SRCS 
-    "${Kit_SRCS}"
-    ""
-    )
-  CONFIGURE_FILE(
-    "${CMAKE_CURRENT_SOURCE_DIR}/vtkPVProcessModuleBatchHelperConfig.h.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/vtkPVProcessModuleBatchHelperConfig.h"
-    @ONLY IMMEDIATE)
-  ADD_LIBRARY(vtk${KIT}TCL ${KitTCL_SRCS}
-    vtkPVProcessModuleBatchHelper.cxx
-    )
-  TARGET_LINK_LIBRARIES (vtk${KIT}TCL vtk${KIT} vtkCommonTCL)
-  TARGET_LINK_LIBRARIES (vtk${KIT}TCL vtkPVServerCommonTCL)
-ENDIF (PARAVIEW_BUILD_GUI)
-
 IF (PARAVIEW_ENABLE_PYTHON)
   SET(Kit_PYTHON_EXTRA_SRCS)
+  SET (Kit_SRCS
+      ${Kit_SRCS}
+      vtkSMXMLParser.cxx
+    )
   SET(KIT_PYTHON_LIBS
     vtkPVServerCommonPythonD vtk${KIT}
     )
@@ -420,10 +401,6 @@ SET_SOURCE_FILES_PROPERTIES(vtkSMApplication.cxx PROPERTIES OBJECT_DEPENDS
 
 IF(NOT PV_INSTALL_NO_LIBRARIES)
   SET (targets_to_install)
-  IF (PARAVIEW_BUILD_GUI)
-    SET (targets_to_install
-      vtk${KIT}TCL)
-  ENDIF (PARAVIEW_BUILD_GUI)
   
   IF(PARAVIEW_ENABLE_PYTHON)
     SET (targets_to_install ${targets_to_install} 
