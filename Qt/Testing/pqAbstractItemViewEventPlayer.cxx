@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAbstractItemViewEventPlayer.h"
 
 #include <QAbstractItemView>
+#include <QHeaderView>
 #include <QApplication>
 #include <QMouseEvent>
 #include <QKeyEvent>
@@ -125,9 +126,26 @@ bool pqAbstractItemViewEventPlayer::playEvent(QObject* Object, const QString& Co
       Qt::KeyboardModifiers keym = static_cast<Qt::KeyboardModifier>(args[2].toInt());
       int x = args[3].toInt();
       int y = args[4].toInt();
-      QModelIndex idx = GetIndex(object, args[5]);
-      QRect r = object->visualRect(idx);
-      QPoint pt = r.topLeft() + QPoint(x,y);
+      QPoint pt;
+      QHeaderView* header = qobject_cast<QHeaderView*>(object);
+      if(header)
+        {
+        int idx = args[5].toInt();
+        if(header->orientation() == Qt::Horizontal)
+          {
+          pt = QPoint(header->sectionPosition(idx), 4);
+          }
+        else
+          {
+          pt = QPoint(4, header->sectionPosition(idx));
+          }
+        }
+      else
+        {
+        QModelIndex idx = GetIndex(object, args[5]);
+        QRect r = object->visualRect(idx);
+        pt = r.topLeft() + QPoint(x,y);
+        }
       QEvent::Type type = QEvent::MouseButtonPress;
       type = Command == "mouseMove" ? QEvent::MouseMove : type;
       type = Command == "mouseRelease" ? QEvent::MouseButtonRelease : type;

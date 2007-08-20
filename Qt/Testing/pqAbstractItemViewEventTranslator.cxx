@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAbstractItemViewEventTranslator.h"
 
 #include <QAbstractItemView>
+#include <QHeaderView>
 #include <QEvent>
 #include <QKeyEvent>
 
@@ -95,10 +96,22 @@ bool pqAbstractItemViewEventTranslator::translateEvent(QObject* Object, QEvent* 
         {
         this->LastPos = mouseEvent->pos();
         }
-      QModelIndex idx = object->indexAt(mouseEvent->pos());
-      QString idxStr = toIndexStr(idx);
-      QRect r = object->visualRect(idx);
-      QPoint relPt = mouseEvent->pos() - r.topLeft();
+      QString idxStr;
+      QPoint relPt = QPoint(0,0);
+      QHeaderView* header = qobject_cast<QHeaderView*>(object);
+      if(header)
+        {
+        int idx = header->logicalIndexAt(mouseEvent->pos());
+        idxStr = QString("%1").arg(idx);
+        }
+      else
+        {
+        QModelIndex idx = object->indexAt(mouseEvent->pos());
+        idxStr = toIndexStr(idx);
+        QRect r = object->visualRect(idx);
+        relPt = mouseEvent->pos() - r.topLeft();
+        }
+
       QString info = QString("%1,%2,%3,%4,%5,%6")
         .arg(mouseEvent->button())
         .arg(mouseEvent->buttons())
