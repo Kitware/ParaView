@@ -73,6 +73,9 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
   QObject::connect(this->Header->model(),
                    SIGNAL(rowsInserted(QModelIndex,int,int)),
                    this, SLOT(updateSizes()));
+  QObject::connect(this->Header->model(),
+                   SIGNAL(rowsRemoved(QModelIndex,int,int)),
+                   this, SLOT(updateSizes()));
   QObject::connect(this->Header,
                    SIGNAL(sectionDoubleClicked(int)),
                    this, SLOT(headerDblClicked(int)));
