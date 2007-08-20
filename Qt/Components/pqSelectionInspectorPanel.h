@@ -121,6 +121,7 @@ protected slots:
   void updateSelectionSource();
 
   virtual void onSelectionModeChanged(int mode);
+  virtual void onSelectionContentTypeChanged();
   virtual void onActiveViewChanged();
   /// Requests update on all views the
   /// Representation is visible in.

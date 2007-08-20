@@ -122,7 +122,7 @@ public:
     this->SelectionSource = 0;
     this->Representation = 0;
     this->InputSource = 0;
-    this->VTKConnect = vtkEventQtSlotConnect::New();
+    this->VTKConnectSelInput = vtkEventQtSlotConnect::New();
     }
 
   ~pqImplementation()
@@ -148,7 +148,7 @@ public:
     this->SelectionSource = 0;
     this->InputSource = 0;
     this->Representation = 0;
-    this->VTKConnect->Delete();
+    this->VTKConnectSelInput->Delete();
     }
 
   QPointer<pqSelectionManager> SelectionManager;
@@ -163,7 +163,7 @@ public:
   vtkSmartPointer<vtkSMSourceProxy> SelectionSource;
 
   // Selection Labels Properties
-  vtkEventQtSlotConnect* VTKConnect;
+  vtkEventQtSlotConnect* VTKConnectSelInput;
   pqPropertyLinks* SourceLinks;
   pqPropertyLinks* RepLinks;
 
@@ -299,14 +299,15 @@ void pqSelectionInspectorPanel::onSelectionChanged()
     //this->setEnabled(true);
     this->setSelectionSource(inputsrc->GetSelectionInput(portnum));
 
-    this->Implementation->VTKConnect->Disconnect();
-    this->Implementation->VTKConnect->Connect(
+    this->Implementation->VTKConnectSelInput->Disconnect();
+    this->Implementation->VTKConnectSelInput->Connect(
       inputsrc->GetSelectionInput(portnum),
       //inputsrc,
       vtkCommand::ModifiedEvent, this, 
       SLOT(updateSelectionSource()),
       NULL, 0.0,
       Qt::QueuedConnection);
+
     }
 }
 
@@ -427,7 +428,7 @@ void pqSelectionInspectorPanel::setupGUI()
     this->Implementation->comboSelectionType);
   QObject::connect(this->Implementation->SelectionTypeAdaptor, 
     SIGNAL(currentTextChanged(const QString&)),
-    this, SLOT(updateSelectionContentType(const QString&)));
+    this, SLOT(updateSelectionContentType(const QString&)), Qt::QueuedConnection);
 
   this->Implementation->FieldTypeAdaptor = new pqSignalAdaptorComboBox(
     this->Implementation->comboFieldType);
@@ -587,6 +588,12 @@ void pqSelectionInspectorPanel::updateSelectionSource()
 void pqSelectionInspectorPanel::updateSelectionSourceGUI()
 {
   vtkSMProxy* selectionSource = this->Implementation->SelectionSource.GetPointer();
+
+  //this->Implementation->SourceLinks->addPropertyLink(
+  //  this->Implementation->SelectionTypeAdaptor, "currentText", 
+  //  SIGNAL(currentTextChanged(const QString&)),
+  //  selectionSource, selectionSource->GetProperty("ContentType"));
+  this->onSelectionContentTypeChanged();
 
   this->Implementation->SourceLinks->addPropertyLink(
     this->Implementation->FieldTypeAdaptor, "currentText", 
@@ -1035,24 +1042,6 @@ void pqSelectionInspectorPanel::updateSurfaceInformationAndDomains()
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::updateSelectionContentType(const QString& type)
 {
-  // update the RubberBandHelper
-  if(type == QString("Thresholds"))
-    {
-    //this->Implementation->RubberBandHelper->
-    }
-  else if(type == QString("Frustum"))
-    {
-    this->Implementation->RubberBandHelper->beginFrustumSelection();
-    }
-  else if(type == QString("Surface"))
-    {
-    this->Implementation->RubberBandHelper->beginSelection();
-    }
-  else //None
-    {
-    this->Implementation->RubberBandHelper->endSelection();
-    }
-  
   // Set up selection connections
   vtkSMProxy* selectionSource = this->Implementation->SelectionSource.GetPointer();
   if(!selectionSource)
@@ -1083,6 +1072,26 @@ void pqSelectionInspectorPanel::updateSelectionContentType(const QString& type)
   else //None
     {
     }
+
+  // update the RubberBandHelper
+  if(type == QString("Thresholds"))
+    {
+    //this->Implementation->RubberBandHelper->
+    }
+  else if(type == QString("Frustum"))
+    {
+    this->Implementation->RubberBandHelper->beginFrustumSelection();
+    }
+  else if(type == QString("Surface"))
+    {
+    this->Implementation->RubberBandHelper->beginSelection();
+    }
+  else //None
+    {
+    //return;
+    this->Implementation->RubberBandHelper->endSelection();
+    }
+
 }
 
 //-----------------------------------------------------------------------------
@@ -1331,13 +1340,39 @@ void pqSelectionInspectorPanel::onSelectionModeChanged(int selMode)
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::onSelectionContentTypeChanged()
+{
+  // Set up selection connections
+  vtkSMProxy* selectionSource = this->Implementation->SelectionSource.GetPointer();
+  if(!selectionSource)
+  {
+    return;
+  }
+
+  vtkSMProperty* idvp = selectionSource->GetProperty("ContentType");
+  if(!idvp)
+  {
+    return;
+  }
+  int contType = pqSMAdaptor::getElementProperty(idvp).toInt();
+
+  if(contType == vtkSelection::INDICES || contType == vtkSelection::GLOBALIDS)
+    {
+    this->Implementation->SelectionTypeAdaptor->setCurrentText("Surface");
+    }
+  else if(contType == vtkSelection::FRUSTUM)
+    {
+    this->Implementation->SelectionTypeAdaptor->setCurrentText("Frustum");
+    }
+}
 
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::onActiveViewChanged()
 {
-  pqRenderView* view = qobject_cast<pqRenderView*>(
+  pqRenderView* renView = qobject_cast<pqRenderView*>(
     pqActiveView::instance().current());
-  if (!view)
+  if (!renView)
     {
     this->Implementation->groupSelectionLabel->setEnabled(false);
     }
@@ -1348,17 +1383,12 @@ void pqSelectionInspectorPanel::onActiveViewChanged()
       this->Implementation->SelectionManager->getSelectedPort();
     pqPipelineSource* input = port? port->getSource() : 0;
 
-    pqRenderView* view = qobject_cast<pqRenderView*>(
-      pqActiveView::instance().current());
-    if (view)
+    pqDataRepresentation *repr = NULL;
+    if(input)
       {
-      pqDataRepresentation *repr = NULL;
-      if(input)
-        {
-        repr = input->getRepresentation(pqActiveView::instance().current());
-        }
-
-      this->setRepresentation(repr);
+      repr = input->getRepresentation(renView);
       }
+
+    this->setRepresentation(repr);
     }
 }
