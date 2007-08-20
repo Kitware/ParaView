@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkIndexBasedBlockFilter.h
+  Module:    vtkIndexBasedBlockSelectionFilter.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,27 +12,29 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkIndexBasedBlockFilter - Filter that convert a field attributes of 
-// a dataobject to a vtkTable, passing only the selected block of attributes.
+// .NAME vtkIndexBasedBlockSelectionFilter
 // .SECTION Description
-// vtkIndexBasedBlockFilter is used to pass a vtkTable of field data associated
-// with a dataobject/dataset for a selected block. 
+// vtkIndexBasedBlockSelectionFilter is a selection algorithm that takes in a
+// vtkSelection and produces a vtkSelection on the output. It is designed to be
+// used in conjunction with vtkIndexBasedBlockFilter to generate a vtkSelection
+// corresponding to the block produced by the vtkIndexBasedBlockFilter. This
+// filter can only work on INDEX based selections.
 
-#ifndef __vtkIndexBasedBlockFilter_h
-#define __vtkIndexBasedBlockFilter_h
+#ifndef __vtkIndexBasedBlockSelectionFilter_h
+#define __vtkIndexBasedBlockSelectionFilter_h
 
-#include "vtkTableAlgorithm.h"
+#include "vtkSelectionAlgorithm.h"
 
 class vtkMultiProcessController;
 
-class VTK_EXPORT vtkIndexBasedBlockFilter : public vtkTableAlgorithm
+class VTK_EXPORT vtkIndexBasedBlockSelectionFilter : public vtkSelectionAlgorithm
 {
 public:
-  static vtkIndexBasedBlockFilter* New();
-  vtkTypeRevisionMacro(vtkIndexBasedBlockFilter, vtkTableAlgorithm);
+  static vtkIndexBasedBlockSelectionFilter* New();
+  vtkTypeRevisionMacro(vtkIndexBasedBlockSelectionFilter, vtkSelectionAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
+   // Description:
   // Get/Set the number of indices that fit within one block.
   vtkSetMacro(BlockSize, vtkIdType);
   vtkGetMacro(BlockSize, vtkIdType);
@@ -67,13 +69,12 @@ public:
     POINT=1,
     FIELD=2
     };
-  //ETX
+  //ETX 
 
 //BTX
 protected:
-  vtkIndexBasedBlockFilter();
-  ~vtkIndexBasedBlockFilter();
-
+  vtkIndexBasedBlockSelectionFilter();
+  ~vtkIndexBasedBlockSelectionFilter();
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
   // Description:
@@ -95,8 +96,8 @@ protected:
   vtkIdType StartIndex;
   vtkIdType EndIndex;
 private:
-  vtkIndexBasedBlockFilter(const vtkIndexBasedBlockFilter&); // Not implemented
-  void operator=(const vtkIndexBasedBlockFilter&); // Not implemented
+  vtkIndexBasedBlockSelectionFilter(const vtkIndexBasedBlockSelectionFilter&); // Not implemented
+  void operator=(const vtkIndexBasedBlockSelectionFilter&); // Not implemented
 //ETX
 };
 

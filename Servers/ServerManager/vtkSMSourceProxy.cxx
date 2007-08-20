@@ -38,7 +38,7 @@
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.55");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.56");
 
 struct vtkSMSourceProxyInternals
 {
@@ -554,6 +554,8 @@ void vtkSMSourceProxy::CreateSelectionProxies()
 void vtkSMSourceProxy::SetSelectionInput(unsigned int portIndex,
   vtkSMSourceProxy* input, unsigned int outputport)
 {
+  this->CreateSelectionProxies();
+
   if (this->PInternals->SelectionProxies.size() <= portIndex)
     {
     return;

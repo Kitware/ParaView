@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Server Manager Includes.
 #include "vtkSMViewProxy.h"
-#include "vtkSMBlockDeliveryRepresentationProxy.h"
+#include "vtkSMSpreadSheetRepresentationProxy.h"
+#include "vtkSMSourceProxy.h"
 
 // Qt Includes.
 #include <QHeaderView>
@@ -43,9 +44,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Includes.
 #include "pqOutputPort.h"
+#include "pqDataRepresentation.h"
 #include "pqServer.h"
-#include "pqRepresentation.h"
 #include "pqSpreadSheetViewModel.h"
+#include "pqSpreadSheetViewSelectionModel.h"
+#include "pqPipelineSource.h"
 
 //-----------------------------------------------------------------------------
 class pqSpreadSheetView::pqDelegate : public QItemDelegate
@@ -111,7 +114,7 @@ protected:
 class pqSpreadSheetView::pqInternal
 {
 public:
-  pqInternal()
+  pqInternal():Model(), SelectionModel(&this->Model)
   {
   pqSpreadSheetView::pqTableView* table = new pqSpreadSheetView::pqTableView();
   pqSpreadSheetView::pqDelegate* delegate = new pqSpreadSheetView::pqDelegate(table);
@@ -120,6 +123,7 @@ public:
   this->Table= table;
   this->Table->setModel(&this->Model);
   this->Table->setSelectionBehavior(QAbstractItemView::SelectRows);
+  this->Table->setSelectionModel(&this->SelectionModel);
   this->Table->horizontalHeader()->setMovable(true);
   }
 
@@ -130,6 +134,7 @@ public:
 
   QPointer<QTableView> Table;
   pqSpreadSheetViewModel Model;
+  pqSpreadSheetViewSelectionModel SelectionModel;
 };
 
 
@@ -149,6 +154,10 @@ pqSpreadSheetView::pqSpreadSheetView(
     this, SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)),
     this, SLOT(updateRepresentationVisibility(pqRepresentation*, bool)));
   QObject::connect(this, SIGNAL(endRender()), this, SLOT(onEndRender()));
+
+  QObject::connect(
+    &this->Internal->SelectionModel, SIGNAL(selection(vtkSMSourceProxy*)),
+    this, SLOT(onCreateSelection(vtkSMSourceProxy*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -176,7 +185,7 @@ void pqSpreadSheetView::onRemoveRepresentation(pqRepresentation* repr)
 {
   if (repr && repr->getProxy() == this->Internal->Model.getRepresentationProxy())
     {
-    this->Internal->Model.setRepresentationProxy(0);
+    this->Internal->Model.setRepresentation(0);
     }
 }
 
@@ -184,6 +193,11 @@ void pqSpreadSheetView::onRemoveRepresentation(pqRepresentation* repr)
 void pqSpreadSheetView::updateRepresentationVisibility(
   pqRepresentation* repr, bool visible)
 {
+  if (!visible && repr && 
+    this->Internal->Model.getRepresentationProxy() == repr->getProxy())
+    {
+    this->Internal->Model.setRepresentation(0);
+    }
   if (!visible || !repr)
     {
     return;
@@ -199,15 +213,13 @@ void pqSpreadSheetView::updateRepresentationVisibility(
       }
     }
 
-  this->Internal->Model.setRepresentationProxy(
-    vtkSMBlockDeliveryRepresentationProxy::SafeDownCast(
-      repr->getProxy()));
+  this->Internal->Model.setRepresentation(qobject_cast<pqDataRepresentation*>(repr));
 }
 
 //-----------------------------------------------------------------------------
 void pqSpreadSheetView::onEndRender()
 {
-  cout << "Render" << endl;
+  // cout << "Render" << endl;
   this->Internal->Model.forceUpdate();
 }
 
@@ -216,4 +228,27 @@ bool pqSpreadSheetView::canDisplay(pqOutputPort* opPort) const
 {
   return (opPort && opPort->getServer()->GetConnectionID() == 
     this->getServer()->GetConnectionID());
+}
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetView::onCreateSelection(vtkSMSourceProxy* selSource)
+{
+  pqDataRepresentation* repr = this->Internal->Model.getRepresentation();
+  if (repr)
+    {
+    pqOutputPort* opport = repr->getOutputPortFromInput();
+    vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(
+      opport->getSource()->getProxy());
+    input->CleanSelectionInputs(opport->getPortNumber());
+    if (selSource)
+      {
+      input->SetSelectionInput(
+        opport->getPortNumber(), selSource, 0);
+      }
+    emit this->selected(opport);
+    }
+  else
+    {
+    emit this->selected(0);
+    }
 }

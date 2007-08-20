@@ -1297,7 +1297,8 @@ void pqSelectionInspectorPanel::updateRepresentationViews()
 {
   if (this->Implementation->Representation)
     {
-    this->Implementation->Representation->renderViewEventually();
+    this->Implementation->Representation->
+      getOutputPortFromInput()->renderAllViews(false);
     }
 }
 

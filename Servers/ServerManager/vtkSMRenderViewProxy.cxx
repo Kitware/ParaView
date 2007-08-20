@@ -68,6 +68,7 @@
 
 #include <vtkstd/map>
 #include <vtkstd/set>
+#include <vtkstd/vector>
 
 //-----------------------------------------------------------------------------
 inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
@@ -89,7 +90,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.38");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.39");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1255,35 +1256,54 @@ vtkSelection* vtkSMRenderViewProxy::NewSelectionForProp(
 //-----------------------------------------------------------------------------
 static void vtkSMRenderViewProxyShrinkSelection(vtkSelection* sel)
 {
+  vtkstd::map<int, int> propToPixelCount;
+  
   unsigned int numChildren = sel->GetNumberOfChildren();
   unsigned int cc;
-  vtkSmartPointer<vtkSelection> preferredChild;
+
+  int choosenPropId = -1;
   int maxPixels = -1;
   for (cc=0; cc < numChildren; cc++)
     {
     vtkSelection* child = sel->GetChild(cc);
     vtkInformation* properties = child->GetProperties();
-    if (properties->Has(vtkSelection::PIXEL_COUNT()))
+    if (properties->Has(vtkSelection::PIXEL_COUNT()) && 
+      properties->Has(vtkSelection::PROP_ID()))
       {
       int numPixels = properties->Get(vtkSelection::PIXEL_COUNT());
+      int prop_id = properties->Get(vtkSelection::PROP_ID());
+      if (propToPixelCount.find(prop_id) != propToPixelCount.end())
+        {
+        numPixels += propToPixelCount[prop_id];
+        }
+
+      propToPixelCount[prop_id] = numPixels;
       if (numPixels > maxPixels)
         {
         maxPixels = numPixels;
-        preferredChild = child;
+        choosenPropId = prop_id;
         }
       }
     }
 
-  if (preferredChild)
+  vtkstd::vector<vtkSmartPointer<vtkSelection> > choosenChildren;
+  if (choosenPropId != -1)
     {
-    int i = int(numChildren)-1;
-    for (; i >=0; i--)
+    for (cc=0; cc < numChildren; cc++)
       {
-      if (sel->GetChild(i) != preferredChild.GetPointer())
+      vtkSelection* child = sel->GetChild(cc);
+      vtkInformation* properties = child->GetProperties();
+      if (properties->Has(vtkSelection::PROP_ID()) && 
+        properties->Get(vtkSelection::PROP_ID()) == choosenPropId)
         {
-        sel->RemoveChild(i);
+        choosenChildren.push_back(child);
         }
       }
+    }
+  sel->RemoveAllChildren();
+  for (cc=0; cc <choosenChildren.size(); cc++)
+    {
+    sel->AddChild(choosenChildren[cc]);
     }
 }
 

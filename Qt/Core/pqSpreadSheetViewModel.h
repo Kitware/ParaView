@@ -33,13 +33,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqSpreadSheetViewModel_h
 
 #include <QAbstractTableModel>
+#include <QPair>
+#include <QSet>
 #include "pqCoreExport.h"
+#include "vtkType.h" // needed for vtkIdType.
 
 /// This is the model used by SpreadSheetView to show the data. This model works
-/// with vtkSMBlockDeliveryRepresentationProxy to fetch blocks of data from the
-/// server and show them. It requires that vtkSMBlockDeliveryRepresentationProxy
+/// with vtkSMSpreadSheetRepresentationProxy to fetch blocks of data from the
+/// server and show them. It requires that vtkSMSpreadSheetRepresentationProxy
 /// delivers vtkTable.
-class vtkSMBlockDeliveryRepresentationProxy;
+class vtkSMSpreadSheetRepresentationProxy;
+class QItemSelectionModel;
+class QItemSelection;
+class vtkSelection;
+class pqDataRepresentation;
+
 class PQCORE_EXPORT pqSpreadSheetViewModel : public QAbstractTableModel
 {
   Q_OBJECT
@@ -47,6 +55,10 @@ class PQCORE_EXPORT pqSpreadSheetViewModel : public QAbstractTableModel
 public:
   pqSpreadSheetViewModel();
   ~pqSpreadSheetViewModel();
+
+  /// Returns the selection model that shows the selection on the representation
+  /// being shown by this model.
+  QItemSelectionModel* selectionModel() const;
 
   /// Returns the number of rows.
   int rowCount(const QModelIndex& parent=QModelIndex()) const;
@@ -63,10 +75,14 @@ public:
   QVariant headerData (int section, Qt::Orientation orientation, 
     int role=Qt::DisplayRole) const; 
 
+ 
+  /// Set/Get the data representation.
+  void setRepresentation(pqDataRepresentation*);
+  pqDataRepresentation* getRepresentation() const;
+
   /// Set/Get the representation proxy which is currently displayed in this
   /// model.
-  void setRepresentationProxy(vtkSMBlockDeliveryRepresentationProxy*);
-  vtkSMBlockDeliveryRepresentationProxy* getRepresentationProxy() const;
+  vtkSMSpreadSheetRepresentationProxy* getRepresentationProxy() const;
 
   /// resets the model.
   void forceUpdate();
@@ -74,12 +90,35 @@ public:
   /// Set the best estimate for the visible block. The model will request data
   /// (if not available) only for the most recently selected active block.
   void setActiveBlock(QModelIndex top, QModelIndex bottom);
+
+  QModelIndex indexFor(int processId, vtkIdType index);
+
+  /// Returns the field type for the data currently shown by this model.
+  int getFieldType() const;
+
+  /// returns the (process id, index) pair for all qt indices.
+  QSet<QPair<vtkIdType, vtkIdType> > getVTKIndices(const QModelIndexList& indexes);
 signals:
   void requestDelayedUpdate() const;
 
 private slots:
+  /// called to fetch data for all pending blocks.
   void delayedUpdate();
 
+  /// called to fetch selection for all pending blocks.
+  void delayedSelectionUpdate();
+
+protected:
+  /// Converts a vtkSelection to a QItemSelection.
+  QItemSelection convertToQtSelection(vtkSelection*);
+
+  /// Updates the selectionModel with the vtk selection provided by the
+  /// representation for the current block. This simply adds to the current Qt
+  /// selection, since representation can never give us the complete state of
+  /// selection. 
+  void updateSelectionForBlock(vtkIdType blocknumber);
+
+  void setRepresentationProxy(vtkSMSpreadSheetRepresentationProxy*);
 private:
   pqSpreadSheetViewModel(const pqSpreadSheetViewModel&); // Not implemented.
   void operator=(const pqSpreadSheetViewModel&); // Not implemented.

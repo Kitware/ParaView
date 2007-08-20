@@ -92,6 +92,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSettings.h
   pqSpreadSheetView.h
   pqSpreadSheetViewModel.h
+  pqSpreadSheetViewSelectionModel.h
   pqStandardServerManagerModelInterface.h
   pqStandardViewModules.h
   pqTableView.h
@@ -283,6 +284,8 @@ ADD_LIBRARY(pqCore
   pqSpreadSheetView.h
   pqSpreadSheetViewModel.cxx
   pqSpreadSheetViewModel.h
+  pqSpreadSheetViewSelectionModel.cxx
+  pqSpreadSheetViewSelectionModel.h
   pqStandardServerManagerModelInterface.cxx
   pqStandardServerManagerModelInterface.h
   pqStandardViewModules.cxx

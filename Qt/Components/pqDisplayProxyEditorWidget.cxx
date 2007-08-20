@@ -76,7 +76,7 @@ public:
 
     if(type == "BarChartRepresentation" ||
        type == "XYPlotRepresentation" ||
-       type == "BlockDeliveryRepresentation" ||
+       type == "SpreadSheetRepresentation" ||
        qobject_cast<pqTextRepresentation*>(proxy))
       {
       return true;
@@ -103,7 +103,7 @@ public:
       return new pqBarChartDisplayProxyEditor(proxy, p);
       }
 
-    if (type == "BlockDeliveryRepresentation")
+    if (type == "SpreadSheetRepresentation")
       {
       return new pqSpreadSheetDisplayEditor(proxy, p);
       }

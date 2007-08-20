@@ -32,7 +32,7 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.5");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.6");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -44,7 +44,7 @@ vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
 
   this->StartIndex= -1;
   this->EndIndex= -1;
-  this->FieldType = POINT_DATA_FIELD;
+  this->FieldType = POINT;
 }
 
 //----------------------------------------------------------------------------
@@ -87,15 +87,15 @@ int vtkIndexBasedBlockFilter::RequestData(vtkInformation*,
   switch (this->FieldType)
     {
 
-  case DATA_OBJECT_FIELD:
+  case FIELD:
     inFD = input->GetFieldData();
     break;
 
-  case CELL_DATA_FIELD:
+  case CELL:
     inFD = input->GetCellData();
     break;
 
-  case POINT_DATA_FIELD:
+  case POINT:
   default:
     inFD = input->GetPointData();
     break;
@@ -123,7 +123,7 @@ int vtkIndexBasedBlockFilter::RequestData(vtkInformation*,
     {
     originalIds->SetTupleValue(outIndex, &inIndex);
     outFD->SetTuple(outIndex, inIndex, inFD);
-    if (this->FieldType == POINT_DATA_FIELD)
+    if (this->FieldType == POINT)
       {
       if (psInput)
         {
@@ -186,15 +186,15 @@ bool vtkIndexBasedBlockFilter::DetermineBlockIndices()
   vtkIdType numFields;
   switch (this->FieldType)
     {
-  case CELL_DATA_FIELD:
+  case CELL:
     numFields = input->GetCellData()->GetNumberOfTuples();
     break;
 
-  case DATA_OBJECT_FIELD:
+  case FIELD:
     numFields = input->GetFieldData()->GetNumberOfTuples();
     break;
 
-  case POINT_DATA_FIELD:
+  case POINT:
   default:
     numFields = input->GetPointData()->GetNumberOfTuples();
     }

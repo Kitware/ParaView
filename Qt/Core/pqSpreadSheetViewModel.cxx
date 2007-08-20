@@ -32,32 +32,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpreadSheetViewModel.h"
 
 // Server Manager Includes.
+#include "vtkIdTypeArray.h"
 #include "vtkIndexBasedBlockFilter.h"
+#include "vtkInformation.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSelection.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMBlockDeliveryRepresentationProxy.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMSpreadSheetRepresentationProxy.h"
 #include "vtkStdString.h"
 #include "vtkTable.h"
 #include "vtkVariant.h"
 
 // Qt Includes.
-#include <QSet>
 #include <QTimer>
+#include <QItemSelectionModel>
+#include <QtDebug>
+#include <QPointer>
 
 // ParaView Includes.
 #include "pqSMAdaptor.h"
+#include "pqDataRepresentation.h"
+
+static uint qHash(QPair<vtkIdType, vtkIdType> pair)
+{
+  return qHash(pair.second);
+}
+
 
 class pqSpreadSheetViewModel::pqInternal
 {
 public:
-  pqInternal() : NumberOfColumns(0), NumberOfRows(0)
+  pqInternal(pqSpreadSheetViewModel* svmodel) : NumberOfColumns(0), NumberOfRows(0),
+  SelectionModel(svmodel)
   {
+  this->ActiveBlockNumber = 0;
   }
-  vtkSmartPointer<vtkSMBlockDeliveryRepresentationProxy> Representation;
+  QPointer<pqDataRepresentation> DataRepresentation;
+  vtkSmartPointer<vtkSMSpreadSheetRepresentationProxy> Representation;
   int NumberOfColumns;
   int NumberOfRows;
+  QItemSelectionModel SelectionModel;
+  vtkIdType ActiveBlockNumber;
 
   vtkIdType getBlockSize()
     {
@@ -80,25 +97,64 @@ public:
     return (row % blocksize);
     }
 
-  QSet<vtkIdType> PendingBlocks;
+  // Given the offset for a location in the current block,
+  // this computes the row number for that location.
+  int computeRowIndex(vtkIdType blockOffset)
+    {
+    vtkIdType blocksize = this->getBlockSize(); 
+    vtkIdType blockNumber = this->getBlockNumber(); 
+    return (blocksize*blockNumber + blockOffset);
+    }
+
+  int getFieldType()
+    {
+    return pqSMAdaptor::getElementProperty(
+      this->Representation->GetProperty("FieldType")).toInt();
+    }
+
+  vtkIdType getBlockNumber()
+    {
+    return this->ActiveBlockNumber;
+    }
+
   QTimer Timer;
+  QSet<vtkIdType> PendingBlocks;
+
+  QTimer SelectionTimer;
+  QSet<vtkIdType> PendingSelectionBlocks;
 };
 
 //-----------------------------------------------------------------------------
 pqSpreadSheetViewModel::pqSpreadSheetViewModel()
 {
-  this->Internal = new pqInternal();
+  this->Internal = new pqInternal(this);
   
   this->Internal->Timer.setSingleShot(true);
   this->Internal->Timer.setInterval(100);//milliseconds.
   QObject::connect(&this->Internal->Timer, SIGNAL(timeout()),
     this, SLOT(delayedUpdate()));
+
+  this->Internal->SelectionTimer.setSingleShot(true);
+  this->Internal->SelectionTimer.setInterval(100);//milliseconds.
+  QObject::connect(&this->Internal->SelectionTimer, SIGNAL(timeout()),
+    this, SLOT(delayedSelectionUpdate()));
+
+  this->Internal->Timer.setSingleShot(true);
+  this->Internal->Timer.setInterval(100);//milliseconds.
+  QObject::connect(&this->Internal->Timer, SIGNAL(timeout()),
+    this, SLOT(delayedSelectionUpdate()));
 }
 
 //-----------------------------------------------------------------------------
 pqSpreadSheetViewModel::~pqSpreadSheetViewModel()
 {
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+QItemSelectionModel* pqSpreadSheetViewModel::selectionModel() const
+{
+  return &this->Internal->SelectionModel;
 }
 
 //-----------------------------------------------------------------------------
@@ -114,8 +170,22 @@ int pqSpreadSheetViewModel::columnCount(const QModelIndex&) const
 }
 
 //-----------------------------------------------------------------------------
+void pqSpreadSheetViewModel::setRepresentation(pqDataRepresentation* repr)
+{
+  this->Internal->DataRepresentation = repr;
+  this->setRepresentationProxy(repr? 
+    vtkSMSpreadSheetRepresentationProxy::SafeDownCast(repr->getProxy()) : 0);
+}
+
+//-----------------------------------------------------------------------------
+pqDataRepresentation* pqSpreadSheetViewModel::getRepresentation() const
+{
+  return this->Internal->DataRepresentation;
+}
+
+//-----------------------------------------------------------------------------
 void pqSpreadSheetViewModel::setRepresentationProxy(
-  vtkSMBlockDeliveryRepresentationProxy* repr)
+  vtkSMSpreadSheetRepresentationProxy* repr)
 {
   if (this->Internal->Representation.GetPointer() != repr)
     {
@@ -124,10 +194,20 @@ void pqSpreadSheetViewModel::setRepresentationProxy(
 }
 
 //-----------------------------------------------------------------------------
-vtkSMBlockDeliveryRepresentationProxy* pqSpreadSheetViewModel::
+vtkSMSpreadSheetRepresentationProxy* pqSpreadSheetViewModel::
 getRepresentationProxy() const
 {
   return this->Internal->Representation;
+}
+
+//-----------------------------------------------------------------------------
+int pqSpreadSheetViewModel::getFieldType() const
+{
+  if (this->Internal->Representation)
+    {
+    return this->Internal->getFieldType();
+    }
+  return -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -137,12 +217,12 @@ void pqSpreadSheetViewModel::forceUpdate()
   // updated.
   this->Internal->NumberOfRows = 0;
   this->Internal->NumberOfColumns = 0;
-  vtkSMBlockDeliveryRepresentationProxy* repr = this->Internal->Representation;
+  vtkSMSpreadSheetRepresentationProxy* repr = this->Internal->Representation;
   if (repr)
     {
-    vtkTable* table = vtkTable::SafeDownCast(repr->GetOutput());
-    int field_type = pqSMAdaptor::getElementProperty(
-      repr->GetProperty("FieldType")).toInt();
+    vtkTable* table = vtkTable::SafeDownCast(
+      repr->GetOutput(this->Internal->ActiveBlockNumber));
+    int field_type = this->Internal->getFieldType(); 
 
     vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
       repr->GetProperty("Input"));
@@ -154,28 +234,58 @@ void pqSpreadSheetViewModel::forceUpdate()
       inputProxy->GetDataInformation(port) : 0;
     if (info)
       {
-      if (field_type == vtkIndexBasedBlockFilter::DATA_OBJECT_FIELD)
+      if (field_type == vtkIndexBasedBlockFilter::FIELD)
         {
         // TODO:
         }
-      else if (field_type == vtkIndexBasedBlockFilter::POINT_DATA_FIELD)
+      else if (field_type == vtkIndexBasedBlockFilter::POINT)
         {
         this->Internal->NumberOfRows = info->GetNumberOfPoints();
         }
-      else if (field_type == vtkIndexBasedBlockFilter::CELL_DATA_FIELD)
+      else if (field_type == vtkIndexBasedBlockFilter::CELL)
         {
         this->Internal->NumberOfRows = info->GetNumberOfCells();
         }
       }
     this->Internal->NumberOfColumns = table? table->GetNumberOfColumns()  :0;
+    if (this->Internal->NumberOfColumns == 0 && this->Internal->ActiveBlockNumber != 0)
+      {
+      // it is possible that the current index is invalid (data size may have
+      // shrunk), update the view once again.
+      this->Internal->ActiveBlockNumber = 0;
+      this->forceUpdate();
+      }
     }
+
+  this->Internal->SelectionModel.clear();
   this->reset();
+  
+  // We do not fetch any data just yet. All data fetches happen when we want to
+  // show the data on the GUI.
+}
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetViewModel::updateSelectionForBlock(
+  vtkIdType blockNumber)
+{
+  vtkSMSpreadSheetRepresentationProxy* repr = this->Internal->Representation;
+  if (repr && 
+    this->Internal->getFieldType() != vtkIndexBasedBlockFilter::FIELD)
+    {
+    vtkSelection* selection = repr->GetSelectionOutput(blockNumber);
+    // This selection has information about ids that are currently selected.
+    // We now need to create a Qt selection list of indices for the items in
+    // the vtk selection.
+    QItemSelection qtSelection = this->convertToQtSelection(selection);;
+    this->Internal->SelectionModel.select(qtSelection, 
+      QItemSelectionModel::Select|QItemSelectionModel::Rows);
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewModel::delayedUpdate()
 {
-  vtkSMBlockDeliveryRepresentationProxy* repr = 
+  vtkSMSpreadSheetRepresentationProxy* repr = 
     this->Internal->Representation;
   if (repr)
     {
@@ -184,10 +294,10 @@ void pqSpreadSheetViewModel::delayedUpdate()
     vtkIdType blocksize = this->Internal->getBlockSize();
     foreach (vtkIdType blockNumber, this->Internal->PendingBlocks)
       {
-      // cout << "Requesting : " << blockNumber << endl;
-      pqSMAdaptor::setElementProperty(repr->GetProperty("Block"), blockNumber);
-      repr->UpdateProperty("Block");
-      repr->Update();
+      // cout << "Requesting : (" << repr << ") " << blockNumber << endl;
+      this->Internal->ActiveBlockNumber = blockNumber;
+      repr->GetOutput(this->Internal->ActiveBlockNumber);
+
       QModelIndex myTopLeft(this->index(blockNumber*blocksize, 0));
       int botRow = blocksize*(blockNumber+1);
       botRow = (botRow<this->rowCount())? botRow: this->rowCount()-1;
@@ -208,9 +318,27 @@ void pqSpreadSheetViewModel::delayedUpdate()
 }
 
 //-----------------------------------------------------------------------------
+void pqSpreadSheetViewModel::delayedSelectionUpdate()
+{
+  vtkSMSpreadSheetRepresentationProxy* repr = 
+    this->Internal->Representation;
+  if (repr)
+    {
+    foreach (vtkIdType blockNumber, this->Internal->PendingSelectionBlocks)
+      {
+      // we grow the current selection.
+      this->updateSelectionForBlock(blockNumber);
+      }
+    }
+
+  this->Internal->PendingSelectionBlocks.clear();
+}
+
+//-----------------------------------------------------------------------------
 void pqSpreadSheetViewModel::setActiveBlock(QModelIndex top, QModelIndex bottom)
 {
   this->Internal->PendingBlocks.clear();
+  this->Internal->PendingSelectionBlocks.clear();
   if (this->Internal->Representation)
     {
     vtkIdType topBlock = this->Internal->computeBlockNumber(top.row());
@@ -218,6 +346,7 @@ void pqSpreadSheetViewModel::setActiveBlock(QModelIndex top, QModelIndex bottom)
     for (vtkIdType cc=topBlock; cc <= bottomBlock; cc++)
       {
       this->Internal->PendingBlocks.insert(cc);
+      this->Internal->PendingSelectionBlocks.insert(cc);
       }
     }
 }
@@ -226,7 +355,7 @@ void pqSpreadSheetViewModel::setActiveBlock(QModelIndex top, QModelIndex bottom)
 QVariant pqSpreadSheetViewModel::data(
   const QModelIndex& idx, int role/*=Qt::DisplayRole*/) const
 {
-  vtkSMBlockDeliveryRepresentationProxy* repr = 
+  vtkSMSpreadSheetRepresentationProxy* repr = 
     this->Internal->Representation;
   int row = idx.row();
   int column = idx.column();
@@ -237,16 +366,21 @@ QVariant pqSpreadSheetViewModel::data(
     // cout << row << " " << "blockNumber: " << blockNumber << endl;
     // cout << row << " " << "blockOffset: " << blockOffset << endl;
 
-    if (!repr->IsCached(blockNumber))
+    if (!repr->IsAvailable(blockNumber)) // FIXME: 
+                                  // show we also check for selection block 
+                                  // availability here?
       {
-      this->Internal->PendingBlocks.insert(blockNumber);
       this->Internal->Timer.start();
       return QVariant("...");
       }
 
-    pqSMAdaptor::setElementProperty(repr->GetProperty("Block"), blockNumber);
-    repr->UpdateProperty("Block");
-    vtkTable* table = vtkTable::SafeDownCast(repr->GetBlockOutput());
+    if (!repr->IsSelectionAvailable(blockNumber))
+      {
+      this->Internal->SelectionTimer.start();
+      }
+
+    this->Internal->ActiveBlockNumber = blockNumber;
+    vtkTable* table = vtkTable::SafeDownCast(repr->GetOutput(blockNumber));
     if (table)
       {
       vtkVariant value = table->GetValue(blockOffset, column);
@@ -261,12 +395,12 @@ QVariant pqSpreadSheetViewModel::data(
 QVariant pqSpreadSheetViewModel::headerData (int section, Qt::Orientation orientation, 
     int role/*=Qt::DisplayRole*/) const 
 {
-  vtkSMBlockDeliveryRepresentationProxy* repr = 
+  vtkSMSpreadSheetRepresentationProxy* repr = 
     this->Internal->Representation;
   if (orientation == Qt::Horizontal && repr && role == Qt::DisplayRole)
     {
     // No need to get updated data, simply get the current data.
-    vtkTable* table = vtkTable::SafeDownCast(repr->GetOutput());
+    vtkTable* table = vtkTable::SafeDownCast(repr->GetOutput(this->Internal->ActiveBlockNumber));
     if (table && table->GetNumberOfColumns() > section)
       {
       QString title = table->GetColumnName(section);
@@ -275,17 +409,117 @@ QVariant pqSpreadSheetViewModel::headerData (int section, Qt::Orientation orient
         {
         title = "Process ID";
         }
-      else if (title == "vtkOriginalPointIds")
+      else if (title == "vtkOriginalIndices")
         {
-        title = "Point ID";
+        title = (this->Internal->getFieldType() == vtkIndexBasedBlockFilter::POINT)?
+          "Point ID" : "Cell ID";
         }
-      else if (title == "vtkOriginalCellIds")
-        {
-        title = "Cell ID";
-        }
+
       return QVariant(title);
       }
     }
 
   return this->Superclass::headerData(section, orientation, role);
+}
+
+//-----------------------------------------------------------------------------
+QModelIndex pqSpreadSheetViewModel::indexFor(int pid, vtkIdType vtkindex)
+{
+  // Find the qt index for a row with given process id and original id. 
+  vtkTable* activeBlock = vtkTable::SafeDownCast(
+    this->Internal->Representation->GetOutput(this->Internal->ActiveBlockNumber));
+
+  vtkIdTypeArray* indexcolumn = vtkIdTypeArray::SafeDownCast(
+    activeBlock->GetColumnByName("vtkOriginalIndices"));
+
+  vtkIdTypeArray* pidcolumn = vtkIdTypeArray::SafeDownCast(
+    activeBlock->GetColumnByName("vtkOriginalProcessIds"));
+
+  for (vtkIdType cc=0; cc < indexcolumn->GetNumberOfTuples(); cc++)
+    {
+    if (indexcolumn->GetValue(cc) == vtkindex)
+      {
+      if (pid == -1 || !pidcolumn || pidcolumn->GetValue(cc) == pid)
+        {
+        return this->createIndex(this->Internal->computeRowIndex(cc), 0);
+        }
+      }
+    }
+
+  return QModelIndex();
+}
+
+//-----------------------------------------------------------------------------
+QItemSelection pqSpreadSheetViewModel::convertToQtSelection(vtkSelection* vtkselection)
+{
+  if (!vtkselection)
+    {
+    return QItemSelection();
+    }
+
+  if (vtkselection->GetContentType() == vtkSelection::SELECTIONS)
+    {
+    QItemSelection qSel;
+    for (unsigned int cc=0; cc < vtkselection->GetNumberOfChildren(); cc++)
+      {
+      vtkSelection* sel = vtkselection->GetChild(cc);
+      qSel.merge(this->convertToQtSelection(sel), QItemSelectionModel::Select);
+      }
+    return qSel;
+    }
+  else if (vtkselection->GetContentType() == vtkSelection::INDICES)
+    {
+    QItemSelection qSel;
+    // Iterate over all indices in the vtk selection, 
+    // Determine the qt model index for each and then add that to the
+    // qt selection.
+    int pid = vtkselection->GetProperties()->Has(vtkSelection::PROCESS_ID())?
+      vtkselection->GetProperties()->Get(vtkSelection::PROCESS_ID()) : -1;
+    vtkIdTypeArray *indices = vtkIdTypeArray::SafeDownCast(
+      vtkselection->GetSelectionList());
+    for (vtkIdType cc=0; indices && cc < indices->GetNumberOfTuples(); cc++)
+      {
+      vtkIdType index = indices->GetValue(cc);
+      QModelIndex qtIndex = this->indexFor(pid, index);
+      if (qtIndex.isValid())
+        {
+        // cout << "Selecting: " << qtIndex.row() << endl;
+        qSel.select(qtIndex, qtIndex);
+        }
+      }
+    return qSel;
+    }
+  qCritical() << "Unknown selection object.";
+  return QItemSelection();
+
+}
+
+//-----------------------------------------------------------------------------
+QSet<QPair<vtkIdType, vtkIdType> > pqSpreadSheetViewModel::getVTKIndices(
+  const QModelIndexList& indexes)
+{
+  QSet<QPair<vtkIdType, vtkIdType> > vtkindices;
+
+  vtkSMSpreadSheetRepresentationProxy* repr =
+    this->getRepresentationProxy();
+  if (repr)
+    {
+    foreach (QModelIndex index, indexes)
+      {
+      int row = index.row();
+      vtkIdType blockNumber = this->Internal->computeBlockNumber(row);
+      vtkIdType blockOffset = this->Internal->computeBlockOffset(row);
+
+      this->Internal->ActiveBlockNumber = blockNumber;
+      vtkTable* table = vtkTable::SafeDownCast(repr->GetOutput(blockNumber));
+      if (table)
+        {
+        vtkVariant processId = table->GetValueByName(blockOffset, "vtkOriginalProcessIds");
+        vtkVariant index = table->GetValueByName(blockOffset, "vtkOriginalIndices");
+        int pid = processId.IsValid()? processId.ToInt() : 0;
+        vtkindices.insert(QPair<vtkIdType, vtkIdType>(pid, index.ToLong()));
+        }
+      }
+    }
+  return vtkindices;
 }

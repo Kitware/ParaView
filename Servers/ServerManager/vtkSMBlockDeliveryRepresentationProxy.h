@@ -20,40 +20,34 @@
 #ifndef __vtkSMBlockDeliveryRepresentationProxy_h
 #define __vtkSMBlockDeliveryRepresentationProxy_h
 
-#include "vtkSMClientDeliveryRepresentationProxy.h"
+#include "vtkSMDataRepresentationProxy.h"
 
 class vtkSMSourceProxy;
 class vtkDataObject;
+class vtkSMClientDeliveryStrategyProxy;
 
 class VTK_EXPORT vtkSMBlockDeliveryRepresentationProxy : 
-  public vtkSMClientDeliveryRepresentationProxy
+  public vtkSMDataRepresentationProxy
 {
 public:
   static vtkSMBlockDeliveryRepresentationProxy* New();
   vtkTypeRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, 
-    vtkSMClientDeliveryRepresentationProxy);
+    vtkSMDataRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Get the data that was collected to the client. Overridden to return the
-  // data in the cache, if any. This method does not update the representation
-  // if data is obsolete, use GetBlockOutput() instead.
-  virtual vtkDataObject* GetOutput();
+  // Get the data for the given block. This may fetch the data to the client,
+  // if it's not already present.
+  virtual vtkDataObject* GetOutput(vtkIdType block);
 
   // Description:
-  // Retuns the dataset for the current block.
-  // This may call update if the block is not available in the cache, or the
-  // cache is obsolete.
-  virtual vtkDataObject* GetBlockOutput();
-
-  // Description:
-  // Indicates if the block is present in the cache.
-  bool IsCached(vtkIdType blockid);
+  // Indicates if the block is available on the client.
+  virtual bool IsAvailable(vtkIdType blockid);
 
   // Description:
   // Get/Set the current block number.
-  vtkSetMacro(Block, vtkIdType);
-  vtkGetMacro(Block, vtkIdType);
+  // This simply passes it to the block filter. Overridden to ensure that the
+  void SetFieldType(int);
 
   // Description:
   // Set the cache size as the maximum number of blocks to cache at a given
@@ -73,21 +67,10 @@ public:
   virtual void Update() { this->Superclass::Update(); };
 
   // Description:
-  // Returns if the representation's input has changed since most recent
-  // Update(). Overridden to forward the request to the strategy, if any. If
-  // subclasses don't use any strategy, they may want to override this method.
-  virtual bool UpdateRequired();
-
-
-  // Description:
   // Clean all cached data. It's usually not required to use this method
   // explicitly, whenever the input is modified, the cache is automatically
   // cleaned.
   void CleanCache();
-
-  // Description:
-  // Overridden to update the CleanCacheOnUpdate flag. 
-  virtual void MarkModified(vtkSMProxy* modifiedProxy);
 
 //BTX
 protected:
@@ -104,16 +87,20 @@ protected:
 
   // Description:
   // Create the data pipeline.
-  virtual void CreatePipeline(vtkSMSourceProxy* input, int outputport);
+  virtual bool CreatePipeline(vtkSMSourceProxy* input, int outputport);
+
+  // Description:
+  // Ensures that the block of data is available on the client.
+  void Fetch(vtkIdType block);
 
   vtkSMSourceProxy* BlockFilter;
   vtkSMSourceProxy* Reduction;
 
-  // Active block id.
-  vtkIdType Block;
+  bool CacheDirty;
+
   vtkIdType CacheSize;
 
-  bool CleanCacheOnUpdate;
+  vtkSMClientDeliveryStrategyProxy* DeliveryStrategy;
 private:
   vtkSMBlockDeliveryRepresentationProxy(const vtkSMBlockDeliveryRepresentationProxy&); // Not implemented
   void operator=(const vtkSMBlockDeliveryRepresentationProxy&); // Not implemented

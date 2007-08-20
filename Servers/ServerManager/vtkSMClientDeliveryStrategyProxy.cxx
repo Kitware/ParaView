@@ -24,7 +24,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryStrategyProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryStrategyProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMClientDeliveryStrategyProxy, "1.13");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryStrategyProxy::vtkSMClientDeliveryStrategyProxy()
 {
@@ -123,7 +123,9 @@ void vtkSMClientDeliveryStrategyProxy::CreatePipeline(vtkSMSourceProxy* input,
 
   this->Connect(input, this->ReductionProxy, "Input", outputport);
   this->Connect(this->ReductionProxy, this->CollectProxy);
-  this->Connect(this->CollectProxy, this->UpdateSuppressor);
+
+  // Connects the CollectProxy to UpdateSuppressor.
+  this->Superclass::CreatePipeline(this->CollectProxy, 0);
 
   // Now we need to set up some default parameters on these filters.
   stream << vtkClientServerStream::Invoke
@@ -141,32 +143,6 @@ void vtkSMClientDeliveryStrategyProxy::CreatePipeline(vtkSMSourceProxy* input,
           << vtkClientServerStream::LastResult
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, this->ReductionProxy->GetServers(), stream);
-
-  // Init UpdateSuppressor properties.
-  // Seems like we can't use properties for this 
-  // to work properly.
-  stream
-    << vtkClientServerStream::Invoke
-    << vtkProcessModule::GetProcessModule()->GetProcessModuleID() 
-    << "GetNumberOfLocalPartitions"
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Invoke
-    << this->UpdateSuppressor->GetID() 
-    << "SetUpdateNumberOfPieces"
-    << vtkClientServerStream::LastResult
-    << vtkClientServerStream::End;
-  stream
-    << vtkClientServerStream::Invoke
-    << vtkProcessModule::GetProcessModule()->GetProcessModuleID() 
-    << "GetPartitionId"
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Invoke
-    << this->UpdateSuppressor->GetID() 
-    << "SetUpdatePiece"
-    << vtkClientServerStream::LastResult
-    << vtkClientServerStream::End;
-  vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
-    this->UpdateSuppressor->GetServers(), stream);
 }
 
 //----------------------------------------------------------------------------

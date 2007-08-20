@@ -21,6 +21,7 @@ SET(Filters_SRCS
   vtkClientServerMoveData.cxx
 #  vtkColorByPart.cxx
   vtkCompleteArrays.cxx
+  vtkCompositeAnimationPlayer.cxx
   vtkCSVReader.cxx
   vtkCSVWriter.cxx
 #  vtkDataAnalysisFilter.cxx
@@ -33,6 +34,7 @@ SET(Filters_SRCS
   vtkHierarchicalFractal.cxx
   vtkImageCompressor.cxx
   vtkIndexBasedBlockFilter.cxx
+  vtkIndexBasedBlockSelectionFilter.cxx
   vtkIntegrateAttributes.cxx
   vtkIntegrateFlowThroughSurface.cxx
   vtkInteractorStyleTransferFunctionEditor.cxx
@@ -95,8 +97,10 @@ SET(Filters_SRCS
   vtkPVTrackballZoom.cxx
   vtkPVUpdateSuppressor.cxx
   vtkPVVisibleCellSelector.cxx
+  vtkRealtimeAnimationPlayer.cxx
   vtkReductionFilter.cxx
 #  vtkSelectInputs.cxx
+  vtkSequenceAnimationPlayer.cxx
   vtkSpyPlotBlock.cxx
   vtkSpyPlotBlockIterator.cxx
   vtkSpyPlotIStream.cxx
@@ -108,6 +112,7 @@ SET(Filters_SRCS
 #  vtkTemporalCacheFilter.cxx
 #  vtkTemporalPickFilter.cxx
 #  vtkTemporalProbeFilter.cxx
+  vtkTimestepsAnimationPlayer.cxx
   vtkTimeToTextConvertor.cxx
   vtkTrackballPan.cxx
   vtkTransferFunctionEditorRepresentation1D.cxx
@@ -126,11 +131,6 @@ SET(Filters_SRCS
   vtkXMLCollectionReader.cxx
   vtkXMLPVAnimationWriter.cxx
   vtkXMLPVDWriter.cxx
-
-  vtkRealtimeAnimationPlayer.cxx
-  vtkTimestepsAnimationPlayer.cxx
-  vtkSequenceAnimationPlayer.cxx
-  vtkCompositeAnimationPlayer.cxx
   )
 
 SET_SOURCE_FILES_PROPERTIES(

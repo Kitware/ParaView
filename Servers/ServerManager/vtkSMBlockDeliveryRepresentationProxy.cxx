@@ -23,6 +23,7 @@
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMIntVectorProperty.h"
 
 #include <vtkstd/map>
 
@@ -71,27 +72,49 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMBlockDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMBlockDeliveryRepresentationProxy::vtkSMBlockDeliveryRepresentationProxy()
 {
-  this->Block = 0;
   this->BlockFilter = 0;
+  this->CacheDirty = false;
+  this->DeliveryStrategy = 0;
   this->Reduction = 0;
   this->CacheSize = 2;
-  this->CleanCacheOnUpdate = true;
   this->Internal = new vtkInternal();
 }
 
 //----------------------------------------------------------------------------
 vtkSMBlockDeliveryRepresentationProxy::~vtkSMBlockDeliveryRepresentationProxy()
 {
-  this->SetPostGatherHelper(0);
+  if (this->DeliveryStrategy)
+    {
+    this->DeliveryStrategy->SetPostGatherHelper((vtkSMProxy*)0);
+    this->DeliveryStrategy->Delete();
+    this->DeliveryStrategy = 0;
+    }
+
   delete this->Internal;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMBlockDeliveryRepresentationProxy::IsCached(vtkIdType blockid)
+void vtkSMBlockDeliveryRepresentationProxy::SetFieldType(int ft)
+{
+  if (this->BlockFilter)
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->BlockFilter->GetProperty("FieldType"));
+    if (ivp)
+      {
+      ivp->SetElement(0, ft);
+      this->BlockFilter->UpdateProperty("FieldType");
+      this->CacheDirty = true;
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMBlockDeliveryRepresentationProxy::IsAvailable(vtkIdType blockid)
 {
   return this->Internal->CachedBlocks.find(blockid) != 
     this->Internal->CachedBlocks.end();
@@ -124,86 +147,113 @@ bool vtkSMBlockDeliveryRepresentationProxy::EndCreateVTKObjects()
     return false;
     }
 
-  // For now, block filter always produces unstructured grid as the output.
-  this->SetReductionType(CUSTOM);
-  this->SetPostGatherHelper(this->Reduction);
-  this->SetGenerateProcessIds(1);
+  if (!this->CreatePipeline(this->GetInputProxy(), this->OutputPort))
+    {
+    return false;
+    }
+
   return true;
 }
 
+
 //----------------------------------------------------------------------------
-void vtkSMBlockDeliveryRepresentationProxy::CreatePipeline(vtkSMSourceProxy* input,
+bool vtkSMBlockDeliveryRepresentationProxy::CreatePipeline(vtkSMSourceProxy* input,
   int outputport)
 {
-  this->Connect(input, this->BlockFilter, "Input", outputport);
-  return this->Superclass::CreatePipeline(this->BlockFilter, 0);
-}
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
-//----------------------------------------------------------------------------
-void vtkSMBlockDeliveryRepresentationProxy::MarkModified(vtkSMProxy* proxy)
-{
-  if (proxy !=  this)
+  // Block delivery uses two strategies
+  // * to update the pipeline.
+  // * to deliver chunk of data.
+
+  // Create the strategy use to update the representation.
+  vtkSMRepresentationStrategy* strategy = vtkSMRepresentationStrategy::SafeDownCast(
+    pxm->NewProxy("strategies", "PolyDataStrategy"));
+  if (!strategy)
     {
-    this->CleanCacheOnUpdate = true;
+    return false;
     }
+  strategy->SetConnectionID(this->ConnectionID);
+  this->AddStrategy(strategy);
+  strategy->Delete();
 
-  this->Superclass::MarkModified(proxy);
+  strategy->SetEnableLOD(false);
+  this->Connect(input, strategy, "Input", outputport);
+  strategy->UpdateVTKObjects();
+
+  // Now create another strategy to deliver the data to the client.
+  // This is an internal strategy i.e. it is not dependent on Update() calls
+  // done by the view, the representation is free to update this strategy
+  // whenever it feels suitable.
+  this->DeliveryStrategy = vtkSMClientDeliveryStrategyProxy::SafeDownCast(
+    pxm->NewProxy("strategies", "ClientDeliveryStrategy"));
+  if (!this->DeliveryStrategy)
+    {
+    return false;
+    }
+  this->DeliveryStrategy->SetConnectionID(this->ConnectionID);
+  this->DeliveryStrategy->SetEnableLOD(false);
+
+  this->Connect(strategy->GetOutput(), this->BlockFilter);
+  this->Connect(this->BlockFilter, this->DeliveryStrategy);
+
+  // Set default strategy values.
+  this->DeliveryStrategy->SetPreGatherHelper((vtkSMProxy*)0);
+  this->DeliveryStrategy->SetPostGatherHelper(this->Reduction);
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->DeliveryStrategy->GetProperty("GenerateProcessIds"));
+  ivp->SetElement(0, 1);
+  this->DeliveryStrategy->UpdateVTKObjects();;
+  return true;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMBlockDeliveryRepresentationProxy::Update(vtkSMViewProxy* view)
 {
-  if (!this->UpdateRequired())
+  if (this->UpdateRequired() || this->CacheDirty)
     {
-    return;
-    }
-
-  if (this->CleanCacheOnUpdate)
-    {
+    // Our cache becomes obsolete following this update.
     this->CleanCache();
-    this->CleanCacheOnUpdate = false;
+    this->CacheDirty = false;
     }
 
-  if (this->Internal->CachedBlocks.find(this->Block)
-    == this->Internal->CachedBlocks.end())
+  this->Superclass::Update(view);
+}
+
+//----------------------------------------------------------------------------
+// Ensure that the block selected by \c block is available on the client.
+void vtkSMBlockDeliveryRepresentationProxy::Fetch(vtkIdType block)
+{
+  vtkInternal::CacheType::iterator iter = 
+    this->Internal->CachedBlocks.find(block);
+  if (iter == this->Internal->CachedBlocks.end())
     {
+    // cout << this << " Fetching Block #" << block << endl;
     // Pass the block number to the BlockFilter.
     vtkSMIdTypeVectorProperty* ivp = vtkSMIdTypeVectorProperty::SafeDownCast(
       this->BlockFilter->GetProperty("Block"));
     if (ivp)
       {
-      ivp->SetElement(0, this->Block);
-      this->BlockFilter->UpdateProperty("Block", /*force=*/1);
+      ivp->SetElement(0, block);
+      this->BlockFilter->UpdateProperty("Block");
       }
+    this->DeliveryStrategy->Update();
+
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkAlgorithm* algorithm = 
+      vtkAlgorithm::SafeDownCast(
+        pm->GetObjectFromID(this->DeliveryStrategy->GetOutput()->GetID()));
+
+    vtkDataObject* output = vtkDataObject::SafeDownCast(
+      algorithm->GetOutputDataObject(0));
+
+    vtkDataObject* clone = output->NewInstance();
+    clone->ShallowCopy(output);
+
+    this->Internal->AddToCache(block, clone, this->CacheSize);
+    this->IsAvailable(block);
+    clone->Delete();
     }
-
-  this->Superclass::Update(view);
-
-  // Cache the data.
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkAlgorithm* algorithm = 
-    vtkAlgorithm::SafeDownCast(
-      pm->GetObjectFromID(this->StrategyProxy->GetOutput()->GetID()));
-
-  vtkDataObject* output = vtkDataObject::SafeDownCast(
-    algorithm->GetOutputDataObject(0));
-  vtkDataObject* clone = output->NewInstance();
-  clone->ShallowCopy(output);
-
-  this->Internal->AddToCache(this->Block, clone, this->CacheSize);
-  clone->Delete();
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMBlockDeliveryRepresentationProxy::UpdateRequired()
-{
-  if (this->Internal->CachedBlocks.find(this->Block)
-    == this->Internal->CachedBlocks.end())
-    {
-    return true;
-    }
-
-  return this->Superclass::UpdateRequired();
 }
 
 //----------------------------------------------------------------------------
@@ -213,9 +263,13 @@ void vtkSMBlockDeliveryRepresentationProxy::CleanCache()
 }
 
 //----------------------------------------------------------------------------
-vtkDataObject* vtkSMBlockDeliveryRepresentationProxy::GetOutput()
+vtkDataObject* vtkSMBlockDeliveryRepresentationProxy::GetOutput(vtkIdType block)
 {
- vtkInternal::CacheType::iterator iter = this->Internal->CachedBlocks.find(this->Block);
+  // Ensure that the current block is available on client.
+  this->Fetch(block);
+
+  vtkInternal::CacheType::iterator iter = 
+    this->Internal->CachedBlocks.find(block);
   if (iter != this->Internal->CachedBlocks.end())
     {
     iter->second.RecentUseTime.Modified();
@@ -226,21 +280,10 @@ vtkDataObject* vtkSMBlockDeliveryRepresentationProxy::GetOutput()
 }
 
 //----------------------------------------------------------------------------
-vtkDataObject* vtkSMBlockDeliveryRepresentationProxy::GetBlockOutput()
-{
-  if (this->UpdateRequired())
-    {
-    this->Update(0);
-    }
-
-  return this->GetOutput();
-}
-
-//----------------------------------------------------------------------------
 void vtkSMBlockDeliveryRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Block: " << this->Block << endl;
+  os << indent << "CacheSize: " << this->CacheSize << endl;
 }
 
 

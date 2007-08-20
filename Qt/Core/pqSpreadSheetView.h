@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqView.h"
 
+class vtkSMSourceProxy;
+
 /// View for spread-sheet view. It can show data from any source/filter on the
 /// client. 
 class PQCORE_EXPORT pqSpreadSheetView : public pqView
@@ -77,6 +79,8 @@ protected slots:
   /// Called at end of every render. We update the table view.
   void onEndRender();
 
+  /// When user creates a "surface" selection on the view.
+  void onCreateSelection(vtkSMSourceProxy* selSource);
 private:
   pqSpreadSheetView(const pqSpreadSheetView&); // Not implemented.
   void operator=(const pqSpreadSheetView&); // Not implemented.

@@ -46,12 +46,12 @@
     <widget class="QComboBox" name="AttributeMode" >
      <item>
       <property name="text" >
-       <string>Point Data</string>
+       <string>Cell Data</string>
       </property>
      </item>
      <item>
       <property name="text" >
-       <string>Cell Data</string>
+       <string>Point Data</string>
       </property>
      </item>
      <item>
