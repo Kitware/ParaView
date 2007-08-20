@@ -24,7 +24,7 @@
 #include "vtkCellData.h"
 #include "vtkPointData.h"
 
-vtkCxxRevisionMacro(vtkPVExtractSelection, "1.5");
+vtkCxxRevisionMacro(vtkPVExtractSelection, "1.6");
 vtkStandardNewMacro(vtkPVExtractSelection);
 
 //----------------------------------------------------------------------------
@@ -96,10 +96,14 @@ int vtkPVExtractSelection::RequestData(
     return 0;
     }
 
-  
-  vtkSelection *sel = vtkSelection::SafeDownCast(
-    inputVector[1]->GetInformationObject(0)->Get(
-      vtkDataObject::DATA_OBJECT()));
+
+  vtkSelection* sel = 0;
+  if (inputVector[1]->GetInformationObject(0))
+    {
+    sel = vtkSelection::SafeDownCast(
+      inputVector[1]->GetInformationObject(0)->Get(
+        vtkDataObject::DATA_OBJECT()));
+    }
 
   vtkDataSet *geomOutput = vtkDataSet::SafeDownCast(
     outputVector->GetInformationObject(0)->Get(vtkDataObject::DATA_OBJECT()));
@@ -118,13 +122,13 @@ int vtkPVExtractSelection::RequestData(
   output->Clear();
   output->SetContentType(vtkSelection::INDICES);
   int ft = vtkSelection::CELL;
-  if (!sel->GetProperties()->Has(vtkSelection::FIELD_TYPE()))
+  if (sel && sel->GetProperties()->Has(vtkSelection::FIELD_TYPE()))
     {
     ft = sel->GetProperties()->Get(vtkSelection::FIELD_TYPE());
     }
   output->GetProperties()->Set(vtkSelection::FIELD_TYPE(), ft);
   int inv = 0;
-  if (!sel->GetProperties()->Has(vtkSelection::INVERSE()))
+  if (sel && sel->GetProperties()->Has(vtkSelection::INVERSE()))
     {
     inv = sel->GetProperties()->Get(vtkSelection::INVERSE());
     }
