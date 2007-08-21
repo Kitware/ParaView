@@ -1382,17 +1382,6 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
      </DoubleVectorProperty> 
 
      <IntVectorProperty 
-        name="PartiallyWithin" 
-        command="SetExactTest" 
-        number_of_elements="1"
-        default_values="1" >
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         For frustum selection, if this property is set to 1 all cells that are at least partially within the frustum are found. If 0 then only cells that are completely within the frustum are found.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
         name="ShowBounds" 
         command="SetShowBounds" 
         number_of_elements="1"
