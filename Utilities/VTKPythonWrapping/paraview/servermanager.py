@@ -18,7 +18,7 @@ provides an interface easier to use from Python by wrapping several VTK
 classes around Python classes.
 
 Note that, upon load, this module will create several sub-modules: sources,
-filters and renderind. These modules can be used to instantiate specific
+filters and rendering. These modules can be used to instantiate specific
 proxy types. For a list, try "dir(servermanager.sources)"
 
 A simple example:
