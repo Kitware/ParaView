@@ -1281,7 +1281,7 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
         name="ContainingCells"
         command="SetContainingCells"
         number_of_elements="1"
-        default_values="1">
+        default_values="0">
         <Documentation>
           When field type is POINT, this controls whether single vertex cells will be produced for each selected point, or whether the cells that contain each selected point will be produced. When field type is CELL this has no effect.
         </Documentation>
