@@ -6834,7 +6834,6 @@ This extracts all cells within a frustum that is defined as the volume behind a 
         </Proxy>
         <ExposedProperties>
           <Property name="Frustum" /> 
-          <Property name="PartiallyWithin" />
           <Property name="ShowBounds" />
           <Property name="InsideOut" />
           <Property name="PreserveTopology" />
@@ -6948,7 +6947,6 @@ This filter extracts a set of thresholds of its input.
           <Property name="Thresholds" />
           <Property name="ArrayName" />
           <Property name="Frustum" />
-          <Property name="PartiallyWithin" />
           <Property name="ShowBounds" />
         </ExposedProperties>
       </SubProxy>
