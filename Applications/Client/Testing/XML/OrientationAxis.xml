@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/menubar/menuEdit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="MainWindow/menubar/menuEdit" command="activate" arguments="actionEditView" />
   <pqevent object="MainWindow/pqSettingsDialog/tabWidget/qt_tabwidget_stackedwidget/pq3DViewProperties/tabWidget/qt_tabwidget_tabbar" command="set_tab" arguments="3" />
   <pqevent object="MainWindow/pqSettingsDialog/tabWidget/qt_tabwidget_stackedwidget/pq3DViewProperties/tabWidget/qt_tabwidget_stackedwidget/tab_5/OrientationAxes/OrientationAxesInteraction" command="set_boolean" arguments="true" />
   <pqevent object="MainWindow/pqSettingsDialog/okButton" command="activate" arguments="" />
