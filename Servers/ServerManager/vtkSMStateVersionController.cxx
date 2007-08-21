@@ -14,13 +14,15 @@
 =========================================================================*/
 #include "vtkSMStateVersionController.h"
 
+#include "vtkCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+
 #include "vtksys/ios/sstream"
 
 vtkStandardNewMacro(vtkSMStateVersionController);
-vtkCxxRevisionMacro(vtkSMStateVersionController, "1.8");
+vtkCxxRevisionMacro(vtkSMStateVersionController, "1.9");
 //----------------------------------------------------------------------------
 vtkSMStateVersionController::vtkSMStateVersionController()
 {
@@ -280,6 +282,15 @@ bool ConvertLineSeriesArrayStatus(vtkPVXMLElement* root,
 }
 
 //----------------------------------------------------------------------------
+bool ConvertPVAnimationSceneToAnimationScene(
+  vtkPVXMLElement* root, void* callData)
+{
+  vtkSMStateVersionController* self = reinterpret_cast<
+    vtkSMStateVersionController*>(callData);
+  return self->ConvertPVAnimationSceneToAnimationScene(root);
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
 {
     {
@@ -471,6 +482,15 @@ bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
       root, "Proxy", attrs, newAttrs);
     }
 
+    {
+    // Convert all PVAnimationScene proxies to AnimationScene proxies.
+    const char* attrs[] = {
+      "type", "PVAnimationScene", 0};
+    this->Select(
+      root, "Proxy", attrs, 
+      &::ConvertPVAnimationSceneToAnimationScene, this);
+    }
+
 
   return true;
 }
@@ -516,6 +536,61 @@ bool vtkSMStateVersionController::ConvertLegacyReader(
   return true;
 }
 
+
+//----------------------------------------------------------------------------
+bool vtkSMStateVersionController::ConvertPVAnimationSceneToAnimationScene(
+  vtkPVXMLElement* parent)
+{
+  parent->SetAttribute("type", "AnimationScene");
+
+  // ClockTimeRange property changed to "StartTime" and "EndTime"
+  vtksys_ios::ostringstream idStr;
+  idStr << parent->GetAttribute("id") << ".ClockTimeRange";
+  vtkPVXMLElement* ctRange = parent->FindNestedElement(idStr.str().c_str());
+  vtkSmartPointer<vtkCollection> elements = vtkSmartPointer<vtkCollection>::New();
+  if (ctRange)
+    {
+    ctRange->GetElementsByName("Element", elements);
+    }
+  if (elements->GetNumberOfItems() == 2)
+    {
+    vtkPVXMLElement* startTime = vtkPVXMLElement::New();
+    startTime->SetName("Property");
+    startTime->SetAttribute("name", "StartTime");
+    startTime->SetAttribute("number_of_elements", "1");
+    vtksys_ios::ostringstream idST;
+    idST << parent->GetAttribute("id") << ".StartTime";
+    startTime->SetAttribute("id", idST.str().c_str());
+    
+    vtkPVXMLElement* element = 
+      vtkPVXMLElement::SafeDownCast(elements->GetItemAsObject(0));
+    ctRange->RemoveNestedElement(element);
+    startTime->AddNestedElement(element);
+    
+    parent->AddNestedElement(startTime);
+    startTime->Delete();
+
+    vtkPVXMLElement* endTime = vtkPVXMLElement::New();
+    endTime->SetName("Property");
+    endTime->SetAttribute("name", "EndTime");
+    endTime->SetAttribute("number_of_elements", "1");
+    vtksys_ios::ostringstream idET;
+    idET << parent->GetAttribute("id") << ".EndTime";
+    endTime->SetAttribute("id", idET.str().c_str());
+    
+    element = vtkPVXMLElement::SafeDownCast(elements->GetItemAsObject(1));
+    ctRange->RemoveNestedElement(element);
+    element->SetAttribute("index", "0");
+    endTime->AddNestedElement(element);
+    
+    parent->AddNestedElement(endTime);
+    endTime->Delete();
+
+    parent->RemoveNestedElement(ctRange);
+    }
+
+  return true;
+}
 
 //----------------------------------------------------------------------------
 void vtkSMStateVersionController::PrintSelf(ostream& os, vtkIndent indent)
