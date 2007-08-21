@@ -1413,6 +1413,7 @@ def _updateModules():
     _createModule("newviews", rendering)
     _createModule("lookup_tables", rendering)
     _createModule("animation", animation)
+    _createModule('animation_keyframes', animation)
     
 def _createModules():
     global sources, filters, rendering, animation
@@ -1423,6 +1424,7 @@ def _createModules():
     _createModule('newviews', rendering)
     _createModule("lookup_tables", rendering)
     animation = _createModule('animation')
+    _createModule('animation_keyframes', animation)
     
 def _createModule(groupName, mdl=None):
     """Populates a module with proxy classes defined in the given group.
