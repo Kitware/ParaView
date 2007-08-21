@@ -977,6 +977,10 @@ class Connection(object):
         self.RSPort = None
         return
 
+    def __eq__(self, other):
+        "Returns true if the connection ids are the same."
+        return self.ID == other.ID
+    
     def SetHost(self, ds_host, ds_port, rs_host=None, rs_port=None):
         """Set the hostname of a given connection. Used by Connect()."""
         self.Hostname = ds_host 
@@ -1053,6 +1057,36 @@ def _connectSelf():
     conn.SetHost("builtin", cid)
     return conn
 
+def SaveState(filename):
+    """Given a state filename, saves the state of objects registered
+    with the proxy manager."""
+    pm = ProxyManager()
+    pm.SaveState(filename)
+
+def LoadState(filename, connection=None):
+    """Given a state filename and an optional connection, loads the server
+    manager state."""
+    if not connection:
+        connection = ActiveConnection
+    if not connection:
+        raise exceptions.RuntimeError, "Cannot load state without a connection"
+    loader = vtkSMPQStateLoader()
+    rvname = _getRenderViewName(connection)
+    if rvname:
+        loader.SetRenderViewXMLName(rvname)
+        pm = ProxyManager()
+        pm.LoadState(filename, ActiveConnection.ID, loader)
+        views = GetRenderViews()
+        for view in views:
+            # Make sure that the client window size matches the
+            # ViewSize property. In paraview, the GUI takes care
+            # of this.
+            if view.GetClassName() == "vtkSMIceTDesktopRenderViewProxy":
+                view.GetRenderWindow().SetSize(view.ViewSize[0], \
+                                               view.ViewSize[1])
+    else:
+        raise exceptions.RuntimeError, "Could not load state because no appropriate render view was found."
+    
 def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     """
     Use this function call to create a new connection. On success,
@@ -1082,7 +1116,7 @@ def Disconnect(connection=None):
     """Disconnects the connection. Make sure to clear the proxy manager
     first."""
     global ActiveConnection
-    if not connection:
+    if not connection or connection == ActiveConnection:
         connection = ActiveConnection
         ActiveConnection = None
     pm =  vtkProcessModule.GetProcessModule()
@@ -1130,6 +1164,17 @@ def GetRenderViews(connection=None):
             render_modules.append(aProxy)
     return render_modules
 
+def _getRenderViewName(connection):
+    proxy_xml_name = None
+    if connection.IsRemote():
+        proxy_xml_name = "IceTDesktopRenderView"
+    else:
+        if connection.GetNumberOfDataPartitions() > 1:
+            proxy_xml_name = "IceTCompositeView"
+        else:
+            proxy_xml_name = "RenderView"
+    return proxy_xml_name
+    
 def CreateRenderView(connection=None, **extraArgs):
     """Creates a render window on the particular connection. If connection
     is not specified, then the active connection is used, if available.
@@ -1145,15 +1190,10 @@ def CreateRenderView(connection=None, **extraArgs):
     if not connection:
         raise exceptions.RuntimeError, "Cannot create render window without connection."
     pxm = ProxyManager()
-    proxy_xml_name = None
-    if connection.IsRemote():
-        proxy_xml_name = "IceTDesktopRenderView"
-    else:
-        if connection.GetNumberOfDataPartitions() > 1:
-            proxy_xml_name = "IceTCompositeView"
-        else:
-            proxy_xml_name = "RenderView"
-    ren_module = CreateProxy("newviews", proxy_xml_name, connection)
+    proxy_xml_name = _getRenderViewName(connection)
+    ren_module = None
+    if proxy_xml_name:
+        ren_module = CreateProxy("newviews", proxy_xml_name, connection)
     if not ren_module:
         return None
     extraArgs['proxy'] = ren_module
@@ -1363,22 +1403,24 @@ def _findClassForProxy(xmlName):
         return None
 
 def _updateModules():
-    global sources, filters, rendering
+    global sources, filters, rendering, animation
 
     _createModule("sources", sources)
     _createModule("filters", filters)
     _createModule("representations", rendering)
     _createModule("newviews", rendering)
     _createModule("lookup_tables", rendering)
+    _createModule("animation", animation)
     
 def _createModules():
-    global sources, filters, rendering
+    global sources, filters, rendering, animation
 
     sources = _createModule('sources')
     filters = _createModule('filters')
     rendering = _createModule('representations')
     _createModule('newviews', rendering)
     _createModule("lookup_tables", rendering)
+    animation = _createModule('animation')
     
 def _createModule(groupName, mdl=None):
     """Populates a module with proxy classes defined in the given group.
