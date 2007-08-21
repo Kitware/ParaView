@@ -6277,45 +6277,6 @@
    fun:_ZNK14QLocalePrivate14doubleToStringEdiNS_10DoubleFormEij
    fun:_ZN7QString6setNumEdci
    fun:_ZN7QString6numberEdci
-   fun:_ZNK21QDoubleSpinBoxPrivate5roundEd
-   fun:_ZN14QDoubleSpinBox10setMaximumEd
-   fun:_ZN23Ui_pqDisplayProxyEditor7setupUiEP7QWidget
-   fun:_ZN20pqDisplayProxyEditorC1EP24pqPipelineRepresentationP7QWidget
-   fun:_ZN26pqDisplayProxyEditorWidget11updatePanelEv
-   fun:_ZN26pqDisplayProxyEditorWidget17setRepresentationEP16pqRepresentation
-   fun:_ZN16pqProxyTabWidget17setRepresentationEP20pqDataRepresentation
-   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
-   fun:_ZN23pqObjectInspectorDriver21representationChangedEP20pqDataRepresentationP6pqView
-   fun:_ZN23pqObjectInspectorDriver15checkForDisplayEv
-   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN7QObject5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_ZN16QCoreApplication16sendPostedEventsEP7QObjecti
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   fun:_Z6Balloci
-   fun:_Z3i2bi
-   fun:_Z8pow5multP6Biginti
-   fun:_ZNK14QLocalePrivate14doubleToStringEdiNS_10DoubleFormEij
-   fun:_ZN7QString6setNumEdci
-   fun:_ZN7QString6numberEdci
-   fun:_ZNK21QDoubleSpinBoxPrivate5roundEd
-   fun:_ZN14QDoubleSpinBox10setMaximumEd
-   fun:_ZN23Ui_pqDisplayProxyEditor7setupUiEP7QWidget
-   fun:_ZN20pqDisplayProxyEditorC1EP24pqPipelineRepresentationP7QWidget
-   fun:_ZN26pqDisplayProxyEditorWidget11updatePanelEv
-   fun:_ZN26pqDisplayProxyEditorWidget17setRepresentationEP16pqRepresentation
-   fun:_ZN16pqProxyTabWidget17setRepresentationEP20pqDataRepresentation
-   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
-   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
 }
 {
    <insert a suppression name here>
@@ -6843,6 +6804,32 @@
    fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
    fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
    fun:_Z19timerSourceDispatchP8_GSourcePFiPvES1_
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:_XFlushGCCache
+   fun:XDrawPoints
+   fun:_ZN15QX11PaintEngine10drawPointsEPK6QPointi
+   fun:_ZN8QPainter10drawPointsEPK6QPointi
+   fun:_Z28qt_plastique_drawShadedPanelP8QPainterPK12QStyleOptionbPK7QWidget
+   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK12QCommonStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
+   fun:_ZNK13QWindowsStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplex)8QPainterPK7QWidget
+   fun:_ZNK15QPlastiqueStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
+   fun:_ZN11QToolButton10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN15QAbstractButton5eventEP6QEvent
+   fun:_ZN11QToolButton5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN19QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
 }
 {
    <insert a suppression name here>
@@ -8986,34 +8973,6 @@
 {
    <insert a suppression name here>
    Memcheck:Leak
-   fun:malloc
-   fun:_Z6Balloci
-   fun:_Z3i2bi
-   fun:_Z8pow5multP6Biginti
-   fun:_ZNK14QLocalePrivate14doubleToStringEdiNS_10DoubleFormEij
-   fun:_ZN7QString6setNumEdci
-   fun:_ZN7QString6numberEdci
-   fun:_Z7convertPKN8QVariant7PrivateENS_4TypeEPvPb
-   fun:_Z7convertPKN8QVariant7PrivateENS_4TypeEPvPb
-   fun:_ZN8QVariant7convertENS_4TypeE
-   fun:_ZNK13QMetaProperty5writeEP7QObjectRK8QVariant
-   fun:_ZN7QObject11setPropertyEPKcRK8QVariant
-   fun:_ZN25pqPropertyLinksConnection23smLinkedPropertyChangedEv
-   fun:_ZN25pqPropertyLinksConnection11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
-   fun:_ZN16QSingleShotTimer7timeoutEv
-   fun:_ZN16QSingleShotTimer10timerEventEP11QTimerEvent
-   fun:_ZN7QObject5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_Z19timerSourceDispatchP8_GSourcePFiPvES1_
-   fun:g_main_context_dispatch
-   obj:/usr/lib/libglib-2.0.so.0.1000.3
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
    fun:_Znwj
    fun:_Z14tryPatternLoadP10_FcPatterniRK8QFontDefi
    fun:_ZN13QFontDatabase4loadEPK12QFontPrivatei
@@ -10268,8 +10227,6 @@
    fun:_ZN22QX11PaintEnginePrivate15fillPolygon_devEPK7QPointFiNS_6GCModeEN12QPaintEngine15PolygonDrawModeE
    fun:_ZN22QX11PaintEnginePrivate8fillPathERK12QPainterPathNS_6GCModeEb
    fun:_ZN15QX11PaintEngine8drawPathERK12QPainterPath
-   fun:_ZN15QX11PaintEngine9drawLinesEPK5QLinei
-   fun:_ZN8QPainter9drawLinesEPK5QLinei
 }
 {
    <insert a suppression name here>
@@ -11096,6 +11053,33 @@
    fun:_Z14qt_format_textRK5QFontRK6QRectFiRK7QStringPS2_iPiiP8QPainter
    fun:_ZNK12QFontMetrics12boundingRectERK5QRectiRK7QStringiPi
    fun:_ZNK12QFontMetrics4sizeEiRK7QStringiPi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/libfreetype.so.6.3.10
+   fun:ft_mem_qalloc
+   fun:ft_mem_alloc
+   fun:ft_mem_qrealloc
+   fun:ft_mem_realloc
+   obj:/usr/lib/libfreetype.so.6.3.10
+   obj:/usr/lib/libfreetype.so.6.3.10
+   obj:/usr/lib/libfreetype.so.6.3.10
+   fun:FT_Open_Face
+   fun:FT_New_Face
+   fun:_ZN13QFreetypeFace7getFaceERKN11QFontEngine6FaceIdE
+   fun:_ZN13QFontEngineFTC1EP10_FcPatternRK8QFontDefi
+   fun:_Z14tryPatternLoadP10_FcPatterniRK8QFontDefi
+   fun:_ZN13QFontDatabase4loadEPK12QFontPrivatei
+   fun:_ZN11QScriptLine16setDefaultHeightEP11QTextEngine
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutBlockERK10QTextBlockP13QLayoutStructiiS2_
+   fun:_ZN26QTextDocumentLayoutPrivate10layoutFlowEN10QTextFrame8iteratorEP13QLayoutStructii
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameiidd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameii
+   fun:_ZN19QTextDocumentLayout8doLayoutEiii
 }
 {
    <insert a suppression name here>
