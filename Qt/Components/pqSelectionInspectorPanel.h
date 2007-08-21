@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include <QWidget>
 
-//class pqPipelineRepresentation;
 class pqDataRepresentation;
 class pqPipelineSource;
 class pqRubberBandHelper;
@@ -48,7 +47,6 @@ class vtkSMClientDeliveryRepresentationProxy;
 class vtkSMSourceProxy;
 class vtkUnstructuredGrid;
 
-/// Displays a collection of data set elements in a spreadsheet form.
 /// pqSelectionInspectorPanel has dual role:
 /// \li showing the data from the active selection
 /// \li showing the data from a "ExtractCellSelection" 
@@ -97,6 +95,8 @@ protected slots:
   void updatePointLabelMode(const QString&);
   void updateCellLabelMode(const QString&);
   void updateSelectionLabelEnableState();
+  void updateSelectionPointLabelArrayName();
+  void updateSelectionCellLabelArrayName();
 
   /// Deletes selected elements.
   void deleteSelectedSurfaceSelection();

@@ -123,6 +123,7 @@ public:
     this->Representation = 0;
     this->InputSource = 0;
     this->VTKConnectSelInput = vtkEventQtSlotConnect::New();
+    this->VTKConnectRep = vtkEventQtSlotConnect::New();
     }
 
   ~pqImplementation()
@@ -149,6 +150,7 @@ public:
     this->InputSource = 0;
     this->Representation = 0;
     this->VTKConnectSelInput->Delete();
+    this->VTKConnectRep->Delete();
     }
 
   QPointer<pqSelectionManager> SelectionManager;
@@ -164,6 +166,7 @@ public:
 
   // Selection Labels Properties
   vtkEventQtSlotConnect* VTKConnectSelInput;
+  vtkEventQtSlotConnect* VTKConnectRep;
   pqPropertyLinks* SourceLinks;
   pqPropertyLinks* RepLinks;
 
@@ -298,16 +301,6 @@ void pqSelectionInspectorPanel::onSelectionChanged()
       vtkSMSourceProxy::SafeDownCast(input->getProxy());
     //this->setEnabled(true);
     this->setSelectionSource(inputsrc->GetSelectionInput(portnum));
-
-    this->Implementation->VTKConnectSelInput->Disconnect();
-    this->Implementation->VTKConnectSelInput->Connect(
-      inputsrc->GetSelectionInput(portnum),
-      //inputsrc,
-      vtkCommand::ModifiedEvent, this, 
-      SLOT(updateSelectionSource()),
-      NULL, 0.0,
-      Qt::QueuedConnection);
-
     }
 }
 
@@ -316,9 +309,9 @@ void pqSelectionInspectorPanel::setInputSource(
   pqPipelineSource* input, int vtkNotUsed(portnum)) 
 {
   if(this->Implementation->InputSource == input)
-  {
+    {
     return;
-  }
+    }
 
   if (this->Implementation->InputSource)
     {
@@ -331,6 +324,7 @@ void pqSelectionInspectorPanel::setInputSource(
   this->updateSurfaceSelectionIDRanges();
 
   this->updateThreholdDataArrays();
+  this->updateSelectionLabelModes();
 
   vtkSMSourceProxy *inputsrc = 
     input ? vtkSMSourceProxy::SafeDownCast(input->getProxy()) : 0;
@@ -378,12 +372,23 @@ void pqSelectionInspectorPanel::setRepresentation(
 
   if (!repr )
     {
-//    this->setEnabled(false);
     return;
     }
   else
     {
-    //this->setEnabled(true);
+    this->Implementation->VTKConnectRep->Disconnect();
+    this->Implementation->VTKConnectRep->Connect(
+      repr->getProxy()->GetProperty("SelectionPointFieldDataArrayName"),
+      vtkCommand::ModifiedEvent, this, 
+      SLOT(updateSelectionPointLabelArrayName()),
+      NULL, 0.0,
+      Qt::QueuedConnection);
+    this->Implementation->VTKConnectRep->Connect(
+      repr->getProxy()->GetProperty("SelectionCellFieldDataArrayName"),
+      vtkCommand::ModifiedEvent, this, 
+      SLOT(updateSelectionCellLabelArrayName()),
+      NULL, 0.0,
+      Qt::QueuedConnection);
     }
 
   this->updateSelectionRepGUI();
@@ -413,6 +418,13 @@ void pqSelectionInspectorPanel::setSelectionSource(
   else
     {
     this->setEnabled(true);
+    this->Implementation->VTKConnectSelInput->Disconnect();
+    this->Implementation->VTKConnectSelInput->Connect(
+      source,
+      vtkCommand::ModifiedEvent, this, 
+      SLOT(updateSelectionSource()),
+      NULL, 0.0,
+      Qt::QueuedConnection);
     }
 
   this->Implementation->SelectionSource = source;
@@ -475,14 +487,15 @@ void pqSelectionInspectorPanel::updateSelectionRepGUI()
     reprProxy, reprProxy->GetProperty("SelectionColor"));
 
   // Selection Label Properties
+
   // Point labels properties
+  QObject::connect(this->Implementation->PointLabelModeAdaptor, 
+    SIGNAL(currentTextChanged(const QString&)),
+    this, SLOT(updatePointLabelMode(const QString&)),
+    Qt::QueuedConnection);
   this->Implementation->RepLinks->addPropertyLink(
     this->Implementation->checkBoxLabelPoints, "checked", SIGNAL(stateChanged(int)),
     reprProxy, reprProxy->GetProperty("SelectionPointLabelVisibility"));
-
-  QObject::connect(this->Implementation->PointLabelModeAdaptor, SIGNAL(currentTextChanged(const QString&)),
-    this, SLOT(updatePointLabelMode(const QString&)),
-    Qt::QueuedConnection);
 
   this->Implementation->RepLinks->addPropertyLink(
     this->Implementation->toolButtonBold_Point, "checked", SIGNAL(toggled(bool)),
@@ -513,13 +526,14 @@ void pqSelectionInspectorPanel::updateSelectionRepGUI()
     reprProxy, reprProxy->GetProperty("SelectionPointLabelOpacity"));
 
   // Cell Labels properties
+
+  QObject::connect(this->Implementation->CellLabelModeAdaptor, 
+    SIGNAL(currentTextChanged(const QString&)),
+    this, SLOT(updateCellLabelMode(const QString&)),
+    Qt::QueuedConnection);
   this->Implementation->RepLinks->addPropertyLink(
     this->Implementation->checkBoxLabelCells, "checked", SIGNAL(stateChanged(int)),
     reprProxy, reprProxy->GetProperty("SelectionCellLabelVisibility"));
-
-  QObject::connect(this->Implementation->CellLabelModeAdaptor, SIGNAL(currentTextChanged(const QString&)),
-    this, SLOT(updateCellLabelMode(const QString&)),
-    Qt::QueuedConnection);
 
   this->Implementation->RepLinks->addPropertyLink(
     this->Implementation->toolButtonBold_Cell, "checked", SIGNAL(toggled(bool)),
@@ -646,7 +660,7 @@ void pqSelectionInspectorPanel::updateSelectionSourceGUI()
     selectionSource, selectionSource->GetProperty("Thresholds"));
 
   this->updateSelectionLabelEnableState();
-  this->updateSelectionLabelModes();
+//  this->updateSelectionLabelModes();
   this->updateSurfaceIDConnections();
 
 }
@@ -703,7 +717,9 @@ void pqSelectionInspectorPanel::setupSelelectionLabelGUI()
   this->Implementation->PointLabelAlignmentAdaptor = new pqSignalAdaptorComboBox(
     this->Implementation->comboTextAlign_Point);
   QObject::connect(this->Implementation->PointLabelModeAdaptor, 
-    SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateRepresentationViews()));
+    SIGNAL(currentTextChanged(const QString&)), 
+    this, SLOT(updateRepresentationViews()),
+    Qt::QueuedConnection);
 
   this->Implementation->CellColorAdaptor = new pqSignalAdaptorColor(
     this->Implementation->buttonColor_Cell, "chosenColor", 
@@ -715,8 +731,76 @@ void pqSelectionInspectorPanel::setupSelelectionLabelGUI()
   this->Implementation->CellLabelAlignmentAdaptor = new pqSignalAdaptorComboBox(
     this->Implementation->comboTextAlign_Cell);
   QObject::connect(this->Implementation->CellLabelModeAdaptor, 
-    SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateRepresentationViews()));
+    SIGNAL(currentTextChanged(const QString&)), 
+    this, SLOT(updateRepresentationViews()),
+    Qt::QueuedConnection);
 }
+
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::updateSelectionPointLabelArrayName()
+{
+  vtkSMProxy* reprProxy = this->Implementation->Representation->getProxy();
+  if(!reprProxy)
+    {
+    return;
+    }
+
+  // Point Label
+  vtkSMProperty* svp = reprProxy->
+    GetProperty("SelectionPointFieldDataArrayName");
+  if(!svp)
+  {
+    return;
+  }
+
+  QString text = pqSMAdaptor::getElementProperty(svp).toString();
+  if(text.isEmpty())
+    {
+    return;
+    }
+
+  if(text == "vtkOriginalPointIds")
+    {
+    this->Implementation->PointLabelModeAdaptor->setCurrentText("Point IDs");
+    }
+  else
+    {
+    this->Implementation->PointLabelModeAdaptor->setCurrentText(text);
+    }
+} 
+
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::updateSelectionCellLabelArrayName()
+{
+  vtkSMProxy* reprProxy = this->Implementation->Representation->getProxy();
+  if(!reprProxy)
+    {
+    return;
+    }
+
+  // Cell Label
+  vtkSMProperty* svp = reprProxy->
+    GetProperty("SelectionCellFieldDataArrayName");
+  if(!svp)
+  {
+    return;
+  }
+
+  QString text = pqSMAdaptor::getElementProperty(svp).toString();
+  if(text.isEmpty())
+    {
+    return;
+    }
+
+  if(text == "vtkOriginalCellIds")
+    {
+    this->Implementation->CellLabelModeAdaptor->setCurrentText("Cell IDs");
+    }
+  else
+    {
+    this->Implementation->CellLabelModeAdaptor->setCurrentText(text);
+    }
+} 
 
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::updatePointLabelMode(const QString& text)
@@ -813,20 +897,21 @@ void pqSelectionInspectorPanel::updateSelectionLabelEnableState()
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::updateSelectionLabelModes()
 {
-  if(!this->Implementation->InputSource->getProxy())
-  {
+  if(!this->Implementation->InputSource ||
+    !this->Implementation->InputSource->getProxy())
+    {
     return;
-  }
+    }
 
   vtkSMProxy* inputSrc = this->Implementation->InputSource->getProxy();
 
   if (inputSrc)
-  {
+    {
     vtkSMSourceProxy* sourceProxy = vtkSMSourceProxy::SafeDownCast(inputSrc);
     if(!sourceProxy)
-    {
+      {
       return;
-    }
+      }
     vtkPVDataInformation* geomInfo = sourceProxy->GetDataInformation();
 
     vtkPVDataSetAttributesInformation* attrInfo;
@@ -835,26 +920,26 @@ void pqSelectionInspectorPanel::updateSelectionLabelModes()
     this->Implementation->comboLabelMode_Point->addItem("Point IDs");
     attrInfo = geomInfo->GetPointDataInformation();
     for(int i=0; i<attrInfo->GetNumberOfArrays(); i++)
-    {
+      {
       QString arrayName = attrInfo->GetArrayInformation(i)->GetName();
       if(arrayName != "vtkOriginalPointIds") // "Point IDs"
-      {
+        {
         this->Implementation->comboLabelMode_Point->addItem(arrayName);
+        }
       }
-    }
 
     this->Implementation->comboLabelMode_Cell->clear();
     this->Implementation->comboLabelMode_Cell->addItem("Cell IDs");
     attrInfo = geomInfo->GetCellDataInformation();
     for(int i=0; i<attrInfo->GetNumberOfArrays(); i++)
-    {
+      {
       QString arrayName = attrInfo->GetArrayInformation(i)->GetName();
       if(arrayName != "vtkOriginalCellIds") // "Cell IDs"
-      {
+        {
         this->Implementation->comboLabelMode_Cell->addItem(arrayName);
-      }
-    }      
-  }
+        }
+      }      
+    }
 }
 
 //-----------------------------------------------------------------------------
