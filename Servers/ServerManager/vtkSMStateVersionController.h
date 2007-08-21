@@ -42,6 +42,7 @@ public:
 //BTX
   bool ConvertViewModulesToViews(vtkPVXMLElement* parent);
   bool ConvertLegacyReader(vtkPVXMLElement* parent);
+  bool ConvertPVAnimationSceneToAnimationScene(vtkPVXMLElement* parent);
 protected:
   vtkSMStateVersionController();
   ~vtkSMStateVersionController();
