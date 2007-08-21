@@ -1399,6 +1399,8 @@ def _findClassForProxy(xmlName):
         return filters.__dict__[xmlName]
     elif xmlName in rendering.__dict__:
         return rendering.__dict__[xmlName]
+    elif xmlName in animation.__dict__:
+        return animation.__dict__[xmlName]
     else:
         return None
 
