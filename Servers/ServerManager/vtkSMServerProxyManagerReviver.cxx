@@ -31,7 +31,7 @@
 
 #include <vtksys/ios/sstream>
 vtkStandardNewMacro(vtkSMServerProxyManagerReviver);
-vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.7");
+vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.8");
 //-----------------------------------------------------------------------------
 vtkSMServerProxyManagerReviver::vtkSMServerProxyManagerReviver()
 {
@@ -95,9 +95,9 @@ int vtkSMServerProxyManagerReviver::ReviveRemoteServerManager(vtkIdType cid)
   vtksys_ios::ostringstream xml_stream;
   root->PrintXML(xml_stream, vtkIndent());
 
-  ofstream file("/tmp/revive.xml");
-  root->PrintXML(file, vtkIndent());
-  file.close();
+  // ofstream file("/tmp/revive.xml");
+  // root->PrintXML(file, vtkIndent());
+  // file.close();
 
   root->Delete();
 

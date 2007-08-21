@@ -32,9 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTimeKeeper.h"
 
 #include "vtkEventQtSlotConnect.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxy.h"
-#include "vtkSmartPointer.h"
+#include "vtkSMProxyProperty.h"
 
 #include <QList>
 #include <QMap>
@@ -46,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
+#include "pqView.h"
 
 #include <vtkstd/vector>
 //-----------------------------------------------------------------------------
@@ -110,6 +112,11 @@ pqTimeKeeper::pqTimeKeeper( const QString& group, const QString& name,
   QObject::connect(smmodel, SIGNAL(sourceRemoved(pqPipelineSource*)),
     this, SLOT(sourceRemoved(pqPipelineSource*)));
 
+  QObject::connect(smmodel, SIGNAL(viewAdded(pqView*)),
+    this, SLOT(viewAdded(pqView*)), Qt::QueuedConnection);
+  QObject::connect(smmodel, SIGNAL(viewRemoved(pqView*)),
+    this, SLOT(viewRemoved(pqView*)));
+
   this->blockSignals(true);
   // ServerManagerModel may already have some registered sources
   // (happens when loading state).
@@ -120,6 +127,12 @@ pqTimeKeeper::pqTimeKeeper( const QString& group, const QString& name,
   foreach(pqPipelineSource* src, sources)
     {
     this->sourceAdded(src);
+    }
+
+  QList<pqView*> views = smmodel->findItems<pqView*>(this->getServer());
+  foreach (pqView* view, views)
+    {
+    this->viewAdded(view);
     }
   this->blockSignals(false);
 
@@ -311,4 +324,28 @@ void pqTimeKeeper::cleanupTimes(pqPipelineSource* source)
   // Remove times reported by this source.
   pqInternals::clearValues(this->Internals->Timesteps, source);
   pqInternals::clearValues(this->Internals->Timeranges, source);
+}
+
+//-----------------------------------------------------------------------------
+void pqTimeKeeper::viewAdded(pqView* view)
+{
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->getProxy()->GetProperty("Views"));
+  if (!pp->IsProxyAdded(view->getProxy()))
+    {
+    pp->AddProxy(view->getProxy());
+    this->getProxy()->UpdateVTKObjects();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqTimeKeeper::viewRemoved(pqView* view)
+{
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->getProxy()->GetProperty("Views"));
+  if (pp->IsProxyAdded(view->getProxy()))
+    {
+    pp->RemoveProxy(view->getProxy());
+    this->getProxy()->UpdateVTKObjects();
+    }
 }

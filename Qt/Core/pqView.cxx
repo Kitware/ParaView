@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkEventQtSlotConnect.h"
-#include "vtkSMPropertyLink.h"
 #include "vtkSMProxyProperty.h"
 
 // Qt includes.
@@ -65,7 +64,6 @@ public:
 
   // List of representation shown by this view.
   QList<QPointer<pqRepresentation> > Representations;
-  vtkSmartPointer<vtkSMPropertyLink> ViewTimeLink;
 
   pqViewInternal()
     {
@@ -103,16 +101,6 @@ pqView::pqView( const QString& type,
   // registered, this method will detect them and sync the GUI state with the 
   // SM state.
   this->onRepresentationsChanged();
-
-  // Link ViewTime with global time.
-  vtkSMProxy* timekeeper = this->getServer()->getTimeKeeper()->getProxy();
-
-  vtkSMPropertyLink* link = vtkSMPropertyLink::New();
-  link->AddLinkedProperty(timekeeper->GetProperty("Time"), vtkSMLink::INPUT);
-  link->AddLinkedProperty(view->GetProperty("ViewTime"), vtkSMLink::OUTPUT);
-  view->GetProperty("ViewTime")->Copy(timekeeper->GetProperty("Time"));
-  this->Internal->ViewTimeLink = link;
-  link->Delete();
 
   this->Internal->RenderTimer.setSingleShot(true);
   this->Internal->RenderTimer.setInterval(1);

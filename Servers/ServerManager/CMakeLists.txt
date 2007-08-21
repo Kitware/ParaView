@@ -112,7 +112,6 @@ SET(Kit_SRCS
   vtkSMProxyProperty.cxx
   vtkSMProxyRegisterUndoElement.cxx
   vtkSMProxyUnRegisterUndoElement.cxx
-#vtkSMPVAnimationSceneProxy.cxx
   vtkSMPVDWriterProxy.cxx
   vtkSMPVLookupTableProxy.cxx
   vtkSMPVRepresentationProxy.cxx
@@ -154,6 +153,7 @@ SET(Kit_SRCS
   vtkSMTextSourceRepresentationProxy.cxx
   vtkSMTextWidgetRepresentationProxy.cxx
   vtkSMTimeAnimationCueProxy.cxx
+  vtkSMTimeKeeperProxy.cxx
   vtkSMTimeRangeInformationHelper.cxx
   vtkSMTimeStepsInformationHelper.cxx
   vtkSMTransformProxy.cxx

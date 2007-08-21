@@ -1739,24 +1739,40 @@
     <!-- End of FileInformationHelper -->
     </Proxy>
 
-    <Proxy name="TimeKeeper" class="">
+    <TimeKeeperProxy name="TimeKeeper" class="">
+      <Documentation>
+        TimeKeeper is used to keep the pipeline time for the application.
+        All views added to the timekeeper show the same time as that on the time
+        keeper.
+      </Documentation>
+
       <DoubleVectorProperty
         name="Time"
-        number_of_elements="1"
-        default_values="0"
+        command="SetTime"
         update_self="1"
-        immediate_update="1" >
+        immediate_update="1" 
+        number_of_elements="1"
+        default_values="0">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
         name="TimestepValues"
-        update_self="1"
         immediate_update="1" >
       </DoubleVectorProperty>
 
+      <ProxyProperty
+        name="Views"
+        command="AddView"
+        remove_command="RemoveView"
+        update_self="1">
+        <Documentation>
+          Views with their view time linked with this time keeper.
+        </Documentation>
+      </ProxyProperty>
+
       <!-- End of TimeKeeper -->
-    </Proxy>
+    </TimeKeeperProxy>
     
     <Proxy name="PluginLoader" class="vtkSMPluginLoader">
       <StringVectorProperty

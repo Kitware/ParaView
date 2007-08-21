@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyUnRegisterUndoElement.h"
 
 vtkStandardNewMacro(pqUndoStackBuilder);
-vtkCxxRevisionMacro(pqUndoStackBuilder, "1.4");
+vtkCxxRevisionMacro(pqUndoStackBuilder, "1.5");
 //-----------------------------------------------------------------------------
 pqUndoStackBuilder::pqUndoStackBuilder()
 {
@@ -192,6 +192,13 @@ void pqUndoStackBuilder::OnPropertyModified(vtkSMProxy* proxy,
   if (proxy->IsA("vtkSMNewWidgetRepresentationProxy"))
     {
     // We don't record 3D widget changes.
+    return;
+    }
+
+  if (proxy->IsA("vtkSMTimeKeeperProxy") &&
+    strcmp(pname, "Views") == 0)
+    {
+    // Views are updated by the GUI automatically.
     return;
     }
 

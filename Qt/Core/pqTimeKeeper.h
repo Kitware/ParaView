@@ -35,9 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPair>
 #include "pqProxy.h"
 
-class vtkSMProxy;
 class pqPipelineSource;
+class pqView;
 class vtkObject;
+class vtkSMProxy;
 
 /// pqTimeKeeper is pqProxy for "TimeKeeper" proxy. A timekeeper is
 /// created by default per connection. pqServer keeps a pointer to the 
@@ -80,12 +81,21 @@ signals:
   /// Fired when the current time changes.
   void timeChanged();
 
-public slots:
-  void sourceAdded(pqPipelineSource*);
-  void sourceRemoved(pqPipelineSource*);
 
 protected slots:
   void propertyModified(vtkObject*, unsigned long, void*, void* callData);
+  
+  /// Called when a source is added.
+  void sourceAdded(pqPipelineSource*);
+
+  /// Called when a source is removed.
+  void sourceRemoved(pqPipelineSource*);
+
+  /// Called when a view is added.
+  void viewAdded(pqView*);
+
+  /// Called when a view is removed.
+  void viewRemoved(pqView*);
 
 protected:
   void updateTimeKeeperProxy();

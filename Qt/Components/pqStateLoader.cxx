@@ -60,7 +60,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqStateLoader);
-vtkCxxRevisionMacro(pqStateLoader, "1.11");
+vtkCxxRevisionMacro(pqStateLoader, "1.12");
 //-----------------------------------------------------------------------------
 pqStateLoader::pqStateLoader()
 {
@@ -127,7 +127,7 @@ vtkSMProxy* pqStateLoader::NewProxyInternal(
   const char* xml_group, const char* xml_name)
 {
   if (xml_group && xml_name && strcmp(xml_group, "animation")==0
-    && strcmp(xml_name, "PVAnimationScene")==0)
+    && strcmp(xml_name, "AnimationScene")==0)
     {
     // If an animation scene already exists, we use that.
     pqAnimationScene* scene = 
@@ -162,7 +162,7 @@ void pqStateLoader::RegisterProxyInternal(const char* group,
 {
   if (proxy->GetXMLGroup() 
     && strcmp(proxy->GetXMLGroup(), "animation")==0
-    && proxy->IsA("vtkSMPVAnimationScene"))
+    && proxy->IsA("vtkSMAnimationScene"))
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     if (pxm->GetProxyName(group, proxy))
@@ -204,6 +204,24 @@ int pqStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
       proxyElement->RemoveNestedElement(toRemove);
       }
     }
+  else if (strcmp(proxy->GetXMLGroup(), "misc")==0 && 
+    strcmp(proxy->GetXMLName(), "TimeKeeper") == 0)
+    {
+    unsigned int max = proxyElement->GetNumberOfNestedElements();
+    for (unsigned int cc=0; cc < max; ++cc)
+      {
+      // Views are not loaded from state, since the pqTimeKeeper 
+      // automatically updates the property appropriately.
+      vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
+      if (element->GetName() == QString("Property") &&
+        element->GetAttribute("name") == QString("Views"))
+        {
+        proxyElement->RemoveNestedElement(element);
+        break;
+        }
+      }
+    }
+
   return this->Superclass::LoadProxyState(proxyElement, proxy);
 }
 
