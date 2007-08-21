@@ -146,16 +146,20 @@ public:
       for(int i=0; i<pxys.size(); i++)
         {
         pqProxy* pqproxy = pxys[i];
-        QList<vtkSMProxy*> helpers = pqproxy->getHelperProxies();
-        int idx = helpers.indexOf(pxy);
-        if(idx != -1)
+        QList<QString> keys = pqproxy->getHelperKeys();
+        for(int j=0; j<keys.size(); j++)
           {
-          QString key = pqproxy->getHelperKeys()[idx];
-          vtkSMProperty* prop =
-            pqproxy->getProxy()->GetProperty(key.toAscii().data());
-          QString pp = prop->GetXMLLabel();
-          QString n = pqproxy->getSMName();
-          name = QString("%1 - %2 - %3").arg(n).arg(pp).arg(p);
+          QString key = keys[j];
+          QList<vtkSMProxy*> helpers = pqproxy->getHelperProxies(keys[j]);
+          int idx = helpers.indexOf(pxy);
+          if(idx != -1)
+            {
+            vtkSMProperty* prop =
+              pqproxy->getProxy()->GetProperty(key.toAscii().data());
+            QString pp = prop->GetXMLLabel();
+            QString n = pqproxy->getSMName();
+            name = QString("%1 - %2 - %3").arg(n).arg(pp).arg(p);
+            }
           }
         }
       }
