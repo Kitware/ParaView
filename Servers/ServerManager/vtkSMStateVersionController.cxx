@@ -20,7 +20,7 @@
 #include "vtksys/ios/sstream"
 
 vtkStandardNewMacro(vtkSMStateVersionController);
-vtkCxxRevisionMacro(vtkSMStateVersionController, "1.7");
+vtkCxxRevisionMacro(vtkSMStateVersionController, "1.8");
 //----------------------------------------------------------------------------
 vtkSMStateVersionController::vtkSMStateVersionController()
 {
@@ -333,17 +333,15 @@ bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
     }
 
     {
-    // Convert different kinds of old-views to new-views.
+    // Remove element inspector view.
     const char* attrs[] = {
       "group", "views",
       "type", "ElementInspectorView", 0};
     const char* newAttrs[] = {
       "group", "newviews",
       "type", "ElementInspectorView", 0};
-    this->Select( root, "Proxy", attrs,
-      &::ConvertViewModulesToViews,
-      this);
-    this->SelectAndSetAttributes(root, "Proxy", attrs, newAttrs);
+    this->SelectAndRemove(root, "Proxy", attrs);
+    this->SelectAndRemove(root, "Proxy", newAttrs);
     }
 
     {
@@ -421,14 +419,14 @@ bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
     }
 
     {
-    // Convert all displays to representations.
+    // Remove element inspector representations. 
     const char* attrs[] = {
       "type", "ElementInspectorDisplay", 0};
     const char* newAttrs[] = {
       "group", "representations",
       "type", "ElementInspectorRepresentation", 0};
-    this->SelectAndSetAttributes(
-      root, "Proxy", attrs, newAttrs);
+    this->SelectAndRemove(root, "Proxy", attrs);
+    this->SelectAndRemove(root, "Proxy", newAttrs);
     }
 
     {
