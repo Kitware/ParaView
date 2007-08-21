@@ -49,7 +49,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.13");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.14");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -632,6 +632,16 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
   vtksys::RegularExpression reg_ex("^(.*)\\.([0-9.]+)$");
   // sequence ending with extension.
   vtksys::RegularExpression reg_ex2("^(.*)(\\.|_)([0-9.]+)\\.(.*)$");
+  
+  // sequence ending with extension, but with no ". or _" before
+  // the series number.
+  vtksys::RegularExpression reg_ex3("^(.*)([a-zA-Z])([0-9.]+)\\.(.*)$");
+  // sequence ending with extension, and starting with series number
+  // followed by ". or _".
+  vtksys::RegularExpression reg_ex4("^([0-9.]+)(\\.|_)(.*)\\.(.*)$");
+  // sequence ending with extension, and starting with series number,
+  // but not followed by ". or _".
+  vtksys::RegularExpression reg_ex5("^([0-9.]+)([a-zA-Z])(.*)\\.(.*)$");
 
   for (vtkPVFileInformationSet::iterator iter = info_set.begin();
     iter != info_set.end(); )
@@ -650,6 +660,21 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
       else if (reg_ex2.find(obj->GetName()))
         {
         groupName = reg_ex2.match(1) + reg_ex2.match(2) + ".." + reg_ex2.match(4);
+        match = true;
+        }
+      else if (reg_ex3.find(obj->GetName()))
+        {
+        groupName = reg_ex3.match(1) + reg_ex3.match(2) + ".." + reg_ex3.match(4);
+        match = true;
+        }
+      else if (reg_ex4.find(obj->GetName()))
+        {
+        groupName = ".." + reg_ex4.match(2) + reg_ex4.match(3) + "." + reg_ex4.match(4);
+        match = true;
+        }
+      else if (reg_ex5.find(obj->GetName()))
+        {
+        groupName = ".." + reg_ex5.match(2) + reg_ex5.match(3) + "." + reg_ex5.match(4);
         match = true;
         }
 
