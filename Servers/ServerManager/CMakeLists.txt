@@ -127,7 +127,6 @@ SET(Kit_SRCS
   vtkSMSelectionHelper.cxx
   vtkSMSelectionLink.cxx
   vtkSMSelectionLinkProxy.cxx
-#  vtkSMSelectionProxy.cxx
   vtkSMSelectionRepresentationProxy.cxx
   vtkSMServerFileListingProxy.cxx
   vtkSMServerProxyManagerReviver.cxx
