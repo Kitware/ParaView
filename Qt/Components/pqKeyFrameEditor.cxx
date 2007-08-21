@@ -43,6 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 #include <QVBoxLayout>
 #include <QDialogButtonBox>
+#include <QSignalMapper>
+
+#include <vtkSMRenderViewProxy.h>
 
 #include "pqAnimationCue.h"
 #include "pqAnimationScene.h"
@@ -64,6 +67,7 @@ pqKeyFrameTypeDialog::pqKeyFrameTypeDialog(QWidget* p, QWidget* child)
 {
   this->Child = child;
   this->setAttribute(Qt::WA_DeleteOnClose);
+  this->setWindowModality(Qt::WindowModal);
   this->setWindowTitle(tr("Key Frame Interpolation"));
   this->setModal(true);
   QVBoxLayout* l = new QVBoxLayout(this);
@@ -105,11 +109,20 @@ public:
 
 //-----------------------------------------------------------------------------
 // item model for putting a key frame interpolation widget in the model
-class pqCameraKeyFrameItem : public QStandardItem
+class pqCameraKeyFrameItem : public QObject, public QStandardItem
 {
 public:
-  pqCameraKeyFrameItem() : Widget()
+  pqCameraKeyFrameItem() : Widget(), CamWidget(&this->Widget)
     {
+    QVBoxLayout* l = new QVBoxLayout(&this->Widget);
+    l->setMargin(0);
+    QHBoxLayout* hl = new QHBoxLayout;
+    l->addLayout(hl);
+    this->Button = new QPushButton(&this->Widget);
+    this->Button->setText("Use Current");
+    hl->addWidget(this->Button);
+    hl->addStretch();
+    l->addWidget(&this->CamWidget);
     }
   // get data from widget
   QVariant data(int role) const
@@ -117,13 +130,15 @@ public:
     QVariant d;
     if(role == Qt::DisplayRole)
       {
-      QList<QVariant> pos = this->Widget.position();
+      QList<QVariant> pos = this->CamWidget.position();
       d = QString("Position(%1,%2,%3), ...").
           arg(pos[0].toString()).arg(pos[1].toString()).arg(pos[2].toString());
       }
     return d;
     }
-  pqCameraWidget Widget;
+  QWidget Widget;
+  QPushButton* Button;
+  pqCameraWidget CamWidget;
 };
 
 //-----------------------------------------------------------------------------
@@ -205,18 +220,23 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class pqKeyFrameEditor::pqInternal : public Ui::pqKeyFrameEditor
+class pqKeyFrameEditor::pqInternal
 {
 public:
-  pqInternal()
+  pqInternal(pqKeyFrameEditor* editor) : Editor(editor)
     {
+    QObject::connect(&this->CameraMapper, SIGNAL(mapped(QObject*)),
+                     editor, SLOT(useCurrentCamera(QObject*)));
     }
+  pqKeyFrameEditor* const Editor;
+  Ui::pqKeyFrameEditor Ui;
   QPointer<pqAnimationCue> Cue;
   QPointer<pqAnimationScene> Scene;
   QStandardItemModel Model;
   QPair<double,double> TimeRange;
   QPair<QVariant,QVariant> ValueRange;
   pqKeyFrameEditorDelegate* EditorDelegate;
+  QSignalMapper CameraMapper;
 
   double normalizedTime(double t)
     {
@@ -268,9 +288,9 @@ public:
     item->setData(time, Qt::DisplayRole);
     return item;
     }
-  QStandardItem* newInterpolationItem(int row)
+  pqKeyFrameInterpolationItem* newInterpolationItem(int row)
     {
-    QStandardItem* item = NULL;
+    pqKeyFrameInterpolationItem* item = NULL;
     int count = this->Model.rowCount();
     if(count != row || row == 0)
       {
@@ -278,23 +298,27 @@ public:
       }
     return item;
     }
-  QStandardItem* newCameraItem(int)
+  pqCameraKeyFrameItem* newCameraItem(int)
     {
     pqCameraKeyFrameItem* item = NULL;
     // default to current view
     vtkSMProxy* pxy = this->Cue->getAnimatedProxy();
     item = new pqCameraKeyFrameItem();
+
+    QObject::connect(item->Button, SIGNAL(clicked(bool)),
+                     &this->CameraMapper, SLOT(map()));
+    this->CameraMapper.setMapping(item->Button, item);
     
-    item->Widget.setPosition(
+    item->CamWidget.setPosition(
       pqSMAdaptor::getMultipleElementProperty(
         pxy->GetProperty("CameraPosition")));
-    item->Widget.setFocalPoint(
+    item->CamWidget.setFocalPoint(
       pqSMAdaptor::getMultipleElementProperty(
         pxy->GetProperty("CameraFocalPoint")));
-    item->Widget.setViewUp(
+    item->CamWidget.setViewUp(
       pqSMAdaptor::getMultipleElementProperty(
         pxy->GetProperty("CameraViewUp")));
-    item->Widget.setViewAngle(
+    item->CamWidget.setViewAngle(
       pqSMAdaptor::getElementProperty(
         pxy->GetProperty("CameraViewAngle")));
 
@@ -338,8 +362,8 @@ pqKeyFrameEditor::pqKeyFrameEditor(pqAnimationScene* scene,
                                    const QString& label)
   : QWidget(p)
 {
-  this->Internal = new pqInternal;
-  this->Internal->setupUi(this);
+  this->Internal = new pqInternal(this);
+  this->Internal->Ui.setupUi(this);
   this->ValuesOnly = false;
   this->Internal->Scene = scene;
   this->Internal->Cue = cue;
@@ -363,23 +387,23 @@ pqKeyFrameEditor::pqKeyFrameEditor(pqAnimationScene* scene,
     this->Internal->ValueRange.second = 0;
     }
 
-  this->Internal->tableView->setModel(&this->Internal->Model);
-  this->Internal->tableView->horizontalHeader()->setStretchLastSection(true);
+  this->Internal->Ui.tableView->setModel(&this->Internal->Model);
+  this->Internal->Ui.tableView->horizontalHeader()->setStretchLastSection(true);
 
   this->Internal->EditorDelegate = 
-    new pqKeyFrameEditorDelegate(this->Internal->tableView);
-  this->Internal->tableView->setItemDelegate(this->Internal->EditorDelegate);
+    new pqKeyFrameEditorDelegate(this->Internal->Ui.tableView);
+  this->Internal->Ui.tableView->setItemDelegate(this->Internal->EditorDelegate);
 
   this->readKeyFrameData();
 
-  connect(this->Internal->pbNew, SIGNAL(clicked(bool)),
+  connect(this->Internal->Ui.pbNew, SIGNAL(clicked(bool)),
           this, SLOT(newKeyFrame()));
-  connect(this->Internal->pbDelete, SIGNAL(clicked(bool)),
+  connect(this->Internal->Ui.pbDelete, SIGNAL(clicked(bool)),
           this, SLOT(deleteKeyFrame()));
-  connect(this->Internal->pbDeleteAll, SIGNAL(clicked(bool)),
+  connect(this->Internal->Ui.pbDeleteAll, SIGNAL(clicked(bool)),
           this, SLOT(deleteAllKeyFrames()));
   
-  this->Internal->label->setText(label);
+  this->Internal->Ui.label->setText(label);
 }
 
 //-----------------------------------------------------------------------------
@@ -392,9 +416,9 @@ pqKeyFrameEditor::~pqKeyFrameEditor()
 void pqKeyFrameEditor::setValuesOnly(bool vo)
 {
   this->ValuesOnly = vo;
-  this->Internal->pbNew->setVisible(!vo);
-  this->Internal->pbDelete->setVisible(!vo);
-  this->Internal->pbDeleteAll->setVisible(!vo);
+  this->Internal->Ui.pbNew->setVisible(!vo);
+  this->Internal->Ui.pbDelete->setVisible(!vo);
+  this->Internal->Ui.pbDeleteAll->setVisible(!vo);
   this->Internal->EditorDelegate->ValuesOnly = vo;
   this->readKeyFrameData();
 }
@@ -452,16 +476,19 @@ void pqKeyFrameEditor::readKeyFrameData()
     if(camera)
       {
       pqCameraKeyFrameItem* item = new pqCameraKeyFrameItem();
-      item->Widget.setPosition(
+      QObject::connect(item->Button, SIGNAL(clicked(bool)),
+                       &this->Internal->CameraMapper, SLOT(map()));
+      this->Internal->CameraMapper.setMapping(item->Button, item);
+      item->CamWidget.setPosition(
         pqSMAdaptor::getMultipleElementProperty(
           keyFrame->GetProperty("Position")));
-      item->Widget.setFocalPoint(
+      item->CamWidget.setFocalPoint(
         pqSMAdaptor::getMultipleElementProperty(
           keyFrame->GetProperty("FocalPoint")));
-      item->Widget.setViewUp(
+      item->CamWidget.setViewUp(
         pqSMAdaptor::getMultipleElementProperty(
           keyFrame->GetProperty("ViewUp")));
-      item->Widget.setViewAngle(
+      item->CamWidget.setViewAngle(
         pqSMAdaptor::getElementProperty(
           keyFrame->GetProperty("ViewAngle")));
       this->Internal->Model.setItem(i, this->ValuesOnly? 0: 1, item);
@@ -562,13 +589,13 @@ void pqKeyFrameEditor::writeKeyFrameData()
       if(item)
         {
         pqSMAdaptor::setMultipleElementProperty(keyFrame->GetProperty("Position"),
-          item->Widget.position());
+          item->CamWidget.position());
         pqSMAdaptor::setMultipleElementProperty(keyFrame->GetProperty("FocalPoint"),
-          item->Widget.focalPoint());
+          item->CamWidget.focalPoint());
         pqSMAdaptor::setMultipleElementProperty(keyFrame->GetProperty("ViewUp"),
-          item->Widget.viewUp());
+          item->CamWidget.viewUp());
         pqSMAdaptor::setElementProperty(keyFrame->GetProperty("ViewAngle"),
-          item->Widget.viewAngle());
+          item->CamWidget.viewAngle());
         }
       }
     else
@@ -620,7 +647,7 @@ void pqKeyFrameEditor::newKeyFrame()
   int count = this->Internal->Model.rowCount();
 
   QModelIndex idx = 
-    this->Internal->tableView->selectionModel()->currentIndex();
+    this->Internal->Ui.tableView->selectionModel()->currentIndex();
   if(idx.isValid())
     {
     row = idx.row();
@@ -647,7 +674,7 @@ void pqKeyFrameEditor::deleteKeyFrame()
     return;
     }
   QModelIndex idx = 
-    this->Internal->tableView->selectionModel()->currentIndex();
+    this->Internal->Ui.tableView->selectionModel()->currentIndex();
   if(idx.isValid())
     {
     this->Internal->Model.removeRow(idx.row());
@@ -674,4 +701,28 @@ void pqKeyFrameEditor::deleteAllKeyFrames()
   this->Internal->Model.removeRows(0, this->Internal->Model.rowCount());
 }
 
+//-----------------------------------------------------------------------------
+void pqKeyFrameEditor::useCurrentCamera(QObject* o)
+{
+  pqCameraKeyFrameItem* item = static_cast<pqCameraKeyFrameItem*>(o);
+  
+  vtkSMProxy* pxy = this->Internal->Cue->getAnimatedProxy();
+  
+  vtkSMRenderViewProxy* ren = vtkSMRenderViewProxy::SafeDownCast(pxy);
+  ren->SynchronizeCameraProperties();
+  
+  item->CamWidget.setPosition(
+    pqSMAdaptor::getMultipleElementProperty(
+      pxy->GetProperty("CameraPosition")));
+  item->CamWidget.setFocalPoint(
+    pqSMAdaptor::getMultipleElementProperty(
+      pxy->GetProperty("CameraFocalPoint")));
+  item->CamWidget.setViewUp(
+    pqSMAdaptor::getMultipleElementProperty(
+      pxy->GetProperty("CameraViewUp")));
+  item->CamWidget.setViewAngle(
+    pqSMAdaptor::getElementProperty(
+      pxy->GetProperty("CameraViewAngle")));
+
+}
 

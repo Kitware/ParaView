@@ -69,6 +69,7 @@ private slots:
   void newKeyFrame();
   void deleteKeyFrame();
   void deleteAllKeyFrames();
+  void useCurrentCamera(QObject*);
 
 private:
   class pqInternal;
