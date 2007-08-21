@@ -641,10 +641,6 @@ void pqSelectionInspectorPanel::updateSelectionSourceGUI()
 
   // Link Frustum selection properties
   this->Implementation->SourceLinks->addPropertyLink(
-    this->Implementation->checkboxPartiallyWithin, "checked", SIGNAL(toggled(bool)),
-    selectionSource, 
-    selectionSource->GetProperty("PartiallyWithin"));
-  this->Implementation->SourceLinks->addPropertyLink(
     this->Implementation->checkboxShowFrustum, "checked", SIGNAL(toggled(bool)),
     selectionSource, 
     selectionSource->GetProperty("ShowBounds"));

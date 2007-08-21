@@ -141,7 +141,7 @@
       <enum>QFrame::StyledPanel</enum>
      </property>
      <property name="currentIndex" >
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page_3" >
       <layout class="QGridLayout" >
@@ -358,13 +358,6 @@
        <property name="spacing" >
         <number>6</number>
        </property>
-       <item>
-        <widget class="QCheckBox" name="checkboxPartiallyWithin" >
-         <property name="text" >
-          <string>Partially Within</string>
-         </property>
-        </widget>
-       </item>
        <item>
         <widget class="QCheckBox" name="checkboxShowFrustum" >
          <property name="text" >
@@ -1434,11 +1427,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqDoubleRangeWidget</class>
-   <extends>QWidget</extends>
-   <header>pqDoubleRangeWidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>pqColorChooserButton</class>
    <extends>QPushButton</extends>
    <header>pqColorChooserButton.h</header>
@@ -1448,6 +1436,11 @@
    <extends>QGroupBox</extends>
    <header>pqCollapsedGroup.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqDoubleRangeWidget</class>
+   <extends>QWidget</extends>
+   <header>pqDoubleRangeWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
