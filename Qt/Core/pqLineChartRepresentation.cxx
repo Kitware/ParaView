@@ -740,7 +740,8 @@ int pqLineChartRepresentation::isEnabledByDefault(const QString &arrayName) cons
 {
   if(arrayName == "BlockId" || arrayName == "Time" ||
       arrayName == "GlobalElementId" || arrayName == "GlobalNodeId" ||
-      arrayName == "PedigreeElementId" || arrayName == "PedigreeNodeId")
+      arrayName == "PedigreeElementId" || arrayName == "PedigreeNodeId" ||
+      arrayName == "vtkEAOTValidity" || arrayName == "Cell's Point Ids")
     {
     return 0;
     }
