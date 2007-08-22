@@ -26,7 +26,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMPropertyLink);
-vtkCxxRevisionMacro(vtkSMPropertyLink, "1.18");
+vtkCxxRevisionMacro(vtkSMPropertyLink, "1.19");
 //-----------------------------------------------------------------------------
 class vtkSMPropertyLinkObserver : public vtkCommand
 {
@@ -376,7 +376,6 @@ void vtkSMPropertyLink::PropertyModified(vtkSMProxy* fromProxy, const char* pnam
     {
     return;
     }
-  this->ModifyingProperty = true;
 
   if (!fromProxy)
     {
@@ -389,6 +388,7 @@ void vtkSMPropertyLink::PropertyModified(vtkSMProxy* fromProxy, const char* pnam
     return;
     }
 
+  this->ModifyingProperty = true;
   // First verify that the property that triggerred this call is indeed
   // an input property.
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter;
@@ -406,6 +406,7 @@ void vtkSMPropertyLink::PropertyModified(vtkSMProxy* fromProxy, const char* pnam
 
   if (!propagate)
     {
+    this->ModifyingProperty = false;
     return;
     }
 
@@ -440,7 +441,6 @@ void vtkSMPropertyLink::PropertyModified(vtkSMProperty* fromProp)
     {
     return;
     }
-  this->ModifyingProperty = true;
   
   // First verify that the property that triggerred this call is indeed
   // an input property.
@@ -461,6 +461,7 @@ void vtkSMPropertyLink::PropertyModified(vtkSMProperty* fromProp)
     return;
     }
  
+  this->ModifyingProperty = true;
   // Propagate the changes.
   for (iter = this->Internals->LinkedProperties.begin(); 
     iter != this->Internals->LinkedProperties.end(); ++iter)
