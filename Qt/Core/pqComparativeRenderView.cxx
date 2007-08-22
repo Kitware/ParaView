@@ -32,11 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComparativeRenderView.h"
 
 // Server Manager Includes.
-#include "vtkSMComparativeViewProxy.h"
 #include "QVTKWidget.h"
-#include "vtkSmartPointer.h"
-#include "vtkEventQtSlotConnect.h"
 #include "vtkCollection.h"
+#include "vtkEventQtSlotConnect.h"
+#include "vtkPVOptions.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMComparativeViewProxy.h"
 #include "vtkSMRenderViewProxy.h"
 
 // Qt Includes.
@@ -46,6 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGridLayout>
 
 // ParaView Includes.
+#include "pqServer.h"
+#include "pqSMAdaptor.h"
 
 class pqComparativeRenderView::pqInternal
 {
@@ -97,6 +100,20 @@ void pqComparativeRenderView::setDefaultPropertyValues()
 {
   //this->getComparativeRenderViewProxy()->Build(3, 3);
   this->Superclass::setDefaultPropertyValues();
+
+  vtkPVOptions* options = this->getServer()->getOptions();
+  if (options->GetTileDimensions()[0])
+    {
+    // change default layout to match the tile displays.
+    pqSMAdaptor::setMultipleElementProperty(
+      this->getProxy()->GetProperty("Dimensions"), 0, 
+      options->GetTileDimensions()[0]);
+    pqSMAdaptor::setMultipleElementProperty(
+      this->getProxy()->GetProperty("Dimensions"), 1, 
+      options->GetTileDimensions()[1]);
+    this->getProxy()->UpdateVTKObjects();
+    }
+
 }
 
 //-----------------------------------------------------------------------------

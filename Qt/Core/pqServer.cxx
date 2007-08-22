@@ -248,3 +248,8 @@ void pqServer::getSupportedProxies(const QString& xmlgroup, QList<QString>& name
     }
 }
 
+//-----------------------------------------------------------------------------
+vtkPVOptions* pqServer::getOptions() const
+{
+  return this->Options;
+}

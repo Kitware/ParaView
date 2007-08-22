@@ -97,6 +97,9 @@ public:
 
   const QString& getRenderViewXMLName() const
     { return this->RenderViewXMLName; }
+
+  /// Returns the PVOptions for this connection.
+  vtkPVOptions* getOptions() const;
 signals:
   /// Fired when the name of the proxy is changed.
   void nameChanged(pqServerManagerModelItem*);
