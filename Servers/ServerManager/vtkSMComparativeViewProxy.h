@@ -139,6 +139,26 @@ public:
   // Set spacing between views. 
   vtkSetVector2Macro(Spacing, int);
   vtkGetVector2Macro(Spacing, int);
+
+  // Description:
+  // Set the time range for film-strip visualization.
+  // This is temporary API.
+  void SetTimeRange (double min, double max)
+    {
+    if ( (this->TimeRange[0] != min) || (this->TimeRange[1] != max))
+      {
+      this->TimeRange[0] = min;
+      this->TimeRange[1] = max;
+      this->Modified();
+      this->MarkSceneOutdated();
+      }
+    }
+  void SetTimeRange(double x[2])
+    {
+    this->SetTimeRange(x[0], x[1]);
+    }
+  vtkGetVector2Macro(TimeRange, double);
+
 //BTX
 protected:
   vtkSMComparativeViewProxy();
@@ -181,6 +201,7 @@ protected:
   int Dimensions[2];
   int ViewSize[2];
   int Spacing[2];
+  double TimeRange[2];
 
   vtkSMAnimationSceneProxy* AnimationSceneX;
   vtkSMAnimationSceneProxy* AnimationSceneY;

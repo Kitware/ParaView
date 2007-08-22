@@ -3546,6 +3546,17 @@
         </Documentation>
       </IntVectorProperty>
 
+      <DoubleVectorProperty
+        name="TimeRange"
+        command="SetTimeRange"
+        update_self="1"
+        number_of_elements="2"
+        default_values="0.0 1.0">
+        <Documentation>
+          Set the time range for FilmStrip visualizations.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <IntVectorProperty
         name="Mode"
         command="SetMode"

@@ -68,7 +68,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.15");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -79,6 +79,8 @@ vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
   this->Dimensions[1] = 0;
   this->ViewSize[0] = 400;
   this->ViewSize[1] = 400;
+  this->TimeRange[0] = 0.0;
+  this->TimeRange[1] = 1.0;
   this->Spacing[0] = this->Spacing[1] = 1;
   this->AnimationSceneX = 0;
   this->AnimationSceneY = 0;
@@ -135,6 +137,7 @@ bool vtkSMComparativeViewProxy::BeginCreateVTKObjects()
   // This view computes view size/view position for each view based on the
   // layout.
   this->Internal->ViewLink->AddException("ViewSize");
+  this->Internal->ViewLink->AddException("ViewTime");
   this->Internal->ViewLink->AddException("ViewPosition");
 
   this->Internal->ViewLink->AddException("CameraPositionInfo");
@@ -178,12 +181,14 @@ void vtkSMComparativeViewProxy::Build(int dx, int dy)
   for (cc=this->Internal->Views.size()-1; cc >= numViews; cc--)
     {
     this->RemoveView(this->Internal->Views[cc]);
+    this->SceneOutdated = true;
     }
 
   // Add view modules, if not enough.
   for (cc=this->Internal->Views.size(); cc < numViews; cc++)
     {
     this->AddNewView();
+    this->SceneOutdated = true;
     }
 
   this->Dimensions[0] = dx;
@@ -565,12 +570,19 @@ void vtkSMComparativeViewProxy::UpdateFilmStripVisualization(
   this->Internal->ActiveIndexX = 0;
   this->Internal->ActiveIndexY = 0;
 
+  double increment =  (this->TimeRange[1] - this->TimeRange[0])/
+    (this->Dimensions[0]*this->Dimensions[1]);
+
   for (int view_index=0; 
     view_index < this->Dimensions[0]*this->Dimensions[1]; ++view_index)
     {
     scene->SetAnimationTime(view_index);
 
     vtkSMViewProxy* view = this->Internal->Views[view_index];
+
+    double time = this->TimeRange[0] + view_index*increment;
+    cout << "ViewTime : " << time << endl;
+    view->SetViewUpdateTime(time);
 
     // HACK: This ensure that obsolete cache is never used when the CV is being
     // generated.
