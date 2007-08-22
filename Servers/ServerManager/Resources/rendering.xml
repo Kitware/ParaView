@@ -3609,6 +3609,7 @@
           <Property name="UseLight" />
           <!-- Light -->
           <Property name="LightAmbientColor" />
+          <Property name="LightDiffuseColor" />
           <Property name="LightSpecularColor" />
           <Property name="LightIntensity" />
           <Property name="LightSwitch" />
@@ -3676,6 +3677,7 @@
           <Property name="UseLight" />
           <!-- Light -->
           <Property name="LightAmbientColor" />
+          <Property name="LightDiffuseColor" />
           <Property name="LightSpecularColor" />
           <Property name="LightIntensity" />
           <Property name="LightSwitch" />
@@ -3747,6 +3749,7 @@
           <Property name="UseLight" />
           <!-- Light -->
           <Property name="LightAmbientColor" />
+          <Property name="LightDiffuseColor" />
           <Property name="LightSpecularColor" />
           <Property name="LightIntensity" />
           <Property name="LightSwitch" />
@@ -3820,6 +3823,7 @@
           <Property name="UseLight" />
           <!-- Light -->
           <Property name="LightAmbientColor" />
+          <Property name="LightDiffuseColor" />
           <Property name="LightSpecularColor" />
           <Property name="LightIntensity" />
           <Property name="LightSwitch" />
