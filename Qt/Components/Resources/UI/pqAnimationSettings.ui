@@ -217,12 +217,15 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>okButton</tabstop>
+  <tabstop>cancelButton</tabstop>
+  <tabstop>animationDuration</tabstop>
+  <tabstop>frameRate</tabstop>
+  <tabstop>spinBoxFramesPerTimestep</tabstop>
   <tabstop>spinBoxNumberOfFrames</tabstop>
   <tabstop>spinBoxWidth</tabstop>
   <tabstop>spinBoxHeight</tabstop>
   <tabstop>checkBoxDisconnect</tabstop>
-  <tabstop>okButton</tabstop>
-  <tabstop>cancelButton</tabstop>
  </tabstops>
  <resources/>
  <connections>
