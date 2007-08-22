@@ -502,7 +502,7 @@ The Line source can be used to interactively (using a 3D widget) or manually (us
          command="SetPoint1"
          number_of_elements="3"
          animateable="1"
-         default_values="0.0 0.0 0.0" >
+         default_values="-0.5 0.0 0.0" >
          <DoubleRangeDomain name="range" />
          <Documentation>
            This property controls the coordinates of the first endpoint of the line.
@@ -514,7 +514,7 @@ The Line source can be used to interactively (using a 3D widget) or manually (us
          command="SetPoint2"
          number_of_elements="3"
          animateable="1"
-         default_values="0.0 0.0 0.0" >
+         default_values="0.5 0.0 0.0" >
          <DoubleRangeDomain name="range" />
          <Documentation>
            This property controls the coordinates of the second endpoint of the line.
