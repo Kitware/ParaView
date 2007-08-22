@@ -3529,7 +3529,7 @@
         update_self="1"
         immediate_update="1"
         number_of_elements="2"
-        default_values="3 2">
+        default_values="2 2">
         <IntRangeDomain name="range" min="1 1" max="10 10" />
       </IntVectorProperty>
 
@@ -3716,6 +3716,75 @@
       </SubProxy>
 
       <!-- End of ComparativeIceTDesktopRenderView -->
+    </ComparativeViewProxy>
+
+    <ComparativeViewProxy name="ComparativeIceTMultiDisplayRenderView"
+      base_proxygroup="newviews" base_proxyname="ComparativeViewBase">
+      <Documentation>
+        The is comparative view comprising of individual 
+        "IceTMultiDisplayRenderView" proxies
+        for each panel in the comparative view grid.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="RootView" 
+          proxygroup="newviews" proxyname="IceTMultiDisplayRenderView">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="LODThreshold" />
+          <Property name="LODResolution" />
+          <Property name="UseTriangleStrips" />
+          <Property name="UseImmediateMode" />
+          <Property name="RenderInterruptsEnabled" />
+          <Property name="ResetCamera" />
+          <Property name="UseLight" />
+          <!-- Light -->
+          <Property name="LightAmbientColor" />
+          <Property name="LightSpecularColor" />
+          <Property name="LightIntensity" />
+          <Property name="LightSwitch" />
+          <!-- LightKit -->
+          <Property name="KeyLightWarmth" />
+          <Property name="KeyLightIntensity" />
+          <Property name="KeyLightElevation" />
+          <Property name="KeyLightAzimuth" />
+          <Property name="FillLightWarmth" />
+          <Property name="FillLightK:F Ratio" />
+          <Property name="FillLightElevation" />
+          <Property name="FillLightAzimuth" />
+          <Property name="BackLightWarmth" />
+          <Property name="BackLightK:B Ratio" />
+          <Property name="BackLightElevation" />
+          <Property name="BackLightAzimuth" />
+          <Property name="HeadLightWarmth" />
+          <Property name="HeadLightK:H Ratio" />
+          <Property name="MaintainLuminance" />
+          <!-- ActiveCamera -->
+          <Property name="CameraPositionInfo" />
+          <Property name="CameraPosition" />
+          <Property name="CameraFocalPointInfo" />
+          <Property name="CameraFocalPoint" />
+          <Property name="CameraViewUpInfo" />
+          <Property name="CameraViewUp" />
+          <Property name="CameraViewAngle" />
+          <Property name="CameraClippingRangeInfo" />
+          <Property name="CameraClippingRange" />
+          <Property name="CameraParallelScale" />
+          <Property name="CameraParallelProjection" />
+          <Property name="EyeAngle" />
+          <!-- Interactor -->
+          <Property name="CameraManipulators" />
+          <Property name="CenterOfRotation" />
+          <!-- Renderer -->
+          <Property name="Background" />
+          <!-- Tiles -->
+          <Property name="CollectGeometryThreshold" />
+          <Property name="StillRenderImageReductionFactor" />
+        </ExposedProperties>
+        <!-- End of "RootView" subproxy -->
+      </SubProxy>
+
+      <!-- End of ComparativeIceTMultiDisplayRenderView -->
     </ComparativeViewProxy>
 
     <ComparativeViewProxy name="ComparativeClientServerRenderView"
