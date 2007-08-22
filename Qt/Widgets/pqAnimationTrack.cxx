@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 pqAnimationTrack::pqAnimationTrack(QObject* p)
-  : QObject(p), Rect(0,0,1,1)
+  : QObject(p), Deletable(true), Rect(0,0,1,1)
 {
 }
 

@@ -62,6 +62,10 @@ public:
   /// remove a keyframe
   void removeKeyFrame(pqAnimationKeyFrame* frame);
 
+
+  bool isDeletable() const { return this->Deletable; }
+  void setDeletable(bool d) { this->Deletable = d; }
+
   QVariant property() const;
   
   QRectF boundingRect() const;
@@ -84,6 +88,7 @@ protected:
 
 
 private:
+  bool Deletable;
   QList<pqAnimationKeyFrame*> Frames;
   QVariant Property;
 

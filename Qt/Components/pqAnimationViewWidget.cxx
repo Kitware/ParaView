@@ -240,6 +240,9 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
   QObject::connect(this->Internal->AnimationWidget,
                    SIGNAL(trackSelected(pqAnimationTrack*)),
                    this, SLOT(trackSelected(pqAnimationTrack*)));
+  QObject::connect(this->Internal->AnimationWidget,
+                   SIGNAL(deleteTrackClicked(pqAnimationTrack*)),
+                   this, SLOT(deleteTrack(pqAnimationTrack*)));
   
   vboxlayout->addWidget(this->Internal->AnimationWidget);
 }
@@ -340,6 +343,10 @@ void pqAnimationViewWidget::onSceneCuesChanged()
     if(iter == this->Internal->TrackMap.end())
       {
       pqAnimationTrack* t = animModel->addTrack();
+      if(completeName.startsWith("TimeKeeper"))
+        {
+        t->setDeletable(false);
+        }
       this->Internal->TrackMap.insert(cue, t);
       t->setProperty(completeName);
       this->Internal->KeyFramesChanged.setMapping(cue, cue);
@@ -540,6 +547,16 @@ void pqAnimationViewWidget::updateTicks()
     this->Internal->AnimationWidget->animationModel();
   int num = this->Internal->numberOfTicks();
   animModel->setTicks(num);
+}
+
+void pqAnimationViewWidget::deleteTrack(pqAnimationTrack* track)
+{
+  pqAnimationCue* cue = this->Internal->findCue(track);
+  if(!cue)
+    {
+    return;
+    }
+  this->Internal->Scene->removeCue(cue);
 }
 
 

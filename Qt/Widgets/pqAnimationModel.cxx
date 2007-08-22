@@ -71,7 +71,11 @@ int pqAnimationModel::count()
 }
 pqAnimationTrack* pqAnimationModel::track(int i)
 {
-  return this->Tracks[i];
+  if(i >= 0 && i < this->Tracks.size())
+    {
+    return this->Tracks[i];
+    }
+  return NULL;
 }
 
 pqAnimationTrack* pqAnimationModel::addTrack()

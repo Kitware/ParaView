@@ -76,6 +76,9 @@ protected slots:
 
   // called when play mode changes
   void updatePlayMode();
+
+  // called when deleting a track
+  void deleteTrack(pqAnimationTrack* track);
   
 private:
   pqAnimationViewWidget(const pqAnimationViewWidget&); // Not implemented.

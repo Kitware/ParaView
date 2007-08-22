@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QScrollBar>
 
 #include "pqAnimationModel.h"
+#include "pqAnimationTrack.h"
 
 pqAnimationWidget::pqAnimationWidget(QWidget* p) 
   : QAbstractScrollArea(p) 
@@ -60,7 +61,6 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
 
   this->AddRemoveHeader->setResizeMode(QHeaderView::Fixed);
   this->AddRemoveHeader->setModel(&this->AddRemoveModel);
-  this->AddRemoveHeader->hide();  // TODO
 
   this->Header = new QHeaderView(Qt::Vertical, this);
   this->Header->setObjectName("TrackHeader");
@@ -87,6 +87,9 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
   QObject::connect(this->Model,
                    SIGNAL(trackSelected(pqAnimationTrack*)),
                    this, SIGNAL(trackSelected(pqAnimationTrack*)));
+  QObject::connect(this->AddRemoveHeader,
+                   SIGNAL(sectionClicked(int)),
+                   this, SLOT(headerDeleteClicked(int)));
 }
 
 pqAnimationWidget::~pqAnimationWidget()
@@ -98,17 +101,30 @@ pqAnimationModel* pqAnimationWidget::animationModel() const
   return this->Model;
 }
 
+QHeaderView* pqAnimationWidget::createHeader() const
+{
+  return this->AddRemoveHeader;
+}
+
 void pqAnimationWidget::updateSizes()
 {
   this->AddRemoveModel.clear();
-  for(int i=0; i<this->Header->count(); i++)
+  this->AddRemoveModel.insertRow(0);
+  this->AddRemoveModel.setHeaderData(0, Qt::Vertical, QVariant(), Qt::DisplayRole);
+
+  int num = this->Model->count();
+
+  for(int i=0; i<num; i++)
     {
-    this->AddRemoveModel.insertRow(i);
-    this->AddRemoveModel.setHeaderData(i, Qt::Vertical,
-      QPixmap(":/QtWidgets/Icons/pqDelete16.png"), Qt::DecorationRole);
-    this->AddRemoveModel.setData(this->AddRemoveModel.index(i,0),
-      QVariant(), Qt::DisplayRole);
+    this->AddRemoveModel.insertRow(i+1);
+    if(this->Model->track(i)->isDeletable())
+      {
+      this->AddRemoveModel.setHeaderData(i+1, Qt::Vertical,
+        QPixmap(":/QtWidgets/Icons/pqDelete16.png"), Qt::DecorationRole);
+      }
+    this->AddRemoveModel.setHeaderData(i+1, Qt::Vertical, QVariant(), Qt::DisplayRole);
     }
+  
   this->AddRemoveModel.insertRow(this->Header->count());
   this->AddRemoveModel.setHeaderData(this->Header->count(), Qt::Vertical,
     QPixmap(":/QtWidgets/Icons/pqPlus16.png"), Qt::DecorationRole);
@@ -203,5 +219,17 @@ void pqAnimationWidget::resizeEvent(QResizeEvent* e)
 {
   this->updateScrollBars();
   QAbstractScrollArea::resizeEvent(e);
+}
+  
+void pqAnimationWidget::headerDeleteClicked(int which)
+{
+  if(which > 0)
+    {
+    pqAnimationTrack* t = this->Model->track(which-1);
+    if(t && t->isDeletable())
+      {
+      emit this->deleteTrackClicked(t);
+      }
+    }
 }
 

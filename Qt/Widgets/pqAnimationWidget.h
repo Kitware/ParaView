@@ -52,13 +52,17 @@ public:
 
   pqAnimationModel* animationModel() const;
 
+  QHeaderView* createHeader() const;
+
 signals:
   // emitted when a track is double clicked on
   void trackSelected(pqAnimationTrack*);
+  void deleteTrackClicked(pqAnimationTrack*);
 
 protected slots:
   void updateSizes();
   void headerDblClicked(int);
+  void headerDeleteClicked(int);
 
 protected:
   void updateGeometries();
