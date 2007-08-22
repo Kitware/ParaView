@@ -26,7 +26,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMPropertyLink);
-vtkCxxRevisionMacro(vtkSMPropertyLink, "1.17");
+vtkCxxRevisionMacro(vtkSMPropertyLink, "1.18");
 //-----------------------------------------------------------------------------
 class vtkSMPropertyLinkObserver : public vtkCommand
 {
@@ -113,6 +113,7 @@ vtkSMPropertyLink::vtkSMPropertyLink()
   this->Internals = new vtkSMPropertyLinkInternals;
   this->Internals->PropertyObserver = vtkSMPropertyLinkObserver::New();
   this->Internals->PropertyObserver->SetTarget(this);
+  this->ModifyingProperty = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -202,12 +203,6 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProperty* property, int updateDir
       {
       input_exists = true;
       }
-    }
-
-  if (addToList && input_exists && (updateDir & INPUT) )
-    {
-    vtkErrorMacro("Only one input can be added at a time.");
-    return;
     }
 
   if (addToList)
@@ -377,6 +372,12 @@ int vtkSMPropertyLink::GetLinkedPropertyDirection(int index)
 //-----------------------------------------------------------------------------
 void vtkSMPropertyLink::PropertyModified(vtkSMProxy* fromProxy, const char* pname)
 {
+  if (this->ModifyingProperty)
+    {
+    return;
+    }
+  this->ModifyingProperty = true;
+
   if (!fromProxy)
     {
     return;
@@ -429,11 +430,18 @@ void vtkSMPropertyLink::PropertyModified(vtkSMProxy* fromProxy, const char* pnam
         }
       }
     }
+  this->ModifyingProperty = false;
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMPropertyLink::PropertyModified(vtkSMProperty* fromProp)
 {
+  if (this->ModifyingProperty)
+    {
+    return;
+    }
+  this->ModifyingProperty = true;
+  
   // First verify that the property that triggerred this call is indeed
   // an input property.
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter;
@@ -468,12 +476,13 @@ void vtkSMPropertyLink::PropertyModified(vtkSMProperty* fromProp)
         {
         toProp = iter->Property;
         }
-      if (toProp)
+      if (toProp && (toProp != fromProp))
         {
         toProp->Copy(fromProp);
         }
       }
     }
+  this->ModifyingProperty = false;
 }
 
 //-----------------------------------------------------------------------------

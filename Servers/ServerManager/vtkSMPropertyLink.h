@@ -116,6 +116,7 @@ protected:
   void PropertyModified(vtkSMProperty* property);
 private:
   vtkSMPropertyLinkInternals* Internals;
+  bool ModifyingProperty;
 
   vtkSMPropertyLink(const vtkSMPropertyLink&); // Not implemented.
   void operator=(const vtkSMPropertyLink&); // Not implemented.
