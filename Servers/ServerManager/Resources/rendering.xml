@@ -3714,6 +3714,10 @@
           <!-- Renderer -->
           <Property name="Background" />
           <!-- RenderWindow -->
+          <Property name="ImageReductionFactor" />
+          <Property name="SquirtLevel" />
+          <Property name="DisableOrderedCompositing" />
+          <Property name="RemoteRenderThreshold" />
         </ExposedProperties>
         <!-- End of "RootView" subproxy -->
       </SubProxy>
@@ -3783,6 +3787,10 @@
           <!-- Tiles -->
           <Property name="CollectGeometryThreshold" />
           <Property name="StillRenderImageReductionFactor" />
+          <Property name="ImageReductionFactor" />
+          <Property name="SquirtLevel" />
+          <Property name="DisableOrderedCompositing" />
+          <Property name="RemoteRenderThreshold" />
         </ExposedProperties>
         <!-- End of "RootView" subproxy -->
       </SubProxy>
@@ -3850,6 +3858,7 @@
           <!-- Renderer -->
           <Property name="Background" />
           <!-- RenderWindow -->
+          <Property name="RemoteRenderThreshold" />
         </ExposedProperties>
         <!-- End of "RootView" subproxy -->
       </SubProxy>
