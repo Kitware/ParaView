@@ -59,6 +59,7 @@ public:
     {
     this->ViewLink = vtkSmartPointer<vtkSMProxyLink>::New();
     this->ViewCameraLink = vtkSmartPointer<vtkSMCameraLink>::New();
+    this->ViewCameraLink->SynchronizeInteractiveRendersOff();
     }
 
   unsigned int ActiveIndexX;
@@ -68,7 +69,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.16");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()

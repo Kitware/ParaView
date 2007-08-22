@@ -37,6 +37,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Get/Set if the link should synchronize interactive renders
+  // as well. On by default.
+  vtkSetMacro(SynchronizeInteractiveRenders, int);
+  vtkGetMacro(SynchronizeInteractiveRenders, int);
+  vtkBooleanMacro(SynchronizeInteractiveRenders, int);
+
+  // Description:
   // Add a property to the link. updateDir determines whether a property of
   // the proxy is read or written. When a property of an input proxy
   // changes, it's value is pushed to all other output proxies in the link.
@@ -84,6 +91,8 @@ protected:
   // Description:
   // Load the link state.
   virtual int LoadState(vtkPVXMLElement* linkElement, vtkSMStateLoader* loader);
+
+  int SynchronizeInteractiveRenders;
 private:
 
   vtkSMCameraLinkInternals* Internals;

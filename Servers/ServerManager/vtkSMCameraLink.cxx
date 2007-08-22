@@ -26,7 +26,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMCameraLink);
-vtkCxxRevisionMacro(vtkSMCameraLink, "1.13");
+vtkCxxRevisionMacro(vtkSMCameraLink, "1.14");
 
 //---------------------------------------------------------------------------
 struct vtkSMCameraLinkInternals
@@ -127,6 +127,7 @@ const char* vtkSMCameraLinkInternals::LinkedPropertyNames[] =
 vtkSMCameraLink::vtkSMCameraLink()
 {
   this->Internals = new vtkSMCameraLinkInternals;
+  this->SynchronizeInteractiveRenders = 1;
 }
 
 //---------------------------------------------------------------------------
@@ -236,7 +237,10 @@ void vtkSMCameraLink::UpdateViews(vtkSMProxy* caller, bool interactive)
         {
         if (interactive)
           {
-          rmp->InteractiveRender();
+          if (this->SynchronizeInteractiveRenders)
+            {
+            rmp->InteractiveRender();
+            }
           }
         else
           {
