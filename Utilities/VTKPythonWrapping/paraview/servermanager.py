@@ -95,6 +95,7 @@ class Proxy(object):
         the proxy with the proxy manager. """
         self.Observed = None
         self.__Properties = {}
+        self.SMProxy = None
 
         if 'proxy' in args:
             self.InitializeFromProxy(args['proxy'])
@@ -122,7 +123,7 @@ class Proxy(object):
             observed = self.Observed
             self.Observed = None
             observed.RemoveObservers("ModifiedEvent")
-        if self.SMProxy in _pyproxies:
+        if self.SMProxy and self.SMProxy in _pyproxies:
             del _pyproxies[self.SMProxy]
 
     def InitializeFromProxy(self, aProxy):
