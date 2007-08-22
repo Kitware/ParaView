@@ -9,10 +9,10 @@
   <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.526237,0.36,1,0,0)" />
   <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.526237,0.36,1,0,0)" />
   <pqevent object="MainWindow/menubar/menuView" command="activate" arguments="Animation View" />
-  <pqevent object="MainWindow/animationViewDock/animationView/1pqAnimationWidget0/qt_scrollarea_viewport/1QWidget0/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,1" />
-  <pqevent object="MainWindow/animationViewDock/animationView/1pqAnimationWidget0/qt_scrollarea_viewport/1QWidget0/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,1" />
-  <pqevent object="MainWindow/animationViewDock/animationView/1pqAnimationWidget0/qt_scrollarea_viewport/1QWidget0/1QHeaderView0" command="mouseDblClick" arguments="1,1,0,0,0,1" />
-  <pqevent object="MainWindow/animationViewDock/animationView/1pqAnimationWidget0/qt_scrollarea_viewport/1QWidget0/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,1" />
+  <pqevent object="MainWindow/animationViewDock/animationView/1pqAnimationWidget0/TrackHeader" command="mousePress" arguments="1,1,0,0,0,1" />
+  <pqevent object="MainWindow/animationViewDock/animationView/1pqAnimationWidget0/TrackHeader" command="mouseRelease" arguments="1,0,0,0,0,1" />
+  <pqevent object="MainWindow/animationViewDock/animationView/1pqAnimationWidget0/TrackHeader" command="mouseDblClick" arguments="1,1,0,0,0,1" />
+  <pqevent object="MainWindow/animationViewDock/animationView/1pqAnimationWidget0/TrackHeader" command="mouseRelease" arguments="1,0,0,0,0,1" />
   <pqevent object="1QDialog0/pqKeyFrameEditor/pbNew" command="activate" arguments="" />
   <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="mousePress" arguments="1,1,0,52,19,/1:2" />
   <pqevent object="1QDialog0/pqKeyFrameEditor/tableView" command="mouseRelease" arguments="1,0,0,52,19,/1:2" />
