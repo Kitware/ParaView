@@ -260,7 +260,7 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->DeleteButton = new QPushButton(this);
   this->DeleteButton->setObjectName("Delete");
   this->DeleteButton->setText(tr("Delete"));
-  this->DeleteButton->setIcon(QIcon(QPixmap(":/pqWidgets/Icons/pqDelete16.png")));
+  this->DeleteButton->setIcon(QIcon(QPixmap(":/QtWidgets/Icons/pqDelete16.png")));
   buttonlayout->addStretch();
   buttonlayout->addWidget(this->AcceptButton);
   buttonlayout->addWidget(this->ResetButton);

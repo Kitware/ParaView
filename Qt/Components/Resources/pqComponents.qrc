@@ -31,9 +31,6 @@
         <file>Icons/pqConnect32.png</file>
         <file>Icons/pqCopy22.png</file>
         <file>Icons/pqCut22.png</file>
-        <file>Icons/pqDelete16.png</file>
-        <file>Icons/pqDelete24.png</file>
-        <file>Icons/pqDelete32.png</file>
         <file>Icons/pqDisconnect16.png</file>
         <file>Icons/pqDisconnect24.png</file>
         <file>Icons/pqDisconnect32.png</file>
@@ -90,7 +87,6 @@
         <file>Icons/pqOpen32.png</file>
         <file>Icons/pqPaste22.png</file>
         <file>Icons/pqPipelineList22.png</file>
-        <file>Icons/pqPlus16.png</file>
         <file>Icons/pqPointData16.png</file>
         <file>Icons/pqPolydata16.png</file>
         <file>Icons/pqPrint22.png</file>

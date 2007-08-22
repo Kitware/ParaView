@@ -101,10 +101,8 @@ pqAnimationModel* pqAnimationWidget::animationModel() const
 void pqAnimationWidget::updateSizes()
 {
   this->AddRemoveModel.clear();
-  int sz = 0;
   for(int i=0; i<this->Header->count(); i++)
     {
-    sz += this->Header->sectionSize(i);
     this->AddRemoveModel.insertRow(i);
     this->AddRemoveModel.setHeaderData(i, Qt::Vertical,
       QPixmap(":/QtWidgets/Icons/pqDelete16.png"), Qt::DecorationRole);
@@ -113,9 +111,7 @@ void pqAnimationWidget::updateSizes()
     }
   this->AddRemoveModel.insertRow(this->Header->count());
   this->AddRemoveModel.setHeaderData(this->Header->count(), Qt::Vertical,
-    QPixmap(":/QtWidgets/Icons/pqDelete16.png"), Qt::DecorationRole);
-  
-  sz = this->AddRemoveHeader->sectionSize(0) * this->AddRemoveHeader->count();
+    QPixmap(":/QtWidgets/Icons/pqPlus16.png"), Qt::DecorationRole);
   
   this->updateGeometries();
 }
