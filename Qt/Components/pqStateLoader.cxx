@@ -60,7 +60,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqStateLoader);
-vtkCxxRevisionMacro(pqStateLoader, "1.12");
+vtkCxxRevisionMacro(pqStateLoader, "1.13");
 //-----------------------------------------------------------------------------
 pqStateLoader::pqStateLoader()
 {
@@ -84,28 +84,39 @@ int pqStateLoader::LoadState(vtkPVXMLElement* root, int keep_proxies/*=0*/)
 {
   this->Internal->HelperProxyCollectionElements.clear();
 
-  unsigned int numElems = root->GetNumberOfNestedElements();
-  for (unsigned int cc=0; cc < numElems; ++cc)
+  const char* name = root->GetName();
+  if (name && strcmp(name, "ServerManagerState") == 0)
     {
-    vtkPVXMLElement* curElement = root->GetNestedElement(cc);
-    const char* name = curElement->GetName();
-    if (!name)
+    if (!this->Superclass::LoadState(root, 1))
       {
-      continue;
+      return 0;
       }
-    if (strcmp(name, "ServerManagerState") == 0)
+    }
+  else
+    {
+    unsigned int numElems = root->GetNumberOfNestedElements();
+    for (unsigned int cc=0; cc < numElems; ++cc)
       {
-      if (!this->Superclass::LoadState(curElement, 1))
+      vtkPVXMLElement* curElement = root->GetNestedElement(cc);
+      name = curElement->GetName();
+      if (!name)
+        {
+        continue;
+        }
+      if (strcmp(name, "ServerManagerState") == 0)
+        {
+        if (!this->Superclass::LoadState(curElement, 1))
+          {
+          return 0;
+          }
+        }
+      else if (strcmp(name, "ViewManager") == 0)
+        {
+      if (!this->Internal->MainWindowCore->multiViewManager().loadState(
+            curElement, this))
         {
         return 0;
         }
-      }
-    else if (strcmp(name, "ViewManager") == 0)
-      {
-      if (!this->Internal->MainWindowCore->multiViewManager().loadState(
-          curElement, this))
-        {
-        return 0;
         }
       }
     }
