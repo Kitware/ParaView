@@ -69,7 +69,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.17");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -474,34 +474,25 @@ void vtkSMComparativeViewProxy::StillRender()
     }
   in_still_render = true;
 
-  this->Internal->ViewCameraLink->SetEnabled(false);
-
   // Generate the CV if required.
   // For starters, we wont update the vis automatically, let the user call
   // UpdateComparativeVisualization explicitly.
   this->UpdateVisualization();
 
-  vtkInternal::VectorOfViews::iterator iter;
-  for (iter = this->Internal->Views.begin(); 
-       iter != this->Internal->Views.end(); ++iter)
-    {
-    iter->GetPointer()->StillRender();
-    }
+  this->GetRootView()->StillRender();
+  // The StillRender will propagate through the ViewCameraLink to all the other
+  // views.
+
   in_still_render = false;
-  this->Internal->ViewCameraLink->SetEnabled(true);
+  //this->Internal->ViewCameraLink->SetEnabled(true);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::InteractiveRender()
 {
-  this->Internal->ViewCameraLink->SetEnabled(false);
-  vtkInternal::VectorOfViews::iterator iter;
-  for (iter = this->Internal->Views.begin(); 
-       iter != this->Internal->Views.end(); ++iter)
-    {
-    iter->GetPointer()->InteractiveRender();
-    }
-  this->Internal->ViewCameraLink->SetEnabled(true);
+  // The InteractiveRender will propagate through the ViewCameraLink to all the 
+  // other views.
+  this->GetRootView()->InteractiveRender();
 }
 
 //----------------------------------------------------------------------------
