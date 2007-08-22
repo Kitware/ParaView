@@ -91,13 +91,13 @@ public:
 
 //-----------------------------------------------------------------------------
 pqLineChartDisplayItem::pqLineChartDisplayItem()
-  : ArrayName(), LegendName(), Color(Qt::white)
+  : ArrayName(), LegendName(), Color(255, 255, 255, 0)
 {
   this->Style = Qt::SolidLine;
   this->Thickness = 0;
   this->AxesIndex = 0;
   this->Enabled = false;
-  this->InLegend = false;
+  this->InLegend = true;
   this->ColorSet = false;
   this->StyleSet = false;
 }
@@ -186,7 +186,7 @@ void pqLineChartRepresentation::setStatusDefaults(vtkSMProperty* prop)
     values.push_back(arrayName);
     values.push_back(arrayName);
     values.push_back(QVariant(arrayEnabled));
-    values.push_back(QVariant(arrayEnabled));
+    values.push_back(QVariant((int)1));
     values.push_back(QVariant((double)-1.0));
     values.push_back(QVariant((double)-1.0));
     values.push_back(QVariant((double)-1.0));
@@ -338,16 +338,10 @@ void pqLineChartRepresentation::setSeriesEnabled(int series, bool enabled)
       this->Internals->ChangeCount++;
       if(!item->Enabled)
         {
-        if(item->InLegend)
-          {
-          item->InLegend = false;
-          emit this->legendStateChanged(series, false);
-          }
-
         if(item->ColorSet)
           {
           item->ColorSet = false;
-          item->Color = Qt::white;
+          item->Color = QColor(255, 255, 255, 0);
           emit this->colorChanged(series, item->Color);
           }
 
@@ -699,9 +693,8 @@ void pqLineChartRepresentation::updateSeries()
         kter->ColorSet = red >= 0.0;
         if(kter->ColorSet)
           {
-          kter->Color.setRedF(red);
-          kter->Color.setGreenF(status[ii + 5].toDouble());
-          kter->Color.setBlueF(status[ii + 6].toDouble());
+          kter->Color.setRgbF(
+              red, status[ii + 5].toDouble(), status[ii + 6].toDouble());
           }
 
         kter->Thickness = status[ii + 7].toInt();

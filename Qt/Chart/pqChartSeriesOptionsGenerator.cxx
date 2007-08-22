@@ -156,7 +156,6 @@ void pqChartSeriesOptionsGenerator::setColorScheme(
     this->Internal->Colors.append(QColor(152, 78, 163));
     this->Internal->Colors.append(QColor(255, 127, 0));
     this->Internal->Colors.append(QColor(166, 86, 40));
-    this->Internal->Colors.append(QColor(247, 129, 191));
     }
   else if(this->Scheme == pqChartSeriesOptionsGenerator::Warm)
     {

@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayPanel.h"
 
 class pqRepresentation;
-class QTreeWidgetItem;
+class QModelIndex;
 
 /// Editor widget for XY plot displays.
 class PQCOMPONENTS_EXPORT pqXYPlotDisplayProxyEditor : public pqDisplayPanel
@@ -50,22 +50,15 @@ public slots:
   void reloadSeries();
 
 protected slots:
-  /// \brief
-  ///   Sets the line series enabled state.
-  /// \param enabled True if the line series is enabled.
-  void setSeriesEnabled(bool enabled);
-
   /// Called when the attribute mode selection changes.
   void onAttributeModeChanged();
 
   /// Slot to listen to clicks for changing color.
-  void activateItem(QTreeWidgetItem *item, int column);
+  void activateItem(const QModelIndex &index);
 
   void updateOptionsWidgets();
 
   void setCurrentSeriesEnabled(int state);
-
-  void setCurrentSeriesInLegend(int state);
 
   void setCurrentSeriesColor(const QColor &color);
 
@@ -79,11 +72,6 @@ protected slots:
   ///   Updates the enabled state for the given series.
   /// \param index The index of the line series.
   void updateItemEnabled(int index);
-
-  /// \brief
-  ///   Updates the legend state for the given series.
-  /// \param index The index of the line series.
-  void updateItemLegend(int index);
 
   /// \brief
   ///   Updates the color for the given series index.
@@ -107,7 +95,6 @@ private:
   void setDisplay(pqRepresentation* display);
 
   Qt::CheckState getEnabledState() const;
-  Qt::CheckState getInLegendState() const;
 
   class pqInternal;
   pqInternal* Internal;

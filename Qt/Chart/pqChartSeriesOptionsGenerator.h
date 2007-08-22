@@ -54,7 +54,7 @@ class QTCHART_EXPORT pqChartSeriesOptionsGenerator
 public:
   enum ColorScheme
     {
-    Spectrum = 0, ///< 8 different hues.
+    Spectrum = 0, ///< 7 different hues.
     Warm,         ///< 6 warm colors (red to yellow).
     Cool,         ///< 7 cool colors (green to purple).
     Blues,        ///< 7 different blues.

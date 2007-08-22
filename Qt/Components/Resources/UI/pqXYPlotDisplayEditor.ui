@@ -36,7 +36,7 @@
       <property name="spacing" >
        <number>6</number>
       </property>
-      <item row="6" column="1" >
+      <item row="5" column="1" >
        <widget class="QComboBox" name="AxisList" >
         <property name="whatsThis" >
          <string>Select the chart axes for the line series.</string>
@@ -63,7 +63,7 @@
         </item>
        </widget>
       </item>
-      <item row="5" column="1" >
+      <item row="4" column="1" >
        <widget class="QComboBox" name="StyleList" >
         <property name="whatsThis" >
          <string>Select the line style for the series.</string>
@@ -95,21 +95,21 @@
         </item>
        </widget>
       </item>
-      <item row="6" column="0" >
+      <item row="5" column="0" >
        <widget class="QLabel" name="label_5" >
         <property name="text" >
          <string>Chart Axes</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="0" >
+      <item row="4" column="0" >
        <widget class="QLabel" name="label_4" >
         <property name="text" >
          <string>Line Style</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="1" >
+      <item row="3" column="1" >
        <widget class="QSpinBox" name="Thickness" >
         <property name="whatsThis" >
          <string>Enter the thickness for the line.</string>
@@ -125,14 +125,14 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0" >
+      <item row="3" column="0" >
        <widget class="QLabel" name="label_3" >
         <property name="text" >
          <string>Line Thickness</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1" >
+      <item row="2" column="1" >
        <widget class="pqColorChooserButton" name="ColorButton" >
         <property name="whatsThis" >
          <string>Press this button to choose a new color for the line.</string>
@@ -142,20 +142,10 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0" >
+      <item row="2" column="0" >
        <widget class="QLabel" name="label_2" >
         <property name="text" >
          <string>Line Color</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="2" >
-       <widget class="QCheckBox" name="ShowInLegend" >
-        <property name="whatsThis" >
-         <string>Use this option to show/hide all the line series in the legend.</string>
-        </property>
-        <property name="text" >
-         <string>Show Line Series in Legend</string>
         </property>
        </widget>
       </item>
@@ -170,7 +160,7 @@
        </widget>
       </item>
       <item row="0" column="0" colspan="2" >
-       <widget class="pqTreeWidget" name="YAxisArrays" >
+       <widget class="pqTreeView" name="SeriesList" >
         <property name="sizePolicy" >
          <sizepolicy>
           <hsizetype>5</hsizetype>
@@ -194,16 +184,6 @@
         <property name="rootIsDecorated" >
          <bool>false</bool>
         </property>
-        <column>
-         <property name="text" >
-          <string>Variable</string>
-         </property>
-        </column>
-        <column>
-         <property name="text" >
-          <string>Legend Name</string>
-         </property>
-        </column>
        </widget>
       </item>
      </layout>
@@ -298,9 +278,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqTreeWidget</class>
-   <extends>QTreeWidget</extends>
-   <header>pqTreeWidget.h</header>
+   <class>pqTreeView</class>
+   <extends>QTreeView</extends>
+   <header>pqTreeView.h</header>
   </customwidget>
   <customwidget>
    <class>pqColorChooserButton</class>
@@ -314,7 +294,7 @@
   <tabstop>UseArrayIndex</tabstop>
   <tabstop>UseDataArray</tabstop>
   <tabstop>XAxisArray</tabstop>
-  <tabstop>YAxisArrays</tabstop>
+  <tabstop>SeriesList</tabstop>
   <tabstop>SeriesEnabled</tabstop>
   <tabstop>ShowInLegend</tabstop>
   <tabstop>ColorButton</tabstop>

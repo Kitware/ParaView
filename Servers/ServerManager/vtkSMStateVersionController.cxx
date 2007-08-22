@@ -22,7 +22,7 @@
 #include "vtksys/ios/sstream"
 
 vtkStandardNewMacro(vtkSMStateVersionController);
-vtkCxxRevisionMacro(vtkSMStateVersionController, "1.9");
+vtkCxxRevisionMacro(vtkSMStateVersionController, "1.10");
 //----------------------------------------------------------------------------
 vtkSMStateVersionController::vtkSMStateVersionController()
 {
@@ -218,11 +218,11 @@ bool ConvertLineSeriesArrayStatus(vtkPVXMLElement* root,
       // 1 --> 5
       // 2 --> 6
       // 3 --> 2
-      // 3 --> 3
       // 4 --> 0
       // 4 --> 1
       //
       // Fill in the rest with new data:
+      // inlegend(new index 3) = 1 (int)
       // thickness(new index 7) = 1 (int)
       // linestyle(new index 8) = 1 (int)
       // axesindex(new index 9) = 0 (int)
@@ -268,12 +268,10 @@ bool ConvertLineSeriesArrayStatus(vtkPVXMLElement* root,
         elem = child->GetNestedElement(j + 3);
         elem2 = child->GetNestedElement(k + 2);
         elem2->SetAttribute("value", elem->GetAttribute("value"));
-        if(j != k)
-          {
-          // Copy the enabled flag from 3 to 3 if necessary.
-          elem2 = child->GetNestedElement(k + 3);
-          elem2->SetAttribute("value", elem->GetAttribute("value"));
-          }
+
+        // Set the in legend flag to true.
+        elem = child->GetNestedElement(k + 3);
+        elem->SetAttribute("value", "1");
         }
       }
     }

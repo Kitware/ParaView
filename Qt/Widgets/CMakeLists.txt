@@ -18,6 +18,10 @@ SET(QtWidgets_SRCS
   pqAnimationWidget.h
   pqChartContextMenu.cxx
   pqChartContextMenu.h
+  pqCheckableHeaderModel.cxx
+  pqCheckableHeaderModel.h
+  pqCheckableHeaderView.cxx
+  pqCheckableHeaderView.h
   pqCollapsedGroup.cxx
   pqCollapsedGroup.h
   pqColorChooserButton.cxx
@@ -38,6 +42,8 @@ SET(QtWidgets_SRCS
   pqFlatTreeView.h
   pqLineEditNumberValidator.cxx
   pqLineEditNumberValidator.h
+  pqListWidgetCheckHelper.cxx
+  pqListWidgetCheckHelper.h
   pqListWidgetItemObject.cxx
   pqListWidgetItemObject.h
   pqLookmarkToolbar.cxx
@@ -56,8 +62,8 @@ SET(QtWidgets_SRCS
   pqSignalAdaptors.h
   pqSpinBox.cxx
   pqSpinBox.h
-  pqListWidgetCheckHelper.cxx
-  pqListWidgetCheckHelper.h
+  pqTreeView.cxx
+  pqTreeView.h
   pqTreeWidget.cxx
   pqTreeWidget.h
   pqTreeWidgetCheckHelper.cxx
@@ -84,6 +90,8 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqAnimationTrack.h
   pqAnimationWidget.h
   pqChartContextMenu.h
+  pqCheckableHeaderModel.h
+  pqCheckableHeaderView.h
   pqCollapsedGroup.h
   pqColorChooserButton.h
   pqColorTableModel.h
@@ -91,6 +99,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqDelimitedTextParser.h
   pqDoubleRangeWidget.h
   pqFlatTreeView.h
+  pqListWidgetCheckHelper.h
   pqListWidgetItemObject.h
   pqLookmarkToolbar.h
   pqProgressBar.h
@@ -98,7 +107,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqSectionVisibilityContextMenu.h
   pqSignalAdaptors.h
   pqSpinBox.h
-  pqListWidgetCheckHelper.h
+  pqTreeView.h
   pqTreeWidget.h
   pqTreeWidgetCheckHelper.h
   pqTreeWidgetItemObject.h
