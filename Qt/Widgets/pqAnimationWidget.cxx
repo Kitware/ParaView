@@ -36,18 +36,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGraphicsView>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QScrollBar>
 
 #include "pqAnimationModel.h"
 
 pqAnimationWidget::pqAnimationWidget(QWidget* p) 
-  : QScrollArea(p) 
+  : QAbstractScrollArea(p) 
 {
-  QWidget* cont = new QWidget();
-  cont->setSizePolicy(QSizePolicy::MinimumExpanding,
-                      QSizePolicy::MinimumExpanding);
-  QHBoxLayout* wlayout = new QHBoxLayout(cont);
-  wlayout->setSizeConstraint(QLayout::SetMinimumSize);
-  this->View = new QGraphicsView(cont);
+  this->View = new QGraphicsView(this->viewport());
+  this->viewport()->setBackgroundRole(QPalette::Window);
   this->View->setBackgroundRole(QPalette::Window);
   this->View->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   this->View->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -55,7 +52,18 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
   this->View->setFrameShape(QFrame::NoFrame);
   this->Model = new pqAnimationModel(this->View);
   this->View->setScene(this->Model);
-  this->Header = new QHeaderView(Qt::Vertical, cont);
+
+  this->AddRemoveHeader = new QHeaderView(Qt::Vertical, this);
+  this->AddRemoveHeader->setClickable(true);
+  this->AddRemoveHeader->setSizePolicy(QSizePolicy::Minimum,
+                              QSizePolicy::MinimumExpanding);
+
+  this->AddRemoveHeader->setResizeMode(QHeaderView::Fixed);
+  this->AddRemoveHeader->setModel(&this->AddRemoveModel);
+  this->AddRemoveHeader->hide();  // TODO
+
+  this->Header = new QHeaderView(Qt::Vertical, this);
+  this->Header->setObjectName("TrackHeader");
   this->Header->setSizePolicy(QSizePolicy::Preferred,
                               QSizePolicy::MinimumExpanding);
   this->View->setSizePolicy(QSizePolicy::Preferred,
@@ -64,14 +72,11 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
   this->Header->setMinimumSectionSize(0);
   this->Header->setModel(this->Model->header());
   this->Model->setRowHeight(this->Header->sectionSize(0));
-  wlayout->addWidget(this->Header);
-  wlayout->addWidget(this->View);
-  wlayout->setMargin(0);
-  wlayout->setSpacing(0);
-  this->setWidget(cont);
-  this->setWidgetResizable(true);
   QObject::connect(this->Header->model(),
                    SIGNAL(rowsInserted(QModelIndex,int,int)),
+                   this, SLOT(updateSizes()));
+  QObject::connect(this->Header->model(),
+                   SIGNAL(headerDataChanged(Qt::Orientation, int, int)),
                    this, SLOT(updateSizes()));
   QObject::connect(this->Header->model(),
                    SIGNAL(rowsRemoved(QModelIndex,int,int)),
@@ -95,13 +100,24 @@ pqAnimationModel* pqAnimationWidget::animationModel() const
 
 void pqAnimationWidget::updateSizes()
 {
+  this->AddRemoveModel.clear();
   int sz = 0;
   for(int i=0; i<this->Header->count(); i++)
     {
     sz += this->Header->sectionSize(i);
+    this->AddRemoveModel.insertRow(i);
+    this->AddRemoveModel.setHeaderData(i, Qt::Vertical,
+      QPixmap(":/QtWidgets/Icons/pqDelete16.png"), Qt::DecorationRole);
+    this->AddRemoveModel.setData(this->AddRemoveModel.index(i,0),
+      QVariant(), Qt::DisplayRole);
     }
-  this->widget()->setMinimumHeight(sz);
-  this->widget()->layout()->invalidate();
+  this->AddRemoveModel.insertRow(this->Header->count());
+  this->AddRemoveModel.setHeaderData(this->Header->count(), Qt::Vertical,
+    QPixmap(":/QtWidgets/Icons/pqDelete16.png"), Qt::DecorationRole);
+  
+  sz = this->AddRemoveHeader->sectionSize(0) * this->AddRemoveHeader->count();
+  
+  this->updateGeometries();
 }
 
   
@@ -111,5 +127,85 @@ void pqAnimationWidget::headerDblClicked(int which)
     {
     emit this->trackSelected(this->Model->track(which-1));
     }
+}
+  
+void pqAnimationWidget::updateGeometries()
+{
+  int width1 = 0;
+  int width2 = 0;
+  if(!this->AddRemoveHeader->isHidden())
+    {
+    int tmp = qMax(this->AddRemoveHeader->minimumWidth(),
+                 this->AddRemoveHeader->sizeHint().width());
+    width1 = qMin(tmp, this->AddRemoveHeader->maximumWidth());
+    }
+  if(!this->Header->isHidden())
+    {
+    int tmp = qMax(this->Header->minimumWidth(),
+                 this->Header->sizeHint().width());
+    width2 = qMin(tmp, this->Header->maximumWidth());
+    }
+
+  this->setViewportMargins(width1 + width2, 0, 0, 0);
+
+  QRect vg = this->contentsRect();
+  this->AddRemoveHeader->setGeometry(vg.left(), vg.top(), width1, vg.height());
+  this->Header->setGeometry(vg.left() + width1, vg.top(), width2, vg.height());
+
+  this->updateScrollBars();
+}
+
+void pqAnimationWidget::scrollContentsBy(int dx, int dy)
+{
+  if(dy)
+    {
+    this->AddRemoveHeader->setOffset(this->verticalScrollBar()->value());
+    this->Header->setOffset(this->verticalScrollBar()->value());
+    }
+  this->updateWidgetPosition();
+  QAbstractScrollArea::scrollContentsBy(dx, dy);
+}
+
+void pqAnimationWidget::updateScrollBars()
+{
+  int h = this->View->sizeHint().height();
+  if(this->AddRemoveHeader->isVisible())
+    {
+    h = qMax(h, this->AddRemoveHeader->length());
+    }
+  if(this->Header->isVisible())
+    {
+    h = qMax(h, this->Header->length());
+    }
+  
+  QSize vsize = this->viewport()->size();
+  this->View->resize(vsize.width(), h);
+
+  this->verticalScrollBar()->setPageStep(vsize.height());
+  this->verticalScrollBar()->setRange(0, h-vsize.height());
+}
+
+void pqAnimationWidget::updateWidgetPosition()
+{
+  this->View->move(0, -this->verticalScrollBar()->value());
+}
+
+bool pqAnimationWidget::event(QEvent* e)
+{
+  if(e->type() == QEvent::FontChange)
+    {
+    this->Model->setRowHeight(this->Header->sectionSize(0));
+    }
+  if(e->type() == QEvent::Show)
+    {
+    this->updateGeometries();
+    }
+  return QAbstractScrollArea::event(e);
+}
+
+void pqAnimationWidget::resizeEvent(QResizeEvent* e)
+{
+  this->updateScrollBars();
+  QAbstractScrollArea::resizeEvent(e);
 }
 

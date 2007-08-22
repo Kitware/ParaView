@@ -35,14 +35,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QtWidgetsExport.h"
 
-#include <QScrollArea>
+#include <QAbstractScrollArea>
+#include <QStandardItemModel>
 
 class QGraphicsView;
 class QHeaderView;
 class pqAnimationModel;
 class pqAnimationTrack;
 
-class QTWIDGETS_EXPORT pqAnimationWidget : public QScrollArea
+class QTWIDGETS_EXPORT pqAnimationWidget : public QAbstractScrollArea
 {
   Q_OBJECT
 public:
@@ -50,9 +51,6 @@ public:
   ~pqAnimationWidget();
 
   pqAnimationModel* animationModel() const;
-
-  QHeaderView* header() const
-    { return this->Header; }
 
 signals:
   // emitted when a track is double clicked on
@@ -62,8 +60,18 @@ protected slots:
   void updateSizes();
   void headerDblClicked(int);
 
+protected:
+  void updateGeometries();
+  void updateScrollBars();
+  void updateWidgetPosition();
+  void scrollContentsBy(int dx, int dy);
+  bool event(QEvent* e);
+  void resizeEvent(QResizeEvent* e);
+
 private:
   QGraphicsView* View;
+  QHeaderView* AddRemoveHeader;
+  QStandardItemModel AddRemoveModel;
   QHeaderView* Header;
   pqAnimationModel* Model;
 

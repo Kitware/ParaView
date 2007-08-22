@@ -281,10 +281,6 @@ bool pqAnimationModel::eventFilter(QObject* w, QEvent* e)
     this->setSceneRect(0, 0, sz.width(), (this->Tracks.size()+1) * this->rowHeight());
     v->ensureVisible(this->sceneRect(), 0, 0);
     }
-  if(e->type() == QEvent::FontChange)
-    {
-    this->resizeTracks();
-    }
   return false;
 }
 
