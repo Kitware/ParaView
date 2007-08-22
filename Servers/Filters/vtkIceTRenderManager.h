@@ -51,6 +51,8 @@
 
 #include "vtkParallelRenderManager.h"
 
+#include "vtkIceTConstants.h"   // For constant definitions
+
 class vtkIceTRenderer;
 class vtkIntArray;
 class vtkPerspectiveTransform;
@@ -104,7 +106,12 @@ public:
 
 //BTX
   enum StrategyType {
-    DEFAULT, REDUCE, VTREE, SPLIT, SERIAL, DIRECT
+    DEFAULT = vtkIceTConstants::DEFAULT,
+    REDUCE  = vtkIceTConstants::REDUCE,
+    VTREE   = vtkIceTConstants::VTREE,
+    SPLIT   = vtkIceTConstants::SPLIT,
+    SERIAL  = vtkIceTConstants::SERIAL,
+    DIRECT  = vtkIceTConstants::DIRECT
   };
 //ETX
 
@@ -122,8 +129,8 @@ public:
 
 //BTX
   enum ComposeOperationType {
-    ComposeOperationClosest = 0,
-    ComposeOperationOver = 1
+    ComposeOperationClosest = vtkIceTConstants::ComposeOperationClosest,
+    ComposeOperationOver    = vtkIceTConstants::ComposeOperationOver
   };
 //ETX
 

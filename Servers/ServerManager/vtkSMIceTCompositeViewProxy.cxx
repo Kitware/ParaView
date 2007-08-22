@@ -17,6 +17,7 @@
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
+#include "vtkIceTConstants.h"
 #include "vtkInformation.h"
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkObjectFactory.h"
@@ -32,20 +33,10 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 
-
-#include "vtkPVConfig.h" // for PARAVIEW_USE_ICE_T
-#include "vtkToolkits.h" // for VTK_USE_MPI
-
-#ifdef VTK_USE_MPI 
-# ifdef PARAVIEW_USE_ICE_T
-#   include "vtkIceTRenderManager.h"
-# endif
-#endif
-
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.17");
 
 vtkInformationKeyMacro(vtkSMIceTCompositeViewProxy, KD_TREE, ObjectBase);
 //----------------------------------------------------------------------------
@@ -597,20 +588,16 @@ void vtkSMIceTCompositeViewProxy::SetOrderedCompositingDecision(bool decision)
   this->LastOrderedCompositingDecision = decision;
 
 
-#ifdef VTK_USE_MPI 
-# ifdef PARAVIEW_USE_ICE_T
   // Cannot do this with the server manager because this method only
   // exists on the render server, not the client.
   vtkClientServerStream stream;
   stream  << vtkClientServerStream::Invoke << this->RendererProxy->GetID()
           << "SetComposeOperation"
-          << (decision? vtkIceTRenderManager::ComposeOperationOver :
-            vtkIceTRenderManager::ComposeOperationClosest)
+          << (decision? vtkIceTConstants::ComposeOperationOver :
+            vtkIceTConstants::ComposeOperationClosest)
           << vtkClientServerStream::End;
   vtkProcessModule::GetProcessModule()->SendStream(
     this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
-# endif
-#endif
 }
 
 //----------------------------------------------------------------------------
