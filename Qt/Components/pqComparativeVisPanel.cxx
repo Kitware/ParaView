@@ -290,7 +290,7 @@ void pqComparativeVisPanel::activateCue(
 
     // Create a new cueProxy.
     cueProxy.TakeReference(
-      vtkSMAnimationCueProxy::SafeDownCast(pxm->NewProxy("animation", "KeyframeAnimationCue")));
+      vtkSMAnimationCueProxy::SafeDownCast(pxm->NewProxy("animation", "KeyFrameAnimationCue")));
     cueProxy->SetServers(vtkProcessModule::CLIENT);
     cueProxy->SetConnectionID(this->Internal->View->getProxy()->GetConnectionID());
 
