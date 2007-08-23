@@ -2650,7 +2650,7 @@
       <IntVectorProperty
         name="ShowAxisGrid"
         number_of_elements="4"
-        default_values="1 1 1 1">
+        default_values="1 1 0 0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
@@ -2863,7 +2863,7 @@
       <IntVectorProperty
         name="ShowAxisGrid"
         number_of_elements="4"
-        default_values="1 1 1 1">
+        default_values="1 1 0 0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
