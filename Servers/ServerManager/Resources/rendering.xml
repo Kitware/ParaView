@@ -2500,6 +2500,15 @@
       <!-- End of UnstructuredGridStrategy -->
     </UniformGridParallelStrategy>
 
+    <BlockDeliveryStrategy name="BlockDeliveryStrategy"
+      base_proxygroup="strategies"
+      base_proxyname="PolyDataStrategy">
+      <Documentation>
+        Strategy used by BlockDeliveryStrategy for updating the pipeline.
+      </Documentation>
+      <!-- End of BlockDeliveryStrategy -->
+    </BlockDeliveryStrategy>
+
     <!-- End of strategies -->
   </ProxyGroup>
 

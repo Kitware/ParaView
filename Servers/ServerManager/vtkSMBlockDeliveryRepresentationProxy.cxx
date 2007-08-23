@@ -72,7 +72,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMBlockDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMBlockDeliveryRepresentationProxy::vtkSMBlockDeliveryRepresentationProxy()
 {
@@ -168,7 +168,7 @@ bool vtkSMBlockDeliveryRepresentationProxy::CreatePipeline(vtkSMSourceProxy* inp
 
   // Create the strategy use to update the representation.
   vtkSMRepresentationStrategy* strategy = vtkSMRepresentationStrategy::SafeDownCast(
-    pxm->NewProxy("strategies", "PolyDataStrategy"));
+    pxm->NewProxy("strategies", "BlockDeliveryStrategy"));
   if (!strategy)
     {
     return false;

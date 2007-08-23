@@ -26,6 +26,7 @@ SET(Kit_SRCS
   vtkSMArraySelectionInformationHelper.cxx
   vtkSMAxesRepresentationProxy.cxx
   vtkSMBlockDeliveryRepresentationProxy.cxx
+  vtkSMBlockDeliveryStrategy.cxx
   vtkSMBooleanDomain.cxx
   vtkSMBooleanKeyFrameProxy.cxx
   vtkSMBoundsDomain.cxx
