@@ -2533,10 +2533,17 @@ void pqMainWindowCore::onToolsPythonShell()
     if (activeServer)
       {
       int cid = static_cast<int>(activeServer->GetConnectionID());
-      QString initStr = QString("import paraview\n"
-                                "paraview.ActiveConnection = paraview.pyConnection(%1)\n"
-                                "paraview.ActiveConnection.SetHost(\"%2\", 0)\n").arg(cid)
-                          .arg(activeServer->getResource().toURI());
+      QString initStr = QString(
+        "import paraview\n"
+        "paraview.ActiveConnection = paraview.pyConnection(%1)\n"
+        "paraview.ActiveConnection.SetHost(\"%2\", 0)\n"
+        "from paraview import servermanager\n"
+        "servermanager.ActiveConnection = servermanager.Connection(%1)\n"
+        "servermanager.ActiveConnection.SetHost(\"%2\", 0)\n")
+        .arg(cid)
+        .arg(activeServer->getResource().toURI())
+        .arg(cid)
+        .arg(activeServer->getResource().toURI());
 /*
       QString initStr = QString(
         "from paraview import servermanager\n"
