@@ -17,8 +17,6 @@
 // This objects is used by the client to get the features 
 // suported by the server.
 // At the moment, server information is only on the root.
-// Currently, the server information object is vtkPVProcessModule.
-// This will probably change soon.
 
 
 #ifndef __vtkPVServerInformation_h
@@ -82,6 +80,11 @@ public:
   vtkGetStringMacro(RenderModuleName);
 
   // Description:
+  // Get/Set if the server supports saving AVIs.
+  vtkSetMacro(AVISupport, int);
+  vtkGetMacro(AVISupport, int);
+
+  // Description:
   // Number of machines to use in data or render server
   // Setting the number of machines has the side effect of wiping out any
   // machine parameters previously set.
@@ -117,6 +120,7 @@ protected:
   int TileMullions[2];
   int UseOffscreenRendering;
   int UseIceT;
+  int AVISupport;
   char* RenderModuleName;
 
   vtkPVServerOptionsInternals* MachinesInternals;

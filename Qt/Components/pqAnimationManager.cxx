@@ -34,11 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqAnimationSettings.h"
 
 #include "vtkProcessModule.h"
+#include "vtkPVServerInformation.h"
 #include "vtkSMAnimationSceneGeometryWriter.h"
 #include "vtkSMAnimationSceneProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMServerProxyManagerReviver.h"
-#include "vtkToolkits.h" // for VTK_USE_FFMPEG_ENCODER
 
 #include <QApplication>
 #include <QFileInfo>
@@ -372,23 +373,40 @@ bool pqAnimationManager::saveAnimation()
     }
   this->Internals->AnimationSettingsDialog = 0;
 
+  bool disconnect_and_save = 
+    (dialogUI.checkBoxDisconnect->checkState() == Qt::Checked);
+
   // Now obtain filename for the animation.
+  vtkSmartPointer<vtkPVServerInformation> serverInfo;
+  if (disconnect_and_save)
+    {
+    serverInfo = vtkProcessModule::GetProcessModule()->GetServerInformation(
+      scene->getServer()->GetConnectionID());
+    if (!serverInfo)
+      {
+      qWarning() << "Failed to locate server information about AVI support.";
+      disconnect_and_save = false;
+      }
+    }
+  else
+    {
+    // vtkPVServerInformation initialize AVI support in constructor for the
+    // local process.
+    serverInfo = vtkSmartPointer<vtkPVServerInformation>::New();
+    }
+
   QString filters = "";
-#ifdef _WIN32
-  filters += "AVI files (*.avi);;";
-#else
-# ifdef VTK_USE_FFMPEG_ENCODER
-  filters += "AVI files (*.avi);;";
-# endif
-#endif
+  if (serverInfo && serverInfo->GetAVISupport())
+    {
+    filters += "AVI files (*.avi);;";
+    }
   filters +="JPEG images (*.jpg);;TIFF images (*.tif);;PNG images (*.png);;";
   filters +="All files(*)";
 
   // Create a server dialog is disconnect-and-save is true, else create a client
   // dialog.
   pqFileDialog *file_dialog = new pqFileDialog(
-    (dialogUI.checkBoxDisconnect->checkState() == Qt::Checked)?
-    scene->getServer() : 0,
+    disconnect_and_save?  scene->getServer() : 0,
     QApplication::activeWindow(),
     tr("Save Animation"), QString(), filters);
   file_dialog->setObjectName("FileSaveAnimationDialog");
@@ -446,7 +464,7 @@ bool pqAnimationManager::saveAnimation()
   // Enforce any view size conditions (such a multiple of 4). 
   int magnification = this->updateViewSizes(newSize, viewSize);
  
-  if (dialogUI.checkBoxDisconnect->checkState() == Qt::Checked)
+  if (disconnect_and_save)
     {
     pqServer* server = this->Internals->ActiveServer;
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
