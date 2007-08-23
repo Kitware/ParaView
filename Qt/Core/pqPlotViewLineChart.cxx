@@ -395,6 +395,14 @@ void pqPlotViewLineChart::update(bool force)
           }
         else
           {
+          // Remove the series from the legend if needed.
+          if(series->LegendId != 0)
+            {
+            this->Internal->Legend->removeEntry(
+                this->Internal->Legend->getIndexForId(series->LegendId));
+            series->LegendId = 0;
+            }
+
           // Remove the series if the x or y array are null.
           this->Internal->Model[series->Chart]->removeSeries(series->Model);
           delete series->Model;
@@ -553,6 +561,14 @@ void pqPlotViewLineChart::removeRepresentation(
         item->Series.begin();
     for( ; series != item->Series.end(); ++series)
       {
+      // Remove the series from the legend if needed.
+      if(series->LegendId != 0)
+        {
+        this->Internal->Legend->removeEntry(
+            this->Internal->Legend->getIndexForId(series->LegendId));
+        series->LegendId = 0;
+        }
+
       this->Internal->Model[series->Chart]->removeSeries(series->Model);
       delete series->Model;
       }
@@ -577,6 +593,14 @@ void pqPlotViewLineChart::removeAllRepresentations()
         iter.value()->Series.begin();
     for( ; series != iter.value()->Series.end(); ++series)
       {
+      // Remove the series from the legend if needed.
+      if(series->LegendId != 0)
+        {
+        this->Internal->Legend->removeEntry(
+            this->Internal->Legend->getIndexForId(series->LegendId));
+        series->LegendId = 0;
+        }
+
       delete series->Model;
       }
 
