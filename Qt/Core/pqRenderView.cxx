@@ -1046,7 +1046,7 @@ bool pqRenderView::eventFilter(QObject* caller, QEvent* e)
       {
       QPoint newPos = static_cast<QMouseEvent*>(e)->pos();
       QPoint delta = newPos - this->Internal->MouseOrigin;
-      if(delta.manhattanLength() < 3)
+      if(delta.manhattanLength() < 3 && qobject_cast<QWidget*>(caller))
         {
         QList<QAction*> actions = this->Internal->Viewport->actions();
         if(!actions.isEmpty())
@@ -1054,7 +1054,7 @@ bool pqRenderView::eventFilter(QObject* caller, QEvent* e)
           QMenu* menu = new QMenu(this->Internal->Viewport);
           menu->setAttribute(Qt::WA_DeleteOnClose);
           menu->addActions(actions);
-          menu->popup(this->Internal->Viewport->mapToGlobal(newPos));
+          menu->popup(qobject_cast<QWidget*>(caller)->mapToGlobal(newPos));
           }
         }
       }
