@@ -1315,7 +1315,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
                                        propertyLabel);
       panelLayout->addWidget(label, rowCount, 0, 1, 1);
       QGridLayout* glayout = new QGridLayout;
-      glayout->setSpacing(2);
+      glayout->setSpacing(0);
       glayout->setObjectName(propertyName);
       panelLayout->addLayout(glayout, rowCount, 1, 1, 1);
 
