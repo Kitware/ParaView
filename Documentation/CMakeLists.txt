@@ -22,8 +22,6 @@ set(PARAVIEW_HTML_DOCUMENTATION
   DisplayStyle.png
   DisplayTransformation.png
   DisplayView.png
-  ElementInspector.html
-  ElementInspector.png
   Exponential.png
   GUIOverview.html
   HistogramDisplayTab.png
@@ -52,6 +50,7 @@ set(PARAVIEW_HTML_DOCUMENTATION
   Sinusoidal.png
   SplitViewHorizontalButton.png
   SplitViewVerticalButton.png
+  SpreadsheetView.png
   Step.png
   UndoCameraButton.png
   VCRBack.png

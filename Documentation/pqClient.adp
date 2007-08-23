@@ -41,9 +41,12 @@
   <section ref="Documentation/Animation.html" title="Animation">
     <keyword ref="Documentation/Animation.html">Animation</keyword>
   </section>
-  <section ref="Documentation/Views.html" title="Views"/>
-  <section ref="Documentation/ElementInspector.html" title="Element Inspector">
-    <keyword ref="Documentation/ElementInspector.html">Element Inspector</keyword>
+  <section ref="Documentation/Views.html" title="Views">
+    <keyword ref="Documentation/Views.html">3D View</keyword>
+    <keyword ref="Documentation/Views.html">Bar Chart View</keyword>
+    <keyword ref="Documentation/Views.html">XY Plot View</keyword>
+    <keyword ref="Documentation/Views.html">3D View (Comparative)</keyword>
+    <keyword ref="Documentation/Views.html">Spreadsheet View</keyword>
   </section>
   <section ref="Documentation/Lookmarks.html" title="Lookmarks">
     <keyword ref="Documentation/Lookmarks.html">Lookmarks</keyword>
