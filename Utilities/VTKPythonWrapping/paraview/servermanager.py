@@ -177,6 +177,8 @@ class Proxy(object):
                 property = InputProperty(self, smproperty)
             elif smproperty.IsA("vtkSMProxyProperty"):
                 property = ProxyProperty(self, smproperty)
+            else:
+                property = Property(self, smproperty)
             if property is not None:
                 import weakref
                 self.__Properties[name] = weakref.ref(property)
@@ -277,13 +279,20 @@ class Property(object):
             repr += name
         else:
             repr += "Unknown"
-        repr += " value = "
-        if self.GetData() is not None:
-            repr += self.GetData().__repr__()
-        else:
-            repr += "None"
+        if not type(self) is Property:
+            repr += " value = "
+            if self.GetData() is not None:
+                repr += self.GetData().__repr__()
+            else:
+                repr += "None"
         return repr
 
+    def __call__(self):
+        if type(self) is Property:
+            self.Proxy.SMProxy.InvokeCommand(self._FindPropertyName())
+        else:
+            raise exceptions.RuntimeError, "Cannot invoke this property"
+        
     def _FindPropertyName(self):
         "Returns the name of this property."
         return self.Proxy.GetPropertyName(self.SMProperty)
@@ -1092,6 +1101,7 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     """
     Use this function call to create a new connection. On success,
     it returns a Connection object that abstracts the connection.
+    Otherwise, it returns None.
     There are several ways in which this function can be called:
     * When called with no arguments, it creates a new connection
       to the built-in server on the client itself.
@@ -1255,7 +1265,7 @@ def LoadPlugin(filename, connection=None):
             _updateModules()
             
 
-def Fetch(input, arg=None):
+def Fetch(input, arg1=None, arg2=None):
     """ 
     A convenience method that moves data from the server to the client, 
     optionally performing some operation on the data as it moves.
@@ -1264,24 +1274,24 @@ def Fetch(input, arg=None):
     
     You can use Fetch to do three things:
 
-    If arg is None (the default) then all of the data is brought to the client.
+    If arg1 is None (the default) then all of the data is brought to the client.
     In parallel runs an appropriate append Filter merges the
     data on each processor into one data object. The filter chosen will be 
     vtkAppendPolyData for vtkPolyData, vtkAppendRectilinearGrid for 
     vtkRectilinearGrid, vtkMultiGroupDataGroupFilter for vtkCompositeData, 
     and vtkAppendFilter for anything else.
     
-    If arg is an integer then one particular processor's output is brought to
+    If arg1 is an integer then one particular processor's output is brought to
     the client. In serial runs the arg is ignored. If you have a filter that
     computes results in parallel and brings them to the root node, then set 
     arg to be 0.
     
-    If arg is an algorithm, for example vtkMinMax, the algorithm will be 
-    applied to the data to obtain some result. In parallel runs the algorithm 
-    will be run on each processor to make intermediate results and then again 
-    on the root processor over all of the intermediate results to create a 
-    global result.
-    """
+    If arg1 and arg2 are a algorithms, for example vtkMinMax, the algorithm
+    will be applied to the data to obtain some result. Here arg1 will be
+    applied pre-gather and arg2 will be applied post-gather. In parallel
+    runs the algorithm will be run on each processor to make intermediate
+    results and then again on the root processor over all of the
+    intermediate results to create a global result.  """
 
     import types
 
@@ -1289,7 +1299,7 @@ def Fetch(input, arg=None):
     gvd = rendering.ClientDeliveryRepresentationBase()
     gvd.AddInput(input, "DONTCARE") 
   
-    if arg == None:
+    if arg1 == None:
         print "getting appended"
 
         cdinfo = input.GetDataInformation().GetCompositeDataInformation()
@@ -1310,18 +1320,18 @@ def Fetch(input, arg=None):
             gvd.SetReductionType(2)
 
         
-    elif type(arg) is types.IntType:          
-        print "getting node %d" % arg
-        gvd.SetReductionType(3)   
+    elif type(arg1) is types.IntType:          
+        print "getting node %d" % arg1
+        gvd.SetReductionType(3)  
         gvd.SetPreGatherHelper(None)
         gvd.SetPostGatherHelper(None)
-        gvd.SetPassThrough(arg)
+        gvd.SetPassThrough(arg1)
 
     else:
         print "applying operation"
-        gvd.SetReductionType(3)   
-        gvd.SetPreGatherHelper(arg)
-        gvd.SetPostGatherHelper(arg)
+        gvd.SetReductionType(6) # CUSTOM   
+        gvd.SetPreGatherHelper(arg1)
+        gvd.SetPostGatherHelper(arg2)
         gvd.SetPassThrough(-1)
 
     #go!
@@ -1329,6 +1339,43 @@ def Fetch(input, arg=None):
     gvd.Update()   
     return gvd.GetOutput()
 
+def AnimateReader(reader, view, filename=None):
+    """This is a utility function that, given a reader and a view
+    animates over all time steps of the reader. If the optional
+    filename is provided, a movie is created (type depends on the
+    extension of the filename."""
+    # Create an animation scene
+    scene = animation.AnimationScene();
+    # with 1 view
+    scene.ViewModules = [view];
+    # Update the reader to get the time information
+    reader.UpdatePipelineInformation()
+    scene.TimeSteps = reader.TimestepValues.GetData()
+    # Animate from 1st time step to last
+    scene.StartTime = reader.TimestepValues.GetData()[0]
+    scene.EndTime = reader.TimestepValues.GetData()[-1];
+
+    # Each frame will correspond to a time step
+    scene.PlayMode = 2; #Snap To Timesteps
+
+    # Create a special animation cue for time.
+    cue = animation.TimeAnimationCue();
+    cue.AnimatedProxy = view;
+    cue.AnimatedPropertyName = "ViewTime";
+    scene.Cues = [cue];
+
+    if filename:
+        writer = vtkSMAnimationSceneImageWriter();
+        writer.SetFileName(filename);
+        writer.SetFrameRate(1);
+        writer.SetAnimationScene(scene.SMProxy);
+        
+        # Now save the animation.
+        if not writer.Save():
+            raise exceptions.RuntimeError, "Saving of animation failed!"
+    else:
+        scene.Play()
+    
 def Finalize():
     """Although not required, this can be called at exit to cleanup."""
     vtkInitializationHelper.Finalize()
@@ -1450,16 +1497,14 @@ def _createModule(groupName, mdl=None):
         iter = PropertyIterator(proto)
         # Add all properties as python properties.
         for prop in iter:
-            if prop.IsA("vtkSMVectorProperty") or \
-               prop.IsA("vtkSMProxyProperty"):
-                propName = iter.GetKey()
-                propDoc = None
-                if prop.GetDocumentation():
-                    propDoc = prop.GetDocumentation().GetDescription()
-                cdict[propName] = property(_createGetProperty(propName),
-                                           _createSetProperty(propName),
-                                           None,
-                                           propDoc)
+            propName = iter.GetKey()
+            propDoc = None
+            if prop.GetDocumentation():
+                propDoc = prop.GetDocumentation().GetDescription()
+            cdict[propName] = property(_createGetProperty(propName),
+                                       _createSetProperty(propName),
+                                       None,
+                                       propDoc)
         # Add the documentation as the class __doc__
         if proto.GetDocumentation() and \
            proto.GetDocumentation().GetDescription():
@@ -1647,3 +1692,60 @@ def demo3():
     
     return (data, rv)
     
+def demo4(fname="/Users/berk/Work/ParaViewData/Data/can.ex2"):
+    """This method demonstrates the user of AnimateReader for
+    creating animations."""
+    if not ActiveConnection:
+        Connect()
+    reader = sources.ExodusIIReader(FileName=fname)
+    view = CreateRenderView()
+    repr = CreateRepresentation(reader, view)
+    view.StillRender();
+    view.ResetCamera();
+    view.StillRender();
+    c = view.GetActiveCamera()
+    c.Elevation(95)
+    AnimateReader(reader, view)
+
+
+def demo5():
+    """ Simple sphere animation"""
+    if not ActiveConnection:
+        Connect()
+    sphere = sources.SphereSource();
+    view = CreateRenderView();
+    repr = CreateRepresentation(sphere, view);
+
+    view.StillRender();
+    view.ResetCamera();
+    view.StillRender();
+
+    # Create an animation scene
+    scene = animation.AnimationScene();
+    # Add 1 view
+    scene.ViewModules = [view];
+
+    # Create a cue to animate the StartTheta property
+    cue = animation.KeyFrameAnimationCue();
+    cue.AnimatedProxy = sphere;
+    cue.AnimatedPropertyName = "StartTheta";
+    # Add it to the scene's cues
+    scene.Cues = [cue];
+
+    # Create 2 keyframes for the StartTheta track
+    keyf0 = animation.CompositeKeyFrame();
+    keyf0.Type = 2 ;# Set keyframe interpolation type to Ramp.
+    # At time = 0, value = 0
+    keyf0.KeyTime = 0;
+    keyf0.KeyValues= [0];
+
+    keyf1 = animation.CompositeKeyFrame();
+    # At time = 1.0, value = 200
+    keyf1.KeyTime = 1.0;
+    keyf1.KeyValues= [200];
+
+    # Add keyframes.
+    cue.KeyFrames = [keyf0, keyf1];
+
+    scene.Play()
+    return scene;
