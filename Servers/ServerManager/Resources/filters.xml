@@ -345,6 +345,8 @@ The Integrate Attributes filter integrates point and cell data over lines and su
       </InputProperty>
    <Hints>
      <Visibility replace_input="0" />
+     <!-- View can be used to specify the preferred view for the proxy -->
+     <View type="SpreadSheetView" />
    </Hints>
    <!-- End IntegrateAttributes -->
    </SourceProxy>
