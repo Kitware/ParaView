@@ -26,7 +26,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMCameraLink);
-vtkCxxRevisionMacro(vtkSMCameraLink, "1.14");
+vtkCxxRevisionMacro(vtkSMCameraLink, "1.15");
 
 //---------------------------------------------------------------------------
 struct vtkSMCameraLinkInternals
@@ -53,6 +53,10 @@ struct vtkSMCameraLinkInternals
       {
       camLink->EndInteraction(caller);
       }
+    else if (eid == vtkCommand::ResetCameraEvent && clientData && caller)
+      {
+      camLink->ResetCamera(caller);
+      }
     }
 
   struct LinkedCamera
@@ -71,6 +75,7 @@ struct vtkSMCameraLinkInternals
         vtkPVGenericRenderWindowInteractor* iren = rmp->GetInteractor();
         iren->AddObserver(vtkCommand::StartInteractionEvent, this->Observer);
         iren->AddObserver(vtkCommand::EndInteractionEvent, this->Observer); 
+        rmp->AddObserver(vtkCommand::ResetCameraEvent, this->Observer); 
         }
       };
     ~LinkedCamera()
@@ -83,6 +88,7 @@ struct vtkSMCameraLinkInternals
         vtkPVGenericRenderWindowInteractor* iren = rmp->GetInteractor();
         iren->RemoveObserver(this->Observer);
         iren->RemoveObserver(this->Observer); 
+        rmp->RemoveObserver(this->Observer);
         }
       }
     vtkSmartPointer<vtkSMProxy> Proxy;
@@ -195,16 +201,8 @@ void vtkSMCameraLink::UpdateVTKObjects(vtkSMProxy* vtkNotUsed(fromProxy))
 }
 
 //---------------------------------------------------------------------------
-void vtkSMCameraLink::UpdateViews(vtkSMProxy* caller, bool interactive)
+void vtkSMCameraLink::CopyProperties(vtkSMProxy* caller)
 {
-  if(this->Internals->Updating)
-    {
-    return;
-    }
-
-
-  this->Internals->Updating = true;
-
   const char** props = this->Internals->LinkedPropertyNames;
 
   for(; *props; props+=2)
@@ -224,6 +222,19 @@ void vtkSMCameraLink::UpdateViews(vtkSMProxy* caller, bool interactive)
         }
       }
     }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMCameraLink::UpdateViews(vtkSMProxy* caller, bool interactive)
+{
+  if(this->Internals->Updating)
+    {
+    return;
+    }
+
+
+  this->Internals->Updating = true;
+  this->CopyProperties(caller);
 
   int numObjects = this->GetNumberOfLinkedProxies();
   for(int i=0; i<numObjects; i++)
@@ -295,6 +306,19 @@ void vtkSMCameraLink::EndInteraction(vtkObject* caller)
       rmp->GetInteractor()->InvokeEvent(vtkCommand::EndInteractionEvent);
       }
     }
+  this->Internals->Updating = false;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMCameraLink::ResetCamera(vtkObject* caller)
+{
+  if (this->Internals->Updating)
+    {
+    return;
+    }
+
+  this->Internals->Updating = true;
+  this->CopyProperties(vtkSMProxy::SafeDownCast(caller));
   this->Internals->Updating = false;
 }
 

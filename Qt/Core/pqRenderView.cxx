@@ -527,9 +527,6 @@ void pqRenderView::resetCamera()
 {
   this->fakeInteraction(true);
   this->getRenderViewProxy()->ResetCamera();
-  // This render is essential since vtkSMCameraLink does not 
-  // propagate changes to linked views until the render call.
-  this->forceRender();
   this->fakeInteraction(false);
 }
 

@@ -59,10 +59,7 @@ public:
   // Update all the views linked with an OUTPUT direction.
   // \c interactive indicates if the render is interactive or not.
   virtual void UpdateViews(vtkSMProxy* caller, bool interactive);
-
-  void StartInteraction(vtkObject* caller);
-  void EndInteraction(vtkObject* caller);
-
+//BTX
 protected:
   vtkSMCameraLink();
   ~vtkSMCameraLink();
@@ -92,13 +89,24 @@ protected:
   // Load the link state.
   virtual int LoadState(vtkPVXMLElement* linkElement, vtkSMStateLoader* loader);
 
+  // Description:
+  // Internal method to copy vtkSMproperty values from caller to all linked
+  // proxies.
+  void CopyProperties(vtkSMProxy* caller);
+
+  void StartInteraction(vtkObject* caller);
+  void EndInteraction(vtkObject* caller);
+  void ResetCamera(vtkObject* caller);
+
   int SynchronizeInteractiveRenders;
 private:
 
   vtkSMCameraLinkInternals* Internals;
+  friend class vtkSMCameraLinkInternals;
 
   vtkSMCameraLink(const vtkSMCameraLink&); // Not implemented
   void operator=(const vtkSMCameraLink&); // Not implemented
+//ETX
 };
 
 #endif
