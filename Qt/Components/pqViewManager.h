@@ -108,6 +108,9 @@ signals:
   /// Fired when the camera button is clicked.
   void triggerCameraAdjustment(pqView*);
 
+  /// Emitted when the view options button is clicked.
+  void viewOptionsRequested();
+
 private slots:
   /// This will create a view module to fill the frame.
   /// the render window is created on the active server

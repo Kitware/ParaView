@@ -482,6 +482,14 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
       this, SLOT(onCameraTriggered()));
     }
 
+  QAction* optionsAction = new QAction(
+    QIcon(":/pqWidgets/Icons/pqOptions16.png"), "Edit View Options", this);
+  optionsAction->setObjectName("OptionsButton");
+  optionsAction->setEnabled(true);
+  frame->addTitlebarAction(optionsAction);
+  QObject::connect(optionsAction, SIGNAL(triggered()), 
+    this, SIGNAL(viewOptionsRequested()));
+
   if (view->supportsUndo())
     {
     // Setup undo/redo connections if the view module
