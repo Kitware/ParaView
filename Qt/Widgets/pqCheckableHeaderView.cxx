@@ -199,7 +199,7 @@ pqCheckableHeaderView::~pqCheckableHeaderView()
   delete this->Internal;
 }
 
-bool pqCheckableHeaderView::eventFilter(QObject *object, QEvent *e)
+bool pqCheckableHeaderView::eventFilter(QObject *, QEvent *e)
 {
   if(e->type() == QEvent::FocusIn || e->type() == QEvent::FocusOut)
     {
@@ -309,14 +309,13 @@ void pqCheckableHeaderView::initializeIcons()
     for(int i = 0; i < total; i++)
       {
       bool checkable = false;
-      int state = current->headerData(
+      int cs = current->headerData(
           i, this->orientation(), Qt::CheckStateRole).toInt(&checkable);
-      this->Internal->Items.append(
-          pqCheckableHeaderViewItem(checkable, state));
+      this->Internal->Items.append(pqCheckableHeaderViewItem(checkable, cs));
       if(checkable)
         {
         current->setHeaderData(i, this->orientation(),
-            this->Internal->getPixmap(state, active), Qt::DecorationRole);
+            this->Internal->getPixmap(cs, active), Qt::DecorationRole);
         }
       else
         {
@@ -332,7 +331,7 @@ void pqCheckableHeaderView::initializeIcons()
 void pqCheckableHeaderView::updateHeaderData(Qt::Orientation orient,
     int first, int last)
 {
-  if(this->Internal->IgnoreChange)
+  if(this->Internal->IgnoreChange || orient != this->orientation())
     {
     return;
     }
@@ -356,19 +355,18 @@ void pqCheckableHeaderView::updateHeaderData(Qt::Orientation orient,
     pqCheckableHeaderViewItem *item = &this->Internal->Items[i];
     if(item->Checkable)
       {
-      int state = current->headerData(
-          i, this->orientation(), Qt::CheckStateRole).toInt(&item->Checkable);
+      int cs = current->headerData(
+          i, orient, Qt::CheckStateRole).toInt(&item->Checkable);
       if(!item->Checkable)
         {
         // Clear the check box pixmap.
-        current->setHeaderData(i, this->orientation(), QVariant(),
-            Qt::DisplayRole);
+        current->setHeaderData(i, orient, QVariant(), Qt::DisplayRole);
         }
-      else if(state != item->State)
+      else if(cs != item->State)
         {
-        item->State = state;
-        current->setHeaderData(i, this->orientation(),
-            this->Internal->getPixmap(state, active), Qt::DecorationRole);
+        item->State = cs;
+        current->setHeaderData(i, orient,
+            this->Internal->getPixmap(cs, active), Qt::DecorationRole);
         }
       }
     }
@@ -393,23 +391,22 @@ void pqCheckableHeaderView::insertHeaderSection(const QModelIndex &parentIndex,
     for(int i = first; i <= last; i++)
       {
       bool checkable = false;
-      int state = current->headerData(
+      int cs = current->headerData(
           i, this->orientation(), Qt::CheckStateRole).toInt(&checkable);
       if(doAdd)
         {
-        this->Internal->Items.append(
-            pqCheckableHeaderViewItem(checkable, state));
+        this->Internal->Items.append(pqCheckableHeaderViewItem(checkable, cs));
         }
       else
         {
         this->Internal->Items.insert(i,
-            pqCheckableHeaderViewItem(checkable, state));
+            pqCheckableHeaderViewItem(checkable, cs));
         }
 
       if(checkable)
         {
         current->setHeaderData(i, this->orientation(),
-            this->Internal->getPixmap(state, active), Qt::DecorationRole);
+            this->Internal->getPixmap(cs, active), Qt::DecorationRole);
         }
       }
 

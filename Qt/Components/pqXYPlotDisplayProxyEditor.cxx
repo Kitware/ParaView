@@ -261,7 +261,7 @@ int pqLineSeriesEditorModel::rowCount(const QModelIndex &parentIndex) const
   return 0;
 }
 
-int pqLineSeriesEditorModel::columnCount(const QModelIndex &parentIndex) const
+int pqLineSeriesEditorModel::columnCount(const QModelIndex &) const
 {
   return 2;
 }
