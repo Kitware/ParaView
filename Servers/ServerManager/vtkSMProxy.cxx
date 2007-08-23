@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.99");
+vtkCxxRevisionMacro(vtkSMProxy, "1.100");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -424,6 +424,7 @@ const char* vtkSMProxy::GetPropertyName(vtkSMProperty* prop)
     if (prop == piter->GetProperty())
       {
       result = piter->GetKey();
+      break;
       }
     }
   piter->Delete();
