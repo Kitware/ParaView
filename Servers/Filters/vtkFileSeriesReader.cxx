@@ -28,7 +28,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkFileSeriesReader);
-vtkCxxRevisionMacro(vtkFileSeriesReader, "1.5");
+vtkCxxRevisionMacro(vtkFileSeriesReader, "1.6");
 
 vtkCxxSetObjectMacro(vtkFileSeriesReader,Reader,vtkAlgorithm);
 
@@ -62,6 +62,7 @@ vtkFileSeriesReader::~vtkFileSeriesReader()
     this->Reader->Delete();
     }
   delete this->Internal;
+  this->SetFileNameMethod(0);
 }
 
 //----------------------------------------------------------------------------
