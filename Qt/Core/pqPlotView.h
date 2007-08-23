@@ -77,6 +77,9 @@ public:
   /// Request a delayed forceRender().
   virtual void render();
 
+  /// Resets the camera to include all visible data.
+  void resetCamera();
+
   /// Called to undo interaction.
   virtual void undo();
 

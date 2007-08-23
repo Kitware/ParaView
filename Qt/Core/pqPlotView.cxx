@@ -328,6 +328,15 @@ void pqPlotView::render()
 }
 
 //-----------------------------------------------------------------------------
+void pqPlotView::resetCamera()
+{
+  if(!this->Internal->Chart.isNull())
+    {
+    this->Internal->Chart->getChartArea()->getContentsSpace()->resetZoom();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqPlotView::delayedRender()
 {
   if (this->Internal->RenderRequestPending)

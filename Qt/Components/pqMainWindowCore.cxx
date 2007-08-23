@@ -89,6 +89,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineMenu.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineRepresentation.h"
+#include "pqPlotView.h"
 #include "pqPluginDialog.h"
 #include "pqPluginManager.h"
 #include "pqPQLookupTableManager.h"
@@ -3596,6 +3597,11 @@ void pqMainWindowCore::resetCamera()
     {
     ren->resetCamera();
     ren->render();
+    }
+  pqPlotView* chart = qobject_cast<pqPlotView*>(pqActiveView::instance().current());
+  if (chart)
+    {
+    chart->resetCamera();
     }
 }
 
