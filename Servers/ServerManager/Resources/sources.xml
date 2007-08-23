@@ -1115,7 +1115,7 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
          default_values="30.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          This property specifies the natural frequency in Y (XY in the equation).
+          This property specifies the natural frequency in Y (YF in the equation).
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1127,7 +1127,7 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
          default_values="40.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          This property specifies the natural frequency in Z (XZ in the equation).
+          This property specifies the natural frequency in Z (ZF in the equation).
         </Documentation>
       </DoubleVectorProperty>
 
