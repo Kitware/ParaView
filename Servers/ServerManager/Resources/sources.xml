@@ -695,6 +695,7 @@ The Mandelbrot source can be used to add a uniform rectilinear grid with scalar 
       <IntVectorProperty
          name="MaximumNumberOfIterations"
          command="SetMaximumNumberOfIterations"
+         label="Maximum Number of Iterations"
          number_of_elements="1"
          animateable="1"
          default_values="100" >
