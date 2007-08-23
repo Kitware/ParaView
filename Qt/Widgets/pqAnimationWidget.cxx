@@ -101,7 +101,7 @@ pqAnimationModel* pqAnimationWidget::animationModel() const
   return this->Model;
 }
 
-QHeaderView* pqAnimationWidget::createHeader() const
+QHeaderView* pqAnimationWidget::createDeleteHeader() const
 {
   return this->AddRemoveHeader;
 }

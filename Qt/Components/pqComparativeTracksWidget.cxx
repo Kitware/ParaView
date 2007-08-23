@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt Includes.
 #include <QDialog>
+#include <QHeaderView>
 #include <QDialogButtonBox>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -67,6 +68,7 @@ public:
   pqInternal(QWidget* parent)
     {
     this->AnimationWidget = new pqAnimationWidget(parent);
+    this->AnimationWidget->createDeleteHeader()->hide();
     this->VTKConnect = vtkEventQtSlotConnect::New();
     }
 

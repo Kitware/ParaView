@@ -52,7 +52,7 @@ public:
 
   pqAnimationModel* animationModel() const;
 
-  QHeaderView* createHeader() const;
+  QHeaderView* createDeleteHeader() const;
 
 signals:
   // emitted when a track is double clicked on
