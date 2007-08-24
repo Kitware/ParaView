@@ -13,3 +13,14 @@ def SetOutputWholeExtent(algorithm, extent):
     if len(extent) != 6:
         raise "Expected a sequence of length 6"
     algorithm.GetExecutive().GetOutputInformation(0).Set(paraview.vtkStreamingDemandDrivenPipeline.WHOLE_EXTENT(), extent[0], extent[1], extent[2],extent[3], extent[4], extent[5])
+
+def IntegrateCell(dataset, cellId):
+    """
+    This functions uses vtkCellIntegrator's Integrate method that calculates
+    the length/area/volume of a 1D/2D/3D cell. The calculation is exact for
+    lines, polylines, triangles, triangle strips, pixels, voxels, convex
+    polygons, quads and tetrahedra. All other 3D cells are triangulated
+    during volume calculation. In such cases, the result may not be exact.
+    """
+    
+    return paraview.vtkCellIntegrator.Integrate(dataset, cellId)
