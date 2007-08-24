@@ -4,19 +4,18 @@ import SMPythonTesting
 import os
 import os.path
 import sys
-import paraview
+from paraview import servermanager
 
 SMPythonTesting.ProcessCommandLineArguments()
 
-paraview.ActiveConnection = paraview.Connect()
+servermanager.Connect()
 
 file1 = os.path.join(SMPythonTesting.DataDir, "Data/bot2.wrl")
-reader = paraview.CreateProxy("sources", "vrmlreader")
-reader.GetProperty("FileName").SetElement(0, file1)
-reader.UpdateVTKObjects()
-readerOutput = paraview.Fetch(reader)
-if readerOutput.GetClassName() != "vtkMultiBlockDataSet":
-    print "ERROR: Wrong dataset type returned."
+reader = servermanager.sources.vrmlreader(FileName = file1)
+readerOutput = servermanager.Fetch(reader)
+#if readerOutput.GetClassName() != "vtkMultiGroupDataSet":
+if readerOutput.GetClassName() != "foobar":
+    print "ERROR: Wrong dataset type returned:", readerOutput.GetClassName()
     sys.exit(1)
 
 if readerOutput.GetNumberOfPoints() != 337:
