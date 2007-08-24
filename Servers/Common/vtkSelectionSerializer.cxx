@@ -31,7 +31,7 @@
 #include "vtkStringArray.h"
 
 vtkStandardNewMacro(vtkSelectionSerializer);
-vtkCxxRevisionMacro(vtkSelectionSerializer, "1.12");
+vtkCxxRevisionMacro(vtkSelectionSerializer, "1.13");
 
 vtkInformationKeyMacro(vtkSelectionSerializer,ORIGINAL_SOURCE_ID,Integer);
 
@@ -107,7 +107,9 @@ void vtkSelectionSerializer::PrintXML(
   // Write the selection list
   if (printData)
     {
-    vtkSelectionSerializer::WriteSelectionList(os, indent, selection);
+    vtkSelectionSerializer::WriteSelectionList(os, indent, selection, 0);
+    vtkSelectionSerializer::WriteSelectionList(os, indent, selection, 1);
+    vtkSelectionSerializer::WriteSelectionList(os, indent, selection, 2);
     }
 
   os << indent << "</Selection>" << endl;
@@ -129,25 +131,43 @@ void vtkSelectionSerializerWriteSelectionList(ostream& os, vtkIndent indent,
 //----------------------------------------------------------------------------
 // Serializes the selection list data array
 void vtkSelectionSerializer::WriteSelectionList(
-  ostream& os, vtkIndent indent, vtkSelection* selection)
+  ostream& os, vtkIndent indent, vtkSelection* selection, int which)
 {
-  vtkDataArray* selectionList = vtkDataArray::SafeDownCast(
-    selection->GetSelectionList());
-  if (selectionList)
+  vtkDataArray* list;
+  vtkstd::string whichString;
+  switch(which) {
+  case 0: 
+    list= vtkDataArray::SafeDownCast(selection->GetSelectionList()); 
+    whichString = "SelectionList";
+    break;
+  case 1:
+    list= vtkDataArray::SafeDownCast(selection->GetAuxiliaryData1()); 
+    whichString = "AuxiliaryData1";
+    break;
+  case 2: 
+    list= vtkDataArray::SafeDownCast(selection->GetAuxiliaryData2());
+    whichString = "AuxiliaryData2";
+    break;
+    }
+    
+  if (list)
     {
-    vtkIdType numTuples = selectionList->GetNumberOfTuples();
-    vtkIdType numComps  = selectionList->GetNumberOfComponents();
+    vtkIdType numTuples = list->GetNumberOfTuples();
+    vtkIdType numComps  = list->GetNumberOfComponents();
+    
     os << indent 
-       << "<SelectionList classname=\""
-       << selectionList->GetClassName()
+       << "<"
+       << whichString 
+       << " classname=\""
+       << list->GetClassName()
        << "\" number_of_tuples=\""
        << numTuples
        << "\" number_of_components=\""
        << numComps
        << "\">"
        << endl;
-    void* dataPtr = selectionList->GetVoidPointer(0);
-    switch (selectionList->GetDataType())
+    void* dataPtr = list->GetVoidPointer(0);
+    switch (list->GetDataType())
       {
       vtkTemplateMacro(
         vtkSelectionSerializerWriteSelectionList(
@@ -155,7 +175,7 @@ void vtkSelectionSerializer::WriteSelectionList(
           numTuples*numComps, (VTK_TT*)(dataPtr)
           ));
       }
-    os << indent << "</SelectionList>" << endl;
+    os << indent << "</" << whichString << ">" << endl;
     }
   else if (vtkStringArray::SafeDownCast(selection->GetSelectionList()))
     {
@@ -164,7 +184,9 @@ void vtkSelectionSerializer::WriteSelectionList(
     vtkIdType numTuples = stringList->GetNumberOfTuples();
     vtkIdType numComps  = stringList->GetNumberOfComponents();
     os << indent 
-       << "<SelectionList classname=\""
+       << "<"
+       << whichString 
+       << " classname=\""
        << stringList->GetClassName()
        << "\" number_of_tuples=\""
        << numTuples
@@ -179,7 +201,7 @@ void vtkSelectionSerializer::WriteSelectionList(
       os << stringList->GetValue(i);
       os << "</String>" << endl;
       }
-    os << indent << "</SelectionList>" << endl;
+    os << indent << "</" << whichString << ">" << endl;
     }
 }
 
@@ -325,10 +347,30 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
             node->GetProperties()->Set(vtkSelection::PIXEL_COUNT(), val);
             }
           }
+        else if (strcmp("INDEXED_VERTICES", key) == 0)
+          {
+          int val;
+          if (elem->GetScalarAttribute("value", &val))
+            {
+            node->GetProperties()->Set(vtkSelection::INDEXED_VERTICES(), val);
+            }
+          }
         }
       }
-    else if (strcmp("SelectionList", name) == 0)
+    else if (
+      (strcmp("SelectionList", name) == 0) ||
+      (strcmp("AuxiliaryData1", name) == 0) ||
+      (strcmp("AuxiliaryData2", name) == 0))
       {
+      int which = 0;
+      if (strcmp("AuxiliaryData1", name) == 0) 
+        {
+        which = 1;
+        }
+      if (strcmp("AuxiliaryData2", name) == 0)
+        {
+        which = 2;
+        }
       if (elem->GetAttribute("classname"))
         {
         vtkAbstractArray* arr = 
@@ -359,7 +401,18 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
               }
             delete[] data;
             }
-          node->SetSelectionList(dataArray);
+          switch (which) 
+            {
+            case 0:
+              node->SetSelectionList(dataArray);
+              break; 
+            case 1:
+              node->SetAuxiliaryData1(dataArray);
+              break;
+            case 2:
+              node->SetAuxiliaryData2(dataArray);
+              break;
+            }
           dataArray->Delete();
           }
         else if (vtkStringArray::SafeDownCast(arr))
@@ -380,7 +433,18 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
               stringArray->SetValue(ind, strElem->GetCharacterData());
               }            
             }
-          node->SetSelectionList(stringArray);
+          switch (which) 
+            {
+            case 0:
+              node->SetSelectionList(stringArray);
+              break; 
+            case 1:
+              node->SetAuxiliaryData1(stringArray);
+              break;
+            case 2:
+              node->SetAuxiliaryData2(stringArray);
+              break;
+            }
           stringArray->Delete();
           }
         }

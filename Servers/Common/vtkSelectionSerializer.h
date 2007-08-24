@@ -69,7 +69,8 @@ private:
 
   static void WriteSelectionList(ostream& os, 
                                  vtkIndent indent, 
-                                 vtkSelection* selection);
+                                 vtkSelection* selection,
+                                 int which);
   static void ParseNode(
     vtkPVXMLElement* nodeXML, vtkSelection* node);
 };
