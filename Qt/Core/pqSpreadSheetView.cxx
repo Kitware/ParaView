@@ -108,6 +108,19 @@ protected:
       smodel->setActiveBlock(del->Top, del->Bottom);
       }
     }
+public:
+  /// HACK: to disable the corner widget (Qt 4.3 has API to do this).
+  void disableCornerWidget()
+    {
+    QList<QWidget*> children = this->findChildren<QWidget*>();
+    foreach (QWidget* child, children)
+      {
+      if (strcmp(child->metaObject()->className(), "QAbstractButton") == 0)
+        {
+        child->setEnabled(false);
+        }
+      }
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -117,6 +130,8 @@ public:
   pqInternal():Model(), SelectionModel(&this->Model)
   {
   pqSpreadSheetView::pqTableView* table = new pqSpreadSheetView::pqTableView();
+  table->disableCornerWidget();
+
   pqSpreadSheetView::pqDelegate* delegate = new pqSpreadSheetView::pqDelegate(table);
 
   table->setItemDelegate(delegate);
