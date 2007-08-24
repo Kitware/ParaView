@@ -739,9 +739,11 @@ void pqLineChartRepresentation::changeSeriesList()
 int pqLineChartRepresentation::isEnabledByDefault(const QString &arrayName) const
 {
   if(arrayName == "BlockId" || arrayName == "Time" ||
-      arrayName == "GlobalElementId" || arrayName == "GlobalNodeId" ||
-      arrayName == "PedigreeElementId" || arrayName == "PedigreeNodeId" ||
-      arrayName == "vtkEAOTValidity" || arrayName == "Cell's Point Ids")
+     arrayName == "GlobalElementId" || arrayName == "GlobalNodeId" ||
+     arrayName == "GlobalEdgeId" || arrayName == "GlobalFaceId" || 
+     arrayName == "PedigreeElementId" || arrayName == "PedigreeNodeId" ||
+     arrayName == "PedigreeEdgeId" || arrayName == "PedigreeFaceId" ||
+     arrayName == "vtkEAOTValidity" || arrayName == "Cell's Point Ids")
     {
     return 0;
     }
