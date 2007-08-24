@@ -49,7 +49,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.15");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.16");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -741,10 +741,11 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
      }
    else
      {
-     for (int cc=0; cc < group->Contents->GetNumberOfItems(); cc++)
+     vtkInfo::ChildrenType::iterator childIter = info.Children.begin();
+     for (; childIter != info.Children.end();++childIter)
        {
-       info_set.insert(vtkPVFileInformation::SafeDownCast(
-           group->Contents->GetItemAsObject(cc)));
+       info_set.insert(
+         childIter->second.GetPointer());
        }
      }
    }
