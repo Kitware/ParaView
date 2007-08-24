@@ -148,8 +148,23 @@ static QString userSettings()
   QString settingsPath = QString("%2%1%3%1%4");
   settingsPath = settingsPath.arg(QDir::separator());
   settingsPath = settingsPath.arg(settingsRoot);
-  QString orgName;
   settingsPath = settingsPath.arg(QApplication::organizationName());
+  settingsPath = settingsPath.arg("servers.pvsc");
+  return settingsPath;
+}
+
+static QString systemSettings()
+{
+  QString settingsRoot;
+#if defined(Q_OS_WIN)
+  settingsRoot = QString::fromLocal8Bit(getenv("COMMON_APPDATA"));
+#else
+  settingsRoot = QString::fromLocal8Bit("/usr/share");
+#endif
+  QString settingsPath = QString("%2%1%3%1%4");
+  settingsPath = settingsPath.arg(QDir::separator());
+  settingsPath = settingsPath.arg(settingsRoot);
+  settingsPath = settingsPath.arg(QApplication::applicationName());
   settingsPath = settingsPath.arg("servers.pvsc");
   return settingsPath;
 }
@@ -161,9 +176,14 @@ pqServerStartups::pqServerStartups(QObject* p) :
     vtkProcessModule::GetProcessModule()->GetOptions());
   if(!options || !options->GetDisableRegistry())
     {
+    // load from application dir
     this->load(QApplication::applicationDirPath() + QDir::separator() +
                "default_servers.pvsc", false);
+    // load from system dir (/usr/share/..., %COMMON_APPDATA%/...)
+    this->load(systemSettings(), false);
+    // load old QSettings from ParaView 3.0
     this->load(pqApplicationCore::instance()->settings());
+    // load user settings
     this->load(userSettings(), true);
     }
 }
