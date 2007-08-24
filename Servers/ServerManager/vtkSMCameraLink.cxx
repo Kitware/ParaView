@@ -26,11 +26,12 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMCameraLink);
-vtkCxxRevisionMacro(vtkSMCameraLink, "1.15");
+vtkCxxRevisionMacro(vtkSMCameraLink, "1.16");
 
 //---------------------------------------------------------------------------
-struct vtkSMCameraLinkInternals
+class vtkSMCameraLink::vtkInternals
 {
+public:
   static void UpdateViewCallback(vtkObject* caller, unsigned long eid, 
                                  void* clientData, void* callData)
     {
@@ -66,7 +67,7 @@ struct vtkSMCameraLinkInternals
       {
       this->Observer = vtkSmartPointer<vtkCallbackCommand>::New();
       this->Observer->SetClientData(camLink);
-      this->Observer->SetCallback(vtkSMCameraLinkInternals::UpdateViewCallback);
+      this->Observer->SetCallback(vtkInternals::UpdateViewCallback);
       proxy->AddObserver(vtkCommand::EndEvent, this->Observer);
 
       vtkSMRenderViewProxy* rmp = vtkSMRenderViewProxy::SafeDownCast(proxy);
@@ -105,11 +106,11 @@ struct vtkSMCameraLinkInternals
 
   static const char* LinkedPropertyNames[];
 
-  vtkSMCameraLinkInternals()
+  vtkInternals()
     {
     this->Updating = false;
     }
-  ~vtkSMCameraLinkInternals()
+  ~vtkInternals()
     {
     LinkedProxiesType::iterator iter;
     for(iter = this->LinkedProxies.begin(); iter != LinkedProxies.end(); ++iter)
@@ -119,7 +120,7 @@ struct vtkSMCameraLinkInternals
     }
 };
 
-const char* vtkSMCameraLinkInternals::LinkedPropertyNames[] =
+const char* vtkSMCameraLink::vtkInternals::LinkedPropertyNames[] =
 {
   /* from */  /* to */
   "CameraPositionInfo", "CameraPosition",
@@ -132,7 +133,7 @@ const char* vtkSMCameraLinkInternals::LinkedPropertyNames[] =
 //---------------------------------------------------------------------------
 vtkSMCameraLink::vtkSMCameraLink()
 {
-  this->Internals = new vtkSMCameraLinkInternals;
+  this->Internals = new vtkInternals;
   this->SynchronizeInteractiveRenders = 1;
 }
 
@@ -157,7 +158,7 @@ void vtkSMCameraLink::AddLinkedProxy(vtkSMProxy* proxy, int updateDir)
         // created, however we want to observer events on the
         // interactor. 
       this->Internals->LinkedProxies.push_back(
-        new vtkSMCameraLinkInternals::LinkedCamera(proxy, this));
+        new vtkInternals::LinkedCamera(proxy, this));
       }
     }
 }
@@ -167,7 +168,7 @@ void vtkSMCameraLink::RemoveLinkedProxy(vtkSMProxy* proxy)
 {
   this->Superclass::RemoveLinkedProxy(proxy);
 
-  vtkSMCameraLinkInternals::LinkedProxiesType::iterator iter;
+  vtkInternals::LinkedProxiesType::iterator iter;
   for(iter = this->Internals->LinkedProxies.begin();
       iter != this->Internals->LinkedProxies.end();
       ++iter)

@@ -25,10 +25,6 @@
 
 #include "vtkSMProxyLink.h"
 
-//BTX
-struct vtkSMCameraLinkInternals;
-//ETX
-
 class VTK_EXPORT vtkSMCameraLink : public vtkSMProxyLink
 {
 public:
@@ -101,8 +97,9 @@ protected:
   int SynchronizeInteractiveRenders;
 private:
 
-  vtkSMCameraLinkInternals* Internals;
-  friend class vtkSMCameraLinkInternals;
+  class vtkInternals;
+  vtkInternals* Internals;
+  friend class vtkInternals;
 
   vtkSMCameraLink(const vtkSMCameraLink&); // Not implemented
   void operator=(const vtkSMCameraLink&); // Not implemented
