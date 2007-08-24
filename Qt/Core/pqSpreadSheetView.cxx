@@ -112,8 +112,8 @@ public:
   /// HACK: to disable the corner widget (Qt 4.3 has API to do this).
   void disableCornerWidget()
     {
-    QList<QWidget*> children = this->findChildren<QWidget*>();
-    foreach (QWidget* child, children)
+    QList<QWidget*> _children = this->findChildren<QWidget*>();
+    foreach (QWidget* child, _children)
       {
       if (strcmp(child->metaObject()->className(), "QAbstractButton") == 0)
         {
