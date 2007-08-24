@@ -424,7 +424,9 @@
       <item row="5" column="1" >
        <widget class="QDoubleSpinBox" name="Opacity" >
         <property name="toolTip" >
-         <string>Set the opacity of the dataset's geometry.  Artifacts may appear in translucent geometry because primatives are not sorted.</string>
+         <string>&lt;html>Set the opacity of the dataset's geometry.  Artifacts
+         may appear in translucent geometry because primatives are not
+         sorted.&lt;/html></string>
         </property>
         <property name="maximum" >
          <double>1.000000000000000</double>
@@ -441,6 +443,29 @@
         </property>
         <property name="alignment" >
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0" >
+       <widget class="QLabel" name="label_14" >
+        <property name="text" >
+         <string>Scalar Opacity Unit Distance</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1" >
+       <widget class="QDoubleSpinBox" name="ScalarOpacityUnitDistance" >
+        <property name="toolTip" >
+         <string>&lt;html>Set the unit distance on which the scalar opacity transfer function is defined for volume rendering.&lt;html></string>
+        </property>
+        <property name="maximum" >
+         <double>100000000000000005250476025520442024870446858110815915491585411551180245798890819578637137508044786404370444383288387817694252323536043057564479218478670698284838720092657580373783023379478809005936895323497079994508111903896764088007465274278014249457925878882005684283811566947219638686545940054016.000000000000000</double>
+        </property>
+        <property name="value" >
+         <double>1.000000000000000</double>
         </property>
        </widget>
       </item>

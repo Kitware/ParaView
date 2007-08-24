@@ -288,12 +288,24 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
   this->Internal->ColorBy->setRepresentation(repr);
   QObject::connect(this->Internal->ColorBy,
     SIGNAL(modified()),
-    this, SLOT(updateEnableState()));
+    this, SLOT(updateEnableState()), Qt::QueuedConnection);
 
   this->Internal->StyleRepresentation->setRepresentation(repr);
   QObject::connect(this->Internal->StyleRepresentation,
     SIGNAL(currentTextChanged(const QString&)),
     this->Internal->ColorBy, SLOT(reloadGUI()));
+
+  QObject::connect(this->Internal->StyleRepresentation,
+    SIGNAL(currentTextChanged(const QString&)),
+    this, SLOT(updateEnableState()), Qt::QueuedConnection);
+
+  if (reprProxy->GetProperty("ScalarOpacityUnitDistance"))
+    {
+    this->Internal->Links->addPropertyLink(
+      this->Internal->ScalarOpacityUnitDistance, "value",
+      SIGNAL(valueChanged(double)),
+      reprProxy, reprProxy->GetProperty("ScalarOpacityUnitDistance"));
+    }
 
 #if 0                                       //FIXME 
   // material
@@ -466,6 +478,10 @@ void pqDisplayProxyEditor::updateEnableState()
     this->Internal->ColorButtonStack->setCurrentWidget(
         this->Internal->ColorMapPage);
     }
+
+  this->Internal->ScalarOpacityUnitDistance->setEnabled(
+    this->Internal->Representation->getRepresentationType() == 
+    vtkSMPVRepresentationProxy::VOLUME);
 
   vtkSMDataRepresentationProxy* display = 
     this->Internal->Representation->getRepresentationProxy();

@@ -4873,6 +4873,7 @@
         </ShareProperties>
         <ExposedProperties>
           <Property name="ScalarOpacityFunction" />
+          <Property name="ScalarOpacityUnitDistance" />
         </ExposedProperties>
       </SubProxy>
 
