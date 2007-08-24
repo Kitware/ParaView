@@ -162,7 +162,10 @@ class Proxy(object):
         
     def SetPropertyWithName(self, pname, arg):
         """Generic method for setting the value of a property."""
-        self.GetProperty(pname).SetData(arg)
+        prop = self.GetProperty(pname)
+        if prop is None:
+            raise exceptions.RuntimeError, "Property %s does not exist. Please check the property name for typos." % pname
+        prop.SetData(arg)
          
     def GetProperty(self, name):
         """Given a property name, returns the property object."""
@@ -755,13 +758,17 @@ class ProxyManager(object):
         for i in range(0, collection.GetNumberOfItems()):
             aProxy = _getPyProxy(collection.GetItemAsObject(i))
             if aProxy:
-                result.append(proxy)
+                result.append(aProxy)
                 
         return result
         
     def __iter__(self):
-        """Returns a new ProxyIterator."""
-        return ProxyIterator()
+        """Returns a new ProxyIterator."""        
+        iter = ProxyIterator()
+        if ActiveConnection:
+            iter.SetConnectionID(ActiveConnection.ID)
+        iter.Begin()
+        return iter
 
     def NewGroupIterator(self, group_name, connection=None):
         """Returns a ProxyIterator for a group. The resulting object
@@ -1453,10 +1460,11 @@ def _findClassForProxy(xmlName):
         return None
 
 def _updateModules():
-    global sources, filters, rendering, animation
+    global sources, filters, writers, rendering, animation
 
     _createModule("sources", sources)
     _createModule("filters", filters)
+    _createModule("writers", writers)
     _createModule("representations", rendering)
     _createModule("newviews", rendering)
     _createModule("lookup_tables", rendering)
@@ -1464,10 +1472,11 @@ def _updateModules():
     _createModule('animation_keyframes', animation)
     
 def _createModules():
-    global sources, filters, rendering, animation
+    global sources, filters, writers, rendering, animation
 
     sources = _createModule('sources')
     filters = _createModule('filters')
+    writers = _createModule('writers')
     rendering = _createModule('representations')
     _createModule('newviews', rendering)
     _createModule("lookup_tables", rendering)
