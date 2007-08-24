@@ -1,7 +1,7 @@
 <ParaViewSources>
-  <Source name="TimeToTextConvertorSource" />
   <Source name="GlyphSource2D" />
   <Source name="VectorText" />
+  <Source name="TimeToTextConvertorSource" />
   <Source name="ArrowSource" />
   <Source name="Axes" />
   <Source name="CubeSource" />
