@@ -67,7 +67,6 @@
 #include "vtkPVLODVolume.h"
 #include "vtkPVLookupTable.h"
 #include "vtkPVMain.h"
-#include "vtkPVRenderModuleHelper.h"
 #include "vtkPVRenderViewProxy.h"
 #include "vtkPVServerArrayHelper.h"
 #include "vtkPVServerArraySelection.h"
@@ -182,7 +181,6 @@ int main(int , char *[])
   c = vtkPVLODVolume::New(); c->Print(cout); c->Delete();
   c = vtkPVLookupTable::New(); c->Print(cout); c->Delete();
   c = vtkPVMain::New(); c->Print(cout); c->Delete();
-  c = vtkPVRenderModuleHelper::New(); c->Print(cout); c->Delete();
   c = vtkPVRenderViewProxy::New(); c->Print(cout); c->Delete();
   c = vtkPVServerArrayHelper::New(); c->Print(cout); c->Delete();
   c = vtkPVServerArraySelection::New(); c->Print(cout); c->Delete();

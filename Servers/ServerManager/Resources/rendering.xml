@@ -1023,12 +1023,6 @@
         </ProxyGroupDomain>
       </ProxyProperty>
 
-      <ProxyProperty name="RenderModuleHelper"
-        command="SetRenderModuleHelper"
-        is_internal="1">
-        <!-- Obsolete -->
-      </ProxyProperty>
-
       <IntVectorProperty name="EnableLOD"
         command="SetEnableLOD"
         number_of_elements="1"
@@ -1046,10 +1040,6 @@
         <ProxyGroupDomain name="groups">
           <Group name="mappers" />
         </ProxyGroupDomain>
-      </ProxyProperty>
-      <ProxyProperty name="RenderModuleHelper"
-        command="SetRenderModuleHelper"
-        is_internal="1">
       </ProxyProperty>
 
       <IntVectorProperty name="EnableLOD"

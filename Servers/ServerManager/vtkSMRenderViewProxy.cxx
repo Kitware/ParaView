@@ -40,7 +40,6 @@
 #include "vtkPVGeometryInformation.h"
 #include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkPVOptions.h"
-#include "vtkPVRenderModuleHelper.h"
 #include "vtkPVVisibleCellSelector.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderer.h"
@@ -90,7 +89,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.39");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.40");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);

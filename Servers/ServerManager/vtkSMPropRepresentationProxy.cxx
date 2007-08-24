@@ -26,7 +26,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMPropRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPropRepresentationProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMPropRepresentationProxy, "1.11");
 //----------------------------------------------------------------------------
 vtkSMPropRepresentationProxy::vtkSMPropRepresentationProxy()
 {
@@ -42,7 +42,6 @@ vtkSMPropRepresentationProxy::vtkSMPropRepresentationProxy()
   this->SelectionPropLink->AddException("Mapper");
   this->SelectionPropLink->AddException("Pickable");
   this->SelectionPropLink->AddException("Property");
-  this->SelectionPropLink->AddException("RenderModuleHelper");
   this->SelectionPropLink->AddException("Texture");
   this->SelectionPropLink->AddException("Visibility");
 }

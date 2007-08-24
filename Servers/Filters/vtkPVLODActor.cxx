@@ -19,7 +19,6 @@
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty.h"
-#include "vtkPVRenderModuleHelper.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkTexture.h"
@@ -30,10 +29,9 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODActor);
-vtkCxxRevisionMacro(vtkPVLODActor, "1.6");
+vtkCxxRevisionMacro(vtkPVLODActor, "1.7");
 
 vtkCxxSetObjectMacro(vtkPVLODActor, LODMapper, vtkMapper);
-vtkCxxSetObjectMacro(vtkPVLODActor, RenderModuleHelper, vtkPVRenderModuleHelper);
 //----------------------------------------------------------------------------
 vtkPVLODActor::vtkPVLODActor()
 {
@@ -46,7 +44,6 @@ vtkPVLODActor::vtkPVLODActor()
   m->Delete();
   
   this->LODMapper = NULL;
-  this->RenderModuleHelper = NULL;
 
   this->EnableLOD = 0;
 }
@@ -54,7 +51,6 @@ vtkPVLODActor::vtkPVLODActor()
 //----------------------------------------------------------------------------
 vtkPVLODActor::~vtkPVLODActor()
 {
-  this->SetRenderModuleHelper(NULL);
   this->SetLODMapper(NULL);
   this->Device->Delete();
   this->Device = NULL;
@@ -72,11 +68,6 @@ vtkMapper *vtkPVLODActor::SelectMapper()
   if (this->LODMapper == NULL || this->LODMapper->GetInput() == NULL)
     {
     return this->Mapper;
-    }
-
-  if (this->RenderModuleHelper && this->RenderModuleHelper->GetLODFlag())
-    {
-    return this->LODMapper;
     }
 
   if (this->EnableLOD)
@@ -313,15 +304,5 @@ void vtkPVLODActor::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "LODMapper: " << this->GetLODMapper() << endl;
     }
 
-  os << indent << "RenderModuleHelper: ";
-  if (this->RenderModuleHelper)
-    {
-    os << endl;
-    this->RenderModuleHelper->PrintSelf(os, indent.GetNextIndent());
-    }
-  else
-    {
-    os << "(none)" << endl;
-    }
   os << indent << "EnableLOD: " << this->EnableLOD << endl;
 }
