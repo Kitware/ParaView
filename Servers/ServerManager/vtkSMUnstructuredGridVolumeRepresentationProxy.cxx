@@ -36,7 +36,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.12");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepresentationProxy()
 {
@@ -432,14 +432,22 @@ void vtkSMUnstructuredGridVolumeRepresentationProxy::SetColorArrayName(
 {
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
     this->VolumeDummyMapper->GetProperty("SelectScalarArray"));
+  vtkSMIntVectorProperty* lod_ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->VolumeLODMapper->GetProperty("ScalarVisibility"));
+  vtkSMStringVectorProperty* lod_svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->VolumeLODMapper->GetProperty("ColorArray"));
 
   if (name && name[0])
     {
     svp->SetElement(0, name);
+    lod_ivp->SetElement(0, 1);
+    lod_svp->SetElement(0, name);
     }
   else
     {
     svp->SetElement(0, "");
+    lod_ivp->SetElement(0, 0);
+    lod_svp->SetElement(0, "");
     }
 
   this->UpdateVTKObjects();
@@ -451,23 +459,46 @@ void vtkSMUnstructuredGridVolumeRepresentationProxy::SetColorAttributeType(
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->VolumeDummyMapper->GetProperty("ScalarMode"));
+  vtkSMIntVectorProperty* lod_ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->VolumeLODMapper->GetProperty("ScalarMode"));
+
   switch (type)
     {
   case POINT_DATA:
     ivp->SetElement(0, VTK_SCALAR_MODE_USE_POINT_FIELD_DATA); 
+    lod_ivp->SetElement(0, VTK_SCALAR_MODE_USE_POINT_FIELD_DATA); 
     break;
 
   case CELL_DATA:
     ivp->SetElement(0, VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
+    lod_ivp->SetElement(0, VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
     break;
 
   case FIELD_DATA:
     ivp->SetElement(0, VTK_SCALAR_MODE_USE_FIELD_DATA);
+    lod_ivp->SetElement(0, VTK_SCALAR_MODE_USE_FIELD_DATA);
     break;
 
   default:
     ivp->SetElement(0,  VTK_SCALAR_MODE_DEFAULT);
+    lod_ivp->SetElement(0,  VTK_SCALAR_MODE_DEFAULT);
     }
+
+  this->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMUnstructuredGridVolumeRepresentationProxy::SetLookupTable(vtkSMProxy* lut)
+{
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->VolumeProperty->GetProperty("ColorTransferFunction"));
+  pp->RemoveAllProxies();
+  pp->AddProxy(lut);
+
+  pp = vtkSMProxyProperty::SafeDownCast(
+    this->VolumeLODMapper->GetProperty("LookupTable"));
+  pp->RemoveAllProxies();
+  pp->AddProxy(lut);
 
   this->UpdateVTKObjects();
 }

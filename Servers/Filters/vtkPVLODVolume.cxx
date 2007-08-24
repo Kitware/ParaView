@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODVolume);
-vtkCxxRevisionMacro(vtkPVLODVolume, "1.12");
+vtkCxxRevisionMacro(vtkPVLODVolume, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVLODVolume::vtkPVLODVolume()
@@ -89,6 +89,17 @@ int vtkPVLODVolume::RenderOpaqueGeometry(vtkViewport *vp)
 
   return retval;
 }
+
+//-----------------------------------------------------------------------------
+int vtkPVLODVolume::RenderTranslucentPolygonalGeometry(vtkViewport *vp)
+{
+  int retval = this->LODProp->RenderTranslucentPolygonalGeometry(vp);
+
+  this->EstimatedRenderTime = this->LODProp->GetEstimatedRenderTime();
+
+  return retval;
+}
+
 
 //-----------------------------------------------------------------------------
 int vtkPVLODVolume::RenderVolumetricGeometry(vtkViewport *vp)
@@ -210,6 +221,16 @@ double *vtkPVLODVolume::GetBounds()
 
 
 //-----------------------------------------------------------------------------
+int vtkPVLODVolume::HasTranslucentPolygonalGeometry()
+{
+  if (this->SelectLOD() == this->LowLODId)
+    {
+    return 1;
+    }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVLODVolume::ShallowCopy(vtkProp *prop)
 {
   vtkPVLODVolume *a = vtkPVLODVolume::SafeDownCast(prop);
@@ -277,7 +298,7 @@ void vtkPVLODVolume::SetLODMapper(vtkMapper *mapper)
   if (mapper)
     {
     vtkProperty *property = vtkProperty::New();
-    //property->SetOpacity(0.5);
+    property->SetOpacity(0.5);
     this->LowLODId = this->LODProp->AddLOD(mapper, property, 0.0);
     property->Delete();
     this->UpdateLODProperty();

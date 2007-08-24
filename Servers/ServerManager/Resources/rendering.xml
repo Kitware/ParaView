@@ -2350,7 +2350,7 @@
 
       <SubProxy>
         <Proxy name="LODDecimator" 
-          proxygroup="filters" proxyname="OutlineFilter" />
+          proxygroup="filters" proxyname="GeometryFilter" />
       </SubProxy>
 
       <SubProxy>
@@ -4515,6 +4515,19 @@
         </ArrayListDomain>
       </StringVectorProperty>
 
+      <ProxyProperty
+        name="LookupTable"
+        command="SetLookupTable"
+        update_self="1" >
+        <Documentation>
+          Set the lookup table to use for mapping scalars to color.
+        </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="transfer_functions" />
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
       <!-- Subproxies for Volume Pipeline -->
       <SubProxy>
         <SourceProxy name="VolumeFilter" class="vtkDataSetTriangleFilter" >
@@ -4610,8 +4623,6 @@
         <ExposedProperties>
           <Property name="ScalarOpacityUnitDistance" />
           <Property name="ScalarOpacityFunction" />
-          <Property name="ColorTransferFunction" 
-                    exposed_name="LookupTable" />
         </ExposedProperties>
       </SubProxy>
 
