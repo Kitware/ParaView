@@ -49,7 +49,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.14");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.15");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -618,11 +618,18 @@ bool vtkPVFileInformation::DetectType()
   return true;
 }
 
+struct vtkPVFileInformation::vtkInfo
+{
+  typedef vtkstd::map<int, vtkSmartPointer<vtkPVFileInformation> > ChildrenType;
+  vtkSmartPointer<vtkPVFileInformation> Group;
+  ChildrenType Children;
+
+};
+
 //-----------------------------------------------------------------------------
 void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
 {
-  typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPVFileInformation> > 
-    MapOfStringToInfo;
+  typedef vtkstd::map<vtkstd::string, vtkInfo> MapOfStringToInfo;
   MapOfStringToInfo fileGroups;
   
   vtkstd::string prefix = this->FullPath;
@@ -652,50 +659,59 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
       {
       bool match = false;
       vtkstd::string groupName;
+      int groupIndex = -1;
       if (reg_ex.find(obj->GetName()))
         {
         groupName = reg_ex.match(1);
+        groupIndex = atoi(reg_ex.match(2).c_str());
         match = true;
         }
       else if (reg_ex2.find(obj->GetName()))
         {
         groupName = reg_ex2.match(1) + reg_ex2.match(2) + ".." + reg_ex2.match(4);
+        groupIndex = atoi(reg_ex2.match(3).c_str());
         match = true;
         }
       else if (reg_ex3.find(obj->GetName()))
         {
         groupName = reg_ex3.match(1) + reg_ex3.match(2) + ".." + reg_ex3.match(4);
+        groupIndex = atoi(reg_ex3.match(3).c_str());
         match = true;
         }
       else if (reg_ex4.find(obj->GetName()))
         {
         groupName = ".." + reg_ex4.match(2) + reg_ex4.match(3) + "." + reg_ex4.match(4);
+        groupIndex = atoi(reg_ex4.match(1).c_str());
         match = true;
         }
       else if (reg_ex5.find(obj->GetName()))
         {
         groupName = ".." + reg_ex5.match(2) + reg_ex5.match(3) + "." + reg_ex5.match(4);
+        groupIndex = atoi(reg_ex5.match(1).c_str());
         match = true;
         }
 
       if (match)
         {
+        MapOfStringToInfo::iterator iter2 = fileGroups.find(groupName);
         vtkPVFileInformation* group = 0;
-        if (fileGroups.find(groupName) == fileGroups.end())
+        if (iter2 == fileGroups.end())
           {
           group = vtkPVFileInformation::New();
           group->SetName(groupName.c_str());
           group->SetFullPath((prefix + groupName).c_str());
           group->Type = FILE_GROUP;
           group->FastFileTypeDetection = this->FastFileTypeDetection;
-          fileGroups[groupName] = group;
+          //fileGroups[groupName] = group;
+          vtkInfo info;
+          info.Group = group;
+          fileGroups[groupName] = info;
           group->Delete();
+
+          iter2 = fileGroups.find(groupName);
           }
-        else
-          {
-          group = fileGroups[groupName];
-          }
-        group->Contents->AddItem(obj);
+
+        iter2->second.Children[groupIndex] = obj;
         vtkPVFileInformationSet::iterator prev_iter = iter++;
         info_set.erase(prev_iter);
         continue;
@@ -704,15 +720,23 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
     ++iter;
     }
 
+
   // Now scan through all created groups and dissolve trivial groups
   // i.e. groups with single entries. Add all other groups to the 
   // results.
  for (MapOfStringToInfo::iterator iter2 = fileGroups.begin();
    iter2 != fileGroups.end(); ++iter2)
    {
-   vtkPVFileInformation* group = iter2->second;
-   if (group->Contents->GetNumberOfItems() > 1)
+   vtkInfo& info = iter2->second;
+   vtkPVFileInformation* group = info.Group;
+   if (info.Children.size() > 1)
      {
+     vtkInfo::ChildrenType::iterator childIter = info.Children.begin();
+     for (; childIter != info.Children.end();++childIter)
+       {
+       group->Contents->AddItem(childIter->second.GetPointer());
+       }
+     // Build group children.
      info_set.insert(group);
      }
    else

@@ -109,6 +109,8 @@ protected:
 private:
   vtkPVFileInformation(const vtkPVFileInformation&); // Not implemented.
   void operator=(const vtkPVFileInformation&); // Not implemented.
+
+  class vtkInfo;
 };
 
 
