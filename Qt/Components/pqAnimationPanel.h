@@ -92,7 +92,7 @@ protected slots:
   void onCurrentChanged(pqServerManagerModelItem*);
 
   /// Called when the user changes the combo box selection.
-  void onCurrentSourceChanged(int index);
+  void onCurrentSourceChanged(vtkSMProxy*);
 
   /// Called when the user changes the property combox box.
   void onCurrentPropertyChanged(int index);
@@ -112,16 +112,9 @@ protected slots:
   /// Called when the cue tells us that the keyframes have somehow changed.
   void onKeyFramesModified();
 
-  /// Called when a source is addded. We make the source
-  /// available in the source selection combo-box.
-  void onSourceAdded(pqPipelineSource* src);
-
   /// Called before a source is removed. We clean up the
   /// animation cue/keyframes for this source.
   void onSourceRemoved(pqPipelineSource* src);
-
-  /// Called when a source's name is changed.
-  void onNameChanged(pqServerManagerModelItem*);
 
   /// Called when the active scene changes.
   void onActiveSceneChanged(pqAnimationScene* scene);

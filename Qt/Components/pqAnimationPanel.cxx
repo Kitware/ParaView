@@ -163,8 +163,8 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
     this, SLOT(setEndTimeByIndex(int)));
 
   QObject::connect(
-    this->Internal->sourceName, SIGNAL(currentIndexChanged(int)),
-    this, SLOT(onCurrentSourceChanged(int)));
+    this->Internal->sourceName, SIGNAL(currentProxyChanged(vtkSMProxy*)),
+    this, SLOT(onCurrentSourceChanged(vtkSMProxy*)));
 
   QObject::connect(
     this->Internal->propertyName, SIGNAL(currentIndexChanged(int)),
@@ -186,11 +186,6 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
     pqApplicationCore::instance()->getServerManagerModel();
   QObject::connect(smmodel, SIGNAL(preSourceRemoved(pqPipelineSource*)),
     this, SLOT(onSourceRemoved(pqPipelineSource*)));
-  QObject::connect(smmodel, SIGNAL(sourceAdded(pqPipelineSource*)),
-    this, SLOT(onSourceAdded(pqPipelineSource*)));
-
-  QObject::connect(smmodel, SIGNAL(nameChanged(pqServerManagerModelItem*)),
-    this, SLOT(onNameChanged(pqServerManagerModelItem*)));
 
   QObject::connect(&pqActiveView::instance(),
     SIGNAL(changed(pqView*)),
@@ -223,55 +218,22 @@ pqAnimationPanel::~pqAnimationPanel()
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationPanel::onSourceAdded(pqPipelineSource* src)
-{
-  this->Internal->sourceName->addItem(src->getSMName(), 
-    QVariant(src->getProxy()->GetSelfID().ID));
-}
-
-//-----------------------------------------------------------------------------
 void pqAnimationPanel::onSourceRemoved(pqPipelineSource* source)
 {
-  int index = this->Internal->sourceName->findData(
-    QVariant(source->getProxy()->GetSelfID().ID));
-  if (index != -1)
+  pqAnimationManager* mgr = this->Internal->Manager;
+  pqAnimationScene* scene = mgr->getScene(source->getServer());
+  if (scene)
     {
-    this->Internal->sourceName->removeItem(index);
-    pqAnimationManager* mgr = this->Internal->Manager;
-    pqAnimationScene* scene = mgr->getScene(source->getServer());
-    if (scene)
-      {
-      scene->removeCues(source->getProxy());
+    scene->removeCues(source->getProxy());
 
-      // we also want to remove cues we might have
-      // added for the proxies on proxy properties. 
-      // We are assured that all those proxies are saved
-      // as internal proxies for the source.
-      QList<vtkSMProxy*> internalProxies = source->getHelperProxies();
-      foreach (vtkSMProxy* proxy, internalProxies)
-        {
-        scene->removeCues(proxy);
-        }
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationPanel::onNameChanged(pqServerManagerModelItem* item)
-{
-  pqPipelineSource* src = qobject_cast<pqPipelineSource*>(item);
-  if (src)
-    {
-    int index = this->Internal->sourceName->findData(
-        QVariant(src->getProxy()->GetSelfID().ID));
-    if (index != -1 
-      && src->getSMName() != this->Internal->sourceName->itemText(index))
+    // we also want to remove cues we might have
+    // added for the proxies on proxy properties. 
+    // We are assured that all those proxies are saved
+    // as internal proxies for the source.
+    QList<vtkSMProxy*> internalProxies = source->getHelperProxies();
+    foreach (vtkSMProxy* proxy, internalProxies)
       {
-      this->Internal->sourceName->blockSignals(true);
-      this->Internal->sourceName->insertItem(index, src->getSMName(),
-        QVariant(src->getProxy()->GetSelfID().ID));
-      this->Internal->sourceName->removeItem(index+1);
-      this->Internal->sourceName->blockSignals(false);
+      scene->removeCues(proxy);
       }
     }
 }
@@ -575,8 +537,7 @@ void pqAnimationPanel::onCurrentChanged(pqProxy* src)
     return;
     }
   
-  int index = this->Internal->sourceName->findData(
-    QVariant(src->getProxy()->GetSelfID().ID));
+  int index = this->Internal->sourceName->findProxy(src->getProxy());
   if (index == -1)
     {
     this->Internal->CurrentProxy = 0;
@@ -592,31 +553,15 @@ void pqAnimationPanel::onCurrentChanged(pqProxy* src)
 
 //-----------------------------------------------------------------------------
 // called when the source combo-box changes.
-void pqAnimationPanel::onCurrentSourceChanged(int index)
+void pqAnimationPanel::onCurrentSourceChanged(vtkSMProxy* pxy)
 {
-  pqProxy* src = 0;
-  if (index != -1)
-    {
-    QString pname = this->Internal->sourceName->itemText(index);
-    if (pname == "Camera" && this->Internal->ActiveRenderView)
-      {
-      src = this->Internal->ActiveRenderView;
-      }
-    else
-      {
-      src = pqApplicationCore::instance()->
-        getServerManagerModel()->findItem<pqProxy*>(pname);
-      }
-    }
-#if 0
-  pqApplicationCore::instance()->getSelectionModel()->setCurrentItem(
-    src, pqServerManagerSelectionModel::ClearAndSelect);
-#else
+  pqProxy* src = pqApplicationCore::instance()->
+        getServerManagerModel()->findItem<pqProxy*>(pxy);
+  
   // Since we decided not to update the application selection, we
   // explictly call this method otherwise it would have been called
   // as a side effect of changing the selection.
   this->onCurrentChanged(src);
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -631,13 +576,11 @@ void pqAnimationPanel::onActiveViewChanged(pqView* view)
   this->Internal->ActiveRenderView = rview;
   if (rview && this->Internal->sourceName->findText("Camera") == -1)
     {
-    this->Internal->sourceName->insertItem(0, "Camera",
-      QVariant(rview->getProxy()->GetSelfID().ID));
-
+    this->Internal->sourceName->addProxy(0, "Camera", rview->getProxy());
     }
-  if (!rview && this->Internal->sourceName->findText("Camera") != -1)
+  if (!rview)
     {
-    this->Internal->sourceName->removeItem(0);
+    this->Internal->sourceName->removeProxy("Camera");
     }
 }
 

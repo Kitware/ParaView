@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMAnimationSceneProxy.h"
+#include "vtkSMRenderViewProxy.h"
 
 #include "pqApplicationCore.h"
 #include "pqServerManagerModel.h"
@@ -63,6 +64,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqComboBoxDomain.h"
 #include "pqSignalAdaptors.h"
+#include "pqAnimatablePropertiesComboBox.h"
+#include "pqAnimatableProxyComboBox.h"
+#include "pqActiveView.h"
+#include "pqRenderView.h"
+#include "pqServerManagerSelectionModel.h"
+#include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
 class pqAnimationViewWidget::pqInternal
@@ -89,6 +96,8 @@ public:
   QSpinBox* Duration;
   pqPropertyLinks Links;
   pqPropertyLinks DurationLink;
+  pqAnimatableProxyComboBox* CreateSource;
+  pqAnimatablePropertiesComboBox* CreateProperty;
 
   pqAnimationTrack* findTrack(pqAnimationCue* cue)
     {
@@ -235,6 +244,19 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
   hboxlayout->addStretch();
 
   this->Internal->AnimationWidget = new pqAnimationWidget(this);
+  QWidget* w = this->Internal->AnimationWidget->createDeleteWidget();
+
+  this->Internal->CreateSource = new pqAnimatableProxyComboBox(w);
+  this->Internal->CreateProperty = new pqAnimatablePropertiesComboBox(w);
+  this->Internal->CreateSource->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+  this->Internal->CreateProperty->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+  QHBoxLayout* l = new QHBoxLayout(w);
+  l->setMargin(0);
+  l->addSpacing(6);
+  l->addWidget(this->Internal->CreateSource);
+  l->addWidget(this->Internal->CreateProperty);
+  l->addStretch();
+
   QObject::connect(&this->Internal->KeyFramesChanged, SIGNAL(mapped(QObject*)),
                    this, SLOT(keyFramesChanged(QObject*)));
   QObject::connect(this->Internal->AnimationWidget,
@@ -243,7 +265,25 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
   QObject::connect(this->Internal->AnimationWidget,
                    SIGNAL(deleteTrackClicked(pqAnimationTrack*)),
                    this, SLOT(deleteTrack(pqAnimationTrack*)));
+  QObject::connect(this->Internal->AnimationWidget,
+                   SIGNAL(deleteTrackClicked(pqAnimationTrack*)),
+                   this, SLOT(deleteTrack(pqAnimationTrack*)));
+  QObject::connect(this->Internal->AnimationWidget,
+                   SIGNAL(createTrackClicked()),
+                   this, SLOT(createTrack()));
   
+  QObject::connect(&pqActiveView::instance(),
+    SIGNAL(changed(pqView*)),
+    this, SLOT(setActiveView(pqView*)));
+  
+  QObject::connect(pqApplicationCore::instance()->getSelectionModel(),
+    SIGNAL(currentChanged(pqServerManagerModelItem*)),
+    this, SLOT(setCurrentSelection(pqServerManagerModelItem*)));
+  
+  QObject::connect(this->Internal->CreateSource,
+    SIGNAL(currentProxyChanged(vtkSMProxy*)),
+    this, SLOT(setCurrentProxy(vtkSMProxy*)));
+
   vboxlayout->addWidget(this->Internal->AnimationWidget);
 }
 
@@ -556,7 +596,187 @@ void pqAnimationViewWidget::deleteTrack(pqAnimationTrack* track)
     {
     return;
     }
+  pqUndoStack* undo = pqApplicationCore::instance()->getUndoStack();
+  if(undo)
+    {
+    undo->beginUndoSet("Remove Animation Track");
+    }
   this->Internal->Scene->removeCue(cue);
+  if(undo)
+    {
+    undo->endUndoSet();
+    }
 }
 
+void pqAnimationViewWidget::setActiveView(pqView* view)
+{
+  pqRenderView* rview = qobject_cast<pqRenderView*>(view);
+
+  if (rview && this->Internal->CreateSource->findText("Camera") == -1)
+    {
+    this->Internal->CreateSource->addProxy(0, "Camera", rview->getProxy());
+    }
+  if (!rview)
+    {
+    this->Internal->CreateSource->removeProxy("Camera");
+    }
+}
+
+void pqAnimationViewWidget::setCurrentSelection(pqServerManagerModelItem* item)
+{
+  pqProxy* pxy = qobject_cast<pqProxy*>(item);
+  if(pxy)
+    {
+    int idx = this->Internal->CreateSource->findProxy(pxy->getProxy());
+    if(idx != -1)
+      {
+      this->Internal->CreateSource->setCurrentIndex(idx);
+      }
+    }
+}
+
+void pqAnimationViewWidget::setCurrentProxy(vtkSMProxy* pxy)
+{
+  if(vtkSMRenderViewProxy::SafeDownCast(pxy))
+    {
+    this->Internal->CreateProperty->setSource(NULL);
+    }
+  else
+    {
+    this->Internal->CreateProperty->setSource(pxy);
+    }
+}
+
+static void pqAnimationPanelResetCameraKeyFrameToCurrent(vtkSMRenderViewProxy* ren,
+                                                         vtkSMProxy* dest)
+{
+  ren->SynchronizeCameraProperties();
+
+  const char* names[] = { "Position", "FocalPoint", "ViewUp", "ViewAngle",  0 };
+  const char* snames[] = { "CameraPositionInfo", "CameraFocalPointInfo", 
+    "CameraViewUpInfo",  "CameraViewAngle", 0 };
+  for (int cc=0; names[cc] && snames[cc]; cc++)
+    {
+    QList<QVariant> p =
+      pqSMAdaptor::getMultipleElementProperty(ren->GetProperty(snames[cc]));
+    pqSMAdaptor::setMultipleElementProperty(dest->GetProperty(names[cc]),p);
+    }
+}
+  
+void pqAnimationViewWidget::createTrack()
+{
+  pqUndoStack* undo = pqApplicationCore::instance()->getUndoStack();
+  if(undo)
+    {
+    undo->beginUndoSet("Add Animation Track");
+    }
+
+  vtkSMRenderViewProxy* ren =
+    vtkSMRenderViewProxy::SafeDownCast(this->Internal->CreateSource->getCurrentProxy());
+  // Need to create new cue for this property.
+  vtkSMProxy* curProxy = this->Internal->CreateProperty->getCurrentProxy();
+  if(ren)
+    {
+    curProxy = ren;
+    }
+  QString pname = this->Internal->CreateProperty->getCurrentPropertyName();
+  int pindex = this->Internal->CreateProperty->getCurrentIndex();
+
+  // check that we don't already have one
+  foreach(pqAnimationCue* cue, this->Internal->TrackMap.keys())
+    {
+    if(cue->getAnimatedProxy() == curProxy &&
+       cue->getAnimatedProxy()->GetPropertyName(cue->getAnimatedProperty()) == pname &&
+       cue->getAnimatedPropertyIndex() == pindex)
+      {
+      return;
+      }
+    }
+  
+  if(!curProxy)
+    {
+    // hmm something went wrong
+    return;
+    }
+  
+  
+  // Check is we are creating a camera cue or a regular cue.
+  if(ren)
+    {
+    pqAnimationCue* cue = this->Internal->Scene->createCue(curProxy,
+      pname.toAscii().data(), pindex, "CameraAnimationCue");
+    cue->setKeyFrameType("CameraKeyFrame");
+    vtkSMProxy* kf = cue->insertKeyFrame(0);
+    pqAnimationPanelResetCameraKeyFrameToCurrent(ren, kf);
+    kf->UpdateVTKObjects();
+    kf = cue->insertKeyFrame(1);
+    pqAnimationPanelResetCameraKeyFrameToCurrent(ren, kf);
+    kf->UpdateVTKObjects();
+    }
+  else
+    {
+    pqAnimationCue* cue = this->Internal->Scene->createCue(curProxy, 
+      pname.toAscii().data(), pindex, "KeyFrameAnimationCue");
+    vtkSMProxy* kf1 = cue->insertKeyFrame(0);
+    vtkSMProxy* kf2 = cue->insertKeyFrame(1);
+
+    vtkSMProperty* prop = curProxy->GetProperty(pname.toAscii().data());
+    QList<QVariant> mins;
+    QList<QVariant> maxs;
+    if(pindex == -1)
+      {
+      QList<QList<QVariant> > domains =
+        pqSMAdaptor::getMultipleElementPropertyDomain(prop);
+      QList<QVariant> currents = pqSMAdaptor::getMultipleElementProperty(prop);
+      for(int i=0; i<currents.size(); i++)
+        {
+        if(domains.size() > i && domains[i].size())
+          {
+          mins.append(domains[i][0].isValid() ? domains[i][0] : currents[i]);
+          maxs.append(domains[i][1].isValid() ? domains[i][1] : currents[i]);
+          }
+        else
+          {
+          mins.append(currents[i]);
+          maxs.append(currents[i]);
+          }
+        }
+      }
+    else
+      {
+      QList<QVariant> domain =
+        pqSMAdaptor::getMultipleElementPropertyDomain(prop, pindex);
+      QVariant current = pqSMAdaptor::getMultipleElementProperty(prop, pindex);
+      if(domain.size() && domain[0].isValid())
+        {
+        mins.append(domain[0]);
+        }
+      else
+        {
+        mins.append(current);
+        }
+      if(domain.size() && domain[1].isValid())
+        {
+        maxs.append(domain[1]);
+        }
+      else
+        {
+        maxs.append(current);
+        }
+      }
+
+    pqSMAdaptor::setMultipleElementProperty(
+      kf1->GetProperty("KeyValues"), mins);
+    pqSMAdaptor::setMultipleElementProperty(
+      kf2->GetProperty("KeyValues"), maxs);
+
+    kf1->UpdateVTKObjects();
+    kf2->UpdateVTKObjects();
+    }
+  
+  if(undo)
+    {
+    undo->endUndoSet();
+    }
+}
 

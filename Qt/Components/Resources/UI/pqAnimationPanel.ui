@@ -238,7 +238,7 @@
        </widget>
       </item>
       <item row="0" column="1" >
-       <widget class="QComboBox" name="sourceName" >
+       <widget class="pqAnimatableProxyComboBox" name="sourceName" >
         <property name="sizePolicy" >
          <sizepolicy>
           <hsizetype>5</hsizetype>
@@ -541,9 +541,14 @@
    <header>pqCameraWidget.h</header>
   </customwidget>
   <customwidget>
-   <class>pqKeyFrameTypeWidget</class>
-   <extends>QFrame</extends>
-   <header>pqKeyFrameTypeWidget.h</header>
+   <class>pqSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>pqSpinBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqAnimatableProxyComboBox</class>
+   <extends>QComboBox</extends>
+   <header>pqAnimatableProxyComboBox.h</header>
   </customwidget>
   <customwidget>
    <class>pqCollapsedGroup</class>
@@ -552,9 +557,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>pqSpinBox</class>
-   <extends>QSpinBox</extends>
-   <header>pqSpinBox.h</header>
+   <class>pqKeyFrameTypeWidget</class>
+   <extends>QFrame</extends>
+   <header>pqKeyFrameTypeWidget.h</header>
   </customwidget>
   <customwidget>
    <class>pqAnimatablePropertiesComboBox</class>

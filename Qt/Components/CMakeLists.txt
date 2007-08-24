@@ -53,6 +53,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqActiveViewOptionsManager.h
   #pqAddSourceDialog.h
   pqAnimatablePropertiesComboBox.h
+  pqAnimatableProxyComboBox.h
   pqAnimationManager.h
   pqAnimationPanel.h
   pqAnimationViewWidget.h
@@ -318,6 +319,8 @@ ADD_LIBRARY(pqComponents
   #pqAddSourceDialog.h
   pqAnimatablePropertiesComboBox.cxx
   pqAnimatablePropertiesComboBox.h
+  pqAnimatableProxyComboBox.cxx
+  pqAnimatableProxyComboBox.h
   pqAnimationManager.cxx
   pqAnimationManager.h
   pqAnimationPanel.cxx

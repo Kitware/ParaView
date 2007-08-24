@@ -37,6 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqAnimationScene;
 class pqAnimationTrack;
+class pqView;
+class pqServerManagerModelItem;
+class vtkSMProxy;
 
 /// This is the Animation panel widget. It controls the behaviour
 /// of the Animation panel which includes adding of key frames,
@@ -79,7 +82,15 @@ protected slots:
 
   // called when deleting a track
   void deleteTrack(pqAnimationTrack* track);
-  
+  // called when creating a track
+  void createTrack();
+
+  // set active view changed
+  void setActiveView(pqView*);
+  // set the current proxy selection
+  void setCurrentSelection(pqServerManagerModelItem*);
+  void setCurrentProxy(vtkSMProxy* pxy);
+
 private:
   pqAnimationViewWidget(const pqAnimationViewWidget&); // Not implemented.
   void operator=(const pqAnimationViewWidget&); // Not implemented.

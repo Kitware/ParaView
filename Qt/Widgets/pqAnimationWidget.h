@@ -53,11 +53,13 @@ public:
   pqAnimationModel* animationModel() const;
 
   QHeaderView* createDeleteHeader() const;
+  QWidget* createDeleteWidget() const;
 
 signals:
   // emitted when a track is double clicked on
   void trackSelected(pqAnimationTrack*);
   void deleteTrackClicked(pqAnimationTrack*);
+  void createTrackClicked();
 
 protected slots:
   void updateSizes();
@@ -74,9 +76,10 @@ protected:
 
 private:
   QGraphicsView* View;
-  QHeaderView* AddRemoveHeader;
-  QStandardItemModel AddRemoveModel;
+  QHeaderView* CreateDeleteHeader;
+  QStandardItemModel CreateDeleteModel;
   QHeaderView* Header;
+  QWidget* CreateDeleteWidget;
   pqAnimationModel* Model;
 
 };
