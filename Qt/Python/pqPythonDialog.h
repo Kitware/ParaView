@@ -61,9 +61,6 @@ private slots:
   
   void clearConsole();
   
-  void accept();
-  void reject();
-
 private:
   ~pqPythonDialog();
   pqPythonDialog(const pqPythonDialog&);

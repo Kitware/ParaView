@@ -144,15 +144,3 @@ void pqPythonDialog::clearConsole()
   this->Implementation->Ui.shellWidget->clear();
 }
 
-void pqPythonDialog::accept()
-{
-  QDialog::accept();
-  delete this;
-}
-
-void pqPythonDialog::reject()
-{
-  QDialog::reject();
-  delete this;
-}
-
