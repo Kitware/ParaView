@@ -1464,11 +1464,8 @@ QList<QList<QVariant> > pqSMAdaptor::getMultipleElementPropertyDomain(
         }
       double min = DoubleDomain->GetMinimum(which, exists1);
       double max = DoubleDomain->GetMaximum(which, exists2);
-      if(exists1 && exists2)  // what if one of them exists?
-        {
-        domain.push_back(min);
-        domain.push_back(max);
-        }
+      domain.push_back(exists1 ? min : QVariant());
+      domain.push_back(exists2 ? max : QVariant());
       domains.push_back(domain);
       }
     }
@@ -1496,11 +1493,8 @@ QList<QList<QVariant> > pqSMAdaptor::getMultipleElementPropertyDomain(
       int exists1, exists2;
       int min = IntDomain->GetMinimum(which, exists1);
       int max = IntDomain->GetMaximum(which, exists2);
-      if(exists1 && exists2)  // what if one of them exists?
-        {
-        domain.push_back(min);
-        domain.push_back(max);
-        }
+      domain.push_back(exists1 ? min : QVariant());
+      domain.push_back(exists2 ? max : QVariant());
       domains.push_back(domain);
       }
     }
@@ -1696,22 +1690,16 @@ QList<QVariant> pqSMAdaptor::getMultipleElementPropertyDomain(
     int exists1, exists2;
     double min = DoubleDomain->GetMinimum(which, exists1);
     double max = DoubleDomain->GetMaximum(which, exists2);
-    if(exists1 && exists2)  // what if one of them exists?
-      {
-      domain.push_back(min);
-      domain.push_back(max);
-      }
+    domain.push_back(exists1 ? min : QVariant());
+    domain.push_back(exists2 ? max : QVariant());
     }
   else if(IntDomain)
     {
     int exists1, exists2;
     int min = IntDomain->GetMinimum(which, exists1);
     int max = IntDomain->GetMaximum(which, exists2);
-    if(exists1 && exists2)  // what if one of them exists?
-      {
-      domain.push_back(min);
-      domain.push_back(max);
-      }
+    domain.push_back(exists1 ? min : QVariant());
+    domain.push_back(exists2 ? max : QVariant());
     }
 
   return domain;

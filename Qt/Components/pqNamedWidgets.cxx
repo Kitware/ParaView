@@ -1202,7 +1202,8 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
         rowCount++;
         }
       else if(elem_property.type() == QVariant::Int && 
-              propertyDomain.size() == 2)
+              propertyDomain.size() == 2 &&
+              propertyDomain[0].isValid() && propertyDomain[1].isValid())
         {
         QLabel* label = createPanelLabel(panelLayout->parentWidget(),
                                          propertyLabel);
@@ -1225,6 +1226,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
         }
       else if(elem_property.type() == QVariant::Double && 
               propertyDomain.size() == 2 && 
+              propertyDomain[0].isValid() && propertyDomain[1].isValid() &&
               domainsTypes.contains("vtkSMDoubleRangeDomain"))
         {
         /*
@@ -1350,7 +1352,8 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
           item = new QWidgetItem(combo);
           }
         else if(v.type() == QVariant::Int && 
-           domain.size() && domain[i].size() == 2)
+           domain.size() && domain[i].size() == 2 &&
+           domain[i][0].isValid() && domain[i][1].isValid())
           {
           int range[2];
           range[0] = domain[i][0].toInt();
@@ -1362,7 +1365,8 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
           item = new QWidgetItem(spinBox);
           }
         else if(v.type() == QVariant::Double && 
-                domain.size() && domain[i].size() == 2)
+                domain.size() && domain[i].size() == 2 &&
+                domain[i][0].isValid() && domain[i][1].isValid())
           {
           /*
           double range[2];
