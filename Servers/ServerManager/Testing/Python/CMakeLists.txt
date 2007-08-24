@@ -42,7 +42,7 @@ SET (PY_TESTS
   SMAnimation
   ProxyPropertyLinks
 #  SMUndoRedo
-  SMCompoundProxyUndoRedo
+#  SMCompoundProxyUndoRedo
   )
 
 

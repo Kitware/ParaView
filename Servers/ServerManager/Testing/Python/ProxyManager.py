@@ -1,16 +1,16 @@
 """This is a test to test the paraview proxy manager API."""
 
-import paraview
+from paraview import servermanager
 
 def Error(message):
   raise "ERROR: %s" % message
   
-paraview.ActiveConnection = paraview.Connect()
-pxm = paraview.pyProxyManager()
+servermanager.Connect()
+pxm = servermanager.ProxyManager()
 
-p1 = paraview.CreateProxy("sources", "SphereSource");
-p2 = paraview.CreateProxy("sources", "ConeSource");
-p3 = paraview.CreateProxy("sources", "ArrowSource");
+p1 = servermanager.sources.SphereSource()
+p2 = servermanager.sources.ConeSource()
+p3 = servermanager.sources.ArrowSource()
 
 pxm.RegisterProxy("sources", "source1_2", p1);
 pxm.RegisterProxy("sources", "source1_2", p2);

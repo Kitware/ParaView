@@ -6,8 +6,8 @@ import SMPythonTesting
 import os.path
 import sys
 import time
-import paraview
-paraview.ActiveConnection = paraview.Connect()
+from paraview import servermanager
+servermanager.Connect()
 
 
 def RenderAndWait(ren):
@@ -21,14 +21,14 @@ pvsm_file = os.path.join(SMPythonTesting.SMStatesDir, "CompoundProxyUndoRedo.pvs
 print "State file: %s" % pvsm_file
 SMPythonTesting.LoadServerManagerState(pvsm_file)
 
-pxm = paraview.pyProxyManager()
+pxm = servermanager.ProxyManager()
 renModule = pxm.GetProxy("rendermodules", "RenderModule0")
 renModule.UpdateVTKObjects()
 
-self_cid = paraview.ActiveConnection.ID
+self_cid = servermanager.ActiveConnection.ID
 
-undoStack = paraview.vtkSMUndoStack()
-undoStackBuilder = paraview.vtkSMUndoStackBuilder();
+undoStack = servermanager.vtkSMUndoStack()
+undoStackBuilder = servermanager.vtkSMUndoStackBuilder();
 undoStackBuilder.SetUndoStack(undoStack);
 undoStackBuilder.SetConnectionID(self_cid);
 
@@ -37,13 +37,13 @@ shrink = pxm.GetProxy("filters", "Shrink0")
 reflect = pxm.GetProxy("filters", "Reflect0")
 connect = pxm.GetProxy("filters", "Connect0")
 
-compound_proxy = paraview.pyProxy(paraview.vtkSMCompoundProxy())
+compound_proxy = servermanager.Proxy(proxy=servermanager.vtkSMCompoundProxy())
 compound_proxy.AddProxy("first", shrink)
 compound_proxy.AddProxy("second", reflect)
 compound_proxy.AddProxy("third", connect)
 compound_proxy.ExposeProperty("first", "Input", "Input")
 
-cp_definition = compound_proxy.SaveDefinition(None)
+cp_definition = compound_proxy.SMProxy.SaveDefinition(None)
 
 pxm.RegisterCompoundProxyDefinition("MyMacro", cp_definition)
 
@@ -53,7 +53,7 @@ undoStackBuilder.EndAndPushToStack()
 
 del compound_proxy
 
-compound_proxy = pxm.NewCompoundProxy("MyMacro")
+compound_proxy = servermanager.Proxy(proxy=pxm.NewCompoundProxy("MyMacro"))
 compound_proxy.SetConnectionID(self_cid)
 
 undoStackBuilder.Begin("CPRegister2")
@@ -75,16 +75,16 @@ while undoStack.GetNumberOfRedoSets() > 0:
   pxm.UpdateRegisteredProxies(0)
   RenderAndWait(renModule)
 
-proxy2 = pxm.NewProxy("sources","CubeSource")
+proxy2 = servermanager.sources.CubeSource()
 
-shrink.SetInput(proxy2)
+shrink.Input = proxy2
 shrink.UpdateVTKObjects()
 RenderAndWait(renModule)
 
 # This change should affect Groupping compound proxy.
 # Verify that.
 compound_proxy = pxm.GetProxy("mygroup", "Groupping")
-if proxy2 != compound_proxy.GetInput()[0]:
+if proxy2 != compound_proxy.Input:
   print "ERROR: Groupping Compund proxy has not groupped proxies correctly."
   sys.exit(1);
 

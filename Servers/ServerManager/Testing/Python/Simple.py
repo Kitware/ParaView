@@ -1,41 +1,26 @@
 # Simple Test for pvbatch.
 
 import SMPythonTesting
-import paraview
+from paraview import servermanager
 
 import sys
 
 SMPythonTesting.ProcessCommandLineArguments()
 
-sphere = paraview.CreateProxy("sources","SphereSource");
-sphere.UpdateVTKObjects();
+servermanager.Connect()
 
-connection = paraview.ActiveConnection;
-if connection.IsRemote():
-    proxy_xml_name = "IceTDesktopRenderView"
-else:
-    if connection.GetNumberOfDataPartitions() > 1:
-        proxy_xml_name = "IceTCompositeView"
-    else:
-        proxy_xml_name = "RenderView"
+sphere = servermanager.sources.SphereSource()
 
-print "RenderView--- %s" % proxy_xml_name
-view = paraview.CreateProxy("newviews", proxy_xml_name);
-view.SetBackground(.5,.1,.5);
+view = servermanager.CreateRenderView();
+view.Background = (.5,.1,.5)
 if view.GetProperty("RemoteRenderThreshold"):
-    view.SetRemoteRenderThreshold(100);
-view.UpdateVTKObjects();
+    view.RemoteRenderThreshold = 100;
 
-repr = view.CreateDefaultRepresentation(sphere);
-repr.UnRegister(None)
-repr.AddToInput(sphere);
-repr.UpdateVTKObjects();
+repr = servermanager.CreateRepresentation(sphere, view);
+repr.Input.append(sphere)
 
-view.AddToRepresentations(repr);
-view.UpdateVTKObjects();
-
-view.ResetCamera();
-view.StillRender();
+view.ResetCamera()
+view.StillRender()
 
 if not SMPythonTesting.DoRegressionTesting(view.SMProxy):
     # This will lead to VTK object leaks.

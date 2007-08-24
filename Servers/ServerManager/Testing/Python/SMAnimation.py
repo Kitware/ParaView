@@ -1,12 +1,12 @@
 # Tests animation.
 
 import SMPythonTesting
-import paraview
+from paraview import servermanager
 
 import os.path
 import sys
 
-paraview.ActiveConnection = paraview.Connect()
+servermanager.Connect()
 
 SMPythonTesting.ProcessCommandLineArguments()
 
@@ -14,7 +14,7 @@ pvsm_file = os.path.join(SMPythonTesting.SMStatesDir, "Animation.pvsm")
 print "State file: %s" % pvsm_file
 
 SMPythonTesting.LoadServerManagerState(pvsm_file)
-pxm = paraview.pyProxyManager() 
+pxm = servermanager.ProxyManager() 
 rmProxy = pxm.GetProxy("rendermodules","RenderModule0")
 rmProxy.StillRender()
 

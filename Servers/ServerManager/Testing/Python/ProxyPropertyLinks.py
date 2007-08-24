@@ -4,31 +4,31 @@ import os
 import os.path
 import sys
 
-import paraview
+from paraview import servermanager
 
 import SMPythonTesting
   
 SMPythonTesting.ProcessCommandLineArguments()
-paraview.ActiveConnection = paraview.Connect()
+servermanager.Connect()
 
 pvsm_file = os.path.join(SMPythonTesting.SMStatesDir, "ProxyPropertyLinks.pvsm")
 print "State file: %s" % pvsm_file
 
 SMPythonTesting.LoadServerManagerState(pvsm_file)
-pxm = paraview.pyProxyManager() 
 
+pxm = servermanager.ProxyManager()
 sphere1 = pxm.GetProxy("sources", "Sphere1")
 sphere2 = pxm.GetProxy("sources", "Sphere2")
 sphere3 = pxm.GetProxy("sources", "Sphere3")
 
 # Create links.
-proxyLink = paraview.vtkSMProxyLink()
+proxyLink = servermanager.vtkSMProxyLink()
 proxyLink.AddLinkedProxy(sphere1.SMProxy, 1) # Input
 proxyLink.AddLinkedProxy(sphere2.SMProxy, 2) # Output
 pxm.RegisterLink("MyProxyLink", proxyLink)
 proxyLink = None
 
-propertyLink = paraview.vtkSMPropertyLink()
+propertyLink = servermanager.vtkSMPropertyLink()
 propertyLink.AddLinkedProperty(sphere3.SMProxy, "EndTheta", 1) # Input.
 propertyLink.AddLinkedProperty(sphere1.SMProxy, "StartTheta", 2) # Output.
 pxm.RegisterLink("MyPropertyLink", propertyLink)

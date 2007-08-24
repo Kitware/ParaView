@@ -4,37 +4,29 @@ import SMPythonTesting
 import os
 import os.path
 import sys
-import paraview
+from paraview import servermanager
 
 SMPythonTesting.ProcessCommandLineArguments()
 
-paraview.ActiveConnection = paraview.Connect()
+servermanager.Connect()
 
-pxm = paraview.pyProxyManager()
+sourceProxy = servermanager.sources.RTAnalyticSource()
 
-sourceProxy = pxm.NewProxy("sources", "RTAnalyticSource")
-
-filterProxy = pxm.NewProxy("filters", "ExtractHistogram")
-filterProxy.SetInput(sourceProxy)
-filterProxy.UpdateVTKObjects()
+filterProxy = servermanager.filters.ExtractHistogram(Input=sourceProxy)
 filterProxy.UpdatePipeline()
 
 temp_filename = os.path.join(SMPythonTesting.TempDir, "histogram.csv")
 
-writerProxy = pxm.NewProxy("writers", "CSVWriter")
-writerProxy.SetInput(filterProxy)
-writerProxy.SetFileName(temp_filename)
-writerProxy.UpdateVTKObjects()
+writerProxy = servermanager.writers.CSVWriter(Input=filterProxy, FileName=temp_filename)
 writerProxy.UpdatePipeline()
 
-readerProxy = pxm.NewProxy("sources", "CSVReader")
-readerProxy.SetFileName(temp_filename)
-readerProxy.UpdateVTKObjects()
+readerProxy = servermanager.sources.CSVReader(FileName = temp_filename)
+readerProxy.UpdatePipeline()
 
 dataInfo = readerProxy.GetDataInformation()
 numPts = dataInfo.GetNumberOfPoints()
 if numPts != 11:
-  print "ERROR: Wrong number of points reported."
+  print "ERROR: Wrong number of points reported:", numPts
   sys.exit(1);
 
 numCells = dataInfo.GetNumberOfCells()
