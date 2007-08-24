@@ -88,8 +88,9 @@ void pqFileDialogEventTranslator::onFilesSelected(const QStringList& files)
     return;
     }
 
-  QString arguments;
-  for(int i = 0; i != files.size(); ++i)
+  QStringList cleanedFiles;
+
+  for(int i = 0; i < files.size(); i++)
     {
     QString file = files[i];
     file.replace('\\', '/');
@@ -104,13 +105,10 @@ void pqFileDialogEventTranslator::onFilesSelected(const QStringList& files)
       return;
       }
     
-    arguments += file;
-
-    /** \todo Handle multiple file selections */
-    break;
+    cleanedFiles.append(file);
     }
   
-  emit recordEvent(this->CurrentObject, "filesSelected", arguments);
+  emit recordEvent(this->CurrentObject, "filesSelected", cleanedFiles.join(","));
 }
 
 void pqFileDialogEventTranslator::onCancelled()

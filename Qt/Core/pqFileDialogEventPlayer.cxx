@@ -62,11 +62,10 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
   if(!object)
     return false;
   
-  /** \todo Handle multiple files */
-  QString file = Arguments;
+  QString fileString = Arguments;
 
   const QString data_directory = pqCoreTestUtility::DataRoot();
-  if(file.contains("PARAVIEW_DATA_ROOT") && data_directory.isEmpty())
+  if(fileString.contains("PARAVIEW_DATA_ROOT") && data_directory.isEmpty())
     {
     qCritical() << "You must set the PARAVIEW_DATA_ROOT environment variable to play-back file selections.";
     Error = true;
@@ -74,7 +73,7 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
     }
 
   const QString test_directory = pqCoreTestUtility::TestDirectory();
-  if (file.contains("PARAVIEW_TEST_ROOT") && test_directory.isEmpty())
+  if (fileString.contains("PARAVIEW_TEST_ROOT") && test_directory.isEmpty())
     {
     qCritical() << "You must specify --test-directory in the command line options.";
     Error = true;
@@ -83,11 +82,10 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
 
   if(Command == "filesSelected")
     {
-    file.replace("$PARAVIEW_DATA_ROOT", data_directory);
-    file.replace("$PARAVIEW_TEST_ROOT", test_directory);
+    fileString.replace("$PARAVIEW_DATA_ROOT", data_directory);
+    fileString.replace("$PARAVIEW_TEST_ROOT", test_directory);
 
-    QStringList files;
-    files.append(file);
+    QStringList files = fileString.split(',', QString::SkipEmptyParts);
 
     object->emitFilesSelected(files);
     pqEventDispatcher::processEventsAndWait(0);
@@ -103,9 +101,9 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
   if (Command == "remove")
     {
     // Delete the file.
-    file.replace("$PARAVIEW_DATA_ROOT", data_directory);
-    file.replace("$PARAVIEW_TEST_ROOT", test_directory);
-    vtksys::SystemTools::RemoveFile(file.toAscii().data()); 
+    fileString.replace("$PARAVIEW_DATA_ROOT", data_directory);
+    fileString.replace("$PARAVIEW_TEST_ROOT", test_directory);
+    vtksys::SystemTools::RemoveFile(fileString.toAscii().data()); 
     return true;
     }
 
