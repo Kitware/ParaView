@@ -81,6 +81,7 @@ public:
   // for the contents of this directory if Type = DIRECTORY
   // or the contents of this file grouop if Type ==FILE_GROUP.
   vtkGetObjectMacro(Contents, vtkCollection);
+//BTX
 protected:
   vtkPVFileInformation();
   ~vtkPVFileInformation();
@@ -111,6 +112,7 @@ private:
   void operator=(const vtkPVFileInformation&); // Not implemented.
 
   class vtkInfo;
+//ETX
 };
 
 
