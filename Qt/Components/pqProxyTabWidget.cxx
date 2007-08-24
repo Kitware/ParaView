@@ -76,8 +76,13 @@ pqProxyTabWidget::pqProxyTabWidget(QWidget* p)
   this->addTab(scr, tr("Information"));
 
   // TODO: allow information page to work without help
+  // This has to be QueuedConnection since the filter won't get updated until the
+  // view has rendered, as a result the data information won't be correct until
+  // after render.
   QObject::connect(this->Inspector, SIGNAL(postaccept()),
-                   this->Information, SLOT(updateInformation()));
+                   this->Information, SLOT(updateInformation()),
+                   Qt::QueuedConnection);
+
   // TODO: allow display page to work without help
   QObject::connect(this->Inspector, SIGNAL(postaccept()),
                    this->Display, SLOT(reloadGUI()));
