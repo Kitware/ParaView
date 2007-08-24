@@ -151,6 +151,7 @@
      </StringVectorProperty>
      <DoubleVectorProperty 
         name="TimestepValues"
+        repeatable="1"
         information_only="1">
         <TimeStepsInformationHelper/>
         <Documentation>
@@ -954,6 +955,7 @@
 
      <DoubleVectorProperty 
         name="TimestepValues"
+        repeatable="1"
         information_only="1">
         <TimeStepsInformationHelper/>
         <Documentation>
@@ -1005,6 +1007,7 @@
 
      <DoubleVectorProperty 
         name="TimestepValues"
+        repeatable="1"
         information_only="1">
         <TimeStepsInformationHelper/>
         <Documentation>
@@ -1098,6 +1101,7 @@
 
      <DoubleVectorProperty 
         name="TimestepValues"
+        repeatable="1"
         information_only="1">
         <TimeStepsInformationHelper/>
         <Documentation>
@@ -1458,6 +1462,7 @@
 
      <DoubleVectorProperty 
          name="TimestepValues"
+         repeatable="1"
          information_only="1">
         <TimeStepsInformationHelper/>
         <Documentation>
@@ -2414,7 +2419,10 @@
      <!-- for discrete time, the latter for continuous time), but changing -->
      <!-- the HasModeShapes ivar switches between discrete and continuous -->
      <!-- time. -->
-     <DoubleVectorProperty name="TimestepValues" information_only="1">
+     <DoubleVectorProperty 
+         name="TimestepValues" 
+         repeatable="1"
+         information_only="1">
        <TimeStepsInformationHelper/>
      </DoubleVectorProperty>
      <DoubleVectorProperty name="TimeRange" information_only="1">
@@ -2571,7 +2579,10 @@
      <!-- for discrete time, the latter for continuous time), but changing -->
      <!-- the HasModeShapes ivar switches between discrete and continuous -->
      <!-- time. -->
-     <DoubleVectorProperty name="TimestepValues" information_only="1">
+     <DoubleVectorProperty 
+         name="TimestepValues" 
+         repeatable="1"
+         information_only="1">
        <TimeStepsInformationHelper/>
      </DoubleVectorProperty>
      <DoubleVectorProperty name="TimeRange" information_only="1">
@@ -3390,8 +3401,10 @@
           Set the current timestep.
         </Documentation>
       </IntVectorProperty>
-      <DoubleVectorProperty name="TimestepValues"
-                            information_only="1">
+      <DoubleVectorProperty 
+          name="TimestepValues"
+          repeatable="1"
+          information_only="1">
         <TimeStepsInformationHelper/>
       </DoubleVectorProperty>
     </SourceProxy>
@@ -3434,7 +3447,10 @@
                          information_only="1">
         <SimpleIntInformationHelper/>
       </IntVectorProperty>
-      <DoubleVectorProperty name="TimestepValues" information_only="1">
+      <DoubleVectorProperty 
+          name="TimestepValues" 
+          repeatable="1"
+          information_only="1">
        <TimeStepsInformationHelper/>
       </DoubleVectorProperty>
       <IntVectorProperty name="TimeStep" 
@@ -3505,7 +3521,10 @@
         </Documentation>
      </StringVectorProperty>
 
-     <DoubleVectorProperty name="TimestepValues" information_only="1">
+     <DoubleVectorProperty 
+         name="TimestepValues" 
+         repeatable="1"
+         information_only="1">
        <TimeStepsInformationHelper/>
      </DoubleVectorProperty>
 
