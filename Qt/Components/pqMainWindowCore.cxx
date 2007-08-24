@@ -2989,9 +2989,12 @@ void pqMainWindowCore::onServerCreation(pqServer* server)
   pqApplicationCore* core = pqApplicationCore::instance();
   this->Implementation->ActiveServer.setCurrent(server);
 
+  pqSettings* settings = core->settings();
+  QString curView = settings->value("/defaultViewType",
+    pqRenderView::renderViewType()).toString();
+
   // When a server is created, we create a new render view for it.
-  pqView* view = core->getObjectBuilder()->createView(
-    pqRenderView::renderViewType(), server);
+  pqView* view = core->getObjectBuilder()->createView(curView, server);
   view->render();
 }
 

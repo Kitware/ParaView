@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSettingsDialog.h
+   Module:    pqApplicationSettingsWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -28,37 +28,36 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
-#ifndef __pqSettingsDialog_h
-#define __pqSettingsDialog_h
+========================================================================*/
+#ifndef __pqApplicationSettingsWidget_h 
+#define __pqApplicationSettingsWidget_h
 
-#include "pqDialog.h"
+#include <QWidget>
+#include "pqComponentsExport.h"
 
-class pqSettingsDialogInternal;
-class pqRenderView;
-
-class PQCOMPONENTS_EXPORT pqSettingsDialog : public pqDialog 
+/// pqApplicationSettingsWidget is the widget used in the pqSettingsDialog to
+/// show application settings.
+class PQCOMPONENTS_EXPORT pqApplicationSettingsWidget : public QWidget
 {
   Q_OBJECT
+  typedef QWidget Superclass;
 public:
-  pqSettingsDialog(QWidget* parent=NULL, Qt::WFlags f=0);
-  virtual ~pqSettingsDialog();
+  pqApplicationSettingsWidget(QWidget* parent=0);
+  virtual ~pqApplicationSettingsWidget();
 
 public slots:
-  /// Set the render view whose properties are to be shown in the dialog.
-  /// We may want to make this general and work for all types of views.
-  void setRenderView(pqRenderView*);
-
-signals:
-  /// Fired when user hits Apply or Ok.
-  void apply();
-
-protected:
-  void setupGUI();
+  /// Called to accept all user changes.
+  void accept();
 
 private:
-  pqSettingsDialogInternal* Internal;
+  pqApplicationSettingsWidget(const pqApplicationSettingsWidget&); // Not implemented.
+  void operator=(const pqApplicationSettingsWidget&); // Not implemented.
+
+  class pqInternal;
+  pqInternal* Internal;
+
 };
 
 #endif
+
 

@@ -39,8 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 
 // ParaView Client includes.
-#include "pqRenderView.h"
 #include "pq3DViewPropertiesWidget.h"
+#include "pqApplicationSettingsWidget.h"
+#include "pqRenderView.h"
 
 //-----------------------------------------------------------------------------
 class pqSettingsDialogInternal : public Ui::pqSettingsDialog
@@ -71,8 +72,9 @@ pqSettingsDialog::pqSettingsDialog(QWidget* _p/*=null*/,
   this->setUndoLabel("Settings");
   
 
-  QObject::connect(this, SIGNAL(finished(int)), this, SLOT(onFinished(int)));
-  QObject::connect(this->Internal->applyButton, SIGNAL(clicked()), this, SLOT(onApplied()));
+  QObject::connect(this, SIGNAL(accepted()), this, SIGNAL(apply()));
+  QObject::connect(this->Internal->applyButton, SIGNAL(clicked()), 
+    this, SIGNAL(apply()));
 }
 
 //-----------------------------------------------------------------------------
@@ -98,25 +100,16 @@ void pqSettingsDialog::setupGUI()
       this->Internal->RenderView);
     this->Internal->tabWidget->addTab(
       this->Internal->ViewProperties, "Active View Properties");
+    QObject::connect( this, SIGNAL(apply()),
+      this->Internal->ViewProperties, SLOT(accept()));
     }
 
   // Add a place holder for application settings.
-  //this->Internal->tabWidget->addTab(
-  //  new QWidget(), "Application Settings");
+  pqApplicationSettingsWidget* as_widget =
+    new pqApplicationSettingsWidget(this);
+  QObject::connect( this, SIGNAL(apply()),
+    as_widget, SLOT(accept()));
+  this->Internal->tabWidget->addTab(
+    as_widget, "Application Settings");
 }
 
-//-----------------------------------------------------------------------------
-void pqSettingsDialog::onFinished(int end_result)
-{
-  if (end_result != QDialog::Accepted)
-    {
-    return;
-    }
-  this->onApplied();
-}
-
-//-----------------------------------------------------------------------------
-void pqSettingsDialog::onApplied()
-{
-  this->Internal->ViewProperties->accept();
-}
