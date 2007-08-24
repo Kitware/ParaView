@@ -29,6 +29,7 @@
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0/0|0" />
   <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="IntegrateAttributes" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/CloseButton" command="activate" arguments="" />
   <pqevent object="MainWindow/commonFilters/1QToolButton6" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Source/1QComboBox0" command="set_string" arguments="Sphere" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/SetScaleFactor" command="key" arguments="46" />
