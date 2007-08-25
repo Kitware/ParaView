@@ -31,7 +31,7 @@
 #include "vtkStringArray.h"
 
 vtkStandardNewMacro(vtkSelectionSerializer);
-vtkCxxRevisionMacro(vtkSelectionSerializer, "1.13");
+vtkCxxRevisionMacro(vtkSelectionSerializer, "1.14");
 
 vtkInformationKeyMacro(vtkSelectionSerializer,ORIGINAL_SOURCE_ID,Integer);
 
@@ -133,21 +133,22 @@ void vtkSelectionSerializerWriteSelectionList(ostream& os, vtkIndent indent,
 void vtkSelectionSerializer::WriteSelectionList(
   ostream& os, vtkIndent indent, vtkSelection* selection, int which)
 {
-  vtkDataArray* list;
+  vtkDataArray* list = 0;
   vtkstd::string whichString;
-  switch(which) {
-  case 0: 
-    list= vtkDataArray::SafeDownCast(selection->GetSelectionList()); 
-    whichString = "SelectionList";
-    break;
-  case 1:
-    list= vtkDataArray::SafeDownCast(selection->GetAuxiliaryData1()); 
-    whichString = "AuxiliaryData1";
-    break;
-  case 2: 
-    list= vtkDataArray::SafeDownCast(selection->GetAuxiliaryData2());
-    whichString = "AuxiliaryData2";
-    break;
+  switch(which) 
+    {
+    case 0: 
+      list= vtkDataArray::SafeDownCast(selection->GetSelectionList()); 
+      whichString = "SelectionList";
+      break;
+    case 1:
+      list= vtkDataArray::SafeDownCast(selection->GetAuxiliaryData1()); 
+      whichString = "AuxiliaryData1";
+      break;
+    case 2: 
+      list= vtkDataArray::SafeDownCast(selection->GetAuxiliaryData2());
+      whichString = "AuxiliaryData2";
+      break;
     }
     
   if (list)
