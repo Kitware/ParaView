@@ -13,8 +13,7 @@ servermanager.Connect()
 file1 = os.path.join(SMPythonTesting.DataDir, "Data/bot2.wrl")
 reader = servermanager.sources.vrmlreader(FileName = file1)
 readerOutput = servermanager.Fetch(reader)
-#if readerOutput.GetClassName() != "vtkMultiGroupDataSet":
-if readerOutput.GetClassName() != "foobar":
+if readerOutput.GetClassName() != "vtkMultiGroupDataSet":
     print "ERROR: Wrong dataset type returned:", readerOutput.GetClassName()
     sys.exit(1)
 
