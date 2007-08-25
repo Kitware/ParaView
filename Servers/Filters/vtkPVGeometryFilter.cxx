@@ -50,7 +50,7 @@
 #include "vtkHyperOctreeSurfaceFilter.h"
 
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.70");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.71");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -81,6 +81,7 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
   this->CurrentGroup = 0;
 
   this->PassThroughCellIds = 1;
+  this->PassThroughPointIds = 1;
   this->ForceUseStrips = 0;
   this->StripModFirstPass = 1;
 }
@@ -862,6 +863,7 @@ void vtkPVGeometryFilter::PolyDataExecute(
       vtkPolyData *inCopy = vtkPolyData::New();
       vtkStripper *stripper = vtkStripper::New();
       stripper->SetPassThroughCellIds(this->PassThroughCellIds);
+      //stripper->SetPassThroughPointIds(this->PassThroughPointIds);
       inCopy->ShallowCopy(input);
       inCopy->RemoveGhostCells(1);
       stripper->SetInput(inCopy);
@@ -892,6 +894,22 @@ void vtkPVGeometryFilter::PolyDataExecute(
         originalCellIds->Delete();
         originalCellIds = NULL;
         }
+      if (this->PassThroughPointIds)
+        {
+        vtkIdTypeArray *originalPointIds = vtkIdTypeArray::New();
+        originalPointIds->SetName("vtkOriginalPointIds");
+        originalPointIds->SetNumberOfComponents(1);
+        vtkPointData *outputPD = out->GetPointData();
+        outputPD->AddArray(originalPointIds);
+        vtkIdType numTup = out->GetNumberOfPoints();
+        originalPointIds->SetNumberOfValues(numTup);
+        for (vtkIdType pId = 0; pId < numTup; pId++)
+          {
+          originalPointIds->SetValue(pId, pId);
+          }
+        originalPointIds->Delete();
+        originalPointIds = NULL;
+        }
       }
     return;
     }
@@ -911,6 +929,7 @@ void vtkPVGeometryFilter::OctreeExecute(
     vtkHyperOctreeSurfaceFilter* internalFilter = 
       vtkHyperOctreeSurfaceFilter::New();
     internalFilter->SetPassThroughCellIds(this->PassThroughCellIds);
+    //internalFilter->SetPassThroughPointIds(this->PassThroughPointIds);
     vtkHyperOctree* octreeCopy = vtkHyperOctree::New();
     octreeCopy->ShallowCopy(input);
     internalFilter->SetInput(octreeCopy);
@@ -970,6 +989,8 @@ void vtkPVGeometryFilter::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "PassThroughCellIds: " 
      << (this->PassThroughCellIds ? "On\n" : "Off\n");
+  os << indent << "PassThroughPointIds: " 
+     << (this->PassThroughPointIds ? "On\n" : "Off\n");
 }
 
 //----------------------------------------------------------------------------
@@ -986,6 +1007,24 @@ void vtkPVGeometryFilter::SetPassThroughCellIds(int newvalue)
     this->GenericGeometryFilter->SetPassThroughCellIds(
       this->PassThroughCellIds);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::SetPassThroughPointIds(int newvalue)
+{
+  this->PassThroughPointIds = newvalue;
+  if (this->DataSetSurfaceFilter)
+    {
+    this->DataSetSurfaceFilter->SetPassThroughPointIds(
+      this->PassThroughPointIds);
+    }
+  /*
+  if (this->GenericGeometryFilter)
+    {
+    this->GenericGeometryFilter->SetPassThroughPointIds(
+      this->PassThroughPointIds);
+    }
+  */
 }
 
 //----------------------------------------------------------------------------
