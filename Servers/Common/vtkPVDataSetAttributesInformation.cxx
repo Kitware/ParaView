@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
-vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.12");
+vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVDataSetAttributesInformation::vtkPVDataSetAttributesInformation()
@@ -161,7 +161,8 @@ vtkPVDataSetAttributesInformation
     vtkAbstractArray* const array = da->GetAbstractArray(idx);
     if (array->GetName() && 
         strcmp(array->GetName(),"vtkGhostLevels") != 0 &&
-        strcmp(array->GetName(), "vtkOriginalCellIds") != 0)
+        strcmp(array->GetName(), "vtkOriginalCellIds") != 0 &&
+        strcmp(array->GetName(), "vtkOriginalPointIds") != 0)
       {
       vtkPVArrayInformation *info = vtkPVArrayInformation::New();
       info->CopyFromObject(array);

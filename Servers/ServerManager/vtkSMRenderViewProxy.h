@@ -169,7 +169,7 @@ public:
   // Description:
   // Return a list of visible cells within the provided screen area.
   vtkSelection *SelectVisibleCells(unsigned int x0, unsigned int y0, 
-    unsigned int x1, unsigned int y1);
+    unsigned int x1, unsigned int y1, int ofPoints);
 
   // Description:
   // Creates a surface selection. Returns if selection was successful.
@@ -185,7 +185,8 @@ public:
     vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources,
     vtkCollection* surfaceSelection=0,
-    bool multiple_selections=true);
+    bool multiple_selections=true,
+    bool ofPoints = false);
 
   // Description:
   // Creates a frustum selection. Returns if selection was successful.
@@ -194,7 +195,8 @@ public:
     vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources,
     vtkCollection* frustumSelection=0,
-    bool multiple_selections=true);
+    bool multiple_selections=true,
+    bool ofPoints = false);
 
   // Description:
   // Methods called by Representation proxies to add/remove the

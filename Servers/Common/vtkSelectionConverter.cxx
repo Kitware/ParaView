@@ -16,6 +16,7 @@
 
 #include "vtkAlgorithm.h"
 #include "vtkCellData.h"
+#include "vtkPointData.h"
 #include "vtkDataSet.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
@@ -23,9 +24,11 @@
 #include "vtkProcessModule.h"
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
+#include "vtkIdList.h"
+#include "vtkstd/set"
 
 vtkStandardNewMacro(vtkSelectionConverter);
-vtkCxxRevisionMacro(vtkSelectionConverter, "1.10");
+vtkCxxRevisionMacro(vtkSelectionConverter, "1.11");
 
 //----------------------------------------------------------------------------
 vtkSelectionConverter::vtkSelectionConverter()
@@ -118,9 +121,9 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
     return;
     }
 
-  vtkIdTypeArray* mapArray = vtkIdTypeArray::SafeDownCast(
+  vtkIdTypeArray* cellMapArray = vtkIdTypeArray::SafeDownCast(
     ds->GetCellData()->GetArray("vtkOriginalCellIds"));
-  if (!mapArray)
+  if (!cellMapArray)
     {
     return;
     }
@@ -143,23 +146,87 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
 
   vtkIdTypeArray* outputArray = vtkIdTypeArray::New();
 
-  vtkIdType numCells = inputList->GetNumberOfTuples() *
+  vtkIdType numHits = inputList->GetNumberOfTuples() *
     inputList->GetNumberOfComponents();
-  outputArray->SetNumberOfTuples(numCells);
 
-  for (vtkIdType cellId=0; cellId<numCells; cellId++)
-    {
-    vtkIdType index = mapArray->GetValue(inputList->GetValue(cellId));
-    if (global_ids)
+  vtkIdTypeArray* vertptrs = vtkIdTypeArray::SafeDownCast(
+    input->GetAuxiliaryData1());
+  vtkIdTypeArray* vertlist = vtkIdTypeArray::SafeDownCast(
+    input->GetAuxiliaryData2());
+  if (inputProperties->Has(vtkSelection::INDEXED_VERTICES())
+      &&
+      (inputProperties->Get(vtkSelection::INDEXED_VERTICES()) == 1)
+      &&
+      vertptrs
+      &&
+      vertlist
+    )
+    {    
+
+    vtkIdTypeArray* pointMapArray = vtkIdTypeArray::SafeDownCast(
+      ds->GetPointData()->GetArray("vtkOriginalPointIds"));
+    if (!pointMapArray)
       {
-      vtkIdType globalId = globalIdsArray->GetValue(index);
-      outputArray->SetValue(cellId, globalId);
+      return;
       }
-    else
+
+    outputProperties->Set(vtkSelection::FIELD_TYPE(),vtkSelection::POINT);
+
+    vtkIdList *idlist = vtkIdList::New();
+    vtkstd::set<vtkIdType> visverts;
+
+    //lookup each hit cell in the polygonal shell, and find those of its
+    //vertices which were hit. For those lookup vertex id in original data set.
+    for (vtkIdType hitId=0; hitId<numHits; hitId++)
       {
-      outputArray->SetValue(cellId, index);
+      vtkIdType ptr = vertptrs->GetValue(hitId);
+      if (ptr != -1)
+        {
+        vtkIdType cellIndex = inputList->GetValue(hitId);
+        ds->GetCellPoints(cellIndex, idlist);
+
+        vtkIdType npts = vertlist->GetValue(ptr);
+        for (vtkIdType v = 0; v < npts; v++)
+          {
+          vtkIdType idx = vertlist->GetValue(ptr+1+v);
+          vtkIdType ptId = idlist->GetId(idx); 
+          if (pointMapArray)
+            {
+            ptId = pointMapArray->GetValue(ptId);
+            }
+          visverts.insert(ptId);
+          }
+        }
+      }
+
+    //this set is just to eliminate duplicates
+    vtkstd::set<vtkIdType>::iterator sit;
+    for (sit = visverts.begin(); sit != visverts.end(); sit++)
+      {
+      outputArray->InsertNextValue(*sit);      
+      }
+
+    idlist->Delete();
+    }
+  else 
+    {
+    outputArray->SetNumberOfTuples(numHits);
+
+    for (vtkIdType hitId=0; hitId<numHits; hitId++)
+      {
+      vtkIdType cellIndex = cellMapArray->GetValue(inputList->GetValue(hitId));
+      if (global_ids)
+        {
+        vtkIdType globalId = globalIdsArray->GetValue(cellIndex);
+        outputArray->SetValue(hitId, globalId);
+        }
+      else
+        {
+        outputArray->SetValue(hitId, cellIndex);
+        }
       }
     }
+
 
   outputProperties->Set(
     vtkSelection::SOURCE_ID(),

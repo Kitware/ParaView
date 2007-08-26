@@ -20,7 +20,7 @@
 #include "vtkIdTypeArray.h"
 #include "vtkIdentColoredPainter.h"
 
-vtkCxxRevisionMacro(vtkPVVisibleCellSelector, "1.6");
+vtkCxxRevisionMacro(vtkPVVisibleCellSelector, "1.7");
 vtkStandardNewMacro(vtkPVVisibleCellSelector);
 
 //----------------------------------------------------------------------------
@@ -40,6 +40,13 @@ void vtkPVVisibleCellSelector::SetSelectMode(int m)
 {
   this->Superclass::SetSelectMode(m);
 }
+
+//----------------------------------------------------------------------------
+void vtkPVVisibleCellSelector::SetDoVertices(int m)
+{
+  this->DoVertices = m;
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVVisibleCellSelector::LookupProcessorId()

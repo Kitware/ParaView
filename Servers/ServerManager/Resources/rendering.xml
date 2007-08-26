@@ -2102,15 +2102,15 @@
           <Group name="renderers"/>
         </ProxyGroupDomain>
       </ProxyProperty>
-
+ 
       <IntVectorProperty
         name="SetSelectMode"
         command="SetSelectMode"
         number_of_elements="1"
         default_values="0">
-        <IntRangeDomain name="range" min="0" max="5"/>
+        <IntRangeDomain name="range" min="0" max="6"/>
       </IntVectorProperty>
- 
+
       <Property
         name="LookupProcessorId"
         command="LookupProcessorId">

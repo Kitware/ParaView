@@ -115,6 +115,8 @@
         <file>Icons/pqSelect16.png</file>
         <file>Icons/pqSelect24.png</file>
         <file>Icons/pqSelect32.png</file>
+        <file>Icons/pqSelectSurfPoints24.png</file>
+        <file>Icons/pqSelectFrustPoints24.png</file>
         <file>Icons/pqServer16.png</file>
         <file>Icons/pqServer22.png</file>
         <file>Icons/pqServer32.png</file>

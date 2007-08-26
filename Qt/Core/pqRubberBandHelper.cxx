@@ -249,9 +249,21 @@ void pqRubberBandHelper::beginSelection()
 }
 
 //-----------------------------------------------------------------------------
+void pqRubberBandHelper::beginSurfacePointsSelection()
+{
+  this->setRubberBandOn(SELECT_POINTS);
+}
+
+//-----------------------------------------------------------------------------
 void pqRubberBandHelper::beginFrustumSelection()
 {
   this->setRubberBandOn(FRUSTUM);
+}
+
+//-----------------------------------------------------------------------------
+void pqRubberBandHelper::beginFrustumPointsSelection()
+{
+  this->setRubberBandOn(FRUSTUM_POINTS);
 }
 
 //-----------------------------------------------------------------------------
@@ -320,9 +332,17 @@ void pqRubberBandHelper::processEvents(unsigned long eventId)
           {
           this->Internal->RenderView->selectOnSurface(rectOut);
           }
+        else if(this->Mode == SELECT_POINTS)
+          {
+          this->Internal->RenderView->selectPointsOnSurface(rectOut);
+          }
         else if(this->Mode == FRUSTUM)
           {
           this->Internal->RenderView->selectFrustum(rectOut);
+          }
+        else if(this->Mode == FRUSTUM_POINTS)
+          {
+          this->Internal->RenderView->selectFrustumPoints(rectOut);
           }
         }
       emit this->selectionFinished(rectOut[0], rectOut[1], rectOut[2], rectOut[3]);

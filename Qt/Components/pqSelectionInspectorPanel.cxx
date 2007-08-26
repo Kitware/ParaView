@@ -609,10 +609,11 @@ void pqSelectionInspectorPanel::updateSelectionSourceGUI()
   //  selectionSource, selectionSource->GetProperty("ContentType"));
   this->onSelectionContentTypeChanged();
 
-  this->Implementation->SourceLinks->addPropertyLink(
-    this->Implementation->FieldTypeAdaptor, "currentText", 
-    SIGNAL(currentTextChanged(const QString&)),
-    selectionSource, selectionSource->GetProperty("FieldType"));
+  //this->Implementation->SourceLinks->addPropertyLink(
+  //  this->Implementation->FieldTypeAdaptor, "currentText", 
+  //  SIGNAL(currentTextChanged(const QString&)),
+  //  selectionSource, selectionSource->GetProperty("FieldType"));
+  this->onSelectionFieldTypeChanged();
 
   //this->Implementation->SourceLinks->addPropertyLink(
   //  this->Implementation->checkboxPassThrough, "checked", SIGNAL(toggled(bool)),
@@ -1146,7 +1147,7 @@ void pqSelectionInspectorPanel::updateSelectionContentType(const QString& type)
     pqSMAdaptor::setElementProperty(
       idvp, vtkSelection::FRUSTUM);
     }
-  else if(type == QString("Surface"))
+  else if(type == QString("IDs"))
     {
     this->updateSurfaceIDConnections();
     }
@@ -1163,7 +1164,7 @@ void pqSelectionInspectorPanel::updateSelectionContentType(const QString& type)
     {
     this->Implementation->RubberBandHelper->beginFrustumSelection();
     }
-  else if(type == QString("Surface"))
+  else if(type == QString("IDs"))
     {
     this->Implementation->RubberBandHelper->beginSelection();
     }
@@ -1226,7 +1227,7 @@ void pqSelectionInspectorPanel::updateSurfaceIDConnections()
     return;
     }
 
-  if(this->Implementation->SelectionTypeAdaptor->currentText() != "Surface")
+  if(this->Implementation->SelectionTypeAdaptor->currentText() != "IDs")
   {
     return;
   }
@@ -1409,7 +1410,7 @@ void pqSelectionInspectorPanel::onSelectionModeChanged(int selMode)
 {
   if(selMode == pqRubberBandHelper::SELECT)
     {
-    this->Implementation->SelectionTypeAdaptor->setCurrentText("Surface");
+    this->Implementation->SelectionTypeAdaptor->setCurrentText("IDs");
     }
   else if(selMode == pqRubberBandHelper::FRUSTUM)
     {
@@ -1440,11 +1441,38 @@ void pqSelectionInspectorPanel::onSelectionContentTypeChanged()
 
   if(contType == vtkSelection::INDICES || contType == vtkSelection::GLOBALIDS)
     {
-    this->Implementation->SelectionTypeAdaptor->setCurrentText("Surface");
+    this->Implementation->SelectionTypeAdaptor->setCurrentText("IDs");
     }
   else if(contType == vtkSelection::FRUSTUM)
     {
     this->Implementation->SelectionTypeAdaptor->setCurrentText("Frustum");
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::onSelectionFieldTypeChanged()
+{
+  // Set up selection connections
+  vtkSMProxy* selectionSource = this->Implementation->SelectionSource.GetPointer();
+  if(!selectionSource)
+  {
+    return;
+  }
+
+  vtkSMProperty* idvp = selectionSource->GetProperty("FieldType");
+  if(!idvp)
+  {
+    return;
+  }
+  int contType = pqSMAdaptor::getElementProperty(idvp).toInt();
+
+  if(contType == vtkSelection::CELL)
+    {
+    this->Implementation->FieldTypeAdaptor->setCurrentText("CELL");
+    }
+  else if(contType == vtkSelection::POINT)
+    {
+    this->Implementation->FieldTypeAdaptor->setCurrentText("POINT");
     }
 }
 

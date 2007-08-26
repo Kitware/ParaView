@@ -67,7 +67,9 @@ public:
   {
     INTERACT,
     SELECT, //aka, Surface selection
-    FRUSTUM
+    SELECT_POINTS,
+    FRUSTUM,
+    FRUSTUM_POINTS
   };
   //ETX
 
@@ -79,10 +81,9 @@ public slots:
   /// Begin rubber band surface selection on the view. 
   /// Has any effect only if active view is a render view.
   void beginSelection();
-
-  /// Begin rubber band frustum selection on the view. 
-  /// Has any effect only if active view is a render view.
+  void beginSurfacePointsSelection();
   void beginFrustumSelection();
+  void beginFrustumPointsSelection();
 
   /// End rubber band selection.
   /// Has any effect only if active view is a render view.

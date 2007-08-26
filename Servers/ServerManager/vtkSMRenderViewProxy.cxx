@@ -89,7 +89,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.40");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.41");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1312,13 +1312,14 @@ bool vtkSMRenderViewProxy::SelectOnSurface(unsigned int x0,
   vtkCollection* selectedRepresentations,
   vtkCollection* selectionSources,
   vtkCollection* surfaceSelections,
-  bool multiple_selections/*=true*/)
+  bool multiple_selections/*=true*/,
+  bool ofPoints/*=false*/)
 {
   // 1) Create surface selection.
   //   Will returns a surface selection in terms of cells selected on the 
   //   visible props from all representations.
-  vtkSelection* surfaceSel = this->SelectVisibleCells(x0, y0, x1, y1);
-
+  vtkSelection* surfaceSel = this->SelectVisibleCells(x0, y0, x1, y1, ofPoints);
+  
   if (!multiple_selections)
     {
     vtkSMRenderViewProxyShrinkSelection(surfaceSel);
@@ -1359,11 +1360,12 @@ bool vtkSMRenderViewProxy::SelectOnSurface(unsigned int x0,
 
 //-----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0, 
-                                           unsigned int y0, unsigned int x1, unsigned int y1,
-                                           vtkCollection* selectedRepresentations,
-                                           vtkCollection* selectionSources,
-                                           vtkCollection* frustumSelections,
-                                           bool vtkNotUsed(multiple_selections))
+                                         unsigned int y0, unsigned int x1, unsigned int y1,
+                                         vtkCollection* selectedRepresentations,
+                                         vtkCollection* selectionSources,
+                                         vtkCollection* frustumSelections,
+                                         bool vtkNotUsed(multiple_selections),
+                                         bool ofPoints/*=false*/)
 {
   int displayRectangle[4] = {x0, y0, x1, y1};
   if (displayRectangle[0] == displayRectangle[2])
@@ -1434,6 +1436,11 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
   vtkSelection* frustumSel = vtkSelection::New();
   frustumSel->GetProperties()->Set(
     vtkSelection::CONTENT_TYPE(), vtkSelection::FRUSTUM);
+  if (ofPoints)
+    {
+    frustumSel->GetProperties()->Set(
+      vtkSelection::FIELD_TYPE(), vtkSelection::POINT);
+    }
   frustumSel->SetSelectionList(frustcorners);
   frustcorners->Delete();
 
@@ -1478,7 +1485,6 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
         continue;
         }
       selectionSources->AddItem(selectionSource);
-        
       if (frustumSelections)
         {
         frustumSelections->AddItem(frustumSel);
@@ -1499,7 +1505,7 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
 
 //-----------------------------------------------------------------------------
 vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0, 
-  unsigned int y0, unsigned int x1, unsigned int y1)
+  unsigned int y0, unsigned int x1, unsigned int y1, int ofPoints)
 {  
   if (!this->IsSelectionAvailable())
     {
@@ -1653,8 +1659,13 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
     me2->SetRemoteRenderThreshold(0.0);
     }      
 
+  if (ofPoints)
+    {
+    pti->SetDoVertices(1);
+    }
+
   unsigned char *buf;  
-  for (int p = 0; p < 5; p++)
+  for (int p = 0; p < 6; p++)
     {
     if ((p==0) && (numProcessors==1))
       {
@@ -1667,6 +1678,10 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
     if ((p==3) && (needs_2_passes==0))
       {
       p++;
+      }
+    if ((p==5) && (!ofPoints))
+      {
+      break;
       }
     //put into a selection mode
     setModeMethod->SetElements1(p+1);

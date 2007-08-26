@@ -25,7 +25,7 @@
      <x>0</x>
      <y>0</y>
      <width>970</width>
-     <height>19</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp" >
@@ -73,18 +73,6 @@
      <string>F&amp;ilters</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuAnimation" >
-    <property name="title" >
-     <string>A&amp;nimation</string>
-    </property>
-    <addaction name="actionVCRFirstFrame" />
-    <addaction name="actionVCRPreviousFrame" />
-    <addaction name="actionVCRPlay" />
-    <addaction name="actionVCRPause" />
-    <addaction name="actionVCRNextFrame" />
-    <addaction name="actionVCRLastFrame" />
-    <addaction name="actionVCRLoop" />
-   </widget>
    <widget class="QMenu" name="menuTools" >
     <property name="title" >
      <string>&amp;Tools</string>
@@ -106,6 +94,18 @@
     <addaction name="actionToolsOutputWindow" />
     <addaction name="separator" />
     <addaction name="actionToolsPythonShell" />
+   </widget>
+   <widget class="QMenu" name="menuAnimation" >
+    <property name="title" >
+     <string>A&amp;nimation</string>
+    </property>
+    <addaction name="actionVCRFirstFrame" />
+    <addaction name="actionVCRPreviousFrame" />
+    <addaction name="actionVCRPlay" />
+    <addaction name="actionVCRPause" />
+    <addaction name="actionVCRNextFrame" />
+    <addaction name="actionVCRLastFrame" />
+    <addaction name="actionVCRLoop" />
    </widget>
    <widget class="QMenu" name="menuView" >
     <property name="title" >
@@ -153,7 +153,9 @@
     <addaction name="separator" />
     <addaction name="actionMoveMode" />
     <addaction name="actionSelectionMode" />
+    <addaction name="actionSelectSurfacePoints" />
     <addaction name="actionSelect_Frustum" />
+    <addaction name="actionSelectFrustumPoints" />
     <addaction name="separator" />
     <addaction name="actionEditView" />
    </widget>
@@ -240,7 +242,9 @@
    </attribute>
    <addaction name="actionMoveMode" />
    <addaction name="actionSelectionMode" />
+   <addaction name="actionSelectSurfacePoints" />
    <addaction name="actionSelect_Frustum" />
+   <addaction name="actionSelectFrustumPoints" />
   </widget>
   <widget class="QToolBar" name="undoRedoToolbar" >
    <property name="windowTitle" >
@@ -1032,7 +1036,7 @@
   </action>
   <action name="actionDelete" >
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqDelete24.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>&amp;Delete</string>
@@ -1130,6 +1134,34 @@
    </property>
    <property name="text" >
     <string>Select Thresholds</string>
+   </property>
+  </action>
+  <action name="actionSelectSurfacePoints" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqSelectSurfPoints24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>SelectSurfacePoints</string>
+   </property>
+  </action>
+  <action name="actionSelectFrustumPoints" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqSelectFrustPoints24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>SelectFrustumPoints</string>
    </property>
   </action>
  </widget>

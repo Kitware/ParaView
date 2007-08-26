@@ -437,8 +437,10 @@ MainWindow::MainWindow() :
   QActionGroup *modeGroup = new QActionGroup(this);
   modeGroup->addAction(this->Implementation->UI.actionMoveMode);
   modeGroup->addAction(this->Implementation->UI.actionSelectionMode);
+  modeGroup->addAction(this->Implementation->UI.actionSelectSurfacePoints);
  // modeGroup->addAction(this->Implementation->UI.actionSelect_Thresholds);
   modeGroup->addAction(this->Implementation->UI.actionSelect_Frustum);
+  modeGroup->addAction(this->Implementation->UI.actionSelectFrustumPoints);
 
   this->Implementation->Core.setupVariableToolbar(
     this->Implementation->UI.variableToolbar);
@@ -692,13 +694,33 @@ MainWindow::MainWindow() :
     this->Implementation->UI.actionMoveMode, SIGNAL(triggered()),
     this->Implementation->Core.renderViewSelectionHelper(), SLOT(endSelection()));
   
-  // Surface Selection mode is available only for 3D views.
+  // 3d Selection Modes
   QObject::connect(
     this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)), 
     this->Implementation->UI.actionSelectionMode, SLOT(setEnabled(bool)));
   QObject::connect(
+    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)), 
+    this->Implementation->UI.actionSelectSurfacePoints, SLOT(setEnabled(bool)));
+  QObject::connect(
+    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)), 
+    this->Implementation->UI.actionSelect_Frustum, SLOT(setEnabled(bool)));
+  QObject::connect(
+    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)), 
+    this->Implementation->UI.actionSelectFrustumPoints, SLOT(setEnabled(bool)));
+
+
+  QObject::connect(
     this->Implementation->UI.actionSelectionMode, SIGNAL(triggered()), 
-    this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginSelection()));
+    this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginSelection()));  
+  QObject::connect(
+    this->Implementation->UI.actionSelectSurfacePoints, SIGNAL(triggered()), 
+    this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginSurfacePointsSelection()));  
+  QObject::connect(
+    this->Implementation->UI.actionSelect_Frustum, SIGNAL(triggered()), 
+    this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginFrustumSelection()));
+  QObject::connect(
+    this->Implementation->UI.actionSelectFrustumPoints, SIGNAL(triggered()), 
+    this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginFrustumPointsSelection()));
 
   QObject::connect(
     this->Implementation->Core.renderViewSelectionHelper(), 
@@ -708,14 +730,6 @@ MainWindow::MainWindow() :
     this->Implementation->Core.renderViewSelectionHelper(), 
     SIGNAL(interactionModeChanged(bool)),
     this->Implementation->UI.actionMoveMode, SLOT(setChecked(bool)));
-  
-  // Frustum Selection mode is available only for 3D views.
-  QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)), 
-    this->Implementation->UI.actionSelect_Frustum, SLOT(setEnabled(bool)));
-  QObject::connect(
-    this->Implementation->UI.actionSelect_Frustum, SIGNAL(triggered()), 
-    this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginFrustumSelection()));
 
   // When a selection is marked, we revert to interaction mode.
   QObject::connect(
@@ -973,9 +987,17 @@ void MainWindow::onSelectionModeChanged(int mode)
       {
       this->Implementation->UI.actionSelectionMode->setChecked(true);
       }
+    else if(mode == pqRubberBandHelper::SELECT_POINTS) //surface selection
+      {
+      this->Implementation->UI.actionSelectSurfacePoints->setChecked(true);
+      }
     else if(mode == pqRubberBandHelper::FRUSTUM)
       {
       this->Implementation->UI.actionSelect_Frustum->setChecked(true);
+      }
+    else if(mode == pqRubberBandHelper::FRUSTUM_POINTS)
+      {
+      this->Implementation->UI.actionSelectFrustumPoints->setChecked(true);
       }
     else // INTERACT
       {

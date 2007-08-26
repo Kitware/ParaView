@@ -35,7 +35,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.8");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.9");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -156,6 +156,9 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelection(
   int contentType = selection->GetChild(0)->GetProperties()->Get(
     vtkSelection::CONTENT_TYPE());
 
+  int fieldType = selection->GetChild(0)->GetProperties()->Get(
+    vtkSelection::FIELD_TYPE());
+
   if(contentType == vtkSelection::FRUSTUM)
     {
     vtkSelection* child = selection->GetChild(0);
@@ -167,6 +170,10 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelection(
     vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
       selectionSourceP->GetProperty("ContentType"));
     ivp->SetElement(0, contentType);
+
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
+      selectionSourceP->GetProperty("FieldType"));
+    ivp->SetElement(0, fieldType);
 
     // Set the selection ids, which is the frustum vertex.
     vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -225,17 +232,21 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelection(
           ids->SetElement(counter++, idList->GetValue(idx));
           }
         }
+
+      child->GetProperties()->Set(vtkSelection::CONTENT_TYPE(), contentType);
+      child->GetProperties()->Set(vtkSelection::FIELD_TYPE(), fieldType);      
       }
+
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      selectionSourceP->GetProperty("FieldType"));
+    ivp->SetElement(0, fieldType);
+
     }
 
   /*
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     selectionSourceP->GetProperty("ContentType"));
   ivp->SetElement(0, selection->GetProperties()->Get(vtkSelection::CONTENT_TYPE()));
-
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    selectionSourceP->GetProperty("FieldType"));
-  ivp->SetElement(0, selection->GetProperties()->Get(vtkSelection::FIELD_TYPE()));
   */
 
   selectionSourceP->UpdateVTKObjects();

@@ -55,6 +55,8 @@ public:
 
   virtual void SetRenderer(vtkRenderer *);
 
+  void SetDoVertices(int mode);
+
 protected:
   vtkPVVisibleCellSelector() {};
   ~vtkPVVisibleCellSelector() {};
