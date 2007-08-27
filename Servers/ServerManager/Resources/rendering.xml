@@ -1721,6 +1721,30 @@
         animateable="0">
         <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
       </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="EdgeColor"
+        command="SetEdgeColor"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <Documentation>
+          Set the edge color. This color is used to draw the edge for the
+          polygonal data when EdgeVisibility is on.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="EdgeVisibility"
+        command="SetEdgeVisibility"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Set the edge visibility. This has any effect only when Visibility is
+          On and Representation type if Surface.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
       <!-- End of Property -->
     </Proxy>
     
@@ -4110,6 +4134,8 @@
           <Property name="AmbientColor" />
           <Property name="Color" />
           <Property name="DiffuseColor" />
+          <Property name="EdgeColor" />
+          <Property name="EdgeVisibility" />
           <Property name="Interpolation" />
           <Property name="LineWidth" />
           <Property name="Opacity" />
@@ -4627,6 +4653,8 @@
           <Property name="Color" />
           <Property name="Diffuse" />
           <Property name="DiffuseColor" />
+          <Property name="EdgeColor" />
+          <Property name="EdgeVisibility" />
           <Property name="Interpolation" />
           <Property name="LineWidth" />
           <Property name="Opacity" />
@@ -4635,6 +4663,7 @@
           <Property name="Specular" />
           <Property name="SpecularColor" />
           <Property name="SpecularPower" />
+
         </ExposedProperties>
       </SubProxy>
 

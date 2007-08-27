@@ -32,10 +32,12 @@
 #include "vtkInformation.h"
 #include "vtkInformationIntegerKey.h"
 #include "vtkInstantiator.h"
+#include "vtkMapper.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
 #include "vtkPVClientServerIdCollectionInformation.h"
+#include "vtkPVDisplayInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkPVOpenGLExtensionsInformation.h"
@@ -53,14 +55,13 @@
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMPropRepresentationProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMRenderViewHelper.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
-#include "vtkPVDisplayInformation.h"
-#include "vtkSMRenderViewHelper.h"
 
 #include "vtkSMMultiProcessRenderView.h"
 #include "vtkProp3DCollection.h"
@@ -89,7 +90,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.41");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.42");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -100,6 +101,9 @@ vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_ORDERED_COMPOSITING, Integer);
 //-----------------------------------------------------------------------------
 vtkSMRenderViewProxy::vtkSMRenderViewProxy()
 {
+  // This is essential to ensure that edge-visibility works correctly.
+  vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
+
   // All the subproxies are created on Client and Render Server.
   this->RendererProxy = 0;
   this->Renderer2DProxy = 0;
