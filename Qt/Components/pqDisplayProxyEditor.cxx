@@ -79,6 +79,7 @@ public:
     this->Links = new pqPropertyLinks;
     this->InterpolationAdaptor = 0;
     this->ColorAdaptor = 0;
+    this->EdgeColorAdaptor = 0;
     }
 
   ~pqDisplayProxyEditorInternal()
@@ -93,6 +94,7 @@ public:
   QPointer<pqPipelineRepresentation> Representation;
   pqSignalAdaptorComboBox* InterpolationAdaptor;
   pqSignalAdaptorColor*    ColorAdaptor;
+  pqSignalAdaptorColor*    EdgeColorAdaptor;
 
   // map of <material labels, material files>
   static QMap<QString, QString> MaterialMap;
@@ -307,6 +309,14 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
       reprProxy, reprProxy->GetProperty("ScalarOpacityUnitDistance"));
     }
 
+  this->Internal->Links->addPropertyLink(
+    this->Internal->EdgeVisibility, "checked", SIGNAL(stateChanged(int)),
+    reprProxy, reprProxy->GetProperty("EdgeVisibility"));
+
+  this->Internal->Links->addPropertyLink(this->Internal->EdgeColorAdaptor,
+    "color", SIGNAL(colorChanged(const QVariant&)),
+    reprProxy, reprProxy->GetProperty("EdgeColor"));
+
 #if 0                                       //FIXME 
   // material
   this->Internal->StyleMaterial->blockSignals(true);
@@ -452,6 +462,10 @@ void pqDisplayProxyEditor::setupGUIConnections()
                             this->Internal->ColorActorColor,
                             "chosenColor",
                             SIGNAL(chosenColorChanged(const QColor&)), false);
+  this->Internal->EdgeColorAdaptor = new pqSignalAdaptorColor(
+    this->Internal->EdgeColor, "chosenColor",
+    SIGNAL(chosenColorChanged(const QColor&)), false);
+
   QObject::connect(
     this->Internal->ColorActorColor, SIGNAL(chosenColorChanged(const QColor&)),
     this, SLOT(updateAllViews()));
@@ -479,9 +493,12 @@ void pqDisplayProxyEditor::updateEnableState()
         this->Internal->ColorMapPage);
     }
 
+  int reprType = this->Internal->Representation->getRepresentationType();
+  
   this->Internal->ScalarOpacityUnitDistance->setEnabled(
-    this->Internal->Representation->getRepresentationType() == 
-    vtkSMPVRepresentationProxy::VOLUME);
+    reprType == vtkSMPVRepresentationProxy::VOLUME);
+  this->Internal->EdgeStyleGroup->setEnabled(
+    reprType == vtkSMPVRepresentationProxy::SURFACE);
 
   vtkSMDataRepresentationProxy* display = 
     this->Internal->Representation->getRepresentationProxy();
