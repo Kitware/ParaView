@@ -98,7 +98,7 @@ private:
   QList<QString> SelectedLookmarks;
   pqLookmarkModel *CurrentLookmark;
   pqLookmarkManagerModel *Model;
-  //QStandardItemModel *PipelineModel;
+  QStandardItemModel *PipelineModel;
   pqLookmarkInspectorForm *Form;   ///< Defines the gui layout.
 };
 
