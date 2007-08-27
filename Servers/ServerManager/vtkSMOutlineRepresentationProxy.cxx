@@ -29,7 +29,7 @@
 #include "vtkSMViewProxy.h"
 
 vtkStandardNewMacro(vtkSMOutlineRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMOutlineRepresentationProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMOutlineRepresentationProxy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMOutlineRepresentationProxy::vtkSMOutlineRepresentationProxy()
 {
@@ -219,14 +219,6 @@ vtkSMProxy* vtkSMOutlineRepresentationProxy::ConvertSelection(
     if (properties->Has(vtkSelection::PROP_ID()))
       {
       hasProp = false;
-      vtkClientServerID propId;
-
-      propId.ID = static_cast<vtkTypeUInt32>(properties->Get(
-        vtkSelection::PROP_ID()));
-      if (propId == this->Prop3D->GetID())
-        {
-        hasProp = true;
-        }
       }
     else if(properties->Has(vtkSelection::PROP()))
       {
