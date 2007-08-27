@@ -432,6 +432,7 @@ void pqLineSeriesEditorModel::setDisplay(pqLineChartRepresentation *display)
 void pqLineSeriesEditorModel::reloadSeries()
 {
   this->cleanupItems();
+  this->Items.clear();
   if(!this->Display.isNull())
     {
     int total = this->Display->getNumberOfSeries();
