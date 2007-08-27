@@ -16,15 +16,18 @@
 
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
+#include "vtkPVDisplayInformation.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationStrategy.h"
 
-vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.2");
+vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.3");
 //----------------------------------------------------------------------------
 vtkSMMultiProcessRenderView::vtkSMMultiProcessRenderView()
 {
   this->RemoteRenderThreshold = 20.0;
   this->LastCompositingDecision = false;
+  this->RemoteRenderAvailable = false;
 }
 
 //----------------------------------------------------------------------------
@@ -67,6 +70,12 @@ vtkSMRepresentationStrategy* vtkSMMultiProcessRenderView::NewStrategyInternal(
 bool vtkSMMultiProcessRenderView::GetCompositingDecision(
   unsigned long totalMemory, int vtkNotUsed(stillRender))
 {
+  if (!this->RemoteRenderAvailable)
+    {
+    // Cannot remote render due to setup issues.
+    return false;
+    }
+
   if (static_cast<float>(totalMemory)/1000.0 < this->RemoteRenderThreshold)
     {
     return false; // Local render.
@@ -140,11 +149,29 @@ void vtkSMMultiProcessRenderView::SetUseCompositing(bool usecompositing)
   this->Information->Set(USE_COMPOSITING(), usecompositing? 1: 0);
 }
 
+//-----------------------------------------------------------------------------
+void vtkSMMultiProcessRenderView::EndCreateVTKObjects()
+{
+  this->Superclass::EndCreateVTKObjects();
+
+  // Check if it's possible to access display on the server side.
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
+  pm->GatherInformation(this->ConnectionID, 
+    vtkProcessModule::RENDER_SERVER, di, pm->GetProcessModuleID());
+  this->RemoteRenderAvailable = (di->GetCanOpenDisplay() == 1);
+  di->Delete();
+}
+
 //----------------------------------------------------------------------------
 void vtkSMMultiProcessRenderView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "RemoteRenderThreshold: " << this->RemoteRenderThreshold << endl;
+  os << indent << "RemoteRenderThreshold: " 
+    << this->RemoteRenderThreshold << endl;
+  os << indent << "RemoteRenderAvailable: " 
+    << this->RemoteRenderAvailable << endl;
 }
 
 

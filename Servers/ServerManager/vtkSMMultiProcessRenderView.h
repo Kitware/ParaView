@@ -38,6 +38,12 @@ public:
   vtkSetClampMacro(RemoteRenderThreshold, double, 0, VTK_DOUBLE_MAX);
   vtkGetMacro(RemoteRenderThreshold, double);
 
+  // Description:
+  // Returns if it is possible to perform remote rendering on the given set up.
+  // It may not be possible to remote render due to server issues such as
+  // inaccessible display.
+  vtkGetMacro(RemoteRenderAvailable, bool);
+
 //BTX
 protected:
   vtkSMMultiProcessRenderView();
@@ -48,6 +54,11 @@ protected:
   // requested.
   virtual vtkSMRepresentationStrategy* NewStrategyInternal(
     int dataType);
+
+  // Description:
+  // Called at the end of CreateVTKObjects().
+  // Overridden to check if remote rendering is possible on the current setup.
+  virtual void EndCreateVTKObjects();
 
   // Description:
   // Method called before Still Render is called.
@@ -77,6 +88,7 @@ protected:
 
   double RemoteRenderThreshold;
   bool LastCompositingDecision;
+  bool RemoteRenderAvailable;
 private:
   vtkSMMultiProcessRenderView(const vtkSMMultiProcessRenderView&); // Not implemented
   void operator=(const vtkSMMultiProcessRenderView&); // Not implemented

@@ -27,7 +27,7 @@ vtkInformationKeyMacro(vtkSMIceTMultiDisplayRenderViewProxy, CLIENT_COLLECT, Int
 vtkInformationKeyMacro(vtkSMIceTMultiDisplayRenderViewProxy, CLIENT_RENDER, Integer);
 
 vtkStandardNewMacro(vtkSMIceTMultiDisplayRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTMultiDisplayRenderViewProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMIceTMultiDisplayRenderViewProxy, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMIceTMultiDisplayRenderViewProxy::vtkSMIceTMultiDisplayRenderViewProxy()
 {
@@ -57,6 +57,13 @@ void vtkSMIceTMultiDisplayRenderViewProxy::EndCreateVTKObjects()
   this->TileMullions[1] = tileMulls[1];
 
   this->Superclass::EndCreateVTKObjects();
+
+  if (!this->RemoteRenderAvailable)
+    {
+    vtkErrorMacro("Display not accessible on server. "
+      "Cannot render on tiles with inaccesible display.");
+    return;
+    }
 
   // Make the server-side windows fullscreen 
   // (unless PV_ICET_WINDOW_BORDERS is set)

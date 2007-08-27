@@ -37,7 +37,6 @@
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
 #include "vtkPVClientServerIdCollectionInformation.h"
-#include "vtkPVDisplayInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkPVOpenGLExtensionsInformation.h"
@@ -90,7 +89,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.42");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.43");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -391,31 +390,23 @@ void vtkSMRenderViewProxy::EndCreateVTKObjects()
   // way simpler this way.
   if (pm->GetOptions()->GetUseOffscreenRendering())
     {
-    // Non-mesa, X offscreen rendering requires access to the display
-    vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
-    pm->GatherInformation(this->ConnectionID, 
-      vtkProcessModule::RENDER_SERVER, di, pm->GetProcessModuleID());
-    if (di->GetCanOpenDisplay())
-      {
-      vtkClientServerStream stream;
-      stream  << vtkClientServerStream::Invoke
-              << this->RenderWindowProxy->GetID()
-              << "SetOffScreenRendering"
-              << 1
-              << vtkClientServerStream::End;
-      pm->SendStream(this->ConnectionID, 
-        vtkProcessModule::RENDER_SERVER, stream);
+    vtkClientServerStream stream;
+    stream  << vtkClientServerStream::Invoke
+            << this->RenderWindowProxy->GetID()
+            << "SetOffScreenRendering"
+            << 1
+            << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, 
+      vtkProcessModule::RENDER_SERVER, stream);
 
-      // Ensure that the client always does onscreen rendering.
-      stream  << vtkClientServerStream::Invoke
-              << this->RenderWindowProxy->GetID()
-              << "SetOffScreenRendering"
-              << 0
-              << vtkClientServerStream::End;
-      pm->SendStream(this->ConnectionID, 
-        vtkProcessModule::CLIENT, stream);
-      }
-    di->Delete();
+    // Ensure that the client always does onscreen rendering.
+    stream  << vtkClientServerStream::Invoke
+            << this->RenderWindowProxy->GetID()
+            << "SetOffScreenRendering"
+            << 0
+            << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, 
+      vtkProcessModule::CLIENT, stream);
     }
 
   this->Interactor->Enable();
@@ -1211,6 +1202,12 @@ int vtkSMRenderViewProxy::IsSelectionAvailable()
     }
   if (compThresh > 100.0) //the highest setting in the paraview gui
     {
+    return 0;
+    }
+
+  if (!me2->GetRemoteRenderAvailable())
+    {
+    // Cannot remote render.
     return 0;
     }
 

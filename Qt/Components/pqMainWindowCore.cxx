@@ -146,6 +146,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkDataObject.h>
 #include <vtkImageData.h>
 #include <vtkProcessModule.h>
+#include <vtkPVDisplayInformation.h>
 #include <vtkPVOptions.h>
 #include <vtkPVXMLElement.h>
 #include <vtkPVXMLParser.h>
@@ -2989,6 +2990,21 @@ void pqMainWindowCore::onServerCreation(pqServer* server)
   pqApplicationCore* core = pqApplicationCore::instance();
   this->Implementation->ActiveServer.setCurrent(server);
 
+  // Check if it is possible to access display on the server. If not, we show a
+  // message.
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
+  pm->GatherInformation(server->GetConnectionID(),
+    vtkProcessModule::RENDER_SERVER, di, pm->GetProcessModuleID());
+  if (!di->GetCanOpenDisplay())
+    {
+    QMessageBox::warning(this->Implementation->Parent, 
+      tr("Server DISPLAY not accessible"),
+      tr("Display is not accessible on the server side.\n"
+        "Remote rendering will be disabled."),
+      QMessageBox::Ok);
+    }
+  di->Delete();
   pqSettings* settings = core->settings();
   QString curView = settings->value("/defaultViewType",
     pqRenderView::renderViewType()).toString();
