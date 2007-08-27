@@ -89,7 +89,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.43");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.44");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1199,16 +1199,16 @@ int vtkSMRenderViewProxy::IsSelectionAvailable()
   if (me2 != NULL)
     {
     compThresh = me2->GetRemoteRenderThreshold();
-    }
-  if (compThresh > 100.0) //the highest setting in the paraview gui
-    {
-    return 0;
-    }
+    if (compThresh > 100.0) //the highest setting in the paraview gui
+      {
+      return 0;
+      }
 
-  if (!me2->GetRemoteRenderAvailable())
-    {
-    // Cannot remote render.
-    return 0;
+    if (!me2->GetRemoteRenderAvailable())
+      {
+      // Cannot remote render.
+      return 0;
+      }
     }
 
   //check if we don't have enough color depth to do color buffer selection
@@ -1648,10 +1648,10 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
     this->ForceTriStripUpdate = 0;
     }
 
+  double compThresh = 0.0;
   //Force parallel compositing on for the selection render.
   //TODO: intelligently code dataserver rank into originalcellids to
   //make this ugly hack unecessary.
-  double compThresh = 0.0;
   vtkSMMultiProcessRenderView *me2 = 
     vtkSMMultiProcessRenderView::SafeDownCast(this);
   if (me2 != NULL)
