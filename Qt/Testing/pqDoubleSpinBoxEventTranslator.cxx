@@ -46,6 +46,12 @@ bool pqDoubleSpinBoxEventTranslator::translateEvent(QObject* Object, QEvent* Eve
   QDoubleSpinBox* const object = qobject_cast<QDoubleSpinBox*>(Object);
   if(!object)
     return false;
+  
+  // consume line edit events if part of spin box
+  if(!object && qobject_cast<QDoubleSpinBox*>(Object->parent()))
+    {
+    return true;
+    }
     
   switch(Event->type())
     {

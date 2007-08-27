@@ -43,7 +43,14 @@ pqSpinBoxEventTranslator::pqSpinBoxEventTranslator(QObject* p)
 
 bool pqSpinBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& /*Error*/)
 {
-  QSpinBox* const object = qobject_cast<QSpinBox*>(Object);
+  QSpinBox* object = qobject_cast<QSpinBox*>(Object);
+  
+  // consume line edit events if part of spin box
+  if(!object && qobject_cast<QSpinBox*>(Object->parent()))
+    {
+    return true;
+    }
+
   if(!object)
     return false;
     
