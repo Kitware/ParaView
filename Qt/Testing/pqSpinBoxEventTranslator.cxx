@@ -56,11 +56,11 @@ bool pqSpinBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event, bo
     
   switch(Event->type())
     {
-    case QEvent::Enter:
+    case QEvent::FocusIn:
       this->CurrentObject = Object;
       connect(object, SIGNAL(valueChanged(int)), this, SLOT(onValueChanged(int)));
       break;
-    case QEvent::Leave:
+    case QEvent::FocusOut:
       disconnect(Object, 0, this, 0);
       this->CurrentObject = 0;
       break;

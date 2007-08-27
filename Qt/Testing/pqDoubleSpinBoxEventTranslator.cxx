@@ -55,11 +55,11 @@ bool pqDoubleSpinBoxEventTranslator::translateEvent(QObject* Object, QEvent* Eve
     
   switch(Event->type())
     {
-    case QEvent::Enter:
+    case QEvent::FocusIn:
       this->CurrentObject = Object;
       connect(object, SIGNAL(valueChanged(double)), this, SLOT(onValueChanged(double)));
       break;
-    case QEvent::Leave:
+    case QEvent::FocusOut:
       disconnect(Object, 0, this, 0);
       this->CurrentObject = 0;
       break;
