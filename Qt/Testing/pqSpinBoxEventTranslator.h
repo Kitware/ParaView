@@ -55,10 +55,6 @@ private:
   pqSpinBoxEventTranslator(const pqSpinBoxEventTranslator&);
   pqSpinBoxEventTranslator& operator=(const pqSpinBoxEventTranslator&);
 
-  QObject* CurrentObject;
-  
-private slots:
-  void onValueChanged(int);  
 };
 
 #endif // !_pqSpinBoxEventTranslator_h

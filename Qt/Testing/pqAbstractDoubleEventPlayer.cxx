@@ -42,15 +42,28 @@ pqAbstractDoubleEventPlayer::pqAbstractDoubleEventPlayer(QObject* p)
 
 bool pqAbstractDoubleEventPlayer::playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
 {
-  if(Command != "set_double")
+  if(Command != "set_double" && Command != "spin")
     return false;
 
   const double value = Arguments.toDouble();
     
   if(QDoubleSpinBox* const object = qobject_cast<QDoubleSpinBox*>(Object))
     {
-    object->setValue(value);
-    return true;
+    if(Command == "set_double")
+      {
+      object->setValue(value);
+      return true;
+      }
+    else if(Command == "spin" && Arguments == "up")
+      {
+      object->stepUp();
+      return true;
+      }
+    else if(Command == "spin" && Arguments == "down")
+      {
+      object->stepDown();
+      return true;
+      }
     }
 
   qCritical() << "calling set_double on unhandled type " << Object;
