@@ -84,7 +84,7 @@ vtkStandardNewMacro(vtkTestingOutputWindow);
 
 
 
-vtkCxxRevisionMacro(vtkTestingProcessModuleGUIHelper, "1.7");
+vtkCxxRevisionMacro(vtkTestingProcessModuleGUIHelper, "1.8");
 vtkStandardNewMacro(vtkTestingProcessModuleGUIHelper);
 
 //----------------------------------------------------------------------------
@@ -167,9 +167,7 @@ int vtkTestingProcessModuleGUIHelper::RunGUIStart(int , char **,
   parser->Delete();
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  pxm->UpdateRegisteredProxies("sources", 0);
-  pxm->UpdateRegisteredProxies("filters", 0);
-  pxm->UpdateRegisteredProxies(0);
+  pxm->UpdateRegisteredProxiesInOrder(0);
 
   vtkSMRenderViewProxy* rm = vtkSMRenderViewProxy::SafeDownCast(
     pxm->GetProxy("rendermodules", "RenderModule0"));

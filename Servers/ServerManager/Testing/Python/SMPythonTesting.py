@@ -80,8 +80,7 @@ def LoadServerManagerState(filename):
   root = parser.GetRootElement()
   if loader.LoadState(root,0):
     pxm = servermanager.vtkSMObject.GetProxyManager()
-    pxm.UpdateRegisteredProxies("sources", 0)
-    pxm.UpdateRegisteredProxies("filters", 0)
+    pxm.UpdateRegisteredProxiesInOrder(0);
     pxm.UpdateRegisteredProxies(0)
     return True
   return Error("Failed to load state file %s" % filename)
