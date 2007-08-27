@@ -6264,7 +6264,7 @@
    fun:__glXInitialize
    obj:/usr/lib/libGL.so.1.2
    fun:glXChooseVisual
-   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiii
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
    fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
 }
 {
@@ -7815,7 +7815,7 @@
    fun:__glXInitialize
    obj:/usr/lib/libGL.so.1.2
    fun:glXChooseVisual
-   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiii
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
    fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
 }
 {
@@ -9599,7 +9599,7 @@
    fun:__glXInitialize
    obj:/usr/lib/libGL.so.1.2
    fun:glXChooseVisual
-   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiii
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
    fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
    fun:_ZN22vtkXOpenGLRenderWindow15GetDesiredDepthEv
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -9613,7 +9613,7 @@
    fun:__glXInitialize
    obj:/usr/lib/libGL.so.1.2
    fun:glXChooseVisual
-   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiii
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
    fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
    fun:_ZN22vtkXOpenGLRenderWindow15GetDesiredDepthEv
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -9687,8 +9687,6 @@
    fun:XOpenDisplay
    fun:_ZN22vtkXOpenGLRenderWindow12GetDisplayIdEv
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
-   fun:_ZN15vtkRenderWindow6RenderEv
-   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
 }
 {
    <insert a suppression name here>
@@ -9730,7 +9728,7 @@
    fun:__glXInitialize
    obj:/usr/lib/libGL.so.1.2
    fun:glXChooseVisual
-   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiii
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
    fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
    fun:_ZN22vtkXOpenGLRenderWindow15GetDesiredDepthEv
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -9817,7 +9815,7 @@
    fun:__glXInitialize
    obj:/usr/lib/libGL.so.1.2
    fun:glXChooseVisual
-   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiii
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
    fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
    fun:_ZN22vtkXOpenGLRenderWindow15GetDesiredDepthEv
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -9925,7 +9923,7 @@
    fun:__glXInitialize
    obj:/usr/lib/libGL.so.1.2
    fun:glXChooseVisual
-   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiii
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
    fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
    fun:_ZN22vtkXOpenGLRenderWindow15GetDesiredDepthEv
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -9999,7 +9997,7 @@
    fun:__glXInitialize
    obj:/usr/lib/libGL.so.1.2
    fun:glXChooseVisual
-   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiii
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
    fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
    fun:_ZN22vtkXOpenGLRenderWindow15GetDesiredDepthEv
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -10783,7 +10781,7 @@
    fun:__glXInitialize
    obj:/usr/lib/libGL.so.1.2
    fun:glXChooseVisual
-   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiii
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
    fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
    fun:_ZN22vtkXOpenGLRenderWindow15GetDesiredDepthEv
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -12923,7 +12921,7 @@
    fun:__glXInitialize
    obj:/usr/lib/libGL.so.1.2
    fun:glXChooseVisual
-   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiii
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
    fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
    fun:_ZN10QVTKWidget16x11_setup_windowEv
    fun:_ZN10QVTKWidget15SetRenderWindowEP15vtkRenderWindow
