@@ -1211,7 +1211,7 @@ def CreateRenderView(connection=None, **extraArgs):
     proxy_xml_name = _getRenderViewName(connection)
     ren_module = None
     if proxy_xml_name:
-        ren_module = CreateProxy("newviews", proxy_xml_name, connection)
+        ren_module = CreateProxy("views", proxy_xml_name, connection)
     if not ren_module:
         return None
     extraArgs['proxy'] = ren_module
@@ -1466,7 +1466,7 @@ def _updateModules():
     _createModule("filters", filters)
     _createModule("writers", writers)
     _createModule("representations", rendering)
-    _createModule("newviews", rendering)
+    _createModule("views", rendering)
     _createModule("lookup_tables", rendering)
     _createModule("animation", animation)
     _createModule('animation_keyframes', animation)
@@ -1478,7 +1478,7 @@ def _createModules():
     filters = _createModule('filters')
     writers = _createModule('writers')
     rendering = _createModule('representations')
-    _createModule('newviews', rendering)
+    _createModule('views', rendering)
     _createModule("lookup_tables", rendering)
     animation = _createModule('animation')
     _createModule('animation_keyframes', animation)

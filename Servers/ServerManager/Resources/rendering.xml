@@ -2439,7 +2439,7 @@
     <!-- End of strategies -->
   </ProxyGroup>
 
-  <ProxyGroup name="newviews">
+  <ProxyGroup name="views">
     <Proxy name="ViewBase">
       <Documentation>
         Defines common API for all views.
@@ -2500,7 +2500,7 @@
     </Proxy>
 
     <ViewProxy name="SpreadSheetView" 
-      base_proxygroup="newviews" 
+      base_proxygroup="views" 
       base_proxyname="ViewBase"
       representation_name="SpreadSheetRepresentation">
 
@@ -2509,7 +2509,7 @@
 
 
     <ViewProxy name="BarChartView" 
-      base_proxygroup="newviews" base_proxyname="ViewBase"
+      base_proxygroup="views" base_proxyname="ViewBase"
       representation_name="BarChartRepresentation">
       <Documentation>
         View proxy for a bar char view.
@@ -2723,7 +2723,7 @@
     </ViewProxy>
 
     <ViewProxy name="XYPlotView"
-      base_proxygroup="newviews" base_proxyname="ViewBase"
+      base_proxygroup="views" base_proxyname="ViewBase"
       representation_name="XYPlotRepresentation" >
       <Documentation>
         View proxy used for XY line plots.
@@ -2936,7 +2936,7 @@
     </ViewProxy>
 
     <Proxy name="RenderViewBase"
-      base_proxygroup="newviews" 
+      base_proxygroup="views" 
       base_proxyname="ViewBase">
       <Documentation>
         This defines the properties/subproxies common to all render view
@@ -3103,7 +3103,7 @@
     </Proxy>
 
     <RenderViewProxy name="RenderView" 
-      base_proxygroup="newviews" base_proxyname="RenderViewBase">
+      base_proxygroup="views" base_proxyname="RenderViewBase">
       <Documentation>
         Simplest render view without compositing/client-server support.
       </Documentation>
@@ -3130,7 +3130,7 @@
     </RenderViewProxy>
 
     <IceTCompositeViewProxy name="IceTCompositeView"
-      base_proxygroup="newviews" base_proxyname="RenderViewBase">
+      base_proxygroup="views" base_proxyname="RenderViewBase">
       <Documentation>
         IceT Render View with compositing which can be used when no
         client-server delivery is required.
@@ -3233,7 +3233,7 @@
     </IceTCompositeViewProxy>
 
     <IceTDesktopRenderViewProxy name="IceTDesktopRenderView"
-      base_proxygroup="newviews" base_proxyname="RenderViewBase">
+      base_proxygroup="views" base_proxyname="RenderViewBase">
       <Documentation>
         IceT Render View with compositing and client delivery mechanisms.
       </Documentation>
@@ -3349,7 +3349,7 @@
     </IceTDesktopRenderViewProxy>
 
     <IceTMultiDisplayRenderViewProxy name="IceTMultiDisplayRenderView"
-      base_proxygroup="newviews" base_proxyname="IceTDesktopRenderView">
+      base_proxygroup="views" base_proxyname="IceTDesktopRenderView">
       <Documentation>
       IceT Render View for tile displays.
       </Documentation>
@@ -3384,7 +3384,7 @@
     </IceTMultiDisplayRenderViewProxy>
 
     <ClientServerRenderViewProxy name="ClientServerRenderView"
-      base_proxygroup="newviews" base_proxyname="RenderViewBase">
+      base_proxygroup="views" base_proxyname="RenderViewBase">
       <Documentation>
         Render View with client delivery mechanism. Does not support paralle
         rendering.
@@ -3445,7 +3445,7 @@
     </ClientServerRenderViewProxy>
 
     <Proxy name="ComparativeViewBase"
-      base_proxygroup="newviews" base_proxyname="ViewBase">
+      base_proxygroup="views" base_proxyname="ViewBase">
       <Documentation>
         Base interface for the ComparativeView. It has all the properties except
         the RootView subproxy.
@@ -3526,14 +3526,14 @@
     </Proxy>
 
     <ComparativeViewProxy name="ComparativeRenderView"
-      base_proxygroup="newviews" base_proxyname="ComparativeViewBase">
+      base_proxygroup="views" base_proxyname="ComparativeViewBase">
       <Documentation>
         The is comparative view comprising of individual "RenderView" proxies
         for each panel in the comparative view grid.
       </Documentation>
 
       <SubProxy>
-        <Proxy name="RootView" proxygroup="newviews" proxyname="RenderView">
+        <Proxy name="RootView" proxygroup="views" proxyname="RenderView">
         </Proxy>
         <ExposedProperties>
           <Property name="LODThreshold" />
@@ -3592,7 +3592,7 @@
     </ComparativeViewProxy>
 
     <ComparativeViewProxy name="ComparativeIceTDesktopRenderView"
-      base_proxygroup="newviews" base_proxyname="ComparativeViewBase">
+      base_proxygroup="views" base_proxyname="ComparativeViewBase">
       <Documentation>
         The is comparative view comprising of individual 
         "IceTDesktopRenderView" proxies
@@ -3601,7 +3601,7 @@
 
       <SubProxy>
         <Proxy name="RootView" 
-          proxygroup="newviews" proxyname="IceTDesktopRenderView">
+          proxygroup="views" proxyname="IceTDesktopRenderView">
         </Proxy>
         <ExposedProperties>
           <Property name="LODThreshold" />
@@ -3664,7 +3664,7 @@
     </ComparativeViewProxy>
 
     <ComparativeViewProxy name="ComparativeIceTMultiDisplayRenderView"
-      base_proxygroup="newviews" base_proxyname="ComparativeViewBase">
+      base_proxygroup="views" base_proxyname="ComparativeViewBase">
       <Documentation>
         The is comparative view comprising of individual 
         "IceTMultiDisplayRenderView" proxies
@@ -3673,7 +3673,7 @@
 
       <SubProxy>
         <Proxy name="RootView" 
-          proxygroup="newviews" proxyname="IceTMultiDisplayRenderView">
+          proxygroup="views" proxyname="IceTMultiDisplayRenderView">
         </Proxy>
         <ExposedProperties>
           <Property name="LODThreshold" />
@@ -3738,7 +3738,7 @@
     </ComparativeViewProxy>
 
     <ComparativeViewProxy name="ComparativeClientServerRenderView"
-      base_proxygroup="newviews" base_proxyname="ComparativeViewBase">
+      base_proxygroup="views" base_proxyname="ComparativeViewBase">
       <Documentation>
         The is comparative view comprising of individual 
         "ClientServerRenderView" proxies
@@ -3747,7 +3747,7 @@
 
       <SubProxy>
         <Proxy name="RootView" 
-          proxygroup="newviews" proxyname="ClientServerRenderView">
+          proxygroup="views" proxyname="ClientServerRenderView">
         </Proxy>
         <ExposedProperties>
           <Property name="LODThreshold" />
@@ -3806,7 +3806,7 @@
       <!-- End of ComparativeClientServerRenderView -->
     </ComparativeViewProxy>
 
-    <!-- End if group "newviews" -->
+    <!-- End if group "views" -->
   </ProxyGroup>
 
   <ProxyGroup name="representations">

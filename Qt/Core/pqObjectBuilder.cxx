@@ -335,7 +335,7 @@ pqView* pqObjectBuilder::createView(const QString& type,
     {
     QString xmlname = server->getRenderViewXMLName();
     xmlname = "Comparative" + xmlname;
-    proxy = pxm->NewProxy("newviews", xmlname.toAscii().data());
+    proxy = pxm->NewProxy("views", xmlname.toAscii().data());
     }
   else
     {
@@ -362,7 +362,7 @@ pqView* pqObjectBuilder::createView(const QString& type,
 
   QString name = QString("%1%2").arg(proxy->GetXMLName()).arg(
     this->NameGenerator->GetCountAndIncrement(proxy->GetXMLName()));
-  pxm->RegisterProxy("view_modules", name.toAscii().data(), proxy);
+  pxm->RegisterProxy("views", name.toAscii().data(), proxy);
   proxy->Delete();
 
   pqServerManagerModel* model = 
@@ -461,7 +461,7 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
 
   QString name = QString("DataRepresentation%1").arg(
     this->NameGenerator->GetCountAndIncrement("DataRepresentation"));
-  pxm->RegisterProxy("displays", name.toAscii().data(), reprProxy);
+  pxm->RegisterProxy("representations", name.toAscii().data(), reprProxy);
   reprProxy->Delete();
 
   vtkSMProxy* viewModuleProxy = view->getProxy();

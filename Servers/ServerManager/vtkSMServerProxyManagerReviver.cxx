@@ -31,7 +31,7 @@
 
 #include <vtksys/ios/sstream>
 vtkStandardNewMacro(vtkSMServerProxyManagerReviver);
-vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.8");
+vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.9");
 //-----------------------------------------------------------------------------
 vtkSMServerProxyManagerReviver::vtkSMServerProxyManagerReviver()
 {
@@ -71,7 +71,7 @@ int vtkSMServerProxyManagerReviver::ReviveRemoteServerManager(vtkIdType cid)
     vtkSMProxy* proxy = iter->GetProxy();
     if (proxy && 
       strcmp(proxy->GetXMLGroup(), "representations") !=0 &&
-      strcmp(proxy->GetXMLGroup(), "newviews") !=0)
+      strcmp(proxy->GetXMLGroup(), "views") !=0)
       {
       proxy->SetServers(proxy->GetServers() & vtkProcessModule::CLIENT);
       vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(proxy);
@@ -179,7 +179,7 @@ void vtkSMServerProxyManagerReviver::FilterStateXML(vtkPVXMLElement* root)
       {
       int remove_revival_state = 0;
       vtkstd::string group = element->GetAttribute("group");
-      if (group == "newviews" || group == "representations" || group == "animation")
+      if (group == "views" || group == "representations" || group == "animation")
         {
         // We create views/representations all over again on the server.
         remove_revival_state = 1;

@@ -22,7 +22,7 @@
 #include "vtksys/ios/sstream"
 
 vtkStandardNewMacro(vtkSMStateVersionController);
-vtkCxxRevisionMacro(vtkSMStateVersionController, "1.10");
+vtkCxxRevisionMacro(vtkSMStateVersionController, "1.11");
 //----------------------------------------------------------------------------
 vtkSMStateVersionController::vtkSMStateVersionController()
 {
@@ -301,11 +301,11 @@ bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
 
     {
     // Replace all requests for proxies in the group "rendermodules" by
-    // "newviews".
+    // "views".
     const char* attrs[] = {
       "group", "rendermodules", 0};
     const char* newAttrs[] = {
-      "group", "newviews",
+      "group", "views",
       "type", "RenderView", 0};
     this->Select( root, "Proxy", attrs,
       &::ConvertViewModulesToViews,
@@ -319,7 +319,7 @@ bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
       "group", "plotmodules",
       "type", "BarChartViewModule", 0};
     const char* newAttrs[] = {
-      "group", "newviews",
+      "group", "views",
       "type", "BarChartView", 0};
     this->Select( root, "Proxy", attrs,
       &::ConvertViewModulesToViews,
@@ -333,7 +333,7 @@ bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
       "group", "plotmodules",
       "type", "XYPlotViewModule", 0};
     const char* newAttrs[] = {
-      "group", "newviews",
+      "group", "views",
       "type", "XYPlotView", 0};
     this->Select( root, "Proxy", attrs,
       &::ConvertViewModulesToViews,
@@ -347,7 +347,7 @@ bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
       "group", "views",
       "type", "ElementInspectorView", 0};
     const char* newAttrs[] = {
-      "group", "newviews",
+      "group", "views",
       "type", "ElementInspectorView", 0};
     this->SelectAndRemove(root, "Proxy", attrs);
     this->SelectAndRemove(root, "Proxy", newAttrs);
@@ -368,6 +368,26 @@ bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
       &ConvertDataDisplaysToRepresentations, this);
     this->Select(root, "Proxy", multiAttrs,
       &ConvertDataDisplaysToRepresentations, this);
+    }
+
+    {
+    // Convert registration groups from "displays" to
+    // "representations"
+    const char* attrs[] = {
+      "name", "displays", 0};
+    const char* newAttrs[] = {
+      "name", "representations", 0};
+    this->SelectAndSetAttributes(root, "ProxyCollection", attrs, newAttrs);
+    }
+
+    {
+    // Convert registration groups from "view_modules" to
+    // "views"
+    const char* attrs[] = {
+      "name", "view_modules", 0};
+    const char* newAttrs[] = {
+      "name", "views", 0};
+    this->SelectAndSetAttributes(root, "ProxyCollection", attrs, newAttrs);
     }
 
     {

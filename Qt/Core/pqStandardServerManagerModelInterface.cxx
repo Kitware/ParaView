@@ -69,7 +69,7 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
   QString xml_type = proxy->GetXMLName();
 
   pqPluginManager* pluginMgr = pqApplicationCore::instance()->getPluginManager();
-  if (group == "view_modules")
+  if (group == "views")
     {
     QObjectList ifaces = pluginMgr->interfaces();
     foreach(QObject* iface, ifaces)
@@ -109,7 +109,7 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
     {
     return new pqScalarBarRepresentation(group, name, proxy, server, 0);
     }
-  else if (group == "displays")
+  else if (group == "representations")
     {
     QObjectList ifaces = pluginMgr->interfaces();
     foreach(QObject* iface, ifaces)
@@ -117,7 +117,8 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
       pqViewModuleInterface* vmi = qobject_cast<pqViewModuleInterface*>(iface);
       if(vmi && vmi->displayTypes().contains(xml_type))
         {
-        return vmi->createDisplay(xml_type, "displays", name, proxy, server, 0);
+        return vmi->createDisplay(
+          xml_type, "representations", name, proxy, server, 0);
         }
       }
     if (proxy->IsA("vtkSMPVRepresentationProxy"))

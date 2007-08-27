@@ -76,12 +76,12 @@ public:
     if (local)
       {
       this->RenderView.TakeReference(vtkSMRenderViewProxy::SafeDownCast(
-          pxm->NewProxy("newviews", "RenderView")));
+          pxm->NewProxy("views", "RenderView")));
       }
     else
       {
       this->RenderView.TakeReference(vtkSMRenderViewProxy::SafeDownCast(
-          pxm->NewProxy("newviews", "IceTDesktopRenderView")));
+          pxm->NewProxy("views", "IceTDesktopRenderView")));
       pqSMAdaptor::setElementProperty(this->RenderView->GetProperty("CompositeThreshold"), 0);
       }
       

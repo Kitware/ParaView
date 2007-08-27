@@ -112,11 +112,11 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype)
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   if(viewtype == pqPlotView::barChartType())
     {
-    return pxm->NewProxy("newviews", "BarChartView");
+    return pxm->NewProxy("views", "BarChartView");
     }
   else if(viewtype == pqPlotView::XYPlotType())
     {
-    return pxm->NewProxy("newviews", "XYPlotView");
+    return pxm->NewProxy("views", "XYPlotView");
     }
   else if(viewtype == pqTableView::tableType())
     {
@@ -124,7 +124,7 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype)
     }
   else if (viewtype == pqSpreadSheetView::spreadsheetViewType())
     {
-    return pxm->NewProxy("newviews", "SpreadSheetView");
+    return pxm->NewProxy("views", "SpreadSheetView");
     }
   // Handle creation of RenderView and ComparativeRenderView.
   return NULL;

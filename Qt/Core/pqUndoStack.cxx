@@ -248,7 +248,7 @@ void pqUndoStack::undo()
   // Update of proxies have to happen in order.
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("sources", 1);
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("lookup_tables", 1);
-  vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("displays", 1);
+  vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("representations", 1);
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("scalar_bars", 1);
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
   pqApplicationCore::instance()->render();
@@ -265,7 +265,7 @@ void pqUndoStack::redo()
   // Update of proxies have to happen in order.
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("sources", 1);
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("lookup_tables", 1);
-  vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("displays", 1);
+  vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("representations", 1);
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("scalar_bars", 1);
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
   pqApplicationCore::instance()->render();

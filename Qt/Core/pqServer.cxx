@@ -206,7 +206,7 @@ vtkSMRenderViewProxy* pqServer::newRenderView()
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   return vtkSMRenderViewProxy::SafeDownCast(
-    pxm->NewProxy("newviews", this->RenderViewXMLName.toAscii().data()));
+    pxm->NewProxy("views", this->RenderViewXMLName.toAscii().data()));
 }
 
 //-----------------------------------------------------------------------------

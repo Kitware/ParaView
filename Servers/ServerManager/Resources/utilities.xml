@@ -711,7 +711,7 @@
         clean_command="RemoveAllViewModules"
         update_self="1">
         <ProxyGroupDomain name="groups">
-          <Group name="newviews" />
+          <Group name="views" />
         </ProxyGroupDomain>
         <Documentation>
           Add views to this scene. These are all the views that need to be

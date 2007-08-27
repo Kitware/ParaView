@@ -23,7 +23,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.19");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.20");
 
 struct vtkSMPQStateLoaderInternals
 {
@@ -51,7 +51,7 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
   const char* xml_group, const char* xml_name)
 {
   // Check if the proxy requested is a render module.
-  if (xml_group && xml_name && strcmp(xml_group, "newviews") == 0)
+  if (xml_group && xml_name && strcmp(xml_group, "views") == 0)
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     vtkSMProxy* prototype = pxm->GetPrototypeProxy(xml_group, xml_name);
@@ -112,7 +112,7 @@ void vtkSMPQStateLoader::RegisterProxyInternal(const char* group,
   const char* name, vtkSMProxy* proxy)
 {
   if (proxy->GetXMLGroup() 
-    && strcmp(proxy->GetXMLGroup(), "newviews")==0)
+    && strcmp(proxy->GetXMLGroup(), "views")==0)
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     if (pxm->GetProxyName(group, proxy))

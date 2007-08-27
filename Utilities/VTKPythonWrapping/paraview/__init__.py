@@ -712,7 +712,7 @@ def CreateRenderView(connection=None):
           proxy_xml_name = "IceTCompositeView"
         else:
           proxy_xml_name = "RenderView"
-    ren_module = pxm.NewProxy("newviews", proxy_xml_name)
+    ren_module = pxm.NewProxy("views", proxy_xml_name)
     if not ren_module:
         return None
     pxm.RegisterProxy("render_modules", ren_module.GetSelfIDAsString(), ren_module)
@@ -730,7 +730,7 @@ def CreateRepresentation(proxy, renModule):
         return None
     display.UnRegister(None)
     pxm = pyProxyManager()
-    pxm.RegisterProxy("displays", display.GetSelfIDAsString(), display)
+    pxm.RegisterProxy("representations", display.GetSelfIDAsString(), display)
     display.SetInput(proxy)
     display.UpdateVTKObjects()
     renModule.AddToRepresentations(display)
