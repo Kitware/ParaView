@@ -89,7 +89,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.44");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.45");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -100,8 +100,13 @@ vtkInformationKeyMacro(vtkSMRenderViewProxy, USE_ORDERED_COMPOSITING, Integer);
 //-----------------------------------------------------------------------------
 vtkSMRenderViewProxy::vtkSMRenderViewProxy()
 {
+  /*
   // This is essential to ensure that edge-visibility works correctly.
   vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
+  // We offset lines/vertices.
+  vtkMapper::SetResolveCoincidentTopologyPolygonOffsetFaces(0);
+  vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(-1.0, 1.0);
+  */
 
   // All the subproxies are created on Client and Render Server.
   this->RendererProxy = 0;
