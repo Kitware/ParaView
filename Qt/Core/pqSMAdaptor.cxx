@@ -196,18 +196,6 @@ pqSMProxy pqSMAdaptor::getProxyProperty(vtkSMProperty* Property)
       {
       return pqSMProxy(proxyProp->GetProxy(0));
       }
-    else
-      {
-      // TODO fix this -- we should do this automatically ??
-      // no proxy property defined and one is required, so go find one to set
-      QList<pqSMProxy> domain;
-      domain = pqSMAdaptor::getProxyPropertyDomain(Property);
-      if(domain.size())
-        {
-        //pqSMAdaptor::setProxyProperty(Property, domain[0]);
-        return domain[0];
-        }
-      }
     }
   return pqSMProxy(NULL);
 }
