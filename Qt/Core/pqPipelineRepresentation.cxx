@@ -898,7 +898,8 @@ void pqPipelineRepresentation::onRepresentationChanged()
   QList<QString> colorFields = this->getColorFields();
   if (colorFields.size() == 0)
     {
-    qCritical() << "Cannot volume render since no point data available!";
+    qCritical() << 
+      "Cannot volume render since no point (or cell) data available.";
     this->setRepresentation(vtkSMPVRepresentationProxy::OUTLINE);
     return;
     }
