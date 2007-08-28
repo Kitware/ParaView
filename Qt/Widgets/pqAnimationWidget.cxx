@@ -55,14 +55,16 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
   this->View->setScene(this->Model);
 
   this->CreateDeleteHeader = new QHeaderView(Qt::Vertical, this);
+  this->CreateDeleteHeader->viewport()->setBackgroundRole(QPalette::Window);
+
   this->CreateDeleteHeader->setClickable(true);
   this->CreateDeleteHeader->setSizePolicy(QSizePolicy::Minimum,
                               QSizePolicy::MinimumExpanding);
-
   this->CreateDeleteHeader->setResizeMode(QHeaderView::Fixed);
   this->CreateDeleteHeader->setModel(&this->CreateDeleteModel);
 
   this->Header = new QHeaderView(Qt::Vertical, this);
+  this->Header->viewport()->setBackgroundRole(QPalette::Window);
   this->Header->setObjectName("TrackHeader");
   this->Header->setSizePolicy(QSizePolicy::Preferred,
                               QSizePolicy::MinimumExpanding);
