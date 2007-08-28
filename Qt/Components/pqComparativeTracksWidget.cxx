@@ -124,7 +124,7 @@ pqComparativeTracksWidget::pqComparativeTracksWidget(QWidget* _parent)
   QVBoxLayout* vboxlayout = new QVBoxLayout(this);
   vboxlayout->addWidget(this->Internal->AnimationWidget);
 
-  QObject::connect(this->Internal->AnimationWidget->animationModel(),
+  QObject::connect(this->Internal->AnimationWidget,
     SIGNAL(trackSelected(pqAnimationTrack*)),
     this, SLOT(trackSelected(pqAnimationTrack*)));
 }
