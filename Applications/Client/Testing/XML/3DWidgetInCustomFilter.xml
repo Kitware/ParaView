@@ -22,4 +22,5 @@
   <pqevent object="MainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageCustomFilters" />
   <pqevent object="MainWindow/pqCustomFilterManager/RemoveButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterManager/CloseButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/representationToolbar/displayRepresentation/comboBox" command="set_string" arguments="Surface With Edges" />
 </pqevents>
