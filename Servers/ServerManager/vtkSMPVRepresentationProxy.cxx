@@ -37,7 +37,7 @@ inline void vtkSMPVRepresentationProxySetInt(
 }
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.13");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -186,18 +186,27 @@ void vtkSMPVRepresentationProxy::SetRepresentation(int repr)
 
     case POINTS:
       this->ActiveRepresentation = this->SurfaceRepresentation;
-      vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation, "Representation", VTK_POINTS);
+      vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation, 
+        "Representation", VTK_POINTS);
       break;
 
     case WIREFRAME:
       this->ActiveRepresentation = this->SurfaceRepresentation;
-      vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation, "Representation", VTK_WIREFRAME);
+      vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation, 
+        "Representation", VTK_WIREFRAME);
+      break;
+
+    case SURFACE_WITH_EDGES:
+      this->ActiveRepresentation = this->SurfaceRepresentation;
+      vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation, 
+        "Representation", VTK_SURFACE_WITH_EDGES);
       break;
 
     case SURFACE:
     default:
       this->ActiveRepresentation = this->SurfaceRepresentation;
-      vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation, "Representation", VTK_SURFACE);
+      vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation, 
+        "Representation", VTK_SURFACE);
       }
 
     vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation, "Visibility", 

@@ -1726,7 +1726,7 @@
         name="EdgeColor"
         command="SetEdgeColor"
         number_of_elements="3"
-        default_values="0 0 0">
+        default_values="0 0 0.5">
         <Documentation>
           Set the edge color. This color is used to draw the edge for the
           polygonal data when EdgeVisibility is on.
@@ -4038,6 +4038,7 @@
           <Entry value="0" text="Points" />
           <Entry value="1" text="Wireframe" />
           <Entry value="2" text="Surface" />
+          <Entry value="3" text="Surface With Edges" />
         </EnumerationDomain>
       </IntVectorProperty>
 
@@ -4135,7 +4136,6 @@
           <Property name="Color" />
           <Property name="DiffuseColor" />
           <Property name="EdgeColor" />
-          <Property name="EdgeVisibility" />
           <Property name="Interpolation" />
           <Property name="LineWidth" />
           <Property name="Opacity" />
@@ -4654,7 +4654,6 @@
           <Property name="Diffuse" />
           <Property name="DiffuseColor" />
           <Property name="EdgeColor" />
-          <Property name="EdgeVisibility" />
           <Property name="Interpolation" />
           <Property name="LineWidth" />
           <Property name="Opacity" />
@@ -4757,6 +4756,7 @@
           <Entry value="1" text="Wireframe" />
           <Entry value="2" text="Surface" />
           <Entry value="3" text="Outline" />
+          <Entry value="5" text="Surface With Edges" />
         </EnumerationDomain>
       </IntVectorProperty>
 
@@ -4795,6 +4795,7 @@
           <Entry value="2" text="Surface" />
           <Entry value="3" text="Outline" />
           <Entry value="4" text="Volume" />
+          <Entry value="5" text="Surface With Edges" />
         </EnumerationDomain>
       </IntVectorProperty>
 
@@ -4847,6 +4848,7 @@
           <Entry value="2" text="Surface" />
           <Entry value="3" text="Outline" />
           <Entry value="4" text="Volume" />
+          <Entry value="5" text="Surface With Edges" />
         </EnumerationDomain>
       </IntVectorProperty>
 

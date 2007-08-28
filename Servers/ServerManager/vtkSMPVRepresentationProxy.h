@@ -147,7 +147,8 @@ public:
     WIREFRAME=1,
     SURFACE=2,
     OUTLINE=3,
-    VOLUME=4
+    VOLUME=4,
+    SURFACE_WITH_EDGES=5
     };
 protected:
   vtkSMPVRepresentationProxy();

@@ -37,7 +37,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.19");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.20");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -395,7 +395,18 @@ void vtkSMSurfaceRepresentationProxy::SetRepresentation(int repr)
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->Property->GetProperty("Representation"));
-  ivp->SetElement(0, repr);
+  vtkSMIntVectorProperty* edgeVisibility = vtkSMIntVectorProperty::SafeDownCast(
+    this->Property->GetProperty("EdgeVisibility"));
+  if (repr == VTK_SURFACE_WITH_EDGES)
+    {
+    ivp->SetElement(0, VTK_SURFACE);
+    edgeVisibility->SetElement(0, 1);
+    }
+  else
+    {
+    ivp->SetElement(0, repr);
+    edgeVisibility->SetElement(0, 0);
+    }
   this->Property->UpdateVTKObjects();
 
   this->Representation = repr;
@@ -411,7 +422,8 @@ void vtkSMSurfaceRepresentationProxy::UpdateShadingParameters()
   double specular = this->Specular;
   double ambient = this->Ambient;
 
-  if (this->Representation != VTK_SURFACE)
+  if (this->Representation != VTK_SURFACE && 
+    this->Representation != VTK_SURFACE_WITH_EDGES)
     {
     diffuse = 0.0;
     ambient = 1.0;

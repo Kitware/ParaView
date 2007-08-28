@@ -25,6 +25,9 @@
 
 #include "vtkSMPropRepresentationProxy.h"
 
+// Making this a #define to match those in vtkProperty.
+#define VTK_SURFACE_WITH_EDGES 3
+
 class VTK_EXPORT vtkSMSurfaceRepresentationProxy : 
   public vtkSMPropRepresentationProxy
 {
@@ -104,7 +107,8 @@ public:
 
   // Description:
   // Set the representation type.
-  // repr can be VTK_SURFACE or VTK_WIREFRAME or VTK_POINTS.
+  // repr can be VTK_SURFACE or VTK_WIREFRAME or VTK_POINTS or
+  // VTK_SURFACE_WITH_EDGES.
   void SetRepresentation(int repr);
 
   // Description:
