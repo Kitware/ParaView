@@ -196,13 +196,25 @@ void pqScalarsToColors::setScalarRange(double min, double max)
     this->getProxy()->GetProperty("RGBPoints"));
   QList<QVariant> controlPoints = pqSMAdaptor::getMultipleElementProperty(dvp);
 
-  for (int cc=0; cc < controlPoints.size(); 
-    cc+= dvp->GetNumberOfElementsPerCommand())
+  int num_elems_per_command = dvp->GetNumberOfElementsPerCommand();
+  for (int cc=0; cc < controlPoints.size();  cc += num_elems_per_command)
     {
-    controlPoints[cc] = 
-      scale * (controlPoints[cc].toDouble()-current_range.first) + min;
+    // These checks ensure that the first and last control points match the 
+    // min and max values exactly.
+    if (cc==0)
+      {
+      controlPoints[cc] = min;
+      }
+    else if ((cc+num_elems_per_command) >= controlPoints.size())
+      {
+      controlPoints[cc] = max;
+      }
+    else
+      {
+      controlPoints[cc] = 
+        scale * (controlPoints[cc].toDouble()-current_range.first) + min;
+      }
     }
-
   pqSMAdaptor::setMultipleElementProperty(dvp, controlPoints);
   this->getProxy()->UpdateVTKObjects();
 }
