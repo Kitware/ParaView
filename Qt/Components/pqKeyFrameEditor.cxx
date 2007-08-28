@@ -401,7 +401,14 @@ pqKeyFrameEditor::pqKeyFrameEditor(pqAnimationScene* scene,
   connect(this->Internal->Ui.pbDeleteAll, SIGNAL(clicked(bool)),
           this, SLOT(deleteAllKeyFrames()));
   
-  this->Internal->Ui.label->setText(label);
+  if(label != QString())
+    {
+    this->Internal->Ui.label->setText(label);
+    }
+  else
+    {
+    this->Internal->Ui.label->hide();
+    }
 }
 
 //-----------------------------------------------------------------------------
