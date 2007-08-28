@@ -356,8 +356,9 @@ public:
 
 //-----------------------------------------------------------------------------
 pqKeyFrameEditor::pqKeyFrameEditor(pqAnimationScene* scene, 
-                                   pqAnimationCue* cue, QWidget* p,
-                                   const QString& label)
+                                   pqAnimationCue* cue, 
+                                   const QString& label,
+                                   QWidget* p)
   : QWidget(p)
 {
   this->Internal = new pqInternal(this);
@@ -415,7 +416,7 @@ void pqKeyFrameEditor::setValuesOnly(bool vo)
   this->Internal->Ui.pbNew->setVisible(!vo);
   this->Internal->Ui.pbDelete->setVisible(!vo);
   this->Internal->Ui.pbDeleteAll->setVisible(!vo);
-  this->Internal->Ui.tableView->setColumnHidden(0, true);
+  this->Internal->Ui.tableView->setColumnHidden(0, vo);
 }
 
 //-----------------------------------------------------------------------------

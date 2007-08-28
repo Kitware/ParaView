@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqKeyFrameEditor.h
+   Module:    pqPipelineTimeKeyFrameEditor.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,61 +30,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqKeyFrameEditor_h
-#define _pqKeyFrameEditor_h
+#ifndef _pqPipelineTimeKeyFrameEditor_h
+#define _pqPipelineTimeKeyFrameEditor_h
 
-#include <QWidget>
 #include <QDialog>
 #include "pqComponentsExport.h"
 
-class pqAnimationCue;
 class pqAnimationScene;
+class pqAnimationCue;
 
-/// editor for editing animation key frames
-class PQCOMPONENTS_EXPORT pqKeyFrameEditor : public QWidget
+/// editor for editing pipeline time key frames
+class PQCOMPONENTS_EXPORT pqPipelineTimeKeyFrameEditor : public QDialog
 {
-  typedef QWidget Superclass;
-
+  typedef QDialog Superclass;
   Q_OBJECT
-
 public:
-  pqKeyFrameEditor(pqAnimationScene* scene, pqAnimationCue* cue,
-                   const QString& label, QWidget* p);
-  ~pqKeyFrameEditor();
+  pqPipelineTimeKeyFrameEditor(pqAnimationScene* scene, pqAnimationCue* cue,
+                               QWidget* p);
+  ~pqPipelineTimeKeyFrameEditor();
 
-  /// The keyframe editor can be set in a mode where the user can only edit the
-  /// key frame values or keyframe interpolation and not add/delete keyframes
-  /// or change key time. To enable this mode, set this to true (false by
-  /// default).
-  void setValuesOnly(bool);
-  bool valuesOnly() const;
 public slots:
   /// read the key frame data and display it
   void readKeyFrameData();
   /// write the key frame data as edited by the user to the server manager
   void writeKeyFrameData();
 
-private slots:
-  void newKeyFrame();
-  void deleteKeyFrame();
-  void deleteAllKeyFrames();
-  void useCurrentCamera(QObject*);
+protected slots:
+  void updateState();
 
 private:
   class pqInternal;
   pqInternal* Internal;
 };
 
-
-// internal class
-class pqKeyFrameTypeDialog : public QDialog
-{
-  Q_OBJECT
-public:
-  pqKeyFrameTypeDialog(QWidget* p, QWidget* child);
-  ~pqKeyFrameTypeDialog();
-  QWidget* Child;
-};
 
 #endif
 

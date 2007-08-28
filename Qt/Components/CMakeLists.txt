@@ -135,6 +135,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineMenu.h
   pqPipelineModel.h
   pqPipelineModelSelectionAdaptor.h
+  pqPipelineTimeKeyFrameEditor.h
   pqPluginDialog.h
   pqPointSourceWidget.h
   pqProxyInformationWidget.h
@@ -230,6 +231,7 @@ SET(UI_FORMS
   Resources/UI/pqMultiViewFrameMenu.ui
   Resources/UI/pqOptionsDialog.ui
 #  Resources/UI/pqParticleTracerPanel.ui
+  Resources/UI/pqPipelineTimeKeyFrameEditor.ui
   Resources/UI/pqPluginDialog.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqProxyInformationWidget.ui
@@ -494,6 +496,8 @@ ADD_LIBRARY(pqComponents
   pqPipelineModel.h
   pqPipelineModelSelectionAdaptor.cxx
   pqPipelineModelSelectionAdaptor.h
+  pqPipelineTimeKeyFrameEditor.cxx
+  pqPipelineTimeKeyFrameEditor.h
   pqPluginDialog.cxx
   pqPluginDialog.h
   pqPointSourceWidget.cxx

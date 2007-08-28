@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqServer.h"
 #include "pqKeyFrameEditor.h"
+#include "pqPipelineTimeKeyFrameEditor.h"
 #include "pqPropertyLinks.h"
 #include "pqComboBoxDomain.h"
 #include "pqSignalAdaptors.h"
@@ -502,27 +503,38 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
     return;
     }
 
-  this->Internal->Editor = new QDialog;
+  if(track->property().toString().startsWith("TimeKeeper"))
+    {
+    this->Internal->Editor = 
+      new pqPipelineTimeKeyFrameEditor(this->Internal->Scene, cue, NULL);
+    }
+  else
+    {
+    this->Internal->Editor = new QDialog;
+    QVBoxLayout* l = new QVBoxLayout(this->Internal->Editor);
+    QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok
+                                                | QDialogButtonBox::Cancel);
+    pqKeyFrameEditor* editor = new pqKeyFrameEditor(this->Internal->Scene, cue,
+                        QString("Editing ") + this->Internal->cueName(cue),
+                        this->Internal->Editor);
+
+    l->addWidget(editor);
+    l->addWidget(buttons);
+    
+    connect(buttons, SIGNAL(accepted()), 
+            this->Internal->Editor, SLOT(accept()));
+    connect(buttons, SIGNAL(rejected()), 
+            this->Internal->Editor, SLOT(reject()));
+    connect(this->Internal->Editor, SIGNAL(accepted()), 
+            editor, SLOT(writeKeyFrameData()));
+    }
+  
+  this->Internal->Editor->setWindowTitle(tr("Animation Keyframes"));
   this->Internal->Editor->setAttribute(Qt::WA_QuitOnClose, false);
   this->Internal->Editor->setAttribute(Qt::WA_DeleteOnClose);
+  
+
   this->Internal->Editor->resize(500, 400);
-  this->Internal->Editor->setWindowTitle(tr("Animation Keyframes"));
-  QVBoxLayout* l = new QVBoxLayout(this->Internal->Editor);
-  pqKeyFrameEditor* editor = new pqKeyFrameEditor(this->Internal->Scene,
-                      cue, this->Internal->Editor,
-                      QString("Editing ") + this->Internal->cueName(cue));
-  QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok
-                                              | QDialogButtonBox::Cancel);
-  l->addWidget(editor);
-  l->addWidget(buttons);
-
-  connect(this->Internal->Editor, SIGNAL(accepted()), 
-          editor, SLOT(writeKeyFrameData()));
-  connect(buttons, SIGNAL(accepted()), 
-          this->Internal->Editor, SLOT(accept()));
-  connect(buttons, SIGNAL(rejected()), 
-          this->Internal->Editor, SLOT(reject()));
-
   this->Internal->Editor->show();
 }
   
