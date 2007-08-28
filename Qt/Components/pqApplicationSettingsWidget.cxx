@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 #include "pqApplicationCore.h"
 #include "pqPluginManager.h"
+#include "pqRenderView.h"
 #include "pqSettings.h"
 #include "pqViewModuleInterface.h"
 
@@ -53,7 +54,7 @@ pqApplicationSettingsWidget::pqApplicationSettingsWidget(QWidget* _parent)
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
 
-  this->Internal->DefaultViewType->addItem("None");
+  this->Internal->DefaultViewType->addItem("None", "None");
   // Get available view types.
   QObjectList ifaces =
     pqApplicationCore::instance()->getPluginManager()->interfaces();
@@ -79,7 +80,8 @@ pqApplicationSettingsWidget::pqApplicationSettingsWidget(QWidget* _parent)
     } 
 
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  QString curView = settings->value("/defaultViewType", "None").toString();
+  QString curView = settings->value("/defaultViewType", 
+    pqRenderView::renderViewType()).toString();
   int index = this->Internal->DefaultViewType->findData(curView);
   index = (index==-1)? 0 : index;
   this->Internal->DefaultViewType->setCurrentIndex(index);

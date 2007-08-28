@@ -3009,9 +3009,12 @@ void pqMainWindowCore::onServerCreation(pqServer* server)
   QString curView = settings->value("/defaultViewType",
     pqRenderView::renderViewType()).toString();
 
-  // When a server is created, we create a new render view for it.
-  pqView* view = core->getObjectBuilder()->createView(curView, server);
-  view->render();
+  if (curView != "None" && !curView.isEmpty()) 
+    {
+    // When a server is created, we create a new render view for it.
+    pqView* view = core->getObjectBuilder()->createView(curView, server);
+    view->render();
+    }
 }
 
 //-----------------------------------------------------------------------------
