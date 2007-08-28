@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqManualServerStartup.h"
 #include "pqServerResource.h"
 #include "pqServerStartups.h"
-#include "pqSettings.h"
 #include "pqCommandServerStartup.h"
 #include "pqOptions.h"
 #include "pqApplicationCore.h"
@@ -148,7 +147,7 @@ static QString userSettings()
   QString settingsPath = QString("%2%1%3%1%4");
   settingsPath = settingsPath.arg(QDir::separator());
   settingsPath = settingsPath.arg(settingsRoot);
-  settingsPath = settingsPath.arg(QApplication::organizationName());
+  settingsPath = settingsPath.arg(QApplication::applicationName());
   settingsPath = settingsPath.arg("servers.pvsc");
   return settingsPath;
 }
@@ -181,8 +180,6 @@ pqServerStartups::pqServerStartups(QObject* p) :
                "default_servers.pvsc", false);
     // load from system dir (/usr/share/..., %COMMON_APPDATA%/...)
     this->load(systemSettings(), false);
-    // load old QSettings from ParaView 3.0
-    this->load(pqApplicationCore::instance()->settings());
     // load user settings
     this->load(userSettings(), true);
     }
@@ -196,8 +193,6 @@ pqServerStartups::~pqServerStartups()
     {
     this->save(userSettings(),true);
     }
-  // remove so they don't clobber with new saved settings
-  pqApplicationCore::instance()->settings()->remove("Servers");
   delete this->Implementation;
 }
 
@@ -346,31 +341,6 @@ void pqServerStartups::save(const QString& path, bool saveOnly) const
     {
     qCritical() << "Error opening " << path << "for writing";
     }
-}
-
-// only here to provide migration from old QSettings to XML file
-// read QSettings, and contents will be saved in XML file
-// when the app quits
-void pqServerStartups::load(pqSettings* settings)
-{
-  settings->beginGroup("Servers");
-  const QStringList startups = settings->childKeys();
-  for(int i = 0; i != startups.size(); ++i)
-    {
-    const QString name = startups[i];
-    const QString value = settings->value(name).toString();
-    
-    QDomDocument xml_server;
-    QString error_message;
-    xml_server.setContent(value, &error_message);
-    if(pqServerStartup* const startup =
-      pqImplementation::load(xml_server.documentElement(), true))
-      {
-      this->Implementation->deleteStartup(name);
-      this->Implementation->Startups.insert(vtkstd::make_pair(name, startup));
-      }
-    }
-  settings->endGroup();
 }
 
 void pqServerStartups::load(QDomDocument& xml_document, bool s)

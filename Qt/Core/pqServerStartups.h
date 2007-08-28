@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqServerResource;
 class pqServerStartup;
-class pqSettings;
 class QDomDocument;
 
 /** Manages a persistent collection of server "startups" - instructions
@@ -92,7 +91,6 @@ signals:
 private:
   void save(QDomDocument&, bool) const;
   void load(QDomDocument&, bool save);
-  void load(pqSettings*);
 
   pqServerStartups(const pqServerStartups&);
   pqServerStartups& operator=(const pqServerStartups&);

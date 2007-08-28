@@ -438,13 +438,13 @@ pqSettings* pqApplicationCore::settings()
       vtkProcessModule::GetProcessModule()->GetOptions());
     if (options && options->GetDisableRegistry())
       {
-      this->Internal->Settings = new pqSettings(QApplication::organizationName(),
+      this->Internal->Settings = new pqSettings(QApplication::applicationName(),
         QApplication::applicationName() + ".DisabledRegistry", this);
       this->Internal->Settings->clear();
       }
     else
       {
-      this->Internal->Settings = new pqSettings(QApplication::organizationName(),
+      this->Internal->Settings = new pqSettings(QApplication::applicationName(),
         QApplication::applicationName(), this);
       }
     }
