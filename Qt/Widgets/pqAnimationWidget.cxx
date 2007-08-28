@@ -210,7 +210,7 @@ void pqAnimationWidget::updateScrollBars()
     }
   
   QSize vsize = this->viewport()->size();
-  this->View->resize(vsize.width(), h);
+  this->View->resize(vsize.width(), viewh);
   this->CreateDeleteWidget->resize(vsize.width()+extraw,
                                    this->Header->defaultSectionSize());
 
@@ -224,14 +224,19 @@ void pqAnimationWidget::updateWidgetPosition()
 {
   int s = this->verticalScrollBar()->value();
   this->View->move(0, -s);
-  int m = this->View->frameGeometry().bottom()+1-
-          this->CreateDeleteHeader->defaultSectionSize();
-  int w = 0;
   if(this->CreateDeleteHeader->isVisible())
     {
-    w = this->CreateDeleteHeader->frameGeometry().right()+1;
+    int xpos = this->CreateDeleteHeader->frameGeometry().right()+1;
+    int ypos = this->CreateDeleteHeader->frameGeometry().bottom()-
+               this->CreateDeleteHeader->defaultSectionSize() -
+               this->CreateDeleteHeader->offset();
+    this->CreateDeleteWidget->raise();
+    this->CreateDeleteWidget->move(xpos, ypos);
     }
-  this->CreateDeleteWidget->move(w, m);
+  else
+    {
+    this->CreateDeleteWidget->lower();
+    }
 }
 
 bool pqAnimationWidget::event(QEvent* e)
