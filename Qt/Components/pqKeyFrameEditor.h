@@ -57,8 +57,7 @@ public:
   /// or change key time. To enable this mode, set this to true (false by
   /// default).
   void setValuesOnly(bool);
-  bool valuesOnly() const
-    { return this->ValuesOnly; }
+  bool valuesOnly() const;
 public slots:
   /// read the key frame data and display it
   void readKeyFrameData();
@@ -74,7 +73,6 @@ private slots:
 private:
   class pqInternal;
   pqInternal* Internal;
-  bool ValuesOnly;
 };
 
 

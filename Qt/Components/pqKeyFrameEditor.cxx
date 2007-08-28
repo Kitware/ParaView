@@ -146,17 +146,16 @@ public:
 class pqKeyFrameEditorDelegate : public QItemDelegate
 {
 public:
-  pqKeyFrameEditorDelegate(QObject* p) : QItemDelegate(p), CameraMode(false), ValuesOnly(false) {}
+  pqKeyFrameEditorDelegate(QObject* p) : QItemDelegate(p), CameraMode(false) {}
   QWidget* createEditor(QWidget* p, const QStyleOptionViewItem&, 
                         const QModelIndex & index ) const
     {
     const QStandardItemModel* model = 
       qobject_cast<const QStandardItemModel*>(index.model());
 
-    int time_index = this->ValuesOnly? -1 : 0;
-    int interpolation_index = this->CameraMode? -1 : (this->ValuesOnly? 0 : 1);
-    int value_index = this->CameraMode?
-      (this->ValuesOnly? 0 : 1) : (this->ValuesOnly? 1 : 2);
+    int time_index = 0;
+    int interpolation_index = this->CameraMode? -1 : 1;
+    int value_index = this->CameraMode? 1 : 2;
 
     if(index.column() == time_index)
       {
@@ -216,7 +215,6 @@ public:
     }
 
   bool CameraMode;
-  bool ValuesOnly;
 };
 
 //-----------------------------------------------------------------------------
@@ -364,7 +362,6 @@ pqKeyFrameEditor::pqKeyFrameEditor(pqAnimationScene* scene,
 {
   this->Internal = new pqInternal(this);
   this->Internal->Ui.setupUi(this);
-  this->ValuesOnly = false;
   this->Internal->Scene = scene;
   this->Internal->Cue = cue;
   this->Internal->TimeRange = scene? scene->getClockTimeRange() :
@@ -415,12 +412,16 @@ pqKeyFrameEditor::~pqKeyFrameEditor()
 //-----------------------------------------------------------------------------
 void pqKeyFrameEditor::setValuesOnly(bool vo)
 {
-  this->ValuesOnly = vo;
   this->Internal->Ui.pbNew->setVisible(!vo);
   this->Internal->Ui.pbDelete->setVisible(!vo);
   this->Internal->Ui.pbDeleteAll->setVisible(!vo);
-  this->Internal->EditorDelegate->ValuesOnly = vo;
-  this->readKeyFrameData();
+  this->Internal->Ui.tableView->setColumnHidden(0, true);
+}
+
+//-----------------------------------------------------------------------------
+bool pqKeyFrameEditor::valuesOnly() const
+{
+  return this->Internal->Ui.tableView->isColumnHidden(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -440,20 +441,14 @@ void pqKeyFrameEditor::readKeyFrameData()
   this->Internal->EditorDelegate->CameraMode = camera;
   if(camera)
     {
-    this->Internal->Model.setColumnCount(this->ValuesOnly? 1 : 2);
-    if (!this->ValuesOnly)
-      {
-      headerLabels << tr("Time");
-      }
+    this->Internal->Model.setColumnCount(2);
+    headerLabels << tr("Time");
     headerLabels << tr("Camera Values");
     }
   else
     {
-    this->Internal->Model.setColumnCount(this->ValuesOnly? 2 : 3);
-    if (!this->ValuesOnly)
-      {
-      headerLabels << tr("Time");
-      }
+    this->Internal->Model.setColumnCount(3);
+    headerLabels << tr("Time");
     headerLabels << tr("Interpolation") << tr("Value");
     }
 
@@ -468,10 +463,7 @@ void pqKeyFrameEditor::readKeyFrameData()
     QVariant keyTime =
       pqSMAdaptor::getElementProperty(keyFrame->GetProperty("KeyTime"));
     double realKeyTime = this->Internal->realTime(keyTime.toDouble());
-    if (!this->ValuesOnly)
-      {
-      this->Internal->Model.setData(idx, realKeyTime, Qt::DisplayRole);
-      }
+    this->Internal->Model.setData(idx, realKeyTime, Qt::DisplayRole);
 
     if(camera)
       {
@@ -491,14 +483,14 @@ void pqKeyFrameEditor::readKeyFrameData()
       item->CamWidget.setViewAngle(
         pqSMAdaptor::getElementProperty(
           keyFrame->GetProperty("ViewAngle")));
-      this->Internal->Model.setItem(i, this->ValuesOnly? 0: 1, item);
+      this->Internal->Model.setItem(i, 1, item);
       }
     else
       {
       if(i < numberKeyFrames-1)
         {
         pqKeyFrameInterpolationItem* item = new pqKeyFrameInterpolationItem();
-        this->Internal->Model.setItem(i, this->ValuesOnly? 0 : 1, item);
+        this->Internal->Model.setItem(i, 1, item);
         
         // intialize gui with adaptor
         pqPropertyLinks links;
@@ -506,7 +498,7 @@ void pqKeyFrameEditor::readKeyFrameData()
         adaptor.setKeyFrameProxy(keyFrame);
         }
       
-      idx = this->Internal->Model.index(i, this->ValuesOnly? 1: 2);
+      idx = this->Internal->Model.index(i, 2);
       this->Internal->Model.setData(idx,
         pqSMAdaptor::getElementProperty(keyFrame->GetProperty("KeyValues")),
         Qt::DisplayRole);
@@ -577,15 +569,12 @@ void pqKeyFrameEditor::writeKeyFrameData()
     QModelIndex idx = this->Internal->Model.index(j, 0);
     QVariant newData = this->Internal->Model.data(idx, Qt::DisplayRole);
     double nTime = this->Internal->normalizedTime(newData.toDouble());
-    if (!this->ValuesOnly)
-      {
-      pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyTime"), nTime);
-      }
+    pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyTime"), nTime);
 
     if(camera)
       {
       pqCameraKeyFrameItem* item = static_cast<pqCameraKeyFrameItem*>(
-        this->Internal->Model.item(j, this->ValuesOnly? 0 : 1));
+        this->Internal->Model.item(j, 1));
       if(item)
         {
         pqSMAdaptor::setMultipleElementProperty(keyFrame->GetProperty("Position"),
@@ -602,7 +591,7 @@ void pqKeyFrameEditor::writeKeyFrameData()
       {
       pqKeyFrameInterpolationItem* item = 
         static_cast<pqKeyFrameInterpolationItem*>(
-          this->Internal->Model.item(j, this->ValuesOnly? 0 :1));
+          this->Internal->Model.item(j, 1));
       if(item)
         {
         pqSMAdaptor::setEnumerationProperty(keyFrame->GetProperty("Type"),
@@ -621,7 +610,7 @@ void pqKeyFrameEditor::writeKeyFrameData()
           item->Widget.frequency());
         }
       
-      idx = this->Internal->Model.index(j, this->ValuesOnly? 1: 2);
+      idx = this->Internal->Model.index(j, 2);
       newData = this->Internal->Model.data(idx, Qt::DisplayRole);
       pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyValues"), newData);
       }
@@ -637,11 +626,6 @@ void pqKeyFrameEditor::writeKeyFrameData()
 //-----------------------------------------------------------------------------
 void pqKeyFrameEditor::newKeyFrame()
 {
-  if (this->ValuesOnly)
-    {
-    return;
-    }
-
   // insert before selection, or insert 2nd to last
   int row = 0;
   int count = this->Internal->Model.rowCount();
@@ -669,10 +653,6 @@ void pqKeyFrameEditor::newKeyFrame()
 //-----------------------------------------------------------------------------
 void pqKeyFrameEditor::deleteKeyFrame()
 {
-  if (this->ValuesOnly)
-    {
-    return;
-    }
   QModelIndex idx = 
     this->Internal->Ui.tableView->selectionModel()->currentIndex();
   if(idx.isValid())
@@ -693,10 +673,6 @@ void pqKeyFrameEditor::deleteKeyFrame()
 //-----------------------------------------------------------------------------
 void pqKeyFrameEditor::deleteAllKeyFrames()
 {
-  if (this->ValuesOnly)
-    {
-    return;
-    }
   // remove all rows
   this->Internal->Model.removeRows(0, this->Internal->Model.rowCount());
 }
