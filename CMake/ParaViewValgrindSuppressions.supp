@@ -5760,6 +5760,35 @@
    fun:__write_nocancel
    fun:_X11TransWrite
    obj:/usr/lib/libX11.so.6.2.0
+   fun:_XFlushGCCache
+   fun:XCopyArea
+   fun:_ZN17QX11WindowSurface5flushEP7QWidgetRK7QRegionRK6QPoint
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
+   fun:_Z19qt_syncBackingStoreP7QWidget
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN15QAbstractButton5eventEP6QEvent
+   fun:_ZN11QPushButton5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_ZN16QCoreApplication16sendPostedEventsEP7QObjecti
+   fun:_Z23postEventSourceDispatchP8_GSourcePFiPvES1_
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
    fun:XFreeGC
    fun:_ZN7QPixmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -5776,7 +5805,7 @@
    fun:XFreeGC
    fun:_ZN15QX11PaintEngine3endEv
    fun:_ZN8QPainter3endEv
-   fun:_ZN8QPainterD2Ev
+   fun:_ZN8QPainterD*Ev
 }
 {
    <insert a suppression name here>
@@ -9095,6 +9124,62 @@
 {
    <insert a suppression name here>
    Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/libfontconfig.so.1.0.4
+   obj:/usr/lib/libfontconfig.so.1.0.4
+   obj:/usr/lib/libfontconfig.so.1.0.4
+   obj:/usr/lib/libfontconfig.so.1.0.4
+   obj:/usr/lib/libfontconfig.so.1.0.4
+   obj:/usr/lib/libfontconfig.so.1.0.4
+   obj:/usr/lib/libfontconfig.so.1.0.4
+   obj:/usr/lib/libfontconfig.so.1.0.4
+   obj:/usr/lib/libfontconfig.so.1.0.4
+   fun:FcConfigSubstituteWithPat
+   fun:FcConfigSubstitute
+   fun:_ZN13QFontDatabase4loadEPK12QFontPrivatei
+   fun:_ZN11QScriptLine16setDefaultHeightEP11QTextEngine
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutBlockERK10QTextBlockP13QLayoutStructiiS2_
+   fun:_ZN26QTextDocumentLayoutPrivate10layoutFlowEN10QTextFrame8iteratorEP13QLayoutStructii
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameiidd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameii
+   fun:_ZN19QTextDocumentLayout8doLayoutEiii
+   fun:_ZNK26QTextDocumentLayoutPrivate24ensureLayoutedByPositionEi
+   fun:_ZNK26QTextDocumentLayoutPrivate10layoutStepEv
+   fun:_ZN19QTextDocumentLayout15documentChangedEiii
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/libfontconfig.so.1.0.4
+   obj:/usr/lib/libfontconfig.so.1.0.4
+   obj:/usr/lib/libfontconfig.so.1.0.4
+   obj:/usr/lib/libfontconfig.so.1.0.4
+   obj:/usr/lib/libfontconfig.so.1.0.4
+   obj:/usr/lib/libfontconfig.so.1.0.4
+   obj:/usr/lib/libfontconfig.so.1.0.4
+   obj:/usr/lib/libfontconfig.so.1.0.4
+   fun:FcConfigSubstituteWithPat
+   fun:FcConfigSubstitute
+   fun:_ZN13QFontDatabase4loadEPK12QFontPrivatei
+   fun:_ZN11QScriptLine16setDefaultHeightEP11QTextEngine
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutBlockERK10QTextBlockP13QLayoutStructiiS2_
+   fun:_ZN26QTextDocumentLayoutPrivate10layoutFlowEN10QTextFrame8iteratorEP13QLayoutStructii
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameiidd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameii
+   fun:_ZN19QTextDocumentLayout8doLayoutEiii
+   fun:_ZNK26QTextDocumentLayoutPrivate24ensureLayoutedByPositionEi
+   fun:_ZNK26QTextDocumentLayoutPrivate10layoutStepEv
+   fun:_ZN19QTextDocumentLayout15documentChangedEiii
+   fun:_ZN20QTextDocumentPrivate9setLayoutEP27QAbstractTextDocumentLayout
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
    fun:_Znwj
    fun:_ZN7QObjectC2EPS_
    fun:_ZN23PrismClientPluginPluginC1Ev
@@ -10109,8 +10194,6 @@
    fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
    fun:_ZN13vtkObjectBase10UnRegisterEPS_
    fun:_ZN25vtkRenderWindowInteractor10UnRegisterEP13vtkObjectBase
-   fun:_ZN15vtkRenderWindow10UnRegisterEP13vtkObjectBase
-   fun:_ZN13vtkObjectBase6DeleteEv
 }
 {
    <insert a suppression name here>
@@ -10163,6 +10246,34 @@
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XtMalloc
+   fun:__XtMalloc
+   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/lib/libXt.so.6.0.0
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/lib/libXt.so.6.0.0
+   fun:_XtAppCreateShell
+   fun:XtVaAppCreateShell
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+   fun:_ZN25vtkTransferFunctionViewer6RenderEv
+   fun:_ZN25vtkTransferFunctionViewer7SetSizeEii
 }
 {
    <insert a suppression name here>
@@ -10663,14 +10774,6 @@
    fun:_Z11basic_shapeP11QShaperItem
    fun:_ZNK11QTextEngine9shapeTextEi
    fun:_ZNK11QTextEngine5shapeEi
-   fun:_ZNK11QTextEngine5widthEii
-   fun:_ZNK12QFontMetrics5widthERK7QStringi
-   fun:_ZNK16QAbstractSpinBox8sizeHintEv
-   fun:_ZNK11QWidgetItem8sizeHintEv
-   fun:_ZN18QGridLayoutPrivate15setupLayoutDataEi
-   fun:_ZNK18QGridLayoutPrivate8findSizeEM13QLayoutStructii
-   fun:_ZNK18QGridLayoutPrivate11minimumSizeEi
-   fun:_ZNK11QGridLayout11minimumSizeEv
 }
 {
    <insert a suppression name here>
@@ -11190,6 +11293,32 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/libfreetype.so.6.3.10
+   fun:ft_mem_qalloc
+   fun:ft_mem_alloc
+   fun:ft_mem_qrealloc
+   fun:ft_mem_realloc
+   obj:/usr/lib/libfreetype.so.6.3.10
+   obj:/usr/lib/libfreetype.so.6.3.10
+   fun:FT_Open_Face
+   fun:FT_New_Face
+   fun:_ZN13QFreetypeFace7getFaceERKN11QFontEngine6FaceIdE
+   fun:_ZN13QFontEngineFTC1EP10_FcPatternRK8QFontDefi
+   fun:_Z14tryPatternLoadP10_FcPatterniRK8QFontDefi
+   fun:_ZN13QFontDatabase4loadEPK12QFontPrivatei
+   fun:_ZN11QScriptLine16setDefaultHeightEP11QTextEngine
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutBlockERK10QTextBlockP13QLayoutStructiiS2_
+   fun:_ZN26QTextDocumentLayoutPrivate10layoutFlowEN10QTextFrame8iteratorEP13QLayoutStructii
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameiidd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameii
+   fun:_ZN19QTextDocumentLayout8doLayoutEiii
+}
+{
+   <insert a suppression name here>
    Memcheck:Param
    write(buf)
    fun:__write_nocancel
@@ -11214,6 +11343,35 @@
    fun:_ZNK9QTextLine4drawEP8QPainterRK7QPointFPKN11QTextLayout11FormatRangeE
    fun:_Z14qt_format_textRK5QFontRK6QRectFiPK11QTextOptionRK7QStringPS2_iPiiP8QPainter
    fun:_ZN8QPainter8drawTextERK6QRectFRK7QStringRK11QTextOption
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XRenderComposite
+   fun:_ZN15QX11PaintEngine10drawPixmapERK6QRectFRK7QPixmapS2_
+   fun:_ZN8QPainter10drawPixmapERK6QRectFRK7QPixmapS2_
+   fun:_ZNK6QStyle14drawItemPixmapEP8QPainterRK5QRectiRK7QPixmap
+   fun:_ZNK12QCommonStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK13QWindowsStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK15QPlastiqueStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK12QCommonStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
+   fun:_ZNK13QWindowsStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
+   fun:_ZNK15QPlastiqueStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
+   fun:_ZN11QToolButton10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN15QAbstractButton5eventEP6QEvent
+   fun:_ZN11QToolButton5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
 }
 {
    <insert a suppression name here>
@@ -12848,6 +13006,35 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XChangeProperty
+   fun:XSetTextProperty
+   fun:XSetWMName
+   fun:_ZN14QWidgetPrivate18setWindowTitle_sysERK7QString
+   fun:_ZN14QWidgetPrivate21setWindowTitle_helperERK7QString
+   fun:_ZN7QWidget14setWindowTitleERK7QString
+   fun:_ZN27Ui_DisplayProxyEditorWidget13retranslateUiEP7QWidget
+   fun:_ZN27Ui_DisplayProxyEditorWidget7setupUiEP7QWidget
+   fun:_ZN21pqDefaultDisplayPanelC1EP16pqRepresentationP7QWidget
+   fun:_ZN26pqDisplayProxyEditorWidget11updatePanelEv
+   fun:_ZN26pqDisplayProxyEditorWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
+   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+}
+{
+   <insert a suppression name here>
    Memcheck:Leak
    fun:_Znwj
    fun:_ZN7QWidget14updateGeometryEv
@@ -13106,6 +13293,34 @@
    fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
    fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
    fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:realloc
+   fun:_Z8qReallocPvj
+   fun:_ZN9QListData7reallocEi
+   fun:_ZN9QListData6appendEv
+   fun:_ZN5QListIP7QObjectE6appendERKS1_
+   fun:_ZN14QObjectPrivate16setParent_helperEP7QObject
+   fun:_ZN7QObject9setParentEPS_
+   fun:_ZN7QObjectC2ER14QObjectPrivatePS_
+   fun:_ZN7QActionC1ERK7QStringP7QObject
+   fun:_ZN19PrismToolBarActionsC1EP7QObject
+   fun:_ZN33PrismToolBarActionsImplementationC1EP7QObject
+   fun:_ZN23PrismClientPluginPluginC1Ev
+   fun:qt_plugin_instance
+   fun:_ZN13QPluginLoader8instanceEv
+   fun:_ZN13QFormInternal12QFormBuilder19updateCustomWidgetsEv
+   fun:_ZN13QFormInternal12QFormBuilder13addPluginPathERK7QString
+   fun:_ZN9QUiLoader13addPluginPathERK7QString
+   fun:_ZN13pqFormBuilderC1EP7QObject
+   fun:_ZN23pqLoadedFormObjectPanelC2E7QStringP7pqProxyP7QWidget
+   fun:_ZN16pqThresholdPanelC1EP7pqProxyP7QWidget
+   fun:_ZN22pqStandardCustomPanels11createPanelEP7pqProxyP7QWidget
+   fun:_ZN23pqObjectInspectorWidget8setProxyEP7pqProxy
+   fun:_ZN16pqProxyTabWidget8setProxyEP16pqPipelineSource
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
 }
 {
    <insert a suppression name here>
@@ -13389,6 +13604,34 @@
 {
    <insert a suppression name here>
    Memcheck:Leak
+   fun:realloc
+   obj:/usr/lib/libfreetype.so.6.3.10
+   fun:ft_mem_qrealloc
+   fun:ft_mem_realloc
+   obj:/usr/lib/libfreetype.so.6.3.10
+   obj:/usr/lib/libfreetype.so.6.3.10
+   obj:/usr/lib/libfreetype.so.6.3.10
+   obj:/usr/lib/libfreetype.so.6.3.10
+   obj:/usr/lib/libfreetype.so.6.3.10
+   fun:FT_Load_Glyph
+   fun:_ZNK13QFontEngineFT4Font9loadGlyphEPKS_jNS_11GlyphFormatE
+   fun:_ZNK13QFontEngineFT14recalcAdvancesEiP12QGlyphLayout6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_ZNK13QFontEngineFT12stringToCMapEPK5QChariP12QGlyphLayoutPi6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_ZNK16QFontEngineMulti12stringToCMapEPK5QChariP12QGlyphLayoutPi6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_Z11basic_shapeP11QShaperItem
+   fun:_ZNK11QTextEngine9shapeTextEi
+   fun:_ZNK11QTextEngine5shapeEi
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_Z14qt_format_textRK5QFontRK6QRectFiPK11QTextOptionRK7QStringPS2_iPiiP8QPainter
+   fun:_Z14qt_format_textRK5QFontRK6QRectFiRK7QStringPS2_iPiiP8QPainter
+   fun:_ZNK12QFontMetrics12boundingRectERK5QRectiRK7QStringiPi
+   fun:_ZNK12QFontMetrics4sizeEiRK7QStringiPi
+   fun:_ZNK11QPushButton8sizeHintEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
    fun:_Znwj
    fun:_Z11globalMutexv
    fun:_Z7getPathN9QSettings6FormatENS_5ScopeE
@@ -13437,6 +13680,35 @@
    fun:g_main_context_iteration
    fun:_ZN20QEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
    fun:_ZN23QGuiEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XCreateGC
+   fun:_ZN17QX11WindowSurface5flushEP7QWidgetRK7QRegionRK6QPoint
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
+   fun:_Z19qt_syncBackingStoreP7QWidget
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_ZN16QCoreApplication16sendPostedEventsEP7QObjecti
+   fun:_Z23postEventSourceDispatchP8_GSourcePFiPvES1_
+   fun:g_main_context_dispatch
+   obj:/usr/lib/libglib-2.0.so.0.1000.3
+   fun:g_main_context_iteration
+   fun:_ZN20QEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   fun:_ZN23QGuiEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   fun:_ZN10QEventLoop13processEventsE6QFlagsINS_17ProcessEventsFlagEE
+   fun:_ZN10QEventLoop4execE6QFlagsINS_17ProcessEventsFlagEE
+   fun:_ZN17pqEventDispatcher20processEventsAndWaitEi
 }
 {
    <insert a suppression name here>
@@ -13549,6 +13821,31 @@
    fun:_ZN20QEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
    fun:_ZN23QGuiEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
    fun:_ZN10QEventLoop13processEventsE6QFlagsINS_17ProcessEventsFlagEE
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:_XFlushGCCache
+   fun:_ZN17QX11WindowSurface5flushEP7QWidgetRK7QRegionRK6QPoint
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
+   fun:_Z19qt_syncBackingStoreP7QWidget
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_ZN16QCoreApplication16sendPostedEventsEP7QObjecti
+   fun:_Z23postEventSourceDispatchP8_GSourcePFiPvES1_
+   fun:g_main_context_dispatch
+   obj:/usr/lib/libglib-2.0.so.0.1000.3
+   fun:g_main_context_iteration
+   fun:_ZN20QEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   fun:_ZN23QGuiEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
 }
 {
    <insert a suppression name here>
@@ -14972,18 +15269,6 @@
    fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
    fun:_Z19qt_syncBackingStoreP7QWidget
    fun:_ZN7QWidget5eventEP6QEvent
-   fun:_ZN15QAbstractButton5eventEP6QEvent
-   fun:_ZN11QToolButton5eventEP6QEvent
-   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
-   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
-   fun:_ZN16QCoreApplication16sendPostedEventsEP7QObjecti
-   fun:_Z23postEventSourceDispatchP8_GSourcePFiPvES1_
-   fun:g_main_context_dispatch
-   obj:/usr/lib/libglib-2.0.so.0.1000.3
-   fun:g_main_context_iteration
-   fun:_ZN20QEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
-   fun:_ZN23QGuiEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
-   fun:_ZN10QEventLoop13processEventsE6QFlagsINS_17ProcessEventsFlagEE
 }
 {
    <insert a suppression name here>
