@@ -69,7 +69,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.18");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -573,7 +573,6 @@ void vtkSMComparativeViewProxy::UpdateFilmStripVisualization(
     vtkSMViewProxy* view = this->Internal->Views[view_index];
 
     double time = this->TimeRange[0] + view_index*increment;
-    cout << "ViewTime : " << time << endl;
     view->SetViewUpdateTime(time);
 
     // HACK: This ensure that obsolete cache is never used when the CV is being
