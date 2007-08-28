@@ -104,7 +104,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.17");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.18");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
@@ -478,7 +478,9 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
       vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
       name = element->GetAttribute("name");
       if (element->GetName() == QString("Property") &&
-         ( name.contains("PointArrayStatus") || name.contains("CellArrayStatus")))
+         ( name.contains("PointArrayStatus") ||
+           name.contains("CellArrayStatus") ||
+           name.contains("ResultArrayStatus") ))
         {
         arrayElementsToRemove.clear();
         for(unsigned int cc1=0; cc1<element->GetNumberOfNestedElements(); cc1++)
