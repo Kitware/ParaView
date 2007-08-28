@@ -14,16 +14,16 @@
 =========================================================================*/
 #include "vtkSMKeyFrameAnimationCueManipulatorProxy.h"
 
-#include "vtkClientServerID.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMDoubleRangeDomain.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMKeyFrameProxy.h"
 #include "vtkSMProperty.h"
 
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.18");
 vtkStandardNewMacro(vtkSMKeyFrameAnimationCueManipulatorProxy);
 
 //****************************************************************************
@@ -73,27 +73,59 @@ vtkSMKeyFrameAnimationCueManipulatorProxy::vtkSMKeyFrameAnimationCueManipulatorP
   this->Internals = new vtkSMKeyFrameAnimationCueManipulatorProxyInternals;
   this->Observer = vtkSMKeyFrameAnimationCueManipulatorProxyObserver::New();
   this->Observer->SetKeyFrameAnimationCueManipulatorProxy(this);
+  this->CueStarter = 0;
   this->SendEndEvent = 0;
   this->LastAddedKeyFrameIndex = 0;
+  this->CueStarterInitialized = false;
 }
 
 //----------------------------------------------------------------------------
 vtkSMKeyFrameAnimationCueManipulatorProxy::~vtkSMKeyFrameAnimationCueManipulatorProxy()
 {
   this->RemoveAllKeyFrames();
+
   delete this->Internals;
   this->Observer->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMKeyFrameAnimationCueManipulatorProxy::CreateVTKObjects()
+{
+  if (this->ObjectsCreated)
+    {
+    return;
+    }
+
+  this->CueStarter = vtkSMKeyFrameProxy::SafeDownCast(
+    this->GetSubProxy("CueStarter"));
+
+  this->Superclass::CreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMKeyFrameAnimationCueManipulatorProxy::Initialize(vtkSMAnimationCueProxy*)
 {
   this->SendEndEvent = 1;
+  this->CueStarterInitialized = false;
+  if (this->CueStarter && this->GetNumberOfKeyFrames() > 0)
+    {
+    vtkSMKeyFrameProxy* firstKF = this->GetEndKeyFrame(0.0);
+    if (firstKF && firstKF->GetKeyTime() > 0.0)
+      {
+      this->CueStarter->Copy(firstKF, "vtkSMProxyProperty");
+      vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+        this->CueStarter->GetProperty("KeyTime"));
+      dvp->SetElement(0, 0);
+      this->CueStarter->UpdateVTKObjects();
+      this->CueStarterInitialized = true;
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMKeyFrameAnimationCueManipulatorProxy::Finalize(vtkSMAnimationCueProxy* cue)
 {
+  this->CueStarterInitialized = false;
   if (this->SendEndEvent)
     {
     this->UpdateValue(1.0, cue);
@@ -225,10 +257,15 @@ void vtkSMKeyFrameAnimationCueManipulatorProxy::UpdateValue(double currenttime,
     return;
     }
   
-  vtkSMKeyFrameProxy* startKF = 
-    this->GetStartKeyFrame(currenttime);
-  vtkSMKeyFrameProxy* endKF = 
-    this->GetEndKeyFrame(currenttime);
+  vtkSMKeyFrameProxy* startKF = this->GetStartKeyFrame(currenttime);
+  if (!startKF && this->CueStarterInitialized)
+    {
+    // If the first keyframe use added has key time > 0.0, we create a copy of
+    // the first keyframe and add it at time 0.0. The type of the copy is
+    // typically a BooleanKeyFrame and is defined in the xml configuration.
+    startKF = this->CueStarter;
+    }
+  vtkSMKeyFrameProxy* endKF = this->GetEndKeyFrame(currenttime);
   if (startKF && endKF)
     {
     // normalized time to the range between start key frame and end key frame.

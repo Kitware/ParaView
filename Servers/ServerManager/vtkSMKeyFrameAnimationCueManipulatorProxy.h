@@ -36,9 +36,9 @@
 
 #include "vtkSMAnimationCueManipulatorProxy.h"
 
-class vtkSMKeyFrameProxy;
 class vtkSMKeyFrameAnimationCueManipulatorProxyInternals;
 class vtkSMKeyFrameAnimationCueManipulatorProxyObserver;
+class vtkSMKeyFrameProxy;
 
 class VTK_EXPORT vtkSMKeyFrameAnimationCueManipulatorProxy : 
   public vtkSMAnimationCueManipulatorProxy
@@ -113,6 +113,8 @@ protected:
   vtkSMKeyFrameAnimationCueManipulatorProxy();
   ~vtkSMKeyFrameAnimationCueManipulatorProxy();
 
+  virtual void CreateVTKObjects();
+
   // Description:
   // This method is called when the AnimationCue's StartAnimationCueEvent is
   // triggerred, to let the animation manipulator know that the cue has
@@ -148,6 +150,11 @@ protected:
   int SendEndEvent;
   int LastAddedKeyFrameIndex;
 
+  // When the keyframes added don't begin at the start of the cue, we pretend
+  // that a boolean key frame has been added at the start of the cue with the
+  // value same as the first added key frame. 
+  vtkSMKeyFrameProxy* CueStarter;
+  bool CueStarterInitialized;
 private:
   vtkSMKeyFrameAnimationCueManipulatorProxy(const vtkSMKeyFrameAnimationCueManipulatorProxy&); // Not implemented.
   void operator=(const vtkSMKeyFrameAnimationCueManipulatorProxy&); // Not implemented.

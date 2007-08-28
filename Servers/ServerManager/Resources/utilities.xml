@@ -1024,6 +1024,14 @@
         information_only="1">
         <SimpleIntInformationHelper />
       </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="CueStarter"
+          proxygroup="animation_keyframes"
+          proxyname="BooleanKeyFrame">
+        </Proxy>
+      </SubProxy>
+
     </KeyFrameAnimationCueManipulatorProxy>
 
     <CameraManipulatorProxy name="CameraManipulator"

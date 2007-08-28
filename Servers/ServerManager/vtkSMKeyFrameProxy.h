@@ -74,6 +74,8 @@ public:
   // Overridden to call MarkAllPropertiesAsModified().
   virtual void Copy(vtkSMProxy* src, const char* exceptionClass, 
     int proxyPropertyCopyFlag);
+  void Copy(vtkSMProxy* src, const char* exceptionClass)
+    { this->Superclass::Copy(src, exceptionClass); }
 protected:
   vtkSMKeyFrameProxy();
   ~vtkSMKeyFrameProxy();
