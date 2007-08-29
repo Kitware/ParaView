@@ -104,7 +104,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.73");
+vtkCxxRevisionMacro(vtkProcessModule, "1.74");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -1666,29 +1666,6 @@ void vtkProcessModule::SetProcessEnvironmentVariable(int processId,
     {
     char* envstr = vtksys::SystemTools::DuplicateString(var);
     putenv(envstr);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkProcessModule::SynchronizeServerClientOptions(vtkIdType id)
-{
-  vtkPVServerInformation* info = this->GetServerInformation(id);
-  if (!info)
-    {
-    return;
-    }
-  if (!this->Options->GetTileDimensions()[0])
-    {
-    this->Options->SetTileDimensions(info->GetTileDimensions());
-    }
-  if (   !this->Options->GetTileMullions()[0]
-      && !this->Options->GetTileMullions()[1])
-    {
-    this->Options->SetTileMullions(info->GetTileMullions());
-    }
-  if (!this->Options->GetUseOffscreenRendering())
-    {
-    this->Options->SetUseOffscreenRendering(info->GetUseOffscreenRendering());
     }
 }
 

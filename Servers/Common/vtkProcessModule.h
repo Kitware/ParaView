@@ -376,9 +376,9 @@ public:
   const char* GetMachineName(unsigned int idx);
 
   // Description:
-  // Earlier, the ServerInformation was synchronized with the
-  // ClientOptions.  This no longer is appropriate. Hence, we provide
-  // access to the server information on each connection.
+  // Returns the information about command line arguments on the server for the
+  // given connection.  This returns 0 if the connection is not a remote 
+  // connection.
   vtkPVServerInformation* GetServerInformation(vtkIdType id);
 
 //BTX
@@ -386,12 +386,6 @@ public:
   // Get the ID used for MPIMToNSocketConnection for the given connection.
   vtkClientServerID GetMPIMToNSocketConnectionID(vtkIdType id);
   
-
-  // Description:
-  // Synchronizes the Client options with the specified server connection.
-  // Not sure this is applicable in anything but legacy ParaView.
-  void SynchronizeServerClientOptions(vtkIdType);
-
   // Description:
   // Given a connection ID, this call returns the ClientServer ID
   // assigned to that connection. For now, only vtkRemoteConnections are

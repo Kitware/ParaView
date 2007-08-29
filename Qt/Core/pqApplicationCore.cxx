@@ -533,14 +533,6 @@ pqServer* pqApplicationCore::createServer(const pqServerResource& resource)
 
     if(id != vtkProcessModuleConnectionManager::GetNullConnectionID())
       {
-      if(server_resource.scheme() != "builtin")
-        {
-        // Synchronize options with the server.
-        // TODO: This again will work more reliably once we have separate
-        // PVOptions per connection.
-        pm->SynchronizeServerClientOptions(id);
-        }
-
       server = smModel->findServer(id);
       server->setResource(server_resource);
       emit this->finishedAddingServer(server);

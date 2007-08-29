@@ -82,8 +82,10 @@ pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _pare
 
   this->ConnectionID = connectionID;
   this->Options = options;
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SynchronizeServerClientOptions(this->ConnectionID);
+
+  this->RenderViewXMLName = 
+    vtkSMRenderViewProxy::GetSuggestedRenderViewType(
+      this->ConnectionID);
 }
 
 //-----------------------------------------------------------------------------
@@ -116,7 +118,6 @@ void pqServer::initialize()
   // connection times together.
   this->createTimeKeeper();
 
-  this->initializeRenderViewType();
 }
 
 //-----------------------------------------------------------------------------
@@ -143,60 +144,13 @@ void pqServer::createTimeKeeper()
 }
 
 //-----------------------------------------------------------------------------
-void pqServer::initializeRenderViewType()
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-  const char* renderViewName = 0;
-  if (!this->isRemote())
-    {
-    renderViewName = "RenderView";
-    }
-
-  if (!renderViewName)
-    {
-    renderViewName = this->Options->GetRenderModuleName();
-    }
-
-  if (!renderViewName)
-    {
-    vtkPVServerInformation* server_info = pm->GetServerInformation(
-      this->ConnectionID);
-    if (server_info && server_info->GetUseIceT())
-      {
-      if (this->Options->GetTileDimensions()[0] )
-        {
-        renderViewName = "IceTMultiDisplayRenderView";
-        }
-      else if(this->Options->GetClientMode())
-        {
-        renderViewName = "IceTDesktopRenderView";
-        }
-      } 
-    else if(server_info && !server_info->GetUseIceT())
-      {
-      // This fallback render module does not handle parallel rendering or tile
-      // display, but it will handle remote serial rendering and multiple views.
-      renderViewName = "ClientServerRenderView";
-      }
-    }
-  if (!renderViewName)
-    {
-    // Last resort.
-    renderViewName = "RenderView";
-    }
-
-  this->RenderViewXMLName = renderViewName;
-}
-
-//-----------------------------------------------------------------------------
 const pqServerResource& pqServer::getResource()
 {
   return this->Resource;
 }
 
 //-----------------------------------------------------------------------------
-vtkIdType pqServer::GetConnectionID()
+vtkIdType pqServer::GetConnectionID() const
 {
   return this->ConnectionID;
 }
@@ -252,4 +206,11 @@ void pqServer::getSupportedProxies(const QString& xmlgroup, QList<QString>& name
 vtkPVOptions* pqServer::getOptions() const
 {
   return this->Options;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVServerInformation* pqServer::getServerInformation() const
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  return pm->GetServerInformation(this->GetConnectionID());
 }

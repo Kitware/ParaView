@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqTimeKeeper;
 class vtkProcessModule;
 class vtkPVOptions;
+class vtkPVServerInformation;
 class vtkSMApplication;
 class vtkSMProxyManager;
 class vtkSMRenderViewProxy;
@@ -69,7 +70,7 @@ public:
   void setResource(const pqServerResource &server_resource);
 
   /// Returns the connection id for the server connection.
-  vtkIdType GetConnectionID();
+  vtkIdType GetConnectionID() const;
 
   /// Return the number of data server partitions on this 
   /// server connection. A convenience method.
@@ -98,16 +99,18 @@ public:
   const QString& getRenderViewXMLName() const
     { return this->RenderViewXMLName; }
 
-  /// Returns the PVOptions for this connection.
+  /// Returns the PVOptions for this connection. These are client side options.
   vtkPVOptions* getOptions() const;
+
+  /// Returns the vtkPVServerInformation object which contains information about
+  /// the command line options specified on the remote server, if any.
+ vtkPVServerInformation* getServerInformation() const;
+
 signals:
   /// Fired when the name of the proxy is changed.
   void nameChanged(pqServerManagerModelItem*);
 
 protected:
-  /// Decides which render view proxy subclass to create for this connection.
-  void initializeRenderViewType();
-
   // Creates the TimeKeeper proxy for this connection.
   void createTimeKeeper();
 

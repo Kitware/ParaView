@@ -19,7 +19,7 @@
 #include "vtkInformationIntegerKey.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkPVOptions.h"
+#include "vtkPVServerInformation.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMRepresentationStrategy.h"
 
@@ -27,7 +27,7 @@ vtkInformationKeyMacro(vtkSMIceTMultiDisplayRenderViewProxy, CLIENT_COLLECT, Int
 vtkInformationKeyMacro(vtkSMIceTMultiDisplayRenderViewProxy, CLIENT_RENDER, Integer);
 
 vtkStandardNewMacro(vtkSMIceTMultiDisplayRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTMultiDisplayRenderViewProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMIceTMultiDisplayRenderViewProxy, "1.5");
 //-----------------------------------------------------------------------------
 vtkSMIceTMultiDisplayRenderViewProxy::vtkSMIceTMultiDisplayRenderViewProxy()
 {
@@ -49,12 +49,12 @@ void vtkSMIceTMultiDisplayRenderViewProxy::EndCreateVTKObjects()
 {
   // Obtain information about the tiles from the process module options.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  int *tileDims =  pm->GetOptions()->GetTileDimensions();
-  this->TileDimensions[0] = tileDims[0];
-  this->TileDimensions[1] = tileDims[1];
-  int *tileMulls =  pm->GetOptions()->GetTileMullions();
-  this->TileMullions[0] = tileMulls[0];
-  this->TileMullions[1] = tileMulls[1];
+  vtkPVServerInformation* serverInfo = pm->GetServerInformation(this->ConnectionID);
+  if (serverInfo)
+    {
+    serverInfo->GetTileMullions(this->TileMullions);
+    serverInfo->GetTileDimensions(this->TileDimensions);
+    }
 
   this->Superclass::EndCreateVTKObjects();
 
