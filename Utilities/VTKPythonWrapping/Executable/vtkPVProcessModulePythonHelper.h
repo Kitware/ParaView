@@ -61,14 +61,9 @@ protected:
   virtual ~vtkPVProcessModulePythonHelper();
 
   vtkSMApplication* SMApplication;
-  int ShowProgress;
-  vtkSetStringMacro(Filter);
-  char* Filter;
-  int CurrentProgress;
 
   bool DisableConsole;
 
-  void CloseCurrentProgress();
 private:
 
   vtkPVProcessModulePythonHelper(const vtkPVProcessModulePythonHelper&); // Not implemented

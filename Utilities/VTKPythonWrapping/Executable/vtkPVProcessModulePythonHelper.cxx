@@ -24,16 +24,13 @@
 
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.14");
+vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.15");
 vtkStandardNewMacro(vtkPVProcessModulePythonHelper);
 
 //----------------------------------------------------------------------------
 vtkPVProcessModulePythonHelper::vtkPVProcessModulePythonHelper()
 {
   this->SMApplication = vtkSMApplication::New();
-  this->ShowProgress = 0;
-  this->Filter = 0;
-  this->CurrentProgress = 0;
   this->DisableConsole = false;
 }
 
@@ -42,7 +39,6 @@ vtkPVProcessModulePythonHelper::~vtkPVProcessModulePythonHelper()
 {
   this->SMApplication->Finalize();
   this->SMApplication->Delete();
-  this->SetFilter(0);
 }
 
 //----------------------------------------------------------------------------
@@ -122,58 +118,12 @@ void vtkPVProcessModulePythonHelper::SendPrepareProgress()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModulePythonHelper::CloseCurrentProgress()
-{
-  if ( this->ShowProgress )
-    {
-    while ( this->CurrentProgress <= 10 )
-      {
-      cout << ".";
-      this->CurrentProgress ++;
-      }
-    cout << "]" << endl;
-    }
-  this->CurrentProgress = 0;
-}
-
-//----------------------------------------------------------------------------
 void vtkPVProcessModulePythonHelper::SendCleanupPendingProgress()
 {
-  this->CloseCurrentProgress();
-  this->ShowProgress = 0;
-  this->SetFilter(0);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVProcessModulePythonHelper::SetLocalProgress(const char* filter, int val)
 {
-  val /= 10;
-  int new_progress = 0;
-  if ( !filter || !this->Filter || strcmp(filter, this->Filter) != 0 )
-    {
-    this->CloseCurrentProgress();
-    this->SetFilter(filter);
-    new_progress = 1;
-    }
-  if ( !this->ShowProgress )
-    {
-    new_progress = 1;
-    this->ShowProgress = 1;
-    }
-  if ( new_progress )
-    {
-    if ( filter[0] == 'v' && filter[1] == 't' && filter[2] == 'k' )
-      {
-      filter += 3;
-      }
-    cout << "Process " << filter << " [";
-    cout.flush();
-    }
-  while ( this->CurrentProgress <= val )
-    {
-    cout << ".";
-    cout.flush();
-    this->CurrentProgress ++;
-    }
 }
 
