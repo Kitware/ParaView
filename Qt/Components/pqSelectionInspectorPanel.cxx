@@ -101,7 +101,6 @@ public:
     {
     this->SourceLinks = new pqPropertyLinks;
     this->RepLinks = new pqPropertyLinks;
-    this->GlobalIDsAdaptor = 0;
     this->IndicesAdaptor = 0;
     this->SelectionSource = 0;
     // Selection Labels Properties
@@ -156,7 +155,6 @@ public:
   QPointer<pqSelectionManager> SelectionManager;
   QPointer<pqRubberBandHelper> RubberBandHelper;
 
-  pqSignalAdaptorTreeWidget* GlobalIDsAdaptor;
   pqSignalAdaptorTreeWidget* IndicesAdaptor;
 
   QPointer<pqPipelineSource> InputSource;
@@ -185,6 +183,8 @@ public:
   pqSignalAdaptorComboBox *SelectionTypeAdaptor;
   pqSignalAdaptorTreeWidget* ThresholdsAdaptor;
   pqSignalAdaptorComboBox *ThresholdScalarArrayAdaptor;
+
+  bool UseProcessID;
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -228,12 +228,24 @@ pqSelectionInspectorPanel::pqSelectionInspectorPanel(QWidget *p) :
 
   this->setEnabled(false);
 
-  }
+}
 
 //-----------------------------------------------------------------------------
 pqSelectionInspectorPanel::~pqSelectionInspectorPanel()
 {
   delete this->Implementation;
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::activeServerChanged(pqServer* server)
+{
+  this->Implementation->UseProcessID =
+    (server && server->getNumberOfPartitions() > 1);
+
+  this->Implementation->Indices->setColumnHidden(0, 
+    !this->Implementation->UseProcessID);
+  this->Implementation->ProcessIDRange->setVisible(
+    this->Implementation->UseProcessID);
 }
 
 //-----------------------------------------------------------------------------
@@ -444,6 +456,9 @@ void pqSelectionInspectorPanel::setupGUI()
 
   this->Implementation->FieldTypeAdaptor = new pqSignalAdaptorComboBox(
     this->Implementation->comboFieldType);
+
+  // Updates the enable state of "Containing Cells" check box based on whether
+  // we are doing a point selection or cell selection. 
   QObject::connect(this->Implementation->FieldTypeAdaptor, 
     SIGNAL(currentTextChanged(const QString&)),
     this, SLOT(updateSelectionFieldType(const QString&)), Qt::QueuedConnection);
@@ -609,11 +624,10 @@ void pqSelectionInspectorPanel::updateSelectionSourceGUI()
   //  selectionSource, selectionSource->GetProperty("ContentType"));
   this->onSelectionContentTypeChanged();
 
-  //this->Implementation->SourceLinks->addPropertyLink(
-  //  this->Implementation->FieldTypeAdaptor, "currentText", 
-  //  SIGNAL(currentTextChanged(const QString&)),
-  //  selectionSource, selectionSource->GetProperty("FieldType"));
-  this->onSelectionFieldTypeChanged();
+  this->Implementation->SourceLinks->addPropertyLink(
+    this->Implementation->FieldTypeAdaptor, "currentText", 
+    SIGNAL(currentTextChanged(const QString&)),
+    selectionSource, selectionSource->GetProperty("FieldType"));
 
   //this->Implementation->SourceLinks->addPropertyLink(
   //  this->Implementation->checkboxPassThrough, "checked", SIGNAL(toggled(bool)),
@@ -630,15 +644,9 @@ void pqSelectionInspectorPanel::updateSelectionSourceGUI()
     selectionSource, 
     selectionSource->GetProperty("InsideOut"));
 
-  //this->Implementation->SourceLinks->addPropertyLink(
-  //  this->Implementation->UseGlobalIDs, "checked", SIGNAL(toggled(bool)),
-  //  selectionSource, selectionSource->GetProperty("UseGlobalIDs"));
-  //this->Implementation->SourceLinks->addPropertyLink(
-  //  this->Implementation->GlobalIDsAdaptor, "values", SIGNAL(valuesChanged()),
-  //  selectionSource, selectionSource->GetProperty("GlobalIDs"));
-  //this->Implementation->SourceLinks->addPropertyLink(
-  //  this->Implementation->IndicesAdaptor, "values", SIGNAL(valuesChanged()),
-  //  selectionSource, selectionSource->GetProperty("Indices"));
+  this->Implementation->SourceLinks->addPropertyLink(
+    this->Implementation->IndicesAdaptor, "values", SIGNAL(valuesChanged()),
+    selectionSource, selectionSource->GetProperty("IDs"));
 
   // Link Frustum selection properties
   this->Implementation->SourceLinks->addPropertyLink(
@@ -658,7 +666,7 @@ void pqSelectionInspectorPanel::updateSelectionSourceGUI()
 
   this->updateSelectionLabelEnableState();
 //  this->updateSelectionLabelModes();
-  this->updateSurfaceIDConnections();
+//  this->updateSurfaceIDConnections();
 
 }
 
@@ -942,12 +950,7 @@ void pqSelectionInspectorPanel::updateSelectionLabelModes()
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::setupSurfaceSelectionGUI()
 {
-
-  this->Implementation->GlobalIDs->sortItems(0, Qt::AscendingOrder);
   this->Implementation->Indices->sortItems(0, Qt::AscendingOrder);
-
-  this->Implementation->GlobalIDsAdaptor =
-    new pqSignalAdaptorTreeWidget(this->Implementation->GlobalIDs, true);
 
   this->Implementation->IndicesAdaptor=
     new pqSignalAdaptorTreeWidget(this->Implementation->Indices, true);
@@ -958,10 +961,8 @@ void pqSelectionInspectorPanel::setupSurfaceSelectionGUI()
   //this->Implementation->SelectionSource.GetPointer()->SetServers(
   //  this->Implementation->Representation.GetPointer()->GetServers());
 
-  QObject::connect(this->Implementation->GlobalIDsAdaptor, SIGNAL(valuesChanged()),
-    this, SLOT(updateSurfaceSelectionView()));
   QObject::connect(this->Implementation->IndicesAdaptor, SIGNAL(valuesChanged()),
-    this, SLOT(updateSurfaceSelectionView()));
+    this, SLOT(updateAllSelectionViews()));
   QObject::connect(this->Implementation->UseGlobalIDs, SIGNAL(toggled(bool)),
     this, SLOT(updateSurfaceIDConnections()));
 
@@ -1035,8 +1036,7 @@ void pqSelectionInspectorPanel::updateSurfaceSelectionIDRanges()
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::deleteSelectedSurfaceSelection()
 {
-  QTreeWidget* activeTree = (this->Implementation->UseGlobalIDs->isChecked()?  
-    this->Implementation->GlobalIDs: this->Implementation->Indices);
+  QTreeWidget* activeTree = this->Implementation->Indices;
 
   QList<QTreeWidgetItem*> items = activeTree->selectedItems(); 
   foreach (QTreeWidgetItem* item, items)
@@ -1048,27 +1048,23 @@ void pqSelectionInspectorPanel::deleteSelectedSurfaceSelection()
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::deleteAllSurfaceSelection()
 {
-  QTreeWidget* activeTree = (this->Implementation->UseGlobalIDs->isChecked()?  
-    this->Implementation->GlobalIDs: this->Implementation->Indices);
+  QTreeWidget* activeTree =  this->Implementation->Indices;
   activeTree->clear();
 }
 
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::newValueSurfaceSelection()
 {
-  pqSignalAdaptorTreeWidget* adaptor = 
-    (this->Implementation->UseGlobalIDs->isChecked()?  
-    this->Implementation->GlobalIDsAdaptor: this->Implementation->IndicesAdaptor);
-  QTreeWidget* activeTree = (this->Implementation->UseGlobalIDs->isChecked()?  
-    this->Implementation->GlobalIDs: this->Implementation->Indices);
+  pqSignalAdaptorTreeWidget* adaptor = this->Implementation->IndicesAdaptor;
+  QTreeWidget* activeTree = this->Implementation->Indices;
 
   QStringList value;
   // TODO: Use some good defaults.
   value.push_back(QString::number(0));
   if (!this->Implementation->UseGlobalIDs->isChecked())
-  {
+    {
     value.push_back(QString::number(0));
-  }
+    }
 
   pqSelectionInspectorTreeItem* item = new pqSelectionInspectorTreeItem(value);
   adaptor->appendItem(item);
@@ -1082,43 +1078,43 @@ void pqSelectionInspectorPanel::newValueSurfaceSelection()
 void pqSelectionInspectorPanel::updateSurfaceInformationAndDomains()
 {
   if(!this->Implementation->InputSource)
-  {
+    {
     return;
-  }
+    }
   vtkSMSourceProxy* sourceProxy = vtkSMSourceProxy::SafeDownCast(
     this->Implementation->InputSource->getProxy());
   if(!sourceProxy)
-  {
+    {
     return;
-  }
+    }
   vtkPVDataInformation* dataInfo = sourceProxy->GetDataInformation(0, false);
 
   if (!dataInfo)
-  {
+    {
     return;
-  }
+    }
 
   vtkPVDataSetAttributesInformation* dsainfo = 0;
   if (this->Implementation->comboFieldType->currentText() == QString("CELL"))
-  {
+    {
     dsainfo = dataInfo->GetCellDataInformation();
-  }
+    }
   else
-  {
+    {
     dsainfo = dataInfo->GetPointDataInformation();
-  }
+    }
 
   if (dsainfo->GetAttributeInformation(vtkDataSetAttributes::GLOBALIDS))
-  {
+    {
     // We have global ids.
     this->Implementation->UseGlobalIDs->setEnabled(true);
-  }
+    }
   else
-  {
+    {
     this->Implementation->UseGlobalIDs->setCheckState(Qt::Unchecked);
     this->Implementation->UseGlobalIDs->setEnabled(false);
-  }
-  
+    }
+
 }
 
 //-----------------------------------------------------------------------------
@@ -1127,16 +1123,16 @@ void pqSelectionInspectorPanel::updateSelectionContentType(const QString& type)
   // Set up selection connections
   vtkSMProxy* selectionSource = this->Implementation->SelectionSource.GetPointer();
   if(!selectionSource)
-  {
+    {
     return;
-  }
+    }
   vtkSMProperty* idvp = selectionSource->GetProperty("ContentType");
 
   if(!idvp)
-  {
+    {
     return;
-  }
-  
+    }
+
   if(type == QString("Thresholds"))
     {
     pqSMAdaptor::setElementProperty(
@@ -1177,6 +1173,8 @@ void pqSelectionInspectorPanel::updateSelectionContentType(const QString& type)
 }
 
 //-----------------------------------------------------------------------------
+// Updates the enable state of "Containing Cells" check box based on whether
+// we are doing a point selection or cell selection. 
 void pqSelectionInspectorPanel::updateSelectionFieldType(const QString& type)
 {
   if(type == QString("POINT"))
@@ -1187,38 +1185,11 @@ void pqSelectionInspectorPanel::updateSelectionFieldType(const QString& type)
     {
     this->Implementation->checkboxContainCell->setEnabled(false);
     }
-
-  // Set up selection connections
-  vtkSMProxy* selectionSource = this->Implementation->SelectionSource.GetPointer();
-  if(!selectionSource)
-  {
-  return;
-  }
-  vtkSMProperty* idvp = selectionSource->GetProperty("FieldType");
-
-  if(!idvp)
-  {
-  return;
-  }
-  
-  if(type == QString("CELL"))
-    {
-    pqSMAdaptor::setElementProperty(
-      idvp, vtkSelection::CELL);
-    }
-  else if(type == QString("POINT"))
-    {
-    pqSMAdaptor::setElementProperty(
-      idvp, vtkSelection::POINT);
-    }
-  else
-    {
-    return;
-    }
-  this->updateSurfaceIDConnections();
 }
 
 //-----------------------------------------------------------------------------
+// Update the SMProperty for ContentType based on the GUI state of ContentType
+// combo box and the UseGlobalIDs check box.
 void pqSelectionInspectorPanel::updateSurfaceIDConnections()
 {
   if(!this->Implementation->SelectionSource ||
@@ -1228,48 +1199,33 @@ void pqSelectionInspectorPanel::updateSurfaceIDConnections()
     }
 
   if(this->Implementation->SelectionTypeAdaptor->currentText() != "IDs")
-  {
+    {
     return;
-  }
-
-  // Set up selection connections
-  vtkSMProxy* selectionSource = this->Implementation->SelectionSource.GetPointer();
-  this->Implementation->SourceLinks->removePropertyLink(
-    this->Implementation->GlobalIDsAdaptor, "values", SIGNAL(valuesChanged()),
-    selectionSource, selectionSource->GetProperty("IDs"));
-  this->Implementation->SourceLinks->removePropertyLink(
-    this->Implementation->IndicesAdaptor, "values", SIGNAL(valuesChanged()),
-    selectionSource, selectionSource->GetProperty("IDs"));
-
-  if(this->Implementation->UseGlobalIDs->isChecked())
-    {
-    this->Implementation->SourceLinks->addPropertyLink(
-      this->Implementation->GlobalIDsAdaptor, "values", SIGNAL(valuesChanged()),
-      selectionSource, selectionSource->GetProperty("IDs"));
-    }
-  else
-    {
-    this->Implementation->SourceLinks->addPropertyLink(
-      this->Implementation->IndicesAdaptor, "values", SIGNAL(valuesChanged()),
-      selectionSource, selectionSource->GetProperty("IDs"));
     }
 
   //vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
   //  selectionSource->GetProperty("FieldType"));
   //ivp->SetElement(0, vtkSelection::CELL);
 
+  vtkSMProxy* selectionSource = this->Implementation->SelectionSource.GetPointer();
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     selectionSource->GetProperty("ContentType"));
+  QStringList headerLabels;
+  headerLabels << "Process ID";
   if (this->Implementation->UseGlobalIDs->isChecked())
     {
     ivp->SetElement(0, vtkSelection::GLOBALIDS);
+    headerLabels << "Global ID";
     }
   else
     {
     ivp->SetElement(0, vtkSelection::INDICES);
+    headerLabels << "Index";
     }
-  
-  this->updateSurfaceSelectionView();
+  this->Implementation->Indices->setHeaderLabels(headerLabels);
+  selectionSource->UpdateVTKObjects();
+
+  this->updateAllSelectionViews();
 }
 
 //-----------------------------------------------------------------------------
@@ -1355,35 +1311,6 @@ void pqSelectionInspectorPanel::addThresholds()
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionInspectorPanel::updateSurfaceSelectionView()
-{
-  if(!this->Implementation->SelectionSource ||
-    !this->Implementation->SelectionSource.GetPointer())
-  {
-    return;
-  }
-  // Set up selection connections
-  vtkSMProxy* selectionSource = 
-    this->Implementation->SelectionSource.GetPointer();
-  vtkSMProperty* idvp = selectionSource->GetProperty("IDs");
-
-  if(this->Implementation->UseGlobalIDs->isChecked())
-    {
-    pqSMAdaptor::setMultipleElementProperty(
-      idvp, this->Implementation->GlobalIDsAdaptor->values());
-    selectionSource->UpdateVTKObjects();
-    }
-  else
-    {
-    pqSMAdaptor::setMultipleElementProperty(
-      idvp, this->Implementation->IndicesAdaptor->values());
-    selectionSource->UpdateVTKObjects();
-    }
-
-  this->updateAllSelectionViews();
-}
-
-//-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::updateRepresentationViews()
 {
   if (this->Implementation->Representation)
@@ -1423,25 +1350,28 @@ void pqSelectionInspectorPanel::onSelectionModeChanged(int selMode)
 }
 
 //-----------------------------------------------------------------------------
+// Use SMProperty ContentType to update the GUI.
 void pqSelectionInspectorPanel::onSelectionContentTypeChanged()
 {
   // Set up selection connections
   vtkSMProxy* selectionSource = this->Implementation->SelectionSource.GetPointer();
   if(!selectionSource)
-  {
+    {
     return;
-  }
+    }
 
   vtkSMProperty* idvp = selectionSource->GetProperty("ContentType");
   if(!idvp)
-  {
+    {
     return;
-  }
+    }
   int contType = pqSMAdaptor::getElementProperty(idvp).toInt();
 
   if(contType == vtkSelection::INDICES || contType == vtkSelection::GLOBALIDS)
     {
     this->Implementation->SelectionTypeAdaptor->setCurrentText("IDs");
+    this->Implementation->UseGlobalIDs->setCheckState(
+      (contType == vtkSelection::GLOBALIDS)? Qt::Checked: Qt::Unchecked);
     }
   else if(contType == vtkSelection::FRUSTUM)
     {

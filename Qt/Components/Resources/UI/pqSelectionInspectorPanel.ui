@@ -312,40 +312,6 @@
            </column>
           </widget>
          </item>
-         <item>
-          <widget class="QTreeWidget" name="GlobalIDs" >
-           <property name="sizePolicy" >
-            <sizepolicy>
-             <hsizetype>5</hsizetype>
-             <vsizetype>7</vsizetype>
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="alternatingRowColors" >
-            <bool>true</bool>
-           </property>
-           <property name="selectionMode" >
-            <enum>QAbstractItemView::ExtendedSelection</enum>
-           </property>
-           <property name="rootIsDecorated" >
-            <bool>false</bool>
-           </property>
-           <property name="sortingEnabled" >
-            <bool>true</bool>
-           </property>
-           <column>
-            <property name="text" >
-             <string>Process ID</string>
-            </property>
-           </column>
-           <column>
-            <property name="text" >
-             <string>Global ID</string>
-            </property>
-           </column>
-          </widget>
-         </item>
         </layout>
        </item>
       </layout>
@@ -1427,11 +1393,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqColorChooserButton</class>
-   <extends>QPushButton</extends>
-   <header>pqColorChooserButton.h</header>
-  </customwidget>
-  <customwidget>
    <class>pqCollapsedGroup</class>
    <extends>QGroupBox</extends>
    <header>pqCollapsedGroup.h</header>
@@ -1441,6 +1402,11 @@
    <class>pqDoubleRangeWidget</class>
    <extends>QWidget</extends>
    <header>pqDoubleRangeWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqColorChooserButton</class>
+   <extends>QPushButton</extends>
+   <header>pqColorChooserButton.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
@@ -1506,38 +1472,6 @@
     <hint type="destinationlabel" >
      <x>264</x>
      <y>175</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>UseGlobalIDs</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>GlobalIDs</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>75</x>
-     <y>154</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>87</x>
-     <y>348</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>UseGlobalIDs</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>Indices</receiver>
-   <slot>setHidden(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>151</x>
-     <y>154</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>158</x>
-     <y>265</y>
     </hint>
    </hints>
   </connection>

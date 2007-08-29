@@ -1228,6 +1228,10 @@ void pqMainWindowCore::setupSelectionInspector(QDockWidget* dock_widget)
   selection_inspector->setRubberBandHelper(
     this->renderViewSelectionHelper());
 
+  QObject::connect(
+    &this->Implementation->ActiveServer, SIGNAL(changed(pqServer*)),
+    selection_inspector, SLOT(activeServerChanged(pqServer*)));
+
   //QObject::connect(this, SIGNAL(postAccept()),
   //  selection_inspector, SLOT(refresh()));
 

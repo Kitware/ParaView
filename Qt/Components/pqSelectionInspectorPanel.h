@@ -71,6 +71,10 @@ public slots:
   /// surface selection is cleared).
   void onSelectionChanged();
 
+  /// Called when active server changes. We make the decision if process id
+  /// needs to be shown for the server connection.
+  void activeServerChanged(pqServer* server);
+
 protected:
 
   void setupGUI();
@@ -117,7 +121,6 @@ protected slots:
   void updateSelectionFieldType(const QString&);
   void updateSelectionContentType(const QString&);
 
-  void updateSurfaceSelectionView();
   void updateSelectionSource();
 
   virtual void onSelectionModeChanged(int mode);
