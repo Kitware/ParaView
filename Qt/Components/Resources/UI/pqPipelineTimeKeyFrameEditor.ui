@@ -93,6 +93,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>noneRadio</tabstop>
+  <tabstop>constantRadio</tabstop>
+  <tabstop>constantTime</tabstop>
+  <tabstop>variableRadio</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
