@@ -522,14 +522,6 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
 }
 
 //-----------------------------------------------------------------------------
-void pqFileDialog::emitFileSelected(const QString& file)
-{
-  QStringList files;
-  files << file;
-  this->emitFilesSelected(files);
-}
-
-//-----------------------------------------------------------------------------
 void pqFileDialog::emitFilesSelected(const QStringList& files)
 {
   // Ensure that we are hidden before broadcasting the selection,
@@ -552,6 +544,16 @@ void pqFileDialog::accept()
   /* TODO:  handle pqFileDialog::ExistingFiles mode */
   QString filename = this->Implementation->Ui.FileName->text();
   filename = filename.trimmed();
+
+  QString emitFilename = filename;
+  QFileInfo info(emitFilename);
+  if(!info.isAbsolute())
+    {
+    QString currentPath = this->Implementation->Model->getCurrentPath();
+    QFileInfo joinInfo(currentPath, emitFilename);
+    emitFilename = joinInfo.absoluteFilePath();
+    }
+  emit this->fileAccepted(emitFilename);
   
   // TODO: if it is a group, we're getting the first file instead
   // This is changed to pass along all files in the group, since now
@@ -562,7 +564,8 @@ void pqFileDialog::accept()
   for(int i=0; i<numrows; i++)
     {
     QModelIndex idx = m->index(i, 0, QModelIndex());
-    if(filename == m->data(idx, Qt::DisplayRole))
+    QString cmp = m->data(idx, Qt::DisplayRole).toString();
+    if(filename == cmp)
       {
       QModelIndex sidx = m->mapToSource(idx);
       QStringList sel_files = this->Implementation->Model->getFilePaths(sidx);
@@ -751,7 +754,7 @@ void pqFileDialog::acceptInternal(QStringList& selected_files)
     switch(this->Implementation->Mode)
       {
       case Directory:
-        this->emitFileSelected(file);
+        this->emitFilesSelected(QStringList(file));
         break;
 
       case ExistingFile:
@@ -812,7 +815,7 @@ void pqFileDialog::acceptInternal(QStringList& selected_files)
           {
           return;
           }
-        this->emitFileSelected(file);
+        this->emitFilesSelected(QStringList(file));
         return;
       }
     }
@@ -827,7 +830,7 @@ void pqFileDialog::acceptInternal(QStringList& selected_files)
       return;
 
     case AnyFile:
-      this->emitFileSelected(file);
+      this->emitFilesSelected(QStringList(file));
       return;
       }
     }
@@ -866,5 +869,12 @@ void pqFileDialog::fileSelectionChanged()
 
 
   this->Implementation->Ui.FileName->setText(fileString);
+}
+  
+void pqFileDialog::setCurrentFile(const QString& f)
+{
+  QFileInfo info(f);
+  this->Implementation->Model->setCurrentPath(info.absolutePath());
+  this->Implementation->Ui.FileName->setText(info.fileName());
 }
 

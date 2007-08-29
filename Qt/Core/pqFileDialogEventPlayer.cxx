@@ -85,11 +85,10 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
     fileString.replace("$PARAVIEW_DATA_ROOT", data_directory);
     fileString.replace("$PARAVIEW_TEST_ROOT", test_directory);
 
-    QStringList files = fileString.split(',', QString::SkipEmptyParts);
-
-    object->emitFilesSelected(files);
+    object->setCurrentFile(fileString);
+    object->accept();
     pqEventDispatcher::processEventsAndWait(0);
-        
+
     return true;
     }
     

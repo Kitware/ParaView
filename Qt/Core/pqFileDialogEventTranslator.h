@@ -61,7 +61,7 @@ private:
   pqFileDialog* CurrentObject;
 
 private slots:
-  void onFilesSelected(const QStringList&);
+  void onFilesSelected(const QString&);
   void onCancelled();
 };
 

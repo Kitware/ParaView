@@ -64,7 +64,7 @@ bool pqFileDialogEventTranslator::translateEvent(QObject* Object, QEvent* Event,
       {
       case QEvent::Enter:
         this->CurrentObject = object;
-        connect(object, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFilesSelected(const QStringList&)));
+        connect(object, SIGNAL(fileAccepted(const QString&)), this, SLOT(onFilesSelected(const QString&)));
         connect(object, SIGNAL(rejected()), this, SLOT(onCancelled()));
         break;
       case QEvent::Leave:
@@ -79,7 +79,7 @@ bool pqFileDialogEventTranslator::translateEvent(QObject* Object, QEvent* Event,
   return true;
 }
 
-void pqFileDialogEventTranslator::onFilesSelected(const QStringList& files)
+void pqFileDialogEventTranslator::onFilesSelected(const QString& file)
 {
   const QString data_directory = pqCoreTestUtility::DataRoot();
   if(data_directory.isEmpty())
@@ -88,27 +88,20 @@ void pqFileDialogEventTranslator::onFilesSelected(const QStringList& files)
     return;
     }
 
-  QStringList cleanedFiles;
-
-  for(int i = 0; i < files.size(); i++)
+  QString cleanedFile = file;
+  cleanedFile.replace('\\', '/');
+  
+  if(cleanedFile.indexOf(data_directory, 0, Qt::CaseInsensitive) == 0)
     {
-    QString file = files[i];
-    file.replace('\\', '/');
-    
-    if(file.indexOf(data_directory, 0, Qt::CaseInsensitive) == 0)
-      {
-      file.replace(data_directory, "$PARAVIEW_DATA_ROOT", Qt::CaseInsensitive);
-      }
-    else
-      {
-      qCritical() << "You must choose a file under the PARAVIEW_DATA_ROOT directory to record file selections.";
-      return;
-      }
-    
-    cleanedFiles.append(file);
+    cleanedFile.replace(data_directory, "$PARAVIEW_DATA_ROOT", Qt::CaseInsensitive);
+    }
+  else
+    {
+    qCritical() << "You must choose a file under the PARAVIEW_DATA_ROOT directory to record file selections.";
+    return;
     }
   
-  emit recordEvent(this->CurrentObject, "filesSelected", cleanedFiles.join(","));
+  emit recordEvent(this->CurrentObject, "filesSelected", cleanedFile);
 }
 
 void pqFileDialogEventTranslator::onCancelled()

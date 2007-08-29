@@ -109,20 +109,24 @@ public:
   /// set the file mode
   void setFileMode(FileMode);
 
-  /// Emits the filesSelected() signal and closes the dialog,
-  void emitFileSelected(const QString&);
-  /// Emits the filesSelected() signal and closes the dialog,
-  void emitFilesSelected(const QStringList&);
-
   /// Returns the set of files
   QStringList getSelectedFiles();
 
+  /// accept this dialog
   void accept();
+
+  /// set a file current to support test playback
+  void setCurrentFile(const QString&);
 
 signals:
   /// Signal emitted when the user has chosen a set of files
   /// and accepted the dialog
   void filesSelected(const QStringList&);
+
+  /// signal emitted when user has chosen a set of files and accepted the
+  /// dialog.  This signal includes only the path and file string as is
+  /// This is to support test recording
+  void fileAccepted(const QString&);
 
 private slots:
   void onModelReset();
@@ -153,6 +157,9 @@ private slots:
   // Called when the user presses 'return' or clicks out of the qlineedit 
   // widget used to change the name of a directory that has just been created
   void onFinishedEditingNewFolderName();
+  
+  /// Emits the filesSelected() signal and closes the dialog,
+  void emitFilesSelected(const QStringList&);
   
 private:
   pqFileDialog(const pqFileDialog&);
