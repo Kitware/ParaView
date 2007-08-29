@@ -568,6 +568,13 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqView* view)
       }
     }
 
+  QAction *optionsAction= frame->getAction("OptionsButton");
+  if(optionsAction)
+    {
+    frame->removeTitlebarAction(optionsAction);
+    delete optionsAction;
+    }
+
   if (view->supportsUndo())
     {
     QAction *forwardAction= frame->getAction("ForwardButton");
