@@ -35,7 +35,7 @@
 
 
 vtkStandardNewMacro(vtkServerConnection);
-vtkCxxRevisionMacro(vtkServerConnection, "1.12");
+vtkCxxRevisionMacro(vtkServerConnection, "1.13");
 //-----------------------------------------------------------------------------
 vtkServerConnection::vtkServerConnection()
 {
@@ -449,7 +449,10 @@ int vtkServerConnection::AuthenticateWithServer(vtkSocketController* controller)
     vtkRemoteConnection::CLIENT_SERVER_COMMUNICATION_TAG);
   if (!match)
     {
-    vtkErrorMacro("Connection ID mismatch.");
+    vtkErrorMacro("Connection ID mismatch. Make sure to specify the right "
+                  "connection id on the server and client. This error can "
+                  "also occur if you have mismatching client and server "
+                  "versions even if you are not using connection ids.");
     return 0;
     }
 
