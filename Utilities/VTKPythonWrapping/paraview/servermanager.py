@@ -1105,7 +1105,7 @@ def LoadState(filename, connection=None):
     if not connection:
         raise exceptions.RuntimeError, "Cannot load state without a connection"
     loader = vtkSMPQStateLoader()
-    rvname = _getRenderViewName(connection)
+    rvname = vtkSMRenderViewProxy.GetSuggestedRenderViewType(connection.ID)
     if rvname:
         loader.SetRenderViewXMLName(rvname)
         pm = ProxyManager()
@@ -1216,19 +1216,6 @@ def GetRenderViews(connection=None):
             render_modules.append(aProxy)
     return render_modules
 
-def _getRenderViewName(connection):
-    """Utility function that returns the name of the render view
-    that is appropriate for the given connection"""
-    proxy_xml_name = None
-    if connection.IsRemote():
-        proxy_xml_name = "IceTDesktopRenderView"
-    else:
-        if connection.GetNumberOfDataPartitions() > 1:
-            proxy_xml_name = "IceTCompositeView"
-        else:
-            proxy_xml_name = "RenderView"
-    return proxy_xml_name
-    
 def CreateRenderView(connection=None, **extraArgs):
     """Creates a render window on the particular connection. If connection
     is not specified, then the active connection is used, if available.
@@ -1244,7 +1231,8 @@ def CreateRenderView(connection=None, **extraArgs):
     if not connection:
         raise exceptions.RuntimeError, "Cannot create render window without connection."
     pxm = ProxyManager()
-    proxy_xml_name = _getRenderViewName(connection)
+    proxy_xml_name = vtkSMRenderViewProxy.GetSuggestedRenderViewType(\
+        connection.ID)
     ren_module = None
     if proxy_xml_name:
         ren_module = CreateProxy("views", proxy_xml_name, connection)
@@ -1435,6 +1423,10 @@ def ToggleProgressPrinting():
     
 def Finalize():
     """Although not required, this can be called at exit to cleanup."""
+    global progressObserverTag
+    # Make sure to remove the observer
+    if progressObserverTag:
+        ToggleProgressPrinting()
     vtkInitializationHelper.Finalize()
     
 # Internal methods
