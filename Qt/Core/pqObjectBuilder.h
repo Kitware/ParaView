@@ -150,16 +150,19 @@ public:
   virtual void destroy(pqProxy* proxy);
 
   /// Destroy all sources/filters on a server.
-  virtual void destroySources(pqServer*);
+  virtual void destroySources(pqServer* server=0);
 
-  /// Destroy all sources/filters on all servers.
-  void destroySources();
+  /// Destroy all lookup tables and scalar bars associated with them.
+  virtual void destroyLookupTables(pqServer* server=0);
+
+  /// Destroys all proxies that are involved in pipelines i.e. simply calls
+  /// destroySources(), destroyLookupTables().
+  virtual void destroyPipelineProxies(pqServer* server=0);
 
   /// This method unregisters all proxies on the given server. 
   /// This is usually done in anticipate of a disconnect
   /// or starting afresh.
   virtual void destroyAllProxies(pqServer* server);
-
 
   /// This is a convenience method to return the name of the
   /// property on the proxy, if any, which can be used to set the filename.

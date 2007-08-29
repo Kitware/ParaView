@@ -499,7 +499,6 @@ void pqObjectBuilder::destroy(pqRepresentation* repr)
 
   emit this->destroying(repr);
 
-
   // Remove repr from the view module.
   pqView* view = repr->getView();
   if (view)
@@ -637,15 +636,32 @@ void pqObjectBuilder::destroySources(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-void pqObjectBuilder::destroySources()
+void pqObjectBuilder::destroyLookupTables(pqServer* server)
 {
   pqServerManagerModel* model = 
     pqApplicationCore::instance()->getServerManagerModel();
-  QList<pqServer*> servers = model->findItems<pqServer*>();
-  foreach(pqServer* server, servers)
+  pqObjectBuilder* builder =
+    pqApplicationCore::instance()->getObjectBuilder();
+
+  QList<pqScalarsToColors*> luts = model->findItems<pqScalarsToColors*>(server);
+  foreach (pqScalarsToColors* lut, luts)
     {
-    this->destroySources(server);
+    builder->destroy(lut);
     }
+
+  QList<pqScalarBarRepresentation*> scalarbars = 
+    model->findItems<pqScalarBarRepresentation*>(server);
+  foreach (pqScalarBarRepresentation* sb, scalarbars)
+    {
+    builder->destroy(sb);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqObjectBuilder::destroyPipelineProxies(pqServer* server)
+{
+  this->destroySources(server);
+  this->destroyLookupTables(server);
 }
 
 //-----------------------------------------------------------------------------
