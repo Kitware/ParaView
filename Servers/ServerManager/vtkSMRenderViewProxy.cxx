@@ -41,6 +41,7 @@
 #include "vtkPVGeometryInformation.h"
 #include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkPVOptions.h"
+#include "vtkPVServerInformation.h"
 #include "vtkPVVisibleCellSelector.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderer.h"
@@ -65,6 +66,7 @@
 #include "vtkSMMultiProcessRenderView.h"
 #include "vtkProp3DCollection.h"
 
+#include <vtksys/SystemTools.hxx>
 #include <vtkstd/map>
 #include <vtkstd/set>
 #include <vtkstd/vector>
@@ -89,7 +91,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.46");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.47");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1813,6 +1815,50 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
 
   return vtkSMRepresentationProxy::SafeDownCast(
       pxm->NewProxy("representations", "GeometryRepresentation"));
+}
+
+//-----------------------------------------------------------------------------
+const char* vtkSMRenderViewProxy::GetSuggestedRenderViewType(
+  vtkIdType connectionID)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
+  // Default is built-in connection
+  const char* renderViewName = "RenderView";
+  if (pm->IsRemote(connectionID))
+    {
+    // Client-server
+    vtkPVServerInformation* server_info = pm->GetServerInformation(
+      connectionID);
+    if (server_info && server_info->GetUseIceT())
+      {
+      // With ice-t
+      if (server_info->GetTileDimensions()[0] )
+        {
+        // tiled-display
+        renderViewName = "IceTMultiDisplayRenderView";
+        }
+      else
+        {
+        // regular client-server
+        renderViewName = "IceTDesktopRenderView";
+        }
+      } 
+    else
+      {
+      // This fallback render module does not handle parallel rendering or tile
+      // display, but it will handle remote serial rendering and multiple views.
+      renderViewName = "ClientServerRenderView";
+      }
+    }
+  else if (pm->GetNumberOfPartitions(connectionID) > 1) 
+    {
+    // MPI but not client-server. pvbatch and disconnected server generating
+    // animation.
+    renderViewName = "IceTCompositeView";
+    }
+  
+  return renderViewName;
 }
 
 //-----------------------------------------------------------------------------

@@ -220,6 +220,11 @@ public:
   virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy* proxy)
     { return this->Superclass::CreateDefaultRepresentation(proxy); }
 
+  // Description:
+  // This method returns the suggested render view type (as a proxy name)
+  // for the given connection. 
+  static const char* GetSuggestedRenderViewType(vtkIdType connectionID);
+
 //BTX
 protected:
   vtkSMRenderViewProxy();
