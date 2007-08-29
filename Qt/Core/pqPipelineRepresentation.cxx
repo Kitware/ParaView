@@ -288,6 +288,26 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
         "Outline");
       }
     }
+  if (repr->GetProperty("ScalarOpacityUnitDistance"))
+    {
+    double bounds[6];
+    dataInfo->GetBounds(bounds);
+    double diameter =
+      sqrt( (bounds[1] - bounds[0]) * (bounds[1] - bounds[0]) +
+        (bounds[3] - bounds[2]) * (bounds[3] - bounds[2]) +
+        (bounds[5] - bounds[4]) * (bounds[5] - bounds[4]) );
+
+    int numCells = dataInfo->GetNumberOfCells();
+    double linearNumCells = pow( (double) numCells, (1.0/3.0) );
+    double unitDistance = diameter;
+    if (linearNumCells != 0.0)
+      {
+      unitDistance = diameter / linearNumCells;
+      }
+    pqSMAdaptor::setElementProperty(
+      repr->GetProperty("ScalarOpacityUnitDistance"),
+      unitDistance);
+    }
   repr->UpdateVTKObjects();
 
   // Update the representation, so that we can obtain updated data information.
