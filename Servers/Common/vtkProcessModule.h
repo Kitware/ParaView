@@ -546,7 +546,7 @@ public:
   // the client.  The gui must explicitly call this method to check if any
   // new connections are pending.  Return value: -1 on error, 0 on timeout,
   // 1 if a new connection has been established.
-  int MonitorConnections(unsigned long msec);
+  vtkIdType MonitorConnections(unsigned long msec);
   
   // Description:
   // Clear this flag to override using of MPI for self connection.  This
@@ -590,7 +590,18 @@ public:
   // To gather information about caches on all processes,
   // use vtkPVCacheSizeInformation.
   vtkGetObjectMacro(CacheSizeKeeper, vtkCacheSizeKeeper);
+
+  // Description:
+  // Returns the value (0-100) of the last progress that was
+  // reported.
+  int GetLastProgress() { return this->LastProgress; }
+
+  // Description:
+  // Returns the name of the algorithm the last progress was reported for.
+  vtkGetStringMacro(LastProgressName);
+
 //BTX
+
 protected:
   vtkProcessModule();
   ~vtkProcessModule();
@@ -692,6 +703,10 @@ protected:
   vtkTimerLog* Timer;
   vtkKWProcessStatistics* MemoryInformation;
 
+  vtkSetStringMacro(LastProgressName);
+  char* LastProgressName;
+  int LastProgress;
+
   // Description:
   // When this flag is set, it implies that the server (or client)
   // can accept multiple remote connections. This class only affects when running
@@ -722,6 +737,8 @@ protected:
 private:
   vtkProcessModule(const vtkProcessModule&); // Not implemented.
   void operator=(const vtkProcessModule&); // Not implemented.
+
+  vtkIdType LastConnectionID;
 //ETX
 };
 

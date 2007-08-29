@@ -104,7 +104,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.72");
+vtkCxxRevisionMacro(vtkProcessModule, "1.73");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -148,6 +148,11 @@ vtkProcessModule::vtkProcessModule()
   this->SendStreamToClientOnly = 0;
 
   this->CacheSizeKeeper = vtkCacheSizeKeeper::New();
+
+  this->LastConnectionID = -1;
+
+  this->LastProgress = -1;
+  this->LastProgressName = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -683,14 +688,16 @@ int vtkProcessModule::IsRemote(vtkIdType id)
 }
 
 //-----------------------------------------------------------------------------
-int vtkProcessModule::MonitorConnections(unsigned long msec)
+vtkIdType vtkProcessModule::MonitorConnections(unsigned long msec)
 {
   switch(this->ConnectionManager->MonitorConnections(msec))
     {
     case -1:
       return -1;
     case 2:
-      return 1;
+      vtkIdType connid = this->LastConnectionID;
+      this->LastConnectionID = -1;
+      return connid;
     }
     
   return 0;
@@ -1142,8 +1149,15 @@ void vtkProcessModule::SendCleanupPendingProgress(vtkIdType connectionId)
   this->SendStream(connectionId, this->Internals->ProgressServersFlag, stream);
   this->Internals->ProgressServersFlag = 0;
   
-
   this->GUIHelper->SendCleanupPendingProgress();
+
+  if (this->LastProgress < 100 && this->LastProgressName)
+    {
+    this->LastProgress = 100;
+    float fprog = 1.0;
+    this->InvokeEvent(vtkCommand::ProgressEvent, &fprog);
+    this->SetLastProgressName(0);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1213,6 +1227,10 @@ void vtkProcessModule::ExecuteEvent(
     break;
 
   case vtkCommand::ConnectionCreatedEvent:
+    this->InvokeEvent(event, calldata);
+    this->LastConnectionID = *(reinterpret_cast<vtkIdType*>(calldata));
+    break;
+
   case vtkCommand::ConnectionClosedEvent:
     this->InvokeEvent(event, calldata);
     break;
@@ -1245,6 +1263,10 @@ void vtkProcessModule::SetLocalProgress(const char* filter, int progress)
       << " " << progress);
     return;
     }
+  this->LastProgress = progress;
+  this->SetLastProgressName(filter);
+  float fprog = (float)progress/100.0;
+  this->InvokeEvent(vtkCommand::ProgressEvent, &fprog);
   this->GUIHelper->SetLocalProgress(filter, progress);
 }
 
