@@ -314,6 +314,10 @@ void pqSelectionInspectorPanel::onSelectionChanged()
     //this->setEnabled(true);
     this->setSelectionSource(inputsrc->GetSelectionInput(portnum));
     }
+  else
+    {
+    this->setSelectionSource(0);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -422,6 +426,7 @@ void pqSelectionInspectorPanel::setSelectionSource(
     this->Implementation->SourceLinks->removeAllPropertyLinks();
     }
 
+  this->Implementation->SelectionSource = source;
   if (!source )
     {
     this->setEnabled(false);
@@ -438,11 +443,7 @@ void pqSelectionInspectorPanel::setSelectionSource(
       NULL, 0.0,
       Qt::QueuedConnection);
     }
-
-  this->Implementation->SelectionSource = source;
-
   this->updateSelectionSourceGUI();
-
 }
 
 //-----------------------------------------------------------------------------
