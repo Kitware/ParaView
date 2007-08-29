@@ -1328,7 +1328,7 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
      <DoubleVectorProperty 
         name="Locations"
         command="AddLocation" 
-        clean_command="RemoveAllValues"
+        clean_command="RemoveAllLocations"
         repeat_command="1"
         number_of_elements_per_command="3"
         number_of_elements="0"
@@ -1341,7 +1341,7 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
      <DoubleVectorProperty 
         name="Thresholds"
         command="AddThreshold" 
-        clean_command="RemoveAllValues"
+        clean_command="RemoveAllThresholds"
         repeat_command="1"
         number_of_elements_per_command="2"
         number_of_elements="0"
@@ -1364,8 +1364,6 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
      <DoubleVectorProperty 
         name="Frustum"
         command="SetFrustum" 
-        clean_command="RemoveAllValues"
-        repeat_command="0"
         number_of_elements="32"
         argument_is_array="1"
         default_values=
