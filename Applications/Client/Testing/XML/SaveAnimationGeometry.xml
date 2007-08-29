@@ -7,6 +7,7 @@
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tracksGroup/propertyName" command="set_string" arguments="Start Theta" />
   <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/addKeyFrame" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuFile" command="activate" arguments="actionFileSaveGeometry" />
+  <pqevent object="MainWindow/FileSaveAnimationDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/SaveAnimationGeometry.pvd" />
   <pqevent object="MainWindow/FileSaveAnimationDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/SaveAnimationGeometry.pvd" />
   <pqevent object="MainWindow/VCRToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Delete" command="activate" arguments="" />
