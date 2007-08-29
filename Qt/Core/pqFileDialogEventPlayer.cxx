@@ -85,8 +85,7 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
     fileString.replace("$PARAVIEW_DATA_ROOT", data_directory);
     fileString.replace("$PARAVIEW_TEST_ROOT", test_directory);
 
-    object->setCurrentFile(fileString);
-    object->accept();
+    object->selectFile(fileString);
     pqEventDispatcher::processEventsAndWait(0);
 
     return true;

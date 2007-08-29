@@ -116,7 +116,7 @@ public:
   void accept();
 
   /// set a file current to support test playback
-  void setCurrentFile(const QString&);
+  void selectFile(const QString&);
 
 signals:
   /// Signal emitted when the user has chosen a set of files

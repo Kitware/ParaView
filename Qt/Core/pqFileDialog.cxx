@@ -115,6 +115,7 @@ public:
   Ui::pqFileDialog Ui;
   QStringList SelectedFiles;
   QString TempFolderName;
+  bool SupressOverwriteWarning;
   
   // remember the last locations we browsed
   static QMap<QPointer<pqServer>, QString> ServerFilePaths;
@@ -126,7 +127,8 @@ public:
     FavoriteModel(new pqFileDialogFavoriteModel(server, NULL)),
     FileFilter(this->Model),
     FolderNameEditorWidget(NULL),
-    Mode(ExistingFile)
+    Mode(ExistingFile),
+    SupressOverwriteWarning(false)
   {
   }
   
@@ -545,36 +547,44 @@ void pqFileDialog::accept()
   QString filename = this->Implementation->Ui.FileName->text();
   filename = filename.trimmed();
 
-  QString emitFilename = filename;
-  QFileInfo info(emitFilename);
+  QString fullFilePath = filename;
+  QFileInfo info(fullFilePath);
   if(!info.isAbsolute())
     {
     QString currentPath = this->Implementation->Model->getCurrentPath();
-    QFileInfo joinInfo(currentPath, emitFilename);
-    emitFilename = joinInfo.absoluteFilePath();
+    QFileInfo joinInfo(currentPath, fullFilePath);
+    fullFilePath = joinInfo.absoluteFilePath();
     }
-  emit this->fileAccepted(emitFilename);
+  emit this->fileAccepted(fullFilePath);
   
-  // TODO: if it is a group, we're getting the first file instead
-  // This is changed to pass along all files in the group, since now
-  // we can handle a file-series dataset.
-  QAbstractProxyModel* m = &this->Implementation->FileFilter;
   QStringList files;
-  int numrows = m->rowCount(QModelIndex());
-  for(int i=0; i<numrows; i++)
+  if(this->Implementation->Mode != pqFileDialog::AnyFile)
     {
-    QModelIndex idx = m->index(i, 0, QModelIndex());
-    QString cmp = m->data(idx, Qt::DisplayRole).toString();
-    if(filename == cmp)
+    // if we got a group, let's expand it.
+    QAbstractProxyModel* m = &this->Implementation->FileFilter;
+    int numrows = m->rowCount(QModelIndex());
+    for(int i=0; i<numrows; i++)
       {
-      QModelIndex sidx = m->mapToSource(idx);
-      QStringList sel_files = this->Implementation->Model->getFilePaths(sidx);
-      for(int j=0; j<sel_files.count();j++)
+      QModelIndex idx = m->index(i, 0, QModelIndex());
+      QString cmp = m->data(idx, Qt::DisplayRole).toString();
+      if(filename == cmp)
         {
-        files.push_back(sel_files.at(j));
+        QModelIndex sidx = m->mapToSource(idx);
+        QStringList sel_files = this->Implementation->Model->getFilePaths(sidx);
+        for(int j=0; j<sel_files.count();j++)
+          {
+          files.push_back(sel_files.at(j));
+          if(this->Implementation->Mode == pqFileDialog::ExistingFile)
+            {
+            break;
+            }
+          }
         }
-      break;
       }
+    }
+  else
+    {
+    files.push_back(fullFilePath);
     }
 
   if(files.empty())
@@ -806,14 +816,17 @@ void pqFileDialog::acceptInternal(QStringList& selected_files)
         return;
       case AnyFile:
         // User chose an existing file, prompt before overwrite
-        if(QMessageBox::No == QMessageBox::warning(
-          this,
-          this->windowTitle(),
-          QString(tr("%1 already exists.\nDo you want to replace it?")).arg(file),
-          QMessageBox::Yes,
-          QMessageBox::No))
+        if(!this->Implementation->SupressOverwriteWarning)
           {
-          return;
+          if(QMessageBox::No == QMessageBox::warning(
+            this,
+            this->windowTitle(),
+            QString(tr("%1 already exists.\nDo you want to replace it?")).arg(file),
+            QMessageBox::Yes,
+            QMessageBox::No))
+            {
+            return;
+            }
           }
         this->emitFilesSelected(QStringList(file));
         return;
@@ -871,10 +884,12 @@ void pqFileDialog::fileSelectionChanged()
   this->Implementation->Ui.FileName->setText(fileString);
 }
   
-void pqFileDialog::setCurrentFile(const QString& f)
+void pqFileDialog::selectFile(const QString& f)
 {
   QFileInfo info(f);
   this->Implementation->Model->setCurrentPath(info.absolutePath());
   this->Implementation->Ui.FileName->setText(info.fileName());
+  this->Implementation->SupressOverwriteWarning = true;
+  this->accept();
 }
 
