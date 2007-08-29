@@ -130,6 +130,7 @@ public:
   pqInternal():Model(), SelectionModel(&this->Model)
   {
   pqSpreadSheetView::pqTableView* table = new pqSpreadSheetView::pqTableView();
+  table->setAlternatingRowColors(true);
   table->disableCornerWidget();
 
   pqSpreadSheetView::pqDelegate* delegate = new pqSpreadSheetView::pqDelegate(table);
