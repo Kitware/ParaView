@@ -186,6 +186,7 @@ IF(BUILD_TESTING)
       SET(PYTHON_TESTS ${PYTHON_TESTS}
         #HistogramChart
         LoadStateMultiView
+        FileSeries
         #SaveAnimationMultiView   -- need to fix timing issue
 # VCRAnimation -- enable after PVD reader supports time.
         )
