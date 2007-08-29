@@ -41,7 +41,7 @@ QtTesting.playCommand(object11, 'mouseRelease', '1,0,0,8,16')
 object12 = 'MainWindow/currentTimeToolbar/CurrentTimeIndex'
 QtTesting.playCommand(object12, 'key', '16777219')
 QtTesting.playCommand(object12, 'key', '16777219')
-QtTesting.playCommand(object12, 'set_int', '9')
+QtTesting.playCommand(object12, 'set_int', '3')
 QtTesting.playCommand(object12, 'key', '16777220')
 #QtTesting.playCommand(object8, 'activate', 'actionToolsRecordTestScreenshot')
 #QtTesting.playCommand(object9, 'filesSelected', '$PARAVIEW_DATA_ROOT/Baseline/FileSeries2.png')
