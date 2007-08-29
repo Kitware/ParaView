@@ -94,6 +94,7 @@ class Proxy(object):
         can be specified (as keyword arguments) to automatically register
         the proxy with the proxy manager. """
         self.Observed = None
+        self.ObserverTag = -1
         self.__Properties = {}
         self.SMProxy = None
 
@@ -121,8 +122,10 @@ class Proxy(object):
         # Make sure that we remove observers we added
         if self.Observed:
             observed = self.Observed
+            tag = self.ObserverTag
             self.Observed = None
-            observed.RemoveObservers("ModifiedEvent")
+            self.ObserverTag = -1
+            observed.RemoveObserver(tag)
         if self.SMProxy and self.SMProxy in _pyproxies:
             del _pyproxies[self.SMProxy]
 
@@ -152,14 +155,6 @@ class Proxy(object):
         "Creates an iterator for the properties."
         return PropertyIterator(self)
 
-    def __GetDataInformation(self, idx=0):
-        """Internal method that returns a DataInformation wrapper
-        around a vtkPVDataInformation"""
-        if self.SMProxy:
-            return DataInformation( \
-                self.SMProxy.GetDataInformation(idx, False), \
-                self.SMProxy, idx)
-        
     def SetPropertyWithName(self, pname, arg):
         """Generic method for setting the value of a property."""
         prop = self.GetProperty(pname)
@@ -227,8 +222,8 @@ class Proxy(object):
         import weakref
         c = self.SMProxy.GetActiveCamera()
         if not c.HasObserver("ModifiedEvent"):
-            c.AddObserver("ModifiedEvent", \
-                          _makeUpdateCameraMethod(weakref.ref(self)))
+            self.ObserverTag =c.AddObserver("ModifiedEvent", \
+                              _makeUpdateCameraMethod(weakref.ref(self)))
             self.Observed = c
         return c
         
@@ -241,9 +236,6 @@ class Proxy(object):
         if name == "GetActiveCamera" and \
            hasattr(self.SMProxy, "GetActiveCamera"):
             return self.__GetActiveCamera
-        if name == "GetDataInformation" and \
-           hasattr(self.SMProxy, "GetDataInformation"):
-            return self.__GetDataInformation
         if name == "SaveDefinition" and hasattr(self.SMProxy, "SaveDefinition"):
             return self.__SaveDefinition
         # If not a property, see if SMProxy has the method
@@ -255,6 +247,26 @@ class Proxy(object):
             pass
         return getattr(self.SMProxy, name)
 
+class SourceProxy(Proxy):
+    """Source proxy wrapper. This class adds a few methods to Proxy
+    that are specific to source proxies."""
+    
+    def UpdatePipeline(self):
+        """This method updates the server-side VTK pipeline and the associated
+        data information."""
+        self.SMProxy.UpdatePipeline()
+        # Fetch the new information. This is also here to cause a receive
+        # on the client side so that progress works properly.
+        self.SMProxy.GetDataInformation()
+
+    def GetDataInformation(self, idx=0):
+        """This method returns a DataInformation wrapper around a
+        vtkPVDataInformation"""
+        if self.SMProxy:
+            return DataInformation( \
+                self.SMProxy.GetDataInformation(idx, False), \
+                self.SMProxy, idx)
+                
 class Property(object):
     """Python wrapper around a vtkSMProperty with a simple interface.
     In addition to all method provided by vtkSMProperty (obtained by
@@ -1028,23 +1040,28 @@ class Connection(object):
         return pm.GetNumberOfPartitions(self.ID);
 
 
-# Users can set the active connection which will be used by API
-# to create proxies etc when no connection argument is passed.
-# Connect() automatically sets this if it is not already set.
-ActiveConnection = None
-
 ## These are methods to create a new connection.
 ## One can connect to a server, (data-server,render-server)
 ## or simply create a built-in connection.
 ## Note: these are internal methods. Use Connect() instead.
-def _connectServer(host, port):
+def _connectServer(host, port, rc=False):
     """Connect to a host:port. Returns the connection object if successfully
     connected with the server. Internal method, use Connect() instead."""
     pm =  vtkProcessModule.GetProcessModule()
-    cid = pm.ConnectToRemote(host, port)
-    if not cid:
-        return None
-    conn = Connection(cid)
+    if not rc:
+        cid = pm.ConnectToRemote(host, port)
+        if not cid:
+            return None
+        conn = Connection(cid)
+    else:
+        pm.AcceptConnectionsOnPort(port)
+        print "Waiting for connection..."
+        while True:
+            cid = pm.MonitorConnections(10)
+            if cid > 0:
+                conn = Connection(cid)
+                break
+        pm.StopAcceptingAllConnections()
     conn.SetHost(host, port)
     return conn 
 
@@ -1130,6 +1147,23 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
         ActiveConnection = connectionId
     return connectionId
 
+def ReverseConnect(port=11111):
+    """
+    Use this function call to create a new connection. On success,
+    it returns a Connection object that abstracts the connection.
+    Otherwise, it returns None.
+    In reverse connection mode, the client waits for a connection
+    from the server (client has to be started first). The server
+    then connects to the client (run pvserver with -rc and -ch
+    option).
+    The optional port specified the port to listen to.
+    """
+    global ActiveConnection
+    connectionId = _connectServer("Reverse connection", port, True)
+    if not ActiveConnection:
+        ActiveConnection = connectionId
+    return connectionId
+
 def Disconnect(connection=None):
     """Disconnects the connection. Make sure to clear the proxy manager
     first."""
@@ -1183,6 +1217,8 @@ def GetRenderViews(connection=None):
     return render_modules
 
 def _getRenderViewName(connection):
+    """Utility function that returns the name of the render view
+    that is appropriate for the given connection"""
     proxy_xml_name = None
     if connection.IsRemote():
         proxy_xml_name = "IceTDesktopRenderView"
@@ -1382,6 +1418,20 @@ def AnimateReader(reader, view, filename=None):
             raise exceptions.RuntimeError, "Saving of animation failed!"
     else:
         scene.Play()
+
+def ToggleProgressPrinting():
+    """Turn on/off printing of progress (by default, it is on). You can
+    always turn progress off and add your own observer to the process
+    module to handle progress in a custom way. See _printProgress for
+    an example event observer."""
+    global progressObserverTag
+
+    if progressObserverTag:
+        vtkProcessModule.GetProcessModule().RemoveObserver(progressObserverTag)
+        progressObserverTag = None
+    else:
+        progressObserverTag = vtkProcessModule.GetProcessModule().AddObserver(\
+             "ProgressEvent", _printProgress)
     
 def Finalize():
     """Although not required, this can be called at exit to cleanup."""
@@ -1459,7 +1509,37 @@ def _findClassForProxy(xmlName):
     else:
         return None
 
+def _printProgress(caller, event):
+    """The default event handler for progress. Prints algorithm
+    name and 1 '.' per 10% progress."""
+    global currentAlgorithm, currentProgress
+    
+    pm = vtkProcessModule.GetProcessModule()
+    progress = pm.GetLastProgress() / 10
+    alg = pm.GetLastProgressName()
+    if alg != currentAlgorithm and alg:
+        if currentAlgorithm:
+            while currentProgress <= 10:
+                import sys
+                sys.stdout.write(".")
+                currentProgress += 1
+            print "]"
+            currentProgress = 0
+        print alg, ": [ ",
+        currentAlgorithm = alg
+    while currentProgress <= progress:
+        import sys
+        sys.stdout.write(".")
+        #sys.stdout.write("%d " % pm.GetLastProgress())
+        currentProgress += 1
+    if progress == 10:
+        print "]"
+        currentAlgorithm = None
+        currentProgress = 0
+            
 def _updateModules():
+    """Called when a plugin is loaded, this method updates
+    the proxy class object in all known modules."""
     global sources, filters, writers, rendering, animation
 
     _createModule("sources", sources)
@@ -1472,6 +1552,8 @@ def _updateModules():
     _createModule('animation_keyframes', animation)
     
 def _createModules():
+    """Called when the module is loaded, this creates sub-
+    modules for all know proxy groups."""
     global sources, filters, writers, rendering, animation
 
     sources = _createModule('sources')
@@ -1522,20 +1604,13 @@ def _createModule(groupName, mdl=None):
             doc = Proxy.__doc__
         cdict['__doc__'] = doc
         # Create the new type
-        cobj = type(pname, (Proxy,), cdict)
+        if proto.IsA("vtkSMSourceProxy"):
+            cobj = type(pname, (SourceProxy,), cdict)
+        else:
+            cobj = type(pname, (Proxy,), cdict)            
         # Add it to the modules dictionary
         mdl.__dict__[pname] = cobj
     return mdl
-
-# Needs to be called when paraview module is loaded from python instead
-# of pvpython, pvbatch or GUI.
-if not vtkSMObject.GetProxyManager():
-    vtkInitializationHelper.Initialize(sys.executable)
-
-_pyproxies = {}
-
-# Create needed sub-modules
-_createModules()
 
 def demo1():
     """This simple demonstration creates a sphere, renders it and delivers
@@ -1758,3 +1833,26 @@ def demo5():
 
     scene.Play()
     return scene;
+
+# Users can set the active connection which will be used by API
+# to create proxies etc when no connection argument is passed.
+# Connect() automatically sets this if it is not already set.
+ActiveConnection = None
+
+# Needs to be called when paraview module is loaded from python instead
+# of pvpython, pvbatch or GUI.
+if not vtkSMObject.GetProxyManager():
+    vtkInitializationHelper.Initialize(sys.executable)
+
+# Initialize progress printing. Can be turned off by calling
+# ToggleProgressPrinting() again.
+progressObserverTag = None
+currentAlgorithm = False
+currentProgress = 0
+ToggleProgressPrinting()
+
+_pyproxies = {}
+
+# Create needed sub-modules
+_createModules()
+
