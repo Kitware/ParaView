@@ -173,6 +173,11 @@ void pqPipelineTimeKeyFrameEditor::writeKeyFrameData()
     pqSMAdaptor::setElementProperty(keyFrame->GetProperty("KeyValues"),
       this->Internal->Ui.constantTime->text());
     keyFrame->UpdateVTKObjects();
+    
+    // for convenience, set the current time
+    pqServer* server = this->Internal->Scene->getServer();
+    pqTimeKeeper* tk = server->getTimeKeeper();
+    tk->setTime(this->Internal->Ui.constantTime->text().toDouble());
     }
   else // use animation time
     {
