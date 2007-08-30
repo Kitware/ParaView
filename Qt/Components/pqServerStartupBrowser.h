@@ -63,7 +63,6 @@ class PQCOMPONENTS_EXPORT pqServerStartupBrowser :
 public:
   pqServerStartupBrowser(
     pqServerStartups& startups,
-    pqSettings& settings,
     QWidget* parent = 0);
   ~pqServerStartupBrowser();
 

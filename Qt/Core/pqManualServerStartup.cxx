@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqManualServerStartup.h"
 
+#include "vtkPVXMLElement.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // pqManualServerStartup
 
@@ -39,7 +41,7 @@ pqManualServerStartup::pqManualServerStartup(
     const QString& name, 
     const pqServerResource& server,
     bool save,
-    const QDomDocument& configuration) :
+    vtkPVXMLElement* configuration) :
   pqServerStartup(save),
   Name(name),
   Server(server.schemeHosts()),
@@ -57,7 +59,7 @@ const pqServerResource pqManualServerStartup::getServer()
   return this->Server;
 }
 
-const QDomDocument pqManualServerStartup::getConfiguration()
+vtkPVXMLElement* pqManualServerStartup::getConfiguration()
 {
   return this->Configuration;
 }

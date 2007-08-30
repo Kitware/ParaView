@@ -497,7 +497,7 @@ bool pqAnimationManager::saveAnimation()
     int status = reviver->ReviveRemoteServerManager(server->GetConnectionID());
     reviver->Delete();
     emit this->endNonUndoableChanges();
-    pqApplicationCore::instance()->removeServer(server);
+    pqApplicationCore::instance()->getObjectBuilder()->removeServer(server);
     this->restoreViewSizes();
     emit this->disconnectServer();
     return status;

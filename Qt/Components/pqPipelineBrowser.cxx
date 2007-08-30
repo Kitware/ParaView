@@ -401,7 +401,7 @@ void pqPipelineBrowser::deleteSelected()
     }
   else if(server)
     {
-    pqApplicationCore::instance()->removeServer(server);
+    pqApplicationCore::instance()->getObjectBuilder()->removeServer(server);
     }
 }
 

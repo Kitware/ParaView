@@ -663,7 +663,7 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     SIGNAL(serverAdded(pqServer*)),
     this, SLOT(onServerCreation(pqServer*)));
 
-  this->connect(core, 
+  this->connect(core->getObjectBuilder(), 
     SIGNAL(finishedAddingServer(pqServer*)),
     this, SLOT(onServerCreationFinished(pqServer*)));
 
@@ -1781,7 +1781,7 @@ bool pqMainWindowCore::makeServerConnection()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerStartupBrowser server_browser (core->serverStartups(), 
-    *(core->settings()), this->Implementation->Parent);
+    this->Implementation->Parent);
   QStringList ignoreList;
   ignoreList << "builtin";
   server_browser.setIgnoreList(ignoreList);
@@ -1806,7 +1806,7 @@ void pqMainWindowCore::makeDefaultConnectionIfNoneExists()
     }
 
   pqServerResource resource = pqServerResource("builtin:");
-  core->createServer(resource);
+  core->getObjectBuilder()->createServer(resource);
 }
 
 //-----------------------------------------------------------------------------
@@ -2240,7 +2240,7 @@ void pqMainWindowCore::onServerDisconnect()
   pqServer* server = this->getActiveServer();
   if (server)
     {
-    core->removeServer(server);
+    core->getObjectBuilder()->removeServer(server);
     }
 
   pqEventDispatcher::processEventsAndWait(1);
@@ -3378,7 +3378,7 @@ void pqMainWindowCore::removeActiveServer()
     qDebug() << "No active server to remove.";
     return;
     }
-  pqApplicationCore::instance()->removeServer(server);
+  pqApplicationCore::instance()->getObjectBuilder()->removeServer(server);
 }
 
 //-----------------------------------------------------------------------------

@@ -23,6 +23,7 @@
 #include "pqApplicationCore.h"
 #include "pqTestUtility.h"
 #include "pqOptions.h"
+#include "pqObjectBuilder.h"
 
 pqFileDialogTestUtility::pqFileDialogTestUtility()
 {
@@ -139,7 +140,8 @@ pqFileDialogTestWidget::pqFileDialogTestWidget()
   this->setObjectName("main");
   // automatically make a server connection
   pqApplicationCore* core = pqApplicationCore::instance();
-  this->Server = core->createServer(pqServerResource("builtin:"));
+  pqObjectBuilder* ob = core->getObjectBuilder();
+  this->Server = ob->createServer(pqServerResource("builtin:"));
   QVBoxLayout* l = new QVBoxLayout(this);
 
   QPushButton* rec = new QPushButton(this);

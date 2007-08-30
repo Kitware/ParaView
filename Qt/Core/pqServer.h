@@ -52,12 +52,6 @@ class vtkSMRenderViewProxy;
 class PQCORE_EXPORT pqServer : public pqServerManagerModelItem 
 {
   Q_OBJECT
-
-public:
-  /// Use this method to disconnect a server. On calling this method,
-  /// the server instance will be deleted.
-  static void disconnect(pqServer* server);
-
 public:  
   pqServer(vtkIdType connectionId, vtkPVOptions*, QObject* parent = NULL);
   virtual ~pqServer();

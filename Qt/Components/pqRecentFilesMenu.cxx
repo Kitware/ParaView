@@ -219,10 +219,7 @@ void pqRecentFilesMenu::onOpenResource()
       ? resource.sessionServer().schemeHostsPorts()
       : resource.schemeHostsPorts();
 
-  this->Implementation->ServerStartup.startServer(
-    pqApplicationCore::instance()->serverStartups(),
-    *pqApplicationCore::instance()->settings(),
-    server);
+  this->Implementation->ServerStartup.startServer(server);
 }
 
 void pqRecentFilesMenu::onServerStarted(pqServer* server)

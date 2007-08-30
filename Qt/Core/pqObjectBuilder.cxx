@@ -764,3 +764,88 @@ QString pqObjectBuilder::getFileNamePropertyName(vtkSMProxy* proxy) const
 
   return QString::Null();
 }
+
+//-----------------------------------------------------------------------------
+pqServer* pqObjectBuilder::createServer(const pqServerResource& resource)
+{
+
+  // TODO: we should have code to make all kinds of server connections in one
+  // place.  Right now its split between here and pqComponents.
+
+  // Create a modified version of the resource that only contains server information
+  const pqServerResource server_resource = resource.schemeHostsPorts();
+
+  // See if the server is already created.
+  pqServerManagerModel *smModel = pqApplicationCore::instance()->getServerManagerModel();
+  pqServer *server = smModel->findServer(server_resource);
+  if(!server)
+    {
+    // TEMP: ParaView only allows one server connection. Remove this
+    // code when it supports multiple server connections.
+    if(smModel->getNumberOfItems<pqServer*>() > 0)
+      {
+      this->removeServer(smModel->getItemAtIndex<pqServer*>(0));
+      }
+
+    // Based on the server resource, create the correct type of server ...
+    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+    vtkIdType id = vtkProcessModuleConnectionManager::GetNullConnectionID();
+    if(server_resource.scheme() == "builtin")
+      {
+      id = pm->ConnectToSelf();
+      }
+    else if(server_resource.scheme() == "cs")
+      {
+      id = pm->ConnectToRemote(
+        resource.host().toAscii().data(),
+        resource.port(11111));
+      }
+    else if(server_resource.scheme() == "csrc")
+      {
+      qWarning() << "Server reverse connections not supported yet\n";
+      }
+    else if(server_resource.scheme() == "cdsrs")
+      {
+      id = pm->ConnectToRemote(
+        server_resource.dataServerHost().toAscii().data(),
+        server_resource.dataServerPort(11111),
+        server_resource.renderServerHost().toAscii().data(),
+        server_resource.renderServerPort(22221));
+      }
+    else if(server_resource.scheme() == "cdsrsrc")
+      {
+      qWarning() << "Data server/render server reverse connections not supported yet\n";
+      }
+    else
+      {
+      qCritical() << "Unknown server type: " << server_resource.scheme() << "\n";
+      }
+
+    if(id != vtkProcessModuleConnectionManager::GetNullConnectionID())
+      {
+      server = smModel->findServer(id);
+      server->setResource(server_resource);
+      emit this->finishedAddingServer(server);
+      }
+    }
+
+  return server;
+}
+
+//-----------------------------------------------------------------------------
+void pqObjectBuilder::removeServer(pqServer* server)
+{
+  if (!server)
+    {
+    qDebug() << "No server to remove.";
+    return;
+    }
+
+  pqApplicationCore* core = pqApplicationCore::instance();
+  core->getServerManagerModel()->beginRemoveServer(server);
+  this->destroyAllProxies(server);
+  vtkProcessModule::GetProcessModule()->Disconnect(
+    server->GetConnectionID());
+  core->getServerManagerModel()->endRemoveServer();
+}
+

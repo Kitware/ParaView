@@ -26,7 +26,7 @@ public:
     // automatically make a server connection
     pqApplicationCore* core = pqApplicationCore::instance();
     pqObjectBuilder* ob = core->getObjectBuilder();
-    pqServer* server = core->createServer(pqServerResource("builtin:"));
+    pqServer* server = ob->createServer(pqServerResource("builtin:"));
     
     // create a graphics window and put it in our main window
     this->RenderView = qobject_cast<pqRenderView*>(

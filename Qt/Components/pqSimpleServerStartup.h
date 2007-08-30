@@ -41,6 +41,8 @@ class pqServerResource;
 class pqServerStartup;
 class pqServerStartups;
 class pqSettings;
+// TODO  move some of this code into pqCore so we can 
+//       make reverse connections there
 
 /**
 Convenience class that handles the entire process of connecting to a server ...
@@ -79,10 +81,7 @@ public:
   /** Start a server, prompting the user if there's any ambiguity
   over which startup procedure to use, or if a startup isn't already
   configured for the server */
-  void startServer(
-    pqServerStartups& startups,
-    pqSettings& settings,
-    const pqServerResource& server);
+  void startServer(const pqServerResource& server);
 
   /// By default, if the server request is same as the existing server
   /// then nothing is done. The request to connect to the server again

@@ -152,8 +152,6 @@ public:
   void setLookupTableManager(pqLookupTableManager*);
   pqLookupTableManager* getLookupTableManager() const;
 
-  void removeServer(pqServer *server);
-
   /// Save the ServerManager state.
   void saveState(vtkPVXMLElement* root);
 
@@ -178,8 +176,6 @@ public:
   void setOrganizationName(const QString&);
   QString organizationName();
 
-  pqServer* createServer(const pqServerResource& resource);
-  
   /// Renders all windows
   void render();
 
@@ -191,14 +187,6 @@ public:
   // Check to see if its in the process of loading a state
   bool isLoadingState(){return this->LoadingState;};
 
-  // HACK: pqSimpleServerStartup needs to fire the
-  // finishedAddingServer() signal on successful
-  // reverse connection. Server creation and correspoinding
-  // signals need a bit reorganizing.
-  void fireFinishedAddingServer(pqServer* server)
-    {
-    emit this->finishedAddingServer(server);
-    }
 public slots:
   /// Called QCoreApplication::quit().
   /// Applications should use this method instead of directly
@@ -209,9 +197,6 @@ public slots:
 signals:
   // Fired when a state file is loaded successfully.
   void stateLoaded();
-
-  /// Emitted after the core has finished creating a new server connection.
-  void finishedAddingServer(pqServer *server);
 
 protected:
 

@@ -37,14 +37,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOptions.h"
 #include "pqApplicationCore.h"
 
-#include <QDomDocument>
 #include <QApplication>
 #include <QDir>
 #include <QFile>
 #include <QtDebug>
 
+#include <vtkPVXMLElement.h>
+#include <vtkPVXMLParser.h>
 #include <vtkProcessModule.h>
 #include <vtkstd/map>
+#include <vtksys/ios/sstream>
 
 /////////////////////////////////////////////////////////////////////////////
 // pqServerStartups::pqImplementation
@@ -54,9 +56,10 @@ class pqServerStartups::pqImplementation
 public:
   pqImplementation()
   {
-    QDomDocument configuration;
-    configuration.setContent(QString("<ManualStartup/>"));
-  
+    vtkSmartPointer<vtkPVXMLElement> configuration =
+      vtkSmartPointer<vtkPVXMLElement>::New();
+    configuration->SetName("ManualStartup");
+    
     // Setup a builtin server as a hard-coded default ...
     Startups["builtin"] = new pqManualServerStartup(
       "builtin",
@@ -85,43 +88,36 @@ public:
     }
   }
   
-  static QDomElement save(QDomDocument& xml, const QString& name, pqServerStartup& startup)
+  static vtkSmartPointer<vtkPVXMLElement> save(const QString& name, pqServerStartup& startup)
   {
-    QDomElement xml_server = xml.createElement("Server");
-
-    QDomAttr xml_server_name = xml.createAttribute("name");
-    xml_server_name.setValue(name);
-    xml_server.setAttributeNode(xml_server_name);
-
-    QDomAttr xml_server_resource = xml.createAttribute("resource");
-    xml_server_resource.setValue(startup.getServer().toURI());
-    xml_server.setAttributeNode(xml_server_resource);
-
-    xml_server.appendChild(xml.importNode(startup.getConfiguration().documentElement(), true));
-    
+    vtkSmartPointer<vtkPVXMLElement> xml_server =
+      vtkSmartPointer<vtkPVXMLElement>::New();
+    xml_server->SetName("Server");
+    xml_server->AddAttribute("name", name.toAscii().data());
+    xml_server->AddAttribute("resource",
+      startup.getServer().toURI().toAscii().data());
+    xml_server->AddNestedElement(startup.getConfiguration());
     return xml_server;
   }
 
-  static pqServerStartup* load(QDomElement xml_server, bool save)
+  static pqServerStartup* load(vtkPVXMLElement* xml_server, bool save)
   {
-    const QString name = xml_server.toElement().attribute("name");
+    const QString name = xml_server->GetAttribute("name");
   
     const pqServerResource server =
-      pqServerResource(xml_server.toElement().attribute("resource"));
+      pqServerResource(xml_server->GetAttribute("resource"));
       
-    for(QDomNode xml_startup = xml_server.firstChild(); !xml_startup.isNull(); xml_startup = xml_startup.nextSibling())
+    int num = xml_server->GetNumberOfNestedElements();
+    for(int i=0; i<num; i++)
       {
-      if(xml_startup.isElement() && xml_startup.toElement().tagName() == "ManualStartup")
+      vtkPVXMLElement* xml_startup = xml_server->GetNestedElement(i);
+      if(QString(xml_startup->GetName()) == "ManualStartup")
         {
-        QDomDocument xml;
-        xml.appendChild(xml.importNode(xml_startup, true));
-        return new pqManualServerStartup(name, server, save, xml);
+        return new pqManualServerStartup(name, server, save, xml_startup);
         }
-      else if(xml_startup.isElement() && xml_startup.toElement().tagName() == "CommandStartup")
+      else if(QString(xml_startup->GetName()) == "CommandStartup")
         {
-        QDomDocument xml;
-        xml.appendChild(xml.importNode(xml_startup, true));
-        return new pqCommandServerStartup(name, server, save, xml);
+        return new pqCommandServerStartup(name, server, save, xml_startup);
         }
       }
 
@@ -240,8 +236,9 @@ void pqServerStartups::setManualStartup(
   const QString& name,
   const pqServerResource& server)
 {
-  QDomDocument configuration;
-  configuration.setContent(QString("<ManualStartup/>"));
+  vtkSmartPointer<vtkPVXMLElement> configuration =
+    vtkSmartPointer<vtkPVXMLElement>::New();
+  configuration->SetName("ManualStartup");
   
   this->Implementation->deleteStartup(name);
   this->Implementation->Startups.insert(
@@ -257,41 +254,38 @@ void pqServerStartups::setCommandStartup(
   double delay,
   const QStringList& arguments)
 {
-  QDomDocument xml;
-  QDomElement xml_command_startup = xml.createElement("CommandStartup");
-  xml.appendChild(xml_command_startup);
+  vtkSmartPointer<vtkPVXMLElement> configuration =
+    vtkSmartPointer<vtkPVXMLElement>::New();
+  configuration->SetName("CommandStartup");
+  
+  vtkSmartPointer<vtkPVXMLElement> xml_command =
+    vtkSmartPointer<vtkPVXMLElement>::New();
+  xml_command->SetName("Command");
+  configuration->AddNestedElement(xml_command);
 
-  QDomElement xml_command = xml.createElement("Command");
-  xml_command_startup.appendChild(xml_command);
+  xml_command->AddAttribute("exec", executable.toAscii().data());
+  xml_command->AddAttribute("timeout", timeout);
+  xml_command->AddAttribute("delay", delay);
   
-  QDomAttr xml_command_exec = xml.createAttribute("exec");
-  xml_command_exec.setValue(executable);
-  xml_command.setAttributeNode(xml_command_exec);
+  xml_command->AddAttribute("Arguments", delay);
   
-  QDomAttr xml_command_timeout = xml.createAttribute("timeout");
-  xml_command_timeout.setValue(QString::number(timeout));
-  xml_command.setAttributeNode(xml_command_timeout);
-  
-  QDomAttr xml_command_delay = xml.createAttribute("delay");
-  xml_command_delay.setValue(QString::number(delay));
-  xml_command.setAttributeNode(xml_command_delay);
+  vtkSmartPointer<vtkPVXMLElement> xml_arguments =
+    vtkSmartPointer<vtkPVXMLElement>::New();
+  xml_arguments->SetName("Arguments");
+  xml_command->AddNestedElement(xml_arguments);
 
-  QDomElement xml_arguments = xml.createElement("Arguments");
-  xml_command.appendChild(xml_arguments);
-  
   for(int i = 0; i != arguments.size(); ++i)
     {
-    QDomElement xml_argument = xml.createElement("Argument");
-    xml_arguments.appendChild(xml_argument);
-    
-    QDomAttr xml_argument_value = xml.createAttribute("value");
-    xml_argument_value.setValue(arguments[i]);
-    xml_argument.setAttributeNode(xml_argument_value);
+    vtkSmartPointer<vtkPVXMLElement> xml_argument =
+      vtkSmartPointer<vtkPVXMLElement>::New();
+    xml_argument->SetName("Argument");
+    xml_arguments->AddNestedElement(xml_argument);
+    xml_argument->AddAttribute("value", arguments[i].toAscii().data());
     }
 
   this->Implementation->deleteStartup(name);
   this->Implementation->Startups.insert(vtkstd::make_pair(
-    name, new pqCommandServerStartup(name, server, true, xml)));
+    name, new pqCommandServerStartup(name, server, true, configuration)));
   emit this->changed();
 }
 
@@ -308,10 +302,12 @@ void pqServerStartups::deleteStartups(const StartupsT& startups)
   emit this->changed();
 }
 
-void pqServerStartups::save(QDomDocument& xml, bool saveOnly) const
+void pqServerStartups::save(vtkPVXMLElement* xml, bool saveOnly) const
 {
-  QDomElement xml_servers = xml.createElement("Servers");
-  xml.appendChild(xml_servers);
+  vtkSmartPointer<vtkPVXMLElement> xml_servers =
+    vtkSmartPointer<vtkPVXMLElement>::New();
+  xml_servers->SetName("Servers");
+  xml->AddNestedElement(xml_servers);
 
   for(
     pqImplementation::StartupsT::iterator startup = this->Implementation->Startups.begin();
@@ -323,19 +319,23 @@ void pqServerStartups::save(QDomDocument& xml, bool saveOnly) const
     if(saveOnly && !startup_command->shouldSave())
       continue;
     
-    xml_servers.appendChild(pqImplementation::save(xml, startup_name, *startup_command));
+    xml_servers->AddNestedElement(pqImplementation::save(startup_name, *startup_command));
     }
 }
 
 void pqServerStartups::save(const QString& path, bool saveOnly) const
 {
-  QDomDocument xml;
+  vtkSmartPointer<vtkPVXMLElement> xml =
+    vtkSmartPointer<vtkPVXMLElement>::New();
   this->save(xml, saveOnly);
-  
+
+  vtksys_ios::ostringstream xml_stream;
+  xml->GetNestedElement(0)->PrintXML(xml_stream, vtkIndent());
+
   QFile file(path);
   if(file.open(QIODevice::WriteOnly))
     {
-    file.write(xml.toByteArray());
+    file.write(xml_stream.str().c_str());
     }
   else
     {
@@ -343,21 +343,22 @@ void pqServerStartups::save(const QString& path, bool saveOnly) const
     }
 }
 
-void pqServerStartups::load(QDomDocument& xml_document, bool s)
+void pqServerStartups::load(vtkPVXMLElement* xml_servers, bool s)
 {
-  QDomElement xml_servers = xml_document.documentElement();
-  if(xml_servers.nodeName() != "Servers")
+  if(QString(xml_servers->GetName()) != "Servers")
     {
     qCritical() << "Not a ParaView server configuration document";
     return;
     }
 
-  for(QDomNode xml_server = xml_servers.firstChild(); !xml_server.isNull(); xml_server = xml_server.nextSibling())
+  int num = xml_servers->GetNumberOfNestedElements();
+  for(int i=0; i<num; i++)
     {
-    if(xml_server.isElement() && xml_server.toElement().tagName() == "Server")
+    vtkPVXMLElement* xml_server = xml_servers->GetNestedElement(i);
+    if(QString(xml_server->GetName()) == "Server")
       {
-      const QString name = xml_server.toElement().attribute("name");
-      if(pqServerStartup* const startup = pqImplementation::load(xml_server.toElement(), s))
+      const QString name = xml_server->GetAttribute("name");
+      if(pqServerStartup* const startup = pqImplementation::load(xml_server, s))
         {
         this->Implementation->deleteStartup(name);
         this->Implementation->Startups.insert(vtkstd::make_pair(name, startup));
@@ -373,17 +374,12 @@ void pqServerStartups::load(const QString& path, bool s)
   QFile file(path);
   if(file.exists())
     {
-    QDomDocument xml;
-    QString error_message;
-    int error_line = 0;
-    int error_column = 0;
-    if(xml.setContent(&file, false, &error_message, &error_line, &error_column))
+    vtkSmartPointer<vtkPVXMLParser> parser =
+      vtkSmartPointer<vtkPVXMLParser>::New();
+    parser->SetFileName(path.toAscii().data());
+    if(parser->Parse())
       {
-      this->load(xml, s);
-      }
-    else
-      {
-      qWarning() << "Error parsing " << path;
+      this->load(parser->GetRootElement(), s);
       }
     }
 }

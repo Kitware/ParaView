@@ -48,6 +48,7 @@ class pqScalarsToColors;
 class pqServer;
 class pqView;
 class vtkSMProxy;
+class pqServerResource;
 
 /// pqObjectBuilder is loosely based on the \c Builder design pattern.
 /// It is used to create as well as destroy complex objects such as 
@@ -70,6 +71,12 @@ class PQCORE_EXPORT pqObjectBuilder : public QObject
 public:
   pqObjectBuilder(QObject* parent=0);
   virtual ~pqObjectBuilder();
+  
+  /// Create a server connection give a server resource
+  pqServer* createServer(const pqServerResource& resource);
+ 
+  /// Destroy a server connection 
+  void removeServer(pqServer *server);
 
   /// Creates a source of the given server manager group (\c sm_group) and 
   /// name (\c sm_name) on the given \c server. On success, returns the
@@ -168,8 +175,21 @@ public:
   /// property on the proxy, if any, which can be used to set the filename.
   /// If no such property exists, this retruns a null string.
   QString getFileNamePropertyName(vtkSMProxy*)  const;
+  
+  // HACK: pqSimpleServerStartup needs to fire the
+  // finishedAddingServer() signal on successful
+  // reverse connection. Server creation and correspoinding
+  // signals need a bit reorganizing.
+  void fireFinishedAddingServer(pqServer* server)
+    {
+    emit this->finishedAddingServer(server);
+    }
 
 signals:
+  
+  /// Emitted after a new server connection is created
+  void finishedAddingServer(pqServer *server);
+
   /// Fired on successful completion of createSource().
   /// Remember that this signal is fired only when the creation of the object
   /// is requested by the GUI. It wont be triggered when the python client

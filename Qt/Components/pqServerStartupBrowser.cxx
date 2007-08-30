@@ -59,9 +59,8 @@ public:
 
 pqServerStartupBrowser::pqServerStartupBrowser(
     pqServerStartups& startups,
-    pqSettings& settings,
     QWidget* Parent) :
-  Superclass(startups, settings, Parent),
+  Superclass(startups, Parent),
   Implementation(new pqImplementation())
 {
   this->setObjectName("ServerStartupBrowser");

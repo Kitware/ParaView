@@ -45,11 +45,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqServerResource.h>
 #include <pqServerStartup.h>
 #include <pqServerStartups.h>
+#include <pqObjectBuilder.h>
 
 #include <vtkProcessModule.h>
 #include <vtkProcessModuleConnectionManager.h>
 #include <vtkMath.h>
 #include <vtkTimerLog.h>
+#include <vtkPVXMLElement.h>
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -236,11 +238,11 @@ void pqSimpleServerStartup::startServer(pqServerStartup& startup)
 }
 
 //-----------------------------------------------------------------------------
-void pqSimpleServerStartup::startServer(
-  pqServerStartups& server_startups,
-  pqSettings& settings,
-  const pqServerResource& server)
+void pqSimpleServerStartup::startServer(const pqServerResource& server)
 {
+  pqServerStartups& server_startups = 
+    pqApplicationCore::instance()->serverStartups();
+
   // There may be zero, one, or more-than-one startup already configured for this server
   const pqServerStartups::StartupsT startups =
     server_startups.getStartups(server);
@@ -297,7 +299,7 @@ void pqSimpleServerStartup::startServer(
         }
       }
 
-    pqServerBrowser dialog(server_startups, settings);
+    pqServerBrowser dialog(server_startups);
     dialog.setMessage(
       QString(tr("Pick the configuration for starting %1")).arg(
         server.schemeHosts().toURI()));
@@ -365,15 +367,15 @@ void pqSimpleServerStartup::started(pqServer* server)
 bool pqSimpleServerStartup::promptRuntimeArguments()
 {
   // See whether we need to prompt the user, if not we're done ...
-  QDomDocument xml = this->Implementation->Startup->getConfiguration();
-  QDomElement xml_startup_type = xml.firstChildElement();
-  if(xml_startup_type.isNull())
+  vtkPVXMLElement* xml = this->Implementation->Startup->getConfiguration();
+
+  if(!xml)
     {
     return true;
     }
   
-  QDomElement xml_options = xml_startup_type.firstChildElement("Options");
-  if(xml_options.isNull())
+  vtkPVXMLElement* xml_options = xml->FindNestedElementByName("Options");
+  if(!xml_options)
     {
     return true;
     }
@@ -388,36 +390,38 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
   const int label_column = 0;
   const int widget_column = 1;
   
-  typedef vtkstd::map<QString, QWidget*> widgets_t;
+  typedef vtkstd::map<vtkPVXMLElement*, QWidget*> widgets_t;
   widgets_t widgets;
   
   vtkstd::map<QString, QString> true_values;
   vtkstd::map<QString, QString> false_values;
 
-  for(QDomNode xml_option = xml_options.firstChild(); !xml_option.isNull(); xml_option = xml_option.nextSibling())
+  int num = xml_options->GetNumberOfNestedElements();
+  for(int i=0; i<num; i++)
     {
-    if(xml_option.isElement() && xml_option.toElement().tagName() == "Option")
+    vtkPVXMLElement* xml_option = xml_options->GetNestedElement(i);
+    if(QString(xml_option->GetName()) == "Option")
       {
-      const QString option_name = xml_option.toElement().attribute("name");
-      const QString option_label = xml_option.toElement().attribute("label");
-      const bool option_readonly = xml_option.toElement().attribute("readonly") == "true";
+      const QString option_name = xml_option->GetAttribute("name");
+      const QString option_label = xml_option->GetAttribute("label");
+      const bool option_readonly = QString(xml_option->GetAttribute("readonly")) == "true";
 
-      QDomNode xml_type = xml_option.firstChildElement();
-      if(xml_type.isElement())
+      vtkPVXMLElement* xml_type = xml_option->GetNestedElement(0);
+      if(xml_type)
         {
         const int row = layout->rowCount();
         
         layout->addWidget(new QLabel(option_label + ":"), row, label_column, Qt::AlignLeft | Qt::AlignVCenter);
         
-        if(xml_type.toElement().tagName() == "Range")
+        if(QString(xml_type->GetName()) == "Range")
           {
-          const QString range_type = xml_type.toElement().attribute("type");
+          const QString range_type = xml_type->GetAttribute("type");
           if(range_type == "int")
             {
-            const QString widget_min = xml_type.toElement().attribute("min");
-            const QString widget_max = xml_type.toElement().attribute("max");
-            const QString widget_step = xml_type.toElement().attribute("step");
-            const QString widget_default = xml_type.toElement().attribute("default");
+            const QString widget_min = xml_type->GetAttribute("min");
+            const QString widget_max = xml_type->GetAttribute("max");
+            const QString widget_step = xml_type->GetAttribute("step");
+            const QString widget_default = xml_type->GetAttribute("default");
 
             QSpinBox* const widget = new QSpinBox();
             widget->setMinimum(widget_min.toInt());
@@ -440,15 +444,15 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
             widget->setEnabled(!option_readonly);
             
             layout->addWidget(widget, row, widget_column, Qt::AlignLeft | Qt::AlignVCenter);
-            widgets[option_name] = widget;
+            widgets[xml_option] = widget;
             }
           else if(range_type == "double")
             {
-            const QString widget_min = xml_type.toElement().attribute("min");
-            const QString widget_max = xml_type.toElement().attribute("max");
-            const QString widget_step = xml_type.toElement().attribute("step");
-            const QString widget_precision = xml_type.toElement().attribute("precision");
-            const QString widget_default = xml_type.toElement().attribute("default");
+            const QString widget_min = xml_type->GetAttribute("min");
+            const QString widget_max = xml_type->GetAttribute("max");
+            const QString widget_step = xml_type->GetAttribute("step");
+            const QString widget_precision = xml_type->GetAttribute("precision");
+            const QString widget_default = xml_type->GetAttribute("default");
 
             QDoubleSpinBox* const widget = new QDoubleSpinBox();
             widget->setMinimum(widget_min.toDouble());
@@ -459,43 +463,45 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
             widget->setEnabled(!option_readonly);
             
             layout->addWidget(widget, row, widget_column, Qt::AlignLeft | Qt::AlignVCenter);
-            widgets[option_name] = widget;
+            widgets[xml_option] = widget;
             }
           }
-        else if(xml_type.toElement().tagName() == "String")
+        else if(QString(xml_type->GetName()) == "String")
           {
-          const QString widget_default = xml_type.toElement().attribute("default");
+          const QString widget_default = xml_type->GetAttribute("default");
           QLineEdit* const widget = new QLineEdit(widget_default);
           widget->setEnabled(!option_readonly);
           layout->addWidget(widget, row, widget_column, Qt::AlignLeft | Qt::AlignVCenter);
-          widgets[option_name] = widget;
+          widgets[xml_option] = widget;
           }
-        else if(xml_type.toElement().tagName() == "Boolean")
+        else if(QString(xml_type->GetName()) == "Boolean")
           {
-          const QString widget_true = xml_type.toElement().attribute("true");
-          const QString widget_false = xml_type.toElement().attribute("false");
-          const QString widget_default = xml_type.toElement().attribute("default");
+          const QString widget_true = xml_type->GetAttribute("true");
+          const QString widget_false = xml_type->GetAttribute("false");
+          const QString widget_default = xml_type->GetAttribute("default");
           
           QCheckBox* const widget = new QCheckBox();
           widget->setChecked(widget_default == "true");
           widget->setEnabled(!option_readonly);
           
           layout->addWidget(widget, row, widget_column, Qt::AlignLeft | Qt::AlignVCenter);
-          widgets[option_name] = widget;
+          widgets[xml_option] = widget;
           true_values[option_name] = widget_true;
           false_values[option_name] = widget_false;
           }
-        else if(xml_type.toElement().tagName() == "Enumeration")
+        else if(QString(xml_type->GetName()) == "Enumeration")
           {
-          const QString widget_default = xml_type.toElement().attribute("default");
+          const QString widget_default = xml_type->GetAttribute("default");
           QComboBox* const widget = new QComboBox();
 
-          for(QDomNode xml_enumeration = xml_type.firstChild(); !xml_enumeration.isNull(); xml_enumeration = xml_enumeration.nextSibling())
+          int numchild = xml_type->GetNumberOfNestedElements();
+          for(int j=0; j<numchild; j++)
             {
-            if(xml_enumeration.isElement() && xml_enumeration.toElement().tagName() == "Entry") 
+            vtkPVXMLElement* xml_enumeration = xml_type->GetNestedElement(j);
+            if(QString(xml_enumeration->GetName()) == "Entry") 
               {
-              const QString xml_value = xml_enumeration.toElement().attribute("value");
-              const QString xml_label = xml_enumeration.toElement().attribute("label");
+              const QString xml_value = xml_enumeration->GetAttribute("value");
+              const QString xml_label = xml_enumeration->GetAttribute("label");
               widget->addItem(xml_label, xml_value);
               }
             }
@@ -504,7 +510,7 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
           widget->setEnabled(!option_readonly);
           
           layout->addWidget(widget, row, widget_column, Qt::AlignLeft | Qt::AlignVCenter);
-          widgets[option_name] = widget;
+          widgets[xml_option] = widget;
           }
         }
       }
@@ -530,29 +536,35 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
 
   for(widgets_t::const_iterator option = widgets.begin(); option != widgets.end(); ++option)
     {
-    const QString option_name = option->first;
+    vtkPVXMLElement* xml_option = option->first;
+    const QString option_name = xml_option->GetAttribute("name");
     QWidget* const option_widget = option->second;
+    QString val;
     
     if(QSpinBox* const widget1 = qobject_cast<QSpinBox*>(option_widget))
       {
-      this->Implementation->Options[option_name] = QString::number(widget1->value());
+      val = QString::number(widget1->value());
       }
     else if(QDoubleSpinBox* const widget2 = qobject_cast<QDoubleSpinBox*>(option_widget))
       {
-      this->Implementation->Options[option_name] = QString::number(widget2->value());
+      val = QString::number(widget2->value());
       }
     else if(QLineEdit* const widget3 = qobject_cast<QLineEdit*>(option_widget))
       {
-      this->Implementation->Options[option_name] = widget3->text();
+      val = widget3->text();
       }
     else if(QCheckBox* const widget4 = qobject_cast<QCheckBox*>(option_widget))
       {
-      this->Implementation->Options[option_name] = widget4->isChecked() ? true_values[option_name] : false_values[option_name];
+      val = widget4->isChecked() ? true_values[option_name] : false_values[option_name];
       }
     else if(QComboBox* const widget5 = qobject_cast<QComboBox*>(option_widget))
       {
-      this->Implementation->Options[option_name] = widget5->itemData(widget5->currentIndex()).toString();
+      val = widget5->itemData(widget5->currentIndex()).toString();
       }
+      
+    this->Implementation->Options[option_name] = val;
+    // remember defaults
+    xml_option->GetNestedElement(0)->SetAttribute("default", val.toAscii().data());
     }
 
   if(this->Implementation->Options.contains("PV_SERVER_PORT"))
@@ -589,8 +601,8 @@ void pqSimpleServerStartup::startBuiltinConnection()
     new pqServerStartupDialog(this->Implementation->Server, false);
   this->Implementation->StartupDialog->show();
 
-  pqServer* const server = pqApplicationCore::instance()->createServer(
-    pqServerResource("builtin:"));
+  pqServer* const server = pqApplicationCore::instance()->getObjectBuilder()->
+    createServer(pqServerResource("builtin:"));
 
   this->Implementation->StartupDialog->hide();
     
@@ -660,8 +672,11 @@ void pqSimpleServerStartup::startForwardConnection()
 //-----------------------------------------------------------------------------
 void pqSimpleServerStartup::forwardConnectServer()
 {
-  if(pqServer* const server = pqApplicationCore::instance()->createServer(
-    this->Implementation->Server))
+  pqServer* const server =
+    pqApplicationCore::instance()->getObjectBuilder()->
+    createServer(this->Implementation->Server);
+
+  if(server)
     {
     this->started(server);
     }
@@ -678,7 +693,7 @@ void pqSimpleServerStartup::disconnectAllServers()
   pqServerManagerModel* smModel = core->getServerManagerModel();
   while (smModel->getNumberOfItems<pqServer*>() > 0)
     {
-    core->removeServer(smModel->getItemAtIndex<pqServer*>(0));
+    core->getObjectBuilder()->removeServer(smModel->getItemAtIndex<pqServer*>(0));
     }
 }
 
@@ -791,6 +806,7 @@ void pqSimpleServerStartup::finishReverseConnection(pqServer* server)
 
   // It is essential that pqApplicationCore fires the finishedAddingServer()
   // signal on server creation. Make it fire explicitly.
-  pqApplicationCore::instance()->fireFinishedAddingServer(server);
+  pqApplicationCore::instance()->getObjectBuilder()->fireFinishedAddingServer(server);
   this->started(server);
 }
+

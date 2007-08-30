@@ -65,10 +65,7 @@ class PQCOMPONENTS_EXPORT pqServerBrowser :
   Q_OBJECT
 
 public:
-  pqServerBrowser(
-    pqServerStartups& startups,
-    pqSettings& settings,
-    QWidget* parent = 0);
+  pqServerBrowser(pqServerStartups& startups, QWidget* parent = 0);
   ~pqServerBrowser();
 
   /// Sets a message to be displayed to the user

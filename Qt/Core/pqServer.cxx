@@ -65,16 +65,6 @@ public:
 // pqServer
 
 //-----------------------------------------------------------------------------
-void pqServer::disconnect(pqServer* server)
-{
-  // disconnect on the process module. The event handling will
-  // clean up the connection.
-  
-  vtkProcessModule::GetProcessModule()->Disconnect(
-    server->GetConnectionID());
-}
-
-//-----------------------------------------------------------------------------
 pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _parent) :
   pqServerManagerModelItem(_parent)
 {

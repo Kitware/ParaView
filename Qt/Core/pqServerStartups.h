@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqServerResource;
 class pqServerStartup;
-class QDomDocument;
+class vtkPVXMLElement;
 
 /** Manages a persistent collection of server "startups" - instructions
 on how to start a server prior to connection */
@@ -89,8 +89,8 @@ signals:
   void changed();
 
 private:
-  void save(QDomDocument&, bool) const;
-  void load(QDomDocument&, bool save);
+  void save(vtkPVXMLElement*, bool) const;
+  void load(vtkPVXMLElement*, bool save);
 
   pqServerStartups(const pqServerStartups&);
   pqServerStartups& operator=(const pqServerStartups&);

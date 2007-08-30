@@ -51,16 +51,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqServerBrowser::pqImplementation
 {
 public:
-  pqImplementation(pqServerStartups& startups, pqSettings& settings) :
+  pqImplementation(pqServerStartups& startups) :
     Startups(startups),
-    Settings(settings),
     SelectedServer(0)
   {
   }
 
   Ui::pqServerBrowser UI;
   pqServerStartups& Startups;
-  pqSettings& Settings;
   pqServerStartup* SelectedServer;
   QStringList IgnoreList;
 };
@@ -70,10 +68,9 @@ public:
 
 pqServerBrowser::pqServerBrowser(
     pqServerStartups& startups,
-    pqSettings& settings,
     QWidget* Parent) :
   Superclass(Parent),
-  Implementation(new pqImplementation(startups, settings))
+  Implementation(new pqImplementation(startups))
 {
   this->Implementation->UI.setupUi(this);
   this->setObjectName("ServerBrowser");

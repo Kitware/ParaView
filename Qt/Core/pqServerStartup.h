@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 
 #include <QObject>
-#include <QDomDocument>
 #include <QMap>
+class vtkPVXMLElement;
 
 /////////////////////////////////////////////////////////////////////////////
 // pqServerStartup
@@ -57,7 +57,7 @@ public:
   /// Returns the server for this startup
   virtual const pqServerResource getServer() = 0;
   /// Returns an XML description of the configuration for this startup
-  virtual const QDomDocument getConfiguration() = 0;
+  virtual vtkPVXMLElement* getConfiguration() = 0;
   /// Returns whether the startup can be saved
   virtual bool shouldSave() { return ShouldSave; }
   

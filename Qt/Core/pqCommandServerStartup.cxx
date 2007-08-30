@@ -30,12 +30,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqServerResource.h"
 #include "pqCommandServerStartup.h"
 
 #include <QtNetwork/QHostInfo>
 #include <QTimer>
 #include <QtDebug>
+
+#include "vtkPVXMLElement.h"
+
+#include "pqServerResource.h"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -45,7 +48,7 @@ pqCommandServerStartup::pqCommandServerStartup(
     const QString& name,
     const pqServerResource& server,
     bool save,
-    const QDomDocument& configuration) :
+    vtkPVXMLElement* configuration) :
   pqServerStartup(save),
   Name(name),
   Server(server.schemeHosts()),
@@ -64,7 +67,7 @@ const pqServerResource pqCommandServerStartup::getServer()
   return this->Server;
 }
 
-const QDomDocument pqCommandServerStartup::getConfiguration()
+vtkPVXMLElement* pqCommandServerStartup::getConfiguration()
 {
   return this->Configuration;
 }
@@ -171,13 +174,13 @@ const QString pqCommandServerStartup::getExecutable()
 {
   QString result;
 
-  QDomElement xml = this->Configuration.documentElement();
-  if(xml.nodeName() == "CommandStartup")
+  vtkPVXMLElement* xml = this->Configuration;
+  if(QString(xml->GetName()) == "CommandStartup")
     {
-    QDomElement xml_command = xml.firstChildElement("Command");
-    if(!xml_command.isNull())
+    vtkPVXMLElement* xml_command = xml->FindNestedElementByName("Command");
+    if(xml_command)
       {
-      result = xml_command.attribute("exec");
+      result = xml_command->GetAttribute("exec");
       }
     }
     
@@ -188,13 +191,13 @@ double pqCommandServerStartup::getTimeout()
 {
   double result = 0.0;
   
-  QDomElement xml = this->Configuration.documentElement();
-  if(xml.nodeName() == "CommandStartup")
+  vtkPVXMLElement* xml = this->Configuration;
+  if(QString(xml->GetName()) == "CommandStartup")
     {
-    QDomElement xml_command = xml.firstChildElement("Command");
-    if(!xml_command.isNull())
+    vtkPVXMLElement* xml_command = xml->FindNestedElementByName("Command");
+    if(xml_command)
       {
-      result = xml_command.attribute("timeout").toDouble();
+      result = QString(xml_command->GetAttribute("timeout")).toDouble();
       }
     }
     
@@ -205,13 +208,13 @@ double pqCommandServerStartup::getDelay()
 {
   double result = 0.0;
   
-  QDomElement xml = this->Configuration.documentElement();
-  if(xml.nodeName() == "CommandStartup")
+  vtkPVXMLElement* xml = this->Configuration;
+  if(QString(xml->GetName()) == "CommandStartup")
     {
-    QDomElement xml_command = xml.firstChildElement("Command");
-    if(!xml_command.isNull())
+    vtkPVXMLElement* xml_command = xml->FindNestedElementByName("Command");
+    if(xml_command)
       {
-      result = xml_command.attribute("delay").toDouble();
+      result = QString(xml_command->GetAttribute("delay")).toDouble();
       }
     }
     
@@ -222,25 +225,22 @@ const QStringList pqCommandServerStartup::getArguments()
 {
   QStringList results;
 
-  QDomElement xml = this->Configuration.documentElement();
-  if(xml.nodeName() == "CommandStartup")
+  vtkPVXMLElement* xml = this->Configuration;
+  if(QString(xml->GetName()) == "CommandStartup")
     {
-    QDomElement xml_command = xml.firstChildElement("Command");
-    if(!xml_command.isNull())
+    vtkPVXMLElement* xml_command = xml->FindNestedElementByName("Command");
+    if(xml_command)
       {
-      QDomElement xml_arguments = xml_command.firstChildElement("Arguments");
-      if(!xml_arguments.isNull())
+      vtkPVXMLElement* xml_arguments = xml_command->FindNestedElementByName("Arguments");
+      if(xml_arguments)
         {
-        for(
-          QDomNode xml_argument = xml_arguments.firstChild();
-          !xml_argument.isNull();
-          xml_argument = xml_argument.nextSibling())
+        int num = xml_arguments->GetNumberOfNestedElements();
+        for(int i=0; i<num; i++)
           {
-          if(xml_argument.isElement()
-            && xml_argument.toElement().tagName() == "Argument")
+          vtkPVXMLElement* xml_argument = xml_arguments->GetNestedElement(i);
+          if(QString(xml_argument->GetName()) == "Argument")
             {
-            const QString argument =
-              xml_argument.toElement().attribute("value");
+            QString argument = xml_argument->GetAttribute("value");
             if(!argument.isEmpty())
               {
               results.push_back(argument);

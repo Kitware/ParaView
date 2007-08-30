@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqServerStartup.h"
 #include "pqCoreExport.h"
+#include "vtkSmartPointer.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // pqManualServerStartup
@@ -51,17 +52,17 @@ public:
     const QString& name,
     const pqServerResource& server,
     bool shouldSave,
-    const QDomDocument& configuration);
+    vtkPVXMLElement* configuration);
 
   const QString getName();
   const pqServerResource getServer();
-  const QDomDocument getConfiguration();
+  vtkPVXMLElement* getConfiguration();
   void execute(const OptionsT& options);
   
 private:
   const QString Name;
   const pqServerResource Server;
-  const QDomDocument Configuration;
+  vtkSmartPointer<vtkPVXMLElement> Configuration;
 };
 
 #endif // !_paManualServerStartup_h
