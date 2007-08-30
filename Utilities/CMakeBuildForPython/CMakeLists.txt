@@ -53,8 +53,17 @@ if(HAVE_DYNAMIC_LOADING)
   if(WIN32)
     set(DYNLOAD_SRC ${DYNLOAD_SRC} Python/dynload_win.c PC/import_nt.c PC/dl_nt.c)
   endif(WIN32)
+  set(BUILD_LIBS_SHARED_DEFAULT TRUE)
+else(HAVE_DYNAMIC_LOADING)
+  set(BUILD_LIBS_SHARED_DEFAULT FALSE)
 endif(HAVE_DYNAMIC_LOADING)
 
+option(PYTHON_BUILD_LIB_SHARED "Build libpython shared" ${BUILD_LIBS_SHARED_DEFAULT})
+if(PYTHON_BUILD_LIB_SHARED)
+  set(LIB_BUILD_TYPE SHARED)
+else(PYTHON_BUILD_LIB_SHARED)
+  set(LIB_BUILD_TYPE STATIC)
+endif(PYTHON_BUILD_LIB_SHARED)
 
 set(MACHDEP_SRCS )   #TODO: configure
 
@@ -62,16 +71,29 @@ set(SIGNAL_SRCS )    #TODO: configure
 
 set(MOD_SRCS )
 
+
+#####################################
+#
+# setup modules
+#
+#####################################
+
+set(STATIC_MODULES)
+set(DYNAMIC_MODULES)
+
 macro(ADD_PYTHON_MODULE _NAME _STATIC_SRCS)
   option(MODULE_${_NAME}_ENABLE "Add module ${_NAME}" TRUE)
 
   if(MODULE_${_NAME}_ENABLE)
-    option(MODULE_${_NAME}_SHARED "Add module ${_NAME} shared" FALSE)
+    option(MODULE_${_NAME}_SHARED "Add module ${_NAME} shared" ${BUILD_LIBS_SHARED_DEFAULT})
     if(MODULE_${_NAME}_SHARED)
       message(STATUS "Adding ${_NAME} as shared module")
+      set(DYNAMIC_MODULES ${DYNAMIC_MODULES} ${_NAME})
       add_library(${_NAME} MODULE ${ARGN})
+      set_target_properties(${_NAME} PROPERTIES PREFIX "")
     else(MODULE_${_NAME}_SHARED)
       message(STATUS "Adding ${_NAME} as static module")
+      set(STATIC_MODULES ${STATIC_MODULES} ${_NAME})
       set(${_STATIC_SRCS} ${${_STATIC_SRCS}} ${ARGN})
       set(PY_STATIC_MODULES_INIT_FUNCTIONS "${PY_STATIC_MODULES_INIT_FUNCTIONS}extern void init${_NAME}(void);\n")
       set(PY_STATIC_MODULES_INITTAB        "${PY_STATIC_MODULES_INITTAB}  {\"${_NAME}\", init${_NAME}},\n")
@@ -90,15 +112,42 @@ else(WIN32)
 endif(WIN32)
 
 add_python_module(${PY_POSIX_NAME}  MOD_SRCS Modules/posixmodule.c)
-add_python_module(signal    MOD_SRCS Modules/signalmodule.c)
+#add_python_module(signal    MOD_SRCS Modules/signalmodule.c)
+add_python_module(_codecs   MOD_SRCS Modules/_codecsmodule.c)
+add_python_module(_sre      MOD_SRCS Modules/_sre.c)
+add_python_module(_weakref  MOD_SRCS Modules/_weakref.c)
 add_python_module(errno     MOD_SRCS Modules/errnomodule.c)
 add_python_module(pwd       MOD_SRCS Modules/pwdmodule.c)
-add_python_module(_sre      MOD_SRCS Modules/_sre.c)
-add_python_module(_codecs   MOD_SRCS Modules/_codecsmodule.c)
-add_python_module(zipimport MOD_SRCS Modules/zipimport.c)
 add_python_module(_symtable MOD_SRCS Modules/symtablemodule.c)
 add_python_module(xxsubtype MOD_SRCS Modules/xxsubtype.c)
-add_python_module(_weakref  MOD_SRCS Modules/_weakref.c)
+add_python_module(zipimport MOD_SRCS Modules/zipimport.c)
+
+option(BUILD_UNTESTED_MODULES "Build extra modules" FALSE)
+if(BUILD_UNTESTED_MODULES)
+  add_python_module(_bisect       MOD_SRCS Modules/_bisectmodule.c )
+  add_python_module(_bsddb        MOD_SRCS Modules/_bsddb.c )
+  add_python_module(_collections  MOD_SRCS Modules/_collectionsmodule.c )
+  add_python_module(_csv          MOD_SRCS Modules/_csv.c )
+  add_python_module(_elementtree  MOD_SRCS Modules/_elementtree.c )
+  add_python_module(_functools    MOD_SRCS Modules/_functoolsmodule.c )
+  add_python_module(_heapq        MOD_SRCS Modules/_heapqmodule.c )
+  add_python_module(_hotshot      MOD_SRCS Modules/_hotshot.c )
+  add_python_module(_locale       MOD_SRCS Modules/_localemodule.c )
+  add_python_module(_lsprof       MOD_SRCS Modules/_lsprof.c )
+  add_python_module(_random       MOD_SRCS Modules/_randommodule.c )
+  add_python_module(_struct       MOD_SRCS Modules/_struct.c )
+  add_python_module(array         MOD_SRCS Modules/arraymodule.c )
+  add_python_module(binascii      MOD_SRCS Modules/binascii.c )
+  add_python_module(cmath         MOD_SRCS Modules/cmathmodule.c )
+  add_python_module(datetime      MOD_SRCS Modules/datetimemodule.c )
+  add_python_module(dl            MOD_SRCS Modules/dlmodule.c )
+  add_python_module(fcntl         MOD_SRCS Modules/fcntlmodule.c )
+  add_python_module(grp           MOD_SRCS Modules/grpmodule.c )
+  add_python_module(imageop       MOD_SRCS Modules/imageop.c )
+  add_python_module(math          MOD_SRCS Modules/mathmodule.c )
+  add_python_module(operator      MOD_SRCS Modules/operator.c )
+  add_python_module(parser        MOD_SRCS Modules/parsermodule.c )
+endif(BUILD_UNTESTED_MODULES)
 
 
 file(MAKE_DIRECTORY ${Python_BINARY_DIR}/Modules)
@@ -110,7 +159,12 @@ endif(WIN32)
 configure_file(Modules/config.c.cmake ${CMAKE_CURRENT_BINARY_DIR}/Modules/modules-config.c @ONLY)
 file(WRITE ${Python_BINARY_DIR}/Modules/Setup "#created by cmake, do not edit\n")
 
-############################## 
+
+#####################################
+#
+# build python and libpython
+# 
+#####################################
 
 set(P_SRCS      Parser/acceler.c
                 Parser/grammar1.c
@@ -213,6 +267,7 @@ set(MODULE_SRCS ${CMAKE_CURRENT_BINARY_DIR}/Modules/modules-config.c
                 Modules/getpath.c 
                 Modules/main.c 
                 Modules/gcmodule.c  
+                Modules/signalmodule.c  
                 ${MOD_SRCS} )
 
 set_source_files_properties(Python/getplatform.c PROPERTIES COMPILE_FLAGS -DPLATFORM=\\"${PY_PLATFORM}\\")
@@ -231,7 +286,7 @@ if(NOT HAVE_HYPOT)
 endif(NOT HAVE_HYPOT)
 
 
-add_library(pythonLib 
+add_library(pythonLib  ${LIB_BUILD_TYPE}
               ${PARSER_SRCS}
               ${OBJECT_SRCS}
               ${PYTHON_SRCS}
@@ -253,22 +308,41 @@ target_link_libraries(python pythonLib)
 add_subdirectory(Lib)
 
 
+#####################################
+#
 # install rules
+#
+#####################################
 
 install(TARGETS python pythonLib 
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
 
+# install the python headers
 file(GLOB pyHeaders ${Python_SOURCE_DIR}/Include/*.h )
 install(FILES ${Python_BINARY_DIR}/pyconfig.h ${pyHeaders} DESTINATION include/python${PY_MAJOR}.${PY_MINOR})
 
+# install the dynamic python modules
+if(DYNAMIC_MODULES)
+  install(TARGETS ${DYNAMIC_MODULES} DESTINATION lib/python${PY_MAJOR}.${PY_MINOR}/lib-dynload )
+endif(DYNAMIC_MODULES)
+
+# install the python config tool
 set(EXENAME ${CMAKE_INSTALL_PREFIX}/bin/python)
 configure_file(Misc/python-config.in ${CMAKE_CURRENT_BINARY_DIR}/python${PY_MAJOR}.${PY_MINOR}-config @ONLY)
 install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/python${PY_MAJOR}.${PY_MINOR}-config DESTINATION bin)
 
+# man pages
 install(FILES Misc/python.man DESTINATION man/man1 RENAME python.1)
 
+install(FILES LICENSE DESTINATION lib/python${PY_MAJOR}.${PY_MINOR} RENAME LICENSE.txt)
+
+
+#####################################
+#
 # setup packaging with CPack
+#
+#####################################
 
 include(PythonCPack.cmake)

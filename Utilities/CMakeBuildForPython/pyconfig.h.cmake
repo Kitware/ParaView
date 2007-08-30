@@ -44,7 +44,7 @@
 #cmakedefine HAVE_ASM_TYPES_H 1
 
 /* Define if GCC supports __attribute__((format(PyArg_ParseTuple, 2, 3))) */
-#undef HAVE_ATTRIBUTE_FORMAT_PARSETUPLE
+#cmakedefine HAVE_ATTRIBUTE_FORMAT_PARSETUPLE
 
 /* Define to 1 if you have the `bind_textdomain_codeset' function. */
 #cmakedefine HAVE_BIND_TEXTDOMAIN_CODESET 1
@@ -68,10 +68,10 @@
 #cmakedefine HAVE_BROKEN_PTHREAD_SIGMASK
 
 /* Define this if you have the type _Bool. */
-#undef HAVE_C99_BOOL
+#cmakedefine HAVE_C99_BOOL 1
 
 /* Define to 1 if you have the `chflags' function. */
-#undef HAVE_CHFLAGS
+#cmakedefine HAVE_CHFLAGS
 
 /* Define to 1 if you have the `chown' function. */
 #cmakedefine HAVE_CHOWN 1
@@ -108,7 +108,7 @@
 
 /* Define to 1 if you have the declaration of `tzname', and to 0 if you don't.
    */
-#undef HAVE_DECL_TZNAME
+#cmakedefine HAVE_DECL_TZNAME
 
 /* Define to 1 if you have the device macros. */
 #cmakedefine HAVE_DEVICE_MACROS 1
@@ -301,7 +301,7 @@
 #cmakedefine HAVE_LARGEFILE_SUPPORT @HAVE_LARGEFILE_SUPPORT@
 
 /* Define to 1 if you have the `lchflags' function. */
-#undef HAVE_LCHFLAGS
+#cmakedefine HAVE_LCHFLAGS 1
 
 /* Define to 1 if you have the `lchown' function. */
 #cmakedefine HAVE_LCHOWN 1
@@ -870,7 +870,7 @@
 #cmakedefine SIZEOF_WCHAR_T @SIZEOF_WCHAR_T@
 
 /* The size of `_Bool', as computed by sizeof. */
-#undef SIZEOF__BOOL
+#cmakedefine SIZEOF__BOOL @SIZEOF__BOOL@
 
 /* Define to 1 if you have the ANSI C header files. */
 #cmakedefine STDC_HEADERS 1
@@ -950,7 +950,7 @@
 #endif
 
 /* Define on OpenBSD to activate all library features */
-#undef _BSD_SOURCE
+#cmakedefine _BSD_SOURCE 1
 
 /* Define on Irix to enable u_int */
 #cmakedefine _BSD_TYPES 1
