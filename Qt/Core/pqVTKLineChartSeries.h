@@ -52,7 +52,7 @@ public:
   virtual int getTotalNumberOfPoints() const;
   virtual SequenceType getSequenceType(int sequence) const;
   virtual int getNumberOfPoints(int sequence) const;
-  virtual void getPoint(int sequence, int index,
+  virtual bool getPoint(int sequence, int index,
       pqChartCoordinate &coord) const;
   virtual void getErrorBounds(int sequence, int index, pqChartValue &upper,
       pqChartValue &lower) const;
@@ -67,6 +67,14 @@ public:
   /// \param xarray The x-axis data array.
   /// \param yarray The y-axis data array.
   void setDataArrays(vtkDataArray *xarray, vtkDataArray *yarray);
+
+  /// \brief
+  ///   Sets the mask arrays to be used for each axis. A mask array indicates
+  ///   which indices are valid. If a mask array is 0, then all indices are
+  ///   assumed to be valid.
+  /// \param xmask The x-axis mask array.
+  /// \param ymask The y-axis mask array.
+  void setMaskArrays(vtkDataArray* xmask, vtkDataArray*  ymask);
 
 private:
   pqVTKLineChartSeries(const pqVTKLineChartSeries&); // Not implemented.

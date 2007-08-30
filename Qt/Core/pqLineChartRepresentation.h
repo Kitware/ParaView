@@ -71,6 +71,11 @@ public:
   /// Returns the array used for y axis at the given index.
   vtkDataArray* getYArray(int index);
 
+  /// Returns the array used for masking. The Y mask array is same irrespective
+  /// of the index.
+  vtkDataArray* getXMaskArray();
+  vtkDataArray* getYMaskArray(int index);
+
   int getAttributeType() const;
 
   int getNumberOfSeries() const;

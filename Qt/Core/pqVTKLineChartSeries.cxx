@@ -46,6 +46,14 @@ public:
 
   vtkSmartPointer<vtkDataArray> XArray;
   vtkSmartPointer<vtkDataArray> YArray;
+
+  vtkSmartPointer<vtkDataArray> XMask;
+  vtkSmartPointer<vtkDataArray> YMask;
+
+  double XRangeCache[2];
+  double YRangeCache[2];
+  bool XRangeCacheValid;
+  bool YRangeCacheValid;
 };
 
 
@@ -54,6 +62,8 @@ pqVTKLineChartSeriesInternal::pqVTKLineChartSeriesInternal()
 {
   this->XArray = 0;
   this->YArray = 0;
+  this->XRangeCacheValid = false;
+  this->YRangeCacheValid = false;
 }
 
 
@@ -99,14 +109,18 @@ int pqVTKLineChartSeries::getNumberOfPoints(int sequence) const
   return 0;
 }
 
-void pqVTKLineChartSeries::getPoint(int sequence, int index,
+bool pqVTKLineChartSeries::getPoint(int sequence, int index,
     pqChartCoordinate &coord) const
 {
   if(index >= 0 && index < this->getNumberOfPoints(sequence))
     {
     coord.X = this->Internal->XArray->GetTuple1(index);;
     coord.Y = this->Internal->YArray->GetTuple1(index);
+
+    return !((this->Internal->XMask && this->Internal->XMask->GetTuple1(index)==0) ||
+      (this->Internal->YMask && this->Internal->YMask->GetTuple1(index)==0));
     }
+  return false;
 }
 
 void pqVTKLineChartSeries::getErrorBounds(int, int, pqChartValue &,
@@ -118,41 +132,102 @@ void pqVTKLineChartSeries::getErrorWidth(int , pqChartValue &) const
 {
 }
 
+static bool computeRange(vtkDataArray* array, vtkDataArray* maskArray, double range[2])
+{
+  if (!array || !maskArray)
+    {
+    return false;
+    }
+
+  vtkIdType numTuples = array->GetNumberOfTuples();
+  range[0] = VTK_DOUBLE_MAX;
+  range[1] = -VTK_DOUBLE_MAX;
+  for (vtkIdType cc=0; cc < numTuples; cc++)
+    {
+    if (maskArray->GetTuple1(cc) != 0)
+      {
+      double val = array->GetTuple1(cc);
+      range[0] = (val < range[0])? val : range[0];
+      range[1] = (val > range[1])? val : range[1];
+      }
+    }
+
+  return (range[1] >= range[0]);
+}
+
 void pqVTKLineChartSeries::getRangeX(pqChartValue &min, pqChartValue &max) const
 {
+  min = (double)0.0;
+  max = (double)1.0;
   if(this->Internal->XArray)
     {
-    double range[2];
-    this->Internal->XArray->GetRange(range);
-    min = range[0];
-    max = range[1];
-    }
-  else
-    {
-    min = (double)0.0;
-    max = (double)1.0;
+    if (this->Internal->XMask)
+      {
+      if (this->Internal->XRangeCacheValid)
+        {
+        min = this->Internal->XRangeCache[0];
+        max = this->Internal->XRangeCache[1];
+        }
+      else
+        {
+        if (::computeRange(this->Internal->XArray, 
+            this->Internal->XMask, this->Internal->XRangeCache))
+          {
+          min = this->Internal->XRangeCache[0];
+          max = this->Internal->XRangeCache[1];
+          this->Internal->XRangeCacheValid =true;
+          }
+        }
+      }
+    else
+      {
+      double range[2];
+      this->Internal->XArray->GetRange(range);
+      min = range[0];
+      max = range[1];
+      }
     }
 }
 
 void pqVTKLineChartSeries::getRangeY(pqChartValue &min, pqChartValue &max) const
 {
+  min = (double)0.0;
+  max = (double)1.0;
   if(this->Internal->YArray)
     {
-    double range[2];
-    this->Internal->YArray->GetRange(range);
-    min = range[0];
-    max = range[1];
-    }
-  else
-    {
-    min = (double)0.0;
-    max = (double)1.0;
+    if (this->Internal->YMask)
+      {
+      if (this->Internal->YRangeCacheValid)
+        {
+        min = this->Internal->YRangeCache[0]; 
+        max = this->Internal->YRangeCache[1]; 
+        }
+      else
+        {
+        if (::computeRange(this->Internal->YArray, 
+            this->Internal->YMask, this->Internal->YRangeCache))
+          {
+          min = this->Internal->YRangeCache[0];
+          max = this->Internal->YRangeCache[1];
+          this->Internal->YRangeCacheValid =true;
+          }
+        }
+      }
+    else
+      {
+      double range[2];
+      this->Internal->YArray->GetRange(range);
+      min = range[0];
+      max = range[1];
+      }
     }
 }
 
 void pqVTKLineChartSeries::setDataArrays(vtkDataArray *xArray,
     vtkDataArray *yArray)
 {
+  this->Internal->XRangeCacheValid = false;
+  this->Internal->YRangeCacheValid = false;
   if(xArray && yArray)
     {
     this->Internal->XArray = xArray;
@@ -167,4 +242,13 @@ void pqVTKLineChartSeries::setDataArrays(vtkDataArray *xArray,
   this->resetSeries();
 }
 
-
+//-----------------------------------------------------------------------------
+void pqVTKLineChartSeries::setMaskArrays(vtkDataArray* xmask,
+  vtkDataArray* ymask)
+{
+  this->Internal->XMask = xmask;
+  this->Internal->YMask = ymask;
+  this->Internal->XRangeCacheValid = false;
+  this->Internal->YRangeCacheValid = false;
+  this->resetSeries();
+}

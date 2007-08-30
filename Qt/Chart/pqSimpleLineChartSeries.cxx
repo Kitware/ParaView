@@ -190,13 +190,15 @@ int pqSimpleLineChartSeries::getNumberOfPoints(int sequence) const
   return 0;
 }
 
-void pqSimpleLineChartSeries::getPoint(int sequence, int index,
+bool pqSimpleLineChartSeries::getPoint(int sequence, int index,
     pqChartCoordinate &coord) const
 {
   if(index >= 0 && index < this->getNumberOfPoints(sequence))
     {
     coord = this->Internal->Sequences[sequence]->Points[index];
+    return true;
     }
+  return false;
 }
 
 void pqSimpleLineChartSeries::getErrorBounds(int sequence, int index,

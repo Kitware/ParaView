@@ -291,17 +291,46 @@ vtkDataArray* pqLineChartRepresentation::getYArray(int index)
     yarrayname.toAscii().data()) : 0;
 }
 
+//-----------------------------------------------------------------------------
+vtkDataArray* pqLineChartRepresentation::getXMaskArray()
+{
+  vtkSMProxy* proxy = this->getProxy();
+  bool use_y_index = pqSMAdaptor::getElementProperty(
+    proxy->GetProperty("UseYArrayIndex")).toBool();
+  if (use_y_index)
+    {
+    return 0;
+    }
+
+  return this->getYMaskArray(0);
+}
+
+//-----------------------------------------------------------------------------
+vtkDataArray* pqLineChartRepresentation::getYMaskArray(int vtkNotUsed(index))
+{
+  vtkRectilinearGrid* data = this->getClientSideData();
+  if (!data)
+    {
+    return 0;
+    }
+
+  return data->GetPointData()->GetArray("vtkValidPointMask");
+}
+
+//-----------------------------------------------------------------------------
 int pqLineChartRepresentation::getAttributeType() const
 {
   return pqSMAdaptor::getElementProperty(
       this->getProxy()->GetProperty("AttributeType")).toInt();
 }
 
+//-----------------------------------------------------------------------------
 int pqLineChartRepresentation::getNumberOfSeries() const
 {
   return this->Internals->Series->size();
 }
 
+//-----------------------------------------------------------------------------
 int pqLineChartRepresentation::getSeriesIndex(const QString &name) const
 {
   QVector<pqLineChartDisplayItem>::ConstIterator iter =
@@ -317,6 +346,7 @@ int pqLineChartRepresentation::getSeriesIndex(const QString &name) const
   return -1;
 }
 
+//-----------------------------------------------------------------------------
 bool pqLineChartRepresentation::isSeriesEnabled(int series) const
 {
   if(series >= 0 && series < this->Internals->Series->size())
@@ -327,6 +357,7 @@ bool pqLineChartRepresentation::isSeriesEnabled(int series) const
   return false;
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::setSeriesEnabled(int series, bool enabled)
 {
   if(series >= 0 && series < this->Internals->Series->size())
@@ -362,6 +393,7 @@ void pqLineChartRepresentation::setSeriesEnabled(int series, bool enabled)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::getSeriesName(int series, QString &name) const
 {
   if(series >= 0 && series < this->Internals->Series->size())
@@ -370,6 +402,7 @@ void pqLineChartRepresentation::getSeriesName(int series, QString &name) const
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::setSeriesName(int series, const QString &name)
 {
   if(series >= 0 && series < this->Internals->Series->size())
@@ -387,6 +420,7 @@ void pqLineChartRepresentation::setSeriesName(int series, const QString &name)
     }
 }
 
+//-----------------------------------------------------------------------------
 bool pqLineChartRepresentation::isSeriesInLegend(int series) const
 {
   if(series >= 0 && series < this->Internals->Series->size())
@@ -397,6 +431,7 @@ bool pqLineChartRepresentation::isSeriesInLegend(int series) const
   return false;
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::setSeriesInLegend(int series, bool inLegend)
 {
   if(series >= 0 && series < this->Internals->Series->size())
@@ -415,6 +450,7 @@ void pqLineChartRepresentation::setSeriesInLegend(int series, bool inLegend)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::getSeriesLabel(int series,
     QString &label) const
 {
@@ -424,6 +460,7 @@ void pqLineChartRepresentation::getSeriesLabel(int series,
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::setSeriesLabel(int series,
     const QString &label)
 {
@@ -442,6 +479,7 @@ void pqLineChartRepresentation::setSeriesLabel(int series,
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::getSeriesColor(int series, QColor &color) const
 {
   if(series >= 0 && series < this->Internals->Series->size())
@@ -450,6 +488,7 @@ void pqLineChartRepresentation::getSeriesColor(int series, QColor &color) const
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::setSeriesColor(int series, const QColor &color)
 {
   if(series >= 0 && series < this->Internals->Series->size())
@@ -469,6 +508,7 @@ void pqLineChartRepresentation::setSeriesColor(int series, const QColor &color)
     }
 }
 
+//-----------------------------------------------------------------------------
 bool pqLineChartRepresentation::isSeriesColorSet(int series) const
 {
   if(series >= 0 && series < this->Internals->Series->size())
@@ -479,6 +519,7 @@ bool pqLineChartRepresentation::isSeriesColorSet(int series) const
   return false;
 }
 
+//-----------------------------------------------------------------------------
 int pqLineChartRepresentation::getSeriesThickness(int series) const
 {
   if(series >= 0 && series < this->Internals->Series->size())
@@ -489,6 +530,7 @@ int pqLineChartRepresentation::getSeriesThickness(int series) const
   return 0;
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::setSeriesThickness(int series, int thickness)
 {
   if(series >= 0 && series < this->Internals->Series->size())
@@ -506,6 +548,7 @@ void pqLineChartRepresentation::setSeriesThickness(int series, int thickness)
     }
 }
 
+//-----------------------------------------------------------------------------
 Qt::PenStyle pqLineChartRepresentation::getSeriesStyle(int series) const
 {
   if(series >= 0 && series < this->Internals->Series->size())
@@ -516,6 +559,7 @@ Qt::PenStyle pqLineChartRepresentation::getSeriesStyle(int series) const
   return Qt::SolidLine;
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::setSeriesStyle(int series, Qt::PenStyle style)
 {
   if(series >= 0 && series < this->Internals->Series->size())
@@ -535,6 +579,7 @@ void pqLineChartRepresentation::setSeriesStyle(int series, Qt::PenStyle style)
     }
 }
 
+//-----------------------------------------------------------------------------
 bool pqLineChartRepresentation::isSeriesStyleSet(int series) const
 {
   if(series >= 0 && series < this->Internals->Series->size())
@@ -545,6 +590,7 @@ bool pqLineChartRepresentation::isSeriesStyleSet(int series) const
   return false;
 }
 
+//-----------------------------------------------------------------------------
 int pqLineChartRepresentation::getSeriesAxesIndex(int series) const
 {
   if(series >= 0 && series < this->Internals->Series->size())
@@ -555,6 +601,7 @@ int pqLineChartRepresentation::getSeriesAxesIndex(int series) const
   return 0;
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::setSeriesAxesIndex(int series, int index)
 {
   if(series >= 0 && series < this->Internals->Series->size())
@@ -572,11 +619,13 @@ void pqLineChartRepresentation::setSeriesAxesIndex(int series, int index)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::beginSeriesChanges()
 {
   this->Internals->InMultiChange = true;
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::endSeriesChanges()
 {
   if(this->Internals->InMultiChange)
@@ -586,6 +635,7 @@ void pqLineChartRepresentation::endSeriesChanges()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::updateSeries()
 {
   // Update the domain information.
@@ -615,6 +665,7 @@ void pqLineChartRepresentation::updateSeries()
       {
       arrayNames.append(arrayDomain->GetString(j));
       }
+    arrayNames.removeAll("vtkValidPointMask");
 
     // Get the current status array.
     QList<QVariant> status =
@@ -716,12 +767,14 @@ void pqLineChartRepresentation::updateSeries()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::setAttributeType(int attr)
 {
   pqSMAdaptor::setElementProperty(
       this->getProxy()->GetProperty("AttributeType"), QVariant(attr));
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::changeSeriesList()
 {
   int attribute_type = pqSMAdaptor::getElementProperty(
@@ -736,6 +789,7 @@ void pqLineChartRepresentation::changeSeriesList()
     }
 }
 
+//-----------------------------------------------------------------------------
 int pqLineChartRepresentation::isEnabledByDefault(const QString &arrayName) const
 {
   if(arrayName == "BlockId" || arrayName == "Time" ||
@@ -751,6 +805,7 @@ int pqLineChartRepresentation::isEnabledByDefault(const QString &arrayName) cons
   return 1;
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::saveSeriesChanges()
 {
   if(this->Internals->ChangeCount == 0)

@@ -63,7 +63,7 @@ public:
   virtual int getTotalNumberOfPoints() const;
   virtual pqLineChartSeries::SequenceType getSequenceType(int sequence) const;
   virtual int getNumberOfPoints(int sequence) const;
-  virtual void getPoint(int sequence, int index,
+  virtual bool getPoint(int sequence, int index,
       pqChartCoordinate &coord) const;
   virtual void getErrorBounds(int sequence, int index, pqChartValue &upper,
       pqChartValue &lower) const;

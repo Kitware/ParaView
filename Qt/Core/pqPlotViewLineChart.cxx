@@ -347,6 +347,9 @@ void pqPlotViewLineChart::update(bool force)
             }
 
           // Update the arrays and options for the series.
+          series->Model->setMaskArrays(
+            (*jter)->Representation->getXMaskArray(),
+            (*jter)->Representation->getYMaskArray(index));
           series->Model->setDataArrays(xArray, yArray);
           pqLineChartSeriesOptions *options =
               this->Internal->Layer[series->Chart]->getOptions()->getSeriesOptions(
@@ -465,6 +468,9 @@ void pqPlotViewLineChart::update(bool force)
             }
 
           // Set the model arrays.
+          plot->Model->setMaskArrays(
+            (*jter)->Representation->getXMaskArray(),
+            (*jter)->Representation->getYMaskArray(i));
           plot->Model->setDataArrays(xArray, yArray);
 
           // Add the line chart series to the line chart model.
