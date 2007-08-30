@@ -565,19 +565,30 @@ bool pqFileDialogModel::makeDir(const QString& dirName)
     return false;
     }
 
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
-  vtkClientServerID dirID = pm->NewStreamObject("vtkDirectory", stream);
-  stream << vtkClientServerStream::Invoke
-         << dirID << "MakeDirectory" << dirPath.toAscii().data()
-         << vtkClientServerStream::End;
-  pm->SendStream(
-    this->Implementation->getServer()->GetConnectionID(),
-    vtkProcessModule::DATA_SERVER, stream);
-  pm->DeleteStreamObject(dirID, stream);
-  pm->SendStream(
-    this->Implementation->getServer()->GetConnectionID(),
-    vtkProcessModule::DATA_SERVER, stream);
+  if(this->Implementation->getServer())
+    {
+    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+    vtkClientServerStream stream;
+    vtkClientServerID dirID = pm->NewStreamObject("vtkDirectory", stream);
+    stream << vtkClientServerStream::Invoke
+          << dirID << "MakeDirectory" << dirPath.toAscii().data()
+          << vtkClientServerStream::End;
+    pm->SendStream(
+      this->Implementation->getServer()->GetConnectionID(),
+      vtkProcessModule::DATA_SERVER, stream);
+    pm->DeleteStreamObject(dirID, stream);
+    pm->SendStream(
+      this->Implementation->getServer()->GetConnectionID(),
+      vtkProcessModule::DATA_SERVER, stream);
+    }
+  else
+    {
+    QDir dir(this->getCurrentPath());
+    if(!dir.mkdir(dirName))
+      {
+      return false;
+      }
+    }
 
   QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
   vtkPVFileInformation* info;

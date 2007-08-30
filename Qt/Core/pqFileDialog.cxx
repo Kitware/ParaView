@@ -255,14 +255,11 @@ pqFileDialog::pqFileDialog(
   this->Implementation->Ui.Files->setModel(&this->Implementation->FileFilter);
   this->Implementation->Ui.Files->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-  if(server)
-    {
-    this->Implementation->Ui.Files->setContextMenuPolicy(Qt::CustomContextMenu);
-    QObject::connect(this->Implementation->Ui.Files,
-                    SIGNAL(customContextMenuRequested(const QPoint &)), 
-                    this, SLOT(onContextMenuRequested(const QPoint &)));
-    this->Implementation->Ui.CreateFolder->setEnabled( true );
-    }
+  this->Implementation->Ui.Files->setContextMenuPolicy(Qt::CustomContextMenu);
+  QObject::connect(this->Implementation->Ui.Files,
+                  SIGNAL(customContextMenuRequested(const QPoint &)), 
+                  this, SLOT(onContextMenuRequested(const QPoint &)));
+  this->Implementation->Ui.CreateFolder->setEnabled( true );
 
   this->Implementation->Ui.Favorites->setModel(this->Implementation->FavoriteModel);
   this->Implementation->Ui.Favorites->setSelectionBehavior(QAbstractItemView::SelectRows);
