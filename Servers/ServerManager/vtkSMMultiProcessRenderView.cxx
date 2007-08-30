@@ -18,10 +18,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDisplayInformation.h"
+#include "vtkPVServerInformation.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationStrategy.h"
 
-vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.3");
+vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.4");
 //----------------------------------------------------------------------------
 vtkSMMultiProcessRenderView::vtkSMMultiProcessRenderView()
 {
@@ -155,13 +156,21 @@ void vtkSMMultiProcessRenderView::EndCreateVTKObjects()
   this->Superclass::EndCreateVTKObjects();
 
   // Check if it's possible to access display on the server side.
-
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
-  pm->GatherInformation(this->ConnectionID, 
-    vtkProcessModule::RENDER_SERVER, di, pm->GetProcessModuleID());
-  this->RemoteRenderAvailable = (di->GetCanOpenDisplay() == 1);
-  di->Delete();
+
+  vtkPVServerInformation* serverInfo = pm->GetServerInformation(this->ConnectionID);
+  if (serverInfo && !serverInfo->GetRemoteRendering())
+    {
+    this->RemoteRenderAvailable = false;
+    }
+  else
+    {
+    vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
+    pm->GatherInformation(this->ConnectionID, 
+      vtkProcessModule::RENDER_SERVER, di, pm->GetProcessModuleID());
+    this->RemoteRenderAvailable = (di->GetCanOpenDisplay() == 1);
+    di->Delete();
+    }
 }
 
 //----------------------------------------------------------------------------
