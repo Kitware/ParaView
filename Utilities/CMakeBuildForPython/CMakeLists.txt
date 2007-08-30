@@ -14,8 +14,8 @@ option(HAVE_LARGEFILE_SUPPORT "Large file support "1)
 option(WITH_THREAD "compile in rudimentary thread support" 1)
 
 set(PY_MAJOR 2)
-set(PY_MINOR 5)
-set(PY_PATCH 1)
+set(PY_MINOR 6)
+set(PY_PATCH 0)
 
 # do the configure checks
 
@@ -191,6 +191,7 @@ set(PYTHON_SRCS Python/Python-ast.c
                 Python/modsupport.c 
                 Python/mystrtoul.c 
                 Python/mysnprintf.c 
+                Python/peephole.c
                 Python/pyarena.c 
                 Python/pyfpe.c 
                 Python/pystate.c 

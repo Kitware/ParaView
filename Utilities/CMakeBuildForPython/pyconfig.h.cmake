@@ -43,6 +43,9 @@
 /* Define to 1 if you have the <asm/types.h> header file. */
 #cmakedefine HAVE_ASM_TYPES_H 1
 
+/* Define if GCC supports __attribute__((format(PyArg_ParseTuple, 2, 3))) */
+#undef HAVE_ATTRIBUTE_FORMAT_PARSETUPLE
+
 /* Define to 1 if you have the `bind_textdomain_codeset' function. */
 #cmakedefine HAVE_BIND_TEXTDOMAIN_CODESET 1
 
@@ -63,6 +66,12 @@
 
 /* Define if pthread_sigmask() does not work on your system. */
 #cmakedefine HAVE_BROKEN_PTHREAD_SIGMASK
+
+/* Define this if you have the type _Bool. */
+#undef HAVE_C99_BOOL
+
+/* Define to 1 if you have the `chflags' function. */
+#undef HAVE_CHFLAGS
 
 /* Define to 1 if you have the `chown' function. */
 #cmakedefine HAVE_CHOWN 1
@@ -96,6 +105,10 @@
 
 /* Define if you have the 'resize_term' function. */
 #cmakedefine HAVE_CURSES_RESIZE_TERM 1
+
+/* Define to 1 if you have the declaration of `tzname', and to 0 if you don't.
+   */
+#undef HAVE_DECL_TZNAME
 
 /* Define to 1 if you have the device macros. */
 #cmakedefine HAVE_DEVICE_MACROS 1
@@ -286,6 +299,9 @@
    add some flags for configuration and compilation to enable this mode. (For
    Solaris and Linux, the necessary defines are already defined.) */
 #cmakedefine HAVE_LARGEFILE_SUPPORT @HAVE_LARGEFILE_SUPPORT@
+
+/* Define to 1 if you have the `lchflags' function. */
+#undef HAVE_LCHFLAGS
 
 /* Define to 1 if you have the `lchown' function. */
 #cmakedefine HAVE_LCHOWN 1
@@ -811,22 +827,22 @@
 /* Define if i>>j for signed int i does not extend the sign bit when i < 0 */
 #cmakedefine SIGNED_RIGHT_SHIFT_ZERO_FILLS
 
-/* The size of a `double', as computed by sizeof. */
+/* The size of `double', as computed by sizeof. */
 #cmakedefine SIZEOF_DOUBLE @SIZEOF_DOUBLE@
 
-/* The size of a `float', as computed by sizeof. */
+/* The size of `float', as computed by sizeof. */
 #cmakedefine SIZEOF_FLOAT @SIZEOF_FLOAT@
 
-/* The size of a `fpos_t', as computed by sizeof. */
+/* The size of `fpos_t', as computed by sizeof. */
 #cmakedefine SIZEOF_FPOS_T @SIZEOF_FPOS_T@
 
-/* The size of a `int', as computed by sizeof. */
+/* The size of `int', as computed by sizeof. */
 #cmakedefine SIZEOF_INT @SIZEOF_INT@
 
-/* The size of a `long', as computed by sizeof. */
+/* The size of `long', as computed by sizeof. */
 #cmakedefine SIZEOF_LONG @SIZEOF_LONG@
 
-/* The size of a `long long', as computed by sizeof. */
+/* The size of `long long', as computed by sizeof. */
 #cmakedefine SIZEOF_LONG_LONG @SIZEOF_LONG_LONG@
 
 /* The number of bytes in an off_t. */
@@ -835,23 +851,26 @@
 /* The number of bytes in a pthread_t. */
 #cmakedefine SIZEOF_PTHREAD_T @SIZEOF_PTHREAD_T@
 
-/* The size of a `short', as computed by sizeof. */
+/* The size of `short', as computed by sizeof. */
 #cmakedefine SIZEOF_SHORT @SIZEOF_SHORT@
 
-/* The size of a `size_t', as computed by sizeof. */
+/* The size of `size_t', as computed by sizeof. */
 #cmakedefine SIZEOF_SIZE_T @SIZEOF_SIZE_T@
 
 /* The number of bytes in a time_t. */
 #cmakedefine SIZEOF_TIME_T @SIZEOF_TIME_T@
 
-/* The size of a `uintptr_t', as computed by sizeof. */
+/* The size of `uintptr_t', as computed by sizeof. */
 #cmakedefine SIZEOF_UINTPTR_T @SIZEOF_UINTPTR_T@
 
-/* The size of a `void *', as computed by sizeof. */
+/* The size of `void *', as computed by sizeof. */
 #cmakedefine SIZEOF_VOID_P @SIZEOF_VOID_P@
 
-/* The size of a `wchar_t', as computed by sizeof. */
+/* The size of `wchar_t', as computed by sizeof. */
 #cmakedefine SIZEOF_WCHAR_T @SIZEOF_WCHAR_T@
+
+/* The size of `_Bool', as computed by sizeof. */
+#undef SIZEOF__BOOL
 
 /* Define to 1 if you have the ANSI C header files. */
 #cmakedefine STDC_HEADERS 1
@@ -930,6 +949,9 @@
 # undef _ALL_SOURCE
 #endif
 
+/* Define on OpenBSD to activate all library features */
+#undef _BSD_SOURCE
+
 /* Define on Irix to enable u_int */
 #cmakedefine _BSD_TYPES 1
 
@@ -986,7 +1008,7 @@
 /* Define to `int' if <sys/types.h> does not define. */
 #cmakedefine mode_t @mode_t@
 
-/* Define to `long' if <sys/types.h> does not define. */
+/* Define to `long int' if <sys/types.h> does not define. */
 #cmakedefine off_t @off_t@
 
 /* Define to `int' if <sys/types.h> does not define. */
@@ -995,7 +1017,7 @@
 /* Define to empty if the keyword does not work. */
 #cmakedefine signed
 
-/* Define to `unsigned' if <sys/types.h> does not define. */
+/* Define to `unsigned int' if <sys/types.h> does not define. */
 #cmakedefine size_t @size_t@
 
 /* Define to `int' if <sys/socket.h> does not define. */

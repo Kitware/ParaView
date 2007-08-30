@@ -142,12 +142,15 @@ check_type_size(uintptr_t SIZEOF_UINTPTR_T)
 set(HAVE_UINTPTR_T ${SIZEOF_UINTPTR_T})
 check_type_size("void *" SIZEOF_VOID_P)
 check_type_size(wchar_t SIZEOF_WCHAR_T)
+check_type_size(_Bool SIZEOF__BOOL)
+set(HAVE_C99_BOOL ${SIZEOF__BOOL})
 
 set(_LARGEFILE_SOURCE 1)
 set(_FILE_OFFSET_BITS 64)
 
 set(_NETBSD_SOURCE 1)
 set(__BSD_VISIBLE 1)
+set(_BSD_SOURCE 1)
 set(_BSD_TYPES 1)
 set(_GNU_SOURCE 1)
 set(_XOPEN_SOURCE 600)
@@ -201,6 +204,7 @@ set(CFG_HEADERS ${CFG_HEADERS} time.h stdio.h math.h)
 check_symbol_exists(alarm        "${CFG_HEADERS}" HAVE_ALARM)
 check_symbol_exists(altzone      "${CFG_HEADERS}" HAVE_ALTZONE)
 check_symbol_exists(bind_textdomain_codeset "${CFG_HEADERS}" HAVE_BIND_TEXTDOMAIN_CODESET)
+check_symbol_exists(chflags      "${CFG_HEADERS}" HAVE_CHFLAGS)
 check_symbol_exists(chown        "${CFG_HEADERS}" HAVE_CHOWN)
 check_symbol_exists(chroot       "${CFG_HEADERS}" HAVE_CHROOT)
 check_symbol_exists(clock        "${CFG_HEADERS}" HAVE_CLOCK)
@@ -242,6 +246,7 @@ check_symbol_exists(getwd        "${CFG_HEADERS}" HAVE_GETWD)
 check_symbol_exists(hypot        "${CFG_HEADERS}" HAVE_HYPOT)
 check_symbol_exists(kill         "${CFG_HEADERS}" HAVE_KILL)
 check_symbol_exists(killpg       "${CFG_HEADERS}" HAVE_KILLPG)
+check_symbol_exists(lchflags     "${CFG_HEADERS}" HAVE_LCHFLAGS)
 check_symbol_exists(lchown       "${CFG_HEADERS}" HAVE_LCHOWN)
 check_symbol_exists(link         "${CFG_HEADERS}" HAVE_LINK)
 check_symbol_exists(lstat        "${CFG_HEADERS}" HAVE_LSTAT)
@@ -534,7 +539,7 @@ endif(NOT mode_t)
 
 check_type_exists(off_t sys/types.h off_t)
 if(NOT off_t)
-  set(off_t long)
+  set(off_t "long int")
 else(NOT off_t)
   set(off_t 0)
 endif(NOT off_t)
@@ -548,7 +553,7 @@ endif(NOT pid_t)
 
 check_type_exists(size_t sys/types.h size_t)
 if(NOT size_t)
-  set(size_t unsigned)
+  set(size_t "unsigned int")
 else(NOT size_t)
   set(size_t 0)
 endif(NOT size_t)
@@ -598,9 +603,14 @@ endif(NOT volatile_WORKS)
 
 #######################################################################
 #
-# tests for bugs
+# tests for bugs and other stuff
 #
 #######################################################################
+
+check_c_source_compiles("
+        void f(char*,...)__attribute((format(PyArg_ParseTuple, 1, 2))) {}; 
+        int main() {f(NULL);} "
+        HAVE_ATTRIBUTE_FORMAT_PARSETUPLE)
 
 set(CMAKE_REQUIRED_INCLUDES ${CFG_HEADERS})
 check_c_source_compiles("#include <unistd.h>\n int main() {getpgrp(0);}" GETPGRP_HAVE_ARG)
@@ -616,7 +626,8 @@ check_c_source_runs(" #include <poll.h>
     int poll_test = poll (&poll_struct, 1, 0);
     if (poll_test < 0) { exit(0); }
     else if (poll_test == 0 && poll_struct.revents != POLLNVAL) { exit(0); }
-    else { exit(1); } }" HAVE_BROKEN_POLL)
+    else { exit(1); } }" 
+    HAVE_BROKEN_POLL)
 
 if(HAVE_SYS_TIME_H)
   check_include_files("sys/time.h;time.h" TIME_WITH_SYS_TIME)
@@ -697,6 +708,7 @@ set(HAVE_PROTOTYPES 1)
 set(PTHREAD_SYSTEM_SCHED_SUPPORTED 1)
 set(RETSIGTYPE void)
 set(HAVE_WORKING_TZSET 1)
+set(HAVE_DECL_TZNAME 0) # no test in python sources
 set(HAVE_DEVICE_MACROS ${HAVE_MAKEDEV})
 
 set(HAVE_GETHOSTBYNAME_R 0)
