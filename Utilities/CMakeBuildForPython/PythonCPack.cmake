@@ -1,0 +1,8 @@
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Python is a programming language")
+
+SET(CPACK_PACKAGE_VERSION_MAJOR ${PY_MAJOR} )
+SET(CPACK_PACKAGE_VERSION_MINOR ${PY_MINOR} )
+SET(CPACK_PACKAGE_VERSION_PATCH ${PY_PATCH} )
+
+# include CPack model once all variables are set
+INCLUDE(CPack)
