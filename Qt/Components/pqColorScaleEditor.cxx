@@ -65,7 +65,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSpacerItem>
 #include <QString>
 #include <QtDebug>
-#include <QTimer>
 #include <QVariant>
 
 #include "vtkColorTransferFunction.h"
@@ -98,9 +97,6 @@ public:
   QPointer<pqPipelineRepresentation> CurrentDisplay;
   int CurrentIndex;
   bool HasOpacity;
-  bool ValueChanged;
-  bool OpacityChanged;
-  bool SizeChanged;
   bool InSetColors;
   bool IgnoreEditor;
   bool IsDormant;
@@ -121,9 +117,6 @@ pqColorScaleEditorForm::pqColorScaleEditorForm()
   this->Presets = 0;
   this->CurrentIndex = -1;
   this->HasOpacity = false;
-  this->ValueChanged = false;
-  this->OpacityChanged = false;
-  this->SizeChanged = false;
   this->InSetColors = false;
   this->IgnoreEditor = false;
   this->IsDormant = true;
@@ -140,7 +133,6 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->Display = 0;
   this->ColorMap = 0;
   this->Legend = 0;
-  this->EditDelay = new QTimer(this);
 
   // Set up the ui.
   this->Form->setupUi(this);
@@ -199,10 +191,6 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
       this, SLOT(handleEditorPointMoveFinished()));
 #endif
 
-  // Set up the timer. The timer is used when the user edits the
-  // table size.
-  this->EditDelay->setSingleShot(true);
-
   // Initialize the state of some of the controls.
   this->enableRescaleControls(this->Form->UseAutoRescale->isChecked());
   this->enableResolutionControls(this->Form->UseDiscreteColors->isChecked());
@@ -227,10 +215,10 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->Form->TableSizeText->installEventFilter(validator);
 
   // Connect the color scale widgets.
-  this->connect(this->Form->ScalarValue, SIGNAL(textEdited(const QString &)),
-      this, SLOT(handleValueEdit()));
-  this->connect(this->Form->Opacity, SIGNAL(textEdited(const QString &)),
-      this, SLOT(handleOpacityEdit()));
+  this->connect(this->Form->ScalarValue, SIGNAL(editingFinished()),
+      this, SLOT(setValueFromText()));
+  this->connect(this->Form->Opacity, SIGNAL(editingFinished()),
+      this, SLOT(setOpacityFromText()));
 
   this->connect(this->Form->ColorSpace, SIGNAL(currentIndexChanged(int)),
       this, SLOT(setColorSpace(int)));
@@ -257,11 +245,8 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
       this, SLOT(setUseDiscreteColors(bool)));
   this->connect(this->Form->TableSize, SIGNAL(valueChanged(int)),
       this, SLOT(setSizeFromSlider(int)));
-  this->connect(this->Form->TableSizeText, SIGNAL(textEdited(const QString &)),
-      this, SLOT(handleSizeTextEdit()));
-
-  this->connect(this->EditDelay, SIGNAL(timeout()),
-      this, SLOT(applyTextChanges()));
+  this->connect(this->Form->TableSizeText, SIGNAL(editingFinished()),
+      this, SLOT(setSizeFromText()));
 
   // Connect the color legend widgets.
   this->connect(this->Form->ShowColorLegend, SIGNAL(toggled(bool)),
@@ -300,7 +285,6 @@ pqColorScaleEditor::~pqColorScaleEditor()
   this->Form->Listener->Delete();
   delete this->Form;
   this->Viewer->Delete();
-  delete this->EditDelay;
 }
 
 void pqColorScaleEditor::setRepresentation(pqPipelineRepresentation *display)
@@ -383,13 +367,6 @@ void pqColorScaleEditor::showEvent(QShowEvent *e)
 
 void pqColorScaleEditor::hideEvent(QHideEvent *e)
 {
-  // If the edit delay timer is active, set the final user entry.
-  if(this->EditDelay->isActive())
-    {
-    this->EditDelay->stop();
-    this->applyTextChanges();
-    }
-
   QDialog::hideEvent(e);
 
   // Save the current display and view and go dormant.
@@ -602,13 +579,6 @@ void pqColorScaleEditor::setCurrentPoint(int index)
 {
   if(index != this->Form->CurrentIndex)
     {
-    // Make sure any pending value or opacity changes are handled.
-    if(this->EditDelay->isActive())
-      {
-      this->EditDelay->stop();
-      this->applyTextChanges();
-      }
-
     // Change the current index and update the gui elements.
     this->Form->CurrentIndex = index;
     this->enablePointControls();
@@ -616,14 +586,6 @@ void pqColorScaleEditor::setCurrentPoint(int index)
     // Get the value and opacity for the current point.
     this->updatePointValues();
     }
-}
-
-void pqColorScaleEditor::handleValueEdit()
-{
-  // Start a timer to allow the user to enter more text. If the timer
-  // is already running delay it for more text.
-  this->Form->ValueChanged = true;
-  this->EditDelay->start(600);
 }
 
 void pqColorScaleEditor::setValueFromText()
@@ -715,14 +677,6 @@ void pqColorScaleEditor::setValueFromText()
 #endif
 }
 
-void pqColorScaleEditor::handleOpacityEdit()
-{
-  // Start a timer to allow the user to enter more text. If the timer
-  // is already running delay it for more text.
-  this->Form->OpacityChanged = true;
-  this->EditDelay->start(600);
-}
-
 void pqColorScaleEditor::setOpacityFromText()
 {
   if(this->Form->CurrentIndex == -1 || !this->Form->HasOpacity)
@@ -798,13 +752,6 @@ void pqColorScaleEditor::setColorSpace(int index)
 
 void pqColorScaleEditor::savePreset()
 {
-  // Make sure the any pending text changes are handled.
-  if(this->EditDelay->isActive())
-    {
-    this->EditDelay->stop();
-    this->applyTextChanges();
-    }
-
   // Get the color preset model from the manager.
   pqColorPresetModel *model = this->Form->Presets->getModel();
 
@@ -851,13 +798,6 @@ void pqColorScaleEditor::savePreset()
 
 void pqColorScaleEditor::loadPreset()
 {
-  // Make sure the any pending text changes are handled.
-  if(this->EditDelay->isActive())
-    {
-    this->EditDelay->stop();
-    this->applyTextChanges();
-    }
-
   this->Form->Presets->setUsingCloseButton(false);
   if(this->Form->Presets->exec() == QDialog::Accepted)
     {
@@ -1095,14 +1035,6 @@ void pqColorScaleEditor::setUseDiscreteColors(bool on)
     }
 }
 
-void pqColorScaleEditor::handleSizeTextEdit()
-{
-  // Start a timer to allow the user to enter more text. If the timer
-  // is already running delay it for more text.
-  this->Form->SizeChanged = true;
-  this->EditDelay->start(600);
-}
-
 void pqColorScaleEditor::setSizeFromText()
 {
   // Get the size from the text. Set the size for the slider and the
@@ -1150,27 +1082,6 @@ void pqColorScaleEditor::setScalarRange(double min, double max)
   // Update the color map and the rendered views.
   this->ColorMap->setScalarRange(min, max);
   this->Display->renderViewEventually();
-}
-
-void pqColorScaleEditor::applyTextChanges()
-{
-  if(this->Form->ValueChanged)
-    {
-    this->Form->ValueChanged = false;
-    this->setValueFromText();
-    }
-
-  if(this->Form->OpacityChanged)
-    {
-    this->Form->OpacityChanged = false;
-    this->setOpacityFromText();
-    }
-
-  if(this->Form->SizeChanged)
-    {
-    this->Form->SizeChanged = false;
-    this->setSizeFromText();
-    }
 }
 
 void pqColorScaleEditor::checkForLegend()
@@ -1425,9 +1336,6 @@ void pqColorScaleEditor::initColorScale()
     }
 
   // Clear any pending changes and clear the current point index.
-  this->Form->ValueChanged = false;
-  this->Form->OpacityChanged = false;
-  this->Form->SizeChanged = false;
   this->Form->CurrentIndex = -1;
 
   // Ignore changes during editor setup.

@@ -47,7 +47,6 @@ class pqScalarsToColors;
 class QHideEvent;
 class QShowEvent;
 class QString;
-class QTimer;
 class vtkTransferFunctionViewer;
 
 
@@ -80,9 +79,7 @@ private slots:
 
   void handleEditorCurrentChanged();
   void setCurrentPoint(int index);
-  void handleValueEdit();
   void setValueFromText();
-  void handleOpacityEdit();
   void setOpacityFromText();
 
   void setColorSpace(int index);
@@ -99,14 +96,11 @@ private slots:
   void rescaleToDataRange();
 
   void setUseDiscreteColors(bool on);
-  void handleSizeTextEdit();
   void setSizeFromText();
   void setSizeFromSlider(int tableSize);
   void setTableSize(int tableSize);
 
   void setScalarRange(double min, double max);
-
-  void applyTextChanges();
   //@}
 
   /// \name Color Legend Methods
@@ -144,7 +138,6 @@ private:
   pqPipelineRepresentation *Display;
   pqScalarsToColors *ColorMap;
   pqScalarBarRepresentation *Legend;
-  QTimer *EditDelay;
 };
 
 #endif
