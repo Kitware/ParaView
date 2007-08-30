@@ -12,7 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVExtractSelection - Adds a second port to vtkExtractSelection, the second port contains an id selection.
+// .NAME vtkPVExtractSelection - Adds a second port to vtkExtractSelection, 
+// the second port contains an id selection.
 // .SECTION Description
 // vtkPVExtractSelection adds a second port to its vtkExtractSelection. The
 // first output (from the parent class) is useful for displaying a subset of
