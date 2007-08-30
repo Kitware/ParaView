@@ -59,10 +59,10 @@ public:
   pqThreadedEventSource& Source;
 
   QWaitCondition WaitCondition;
-  QAtomic Waiting;
+  int Waiting;
 
-  QAtomic ShouldStop;
-  QAtomic GotEvent;
+  int ShouldStop;
+  int GotEvent;
   QString CurrentObject;
   QString CurrentCommand;
   QString CurrentArgument;
