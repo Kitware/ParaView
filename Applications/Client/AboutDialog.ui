@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>528</width>
-    <height>581</height>
+    <height>627</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -30,7 +30,58 @@
    <property name="spacing" >
     <number>6</number>
    </property>
-   <item row="2" column="0" >
+   <item row="1" column="1" >
+    <widget class="QLabel" name="VersionLabel" >
+     <property name="text" >
+      <string>&lt;html>&lt;b>Version: &lt;i>3.x.x&lt;/i>&lt;/b>&lt;/html></string>
+     </property>
+     <property name="textFormat" >
+      <enum>Qt::AutoText</enum>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" >
+    <widget class="QLabel" name="label_3" >
+     <property name="text" >
+      <string>&lt;a href=\"http://www.kitware.com\">www.kitware.com&lt;/a></string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2" >
+    <widget class="QLabel" name="label_2" >
+     <property name="text" >
+      <string>&lt;a href=\"http://www.paraview.org\">www.paraview.org&lt;/a></string>
+     </property>
+     <property name="textFormat" >
+      <enum>Qt::RichText</enum>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="3" >
+    <widget class="QLabel" name="label" >
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>0</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text" >
+      <string/>
+     </property>
+     <property name="pixmap" >
+      <pixmap resource="Resources.qrc" >:/pqClient/PVSplashScreen.png</pixmap>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="3" >
     <widget class="QTabWidget" name="tabWidget" >
      <property name="currentIndex" >
       <number>0</number>
@@ -103,25 +154,7 @@
      </widget>
     </widget>
    </item>
-   <item row="0" column="0" >
-    <widget class="QLabel" name="label" >
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>0</hsizetype>
-       <vsizetype>0</vsizetype>
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text" >
-      <string/>
-     </property>
-     <property name="pixmap" >
-      <pixmap resource="Resources.qrc" >:/pqClient/PVSplashScreen.png</pixmap>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0" >
+   <item row="3" column="0" colspan="3" >
     <layout class="QHBoxLayout" >
      <property name="margin" >
       <number>0</number>
@@ -150,19 +183,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="VersionLabel" >
-     <property name="text" >
-      <string>&lt;html>&lt;b>Version: &lt;i>3.0.0&lt;/i>&lt;/b>&lt;/html></string>
-     </property>
-     <property name="textFormat" >
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="alignment" >
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>
