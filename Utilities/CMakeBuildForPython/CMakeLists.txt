@@ -98,6 +98,7 @@ add_python_module(_codecs   MOD_SRCS Modules/_codecsmodule.c)
 add_python_module(zipimport MOD_SRCS Modules/zipimport.c)
 add_python_module(_symtable MOD_SRCS Modules/symtablemodule.c)
 add_python_module(xxsubtype MOD_SRCS Modules/xxsubtype.c)
+add_python_module(_weakref  MOD_SRCS Modules/_weakref.c)
 
 
 file(MAKE_DIRECTORY ${Python_BINARY_DIR}/Modules)
@@ -242,6 +243,11 @@ set_target_properties(pythonLib PROPERTIES OUTPUT_NAME python${PY_MAJOR}.${PY_MI
 
 add_executable(python Modules/python.c )
 target_link_libraries(python pythonLib)
+
+#if(CMAKE_SYSTEM MATCHES BlueGene)
+#  get_target_property(EXE_LOCATION python LOCATION)
+#  configure_file(runcone.ksh.in ${CMAKE_CURRENT_BINARY_DIR}/runpy.ksh)
+#endif(CMAKE_SYSTEM MATCHES BlueGene)
 
 add_subdirectory(Lib)
 
