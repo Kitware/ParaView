@@ -1414,6 +1414,8 @@ def ToggleProgressPrinting():
     an example event observer."""
     global progressObserverTag
 
+    if fromGUI:
+        raise exceptions.RuntimeError, "Printing progress in the GUI is not supported."
     if progressObserverTag:
         vtkProcessModule.GetProcessModule().RemoveObserver(progressObserverTag)
         progressObserverTag = None
@@ -1841,6 +1843,7 @@ if not vtkSMObject.GetProxyManager():
 progressObserverTag = None
 currentAlgorithm = False
 currentProgress = 0
+fromGUI = False
 ToggleProgressPrinting()
 
 _pyproxies = {}

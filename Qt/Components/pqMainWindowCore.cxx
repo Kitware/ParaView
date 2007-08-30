@@ -2548,7 +2548,9 @@ void pqMainWindowCore::onToolsPythonShell()
         "paraview.ActiveConnection.SetHost(\"%2\", 0)\n"
         "from paraview import servermanager\n"
         "servermanager.ActiveConnection = servermanager.Connection(%3)\n"
-        "servermanager.ActiveConnection.SetHost(\"%4\", 0)\n")
+        "servermanager.ActiveConnection.SetHost(\"%4\", 0)\n"
+        "servermanager.ToggleProgressPrinting()\n"
+        "servermanager.fromGUI = True\n")
         .arg(cid)
         .arg(activeServer->getResource().toURI())
         .arg(cid)
