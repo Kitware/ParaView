@@ -104,7 +104,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.74");
+vtkCxxRevisionMacro(vtkProcessModule, "1.75");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -192,6 +192,7 @@ vtkProcessModule::~vtkProcessModule()
   this->ServerInformation->Delete();
 
   this->CacheSizeKeeper->Delete();
+  this->SetLastProgressName(0);
 }
 
 //-----------------------------------------------------------------------------
