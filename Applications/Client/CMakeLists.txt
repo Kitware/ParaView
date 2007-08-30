@@ -305,17 +305,17 @@ IF(BUILD_TESTING)
     UndoRedo
     UndoRedo1
     UndoRedo2
-    UndoRedo3
+    UndoRedo3y
     UndoRedo4
     UndoRedo5
     UndoRedo6
     UndoRedo7
     XdmfRead
-    #XdmfReadImageData
+    XdmfReadImageData
     XdmfReadImageDataCollection
-    #XdmfReadRectilinearGrid
+    XdmfReadRectilinearGrid
     XdmfReadRectilinearGridCollection
-    #XdmfReadStructuredGrid
+    XdmfReadStructuredGrid
     XdmfReadStructuredGridCollection
   )
 
