@@ -305,7 +305,7 @@ IF(BUILD_TESTING)
     UndoRedo
     UndoRedo1
     UndoRedo2
-    UndoRedo3y
+    UndoRedo3
     UndoRedo4
     UndoRedo5
     UndoRedo6
