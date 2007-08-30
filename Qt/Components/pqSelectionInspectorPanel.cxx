@@ -107,11 +107,9 @@ public:
     this->SelectionColorAdaptor = 0;
     this->PointColorAdaptor = 0;
     this->PointFontFamilyAdaptor = 0;
-    this->PointLabelModeAdaptor = 0;
     this->PointLabelAlignmentAdaptor = 0;
     this->CellColorAdaptor = 0;
     this->CellFontFamilyAdaptor = 0;
-    this->CellLabelModeAdaptor = 0;
     this->CellLabelAlignmentAdaptor = 0;
 
     this->FieldTypeAdaptor = 0;
@@ -135,11 +133,9 @@ public:
     delete this->SelectionColorAdaptor;
     delete this->PointColorAdaptor;
     delete this->PointFontFamilyAdaptor;
-    delete this->PointLabelModeAdaptor;
     delete this->PointLabelAlignmentAdaptor;
     delete this->CellColorAdaptor;
     delete this->CellFontFamilyAdaptor;
-    delete this->CellLabelModeAdaptor;
     delete this->CellLabelAlignmentAdaptor;
     delete this->FieldTypeAdaptor;
     delete this->SelectionTypeAdaptor;
@@ -171,12 +167,10 @@ public:
   pqSignalAdaptorColor* SelectionColorAdaptor;
   pqSignalAdaptorColor *PointColorAdaptor;
   pqSignalAdaptorComboBox *PointFontFamilyAdaptor;
-  pqSignalAdaptorComboBox *PointLabelModeAdaptor;
   pqSignalAdaptorComboBox *PointLabelAlignmentAdaptor;
 
   pqSignalAdaptorColor *CellColorAdaptor;
   pqSignalAdaptorComboBox *CellFontFamilyAdaptor;
-  pqSignalAdaptorComboBox *CellLabelModeAdaptor;
   pqSignalAdaptorComboBox *CellLabelAlignmentAdaptor;
 
   pqSignalAdaptorComboBox *FieldTypeAdaptor;
@@ -505,10 +499,6 @@ void pqSelectionInspectorPanel::updateSelectionRepGUI()
   // Selection Label Properties
 
   // Point labels properties
-  QObject::connect(this->Implementation->PointLabelModeAdaptor, 
-    SIGNAL(currentTextChanged(const QString&)),
-    this, SLOT(updatePointLabelMode(const QString&)),
-    Qt::QueuedConnection);
   this->Implementation->RepLinks->addPropertyLink(
     this->Implementation->checkBoxLabelPoints, "checked", SIGNAL(stateChanged(int)),
     reprProxy, reprProxy->GetProperty("SelectionPointLabelVisibility"));
@@ -542,11 +532,6 @@ void pqSelectionInspectorPanel::updateSelectionRepGUI()
     reprProxy, reprProxy->GetProperty("SelectionPointLabelOpacity"));
 
   // Cell Labels properties
-
-  QObject::connect(this->Implementation->CellLabelModeAdaptor, 
-    SIGNAL(currentTextChanged(const QString&)),
-    this, SLOT(updateCellLabelMode(const QString&)),
-    Qt::QueuedConnection);
   this->Implementation->RepLinks->addPropertyLink(
     this->Implementation->checkBoxLabelCells, "checked", SIGNAL(stateChanged(int)),
     reprProxy, reprProxy->GetProperty("SelectionCellLabelVisibility"));
@@ -718,31 +703,39 @@ void pqSelectionInspectorPanel::setupSelelectionLabelGUI()
     SIGNAL(chosenColorChanged(const QColor&)), false);
   this->Implementation->PointFontFamilyAdaptor = new pqSignalAdaptorComboBox(
     this->Implementation->comboFontFamily_Point);
-  this->Implementation->PointLabelModeAdaptor = new pqSignalAdaptorComboBox(
-    this->Implementation->comboLabelMode_Point);
+
+  QObject::connect(this->Implementation->comboLabelMode_Point, 
+    SIGNAL(currentIndexChanged(const QString&)),
+    this, SLOT(updatePointLabelMode(const QString&)), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->comboLabelMode_Point, 
+    SIGNAL(currentIndexChanged(const QString&)), 
+    this, SLOT(updateRepresentationViews()), Qt::QueuedConnection);
+
   this->Implementation->PointLabelAlignmentAdaptor = new pqSignalAdaptorComboBox(
     this->Implementation->comboTextAlign_Point);
-  QObject::connect(this->Implementation->PointLabelModeAdaptor, 
-    SIGNAL(currentTextChanged(const QString&)), 
-    this, SLOT(updateRepresentationViews()),
-    Qt::QueuedConnection);
+
 
   this->Implementation->CellColorAdaptor = new pqSignalAdaptorColor(
     this->Implementation->buttonColor_Cell, "chosenColor", 
     SIGNAL(chosenColorChanged(const QColor&)), false);
   this->Implementation->CellFontFamilyAdaptor = new pqSignalAdaptorComboBox(
     this->Implementation->comboFontFamily_Cell);
-  this->Implementation->CellLabelModeAdaptor = new pqSignalAdaptorComboBox(
-    this->Implementation->comboLabelMode_Cell);
+
+  QObject::connect(this->Implementation->comboLabelMode_Cell, 
+    SIGNAL(currentIndexChanged(const QString&)),
+    this, SLOT(updateCellLabelMode(const QString&)), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->comboLabelMode_Cell, 
+    SIGNAL(currentIndexChanged(const QString&)), 
+    this, SLOT(updateRepresentationViews()), Qt::QueuedConnection);
+
   this->Implementation->CellLabelAlignmentAdaptor = new pqSignalAdaptorComboBox(
     this->Implementation->comboTextAlign_Cell);
-  QObject::connect(this->Implementation->CellLabelModeAdaptor, 
-    SIGNAL(currentTextChanged(const QString&)), 
-    this, SLOT(updateRepresentationViews()),
-    Qt::QueuedConnection);
+
 }
 
 //-----------------------------------------------------------------------------
+// Called whne the SMProperty for SelectionPointFieldDataArrayName changes. We
+// update the Qt combobox accordingly.
 void pqSelectionInspectorPanel::updateSelectionPointLabelArrayName()
 {
   vtkSMProxy* reprProxy = this->Implementation->Representation->getProxy();
@@ -755,9 +748,9 @@ void pqSelectionInspectorPanel::updateSelectionPointLabelArrayName()
   vtkSMProperty* svp = reprProxy->
     GetProperty("SelectionPointFieldDataArrayName");
   if(!svp)
-  {
+    {
     return;
-  }
+    }
 
   QString text = pqSMAdaptor::getElementProperty(svp).toString();
   if(text.isEmpty())
@@ -767,15 +760,16 @@ void pqSelectionInspectorPanel::updateSelectionPointLabelArrayName()
 
   if(text == "vtkOriginalPointIds")
     {
-    this->Implementation->PointLabelModeAdaptor->setCurrentText("Point IDs");
+    text = "Point IDs";
     }
-  else
-    {
-    this->Implementation->PointLabelModeAdaptor->setCurrentText(text);
-    }
+
+  this->Implementation->comboLabelMode_Point->setCurrentIndex(
+    this->Implementation->comboLabelMode_Point->findText(text));
 } 
 
 //-----------------------------------------------------------------------------
+// Called when the SMProperty for SelectionCellFieldDataArrayName changes.
+// We update the Qt combobox accordingly.
 void pqSelectionInspectorPanel::updateSelectionCellLabelArrayName()
 {
   vtkSMProxy* reprProxy = this->Implementation->Representation->getProxy();
@@ -800,15 +794,16 @@ void pqSelectionInspectorPanel::updateSelectionCellLabelArrayName()
 
   if(text == "vtkOriginalCellIds")
     {
-    this->Implementation->CellLabelModeAdaptor->setCurrentText("Cell IDs");
+    text = "Cell IDs";
     }
-  else
-    {
-    this->Implementation->CellLabelModeAdaptor->setCurrentText(text);
-    }
+
+  this->Implementation->comboLabelMode_Cell->setCurrentIndex(
+    this->Implementation->comboLabelMode_Cell->findText(text));
 } 
 
 //-----------------------------------------------------------------------------
+// Called when the Qt combobox for point label mode changes. We update the 
+// SMProperty accordingly.
 void pqSelectionInspectorPanel::updatePointLabelMode(const QString& text)
 {
   if(text.isEmpty())
@@ -838,6 +833,8 @@ void pqSelectionInspectorPanel::updatePointLabelMode(const QString& text)
 } 
 
 //-----------------------------------------------------------------------------
+// Called when the Qt combobox for cell label mode changes. We update the
+// SMProperty accordingly.
 void pqSelectionInspectorPanel::updateCellLabelMode(const QString& text)
 {
   if(text.isEmpty())
