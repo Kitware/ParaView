@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace Ui { class AboutDialog; }
 
+class pqServer;
+class QTreeWidget;
 /// Provides an about dialog
 class AboutDialog :
   public QDialog
@@ -50,6 +52,10 @@ private:
   ~AboutDialog();
   AboutDialog(const AboutDialog&);
   AboutDialog& operator=(const AboutDialog&);
+
+  void AddClientInformation();
+  void AddServerInformation();
+  void AddServerInformation(pqServer* server, QTreeWidget* tree);
   
   Ui::AboutDialog* const Ui;
 };
