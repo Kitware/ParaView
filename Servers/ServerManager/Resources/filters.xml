@@ -196,11 +196,11 @@ This filter extracts the variables associated with a cell over time. The output 
      <!-- End ExtractCellsOverTime -->
    </ExtractSelectionProxy>
 
-   <SourceProxy name="ExtractGlobalDataOverTime"
+   <SourceProxy name="ExtractFieldDataOverTime"
                           class="vtkExtractTemporalFieldData"
-                          label="Plot Global Data over Time">
+                          label="Plot Field Variable over Time">
      <Documentation>
-This filter extracts the variables that reside in a datasets field data and are defined over time. The output is a 1D rectilinear grid where the x coordinates correspond to time (the same array is also copied to a point array named Time or TimeData (if Time exists in the input)).
+This filter extracts the variables that reside in a dataset's field data and are defined over time. The output is a 1D rectilinear grid where the x coordinates correspond to time (the same array is also copied to a point array named Time or TimeData (if Time exists in the input)).
      </Documentation>
      <InputProperty
          name="Input"
@@ -216,7 +216,7 @@ This filter extracts the variables that reside in a datasets field data and are 
          The input from which the selection is extracted.
        </Documentation>
      </InputProperty>
-     <!-- End ExtractGlobalDatasOverTime -->
+     <!-- End ExtractFieldDatasOverTime -->
    </SourceProxy>
 
    <SourceProxy name="ImageShrink" class="vtkImageShrink3D" label="Image Shrink">
