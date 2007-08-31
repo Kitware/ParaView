@@ -8264,22 +8264,6 @@
    fun:_ZN15QX11PaintEngine11updateStateERK17QPaintEngineState
    fun:_ZN15QPainterPrivate11updateStateEP13QPainterState
    fun:_ZN8QPainter9drawLinesEPK5QLinei
-   fun:_ZN8QPainter8drawLineEiiii
-   fun:_ZNK15pqColorMapModel16generateGradientERK5QSize
-   fun:_ZN22pqColorPresetModelItemC1ERK15pqColorMapModelRK7QString
-   fun:_ZN18pqColorPresetModel18addBuiltinColorMapERK15pqColorMapModelRK7QString
-   fun:_ZN18pqColorScaleEditor23loadBuiltinColorPresetsEv
-   fun:_ZN18pqColorScaleEditorC1EP7QWidget
-   fun:_ZN20pqDisplayProxyEditor18openColorMapEditorEv
-   fun:_ZN20pqDisplayProxyEditor11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iiPPv
-   fun:_ZN15QAbstractButton7clickedEb
-   fun:_ZN22QAbstractButtonPrivate11emitClickedEv
-   fun:_ZN15QAbstractButton5clickEv
-   fun:_ZN29pqAbstractActivateEventPlayer9playEventEP7QObjectRK7QStringS4_Rb
-   fun:_ZN13pqEventPlayer9playEventERK7QStringS2_S2_Rb
-   fun:_ZN17pqEventDispatcher13playNextEventEv
 }
 {
    <insert a suppression name here>
@@ -9309,49 +9293,6 @@
    fun:_ZN14QWidgetPrivate13setParent_sysEP7QWidget6QFlagsIN2Qt10WindowTypeEE
    fun:_ZN7QWidget9setParentEPS_6QFlagsIN2Qt10WindowTypeEE
    fun:_ZN14QWidgetPrivate4initEP7QWidget6QFlagsIN2Qt10WindowTypeEE
-   fun:_ZN7QWidgetC2ER14QWidgetPrivatePS_6QFlagsIN2Qt10WindowTypeEE
-   fun:_ZN15QAbstractButtonC2ER22QAbstractButtonPrivateP7QWidget
-   fun:_ZN9QCheckBoxC1EP7QWidget
-   fun:_ZN27Ui_DisplayProxyEditorWidget7setupUiEP7QWidget
-   fun:_ZN21pqDefaultDisplayPanelC1EP16pqRepresentationP7QWidget
-   fun:_ZN26pqDisplayProxyEditorWidget11updatePanelEv
-   fun:_ZN26pqDisplayProxyEditorWidget13setOutputPortEP12pqOutputPort
-   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
-   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
-   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
-   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
-   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
-}
-{
-   <insert a suppression name here>
-   Memcheck:Param
-   write(buf)
-   fun:__write_nocancel
-   fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
-   fun:XRenderCreatePicture
-   fun:_ZN14QWidgetPrivate10create_sysEmbb
-   fun:_ZN7QWidget6createEmbb
-   fun:_ZN14QWidgetPrivate11createWinIdEm
-   fun:_ZN14QWidgetPrivate13setParent_sysEP7QWidget6QFlagsIN2Qt10WindowTypeEE
-   fun:_ZN7QWidget9setParentEPS_6QFlagsIN2Qt10WindowTypeEE
-   fun:_ZN14QWidgetPrivate4initEP7QWidget6QFlagsIN2Qt10WindowTypeEE
-   fun:_ZN7QWidgetD2Ev
-   fun:_ZN14pqDisplayPanelD2Ev
-   fun:_ZN21pqDefaultDisplayPanelD0Ev
-   fun:_ZN26pqDisplayProxyEditorWidget11updatePanelEv
-   fun:_ZN26pqDisplayProxyEditorWidget13setOutputPortEP12pqOutputPort
-   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
-   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
-   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
-   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
-   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
-   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
 }
 {
    <insert a suppression name here>
@@ -10389,6 +10330,34 @@
    fun:__write_nocancel
    fun:_X11TransWrite
    obj:/usr/lib/libX11.so.6.2.0
+   fun:XRenderComposite
+   fun:_ZN15QX11PaintEngine11updateBrushERK6QBrushRK7QPointF
+   fun:_ZN15QX11PaintEngine11updateStateERK17QPaintEngineState
+   fun:_ZN15QPainterPrivate11updateStateEP13QPainterState
+   fun:_ZN8QPainter9drawRectsEPK5QRecti
+   fun:_ZN8QPainter8fillRectERK5QRectRK6QBrush
+   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK9QTreeView12drawBranchesEP8QPainterRK5QRectRK11QModelIndex
+   fun:_ZNK9QTreeView7drawRowEP8QPainterRK20QStyleOptionViewItemRK11QModelIndex
+   fun:_ZNK9QTreeView8drawTreeEP8QPainterRK7QRegion
+   fun:_ZN9QTreeView10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN6QFrame5eventEP6QEvent
+   fun:_ZN19QAbstractScrollArea13viewportEventEP6QEvent
+   fun:_ZN17QAbstractItemView13viewportEventEP6QEvent
+   fun:_ZN25QAbstractScrollAreaFilter11eventFilterEP7QObjectP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
    fun:XRenderChangePicture
    fun:_ZN15QX11PaintEngine11updateBrushERK6QBrushRK7QPointF
    fun:_ZN15QX11PaintEngine11updateStateERK17QPaintEngineState
@@ -10436,7 +10405,35 @@
    fun:_ZN7QPixmapD1Ev
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN15QX11PaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
-   fun:_ZN8QPainter9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XFreePixmap
+   fun:_ZN11QPixmapDataD1Ev
+   fun:_ZN7QPixmap5derefEv
+   fun:_ZN7QPixmapaSERKS_
+   fun:_ZN7QPixmap4fillERK6QColor
+   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK12QCommonStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK13QWindowsStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK15QPlastiqueStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK12QCommonStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK13QWindowsStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK15QPlastiqueStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZN11QPushButton10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN15QAbstractButton5eventEP6QEvent
+   fun:_ZN11QPushButton5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
 }
 {
   <insert a suppression name here>
@@ -13576,6 +13573,34 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XRenderFreePicture
+   fun:_ZN7QWidget7destroyEbb
+   fun:_ZN7QWidgetD2Ev
+   fun:_ZN16QAbstractSpinBoxD2Ev
+   fun:_ZN14QDoubleSpinBoxD2Ev
+   fun:_ZN14QObjectPrivate14deleteChildrenEv
+   fun:_ZN7QWidgetD2Ev
+   fun:_ZN9QGroupBoxD0Ev
+   fun:_ZN14QObjectPrivate14deleteChildrenEv
+   fun:_ZN7QWidgetD2Ev
+   fun:_ZN14pqDisplayPanelD2Ev
+   fun:_ZN20pqDisplayProxyEditorD0Ev
+   fun:_ZN26pqDisplayProxyEditorWidget11updatePanelEv
+   fun:_ZN26pqDisplayProxyEditorWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+}
+{
+   <insert a suppression name here>
    Memcheck:Leak
    fun:realloc
    obj:/usr/lib/libfreetype.so.6.3.10
@@ -13821,6 +13846,30 @@
    fun:_ZN20QEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
    fun:_ZN23QGuiEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
    fun:_ZN10QEventLoop13processEventsE6QFlagsINS_17ProcessEventsFlagEE
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XCopyArea
+   fun:_ZN17QX11WindowSurface5flushEP7QWidgetRK7QRegionRK6QPoint
+   fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
+   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
+   fun:_Z19qt_syncBackingStoreP7QWidget
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN10QScrollBar5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_ZN16QCoreApplication16sendPostedEventsEP7QObjecti
+   fun:_Z23postEventSourceDispatchP8_GSourcePFiPvES1_
+   fun:g_main_context_dispatch
+   obj:/usr/lib/libglib-2.0.so.0.1000.3
+   fun:g_main_context_iteration
+   fun:_ZN20QEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   fun:_ZN23QGuiEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
 }
 {
    <insert a suppression name here>
