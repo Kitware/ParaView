@@ -86,7 +86,8 @@ public:
   pqColorScaleEditorForm();
   ~pqColorScaleEditorForm() {}
 
-  pqPropertyLinks Links;
+  pqPropertyLinks Links; // used to link properties on the legend
+  pqPropertyLinks ReprLinks; // used to link properties on the representation.
   pqSignalAdaptorColor *TitleColorAdaptor;
   pqSignalAdaptorColor *LabelColorAdaptor;
   pqSignalAdaptorComboBox *TitleFontAdaptor;
@@ -305,6 +306,7 @@ void pqColorScaleEditor::setRepresentation(pqPipelineRepresentation *display)
     {
     this->disconnect(this->Display, 0, this, 0);
     this->disconnect(&this->Form->Links, 0, this->Display, 0);
+    this->Form->ReprLinks.removeAllPropertyLinks();
     if(this->ColorMap)
       {
       this->disconnect(this->ColorMap, 0, this, 0);
@@ -1379,7 +1381,13 @@ void pqColorScaleEditor::initColorScale()
     this->Form->Listener->Connect(
         this->Display->getScalarOpacityFunctionProxy()->GetProperty("Points"),
         vtkCommand::ModifiedEvent, this, SLOT(handlePointsChanged()));
+    this->Form->ReprLinks.addPropertyLink(
+      this->Form->ScalarOpacityUnitDistance, "value", SIGNAL(valueChanged(double)),
+      this->Display->getProxy(),
+      this->Display->getProxy()->GetProperty("ScalarOpacityUnitDistance"));
     }
+  this->Form->ScaleLabel->setEnabled(this->Form->HasOpacity);
+  this->Form->ScalarOpacityUnitDistance->setEnabled(this->Form->HasOpacity);
 
   if(this->ColorMap)
     {

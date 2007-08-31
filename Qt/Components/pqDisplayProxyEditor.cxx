@@ -301,6 +301,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     SIGNAL(currentTextChanged(const QString&)),
     this, SLOT(updateEnableState()), Qt::QueuedConnection);
 
+  /*
   if (reprProxy->GetProperty("ScalarOpacityUnitDistance"))
     {
     this->Internal->Links->addPropertyLink(
@@ -308,6 +309,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
       SIGNAL(valueChanged(double)),
       reprProxy, reprProxy->GetProperty("ScalarOpacityUnitDistance"));
     }
+    */
 
   this->Internal->Links->addPropertyLink(this->Internal->EdgeColorAdaptor,
     "color", SIGNAL(colorChanged(const QVariant&)),
@@ -491,8 +493,8 @@ void pqDisplayProxyEditor::updateEnableState()
 
   int reprType = this->Internal->Representation->getRepresentationType();
   
-  this->Internal->ScalarOpacityUnitDistance->setEnabled(
-    reprType == vtkSMPVRepresentationProxy::VOLUME);
+  //this->Internal->ScalarOpacityUnitDistance->setEnabled(
+  //  reprType == vtkSMPVRepresentationProxy::VOLUME);
   this->Internal->EdgeStyleGroup->setEnabled(
     reprType == vtkSMPVRepresentationProxy::SURFACE_WITH_EDGES);
 
