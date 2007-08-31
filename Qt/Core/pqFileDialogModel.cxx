@@ -341,8 +341,6 @@ public:
           groupFiles.push_back(pqFileDialogModelFileInfo(child->GetName(), child->GetFullPath(),
                                    false));
           }
-        vtkstd::sort(groupFiles.begin(), groupFiles.end(),
-                     CaseInsensitiveSortGroup(info->GetName()));
         files.push_back(pqFileDialogModelFileInfo(info->GetName(), groupFiles[0].filePath(), false,
             groupFiles));
         }
