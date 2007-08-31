@@ -544,14 +544,7 @@ void pqFileDialog::accept()
   QString filename = this->Implementation->Ui.FileName->text();
   filename = filename.trimmed();
 
-  QString fullFilePath = filename;
-  QFileInfo info(fullFilePath);
-  if(!info.isAbsolute())
-    {
-    QString currentPath = this->Implementation->Model->getCurrentPath();
-    QFileInfo joinInfo(currentPath, fullFilePath);
-    fullFilePath = joinInfo.absoluteFilePath();
-    }
+  QString fullFilePath = this->Implementation->Model->absoluteFilePath(filename);
   emit this->fileAccepted(fullFilePath);
   
   QStringList files;

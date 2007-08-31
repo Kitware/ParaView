@@ -17,12 +17,13 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVFileInformationHelper);
-vtkCxxRevisionMacro(vtkPVFileInformationHelper, "1.1");
+vtkCxxRevisionMacro(vtkPVFileInformationHelper, "1.2");
 //-----------------------------------------------------------------------------
 vtkPVFileInformationHelper::vtkPVFileInformationHelper()
 {
   this->DirectoryListing = 0;
   this->Path = 0;
+  this->WorkingDirectory = 0;
   this->SpecialDirectories = 0;
   this->SetPath(".");
   this->PathSeparator = 0;
@@ -39,6 +40,7 @@ vtkPVFileInformationHelper::~vtkPVFileInformationHelper()
 {
   this->SetPath(0);
   this->SetPathSeparator(0);
+  this->SetWorkingDirectory(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -46,6 +48,8 @@ void vtkPVFileInformationHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Path: " << (this->Path? this->Path : "(null)") << endl;
+  os << indent << "WorkingDirectory: " <<
+    (this->WorkingDirectory? this->WorkingDirectory : "(null)") << endl;
   os << indent << "DirectoryListing: " << this->DirectoryListing << endl;
   os << indent << "SpecialDirectories: " << this->SpecialDirectories << endl;
   os << indent << "PathSeparator: " 

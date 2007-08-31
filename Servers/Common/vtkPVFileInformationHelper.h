@@ -34,13 +34,21 @@ public:
   vtkTypeRevisionMacro(vtkPVFileInformationHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-
   // Description:
   // Get/Set the path to the directory/file whose information we are 
   // interested in. This is ignored when SpecialDirectories is set
   // to True.
   vtkSetStringMacro(Path);
   vtkGetStringMacro(Path);
+
+  // Description:
+  // Get/Set the current working directory. This is needed if Path is 
+  // relative. The relative path will be converted to absolute path using the
+  // working directory specified before obtaining information about it.
+  // If 0 (default), then the application's current working directory will be 
+  // used to flatten relative paths.
+  vtkSetStringMacro(WorkingDirectory);
+  vtkGetStringMacro(WorkingDirectory);
 
   // Description:
   // Get/Set if the we should attempt to get the information
@@ -79,6 +87,7 @@ protected:
   ~vtkPVFileInformationHelper();
 
   char* Path;
+  char* WorkingDirectory;
   int DirectoryListing;
   int SpecialDirectories;
   int FastFileTypeDetection;

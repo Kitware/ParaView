@@ -49,7 +49,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.16");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.17");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -163,8 +163,15 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
 
   this->FastFileTypeDetection = helper->GetFastFileTypeDetection();
 
+  vtkstd::string working_directory = 
+    vtksys::SystemTools::GetCurrentWorkingDirectory().c_str();
+  if (helper->GetWorkingDirectory() && helper->GetWorkingDirectory()[0])
+    {
+    working_directory = helper->GetWorkingDirectory();
+    }
+
   vtkstd::string path = vtksys::SystemTools::CollapseFullPath(helper->GetPath(),
-    vtksys::SystemTools::GetCurrentWorkingDirectory().c_str());
+    working_directory.c_str());
   
   this->SetName(helper->GetPath());
 #if defined(_WIN32)

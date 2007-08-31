@@ -267,14 +267,25 @@ public:
                                 const QString& path,
                                 bool specialDirs)
     {
+    return this->GetData(dirListing, "", path, specialDirs);
+    }
+
+  /// query the file system for information
+  vtkPVFileInformation* GetData(bool dirListing, 
+                                const QString& workingDir,
+                                const QString& path,
+                                bool specialDirs)
+    {
     if(this->FileInformationHelperProxy)
       {
       // send data to server
       vtkSMProxy* helper = this->FileInformationHelperProxy;
       pqSMAdaptor::setElementProperty(
+        helper->GetProperty("WorkingDirectory"), workingDir);
+      pqSMAdaptor::setElementProperty(
         helper->GetProperty("DirectoryListing"), dirListing);
-      pqSMAdaptor::setElementProperty(helper->GetProperty("Path"),
-         path.toAscii().data());
+      pqSMAdaptor::setElementProperty(
+        helper->GetProperty("Path"), path.toAscii().data());
       pqSMAdaptor::setElementProperty(
         helper->GetProperty("SpecialDirectories"), specialDirs);
       helper->UpdateVTKObjects();
@@ -293,6 +304,7 @@ public:
       helper->SetDirectoryListing(dirListing);
       helper->SetPath(path.toAscii().data());
       helper->SetSpecialDirectories(specialDirs);
+      helper->SetWorkingDirectory(workingDir.toAscii().data());
       this->FileInformation->CopyFromObject(helper);
       }
     return this->FileInformation;
@@ -470,15 +482,10 @@ QString pqFileDialogModel::absoluteFilePath(const QString& path)
     return QString();
     }
 
-  if(path.at(0) == this->separator() ||
-     ('/' == this->separator() && path.at(0) == '~') ||
-     path.indexOf(QRegExp("[a-zA-Z]:")) == 0)
-    {
-    return path;
-    }
-
-  QString f = this->getCurrentPath() + this->separator() + path;
-  return this->Implementation->cleanPath(f);
+  vtkPVFileInformation* info;
+  info = this->Implementation->GetData(false,
+    this->getCurrentPath(), path, false);
+  return this->Implementation->cleanPath(info->GetFullPath());
 }
 
 QStringList pqFileDialogModel::getFilePaths(const QModelIndex& Index)

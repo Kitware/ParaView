@@ -1739,6 +1739,16 @@
         <SimpleStringInformationHelper />
       </StringVectorProperty>
 
+      <StringVectorProperty 
+        name="WorkingDirectory"
+        command="SetWorkingDirectory"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Override the working directory used to resolve relative paths.
+        </Documentation>
+      </StringVectorProperty>
+
     <!-- End of FileInformationHelper -->
     </Proxy>
     
