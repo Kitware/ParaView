@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.32");
+vtkCxxRevisionMacro(vtkSMPart, "1.33");
 
 
 //----------------------------------------------------------------------------
@@ -392,6 +392,14 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
     return;
     }
 
+  // Set the right executive
+  vtkClientServerID execId = pm->NewStreamObject(
+    "vtkCompositeDataPipeline", stream);
+  stream << vtkClientServerStream::Invoke 
+         << tempDataPiece << "SetExecutive" << execId 
+         << vtkClientServerStream::End;
+  pm->DeleteStreamObject(execId, stream);
+  
   // Connect filter
   stream << vtkClientServerStream::Invoke << tempDataPiece 
          << "SetInputConnection"
