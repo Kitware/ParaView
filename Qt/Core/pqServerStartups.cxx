@@ -159,7 +159,7 @@ static QString systemSettings()
   QString settingsPath = QString("%2%1%3%1%4");
   settingsPath = settingsPath.arg(QDir::separator());
   settingsPath = settingsPath.arg(settingsRoot);
-  settingsPath = settingsPath.arg(QApplication::applicationName());
+  settingsPath = settingsPath.arg(QApplication::organizationName());
   settingsPath = settingsPath.arg("servers.pvsc");
   return settingsPath;
 }
