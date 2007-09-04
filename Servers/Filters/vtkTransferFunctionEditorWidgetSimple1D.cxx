@@ -29,7 +29,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.31");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.32");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -170,6 +170,10 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNodeAction(
   int x = self->Interactor->GetEventPosition()[0];
   int y = self->Interactor->GetEventPosition()[1];
 
+  vtkTransferFunctionEditorRepresentationSimple1D *rep =
+    vtkTransferFunctionEditorRepresentationSimple1D::SafeDownCast(
+      self->WidgetRep);
+  int oldActiveHandle = rep->GetActiveHandle();
   int state = self->WidgetRep->ComputeInteractionState(x, y);
   if (state == vtkTransferFunctionEditorRepresentationSimple1D::NearNode)
     {
@@ -177,19 +181,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNodeAction(
     self->WidgetState = vtkTransferFunctionEditorWidgetSimple1D::MovingNode;
     self->Superclass::StartInteraction();
     self->InvokeEvent(vtkCommand::StartInteractionEvent, NULL);
-    double dispPos[3];
-    vtkTransferFunctionEditorRepresentationSimple1D *rep =
-      vtkTransferFunctionEditorRepresentationSimple1D::SafeDownCast(
-        self->WidgetRep);
-    rep->GetHandleDisplayPosition(rep->GetActiveHandle(), dispPos);
-    int tol2 = rep->GetTolerance();
-    tol2 *= tol2;
-    double leftClickDispPos[3];
-    leftClickDispPos[0] = static_cast<double>(self->LeftClickEventPosition[0]);
-    leftClickDispPos[1] = static_cast<double>(self->LeftClickEventPosition[1]);
-    leftClickDispPos[2] = 0.0;
-    double dist2 = vtkMath::Distance2BetweenPoints(leftClickDispPos, dispPos);
-    if (dist2 <= tol2)
+    if (oldActiveHandle == rep->GetActiveHandle())
       {
       self->LeftClickCount++;
       }
