@@ -5934,7 +5934,7 @@ Groups multiple datasets to create a multigroup dataset
            </Documentation>
      </InputProperty>
      <Hints>
-       <Visibility replace_input="0" />
+       <Visibility replace_input="1" />
      </Hints>
    <!-- End GroupDataSets -->
    </SourceProxy>
