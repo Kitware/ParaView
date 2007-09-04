@@ -299,10 +299,58 @@ vtkSMProxy* pqAnimationCue::insertKeyFrame(int index)
   if (index == 0)
     {
     keyTime = 0.0;
+
+    // If another keyframe existed at index 0 with keytime 0, we change its
+    // keytime to be between 0 and the keytime for the key frame after it (if
+    // any exists) or 0.5.
+    if (keyframes.size()>2)
+      {
+      double oldtime = pqSMAdaptor::getElementProperty(
+        keyframes[1]->GetProperty("KeyTime")).toDouble();
+      double nexttime = pqSMAdaptor::getElementProperty(
+        keyframes[2]->GetProperty("KeyTime")).toDouble();
+      if (oldtime == 0.0)
+        {
+        oldtime = (nexttime+oldtime)/2.0;
+        pqSMAdaptor::setElementProperty(keyframes[1]->GetProperty("KeyTime"),
+          oldtime);
+        keyframes[1]->UpdateVTKObjects();
+        }
+      }
+    else if (keyframes.size()==2)
+      {
+      double oldtime = pqSMAdaptor::getElementProperty(
+        keyframes[1]->GetProperty("KeyTime")).toDouble();
+      if (oldtime == 0.0)
+        {
+        pqSMAdaptor::setElementProperty(keyframes[1]->GetProperty("KeyTime"),
+          0.5);
+        keyframes[1]->UpdateVTKObjects();
+        }
+      }
     }
   else if (index == keyframes.size()-1)
     {
     keyTime = 1.0;
+    // If another keyframe exists with keytime 1 as the previous last key frame
+    // with key time 1.0, we change its keytime to be between 1.0 and the
+    // keytime for the keyframe before it, if one exists or 0.5.
+    double prev_time = pqSMAdaptor::getElementProperty(
+      keyframes[index-1]->GetProperty("KeyTime")).toDouble();
+    if (index >= 2 && prev_time==1.0)
+      {
+      double prev_2_time = pqSMAdaptor::getElementProperty(
+        keyframes[index-2]->GetProperty("KeyTime")).toDouble();
+      pqSMAdaptor::setElementProperty(keyframes[index-1]->GetProperty("KeyTime"),
+        (prev_2_time + prev_time)/2.0);
+      keyframes[index-1]->UpdateVTKObjects();
+      }
+    else if (prev_time==1.0)
+      {
+      pqSMAdaptor::setElementProperty(keyframes[index-1]->GetProperty("KeyTime"),
+        0.5);
+      keyframes[index-1]->UpdateVTKObjects();
+      }
     }
   else 
     {
