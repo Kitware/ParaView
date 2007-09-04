@@ -348,7 +348,7 @@ bool pqAnimationManager::saveAnimation()
     dialogUI.spinBoxNumberOfFrames->setEnabled(false);
     dialogUI.animationDuration->setEnabled(false);
     dialogUI.spinBoxFramesPerTimestep->show();
-    dialogUI.spinBoxFramesPerTimestep->setValue(num_frames);
+    dialogUI.spinBoxFramesPerTimestep->setValue(frames_per_timestep);
     dialogUI.labelFramesPerTimestep->show();
     break;
     }
