@@ -430,6 +430,9 @@ private slots:
   /// Show the camera dialog for the active view module
   void showCameraDialog(pqView*);
 
+  /// Shows message boxes for server timeout warnings.
+  void fiveMinuteTimeoutWarning();
+  void finalTimeoutWarning();
 private:
   pqServerManagerModelItem *getActiveObject() const;
   void updatePendingActions(pqServer *server, pqPipelineSource *source,

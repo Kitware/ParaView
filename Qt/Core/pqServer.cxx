@@ -33,21 +33,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 
 // VTK includes
-#include <vtkToolkits.h>
-#include <vtkObjectFactory.h>
+#include "vtkToolkits.h"
+#include "vtkObjectFactory.h"
 
 // ParaView Server Manager includes
-#include <vtkProcessModuleGUIHelper.h>
-#include <vtkPVOptions.h>
-#include <vtkProcessModule.h>
-#include <vtkProcessModuleConnectionManager.h>
-#include <vtkPVServerInformation.h>
-#include <vtkSMProxyManager.h>
+#include "vtkProcessModuleConnectionManager.h"
+#include "vtkProcessModuleGUIHelper.h"
+#include "vtkProcessModule.h"
+#include "vtkPVOptions.h"
+#include "vtkPVServerInformation.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 
 // Qt includes.
 #include <QCoreApplication>
 #include <QtDebug>
+#include <QTimer>
 
 // ParaView includes.
 #include "pqApplicationCore.h"
@@ -76,6 +77,22 @@ pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _pare
   this->RenderViewXMLName = 
     vtkSMRenderViewProxy::GetSuggestedRenderViewType(
       this->ConnectionID);
+
+  vtkPVServerInformation* serverInfo = this->getServerInformation();
+  if (this->isRemote() && serverInfo && serverInfo->GetTimeout() > 0)
+    {
+    int timeout = serverInfo->GetTimeout();
+    if (timeout > 5)
+      {
+      // 5 minute warning is shown only if timeout > 5.
+      QTimer::singleShot(
+        (timeout-5)*60*1000, this, SIGNAL(fiveMinuteTimeoutWarning()));
+      }
+
+    // 1 minute warning.
+    QTimer::singleShot(
+        (timeout-1)*60*1000, this, SIGNAL(finalTimeoutWarning()));
+    }
 }
 
 //-----------------------------------------------------------------------------

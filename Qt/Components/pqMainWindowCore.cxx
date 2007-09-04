@@ -3021,6 +3021,12 @@ void pqMainWindowCore::onServerCreation(pqServer* server)
     pqView* view = core->getObjectBuilder()->createView(curView, server);
     view->render();
     }
+
+  // Show warning dialogs before server times out.
+  QObject::connect(server, SIGNAL(fiveMinuteTimeoutWarning()), 
+    this, SLOT(fiveMinuteTimeoutWarning()));
+  QObject::connect(server, SIGNAL(finalTimeoutWarning()), 
+    this, SLOT(finalTimeoutWarning()));
 }
 
 //-----------------------------------------------------------------------------
@@ -3926,4 +3932,24 @@ void pqMainWindowCore::showCameraDialog(pqView* view)
     this->Implementation->CameraDialog->activateWindow();
     }
 
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::fiveMinuteTimeoutWarning()
+{
+  QMessageBox::warning(this->Implementation->Parent,
+    tr("Server Timeout Warning"),
+    tr("The server connection will timeout under 5 minutes.\n"
+    "Please save your work."),
+    QMessageBox::Ok);
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::finalTimeoutWarning()
+{
+  QMessageBox::critical(this->Implementation->Parent,
+    tr("Server Timeout Warning"),
+    tr("The server connection will timeout shortly.\n"
+    "Please save your work."),
+    QMessageBox::Ok);
 }

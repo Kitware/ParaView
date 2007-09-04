@@ -85,6 +85,11 @@ public:
   vtkGetMacro(AVISupport, int);
 
   // Description:
+  // Get/Set the time after which the server timesout.
+  vtkSetMacro(Timeout, int);
+  vtkGetMacro(Timeout, int);
+
+  // Description:
   // Number of machines to use in data or render server
   // Setting the number of machines has the side effect of wiping out any
   // machine parameters previously set.
@@ -115,12 +120,13 @@ protected:
   vtkPVServerInformation();
   ~vtkPVServerInformation();
 
+  int AVISupport;
   int RemoteRendering;
   int TileDimensions[2];
   int TileMullions[2];
-  int UseOffscreenRendering;
+  int Timeout;
   int UseIceT;
-  int AVISupport;
+  int UseOffscreenRendering;
   char* RenderModuleName;
 
   vtkPVServerOptionsInternals* MachinesInternals;

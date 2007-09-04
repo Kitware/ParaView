@@ -104,6 +104,17 @@ signals:
   /// Fired when the name of the proxy is changed.
   void nameChanged(pqServerManagerModelItem*);
 
+  /// Fired about 5 minutes before the server timesout. This signal will not be
+  /// fired at all if server timeout < 5 minutes. The server timeout is
+  /// specified by --timeout option on the server process.
+  /// This is not fired if timeout is not specified on the server process.
+  void fiveMinuteTimeoutWarning();
+
+  /// Fired about 1 minute before the server timesout. 
+  /// The server timeout is specified by --timeout option on the server process.
+  /// This is not fired if timeout is not specified on the server process.
+  void finalTimeoutWarning();
+
 protected:
   // Creates the TimeKeeper proxy for this connection.
   void createTimeKeeper();

@@ -73,6 +73,12 @@ public:
   vtkGetStringMacro(ParaViewDataName);
 
   // Description:
+  // Valid on PVSERVER and PVDATA_SERVER only. It denotes the time (in minutes)
+  // since the time that the connection was established with the server that the
+  // server may timeout. timeout <= 0 means no timeout.
+  vtkGetMacro(Timeout, int);
+
+  // Description:
   // Clients need to set the ConnectID so they can handle server connections
   // after the client has started.
   vtkSetMacro(ConnectID, int);
@@ -157,6 +163,7 @@ protected:
   int ClientMode;
   int RenderServerMode;
 
+
 private:
   // Options:
   int ClientRenderServer;
@@ -172,6 +179,7 @@ private:
   int TileDimensions[2];
   int TileMullions[2];
   int UseRenderingGroup;
+  int Timeout;
 
   
   char* RenderModuleName;

@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.41");
+vtkCxxRevisionMacro(vtkPVOptions, "1.42");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -73,6 +73,8 @@ vtkPVOptions::vtkPVOptions()
   this->UseOffscreenRendering = 0;
   this->DisableComposite = 0;
   this->ConnectID = 0;
+
+  this->Timeout = 0;
 
   if (this->XMLParser)
     {
@@ -186,6 +188,12 @@ void vtkPVOptions::Initialize()
   this->AddArgument("--tile-mullion-y", "-tmy", this->TileMullions+1, 
                     "Size of the gap between rows in the tile display, in Pixels.",
                     vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
+
+  this->AddArgument("--timeout", 0, &this->Timeout,
+                    "Time (in minutes) since connecting with a client "
+                    "after which the server may timeout. The client typically shows warning "
+                    "messages before the server times out.",
+                    vtkPVOptions::PVDATA_SERVER|vtkPVOptions::PVSERVER);
   
   // This should be deprecated when I get the time 
   this->AddArgument("--cave-configuration", "-cc", &this->CaveConfigurationFileName,
@@ -351,6 +359,7 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "ClientHostName: " << (this->ClientHostName?this->ClientHostName:"(none)") << endl;
     }
 
+  os << indent << "Timeout: " << this->Timeout << endl;
   os << indent << "Software Rendering: " << (this->UseSoftwareRendering?"Enabled":"Disabled") << endl;
 
   os << indent << "Satellite Software Rendering: " << (this->UseSatelliteSoftwareRendering?"Enabled":"Disabled") << endl;
