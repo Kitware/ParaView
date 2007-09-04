@@ -49,7 +49,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.17");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.18");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -645,14 +645,14 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
   // sequence ending with numbers.
   vtksys::RegularExpression reg_ex("^(.*)\\.([0-9.]+)$");
   // sequence ending with extension.
-  vtksys::RegularExpression reg_ex2("^(.*)(\\.|_)([0-9.]+)\\.(.*)$");
+  vtksys::RegularExpression reg_ex2("^(.*)(\\.|_|-)([0-9.]+)\\.(.*)$");
   
   // sequence ending with extension, but with no ". or _" before
   // the series number.
   vtksys::RegularExpression reg_ex3("^(.*)([a-zA-Z])([0-9.]+)\\.(.*)$");
   // sequence ending with extension, and starting with series number
   // followed by ". or _".
-  vtksys::RegularExpression reg_ex4("^([0-9.]+)(\\.|_)(.*)\\.(.*)$");
+  vtksys::RegularExpression reg_ex4("^([0-9.]+)(\\.|_|-)(.*)\\.(.*)$");
   // sequence ending with extension, and starting with series number,
   // but not followed by ". or _".
   vtksys::RegularExpression reg_ex5("^([0-9.]+)([a-zA-Z])(.*)\\.(.*)$");
