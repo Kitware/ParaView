@@ -59,6 +59,13 @@ private slots:
 private:
   void accept();
 
+  enum
+    {
+    CLIENT_SERVER=0,
+    CLIENT_SERVER_REVERSE_CONNECT=1,
+    CLIENT_DATA_SERVER_RENDER_SERVER=2,
+    CLIENT_DATA_SERVER_RENDER_SERVER_REVERSE_CONNECT=3
+    };
   class pqImplementation;
   pqImplementation* const Implementation;
 };

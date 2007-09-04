@@ -74,6 +74,15 @@ pqCreateServerStartupDialog::pqCreateServerStartupDialog(
   this->Implementation->UI.dataServerHost->setText(server.dataServerHost());
   this->Implementation->UI.renderServerHost->setText(server.renderServerHost());
 
+  int port = server.dataServerPort(11111);
+  this->Implementation->UI.dataServerPort->setValue(port==-1? 11111: port);
+
+  port = server.renderServerPort(22221);
+  this->Implementation->UI.renderServerPort->setValue(port==-1? 22221: port);
+  port = server.port(11111);
+  this->Implementation->UI.port->setValue(port==-1?11111:port);
+
+
   QObject::connect(
     this->Implementation->UI.type,
     SIGNAL(currentIndexChanged(int)),
@@ -130,26 +139,32 @@ const pqServerResource pqCreateServerStartupDialog::getServer()
   
   switch(this->Implementation->UI.type->currentIndex())
     {
-    case 0:
+    case CLIENT_SERVER:
       server.setScheme("cs");
       server.setHost(this->Implementation->UI.host->text());
+      server.setPort(this->Implementation->UI.port->value());
       break;
       
-    case 1:
+    case CLIENT_SERVER_REVERSE_CONNECT:
       server.setScheme("csrc");
       server.setHost(this->Implementation->UI.host->text());
+      server.setPort(this->Implementation->UI.port->value());
       break;
       
-    case 2:
+    case CLIENT_DATA_SERVER_RENDER_SERVER:
       server.setScheme("cdsrs");
       server.setDataServerHost(this->Implementation->UI.dataServerHost->text());
       server.setRenderServerHost(this->Implementation->UI.renderServerHost->text());
+      server.setDataServerPort(this->Implementation->UI.dataServerPort->value());
+      server.setRenderServerPort(this->Implementation->UI.renderServerPort->value());
       break;
       
-    case 3:
+    case CLIENT_DATA_SERVER_RENDER_SERVER_REVERSE_CONNECT:
       server.setScheme("cdsrsrc");
       server.setDataServerHost(this->Implementation->UI.dataServerHost->text());
       server.setRenderServerHost(this->Implementation->UI.renderServerHost->text());
+      server.setDataServerPort(this->Implementation->UI.dataServerPort->value());
+      server.setRenderServerPort(this->Implementation->UI.renderServerPort->value());
       break;
     }
   
@@ -160,40 +175,38 @@ void pqCreateServerStartupDialog::updateServerType()
 {
   switch(this->Implementation->UI.type->currentIndex())
     {
-    case 0:
+    case CLIENT_SERVER:
+    case CLIENT_SERVER_REVERSE_CONNECT:
       this->Implementation->UI.hostLabel->setVisible(true);
       this->Implementation->UI.host->setVisible(true);
       this->Implementation->UI.dataServerHostLabel->setVisible(false);
       this->Implementation->UI.dataServerHost->setVisible(false);
       this->Implementation->UI.renderServerHostLabel->setVisible(false);
       this->Implementation->UI.renderServerHost->setVisible(false);
+
+      this->Implementation->UI.portLabel->setVisible(true);
+      this->Implementation->UI.port->setVisible(true);
+      this->Implementation->UI.dataServerPortLabel->setVisible(false);
+      this->Implementation->UI.dataServerPort->setVisible(false);
+      this->Implementation->UI.renderServerPortLabel->setVisible(false);
+      this->Implementation->UI.renderServerPort->setVisible(false);
       break;
       
-    case 1:
-      this->Implementation->UI.hostLabel->setVisible(true);
-      this->Implementation->UI.host->setVisible(true);
-      this->Implementation->UI.dataServerHostLabel->setVisible(false);
-      this->Implementation->UI.dataServerHost->setVisible(false);
-      this->Implementation->UI.renderServerHostLabel->setVisible(false);
-      this->Implementation->UI.renderServerHost->setVisible(false);
-      break;
-      
-    case 2:
+    case CLIENT_DATA_SERVER_RENDER_SERVER:
+    case CLIENT_DATA_SERVER_RENDER_SERVER_REVERSE_CONNECT:
       this->Implementation->UI.hostLabel->setVisible(false);
       this->Implementation->UI.host->setVisible(false);
       this->Implementation->UI.dataServerHostLabel->setVisible(true);
       this->Implementation->UI.dataServerHost->setVisible(true);
       this->Implementation->UI.renderServerHostLabel->setVisible(true);
       this->Implementation->UI.renderServerHost->setVisible(true);
-      break;
       
-    case 3:
-      this->Implementation->UI.hostLabel->setVisible(false);
-      this->Implementation->UI.host->setVisible(false);
-      this->Implementation->UI.dataServerHostLabel->setVisible(true);
-      this->Implementation->UI.dataServerHost->setVisible(true);
-      this->Implementation->UI.renderServerHostLabel->setVisible(true);
-      this->Implementation->UI.renderServerHost->setVisible(true);
+      this->Implementation->UI.portLabel->setVisible(false);
+      this->Implementation->UI.port->setVisible(false);
+      this->Implementation->UI.dataServerPortLabel->setVisible(true);
+      this->Implementation->UI.dataServerPort->setVisible(true);
+      this->Implementation->UI.renderServerPortLabel->setVisible(true);
+      this->Implementation->UI.renderServerPort->setVisible(true);
       break;
     }
 }
@@ -202,15 +215,15 @@ void pqCreateServerStartupDialog::updateConnectButton()
 {
   switch(this->Implementation->UI.type->currentIndex())
     {
-    case 0:
-    case 1:
+    case CLIENT_SERVER:
+    case CLIENT_SERVER_REVERSE_CONNECT:
       this->Implementation->UI.okButton->setEnabled(
         !this->Implementation->UI.name->text().isEmpty() &&
         !this->Implementation->UI.host->text().isEmpty());
       break;
       
-    case 2:
-    case 3:
+    case CLIENT_DATA_SERVER_RENDER_SERVER:
+    case CLIENT_DATA_SERVER_RENDER_SERVER_REVERSE_CONNECT:
       this->Implementation->UI.okButton->setEnabled(
         !this->Implementation->UI.name->text().isEmpty() &&
         !this->Implementation->UI.dataServerHost->text().isEmpty() &&

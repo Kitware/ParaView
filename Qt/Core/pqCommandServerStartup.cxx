@@ -51,7 +51,7 @@ pqCommandServerStartup::pqCommandServerStartup(
     vtkPVXMLElement* configuration) :
   pqServerStartup(save),
   Name(name),
-  Server(server.schemeHosts()),
+  Server(server.schemeHostsPorts()),
   Configuration(configuration),
   Process(NULL)
 {

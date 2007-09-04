@@ -44,7 +44,7 @@ pqManualServerStartup::pqManualServerStartup(
     vtkPVXMLElement* configuration) :
   pqServerStartup(save),
   Name(name),
-  Server(server.schemeHosts()),
+  Server(server.schemeHostsPorts()),
   Configuration(configuration)
 {
 }
