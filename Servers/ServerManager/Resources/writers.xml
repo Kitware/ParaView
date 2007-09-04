@@ -87,7 +87,7 @@
       </IntVectorProperty>
     </Proxy>
 
-    <WriterProxy name="XMLPVDWriter" class="vtkXMLPVDWriter" 
+    <PWriterProxy name="XMLPVDWriter" class="vtkXMLPVDWriter" 
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
 
       <InputProperty name="Input" command="SetInputConnection">
@@ -103,7 +103,7 @@
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
-    </WriterProxy>
+    </PWriterProxy>
 
     <WriterProxy name="XMLPolyDataWriter" class="vtkXMLPolyDataWriter"
       base_proxygroup="writers" base_proxyname="XMLWriterBase">
