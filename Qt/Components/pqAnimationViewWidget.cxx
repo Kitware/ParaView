@@ -534,7 +534,7 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
   this->Internal->Editor->setAttribute(Qt::WA_DeleteOnClose);
   
 
-  this->Internal->Editor->resize(500, 400);
+  this->Internal->Editor->resize(600, 400);
   this->Internal->Editor->show();
 }
   
