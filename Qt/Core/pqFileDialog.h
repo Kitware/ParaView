@@ -116,7 +116,7 @@ public:
   void accept();
 
   /// set a file current to support test playback
-  void selectFile(const QString&);
+  bool selectFile(const QString&);
 
 signals:
   /// Signal emitted when the user has chosen a set of files
@@ -160,7 +160,7 @@ private slots:
   
   /// Emits the filesSelected() signal and closes the dialog,
   void emitFilesSelected(const QStringList&);
-  
+
 private:
   pqFileDialog(const pqFileDialog&);
   pqFileDialog& operator=(const pqFileDialog&);

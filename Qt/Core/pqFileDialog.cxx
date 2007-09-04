@@ -874,12 +874,18 @@ void pqFileDialog::fileSelectionChanged()
   this->Implementation->Ui.FileName->setText(fileString);
 }
   
-void pqFileDialog::selectFile(const QString& f)
+bool pqFileDialog::selectFile(const QString& f)
 {
+  QPointer<QDialog> diag = this;
   QFileInfo info(f);
   this->Implementation->Model->setCurrentPath(info.absolutePath());
   this->Implementation->Ui.FileName->setText(info.fileName());
   this->Implementation->SupressOverwriteWarning = true;
   this->accept();
+  if(diag && diag->result() != QDialog::Accepted)
+    {
+    return false;
+    }
+  return true;
 }
 

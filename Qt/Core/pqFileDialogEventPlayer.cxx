@@ -85,8 +85,15 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
     fileString.replace("$PARAVIEW_DATA_ROOT", data_directory);
     fileString.replace("$PARAVIEW_TEST_ROOT", test_directory);
 
-    object->selectFile(fileString);
-    pqEventDispatcher::processEventsAndWait(0);
+    if(object->selectFile(fileString))
+      {
+      pqEventDispatcher::processEventsAndWait(0);
+      }
+    else
+      {
+      qCritical() << "Dialog couldn't accept " << fileString;
+      Error = true;
+      }
 
     return true;
     }
