@@ -18,6 +18,7 @@
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkInformation.h"
+#include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkProp3D.h"
@@ -37,7 +38,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.21");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -50,11 +51,19 @@ vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
   this->Diffuse = 1.0;
   this->Specular = 0.1;
   this->Representation = VTK_SURFACE;
+
+  vtkMemberFunctionCommand<vtkSMSurfaceRepresentationProxy>* command =
+    vtkMemberFunctionCommand<vtkSMSurfaceRepresentationProxy>::New();
+  command->SetCallback(*this,
+    &vtkSMSurfaceRepresentationProxy::ProcessViewInformation);
+  this->ViewInformationObserver = command;
 }
 
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::~vtkSMSurfaceRepresentationProxy()
 {
+  this->SetViewInformation(0);
+  this->ViewInformationObserver->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -139,6 +148,7 @@ bool vtkSMSurfaceRepresentationProxy::EndCreateVTKObjects()
 
   this->LinkSelectionProp(this->Prop3D);
 
+  this->ProcessViewInformation();
   return this->Superclass::EndCreateVTKObjects();
 }
 
@@ -146,31 +156,6 @@ bool vtkSMSurfaceRepresentationProxy::EndCreateVTKObjects()
 void vtkSMSurfaceRepresentationProxy::Update(vtkSMViewProxy* view)
 {
   this->Superclass::Update(view);
-
-  if (this->ViewInformation->Has(vtkSMRenderViewProxy::USE_LOD()))
-    {
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->Prop3D->GetProperty("EnableLOD"));
-    ivp->SetElement(0, 
-      this->ViewInformation->Get(vtkSMRenderViewProxy::USE_LOD()));
-    this->Prop3D->UpdateProperty("EnableLOD");
-    }
-
-  if (this->ViewInformation->Has(
-      vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER())
-    && this->ViewInformation->Get(
-      vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER())==1)
-    {
-    // We must use LOD on client side.
-    vtkClientServerStream stream;
-    stream  << vtkClientServerStream::Invoke
-            << this->Prop3D->GetID()
-            << "SetEnableLOD" << 1
-            << vtkClientServerStream::End;
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->ConnectionID, vtkProcessModule::CLIENT, stream);   
-    }
-
 
   // I don't like calling Modified directly, but I need the scalars to be
   // remapped through the lookup table, and this causes that to happen.
@@ -183,6 +168,60 @@ void vtkSMSurfaceRepresentationProxy::Update(vtkSMViewProxy* view)
     this->ConnectionID,
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER, stream);
 
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSurfaceRepresentationProxy::SetViewInformation(vtkInformation* info)
+{
+  if (this->ViewInformation)
+    {
+    this->ViewInformation->RemoveObserver(this->ViewInformationObserver);
+    }
+  this->Superclass::SetViewInformation(info);
+  if (this->ViewInformation)
+    {
+    this->ViewInformation->AddObserver(vtkCommand::ModifiedEvent,
+      this->ViewInformationObserver);
+    // Get the current values from the view helper.
+    this->ProcessViewInformation();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSurfaceRepresentationProxy::ProcessViewInformation()
+{
+  if (!this->ViewInformation || !this->ObjectsCreated)
+    {
+    return;
+    }
+
+  bool use_lod = false;
+  if (this->ViewInformation && 
+    this->ViewInformation->Has(vtkSMRenderViewProxy::USE_LOD()))
+    {
+    use_lod = this->ViewInformation->Get(vtkSMRenderViewProxy::USE_LOD()) > 0;
+    }
+  
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->Prop3D->GetProperty("EnableLOD"));
+  ivp->SetElement(0, use_lod? 1:0); 
+  this->Prop3D->UpdateProperty("EnableLOD");
+
+  if (this->ViewInformation->Has(
+      vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER())
+    && this->ViewInformation->Get(
+      vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER())==1 
+    && use_lod == false)
+    {
+    // We must use LOD on client side.
+    vtkClientServerStream stream;
+    stream  << vtkClientServerStream::Invoke
+            << this->Prop3D->GetID()
+            << "SetEnableLOD" << 1
+            << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID, vtkProcessModule::CLIENT, stream);   
+    }
 }
 
 //----------------------------------------------------------------------------

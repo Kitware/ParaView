@@ -127,6 +127,12 @@ public:
   // Check if this representation has the prop by checking its vtkClientServerID
   virtual bool HasVisibleProp3D(vtkProp3D* prop);
 
+  // Description:
+  // Called to set the view information object.
+  // Don't call this directly, it is called by the View.
+  // Overridden to add modification observer.
+  virtual void SetViewInformation(vtkInformation*);
+
 //BTX
 protected:
   vtkSMSurfaceRepresentationProxy();
@@ -176,6 +182,9 @@ protected:
 private:
   vtkSMSurfaceRepresentationProxy(const vtkSMSurfaceRepresentationProxy&); // Not implemented
   void operator=(const vtkSMSurfaceRepresentationProxy&); // Not implemented
+
+  void ProcessViewInformation();
+  vtkCommand* ViewInformationObserver;
 //ETX
 };
 

@@ -18,6 +18,7 @@
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkInformation.h"
+#include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkProp3D.h"
@@ -36,7 +37,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.13");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepresentationProxy()
 {
@@ -54,11 +55,20 @@ vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepre
   this->SupportsZSweepMapper = 0;
   this->SupportsHAVSMapper   = 0;
   this->RenderViewExtensionsTested = 0;
+
+  vtkMemberFunctionCommand<vtkSMUnstructuredGridVolumeRepresentationProxy>* command =
+    vtkMemberFunctionCommand<vtkSMUnstructuredGridVolumeRepresentationProxy>::New();
+  command->SetCallback(*this,
+    &vtkSMUnstructuredGridVolumeRepresentationProxy::ProcessViewInformation);
+  this->ViewInformationObserver = command;
 }
 
 //----------------------------------------------------------------------------
 vtkSMUnstructuredGridVolumeRepresentationProxy::~vtkSMUnstructuredGridVolumeRepresentationProxy()
 {
+  this->SetViewInformation(0);
+  this->ViewInformationObserver->Delete();
+
   this->VolumeFilter = 0;
   this->VolumePTMapper = 0;
   this->VolumeHAVSMapper = 0;
@@ -81,20 +91,51 @@ void vtkSMUnstructuredGridVolumeRepresentationProxy::Update(vtkSMViewProxy* view
 
   this->DetermineVolumeSupport();
   this->Superclass::Update(view);
+}
 
-  if (this->ViewInformation->Has(vtkSMRenderViewProxy::USE_LOD()))
+//----------------------------------------------------------------------------
+void vtkSMUnstructuredGridVolumeRepresentationProxy::SetViewInformation(
+  vtkInformation* info)
+{
+  if (this->ViewInformation)
     {
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->VolumeActor->GetProperty("EnableLOD"));
-    ivp->SetElement(0, 
-      this->ViewInformation->Get(vtkSMRenderViewProxy::USE_LOD()));
-    this->VolumeActor->UpdateProperty("EnableLOD");
+    this->ViewInformation->RemoveObserver(this->ViewInformationObserver);
     }
+  this->Superclass::SetViewInformation(info);
+  if (this->ViewInformation)
+    {
+    this->ViewInformation->AddObserver(vtkCommand::ModifiedEvent,
+      this->ViewInformationObserver);
+    // Get the current values from the view helper.
+    this->ProcessViewInformation();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMUnstructuredGridVolumeRepresentationProxy::ProcessViewInformation()
+{
+  if (!this->ViewInformation || !this->ObjectsCreated)
+    {
+    return;
+    }
+
+  bool use_lod = false;
+  if (this->ViewInformation && 
+    this->ViewInformation->Has(vtkSMRenderViewProxy::USE_LOD()))
+    {
+    use_lod = this->ViewInformation->Get(vtkSMRenderViewProxy::USE_LOD()) > 0;
+    }
+  
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->VolumeActor->GetProperty("EnableLOD"));
+  ivp->SetElement(0, use_lod? 1:0); 
+  this->VolumeActor->UpdateProperty("EnableLOD");
 
   if (this->ViewInformation->Has(
       vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER())
     && this->ViewInformation->Get(
-      vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER())==1)
+      vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER())==1 
+    && use_lod == false)
     {
     // We must use LOD on client side.
     vtkClientServerStream stream;
@@ -237,6 +278,7 @@ bool vtkSMUnstructuredGridVolumeRepresentationProxy::EndCreateVTKObjects()
   this->Connect(this->VolumeProperty, this->VolumeActor, "Property");
 
 
+  this->ProcessViewInformation();
   return this->Superclass::EndCreateVTKObjects();
 }
 

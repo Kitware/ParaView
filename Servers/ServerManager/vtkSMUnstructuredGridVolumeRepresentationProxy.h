@@ -100,11 +100,16 @@ public:
   // This implementation converts a prop selection to a selection source.
   virtual vtkSMProxy* ConvertSelection(vtkSelection* input);
 
-
   // Description:
   // Update self property method, sets the color lookup table on the
   // VolumeProperty and  LODMapper.
   void SetLookupTable(vtkSMProxy* lut);
+
+  // Description:
+  // Called to set the view information object.
+  // Don't call this directly, it is called by the View.
+  // Overridden to add modification observer.
+  virtual void SetViewInformation(vtkInformation*);
 
 //BTX
 protected:
@@ -171,6 +176,9 @@ protected:
 private:
   vtkSMUnstructuredGridVolumeRepresentationProxy(const vtkSMUnstructuredGridVolumeRepresentationProxy&); // Not implemented
   void operator=(const vtkSMUnstructuredGridVolumeRepresentationProxy&); // Not implemented
+
+  void ProcessViewInformation();
+  vtkCommand* ViewInformationObserver;
 //ETX
 };
 
