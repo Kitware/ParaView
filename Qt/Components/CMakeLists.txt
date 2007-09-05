@@ -99,6 +99,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqFileChooserWidget.h
   pqFilterInputDialog.h
   pqFieldSelectionAdaptor.h
+  pqGlyphPanel.h
   pqHandleWidget.h
   pqImageTip.h
   pqImplicitPlaneWidget.h
@@ -420,6 +421,8 @@ ADD_LIBRARY(pqComponents
   pqFilterInputDialog.h
   pqFieldSelectionAdaptor.cxx
   pqFieldSelectionAdaptor.h
+  pqGlyphPanel.cxx
+  pqGlyphPanel.h
   pqHandleWidget.cxx
   pqHandleWidget.h
   pqImageTip.cxx

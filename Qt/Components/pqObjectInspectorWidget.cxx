@@ -52,11 +52,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqClipPanel.h"
 #include "pqContourPanel.h"
 #include "pqCutPanel.h"
+#include "pqExodusIIPanel.h"
 #include "pqExodusPanel.h"
+#include "pqExtractDataSetsPanel.h"
 #include "pqExtractLocationsPanel.h"
 #include "pqExtractSelectionPanel.h"
 #include "pqExtractSelectionsPanel.h"
 #include "pqExtractThresholdsPanel.h"
+#include "pqGlyphPanel.h"
 #include "pqLoadedFormObjectPanel.h"
 #include "pqObjectBuilder.h"
 #include "pqObjectPanelInterface.h"
@@ -68,12 +71,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqStreamTracerPanel.h"
-#include "pqExtractDataSetsPanel.h"
 #include "pqThresholdPanel.h"
 #include "pqUndoStack.h"
-#include "pqXDMFPanel.h"
-#include "pqExodusIIPanel.h"
 #include "pqView.h"
+#include "pqXDMFPanel.h"
 
 class pqStandardCustomPanels : public QObject, public pqObjectPanelInterface
 {
@@ -99,6 +100,11 @@ public:
       if(QString("Calculator") == proxy->getProxy()->GetXMLName())
         {
         return new pqCalculatorPanel(proxy, p);
+        }
+      if (QString("ArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
+        QString("Glyph") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqGlyphPanel(proxy, p);
         }
       if(QString("StreamTracer") == proxy->getProxy()->GetXMLName())
         {
@@ -182,6 +188,8 @@ public:
       if(QString("Cut") == proxy->getProxy()->GetXMLName() ||
          QString("Clip") == proxy->getProxy()->GetXMLName() ||
          QString("Calculator") == proxy->getProxy()->GetXMLName() ||
+         QString("ArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
+         QString("Glyph") == proxy->getProxy()->GetXMLName() ||
          QString("StreamTracer") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractDataSets") == proxy->getProxy()->GetXMLName() ||
 //         QString("ParticleTracer") == proxy->getProxy()->GetXMLName() ||
