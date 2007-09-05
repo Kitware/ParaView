@@ -3505,7 +3505,9 @@ pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
     // If the GUI created a "ExtractCellSelection"
     // filter, we need to copy the active selection over to the filter.
     if (proxy->GetXMLName() == QString("ExtractCellSelection") ||
-      proxy->GetXMLName() == QString("ExtractCellsOverTime"))
+      proxy->GetXMLName() == QString("ExtractCellsOverTime") ||
+      proxy->GetXMLName() == QString("ExtractPointSelection") ||
+      proxy->GetXMLName() == QString("ExtractPointsOverTime"))
       {
       // If a selection exists on the input to this filter,
       // we initialize the filter with that selection.
