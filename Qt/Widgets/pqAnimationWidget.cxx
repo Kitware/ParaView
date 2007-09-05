@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqAnimationWidget::pqAnimationWidget(QWidget* p) 
   : QAbstractScrollArea(p) 
 {
+  this->setAutoFillBackground(true);
   this->View = new QGraphicsView(this->viewport());
   this->viewport()->setBackgroundRole(QPalette::Window);
   this->View->setBackgroundRole(QPalette::Window);
