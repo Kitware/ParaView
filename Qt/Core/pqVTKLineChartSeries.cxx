@@ -35,7 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartValue.h"
 
 #include "vtkDataArray.h"
+#include "vtkDoubleArray.h"
 #include "vtkSmartPointer.h"
+
+#include <math.h>
 
 
 class pqVTKLineChartSeriesInternal
@@ -46,24 +49,16 @@ public:
 
   vtkSmartPointer<vtkDataArray> XArray;
   vtkSmartPointer<vtkDataArray> YArray;
-
-  vtkSmartPointer<vtkDataArray> XMask;
-  vtkSmartPointer<vtkDataArray> YMask;
-
-  double XRangeCache[2];
-  double YRangeCache[2];
-  bool XRangeCacheValid;
-  bool YRangeCacheValid;
+  QList<int> BreakList;
 };
 
 
 //-----------------------------------------------------------------------------
 pqVTKLineChartSeriesInternal::pqVTKLineChartSeriesInternal()
+  : BreakList()
 {
   this->XArray = 0;
   this->YArray = 0;
-  this->XRangeCacheValid = false;
-  this->YRangeCacheValid = false;
 }
 
 
@@ -114,12 +109,12 @@ bool pqVTKLineChartSeries::getPoint(int sequence, int index,
 {
   if(index >= 0 && index < this->getNumberOfPoints(sequence))
     {
-    coord.X = this->Internal->XArray->GetTuple1(index);;
+    coord.X = this->Internal->XArray->GetTuple1(index);
     coord.Y = this->Internal->YArray->GetTuple1(index);
 
-    return !((this->Internal->XMask && this->Internal->XMask->GetTuple1(index)==0) ||
-      (this->Internal->YMask && this->Internal->YMask->GetTuple1(index)==0));
+    return this->Internal->BreakList.contains(index);
     }
+
   return false;
 }
 
@@ -157,98 +152,250 @@ static bool computeRange(vtkDataArray* array, vtkDataArray* maskArray, double ra
 
 void pqVTKLineChartSeries::getRangeX(pqChartValue &min, pqChartValue &max) const
 {
-  min = (double)0.0;
-  max = (double)1.0;
   if(this->Internal->XArray)
     {
-    if (this->Internal->XMask)
-      {
-      if (this->Internal->XRangeCacheValid)
-        {
-        min = this->Internal->XRangeCache[0];
-        max = this->Internal->XRangeCache[1];
-        }
-      else
-        {
-        if (::computeRange(this->Internal->XArray, 
-            this->Internal->XMask, this->Internal->XRangeCache))
-          {
-          min = this->Internal->XRangeCache[0];
-          max = this->Internal->XRangeCache[1];
-          this->Internal->XRangeCacheValid =true;
-          }
-        }
-      }
-    else
-      {
-      double range[2];
-      this->Internal->XArray->GetRange(range);
-      min = range[0];
-      max = range[1];
-      }
+    double range[2];
+    this->Internal->XArray->GetRange(range);
+    min = range[0];
+    max = range[1];
+    }
+  else
+    {
+    min = (double)0.0;
+    max = (double)1.0;
     }
 }
 
 void pqVTKLineChartSeries::getRangeY(pqChartValue &min, pqChartValue &max) const
 {
-  min = (double)0.0;
-  max = (double)1.0;
   if(this->Internal->YArray)
     {
-    if (this->Internal->YMask)
-      {
-      if (this->Internal->YRangeCacheValid)
-        {
-        min = this->Internal->YRangeCache[0]; 
-        max = this->Internal->YRangeCache[1]; 
-        }
-      else
-        {
-        if (::computeRange(this->Internal->YArray, 
-            this->Internal->YMask, this->Internal->YRangeCache))
-          {
-          min = this->Internal->YRangeCache[0];
-          max = this->Internal->YRangeCache[1];
-          this->Internal->YRangeCacheValid =true;
-          }
-        }
-      }
-    else
-      {
-      double range[2];
-      this->Internal->YArray->GetRange(range);
-      min = range[0];
-      max = range[1];
-      }
+    double range[2];
+    this->Internal->YArray->GetRange(range);
+    min = range[0];
+    max = range[1];
+    }
+  else
+    {
+    min = (double)0.0;
+    max = (double)1.0;
     }
 }
 
 void pqVTKLineChartSeries::setDataArrays(vtkDataArray *xArray,
-    vtkDataArray *yArray)
+    vtkDataArray *yArray, vtkDataArray *mask, int xComponent, int yComponent)
 {
-  this->Internal->XRangeCacheValid = false;
-  this->Internal->YRangeCacheValid = false;
+  this->Internal->XArray = 0;
+  this->Internal->YArray = 0;
+  this->Internal->BreakList.clear();
   if(xArray && yArray)
     {
     this->Internal->XArray = xArray;
-    this->Internal->YArray = yArray;
-    }
-  else
-    {
-    this->Internal->XArray = 0;
-    this->Internal->YArray = 0;
+    if(this->Internal->XArray->GetNumberOfComponents() > 1)
+      {
+      this->Internal->XArray = this->createArray(xArray, xComponent);
+      }
+
+    if(this->Internal->XArray)
+      {
+      this->Internal->YArray = yArray;
+      if(this->Internal->YArray->GetNumberOfComponents() > 1)
+        {
+        this->Internal->YArray = this->createArray(yArray, yComponent);
+        }
+
+      if(!this->Internal->YArray)
+        {
+        this->Internal->XArray = 0;
+        }
+      }
+
+    // If there is a mask array, apply it to the data.
+    if(mask && this->Internal->XArray)
+      {
+      // Get the number of valid points.
+      vtkIdType i = 0;
+      vtkIdType numValid = 0;
+      vtkIdType maskLength = mask->GetNumberOfTuples();
+      for( ; i < mask->GetNumberOfTuples(); i++)
+        {
+        if(mask->GetTuple1(i) != 0)
+          {
+          numValid++;
+          }
+        }
+
+      if(numValid < maskLength)
+        {
+        // Allocate new arrays.
+        vtkDoubleArray *newXArray = vtkDoubleArray::New();
+        newXArray->SetNumberOfComponents(1);
+        newXArray->SetNumberOfTuples(numValid);
+        vtkDoubleArray *newYArray = vtkDoubleArray::New();
+        newYArray->SetNumberOfComponents(1);
+        newYArray->SetNumberOfTuples(numValid);
+
+        // Copy the valid points to the new arrays.
+        vtkIdType j = 0;
+        bool inBreak = false;
+        vtkIdType numPts = this->Internal->XArray->GetNumberOfTuples();
+        for(i = 0; i < maskLength && i < numPts; i++)
+          {
+          if(mask->GetTuple1(i) == 0)
+            {
+            inBreak = true;
+            }
+          else
+            {
+            if(inBreak && j != 0)
+              {
+              inBreak = false;
+              this->Internal->BreakList.append((int)j);
+              }
+
+            newXArray->SetTuple1(j, this->Internal->XArray->GetTuple1(i));
+            newYArray->SetTuple1(j, this->Internal->YArray->GetTuple1(i));
+            j++;
+            }
+          }
+
+        this->Internal->XArray = newXArray;
+        this->Internal->YArray = newYArray;
+        }
+      }
     }
 
   this->resetSeries();
 }
 
-//-----------------------------------------------------------------------------
-void pqVTKLineChartSeries::setMaskArrays(vtkDataArray* xmask,
-  vtkDataArray* ymask)
+vtkDataArray *pqVTKLineChartSeries::createArray(vtkDataArray *array,
+    int component)
 {
-  this->Internal->XMask = xmask;
-  this->Internal->YMask = ymask;
-  this->Internal->XRangeCacheValid = false;
-  this->Internal->YRangeCacheValid = false;
-  this->resetSeries();
+  if(component == -1)
+    {
+    return pqVTKLineChartSeries::createMagnitudeArray(array);
+    }
+  else if(component == -2)
+    {
+    return pqVTKLineChartSeries::createDistanceArray(array);
+    }
+  else if(component < 0 || !array)
+    {
+    return 0;
+    }
+
+  int numComp = array->GetNumberOfComponents();
+  if(component >= numComp)
+    {
+    return 0;
+    }
+  else if(numComp == 1)
+    {
+    return array;
+    }
+
+  vtkIdType numPts = array->GetNumberOfTuples();
+  vtkDoubleArray *newArray = vtkDoubleArray::New();
+  newArray->SetNumberOfComponents(1);
+  newArray->SetNumberOfTuples(numPts);
+
+  double *tupleData = new double[numComp];
+  for(vtkIdType i = 0; i < numPts; i++)
+    {
+    array->GetTuple(i, tupleData);
+    newArray->SetTuple1(i, tupleData[component]);
+    }
+
+  delete [] tupleData;
+  return newArray;
 }
+
+vtkDataArray *pqVTKLineChartSeries::createMagnitudeArray(vtkDataArray *array)
+{
+  if(!array || array->GetNumberOfComponents() < 2)
+    {
+    return array;
+    }
+
+  vtkIdType numPts = array->GetNumberOfTuples();
+  vtkDoubleArray *magnitude = vtkDoubleArray::New();
+  magnitude->SetNumberOfComponents(1);
+  magnitude->SetNumberOfTuples(numPts);
+
+  int numComp = array->GetNumberOfComponents();
+  double *tupleData = new double[numComp];
+  for(vtkIdType i = 0; i < numPts; i++)
+    {
+    double sum = 0.0;
+    array->GetTuple(i, tupleData);
+    for(int j = 0; j < numComp; j++)
+      {
+      sum += tupleData[j] * tupleData[j];
+      }
+
+    if(sum > 0.0)
+      {
+      sum = sqrt(sum);
+      }
+
+    magnitude->SetTuple1(i, sum);
+    }
+
+  delete [] tupleData;
+  return magnitude;
+}
+
+vtkDataArray *pqVTKLineChartSeries::createDistanceArray(vtkDataArray *array)
+{
+  if(!array || array->GetNumberOfComponents() < 1)
+    {
+    return array;
+    }
+
+  vtkIdType numPts = array->GetNumberOfTuples();
+  vtkDoubleArray *distance = vtkDoubleArray::New();
+  distance->SetNumberOfComponents(1);
+  distance->SetNumberOfTuples(numPts);
+
+  int numComp = array->GetNumberOfComponents();
+  double *current = new double[numComp];
+  double *previous = new double[numComp];
+  if(numPts > 0)
+    {
+    distance->SetTuple1(0, 0.0);
+    }
+
+  double total = 0.0;
+  for(vtkIdType i = 1; i < numPts; i++)
+    {
+    double sum = 0.0;
+    array->GetTuple(i, current);
+    array->GetTuple(i - 1, previous);
+    for(int j = 0; j < numComp; j++)
+      {
+      current[j] = current[j] - previous[j];
+      if(numComp == 1)
+        {
+        sum = current[j];
+        }
+      else
+        {
+        sum += current[j] * current[j];
+        }
+      }
+
+    if(numComp > 1 && sum > 0.0)
+      {
+      sum = sqrt(sum);
+      }
+
+    total += sum;
+    distance->SetTuple1(i, total);
+    }
+
+  delete [] current;
+  delete [] previous;
+  return distance;
+}
+
+

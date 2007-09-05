@@ -467,7 +467,7 @@ void pqLineChart::layoutChart(const QRect &area)
           {
           // Get the point coordinate from the series.
           pqChartCoordinate coord;
-          bool coordValid = (*iter)->Series->getPoint(i, j, coord);
+          bool isBreak = (*iter)->Series->getPoint(i, j, coord);
 
           // Use the axis scale to translate the series' coordinates
           // into chart coordinates.
@@ -477,44 +477,30 @@ void pqLineChart::layoutChart(const QRect &area)
           // Store the pixel coordinates for the point.
           if(line)
             {
-            if (!coordValid)
+            // Qt has a bug drawing polylines with large data sets, so
+            // break them up into manageable chunks.
+            if(!polygon || j % 100 == 0 || isBreak)
               {
-              // Coordinate is not valid, we need to break the line being drawn,
-              // if any.
-              if (polygon && polygon->size() > 0)
-                {
-                polygon = 0;
-                line->Sequence.append(QPolygon());
-                polygon = &line->Sequence.last();
-                polygon->reserve(101);
-                }
-              }
-            else
-              {
-              // Qt has a bug drawing polylines with large data sets, so
-              // break them up into manageable chunks.
-              if(!polygon || j % 100 == 0)
-                {
-                line->Sequence.append(QPolygon());
-                polygon = &line->Sequence.last();
-                polygon->reserve(101);
+              line->Sequence.append(QPolygon());
+              polygon = &line->Sequence.last();
+              polygon->reserve(101);
 
-                // Copy the last point from the previous polygon to the
-                // new one.
-                if(line->Sequence.size() > 1)
-                  {
-                  polygon->append(
+              // Copy the last point from the previous polygon to the
+              // new one.
+              if(!isBreak && line->Sequence.size() > 1)
+                {
+                polygon->append(
                     line->Sequence[line->Sequence.size() - 2].last());
-                  }
                 }
-              polygon->append(point);
               }
+
+            polygon->append(point);
             }
-          else if(points && coordValid)
+          else if(points)
             {
             points->Sequence.append(point);
             }
-          else if(error && coordValid)
+          else if(error)
             {
             // If this is the first point, calculate the error width
             // in pixels using the point and the error width.

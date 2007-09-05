@@ -65,16 +65,18 @@ public:
   /// Note that this method does not update the pipeline.
   vtkRectilinearGrid* getClientSideData() const;
 
+  vtkDataArray* getArray(const QString &arrayName) const;
+
+  vtkDataArray* getArray(const QString &arrayName, int attributeType) const;
+
   /// Returns the array used for x-axis.
-  vtkDataArray* getXArray();
+  vtkDataArray* getXArray() const;
 
   /// Returns the array used for y axis at the given index.
-  vtkDataArray* getYArray(int index);
+  vtkDataArray* getYArray(int index) const;
 
-  /// Returns the array used for masking. The Y mask array is same irrespective
-  /// of the index.
-  vtkDataArray* getXMaskArray();
-  vtkDataArray* getYMaskArray(int index);
+  /// Returns the array used for masking.
+  vtkDataArray* getMaskArray();
 
   int getAttributeType() const;
 
@@ -107,6 +109,9 @@ public:
 
   int getSeriesAxesIndex(int series) const;
   void setSeriesAxesIndex(int series, int index);
+
+  int getSeriesComponent(int series) const;
+  void setSeriesComponent(int series, int component);
 
   void beginSeriesChanges();
   void endSeriesChanges();
@@ -146,6 +151,7 @@ signals:
 protected:
   /// method to set default values for the status property.
   void setStatusDefaults(vtkSMProperty* prop);
+  bool getXArrayDefault(vtkSMProperty* prop, QString &arrayName);
 
 private slots:
   void changeSeriesList();

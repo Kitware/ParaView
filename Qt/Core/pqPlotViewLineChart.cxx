@@ -297,6 +297,7 @@ void pqPlotViewLineChart::update(bool force)
     bool isVisible = (*jter)->Representation->isVisible();
     vtkDataArray *yArray = 0;
     vtkDataArray *xArray = (*jter)->Representation->getXArray();
+    vtkDataArray *maskArray = (*jter)->Representation->getMaskArray();
     if(!xArray && isVisible)
       {
       qDebug() << "Failed to locate X array.";
@@ -347,10 +348,8 @@ void pqPlotViewLineChart::update(bool force)
             }
 
           // Update the arrays and options for the series.
-          series->Model->setMaskArrays(
-            (*jter)->Representation->getXMaskArray(),
-            (*jter)->Representation->getYMaskArray(index));
-          series->Model->setDataArrays(xArray, yArray);
+          series->Model->setDataArrays(xArray, yArray, maskArray, 0,
+              (*jter)->Representation->getSeriesComponent(index));
           pqLineChartSeriesOptions *options =
               this->Internal->Layer[series->Chart]->getOptions()->getSeriesOptions(
               this->Internal->Model[series->Chart]->getIndexOf(series->Model));
@@ -468,10 +467,8 @@ void pqPlotViewLineChart::update(bool force)
             }
 
           // Set the model arrays.
-          plot->Model->setMaskArrays(
-            (*jter)->Representation->getXMaskArray(),
-            (*jter)->Representation->getYMaskArray(i));
-          plot->Model->setDataArrays(xArray, yArray);
+          plot->Model->setDataArrays(xArray, yArray, maskArray, 0,
+              (*jter)->Representation->getSeriesComponent(i));
 
           // Add the line chart series to the line chart model.
           plot->Chart = (*jter)->Representation->getSeriesAxesIndex(i);

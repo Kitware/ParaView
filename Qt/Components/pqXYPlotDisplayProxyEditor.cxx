@@ -32,11 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqXYPlotDisplayProxyEditor.h"
 #include "ui_pqXYPlotDisplayEditor.h"
 
+#include "vtkDataArray.h"
+#include "vtkDataObject.h"
 #include "vtkSMArraySelectionDomain.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkDataObject.h"
 
 #include <QColorDialog>
 #include <QHeaderView>
@@ -69,6 +70,8 @@ public:
   QString Variable;
   QString LegendName;
   QPixmap LineColor;
+  int Component;
+  int ComponentCount;
   bool Enabled;
 };
 
@@ -176,6 +179,12 @@ public:
   pqLineSeriesEditorDelegate(QObject *parent=0);
   virtual ~pqLineSeriesEditorDelegate() {}
 
+  virtual QWidget *createEditor(QWidget *parent,
+      const QStyleOptionViewItem &option, const QModelIndex &index) const;
+  virtual void setEditorData(QWidget *editor, const QModelIndex &index) const;
+  virtual void setModelData(QWidget *editor, QAbstractItemModel *model,
+      const QModelIndex &index) const;
+
 protected:
   virtual void drawDecoration(QPainter *painter,
       const QStyleOptionViewItem &options, const QRect &area,
@@ -191,6 +200,7 @@ public:
     {
     this->XAxisArrayDomain = 0;
     this->XAxisArrayAdaptor = 0;
+    this->XAxisComponentAdaptor = 0;
     this->AttributeModeAdaptor = 0;
     this->Model = 0;
     this->InChange = false;
@@ -199,12 +209,14 @@ public:
   ~pqInternal()
     {
     delete this->XAxisArrayAdaptor;
+    delete this->XAxisComponentAdaptor;
     delete this->XAxisArrayDomain;
     delete this->AttributeModeAdaptor;
     }
 
   pqPropertyLinks Links;
   pqSignalAdaptorComboBox* XAxisArrayAdaptor;
+  pqSignalAdaptorComboBox* XAxisComponentAdaptor;
   pqSignalAdaptorComboBox* AttributeModeAdaptor;
   pqComboBoxDomain* XAxisArrayDomain;
 
@@ -220,6 +232,8 @@ pqLineSeriesEditorModelItem::pqLineSeriesEditorModelItem(
     const QString &variable, const QString &legend, const QColor &color)
   : Variable(variable), LegendName(legend), LineColor(16, 16)
 {
+  this->Component = -1;
+  this->ComponentCount = 0;
   this->Enabled = false;
 
   this->setColor(color);
@@ -237,7 +251,7 @@ pqLineSeriesEditorModel::pqLineSeriesEditorModel(
   : pqCheckableHeaderModel(parentObject), Items(), Display(display)
 {
   // Set up the column headers.
-  this->insertHeaderSections(Qt::Horizontal, 0, 1);
+  this->insertHeaderSections(Qt::Horizontal, 0, 2);
   this->setCheckable(0, Qt::Horizontal, true);
   this->setCheckState(0, Qt::Horizontal, Qt::Unchecked);
 
@@ -263,7 +277,7 @@ int pqLineSeriesEditorModel::rowCount(const QModelIndex &parentIndex) const
 
 int pqLineSeriesEditorModel::columnCount(const QModelIndex &) const
 {
-  return 2;
+  return 3;
 }
 
 bool pqLineSeriesEditorModel::hasChildren(const QModelIndex &parentIndex) const
@@ -274,7 +288,7 @@ bool pqLineSeriesEditorModel::hasChildren(const QModelIndex &parentIndex) const
 QModelIndex pqLineSeriesEditorModel::index(int row, int column,
     const QModelIndex &parentIndex) const
 {
-  if(!parentIndex.isValid() && column >= 0 && column < 2 && row >= 0 &&
+  if(!parentIndex.isValid() && column >= 0 && column < 3 && row >= 0 &&
       row < this->Items.size())
     {
     return this->createIndex(row, column);
@@ -292,31 +306,77 @@ QVariant pqLineSeriesEditorModel::data(const QModelIndex &idx, int role) const
 {
   if(idx.isValid() && idx.model() == this)
     {
+    pqLineSeriesEditorModelItem *item = this->Items[idx.row()];
     if(role == Qt::DisplayRole || role == Qt::EditRole ||
         role == Qt::ToolTipRole)
       {
       if(idx.column() == 0)
         {
-        return QVariant(this->Items[idx.row()]->Variable);
+        return QVariant(item->Variable);
         }
-      else
+      else if(idx.column() == 1)
         {
-        return QVariant(this->Items[idx.row()]->LegendName);
+        return QVariant(item->LegendName);
+        }
+      else if(idx.column() == 2)
+        {
+        int component = item->Component;
+        if(role == Qt::DisplayRole && item->ComponentCount > 1)
+          {
+          if(component == -2)
+            {
+            return QVariant(QString("Distance"));
+            }
+          else if(component == -1)
+            {
+            return QVariant(QString("Magnitude"));
+            }
+          else if(item->ComponentCount == 3)
+            {
+            if(item->Component == 0)
+              {
+              return QVariant(QString("X"));
+              }
+            else if(item->Component == 1)
+              {
+              return QVariant(QString("Y"));
+              }
+            else if(item->Component == 2)
+              {
+              return QVariant(QString("Z"));
+              }
+            }
+
+          return QVariant(QString::number(component));
+          }
+        else if(role == Qt::EditRole)
+          {
+          return QVariant(component);
+          }
         }
       }
     else if(role == Qt::CheckStateRole)
       {
       if(idx.column() == 0)
         {
-        return QVariant(
-            this->Items[idx.row()]->Enabled ? Qt::Checked : Qt::Unchecked);
+        return QVariant(item->Enabled ? Qt::Checked : Qt::Unchecked);
         }
       }
     else if(role == Qt::DecorationRole)
       {
       if(idx.column() == 1)
         {
-        return QVariant(this->Items[idx.row()]->LineColor);
+        return QVariant(item->LineColor);
+        }
+      }
+    else if(role == Qt::UserRole)
+      {
+      if(idx.column() == 2 && item->ComponentCount > 1)
+        {
+        QList<QVariant> range;
+        range.append(QVariant(-1));
+        range.append(QVariant(item->ComponentCount));
+        return QVariant(range);
         }
       }
     }
@@ -337,6 +397,10 @@ Qt::ItemFlags pqLineSeriesEditorModel::flags(const QModelIndex &idx) const
       {
       result |= Qt::ItemIsEditable;
       }
+    else if(idx.column() == 2 && this->Items[idx.row()]->ComponentCount > 1)
+      {
+      result |= Qt::ItemIsEditable;
+      }
     }
 
   return result;
@@ -354,6 +418,7 @@ bool pqLineSeriesEditorModel::setData(const QModelIndex &idx,
       QString name = value.toString();
       if(!name.isEmpty())
         {
+        result = true;
         if(name != item->LegendName)
           {
           item->LegendName = name;
@@ -362,8 +427,6 @@ bool pqLineSeriesEditorModel::setData(const QModelIndex &idx,
           this->Display->renderViewEventually();
           emit this->dataChanged(idx, idx);
           }
-
-        result = true;
         }
       }
     else if(idx.column() == 0 && role == Qt::CheckStateRole)
@@ -392,6 +455,19 @@ bool pqLineSeriesEditorModel::setData(const QModelIndex &idx,
         this->updateCheckState(0, Qt::Horizontal);
         }
       }
+    else if(idx.column() == 2 && role == Qt::EditRole)
+      {
+      result = true;
+      int component = value.toInt();
+      if(component != item->Component)
+        {
+        item->Component = component;
+        int series = this->Display->getSeriesIndex(item->Variable);
+        this->Display->setSeriesComponent(series, component);
+        this->Display->renderViewEventually();
+        emit this->dataChanged(idx, idx);
+        }
+      }
     }
 
   if(result)
@@ -414,6 +490,10 @@ QVariant pqLineSeriesEditorModel::headerData(int section,
     else if(section == 1)
       {
       return QVariant(QString("Legend Name"));
+      }
+    else if(section == 2)
+      {
+      return QVariant(QString("Component"));
       }
     }
   else
@@ -445,7 +525,12 @@ void pqLineSeriesEditorModel::reloadSeries()
       this->Display->getSeriesColor(i, seriesColor);
       pqLineSeriesEditorModelItem *item = new pqLineSeriesEditorModelItem(
           seriesName, seriesLabel, seriesColor);
+      item->Component = this->Display->getSeriesComponent(i);
       item->Enabled = this->Display->isSeriesEnabled(i);
+
+      // Get the number of components from the array.
+      vtkDataArray *array = this->Display->getYArray(i);
+      item->ComponentCount = array ? array->GetNumberOfComponents() : 0;
       this->Items.append(item);
       }
     }
@@ -496,6 +581,83 @@ pqLineSeriesEditorDelegate::pqLineSeriesEditorDelegate(QObject *parentObject)
 {
 }
 
+QWidget *pqLineSeriesEditorDelegate::createEditor(QWidget *parentWidget,
+    const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+  if(index.isValid() && index.column() == 2)
+    {
+    QComboBox *combo = new QComboBox(parentWidget);
+    QList<QVariant> range = index.data(Qt::UserRole).toList();
+    if(range.size() == 2)
+      {
+      int min = range[0].toInt();
+      int max = range[1].toInt();
+      if(min <= -1)
+        {
+        combo->addItem("Magnitude", QVariant(-1));
+        }
+
+      if(min <= -2)
+        {
+        combo->addItem("Distance", QVariant(-2));
+        }
+
+      const char *comp_name[] = {"X", "Y", "Z"};
+      for(min = 0; min < max; min++)
+        {
+        if(max == 3)
+          {
+          combo->addItem(comp_name[min], QVariant(min));
+          }
+        else
+          {
+          combo->addItem(QString::number(min), QVariant(min));
+          }
+        }
+      }
+
+    return combo;
+    }
+
+  return QItemDelegate::createEditor(parentWidget, option, index);
+}
+
+void pqLineSeriesEditorDelegate::setEditorData(QWidget *editor,
+    const QModelIndex &index) const
+{
+  if(index.isValid() && index.column() == 2)
+    {
+    QComboBox *combo = qobject_cast<QComboBox *>(editor);
+    QVariant comp = index.data(Qt::EditRole);
+    int compIndex = combo->findData(comp);
+    if(compIndex < 0)
+      {
+      compIndex = 0;
+      }
+
+    combo->setCurrentIndex(compIndex);
+    }
+  else
+    {
+    QItemDelegate::setEditorData(editor, index);
+    }
+}
+
+void pqLineSeriesEditorDelegate::setModelData(QWidget *editor,
+    QAbstractItemModel *model, const QModelIndex &index) const
+{
+  if(index.isValid() && index.column() == 2)
+    {
+    QComboBox *combo = qobject_cast<QComboBox *>(editor);
+    QVariant comp = combo->itemData(combo->currentIndex());
+    model->setData(index, comp, Qt::EditRole);
+    }
+  else
+    {
+    QItemDelegate::setModelData(editor, model, index);
+    }
+}
+
 void pqLineSeriesEditorDelegate::drawDecoration(QPainter *painter,
     const QStyleOptionViewItem &options, const QRect &area,
     const QPixmap &pixmap) const
@@ -519,7 +681,7 @@ pqXYPlotDisplayProxyEditor::pqXYPlotDisplayProxyEditor(pqRepresentation* display
       new pqLineSeriesEditorDelegate(this));
   this->Internal->Model = new pqLineSeriesEditorModel(0, this);
   this->Internal->SeriesList->setModel(this->Internal->Model);
-  this->Internal->SeriesList->header()->setResizeMode(QHeaderView::Stretch);
+  //this->Internal->SeriesList->header()->setResizeMode(QHeaderView::Stretch);
 
   QObject::connect(
     this->Internal->SeriesList, SIGNAL(activated(const QModelIndex &)),
@@ -528,14 +690,24 @@ pqXYPlotDisplayProxyEditor::pqXYPlotDisplayProxyEditor(pqRepresentation* display
   this->Internal->XAxisArrayAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->XAxisArray);
 
+  this->Internal->XAxisComponent->addItem("Magnitude", QVariant(-1));
+  this->Internal->XAxisComponent->addItem("Distance", QVariant(-2));
+  this->Internal->XAxisComponentAdaptor = new pqSignalAdaptorComboBox(
+    this->Internal->XAxisComponent);
+
   this->Internal->AttributeModeAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->AttributeMode);
 
   QObject::connect(this->Internal->UseArrayIndex, SIGNAL(toggled(bool)), 
-    this, SLOT(updateAllViews()), Qt::QueuedConnection);
+    this, SLOT(onUseIndexToggled(bool)), Qt::QueuedConnection);
 
   QObject::connect(this->Internal->XAxisArrayAdaptor,
-    SIGNAL(currentTextChanged(const QString&)), 
+    SIGNAL(currentTextChanged(const QString &)), 
+    this, SLOT(onXArrayNameChanged(const QString &)),
+    Qt::QueuedConnection);
+
+  QObject::connect(this->Internal->XAxisComponentAdaptor,
+    SIGNAL(currentIndexChanged(int)), 
     this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
 
@@ -570,20 +742,17 @@ pqXYPlotDisplayProxyEditor::pqXYPlotDisplayProxyEditor(pqRepresentation* display
   this->setDisplay(display);
 }
 
-//-----------------------------------------------------------------------------
 pqXYPlotDisplayProxyEditor::~pqXYPlotDisplayProxyEditor()
 {
   delete this->Internal;
 }
 
-//-----------------------------------------------------------------------------
 void pqXYPlotDisplayProxyEditor::reloadSeries()
 {
   this->Internal->Model->reloadSeries();
   this->updateOptionsWidgets();
 }
 
-//-----------------------------------------------------------------------------
 void pqXYPlotDisplayProxyEditor::setDisplay(pqRepresentation* disp)
 {
   pqLineChartRepresentation* display = qobject_cast<pqLineChartRepresentation*>(disp);
@@ -628,28 +797,12 @@ void pqXYPlotDisplayProxyEditor::setDisplay(pqRepresentation* disp)
     "checked", SIGNAL(stateChanged(int)),
     proxy, proxy->GetProperty("Visibility"));
 
-  // Setup UseYArrayIndex links.
-  this->Internal->Links.addPropertyLink(this->Internal->UseArrayIndex,
-    "checked", SIGNAL(toggled(bool)),
-    proxy, proxy->GetProperty("UseYArrayIndex"));
-
   // Attribute mode.
   this->Internal->Links.addPropertyLink(this->Internal->AttributeModeAdaptor,
     "currentText", SIGNAL(currentTextChanged(const QString&)),
     proxy, proxy->GetProperty("AttributeType"));
 
-  // pqComboBoxDomain will ensure that when ever the domain changes the
-  // widget is updated as well.
-  this->Internal->XAxisArrayDomain = new pqComboBoxDomain(
-    this->Internal->XAxisArray, proxy->GetProperty("XArrayName"));
-  // This is useful to initially populate the combobox.
-  this->Internal->XAxisArrayDomain->forceDomainChanged();
-
-  // This link will ensure that when ever the widget selection changes,
-  // the property XArrayName will be updated as well.
-  this->Internal->Links.addPropertyLink(this->Internal->XAxisArrayAdaptor,
-    "currentText", SIGNAL(currentTextChanged(const QString&)),
-    proxy, proxy->GetProperty("XArrayName"));
+  this->switchXAxisProperties();
 
   this->connect(this->Internal->Display, SIGNAL(seriesListChanged()),
       this, SLOT(reloadSeries()));
@@ -666,21 +819,25 @@ void pqXYPlotDisplayProxyEditor::setDisplay(pqRepresentation* disp)
   this->reloadSeries();
 }
 
-//-----------------------------------------------------------------------------
 void pqXYPlotDisplayProxyEditor::onAttributeModeChanged()
 {
-  vtkSMProxy* proxy = this->Internal->Display->getProxy();
-  vtkSMIntVectorProperty* at = vtkSMIntVectorProperty::SafeDownCast(
-    proxy->GetProperty("AttributeType"));
-  // FIXME HACK: The domain uses unchecked elements to update the values,
-  // hence  we update the unchecked element.
-  at->SetUncheckedElement(0, at->GetElement(0));
-  proxy->GetProperty("AttributeType")->UpdateDependentDomains();
-
+  this->switchXAxisProperties();
   this->updateAllViews();
 }
 
-//-----------------------------------------------------------------------------
+void pqXYPlotDisplayProxyEditor::onUseIndexToggled(bool checked)
+{
+  this->Internal->XAxisComponent->setEnabled(!checked &&
+      this->Internal->XAxisComponent->count() > 2);
+  this->updateAllViews();
+}
+
+void pqXYPlotDisplayProxyEditor::onXArrayNameChanged(const QString &arrayName)
+{
+  this->reloadXComponentList(arrayName);
+  this->updateAllViews();
+}
+
 void pqXYPlotDisplayProxyEditor::activateItem(const QModelIndex &index)
 {
   if(!this->Internal->Display || !index.isValid() || index.column() != 1)
@@ -945,6 +1102,109 @@ void pqXYPlotDisplayProxyEditor::updateItemStyle(int index,
       this->Internal->StyleList->blockSignals(false);
       }
     }
+}
+
+void pqXYPlotDisplayProxyEditor::switchXAxisProperties()
+{
+  vtkSMProxy *proxy = this->Internal->Display->getProxy();
+  vtkSMProperty *oldIndex = 0;
+  vtkSMProperty *newIndex = 0;
+  vtkSMProperty *oldName = 0;
+  vtkSMProperty *newName = 0;
+  vtkSMProperty *oldComponent = 0;
+  vtkSMProperty *newComponent = 0;
+  int attribute_type = pqSMAdaptor::getElementProperty(
+      proxy->GetProperty("AttributeType")).toInt();
+  if(attribute_type == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+    {
+    oldIndex = proxy->GetProperty("UseYCellArrayIndex");
+    newIndex = proxy->GetProperty("UseYPointArrayIndex");
+    oldName = proxy->GetProperty("XCellArrayName");
+    newName = proxy->GetProperty("XPointArrayName");
+    oldComponent = proxy->GetProperty("XCellArrayComponent");
+    newComponent = proxy->GetProperty("XPointArrayComponent");
+    }
+  else
+    {
+    oldIndex = proxy->GetProperty("UseYPointArrayIndex");
+    newIndex = proxy->GetProperty("UseYCellArrayIndex");
+    oldName = proxy->GetProperty("XPointArrayName");
+    newName = proxy->GetProperty("XCellArrayName");
+    oldComponent = proxy->GetProperty("XPointArrayComponent");
+    newComponent = proxy->GetProperty("XCellArrayComponent");
+    }
+
+  // Disconnect from the previous porperties.
+  this->Internal->Links.removePropertyLink(this->Internal->UseArrayIndex,
+      "checked", SIGNAL(toggled(bool)), proxy, oldIndex);
+  this->Internal->Links.removePropertyLink(this->Internal->XAxisArrayAdaptor,
+      "currentText", SIGNAL(currentTextChanged(const QString&)),
+      proxy, oldName);
+  this->Internal->Links.removePropertyLink(this->Internal->XAxisComponentAdaptor,
+      "currentData", SIGNAL(currentIndexChanged(int)),
+      proxy, oldComponent);
+  if(this->Internal->XAxisArrayDomain)
+    {
+    delete this->Internal->XAxisArrayDomain;
+    this->Internal->XAxisArrayDomain = 0;
+    }
+
+  // Reload the component list for the new x array.
+  this->reloadXComponentList(
+      pqSMAdaptor::getElementProperty(newName).toString());
+
+  // Connect to the new properties.pqComboBoxDomain will ensure that
+  // when ever the domain changes the widget is updated as well.
+  this->Internal->Links.addPropertyLink(this->Internal->UseArrayIndex,
+      "checked", SIGNAL(toggled(bool)), proxy, newIndex);
+  this->Internal->XAxisArrayDomain = new pqComboBoxDomain(
+      this->Internal->XAxisArray, newName);
+  this->Internal->XAxisArrayDomain->forceDomainChanged(); // init list
+  this->Internal->Links.addPropertyLink(this->Internal->XAxisArrayAdaptor,
+      "currentText", SIGNAL(currentTextChanged(const QString&)),
+      proxy, newName);
+  this->Internal->Links.addPropertyLink(this->Internal->XAxisComponentAdaptor,
+      "currentData", SIGNAL(currentIndexChanged(int)),
+      proxy, newComponent);
+
+  // The radio group may need to be initialized.
+  if(pqSMAdaptor::getElementProperty(newIndex).toInt() == 0)
+    {
+    this->Internal->UseDataArray->setChecked(true);
+    }
+}
+
+void pqXYPlotDisplayProxyEditor::reloadXComponentList(const QString &arrayName)
+{
+  // Remove the component entries for the previous x array.
+  while(this->Internal->XAxisComponent->count() > 2)
+    {
+    this->Internal->XAxisComponent->removeItem(2);
+    }
+
+  // Get the new x array and add components to the list if there are
+  // any. Disable the combo-box if there is only one component.
+  vtkDataArray *xArray = this->Internal->Display->getArray(arrayName);
+  int numComponents = xArray ? xArray->GetNumberOfComponents() : 0;
+  if(numComponents > 1)
+    {
+    const char *componentName[] = {"X", "Y", "Z"};
+    for(int i = 0; i < numComponents; i++)
+      {
+      if(numComponents == 3)
+        {
+        this->Internal->XAxisComponent->addItem(componentName[i], QVariant(i));
+        }
+      else
+        {
+        this->Internal->XAxisComponent->addItem(
+            QString::number(i), QVariant(i));
+        }
+      }
+    }
+
+  this->Internal->XAxisComponent->setEnabled(
+      !this->Internal->UseArrayIndex->isChecked() && numComponents > 1);
 }
 
 Qt::CheckState pqXYPlotDisplayProxyEditor::getEnabledState() const

@@ -118,7 +118,7 @@ public:
   /// \param index The index of the point in the sequence.
   /// \param coord Used to return the point's coordinates.
   /// \return
-  ///   Returns if the \c coord has valid point coordinate.
+  ///   True if the point is disconnected from the previous point.
   virtual bool getPoint(int sequence, int index,
       pqChartCoordinate &coord) const=0;
   //@}

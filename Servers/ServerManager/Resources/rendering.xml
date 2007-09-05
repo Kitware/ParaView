@@ -5080,22 +5080,14 @@
           <Group name="glyph_sources" />
         </ProxyGroupDomain>
 
-        <InputArrayDomain name="input_array_selected"
-          number_of_components="1">
-          <RequiredProperties>
-            <Property name="AttributeType"
-              function="FieldDataSelection" />
-          </RequiredProperties>
-        </InputArrayDomain>
-
         <InputArrayDomain name="input_array_cell"
           attribute_type="cell"
-          number_of_components="1">
+          number_of_components="0">
         </InputArrayDomain>
 
         <InputArrayDomain name="input_array_point"
           attribute_type="point"
-          number_of_components="1">
+          number_of_components="0">
         </InputArrayDomain>
 
         <DataTypeDomain name="input_type">
@@ -5121,12 +5113,12 @@
 
       <StringVectorProperty name="YCellArrayStatus"
          repeat_command="1"
-         number_of_elements_per_command="10"
-         element_types="2 2 0 0 1 1 1 0 0 0" >
+         number_of_elements_per_command="11"
+         element_types="2 2 0 0 1 1 1 0 0 0 0" >
            <Documentation>
-             Set the cell array to use on Y axis (arrayname, 
-             legendname, enabled, inlegend, r, g, b, thickness, linestyle, 
-             axesindex)
+             Set the cell array to use on Y axis (arrayname, legendname, 
+             enabled, inlegend, r, g, b, thickness, linestyle, axesindex, 
+            component)
            </Documentation>
           <ArraySelectionDomain name="array_list">
             <RequiredProperties>
@@ -5137,11 +5129,12 @@
 
       <StringVectorProperty name="YPointArrayStatus"
          repeat_command="1"
-         number_of_elements_per_command="10"
-         element_types="2 2 0 0 1 1 1 0 0 0" >
+         number_of_elements_per_command="11"
+         element_types="2 2 0 0 1 1 1 0 0 0 0" >
           <Documentation>
             Set the cell array to use on Y axis (arrayname, legendname, 
-            enabled, inlegend, r, g, b, thickness, linestyle, axesindex)
+            enabled, inlegend, r, g, b, thickness, linestyle, axesindex, 
+            component)
           </Documentation>
           <ArraySelectionDomain name="array_list">
             <RequiredProperties>
@@ -5189,24 +5182,56 @@
 
       </StringVectorProperty>
 
-      <StringVectorProperty name="XArrayName"
-         number_of_elements="1">
-         <!-- Set the array to use on X axis. This is used only if
-          UseYArrayIndex is set to 0 -->
-          <ArrayListDomain name="array_list" attribute_type="Scalars"
-            input_domain_name="input_array_selected">
-            <RequiredProperties>
-               <Property name="Input" function="Input"/>
-            </RequiredProperties>
-          </ArrayListDomain>
-      </StringVectorProperty>
-
-      <IntVectorProperty name="UseYArrayIndex" 
+      <IntVectorProperty name="UseYCellArrayIndex" 
          number_of_elements="1"
          default_values="1">
          <!-- When set array index is plotted on the X axis.
          -->
         <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="UseYPointArrayIndex" 
+         number_of_elements="1"
+         default_values="1">
+         <!-- When set array index is plotted on the X axis.
+         -->
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <StringVectorProperty name="XCellArrayName"
+         number_of_elements="1">
+         <!-- Set the array to use on X axis. This is used only if
+          UseYCellArrayIndex is set to 0 -->
+         <ArrayListDomain name="array_list" 
+           attribute_type="Scalars"
+           input_domain_name="input_array_cell">
+           <RequiredProperties>
+              <Property name="Input" function="Input"/>
+           </RequiredProperties>
+         </ArrayListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="XPointArrayName"
+         number_of_elements="1">
+         <!-- Set the array to use on X axis. This is used only if
+          UseYPointArrayIndex is set to 0 -->
+         <ArrayListDomain name="array_list" 
+           attribute_type="Scalars"
+           input_domain_name="input_array_point">
+           <RequiredProperties>
+              <Property name="Input" function="Input"/>
+           </RequiredProperties>
+         </ArrayListDomain>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="XCellArrayComponent"
+        number_of_elements="1"
+        default_values="-2">
+      </IntVectorProperty>
+
+      <IntVectorProperty name="XPointArrayComponent"
+        number_of_elements="1"
+        default_values="-2">
       </IntVectorProperty>
 
       <SubProxy>

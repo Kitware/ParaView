@@ -53,6 +53,10 @@ protected slots:
   /// Called when the attribute mode selection changes.
   void onAttributeModeChanged();
 
+  void onUseIndexToggled(bool checked);
+
+  void onXArrayNameChanged(const QString &arrayName);
+
   /// Slot to listen to clicks for changing color.
   void activateItem(const QModelIndex &index);
 
@@ -93,6 +97,9 @@ private:
   /// This call will raise an error is the display is not
   /// a XYPlotDisplay2 proxy.
   void setDisplay(pqRepresentation* display);
+
+  void switchXAxisProperties();
+  void reloadXComponentList(const QString &arrayName);
 
   Qt::CheckState getEnabledState() const;
 

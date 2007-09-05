@@ -196,8 +196,8 @@ bool pqSimpleLineChartSeries::getPoint(int sequence, int index,
   if(index >= 0 && index < this->getNumberOfPoints(sequence))
     {
     coord = this->Internal->Sequences[sequence]->Points[index];
-    return true;
     }
+
   return false;
 }
 

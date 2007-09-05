@@ -64,17 +64,25 @@ public:
 
   /// \brief
   ///   Sets the data arrays for the model to use.
-  /// \param xarray The x-axis data array.
-  /// \param yarray The y-axis data array.
-  void setDataArrays(vtkDataArray *xarray, vtkDataArray *yarray);
+  ///
+  /// The component parameter is only necessary when the array has
+  /// more than one component. Use -1 to get the magnitude of the
+  /// components. The mask array indicates which indexes are valid.
+  /// If the mask array is null, then all indexes are assumed to be
+  /// valid.
+  ///
+  /// \param xArray The x-axis data array.
+  /// \param yArray The y-axis data array.
+  /// \param mask The mask array.
+  /// \param xComponent The index of the x-axis array component.
+  /// \param yComponent The index of the y-axis array component.
+  void setDataArrays(vtkDataArray *xArray, vtkDataArray *yArray,
+      vtkDataArray *mask=0, int xComponent=0, int yComponent=0);
 
-  /// \brief
-  ///   Sets the mask arrays to be used for each axis. A mask array indicates
-  ///   which indices are valid. If a mask array is 0, then all indices are
-  ///   assumed to be valid.
-  /// \param xmask The x-axis mask array.
-  /// \param ymask The y-axis mask array.
-  void setMaskArrays(vtkDataArray* xmask, vtkDataArray*  ymask);
+public:
+  static vtkDataArray *createArray(vtkDataArray *array, int component);
+  static vtkDataArray *createMagnitudeArray(vtkDataArray *array);
+  static vtkDataArray *createDistanceArray(vtkDataArray *array);
 
 private:
   pqVTKLineChartSeries(const pqVTKLineChartSeries&); // Not implemented.
