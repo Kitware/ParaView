@@ -127,29 +127,6 @@ void pqVTKLineChartSeries::getErrorWidth(int , pqChartValue &) const
 {
 }
 
-static bool computeRange(vtkDataArray* array, vtkDataArray* maskArray, double range[2])
-{
-  if (!array || !maskArray)
-    {
-    return false;
-    }
-
-  vtkIdType numTuples = array->GetNumberOfTuples();
-  range[0] = VTK_DOUBLE_MAX;
-  range[1] = -VTK_DOUBLE_MAX;
-  for (vtkIdType cc=0; cc < numTuples; cc++)
-    {
-    if (maskArray->GetTuple1(cc) != 0)
-      {
-      double val = array->GetTuple1(cc);
-      range[0] = (val < range[0])? val : range[0];
-      range[1] = (val > range[1])? val : range[1];
-      }
-    }
-
-  return (range[1] >= range[0]);
-}
-
 void pqVTKLineChartSeries::getRangeX(pqChartValue &min, pqChartValue &max) const
 {
   if(this->Internal->XArray)
