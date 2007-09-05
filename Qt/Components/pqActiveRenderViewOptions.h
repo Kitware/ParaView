@@ -41,18 +41,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveViewOptions.h"
 
 
+/// \class pqActiveRenderViewOptions
+/// \brief
+///   The pqActiveRenderViewOptions class is used to dislpay an
+///   options dialog for the render view.
 class PQCOMPONENTS_EXPORT pqActiveRenderViewOptions :
     public pqActiveViewOptions
 {
   Q_OBJECT
 
 public:
+  /// \brief
+  ///   Creates a render view options instance.
+  /// \param parent The parent object.
   pqActiveRenderViewOptions(QObject *parent=0);
   virtual ~pqActiveRenderViewOptions();
 
+  /// \name pqActiveViewOptions Methods
+  //@{
   virtual void showOptions(pqView *view, QWidget *parent=0);
   virtual void changeView(pqView *view);
   virtual void closeOptions();
+  //@}
 };
 
 #endif

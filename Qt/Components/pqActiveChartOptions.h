@@ -44,20 +44,42 @@ class pqActiveChartOptionsInternal;
 class pqOptionsDialog;
 
 
+/// \class pqActiveChartOptions
+/// \brief
+///   The pqActiveChartOptions class is used to dislpay an options
+///   dialog for the chart view.
 class PQCOMPONENTS_EXPORT pqActiveChartOptions : public pqActiveViewOptions
 {
   Q_OBJECT
 
 public:
+  /// \brief
+  ///   Creates a chart options instance.
+  /// \param parent The parent object.
   pqActiveChartOptions(QObject *parent=0);
   virtual ~pqActiveChartOptions();
 
+  /// \name pqActiveViewOptions Methods
+  //@{
   virtual void showOptions(pqView *view, QWidget *parent=0);
   virtual void changeView(pqView *view);
   virtual void closeOptions();
+  //@}
 
 private slots:
+  /// \brief
+  ///   Completes the dialog closing process.
+  ///
+  /// Closing the dialog with the close button will apply any unsaved
+  /// changes. If the user hits the escape key, or closes the dialog
+  /// with the 'x' button, any unsaved changes will be ignored.
+  ///
+  /// This method also signals the manager that the dialog has closed.
+  ///
+  /// \param result Indicates if the user accepted the changes or not.
   void finishDialog(int result);
+
+  /// Cleans up the options dialog data in case it is deleted.
   void cleanupDialog();
 
   void setTitleModified();
@@ -88,11 +110,8 @@ private slots:
   void setAxisTitleAlignmentModified();
 
 private:
-  void initializeOptions();
-
-private:
-  pqActiveChartOptionsInternal *Internal;
-  pqOptionsDialog *Dialog;
+  pqActiveChartOptionsInternal *Internal; ///< Handles the modified data.
+  pqOptionsDialog *Dialog;                ///< Stores the dialog.
 };
 
 #endif

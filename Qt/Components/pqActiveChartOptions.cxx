@@ -1036,9 +1036,4 @@ void pqActiveChartOptions::setAxisTitleAlignmentModified()
       pqActiveChartOptionsInternal::AxisTitleAlignmentModified);
 }
 
-void pqActiveChartOptions::initializeOptions()
-{
-  // TODO: Initialize the chart options.
-}
-
 

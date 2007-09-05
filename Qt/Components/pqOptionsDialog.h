@@ -46,6 +46,13 @@ class pqOptionsPage;
 class QString;
 
 
+/// \class pqOptionsDialog
+/// \brief
+///   The pqOptionsDialog class is a generic options dialog.
+///
+/// Pages can be added to the dialog using the pqOptionsPage and
+/// pqOptionsContainer interfaces. The options dialog has apply and
+/// reset buttons that the pages can use.
 class PQCOMPONENTS_EXPORT pqOptionsDialog : public QDialog
 {
   Q_OBJECT
@@ -54,24 +61,58 @@ public:
   pqOptionsDialog(QWidget *parent=0);
   virtual ~pqOptionsDialog();
 
+  /// \brief
+  ///   Gets whether or not there are changes to apply.
+  /// \return
+  ///   True if there are changes to apply.
   bool isApplyNeeded() const;
+
+  /// \brief
+  ///   Sets whether or not there are changes to apply.
+  /// \param applyNeeded True if there are changes to apply.
   void setApplyNeeded(bool applyNeeded);
 
   //void addOptions(const QString &path, pqOptionsPage *options);
+
+  /// \brief
+  ///   Adds a container to the options dialog.
+  ///
+  /// Each page listed for the container is added to the root of the
+  /// selection tree.
+  ///
+  /// \param options The options container to add.
   void addOptions(pqOptionsContainer *options);
+
+  /// \brief
+  ///   Removes the options page from the options dialog.
+  ///
+  /// The page name is removed from the selection tree. If the page
+  /// is an options container, all the names are removed.
+  ///
+  /// \param options The options page/container to remove.
   void removeOptions(pqOptionsPage *options);
 
 public slots:
+  /// \brief
+  ///   Sets the current options page.
+  /// \param path The name of the options page to show.
   void setCurrentPage(const QString &path);
+
+  /// Calls each page to apply any changes.
   void applyChanges();
+
+  /// Calls each page to reset any changes.
   void resetChanges();
 
 private slots:
+  /// Changes the current page to match the user selection.
   void changeCurrentPage();
+
+  /// Enabled the apply and reset buttons.
   void enableButtons();
 
 private:
-  pqOptionsDialogForm *Form;
+  pqOptionsDialogForm *Form; /// Stores the form and class data.
 };
 
 #endif

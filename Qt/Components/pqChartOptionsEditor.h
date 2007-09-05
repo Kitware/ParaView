@@ -53,6 +53,10 @@ class QString;
 class QStringList;
 
 
+/// \class pqChartOptionsEditor
+/// \brief
+///   The pqChartOptionsEditor class is the user interface for setting
+///   the chart options.
 class PQCOMPONENTS_EXPORT pqChartOptionsEditor : public pqOptionsContainer
 {
   Q_OBJECT

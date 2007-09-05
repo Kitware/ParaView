@@ -44,19 +44,52 @@ class pqView;
 class QWidget;
 
 
+/// \class pqActiveViewOptions
+/// \brief
+///   The pqActiveViewOptions class is the interface to the view
+///   options dialogs used by the pqActiveViewOptionsManager.
 class PQCOMPONENTS_EXPORT pqActiveViewOptions : public QObject
 {
   Q_OBJECT
 
 public:
+  /// \brief
+  ///   Constructs a view options class.
+  /// \param parent The parent object.
   pqActiveViewOptions(QObject *parent=0);
   virtual ~pqActiveViewOptions() {}
 
+  /// \brief
+  ///   Opens the options dialog for the given view.
+  /// \param view The view to show the options for.
+  /// \param parent The parent widget for the options dialog.
   virtual void showOptions(pqView *view, QWidget *parent=0) = 0;
+
+  /// \brief
+  ///   Changes the view displayed in the options dialog.
+  ///
+  /// This method is called when the active view is changed while the
+  /// options dialog is open.
+  ///
+  /// \param view The new view to show the options for.
   virtual void changeView(pqView *view) = 0;
+
+  /// \brief
+  ///   Closes the open options dialog.
+  ///
+  /// This method is called when the active view is changed to a view
+  /// type that is not supported by the current options dialog.
   virtual void closeOptions() = 0;
 
 signals:
+  /// \brief
+  ///   Emitted when the view options dialog has been closed.
+  ///
+  /// This signal is used to notify the view options manager that the
+  /// current dialog has been closed. Subclasses can use the dialog's
+  /// \c finished(int) signal to emit this signal.
+  ///
+  /// \param options The view options whose dialog closed.
   void optionsClosed(pqActiveViewOptions *options);
 };
 

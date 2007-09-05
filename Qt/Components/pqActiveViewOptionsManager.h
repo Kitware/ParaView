@@ -47,34 +47,93 @@ class QString;
 class QWidget;
 
 
+/// \class pqActiveViewOptionsManager
+/// \brief
+///   The pqActiveViewOptionsManager class is used to open the
+///   appropriate view options dialog.
 class PQCOMPONENTS_EXPORT pqActiveViewOptionsManager : public QObject
 {
   Q_OBJECT
 
 public:
+  /// \brief
+  ///   Creates a view options manager.
+  /// \param parent The parent object.
   pqActiveViewOptionsManager(QObject *parent=0);
   virtual ~pqActiveViewOptionsManager();
 
+  /// \brief
+  ///   Sets the main window pointer.
+  ///
+  /// The main window pointer is used as the parent widget when
+  /// opening the options dialogs.
+  ///
+  /// \param parent A pointer to the main window.
   void setMainWindow(QWidget *parent);
+
+  /// \brief
+  ///   Sets the default render view options dialog handler.
+  ///
+  /// The default render view options dialog is used when no view
+  /// options dialog is registered for the render view type.
+  ///
+  /// \param renderOptions The new render view default.
   void setRenderViewOptions(pqActiveViewOptions *renderOptions);
 
+  /// \brief
+  ///   Registers an options dialog handler with a view type.
+  /// \param viewType The name of the view type.
+  /// \param options The options dialog handler.
+  /// \return
+  ///   True if the registration was successful.
   bool registerOptions(const QString &viewType, pqActiveViewOptions *options);
+
+  /// \brief
+  ///   Removes the options dialog from the name mapping.
+  /// \param options The options dialog handler.
   void unregisterOptions(pqActiveViewOptions *options);
+
+  /// \brief
+  ///   Gets whether or not the options dialog is registered.
+  /// \return
+  ///   True if the options dialog is associated with a view type.
   bool isRegistered(pqActiveViewOptions *options) const;
 
+  /// \brief
+  ///   Gets the options dialog handler for the specified view type.
+  /// \param viewType The name of the view type.
+  /// \return
+  ///   A pointer to the options dialog handler.
   pqActiveViewOptions *getOptions(const QString &viewType) const;
 
 public slots:
+  /// \brief
+  ///   Sets the active view.
+  /// \param view The new active view.
   void setActiveView(pqView *view);
+
+  /// Shows the options dialog for the active view.
   void showOptions();
 
 private slots:
+  /// \brief
+  ///   Clears the current options dialog handler.
+  /// \param options The current options dialog handler.
   void removeCurrent(pqActiveViewOptions *options);
 
 private:
+  /// \brief
+  ///   Gets the current options dialog handler.
+  ///
+  /// The active view is used to look up the appropriate options
+  /// dialog handler.
+  ///
+  /// \return
+  ///   A pointer to the current options dialog handler.
   pqActiveViewOptions *getCurrent() const;
 
 private:
+  /// Stores the view/handler mapping.
   pqActiveViewOptionsManagerInternal *Internal;
 };
 
