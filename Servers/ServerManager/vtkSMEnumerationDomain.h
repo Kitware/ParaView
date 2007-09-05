@@ -64,6 +64,14 @@ public:
   // Returns the descriptive string of an enumeration entry.
   const char* GetEntryText(unsigned int idx);
 
+//BTX
+  // Description:
+  // Given an entry text, return the integer value.
+  // Valid is set to 1 if text is defined, otherwise 0.
+  // If valid=0, return value is undefined.
+  int GetEntryValue(const char* text, int& valid);
+//ETX
+
   // Description:
   // Add a new enumeration entry. text cannot be null.
   void AddEntry(const char* text, int value);
