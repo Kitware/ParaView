@@ -28,7 +28,7 @@
 #include "vtkstd/set"
 
 vtkStandardNewMacro(vtkSelectionConverter);
-vtkCxxRevisionMacro(vtkSelectionConverter, "1.11");
+vtkCxxRevisionMacro(vtkSelectionConverter, "1.12");
 
 //----------------------------------------------------------------------------
 vtkSelectionConverter::vtkSelectionConverter()
@@ -150,9 +150,9 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
     inputList->GetNumberOfComponents();
 
   vtkIdTypeArray* vertptrs = vtkIdTypeArray::SafeDownCast(
-    input->GetAuxiliaryData1());
+    input->GetSelectionData()->GetArray("vertptrs"));
   vtkIdTypeArray* vertlist = vtkIdTypeArray::SafeDownCast(
-    input->GetAuxiliaryData2());
+    input->GetSelectionData()->GetArray("vertlist"));
   if (inputProperties->Has(vtkSelection::INDEXED_VERTICES())
       &&
       (inputProperties->Get(vtkSelection::INDEXED_VERTICES()) == 1)

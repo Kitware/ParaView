@@ -67,10 +67,9 @@ private:
   vtkSelectionSerializer(const vtkSelectionSerializer&);  // Not implemented.
   void operator=(const vtkSelectionSerializer&);  // Not implemented.
 
-  static void WriteSelectionList(ostream& os, 
+  static void WriteSelectionData(ostream& os, 
                                  vtkIndent indent, 
-                                 vtkSelection* selection,
-                                 int which);
+                                 vtkSelection* selection);
   static void ParseNode(
     vtkPVXMLElement* nodeXML, vtkSelection* node);
 };
