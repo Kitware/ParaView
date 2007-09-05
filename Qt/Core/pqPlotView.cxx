@@ -403,6 +403,10 @@ void pqPlotView::renderInternal()
 //-----------------------------------------------------------------------------
 vtkImageData* pqPlotView::captureImage(int magnification)
 {
+  // vtkSMRenderViewProxy::CaptureWindow() ensures that render is called on the
+  // view. Hence, we must explicitly call render here to be consistent.
+  this->forceRender();
+
   QPixmap grabbedPixMap = QPixmap::grabWidget(this->getWidget());
   grabbedPixMap = grabbedPixMap.scaled(grabbedPixMap.size().width()*magnification,
     grabbedPixMap.size().height()*magnification);
