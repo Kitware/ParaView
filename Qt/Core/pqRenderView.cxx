@@ -90,8 +90,6 @@ public:
   vtkSmartPointer<vtkSMUndoStack> InteractionUndoStack;
   vtkSmartPointer<vtkSMInteractionUndoStackBuilder> UndoStackBuilder;
 
-  QMap<vtkSMViewProxy*, QPointer<QVTKWidget> > RenderWidgets;
-
   QList<pqRenderView* > LinkedUndoStacks;
   bool UpdatingStack;
 
@@ -157,11 +155,6 @@ pqRenderView::pqRenderView( const QString& group,
 //-----------------------------------------------------------------------------
 pqRenderView::~pqRenderView()
 {
-  foreach (QVTKWidget* widget, this->Internal->RenderWidgets.values())
-    {
-    delete widget;
-    }
-
   delete this->Internal->Viewport;
   delete this->Internal;
 }
