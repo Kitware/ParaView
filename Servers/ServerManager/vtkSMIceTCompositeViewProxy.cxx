@@ -36,7 +36,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.18");
 
 vtkInformationKeyMacro(vtkSMIceTCompositeViewProxy, KD_TREE, ObjectBase);
 //----------------------------------------------------------------------------
@@ -104,7 +104,12 @@ void vtkSMIceTCompositeViewProxy::InitializeForMultiView(vtkSMViewProxy* view)
     return;
     }
 
-  otherView->UpdateVTKObjects();
+  if (!otherView->GetObjectsCreated())
+    {
+    vtkErrorMacro(
+      "InitializeForMultiView was called before the other view was intialized.");
+    return;
+    }
 
   this->SharedParallelRenderManagerID = 
     otherView->SharedParallelRenderManagerID.IsNull()?
