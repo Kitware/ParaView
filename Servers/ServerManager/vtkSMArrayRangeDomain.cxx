@@ -27,7 +27,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArrayRangeDomain);
-vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.13");
+vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.14");
 
 //---------------------------------------------------------------------------
 vtkSMArrayRangeDomain::vtkSMArrayRangeDomain()
@@ -200,7 +200,7 @@ void vtkSMArrayRangeDomain::SetArrayRange(
   if (numArrComp > 1) // vector magnitude range
     {
     this->AddMinimum(numArrComp, ai->GetComponentRange(-1)[0]);
-    this->AddMinimum(numArrComp, ai->GetComponentRange(-1)[1]);
+    this->AddMaximum(numArrComp, ai->GetComponentRange(-1)[1]);
     }
 }
 //---------------------------------------------------------------------------
