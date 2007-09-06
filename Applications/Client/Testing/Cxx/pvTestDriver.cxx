@@ -502,6 +502,11 @@ int pvTestDriver::OutputStringHasError(const char* pname, vtkstd::string& output
   return 0;
 }
 
+#define VTK_CLEAN_PROCESSES \
+  vtksysProcess_Delete(client); \
+  vtksysProcess_Delete(renderServer); \
+  vtksysProcess_Delete(server); 
+
 //----------------------------------------------------------------------------
 int pvTestDriver::Main(int argc, char* argv[])
 {
@@ -525,29 +530,32 @@ int pvTestDriver::Main(int argc, char* argv[])
   // mpi code
   // Allocate process managers.
   vtksysProcess* renderServer = 0;
+  vtksysProcess* server = 0;
+  vtksysProcess* client = 0;
   if(this->TestRenderServer)
     {
     renderServer = vtksysProcess_New();
     if(!renderServer)
       {
+      VTK_CLEAN_PROCESSES;
       cerr << "pvTestDriver: Cannot allocate vtksysProcess to run the render server.\n";
       return 1;
       }
     }
-  vtksysProcess* server = 0;
   if(this->TestServer)
     {
     server = vtksysProcess_New();
     if(!server)
       {
+      VTK_CLEAN_PROCESSES;
       cerr << "pvTestDriver: Cannot allocate vtksysProcess to run the server.\n";
       return 1;
       }
     }
-  vtksysProcess* client = vtksysProcess_New();
+  client = vtksysProcess_New();
   if(!client)
     {
-    vtksysProcess_Delete(server);
+    VTK_CLEAN_PROCESSES;
     cerr << "pvTestDriver: Cannot allocate vtksysProcess to run the client.\n";
     return 1;
     }
@@ -604,6 +612,8 @@ int pvTestDriver::Main(int argc, char* argv[])
 #else
       cerr << "CONNECT_TO_RS_DS_REMOTE_RENDER_SCRIPT must be specified."
            << endl;
+
+      VTK_CLEAN_PROCESSES;
       return 1;
 #endif
       }
@@ -614,6 +624,7 @@ int pvTestDriver::Main(int argc, char* argv[])
       this->ClientPostFlags.push_back("--run-test-init=" + temp);
 #else
       cerr << "CONNECT_TO_RS_DS_SCRIPT must be specified." << endl;
+      VTK_CLEAN_PROCESSES;
       return 1;
 #endif
       }
@@ -628,6 +639,7 @@ int pvTestDriver::Main(int argc, char* argv[])
 #else
       cerr << "CONNECT_TO_SERVER_REMOTE_RENDER_SCRIPT must be specified."
            << endl;
+      VTK_CLEAN_PROCESSES;
       return 1;
 #endif
       }
@@ -638,6 +650,7 @@ int pvTestDriver::Main(int argc, char* argv[])
       this->ClientPostFlags.push_back("--run-test-init=" + temp);
 #else
       cerr << "CONNECT_TO_SERVER_SCRIPT must be specified." << endl;
+      VTK_CLEAN_PROCESSES;
       return 1;
 #endif
       }
@@ -649,6 +662,7 @@ int pvTestDriver::Main(int argc, char* argv[])
     this->ClientPostFlags.push_back("--run-test-init=" + temp);
 #else
     cerr << "CONNECT_TO_BUILTIN_SCRIPT must be specified." << endl;
+    VTK_CLEAN_PROCESSES;
     return 1;
 #endif
     }
@@ -675,12 +689,14 @@ int pvTestDriver::Main(int argc, char* argv[])
                           ClientStdOut, ClientStdErr))
       {
       cerr << "pvTestDriver: Reverse connection client never started.\n";
+      VTK_CLEAN_PROCESSES;
       return -1;
       }
     // Now run the server
     if(!this->StartClient(server, "server"))
       {
       this->Stop(client, "client");
+      VTK_CLEAN_PROCESSES;
       return -1;
       }
     // Now run the render server
@@ -688,6 +704,7 @@ int pvTestDriver::Main(int argc, char* argv[])
       {
       this->Stop(client, "client");
       this->Stop(server, "server");
+      VTK_CLEAN_PROCESSES;
       return -1;
       }
     }
@@ -698,6 +715,7 @@ int pvTestDriver::Main(int argc, char* argv[])
                           RenderServerStdOut, RenderServerStdErr))
       {
       cerr << "pvTestDriver: Render server never started.\n";
+      VTK_CLEAN_PROCESSES;
       return -1;
       }
     // Start the data server if there is one
@@ -706,6 +724,7 @@ int pvTestDriver::Main(int argc, char* argv[])
       {
       this->Stop(renderServer, "renderserver");
       cerr << "pvTestDriver: Server never started.\n";
+      VTK_CLEAN_PROCESSES;
       return -1;
       }
     // Now run the client
@@ -713,6 +732,7 @@ int pvTestDriver::Main(int argc, char* argv[])
       {
       this->Stop(server, "server");
       this->Stop(renderServer, "renderserver");
+      VTK_CLEAN_PROCESSES;
       return -1;
       }
     }
@@ -800,15 +820,8 @@ int pvTestDriver::Main(int argc, char* argv[])
     }
 
   // Free process managers.
-  vtksysProcess_Delete(client);
-  if(server)
-    {
-    vtksysProcess_Delete(server);
-    }
-  if(renderServer)
-    {
-    vtksysProcess_Delete(renderServer);
-    }
+  VTK_CLEAN_PROCESSES;
+
   // Report the server return code if it is nonzero.  Otherwise report
   // the client return code.
   if(serverResult)
