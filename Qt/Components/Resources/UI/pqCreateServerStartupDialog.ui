@@ -224,8 +224,11 @@
   <tabstop>name</tabstop>
   <tabstop>type</tabstop>
   <tabstop>host</tabstop>
+  <tabstop>port</tabstop>
   <tabstop>dataServerHost</tabstop>
+  <tabstop>dataServerPort</tabstop>
   <tabstop>renderServerHost</tabstop>
+  <tabstop>renderServerPort</tabstop>
   <tabstop>okButton</tabstop>
   <tabstop>cancelButton</tabstop>
  </tabstops>
