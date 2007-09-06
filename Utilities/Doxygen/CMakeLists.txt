@@ -28,7 +28,7 @@ IF (BUILD_DOCUMENTATION)
   SET(DOXYGEN_CVSWEB_CHECKOUT_SUFFIX "?cvsroot=ParaView3")
   SET(DOXYGEN_SOURCE_LOCATIONS_DIR "${ParaView_SOURCE_DIR}")
   SET(DOXYGEN_SOURCE_LOCATIONS
-       "\"${ParaView_SOURCE_DIR}/Utilities/Xdmf/vtk\" \\
+       "\"${ParaView_SOURCE_DIR}/Utilities/Xdmf2/vtk\" \\
         \"${ParaView_SOURCE_DIR}/Utilities/VTKPythonWrapping/Executable\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Chart\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Components\" \\
@@ -46,7 +46,7 @@ IF (BUILD_DOCUMENTATION)
   SET(DOXYGEN_BINARY_LOCATIONS
        "")
   SET(DOXYGEN_PARSED_INPUT_DIRS
-      " \"${CMAKE_CURRENT_BINARY_DIR}/dox/Utilities/Xdmf/vtk\" \\
+      " \"${CMAKE_CURRENT_BINARY_DIR}/dox/Utilities/Xdmf2/vtk\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Utilities/VTKPythonWrapping/Executable\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Chart\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Components\" \\
