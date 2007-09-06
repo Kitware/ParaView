@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqLineChartSeries.h"
 #include "pqCoreExport.h"
+#include "vtkSmartPointer.h"
 
 class pqVTKLineChartSeriesInternal;
 class vtkDataArray;
@@ -80,9 +81,12 @@ public:
       vtkDataArray *mask=0, int xComponent=0, int yComponent=0);
 
 public:
-  static vtkDataArray *createArray(vtkDataArray *array, int component);
-  static vtkDataArray *createMagnitudeArray(vtkDataArray *array);
-  static vtkDataArray *createDistanceArray(vtkDataArray *array);
+  static vtkSmartPointer<vtkDataArray> createArray(vtkDataArray *array,
+      int component);
+  static vtkSmartPointer<vtkDataArray> createMagnitudeArray(
+      vtkDataArray *array);
+  static vtkSmartPointer<vtkDataArray> createDistanceArray(
+      vtkDataArray *array);
 
 private:
   pqVTKLineChartSeries(const pqVTKLineChartSeries&); // Not implemented.

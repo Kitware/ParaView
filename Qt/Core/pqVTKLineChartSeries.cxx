@@ -205,10 +205,12 @@ void pqVTKLineChartSeries::setDataArrays(vtkDataArray *xArray,
       if(numValid < maskLength)
         {
         // Allocate new arrays.
-        vtkDoubleArray *newXArray = vtkDoubleArray::New();
+        vtkSmartPointer<vtkDoubleArray> newXArray =
+            vtkSmartPointer<vtkDoubleArray>::New();
         newXArray->SetNumberOfComponents(1);
         newXArray->SetNumberOfTuples(numValid);
-        vtkDoubleArray *newYArray = vtkDoubleArray::New();
+        vtkSmartPointer<vtkDoubleArray> newYArray =
+            vtkSmartPointer<vtkDoubleArray>::New();
         newYArray->SetNumberOfComponents(1);
         newYArray->SetNumberOfTuples(numValid);
 
@@ -245,8 +247,8 @@ void pqVTKLineChartSeries::setDataArrays(vtkDataArray *xArray,
   this->resetSeries();
 }
 
-vtkDataArray *pqVTKLineChartSeries::createArray(vtkDataArray *array,
-    int component)
+vtkSmartPointer<vtkDataArray> pqVTKLineChartSeries::createArray(
+    vtkDataArray *array, int component)
 {
   if(component == -1)
     {
@@ -272,7 +274,8 @@ vtkDataArray *pqVTKLineChartSeries::createArray(vtkDataArray *array,
     }
 
   vtkIdType numPts = array->GetNumberOfTuples();
-  vtkDoubleArray *newArray = vtkDoubleArray::New();
+  vtkSmartPointer<vtkDoubleArray> newArray =
+      vtkSmartPointer<vtkDoubleArray>::New();
   newArray->SetNumberOfComponents(1);
   newArray->SetNumberOfTuples(numPts);
 
@@ -287,7 +290,8 @@ vtkDataArray *pqVTKLineChartSeries::createArray(vtkDataArray *array,
   return newArray;
 }
 
-vtkDataArray *pqVTKLineChartSeries::createMagnitudeArray(vtkDataArray *array)
+vtkSmartPointer<vtkDataArray> pqVTKLineChartSeries::createMagnitudeArray(
+    vtkDataArray *array)
 {
   if(!array || array->GetNumberOfComponents() < 2)
     {
@@ -295,7 +299,8 @@ vtkDataArray *pqVTKLineChartSeries::createMagnitudeArray(vtkDataArray *array)
     }
 
   vtkIdType numPts = array->GetNumberOfTuples();
-  vtkDoubleArray *magnitude = vtkDoubleArray::New();
+  vtkSmartPointer<vtkDoubleArray> magnitude =
+      vtkSmartPointer<vtkDoubleArray>::New();
   magnitude->SetNumberOfComponents(1);
   magnitude->SetNumberOfTuples(numPts);
 
@@ -322,7 +327,8 @@ vtkDataArray *pqVTKLineChartSeries::createMagnitudeArray(vtkDataArray *array)
   return magnitude;
 }
 
-vtkDataArray *pqVTKLineChartSeries::createDistanceArray(vtkDataArray *array)
+vtkSmartPointer<vtkDataArray> pqVTKLineChartSeries::createDistanceArray(
+    vtkDataArray *array)
 {
   if(!array || array->GetNumberOfComponents() < 1)
     {
@@ -330,7 +336,8 @@ vtkDataArray *pqVTKLineChartSeries::createDistanceArray(vtkDataArray *array)
     }
 
   vtkIdType numPts = array->GetNumberOfTuples();
-  vtkDoubleArray *distance = vtkDoubleArray::New();
+  vtkSmartPointer<vtkDoubleArray> distance =
+      vtkSmartPointer<vtkDoubleArray>::New();
   distance->SetNumberOfComponents(1);
   distance->SetNumberOfTuples(numPts);
 
