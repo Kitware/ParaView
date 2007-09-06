@@ -30,15 +30,45 @@
 class vtkSMProxyManagerElementMapType:
   public vtkstd::map<vtkStdString, vtkSmartPointer<vtkPVXMLElement> > {};
 
-struct ProxyInfo
+class vtkSMProxyManagerProxyInfo : public vtkObjectBase
 {
-  ProxyInfo()
+public:
+  vtkSmartPointer<vtkSMProxy> Proxy;
+  unsigned long ModifiedObserverTag;
+  unsigned long UpdateObserverTag;
+  unsigned long UpdateInformationObserverTag;
+
+  static vtkSMProxyManagerProxyInfo* New()
+    {
+    return new vtkSMProxyManagerProxyInfo();
+    }
+
+  // Description:
+  // this needs to be overridden otherwise vtkDebugLeaks warnings are objects
+  // are destroyed.
+  void UnRegister()
+    {
+    int refcount = this->GetReferenceCount()-1;
+    this->SetReferenceCount(refcount);
+    if (refcount <= 0)
+      {
+#ifdef VTK_DEBUG_LEAKS
+      vtkDebugLeaks::DestructClass("vtkSMProxyManagerProxyInfo");
+#endif
+      delete this;
+      }
+    }
+  virtual void UnRegister(vtkObjectBase *)
+    { this->UnRegister(); }
+
+private:
+  vtkSMProxyManagerProxyInfo()
     {
     this->ModifiedObserverTag = 0;
     this->UpdateObserverTag = 0;
     this->UpdateInformationObserverTag = 0;
     }
-  ~ProxyInfo()
+  ~vtkSMProxyManagerProxyInfo()
     {
     // Remove observers.
     if (this->ModifiedObserverTag && this->Proxy.GetPointer())
@@ -58,15 +88,11 @@ struct ProxyInfo
       this->UpdateInformationObserverTag = 0;
       }
     }
-
-  vtkSmartPointer<vtkSMProxy> Proxy;
-  unsigned long ModifiedObserverTag;
-  unsigned long UpdateObserverTag;
-  unsigned long UpdateInformationObserverTag;
 };
 
+//-----------------------------------------------------------------------------
 class vtkSMProxyManagerProxyListType :
-  public vtkstd::vector<ProxyInfo> 
+  public vtkstd::vector<vtkSmartPointer<vtkSMProxyManagerProxyInfo> >
 {
 public:
   // Returns if the proxy exists in  this vector.
@@ -76,7 +102,7 @@ public:
       this->begin();
     for (; iter != this->end(); ++iter)
       {
-      if (iter->Proxy == proxy)
+      if (iter->GetPointer()->Proxy == proxy)
         {
         return true;
         }
@@ -89,7 +115,7 @@ public:
       this->begin();
     for (; iter != this->end(); ++iter)
       {
-      if (iter->Proxy.GetPointer() == proxy)
+      if (iter->GetPointer()->Proxy.GetPointer() == proxy)
         {
         return iter;
         }
@@ -98,11 +124,11 @@ public:
     }
 };
 
+//-----------------------------------------------------------------------------
 class vtkSMProxyManagerProxyMapType:
   public vtkstd::map<vtkStdString, vtkSMProxyManagerProxyListType> {};
 
-
-
+//-----------------------------------------------------------------------------
 struct vtkSMProxyManagerInternals
 {
   // This data structure stores the XML elements (prototypes) from which

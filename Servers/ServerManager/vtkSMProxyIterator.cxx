@@ -19,7 +19,7 @@
 #include "vtkSMProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyIterator);
-vtkCxxRevisionMacro(vtkSMProxyIterator, "1.7");
+vtkCxxRevisionMacro(vtkSMProxyIterator, "1.8");
 
 struct vtkSMProxyIteratorInternals
 {
@@ -320,7 +320,7 @@ vtkSMProxy* vtkSMProxyIterator::GetProxy()
       if (this->Internals->ProxyIterator !=
         this->Internals->ProxyListIterator->second.end())
         {
-        return this->Internals->ProxyIterator->Proxy.GetPointer();
+        return this->Internals->ProxyIterator->GetPointer()->Proxy.GetPointer();
         }
       }
     }

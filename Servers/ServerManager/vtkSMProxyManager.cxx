@@ -93,7 +93,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.65");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.66");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -444,7 +444,7 @@ vtkSMProxy* vtkSMProxyManager::GetProxy(const char* group, const char* name)
       {
       if (it2->second.begin() != it2->second.end())
         {
-        return it2->second.front().Proxy.GetPointer();
+        return it2->second.front()->Proxy.GetPointer();
         }
       }
     }
@@ -464,7 +464,7 @@ vtkSMProxy* vtkSMProxyManager::GetProxy(const char* name)
       {
       if (it2->second.begin() != it2->second.end())
         {
-        return it2->second.front().Proxy.GetPointer();
+        return it2->second.front()->Proxy.GetPointer();
         }
       }
     }
@@ -502,7 +502,7 @@ void vtkSMProxyManager::GetProxies(const char* group,
       vtkSMProxyManagerProxyListType::iterator it3 = it2->second.begin();
       for (; it3 != it2->second.end(); ++it3)
         {
-        collection->AddItem(it3->Proxy);
+        collection->AddItem(it3->GetPointer()->Proxy);
         }
       }
     }
@@ -646,7 +646,7 @@ void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name,
       if (it3 != it2->second.end())
         {
         RegisteredProxyInformation info;
-        info.Proxy = it3->Proxy;
+        info.Proxy = it3->GetPointer()->Proxy;
         info.GroupName = it->first.c_str();
         info.ProxyName = it2->first.c_str();
         info.IsCompoundProxyDefinition = 0;
@@ -682,7 +682,7 @@ void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name)
           it2->second.begin();
 
         RegisteredProxyInformation info;
-        info.Proxy = it3->Proxy;
+        info.Proxy = it3->GetPointer()->Proxy;
         info.GroupName = it->first.c_str();
         info.ProxyName = it2->first.c_str();
         info.IsCompoundProxyDefinition = 0;
@@ -794,21 +794,20 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
     return;
     }
 
-  ProxyInfo temp;
-  proxy_list.push_back(temp);
-  ProxyInfo& obj = proxy_list.back();
-  obj.Proxy = proxy;
-  
-  // Add observers to note proxy modification.
-  obj.ModifiedObserverTag = proxy->AddObserver(vtkCommand::PropertyModifiedEvent,
-    this->Observer);
-  obj.UpdateObserverTag = proxy->AddObserver(vtkCommand::UpdateEvent,
-    this->Observer);
-  obj.UpdateInformationObserverTag = proxy->AddObserver(
-    vtkCommand::UpdateInformationEvent,
-    this->Observer);
+  vtkSMProxyManagerProxyInfo* proxyInfo = vtkSMProxyManagerProxyInfo::New();
+  proxy_list.push_back(proxyInfo);
+  proxyInfo->Delete();
 
-  // Note, these observer will be removed in the destructor of obj.
+  proxyInfo->Proxy = proxy;
+  // Add observers to note proxy modification.
+  proxyInfo->ModifiedObserverTag = proxy->AddObserver(
+    vtkCommand::PropertyModifiedEvent, this->Observer);
+  proxyInfo->UpdateObserverTag = proxy->AddObserver(vtkCommand::UpdateEvent,
+    this->Observer);
+  proxyInfo->UpdateInformationObserverTag = proxy->AddObserver(
+    vtkCommand::UpdateInformationEvent, this->Observer);
+
+  // Note, these observer will be removed in the destructor of proxyInfo.
 
   RegisteredProxyInformation info;
   info.Proxy = proxy;
@@ -836,10 +835,10 @@ void vtkSMProxyManager::UpdateRegisteredProxies(const char* groupname,
         {
         // Check is proxy is in the modified set.
         if (!modified_only || 
-          this->Internals->ModifiedProxies.find(it3->Proxy.GetPointer())
+          this->Internals->ModifiedProxies.find(it3->GetPointer()->Proxy.GetPointer())
           != this->Internals->ModifiedProxies.end())
           {
-          it3->Proxy.GetPointer()->UpdateVTKObjects();
+          it3->GetPointer()->Proxy.GetPointer()->UpdateVTKObjects();
           }
         }
       }
@@ -870,10 +869,10 @@ void vtkSMProxyManager::UpdateRegisteredProxies(int modified_only /*=1*/)
         {
         // Check is proxy is in the modified set.
         if (!modified_only || 
-          this->Internals->ModifiedProxies.find(it3->Proxy.GetPointer())
+          this->Internals->ModifiedProxies.find(it3->GetPointer()->Proxy.GetPointer())
           != this->Internals->ModifiedProxies.end())
           {
-          it3->Proxy.GetPointer()->UpdateVTKObjects();
+          it3->GetPointer()->Proxy.GetPointer()->UpdateVTKObjects();
           }
         }
       }
@@ -1218,28 +1217,28 @@ vtkPVXMLElement* vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
         = it2->second.begin();
       for (; it3 != it2->second.end(); ++it3)
         {
-        if (visited_proxies.find(it3->Proxy.GetPointer()) 
+        if (visited_proxies.find(it3->GetPointer()->Proxy.GetPointer()) 
           != visited_proxies.end())
           {
           // proxy has been saved.
           continue;
           }
-        if (proxySet && proxySet->find(it3->Proxy.GetPointer()) == proxySet->end())
+        if (proxySet && proxySet->find(it3->GetPointer()->Proxy.GetPointer()) == proxySet->end())
           {
           // proxy set was specified, and the indicated proxy
           // does not belong to that set.
           continue;
           }
         if (connectionID == vtkProcessModuleConnectionManager::GetNullConnectionID() || 
-          it3->Proxy.GetPointer()->GetConnectionID() == connectionID)
+          it3->GetPointer()->Proxy.GetPointer()->GetConnectionID() == connectionID)
           {
           vtkPVXMLElement* proxyElement = 
-            it3->Proxy.GetPointer()->SaveState(rootElement);
+            it3->GetPointer()->Proxy.GetPointer()->SaveState(rootElement);
           if (revival && proxyElement)
             {
-            it3->Proxy.GetPointer()->SaveRevivalState(proxyElement);
+            it3->GetPointer()->Proxy.GetPointer()->SaveRevivalState(proxyElement);
             }
-          visited_proxies.insert(it3->Proxy.GetPointer());
+          visited_proxies.insert(it3->GetPointer()->Proxy.GetPointer());
           }
         }
       }
@@ -1276,12 +1275,12 @@ vtkPVXMLElement* vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
           it2->second.begin();
         for (; it3 != it2->second.end(); ++it3)
           {
-          if (visited_proxies.find(it3->Proxy.GetPointer()) != visited_proxies.end())
+          if (visited_proxies.find(it3->GetPointer()->Proxy.GetPointer()) != visited_proxies.end())
             {
             vtkPVXMLElement* itemElement = vtkPVXMLElement::New();
             itemElement->SetName("Item");
             itemElement->AddAttribute("id", 
-              it3->Proxy.GetPointer()->GetSelfIDAsString());
+              it3->GetPointer()->Proxy.GetPointer()->GetSelfIDAsString());
             itemElement->AddAttribute("name", it2->first.c_str());
             collectionElement->AddNestedElement(itemElement);
             itemElement->Delete();
