@@ -138,10 +138,10 @@ void pqTextDisplayPropertiesWidget::setDisplay(pqRepresentation* display)
     this->Internal->Interactivity, "checked", SIGNAL(stateChanged(int)),
     proxy, proxy->GetProperty("Enabled"));
   this->Internal->Links.addPropertyLink(
-    this->Internal->Position1X, "value", SIGNAL(valueChanged(double)),
+    this->Internal->Position1X, "value", SIGNAL(editingFinished()),
     proxy, proxy->GetProperty("Position"), 0);
   this->Internal->Links.addPropertyLink(
-    this->Internal->Position1Y, "value", SIGNAL(valueChanged(double)),
+    this->Internal->Position1Y, "value", SIGNAL(editingFinished()),
     proxy, proxy->GetProperty("Position"), 1);
 
   this->Internal->Links.addPropertyLink(
@@ -165,11 +165,11 @@ void pqTextDisplayPropertiesWidget::setDisplay(pqRepresentation* display)
       proxy, proxy->GetProperty("Justification"));
 
   this->Internal->Links.addPropertyLink(
-    this->Internal->spinBoxSize, "value", SIGNAL(valueChanged(int)),
+    this->Internal->spinBoxSize, "value", SIGNAL(editingFinished()),
     proxy, proxy->GetProperty("FontSize"), 1);
 
   this->Internal->Links.addPropertyLink(
-      this->Internal->spinBoxOpacity, "value", SIGNAL(valueChanged(double)),
+      this->Internal->spinBoxOpacity, "value", SIGNAL(editingFinished()),
       proxy, proxy->GetProperty("Opacity"));
 
   QObject::connect(this->Internal->groupBoxLocation, SIGNAL(clicked(bool)),
