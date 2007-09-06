@@ -35,47 +35,74 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveRenderViewOptions.h"
 
-#include "pqApplicationCore.h"
-#include "pqRenderView.h"
-#include "pqSettingsDialog.h"
-#include "pqUndoStack.h"
-#include "pqView.h"
+#include <QPointer>
 
-#include <QWidget>
+#include "pqRenderViewOptions.h"
+#include "pqOptionsDialog.h"
 
+class pqActiveRenderViewOptions::pqInternal
+{
+public:
+  QPointer<pqOptionsDialog> Dialog;
+  pqRenderViewOptions* Options;
+};
 
 pqActiveRenderViewOptions::pqActiveRenderViewOptions(QObject *parentObject)
   : pqActiveViewOptions(parentObject)
 {
+  this->Internal = new pqInternal;
 }
 
 pqActiveRenderViewOptions::~pqActiveRenderViewOptions()
 {
+  delete this->Internal;
 }
 
 void pqActiveRenderViewOptions::showOptions(pqView *view,
     QWidget *widgetParent)
 {
-  pqSettingsDialog dialog(widgetParent);
-  dialog.setRenderView(qobject_cast<pqRenderView*>(view));
-  pqUndoStack *stack = pqApplicationCore::instance()->getUndoStack();
-  if(stack)
+  if(!this->Internal->Dialog)
     {
-    this->connect(&dialog, SIGNAL(beginUndo(const QString &)),
-        stack, SLOT(beginUndoSet(const QString &)));
-    this->connect(&dialog, SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
+    this->Internal->Dialog = new pqOptionsDialog(widgetParent);
+    this->Internal->Dialog->setApplyNeeded(true);
+    this->Internal->Dialog->setObjectName("ActiveRenderViewOptions");
+    this->Internal->Dialog->setWindowTitle("Render View Options");
+    this->Internal->Options = new pqRenderViewOptions;
+    this->Internal->Dialog->addOptions(this->Internal->Options);
+    QStringList pages = this->Internal->Options->getPageList();
+    if(pages.size())
+      {
+      this->Internal->Dialog->setCurrentPage(pages[0]);
+      }
+    
+    this->connect(this->Internal->Dialog, SIGNAL(finished(int)),
+        this, SLOT(finishDialog(int)));
     }
 
-  dialog.exec();
-  emit this->optionsClosed(this);
+  this->changeView(view);
+  this->Internal->Dialog->show();
 }
 
-void pqActiveRenderViewOptions::changeView(pqView *)
+void pqActiveRenderViewOptions::changeView(pqView *view)
 {
+  this->Internal->Options->setView(view);
 }
 
 void pqActiveRenderViewOptions::closeOptions()
 {
+  if(this->Internal->Dialog)
+    {
+    this->Internal->Dialog->accept();
+    }
+}
+
+void pqActiveRenderViewOptions::finishDialog(int result)
+{
+  if(result == QDialog::Accepted)
+    {
+    this->Internal->Dialog->applyChanges();
+    }
+  emit this->optionsClosed(this);
 }
 
 

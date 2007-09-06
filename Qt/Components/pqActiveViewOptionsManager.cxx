@@ -73,20 +73,16 @@ pqActiveViewOptionsManagerInternal::pqActiveViewOptionsManagerInternal()
 
 
 //----------------------------------------------------------------------------
-pqActiveViewOptionsManager::pqActiveViewOptionsManager(QObject *parentObject)
+pqActiveViewOptionsManager::pqActiveViewOptionsManager(QWidget *parentObject)
   : QObject(parentObject)
 {
   this->Internal = new pqActiveViewOptionsManagerInternal();
+  this->Internal->Parent = parentObject;
 }
 
 pqActiveViewOptionsManager::~pqActiveViewOptionsManager()
 {
   delete this->Internal;
-}
-
-void pqActiveViewOptionsManager::setMainWindow(QWidget *widgetParent)
-{
-  this->Internal->Parent = widgetParent;
 }
 
 void pqActiveViewOptionsManager::setRenderViewOptions(

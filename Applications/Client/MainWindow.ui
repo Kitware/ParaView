@@ -25,7 +25,7 @@
      <x>0</x>
      <y>0</y>
      <width>970</width>
-     <height>25</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp" >
@@ -157,7 +157,8 @@
     <addaction name="actionSelect_Frustum" />
     <addaction name="actionSelectFrustumPoints" />
     <addaction name="separator" />
-    <addaction name="actionEditView" />
+    <addaction name="actionEditSettings" />
+    <addaction name="actionEditViewSettings" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -784,9 +785,9 @@
     <string>Play Test</string>
    </property>
   </action>
-  <action name="actionEditView" >
+  <action name="actionEditSettings" >
    <property name="text" >
-    <string>&amp;Settings</string>
+    <string>Settings...</string>
    </property>
    <property name="iconText" >
     <string>Settings</string>
@@ -1162,6 +1163,11 @@
    </property>
    <property name="text" >
     <string>SelectFrustumPoints</string>
+   </property>
+  </action>
+  <action name="actionEditViewSettings" >
+   <property name="text" >
+    <string>View Settings...</string>
    </property>
   </action>
  </widget>

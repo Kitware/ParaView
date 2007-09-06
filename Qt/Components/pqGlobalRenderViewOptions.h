@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqActiveRenderViewOptions.h
+   Module:    pqGlobalRenderViewOptions.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,42 +30,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqActiveRenderViewOptions.h
-/// \date 7/31/2007
-
-#ifndef _pqActiveRenderViewOptions_h
-#define _pqActiveRenderViewOptions_h
-
+#ifndef _pqGlobalRenderViewOptions_h
+#define _pqGlobalRenderViewOptions_h
 
 #include "pqComponentsExport.h"
-#include "pqActiveViewOptions.h"
+#include "pqOptionsContainer.h"
 
-
-/// \class pqActiveRenderViewOptions
-/// \brief
-///   The pqActiveRenderViewOptions class is used to dislpay an
-///   options dialog for the render view.
-class PQCOMPONENTS_EXPORT pqActiveRenderViewOptions :
-    public pqActiveViewOptions
+/// options container for pages of render view options
+class PQCOMPONENTS_EXPORT pqGlobalRenderViewOptions : public pqOptionsContainer
 {
   Q_OBJECT
 
 public:
-  /// \brief
-  ///   Creates a render view options instance.
-  /// \param parent The parent object.
-  pqActiveRenderViewOptions(QObject *parent=0);
-  virtual ~pqActiveRenderViewOptions();
+  pqGlobalRenderViewOptions(QWidget *parent=0);
+  virtual ~pqGlobalRenderViewOptions();
 
-  /// \name pqActiveViewOptions Methods
-  //@{
-  virtual void showOptions(pqView *view, QWidget *parent=0);
-  virtual void changeView(pqView *view);
-  virtual void closeOptions();
-  //@}
+  // set the current page
+  virtual void setPage(const QString &page);
+  // return a list of strings for pages we have
+  virtual QStringList getPageList();
 
-protected slots:
-  void finishDialog(int);
+  // apply the changes
+  virtual void applyChanges();
+  // reset the changes
+  virtual void resetChanges();
+
+  // tell pqOptionsDialog that we want an apply button
+  virtual bool isApplyUsed() const { return true; }
+
+protected:
+  void init();
+
+private slots:
+  void lodThresholdSliderChanged(int);
+  void lodResolutionSliderChanged(int);
+  void outlineThresholdSliderChanged(int);
+  void compositeThresholdSliderChanged(int);
+  void subsamplingRateSliderChanged(int);
+  void squirtLevelRateSliderChanged(int);
+  void stillRenderSubsampleRateSliderChanged(int);
+  void clientCollectSliderChanged(int);
+  void resetDefaultCameraManipulators();
 
 private:
   class pqInternal;

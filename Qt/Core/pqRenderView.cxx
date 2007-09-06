@@ -303,7 +303,7 @@ void pqRenderView::setDefaultPropertyValues()
 
   proxy->UpdateVTKObjects();
 
-  this->restoreSettings();
+  this->restoreSettings(false);
   this->getRenderViewProxy()->ResetCamera();
   this->clearUndoStack();
 }
@@ -640,20 +640,24 @@ static const char* pqRenderViewModuleLightSettings [] = {
   NULL
   };
 
+static const char* pqGlobalRenderViewModuleMiscSettings [] = {
+  "LODThreshold",
+  "LODResolution",
+  "UseImmediateMode",
+  "UseTriangleStrips",
+  "RenderInterruptsEnabled",
+  "RemoteRenderThreshold",
+  "ImageReductionFactor",
+  "SquirtLevel",
+  "OrderedCompositing",
+  "StillRenderImageReductionFactor",
+  "CollectGeometryThreshold",
+  NULL
+  };
+
 static const char* pqRenderViewModuleMiscSettings [] = {
   "CacheLimit",
   "CameraParallelProjection",
-  "CollectGeometryThreshold",
-  "ImageReductionFactor",
-  "LODResolution",
-  "LODThreshold",
-  "OrderedCompositing",
-  "RemoteRenderThreshold",
-  "RenderInterruptsEnabled",
-  "SquirtLevel",
-  "StillRenderImageReductionFactor",
-  "UseImmediateMode",
-  "UseTriangleStrips",
   NULL
   };
 
@@ -661,6 +665,11 @@ static const char* pqRenderViewModuleMiscSettings [] = {
 static const char** pqRenderViewModuleSettings[] = {
   pqRenderViewModuleLightSettings,
   pqRenderViewModuleMiscSettings,
+  NULL
+  };
+
+static const char** pqGlobalRenderViewModuleSettings[] = {
+  pqGlobalRenderViewModuleMiscSettings,
   NULL
   };
 
@@ -681,7 +690,7 @@ static const char** pqRenderViewModuleSettingsMulti[] = {
 };
 
 //-----------------------------------------------------------------------------
-void pqRenderView::restoreSettings()
+void pqRenderView::restoreSettings(bool only_global)
 {
   vtkSMProxy* proxy = this->getProxy();
 
@@ -690,7 +699,38 @@ void pqRenderView::restoreSettings()
 
   const char*** str;
 
-  for(str=pqRenderViewModuleSettings; *str != NULL; str++)
+  if(!only_global)
+    {
+    for(str=pqRenderViewModuleSettings; *str != NULL; str++)
+      {
+      const char** substr;
+      for(substr = str[0]; *substr != NULL; substr++)
+        {
+        QString key = QString("renderModule/") + *substr;
+        vtkSMProperty* prop = proxy->GetProperty(*substr);
+        if (prop && settings->contains(key))
+          {
+          pqSMAdaptor::setElementProperty(prop, settings->value(key));
+          }
+        }
+      }
+    for(str=pqRenderViewModuleSettingsMulti; *str != NULL; str++)
+      {
+      const char** substr;
+      for(substr = str[0]; *substr != NULL; substr++)
+        {
+        QString key = QString("renderModule/") + *substr;
+        vtkSMProperty* prop = proxy->GetProperty(*substr);
+        if (prop && settings->contains(key))
+          {
+          QList<QVariant> value = settings->value(key).value<QList<QVariant> >();
+          pqSMAdaptor::setMultipleElementProperty(prop, value);
+          }
+        }
+      }
+    }
+  
+  for(str=pqGlobalRenderViewModuleSettings; *str != NULL; str++)
     {
     const char** substr;
     for(substr = str[0]; *substr != NULL; substr++)
@@ -703,60 +743,49 @@ void pqRenderView::restoreSettings()
         }
       }
     }
-  for(str=pqRenderViewModuleSettingsMulti; *str != NULL; str++)
-    {
-    const char** substr;
-    for(substr = str[0]; *substr != NULL; substr++)
-      {
-      QString key = QString("renderModule/") + *substr;
-      vtkSMProperty* prop = proxy->GetProperty(*substr);
-      if (prop && settings->contains(key))
-        {
-        QList<QVariant> value = settings->value(key).value<QList<QVariant> >();
-        pqSMAdaptor::setMultipleElementProperty(prop, value);
-        }
-      }
-    }
   proxy->UpdateVTKObjects();
-
-  // Orientation Axes settings.
-  QString key_prefix = "renderModule/OrientationAxes/";
-  if (settings->contains(key_prefix + "Visibility"))
+    
+  if(!only_global)
     {
-    this->setOrientationAxesVisibility(
-      settings->value(key_prefix + "Visibility").toBool());
-    }
-  if (settings->contains(key_prefix + "Interactivity"))
-    {
-    this->setOrientationAxesInteractivity(
-      settings->value(key_prefix + "Interactivity").toBool());
-    }
-  if (settings->contains(key_prefix + "OutlineColor"))
-    {
-    this->setOrientationAxesOutlineColor(
-      settings->value(key_prefix + "OutlineColor").value<QColor>());
-    }
-  if (settings->contains(key_prefix + "LabelColor"))
-    {
-    this->setOrientationAxesLabelColor(
-      settings->value(key_prefix + "LabelColor").value<QColor>());
-    }
-  
-  // Center Axes settings.
-  key_prefix = "renderModule/CenterAxes/";
-  if (settings->contains(key_prefix + "Visibility"))
-    {
-    this->setCenterAxesVisibility(
-      settings->value(key_prefix + "Visibility").toBool());
-    }
-  if (settings->contains(key_prefix + "ResetCenterWithCamera"))
-    {
-    this->ResetCenterWithCamera =
-      settings->value(key_prefix + "ResetCenterWithCamera").toBool();
+    // Orientation Axes settings.
+    QString key_prefix = "renderModule/OrientationAxes/";
+    if (settings->contains(key_prefix + "Visibility"))
+      {
+      this->setOrientationAxesVisibility(
+        settings->value(key_prefix + "Visibility").toBool());
+      }
+    if (settings->contains(key_prefix + "Interactivity"))
+      {
+      this->setOrientationAxesInteractivity(
+        settings->value(key_prefix + "Interactivity").toBool());
+      }
+    if (settings->contains(key_prefix + "OutlineColor"))
+      {
+      this->setOrientationAxesOutlineColor(
+        settings->value(key_prefix + "OutlineColor").value<QColor>());
+      }
+    if (settings->contains(key_prefix + "LabelColor"))
+      {
+      this->setOrientationAxesLabelColor(
+        settings->value(key_prefix + "LabelColor").value<QColor>());
+      }
+    
+    // Center Axes settings.
+    key_prefix = "renderModule/CenterAxes/";
+    if (settings->contains(key_prefix + "Visibility"))
+      {
+      this->setCenterAxesVisibility(
+        settings->value(key_prefix + "Visibility").toBool());
+      }
+    if (settings->contains(key_prefix + "ResetCenterWithCamera"))
+      {
+      this->ResetCenterWithCamera =
+        settings->value(key_prefix + "ResetCenterWithCamera").toBool();
+      }
     }
 
   // Active Camera Manipulators
-  key_prefix = "renderModule/InteractorStyle/";
+  QString key_prefix = "renderModule/InteractorStyle/";
   if (settings->contains(key_prefix + "CameraManipulators"))
     {
     QStringList qStrManipList = settings->value(

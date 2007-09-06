@@ -58,18 +58,9 @@ class PQCOMPONENTS_EXPORT pqActiveViewOptionsManager : public QObject
 public:
   /// \brief
   ///   Creates a view options manager.
-  /// \param parent The parent object.
-  pqActiveViewOptionsManager(QObject *parent=0);
+  /// \param parent The main window used when opening dialogs.
+  pqActiveViewOptionsManager(QWidget *parent=0);
   virtual ~pqActiveViewOptionsManager();
-
-  /// \brief
-  ///   Sets the main window pointer.
-  ///
-  /// The main window pointer is used as the parent widget when
-  /// opening the options dialogs.
-  ///
-  /// \param parent A pointer to the main window.
-  void setMainWindow(QWidget *parent);
 
   /// \brief
   ///   Sets the default render view options dialog handler.

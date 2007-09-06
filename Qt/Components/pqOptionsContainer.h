@@ -65,11 +65,11 @@ public:
   ///   Sets the currently displayed page.
   /// \param page The page hierarchy name.
   virtual void setPage(const QString &page) = 0;
-
+  
   /// \brief
   ///   Gets the list of available pages in the container.
   /// \param pages Used to return the list of available pages.
-  virtual void getPageList(QStringList &pages) = 0;
+  virtual QStringList getPageList() = 0;
 };
 
 #endif

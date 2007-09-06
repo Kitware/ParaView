@@ -356,8 +356,9 @@ void pqChartOptionsEditor::setPage(const QString &page)
     }
 }
 
-void pqChartOptionsEditor::getPageList(QStringList &pages)
+QStringList pqChartOptionsEditor::getPageList()
 {
+  QStringList pages;
   pages.append("General");
   pages.append("Left Axis");
   pages.append("Left Axis.Layout");
@@ -371,6 +372,7 @@ void pqChartOptionsEditor::getPageList(QStringList &pages)
   pages.append("Top Axis");
   pages.append("Top Axis.Layout");
   pages.append("Top Axis.Title");
+  return pages;
 }
 
 void pqChartOptionsEditor::getTitle(QString &title) const

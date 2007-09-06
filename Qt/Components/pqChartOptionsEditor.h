@@ -70,7 +70,7 @@ public:
   /// \name pqOptionsContainer Methods
   //@{
   virtual void setPage(const QString &page);
-  virtual void getPageList(QStringList &pages);
+  virtual QStringList getPageList();
   //@}
 
   /// \name Chart Title Parameters

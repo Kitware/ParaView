@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqApplicationSettingsWidget.cxx
+   Module:    pqApplicationOptions.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -28,32 +28,32 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-========================================================================*/
-#include "pqApplicationSettingsWidget.h"
-#include "ui_pqApplicationSettingsWidget.h"
+=========================================================================*/
 
-// Server Manager Includes.
 
-// Qt Includes.
+#include "pqApplicationOptions.h"
+#include "ui_pqApplicationOptions.h"
 
-// ParaView Includes.
 #include "pqApplicationCore.h"
+#include "pqViewModuleInterface.h"
+#include "pqSettings.h"
 #include "pqPluginManager.h"
 #include "pqRenderView.h"
-#include "pqSettings.h"
-#include "pqViewModuleInterface.h"
-
-class pqApplicationSettingsWidget::pqInternal : public Ui::ApplicationSettingsWidget
+  
+class pqApplicationOptions::pqInternal 
+  : public Ui::pqApplicationOptions
 {
+public:
 };
 
-//-----------------------------------------------------------------------------
-pqApplicationSettingsWidget::pqApplicationSettingsWidget(QWidget* _parent)
-: Superclass(_parent)
-{
-  this->Internal = new pqInternal();
-  this->Internal->setupUi(this);
 
+//----------------------------------------------------------------------------
+pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
+  : pqOptionsContainer(widgetParent)
+{
+  this->Internal = new pqInternal;
+  this->Internal->setupUi(this);
+  
   this->Internal->DefaultViewType->addItem("None", "None");
   // Get available view types.
   QObjectList ifaces =
@@ -79,26 +79,64 @@ pqApplicationSettingsWidget::pqApplicationSettingsWidget(QWidget* _parent)
       }
     } 
 
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  QString curView = settings->value("/defaultViewType", 
-    pqRenderView::renderViewType()).toString();
-  int index = this->Internal->DefaultViewType->findData(curView);
-  index = (index==-1)? 0 : index;
-  this->Internal->DefaultViewType->setCurrentIndex(index);
+  // start fresh
+  this->resetChanges();
+
+  // enable the apply button when things are changed
+  QObject::connect(this->Internal->DefaultViewType,
+                  SIGNAL(currentIndexChanged(int)),
+                  this, SIGNAL(changesAvailable()));
 }
 
-//-----------------------------------------------------------------------------
-pqApplicationSettingsWidget::~pqApplicationSettingsWidget()
+pqApplicationOptions::~pqApplicationOptions()
 {
   delete this->Internal;
 }
 
-//-----------------------------------------------------------------------------
-void pqApplicationSettingsWidget::accept()
+void pqApplicationOptions::setPage(const QString &page)
+{
+  int count = this->Internal->stackedWidget->count();
+  for(int i=0; i<count; i++)
+    {
+    if(this->Internal->stackedWidget->widget(i)->objectName() == page)
+      {
+      this->Internal->stackedWidget->setCurrentIndex(i);
+      break;
+      }
+    }
+}
+
+QStringList pqApplicationOptions::getPageList()
+{
+  QStringList pages;
+
+  int count = this->Internal->stackedWidget->count();
+  for(int i=0; i<count; i++)
+    {
+    pages << this->Internal->stackedWidget->widget(i)->objectName();
+    }
+  return pages;
+}
+  
+void pqApplicationOptions::applyChanges()
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  settings->setValue("/defaultViewType", 
+  settings->setValue("defaultViewType", 
     this->Internal->DefaultViewType->itemData(
       this->Internal->DefaultViewType->currentIndex()));
+
+
+}
+
+void pqApplicationOptions::resetChanges()
+{
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+
+  QString curView = settings->value("defaultViewType", 
+      pqRenderView::renderViewType()).toString();
+  int index = this->Internal->DefaultViewType->findData(curView);
+  index = (index==-1)? 0 : index;
+  this->Internal->DefaultViewType->setCurrentIndex(index);
+
 }
 

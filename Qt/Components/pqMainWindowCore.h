@@ -338,6 +338,7 @@ public slots:
 
   // Called to show the settings dialog.
   void onEditSettings();
+  void onEditViewSettings();
 
   // invoke the dialog to manage plugins
   void onManagePlugins();

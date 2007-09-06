@@ -106,7 +106,7 @@ public:
   virtual void saveSettings();
 
   /// Apply the settings from QSettings to this render module
-  virtual void restoreSettings();
+  virtual void restoreSettings(bool only_global);
 
   /// Get if the orientation axes is visible.
   bool getOrientationAxesVisibility() const;

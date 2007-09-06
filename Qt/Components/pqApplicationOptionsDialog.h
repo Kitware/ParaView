@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqApplicationSettingsWidget.h
+   Module:    pqApplicationOptionsDialog.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -28,36 +28,25 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-========================================================================*/
-#ifndef __pqApplicationSettingsWidget_h 
-#define __pqApplicationSettingsWidget_h
+=========================================================================*/
 
-#include <QWidget>
+#ifndef _pqApplicationOptionsDialog_h
+#define _pqApplicationOptionsDialog_h
+
+
 #include "pqComponentsExport.h"
+#include "pqOptionsDialog.h"
 
-/// pqApplicationSettingsWidget is the widget used in the pqSettingsDialog to
-/// show application settings.
-class PQCOMPONENTS_EXPORT pqApplicationSettingsWidget : public QWidget
+
+/// dialog class that allows editing of application wide settings
+class PQCOMPONENTS_EXPORT pqApplicationOptionsDialog : public pqOptionsDialog
 {
   Q_OBJECT
-  typedef QWidget Superclass;
+
 public:
-  pqApplicationSettingsWidget(QWidget* parent=0);
-  virtual ~pqApplicationSettingsWidget();
-
-public slots:
-  /// Called to accept all user changes.
-  void accept();
-
-private:
-  pqApplicationSettingsWidget(const pqApplicationSettingsWidget&); // Not implemented.
-  void operator=(const pqApplicationSettingsWidget&); // Not implemented.
-
-  class pqInternal;
-  pqInternal* Internal;
+  pqApplicationOptionsDialog(QWidget *parent=0);
+  ~pqApplicationOptionsDialog();
 
 };
 
 #endif
-
-

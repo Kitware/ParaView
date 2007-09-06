@@ -4,7 +4,8 @@
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Clip" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuEdit" command="activate" arguments="actionEditView" />
-  <pqevent object="MainWindow/pqSettingsDialog/tabWidget/1QStackedWidget0/pq3DViewProperties/tabWidget/1QStackedWidget0/tab/groupBox_2/parallelProjection" command="set_boolean" arguments="true" />
-  <pqevent object="MainWindow/pqSettingsDialog/okButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuEdit" command="activate" arguments="actionEditViewSettings" />
+  <pqevent object="MainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/General/parallelProjection" command="set_boolean" arguments="true" />
+  <pqevent object="MainWindow/ActiveRenderViewOptions/ApplyButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/ActiveRenderViewOptions/CloseButton" command="activate" arguments="" />
 </pqevents>

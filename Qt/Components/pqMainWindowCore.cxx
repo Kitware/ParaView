@@ -52,6 +52,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveServer.h"
 #include "pqActiveView.h"
 #include "pqActiveViewOptionsManager.h"
+#include "pqActiveRenderViewOptions.h"
+#include "pqActiveChartOptions.h"
 #include "pqAnimationManager.h"
 #include "pqAnimationPanel.h"
 #include "pqAnimationViewWidget.h"
@@ -98,6 +100,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyTabWidget.h"
 #include "pqReaderFactory.h"
 #include "pqRenderView.h"
+#include "pqApplicationOptionsDialog.h"
 
 #include "pqSelectionInspectorPanel.h"
 
@@ -111,7 +114,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerStartupBrowser.h"
 #include "pqServerStartup.h"
 #include "pqServerStartups.h"
-#include "pqSettingsDialog.h"
 #include "pqSettings.h"
 #include "pqSimpleServerStartup.h"
 #include "pqSMAdaptor.h"
@@ -334,6 +336,8 @@ public:
 #ifdef PARAVIEW_ENABLE_PYTHON
   QPointer<pqPythonDialog> PythonDialog;
 #endif // PARAVIEW_ENABLE_PYTHON
+  
+  QPointer<pqApplicationOptionsDialog> ApplicationSettings;
 
   pqCoreTestUtility TestUtility;
   pqActiveServer ActiveServer;
@@ -1389,13 +1393,20 @@ pqActiveViewOptionsManager* pqMainWindowCore::getActiveViewOptionsManager()
   if(!this->Implementation->ActiveViewOptions)
     {
     this->Implementation->ActiveViewOptions =
-        new pqActiveViewOptionsManager(this);
-    this->Implementation->ActiveViewOptions->setMainWindow(
-        this->Implementation->Parent);
+        new pqActiveViewOptionsManager(this->Implementation->Parent);
     this->Implementation->ActiveViewOptions->setActiveView(
         pqActiveView::instance().current());
     this->connect(&pqActiveView::instance(), SIGNAL(changed(pqView *)),
         this->Implementation->ActiveViewOptions, SLOT(setActiveView(pqView *)));
+
+    this->Implementation->ActiveViewOptions->setRenderViewOptions(
+      new pqActiveRenderViewOptions(this->Implementation->ActiveViewOptions));
+    pqActiveChartOptions *chartOptions = new pqActiveChartOptions(
+      this->Implementation->ActiveViewOptions);
+    this->Implementation->ActiveViewOptions->registerOptions(
+      pqPlotView::barChartType(), chartOptions);
+    this->Implementation->ActiveViewOptions->registerOptions(
+      pqPlotView::XYPlotType(), chartOptions);
     }
 
   return this->Implementation->ActiveViewOptions;
@@ -2589,10 +2600,25 @@ void pqMainWindowCore::onHelpEnableTooltips(bool enabled)
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::onEditSettings()
+void pqMainWindowCore::onEditViewSettings()
 {
   pqActiveViewOptionsManager *manager = this->getActiveViewOptionsManager();
   manager->showOptions();
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onEditSettings()
+{
+  if(!this->Implementation->ApplicationSettings)
+    {
+    this->Implementation->ApplicationSettings = 
+      new pqApplicationOptionsDialog(this->Implementation->Parent);
+    this->Implementation->ApplicationSettings->setObjectName("ApplicationSettings");
+    this->Implementation->ApplicationSettings->setAttribute(Qt::WA_QuitOnClose, false);
+    }
+  
+  this->Implementation->ApplicationSettings->show();
+  this->Implementation->ApplicationSettings->raise();
 }
 
 //-----------------------------------------------------------------------------

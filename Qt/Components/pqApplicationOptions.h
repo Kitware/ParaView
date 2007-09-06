@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pq3DViewPropertiesWidget.h
+   Module:    pqApplicationOptions.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,46 +29,38 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pq3DViewPropertiesWidget_h
-#define __pq3DViewPropertiesWidget_h
 
-#include<QWidget>
+#ifndef _pqApplicationOptions_h
+#define _pqApplicationOptions_h
+
 #include "pqComponentsExport.h"
+#include "pqOptionsContainer.h"
 
-class pq3DViewPropertiesWidgetInternal;
-class pqRenderView;
-
-class PQCOMPONENTS_EXPORT pq3DViewPropertiesWidget : public QWidget
+/// options container for pages of render view options
+class PQCOMPONENTS_EXPORT pqApplicationOptions : public pqOptionsContainer
 {
   Q_OBJECT
+
 public:
-  pq3DViewPropertiesWidget(QWidget* parent=0);
-  virtual ~pq3DViewPropertiesWidget();
+  pqApplicationOptions(QWidget *parent=0);
+  virtual ~pqApplicationOptions();
 
-  // Set the render module whose properties this widget is editing.
-  void setRenderView(pqRenderView*);
+  // set the current page
+  virtual void setPage(const QString &page);
+  // return a list of strings for pages we have
+  virtual QStringList getPageList();
 
-public slots:
-  // call to accept the changes in the widget.
-  void accept();
+  // apply the changes
+  virtual void applyChanges();
+  // reset the changes
+  virtual void resetChanges();
 
-private slots:
-  void lodThresholdSliderChanged(int);
-  void lodResolutionSliderChanged(int);
-  void outlineThresholdSliderChanged(int);
-  void compositeThresholdSliderChanged(int);
-  void subsamplingRateSliderChanged(int);
-  void squirtLevelRateSliderChanged(int);
-  void stillRenderSubsampleRateSliderChanged(int);
-  void clientCollectSliderChanged(int);
-  void restoreDefaultBackground();
-  void resetLights();
-  void resetDefaultCameraManipulators();
+  // tell pqOptionsDialog that we want an apply button
+  virtual bool isApplyUsed() const { return true; }
 
 private:
-  pq3DViewPropertiesWidgetInternal* Internal;
+  class pqInternal;
+  pqInternal* Internal;
 };
 
-
 #endif
-
