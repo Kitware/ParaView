@@ -5063,7 +5063,7 @@
       <!-- End of BarChartRepresentation -->
     </ClientDeliveryRepresentationProxy>
 
-    <ClientDeliveryRepresentationProxy name="XYPlotRepresentation"
+    <XYPlotRepresentationProxy name="XYPlotRepresentation"
       base_proxygroup="representations" 
       base_proxyname="ClientDeliveryRepresentationBase">
       <Documentation>
@@ -5079,16 +5079,6 @@
           <Group name="filters"/>
           <Group name="glyph_sources" />
         </ProxyGroupDomain>
-
-        <InputArrayDomain name="input_array_cell"
-          attribute_type="cell"
-          number_of_components="0">
-        </InputArrayDomain>
-
-        <InputArrayDomain name="input_array_point"
-          attribute_type="point"
-          number_of_components="0">
-        </InputArrayDomain>
 
         <DataTypeDomain name="input_type">
           <DataType value="vtkRectilinearGrid"/>
@@ -5111,77 +5101,6 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
-      <StringVectorProperty name="YCellArrayStatus"
-         repeat_command="1"
-         number_of_elements_per_command="11"
-         element_types="2 2 0 0 1 1 1 0 0 0 0" >
-           <Documentation>
-             Set the cell array to use on Y axis (arrayname, legendname, 
-             enabled, inlegend, r, g, b, thickness, linestyle, axesindex, 
-            component)
-           </Documentation>
-          <ArraySelectionDomain name="array_list">
-            <RequiredProperties>
-              <Property name="CellArrayInfo" function="ArrayList" />
-            </RequiredProperties>
-          </ArraySelectionDomain>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="YPointArrayStatus"
-         repeat_command="1"
-         number_of_elements_per_command="11"
-         element_types="2 2 0 0 1 1 1 0 0 0 0" >
-          <Documentation>
-            Set the cell array to use on Y axis (arrayname, legendname, 
-            enabled, inlegend, r, g, b, thickness, linestyle, axesindex, 
-            component)
-          </Documentation>
-          <ArraySelectionDomain name="array_list">
-            <RequiredProperties>
-              <Property name="PointArrayInfo" function="ArrayList" />
-            </RequiredProperties>
-          </ArraySelectionDomain>
-      </StringVectorProperty>
-
-      <StringVectorProperty 
-         name="CellArrayInfo"
-         number_of_elements_per_command="1"
-         element_types="2"
-         update_self="1"
-         information_only="1">
-
-         <ArrayListInformationHelper 
-           list_domain_name="array_list" />
-
-         <ArrayListDomain name="array_list" 
-           attribute_type="Scalars"
-           input_domain_name="input_array_cell">
-           <RequiredProperties>
-              <Property name="Input" function="Input"/>
-           </RequiredProperties>
-         </ArrayListDomain>
-      </StringVectorProperty>
-
-      <StringVectorProperty 
-         name="PointArrayInfo"
-         update_self="1"
-         number_of_elements_per_command="1"
-         element_types="2"
-         information_only="1">
-
-         <ArrayListInformationHelper 
-           list_domain_name="array_list" />
-
-         <ArrayListDomain name="array_list" 
-           attribute_type="Scalars"
-           input_domain_name="input_array_point">
-           <RequiredProperties>
-              <Property name="Input" function="Input"/>
-           </RequiredProperties>
-         </ArrayListDomain>
-
-      </StringVectorProperty>
-
       <IntVectorProperty name="UseYCellArrayIndex" 
          number_of_elements="1"
          default_values="1">
@@ -5198,49 +5117,145 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
-      <StringVectorProperty name="XCellArrayName"
-         number_of_elements="1">
-         <!-- Set the array to use on X axis. This is used only if
-          UseYCellArrayIndex is set to 0 -->
-         <ArrayListDomain name="array_list" 
-           attribute_type="Scalars"
-           input_domain_name="input_array_cell">
-           <RequiredProperties>
-              <Property name="Input" function="Input"/>
-           </RequiredProperties>
-         </ArrayListDomain>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="XPointArrayName"
-         number_of_elements="1">
-         <!-- Set the array to use on X axis. This is used only if
-          UseYPointArrayIndex is set to 0 -->
-         <ArrayListDomain name="array_list" 
-           attribute_type="Scalars"
-           input_domain_name="input_array_point">
-           <RequiredProperties>
-              <Property name="Input" function="Input"/>
-           </RequiredProperties>
-         </ArrayListDomain>
-      </StringVectorProperty>
-
-      <IntVectorProperty name="XCellArrayComponent"
-        number_of_elements="1"
-        default_values="-2">
-      </IntVectorProperty>
-
-      <IntVectorProperty name="XPointArrayComponent"
-        number_of_elements="1"
-        default_values="-2">
-      </IntVectorProperty>
-
       <SubProxy>
         <Proxy name="PostProcessor" 
           proxygroup="filters" proxyname="PolyLineToRectilinearGrid">
         </Proxy>
       </SubProxy>
+
+      <SubProxy>
+        <Proxy name="DummyConsumer">
+          <ProxyProperty name="Input">
+            <InputArrayDomain name="input_array_cell"
+              attribute_type="cell"
+              number_of_components="0">
+            </InputArrayDomain>
+
+            <InputArrayDomain name="input_array_point"
+              attribute_type="point"
+              number_of_components="0">
+            </InputArrayDomain>
+          </ProxyProperty>
+
+          <StringVectorProperty name="YCellArrayStatus"
+             repeat_command="1"
+             number_of_elements_per_command="11"
+             element_types="2 2 0 0 1 1 1 0 0 0 0" >
+               <Documentation>
+                 Set the cell array to use on Y axis (arrayname, legendname, 
+                 enabled, inlegend, r, g, b, thickness, linestyle, axesindex, 
+                component)
+               </Documentation>
+              <ArraySelectionDomain name="array_list">
+                <RequiredProperties>
+                  <Property name="CellArrayInfo" function="ArrayList" />
+                </RequiredProperties>
+              </ArraySelectionDomain>
+          </StringVectorProperty>
+
+          <StringVectorProperty name="YPointArrayStatus"
+             repeat_command="1"
+             number_of_elements_per_command="11"
+             element_types="2 2 0 0 1 1 1 0 0 0 0" >
+              <Documentation>
+                Set the cell array to use on Y axis (arrayname, legendname, 
+                enabled, inlegend, r, g, b, thickness, linestyle, axesindex, 
+                component)
+              </Documentation>
+              <ArraySelectionDomain name="array_list">
+                <RequiredProperties>
+                  <Property name="PointArrayInfo" function="ArrayList" />
+                </RequiredProperties>
+              </ArraySelectionDomain>
+          </StringVectorProperty>
+
+          <StringVectorProperty 
+             name="CellArrayInfo"
+             number_of_elements_per_command="1"
+             element_types="2"
+             update_self="1"
+             information_only="1">
+
+             <ArrayListInformationHelper 
+               list_domain_name="array_list" />
+
+             <ArrayListDomain name="array_list" 
+               attribute_type="Scalars"
+               input_domain_name="input_array_cell">
+               <RequiredProperties>
+                  <Property name="Input" function="Input"/>
+               </RequiredProperties>
+             </ArrayListDomain>
+          </StringVectorProperty>
+
+          <StringVectorProperty 
+             name="PointArrayInfo"
+             update_self="1"
+             number_of_elements_per_command="1"
+             element_types="2"
+             information_only="1">
+
+             <ArrayListInformationHelper 
+               list_domain_name="array_list" />
+
+             <ArrayListDomain name="array_list" 
+               attribute_type="Scalars"
+               input_domain_name="input_array_point">
+               <RequiredProperties>
+                  <Property name="Input" function="Input"/>
+               </RequiredProperties>
+             </ArrayListDomain>
+          </StringVectorProperty>
+
+          <StringVectorProperty name="XCellArrayName"
+             number_of_elements="1">
+             <!-- Set the array to use on X axis. This is used only if
+              UseYCellArrayIndex is set to 0 -->
+             <ArrayListDomain name="array_list" 
+               attribute_type="Scalars"
+               input_domain_name="input_array_cell">
+               <RequiredProperties>
+                  <Property name="Input" function="Input"/>
+               </RequiredProperties>
+             </ArrayListDomain>
+          </StringVectorProperty>
+
+          <StringVectorProperty name="XPointArrayName"
+             number_of_elements="1">
+             <!-- Set the array to use on X axis. This is used only if
+              UseYPointArrayIndex is set to 0 -->
+             <ArrayListDomain name="array_list" 
+               attribute_type="Scalars"
+               input_domain_name="input_array_point">
+               <RequiredProperties>
+                  <Property name="Input" function="Input"/>
+               </RequiredProperties>
+             </ArrayListDomain>
+          </StringVectorProperty>
+
+          <IntVectorProperty name="XCellArrayComponent"
+            number_of_elements="1"
+            default_values="-2">
+          </IntVectorProperty>
+
+          <IntVectorProperty name="XPointArrayComponent"
+            number_of_elements="1"
+            default_values="-2">
+          </IntVectorProperty>
+        </Proxy>
+        <ExposedProperties>
+          <Property name="YCellArrayStatus" />
+          <Property name="YPointArrayStatus" />
+          <Property name="CellArrayInfo" />
+          <Property name="PointArrayInfo" />
+          <Property name="XCellArrayName" />
+          <Property name="XPointArrayName" />
+          <Property name="XCellArrayComponent" />
+          <Property name="XPointArrayComponent" />
+        </ExposedProperties>
+      </SubProxy>
       <!-- End of XYPlotRepresentation -->
-    </ClientDeliveryRepresentationProxy>
+    </XYPlotRepresentationProxy>
 
     <BlockDeliveryRepresentationProxy name="BlockDeliveryRepresentation">
       <Documentation>

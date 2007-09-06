@@ -175,6 +175,7 @@ SET(Kit_SRCS
   vtkSMXDMFInformationHelper.cxx
   vtkSMXDMFPropertyDomain.cxx
   vtkSMXMLPVAnimationWriterProxy.cxx
+  vtkSMXYPlotRepresentationProxy.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS
