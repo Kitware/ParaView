@@ -957,9 +957,10 @@ static void setupValidator(QLineEdit* lineEdit, QVariant::Type type)
     }
 }
 
-static QLabel* createPanelLabel(QWidget* parent, QString text)
+static QLabel* createPanelLabel(QWidget* parent, QString text, QString pname)
 {
   QLabel* label = new QLabel(parent);
+  label->setObjectName(pname+QString("_label"));
   label->setText(text);
   label->setWordWrap(true);
   return label;
@@ -1082,7 +1083,8 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
       QComboBox* combo = new QComboBox(panelLayout->parentWidget());
       combo->setObjectName(propertyName);
       QLabel* label = createPanelLabel(panelLayout->parentWidget(),
-                                       propertyLabel);
+                                       propertyLabel,
+                                       propertyName);
       panelLayout->addWidget(label, rowCount, 0, 1, 1);
       panelLayout->addWidget(combo, rowCount, 1, 1, 1);
       rowCount++;
@@ -1140,7 +1142,8 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
           QComboBox* combo = new QComboBox(panelLayout->parentWidget());
           combo->setObjectName(propertyName);
           QLabel* label = createPanelLabel(panelLayout->parentWidget(),
-            propertyLabel);
+                                           propertyLabel,
+                                           propertyName);
           panelLayout->addWidget(label, rowCount, 0, 1, 1);
           panelLayout->addWidget(combo, rowCount, 1, 1, 1);
           }
@@ -1195,7 +1198,8 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
         QComboBox* combo = new QComboBox(panelLayout->parentWidget());
         combo->setObjectName(propertyName);
         QLabel* label = createPanelLabel(panelLayout->parentWidget(),
-                                         propertyLabel);
+                                         propertyLabel,
+                                         propertyName);
         
         panelLayout->addWidget(label, rowCount, 0, 1, 1);
         panelLayout->addWidget(combo, rowCount, 1, 1, 1);
@@ -1206,7 +1210,8 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
               propertyDomain[0].isValid() && propertyDomain[1].isValid())
         {
         QLabel* label = createPanelLabel(panelLayout->parentWidget(),
-                                         propertyLabel);
+                                         propertyLabel,
+                                         propertyName);
         QSlider* slider;
         slider = new QSlider(Qt::Horizontal, panelLayout->parentWidget());
         slider->setObjectName(QString(propertyName) + "_Slider");
@@ -1235,7 +1240,8 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
         range[1] = propertyDomain[1].toDouble();
         */
         QLabel* label = createPanelLabel(panelLayout->parentWidget(),
-                                         propertyLabel);
+                                         propertyLabel,
+                                         propertyName);
         /*
         QDoubleSpinBox* spinBox;
         spinBox = new QDoubleSpinBox(panelLayout->parentWidget());
@@ -1278,7 +1284,8 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
           setupValidator(lineEdit, elem_property.type()); 
           
           QLabel* label = createPanelLabel(panelLayout->parentWidget(),
-                                           propertyLabel);
+                                           propertyLabel,
+                                           propertyName);
           
           panelLayout->addWidget(label, rowCount, 0, 1, 1);
           panelLayout->addWidget(lineEdit, rowCount, 1, 1, 1);
@@ -1295,7 +1302,8 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
           textEdit->setLineWrapMode(QTextEdit::NoWrap);
           
           QLabel* label = createPanelLabel(panelLayout->parentWidget(),
-                                           QString(propertyLabel)+":");
+                                           QString(propertyLabel)+":",
+                                           propertyName);
           
           panelLayout->addWidget(label, rowCount, 0, 1, 2);
           rowCount++;
@@ -1314,7 +1322,8 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
       domain = pqSMAdaptor::getMultipleElementPropertyDomain(SMProperty);
       
       QLabel* label = createPanelLabel(panelLayout->parentWidget(),
-                                       propertyLabel);
+                                       propertyLabel,
+                                       propertyName);
       panelLayout->addWidget(label, rowCount, 0, 1, 1);
       QGridLayout* glayout = new QGridLayout;
       glayout->setSpacing(0);
@@ -1436,7 +1445,8 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
       chooser->setServer(m->findServer(pxy->GetConnectionID()));
       chooser->setObjectName(propertyName);
       QLabel* label = createPanelLabel(panelLayout->parentWidget(),
-                                       propertyLabel);
+                                       propertyLabel,
+                                       propertyName);
       
       panelLayout->addWidget(label, rowCount, 0, 1, 1);
       panelLayout->addWidget(chooser, rowCount, 1, 1, 1);
@@ -1445,7 +1455,8 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
     else if(pt == pqSMAdaptor::FIELD_SELECTION)
       {
       QLabel* label = createPanelLabel(panelLayout->parentWidget(),
-                                       "Scalars");
+                                       "Scalars",
+                                       propertyName);
       QComboBox* combo = new QComboBox(panelLayout->parentWidget());
       combo->setObjectName(QString(propertyName));
       panelLayout->addWidget(label, rowCount, 0, 1, 1);
