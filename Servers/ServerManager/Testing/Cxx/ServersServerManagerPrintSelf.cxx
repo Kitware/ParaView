@@ -73,7 +73,6 @@
 #include "vtkSMObject.h"
 #include "vtkSMOrderedPropertyIterator.h"
 #include "vtkSMPart.h"
-#include "vtkSMPluginLoader.h"
 #include "vtkSMPQStateLoader.h"
 #include "vtkSMPropertyAdaptor.h"
 #include "vtkSMProperty.h"
@@ -217,7 +216,6 @@ int main(int , char *[])
   c = vtkSMObject::New(); c->Print( cout ); c->Delete();
   c = vtkSMOrderedPropertyIterator::New(); c->Print( cout ); c->Delete();
   c = vtkSMPart::New(); c->Print( cout ); c->Delete();
-  c = vtkSMPluginLoader::New(); c->Print( cout ); c->Delete();
   c = vtkSMPQStateLoader::New(); c->Print( cout ); c->Delete();
   c = vtkSMPropertyAdaptor::New(); c->Print( cout ); c->Delete();
   c = vtkSMProperty::New(); c->Print( cout ); c->Delete();

@@ -92,11 +92,11 @@ MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name XMLFile)
   ENDIF(HDRS)
   
   CONFIGURE_FILE(
-    "${ParaView_SOURCE_DIR}/Servers/ServerManager/vtkSMPluginInit.cxx.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/vtkSMPluginInit_${Name}.cxx" @ONLY)
+    "${ParaView_SOURCE_DIR}/Servers/Common/vtkPVPluginInit.cxx.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/vtkPVPluginInit_${Name}.cxx" @ONLY)
 
   SET(${OUTSRCS} ${CS_SRCS} ${XML_HEADER}
-    ${CMAKE_CURRENT_BINARY_DIR}/vtkSMPluginInit_${Name}.cxx
+    ${CMAKE_CURRENT_BINARY_DIR}/vtkPVPluginInit_${Name}.cxx
     )
   
 ENDMACRO(ADD_SERVER_MANAGER_EXTENSION)

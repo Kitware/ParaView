@@ -42,6 +42,7 @@
 #include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVOptionsXMLParser.h"
+#include "vtkPVPluginLoader.h"
 #include "vtkPVProgressHandler.h"
 #include "vtkPVSelectionInformation.h"
 #include "vtkPVServerInformation.h"
@@ -87,6 +88,7 @@ int main(int, char * [])
   c = vtkPVFileInformation::New(); c->Print(cout); c->Delete();
   c = vtkPVFileInformationHelper::New(); c->Print(cout); c->Delete();
   c = vtkPVInformation::New(); c->Print(cout); c->Delete();
+  c = vtkPVPluginLoader::New(); c->Print( cout ); c->Delete();
   c = vtkPVProgressHandler::New(); c->Print(cout); c->Delete();
   c = vtkPVOptions::New(); c->Print(cout); c->Delete();
   c = vtkPVOptionsXMLParser::New(); c->Print(cout); c->Delete();

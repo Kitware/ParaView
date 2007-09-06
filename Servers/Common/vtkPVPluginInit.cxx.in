@@ -4,7 +4,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMPluginInit.cxx.in
+  Module:    vtkPVPluginInit.cxx.in
 
   Copyright (c) Kitware, Inc.
   All rights reserved.

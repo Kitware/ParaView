@@ -49,6 +49,7 @@ SET(Kit_SRCS
   vtkPVInformation.cxx
   vtkPVNumberOfOutputsInformation.cxx
   vtkPVOpenGLExtensionsInformation.cxx
+  vtkPVPluginLoader.cxx
   vtkPVProgressHandler.cxx
   vtkPVSelectionInformation.cxx
   vtkPVServerInformation.cxx

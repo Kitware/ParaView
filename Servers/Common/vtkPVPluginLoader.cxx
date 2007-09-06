@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMPluginLoader.cxx
+  Module:    vtkPVPluginLoader.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,15 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMPluginLoader.h"
+#include "vtkPVPluginLoader.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkClientServerInterpreter.h"
 #include "vtkDynamicLoader.h"
 
-vtkStandardNewMacro(vtkSMPluginLoader);
-vtkCxxRevisionMacro(vtkSMPluginLoader, "1.7");
+vtkStandardNewMacro(vtkPVPluginLoader);
+vtkCxxRevisionMacro(vtkPVPluginLoader, "1.1");
 
 #ifdef _WIN32
 // __cdecl gives an unmangled name
@@ -34,7 +34,7 @@ typedef void (C_DECL *PluginInit)(vtkClientServerInterpreter*);
 
 
 //-----------------------------------------------------------------------------
-vtkSMPluginLoader::vtkSMPluginLoader()
+vtkPVPluginLoader::vtkPVPluginLoader()
 {
   this->Loaded = 0;
   this->FileName = 0;
@@ -43,7 +43,7 @@ vtkSMPluginLoader::vtkSMPluginLoader()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMPluginLoader::~vtkSMPluginLoader()
+vtkPVPluginLoader::~vtkPVPluginLoader()
 {
   if(this->ServerManagerXML)
     {
@@ -52,7 +52,7 @@ vtkSMPluginLoader::~vtkSMPluginLoader()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPluginLoader::SetFileName(const char* file)
+void vtkPVPluginLoader::SetFileName(const char* file)
 {
   if(this->Loaded)
     {
@@ -114,7 +114,7 @@ void vtkSMPluginLoader::SetFileName(const char* file)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPluginLoader::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVPluginLoader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "FileName: " 

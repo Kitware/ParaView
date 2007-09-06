@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMPluginLoader.h
+  Module:    vtkPVPluginLoader.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,21 +12,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMPluginLoader - Object that can
+// .NAME vtkPVPluginLoader - Object that can
 // be used to load plugins in the server manager.
 // .SECTION Description
-// vtkSMPluginLoader can be used to load plugins into the server manager.
+// vtkPVPluginLoader can be used to load plugins into the server manager.
 
-#ifndef __vtkSMPluginLoader_h
-#define __vtkSMPluginLoader_h
+#ifndef __vtkPVPluginLoader_h
+#define __vtkPVPluginLoader_h
 
-#include "vtkSMObject.h"
+#include "vtkObject.h"
 
-class VTK_EXPORT vtkSMPluginLoader : public vtkSMObject
+class VTK_EXPORT vtkPVPluginLoader : public vtkObject
 {
 public:
-  static vtkSMPluginLoader* New();
-  vtkTypeRevisionMacro(vtkSMPluginLoader, vtkSMObject);
+  static vtkPVPluginLoader* New();
+  vtkTypeRevisionMacro(vtkPVPluginLoader, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -47,8 +47,8 @@ public:
   vtkGetStringMacro(Error);
 
 protected:
-  vtkSMPluginLoader();
-  ~vtkSMPluginLoader();
+  vtkPVPluginLoader();
+  ~vtkPVPluginLoader();
   
   vtkSetStringMacro(Error);
 
@@ -58,8 +58,8 @@ protected:
   char* Error;
 
 private:
-  vtkSMPluginLoader(const vtkSMPluginLoader&); // Not implemented.
-  void operator=(const vtkSMPluginLoader&); // Not implemented.
+  vtkPVPluginLoader(const vtkPVPluginLoader&); // Not implemented.
+  void operator=(const vtkPVPluginLoader&); // Not implemented.
 };
 
 

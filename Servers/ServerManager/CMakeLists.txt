@@ -93,7 +93,6 @@ SET(Kit_SRCS
   vtkSMOrderedPropertyIterator.cxx
   vtkSMOutlineRepresentationProxy.cxx
   vtkSMPart.cxx
-  vtkSMPluginLoader.cxx
   vtkSMPQStateLoader.cxx
   vtkSMPropertyAdaptor.cxx
   vtkSMProperty.cxx
