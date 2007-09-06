@@ -19,7 +19,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMXYPlotRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMXYPlotRepresentationProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMXYPlotRepresentationProxy::vtkSMXYPlotRepresentationProxy()
 {
@@ -44,6 +44,7 @@ bool vtkSMXYPlotRepresentationProxy::EndCreateVTKObjects()
   pp->RemoveAllProxies();
   pp->AddProxy(this->PostProcessorProxy);
   pp->UpdateDependentDomains();
+  return true;
 }
 
 
