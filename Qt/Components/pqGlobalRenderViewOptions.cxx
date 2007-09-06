@@ -54,6 +54,15 @@ struct Manip
   int Shift;
   int Control;
   QByteArray Name;
+
+  Manip &operator=(const Manip &other)
+    {
+    this->Mouse = other.Mouse;
+    this->Shift = other.Shift;
+    this->Control = other.Control;
+    this->Name = other.Name;
+    return *this;
+    }
 };
 
 // set up with default names
@@ -368,9 +377,10 @@ void pqGlobalRenderViewOptions::applyChanges()
     }
   
   // save out camera manipulators
-  Manip manips[9] = DefaultManips;
+  Manip manips[9];
   for(int i=0; i<9; i++)
     {
+    manips[i] = DefaultManips[i];
     manips[i].Name =
       this->Internal->CameraControl3DComboBoxList[i]->currentText().toAscii();
     }
@@ -510,7 +520,11 @@ void pqGlobalRenderViewOptions::resetChanges()
 
   val = settings->value("InteractorStyle/CameraManipulators");
 
-  Manip manips[9] = DefaultManips;
+  Manip manips[9];
+  for(int k = 0; k < 9; k++)
+    {
+    manips[k] = DefaultManips[k];
+    }
 
   if(val.isValid())
     {
