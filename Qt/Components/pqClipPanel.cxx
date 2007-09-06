@@ -52,13 +52,13 @@ pqClipPanel::~pqClipPanel()
 {
 }
 
-void pqClipPanel::setScalarWidgetsVisibility(pqSMProxy proxy)
+void pqClipPanel::setScalarWidgetsVisibility(pqSMProxy aproxy)
 {
   QLabel* label = this->findChild<QLabel*>("SelectInputScalars_label");
   QComboBox* arraySel = this->findChild<QComboBox*>("SelectInputScalars");
   QLabel* label2 = this->findChild<QLabel*>("Value_label");
   QLineEdit* value = this->findChild<QLineEdit*>("Value");
-  if (strcmp(proxy->GetXMLName(), "Scalar") == 0)
+  if (strcmp(aproxy->GetXMLName(), "Scalar") == 0)
     {
     label->show();
     arraySel->show();
@@ -74,8 +74,8 @@ void pqClipPanel::setScalarWidgetsVisibility(pqSMProxy proxy)
     }
 }
 
-void pqClipPanel::clipTypeChanged(pqSMProxy proxy)
+void pqClipPanel::clipTypeChanged(pqSMProxy aproxy)
 {
-  this->setScalarWidgetsVisibility(proxy);
+  this->setScalarWidgetsVisibility(aproxy);
 }
 
