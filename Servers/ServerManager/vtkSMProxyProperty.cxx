@@ -32,7 +32,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.48");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.49");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -385,6 +385,11 @@ unsigned int vtkSMProxyProperty::RemoveProxy(vtkSMProxy* proxy, int modify)
 //---------------------------------------------------------------------------
 int vtkSMProxyProperty::SetProxy(unsigned int idx, vtkSMProxy* proxy)
 {
+  if (proxy == this->PPInternals->Proxies[idx])
+    {
+    return 1;
+    }
+
   if ( vtkSMProperty::GetCheckDomains() )
     {
     this->SetUncheckedProxy(idx, proxy);
