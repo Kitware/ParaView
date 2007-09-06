@@ -166,6 +166,10 @@ void pqCommandServerStartup::execute(const OptionsT& user_options)
   QObject::connect(
     this->Process, SIGNAL(started()),
     this, SLOT(onStarted()));
+  
+  QObject::connect(
+    &this->Timer, SIGNAL(timeout()),
+    this, SLOT(onDelayComplete()));
     
   this->Process->start(executable, arguments);
 }
@@ -266,8 +270,9 @@ void pqCommandServerStartup::onReadyReadStandardError()
 
 void pqCommandServerStartup::onStarted()
 {
-  QTimer::singleShot(
-    static_cast<int>(this->getDelay() * 1000), this, SLOT(onDelayComplete()));
+  this->Timer.setSingleShot(true);
+  this->Timer.setInterval(static_cast<int>(this->getDelay() * 1000));
+  this->Timer.start();
 }
 
 void pqCommandServerStartup::onError(
@@ -286,13 +291,14 @@ void pqCommandServerStartup::onError(
       qWarning() << "Unknown error running startup command";
       break;
     }
+  this->Timer.stop();
   
   emit this->failed();
 }
 
 void pqCommandServerStartup::onDelayComplete()
 {
-  if(this->Process->state() == QProcess::NotRunning)
+  if(this->Process && this->Process->state() == QProcess::NotRunning)
     {
     if(this->Process->exitStatus() == QProcess::CrashExit)
       {

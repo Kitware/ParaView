@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 #include <QProcess>
+#include <QPointer>
+#include <QTimer>
 
 /////////////////////////////////////////////////////////////////////////////
 // pqCommandServerStartup
@@ -77,7 +79,8 @@ private:
   const QString Name;
   const pqServerResource Server;
   vtkSmartPointer<vtkPVXMLElement> Configuration;
-  QProcess* Process;
+  QPointer<QProcess> Process;
+  QTimer Timer;
 };
 
 #endif // !_pqCommandServerStartup
