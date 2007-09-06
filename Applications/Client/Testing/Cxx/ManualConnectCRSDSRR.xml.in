@@ -11,8 +11,12 @@
   <pqevent object="pqEditServerStartupDialog/okButton" command="activate" arguments="" />
   <pqevent object="MainWindow/ServerStartupBrowser/startups" command="currentChanged" arguments="/0|0" />
   <pqevent object="MainWindow/ServerStartupBrowser/connect" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuEdit" command="activate" arguments="actionEditView" />
-  <pqevent object="MainWindow/pqSettingsDialog/tabWidget/qt_tabwidget_stackedwidget/pq3DViewProperties/tabWidget/qt_tabwidget_tabbar" command="set_tab" arguments="4" />
-  <pqevent object="MainWindow/pqSettingsDialog/tabWidget/qt_tabwidget_stackedwidget/pq3DViewProperties/tabWidget/qt_tabwidget_stackedwidget/tab_4/compositingParameters/compositeThreshold" command="set_int" arguments="0" />
-  <pqevent object="MainWindow/pqSettingsDialog/okButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuEdit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="MainWindow/ApplicationSettings/PageNames" command="mousePress" arguments="1,1,0,-13,10,/1:0" />
+  <pqevent object="MainWindow/ApplicationSettings/PageNames" command="mouseRelease" arguments="1,0,0,-13,10,/1:0" />
+  <pqevent object="MainWindow/ApplicationSettings/PageNames" command="mousePress" arguments="1,1,0,36,8,/1:0/2:0" />
+  <pqevent object="MainWindow/ApplicationSettings/PageNames" command="mouseRelease" arguments="1,0,0,36,8,/1:0/2:0" />
+  <pqevent object="MainWindow/ApplicationSettings/Stack/pqGlobalRenderViewOptions/stackedWidget/Server/compositingParameters/compositeThreshold" command="set_int" arguments="0" />
+  <pqevent object="MainWindow/ApplicationSettings/ApplyButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/ApplicationSettings/CloseButton" command="activate" arguments="" />
 </pqevents>
