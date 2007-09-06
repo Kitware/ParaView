@@ -32,7 +32,7 @@
 #include "vtkStringArray.h"
 
 vtkStandardNewMacro(vtkSelectionSerializer);
-vtkCxxRevisionMacro(vtkSelectionSerializer, "1.15");
+vtkCxxRevisionMacro(vtkSelectionSerializer, "1.16");
 
 vtkInformationKeyMacro(vtkSelectionSerializer,ORIGINAL_SOURCE_ID,Integer);
 
@@ -183,10 +183,10 @@ void vtkSelectionSerializer::WriteSelectionData(
          << "\">"
          << endl;
       vtkIndent ni = indent.GetNextIndent();
-      for (vtkIdType i = 0; i < numTuples*numComps; i++)
+      for (vtkIdType j = 0; j < numTuples*numComps; j++)
         {
         os << ni << "<String>";
-        os << stringList->GetValue(i);
+        os << stringList->GetValue(j);
         os << "</String>" << endl;
         }
       os << indent << "</SelectionList>" << endl;
