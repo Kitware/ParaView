@@ -383,7 +383,9 @@ QVariant pqSpreadSheetViewModel::data(
     if (table)
       {
       vtkVariant value = table->GetValue(blockOffset, column);
-      return QVariant(value.ToString().c_str());
+      QString str = value.ToString().c_str();
+      str.replace(" ", ", ");
+      return str;
       }
     }
 
