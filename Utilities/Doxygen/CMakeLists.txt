@@ -74,7 +74,7 @@ IF (BUILD_DOCUMENTATION)
 
   SET(TAGFILES "\"${CMAKE_CURRENT_BINARY_DIR}/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html\"")
   IF(INCLUDE_QT_DOCUMENTATION)
-    SET (TAGFILES "${TAGFILES} \"${QT_TAG_FILE}=http://doc.trolltech.com/4.1\"")
+    SET (TAGFILES "${TAGFILES} \"${QT_TAG_FILE}=http://doc.trolltech.com/4.2\"")
   ENDIF(INCLUDE_QT_DOCUMENTATION)
 
   CONFIGURE_FILE(
