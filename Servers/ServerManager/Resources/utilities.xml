@@ -180,6 +180,9 @@
     <NullProxy name="None">
     </NullProxy>
 
+    <NullProxy name="Scalar">
+    </NullProxy>
+
     <ImplicitPlaneProxy name="Plane" class="vtkPlane">
       <InputProperty
         name="Input"

@@ -3578,7 +3578,7 @@ The Clip filter cuts away a portion of the input data set using an implicit plan
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
           <InputArrayDomain name="input_array" attribute_type="point"
-                            optional="1"/>
+                            number_of_components="1" optional="1"/>
          <Documentation>
            This property specifies the dataset on which the Clip filter will operate.
           </Documentation>
@@ -3591,6 +3591,7 @@ The Clip filter cuts away a portion of the input data set using an implicit plan
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
+              <Proxy group="implicit_functions" name="Scalar" />
               <!--
               <Proxy group="implicit_functions" name="Box" />
               <Proxy group="implicit_functions" name="Sphere" />
@@ -3610,22 +3611,12 @@ The Clip filter cuts away a portion of the input data set using an implicit plan
        </BoundsDomain>
      </DoubleVectorProperty>
 
-     <IntVectorProperty 
-        name="InsideOut" 
-        command="SetInsideOut" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         If this property is set to 0, the clip filter will return that portion of the dataset that lies within the clip function. If set to 1, the portions of the dataset that lie outside the clip function will be returned instead.
-       </Documentation>
-     </IntVectorProperty>
-
-<!--     <StringVectorProperty 
+     <StringVectorProperty 
         name="SelectInputScalars" 
         command="SetInputArrayToProcess"
         number_of_elements="5"
         element_types="0 0 0 0 2"
+        animateable="0"
         label="Scalars">
            <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
@@ -3633,7 +3624,7 @@ The Clip filter cuts away a portion of the input data set using an implicit plan
              </RequiredProperties>
            </ArrayListDomain>
            <Documentation>
-             If clipping with scalars (not currently available), this property specifies the name of the scalar array on which to perform the clip operation.
+             If clipping with scalars, this property specifies the name of the scalar array on which to perform the clip operation.
            </Documentation>
      </StringVectorProperty> 
 
@@ -3649,12 +3640,37 @@ The Clip filter cuts away a portion of the input data set using an implicit plan
             </RequiredProperties>
           </ArrayRangeDomain>         
           <DoubleRangeDomain name="range"/>
+
           <Documentation>
             If clipping with scalars, this property sets the scalar value about which to clip the dataset based on the scalar array chosen. (See SelectInputScalars.) If clipping with a clip function, this property specifies an offset from the clip function to use in the clipping operation. Neither functionality is currently available in ParaView's user interface.
           </Documentation>
-     </DoubleVectorProperty> -->
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+         name="InsideOut" 
+         command="SetInsideOut" 
+         number_of_elements="1"
+         default_values="0" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is set to 0, the clip filter will return that portion of the dataset that lies within the clip function. If set to 1, the portions of the dataset that lie outside the clip function will be returned instead.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="UseValueAsOffset"
+        command="SetUseValueAsOffset"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+           If UseValueAsOffset is true, Value is used as an offset parameter to the implicit function. Otherwise, Value is used only when clipping using a scalar array. 
+        </Documentation>
+     </IntVectorProperty>
+
      <Hints>
        <Visibility replace_input="2" />
+       <Property name="UseValueAsOffset" show="0"/>
      </Hints>
    <!-- End Clip -->
    </SourceProxy>

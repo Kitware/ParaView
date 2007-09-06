@@ -30,140 +30,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqApplicationCore.h"
 #include "pqClipPanel.h"
-#include "pqImplicitPlaneWidget.h"
-#include "pqPipelineFilter.h"
-#include "pqPropertyManager.h"
 
-#include <pqCollapsedGroup.h>
+#include "pqProxySelectionWidget.h"
 
-#include <vtkPVXMLElement.h>
-#include <vtkSMDoubleVectorProperty.h>
-#include <vtkSMProxy.h>
-#include <vtkSMProxyListDomain.h>
-#include <vtkSMProxyProperty.h>
-
-#include <QCheckBox>
-#include <QFrame>
-#include <QVBoxLayout>
-
-//////////////////////////////////////////////////////////////////////////////
-// pqClipPanel::pqImplementation
-
-class pqClipPanel::pqImplementation
-{
-public:
-  pqImplementation() :
-    InsideOutWidget(tr("Inside Out")),
-    ImplicitPlaneWidget(NULL)
-  {
-  }
-  
-  /// Provides a Qt control for the "Inside Out" property of the Clip filter
-  QCheckBox InsideOutWidget;
-  /// Manages a 3D implicit plane widget, plus Qt controls  
-  pqImplicitPlaneWidget* ImplicitPlaneWidget;
-};
+#include <QComboBox>
+#include <QLabel>
+#include <QLineEdit>
 
 pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
-  Superclass(object_proxy, p),
-  Implementation(new pqImplementation())
+  Superclass(object_proxy, p)
 {
-  vtkSMProxy* controlled_proxy = NULL;
-   
-  if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
-    this->proxy()->GetProperty("ClipFunction")))
-    {
-    if (clip_function_property->GetNumberOfProxies() == 0)
-      {
-      vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
-        clip_function_property->GetDomain("proxy_list"));
-      if (pld)
-        {
-        clip_function_property->AddProxy(pld->GetProxy(0));
-        this->proxy()->UpdateVTKObjects();
-        }
-      }
-    controlled_proxy = clip_function_property->GetProxy(0);
-    controlled_proxy->UpdateVTKObjects();
-    controlled_proxy->UpdatePropertyInformation();
-    }
-  
-  this->Implementation->ImplicitPlaneWidget =
-    new pqImplicitPlaneWidget(this->proxy(), controlled_proxy, NULL);
+  pqProxySelectionWidget* clipFunc = this->findChild<pqProxySelectionWidget*>("ClipFunction");
+  QObject::connect(clipFunc, SIGNAL(proxyChanged(pqSMProxy)),
+                   this, SLOT(clipTypeChanged(pqSMProxy)));
 
-  pqCollapsedGroup* const group1 = new pqCollapsedGroup(this);
-  group1->setTitle(tr("Clip"));
-  QVBoxLayout* l = new QVBoxLayout(group1);
-  l->addWidget(&this->Implementation->InsideOutWidget);
-
-  pqCollapsedGroup* const group2 = new pqCollapsedGroup(this);
-  group2->setTitle(QString("Clip Type: ") + QString(tr(controlled_proxy->GetXMLLabel())));
-  l = new QVBoxLayout(group2);
-  this->Implementation->ImplicitPlaneWidget->layout()->setMargin(0);
-  l->addWidget(this->Implementation->ImplicitPlaneWidget);
-  
-  QVBoxLayout* const panel_layout = new QVBoxLayout(this);
-  panel_layout->addWidget(group1);
-  panel_layout->addWidget(group2);
-  panel_layout->addStretch();
-  
-  QObject::connect(this, SIGNAL(viewChanged(pqView*)),
-                   this->Implementation->ImplicitPlaneWidget, SLOT(setView(pqView*)));
-  this->Implementation->ImplicitPlaneWidget->setView(this->view());
-
-  connect(this->Implementation->ImplicitPlaneWidget,
-          SIGNAL(modified()),
-          this, SLOT(setModified()));
-  connect(this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
-  connect(this->propertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
-
-
-  if (controlled_proxy)
-    {
-    vtkPVXMLElement* hints = controlled_proxy->GetHints();
-    for (unsigned int cc=0; cc <hints->GetNumberOfNestedElements(); cc++)
-      {
-      vtkPVXMLElement* elem = hints->GetNestedElement(cc);
-      if (QString("PropertyGroup") == elem->GetName() && 
-        QString("Plane") == elem->GetAttribute("type"))
-        {
-        this->Implementation->ImplicitPlaneWidget->setHints(elem);
-        break;
-        }
-      }
-    }
-  this->Implementation->ImplicitPlaneWidget->resetBounds();
-  this->Implementation->ImplicitPlaneWidget->reset();
-
-  this->propertyManager()->registerLink(
-    &this->Implementation->InsideOutWidget, "checked", SIGNAL(toggled(bool)),
-    this->proxy(), 
-    this->proxy()->GetProperty("InsideOut"));
+  this->setScalarWidgetsVisibility(clipFunc->proxy());
 }
 
 pqClipPanel::~pqClipPanel()
 {
-  delete this->Implementation;
 }
 
-void pqClipPanel::onAccepted()
+void pqClipPanel::setScalarWidgetsVisibility(pqSMProxy proxy)
 {
-  this->Implementation->ImplicitPlaneWidget->accept();
+  QLabel* label = this->findChild<QLabel*>("SelectInputScalars_label");
+  QComboBox* arraySel = this->findChild<QComboBox*>("SelectInputScalars");
+  QLabel* label2 = this->findChild<QLabel*>("Value_label");
+  QLineEdit* value = this->findChild<QLineEdit*>("Value");
+  if (strcmp(proxy->GetXMLName(), "Scalar") == 0)
+    {
+    label->show();
+    arraySel->show();
+    label2->show();
+    value->show();
+    }
+  else
+    {
+    label->hide();
+    arraySel->hide();
+    label2->hide();
+    value->hide();
+    }
 }
 
-void pqClipPanel::onRejected()
+void pqClipPanel::clipTypeChanged(pqSMProxy proxy)
 {
-  this->Implementation->ImplicitPlaneWidget->reset();
+  this->setScalarWidgetsVisibility(proxy);
 }
 
-void pqClipPanel::select()
-{
-  this->Implementation->ImplicitPlaneWidget->select();
-}
-
-void pqClipPanel::deselect()
-{
-  this->Implementation->ImplicitPlaneWidget->deselect();
-}
