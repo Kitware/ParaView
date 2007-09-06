@@ -32,12 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqGlyphPanel.h"
 
 // Server Manager Includes.
-#include "vtkSMProxy.h"
 #include "vtkGlyph3D.h"
-#include "vtkSMProperty.h"
 #include "vtkSMArrayRangeDomain.h"
 #include "vtkSMBoundsDomain.h"
 #include "vtkSMEnumerationDomain.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 
 // Qt Includes.
 #include <QCheckBox>
@@ -47,8 +47,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView Includes.
-#include "pqSMAdaptor.h"
 #include "pqPropertyManager.h"
+#include "pqProxy.h"
+#include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
 pqGlyphPanel::pqGlyphPanel(pqProxy* object_proxy, QWidget* _parent)
@@ -107,6 +108,11 @@ pqGlyphPanel::pqGlyphPanel(pqProxy* object_proxy, QWidget* _parent)
     this->ScaleFactorWidget, SLOT(setEnabled(bool)));
   lockButton->toggle();
   lockButton->toggle();
+
+  if (!object_proxy->getAutoCreated())
+    {
+    this->updateScaleFactor();
+    }
 }
 
 //-----------------------------------------------------------------------------

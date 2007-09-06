@@ -21,11 +21,6 @@
   <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="SurfaceVectors" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Glyph" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/SetScaleFactor" command="set_string" arguments="0" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/SetScaleFactor" command="key" arguments="46" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/SetScaleFactor" command="set_string" arguments="0.0" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/SetScaleFactor" command="set_string" arguments="0.00" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/SetScaleFactor" command="set_string" arguments="0.003" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_tabbar" command="set_tab" arguments="1" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="Solid Color" />
