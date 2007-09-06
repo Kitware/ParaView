@@ -178,21 +178,21 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
                    SIGNAL(colorChanged(const QVariant&)),
                    this, SIGNAL(specularColorChanged()));
   this->Internal->Links->addPropertyLink(this->Internal->SpecularIntensity,
-    "value", SIGNAL(valueChanged(double)),
+    "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Specular"));
   this->Internal->Links->addPropertyLink(this,
     "specularColor", SIGNAL(specularColorChanged()),
     reprProxy, reprProxy->GetProperty("SpecularColor"));
   this->Internal->Links->addPropertyLink(this->Internal->SpecularPower,
-    "value", SIGNAL(valueChanged(int)),
+    "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("SpecularPower"));
-  QObject::connect(this->Internal->SpecularIntensity, SIGNAL(valueChanged(double)),
+  QObject::connect(this->Internal->SpecularIntensity, SIGNAL(editingFinished()),
                    this, SLOT(updateAllViews()),
                    Qt::QueuedConnection);
   QObject::connect(this, SIGNAL(specularColorChanged()),
                    this, SLOT(updateAllViews()),
                    Qt::QueuedConnection);
-  QObject::connect(this->Internal->SpecularPower, SIGNAL(valueChanged(int)),
+  QObject::connect(this->Internal->SpecularPower, SIGNAL(editingFinished()),
                    this, SLOT(updateAllViews()),
                    Qt::QueuedConnection);
   
@@ -212,69 +212,69 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
 
   // setup for point size
   this->Internal->Links->addPropertyLink(this->Internal->StylePointSize,
-    "value", SIGNAL(valueChanged(double)),
+    "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("PointSize"));
 
   // setup for line width
   this->Internal->Links->addPropertyLink(this->Internal->StyleLineWidth,
-    "value", SIGNAL(valueChanged(double)),
+    "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("LineWidth"));
 
   // setup for translate
   this->Internal->Links->addPropertyLink(this->Internal->TranslateX,
-    "value", SIGNAL(valueChanged(double)),
+    "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Position"), 0);
 
   this->Internal->Links->addPropertyLink(this->Internal->TranslateY,
-    "value", SIGNAL(valueChanged(double)),
+    "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Position"), 1);
   
   this->Internal->Links->addPropertyLink(this->Internal->TranslateZ,
-    "value", SIGNAL(valueChanged(double)),
+    "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Position"), 2);
 
   // setup for scale
   this->Internal->Links->addPropertyLink(this->Internal->ScaleX,
-    "value", SIGNAL(valueChanged(double)),
+    "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Scale"), 0);
 
   this->Internal->Links->addPropertyLink(this->Internal->ScaleY,
-    "value", SIGNAL(valueChanged(double)),
+    "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Scale"), 1);
 
   this->Internal->Links->addPropertyLink(this->Internal->ScaleZ,
-    "value", SIGNAL(valueChanged(double)),
+    "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Scale"), 2);
 
   // setup for orientation
   this->Internal->Links->addPropertyLink(this->Internal->OrientationX,
-    "value", SIGNAL(valueChanged(double)),
+    "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Orientation"), 0);
 
   this->Internal->Links->addPropertyLink(this->Internal->OrientationY,
-    "value", SIGNAL(valueChanged(double)),
+    "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Orientation"), 1);
 
   this->Internal->Links->addPropertyLink(this->Internal->OrientationZ,
-    "value", SIGNAL(valueChanged(double)),
+    "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Orientation"), 2);
 
   // setup for origin
   this->Internal->Links->addPropertyLink(this->Internal->OriginX,
-    "value", SIGNAL(valueChanged(double)),
+    "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Origin"), 0);
 
   this->Internal->Links->addPropertyLink(this->Internal->OriginY,
-    "value", SIGNAL(valueChanged(double)),
+    "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Origin"), 1);
 
   this->Internal->Links->addPropertyLink(this->Internal->OriginZ,
-    "value", SIGNAL(valueChanged(double)),
+    "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Origin"), 2);
 
   // setup for opacity
   this->Internal->Links->addPropertyLink(this->Internal->Opacity,
-    "value", SIGNAL(valueChanged(double)),
+    "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Opacity"));
 
   // setup for map scalars
@@ -306,7 +306,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     {
     this->Internal->Links->addPropertyLink(
       this->Internal->ScalarOpacityUnitDistance, "value",
-      SIGNAL(valueChanged(double)),
+      SIGNAL(editingFinished()),
       reprProxy, reprProxy->GetProperty("ScalarOpacityUnitDistance"));
     }
     */
@@ -374,62 +374,62 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
-    this->Internal->StylePointSize,  SIGNAL(valueChanged(double)), 
+    this->Internal->StylePointSize,  SIGNAL(editingFinished()), 
     this, SLOT(updateAllViews()));
   QObject::connect(
-    this->Internal->StyleLineWidth, SIGNAL(valueChanged(double)),
+    this->Internal->StyleLineWidth, SIGNAL(editingFinished()),
     this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
-    this->Internal->TranslateX, SIGNAL(valueChanged(double)),
+    this->Internal->TranslateX, SIGNAL(editingFinished()),
     this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
-    this->Internal->TranslateY, SIGNAL(valueChanged(double)),
+    this->Internal->TranslateY, SIGNAL(editingFinished()),
     this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
-    this->Internal->TranslateZ, SIGNAL(valueChanged(double)),
+    this->Internal->TranslateZ, SIGNAL(editingFinished()),
     this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
-    this->Internal->ScaleX, SIGNAL(valueChanged(double)),
+    this->Internal->ScaleX, SIGNAL(editingFinished()),
     this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
-    this->Internal->ScaleY, SIGNAL(valueChanged(double)),
+    this->Internal->ScaleY, SIGNAL(editingFinished()),
     this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
-    this->Internal->ScaleZ, SIGNAL(valueChanged(double)),
+    this->Internal->ScaleZ, SIGNAL(editingFinished()),
     this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
-    this->Internal->OrientationX, SIGNAL(valueChanged(double)),
+    this->Internal->OrientationX, SIGNAL(editingFinished()),
     this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
-    this->Internal->OrientationY, SIGNAL(valueChanged(double)),
+    this->Internal->OrientationY, SIGNAL(editingFinished()),
     this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
-    this->Internal->OrientationZ, SIGNAL(valueChanged(double)),
+    this->Internal->OrientationZ, SIGNAL(editingFinished()),
     this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
-    this->Internal->OriginX, SIGNAL(valueChanged(double)),
+    this->Internal->OriginX, SIGNAL(editingFinished()),
     this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
-    this->Internal->OriginY, SIGNAL(valueChanged(double)),
+    this->Internal->OriginY, SIGNAL(editingFinished()),
     this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
-    this->Internal->OriginZ, SIGNAL(valueChanged(double)),
+    this->Internal->OriginZ, SIGNAL(editingFinished()),
     this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
-    this->Internal->Opacity, SIGNAL(valueChanged(double)),
+    this->Internal->Opacity, SIGNAL(editingFinished()),
     this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
   QObject::connect(
