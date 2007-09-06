@@ -41,7 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqClipPanel::pqClipPanel(pqProxy* object_proxy, QWidget* p) :
   Superclass(object_proxy, p)
 {
-  pqProxySelectionWidget* clipFunc = this->findChild<pqProxySelectionWidget*>("ClipFunction");
+  pqProxySelectionWidget* clipFunc = 
+    this->findChild<pqProxySelectionWidget*>("ClipFunction");
   QObject::connect(clipFunc, SIGNAL(proxyChanged(pqSMProxy)),
                    this, SLOT(clipTypeChanged(pqSMProxy)));
 
@@ -54,6 +55,11 @@ pqClipPanel::~pqClipPanel()
 
 void pqClipPanel::setScalarWidgetsVisibility(pqSMProxy aproxy)
 {
+  if (!aproxy)
+    {
+    return;
+    }
+
   QLabel* label = this->findChild<QLabel*>("SelectInputScalars_label");
   QComboBox* arraySel = this->findChild<QComboBox*>("SelectInputScalars");
   QLabel* label2 = this->findChild<QLabel*>("Value_label");
