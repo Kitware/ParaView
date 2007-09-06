@@ -310,7 +310,7 @@ bool pqLineChartRepresentation::getXArrayDefault(vtkSMProperty* prop,
       arrayName = current;
       return true;
       }
-    else if(current == "Probe_Location")
+    else if(current == "original_coordinates")
       {
       arrayName = current;
       }
@@ -918,7 +918,7 @@ int pqLineChartRepresentation::isEnabledByDefault(const QString &arrayName) cons
       arrayName == "PedigreeElementId" || arrayName == "PedigreeNodeId" ||
       arrayName == "PedigreeEdgeId" || arrayName == "PedigreeFaceId" ||
       arrayName == "vtkEAOTValidity" || arrayName == "Cell's Point Ids" ||
-      arrayName == "Probe_Location")
+      arrayName == "original_coordinates" || arrayName == "arc_length")
     {
     return 0;
     }
