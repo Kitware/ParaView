@@ -168,8 +168,7 @@ void pqGlyphPanel::updateScaleFactor()
       if (domain->GetMaximumExists(3) && domain->GetMinimumExists(3))
         {
         // we use the vector magnitude.
-        scalefactor = scaled_extent/
-          (domain->GetMaximum(3)-domain->GetMinimum(3));
+        divisor = domain->GetMaximum(3)-domain->GetMinimum(3);
         }
       }
     break;
