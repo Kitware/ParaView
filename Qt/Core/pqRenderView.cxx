@@ -1314,6 +1314,7 @@ void pqRenderView::resetViewDirection(
   proxy->UpdateVTKObjects();
 
   this->resetCamera();
+  this->render();
 }
 
 //-----------------------------------------------------------------------------
