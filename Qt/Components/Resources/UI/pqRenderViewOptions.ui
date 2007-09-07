@@ -960,54 +960,6 @@
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QCheckBox" name="AutoResetCenterOfRotation" >
-            <property name="toolTip" >
-             <string>Reset center of rotation when camera is reset.</string>
-            </property>
-            <property name="text" >
-             <string>Reset Center with Camera</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="CustomCenter" >
-            <property name="text" >
-             <string>Use Custom Center</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" >
-            <property name="margin" >
-             <number>0</number>
-            </property>
-            <property name="spacing" >
-             <number>6</number>
-            </property>
-            <item>
-             <widget class="QLineEdit" name="CenterX" >
-              <property name="enabled" >
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="CenterY" >
-              <property name="enabled" >
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="CenterZ" >
-              <property name="enabled" >
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
          </layout>
         </widget>
        </item>
@@ -1096,54 +1048,6 @@
  </customwidgets>
  <resources/>
  <connections>
-  <connection>
-   <sender>CustomCenter</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>CenterZ</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>75</x>
-     <y>208</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>385</x>
-     <y>229</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>CustomCenter</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>CenterY</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>46</x>
-     <y>206</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>227</x>
-     <y>238</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>CustomCenter</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>CenterX</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>29</x>
-     <y>206</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>40</x>
-     <y>232</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>OrientationAxesInteraction</sender>
    <signal>toggled(bool)</signal>

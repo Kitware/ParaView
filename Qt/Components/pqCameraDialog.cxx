@@ -90,6 +90,27 @@ pqCameraDialog::pqCameraDialog(QWidget* _p/*=null*/,
     this, SLOT(resetViewDirectionNegZ()));
 
   QObject::connect(
+    this->Internal->CustomCenter,
+    SIGNAL(toggled(bool)),
+    this, SLOT(useCustomRotationCenter()));
+  QObject::connect(
+    this->Internal->AutoResetCenterOfRotation,
+    SIGNAL(toggled(bool)),
+    this, SLOT(resetRotationCenterWithCamera()));
+  QObject::connect(
+    this->Internal->CenterX,
+    SIGNAL(valueChanged(double)),
+    this, SLOT(applyRotationCenter()));
+  QObject::connect(
+    this->Internal->CenterY,
+    SIGNAL(valueChanged(double)),
+    this, SLOT(applyRotationCenter()));
+  QObject::connect(
+    this->Internal->CenterZ,
+    SIGNAL(valueChanged(double)),
+    this, SLOT(applyRotationCenter()));
+
+  QObject::connect(
     this->Internal->rollButton, SIGNAL(clicked()),
     this, SLOT(applyCameraRoll()));
   QObject::connect(
@@ -154,11 +175,24 @@ void pqCameraDialog::setupGUI()
       proxy, proxy->GetProperty("CameraViewUp"), 2);
 
     this->Internal->CameraLinks.addPropertyLink(
+      this->Internal->CenterX, "value", SIGNAL(valueChanged(double)),
+      proxy, proxy->GetProperty("CenterOfRotation"), 0);
+    this->Internal->CameraLinks.addPropertyLink(
+      this->Internal->CenterY, "value", SIGNAL(valueChanged(double)),
+      proxy, proxy->GetProperty("CenterOfRotation"), 1);  
+    this->Internal->CameraLinks.addPropertyLink(
+      this->Internal->CenterZ, "value", SIGNAL(valueChanged(double)),
+      proxy, proxy->GetProperty("CenterOfRotation"), 2);
+
+    this->Internal->CameraLinks.addPropertyLink(
       this->Internal->viewAngle, "value", SIGNAL(valueChanged(double)),
       proxy, proxy->GetProperty("CameraViewAngle"), 0);
 
     QObject::connect(&this->Internal->CameraLinks, SIGNAL(qtWidgetChanged()),
       this->Internal->RenderModule, SLOT(render()));
+
+    this->Internal->AutoResetCenterOfRotation->setCheckState(
+      this->Internal->RenderModule->getResetCenterWithCamera()? Qt::Checked : Qt::Unchecked);
     }
 }
 
@@ -268,4 +302,57 @@ void pqCameraDialog::applyCameraAzimuth()
 {
   this->adjustCamera(pqCameraDialog::Azimuth, 
     this->Internal->azimuthAngle->value());
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::useCustomRotationCenter()
+{
+  if(this->Internal->CustomCenter->checkState() == Qt::Checked)
+    {
+    this->resetRotationCenter();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::applyRotationCenter()
+{
+  if(!this->Internal->RenderModule)
+    {
+    return;
+    }
+
+  if (this->Internal->CustomCenter->checkState() == Qt::Checked)
+    {
+    double center[3];
+    center[0] = this->Internal->CenterX->text().toDouble();
+    center[1] = this->Internal->CenterY->text().toDouble();
+    center[2] = this->Internal->CenterZ->text().toDouble();
+    this->Internal->RenderModule->setCenterOfRotation(center);
+    }
+
+  // update the view after changes
+  this->Internal->RenderModule->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::resetRotationCenterWithCamera()
+{
+  if(this->Internal->RenderModule)
+    {
+    this->Internal->RenderModule->setResetCenterWithCamera(
+      this->Internal->AutoResetCenterOfRotation->checkState()==Qt::Checked);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::resetRotationCenter()
+{
+  if(this->Internal->RenderModule)
+    {
+    double center[3];
+    this->Internal->RenderModule->getCenterOfRotation(center);
+    this->Internal->CenterX->setValue(center[0]);
+    this->Internal->CenterY->setValue(center[1]);
+    this->Internal->CenterZ->setValue(center[2]);
+    }
 }

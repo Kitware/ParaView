@@ -86,23 +86,8 @@ pqRenderViewOptions::pqRenderViewOptions(QWidget *widgetParent)
   QObject::connect(this->Internal->OrientationAxesLabelColor,
           SIGNAL(chosenColorChanged(const QColor&)),
           this, SIGNAL(changesAvailable()));
-  QObject::connect(this->Internal->CustomCenter,
-          SIGNAL(toggled(bool)),
-          this, SIGNAL(changesAvailable()));
-  QObject::connect(this->Internal->AutoResetCenterOfRotation,
-          SIGNAL(toggled(bool)),
-          this, SIGNAL(changesAvailable()));
   QObject::connect(this->Internal->CenterAxesVisibility,
           SIGNAL(toggled(bool)),
-          this, SIGNAL(changesAvailable()));
-  QObject::connect(this->Internal->CenterX,
-          SIGNAL(textChanged(QString)),
-          this, SIGNAL(changesAvailable()));
-  QObject::connect(this->Internal->CenterY,
-          SIGNAL(textChanged(QString)),
-          this, SIGNAL(changesAvailable()));
-  QObject::connect(this->Internal->CenterZ,
-          SIGNAL(textChanged(QString)),
           this, SIGNAL(changesAvailable()));
 }
 
@@ -170,16 +155,6 @@ void pqRenderViewOptions::applyChanges()
 
   this->Internal->RenderView->setCenterAxesVisibility(
     this->Internal->CenterAxesVisibility->checkState() == Qt::Checked);
-  this->Internal->RenderView->setResetCenterWithCamera(
-    this->Internal->AutoResetCenterOfRotation->checkState() == Qt::Checked);
-  if (this->Internal->CustomCenter->checkState() == Qt::Checked)
-    {
-    double center[3];
-    center[0] = this->Internal->CenterX->text().toDouble();
-    center[1] = this->Internal->CenterY->text().toDouble();
-    center[2] = this->Internal->CenterZ->text().toDouble();
-    this->Internal->RenderView->setCenterOfRotation(center);
-    }
   
   this->Internal->RenderView->saveSettings();
 
@@ -242,7 +217,6 @@ void pqRenderViewOptions::connectGUI()
 
 }
 
-
 void pqRenderViewOptions::resetAnnotation()
 {
   this->Internal->OrientationAxes->setChecked(this->Internal->RenderView->getOrientationAxesVisibility());
@@ -253,16 +227,8 @@ void pqRenderViewOptions::resetAnnotation()
   this->Internal->OrientationAxesLabelColor->setChosenColor(
     this->Internal->RenderView->getOrientationAxesLabelColor());
 
-  this->Internal->CustomCenter->setCheckState(Qt::Unchecked);
-  this->Internal->AutoResetCenterOfRotation->setCheckState(
-    this->Internal->RenderView->getResetCenterWithCamera()? Qt::Checked : Qt::Unchecked);
   this->Internal->CenterAxesVisibility->setCheckState(
     this->Internal->RenderView->getCenterAxesVisibility()? Qt::Checked : Qt::Unchecked);
-  double center[3];
-  this->Internal->RenderView->getCenterOfRotation(center);
-  this->Internal->CenterX->setText(QString::number(center[0],'g',3));
-  this->Internal->CenterY->setText(QString::number(center[1],'g',3));
-  this->Internal->CenterZ->setText(QString::number(center[2],'g',3));
 }
 
 void pqRenderViewOptions::disconnectGUI()

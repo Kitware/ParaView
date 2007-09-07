@@ -65,8 +65,13 @@ private slots:
   void applyCameraElevation();
   void applyCameraAzimuth();
 
+  void applyRotationCenter();
+  void useCustomRotationCenter();
+  void resetRotationCenterWithCamera();
+
 protected:
   void setupGUI();
+  void resetRotationCenter();
 
 private:
   pqCameraDialogInternal* Internal;
