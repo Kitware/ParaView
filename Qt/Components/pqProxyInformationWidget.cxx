@@ -58,6 +58,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqSMAdaptor.h"
+#include "pqServer.h"
+#include "pqTimeKeeper.h"
 
 // ParaView components includes
 
@@ -89,8 +91,23 @@ void pqProxyInformationWidget::setOutputPort(pqOutputPort* source)
     {
     return;
     }
+  
+  if(this->OutputPort)
+    {
+    QObject::disconnect(this->OutputPort->getServer()->getTimeKeeper(),
+                     SIGNAL(timeChanged()),
+                     this, SLOT(updateInformation()));
+    }
 
   this->OutputPort = source;
+  
+  if(this->OutputPort)
+    {
+    QObject::connect(this->OutputPort->getServer()->getTimeKeeper(),
+                     SIGNAL(timeChanged()),
+                     this, SLOT(updateInformation()),
+                     Qt::QueuedConnection);
+    }
 
   this->updateInformation();
 }
