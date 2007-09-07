@@ -174,6 +174,11 @@ pqSpreadSheetView::pqSpreadSheetView(
   QObject::connect(
     &this->Internal->SelectionModel, SIGNAL(selection(vtkSMSourceProxy*)),
     this, SLOT(onCreateSelection(vtkSMSourceProxy*)));
+  
+  foreach(pqRepresentation* rep, this->getRepresentations())
+    {
+    this->onAddRepresentation(rep);
+    }
 }
 
 //-----------------------------------------------------------------------------
