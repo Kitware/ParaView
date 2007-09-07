@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqAnimationWidget::pqAnimationWidget(QWidget* p) 
   : QAbstractScrollArea(p) 
 {
-  this->setAutoFillBackground(true);
   this->View = new QGraphicsView(this->viewport());
   this->viewport()->setBackgroundRole(QPalette::Window);
   this->View->setBackgroundRole(QPalette::Window);
@@ -155,30 +154,25 @@ void pqAnimationWidget::updateGeometries()
 {
   int width1 = 0;
   int width2 = 0;
-  int height1 = 0;
-  int height2 = 0;
+  
   if(!this->CreateDeleteHeader->isHidden())
     {
     int tmp = qMax(this->CreateDeleteHeader->minimumWidth(),
                  this->CreateDeleteHeader->sizeHint().width());
     width1 = qMin(tmp, this->CreateDeleteHeader->maximumWidth());
-    height1 = this->CreateDeleteHeader->defaultSectionSize() *
-              this->CreateDeleteHeader->count();
     }
   if(!this->Header->isHidden())
     {
     int tmp = qMax(this->Header->minimumWidth(),
                  this->Header->sizeHint().width());
     width2 = qMin(tmp, this->Header->maximumWidth());
-    height2 = this->Header->defaultSectionSize() *
-              this->Header->count();
     }
 
   this->setViewportMargins(width1 + width2, 0, 0, 0);
 
   QRect vg = this->contentsRect();
-  this->CreateDeleteHeader->setGeometry(vg.left(), vg.top(), width1, height1);
-  this->Header->setGeometry(vg.left() + width1, vg.top(), width2, height2);
+  this->CreateDeleteHeader->setGeometry(vg.left(), vg.top(), width1, vg.height());
+  this->Header->setGeometry(vg.left() + width1, vg.top(), width2, vg.height());
 
   this->updateScrollBars();
 }
@@ -228,7 +222,7 @@ void pqAnimationWidget::updateWidgetPosition()
   if(this->CreateDeleteHeader->isVisible())
     {
     int xpos = this->CreateDeleteHeader->frameGeometry().right()+1;
-    int ypos = this->CreateDeleteHeader->frameGeometry().bottom()-
+    int ypos = 2+(this->CreateDeleteHeader->count()-1)*
                this->CreateDeleteHeader->defaultSectionSize() -
                this->CreateDeleteHeader->offset();
     this->CreateDeleteWidget->raise();
