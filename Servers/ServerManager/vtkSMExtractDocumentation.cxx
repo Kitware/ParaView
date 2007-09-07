@@ -930,6 +930,63 @@ void WriteHTMLList(const char* groupname, vtkStringPairList *nameList, ostream &
   baseFile << "</html>" << endl;
 }
 
+void WriteXMLKeywords(const char* baseName, vtkStringPairList *nameList,
+                      istream &inFile, ostream& outFile)
+{
+  char line[256];
+  char extractedName[100];
+
+  vtksys_ios::ostringstream baseFileName;
+  baseFileName << baseName << ".html\"" << ends;
+
+  inFile.getline(line, 255);
+  while (!inFile.eof() && !inFile.fail())
+    {
+    outFile << line << endl;
+    if (sscanf(line, " <section ref=\"Documentation/%s", extractedName) == 1 &&
+        !strcmp(extractedName, baseFileName.str().c_str()))
+      {
+      break;
+      }
+    inFile.getline(line, 255);
+    }
+
+  vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
+  vtkStringPairListIterator iter;
+  for (iter = nameList->begin(); iter != nameList->end(); iter++)
+    {
+    vtkSMProxy *proxy = manager->GetPrototypeProxy((*iter).second.c_str(),
+                                                   (*iter).first.c_str());
+    if (!proxy)
+      {
+      continue;
+      }
+
+    outFile << "    <keyword ref=\"Documentation/" << proxy->GetXMLName()
+            << ".html\">" << proxy->GetXMLLabel() << "</keyword>" << endl;
+    }
+
+  inFile.getline(line, 255);
+
+  // Skip over any keywords that were already in pqClient.adp.
+  while (!inFile.eof() && !inFile.fail())
+    {
+    if (!strcmp(line, "  </section>"))
+      {
+      outFile << line << endl;
+      break;
+      }
+    inFile.getline(line, 255);
+    }
+
+  inFile.getline(line, 255);
+  while (!inFile.eof() && !inFile.fail())
+    {
+    outFile << line << endl;
+    inFile.getline(line, 255);
+    }
+}
+
 int main(int argc, char *argv[])
 {
   if (argc < 3)
@@ -976,6 +1033,24 @@ int main(int argc, char *argv[])
   proxyLabelList->sort();
 
   WriteHTMLList(proxyTypeName, proxyNameList, baseFile);
+
+  ifstream adpFile;
+  vtksys_ios::ostringstream adpFileName;
+  adpFileName << argv[1] << "/../pqClient.adp" << ends;
+  adpFile.open(adpFileName.str().c_str());
+
+  ofstream tmpAdpFile;
+  vtksys_ios::ostringstream tmpAdpFileName;
+  tmpAdpFileName << argv[1] << "/../temp.adp" << ends;
+  tmpAdpFile.open(tmpAdpFileName.str().c_str());
+
+  WriteXMLKeywords(baseName, proxyNameList, adpFile, tmpAdpFile);
+
+  adpFile.close();
+  tmpAdpFile.close();
+  vtksys::SystemTools::CopyAFile(tmpAdpFileName.str().c_str(),
+                                 adpFileName.str().c_str());
+  vtksys::SystemTools::RemoveFile(tmpAdpFileName.str().c_str());
 
   vtkStringPairListIterator iter;
   for (iter = proxyNameList->begin(); iter != proxyNameList->end();)

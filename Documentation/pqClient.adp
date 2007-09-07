@@ -51,9 +51,15 @@
   <section ref="Documentation/Lookmarks.html" title="Lookmarks">
     <keyword ref="Documentation/Lookmarks.html">Lookmarks</keyword>
   </section>
-  <section ref="Documentation/ParaViewReaders.html" title="Readers"/>
-  <section ref="Documentation/ParaViewSources.html" title="Sources"/>
-  <section ref="Documentation/ParaViewFilters.html" title="Filters"/>
-  <section ref="Documentation/ParaViewWriters.html" title="Writers"/>
+  <!-- Keywords in the next 4 sections (before each closing section tag) are
+       filled in by vtkSMExtractDocumentation. -->
+  <section ref="Documentation/ParaViewReaders.html" title="Readers">
+  </section>
+  <section ref="Documentation/ParaViewSources.html" title="Sources">
+  </section>
+  <section ref="Documentation/ParaViewFilters.html" title="Filters">
+  </section>
+  <section ref="Documentation/ParaViewWriters.html" title="Writers">
+  </section>
 </DCF>
 </assistantconfig> 

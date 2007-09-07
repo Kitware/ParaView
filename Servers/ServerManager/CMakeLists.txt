@@ -363,12 +363,13 @@ ENDIF(NOT CMAKE_CROSSCOMPILING)
 
 GET_TARGET_PROPERTY(DOCUMENTATION_EXE vtkSMExtractDocumentation LOCATION)
 
+SET(adpFile ${ParaView_SOURCE_DIR}/Documentation/pqClient.adp)
 FOREACH(gcf ${GUI_CONFIG_FILES})
   SET(fullXMLFile ${ParaView_SOURCE_DIR}/Qt/Components/Resources/XML/${gcf}.xml)
   SET(fullHTMLFile ${ParaView_BINARY_DIR}/Documentation/${gcf}.html)
   ADD_CUSTOM_COMMAND(
     OUTPUT ${fullHTMLFile}
-    DEPENDS ${fullXMLFile} ${resourceFiles} vtkSMExtractDocumentation
+    DEPENDS ${fullXMLFile} ${resourceFiles} ${adpFile} vtkSMExtractDocumentation
     COMMAND ${DOCUMENTATION_EXE}
     ARGS ${ParaView_BINARY_DIR}/Documentation ${fullXMLFile}
     COMMENT "Creating Documentation for ${gcf}"
