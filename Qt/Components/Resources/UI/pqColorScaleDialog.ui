@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>424</width>
-    <height>382</height>
+    <width>435</width>
+    <height>424</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -35,21 +35,10 @@
        <property name="spacing" >
         <number>6</number>
        </property>
-       <item row="7" column="1" >
-        <widget class="QLabel" name="MinimumLabel" >
-         <property name="sizePolicy" >
-          <sizepolicy>
-           <hsizetype>3</hsizetype>
-           <vsizetype>5</vsizetype>
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="whatsThis" >
-          <string>Displays the minimum scalar value.</string>
-         </property>
+       <item row="7" column="0" >
+        <widget class="QLabel" name="label_2" >
          <property name="text" >
-          <string/>
+          <string>Minimum:</string>
          </property>
         </widget>
        </item>
@@ -96,6 +85,19 @@
          </item>
         </layout>
        </item>
+       <item row="6" column="0" colspan="4" >
+        <widget class="QCheckBox" name="UseAutoRescale" >
+         <property name="whatsThis" >
+          <string>Check this option to automatically rescale the color map to the current data range.</string>
+         </property>
+         <property name="text" >
+          <string>Automatically Rescale to Fit Data Range</string>
+         </property>
+         <property name="checked" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="1" >
         <widget class="QLineEdit" name="ScalarValue" >
          <property name="whatsThis" >
@@ -103,24 +105,20 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="3" >
-        <widget class="QLineEdit" name="Opacity" >
-         <property name="whatsThis" >
-          <string>This displays the opacity for the current control point. It can also be used to change the opacity of the point.</string>
+       <item row="1" column="0" >
+        <widget class="QLabel" name="ValueLabel" >
+         <property name="text" >
+          <string>Scalar Value</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="2" >
-        <widget class="QLabel" name="label_3" >
-         <property name="text" >
-          <string>Maximum:</string>
+       <item row="2" column="3" >
+        <widget class="QDoubleSpinBox" name="ScalarOpacityUnitDistance" >
+         <property name="toolTip" >
+          <string>&lt;html>Set the unit distance on which the scalar opacity transfer function is defined for volume rendering.&lt;html></string>
          </property>
-        </widget>
-       </item>
-       <item row="3" column="0" >
-        <widget class="QLabel" name="label" >
-         <property name="text" >
-          <string>Color Space</string>
+         <property name="maximum" >
+          <double>100000000000000005250476025520442024870446858110815915491585411551180245798890819578637137508044786404370444383288387817694252323536043057564479218478670698284838720092657580373783023379478809005936895323497079994508111903896764088007465274278014249457925878882005684283811566947219638686545940054016.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -175,6 +173,20 @@
          </item>
         </layout>
        </item>
+       <item row="1" column="2" >
+        <widget class="QLabel" name="OpacityLabel" >
+         <property name="text" >
+          <string>Opacity</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" >
+        <widget class="QLabel" name="label" >
+         <property name="text" >
+          <string>Color Space</string>
+         </property>
+        </widget>
+       </item>
        <item row="9" column="0" colspan="4" >
         <widget class="QCheckBox" name="UseDiscreteColors" >
          <property name="whatsThis" >
@@ -188,83 +200,10 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="2" >
-        <widget class="QLabel" name="OpacityLabel" >
+       <item row="4" column="0" >
+        <widget class="QLabel" name="ComponentLabel" >
          <property name="text" >
-          <string>Opacity</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1" >
-        <widget class="QComboBox" name="ColorSpace" >
-         <property name="whatsThis" >
-          <string>Select the color space used for the color interpolation.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0" >
-        <widget class="QLabel" name="label_2" >
-         <property name="text" >
-          <string>Minimum:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="ValueLabel" >
-         <property name="text" >
-          <string>Scalar Value</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" colspan="4" >
-        <widget class="QVTKWidget" native="1" name="ColorScale" >
-         <property name="sizePolicy" >
-          <sizepolicy>
-           <hsizetype>7</hsizetype>
-           <vsizetype>3</vsizetype>
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize" >
-          <size>
-           <width>0</width>
-           <height>45</height>
-          </size>
-         </property>
-         <property name="whatsThis" >
-          <string>This displays the color scale. The control points determine how the gradient is rendered.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0" colspan="4" >
-        <widget class="QCheckBox" name="UseAutoRescale" >
-         <property name="whatsThis" >
-          <string>Check this option to automatically rescale the color map to the current data range.</string>
-         </property>
-         <property name="text" >
-          <string>Automatically Rescale to Fit Data Range</string>
-         </property>
-         <property name="checked" >
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="3" >
-        <widget class="QLabel" name="MaximumLabel" >
-         <property name="sizePolicy" >
-          <sizepolicy>
-           <hsizetype>3</hsizetype>
-           <vsizetype>5</vsizetype>
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="whatsThis" >
-          <string>Displays the maximum scalar value.</string>
-         </property>
-         <property name="text" >
-          <string/>
+          <string>Component</string>
          </property>
         </widget>
        </item>
@@ -311,17 +250,76 @@
          </item>
         </layout>
        </item>
-       <item row="4" column="0" >
-        <widget class="QLabel" name="ComponentLabel" >
-         <property name="text" >
-          <string>Component</string>
+       <item row="3" column="1" >
+        <widget class="QComboBox" name="ColorSpace" >
+         <property name="whatsThis" >
+          <string>Select the color space used for the color interpolation.</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1" >
-        <widget class="QComboBox" name="Component" >
+       <item row="0" column="0" colspan="4" >
+        <widget class="QVTKWidget" native="1" name="ColorScale" >
+         <property name="sizePolicy" >
+          <sizepolicy>
+           <hsizetype>7</hsizetype>
+           <vsizetype>0</vsizetype>
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize" >
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="maximumSize" >
+          <size>
+           <width>16777215</width>
+           <height>50</height>
+          </size>
+         </property>
          <property name="whatsThis" >
-          <string>Select the component to color by.</string>
+          <string>This displays the color scale. The control points determine how the gradient is rendered.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3" >
+        <widget class="QLineEdit" name="Opacity" >
+         <property name="whatsThis" >
+          <string>This displays the opacity for the current control point. It can also be used to change the opacity of the point.</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="2" >
+        <widget class="QLabel" name="label_3" >
+         <property name="text" >
+          <string>Maximum:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2" >
+        <widget class="QLabel" name="ScaleLabel" >
+         <property name="text" >
+          <string>Scale</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="3" >
+        <widget class="QLabel" name="MaximumLabel" >
+         <property name="sizePolicy" >
+          <sizepolicy>
+           <hsizetype>3</hsizetype>
+           <vsizetype>5</vsizetype>
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="whatsThis" >
+          <string>Displays the maximum scalar value.</string>
+         </property>
+         <property name="text" >
+          <string/>
          </property>
         </widget>
        </item>
@@ -335,22 +333,43 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="3" >
-        <widget class="QDoubleSpinBox" name="ScalarOpacityUnitDistance" >
-         <property name="toolTip" >
-          <string>&lt;html>Set the unit distance on which the scalar opacity transfer function is defined for volume rendering.&lt;html></string>
+       <item row="7" column="1" >
+        <widget class="QLabel" name="MinimumLabel" >
+         <property name="sizePolicy" >
+          <sizepolicy>
+           <hsizetype>3</hsizetype>
+           <vsizetype>5</vsizetype>
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-         <property name="maximum" >
-          <double>100000000000000005250476025520442024870446858110815915491585411551180245798890819578637137508044786404370444383288387817694252323536043057564479218478670698284838720092657580373783023379478809005936895323497079994508111903896764088007465274278014249457925878882005684283811566947219638686545940054016.000000000000000</double>
+         <property name="whatsThis" >
+          <string>Displays the minimum scalar value.</string>
+         </property>
+         <property name="text" >
+          <string/>
          </property>
         </widget>
        </item>
-       <item row="2" column="2" >
-        <widget class="QLabel" name="ScaleLabel" >
-         <property name="text" >
-          <string>Scale</string>
+       <item row="4" column="1" >
+        <widget class="QComboBox" name="Component" >
+         <property name="whatsThis" >
+          <string>Select the component to color by.</string>
          </property>
         </widget>
+       </item>
+       <item row="11" column="0" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -843,14 +862,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QVTKWidget</class>
-   <extends>QWidget</extends>
-   <header>QVTKWidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>pqColorChooserButton</class>
    <extends>QPushButton</extends>
    <header>pqColorChooserButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QVTKWidget</class>
+   <extends>QWidget</extends>
+   <header>QVTKWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
