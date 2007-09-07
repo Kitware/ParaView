@@ -47,7 +47,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.17");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.18");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkReductionFilter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
@@ -240,21 +240,28 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
     {
     // Note that preOutput is never the input directly (it is shallow copied at
     // the least, hence we can add arrays to it.
-    vtkIdTypeArray* originalProcessIds = vtkIdTypeArray::New();
-    originalProcessIds->SetNumberOfComponents(1);
-    originalProcessIds->SetName("vtkOriginalProcessIds");
-    originalProcessIds->SetNumberOfTuples(dsPreOutput->GetNumberOfPoints());
-    originalProcessIds->FillComponent(0, controller->GetLocalProcessId());
-    dsPreOutput->GetPointData()->AddArray(originalProcessIds);
-    originalProcessIds->Delete();
-
-    originalProcessIds = vtkIdTypeArray::New();
-    originalProcessIds->SetNumberOfComponents(1);
-    originalProcessIds->SetName("vtkOriginalProcessIds");
-    originalProcessIds->SetNumberOfTuples(dsPreOutput->GetNumberOfCells());
-    originalProcessIds->FillComponent(0, controller->GetLocalProcessId());
-    dsPreOutput->GetCellData()->AddArray(originalProcessIds);
-    originalProcessIds->Delete();
+    vtkIdTypeArray* originalProcessIds = 0;
+    if (dsPreOutput->GetNumberOfPoints() > 0)
+      {
+      originalProcessIds = vtkIdTypeArray::New();
+      originalProcessIds->SetNumberOfComponents(1);
+      originalProcessIds->SetName("vtkOriginalProcessIds");
+      originalProcessIds->SetNumberOfTuples(dsPreOutput->GetNumberOfPoints());
+      originalProcessIds->FillComponent(0, controller->GetLocalProcessId());
+      dsPreOutput->GetPointData()->AddArray(originalProcessIds);
+      originalProcessIds->Delete();
+      }
+      
+    if (dsPreOutput->GetNumberOfCells() > 0)
+      {
+      originalProcessIds = vtkIdTypeArray::New();
+      originalProcessIds->SetNumberOfComponents(1);
+      originalProcessIds->SetName("vtkOriginalProcessIds");
+      originalProcessIds->SetNumberOfTuples(dsPreOutput->GetNumberOfCells());
+      originalProcessIds->FillComponent(0, controller->GetLocalProcessId());
+      dsPreOutput->GetCellData()->AddArray(originalProcessIds);
+      originalProcessIds->Delete();
+      }
     }
 
   vtkTable* tablePreOutput = vtkTable::SafeDownCast(preOutput);
@@ -262,13 +269,16 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
     {
     // Note that preOutput is never the input directly (it is shallow copied at
     // the least, hence we can add arrays to it.
-    vtkIdTypeArray* originalProcessIds = vtkIdTypeArray::New();
-    originalProcessIds->SetNumberOfComponents(1);
-    originalProcessIds->SetName("vtkOriginalProcessIds");
-    originalProcessIds->SetNumberOfTuples(tablePreOutput->GetNumberOfRows());
-    originalProcessIds->FillComponent(0, controller->GetLocalProcessId());
-    tablePreOutput->AddColumn(originalProcessIds);
-    originalProcessIds->Delete();
+    if (tablePreOutput->GetNumberOfRows() > 0)
+      {
+      vtkIdTypeArray* originalProcessIds = vtkIdTypeArray::New();
+      originalProcessIds->SetNumberOfComponents(1);
+      originalProcessIds->SetName("vtkOriginalProcessIds");
+      originalProcessIds->SetNumberOfTuples(tablePreOutput->GetNumberOfRows());
+      originalProcessIds->FillComponent(0, controller->GetLocalProcessId());
+      tablePreOutput->AddColumn(originalProcessIds);
+      originalProcessIds->Delete();
+      }
     }
 
 
