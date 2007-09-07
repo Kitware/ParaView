@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QDir>
 #include <QMainWindow>
+#include <QDoubleSpinBox>
 
 #include "pqActionGroupInterface.h"
 #include "pqActiveServer.h"
@@ -105,6 +106,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionInspectorPanel.h"
 
 #include "pqRubberBandHelper.h"
+#include "pqPickHelper.h"
 #include "pqSelectionManager.h"
 #include "pqSelectReaderDialog.h"
 #include "pqServer.h"
@@ -308,6 +310,7 @@ public:
   pqWriterFactory WriterFactory;
   pqPendingDisplayManager PendingDisplayManager;
   pqRubberBandHelper RenderViewSelectionHelper;
+  pqPickHelper RenderViewPickHelper;
   QPointer<pqUndoStack> UndoStack;
  
   QPointer<QMenu> RecentFiltersMenu; 
@@ -800,6 +803,12 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   pxm->InstantiateGroupPrototypes("sources");
   pxm->InstantiateGroupPrototypes("filters");
+
+
+  QObject::connect(&this->Implementation->RenderViewPickHelper, 
+                   SIGNAL(pickFinished(double, double, double)),
+                   this, 
+                   SLOT(pickCenterOfRotationFinished(double, double, double)));
 }
 
 //-----------------------------------------------------------------------------
@@ -2857,7 +2866,7 @@ void pqMainWindowCore::onSelectionChanged()
   this->updatePendingActions(server, source, numServers, pendingDisplays);
 
   // Update the reset center action.
-  emit this->enableResetCenter(source != 0 && renderView != 0);
+  emit this->enableModifyCenter(source != 0 && renderView != 0);
 
   // Update the save screenshot action.
   emit this->enableFileSaveScreenshot(server != 0 && view != 0);
@@ -2894,7 +2903,7 @@ void pqMainWindowCore::onActiveViewChanged(pqView* view)
   pqServer *server = this->getActiveServer();
 
   // Update the reset center action.
-  emit this->enableResetCenter(source != 0 && renderView != 0);
+  emit this->enableModifyCenter(source != 0 && renderView != 0);
 
   // Update the show center axis action.
   emit this->enableShowCenterAxis(renderView != 0);
@@ -3730,6 +3739,117 @@ void pqMainWindowCore::setMaxRenderWindowSize(const QSize& size)
 }
 
 //-----------------------------------------------------------------------------
+void pqMainWindowCore::pickCenterOfRotation()
+{
+  pqRenderView* rm = qobject_cast<pqRenderView*>(
+    pqActiveView::instance().current());
+  if (!rm)
+    {
+    qDebug() << "No active render module. Cannot reset center of rotation.";
+    return;
+    }
+
+  this->Implementation->RenderViewPickHelper.setView(rm);
+  this->Implementation->RenderViewPickHelper.beginPick();  
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::pickCenterOfRotationFinished(double x, double y, double z)
+{
+  this->Implementation->RenderViewPickHelper.endPick();  
+
+  pqRenderView* rm = qobject_cast<pqRenderView*>(
+    pqActiveView::instance().current());
+  if (!rm)
+    {
+    qDebug() << "No active render module. Cannot reset center of rotation.";
+    return;
+    }
+
+  double center[3];
+  center[0] = x;
+  center[1] = y;
+  center[2] = z;
+
+  rm->setCenterOfRotation(center);
+  rm->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::enterCenterOfRotation()
+{
+  pqRenderView* rm = qobject_cast<pqRenderView*>(
+    pqActiveView::instance().current());
+  if (!rm)
+    {
+    qDebug() << "No active render module. Cannot reset center of rotation.";
+    return;
+    }
+  pqPipelineSource* source = this->getActiveSource();
+  if (!source)
+    {
+    qDebug() << "No active source. Cannot reset center of rotation.";
+    return;
+    }
+
+  pqPipelineRepresentation* repr = qobject_cast<pqPipelineRepresentation*>(
+    source->getRepresentation(rm));
+  if (!repr)
+    {
+    //qDebug() << "Active source not shown in active view. Cannot set center.";
+    return;
+    }
+
+  QDialog dlg;
+  QVBoxLayout* layout = new QVBoxLayout();
+  dlg.setLayout(layout);
+
+  double bounds[6];
+  repr->getDataBounds(bounds);
+  double center[3];
+  rm->getCenterOfRotation(center);
+
+  QDoubleSpinBox *xEdit = new QDoubleSpinBox();
+  //pick's center can be outside bounds, so disable to use dialog just to query
+  //xEdit->setMinimum(bounds[0]); 
+  //xEdit->setMaximum(bounds[1]);
+  xEdit->setSingleStep((bounds[1]-bounds[0])/25.0);
+  xEdit->setValue(center[0]);
+  layout->addWidget(xEdit);    
+
+  QDoubleSpinBox *yEdit = new QDoubleSpinBox();
+  //yEdit->setMinimum(bounds[2]);
+  //yEdit->setMaximum(bounds[3]);
+  yEdit->setSingleStep((bounds[3]-bounds[2])/25.0);
+  yEdit->setValue(center[1]);
+  layout->addWidget(yEdit);    
+
+  QDoubleSpinBox *zEdit = new QDoubleSpinBox();
+  //zEdit->setMinimum(bounds[4]); 
+  //zEdit->setMaximum(bounds[5]);
+  zEdit->setSingleStep((bounds[5]-bounds[4])/25.0);
+  zEdit->setValue(center[2]);
+  layout->addWidget(zEdit);    
+
+  QPushButton *ok = new QPushButton("OK");
+  layout->addWidget(ok);
+  QPushButton *cancel = new QPushButton("CANCEL");
+  layout->addWidget(cancel);
+  QObject::connect(ok, SIGNAL(clicked()), &dlg, SLOT(accept()));
+  QObject::connect(cancel, SIGNAL(clicked()), &dlg, SLOT(reject()));
+
+  int code = dlg.exec();
+  if (code == QDialog::Accepted)
+    {
+    center[0] = xEdit->value();
+    center[1] = yEdit->value();
+    center[2] = zEdit->value();
+    rm->setCenterOfRotation(center);
+    rm->render();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::resetCenterOfRotationToCenterOfCurrentData()
 {
   pqRenderView* rm = qobject_cast<pqRenderView*>(
@@ -3750,7 +3870,7 @@ void pqMainWindowCore::resetCenterOfRotationToCenterOfCurrentData()
     source->getRepresentation(rm));
   if (!repr)
     {
-    //qDebug() << "Active source not shown in active view. Cannot reset center.";
+    //qDebug() << "Active source not shown in active view. Cannot set center.";
     return;
     }
 

@@ -34,6 +34,7 @@
         <file>Icons/pqDisconnect16.png</file>
         <file>Icons/pqDisconnect24.png</file>
         <file>Icons/pqDisconnect32.png</file>
+        <file>Icons/pqEnterCenter24.png</file>
         <file>Icons/pqExponential16.png</file>
         <file>Icons/pqExponential24.png</file>
         <file>Icons/pqExtractGrid24.png</file>
@@ -87,6 +88,7 @@
         <file>Icons/pqOpen32.png</file>
         <file>Icons/pqOptions16.png</file>
         <file>Icons/pqPaste22.png</file>
+        <file>Icons/pqPickCenter24.png</file>
         <file>Icons/pqPipelineList22.png</file>
         <file>Icons/pqPointData16.png</file>
         <file>Icons/pqPolydata16.png</file>

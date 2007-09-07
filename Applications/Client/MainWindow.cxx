@@ -663,19 +663,33 @@ MainWindow::MainWindow() :
 
   // Set up Center Axes toolbar.
   QObject::connect(
+    this->Implementation->UI.actionShowCenterAxes, SIGNAL(toggled(bool)),
+    &this->Implementation->Core, SLOT(setCenterAxesVisibility(bool)));
+  QObject::connect(
     this->Implementation->UI.actionResetCenter, SIGNAL(triggered()),
     &this->Implementation->Core, 
     SLOT(resetCenterOfRotationToCenterOfCurrentData()));
   QObject::connect(
-    this->Implementation->UI.actionShowCenterAxes, SIGNAL(toggled(bool)),
-    &this->Implementation->Core, SLOT(setCenterAxesVisibility(bool)));
+    this->Implementation->UI.actionPickCenter, SIGNAL(triggered()),
+    &this->Implementation->Core, 
+    SLOT(pickCenterOfRotation()));
+  QObject::connect(
+    this->Implementation->UI.actionEnterCenter, SIGNAL(triggered()),
+    &this->Implementation->Core, 
+    SLOT(enterCenterOfRotation()));
 
   QObject::connect(
     &this->Implementation->Core, SIGNAL(enableShowCenterAxis(bool)),
     this, SLOT(onShowCenterAxisChanged(bool)), Qt::QueuedConnection);
   QObject::connect(
-    &this->Implementation->Core, SIGNAL(enableResetCenter(bool)),
+    &this->Implementation->Core, SIGNAL(enableModifyCenter(bool)),
     this->Implementation->UI.actionResetCenter, SLOT(setEnabled(bool)));
+  QObject::connect(
+    &this->Implementation->Core, SIGNAL(enableModifyCenter(bool)),
+    this->Implementation->UI.actionPickCenter, SLOT(setEnabled(bool)));
+  QObject::connect(
+    &this->Implementation->Core, SIGNAL(enableModifyCenter(bool)),
+    this->Implementation->UI.actionEnterCenter, SLOT(setEnabled(bool)));
   
   connect(this->Implementation->UI.actionManage_Plugins,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onManagePlugins()));

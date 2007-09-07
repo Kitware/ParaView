@@ -248,7 +248,7 @@ signals:
   void enableSourceCreate(bool);
   void enableFilterCreate(bool);
   void enableVariableToolbar(bool);
-  void enableResetCenter(bool);
+  void enableModifyCenter(bool);
   void enableShowCenterAxis(bool);
   
   /** \todo Hide these private implementation details */
@@ -366,8 +366,18 @@ public slots:
   // source in the active view.
   void resetCenterOfRotationToCenterOfCurrentData();
 
+  // Next mouse press in 3D window sets the center of rotation to 
+  // the corresponding world coordinates.
+  void pickCenterOfRotation();
+  void pickCenterOfRotationFinished(double x, double y, double z);
+
+  // Brings up a dialog and point widget to manually set the center 
+  //of rotation.
+  void enterCenterOfRotation();
+
   // Set center axes visibility on active render view.
   void setCenterAxesVisibility(bool visible);
+
 
 private slots:
   void onCreateSource(QAction*);

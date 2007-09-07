@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>970</width>
-    <height>700</height>
+    <width>1147</width>
+    <height>712</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -36,42 +36,6 @@
     <addaction name="actionHelpHelp" />
     <addaction name="separator" />
     <addaction name="actionHelpEnableTooltips" />
-   </widget>
-   <widget class="QMenu" name="menuFile" >
-    <property name="title" >
-     <string>&amp;File</string>
-    </property>
-    <widget class="QMenu" name="menuRecentFiles" >
-     <property name="title" >
-      <string>Recent Files</string>
-     </property>
-    </widget>
-    <addaction name="actionFileOpen" />
-    <addaction name="menuRecentFiles" />
-    <addaction name="separator" />
-    <addaction name="actionFileLoadServerState" />
-    <addaction name="actionFileSaveServerState" />
-    <addaction name="separator" />
-    <addaction name="actionFileSaveData" />
-    <addaction name="actionFileSaveScreenshot" />
-    <addaction name="separator" />
-    <addaction name="actionFileSaveAnimation" />
-    <addaction name="actionFileSaveGeometry" />
-    <addaction name="separator" />
-    <addaction name="actionServerConnect" />
-    <addaction name="actionServerDisconnect" />
-    <addaction name="separator" />
-    <addaction name="actionFileExit" />
-   </widget>
-   <widget class="QMenu" name="menuSources" >
-    <property name="title" >
-     <string>&amp;Sources</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuFilters" >
-    <property name="title" >
-     <string>F&amp;ilters</string>
-    </property>
    </widget>
    <widget class="QMenu" name="menuTools" >
     <property name="title" >
@@ -106,6 +70,16 @@
     <addaction name="actionVCRNextFrame" />
     <addaction name="actionVCRLastFrame" />
     <addaction name="actionVCRLoop" />
+   </widget>
+   <widget class="QMenu" name="menuFilters" >
+    <property name="title" >
+     <string>F&amp;ilters</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuSources" >
+    <property name="title" >
+     <string>&amp;Sources</string>
+    </property>
    </widget>
    <widget class="QMenu" name="menuView" >
     <property name="title" >
@@ -159,6 +133,32 @@
     <addaction name="separator" />
     <addaction name="actionEditSettings" />
     <addaction name="actionEditViewSettings" />
+   </widget>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>&amp;File</string>
+    </property>
+    <widget class="QMenu" name="menuRecentFiles" >
+     <property name="title" >
+      <string>Recent Files</string>
+     </property>
+    </widget>
+    <addaction name="actionFileOpen" />
+    <addaction name="menuRecentFiles" />
+    <addaction name="separator" />
+    <addaction name="actionFileLoadServerState" />
+    <addaction name="actionFileSaveServerState" />
+    <addaction name="separator" />
+    <addaction name="actionFileSaveData" />
+    <addaction name="actionFileSaveScreenshot" />
+    <addaction name="separator" />
+    <addaction name="actionFileSaveAnimation" />
+    <addaction name="actionFileSaveGeometry" />
+    <addaction name="separator" />
+    <addaction name="actionServerConnect" />
+    <addaction name="actionServerDisconnect" />
+    <addaction name="separator" />
+    <addaction name="actionFileExit" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -365,6 +365,8 @@
    </attribute>
    <addaction name="actionShowCenterAxes" />
    <addaction name="actionResetCenter" />
+   <addaction name="actionPickCenter" />
+   <addaction name="actionEnterCenter" />
   </widget>
   <widget class="QDockWidget" name="animationPanelDock" >
    <property name="windowTitle" >
@@ -973,7 +975,7 @@
     <string>Show Center</string>
    </property>
    <property name="statusTip" >
-    <string>Show Center</string>
+    <string>Show/Hide center of rotation</string>
    </property>
   </action>
   <action name="actionResetCenter" >
@@ -987,7 +989,7 @@
     <string>Reset Center</string>
    </property>
    <property name="statusTip" >
-    <string>Reset Center</string>
+    <string>Reset center of rotation</string>
    </property>
   </action>
   <action name="actionAddSource" >
@@ -1163,6 +1165,46 @@
    </property>
    <property name="text" >
     <string>SelectFrustumPoints</string>
+   </property>
+  </action>
+  <action name="actionPickCenter" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqPickCenter24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Pick Center</string>
+   </property>
+   <property name="iconText" >
+    <string>Pick Center</string>
+   </property>
+   <property name="toolTip" >
+    <string>Pick Center</string>
+   </property>
+   <property name="statusTip" >
+    <string>Mouse press to pick center of rotation</string>
+   </property>
+  </action>
+  <action name="actionEnterCenter" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqEnterCenter24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Enter Center</string>
+   </property>
+   <property name="iconText" >
+    <string>Enter Center</string>
+   </property>
+   <property name="toolTip" >
+    <string>Enter Center</string>
+   </property>
+   <property name="statusTip" >
+    <string>Enter coordinates of center of rotation</string>
    </property>
   </action>
   <action name="actionEditViewSettings" >

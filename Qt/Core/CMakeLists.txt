@@ -62,6 +62,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqOutputWindowAdapter.h
   pqOutputPort.h
   pqPendingDisplayManager.h
+  pqPickHelper.h
   pqPipelineSource.h
   pqPipelineFilter.h
   pqPipelineRepresentation.h
@@ -213,6 +214,8 @@ ADD_LIBRARY(pqCore
   pqPendingDisplayManager.h
   pqPendingDisplayUndoElement.cxx
   pqPendingDisplayUndoElement.h
+  pqPickHelper.cxx
+  pqPickHelper.h
   pqPipelineFilter.cxx
   pqPipelineFilter.h
   pqPipelineSource.cxx
