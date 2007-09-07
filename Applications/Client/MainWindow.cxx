@@ -673,10 +673,6 @@ MainWindow::MainWindow() :
     this->Implementation->UI.actionPickCenter, SIGNAL(triggered()),
     &this->Implementation->Core, 
     SLOT(pickCenterOfRotation()));
-  QObject::connect(
-    this->Implementation->UI.actionEnterCenter, SIGNAL(triggered()),
-    &this->Implementation->Core, 
-    SLOT(enterCenterOfRotation()));
 
   QObject::connect(
     &this->Implementation->Core, SIGNAL(enableShowCenterAxis(bool)),
@@ -687,9 +683,6 @@ MainWindow::MainWindow() :
   QObject::connect(
     &this->Implementation->Core, SIGNAL(enableModifyCenter(bool)),
     this->Implementation->UI.actionPickCenter, SLOT(setEnabled(bool)));
-  QObject::connect(
-    &this->Implementation->Core, SIGNAL(enableModifyCenter(bool)),
-    this->Implementation->UI.actionEnterCenter, SLOT(setEnabled(bool)));
   
   connect(this->Implementation->UI.actionManage_Plugins,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onManagePlugins()));

@@ -371,10 +371,6 @@ public slots:
   void pickCenterOfRotation();
   void pickCenterOfRotationFinished(double x, double y, double z);
 
-  // Brings up a dialog and point widget to manually set the center 
-  //of rotation.
-  void enterCenterOfRotation();
-
   // Set center axes visibility on active render view.
   void setCenterAxesVisibility(bool visible);
 

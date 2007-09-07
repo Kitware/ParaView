@@ -24,8 +24,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>970</width>
-     <height>29</height>
+     <width>1147</width>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp" >
@@ -366,7 +366,6 @@
    <addaction name="actionShowCenterAxes" />
    <addaction name="actionResetCenter" />
    <addaction name="actionPickCenter" />
-   <addaction name="actionEnterCenter" />
   </widget>
   <widget class="QDockWidget" name="animationPanelDock" >
    <property name="windowTitle" >
