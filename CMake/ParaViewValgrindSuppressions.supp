@@ -4958,6 +4958,27 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
+   fun:g_malloc
+   obj:/usr/lib/libglib-2.0.so.0.1000.3
+   fun:g_main_context_dispatch
+   obj:/usr/lib/libglib-2.0.so.0.1000.3
+   fun:g_main_context_iteration
+   fun:_ZN20QEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   fun:_ZN23QGuiEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   fun:_ZN10QEventLoop13processEventsE6QFlagsINS_17ProcessEventsFlagEE
+   fun:_ZN10QEventLoop4execE6QFlagsINS_17ProcessEventsFlagEE
+   fun:_ZN16QCoreApplication4execEv
+   fun:_ZN24pqProcessModuleGUIHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:_ZN6pqMain3RunER12QApplicationP24pqProcessModuleGUIHelper
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
    fun:FcStrCopy
    fun:FcStrSetAdd
    fun:FcConfigParseAndLoad
@@ -11565,6 +11586,22 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
+   fun:XRenderComposite
+   fun:_ZN15QX11PaintEngine10drawPixmapERK6QRectFRK7QPixmapS2_
+   fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZN15QX11PaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZN15QPainterPrivate11draw_helperERK12QPainterPathNS_13DrawOperationE
+   fun:_ZN8QPainter9drawRectsEPK6QRectFi
+   fun:_ZN8QPainter8fillRectERK6QRectFRK6QBrush
+   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZN12pqTreeWidgetC1EP7QWidget
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
    obj:/usr/lib/libX11.so.6.2.0
    fun:XCreateGC
    fun:_ZN15QX11PaintEngine5beginEP12QPaintDevice
@@ -15607,4 +15644,11 @@
    fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
    fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
    fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XtMalloc
+   fun:XtAppAddTimeOut
 }
