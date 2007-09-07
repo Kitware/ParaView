@@ -25,7 +25,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.2");
+vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.3");
 vtkStandardNewMacro(vtkPVInteractorStyle);
 
 //-------------------------------------------------------------------------
@@ -148,7 +148,6 @@ void vtkPVInteractorStyle::OnButtonUp(int button)
                               this->Interactor);
     this->Current->EndInteraction();
     this->InvokeEvent(vtkCommand::EndInteractionEvent);
-    this->Interactor->Render();
     this->Current->UnRegister(this);
     this->Current = NULL;
     }
