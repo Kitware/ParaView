@@ -23,6 +23,7 @@
 
 class vtkPKdTree;
 class vtkAlgorithm;
+class vtkDataSet;
 
 class VTK_EXPORT vtkKdTreeManager : public vtkObject
 {
@@ -61,6 +62,8 @@ public:
 protected:
   vtkKdTreeManager();
   ~vtkKdTreeManager();
+
+  void AddDataSetToKdTree(vtkDataSet *data);
 
   vtkAlgorithm* StructuredProducer;
   vtkPKdTree* KdTree;
