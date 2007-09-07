@@ -69,7 +69,6 @@ pqProxy::pqProxy(const QString& group, const QString& name,
   this->Internal = new pqProxyInternal;
   this->Internal->Proxy = proxy;
   this->Modified = pqProxy::UNMODIFIED;
-  this->AutoCreated = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -253,7 +252,6 @@ void pqProxy::setModifiedState(ModifiedState modified)
 //-----------------------------------------------------------------------------
 void pqProxy::setDefaultPropertyValues()
 {
-  this->AutoCreated = false;
   vtkSMProxy* proxy = this->getProxy();
 
   // If this is a compound proxy, its property values will be set from XML

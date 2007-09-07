@@ -109,7 +109,7 @@ pqGlyphPanel::pqGlyphPanel(pqProxy* object_proxy, QWidget* _parent)
   lockButton->toggle();
   lockButton->toggle();
 
-  if (!object_proxy->getAutoCreated())
+  if (object_proxy->modifiedState() == pqProxy::UNINITIALIZED)
     {
     this->updateScaleFactor();
     }

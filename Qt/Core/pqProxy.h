@@ -128,12 +128,6 @@ public:
   /// Unregisters all helper proxies.
   void clearHelperProxies();
 
-  /// HACK:
-  /// This flag tells if the proxy was created by the pqObjectBuilder (in which
-  /// case it returns false) or by the server manager as a consequence of
-  /// undo/redo or state loading (return true).
-  bool getAutoCreated() const
-    { return this->AutoCreated; }
 signals:
   /// Fired when the name of the proxy is changed.
   void nameChanged(pqServerManagerModelItem*);
@@ -164,10 +158,6 @@ private:
   QString SMGroup;
   pqProxyInternal* Internal;
   ModifiedState Modified;
-
-  // HACK: flag is set to false when the vtkSMProxy was created by the object
-  // builder else set to true.
-  bool AutoCreated;
 };
 
 #endif
