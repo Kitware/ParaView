@@ -91,7 +91,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.48");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.49");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -106,7 +106,7 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
   vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
   // We offset lines/vertices.
   vtkMapper::SetResolveCoincidentTopologyPolygonOffsetFaces(0);
-  vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(-1.0, 1.0);
+  vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(-1.0, -1.0);
 
   // All the subproxies are created on Client and Render Server.
   this->RendererProxy = 0;
