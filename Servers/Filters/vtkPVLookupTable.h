@@ -98,6 +98,14 @@ public:
   // blend its opacity.
   // Overridden to pass the alpha to the internal vtkLookupTable.
   virtual void SetAlpha(double alpha);
+
+
+  // Description:
+  // This should return 1 is the subclass is using log scale for mapping scalars
+  // to colors. 
+  virtual int UsingLogScale()
+    { return this->UseLogScale; }
+
 protected:
   vtkPVLookupTable();
   ~vtkPVLookupTable();
