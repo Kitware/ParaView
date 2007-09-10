@@ -149,6 +149,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>position0</tabstop>
+  <tabstop>position1</tabstop>
+  <tabstop>position2</tabstop>
+  <tabstop>focalPoint0</tabstop>
+  <tabstop>focalPoint1</tabstop>
+  <tabstop>focalPoint2</tabstop>
+  <tabstop>viewUp0</tabstop>
+  <tabstop>viewUp1</tabstop>
+  <tabstop>viewUp2</tabstop>
+  <tabstop>viewAngle</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
