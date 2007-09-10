@@ -6578,6 +6578,34 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:FcObjectStaticName
+   obj:/usr/lib/libfontconfig.so.1.0.4
+   fun:FcPatternFindElt
+   fun:FcPatternGet
+   fun:FcDefaultSubstitute
+   fun:_ZN13QFontDatabase4loadEPK12QFontPrivatei
+   fun:_ZN11QScriptLine16setDefaultHeightEP11QTextEngine
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutBlockERK10QTextBlockP13QLayoutStructiiS2_
+   fun:_ZN26QTextDocumentLayoutPrivate10layoutFlowEN10QTextFrame8iteratorEP13QLayoutStructii
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameiidd
+   fun:_ZN26QTextDocumentLayoutPrivate11layoutFrameEP10QTextFrameii
+   fun:_ZN19QTextDocumentLayout8doLayoutEiii
+   fun:_ZNK26QTextDocumentLayoutPrivate24ensureLayoutedByPositionEi
+   fun:_ZNK26QTextDocumentLayoutPrivate10layoutStepEv
+   fun:_ZN19QTextDocumentLayout15documentChangedEiii
+   fun:_ZN20QTextDocumentPrivate9setLayoutEP27QAbstractTextDocumentLayout
+   fun:_ZNK13QTextDocument14documentLayoutEv
+   fun:_ZN19QTextControlPrivate10setContentEN2Qt10TextFormatERK7QStringP13QTextDocument
+   fun:_ZN12QTextControlC2EP7QObject
+   fun:_ZN16QTextEditPrivate4initERK7QString
+   fun:_ZN9QTextEditC2EP7QWidget
+}
+{
+   <insert a suppression name here>
    Memcheck:Cond
    fun:_ZN15QPainterPrivate12updateMatrixEv
    fun:_ZN8QPainter5beginEP12QPaintDevice
@@ -8284,6 +8312,19 @@
    fun:_ZN16pqMainWindowCore14onEditSettingsEv
    fun:_ZN16pqMainWindowCore11qt_metacallEN11QMetaObject4CallEiPPv
    fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XMoveResizeWindow
+   fun:_ZN14QWidgetPrivate13setWSGeometryEb
+   fun:_ZN14QWidgetPrivate13setWSGeometryEb
+   fun:_ZN14QWidgetPrivate13setWSGeometryEb
+   fun:_ZN14QWidgetPrivate15setGeometry_sysEiiiib
 }
 {
    <insert a suppression name here>
@@ -11029,6 +11070,34 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XPutImage
+   fun:_ZN7QPixmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZN15QX11PaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZN8QPainter9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_Z24qt_plastique_draw_handleP8QPainterPK12QStyleOptionRK5QRectN2Qt11OrientationEPK7QWidget
+   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_Z8paintSepP8QPainterP7QWidgetRK5QRectN2Qt11OrientationEb
+   fun:_ZNK17QDockWidgetLayout15paintSeparatorsEP8QPainterP7QWidgetRK7QRegionRK6QPoint
+   fun:_ZN11QMainWindow5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
+   fun:_Z19qt_syncBackingStoreP7QWidget
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN6QFrame5eventEP6QEvent
+   fun:_ZN6QLabel5eventEP6QEvent
+}
+{
+   <insert a suppression name here>
    Memcheck:Leak
    fun:realloc
    fun:_Z8qReallocPvj
@@ -12504,6 +12573,23 @@
    fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
    fun:_ZN6pqMain3RunER12QApplicationP24pqProcessModuleGUIHelper
    fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   fun:_X11TransWrite
+   obj:/usr/lib/libX11.so.6.2.0
+   fun:XRenderComposite
+   fun:_ZN15QX11PaintEngine10drawPixmapERK6QRectFRK7QPixmapS2_
+   fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZN15QX11PaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
+   fun:_ZN15QPainterPrivate11draw_helperERK12QPainterPathNS_13DrawOperationE
+   fun:_ZN8QPainter9drawRectsEPK6QRectFi
+   fun:_ZN8QPainter8fillRectERK6QRectFRK6QBrush
+   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZN12pqTreeWidgetC1EP7QWidget
 }
 {
    <insert a suppression name here>
