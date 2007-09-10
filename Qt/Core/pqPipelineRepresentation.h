@@ -167,6 +167,10 @@ protected slots:
   /// "Solid Color" otherwise the volume mapper segfaults.
   void onRepresentationChanged();
 
+  /// called when this representations visibility changes. We check if the LUT
+  /// used to color this repr is being used by any other repr. If not, we turn off
+  /// the scalar bar.
+  void updateScalarBarVisibility(bool visible);
 protected:
   /// Creates helper proxies such as as the proxy
   /// for volume opacity function.

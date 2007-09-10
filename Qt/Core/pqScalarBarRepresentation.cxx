@@ -61,6 +61,7 @@ pqScalarBarRepresentation::pqScalarBarRepresentation(const QString& group, const
     QObject* _parent)
 : pqRepresentation(group, name, scalarbar, server, _parent)
 {
+  this->AutoHidden = false;
   this->Internal = new pqScalarBarRepresentation::pqInternal();
 
   this->Internal->VTKConnect = vtkEventQtSlotConnect::New();

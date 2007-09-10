@@ -65,11 +65,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
+#include "pqRenderView.h"
+#include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
-
 
 //-----------------------------------------------------------------------------
 class pqPipelineRepresentation::pqInternal
@@ -149,6 +150,9 @@ pqPipelineRepresentation::pqPipelineRepresentation(
     display->GetProperty("Representation"), vtkCommand::ModifiedEvent,
     this, SLOT(onRepresentationChanged()), 0, 0, Qt::QueuedConnection);
     */
+
+  QObject::connect(this, SIGNAL(visibilityChanged(bool)),
+    this, SLOT(updateScalarBarVisibility(bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -933,4 +937,44 @@ void pqPipelineRepresentation::onRepresentationChanged()
     }
 
   this->updateLookupTableScalarRange();
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineRepresentation::updateScalarBarVisibility(bool visible)
+{
+  pqView* view = this->getView();
+  pqScalarsToColors* lut = this->getLookupTable();
+  if (!view || !lut)
+    {
+    return;
+    }
+
+  // Is this lut used by any other visible repr in this view?
+  QList<pqRepresentation*> reprs = view->getRepresentations();
+  foreach (pqRepresentation* repr, reprs)
+    {
+    pqDataRepresentation* dataRepr=qobject_cast<pqDataRepresentation*>(repr);
+    if (dataRepr && dataRepr != this &&
+      dataRepr->isVisible() && dataRepr->getLookupTable() == lut)
+      {
+      // lut is used by another visible repr. Don't change lut visibility.
+      return;
+      }
+    }
+
+  pqScalarBarRepresentation* sbRepr = lut->getScalarBar(
+    qobject_cast<pqRenderView*>(view));
+  if (sbRepr)
+    {
+    if (!visible && sbRepr->isVisible())
+      {
+      sbRepr->setVisible(false);
+      sbRepr->setAutoHidden(true);
+      }
+    else if (visible && sbRepr->getAutoHidden() && !sbRepr->isVisible())
+      {
+      sbRepr->setAutoHidden(false);
+      sbRepr->setVisible(true);
+      }
+    }
 }
