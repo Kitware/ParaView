@@ -41,13 +41,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 
+#include "pqServer.h"
+#include "pqTimeKeeper.h"
+#include "vtkAlgorithm.h"
 #include "vtkCollection.h"
+#include "vtkIdTypeArray.h"
+#include "vtkInformation.h"
 #include "vtkProcessModule.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkSelection.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMClientDeliveryRepresentationProxy.h"
+#include "vtkSMClientDeliveryStrategyProxy.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
@@ -221,3 +228,176 @@ QList<QVariant> pqSelectionManager::getSelectedGlobalIDs() const
   return reply;
 }
 
+//-----------------------------------------------------------------------------
+static void getGlobalIDs(vtkSelection* sel, QList<vtkIdType>& gids)
+{
+  if (sel && sel->GetContentType() == vtkSelection::SELECTIONS)
+    {
+    for (unsigned int cc=0; cc < sel->GetNumberOfChildren(); cc++)
+      {
+      ::getGlobalIDs(sel->GetChild(cc), gids);
+      }
+    }
+  else if (sel && sel->GetContentType() == vtkSelection::GLOBALIDS)
+    {
+    vtkIdTypeArray* selList = vtkIdTypeArray::SafeDownCast(
+      sel->GetSelectionList());
+    for (vtkIdType cc=0; selList && 
+      cc < selList->GetNumberOfTuples()* selList->GetNumberOfComponents(); cc++)
+      {
+      gids << selList->GetValue(cc);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+static void getIndices(vtkSelection* sel, QList<QPair<int, vtkIdType> >& indices)
+{
+  if (sel && sel->GetContentType() == vtkSelection::SELECTIONS)
+    {
+    for (unsigned int cc=0; cc < sel->GetNumberOfChildren(); cc++)
+      {
+      ::getIndices(sel->GetChild(cc), indices);
+      }
+    }
+  else if (sel && sel->GetContentType() == vtkSelection::INDICES)
+    {
+    vtkIdTypeArray* selList = vtkIdTypeArray::SafeDownCast(
+      sel->GetSelectionList());
+    int pid = sel->GetProperties()->Has(vtkSelection::PROCESS_ID())?
+      sel->GetProperties()->Get(vtkSelection::PROCESS_ID()): -1;
+    for (vtkIdType cc=0; selList && 
+      cc < (selList->GetNumberOfTuples()* selList->GetNumberOfComponents());
+      cc++)
+      {
+      indices.push_back(QPair<int, vtkIdType>(pid, selList->GetValue(cc)));
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+QList<vtkIdType> pqSelectionManager::getGlobalIDs()
+{
+  QList<vtkIdType> gids;
+
+  vtkSMProxy* selectionSource = this->Implementation->getSelectionSourceProxy();
+  int selectionPort = 0;
+  pqOutputPort* opport = this->getSelectedPort();
+  vtkSMProxy* dataSource = opport->getSource()->getProxy();
+  int dataPort = opport->getPortNumber();
+
+  // If selectionSource's content type is GLOBALIDS,
+  // we dont need to do any conversion.
+  if (pqSMAdaptor::getElementProperty(
+      selectionSource->GetProperty("ContentType")).toInt() 
+    == vtkSelection::GLOBALIDS)
+    {
+    QList<QVariant> ids = pqSMAdaptor::getMultipleElementProperty(
+      selectionSource->GetProperty("IDs"));
+    for (int cc=1; cc < ids.size() ; cc+=2)
+      {
+      gids.push_back(ids[cc].value<vtkIdType>());
+      }
+    return gids;
+    }
+
+  pqTimeKeeper* timeKeeper = opport->getServer()->getTimeKeeper();
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+
+  // Filter that converts selections.
+  vtkSMSourceProxy* convertor = vtkSMSourceProxy::SafeDownCast(
+    pxm->NewProxy("filters", "ConvertSelection"));
+  convertor->SetConnectionID(selectionSource->GetConnectionID());
+  pqSMAdaptor::setInputProperty(convertor->GetProperty("Input"),
+    selectionSource, selectionPort);
+  pqSMAdaptor::setInputProperty(convertor->GetProperty("DataInput"),
+    dataSource, dataPort);
+  pqSMAdaptor::setElementProperty(convertor->GetProperty("OutputType"),
+    vtkSelection::GLOBALIDS);
+  convertor->UpdateVTKObjects();
+  convertor->UpdatePipeline(timeKeeper->getTime());
+
+  // Now deliver the selection to the client.
+
+  vtkSMClientDeliveryStrategyProxy* strategy = 
+    vtkSMClientDeliveryStrategyProxy::SafeDownCast(
+      pxm->NewProxy("strategies", "ClientDeliveryStrategy"));
+  strategy->AddInput(convertor, 0);
+  strategy->SetPostGatherHelper("vtkAppendSelection");
+  strategy->Update();
+ 
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkAlgorithm* alg = vtkAlgorithm::SafeDownCast(
+    pm->GetObjectFromID(strategy->GetOutput()->GetID()));
+  vtkSelection* sel= vtkSelection::SafeDownCast(
+    alg->GetOutputDataObject(0));
+
+  ::getGlobalIDs(sel, gids);
+
+  convertor->Delete();
+  strategy->Delete();
+  return gids;
+}
+
+//-----------------------------------------------------------------------------
+QList<QPair<int, vtkIdType> > pqSelectionManager::getIndices()
+{
+  QList<QPair<int, vtkIdType> > indices;
+
+  vtkSMProxy* selectionSource = this->Implementation->getSelectionSourceProxy();
+  int selectionPort = 0;
+  pqOutputPort* opport = this->getSelectedPort();
+  vtkSMProxy* dataSource = opport->getSource()->getProxy();
+  int dataPort = opport->getPortNumber();
+
+  // If selectionSource's content type is INDICES,
+  // we dont need to do any conversion.
+  if (pqSMAdaptor::getElementProperty(
+      selectionSource->GetProperty("ContentType")).toInt() 
+    == vtkSelection::INDICES)
+    {
+    QList<QVariant> ids = pqSMAdaptor::getMultipleElementProperty(
+      selectionSource->GetProperty("IDs"));
+    for (int cc=0; (cc+1) < ids.size() ; cc+=2)
+      {
+      indices.push_back(QPair<int, vtkIdType>(ids[cc].toInt(),
+          ids[cc+1].value<vtkIdType>()));
+      }
+    return indices;
+    }
+
+    pqTimeKeeper* timeKeeper = opport->getServer()->getTimeKeeper();
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+
+  // Filter that converts selections.
+  vtkSMSourceProxy* convertor = vtkSMSourceProxy::SafeDownCast(
+    pxm->NewProxy("filters", "ConvertSelection"));
+  convertor->SetConnectionID(selectionSource->GetConnectionID());
+  pqSMAdaptor::setInputProperty(convertor->GetProperty("Input"),
+    selectionSource, selectionPort);
+  pqSMAdaptor::setInputProperty(convertor->GetProperty("DataInput"),
+    dataSource, dataPort);
+  pqSMAdaptor::setElementProperty(convertor->GetProperty("OutputType"),
+    vtkSelection::INDICES);
+  convertor->UpdateVTKObjects();
+  convertor->UpdatePipeline(timeKeeper->getTime());
+
+  vtkSMClientDeliveryStrategyProxy* strategy = 
+    vtkSMClientDeliveryStrategyProxy::SafeDownCast(
+      pxm->NewProxy("strategies", "ClientDeliveryStrategy"));
+  strategy->AddInput(convertor, 0);
+  strategy->SetPostGatherHelper("vtkAppendSelection");
+  strategy->Update();
+ 
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkAlgorithm* alg = vtkAlgorithm::SafeDownCast(
+    pm->GetObjectFromID(strategy->GetOutput()->GetID()));
+  vtkSelection* sel= vtkSelection::SafeDownCast(
+    alg->GetOutputDataObject(0));
+
+  ::getIndices(sel, indices);
+
+  convertor->Delete();
+  strategy->Delete();
+  return indices;
+}

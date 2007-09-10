@@ -4959,6 +4959,18 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <IntVectorProperty name="UseViewUpdateTime"
+        command="SetUseViewUpdateTime"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Indicates if the representation should use the view time to update the
+          pipeline or use "UpdateTime" set on the representation instead.
+        </Documentation>
+      </IntVectorProperty>
+
       <!-- End of ClientDeliveryRepresentationBase -->
     </ClientDeliveryRepresentationProxy>
 
@@ -5295,6 +5307,31 @@
         </Documentation>
       </IdTypeVectorProperty>
 
+      <DoubleVectorProperty name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        is_internal="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          This time is not used unless UseViewUpdateTime is off.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="UseViewUpdateTime"
+        command="SetUseViewUpdateTime"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Indicates if the representation should use the view time to update the
+          pipeline or use "UpdateTime" set on the representation instead.
+        </Documentation>
+      </IntVectorProperty>
+
       <SubProxy>
         <SourceProxy name="BlockFilter" class="vtkIndexBasedBlockFilter">
           <InputProperty name="Input" 
@@ -5379,6 +5416,31 @@
         </Documentation>
       </IdTypeVectorProperty>
 
+      <DoubleVectorProperty name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        is_internal="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          This time is not used unless UseViewUpdateTime is off.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="UseViewUpdateTime"
+        command="SetUseViewUpdateTime"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Indicates if the representation should use the view time to update the
+          pipeline or use "UpdateTime" set on the representation instead.
+        </Documentation>
+      </IntVectorProperty>
+
       <SubProxy>
         <SourceProxy name="BlockFilter" class="vtkIndexBasedBlockSelectionFilter">
           <InputProperty name="Input" 
@@ -5428,17 +5490,6 @@
 
       <SubProxy>
         <SourceProxy name="Reduction" class="vtkAppendSelection">
-          <IntVectorProperty 
-            name="AppendByCompositing"
-            command="SetAppendByCompositing"
-            number_of_elements="1"
-            default_values="1">
-            <Documentation>
-              Essential that this property is set to 1 to ensure that selections
-              from different processes get collected correctly.
-            </Documentation>
-            <BooleanDomain name="bool" />
-          </IntVectorProperty>
         </SourceProxy>
       </SubProxy>
     </BlockDeliveryRepresentationProxy>

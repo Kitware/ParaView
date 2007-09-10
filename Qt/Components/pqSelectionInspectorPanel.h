@@ -133,6 +133,8 @@ protected slots:
 
   virtual void updateAllSelectionViews();
 
+  /// Converts index selection to global id selection and vice versa.
+  void convertSelection(bool toGlobalIds);
 private:
   /// Set the display whose properties we want to edit.
   void setRepresentation(pqDataRepresentation* repr);

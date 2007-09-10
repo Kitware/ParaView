@@ -47,6 +47,7 @@ SET(Filters_SRCS
   vtkMultiViewManager.cxx
   vtkNetworkImageSource.cxx
   vtkOrderedCompositeDistributor.cxx
+  vtkPConvertSelection.cxx
   vtkPExtractHistogram.cxx
   vtkPhastaReader.cxx
   vtkPointHandleRepresentationSphere.cxx

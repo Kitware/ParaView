@@ -6949,6 +6949,58 @@ This filter extracts a set of thresholds of its input.
       <!-- End of ExtractSelections -->
     </ExtractSelectionsProxy>
 
+    <SourceProxy name="ConvertSelection" class="vtkPConvertSelection">
+      <Documentation>
+        Converts a selection from one type to another.
+      </Documentation>
+
+      <InputProperty 
+        name="DataInput"
+        command="SetInputConnection"
+        port_index="1">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>
+          Set the vtkDataObject input used to convert the selection.
+        </Documentation>
+      </InputProperty>
+
+      <InputProperty
+        name="Input"
+        command="SetInputConnection"
+        port_index="0">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkSelection" />
+        </DataTypeDomain>
+        <Documentation>
+          Set the selection to convert.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty
+        name="OutputType"
+        command="SetOutputType"
+        number_of_elements="1"
+        default_values="5">
+        <Documentation>
+          Set the ContentType for the output.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="SELECTIONS" />
+          <Entry value="1" text="COMPOSITE_SELECTIONS" />
+          <Entry value="2" text="GLOBALIDs" />
+          <Entry value="3" text="PEDIGREEIDS" />
+          <Entry value="4" text="VALUES" />
+          <Entry value="5" text="INDICES" />
+          <Entry value="6" text="FRUSTUM" />
+          <Entry value="7" text="LOCATION" />
+          <Entry value="8" text="THRESHOLDS" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <!-- End of ConvertSelection -->
+    </SourceProxy>
+
   </ProxyGroup>
 
 </ServerManagerConfiguration>

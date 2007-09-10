@@ -236,8 +236,9 @@ void pqSelectionInspectorPanel::activeServerChanged(pqServer* server)
   this->Implementation->UseProcessID =
     (server && server->getNumberOfPartitions() > 1);
 
-  this->Implementation->Indices->setColumnHidden(0, 
-    !this->Implementation->UseProcessID);
+  bool show_pid = this->Implementation->UseProcessID
+    && !this->Implementation->UseGlobalIDs->isChecked();
+  this->Implementation->Indices->setColumnHidden(0, !show_pid);
   this->Implementation->ProcessIDRange->setVisible(
     this->Implementation->UseProcessID);
 }
@@ -1201,10 +1202,6 @@ void pqSelectionInspectorPanel::updateSurfaceIDConnections()
     return;
     }
 
-  //vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-  //  selectionSource->GetProperty("FieldType"));
-  //ivp->SetElement(0, vtkSelection::CELL);
-
   vtkSMProxy* selectionSource = this->Implementation->SelectionSource.GetPointer();
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     selectionSource->GetProperty("ContentType"));
@@ -1212,13 +1209,25 @@ void pqSelectionInspectorPanel::updateSurfaceIDConnections()
   headerLabels << "Process ID";
   if (this->Implementation->UseGlobalIDs->isChecked())
     {
+    // convert selection must be called before the ContentType on the selection
+    // source is changed otherwise the conversion wont result in any change.
+    this->convertSelection(true);
     ivp->SetElement(0, vtkSelection::GLOBALIDS);
     headerLabels << "Global ID";
+    // hide pid column
+    this->Implementation->Indices->setColumnHidden(0, true);
     }
   else
     {
+    // convert selection must be called before the ContentType on the selection
+    // source is changed otherwise the conversion wont result in any change.
+    this->convertSelection(false);
     ivp->SetElement(0, vtkSelection::INDICES);
     headerLabels << "Index";
+
+    // show pid column if num of process is > 1
+    this->Implementation->Indices->setColumnHidden(0,
+      !this->Implementation->UseProcessID);
     }
   this->Implementation->Indices->setHeaderLabels(headerLabels);
   selectionSource->UpdateVTKObjects();
@@ -1428,4 +1437,49 @@ void pqSelectionInspectorPanel::onActiveViewChanged()
 
     this->setRepresentation(repr);
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::convertSelection(bool toGIDs)
+{
+  vtkSMProxy* selectionSource = this->Implementation->SelectionSource.GetPointer();
+  pqOutputPort* port = 
+    this->Implementation->SelectionManager->getSelectedPort();
+  if(!selectionSource || !port)
+    {
+    return;
+    }
+
+  if (toGIDs) // Convert INDICES to GLOBALIDS.
+    {
+    QList<vtkIdType> globalIds = 
+      this->Implementation->SelectionManager->getGlobalIDs();
+
+    // Now to set gids on the IDs property, we need to insert process numbers.
+    QList<QVariant> ids;
+    foreach (vtkIdType gid, globalIds)
+      {
+      ids.push_back(-1);
+      ids.push_back(gid);
+      }
+    pqSMAdaptor::setMultipleElementProperty(
+      selectionSource->GetProperty("IDs"), ids);
+    }
+  else  // Convert GLOBALIDS to INDICES.
+    {
+    QList<QPair<int, vtkIdType> > indices =
+      this->Implementation->SelectionManager->getIndices();
+
+    QList<QVariant> ids;
+    for(int cc=0; cc < indices.size(); cc++)
+      {
+      QPair<int, vtkIdType> pair = indices[cc];
+      ids.push_back(pair.first);
+      ids.push_back(pair.second);
+      }
+    pqSMAdaptor::setMultipleElementProperty(
+      selectionSource->GetProperty("IDs"), ids);
+    }
+
+  selectionSource->UpdateVTKObjects();
 }

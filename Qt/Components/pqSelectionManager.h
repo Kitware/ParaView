@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerSelectionModel.h"
 
 #include <QObject>
+#include <QPair>
 #include "vtkType.h"
 
 class pqOutputPort;
@@ -72,12 +73,20 @@ public:
 
   /// Returns a list of indices currently selected.
   /// The list is in the form (<process id>, <index>, <process id>, <index> ...).
+  /// OBSOLETE WILL BE REMOVED.
   QList<QVariant> getSelectedIndicesWithProcessIDs() const;
 
   /// Returns a list of global ids currently selected.
   /// This list does not include the process Ids.
+  /// OBSOLETE WILL BE REMOVED.
   QList<QVariant> getSelectedGlobalIDs() const;
 
+  /// For the current selection, returns the list of global ids selected. This
+  /// valid only if the selected data source indeed has global ids.
+  QList<vtkIdType> getGlobalIDs();
+
+  /// For the current selection, returns the list of indices selected.
+  QList<QPair<int, vtkIdType> > getIndices();
 signals:
   /// fired when the selection changes.
   void selectionChanged(pqSelectionManager*);
