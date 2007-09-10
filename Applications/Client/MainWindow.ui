@@ -24,10 +24,59 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1147</width>
+     <width>970</width>
      <height>25</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>&amp;File</string>
+    </property>
+    <widget class="QMenu" name="menuRecentFiles" >
+     <property name="title" >
+      <string>Recent Files</string>
+     </property>
+    </widget>
+    <addaction name="actionFileOpen" />
+    <addaction name="menuRecentFiles" />
+    <addaction name="separator" />
+    <addaction name="actionFileLoadServerState" />
+    <addaction name="actionFileSaveServerState" />
+    <addaction name="separator" />
+    <addaction name="actionFileSaveData" />
+    <addaction name="actionFileSaveScreenshot" />
+    <addaction name="separator" />
+    <addaction name="actionFileSaveAnimation" />
+    <addaction name="actionFileSaveGeometry" />
+    <addaction name="separator" />
+    <addaction name="actionServerConnect" />
+    <addaction name="actionServerDisconnect" />
+    <addaction name="separator" />
+    <addaction name="actionFileExit" />
+   </widget>
+   <widget class="QMenu" name="menuEdit" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="actionEditUndo" />
+    <addaction name="actionEditRedo" />
+    <addaction name="separator" />
+    <addaction name="actionEditCameraUndo" />
+    <addaction name="actionEditCameraRedo" />
+    <addaction name="separator" />
+    <addaction name="actionChangeInput" />
+    <addaction name="actionDelete" />
+    <addaction name="actionDelete_All" />
+    <addaction name="separator" />
+    <addaction name="actionMoveMode" />
+    <addaction name="actionSelectionMode" />
+    <addaction name="actionSelectSurfacePoints" />
+    <addaction name="actionSelect_Frustum" />
+    <addaction name="actionSelectFrustumPoints" />
+    <addaction name="separator" />
+    <addaction name="actionEditSettings" />
+    <addaction name="actionEditViewSettings" />
+   </widget>
    <widget class="QMenu" name="menuHelp" >
     <property name="title" >
      <string>&amp;Help</string>
@@ -76,11 +125,6 @@
      <string>F&amp;ilters</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuSources" >
-    <property name="title" >
-     <string>&amp;Sources</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuView" >
     <property name="title" >
      <string>&amp;View</string>
@@ -106,59 +150,16 @@
     <addaction name="separator" />
     <addaction name="actionShowCenterAxes" />
     <addaction name="actionResetCenter" />
+    <addaction name="actionPickCenter" />
     <addaction name="actionScalarBarVisibility" />
     <addaction name="separator" />
     <addaction name="menuToolbars" />
     <addaction name="separator" />
    </widget>
-   <widget class="QMenu" name="menuEdit" >
+   <widget class="QMenu" name="menuSources" >
     <property name="title" >
-     <string>&amp;Edit</string>
+     <string>&amp;Sources</string>
     </property>
-    <addaction name="actionEditUndo" />
-    <addaction name="actionEditRedo" />
-    <addaction name="separator" />
-    <addaction name="actionEditCameraUndo" />
-    <addaction name="actionEditCameraRedo" />
-    <addaction name="separator" />
-    <addaction name="actionChangeInput" />
-    <addaction name="actionDelete" />
-    <addaction name="actionDelete_All" />
-    <addaction name="separator" />
-    <addaction name="actionMoveMode" />
-    <addaction name="actionSelectionMode" />
-    <addaction name="actionSelectSurfacePoints" />
-    <addaction name="actionSelect_Frustum" />
-    <addaction name="actionSelectFrustumPoints" />
-    <addaction name="separator" />
-    <addaction name="actionEditSettings" />
-    <addaction name="actionEditViewSettings" />
-   </widget>
-   <widget class="QMenu" name="menuFile" >
-    <property name="title" >
-     <string>&amp;File</string>
-    </property>
-    <widget class="QMenu" name="menuRecentFiles" >
-     <property name="title" >
-      <string>Recent Files</string>
-     </property>
-    </widget>
-    <addaction name="actionFileOpen" />
-    <addaction name="menuRecentFiles" />
-    <addaction name="separator" />
-    <addaction name="actionFileLoadServerState" />
-    <addaction name="actionFileSaveServerState" />
-    <addaction name="separator" />
-    <addaction name="actionFileSaveData" />
-    <addaction name="actionFileSaveScreenshot" />
-    <addaction name="separator" />
-    <addaction name="actionFileSaveAnimation" />
-    <addaction name="actionFileSaveGeometry" />
-    <addaction name="separator" />
-    <addaction name="actionServerConnect" />
-    <addaction name="actionServerDisconnect" />
-    <addaction name="separator" />
-    <addaction name="actionFileExit" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
