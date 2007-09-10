@@ -49,7 +49,7 @@ public:
   pqTreeWidgetItemObject(QTreeWidgetItem* p, const QStringList& t);
 
   /// overload setData() to emit changed signal
-  void setData(int column, int role, const QVariant& v);
+  virtual void setData(int column, int role, const QVariant& v);
 
 public slots:
   /// get the check true/false
