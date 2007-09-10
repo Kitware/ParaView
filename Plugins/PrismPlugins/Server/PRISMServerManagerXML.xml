@@ -1,11 +1,35 @@
 <ServerManagerConfiguration>
  <ProxyGroup name="filters">
-   <SourceProxy name="PrismGeometryFilter" class="vtkPrismGeometryFilter"
-     label="Prism Geometry Filter">
-     <Documentation
-        long_help="Creates points for each cell in geometry."
-        short_help="Creates points for each cell in geometry.">
-     </Documentation>
+   <SourceProxy name="PrismFilter"
+                class="vtkPrismFilter">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="SESAME File"/>
+     </StringVectorProperty>
+     <IntVectorProperty
+         name="TableId"
+         command="SetTable"
+         number_of_elements="1"
+         default_values="-1">
+         <EnumerationDomain name="enum">
+           <RequiredProperties>
+             <Property name="TableIds" function="Enumeration"/>
+          </RequiredProperties>
+         </EnumerationDomain>
+     </IntVectorProperty>
+     <IntVectorProperty
+         name="TableIds"
+         command="GetTableIdsAsArray"
+         information_only="1">
+         <IntArrayInformationHelper />
+     </IntVectorProperty>
+     <StringVectorProperty
+         name="TableArrayInfo"
+         information_only="1">
+         <ArraySelectionInformationHelper attribute_name="Table"/>
+     </StringVectorProperty>
      <InputProperty
         name="Input"
         command="SetInputConnection">
@@ -19,7 +43,6 @@
            <InputArrayDomain name="input_array" attribute_type="cell"/>
            <FixedTypeDomain name="fixed_type"/>
       </InputProperty>
-
      <IntVectorProperty 
         name="TableConversion" 
         command="SetTable" 
@@ -66,10 +89,8 @@
              </RequiredProperties>
            </ArrayListDomain>
      </StringVectorProperty>
-   <!-- End PrismGeometryFilter -->
-   </SourceProxy>
- </ProxyGroup>
- <ProxyGroup name="sources">
+     <!-- End Prism -->
+    </SourceProxy>
    <SourceProxy name="PrismSurfaceFilter"
                 class="vtkPrismSurfaceFilter">
      <StringVectorProperty

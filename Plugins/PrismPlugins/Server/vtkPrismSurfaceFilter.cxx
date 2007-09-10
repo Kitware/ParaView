@@ -25,7 +25,7 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismSurfaceFilter, "1.1");
+vtkCxxRevisionMacro(vtkPrismSurfaceFilter, "1.2");
 vtkStandardNewMacro(vtkPrismSurfaceFilter);
 
 class vtkPrismSurfaceFilter::MyInternal
@@ -249,6 +249,7 @@ int vtkPrismSurfaceFilter::RequestData(
   vtkIdType ptId, numPts;
   double x[3], newX[3];
   double s;
+  double bounds[6];
   int tableID;
  
   
@@ -298,10 +299,8 @@ int vtkPrismSurfaceFilter::RequestData(
       newX[1]=x[1];
       newX[2]=s;
       newPts->SetPoint(ptId, newX);
+
       outScalars->SetComponent(ptId,0,s);
-
-
-
       }
     }
   else if(tableID== 301 || tableID == 304)
@@ -347,6 +346,52 @@ int vtkPrismSurfaceFilter::RequestData(
       newPts->SetPoint(ptId, newX);
       }
     }
+
+
+
+  newPts->GetBounds(bounds);
+
+
+  double delta[3] = {
+    bounds[1] - bounds[0],
+    bounds[3] - bounds[2],
+    bounds[5] - bounds[4]
+    };
+
+  double smVal = delta[0];
+  if ( delta[1] < smVal )
+    {
+    smVal = delta[1];
+    }
+  if ( delta[2] < smVal )
+    {
+    smVal = delta[2];
+    }
+  if ( smVal != 0.0 )
+    {
+
+    double scale[3] = {
+      smVal/delta[0],
+      smVal/delta[1],
+      smVal/delta[2]
+      };
+
+
+    for (ptId=0; ptId < numPts; ptId++)
+      {
+
+      newPts->GetPoint(ptId, x);
+
+      newX[0] = x[0]*scale[0];
+      newX[1] = x[1]*scale[1];
+      newX[2] = x[2]*scale[2];
+
+      newPts->SetPoint(ptId, newX);
+
+      }
+
+    }
+
 
 
 
