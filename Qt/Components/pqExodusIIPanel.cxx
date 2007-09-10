@@ -463,7 +463,7 @@ void pqExodusIIPanel::updateDataRanges()
     var = strs.join(" ");
 
     ai = 0;
-    if (which == PM_ELEM && cdi)
+    if ((which == PM_ELEM || which == PM_ELEMBLK) && cdi)
       {
       ai = cdi->GetArrayInformation(var.toAscii().data());
       }
