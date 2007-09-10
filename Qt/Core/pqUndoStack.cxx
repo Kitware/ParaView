@@ -233,12 +233,6 @@ void pqUndoStack::endUndoSet()
 }
 
 //-----------------------------------------------------------------------------
-void pqUndoStack::accept()
-{
-  this->beginUndoSet("Accept");
-}
-
-//-----------------------------------------------------------------------------
 void pqUndoStack::undo()
 {
   this->beginNonUndoableChanges();

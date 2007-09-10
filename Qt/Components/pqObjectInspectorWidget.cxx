@@ -473,6 +473,12 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
 //-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::accept()
 {
+  pqUndoStack* us = pqApplicationCore::instance()->getUndoStack();
+  if(us)
+    {
+    us->beginUndoSet("Apply");
+    }
+
   emit this->preaccept();
 
   // accept all queued panels
@@ -491,6 +497,11 @@ void pqObjectInspectorWidget::accept()
   this->QueuedPanels.clear();
   
   emit this->postaccept();
+  
+  if(us)
+    {
+    us->endUndoSet();
+    }
   
   // Essential to render all views.
   pqApplicationCore::instance()->render();

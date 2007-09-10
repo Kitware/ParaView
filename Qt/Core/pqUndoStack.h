@@ -85,7 +85,6 @@ public:
 public slots:
   void beginUndoSet(QString label);
   void endUndoSet();
-  void accept();
  
   /// triggers Undo.
   void undo();

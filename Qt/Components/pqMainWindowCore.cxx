@@ -1125,12 +1125,6 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
     
   dock_widget->setWidget(proxyPanel);
 
-  pqUndoStack* const undoStack = this->Implementation->UndoStack;
-  
-  // Connect Accept/reset signals.
-  QObject::connect(object_inspector, SIGNAL(preaccept()),
-                   undoStack,        SLOT(accept()));
-    
   //QObject::connect(object_inspector, 
   //                 SIGNAL(preaccept()),
   //                 &this->Implementation->SelectionManager, 
@@ -1139,8 +1133,6 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
                    SIGNAL(accepted()),
                    this->Implementation->LookupTableManager, 
                    SLOT(updateLookupTableScalarRanges()));
-  QObject::connect( object_inspector, SIGNAL(postaccept()),
-                    undoStack,        SLOT(endUndoSet()));
   QObject::connect(object_inspector, SIGNAL(postaccept()),
                    this,             SLOT(onPostAccept()));
   QObject::connect(object_inspector, SIGNAL(accepted()), 
@@ -1167,17 +1159,10 @@ pqObjectInspectorWidget* pqMainWindowCore::setupObjectInspector(QDockWidget* doc
 
   dock_widget->setWidget(object_inspector);
 
-  pqUndoStack* const undoStack = this->Implementation->UndoStack;
-  
-  // Connect Accept/reset signals.
-  QObject::connect(object_inspector, SIGNAL(preaccept()),
-                   undoStack,        SLOT(accept()));
   //QObject::connect(object_inspector,
   //                 SIGNAL(preaccept()),
   //                 &this->Implementation->SelectionManager,
   //                 SLOT(clearSelection()));
-  QObject::connect(object_inspector, SIGNAL(postaccept()),
-                   undoStack,        SLOT(endUndoSet()));
   QObject::connect(object_inspector, SIGNAL(postaccept()),
                    this,             SLOT(onPostAccept()));
   QObject::connect(object_inspector, SIGNAL(accepted()), 
