@@ -352,7 +352,7 @@ void pqPipelineBrowser::changeInput()
       for (int cc=0; cc < filter->getNumberOfInputPorts(); cc++)
         {
         QString inputPortName = filter->getInputPortName(cc);
-        QList<pqOutputPort*> &inputs = dialog.getFilterInputs(inputPortName);
+        QList<pqOutputPort*> inputs = dialog.getFilterInputs(inputPortName);
 
         vtkstd::vector<vtkSMProxy*> inputPtrs;
         vtkstd::vector<unsigned int> inputPorts;
