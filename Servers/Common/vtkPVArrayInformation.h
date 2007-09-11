@@ -52,6 +52,11 @@ public:
   vtkGetMacro(NumberOfComponents, int);
 
   // Description:
+  // Set/get the array's length
+  vtkSetMacro(NumberOfTuples, int);
+  vtkGetMacro(NumberOfTuples, int);
+
+  // Description:
   // There is a range for each component.
   // Range for component -1 is the range of the vector magnitude.
   // The number of components should be set before these ranges.
@@ -110,6 +115,7 @@ protected:
   int IsPartial;
   int DataType;
   int NumberOfComponents;
+  int NumberOfTuples;
   char *Name;
   double *Ranges;
 

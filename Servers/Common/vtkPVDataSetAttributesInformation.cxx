@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
-vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.13");
+vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.14");
 
 //----------------------------------------------------------------------------
 vtkPVDataSetAttributesInformation::vtkPVDataSetAttributesInformation()
@@ -406,6 +406,21 @@ vtkPVDataSetAttributesInformation::GetAttributeInformation(int attributeType)
 int vtkPVDataSetAttributesInformation::GetNumberOfArrays() const
 {
   return this->ArrayInformation->GetNumberOfItems();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVDataSetAttributesInformation::GetMaximumNumberOfTuples() const
+{
+  vtkPVArrayInformation* info;
+  int maxNumVals = 0;
+
+  this->ArrayInformation->InitTraversal();
+  while ( (info = static_cast<vtkPVArrayInformation*>(this->ArrayInformation->GetNextItemAsObject())) )
+    {
+    maxNumVals = info->GetNumberOfTuples() > maxNumVals ? info->GetNumberOfTuples() : maxNumVals;
+    }
+
+  return maxNumVals;
 }
 
 //----------------------------------------------------------------------------

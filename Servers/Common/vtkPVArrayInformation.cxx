@@ -19,7 +19,7 @@ cxx     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVArrayInformation);
-vtkCxxRevisionMacro(vtkPVArrayInformation, "1.7");
+vtkCxxRevisionMacro(vtkPVArrayInformation, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()
@@ -41,6 +41,7 @@ void vtkPVArrayInformation::Initialize()
   this->SetName(0);
   this->DataType = VTK_VOID;
   this->NumberOfComponents = 0;
+  this->NumberOfTuples = 0;
   if(this->Ranges)
     {
     delete [] this->Ranges;
@@ -62,6 +63,7 @@ void vtkPVArrayInformation::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << indent << "DataType: " << this->DataType << endl;
   os << indent << "NumberOfComponents: " << this->NumberOfComponents << endl;
+  os << indent << "NumberOfTuples: " << this->NumberOfTuples << endl;
   os << indent << "IsPartial: " << this->IsPartial << endl;
 
   os << indent << "Ranges :" << endl;
@@ -75,6 +77,7 @@ void vtkPVArrayInformation::PrintSelf(ostream& os, vtkIndent indent)
     os << i2 << this->Ranges[2*idx] << ", " << this->Ranges[2*idx+1] << endl;
     }
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVArrayInformation::SetNumberOfComponents(int numComps)
@@ -260,6 +263,8 @@ void vtkPVArrayInformation::AddRanges(vtkPVArrayInformation *info)
       }
     ptr += 2;
     }
+
+  this->NumberOfTuples += info->GetNumberOfTuples();
 }
 
 //----------------------------------------------------------------------------
@@ -270,6 +275,7 @@ void vtkPVArrayInformation::DeepCopy(vtkPVArrayInformation *info)
   this->SetName(info->GetName());
   this->DataType = info->GetDataType();
   this->SetNumberOfComponents(info->GetNumberOfComponents());
+  this->SetNumberOfTuples(info->GetNumberOfTuples());
 
   num = 2*this->NumberOfComponents;
   if (this->NumberOfComponents > 1)
@@ -290,7 +296,8 @@ int vtkPVArrayInformation::Compare(vtkPVArrayInformation *info)
     return 0;
     }
   if (strcmp(info->GetName(), this->Name) == 0 &&
-      info->GetNumberOfComponents() == this->NumberOfComponents)
+      info->GetNumberOfComponents() == this->NumberOfComponents && 
+      info->GetNumberOfTuples() == this->NumberOfTuples)
     {
     return 1;
     }
@@ -316,6 +323,7 @@ void vtkPVArrayInformation::CopyFromObject(vtkObject* obj)
   this->SetName(array->GetName());
   this->DataType = array->GetDataType();
   this->SetNumberOfComponents(array->GetNumberOfComponents());
+  this->SetNumberOfTuples(array->GetNumberOfTuples());
   
   if(vtkDataArray* const data_array = vtkDataArray::SafeDownCast(obj))
     {
@@ -378,6 +386,7 @@ void vtkPVArrayInformation::CopyToStream(vtkClientServerStream* css)
   // Array name, data type, and number of components.
   *css << this->Name;
   *css << this->DataType;
+  *css << this->NumberOfTuples;
   *css << this->NumberOfComponents;
 
   // Range of each component.
@@ -414,9 +423,17 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
     return;
     }
 
-  // Number of components.
+  // Number of tuples.
   int num;
   if(!css->GetArgument(0, 2, &num))
+    {
+    vtkErrorMacro("Error parsing number of tuples from message.");
+    return;
+    }
+  this->SetNumberOfTuples(num);
+
+  // Number of components.
+  if(!css->GetArgument(0, 3, &num))
     {
     vtkErrorMacro("Error parsing number of components from message.");
     return;
@@ -431,7 +448,7 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
   // Range of each component.
   for(int i=0; i < num; ++i)
     {
-    if(!css->GetArgument(0, 3+i, this->Ranges + 2*i, 2))
+    if(!css->GetArgument(0, 4+i, this->Ranges + 2*i, 2))
       {
       vtkErrorMacro("Error parsing range of component.");
       return;

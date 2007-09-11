@@ -66,6 +66,8 @@ public:
   // Description:
   // Access to information.
   int                    GetNumberOfArrays() const;
+  // Because not all the arrays have to be the same length:
+  int                    GetMaximumNumberOfTuples() const;
   vtkPVArrayInformation* GetArrayInformation(int idx) const;
   vtkPVArrayInformation* GetArrayInformation(const char *name) const;
 
