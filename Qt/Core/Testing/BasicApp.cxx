@@ -6,6 +6,7 @@
 #include <QPointer>
 
 #include <QVTKWidget.h>
+#include <vtkObjectFactory.h>
 
 #include "pqApplicationCore.h"
 #include "pqCoreTestUtility.h"
@@ -58,10 +59,9 @@ public:
 class GUIHelper : public pqProcessModuleGUIHelper
 {
 public:
-  static GUIHelper* New()
-  {
-    return new GUIHelper;
-  }
+  static GUIHelper* New();
+  vtkTypeMacro(GUIHelper, pqProcessModuleGUIHelper);
+
   QWidget* CreateMainWindow()
   {
     Win = new MainWindow;
@@ -103,6 +103,7 @@ public:
   QPointer<MainWindow> Win;
 };
 
+vtkStandardNewMacro(GUIHelper);
 
 int main(int argc, char** argv)
 {
