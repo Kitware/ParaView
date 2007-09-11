@@ -56,33 +56,62 @@ class QScrollArea;
 class QString;
 
 
+/// \class pqFilterInputDialog
+/// \brief
+///   The pqFilterInputDialog class is used to change or set up the
+///   inputs for a filter.
 class PQCOMPONENTS_EXPORT pqFilterInputDialog : public QDialog
 {
   Q_OBJECT
 
 public:
+  /// \brief
+  ///   Creates a filter input dialog.
+  /// \param parent The parent widget.
   pqFilterInputDialog(QWidget *parent=0);
   virtual ~pqFilterInputDialog();
 
+  /// \brief
+  ///   Gets the pipeline model.
+  /// \return
+  ///   A pointer to the pipeline model.
   pqPipelineModel *getModel() const {return this->Model;}
+
+  /// \brief
+  ///   Gets the pipeline filter.
+  /// \return
+  ///   A pointer to the pipeline filter.
   pqPipelineFilter *getFilter() const {return this->Filter;}
 
-  /// Set the original pipeline model, and the filter whose input this dialog is
-  /// going to change.
-  /// \c namedInputs is the map of input port name to the list of inputs on that
-  /// port. This is used as the current state of the selection for the filter
-  /// inputs.
+  /// \brief
+  ///   Sets up the input filter dialog.
+  /// \param model The pipeline model to use.
+  /// \param filter The filter to modify.
+  /// \param namedInputs A map of the filter inputs. This is used
+  ///   instead of the current filter inputs, which is usefull when
+  ///   the filter hasn't actually been added to the pipeline.
   void setModelAndFilter(pqPipelineModel *model, pqPipelineFilter *filter,
-    const QMap<QString, QList<pqOutputPort*> > &namedInputs);
+      const QMap<QString, QList<pqOutputPort*> > &namedInputs);
 
-  /// Used to obtain the input of inputs for the given input port.
-  QList<pqOutputPort*>& getFilterInputs(const QString &port) const;
+  /// \brief
+  ///   Gets the list of output ports connected to the given input
+  ///   port.
+  /// \param port The name of the input port.
+  /// \return
+  ///   A list of the output ports connected to the given input port.
+  QList<pqOutputPort *> getFilterInputs(const QString &port) const;
 
-  bool isInputAcceptable(pqOutputPort*) const;
 private slots:
-  /// Called when the user selection for the current input port changes.
+  /// \brief
+  ///   Updates the dialog when the user changes the current input
+  ///   port.
+  /// \param id The input port radio button identifier.
   void changeCurrentInput(int id);
 
+  /// \brief
+  ///   Changes the filter input to match the user's selection.
+  /// \param selected The newly selected sources.
+  /// \param deselected The sources being deselected.
   void changeInput(const QItemSelection &selected,
       const QItemSelection &deselected);
 

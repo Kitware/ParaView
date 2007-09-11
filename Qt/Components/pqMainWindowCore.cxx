@@ -3491,6 +3491,12 @@ pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
         pqApplicationCore::instance()->getServerManagerModel();
     pqPipelineModel *model = new pqPipelineModel(*smModel);
     model->addSource(filter);
+    foreach (pqOutputPort *outputPort, selectedOutputPorts)
+      {
+      model->addConnection(outputPort->getSource(), filter,
+          outputPort->getPortNumber());
+      }
+
     dialog.setModelAndFilter(model, filter, namedInputs);
     if (QDialog::Accepted != dialog.exec())
       {

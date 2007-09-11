@@ -44,6 +44,7 @@ class pqDataRepresentation;
 class pqPipelineModelFilter;
 class pqPipelineModelInternal;
 class pqPipelineModelItem;
+class pqPipelineModelOutput;
 class pqPipelineModelSource;
 class pqPipelineSource;
 class pqView;
@@ -83,8 +84,8 @@ public:
     Filter,
     CustomFilter,
     Link,
-    SourceOutputPort,
-    LastType = SourceOutputPort
+    OutputPort,
+    LastType = OutputPort
     };
 
 public:
@@ -193,20 +194,50 @@ public:
   ///   The model index for the given item. The index will be invalid
   ///   if the item is not in the model.
   QModelIndex getIndexFor(pqServerManagerModelItem *item) const;
+
+  /// \brief
+  ///   Gets the type for the given index.
+  /// \param index The model index to look up.
+  /// \return
+  ///   The type for the given index.
+  ItemType getTypeFor(const QModelIndex &index) const;
   //@}
 
   /// \name Model Interaction
   //@{
   /// \brief
-  ///   Sets whether or not the model indexes are editable.
-  /// \param editable True if the model indexes can be edited.
-  void setEditable(bool editable) {this->Editable = editable;}
+  ///   Gets the next model index in the tree.
+  /// \param index The current index.
+  /// \param root An alternate root for walking a subtree.
+  /// \return
+  ///   An index to the next item in the tree or an invalid index
+  ///   when the end of the tree is reached.
+  QModelIndex getNextIndex(const QModelIndex index,
+      const QModelIndex &root=QModelIndex()) const;
 
   /// \brief
   ///   Gets whether or not the model indexes are editable.
   /// \return
   ///   True if the model indexes can be edited.
   bool isEditable() const {return this->Editable;}
+
+  /// \brief
+  ///   Sets whether or not the model indexes are editable.
+  /// \param editable True if the model indexes can be edited.
+  void setEditable(bool editable) {this->Editable = editable;}
+
+  /// \brief
+  ///   Gets whether or not the given index is selectable.
+  /// \param index The model index.
+  /// \return
+  ///   True if the given index is selectable.
+  bool isSelectable(const QModelIndex &index) const;
+
+  /// \brief
+  ///   Sets whether or not the given index is selectable.
+  /// \param index The model index.
+  /// \param selectable True if the index can be selected.
+  void setSelectable(const QModelIndex &index, bool selectable);
 
   /// \brief
   ///   Sets whether of not an item subtree is selectable.
@@ -258,7 +289,7 @@ public slots:
   ///
   /// \param source The source object to add.
   /// \sa pqPipelineModel::addConnection(pqPipelineSource *,
-  ///   pqPipelineSource *)
+  ///   pqPipelineSource *, int)
   void addSource(pqPipelineSource *source);
 
   /// \brief
@@ -268,24 +299,28 @@ public slots:
   ///
   /// \param source The source object to remove.
   /// \sa pqPipelineModel::removeConnection(pqPipelineSource *,
-  ///   pqPipelineSource *)
+  ///   pqPipelineSource *, int)
   void removeSource(pqPipelineSource *source);
 
   /// \brief
   ///   Creates a connection between the source and sink.
   /// \param source The source object being connected.
   /// \param sink The sink object being connected.
-  /// \sa pqPipelineModel::addConnection(pqPipelineModelSource *,
+  /// \param sourceOutputPort The ouput port on the source.
+  /// \sa pqPipelineModel::addConnection(pqPipelineModelOutput *,
   ///   pqPipelineModelFilter *)
-  void addConnection(pqPipelineSource *source, pqPipelineSource *sink, int srcOutputPort);
+  void addConnection(pqPipelineSource *source, pqPipelineSource *sink,
+      int sourceOutputPort);
 
   /// \brief
   ///   Disconnects the source and sink.
   /// \param source The source object being connected.
   /// \param sink The sink object being connected.
-  /// \sa pqPipelineModel::removeConnection(pqPipelineModelSource *,
+  /// \param sourceOutputPort The ouput port on the source.
+  /// \sa pqPipelineModel::removeConnection(pqPipelineModelOutput *,
   ///   pqPipelineModelFilter *)
-  void removeConnection(pqPipelineSource *source, pqPipelineSource *sink, int srcOutputPort);
+  void removeConnection(pqPipelineSource *source, pqPipelineSource *sink,
+      int sourceOutputPort);
   //@}
 
   /// \name Model Update Methods
@@ -372,18 +407,10 @@ private:
   ///
   /// \param source The source object being connected.
   /// \param sink The sink object being connected.
-  /// \sa pqPipelineModel::removeConnection(pqPipelineModelSource *,
+  /// \sa pqPipelineModel::removeConnection(pqPipelineModelOutput *,
   ///   pqPipelineModelFilter *)
-  void addConnection(pqPipelineModelSource *source,
-      pqPipelineModelFilter *sink, int srcOutputPort);
-
-  /// \brief adds the internal pipeline object to the model.
-  ///
-  /// Adds the source item under the server item to which the source belongs.
-  /// This assumes that the source has no input/output connections.
-  void addSource(pqPipelineModelSource* sourceItem);
-
-  void removeSource(pqPipelineModelSource* sourceItem);
+  void addConnection(pqPipelineModelOutput *source,
+      pqPipelineModelFilter *sink);
 
   /// \brief
   ///   Removes the connection of the internal pipeline objects.
@@ -396,10 +423,10 @@ private:
   ///
   /// \param source The source object being disconnected.
   /// \param sink The sink object being disconnected.
-  /// \sa pqPipelineModel::addConnection(pqPipelineModelSource *,
+  /// \sa pqPipelineModel::addConnection(pqPipelineModelOutput *,
   ///   pqPipelineModelFilter *)
-  void removeConnection(pqPipelineModelSource *source,
-      pqPipelineModelFilter *sink, int srcOutputPort);
+  void removeConnection(pqPipelineModelOutput *source,
+      pqPipelineModelFilter *sink);
 
   /// \brief
   ///   Updates the display columns for sources displayed in the
@@ -410,11 +437,13 @@ private:
   /// \brief
   ///   Notifies the view that the input link items have changed.
   /// \param sink The modified item.
+  /// \param column The column to use in the index.
   void updateInputLinks(pqPipelineModelFilter *sink, int column=0);
 
   /// \brief
   ///   Notifies the view that the output port items have changed.
   /// \param source The modified item.
+  /// \param column The column to use in the index.
   void updateOutputPorts(pqPipelineModelSource* source, int column=0);
 
   /// \brief
