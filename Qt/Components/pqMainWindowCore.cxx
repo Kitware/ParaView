@@ -2222,7 +2222,7 @@ void pqMainWindowCore::onServerConnect()
       tr("Disconnect from current server?"),
       tr("Before connecting to a new server, \n"
         "the current connection will be closed and \n"
-        "the state will be discarded.\n"
+        "the state will be discarded.\n\n"
         "Are you sure you want to continue?"),
       QMessageBox::Yes | QMessageBox::No);
     if (ret == QMessageBox::No)
@@ -2242,7 +2242,23 @@ void pqMainWindowCore::onServerConnect()
 void pqMainWindowCore::onServerDisconnect()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
   pqServer* server = this->getActiveServer();
+
+  if (server && smmodel->findItems<pqPipelineSource*>(server).size() > 0)
+    {
+    int ret = QMessageBox::warning(this->Implementation->Parent, 
+      tr("Disconnect from current server?"),
+      tr("The current connection will be closed and \n"
+        "the state will be discarded.\n\n"
+        "Are you sure you want to continue?"),
+      QMessageBox::Yes | QMessageBox::No);
+    if (ret == QMessageBox::No)
+      {
+      return;
+      }
+    }
+
   if (server)
     {
     core->getObjectBuilder()->removeServer(server);
