@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QComboBox;
 class QSlider;
 class QTextEdit;
+class QSpinBox;
 
 #include "QtWidgetsExport.h"
 
@@ -142,6 +143,26 @@ signals:
   void textChanged();  
 public slots:
   void setText(const QString&);
+protected:
+};
+
+
+/// signal adaptor that lets us set/get the integer value inside a QSpinBox
+class QTWIDGETS_EXPORT pqSignalAdaptorSpinBox : public QObject
+{
+  Q_OBJECT
+  Q_PROPERTY(int value READ value WRITE setValue)
+
+public:
+  /// constructor
+  pqSignalAdaptorSpinBox(QSpinBox* p);
+  /// get the current text
+  int value() const;
+signals:
+  /// signal text changed
+  void valueChanged(int val);  
+public slots:
+  void setValue(int val);
 protected:
 };
 

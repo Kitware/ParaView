@@ -44,6 +44,11 @@ public:
   pqSpreadSheetDisplayEditor(pqRepresentation* repr, QWidget* parent=0);
   virtual ~pqSpreadSheetDisplayEditor();
 
+protected slots:
+  /// Show/hide the process id controls based on whether mode 
+  /// is "Field Data" or not.
+  void onAttributeModeChanged(const QString &mode);
+
 private:
   pqSpreadSheetDisplayEditor(const pqSpreadSheetDisplayEditor&); // Not implemented.
   void operator=(const pqSpreadSheetDisplayEditor&); // Not implemented.

@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqRepresentation.h"
 #include "pqSignalAdaptors.h"
+#include "pqServer.h"
 
 //-----------------------------------------------------------------------------
 class pqSpreadSheetDisplayEditor::pqInternal : public Ui::SpreadSheetDisplayEditor
@@ -48,6 +49,7 @@ class pqSpreadSheetDisplayEditor::pqInternal : public Ui::SpreadSheetDisplayEdit
 public:
   pqPropertyLinks Links;
   pqSignalAdaptorComboBox* AttributeModeAdaptor;
+  pqSignalAdaptorSpinBox* ProcessIDAdaptor;
 };
 
 //-----------------------------------------------------------------------------
@@ -59,8 +61,17 @@ pqSpreadSheetDisplayEditor::pqSpreadSheetDisplayEditor(
   
   this->Internal->AttributeModeAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->AttributeMode);
+  this->Internal->ProcessIDAdaptor = new pqSignalAdaptorSpinBox(
+    this->Internal->ProcessID);
 
   this->setRepresentationInternal(repr);
+
+  QObject::connect(this->Internal->AttributeMode,
+                   SIGNAL(currentIndexChanged(const QString&)), 
+                   this, 
+                   SLOT(onAttributeModeChanged(const QString&)));
+
+  this->onAttributeModeChanged(this->Internal->AttributeMode->currentText());
 }
 
 //-----------------------------------------------------------------------------
@@ -81,6 +92,33 @@ void pqSpreadSheetDisplayEditor::setRepresentationInternal(pqRepresentation* rep
   this->Internal->Links.addPropertyLink(this->Internal->AttributeModeAdaptor,
     "currentText", SIGNAL(currentTextChanged(const QString&)),
     reprProxy, reprProxy->GetProperty("FieldType"));
+  this->Internal->Links.addPropertyLink(this->Internal->ProcessIDAdaptor,
+    "value", SIGNAL(valueChanged(int)),
+    reprProxy, reprProxy->GetProperty("ProcessID"));
   QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(updateAllViews()), Qt::QueuedConnection);
+
+  // Update the label displaying the number of processes
+  int numPartitions = repr->getServer()->getNumberOfPartitions();
+  this->Internal->ProcessIDLabel->setText(
+    QString("Process ID: (Range 0 - %1)").arg(numPartitions-1));
+
+  // Update the upper bounds for the spin box
+  this->Internal->ProcessID->setMaximum(numPartitions-1);
+}
+
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetDisplayEditor::onAttributeModeChanged(const QString &mode)
+{
+  if(mode == "Field Data")
+    {
+    this->Internal->ProcessIDLabel->show();
+    this->Internal->ProcessID->show();
+    }
+  else
+    {
+    this->Internal->ProcessIDLabel->hide();
+    this->Internal->ProcessID->hide();
+    }
 }

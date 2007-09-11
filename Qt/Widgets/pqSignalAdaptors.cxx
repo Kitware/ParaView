@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 #include <QSlider>
 #include <QTextEdit>
+#include <QSpinBox>
 
 //----------------------------------------------------------------------------
 pqSignalAdaptorComboBox::pqSignalAdaptorComboBox(QComboBox* p)
@@ -206,5 +207,25 @@ void pqSignalAdaptorTextEdit::setText(const QString& ptext)
 {
   QTextEdit* combo = static_cast<QTextEdit*>(this->parent());
   combo->setPlainText(ptext);
+}
+
+
+//----------------------------------------------------------------------------
+pqSignalAdaptorSpinBox::pqSignalAdaptorSpinBox(QSpinBox* p)
+  : QObject(p)
+{
+  QObject::connect(p, SIGNAL(valueChanged(int)), 
+                   this, SIGNAL(valueChanged(int)));
+}
+
+int pqSignalAdaptorSpinBox::value() const
+{
+  return static_cast<QSpinBox*>(this->parent())->value();
+}
+
+void pqSignalAdaptorSpinBox::setValue(int val)
+{
+  QSpinBox* widget = static_cast<QSpinBox*>(this->parent());
+  widget->setValue(val);
 }
 

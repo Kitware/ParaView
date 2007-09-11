@@ -5387,9 +5387,16 @@
               <Entry value="2" text="Field Data" />
             </EnumerationDomain>
           </IntVectorProperty>
+
+          <IntVectorProperty name="ProcessID"
+            command="SetProcessID"
+            number_of_elements="1"
+            default_values="0">
+          </IntVectorProperty>
         </SourceProxy>
         <ExposedProperties>
           <Property name="BlockSize" />
+          <Property name="ProcessID" />
         </ExposedProperties>
       </SubProxy>
 
