@@ -393,10 +393,8 @@ void pqFileDialog::onCreateNewFolder()
   // Listen for when the user is finished editing
   QObject::connect(editor,SIGNAL(editingFinished()),this,
                   SLOT(onFinishedEditingNewFolderName()));
-  editor->grabMouse();
-  editor->grabKeyboard();
+  editor->setFocus();
   this->Implementation->Ui.OK->setAutoDefault(false);
-  //this->Implementation->Ui.OK->setDefault(false);
   QObject::disconnect(this->Implementation->Ui.Files, 
                   SIGNAL(activated(const QModelIndex&)), 
                   this, 
@@ -410,10 +408,6 @@ void pqFileDialog::onCreateNewFolder()
 //-----------------------------------------------------------------------------
 void pqFileDialog::onFinishedEditingNewFolderName()
 {
-  // Do this before anything else
-  this->Implementation->FolderNameEditorWidget->releaseMouse();
-  this->Implementation->FolderNameEditorWidget->releaseKeyboard();
-
   // get the name for the new directory provided by the user
   QString newName = this->Implementation->FolderNameEditorWidget->text();
   
