@@ -26,10 +26,11 @@
 #include "vtkDataObject.h"
 #include "vtkInstantiator.h"
 #include "vtkKWProcessStatistics.h"
-#include "vtkObjectFactory.h"
-#include "vtkOutputWindow.h"
+#include "vtkMapper.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiThreader.h"
+#include "vtkObjectFactory.h"
+#include "vtkOutputWindow.h"
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModuleGUIHelper.h"
 #include "vtkPVConfig.h"
@@ -104,7 +105,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.75");
+vtkCxxRevisionMacro(vtkProcessModule, "1.76");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -153,6 +154,15 @@ vtkProcessModule::vtkProcessModule()
 
   this->LastProgress = -1;
   this->LastProgressName = 0;
+
+
+  // setting this here since this must be initialized on all processes to produce
+  // correct result.
+  // This is essential to ensure that edge-visibility works correctly.
+  vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
+  // We offset lines/vertices.
+  vtkMapper::SetResolveCoincidentTopologyPolygonOffsetFaces(0);
+  vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(-1.0, -1.0);
 }
 
 //-----------------------------------------------------------------------------
