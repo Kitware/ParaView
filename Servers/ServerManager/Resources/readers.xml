@@ -180,6 +180,16 @@
         </Documentation>
      </StringVectorProperty>
 
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
      <StringVectorProperty 
         name="CellArrayInfo"
         information_only="1">
@@ -304,6 +314,16 @@
         </Documentation>
      </StringVectorProperty>
 
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
      <StringVectorProperty 
         name="CellArrayInfo"
         information_only="1">
@@ -374,6 +394,16 @@
           This property specifies the file name for the VTK XML uniform rectilinear (image/volume) data reader.
         </Documentation>
      </StringVectorProperty>
+
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
 
      <StringVectorProperty 
         name="CellArrayInfo"
@@ -446,6 +476,16 @@
         </Documentation>
      </StringVectorProperty>
 
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
      <StringVectorProperty 
         name="CellArrayInfo"
         information_only="1">
@@ -516,6 +556,16 @@
           This property specifies the file name for the VTK XML non-uniform rectilinear grid reader.
         </Documentation>
      </StringVectorProperty>
+
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
 
      <StringVectorProperty 
         name="CellArrayInfo"
