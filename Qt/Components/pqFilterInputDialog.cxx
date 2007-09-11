@@ -411,12 +411,12 @@ void pqFilterInputDialog::setModelAndFilter(pqPipelineModel *model,
       // Save the current list of inputs for the port. The index from
       // the source view is used since it is not modified.
       pqFilterInputDialogItem *inputItem = new pqFilterInputDialogItem();
-      QMap<QString, QList<pqOutputPort *> >::ConstIterator iter =
+      QMap<QString, QList<pqOutputPort *> >::ConstIterator inputList =
           namedInputs.find(name);
-      if(iter != namedInputs.end())
+      if(inputList != namedInputs.end())
         {
-        QList<pqOutputPort *>::ConstIterator jter = iter->begin();
-        for( ; jter != iter->end(); ++jter)
+        QList<pqOutputPort *>::ConstIterator jter = inputList->begin();
+        for( ; jter != inputList->end(); ++jter)
           {
           QPersistentModelIndex itemIndex = this->Pipeline->getIndexFor(*jter);
           if(itemIndex.isValid())
