@@ -60,6 +60,11 @@ public:
   void SetFieldTypeToField()
     { this->SetFieldType(FIELD); }
 
+  // Description: 
+  // Get/Set a process number to read the data from.
+  vtkSetMacro(ProcessID, int);
+  vtkGetMacro(ProcessID, int);
+
   //BTX
   enum FieldDataType
     {
@@ -94,6 +99,8 @@ protected:
   int FieldType;
   vtkIdType StartIndex;
   vtkIdType EndIndex;
+  int ProcessID;
+
 private:
   vtkIndexBasedBlockFilter(const vtkIndexBasedBlockFilter&); // Not implemented
   void operator=(const vtkIndexBasedBlockFilter&); // Not implemented

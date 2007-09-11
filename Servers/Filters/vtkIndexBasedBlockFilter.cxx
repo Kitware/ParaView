@@ -32,7 +32,7 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.7");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.8");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -45,6 +45,7 @@ vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
   this->StartIndex= -1;
   this->EndIndex= -1;
   this->FieldType = POINT;
+  this->ProcessID = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -103,7 +104,30 @@ int vtkIndexBasedBlockFilter::RequestData(vtkInformation*,
 
   vtkFieldData* outFD = vtkFieldData::New();
   outFD->CopyStructure(inFD);
-  outFD->SetNumberOfTuples(this->EndIndex-this->StartIndex+1);
+
+  // The length of the individual arrays will be set in the FIELD case
+  vtkAbstractArray *inArray, *outArray;
+  int inNumTuples, outNumTuples;
+  if(this->FieldType == FIELD)
+    {
+    for(vtkIdType j=0; j<inFD->GetNumberOfArrays(); j++)
+      {   
+      inArray = inFD->GetArray(j);
+      outArray = outFD->GetArray(j);
+      inNumTuples = inArray->GetNumberOfTuples();
+      if(this->StartIndex < inNumTuples-1)
+        {
+        outNumTuples = this->EndIndex < inNumTuples ? 
+                       this->EndIndex-this->StartIndex+1 : 
+                       inNumTuples-this->StartIndex+1;
+        outArray->SetNumberOfTuples(outNumTuples);
+        }
+      }
+    }
+  else
+    {
+    outFD->SetNumberOfTuples(this->EndIndex-this->StartIndex+1);
+    }
 
   vtkDoubleArray* points = 0; 
   vtkIdTypeArray* ijk = 0;
@@ -122,7 +146,24 @@ int vtkIndexBasedBlockFilter::RequestData(vtkInformation*,
   for (inIndex=this->StartIndex, outIndex=0; inIndex <= this->EndIndex; ++inIndex, ++outIndex)
     {
     originalIds->SetTupleValue(outIndex, &inIndex);
-    outFD->SetTuple(outIndex, inIndex, inFD);
+
+    if(this->FieldType == FIELD)
+      {
+      // Then the arrays can be different sizes so handle each one separately:
+      for(vtkIdType i=0; i<inFD->GetNumberOfArrays(); i++)
+        {   
+        inArray = inFD->GetArray(i);
+        outArray = outFD->GetArray(i);
+        if(inIndex >= inArray->GetNumberOfTuples())
+          continue;
+        outArray->SetTuple(outIndex, inIndex, inArray);
+        }
+      }
+    else
+      {
+      outFD->SetTuple(outIndex, inIndex, inFD);
+      }
+
     if (this->FieldType == POINT)
       {
       if (psInput)
@@ -184,6 +225,7 @@ bool vtkIndexBasedBlockFilter::DetermineBlockIndices()
     this->GetExecutive()->GetInputData(0, 0));
 
   vtkIdType numFields;
+  vtkIdType tempNumFields;
   switch (this->FieldType)
     {
   case CELL:
@@ -191,7 +233,13 @@ bool vtkIndexBasedBlockFilter::DetermineBlockIndices()
     break;
 
   case FIELD:
-    numFields = input->GetFieldData()->GetNumberOfTuples();
+    numFields = 0;  
+    tempNumFields = 0;
+    for(vtkIdType i=0; i<input->GetFieldData()->GetNumberOfArrays(); i++)
+      { 
+      tempNumFields = input->GetFieldData()->GetArray(i)->GetNumberOfTuples();
+      numFields = tempNumFields > numFields ? tempNumFields : numFields;
+      }
     break;
 
   case POINT:
@@ -210,21 +258,35 @@ bool vtkIndexBasedBlockFilter::DetermineBlockIndices()
 
   int myId = this->Controller->GetLocalProcessId();
 
-  vtkIdType* gathered_data = new vtkIdType[numProcs];
-
-  // cout << myId<< ": numFields: " << numFields<<endl;
   vtkCommunicator* comm = this->Controller->GetCommunicator();
-  if (!comm->AllGather(&numFields, gathered_data, 1))
+  vtkIdType mydataStartIndex=0;
+
+  if(this->FieldType == FIELD)
     {
-    vtkErrorMacro("Failed to gather data from all processes.");
-    return false;
+    if(myId != this->ProcessID)
+      {
+      this->StartIndex = -1;
+      this->EndIndex = -1;
+      return true;
+      }
+    }
+  else
+    {
+    vtkIdType* gathered_data = new vtkIdType[numProcs];
+
+    // cout << myId<< ": numFields: " << numFields<<endl;
+    if (!comm->AllGather(&numFields, gathered_data, 1))
+      {
+      vtkErrorMacro("Failed to gather data from all processes.");
+      return false;
+      }
+
+    for (int cc=0; cc < myId; cc++)
+      {
+      mydataStartIndex += gathered_data[cc];
+      }
     }
 
-  vtkIdType mydataStartIndex=0;
-  for (int cc=0; cc < myId; cc++)
-    {
-    mydataStartIndex += gathered_data[cc];
-    }
   vtkIdType mydataEndIndex = mydataStartIndex + numFields - 1;
 
   if ((mydataStartIndex < blockStartIndex && mydataEndIndex < blockStartIndex) || 
@@ -257,6 +319,7 @@ void vtkIndexBasedBlockFilter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Block: " << this->Block << endl;
   os << indent << "BlockSize: " << this->BlockSize << endl;
   os << indent << "FieldType: " << this->FieldType << endl;
+  os << indent << "ProcessID: " << this->ProcessID << endl;
 }
 
 

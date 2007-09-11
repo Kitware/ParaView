@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkIndexBasedBlockFilter.h"
 #include "vtkInformation.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkSelection.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMInputProperty.h"
@@ -227,9 +229,13 @@ void pqSpreadSheetViewModel::forceUpdate()
       inputProxy->GetDataInformation(port) : 0;
     if (info)
       {
-      if (field_type == vtkIndexBasedBlockFilter::FIELD)
+      if (field_type == vtkIndexBasedBlockFilter::FIELD && 
+          info->GetFieldDataInformation())
         {
-        // TODO:
+        // Since arrays in the field data can be variables lengths, find the
+        // length of the longest one:
+        this->Internal->NumberOfRows = 
+            info->GetFieldDataInformation()->GetMaximumNumberOfTuples();
         }
       else if (field_type == vtkIndexBasedBlockFilter::POINT)
         {
@@ -371,6 +377,16 @@ QVariant pqSpreadSheetViewModel::data(
       {
       this->Internal->Timer.start();
       return QVariant("...");
+      }
+
+    // If displaying field data, check to make sure that the data is valid
+    // since its arrays can be of different lengths
+    if(this->Internal->getFieldType() == vtkIndexBasedBlockFilter::FIELD)
+      {
+      if(!this->isDataValid(idx))
+        {
+        return QVariant("");
+        }
       }
 
     if (!repr->IsSelectionAvailable(blockNumber))
@@ -524,4 +540,64 @@ QSet<QPair<vtkIdType, vtkIdType> > pqSpreadSheetViewModel::getVTKIndices(
       }
     }
   return vtkindices;
+}
+
+
+//-----------------------------------------------------------------------------
+bool pqSpreadSheetViewModel::isDataValid( const QModelIndex &idx) const
+{
+  // First make sure the index itself is valid
+  if(!idx.isValid())
+    {
+    return false;
+    }
+
+  vtkSMSpreadSheetRepresentationProxy* repr = this->Internal->Representation;
+  if (repr)
+    {
+    vtkTable* table = vtkTable::SafeDownCast(
+      repr->GetOutput(this->Internal->ActiveBlockNumber));
+
+    vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
+      repr->GetProperty("Input"));
+    vtkSMSourceProxy* inputProxy = vtkSMSourceProxy::SafeDownCast(
+      ip->GetProxy(0));
+    int port = ip->GetOutputPortForConnection(0);
+
+    int field_type = this->Internal->getFieldType(); 
+
+    vtkPVDataInformation* info = inputProxy?
+      inputProxy->GetDataInformation(port) : 0;
+
+    // Get the appropriate attribute information object
+    vtkPVDataSetAttributesInformation *attrInfo = NULL;
+    if (info)
+      {
+      if (field_type == vtkIndexBasedBlockFilter::FIELD)
+        {
+        attrInfo = info->GetFieldDataInformation();
+        }
+      else if (field_type == vtkIndexBasedBlockFilter::POINT)
+        {
+        attrInfo = info->GetPointDataInformation();
+        }
+      else if (field_type == vtkIndexBasedBlockFilter::CELL)
+        {
+        attrInfo = info->GetCellDataInformation();
+        }
+      }
+ 
+    if(attrInfo)
+      {
+      // Ensure that the row of this index is less than the length of the 
+      // data array associated with its column
+      vtkPVArrayInformation *arrayInfo = attrInfo->GetArrayInformation(table->GetColumnName(idx.column()));
+      if(arrayInfo && idx.row() < arrayInfo->GetNumberOfTuples())
+        {
+        return true;
+        }
+      }
+    }
+
+  return false;
 }

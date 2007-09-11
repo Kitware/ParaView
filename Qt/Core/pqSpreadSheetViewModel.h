@@ -119,6 +119,11 @@ protected:
   void updateSelectionForBlock(vtkIdType blocknumber);
 
   void setRepresentationProxy(vtkSMSpreadSheetRepresentationProxy*);
+
+  /// Given an index into the model, check to see that its row number is
+  /// less than the length of the data array associated with its column
+  bool isDataValid(const QModelIndex &idx) const;
+
 private:
   pqSpreadSheetViewModel(const pqSpreadSheetViewModel&); // Not implemented.
   void operator=(const pqSpreadSheetViewModel&); // Not implemented.
