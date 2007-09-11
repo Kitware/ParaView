@@ -406,6 +406,7 @@ void pqOptionsDialog::addOptions(pqOptionsContainer *options)
       {
       this->Form->ApplyButton->show();
       this->Form->ResetButton->show();
+      QObject::connect(this, SIGNAL(accepted()), this, SLOT(applyChanges()));
       }
 
     this->connect(options, SIGNAL(changesAvailable()),
@@ -446,6 +447,7 @@ void pqOptionsDialog::removeOptions(pqOptionsPage *options)
       this->Form->ResetButton->setEnabled(false);
       this->Form->ApplyButton->hide();
       this->Form->ResetButton->hide();
+      QObject::disconnect(this, SIGNAL(accepted()), this, SLOT(applyChanges()));
       }
 
     this->disconnect(options, 0, this, 0);

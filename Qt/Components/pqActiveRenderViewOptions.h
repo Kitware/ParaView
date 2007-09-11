@@ -65,7 +65,7 @@ public:
   //@}
 
 protected slots:
-  void finishDialog(int);
+  void finishDialog();
 
 private:
   class pqInternal;

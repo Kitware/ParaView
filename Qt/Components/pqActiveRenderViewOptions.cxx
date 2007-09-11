@@ -76,7 +76,7 @@ void pqActiveRenderViewOptions::showOptions(pqView *view,
       }
     
     this->connect(this->Internal->Dialog, SIGNAL(finished(int)),
-        this, SLOT(finishDialog(int)));
+        this, SLOT(finishDialog()));
     }
 
   this->changeView(view);
@@ -96,12 +96,8 @@ void pqActiveRenderViewOptions::closeOptions()
     }
 }
 
-void pqActiveRenderViewOptions::finishDialog(int result)
+void pqActiveRenderViewOptions::finishDialog()
 {
-  if(result == QDialog::Accepted)
-    {
-    this->Internal->Dialog->applyChanges();
-    }
   emit this->optionsClosed(this);
 }
 

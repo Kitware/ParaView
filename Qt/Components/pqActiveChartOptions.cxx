@@ -865,11 +865,7 @@ void pqActiveChartOptions::closeOptions()
 
 void pqActiveChartOptions::finishDialog(int result)
 {
-  if(result == QDialog::Accepted)
-    {
-    this->Dialog->applyChanges();
-    }
-  else
+  if(result != QDialog::Accepted)
     {
     this->Dialog->setApplyNeeded(false);
     }
