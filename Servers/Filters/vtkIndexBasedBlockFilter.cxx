@@ -32,7 +32,7 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.8");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.9");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -263,6 +263,9 @@ bool vtkIndexBasedBlockFilter::DetermineBlockIndices()
 
   if(this->FieldType == FIELD)
     {
+    // When working with field data, only use the data from one process
+    // FIXME: what do I do with the start and end indices when 
+    //    myId == this->ProcessID? Right now no data is getting delivered.
     if(myId != this->ProcessID)
       {
       this->StartIndex = -1;
