@@ -943,8 +943,13 @@ void pqPipelineRepresentation::onRepresentationChanged()
 void pqPipelineRepresentation::updateScalarBarVisibility(bool visible)
 {
   pqView* view = this->getView();
+  if (!view)
+    {
+    return;
+    }
+
   pqScalarsToColors* lut = this->getLookupTable();
-  if (!view || !lut)
+  if (!lut)
     {
     return;
     }
