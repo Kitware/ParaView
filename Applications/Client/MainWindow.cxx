@@ -438,6 +438,12 @@ MainWindow::MainWindow() :
     this->Implementation->UI.variableToolbar);
   foreach(QAction* a, this->Implementation->UI.variableToolbar->actions())
     {
+    if (a == this->Implementation->UI.actionScalarBarVisibility)
+      {
+      // actionScalarBarVisibility's enabled state is managed by 
+      // pqScalarBarVisibilityAdaptor.
+      continue;
+      }
     connect(
       &this->Implementation->Core,
       SIGNAL(enableVariableToolbar(bool)),
@@ -738,6 +744,8 @@ MainWindow::MainWindow() :
 
   // Restore the state of the window ...
   pqApplicationCore::instance()->settings()->restoreState("MainWindow", *this);
+
+  this->Implementation->UI.actionScalarBarVisibility->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
