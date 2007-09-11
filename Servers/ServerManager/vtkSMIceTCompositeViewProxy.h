@@ -152,6 +152,7 @@ protected:
   // tiling.
   int TileDimensions[2];
   int TileMullions[2];
+  bool EnableTiles;
 
   int ViewSize[2];
   bool ViewSizeInitialized;

@@ -22,7 +22,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.13");
 
 //----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderViewProxy::vtkSMIceTDesktopRenderViewProxy()
@@ -122,6 +122,13 @@ bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects()
     this->RenderSyncManager, this->SharedServerRenderSyncManagerID,
     "vtkPVDesktopDeliveryServer");
 
+  // When using tile displays it is essential that we disable automatic tile
+  // parameter synchronization.
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->RenderSyncManager->GetProperty("SynchronizeTileProperties"));
+  ivp->SetElement(0, this->EnableTiles? 0 : 1);
+  this->RenderSyncManager->UpdateVTKObjects();
+
   // We need to create vtkIceTRenderer on the server side and vtkRenderer on
   // the client.
   this->RendererProxy->SetServers(vtkProcessModule::CLIENT);
@@ -134,7 +141,7 @@ bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects()
   pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
   this->RendererProxy->SetServers(
     vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-
+ 
   return true;
 }
 

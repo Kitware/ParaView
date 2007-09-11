@@ -43,7 +43,7 @@ static void vtkPVDesktopDeliveryClientReceiveImageCallback(vtkObject *,
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryClient, "1.5");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryClient, "1.6");
 vtkStandardNewMacro(vtkPVDesktopDeliveryClient);
 
 //----------------------------------------------------------------------------
@@ -156,8 +156,8 @@ void vtkPVDesktopDeliveryClient::SendWindowInformation()
   vtkPVDesktopDeliveryServer::WindowGeometry winGeoInfo;
   if ((this->GUISize[0] == 0) || (this->GUISize[1] == 0))
     {
-    winGeoInfo.GUISize[0] = this->RenderWindow->GetSize()[0];
-    winGeoInfo.GUISize[1] = this->RenderWindow->GetSize()[1];
+    winGeoInfo.GUISize[0] = this->RenderWindow->GetActualSize()[0];
+    winGeoInfo.GUISize[1] = this->RenderWindow->GetActualSize()[1];
     }
   else
     {
@@ -168,7 +168,7 @@ void vtkPVDesktopDeliveryClient::SendWindowInformation()
   winGeoInfo.Position[0] = this->WindowPosition[0];
   winGeoInfo.Position[1]
     = (  winGeoInfo.GUISize[1]
-       - this->WindowPosition[1] - this->RenderWindow->GetSize()[1] );
+       - this->WindowPosition[1] - this->RenderWindow->GetActualSize()[1] );
   winGeoInfo.Id = this->Id;
   winGeoInfo.AnnotationLayer = this->AnnotationLayer;
   this->Controller->Send(reinterpret_cast<int *>(&winGeoInfo),

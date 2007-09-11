@@ -94,7 +94,7 @@ static void vtkIceTRenderManagerReconstructWindowImage(vtkObject *,
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.39");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.40");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
@@ -134,6 +134,8 @@ vtkIceTRenderManager::vtkIceTRenderManager()
   // Reload the controller so that we make an ICE-T context.
   this->Superclass::SetController(NULL);
   this->SetController(vtkMultiProcessController::GetGlobalController());
+
+  this->EnableTiles = 0;
 }
 
 //-------------------------------------------------------------------------
@@ -460,11 +462,28 @@ void vtkIceTRenderManager::SetTileMullions(int mullX, int mullY)
   this->TileMullions[1] = mullY;
   this->TilesDirty = 1;
 }
-//-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+void vtkIceTRenderManager::SetEnableTiles(int enable)
+{
+  if (this->EnableTiles != enable)
+    {
+    this->EnableTiles = enable;
+    this->TilesDirty = true;
+    this->SetSynchronizeTileProperties(enable? 0 : 1);
+    this->Modified();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkIceTRenderManager::ComputeTileViewportTransform()
 {
   vtkDebugMacro("ComputeTileViewportTransform");
+
+  if (!this->EnableTiles)
+    {
+    return;
+    }
 
   if (!this->Controller)
     {
@@ -1234,6 +1253,8 @@ void vtkIceTRenderManager::PrintSelf(ostream &os, vtkIndent indent)
 
   this->Superclass::PrintSelf(os, indent);
 
+  os << indent << "EnableTiles: " 
+    << (this->EnableTiles? "On" : "Off") << endl;
   os << indent << "Display: " << this->TileDimensions[0]
      << " X " << this->TileDimensions[1] << " with display ranks" << endl;
   vtkIndent rankIndent = indent.GetNextIndent();

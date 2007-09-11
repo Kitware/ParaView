@@ -98,6 +98,11 @@ public:
     { this->SetTileMullions(mull[0], mull[1]); }
   vtkGetVector2Macro(TileMullions, int);
 
+  // Description:
+  // To use tile displays, it is essential to set this property to 1.
+  void SetEnableTiles(int x);
+  vtkGetMacro(EnableTiles, int);
+
   virtual double GetRenderTime();
   virtual double GetImageProcessingTime();
   virtual double GetBufferReadTime();
@@ -222,6 +227,7 @@ protected:
   int TilesDirty;
   int CleanScreenWidth;
   int CleanScreenHeight;
+  int EnableTiles;
 
   // Description:
   // Used to keep track of when the ImageReductionFactor changes, which

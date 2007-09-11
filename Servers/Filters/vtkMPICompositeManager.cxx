@@ -20,7 +20,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkRenderWindow.h"
 vtkStandardNewMacro(vtkMPICompositeManager);
-vtkCxxRevisionMacro(vtkMPICompositeManager, "1.5");
+vtkCxxRevisionMacro(vtkMPICompositeManager, "1.6");
 
 //-----------------------------------------------------------------------------
 static void vtkMPICompositeManagerGatherZBufferValueRMI(void *local, void *pArg, 
@@ -117,7 +117,7 @@ void vtkMPICompositeManager::GatherZBufferValueRMI(int x, int y)
   float z;
 
   // Get the z value.
-  int *size = this->RenderWindow->GetSize();
+  int *size = this->RenderWindow->GetActualSize();
   if (x < 0 || x >= size[0] || y < 0 || y >= size[1])
     {
     vtkErrorMacro("Point not contained in window.");
@@ -169,15 +169,10 @@ void vtkMPICompositeManager::StartRender()
   if (!this->ParallelRendering)
     {
     // Make adjustments for window size.
-    int *tilesize = this->RenderWindow->GetSize();
-    // To me, it seems dangerous for RenderWindow to return a size bigger
-    // than it actually supports or for GetSize to not return the same values
-    // as SetSize.  Yet this is the case when tile rendering is established
-    // in RenderWindow.  Correct for this.
+    int *sizeptr = this->RenderWindow->GetActualSize();
     int size[2];
-    int *tilescale;
-    tilescale = this->RenderWindow->GetTileScale();
-    size[0] = tilesize[0]/tilescale[0];  size[1] = tilesize[1]/tilescale[1];
+    size[0] = sizeptr[0];  
+    size[1] = sizeptr[1];
     if ((size[0] == 0) || (size[1] == 0))
       {
       // It helps to have a real window size.

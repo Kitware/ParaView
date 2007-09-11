@@ -46,7 +46,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.24");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.25");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkCxxSetObjectMacro(vtkIceTRenderer, SortingKdTree, vtkPKdTree);
@@ -144,10 +144,9 @@ void vtkIceTRenderer::GetTiledSizeAndOrigin(int *width, int *height,
     // If this method is being called during an IceT render, then IceT has
     // modified the view to cover the full tile (rendering context).  Report as
     // such.
-    int *size = this->VTKWindow->GetSize();
-    int *tileScale = this->VTKWindow->GetTileScale();
-    *width = size[0]/tileScale[0];
-    *height = size[1]/tileScale[1];
+    int *size = this->VTKWindow->GetActualSize();
+    *width = size[0];
+    *height = size[1];
 
     *lowerLeftX = 0;  *lowerLeftY = 0;
     }
@@ -190,12 +189,8 @@ void vtkIceTRenderer::DeviceRender()
 
   // IceT will use the full render window.  We'll move images back where they
   // belong later.
-  int *size = this->RenderWindow->GetSize();
-  int *tileScale = this->RenderWindow->GetTileScale();
-  int physicalSize[2];
-  physicalSize[0] = size[0]/tileScale[0];
-  physicalSize[1] = size[1]/tileScale[1];
-  glViewport(0, 0, physicalSize[0], physicalSize[1]);
+  int *size = this->RenderWindow->GetActualSize();
+  glViewport(0, 0, size[0], size[1]);
   glDisable(GL_SCISSOR_TEST);
 
   //Just in case ICE-T decides we don't have to render, make sure we have

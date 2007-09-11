@@ -36,7 +36,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.18");
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.19");
 
 vtkInformationKeyMacro(vtkSMIceTCompositeViewProxy, KD_TREE, ObjectBase);
 //----------------------------------------------------------------------------
@@ -53,6 +53,7 @@ vtkSMIceTCompositeViewProxy::vtkSMIceTCompositeViewProxy()
 
   this->TileDimensions[0] = this->TileDimensions[1] = 1;
   this->TileMullions[0] = this->TileMullions[1] = 0;
+  this->EnableTiles = false;
 
   this->LastCompositingDecision = false;
   this->LastOrderedCompositingDecision = false;
@@ -266,6 +267,13 @@ void vtkSMIceTCompositeViewProxy::EndCreateVTKObjects()
   if (ivp)
     {
     ivp->SetElements(this->TileMullions);
+    }
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ParallelRenderManager->GetProperty("EnableTiles"));
+  if (ivp)
+    {
+    ivp->SetElement(0, this->EnableTiles? 1 : 0);
     }
   this->ParallelRenderManager->UpdateVTKObjects();
 

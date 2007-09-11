@@ -27,10 +27,11 @@ vtkInformationKeyMacro(vtkSMIceTMultiDisplayRenderViewProxy, CLIENT_COLLECT, Int
 vtkInformationKeyMacro(vtkSMIceTMultiDisplayRenderViewProxy, CLIENT_RENDER, Integer);
 
 vtkStandardNewMacro(vtkSMIceTMultiDisplayRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTMultiDisplayRenderViewProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMIceTMultiDisplayRenderViewProxy, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMIceTMultiDisplayRenderViewProxy::vtkSMIceTMultiDisplayRenderViewProxy()
 {
+  this->EnableTiles = true;
   this->CollectGeometryThreshold = 10.0;
   this->StillRenderImageReductionFactor = 1;
 
