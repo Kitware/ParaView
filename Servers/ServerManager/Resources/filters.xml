@@ -4189,6 +4189,9 @@ The Glyph filter generates a glyph at each point in the input dataset. The glyph
           visibility of this filter (or its input) on creation.
           replace_input="0" implies that the input visibility is not
             changed on creation of this filter (defaults to "1")
+          replace_input="1" implies always replace input.
+          replace_input="2" implies replace input only when input is shown as a
+                            solid i.e surface or surface with edges.
        -->
      <Visibility replace_input="0" />
    </Hints>

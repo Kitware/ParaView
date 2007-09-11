@@ -182,8 +182,9 @@ void pqPendingDisplayManager::createPendingDisplays(
                 {
                 // Conditionaly turn off the input. The input should be turned
                 // off if the representation is surface and the opacity is 1.
-                if (sourceDisp->getRepresentationType() != 
-                  vtkSMPVRepresentationProxy::SURFACE ||
+                int reprType = sourceDisp->getRepresentationType();
+                if ((reprType != vtkSMPVRepresentationProxy::SURFACE &&
+                    reprType != vtkSMPVRepresentationProxy::SURFACE_WITH_EDGES) ||
                   sourceDisp->getOpacity() < 1.0)
                   {
                   continue;
