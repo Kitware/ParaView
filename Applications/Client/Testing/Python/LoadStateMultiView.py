@@ -31,6 +31,8 @@ object13 = 'MainWindow/FileSaveServerStateDialog'
 QtTesting.playCommand(object13, 'filesSelected', '$PARAVIEW_TEST_ROOT/TestMultiView.pvsm')
 object14 = 'MainWindow/mainToolBar/1QToolButton3'
 QtTesting.playCommand(object14, 'activate', '')
+object14a ="MainWindow/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" 
+QtTesting.playCommand(object14a, 'activate', '')
 QtTesting.playCommand(object1, 'activate', 'actionFileLoadServerState')
 #QtTesting.playCommand(object2, 'activate', '')
 QtTesting.playCommand(object3, 'filesSelected', '$PARAVIEW_TEST_ROOT/TestMultiView.pvsm')
