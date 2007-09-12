@@ -438,7 +438,7 @@ void pqReaderFactory::loadFileTypes(const QString& xmlfilename)
   if (!doc.setContent(&xml))
     {
     xml.close();
-    qDebug() << "Failed to load " << xmlfilename;
+    qDebug() << "Failed to parse " << xmlfilename;
     return;
     }
   QDomNodeList readerElements = doc.elementsByTagName("Reader");
