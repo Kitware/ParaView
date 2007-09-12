@@ -15,10 +15,11 @@
 #include "vtkKdTreeGenerator.h"
 
 #include "vtkBSPCuts.h"
-#include "vtkDataObject.h"
 #include "vtkExtentTranslator.h"
+#include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkKdNode.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPKdTree.h"
 #include "vtkSmartPointer.h"
@@ -29,7 +30,7 @@
 class vtkKdTreeGeneratorVector : public vtkstd::vector<int> {};
 
 vtkStandardNewMacro(vtkKdTreeGenerator);
-vtkCxxRevisionMacro(vtkKdTreeGenerator, "1.2");
+vtkCxxRevisionMacro(vtkKdTreeGenerator, "1.3");
 vtkCxxSetObjectMacro(vtkKdTreeGenerator, ExtentTranslator, vtkExtentTranslator);
 vtkCxxSetObjectMacro(vtkKdTreeGenerator, KdTree, vtkPKdTree);
 //-----------------------------------------------------------------------------
@@ -107,32 +108,39 @@ int vtkKdTreeGenerator::BuildTree(vtkDataObject* data)
     {
     regions_ids.push_back(cc);
     }
- if (!this->FormTree(root, regions_ids))
-   {
-   return 0;
-   }
- vtkSmartPointer<vtkBSPCuts> cuts = vtkSmartPointer<vtkBSPCuts>::New();
- cuts->CreateCuts(root);
- if (!this->KdTree)
-   {
-   vtkPKdTree* tree = vtkPKdTree::New();
-   this->SetKdTree(tree);
-   tree->Delete();
-   }
- this->KdTree->SetCuts(cuts);
- // cout  << endl << "Tree: " << endl;
- // cuts->PrintTree();
+  if (!this->FormTree(root, regions_ids))
+    {
+    return 0;
+    }
 
- // Now to determine assigments (not much different from inorder traversal printing 
- // the leaf nodes alone).
- int *assignments = new int[this->NumberOfPieces];
- int *ptr = assignments;
- vtkKdTreeGeneratorOrder(ptr, root);
- this->KdTree->AssignRegions(assignments, this->NumberOfPieces);
+  // The formed tree is based on extents, we convert it to bounds.
+  if (!this->ConvertToBounds(data, root))
+    {
+    return 0;
+    }
 
- this->SetExtentTranslator(0);
- delete []assignments;
- return 1;
+  vtkSmartPointer<vtkBSPCuts> cuts = vtkSmartPointer<vtkBSPCuts>::New();
+  cuts->CreateCuts(root);
+  if (!this->KdTree)
+    {
+    vtkPKdTree* tree = vtkPKdTree::New();
+    this->SetKdTree(tree);
+    tree->Delete();
+    }
+  this->KdTree->SetCuts(cuts);
+  // cout  << endl << "Tree: " << endl;
+  // cuts->PrintTree();
+
+  // Now to determine assigments (not much different from inorder traversal printing 
+  // the leaf nodes alone).
+  int *assignments = new int[this->NumberOfPieces];
+  int *ptr = assignments;
+  vtkKdTreeGeneratorOrder(ptr, root);
+  this->KdTree->AssignRegions(assignments, this->NumberOfPieces);
+
+  this->SetExtentTranslator(0);
+  delete []assignments;
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -181,7 +189,6 @@ int vtkKdTreeGenerator::FormTree(vtkKdNode* parent,
       if (this->CanPartition(division_point, current_dim, 
           regions_ids, left, right))
         {
-
         break;
         }
       }
@@ -254,7 +261,7 @@ int vtkKdTreeGenerator::CanPartition(int division_point, int dimension,
       {
       work_right.push_back(region_id);
       }
-    else
+    else // if (division_point >= max)
       {
       work_left.push_back(region_id);
       }
@@ -282,6 +289,72 @@ void vtkKdTreeGenerator::FormRegions()
     this->ExtentTranslator->PieceToExtent();
     this->ExtentTranslator->GetExtent(&this->Regions[cc*6]);
     }
+}
+
+static bool vtkConvertToBoundsInternal(
+  vtkKdNode* node, double origin[3], double spacing[3])
+{
+  // convert extents to bounds (copied from vtkImageData::ConvertToBounds())
+  double extent[6];
+  node->GetBounds(extent);
+
+  if ( extent[0] > extent[1] ||
+    extent[2] > extent[3] ||
+    extent[4] > extent[5] )
+    {
+    return false;
+    }
+
+  int swapXBounds = (spacing[0] < 0);  // 1 if true, 0 if false
+  int swapYBounds = (spacing[1] < 0);  // 1 if true, 0 if false
+  int swapZBounds = (spacing[2] < 0);  // 1 if true, 0 if false
+
+  double bounds[6];
+  bounds[0] = origin[0] + (extent[0+swapXBounds] * spacing[0]);
+  bounds[2] = origin[1] + (extent[2+swapYBounds] * spacing[1]);
+  bounds[4] = origin[2] + (extent[4+swapZBounds] * spacing[2]);
+
+  bounds[1] = origin[0] + (extent[1-swapXBounds] * spacing[0]);
+  bounds[3] = origin[1] + (extent[3-swapYBounds] * spacing[1]);
+  bounds[5] = origin[2] + (extent[5-swapZBounds] * spacing[2]);
+  node->SetBounds(bounds);
+  
+  if (node->GetLeft())
+    {
+    if (!vtkConvertToBoundsInternal(node->GetLeft(), origin, spacing))
+      {
+      return false;
+      }
+    }
+  if (node->GetRight())
+    {
+    if (!vtkConvertToBoundsInternal(node->GetRight(), origin, spacing))
+      {
+      return false;
+      }
+    }
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkKdTreeGenerator::ConvertToBounds(vtkDataObject* data, vtkKdNode* node)
+{
+  double origin[3];
+  double spacing[3];
+  
+  vtkImageData* id = vtkImageData::SafeDownCast(data);
+  if (data)
+    {
+    id->GetOrigin(origin);
+    id->GetSpacing(spacing); 
+    }
+  else
+    {
+    vtkErrorMacro(<< data->GetClassName() << " is not supported.");
+    return false;
+    }
+
+  return vtkConvertToBoundsInternal(node, origin, spacing);
 }
 
 //-----------------------------------------------------------------------------

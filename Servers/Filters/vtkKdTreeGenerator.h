@@ -83,12 +83,18 @@ protected:
   vtkSetVector6Macro(WholeExtent, int);
   vtkGetVector6Macro(WholeExtent, int);
 
+  // Description:
+  // Obtains information from the extent translator about the partitioning of
+  // the input dataset among processes.
   void FormRegions();
+
   int FormTree(vtkKdNode* parent, vtkKdTreeGeneratorVector& regions_ids);
   int CanPartition(int division_point, int dimension,
   vtkKdTreeGeneratorVector& ids,
   vtkKdTreeGeneratorVector& left, vtkKdTreeGeneratorVector& right);
 
+  // Converts extents to bounds in the kdtree.
+  bool ConvertToBounds(vtkDataObject* data, vtkKdNode* node);
 
   vtkPKdTree* KdTree;
   vtkExtentTranslator* ExtentTranslator;
