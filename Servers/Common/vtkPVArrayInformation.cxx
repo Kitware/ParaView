@@ -19,7 +19,7 @@ cxx     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVArrayInformation);
-vtkCxxRevisionMacro(vtkPVArrayInformation, "1.8");
+vtkCxxRevisionMacro(vtkPVArrayInformation, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()
@@ -296,8 +296,7 @@ int vtkPVArrayInformation::Compare(vtkPVArrayInformation *info)
     return 0;
     }
   if (strcmp(info->GetName(), this->Name) == 0 &&
-      info->GetNumberOfComponents() == this->NumberOfComponents && 
-      info->GetNumberOfTuples() == this->NumberOfTuples)
+      info->GetNumberOfComponents() == this->NumberOfComponents)
     {
     return 1;
     }
