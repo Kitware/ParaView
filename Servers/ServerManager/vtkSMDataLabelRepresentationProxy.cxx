@@ -167,6 +167,26 @@ bool vtkSMDataLabelRepresentationProxy::BeginCreateVTKObjects()
 //----------------------------------------------------------------------------
 bool vtkSMDataLabelRepresentationProxy::EndCreateVTKObjects()
 {
+  // Init UpdateSuppressor so that my pipeline knows what portion to do.
+  vtkClientServerStream stream;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
+         << vtkClientServerStream::End
+         << vtkClientServerStream::Invoke
+         << this->UpdateSuppressorProxy->GetID() << "SetUpdateNumberOfPieces"
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() << "GetPartitionId"
+         << vtkClientServerStream::End
+         << vtkClientServerStream::Invoke
+         << this->UpdateSuppressorProxy->GetID() << "SetUpdatePiece"
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+    this->UpdateSuppressorProxy->GetServers(), stream);
+
   // There used to be a check to ensure that the data type of input is vtkDataSet.
   // I've taken that out since it would cause excution of the extract selection
   // filter. We can put that back if needed.
