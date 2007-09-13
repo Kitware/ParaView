@@ -56,8 +56,6 @@ TARGET_LINK_LIBRARIES(csClient
 )
 
 IF(WIN32)
-  TARGET_LINK_LIBRARIES(csClient
-    optimized qtmain debug qtmaind
-  )
+  TARGET_LINK_LIBRARIES(csClient ${QT_QTMAIN_LIBRARY})
 ENDIF(WIN32)
 

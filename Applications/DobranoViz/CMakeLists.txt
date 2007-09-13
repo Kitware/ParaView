@@ -63,8 +63,6 @@ TARGET_LINK_LIBRARIES(DobranoViz
 )
 
 IF(WIN32)
-  TARGET_LINK_LIBRARIES(DobranoViz
-    optimized qtmain debug qtmaind
-  )
+  TARGET_LINK_LIBRARIES(DobranoViz ${QT_QTMAIN_LIBRARY})
 ENDIF(WIN32)
 
