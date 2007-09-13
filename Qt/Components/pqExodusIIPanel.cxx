@@ -56,6 +56,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes
 #include "pqPropertyManager.h"
 #include "pqProxy.h"
+#include "pqServer.h"
+#include "pqTimeKeeper.h"
 #include "pqSMAdaptor.h"
 #include "pqTreeWidgetCheckHelper.h"
 #include "pqTreeWidgetItemObject.h"
@@ -92,11 +94,6 @@ pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
 
   this->DisplItem = 0;
   
-  QObject::connect(this, SIGNAL(onaccept()),
-                   this, SLOT(propertyChanged()));
-
-  this->DataUpdateInProgress = false;
-
   this->UI->XMLFileName->setServer(this->referenceProxy()->getServer());
   
   this->linkServerManagerProperties();
@@ -302,9 +299,6 @@ void pqExodusIIPanel::linkServerManagerProperties()
   this->addSelectionsToTreeWidget("ElementMapArrayStatus",
                                   this->UI->Maps, PM_NONE);
 
-  // update ranges to begin with
-  this->updateDataRanges();
-
   // Get the timestep values.  Note that the TimestepValues property will change
   // if HasModeShapes is on.  However, we know that when this method is called
   // on initialization, it has the actual time steps in the data.  Store the
@@ -428,71 +422,6 @@ void pqExodusIIPanel::modeChanged(int value)
     }
 }
 
-void pqExodusIIPanel::updateDataRanges()
-{
-  this->DataUpdateInProgress = false;
-
-  // update data information about loaded arrays
-
-  vtkSMSourceProxy* sp =
-    vtkSMSourceProxy::SafeDownCast(this->proxy());
-  vtkPVDataSetAttributesInformation* pdi = 0;
-  vtkPVDataSetAttributesInformation* cdi = 0;
-  vtkPVDataSetAttributesInformation* gdi = 0;
-  if (sp->GetNumberOfParts() > 0)
-    {
-    vtkPVDataInformation* di = sp->GetDataInformation();
-    pdi = di->GetPointDataInformation();
-    cdi = di->GetCellDataInformation();
-    gdi = di->GetFieldDataInformation();
-    }
-  vtkPVArrayInformation* ai;
-  
-  QTreeWidget* VariablesTree = this->UI->Variables;
-  QString dataString;
-
-  int numItems = VariablesTree->topLevelItemCount();
-
-  for(int i=0; i<numItems; i++)
-    {
-    QTreeWidgetItem* item = VariablesTree->topLevelItem(i);
-    QString var = item->data(0, Qt::UserRole).toString();
-    QStringList strs = var.split(" ");
-    int which = strs[0].toInt();
-    strs.removeFirst();
-    var = strs.join(" ");
-
-    ai = 0;
-    if ((which == PM_ELEM || which == PM_ELEMBLK) && cdi)
-      {
-      ai = cdi->GetArrayInformation(var.toAscii().data());
-      }
-    else if (which == PM_NODE && cdi)
-      {
-      ai = pdi->GetArrayInformation(var.toAscii().data());
-      }
-    else if (which == PM_NONE && gdi)
-      {
-      ai = gdi->GetArrayInformation(var.toAscii().data());
-      }
-    
-    dataString = this->formatDataFor(ai);
-    item->setData(1, Qt::DisplayRole, dataString);
-    item->setData(1, Qt::ToolTipRole, dataString);
-    }
-}
-
-
-void pqExodusIIPanel::propertyChanged()
-{
-  if(this->DataUpdateInProgress == false)
-    {
-    this->DataUpdateInProgress = true;
-    QTimer::singleShot(0, this, SLOT(updateDataRanges()));
-    }
-}
-
-
 void pqExodusIIPanel::blockItemChanged(QTreeWidgetItem* item)
 {
   // Use our map to find which property name this tree item belongs to, 
@@ -587,3 +516,4 @@ void pqExodusIIPanel::selectionItemChanged(QTreeWidgetItem* item,
     }
 
 }
+

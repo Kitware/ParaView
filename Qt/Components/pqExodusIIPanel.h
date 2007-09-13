@@ -61,9 +61,6 @@ protected slots:
 
   void modeChanged(int);
 
-  void updateDataRanges();
-  void propertyChanged();
-
   // When a block, material, or hierarchy item is toggled, 
   // these methods keep everything synced up.
   void blockItemChanged(QTreeWidgetItem*);
@@ -95,8 +92,6 @@ protected:
                                 int propIdx = -1);
 
   pqTreeWidgetItemObject* DisplItem;
-
-  bool DataUpdateInProgress;
 
   class pqUI;
   pqUI* UI;

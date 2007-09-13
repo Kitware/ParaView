@@ -43,11 +43,6 @@
        <string>Variables</string>
       </property>
      </column>
-     <column>
-      <property name="text" >
-       <string>Range(s)</string>
-      </property>
-     </column>
     </widget>
    </item>
    <item>
@@ -476,11 +471,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqTreeWidget</class>
-   <extends>QTreeWidget</extends>
-   <header>pqTreeWidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>pqCollapsedGroup</class>
    <extends>QGroupBox</extends>
    <header>pqCollapsedGroup.h</header>
@@ -490,6 +480,11 @@
    <class>pqFileChooserWidget</class>
    <extends>QWidget</extends>
    <header>pqFileChooserWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>pqTreeWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
