@@ -165,14 +165,17 @@ void pqAnimatablePropertiesComboBox::buildPropertyListInternal(vtkSMProxy* proxy
       pqSMAdaptor::getPropertyType(smproperty) == pqSMAdaptor::PROXYSELECTION)
       {
       vtkSMProxy* child_proxy = pqSMAdaptor::getProxyProperty(smproperty);
-      QString newPrefix = labelPrefix.isEmpty()? "" : labelPrefix + ":";
-      newPrefix += smproperty->GetXMLLabel();
-      this->buildPropertyListInternal(child_proxy, newPrefix);
+      if(child_proxy)
+        {
+        QString newPrefix = labelPrefix.isEmpty()? "" : labelPrefix + ":";
+        newPrefix += smproperty->GetXMLLabel();
+        this->buildPropertyListInternal(child_proxy, newPrefix);
 
-      // if this property's value changes, we'll have to rebuild
-      // the property names menu.
-      this->Internal->VTKConnect->Connect(smproperty, vtkCommand::ModifiedEvent,
-        this, SLOT(buildPropertyList()), 0, 0, Qt::QueuedConnection);
+        // if this property's value changes, we'll have to rebuild
+        // the property names menu.
+        this->Internal->VTKConnect->Connect(smproperty, vtkCommand::ModifiedEvent,
+          this, SLOT(buildPropertyList()), 0, 0, Qt::QueuedConnection);
+        }
       }
     }
 }
