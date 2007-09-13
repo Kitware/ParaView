@@ -230,6 +230,18 @@ IF(CMAKE_COMPILER_2005)
   ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE)
 ENDIF(CMAKE_COMPILER_2005)
 
+# On AIX using the IBM xlC compiler check whether the compiler knows about
+# -binitfini:poe_remote_main, which is required to get MPI executables working
+# on Purple
+IF(CMAKE_SYSTEM MATCHES AIX  AND CMAKE_CXX_COMPILER MATCHES xlC)
+  INCLUDE(CheckCCompilerFlag)
+  CHECK_C_COMPILER_FLAG("-binitfini:poe_remote_main" _XLC_COMPILER_HAS_INITFINI)
+  IF(_XLC_COMPILER_HAS_INITFINI)
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -binitfini:poe_remote_main")
+  ENDIF(_XLC_COMPILER_HAS_INITFINI)
+ENDIF(CMAKE_SYSTEM MATCHES AIX  AND CMAKE_CXX_COMPILER MATCHES xlC)
+
+
 #########################################################################
 # Configure Testing
 OPTION(BUILD_TESTING "Build ParaView Complete Testing" ON)
