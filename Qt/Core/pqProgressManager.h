@@ -69,6 +69,10 @@ public:
   void removeNonBlockableObject(QObject* o)
     { this->NonBlockableObjects.removeAll(o); }
 
+
+  /// Returns the list of non-blockable objects.
+  const QList<QPointer<QObject> >& nonBlockableObjects() const
+    {return this->NonBlockableObjects; }
 protected:
   /// Filter QApplication events.
   bool eventFilter(QObject* obj, QEvent *event);

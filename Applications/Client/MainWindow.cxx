@@ -64,6 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqVCRController.h>
 #include <pqViewManager.h>
 #include <pqViewMenu.h>
+#include <pqProgressManager.h>
 
 #include <QAssistantClient>
 #include <QDir>
@@ -374,6 +375,11 @@ MainWindow::MainWindow() :
   connect(vcrcontroller, SIGNAL(playing(bool)),
     this->Implementation->UI.actionVCRPause, SLOT(setEnabled(bool)));
   this->Implementation->UI.actionVCRPause->setVisible(false);
+
+  pqProgressManager* progress_manager = 
+    pqApplicationCore::instance()->getProgressManager();
+  progress_manager->addNonBlockableObject(
+    this->Implementation->UI.VCRToolbar);
   
   // Create Selection Shortcut.
   QShortcut *s=new QShortcut(QKeySequence(tr("S")),&this->Implementation->Core.multiViewManager());
@@ -1070,6 +1076,7 @@ void MainWindow::onPlaying(bool playing)
 {
   this->Implementation->UI.actionVCRPlay->setVisible(!playing);
   this->Implementation->UI.actionVCRPause->setVisible(playing);
+  this->Implementation->Core.setSelectiveEnabledState(!playing);
 }
 
 //-----------------------------------------------------------------------------

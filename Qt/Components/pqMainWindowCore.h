@@ -374,6 +374,10 @@ public slots:
   // Set center axes visibility on active render view.
   void setCenterAxesVisibility(bool visible);
 
+  // Set the enable state for main window excepting some widgets marked as
+  // non-blockable. Non-blockable widgets are registered with the
+  // pqProgressManager.
+  void setSelectiveEnabledState(bool);
 
 private slots:
   void onCreateSource(QAction*);
@@ -440,6 +444,7 @@ private slots:
   /// Shows message boxes for server timeout warnings.
   void fiveMinuteTimeoutWarning();
   void finalTimeoutWarning();
+
 private:
   pqServerManagerModelItem *getActiveObject() const;
   void updatePendingActions(pqServer *server, pqPipelineSource *source,
