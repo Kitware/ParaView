@@ -15738,3 +15738,5547 @@
    fun:XtMalloc
    fun:XtAppAddTimeOut
 }
+{
+   1st entry from amber1
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dictresize
+   fun:PyString_InternInPlace
+   fun:PyString_InternFromString
+   fun:init_slotdefs
+   fun:PyType_Ready
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dictresize
+   fun:PyString_InternInPlace
+   fun:PyString_InternFromString
+   fun:descr_new
+   fun:PyDescr_NewGetSet
+   fun:PyType_Ready
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dictresize
+   fun:PyString_InternInPlace
+   fun:PyString_InternFromString
+   fun:descr_new
+   fun:PyDescr_NewGetSet
+   fun:PyType_Ready
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dictresize
+   fun:PyDict_SetItemString
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:list_dealloc
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dictresize
+   fun:PyType_Ready
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:_PyUnicodeUCS4_Init
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:_PyUnicodeUCS4_Init
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dictresize
+   fun:PyDict_SetItemString
+   fun:Py_InitModule4
+   fun:_PySys_Init
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:_PySys_Init
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:_PyExc_Init
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:instance_dealloc
+   fun:PyDict_DelItem
+   fun:PyDict_DelItemString
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:instance_dealloc
+   fun:dict_dealloc
+   fun:instance_dealloc
+   fun:frame_dealloc
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:instance_dealloc
+   fun:frame_dealloc
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:_PyExc_Init
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:list_dealloc
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:initzipimport
+   fun:init_builtin
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:_PyImportHooks_Init
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:list_dealloc
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:initzipimport
+   fun:init_builtin
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:_PyImportHooks_Init
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dictresize
+   fun:PyString_InternInPlace
+   fun:PyDict_SetItemString
+   fun:initsignal
+   fun:PyOS_InitInterrupts
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyCode_New
+   fun:r_object
+   fun:r_object
+   fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:r_object
+   fun:r_object
+   fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:PyCode_New
+   fun:r_object
+   fun:r_object
+   fun:r_object
+   fun:r_object
+   fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:PyCode_New
+   fun:r_object
+   fun:r_object
+   fun:r_object
+   fun:r_object
+   fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dictresize
+   fun:initposix
+   fun:init_builtin
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dictresize
+   fun:PyDict_SetItemString
+   fun:setup_confname_table
+   fun:initposix
+   fun:init_builtin
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dictresize
+   fun:PyDict_SetItemString
+   fun:PyType_Ready
+   fun:PyStructSequence_InitType
+   fun:initposix
+   fun:init_builtin
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dictresize
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dictresize
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dictresize
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dictresize
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyCode_New
+   fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:PyCode_New
+   fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:PyCode_New
+   fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:tupledealloc
+   fun:code_dealloc
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:code_dealloc
+   fun:tupledealloc
+   fun:code_dealloc
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:tupledealloc
+   fun:code_dealloc
+   fun:tupledealloc
+   fun:code_dealloc
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:code_dealloc
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:code_dealloc
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:code_dealloc
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:listsort
+   fun:PyList_Sort
+   fun:PyObject_Dir
+   fun:builtin_dir
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyObject_GC_Resize
+   fun:PyFrame_New
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:instance_setattr
+   fun:PyObject_SetAttr
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:function_call
+   fun:PyObject_Call
+   fun:instancemethod_call
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyInstance_New
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:func_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:func_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:func_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:code_dealloc
+   fun:func_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyGrammar_AddAccelerators
+   fun:PyParser_New
+   fun:parsetok
+   fun:PyParser_SimpleParseStringFlags
+   fun:PyRun_StringFlags
+   fun:builtin_eval
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:PyGrammar_AddAccelerators
+   fun:PyParser_New
+   fun:parsetok
+   fun:PyParser_SimpleParseStringFlags
+   fun:PyRun_StringFlags
+   fun:builtin_eval
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:PyGrammar_AddAccelerators
+   fun:PyParser_New
+   fun:parsetok
+   fun:PyParser_SimpleParseStringFlags
+   fun:PyRun_StringFlags
+   fun:builtin_eval
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:parsetok
+   fun:PyParser_SimpleParseStringFlags
+   fun:PyRun_StringFlags
+   fun:builtin_eval
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:PyNode_AddChild
+   fun:PyParser_AddToken
+   fun:parsetok
+   fun:PyParser_SimpleParseFileFlags
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:parsetok
+   fun:PyParser_SimpleParseFileFlags
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyTokenizer_Free
+   fun:parsetok
+   fun:PyParser_SimpleParseFileFlags
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   fun:jcompile
+   fun:run_node
+   fun:builtin_eval
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyCode_New
+   fun:jcompile
+   fun:run_node
+   fun:builtin_eval
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:ste_dealloc
+   fun:PySymtable_Free
+   fun:jcompile
+   fun:run_node
+   fun:builtin_eval
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:ste_dealloc
+   fun:list_dealloc
+   fun:ste_dealloc
+   fun:PySymtable_Free
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:ste_dealloc
+   fun:list_dealloc
+   fun:ste_dealloc
+   fun:PySymtable_Free
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:ste_dealloc
+   fun:PySymtable_Free
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:PySymtable_Free
+   fun:jcompile
+   fun:run_node
+   fun:builtin_eval
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:com_free
+   fun:jcompile
+   fun:run_node
+   fun:builtin_eval
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:com_free
+   fun:jcompile
+   fun:run_node
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:com_free
+   fun:jcompile
+   fun:run_node
+   fun:builtin_eval
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:com_free
+   fun:jcompile
+   fun:com_node
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:com_free
+   fun:jcompile
+   fun:com_node
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:jcompile
+   fun:run_node
+   fun:builtin_eval
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:jcompile
+   fun:run_node
+   fun:builtin_eval
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:jcompile
+   fun:run_node
+   fun:builtin_eval
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:jcompile
+   fun:run_node
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:frame_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:PyObject_GenericGetAttr
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:class_dealloc
+   fun:instance_dealloc
+   fun:PyDict_DelItem
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:class_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:PyDict_SetItemString
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:load_package
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:load_package
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:load_package
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:eval_frame
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:frame_dealloc
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:frame_dealloc
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:frame_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:frame_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyObject_GC_Resize
+   fun:PyFrame_New
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_ass_slice
+   fun:assign_slice
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_ass_slice
+   fun:symtable_exit_scope
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_build
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_ass_slice
+   fun:symtable_exit_scope
+   fun:com_node
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:PyDict_DelItem
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:cleanreturn
+   fun:vgetargs1
+   fun:PyArg_ParseTuple
+   fun:posix_do_stat
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:posix_do_stat
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:posix_listdir
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:file_init
+   fun:type_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:posix_error_with_allocated_filename
+   fun:posix_do_stat
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:function_call
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:_PyCodec_Lookup
+   fun:PyCodec_Encoder
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dictresize
+   fun:symtable_add_def_o
+   fun:symtable_add_def
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_build
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dictresize
+   fun:symtable_add_def_o
+   fun:symtable_add_def
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_node
+   fun:symtable_build
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   fun:jcompile
+   fun:com_node
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyCode_New
+   fun:jcompile
+   fun:com_node
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:com_free
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:com_free
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:freechildren
+   fun:freechildren
+   fun:freechildren
+   fun:freechildren
+   fun:freechildren
+   fun:PyNode_Free
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:freechildren
+   fun:PyNode_Free
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:builtin_map
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:type_new
+   fun:type_call
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:load_package
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:type_new
+   fun:type_call
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:load_package
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:type_new
+   fun:type_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   fun:_XReply
+   fun:XSync
+   fun:_ZN22vtkXOpenGLRenderWindow13CreateAWindowEv
+   fun:_ZN22vtkXOpenGLRenderWindow16WindowInitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
+   fun:_ZN15vtkRenderWindow14DoStereoRenderEv
+   fun:_ZN15vtkRenderWindow10DoFDRenderEv
+   fun:_ZN15vtkRenderWindow10DoAARenderEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
+   fun:_ZN14vtkSMViewProxy11StillRenderEv
+   fun:_Z28PyvtkSMViewProxy_StillRenderP7_objectS0_
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyDict_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:_PyImport_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyFrame_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:PyFrame_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:PyFrame_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyInt_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:PyFloat_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:PyFloat_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:_PyUnicodeUCS4_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyGrammar_RemoveAccelerators
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:PyGrammar_RemoveAccelerators
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:PyGrammar_RemoveAccelerators
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:strdup
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_mesa_realloc
+   fun:save_glx_visual
+   fun:choose_visual
+   fun:Fake_glXChooseVisual
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
+   fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
+   fun:_ZN22vtkXOpenGLRenderWindow13CreateAWindowEv
+   fun:_ZN22vtkXOpenGLRenderWindow16WindowInitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
+   fun:_ZN15vtkRenderWindow14DoStereoRenderEv
+   fun:_ZN15vtkRenderWindow10DoFDRenderEv
+   fun:_ZN15vtkRenderWindow10DoAARenderEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
+   fun:_ZN14vtkSMViewProxy11StillRenderEv
+   fun:_Z28PyvtkSMViewProxy_StillRenderP7_objectS0_
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:PyList_New
+   fun:do_mkvalue
+   fun:Py_VaBuildValue
+   fun:Py_BuildValue
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:_PyExc_Init
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:glXChooseVisual
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
+   fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
+   fun:_ZN22vtkXOpenGLRenderWindow13CreateAWindowEv
+   fun:_ZN22vtkXOpenGLRenderWindow16WindowInitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
+   fun:_ZN15vtkRenderWindow14DoStereoRenderEv
+   fun:_ZN15vtkRenderWindow10DoFDRenderEv
+   fun:_ZN15vtkRenderWindow10DoAARenderEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
+   fun:_ZN14vtkSMViewProxy11StillRenderEv
+   fun:_Z28PyvtkSMViewProxy_StillRenderP7_objectS0_
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   fun:_PyImport_GetDynLoadFunc
+   fun:_PyImport_LoadDynamicModule
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XMesaCreateVisual
+   fun:save_glx_visual
+   fun:choose_visual
+   fun:Fake_glXChooseVisual
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
+   fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
+   fun:_ZN22vtkXOpenGLRenderWindow13CreateAWindowEv
+   fun:_ZN22vtkXOpenGLRenderWindow16WindowInitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
+   fun:_ZN15vtkRenderWindow14DoStereoRenderEv
+   fun:_ZN15vtkRenderWindow10DoFDRenderEv
+   fun:_ZN15vtkRenderWindow10DoAARenderEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
+   fun:_ZN14vtkSMViewProxy11StillRenderEv
+   fun:_Z28PyvtkSMViewProxy_StillRenderP7_objectS0_
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:PyThread_allocate_lock
+   fun:PyInterpreterState_New
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:realloc
+   fun:ins1
+   fun:add_subclass
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:realloc
+   fun:ins1
+   fun:add_subclass
+   fun:PyType_Ready
+   fun:_PyUnicodeUCS4_Init
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:PyObject_Malloc
+   fun:_PyObject_GC_Malloc
+   fun:_PyObject_GC_NewVar
+   fun:PyTuple_New
+   fun:PyType_Ready
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:XShmCreateImage
+   fun:xmesa_alloc_back_storage
+   fun:alloc_storage_alpha8
+   fun:_mesa_resize_framebuffer
+   fun:xmesa_check_and_update_buffer_size
+   fun:XMesaMakeCurrent2
+   fun:Fake_glXMakeContextCurrent
+   fun:glXMakeCurrent
+   fun:_ZN22vtkXOpenGLRenderWindow11MakeCurrentEv
+   fun:_ZN22vtkXOpenGLRenderWindow16WindowInitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
+   fun:_ZN15vtkRenderWindow14DoStereoRenderEv
+   fun:_ZN15vtkRenderWindow10DoFDRenderEv
+   fun:_ZN15vtkRenderWindow10DoAARenderEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
+   fun:_ZN14vtkSMViewProxy11StillRenderEv
+   fun:_Z28PyvtkSMViewProxy_StillRenderP7_objectS0_
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:calculate_path
+   fun:Py_GetProgramFullPath
+   fun:_PySys_Init
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:*alloc
+   fun:_dl_new_object
+   fun:_dl_map_object_from_fd
+   fun:_dl_map_object
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   fun:_PyImport_GetDynLoadFunc
+   fun:_PyImport_LoadDynamicModule
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:expand_dynamic_string_token
+   fun:_dl_map_object
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   fun:_PyImport_GetDynLoadFunc
+   fun:_PyImport_LoadDynamicModule
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:*alloc
+   fun:XCreate*
+   fun:initialize_visual_and_buffer
+   fun:XMesaCreateWindowBuffer2
+   fun:Fake_glXMakeContextCurrent
+   fun:glXMakeCurrent
+   fun:_ZN22vtkXOpenGLRenderWindow11MakeCurrentEv
+   fun:_ZN22vtkXOpenGLRenderWindow16WindowInitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
+   fun:_ZN15vtkRenderWindow14DoStereoRenderEv
+   fun:_ZN15vtkRenderWindow10DoFDRenderEv
+   fun:_ZN15vtkRenderWindow10DoAARenderEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
+   fun:_ZN14vtkSMViewProxy11StillRenderEv
+   fun:_Z28PyvtkSMViewProxy_StillRenderP7_objectS0_
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:initialize_visual_and_buffer
+   fun:XMesaCreateWindowBuffer2
+   fun:Fake_glXMakeContextCurrent
+   fun:glXMakeCurrent
+   fun:_ZN22vtkXOpenGLRenderWindow11MakeCurrentEv
+   fun:_ZN22vtkXOpenGLRenderWindow16WindowInitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
+   fun:_ZN15vtkRenderWindow14DoStereoRenderEv
+   fun:_ZN15vtkRenderWindow10DoFDRenderEv
+   fun:_ZN15vtkRenderWindow10DoAARenderEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
+   fun:_ZN14vtkSMViewProxy11StillRenderEv
+   fun:_Z28PyvtkSMViewProxy_StillRenderP7_objectS0_
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_dl_check_map_versions
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   fun:_PyImport_GetDynLoadFunc
+   fun:_PyImport_LoadDynamicModule
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_dl_map_object_deps
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   fun:_PyImport_GetDynLoadFunc
+   fun:_PyImport_LoadDynamicModule
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:PyStructSequence_InitType
+   fun:initposix
+   fun:init_builtin
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:fill_free_list
+   fun:_PyInt_Init
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:PyString_FromStringAndSize
+   fun:PyCode_New
+   fun:r_object
+   fun:r_object
+   fun:r_object
+   fun:r_object
+   fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:load_package
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XGetVisualInfo
+   fun:choose_x_visual
+   fun:choose_visual
+   fun:Fake_glXChooseVisual
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
+   fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
+   fun:_ZN22vtkXOpenGLRenderWindow13CreateAWindowEv
+   fun:_ZN22vtkXOpenGLRenderWindow16WindowInitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
+   fun:_ZN15vtkRenderWindow14DoStereoRenderEv
+   fun:_ZN15vtkRenderWindow10DoFDRenderEv
+   fun:_ZN15vtkRenderWindow10DoAARenderEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
+   fun:_ZN14vtkSMViewProxy11StillRenderEv
+   fun:_Z28PyvtkSMViewProxy_StillRenderP7_objectS0_
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:dictresize
+   fun:PyDict_SetItemString
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dictresize
+   fun:com_add
+   fun:com_addop_name
+   fun:com_addopname
+   fun:com_apply_trailer
+   fun:com_power
+   fun:com_term
+   fun:com_arith_expr
+   fun:com_shift_expr
+   fun:com_and_expr
+   fun:com_xor_expr
+   fun:com_expr
+   fun:com_comparison
+   fun:com_and_test
+   fun:com_node
+   fun:com_apply_trailer
+   fun:com_power
+   fun:com_term
+   fun:com_arith_expr
+   fun:com_shift_expr
+   fun:com_and_expr
+   fun:com_xor_expr
+   fun:com_expr
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dictresize
+   fun:com_add
+   fun:com_addop_name
+   fun:com_addopname
+   fun:com_apply_trailer
+   fun:com_power
+   fun:com_term
+   fun:com_arith_expr
+   fun:com_shift_expr
+   fun:com_and_expr
+   fun:com_xor_expr
+   fun:com_expr
+   fun:com_comparison
+   fun:com_and_test
+   fun:com_node
+   fun:com_apply_trailer
+   fun:com_power
+   fun:com_term
+   fun:com_arith_expr
+   fun:com_shift_expr
+   fun:com_and_expr
+   fun:com_xor_expr
+   fun:com_expr
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:frame_dealloc
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dictresize
+   fun:PyDict_SetItemString
+   fun:initlibvtkPVServerManagerPython
+   fun:_PyImport_LoadDynamicModule
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:load_package
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dictresize
+   fun:PyDict_SetItemString
+   fun:_Z20PyVTKClass_PyGetAttrP10PyVTKClassP7_object
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dictresize
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dictresize
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dictresize
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dictresize
+   fun:PyDict_SetItemString
+   fun:_Z21PyVTKObject_PyGetAttrP11PyVTKObjectP7_object
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:function_call
+   fun:PyObject_Call
+   fun:instancemethod_call
+   fun:PyObject_Call
+   fun:slot_tp_init
+   fun:type_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_PyObject_GC_Malloc
+   fun:_PyObject_GC_New
+   fun:PyDict_New
+   fun:_Z21PyVTKObject_PyGetAttrP11PyVTKObjectP7_object
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:function_call
+   fun:PyObject_Call
+   fun:instancemethod_call
+   fun:PyObject_Call
+   fun:slot_tp_init
+   fun:type_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:meth_dealloc
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:meth_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:meth_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:instance_dealloc
+   fun:PyErr_Restore
+   fun:PyIter_Next
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:instance_dealloc
+   fun:PyErr_Restore
+   fun:PyIter_Next
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:instance_dealloc
+   fun:PyErr_Restore
+   fun:PyIter_Next
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:instance_dealloc
+   fun:frame_dealloc
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:instance_dealloc
+   fun:frame_dealloc
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:dict_dealloc
+   fun:subtype_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:dict_dealloc
+   fun:subtype_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:dict_dealloc
+   fun:subtype_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:frame_dealloc
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:subtype_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:subtype_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:subtype_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:subtype_dealloc
+   fun:frame_dealloc
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:listiter_next
+   fun:PyIter_Next
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   fun:file_read
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   fun:file_read
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:eval_frame
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:frame_dealloc
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:frame_dealloc
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:pattern_subx
+   fun:pattern_sub
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:tupledealloc
+   fun:_ZN16vtkPythonCommand7ExecuteEP9vtkObjectmPv
+   fun:_ZN16vtkSubjectHelper11InvokeEventEmPvP9vtkObject
+   fun:_ZN9vtkObject11InvokeEventEmPv
+   fun:_ZN16vtkProcessModule16SetLocalProgressEPKci
+   fun:_ZN20vtkPVProgressHandler20LocalDisplayProgressEP16vtkProcessModulePKci
+   fun:_ZN20vtkPVProgressHandler19InvokeProgressEventEP16vtkProcessModuleP9vtkObjectiPKc
+   fun:_ZN16vtkProcessModule13ProgressEventEP9vtkObjectiPKc
+   fun:_ZN16vtkProcessModule12ExecuteEventEP9vtkObjectmPv
+   fun:_ZN24vtkProcessModuleObserver7ExecuteEP9vtkObjectmPv
+   fun:_ZN16vtkSubjectHelper11InvokeEventEmPvP9vtkObject
+   fun:_ZN9vtkObject11InvokeEventEmPv
+   fun:_ZN12vtkAlgorithm14UpdateProgressEd
+   fun:_ZN23vtkDemandDrivenPipeline16ExecuteDataStartEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN32vtkStreamingDemandDrivenPipeline16ExecuteDataStartEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline16ExecuteDataStartEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN32vtkStreamingDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:tupledealloc
+   fun:_ZN16vtkPythonCommand7ExecuteEP9vtkObjectmPv
+   fun:_ZN16vtkSubjectHelper11InvokeEventEmPvP9vtkObject
+   fun:_ZN9vtkObject11InvokeEventEmPv
+   fun:_ZN16vtkProcessModule16SetLocalProgressEPKci
+   fun:_ZN20vtkPVProgressHandler20LocalDisplayProgressEP16vtkProcessModulePKci
+   fun:_ZN20vtkPVProgressHandler19InvokeProgressEventEP16vtkProcessModuleP9vtkObjectiPKc
+   fun:_ZN16vtkProcessModule13ProgressEventEP9vtkObjectiPKc
+   fun:_ZN16vtkProcessModule12ExecuteEventEP9vtkObjectmPv
+   fun:_ZN24vtkProcessModuleObserver7ExecuteEP9vtkObjectmPv
+   fun:_ZN16vtkSubjectHelper11InvokeEventEmPvP9vtkObject
+   fun:_ZN9vtkObject11InvokeEventEmPv
+   fun:_ZN12vtkAlgorithm14UpdateProgressEd
+   fun:_ZN23vtkDemandDrivenPipeline14ExecuteDataEndEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN32vtkStreamingDemandDrivenPipeline14ExecuteDataEndEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN32vtkStreamingDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline15ForwardUpstreamEP14vtkInformation
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:tupledealloc
+   fun:_ZN16vtkPythonCommand7ExecuteEP9vtkObjectmPv
+   fun:_ZN16vtkSubjectHelper11InvokeEventEmPvP9vtkObject
+   fun:_ZN9vtkObject11InvokeEventEmPv
+   fun:_ZN16vtkProcessModule16SetLocalProgressEPKci
+   fun:_ZN20vtkPVProgressHandler20LocalDisplayProgressEP16vtkProcessModulePKci
+   fun:_ZN20vtkPVProgressHandler19InvokeProgressEventEP16vtkProcessModuleP9vtkObjectiPKc
+   fun:_ZN16vtkProcessModule13ProgressEventEP9vtkObjectiPKc
+   fun:_ZN16vtkProcessModule12ExecuteEventEP9vtkObjectmPv
+   fun:_ZN24vtkProcessModuleObserver7ExecuteEP9vtkObjectmPv
+   fun:_ZN16vtkSubjectHelper11InvokeEventEmPvP9vtkObject
+   fun:_ZN9vtkObject11InvokeEventEmPv
+   fun:_ZN12vtkAlgorithm14UpdateProgressEd
+   fun:_ZN23vtkDemandDrivenPipeline14ExecuteDataEndEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN32vtkStreamingDemandDrivenPipeline14ExecuteDataEndEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN32vtkStreamingDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN24vtkCompositeDataPipeline15ForwardUpstreamEP14vtkInformation
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:code_dealloc
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:tupledealloc
+   fun:code_dealloc
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:tupledealloc
+   fun:code_dealloc
+   fun:func_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:module_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:PyDict_SetItemString
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:module_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:module_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:module_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:subtype_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:pattern_dealloc
+   fun:dict_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:pattern_dealloc
+   fun:dict_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:tupledealloc
+   fun:dict_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:code_dealloc
+   fun:func_dealloc
+   fun:dict_dealloc
+   fun:class_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:func_dealloc
+   fun:dict_dealloc
+   fun:class_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:class_dealloc
+   fun:tupledealloc
+   fun:class_dealloc
+   fun:instance_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:class_dealloc
+   fun:instance_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:instance_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:dict_dealloc
+   fun:instance_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:func_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:func_dealloc
+   fun:dict_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:dict_dealloc
+   fun:_PyImport_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:dict_dealloc
+   fun:_PyImport_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:dict_dealloc
+   fun:_PyImport_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:dict_dealloc
+   fun:dict_dealloc
+   fun:_PyImport_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_PyImport_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:PyString_FromString
+   fun:_Z35PyvtkSMDocumentation_GetDescriptionP7_objectS0_
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   fun:_Z17vtkBuildDocStringPPc
+   fun:PyVTKClass_New
+   fun:PyVTKClass_vtkSMPropertyLinkNew
+   fun:initlibvtkPVServerManagerPython
+   fun:_PyImport_LoadDynamicModule
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:load_package
+   fun:load_module
+   fun:import_submodule
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:instance_dealloc
+   fun:_PyExc_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:class_dealloc
+   fun:_PyExc_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyDict_Clear
+   fun:_PyExc_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:code_dealloc
+   fun:func_dealloc
+   fun:list_dealloc
+   fun:PyInterpreterState_Clear
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:func_dealloc
+   fun:list_dealloc
+   fun:PyInterpreterState_Clear
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:class_dealloc
+   fun:tupledealloc
+   fun:class_dealloc
+   fun:tupledealloc
+   fun:class_dealloc
+   fun:tupledealloc
+   fun:dict_dealloc
+   fun:PyInterpreterState_Clear
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:func_dealloc
+   fun:class_dealloc
+   fun:tupledealloc
+   fun:dict_dealloc
+   fun:PyInterpreterState_Clear
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:PyInterpreterState_Clear
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:code_dealloc
+   fun:func_dealloc
+   fun:_ZN16vtkPythonCommandD0Ev
+   fun:_ZN10vtkCommand10UnRegisterEv
+   fun:_ZN10vtkCommand10UnRegisterEP13vtkObjectBase
+   fun:_ZN11vtkObserverD1Ev
+   fun:_ZN16vtkSubjectHelper18RemoveAllObserversEv
+   fun:_ZN9vtkObject18RemoveAllObserversEv
+   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
+   fun:_ZN13vtkObjectBase10UnRegisterEPS_
+   fun:_ZN13vtkObjectBase6DeleteEv
+   fun:_ZN9vtkPVMainD0Ev
+   fun:_ZN13vtkObjectBase18UnRegisterInternalEPS_i
+   fun:_ZN9vtkObject18UnRegisterInternalEP13vtkObjectBasei
+   fun:_ZN13vtkObjectBase10UnRegisterEPS_
+   fun:_ZN13vtkObjectBase6DeleteEv
+   fun:main
+}
