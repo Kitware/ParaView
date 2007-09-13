@@ -112,16 +112,6 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="3" >
-        <widget class="QDoubleSpinBox" name="ScalarOpacityUnitDistance" >
-         <property name="toolTip" >
-          <string>&lt;html>Set the unit distance on which the scalar opacity transfer function is defined for volume rendering.&lt;html></string>
-         </property>
-         <property name="maximum" >
-          <double>100000000000000005250476025520442024870446858110815915491585411551180245798890819578637137508044786404370444383288387817694252323536043057564479218478670698284838720092657580373783023379478809005936895323497079994508111903896764088007465274278014249457925878882005684283811566947219638686545940054016.000000000000000</double>
-         </property>
-        </widget>
-       </item>
        <item row="10" column="0" colspan="4" >
         <layout class="QHBoxLayout" >
          <property name="margin" >
@@ -370,6 +360,9 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item row="2" column="3" >
+        <widget class="QLineEdit" name="ScalarOpacityUnitDistance" />
        </item>
       </layout>
      </widget>
@@ -862,14 +855,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqColorChooserButton</class>
-   <extends>QPushButton</extends>
-   <header>pqColorChooserButton.h</header>
-  </customwidget>
-  <customwidget>
    <class>QVTKWidget</class>
    <extends>QWidget</extends>
    <header>QVTKWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqColorChooserButton</class>
+   <extends>QPushButton</extends>
+   <header>pqColorChooserButton.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

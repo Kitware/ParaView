@@ -215,6 +215,11 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   validator = new pqLineEditNumberValidator(false, this);
   this->Form->TableSizeText->installEventFilter(validator);
 
+  // Why are we not using QDoubleValidator?
+  validator = new pqLineEditNumberValidator(true, this);
+  this->Form->TableSizeText->installEventFilter(validator);
+  this->Form->ScalarOpacityUnitDistance->installEventFilter(validator);
+
   // Connect the color scale widgets.
   this->connect(this->Form->ScalarValue, SIGNAL(editingFinished()),
       this, SLOT(setValueFromText()));
@@ -306,6 +311,7 @@ void pqColorScaleEditor::setRepresentation(pqPipelineRepresentation *display)
     {
     this->disconnect(this->Display, 0, this, 0);
     this->disconnect(&this->Form->Links, 0, this->Display, 0);
+    this->disconnect(&this->Form->ReprLinks, 0, this->Display, 0);
     this->Form->ReprLinks.removeAllPropertyLinks();
     if(this->ColorMap)
       {
@@ -328,6 +334,8 @@ void pqColorScaleEditor::setRepresentation(pqPipelineRepresentation *display)
     this->connect(this->Display, SIGNAL(destroyed(QObject *)),
         this, SLOT(cleanupDisplay()));
     this->connect(&this->Form->Links, SIGNAL(qtWidgetChanged()),
+        this->Display, SLOT(renderViewEventually()));
+    this->connect(&this->Form->ReprLinks, SIGNAL(qtWidgetChanged()),
         this->Display, SLOT(renderViewEventually()));
 
     // Get the color map object for the display's lookup table.
@@ -1382,7 +1390,7 @@ void pqColorScaleEditor::initColorScale()
         this->Display->getScalarOpacityFunctionProxy()->GetProperty("Points"),
         vtkCommand::ModifiedEvent, this, SLOT(handlePointsChanged()));
     this->Form->ReprLinks.addPropertyLink(
-      this->Form->ScalarOpacityUnitDistance, "value", SIGNAL(valueChanged(double)),
+      this->Form->ScalarOpacityUnitDistance, "text", SIGNAL(editingFinished()),
       this->Display->getProxy(),
       this->Display->getProxy()->GetProperty("ScalarOpacityUnitDistance"));
     }
