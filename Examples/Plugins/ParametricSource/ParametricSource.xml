@@ -3,13 +3,22 @@
     <Proxy name="ParametricBoy" class="vtkParametricBoy"/>
     <Proxy name="ParametricConicSpiral" class="vtkParametricConicSpiral">
       <DoubleVectorProperty name="TubeRadius" command="SetA"
-         number_of_elements="1" default_values="0.2"/>
+         animateable="1" 
+         number_of_elements="1" default_values="0.2">
+         <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
       <DoubleVectorProperty name="Height" command="SetB"
-         number_of_elements="1" default_values="1"/>
+         number_of_elements="1" default_values="1">
+         <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
       <DoubleVectorProperty name="Radius" command="SetC"
-         number_of_elements="1" default_values="0.1"/>
+         number_of_elements="1" default_values="0.1">
+         <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
       <DoubleVectorProperty name="NumberOfWindings" command="SetN"
-         number_of_elements="1" default_values="2"/>
+         number_of_elements="1" default_values="2">
+         <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
     </Proxy>
     <Proxy name="ParametricEllipsoid" class="vtkParametricEllipsoid"/>
   </ProxyGroup>
