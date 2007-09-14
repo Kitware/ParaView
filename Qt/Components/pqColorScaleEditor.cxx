@@ -1201,47 +1201,47 @@ void pqColorScaleEditor::loadBuiltinColorPresets()
   pqColorMapModel colorMap;
   pqColorPresetModel *model = this->Form->Presets->getModel();
   colorMap.setColorSpace(pqColorMapModel::HsvSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor(0, 0, 255));
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 0, 0));
+  colorMap.addPoint(pqChartValue((double)0.0), QColor(0, 0, 255), (double)0.0);
+  colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 0, 0), (double)0.0);
   model->addBuiltinColorMap(colorMap, "Blue to Red Rainbow");
 
   colorMap.removeAllPoints();
   colorMap.setColorSpace(pqColorMapModel::HsvSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor(255, 0, 0));
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(0, 0, 255));
+  colorMap.addPoint(pqChartValue((double)0.0), QColor(255, 0, 0), (double)0.0);
+  colorMap.addPoint(pqChartValue((double)1.0), QColor(0, 0, 255), (double)1.0);
   model->addBuiltinColorMap(colorMap, "Red to Blue Rainbow");
 
   colorMap.removeAllPoints();
   colorMap.setColorSpace(pqColorMapModel::LabSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor(0, 0, 0));
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 255, 255));
+  colorMap.addPoint(pqChartValue((double)0.0), QColor(0,   0,   0  ), (double)0.0);
+  colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 255, 255), (double)1.0);
   model->addBuiltinColorMap(colorMap, "Grayscale");
 
   colorMap.removeAllPoints();
   colorMap.setColorSpace(pqColorMapModel::LabSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor(0, 0, 0));
-  colorMap.addPoint(pqChartValue((double)0.4), QColor(255, 0, 0));
-  colorMap.addPoint(pqChartValue((double)0.8), QColor(255, 255, 0));
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 255, 255));
+  colorMap.addPoint(pqChartValue((double)0.0), QColor(0,   0,   0  ), (double)0.0);
+  colorMap.addPoint(pqChartValue((double)0.4), QColor(230, 0,   0  ), (double)0.4);
+  colorMap.addPoint(pqChartValue((double)0.8), QColor(230, 230, 0  ), (double)0.8);
+  colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 255, 255), (double)1.0);
   model->addBuiltinColorMap(colorMap, "Black-Body Radiation");
 
   colorMap.removeAllPoints();
   colorMap.setColorSpace(pqColorMapModel::LabSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor(0, 153, 191));
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(196, 119, 87));
+  colorMap.addPoint(pqChartValue((double)0.0), QColor(0, 153, 191), (double)0.0);
+  colorMap.addPoint(pqChartValue((double)1.0), QColor(196, 119, 87),(double)1.0);
   model->addBuiltinColorMap(colorMap, "CIELab Blue to Red");
 
   colorMap.removeAllPoints();
   colorMap.setColorSpace(pqColorMapModel::LabSpace);
-  colorMap.addPoint(pqChartValue((double)0.0  ), QColor( 19, 119, 255));
-  colorMap.addPoint(pqChartValue((double)0.125), QColor(119, 150, 255));
-  colorMap.addPoint(pqChartValue((double)0.25 ), QColor(167, 180, 255));
-  colorMap.addPoint(pqChartValue((double)0.375), QColor(210, 214, 255));
-  colorMap.addPoint(pqChartValue((double)0.5  ), QColor(241, 241, 241));
-  colorMap.addPoint(pqChartValue((double)0.625), QColor(255, 201, 191));
-  colorMap.addPoint(pqChartValue((double)0.75 ), QColor(255, 160, 145));
-  colorMap.addPoint(pqChartValue((double)0.875), QColor(255, 121, 103));
-  colorMap.addPoint(pqChartValue((double)1.0  ), QColor(234,  60,  54));
+  colorMap.addPoint(pqChartValue((double)0.0  ), QColor( 19, 119, 255), 0.0  );
+  colorMap.addPoint(pqChartValue((double)0.125), QColor(119, 150, 255), 0.125);
+  colorMap.addPoint(pqChartValue((double)0.25 ), QColor(167, 180, 255), 0.25 );
+  colorMap.addPoint(pqChartValue((double)0.375), QColor(210, 214, 255), 0.375);
+  colorMap.addPoint(pqChartValue((double)0.5  ), QColor(241, 241, 241), 0.5  );
+  colorMap.addPoint(pqChartValue((double)0.625), QColor(255, 201, 191), 0.625);
+  colorMap.addPoint(pqChartValue((double)0.75 ), QColor(255, 160, 145), 0.75 );
+  colorMap.addPoint(pqChartValue((double)0.875), QColor(255, 121, 103), 0.875);
+  colorMap.addPoint(pqChartValue((double)1.0  ), QColor(234,  60,  54), 1.0  );
   model->addBuiltinColorMap(colorMap, "Cool to Warm");
 }
 
