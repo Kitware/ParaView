@@ -1236,7 +1236,7 @@
     <SubProxy name="UpdateSuppressor" id="393"/>
   </Proxy>
   <Proxy group="filters" type="CTHPart" id="1096">
-    <Property name="AddVolumeArrayName" id="1096.AddVolumeArrayName" number_of_elements="2">
+    <Property name="AddUnsignedCharVolumeArrayName" id="1096.AddUnsignedCharVolumeArrayName" number_of_elements="2">
       <Element index="0" value="Material volume fraction - 0"/>
       <Element index="1" value="Material volume fraction - 1"/>
     </Property>

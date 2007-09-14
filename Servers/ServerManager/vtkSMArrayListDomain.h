@@ -27,6 +27,11 @@
 //    - normals
 //    - tcoords
 //    - tensors
+// * data_type - one of:
+//    - VTK_BIT, VTK_CHAR, etc or the equivalent integers
+//      from vtkType.h
+//    - VTK_VOID, and 0 are equivalent to not specifying, meaning any data type
+//      is allowed
 // @endverbatim
 // .SECTION See Also
 // vtkSMDomain vtkSMProxyProperty vtkSMInputArrayDomain
@@ -88,6 +93,11 @@ public:
   // Returns 1 if the domain updated the property.
   virtual int SetDefaultValues(vtkSMProperty*);
 
+  // Description:
+  // Return the attribute format. unsigned char, float, int, double etc.
+  // See vtkType.h for the type listing.
+  vtkGetMacro(DataType, int);
+
 protected:
   vtkSMArrayListDomain();
   ~vtkSMArrayListDomain();
@@ -114,7 +124,9 @@ protected:
   vtkSetMacro(DefaultElement, unsigned int);
 
   int AttributeType;
+  int Attribute;
   unsigned int DefaultElement;
+  int DataType;
 
   vtkSetStringMacro(InputDomainName);
   vtkGetStringMacro(InputDomainName);

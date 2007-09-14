@@ -91,6 +91,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqEditServerStartupDialog.h
   pqExodusIIPanel.h
   pqExodusPanel.h
+  pqExtractCTHPartsPanel.h
   pqExtractDataSetsPanel.h  
   pqExtractLocationsPanel.h  
   pqExtractSelectionPanel.h  
@@ -406,6 +407,8 @@ ADD_LIBRARY(pqComponents
   pqExodusIIPanel.h
   pqExodusPanel.cxx
   pqExodusPanel.h
+  pqExtractCTHPartsPanel.cxx
+  pqExtractCTHPartsPanel.h
   pqExtractDataSetsPanel.cxx
   pqExtractDataSetsPanel.h
   pqExtractLocationsPanel.cxx

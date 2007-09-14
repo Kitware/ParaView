@@ -1180,16 +1180,62 @@ Extract CTH Parts is a specialized filter for visualizing the data from a CTH si
      </ProxyProperty>
 
      <StringVectorProperty 
-        name="AddVolumeArrayName"
-        command="AddVolumeArrayName" 
+        name="AddDoubleVolumeArrayName"
+        command="AddDoubleVolumeArrayName" 
         clean_command="RemoveAllVolumeArrayNames"
         repeat_command="1"
         number_of_elements_per_command="1"
-        label="Volume Arrays">
+        label="Double Volume Arrays">
         <Documentation>
           This property specifies the name(s) of the volume fraction array(s) for generating parts.
         </Documentation>
-        <ArrayListDomain name="array_list" attribute_type="Scalars">
+        <ArrayListDomain name="array_list" attribute_type="Scalars" data_type="VTK_DOUBLE" >
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <!-- This overrides the GUI's default mechanism to
+            not set the default value for this property
+            using the domain when the proxy is created -->
+          <NoDefault />
+        </Hints>
+     </StringVectorProperty> 
+
+     <StringVectorProperty 
+        name="AddFloatVolumeArrayName"
+        command="AddFloatVolumeArrayName" 
+        clean_command="RemoveAllVolumeArrayNames"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        label="Float Volume Arrays">
+        <Documentation>
+          This property specifies the name(s) of the volume fraction array(s) for generating parts.
+        </Documentation>
+        <ArrayListDomain name="array_list" attribute_type="Scalars" data_type="VTK_FLOAT" >
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <!-- This overrides the GUI's default mechanism to
+            not set the default value for this property
+            using the domain when the proxy is created -->
+          <NoDefault />
+        </Hints>
+     </StringVectorProperty> 
+
+     <StringVectorProperty 
+        name="AddUnsignedCharVolumeArrayName"
+        command="AddUnsignedCharVolumeArrayName" 
+        clean_command="RemoveAllVolumeArrayNames"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        label="Unsigned Character Volume Arrays">
+        <Documentation>
+          This property specifies the name(s) of the volume fraction array(s) for generating parts.
+        </Documentation>
+        <ArrayListDomain name="array_list" attribute_type="Scalars" data_type="VTK_UNSIGNED_CHAR" >
           <RequiredProperties>
              <Property name="Input" function="Input"/>
           </RequiredProperties>

@@ -30,7 +30,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.11");
+vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.12");
 
 struct vtkSMArrayListDomainInternals
 {
@@ -41,6 +41,7 @@ struct vtkSMArrayListDomainInternals
 vtkSMArrayListDomain::vtkSMArrayListDomain()
 {
   this->AttributeType = vtkDataSetAttributes::SCALARS;
+  this->DataType = VTK_VOID;
   this->DefaultElement = 0;
   this->InputDomainName = 0;
   this->ALDInternals = new vtkSMArrayListDomainInternals;
@@ -78,10 +79,13 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
     if ( iad->IsFieldValid(sp, outputport, info->GetArrayInformation(idx)) )
       {
       this->ALDInternals->PartialMap[arrayInfo->GetName()] = arrayInfo->GetIsPartial();
-      unsigned int newidx = this->AddString(arrayInfo->GetName());
-      if (arrayInfo == attrInfo)
+      if (!this->DataType || (arrayInfo->GetDataType() == this->DataType))
         {
-        attrIdx = newidx;
+        unsigned int newidx = this->AddString(arrayInfo->GetName());
+        if (arrayInfo == attrInfo)
+          {
+          attrIdx = newidx;
+          }
         }
       }
     }
@@ -231,10 +235,103 @@ int vtkSMArrayListDomain::ReadXMLAttributes(
         }
       }
     }
+
   if(i == vtkDataSetAttributes::NUM_ATTRIBUTES)
     {
     this->SetAttributeType(vtkDataSetAttributes::SCALARS);
     }
+
+  const char* data_type = element->GetAttribute("data_type");  
+  if(data_type)
+    {
+    //from vtkType.h
+    this->DataType = -1;
+    if (!strcmp(data_type, "VTK_VOID")) 
+      {
+      this->DataType=0;    
+      }
+    if (!strcmp(data_type, "VTK_BIT")) 
+      {
+      this->DataType=1;
+      }
+    if (!strcmp(data_type, "VTK_CHAR")) 
+      {
+      this->DataType=2;
+      }
+    if (!strcmp(data_type, "VTK_SIGNED_CHAR")) 
+      {
+      this->DataType=15;
+      }
+    if (!strcmp(data_type, "VTK_UNSIGNED_CHAR")) 
+      {
+      this->DataType=3;
+      }
+    if (!strcmp(data_type, "VTK_SHORT")) 
+      {
+      this->DataType=4;
+      }
+    if (!strcmp(data_type, "VTK_UNSIGNED_SHORT")) 
+      {
+      this->DataType=5;
+      }
+    if (!strcmp(data_type, "VTK_INT")) 
+      {
+      this->DataType=6;
+      }
+    if (!strcmp(data_type, "VTK_UNSIGNED_INT")) 
+      {
+      this->DataType=7;
+      }
+    if (!strcmp(data_type, "VTK_LONG")) 
+      {
+      this->DataType=8;
+      }
+    if (!strcmp(data_type, "VTK_UNSIGNED_LONG")) 
+      {
+      this->DataType=9;
+      }
+    if (!strcmp(data_type, "VTK_FLOAT")) 
+      {
+      this->DataType=10;
+      }
+    if (!strcmp(data_type, "VTK_DOUBLE")) 
+      {
+      this->DataType=11;
+      }
+    if (!strcmp(data_type, "VTK_ID_TYPE")) 
+      {
+      this->DataType=12;
+      }
+    if (!strcmp(data_type, "VTK_STRING")) 
+      {
+      this->DataType=13;
+      }
+    if (!strcmp(data_type, "VTK_OPAQUE")) 
+      {
+      this->DataType=14;
+      }
+    if (!strcmp(data_type, "VTK_LONG_LONG")) 
+      {
+      this->DataType=16;
+      }
+    if (!strcmp(data_type, "VTK_UNSIGNED_LONG_LONG")) 
+      {
+      this->DataType=17;
+      }
+    if (!strcmp(data_type, "VTK___INT64")) 
+      {
+      this->DataType=18;
+      }
+    if (!strcmp(data_type, "VTK_UNSIGNED___INT64")) 
+      {
+      this->DataType=19;
+      }
+    if (this->DataType == -1)
+      {
+      this->DataType = atoi(data_type);
+      }
+    }
+
   
   return 1;
 }
@@ -272,4 +369,5 @@ void vtkSMArrayListDomain::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "DefaultElement: " << this->DefaultElement << endl;
   os << indent << "AttributeType: " << this->AttributeType << endl;
+  os << indent << "DataType: " << this->DataType << endl;
 }

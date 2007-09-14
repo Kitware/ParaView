@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCutPanel.h"
 #include "pqExodusIIPanel.h"
 #include "pqExodusPanel.h"
+#include "pqExtractCTHPartsPanel.h"
 #include "pqExtractDataSetsPanel.h"
 #include "pqExtractLocationsPanel.h"
 #include "pqExtractSelectionPanel.h"
@@ -162,6 +163,10 @@ public:
         {
         return new pqExtractThresholdsPanel(proxy, p);
         }
+      if(QString("CTHPart") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqExtractCTHPartsPanel(proxy, p);
+        }
 
       }
     if(QString("sources") == proxy->getProxy()->GetXMLGroup())
@@ -202,7 +207,8 @@ public:
 //         QString("ProbeLocationOverTime") == proxy->getProxy()->GetXMLName() ||
          QString("Contour") == proxy->getProxy()->GetXMLName() || 
          QString("SelectThrough") == proxy->getProxy()->GetXMLName() ||
-         QString("ExtractThresholds") == proxy->getProxy()->GetXMLName())
+         QString("ExtractThresholds") == proxy->getProxy()->GetXMLName() || 
+         QString("CTHPart") == proxy->getProxy()->GetXMLName())
         {
         return true;
         }
