@@ -11,7 +11,7 @@
 
  <ProxyGroup name="views">
    <ViewProxy name="MyView"
-     base_proxygroup="newviews" base_proxyname="ViewBase"
+     base_proxygroup="views" base_proxyname="ViewBase"
      representation_name="MyDisplay">
    </ViewProxy>
  </ProxyGroup>
