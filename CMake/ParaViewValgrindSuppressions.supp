@@ -3853,7 +3853,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XReply
    fun:XInternAtom
    fun:XSetWMProperties
@@ -3902,7 +3902,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XEventsQueued
    fun:XEventsQueued
    fun:_Z22x11EventSourceDispatchP8_GSourcePFiPvES1_
@@ -3922,7 +3922,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XFlush
    fun:_ZN14QWidgetPrivate8hide_sysEv
    fun:_ZN14QWidgetPrivate11hide_helperEv
@@ -3957,13 +3957,13 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcCreateLC
    fun:_XlcDefaultLoader
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
 }
 {
@@ -4051,11 +4051,11 @@
    fun:calloc
    obj:/lib/tls/i686/cmov/libdl-2.3.6.so
    fun:dlopen
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
 }
 {
@@ -4189,14 +4189,14 @@
    fun:malloc
    fun:_XlcAddCT
    fun:_XlcInitCTInfo
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcCreateLC
    fun:_XlcDefaultLoader
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
 }
 {
@@ -4339,7 +4339,7 @@
    fun:malloc
    obj:/lib/tls/i686/cmov/libc-2.3.6.so
    fun:getaddrinfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_X11TransConnect
    fun:_X11TransConnectDisplay
    fun:XOpenDisplay
@@ -4437,14 +4437,14 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcCreateLC
    fun:_XlcDefaultLoader
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
 }
 {
@@ -4464,7 +4464,7 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_X11TransConnect
    fun:_X11TransConnectDisplay
    fun:XOpenDisplay
@@ -4498,22 +4498,22 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:realloc
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcCreateLC
    fun:_XlcDefaultLoader
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
 }
 {
    <insert a suppression name here>
    Memcheck:Leak
    fun:realloc
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
    fun:XGetDefault
    fun:_Z11getXDefaultPKcS0_Pi
@@ -4594,11 +4594,11 @@
    Memcheck:Leak
    fun:malloc
    fun:strdup
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
 }
 {
@@ -4672,11 +4672,11 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
 }
 {
@@ -4686,14 +4686,14 @@
    fun:_XlcAddCharSet
    fun:_XlcAddCT
    fun:_XlcInitCTInfo
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcCreateLC
    fun:_XlcDefaultLoader
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
 }
 {
@@ -4703,14 +4703,14 @@
    fun:_XlcCreateDefaultCharSet
    fun:_XlcAddCT
    fun:_XlcInitCTInfo
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcCreateLC
    fun:_XlcDefaultLoader
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
 }
 {
@@ -4780,14 +4780,14 @@
    fun:malloc
    fun:_XlcSetConverter
    fun:_XlcInitCTInfo
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcCreateLC
    fun:_XlcDefaultLoader
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
 }
 {
@@ -4906,14 +4906,14 @@
    Memcheck:Leak
    fun:malloc
    fun:_XlcCreateLocaleDataBase
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcCreateLC
    fun:_XlcDefaultLoader
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
 }
 {
@@ -5015,7 +5015,7 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XrmInternalStringToQuark
    fun:XrmPermStringToQuark
    fun:XrmInitialize
@@ -5673,10 +5673,10 @@
    Memcheck:Param
    writev(vector[...])
    fun:writev
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_X11TransWritev
    fun:_XSend
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XPutImage
 }
 {
@@ -5685,7 +5685,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XFlush
    fun:_ZN14QWidgetPrivate13setCursor_sysERK7QCursor
    fun:_ZN7QWidget9setCursorERK7QCursor
@@ -5775,7 +5775,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderCompositeTrapezoids
    fun:_Z29qt_XRenderCompositeTrapezoidsP9_XDisplayimmPK17XRenderPictFormatiiRK7QVectorI11_XTrapezoidE
    fun:_ZN22QX11PaintEnginePrivate15fillPolygon_devEPK7QPointFiNS_6GCModeEN12QPaintEngine15PolygonDrawModeE
@@ -5804,7 +5804,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XFlushGCCache
    fun:XSetClipMask
 }
@@ -5814,7 +5814,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XFlushGCCache
    fun:XDrawLine
    fun:_ZN15QX11PaintEngine9drawLinesEPK5QLinei
@@ -5826,7 +5826,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XFlushGCCache
    fun:XCopyArea
    fun:_ZN15QX11PaintEngine10drawPixmapERK6QRectFRK7QPixmapS2_
@@ -5853,7 +5853,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XFlushGCCache
    fun:XCopyArea
    fun:_ZN17QX11WindowSurface5flushEP7QWidgetRK7QRegionRK6QPoint
@@ -5865,7 +5865,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XFreeGC
    fun:_ZN7QPixmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -5878,7 +5878,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XFreeGC
    fun:_ZN15QX11PaintEngine3endEv
    fun:_ZN8QPainter3endEv
@@ -5890,7 +5890,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XFreeGC
    fun:_ZN15QX11PaintEngine3endEv
    fun:_ZN8QPainter3endEv
@@ -5919,7 +5919,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XFreeGC
    fun:_ZN7QPixmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN7QPixmap4loadERK7QStringPKc6QFlagsIN2Qt19ImageConversionFlagEE
@@ -6115,12 +6115,12 @@
    Memcheck:Leak
    fun:malloc
    fun:_XimOpenIM
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XOpenIM
    fun:_ZN16QXIMInputContext10create_ximEv
    fun:xim_create_callback
    fun:_XimRegisterIMInstantiateCallback
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRegisterIMInstantiateCallback
    fun:_ZN16QXIMInputContextC1Ev
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
@@ -6143,9 +6143,9 @@
    Memcheck:Leak
    fun:malloc
    fun:_XimOpenIM
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XimRegisterIMInstantiateCallback
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRegisterIMInstantiateCallback
    fun:_ZN16QXIMInputContextC1Ev
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
@@ -6156,7 +6156,7 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XmbTextListToTextProperty
    fun:_Z14qstring_to_xtpRK7QString
    fun:_ZN14QWidgetPrivate18setWindowTitle_sysERK7QString
@@ -6173,7 +6173,7 @@
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
    fun:XGetDefault
    fun:_Z11getXDefaultPKcS0_Pi
@@ -6187,7 +6187,7 @@
    fun:malloc
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
    fun:XGetDefault
    fun:_Z11getXDefaultPKcS0_Pi
@@ -6223,12 +6223,12 @@
    fun:_XimSetLocalIMDefaults
    fun:_XimLocalOpenIM
    fun:_XimOpenIM
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XOpenIM
    fun:_ZN16QXIMInputContext10create_ximEv
    fun:xim_create_callback
    fun:_XimRegisterIMInstantiateCallback
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRegisterIMInstantiateCallback
    fun:_ZN16QXIMInputContextC1Ev
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
@@ -6239,17 +6239,17 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcOpenConverter
    fun:_XimLocalOpenIM
    fun:_XimOpenIM
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XOpenIM
    fun:_ZN16QXIMInputContext10create_ximEv
    fun:xim_create_callback
    fun:_XimRegisterIMInstantiateCallback
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRegisterIMInstantiateCallback
    fun:_ZN16QXIMInputContextC1Ev
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
@@ -6273,12 +6273,12 @@
    fun:_XlcOpenConverter
    fun:_XimLocalOpenIM
    fun:_XimOpenIM
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XOpenIM
    fun:_ZN16QXIMInputContext10create_ximEv
    fun:xim_create_callback
    fun:_XimRegisterIMInstantiateCallback
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRegisterIMInstantiateCallback
    fun:_ZN16QXIMInputContextC1Ev
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
@@ -6292,12 +6292,12 @@
    fun:_XlcOpenConverter
    fun:_XimLocalOpenIM
    fun:_XimOpenIM
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XOpenIM
    fun:_ZN16QXIMInputContext10create_ximEv
    fun:xim_create_callback
    fun:_XimRegisterIMInstantiateCallback
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRegisterIMInstantiateCallback
    fun:_ZN16QXIMInputContextC1Ev
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
@@ -6309,14 +6309,14 @@
    Memcheck:Leak
    fun:realloc
    fun:_XlcResolveLocaleName
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcCreateLC
    fun:_XlcDefaultLoader
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
    fun:XGetDefault
    fun:_Z11getXDefaultPKcS0_Pi
@@ -6329,16 +6329,16 @@
    Memcheck:Leak
    fun:malloc
    obj:/usr/lib/X11/locale/common/xlcDef.so.2.0.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcOpenConverter
    fun:_XimLocalOpenIM
    fun:_XimOpenIM
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XOpenIM
    fun:_ZN16QXIMInputContext10create_ximEv
    fun:xim_create_callback
    fun:_XimRegisterIMInstantiateCallback
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRegisterIMInstantiateCallback
    fun:_ZN16QXIMInputContextC1Ev
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
@@ -6360,35 +6360,35 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcCreateLocaleDataBase
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcCreateLC
    fun:_XlcDefaultLoader
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
 }
 {
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcCreateLocaleDataBase
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcCreateLC
    fun:_XlcDefaultLoader
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
 }
 {
@@ -6420,12 +6420,12 @@
    fun:_XimParseStringFile
    fun:_XimLocalOpenIM
    fun:_XimOpenIM
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XOpenIM
    fun:_ZN16QXIMInputContext10create_ximEv
    fun:xim_create_callback
    fun:_XimRegisterIMInstantiateCallback
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRegisterIMInstantiateCallback
    fun:_ZN16QXIMInputContextC1Ev
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
@@ -6488,12 +6488,12 @@
    obj:/usr/lib/X11/locale/common/ximcp.so.2.0.0
    fun:_XimLocalOpenIM
    fun:_XimOpenIM
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XOpenIM
    fun:_ZN16QXIMInputContext10create_ximEv
    fun:xim_create_callback
    fun:_XimRegisterIMInstantiateCallback
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRegisterIMInstantiateCallback
    fun:_ZN16QXIMInputContextC1Ev
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
@@ -6527,9 +6527,9 @@
    fun:_XimInitialResourceInfo
    fun:_XimLocalOpenIM
    fun:_XimOpenIM
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XimRegisterIMInstantiateCallback
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRegisterIMInstantiateCallback
    fun:_ZN16QXIMInputContextC1Ev
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
@@ -6730,7 +6730,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XCheckTypedWindowEvent
    fun:_ZN9QETWidget20translateConfigEventEPK7_XEvent
    fun:_ZN12QApplication15x11ProcessEventEP7_XEvent
@@ -6750,7 +6750,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderChangePicture
    fun:_ZN15QX11PaintEngine3endEv
    fun:_ZN8QPainter3endEv
@@ -6889,7 +6889,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XEventsQueued
    fun:XEventsQueued
    fun:_Z21x11EventSourcePrepareP8_GSourcePi
@@ -6918,7 +6918,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XFlushGCCache
    fun:XDrawPoints
    fun:_ZN15QX11PaintEngine10drawPointsEPK6QPointi
@@ -6944,7 +6944,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XDrawPoints
    fun:_ZN15QX11PaintEngine10drawPointsEPK6QPointi
    fun:_ZN8QPainter10drawPointsEPK6QPointi
@@ -6969,7 +6969,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XDrawPoints
    fun:_ZN15QX11PaintEngine10drawPointsEPK6QPointi
    fun:_ZN8QPainter10drawPointsEPK6QPointi
@@ -6984,7 +6984,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderFreePicture
    fun:_ZN7QWidget7destroyEbb
    fun:_ZN7QWidgetD2Ev
@@ -7170,7 +7170,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderFreePicture
    fun:_ZN7QWidget7destroyEbb
    fun:_ZN7QWidgetD2Ev
@@ -7218,7 +7218,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    obj:/usr/lib/libXrender.so.1.3.0
    fun:XRenderSetPictureClipRectangles
    fun:_ZN15QX11PaintEngine9updatePenERK4QPen
@@ -7449,7 +7449,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XCreateSimpleWindow
    fun:_Z22qt_XCreateSimpleWindowPK7QWidgetP9_XDisplaymiijjimm
    fun:_ZN14QWidgetPrivate10create_sysEmbb
@@ -7507,7 +7507,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XEventsQueued
    fun:XEventsQueued
    fun:_Z22x11EventSourceDispatchP8_GSourcePFiPvES1_
@@ -7648,7 +7648,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XDrawLine
    fun:_ZN15QX11PaintEngine9drawLinesEPK5QLinei
    fun:_ZN8QPainter9drawLinesEPK5QLinei
@@ -7659,7 +7659,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderComposite
    fun:_ZN15QX11PaintEngine10drawPixmapERK6QRectFRK7QPixmapS2_
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -7681,7 +7681,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderComposite
    fun:_ZN15QX11PaintEngine10drawPixmapERK6QRectFRK7QPixmapS2_
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -7705,7 +7705,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XCreateGC
    fun:_ZN7QPixmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -7727,7 +7727,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XEventsQueued
    fun:XEventsQueued
    fun:_Z22x11EventSourceDispatchP8_GSourcePFiPvES1_
@@ -7756,7 +7756,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderComposite
    fun:_ZN15QX11PaintEngine10drawPixmapERK6QRectFRK7QPixmapS2_
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -7826,7 +7826,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XCopyArea
    fun:_ZN15QX11PaintEngine10drawPixmapERK6QRectFRK7QPixmapS2_
    fun:_ZN8QPainter10drawPixmapERK6QRectFRK7QPixmapS2_
@@ -7852,7 +7852,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XCheckIfEvent
    fun:_ZN9QETWidget19translatePaintEventEPK7_XEvent
    fun:_ZN12QApplication15x11ProcessEventEP7_XEvent
@@ -7871,7 +7871,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderComposite
    fun:_ZN15QX11PaintEngine10drawPixmapERK6QRectFRK7QPixmapS2_
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -7900,7 +7900,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XReply
    fun:XSync
    fun:_ZN22vtkXOpenGLRenderWindow13CreateAWindowEv
@@ -7928,7 +7928,7 @@
    Memcheck:Param
    writev(vector[...])
    fun:writev
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_X11TransWritev
    fun:_XSend
    fun:__glXFlushRenderBuffer
@@ -7951,7 +7951,7 @@
    Memcheck:Param
    writev(vector[...])
    fun:writev
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_X11TransWritev
    fun:_XSend
    fun:__glXFlushRenderBuffer
@@ -7985,7 +7985,7 @@
    fun:malloc
    obj:/lib/tls/i686/cmov/libc-2.3.6.so
    fun:getaddrinfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_X11TransConnect
    fun:_X11TransConnectDisplay
    fun:XOpenDisplay
@@ -8009,7 +8009,7 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_X11TransConnect
    fun:_X11TransConnectDisplay
    fun:XOpenDisplay
@@ -8149,7 +8149,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XSetClipRectangles
    fun:XSetClipRectangles
 }
@@ -8159,7 +8159,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XSetWindowBackgroundPixmap
    fun:_ZN14QWidgetPrivate22updateSystemBackgroundEv
    fun:_ZN7QWidget12setAttributeEN2Qt15WidgetAttributeEb
@@ -8261,7 +8261,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XSetWindowBackgroundPixmap
    fun:_ZN14QWidgetPrivate8show_sysEv
    fun:_ZN14QWidgetPrivate11show_helperEv
@@ -8290,7 +8290,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XMoveResizeWindow
    fun:_ZN14QWidgetPrivate13setWSGeometryEb
    fun:_ZN14QWidgetPrivate13setWSGeometryEb
@@ -8319,7 +8319,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XMoveResizeWindow
    fun:_ZN14QWidgetPrivate13setWSGeometryEb
    fun:_ZN14QWidgetPrivate13setWSGeometryEb
@@ -8358,7 +8358,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XCreatePixmap
    fun:_ZN7QPixmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -8387,7 +8387,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XSelectInput
    fun:_ZN14QWidgetPrivate10create_sysEmbb
    fun:_ZN7QWidget6createEmbb
@@ -8403,7 +8403,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderChangePicture
    fun:_ZN15QX11PaintEngine9updatePenERK4QPen
    fun:_ZN15QX11PaintEngine11updateStateERK17QPaintEngineState
@@ -8416,7 +8416,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderChangePicture
    fun:_ZN15QX11PaintEngine9updatePenERK4QPen
    fun:_ZN15QX11PaintEngine11updateStateERK17QPaintEngineState
@@ -8496,7 +8496,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XEventsQueued
    fun:XEventsQueued
    fun:_Z21x11EventSourcePrepareP8_GSourcePi
@@ -8525,7 +8525,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XEventsQueued
    fun:XEventsQueued
    fun:_Z21x11EventSourcePrepareP8_GSourcePi
@@ -8571,7 +8571,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XMapWindow
    fun:_ZN14QWidgetPrivate8show_sysEv
    fun:_ZN14QWidgetPrivate11show_helperEv
@@ -8600,7 +8600,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderCreatePicture
    fun:_ZN7QPixmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -8622,7 +8622,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderCreatePicture
    fun:_ZN7QPixmap4initEiiNS_4TypeE
    fun:_ZN7QPixmapC1Ev
@@ -8649,7 +8649,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XCopyArea
    fun:_ZN15QX11PaintEngine10drawPixmapERK6QRectFRK7QPixmapS2_
    fun:_ZN8QPainter10drawPixmapERK6QRectFRK7QPixmapS2_
@@ -8672,7 +8672,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XFlush
    fun:_ZN14QWidgetPrivate8hide_sysEv
    fun:_ZN14QWidgetPrivate11hide_helperEv
@@ -8728,8 +8728,8 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XPutImage
    fun:_ZN7QPixmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -9486,7 +9486,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderCreatePicture
    fun:_ZN14QWidgetPrivate10create_sysEmbb
    fun:_ZN7QWidget6createEmbb
@@ -9501,7 +9501,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderCreatePicture
    fun:_ZN7QPixmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -9525,7 +9525,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderCreatePicture
    fun:_ZN7QPixmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -9554,7 +9554,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XCreatePixmap
    fun:_ZN7QPixmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -9567,7 +9567,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XSetWindowBackground
    fun:_ZN14QWidgetPrivate22updateSystemBackgroundEv
    fun:_ZN7QWidget6createEmbb
@@ -9597,7 +9597,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderFreePicture
    fun:_ZN7QWidget7destroyEbb
    fun:_ZN7QWidgetD2Ev
@@ -9626,7 +9626,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XReply
    fun:XSync
    fun:_ZN22vtkXOpenGLRenderWindow13CreateAWindowEv
@@ -9644,7 +9644,7 @@
    Memcheck:Param
    writev(vector[...])
    fun:writev
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_X11TransWritev
    fun:_XSend
    fun:__glXFlushRenderBuffer
@@ -9667,7 +9667,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XSetWindowBackground
    fun:_ZN14QWidgetPrivate22updateSystemBackgroundEv
    fun:_ZN7QWidget17setForegroundRoleEN8QPalette9ColorRoleE
@@ -9699,9 +9699,9 @@
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtDisplayInitialize
    fun:XtDisplayInitialize
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -9712,8 +9712,8 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_X11TransConnectDisplay
    fun:XOpenDisplay
    fun:_ZN22vtkXOpenGLRenderWindow12GetDisplayIdEv
@@ -9726,16 +9726,16 @@
    Memcheck:Leak
    fun:malloc
    fun:_XlcResolveLocaleName
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XlcCreateLC
    fun:_XlcDefaultLoader
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtDisplayInitialize
    fun:XtDisplayInitialize
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -9748,9 +9748,9 @@
    fun:malloc
    fun:_XrmDefaultInitParseInfo
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtDisplayInitialize
    fun:XtDisplayInitialize
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -9776,9 +9776,9 @@
    fun:_XlcInitLoader
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtDisplayInitialize
    fun:XtDisplayInitialize
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -9802,9 +9802,9 @@
    fun:malloc
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtDisplayInitialize
    fun:XtDisplayInitialize
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -9866,7 +9866,7 @@
    Memcheck:Leak
    fun:malloc
    fun:XCreateRegion
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:XtDisplayInitialize
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
@@ -9876,9 +9876,23 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
+   fun:_XtDisplayInitialize
+   fun:XtDisplayInitialize
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:*alloc
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
+   fun:XrmGetStringDatabase
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtDisplayInitialize
    fun:XtDisplayInitialize
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -9889,21 +9903,7 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
-   fun:XrmGetStringDatabase
-   obj:/usr/lib/libXt.so.6.0.0
-   fun:_XtDisplayInitialize
-   fun:XtDisplayInitialize
-   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
-   fun:_ZN15vtkRenderWindow6RenderEv
-   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_X11TransConnect
    fun:_X11TransConnectDisplay
    fun:XOpenDisplay
@@ -9982,9 +9982,9 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:calloc
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_X11TransConnectDisplay
    fun:XOpenDisplay
    fun:_ZN22vtkXOpenGLRenderWindow12GetDisplayIdEv
@@ -10002,11 +10002,11 @@
    fun:XcmsCCCOfColormap
    fun:XAllocNamedColor
    fun:XtCvtStringToPixel
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtConvert
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtGetResources
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtAppCreateShell
    fun:XtVaAppCreateShell
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -10017,10 +10017,10 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:realloc
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtDisplayInitialize
    fun:XtDisplayInitialize
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -10052,11 +10052,11 @@
    fun:XcmsCCCOfColormap
    fun:XAllocNamedColor
    fun:XtCvtStringToPixel
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtConvert
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtGetResources
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtAppCreateShell
    fun:XtVaAppCreateShell
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -10073,11 +10073,11 @@
    fun:XcmsCCCOfColormap
    fun:XAllocNamedColor
    fun:XtCvtStringToPixel
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtConvert
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtGetResources
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtAppCreateShell
    fun:XtVaAppCreateShell
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -10158,7 +10158,7 @@
    fun:malloc
    fun:_XUpdateAtomCache
    fun:XInternAtom
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:XtDisplayInitialize
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
@@ -10185,9 +10185,9 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:calloc
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XInternAtom
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:XtDisplayInitialize
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
@@ -10202,9 +10202,9 @@
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtDisplayInitialize
    fun:XtDisplayInitialize
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -10244,7 +10244,7 @@
    fun:calloc
    fun:XtCalloc
    fun:__XtCalloc
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:XtDisplayInitialize
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
@@ -10255,7 +10255,7 @@
    Memcheck:Leak
    fun:calloc
    fun:XtCalloc
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:XtDisplayInitialize
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
@@ -10312,9 +10312,9 @@
    Memcheck:Leak
    fun:malloc
    fun:_XrmInternalStringToQuark
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtDisplayInitialize
    fun:XtDisplayInitialize
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -10338,8 +10338,8 @@
    fun:malloc
    fun:XtMalloc
    fun:__XtMalloc
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:XtInitializeWidgetClass
    fun:XtInitializeWidgetClass
    fun:XtInitializeWidgetClass
@@ -10350,8 +10350,8 @@
    fun:XtInitializeWidgetClass
    fun:XtInitializeWidgetClass
    fun:XtInitializeWidgetClass
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtAppCreateShell
    fun:XtVaAppCreateShell
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -10364,20 +10364,20 @@
    fun:malloc
    fun:XtMalloc
    fun:__XtMalloc
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:XtInitializeWidgetClass
    fun:XtInitializeWidgetClass
    fun:XtInitializeWidgetClass
    fun:XtInitializeWidgetClass
    fun:XtInitializeWidgetClass
    fun:XtInitializeWidgetClass
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtAppCreateShell
    fun:XtVaAppCreateShell
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -10390,20 +10390,20 @@
    fun:malloc
    fun:XtMalloc
    fun:__XtMalloc
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:XtInitializeWidgetClass
    fun:XtInitializeWidgetClass
    fun:XtInitializeWidgetClass
    fun:XtInitializeWidgetClass
    fun:XtInitializeWidgetClass
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtAppCreateShell
    fun:XtVaAppCreateShell
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -10416,7 +10416,7 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XrmInternalStringToQuark
    fun:XrmPermStringToQuark
    fun:XrmInitialize
@@ -10431,16 +10431,16 @@
    fun:__XtMalloc
    fun:_XtDependencies
    fun:_XtResourceDependencies
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
 }
 {
    <insert a suppression name here>
@@ -10458,7 +10458,7 @@
    Memcheck:Param
    writev(vector[...])
    fun:writev
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_X11TransWritev
    fun:_XSend
    fun:XRenderCompositeTrapezoids
@@ -10487,7 +10487,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderChangePicture
    fun:_ZN22QX11PaintEnginePrivate15fillPolygon_devEPK7QPointFiNS_6GCModeEN12QPaintEngine15PolygonDrawModeE
    fun:_ZN22QX11PaintEnginePrivate8fillPathERK12QPainterPathNS_6GCModeEb
@@ -10499,7 +10499,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    obj:/usr/lib/libXrender.so.1.3.0
    fun:XRenderSetPictureClipRectangles
    fun:_ZN15QX11PaintEngine11updateBrushERK6QBrushRK7QPointF
@@ -10512,7 +10512,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderComposite
    fun:_ZN15QX11PaintEngine11updateBrushERK6QBrushRK7QPointF
    fun:_ZN15QX11PaintEngine11updateStateERK17QPaintEngineState
@@ -10540,7 +10540,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderChangePicture
    fun:_ZN15QX11PaintEngine11updateBrushERK6QBrushRK7QPointF
    fun:_ZN15QX11PaintEngine11updateStateERK17QPaintEngineState
@@ -10552,7 +10552,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XChangeWindowAttributes
    fun:_ZN14QWidgetPrivate10create_sysEmbb
    fun:_ZN7QWidget6createEmbb
@@ -10581,7 +10581,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XFreePixmap
    fun:_ZN11QPixmapDataD1Ev
    fun:_ZN7QPixmap5derefEv
@@ -10595,7 +10595,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XFreePixmap
    fun:_ZN11QPixmapDataD1Ev
    fun:_ZN7QPixmap5derefEv
@@ -10624,7 +10624,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XCreatePixmap
    fun:_ZN7QPixmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN7QPixmap4fillERK6QColor
@@ -10651,7 +10651,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderFreePicture
    fun:_ZN11QPixmapDataD1Ev
    fun:_ZN7QPixmap5derefEv
@@ -11016,7 +11016,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XMoveResizeWindow
    fun:_ZN14QWidgetPrivate13setWSGeometryEb
    fun:_ZN14QWidgetPrivate13setWSGeometryEb
@@ -11045,8 +11045,8 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XPutImage
    fun:_ZN7QPixmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -11074,8 +11074,8 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XPutImage
    fun:_ZN7QPixmap9fromImageERK6QImage6QFlagsIN2Qt19ImageConversionFlagEE
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -11198,7 +11198,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XMoveResizeWindow
    fun:_ZN14QWidgetPrivate13setWSGeometryEb
    fun:_ZN14QWidgetPrivate13setWSGeometryEb
@@ -11215,7 +11215,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XMoveResizeWindow
    fun:_ZN14QWidgetPrivate13setWSGeometryEb
    fun:_ZN14QWidgetPrivate13setWSGeometryEb
@@ -11244,7 +11244,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XCreateGC
    fun:_ZN15QX11PaintEngine5beginEP12QPaintDevice
    fun:_ZN8QPainter5beginEP12QPaintDevice
@@ -11263,7 +11263,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XCreateGC
    fun:_ZN15QX11PaintEngine5beginEP12QPaintDevice
    fun:_ZN8QPainter5beginEP12QPaintDevice
@@ -11292,7 +11292,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XCreateGC
    fun:_ZN15QX11PaintEngine5beginEP12QPaintDevice
    fun:_ZN8QPainter5beginEP12QPaintDevice
@@ -11320,7 +11320,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XCreateGC
    fun:_ZN15QX11PaintEngine5beginEP12QPaintDevice
    fun:_ZN8QPainter5beginEP12QPaintDevice
@@ -11341,7 +11341,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderFreePicture
    fun:_ZN7QWidget7destroyEbb
    fun:_ZN7QWidgetD2Ev
@@ -11601,7 +11601,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XDestroyWindow
    fun:_Z17qt_XDestroyWindowPK7QWidgetP9_XDisplaym
    fun:_ZN7QWidget7destroyEbb
@@ -11613,7 +11613,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderCompositeText32
    fun:_ZN15QX11PaintEngine12drawFreetypeERK7QPointFRK12QTextItemInt
    fun:_ZN15QX11PaintEngine12drawTextItemERK7QPointFRK9QTextItem
@@ -11628,7 +11628,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderComposite
    fun:_ZN15QX11PaintEngine10drawPixmapERK6QRectFRK7QPixmapS2_
    fun:_ZN8QPainter10drawPixmapERK6QRectFRK7QPixmapS2_
@@ -11671,7 +11671,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XCreateGC
    fun:_ZN15QX11PaintEngine5beginEP12QPaintDevice
    fun:_ZN8QPainter5beginEP12QPaintDevice
@@ -12172,7 +12172,7 @@
    Memcheck:Param
    writev(vector[...])
    fun:writev
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_X11TransWritev
    fun:_XSend
    fun:__glXFlushRenderBuffer
@@ -12193,9 +12193,9 @@
    fun:_XlcDynamicLoad
    fun:_XOpenLC
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtDisplayInitialize
    fun:XtDisplayInitialize
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -12210,9 +12210,9 @@
    fun:_XReply
    fun:XInternAtom
    fun:XSetWMProperties
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:XtRealizeWidget
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
    fun:_ZN15vtkRenderWindow6RenderEv
@@ -12234,15 +12234,15 @@
    fun:malloc
    fun:XtMalloc
    fun:__XtMalloc
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:XtInitializeWidgetClass
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtCreateHookObj
    fun:XtHooksOfDisplay
    fun:_XtAddShellToHookObj
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtAppCreateShell
    fun:XtVaAppCreateShell
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -12254,15 +12254,15 @@
    Memcheck:Leak
    fun:malloc
    fun:XtMalloc
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:XtInitializeWidgetClass
    fun:XtInitializeWidgetClass
    fun:XtInitializeWidgetClass
-   obj:/usr/lib/libXt.so.6.0.0
-   obj:/usr/lib/libXt.so.6.0.0
+   obj:/usr/*lib*/libXt.so.6.0*
+   obj:/usr/*lib*/libXt.so.6.0*
    fun:_XtAppCreateShell
    fun:XtVaAppCreateShell
    fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
@@ -12326,8 +12326,8 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_X11TransConnectDisplay
    fun:XOpenDisplay
    fun:_Z7qt_initP19QApplicationPrivateiP9_XDisplaymm
@@ -12459,7 +12459,7 @@
    fun:malloc
    fun:_XrmDefaultInitParseInfo
    fun:_XrmInitParseInfo
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
    fun:XGetDefault
    fun:_Z11getXDefaultPKcS0_Pi
@@ -12580,7 +12580,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderComposite
    fun:_ZN15QX11PaintEngine10drawPixmapERK6QRectFRK7QPixmapS2_
    fun:_ZN12QPaintEngine9drawImageERK6QRectFRK6QImageS2_6QFlagsIN2Qt19ImageConversionFlagEE
@@ -13121,7 +13121,7 @@
    Memcheck:Leak
    fun:malloc
    fun:_XomGenericOpenOM
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XOpenOM
    fun:XCreateFontSet
    fun:_Z10getFontSetRK5QFont
@@ -13368,7 +13368,7 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XmbTextListToTextProperty
    fun:_Z14qstring_to_xtpRK7QString
    fun:_ZN14QWidgetPrivate18setWindowTitle_sysERK7QString
@@ -13398,7 +13398,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XChangeProperty
    fun:_ZN14QWidgetPrivate18setWindowTitle_sysERK7QString
    fun:_ZN14QWidgetPrivate21setWindowTitle_helperERK7QString
@@ -13410,7 +13410,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XChangeProperty
    fun:XSetTextProperty
    fun:XSetWMName
@@ -13533,8 +13533,8 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
    fun:XGetDefault
    fun:_Z11getXDefaultPKcS0_Pi
@@ -13547,7 +13547,7 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XrmGetStringDatabase
    fun:XGetDefault
    fun:_Z11getXDefaultPKcS0_Pi
@@ -14232,7 +14232,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XRenderFreePicture
    fun:_ZN7QWidget7destroyEbb
    fun:_ZN7QWidgetD2Ev
@@ -14366,7 +14366,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XCopyArea
    fun:_ZN17QX11WindowSurface5flushEP7QWidgetRK7QRegionRK6QPoint
    fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
@@ -14377,7 +14377,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XCreateGC
    fun:_ZN17QX11WindowSurface5flushEP7QWidgetRK7QRegionRK6QPoint
    fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
@@ -14388,7 +14388,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:_XFlushGCCache
    fun:_ZN17QX11WindowSurface5flushEP7QWidgetRK7QRegionRK6QPoint
    fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
@@ -15671,7 +15671,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XDefineCursor
    fun:_Z21qt_x11_enforce_cursorP7QWidget
    fun:_ZN12QApplication21restoreOverrideCursorEv
@@ -15700,7 +15700,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XFreeGC
    fun:_ZN17QX11WindowSurface5flushEP7QWidgetRK7QRegionRK6QPoint
    fun:_ZN19QWidgetBackingStore12copyToScreenERK7QRegionP7QWidgetRK6QPointb
@@ -15711,7 +15711,7 @@
    write(buf)
    fun:__write_nocancel
    fun:_X11TransWrite
-   obj:/usr/lib/libX11.so.6.2.0
+   obj:/usr/*lib*/libX11.so.6.2*
    fun:XDrawPoints
    fun:_ZN15QX11PaintEngine10drawPointsEPK6QPointi
    fun:_ZN8QPainter10drawPointsEPK6QPointi
@@ -16195,6 +16195,62 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:r_object
+   fun:r_object
+   fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:r_object
+   fun:r_object
+   fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
    Memcheck:Addr4
    fun:PyObject_Free
    fun:r_object
@@ -16229,6 +16285,32 @@
    fun:r_object
    fun:r_object
    fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:PyCode_New
+   fun:r_object
    fun:r_object
    fun:r_object
    fun:PyMarshal_ReadObjectFromString
@@ -16241,13 +16323,36 @@
    fun:PyImport_ImportModuleEx
    fun:builtin___import__
    fun:PyObject_Call
-   fun:PyObject_CallFunction
-   fun:PyImport_Import
-   fun:PyImport_ImportModule
-   fun:initsite
-   fun:Py_Initialize
-   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
-   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:PyCode_New
+   fun:r_object
+   fun:r_object
+   fun:r_object
+   fun:r_object
+   fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
 }
 {
    <insert a suppression name here>
@@ -16269,13 +16374,6 @@
    fun:PyImport_ImportModuleEx
    fun:builtin___import__
    fun:PyObject_Call
-   fun:PyObject_CallFunction
-   fun:PyImport_Import
-   fun:PyImport_ImportModule
-   fun:initsite
-   fun:Py_Initialize
-   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
-   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
 }
 {
    <insert a suppression name here>
@@ -16412,10 +16510,6 @@
    fun:PyImport_ExecCodeModuleEx
    fun:load_source_module
    fun:load_module
-   fun:import_submodule
-   fun:load_next
-   fun:PyImport_ImportModuleEx
-   fun:builtin___import__
 }
 {
    <insert a suppression name here>
@@ -16524,10 +16618,6 @@
    fun:PyImport_ExecCodeModuleEx
    fun:load_source_module
    fun:load_module
-   fun:import_submodule
-   fun:load_next
-   fun:PyImport_ImportModuleEx
-   fun:builtin___import__
 }
 {
    <insert a suppression name here>
@@ -16700,6 +16790,62 @@
 {
    <insert a suppression name here>
    Memcheck:Addr4
+   fun:PyObject_Free
+   fun:tupledealloc
+   fun:code_dealloc
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:tupledealloc
+   fun:code_dealloc
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
    fun:PyObject_Free
    fun:tupledealloc
    fun:code_dealloc
@@ -16889,6 +17035,146 @@
    fun:PyImport_ExecCodeModuleEx
    fun:load_source_module
    fun:load_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:listsort
+   fun:PyList_Sort
+   fun:PyObject_Dir
+   fun:builtin_dir
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:listsort
+   fun:PyList_Sort
+   fun:PyObject_Dir
+   fun:builtin_dir
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:listsort
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:listsort
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:listsort
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
 }
 {
    <insert a suppression name here>
@@ -17168,6 +17454,42 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Realloc
+   fun:PyNode_AddChild
+   fun:PyParser_AddToken
+   fun:parsetok
+   fun:PyParser_SimpleParseFileFlags
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Realloc
+   fun:PyNode_AddChild
+   fun:PyParser_AddToken
+   fun:parsetok
+   fun:PyParser_SimpleParseFileFlags
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
    Memcheck:Addr4
    fun:PyObject_Free
    fun:parsetok
@@ -17184,7 +17506,73 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:parsetok
+   fun:PyParser_SimpleParseFileFlags
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:parsetok
+   fun:PyParser_SimpleParseFileFlags
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
    Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyTokenizer_Free
+   fun:parsetok
+   fun:PyParser_SimpleParseFileFlags
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:PyTokenizer_Free
+   fun:parsetok
+   fun:PyParser_SimpleParseFileFlags
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
    fun:PyObject_Free
    fun:PyTokenizer_Free
    fun:parsetok
@@ -17230,6 +17618,62 @@
 {
    <insert a suppression name here>
    Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyCode_New
+   fun:jcompile
+   fun:run_node
+   fun:builtin_eval
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:PyCode_New
+   fun:jcompile
+   fun:run_node
+   fun:builtin_eval
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
    fun:PyObject_Free
    fun:PyCode_New
    fun:jcompile
@@ -17455,10 +17899,84 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:com_free
+   fun:jcompile
+   fun:run_node
+   fun:builtin_eval
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:com_free
+   fun:jcompile
+   fun:run_node
+   fun:builtin_eval
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+}
+{
+   <insert a suppression name here>
    Memcheck:Addr4
    fun:PyObject_Free
    fun:dict_dealloc
    fun:com_free
+   fun:jcompile
+   fun:com_node
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:PyCode_New
    fun:jcompile
    fun:com_node
    fun:jcompile
@@ -17662,6 +18180,34 @@
    <insert a suppression name here>
    Memcheck:Addr4
    fun:PyObject_Free
+   fun:dictresize
+   fun:PyDict_SetItemString
+   fun:PyType_Ready
+   fun:PyObject_GenericGetAttr
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
    fun:dict_dealloc
    fun:class_dealloc
    fun:instance_dealloc
@@ -17796,11 +18342,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
-   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
-   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
 }
 {
    <insert a suppression name here>
@@ -17824,11 +18365,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
-   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
-   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
 }
 {
    <insert a suppression name here>
@@ -17860,7 +18396,119 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:eval_frame
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:eval_frame
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+}
+{
+   <insert a suppression name here>
    Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:frame_dealloc
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:frame_dealloc
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
    fun:PyObject_Free
    fun:list_dealloc
    fun:frame_dealloc
@@ -17965,6 +18613,34 @@
    fun:Py_Initialize
    fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
    fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyObject_GC_Resize
+   fun:PyFrame_New
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
 }
 {
    <insert a suppression name here>
@@ -18092,6 +18768,58 @@
    <insert a suppression name here>
    Memcheck:Addr4
    fun:PyObject_Free
+   fun:list_dealloc
+   fun:cleanreturn
+   fun:PyArg_ParseTupleAndKeywords
+   fun:file_init
+   fun:type_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:cleanreturn
+   fun:PyArg_ParseTupleAndKeywords
+   fun:file_init
+   fun:type_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
    fun:posix_do_stat
    fun:eval_frame
    fun:eval_frame
@@ -18199,6 +18927,34 @@
    fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
    fun:_ZN16vtkProcessModule11StartClientEiPPc
    fun:_ZN16vtkProcessModule5StartEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:posix_do_stat
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
 }
 {
    <insert a suppression name here>
@@ -18381,6 +19137,57 @@
    <insert a suppression name here>
    Memcheck:Addr4
    fun:PyObject_Free
+   fun:dict_dealloc
+   fun:com_free
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:com_free
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:com_free
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
    fun:jcompile
    fun:run_node
    fun:PyRun_SimpleFileExFlags
@@ -18414,8 +19221,55 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:freechildren
+   fun:freechildren
+   fun:freechildren
+   fun:freechildren
+   fun:freechildren
+   fun:PyNode_Free
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
    Memcheck:Addr4
    fun:PyObject_Free
+   fun:freechildren
+   fun:PyNode_Free
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:freechildren
+   fun:freechildren
+   fun:freechildren
+   fun:freechildren
+   fun:freechildren
+   fun:freechildren
+   fun:freechildren
+   fun:freechildren
+   fun:freechildren
+   fun:freechildren
+   fun:freechildren
    fun:freechildren
    fun:PyNode_Free
    fun:run_node
@@ -18486,6 +19340,118 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:type_new
+   fun:type_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:type_new
+   fun:type_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:list_dealloc
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:type_new
+   fun:type_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:list_dealloc
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:type_new
+   fun:type_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+}
+{
+   <insert a suppression name here>
    Memcheck:Value8
    fun:PyObject_Free
    fun:mro_implementation
@@ -18537,8 +19503,228 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:type_new
+   fun:type_call
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:type_new
+   fun:type_call
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:type_new
+   fun:type_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:type_new
+   fun:type_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:type_new
+   fun:type_call
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:type_new
+   fun:type_call
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:type_new
+   fun:type_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:type_new
+   fun:type_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
 }
 {
    <insert a suppression name here>
@@ -18562,11 +19748,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
-   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
-   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
 }
 {
    <insert a suppression name here>
@@ -18590,11 +19771,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
-   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
-   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
 }
 {
    <insert a suppression name here>
@@ -18618,11 +19794,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
-   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
-   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
 }
 {
    <insert a suppression name here>
@@ -18642,16 +19813,6 @@
    fun:_ZN15vtkRenderWindow10DoAARenderEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
-   fun:_ZN14vtkSMViewProxy11StillRenderEv
-   fun:_Z28PyvtkSMViewProxy_StillRenderP7_objectS0_
-   fun:eval_frame
-   fun:PyEval_EvalCodeEx
-   fun:eval_frame
-   fun:PyEval_EvalCodeEx
-   fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
 }
 {
    <insert a suppression name here>
@@ -18673,6 +19834,47 @@
    Memcheck:Addr4
    fun:PyObject_Free
    fun:_PyImport_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:_PyImport_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:_PyImport_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
    fun:Py_Finalize
    fun:Py_Main
    fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
@@ -18742,6 +19944,20 @@
    Memcheck:Addr4
    fun:PyObject_Free
    fun:PyInt_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyFloat_Fini
    fun:Py_Finalize
    fun:Py_Main
    fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
@@ -18867,14 +20083,6 @@
    fun:_ZN15vtkRenderWindow10DoAARenderEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
-   fun:_ZN14vtkSMViewProxy11StillRenderEv
-   fun:_Z28PyvtkSMViewProxy_StillRenderP7_objectS0_
-   fun:eval_frame
-   fun:PyEval_EvalCodeEx
-   fun:eval_frame
-   fun:PyEval_EvalCodeEx
-   fun:PyEval_EvalCode
 }
 {
    <insert a suppression name here>
@@ -18911,17 +20119,6 @@
    fun:_ZN15vtkRenderWindow10DoAARenderEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
-   fun:_ZN14vtkSMViewProxy11StillRenderEv
-   fun:_Z28PyvtkSMViewProxy_StillRenderP7_objectS0_
-   fun:eval_frame
-   fun:PyEval_EvalCodeEx
-   fun:eval_frame
-   fun:PyEval_EvalCodeEx
-   fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
 }
 {
    <insert a suppression name here>
@@ -18970,14 +20167,21 @@
    fun:_ZN15vtkRenderWindow10DoAARenderEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
-   fun:_ZN14vtkSMViewProxy11StillRenderEv
-   fun:_Z28PyvtkSMViewProxy_StillRenderP7_objectS0_
-   fun:eval_frame
-   fun:PyEval_EvalCodeEx
-   fun:eval_frame
-   fun:PyEval_EvalCodeEx
-   fun:PyEval_EvalCode
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XMesaCreateVisual
+   fun:save_glx_visual
+   fun:choose_visual
+   fun:Fake_glXChooseVisual
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
+   fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
+   fun:_ZN22vtkXOpenGLRenderWindow15GetDesiredDepthEv
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
 }
 {
    <insert a suppression name here>
@@ -19066,12 +20270,26 @@
    fun:_ZN15vtkRenderWindow10DoAARenderEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
-   fun:_ZN14vtkSMViewProxy11StillRenderEv
-   fun:_Z28PyvtkSMViewProxy_StillRenderP7_objectS0_
-   fun:eval_frame
-   fun:PyEval_EvalCodeEx
-   fun:eval_frame
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:XShmCreateImage
+   fun:xmesa_alloc_back_storage
+   fun:alloc_storage_alpha8
+   fun:_mesa_resize_framebuffer
+   fun:xmesa_check_and_update_buffer_size
+   fun:XMesaMakeCurrent2
+   fun:Fake_glXMakeContextCurrent
+   fun:glXMakeCurrent
+   fun:_ZN22vtkXOpenGLRenderWindow11MakeCurrentEv
+   fun:_ZN22vtkXOpenGLRenderWindow16WindowInitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
 }
 {
    <insert a suppression name here>
@@ -19119,6 +20337,33 @@
 {
    <insert a suppression name here>
    Memcheck:Leak
+   fun:*alloc
+   fun:_dl_new_object
+   fun:_dl_map_object_from_fd
+   fun:_dl_map_object
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   fun:_XlcDynamicLoad
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   fun:XrmGetStringDatabase
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   fun:_XtDisplayInitialize
+   fun:XtDisplayInitialize
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
    fun:malloc
    fun:expand_dynamic_string_token
    fun:_dl_map_object
@@ -19147,6 +20392,32 @@
 {
    <insert a suppression name here>
    Memcheck:Leak
+   fun:malloc
+   fun:expand_dynamic_string_token
+   fun:_dl_map_object
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   fun:_XlcDynamicLoad
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   fun:XrmGetStringDatabase
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   fun:_XtDisplayInitialize
+   fun:XtDisplayInitialize
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
    fun:*alloc
    fun:XCreate*
    fun:initialize_visual_and_buffer
@@ -19162,15 +20433,6 @@
    fun:_ZN15vtkRenderWindow10DoAARenderEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
-   fun:_ZN14vtkSMViewProxy11StillRenderEv
-   fun:_Z28PyvtkSMViewProxy_StillRenderP7_objectS0_
-   fun:eval_frame
-   fun:PyEval_EvalCodeEx
-   fun:eval_frame
-   fun:PyEval_EvalCodeEx
-   fun:PyEval_EvalCode
-   fun:run_node
 }
 {
    <insert a suppression name here>
@@ -19189,16 +20451,39 @@
    fun:_ZN15vtkRenderWindow10DoAARenderEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
-   fun:_ZN14vtkSMViewProxy11StillRenderEv
-   fun:_Z28PyvtkSMViewProxy_StillRenderP7_objectS0_
-   fun:eval_frame
-   fun:PyEval_EvalCodeEx
-   fun:eval_frame
-   fun:PyEval_EvalCodeEx
-   fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:*alloc
+   fun:XCreate*
+   fun:initialize_visual_and_buffer
+   fun:XMesaCreateWindowBuffer2
+   fun:Fake_glXMakeContextCurrent
+   fun:glXMakeCurrent
+   fun:_ZN22vtkXOpenGLRenderWindow11MakeCurrentEv
+   fun:_ZN22vtkXOpenGLRenderWindow16WindowInitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:initialize_visual_and_buffer
+   fun:XMesaCreateWindowBuffer2
+   fun:Fake_glXMakeContextCurrent
+   fun:glXMakeCurrent
+   fun:_ZN22vtkXOpenGLRenderWindow11MakeCurrentEv
+   fun:_ZN22vtkXOpenGLRenderWindow16WindowInitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow10InitializeEv
+   fun:_ZN22vtkXOpenGLRenderWindow5StartEv
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
 }
 {
    <insert a suppression name here>
@@ -19255,6 +20540,75 @@
    fun:PyImport_ExecCodeModuleEx
    fun:load_source_module
    fun:load_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_dl_map_object_deps
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   fun:_XlcDynamicLoad
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   fun:XrmGetStringDatabase
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   fun:_XtDisplayInitialize
+   fun:XtDisplayInitialize
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   fun:_XlcDynamicLoad
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   fun:XrmGetStringDatabase
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   fun:_XtDisplayInitialize
+   fun:XtDisplayInitialize
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_dl_check_map_versions
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   fun:_XlcDynamicLoad
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   fun:XrmGetStringDatabase
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   fun:_XtDisplayInitialize
+   fun:XtDisplayInitialize
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
 }
 {
    <insert a suppression name here>
@@ -19328,6 +20682,62 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:PyCode_New
+   fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:function_call
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:_PyCodec_Lookup
+   fun:PyCodec_Encoder
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:PyCode_New
+   fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:function_call
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:_PyCodec_Lookup
+   fun:PyCodec_Encoder
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+}
+{
+   <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
    fun:XGetVisualInfo
@@ -19345,14 +20755,21 @@
    fun:_ZN15vtkRenderWindow10DoAARenderEv
    fun:_ZN15vtkRenderWindow6RenderEv
    fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
-   fun:_ZN20vtkSMRenderViewProxy13PerformRenderEv
-   fun:_ZN14vtkSMViewProxy11StillRenderEv
-   fun:_Z28PyvtkSMViewProxy_StillRenderP7_objectS0_
-   fun:eval_frame
-   fun:PyEval_EvalCodeEx
-   fun:eval_frame
-   fun:PyEval_EvalCodeEx
-   fun:PyEval_EvalCode
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XGetVisualInfo
+   fun:choose_x_visual
+   fun:choose_visual
+   fun:Fake_glXChooseVisual
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
+   fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
+   fun:_ZN22vtkXOpenGLRenderWindow18GetDesiredColormapEv
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
 }
 {
    <insert a suppression name here>
@@ -19425,6 +20842,76 @@
    fun:com_and_expr
    fun:com_xor_expr
    fun:com_expr
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:com_apply_trailer
+   fun:com_power
+   fun:com_term
+   fun:com_arith_expr
+   fun:com_shift_expr
+   fun:com_and_expr
+   fun:com_xor_expr
+   fun:com_expr
+   fun:com_comparison
+   fun:com_and_test
+   fun:com_node
+   fun:com_node
+   fun:com_node
+   fun:com_node
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dictresize
+   fun:com_add
+   fun:com_addop_varname
+   fun:com_assign_name
+   fun:com_node
+   fun:com_node
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dictresize
+   fun:com_add
+   fun:com_addop_varname
+   fun:com_assign_name
+   fun:com_node
+   fun:com_node
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
 }
 {
    <insert a suppression name here>
@@ -19531,12 +21018,31 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
-   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
-   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
-   fun:_ZN16vtkProcessModule11StartClientEiPPc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
 }
 {
    <insert a suppression name here>
@@ -19562,9 +21068,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
 }
 {
    <insert a suppression name here>
@@ -19590,9 +21093,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
 }
 {
    <insert a suppression name here>
@@ -19617,10 +21117,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
-   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
 }
 {
    <insert a suppression name here>
@@ -19645,10 +21141,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
-   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
 }
 {
    <insert a suppression name here>
@@ -19673,10 +21165,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
-   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
 }
 {
    <insert a suppression name here>
@@ -19701,10 +21189,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
-   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
 }
 {
    <insert a suppression name here>
@@ -19764,11 +21248,17 @@
 }
 {
    <insert a suppression name here>
-   Memcheck:Addr4
-   fun:PyObject_Free
-   fun:dict_dealloc
-   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
-   fun:meth_dealloc
+   Memcheck:Leak
+   fun:malloc
+   fun:_PyObject_GC_Malloc
+   fun:_PyObject_GC_New
+   fun:PyDict_New
+   fun:PyDict_Copy
+   fun:type_new
+   fun:type_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
    fun:eval_frame
    fun:eval_frame
    fun:PyEval_EvalCodeEx
@@ -19782,6 +21272,47 @@
    fun:builtin___import__
    fun:PyObject_Call
    fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:frame_dealloc
+   fun:PyEval_EvalCodeEx
+   fun:function_call
+   fun:PyObject_Call
+   fun:instancemethod_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:function_call
+   fun:PyObject_Call
+   fun:instancemethod_call
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyInstance_New
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:function_call
+   fun:PyObject_Call
+   fun:instancemethod_call
+   fun:PyObject_Call
+   fun:slot_tp_init
+   fun:type_call
+   fun:PyObject_Call
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
@@ -19789,6 +21320,61 @@
    fun:PyRun_SimpleFileExFlags
    fun:Py_Main
    fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:meth_dealloc
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:meth_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
 }
 {
    <insert a suppression name here>
@@ -19815,8 +21401,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
 }
 {
    <insert a suppression name here>
@@ -19843,8 +21427,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
 }
 {
    <insert a suppression name here>
@@ -19870,9 +21452,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
 }
 {
    <insert a suppression name here>
@@ -19900,7 +21479,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
 }
 {
    <insert a suppression name here>
@@ -19928,7 +21506,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
 }
 {
    <insert a suppression name here>
@@ -19956,7 +21533,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
 }
 {
    <insert a suppression name here>
@@ -20033,10 +21609,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
-   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
 }
 {
    <insert a suppression name here>
@@ -20061,10 +21633,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
-   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
 }
 {
    <insert a suppression name here>
@@ -20089,10 +21657,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
-   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
 }
 {
    <insert a suppression name here>
@@ -20120,7 +21684,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
 }
 {
    <insert a suppression name here>
@@ -20148,7 +21711,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
 }
 {
    <insert a suppression name here>
@@ -20176,7 +21738,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
 }
 {
    <insert a suppression name here>
@@ -20202,9 +21763,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
 }
 {
    <insert a suppression name here>
@@ -20230,9 +21788,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
 }
 {
    <insert a suppression name here>
@@ -20258,9 +21813,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
 }
 {
    <insert a suppression name here>
@@ -20286,9 +21838,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
 }
 {
    <insert a suppression name here>
@@ -20314,9 +21863,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
 }
 {
    <insert a suppression name here>
@@ -20343,8 +21889,34 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:listiter_next
+   fun:PyIter_Next
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
 }
 {
    <insert a suppression name here>
@@ -20507,14 +22079,6 @@
    fun:_ZN16vtkSubjectHelper11InvokeEventEmPvP9vtkObject
    fun:_ZN9vtkObject11InvokeEventEmPv
    fun:_ZN12vtkAlgorithm14UpdateProgressEd
-   fun:_ZN23vtkDemandDrivenPipeline16ExecuteDataStartEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN32vtkStreamingDemandDrivenPipeline16ExecuteDataStartEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN24vtkCompositeDataPipeline16ExecuteDataStartEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN23vtkDemandDrivenPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN24vtkCompositeDataPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN32vtkStreamingDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
 }
 {
    <insert a suppression name here>
@@ -20535,14 +22099,6 @@
    fun:_ZN16vtkSubjectHelper11InvokeEventEmPvP9vtkObject
    fun:_ZN9vtkObject11InvokeEventEmPv
    fun:_ZN12vtkAlgorithm14UpdateProgressEd
-   fun:_ZN23vtkDemandDrivenPipeline14ExecuteDataEndEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN32vtkStreamingDemandDrivenPipeline14ExecuteDataEndEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN23vtkDemandDrivenPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN24vtkCompositeDataPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN32vtkStreamingDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN24vtkCompositeDataPipeline15ForwardUpstreamEP14vtkInformation
 }
 {
    <insert a suppression name here>
@@ -20563,14 +22119,6 @@
    fun:_ZN16vtkSubjectHelper11InvokeEventEmPvP9vtkObject
    fun:_ZN9vtkObject11InvokeEventEmPv
    fun:_ZN12vtkAlgorithm14UpdateProgressEd
-   fun:_ZN23vtkDemandDrivenPipeline14ExecuteDataEndEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN32vtkStreamingDemandDrivenPipeline14ExecuteDataEndEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN23vtkDemandDrivenPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN24vtkCompositeDataPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN32vtkStreamingDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN24vtkCompositeDataPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
-   fun:_ZN24vtkCompositeDataPipeline15ForwardUpstreamEP14vtkInformation
 }
 {
    <insert a suppression name here>
@@ -20756,6 +22304,26 @@
    Memcheck:Addr4
    fun:PyObject_Free
    fun:dict_dealloc
+   fun:dict_dealloc
+   fun:subtype_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
    fun:pattern_dealloc
    fun:dict_dealloc
    fun:insertdict
@@ -20790,6 +22358,34 @@
    fun:_ZN16vtkProcessModule5StartEiPPc
    fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
    fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:pattern_dealloc
+   fun:tupledealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
 }
 {
    <insert a suppression name here>
@@ -21091,9 +22687,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:run_node
-   fun:PyRun_SimpleFileExFlags
-   fun:Py_Main
 }
 {
    <insert a suppression name here>
@@ -21249,7 +22842,7 @@
    <insert a suppression name here>
    Memcheck:Addr4
    fun:PyObject_Free
-   fun:dict_dealloc
+   fun:*_dealloc
    fun:PyInterpreterState_Clear
    fun:Py_Finalize
    fun:Py_Main
@@ -21281,4 +22874,2347 @@
    fun:_ZN13vtkObjectBase10UnRegisterEPS_
    fun:_ZN13vtkObjectBase6DeleteEv
    fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:instance_dealloc
+   fun:frame_dealloc
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dictresize
+   fun:PyDict_SetItemString
+   fun:initlibvtkCommonPython
+   fun:_PyImport_LoadDynamicModule
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:load_package
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:dict_dealloc
+   fun:instance_dealloc
+   fun:frame_dealloc
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:load_package
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:load_package
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:class_dealloc
+   fun:tupledealloc
+   fun:class_dealloc
+   fun:tupledealloc
+   fun:class_dealloc
+   fun:instance_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:func_dealloc
+   fun:dict_dealloc
+   fun:class_dealloc
+   fun:tupledealloc
+   fun:class_dealloc
+   fun:instance_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:class_dealloc
+   fun:tupledealloc
+   fun:class_dealloc
+   fun:_PyExc_Fini
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:func_dealloc
+   fun:dict_dealloc
+   fun:class_dealloc
+   fun:tupledealloc
+   fun:class_dealloc
+   fun:tupledealloc
+   fun:dict_dealloc
+   fun:PyInterpreterState_Clear
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:class_dealloc
+   fun:tupledealloc
+   fun:class_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+   fun:Py_Finalize
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_dl_allocate_tls
+   fun:pthread_create@@GLIBC_2.2.5
+   fun:_ZN16vtkMultiThreader19SingleMethodExecuteEv
+   fun:_ZN25vtkThreadedImageAlgorithm11RequestDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN17vtkImageAlgorithm14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN12vtkExecutive13CallAlgorithmEP14vtkInformationiPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline11ExecuteDataEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN32vtkStreamingDemandDrivenPipeline14ProcessRequestEP14vtkInformationPP20vtkInformationVectorS3_
+   fun:_ZN23vtkDemandDrivenPipeline10UpdateDataEi
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEi
+   fun:_ZN12vtkExecutive6UpdateEv
+   fun:_ZN23vtkDemandDrivenPipeline6UpdateEv
+   fun:_ZN32vtkStreamingDemandDrivenPipeline6UpdateEv
+   fun:_ZN12vtkAlgorithm6UpdateEv
+   fun:_ZN10vtkTesting14RegressionTestEP12vtkImageDatadRSo
+   fun:_ZN10vtkTesting14RegressionTestEdRSo
+   fun:_ZN10vtkTesting14RegressionTestEd
+   fun:_ZN10vtkTesting4TestEiPPcP15vtkRenderWindowd
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:posix_1str
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:posix_1str
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Overlap
+   fun:memcpy
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   fun:_XtGetResources
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   fun:_XtAppCreateShell
+   fun:XtVaAppCreateShell
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_mesa_realloc
+   fun:save_glx_visual
+   fun:choose_visual
+   fun:Fake_glXChooseVisual
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
+   fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
+   fun:_ZN22vtkXOpenGLRenderWindow15GetDesiredDepthEv
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:glXChooseVisual
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
+   fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
+   fun:_ZN22vtkXOpenGLRenderWindow15GetDesiredDepthEv
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_XrmInternalStringToQuark
+   fun:XrmInitialize
+   fun:XtToolkitInitialize
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:*alloc
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   fun:_XlcCreateLC
+   fun:_XlcDefaultLoader
+   fun:_XlcDynamicLoad
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   fun:XrmGetStringDatabase
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   fun:_XtDisplayInitialize
+   fun:XtDisplayInitialize
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:strdup
+   fun:_XlcDynamicLoad
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   fun:XrmGetStringDatabase
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   fun:_XtDisplayInitialize
+   fun:XtDisplayInitialize
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_XlcDynamicLoad
+   fun:_XOpenLC
+   fun:_XrmInitParseInfo
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   fun:XrmGetStringDatabase
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   fun:_XtDisplayInitialize
+   fun:XtDisplayInitialize
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_XrmInternalStringToQuark
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   fun:_XtAppCreateShell
+   fun:XtVaAppCreateShell
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/X11R6/lib64/libX11.so.6.2
+   fun:_XrmInternalStringToQuark
+   fun:_XtCompileResourceList
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   fun:_XtAppCreateShell
+   fun:XtVaAppCreateShell
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XtMalloc
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   fun:XtInitializeWidgetClass
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   obj:/usr/X11R6/lib64/libXt.so.6.0
+   fun:_XtAppCreateShell
+   fun:XtVaAppCreateShell
+   fun:_ZN26vtkXRenderWindowInteractor10InitializeEv
+   fun:_ZN15vtkRenderWindow6RenderEv
+   fun:_ZN22vtkXOpenGLRenderWindow6RenderEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyString_InternInPlace
+   fun:PyString_InternFromString
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyType_Ready
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyString_InternInPlace
+   fun:PyString_InternFromString
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyType_Ready
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyParser_SimpleParseFileFlags
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:PyTokenizer_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyParser_SimpleParseFileFlags
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:PyTokenizer_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyParser_SimpleParseFileFlags
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyDict_SetItemString
+   fun:PyType_Ready
+   fun:_PyUnicodeUCS4_Init
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyDict_SetItemString
+   fun:Py_InitModule4
+   fun:_PyBuiltin_Init
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyType_Ready
+   fun:_PyUnicodeUCS4_Init
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyDict_SetItemString
+   fun:_PyExc_Init
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyString_InternInPlace
+   fun:PyDict_SetItemString
+   fun:initsignal
+   fun:PyOS_InitInterrupts
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyCode_New
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyCode_New
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyMarshal_ReadLastObjectFromFile
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyDict_SetItemString
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:initposix
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyDict_SetItem
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+   fun:(below main)
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:PyCode_New
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:PyCode_New
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyCode_New
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyObject_GC_Resize
+   fun:PyFrame_New
+   fun:PyEval_EvalCodeEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyObject_GC_Resize
+   fun:PyFrame_New
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Realloc
+   fun:_PyObject_GC_Resize
+   fun:PyFrame_New
+   fun:PyEval_EvalCodeEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Realloc
+   fun:_PyObject_GC_Resize
+   fun:PyFrame_New
+   fun:PyEval_EvalCodeEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:PyGrammar_AddAccelerators
+   fun:PyParser_New
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyParser_SimpleParseStringFlags
+   fun:PyRun_StringFlags
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:PyNode_AddChild
+   fun:PyParser_AddToken
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyParser_SimpleParseFileFlags
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Realloc
+   fun:PyNode_AddChild
+   fun:PyParser_AddToken
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyParser_SimpleParseFileFlags
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Realloc
+   fun:PyNode_AddChild
+   fun:PyParser_AddToken
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyParser_SimpleParseFileFlags
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyParser_SimpleParseFileFlags
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyParser_SimpleParseFileFlags
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyParser_SimpleParseStringFlags
+   fun:PyRun_StringFlags
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyParser_SimpleParseStringFlags
+   fun:PyRun_StringFlags
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyParser_SimpleParseStringFlags
+   fun:PyRun_StringFlags
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyParser_SimpleParseStringFlags
+   fun:PyRun_String
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PySymtable_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PySymtable_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyDict_DelItem
+   fun:PyDict_DelItemString
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyDict_DelItem
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyDict_DelItem
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyArg_ParseTuple
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyArg_ParseTupleAndKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyArg_ParseTuple
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyArg_ParseTuple
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_ImportModuleEx
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:Py_Initialize
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:Py_Initialize
+   fun:Py_Main
+   fun:(below main)
 }
