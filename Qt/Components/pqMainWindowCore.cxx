@@ -906,12 +906,19 @@ void pqMainWindowCore::refreshSourcesMenu()
     {
     this->Implementation->SourceMenu->clear();
 
+    pqObjectBuilder* ob = pqApplicationCore::instance()->getObjectBuilder();
+
     vtkstd::set<vtkstd::string> newSources;
     vtkstd::set<vtkstd::string>::iterator iter;
     this->Implementation->instantiateGroupPrototypes("sources", newSources);
     for(iter = newSources.begin(); iter != newSources.end(); ++iter)
       {
-      this->Implementation->Sources.push_back(*iter);
+      vtkSMProxyManager* pxyMgr = vtkSMProxyManager::GetProxyManager();
+      vtkSMProxy* pxy = pxyMgr->GetProxy("sources_prototypes", iter->c_str());
+      if(ob->getFileNamePropertyName(pxy).isEmpty())
+        {
+        this->Implementation->Sources.push_back(*iter);
+        }
       }
 
     vtkstd::vector<vtkstd::string>::iterator sourceIter =
