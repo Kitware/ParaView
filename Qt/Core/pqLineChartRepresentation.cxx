@@ -782,6 +782,7 @@ void pqLineChartRepresentation::updateSeries()
       arrayNames.append(arrayDomain->GetString(j));
       }
     arrayNames.removeAll("vtkValidPointMask");
+    arrayNames.removeAll("Cell's Point Ids");
 
     // Get the current status array.
     QList<QVariant> status =
