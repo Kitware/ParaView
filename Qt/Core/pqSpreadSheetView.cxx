@@ -41,6 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QItemDelegate>
 #include <QPointer>
 #include <QTableView>
+#include <QTextLayout>
+#include <QTextOption>
+#include <QPainter>
+#include <QPen>
+#include <QApplication>
 
 // ParaView Includes.
 #include "pqOutputPort.h"
@@ -78,8 +83,105 @@ public:
     this->Superclass::paint(painter, option, index);
     }
 
+  // special text painter that does tab stops to line up multi-component data
+  // at this point, multi-component data is already in string format and 
+  // has '\t' characters separating each component
+  // taken from QItemDelegate::drawDisplay and tweaked
+  void drawDisplay(QPainter* painter, const QStyleOptionViewItem& option,
+                   const QRect & r, const QString & text ) const
+    {
+      if (text.isEmpty())
+          return;
+
+      QPen pen = painter->pen();
+      QPalette::ColorGroup cg = option.state & QStyle::State_Enabled
+                                ? QPalette::Normal : QPalette::Disabled;
+      if (cg == QPalette::Normal && !(option.state & QStyle::State_Active))
+          cg = QPalette::Inactive;
+      if (option.state & QStyle::State_Selected) {
+          painter->fillRect(r, option.palette.brush(cg, QPalette::Highlight));
+          painter->setPen(option.palette.color(cg, QPalette::HighlightedText));
+      } else {
+          painter->setPen(option.palette.color(cg, QPalette::Text));
+      }
+
+      if (option.state & QStyle::State_Editing) {
+          painter->save();
+          painter->setPen(option.palette.color(cg, QPalette::Text));
+          painter->drawRect(r.adjusted(0, 0, -1, -1));
+          painter->restore();
+      }
+
+      const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
+      QRect textRect = r.adjusted(textMargin, 0, -textMargin, 0); // remove width padding
+      this->TextOption.setWrapMode(QTextOption::ManualWrap);
+      this->TextOption.setTextDirection(option.direction);
+      this->TextOption.setAlignment(QStyle::visualAlignment(option.direction, option.displayAlignment));
+      // assume this is representative of the largest number we'll show
+      int len = option.fontMetrics.width("-8.88888e-8888 ");
+      this->TextOption.setTabStop(len);
+      this->TextLayout.setTextOption(this->TextOption);
+      this->TextLayout.setFont(option.font);
+      this->TextLayout.setText(this->replaceNewLine(text));
+
+      QSizeF textLayoutSize = this->doTextLayout(textRect.width());
+
+      if (textRect.width() < textLayoutSize.width()
+          || textRect.height() < textLayoutSize.height()) {
+          QString elided;
+          int start = 0;
+          int end = text.indexOf(QChar::LineSeparator, start);
+          if (end == -1) {
+              elided += option.fontMetrics.elidedText(text, option.textElideMode, textRect.width());
+          } else while (end != -1) {
+              elided += option.fontMetrics.elidedText(text.mid(start, end - start),
+                                                      option.textElideMode, textRect.width());
+              start = end + 1;
+              end = text.indexOf(QChar::LineSeparator, start);
+          }
+          this->TextLayout.setText(elided);
+          textLayoutSize = this->doTextLayout(textRect.width());
+      }
+
+      const QSize layoutSize(textRect.width(), int(textLayoutSize.height()));
+      const QRect layoutRect = QStyle::alignedRect(option.direction, option.displayAlignment,
+                                                    layoutSize, textRect);
+      this->TextLayout.draw(painter, layoutRect.topLeft(), QVector<QTextLayout::FormatRange>(), layoutRect);
+    }
+    
+  QSizeF doTextLayout(int lineWidth) const
+    {
+      QFontMetrics fontMetrics(this->TextLayout.font());
+      int leading = fontMetrics.leading();
+      qreal height = 0;
+      qreal widthUsed = 0;
+      this->TextLayout.beginLayout();
+      while (true) {
+          QTextLine line = this->TextLayout.createLine();
+          if (!line.isValid())
+              break;
+          line.setLineWidth(lineWidth);
+          height += leading;
+          line.setPosition(QPointF(0, height));
+          height += line.height();
+          widthUsed = qMax(widthUsed, line.naturalTextWidth());
+      }
+      this->TextLayout.endLayout();
+      return QSizeF(widthUsed, height);
+    }
+  static QString replaceNewLine(QString text)
+    {
+      const QChar nl = QLatin1Char('\n');
+      for (int i = 0; i < text.count(); ++i)
+        if (text.at(i) == nl)
+          text[i] = QChar::LineSeparator;
+      return text;
+    }
+
   QModelIndex Top;
   QModelIndex Bottom;
+  mutable QTextLayout TextLayout;
+  mutable QTextOption TextOption;
 };
 
 //-----------------------------------------------------------------------------

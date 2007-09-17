@@ -247,6 +247,15 @@ void pqSpreadSheetViewModel::forceUpdate()
         }
       }
     this->Internal->NumberOfColumns = table? table->GetNumberOfColumns()  :0;
+    if(table)
+      {
+      int colCount = table->GetNumberOfColumns();
+      for(int i=0; i<colCount; i++)
+        {
+        vtkVariant val = table->GetValue(0, i);
+        }
+      }
+
     if (this->Internal->NumberOfColumns == 0 && this->Internal->ActiveBlockNumber != 0)
       {
       // it is possible that the current index is invalid (data size may have
@@ -400,7 +409,7 @@ QVariant pqSpreadSheetViewModel::data(
       {
       vtkVariant value = table->GetValue(blockOffset, column);
       QString str = value.ToString().c_str();
-      str.replace(" ", ", ");
+      str.replace(" ", "\t");
       return str;
       }
     }
