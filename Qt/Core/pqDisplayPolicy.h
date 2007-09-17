@@ -96,6 +96,13 @@ public:
   virtual pqDataRepresentation* setRepresentationVisibility(
     pqOutputPort* opPort, pqView* view, bool visible);
 
+  /// Returns the type for the view that is indicated as the preferred view
+  /// for the given output port. May return a null string if the no view type
+  /// can be determined as the preferred view.
+  /// If update_pipeline is set, then the pipeline will be update prior to
+  /// fetching the data information from the port.
+  QString getPreferredViewType(pqOutputPort* opPort, bool update_pipeline) const;
+
 protected:
   /// Determines the type of view that's preferred by the \c source. If \c view
   /// is of the preferred type, returns it. Otherwise a new view of the preferred 

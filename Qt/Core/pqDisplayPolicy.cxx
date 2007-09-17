@@ -63,13 +63,11 @@ pqDisplayPolicy::~pqDisplayPolicy()
 }
 
 //-----------------------------------------------------------------------------
-pqView* pqDisplayPolicy::getPreferredView(
-  pqOutputPort* opPort, pqView* currentView) const
+QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
+  bool update_pipeline) const
 {
   pqPipelineSource* source = opPort->getSource();
   
-  pqObjectBuilder* builder = 
-    pqApplicationCore::instance()->getObjectBuilder();
   vtkPVXMLElement* hints = source->getHints();
   vtkPVXMLElement* viewElement = hints? 
     hints->FindNestedElementByName("View") : 0;
@@ -80,7 +78,7 @@ pqView* pqDisplayPolicy::getPreferredView(
     {
     // The proxy gives us no hint. In that case we try to determine the
     // preferred view by looking at the output from the source.
-    vtkPVDataInformation* datainfo = opPort->getDataInformation(true);
+    vtkPVDataInformation* datainfo = opPort->getDataInformation(update_pipeline);
     if (datainfo && (
         datainfo->GetDataClassName() == QString("vtkRectilinearGrid")  ||
         source->getProxy()->GetXMLName() == QString("ProbeLine")))
@@ -114,6 +112,18 @@ pqView* pqDisplayPolicy::getPreferredView(
         }
       }
     }
+
+  return view_type;
+}
+
+//-----------------------------------------------------------------------------
+pqView* pqDisplayPolicy::getPreferredView(
+  pqOutputPort* opPort, pqView* currentView) const
+{
+  pqObjectBuilder* builder = 
+    pqApplicationCore::instance()->getObjectBuilder();
+  QString view_type = this->getPreferredViewType(opPort, true); 
+
   if (!view_type.isNull())
     {
     QString proxy_name = view_type;

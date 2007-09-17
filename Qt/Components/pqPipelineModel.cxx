@@ -35,9 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPipelineModel.h"
 
+#include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
+#include "pqDisplayPolicy.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
+#include "pqPlotView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerModelItem.h"
@@ -69,6 +72,16 @@ public:
     NotVisible
     };
 
+  enum IconType
+    {
+    SERVER,
+    LINK,
+    GEOMETRY,
+    BARCHART,
+    LINECHART,
+    INDETERMINATE,
+    LAST
+    };
 public:
   pqPipelineModelItem(QObject *parent=0);
   virtual ~pqPipelineModelItem() {}
@@ -87,6 +100,8 @@ public:
 
   pqPipelineModel::ItemType getType() const {return this->Type;}
 
+  /// Returns the type of icon to use for this item.
+  virtual IconType getIconType() const=0;
 protected:
   void setType(pqPipelineModel::ItemType type) {this->Type = type;}
 
@@ -119,6 +134,9 @@ public:
 
   QList<pqPipelineModelSource *> &getSources() {return this->Sources;}
 
+  /// Returns the type of icon to use for this item.
+  virtual IconType getIconType() const
+    { return SERVER; }
 private:
   pqServer *Server;
   QList<pqPipelineModelSource *> Sources;
@@ -163,6 +181,9 @@ public:
   static pqPipelineModelItem::VisibleState computeVisibleState(
       pqOutputPort *port, pqView *view);
 
+  /// Returns the type of icon to use for this item.
+  virtual IconType getIconType() const
+    { return INDETERMINATE; }
 private:
   QList<pqPipelineModelObject *> Outputs;
   pqPipelineModelItem::VisibleState Eyeball;
@@ -173,6 +194,7 @@ private:
 /// \class pqPipelineModelSource
 class pqPipelineModelSource : public pqPipelineModelOutput
 {
+  typedef pqPipelineModelOutput Superclass;
 public:
   pqPipelineModelSource(pqPipelineModelServer *server=0,
       pqPipelineSource *source=0, QObject *parent=0);
@@ -187,6 +209,9 @@ public:
   void setSource(pqPipelineSource *source) {this->Source = source;}
 
   void updateVisibleState(pqView *module);
+
+  /// Returns the type of icon to use for this item.
+  virtual IconType getIconType() const;
 
 private:
   pqPipelineSource *Source;
@@ -235,6 +260,8 @@ public:
   int getPort() const {return this->Port;}
   void setPort(int port) {this->Port = port;}
 
+  /// Returns the type of icon to use for this item.
+  virtual IconType getIconType() const;
 private:
   pqPipelineModelSource *Source;
   int Port;
@@ -266,6 +293,11 @@ public:
   pqPipelineModelFilter *getSink() const {return this->Sink;}
   void setSink(pqPipelineModelFilter *sink) {this->Sink = sink;}
 
+
+  /// Returns the type of icon to use for this item.
+  virtual IconType getIconType() const
+    { return LINK; }
+
 private:
   pqPipelineModelOutput *Source;
   pqPipelineModelFilter *Sink;
@@ -281,9 +313,9 @@ class pqPipelineModelInternal
 public:
   enum PixmapIndex
     {
-    Eyeball = pqPipelineModel::LastType + 1,
-    EyeballGray,
-    Total
+    EYEBALL = pqPipelineModelItem::LAST,
+    EYEBALL_GRAY,
+    LAST 
     };
 
 public:
@@ -510,6 +542,33 @@ bool pqPipelineModelSource::isModified() const
   return false;
 }
 
+pqPipelineModelItem::IconType pqPipelineModelSource::getIconType() const
+{
+  if (this->Source->getNumberOfOutputPorts() > 1)
+    {
+    // the icon will be shown on each outport port.
+    return INDETERMINATE;
+    }
+
+  // This has only 1 output port.
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqDisplayPolicy* policy = core->getDisplayPolicy();
+  if (policy)
+    {
+    QString type = policy->getPreferredViewType(
+      this->Source->getOutputPort(0), false);
+    if (type == pqPlotView::barChartType())
+      {
+      return BARCHART;
+      }
+    if (type == pqPlotView::XYPlotType())
+      {
+      return LINECHART;
+      }
+    }
+  return GEOMETRY;
+}
+
 void pqPipelineModelSource::updateVisibleState(pqView *view)
 {
   if(this->Source->getNumberOfOutputPorts() > 1)
@@ -602,7 +661,25 @@ void pqPipelineModelOutputPort::updateVisibleState(pqView *view)
         source ? source->getOutputPort(this->Port) : 0, view));
     }
 }
-
+pqPipelineModelItem::IconType pqPipelineModelOutputPort::getIconType() const
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqDisplayPolicy* policy = core->getDisplayPolicy();
+  if (policy)
+    {
+    QString type = policy->getPreferredViewType(
+      this->Source->getSource()->getOutputPort(this->Port), false);
+    if (type == pqPlotView::barChartType())
+      {
+      return BARCHART;
+      }
+    if (type == pqPlotView::XYPlotType())
+      {
+      return LINECHART;
+      }
+    }
+  return GEOMETRY;
+}
 
 //-----------------------------------------------------------------------------
 pqPipelineModelLink::pqPipelineModelLink(pqPipelineModelServer *server,
@@ -917,12 +994,12 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
             if(visible == pqPipelineModelItem::Visible)
               {
               return QVariant(QIcon(
-                  this->PixmapList[pqPipelineModelInternal::Eyeball]));
+                  this->PixmapList[pqPipelineModelInternal::EYEBALL]));
               }
             else if(visible == pqPipelineModelItem::NotVisible)
               {
               return QVariant(QIcon(
-                  this->PixmapList[pqPipelineModelInternal::EyeballGray]));
+                  this->PixmapList[pqPipelineModelInternal::EYEBALL_GRAY]));
               }
             }
           }
@@ -941,7 +1018,7 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
           if(idx.column() == 0 && this->PixmapList &&
               item->getType() != pqPipelineModel::Invalid)
             {
-            return QVariant(this->PixmapList[item->getType()]);
+            return QVariant(this->PixmapList[item->getIconType()]);
             }
 
           break;
@@ -1939,30 +2016,26 @@ void pqPipelineModel::initializePixmaps()
 {
   if(this->PixmapList == 0)
     {
-    this->PixmapList = new QPixmap[pqPipelineModelInternal::Total];
-    this->PixmapList[pqPipelineModel::Server].load(
-        ":/pqWidgets/Icons/pqServer16.png");
-    /*
-    this->PixmapList[pqPipelineModel::Source].load(
-        ":/pqWidgets/Icons/pqSource16.png");
-    this->PixmapList[pqPipelineModel::Filter].load(
+    this->PixmapList = new QPixmap[pqPipelineModelInternal::LAST];
+    
+    this->PixmapList[pqPipelineModelItem::SERVER].load(
+      ":/pqWidgets/Icons/pqServer16.png");
+    this->PixmapList[pqPipelineModelItem::LINK].load(
+      ":/pqWidgets/Icons/pqLinkBack16.png");
+    this->PixmapList[pqPipelineModelItem::GEOMETRY].load(
+      ":/pqWidgets/Icons/pqBundle16.png");
+    this->PixmapList[pqPipelineModelItem::BARCHART].load(
+    //  ":/pqWidgets/Icons/pqBundle16.png");
         ":/pqWidgets/Icons/pqFilter16.png");
-    this->PixmapList[pqPipelineModel::CustomFilter].load(
-        ":/pqWidgets/Icons/pqBundle16.png");
-    */
-    this->PixmapList[pqPipelineModel::Source].load(
-        ":/pqWidgets/Icons/pqBundle16.png");
-    this->PixmapList[pqPipelineModel::Filter].load(
-        ":/pqWidgets/Icons/pqBundle16.png");
-    this->PixmapList[pqPipelineModel::CustomFilter].load(
-        ":/pqWidgets/Icons/pqBundle16.png");
-
-    this->PixmapList[pqPipelineModel::Link].load(
-        ":/pqWidgets/Icons/pqLinkBack16.png");
-    this->PixmapList[pqPipelineModelInternal::Eyeball].load(
-        ":/pqWidgets/Icons/pqEyeball16.png");
-    this->PixmapList[pqPipelineModelInternal::EyeballGray].load(
-        ":/pqWidgets/Icons/pqEyeballd16.png");
+    this->PixmapList[pqPipelineModelItem::LINECHART].load(
+    //  ":/pqWidgets/Icons/pqBundle16.png");
+       ":/pqWidgets/Icons/pqFilter16.png");
+    this->PixmapList[pqPipelineModelItem::INDETERMINATE].load(
+      ":/pqWidgets/Icons/pqSource16.png");
+    this->PixmapList[pqPipelineModelInternal::EYEBALL].load(
+      ":/pqWidgets/Icons/pqEyeball16.png");
+    this->PixmapList[pqPipelineModelInternal::EYEBALL_GRAY].load(
+      ":/pqWidgets/Icons/pqEyeballd16.png");
     }
 }
 
