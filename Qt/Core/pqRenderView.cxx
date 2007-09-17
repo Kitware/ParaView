@@ -150,6 +150,7 @@ pqRenderView::pqRenderView( const QString& group,
   this->Internal->VTKConnect->Connect(
     renModule, vtkCommand::ResetCameraEvent,
     this, SLOT(onResetCameraEvent()));
+
 }
 
 //-----------------------------------------------------------------------------
@@ -486,6 +487,8 @@ void pqRenderView::initializeCenterAxes()
   renView->AddRepresentation(
     vtkSMRepresentationProxy::SafeDownCast(centerAxes));
   centerAxes->Delete();
+
+  this->updateCenterAxes();
 }
 
 //-----------------------------------------------------------------------------
@@ -1022,6 +1025,13 @@ void pqRenderView::setCenterAxesVisibility(bool visible)
     visible? 1 : 0);
   this->Internal->CenterAxesProxy->UpdateVTKObjects();
   this->getProxy()->MarkModified(0);
+  if (visible)
+    {
+    // since updateCenterAxes does not do anything unless the axes is visible,
+    // we update the center when the axes becomes visible so that we are assured
+    // that the correct center of rotation is used.
+    this->updateCenterAxes();
+    }
 }
 
 //-----------------------------------------------------------------------------
