@@ -1,5 +1,5 @@
 <ParaViewReaders>
-  <Reader name="PNGReader"
+  <Reader name="MyPNGReader"
           extensions="mypng"
           file_description="My PNG Files">
   </Reader>
