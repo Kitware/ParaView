@@ -113,8 +113,6 @@ void pqExtractCTHPartsPanel::cArrayEnabled(QTreeWidgetItem *, int )
 
 void pqExtractCTHPartsPanel::arrayEnabled(int which)
 {
-  QTreeWidget *myWidget = 
-    this->findChild<QTreeWidget*>(pqExtractCTHPartsPanelNames[which]);
   QTreeWidget *otherWidgets[2];
   int loc = 0;
   int i;
