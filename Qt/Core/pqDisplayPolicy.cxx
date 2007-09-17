@@ -67,6 +67,14 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
   bool update_pipeline) const
 {
   pqPipelineSource* source = opPort->getSource();
+  vtkSMSourceProxy* spProxy = vtkSMSourceProxy::SafeDownCast(
+    source->getProxy());
+  if (spProxy && !update_pipeline 
+    /*&& !spProxy->GetNumberOfParts() */)
+    {
+    // If parts aren't created, don't update the information at all.
+    return QString();
+    }
   
   vtkPVXMLElement* hints = source->getHints();
   vtkPVXMLElement* viewElement = hints? 
