@@ -51,6 +51,7 @@ public:
   pqChartContentsSpaceInternal();
   ~pqChartContentsSpaceInternal() {}
 
+  QRect Layer;                ///< Stores the chart layer viewport.
   pqChartZoomHistory History; ///< Stores the viewport zoom history.
   bool InHistory;             ///< Used for zoom history processing.
   bool InInteraction;         ///< Used for interactive zoom.
@@ -59,7 +60,7 @@ public:
 
 //----------------------------------------------------------------------------
 pqChartContentsSpaceInternal::pqChartContentsSpaceInternal()
-  : History()
+  : Layer(), History()
 {
   this->InHistory = false;
   this->InInteraction = false;
@@ -187,6 +188,11 @@ void pqChartContentsSpace::setChartSize(int width, int height)
     }
 }
 
+void pqChartContentsSpace::setChartLayerBounds(const QRect &bounds)
+{
+  this->Internal->Layer = bounds;
+}
+
 void pqChartContentsSpace::zoomToPercent(int percent)
 {
   this->zoomToPercent(percent, percent);
@@ -257,7 +263,8 @@ void pqChartContentsSpace::zoomToRectangle(const QRect &area)
 {
   // Make sure the rectangle is valid and the chart size has been
   // assigned.
-  if(!area.isValid() || this->Width == 0 || this->Height == 0)
+  if(!area.isValid() || this->Width == 0 || this->Height == 0 ||
+      !this->Internal->Layer.isValid())
     {
     return;
     }
@@ -270,51 +277,37 @@ void pqChartContentsSpace::zoomToRectangle(const QRect &area)
     return;
     }
 
-  // Adjust the width or height of the area to match the chart aspect
-  // ratio. Use the larger ratio when converting.
-  int aWidth = area.width();
-  int aHeight = area.height();
-  int width = 0;
-  if(this->Width > aWidth)
-    {
-    width = this->Width / aWidth;
-    }
-  else
-    {
-    width = aWidth / this->Width;
-    }
+  // Adjust the top-left corner coordinates for the chart layer
+  // viewport and the current offset.
+  x = x - this->Internal->Layer.x() + this->OffsetX;
+  y = y - this->Internal->Layer.y() + this->OffsetY;
 
-  int height = 0;
-  if(this->Height > aHeight)
-    {
-    height = this->Height / aHeight;
-    }
-  else
-    {
-    height = aHeight / this->Height;
-    }
+  // Find the new zoom factors using the zoom factors for the chart
+  // layer viewport.
+  int xZoom1 = this->Width * (this->ZoomFactorX - 100);
+  xZoom1 = (xZoom1 / this->Internal->Layer.width()) + 100;
+  int xZoom2 = (xZoom1 * this->Internal->Layer.width()) / area.width();
+  int xFactor = this->Internal->Layer.width() * (xZoom2 - 100);
+  xFactor = (xFactor / this->Width) + 100;
 
-  if(height < width)
-    {
-    aWidth = (this->Width * aHeight) / this->Height;
-    }
-  else
-    {
-    aHeight = (this->Height * aWidth) / this->Width;
-    }
+  int yZoom1 = this->Height * (this->ZoomFactorY - 100);
+  yZoom1 = (yZoom1 / this->Internal->Layer.height()) + 100;
+  int yZoom2 = (yZoom1 * this->Internal->Layer.height()) / area.height();
+  int yFactor = this->Internal->Layer.height() * (yZoom2 - 100);
+  yFactor = (yFactor / this->Height) + 100;
 
-  // Use the width and height ratios to determine the new zoom
-  // factors. Make sure the resulting size is not too big.
-  width = this->Width + this->MaximumX;
-  height = this->Height + this->MaximumY;
-  this->zoomToPercent((width * 100) / aWidth, (height * 100) / aHeight);
+  // Set the new zoom factors.
+  this->zoomToPercent(xFactor, yFactor);
 
-  // Move the viewport to show the rectangle.
-  x = ((this->Width + this->MaximumX) * x) / width;
-  this->setXOffset(x);
+  // Re-calculate the second zoom factors.
+  xZoom2 = this->Width * (this->ZoomFactorX - 100);
+  xZoom2 = (xZoom2 / this->Internal->Layer.width()) + 100;
+  yZoom2 = this->Height * (this->ZoomFactorY - 100);
+  yZoom2 = (yZoom2 / this->Internal->Layer.height()) + 100;
 
-  y = ((this->Height + this->MaximumY) * y) / height;
-  this->setYOffset(y);
+  // Set the offset to match the original zoom area.
+  this->setXOffset((xZoom2 * x) / xZoom1);
+  this->setYOffset((yZoom2 * y) / yZoom1);
 }
 
 void pqChartContentsSpace::zoomIn(pqChartContentsSpace::InteractFlags flags)

@@ -224,7 +224,6 @@ bool pqChartMouseSelection::mousePressEvent(QMouseEvent *e,
         // If a selection change is made, delay the model change
         // signal until mouse release.
         this->Histogram->DelaySelection = true;
-        emit this->repaintNeeded();
         }
       }
     }
@@ -575,14 +574,6 @@ void pqChartMouseSelection::mouseMoveSelectBox(pqChartContentsSpace *contents,
     model->setSelection(newSelection);
     }
 
-  // Adjust the repaint area to include the entire bin and the
-  // highlight, which extends from top to bottom.
-  int extra = this->Histogram->Chart->getBinWidth() + 1;
-  area.setRight(area.right() + extra);
-  area.setLeft(area.left() - extra);
-  area.setTop(0);
-  area.setBottom(contents->getContentsHeight());
-
   // Save the new selection in place of the old one.
   this->Histogram->Selection.clear();
   this->Histogram->Selection = newSelection;
@@ -629,9 +620,6 @@ void pqChartMouseSelection::mouseMoveSelectDrag(pqChartContentsSpace *contents,
   // Save the new selection in place of the old one.
   this->Histogram->Selection.clear();
   this->Histogram->Selection = newSelection;
-
-  contents->translateFromContents(area);
-  emit this->repaintNeeded(area);
 }
 
 void pqChartMouseSelection::mouseMoveDragMove(const QPoint &point)
@@ -665,8 +653,6 @@ void pqChartMouseSelection::mouseMoveDragMove(const QPoint &point)
           {
           this->Histogram->LastValueX = point.x();
           }
-
-        emit this->repaintNeeded();
         }
       }
     }

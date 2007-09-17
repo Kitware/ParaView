@@ -112,12 +112,6 @@ public:
   pqHistogramSelectionModel *getSelectionModel() const {return this->Selection;}
 
   /// \brief
-  ///   Gets the pixel width of a bin on the chart.
-  /// \return
-  ///   The pixel width of a bin on the chart.
-  int getBinWidth() const;
-
-  /// \brief
   ///   Gets the bin index for the given location.
   ///
   /// If there is no bin in the given location, -1 is returned.
@@ -167,6 +161,13 @@ public:
   /// \param list Used to return the list of value ranges.
   /// \sa pqHistogramChart::getValueAt(int, int)
   void getValuesIn(const QRect &area, pqHistogramSelectionList &list) const;
+
+  /// \brief
+  ///   Gets the area that contains the given selection.
+  /// \param list The selection to find.
+  /// \param area Used to return the selection area.
+  void getSelectionArea(const pqHistogramSelectionList &list,
+      QRect &area) const;
   //@}
 
   /// \name Drawing Parameters

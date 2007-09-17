@@ -820,6 +820,7 @@ void pqChartArea::layoutChart()
     }
 
   // Layout the chart layers using the calculated bounds.
+  this->Contents->setChartLayerBounds(chartBounds);
   layer = this->Internal->Layers.begin();
   for( ; layer != this->Internal->Layers.end(); ++layer)
     {

@@ -166,17 +166,6 @@ void pqHistogramChart::setModel(pqHistogramModel *model)
   this->InModelChange = false;
 }
 
-int pqHistogramChart::getBinWidth() const
-{
-  if(this->Model && this->Model->getNumberOfBins() > 0 &&
-      this->Internal->Contents.isValid())
-    {
-    return this->Internal->Contents.width()/this->Model->getNumberOfBins();
-    }
-
-  return 0;
-}
-
 int pqHistogramChart::getBinAt(int x, int y,
     pqHistogramChart::BinPickMode mode) const
 {
@@ -369,6 +358,66 @@ void pqHistogramChart::getValuesIn(const QRect &area,
     selection.setType(pqHistogramSelection::Value);
     list.append(selection);
     }
+}
+
+void pqHistogramChart::getSelectionArea(const pqHistogramSelectionList &list,
+    QRect &area) const
+{
+  if(list.isEmpty())
+    {
+    return;
+    }
+
+  const pqHistogramSelection &first = list.first();
+  const pqHistogramSelection &last = list.last();
+  if(first.getType() != last.getType() ||
+      first.getType() == pqHistogramSelection::None)
+    {
+    qDebug() << "Invalid histogram selection list.";
+    return;
+    }
+
+  if(first.getType() == pqHistogramSelection::Bin)
+    {
+    int leftBin = first.getFirst().getIntValue();
+    int rightBin = last.getSecond().getIntValue();
+    if(rightBin < leftBin)
+      {
+      leftBin = rightBin;
+      rightBin = last.getFirst().getIntValue();
+      }
+
+    if(leftBin >= 0 && leftBin < this->Internal->Items.size() &&
+        rightBin >= 0 && rightBin < this->Internal->Items.size())
+      {
+      area.setLeft(this->Internal->Items[leftBin].left());
+      area.setRight(this->Internal->Items[rightBin].right());
+      }
+    else
+      {
+      return;
+      }
+    }
+  else
+    {
+    if(!this->XAxis)
+      {
+      return;
+      }
+
+    const pqChartPixelScale *scale = this->XAxis->getPixelValueScale();
+    if(!scale->isValid())
+      {
+      return;
+      }
+
+    area.setLeft(scale->getPixelFor(first.getFirst()));
+    area.setRight(scale->getPixelFor(last.getSecond()));
+    }
+
+  const pqChartContentsSpace *zoomPan = this->getContentsSpace();
+  area.setTop(0);
+  area.setBottom(zoomPan->getContentsHeight());
 }
 
 void pqHistogramChart::setOptions(const pqHistogramChartOptions &options)

@@ -138,6 +138,11 @@ public:
   /// \param width The chart width.
   /// \param height The chart height.
   void setChartSize(int width, int height);
+
+  /// \brief
+  ///   Sets the chart layer bounds.
+  /// \param bounds The chart layer bounds.
+  void setChartLayerBounds(const QRect &bounds);
   //@}
 
   /// \name Zoom Methods
@@ -192,10 +197,8 @@ public:
   /// \brief
   ///   Zooms chart to the given rectangle.
   ///
-  /// The rectangle should be given in contents coordinates. If the
-  /// rectangle aspect ratio does not match the viewport aspect
-  /// ratio, the longest length will be used to ensure that
-  /// everything in the rectangle will be shown.
+  /// The rectangle should be given in contents coordinates. The
+  /// chart layer bounds must be set in order to call this method.
   ///
   /// \param area The zoom area in current contents coordinates.
   /// \sa pqChartContentsSpace::zoomToPercent(int, int)
