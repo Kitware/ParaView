@@ -79,12 +79,6 @@ public slots:
   /// Set the values in the widget.
   void setValues(const QList<QVariant>&);
 
-  /// Since the tree widget does not fire any signals
-  /// when items are removed, if anyone removed elements from
-  /// the tree widget, it should call this method.
-  void itemsDeleted()
-    { emit this->valuesChanged(); }
-
 private:
   pqSignalAdaptorTreeWidget(const pqSignalAdaptorTreeWidget&); // Not implemented.
   void operator=(const pqSignalAdaptorTreeWidget&); // Not implemented.
