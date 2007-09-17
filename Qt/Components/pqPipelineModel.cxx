@@ -550,6 +550,7 @@ pqPipelineModelItem::IconType pqPipelineModelSource::getIconType() const
     return INDETERMINATE;
     }
 
+  /*
   // This has only 1 output port.
   pqApplicationCore* core = pqApplicationCore::instance();
   pqDisplayPolicy* policy = core->getDisplayPolicy();
@@ -566,6 +567,7 @@ pqPipelineModelItem::IconType pqPipelineModelSource::getIconType() const
       return LINECHART;
       }
     }
+    */
   return GEOMETRY;
 }
 
@@ -663,6 +665,7 @@ void pqPipelineModelOutputPort::updateVisibleState(pqView *view)
 }
 pqPipelineModelItem::IconType pqPipelineModelOutputPort::getIconType() const
 {
+  /*
   pqApplicationCore* core = pqApplicationCore::instance();
   pqDisplayPolicy* policy = core->getDisplayPolicy();
   if (policy)
@@ -678,6 +681,7 @@ pqPipelineModelItem::IconType pqPipelineModelOutputPort::getIconType() const
       return LINECHART;
       }
     }
+    */
   return GEOMETRY;
 }
 
