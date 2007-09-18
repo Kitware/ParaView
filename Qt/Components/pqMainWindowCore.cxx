@@ -3347,6 +3347,17 @@ void pqMainWindowCore::updateFiltersMenu()
       continue;
       }
 
+    int numProcs = this->getActiveServer()->getNumberOfPartitions();
+    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(output);
+    if (sp &&
+        sp->GetProcessSupport() == vtkSMSourceProxy::SINGLE_PROCESS &&
+        numProcs > 1 ||
+        sp->GetProcessSupport() == vtkSMSourceProxy::MULTIPLE_PROCESSES &&
+        numProcs == 1)
+      {
+      continue;
+      }
+         
     vtkSMInputProperty *input = vtkSMInputProperty::SafeDownCast(
       output->GetProperty("Input"));
     if(input)
