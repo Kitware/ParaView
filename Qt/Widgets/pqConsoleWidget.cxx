@@ -250,21 +250,25 @@ pqConsoleWidget::pqConsoleWidget(QWidget* Parent) :
   l->addWidget(this->Implementation);
 }
 
+//-----------------------------------------------------------------------------
 pqConsoleWidget::~pqConsoleWidget()
 {
   delete this->Implementation;
 }
 
+//-----------------------------------------------------------------------------
 QTextCharFormat pqConsoleWidget::getFormat()
 {
   return this->Implementation->currentCharFormat();
 }
 
+//-----------------------------------------------------------------------------
 void pqConsoleWidget::setFormat(const QTextCharFormat& Format)
 {
   this->Implementation->setCurrentCharFormat(Format);
 }
 
+//-----------------------------------------------------------------------------
 void pqConsoleWidget::printString(const QString& Text)
 {
   this->Implementation->textCursor().movePosition(QTextCursor::End);
@@ -273,12 +277,16 @@ void pqConsoleWidget::printString(const QString& Text)
   this->Implementation->ensureCursorVisible();
 }
 
+//-----------------------------------------------------------------------------
 void pqConsoleWidget::clear()
 {
   this->Implementation->clear();
 }
 
+//-----------------------------------------------------------------------------
 void pqConsoleWidget::internalExecuteCommand(const QString& Command)
 {
   emit this->executeCommand(Command);
 }
+
+//-----------------------------------------------------------------------------

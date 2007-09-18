@@ -60,7 +60,7 @@ struct pqPythonStreamWrapper
 
 pqPythonStream* getStream(PyObject*);
 
-  PyObject* pqPythonStreamWrapperNew(PyTypeObject* type, PyObject* /*args*/, PyObject* /*kwds*/)
+PyObject* pqPythonStreamWrapperNew(PyTypeObject* type, PyObject* /*args*/, PyObject* /*kwds*/)
 {
   PyObject* const self = type->tp_alloc(type, 0);
   if(self)
