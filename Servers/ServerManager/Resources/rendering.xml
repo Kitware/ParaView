@@ -5324,6 +5324,13 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
+      <IntVectorProperty name="ProcessID"
+         command="SetProcessID"
+         update_self="1"
+         number_of_elements="1"
+         default_values="0">
+      </IntVectorProperty>
+
       <IdTypeVectorProperty name="CacheSize"
         command="SetCacheSize"
         update_self="1"
@@ -5396,7 +5403,6 @@
         </SourceProxy>
         <ExposedProperties>
           <Property name="BlockSize" />
-          <Property name="ProcessID" />
         </ExposedProperties>
       </SubProxy>
 

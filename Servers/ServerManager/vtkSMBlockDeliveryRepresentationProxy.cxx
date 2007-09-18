@@ -72,7 +72,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMBlockDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMBlockDeliveryRepresentationProxy::vtkSMBlockDeliveryRepresentationProxy()
 {
@@ -108,6 +108,23 @@ void vtkSMBlockDeliveryRepresentationProxy::SetFieldType(int ft)
       {
       ivp->SetElement(0, ft);
       this->BlockFilter->UpdateProperty("FieldType");
+      this->CacheDirty = true;
+      }
+    }
+}
+
+
+//----------------------------------------------------------------------------
+void vtkSMBlockDeliveryRepresentationProxy::SetProcessID(int id)
+{
+  if (this->BlockFilter)
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->BlockFilter->GetProperty("ProcessID"));
+    if (ivp)
+      {
+      ivp->SetElement(0, id);
+      this->BlockFilter->UpdateProperty("ProcessID");
       this->CacheDirty = true;
       }
     }

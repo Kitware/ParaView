@@ -50,6 +50,11 @@ public:
   void SetFieldType(int);
 
   // Description:
+  // Get/Set the process id to pull data from.
+  // This simply passes it to the block filter.
+  void SetProcessID(int);
+
+  // Description:
   // Set the cache size as the maximum number of blocks to cache at a given
   // time. When cache size exceeds this number, the least-recently-accessed
   // block(s) will be discarded.

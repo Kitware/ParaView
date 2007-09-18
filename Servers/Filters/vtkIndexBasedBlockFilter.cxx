@@ -32,7 +32,7 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.10");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.11");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -108,6 +108,7 @@ int vtkIndexBasedBlockFilter::RequestData(vtkInformation*,
   // The length of the individual arrays will be set in the FIELD case
   vtkAbstractArray *inArray, *outArray;
   int inNumTuples, outNumTuples;
+  int maxNumOutputTuples = 0;
   if(this->FieldType == FIELD)
     {
     for(vtkIdType j=0; j<inFD->GetNumberOfArrays(); j++)
@@ -122,11 +123,13 @@ int vtkIndexBasedBlockFilter::RequestData(vtkInformation*,
                        inNumTuples-this->StartIndex+1;
         outArray->SetNumberOfTuples(outNumTuples);
         }
+      maxNumOutputTuples = outNumTuples > maxNumOutputTuples ? outNumTuples : maxNumOutputTuples;
       }
     }
   else
     {
     outFD->SetNumberOfTuples(this->EndIndex-this->StartIndex+1);
+    maxNumOutputTuples = outFD->GetNumberOfTuples();
     }
 
   vtkDoubleArray* points = 0; 
@@ -135,6 +138,7 @@ int vtkIndexBasedBlockFilter::RequestData(vtkInformation*,
   vtkIdTypeArray* originalIds = vtkIdTypeArray::New();
   originalIds->SetName("vtkOriginalIndices");
   originalIds->SetNumberOfComponents(1);
+  //originalIds->SetNumberOfTuples(maxNumOutputTuples);
   originalIds->SetNumberOfTuples(outFD->GetNumberOfTuples());
 
   vtkPointSet* psInput = vtkPointSet::SafeDownCast(input);
