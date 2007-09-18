@@ -162,7 +162,21 @@ public:
   // output port.
   vtkSMSourceProxy* GetSelectionOutput(unsigned int portIndex);
 
+  // Description:
+  // This returns information about whether the VTK algorithm supports
+  // multiple processes or not. SINGLE_PROCESS means that this algorithm
+  // works only in serial, MULTIPLE_PROCESSES means that it will only
+  // work in parallel (or it is useless in serial), BOTH means both :-)
+  // Default is BOTH. This ivar is filled from the xml configuration.
+  vtkGetMacro(ProcessSupport, int);
+
 //BTX
+  enum ProcessSupportType
+  {
+    SINGLE_PROCESS,
+    MULTIPLE_PROCESSES,
+    BOTH
+  };
 protected:
   vtkSMSourceProxy();
   ~vtkSMSourceProxy();
@@ -170,6 +184,8 @@ protected:
   friend class vtkSMInputProperty;
 
   int PartsCreated;
+
+  int ProcessSupport;
 
   bool DataInformationValid;
 

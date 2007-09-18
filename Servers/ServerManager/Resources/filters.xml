@@ -393,7 +393,8 @@ The flow integration fitler  integrates the dot product of a point flow vector f
    </SourceProxy>
 
    <SourceProxy name="AllToN" class="vtkAllToNRedistributePolyData"
-      label="All to N">
+                label="All to N"
+                multiprocess_support="multiple_processes">
       <Documentation
          long_help="Redistribute data to a subset of available processes."
          short_help="Repartition data filter.">
@@ -427,7 +428,8 @@ The All to N filter is available when ParaView is run in parallel. It redistribu
    <!-- End AllToN -->
    </SourceProxy>
 
-   <SourceProxy name="Balance" class="vtkBalancedRedistributePolyData">
+   <SourceProxy name="Balance" class="vtkBalancedRedistributePolyData"
+                multiprocess_support="multiple_processes">
       <Documentation
          long_help="Balance data among available processes."
          short_help="Load balance filter.">
@@ -1009,7 +1011,8 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
    <!-- End DecimatePro -->
    </SourceProxy>
 
-   <SourceProxy name="D3" class="vtkDistributedDataFilter" label="D3">
+   <SourceProxy name="D3" class="vtkDistributedDataFilter" label="D3"
+                multiprocess_support="multiple_processes">
     <Documentation
        long_help="Repartition a data set into load-balanced spatially convex regions.  Create ghost cells if requested."
        short_help="Repartition a data set.">
@@ -2374,7 +2377,8 @@ The Octree Depth Limit filter takes in an octree and produces a new octree that 
    </SourceProxy>
 
    <SourceProxy name="ProcessIdScalars" class="vtkProcessIdScalars"
-     label="Process Id Scalars">
+                label="Process Id Scalars"
+                multiprocess_support="multiple_processes">
      <Documentation
         long_help="This filter uses colors to show how data is partitioned across processes."
         short_help="Generate point scalars from process id.">
@@ -2855,7 +2859,7 @@ The Rotational Extrusion filter forms a surface by rotating the input about the 
    </SourceProxy>
 
    <SourceProxy name="ShrinkFilter" class="vtkShrinkFilter"
-     label="Shrink">
+                label="Shrink">
      <Documentation
         long_help="This filter shrinks each input cell so they pull away from their neighbors."
         short_help="Shrink each input cell.">

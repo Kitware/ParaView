@@ -38,7 +38,7 @@
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.56");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.57");
 
 struct vtkSMSourceProxyInternals
 {
@@ -58,6 +58,8 @@ vtkSMSourceProxy::vtkSMSourceProxy()
 
   this->DoInsertExtractPieces = 1;
   this->SelectionProxiesCreated = 0;
+
+  this->ProcessSupport = vtkSMSourceProxy::BOTH;
 }
 
 //---------------------------------------------------------------------------
@@ -110,6 +112,22 @@ int vtkSMSourceProxy::ReadXMLAttributes(vtkSMProxyManager* pm,
   if (executiveName)
     {
     this->SetExecutiveName(executiveName);
+    }
+  const char* mp = element->GetAttribute("multiprocess_support");
+  if (mp)
+    {
+    if (strcmp(mp, "multiple_processes") == 0)
+      {
+      this->ProcessSupport = vtkSMSourceProxy::MULTIPLE_PROCESSES;
+      }
+    else if (strcmp(mp, "single_process") == 0)
+      {
+      this->ProcessSupport = vtkSMSourceProxy::SINGLE_PROCESS;
+      }
+    else
+      {
+      this->ProcessSupport = vtkSMSourceProxy::BOTH;
+      }
     }
   return this->Superclass::ReadXMLAttributes(pm, element);
 }
