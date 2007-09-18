@@ -283,8 +283,6 @@ void pqRenderView::initializeWidgets()
 // undo/redo, this method won't be called. 
 void pqRenderView::setDefaultPropertyValues()
 {
-  this->Superclass::setDefaultPropertyValues();
-
   this->createDefaultInteractors();
   this->updateDefaultInteractors(
     this->Internal->DefaultCameraManipulators);
