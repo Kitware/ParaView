@@ -143,13 +143,6 @@ public:
         {
         return new pqExtractSelectionPanel(proxy, p);
         }
-/*
-      if(QString("ProbeLocationOverTime") == 
-         proxy->getProxy()->GetXMLName())
-        {
-        return new pqExtractLocationsPanel(proxy, p);
-        }
-*/
       if(QString("Contour") == proxy->getProxy()->GetXMLName())
         {
         return new pqContourPanel(proxy, p);
@@ -167,7 +160,6 @@ public:
         {
         return new pqExtractCTHPartsPanel(proxy, p);
         }
-
       }
     if(QString("sources") == proxy->getProxy()->GetXMLGroup())
       {
@@ -204,11 +196,11 @@ public:
          QString("ExtractSelections") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractPointsOverTime") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractCellsOverTime") == proxy->getProxy()->GetXMLName() ||
-//         QString("ProbeLocationOverTime") == proxy->getProxy()->GetXMLName() ||
          QString("Contour") == proxy->getProxy()->GetXMLName() || 
          QString("SelectThrough") == proxy->getProxy()->GetXMLName() ||
-         QString("ExtractThresholds") == proxy->getProxy()->GetXMLName() || 
-         QString("CTHPart") == proxy->getProxy()->GetXMLName())
+         QString("ExtractThresholds") == proxy->getProxy()->GetXMLName() 
+        || QString("CTHPart") == proxy->getProxy()->GetXMLName()
+        )
         {
         return true;
         }

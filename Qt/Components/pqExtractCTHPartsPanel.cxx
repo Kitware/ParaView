@@ -160,7 +160,7 @@ int pqExtractCTHPartsPanel::enableMaterialNamedArrays(int which)
   int foundone = 0;
   for (unsigned int i = 0; i < myDomain->GetNumberOfStrings(); i++)
     {
-    if (strstr(myDomain->GetString(i), "Material volume fraction"))
+    if (strstr(myDomain->GetString(i), "raction")) //{F|f}raction
       {
       foundone = 1;
       myProp->SetNumberOfElements(i+1);
@@ -175,6 +175,5 @@ int pqExtractCTHPartsPanel::enableMaterialNamedArrays(int which)
 
   return foundone;
 }
-
 
 

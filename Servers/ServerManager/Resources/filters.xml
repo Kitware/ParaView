@@ -1136,7 +1136,6 @@ The Input menu allows the user to select the data set to which this filter will 
    <!-- End ElevationFilter -->
    </SourceProxy>
 
-#if 1
    <SourceProxy name="CTHPart" class="vtkExtractCTHPart"
     label="Extract CTH Parts">
     <Documentation
@@ -1182,7 +1181,7 @@ Extract CTH Parts is a specialized filter for visualizing the data from a CTH si
      <StringVectorProperty 
         name="AddDoubleVolumeArrayName"
         command="AddDoubleVolumeArrayName" 
-        clean_command="RemoveAllVolumeArrayNames"
+        clean_command="RemoveDoubleVolumeArrayNames"
         repeat_command="1"
         number_of_elements_per_command="1"
         label="Double Volume Arrays">
@@ -1205,7 +1204,7 @@ Extract CTH Parts is a specialized filter for visualizing the data from a CTH si
      <StringVectorProperty 
         name="AddFloatVolumeArrayName"
         command="AddFloatVolumeArrayName" 
-        clean_command="RemoveAllVolumeArrayNames"
+        clean_command="RemoveFloatVolumeArrayNames"
         repeat_command="1"
         number_of_elements_per_command="1"
         label="Float Volume Arrays">
@@ -1228,7 +1227,7 @@ Extract CTH Parts is a specialized filter for visualizing the data from a CTH si
      <StringVectorProperty 
         name="AddUnsignedCharVolumeArrayName"
         command="AddUnsignedCharVolumeArrayName" 
-        clean_command="RemoveAllVolumeArrayNames"
+        clean_command="RemoveUnsignedCharVolumeArrayNames"
         repeat_command="1"
         number_of_elements_per_command="1"
         label="Unsigned Character Volume Arrays">
@@ -1261,7 +1260,6 @@ Extract CTH Parts is a specialized filter for visualizing the data from a CTH si
      </DoubleVectorProperty>
    <!-- End CTHPart -->
    </SourceProxy>
-#endif
 
    <SourceProxy name="ExtractEdges" class="vtkExtractEdges"
       label="Extract Edges">
