@@ -29,7 +29,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.22");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.23");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -244,6 +244,7 @@ void vtkPythonProgrammableFilter::Exec(const char* script)
   if (this->Implementation->Interpretor == NULL)
     {
     this->Implementation->Interpretor = vtkPVPythonInterpretor::New();
+    this->Implementation->Interpretor->SetCaptureStreams(true);
     const char* argv0 = vtkProcessModule::GetProcessModule()->
       GetOptions()->GetArgv0();
     this->Implementation->Interpretor->InitializeSubInterpretor(1, (char**)&argv0);
@@ -274,6 +275,7 @@ void vtkPythonProgrammableFilter::Exec(const char* script)
     }
   this->Implementation->Interpretor->RunSimpleString(script);
 
+  this->Implementation->Interpretor->FlushMessages();
   this->Implementation->DestroyInterpretor();
   this->Implementation->Running = 0;
 }
