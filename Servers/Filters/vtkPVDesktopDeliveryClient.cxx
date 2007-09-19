@@ -43,7 +43,7 @@ static void vtkPVDesktopDeliveryClientReceiveImageCallback(vtkObject *,
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryClient, "1.6");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryClient, "1.7");
 vtkStandardNewMacro(vtkPVDesktopDeliveryClient);
 
 //----------------------------------------------------------------------------
@@ -61,6 +61,7 @@ vtkPVDesktopDeliveryClient::vtkPVDesktopDeliveryClient()
   this->WindowPosition[0] = this->WindowPosition[1] = 0;
   this->GUISize[0] = this->GUISize[1] = 0;
   this->RemoteImageProcessingTime = 0.0;
+  this->TransferTime = 0.0;
 
   vtkCallbackCommand *cbc = vtkCallbackCommand::New();
   cbc->SetClientData(this);
