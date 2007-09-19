@@ -809,6 +809,12 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
                    SIGNAL(pickFinished(double, double, double)),
                    this, 
                    SLOT(pickCenterOfRotationFinished(double, double, double)));
+
+  // Make the view manager non-blockable so that none of the views are disabled.
+  pqProgressManager* progress_manager = 
+    pqApplicationCore::instance()->getProgressManager();
+  progress_manager->addNonBlockableObject(
+    &this->Implementation->MultiViewManager);
 }
 
 //-----------------------------------------------------------------------------
