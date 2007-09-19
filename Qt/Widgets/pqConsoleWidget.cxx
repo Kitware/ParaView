@@ -295,14 +295,14 @@ void pqConsoleWidget::printString(const QString& Text)
 //-----------------------------------------------------------------------------
 void pqConsoleWidget::prompt(const QString& text)
 {
-  QTextCursor cursor = this->Implementation->textCursor();
+  QTextCursor text_cursor = this->Implementation->textCursor();
 
   // if the cursor is currently on a clean line, do nothing, otherwise we move
   // the cursor to a new line before showing the prompt.
-  cursor.movePosition(QTextCursor::StartOfLine);
-  int startpos = cursor.position();
-  cursor.movePosition(QTextCursor::EndOfLine);
-  int endpos = cursor.position();
+  text_cursor.movePosition(QTextCursor::StartOfLine);
+  int startpos = text_cursor.position();
+  text_cursor.movePosition(QTextCursor::EndOfLine);
+  int endpos = text_cursor.position();
   if (endpos != startpos)
     {
     this->Implementation->textCursor().insertText("\n");
