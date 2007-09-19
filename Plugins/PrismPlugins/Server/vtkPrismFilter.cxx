@@ -27,7 +27,7 @@ Module:    vtkPrismFilter.cxx
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismFilter, "1.1");
+vtkCxxRevisionMacro(vtkPrismFilter, "1.2");
 vtkStandardNewMacro(vtkPrismFilter);
 
 class vtkPrismFilter::MyInternal
@@ -245,9 +245,9 @@ int vtkPrismFilter::RequestData(
                                 vtkInformationVector **inputVector,
                                 vtkInformationVector *outputVector)
 {
-  this->RequestSESAMEData(request, inputVector,outputVector);
-  this->RequestGeometryData(request, inputVector,outputVector);
-  return 1;
+ this->RequestSESAMEData(request, inputVector,outputVector);
+ this->RequestGeometryData(request, inputVector,outputVector);
+ return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -436,7 +436,6 @@ int vtkPrismFilter::RequestSESAMEData(
 
   output->SetPoints(newPts);
   output->GetPointData()->AddArray(newScalars);
-  // newPts->Delete();
 
   return 1;
 }
@@ -469,6 +468,7 @@ int vtkPrismFilter::RequestGeometryData(
   vtkPointData *inPD  = input->GetPointData();
   vtkCellData  *inCD  = input->GetCellData();
   vtkPointData  *outPD = output->GetPointData();
+  vtkCellData  *outCD = output->GetCellData();
   int maxCellSize     = input->GetMaxCellSize();
   vtkIdList *cellPts  = NULL;
   double weight       = 0.0;
@@ -498,7 +498,7 @@ int vtkPrismFilter::RequestGeometryData(
 
   // Pass cell data (note that this passes current cell data through to the
   // new points that will be created at the cell centers)
-  outPD->PassData( inCD );
+  outCD->PassData( inCD );
 
   // create space for the newly interpolated values
   outPD->CopyAllocate( inPD,numCells );

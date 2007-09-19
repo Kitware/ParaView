@@ -24,7 +24,7 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismGeometryFilter, "1.1");
+vtkCxxRevisionMacro(vtkPrismGeometryFilter, "1.2");
 vtkStandardNewMacro(vtkPrismGeometryFilter);
 
 class vtkPrismGeometryFilter::MyInternal
@@ -39,7 +39,6 @@ public:
       this->AxisVarName[0]      = "none";
       this->AxisVarName[1]      = "none";
       this->AxisVarName[2]      = "none";
-  //    this->Glyph = vtkGlyph3D::New();
       this->TableId = -1;
     }
   ~MyInternal()
@@ -104,8 +103,9 @@ int vtkPrismGeometryFilter::RequestData(
   int maxCellSize     = input->GetMaxCellSize();
   vtkIdList *cellPts  = NULL;
   double weight       = 0.0;
-  double *weights     = NULL;;
-
+  double *weights     = NULL;
+  double x[3], newX[3];
+ 
   vtkDebugMacro( << "Mapping point data to new cell center point..." );
 
   // construct new points at the centers of the cells 
@@ -169,6 +169,25 @@ int vtkPrismGeometryFilter::RequestData(
     }
 
   // pass the new points to the output data, etc.
+
+
+   double scale[3];
+   for (ptId=0; ptId < numPts; ptId++)
+      {
+
+      newPoints->GetPoint(ptId, x);
+
+      newX[0] = x[0]*scale[0];
+      newX[1] = x[1]*scale[1];
+      newX[2] = x[2]*scale[2];
+
+      newPoints->SetPoint(ptId, newX);
+
+      }
+
+
+
+
   output->SetPoints( newPoints );
   newPoints->Delete();
   output->Squeeze();
