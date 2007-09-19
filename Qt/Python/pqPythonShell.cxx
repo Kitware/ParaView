@@ -187,16 +187,16 @@ void pqPythonShell::executeScript(const QString& script)
   this->Implementation->promptForInput();
 }
 
-void pqPythonShell::printStdout(vtkObject*, unsigned long, void*, void* data)
+void pqPythonShell::printStdout(vtkObject*, unsigned long, void*, void* calldata)
 {
-  const char* text = reinterpret_cast<const char*>(data);
+  const char* text = reinterpret_cast<const char*>(calldata);
   this->printStdout(text);
   this->Implementation->Interpreter->ClearMessages();
 }
 
-void pqPythonShell::printStderr(vtkObject*, unsigned long, void*, void* data)
+void pqPythonShell::printStderr(vtkObject*, unsigned long, void*, void* calldata)
 {
-  const char* text = reinterpret_cast<const char*>(data);
+  const char* text = reinterpret_cast<const char*>(calldata);
   this->printStderr(text);
   this->Implementation->Interpreter->ClearMessages();
 }
