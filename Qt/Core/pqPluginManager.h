@@ -56,6 +56,11 @@ public:
   /// attempt to load all available plugins on a server, 
   /// or client plugins if NULL
   void loadPlugins(pqServer*);
+
+  /// Attempts to load all available plugins in the directory pointed by
+  /// \c path. If server is 0, it loads client plugins, else it loads server
+  /// plugins
+  void loadPlugins(const QString& path, pqServer* server);
   
   /// return all GUI interfaces that have been loaded
   QObjectList interfaces();

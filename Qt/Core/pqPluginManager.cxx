@@ -222,29 +222,31 @@ void pqPluginManager::loadPlugins(pqServer* server)
     }
 
   QStringList plugin_paths = pv_plugin_path.split(';', QString::SkipEmptyParts);
-  if(plugin_paths.isEmpty())
-    {
-    return;
-    }
-  QStringList libs;
   foreach(QString path, plugin_paths)
     {
-    libs += getLibraries(path, server);
+    this->loadPlugins(path, server);
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqPluginManager::loadPlugins(const QString& path, pqServer* server)
+{
+  QStringList libs = ::getLibraries(path, server);
   foreach(QString lib, libs)
     {
     QString dummy;
     if(server)
       {
-      loadServerPlugin(server, lib, dummy);
+      pqPluginManager::loadServerPlugin(server, lib, dummy);
       }
     else
       {
-      loadClientPlugin(lib, dummy);
+      pqPluginManager::loadClientPlugin(lib, dummy);
       }
     }
 }
 
+//-----------------------------------------------------------------------------
 bool pqPluginManager::loadPlugin(pqServer* server, const QString& lib)
 {
   bool success = false;
