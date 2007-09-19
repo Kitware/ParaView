@@ -26,7 +26,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVPythonInteractiveInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInteractiveInterpretor, "1.1");
+vtkCxxRevisionMacro(vtkPVPythonInteractiveInterpretor, "1.2");
 //----------------------------------------------------------------------------
 vtkPVPythonInteractiveInterpretor::vtkPVPythonInteractiveInterpretor()
 {
@@ -42,6 +42,7 @@ vtkPVPythonInteractiveInterpretor::~vtkPVPythonInteractiveInterpretor()
     this->MakeCurrent();
     Py_DECREF(this->Internal->InteractiveConsole);
     this->Internal->InteractiveConsole = 0;
+    this->ReleaseControl();
     }
 
   delete this->Internal;
@@ -63,7 +64,11 @@ void vtkPVPythonInteractiveInterpretor::InitializeInternal()
   PyObject* global_dict = PyModule_GetDict(main_module);
   this->Internal->InteractiveConsole = PyDict_GetItemString(
     global_dict, "__vtkConsole");
-  if (!this->Internal->InteractiveConsole)
+  if (this->Internal->InteractiveConsole)
+    {
+    Py_INCREF(this->Internal->InteractiveConsole);
+    }
+  else
     {
     vtkErrorMacro("Failed to locate the InteractiveConsole object.");
     }
