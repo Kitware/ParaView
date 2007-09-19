@@ -66,9 +66,15 @@ signals:
 public slots:
   /// Writes the supplied text to the console
   void printString(const QString& Text);
+
   /// Clears the contents of the console
   void clear();
 
+  /// Puts out an input accepting prompt.
+  /// It is recommended that one uses prompt instead of printString() to print
+  /// an input prompt since this call ensures that the prompt is shown on a new
+  /// line.
+  void prompt(const QString& text);
 private:
   pqConsoleWidget(const pqConsoleWidget&);
   pqConsoleWidget& operator=(const pqConsoleWidget&);

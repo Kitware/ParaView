@@ -111,11 +111,11 @@ struct pqPythonShell::pqImplementation
     this->Interpreter->MakeCurrent();
     if(!this->MultilineStatement)
       {
-      this->Console.printString(PyString_AsString(PySys_GetObject(const_cast<char*>("ps1"))));
+      this->Console.prompt(PyString_AsString(PySys_GetObject(const_cast<char*>("ps1"))));
       }
     else
       {
-      this->Console.printString(PyString_AsString(PySys_GetObject(const_cast<char*>("ps2"))));
+      this->Console.prompt(PyString_AsString(PySys_GetObject(const_cast<char*>("ps2"))));
       }
     this->Interpreter->ReleaseControl();
   }

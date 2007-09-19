@@ -167,6 +167,12 @@ public:
           this->updateCommandBuffer();
           }
         break;
+
+      case Qt::Key_Home:
+        e->accept();
+        text_cursor.setPosition(this->InteractivePosition);
+        this->setTextCursor(text_cursor);
+        break;
         
       case Qt::Key_Return:
       case Qt::Key_Enter:
@@ -282,6 +288,27 @@ void pqConsoleWidget::printString(const QString& Text)
 {
   this->Implementation->textCursor().movePosition(QTextCursor::End);
   this->Implementation->textCursor().insertText(Text);
+  this->Implementation->InteractivePosition = this->Implementation->documentEnd();
+  this->Implementation->ensureCursorVisible();
+}
+
+//-----------------------------------------------------------------------------
+void pqConsoleWidget::prompt(const QString& text)
+{
+  QTextCursor cursor = this->Implementation->textCursor();
+
+  // if the cursor is currently on a clean line, do nothing, otherwise we move
+  // the cursor to a new line before showing the prompt.
+  cursor.movePosition(QTextCursor::StartOfLine);
+  int startpos = cursor.position();
+  cursor.movePosition(QTextCursor::EndOfLine);
+  int endpos = cursor.position();
+  if (endpos != startpos)
+    {
+    this->Implementation->textCursor().insertText("\n");
+    }
+
+  this->Implementation->textCursor().insertText(text);
   this->Implementation->InteractivePosition = this->Implementation->documentEnd();
   this->Implementation->ensureCursorVisible();
 }
