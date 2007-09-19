@@ -134,14 +134,23 @@ public:
       {
       case Qt::Key_Up:
         e->accept();
-        if(this->CommandPosition > 0)
+        if (this->CommandPosition > 0)
+          {
           this->replaceCommandBuffer(this->CommandHistory[--this->CommandPosition]);
+          }
         break;
         
       case Qt::Key_Down:
         e->accept();
-        if(this->CommandPosition < this->CommandHistory.size() - 2)
+        if (this->CommandPosition < this->CommandHistory.size() - 2)
+          {
           this->replaceCommandBuffer(this->CommandHistory[++this->CommandPosition]);
+          }
+        else
+          {
+          this->CommandPosition = this->CommandHistory.size()-1;
+          this->replaceCommandBuffer("");
+          }
         break;
   
       case Qt::Key_Delete:
