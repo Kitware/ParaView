@@ -26,7 +26,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVPythonInteractiveInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInteractiveInterpretor, "1.2");
+vtkCxxRevisionMacro(vtkPVPythonInteractiveInterpretor, "1.3");
 //----------------------------------------------------------------------------
 vtkPVPythonInteractiveInterpretor::vtkPVPythonInteractiveInterpretor()
 {
@@ -60,7 +60,7 @@ void vtkPVPythonInteractiveInterpretor::InitializeInternal()
   PyRun_SimpleString(code);
 
   // Now get the reference to __vtkConsole and save the pointer.
-  PyObject* main_module = PyImport_AddModule("__main__");
+  PyObject* main_module = PyImport_AddModule((char*)"__main__");
   PyObject* global_dict = PyModule_GetDict(main_module);
   this->Internal->InteractiveConsole = PyDict_GetItemString(
     global_dict, "__vtkConsole");
@@ -85,14 +85,27 @@ bool vtkPVPythonInteractiveInterpretor::Push(const char* const code)
     // The embedded python interpreter cannot handle DOS line-endings, see
     // http://sourceforge.net/tracker/?group_id=5470&atid=105470&func=detail&aid=1167922
     vtkstd::string buffer = code ? code : "";
-    buffer.erase(vtkstd::remove(buffer.begin(), buffer.end(), '\r'), buffer.end());
+    // replace "\r\n" with "\n"
+    vtkstd::string::size_type i = buffer.find("\r\n");
+    for(; i != vtkstd::string::npos; i = buffer.find("\r\n", i))
+      {
+      buffer.replace(i, 2, "\n");
+      i++;
+      }
+    // replace "\r" with "\n"  (sometimes seen on Mac)
+    i = buffer.find("\r");
+    for(; i != vtkstd::string::npos; i = buffer.find("\r", i))
+      {
+      buffer.replace(i, 1, "\n");
+      i++;
+      }
 
     PyObject *res = PyObject_CallMethod(this->Internal->InteractiveConsole,
-      "push", "z", buffer.c_str());
+      (char*)"push", (char*)"z", buffer.c_str());
     if (res)
       {
       int status = 0;
-      if (PyArg_Parse(res, "i", &status))
+      if (PyArg_Parse(res, (char*)"i", &status))
         {
         ret_value = (status>0);
         }
