@@ -36,9 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqConsoleWidget.h"
 #include "pqPythonShell.h"
-#include "pqPythonStream.h"
-
-#include "vtkPVPythonInterpretor.h"
+#include "vtkCommand.h"
+#include "vtkEventQtSlotConnect.h"
+#include "vtkPVPythonInteractiveInterpretor.h"
 
 #include <QCoreApplication>
 #include <QResizeEvent>
@@ -53,19 +53,17 @@ struct pqPythonShell::pqImplementation
   pqImplementation(QWidget* Parent) 
     : Console(Parent) 
   {
-    this->Interpreter = vtkPVPythonInterpretor::New();
+    this->Interpreter = vtkPVPythonInteractiveInterpretor::New();
+    this->VTKConnect = vtkEventQtSlotConnect::New();
   }
 
   void Initialize(int argc, char* argv[])
   {
+    this->Interpreter->SetCaptureStreams(true);
     this->Interpreter->SetMultithreadSupport(true);
     this->Interpreter->InitializeSubInterpretor(argc, argv);
     this->Interpreter->MakeCurrent();
     
-    // Redirect Python's stdout and stderr
-    PySys_SetObject(const_cast<char*>("stdout"), reinterpret_cast<PyObject*>(pqWrap(this->pythonStdout)));
-    PySys_SetObject(const_cast<char*>("stderr"), reinterpret_cast<PyObject*>(pqWrap(this->pythonStderr)));
-
     // Setup Python's interactive prompts
     PyObject* ps1 = PySys_GetObject(const_cast<char*>("ps1"));
     if(!ps1)
@@ -81,10 +79,14 @@ struct pqPythonShell::pqImplementation
       Py_XDECREF(ps2);
       }
     this->Interpreter->ReleaseControl();
+    this->MultilineStatement = false;
   }
 
   ~pqImplementation()
   {
+    this->VTKConnect->Disconnect();
+    this->VTKConnect->Delete();
+
     this->Interpreter->MakeCurrent();
 
     // Restore Python's original stdout and stderr
@@ -96,18 +98,18 @@ struct pqPythonShell::pqImplementation
 
   void executeCommand(const QString& Command)
   {
-    this->Interpreter->RunSimpleString(Command.toAscii().data());
+    this->MultilineStatement = 
+      this->Interpreter->Push(Command.toAscii().data());
   }
 
   void promptForInput()
   {
-    this->Interpreter->MakeCurrent();
-
     QTextCharFormat format = this->Console.getFormat();
     format.setForeground(QColor(0, 0, 0));
     this->Console.setFormat(format);
 
-    if(this->MultilineStatement.isEmpty())
+    this->Interpreter->MakeCurrent();
+    if(!this->MultilineStatement)
       {
       this->Console.printString(PyString_AsString(PySys_GetObject(const_cast<char*>("ps1"))));
       }
@@ -118,16 +120,17 @@ struct pqPythonShell::pqImplementation
     this->Interpreter->ReleaseControl();
   }
 
-  /// Provides a console for gathering user input and displaying Python output
+  /// Provides a console for gathering user input and displaying 
+  /// Python output
   pqConsoleWidget Console;
-  /// Iff the user is in the process of entering a multi-line statement, this will contain everything entered so-far
-  QString MultilineStatement;
-  /// Redirects Python's stdout stream
-  pqPythonStream pythonStdout;
-  /// Redirects Python's stderr stream
-  pqPythonStream pythonStderr;
+
+  /// Indicates if the last statement processes was incomplete.
+  bool MultilineStatement;
+
   /// Separate Python interpreter that will be used for this shell
-  vtkPVPythonInterpretor* Interpreter;
+  vtkPVPythonInteractiveInterpretor* Interpreter;
+
+  vtkEventQtSlotConnect *VTKConnect;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -143,10 +146,16 @@ pqPythonShell::pqPythonShell(QWidget* Parent) :
 
   this->setObjectName("pythonShell");
   
-  QObject::connect(&this->Implementation->pythonStdout, SIGNAL(streamWrite(const QString&)), this, SLOT(printStdout(const QString&)));
-  QObject::connect(&this->Implementation->pythonStderr, SIGNAL(streamWrite(const QString&)), this, SLOT(printStderr(const QString&)));
-  QObject::connect(&this->Implementation->Console, SIGNAL(executeCommand(const QString&)), this, SLOT(onExecuteCommand(const QString&)));
+  QObject::connect(
+    &this->Implementation->Console, SIGNAL(executeCommand(const QString&)), 
+    this, SLOT(onExecuteCommand(const QString&)));
 
+  this->Implementation->VTKConnect->Connect(
+    this->Implementation->Interpreter, vtkCommand::ErrorEvent, 
+    this, SLOT(printStderr(vtkObject*, unsigned long, void*, void*))); 
+  this->Implementation->VTKConnect->Connect(
+    this->Implementation->Interpreter, vtkCommand::WarningEvent, 
+    this, SLOT(printStdout(vtkObject*, unsigned long, void*, void*))); 
 }
 
 pqPythonShell::~pqPythonShell()
@@ -171,28 +180,45 @@ void pqPythonShell::clear()
 void pqPythonShell::executeScript(const QString& script)
 {
   this->printStdout("\n");
-  this->internalExecuteCommand(script);
+  emit this->executing(true);  
+  this->Implementation->Interpreter->RunSimpleString(
+    script.toAscii().data());
+  emit this->executing(false);
   this->Implementation->promptForInput();
 }
 
-void pqPythonShell::printStdout(const QString& String)
+void pqPythonShell::printStdout(vtkObject*, unsigned long, void*, void* data)
+{
+  const char* text = reinterpret_cast<const char*>(data);
+  this->printStdout(text);
+  this->Implementation->Interpreter->ClearMessages();
+}
+
+void pqPythonShell::printStderr(vtkObject*, unsigned long, void*, void* data)
+{
+  const char* text = reinterpret_cast<const char*>(data);
+  this->printStderr(text);
+  this->Implementation->Interpreter->ClearMessages();
+}
+
+void pqPythonShell::printStdout(const QString& text)
 {
   QTextCharFormat format = this->Implementation->Console.getFormat();
-  format.setForeground(QColor(0, 0, 0));
+  format.setForeground(QColor(0, 150, 0));
   this->Implementation->Console.setFormat(format);
   
-  this->Implementation->Console.printString(String);
+  this->Implementation->Console.printString(text);
   
   QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
-void pqPythonShell::printStderr(const QString& String)
+void pqPythonShell::printStderr(const QString& text)
 {
   QTextCharFormat format = this->Implementation->Console.getFormat();
   format.setForeground(QColor(255, 0, 0));
   this->Implementation->Console.setFormat(format);
   
-  this->Implementation->Console.printString(String);
+  this->Implementation->Console.printString(text);
   
   QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 }
@@ -201,34 +227,7 @@ void pqPythonShell::onExecuteCommand(const QString& Command)
 {
   QString command = Command;
   command.replace(QRegExp("\\s*$"), "");
-  
-  if(this->Implementation->MultilineStatement.isEmpty())
-    {
-    if(command.endsWith(":"))
-      {
-      this->Implementation->MultilineStatement.append(command);
-      this->Implementation->MultilineStatement.append("\n");
-      }
-    else
-      {
-      this->internalExecuteCommand(command);
-      }
-    }
-  else
-    {
-    if(command.isEmpty())
-      {
-      this->Implementation->MultilineStatement.append("\n");
-      this->internalExecuteCommand(this->Implementation->MultilineStatement);
-      this->Implementation->MultilineStatement.clear();
-      }
-    else
-      {
-      this->Implementation->MultilineStatement.append(command);
-      this->Implementation->MultilineStatement.append("\n");
-      }
-    }
-  
+  this->internalExecuteCommand(command);
   this->promptForInput();
 }
 

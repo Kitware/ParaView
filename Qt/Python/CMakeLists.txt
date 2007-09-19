@@ -9,6 +9,7 @@ INCLUDE_DIRECTORIES(
   ${VTK_INCLUDE_DIR}
   ${PYTHON_INCLUDE_PATH}
   ${VTKPythonWrapping_SOURCE_DIR}/Executable
+  ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
 )
 
 # Reduce the number of dirs that get included on moc command line
@@ -19,7 +20,6 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 QT4_WRAP_CPP(QtPython_MOC_BUILT_SOURCES
   pqPythonDialog.h
   pqPythonShell.h
-  pqPythonStream.h
 )
 
 QT4_WRAP_UI(QtPython_UI_BUILT_SOURCES
@@ -33,8 +33,6 @@ ADD_LIBRARY(QtPython
   pqPythonDialog.h
   pqPythonShell.cxx
   pqPythonShell.h
-  pqPythonStream.cxx
-  pqPythonStream.h
   QtPythonExport.h
   ${QtPython_MOC_BUILT_SOURCES}
   ${QtPython_UI_BUILT_SOURCES}

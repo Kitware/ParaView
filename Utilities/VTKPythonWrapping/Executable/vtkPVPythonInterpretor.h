@@ -30,6 +30,7 @@
 
 #include "vtkObject.h"
 
+class vtkStdString;
 class vtkPVPythonInterpretorInternal;
 class VTK_EXPORT vtkPVPythonInterpretor : public vtkObject
 {
@@ -92,17 +93,49 @@ public:
   static void SetMultithreadSupport(bool enable);
   static bool GetMultithreadSupport();
 
+  // Description:
+  // In some cases, the application may want to capture the output/error streams
+  // dumped by the python interpretor. When enabled, the streams are captured
+  // and output/error is collected which can be flushed by FlushMessages.
+  // vtkCommand::ErrorEvent is fired when data is received on stderr and
+  // vtkCommand::WarningEvent is fired when data is received on stdout.
+  // from the python interpretor. Event data for both the events is the text
+  // received.  This flag can be changed only before the interpretor is 
+  // initialized. Changing it afterwards has no effect.
+  vtkSetMacro(CaptureStreams, bool);
+  vtkGetMacro(CaptureStreams, bool);
+
+  // Description:
+  // Flush any errors received from the python interpretor to the
+  // vtkOutputWindow. Applicable only if CaptureStreams was true when the
+  // interpretor was initialized.
+  void FlushMessages();
+
+  // Description:
+  // Clears all received messages. Unlike FlushMessages, this call does not dump
+  // it on the vtkOutputWindow.
+  // Applicable only if CaptureStreams was true when the
+  // interpretor was initialized.
+  void ClearMessages();
+
 protected:
   vtkPVPythonInterpretor();
   ~vtkPVPythonInterpretor();
 
   // Description:
   // Initialize the interpretor.
-  void InitializeInternal();
+  virtual void InitializeInternal();
 
   char* ExecutablePath;
   vtkSetStringMacro(ExecutablePath);
 
+  bool CaptureStreams;
+
+  friend struct vtkPVPythonInterpretorWrapper;
+
+  void DumpError(const char* string);
+  void DumpOutput(const char* string);
+  
 private:
   vtkPVPythonInterpretor(const vtkPVPythonInterpretor&); // Not implemented.
   void operator=(const vtkPVPythonInterpretor&); // Not implemented.

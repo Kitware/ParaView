@@ -25,7 +25,8 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/vtkPythonAppInitConfigure.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/vtkPythonAppInitConfigure.h)
 
 ADD_LIBRARY(vtkPVPythonInterpretor
-  vtkPVPythonInterpretor.cxx)
+  vtkPVPythonInterpretor.cxx
+  vtkPVPythonInteractiveInterpretor.cxx)
 
 ADD_EXECUTABLE(pvpython${PV_EXE_SUFFIX}
   pvpython.cxx

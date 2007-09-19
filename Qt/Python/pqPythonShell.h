@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QtPythonExport.h"
 #include <QWidget>
-
 /**
   Qt widget that provides an interactive "shell" interface to an embedded Python interpreter.
   You can put an instance of pqPythonShell in a dialog or a window, and the user will be able
@@ -44,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   \sa pqConsoleWidget, pqPythonDialog
 */  
   
+class vtkObject;
 class QTPYTHON_EXPORT pqPythonShell :
   public QWidget
 {
@@ -63,8 +63,9 @@ public slots:
   void executeScript(const QString&);
 
 private slots:
-  void printStdout(const QString&);
-  void printStderr(const QString&);
+  void printStderr(vtkObject*, unsigned long, void*, void*);
+  void printStdout(vtkObject*, unsigned long, void*, void*);
+
   void onExecuteCommand(const QString&);
 
 private:
@@ -76,6 +77,9 @@ private:
 
   struct pqImplementation;
   pqImplementation* const Implementation;
+
+  void printStderr(const QString&);
+  void printStdout(const QString&);
 };
 
 #endif // !_pqPythonShell_h

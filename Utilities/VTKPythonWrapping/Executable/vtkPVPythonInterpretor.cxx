@@ -16,14 +16,14 @@
 #include "vtkPython.h"
 #include "vtkPVPythonInterpretor.h"
 
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPythonAppInitConfigure.h"
+#include "vtkStdString.h"
 #include "vtkWindows.h"
-
 #include "pvpythonmodules.h"
 
 #include <vtksys/SystemTools.hxx>
-
 #include <vtkstd/algorithm>
 #include <vtkstd/string>
 
@@ -57,6 +57,7 @@ extern "C" {
   extern DL_IMPORT(int) Py_Main(int, char **);
 }
 
+#include "vtkPVPythonInterpretorWrapper.h"
 //----------------------------------------------------------------------------
 static void vtkPythonAppInitPrependPythonPath(const char* dir)
 {
@@ -166,12 +167,20 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
     }
 }
 
+struct vtkPythonMessage
+{
+  vtkStdString Message;
+  bool IsError;
+};
+
 //-----------------------------------------------------------------------------
 class vtkPVPythonInterpretorInternal
 {
 public:
   PyThreadState* Interpretor;
   PyThreadState* ParentThreadState;
+  vtkstd::vector<vtkPythonMessage> Messages;
+
   static int GILByPVPythonInterpretor;
   static bool MultithreadSupport;
 
@@ -264,13 +273,14 @@ void vtkPVPythonInterpretor::SetMultithreadSupport(bool enable)
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.21");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.22");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
 {
   this->Internal = new vtkPVPythonInterpretorInternal();
   this->ExecutablePath = 0;
+  this->CaptureStreams = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -278,6 +288,76 @@ vtkPVPythonInterpretor::~vtkPVPythonInterpretor()
 {
   delete this->Internal;
   this->SetExecutablePath(0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPythonInterpretor::DumpError(const char* str)
+{
+  vtkPythonMessage msg;
+  msg.Message = str;
+  msg.IsError = true;
+  if (msg.Message.size() > 0)
+    {
+    // add new entry only if type changed.
+    if (this->Internal->Messages.size() > 0 &&
+      this->Internal->Messages.back().IsError)
+      {
+      this->Internal->Messages.back().Message += str; 
+      }
+    else
+      {
+      this->Internal->Messages.push_back(msg);
+      }
+    this->InvokeEvent(vtkCommand::ErrorEvent, const_cast<char*>(str));
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPythonInterpretor::DumpOutput(const char* str)
+{
+  vtkPythonMessage msg;
+  msg.Message = str;
+  msg.IsError = false;
+  if (msg.Message.size() > 0)
+    {
+    // add new entry only if type changed.
+    if (this->Internal->Messages.size() > 0 &&
+      !this->Internal->Messages.back().IsError)
+      {
+      this->Internal->Messages.back().Message += str; 
+      }
+    else
+      {
+      this->Internal->Messages.push_back(msg);
+      }
+    this->InvokeEvent(vtkCommand::WarningEvent, const_cast<char*>(str));
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPythonInterpretor::FlushMessages()
+{
+  vtkstd::vector<vtkPythonMessage>::iterator iter = 
+    this->Internal->Messages.begin();
+
+  for (; iter != this->Internal->Messages.end(); ++iter)
+    {
+    if (iter->IsError)
+      {
+      vtkOutputWindowDisplayErrorText(iter->Message.c_str());
+      }
+    else
+      {
+      vtkOutputWindowDisplayText(iter->Message.c_str());
+      }
+    }
+  this->ClearMessages();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPythonInterpretor::ClearMessages()
+{
+  this->Internal->Messages.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -302,6 +382,25 @@ void vtkPVPythonInterpretor::InitializeInternal()
     // the VTK python modules.
     vtkstd::string self_dir = vtksys::SystemTools::GetFilenamePath(exe_str);
     vtkPythonAppInitPrependPath(self_dir.c_str());
+    }
+
+  if (this->CaptureStreams)
+    {
+    vtkPVPythonInterpretorWrapper* wrapperOut = vtkWrapInterpretor(this);
+    wrapperOut->DumpToError = false;
+
+    vtkPVPythonInterpretorWrapper* wrapperErr = vtkWrapInterpretor(this);
+    wrapperErr->DumpToError = true;
+
+    // Redirect Python's stdout and stderr
+    PySys_SetObject(const_cast<char*>("stdout"), 
+      reinterpret_cast<PyObject*>(wrapperOut));
+
+    PySys_SetObject(const_cast<char*>("stderr"), 
+      reinterpret_cast<PyObject*>(wrapperErr));
+
+    Py_DECREF(wrapperOut);
+    Py_DECREF(wrapperErr);
     }
 }
 
