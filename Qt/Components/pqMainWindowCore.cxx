@@ -2276,6 +2276,8 @@ void pqMainWindowCore::onServerDisconnect()
     {
     core->getObjectBuilder()->removeServer(server);
     }
+  QList<QWidget*> removed;
+  this->Implementation->MultiViewManager.reset(removed);
 
   pqEventDispatcher::processEventsAndWait(1);
 
