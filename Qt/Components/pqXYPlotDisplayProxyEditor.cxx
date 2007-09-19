@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QColorDialog>
 #include <QHeaderView>
 #include <QItemDelegate>
+#include <QKeyEvent>
 #include <QList>
 #include <QPointer>
 #include <QPixmap>
@@ -178,6 +179,8 @@ class pqLineSeriesEditorDelegate : public QItemDelegate
 public:
   pqLineSeriesEditorDelegate(QObject *parent=0);
   virtual ~pqLineSeriesEditorDelegate() {}
+
+  virtual bool eventFilter(QObject *object, QEvent *e);
 
   virtual QWidget *createEditor(QWidget *parent,
       const QStyleOptionViewItem &option, const QModelIndex &index) const;
@@ -470,11 +473,6 @@ bool pqLineSeriesEditorModel::setData(const QModelIndex &idx,
       }
     }
 
-  if(result)
-    {
-    emit this->dataChanged(idx, idx);
-    }
-
   return result;
 }
 
@@ -579,6 +577,33 @@ void pqLineSeriesEditorModel::cleanupItems()
 pqLineSeriesEditorDelegate::pqLineSeriesEditorDelegate(QObject *parentObject)
   : QItemDelegate(parentObject)
 {
+}
+
+bool pqLineSeriesEditorDelegate::eventFilter(QObject *object, QEvent *e)
+{
+  // When the user presses the tab key, Qt tries to edit the next
+  // item. If the item is not editable, Qt pops up a warning
+  // "edit: editing failed". According to the tree view, the next
+  // item is always in column zero, which is never editable. This
+  // workaround avoids the edit next hint to prevent the message.
+  if(e->type() == QEvent::KeyPress)
+    {
+    QKeyEvent *ke = static_cast<QKeyEvent *>(e);
+    if(ke->key() == Qt::Key_Tab || ke->key() == Qt::Key_Backtab)
+      {
+      QWidget *editor = qobject_cast<QWidget *>(object);
+      if(!editor)
+        {
+        return false;
+        }
+
+      emit this->commitData(editor);
+      emit this->closeEditor(editor, QAbstractItemDelegate::NoHint);
+      return true;
+      }
+    }
+
+  return QItemDelegate::eventFilter(object, e);
 }
 
 QWidget *pqLineSeriesEditorDelegate::createEditor(QWidget *parentWidget,
