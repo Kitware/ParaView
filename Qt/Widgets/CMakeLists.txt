@@ -38,6 +38,8 @@ SET(QtWidgets_SRCS
   pqDelimitedTextParser.h
   pqDoubleRangeWidget.cxx
   pqDoubleRangeWidget.h
+  pqDoubleSpinBox.cxx
+  pqDoubleSpinBox.h
   pqFlatTreeView.cxx
   pqFlatTreeView.h
   pqLineEditNumberValidator.cxx
@@ -98,6 +100,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqConsoleWidget.h
   pqDelimitedTextParser.h
   pqDoubleRangeWidget.h
+  pqDoubleSpinBox.h
   pqFlatTreeView.h
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.h
