@@ -14,7 +14,7 @@ object5 = 'MainWindow/VCRToolbar/1QToolButton2'
 QtTesting.playCommand(object5, 'activate', '')
 
 while QtTesting.getProperty(object5, 'text') != 'Play':
-  time.sleep(0.01)
+  time.sleep(0.2)
 
 snapshotWidget = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
 QtTestingImage.compareImage(snapshotWidget, 'VCRAnimation.png', 300, 300);
