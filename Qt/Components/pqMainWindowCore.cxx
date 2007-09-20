@@ -574,6 +574,9 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     &this->Implementation->PendingDisplayManager);
   core->registerManager("MULTIVIEW_MANAGER",
     &this->Implementation->MultiViewManager);
+  core->registerManager("SELECTION_MANAGER",
+    &this->Implementation->SelectionManager);
+
 
   // Connect the view manager to the pqActiveView.
   QObject::connect(&this->Implementation->MultiViewManager,
