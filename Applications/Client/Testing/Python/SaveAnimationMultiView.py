@@ -4,11 +4,6 @@ import QtTesting
 import QtTestingImage
 import time
 
-object1 = 'MainWindow/menubar/menuFile'
-QtTesting.playCommand(object1, 'activate', 'actionServerConnect')
-object2 = 'MainWindow/ServerStartupBrowser/connect'
-QtTesting.playCommand(object2, 'activate', '')
-
 object1 = 'MainWindow/menubar/menuSources'
 QtTesting.playCommand(object1, 'activate', 'Wavelet')
 object2 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept'
@@ -79,20 +74,19 @@ QtTesting.playCommand(object11, 'activate', 'Animation Inspector')
 QtTesting.playCommand(object11, 'activate', 'Object Inspector')
 QtTesting.playCommand(object11, 'activate', 'Pipeline Browser')
 QtTesting.playCommand(object9, 'activate', 'actionFileSaveAnimation')
-objectSaveAnimationDialog = 'MainWindow/FileSaveAnimationDialog'
-QtTesting.playCommand(objectSaveAnimationDialog, 'filesSelected', '$PARAVIEW_TEST_ROOT/movie_test.png')
 object21 = 'Dialog/spinBoxWidth'
 QtTesting.playCommand(object21, 'set_int', '800')
 object22 = 'Dialog/spinBoxHeight'
 QtTesting.playCommand(object22, 'set_int', '800')
 object22 = 'Dialog/okButton'
 QtTesting.playCommand(object22, 'activate', '')
+objectSaveAnimationDialog = 'FileSaveAnimationDialog'
+QtTesting.playCommand(objectSaveAnimationDialog, 'filesSelected', '$PARAVIEW_TEST_ROOT/movie_test.png')
 
-print 'wait 1 sec'
-QtTesting.wait(1000);
+time.sleep(3);
 objectPlayButton = 'MainWindow/VCRToolbar/1QToolButton2'
-while QtTesting.getProperty(objectPlayButton, "text") == 'Pause' :
-  print 'wait 2 sec'
-  QtTesting.wait(2000);
+while QtTesting.getProperty(objectPlayButton, "text") != 'Play' :
+  time.sleep(1);
 
 QtTestingImage.compareImage('$PARAVIEW_TEST_ROOT/movie_test.0005.png', 'SaveAnimationMultiView.png');
+

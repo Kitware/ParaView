@@ -151,17 +151,10 @@ IF(BUILD_TESTING)
     # ColorEditor3 doesn't work in client/server mode
     ColorEditor3
     CreateSourceWithoutConnect
-    # flow crashes in SurfaceVectors in an mpi build in client/server mode
-    ExodusWriter
 #    LoadStateSelection
     OpenFile
     OpenSaveData
-    PropertyLink
-    # PropertyLink doesn't work in client/server mode
-    SimpleInteraction
 #    SelectionUndo
-    VariableSelector
-    ViewSettingsDialog
     )
 
   SET (TESTS_WITHOUT_BASELINES
@@ -188,8 +181,8 @@ IF(BUILD_TESTING)
         #HistogramChart
         LoadStateMultiView
         FileSeries
-        #SaveAnimationMultiView   -- need to fix timing issue
-# VCRAnimation -- enable after PVD reader supports time.
+        SaveAnimationMultiView
+        VCRAnimation
         )
 
       SET(PYTHON_TESTS_REMOTE_ONLY 
@@ -292,10 +285,12 @@ IF(BUILD_TESTING)
     ObjectInspectorSphere
     OrientationAxis
     Plot3DReader
+    PropertyLink
     RectilinearFractal
     RepresentationSelector
     SaveAnimationGeometry
     SelectReader
+    SimpleInteraction
     StreamTracer
     StreamTracerUpdates
     TemporalInterpolator
@@ -311,6 +306,8 @@ IF(BUILD_TESTING)
     UndoRedo5
     UndoRedo6
     UndoRedo7
+    VariableSelector
+    ViewSettingsDialog
     XdmfRead
     XdmfReadImageData
     XdmfReadImageDataCollection
