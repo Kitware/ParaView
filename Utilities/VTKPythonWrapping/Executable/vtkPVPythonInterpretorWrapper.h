@@ -49,8 +49,9 @@ struct vtkPVPythonInterpretorWrapper
 
 static PyObject* vtkWrite(PyObject* self, PyObject* args);
 
+// const_cast since older versions of python are not const correct.
 static PyMethodDef vtkPVPythonInterpretorWrapperMethods[] = {
-    {"write", vtkWrite, METH_VARARGS, "Dump message"},
+    {const_cast<char*>("write"), vtkWrite, METH_VARARGS, const_cast<char*>("Dump message")},
     {0, 0, 0, 0}
 };
 
@@ -121,11 +122,12 @@ static PyObject* vtkWrite(PyObject* self, PyObject* args)
     reinterpret_cast<vtkPVPythonInterpretorWrapper*>(self);
   
   char *string;
-  if (wrapper && PyArg_ParseTuple(args, "s", &string))
+  // const_cast since older versions of python are not const correct.
+  if (wrapper && PyArg_ParseTuple(args, const_cast<char*>("s"), &string))
     {
     wrapper->Write(string);
     }
-  return Py_BuildValue("");
+  return Py_BuildValue(const_cast<char*>(""));
 }
 
 static vtkPVPythonInterpretorWrapper* vtkWrapInterpretor(vtkPVPythonInterpretor* interpretor)
