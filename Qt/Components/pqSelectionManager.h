@@ -84,6 +84,10 @@ public:
   /// For the current selection, returns the list of global ids selected. This
   /// valid only if the selected data source indeed has global ids.
   QList<vtkIdType> getGlobalIDs();
+ 
+  /// For the given parameters, returns the list of global ids selected. This
+  /// valid only if the selected data source indeed has global ids.  
+  QList<vtkIdType> getGlobalIDs(vtkSMProxy* selectionSource,pqOutputPort* opport);
 
   /// For the current selection, returns the list of indices selected.
   QList<QPair<int, vtkIdType> > getIndices();

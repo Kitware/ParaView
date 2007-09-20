@@ -278,11 +278,16 @@ static void getIndices(vtkSelection* sel, QList<QPair<int, vtkIdType> >& indices
 //-----------------------------------------------------------------------------
 QList<vtkIdType> pqSelectionManager::getGlobalIDs()
 {
-  QList<vtkIdType> gids;
-
-  vtkSMProxy* selectionSource = this->Implementation->getSelectionSourceProxy();
-  int selectionPort = 0;
+ vtkSMProxy* selectionSource = this->Implementation->getSelectionSourceProxy();
   pqOutputPort* opport = this->getSelectedPort();
+  return this->getGlobalIDs(selectionSource,opport);
+}
+
+//-----------------------------------------------------------------------------
+QList<vtkIdType> pqSelectionManager::getGlobalIDs(vtkSMProxy* selectionSource,pqOutputPort* opport)
+{
+  QList<vtkIdType> gids;
+  int selectionPort = 0;
   vtkSMProxy* dataSource = opport->getSource()->getProxy();
   int dataPort = opport->getPortNumber();
 
