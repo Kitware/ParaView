@@ -203,42 +203,6 @@ QtTesting_setProperty(PyObject* /*self*/, PyObject* args)
 }
 
 static PyObject*
-QtTesting_wait(PyObject* /*self*/, PyObject* args)
-{
-  // void QtTesting.wait(msec)
-  
-  int ms = 0;
-
-  if(!PyArg_ParseTuple(args, const_cast<char*>("i"), &ms))
-    {
-    PyErr_SetString(PyExc_TypeError, "bad arguments to wait(msec)");
-    return NULL;
-    }
-
-  if(Instance && QThread::currentThread() != QApplication::instance()->thread())
-    {
-    QMetaObject::invokeMethod(Instance, "threadWait", Qt::QueuedConnection,
-                              Q_ARG(int, ms) );
-    if(!Instance->waitForGUI())
-      {
-      PyErr_SetString(PyExc_ValueError, "error waiting");
-      return NULL;
-      }
-    }
-  else if(QThread::currentThread() == QApplication::instance()->thread())
-    {
-    pqPythonEventSource::wait(ms);
-    }
-  else
-    {
-    PyErr_SetString(PyExc_AssertionError, "pqPythonEventSource not defined");
-    return NULL;
-    }
-
-  return Py_BuildValue(const_cast<char*>(""));
-}
-
-static PyObject*
 QtTesting_getQtVersion(PyObject* /*self*/, PyObject* /*args*/)
 {
   // string QtTesting.getQtVersion()
@@ -374,13 +338,6 @@ static PyMethodDef QtTestingMethods[] = {
     QtTesting_getQtVersion,
     METH_VARARGS,
     const_cast<char*>("Get the version of Qt being used.")
-  },
-  {
-    const_cast<char*>("wait"),
-    QtTesting_wait,
-    METH_VARARGS,
-    const_cast<char*>("Have the python script wait for a specfied number"
-                      " of msecs, while the Qt app is alive.")
   },
   {
     const_cast<char*>("getChildren"),
@@ -588,16 +545,5 @@ QString pqPythonEventSource::invokeMethod(QString& object, QString& method)
       }
     }
   return ret.toString();
-}
-
-void pqPythonEventSource::threadWait(int ms)
-{
-  this->wait(ms);
-  this->guiAcknowledge();
-}
-
-void pqPythonEventSource::wait(int ms)
-{
-  pqEventDispatcher::processEventsAndWait(ms);
 }
 
