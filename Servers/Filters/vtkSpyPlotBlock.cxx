@@ -206,7 +206,6 @@ int vtkSpyPlotBlock::FixInformation(const vtkBoundingBox &globalBounds,
                                     vtkDataArray *ca[3]
   )
 {
-  
   // This better not be a AMR block!
   assert("Check Block is not AMR" && (!this->IsAMR()));
   const double *minP = globalBounds.GetMinPoint();
@@ -214,12 +213,42 @@ int vtkSpyPlotBlock::FixInformation(const vtkBoundingBox &globalBounds,
 
   this->GetExtents(extents);
 
+  if (this->Status.Fixed)
+    {
+    //if a previous run through removed the invalid ghost cells,
+    //reuse the extent and geometry information calculated then
+    extents[0] = this->SavedExtents[0] ;
+    extents[1] = this->SavedExtents[1] ;
+    extents[2] = this->SavedExtents[2] ;
+    extents[3] = this->SavedExtents[3] ;
+    extents[4] = this->SavedExtents[4] ;
+    extents[5] = this->SavedExtents[5] ;
+    realExtents[0] = this->SavedRealExtents[0] ;
+    realExtents[1] = this->SavedRealExtents[1] ;
+    realExtents[2] = this->SavedRealExtents[2] ;
+    realExtents[3] = this->SavedRealExtents[3] ;
+    realExtents[4] = this->SavedRealExtents[4] ;
+    realExtents[5] = this->SavedRealExtents[5] ;
+    realDims[0] = this->SavedRealDims[0] ;
+    realDims[1] = this->SavedRealDims[1] ;
+    realDims[2] = this->SavedRealDims[2] ;
+
+    for (int i = 0; i < 3; i++)
+      {
+      if (this->Dimensions[i] == 1)
+        {
+          ca[i] = 0;
+          continue;
+        }      
+      ca[i] = this->XYZArrays[i];
+      }
+    return 1;
+    }
+  
+
   int i, j, hasBadGhostCells = 0;
   int vectorsWereFixed = 0;
  
-  /*cout  << "Dims: " << this->Dimensions[0] << " " 
-    << this->Dimensions[1] << " " << this->Dimensions[2] << endl;
-  */
   vtkDebugMacro( "Vectors for block: ");
   vtkDebugMacro( "  X: " << this->XYZArrays[0]->GetNumberOfTuples() );
   vtkDebugMacro( "  Y: " << this->XYZArrays[1]->GetNumberOfTuples() );
@@ -280,6 +309,21 @@ int vtkSpyPlotBlock::FixInformation(const vtkBoundingBox &globalBounds,
     }
   if (vectorsWereFixed)
     {
+    this->SavedExtents[0] = extents[0];
+    this->SavedExtents[1] = extents[1];
+    this->SavedExtents[2] = extents[2];
+    this->SavedExtents[3] = extents[3];
+    this->SavedExtents[4] = extents[4];
+    this->SavedExtents[5] = extents[5];
+    this->SavedRealExtents[0] = realExtents[0];
+    this->SavedRealExtents[1] = realExtents[1];
+    this->SavedRealExtents[2] = realExtents[2];
+    this->SavedRealExtents[3] = realExtents[3];
+    this->SavedRealExtents[4] = realExtents[4];
+    this->SavedRealExtents[5] = realExtents[5];
+    this->SavedRealDims[0] = realDims[0];
+    this->SavedRealDims[1] = realDims[1];
+    this->SavedRealDims[2] = realDims[2];
     this->Status.Fixed = 1;
     }
   return hasBadGhostCells;

@@ -94,6 +94,11 @@ protected:
   BlockStatusType Status;
   int Level;
   vtkFloatArray* XYZArrays[3];
+
+  //for restoring structured once external ghost cells are removed
+  int SavedExtents[6];
+  int SavedRealExtents[6];
+  int SavedRealDims[6];
 };
 
 inline int vtkSpyPlotBlock::GetLevel() const 
