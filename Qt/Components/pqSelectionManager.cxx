@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
+#include "pqServerManagerSelectionModel.h"
 #include "pqSMAdaptor.h"
 
 #include "pqServer.h"
@@ -193,6 +194,13 @@ void pqSelectionManager::onSelected(pqOutputPort* selectedPort)
   if (selectedPort)
     {
     selectedPort->renderAllViews(false);
+
+    // update the servermanagermodel selection so that the pipeline browser
+    // knows which source was selected.
+    pqApplicationCore* core = pqApplicationCore::instance();
+    pqServerManagerSelectionModel* selModel = core->getSelectionModel();
+    selModel->setCurrentItem(selectedPort,
+      pqServerManagerSelectionModel::ClearAndSelect);
     }
 
   emit this->selectionChanged(this);
