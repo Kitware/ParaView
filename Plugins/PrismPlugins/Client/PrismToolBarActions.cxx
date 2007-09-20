@@ -274,36 +274,24 @@ void PrismToolBarActions::onSelectionChanged()
 {
   pqServerManagerModelItem *item = this->getActiveObject();
   pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
-  //pqServer* server = dynamic_cast<pqServer*>(item);
-  if (source)
+  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxy* prismFilter = proxyManager->GetProxy("filters_prototypes", "PrismFilter");
+  
+  if (source && prismFilter)
     {
-      vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
-    vtkSMProxy* prismFilter = proxyManager->GetProxy("filters_prototypes",
-      "PrismFilter");
-
-
-    vtkSMInputProperty *input = vtkSMInputProperty::SafeDownCast(
-      prismFilter->GetProperty("Input"));
+    vtkSMProperty *input = prismFilter->GetProperty("Input");
     if(input)
       {
-      input->RemoveAllUncheckedProxies();
-      input->AddUncheckedInputConnection(source->getProxy(), 0);
-
+      pqSMAdaptor::setUncheckedProxyProperty(input, source->getProxy());
       if(input->IsInDomains())
         {
         this->SesameViewAction->setEnabled(true);
-        }
-      else
-        {
-        this->SesameViewAction->setEnabled(false);
+        return;
         }
       }
     }
-    else
-      {
-      this->SesameViewAction->setEnabled(false);
-      }
 
+  this->SesameViewAction->setEnabled(false);
 }
 
 pqServerManagerModelItem *PrismToolBarActions::getActiveObject() const
