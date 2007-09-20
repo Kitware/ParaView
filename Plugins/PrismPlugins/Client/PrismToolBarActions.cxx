@@ -39,7 +39,7 @@ PrismToolBarActions::PrismToolBarActions(QObject* p)
   pqServerManagerModel* model=pqApplicationCore::instance()->getServerManagerModel();
 
   this->connect(model, SIGNAL(connectionAdded(pqPipelineSource*,pqPipelineSource*, int)),
-      this, SLOT(onConnectionAdded(pqPipelineSource*,pqPipelineSource*, int)));
+      this, SLOT(onConnectionAdded(pqPipelineSource*,pqPipelineSource*)));
 
   pqServerManagerSelectionModel *selection =
       pqApplicationCore::instance()->getSelectionModel();
@@ -96,7 +96,7 @@ pqPipelineSource* PrismToolBarActions::createFilterForActiveSource(
 }
 
 void PrismToolBarActions::onConnectionAdded(pqPipelineSource* source, 
-    pqPipelineSource* consumer, int srcOutputPort)
+    pqPipelineSource* consumer)
 {
   if (consumer)
     {
@@ -126,7 +126,7 @@ void PrismToolBarActions::onConnectionAdded(pqPipelineSource* source,
 
 
 
-void PrismToolBarActions::onPrismRepresentationAdded(pqPipelineSource* source,
+void PrismToolBarActions::onPrismRepresentationAdded(pqPipelineSource* ,
                                                       pqDataRepresentation* repr,
                                                       int srcOutputPort)
 {
@@ -137,7 +137,7 @@ void PrismToolBarActions::onPrismRepresentationAdded(pqPipelineSource* source,
   
 }
 void PrismToolBarActions::onPrismSelection(vtkObject* caller,
-                                              unsigned long vtk_event,
+                                              unsigned long,
                                               void* client_data, void* call_data)
 {
 
@@ -147,7 +147,7 @@ void PrismToolBarActions::onPrismSelection(vtkObject* caller,
     {
     this->ProcessingEvent=true;
 
-    unsigned int portIndex = (unsigned int)call_data;
+    unsigned int portIndex = *(unsigned int*)call_data;
     vtkSMSourceProxy* prismP=static_cast<vtkSMSourceProxy*>(caller);
     vtkSMSourceProxy* sourceP=static_cast<vtkSMSourceProxy*>(client_data);
 
@@ -206,7 +206,7 @@ void PrismToolBarActions::onPrismSelection(vtkObject* caller,
 }
 
 void PrismToolBarActions::onGeometrySelection(vtkObject* caller,
-                                              unsigned long vtk_event,
+                                              unsigned long,
                                               void* client_data, void* call_data)
 {
 
@@ -214,7 +214,7 @@ void PrismToolBarActions::onGeometrySelection(vtkObject* caller,
     {
     this->ProcessingEvent=true;
 
-    unsigned int portIndex = (unsigned int)call_data;
+    unsigned int portIndex = *(unsigned int*)call_data;
     vtkSMSourceProxy* sourceP=static_cast<vtkSMSourceProxy*>(caller);
     vtkSMSourceProxy* prismP=static_cast<vtkSMSourceProxy*>(client_data);
 
