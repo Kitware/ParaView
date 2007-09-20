@@ -49,7 +49,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.18");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.19");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -510,6 +510,15 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
   vtkErrorMacro("GetWindowsDirectoryListing cannot be called on non-Windows systems.");
 #endif
 }
+
+/* There is a problem with the Portland compiler, large file
+support and glibc/Linux system headers: 
+             http://www.pgroup.com/userforum/viewtopic.php?
+             p=1992&sid=f16167f51964f1a68fe5041b8eb213b6
+*/
+#if defined(__PGI) && defined(__USE_FILE_OFFSET64)
+# define dirent dirent64
+#endif
 
 //-----------------------------------------------------------------------------
 void vtkPVFileInformation::GetDirectoryListing()

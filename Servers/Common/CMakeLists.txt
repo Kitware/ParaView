@@ -26,8 +26,6 @@ SET(Kit_SRCS
   vtkCellIntegrator.cxx
   vtkClientConnection.cxx
   vtkConnectionIterator.cxx
-  vtkMPIMToNSocketConnection.cxx
-  vtkMPIMToNSocketConnectionPortInformation.cxx
   vtkMPISelfConnection.cxx
   vtkProcessModuleConnection.cxx
   vtkProcessModuleConnectionManager.cxx
@@ -54,7 +52,6 @@ SET(Kit_SRCS
   vtkPVSelectionInformation.cxx
   vtkPVServerInformation.cxx
   vtkPVServerOptions.cxx
-  vtkPVServerSocket.cxx
   vtkPVTimerInformation.cxx
   vtkRemoteConnection.cxx
   vtkSelectionConverter.cxx
@@ -65,7 +62,14 @@ SET(Kit_SRCS
   vtkUndoElement.cxx
   vtkUndoSet.cxx
   vtkUndoStack.cxx
-  )
+
+# these files seem to be socket related, so for Cray Xt3/Catamount they probably have to 
+# be excluded, e.g. via IF(HAVE_SOCKETS) coming from VTK/Parallel/VTKParallelCMakeTests.cmake, Alex
+    vtkMPIMToNSocketConnection.cxx
+    vtkMPIMToNSocketConnectionPortInformation.cxx
+    vtkPVServerSocket.cxx )
+
+
 
 # Abstract and Wrap exclude
 SET_SOURCE_FILES_PROPERTIES(
