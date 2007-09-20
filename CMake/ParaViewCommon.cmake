@@ -241,6 +241,15 @@ IF(CMAKE_SYSTEM MATCHES AIX  AND CMAKE_CXX_COMPILER MATCHES xlC)
   ENDIF(_XLC_COMPILER_HAS_INITFINI)
 ENDIF(CMAKE_SYSTEM MATCHES AIX  AND CMAKE_CXX_COMPILER MATCHES xlC)
 
+# Cray Xt3/Catamount does support only a subset of networking/posix/etc. functions
+# nevertheless many of them are part of the libc, but when linking the linker warns
+#: warning: warning: socket is not implemented and will always fail
+# --fatal-warnings makes the test fail in this case
+IF(CMAKE_SYSTEM MATCHES Catamount)
+  SET(CMAKE_REQUIRED_FLAGS -Wl,--fatal-warnings)
+ENDIF(CMAKE_SYSTEM MATCHES Catamount)
+
+
 
 #########################################################################
 # Configure Testing
