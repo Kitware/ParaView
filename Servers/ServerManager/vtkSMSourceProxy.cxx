@@ -38,7 +38,7 @@
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.57");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.58");
 
 struct vtkSMSourceProxyInternals
 {
@@ -586,6 +586,7 @@ void vtkSMSourceProxy::SetSelectionInput(unsigned int portIndex,
     pp->RemoveAllProxies();
     pp->AddInputConnection(input, outputport);
     esProxy->UpdateVTKObjects();
+    this->InvokeEvent(vtkCommand::SelectionChangedEvent,(void*)portIndex);
     }
 }
 
