@@ -254,8 +254,13 @@ IF(HDF5_STREAM_VFD)
   CHECK_INCLUDE_FILE_CONCAT("netdb.h" HAVE_NETDB_H)
   CHECK_INCLUDE_FILE_CONCAT("netinet/tcp.h" HAVE_NETINET_TCP_H)
   CHECK_INCLUDE_FILE_CONCAT("sys/filio.h" HAVE_SYS_FILIO_H)
-  SET(HAVE_STREAM 1)
+  SET(H5_HAVE_STREAM 1)
 ENDIF(HDF5_STREAM_VFD)
+
+# Cray Xt3/Catamount doesn't support IP networking
+IF(CMAKE_SYSTEM MATCHES Catamount)
+  SET(H5_HAVE_STREAM 0)
+ENDIF(CMAKE_SYSTEM MATCHES Catamount)
 
 
 # For other other specific tests, use this macro.

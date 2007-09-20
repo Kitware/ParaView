@@ -260,7 +260,7 @@
 #cmakedefine HAVE_STRDUP ${HAVE_STRDUP}
 
 /* Define if the stream virtual file driver should be compiled */
-#cmakedefine HAVE_STREAM ${HAVE_STREAM}
+#cmakedefine H5_HAVE_STREAM ${H5_HAVE_STREAM}
 
 /* Define to 1 if you have the <strings.h> header file. */
 #cmakedefine HAVE_STRINGS_H ${HAVE_STRINGS_H}
