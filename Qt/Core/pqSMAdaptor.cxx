@@ -1552,6 +1552,11 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
     {
     bool ok = true;
     int v = Value.toInt(&ok);
+    if (!ok && Value.canConvert(QVariant::Bool))
+      {
+      v = Value.toBool()? 1 : 0;
+      ok = true;
+      }
     if(ok)
       {
       ivp->SetElement(Index, v);
