@@ -972,7 +972,6 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
   int rowCount = 0;
   int skippedFirstFileProperty = 0;
   bool isCompoundProxy = pxy->IsA("vtkSMCompoundProxy");
-  bool isSourceProxy = !pxy->GetProperty("Input");
 
   // query for proxy properties, and create widgets
   vtkSMOrderedPropertyIterator *iter = vtkSMOrderedPropertyIterator::New();
@@ -1036,9 +1035,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
 
     if (!propertiesToShow.contains(propertyName))
       {
-      if (isSourceProxy &&
-          SMProperty->IsA("vtkSMStringVectorProperty") && 
-          !skippedFirstFileProperty)
+      if (SMProperty->IsA("vtkSMStringVectorProperty") && !skippedFirstFileProperty)
         {
         // Do not show the first file property. We do not allow changing of
         // the main filename from the gui. The user has to create another
