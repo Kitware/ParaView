@@ -10,7 +10,7 @@ object2 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stacke
 QtTesting.playCommand(object2, 'activate', '')
 object6 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_tabbar'
 QtTesting.playCommand(object6, 'set_tab', '1')
-object24 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/groupBox_2/StyleRepresentation/comboBox'
+object24 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/StyleGroup/StyleRepresentation/comboBox'
 QtTesting.playCommand(object24, 'set_string', 'Surface')
 object25 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables'
 QtTesting.playCommand(object25, 'set_string', 'RTData')
