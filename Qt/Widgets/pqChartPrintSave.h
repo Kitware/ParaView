@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqActiveRenderViewOptions.h
+   Module:    pqChartPrintSave.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,47 +30,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqActiveRenderViewOptions.h
-/// \date 7/31/2007
-
-#ifndef _pqActiveRenderViewOptions_h
-#define _pqActiveRenderViewOptions_h
+#ifndef _pqChartPrintSave_h
+#define _pqChartPrintSave_h
 
 
-#include "pqComponentsExport.h"
-#include "pqActiveViewOptions.h"
+#include "QtWidgetsExport.h"
+#include <QObject>
+
+class QMenu;
+class QWidget;
 
 
-/// \class pqActiveRenderViewOptions
-/// \brief
-///   The pqActiveRenderViewOptions class is used to dislpay an
-///   options dialog for the render view.
-class PQCOMPONENTS_EXPORT pqActiveRenderViewOptions :
-    public pqActiveViewOptions
+class QTWIDGETS_EXPORT pqChartPrintSave : public QObject
 {
   Q_OBJECT
 
 public:
-  /// \brief
-  ///   Creates a render view options instance.
-  /// \param parent The parent object.
-  pqActiveRenderViewOptions(QObject *parent=0);
-  virtual ~pqActiveRenderViewOptions();
+  pqChartPrintSave(QObject *parent=0);
+  virtual ~pqChartPrintSave() {}
 
-  /// \name pqActiveViewOptions Methods
-  //@{
-  virtual void showOptions(pqView *view, const QString &page,
-      QWidget *parent=0);
-  virtual void changeView(pqView *view);
-  virtual void closeOptions();
-  //@}
+  void addMenuActions(QMenu &menu, QWidget *chart) const;
 
 protected slots:
-  void finishDialog();
-
-private:
-  class pqInternal;
-  pqInternal* Internal;
+  void printChart();
+  void savePDF();
+  void savePNG();
 };
 
 #endif

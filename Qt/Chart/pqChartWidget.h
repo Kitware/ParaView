@@ -138,6 +138,23 @@ public slots:
   /// \param filename The name of the file to write.
   void saveChart(const QString &filename);
 
+signals:
+  /// \brief
+  ///   Emitted when a new chart title has been set.
+  /// \param title The new chart title.
+  void newChartTitle(pqChartTitle *title);
+
+  /// \brief
+  ///   Emitted when a new chart legend has been set.
+  /// \param legend The new chart legend.
+  void newChartLegend(pqChartLegend *legend);
+
+  /// \brief
+  ///   Emitted when a new axis title has been set.
+  /// \param axis The axis location.
+  /// \param title The new axis title.
+  void newAxisTitle(pqChartAxis::AxisLocation axis, pqChartTitle *title);
+
 private slots:
   /// Moves the legend when the location changes.
   void changeLegendLocation();

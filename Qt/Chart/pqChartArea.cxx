@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartMouseBox.h"
 #include "pqChartLayer.h"
 
+#include <QCoreApplication>
 #include <QCursor>
 #include <QEvent>
 #include <QList>
@@ -91,6 +92,9 @@ public:
   pqChartAxis **Axis;           ///< Stores the axis objects.
   bool RangeChanged;            ///< True if the range has changed.
   bool InResize;                ///< True if the widget is resizing.
+  bool SkipContextMenu;         ///< Used for context menu interaction.
+  bool DelayContextMenu;        ///< Used for context menu interaction.
+  bool ContextMenuBlocked;      ///< Used for context menu interaction.
 };
 
 
@@ -110,6 +114,9 @@ pqChartAreaInternal::pqChartAreaInternal()
   this->Axis = new pqChartAxis *[pqChartAreaInternal::AxisCount];
   this->RangeChanged = false;
   this->InResize = false;
+  this->SkipContextMenu = false;
+  this->DelayContextMenu = false;
+  this->ContextMenuBlocked = false;
 
   // Initialize the axis pointers.
   for(int i = 0; i < pqChartAreaInternal::AxisCount; i++)
@@ -401,6 +408,16 @@ void pqChartArea::removeLayer(pqChartLayer *chart)
   chart->setContentsSpace(0);
   this->disconnect(chart, 0, this, 0);
   this->Internal->RangeChanged = true;
+}
+
+pqChartLayer *pqChartArea::getLayer(int index) const
+{
+  if(index >= 0 && index < this->Internal->Layers.size())
+    {
+    return this->Internal->Layers[index];
+    }
+
+  return 0;
 }
 
 int pqChartArea::getGridLayerIndex() const
@@ -849,13 +866,23 @@ bool pqChartArea::event(QEvent *e)
     // Layout the chart area.
     this->layoutChart();
     }
+  else if(e->type() == QEvent::ContextMenu)
+    {
+    QContextMenuEvent *cme = static_cast<QContextMenuEvent *>(e);
+    if(cme->reason() == QContextMenuEvent::Mouse &&
+        (this->Internal->SkipContextMenu || this->Internal->DelayContextMenu))
+      {
+      this->Internal->SkipContextMenu = false;
+      if(this->Internal->DelayContextMenu)
+        {
+        this->Internal->ContextMenuBlocked = true;
+        }
+
+      e->accept();
+      return true;
+      }
+    }
   // TODO
-  //else if(e->type() == QEvent::ContextMenu && this->Internal->SkipContextMenu)
-  //  {
-  //  this->Internal->SkipContextMenu = false;
-  //  e->accept();
-  //  return true;
-  //  }
   //else if(e->type() == QEvent::ToolTip)
   //  {
   //  this->LineChart->showTooltip(static_cast<QHelpEvent*>(e));
@@ -927,6 +954,12 @@ void pqChartArea::mousePressEvent(QMouseEvent *e)
   // Save the necessary coordinates.
   this->MouseBox->setStartingPosition(point);
 
+  // If the mouse button is the right button, delay the context menu.
+  if(e->button() == Qt::RightButton)
+    {
+    this->Internal->DelayContextMenu = true;
+    }
+
   // Let the interactor handle the rest of the event.
   if(this->Interactor)
     {
@@ -940,6 +973,13 @@ void pqChartArea::mousePressEvent(QMouseEvent *e)
 
 void pqChartArea::mouseMoveEvent(QMouseEvent *e)
 {
+  // When the mouse is moved, the context menu should not pop-up.
+  if(e->buttons() & Qt::RightButton)
+    {
+    this->Internal->SkipContextMenu = true;
+    this->Internal->DelayContextMenu = false;
+    }
+
   if(this->Interactor)
     {
     this->Interactor->mouseMoveEvent(e);
@@ -962,6 +1002,27 @@ void pqChartArea::mouseReleaseEvent(QMouseEvent *e)
     }
 
   this->MouseBox->resetRectangle();
+
+  if(e->button() == Qt::RightButton)
+    {
+    if(this->Internal->ContextMenuBlocked)
+      {
+      if(this->Internal->SkipContextMenu)
+        {
+        this->Internal->SkipContextMenu = false;
+        }
+      else if(this->Internal->DelayContextMenu)
+        {
+        // Re-send the context menu event.
+        QContextMenuEvent *cme = new QContextMenuEvent(
+            QContextMenuEvent::Mouse, e->pos(), e->globalPos());
+        QCoreApplication::postEvent(this, cme);
+        }
+      }
+
+    this->Internal->ContextMenuBlocked = false;
+    this->Internal->DelayContextMenu = false;
+    }
 }
 
 void pqChartArea::mouseDoubleClickEvent(QMouseEvent *e)

@@ -58,7 +58,7 @@ pqActiveRenderViewOptions::~pqActiveRenderViewOptions()
   delete this->Internal;
 }
 
-void pqActiveRenderViewOptions::showOptions(pqView *view,
+void pqActiveRenderViewOptions::showOptions(pqView *view, const QString &page,
     QWidget *widgetParent)
 {
   if(!this->Internal->Dialog)
@@ -69,10 +69,17 @@ void pqActiveRenderViewOptions::showOptions(pqView *view,
     this->Internal->Dialog->setWindowTitle("Render View Options");
     this->Internal->Options = new pqRenderViewOptions;
     this->Internal->Dialog->addOptions(this->Internal->Options);
-    QStringList pages = this->Internal->Options->getPageList();
-    if(pages.size())
+    if(page.isEmpty())
       {
-      this->Internal->Dialog->setCurrentPage(pages[0]);
+      QStringList pages = this->Internal->Options->getPageList();
+      if(pages.size())
+        {
+        this->Internal->Dialog->setCurrentPage(pages[0]);
+        }
+      }
+    else
+      {
+      this->Internal->Dialog->setCurrentPage(page);
       }
     
     this->connect(this->Internal->Dialog, SIGNAL(finished(int)),

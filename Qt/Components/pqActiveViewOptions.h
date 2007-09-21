@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 class pqView;
+class QString;
 class QWidget;
 
 
@@ -61,9 +62,15 @@ public:
 
   /// \brief
   ///   Opens the options dialog for the given view.
+  ///
+  /// If the \c page parameter is empty, the default page should be
+  /// shown.
+  ///
   /// \param view The view to show the options for.
+  /// \param page The path to the properties page to display.
   /// \param parent The parent widget for the options dialog.
-  virtual void showOptions(pqView *view, QWidget *parent=0) = 0;
+  virtual void showOptions(pqView *view, const QString &page,
+      QWidget *parent=0) = 0;
 
   /// \brief
   ///   Changes the view displayed in the options dialog.

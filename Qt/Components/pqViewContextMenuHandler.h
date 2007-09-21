@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqActiveRenderViewOptions.h
+   Module:    pqViewContextMenuHandler.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,47 +30,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqActiveRenderViewOptions.h
-/// \date 7/31/2007
+/// \file pqViewContextMenuHandler.h
+/// \date 9/19/2007
 
-#ifndef _pqActiveRenderViewOptions_h
-#define _pqActiveRenderViewOptions_h
+#ifndef _pqViewContextMenuHandler_h
+#define _pqViewContextMenuHandler_h
 
 
 #include "pqComponentsExport.h"
-#include "pqActiveViewOptions.h"
+#include <QObject>
+
+class pqView;
 
 
-/// \class pqActiveRenderViewOptions
+/// \class pqViewContextMenuHandler
 /// \brief
-///   The pqActiveRenderViewOptions class is used to dislpay an
-///   options dialog for the render view.
-class PQCOMPONENTS_EXPORT pqActiveRenderViewOptions :
-    public pqActiveViewOptions
+///   The pqViewContextMenuHandler class is used to setup and cleanup
+///   the context menu for a view of a given type.
+class PQCOMPONENTS_EXPORT pqViewContextMenuHandler : public QObject
 {
   Q_OBJECT
 
 public:
   /// \brief
-  ///   Creates a render view options instance.
+  ///   Constructs a view context menu handler.
   /// \param parent The parent object.
-  pqActiveRenderViewOptions(QObject *parent=0);
-  virtual ~pqActiveRenderViewOptions();
+  pqViewContextMenuHandler(QObject *parent=0);
+  virtual ~pqViewContextMenuHandler() {}
 
-  /// \name pqActiveViewOptions Methods
-  //@{
-  virtual void showOptions(pqView *view, const QString &page,
-      QWidget *parent=0);
-  virtual void changeView(pqView *view);
-  virtual void closeOptions();
-  //@}
+  /// \brief
+  ///   Sets up the context menu for the given view.
+  ///
+  /// The pqViewContextMenuManager maps the view type to the correct
+  /// handler and calls this method to set up the context menu.
+  ///
+  /// \param view The view to set up.
+  virtual void setupContextMenu(pqView *view)=0;
 
-protected slots:
-  void finishDialog();
-
-private:
-  class pqInternal;
-  pqInternal* Internal;
+  /// \brief
+  ///   Cleans up the context menu for the given view.
+  /// \param view The view to clean up.
+  virtual void cleanupContextMenu(pqView *view)=0;
 };
 
 #endif

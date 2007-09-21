@@ -81,13 +81,19 @@ public slots:
 
   /// Called to undo interaction.
   /// View modules supporting interaction undo must override this method.
-  virtual void undo() { }
+  virtual void undo() {}
 
   /// Called to redo interaction.
   /// View modules supporting interaction undo must override this method.
   virtual void redo() {}
 
 public:
+  /// Returns true if undo can be done.
+  virtual bool canUndo() const {return false;}
+
+  /// Returns true if redo can be done.
+  virtual bool canRedo() const {return false;}
+
   /// Save a screenshot for the render module. If width or height ==0,
   /// the current window size is used.
   /// TODO:  pqView should probably report file types it supports

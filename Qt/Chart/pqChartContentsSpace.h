@@ -248,6 +248,21 @@ public:
   void handleWheelZoom(int delta, const QPoint &pos, InteractFlags flags);
   //@}
 
+  /// \name History Methods
+  //@{
+  /// \brief
+  ///   Gets whether or not a previous zoom viewport is available.
+  /// \return
+  ///   True if a previous zoom viewport is available.
+  bool isHistoryPreviousAvailable() const;
+
+  /// \brief
+  ///   Gets whether or not a forward zoom viewport is available.
+  /// \return
+  ///   True if a forward zoom viewport is available.
+  bool isHistoryNextAvailable() const;
+  //@}
+
 public slots:
   /// \brief
   ///   Sets the x offset.

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqChartContextMenu.h
+   Module:    pqViewContextMenuHandler.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,31 +30,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqChartContextMenu_h
-#define _pqChartContextMenu_h
+/// \file pqViewContextMenuHandler.cxx
+/// \date 9/19/2007
+
+#include "pqViewContextMenuHandler.h"
 
 
-#include "QtWidgetsExport.h"
-#include <QObject>
-
-class QMenu;
-class QWidget;
-
-
-class QTWIDGETS_EXPORT pqChartContextMenu : public QObject
+pqViewContextMenuHandler::pqViewContextMenuHandler(QObject *parentObject)
+  : QObject(parentObject)
 {
-  Q_OBJECT
+}
 
-public:
-  pqChartContextMenu(QObject *parent=0);
-  virtual ~pqChartContextMenu() {}
 
-  void addMenuActions(QMenu &menu, QWidget *chart) const;
-
-protected slots:
-  void printChart();
-  void savePDF();
-  void savePNG();
-};
-
-#endif

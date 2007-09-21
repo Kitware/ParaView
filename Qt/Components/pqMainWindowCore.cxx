@@ -93,6 +93,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineModel.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPlotView.h"
+#include "pqPlotViewContextMenuHandler.h"
 #include "pqPluginDialog.h"
 #include "pqPluginManager.h"
 #include "pqPQLookupTableManager.h"
@@ -126,6 +127,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStackBuilder.h"
 #include "pqVCRController.h"
 #include "pqView.h"
+#include "pqViewContextMenuManager.h"
 #include "pqViewManager.h"
 #include "pqWriterFactory.h"
 
@@ -192,6 +194,7 @@ public:
     LookupTableManager(new pqPQLookupTableManager(parent)),
     ObjectInspectorDriver(0),
     ActiveViewOptions(0),
+    ViewContextMenu(0),
     RecentFiltersMenu(0),
     SourceMenu(0),
     FilterMenu(0),
@@ -306,6 +309,7 @@ public:
   pqPQLookupTableManager* LookupTableManager;
   pqObjectInspectorDriver* ObjectInspectorDriver;
   pqActiveViewOptionsManager *ActiveViewOptions;
+  pqViewContextMenuManager *ViewContextMenu;
   pqReaderFactory ReaderFactory;
   pqWriterFactory WriterFactory;
   pqPendingDisplayManager PendingDisplayManager;
@@ -577,6 +581,9 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   core->registerManager("SELECTION_MANAGER",
     &this->Implementation->SelectionManager);
 
+
+  // Set up the context menu manager.
+  this->getViewContextMenuManager();
 
   // Connect the view manager to the pqActiveView.
   QObject::connect(&this->Implementation->MultiViewManager,
@@ -1423,6 +1430,34 @@ pqActiveViewOptionsManager* pqMainWindowCore::getActiveViewOptionsManager()
 }
 
 //-----------------------------------------------------------------------------
+pqViewContextMenuManager* pqMainWindowCore::getViewContextMenuManager()
+{
+  if(!this->Implementation->ViewContextMenu)
+    {
+    this->Implementation->ViewContextMenu = new pqViewContextMenuManager(this);
+    pqServerManagerModel* smModel = 
+      pqApplicationCore::instance()->getServerManagerModel();
+    QObject::connect(smModel, SIGNAL(viewAdded(pqView*)),
+      this->Implementation->ViewContextMenu, SLOT(setupContextMenu(pqView*)));
+    QObject::connect(smModel, SIGNAL(viewRemoved(pqView*)),
+      this->Implementation->ViewContextMenu, SLOT(cleanupContextMenu(pqView*)));
+
+    // Set up the default context menu handlers.
+    pqPlotViewContextMenuHandler *handler = new pqPlotViewContextMenuHandler(
+      this->Implementation->ViewContextMenu);
+    handler->setOptionsManager(this->getActiveViewOptionsManager());
+    this->connect(handler, SIGNAL(screenshotRequested()),
+      this, SLOT(onFileSaveScreenshot()));
+    this->Implementation->ViewContextMenu->registerHandler(
+      pqPlotView::barChartType(), handler);
+    this->Implementation->ViewContextMenu->registerHandler(
+      pqPlotView::XYPlotType(), handler);
+    }
+
+  return this->Implementation->ViewContextMenu;
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::setupRepresentationToolbar(QToolBar* toolbar)
 {
   pqDisplayRepresentationWidget* display_representation = new pqDisplayRepresentationWidget(
@@ -2081,7 +2116,7 @@ void pqMainWindowCore::onFileSaveScreenshot()
   pqView* view = pqActiveView::instance().current();
   if(!view)
     {
-    qDebug() << "Cannnot save image. No active render module.";
+    qDebug() << "Cannnot save image. No active view.";
     return;
     }
 
@@ -2110,7 +2145,7 @@ void pqMainWindowCore::onFileSaveScreenshot(const QStringList& files)
   pqView* view = pqActiveView::instance().current();
   if(!view)
     {
-    qDebug() << "Cannnot save image. No active view module.";
+    qDebug() << "Cannnot save image. No active view.";
     return;
     }
   for(int i = 0; i != files.size(); ++i)

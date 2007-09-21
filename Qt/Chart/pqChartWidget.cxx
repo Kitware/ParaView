@@ -109,6 +109,8 @@ void pqChartWidget::setTitle(pqChartTitle *title)
       this->TitleLayout->insertWidget(0, this->Title);
       this->Title->show();
       }
+
+    emit this->newChartTitle(this->Title);
     }
 }
 
@@ -149,6 +151,8 @@ void pqChartWidget::setLegend(pqChartLegend *legend)
           this, SLOT(changeLegendLocation()));
       this->Legend->show();
       }
+
+    emit this->newChartLegend(this->Legend);
     }
 }
 
@@ -193,6 +197,8 @@ void pqChartWidget::setAxisTitle(pqChartAxis::AxisLocation axis,
         this->ChartLayout->insertWidget(0, this->LeftTitle);
         this->LeftTitle->show();
         }
+
+      emit this->newAxisTitle(axis, this->LeftTitle);
       }
     }
   else if(axis == pqChartAxis::Top)
@@ -213,6 +219,8 @@ void pqChartWidget::setAxisTitle(pqChartAxis::AxisLocation axis,
         this->TopLayout->insertWidget(0, this->TopTitle);
         this->TopTitle->show();
         }
+
+      emit this->newAxisTitle(axis, this->TopTitle);
       }
     }
   else if(axis == pqChartAxis::Right)
@@ -233,6 +241,8 @@ void pqChartWidget::setAxisTitle(pqChartAxis::AxisLocation axis,
         this->ChartLayout->addWidget(this->RightTitle);
         this->RightTitle->show();
         }
+
+      emit this->newAxisTitle(axis, this->RightTitle);
       }
     }
   else if(this->BottomTitle != title)
@@ -251,6 +261,8 @@ void pqChartWidget::setAxisTitle(pqChartAxis::AxisLocation axis,
       this->TopLayout->addWidget(this->BottomTitle);
       this->BottomTitle->show();
       }
+
+    emit this->newAxisTitle(axis, this->BottomTitle);
     }
 }
 

@@ -217,13 +217,18 @@ void pqActiveViewOptionsManager::setActiveView(pqView *view)
         {
         // Open the options dialog for the new active view.
         this->Internal->Current->showOptions(this->Internal->ActiveView,
-            this->Internal->Parent);
+            QString(), this->Internal->Parent);
         }
       }
     }
 }
 
 void pqActiveViewOptionsManager::showOptions()
+{
+  this->showOptions(QString());
+}
+
+void pqActiveViewOptionsManager::showOptions(const QString &page)
 {
   if(this->Internal->Current || !this->Internal->ActiveView)
     {
@@ -233,7 +238,7 @@ void pqActiveViewOptionsManager::showOptions()
   this->Internal->Current = this->getCurrent();
   if(this->Internal->Current)
     {
-    this->Internal->Current->showOptions(this->Internal->ActiveView,
+    this->Internal->Current->showOptions(this->Internal->ActiveView, page,
         this->Internal->Parent);
     }
   else

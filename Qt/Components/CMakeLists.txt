@@ -139,6 +139,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineModel.h
   pqPipelineModelSelectionAdaptor.h
   pqPipelineTimeKeyFrameEditor.h
+  pqPlotViewContextMenu.h
+  pqPlotViewContextMenuHandler.h
   pqPluginDialog.h
   pqPointSourceWidget.h
   pqProxyInformationWidget.h
@@ -181,6 +183,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqTimerLogDisplay.h
   pqToolTipTrapper.h
   pqVCRController.h
+  pqViewContextMenuHandler.h
+  pqViewContextMenuManager.h
   pqViewManager.h
   pqWriterDialog.h
   pqXDMFPanel.h
@@ -507,6 +511,10 @@ ADD_LIBRARY(pqComponents
   pqPipelineModelSelectionAdaptor.h
   pqPipelineTimeKeyFrameEditor.cxx
   pqPipelineTimeKeyFrameEditor.h
+  pqPlotViewContextMenu.cxx
+  pqPlotViewContextMenu.h
+  pqPlotViewContextMenuHandler.cxx
+  pqPlotViewContextMenuHandler.h
   pqPluginDialog.cxx
   pqPluginDialog.h
   pqPointSourceWidget.cxx
@@ -600,6 +608,10 @@ ADD_LIBRARY(pqComponents
   pqVariableType.h
   pqVCRController.cxx
   pqVCRController.h
+  pqViewContextMenuHandler.cxx
+  pqViewContextMenuHandler.h
+  pqViewContextMenuManager.cxx
+  pqViewContextMenuManager.h
   pqViewManager.cxx
   pqViewManager.h
   pqWriterDialog.cxx

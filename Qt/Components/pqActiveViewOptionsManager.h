@@ -86,6 +86,7 @@ public:
 
   /// \brief
   ///   Gets whether or not the options dialog is registered.
+  /// \param options The options dialog handler.
   /// \return
   ///   True if the options dialog is associated with a view type.
   bool isRegistered(pqActiveViewOptions *options) const;
@@ -105,6 +106,11 @@ public slots:
 
   /// Shows the options dialog for the active view.
   void showOptions();
+
+  /// \brief
+  ///   Shows the options dialog for the active view.
+  /// \param page The options page to display.
+  void showOptions(const QString &page);
 
 private slots:
   /// \brief

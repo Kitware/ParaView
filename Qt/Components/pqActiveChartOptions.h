@@ -61,7 +61,8 @@ public:
 
   /// \name pqActiveViewOptions Methods
   //@{
-  virtual void showOptions(pqView *view, QWidget *parent=0);
+  virtual void showOptions(pqView *view, const QString &page,
+      QWidget *parent=0);
   virtual void changeView(pqView *view);
   virtual void closeOptions();
   //@}

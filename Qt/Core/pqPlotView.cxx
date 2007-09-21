@@ -514,6 +514,32 @@ void pqPlotView::redo()
 }
 
 //-----------------------------------------------------------------------------
+bool pqPlotView::canUndo() const
+{
+  if(this->supportsUndo())
+    {
+    pqChartArea *area = this->Internal->Chart->getChartArea();
+    pqChartContentsSpace *space = area->getInteractor()->getContentsSpace();
+    return space->isHistoryPreviousAvailable();
+    }
+
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+bool pqPlotView::canRedo() const
+{
+  if(this->supportsUndo())
+    {
+    pqChartArea *area = this->Internal->Chart->getChartArea();
+    pqChartContentsSpace *space = area->getInteractor()->getContentsSpace();
+    return space->isHistoryNextAvailable();
+    }
+
+  return false;
+}
+
+//-----------------------------------------------------------------------------
 bool pqPlotView::canDisplay(pqOutputPort* opPort) const
 {
   pqPipelineSource* source = opPort? opPort->getSource() :0;

@@ -68,6 +68,7 @@ class pqToolsMenu;
 class pqUndoStack;
 class pqVCRController;
 class pqView;
+class pqViewContextMenuManager;
 class pqViewManager;
 class pqViewMenu;
 class vtkUnstructuredGrid;
@@ -217,6 +218,10 @@ public:
   // Returns the active view options manager. If the manager is not
   // created, a new one will be created and returned.
   pqActiveViewOptionsManager* getActiveViewOptionsManager();
+
+  // Returns the view context menu manager. If the manager is not
+  // created, a new one will be created and returned.
+  pqViewContextMenuManager* getViewContextMenuManager();
 
   void removePluginToolBars();
 

@@ -14,7 +14,7 @@
 #include "ui_MainWindow.h"
 
 #include <pqApplicationCore.h>
-#include <pqChartContextMenu.h>
+#include <pqChartPrintSave.h>
 #include <pqConnect.h>
 #include <pqSetName.h>
 #include <pqFileDialog.h>
@@ -63,7 +63,7 @@ public:
   pqMainWindowCore Core;
   pqViewMenu* ViewMenu;
   pqChartWidget* LineChartWidget;
-  pqChartContextMenu *ChartMenu;
+  pqChartPrintSave *ChartMenu;
   LineChartAdapter* LineChart;
   QComboBox* ChooseDataCombo;
 };
@@ -75,7 +75,7 @@ MainWindow::MainWindow() :
   this->Implementation->ViewMenu = new pqViewMenu(*this->Implementation->UI.menuView);
 
   // Setup the default chart context menu.
-  this->Implementation->ChartMenu = new pqChartContextMenu(this);
+  this->Implementation->ChartMenu = new pqChartPrintSave(this);
 
   // Setup menus and toolbars ...
   connect(this->Implementation->UI.actionFileNew,

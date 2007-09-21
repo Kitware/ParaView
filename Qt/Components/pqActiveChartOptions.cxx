@@ -743,7 +743,8 @@ pqActiveChartOptions::~pqActiveChartOptions()
   delete this->Internal;
 }
 
-void pqActiveChartOptions::showOptions(pqView *view, QWidget *widgetParent)
+void pqActiveChartOptions::showOptions(pqView *view, const QString &page,
+    QWidget *widgetParent)
 {
   // Create the chart options dialog if necessary.
   if(!this->Dialog)
@@ -840,7 +841,15 @@ void pqActiveChartOptions::showOptions(pqView *view, QWidget *widgetParent)
   this->Internal->setChart(chart);
   if(chart)
     {
-    this->Dialog->setCurrentPage("General");
+    if(page.isEmpty())
+      {
+      this->Dialog->setCurrentPage("General");
+      }
+    else
+      {
+      this->Dialog->setCurrentPage(page);
+      }
+
     this->Dialog->setResult(0);
     this->Dialog->show();
     }

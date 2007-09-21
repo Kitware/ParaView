@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqChartContextMenu.cxx
+   Module:    pqChartPrintSave.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqChartContextMenu.h"
+#include "pqChartPrintSave.h"
 
 #include <QAction>
 #include <QMenu>
@@ -40,12 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFileDialog>
 
 
-pqChartContextMenu::pqChartContextMenu(QObject *parentObject)
+pqChartPrintSave::pqChartPrintSave(QObject *parentObject)
   : QObject(parentObject)
 {
 }
 
-void pqChartContextMenu::addMenuActions(QMenu &menu, QWidget *chart) const
+void pqChartPrintSave::addMenuActions(QMenu &menu, QWidget *chart) const
 {
   // Create the actions with the chart stored as data.
   QAction *action = menu.addAction("Print Chart", this, SLOT(printChart()));
@@ -56,7 +56,7 @@ void pqChartContextMenu::addMenuActions(QMenu &menu, QWidget *chart) const
   action->setData(qVariantFromValue<QWidget *>(chart));
 }
 
-void pqChartContextMenu::printChart()
+void pqChartPrintSave::printChart()
 {
   // Get the action from the sender.
   QAction *action = qobject_cast<QAction *>(this->sender());
@@ -78,7 +78,7 @@ void pqChartContextMenu::printChart()
     }
 }
 
-void pqChartContextMenu::savePDF()
+void pqChartPrintSave::savePDF()
 {
   // Get the action from the sender.
   QAction *action = qobject_cast<QAction *>(this->sender());
@@ -101,7 +101,7 @@ void pqChartContextMenu::savePDF()
     }
 }
 
-void pqChartContextMenu::savePNG()
+void pqChartPrintSave::savePNG()
 {
   // Get the action from the sender.
   QAction *action = qobject_cast<QAction *>(this->sender());

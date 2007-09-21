@@ -144,6 +144,13 @@ public:
   void removeLayer(pqChartLayer *chart);
 
   /// \brief
+  ///   Gets the chart layer at the specified index.
+  /// \param index The index of the layer.
+  /// \return
+  ///   A pointer to the chart layer at the specified index.
+  pqChartLayer *getLayer(int index) const;
+
+  /// \brief
   ///   Gets the index for the grid layer.
   /// \return
   ///   The index for the grid layer.

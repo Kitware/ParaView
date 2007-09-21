@@ -146,8 +146,8 @@ public:
 
   /// Returns if the view module can undo/redo interaction
   /// given the current state of the interaction undo stack.
-  bool canUndo() const;
-  bool canRedo() const;
+  virtual bool canUndo() const;
+  virtual bool canRedo() const;
 
   /// For linking of interaction undo stacks.
   /// This method is used by pqLinksModel to link 

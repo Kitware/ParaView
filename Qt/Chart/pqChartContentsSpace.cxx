@@ -470,6 +470,16 @@ void pqChartContentsSpace::handleWheelZoom(int delta, const QPoint &pos,
   this->setYOffset(y);
 }
 
+bool pqChartContentsSpace::isHistoryPreviousAvailable() const
+{
+  return this->Internal->History.isPreviousAvailable();
+}
+
+bool pqChartContentsSpace::isHistoryNextAvailable() const
+{
+  return this->Internal->History.isNextAvailable();
+}
+
 void pqChartContentsSpace::setXOffset(int offset)
 {
   if(offset < 0)

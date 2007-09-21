@@ -86,6 +86,12 @@ public:
   /// Called to redo interaction.
   virtual void redo();
 
+  /// Returns true if undo can be done.
+  virtual bool canUndo() const;
+
+  /// Returns true if redo can be done.
+  virtual bool canRedo() const;
+
   /// Called to check if the given source can be shown in this view.
   virtual bool canDisplay(pqOutputPort* opPort) const;
 

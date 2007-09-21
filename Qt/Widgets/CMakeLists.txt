@@ -16,8 +16,8 @@ SET(QtWidgets_SRCS
   pqAnimationTrack.h
   pqAnimationWidget.cxx
   pqAnimationWidget.h
-  pqChartContextMenu.cxx
-  pqChartContextMenu.h
+  pqChartPrintSave.cxx
+  pqChartPrintSave.h
   pqCheckableHeaderModel.cxx
   pqCheckableHeaderModel.h
   pqCheckableHeaderView.cxx
@@ -91,7 +91,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqAnimationModel.h
   pqAnimationTrack.h
   pqAnimationWidget.h
-  pqChartContextMenu.h
+  pqChartPrintSave.h
   pqCheckableHeaderModel.h
   pqCheckableHeaderView.h
   pqCollapsedGroup.h
