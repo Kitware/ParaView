@@ -27,11 +27,11 @@ PrismToolBarActions::PrismToolBarActions(QObject* p)
   : QActionGroup(p)
 {
   this->ProcessingEvent=false;
-  this->VTKConnections = vtkEventQtSlotConnect::New();
+  this->VTKConnections = NULL;
 
-  this->SesameViewAction = new QAction("SESAME View",this);
-  this->SesameViewAction->setToolTip("Open SESAME View");
-  this->SesameViewAction->setIcon(QIcon(":/Prism/Icons/CreateSESAME.png"));
+  this->SesameViewAction = new QAction("Prism View",this);
+  this->SesameViewAction->setToolTip("Create Prism View");
+  this->SesameViewAction->setIcon(QIcon(":/Prism/Icons/PrismSmall.png"));
   this->addAction(this->SesameViewAction);
 
   QObject::connect(this->SesameViewAction, SIGNAL(triggered(bool)), this, SLOT(onSESAMEFileOpen()));
@@ -54,7 +54,10 @@ PrismToolBarActions::PrismToolBarActions(QObject* p)
 
 PrismToolBarActions::~PrismToolBarActions()
 {
-  this->VTKConnections->Delete();
+  if(this->VTKConnections!=NULL)
+    {
+    this->VTKConnections->Delete();
+    }
 
 }
 
@@ -105,6 +108,11 @@ void PrismToolBarActions::onConnectionAdded(pqPipelineSource* source,
       {
       vtkSMSourceProxy* prismP = vtkSMSourceProxy::SafeDownCast(consumer->getProxy());
       vtkSMSourceProxy* sourceP = vtkSMSourceProxy::SafeDownCast(source->getProxy());
+
+      if(this->VTKConnections==NULL)
+        {
+        this->VTKConnections = vtkEventQtSlotConnect::New();
+        }
 
       this->VTKConnections->Connect(sourceP, vtkCommand::SelectionChangedEvent,
         this, 
