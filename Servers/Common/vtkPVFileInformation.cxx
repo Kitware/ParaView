@@ -22,6 +22,7 @@
 #include "vtkSmartPointer.h"
 
 #if defined(_WIN32)
+# define _WIN32_IE 0x0400  // special folder support
 # include <windows.h>   // FindFirstFile, FindNextFile, FindClose, ...
 # include <direct.h>    // _getcwd
 # include <shlobj.h>    // SHGetFolderPath
@@ -49,7 +50,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.19");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.20");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -242,8 +243,6 @@ void vtkPVFileInformation::GetSpecialDirectories()
 {
 #if defined (_WIN32)
 
-#if (_WIN32_IE >= 0x0400) // For SHGetSpecialFolderPath()
-
   // Return favorite directories ...
 
   TCHAR szPath[MAX_PATH];
@@ -277,8 +276,6 @@ void vtkPVFileInformation::GetSpecialDirectories()
     info->Type = DIRECTORY;
     this->Contents->AddItem(info);
     }
-
-#endif // _WIN32_ID >= 0x0400
 
   // Return drive letters ...
   char strings[1024];
