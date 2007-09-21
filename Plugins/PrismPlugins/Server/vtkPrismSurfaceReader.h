@@ -78,9 +78,17 @@ public:
   int GetTableArrayStatus(const char* name);
 
 
+  //The calculated values used to scale the surface;
+  vtkGetVectorMacro(Scale,double,3);
+
+
+
 protected:
   vtkPrismSurfaceReader();
   ~vtkPrismSurfaceReader() {}
+
+
+  double Scale[3];
 
 
   //BTX 

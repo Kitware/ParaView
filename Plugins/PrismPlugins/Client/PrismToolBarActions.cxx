@@ -24,6 +24,7 @@
 #include <QMessageBox>
 #include <QtDebug>
 #include <pqFileDialog.h>
+#include "pqUndoStack.h"
 
 PrismToolBarActions::PrismToolBarActions(QObject* p)
   : QActionGroup(p)
@@ -44,11 +45,6 @@ PrismToolBarActions::PrismToolBarActions(QObject* p)
   this->addAction(this->SesameViewAction);
 
   QObject::connect(this->SesameViewAction, SIGNAL(triggered(bool)), this, SLOT(onSESAMEFileOpen()));
-
-
-
-
-
 
   pqServerManagerModel* model=pqApplicationCore::instance()->getServerManagerModel();
 
@@ -72,7 +68,6 @@ PrismToolBarActions::~PrismToolBarActions()
     {
     this->VTKConnections->Delete();
     }
-
 }
 
 pqPipelineSource* PrismToolBarActions::getActiveSource() const
@@ -94,6 +89,7 @@ pqServer* PrismToolBarActions::getActiveServer() const
   pqServerManagerSelection sels = *core->getSelectionModel()->selectedItems();
   pqPipelineSource* source = 0;
   pqServer* server=0;
+  pqOutputPort* outputPort=0;
   pqServerManagerModelItem* item = 0;
   pqServerManagerSelection::ConstIterator iter = sels.begin();
 
@@ -106,7 +102,15 @@ pqServer* PrismToolBarActions::getActiveServer() const
     }
   else
     {
-    server = dynamic_cast<pqServer*>(item);   
+    outputPort=dynamic_cast<pqOutputPort*>(item); 
+    if(outputPort)
+      {
+      server= outputPort->getServer();
+      }
+    else
+      {
+      server = dynamic_cast<pqServer*>(item);  
+      }
     }
   return server;
 }
@@ -123,8 +127,7 @@ void PrismToolBarActions::onSESAMEFileOpen()
     qDebug() << "No active server selected.";
     }
 
-
- QString filters = "All files (*)";
+  QString filters = "All files (*)";
   pqFileDialog* const file_dialog = new pqFileDialog(server, 
     NULL, tr("Open File:"), QString(), filters);
     
@@ -138,14 +141,13 @@ void PrismToolBarActions::onSESAMEFileOpen()
 
 }
 void PrismToolBarActions::onSESAMEFileOpen(const QStringList& files)
-  {
-
+{
   if (files.empty())
     {
     return ;
     }
 
-   pqApplicationCore* core = pqApplicationCore::instance();
+  pqApplicationCore* core = pqApplicationCore::instance();
   pqObjectBuilder* builder = core->getObjectBuilder();
 
   pqServer* server = this->getActiveServer();
@@ -155,27 +157,37 @@ void PrismToolBarActions::onSESAMEFileOpen(const QStringList& files)
     return ;
     }
 
-   pqPipelineSource* reader = builder->createReader("sources", "PrismSurfaceReader", files, server);
-
+  pqUndoStack *stack=core->getUndoStack();
+  if(stack)
+    {
+    stack->beginUndoSet("Open Prism Surface");
+    }
+  
+  builder->createReader("sources", "PrismSurfaceReader", files, server);
+  
+  if(stack)
+    {
+    stack->endUndoSet();
+    }  
 }
 
 
 void PrismToolBarActions::onCreatePrismView()
 {
- // Get the list of selected sources.
+  // Get the list of selected sources.
 
   pqServer* server = this->getActiveServer();
- 
- if(!server)
+
+  if(!server)
     {
     qDebug() << "No active server selected.";
     }
 
 
- QString filters = "All files (*)";
+  QString filters = "All files (*)";
   pqFileDialog* const file_dialog = new pqFileDialog(server, 
     NULL, tr("Open File:"), QString(), filters);
-    
+
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setObjectName("FileOpenDialog");
   file_dialog->setFileMode(pqFileDialog::ExistingFiles);
@@ -187,7 +199,7 @@ void PrismToolBarActions::onCreatePrismView()
 }
 void PrismToolBarActions::onCreatePrismView(const QStringList& files)
 {
- // Get the list of selected sources.
+  // Get the list of selected sources.
   pqApplicationCore* core = pqApplicationCore::instance();
   pqObjectBuilder* builder = core->getObjectBuilder();
   pqPipelineSource* source = 0;
@@ -198,25 +210,36 @@ void PrismToolBarActions::onCreatePrismView(const QStringList& files)
 
   source = this->getActiveSource();   
   server = source->getServer();
- 
+
   inputs.push_back(source->getOutputPort(0));
 
   QMap<QString, QList<pqOutputPort*> > namedInputs;
   namedInputs["Input"] = inputs;
+
+  pqUndoStack *stack=core->getUndoStack();
+  if(stack)
+    {
+    stack->beginUndoSet("Create Prism Filter");
+    }
+
   filter = builder->createFilter("PrismFilters", "PrismFilter", namedInputs, server);
 
   vtkSMProperty *fileNameProperty=filter->getProxy()->GetProperty("FileName");
-       
+
   pqSMAdaptor::setElementProperty(fileNameProperty, files[0]);
-    
+
   filter->getProxy()->UpdateVTKObjects();
   fileNameProperty->UpdateDependentDomains();
 
-
+ if(stack)
+   {
+    stack->endUndoSet();
+   }  
 }
+
 void PrismToolBarActions::onConnectionAdded(pqPipelineSource* source, 
-    pqPipelineSource* consumer)
-{
+                                            pqPipelineSource* consumer)
+  {
   if (consumer)
     {
     QString name=consumer->getProxy()->GetXMLName();
@@ -246,7 +269,7 @@ void PrismToolBarActions::onConnectionAdded(pqPipelineSource* source,
         int)));
       }
     }
-}
+  }
 
 
 
@@ -264,9 +287,6 @@ void PrismToolBarActions::onPrismSelection(vtkObject* caller,
                                               unsigned long,
                                               void* client_data, void* call_data)
 {
-
-
-
   if(!this->ProcessingEvent)
     {
     this->ProcessingEvent=true;
@@ -280,30 +300,24 @@ void PrismToolBarActions::onPrismSelection(vtkObject* caller,
 
     pqOutputPort* opport = pqPrismSourceP->getOutputPort(portIndex);
 
-
-
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     vtkSMSourceProxy* selSource =vtkSMSourceProxy::SafeDownCast(
       pxm->NewProxy("sources", "SelectionSource"));
 
     vtkSMSourceProxy* selPrism = prismP->GetSelectionInput(portIndex);
     
-
     pqApplicationCore* const core = pqApplicationCore::instance();
     pqSelectionManager* slmanager = qobject_cast<pqSelectionManager*>(
       core->manager("SELECTION_MANAGER"));
-     QList<vtkIdType> globalIds= slmanager->getGlobalIDs(selPrism,opport);
+    QList<vtkIdType> globalIds= slmanager->getGlobalIDs(selPrism,opport);
 
-
-   QList<QVariant> ids;
-   foreach (vtkIdType gid, globalIds)
+    QList<QVariant> ids;
+    foreach (vtkIdType gid, globalIds)
       {
       ids.push_back(-1);
       ids.push_back(gid);
       }
     
-
-  
     pqSMAdaptor::setMultipleElementProperty(
        selSource->GetProperty("IDs"), ids);
     pqSMAdaptor::setEnumerationProperty(
@@ -322,18 +336,14 @@ void PrismToolBarActions::onPrismSelection(vtkObject* caller,
       v->render();
       }
 
-
     this->ProcessingEvent=false;
     }
-
-
 }
 
 void PrismToolBarActions::onGeometrySelection(vtkObject* caller,
                                               unsigned long,
                                               void* client_data, void* call_data)
 {
-
   if(!this->ProcessingEvent)
     {
     this->ProcessingEvent=true;
@@ -347,37 +357,31 @@ void PrismToolBarActions::onGeometrySelection(vtkObject* caller,
 
     pqOutputPort* opport = pqSourceP->getOutputPort(portIndex);
 
-
-
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     vtkSMSourceProxy* selPrism =vtkSMSourceProxy::SafeDownCast(
       pxm->NewProxy("sources", "SelectionSource"));
 
     vtkSMSourceProxy* selSource = sourceP->GetSelectionInput(portIndex);
     
-
     pqApplicationCore* const core = pqApplicationCore::instance();
     pqSelectionManager* slmanager = qobject_cast<pqSelectionManager*>(
       core->manager("SELECTION_MANAGER"));
-     QList<vtkIdType> globalIds= slmanager->getGlobalIDs(selSource,opport);
+    QList<vtkIdType> globalIds= slmanager->getGlobalIDs(selSource,opport);
 
-
-   QList<QVariant> ids;
-   foreach (vtkIdType gid, globalIds)
+    QList<QVariant> ids;
+    foreach (vtkIdType gid, globalIds)
       {
       ids.push_back(-1);
       ids.push_back(gid);
       }
-    
 
-  
     pqSMAdaptor::setMultipleElementProperty(
-       selPrism->GetProperty("IDs"), ids);
+      selPrism->GetProperty("IDs"), ids);
     pqSMAdaptor::setEnumerationProperty(
-       selPrism->GetProperty("ContentType"),"GLOBALIDs");
-     selPrism->GetProperty("FieldType")->Copy(selSource->GetProperty("FieldType"));
-   
-     selPrism->UpdateVTKObjects();
+      selPrism->GetProperty("ContentType"),"GLOBALIDs");
+    selPrism->GetProperty("FieldType")->Copy(selSource->GetProperty("FieldType"));
+
+    selPrism->UpdateVTKObjects();
     prismP->SetSelectionInput(1,selPrism,0);
     selPrism->UnRegister(NULL);
 
@@ -389,10 +393,8 @@ void PrismToolBarActions::onGeometrySelection(vtkObject* caller,
       v->render();
       }
 
-
     this->ProcessingEvent=false;
     }
-
 }
 void PrismToolBarActions::onSelectionChanged()
 {

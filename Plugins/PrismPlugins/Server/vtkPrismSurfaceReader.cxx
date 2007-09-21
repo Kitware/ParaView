@@ -26,7 +26,7 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismSurfaceReader, "1.1");
+vtkCxxRevisionMacro(vtkPrismSurfaceReader, "1.2");
 vtkStandardNewMacro(vtkPrismSurfaceReader);
 
 class vtkPrismSurfaceReader::MyInternal
@@ -377,21 +377,19 @@ int vtkPrismSurfaceReader::RequestData(
   if ( smVal != 0.0 )
     {
 
-    double scale[3] = {
-      smVal/delta[0],
-      smVal/delta[1],
-      smVal/delta[2]
-      };
-
+    this->Scale[0]=smVal/delta[0];
+    this->Scale[1]=smVal/delta[1];
+    this->Scale[2]=smVal/delta[2];
+ 
 
     for (ptId=0; ptId < numPts; ptId++)
       {
 
       newPts->GetPoint(ptId, x);
 
-      newX[0] = x[0]*scale[0];
-      newX[1] = x[1]*scale[1];
-      newX[2] = x[2]*scale[2];
+      newX[0] = x[0]*this->Scale[0];
+      newX[1] = x[1]*this->Scale[1];
+      newX[2] = x[2]*this->Scale[2];
 
       newPts->SetPoint(ptId, newX);
 
