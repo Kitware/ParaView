@@ -1,11 +1,11 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPrismSurfaceFilter.cxx
+  Module:    vtkPrismSurfaceReader.cxx
 
 
 =========================================================================*/
-#include "vtkPrismSurfaceFilter.h"
+#include "vtkPrismSurfaceReader.h"
 
 #include "vtkFloatArray.h"
 #include "vtkMath.h"
@@ -21,14 +21,15 @@
 #include "vtkCellData.h"
 #include "vtkSESAMEReader.h"
 #include "vtkRectilinearGridGeometryFilter.h"
-
+#include "vtkSmartPointer.h"
+#include "vtkPoints.h"
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismSurfaceFilter, "1.2");
-vtkStandardNewMacro(vtkPrismSurfaceFilter);
+vtkCxxRevisionMacro(vtkPrismSurfaceReader, "1.1");
+vtkStandardNewMacro(vtkPrismSurfaceReader);
 
-class vtkPrismSurfaceFilter::MyInternal
+class vtkPrismSurfaceReader::MyInternal
 {
 public:
   vtkSESAMEReader *Reader;
@@ -51,7 +52,7 @@ public:
 
 
 //----------------------------------------------------------------------------
-vtkPrismSurfaceFilter::vtkPrismSurfaceFilter()
+vtkPrismSurfaceReader::vtkPrismSurfaceReader()
 {
 
   this->Internal = new MyInternal();
@@ -59,7 +60,7 @@ vtkPrismSurfaceFilter::vtkPrismSurfaceFilter()
   this->SetNumberOfInputPorts(0);
 }
 
-int vtkPrismSurfaceFilter::IsValidFile()
+int vtkPrismSurfaceReader::IsValidFile()
 {
   if(!this->Internal->Reader)
     {
@@ -70,7 +71,7 @@ int vtkPrismSurfaceFilter::IsValidFile()
 
 }
 
-void vtkPrismSurfaceFilter::SetFileName(const char* file)
+void vtkPrismSurfaceReader::SetFileName(const char* file)
 {
  if(!this->Internal->Reader)
     {
@@ -80,7 +81,7 @@ void vtkPrismSurfaceFilter::SetFileName(const char* file)
  this->Internal->Reader->SetFileName(file);
 }
 
-const char* vtkPrismSurfaceFilter::GetFileName()
+const char* vtkPrismSurfaceReader::GetFileName()
 {
   if(!this->Internal->Reader)
     {
@@ -91,7 +92,7 @@ const char* vtkPrismSurfaceFilter::GetFileName()
   
 
 
-int vtkPrismSurfaceFilter::GetNumberOfTableIds()
+int vtkPrismSurfaceReader::GetNumberOfTableIds()
 {
   if(!this->Internal->Reader)
     {
@@ -101,7 +102,7 @@ int vtkPrismSurfaceFilter::GetNumberOfTableIds()
   return this->Internal->Reader->GetNumberOfTableIds();
 }
 
-int* vtkPrismSurfaceFilter::GetTableIds()
+int* vtkPrismSurfaceReader::GetTableIds()
 {
   if(!this->Internal->Reader)
     {
@@ -111,7 +112,7 @@ int* vtkPrismSurfaceFilter::GetTableIds()
   return this->Internal->Reader->GetTableIds();
 }
 
-vtkIntArray* vtkPrismSurfaceFilter::GetTableIdsAsArray()
+vtkIntArray* vtkPrismSurfaceReader::GetTableIdsAsArray()
 {
    if(!this->Internal->Reader)
     {
@@ -121,7 +122,7 @@ vtkIntArray* vtkPrismSurfaceFilter::GetTableIdsAsArray()
    return this->Internal->Reader->GetTableIdsAsArray();
 }
 
-void vtkPrismSurfaceFilter::SetTable(int tableId)
+void vtkPrismSurfaceReader::SetTable(int tableId)
 {
  if(!this->Internal->Reader)
     {
@@ -131,7 +132,7 @@ void vtkPrismSurfaceFilter::SetTable(int tableId)
   this->Internal->Reader->SetTable(tableId);
 }
 
-int vtkPrismSurfaceFilter::GetTable()
+int vtkPrismSurfaceReader::GetTable()
 {
  if(!this->Internal->Reader)
     {
@@ -141,7 +142,7 @@ int vtkPrismSurfaceFilter::GetTable()
  return this->Internal->Reader->GetTable();
 }
 
-int vtkPrismSurfaceFilter::GetNumberOfTableArrayNames()
+int vtkPrismSurfaceReader::GetNumberOfTableArrayNames()
 {
  if(!this->Internal->Reader)
     {
@@ -151,7 +152,7 @@ int vtkPrismSurfaceFilter::GetNumberOfTableArrayNames()
  return this->Internal->Reader->GetNumberOfTableArrayNames();
 }
 
-const char* vtkPrismSurfaceFilter::GetTableArrayName(int index)
+const char* vtkPrismSurfaceReader::GetTableArrayName(int index)
 {
  if(!this->Internal->Reader)
     {
@@ -162,7 +163,7 @@ const char* vtkPrismSurfaceFilter::GetTableArrayName(int index)
 
 }
 
-void vtkPrismSurfaceFilter::SetTableArrayToProcess(const char* name)
+void vtkPrismSurfaceReader::SetTableArrayToProcess(const char* name)
 {
   if(!this->Internal->Reader)
     {
@@ -183,7 +184,7 @@ void vtkPrismSurfaceFilter::SetTableArrayToProcess(const char* name)
 
 }
 
-const char* vtkPrismSurfaceFilter::GetTableArrayNameToProcess()
+const char* vtkPrismSurfaceReader::GetTableArrayNameToProcess()
 {
   int numberOfArrays;
   int i;
@@ -203,7 +204,7 @@ const char* vtkPrismSurfaceFilter::GetTableArrayNameToProcess()
 }
 
 
-void vtkPrismSurfaceFilter::SetTableArrayStatus(const char* name, int flag)
+void vtkPrismSurfaceReader::SetTableArrayStatus(const char* name, int flag)
 {
    if(!this->Internal->Reader)
     {
@@ -213,7 +214,7 @@ void vtkPrismSurfaceFilter::SetTableArrayStatus(const char* name, int flag)
    return this->Internal->Reader->SetTableArrayStatus(name , flag);
 }
 
-int vtkPrismSurfaceFilter::GetTableArrayStatus(const char* name)
+int vtkPrismSurfaceReader::GetTableArrayStatus(const char* name)
 {
    if(!this->Internal->Reader)
     {
@@ -225,7 +226,7 @@ int vtkPrismSurfaceFilter::GetTableArrayStatus(const char* name)
 
 
 //----------------------------------------------------------------------------
-int vtkPrismSurfaceFilter::RequestData(
+int vtkPrismSurfaceReader::RequestData(
   vtkInformation *vtkNotUsed(request),
   vtkInformationVector **vtkNotUsed(inputVector),
   vtkInformationVector *outputVector)
@@ -244,7 +245,6 @@ int vtkPrismSurfaceFilter::RequestData(
   vtkPoints *inPts;
   vtkDataArray *inScalars;
   vtkDataArray *outScalars;
-  vtkPoints *newPts;
   vtkPointData *pd;
   vtkIdType ptId, numPts;
   double x[3], newX[3];
@@ -265,10 +265,18 @@ int vtkPrismSurfaceFilter::RequestData(
   pd = input->GetPointData();
 
   numPts = inPts->GetNumberOfPoints();
-  newPts = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> newPts = vtkSmartPointer<vtkPoints>::New();
   newPts->SetNumberOfPoints(numPts);
 
- // Loop over all points, adjusting locations
+
+  vtkSmartPointer<vtkFloatArray> newScalars= vtkSmartPointer<vtkFloatArray>::New();
+  newScalars->SetNumberOfComponents(1);
+  newScalars->Allocate(numPts);
+  newScalars->SetName(this->GetTableArrayNameToProcess());
+  newScalars->SetNumberOfTuples(numPts);
+
+
+  // Loop over all points, adjusting locations
   //
 
   inScalars = input->GetPointData()->GetArray(this->GetTableArrayNameToProcess());
@@ -299,8 +307,7 @@ int vtkPrismSurfaceFilter::RequestData(
       newX[1]=x[1];
       newX[2]=s;
       newPts->SetPoint(ptId, newX);
-
-      outScalars->SetComponent(ptId,0,s);
+      newScalars->SetComponent(ptId,0,s);
       }
     }
   else if(tableID== 301 || tableID == 304)
@@ -316,7 +323,7 @@ int vtkPrismSurfaceFilter::RequestData(
           }
         }
       inPts->GetPoint(ptId, x);
-       s = inScalars->GetComponent(ptId,0);
+      s = inScalars->GetComponent(ptId,0);
 
       newX[0] = x[0];
       newX[1] = x[1];
@@ -401,14 +408,15 @@ int vtkPrismSurfaceFilter::RequestData(
   //
 
   output->SetPoints(newPts);
-  newPts->Delete();
+  output->GetPointData()->AddArray(newScalars);
+
 
   return 1;
 
 }
 
 //----------------------------------------------------------------------------
-int vtkPrismSurfaceFilter::RequestInformation(
+int vtkPrismSurfaceReader::RequestInformation(
   vtkInformation *vtkNotUsed(request),
   vtkInformationVector **vtkNotUsed(inputVector),
   vtkInformationVector *outputVector)
@@ -421,7 +429,7 @@ int vtkPrismSurfaceFilter::RequestInformation(
 }
 
 //----------------------------------------------------------------------------
-void vtkPrismSurfaceFilter::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPrismSurfaceReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 

@@ -1,26 +1,26 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPrismSurfaceFilter.h
+  Module:    vtkPrismSurfaceReader.h
 
 =========================================================================*/
-// .NAME vtkPrismSurfaceFilter - 
+// .NAME vtkPrismSurfaceReader - 
 // .SECTION Description
 
-#ifndef __vtkPrismSurfaceFilter
-#define __vtkPrismSurfaceFilter
+#ifndef __vtkPrismSurfaceReader
+#define __vtkPrismSurfaceReader
 
 #include "vtkPolyDataAlgorithm.h"
 
 #include "vtkCell.h" // Needed for VTK_CELL_SIZE
 
-class VTK_EXPORT vtkPrismSurfaceFilter : public vtkPolyDataAlgorithm 
+class VTK_EXPORT vtkPrismSurfaceReader : public vtkPolyDataAlgorithm 
 {
 public:
-  vtkTypeRevisionMacro(vtkPrismSurfaceFilter,vtkPolyDataAlgorithm);
+  vtkTypeRevisionMacro(vtkPrismSurfaceReader,vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  static vtkPrismSurfaceFilter *New();
+  static vtkPrismSurfaceReader *New();
  
 
 
@@ -79,8 +79,8 @@ public:
 
 
 protected:
-  vtkPrismSurfaceFilter();
-  ~vtkPrismSurfaceFilter() {}
+  vtkPrismSurfaceReader();
+  ~vtkPrismSurfaceReader() {}
 
 
   //BTX 
@@ -93,8 +93,8 @@ protected:
   int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
 private:
-  vtkPrismSurfaceFilter(const vtkPrismSurfaceFilter&);  // Not implemented.
-  void operator=(const vtkPrismSurfaceFilter&);  // Not implemented.
+  vtkPrismSurfaceReader(const vtkPrismSurfaceReader&);  // Not implemented.
+  void operator=(const vtkPrismSurfaceReader&);  // Not implemented.
 };
 
 #endif

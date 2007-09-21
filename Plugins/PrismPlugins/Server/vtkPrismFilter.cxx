@@ -22,12 +22,12 @@ Module:    vtkPrismFilter.cxx
 #include "vtkSESAMEReader.h"  
 #include "vtkRectilinearGridGeometryFilter.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkGlyph3D.h"
 #include "vtkSmartPointer.h"
+#include "vtkPoints.h"
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismFilter, "1.2");
+vtkCxxRevisionMacro(vtkPrismFilter, "1.3");
 vtkStandardNewMacro(vtkPrismFilter);
 
 class vtkPrismFilter::MyInternal
@@ -36,7 +36,6 @@ class vtkPrismFilter::MyInternal
     vtkSESAMEReader *Reader;
     vtkRectilinearGridGeometryFilter *RectGridGeometry;
 
-    vtkGlyph3D *Glyph;
     vtkstd::string AxisVarName[3];
     double Scale[3];
     MyInternal()

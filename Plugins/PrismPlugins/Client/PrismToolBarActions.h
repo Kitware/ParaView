@@ -3,6 +3,7 @@
 #include <QString>
 class pqServerManagerModelItem;
 class pqPipelineSource;
+class pqServer;
 class pqOutputPort;
 class vtkObject;
 class vtkEventQtSlotConnect;
@@ -17,6 +18,9 @@ public:
 
 public slots:
   void onSESAMEFileOpen();
+  void onSESAMEFileOpen(const QStringList&);
+  void onCreatePrismView();
+  void onCreatePrismView(const QStringList& files);
 
 private slots:
   void onSelectionChanged();
@@ -28,10 +32,11 @@ private slots:
 
 private:
   pqServerManagerModelItem *getActiveObject() const;
+  pqPipelineSource *getActiveSource() const;
+  pqServer* getActiveServer() const;
 
  QAction *SesameViewAction;
- pqPipelineSource* createFilterForActiveSource(
-  const QString& xmlname);
+ QAction *PrismViewAction;
 
  vtkEventQtSlotConnect* VTKConnections;
  bool ProcessingEvent;

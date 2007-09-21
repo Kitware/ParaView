@@ -6,4 +6,4 @@
     <qresource prefix="/ParaViewResources" >
         <file>PrismReader.xml</file>
     </qresource>
-</RCC>
+</RCC>  

@@ -22,6 +22,8 @@
 #include <QApplication>
 #include <QStyle>
 #include <QMessageBox>
+#include <QtDebug>
+#include <pqFileDialog.h>
 
 PrismToolBarActions::PrismToolBarActions(QObject* p)
   : QActionGroup(p)
@@ -29,12 +31,24 @@ PrismToolBarActions::PrismToolBarActions(QObject* p)
   this->ProcessingEvent=false;
   this->VTKConnections = NULL;
 
-  this->SesameViewAction = new QAction("Prism View",this);
-  this->SesameViewAction->setToolTip("Create Prism View");
-  this->SesameViewAction->setIcon(QIcon(":/Prism/Icons/PrismSmall.png"));
+  this->PrismViewAction = new QAction("Prism View",this);
+  this->PrismViewAction->setToolTip("Create Prism View");
+  this->PrismViewAction->setIcon(QIcon(":/Prism/Icons/PrismSmall.png"));
+  this->addAction(this->PrismViewAction);
+
+  QObject::connect(this->PrismViewAction, SIGNAL(triggered(bool)), this, SLOT(onCreatePrismView()));
+
+  this->SesameViewAction = new QAction("SESAME Surface",this);
+  this->SesameViewAction->setToolTip("Open SESAME Surface");
+  this->SesameViewAction->setIcon(QIcon(":/Prism/Icons/CreateSESAME.png"));
   this->addAction(this->SesameViewAction);
 
   QObject::connect(this->SesameViewAction, SIGNAL(triggered(bool)), this, SLOT(onSESAMEFileOpen()));
+
+
+
+
+
 
   pqServerManagerModel* model=pqApplicationCore::instance()->getServerManagerModel();
 
@@ -61,43 +75,145 @@ PrismToolBarActions::~PrismToolBarActions()
 
 }
 
-void PrismToolBarActions::onSESAMEFileOpen()
+pqPipelineSource* PrismToolBarActions::getActiveSource() const
 {
-  this->createFilterForActiveSource("PrismFilter");
-}
-
-//-----------------------------------------------------------------------------
-pqPipelineSource* PrismToolBarActions::createFilterForActiveSource(
-  const QString& xmlname)
-{
-  // Get the list of selected sources.
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqObjectBuilder* builder = core->getObjectBuilder();
   pqServerManagerSelection sels = *core->getSelectionModel()->selectedItems();
   pqPipelineSource* source = 0;
-  pqPipelineSource* filter = 0;
   pqServerManagerModelItem* item = 0;
   pqServerManagerSelection::ConstIterator iter = sels.begin();
 
+  item = *iter;
+  source = dynamic_cast<pqPipelineSource*>(item);   
+ 
+  return source;
+}
+pqServer* PrismToolBarActions::getActiveServer() const
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerSelection sels = *core->getSelectionModel()->selectedItems();
+  pqPipelineSource* source = 0;
+  pqServer* server=0;
+  pqServerManagerModelItem* item = 0;
+  pqServerManagerSelection::ConstIterator iter = sels.begin();
+
+  item = *iter;
+  source = dynamic_cast<pqPipelineSource*>(item);   
+ 
+  if(source)
+    {
+    server = source->getServer();
+    }
+  else
+    {
+    server = dynamic_cast<pqServer*>(item);   
+    }
+  return server;
+}
+
+
+void PrismToolBarActions::onSESAMEFileOpen()
+{
+  // Get the list of selected sources.
+
+  pqServer* server = this->getActiveServer();
+ 
+ if(!server)
+    {
+    qDebug() << "No active server selected.";
+    }
+
+
+ QString filters = "All files (*)";
+  pqFileDialog* const file_dialog = new pqFileDialog(server, 
+    NULL, tr("Open File:"), QString(), filters);
+    
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
+  file_dialog->setObjectName("FileOpenDialog");
+  file_dialog->setFileMode(pqFileDialog::ExistingFiles);
+  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
+    this, SLOT(onSESAMEFileOpen(const QStringList&)));
+  file_dialog->setModal(true); 
+  file_dialog->show(); 
+
+}
+void PrismToolBarActions::onSESAMEFileOpen(const QStringList& files)
+  {
+
+  if (files.empty())
+    {
+    return ;
+    }
+
+   pqApplicationCore* core = pqApplicationCore::instance();
+  pqObjectBuilder* builder = core->getObjectBuilder();
+
+  pqServer* server = this->getActiveServer();
+  if(!server)
+    {
+    qCritical() << "Cannot create reader without an active server.";
+    return ;
+    }
+
+   pqPipelineSource* reader = builder->createReader("sources", "PrismSurfaceReader", files, server);
+
+}
+
+
+void PrismToolBarActions::onCreatePrismView()
+{
+ // Get the list of selected sources.
+
+  pqServer* server = this->getActiveServer();
+ 
+ if(!server)
+    {
+    qDebug() << "No active server selected.";
+    }
+
+
+ QString filters = "All files (*)";
+  pqFileDialog* const file_dialog = new pqFileDialog(server, 
+    NULL, tr("Open File:"), QString(), filters);
+    
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
+  file_dialog->setObjectName("FileOpenDialog");
+  file_dialog->setFileMode(pqFileDialog::ExistingFiles);
+  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
+    this, SLOT(onCreatePrismView(const QStringList&)));
+  file_dialog->setModal(true); 
+  file_dialog->show(); 
+
+}
+void PrismToolBarActions::onCreatePrismView(const QStringList& files)
+{
+ // Get the list of selected sources.
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqObjectBuilder* builder = core->getObjectBuilder();
+  pqPipelineSource* source = 0;
+  pqPipelineSource* filter = 0;
   pqServer* server = 0;
   QList<pqOutputPort*> inputs;
 
 
-  item = *iter;
-  source = dynamic_cast<pqPipelineSource*>(item);   
+  source = this->getActiveSource();   
+  server = source->getServer();
+ 
   inputs.push_back(source->getOutputPort(0));
-  if (!server)
-    {
-    server = source->getServer();
-    }
 
   QMap<QString, QList<pqOutputPort*> > namedInputs;
   namedInputs["Input"] = inputs;
-  filter = builder->createFilter("filters", xmlname, namedInputs, server);
+  filter = builder->createFilter("PrismFilters", "PrismFilter", namedInputs, server);
 
-  return filter;
+  vtkSMProperty *fileNameProperty=filter->getProxy()->GetProperty("FileName");
+       
+  pqSMAdaptor::setElementProperty(fileNameProperty, files[0]);
+    
+  filter->getProxy()->UpdateVTKObjects();
+  fileNameProperty->UpdateDependentDomains();
+
+
 }
-
 void PrismToolBarActions::onConnectionAdded(pqPipelineSource* source, 
     pqPipelineSource* consumer)
 {
@@ -283,7 +399,8 @@ void PrismToolBarActions::onSelectionChanged()
   pqServerManagerModelItem *item = this->getActiveObject();
   pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
-  vtkSMProxy* prismFilter = proxyManager->GetProxy("filters_prototypes", "PrismFilter");
+  proxyManager->InstantiateGroupPrototypes("PrismFilters");
+  vtkSMProxy* prismFilter = proxyManager->GetProxy("PrismFilters_prototypes", "PrismFilter");
   
   if (source && prismFilter)
     {
@@ -293,13 +410,13 @@ void PrismToolBarActions::onSelectionChanged()
       pqSMAdaptor::setUncheckedProxyProperty(input, source->getProxy());
       if(input->IsInDomains())
         {
-        this->SesameViewAction->setEnabled(true);
+        this->PrismViewAction->setEnabled(true);
         return;
         }
       }
     }
 
-  this->SesameViewAction->setEnabled(false);
+  this->PrismViewAction->setEnabled(false);
 }
 
 pqServerManagerModelItem *PrismToolBarActions::getActiveObject() const
