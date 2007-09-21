@@ -52,6 +52,14 @@ int main(int argc, char* argv[])
     {
     QApplication::setStyle(new QCleanlooksStyle);
     }
+
+  // Bug(#179200) in cleanlooks style can cause test errors 
+  // when querying desktop settings (scheduled to be fixed in 4.4.0)
+  if(qobject_cast<QCleanlooksStyle*>(QApplication::style()))
+    {
+    QApplication::setDesktopSettingsAware(false);
+    }
+
 #endif
 
   pqComponentsInit();
