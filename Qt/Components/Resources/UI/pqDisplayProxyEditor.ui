@@ -292,7 +292,7 @@
     </widget>
    </item>
    <item row="5" column="0" >
-    <widget class="QGroupBox" name="groupBox_3" >
+    <widget class="QGroupBox" name="TransformationGroup" >
      <property name="title" >
       <string>Transformation</string>
      </property>
@@ -626,7 +626,7 @@
     </widget>
    </item>
    <item row="2" column="0" >
-    <widget class="QGroupBox" name="groupBox_2" >
+    <widget class="QGroupBox" name="StyleGroup" >
      <property name="title" >
       <string>Style</string>
      </property>
