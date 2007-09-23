@@ -269,6 +269,7 @@ public:
 
   // Stuff related to the filters menu
   void updateFiltersFromXML();
+  void updateFiltersFromXML(const QString& xmlfilename);
   void setupFiltersMenu();
   void restoreRecentFilterMenu();
 
@@ -292,6 +293,7 @@ public:
 
   // Stuff related to the sources menu
   void updateSourcesFromXML();
+  void updateSourcesFromXML(const QString& xmlfilename);
 
   vtkstd::vector<vtkstd::string> Sources;
 
@@ -349,10 +351,21 @@ public:
   pqCoreTestUtility TestUtility;
   pqActiveServer ActiveServer;
 };
-
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::pqImplementation::updateSourcesFromXML()
 {
-  QString xmlfilename(":/ParaViewResources/ParaViewSources.xml");
+  QString readersDirName = ":/ParaViewResources";
+  QDir readersDir(readersDirName);
+  QStringList resources = readersDir.entryList(QDir::Files);
+  this->Sources.clear();
+  foreach(QString resource, resources)
+    {
+    this->updateSourcesFromXML(readersDirName + QString("/") + resource);
+    }
+}
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::pqImplementation::updateSourcesFromXML(const QString& xmlfilename)
+{
   QFile xml(xmlfilename);
   if (!xml.open(QIODevice::ReadOnly))
     {
@@ -369,7 +382,6 @@ void pqMainWindowCore::pqImplementation::updateSourcesFromXML()
     }
 
   // Get all the sources
-  this->Sources.clear();
   QDomNodeList sourceList = doc.elementsByTagName("Source");
   for(int i=0; i<sourceList.size(); i++)
     {
@@ -380,6 +392,7 @@ void pqMainWindowCore::pqImplementation::updateSourcesFromXML()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::pqImplementation::setupFiltersMenu()
 {
   this->updateFiltersFromXML();
@@ -424,11 +437,25 @@ void pqMainWindowCore::pqImplementation::setupFiltersMenu()
 
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::pqImplementation::updateFiltersFromXML()
+{
+  QString readersDirName = ":/ParaViewResources";
+  QDir readersDir(readersDirName);
+  QStringList resources = readersDir.entryList(QDir::Files);
+  this->FilterCategories.clear();
+  this->AlphabeticalFilters.clear();
+  foreach(QString resource, resources)
+    {
+    this->updateFiltersFromXML(readersDirName + QString("/") + resource);
+    }
+}
+//-----------------------------------------------------------------------------
+
+void pqMainWindowCore::pqImplementation::updateFiltersFromXML(const QString& xmlfilename)
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
 
-  QString xmlfilename(":/ParaViewResources/ParaViewFilters.xml");
   QFile xml(xmlfilename);
   if (!xml.open(QIODevice::ReadOnly))
     {
@@ -443,8 +470,6 @@ void pqMainWindowCore::pqImplementation::updateFiltersFromXML()
     qDebug() << "Failed to load " << xmlfilename;
     return;
     }
-
-  this->FilterCategories.clear();
 
   // First create a uniquified, alphabetical vector of all filters
   pqImplementation::ProxyVector filters;
@@ -473,7 +498,6 @@ void pqMainWindowCore::pqImplementation::updateFiltersFromXML()
   pqImplementation::ProxyVector::iterator newEnd =
     vtkstd::unique(filters.begin(), filters.end(), pqImplementation::proxySame);
 
-  this->AlphabeticalFilters.clear();
   pqImplementation::ProxyVector::iterator filterIter = filters.begin();
   this->AlphabeticalFilters.insert(this->AlphabeticalFilters.begin(),
                                    filters.begin(), 
@@ -578,9 +602,6 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     &this->Implementation->PendingDisplayManager);
   core->registerManager("MULTIVIEW_MANAGER",
     &this->Implementation->MultiViewManager);
-  core->registerManager("SELECTION_MANAGER",
-    &this->Implementation->SelectionManager);
-
 
   // Set up the context menu manager.
   this->getViewContextMenuManager();
@@ -819,12 +840,6 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
                    SIGNAL(pickFinished(double, double, double)),
                    this, 
                    SLOT(pickCenterOfRotationFinished(double, double, double)));
-
-  // Make the view manager non-blockable so that none of the views are disabled.
-  pqProgressManager* progress_manager = 
-    pqApplicationCore::instance()->getProgressManager();
-  progress_manager->addNonBlockableObject(
-    &this->Implementation->MultiViewManager);
 }
 
 //-----------------------------------------------------------------------------
@@ -2314,8 +2329,6 @@ void pqMainWindowCore::onServerDisconnect()
     {
     core->getObjectBuilder()->removeServer(server);
     }
-  QList<QWidget*> removed;
-  this->Implementation->MultiViewManager.reset(removed);
 
   pqEventDispatcher::processEventsAndWait(1);
 
@@ -3393,17 +3406,6 @@ void pqMainWindowCore::updateFiltersMenu()
       continue;
       }
 
-    int numProcs = this->getActiveServer()->getNumberOfPartitions();
-    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(output);
-    if (sp &&
-        sp->GetProcessSupport() == vtkSMSourceProxy::SINGLE_PROCESS &&
-        numProcs > 1 ||
-        sp->GetProcessSupport() == vtkSMSourceProxy::MULTIPLE_PROCESSES &&
-        numProcs == 1)
-      {
-      continue;
-      }
-         
     vtkSMInputProperty *input = vtkSMInputProperty::SafeDownCast(
       output->GetProperty("Input"));
     if(input)
