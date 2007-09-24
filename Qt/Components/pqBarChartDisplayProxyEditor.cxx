@@ -78,7 +78,7 @@ pqBarChartDisplayProxyEditor::pqBarChartDisplayProxyEditor(pqRepresentation* rep
     this->Internal->EditColorMapButton, SIGNAL(clicked()),
     this, SLOT(openColorMapEditor()));
   QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
-    this, SLOT(updateAllViews()), Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
 
   this->Internal->UsePoints->setCheckState(Qt::Checked);
 

@@ -187,14 +187,11 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("SpecularPower"));
   QObject::connect(this->Internal->SpecularIntensity, SIGNAL(editingFinished()),
-                   this, SLOT(updateAllViews()),
-                   Qt::QueuedConnection);
+                   this, SLOT(updateAllViews()));
   QObject::connect(this, SIGNAL(specularColorChanged()),
-                   this, SLOT(updateAllViews()),
-                   Qt::QueuedConnection);
+                   this, SLOT(updateAllViews()));
   QObject::connect(this->Internal->SpecularPower, SIGNAL(editingFinished()),
-                   this, SLOT(updateAllViews()),
-                   Qt::QueuedConnection);
+                   this, SLOT(updateAllViews()));
   
   // setup for interpolation
   this->Internal->StyleInterpolation->clear();
@@ -363,75 +360,58 @@ void pqDisplayProxyEditor::setupGUIConnections()
   // only after the vtkSMProperty has been changed by the pqPropertyLinks.
   QObject::connect(
     this->Internal->ViewData, SIGNAL(stateChanged(int)),
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->ColorInterpolateColors, SIGNAL(stateChanged(int)),
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->ColorMapScalars, SIGNAL(stateChanged(int)),
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->StylePointSize,  SIGNAL(editingFinished()), 
     this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->StyleLineWidth, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->TranslateX, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->TranslateY, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->TranslateZ, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->ScaleX, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->ScaleY, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->ScaleZ, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->OrientationX, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->OrientationY, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->OrientationZ, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->OriginX, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->OriginY, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->OriginZ, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->Opacity, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->ViewZoomToData, SIGNAL(clicked(bool)), 
     this, SLOT(zoomToData()));
@@ -453,8 +433,7 @@ void pqDisplayProxyEditor::setupGUIConnections()
   this->Internal->InterpolationAdaptor->setObjectName(
     "StyleInterpolationAdapator");
   QObject::connect(this->Internal->InterpolationAdaptor, 
-    SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
+    SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateAllViews()));
     
   this->Internal->ColorAdaptor = new pqSignalAdaptorColor(
                             this->Internal->ColorActorColor,

@@ -733,16 +733,14 @@ pqXYPlotDisplayProxyEditor::pqXYPlotDisplayProxyEditor(pqRepresentation* display
 
   QObject::connect(this->Internal->XAxisComponentAdaptor,
     SIGNAL(currentIndexChanged(int)), 
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
-
+    this, SLOT(updateAllViews())); 
   QObject::connect(this->Internal->AttributeModeAdaptor,
     SIGNAL(currentTextChanged(const QString&)), 
     this, SLOT(onAttributeModeChanged()),
     Qt::QueuedConnection);
 
   QObject::connect(this->Internal->ViewData, SIGNAL(stateChanged(int)),
-    this, SLOT(updateAllViews()), Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
 
   QItemSelectionModel *model = this->Internal->SeriesList->selectionModel();
   QObject::connect(model,

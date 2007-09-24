@@ -96,7 +96,7 @@ void pqSpreadSheetDisplayEditor::setRepresentationInternal(pqRepresentation* rep
     "value", SIGNAL(valueChanged(int)),
     reprProxy, reprProxy->GetProperty("ProcessID"));
   QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
-    this, SLOT(updateAllViews()), Qt::QueuedConnection);
+    this, SLOT(updateAllViews()));
 
   // Update the label displaying the number of processes
   int numPartitions = repr->getServer()->getNumberOfPartitions();
