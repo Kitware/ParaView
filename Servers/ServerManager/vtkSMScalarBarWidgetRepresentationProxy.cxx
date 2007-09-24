@@ -34,7 +34,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy, "1.6");
 
 class vtkSMScalarBarWidgetRepresentationObserver : public vtkCommand
 {
@@ -225,6 +225,7 @@ void vtkSMScalarBarWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
   case vtkCommand::EndInteractionEvent:
     // disable interactive rendering.
     iren->InteractiveRenderEnabledOff();
+    iren->Render();
     break;
 
   case vtkCommand::InteractionEvent:

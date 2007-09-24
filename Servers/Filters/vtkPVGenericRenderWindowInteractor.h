@@ -57,11 +57,12 @@ public:
   // They call SetInteractive to tell whether to use still or interactive rendering.
   // This class just forwards the render request to ParaView's RenderModule.
   // DesiredUpdateRate is ignored.
-  // Since I was having trouble with the 3D widget doing the final full res render,
-  // setting this to 0 causes the render view to eventually render.
   void SetInteractiveRenderEnabled(int);
   vtkGetMacro(InteractiveRenderEnabled,int);
   vtkBooleanMacro(InteractiveRenderEnabled,int);
+
+  // Description:
+  // Triggers a render.
   virtual void Render();
 
   // Description:
