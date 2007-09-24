@@ -602,6 +602,9 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     &this->Implementation->PendingDisplayManager);
   core->registerManager("MULTIVIEW_MANAGER",
     &this->Implementation->MultiViewManager);
+  core->registerManager("SELECTION_MANAGER",
+    &this->Implementation->SelectionManager);
+
 
   // Set up the context menu manager.
   this->getViewContextMenuManager();
@@ -840,6 +843,12 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
                    SIGNAL(pickFinished(double, double, double)),
                    this, 
                    SLOT(pickCenterOfRotationFinished(double, double, double)));
+
+  // Make the view manager non-blockable so that none of the views are disabled.
+  pqProgressManager* progress_manager = 
+    pqApplicationCore::instance()->getProgressManager();
+  progress_manager->addNonBlockableObject(
+    &this->Implementation->MultiViewManager);
 }
 
 //-----------------------------------------------------------------------------
@@ -2329,6 +2338,8 @@ void pqMainWindowCore::onServerDisconnect()
     {
     core->getObjectBuilder()->removeServer(server);
     }
+  QList<QWidget*> removed;
+  this->Implementation->MultiViewManager.reset(removed);
 
   pqEventDispatcher::processEventsAndWait(1);
 
@@ -3406,6 +3417,17 @@ void pqMainWindowCore::updateFiltersMenu()
       continue;
       }
 
+    int numProcs = this->getActiveServer()->getNumberOfPartitions();
+    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(output);
+    if (sp &&
+        sp->GetProcessSupport() == vtkSMSourceProxy::SINGLE_PROCESS &&
+        numProcs > 1 ||
+        sp->GetProcessSupport() == vtkSMSourceProxy::MULTIPLE_PROCESSES &&
+        numProcs == 1)
+      {
+      continue;
+      }
+         
     vtkSMInputProperty *input = vtkSMInputProperty::SafeDownCast(
       output->GetProperty("Input"));
     if(input)
