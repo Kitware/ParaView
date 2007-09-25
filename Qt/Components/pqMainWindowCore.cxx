@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDir>
 #include <QMainWindow>
 #include <QDoubleSpinBox>
+#include <QMenuBar>
 
 #include "pqActionGroupInterface.h"
 #include "pqActiveServer.h"
@@ -329,7 +330,7 @@ public:
   pqPipelineBrowser *PipelineBrowser;
   QToolBar* VariableToolbar;
   QToolBar* LookmarkToolbar;
-  QList<QToolBar*> PluginToolBars;
+  QList<QObject*> PluginToolBars;
   
   pqToolTipTrapper* ToolTipTrapper;
   
@@ -3987,6 +3988,14 @@ void pqMainWindowCore::addPluginActions(pqActionGroupInterface* iface)
     tb->addActions(iface->actionGroup()->actions());
     mw->addToolBar(tb);
     this->Implementation->PluginToolBars.append(tb);
+    }
+  else if(splitName.size() == 2 && splitName[0] == "MenuBar")
+    {
+    QMenu* menu = new QMenu(splitName[1], mw);
+    menu->setObjectName(splitName[1]);
+    menu->addActions(iface->actionGroup()->actions());
+    mw->menuBar()->addMenu(menu);
+    this->Implementation->PluginToolBars.append(menu);
     }
   else if (splitName.size())
     {
