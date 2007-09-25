@@ -53,12 +53,13 @@ struct pqPythonShell::pqImplementation
   pqImplementation(QWidget* Parent) 
     : Console(Parent) 
   {
-    this->Interpreter = vtkPVPythonInteractiveInterpretor::New();
     this->VTKConnect = vtkEventQtSlotConnect::New();
   }
 
-  void Initialize(int argc, char* argv[])
+  void initialize(int argc, char* argv[])
   {
+    this->destroyInterpretor();
+    this->Interpreter = vtkPVPythonInteractiveInterpretor::New();
     this->Interpreter->SetCaptureStreams(true);
     this->Interpreter->SetMultithreadSupport(true);
     this->Interpreter->InitializeSubInterpretor(argc, argv);
@@ -86,15 +87,30 @@ struct pqPythonShell::pqImplementation
   {
     this->VTKConnect->Disconnect();
     this->VTKConnect->Delete();
-
-    this->Interpreter->MakeCurrent();
-
-    // Restore Python's original stdout and stderr
-    PySys_SetObject(const_cast<char*>("stdout"), PySys_GetObject(const_cast<char*>("__stdout__")));
-    PySys_SetObject(const_cast<char*>("stderr"), PySys_GetObject(const_cast<char*>("__stderr__")));
-    this->Interpreter->ReleaseControl();
-    this->Interpreter->Delete();
+    this->destroyInterpretor();
   }
+
+  void destroyInterpretor()
+    {
+    if (this->Interpreter)
+      {
+      QTextCharFormat format = this->Console.getFormat();
+      format.setForeground(QColor(255, 0, 0));
+      this->Console.setFormat(format);
+      this->Console.printString("\n... restarting ...\n");
+      format.setForeground(QColor(0, 0, 0));
+      this->Console.setFormat(format);
+
+      this->Interpreter->MakeCurrent();
+
+      // Restore Python's original stdout and stderr
+      PySys_SetObject(const_cast<char*>("stdout"), PySys_GetObject(const_cast<char*>("__stdout__")));
+      PySys_SetObject(const_cast<char*>("stderr"), PySys_GetObject(const_cast<char*>("__stderr__")));
+      this->Interpreter->ReleaseControl();
+      this->Interpreter->Delete();
+      }
+    this->Interpreter = 0;
+    }
 
   void executeCommand(const QString& Command)
   {
@@ -149,13 +165,6 @@ pqPythonShell::pqPythonShell(QWidget* Parent) :
   QObject::connect(
     &this->Implementation->Console, SIGNAL(executeCommand(const QString&)), 
     this, SLOT(onExecuteCommand(const QString&)));
-
-  this->Implementation->VTKConnect->Connect(
-    this->Implementation->Interpreter, vtkCommand::ErrorEvent, 
-    this, SLOT(printStderr(vtkObject*, unsigned long, void*, void*))); 
-  this->Implementation->VTKConnect->Connect(
-    this->Implementation->Interpreter, vtkCommand::WarningEvent, 
-    this, SLOT(printStdout(vtkObject*, unsigned long, void*, void*))); 
 }
 
 pqPythonShell::~pqPythonShell()
@@ -163,12 +172,24 @@ pqPythonShell::~pqPythonShell()
   delete this->Implementation;
 }
 
-void pqPythonShell::InitializeInterpretor(int argc, char* argv[])
+void pqPythonShell::initializeInterpretor(int argc, char* argv[])
 {
-  this->Implementation->Initialize(argc, argv);
+  this->Implementation->VTKConnect->Disconnect();
+
+  this->Implementation->initialize(argc, argv);
+  QTextCharFormat format = this->Implementation->Console.getFormat();
+  format.setForeground(QColor(0, 0, 255));
+  this->Implementation->Console.setFormat(format);
   this->Implementation->Console.printString(
     QString("Python %1 on %2\n").arg(Py_GetVersion()).arg(Py_GetPlatform()));
   this->promptForInput();
+
+  this->Implementation->VTKConnect->Connect(
+    this->Implementation->Interpreter, vtkCommand::ErrorEvent, 
+    this, SLOT(printStderr(vtkObject*, unsigned long, void*, void*))); 
+  this->Implementation->VTKConnect->Connect(
+    this->Implementation->Interpreter, vtkCommand::WarningEvent, 
+    this, SLOT(printStdout(vtkObject*, unsigned long, void*, void*))); 
 }
 
 void pqPythonShell::clear()

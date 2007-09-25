@@ -458,6 +458,9 @@ private:
   void saveRecentFilterMenu();
   class pqImplementation;
   pqImplementation* const Implementation;
+
+
+  void initPythonInterpretor();
 };
 
 #endif // !_pqMainWindowCore_h

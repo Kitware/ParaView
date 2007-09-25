@@ -2623,6 +2623,36 @@ void pqMainWindowCore::onToolsOutputWindow()
 }
 
 //-----------------------------------------------------------------------------
+void pqMainWindowCore::initPythonInterpretor()
+{
+  // Since paraview application always has a server connection,
+  // intialize the paraview.ActiveConnection to point to the currently
+  // existsing connection, so that the user can directly start creating
+  // proxies etc.
+  pqServer* activeServer = this->getActiveServer();
+  if (activeServer)
+    {
+    int cid = static_cast<int>(activeServer->GetConnectionID());
+    QString initStr = QString(
+      "import paraview\n"
+      "paraview.ActiveConnection = paraview.pyConnection(%1)\n"
+      "paraview.ActiveConnection.SetHost(\"%2\", 0)\n"
+      "from paraview import servermanager\n"
+      "servermanager.ActiveConnection = servermanager.Connection(%3)\n"
+      "servermanager.ActiveConnection.SetHost(\"%4\", 0)\n"
+      "servermanager.ToggleProgressPrinting()\n"
+      "servermanager.fromGUI = True\n")
+      .arg(cid)
+      .arg(activeServer->getResource().toURI())
+      .arg(cid)
+      .arg(activeServer->getResource().toURI());
+    this->Implementation->PythonDialog->runString(initStr);
+    }
+
+  this->Implementation->PythonDialog->setAttribute(Qt::WA_QuitOnClose, false);
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsPythonShell()
 {
 #ifdef PARAVIEW_ENABLE_PYTHON
@@ -2632,38 +2662,9 @@ void pqMainWindowCore::onToolsPythonShell()
       GetOptions()->GetArgv0();
     this->Implementation->PythonDialog = 
       new pqPythonDialog(this->Implementation->Parent, 1, (char**)&argv0);
-
-    // Since paraview application always has a server connection,
-    // intialize the paraview.ActiveConnection to point to the currently
-    // existsing connection, so that the user can directly start creating
-    // proxies etc.
-    pqServer* activeServer = this->getActiveServer();
-    if (activeServer)
-      {
-      int cid = static_cast<int>(activeServer->GetConnectionID());
-      QString initStr = QString(
-        "import paraview\n"
-        "paraview.ActiveConnection = paraview.pyConnection(%1)\n"
-        "paraview.ActiveConnection.SetHost(\"%2\", 0)\n"
-        "from paraview import servermanager\n"
-        "servermanager.ActiveConnection = servermanager.Connection(%3)\n"
-        "servermanager.ActiveConnection.SetHost(\"%4\", 0)\n"
-        "servermanager.ToggleProgressPrinting()\n"
-        "servermanager.fromGUI = True\n")
-        .arg(cid)
-        .arg(activeServer->getResource().toURI())
-        .arg(cid)
-        .arg(activeServer->getResource().toURI());
-/*
-      QString initStr = QString(
-        "from paraview import servermanager\n"
-        "servermanager.ActiveConnection = servermanager.Connection(%1)\n"
-        "servermanager.ActiveConnection.SetHost(\"%2\", 0)\n").arg(cid).arg(activeServer->getResource().toURI());*/
-      this->Implementation->PythonDialog->runString(initStr);
-      }
-
-    this->Implementation->PythonDialog->setAttribute(Qt::WA_QuitOnClose, false);
+    this->initPythonInterpretor();
     }
+
   this->Implementation->PythonDialog->show();
   this->Implementation->PythonDialog->raise();
   this->Implementation->PythonDialog->activateWindow();
@@ -3150,12 +3151,32 @@ void pqMainWindowCore::onServerCreationFinished(pqServer *server)
   core->getSelectionModel()->setCurrentItem(server,
       pqServerManagerSelectionModel::ClearAndSelect);
 
+#ifdef PARAVIEW_ENABLE_PYTHON
+  // Initialize interpretor using the new server connection.
+  if (this->Implementation->PythonDialog)
+    {
+    this->initPythonInterpretor();
+    }
+#endif // PARAVIEW_ENABLE_PYTHON
+
   this->Implementation->UndoStack->clear();
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onRemovingServer(pqServer *server)
 {
+#ifdef PARAVIEW_ENABLE_PYTHON
+  // Initialize interpretor using the new server connection.
+  if (this->Implementation->PythonDialog)
+    {
+    // ensure that the interpretor is destroyed before the server connection is
+    // closed.
+    const char* argv0 = vtkProcessModule::GetProcessModule()->
+      GetOptions()->GetArgv0();    
+    this->Implementation->PythonDialog->restartInterpretor(1, (char**)&argv0);
+    }
+#endif // PARAVIEW_ENABLE_PYTHON
+
   // Make sure the server and its sources are not selected.
   pqServerManagerSelection toDeselect;
   pqApplicationCore *core = pqApplicationCore::instance();

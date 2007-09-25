@@ -53,7 +53,10 @@ public:
   pqPythonShell(QWidget* Parent);
   ~pqPythonShell();
 
-  void InitializeInterpretor(int argc, char* argv[]);
+
+  /// Initializes the interpretor. If an interpretor is already setup (by an
+  /// earlier call to this method), it will be destroyed.
+  void initializeInterpretor(int argc, char* argv[]);
 
 signals:
   void executing(bool);

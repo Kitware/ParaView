@@ -55,12 +55,15 @@ public:
   /// Execute a commond in the python shell.
   void runString(const QString& script);
 
+  /// Calling this slot will destroy the current python interpretor and start a
+  /// new one without closing the dialog.
+  void restartInterpretor(int argc, char** argv);
 private slots:
   void runScript();
   void runScript(const QStringList&);
   
   void clearConsole();
-  
+ 
 private:
   ~pqPythonDialog();
   pqPythonDialog(const pqPythonDialog&);

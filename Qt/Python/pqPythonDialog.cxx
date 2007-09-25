@@ -87,7 +87,7 @@ pqPythonDialog::pqPythonDialog(QWidget* Parent, int argc, char** argv) :
     this->Implementation->Ui.close,
     SLOT(setDisabled(bool)));
 
-  this->Implementation->Ui.shellWidget->InitializeInterpretor(argc, argv);
+  this->Implementation->Ui.shellWidget->initializeInterpretor(argc, argv);
   
   pqApplicationCore::instance()->settings()->restoreState("PythonDialog", *this);
 }
@@ -144,3 +144,7 @@ void pqPythonDialog::clearConsole()
   this->Implementation->Ui.shellWidget->clear();
 }
 
+void pqPythonDialog::restartInterpretor(int argc, char* argv[])
+{
+  this->Implementation->Ui.shellWidget->initializeInterpretor(argc, argv);
+}
