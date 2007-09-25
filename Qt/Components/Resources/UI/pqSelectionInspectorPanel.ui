@@ -276,7 +276,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QTreeWidget" name="Indices" >
+          <widget class="pqTreeWidget" name="Indices" >
            <property name="sizePolicy" >
             <sizepolicy>
              <hsizetype>5</hsizetype>
@@ -1393,12 +1393,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqCollapsedGroup</class>
-   <extends>QGroupBox</extends>
-   <header>pqCollapsedGroup.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>pqDoubleRangeWidget</class>
    <extends>QWidget</extends>
    <header>pqDoubleRangeWidget.h</header>
@@ -1407,6 +1401,17 @@
    <class>pqColorChooserButton</class>
    <extends>QPushButton</extends>
    <header>pqColorChooserButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqCollapsedGroup</class>
+   <extends>QGroupBox</extends>
+   <header>pqCollapsedGroup.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>pqTreeWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

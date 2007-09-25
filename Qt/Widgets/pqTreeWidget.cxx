@@ -54,6 +54,7 @@ enum pqTreeWidgetPixmap
   pqMaxCheck            = 6
 };
 
+//-----------------------------------------------------------------------------
 // array of style corresponding with the pqTreeWidgetPixmap enum
 static const QStyle::State pqTreeWidgetPixmapStyle[] =
 {
@@ -65,6 +66,7 @@ static const QStyle::State pqTreeWidgetPixmapStyle[] =
   QStyle::State_Off | QStyle::State_Enabled | QStyle::State_Active
 };
 
+//-----------------------------------------------------------------------------
 QPixmap pqTreeWidget::pixmap(Qt::CheckState cs, bool active)
 {
   int offset = active ? pqMaxCheck/2 : 0;
@@ -80,6 +82,7 @@ QPixmap pqTreeWidget::pixmap(Qt::CheckState cs, bool active)
   return QPixmap();
 }
 
+//-----------------------------------------------------------------------------
 pqTreeWidget::pqTreeWidget(QWidget* p)
   : QTreeWidget(p)
 {
@@ -119,6 +122,7 @@ pqTreeWidget::pqTreeWidget(QWidget* p)
                    this, SLOT(invalidateLayout()));
 }
 
+//-----------------------------------------------------------------------------
 pqTreeWidget::~pqTreeWidget()
 {
   for(int i=0; i<pqMaxCheck; i++)
@@ -128,6 +132,7 @@ pqTreeWidget::~pqTreeWidget()
   delete [] this->CheckPixmaps;
 }
 
+//-----------------------------------------------------------------------------
 bool pqTreeWidget::event(QEvent* e)
 {
   if(e->type() == QEvent::FocusIn ||
@@ -146,6 +151,7 @@ bool pqTreeWidget::event(QEvent* e)
   return Superclass::event(e);
 }
 
+//-----------------------------------------------------------------------------
 void pqTreeWidget::updateCheckState()
 {
   Qt::CheckState newState = Qt::Checked;
@@ -193,6 +199,7 @@ void pqTreeWidget::updateCheckState()
                               pixmap(newState, this->hasFocus()));
 }
 
+//-----------------------------------------------------------------------------
 void pqTreeWidget::allOn()
 {
   QTreeWidgetItem* item;
@@ -204,6 +211,7 @@ void pqTreeWidget::allOn()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqTreeWidget::allOff()
 {
   QTreeWidgetItem* item;
@@ -216,6 +224,7 @@ void pqTreeWidget::allOff()
 }
 
 
+//-----------------------------------------------------------------------------
 void pqTreeWidget::doToggle(int column)
 {
   if(column == 0)
@@ -237,6 +246,7 @@ void pqTreeWidget::doToggle(int column)
     }
 }
 
+//-----------------------------------------------------------------------------
 QSize pqTreeWidget::sizeHint() const
 {
   // lets show X items before we get a scrollbar
@@ -262,11 +272,13 @@ QSize pqTreeWidget::sizeHint() const
   return QSize(156, h);
 }
 
+//-----------------------------------------------------------------------------
 QSize pqTreeWidget::minimumSizeHint() const
 {
   return this->sizeHint();
 }
 
+//-----------------------------------------------------------------------------
 void pqTreeWidget::invalidateLayout()
 {
   // sizeHint is dynamic, so we need to invalidate parent layouts
@@ -279,3 +291,54 @@ void pqTreeWidget::invalidateLayout()
     }
 }
 
+//-----------------------------------------------------------------------------
+QModelIndex pqTreeWidget::moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers) 
+{
+  QModelIndex suggestedIndex = this->Superclass::moveCursor(cursorAction, modifiers);
+
+  int max_rows = this->topLevelItemCount();
+  int max_colums = this->columnCount();
+  QTreeWidgetItem* curItem = this->currentItem();
+  int cur_col = this->currentColumn();
+  if (!curItem || cur_col < 0 || cur_col >= max_colums)
+    {
+    return suggestedIndex;
+    }
+
+  int cur_row = this->indexOfTopLevelItem(curItem);
+  if (cursorAction == QAbstractItemView::MoveNext && modifiers ==  Qt::NoModifier)
+    {
+    if ((cur_col+1) < max_colums)
+      {
+      return this->indexFromItem(curItem, cur_col+1);
+      }
+    else if ((cur_row +1) == max_rows)
+      {
+      // User is at last row, we need to add a new row before moving to that
+      // row.
+      emit this->navigatedPastEnd();
+      // if the table grows, the index may change.
+      suggestedIndex = this->Superclass::moveCursor(cursorAction, modifiers);
+      }
+    // otherwise default behaviour takes it to the first column in the next
+    // row, which is what is expected.
+    }
+  else if (cursorAction == QAbstractItemView::MovePrevious && modifiers == Qt::NoModifier)
+    {
+    if (cur_col > 0)
+      {
+      return this->indexFromItem(curItem, cur_col-1);
+      }
+    else
+      {
+      // we need to go to the last column in the previous row.
+      if (cur_row > 0)
+        {
+        return this->indexFromItem(
+          this->topLevelItem(cur_row-1), max_colums-1);
+        }
+      }
+    }
+
+  return suggestedIndex;
+}

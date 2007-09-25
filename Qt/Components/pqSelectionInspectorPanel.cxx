@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QScrollArea>
 #include <QVBoxLayout>
+#include <QItemDelegate>
 
 #include "pqActiveView.h"
 #include "pqApplicationCore.h"
@@ -83,7 +84,7 @@ public:
     : pqTreeWidgetItemObject(l)
   {
   }
-  bool operator< ( const QTreeWidgetItem & other ) const  
+  virtual bool operator< ( const QTreeWidgetItem & other ) const  
   {
     int sortCol = treeWidget()->sortColumn();
     double myNumber = text(sortCol).toDouble();
@@ -92,6 +93,7 @@ public:
   }
 };
 
+//////////////////////////////////////////////////////////////////////////////
 // pqSelectionInspectorPanel::pqImplementation
 
 struct pqSelectionInspectorPanel::pqImplementation : public Ui::SelectionInspectorPanel
@@ -222,6 +224,8 @@ pqSelectionInspectorPanel::pqSelectionInspectorPanel(QWidget *p) :
 
   this->setEnabled(false);
 
+  QObject::connect(this->Implementation->Indices, SIGNAL(navigatedPastEnd()),
+    this, SLOT(growIndicesTable()));
 }
 
 //-----------------------------------------------------------------------------
@@ -1059,11 +1063,15 @@ void pqSelectionInspectorPanel::newValueSurfaceSelection()
 
   QStringList value;
   // TODO: Use some good defaults.
-  value.push_back(QString::number(0));
-  if (!this->Implementation->UseGlobalIDs->isChecked())
+  if (this->Implementation->UseGlobalIDs->isChecked())
+    {
+    value.push_back(QString::number(-1));
+    }
+  else
     {
     value.push_back(QString::number(0));
     }
+  value.push_back(QString::number(0));
 
   pqSelectionInspectorTreeItem* item = new pqSelectionInspectorTreeItem(value);
   adaptor->appendItem(item);
@@ -1482,4 +1490,28 @@ void pqSelectionInspectorPanel::convertSelection(bool toGIDs)
     }
 
   selectionSource->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::growIndicesTable()
+{
+  if ( this->Implementation->Indices->topLevelItemCount()>0)
+    {
+    pqSignalAdaptorTreeWidget* adaptor = this->Implementation->IndicesAdaptor;
+
+    QTreeWidgetItem* curItem = this->Implementation->Indices->topLevelItem(
+      this->Implementation->Indices->topLevelItemCount()-1);
+
+    if (curItem)
+      {
+      QStringList value;
+      for (int cc=0; cc < curItem->columnCount(); cc++)
+        {
+        value.push_back(curItem->text(cc));
+        }
+
+      pqSelectionInspectorTreeItem* item = new pqSelectionInspectorTreeItem(value);
+      adaptor->appendItem(item);
+      }
+    }
 }
