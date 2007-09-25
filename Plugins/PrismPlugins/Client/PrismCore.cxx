@@ -24,7 +24,7 @@
 #include <QMessageBox>
 #include <QtDebug>
 #include <pqFileDialog.h>
-#include <QAction.h>
+#include <QAction>
 #include "pqUndoStack.h"
 //-----------------------------------------------------------------------------
 static PrismCore* Instance = 0;
@@ -84,13 +84,13 @@ PrismCore* PrismCore::instance()
 
 QList<QAction*> PrismCore::actions()
 {
-  QList<QAction*> actions;
-  actions.push_back(this->SesameViewAction);
-  actions.push_back(this->PrismViewAction);
+  QList<QAction*> tmp;
+  tmp.push_back(this->SesameViewAction);
+  tmp.push_back(this->PrismViewAction);
 
-  return actions;
-
+  return tmp;
 }
+
 pqPipelineSource* PrismCore::getActiveSource() const
 {
   pqApplicationCore* core = pqApplicationCore::instance();
