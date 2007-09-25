@@ -4060,6 +4060,31 @@
 {
    <insert a suppression name here>
    Memcheck:Leak
+   fun:malloc
+   fun:realloc
+   fun:g_realloc
+   obj:/usr/lib*/libglib-2.0.so.0*
+   fun:g_array_set_size
+   fun:g_static_private_set
+   fun:g_main_context_dispatch
+   obj:/usr/lib*/libglib-2.0.so.0*
+   fun:g_main_context_iteration
+   fun:_ZN20QEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   obj:/usr/lib*/libglib-2.0.so.0*
+   fun:_ZN23QGuiEventDispatcherGlib13processEventsE6QFlagsIN10QEventLoop17ProcessEventsFlagEE
+   fun:_ZN10QEventLoop13processEventsE6QFlagsINS_17ProcessEventsFlagEE
+   fun:_ZN10QEventLoop4execE6QFlagsINS_17ProcessEventsFlagEE
+   fun:_ZN16QCoreApplication4execEv
+   fun:_ZN24pqProcessModuleGUIHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:_ZN6pqMain3RunER12QApplicationP24pqProcessModuleGUIHelper
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
    fun:realloc
    obj:/usr/lib*/libfontconfig.so.1.0.4
    fun:FcNameParseCharSet
@@ -6044,6 +6069,32 @@
 {
    <insert a suppression name here>
    Memcheck:Leak
+   fun:malloc
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
+   fun:_XlcOpenConverter
+   fun:_XimLocalOpenIM
+   fun:_XimOpenIM
+   obj:/usr/*lib*/libX11.so.6.2*
+   fun:_ZN16QXIMInputContext10create_ximEv
+   fun:_XimRegisterIMInstantiateCallback
+   fun:_ZN16QXIMInputContextC1Ev
+   fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
+   fun:_ZNK12QApplication12inputContextEv
+   fun:_ZN7QWidget12inputContextEv
+   fun:_ZN7QWidget16updateMicroFocusEv
+   fun:_ZN16QLineEditPrivate12finishChangeEibb
+   fun:_ZN16QLineEditPrivate7setTextERK7QStringib
+   fun:_ZN19pqDoubleRangeWidgetC1EP7QWidget
+   fun:_ZN26Ui_SelectionInspectorPanel7setupUiEP7QWidget
+   fun:_ZN25pqSelectionInspectorPanelC1EP7QWidget
+   fun:_ZN16pqMainWindowCore23setupSelectionInspectorEP11QDockWidget
+   fun:_ZN10MainWindowC1Ev
+   fun:_ZN22ProcessModuleGUIHelper16CreateMainWindowEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
    fun:realloc
    fun:_Z8qReallocPvj
    fun:_ZN7QVectorIP10QEventLoopE7reallocEii
@@ -6129,6 +6180,32 @@
    fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
    fun:_ZNK12QApplication12inputContextEv
    fun:_ZN7QWidget12inputContextEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/X11/locale/common/xlcDef.so.2.0.0
+   fun:_XlcOpenConverter
+   fun:_XimLocalOpenIM
+   fun:_XimOpenIM
+   obj:/usr/*lib*/libX11.so.6.2*
+   fun:_ZN16QXIMInputContext10create_ximEv
+   fun:_XimRegisterIMInstantiateCallback
+   obj:/usr/*lib*/libX11.so.6.2*
+   fun:XRegisterIMInstantiateCallback
+   fun:_ZN16QXIMInputContextC1Ev
+   fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
+   fun:_ZNK12QApplication12inputContextEv
+   fun:_ZN7QWidget16updateMicroFocusEv
+   fun:_ZN16QLineEditPrivate12finishChangeEibb
+   fun:_ZN16QLineEditPrivate7setTextERK7QStringib
+   fun:_ZN19pqDoubleRangeWidgetC1EP7QWidget
+   fun:_ZN26Ui_SelectionInspectorPanel7setupUiEP7QWidget
+   fun:_ZN25pqSelectionInspectorPanelC1EP7QWidget
+   fun:_ZN16pqMainWindowCore23setupSelectionInspectorEP11QDockWidget
+   fun:_ZN10MainWindowC1Ev
+   fun:_ZN22ProcessModuleGUIHelper16CreateMainWindowEv
 }
 {
    <insert a suppression name here>
@@ -9736,6 +9813,34 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
+   fun:XSetWindowBackground
+   fun:_ZN14QWidgetPrivate22updateSystemBackgroundEv
+   fun:_ZN7QWidget17setForegroundRoleEN8QPalette9ColorRoleE
+   fun:_ZN22QAbstractButtonPrivate4initEv
+   fun:_ZN15QAbstractButtonC2ER22QAbstractButtonPrivateP7QWidget
+   fun:_ZN9QCheckBoxC1EP7QWidget
+   fun:_ZN27Ui_DisplayProxyEditorWidget7setupUiEP7QWidget
+   fun:_ZN21pqDefaultDisplayPanelC1EP16pqRepresentationP7QWidget
+   fun:_ZN26pqDisplayProxyEditorWidget11updatePanelEv
+   fun:_ZN26pqDisplayProxyEditorWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
+   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN29pqServerManagerSelectionModel16selectionChangedERK24pqServerManagerSelectionS2_
+   fun:_ZN29pqServerManagerSelectionModel6selectERK24pqServerManagerSelection6QFlagsINS_13SelectionFlagEE
+}
+{
+   <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
    fun:_XlcCreateLC
@@ -10457,6 +10562,30 @@
    fun:_ZN8QPainter9drawLinesEPK5QLinei
    fun:_Z23qt_plastique_draw_frameP8QPainterRK5QRectPK12QStyleOptionN6QFrame6ShadowE
    fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK15QPlastiqueStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
+   fun:_ZN16QAbstractSpinBox10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN16QAbstractSpinBox5eventEP6QEvent
+   fun:_ZN8QSpinBox5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
+   fun:XRenderCompositeTrapezoids
+   fun:_Z29qt_XRenderCompositeTrapezoidsP9_XDisplayimmPK17XRenderPictFormatiiRK7QVectorI11_XTrapezoidE
+   fun:_ZN22QX11PaintEnginePrivate15fillPolygon_devEPK7QPointFiNS_6GCModeEN12QPaintEngine15PolygonDrawModeE
+   fun:_ZN22QX11PaintEnginePrivate8fillPathERK12QPainterPathNS_6GCModeEb
+   fun:_ZN15QX11PaintEngine10drawPointsEPK6QPointi
+   fun:_ZN8QPainter10drawPointsEPK6QPointi
    fun:_ZNK15QPlastiqueStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
    fun:_ZN16QAbstractSpinBox10paintEventEP11QPaintEvent
    fun:_ZN7QWidget5eventEP6QEvent
@@ -16853,6 +16982,16 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:_PyUnicodeUCS4_Init
+   fun:Py_Initialize
+}
+{
+   <insert a suppression name here>
    Memcheck:Cond
    fun:PyObject_Free
    fun:list_dealloc
@@ -17692,18 +17831,6 @@
    fun:PyImport_ImportModuleEx
    fun:builtin___import__
    fun:PyObject_Call
-   fun:PyEval_CallObjectWithKeywords
-   fun:eval_frame
-   fun:PyEval_EvalCodeEx
-   fun:PyEval_EvalCode
-   fun:PyImport_ExecCodeModuleEx
-   fun:load_source_module
-   fun:load_module
-   fun:import_submodule
-   fun:load_next
-   fun:PyImport_ImportModuleEx
-   fun:builtin___import__
-   fun:PyObject_Call
 }
 {
    <insert a suppression name here>
@@ -17720,18 +17847,6 @@
    fun:PyImport_ImportModuleEx
    fun:builtin___import__
    fun:PyObject_Call
-   fun:PyEval_CallObjectWithKeywords
-   fun:eval_frame
-   fun:PyEval_EvalCodeEx
-   fun:PyEval_EvalCode
-   fun:PyImport_ExecCodeModuleEx
-   fun:load_source_module
-   fun:load_module
-   fun:import_submodule
-   fun:load_next
-   fun:PyImport_ImportModuleEx
-   fun:builtin___import__
-   fun:PyObject_Call
 }
 {
    <insert a suppression name here>
@@ -17741,18 +17856,6 @@
    fun:PyMarshal_ReadObjectFromString
    fun:PyMarshal_ReadLastObjectFromFile
    fun:read_compiled_module
-   fun:load_source_module
-   fun:load_module
-   fun:import_submodule
-   fun:load_next
-   fun:PyImport_ImportModuleEx
-   fun:builtin___import__
-   fun:PyObject_Call
-   fun:PyEval_CallObjectWithKeywords
-   fun:eval_frame
-   fun:PyEval_EvalCodeEx
-   fun:PyEval_EvalCode
-   fun:PyImport_ExecCodeModuleEx
    fun:load_source_module
    fun:load_module
    fun:import_submodule
@@ -19100,6 +19203,46 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:ste_dealloc
+   fun:list_dealloc
+   fun:ste_dealloc
+   fun:PySymtable_Free
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:ste_dealloc
+   fun:list_dealloc
+   fun:ste_dealloc
+   fun:PySymtable_Free
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
    Memcheck:Addr4
    fun:PyObject_Free
    fun:dict_dealloc
@@ -19645,6 +19788,42 @@
 {
    <insert a suppression name here>
    Memcheck:Addr4
+   fun:PyObject_Free
+   fun:com_free
+   fun:jcompile
+   fun:com_node
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:com_free
+   fun:jcompile
+   fun:com_node
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
    fun:PyObject_Free
    fun:com_free
    fun:jcompile
@@ -20937,6 +21116,54 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:cleanreturn
+   fun:PyArg_ParseTupleAndKeywords
+   fun:file_init
+   fun:type_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:cleanreturn
+   fun:PyArg_ParseTupleAndKeywords
+   fun:file_init
+   fun:type_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
    Memcheck:Addr4
    fun:PyObject_Free
    fun:list_dealloc
@@ -21379,6 +21606,42 @@
 {
    <insert a suppression name here>
    Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   fun:jcompile
+   fun:com_node
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   fun:jcompile
+   fun:com_node
+   fun:jcompile
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
    fun:PyObject_Realloc
    fun:_PyString_Resize
    fun:jcompile
@@ -24241,6 +24504,62 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:frame_dealloc
+   fun:PyEval_EvalCodeEx
+   fun:function_call
+   fun:PyObject_Call
+   fun:instancemethod_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:function_call
+   fun:PyObject_Call
+   fun:instancemethod_call
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyInstance_New
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:frame_dealloc
+   fun:PyEval_EvalCodeEx
+   fun:function_call
+   fun:PyObject_Call
+   fun:instancemethod_call
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:function_call
+   fun:PyObject_Call
+   fun:instancemethod_call
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyInstance_New
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+}
+{
+   <insert a suppression name here>
    Memcheck:Addr4
    fun:PyObject_Free
    fun:function_call
@@ -24961,6 +25280,26 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   fun:file_read
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
    Memcheck:Cond
    fun:PyObject_Realloc
    fun:_PyString_Resize
@@ -25002,6 +25341,60 @@
 {
    <insert a suppression name here>
    Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:eval_frame
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:eval_frame
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
    fun:PyObject_Free
    fun:list_dealloc
    fun:eval_frame
@@ -26141,6 +26534,60 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:dict_dealloc
+   fun:instance_dealloc
+   fun:frame_dealloc
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:dict_dealloc
+   fun:instance_dealloc
+   fun:frame_dealloc
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
    Memcheck:Addr4
    fun:PyObject_Realloc
    fun:_PyObject_GC_Resize
@@ -26329,6 +26776,22 @@
 {
    <insert a suppression name here>
    Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:class_dealloc
+   fun:tupledealloc
+   fun:class_dealloc
+   fun:tupledealloc
+   fun:class_dealloc
+   fun:instance_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
    fun:PyObject_Free
    fun:dict_dealloc
    fun:class_dealloc
@@ -28795,12 +29258,44 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:frame_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
    Memcheck:Cond
    fun:PyObject_Free
    fun:dict_dealloc
    fun:PyImport_Import
    fun:PyImport_ImportModule
    fun:initsite
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
 }
 {
    <insert a suppression name here>
@@ -29889,6 +30384,30 @@
 {
    <insert a suppression name here>
    Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
    fun:PyObject_Realloc
    fun:_PyString_Resize
    obj:/usr/lib64/libpython2.3.so.1.0
@@ -31088,6 +31607,32 @@
    Memcheck:Cond
    fun:PyObject_Free
    obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
    obj:/usr/lib64/libpython2.3.so.1.0
@@ -31298,6 +31843,34 @@
 {
    <insert a suppression name here>
    Memcheck:Addr4
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   obj:/usr/lib64/libpython2.3.so.1.0
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
    fun:PyObject_Free
    obj:/usr/lib64/libpython2.3.so.1.0
    obj:/usr/lib64/libpython2.3.so.1.0
@@ -33467,11 +34040,6 @@
    fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
    fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
    fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
-   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
 }
 {
    <insert a suppression name here>
@@ -33946,14 +34514,6 @@
    fun:PyType_Ready
    fun:_PyUnicodeUCS4_Init
    fun:Py_Initialize
-   fun:_ZN19pqPythonEventSourceC1EP7QObject
-   fun:_ZN13pqTestUtilityC2EP7QObject
-   fun:_ZN17pqCoreTestUtilityC1EP7QObject
-   fun:_ZN24pqProcessModuleGUIHelper16pqImplementationC1Ev
-   fun:_ZN24pqProcessModuleGUIHelperC2Ev
-   fun:_ZN22ProcessModuleGUIHelperC1Ev
-   fun:_ZN22ProcessModuleGUIHelper3NewEv
-   fun:main
 }
 {
    <insert a suppression name here>
@@ -34118,6 +34678,24 @@
    fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
    fun:_ZN6pqMain3RunER12QApplicationP24pqProcessModuleGUIHelper
    fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:instance_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:PyDict_SetItemString
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:function_call
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:_PyCodec_Lookup
+   fun:PyCodec_Encoder
+   fun:Py_Initialize
 }
 {
    <insert a suppression name here>
@@ -35070,6 +35648,24 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:_PyUnicodeUCS4_Init
+   fun:Py_Initialize
+   fun:_ZN19pqPythonEventSourceC1EP7QObject
+   fun:_ZN13pqTestUtilityC2EP7QObject
+   fun:_ZN17pqCoreTestUtilityC1EP7QObject
+   fun:_ZN24pqProcessModuleGUIHelper16pqImplementationC1Ev
+   fun:_ZN24pqProcessModuleGUIHelperC2Ev
+   fun:_ZN22ProcessModuleGUIHelperC1Ev
+   fun:_ZN22ProcessModuleGUIHelper3NewEv
+   fun:main
+}
+{
+   <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
    fun:_ZN10QByteArray7reallocEi
@@ -35289,6 +35885,23 @@
    fun:_ZN24pqPythonEventSourceImage3runEv
    fun:_ZN21pqThreadedEventSource10pqInternal3runEv
    fun:_ZN14QThreadPrivate5startEPv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:Py_Initialize
+   fun:_ZN19pqPythonEventSourceC1EP7QObject
+   fun:_ZN13pqTestUtilityC2EP7QObject
+   fun:_ZN17pqCoreTestUtilityC1EP7QObject
+   fun:_ZN24pqProcessModuleGUIHelper16pqImplementationC1Ev
+   fun:_ZN24pqProcessModuleGUIHelperC2Ev
+   fun:_ZN22ProcessModuleGUIHelperC1Ev
+   fun:_ZN22ProcessModuleGUIHelper3NewEv
+   fun:main
 }
 {
    <insert a suppression name here>
