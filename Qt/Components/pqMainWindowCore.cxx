@@ -3645,13 +3645,28 @@ pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
       if (allInputs.contains(
           this->Implementation->SelectionManager.getSelectedPort()))
         {
+        QList<QPair<int, vtkIdType> > indices = 
+          this->Implementation->SelectionManager.getIndices();
+        int cc;
+        QList<QVariant> values;
+        for (cc=0; cc < indices.size(); cc++)
+          {
+          values << indices[cc].first << indices[cc].second;
+          }
+
         pqSMAdaptor::setMultipleElementProperty(
-          proxy->GetProperty("Indices"),
-          this->Implementation->SelectionManager.
-          getSelectedIndicesWithProcessIDs());
+          proxy->GetProperty("Indices"), values);
+
+        values.clear();
+        QList<vtkIdType> gids = 
+          this->Implementation->SelectionManager.getGlobalIDs();
+        for (cc=0; cc < gids.size(); cc++)
+          {
+          values << gids[cc];
+          }
+            
         pqSMAdaptor::setMultipleElementProperty(
-          proxy->GetProperty("GlobalIDs"),
-          this->Implementation->SelectionManager.getSelectedGlobalIDs());
+          proxy->GetProperty("GlobalIDs"), values);
         proxy->UpdateVTKObjects();
         }
       }
@@ -4135,7 +4150,8 @@ void pqMainWindowCore::finalTimeoutWarning()
 //-----------------------------------------------------------------------------
 // update the state of the \c node if node is not an ancestor of any of the
 // non-blockable widgets. If so, then it recurses over all its children.
-void selectiveEnabledInternal(QWidget* node, QList<QPointer<QObject> >& nonblockable, bool enable)
+static void selectiveEnabledInternal(QWidget* node, 
+  QList<QPointer<QObject> >& nonblockable, bool enable)
 {
   if (!node)
     {
