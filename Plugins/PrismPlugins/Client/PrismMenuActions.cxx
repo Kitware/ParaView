@@ -1,9 +1,9 @@
 
 
-#include "PrismToolBarActions.h"
+#include "PrismMenuActions.h"
 #include "PrismCore.h"
 
-PrismToolBarActions::PrismToolBarActions(QObject* p)
+PrismMenuActions::PrismMenuActions(QObject* p)
   : QActionGroup(p)
 {
   PrismCore* core=PrismCore::instance();
@@ -11,7 +11,7 @@ PrismToolBarActions::PrismToolBarActions(QObject* p)
     {
     core=new PrismCore(this);
     }
-  
+
   QList<QAction*> actions= core->actions();
   foreach(QAction *a,actions)
     {
@@ -20,7 +20,7 @@ PrismToolBarActions::PrismToolBarActions(QObject* p)
 
 }
 
-PrismToolBarActions::~PrismToolBarActions()
+PrismMenuActions::~PrismMenuActions()
 {
 
 }
