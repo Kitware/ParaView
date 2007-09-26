@@ -32,14 +32,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCommandServerStartup.h"
 
-#include <QtNetwork/QHostInfo>
 #include <QTimer>
 #include <QtDebug>
+
+#if defined(Q_WS_WIN)
+# include <QtNetwork/QHostInfo>
+#else
+# include <unistd.h>
+#endif
 
 #include "vtkPVXMLElement.h"
 
 #include "pqServerResource.h"
 
+// TODO maybe move this to kwsys or something
+static QString localHostName()
+{
+#if defined(Q_WS_WIN)
+  QHostInfo::localHostName();
+#else
+  char hostName[512];
+  if (gethostname(hostName, sizeof(hostName)) == -1)
+    return QString();
+  hostName[sizeof(hostName) - 1] = '\0';
+  return QString::fromLocal8Bit(hostName);
+#endif
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // pqCommandServerStartup
@@ -81,7 +99,7 @@ void pqCommandServerStartup::execute(const OptionsT& user_options)
   options["PV_CONNECTION_SCHEME"] =
     this->Server.scheme();
   options["PV_CLIENT_HOST"] =
-    QHostInfo::localHostName();
+    localHostName();
   options["PV_SERVER_HOST"] =
     this->Server.host();
   options["PV_SERVER_PORT"] =
