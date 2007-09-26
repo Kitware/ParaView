@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 #if defined(Q_WS_WIN)
-# include <QtNetwork/QHostInfo>
+# include <winsock2.h>
 #else
 # include <unistd.h>
 #endif
@@ -49,13 +49,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static QString localHostName()
 {
 #if defined(Q_WS_WIN)
-  QHostInfo::localHostName();
-#else
+  WSAData wsadata;
+  WSAStartup(MAKEWORD(2,0), &wsadata);
+#endif
+
   char hostName[512];
   if (gethostname(hostName, sizeof(hostName)) == -1)
     return QString();
   hostName[sizeof(hostName) - 1] = '\0';
   return QString::fromLocal8Bit(hostName);
+
+#if defined(Q_WS_WIN)
+  WSACleanup();
 #endif
 }
 
