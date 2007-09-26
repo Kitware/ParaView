@@ -1,8 +1,7 @@
 <RCC>
     <qresource prefix="/pqWidgets" >
         <file>UI/pqThresholdPanel.ui</file>
-        <file>Icons/SplitViewHorizontal.png</file>
-        <file>Icons/SplitViewVertical.png</file>
+        <file>Icons/pq3DView16.png</file>
         <file>Icons/pqAddFavorites16.png</file>
         <file>Icons/pqAppIcon16.png</file>
         <file>Icons/pqAppIcon22.png</file>
@@ -23,8 +22,11 @@
         <file>Icons/pqCancel16.png</file>
         <file>Icons/pqCancel24.png</file>
         <file>Icons/pqCancel32.png</file>
+        <file>Icons/pqCaptureScreenshot24.png</file>
+        <file>Icons/pqCellCenterData16.png</file>
         <file>Icons/pqCellData16.png</file>
         <file>Icons/pqClip24.png</file>
+        <file>Icons/pqComparative3DView16.png</file>
         <file>Icons/pqComparativeVis16.png</file>
         <file>Icons/pqConnect16.png</file>
         <file>Icons/pqConnect24.png</file>
@@ -34,12 +36,16 @@
         <file>Icons/pqDisconnect16.png</file>
         <file>Icons/pqDisconnect24.png</file>
         <file>Icons/pqDisconnect32.png</file>
+        <file>Icons/pqEdgeCenterData16.png</file>
+        <file>Icons/pqEditCamera16.png</file>
         <file>Icons/pqEnterCenter24.png</file>
         <file>Icons/pqExponential16.png</file>
         <file>Icons/pqExponential24.png</file>
         <file>Icons/pqExtractGrid24.png</file>
+        <file>Icons/pqExtractSelection24.png</file>
         <file>Icons/pqEyeball16.png</file>
         <file>Icons/pqEyeballd16.png</file>
+        <file>Icons/pqFaceCenterData16.png</file>
         <file>Icons/pqFavorites16.png</file>
         <file>Icons/pqFavorites32.png</file>
         <file>Icons/pqFilter16.png</file>
@@ -54,6 +60,8 @@
         <file>Icons/pqFolderNew16.png</file>
         <file>Icons/pqFolderOpen16.png</file>
         <file>Icons/pqFolderUp16.png</file>
+        <file>Icons/pqFrustumSelectionCell24.png</file>
+        <file>Icons/pqFrustumSelectionPoint24.png</file>
         <file>Icons/pqGlyph24.png</file>
         <file>Icons/pqGroup24.png</file>
         <file>Icons/pqGroupExtract24.png</file>
@@ -62,9 +70,12 @@
         <file>Icons/pqHelp32.png</file>
         <file>Icons/pqHideCenterAxes24.png</file>
         <file>Icons/pqHierarchicalData16.png</file>
+        <file>Icons/pqHistogram16.png</file>
+        <file>Icons/pqHistogram24.png</file>
         <file>Icons/pqImageData16.png</file>
         <file>Icons/pqInspect22.png</file>
         <file>Icons/pqIsosurface24.png</file>
+        <file>Icons/pqLineChart16.png</file>
         <file>Icons/pqLinkBack16.png</file>
         <file>Icons/pqLinkIn16.png</file>
         <file>Icons/pqLookmark16.png</file>
@@ -90,9 +101,14 @@
         <file>Icons/pqPaste22.png</file>
         <file>Icons/pqPickCenter24.png</file>
         <file>Icons/pqPipelineList22.png</file>
+        <file>Icons/pqPlotCellOverTime24.png</file>
+        <file>Icons/pqPlotLineOverTime24.png</file>
+        <file>Icons/pqPlotPointOverTime24.png</file>
         <file>Icons/pqPointData16.png</file>
         <file>Icons/pqPolydata16.png</file>
         <file>Icons/pqPrint22.png</file>
+        <file>Icons/pqProbeLocation24.png</file>
+        <file>Icons/pqProgrammableFilter24.png</file>
         <file>Icons/pqRamp16.png</file>
         <file>Icons/pqRamp24.png</file>
         <file>Icons/pqRectilinearGrid16.png</file>
@@ -111,14 +127,15 @@
         <file>Icons/pqSave16.png</file>
         <file>Icons/pqSave24.png</file>
         <file>Icons/pqSave32.png</file>
+        <file>Icons/pqSaveAnimation24.png</file>
         <file>Icons/pqScalarBar16.png</file>
         <file>Icons/pqScalarBar24.png</file>
         <file>Icons/pqScalarBar32.png</file>
         <file>Icons/pqSelect16.png</file>
         <file>Icons/pqSelect24.png</file>
         <file>Icons/pqSelect32.png</file>
-        <file>Icons/pqSelectSurfPoints24.png</file>
         <file>Icons/pqSelectFrustPoints24.png</file>
+        <file>Icons/pqSelectSurfPoints24.png</file>
         <file>Icons/pqServer16.png</file>
         <file>Icons/pqServer22.png</file>
         <file>Icons/pqServer32.png</file>
@@ -134,10 +151,13 @@
         <file>Icons/pqSource32.png</file>
         <file>Icons/pqSplitViewH12.png</file>
         <file>Icons/pqSplitViewV12.png</file>
+        <file>Icons/pqSpreadsheet16.png</file>
         <file>Icons/pqStep16.png</file>
         <file>Icons/pqStep24.png</file>
         <file>Icons/pqStreamTracer24.png</file>
         <file>Icons/pqStructuredGrid16.png</file>
+        <file>Icons/pqSurfaceSelectionCell24.png</file>
+        <file>Icons/pqSurfaceSelectionPoint24.png</file>
         <file>Icons/pqThreshold24.png</file>
         <file>Icons/pqTopCenter32.png</file>
         <file>Icons/pqTopLeftCorner32.png</file>
@@ -199,8 +219,7 @@
         <file>Icons/pqZPlus16.png</file>
         <file>Icons/pqZPlus24.png</file>
         <file>Icons/pqZPlus32.png</file>
-        <file>Icons/pqCellCenterData16.png</file>
-        <file>Icons/pqFaceCenterData16.png</file>
-        <file>Icons/pqEdgeCenterData16.png</file>
+        <file>Icons/SplitViewHorizontal.png</file>
+        <file>Icons/SplitViewVertical.png</file>
     </qresource>
 </RCC>

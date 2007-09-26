@@ -546,11 +546,17 @@
    </property>
   </action>
   <action name="actionFileSaveScreenshot" >
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqCaptureScreenshot24.png</iconset>
+   </property>
    <property name="text" >
     <string>Save Screenshot</string>
    </property>
   </action>
   <action name="actionFileSaveAnimation" >
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqSaveAnimation24.png</iconset>
+   </property>
    <property name="text" >
     <string>Save &amp;Animation</string>
    </property>
@@ -660,7 +666,6 @@
     <string/>
    </property>
   </action>
-
   <action name="actionSelectionMode" >
    <property name="checkable" >
     <bool>true</bool>
@@ -669,7 +674,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqSelect24.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqSurfaceSelectionCell24.png</iconset>
    </property>
    <property name="text" >
     <string>Select Cells On</string>
@@ -684,7 +689,6 @@
     <string>Select Cells On</string>
    </property>
   </action>
-
   <action name="actionSelect_Frustum" >
    <property name="checkable" >
     <bool>true</bool>
@@ -693,7 +697,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqExtractGrid24.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqFrustumSelectionCell24.png</iconset>
    </property>
    <property name="text" >
     <string>Select Cells Through</string>
@@ -708,7 +712,6 @@
     <string>Select Cells Through</string>
    </property>
   </action>
-
   <action name="actionSelectSurfacePoints" >
    <property name="checkable" >
     <bool>true</bool>
@@ -717,7 +720,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqSelectSurfPoints24.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqSurfaceSelectionPoint24.png</iconset>
    </property>
    <property name="text" >
     <string>Select Points On</string>
@@ -732,7 +735,6 @@
     <string>Select Points On</string>
    </property>
   </action>
-
   <action name="actionSelectFrustumPoints" >
    <property name="checkable" >
     <bool>true</bool>
@@ -741,7 +743,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqSelectFrustPoints24.png</iconset>
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqFrustumSelectionPoint24.png</iconset>
    </property>
    <property name="text" >
     <string>Select Points Through</string>
@@ -756,7 +758,6 @@
     <string>Select Points Through</string>
    </property>
   </action>
-
   <action name="actionSelect_Thresholds" >
    <property name="checkable" >
     <bool>true</bool>
@@ -771,7 +772,6 @@
     <string>Select Thresholds</string>
    </property>
   </action>
-
   <action name="actionEditUndo" >
    <property name="checkable" >
     <bool>false</bool>
