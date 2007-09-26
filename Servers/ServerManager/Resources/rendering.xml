@@ -5375,7 +5375,7 @@
           <IdTypeVectorProperty name="BlockSize"
             command="SetBlockSize"
             number_of_elements="1"
-            default_values="10" >
+            default_values="1024" >
           </IdTypeVectorProperty>
 
           <IdTypeVectorProperty name="Block"
@@ -5502,7 +5502,7 @@
           <IdTypeVectorProperty name="BlockSize"
             command="SetBlockSize"
             number_of_elements="1"
-            default_values="10" >
+            default_values="1024" >
           </IdTypeVectorProperty>
 
           <IdTypeVectorProperty name="Block"
