@@ -9236,6 +9236,7 @@
    Memcheck:Leak
    fun:_Znw*
    fun:_ZN7QActionC1ERK7QStringP7QObject
+   fun:_ZN9PrismCoreC1EP7QObject
    fun:_ZN19PrismToolBarActionsC1EP7QObject
    fun:_ZN33PrismToolBarActionsImplementationC1EP7QObject
    fun:_ZN23PrismClientPluginPluginC1Ev
@@ -9257,7 +9258,6 @@
    fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
    fun:_ZN29pqServerManagerSelectionModel16selectionChangedERK24pqServerManagerSelectionS2_
    fun:_ZN29pqServerManagerSelectionModel6selectERK24pqServerManagerSelection6QFlagsINS_13SelectionFlagEE
-   fun:_ZN29pqServerManagerSelectionModel6selectEP24pqServerManagerModelItem6QFlagsINS_13SelectionFlagEE
 }
 {
    <insert a suppression name here>
@@ -9512,6 +9512,7 @@
    fun:_ZN7QVectorI22QPixmapIconEngineEntryE6appendERKS0_
    fun:_ZN17QPixmapIconEngine7addFileERK7QStringRK5QSizeN5QIcon4ModeENS6_5StateE
    fun:_ZN5QIconC1ERK7QString
+   fun:_ZN9PrismCoreC1EP7QObject
    fun:_ZN19PrismToolBarActionsC1EP7QObject
    fun:_ZN33PrismToolBarActionsImplementationC1EP7QObject
    fun:_ZN23PrismClientPluginPluginC1Ev
@@ -9530,7 +9531,6 @@
    fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
    fun:_ZN23pqObjectInspectorDriver12updateSourceEv
    fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
 }
 {
    <insert a suppression name here>
@@ -9538,6 +9538,7 @@
    fun:_Znw*
    fun:_ZN5QIcon7addFileERK7QStringRK5QSizeNS_4ModeENS_5StateE
    fun:_ZN5QIconC1ERK7QString
+   fun:_ZN9PrismCoreC1EP7QObject
    fun:_ZN19PrismToolBarActionsC1EP7QObject
    fun:_ZN33PrismToolBarActionsImplementationC1EP7QObject
    fun:_ZN23PrismClientPluginPluginC1Ev
@@ -9558,7 +9559,6 @@
    fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
    fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
    fun:_ZN29pqServerManagerSelectionModel16selectionChangedERK24pqServerManagerSelectionS2_
-   fun:_ZN29pqServerManagerSelectionModel6selectERK24pqServerManagerSelection6QFlagsINS_13SelectionFlagEE
 }
 {
    <insert a suppression name here>
@@ -9696,6 +9696,34 @@
    fun:_ZN14QWidgetPrivate13setParent_sysEP7QWidget6QFlagsIN2Qt10WindowTypeEE
    fun:_ZN7QWidget9setParentEPS_6QFlagsIN2Qt10WindowTypeEE
    fun:_ZN14QWidgetPrivate4initEP7QWidget6QFlagsIN2Qt10WindowTypeEE
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
+   fun:_XSetClipRectangles
+   fun:XSetClipRectangles
+   fun:_ZN15QX11PaintEngine9updatePenERK4QPen
+   fun:_ZN15QX11PaintEngine11updateStateERK17QPaintEngineState
+   fun:_ZN15QPainterPrivate11updateStateEP13QPainterState
+   fun:_ZN8QPainter9drawLinesEPK5QLinei
+   fun:_Z28qt_plastique_drawShadedPanelP8QPainterPK12QStyleOptionbPK7QWidget
+   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK12QCommonStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
+   fun:_ZNK13QWindowsStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
+   fun:_ZNK15QPlastiqueStyle18drawComplexControlEN6QStyle14ComplexControlEPK19QStyleOptionComplexP8QPainterPK7QWidget
+   fun:_ZN11QToolButton10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN15QAbstractButton5eventEP6QEvent
+   fun:_ZN11QToolButton5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
 }
 {
    <insert a suppression name here>
@@ -10835,6 +10863,34 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:_Znw*
+   fun:_ZN12QActionGroupC2EP7QObject
+   fun:_ZN16PrismMenuActionsC1EP7QObject
+   fun:_ZN30PrismMenuActionsImplementationC1EP7QObject
+   fun:_ZN23PrismClientPluginPluginC1Ev
+   fun:qt_plugin_instance
+   fun:_ZN13QFormInternal12QFormBuilder19updateCustomWidgetsEv
+   fun:_ZN13pqFormBuilderC1EP7QObject
+   fun:_ZN23pqLoadedFormObjectPanelC2E7QStringP7pqProxyP7QWidget
+   fun:_ZN16pqThresholdPanelC1EP7pqProxyP7QWidget
+   fun:_ZN22pqStandardCustomPanels11createPanelEP7pqProxyP7QWidget
+   fun:_ZN23pqObjectInspectorWidget8setProxyEP7pqProxy
+   fun:_ZN16pqProxyTabWidget8setProxyEP16pqPipelineSource
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
+   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN29pqServerManagerSelectionModel16selectionChangedERK24pqServerManagerSelectionS2_
+   fun:_ZN29pqServerManagerSelectionModel6selectERK24pqServerManagerSelection6QFlagsINS_13SelectionFlagEE
+   fun:_ZN29pqServerManagerSelectionModel6selectEP24pqServerManagerModelItem6QFlagsINS_13SelectionFlagEE
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znw*
    fun:_ZN7QObjectC2EPS_
    fun:_ZN10QVTKPluginC1Ev
    fun:qt_plugin_instance
@@ -10963,6 +11019,7 @@
    fun:_ZN7QString17fromLatin1_helperEPKci
    fun:_ZN7QString16fromAscii_helperEPKci
    fun:_ZN7QStringC1EPKc
+   fun:_ZN9PrismCoreC1EP7QObject
    fun:_ZN19PrismToolBarActionsC1EP7QObject
    fun:_ZN33PrismToolBarActionsImplementationC1EP7QObject
    fun:_ZN23PrismClientPluginPluginC1Ev
@@ -10982,7 +11039,6 @@
    fun:_ZN23pqObjectInspectorDriver12updateSourceEv
    fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
    fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN29pqServerManagerSelectionModel16selectionChangedERK24pqServerManagerSelectionS2_
 }
 {
    <insert a suppression name here>
@@ -11627,8 +11683,8 @@
    fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
    fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
    fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
-   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
-   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamE*jR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamE*jR21vtkClientServerStreami
    fun:_Z26vtkClientConnectionRootRMIPvS_ii
    fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
    fun:_ZN25vtkMultiProcessController11ProcessRMIsEii
@@ -12115,6 +12171,7 @@
    fun:_ZN7QPixmapC1Ev
    fun:_ZN17QPixmapIconEngine7addFileERK7QStringRK5QSizeN5QIcon4ModeENS6_5StateE
    fun:_ZN5QIconC1ERK7QString
+   fun:_ZN9PrismCoreC1EP7QObject
    fun:_ZN19PrismToolBarActionsC1EP7QObject
    fun:_ZN33PrismToolBarActionsImplementationC1EP7QObject
    fun:_ZN23PrismClientPluginPluginC1Ev
@@ -12133,7 +12190,6 @@
    fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
    fun:_ZN23pqObjectInspectorDriver12updateSourceEv
    fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
 }
 {
    <insert a suppression name here>
@@ -12167,6 +12223,7 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:_Znw*
+   fun:_ZN9PrismCoreC1EP7QObject
    fun:_ZN19PrismToolBarActionsC1EP7QObject
    fun:_ZN33PrismToolBarActionsImplementationC1EP7QObject
    fun:_ZN23PrismClientPluginPluginC1Ev
@@ -12189,7 +12246,34 @@
    fun:_ZN29pqServerManagerSelectionModel16selectionChangedERK24pqServerManagerSelectionS2_
    fun:_ZN29pqServerManagerSelectionModel6selectERK24pqServerManagerSelection6QFlagsINS_13SelectionFlagEE
    fun:_ZN29pqServerManagerSelectionModel6selectEP24pqServerManagerModelItem6QFlagsINS_13SelectionFlagEE
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znw*
+   fun:_ZN30PrismMenuActionsImplementationC1EP7QObject
+   fun:_ZN23PrismClientPluginPluginC1Ev
+   fun:qt_plugin_instance
+   fun:_ZN13QFormInternal12QFormBuilder19updateCustomWidgetsEv
+   fun:_ZN13pqFormBuilderC1EP7QObject
+   fun:_ZN23pqLoadedFormObjectPanelC2E7QStringP7pqProxyP7QWidget
+   fun:_ZN16pqThresholdPanelC1EP7pqProxyP7QWidget
+   fun:_ZN22pqStandardCustomPanels11createPanelEP7pqProxyP7QWidget
+   fun:_ZN23pqObjectInspectorWidget8setProxyEP7pqProxy
+   fun:_ZN16pqProxyTabWidget8setProxyEP16pqPipelineSource
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
+   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN29pqServerManagerSelectionModel16selectionChangedERK24pqServerManagerSelectionS2_
+   fun:_ZN29pqServerManagerSelectionModel6selectERK24pqServerManagerSelection6QFlagsINS_13SelectionFlagEE
+   fun:_ZN29pqServerManagerSelectionModel6selectEP24pqServerManagerModelItem6QFlagsINS_13SelectionFlagEE
    fun:_ZN29pqServerManagerSelectionModel14setCurrentItemEP24pqServerManagerModelItem6QFlagsINS_13SelectionFlagEE
+   fun:_ZN16pqMainWindowCore24onSourceCreationFinishedEP16pqPipelineSource
 }
 {
    <insert a suppression name here>
@@ -12654,6 +12738,7 @@
    fun:_ZN12QKeySequenceC1Ev
    fun:_ZN14QActionPrivateC1Ev
    fun:_ZN7QActionC1ERK7QStringP7QObject
+   fun:_ZN9PrismCoreC1EP7QObject
    fun:_ZN19PrismToolBarActionsC1EP7QObject
    fun:_ZN33PrismToolBarActionsImplementationC1EP7QObject
    fun:_ZN23PrismClientPluginPluginC1Ev
@@ -12673,7 +12758,6 @@
    fun:_ZN23pqObjectInspectorDriver12updateSourceEv
    fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
    fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
-   fun:_ZN29pqServerManagerSelectionModel16selectionChangedERK24pqServerManagerSelectionS2_
 }
 {
    <insert a suppression name here>
@@ -13998,8 +14082,8 @@
    fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
    fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
    fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
-   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
-   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamE*jR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamE*jR21vtkClientServerStreami
    fun:_Z26vtkClientConnectionRootRMIPvS_ii
    fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
    fun:_ZN25vtkMultiProcessController11ProcessRMIsEii
@@ -14260,6 +14344,90 @@
 {
    <insert a suppression name here>
    Memcheck:Leak
+   fun:realloc
+   fun:_ZN9QListData7reallocEi
+   fun:_ZN9QListData6appendEv
+   fun:_ZN5QListIP7QActionE6appendERKS1_
+   fun:_ZN12QActionGroup9addActionEP7QAction
+   fun:_ZN19PrismToolBarActionsC1EP7QObject
+   fun:_ZN33PrismToolBarActionsImplementationC1EP7QObject
+   fun:_ZN23PrismClientPluginPluginC1Ev
+   fun:qt_plugin_instance
+   fun:_ZN13QFormInternal12QFormBuilder19updateCustomWidgetsEv
+   fun:_ZN13pqFormBuilderC1EP7QObject
+   fun:_ZN23pqLoadedFormObjectPanelC2E7QStringP7pqProxyP7QWidget
+   fun:_ZN16pqThresholdPanelC1EP7pqProxyP7QWidget
+   fun:_ZN22pqStandardCustomPanels11createPanelEP7pqProxyP7QWidget
+   fun:_ZN23pqObjectInspectorWidget8setProxyEP7pqProxy
+   fun:_ZN16pqProxyTabWidget8setProxyEP16pqPipelineSource
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
+   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:realloc
+   fun:_ZN9QListData7reallocEi
+   fun:_ZN9QListData6appendEv
+   fun:_ZN5QListIP7QObjectE6appendERKS1_
+   fun:_ZN14QObjectPrivate16setParent_helperEP7QObject
+   fun:_ZN7QObjectC2ER14QObjectPrivatePS_
+   fun:_ZN7QActionC1ERK7QStringP7QObject
+   fun:_ZN9PrismCoreC1EP7QObject
+   fun:_ZN19PrismToolBarActionsC1EP7QObject
+   fun:_ZN33PrismToolBarActionsImplementationC1EP7QObject
+   fun:_ZN23PrismClientPluginPluginC1Ev
+   fun:qt_plugin_instance
+   fun:_ZN13QFormInternal12QFormBuilder19updateCustomWidgetsEv
+   fun:_ZN13pqFormBuilderC1EP7QObject
+   fun:_ZN23pqLoadedFormObjectPanelC2E7QStringP7pqProxyP7QWidget
+   fun:_ZN16pqThresholdPanelC1EP7pqProxyP7QWidget
+   fun:_ZN22pqStandardCustomPanels11createPanelEP7pqProxyP7QWidget
+   fun:_ZN23pqObjectInspectorWidget8setProxyEP7pqProxy
+   fun:_ZN16pqProxyTabWidget8setProxyEP16pqPipelineSource
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znw*
+   fun:_ZN19PrismToolBarActionsC1EP7QObject
+   fun:_ZN33PrismToolBarActionsImplementationC1EP7QObject
+   fun:_ZN23PrismClientPluginPluginC1Ev
+   fun:qt_plugin_instance
+   fun:_ZN13QFormInternal12QFormBuilder19updateCustomWidgetsEv
+   fun:_ZN13pqFormBuilderC1EP7QObject
+   fun:_ZN23pqLoadedFormObjectPanelC2E7QStringP7pqProxyP7QWidget
+   fun:_ZN16pqThresholdPanelC1EP7pqProxyP7QWidget
+   fun:_ZN22pqStandardCustomPanels11createPanelEP7pqProxyP7QWidget
+   fun:_ZN23pqObjectInspectorWidget8setProxyEP7pqProxy
+   fun:_ZN16pqProxyTabWidget8setProxyEP16pqPipelineSource
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
+   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN29pqServerManagerSelectionModel16selectionChangedERK24pqServerManagerSelectionS2_
+   fun:_ZN29pqServerManagerSelectionModel6selectERK24pqServerManagerSelection6QFlagsINS_13SelectionFlagEE
+   fun:_ZN29pqServerManagerSelectionModel6selectEP24pqServerManagerModelItem6QFlagsINS_13SelectionFlagEE
+   fun:_ZN29pqServerManagerSelectionModel14setCurrentItemEP24pqServerManagerModelItem6QFlagsINS_13SelectionFlagEE
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
    fun:_Znw*
    fun:_ZN33PrismToolBarActionsImplementationC1EP7QObject
    fun:_ZN23PrismClientPluginPluginC1Ev
@@ -14362,8 +14530,8 @@
    fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
    fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
    fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
-   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
-   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamE*jR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamE*jR21vtkClientServerStreami
    fun:_Z26vtkClientConnectionRootRMIPvS_ii
    fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
    fun:_ZN25vtkMultiProcessController11ProcessRMIsEii
@@ -14420,8 +14588,8 @@
    fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
    fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
    fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
-   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
-   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamE*jR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamE*jR21vtkClientServerStreami
    fun:_Z26vtkClientConnectionRootRMIPvS_ii
    fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
 }
@@ -14476,8 +14644,8 @@
    fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
    fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
    fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
-   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
-   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamE*jR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamE*jR21vtkClientServerStreami
    fun:_Z26vtkClientConnectionRootRMIPvS_ii
    fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
 }
@@ -14589,8 +14757,8 @@
    fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
    fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
    fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
-   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
-   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamE*jR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamE*jR21vtkClientServerStreami
    fun:_Z26vtkClientConnectionRootRMIPvS_ii
 }
 {
@@ -14642,8 +14810,8 @@
    fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
    fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
    fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
-   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
-   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamE*jR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamE*jR21vtkClientServerStreami
    fun:_Z26vtkClientConnectionRootRMIPvS_ii
    fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
    fun:_ZN25vtkMultiProcessController11ProcessRMIsEii
@@ -14700,8 +14868,8 @@
    fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
    fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
    fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
-   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
-   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamE*jR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamE*jR21vtkClientServerStreami
    fun:_Z26vtkClientConnectionRootRMIPvS_ii
    fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
 }
@@ -14754,8 +14922,8 @@
    fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
    fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
    fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
-   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
-   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamE*jR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamE*jR21vtkClientServerStreami
    fun:_Z26vtkClientConnectionRootRMIPvS_ii
    fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
    fun:_ZN25vtkMultiProcessController11ProcessRMIsEii
@@ -14810,8 +14978,8 @@
    fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
    fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
    fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
-   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
-   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamE*jR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamE*jR21vtkClientServerStreami
    fun:_Z26vtkClientConnectionRootRMIPvS_ii
    fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
    fun:_ZN25vtkMultiProcessController11ProcessRMIsEii
@@ -14865,8 +15033,8 @@
    fun:_ZN20vtkMPISelfConnection30SendStreamToServerNodeInternalEiR21vtkClientServerStream
    fun:_ZN20vtkMPISelfConnection26SendStreamToDataServerRootER21vtkClientServerStream
    fun:_ZN26vtkProcessModuleConnection10SendStreamEjR21vtkClientServerStream
-   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamEijR21vtkClientServerStreami
-   fun:_ZN16vtkProcessModule10SendStreamEijR21vtkClientServerStreami
+   fun:_ZN33vtkProcessModuleConnectionManager10SendStreamE*jR21vtkClientServerStreami
+   fun:_ZN16vtkProcessModule10SendStreamE*jR21vtkClientServerStreami
    fun:_Z26vtkClientConnectionRootRMIPvS_ii
    fun:_ZN25vtkMultiProcessController10ProcessRMIEiPvii
    fun:_ZN25vtkMultiProcessController11ProcessRMIsEii
@@ -14928,6 +15096,34 @@
    fun:_ZN23pqObjectInspectorDriver12updateSourceEv
    fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
    fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znw*
+   fun:_ZN7QObjectC2EPS_
+   fun:_ZN22pqColorMapWidgetPluginC1EP7QObject
+   fun:_ZN13pqChartPluginC1EP7QObject
+   fun:qt_plugin_instance
+   fun:_ZN13QFormInternal12QFormBuilder19updateCustomWidgetsEv
+   fun:_ZN13pqFormBuilderC1EP7QObject
+   fun:_ZN23pqLoadedFormObjectPanelC2E7QStringP7pqProxyP7QWidget
+   fun:_ZN16pqThresholdPanelC1EP7pqProxyP7QWidget
+   fun:_ZN22pqStandardCustomPanels11createPanelEP7pqProxyP7QWidget
+   fun:_ZN23pqObjectInspectorWidget8setProxyEP7pqProxy
+   fun:_ZN16pqProxyTabWidget8setProxyEP16pqPipelineSource
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
+   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN29pqServerManagerSelectionModel16selectionChangedERK24pqServerManagerSelectionS2_
+   fun:_ZN29pqServerManagerSelectionModel6selectERK24pqServerManagerSelection6QFlagsINS_13SelectionFlagEE
+   fun:_ZN29pqServerManagerSelectionModel6selectEP24pqServerManagerModelItem6QFlagsINS_13SelectionFlagEE
+   fun:_ZN29pqServerManagerSelectionModel14setCurrentItemEP24pqServerManagerModelItem6QFlagsINS_13SelectionFlagEE
 }
 {
    <insert a suppression name here>
@@ -15040,6 +15236,34 @@
    fun:_ZN29pqServerManagerSelectionModel14setCurrentItemEP24pqServerManagerModelItem6QFlagsINS_13SelectionFlagEE
    fun:_ZN16pqMainWindowCore24onSourceCreationFinishedEP16pqPipelineSource
    fun:_ZN16pqMainWindowCore11qt_metacallEN11QMetaObject4CallEiPPv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znw*
+   fun:_ZN7QObjectC2EPS_
+   fun:_ZN15QtWidgetsPluginC1EP7QObject
+   fun:qt_plugin_instance
+   fun:_ZN13QFormInternal12QFormBuilder19updateCustomWidgetsEv
+   fun:_ZN13pqFormBuilderC1EP7QObject
+   fun:_ZN23pqLoadedFormObjectPanelC2E7QStringP7pqProxyP7QWidget
+   fun:_ZN16pqThresholdPanelC1EP7pqProxyP7QWidget
+   fun:_ZN22pqStandardCustomPanels11createPanelEP7pqProxyP7QWidget
+   fun:_ZN23pqObjectInspectorWidget8setProxyEP7pqProxy
+   fun:_ZN16pqProxyTabWidget8setProxyEP16pqPipelineSource
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
+   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN29pqServerManagerSelectionModel16selectionChangedERK24pqServerManagerSelectionS2_
+   fun:_ZN29pqServerManagerSelectionModel6selectERK24pqServerManagerSelection6QFlagsINS_13SelectionFlagEE
+   fun:_ZN29pqServerManagerSelectionModel6selectEP24pqServerManagerModelItem6QFlagsINS_13SelectionFlagEE
+   fun:_ZN29pqServerManagerSelectionModel14setCurrentItemEP24pqServerManagerModelItem6QFlagsINS_13SelectionFlagEE
+   fun:_ZN16pqMainWindowCore24onSourceCreationFinishedEP16pqPipelineSource
 }
 {
    <insert a suppression name here>
@@ -15212,6 +15436,34 @@
 {
    <insert a suppression name here>
    Memcheck:Leak
+   fun:malloc
+   fun:FT_Alloc
+   obj:/usr/lib*/libfreetype.so.6.3.*
+   obj:/usr/lib*/libfreetype.so.6.3.*
+   obj:/usr/lib*/libfreetype.so.6.3.*
+   obj:/usr/lib*/libfreetype.so.6.3.*
+   obj:/usr/lib*/libfreetype.so.6.3.*
+   obj:/usr/lib*/libfreetype.so.6.3.*
+   obj:/usr/lib*/libfreetype.so.6.3.*
+   fun:FT_Load_Glyph
+   fun:_ZNK13QFontEngineFT4Font9loadGlyphEPKS_jNS_11GlyphFormatE
+   fun:_ZNK13QFontEngineFT14recalcAdvancesEiP12QGlyphLayout6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_ZNK13QFontEngineFT12stringToCMapEPK5QChariP12QGlyphLayoutPi6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_Z11basic_shapeP11QShaperItem
+   fun:_ZNK11QTextEngine9shapeTextEi
+   fun:_ZNK11QTextEngine5shapeEi
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_Z14qt_format_textRK5QFontRK6QRectFiPK11QTextOptionRK7QStringPS2_iPiiP8QPainter
+   fun:_Z14qt_format_textRK5QFontRK6QRectFiRK7QStringPS2_iPiiP8QPainter
+   fun:_ZNK12QFontMetrics12boundingRectERK5QRectiRK7QStringiPi
+   fun:_ZNK12QFontMetrics4sizeEiRK7QStringiPi
+   fun:_ZNK11QPushButton8sizeHintEv
+   fun:_Z13qSmartMaxSizePK11QWidgetItem6QFlagsIN2Qt13AlignmentFlagEE
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
    fun:_Znw*
    fun:_ZNK13QFontEngineFT4Font9loadGlyphEPKS_jNS_11GlyphFormatE
    fun:_ZNK13QFontEngineFT14recalcAdvancesEiP12QGlyphLayout6QFlagsIN11QTextEngine10ShaperFlagEE
@@ -15264,6 +15516,145 @@
    fun:_ZNK6QLabel15minimumSizeHintEv
    fun:_ZNK6QLabel8sizeHintEv
    fun:_ZNK11QWidgetItem8sizeHintEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znw*
+   fun:_ZNK13QFontEngineFT4Font9loadGlyphEPKS_jNS_11GlyphFormatE
+   fun:_ZNK13QFontEngineFT14recalcAdvancesEiP12QGlyphLayout6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_ZNK13QFontEngineFT12stringToCMapEPK5QChariP12QGlyphLayoutPi6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_Z11basic_shapeP11QShaperItem
+   fun:_ZNK11QTextEngine9shapeTextEi
+   fun:_ZNK11QTextEngine5shapeEi
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_Z14qt_format_textRK5QFontRK6QRectFiPK11QTextOptionRK7QStringPS2_iPiiP8QPainter
+   fun:_Z14qt_format_textRK5QFontRK6QRectFiRK7QStringPS2_iPiiP8QPainter
+   fun:_ZNK12QFontMetrics12boundingRectERK5QRectiRK7QStringiPi
+   fun:_ZNK12QFontMetrics4sizeEiRK7QStringiPi
+   fun:_ZNK11QPushButton8sizeHintEv
+   fun:_Z13qSmartMaxSizePK11QWidgetItem6QFlagsIN2Qt13AlignmentFlagEE
+   fun:_ZNK11QWidgetItem11maximumSizeEv
+   fun:_ZN17QBoxLayoutPrivate9setupGeomEv
+   fun:_ZNK10QBoxLayout11maximumSizeEv
+   fun:_ZN17QBoxLayoutPrivate9setupGeomEv
+   fun:_ZN10QBoxLayout11setGeometryERK5QRect
+   fun:_ZN14QLayoutPrivate8doResizeERK5QSize
+   fun:_ZN7QLayout8activateEv
+   fun:_ZN7QWidget10setVisibleEb
+   fun:_ZN14QStackedLayout15setCurrentIndexEi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_ZNK13QFontEngineFT4Font9loadGlyphEPKS_jNS_11GlyphFormatE
+   fun:_ZNK13QFontEngineFT14recalcAdvancesEiP12QGlyphLayout6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_ZNK13QFontEngineFT12stringToCMapEPK5QChariP12QGlyphLayoutPi6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_Z11basic_shapeP11QShaperItem
+   fun:_ZNK11QTextEngine9shapeTextEi
+   fun:_ZNK11QTextEngine5shapeEi
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_Z14qt_format_textRK5QFontRK6QRectFiPK11QTextOptionRK7QStringPS2_iPiiP8QPainter
+   fun:_Z14qt_format_textRK5QFontRK6QRectFiRK7QStringPS2_iPiiP8QPainter
+   fun:_ZNK12QFontMetrics12boundingRectERK5QRectiRK7QStringiPi
+   fun:_ZNK12QFontMetrics4sizeEiRK7QStringiPi
+   fun:_ZNK11QToolButton8sizeHintEv
+   fun:_Z13qSmartMaxSizePK11QWidgetItem6QFlagsIN2Qt13AlignmentFlagEE
+   fun:_ZNK11QWidgetItem11maximumSizeEv
+   fun:_ZN17QBoxLayoutPrivate9setupGeomEv
+   fun:_ZNK10QBoxLayout11minimumSizeEv
+   fun:_ZNK7QLayout16totalMinimumSizeEv
+   fun:_ZNK7QWidget15minimumSizeHintEv
+   fun:_ZN21Ui_MultiViewFrameMenu7setupUiEP7QWidget
+   fun:_ZN16pqMultiViewFrameC1EP7QWidget
+   fun:_ZN11pqMultiViewC2EP7QWidget
+   fun:_ZN13pqViewManagerC1EP7QWidget
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_ZNK13QFontEngineFT4Font9loadGlyphEPKS_jNS_11GlyphFormatE
+   fun:_ZNK13QFontEngineFT14recalcAdvancesEiP12QGlyphLayout6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_ZNK13QFontEngineFT12stringToCMapEPK5QChariP12QGlyphLayoutPi6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_Z11basic_shapeP11QShaperItem
+   fun:_ZNK11QTextEngine9shapeTextEi
+   fun:_ZNK11QTextEngine5shapeEi
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_Z14qt_format_textRK5QFontRK6QRectFiPK11QTextOptionRK7QStringPS2_iPiiP8QPainter
+   fun:_Z14qt_format_textRK5QFontRK6QRectFiRK7QStringPS2_iPiiP8QPainter
+   fun:_ZNK12QFontMetrics12boundingRectERK5QRectiRK7QStringiPi
+   fun:_ZNK12QFontMetrics4sizeEiRK7QStringiPi
+   fun:_ZNK11QPushButton8sizeHintEv
+   fun:_Z13qSmartMaxSizePK11QWidgetItem6QFlagsIN2Qt13AlignmentFlagEE
+   fun:_ZNK11QWidgetItem11maximumSizeEv
+   fun:_ZN17QBoxLayoutPrivate9setupGeomEv
+   fun:_ZNK10QBoxLayout11maximumSizeEv
+   fun:_ZN17QBoxLayoutPrivate9setupGeomEv
+   fun:_ZN10QBoxLayout11setGeometryERK5QRect
+   fun:_ZN14QLayoutPrivate8doResizeERK5QSize
+   fun:_ZN7QLayout8activateEv
+   fun:_ZN7QWidget10setVisibleEb
+   fun:_ZN14QStackedLayout15setCurrentIndexEi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwm
+   fun:_ZNK13QFontEngineFT4Font9loadGlyphEPKS_jNS_11GlyphFormatE
+   fun:_ZNK13QFontEngineFT14recalcAdvancesEiP12QGlyphLayout6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_ZNK13QFontEngineFT12stringToCMapEPK5QChariP12QGlyphLayoutPi6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_Z11basic_shapeP11QShaperItem
+   fun:_ZNK11QTextEngine9shapeTextEi
+   fun:_ZNK11QTextEngine5shapeEi
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_Z14qt_format_textRK5QFontRK6QRectFiPK11QTextOptionRK7QStringPS2_iPiiP8QPainter
+   fun:_ZN8QPainter8drawTextERK5QRectiRK7QStringPS0_
+   fun:_ZNK6QStyle12drawItemTextEP8QPainterRK5QRectiRK8QPalettebRK7QStringNS5_9ColorRoleE
+   fun:_ZNK12QCommonStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK13QWindowsStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK15QPlastiqueStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZN9QComboBox10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN9QComboBox5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_ZNK13QFontEngineFT4Font9loadGlyphEPKS_jNS_11GlyphFormatE
+   fun:_ZNK13QFontEngineFT14recalcAdvancesEiP12QGlyphLayout6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_ZNK13QFontEngineFT12stringToCMapEPK5QChariP12QGlyphLayoutPi6QFlagsIN11QTextEngine10ShaperFlagEE
+   fun:_Z11basic_shapeP11QShaperItem
+   fun:_ZNK11QTextEngine9shapeTextEi
+   fun:_ZNK11QTextEngine5shapeEi
+   fun:_ZN9QTextLine13layout_helperEi
+   fun:_ZN9QTextLine12setLineWidthEd
+   fun:_Z14qt_format_textRK5QFontRK6QRectFiPK11QTextOptionRK7QStringPS2_iPiiP8QPainter
+   fun:_Z14qt_format_textRK5QFontRK6QRectFiRK7QStringPS2_iPiiP8QPainter
+   fun:_ZNK12QFontMetrics12boundingRectERK5QRectiRK7QStringiPi
+   fun:_ZNK6QStyle12itemTextRectERK12QFontMetricsRK5QRectibRK7QString
+   fun:_ZNK9QCheckBox8sizeHintEv
+   fun:_Z13qSmartMaxSizePK11QWidgetItem6QFlagsIN2Qt13AlignmentFlagEE
+   fun:_ZNK11QWidgetItem11maximumSizeEv
+   fun:_ZN17QBoxLayoutPrivate9setupGeomEv
+   fun:_ZNK10QBoxLayout11minimumSizeEv
+   fun:_ZNK7QLayout16totalMinimumSizeEv
+   fun:_ZNK7QWidget15minimumSizeHintEv
+   fun:_ZNK9QGroupBox15minimumSizeHintEv
+   fun:_Z13qSmartMinSizePK11QWidgetItem
+   fun:_ZNK11QWidgetItem11minimumSizeEv
+   fun:_ZN17QBoxLayoutPrivate9setupGeomEv
 }
 {
    <insert a suppression name here>
@@ -16869,6 +17260,20 @@
    fun:PyString_InternInPlace
    fun:PyString_InternFromString
    fun:init_slotdefs
+   fun:PyType_Ready
+   fun:PyType_Ready
+   fun:_Py_ReadyTypes
+   fun:Py_Initialize
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dictresize
+   fun:PyString_InternInPlace
+   fun:PyString_InternFromString
+   fun:descr_new
+   fun:PyDescr_NewGetSet
    fun:PyType_Ready
    fun:PyType_Ready
    fun:_Py_ReadyTypes
@@ -24476,6 +24881,34 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_PyObject_GC_Malloc
+   fun:_PyObject_GC_New
+   fun:PyDict_New
+   fun:PyInstance_NewRaw
+   fun:PyInstance_New
+   fun:PyObject_Call
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN19pqPythonEventSourceC1EP7QObject
+}
+{
+   <insert a suppression name here>
    Memcheck:Addr4
    fun:PyObject_Free
    fun:dict_dealloc
@@ -31468,6 +31901,34 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+   fun:_PyObject_GC_Resize
+   fun:PyFrame_New
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN19pqPythonEventSourceC1EP7QObject
+}
+{
+   <insert a suppression name here>
    Memcheck:Value8
    fun:PyObject_Free
    fun:dict_dealloc
@@ -34701,6 +35162,34 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
+   fun:dictresize
+   fun:PyDict_SetItemString
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:load_package
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
    fun:_XimOpenIM
    obj:/usr/*lib*/libX11.so.6.2*
    fun:_XimRegisterIMInstantiateCallback
@@ -35410,8 +35899,6 @@
    fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
    fun:_ZN29pqServerManagerSelectionModel16selectionChangedERK24pqServerManagerSelectionS2_
    fun:_ZN29pqServerManagerSelectionModel6selectERK24pqServerManagerSelection6QFlagsINS_13SelectionFlagEE
-   fun:_ZN29pqServerManagerSelectionModel6selectEP24pqServerManagerModelItem6QFlagsINS_13SelectionFlagEE
-   fun:_ZN29pqServerManagerSelectionModel14setCurrentItemEP24pqServerManagerModelItem6QFlagsINS_13SelectionFlagEE
 }
 {
    <insert a suppression name here>
