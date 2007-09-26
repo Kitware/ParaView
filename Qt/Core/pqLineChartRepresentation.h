@@ -64,6 +64,7 @@ public:
   /// Returns the client-side rectilinear grid. 
   /// Note that this method does not update the pipeline.
   vtkRectilinearGrid* getClientSideData() const;
+  bool isDataModified() const;
 
   vtkDataArray* getArray(const QString &arrayName) const;
 
@@ -77,6 +78,9 @@ public:
 
   /// Returns the array used for masking.
   vtkDataArray* getMaskArray();
+
+  bool isUpdateNeeded() const;
+  bool isArrayUpdateNeeded(int attributeType) const;
 
   int getAttributeType() const;
 
@@ -117,8 +121,10 @@ public:
   void endSeriesChanges();
 
 public slots:
-  void updateSeries();
+  void startSeriesUpdate(bool force=false);
+  void finishSeriesUpdate();
   void setAttributeType(int attr);
+  void markAsModified();
 
 signals:
   /// Emitted when the series list has changed.
@@ -155,6 +161,8 @@ protected:
 
 private slots:
   void changeSeriesList();
+  void markPointModified();
+  void markCellModified();
 
 private:
   pqLineChartRepresentation(const pqLineChartRepresentation&); // Not implemented.

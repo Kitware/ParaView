@@ -73,9 +73,6 @@ public:
   void removeRepresentation(pqLineChartRepresentation *lineChart);
   void removeAllRepresentations();
 
-private slots:
-  void markLineItemModified(vtkObject *object);
-
 public:
   pqPlotViewLineChartInternal *Internal;
 };

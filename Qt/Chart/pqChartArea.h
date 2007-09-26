@@ -205,6 +205,9 @@ public slots:
   /// Calculates the axis and chart layout.
   void layoutChart();
 
+  /// Merges layout requests into one delayed layout event.
+  void updateLayout();
+
 protected:
   /// \brief
   ///   Updates the layout when the font changes.
@@ -259,6 +262,9 @@ protected:
   /// \param e Event specific information.
   virtual void wheelEvent(QWheelEvent *e);
   //@}
+
+signals:
+  void delayedLayoutNeeded();
 
 private slots:
   /// Sets a flag to recalculate the overall range.

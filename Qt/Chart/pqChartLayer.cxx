@@ -68,14 +68,4 @@ void pqChartLayer::setContentsSpace(const pqChartContentsSpace *contents)
   this->Contents = contents;
 }
 
-void pqChartLayer::sendLayoutSignal()
-{
-  emit this->layoutNeeded();
-}
-
-void pqChartLayer::sendRepaintSignal()
-{
-  emit this->repaintNeeded();
-}
-
 

@@ -655,7 +655,6 @@ void pqHistogramChart::drawChart(QPainter &painter, const QRect &area)
     return;
     }
 
-
   // Translate the painter and the area to paint to contents space.
   painter.save();
   QRect clipArea = area.intersect(this->Internal->Bounds);

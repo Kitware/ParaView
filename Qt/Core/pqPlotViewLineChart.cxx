@@ -77,6 +77,7 @@ public:
   pqVTKLineChartSeries *Model;
   QString RepresentationName;
   int Chart;
+  int YComponent;
   unsigned int LegendId;
 };
 
@@ -87,14 +88,11 @@ public:
   pqPlotViewLineChartItem(pqLineChartRepresentation *display);
   ~pqPlotViewLineChartItem() {}
 
-  bool isUpdateNeeded();
   bool setDataType(int dataType);
 
 public:
   QPointer<pqLineChartRepresentation> Representation;
   QList<pqPlotViewLineChartSeries> Series;
-  vtkTimeStamp LastUpdateTime;
-  vtkTimeStamp ModifiedTime;
   int DataType;
 };
 
@@ -108,7 +106,6 @@ public:
   QPointer<pqLineChart> Layer[4];
   pqLineChartModel *Model[4];
   QMap<vtkSMProxy *, pqPlotViewLineChartItem *> Representations;
-  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   pqChartLegendModel *Legend;
 };
 
@@ -120,6 +117,7 @@ pqPlotViewLineChartSeries::pqPlotViewLineChartSeries(
 {
   this->Model = model;
   this->Chart = -1;
+  this->YComponent = -1;
   this->LegendId = 0;
 }
 
@@ -129,6 +127,7 @@ pqPlotViewLineChartSeries::pqPlotViewLineChartSeries(
 {
   this->Model = other.Model;
   this->Chart = other.Chart;
+  this->YComponent = other.YComponent;
   this->LegendId = other.LegendId;
 }
 
@@ -138,6 +137,7 @@ pqPlotViewLineChartSeries &pqPlotViewLineChartSeries::operator=(
   this->Model = other.Model;
   this->RepresentationName = other.RepresentationName;
   this->Chart = other.Chart;
+  this->YComponent = other.YComponent;
   this->LegendId = other.LegendId;
   return *this;
 }
@@ -146,18 +146,9 @@ pqPlotViewLineChartSeries &pqPlotViewLineChartSeries::operator=(
 //----------------------------------------------------------------------------
 pqPlotViewLineChartItem::pqPlotViewLineChartItem(
     pqLineChartRepresentation *display)
-  : Representation(display), Series(), LastUpdateTime(), ModifiedTime()
+  : Representation(display), Series()
 {
   this->DataType = 0;
-}
-
-bool pqPlotViewLineChartItem::isUpdateNeeded()
-{
-  bool updateNeeded = this->LastUpdateTime <= this->ModifiedTime;
-  vtkRectilinearGrid *data = this->Representation->getClientSideData();
-  updateNeeded = updateNeeded || (data &&
-      data->GetMTime() > this->LastUpdateTime);
-  return updateNeeded;
 }
 
 bool pqPlotViewLineChartItem::setDataType(int dataType)
@@ -184,7 +175,6 @@ pqPlotViewLineChartInternal::pqPlotViewLineChartInternal()
   this->Model[pqPlotViewLineChart::BottomRight] = 0;
   this->Model[pqPlotViewLineChart::TopLeft] = 0;
   this->Model[pqPlotViewLineChart::TopRight] = 0;
-  this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   this->Legend = 0;
 }
 
@@ -285,16 +275,19 @@ void pqPlotViewLineChart::update(bool force)
       this->Internal->Representations.begin();
   for( ; jter != this->Internal->Representations.end(); ++jter)
     {
-    if(!(*jter)->isUpdateNeeded() && !force)
+    if(!(*jter)->Representation->isUpdateNeeded() && !force)
       {
       continue;
       }
 
     // Update the display data.
-    (*jter)->Representation->updateSeries();
+    (*jter)->Representation->startSeriesUpdate(force);
     bool typeChanged = (*jter)->setDataType(
         (*jter)->Representation->getAttributeType());
+    bool arrayChanged = force ||
+        (*jter)->Representation->isArrayUpdateNeeded((*jter)->DataType);
     bool isVisible = (*jter)->Representation->isVisible();
+
     vtkDataArray *yArray = 0;
     vtkDataArray *xArray = (*jter)->Representation->getXArray();
     vtkDataArray *maskArray = (*jter)->Representation->getMaskArray();
@@ -330,86 +323,97 @@ void pqPlotViewLineChart::update(bool force)
         }
       else
         {
-        yArray = (*jter)->Representation->getYArray(index);
-        if(!yArray)
+        yArray = 0;
+        int component = (*jter)->Representation->getSeriesComponent(index);
+        bool componentChanged = component != series->YComponent;
+        if(arrayChanged || componentChanged)
           {
-          qDebug() << "Failed to locate Y array.";
-          }
-
-        if(xArray && yArray)
-          {
-          // Move the series if needed.
-          int axesIndex = (*jter)->Representation->getSeriesAxesIndex(index);
-          if(axesIndex != series->Chart)
+          yArray = (*jter)->Representation->getYArray(index);
+          if(!yArray)
             {
+            qDebug() << "Failed to locate Y array.";
+            }
+
+          if(!xArray || !yArray)
+            {
+            // Remove the series from the legend if needed.
+            if(series->LegendId != 0)
+              {
+              this->Internal->Legend->removeEntry(
+                  this->Internal->Legend->getIndexForId(series->LegendId));
+              series->LegendId = 0;
+              }
+
+            // Remove the series if the x or y array are null.
             this->Internal->Model[series->Chart]->removeSeries(series->Model);
-            series->Chart = axesIndex;
-            this->Internal->Model[series->Chart]->appendSeries(series->Model);
+            delete series->Model;
+            series = (*jter)->Series.erase(series);
+            continue;
             }
-
-          // Update the arrays and options for the series.
-          series->Model->setDataArrays(xArray, yArray, maskArray, 0,
-              (*jter)->Representation->getSeriesComponent(index));
-          pqLineChartSeriesOptions *options =
-              this->Internal->Layer[series->Chart]->getOptions()->getSeriesOptions(
-              this->Internal->Model[series->Chart]->getIndexOf(series->Model));
-          QPen seriesPen;
-          options->getPen(seriesPen);
-          QColor color;
-          (*jter)->Representation->getSeriesColor(index, color);
-          seriesPen.setColor(color);
-          seriesPen.setWidth(
-              (*jter)->Representation->getSeriesThickness(index));
-          seriesPen.setStyle((*jter)->Representation->getSeriesStyle(index));
-          options->setPen(seriesPen);
-
-          // Update the legend status for the series.
-          if((*jter)->Representation->isSeriesInLegend(index))
-            {
-            QString label;
-            (*jter)->Representation->getSeriesLabel(index, label);
-            if(series->LegendId == 0)
-              {
-              // Add the series to the legend.
-              series->LegendId = this->Internal->Legend->addEntry(
-                  pqChartLegendModel::generateLineIcon(seriesPen), label);
-              }
-            else
-              {
-              // Update the legend label and icon in case they changed.
-              int legendIndex = this->Internal->Legend->getIndexForId(
-                  series->LegendId);
-              this->Internal->Legend->setIcon(legendIndex,
-                  pqChartLegendModel::generateLineIcon(seriesPen));
-              this->Internal->Legend->setText(legendIndex, label);
-              }
-            }
-          else if(series->LegendId != 0)
-            {
-            // Remove the series from the legend.
-            this->Internal->Legend->removeEntry(
-                this->Internal->Legend->getIndexForId(series->LegendId));
-            series->LegendId = 0;
-            }
-
-          displayNames.append(series->RepresentationName);
-          ++series;
           }
-        else
+
+        // Move the series if needed.
+        int axesIndex = (*jter)->Representation->getSeriesAxesIndex(index);
+        if(axesIndex != series->Chart)
           {
-          // Remove the series from the legend if needed.
-          if(series->LegendId != 0)
-            {
-            this->Internal->Legend->removeEntry(
-                this->Internal->Legend->getIndexForId(series->LegendId));
-            series->LegendId = 0;
-            }
-
-          // Remove the series if the x or y array are null.
           this->Internal->Model[series->Chart]->removeSeries(series->Model);
-          delete series->Model;
-          series = (*jter)->Series.erase(series);
+          series->Chart = axesIndex;
+          this->Internal->Model[series->Chart]->appendSeries(series->Model);
           }
+
+        if(arrayChanged || componentChanged)
+          {
+          // Update the arrays for the series.
+          series->YComponent = component;
+          series->Model->setDataArrays(xArray, yArray, maskArray, 0,
+              series->YComponent);
+          }
+
+        // Update the options for the series.
+        pqLineChartSeriesOptions *options =
+            this->Internal->Layer[series->Chart]->getOptions()->getSeriesOptions(
+            this->Internal->Model[series->Chart]->getIndexOf(series->Model));
+        QPen seriesPen;
+        options->getPen(seriesPen);
+        QColor color;
+        (*jter)->Representation->getSeriesColor(index, color);
+        seriesPen.setColor(color);
+        seriesPen.setWidth(
+            (*jter)->Representation->getSeriesThickness(index));
+        seriesPen.setStyle((*jter)->Representation->getSeriesStyle(index));
+        options->setPen(seriesPen);
+
+        // Update the legend status for the series.
+        if((*jter)->Representation->isSeriesInLegend(index))
+          {
+          QString label;
+          (*jter)->Representation->getSeriesLabel(index, label);
+          if(series->LegendId == 0)
+            {
+            // Add the series to the legend.
+            series->LegendId = this->Internal->Legend->addEntry(
+                pqChartLegendModel::generateLineIcon(seriesPen), label);
+            }
+          else
+            {
+            // Update the legend label and icon in case they changed.
+            int legendIndex = this->Internal->Legend->getIndexForId(
+                series->LegendId);
+            this->Internal->Legend->setIcon(legendIndex,
+                pqChartLegendModel::generateLineIcon(seriesPen));
+            this->Internal->Legend->setText(legendIndex, label);
+            }
+          }
+        else if(series->LegendId != 0)
+          {
+          // Remove the series from the legend.
+          this->Internal->Legend->removeEntry(
+              this->Internal->Legend->getIndexForId(series->LegendId));
+          series->LegendId = 0;
+          }
+
+        displayNames.append(series->RepresentationName);
+        ++series;
         }
       }
 
@@ -467,8 +471,9 @@ void pqPlotViewLineChart::update(bool force)
             }
 
           // Set the model arrays.
+          plot->YComponent = (*jter)->Representation->getSeriesComponent(i);
           plot->Model->setDataArrays(xArray, yArray, maskArray, 0,
-              (*jter)->Representation->getSeriesComponent(i));
+              plot->YComponent);
 
           // Add the line chart series to the line chart model.
           plot->Chart = (*jter)->Representation->getSeriesAxesIndex(i);
@@ -532,7 +537,7 @@ void pqPlotViewLineChart::update(bool force)
       (*jter)->Representation->endSeriesChanges();
       }
 
-    (*jter)->LastUpdateTime.Modified();
+    (*jter)->Representation->finishSeriesUpdate();
     }
 }
 
@@ -544,10 +549,7 @@ void pqPlotViewLineChart::addRepresentation(
     {
     pqPlotViewLineChartItem *item = new pqPlotViewLineChartItem(lineChart);
     this->Internal->Representations[lineChart->getProxy()] = item;
-    this->Internal->VTKConnect->Connect(
-        lineChart->getProxy(), vtkCommand::PropertyModifiedEvent,
-        this, SLOT(markLineItemModified(vtkObject *)));
-    item->ModifiedTime.Modified();
+    lineChart->markAsModified();
     }
 }
 
@@ -557,7 +559,6 @@ void pqPlotViewLineChart::removeRepresentation(
   if(lineChart &&
       this->Internal->Representations.contains(lineChart->getProxy()))
     {
-    this->Internal->VTKConnect->Disconnect(lineChart->getProxy());
     pqPlotViewLineChartItem *item =
         this->Internal->Representations.take(lineChart->getProxy());
     QList<pqPlotViewLineChartSeries>::Iterator series =
@@ -591,7 +592,6 @@ void pqPlotViewLineChart::removeAllRepresentations()
       this->Internal->Representations.begin();
   for( ; iter != this->Internal->Representations.end(); ++iter)
     {
-    this->Internal->VTKConnect->Disconnect(iter.key());
     QList<pqPlotViewLineChartSeries>::Iterator series =
         iter.value()->Series.begin();
     for( ; series != iter.value()->Series.end(); ++series)
@@ -611,18 +611,6 @@ void pqPlotViewLineChart::removeAllRepresentations()
     }
 
   this->Internal->Representations.clear();
-}
-
-void pqPlotViewLineChart::markLineItemModified(vtkObject *object)
-{
-  // Look up the line chart item using the proxy.
-  vtkSMProxy *proxy = vtkSMProxy::SafeDownCast(object);
-  QMap<vtkSMProxy *, pqPlotViewLineChartItem *>::Iterator iter =
-      this->Internal->Representations.find(proxy);
-  if(iter != this->Internal->Representations.end())
-    {
-    iter.value()->ModifiedTime.Modified();
-    }
 }
 
 

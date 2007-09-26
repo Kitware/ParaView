@@ -89,6 +89,7 @@ public:
 
   QVector<pqLineChartDisplayItem> Series;
   vtkSmartPointer<vtkDataArray> XArray;
+  bool XChanged;
 };
 
 
@@ -100,6 +101,8 @@ public:
 
   vtkSmartPointer<vtkDoubleArray> YIndexArray;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  vtkTimeStamp LastUpdateTime;
+  vtkTimeStamp ModifiedTime;
   pqLineChartDisplayItemList PointList;
   pqLineChartDisplayItemList CellList;
   pqLineChartDisplayItemList *List;
@@ -159,6 +162,7 @@ pqLineChartDisplayItem &pqLineChartDisplayItem::operator=(
 pqLineChartDisplayItemList::pqLineChartDisplayItemList()
   : Series(), XArray(0)
 {
+  this->XChanged = true;
 }
 
 void pqLineChartDisplayItemList::setXArray(vtkRectilinearGrid *data,
@@ -201,7 +205,7 @@ void pqLineChartDisplayItemList::setXArray(vtkRectilinearGrid *data,
 
 //-----------------------------------------------------------------------------
 pqLineChartRepresentation::pqInternals::pqInternals()
-  : PointList(), CellList()
+  : LastUpdateTime(), ModifiedTime(), PointList(), CellList()
 {
   this->YIndexArray = vtkSmartPointer<vtkDoubleArray>::New();
   this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
@@ -222,6 +226,26 @@ pqLineChartRepresentation::pqLineChartRepresentation(const QString& group,
   // Listen to some property change events.
   this->Internals->VTKConnect->Connect(display->GetProperty("AttributeType"),
       vtkCommand::ModifiedEvent, this, SLOT(changeSeriesList()));
+  this->Internals->VTKConnect->Connect(display,
+      vtkCommand::PropertyModifiedEvent, this, SLOT(markAsModified()));
+  this->Internals->VTKConnect->Connect(
+      display->GetProperty("XPointArrayName"),
+      vtkCommand::ModifiedEvent, this, SLOT(markPointModified()));
+  this->Internals->VTKConnect->Connect(
+      display->GetProperty("UseYPointArrayIndex"),
+      vtkCommand::ModifiedEvent, this, SLOT(markPointModified()));
+  this->Internals->VTKConnect->Connect(
+      display->GetProperty("XPointArrayComponent"),
+      vtkCommand::ModifiedEvent, this, SLOT(markPointModified()));
+  this->Internals->VTKConnect->Connect(
+      display->GetProperty("XCellArrayName"),
+      vtkCommand::ModifiedEvent, this, SLOT(markCellModified()));
+  this->Internals->VTKConnect->Connect(
+      display->GetProperty("UseYCellArrayIndex"),
+      vtkCommand::ModifiedEvent, this, SLOT(markCellModified()));
+  this->Internals->VTKConnect->Connect(
+      display->GetProperty("XCellArrayComponent"),
+      vtkCommand::ModifiedEvent, this, SLOT(markCellModified()));
 }
 
 pqLineChartRepresentation::~pqLineChartRepresentation()
@@ -330,6 +354,12 @@ vtkRectilinearGrid* pqLineChartRepresentation::getClientSideData() const
   return 0;
 }
 
+bool pqLineChartRepresentation::isDataModified() const
+{
+  vtkRectilinearGrid *data = this->getClientSideData();
+  return data && data->GetMTime() > this->Internals->LastUpdateTime;
+}
+
 vtkDataArray* pqLineChartRepresentation::getArray(
     const QString &arrayName) const
 {
@@ -389,6 +419,25 @@ vtkDataArray* pqLineChartRepresentation::getMaskArray()
     }
 
   return data->GetPointData()->GetArray("vtkValidPointMask");
+}
+
+//-----------------------------------------------------------------------------
+bool pqLineChartRepresentation::isUpdateNeeded() const
+{
+  return (this->Internals->LastUpdateTime <= this->Internals->ModifiedTime) ||
+      this->isDataModified();
+}
+
+//-----------------------------------------------------------------------------
+bool pqLineChartRepresentation::isArrayUpdateNeeded(int attributeType) const
+{
+  bool updateNeeded = this->Internals->CellList.XChanged;
+  if(attributeType == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+    {
+    updateNeeded = this->Internals->PointList.XChanged;
+    }
+
+  return updateNeeded || this->isDataModified();
 }
 
 //-----------------------------------------------------------------------------
@@ -739,7 +788,7 @@ void pqLineChartRepresentation::endSeriesChanges()
 }
 
 //-----------------------------------------------------------------------------
-void pqLineChartRepresentation::updateSeries()
+void pqLineChartRepresentation::startSeriesUpdate(bool force)
 {
   // Update the domain information.
   vtkSMProxy *proxy = this->getProxy();
@@ -760,14 +809,19 @@ void pqLineChartRepresentation::updateSeries()
   for(int i = 0; i < 2; i++)
     {
     // Update the x-axis array.
-    bool useIndex = pqSMAdaptor::getElementProperty(
-        proxy->GetProperty(index_name[i])).toInt() != 0;
-    QString xArray = pqSMAdaptor::getElementProperty(
-        proxy->GetProperty(xarray_name[i])).toString();
-    int component = pqSMAdaptor::getElementProperty(
-        proxy->GetProperty(comp_name[i])).toInt();
-    series[i]->setXArray(this->getClientSideData(), i == 0,
-        useIndex, xArray, component);
+    if(force || this->isArrayUpdateNeeded(i == 0 ?
+        vtkDataObject::FIELD_ASSOCIATION_POINTS :
+        vtkDataObject::FIELD_ASSOCIATION_CELLS))
+      {
+      bool useIndex = pqSMAdaptor::getElementProperty(
+          proxy->GetProperty(index_name[i])).toInt() != 0;
+      QString xArray = pqSMAdaptor::getElementProperty(
+          proxy->GetProperty(xarray_name[i])).toString();
+      int component = pqSMAdaptor::getElementProperty(
+          proxy->GetProperty(comp_name[i])).toInt();
+      series[i]->setXArray(this->getClientSideData(), i == 0,
+          useIndex, xArray, component);
+      }
 
     smProperty = vtkSMStringVectorProperty::SafeDownCast(
         proxy->GetProperty(status_name[i]));
@@ -889,10 +943,24 @@ void pqLineChartRepresentation::updateSeries()
 }
 
 //-----------------------------------------------------------------------------
+void pqLineChartRepresentation::finishSeriesUpdate()
+{
+  this->Internals->LastUpdateTime.Modified();
+  this->Internals->PointList.XChanged = false;
+  this->Internals->CellList.XChanged = false;
+}
+
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::setAttributeType(int attr)
 {
   pqSMAdaptor::setElementProperty(
       this->getProxy()->GetProperty("AttributeType"), QVariant(attr));
+}
+
+//-----------------------------------------------------------------------------
+void pqLineChartRepresentation::markAsModified()
+{
+  this->Internals->ModifiedTime.Modified();
 }
 
 //-----------------------------------------------------------------------------
@@ -908,6 +976,18 @@ void pqLineChartRepresentation::changeSeriesList()
     this->Internals->List = newArray;
     emit this->seriesListChanged();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqLineChartRepresentation::markPointModified()
+{
+  this->Internals->PointList.XChanged = true;
+}
+
+//-----------------------------------------------------------------------------
+void pqLineChartRepresentation::markCellModified()
+{
+  this->Internals->CellList.XChanged = true;
 }
 
 //-----------------------------------------------------------------------------

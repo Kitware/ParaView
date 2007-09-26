@@ -194,7 +194,7 @@ void pqVTKLineChartSeries::setDataArrays(vtkDataArray *xArray,
       vtkIdType i = 0;
       vtkIdType numValid = 0;
       vtkIdType maskLength = mask->GetNumberOfTuples();
-      for( ; i < mask->GetNumberOfTuples(); i++)
+      for( ; i < maskLength; i++)
         {
         if(mask->GetTuple1(i) != 0)
           {
