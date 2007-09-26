@@ -45,23 +45,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqServerResource.h"
 
+class pqCommandServerStartupWSAInit
+{
+public:
+  pqCommandServerStartupWSAInit()
+    {
+#if defined(Q_WS_WIN)
+    WSAData wsadata;
+    WSAStartup(MAKEWORD(2,0), &wsadata);
+#endif
+    }
+  ~pqCommandServerStartupWSAInit()
+    {
+#if defined(Q_WS_WIN)
+    WSACleanup();
+#endif
+    }
+};
+
 // TODO maybe move this to kwsys or something
 static QString localHostName()
 {
-#if defined(Q_WS_WIN)
-  WSAData wsadata;
-  WSAStartup(MAKEWORD(2,0), &wsadata);
-#endif
-
+  pqCommandServerStartupWSAInit init;
   char hostName[512];
   if (gethostname(hostName, sizeof(hostName)) == -1)
     return QString();
   hostName[sizeof(hostName) - 1] = '\0';
   return QString::fromLocal8Bit(hostName);
-
-#if defined(Q_WS_WIN)
-  WSACleanup();
-#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////
