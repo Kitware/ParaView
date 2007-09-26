@@ -15,24 +15,24 @@
 
   <Category name="DataAnalysis" menu_label="&amp;Data Analysis">
     <Filter name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
-    <!--    
-    <Filter name="ExtractCellSelection" />
-    <Filter name="ExtractPointSelection" />
-    -->
-    <Filter name="ExtractSelections" />
-    <Filter name="ExtractHistogram" />
+    <Filter name="ExtractSelections"
+            icon=":/pqWidgets/Icons/pqExtractSelection24.png" />
+    <Filter name="ExtractHistogram" 
+            icon=":/pqWidgets/Icons/pqHistogram24.png"/>
     <Filter name="IntegrateAttributes" />
-    <Filter name="ExtractCellsOverTime" />
-    <Filter name="ExtractPointsOverTime" />
+    <Filter name="ExtractCellsOverTime" 
+            icon=":/pqWidgets/Icons/pqPlotCellOverTime24.png" />
+    <Filter name="ExtractPointsOverTime"
+            icon=":/pqWidgets/Icons/pqPlotPointOverTime24.png" />
     <Filter name="ExtractFieldDataOverTime" />
     <Filter name="ExtractThresholds" /> 
-    <Filter name="ProbeLine" />
-    <Filter name="ProbePoint" />
+    <Filter name="ProbeLine" 
+            icon=":/pqWidgets/Icons/pqPlotLineOverTime24.png" />
+    <Filter name="ProbePoint" 
+            icon=":/pqWidgets/Icons/pqProbeLocation24.png" />
     <Filter name="ProbeLocationOverTime" />
-    <Filter name="Programmable Filter" />
-    <!--
-    <Filter name="SelectThrough" />
-    -->
+    <Filter name="Programmable Filter" 
+            icon=":/pqWidgets/Icons/pqProgrammableFilter24.png"/>
   </Category>
 
   <Filter name="Append" />
@@ -55,24 +55,13 @@
   <Filter name="DecimatePro" />
   <Filter name="Delaunay2D" />
   <Filter name="ElevationFilter" />
-  <!--
-  <Filter name="ExtractCellSelection" />
-  -->
   <Filter name="ExtractDataSets" />
   <Filter name="ExtractEdges" />
   <Filter name="ExtractGeometry" />
   <Filter name="ExtractGrid" />
   <Filter name="ExtractHistogram" />
   <Filter name="ExtractLevel" />
-  <!--
-  <Filter name="ExtractPointSelection" />
-  -->
   <Filter name="ExtractSelections" />
-
-  <!--
-  <Filter name="ExtractSelection" />
-  -->
-<!--  <Filter name="ExtractThresholds" /> -->
   <Filter name="FeatureEdges" />
   <Filter name="Glyph" />
   <Filter name="ArbitrarySourceGlyph" />
@@ -104,9 +93,6 @@
   <Filter name="ReflectionFilter" />
   <Filter name="RibbonFilter" />
   <Filter name="RotationalExtrusionFilter" />
-  <!--
-  <Filter name="SelectThrough" />
-  -->
   <Filter name="ShrinkFilter" />
   <Filter name="SmoothPolyDataFilter" />
   <Filter name="StreamTracer" />

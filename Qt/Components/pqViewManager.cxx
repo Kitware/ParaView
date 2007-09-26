@@ -444,19 +444,6 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
     frame->setMainWidget(NULL);
     }
 
-  pqComparativeRenderView* cvRenderView = 
-    qobject_cast<pqComparativeRenderView*>(view);
-  if (cvRenderView)
-    {
-    QAction* editCV = new QAction(
-      QIcon(":/pqWidgets/Icons/pqComparativeVis16.png"),
-      "Edit Comparative Vis",
-      this);
-    editCV->setObjectName("EditComparativeVis");
-    frame->addTitlebarAction(editCV);
-    editCV->setEnabled(true);
-    }
-
   pqRenderView* const render_module = 
     qobject_cast<pqRenderView*>(view);
   if(render_module)
@@ -472,7 +459,7 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
     QObject::connect(lookmarkAction, SIGNAL(triggered(bool)), 
       this->Internal->LookmarkSignalMapper, SLOT(map()));
 
-    QAction* cameraAction = new QAction(QIcon(":/pqWidgets/Icons/pqCamera16.png"), 
+    QAction* cameraAction = new QAction(QIcon(":/pqWidgets/Icons/pqEditCamera16.png"), 
       "Adjust Camera", 
       this);
     cameraAction->setObjectName("CameraButton");
@@ -559,12 +546,6 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqView* view)
       {
       frame->removeTitlebarAction(cameraAction);
       delete cameraAction;
-      }
-    QAction *editCVAction = frame->getAction("EditComparativeVis");
-    if (editCVAction)
-      {
-      frame->removeTitlebarAction(editCVAction);
-      delete editCVAction;
       }
     }
 
