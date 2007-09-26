@@ -495,6 +495,7 @@
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkRectilinearGrid" />
+          <DataType value="vtkPolyData" />
         </DataTypeDomain>
       </InputProperty>
 
