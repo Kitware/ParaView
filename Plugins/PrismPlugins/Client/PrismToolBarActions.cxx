@@ -12,8 +12,8 @@ PrismToolBarActions::PrismToolBarActions(QObject* p)
     core=new PrismCore(this);
     }
   
-  QList<QAction*> actions= core->actions();
-  foreach(QAction *a,actions)
+  QList<QAction*> actionsList= core->actions();
+  foreach(QAction *a,actionsList)
     {
     this->addAction(a);
     }
