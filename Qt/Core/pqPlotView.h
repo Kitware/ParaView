@@ -115,6 +115,9 @@ private slots:
   /// Internal slot.
   void delayedRender();
 
+  /// Sets the axis layout modified.
+  void setAxisLayoutModified();
+
 private:
   pqPlotView(const pqPlotView&); // Not implemented.
   void operator=(const pqPlotView&); // Not implemented.

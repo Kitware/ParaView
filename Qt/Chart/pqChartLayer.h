@@ -149,13 +149,6 @@ signals:
   ///   signal to be effective.
   void rangeChanged();
 
-protected:
-  /// Used by a sub-class to request a layout.
-  void sendLayoutSignal();
-
-  /// Used by a subclass to request a repaint.
-  void sendRepaintSignal();
-
 private:
   const pqChartContentsSpace *Contents; ///< Stores the contents space.
 };

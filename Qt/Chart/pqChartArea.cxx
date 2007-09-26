@@ -92,9 +92,11 @@ public:
   pqChartAxis **Axis;           ///< Stores the axis objects.
   bool RangeChanged;            ///< True if the range has changed.
   bool InResize;                ///< True if the widget is resizing.
+  bool InZoom;                  ///< True if handling a zoom layout.
   bool SkipContextMenu;         ///< Used for context menu interaction.
   bool DelayContextMenu;        ///< Used for context menu interaction.
   bool ContextMenuBlocked;      ///< Used for context menu interaction.
+  bool LayoutPending;           ///< Used to delay chart layout.
 };
 
 
@@ -114,9 +116,11 @@ pqChartAreaInternal::pqChartAreaInternal()
   this->Axis = new pqChartAxis *[pqChartAreaInternal::AxisCount];
   this->RangeChanged = false;
   this->InResize = false;
+  this->InZoom = false;
   this->SkipContextMenu = false;
   this->DelayContextMenu = false;
   this->ContextMenuBlocked = false;
+  this->LayoutPending = false;
 
   // Initialize the axis pointers.
   for(int i = 0; i < pqChartAreaInternal::AxisCount; i++)
@@ -189,6 +193,10 @@ pqChartArea::pqChartArea(QWidget *widgetParent)
       this, SLOT(update()));
   this->connect(this->Contents, SIGNAL(maximumChanged(int, int)),
       this, SLOT(handleZoomChange()));
+
+  // Link the layout needed signal to the delay mechanism.
+  this->connect(this, SIGNAL(delayedLayoutNeeded()),
+      this, SLOT(layoutChart()), Qt::QueuedConnection);
 }
 
 pqChartArea::~pqChartArea()
@@ -310,7 +318,7 @@ void pqChartArea::createAxis(pqChartAxis::AxisLocation location)
       }
 
     // Listen to the axis update signals.
-    this->connect(axis, SIGNAL(layoutNeeded()), this, SLOT(layoutChart()));
+    this->connect(axis, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
     this->connect(axis, SIGNAL(repaintNeeded()), this, SLOT(update()));
     }
 }
@@ -386,7 +394,7 @@ void pqChartArea::insertLayer(int index, pqChartLayer *chart)
   chart->setContentsSpace(this->Contents);
 
   // Listen for the chart update signals.
-  this->connect(chart, SIGNAL(layoutNeeded()), this, SLOT(layoutChart()));
+  this->connect(chart, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
   this->connect(chart, SIGNAL(repaintNeeded()), this, SLOT(update()));
   this->connect(chart, SIGNAL(rangeChanged()),
       this, SLOT(handleChartRangeChange()));
@@ -486,6 +494,11 @@ void pqChartArea::drawChart(QPainter &painter, const QRect &area)
 
 void pqChartArea::layoutChart()
 {
+  if(!(this->Internal->InResize || this->Internal->InZoom))
+    {
+    this->Internal->LayoutPending = false;
+    }
+
   // If the axis layout behavior is ChartSelect, the axis could be fit
   // to the data range or determined by a chart. If the axis is data
   // driven, give the chart a chance to generate the axis labels.
@@ -847,6 +860,15 @@ void pqChartArea::layoutChart()
   this->update();
 }
 
+void pqChartArea::updateLayout()
+{
+  if(!this->Internal->LayoutPending)
+    {
+    this->Internal->LayoutPending = true;
+    emit this->delayedLayoutNeeded();
+    }
+}
+
 bool pqChartArea::event(QEvent *e)
 {
   if(e->type() == QEvent::FontChange)
@@ -864,7 +886,7 @@ bool pqChartArea::event(QEvent *e)
       }
 
     // Layout the chart area.
-    this->layoutChart();
+    this->updateLayout();
     }
   else if(e->type() == QEvent::ContextMenu)
     {
@@ -895,7 +917,7 @@ void pqChartArea::resizeEvent(QResizeEvent *e)
 {
   this->Internal->InResize = true;
   this->Contents->setChartSize(e->size().width(), e->size().height());
-  this->layoutChart();
+  this->updateLayout();
   this->Internal->InResize = false;
 }
 
@@ -1058,7 +1080,9 @@ void pqChartArea::handleZoomChange()
 {
   if(!this->Internal->InResize)
     {
+    this->Internal->InZoom = true;
     this->layoutChart();
+    this->Internal->InZoom = false;
     }
 }
 

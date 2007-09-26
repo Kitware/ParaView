@@ -31,8 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqPlotView.h"
 
+#include "vtkEventQtSlotConnect.h"
 #include "vtkImageData.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
 
@@ -76,6 +79,7 @@ public:
   pqPlotViewInternal();
   ~pqPlotViewInternal();
 
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   QPointer<pqChartWidget> Chart;
   QPointer<pqChartLegend> Legend;
   QPointer<pqChartTitle> Title;
@@ -86,6 +90,7 @@ public:
   pqChartLegendModel *LegendModel;
   bool RenderRequestPending;
   bool ShowLegend;
+  bool AxisLayoutModified;
 };
 
 
@@ -93,11 +98,13 @@ public:
 pqPlotViewInternal::pqPlotViewInternal()
   : Chart(0), Legend(0), Title(0), AxisTitles(), Selection(0)
 {
+  this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   this->Histogram = 0;
   this->LineChart = 0;
   this->LegendModel = 0;
   this->RenderRequestPending = false;
   this->ShowLegend = true;
+  this->AxisLayoutModified = true;
 
   this->AxisTitles.reserve(4);
   this->AxisTitles.append(0);
@@ -216,6 +223,32 @@ pqPlotView::pqPlotView(const QString& type,
       this, SLOT(addRepresentation(pqRepresentation*)));
   this->connect(this, SIGNAL(representationRemoved(pqRepresentation*)), 
       this, SLOT(removeRepresentation(pqRepresentation*)));
+
+  // Listen for axis layout property changes.
+  this->Internal->VTKConnect->Connect(
+      renModule->GetProperty("AxisScale"), vtkCommand::ModifiedEvent,
+      this, SLOT(setAxisLayoutModified()));
+  this->Internal->VTKConnect->Connect(
+      renModule->GetProperty("AxisBehavior"), vtkCommand::ModifiedEvent,
+      this, SLOT(setAxisLayoutModified()));
+  this->Internal->VTKConnect->Connect(
+      renModule->GetProperty("AxisMinimum"), vtkCommand::ModifiedEvent,
+      this, SLOT(setAxisLayoutModified()));
+  this->Internal->VTKConnect->Connect(
+      renModule->GetProperty("AxisMaximum"), vtkCommand::ModifiedEvent,
+      this, SLOT(setAxisLayoutModified()));
+  this->Internal->VTKConnect->Connect(
+      renModule->GetProperty("LeftAxisLabels"), vtkCommand::ModifiedEvent,
+      this, SLOT(setAxisLayoutModified()));
+  this->Internal->VTKConnect->Connect(
+      renModule->GetProperty("BottomAxisLabels"), vtkCommand::ModifiedEvent,
+      this, SLOT(setAxisLayoutModified()));
+  this->Internal->VTKConnect->Connect(
+      renModule->GetProperty("RightAxisLabels"), vtkCommand::ModifiedEvent,
+      this, SLOT(setAxisLayoutModified()));
+  this->Internal->VTKConnect->Connect(
+      renModule->GetProperty("TopAxisLabels"), vtkCommand::ModifiedEvent,
+      this, SLOT(setAxisLayoutModified()));
 
   // Add the current Representations to the chart.
   QList<pqRepresentation*> currentRepresentations = this->getRepresentations();
@@ -394,7 +427,11 @@ void pqPlotView::renderInternal()
   this->updateTitles();
 
   // Update the axis layout.
-  this->updateAxisLayout();
+  if(this->Internal->AxisLayoutModified)
+    {
+    this->updateAxisLayout();
+    this->Internal->AxisLayoutModified = false;
+    }
 
   // Update the axis options.
   this->updateAxisOptions();
@@ -652,6 +689,12 @@ void pqPlotView::removeAllRepresentations()
 }
 
 //-----------------------------------------------------------------------------
+void pqPlotView::setAxisLayoutModified()
+{
+  this->Internal->AxisLayoutModified = true;
+}
+
+//-----------------------------------------------------------------------------
 void pqPlotView::updateTitles()
 {
   // Update the chart title.
@@ -855,7 +898,7 @@ void pqPlotView::updateAxisLayout()
       }
     }
 
-  area->layoutChart();
+  area->updateLayout();
 }
 
 //-----------------------------------------------------------------------------
