@@ -51,7 +51,9 @@ public:
   // Set the whole range of possible scalar values to show in the transfer
   // function editor. This is used for showing the whole scalar range when
   // the histogram is not set.
-  vtkSetVector2Macro(WholeScalarRange, double);
+  void SetWholeScalarRange(double min, double max);
+  void SetWholeScalarRange(double range[2])
+    { this->SetWholeScalarRange(range[0], range[1]); }
   vtkGetVector2Macro(WholeScalarRange, double);
 
   // Description:

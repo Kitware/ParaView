@@ -29,7 +29,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.33");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.34");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -194,9 +194,12 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNodeAction(
     }
   else
     {
-    // add a new node
-    self->WidgetState = vtkTransferFunctionEditorWidgetSimple1D::PlacingNode;
-    self->AddNewNode(x, y);
+    if (self->WholeScalarRange[0] != self->WholeScalarRange[1])
+      {
+      // add a new node
+      self->WidgetState = vtkTransferFunctionEditorWidgetSimple1D::PlacingNode;
+      self->AddNewNode(x, y);
+      }
     self->LeftClickCount = 0;
     self->LeftClickEventPosition[0] = x;
     self->LeftClickEventPosition[1] = y;
@@ -308,10 +311,29 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNewNode(double scalar)
   int displaySize[2];
   rep->GetDisplaySize(displaySize);
 
-  displayPos[0] = this->ComputePositionFromScalar(scalar, displaySize[0]);
+  if (this->WholeScalarRange[0] != this->WholeScalarRange[1] ||
+      this->Nodes->size() == 0)
+    {
+    displayPos[0] = this->ComputePositionFromScalar(scalar, displaySize[0]);
+    }
+  else
+    {
+    displayPos[0] = displaySize[0] - this->BorderWidth;
+    }
+  
   if (this->ModificationType != COLOR)
     {
-    opacity = this->OpacityFunction->GetValue(scalar);
+    if (this->WholeScalarRange[0] != this->WholeScalarRange[1] ||
+        this->Nodes->size() == 0)
+      {
+      opacity = this->OpacityFunction->GetValue(scalar);
+      }
+    else
+      {
+      double opacityNode[4];
+      this->OpacityFunction->GetNodeValue(1, opacityNode);
+      opacity = opacityNode[1];
+      }
     displayPos[1] = (displaySize[1] - 2*this->BorderWidth) * opacity
       + this->BorderWidth;
     }
@@ -322,7 +344,12 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNewNode(double scalar)
   displayPos[2] = 0;
 
   double clampedScalar = scalar;
-  this->ClampToWholeRange(displayPos, displaySize, clampedScalar);
+  if (this->WholeScalarRange[0] != this->WholeScalarRange[1] ||
+      this->Nodes->size() == 0)
+    {
+    this->ClampToWholeRange(displayPos, displaySize, clampedScalar);
+    }
+
   int nodeId;
   if (clampedScalar != scalar)
     {
@@ -361,7 +388,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNewNode(double scalar)
     }
 
   double nodePos[3];
-  double rgb[3];
+  double rgbNode[6];
   unsigned int i;
   for (i = 0; i < this->Nodes->size(); i++)
     {
@@ -372,10 +399,10 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNewNode(double scalar)
       if (this->ModificationType != OPACITY)
         {
         // color the node based on the CTF
-        this->ColorFunction->GetColor(scalar, rgb);
+        this->ColorFunction->GetNodeValue(i, rgbNode);
         if (rep->GetColorElementsByColorFunction())
           {
-          rep->SetHandleColor(i, rgb[0], rgb[1], rgb[2]);
+          rep->SetHandleColor(i, rgbNode[1], rgbNode[2], rgbNode[3]);
           }
         }
       return;
@@ -386,10 +413,11 @@ void vtkTransferFunctionEditorWidgetSimple1D::AddNewNode(double scalar)
   if (this->ModificationType != OPACITY)
     {
     // color the node based on the CTF
-    this->ColorFunction->GetColor(scalar, rgb);
+    double colorNode[6];
+    this->ColorFunction->GetNodeValue(currentHandleNumber, colorNode);
     if (rep->GetColorElementsByColorFunction())
       {
-      rep->SetHandleColor(currentHandleNumber, rgb[0], rgb[1], rgb[2]);
+      rep->SetHandleColor(currentHandleNumber, colorNode[1], colorNode[2], colorNode[3]);
       }
     }
   vtkHandleWidget *newHandleWidget = NULL;
@@ -445,6 +473,11 @@ void vtkTransferFunctionEditorWidgetSimple1D::MoveNodeAction(
 
   if (self->WidgetState == vtkTransferFunctionEditorWidgetSimple1D::Start ||
       self->WidgetState == vtkTransferFunctionEditorWidgetSimple1D::PlacingNode)
+    {
+    return;
+    }
+
+  if (self->WholeScalarRange[0] == self->WholeScalarRange[1])
     {
     return;
     }
@@ -678,7 +711,8 @@ void vtkTransferFunctionEditorWidgetSimple1D::UpdateFromTransferFunctions()
       idx++;
       if (this->AllowInteriorElements)
         {
-        if (this->ModificationType == COLOR_AND_OPACITY)
+        if (this->ModificationType == COLOR_AND_OPACITY &&
+            this->WholeScalarRange[0] != this->WholeScalarRange[1])
           {
           double rgb[3];
           this->ColorFunction->GetColor(oNode[0], rgb);
@@ -733,7 +767,8 @@ void vtkTransferFunctionEditorWidgetSimple1D::UpdateFromTransferFunctions()
       idx++;
       if (this->AllowInteriorElements)
         {
-        if (this->ModificationType == COLOR_AND_OPACITY)
+        if (this->ModificationType == COLOR_AND_OPACITY &&
+            this->WholeScalarRange[0] != this->WholeScalarRange[1])
           {
           double opacity = this->OpacityFunction->GetValue(cNode[0]);
           this->OpacityFunction->AddPoint(cNode[0], opacity);
@@ -1029,9 +1064,8 @@ void vtkTransferFunctionEditorWidgetSimple1D::SetElementOpacity(
 
   double value[4];
   this->OpacityFunction->GetNodeValue(idx, value);
-  this->RemoveOpacityPoint(idx);
-
-  this->OpacityFunction->AddPoint(value[0], opacity);
+  value[1] = opacity;
+  this->OpacityFunction->SetNodeValue(idx, value);
   this->UpdateTransferFunctionMTime();
 
   vtkTransferFunctionEditorRepresentationSimple1D *rep =
@@ -1062,8 +1096,10 @@ void vtkTransferFunctionEditorWidgetSimple1D::SetElementRGBColor(
 
   double value[6];
   this->ColorFunction->GetNodeValue(idx, value);
-  this->ColorFunction->RemovePoint(value[0]);
-  this->ColorFunction->AddRGBPoint(value[0], r, g, b);
+  value[1] = r;
+  value[2] = g;
+  value[3] = b;
+  this->ColorFunction->SetNodeValue(idx, value);
   this->UpdateTransferFunctionMTime();
 
   vtkTransferFunctionEditorRepresentationSimple1D *rep =
