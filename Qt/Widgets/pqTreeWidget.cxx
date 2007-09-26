@@ -308,9 +308,15 @@ QModelIndex pqTreeWidget::moveCursor(CursorAction cursorAction, Qt::KeyboardModi
   int cur_row = this->indexOfTopLevelItem(curItem);
   if (cursorAction == QAbstractItemView::MoveNext && modifiers ==  Qt::NoModifier)
     {
-    if ((cur_col+1) < max_colums)
+    int next_column = cur_col+1;
+    while (next_column < max_colums && this->isColumnHidden(next_column))
       {
-      return this->indexFromItem(curItem, cur_col+1);
+      // skip hidden columns.
+      next_column++;
+      }
+    if (next_column < max_colums)
+      {
+      return this->indexFromItem(curItem, next_column);
       }
     else if ((cur_row +1) == max_rows)
       {
@@ -325,17 +331,32 @@ QModelIndex pqTreeWidget::moveCursor(CursorAction cursorAction, Qt::KeyboardModi
     }
   else if (cursorAction == QAbstractItemView::MovePrevious && modifiers == Qt::NoModifier)
     {
-    if (cur_col > 0)
+    int prev_column = cur_col-1;
+    while (prev_column >=0 && this->isColumnHidden(prev_column))
       {
-      return this->indexFromItem(curItem, cur_col-1);
+      // skip hidden columns.
+      prev_column--;
+      }
+    if (prev_column >= 0)
+      {
+      return this->indexFromItem(curItem, prev_column);
       }
     else
       {
       // we need to go to the last column in the previous row.
       if (cur_row > 0)
         {
-        return this->indexFromItem(
-          this->topLevelItem(cur_row-1), max_colums-1);
+        int prev_column = max_colums-1;
+        while (prev_column >=0 && this->isColumnHidden(prev_column))
+          {
+          // skip hidden columns.
+          prev_column--;
+          }
+        if (prev_column >= 0)
+          {
+          return this->indexFromItem(
+            this->topLevelItem(cur_row-1), max_colums-1);
+          }
         }
       }
     }
