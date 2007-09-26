@@ -550,7 +550,6 @@ pqPipelineModelItem::IconType pqPipelineModelSource::getIconType() const
     return INDETERMINATE;
     }
 
-  /*
   // This has only 1 output port.
   pqApplicationCore* core = pqApplicationCore::instance();
   pqDisplayPolicy* policy = core->getDisplayPolicy();
@@ -567,7 +566,7 @@ pqPipelineModelItem::IconType pqPipelineModelSource::getIconType() const
       return LINECHART;
       }
     }
-    */
+  
   return GEOMETRY;
 }
 
@@ -2027,15 +2026,13 @@ void pqPipelineModel::initializePixmaps()
     this->PixmapList[pqPipelineModelItem::LINK].load(
       ":/pqWidgets/Icons/pqLinkBack16.png");
     this->PixmapList[pqPipelineModelItem::GEOMETRY].load(
-      ":/pqWidgets/Icons/pqBundle16.png");
+      ":/pqWidgets/Icons/pq3DView16.png");
     this->PixmapList[pqPipelineModelItem::BARCHART].load(
-    //  ":/pqWidgets/Icons/pqBundle16.png");
-        ":/pqWidgets/Icons/pqFilter16.png");
+        ":/pqWidgets/Icons/pqHistogram16.png");
     this->PixmapList[pqPipelineModelItem::LINECHART].load(
-    //  ":/pqWidgets/Icons/pqBundle16.png");
-       ":/pqWidgets/Icons/pqFilter16.png");
+       ":/pqWidgets/Icons/pqLineChart16.png");
     this->PixmapList[pqPipelineModelItem::INDETERMINATE].load(
-      ":/pqWidgets/Icons/pqSource16.png");
+      ":/pqWidgets/Icons/pq3DView16.png");
     this->PixmapList[pqPipelineModelInternal::EYEBALL].load(
       ":/pqWidgets/Icons/pqEyeball16.png");
     this->PixmapList[pqPipelineModelInternal::EYEBALL_GRAY].load(

@@ -47,6 +47,8 @@ This filter extracts cell and point variables at a given location over time. The
        <PropertyGroup type="Handle" label="Location Widget">
          <Property function="WorldPosition" name="Locations" />
        </PropertyGroup>
+        <!-- View can be used to specify the preferred view for the proxy -->
+       <View type="XYPlotView" />
      </Hints>
 
      <!-- End ProbeLocationOverTime -->
@@ -121,6 +123,10 @@ This filter extracts the variables associated with a vertex over time. The outpu
           proxyname="SelectionSource">
         </Proxy>
      </SubProxy>
+     <Hints>
+       <!-- View can be used to specify the preferred view for the proxy -->
+       <View type="XYPlotView" />
+     </Hints>
      <!-- End ExtractPointsOverTime -->
    </ExtractSelectionProxy>
 
@@ -193,6 +199,10 @@ This filter extracts the variables associated with a cell over time. The output 
           proxyname="SelectionSource">
         </Proxy>
      </SubProxy>
+     <Hints>
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <View type="XYPlotView" />
+     </Hints>
      <!-- End ExtractCellsOverTime -->
    </ExtractSelectionProxy>
 
@@ -262,6 +272,10 @@ This filter extracts the variables that reside in a dataset's field data and are
          If the value of this property is 1, an average of neighborhood scalar values will be used as the output scalar value for each output point. If its value is 0, only subsampling will be performed, and the original scalar values at the points will be retained.
        </Documentation>
      </IntVectorProperty>
+     <Hints>
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <View type="XYPlotView" />
+     </Hints>
    <!-- End ImageShrink -->
    </SourceProxy>
 
@@ -4423,6 +4437,8 @@ The Plot Over Line filter samples the data set attributes of the current data se
       </InputProperty>
       <Hints>
         <Visibility replace_input="0" />
+        <!-- View can be used to specify the preferred view for the proxy -->
+       <View type="XYPlotView" />
       </Hints>
    <!-- End ProbeLine -->
    </SourceProxy>

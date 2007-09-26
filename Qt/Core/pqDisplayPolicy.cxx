@@ -67,20 +67,25 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
   bool update_pipeline) const
 {
   pqPipelineSource* source = opPort->getSource();
-  vtkSMSourceProxy* spProxy = vtkSMSourceProxy::SafeDownCast(
-    source->getProxy());
-  if (spProxy && !update_pipeline 
-    /*&& !spProxy->GetNumberOfParts() */)
-    {
-    // If parts aren't created, don't update the information at all.
-    return QString();
-    }
   
   vtkPVXMLElement* hints = source->getHints();
   vtkPVXMLElement* viewElement = hints? 
     hints->FindNestedElementByName("View") : 0;
   QString view_type = viewElement ? 
     QString(viewElement->GetAttribute("type")) : QString::null;
+
+  // HACK: for now, when update_pipeline is false, we don't do any gather
+  // information as that can result in progress events which may case Qt paint
+  // issues.
+  vtkSMSourceProxy* spProxy = vtkSMSourceProxy::SafeDownCast(
+    source->getProxy());
+  if (spProxy && !update_pipeline /*&& !spProxy->GetNumberOfParts()*/)
+    {
+    // If parts aren't created, don't update the information at all.
+    // Typically means that the filter hasn't been "Applied" even once and
+    // updating information on it may raise errors.
+    return view_type;
+    }
 
   if (view_type.isNull())
     {
