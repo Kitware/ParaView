@@ -2625,6 +2625,7 @@ void pqMainWindowCore::onToolsOutputWindow()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::initPythonInterpretor()
 {
+#ifdef PARAVIEW_ENABLE_PYTHON
   // Since paraview application always has a server connection,
   // intialize the paraview.ActiveConnection to point to the currently
   // existsing connection, so that the user can directly start creating
@@ -2650,6 +2651,7 @@ void pqMainWindowCore::initPythonInterpretor()
     }
 
   this->Implementation->PythonDialog->setAttribute(Qt::WA_QuitOnClose, false);
+#endif
 }
 
 //-----------------------------------------------------------------------------
