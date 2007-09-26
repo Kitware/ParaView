@@ -485,31 +485,46 @@ void pqMainWindowCore::pqImplementation::updateFiltersFromXML(const QString& xml
   vtkPVXMLElement* elem = parser->GetRootElement();
   int num = elem->GetNumberOfNestedElements();
   pqImplementation::ProxyVector filters;
-  
-  // First create a uniquified, alphabetical vector of all filters
-  for(int i=0; i<num; i++)
+
+  QList<vtkPVXMLElement*> elements;
+  elements.append(parser->GetRootElement());
+
+  // First create a uniquified, alphabetical vector of all filters (recursively)
+  while(!elements.isEmpty())
     {
-    vtkPVXMLElement* element = elem->GetNestedElement(i);
-    if(QString("Filter") == element->GetName())
+    vtkPVXMLElement* element = elements.takeLast();
+    int numNested = element->GetNumberOfNestedElements();
+    if(numNested)
       {
-      QString name = element->GetAttribute("name");
-      QString icon = element->GetAttribute("icon");
-      if (!name.isEmpty())
+      for(int i=0; i<numNested; i++)
         {
-        vtkSMProxy* prototype = pxm->GetProxy("filters_prototypes",
-                                              name.toAscii().data());
-        if (prototype)
+        elements.append(element->GetNestedElement(i));
+        }
+      }
+    else
+      {
+      if(QString("Filter") == element->GetName())
+        {
+        QString name = element->GetAttribute("name");
+        QString icon = element->GetAttribute("icon");
+
+        if (!name.isEmpty())
           {
-          filters.push_back(prototype);
-          if (icon != "")
+          vtkSMProxy* prototype = pxm->GetProxy("filters_prototypes",
+                                                name.toAscii().data());
+          if (prototype)
             {
-            this->FilterIcons[name.toStdString()] = icon.toStdString();
+            filters.push_back(prototype);
+            if (!icon.isEmpty())
+              {
+              this->FilterIcons[name.toStdString()] = icon.toStdString();
+              }
             }
           }
         }
       }
     }
-
+  
   vtkstd::sort(filters.begin(), filters.end(), pqImplementation::proxyLessThan);
   pqImplementation::ProxyVector::iterator newEnd =
     vtkstd::unique(filters.begin(), filters.end(), pqImplementation::proxySame);
