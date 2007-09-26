@@ -31,7 +31,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkCSVWriter);
-vtkCxxRevisionMacro(vtkCSVWriter, "1.6");
+vtkCxxRevisionMacro(vtkCSVWriter, "1.7");
 //-----------------------------------------------------------------------------
 vtkCSVWriter::vtkCSVWriter()
 {
@@ -155,7 +155,7 @@ void vtkCSVWriter::WriteData()
     vtkDataSet* ds = vtkDataSet::SafeDownCast(this->GetInput());
     if (ds)
       {
-      static char* const pdInfoStr =
+      static char* pdInfoStr =
         "vtkCSVWriter: input data type needs to be of type vtkPolyData";
       vtkPointSet* ps = vtkPointSet::SafeDownCast(ds);
       if (ps)
@@ -166,7 +166,7 @@ void vtkCSVWriter::WriteData()
           vtkPolyData* clone = vtkPolyData::New();
           clone->ShallowCopy(pd);
 
-          static char* const infoStr =
+          static char* infoStr =
             "input data type is a vtkPolyData."
             " Converting via vtkPolyLineToRectilinearGridFilter";
           vtkDebugMacro(<< infoStr);
