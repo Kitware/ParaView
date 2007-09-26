@@ -44,10 +44,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDomain.h"
+#include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
 
 
 // Qt includes.
-#include <QDomDocument>
 #include <QFileInfo>
 #include <QDir>
 #include <QList>
@@ -434,28 +435,33 @@ void pqReaderFactory::loadFileTypes(const QString& xmlfilename)
     return;
     }
 
-  QDomDocument doc("doc");
-  if (!doc.setContent(&xml))
+  QByteArray dat = xml.readAll();
+
+  vtkSmartPointer<vtkPVXMLParser> parser = 
+    vtkSmartPointer<vtkPVXMLParser>::New();
+
+  if(!parser->Parse(dat.data()))
     {
-    xml.close();
     qDebug() << "Failed to parse " << xmlfilename;
+    xml.close();
     return;
     }
-  QDomNodeList readerElements = doc.elementsByTagName("Reader");
-  for(int cc=0; cc < readerElements.size(); cc++)
+
+  vtkPVXMLElement* elem = parser->GetRootElement();
+  int num = elem->GetNumberOfNestedElements();
+  for(int i=0; i<num; i++)
     {
-    QDomNode node = readerElements.item(cc);
-    QDomElement reader = node.toElement();
-    if (reader.isNull())
+    vtkPVXMLElement* reader = elem->GetNestedElement(i);
+    if(QString(reader->GetName()) == "Reader")
       {
-      continue;
+      QString name = reader->GetAttribute("name");
+      QString extensions = reader->GetAttribute("extensions");
+      QString desc = reader->GetAttribute("file_description");
+      const char* grp = reader->GetAttribute("group");
+      QString group = grp ? grp : "sources";
+      QStringList exts = extensions.split(" ", QString::SkipEmptyParts);
+      this->addFileType(desc, exts, group, name.toAscii().data());
       }
-    QString name = reader.attribute("name");
-    QString extensions = reader.attribute("extensions");
-    QString desc = reader.attribute("file_description");
-    QString group = reader.attribute("group", "sources");
-    QStringList exts = extensions.split(" ", QString::SkipEmptyParts);
-    this->addFileType(desc, exts, group, name.toAscii().data());
     }
 }
 

@@ -31,7 +31,6 @@
 
 #include <QBrush>
 #include <QDir>
-#include <QDomDocument>
 #include <QFileInfo>
 #include <QHBoxLayout>
 #include <QMap>
@@ -59,6 +58,8 @@
 #include <vtkSphereSource.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkUnstructuredGrid.h>
+#include <vtkPVXMLParser.h>
+#include <vtkPVXMLElement.h>
 
 #include <vtkExodusReader.h>
 #include <vtkProcessModule.h>
@@ -1204,38 +1205,40 @@ void LineChartAdapter::loadSetup(const QStringList& files)
     {
     QFileInfo setup_file_info(files[i]);
     QFile file(files[i]);
-    QDomDocument xml_document;
-    xml_document.setContent(&file, false);
-
-    QDomElement xml_setup = xml_document.documentElement();
-    if(xml_setup.nodeName() != "setup")
+    QByteArray dat = file.readAll();
+    vtkSmartPointer<vtkPVXMLParser> parser = 
+      vtkSmartPointer<vtkPVXMLParser>::New();
+    parser->Parse(dat.data());
+    vtkPVXMLElement* element = parser->GetRootElement();
+    if(QString(element->GetName()) != "setup")
       {
       QMessageBox::warning(0, "Dobran-O-Viz Error:", files[i] + " is not a Dobran-O-Viz setup file");
       continue;
       }
 
-    for(QDomNode xml_file = xml_setup.firstChild(); !xml_file.isNull(); xml_file = xml_file.nextSibling())
+    int num = element->GetNumberOfNestedElements();
+    for(int j=0; j<num; j++)
       {
-      if(!xml_file.isElement())
-        continue;
+      vtkPVXMLElement* xml_file = element->GetNestedElement(j);
 
-      QFileInfo file_info(xml_file.toElement().text());
+      QString filename = xml_file->GetCharacterData();
+      QFileInfo file_info(filename);
       if(file_info.isRelative())
-        file_info = setup_file_info.absoluteDir().absoluteFilePath(xml_file.toElement().text());
+        file_info = setup_file_info.absoluteDir().absoluteFilePath(filename);
       
-      if(xml_file.nodeName() == "experimental")
+      if(QString(xml_file->GetName()) == "experimental")
         {
         loadExperimentalData(file_info.absoluteFilePath());
         }
-      else if(xml_file.nodeName() == "experimental_uncertainty")
+      else if(QString(xml_file->GetName()) == "experimental_uncertainty")
         {
         loadExperimentalUncertainty(file_info.absoluteFilePath());
         }
-      else if(xml_file.nodeName() == "simulation_uncertainty")
+      else if(QString(xml_file->GetName()) == "simulation_uncertainty")
         {
         loadSimulationUncertainty(file_info.absoluteFilePath());
         }
-      else if(xml_file.nodeName() == "experiment_simulation_map")
+      else if(QString(xml_file->GetName()) == "experiment_simulation_map")
         {
         loadExperimentSimulationMap(file_info.absoluteFilePath());
         }

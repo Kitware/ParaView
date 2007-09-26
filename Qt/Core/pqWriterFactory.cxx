@@ -38,9 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMWriterProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
 
 // Qt includes.
-#include <QDomDocument>
 #include <QFileInfo>
 #include <QDir>
 #include <QList>
@@ -318,29 +319,34 @@ void pqWriterFactory::loadFileTypes(const QString& xmlfilename)
     qDebug() << "Failed to load " << xmlfilename;
     return;
     }
+  
+  QByteArray dat = xml.readAll();
+  
+  vtkSmartPointer<vtkPVXMLParser> parser = 
+    vtkSmartPointer<vtkPVXMLParser>::New();
 
-  QDomDocument doc("doc");
-  if (!doc.setContent(&xml))
+  if(!parser->Parse(dat.data()))
     {
-    xml.close();
     qDebug() << "Failed to parse " << xmlfilename;
+    xml.close();
     return;
     }
-  QDomNodeList readerElements = doc.elementsByTagName("Writer");
-  for(int cc=0; cc < readerElements.size(); cc++)
+
+  vtkPVXMLElement* elem = parser->GetRootElement();
+  int num = elem->GetNumberOfNestedElements();
+  for(int i=0; i<num; i++)
     {
-    QDomNode node = readerElements.item(cc);
-    QDomElement writer = node.toElement();
-    if (writer.isNull())
+    vtkPVXMLElement* reader = elem->GetNestedElement(i);
+    if(QString(reader->GetName()) == "Writer")
       {
-      continue;
+      QString name = reader->GetAttribute("name");
+      QString extensions = reader->GetAttribute("extensions");
+      QString desc = reader->GetAttribute("file_description");
+      const char* grp = reader->GetAttribute("group");
+      QString group = grp ? grp : "writers";
+      QStringList exts = extensions.split(" ", QString::SkipEmptyParts);
+      this->addFileType(desc, exts, group, name.toAscii().data());
       }
-    QString name = writer.attribute("name");
-    QString extensions = writer.attribute("extensions");
-    QString desc = writer.attribute("file_description");
-    QString group = writer.attribute("group", "writers");
-    QStringList exts = extensions.split(" ", QString::SkipEmptyParts);
-    this->addFileType(desc, exts, group, name.toAscii().data());
     }
 }
 

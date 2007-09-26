@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAction>
 #include <QApplication>
 #include <QDockWidget>
-#include <QDomDocument>
 #include <QFile>
 #include <QMenu>
 #include <QMessageBox>
@@ -373,23 +372,30 @@ void pqMainWindowCore::pqImplementation::updateSourcesFromXML(const QString& xml
     qDebug() << "Failed to load " << xmlfilename;
     return;
     }
-
-  QDomDocument doc("doc");
-  if (!doc.setContent(&xml))
+  
+  QByteArray dat = xml.readAll();
+  
+  vtkSmartPointer<vtkPVXMLParser> parser = 
+    vtkSmartPointer<vtkPVXMLParser>::New();
+  
+  if(!parser->Parse(dat.data()))
     {
+    qDebug() << "Failed to parse " << xmlfilename;
     xml.close();
-    qDebug() << "Failed to load " << xmlfilename;
     return;
     }
-
+  
   // Get all the sources
-  QDomNodeList sourceList = doc.elementsByTagName("Source");
-  for(int i=0; i<sourceList.size(); i++)
+  vtkPVXMLElement* elem = parser->GetRootElement();
+  int num = elem->GetNumberOfNestedElements();
+  for(int i=0; i<num; i++)
     {
-    QDomNode node = sourceList.item(i);
-    QDomElement source = node.toElement();
-    QString name = source.attribute("name");
-    this->Sources.push_back(name.toStdString());
+    vtkPVXMLElement* element = elem->GetNestedElement(i);
+    if(QString("Source") == element->GetName())
+      {
+      QString name = element->GetAttribute("name");
+      this->Sources.push_back(name.toStdString());
+      }
     }
 }
 
@@ -463,38 +469,47 @@ void pqMainWindowCore::pqImplementation::updateFiltersFromXML(const QString& xml
     qDebug() << "Failed to load " << xmlfilename;
     return;
     }
-
-  QDomDocument doc("doc");
-  if (!doc.setContent(&xml))
+  
+  QByteArray dat = xml.readAll();
+  
+  vtkSmartPointer<vtkPVXMLParser> parser = 
+    vtkSmartPointer<vtkPVXMLParser>::New();
+  
+  if(!parser->Parse(dat.data()))
     {
+    qDebug() << "Failed to parse " << xmlfilename;
     xml.close();
-    qDebug() << "Failed to load " << xmlfilename;
     return;
     }
-
-  // First create a uniquified, alphabetical vector of all filters
+  
+  vtkPVXMLElement* elem = parser->GetRootElement();
+  int num = elem->GetNumberOfNestedElements();
   pqImplementation::ProxyVector filters;
-  QDomNodeList filterList = doc.elementsByTagName("Filter");
-  for(int i=0; i<filterList.size(); i++)
+  
+  // First create a uniquified, alphabetical vector of all filters
+  for(int i=0; i<num; i++)
     {
-    QDomNode node = filterList.item(i);
-    QDomElement filter = node.toElement();
-    QString name = filter.attribute("name");
-    QString icon = filter.attribute("icon");
-    if (name != "")
+    vtkPVXMLElement* element = elem->GetNestedElement(i);
+    if(QString("Filter") == element->GetName())
       {
-      vtkSMProxy* prototype = pxm->GetProxy("filters_prototypes",
-                                            name.toAscii().data());
-      if (prototype)
+      QString name = element->GetAttribute("name");
+      QString icon = element->GetAttribute("icon");
+      if (!name.isEmpty())
         {
-        filters.push_back(prototype);
-        if (icon != "")
+        vtkSMProxy* prototype = pxm->GetProxy("filters_prototypes",
+                                              name.toAscii().data());
+        if (prototype)
           {
-          this->FilterIcons[name.toStdString()] = icon.toStdString();
+          filters.push_back(prototype);
+          if (icon != "")
+            {
+            this->FilterIcons[name.toStdString()] = icon.toStdString();
+            }
           }
         }
       }
     }
+
   vtkstd::sort(filters.begin(), filters.end(), pqImplementation::proxyLessThan);
   pqImplementation::ProxyVector::iterator newEnd =
     vtkstd::unique(filters.begin(), filters.end(), pqImplementation::proxySame);
@@ -505,40 +520,40 @@ void pqMainWindowCore::pqImplementation::updateFiltersFromXML(const QString& xml
                                    newEnd);
 
   // Next create the categories
-  QDomNodeList categoryList = doc.elementsByTagName("Category");
-  for(int i=0; i<categoryList.size(); i++)
+  for(int i=0; i<num; i++)
     {
-    QDomNode node = categoryList.item(i);
-    QDomElement categoryNode = node.toElement();
-    QString categoryName = categoryNode.attribute("name");
-    if (categoryName != "")
+    vtkPVXMLElement* element = elem->GetNestedElement(i);
+    if(QString("Category") == element->GetName())
       {
-      QString categoryLabel = categoryNode.attribute("menu_label");
-      if (categoryLabel == "")
+      QString categoryName = element->GetAttribute("name");
+      if (!categoryName.isEmpty())
         {
-        categoryLabel = categoryName;
-        }
-      pqImplementation::FilterCategory category(
-        categoryName.toAscii().data(),
-        categoryLabel.toAscii().data());
-      QDomNodeList children = node.childNodes();
-      for (int j=0; j<children.size(); j++)
-        {
-        QDomNode childNode = children.item(j);
-        QString nodeName = childNode.nodeName();
-        if (nodeName == "Filter")
+        QString categoryLabel = element->GetAttribute("menu_label");
+        if (categoryLabel.isEmpty())
           {
-          QDomElement filter = childNode.toElement();
-          QString name = filter.attribute("name");
-          if (name != "")
+          categoryLabel = categoryName;
+          }
+        pqImplementation::FilterCategory category(
+          categoryName.toAscii().data(),
+          categoryLabel.toAscii().data());
+        
+        int numChild = element->GetNumberOfNestedElements();
+        for (int j=0; j<numChild; j++)
+          {
+          vtkPVXMLElement* childElem = element->GetNestedElement(j);
+          if (QString(childElem->GetName()) == "Filter")
             {
-            category.Filters.push_back(name.toStdString());
+            QString name = childElem->GetAttribute("name");
+            if (!name.isEmpty())
+              {
+              category.Filters.push_back(name.toStdString());
+              }
             }
           }
-        }
-      if (!category.Filters.empty())
-        {
-        this->FilterCategories.push_back(category);
+        if (!category.Filters.empty())
+          {
+          this->FilterCategories.push_back(category);
+          }
         }
       }
     }
