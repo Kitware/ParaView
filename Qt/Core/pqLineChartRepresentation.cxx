@@ -993,7 +993,9 @@ void pqLineChartRepresentation::markCellModified()
 //-----------------------------------------------------------------------------
 int pqLineChartRepresentation::isEnabledByDefault(const QString &arrayName) const
 {
-  if(arrayName == "ObjectId" || arrayName == "Time" ||
+  if(arrayName == "ObjectId" ||
+      arrayName.compare("Time", Qt::CaseInsensitive) == 0 ||
+      arrayName.compare("TimeData", Qt::CaseInsensitive) == 0 ||
       arrayName == "GlobalElementId" || arrayName == "GlobalNodeId" ||
       arrayName == "GlobalEdgeId" || arrayName == "GlobalFaceId" || 
       arrayName == "PedigreeElementId" || arrayName == "PedigreeNodeId" ||
