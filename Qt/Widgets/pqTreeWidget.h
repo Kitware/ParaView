@@ -40,6 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   A convenience QTreeWidget with extra features:
   1.  Automatic size hints based on contents
   2.  A check box added in a header if items have check boxes
+  3.  Navigation through columns of top level items on Tab.
+  4.  Signal emitted when user navigates beyond end of the table giving an 
+      opportunity to the lister to grow the table.
 */
 class QTWIDGETS_EXPORT pqTreeWidget : public QTreeWidget
 {
@@ -55,10 +58,14 @@ public:
   /// give a hint on the size
   QSize sizeHint() const;
   QSize minimumSizeHint() const;
-  
+
 public slots:
   void allOn();
   void allOff();
+
+signals:
+  /// Fired when moveCursor takes the cursor beyond the last row.
+  void navigatedPastEnd();
 
 protected slots:
   void doToggle(int col);
@@ -68,6 +75,11 @@ protected slots:
 protected:
   QPixmap** CheckPixmaps;
   QPixmap pixmap(Qt::CheckState state, bool active);
+
+  /// Move the cursor in the way described by cursorAction, 
+  /// using the information provided by the button modifiers.
+  virtual QModelIndex moveCursor(CursorAction cursorAction, 
+    Qt::KeyboardModifiers modifiers);
 };
 
 #endif // !_pqTreeWidget_h

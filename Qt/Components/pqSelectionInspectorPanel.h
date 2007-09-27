@@ -135,6 +135,10 @@ protected slots:
 
   /// Converts index selection to global id selection and vice versa.
   void convertSelection(bool toGlobalIds);
+
+  /// Called when user navigates beyond the end in the indices table widget. We
+  /// add a new row to simplify editing.
+  void growIndicesTable();
 private:
   /// Set the display whose properties we want to edit.
   void setRepresentation(pqDataRepresentation* repr);

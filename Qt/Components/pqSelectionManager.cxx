@@ -82,7 +82,6 @@ public:
       src->CleanSelectionInputs(this->SelectedPort->getPortNumber());
       }
     this->SelectedPort = 0;
-    this->GlobalIDSelectionSource = 0;
     }
 
   vtkSMProxy* getSelectionSourceProxy()
@@ -98,8 +97,6 @@ public:
 
   QPointer<pqOutputPort> SelectedPort;
   QPointer<pqView> ActiveView;
-
-  vtkSmartPointer<vtkSMProxy> GlobalIDSelectionSource;
 };
 
 //-----------------------------------------------------------------------------
@@ -204,36 +201,6 @@ void pqSelectionManager::onSelected(pqOutputPort* selectedPort)
     }
 
   emit this->selectionChanged(this);
-}
-
-//-----------------------------------------------------------------------------
-QList<QVariant> pqSelectionManager::getSelectedIndicesWithProcessIDs() const
-{
-  vtkSMProxy* selectionSource = this->Implementation->getSelectionSourceProxy();
-  if (!selectionSource)
-    {
-    return QList<QVariant>();
-    }
-
-  return pqSMAdaptor::getMultipleElementProperty(
-    selectionSource->GetProperty("IDs"));
-}
-
-//-----------------------------------------------------------------------------
-QList<QVariant> pqSelectionManager::getSelectedGlobalIDs() const
-{
-  if (!this->Implementation->GlobalIDSelectionSource.GetPointer())
-    {
-    return QList<QVariant>();
-    }
-  QList<QVariant> reply;
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->Implementation->GlobalIDSelectionSource->GetProperty("IDs"));
-  for (int cc=1; cc < values.size(); cc+=2)
-    {
-    reply.push_back(values[cc]);
-    }
-  return reply;
 }
 
 //-----------------------------------------------------------------------------
