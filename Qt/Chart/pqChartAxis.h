@@ -311,6 +311,13 @@ public:
   const pqChartPixelScale *getPixelValueScale() const;
 
   /// \brief
+  ///   Gets wether or not the given label tickmark is visible.
+  /// \param index The index of the label.
+  /// \return
+  ///   True if the given label tickmark is visible.
+  bool isLabelTickVisible(int index) const;
+
+  /// \brief
   ///   Gets the location of the given label.
   /// \param index The index of the label.
   /// \return

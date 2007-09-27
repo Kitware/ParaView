@@ -917,7 +917,7 @@ void pqChartArea::resizeEvent(QResizeEvent *e)
 {
   this->Internal->InResize = true;
   this->Contents->setChartSize(e->size().width(), e->size().height());
-  this->updateLayout();
+  this->layoutChart();
   this->Internal->InResize = false;
 }
 

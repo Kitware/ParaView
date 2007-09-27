@@ -177,6 +177,12 @@ void pqChartGridLayer::drawAxisGrid(QPainter &painter, const pqChartAxis *axis)
   painter.setPen(options->getGridColor());
   for(int i = 0; i < total; i++)
     {
+    // Only draw grid lines for visible tick marks.
+    if(!axis->isLabelTickVisible(i))
+      {
+      continue;
+      }
+
     // Only draw the grid lines inside the bounds.
     pixel = axis->getLabelLocation(i);
     if(vertical)

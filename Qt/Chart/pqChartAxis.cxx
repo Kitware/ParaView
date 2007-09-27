@@ -76,6 +76,7 @@ public:
   int SmallTickLength;
   int MaxLabelWidth;
   int Skip;
+  int TickSkip;
   bool InLayout;
   bool UsingBestFit;
   bool DataAvailable;
@@ -114,6 +115,7 @@ pqChartAxisInternal::pqChartAxisInternal()
   this->SmallTickLength = 3;
   this->MaxLabelWidth = 0;
   this->Skip = 1;
+  this->TickSkip = 1;
   this->InLayout = false;
   this->UsingBestFit = false;
   this->DataAvailable = false;
@@ -638,8 +640,9 @@ void pqChartAxis::layoutAxis(const QRect &area)
   // Calculate the pixel location for each label.
   this->Internal->ScaleChanged = false;
   this->Internal->Skip = 1;
+  this->Internal->TickSkip = 1;
   if(this->Scale->isValid() && this->Options->isVisible() &&
-      this->Options->areLabelsVisible())
+      (this->Options->areLabelsVisible() || this->Options->isGridVisible()))
     {
     iter = this->Internal->Items.begin();
     for(i = 0; iter != this->Internal->Items.end(); ++iter, ++i)
@@ -671,6 +674,39 @@ void pqChartAxis::layoutAxis(const QRect &area)
       if(this->Internal->Skip == 0 || needed % pixelRange > 0)
         {
         this->Internal->Skip += 1;
+        }
+
+      if(this->Internal->Skip > 1)
+        {
+        // If there is not enough space for the tick marks, set up the
+        // tick skip count.
+        int count = this->Internal->Skip;
+        if(count >= this->Internal->Items.size())
+          {
+          count = this->Internal->Items.size() - 1;
+          }
+
+        needed = 4 * count;
+        pixelRange = this->Internal->Items[0]->Pixel;
+        int pixel = this->Internal->Items[count]->Pixel;
+        if(pixel < pixelRange)
+          {
+          pixelRange = pixelRange - pixel;
+          }
+        else
+          {
+          pixelRange = pixel - pixelRange;
+          }
+
+        if(pixelRange > 0)
+          {
+          this->Internal->TickSkip = needed / pixelRange;
+          }
+
+        if(this->Internal->TickSkip == 0 || needed % pixelRange > 0)
+          {
+          this->Internal->TickSkip += 1;
+          }
         }
       }
     }
@@ -895,30 +931,12 @@ void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
   int halfAscent = fontAscent/2;
   int fontDescent = fm.descent();
 
-  // Use the font height and max label width to determine the minimum
-  // space between labels.
-  int lastTick = 0;
   bool vertical = this->Location == pqChartAxis::Left ||
       this->Location == pqChartAxis::Right;
-  if(vertical)
-    {
-    lastTick = this->Internal->Bounds.bottom() + 1;
-    if(this->Zoom)
-      {
-      lastTick -= this->Zoom->getYOffset();
-      }
-    }
-  else
-    {
-    lastTick = this->Internal->Bounds.left() - 1;
-    if(this->Zoom)
-      {
-      lastTick -= this->Zoom->getXOffset();
-      }
-    }
 
   // Draw the axis labels.
   int i = 0;
+  int skipIndex = 0;
   QString label;
   pqChartValue value;
   QList<pqChartAxisItem *>::Iterator iter = this->Internal->Items.begin();
@@ -937,7 +955,6 @@ void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
       // Make sure the label is inside the axis bounds.
       if(y > this->Internal->Bounds.bottom())
         {
-        lastTick = y;
         continue;
         }
       else if(y < this->Internal->Bounds.top())
@@ -947,9 +964,9 @@ void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
 
       // Draw the tick mark for the label. If the label won't fit,
       // draw a smaller tick mark.
-      if(this->Internal->Skip == 1 || i % this->Internal->Skip == 0)
+      skipIndex = i % this->Internal->Skip;
+      if(this->Internal->Skip == 1 || skipIndex == 0)
         {
-        lastTick = y;
         painter.setPen(this->Options->getAxisColor());
         painter.drawLine(tick, y, x, y);
         this->Model->getLabel(i, value);
@@ -967,11 +984,9 @@ void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
           painter.drawText(tick + this->Internal->TickLabelSpacing, y, label);
           }
         }
-      else if(y < lastTick)
+      else if(this->Internal->TickSkip == 1 ||
+          skipIndex % this->Internal->TickSkip == 0)
         {
-        // Only draw the tick mark if it isn't in the same position
-        // as the previous one.
-        lastTick = y;
         painter.setPen(this->Options->getAxisColor());
         painter.drawLine(tickSmall, y, x, y);
         }
@@ -988,7 +1003,6 @@ void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
       // Make sure the label is inside the axis bounds.
       if(x < this->Internal->Bounds.left())
         {
-        lastTick = x;
         continue;
         }
       else if(x > this->Internal->Bounds.right())
@@ -998,9 +1012,9 @@ void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
 
       // Draw the tick mark for the label. If the label won't fit,
       // draw a smaller tick mark.
-      if(this->Internal->Skip == 1 || i % this->Internal->Skip == 0)
+      skipIndex = i % this->Internal->Skip;
+      if(this->Internal->Skip == 1 || skipIndex == 0)
         {
-        lastTick = x;
         painter.setPen(this->Options->getAxisColor());
         painter.drawLine(x, tick, x, y);
         this->Model->getLabel(i, value);
@@ -1019,11 +1033,9 @@ void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
               x, tick + this->Internal->TickLabelSpacing + fontAscent, label);
           }
         }
-      else if(x > lastTick)
+      else if(this->Internal->TickSkip == 1 ||
+          skipIndex % this->Internal->TickSkip == 0)
         {
-        // Only draw the tick mark if it isn't in the same position
-        // as the previous one.
-        lastTick = x;
         painter.setPen(this->Options->getAxisColor());
         painter.drawLine(x, tickSmall, x, y);
         }
@@ -1039,6 +1051,22 @@ void pqChartAxis::getBounds(QRect &bounds) const
 const pqChartPixelScale *pqChartAxis::getPixelValueScale() const
 {
   return this->Scale;
+}
+
+bool pqChartAxis::isLabelTickVisible(int index) const
+{
+  if(index >= 0 || index < this->Internal->Items.size())
+    {
+    if(this->Internal->TickSkip > 1)
+      {
+      int skipIndex = index % this->Internal->Skip;
+      return skipIndex % this->Internal->TickSkip == 0;
+      }
+
+    return true;
+    }
+
+  return false;
 }
 
 int pqChartAxis::getLabelLocation(int index) const
