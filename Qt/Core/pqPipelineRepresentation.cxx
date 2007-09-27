@@ -608,14 +608,26 @@ void pqPipelineRepresentation::setScalarOpacityRange(double min, double max)
   dold = (dold > 0) ? dold : 1;
 
   double dnew = (max -min);
-  dnew = (dnew > 0) ? dnew : 1;
 
-  double scale = dnew/dold;
-  for (int cc=0; cc < controlPoints.size(); 
-    cc+= dvp->GetNumberOfElementsPerCommand())
+  if (dnew > 0)
     {
-    controlPoints[cc] = 
-      scale * (controlPoints[cc].toDouble()-current_range.first) + min;
+    double scale = dnew/dold;
+    for (int cc=0; cc < controlPoints.size(); 
+         cc+= dvp->GetNumberOfElementsPerCommand())
+      {
+      controlPoints[cc] = 
+        scale * (controlPoints[cc].toDouble()-current_range.first) + min;
+      }
+    }
+  else
+    {
+    // allowing an opacity transfer function with a scalar range of 0.
+    // In this case, the piecewise function only contains the endpoints.
+    controlPoints.clear();
+    controlPoints.push_back(min);
+    controlPoints.push_back(0);
+    controlPoints.push_back(max);
+    controlPoints.push_back(1);
     }
 
   pqSMAdaptor::setMultipleElementProperty(dvp, controlPoints);
