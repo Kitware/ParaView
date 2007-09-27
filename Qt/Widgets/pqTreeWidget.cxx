@@ -346,7 +346,7 @@ QModelIndex pqTreeWidget::moveCursor(CursorAction cursorAction, Qt::KeyboardModi
       // we need to go to the last column in the previous row.
       if (cur_row > 0)
         {
-        int prev_column = max_colums-1;
+        prev_column = max_colums-1;
         while (prev_column >=0 && this->isColumnHidden(prev_column))
           {
           // skip hidden columns.
