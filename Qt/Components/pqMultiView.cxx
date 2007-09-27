@@ -958,9 +958,9 @@ void pqMultiView::restoreSplitter(QWidget *w,
 void pqMultiView::hideDecorations()
 {
   QList<pqSplitterHandle*> handles = this->findChildren<pqSplitterHandle*>();
-  foreach (pqSplitterHandle* handle, handles)
+  foreach (pqSplitterHandle* shandle, handles)
     {
-    handle->hideDecorations(true);
+    shandle->hideDecorations(true);
     }
 
   emit this->hideFrameDecorations();
@@ -970,9 +970,9 @@ void pqMultiView::hideDecorations()
 void pqMultiView::showDecorations()
 {
   QList<pqSplitterHandle*> handles = this->findChildren<pqSplitterHandle*>();
-  foreach (pqSplitterHandle* handle, handles)
+  foreach (pqSplitterHandle* shandle, handles)
     {
-    handle->hideDecorations(false);
+    shandle->hideDecorations(false);
     }
   emit this->showFrameDecorations();
 }
