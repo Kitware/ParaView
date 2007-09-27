@@ -47,6 +47,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqXMLUtil.h"
 
 
+/// Special QSplitterHandle which can give minimal size hint when requested.
+/// This makes it possible to almost hide the splitter handles in the view.
+class pqSplitterHandle :public QSplitterHandle
+{
+  bool HideDecorations;
+public:
+  pqSplitterHandle(Qt::Orientation _orientation, QSplitter* _parent)
+    :QSplitterHandle (_orientation, _parent),
+    HideDecorations(false)
+    {
+    }
+
+  // overrides default behaviour when this->HideDecorations is true.
+  virtual QSize sizeHint () const
+    {
+    return this->HideDecorations? QSize(): QSplitterHandle::sizeHint();
+    }
+
+  // When set to true this widget returns empty size hint indicating that this
+  // widget needs no size.
+  void hideDecorations(bool m)
+    { this->HideDecorations = m; }
+};
+
+/// Special QSplitter which creates pqSplitterHandle.
+class pqSplitter: public QSplitter
+{
+public:
+  pqSplitter(Qt::Orientation _orientation, QWidget* _parent=0):
+    QSplitter(_orientation, _parent)
+  {}
+  pqSplitter(QWidget* _parent=0):QSplitter(_parent){}
+    
+
+protected:
+  QSplitterHandle* createHandle()
+    {
+    return new pqSplitterHandle(this->orientation(), this);
+    }
+
+};
 
 //-----------------------------------------------------------------------------
 QString pqMultiView::Index::getString() const
@@ -105,7 +146,7 @@ pqMultiView::pqMultiView(QWidget* p)
   l->setMargin(0);
   this->SplitterFrame->setLayout(l);
 
-  QSplitter* splitter = new QSplitter(this->SplitterFrame);
+  QSplitter* splitter = new pqSplitter(this->SplitterFrame);
   splitter->setObjectName("MultiViewSplitter");
   l->addWidget(splitter);
 
@@ -321,7 +362,7 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index,
     splitter->hide();
     
     int location = splitter->indexOf(w);
-    QSplitter* newSplitter = new QSplitter(orientation);
+    QSplitter* newSplitter = new pqSplitter(orientation);
     // add splitter to splitter
     splitter->insertWidget(location, newSplitter);
     // remove from old splitter, and add to new splitter
@@ -916,23 +957,22 @@ void pqMultiView::restoreSplitter(QWidget *w,
 //-----------------------------------------------------------------------------
 void pqMultiView::hideDecorations()
 {
-  QList<QSplitter*> splitters = this->findChildren<QSplitter*>();
-  foreach (QSplitter* splitter, splitters)
+  QList<pqSplitterHandle*> handles = this->findChildren<pqSplitterHandle*>();
+  foreach (pqSplitterHandle* handle, handles)
     {
-    splitter->setHandleWidth(1);
+    handle->hideDecorations(true);
     }
+
   emit this->hideFrameDecorations();
 }
 
 //-----------------------------------------------------------------------------
 void pqMultiView::showDecorations()
 {
-  QSplitter* temp = new QSplitter();
-  QList<QSplitter*> splitters = this->findChildren<QSplitter*>();
-  foreach (QSplitter* splitter, splitters)
+  QList<pqSplitterHandle*> handles = this->findChildren<pqSplitterHandle*>();
+  foreach (pqSplitterHandle* handle, handles)
     {
-    splitter->setHandleWidth(temp->handleWidth());
+    handle->hideDecorations(false);
     }
-  delete temp;
   emit this->showFrameDecorations();
 }
