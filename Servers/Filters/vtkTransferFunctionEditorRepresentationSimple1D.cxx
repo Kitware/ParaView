@@ -37,7 +37,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.18");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.18.4.1");
 vtkStandardNewMacro(vtkTransferFunctionEditorRepresentationSimple1D);
 
 // The vtkHandleList is a PIMPLed list<T>.
@@ -107,8 +107,8 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
   int histDepth = -10;
   int linesDepth = -8;
 
-  // Add lines between the handles if there is more than 1.
-  if (this->Handles->size() > 1)
+  // Add lines between the handles if there is at least 1.
+  if (this->Handles->size() > 0)
     {
     int minX = this->BorderWidth;
     int maxX = this->DisplaySize[0] - this->BorderWidth;
@@ -227,28 +227,36 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
       lastPos[1] = pos[0];
       lastPos[2] = pos[0];
       }
-    this->Lines->SetPoints(pts);
-    this->Lines->GetPointData()->SetScalars(scalars);
+    if (this->Handles->size() > 1)
+      {
+      this->Lines->SetPoints(pts);
+      this->Lines->GetPointData()->SetScalars(scalars);
 
-    // Clip the Lines so they don't run into the border.
-    // X minimum
-    vtkPlane *minXPlane = vtkPlane::New();
-    minXPlane->SetOrigin(minX, 0, 0);
-    minXPlane->SetNormal(1, 0, 0);
+      // Clip the Lines so they don't run into the border.
+      // X minimum
+      vtkPlane *minXPlane = vtkPlane::New();
+      minXPlane->SetOrigin(minX, 0, 0);
+      minXPlane->SetNormal(1, 0, 0);
 
-    vtkClipPolyData *minXClip = vtkClipPolyData::New();
-    minXClip->SetInput(this->Lines);
-    minXClip->SetClipFunction(minXPlane);
+      vtkClipPolyData *minXClip = vtkClipPolyData::New();
+      minXClip->SetInput(this->Lines);
+      minXClip->SetClipFunction(minXPlane);
     
-    // X maximum
-    vtkPlane *maxXPlane = vtkPlane::New();
-    maxXPlane->SetOrigin(maxX, 0, 0);
-    maxXPlane->SetNormal(-1, 0, 0);
+      // X maximum
+      vtkPlane *maxXPlane = vtkPlane::New();
+      maxXPlane->SetOrigin(maxX, 0, 0);
+      maxXPlane->SetNormal(-1, 0, 0);
 
-    vtkClipPolyData *maxXClip = vtkClipPolyData::New();
-    maxXClip->SetInputConnection(minXClip->GetOutputPort());
-    maxXClip->SetClipFunction(maxXPlane);
-    this->LinesMapper->SetInputConnection(maxXClip->GetOutputPort());
+      vtkClipPolyData *maxXClip = vtkClipPolyData::New();
+      maxXClip->SetInputConnection(minXClip->GetOutputPort());
+      maxXClip->SetClipFunction(maxXPlane);
+      this->LinesMapper->SetInputConnection(maxXClip->GetOutputPort());
+
+      minXPlane->Delete();
+      minXClip->Delete();
+      maxXPlane->Delete();
+      maxXClip->Delete();
+      }
 
     bkndIds[2] = bi;
     bkndIds[3] = bi+1;
@@ -266,10 +274,6 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
     bkndScalars->Delete();
     delete [] ids;
     delete [] bkndIds;
-    minXPlane->Delete();
-    minXClip->Delete();
-    maxXPlane->Delete();
-    maxXClip->Delete();
     }
 }
 

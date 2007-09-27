@@ -24,7 +24,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkTransferFunctionEditorRepresentation.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.16");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget, "1.16.4.1");
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidget::vtkTransferFunctionEditorWidget()
@@ -91,6 +91,22 @@ void vtkTransferFunctionEditorWidget::SetVisibleScalarRange(double min,
                            (histogramRange[1] - histogramRange[0])));
         }
       }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorWidget::SetWholeScalarRange(double min,
+                                                          double max)
+{
+  if (this->WholeScalarRange[0] != min ||
+      this->WholeScalarRange[1] != max)
+    {
+    this->WholeScalarRange[0] = min;
+    this->WholeScalarRange[1] = max;
+    int zeroRange = (min == max);
+    this->ColorFunction->SetAllowDuplicateScalars(zeroRange);
+    this->OpacityFunction->SetAllowDuplicateScalars(zeroRange);
+    this->Modified();
     }
 }
 
