@@ -58,6 +58,7 @@ IF(WIN32 AND QT_QTUITOOLS_FOUND)
 ENDIF(WIN32 AND QT_QTUITOOLS_FOUND)
 
 SET(QT_USE_QTUITOOLS TRUE)
+SET(QT_USE_QTXML TRUE)  # uitools depends on xml
 # This ensures that the Qt includes dir etc are set properly.
 # We don't need to find the Qt4 package or include the use file
 # in any of the SUBDIRS in this directory.
