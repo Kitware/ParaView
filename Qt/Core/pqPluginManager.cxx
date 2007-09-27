@@ -162,7 +162,7 @@ static QStringList getLibraries(const QString& path, pqServer* server)
     QString file = model.getFilePaths(idx)[0];
     QFileInfo fileinfo(file);
     // if file names start with known lib suffixes
-    if(fileinfo.completeSuffix().indexOf(QRegExp("(so|dll|sl|dylib)")) == 0)
+    if(fileinfo.completeSuffix().indexOf(QRegExp("(so|dll|sl|dylib)$")) == 0)
       {
       libs.append(file);
       }
