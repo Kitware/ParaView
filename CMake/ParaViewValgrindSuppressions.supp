@@ -9869,6 +9869,35 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
+   fun:XSetWindowBackground
+   fun:_ZN14QWidgetPrivate22updateSystemBackgroundEv
+   fun:_ZN7QWidget6createEmbb
+   fun:_ZN14QWidgetPrivate11createWinIdEm
+   fun:_ZN14QWidgetPrivate13setParent_sysEP7QWidget6QFlagsIN2Qt10WindowTypeEE
+   fun:_ZN7QWidget9setParentEPS_6QFlagsIN2Qt10WindowTypeEE
+   fun:_ZN14QWidgetPrivate4initEP7QWidget6QFlagsIN2Qt10WindowTypeEE
+   fun:_ZN7QWidgetC2ER14QWidgetPrivatePS_6QFlagsIN2Qt10WindowTypeEE
+   fun:_ZN9QGroupBoxC1EP7QWidget
+   fun:_ZN27Ui_DisplayProxyEditorWidget7setupUiEP7QWidget
+   fun:_ZN21pqDefaultDisplayPanelC1EP16pqRepresentationP7QWidget
+   fun:_ZN26pqDisplayProxyEditorWidget11updatePanelEv
+   fun:_ZN26pqDisplayProxyEditorWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget13setOutputPortEP12pqOutputPort
+   fun:_ZN16pqProxyTabWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN23pqObjectInspectorDriver17outputPortChangedEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver15setActiveSourceEP12pqOutputPort
+   fun:_ZN23pqObjectInspectorDriver12updateSourceEv
+   fun:_ZN23pqObjectInspectorDriver11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+}
+{
+   <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
    fun:_XlcCreateLC
@@ -10624,6 +10653,35 @@
    fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
    fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
    fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Param
+   write(buf)
+   fun:__write_nocancel
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
+   fun:XRenderCompositeTrapezoids
+   fun:_Z29qt_XRenderCompositeTrapezoidsP9_XDisplayimmPK17XRenderPictFormatiiRK7QVectorI11_XTrapezoidE
+   fun:_ZN22QX11PaintEnginePrivate15fillPolygon_devEPK7QPointFiNS_6GCModeEN12QPaintEngine15PolygonDrawModeE
+   fun:_ZN22QX11PaintEnginePrivate8fillPathERK12QPainterPathNS_6GCModeEb
+   fun:_ZN15QX11PaintEngine8drawPathERK12QPainterPath
+   fun:_ZN15QX11PaintEngine10drawPointsEPK6QPointi
+   fun:_ZN8QPainter10drawPointsEPK6QPointi
+   fun:_Z23qt_plastique_draw_frameP8QPainterRK5QRectPK12QStyleOptionN6QFrame6ShadowE
+   fun:_ZNK15QPlastiqueStyle13drawPrimitiveEN6QStyle16PrimitiveElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK12QCommonStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK13QWindowsStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK15QPlastiqueStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK12QCommonStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK13QWindowsStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZNK15QPlastiqueStyle11drawControlEN6QStyle14ControlElementEPK12QStyleOptionP8QPainterPK7QWidget
+   fun:_ZN11QPushButton10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN15QAbstractButton5eventEP6QEvent
+   fun:_ZN11QPushButton5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
 }
 {
    <insert a suppression name here>
@@ -15785,6 +15843,146 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XCreateGC
+   fun:_ZN15QX11PaintEngine5beginEP12QPaintDevice
+   fun:_ZN8QPainter5beginEP12QPaintDevice
+   fun:_ZN8QPainterC1EP12QPaintDevice
+   fun:_ZN11QMainWindow5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
+   fun:_ZN7QWidget7repaintERK7QRegion
+   fun:_ZN7QWidget7repaintERK5QRect
+   fun:_ZN7QWidget7repaintEv
+   fun:_ZN19pqProgressBarHelper11setProgressEi
+   fun:_ZN13pqProgressBar11setProgressERK7QStringi
+   fun:_ZN16pqProgressWidget11setProgressERK7QStringi
+   fun:_ZN16pqProgressWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN17pqProgressManager8progressERK7QStringi
+   fun:_ZN17pqProgressManager11setProgressERK7QStringi
+   fun:_ZN17pqApplicationCore12sendProgressEPKci
+   fun:_ZN24pqProcessModuleGUIHelper16SetLocalProgressEPKci
+   fun:_ZN16vtkProcessModule16SetLocalProgressEPKci
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XCreateGC
+   fun:_ZN15QX11PaintEngine5beginEP12QPaintDevice
+   fun:_ZN8QPainter5beginEP12QPaintDevice
+   fun:_ZN8QPainterC1EP12QPaintDevice
+   fun:_ZN14pqFlatTreeView10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN6QFrame5eventEP6QEvent
+   fun:_ZN19QAbstractScrollArea13viewportEventEP6QEvent
+   fun:_ZN14pqFlatTreeView13viewportEventEP6QEvent
+   fun:_ZN25QAbstractScrollAreaFilter11eventFilterEP7QObjectP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XCreateGC
+   fun:_ZN15QX11PaintEngine5beginEP12QPaintDevice
+   fun:_ZN8QPainter5beginEP12QPaintDevice
+   fun:_ZN12QProgressBar10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN12QProgressBar5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
+   fun:_ZN7QWidget7repaintERK7QRegion
+   fun:_ZN7QWidget7repaintERK5QRect
+   fun:_ZN7QWidget7repaintEv
+   fun:_ZN19pqProgressBarHelper11setProgressEi
+   fun:_ZN13pqProgressBar11setProgressERK7QStringi
+   fun:_ZN16pqProgressWidget11setProgressERK7QStringi
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XCreateGC
+   fun:_ZN15QX11PaintEngine5beginEP12QPaintDevice
+   fun:_ZN8QPainter5beginEP12QPaintDevice
+   fun:_ZN8QPainterC1EP12QPaintDevice
+   fun:_ZN7QWidget10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN11QMainWindow5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
+   fun:_ZN7QWidget7repaintERK7QRegion
+   fun:_ZN7QWidget7repaintERK5QRect
+   fun:_ZN7QWidget7repaintEv
+   fun:_ZN19pqProgressBarHelper11setProgressEi
+   fun:_ZN13pqProgressBar11setProgressERK7QStringi
+   fun:_ZN16pqProgressWidget11setProgressERK7QStringi
+   fun:_ZN16pqProgressWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN17pqProgressManager8progressERK7QStringi
+   fun:_ZN17pqProgressManager11setProgressERK7QStringi
+   fun:_ZN17pqApplicationCore12sendProgressEPKci
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XCreateGC
+   fun:_ZN15QX11PaintEngine5beginEP12QPaintDevice
+   fun:_ZN8QPainter5beginEP12QPaintDevice
+   fun:_ZN8QPainterC1EP12QPaintDevice
+   fun:_ZN7QWidget10paintEventEP11QPaintEvent
+   fun:_ZN7QWidget5eventEP6QEvent
+   fun:_ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent
+   fun:_ZN12QApplication6notifyEP7QObjectP6QEvent
+   fun:_Z23qt_sendSpontaneousEventP7QObjectP6QEvent
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore22paintSiblingsRecursiveEP12QPaintDeviceRK5QListIP7QObjectEiRK7QRegionRK6QPointi
+   fun:_ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPointi
+   fun:_ZN19QWidgetBackingStore11cleanRegionERK7QRegionP7QWidgetb
+   fun:_ZN7QWidget7repaintERK7QRegion
+   fun:_ZN7QWidget7repaintERK5QRect
+   fun:_ZN7QWidget7repaintEv
+   fun:_ZN19pqProgressBarHelper11setProgressEi
+   fun:_ZN13pqProgressBar11setProgressERK7QStringi
+   fun:_ZN16pqProgressWidget11setProgressERK7QStringi
+   fun:_ZN16pqProgressWidget11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+}
+{
+   <insert a suppression name here>
    Memcheck:Param
    write(buf)
    fun:__write_nocancel
@@ -17551,6 +17749,29 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:list_dealloc
+   fun:list_dealloc
+   fun:mro_implementation
+   fun:mro_internal
+   fun:PyType_Ready
+   fun:initzipimport
+   fun:init_builtin
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:_PyImportHooks_Init
+   fun:Py_Initialize
+}
+{
+   <insert a suppression name here>
    Memcheck:Cond
    fun:PyObject_Free
    fun:list_dealloc
@@ -18088,6 +18309,62 @@
 {
    <insert a suppression name here>
    Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dictresize
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dictresize
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
    fun:PyObject_Free
    fun:dictresize
    fun:eval_frame
@@ -23421,6 +23698,21 @@
    <insert a suppression name here>
    Memcheck:Leak
    fun:malloc
+   fun:PyThread_allocate_lock
+   fun:PyEval_InitThreads
+   fun:_ZN19pqPythonEventSourceC1EP7QObject
+   fun:_ZN13pqTestUtilityC2EP7QObject
+   fun:_ZN17pqCoreTestUtilityC1EP7QObject
+   fun:_ZN24pqProcessModuleGUIHelper16pqImplementationC1Ev
+   fun:_ZN24pqProcessModuleGUIHelperC2Ev
+   fun:_ZN22ProcessModuleGUIHelperC1Ev
+   fun:_ZN22ProcessModuleGUIHelper3NewEv
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
    fun:PyObject_Malloc
    fun:_PyObject_GC_Malloc
    fun:_PyObject_GC_NewVar
@@ -26128,6 +26420,17 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:module_dealloc
+   fun:insertdict
+   fun:PyDict_SetItem
+   fun:_PyModule_Clear
+   fun:PyImport_Cleanup
+}
+{
+   <insert a suppression name here>
    Memcheck:Cond
    fun:PyObject_Free
    fun:dict_dealloc
@@ -26602,6 +26905,34 @@
    fun:PyVTKClass_New
    fun:PyVTKClass_vtkSMPropertyLinkNew
    fun:initlibvtkPVServerManagerPython
+   fun:_PyImport_LoadDynamicModule
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:load_package
+   fun:load_module
+   fun:import_submodule
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:PyObject_Realloc
+   fun:_PyString_Resize
+   fun:_Z17vtkBuildDocStringPPc
+   fun:PyVTKClass_New
+   fun:PyVTKClass_vtkPVOpenGLExtensionsInformationNew
+   fun:initlibvtkPVServerCommonPython
    fun:_PyImport_LoadDynamicModule
    fun:load_module
    fun:import_submodule
@@ -27455,13 +27786,6 @@
    fun:eval_frame
    fun:PyEval_EvalCodeEx
    fun:PyEval_EvalCode
-   fun:PyImport_ExecCodeModuleEx
-   fun:load_source_module
-   fun:load_module
-   fun:import_submodule
-   fun:load_next
-   fun:PyImport_ImportModuleEx
-   fun:builtin___import__
 }
 {
    <insert a suppression name here>
@@ -27943,6 +28267,34 @@
    fun:_ZN24pqProcessModuleGUIHelper16pqImplementationC1Ev
    fun:_ZN24pqProcessModuleGUIHelperC2Ev
    fun:_ZN22ProcessModuleGUIHelperC1Ev
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:PyList_New
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
 }
 {
    <insert a suppression name here>
@@ -30009,6 +30361,24 @@
    fun:PyImport_Import
    fun:PyImport_ImportModule
    fun:initsite
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+   fun:dictresize
+   fun:PyDict_SetItemString
+   fun:initsignal
+   fun:PyOS_InitInterrupts
+   fun:Py_Initialize
+   fun:_ZN19pqPythonEventSourceC1EP7QObject
+   fun:_ZN13pqTestUtilityC2EP7QObject
+   fun:_ZN17pqCoreTestUtilityC1EP7QObject
+   fun:_ZN24pqProcessModuleGUIHelper16pqImplementationC1Ev
+   fun:_ZN24pqProcessModuleGUIHelperC2Ev
+   fun:_ZN22ProcessModuleGUIHelperC1Ev
+   fun:_ZN22ProcessModuleGUIHelper3NewEv
+   fun:main
 }
 {
    <insert a suppression name here>
@@ -34980,6 +35350,30 @@
    <insert a suppression name here>
    Memcheck:Addr4
    fun:PyObject_Free
+   fun:code_dealloc
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:load_next
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyObject_CallFunction
+   fun:PyImport_Import
+   fun:PyImport_ImportModule
+   fun:initsite
+   fun:Py_Initialize
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
    fun:dictresize
    fun:PyString_InternInPlace
    fun:PyCode_New
@@ -35413,6 +35807,34 @@
 {
    <insert a suppression name here>
    Memcheck:Leak
+   fun:malloc
+   fun:XGetVisualInfo
+   fun:choose_x_visual
+   fun:choose_visual
+   fun:Fake_glXChooseVisual
+   fun:_Z34vtkXOpenGLRenderWindowTryForVisualP9_XDisplayiiiii
+   fun:_ZN22vtkXOpenGLRenderWindow20GetDesiredVisualInfoEv
+   fun:_ZN10QVTKWidget16x11_setup_windowEv
+   fun:_ZN10QVTKWidget15SetRenderWindowEP15vtkRenderWindow
+   fun:_ZN10QVTKWidget15GetRenderWindowEv
+   fun:_ZN18pqColorScaleEditorC1EP7QWidget
+   fun:_ZN20pqDisplayProxyEditor18openColorMapEditorEv
+   fun:_ZN20pqDisplayProxyEditor11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN15QAbstractButton7clickedEb
+   fun:_ZN22QAbstractButtonPrivate11emitClickedEv
+   fun:_ZN15QAbstractButton5clickEv
+   fun:_ZN29pqAbstractActivateEventPlayer9playEventEP7QObjectRK7QStringS4_Rb
+   fun:_ZN13pqEventPlayer9playEventERK7QStringS2_S2_Rb
+   fun:_ZN17pqEventDispatcher13playNextEventEv
+   fun:_ZN17pqEventDispatcher11qt_metacallEN11QMetaObject4CallEiPPv
+   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+   fun:_ZN17pqEventDispatcher18readyPlayNextEventEv
+   fun:_ZN17pqEventDispatcher18checkPlayNextEventEv
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
    fun:*alloc
    obj:/usr/*lib*/libX11.so.6.2*
    obj:/usr/*lib*/libX11.so.6.2*
@@ -35493,6 +35915,34 @@
    fun:_ZN22ProcessModuleGUIHelper16CreateMainWindowEv
    fun:_ZN24pqProcessModuleGUIHelper21InitializeApplicationEiPPc
    fun:_ZN24pqProcessModuleGUIHelper11RunGUIStartEiPPcii
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/*lib*/libX11.so.6.2*
+   fun:_XrmInternalStringToQuark
+   fun:XStringToKeysym
+   fun:_XimParseStringFile
+   fun:_XimLocalOpenIM
+   fun:_XimOpenIM
+   obj:/usr/*lib*/libX11.so.6.2*
+   fun:_XimRegisterIMInstantiateCallback
+   obj:/usr/*lib*/libX11.so.6.2*
+   fun:XRegisterIMInstantiateCallback
+   fun:_ZN16QXIMInputContextC1Ev
+   fun:_ZN20QInputContextFactory6createERK7QStringP7QObject
+   fun:_ZNK12QApplication12inputContextEv
+   fun:_ZN7QWidget16updateMicroFocusEv
+   fun:_ZN16QLineEditPrivate12finishChangeEibb
+   fun:_ZN16QLineEditPrivate7setTextERK7QStringib
+   fun:_ZN19pqDoubleRangeWidgetC1EP7QWidget
+   fun:_ZN26Ui_SelectionInspectorPanel7setupUiEP7QWidget
+   fun:_ZN25pqSelectionInspectorPanelC1EP7QWidget
+   fun:_ZN16pqMainWindowCore23setupSelectionInspectorEP11QDockWidget
+   fun:_ZN10MainWindowC1Ev
+   fun:_ZN22ProcessModuleGUIHelper16CreateMainWindowEv
+   fun:_ZN24pqProcessModuleGUIHelper21InitializeApplicationEiPPc
 }
 {
    <insert a suppression name here>
@@ -35952,6 +36402,62 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_dl_new_object
+   fun:_dl_map_object_from_fd
+   fun:_dl_map_object
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
+   fun:XCreateFontSet
+   fun:_Z10getFontSetRK5QFont
+   fun:_ZN16QXIMInputContext12createICDataEP7QWidget
+   fun:_ZN16QXIMInputContext14setFocusWidgetEP7QWidget
+   fun:_ZN19QApplicationPrivate14setFocusWidgetEP7QWidgetN2Qt11FocusReasonE
+   fun:_ZN7QWidget8setFocusEN2Qt11FocusReasonE
+   fun:_ZN12QApplication15setActiveWindowEP7QWidget
+   fun:_ZN12QApplication15x11ProcessEventEP7_XEvent
+   fun:_Z22x11EventSourceDispatchP8_GSourcePFiPvES1_
+   fun:g_main_context_dispatch
+   obj:/usr/lib*/libglib-2.0.so.0*
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:expand_dynamic_string_token
+   fun:_dl_map_object
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   obj:/usr/*lib*/libX11.so.6.2*
+   obj:/usr/*lib*/libX11.so.6.2*
+   fun:XCreateFontSet
+   fun:_Z10getFontSetRK5QFont
+   fun:_ZN16QXIMInputContext12createICDataEP7QWidget
+   fun:_ZN16QXIMInputContext14setFocusWidgetEP7QWidget
+   fun:_ZN19QApplicationPrivate14setFocusWidgetEP7QWidgetN2Qt11FocusReasonE
+   fun:_ZN7QWidget8setFocusEN2Qt11FocusReasonE
+   fun:_ZN12QApplication15setActiveWindowEP7QWidget
+   fun:_ZN12QApplication15x11ProcessEventEP7_XEvent
+   fun:_Z22x11EventSourceDispatchP8_GSourcePFiPvES1_
+   fun:g_main_context_dispatch
+   obj:/usr/lib*/libglib-2.0.so.0*
+   fun:g_main_context_iteration
+}
+{
+   <insert a suppression name here>
    Memcheck:Param
    write(buf)
    fun:__write_nocancel
@@ -36082,6 +36588,46 @@
 }
 {
    <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:frame_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:dict_dealloc
+   fun:_Z20PyVTKObject_PyDeleteP11PyVTKObject
+   fun:frame_dealloc
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+   fun:_ZN16vtkProcessModule11StartClientEiPPc
+   fun:_ZN16vtkProcessModule5StartEiPPc
+   fun:_ZN25vtkProcessModuleGUIHelper3RunEP12vtkPVOptions
+   fun:main
+}
+{
+   <insert a suppression name here>
    Memcheck:Leak
    fun:_Znw*
    fun:_ZN5QFont6detachEv
@@ -36150,6 +36696,62 @@
    fun:_ZN22ProcessModuleGUIHelperC1Ev
    fun:_ZN22ProcessModuleGUIHelper3NewEv
    fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+   fun:PyCode_New
+   fun:r_object
+   fun:r_object
+   fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value8
+   fun:PyObject_Free
+   fun:PyCode_New
+   fun:r_object
+   fun:r_object
+   fun:r_object
+   fun:PyMarshal_ReadObjectFromString
+   fun:PyMarshal_ReadLastObjectFromFile
+   fun:read_compiled_module
+   fun:load_source_module
+   fun:load_module
+   fun:import_submodule
+   fun:ensure_fromlist
+   fun:PyImport_ImportModuleEx
+   fun:builtin___import__
+   fun:PyObject_Call
+   fun:PyEval_CallObjectWithKeywords
+   fun:eval_frame
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_node
+   fun:PyRun_SimpleFileExFlags
+   fun:Py_Main
+   fun:_ZN22vtkPVPythonInterpretor6PyMainEiPPc
+   fun:_ZN30vtkPVProcessModulePythonHelper11RunGUIStartEiPPcii
 }
 {
    <insert a suppression name here>
