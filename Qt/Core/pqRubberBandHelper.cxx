@@ -136,10 +136,9 @@ void pqRubberBandHelper::setView(pqView* view)
     return;
     }
 
-  if (this->Internal->RenderView && 
-    (this->Mode == SELECT || this->Mode == FRUSTUM))
+  if (this->Internal->RenderView && this->Mode != INTERACT)
     {
-    // Ensure that we are not currently in selection mode.
+    // Before switching view, disable selection mode on the old active view.
     this->setRubberBandOff();
     }
 
