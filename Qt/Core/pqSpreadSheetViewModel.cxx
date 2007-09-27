@@ -396,6 +396,19 @@ QVariant pqSpreadSheetViewModel::headerData (int section, Qt::Orientation orient
     this->Internal->Representation;
   if (orientation == Qt::Horizontal && repr && role == Qt::DisplayRole)
     {
+    if (!repr->IsAvailable(this->Internal->ActiveBlockNumber))
+      {
+      // Generally, this case doesn't arise since header data is invalidated in
+      // forceUpdate() only after the data for the active block has been
+      // fetched.
+      // However, when progress bar is begin painted, Qt may call this method 
+      // to paint the header on this view. In that case this method would have 
+      // been called before the this->forceUpdate() was called which will 
+      // ensure that the data is available.  
+      // This skips such cases.
+      return QVariant("...");
+      }
+
     // No need to get updated data, simply get the current data.
     vtkTable* table = vtkTable::SafeDownCast(repr->GetOutput(this->Internal->ActiveBlockNumber));
     if (table && table->GetNumberOfColumns() > section)
