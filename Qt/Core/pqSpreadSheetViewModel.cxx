@@ -217,35 +217,7 @@ void pqSpreadSheetViewModel::forceUpdate()
     {
     vtkTable* table = vtkTable::SafeDownCast(
       repr->GetOutput(this->Internal->ActiveBlockNumber));
-    int field_type = this->Internal->getFieldType(); 
-
-    vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
-      repr->GetProperty("Input"));
-    vtkSMSourceProxy* inputProxy = vtkSMSourceProxy::SafeDownCast(
-      ip->GetProxy(0));
-    int port = ip->GetOutputPortForConnection(0);
-
-    vtkPVDataInformation* info = inputProxy?
-      inputProxy->GetDataInformation(port) : 0;
-    if (info)
-      {
-      if (field_type == vtkIndexBasedBlockFilter::FIELD && 
-          info->GetFieldDataInformation())
-        {
-        // Since arrays in the field data can be variables lengths, find the
-        // length of the longest one:
-        this->Internal->NumberOfRows = 
-            info->GetFieldDataInformation()->GetMaximumNumberOfTuples();
-        }
-      else if (field_type == vtkIndexBasedBlockFilter::POINT)
-        {
-        this->Internal->NumberOfRows = info->GetNumberOfPoints();
-        }
-      else if (field_type == vtkIndexBasedBlockFilter::CELL)
-        {
-        this->Internal->NumberOfRows = info->GetNumberOfCells();
-        }
-      }
+    this->Internal->NumberOfRows = repr->GetMaximumNumberOfItems();
     this->Internal->NumberOfColumns = table? table->GetNumberOfColumns()  :0;
     if (this->Internal->NumberOfColumns == 0 && this->Internal->ActiveBlockNumber != 0)
       {
@@ -253,6 +225,14 @@ void pqSpreadSheetViewModel::forceUpdate()
       // shrunk), update the view once again.
       this->Internal->ActiveBlockNumber = 0;
       this->forceUpdate();
+      }
+    
+    // When SelectionOnly is true, the delivered data has an extra
+    // "vtkOriginalIndices" column that needs to be hidden since it does not
+    // make any sense to the user.
+    if (this->Internal->NumberOfColumns && repr->GetSelectionOnly())
+      {
+      this->Internal->NumberOfColumns--;
       }
     }
 
@@ -431,6 +411,14 @@ QVariant pqSpreadSheetViewModel::headerData (int section, Qt::Orientation orient
         title = (this->Internal->getFieldType() == vtkIndexBasedBlockFilter::POINT)?
           "Point ID" : "Cell ID";
         }
+      else if (title == "vtkOriginalCellIds" && repr->GetSelectionOnly())
+        {
+        title = "Cell ID";
+        }
+      else if (title == "vtkOriginalPointIds" && repr->GetSelectionOnly())
+        {
+        title = "Point ID";
+        }
 
       return QVariant(title);
       }
@@ -442,12 +430,22 @@ QVariant pqSpreadSheetViewModel::headerData (int section, Qt::Orientation orient
 //-----------------------------------------------------------------------------
 QModelIndex pqSpreadSheetViewModel::indexFor(int pid, vtkIdType vtkindex)
 {
+  vtkSMSpreadSheetRepresentationProxy* repr = 
+    this->Internal->Representation;
+
   // Find the qt index for a row with given process id and original id. 
   vtkTable* activeBlock = vtkTable::SafeDownCast(
     this->Internal->Representation->GetOutput(this->Internal->ActiveBlockNumber));
 
+  const char* column_name = "vtkOriginalIndices";
+  if (repr->GetSelectionOnly())
+    {
+    column_name = (this->Internal->getFieldType() == vtkIndexBasedBlockFilter::POINT)?
+      "vtkOriginalPointIds" : "vtkOriginalCellIds";
+    }
+
   vtkIdTypeArray* indexcolumn = vtkIdTypeArray::SafeDownCast(
-    activeBlock->GetColumnByName("vtkOriginalIndices"));
+    activeBlock->GetColumnByName(column_name));
 
   vtkIdTypeArray* pidcolumn = vtkIdTypeArray::SafeDownCast(
     activeBlock->GetColumnByName("vtkOriginalProcessIds"));
@@ -533,7 +531,14 @@ QSet<QPair<vtkIdType, vtkIdType> > pqSpreadSheetViewModel::getVTKIndices(
       if (table)
         {
         vtkVariant processId = table->GetValueByName(blockOffset, "vtkOriginalProcessIds");
-        vtkVariant vtkindex = table->GetValueByName(blockOffset, "vtkOriginalIndices");
+
+        const char* column_name = "vtkOriginalIndices";
+        if (repr->GetSelectionOnly())
+          {
+          column_name = (this->Internal->getFieldType() == vtkIndexBasedBlockFilter::POINT)?
+            "vtkOriginalPointIds" : "vtkOriginalCellIds";
+          }
+        vtkVariant vtkindex = table->GetValueByName(blockOffset, column_name);
         int pid = processId.IsValid()? processId.ToInt() : 0;
         vtkindices.insert(QPair<vtkIdType, vtkIdType>(pid, vtkindex.ToLong()));
         }

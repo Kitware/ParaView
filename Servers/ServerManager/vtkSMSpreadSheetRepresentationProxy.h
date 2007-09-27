@@ -57,6 +57,21 @@ public:
   // Indicates if the block for selection output is available on the client.
   virtual bool IsSelectionAvailable(vtkIdType blockid);
 
+
+  // Description:
+  // Set if the representation should deliver only the selected elements to the
+  // client.
+  vtkSetMacro(SelectionOnly, int);
+  vtkGetMacro(SelectionOnly, int);
+  vtkBooleanMacro(SelectionOnly, int);
+
+  // Description:
+  // This returns the maximum number of items that this representation can
+  // deliver to the client. This depends on the FieldType and SelectionOnly
+  // attributes. This does not call Update(), it uses the current pipeline state
+  // to gather the information.
+  vtkIdType GetMaximumNumberOfItems();
+
 //BTX
 protected:
   vtkSMSpreadSheetRepresentationProxy();
@@ -83,6 +98,8 @@ protected:
   void PassEssentialAttributes();
   vtkSMBlockDeliveryRepresentationProxy* SelectionRepresentation;
 
+  int SelectionOnly;
+  int PreviousSelectionOnly;
 private:
   vtkSMSpreadSheetRepresentationProxy(const vtkSMSpreadSheetRepresentationProxy&); // Not implemented
   void operator=(const vtkSMSpreadSheetRepresentationProxy&); // Not implemented

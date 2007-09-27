@@ -105,6 +105,7 @@ protected:
 
   vtkIdType CacheSize;
 
+  vtkSMRepresentationStrategy* UpdateStrategy;
   vtkSMClientDeliveryStrategyProxy* DeliveryStrategy;
 private:
   vtkSMBlockDeliveryRepresentationProxy(const vtkSMBlockDeliveryRepresentationProxy&); // Not implemented

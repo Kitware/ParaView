@@ -72,12 +72,13 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMBlockDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMBlockDeliveryRepresentationProxy::vtkSMBlockDeliveryRepresentationProxy()
 {
   this->BlockFilter = 0;
   this->CacheDirty = false;
+  this->UpdateStrategy = 0;
   this->DeliveryStrategy = 0;
   this->Reduction = 0;
   this->CacheSize = 2;
@@ -93,7 +94,7 @@ vtkSMBlockDeliveryRepresentationProxy::~vtkSMBlockDeliveryRepresentationProxy()
     this->DeliveryStrategy->Delete();
     this->DeliveryStrategy = 0;
     }
-
+  this->UpdateStrategy = 0;
   delete this->Internal;
 }
 
@@ -184,19 +185,19 @@ bool vtkSMBlockDeliveryRepresentationProxy::CreatePipeline(vtkSMSourceProxy* inp
   // * to deliver chunk of data.
 
   // Create the strategy use to update the representation.
-  vtkSMRepresentationStrategy* strategy = vtkSMRepresentationStrategy::SafeDownCast(
+  this->UpdateStrategy = vtkSMRepresentationStrategy::SafeDownCast(
     pxm->NewProxy("strategies", "BlockDeliveryStrategy"));
-  if (!strategy)
+  if (!this->UpdateStrategy)
     {
     return false;
     }
-  strategy->SetConnectionID(this->ConnectionID);
-  this->AddStrategy(strategy);
-  strategy->Delete();
+  this->UpdateStrategy->SetConnectionID(this->ConnectionID);
+  this->AddStrategy(this->UpdateStrategy);
+  this->UpdateStrategy->Delete();
 
-  strategy->SetEnableLOD(false);
-  this->Connect(input, strategy, "Input", outputport);
-  strategy->UpdateVTKObjects();
+  this->UpdateStrategy->SetEnableLOD(false);
+  this->Connect(input, this->UpdateStrategy, "Input", outputport);
+  this->UpdateStrategy->UpdateVTKObjects();
 
   // Now create another strategy to deliver the data to the client.
   // This is an internal strategy i.e. it is not dependent on Update() calls
@@ -211,7 +212,7 @@ bool vtkSMBlockDeliveryRepresentationProxy::CreatePipeline(vtkSMSourceProxy* inp
   this->DeliveryStrategy->SetConnectionID(this->ConnectionID);
   this->DeliveryStrategy->SetEnableLOD(false);
 
-  this->Connect(strategy->GetOutput(), this->BlockFilter);
+  this->Connect(this->UpdateStrategy->GetOutput(), this->BlockFilter);
   this->Connect(this->BlockFilter, this->DeliveryStrategy);
 
   // Set default strategy values.

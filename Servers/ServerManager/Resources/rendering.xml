@@ -5538,6 +5538,20 @@
       base_proxygroup="representations"
       base_proxyname="BlockDeliveryRepresentation">
 
+      <IntVectorProperty
+        name="SelectionOnly"
+        command="SetSelectionOnly"
+        update_self="1"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          When set to 1, this representations shows only the selected cells (or
+          points). The change will effect only after calling Update().
+          Note that changing this will clean all cache.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <SubProxy>
         <Proxy name="SelectionRepresentation"
           proxygroup="representations"
