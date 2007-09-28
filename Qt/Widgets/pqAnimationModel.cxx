@@ -385,8 +385,10 @@ pqAnimationKeyFrame* pqAnimationModel::hitTestKeyFrame(pqAnimationTrack* t, cons
     for(int i=0; i<t->count(); i++)
       {
       pqAnimationKeyFrame* kf = t->keyFrame(i);
-      double keyPos1 = this->positionFromTime(kf->startTime());
-      double keyPos2 = this->positionFromTime(kf->endTime());
+      double keyPos1 =
+        this->positionFromTime(this->normalizedTimeToTime(kf->normalizedStartTime()));
+      double keyPos2 =
+        this->positionFromTime(this->normalizedTimeToTime(kf->normalizedEndTime()));
       if(pos.x() >= keyPos1 && pos.x() <= keyPos2)
         {
         return kf;
@@ -430,8 +432,10 @@ void pqAnimationModel::mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent)
   pqAnimationKeyFrame* kf = hitTestKeyFrame(t, pos);
   if(kf)
     {
-    double keyPos1 = this->positionFromTime(kf->startTime());
-    double keyPos2 = this->positionFromTime(kf->endTime());
+    double keyPos1 =
+      this->positionFromTime(this->normalizedTimeToTime(kf->normalizedStartTime()));
+    double keyPos2 =
+      this->positionFromTime(this->normalizedTimeToTime(kf->normalizedEndTime()));
     if(qAbs(keyPos1 - pos.x()) < 3)
       {
       this->CurrentTrackGrabbed = t;
@@ -468,13 +472,11 @@ void pqAnimationModel::mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)
     time = qMin(time, this->EndTime);
 
     // snap to ticks in sequence mode
-    /*
     if(this->mode() == Sequence)
       {
       int tick = this->tickFromTime(time);
       time = this->timeFromTick(tick);
       }
-      */
     this->NewCurrentTime = time;
     this->update();
     return;
@@ -493,8 +495,10 @@ void pqAnimationModel::mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)
   pqAnimationKeyFrame* kf = hitTestKeyFrame(t, pos);
   if(kf)
     {
-    double keyPos1 = this->positionFromTime(kf->startTime());
-    double keyPos2 = this->positionFromTime(kf->endTime());
+    double keyPos1 =
+      this->positionFromTime(this->normalizedTimeToTime(kf->normalizedStartTime()));
+    double keyPos2 =
+      this->positionFromTime(this->normalizedTimeToTime(kf->normalizedEndTime()));
     if(qAbs(keyPos1 - pos.x()) < 3 || qAbs(keyPos2 - pos.x()) < 3)
       {
       view->setCursor(QCursor(Qt::SizeHorCursor));
@@ -528,4 +532,15 @@ void pqAnimationModel::mouseReleaseEvent(QGraphicsSceneMouseEvent*)
     this->update();
     }
 }
+
+double pqAnimationModel::timeToNormalizedTime(double t) const
+{
+  return (t - this->startTime()) / (this->endTime() - this->startTime());
+}
+
+double pqAnimationModel::normalizedTimeToTime(double t) const
+{
+  return t * (this->endTime() - this->startTime()) + this->startTime();
+}
+
 

@@ -143,6 +143,9 @@ protected:
   void mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent);
   void mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent);
 
+  double timeToNormalizedTime(double) const;
+  double normalizedTimeToTime(double) const;
+
 private:
 
   ModeType Mode;

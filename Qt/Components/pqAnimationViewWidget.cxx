@@ -469,8 +469,8 @@ void pqAnimationViewWidget::keyFramesChanged(QObject* cueObject)
       }
 
     pqAnimationKeyFrame* newFrame = track->addKeyFrame();
-    newFrame->setStartTime(startTime);
-    newFrame->setEndTime(endTime);
+    newFrame->setNormalizedStartTime(startTime);
+    newFrame->setNormalizedEndTime(endTime);
     newFrame->setStartValue(startValue);
     newFrame->setEndValue(endValue);
     newFrame->setIcon(QIcon(icon));

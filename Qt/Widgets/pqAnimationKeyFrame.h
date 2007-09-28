@@ -45,9 +45,13 @@ class QTWIDGETS_EXPORT pqAnimationKeyFrame : public QObject, public QGraphicsIte
 {
   Q_OBJECT
   /// the time as a fraction of scene time that this keyframe starts at
-  Q_PROPERTY(double startTime READ startTime WRITE setStartTime)
+  Q_PROPERTY(double normalizedStartTime
+             READ normalizedStartTime
+             WRITE setNormalizedStartTime)
   /// the time as a fraction of scene time that this keyframe ends at
-  Q_PROPERTY(double endTime READ endTime WRITE setEndTime)
+  Q_PROPERTY(double normalizedEndTime
+             READ normalizedEndTime
+             WRITE setNormalizedEndTime)
   /// the value at the start of the keyframe
   Q_PROPERTY(QVariant startValue READ startValue WRITE setStartValue)
   /// the value at the end of the keyframe
@@ -60,8 +64,8 @@ public:
   pqAnimationKeyFrame(pqAnimationTrack* p, QGraphicsScene* s);
   ~pqAnimationKeyFrame();
 
-  double startTime() const;
-  double endTime() const;
+  double normalizedStartTime() const;
+  double normalizedEndTime() const;
   QVariant startValue() const;
   QVariant endValue() const;
   QIcon icon() const;
@@ -69,8 +73,8 @@ public:
   QRectF boundingRect() const;
 
 public slots:
-  void setStartTime(double t);
-  void setEndTime(double t);
+  void setNormalizedStartTime(double t);
+  void setNormalizedEndTime(double t);
   void setStartValue(const QVariant&);
   void setEndValue(const QVariant&);
   void setIcon(const QIcon& icon);
@@ -90,8 +94,8 @@ protected:
   
 
 private:
-  double StartTime;
-  double EndTime;
+  double NormalizedStartTime;
+  double NormalizedEndTime;
   QVariant StartValue;
   QVariant EndValue;
   QIcon Icon;
