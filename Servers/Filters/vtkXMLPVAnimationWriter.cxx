@@ -17,6 +17,7 @@
 #include "vtkDataSet.h"
 #include "vtkErrorCode.h"
 #include "vtkExecutive.h"
+#include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 #include "vtkXMLWriter.h"
@@ -28,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVAnimationWriter);
-vtkCxxRevisionMacro(vtkXMLPVAnimationWriter, "1.9");
+vtkCxxRevisionMacro(vtkXMLPVAnimationWriter, "1.10");
 
 //----------------------------------------------------------------------------
 class vtkXMLPVAnimationWriterInternals
@@ -215,6 +216,7 @@ void vtkXMLPVAnimationWriter::WriteTime(double time)
   
   for(i=0; i < this->GetNumberOfInputConnections(0); ++i)
     {
+    vtkDataObject* dataObject = exec->GetInputData(0, i);
     // Make sure the pipeline mtime is up to date.
     exec->GetInputData(0, i)->UpdateInformation();
     
@@ -226,8 +228,17 @@ void vtkXMLPVAnimationWriter::WriteTime(double time)
       {
       this->Internal->InputMTimes[i] = 
         exec->GetInputData(0, i)->GetPipelineMTime();
-      this->Internal->InputChangeCounts[i] += 1;
       changed = 1;
+      }
+
+    if (dataObject->GetInformation()->Has(vtkDataObject::DATA_TIME_STEPS()))
+      {
+      changed = 1;
+      }
+
+    if (changed)
+      {
+      this->Internal->InputChangeCounts[i] += 1;
       }
     
     // Create this animation entry.
