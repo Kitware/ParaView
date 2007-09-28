@@ -32,8 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 
 // Server Manager Includes.
+#include "vtkPVClassNameInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMCompoundProxy.h"
+#include "vtkSMPart.h"
 #include "vtkSMSourceProxy.h"
 
 // Qt Includes.
@@ -107,6 +109,26 @@ vtkPVDataInformation* pqOutputPort::getDataInformation(bool update) const
     }
 
   return source->GetDataInformation(this->PortNumber, false);
+}
+
+//-----------------------------------------------------------------------------
+const char* pqOutputPort::getDataClassName() const
+{
+  vtkSMCompoundProxy* compoundProxy = vtkSMCompoundProxy::SafeDownCast(
+    this->getSource()->getProxy());
+
+  vtkSMSourceProxy* source = compoundProxy?
+    vtkSMSourceProxy::SafeDownCast(compoundProxy->GetConsumableProxy()):
+    vtkSMSourceProxy::SafeDownCast(this->getSource()->getProxy());
+
+  if (!source)
+    {
+    return 0;
+    }
+
+  vtkPVClassNameInformation* ciInfo = 
+    source->GetPart(this->PortNumber)->GetClassNameInformation();
+  return ciInfo? ciInfo->GetVTKClassName(): 0;
 }
 
 //-----------------------------------------------------------------------------

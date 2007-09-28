@@ -74,12 +74,17 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
   QString view_type = viewElement ? 
     QString(viewElement->GetAttribute("type")) : QString::null;
 
+  if (!view_type.isNull())
+    {
+    return view_type;
+    }
+
   // HACK: for now, when update_pipeline is false, we don't do any gather
   // information as that can result in progress events which may case Qt paint
   // issues.
   vtkSMSourceProxy* spProxy = vtkSMSourceProxy::SafeDownCast(
     source->getProxy());
-  if (!spProxy || !update_pipeline && !spProxy->GetNumberOfParts())
+  if (!spProxy || (!update_pipeline && !spProxy->GetNumberOfParts()))
     {
     // If parts aren't created, don't update the information at all.
     // Typically means that the filter hasn't been "Applied" even once and
@@ -87,42 +92,40 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
     return view_type;
     }
 
-  if (view_type.isNull())
+  QString className = opPort->getDataClassName();
+  if (className != "vtkRectilinearGrid")
     {
-    // The proxy gives us no hint. In that case we try to determine the
-    // preferred view by looking at the output from the source.
-    vtkPVDataInformation* datainfo = opPort->getDataInformation(update_pipeline);
-    if (datainfo && (
-        datainfo->GetDataClassName() == QString("vtkRectilinearGrid")  ||
-        source->getProxy()->GetXMLName() == QString("ProbeLine")))
+    return view_type;
+    }
+  // The proxy gives us no hint. In that case we try to determine the
+  // preferred view by looking at the output from the source.
+  vtkPVDataInformation* datainfo = opPort->getDataInformation(update_pipeline);
+  if (datainfo)
+    {
+    int extent[6];
+    datainfo->GetExtent(extent);
+    int non_zero_dims = 0;
+    for (int cc=0; cc < 3; cc++)
       {
-      int extent[6];
-      datainfo->GetExtent(extent);
-      int non_zero_dims = 0;
-      for (int cc=0; cc < 3; cc++)
-        {
-        non_zero_dims += (extent[2*cc+1]-extent[2*cc]>0)? 1: 0;
-        }
+      non_zero_dims += (extent[2*cc+1]-extent[2*cc]>0)? 1: 0;
+      }
 
-      vtkPVDataSetAttributesInformation* cellDataInfo =
-        datainfo->GetCellDataInformation();
-      vtkPVDataSetAttributesInformation* pointDataInfo =
-        datainfo->GetPointDataInformation();
-      if (non_zero_dims == 1 && cellDataInfo->GetNumberOfArrays() > 0)
-        {
-        // Has cell data, mostlikely this is a histogram.
-        view_type = pqPlotView::barChartType();
-        }
-      else if (
-        (source->getProxy()->GetXMLName() == QString("ProbeLine") || 
-         non_zero_dims == 1) && 
-        (pointDataInfo->GetNumberOfArrays() > 0 ||
-         cellDataInfo->GetNumberOfArrays() > 0 ) && 
-        datainfo->GetNumberOfPoints() > 1)
-        {
-        // No cell data, but some point data -- may be a XY line plot.
-        view_type = pqPlotView::XYPlotType();
-        }
+    vtkPVDataSetAttributesInformation* cellDataInfo =
+      datainfo->GetCellDataInformation();
+    vtkPVDataSetAttributesInformation* pointDataInfo =
+      datainfo->GetPointDataInformation();
+    if (non_zero_dims == 1 && cellDataInfo->GetNumberOfArrays() > 0)
+      {
+      // Has cell data, mostlikely this is a histogram.
+      view_type = pqPlotView::barChartType();
+      }
+    else if (non_zero_dims == 1 && 
+      (pointDataInfo->GetNumberOfArrays() > 0 ||
+       cellDataInfo->GetNumberOfArrays() > 0 ) && 
+      datainfo->GetNumberOfPoints() > 1)
+      {
+      // No cell data, but some point data -- may be a XY line plot.
+      view_type = pqPlotView::XYPlotType();
       }
     }
 

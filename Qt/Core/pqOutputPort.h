@@ -96,6 +96,8 @@ public:
   /// data information, otherwise the current data information is returned.
   vtkPVDataInformation* getDataInformation(bool update) const;
 
+  /// Returns the class name of the output data.
+  const char* getDataClassName() const;
 signals:
   /// Fired when a connection is added between this output port and a consumer.
   void connectionAdded(pqOutputPort* port, pqPipelineSource* consumer);
