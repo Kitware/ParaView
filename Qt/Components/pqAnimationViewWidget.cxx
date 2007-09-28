@@ -245,6 +245,7 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
   hboxlayout->addStretch();
 
   this->Internal->AnimationWidget = new pqAnimationWidget(this);
+  this->Internal->AnimationWidget->animationModel()->setInteractive(true);
   QWidget* w = this->Internal->AnimationWidget->createDeleteWidget();
 
   this->Internal->CreateSource = new pqAnimatableProxyComboBox(w);
@@ -272,6 +273,13 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
   QObject::connect(this->Internal->AnimationWidget,
                    SIGNAL(createTrackClicked()),
                    this, SLOT(createTrack()));
+  
+  QObject::connect(this->Internal->AnimationWidget->animationModel(),
+                   SIGNAL(currentTimeSet(double)),
+                   this, SLOT(setCurrentTime(double)));
+  QObject::connect(this->Internal->AnimationWidget->animationModel(),
+                   SIGNAL(keyFrameTimeChanged(pqAnimationTrack*, pqAnimationKeyFrame*, int, double)),
+                   this, SLOT(setKeyFrameTime(pqAnimationTrack*, pqAnimationKeyFrame*, int, double)));
   
   QObject::connect(&pqActiveView::instance(),
     SIGNAL(changed(pqView*)),
@@ -488,6 +496,43 @@ void pqAnimationViewWidget::updateSceneTime()
   animModel->setCurrentTime(time);
 }
 
+void pqAnimationViewWidget::setCurrentTime(double t)
+{
+  this->Internal->Scene->getAnimationSceneProxy()->SetAnimationTime(t);
+}
+  
+void pqAnimationViewWidget::setKeyFrameTime(pqAnimationTrack* track, 
+                                            pqAnimationKeyFrame* kf, 
+                                            int edge, double time)
+{
+  pqAnimationCue* cue = this->Internal->findCue(track);
+  if(!cue)
+    {
+    return;
+    }
+  QList<vtkSMProxy*> keyFrames = cue->getKeyFrames();
+  int i = 0;
+  for(i=0; i<track->count(); i++)
+    {
+    if(track->keyFrame(i) == kf)
+      {
+      break;
+      }
+    }
+  if(edge)
+    {
+    i++;
+    }
+
+  if(i < keyFrames.size())
+    {
+    QPair<double, double> timeRange = this->Internal->Scene->getClockTimeRange();
+    double normTime = (time - timeRange.first) / (timeRange.second - timeRange.first);
+    pqSMAdaptor::setElementProperty(keyFrames[i]->GetProperty("KeyTime"), 
+                                    normTime);
+    keyFrames[i]->UpdateVTKObjects();
+    }
+}
 
 void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
 {

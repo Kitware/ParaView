@@ -38,8 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QGraphicsScene>
 #include <QStandardItemModel>
+#include <QPolygonF>
 
 class pqAnimationTrack;
+class pqAnimationKeyFrame;
 class QGraphicsView;
 
 // a model that represents a collection of animation tracks
@@ -52,6 +54,7 @@ class QTWIDGETS_EXPORT pqAnimationModel : public QGraphicsScene
   Q_PROPERTY(double currentTime READ currentTime WRITE setCurrentTime)
   Q_PROPERTY(double startTime READ startTime WRITE setStartTime)
   Q_PROPERTY(double endTime READ endTime WRITE setEndTime)
+  Q_PROPERTY(bool interactive READ interactive WRITE setInteractive)
 public:
 
   /// Real or Sequence mode
@@ -87,6 +90,8 @@ public:
   double startTime() const;
   /// get the end time
   double endTime() const;
+  /// get whether this scene is interactive
+  bool interactive() const;
 
   QAbstractItemModel* header();
   void setRowHeight(int);
@@ -104,10 +109,16 @@ public slots:
   void setStartTime(double);
   /// set the end time
   void setEndTime(double);
+  /// set whether this scene is interactive
+  void setInteractive(bool);
 
 signals:
   // emitted when a track is double clicked on
   void trackSelected(pqAnimationTrack*);
+  // emitted when the current time was changed by this model
+  void currentTimeSet(double);
+  // emitted when the time of a keyframe was changed by this model
+  void keyFrameTimeChanged(pqAnimationTrack* track, pqAnimationKeyFrame* kf, int end, double time);
 
 protected slots:
 
@@ -115,11 +126,22 @@ protected slots:
   void trackNameChanged();
 
 protected:
+  QPolygonF timeBarPoly(double time);
+  double positionFromTime(double time);
+  double timeFromPosition(double pos);
+  double timeFromTick(int tick);
+  int tickFromTime(double pos);
   void drawForeground(QPainter* painter, const QRectF& rect);
+  bool hitTestCurrentTimePoly(const QPointF& pos);
+  pqAnimationTrack* hitTestTracks(const QPointF& pos);
+  pqAnimationKeyFrame* hitTestKeyFrame(pqAnimationTrack* t, const QPointF& pos);
 
   bool eventFilter(QObject* w, QEvent* e);
 
   void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent);
+  void mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent);
+  void mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent);
+  void mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent);
 
 private:
 
@@ -129,6 +151,12 @@ private:
   double StartTime;
   double EndTime;
   int    RowHeight;
+  bool   Interactive;
+  bool   CurrentTimeGrabbed;
+  double NewCurrentTime;
+  pqAnimationTrack*   CurrentTrackGrabbed;
+  pqAnimationKeyFrame*   CurrentKeyFrameGrabbed;
+  int   CurrentKeyFrameEdge;
 
   QList<pqAnimationTrack*> Tracks;
 

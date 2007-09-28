@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqAnimationScene;
 class pqAnimationTrack;
+class pqAnimationKeyFrame;
 class pqView;
 class pqServerManagerModelItem;
 class vtkSMProxy;
@@ -90,6 +91,10 @@ protected slots:
   // set the current proxy selection
   void setCurrentSelection(pqServerManagerModelItem*);
   void setCurrentProxy(vtkSMProxy* pxy);
+  
+  // sets the current time
+  void setCurrentTime(double);
+  void setKeyFrameTime(pqAnimationTrack*, pqAnimationKeyFrame*, int, double);
 
 private:
   pqAnimationViewWidget(const pqAnimationViewWidget&); // Not implemented.
