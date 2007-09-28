@@ -20,6 +20,7 @@
 #include "vtkWriter.h"
 
 class vtkStdString;
+class vtkRectilinearGrid;
 
 class VTK_EXPORT vtkCSVWriter : public vtkWriter
 {
@@ -62,6 +63,7 @@ protected:
   bool OpenFile();
 
   virtual void WriteData();
+  virtual void WriteRectilinearGridData(vtkRectilinearGrid* rectilinearGrid);
 
   // see algorithm for more info.
   // This writer takes in vtkRectilinearGrids.

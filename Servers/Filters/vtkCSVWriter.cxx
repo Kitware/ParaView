@@ -22,13 +22,16 @@
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkPointSet.h"
+#include "vtkPolyData.h"
+#include "vtkPolyLineToRectilinearGridFilter.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSmartPointer.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkCSVWriter);
-vtkCxxRevisionMacro(vtkCSVWriter, "1.5");
+vtkCxxRevisionMacro(vtkCSVWriter, "1.5.10.1");
 //-----------------------------------------------------------------------------
 vtkCSVWriter::vtkCSVWriter()
 {
@@ -54,7 +57,7 @@ vtkCSVWriter::~vtkCSVWriter()
 int vtkCSVWriter::FillInputPortInformation(
   int vtkNotUsed(port), vtkInformation* info)
 {
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkRectilinearGrid");
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   return 1;
 }
 
@@ -143,13 +146,69 @@ vtkStdString vtkCSVWriter::GetString(vtkStdString string)
 void vtkCSVWriter::WriteData()
 {
   vtkRectilinearGrid* rg = vtkRectilinearGrid::SafeDownCast(this->GetInput());
-  vtkIdType numPoints = rg->GetNumberOfPoints();
-  vtkPointData* pd = rg->GetPointData();
-  vtkCellData* cd = rg->GetCellData();
+  if (rg)
+    {
+    this->WriteRectilinearGridData(rg);
+    }
+  else
+    {
+    vtkDataSet* ds = vtkDataSet::SafeDownCast(this->GetInput());
+    if (ds)
+      {
+      static const char* const pdInfoStr =
+        "vtkCSVWriter: input data type needs to be of type vtkPolyData";
+      vtkPointSet* ps = vtkPointSet::SafeDownCast(ds);
+      if (ps)
+        {
+        vtkPolyData* pd = vtkPolyData::SafeDownCast(ps);
+        if (pd)
+          {
+          vtkPolyData* clone = vtkPolyData::New();
+          clone->ShallowCopy(pd);
+
+          static const char* const infoStr =
+            "input data type is a vtkPolyData."
+            " Converting via vtkPolyLineToRectilinearGridFilter";
+          vtkDebugMacro(<< infoStr);
+          vtkPolyLineToRectilinearGridFilter* p2rgf =
+            vtkPolyLineToRectilinearGridFilter::New();
+          p2rgf->SetInput(clone);
+
+          p2rgf->Update();
+          this->WriteRectilinearGridData(p2rgf->GetOutput());
+
+          p2rgf->Delete();
+          clone->Delete();
+          }
+        else
+          {
+          vtkDebugMacro(<< pdInfoStr);
+          vtkWarningMacro(<< pdInfoStr);
+          }
+        }
+      else
+        {
+        vtkDebugMacro(<< pdInfoStr);
+        vtkWarningMacro(<< pdInfoStr);
+        }
+      }
+    else
+      {
+      vtkErrorMacro(<< "Bad Ju Ju! The input to vtkCSVWriter must be a vtkDataSet");
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkCSVWriter::WriteRectilinearGridData(vtkRectilinearGrid* rectilinearGrid)
+{
+  vtkIdType numPoints = rectilinearGrid->GetNumberOfPoints();
+  vtkPointData* pd = rectilinearGrid->GetPointData();
+  vtkCellData* cd = rectilinearGrid->GetCellData();
   int dims[3];
   int non_unit_dims = 0;
   int cc;
-  rg->GetDimensions(dims);
+  rectilinearGrid->GetDimensions(dims);
   for (cc=0; cc < 3; cc++)
     {
     non_unit_dims += (dims[cc] > 1)?  1:  0;
@@ -157,12 +216,12 @@ void vtkCSVWriter::WriteData()
   if (non_unit_dims > 1)
     {
     vtkErrorMacro("The rectilinear grid must be 1D to be save as CSV.");
-    return ;
+    return;
     }
 
   if (!this->OpenFile())
     {
-    return ;
+    return;
     }
 
   // Write headers:
@@ -175,7 +234,8 @@ void vtkCSVWriter::WriteData()
   vtkstd::vector<vtkSmartPointer<vtkArrayIterator> > pointIters;
   vtkstd::vector<vtkSmartPointer<vtkArrayIterator> > cellIters;
 
-  for (cc=0; cc < pd->GetNumberOfArrays(); cc++)
+  int pdNumArrays = pd->GetNumberOfArrays();
+  for (cc=0; cc < pdNumArrays; cc++)
     {
     vtkAbstractArray* array = pd->GetAbstractArray(cc);
     for (int comp=0; comp < array->GetNumberOfComponents(); comp++)
@@ -183,13 +243,13 @@ void vtkCSVWriter::WriteData()
       (*this->Stream) << this->FieldDelimiter
         << this->GetString(vtkStdString(array->GetName())+"::PointData");
       }
-
     vtkArrayIterator* iter = array->NewIterator();
     pointIters.push_back(iter);
     iter->Delete();
     }
 
-  for (cc=0; cc < cd->GetNumberOfArrays(); cc++)
+  int cdNumArrays = cd->GetNumberOfArrays();
+  for (cc=0; cc < cdNumArrays; cc++)
     {
     vtkAbstractArray* array = cd->GetAbstractArray(cc);
     for (int comp=0; comp < array->GetNumberOfComponents(); comp++)
@@ -197,30 +257,28 @@ void vtkCSVWriter::WriteData()
       (*this->Stream) << this->FieldDelimiter
         << this->GetString(vtkStdString(array->GetName())+"::CellData");
       }
-
     vtkArrayIterator* iter = array->NewIterator();
     cellIters.push_back(iter);
     iter->Delete();
     }
-
   (*this->Stream) << "\n";
 
   for (vtkIdType index=0; index < numPoints; index++)
     {
     double point[3];
-    rg->GetPoint(index, point);
-    (*this->Stream) << point[0] << this->FieldDelimiter
+    rectilinearGrid->GetPoint(index, point);
+    (*this->Stream)
+      << point[0] << this->FieldDelimiter
       << point[1] << this->FieldDelimiter
       << point[2];
-
     vtkstd::vector<vtkSmartPointer<vtkArrayIterator> >::iterator iter;
     for (iter = pointIters.begin(); iter != pointIters.end(); ++iter)
       {
       switch ((*iter)->GetDataType())
         {
         vtkArrayIteratorTemplateMacro(
-          vtkCSVWriterGetDataString(static_cast<VTK_TT*>(iter->GetPointer()), index,
-            this->Stream, this));
+          vtkCSVWriterGetDataString(static_cast<VTK_TT*>(iter->GetPointer()),
+            index, this->Stream, this));
         }
       }
 
@@ -229,8 +287,8 @@ void vtkCSVWriter::WriteData()
       switch ((*iter)->GetDataType())
         {
         vtkArrayIteratorTemplateMacro(
-          vtkCSVWriterGetDataString(static_cast<VTK_TT*>(iter->GetPointer()), index,
-            this->Stream, this));
+          vtkCSVWriterGetDataString(static_cast<VTK_TT*>(iter->GetPointer()),
+            index, this->Stream, this));
         }
       }
 
