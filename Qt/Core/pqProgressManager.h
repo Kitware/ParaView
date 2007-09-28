@@ -106,7 +106,7 @@ protected:
   QPointer<QObject> Lock;
   QList<QPointer<QObject> > NonBlockableObjects;
   int ProgressCount;
-
+  bool InUpdate; // used to avoid recursive updates.
 private:
   pqProgressManager(const pqProgressManager&); // Not implemented.
   void operator=(const pqProgressManager&); // Not implemented.

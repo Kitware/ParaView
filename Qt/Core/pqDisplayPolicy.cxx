@@ -79,7 +79,7 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
   // issues.
   vtkSMSourceProxy* spProxy = vtkSMSourceProxy::SafeDownCast(
     source->getProxy());
-  if (!spProxy || !update_pipeline /*&& !spProxy->GetNumberOfParts()*/)
+  if (!spProxy || !update_pipeline && !spProxy->GetNumberOfParts())
     {
     // If parts aren't created, don't update the information at all.
     // Typically means that the filter hasn't been "Applied" even once and

@@ -41,6 +41,7 @@ pqProgressManager::pqProgressManager(QObject* _parent)
   : QObject(_parent)
 {
   this->ProgressCount = 0;
+  this->InUpdate = false;
   QApplication::instance()->installEventFilter(this); 
 }
 
@@ -111,7 +112,13 @@ void pqProgressManager::setProgress(const QString& message, int progress_val)
     // When locked, ignore all other senders.
     return;
     }
+  if (this->InUpdate)
+    {
+    return;
+    }
+  this->InUpdate = true;
   emit this->progress(message, progress_val);
+  this->InUpdate = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -133,16 +140,22 @@ void pqProgressManager::setEnableProgress(bool enable)
     // When locked, ignore all other senders.
     return;
     }
+
   this->ProgressCount += (enable? 1 : -1);
   if (this->ProgressCount < 0)
     {
     this->ProgressCount = 0;
     }
 
+  if (this->InUpdate)
+    {
+    return;
+    }  this->InUpdate = true;
   if (this->ProgressCount <= 1)
     {
     emit this->enableProgress(enable);
     }
+  this->InUpdate = false;
 }
 
 //-----------------------------------------------------------------------------
