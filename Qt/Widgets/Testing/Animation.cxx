@@ -26,43 +26,43 @@ int Animation(int argc, char* argv[])
   track = scene->addTrack();
   track->setProperty("dummy1");
   keyFrame = track->addKeyFrame();
-  keyFrame->setStartTime(0);
-  keyFrame->setEndTime(1);
+  keyFrame->setNormalizedStartTime(0);
+  keyFrame->setNormalizedEndTime(1);
   keyFrame->setStartValue(0.0);
   keyFrame->setEndValue(1.0);
   
   track = scene->addTrack();
   track->setProperty("dummy");
   keyFrame = track->addKeyFrame();
-  keyFrame->setStartTime(0.75);
-  keyFrame->setEndTime(1);
+  keyFrame->setNormalizedStartTime(0.75);
+  keyFrame->setNormalizedEndTime(1);
   keyFrame->setStartValue(25);
   keyFrame->setEndValue(25);
   
   track = scene->addTrack();
   keyFrame = track->addKeyFrame();
-  keyFrame->setStartTime(0);
-  keyFrame->setEndTime(0.5);
+  keyFrame->setNormalizedStartTime(0);
+  keyFrame->setNormalizedEndTime(0.5);
   keyFrame->setStartValue(0);
   keyFrame->setEndValue(360);
   
   track = scene->addTrack();
   keyFrame = track->addKeyFrame();
-  keyFrame->setStartTime(0.5);
-  keyFrame->setEndTime(1.0);
+  keyFrame->setNormalizedStartTime(0.5);
+  keyFrame->setNormalizedEndTime(1.0);
   keyFrame->setStartValue(0);
   keyFrame->setEndValue(360);
   
   track = scene->addTrack();
   keyFrame = track->addKeyFrame();
-  keyFrame->setStartTime(0.25);
-  keyFrame->setEndTime(0.6);
+  keyFrame->setNormalizedStartTime(0.25);
+  keyFrame->setNormalizedEndTime(0.6);
   keyFrame->setStartValue(0);
   keyFrame->setEndValue(1.0);
   
   keyFrame = track->addKeyFrame();
-  keyFrame->setStartTime(0.6);
-  keyFrame->setEndTime(0.9);
+  keyFrame->setNormalizedStartTime(0.6);
+  keyFrame->setNormalizedEndTime(0.9);
   keyFrame->setStartValue(1.0);
   keyFrame->setEndValue(0);
 

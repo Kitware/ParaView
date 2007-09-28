@@ -251,8 +251,8 @@ void pqComparativeTracksWidget::updateTrack(int index, vtkSMProperty* smproperty
       pqSMAdaptor::getElementProperty(pp->GetProxy(1)->GetProperty("KeyValues"));
 
     pqAnimationKeyFrame* newFrame = track->addKeyFrame();
-    newFrame->setStartTime(0);
-    newFrame->setEndTime(1);
+    newFrame->setNormalizedStartTime(0);
+    newFrame->setNormalizedEndTime(1);
     newFrame->setStartValue(startValue);
     newFrame->setEndValue(endValue);
 

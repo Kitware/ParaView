@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 pqAnimationKeyFrame::pqAnimationKeyFrame(pqAnimationTrack* p, QGraphicsScene* s)
   : QObject(p), QGraphicsItem(p,s),
-  StartTime(0), EndTime(1),
+  NormalizedStartTime(0), NormalizedEndTime(1),
   Rect(0,0,1,1)
 {
 }
@@ -63,22 +63,22 @@ QIcon pqAnimationKeyFrame::icon() const
   return this->Icon;
 }
 
-double pqAnimationKeyFrame::startTime() const
+double pqAnimationKeyFrame::normalizedStartTime() const
 {
-  return this->StartTime;
+  return this->NormalizedStartTime;
 }
-double pqAnimationKeyFrame::endTime() const
+double pqAnimationKeyFrame::normalizedEndTime() const
 {
-  return this->EndTime;
+  return this->NormalizedEndTime;
 }
-void pqAnimationKeyFrame::setStartTime(double t)
+void pqAnimationKeyFrame::setNormalizedStartTime(double t)
 {
-  this->StartTime = t;
+  this->NormalizedStartTime = t;
   this->adjustRect();
 }
-void pqAnimationKeyFrame::setEndTime(double t)
+void pqAnimationKeyFrame::setNormalizedEndTime(double t)
 {
-  this->EndTime = t;
+  this->NormalizedEndTime = t;
   this->adjustRect();
 }
 
@@ -120,8 +120,8 @@ void pqAnimationKeyFrame::adjustRect()
 
   double w = trackRect.width();
 
-  double left = trackRect.left() + w * this->startTime();
-  double right = trackRect.left() + w * this->endTime();
+  double left = trackRect.left() + w * this->normalizedStartTime();
+  double right = trackRect.left() + w * this->normalizedEndTime();
 
   this->setBoundingRect(QRectF(left, trackRect.top(), right-left, trackRect.height()));
 }
