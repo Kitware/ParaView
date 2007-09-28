@@ -155,11 +155,15 @@ private:
   double EndTime;
   int    RowHeight;
   bool   Interactive;
+  
+  // vars to support interaction
   bool   CurrentTimeGrabbed;
   double NewCurrentTime;
   pqAnimationTrack*   CurrentTrackGrabbed;
   pqAnimationKeyFrame*   CurrentKeyFrameGrabbed;
   int   CurrentKeyFrameEdge;
+  QPair<double, double> InteractiveRange;
+  QList<double> SnapHints;
 
   QList<pqAnimationTrack*> Tracks;
 

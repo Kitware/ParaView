@@ -415,42 +415,99 @@ void pqAnimationModel::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEven
 
 void pqAnimationModel::mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent)
 {
-  if(!this->Interactive)
+  if(!this->Interactive || mouseEvent->button() != Qt::LeftButton)
     {
     return;
     }
 
+  // see if current time is grabbed
   QPointF pos = mouseEvent->scenePos();
   if(this->hitTestCurrentTimePoly(pos))
     {
     this->CurrentTimeGrabbed = true;
-    this->NewCurrentTime = this->CurrentTime;
-    return;
+    this->InteractiveRange.first = this->StartTime;
+    this->InteractiveRange.second = this->EndTime;
     }
   
-  pqAnimationTrack* t = hitTestTracks(pos);
-  pqAnimationKeyFrame* kf = hitTestKeyFrame(t, pos);
-  if(kf)
+  // see if any keyframe is grabbed
+  if(!this->CurrentTimeGrabbed)
     {
-    double keyPos1 =
-      this->positionFromTime(this->normalizedTimeToTime(kf->normalizedStartTime()));
-    double keyPos2 =
-      this->positionFromTime(this->normalizedTimeToTime(kf->normalizedEndTime()));
-    if(qAbs(keyPos1 - pos.x()) < 3)
+    pqAnimationTrack* t = hitTestTracks(pos);
+    pqAnimationKeyFrame* kf = hitTestKeyFrame(t, pos);
+
+    int whichkf = 0;
+    for(whichkf=0; whichkf<t->count(); whichkf++)
       {
-      this->CurrentTrackGrabbed = t;
-      this->CurrentKeyFrameGrabbed = kf;
-      this->CurrentKeyFrameEdge = 0;
-      return;
-      }
-    if(qAbs(keyPos2 - pos.x()) < 3)
-      {
-      this->CurrentTrackGrabbed = t;
-      this->CurrentKeyFrameGrabbed = kf;
-      this->CurrentKeyFrameEdge = 1;
-      return;
+      if(t->keyFrame(whichkf) == kf)
+        {
+        break;
+        }
       }
 
+    if(kf)
+      {
+      double keyPos1 =
+        this->positionFromTime(this->normalizedTimeToTime(kf->normalizedStartTime()));
+      double keyPos2 =
+        this->positionFromTime(this->normalizedTimeToTime(kf->normalizedEndTime()));
+      if(qAbs(keyPos1 - pos.x()) < 3)
+        {
+        this->CurrentTrackGrabbed = t;
+        this->CurrentKeyFrameGrabbed = kf;
+        this->CurrentKeyFrameEdge = 0;
+        }
+      else if(qAbs(keyPos2 - pos.x()) < 3)
+        {
+        whichkf++;
+        this->CurrentTrackGrabbed = t;
+        this->CurrentKeyFrameGrabbed = kf;
+        this->CurrentKeyFrameEdge = 1;
+        this->InteractiveRange.first = this->StartTime;
+        this->InteractiveRange.second = this->EndTime;
+        }
+      
+      if(whichkf > 0)
+        {
+        this->InteractiveRange.first =
+          this->normalizedTimeToTime(
+            t->keyFrame(whichkf-1)->normalizedStartTime());
+        }
+      else
+        {
+        this->InteractiveRange.first = this->StartTime;
+        }
+      
+      if(whichkf < t->count())
+        {
+        this->InteractiveRange.second =
+          this->normalizedTimeToTime(
+            t->keyFrame(whichkf)->normalizedEndTime());
+        }
+      else
+        {
+        this->InteractiveRange.second = this->EndTime;
+        }
+      }
+    }
+
+  // gather some snap hints from the current time
+  // and all the keyframes
+  if(this->CurrentTimeGrabbed || this->CurrentTrackGrabbed)
+    {
+    this->SnapHints.append(this->CurrentTime);
+
+    for(int i=0; i<this->count(); i++)
+      {
+      pqAnimationTrack* t = this->track(i);
+      for(int j=0; j<t->count(); j++)
+        {
+        pqAnimationKeyFrame* kf = t->keyFrame(j);
+        this->SnapHints.append(
+          this->normalizedTimeToTime(kf->normalizedStartTime()));
+        this->SnapHints.append(
+          this->normalizedTimeToTime(kf->normalizedEndTime()));
+        }
+      }
     }
 
 }
@@ -467,21 +524,41 @@ void pqAnimationModel::mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)
   if(this->CurrentTimeGrabbed || this->CurrentKeyFrameGrabbed)
     {
     double time = this->timeFromPosition(pos.x());
-    // clamp to start/end time
-    time = qMax(time, this->StartTime);
-    time = qMin(time, this->EndTime);
 
     // snap to ticks in sequence mode
+    // (should snap to hints if we find one closer? )
     if(this->mode() == Sequence)
       {
       int tick = this->tickFromTime(time);
       time = this->timeFromTick(tick);
       }
+    else
+      {
+      // snap to nearby snap hints (if any)
+      for(int i=0; i<this->SnapHints.size(); i++)
+        {
+        if(qAbs(this->positionFromTime(this->SnapHints[i]) -
+                this->positionFromTime(time)) < 3)
+          {
+          time = this->SnapHints[i];
+          break;
+          }
+        }
+      }
+    
+    // clamp to start/end time
+    time = qMax(time, this->InteractiveRange.first);
+    time = qMin(time, this->InteractiveRange.second);
+
     this->NewCurrentTime = time;
     this->update();
     return;
     }
-  
+ 
+
+  // we haven't gone in any interaction mode yet,
+  // so lets adjust the cursor to give indication of being
+  // able to interact if the mouse was pressed at this location 
   QGraphicsView* view = qobject_cast<QGraphicsView*>(this->parent());
   
   if(this->hitTestCurrentTimePoly(pos))
@@ -531,6 +608,9 @@ void pqAnimationModel::mouseReleaseEvent(QGraphicsSceneMouseEvent*)
     this->NewCurrentTime = this->CurrentTime;
     this->update();
     }
+
+  this->SnapHints.clear();
+
 }
 
 double pqAnimationModel::timeToNormalizedTime(double t) const
