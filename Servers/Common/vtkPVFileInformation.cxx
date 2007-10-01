@@ -50,7 +50,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.20");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.21");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -59,7 +59,11 @@ inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
     char last = *(name.end()-1);
     if (last != '/' && last != '\\')
       {
+#if defined(_WIN32)
+      name += "\\";
+#else
       name += "/";
+#endif
       }
     }
 }
