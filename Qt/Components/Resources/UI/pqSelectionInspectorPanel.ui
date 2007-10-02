@@ -1398,6 +1398,11 @@
    <header>pqDoubleRangeWidget.h</header>
   </customwidget>
   <customwidget>
+   <class>pqTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>pqTreeWidget.h</header>
+  </customwidget>
+  <customwidget>
    <class>pqColorChooserButton</class>
    <extends>QPushButton</extends>
    <header>pqColorChooserButton.h</header>
@@ -1408,12 +1413,50 @@
    <header>pqCollapsedGroup.h</header>
    <container>1</container>
   </customwidget>
-  <customwidget>
-   <class>pqTreeWidget</class>
-   <extends>QTreeWidget</extends>
-   <header>pqTreeWidget.h</header>
-  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>comboSelectionType</tabstop>
+  <tabstop>comboFieldType</tabstop>
+  <tabstop>checkboxContainCell</tabstop>
+  <tabstop>checkboxInsideOut</tabstop>
+  <tabstop>UseGlobalIDs</tabstop>
+  <tabstop>Indices</tabstop>
+  <tabstop>Delete</tabstop>
+  <tabstop>DeleteAll</tabstop>
+  <tabstop>NewValue</tabstop>
+  <tabstop>NewRange</tabstop>
+  <tabstop>tabWidget_SelectionLabelStyle</tabstop>
+  <tabstop>Sel_buttonColor</tabstop>
+  <tabstop>Sel_StyleOpacity</tabstop>
+  <tabstop>Sel_StyleLineWidth</tabstop>
+  <tabstop>checkBoxLabelCells</tabstop>
+  <tabstop>comboLabelMode_Cell</tabstop>
+  <tabstop>spinBoxSize_Cell</tabstop>
+  <tabstop>comboFontFamily_Cell</tabstop>
+  <tabstop>toolButtonBold_Cell</tabstop>
+  <tabstop>toolButtonItalic_Cell</tabstop>
+  <tabstop>toolButtonShadow_Cell</tabstop>
+  <tabstop>comboTextAlign_Cell</tabstop>
+  <tabstop>spinBoxOpacity_Cell</tabstop>
+  <tabstop>buttonColor_Cell</tabstop>
+  <tabstop>checkBoxLabelPoints</tabstop>
+  <tabstop>comboLabelMode_Point</tabstop>
+  <tabstop>spinBoxSize_Point</tabstop>
+  <tabstop>comboFontFamily_Point</tabstop>
+  <tabstop>toolButtonBold_Point</tabstop>
+  <tabstop>toolButtonItalic_Point</tabstop>
+  <tabstop>toolButtonShadow_Point</tabstop>
+  <tabstop>comboTextAlign_Point</tabstop>
+  <tabstop>spinBoxOpacity_Point</tabstop>
+  <tabstop>buttonColor_Point</tabstop>
+  <tabstop>checkboxShowFrustum</tabstop>
+  <tabstop>thresholdRanges</tabstop>
+  <tabstop>DeleteAll_Threshold</tabstop>
+  <tabstop>ThresholdScalarArray</tabstop>
+  <tabstop>Sel_StylePointSize</tabstop>
+  <tabstop>buttonAddThresholds</tabstop>
+  <tabstop>Delete_Threshold</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
