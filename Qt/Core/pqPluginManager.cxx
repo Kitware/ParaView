@@ -247,7 +247,8 @@ void pqPluginManager::loadPlugins(const QString& path, pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-bool pqPluginManager::loadPlugin(pqServer* server, const QString& lib)
+bool pqPluginManager::loadPlugin(pqServer* server, const QString& lib,
+                                 QString* errorReturn)
 {
   bool success = false;
   QString error;
@@ -266,7 +267,14 @@ bool pqPluginManager::loadPlugin(pqServer* server, const QString& lib)
   
   if(!success)
     {
-    QMessageBox::information(NULL, "Plugin Load Failed", error);
+    if(!errorReturn)
+      {
+      QMessageBox::information(NULL, "Plugin Load Failed", error);
+      }
+    else
+      {
+      *errorReturn = error;
+      }
     }
 
   return success;

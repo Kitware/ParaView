@@ -51,7 +51,9 @@ public:
 
   /// attempt to load a plugin
   /// return true on success, if there was a failure, the error is reported
-  bool loadPlugin(pqServer* server, const QString& lib);
+  /// If errorMsg is non-null, then errors are not reported, but the error
+  /// message is put in the errorMsg string
+  bool loadPlugin(pqServer* server, const QString& lib, QString* errorMsg=0);
   
   /// attempt to load all available plugins on a server, 
   /// or client plugins if NULL
