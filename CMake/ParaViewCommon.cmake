@@ -640,7 +640,6 @@ CONFIGURE_FILE(${ParaView_SOURCE_DIR}/CMake/CTestCustom.ctest.in
 #########################################################################
 SET(PARAVIEW_INCLUDE_DIRS
   ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer
-  ${ParaView_SOURCE_DIR}/Utilities/hdf5
   ${KWCommon_INCLUDE_PATH}
   ${ParaView_SOURCE_DIR}/Servers/Filters
   ${ParaView_SOURCE_DIR}/Servers/ServerManager
@@ -648,11 +647,11 @@ SET(PARAVIEW_INCLUDE_DIRS
 #
   ${ParaView_BINARY_DIR}
   ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
-  ${ParaView_BINARY_DIR}/Utilities/hdf5
   ${ParaView_BINARY_DIR}/Servers/Filters
   ${ParaView_BINARY_DIR}/Servers/ServerManager
   ${ParaView_BINARY_DIR}/Servers/Common
   ${XDMF_INCLUDE_DIRS}
+  ${HDF5_INCLUDE_DIR}
   )
 
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPVConfig.h.in
