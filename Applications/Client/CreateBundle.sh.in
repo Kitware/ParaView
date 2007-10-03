@@ -52,12 +52,6 @@ for a in QtCore QtGui QtNetwork QtXml QtAssistant; do
 done
 
 EXECUTABLES="paraview.app/Contents/MacOS/paraview"
-EXECUTABLES="${EXECUTABLES} paraview.app/Contents/MacOS/pvserver"
-EXECUTABLES="${EXECUTABLES} paraview.app/Contents/MacOS/pvrenderserver"
-EXECUTABLES="${EXECUTABLES} paraview.app/Contents/MacOS/pvdataserver"
-if [ -e paraview.app/Contents/MacOS/pvpython ]; then
-    EXECUTABLES="${EXECUTABLES} paraview.app/Contents/MacOS/pvpython"
-fi
 SUB_EXECUTABLES="${SUB_EXECUTABLES} paraview.app/Contents/MacOS/assistant.app/Contents/MacOS/assistant"
 
 ################################################################################
