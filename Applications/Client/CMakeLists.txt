@@ -82,10 +82,16 @@ ENDIF(NOT Q_WS_MAC)
 # call assistant. This executable will set the appropriate ld library
 # path and execute assistant-real. It is the installation's requirement
 # to install assistant-real
-#SET(PV_EXE_LIST ${PV_EXE_LIST} assistant)
+SET(PV_EXE_LIST ${PV_EXE_LIST} assistant)
 
 SET(MACOSX_BUNDLE_BUNDLE_NAME "ParaView")
-ADD_EXECUTABLE(paraview${PV_EXE_SUFFIX} WIN32 ${MAKE_BUNDLE}  
+IF(NOT Q_WS_MAC)
+  SET(PV_EXE_NAME paraview${PV_EXE_SUFFIX})
+ELSE(NOT Q_WS_MAC)
+  SET(PV_EXE_NAME paraview)
+ENDIF(NOT Q_WS_MAC)
+
+ADD_EXECUTABLE(${PV_EXE_NAME} WIN32 ${MAKE_BUNDLE}  
   AboutDialog.cxx
   AboutDialog.h
   MainWindow.cxx
@@ -100,7 +106,7 @@ ADD_EXECUTABLE(paraview${PV_EXE_SUFFIX} WIN32 ${MAKE_BUNDLE}
   ${apple_bundle_sources}
 )
 
-TARGET_LINK_LIBRARIES(paraview${PV_EXE_SUFFIX}
+TARGET_LINK_LIBRARIES(${PV_EXE_NAME}
   pqComponents
   pqCore
   pqWidgets
@@ -116,17 +122,13 @@ IF(Q_WS_MAC)
   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/CreateBundle.sh.in"
     "${CMAKE_CURRENT_BINARY_DIR}/CreateBundle.sh"
     @ONLY IMMEDIATE)
-#  ADD_CUSTOM_COMMAND(
-#    TARGET paraview${PV_EXE_SUFFIX}
-#    POST_BUILD
-#    COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/CompleteBundle.cmake")
   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/CreateBundleDuringMakeInstall.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/CreateBundleDuringMakeInstall.cmake"
     @ONLY IMMEDIATE)
 ENDIF(Q_WS_MAC)
 
 IF(WIN32)
-  TARGET_LINK_LIBRARIES(paraview${PV_EXE_SUFFIX} ${QT_QTMAIN_LIBRARY} )
+  TARGET_LINK_LIBRARIES(${PV_EXE_NAME} ${QT_QTMAIN_LIBRARY} )
 ENDIF(WIN32)
 
 EXEC_PROGRAM(${QT_QMAKE_EXECUTABLE} ARGS "-query QT_INSTALL_BINS"
@@ -443,7 +445,7 @@ IF(PV_NEED_SHARED_FORWARD)
 ENDIF(PV_NEED_SHARED_FORWARD)
 
 IF(NOT Q_WS_MAC)
-  INSTALL(TARGETS paraview${PV_EXE_SUFFIX}
+  INSTALL(TARGETS ${PV_EXE_NAME}
     DESTINATION ${PV_EXE_INSTALL_CM24}
     COMPONENT Runtime)
 ENDIF(NOT Q_WS_MAC)
@@ -500,29 +502,28 @@ ENDIF(NOT Q_WS_MAC)
 # libraries
 # INSTALL(FILES /usr/lib/libstdc++.so.5 /lib/libgcc_s.so.1 /usr/lib/libpng.so.3 /usr/lib/libexpat.so.0 /usr/lib/libfontconfig.so.1 /usr/lib/libfreetype.so.6 /lib/libz.so.1 DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Runtime)
 
-# Hard-coded install rules for anything left to install. These should
-# probably go to a local cmake file. Change to match the build system's
-# assistant. Make sure share forwarding for assistant (see up above) is
-# enabled if necessary
-# IF(WIN32)
-#   INSTALL(FILES C:/Qt/4.1.4/bin/assistant.exe
-#     DESTINATION ${PV_EXE_INSTALL_CM24} 
-#     PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ 
-#     COMPONENT Runtime)
-# ELSE(WIN32)
-#   IF(PV_NEED_SHARED_FORWARD)
-#     INSTALL(FILES /opt/qt-4.1.3/bin/assistant 
-#       DESTINATION ${PV_EXE_INSTALL_CM24} 
-#       PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ 
-#       COMPONENT Runtime
-#       RENAME assistant-real)
-#   ELSE(PV_NEED_SHARED_FORWARD)
-#     INSTALL(FILES /opt/qt-4.1.3/bin/assistant 
-#       DESTINATION ${PV_EXE_INSTALL_CM24} 
-#       PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ 
-#       COMPONENT Runtime)
-#   ENDIF(PV_NEED_SHARED_FORWARD)
-# ENDIF(WIN32)
+# We also need Qt assistant
+IF(WIN32)
+  INSTALL(FILES ${QT_BINARY_DIR}/assistant.exe
+    DESTINATION ${PV_EXE_INSTALL_CM24} 
+    PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ 
+    COMPONENT Runtime)
+ELSE(WIN32)
+  IF (NOT Q_WS_MAC)
+    IF(PV_NEED_SHARED_FORWARD)
+      INSTALL(FILES ${QT_BINARY_DIR}/assistant 
+        DESTINATION ${PV_EXE_INSTALL_CM24} 
+        PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ 
+        COMPONENT Runtime
+        RENAME assistant-real)
+    ELSE(PV_NEED_SHARED_FORWARD)
+      INSTALL(FILES ${QT_BINARY_DIR}/assistant 
+        DESTINATION ${PV_EXE_INSTALL_CM24} 
+        PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ 
+        COMPONENT Runtime)
+    ENDIF(PV_NEED_SHARED_FORWARD)
+  ENDIF (NOT Q_WS_MAC)
+ENDIF(WIN32)
 
 # Call this one last so that it happens after the above targets are all installed:
 #
