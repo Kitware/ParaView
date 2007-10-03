@@ -9,6 +9,13 @@ fi
 
 ParaView_BINARY_DIR="@ParaView_BINARY_DIR@"
 PARAVIEW_VERSION=@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@.@PARAVIEW_VERSION_PATCH@
+VTK_USE_RPATH="@VTK_USE_RPATH@"
+
+if [ $VTK_USE_RPATH = ON ] || [ $VTK_USE_RPATH = 1 ]; then
+    PV_BINARY_PATH = "${ParaView_BINARY_DIR}/bin/"
+else
+    PV_BINARY_PATH = ""
+fi
 
 ################################################################################
 #
@@ -78,7 +85,7 @@ for a in $(cd "${QT_LIB_DIR}" && ls *.dylib); do
       fi
       for lib in $(cd "${ParaView_BINARY_DIR}/bin" && ls *.so *.dylib); do
           libfile=$(basename "${ParaView_BINARY_DIR}/bin/${lib}")
-          install_name_tool paraview.app/Contents/MacOS/${file} -change "${ParaView_BINARY_DIR}/bin/${lib}" @executable_path/${libfile}
+          install_name_tool paraview.app/Contents/MacOS/${file} -change "${PV_BINARY_PATH}${lib}" @executable_path/${libfile}
       done
       if [ "x$DEBUG" = "x1" ]; then
           echo "Stage 1.b.${QT_LIB_DIR}/$a"
@@ -117,10 +124,10 @@ for a in $(cd "${ParaView_BINARY_DIR}/bin" && ls *.so *.dylib); do
         echo -n .
         file=$(basename "${ParaView_BINARY_DIR}/bin/$a")
         for executable in ${EXECUTABLES}; do
-            install_name_tool "${executable}" -change "${ParaView_BINARY_DIR}/bin/$a" @executable_path/${file}
+            install_name_tool "${executable}" -change "${PV_BINARY_PATH}$a" @executable_path/${file}
         done
         for executable in ${SUB_EXECUTABLES}; do
-            install_name_tool "${executable}" -change "${ParaView_BINARY_DIR}/bin/$a" @executable_path/../../../${file}
+            install_name_tool "${executable}" -change "${PV_BINARY_PATH}$a" @executable_path/../../../${file}
         done
         install_name_tool paraview.app/Contents/MacOS/${file} -id @executable_path/${file}
 
@@ -129,7 +136,7 @@ for a in $(cd "${ParaView_BINARY_DIR}/bin" && ls *.so *.dylib); do
         fi
         for lib in $(cd "${ParaView_BINARY_DIR}/bin" && ls *.so *.dylib); do
             libfile=$(basename "${ParaView_BINARY_DIR}/bin/${lib}")
-            install_name_tool paraview.app/Contents/MacOS/${file} -change "${ParaView_BINARY_DIR}/bin/${lib}" @executable_path/${libfile}
+            install_name_tool paraview.app/Contents/MacOS/${file} -change "${PV_BINARY_PATH}${lib}" @executable_path/${libfile}
         done
         for lib in $(cd "${FFMPEG_LIB_DIR}" && ls libavcodec*dylib* libavformat*dylib* libavutil*dylib*); do
             libfile=$(basename "${FFMPEG_LIB_DIR}/${lib}")
@@ -162,7 +169,7 @@ for a in $(cd "${FFMPEG_LIB_DIR}" && ls libavcodec*dylib* libavformat*dylib* lib
         fi
         for lib in $(cd "${ParaView_BINARY_DIR}/bin" && ls *.so *.dylib); do
             libfile=$(basename "${ParaView_BINARY_DIR}/bin/${lib}")
-            install_name_tool paraview.app/Contents/MacOS/${file} -change "${ParaView_BINARY_DIR}/bin/${lib}" @executable_path/${libfile}
+            install_name_tool paraview.app/Contents/MacOS/${file} -change "${PV_BINARY_PATH}${lib}" @executable_path/${libfile}
         done
         for lib in $(cd "${FFMPEG_LIB_DIR}" && ls libavcodec*dylib* libavformat*dylib* libavutil*dylib*); do
             libfile=$(basename "${FFMPEG_LIB_DIR}/${lib}")
