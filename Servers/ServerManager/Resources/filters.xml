@@ -1384,7 +1384,6 @@ The filter operates on any type of data set, but the input data set must have at
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
-          <InputArrayDomain name="input_array"/>
           <Documentation>
             This property specifies the input dataset to the Calculator filter. The scalar and vector variables may be chosen from this dataset's arrays.
           </Documentation>
