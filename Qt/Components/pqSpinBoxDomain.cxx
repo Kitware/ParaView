@@ -132,45 +132,21 @@ void pqSpinBoxDomain::internalDomainChanged()
   pqSMAdaptor::PropertyType type;
   type = pqSMAdaptor::getPropertyType(this->Internal->Property);
   QList<QVariant> range;
-  if(type == pqSMAdaptor::SINGLE_ELEMENT)
+  int idx = type == pqSMAdaptor::MULTIPLE_ELEMENTS ? this->Internal->Index : 0;
+
+  range = pqSMAdaptor::getMultipleElementPropertyDomain(this->Internal->Property,
+                                                        idx);
+  if(range.size() == 2)
     {
-    range = pqSMAdaptor::getElementPropertyDomain(this->Internal->Property);
-    if(range.size() == 2)
-      {
-      int min = range[0].toInt();
-      int max = range[1].toInt();
-      if(range[0].type() == QVariant::Int)
-        {
-        //spinbox->setSingleStep( (max - min) / 50 );  // arbitrary
-        spinbox->setSingleStep(1);
-        }
-      else
-        {
-        spinbox->setSingleStep(1);
-        }
-      spinbox->setRange(min, max);
-      }
+    int min = range[0].canConvert(QVariant::Int) ?
+      range[0].toInt() : VTK_INT_MIN;
+    int max = range[1].canConvert(QVariant::Int) ?
+      range[1].toInt() : VTK_INT_MAX;
+    
+    spinbox->setSingleStep(1);
+    spinbox->setRange(min, max);
     }
-  else if(type == pqSMAdaptor::MULTIPLE_ELEMENTS)
-    {
-    range = pqSMAdaptor::getMultipleElementPropertyDomain(this->Internal->Property,
-                                                          this->Internal->Index);
-    if(range.size() == 2)
-      {
-      int min = range[0].toInt();
-      int max = range[1].toInt();
-      if(range[0].type() == QVariant::Int)
-        {
-        //spinbox->setSingleStep( (max - min) / 50 );  // arbitrary
-        spinbox->setSingleStep(1);
-        }
-      else
-        {
-        spinbox->setSingleStep(1);
-        }
-      spinbox->setRange(min, max);
-      }
-    }
+  
   this->Internal->MarkedForUpdate = false;
 }
 
