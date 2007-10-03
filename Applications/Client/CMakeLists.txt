@@ -120,6 +120,9 @@ IF(Q_WS_MAC)
 #    TARGET paraview${PV_EXE_SUFFIX}
 #    POST_BUILD
 #    COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/CompleteBundle.cmake")
+  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/CreateBundleDuringMakeInstall.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/CreateBundleDuringMakeInstall.cmake"
+    @ONLY IMMEDIATE)
 ENDIF(Q_WS_MAC)
 
 IF(WIN32)
@@ -521,3 +524,8 @@ ENDIF(NOT Q_WS_MAC)
 #   ENDIF(PV_NEED_SHARED_FORWARD)
 # ENDIF(WIN32)
 
+# Call this one last so that it happens after the above targets are all installed:
+#
+IF(Q_WS_MAC)
+  INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/CreateBundleDuringMakeInstall.cmake")
+ENDIF(Q_WS_MAC)

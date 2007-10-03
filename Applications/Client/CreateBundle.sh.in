@@ -1,31 +1,41 @@
 #!/bin/sh
 
-DEBUG=0
+DEBUG=1
 
 TAR_FLAG=
 if [ "x$DEBUG" = "x1" ]; then
   TAR_FLAG=v
 fi
 
-mkdir -p "@ParaView_BINARY_DIR@/paraview_bundle/paraview.app/Contents/Frameworks"
-mkdir -p "@ParaView_BINARY_DIR@/paraview_bundle/paraview.app/Contents/MacOS"
-mkdir -p "@ParaView_BINARY_DIR@/paraview_bundle/paraview.app/Contents/Resources"
-cd "@ParaView_BINARY_DIR@/paraview_bundle"
+ParaView_BINARY_DIR="@ParaView_BINARY_DIR@"
+PARAVIEW_VERSION=@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@.@PARAVIEW_VERSION_PATCH@
 
-echo "Copy ParaView bundle"
-(cd "@ParaView_BINARY_DIR@/bin" && tar c${TAR_FLAG}f - paraview.app) | tar xf -
-(cd "@ParaView_BINARY_DIR@/bin" && tar c${TAR_FLAG}f - pvserver pvdataserver pvrenderserver pvpython) | (cd paraview.app/Contents/MacOS && tar xf -)
+################################################################################
+#
+echo "Removing existing bundles"
+if [ -e "${ParaView_BINARY_DIR}/paraview_bundle" ]; then
+    rm -fr "${ParaView_BINARY_DIR}/paraview_bundle" 
+fi
+if [ -e "${ParaView_BINARY_DIR}/paraview-${PARAVIEW_VERSION}" ]; then
+    rm -fr "${ParaView_BINARY_DIR}/paraview-${PARAVIEW_VERSION}"
+fi
+echo "Creating ParaView bundle in ${ParaView_BINARY_DIR}..."
+mkdir -p "${ParaView_BINARY_DIR}/paraview_bundle/paraview.app/Contents/Frameworks"
+mkdir -p "${ParaView_BINARY_DIR}/paraview_bundle/paraview.app/Contents/MacOS"
+mkdir -p "${ParaView_BINARY_DIR}/paraview_bundle/paraview.app/Contents/Resources"
+cd "${ParaView_BINARY_DIR}/paraview_bundle"
+
+# Copy paraview.app from the build tree recursively
+(cd "${ParaView_BINARY_DIR}/bin" && tar c${TAR_FLAG}f - paraview.app) | tar xf -
 
 echo "Copy ParaView Documentation"
-(cd "@ParaView_BINARY_DIR@/" && tar c${TAR_FLAG}f - Documentation pqClient.adp) | (cd paraview.app/Contents/MacOS && tar xf -)
+(cd "${ParaView_BINARY_DIR}" && tar c${TAR_FLAG}f - Documentation pqClient.adp) | (cd paraview.app/Contents/MacOS && tar xf -)
 
 echo "Copy ParaView libraries"
-(cd "@ParaView_BINARY_DIR@/bin" && tar c${TAR_FLAG}f - *.dylib *.so) | (cd paraview.app/Contents/MacOS && tar xf - )
+(cd "${ParaView_BINARY_DIR}/bin" && tar c${TAR_FLAG}f - *.dylib *.so) | (cd paraview.app/Contents/MacOS && tar xf - )
 
 echo "Copy ParaView Python scripts"
-(cd "@ParaView_BINARY_DIR@/Utilities/VTKPythonWrapping" && tar c${TAR_FLAG}f - paraview) | (cd paraview.app/Contents/Resources && tar xf - )
-
-#exit
+(cd "${ParaView_BINARY_DIR}/Utilities/VTKPythonWrapping" && tar c${TAR_FLAG}f - paraview) | (cd paraview.app/Contents/Resources && tar xf - )
 
 QT_LIB_DIR="@QT_LIBRARY_DIR@"
 QT_BIN_DIR="$(dirname @QT_MOC_EXECUTABLE@)"
@@ -50,32 +60,38 @@ if [ -e paraview.app/Contents/MacOS/pvpython ]; then
 fi
 SUB_EXECUTABLES="${SUB_EXECUTABLES} paraview.app/Contents/MacOS/assistant.app/Contents/MacOS/assistant"
 
+################################################################################
+#
+echo ""
+echo "Fixups using install_name_tool..."
+echo ""
 echo "Stage 1 - fix all the Qt dylib's"
-for a in ${QT_LIB_DIR}/*.dylib; do
-  if [ -e $a  ]; then
+
+for a in $(cd "${QT_LIB_DIR}" && ls *.dylib); do
+  if [ -e "${QT_LIB_DIR}/$a" ]; then
       echo -n .
-      file=$(basename $a)
+      file=$(basename "${QT_LIB_DIR}/$a")
       for executable in ${EXECUTABLES}; do
-          install_name_tool "${executable}" -change $a @executable_path/${file}
+          install_name_tool "${executable}" -change "${QT_LIB_DIR}/$a" @executable_path/${file}
       done
       for executable in ${SUB_EXECUTABLES}; do
-          install_name_tool "${executable}" -change $a @executable_path/../../../${file}
+          install_name_tool "${executable}" -change "${QT_LIB_DIR}/$a" @executable_path/../../../${file}
       done
       install_name_tool paraview.app/Contents/MacOS/${file} -id @executable_path/${file}
       
       if [ "x$DEBUG" = "x1" ]; then
-          echo "Stage 1.a.$a"
+          echo "Stage 1.a.${QT_LIB_DIR}/$a"
       fi
-      for lib in @ParaView_BINARY_DIR@/bin/*.so @ParaView_BINARY_DIR@/bin/*.dylib; do
-          libfile=$(basename ${lib})
-          install_name_tool paraview.app/Contents/MacOS/${file} -change ${lib} @executable_path/${libfile}
+      for lib in $(cd "${ParaView_BINARY_DIR}/bin" && ls *.so *.dylib); do
+          libfile=$(basename "${ParaView_BINARY_DIR}/bin/${lib}")
+          install_name_tool paraview.app/Contents/MacOS/${file} -change "${ParaView_BINARY_DIR}/bin/${lib}" @executable_path/${libfile}
       done
       if [ "x$DEBUG" = "x1" ]; then
-          echo "Stage 1.b.$a"
+          echo "Stage 1.b.${QT_LIB_DIR}/$a"
       fi
-      for lib in ${QT_LIB_DIR}/*.dylib; do
-          libfile=$(basename ${lib})
-          install_name_tool paraview.app/Contents/MacOS/${file} -change ${lib} @executable_path/${libfile}
+      for lib in $(cd "${QT_LIB_DIR}" && ls *.dylib); do
+          libfile=$(basename "${QT_LIB_DIR}/${lib}")
+          install_name_tool paraview.app/Contents/MacOS/${file} -change "${QT_LIB_DIR}/${lib}" @executable_path/${libfile}
       done
   fi
 done
@@ -86,49 +102,94 @@ if [ "x$VTK_USE_FFMPEG" = "xON" ]; then
     FFMPEG_LIB_DIR=`dirname $FFMPEG_LIB_DIR`
 
     echo ""
-    echo "Stage 1.a - Install FFMPEG libraries"
+    echo "Stage 1.c - Install FFMPEG libraries"
 
     echo "FFMPEG is ON, libdir: $FFMPEG_LIB_DIR"
-    for a in ${FFMPEG_LIB_DIR}/libavcodec*dylib* ${FFMPEG_LIB_DIR}/libavformat*dylib* ${FFMPEG_LIB_DIR}/libavutil*dylib*; do
-	echo -n .
-	cp $a  paraview.app/Contents/MacOS/
+    for a in $(cd "${FFMPEG_LIB_DIR}" && ls libavcodec*dylib* libavformat*dylib* libavutil*dylib*); do
+        echo -n .
+        cp "${FFMPEG_LIB_DIR}/$a"  paraview.app/Contents/MacOS/
     done
     echo "."
 fi
 
+
+################################################################################
+#
 echo ""
 echo "Stage 2 - Fix all the remaining dylib's"
-for a in @ParaView_BINARY_DIR@/bin/*.so @ParaView_BINARY_DIR@/bin/*.dylib ${FFMPEG_LIB_DIR}/libavcodec*dylib* ${FFMPEG_LIB_DIR}/libavformat*dylib* ${FFMPEG_LIB_DIR}/libavutil*dylib*; do
-    if [ -e $a ]; then
+
+for a in $(cd "${ParaView_BINARY_DIR}/bin" && ls *.so *.dylib); do
+    if [ -e "${ParaView_BINARY_DIR}/bin/$a" ]; then
         echo -n .
-        file=$(basename $a)
+        file=$(basename "${ParaView_BINARY_DIR}/bin/$a")
         for executable in ${EXECUTABLES}; do
-            install_name_tool "${executable}" -change $a @executable_path/${file}
+            install_name_tool "${executable}" -change "${ParaView_BINARY_DIR}/bin/$a" @executable_path/${file}
         done
         for executable in ${SUB_EXECUTABLES}; do
-            install_name_tool "${executable}" -change $a @executable_path/../../../${file}
+            install_name_tool "${executable}" -change "${ParaView_BINARY_DIR}/bin/$a" @executable_path/../../../${file}
         done
         install_name_tool paraview.app/Contents/MacOS/${file} -id @executable_path/${file}
-        
+
         if [ "x$DEBUG" = "x1" ]; then
-            echo "Stage 2.a.$a"
+            echo "Stage 2.a.${ParaView_BINARY_DIR}/bin/$a"
         fi
-        for lib in @ParaView_BINARY_DIR@/bin/*.dylib ${FFMPEG_LIB_DIR}/libavcodec*dylib* ${FFMPEG_LIB_DIR}/libavformat*dylib* ${FFMPEG_LIB_DIR}/libavutil*dylib*; do
-            libfile=$(basename ${lib})
-            install_name_tool paraview.app/Contents/MacOS/${file} -change ${lib} @executable_path/${libfile}
+        for lib in $(cd "${ParaView_BINARY_DIR}/bin" && ls *.so *.dylib); do
+            libfile=$(basename "${ParaView_BINARY_DIR}/bin/${lib}")
+            install_name_tool paraview.app/Contents/MacOS/${file} -change "${ParaView_BINARY_DIR}/bin/${lib}" @executable_path/${libfile}
+        done
+        for lib in $(cd "${FFMPEG_LIB_DIR}" && ls libavcodec*dylib* libavformat*dylib* libavutil*dylib*); do
+            libfile=$(basename "${FFMPEG_LIB_DIR}/${lib}")
+            install_name_tool paraview.app/Contents/MacOS/${file} -change "${FFMPEG_LIB_DIR}/${lib}" @executable_path/${libfile}
         done
         if [ "x$DEBUG" = "x1" ]; then
-            echo "Stage 2.b.$a"
+            echo "Stage 2.b.${ParaView_BINARY_DIR}/bin/$a"
         fi
-        for lib in ${QT_LIB_DIR}/*.dylib; do
-            libfile=$(basename ${lib})
-            install_name_tool paraview.app/Contents/MacOS/${file} -change ${lib} @executable_path/${libfile}
+        for lib in $(cd "${QT_LIB_DIR}" && ls *.dylib); do
+            libfile=$(basename "${QT_LIB_DIR}/${lib}")
+            install_name_tool paraview.app/Contents/MacOS/${file} -change "${QT_LIB_DIR}/${lib}" @executable_path/${libfile}
         done
     fi
 done
 
+for a in $(cd "${FFMPEG_LIB_DIR}" && ls libavcodec*dylib* libavformat*dylib* libavutil*dylib*); do
+    if [ -e "${FFMPEG_LIB_DIR}/$a" ]; then
+        echo -n .
+        file=$(basename "${FFMPEG_LIB_DIR}/$a")
+        for executable in ${EXECUTABLES}; do
+            install_name_tool "${executable}" -change "${FFMPEG_LIB_DIR}/$a" @executable_path/${file}
+        done
+        for executable in ${SUB_EXECUTABLES}; do
+            install_name_tool "${executable}" -change "${FFMPEG_LIB_DIR}/$a" @executable_path/../../../${file}
+        done
+        install_name_tool paraview.app/Contents/MacOS/${file} -id @executable_path/${file}
+
+        if [ "x$DEBUG" = "x1" ]; then
+            echo "Stage 2.a.${FFMPEG_LIB_DIR}/$a"
+        fi
+        for lib in $(cd "${ParaView_BINARY_DIR}/bin" && ls *.so *.dylib); do
+            libfile=$(basename "${ParaView_BINARY_DIR}/bin/${lib}")
+            install_name_tool paraview.app/Contents/MacOS/${file} -change "${ParaView_BINARY_DIR}/bin/${lib}" @executable_path/${libfile}
+        done
+        for lib in $(cd "${FFMPEG_LIB_DIR}" && ls libavcodec*dylib* libavformat*dylib* libavutil*dylib*); do
+            libfile=$(basename "${FFMPEG_LIB_DIR}/${lib}")
+            install_name_tool paraview.app/Contents/MacOS/${file} -change "${FFMPEG_LIB_DIR}/${lib}" @executable_path/${libfile}
+        done
+        if [ "x$DEBUG" = "x1" ]; then
+            echo "Stage 2.b.${FFMPEG_LIB_DIR}/$a"
+        fi
+        for lib in $(cd "${QT_LIB_DIR}" && ls *.dylib); do
+            libfile=$(basename "${QT_LIB_DIR}/${lib}")
+            install_name_tool paraview.app/Contents/MacOS/${file} -change "${QT_LIB_DIR}/${lib}" @executable_path/${libfile}
+        done
+    fi
+done
+
+
+################################################################################
+#
 echo ""
 echo "Stage 3 - Fix all the Qt Frameworks"
+
 for a in QtCore QtGui QtNetwork QtXml QtAssistant; do
   install_name_tool -id @executable_path/../Frameworks/$a.framework/Versions/4/$a paraview.app/Contents/Frameworks/$a.framework/Versions/4/$a
   for executable in ${EXECUTABLES}; do
@@ -154,6 +215,9 @@ for a in QtCore QtGui QtNetwork QtXml QtAssistant; do
   done
 done
 
+
+################################################################################
+#
 echo "Installing python libraries"
 mkdir paraview.app/Contents/Frameworks/Python.Framework
 # We are assuming that python is installed as a framework. This will fail otherwise.
@@ -163,9 +227,18 @@ if [ -e ${PYTHON_FRAMEWORK_ROOT}/Python ];  then
 elif [ -e ${PYTHON_FRAMEWORK_ROOT}/../../../Python ]; then
     python_root=${PYTHON_FRAMEWORK_ROOT}/../../..
 fi
+
 cp ${python_root}/Python paraview.app/Contents/Frameworks/Python.Framework
 chmod u+w paraview.app/Contents/Frameworks/Python.Framework/Python
 
+echo "Copying python lib folder"
+mkdir paraview.app/Contents/MacOS/lib
+PYTHON_LIB_FOLDER="${python_root}/Versions/Current/lib"
+cp -R "${PYTHON_LIB_FOLDER}" paraview.app/Contents/MacOS
+
+
+################################################################################
+#
 echo ""
 echo "Stage 4 - Fix all the Python Frameworks"
 for a in Python; do
@@ -175,27 +248,49 @@ for a in Python; do
       old_path=`otool -L ${lib_name} | grep $a | cut -f1 -d\( | grep -v :`
       install_name_tool -id @executable_path/../Frameworks/$a.framework/$a ${lib_name}
       for executable in ${EXECUTABLES}; do
-	  install_name_tool "${executable}" -change ${old_path}  @executable_path/../Frameworks/$a.framework/$a
+        install_name_tool "${executable}" -change ${old_path}  @executable_path/../Frameworks/$a.framework/$a
       done
       for executable in ${SUB_EXECUTABLES}; do
-	  install_name_tool "${executable}" -change ${old_path}  @executable_path/../Frameworks/$a.framework/$a
+        install_name_tool "${executable}" -change ${old_path}  @executable_path/../Frameworks/$a.framework/$a
       done
       
       if [ "x$DEBUG" = "x1" ]; then
-	  echo "Stage 3.a.$a"
+        echo "Stage 3.a.$a"
       fi
       for b in $(ls paraview.app/Contents/MacOS/*.dylib); do
-	  install_name_tool -change ${old_path}  @executable_path/../Frameworks/$a.framework/$a $b
+        install_name_tool -change ${old_path}  @executable_path/../Frameworks/$a.framework/$a $b
       done
       for b in $(ls paraview.app/Contents/MacOS/*.so); do
-	  install_name_tool -change ${old_path}  @executable_path/../Frameworks/$a.framework/$a $b
+        install_name_tool -change ${old_path}  @executable_path/../Frameworks/$a.framework/$a $b
       done
   fi
 done
 
-echo "Remove unnecessary stuff"
+
+################################################################################
+#
+# Needed to prevent assistant from loading modules (which causes errors if
+# the original qt source is present)
+#
+touch paraview.app/Contents/MacOS/assistant.app/Contents/Resources/qt.conf
+
+
+################################################################################
+#
+echo "Removing unnecessary files"
 rm -rf paraview.app/Contents/Frameworks/*.framework/Versions/Current/Headers
 rm -rf paraview.app/Contents/Frameworks/*.framework/*debug*
 rm -rf paraview.app/Contents/Frameworks/*.framework/*.prl
 rm -rf paraview.app/Contents/Frameworks/*.framework/Versions/Current/*debug*
-rm -rf paraview.app/Contents/MacOS/doc/CVS
+rm -rf paraview.app/Contents/MacOS/Documentation/CMakeFiles
+rm -rf paraview.app/Contents/MacOS/Documentation/DartTestfile.txt
+rm -rf paraview.app/Contents/MacOS/Documentation/Makefile
+rm -rf paraview.app/Contents/MacOS/Documentation/cmake_install.cmake
+
+
+################################################################################
+#
+cd "${ParaView_BINARY_DIR}"
+mv paraview_bundle paraview-${PARAVIEW_VERSION}
+
+echo "Done"
