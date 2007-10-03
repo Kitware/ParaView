@@ -91,7 +91,7 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
     }
 
   vtkSMProxyProperty* proxy = vtkSMProxyProperty::SafeDownCast(Property);
-  vtkSMVectorProperty* vectorProperty = 
+  vtkSMVectorProperty* VectorProperty = 
     vtkSMVectorProperty::SafeDownCast(Property);
   
   if(proxy)
@@ -155,7 +155,7 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
       type = pqSMAdaptor::FILE_LIST;
       }
     else if(stringListRangeDomain || 
-      (vectorProperty->GetRepeatCommand() && 
+      (VectorProperty && VectorProperty->GetRepeatCommand() && 
        (stringListDomain || enumerationDomain)))
       {
       type = pqSMAdaptor::SELECTION;
@@ -167,10 +167,6 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
       }
     else 
       {
-      vtkSMVectorProperty* VectorProperty;
-      VectorProperty = vtkSMVectorProperty::SafeDownCast(Property);
-
-      Q_ASSERT(VectorProperty != NULL);
       if(VectorProperty && 
         (VectorProperty->GetNumberOfElements() > 1 || VectorProperty->GetRepeatCommand()))
         {
