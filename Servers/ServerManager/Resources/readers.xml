@@ -2654,6 +2654,14 @@
          Specify the current mode shape with HasModeShapes in on.
        </Documentation>
      </IntVectorProperty>
+
+     <Property name="Refresh"
+               command="UpdateTimeInformation"
+               is_internal="1">
+       <Documentation>
+          Read in more time information if its available. Useful while running a simulation.
+       </Documentation>
+     </Property>
      
      <StringVectorProperty 
         name="EdgeBlockArrayInfo"
@@ -3216,6 +3224,10 @@
         default_values="0" > 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
+
+     <Hints>
+       <Property name="Refresh" show="0"/>
+     </Hints>
 
    <!-- End ExodusIIReader -->
    </SourceProxy>

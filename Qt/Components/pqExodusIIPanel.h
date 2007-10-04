@@ -68,6 +68,12 @@ protected slots:
   void materialItemChanged(QTreeWidgetItem*);
   void selectionItemChanged(QTreeWidgetItem*, const QString&);
 
+  // When the "Refresh" button is pressed, call a method on the reader
+  // which will cause the reader's TIME_STEPS() and TIME_RANGE() output
+  // information keys to update. Then "pull" their values from the server
+  // in order to update the pqTimeKeeper.
+  void onRefresh();
+
 protected:
   
   /// populate widgets with properties from the server manager

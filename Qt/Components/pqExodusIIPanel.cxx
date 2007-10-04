@@ -351,6 +351,10 @@ void pqExodusIIPanel::linkServerManagerProperties()
   QObject::connect(this->UI->MaterialArrayStatus,
     SIGNAL(itemChanged(QTreeWidgetItem*, int)),
     this, SLOT(materialItemChanged(QTreeWidgetItem*)));
+
+  QObject::connect(this->UI->Refresh,
+    SIGNAL(pressed()), this, SLOT(onRefresh()));
+
 }
   
 void pqExodusIIPanel::applyDisplacements(int state)
@@ -517,3 +521,16 @@ void pqExodusIIPanel::selectionItemChanged(QTreeWidgetItem* item,
 
 }
 
+void pqExodusIIPanel::onRefresh()
+{
+  vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(this->proxy());
+  vtkSMProperty *prop = sp->GetProperty("Refresh");
+
+  // The "Refresh" property has no values, so force an update this way
+  prop->SetImmediateUpdate(1);
+  prop->Modified();
+
+  // "Pull" the values
+  sp->UpdatePropertyInformation(sp->GetProperty("TimeRange"));
+  sp->UpdatePropertyInformation(sp->GetProperty("TimestepValues")); 
+}
