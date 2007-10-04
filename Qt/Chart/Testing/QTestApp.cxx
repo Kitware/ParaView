@@ -1,5 +1,8 @@
 
 #include "QTestApp.h"
+
+#include <stdio.h>
+
 #include <QTimer>
 #include <QWidget>
 #include <QKeyEvent>
