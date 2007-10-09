@@ -109,6 +109,8 @@ pqDisplayProxyEditor::pqDisplayProxyEditor(pqPipelineRepresentation* repr, QWidg
 {
   this->Internal = new pqDisplayProxyEditorInternal;
   this->Internal->setupUi(this);
+  this->Internal->StyleMaterial->hide();  // FIXME
+  this->Internal->StyleMaterialLabel->hide();  // FIXME
   this->setupGUIConnections();
 
   // setting a repr proxy will enable this
