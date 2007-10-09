@@ -256,7 +256,7 @@ public:
   // Given a group name, instantiate the related prototype. The
   // change in the prototype group is returned in difference.
   void instantiateGroupPrototypes(vtkstd::string groupName,
-                                  vtkstd::set<vtkstd::string>& difference);
+                                  vtkstd::vector<vtkstd::string>& difference);
 
   // Helper method: given a proxy name, looks up it's prototype in the given
   // group, gets the XMLLabel and adds an action to the given menu with
@@ -576,7 +576,7 @@ void pqMainWindowCore::pqImplementation::updateFiltersFromXML(const QString& xml
 
 void pqMainWindowCore::pqImplementation::instantiateGroupPrototypes(
   vtkstd::string groupName,
-  vtkstd::set<vtkstd::string>& difference)
+  vtkstd::vector<vtkstd::string>& difference)
 {
   difference.clear();
 
@@ -606,10 +606,10 @@ void pqMainWindowCore::pqImplementation::instantiateGroupPrototypes(
       proxySetAfter.insert(proxyIter->GetKey());
       proxyIter->Next();
       }
-    vtkstd::set<vtkstd::string> proxySetD;
-    vtkstd::set_difference(proxySetAfter.begin(),  proxySetAfter.end(),
-                           proxySetBefore.begin(), proxySetBefore.end(),
-                           vtkstd::inserter(difference, difference.begin()));
+    difference.resize(proxySetAfter.size());
+    difference.erase(vtkstd::set_difference(proxySetAfter.begin(),  proxySetAfter.end(),
+                     proxySetBefore.begin(), proxySetBefore.end(),
+                     difference.begin()), difference.end());
     }
   proxyIter->Delete();
 }
@@ -979,8 +979,8 @@ void pqMainWindowCore::refreshSourcesMenu()
 
     pqObjectBuilder* ob = pqApplicationCore::instance()->getObjectBuilder();
 
-    vtkstd::set<vtkstd::string> newSources;
-    vtkstd::set<vtkstd::string>::iterator iter;
+    vtkstd::vector<vtkstd::string> newSources;
+    vtkstd::vector<vtkstd::string>::iterator iter;
     this->Implementation->instantiateGroupPrototypes("sources", newSources);
     for(iter = newSources.begin(); iter != newSources.end(); ++iter)
       {
@@ -1010,13 +1010,13 @@ void pqMainWindowCore::refreshFiltersMenu()
 {
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
 
-  vtkstd::set<vtkstd::string> newFilters;
+  vtkstd::vector<vtkstd::string> newFilters;
   this->Implementation->instantiateGroupPrototypes("filters", newFilters);
   // We now add the new filters that were added to filters_prototypes:
   // these filters were added by a plugin
   if (!newFilters.empty())
     {
-    vtkstd::set<vtkstd::string>::iterator nfIter = newFilters.begin();
+    vtkstd::vector<vtkstd::string>::iterator nfIter = newFilters.begin();
     for(; nfIter != newFilters.end(); nfIter++)
       {
       vtkSMProxy* prototype = proxyManager->GetProxy("filters_prototypes",
