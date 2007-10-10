@@ -1237,8 +1237,8 @@
   </Proxy>
   <Proxy group="filters" type="CTHPart" id="1096">
     <Property name="AddUnsignedCharVolumeArrayName" id="1096.AddUnsignedCharVolumeArrayName" number_of_elements="2">
-      <Element index="0" value="Material volume fraction - 0"/>
-      <Element index="1" value="Material volume fraction - 1"/>
+      <Element index="0" value="Material volume fraction - 1"/>
+      <Element index="1" value="Material volume fraction - 2"/>
     </Property>
     <Property name="ClipPlane" id="1096.ClipPlane" number_of_elements="1">
       <Domain name="groups" id="1096.ClipPlane.groups">
@@ -1439,9 +1439,9 @@
   </Proxy>
   <Proxy group="sources" type="spcthreader" id="983">
     <Property name="CellArrayInfo" id="983.CellArrayInfo" number_of_elements="14">
-      <Element index="0" value="Mass (g) - 0"/>
+      <Element index="0" value="Mass (g) - 1"/>
       <Element index="1" value="1"/>
-      <Element index="2" value="Mass (g) - 1"/>
+      <Element index="2" value="Mass (g) - 2"/>
       <Element index="3" value="1"/>
       <Element index="4" value="X velocity (cm/s)"/>
       <Element index="5" value="1"/>
@@ -1449,15 +1449,15 @@
       <Element index="7" value="1"/>
       <Element index="8" value="Pressure (dynes/cm^2^)"/>
       <Element index="9" value="1"/>
-      <Element index="10" value="Material volume fraction - 0"/>
+      <Element index="10" value="Material volume fraction - 1"/>
       <Element index="11" value="1"/>
-      <Element index="12" value="Material volume fraction - 1"/>
+      <Element index="12" value="Material volume fraction - 2"/>
       <Element index="13" value="1"/>
     </Property>
     <Property name="CellArrayStatus" id="983.CellArrayStatus" number_of_elements="14">
-      <Element index="0" value="Mass (g) - 0"/>
+      <Element index="0" value="Mass (g) - 1"/>
       <Element index="1" value="1"/>
-      <Element index="2" value="Mass (g) - 1"/>
+      <Element index="2" value="Mass (g) - 2"/>
       <Element index="3" value="1"/>
       <Element index="4" value="X velocity (cm/s)"/>
       <Element index="5" value="1"/>
@@ -1465,18 +1465,18 @@
       <Element index="7" value="1"/>
       <Element index="8" value="Pressure (dynes/cm^2^)"/>
       <Element index="9" value="1"/>
-      <Element index="10" value="Material volume fraction - 0"/>
+      <Element index="10" value="Material volume fraction - 1"/>
       <Element index="11" value="1"/>
-      <Element index="12" value="Material volume fraction - 1"/>
+      <Element index="12" value="Material volume fraction - 2"/>
       <Element index="13" value="1"/>
       <Domain name="array_list" id="983.CellArrayStatus.array_list">
-        <String text="Mass (g) - 0"/>
         <String text="Mass (g) - 1"/>
+        <String text="Mass (g) - 2"/>
         <String text="X velocity (cm/s)"/>
         <String text="Z velocity (cm/s)"/>
         <String text="Pressure (dynes/cm^2^)"/>
-        <String text="Material volume fraction - 0"/>
         <String text="Material volume fraction - 1"/>
+        <String text="Material volume fraction - 2"/>
       </Domain>
     </Property>
     <Property name="DistributeFiles" id="983.DistributeFiles" number_of_elements="1">
