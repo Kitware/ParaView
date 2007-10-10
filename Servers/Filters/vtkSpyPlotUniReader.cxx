@@ -12,7 +12,7 @@
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.7");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.7.4.1");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -358,7 +358,7 @@ int vtkSpyPlotUniReader::ReadInformation()
         {
         vtksys_ios::ostringstream ostr;
         ostr << this->MaterialFields[variable->Material].Comment << " - " 
-             << variable->Index << ends;
+             << variable->Index+1 << ends;
         variable->Name = new char[ostr.str().size() + 1];
         strcpy(variable->Name, ostr.str().c_str());
         }
