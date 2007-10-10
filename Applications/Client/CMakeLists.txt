@@ -1,6 +1,7 @@
 PROJECT(pqClient)
 
 SET(QT_USE_QTASSISTANT TRUE)
+SET(QT_USE_QTNETWORK TRUE) # QtAssistant depends on it (only for linking)
 SET(QT_USE_QTUITOOLS TRUE)
 INCLUDE(${QT_USE_FILE})
 
