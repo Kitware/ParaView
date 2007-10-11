@@ -110,6 +110,7 @@ SET(VTK_COMMON_SOURCES
   ${VTK_SOURCE_DIR}/Common/vtkCollection.cxx
   ${VTK_SOURCE_DIR}/Common/vtkCollectionIterator.cxx
   ${VTK_SOURCE_DIR}/Common/vtkCommand.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkCommonInformationKeyManager.cxx
   ${VTK_SOURCE_DIR}/Common/vtkContourValues.cxx
   ${VTK_SOURCE_DIR}/Common/vtkCylindricalTransform.cxx
   ${VTK_SOURCE_DIR}/Common/vtkDataArray.cxx
@@ -411,6 +412,7 @@ SET(VTK_COMMON_ABSTRACTS
   ${VTK_SOURCE_DIR}/Common/vtkAbstractTransform
   ${VTK_SOURCE_DIR}/Common/vtkCallbackCommand
   ${VTK_SOURCE_DIR}/Common/vtkCommand
+  ${VTK_SOURCE_DIR}/Common/vtkCommonInformationKeyManager
   ${VTK_SOURCE_DIR}/Common/vtkDataArray
   ${VTK_SOURCE_DIR}/Common/vtkEventForwarderCommand
   ${VTK_SOURCE_DIR}/Common/vtkFunctionSet
@@ -529,6 +531,7 @@ SET(VTK_COMMON_WRAP_EXCLUDES
   ${VTK_SOURCE_DIR}/Common/vtkBoundingBox.cxx
   ${VTK_SOURCE_DIR}/Common/vtkCallbackCommand.cxx
   ${VTK_SOURCE_DIR}/Common/vtkCommand.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkCommonInformationKeyManager.cxx
   ${VTK_SOURCE_DIR}/Common/vtkDebugLeaksManager.cxx
   ${VTK_SOURCE_DIR}/Common/vtkErrorCode.cxx
   ${VTK_SOURCE_DIR}/Common/vtkEventForwarderCommand.cxx
