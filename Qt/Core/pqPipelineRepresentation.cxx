@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyProperty.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkMath.h"
 
 // Qt includes.
 #include <QList>
@@ -296,17 +297,21 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
     {
     double bounds[6];
     dataInfo->GetBounds(bounds);
-    double diameter =
-      sqrt( (bounds[1] - bounds[0]) * (bounds[1] - bounds[0]) +
-        (bounds[3] - bounds[2]) * (bounds[3] - bounds[2]) +
-        (bounds[5] - bounds[4]) * (bounds[5] - bounds[4]) );
-
-    int numCells = dataInfo->GetNumberOfCells();
-    double linearNumCells = pow( (double) numCells, (1.0/3.0) );
-    double unitDistance = diameter;
-    if (linearNumCells != 0.0)
+    double unitDistance = 1.0;
+    if(vtkMath::AreBoundsInitialized(bounds))
       {
-      unitDistance = diameter / linearNumCells;
+      double diameter =
+        sqrt( (bounds[1] - bounds[0]) * (bounds[1] - bounds[0]) +
+          (bounds[3] - bounds[2]) * (bounds[3] - bounds[2]) +
+          (bounds[5] - bounds[4]) * (bounds[5] - bounds[4]) );
+
+      int numCells = dataInfo->GetNumberOfCells();
+      double linearNumCells = pow( (double) numCells, (1.0/3.0) );
+      unitDistance = diameter;
+      if (linearNumCells != 0.0)
+        {
+        unitDistance = diameter / linearNumCells;
+        }
       }
     pqSMAdaptor::setElementProperty(
       repr->GetProperty("ScalarOpacityUnitDistance"),
