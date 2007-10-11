@@ -137,6 +137,26 @@ SET(VTK_COMMON_SOURCES
   ${VTK_SOURCE_DIR}/Common/vtkIdentityTransform.cxx
   ${VTK_SOURCE_DIR}/Common/vtkImplicitFunction.cxx
   ${VTK_SOURCE_DIR}/Common/vtkImplicitFunctionCollection.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformation.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationDataObjectKey.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationDoubleKey.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationDoubleVectorKey.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationExecutivePortKey.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationExecutivePortVectorKey.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationIdTypeKey.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationInformationKey.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationInformationVectorKey.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationIntegerKey.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationIntegerPointerKey.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationIntegerVectorKey.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationIterator.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationKey.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationKeyVectorKey.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationObjectBaseKey.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationRequestKey.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationStringKey.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationUnsignedLongKey.cxx
+  ${VTK_SOURCE_DIR}/Common/vtkInformationVector.cxx
   ${VTK_SOURCE_DIR}/Common/vtkInitialValueProblemSolver.cxx
   ${VTK_SOURCE_DIR}/Common/vtkInstantiator.cxx
   ${VTK_SOURCE_DIR}/Common/vtkIntArray.cxx
@@ -293,26 +313,6 @@ SET(VTK_FILTERS_SOURCES
   ${VTK_SOURCE_DIR}/Filtering/vtkImplicitSum.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkImplicitVolume.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkImplicitWindowFunction.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformation.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationDataObjectKey.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationDoubleKey.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationDoubleVectorKey.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationExecutivePortKey.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationExecutivePortVectorKey.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationIdTypeKey.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationInformationKey.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationInformationVectorKey.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationIntegerKey.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationIntegerPointerKey.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationIntegerVectorKey.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationIterator.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationKey.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationKeyVectorKey.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationObjectBaseKey.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationRequestKey.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationStringKey.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationUnsignedLongKey.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationVector.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkInterpolatedVelocityField.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkKochanekSpline.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkLine.cxx
@@ -416,6 +416,23 @@ SET(VTK_COMMON_ABSTRACTS
   ${VTK_SOURCE_DIR}/Common/vtkFunctionSet
   ${VTK_SOURCE_DIR}/Common/vtkHomogeneousTransform
   ${VTK_SOURCE_DIR}/Common/vtkImplicitFunction
+  ${VTK_SOURCE_DIR}/Common/vtkInformationDataObjectKey
+  ${VTK_SOURCE_DIR}/Common/vtkInformationDoubleKey
+  ${VTK_SOURCE_DIR}/Common/vtkInformationDoubleVectorKey
+  ${VTK_SOURCE_DIR}/Common/vtkInformationExecutivePortKey
+  ${VTK_SOURCE_DIR}/Common/vtkInformationExecutivePortVectorKey
+  ${VTK_SOURCE_DIR}/Common/vtkInformationIdTypeKey
+  ${VTK_SOURCE_DIR}/Common/vtkInformationInformationKey
+  ${VTK_SOURCE_DIR}/Common/vtkInformationInformationVectorKey
+  ${VTK_SOURCE_DIR}/Common/vtkInformationIntegerKey
+  ${VTK_SOURCE_DIR}/Common/vtkInformationIntegerPointerKey
+  ${VTK_SOURCE_DIR}/Common/vtkInformationIntegerVectorKey
+  ${VTK_SOURCE_DIR}/Common/vtkInformationKey
+  ${VTK_SOURCE_DIR}/Common/vtkInformationKeyVectorKey
+  ${VTK_SOURCE_DIR}/Common/vtkInformationObjectBaseKey
+  ${VTK_SOURCE_DIR}/Common/vtkInformationRequestKey
+  ${VTK_SOURCE_DIR}/Common/vtkInformationStringKey
+  ${VTK_SOURCE_DIR}/Common/vtkInformationUnsignedLongKey
   ${VTK_SOURCE_DIR}/Common/vtkInitialValueProblemSolver
   ${VTK_SOURCE_DIR}/Common/vtkLinearTransform
   ${VTK_SOURCE_DIR}/Common/vtkObjectBase
@@ -471,23 +488,6 @@ SET(VTK_FILTERS_ABSTRACTS
   ${VTK_SOURCE_DIR}/Filtering/vtkImageSource
   ${VTK_SOURCE_DIR}/Filtering/vtkImageToImageFilter
   ${VTK_SOURCE_DIR}/Filtering/vtkImageTwoInputFilter
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationDataObjectKey
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationDoubleKey
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationDoubleVectorKey
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationExecutivePortKey
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationExecutivePortVectorKey
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationIdTypeKey
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationInformationKey
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationInformationVectorKey
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationIntegerKey
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationIntegerPointerKey
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationIntegerVectorKey
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationKey
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationKeyVectorKey
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationObjectBaseKey
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationRequestKey
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationStringKey
-  ${VTK_SOURCE_DIR}/Filtering/vtkInformationUnsignedLongKey
   ${VTK_SOURCE_DIR}/Filtering/vtkLocator
   ${VTK_SOURCE_DIR}/Filtering/vtkMapper2D
   ${VTK_SOURCE_DIR}/Filtering/vtkMultiGroupDataSetAlgorithm
