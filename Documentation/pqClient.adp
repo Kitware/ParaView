@@ -38,10 +38,10 @@
   </section>
   <section ref="Documentation/EditMenu.html" title="Edit Menu">
     <keyword ref="Documentation/EditMenu.html">Edit menu</keyword>
-    <keyword ref="Documentation/EditMenu.html#Undo">Undo</keyword>
-    <keyword ref="Documentation/EditMenu.html#Redo">Redo</keyword>
-    <keyword ref="Documentation/EditMenu.html#UndoCamera">Undo Camera</keyword>
-    <keyword ref="Documentation/EditMenu.html#RedoCamera">Redo Camera</keyword>
+    <keyword ref="Documentation/EditMenu.html#UndoRedo">Undo</keyword>
+    <keyword ref="Documentation/EditMenu.html#UndoRedo">Redo</keyword>
+    <keyword ref="Documentation/EditMenu.html#UndoRedoCamera">Undo Camera</keyword>
+    <keyword ref="Documentation/EditMenu.html#UndoRedoCamera">Redo Camera</keyword>
     <keyword ref="Documentation/EditMenu.html#ChangeInput">Change Input</keyword>
     <keyword ref="Documentation/EditMenu.html#Delete">Delete</keyword>
     <keyword ref="Documentation/EditMenu.html#DeleteAll">Delete All</keyword>
@@ -52,10 +52,10 @@
     <keyword ref="Documentation/EditMenu.html#SelectPointsThrough">Select Points Through</keyword>
     <keyword ref="Documentation/EditMenu.html#Settings">Settings</keyword>
     <keyword ref="Documentation/EditMenu.html#ViewSettings">View Settings</keyword>
-    <section ref="Documentation/EditMenu.html#Undo" title="Undo"/>
-    <section ref="Documentation/EditMenu.html#Redo" title="Redo"/>
-    <section ref="Documentation/EditMenu.html#UndoCamera" title="Undo Camera"/>
-    <section ref="Documentation/EditMenu.html#RedoCamera" title="Redo Camera"/>
+    <section ref="Documentation/EditMenu.html#UndoRedo" title="Undo"/>
+    <section ref="Documentation/EditMenu.html#UndoRedo" title="Redo"/>
+    <section ref="Documentation/EditMenu.html#UndoRedoCamera" title="Undo Camera"/>
+    <section ref="Documentation/EditMenu.html#UndoRedoCamera" title="Redo Camera"/>
     <section ref="Documentation/EditMenu.html#ChangeInput" title="Change Input"/>
     <section ref="Documentation/EditMenu.html#Delete" title="Delete"/>
     <section ref="Documentation/EditMenu.html#DeleteAll" title="Delete All"/>
