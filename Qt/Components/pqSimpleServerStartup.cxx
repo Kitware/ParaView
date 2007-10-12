@@ -429,11 +429,17 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
             widget->setSingleStep(widget_step.toInt());
             if(widget_default == "random")
               {
-              vtkTimerLog* timerLog = vtkTimerLog::New();
-              unsigned long rseed = 
-                static_cast<unsigned long>(timerLog->GetUniversalTime()*1000);
+              // We need a seed that changes every execution. Get the
+              // universal time as double and then add all the bytes
+              // together to get a nice seed without causing any overflow.
+              long rseed = 0;
+              double atime = vtkTimerLog::GetUniversalTime()*1000;
+              char* tc = (char*)&atime;
+              for (unsigned int ic=0; ic<sizeof(double); ic++)
+                {
+                rseed += tc[ic];
+                }
               vtkMath::RandomSeed(rseed);
-              timerLog->Delete();
               widget->setValue(static_cast<int>(
                 vtkMath::Random(widget_min.toInt(), widget_max.toInt())));
               }
