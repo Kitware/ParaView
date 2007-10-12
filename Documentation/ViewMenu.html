@@ -1,0 +1,306 @@
+<html>
+<head>
+  <title>View Menu</title>
+  <link rel="stylesheet" type="text/css" href="ParaViewDoc.css"/>
+</head>
+
+<body>
+<div class="ProxyDocumentation">
+  <div class="ProxyHeading">
+    View Menu
+  </div>
+</div>
+
+<p>
+From the View menu you can modify the camera and center of rotation for the
+3D view. You can also toggle the visibility of the toolbars and various views
+and inspectors.
+
+<a name="Camera"/>
+<h2>Camera submenu</h2>
+<p>
+The entries on the Camera submenu are exactly the same as those on the <a href="CameraToolbar">Camera toolbar</a>.
+
+<a name="ShowCenter"/>
+<h2>Show Center</h2>
+<p>
+<table class="PropertiesTable" cellpadding="3">
+<tr><td><img src="ShowCenterButton.png"/></td><td>Toggle the visibility of the center of rotation axes. This is also available from the toolbar using the button shown on the left.</td></tr>
+</table>
+
+<a name="ResetCenter"/>
+<h2>Reset Center</h2>
+<p>
+<table class="PropertiesTable" cellpadding="3">
+<tr><td><img src="ResetCenterButton.png"/></td>
+<td>
+Set the center of rotation axes to be at the center of the axis-aligned
+bounding box for the data set selected in the Pipeline Browser. This is also
+available on the toolbar using the button shown to the left.
+</td>
+</table>
+
+<a name="PickCenter"/>
+<h2>Pick Center</h2>
+<p>
+<table class="PropertiesTable" cellpadding="3">
+<tr><td><img src="PickCenterButton.png"/></td>
+<td>
+Once you have selected Pick Center, you may click anywhere in the selected 3D
+view (highlighted in red) to choose a new center of rotation. If you click on
+a data set, the center of rotation will be set to the position on the surface
+of that dataset directly under the position of the mouse cursor. This option
+is also available on the toolbar using the button shown to the left.
+</td>
+</table>
+
+<a name="ShowColorLegend"/>
+<h2>Show Color Legend</h2>
+<p>
+This menu entry has the same behavior as the Color Legend toolbar button in
+the <a href="#ActiveVariableControls">Active Variable</a> toolbar.
+
+<a name="Toolbars"/>
+<h2>Toolbars submenu</h2>
+<p>
+Selecting an item in the Toolbars submenu toggles the visibility of the
+corresponding toolbar at the top of the ParaView user interface. The following toolbars are available.
+
+<a name="ActiveVariableControls"/>
+<h3>Active Variable Controls</h3>
+<p>
+The Active Variable Controls toolbar allows you to make modifications related
+to the active variable in a 3D view.
+<p align="center">
+<img src="ActiveVariableControlsToolbar.png"/>
+</p><br>
+<table class="PropertiesTable" border="1" cellpadding="3">
+<tr><td><img src="ColorLegendToolbarButton.png"></td><td>Toggle the visibility of the color legend for the active variable in the selected 3D view.</td></tr>
+<tr><td><img src="ActiveVariableSelection.png"></td><td>Select the active variable in the selected 3D view. This variable is used for coloring the dataset.</td></tr>
+</table>
+
+<a name="CameraControls"/>
+<h3>Camera Controls</h3>
+<p>
+The buttons in the Camera Controls toolbar controls the user's point of view
+in a 3D view.
+
+<p align="center">
+<img src="CameraControlsToolbar.png"/>
+</p><br>
+<table class="PropertiesTable" border="1" cellpadding="3">
+<tr><td><img src="ResetCameraButton.png"></td><td>Set the viewing position so that all visible datasets in the selected 3D view are within the viewing frustum. The viewing direction is not changed. Some datasets (or portions of them) may not be visible if they are obscured by another dataset closer to the viewing position.</td></tr>
+<tr><td><img src="View+XButton.png"></td><td>Set the viewing position to view the data along the +X axis.</td></tr>
+<tr><td><img src="View-XButton.png"></td><td>Set the viewing position to view the data along the -X axis.</td></tr>
+<tr><td><img src="View+YButton.png"></td><td>Set the viewing position to view the data along the +Y axis.</td></tr>
+<tr><td><img src="View-YButton.png"></td><td>Set the viewing position to view the data along the -Y axis.</td></tr>
+<tr><td><img src="View+ZButton.png"></td><td>Set the viewing position to view the data along the +Z axis.</td></tr>
+<tr><td><img src="View-ZButton.png"></td><td>Set the viewing position to view the data along the -Z axis.</td></tr>
+</table>
+
+<a name="CommonFilters"/>
+<h3>Common Filters</h3>
+<p>
+The most commonly-used filters are available in the Common Filters
+toolbar. Selecting a filter from the toolbar has the same effect as selecting
+it from the Filters menu. Not all filters may be applied to every dataset
+(the output of a reader, source, or filter); the buttons for those that are
+not applicable will be grayed out when a particular reader, source, or filter
+is selected.
+
+<p align="center">
+<img src="CommonFiltersToolbar.png"/>
+</p><br>
+
+<table class="PropertiesTable" border="1" cellpadding="3">
+<tr><td><img src="CalculatorButton.png"/></td><td>Apply the <a href="Calculator.html">Calculator</a> filter.</td></tr>
+<tr><td><img src="ContourButton.png"/></td><td>Apply the <a href="Contour.html">Contour</a> (or Isosurface) filter.</td></tr>
+<tr><td><img src="ClipButton.png"/></td><td>Apply the <a href="Clip.html">Clip</a> filter.</td></tr>
+<tr><td><img src="CutButton.png"/></td><td>Apply the <a href="Cut.html">Slice</a> filter.</td></tr>
+<tr><td><img src="ThresholdButton.png"/></td><td>Apply the <a href="Threshold.html">Threshold</a> filter.</td></tr>
+<tr><td><img src="ExtractGridButton.png"/></td><td>Apply the <a href="ExtractGrid.html">Extract Subset</a> filter.</td></tr>
+<tr><td><img src="GlyphButton.png"/></td><td>Apply the <a href="Glyph.html">Glyph</a> filter.</td></tr>
+<tr><td><img src="StreamlinesButton.png"/></td><td>Apply the <a href="StreamTracer.html">Stream Tracer</a> filter.</td></tr>
+<tr><td><img src="WarpVectorButton.png"/></td><td>Apply the <a href="WarpVector.html">Warp (vector)</a> filter.</td></tr>
+<tr><td><img src="GroupDataSetsButton.png"/></td><td>Apply the <a href="GroupDataSets.html">Group Datasets</a> filter.</td></tr>
+<tr><td><img src="UngroupDataSetsButton.png"/></td><td>Apply the <a href="ExtractLevel.html">Extract Group</a> filter.</td></tr>
+</table>
+
+<a name="CurrentTimeControls"/>
+<h3>Current Time Controls</h3>
+<p>
+Use the controls in this toolbar to specify the current time in this ParaView
+session.
+
+<p align="center">
+<img src="CurrentTimeControlsToolbar.png"/>
+</p><br>
+
+<table class="PropertiesTable" border="1" cellpadding="3">
+<tr><td><img src="TimeValueEntry.png"/></td><td>Enter a time value to jump to a particular point in an animation</td></tr>
+<tr><td><img src="TimeStepSpinBox.png"/></td><td>Use this spin box to select a time step from a dataset with time information.</td></tr>
+</table>
+
+<a name="Lookmarks"/>
+<h3>Lookmarks</h3>
+<p>
+The Lookmarks toolbar is empty by default. Buttons are added to it as
+lookmarks are created. See the <a href="Lookmarks.html#LookmarkToolbar">Lookmark Toolbar</a> section of the Lookmarks page
+for more information.
+
+<a name="MainControls"/>
+<h3>Main Controls</h3>
+<p>
+The controls in this toolbar allow you to perform some of the most basic
+tasks in the ParaView application.
+
+<p align="center">
+<img src="MainControlsToolbar.png"/>
+</p><br>
+
+<table class="PropertiesTable" border="1" cellpadding="3">
+<tr><td><img src="OpenDataFileButton.png"/></td><td>Open a data file to load a dataset into ParaView. Please see the <a href="ParaViewReaders.html">list of file formats</a> ParaView can read.</td></tr>
+<tr><td><img src="SaveDataFileButton.png"/></td><td>Save the dataset selected in the <a href="PipelineBrowser.html">Pipeline Browser</a> to a file. Please see the <a href="ParaViewWriters.html">list of file formats</a> in which ParaView can save data.</td></tr>
+<tr><td><img src="ConnectButton.png"/></td><td>Connect to an existing server or launch a server to which you wish to connect. See the <a href="FileMenu.html#Connect">Connect</a> entry on the File menu page for more information.</td></tr>
+<tr><td><img src="DisconnectButton.png"/></td><td>Disconnect from a server to which you are currently connected. See the <a href="FileMenu.html#Disconnect">Disconnect</a> entry on the File menu page for more information.</td></tr>
+<tr><td><img src="HelpButton.png"/></td><td>Display this Help browser.</td></tr>
+</table>
+
+<a name="Representation"/>
+<h3>Representation</h3>
+<p>
+The Representation toolbar contains only one item: the Representation
+menu. It is used for selecting the representation of the dataset selected in
+the Pipeline Browser.
+
+<p align="center">
+<img src="RepresentationToolbar.png"/>
+</p>
+
+<p>
+The following options are available from the Representation menu: Points,
+Wireframe, Surface, Outline, Volume (only for uniform rectilinear and
+unstructured datasets), and Surface with Edges. These are the same options
+available from the Display panel. See the <a
+href="Display.html#Style">Style</a> section of the Display panel page for
+more information.
+
+<a name="SelectionControls"/>
+<h3>Selection Controls</h3>
+<p>
+The item chosen in the Selection toolbar determines what happens when you
+click and drag the mouse in a 3D view. Items chosen in the selection modes
+(i.e., not Interaction) will be listed in the <a
+href="#SelectionInspector">Selection Inspector</a>. In any of the selection
+modes, left-clicking and dragging draws out a rectangle on the screen in
+which the selection happens. Selection only occurs on one dataset at a time.
+
+<p align="center">
+<img src="SelectionToolbar.png"/>
+</p><br>
+
+<table class="PropertiesTable" border="1" cellpadding="3">
+<tr><td><img src="InteractButton.png"/></td><td>Left-click and drag to rotate the dataset. Middle-click and drag to pan. Right-click and drag to zoom (down to zoom in, up to zoom out).</td></tr>
+<tr><td><img src="SelectCellsSurfaceButton.png"/></td><td>The cells/elements lying within the selection rectangle on the surface of the dataset are selected.</td></tr>
+<tr><td><img src="SelectPointsSurfaceButton.png"/></td><td>The points/nodes lying within the selection rectangle on the surface of the dataset are selected.</td></tr>
+<tr><td><img src="SelectCellsFrustumButton.png"/></td><td>The cells/elements lying within the selection rectangle all the way through the dataset are selected.</td></tr>
+<tr><td><img src="SelectPointsFrustumButton.png"/></td><td>The points/nodes lying within the selection rectangle all the way through the dataset are selected.</td></tr>
+</table>
+
+<a name="UndoRedoControls"/>
+<h3>Undo/Redo Controls</h3>
+<p>
+The buttons in the Undo/Redo toolbar allow you undo and redo actions you have
+performed in ParaView not related to moving the camera. Go <a
+href="Views.html#UndoRedoCamera">here</a> for undo/redo information as it
+applies to the camera.
+
+<p align="center">
+<img src="UndoRedoToolbar.png"/>
+</p>
+
+<table class="PropertiesTable" border="1" cellpadding="3">
+<tr><td><img src="UndoButton.png"/></td><td>Undo the last action performed in ParaView.</td></tr>
+<tr><td><img src="RedoButton.png"/></td><td>Redo the last undone action in ParaView.</td></tr>
+</table>
+
+<a name="VCRControls"/>
+<h3>VCR Controls</h3>
+<p>
+The VCR controls allow you to move through an animation that has already been
+created. Please see the <a href="Animation.html#AnimationToolbar">Animation
+Toolbar</a> section of the Animation page for a description of the various
+buttons.
+
+<a name="AnimationInspector"/>
+<h2>Animation Inspector</h2>
+<p>
+See the <a href="Animation.html">Animation</a> page.
+
+<a name="AnimationView"/>
+<h2>Animation View</h2>
+<p>
+See the <a href="Animation.html#AnimationView">Animatin View</a> section of
+the Animation page.
+
+<a name="ComparativeViewInspector"/>
+<h2>Comparative View Inspector</h2>
+<a>
+A Comparative View is essentially a one or two dimensional array of 3D
+Views. The extra controls for the Comparative View, beyond those for the 3D
+View, are exposed in the Comparative View Inspector panel. The controls on
+the Comparative View Inspector panel allow you to set up a parameter
+study. The Mode menu has two settings, Film Strip, and Comparative. In Film
+Strip mode, a single parameter, such as time, changes in each pane. In
+Comparative mode, two parameters are allowed to change, one ranges along the
+X axis of the array, and the other along the Y axis. Below this menu are
+controls which define the output grid size in the X and Y dimensions, and
+thus the total number of renderings. The Animated Source (X Axis) and, when
+in Comparative Mode, Animated Source (Y Axis) controls allow you to pick a
+particular filter, and a particular parameter of that filter to vary. At the
+bottom of the panel is a table that lets you control how the values of the
+parameter(s) will vary. Clicking on entries in this table brings up a dialog
+box that lets you choose the start and end values for the parameter, and the
+interpolation function used in between the two extremes.
+
+<p align="center">
+<img src="ComparativeView.png"/>
+</p>
+
+<a name="SelectionInspector"/>
+<h2>Selection Inspector</h2>
+See the <a href="SelectionInspector.html">Selection Inspector</a> page.
+
+<a name="LookmarkBrowser"/>
+<h2>Lookmark Browser</h2>
+<p>
+See the <a href="Lookmarks.html#LookmarkBrowser">Lookmark Browser</a> section
+on the Lookmarks page.
+
+<a name="LookmarkInspector"/>
+<h2>Lookmark Inspector</h2>
+<p>
+See the <a href="Lookmarks.html#LookmarkInspector">Lookmark Inspector</a>
+section on the Lookmarks page.
+
+<a name="ObjectInspector"/>
+<h2>Object Inspector</h2>
+<p>
+See the <a href="ObjectInspector.html">Object Inspector</a> page.
+
+<a name="PipelineBrowser"/>
+<h2>Pipeline Browser</h2>
+<p>
+See the <a href="PipelineBrowser.html">Pipeline Browser</a> page.
+
+<a name="StatisticsView"/>
+<h2>Statistics View</h2>
+<p>
+Selecting this entry toggles the visibility of the Statistics View. This view
+lists basic statistical information for each instance of a reader, source, or
+filter used in the current ParaView session, including its name several
+pieces of information about its output (i.e., the dataset type, the number of
+cells and points, the amount of memory it consumes, and its spatial bounds).
+
+</body>
+</html>
