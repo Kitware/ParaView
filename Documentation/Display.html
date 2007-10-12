@@ -11,14 +11,6 @@
   </div>
 </div>
 
-<p>
-<a href="#View">View section</a><br>
-<a href="#Color">Color section</a><br>
-<a href="#Style">Style selection</a><br>
-<a href="#Transformation">Transformation section</a><br>
-<a href="#Bar Chart View">Bar Chart view section</a><br>
-<a href="#XY Plot View">XY Plot view section</a><br> 
-<p>
 <a name="View"/>
 <h2>View</h2>
 The object inspector's Display tab contains user interface elements for
@@ -211,19 +203,22 @@ beside the color gradient.
 From the Representation menu in the style section of the Display tab,
 ParaView provides several options for how to display the geometry of the
 dataset. The options available regardless of the dataset type are Points,
-Wireframe, Surface, and Outline. Volume rendering (discussed later on this
-page) is only available for unstructured grid and uniform rectilinear grid
-(volume) datasets. Selecting Points displays the vertices of the dataset as
-points. The Wireframe option shows all the edges of the cells in the dataset
-as lines. If Surface is selected, the faces of the cells making up the
-exterior surface of the dataset are shown (and colored as specified in the
-"Color by" menu). For most dataset types, if Outline is selected, an
-axis-aligned bounding box is drawn, marking the minimum and maximum extents
-of the dataset in each dimension. If the dataset is curvilinear, then the
-outside edges of the dataset are drawn instead of an axis-aligned bounding
-box. Structured grids, rectilinear grids, and uniform rectilinear grids
-(images/volumes) default to being drawn using a Wireframe representation. All
-other dataset types default to being drawn as surfaces.
+Wireframe, Surface, Outline, and Surface with Edges. Volume rendering
+(discussed later on this page) is only available for unstructured grid and
+uniform rectilinear grid (volume) datasets. Selecting Points displays the
+vertices of the dataset as points. The Wireframe option shows all the edges
+of the cells in the dataset as lines. If Surface is selected, the faces of
+the cells making up the exterior surface of the dataset are shown (and
+colored as specified in the "Color by" menu). For most dataset types, if
+Outline is selected, an axis-aligned bounding box is drawn, marking the
+minimum and maximum extents of the dataset in each dimension. If the dataset
+is curvilinear, then the outside edges of the dataset are drawn instead of an
+axis-aligned bounding box. The Surface with Edges representation displays the
+surface of the dataset as the Surface option does; however, it also shows the
+outlines of the cells forming the surface of the dataset. Structured grids,
+rectilinear grids, and uniform rectilinear grids (images/volumes) default to
+being drawn using a Wireframe representation. All other dataset types default
+to being drawn as surfaces.
 
 <p>
 When the dataset is displayed as a surface, the Interpolation menu in this

@@ -15,7 +15,7 @@ more datasets.
   </div>
 </div>
 
-
+<a name="CreateLookmark"/>
 <h2>Creating a Lookmark</h2>
 <p align="center">
 <img src="CreateLookmarkDialog.png"/>
@@ -32,11 +32,12 @@ lookmark. Lookmarks created in one ParaView session are available in
 subsequent ParaView sessions unless they are deleted. (Accessing stored
 lookmarks and deleting existing lookmarks are discussed later on this page.)
 
+<a name="LookmarkToolbar"/>
 <h2>Lookmark Toolbar</h2>
 <p>
 One way to access lookmarks in the user interface (UI) is through the
 lookmark toolbar.  It is located on the right side of the ParaView
-application window by default and is visible when lookmarks have been
+application window by default, and it contains buttons when lookmarks have been
 created. It contains an icon for each lookmark. Hovering your mouse over an
 icon in the toolbar will display the lookmark's name in a help balloon, while
 right-clicking an icon will give the user the option to delete that lookmark,
@@ -45,6 +46,7 @@ lookmark (by displaying the "Create Lookmark" dialog), or display the
 Lookmark Browser. Left-clicking on an icon in the lookmark toolbar will apply
 that lookmark in the selected view.
 
+<a name="LookmarkBrowser"/>
 <h2>Lookmark Browser</h2>
 <p align="center">
 <img src="LookmarkBrowser.png"/>
@@ -61,6 +63,7 @@ the selected view. Finally, if the Lookmark Inspector (see next section) is
 open at the same time as the Lookmark Browser, the inspector will display the
 properties of the currently selected lookmark in the browser.
 
+<a name="LookmarkInspector"/>
 <h2>Lookmark Inspector</h2>
 <p align="center">
 <img src="LookmarkInspector.png"/>
@@ -77,12 +80,12 @@ lookmark inspector displays the pipeline that has been saved in the lookmark
 and that will be generated when the lookmark is applied. The name and
 description of a lookmark can be edited, but the "Save" button must be
 pressed for these changes to take effect. The user also has control over two
-properties of how lookmark behave when they are applied. When a lookmark is
+properties of how lookmarks behave when they are applied. When a lookmark is
 created, the time value and camera properties in the selected view are stored
 in the lookmark. When the lookmark is applied, these saved values (time value
 and/or camera properties) can be restored. This behavior is controlled by two
 checkboxes at the bottom of the Lookmark Inspector. By default, neither of
-these values are applied with the lookmark. If the user marks or unmarks one
+these values is applied with the lookmark. If the user marks or unmarks one
 of these checkboxes, then the Save button must be pressed for the changes to
 take effect next time the lookmark is applied.
 

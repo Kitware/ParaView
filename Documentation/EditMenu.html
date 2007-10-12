@@ -1,0 +1,107 @@
+<html>
+<head>
+  <title>Edit Menu</title>
+  <link rel="stylesheet" type="text/css" href="ParaViewDoc.css"/>
+</head>
+
+<body>
+<div class="ProxyDocumentation">
+  <div class="ProxyHeading">
+    Edit Menu
+  </div>
+</div>
+
+<p>
+From the Edit menu you can control settings for ParaView, undo and redo
+various actions, change the pipeline topology, and determine how the mouse
+interacts with the 3D view.
+
+<a name="UndoRedo"/>
+<h2>Undo / Redo</h2>
+<p>
+Undo the last action (or redo the last undone action) performed in ParaView
+not related to changing the point of view or orientation for viewing data in
+a 3D view. This is the same functionality provided by the <a
+href="ViewMenu#UndoRedoControls">Undo/Redo controls</a> toolbar.
+
+<a name="UndoRedoCamera"/>
+<h2>Undo / Redo Camera</h2>
+<p>
+Undo the last camera-related action (or redo the last undone action of this
+type). Camera-related actions include changing the viewpoint for looking at
+the data in the 3D scene (rotating, panning, zooming, selecting one of the
+axis-aligned views) or changing the orientation for viewing the data
+(rolling).
+
+<a name="ChangeInput"/>
+<h2>Change Input</h2>
+<p>
+Choose a new input for the item selected in the Pipeline Browser. This only
+works for filters in the pipeline since sources and readers do not have
+inputs.
+
+<p>
+See the <a href="PipelingBrowser.html#ChangeInput">Change Input</a> section
+of the Pipeline Browser page for more information.
+
+<a name="Delete"/>
+<h2>Delete</h2>
+<p>
+Remove the item selected in the Pipeline Browser from the visualization
+pipeline. This can only be done if the selected item is at the end of the
+pipeline (i.e., no filters are connected to it).
+
+<a name="DeleteAll"/>
+<h2>Delete All</h2>
+<p>
+This option removes any readers, sources, or filters you have created. This
+is the equivalent of going to the Properties tab for each data set and
+pressing the Delete button or selecting each data set in the Pipeline Browser
+and selecting Delete from the Edit menu (see above) for it.
+
+<a name="Interact"/>
+<h2>Interact</h2>
+<p>
+Click and drag in a 3D view to change the point of view or orientation for
+viewing the data set.
+
+<a name="SelectCellsOn"/>
+<h2>Select Cells On</h2>
+<p>
+Draw a selection rectangle to select cells located on the surface of a data
+set.
+
+<a name="SelectPointsOn"/>
+<h2>Select Points On</h2>
+<p>
+Draw a selection rectangle to select points located on the surface of a data
+set.
+
+<a name="SelectCellsThrough"/>
+<h2>Select Cells Through</h2>
+<p>
+Draw a selection rectangle to select cells through a data set regardless of
+their depth relative to the visible surface.
+
+<a name="SelectPointsThrough"/>
+<h2>Select Points Through</h2>
+<p>
+Draw a selection rectangle to select points through a data set regardless of
+their depth relative to the visible surface.
+
+<a name="Settings"/>
+<h2>Settings</h2>
+<p>
+Selecting this option displays a dialog box that controls the settings for
+the ParaView application as a whole. In the left column of the dialog box is
+a tree structure for selecting which settings to view and/or change.
+
+<a href="ViewSettings"/>
+<h2>View Settings</h2>
+<p>
+The View Settings entry in the Edit menu displays a dialog for changing
+properties of the selected view. The contents of this dialog change depending
+on which view type is selected.
+
+</body>
+</html>

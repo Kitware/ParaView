@@ -1,58 +1,115 @@
 set(PARAVIEW_HTML_DOCUMENTATION
   3DView.png
   3DViewTitleBarButtons.png
+  AboutDialog.png
+  ActiveVariableControlsToolbar.png
+  ActiveVariableSelection.png
+  AddPropertyLinkDialog.png
   AfterSwapViews.png
   Animation.html
   AnimationInspector.png
   AnimationToolbar.png
   BeforeSwapViews.png
+  CalculatorButton.png
+  CameraControlsToolbar.png
   CellData.png
   ChangeInput.png
+  ChooseServerDialog.png
+  ClipButton.png
   CloseViewButton.png
   ColorEditor.png
   ColorLegend.png
   ColorLegendToolbarButton.png
   ColorOpacityEditor.png
   ColorScalePresets.png
+  CommonFiltersToolbar.png
+  ComparativeView.png
+  ConfigureNewServerDialog.png
+  ConfigureServerCommandDialog.png
+  ConfigureServerManualDialog.png
+  ConnectButton.png
+  ContourButton.png
   CreateLookmarkDialog.png
   CreateViewButtons.png
+  CurrentTimeControlsToolbar.png
+  CutButton.png
+  DisconnectButton.png
+  DisconnectDialog.png
+  DisconnectReconnectDialog.png
   Display.html
   DisplayColorByArray.png
   DisplayColorSolid.png
   DisplayStyle.png
   DisplayTransformation.png
   DisplayView.png
+  EditMenu.html
   Exponential.png
+  ExtractGridButton.png
+  FileMenu.html
+  GlyphButton.png
+  GroupDataSetsButton.png
   GUIOverview.html
+  HelpButton.png
+  HelpMenu.html
   HistogramDisplayTab.png
   HistogramView.png
   index.html
   Information.html
   InformationTab.png
+  InteractButton.png
+  LabeledSelection.png
+  LinkManagerDialog.png
   LookmarkBrowser.png
   LookmarkButton.png
   LookmarkInspector.png
   Lookmarks.html
+  MainControlsToolbar.png
   MaximizeViewButton.png
   ObjectInspector.html
+  OpenDataFileButton.png
   ParaViewDoc.css
   ParaViewGUIOverview.png
   ParaViewLogo.png
+  PickCenterButton.png
   PipelineBrowser.html
   PipelineBrowser.png
   PointData.png
   Properties.html
   PropertiesButtons.png
   Ramp.png
+  ReaderSelectionDialog.png
+  RedoButton.png
   RedoCameraButton.png
+  RepresentationToolbar.png
+  ResetCameraButton.png
+  ResetCenterButton.png
   RestoreViewButton.png
   RightClickFilter.png
+  SaveDataFileButton.png
+  SelectCellsFrustumButton.png
+  SelectCellsSurfaceButton.png
+  SelectionInspector.html
+  SelectionInspector.png
+  SelectionToolbar.png
+  SelectPointsFrustumButton.png
+  SelectPointsSurfaceButton.png
+  SettingsGeneral.png
+  ShowCenterButton.png
   Sinusoidal.png
   SplitViewHorizontalButton.png
   SplitViewVerticalButton.png
   SpreadsheetView.png
   Step.png
+  StreamlinesButton.png
+  ThresholdButton.png
+  TimerLog.png
+  TimeStepSpinBox.png
+  TimeValueEntry.png
+  ToolsMenu.html
+  UndoButton.png
   UndoCameraButton.png
+  UndoRedoToolbar.png
+  UngroupDataSetsButton.png
   VCRBack.png
   VCRFirst.png
   VCRForward.png
@@ -60,8 +117,16 @@ set(PARAVIEW_HTML_DOCUMENTATION
   VCRLoop.png
   VCRPlay.png
   VCRPause.png
+  View+XButton.png
+  View-XButton.png
+  View+YButton.png
+  View-YButton.png
+  View+ZButton.png
+  View-ZButton.png
+  ViewMenu.html
   Views.html
   ViewTitleBarButtons.png
+  WarpVectorButton.png
   XYPlotDisplayTab.png
   XYPlotView.png
 )
