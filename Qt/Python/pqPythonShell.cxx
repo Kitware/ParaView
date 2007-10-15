@@ -51,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct pqPythonShell::pqImplementation
 {
   pqImplementation(QWidget* Parent) 
-    : Console(Parent) 
+    : Console(Parent), Interpreter(0)
   {
     this->VTKConnect = vtkEventQtSlotConnect::New();
   }
