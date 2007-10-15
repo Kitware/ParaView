@@ -21,7 +21,7 @@ propAdap.SetProperty(glyphSourceProxy.GetProperty("GlyphType"))
 if propAdap.GetPropertyType() != 1:
   print "ERROR: Wrong property type reported for GlyphType property of GlyphSource2D proxy."
   sys.exit(1)
-if propAdap.GetNumberOfEnumerationElements() != 10:
+if propAdap.GetNumberOfEnumerationElements() != 12:
   print "ERROR: Wrong number of enumeration elements reported for GlyphType property of GlyphSource2D proxy."
   sys.exit(1)
 if propAdap.GetEnumerationName(3) != "ThickCross":
