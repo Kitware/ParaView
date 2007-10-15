@@ -328,8 +328,11 @@ pqPipelineSource* pqReaderFactory::createReader(const QStringList& files,
 QString pqReaderFactory::getReaderType(const QString& filename, 
   pqServer* server)
 {
-  foreach(const pqReaderInfo &info, this->Internal->ReaderList)
+  // loop backwards, allowing extensions to be overloaded
+  int num = this->Internal->ReaderList.size();
+  for(int i=0; i<num; i++)
     {
+    const pqReaderInfo &info = this->Internal->ReaderList[num-i-1];
     if (info.canReadFile(filename, server))
       {
       return QString(info.PrototypeProxy->GetXMLName());
