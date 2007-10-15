@@ -22,6 +22,8 @@ The 2D Glyph source is used for generating a family of 2D glyphs, each of which 
          <Entry value="8" text="Diamond"/>
          <Entry value="9" text="Arrow"/>
          <Entry value="10" text="ThickArrow"/>
+         <Entry value="11" text="HookedArrow"/>
+         <Entry value="12" text="EdgeArrow"/>
        </EnumerationDomain>
        <Documentation>
          This property specifies the type of the 2D glyph.
