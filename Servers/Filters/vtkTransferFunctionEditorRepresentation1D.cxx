@@ -22,21 +22,16 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.12");
-
-vtkCxxSetObjectMacro(vtkTransferFunctionEditorRepresentation1D, Histogram,
-                     vtkIntArray);
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.13");
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorRepresentation1D::vtkTransferFunctionEditorRepresentation1D()
 {
-  this->Histogram = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorRepresentation1D::~vtkTransferFunctionEditorRepresentation1D()
 {
-  this->SetHistogram(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -136,6 +131,7 @@ void vtkTransferFunctionEditorRepresentation1D::UpdateHistogramImage()
     }
 
   this->HistogramImage->Modified();
+  this->UpdateHistogramMTime();
 }
 
 //----------------------------------------------------------------------------

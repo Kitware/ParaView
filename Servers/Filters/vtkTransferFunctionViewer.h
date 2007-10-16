@@ -282,7 +282,6 @@ protected:
   vtkInteractorStyleTransferFunctionEditor *InteractorStyle;
   vtkTransferFunctionEditorWidget *EditorWidget;
   vtkEventForwarderCommand *EventForwarder;
-  unsigned long HistogramMTime;
   vtkRectilinearGrid *Histogram;
 
 private:

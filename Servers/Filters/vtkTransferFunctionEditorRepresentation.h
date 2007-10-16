@@ -33,6 +33,7 @@
 class vtkActor;
 class vtkColorTransferFunction;
 class vtkImageData;
+class vtkIntArray;
 class vtkPolyData;
 class vtkPolyDataMapper;
 class vtkTexture;
@@ -137,6 +138,15 @@ public:
   // may be sized accordingly.
   virtual void SetBorderWidth(int width);
 
+  // Description:
+  // Set the int array containing the histogram (computed by the
+  // associated vtkTransferFunctionEditorWidget1D).
+  void SetHistogram(vtkIntArray* histogram);
+
+  // Description:
+  // Get the modified time associated with the histogram.
+  vtkGetMacro(HistogramMTime, unsigned long);
+
 protected:
   vtkTransferFunctionEditorRepresentation();
   ~vtkTransferFunctionEditorRepresentation();
@@ -160,9 +170,12 @@ protected:
   int ShowColorFunctionInHistogram;
   double VisibleScalarRange[2];
   int BorderWidth;
+  unsigned long HistogramMTime;
+  vtkIntArray *Histogram;
 
   void InitializeImage(vtkImageData *image);
   void UpdateActorSize(vtkActor *actor);
+  void UpdateHistogramMTime();
 
 private:
   vtkTransferFunctionEditorRepresentation(const vtkTransferFunctionEditorRepresentation&); // Not implemented.

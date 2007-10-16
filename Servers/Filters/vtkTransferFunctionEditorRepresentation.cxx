@@ -17,13 +17,14 @@
 #include "vtkActor.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkImageData.h"
+#include "vtkIntArray.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkTexture.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation, "1.12");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation, "1.13");
 
 vtkCxxSetObjectMacro(vtkTransferFunctionEditorRepresentation,
                      ColorFunction, vtkColorTransferFunction);
@@ -67,6 +68,10 @@ vtkTransferFunctionEditorRepresentation::vtkTransferFunctionEditorRepresentation
   this->VisibleScalarRange[1] = 0;
 
   this->BorderWidth = 0;
+
+  this->HistogramMTime = 0;
+
+  this->Histogram = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -81,6 +86,27 @@ vtkTransferFunctionEditorRepresentation::~vtkTransferFunctionEditorRepresentatio
   this->BackgroundImage->Delete();
   this->BackgroundMapper->Delete();
   this->BackgroundActor->Delete();
+  this->SetHistogram(NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentation::SetHistogram(
+  vtkIntArray *hist)
+{
+  if (this->Histogram != hist)
+    {
+    vtkIntArray *tmp = this->Histogram;
+    this->Histogram = hist;
+    if (this->Histogram != NULL)
+      {
+      this->Histogram->Register(this);
+      this->HistogramMTime = this->Histogram->GetMTime();
+      }
+    if (tmp != NULL)
+      {
+      tmp->UnRegister(this);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -195,6 +221,15 @@ void vtkTransferFunctionEditorRepresentation::InitializeImage(
       array->FillComponent(2, 0);
       array->FillComponent(3, 0);
       }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkTransferFunctionEditorRepresentation::UpdateHistogramMTime()
+{
+  if (this->Histogram)
+    {
+    this->HistogramMTime = this->Histogram->GetMTime();
     }
 }
 

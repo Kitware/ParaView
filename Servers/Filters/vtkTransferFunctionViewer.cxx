@@ -32,7 +32,7 @@
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.24");
+vtkCxxRevisionMacro(vtkTransferFunctionViewer, "1.25");
 vtkStandardNewMacro(vtkTransferFunctionViewer);
 
 //----------------------------------------------------------------------------
@@ -65,7 +65,6 @@ vtkTransferFunctionViewer::vtkTransferFunctionViewer()
   this->EditorWidget = NULL;
   this->EventForwarder = vtkEventForwarderCommand::New();
   this->Histogram = NULL;  
-  this->HistogramMTime = 0;
 
   this->EventForwarder->SetTarget(this);
 
@@ -431,7 +430,10 @@ void vtkTransferFunctionViewer::Render()
     {
     if (this->Histogram)
       {
-      if (this->Histogram->GetMTime() > this->HistogramMTime ||
+      vtkTransferFunctionEditorRepresentation *rep =
+        vtkTransferFunctionEditorRepresentation::SafeDownCast(
+          this->EditorWidget->GetRepresentation());
+      if (rep && this->Histogram->GetMTime() > rep->GetHistogramMTime() ||
           !this->EditorWidget->GetHistogram())
         {
         this->EditorWidget->SetHistogram(this->Histogram);
@@ -443,7 +445,6 @@ void vtkTransferFunctionViewer::Render()
           this->SetWholeScalarRange(range);
           this->SetVisibleScalarRange(this->GetWholeScalarRange());
           }
-        this->HistogramMTime = this->Histogram->GetMTime();
         }
       }
     else
@@ -825,7 +826,6 @@ void vtkTransferFunctionViewer::SetHistogram(vtkRectilinearGrid *histogram)
     if (this->Histogram)
       {
       this->Histogram->Register(this);
-      this->HistogramMTime = histogram->GetMTime();
       }
     if (tmpHist)
       {

@@ -29,18 +29,11 @@
 
 #include "vtkTransferFunctionEditorRepresentation.h"
 
-class vtkIntArray;
-
 class VTK_EXPORT vtkTransferFunctionEditorRepresentation1D : public vtkTransferFunctionEditorRepresentation
 {
 public:
   vtkTypeRevisionMacro(vtkTransferFunctionEditorRepresentation1D, vtkTransferFunctionEditorRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Set the int array containing the histogram (computed by the
-  // associated vtkTransferFunctionEditorWidget1D).
-  void SetHistogram(vtkIntArray* histogram);
 
   // Description:
   // Put together the necessary parts to display this 3D widget
@@ -59,8 +52,6 @@ protected:
   ~vtkTransferFunctionEditorRepresentation1D();
 
   void UpdateHistogramImage();
-
-  vtkIntArray *Histogram;
 
 private:
   vtkTransferFunctionEditorRepresentation1D(const vtkTransferFunctionEditorRepresentation1D&); // Not implemented.
