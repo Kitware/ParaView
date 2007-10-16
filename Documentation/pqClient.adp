@@ -214,5 +214,6 @@
   </section>
   <section ref="Documentation/ParaViewWriters.html" title="Writers">
   </section>
+  <section ref="Documentation/ExtendedHelp.html" title="Extended Help"/>
 </DCF>
 </assistantconfig> 
