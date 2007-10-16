@@ -20,7 +20,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMTimeStepsInformationHelper);
-vtkCxxRevisionMacro(vtkSMTimeStepsInformationHelper, "1.6");
+vtkCxxRevisionMacro(vtkSMTimeStepsInformationHelper, "1.7");
 
 //---------------------------------------------------------------------------
 vtkSMTimeStepsInformationHelper::vtkSMTimeStepsInformationHelper()
@@ -83,14 +83,6 @@ void vtkSMTimeStepsInformationHelper::UpdateProperty(
       dvp->SetElements(values);
       delete[] values;
       }
-    }
-  else if (numArgs == 1)
-    {
-    double *range = new double[2];
-    timeSteps.GetArgument(0, 0, range, 2);
-    dvp->SetElements(range);
-    delete[] range;
-    dvp->SetNumberOfElements(2);
     }
   else
     {
