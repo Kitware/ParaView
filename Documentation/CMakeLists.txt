@@ -44,6 +44,7 @@ set(PARAVIEW_HTML_DOCUMENTATION
   DisplayView.png
   EditMenu.html
   Exponential.png
+  ExtendedHelp.html
   ExtractGridButton.png
   FileMenu.html
   GlyphButton.png
@@ -67,6 +68,7 @@ set(PARAVIEW_HTML_DOCUMENTATION
   MaximizeViewButton.png
   ObjectInspector.html
   OpenDataFileButton.png
+  ParaViewBook_FrontCover_smaller.png
   ParaViewDoc.css
   ParaViewGUIOverview.png
   ParaViewLogo.png
