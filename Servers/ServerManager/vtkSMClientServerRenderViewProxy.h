@@ -48,6 +48,11 @@ public:
   // Overridden to pass the ViewPosition to the RenderSyncManager.
   virtual void SetViewPosition(int x, int y);
 
+  // Description:
+  // Get the value of the z buffer at a position. 
+  // This is necessary for picking the center of rotation.
+  virtual double GetZBufferValue(int x, int y);
+
 //BTX
 protected:
   vtkSMClientServerRenderViewProxy();

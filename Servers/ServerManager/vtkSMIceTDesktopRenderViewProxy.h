@@ -54,6 +54,11 @@ public:
   // It is the responsibility of the caller to delete the image data.
   virtual vtkImageData* CaptureWindow(int magnification);
 
+  // Description:
+  // Get the value of the z buffer at a position. 
+  // This is necessary for picking the center of rotation.
+  virtual double GetZBufferValue(int x, int y);
+
 //BTX
 protected:
   vtkSMIceTDesktopRenderViewProxy();

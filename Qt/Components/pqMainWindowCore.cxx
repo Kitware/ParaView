@@ -870,10 +870,21 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   pxm->InstantiateGroupPrototypes("filters");
 
 
+  QObject::connect(
+    &pqActiveView::instance(), SIGNAL(changed(pqView*)),
+    &this->Implementation->RenderViewPickHelper, SLOT(setView(pqView*)));
+
   QObject::connect(&this->Implementation->RenderViewPickHelper, 
                    SIGNAL(pickFinished(double, double, double)),
                    this, 
                    SLOT(pickCenterOfRotationFinished(double, double, double)));
+
+  QObject::connect(&this->Implementation->RenderViewPickHelper,
+    SIGNAL(enabled(bool)), 
+    this, SIGNAL(enablePickCenter(bool)));
+  QObject::connect(&this->Implementation->RenderViewPickHelper,
+    SIGNAL(picking(bool)), 
+    this, SIGNAL(pickingCenter(bool)));
 
   // Make the view manager non-blockable so that none of the views are disabled.
   pqProgressManager* progress_manager = 
@@ -2978,7 +2989,7 @@ void pqMainWindowCore::onSelectionChanged()
   this->updatePendingActions(server, source, numServers, pendingDisplays);
 
   // Update the reset center action.
-  emit this->enableModifyCenter(source != 0 && renderView != 0);
+  emit this->enableResetCenter(source != 0 && renderView != 0);
 
   // Update the save screenshot action.
   emit this->enableFileSaveScreenshot(server != 0 && view != 0);
@@ -3015,7 +3026,7 @@ void pqMainWindowCore::onActiveViewChanged(pqView* view)
   pqServer *server = this->getActiveServer();
 
   // Update the reset center action.
-  emit this->enableModifyCenter(source != 0 && renderView != 0);
+  emit this->enableResetCenter(source != 0 && renderView != 0);
 
   // Update the show center axis action.
   emit this->enableShowCenterAxis(renderView != 0);
@@ -3903,19 +3914,23 @@ void pqMainWindowCore::setMaxRenderWindowSize(const QSize& size)
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::pickCenterOfRotation()
+void pqMainWindowCore::pickCenterOfRotation(bool begin)
 {
-  pqRenderView* rm = qobject_cast<pqRenderView*>(
-    pqActiveView::instance().current());
-  if (!rm)
+ if (!qobject_cast<pqRenderView*>(pqActiveView::instance().current()))
     {
-    qDebug() << "No active render module. Cannot reset center of rotation.";
     return;
     }
 
-  this->Implementation->RenderViewPickHelper.setView(rm);
-  this->Implementation->RenderViewPickHelper.beginPick();  
+  if (begin)
+    {
+    this->Implementation->RenderViewPickHelper.beginPick();  
+    }
+  else
+    {
+    this->Implementation->RenderViewPickHelper.endPick();
+    }
 }
+
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::pickCenterOfRotationFinished(double x, double y, double z)

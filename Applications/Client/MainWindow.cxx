@@ -682,19 +682,22 @@ MainWindow::MainWindow() :
     &this->Implementation->Core, 
     SLOT(resetCenterOfRotationToCenterOfCurrentData()));
   QObject::connect(
-    this->Implementation->UI.actionPickCenter, SIGNAL(triggered()),
+    this->Implementation->UI.actionPickCenter, SIGNAL(toggled(bool)),
     &this->Implementation->Core, 
-    SLOT(pickCenterOfRotation()));
+    SLOT(pickCenterOfRotation(bool)));
 
   QObject::connect(
     &this->Implementation->Core, SIGNAL(enableShowCenterAxis(bool)),
     this, SLOT(onShowCenterAxisChanged(bool)), Qt::QueuedConnection);
   QObject::connect(
-    &this->Implementation->Core, SIGNAL(enableModifyCenter(bool)),
+    &this->Implementation->Core, SIGNAL(enableResetCenter(bool)),
     this->Implementation->UI.actionResetCenter, SLOT(setEnabled(bool)));
   QObject::connect(
-    &this->Implementation->Core, SIGNAL(enableModifyCenter(bool)),
+    &this->Implementation->Core, SIGNAL(enablePickCenter(bool)),
     this->Implementation->UI.actionPickCenter, SLOT(setEnabled(bool)));
+  QObject::connect(
+    &this->Implementation->Core, SIGNAL(pickingCenter(bool)),
+    this->Implementation->UI.actionPickCenter, SLOT(setChecked(bool)));
   
   connect(this->Implementation->UI.actionManage_Plugins,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onManagePlugins()));

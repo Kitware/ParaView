@@ -253,8 +253,10 @@ signals:
   void enableSourceCreate(bool);
   void enableFilterCreate(bool);
   void enableVariableToolbar(bool);
-  void enableModifyCenter(bool);
+  void enableResetCenter(bool);
+  void enablePickCenter(bool);
   void enableShowCenterAxis(bool);
+  void pickingCenter(bool);
   
   /** \todo Hide these private implementation details */
   void postAccept();
@@ -373,7 +375,7 @@ public slots:
 
   // Next mouse press in 3D window sets the center of rotation to 
   // the corresponding world coordinates.
-  void pickCenterOfRotation();
+  void pickCenterOfRotation(bool begin);
   void pickCenterOfRotationFinished(double x, double y, double z);
 
   // Set center axes visibility on active render view.

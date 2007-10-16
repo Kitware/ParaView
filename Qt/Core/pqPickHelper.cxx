@@ -183,6 +183,7 @@ int pqPickHelper::setPickOn(int selectionMode)
 
   this->Mode = selectionMode;
   emit this->modeChanged(this->Mode);
+  emit this->picking(true);
   return 1;
 }
 
@@ -223,6 +224,7 @@ int pqPickHelper::setPickOff()
   this->Internal->RenderView->getWidget()->setCursor(QCursor());
   this->Mode = INTERACT;
   emit this->modeChanged(this->Mode);
+  emit this->picking(false);
   return 1;
 }
 
@@ -271,18 +273,6 @@ void pqPickHelper::processEvents(unsigned long eventId)
   int* eventpos = rwi->GetEventPosition();
   switch(eventId)
     {
-    case vtkCommand::LeftButtonPressEvent:
-      this->Xs = eventpos[0];
-      if (this->Xs < 0) 
-        {
-        this->Xs = 0;
-        }
-      this->Ys = eventpos[1];
-      if (this->Ys < 0) 
-        {
-        this->Ys = 0;
-        }
-      break;
     case vtkCommand::LeftButtonReleaseEvent:
       this->Xe = eventpos[0];
       if (this->Xe < 0) 

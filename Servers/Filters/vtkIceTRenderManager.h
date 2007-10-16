@@ -57,6 +57,7 @@ class vtkIceTRenderer;
 class vtkIntArray;
 class vtkPerspectiveTransform;
 class vtkPKdTree;
+class vtkFloatArray;
 
 class VTK_EXPORT vtkIceTRenderManager : public vtkParallelRenderManager
 {
@@ -203,6 +204,10 @@ public:
   // DO NOT USE.  FOR INTERNAL USE ONLY.  DO NOT EXCEED RECOMMENDED DOSAGE.
   virtual void ForceImageWriteback();
 
+  // Description:
+  // Returns the Z buffer value at the given location. Cannot be called on the
+  // satellites, valid only on the root node.
+  float GetZBufferValue(int x, int y);
 protected:
   vtkIceTRenderManager();
   virtual ~vtkIceTRenderManager();
@@ -252,7 +257,8 @@ protected:
   // change.
   vtkDoubleArray *LastViewports;
 
-  vtkUnsignedCharArray *InflateImageBuffer;
+  int PhysicalViewport[4];
+  vtkFloatArray *ReducedZBuffer;
 
   // Description:
   // Convenience functions for determining IceT's logical viewports for

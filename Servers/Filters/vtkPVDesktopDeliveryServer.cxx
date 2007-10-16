@@ -18,13 +18,14 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkCallbackCommand.h"
 #include "vtkCamera.h"
 #include "vtkDoubleArray.h"
-#include "vtkLight.h"
+#include "vtkFloatArray.h"
 #include "vtkLightCollection.h"
+#include "vtkLight.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 #include "vtkSquirtCompressor.h"
 #include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
@@ -61,7 +62,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.9");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.10");
 vtkStandardNewMacro(vtkPVDesktopDeliveryServer);
 
 //----------------------------------------------------------------------------
@@ -79,6 +80,7 @@ vtkPVDesktopDeliveryServer::vtkPVDesktopDeliveryServer()
   this->Renderers = NULL;
 
   this->WindowIdRMIId = 0;
+  this->ReducedZBuffer = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -97,6 +99,11 @@ vtkPVDesktopDeliveryServer::~vtkPVDesktopDeliveryServer()
     {
     this->Controller->RemoveRMI(this->WindowIdRMIId);
     this->WindowIdRMIId = 0;
+    }
+  if (this->ReducedZBuffer)
+    {
+    this->ReducedZBuffer->Delete();
+    this->ReducedZBuffer=0;
     }
 }
 
@@ -605,7 +612,44 @@ void vtkPVDesktopDeliveryServer::ReadReducedImage()
   else
     {
     this->Superclass::ReadReducedImage();
+    if (this->CaptureZBuffer)
+      {
+      this->ReducedZBuffer = this->ReducedZBuffer? 
+        this->ReducedZBuffer : vtkFloatArray::New();
+      this->RenderWindow->GetZbufferData(0, 0, this->ReducedImageSize[0]-1,
+        this->ReducedImageSize[1]-1, this->ReducedZBuffer);
+      }
+    else if (this->ReducedZBuffer)
+      {
+      this->ReducedZBuffer->Delete();
+      this->ReducedZBuffer=0;
+      }
     }
+}
+
+//-----------------------------------------------------------------------------
+float vtkPVDesktopDeliveryServer::GetZBufferValue(int x, int y)
+{
+  if (this->ParallelRenderManager)
+    {
+    vtkErrorMacro("When running in parallel, ask the IceTRenderManager "
+      "for Z buffer value.");
+    return 0.0f;
+    }
+  
+  int width = this->ReducedImageSize[0];
+  int height = this->ReducedImageSize[1]; 
+  
+  if (x>=0 && y>=0 && x <width && y < height)
+    {
+    int index = y* (width) + x;
+    if (index < this->ReducedZBuffer->GetNumberOfTuples())
+      {
+      return this->ReducedZBuffer->GetValue(index);
+      }
+    }
+
+  return 1.0f;
 }
 
 //----------------------------------------------------------------------------

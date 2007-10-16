@@ -46,7 +46,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.25");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.26");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkCxxSetObjectMacro(vtkIceTRenderer, SortingKdTree, vtkPKdTree);
@@ -67,6 +67,7 @@ vtkIceTRenderer::vtkIceTRenderer()
   this->Context = vtkIceTContext::New();
   this->SetController(vtkMultiProcessController::GetGlobalController());
   this->PropVisibility = 0;
+  this->CollectDepthBuffer = 0;
 }
 
 vtkIceTRenderer::~vtkIceTRenderer()
@@ -219,8 +220,11 @@ void vtkIceTRenderer::DeviceRender()
     {
     case vtkIceTRenderManager::ComposeOperationClosest:
       icetInputOutputBuffers(ICET_COLOR_BUFFER_BIT | ICET_DEPTH_BUFFER_BIT,
-                             ICET_COLOR_BUFFER_BIT);
+        this->CollectDepthBuffer?
+        ICET_COLOR_BUFFER_BIT| ICET_DEPTH_BUFFER_BIT:
+        ICET_COLOR_BUFFER_BIT);
       break;
+
     case vtkIceTRenderManager::ComposeOperationOver:
       icetInputOutputBuffers(ICET_COLOR_BUFFER_BIT, ICET_COLOR_BUFFER_BIT);
       break;
@@ -645,6 +649,7 @@ void vtkIceTRenderer::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->vtkOpenGLRenderer::PrintSelf(os, indent);
 
+  os << indent << "CollectDepthBuffer: " << this->CollectDepthBuffer << endl;
   os << indent << "ComposeNextFrame: " << this->ComposeNextFrame << endl;
 
   os << indent << "ICE-T Context: " << this->Context << endl;
