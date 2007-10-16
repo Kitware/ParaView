@@ -554,6 +554,10 @@ MainWindow::MainWindow() :
     this->Implementation->UI.cameraToolbar->windowTitle());
 
   this->Implementation->ToolbarsMenu->addWidget(
+    this->Implementation->UI.axesToolbar,
+    this->Implementation->UI.axesToolbar->windowTitle());
+
+  this->Implementation->ToolbarsMenu->addWidget(
     this->Implementation->UI.commonFilters,
     this->Implementation->UI.commonFilters->windowTitle());
 
