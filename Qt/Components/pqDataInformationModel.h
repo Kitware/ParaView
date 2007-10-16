@@ -96,7 +96,8 @@ private:
     CellCount,
     PointCount,
     MemorySize,
-    Bounds
+    Bounds,
+    TimeSpan
     };
 };
 

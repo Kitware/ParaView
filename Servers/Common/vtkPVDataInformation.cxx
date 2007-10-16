@@ -40,11 +40,12 @@
 #include "vtkStructuredGrid.h"
 #include "vtkTable.h"
 #include "vtkUniformGrid.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.38");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.39");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -73,6 +74,8 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->CompositeDataClassName = 0;
   this->NumberOfDataSets = 0;
   this->NameSetToDefault = 0;
+  this->TimeSpan[0] = VTK_DOUBLE_MAX;
+  this->TimeSpan[1] = -VTK_DOUBLE_MAX;
 }
 
 //----------------------------------------------------------------------------
@@ -88,7 +91,6 @@ vtkPVDataInformation::~vtkPVDataInformation()
   this->CompositeDataInformation = NULL;
   this->PointArrayInformation->Delete();
   this->PointArrayInformation = NULL;
-  
   this->SetName(0);
   this->SetDataClassName(0);
   this->SetCompositeDataClassName(0);
@@ -114,6 +116,7 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Extent: " << this->Extent[0] << ", " << this->Extent[1]
      << ", " << this->Extent[2] << ", " << this->Extent[3]
      << ", " << this->Extent[4] << ", " << this->Extent[5] << endl;
+
   os << indent << "PointDataInformation " << endl;
   this->PointDataInformation->PrintSelf(os, i2);
   os << indent << "CellDataInformation " << endl;
@@ -138,6 +141,12 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
      << (this->DataClassName?this->DataClassName:"(none)") << endl;
   os << indent << "CompositeDataClassName: " 
      << (this->CompositeDataClassName?this->CompositeDataClassName:"(none)") << endl;
+
+  //DDM
+  os << indent << "TimeSpan: " 
+     << this->TimeSpan[0] << ", " << this->TimeSpan[1]
+     << endl;
+
 }
 
 //----------------------------------------------------------------------------
@@ -160,10 +169,11 @@ void vtkPVDataInformation::Initialize()
   this->FieldDataInformation->Initialize();
   this->CompositeDataInformation->Initialize();
   this->PointArrayInformation->Initialize();
-  
   this->SetName(0);
   this->SetDataClassName(0);
   this->SetCompositeDataClassName(0);
+  this->TimeSpan[0] = VTK_DOUBLE_MAX;
+  this->TimeSpan[1] = -VTK_DOUBLE_MAX;
 }
 
 //----------------------------------------------------------------------------
@@ -207,6 +217,11 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
     dataInfo->GetPointArrayInformation());
 
   this->SetName(dataInfo->GetName());
+
+  double *timespan;
+  timespan = dataInfo->GetTimeSpan();
+  this->TimeSpan[0] = timespan[0];
+  this->TimeSpan[1] = timespan[1];
 }
 
 //----------------------------------------------------------------------------
@@ -354,7 +369,17 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
     {
     this->FieldDataInformation->CopyFromFieldData(fd);
     }
+
+  //Copy time span from the dataset's producing algorithm
+  vtkInformation *pinfo = data->GetPipelineInformation();
+  if (pinfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()))
+    {    
+    double *times = pinfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+    this->TimeSpan[0] = times[0];
+    this->TimeSpan[1] = times[1];
+    }
 }
+
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromGenericDataSet(vtkGenericDataSet *data)
 {
@@ -503,7 +528,9 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
 
   vtkErrorMacro("Could not cast object to a known data set: " 
                 << (dobj?dobj->GetClassName():"(null"));
+
 }
+
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi)
 {
@@ -657,6 +684,16 @@ void vtkPVDataInformation::AddInformation(
   if (this->Name == NULL)
     {
     this->SetName(info->GetName());
+    }
+
+  double *times = info->GetTimeSpan(); 
+  if (times[0] < this->TimeSpan[0])
+    {
+    this->TimeSpan[0] = times[0];
+    }
+  if (times[1] > this->TimeSpan[1])
+    {
+    this->TimeSpan[1] = times[1];
     }
 }
 
@@ -975,6 +1012,8 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
   dcss.GetData(&data, &length);
   *css << vtkClientServerStream::InsertArray(data, length);
 
+  *css << vtkClientServerStream::InsertArray(this->TimeSpan, 2);
+
   *css << vtkClientServerStream::End;
 }
 
@@ -1141,4 +1180,11 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
     }
   dcss.SetData(&*data.begin(), length);
   this->FieldDataInformation->CopyFromStream(&dcss);
+
+  if(!css->GetArgument(0, 18, this->TimeSpan, 2))
+    {
+    vtkErrorMacro("Error parsing timespan.");
+    return;
+    }
+  
 }

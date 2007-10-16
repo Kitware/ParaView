@@ -56,6 +56,8 @@ struct pqSourceInfo
   double MemorySize;
   bool DataInformationValid;
   double Bounds[6];
+  double TimeSpan[2];
+
   QString DataTypeName;
 
   unsigned long MTime;
@@ -138,6 +140,25 @@ struct pqSourceInfo
         bounds = bounds.arg(this->Bounds[i], 0, 'g', 3);
         }
       return QVariant(bounds);
+      }
+    return QVariant("Unavailable");
+    }
+  QVariant getTimes() const
+    {
+    if (this->DataInformationValid)
+      {
+      if (this->TimeSpan[0] > this->TimeSpan[1])
+        {
+        QString times("[ALL]");
+        return QVariant(times);
+        }
+      else
+        {
+        QString times("[ %1, %2]");
+        times = times.arg(this->TimeSpan[0], 0, 'g', 3);
+        times = times.arg(this->TimeSpan[1], 0, 'g', 3);
+        return QVariant(times);
+        }
       }
     return QVariant("Unavailable");
     }
@@ -281,7 +302,7 @@ int pqDataInformationModel::rowCount(
 int pqDataInformationModel::columnCount(
   const QModelIndex &vtkNotUsed(parent) /*= QModelIndex()*/) const
 {
-  return 6;
+  return 7;
 }
 
 
@@ -354,6 +375,15 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
       }
     break;
 
+  case pqDataInformationModel::MemorySize:
+    // Memory.
+    switch(role)
+      {
+    case Qt::DisplayRole:
+      return info.getMemorySize();
+      }
+    break;
+
   case pqDataInformationModel::Bounds:
     // Spatial Bounds.
     switch (role)
@@ -361,13 +391,14 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     case Qt::DisplayRole:
       return info.getBounds();
       }
+    break;
 
-  case pqDataInformationModel::MemorySize:
-    // Memory.
-    switch(role)
+  case pqDataInformationModel::TimeSpan:
+    // Temporal Bounds and steps
+    switch (role)
       {
     case Qt::DisplayRole:
-      return info.getMemorySize();
+      return info.getTimes();
       }
     break;
 
@@ -403,6 +434,9 @@ QVariant pqDataInformationModel::headerData(int section,
 
       case pqDataInformationModel::Bounds:
         return QVariant("Spatial Bounds");
+
+      case pqDataInformationModel::TimeSpan:
+        return QVariant("Temporal Bounds");
         }
       break;
       }
@@ -488,8 +522,9 @@ void pqDataInformationModel::refreshModifiedData()
       iter->NumberOfCells = dataInfo->GetNumberOfCells();
       iter->NumberOfPoints =dataInfo->GetNumberOfPoints();
       iter->MemorySize = dataInfo->GetMemorySize()/1000.0;
+      dataInfo->GetBounds(iter->Bounds);      
+      dataInfo->GetTimeSpan(iter->TimeSpan);
       iter->DataInformationValid = true;
-      dataInfo->GetBounds(iter->Bounds);
 
       emit this->dataChanged(this->index(row_no, 0),
         this->index(row_no, 4));

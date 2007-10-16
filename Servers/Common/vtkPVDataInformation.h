@@ -83,7 +83,7 @@ public:
   vtkGetMacro(PolygonCount, int);
   vtkGetMacro(NumberOfDataSets, int);
   vtkGetVector6Macro(Bounds, double);
-
+  
   // Description:
   // Returns a string describing the datatype that can be directly
   // shown in a user interface.
@@ -130,6 +130,8 @@ public:
   // The least common class name of composite dataset blocks
   vtkGetStringMacro(CompositeDataClassName);
 
+  vtkGetVector2Macro(TimeSpan, double);
+
 protected:
   vtkPVDataInformation();
   ~vtkPVDataInformation();
@@ -159,6 +161,7 @@ protected:
   vtkIdType      PolygonCount;
   double         Bounds[6];
   int            Extent[6];
+  double         TimeSpan[2];
 
   char*          Name;
 
