@@ -1,6 +1,12 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="writers">
     <Proxy name="ParallelWriterBase" class="not-used">
+      <Documentation
+        short_help="Defines the interface for the parallel writers.">
+        This defines the interface for the parallel writers. One should not
+        try to create an instance of this proxy since it merely defines the
+        interface.
+      </Documentation>
       <!-- Base for parallel writers -->
       <SubProxy>
         <SourceProxy name="CompleteArrays" class="vtkCompleteArrays">
@@ -13,6 +19,9 @@
         name="FileName" 
         command="SetFileName"
         number_of_elements="1">
+        <Documentation>
+          The name of the file to be written.
+        </Documentation>
       </StringVectorProperty>
 
       <IntVectorProperty 
@@ -21,10 +30,22 @@
         number_of_elements="1"
         default_values="0">
         <IntRangeDomain name="range" min="0"/>
+        <Documentation>
+          The number of ghost levels to include in the output file(s). Note that
+          some writers (such as ExodusIIWriter) may not support writing ghost
+          levels.
+        </Documentation>
       </IntVectorProperty>
+      <!-- End of ParallelWriterBase -->
     </Proxy>
 
     <Proxy name="XMLWriterBase" class="not-used">
+      <Documentation
+        short_help="This defines the interface for XML-based vtk data files writer.">
+        This defines the interface for XML-based vtk data files writer. One should 
+        not try to create an instance of this proxy since it merely defines the
+        interface.
+      </Documentation>
       <!-- Base class for XML writers -->
       <IntVectorProperty 
         name="DataMode"
@@ -36,22 +57,39 @@
           <Entry value="1" text="Binary" />
           <Entry value="2" text="Appended" />
         </EnumerationDomain>
+        <Documentation>
+          The mode uses for writing the file's data i.e. ascii, binary, appended
+          binary.
+        </Documentation>
       </IntVectorProperty>
 
       <StringVectorProperty 
         name="FileName" 
         command="SetFileName"
         number_of_elements="1">
+        <Documentation>
+        The name of the file to be written.
+        </Documentation>
       </StringVectorProperty>
-
+      <!-- End of XMLWriterBase -->
     </Proxy>
 
     <Proxy name="DataWriterBase" class="not-used">
       <!-- Base for non-xml data writers -->
+      <Documentation
+        short_help="defines the interface for legacy vtk data files writer.">
+        This defines the interface for legacy vtk data files writer. One should 
+        not try to create an instance of this proxy since it merely defines the
+        interface.
+      </Documentation>
+
       <StringVectorProperty 
         name="FileName" 
         command="SetFileName"
         number_of_elements="1">
+       <Documentation>
+        The name of the file to be written.
+        </Documentation>
       </StringVectorProperty>
       
       <IntVectorProperty 
@@ -63,12 +101,22 @@
           <Entry value="1" text="Ascii" />
           <Entry value="2" text="Binary" />
         </EnumerationDomain>
+        <Documentation>
+          The type for the data file (i.e. ascii or binary).
+        </Documentation>
       </IntVectorProperty>
+      <!-- End of DataWriterBase -->
     </Proxy>
 
     <Proxy name="ParallelXMLWriterBase" class="not-used" 
       base_proxygroup="writers" base_proxyname="XMLWriterBase">
       <!-- Base for parallel XML writers -->
+      <Documentation
+        short_help="Defines the interface for XML-based parallel vtk data files writer.">
+        This defines the interface for XML-based parallel vtk data files writer. 
+        One should not try to create an instance of this proxy since it merely 
+        defines the interface.
+      </Documentation>
       <SubProxy>
         <SourceProxy name="CompleteArrays" class="vtkCompleteArrays">
           <InputProperty name="Input" command="SetInputConnection">
@@ -84,12 +132,21 @@
       <IntVectorProperty name="GhostLevel" command="SetGhostLevel"
         number_of_elements="1" default_values="0">
         <IntRangeDomain name="range" min="0"/>
+        <Documentation>
+          The number of ghost levels to include in the output file(s). 
+        </Documentation>
       </IntVectorProperty>
+      <!-- End of ParallelXMLWriterBase -->
     </Proxy>
 
     <PWriterProxy name="XMLPVDWriter" class="vtkXMLPVDWriter" 
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
-
+      <Documentation
+        short_help="Write ParaView data files (pvd).">
+        Writer to write ParaView data files (pvd). It is used to save all pieces
+        of a source/filter to a file with pieces spread across the server
+        processes. 
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -98,196 +155,339 @@
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          files.
+        </Documentation>
       </InputProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
+      <!-- End of XMLPVDWriter -->
     </PWriterProxy>
 
     <WriterProxy name="XMLPolyDataWriter" class="vtkXMLPolyDataWriter"
       base_proxygroup="writers" base_proxyname="XMLWriterBase">
+      <Documentation
+        short_help="Write poly data in a xml-based vtk data file.">
+        Writer to write poly data in a xml-based vtk data file. Cannot be used
+        for parallel writing.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkPolyData" />
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
+      <!-- End of XMLPolyDataWriter -->
     </WriterProxy>
 
     <WriterProxy name="XMLUnstructuredGridWriter" 
       class="vtkXMLUnstructuredGridWriter"
       base_proxygroup="writers" base_proxyname="XMLWriterBase">
+      <Documentation
+        short_help="Write unstructured grid in a xml-based vtk data
+        file.">
+        Writer to write unstructured grid in a xml-based vtk data file. Cannot be used
+        for parallel writing.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkUnstructuredGrid" />
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
+      <!-- End of XMLUnstructuredGridWriter -->
     </WriterProxy>
 
     <WriterProxy name="XMLStructuredGridWriter" 
       class="vtkXMLStructuredGridWriter"
       base_proxygroup="writers" base_proxyname="XMLWriterBase">
+      <Documentation
+        short_help="Write structured grid in a xml-based vtk data file." >
+        Writer to write structured grid in a xml-based vtk data file. Cannot be used
+        for parallel writing.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkStructuredGrid" />
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
+      <!-- End of XMLStructuredGridWriter -->
     </WriterProxy>
 
     <WriterProxy name="XMLRectilinearGridWriter" 
       class="vtkXMLRectilinearGridWriter"
       base_proxygroup="writers" base_proxyname="XMLWriterBase">
+      <Documentation
+        short_help="Write rectilinear grid in a xml-based vtk data file." >
+        Writer to write rectilinear grid in a xml-based vtk data file. Cannot be used
+        for parallel writing.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkRectilinearGrid" />
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
+      <!-- End of XMLRectilinearGridWriter -->
     </WriterProxy>
 
     <WriterProxy name="XMLImageDataWriter" 
       class="vtkXMLImageDataWriter"
       base_proxygroup="writers" base_proxyname="XMLWriterBase">
+      <Documentation
+        short_help="Write image data in a xml-based vtk data file.">
+        Writer to write image data in a xml-based vtk data file. Cannot be used
+        for parallel writing.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkImageData" />
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
+      <!-- End of XMLImageDataWriter -->
     </WriterProxy>
 
     <WriterProxy name="XMLMultiGroupDataWriter"
       class="vtkXMLMultiGroupDataWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
+      <Documentation
+        short_help="Write a multigroup dataset in a xml-based vtk data file.">
+        Writer to write a multigroup dataset in a xml-based vtk data file. 
+        Cannot be used for parallel writing.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="1">
           <DataType value="vtkMultiGroupDataSet" />
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
+      <!-- End of XMLMultiGroupDataWriter -->
     </WriterProxy>
 
     <PWriterProxy name="XMLPPolyDataWriter"
       class="vtkXMLPPolyDataWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
+      <Documentation
+        short_help="Write polydata in a xml-based vtk data file.">
+        Writer to write polydata in a xml-based vtk data file. Can be used
+        for parallel writing.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkPolyData" />
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
+      <!-- End of XMLPPolyDataWriter -->
     </PWriterProxy>
 
     <PWriterProxy name="XMLPUnstructuredGridWriter"
       class="vtkXMLPUnstructuredGridWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
+      <Documentation
+        short_help="Write unstructured grid in a xml-based vtk data file.">
+        Writer to write unstructured grid in a xml-based vtk data file. Can be used
+        for parallel writing.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkUnstructuredGrid" />
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
+      <!-- End of XMLPUnstructuredGridWriter -->
     </PWriterProxy>
 
     <PWriterProxy name="XMLPStructuredGridWriter"
       class="vtkXMLPStructuredGridWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
+      <Documentation
+        short_help="Write structured grid in a xml-based vtk data file.">
+        Writer to write structured grid in a xml-based vtk data file. Can be used
+        for parallel writing.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkStructuredGrid" />
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
+      <!-- End of XMLPStructuredGridWriter -->
     </PWriterProxy>
 
     <PWriterProxy name="XMLPRectilinearGridWriter"
       class="vtkXMLPRectilinearGridWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
+      <Documentation
+        short_help="Write rectilinear grid in a xml-based vtk data file.">
+        Writer to write rectilinear grid in a xml-based vtk data file. Can be used
+        for parallel writing.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkRectilinearGrid" />
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
+      <!-- End of XMLPRectilinearGridWriter -->
     </PWriterProxy>
 
     <PWriterProxy name="XMLPImageDataWriter"
       class="vtkXMLPImageDataWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
+      <Documentation
+        short_help="Write image data in a xml-based vtk data file.">
+        Writer to write image data in a xml-based vtk data file. Can be used
+        for parallel writing.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkImageData" />
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
+      <!-- End of XMLPImageDataWriter -->
     </PWriterProxy>
 
     <PWriterProxy name="XMLPMultiGroupDataWriter"
       class="vtkXMLPMultiGroupDataWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
+      <Documentation
+        short_help="Write a multigroup in a xml-based vtk data file.">
+        Writer to write a multigroup in a xml-based vtk data file. Can be used
+        for parallel writing.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="1">
           <DataType value="vtkMultiGroupDataSet" />
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
+      <!-- End of XMLPMultiGroupDataWriter -->
     </PWriterProxy>
 
     <WriterProxy name="DataSetWriter" class="vtkGenericDataObjectWriter"
       base_proxygroup="writers" base_proxyname="DataWriterBase">
+      <Documentation
+        short_help="Write any type of data object in a legacy vtk data file.">
+        Writer to write any type of data object in a legacy vtk data file. 
+        Cannot be used for parallel writing.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkDataObject" />
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
+      <!-- End of DataSetWriter -->
     </WriterProxy>
 
 
     <WriterProxy name="PLYWriter" class="vtkPLYWriter"
       base_proxygroup="writers" base_proxyname="DataWriterBase">
+      <Documentation
+        short_help="Write polygonal data in Stanford University PLY format.">
+        Writer to write polygonal data in Stanford University PLY format. The 
+        data can be written in either binary (little or big endian) or ASCII 
+        representation. As for PointData and CellData, vtkPLYWriter cannot 
+        handle normals or vectors. It only handles RGB PointData and CellData. 
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -296,16 +496,28 @@
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkPolyData"/>
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
         <Property name="FileType" show="0"/>
       </Hints>
+      <!-- End of PLYWriter -->
     </WriterProxy>
 
     <WriterProxy name="MetaImageWriter" class="vtkMetaImageWriter"
       base_proxygroup="writers" base_proxyname="DataWriterBase">
+      <Documentation
+        short_help="Write a binary UNC meta image data.">
+        Writer to write a binary UNC meta image data. This is a fairly simple 
+        yet powerful format consisting of a text header and a binary data 
+        section. 
+        MetaImage headers are expected to have extension: ".mha" or ".mhd"
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -314,16 +526,26 @@
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkImageData"/>
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
         <Property name="FileType" show="0"/>
       </Hints>
+      <!-- End of MetaImageWriter -->
     </WriterProxy>
 
     <WriterProxy name="PNGWriter" class="vtkPNGWriter"
       base_proxygroup="writers" base_proxyname="DataWriterBase">
+      <Documentation
+        short_help="Write image data as a PNG file.">
+        Writer to write image data as a PNG file. It supports 1 to 4 component
+        data of unsigned char or unsigned short.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -332,15 +554,24 @@
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkImageData"/>
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
         <Property name="FileType" show="0"/>
       </Hints>
+      <!-- End of PNGWriter -->
     </WriterProxy>
 
     <WriterProxy name="XdmfWriter" class="vtkXdmfWriter">
+      <Documentation
+        short_help="Writer data in Xdmf files.">
+        Writer to writer data in eXtensible Data Model and Format *(XDMF) files.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -349,6 +580,10 @@
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
 
       <StringVectorProperty 
@@ -360,10 +595,16 @@
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
+      <!-- End of XdmfWriter -->
     </WriterProxy>
 
     <PWriterProxy name="ExodusIIWriter" class="vtkExodusIIWriter"
       base_proxygroup="writers" base_proxyname="ParallelWriterBase">
+      <Documentation
+        short_help="Write Exodus II files.">
+        Writer to write Exodus II files. Refere to http://endo.sandia.gov/SEACAS/ 
+        for more information about the Exodus II format.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -372,22 +613,37 @@
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkUnstructuredGrid"/>
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
       <IntVectorProperty name="WriteAllTimeSteps"
         command="SetWriteAllTimeSteps"
         number_of_elements="1"
         default_values="0">
         <BooleanDomain name="bool" /> 
+        <Documentation>
+        When WriteAllTimeSteps is turned ON, the writer is executed 
+        once for each timestep available from the reader.
+        </Documentation>
       </IntVectorProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
         <Property name="GhostLevel" show="0"/>
       </Hints>
+      <!-- End of ExodusIIWriter -->
     </PWriterProxy>
 
     <PWriterProxy name="EnSightWriter" class="vtkEnSightWriter"
       base_proxygroup="writers" base_proxyname="ParallelWriterBase">
+      <Documentation
+        short_help="Write unstructured grid data as an EnSight file.">
+        Writer to write unstructured grid data as an EnSight file. Binary files 
+        written on one system may not be readable on other systems. Be sure to 
+        specify the endian-ness of the file when reading it into EnSight.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -396,16 +652,27 @@
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkUnstructuredGrid"/>
         </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
+      <!-- End of EnSightWriter -->
     </PWriterProxy>
 
     <Proxy name="AnimationSceneImageWriter" class="vtkSMAnimationSceneImageWriter">
+      <Documentation>
+        Writer to write animation images/movie.
+      </Documentation>
       <ProxyProperty name="AnimationScene"
         command="SetAnimationScene">
+        <Documentation>
+          The animation scene to write.
+        </Documentation>
       </ProxyProperty>
 
       <IntVectorProperty name="Magnification"
@@ -413,17 +680,30 @@
         number_of_elements="1"
         default_values="1">
         <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          The magnification factor to use for the saved animation.
+        </Documentation>
       </IntVectorProperty>
 
       <StringVectorProperty name="FileName"
         command="SetFileName"
         number_of_elements="1">
+        <Documentation>
+          The name of the file to save the animation into.
+        </Documentation>
       </StringVectorProperty>
 
       <DoubleVectorProperty name="FrameRate"
         command="SetFrameRate"
         number_of_elements="1"
         default_values="0">
+        <Documentation>
+          Get/Set the frame rate to use for saving the animation.
+          This frame rate is the frame rate that gets saved in the movie 
+          file generated, if applicable. If does not affect the FrameRate
+          set on the animation scene at all. In other words, this is the 
+          playback frame rate and not the animation generation frame rate.
+        </Documentation>
       </DoubleVectorProperty>
 
       <Hints>
@@ -434,6 +714,11 @@
     </Proxy>
 
     <XMLPVAnimationWriterProxy name="XMLPVAnimationWriter" class ="vtkXMLPVAnimationWriter">
+      <Documentation>
+        Internal writer proxy used when saving animation geometry to save all
+        parts of the current source to the file with pieces spread across the
+        server processes.
+      </Documentation>
       <InputProperty
         name="Input" 
         command="AddInputConnection"
@@ -443,9 +728,17 @@
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
       </InputProperty>
 
-      <StringVectorProperty name="FileName" command="SetFileName" />
+      <StringVectorProperty name="FileName" command="SetFileName" >
+        <Documentation>
+          Name of the file to write.
+        </Documentation>
+      </StringVectorProperty>
       
       <Property
         name="Start"
@@ -475,9 +768,13 @@
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
+      <!-- End of XMLPVAnimationWriter -->
     </XMLPVAnimationWriterProxy>
 
     <SummaryHelperProxy name="SummaryHelper" class="vtkPVSummaryHelper">
+      <Documentation>
+        Internal proxy used to synchronize writing for summary files.
+      </Documentation>
       <ProxyProperty name="Writer" command="SetWriter">
         <ProxyGroupDomain name="group">
           <Group name="writers" />
@@ -489,9 +786,14 @@
         command="SynchronizeSummaryFiles"
         immediate_update="1">
       </Property>
+      <!-- End of SummaryHelper -->
     </SummaryHelperProxy>
 
     <WriterProxy name="CSVWriter" class="vtkCSVWriter">
+      <Documentation
+        short_help="Write CSV files">
+        Writer to write CSV files. Cannot be used to write in parallel.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkRectilinearGrid" />
@@ -503,6 +805,9 @@
         name="FileName" 
         command="SetFileName"
         number_of_elements="1">
+        <Documentation>
+          The name of the file to write.
+        </Documentation>
       </StringVectorProperty>
 
       <Hints>
