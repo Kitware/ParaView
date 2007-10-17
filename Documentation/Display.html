@@ -316,33 +316,59 @@ which array controls the height of the bars in the bar chart.
 </p>
 
 <p>
-The above image shows the Display tab for an XY Plot view. In the Properties
-section is a drop-down menu labelled Attribute Mode. The options in this menu
-are Point Data and Cell Data. Selecting Point Data causes point-centered
+The above image shows the Display tab for an XY Plot view. At the top of this
+tab is a check box labeled "Show Line Series in Chart" for toggling the
+visibility of the data set in the XY Plot view. Below that check box is a
+drop-down menu labelled Attribute Mode. The options in this menu are Point
+Data and Cell Data. Selecting Point Data causes point-centered
 (node-centered) scalar variables to be displayed in the XY Plot; selecting
 Cell Data causes the plot to contain cell-centered (element-centered) scalar
 variables.
 
 <p>
 The X Axis section controls the scale of the X axis of the XY plot. If the
-"Use Y Array Index" checkbox is marked, then the X axis is an index over the
-number of point or cell scalar values being plotted. If this checkbox is not
-marked, then the Data Array Name drop-down menu becomes available. It
-contains the names either of all the point-centered or all the cell-centered
-scalar array names, depending on the selection from the Attribute Mode
-menu. Selecting an array name from the Data Array Menu uses the range of the
-scalar values in that array over the points being plotted as the values along
-the X axis. This allows for plotting one or more variables with respect to
-another one.
+"Use Y Array Index" radio button is selected, then the X axis is an index
+over the number of point or cell scalar values being plotted. If the Use Data
+Array radio button is selected instead, then the drop-down menu beside this
+radio button becomes available. It contains the names either of all the
+point-centered or all the cell-centered scalar array names, depending on the
+selection from the Attribute Mode menu. Selecting an array name from this
+drop-down menu uses the range of the scalar values in that array over the
+points being plotted as the values along the X axis. This allows for plotting
+one or more variables with respect to another one.
 
 <p>
-The Y Axis section controls which arrays are plotted and what color is used
-for drawing the line graph for that array. The checkbox to the left of each
-array name toggles the visibility of that array's line plot. The colored
-squares in the Color column (to the right of the array names) indicates the
-color used for drawing the associated line graph. Clicking in a colored
-square causes a color chooser dialog to appear, from which a new color for
-the associated variable's line plot may be selected.
+The Line Series section controls which arrays are plotted and the properties
+of the associated line in the XY plot. The checkbox to the left of each array
+name toggles the visibility of that array's line plot. The colored squares in
+the Legend Name column beside the name to show in the legend for that array
+indicates the color used for drawing the associated line graph. Clicking in a
+colored square causes a color chooser dialog to appear, from which a new
+color for the associated variable's line plot may be selected. For arrays
+(variables) with more than one component, the Component column lists which
+component (or the vector's magnitude) is being plotted; the entries in this
+column are actually menus from which a different component may be selected.
+
+<p>
+Below the list of variable names is a set of controls for specifying how the
+line for a particular variable should be drawn in the XY Plot view. These
+values of these controls may be different per variable. The first check box,
+Enable Line Series, has the same effect as the check box to the left of the
+array name in the Variable column: it toggles the visibility of the
+associated variable in the plot. Following that check box is a button labeled
+Line Color that allows you to choose the color for the line for the
+associated variable. It has the same effect as double-clicking the colored
+square for a particular variable in the Legend Name column.
+
+<p>
+Below the button for selecting the line color is a spin box for determining
+the the thickness of the line in the XY Plot view; larger values indicate
+thicker lines. Below the spin box is a Line Style drop-down menu; it provides
+you a few options for choosing how the line is drawn: as a solid line, as a
+dashed line, etc. The last drop-down menu in this section -- "Chart Axes" --
+let you choose which edges of the XY Plot should be labeled for this
+variable. The choices are Bottom-Left (the bottom and left edges of the XY
+Plot -- the default), Bottom-Right, Top-Left, and Top-Right.
 
 </body>
 </html>

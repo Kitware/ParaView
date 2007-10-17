@@ -5,6 +5,7 @@ set(PARAVIEW_HTML_DOCUMENTATION
   ActiveVariableControlsToolbar.png
   ActiveVariableSelection.png
   AddPropertyLinkDialog.png
+  AdjustCameraButton.png
   AfterSwapViews.png
   Animation.html
   AnimationInspector.png
@@ -43,6 +44,7 @@ set(PARAVIEW_HTML_DOCUMENTATION
   DisplayTransformation.png
   DisplayView.png
   EditMenu.html
+  EditViewOptionsButton.png
   Exponential.png
   ExtendedHelp.html
   ExtractGridButton.png
