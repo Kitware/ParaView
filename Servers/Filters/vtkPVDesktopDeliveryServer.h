@@ -35,6 +35,7 @@
 
 class vtkPVDesktopDeliveryServerRendererMap;
 
+class vtkFloatArray;
 class VTK_EXPORT vtkPVDesktopDeliveryServer : public vtkParallelRenderManager
 {
 public:
@@ -92,6 +93,19 @@ public:
   // Unused. This is here to provide the same API as the desktop delivery
   // client. This is required by the render module proxy.
   void SetSquirtLevel (int) {}
+
+  // Description:
+  // Capture Z buffer from render window on end render. Works only when
+  // ParallelRenderManager is 0.
+  vtkSetMacro(CaptureZBuffer, int);
+  vtkGetMacro(CaptureZBuffer, int);
+
+  // Description:
+  // Get Z buffer value from captured buffer, if any.
+  // This API for ZBuffer should not be used when ParallelRenderManager is set
+  // i.e. IceT is being used. In that case get the Z value from the
+  // IceTRenderManager.
+  float GetZBufferValue(int x, int y);
 
 //BTX
 
@@ -186,7 +200,9 @@ protected:
   int AnnotationLayer;
 
   int ImageResized;
+  int CaptureZBuffer;
 
+  vtkFloatArray* ReducedZBuffer;
   vtkUnsignedCharArray *SendImageBuffer;
   unsigned long WindowIdRMIId;
 

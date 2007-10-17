@@ -162,6 +162,14 @@ public:
   vtkSetVector4Macro(PhysicalViewport, int);
   vtkGetVector4Macro(PhysicalViewport, int);
 
+  // Description:
+  // Indicates if the depth buffer needs to be composited.
+  // This is needed only for picking. Don't enable this otherwise, since it
+  // causes considerable slow down.
+  vtkSetMacro(CollectDepthBuffer, int);
+  vtkGetMacro(CollectDepthBuffer, int);
+
+
 protected:
   vtkIceTRenderer();
   virtual ~vtkIceTRenderer();
@@ -172,6 +180,7 @@ protected:
   int ComposeNextFrame;
   int InIceTRender;
 
+  int CollectDepthBuffer;
   int Strategy;
   int ComposeOperation;
 

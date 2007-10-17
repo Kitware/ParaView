@@ -25,7 +25,6 @@
 #include "vtkDoubleArray.h"
 #include "vtkErrorCode.h"
 #include "vtkExtractSelectedFrustum.h"
-#include "vtkFloatArray.h"
 #include "vtkIdTypeArray.h"
 #include "vtkImageWriter.h"
 #include "vtkInformationDoubleKey.h"
@@ -90,7 +89,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.50");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.50.2.1");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -679,14 +678,7 @@ void vtkSMRenderViewProxy::SetBackgroundColorCM(double rgb[3])
 //----------------------------------------------------------------------------
 double vtkSMRenderViewProxy::GetZBufferValue(int x, int y)
 {
-  vtkFloatArray *array = vtkFloatArray::New();
-  double val;
-
-  array->SetNumberOfTuples(1);
-  this->GetRenderWindow()->GetZbufferData(x,y, x, y,
-                                     array);
-  val = array->GetValue(0);
-  array->Delete();
+  double val = this->GetRenderWindow()->GetZbufferDataAtPoint(x,y);
   return val;  
 }
 

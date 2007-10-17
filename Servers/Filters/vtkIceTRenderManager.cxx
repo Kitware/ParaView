@@ -94,7 +94,7 @@ static void vtkIceTRenderManagerReconstructWindowImage(vtkObject *,
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.40");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.40.2.1");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
@@ -253,19 +253,18 @@ void vtkIceTRenderManager::UpdateIceTContext()
       // displaySize should take into account render window's
       // tileScale. Later code assumes that the display size
       // includes it.
-      // KEN: On reviewing this code, I'm not sure that it is correct.
-      // displaySize is based on the full image size whereas the things it is
-      // compared to are based on the reduced image size.  I would guess that
-      // displaySize should be based on the reduced image size.  It may also
-      // make sense to make the condition above based on the reduced image size
-      // and get rid of the condition above it concerning the image reduction
-      // factor.  There is also little point to using the render window tile
-      // scale rather than the local TileDimensions ivar.
+      // KEN: On reviewing this code, the calculation is a bit "weird."  Why is
+      // the displaySize being calculated with the FullImageSize and then scaled
+      // by ImageReductionFactor?  Why not just use the ReducedImageSize?  It
+      // may also make sense to make the condition above based on the reduced
+      // image size and get rid of the condition above it concerning the image
+      // reduction factor.  There is also little point to using the render
+      // window tile scale rather than the local TileDimensions ivar.
       int displaySize[2];
       displaySize[0] = tileScale[0]* this->FullImageSize[0];
       displaySize[1] = tileScale[1]* this->FullImageSize[1];
-      displaySize[0] += int(this->TileDimensions[0]*this->TileMullions[0]*this->ImageReductionFactor);
-      displaySize[1] += int(this->TileDimensions[1]*this->TileMullions[1]*this->ImageReductionFactor);
+      displaySize[0] += int((this->TileDimensions[0]-1)*this->TileMullions[0]*this->ImageReductionFactor);
+      displaySize[1] += int((this->TileDimensions[1]-1)*this->TileMullions[1]*this->ImageReductionFactor);
 
       // Adjust the global viewport of the renderer.  That is convert the
       // normalized renderer viewport (as values between 0 and 1) to actual

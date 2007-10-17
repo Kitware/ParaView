@@ -80,6 +80,9 @@ signals:
   /// fired after mouse up in pick mode
   void pickFinished(double x, double y, double z);
 
+  /// fired by beginPick() and endPick().
+  void picking(bool);
+
   void enabled(bool enable);
 
   /// Fired with pick mode changes. 
@@ -90,7 +93,7 @@ protected:
   int setPickOn(int mode);
   int setPickOff();
   int Mode;
-  int Xs, Ys, Xe, Ye;
+  int Xe, Ye;
 
 private:
   class pqInternal;

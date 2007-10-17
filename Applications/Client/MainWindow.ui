@@ -1207,6 +1207,9 @@
    </property>
   </action>
   <action name="actionPickCenter" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
    <property name="enabled" >
     <bool>false</bool>
    </property>
