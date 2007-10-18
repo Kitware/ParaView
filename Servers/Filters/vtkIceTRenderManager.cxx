@@ -94,7 +94,7 @@ static void vtkIceTRenderManagerReconstructWindowImage(vtkObject *,
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.40.2.1");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.40.2.2");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
@@ -118,8 +118,6 @@ vtkIceTRenderManager::vtkIceTRenderManager()
   this->LastViewports = vtkDoubleArray::New();
   this->LastViewports->SetNumberOfComponents(4);
   this->LastViewports->SetNumberOfTuples(0);
-
-  this->InflateImageBuffer = vtkUnsignedCharArray::New();
 
   vtkCallbackCommand *cbc = vtkCallbackCommand::New();
   cbc->SetClientData(this);
@@ -153,7 +151,6 @@ vtkIceTRenderManager::~vtkIceTRenderManager()
   this->RecordIceTImageCallback->Delete();
   this->FixRenderWindowCallback->Delete();
   this->LastViewports->Delete();
-  this->InflateImageBuffer->Delete();
 }
 
 //-------------------------------------------------------------------------
