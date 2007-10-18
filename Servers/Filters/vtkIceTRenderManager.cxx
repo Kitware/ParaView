@@ -94,7 +94,7 @@ static void vtkIceTRenderManagerReconstructWindowImage(vtkObject *,
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.40.2.2");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.40.2.3");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
@@ -119,6 +119,8 @@ vtkIceTRenderManager::vtkIceTRenderManager()
   this->LastViewports->SetNumberOfComponents(4);
   this->LastViewports->SetNumberOfTuples(0);
 
+  this->ReducedZBuffer = vtkFloatArray::New();
+
   vtkCallbackCommand *cbc = vtkCallbackCommand::New();
   cbc->SetClientData(this);
   cbc->SetCallback(vtkIceTRenderManagerRecordIceTImage);
@@ -132,6 +134,11 @@ vtkIceTRenderManager::vtkIceTRenderManager()
   // Reload the controller so that we make an ICE-T context.
   this->Superclass::SetController(NULL);
   this->SetController(vtkMultiProcessController::GetGlobalController());
+
+  this->PhysicalViewport[0] = 
+    this->PhysicalViewport[1] = 
+    this->PhysicalViewport[2] = 
+    this->PhysicalViewport[3];
 
   this->EnableTiles = 0;
 }
@@ -151,6 +158,7 @@ vtkIceTRenderManager::~vtkIceTRenderManager()
   this->RecordIceTImageCallback->Delete();
   this->FixRenderWindowCallback->Delete();
   this->LastViewports->Delete();
+  this->ReducedZBuffer->Delete();
 }
 
 //-------------------------------------------------------------------------
@@ -1085,7 +1093,6 @@ void vtkIceTRenderManager::PostRenderProcessing()
 }
 
 //-----------------------------------------------------------------------------
-
 void vtkIceTRenderManager::RecordIceTImage(vtkIceTRenderer *icetRen)
 {
   int physicalViewport[4];
@@ -1161,6 +1168,29 @@ void vtkIceTRenderManager::RecordIceTImage(vtkIceTRenderer *icetRen)
     return;
     }
 
+  if (icetRen->GetCollectDepthBuffer())
+    {
+    memcpy(this->PhysicalViewport, physicalViewport, 4*sizeof(int));
+    
+    // Get depth buffer.
+    GLuint *zbuffer = (GLuint *)icetGetDepthBuffer();
+    if (zbuffer)
+      {
+      this->ReducedZBuffer->SetNumberOfComponents(1);
+      this->ReducedZBuffer->SetNumberOfTuples(width*height);
+      const float divisor = pow(2, 32) -1;
+      for (vtkIdType cc=0; cc < width* height; cc++)
+        {
+        this->ReducedZBuffer->SetValue(cc, zbuffer[cc]/divisor);
+        }
+      }
+    }
+  else if (this->ReducedZBuffer->GetNumberOfTuples() > 0)
+    {
+    this->ReducedZBuffer->Initialize();
+    }
+  
+
   this->Timer->StopTimer();
   this->ImageProcessingTime += this->Timer->GetElapsedTime();
 
@@ -1190,6 +1220,31 @@ void vtkIceTRenderManager::RecordIceTImage(vtkIceTRenderer *icetRen)
                        this->ReducedImage, this->ReducedImageSize,
                        fullImageViewport, physicalViewport);
     }
+}
+
+//-----------------------------------------------------------------------------
+// NOTE x,y are relative to the corner of the most recently rendered
+// view module (this is significant is case of multiviews).
+float vtkIceTRenderManager::GetZBufferValue(int x, int y)
+{
+  if (this->PhysicalViewport[0] == -1)
+    {
+    return 1.0f;
+    }
+
+  int width = this->PhysicalViewport[2]-this->PhysicalViewport[0];
+  int height = this->PhysicalViewport[3] - this->PhysicalViewport[1];
+  
+  if (x>=0 && y>=0 && x <width && y < height)
+    {
+    int index = y* (width) + x;
+    if (index < this->ReducedZBuffer->GetNumberOfTuples())
+      {
+      return this->ReducedZBuffer->GetValue(index);
+      }
+    }
+
+  return 1.0f;
 }
 
 //-----------------------------------------------------------------------------

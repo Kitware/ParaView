@@ -204,6 +204,10 @@ public:
   // DO NOT USE.  FOR INTERNAL USE ONLY.  DO NOT EXCEED RECOMMENDED DOSAGE.
   virtual void ForceImageWriteback();
 
+  // Description:
+  // Returns the Z buffer value at the given location. Cannot be called on the
+  // satellites, valid only on the root node.
+  float GetZBufferValue(int x, int y);
 protected:
   vtkIceTRenderManager();
   virtual ~vtkIceTRenderManager();
