@@ -71,6 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRepresentation.h"
 #include "pqServer.h"
 #include "pqSMAdaptor.h"
+#include "pqEventDispatcher.h"
 
 
 class pqPlotViewInternal
@@ -443,6 +444,11 @@ vtkImageData* pqPlotView::captureImage(int magnification)
   // vtkSMRenderViewProxy::CaptureWindow() ensures that render is called on the
   // view. Hence, we must explicitly call render here to be consistent.
   this->forceRender();
+
+  // Since charts don't update the view immediatetly, we need to process all the
+  // Qt::QueuedConnection slots which render the plots before capturing the
+  // image.
+  pqEventDispatcher::processEventsAndWait(0);
 
   QPixmap grabbedPixMap = QPixmap::grabWidget(this->getWidget());
   grabbedPixMap = grabbedPixMap.scaled(grabbedPixMap.size().width()*magnification,
