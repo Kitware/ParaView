@@ -3217,6 +3217,14 @@
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
+     <Property name="Refresh"
+               command="UpdateTimeInformation"
+               is_internal="1">
+       <Documentation>
+          Read in more time information if its available. Useful while running a simulation.
+       </Documentation>
+     </Property>
+
    <!-- End ExodusIIReader -->
    </SourceProxy>
 
