@@ -142,8 +142,6 @@ SET(VTK_COMMON_SOURCES
   ${VTK_SOURCE_DIR}/Common/vtkInformationDataObjectKey.cxx
   ${VTK_SOURCE_DIR}/Common/vtkInformationDoubleKey.cxx
   ${VTK_SOURCE_DIR}/Common/vtkInformationDoubleVectorKey.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkInformationExecutivePortKey.cxx
-  ${VTK_SOURCE_DIR}/Common/vtkInformationExecutivePortVectorKey.cxx
   ${VTK_SOURCE_DIR}/Common/vtkInformationIdTypeKey.cxx
   ${VTK_SOURCE_DIR}/Common/vtkInformationInformationKey.cxx
   ${VTK_SOURCE_DIR}/Common/vtkInformationInformationVectorKey.cxx
@@ -314,6 +312,8 @@ SET(VTK_FILTERS_SOURCES
   ${VTK_SOURCE_DIR}/Filtering/vtkImplicitSum.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkImplicitVolume.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkImplicitWindowFunction.cxx
+  ${VTK_SOURCE_DIR}/Filtering/vtkInformationExecutivePortKey.cxx
+  ${VTK_SOURCE_DIR}/Filtering/vtkInformationExecutivePortVectorKey.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkInterpolatedVelocityField.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkKochanekSpline.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkLine.cxx
@@ -421,8 +421,6 @@ SET(VTK_COMMON_ABSTRACTS
   ${VTK_SOURCE_DIR}/Common/vtkInformationDataObjectKey
   ${VTK_SOURCE_DIR}/Common/vtkInformationDoubleKey
   ${VTK_SOURCE_DIR}/Common/vtkInformationDoubleVectorKey
-  ${VTK_SOURCE_DIR}/Common/vtkInformationExecutivePortKey
-  ${VTK_SOURCE_DIR}/Common/vtkInformationExecutivePortVectorKey
   ${VTK_SOURCE_DIR}/Common/vtkInformationIdTypeKey
   ${VTK_SOURCE_DIR}/Common/vtkInformationInformationKey
   ${VTK_SOURCE_DIR}/Common/vtkInformationInformationVectorKey
@@ -490,6 +488,8 @@ SET(VTK_FILTERS_ABSTRACTS
   ${VTK_SOURCE_DIR}/Filtering/vtkImageSource
   ${VTK_SOURCE_DIR}/Filtering/vtkImageToImageFilter
   ${VTK_SOURCE_DIR}/Filtering/vtkImageTwoInputFilter
+  ${VTK_SOURCE_DIR}/Filtering/vtkInformationExecutivePortKey
+  ${VTK_SOURCE_DIR}/Filtering/vtkInformationExecutivePortVectorKey
   ${VTK_SOURCE_DIR}/Filtering/vtkLocator
   ${VTK_SOURCE_DIR}/Filtering/vtkMapper2D
   ${VTK_SOURCE_DIR}/Filtering/vtkMultiGroupDataSetAlgorithm
