@@ -1069,10 +1069,20 @@ bool pqRenderView::eventFilter(QObject* caller, QEvent* e)
       this->Internal->MouseOrigin = me->pos();
       }
     }
+  else if(e->type() == QEvent::MouseMove &&
+          !this->Internal->MouseOrigin.isNull())
+    {
+    QPoint newPos = static_cast<QMouseEvent*>(e)->pos();
+    QPoint delta = newPos - this->Internal->MouseOrigin;
+    if(delta.manhattanLength() < 3)
+      {
+      this->Internal->MouseOrigin = QPoint();
+      }
+    }
   else if(e->type() == QEvent::MouseButtonRelease)
     {
     QMouseEvent* me = static_cast<QMouseEvent*>(e);
-    if(me->button() & Qt::RightButton)
+    if(me->button() & Qt::RightButton && !this->Internal->MouseOrigin.isNull())
       {
       QPoint newPos = static_cast<QMouseEvent*>(e)->pos();
       QPoint delta = newPos - this->Internal->MouseOrigin;
@@ -1087,6 +1097,7 @@ bool pqRenderView::eventFilter(QObject* caller, QEvent* e)
           menu->popup(qobject_cast<QWidget*>(caller)->mapToGlobal(newPos));
           }
         }
+      this->Internal->MouseOrigin = QPoint();
       }
     }
   
