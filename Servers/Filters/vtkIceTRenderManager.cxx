@@ -94,7 +94,7 @@ static void vtkIceTRenderManagerReconstructWindowImage(vtkObject *,
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.42");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.43");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
@@ -1178,7 +1178,7 @@ void vtkIceTRenderManager::RecordIceTImage(vtkIceTRenderer *icetRen)
       {
       this->ReducedZBuffer->SetNumberOfComponents(1);
       this->ReducedZBuffer->SetNumberOfTuples(width*height);
-      const float divisor = pow(2, 32) -1;
+      const float divisor = pow((float)2, 32) -1;
       for (vtkIdType cc=0; cc < width* height; cc++)
         {
         this->ReducedZBuffer->SetValue(cc, zbuffer[cc]/divisor);
