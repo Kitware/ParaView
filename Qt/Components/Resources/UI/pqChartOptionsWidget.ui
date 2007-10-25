@@ -824,7 +824,7 @@
        <item row="1" column="1" >
         <widget class="QCheckBox" name="UseLogScale" >
          <property name="text" >
-          <string>Use Logarithmic Scale</string>
+          <string>Use Logarithmic Scale When Available</string>
          </property>
         </widget>
        </item>
