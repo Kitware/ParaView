@@ -110,6 +110,9 @@
         <property name="text" >
          <string>Edit Color Map</string>
         </property>
+        <property name="visible" >
+         <bool>false</bool>
+        </property>
        </widget>
       </item>
      </layout>
