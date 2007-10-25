@@ -100,8 +100,9 @@ public:
 
   // Description:
   // DataInformation is used by the source proxy to obtain information
-  // on the output(s) from the server. If \c update is false the pipeline wont
-  // be updated before gather the data information.
+  // on the output(s) from the server. 
+  // If \c update is false the pipeline will not 
+  // be updated before gathering the data information.
   vtkPVDataInformation* GetDataInformation()
   {
     return this->GetDataInformation(0, true);
