@@ -33,7 +33,7 @@ SET(MOC_INCLUDE_DIRS ${MOC_INCLUDE_DIRS} ${QT_QTDESIGNER_INCLUDE_DIR})
 GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
-QT4_WRAP_CPP(MOC_SRCS PrismToolBarActions.h)
+QT4_WRAP_CPP(MOC_SRCS PrismToolBarActions.h PrismCore.h PrismMenuActions.h)
 
 SET(UI_RESOURCES
   Resources/Prism.qrc
@@ -53,14 +53,15 @@ SOURCE_GROUP("Generated" FILES
   ${RCS_SOURCES}
 )
 
-# we implement a pqConePanel.h for the ConeSource
-ADD_PARAVIEW_ACTION_GROUP(IFACES IFACE_SRCS CLASS_NAME PrismToolBarActions 
-                          GROUP_NAME "ToolBar/PrismActions")
+ADD_PARAVIEW_ACTION_GROUP(TOOLBARIFACE TOOLBAR_IFACE_SRCS CLASS_NAME PrismToolBarActions 
+                          GROUP_NAME "ToolBar/Prism")
 
+ADD_PARAVIEW_ACTION_GROUP(MENUBARIFACE MENU_IFACE_SRCS CLASS_NAME PrismMenuActions 
+                          GROUP_NAME "MenuBar/Prism")
 # create a plugin for this panel
 ADD_PARAVIEW_PLUGIN(PrismClientPlugin "1.0" 
-                    GUI_INTERFACES ${IFACES} 
-                    SOURCES PrismToolBarActions.cxx ${RCS_SOURCES} ${MOC_SRCS} ${IFACE_SRCS})
+                    GUI_INTERFACES ${TOOLBARIFACE} ${MENUBARIFACE}
+                    SOURCES PrismToolBarActions.cxx PrismCore.cxx PrismMenuActions.cxx ${RCS_SOURCES} ${MOC_SRCS} ${TOOLBAR_IFACE_SRCS} ${MENU_IFACE_SRCS})
   
 
 ENDIF(QT4_FOUND)
