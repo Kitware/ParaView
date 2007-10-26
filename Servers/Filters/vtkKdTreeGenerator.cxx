@@ -18,6 +18,7 @@
 #include "vtkExtentTranslator.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
+#include "vtkInformationExecutivePortKey.h"
 #include "vtkKdNode.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
@@ -30,7 +31,7 @@
 class vtkKdTreeGeneratorVector : public vtkstd::vector<int> {};
 
 vtkStandardNewMacro(vtkKdTreeGenerator);
-vtkCxxRevisionMacro(vtkKdTreeGenerator, "1.3");
+vtkCxxRevisionMacro(vtkKdTreeGenerator, "1.4");
 vtkCxxSetObjectMacro(vtkKdTreeGenerator, ExtentTranslator, vtkExtentTranslator);
 vtkCxxSetObjectMacro(vtkKdTreeGenerator, KdTree, vtkPKdTree);
 //-----------------------------------------------------------------------------
@@ -80,7 +81,7 @@ int vtkKdTreeGenerator::BuildTree(vtkDataObject* data)
   vtkInformation* info = data->GetPipelineInformation();
   vtkStreamingDemandDrivenPipeline* sddp = 
     vtkStreamingDemandDrivenPipeline::SafeDownCast(
-      info->GetExecutive(vtkExecutive::PRODUCER()));
+      vtkExecutive::PRODUCER()->GetExecutive(info));
   if (sddp)
     {
     this->SetExtentTranslator(sddp->GetExtentTranslator(info));

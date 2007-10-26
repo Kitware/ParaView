@@ -21,8 +21,9 @@
 #include "vtkCompositeDataPipeline.h"
 #include "vtkDataObject.h"
 #include "vtkDemandDrivenPipeline.h"
-#include "vtkInformationDoubleVectorKey.h"
 #include "vtkInformation.h"
+#include "vtkInformationDoubleVectorKey.h"
+#include "vtkInformationExecutivePortKey.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
@@ -56,7 +57,7 @@ public:
     }
 };
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.55");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.56");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 vtkCxxSetObjectMacro(vtkPVUpdateSuppressor, CacheSizeKeeper, vtkCacheSizeKeeper);
 //----------------------------------------------------------------------------
@@ -160,7 +161,7 @@ void vtkPVUpdateSuppressor::ForceUpdate()
   vtkInformation* info = input->GetPipelineInformation();
   vtkStreamingDemandDrivenPipeline* sddp = 
     vtkStreamingDemandDrivenPipeline::SafeDownCast(
-      info->GetExecutive(vtkExecutive::PRODUCER()));
+      vtkExecutive::PRODUCER()->GetExecutive(info));
   if (sddp)
     {
     sddp->SetUpdateExtent(info,
@@ -274,7 +275,7 @@ int vtkPVUpdateSuppressor::RequestUpdateExtent(vtkInformation* vtkNotUsed(reques
     vtkInformation* info = inputVector[0]->GetInformationObject(0);
     vtkStreamingDemandDrivenPipeline* sddp = 
       vtkStreamingDemandDrivenPipeline::SafeDownCast(
-        info->GetExecutive(vtkExecutive::PRODUCER()));
+        vtkExecutive::PRODUCER()->GetExecutive(info));
     if (sddp)
       {
       sddp->SetUpdateExtent(info, this->UpdatePiece, 
