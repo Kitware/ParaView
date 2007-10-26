@@ -326,7 +326,21 @@ void PrismCore::onPrismSelection(vtkObject* caller,
       pxm->NewProxy("sources", "SelectionSource"));
 
     vtkSMSourceProxy* selPrism = prismP->GetSelectionInput(portIndex);
-    
+       
+    if(!selPrism)
+    {
+      sourceP->CleanSelectionInputs(0);
+      this->ProcessingEvent=false;
+      pqPipelineSource* pqSourceP=model->findItem<pqPipelineSource*>(sourceP);
+      QList<pqView*> Views=pqSourceP->getViews();
+
+      foreach(pqView* v,Views)
+      {
+        v->render();
+      }
+
+      return;
+    }
     pqApplicationCore* const core = pqApplicationCore::instance();
     pqSelectionManager* slmanager = qobject_cast<pqSelectionManager*>(
       core->manager("SELECTION_MANAGER"));
@@ -383,7 +397,20 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
       pxm->NewProxy("sources", "SelectionSource"));
 
     vtkSMSourceProxy* selSource = sourceP->GetSelectionInput(portIndex);
-    
+    if(!selSource)
+    {
+      prismP->CleanSelectionInputs(1);
+      this->ProcessingEvent=false;
+      pqPipelineSource* pqSourceP=model->findItem<pqPipelineSource*>(prismP);
+      QList<pqView*> Views=pqSourceP->getViews();
+
+      foreach(pqView* v,Views)
+      {
+        v->render();
+      }
+      return;
+    }
+
     pqApplicationCore* const core = pqApplicationCore::instance();
     pqSelectionManager* slmanager = qobject_cast<pqSelectionManager*>(
       core->manager("SELECTION_MANAGER"));
