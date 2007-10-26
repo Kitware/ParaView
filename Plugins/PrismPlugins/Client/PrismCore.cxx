@@ -401,8 +401,8 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
     {
       prismP->CleanSelectionInputs(1);
       this->ProcessingEvent=false;
-      pqPipelineSource* pqSourceP=model->findItem<pqPipelineSource*>(prismP);
-      QList<pqView*> Views=pqSourceP->getViews();
+      pqPipelineSource* pqPrismP=model->findItem<pqPipelineSource*>(prismP);
+      QList<pqView*> Views=pqPrismP->getViews();
 
       foreach(pqView* v,Views)
       {
