@@ -142,13 +142,21 @@ void pqExodusIIPanel::addSelectionToTreeWidget(const QString& name,
 {
   static QPixmap pixmaps[] =
     {
-    QPixmap(":/pqWidgets/Icons/pqPointData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqCellData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqSideSet16.png"),
-    QPixmap(":/pqWidgets/Icons/pqNodeSet16.png"),
+    QPixmap(":/pqWidgets/Icons/pqNodalData16.png"),
+    QPixmap(":/pqWidgets/Icons/pqCellCenterData16.png"),
     QPixmap(":/pqWidgets/Icons/pqCellCenterData16.png"),
     QPixmap(":/pqWidgets/Icons/pqFaceCenterData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqEdgeCenterData16.png")
+    QPixmap(":/pqWidgets/Icons/pqEdgeCenterData16.png"),
+    QPixmap(":/pqWidgets/Icons/pqNodeSetData16.png"),
+    QPixmap(":/pqWidgets/Icons/pqEdgeSetData16.png"),
+    QPixmap(":/pqWidgets/Icons/pqFaceSetData16.png"),
+    QPixmap(":/pqWidgets/Icons/pqSideSetData16.png"),
+    QPixmap(":/pqWidgets/Icons/pqElemSetData16.png"),
+    QPixmap(":/pqWidgets/Icons/pqNodeMapData16.png"),
+    QPixmap(":/pqWidgets/Icons/pqEdgeMapData16.png"),
+    QPixmap(":/pqWidgets/Icons/pqFaceMapData16.png"),
+    QPixmap(":/pqWidgets/Icons/pqElemMapData16.png"),
+    QPixmap(":/pqWidgets/Icons/pqGlobalData16.png")
     };
 
   vtkSMProperty* SMProperty = this->proxy()->GetProperty(prop.toAscii().data());
@@ -212,11 +220,11 @@ void pqExodusIIPanel::linkServerManagerProperties()
   this->addSelectionsToTreeWidget("NodeSetResultArrayStatus",
                                   this->UI->Variables, PM_NODESET);
   this->addSelectionsToTreeWidget("FaceSetResultArrayStatus",
-                                  this->UI->Variables, PM_ELEM);
+                                  this->UI->Variables, PM_FACESET);
   this->addSelectionsToTreeWidget("EdgeSetResultArrayStatus",
-                                  this->UI->Variables, PM_ELEM);
+                                  this->UI->Variables, PM_EDGESET);
   this->addSelectionsToTreeWidget("ElementSetResultArrayStatus",
-                                  this->UI->Variables, PM_ELEM);
+                                  this->UI->Variables, PM_ELEMSET);
   
     
   this->addSelectionToTreeWidget("Global Node Ids", "GlobalNodeId", this->UI->Variables,
@@ -262,7 +270,7 @@ void pqExodusIIPanel::linkServerManagerProperties()
 
   // do the global variables
   this->addSelectionsToTreeWidget("GlobalResultArrayStatus",
-                                  this->UI->Variables, PM_NONE);
+                                  this->UI->Variables, PM_GLOBAL);
 
   // we hook up the sideset/nodeset 
   QTreeWidget* SetsTree = this->UI->Sets;
@@ -271,11 +279,11 @@ void pqExodusIIPanel::linkServerManagerProperties()
 
   // blocks
   this->addSelectionsToTreeWidget("EdgeBlockArrayStatus",
-                                  this->UI->BlockArrayStatus, PM_NONE);
+                                  this->UI->BlockArrayStatus, PM_EDGEBLK);
   this->addSelectionsToTreeWidget("FaceBlockArrayStatus",
-                                  this->UI->BlockArrayStatus, PM_NONE);
+                                  this->UI->BlockArrayStatus, PM_FACEBLK);
   this->addSelectionsToTreeWidget("ElementBlockArrayStatus",
-                                  this->UI->BlockArrayStatus, PM_NONE);
+                                  this->UI->BlockArrayStatus, PM_ELEMBLK);
 
   // sets
   this->addSelectionsToTreeWidget("SideSetArrayStatus",
@@ -283,21 +291,21 @@ void pqExodusIIPanel::linkServerManagerProperties()
   this->addSelectionsToTreeWidget("NodeSetArrayStatus",
                                   this->UI->Sets, PM_NODESET);
   this->addSelectionsToTreeWidget("FaceSetArrayStatus",
-                                  this->UI->Sets, PM_ELEM);
+                                  this->UI->Sets, PM_FACESET);
   this->addSelectionsToTreeWidget("EdgeSetArrayStatus",
-                                  this->UI->Sets, PM_ELEM);
+                                  this->UI->Sets, PM_EDGESET);
   this->addSelectionsToTreeWidget("ElementSetArrayStatus",
-                                  this->UI->Sets, PM_ELEM);
+                                  this->UI->Sets, PM_ELEMSET);
 
   // maps
   this->addSelectionsToTreeWidget("NodeMapArrayStatus",
-                                  this->UI->Maps, PM_NONE);
+                                  this->UI->Maps, PM_NODEMAP);
   this->addSelectionsToTreeWidget("EdgeMapArrayStatus",
-                                  this->UI->Maps, PM_NONE);
+                                  this->UI->Maps, PM_EDGEMAP);
   this->addSelectionsToTreeWidget("FaceMapArrayStatus",
-                                  this->UI->Maps, PM_NONE);
+                                  this->UI->Maps, PM_FACEMAP);
   this->addSelectionsToTreeWidget("ElementMapArrayStatus",
-                                  this->UI->Maps, PM_NONE);
+                                  this->UI->Maps, PM_ELEMMAP);
 
   // Get the timestep values.  Note that the TimestepValues property will change
   // if HasModeShapes is on.  However, we know that when this method is called

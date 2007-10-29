@@ -37,7 +37,12 @@
         <file>Icons/pqDisconnect24.png</file>
         <file>Icons/pqDisconnect32.png</file>
         <file>Icons/pqEdgeCenterData16.png</file>
+        <file>Icons/pqEdgeMapData16.png</file>
+        <file>Icons/pqEdgeSetData16.png</file>
         <file>Icons/pqEditCamera16.png</file>
+        <file>Icons/pqElemData16.png</file>
+        <file>Icons/pqElemMapData16.png</file>
+        <file>Icons/pqElemSetData16.png</file>
         <file>Icons/pqEnterCenter24.png</file>
         <file>Icons/pqExponential16.png</file>
         <file>Icons/pqExponential24.png</file>
@@ -46,6 +51,8 @@
         <file>Icons/pqEyeball16.png</file>
         <file>Icons/pqEyeballd16.png</file>
         <file>Icons/pqFaceCenterData16.png</file>
+        <file>Icons/pqFaceMapData16.png</file>
+        <file>Icons/pqFaceSetData16.png</file>
         <file>Icons/pqFavorites16.png</file>
         <file>Icons/pqFavorites32.png</file>
         <file>Icons/pqFilter16.png</file>
@@ -62,6 +69,7 @@
         <file>Icons/pqFolderUp16.png</file>
         <file>Icons/pqFrustumSelectionCell24.png</file>
         <file>Icons/pqFrustumSelectionPoint24.png</file>
+        <file>Icons/pqGlobalData16.png</file>
         <file>Icons/pqGlyph24.png</file>
         <file>Icons/pqGroup24.png</file>
         <file>Icons/pqGroupExtract24.png</file>
@@ -92,7 +100,9 @@
         <file>Icons/pqNewProject16.png</file>
         <file>Icons/pqNewProject22.png</file>
         <file>Icons/pqNewProject32.png</file>
-        <file>Icons/pqNodeSet16.png</file>
+        <file>Icons/pqNodalData16.png</file>
+        <file>Icons/pqNodeMapData16.png</file>
+        <file>Icons/pqNodeSetData16.png</file>
         <file>Icons/pqOctreeData16.png</file>
         <file>Icons/pqOpen16.png</file>
         <file>Icons/pqOpen24.png</file>
@@ -141,7 +151,7 @@
         <file>Icons/pqServer32.png</file>
         <file>Icons/pqShowCenterAxes24.png</file>
         <file>Icons/pqShowCenterAxes32.png</file>
-        <file>Icons/pqSideSet16.png</file>
+        <file>Icons/pqSideSetData16.png</file>
         <file>Icons/pqSinusoidal16.png</file>
         <file>Icons/pqSinusoidal24.png</file>
         <file>Icons/pqSlice24.png</file>
