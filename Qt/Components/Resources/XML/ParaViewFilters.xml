@@ -25,7 +25,6 @@
     <Filter name="ExtractPointsOverTime"
             icon=":/pqWidgets/Icons/pqPlotPointOverTime24.png" />
     <Filter name="ExtractFieldDataOverTime" />
-    <Filter name="ExtractThresholds" /> 
     <Filter name="ProbeLine" 
             icon=":/pqWidgets/Icons/pqPlotLineOverTime24.png" />
     <Filter name="ProbePoint" 
