@@ -2221,6 +2221,18 @@
       base_proxyname="PolyDataStrategy">
 
       <SubProxy>
+        <Proxy name="PreCollectUpdateSuppressor" proxygroup="filters"
+          proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
         <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
         </Proxy>
       </SubProxy>
@@ -2244,6 +2256,18 @@
         <ExposedProperties>
           <Property name="PKdTree" />
         </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PreCollectUpdateSuppressorLOD" proxygroup="filters"
+          proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressorLOD" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
       </SubProxy>
 
       <SubProxy>
@@ -2347,6 +2371,18 @@
       base_proxyname="UnstructuredGridStrategy">
 
       <SubProxy>
+        <Proxy name="PreCollectUpdateSuppressor" proxygroup="filters"
+          proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
         <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
         </Proxy>
       </SubProxy>
@@ -2370,6 +2406,18 @@
         <ExposedProperties>
           <Property name="PKdTree" />
         </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PreCollectUpdateSuppressorLOD" proxygroup="filters"
+          proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressorLOD" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
       </SubProxy>
 
       <SubProxy>

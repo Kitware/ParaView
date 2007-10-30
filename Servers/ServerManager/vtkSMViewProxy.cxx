@@ -22,7 +22,6 @@
 #include "vtkInformationIntegerKey.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyManager.h"
@@ -123,7 +122,7 @@ void vtkSMViewProxy::CleanMultiViewInitializer()
 }
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.18");
 
 vtkInformationKeyMacro(vtkSMViewProxy, USE_CACHE, Integer);
 vtkInformationKeyMacro(vtkSMViewProxy, CACHE_TIME, Double);
@@ -144,8 +143,6 @@ vtkSMViewProxy::vtkSMViewProxy()
 
   this->FullResDataSize = 0;
   this->FullResDataSizeValid = false;
-
-  this->ForceRepresentationUpdate = false;
 
   this->DefaultRepresentationName = 0;
   this->ViewUpdateTime = 0;
@@ -369,17 +366,13 @@ void vtkSMViewProxy::StillRender()
     }
 
   this->InRender = true;
-  // Ensure that all representation pipelines are updated.
-  this->UpdateAllRepresentations();
 
-  this->ForceRepresentationUpdate = false;
   this->BeginStillRender();
-  if (this->ForceRepresentationUpdate)
-    {
-    // BeginStillRender modified the representations, we need another update.
-    this->UpdateAllRepresentations();
-    }
+
+  // Now update all representation pipelines.
+  this->UpdateAllRepresentations();
   this->PerformRender();
+
   this->EndStillRender();
   this->InRender = false;
 }
@@ -393,18 +386,13 @@ void vtkSMViewProxy::InteractiveRender()
     }
 
   this->InRender = true;
-  // Ensure that all representation pipelines are updated.
-  this->UpdateAllRepresentations();
 
-  this->ForceRepresentationUpdate = false;
   this->BeginInteractiveRender();
-  if (this->ForceRepresentationUpdate)
-    {
-    // BeginInteractiveRender modified the representations, we need another 
-    // update.
-    this->UpdateAllRepresentations();
-    }
+
+  // Now update all representation pipelines.
+  this->UpdateAllRepresentations();
   this->PerformRender();
+
   this->EndInteractiveRender();
   this->InRender = false;
 }
@@ -506,9 +494,10 @@ unsigned long vtkSMViewProxy::GetVisibleDisplayedDataSize()
 {
   if (!this->DisplayedDataSizeValid)
     {
-    this->DisplayedDataSizeValid = true;
     this->DisplayedDataSize = 0;
 
+    bool enable_progress = false;
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkSmartPointer<vtkCollectionIterator> iter;
     iter.TakeReference(this->Representations->NewIterator());
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
@@ -520,13 +509,24 @@ unsigned long vtkSMViewProxy::GetVisibleDisplayedDataSize()
         // Skip invisible representations.
         continue;
         }
-
-      vtkPVDataInformation* info = repr->GetDisplayedDataInformation();
-      if (info)
+      if (!enable_progress && repr->UpdateRequired())
         {
-        this->DisplayedDataSize += info->GetMemorySize();
+        // If a representation required an update, than it implies that the
+        // update will result in progress events. We don't to ignore those
+        // progress events, hence we enable progress handling.
+        pm->SendPrepareProgress(this->ConnectionID,
+          vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER);
+        enable_progress = true;
         }
+      // This may partially update the representation pipeline to obtain correct
+      // data size information.
+      this->DisplayedDataSize += repr->GetDisplayedMemorySize();
       }
+    if (enable_progress)
+      {
+      pm->SendCleanupPendingProgress(this->ConnectionID);
+      }
+    this->DisplayedDataSizeValid = true;
     }
 
   return this->DisplayedDataSize;
@@ -538,8 +538,9 @@ unsigned long vtkSMViewProxy::GetVisibileFullResDataSize()
   if (!this->FullResDataSizeValid)
     {
     this->FullResDataSize = 0;
-    this->FullResDataSizeValid = true;
 
+    bool enable_progress = false;
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkSmartPointer<vtkCollectionIterator> iter;
     iter.TakeReference(this->Representations->NewIterator());
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
@@ -551,13 +552,25 @@ unsigned long vtkSMViewProxy::GetVisibileFullResDataSize()
         // Skip invisible representations.
         continue;
         }
-
-      vtkPVDataInformation* info = repr->GetFullResDataInformation();
-      if (info)
+      if (!enable_progress && repr->UpdateRequired())
         {
-        this->FullResDataSize += info->GetMemorySize();
+        // If a representation required an update, than it implies that the
+        // update will result in progress events. We don't to ignore those
+        // progress events, hence we enable progress handling.
+        pm->SendPrepareProgress(this->ConnectionID,
+          vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER);
+        enable_progress = true;
         }
+
+      // This may partially update the representation pipeline to obtain correct
+      // data size information.
+      this->FullResDataSize += repr->GetFullResMemorySize();
       }
+    if (enable_progress)
+      {
+      pm->SendCleanupPendingProgress(this->ConnectionID);
+      }
+    this->FullResDataSizeValid = true;
     }
 
   return this->FullResDataSize;

@@ -37,7 +37,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.14");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepresentationProxy()
 {
@@ -289,8 +289,8 @@ void vtkSMUnstructuredGridVolumeRepresentationProxy::DetermineVolumeSupport()
     this->VolumeFilter->GetProperty("Input")->GetDomain("input_type"));
   if (domain && domain->IsInDomain(this->GetInputProxy(), this->OutputPort))
     {
-
-    vtkPVDataInformation* datainfo = this->GetInputProxy()->GetDataInformation();
+    vtkPVDataInformation* datainfo = 
+      this->GetInputProxy()->GetDataInformation();
     if (datainfo->GetNumberOfCells() < 1000000)
       {
       this->SupportsZSweepMapper = 1;
@@ -638,7 +638,7 @@ vtkSMProxy* vtkSMUnstructuredGridVolumeRepresentationProxy::ConvertSelection(
 void vtkSMUnstructuredGridVolumeRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "VolumeFilterProxy: " << this->VolumeFilter << endl;
+  os << indent << "VolumeFilter: " << this->VolumeFilter << endl;
   os << indent << "VolumePropertyProxy: " << this->VolumeProperty << endl;
   os << indent << "VolumeActorProxy: " << this->VolumeActor << endl;
   os << indent << "SupportsHAVSMapper: " << this->SupportsHAVSMapper << endl;

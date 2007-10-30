@@ -156,7 +156,7 @@ protected:
   void UpdateRenderViewExtensions(vtkSMViewProxy*);
   
   // Unstructured volume rendering classes
-  vtkSMProxy* VolumeFilter;
+  vtkSMSourceProxy* VolumeFilter;
   vtkSMProxy* VolumePTMapper;
   vtkSMProxy* VolumeHAVSMapper;
   vtkSMProxy* VolumeBunykMapper;

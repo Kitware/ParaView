@@ -38,6 +38,7 @@ SET(Kit_SRCS
   vtkPVCompositeDataInformation.cxx
   vtkPVDataInformation.cxx
   vtkPVDataSetAttributesInformation.cxx
+  vtkPVDataSizeInformation.cxx
   vtkPVDisplayInformation.cxx
   vtkPVEnvironmentInformation.cxx
   vtkPVEnvironmentInformationHelper.cxx

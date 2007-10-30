@@ -37,6 +37,7 @@ public:
   // Description:
   // Update the data the gets distributed.
   virtual void UpdateDistributedData();
+
 //BTX
 protected:
   vtkSMSimpleParallelStrategy();
@@ -58,20 +59,16 @@ protected:
   virtual void CreateLODPipeline(vtkSMSourceProxy* input, int outputport);
 
   // Description:
-  // Gather the information of the displayed data
-  // for the current update state of the data pipeline (non-LOD).
-  // Overridden to update the server flag to ensure that the information is
-  // collected from  the update suppressor that has valid data depending upon
-  // the state of compositing flag.
-  virtual void GatherInformation(vtkPVDataInformation*);
+  // Gather the information of the displayed data (non-LOD).
+  // Update the part of the pipeline needed to gather full information
+  // and then gather that information. 
+  virtual void GatherInformation(vtkPVInformation*);
 
   // Description:
-  // Gather the information of the displayed data
-  // for the current update state of the LOD pipeline.
-  // Overridden to update the server flag to ensure that the information is
-  // collected from  the update suppressor that has valid data depending upon
-  // the state of compositing flag.
-  virtual void GatherLODInformation(vtkPVDataInformation*);
+  // Gather the information of the displayed data (lod);
+  // Update the part of the pipeline needed to gather full information
+  // and then gather that information. 
+  virtual void GatherLODInformation(vtkPVInformation*);
 
   // Description:
   // Update the LOD pipeline.
@@ -110,10 +107,12 @@ protected:
   void SetLODClientCollect(bool);
   void SetLODClientRender(bool);
 
+  vtkSMSourceProxy* PreCollectUpdateSuppressor;
   vtkSMSourceProxy* Collect;
   vtkSMSourceProxy* PreDistributorSuppressor;
   vtkSMSourceProxy* Distributor;
 
+  vtkSMSourceProxy* PreCollectUpdateSuppressorLOD;
   vtkSMSourceProxy* CollectLOD;
   vtkSMSourceProxy* PreDistributorSuppressorLOD;
   vtkSMSourceProxy* DistributorLOD;

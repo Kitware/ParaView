@@ -37,7 +37,7 @@ inline void vtkSMPVRepresentationProxySetInt(
 }
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.14");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -227,28 +227,6 @@ void vtkSMPVRepresentationProxy::SetVisibility(int visible)
 }
 
 //----------------------------------------------------------------------------
-vtkPVDataInformation* vtkSMPVRepresentationProxy::GetDisplayedDataInformation()
-{
-  if (this->ActiveRepresentation)
-    {
-    return this->ActiveRepresentation->GetDisplayedDataInformation();
-    }
-
-  return this->Superclass::GetDisplayedDataInformation();
-}
-
-//----------------------------------------------------------------------------
-vtkPVDataInformation* vtkSMPVRepresentationProxy::GetFullResDataInformation()
-{
-  if (this->ActiveRepresentation)
-    {
-    return this->ActiveRepresentation->GetFullResDataInformation();
-    }
-
-  return this->Superclass::GetFullResDataInformation();
-}
-
-//----------------------------------------------------------------------------
 void vtkSMPVRepresentationProxy::Update(vtkSMViewProxy* view)
 {
   if (this->ActiveRepresentation)
@@ -257,6 +235,18 @@ void vtkSMPVRepresentationProxy::Update(vtkSMViewProxy* view)
     }
 
   this->Superclass::Update(view);
+}
+
+//----------------------------------------------------------------------------
+vtkPVDataInformation* 
+vtkSMPVRepresentationProxy::GetRepresentedDataInformation(bool update)
+{
+  if (this->ActiveRepresentation)
+    {
+    return this->ActiveRepresentation->GetRepresentedDataInformation(update);
+    }
+
+  return this->Superclass::GetRepresentedDataInformation(update);
 }
 
 //----------------------------------------------------------------------------

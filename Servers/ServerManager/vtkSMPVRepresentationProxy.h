@@ -45,25 +45,6 @@ public:
   virtual void SetVisibility(int visible);
 
   // Description:
-  // Get the data information for the represented data.
-  // Representations that do not have significatant data representations such as
-  // 3D widgets, text annotations may return NULL.
-  // Overridden to return the strategy's data information. Currently, it returns
-  // the data information from the first representation strategy,
-  // subclasses using multiple strategies may want to override this.
-  virtual vtkPVDataInformation* GetDisplayedDataInformation();
-
-  // Description:
-  // Get the data information for the full resolution data irrespective of
-  // whether current rendering decision was to use LOD. For representations that
-  // don't have separate LOD pipelines, this simply calls
-  // GetDisplayedDataInformation().
-  // Overridden to return the strategy's data information. Currently, it returns
-  // the data information from the first representation strategy,
-  // subclasses using multiple strategies may want to override this.
-  virtual vtkPVDataInformation* GetFullResDataInformation();
-
-  // Description:
   // Called to update the Representation. 
   // Overridden to forward the update request to the strategy if any. 
   // If subclasses don't use any strategy, they may want to override this
@@ -78,6 +59,19 @@ public:
   // Update(). Overridden to forward the request to the strategy, if any. If
   // subclasses don't use any strategy, they may want to override this method.
   virtual bool UpdateRequired();
+
+  // Description:
+  // Get the information about the data shown by this representation. 
+  // Some representations use some pre-processing before displaying the data eg.
+  // apply a geometry filter. This is the data information after that
+  // pre-processing stage. If \c update is set to false, the pipeline is not
+  // updated before gathering the information, (\c update is true by default).
+  // Default implementation simply returns the data information from the input.
+  // When update is true, the pipeline until the filter from which the
+  // information is obtained is updated. This is preferred to calling Update()
+  // on the representation directly, since an Update include delivering of the
+  // data to the destination where it will be rendered.
+  virtual vtkPVDataInformation* GetRepresentedDataInformation(bool update=true);
 
   // Description:
   // Set the time used during update requests.

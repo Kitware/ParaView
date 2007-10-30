@@ -71,8 +71,8 @@ public:
   // Description:
   // Renders the view using full resolution.
   // Internally calls 
-  // \li UpdateAllDisplays()
   // \li BeginStillRender()
+  // \li UpdateAllRepresentations()
   // \li PerformRender()
   // \li EndStillRender() 
   // in that order.
@@ -81,8 +81,8 @@ public:
   // Description:
   // Renders the view using lower resolution is possible.
   // Internally calls 
-  // \li UpdateAllDisplays()
   // \li BeginInteractiveRender()
+  // \li UpdateAllRepresentations()
   // \li PerformRender()
   // \li EndInteractiveRender() 
   // in that order.
@@ -115,12 +115,20 @@ public:
 
   // Description:
   // Returns the memory size for the visible data.
+  // If some of the visible representations are dirty, this results in updating
+  // those representations partially. i.e. the representation is updated only
+  // until the filter from which the data size information is updated (which is
+  // generally before the expensive data transfer filters).
   unsigned long GetVisibleDisplayedDataSize();
 
   // Description:
   // Returns the full resoultion memory size for the all the visible
   // representations irresepective of whether low resolution (LOD) data is
   // currently shown in the view.
+  // If some of the visible representations are dirty, this results in updating
+  // those representations partially. i.e. the representation is updated only
+  // until the filter from which the data size information is updated (which is
+  // generally before the expensive data transfer filters).
   unsigned long GetVisibileFullResDataSize();
  
   // Description:
@@ -157,10 +165,11 @@ protected:
 
   // Description:
   // Method called at the start of StillRender().
-  // Before this method is called, we as assured that all representations are
-  // updated. However, if this method invalidates any of the representations,
-  // it must set ForceRepresentationUpdate flag to true so that representations
-  // are updated once again before performing the render.
+  // All the representations are in an un-updated state. It is not recommended
+  // to update the representation until important decisions such as use of
+  // lod/compositing are made. It is safe however to use
+  // GetVisibileFullResDataSize() or GetVisibleDisplayedDataSize() since these
+  // methods only partially update the representation pipelines, if at all.
   virtual void BeginStillRender();
 
   // Description:
@@ -169,8 +178,11 @@ protected:
 
   // Description:
   // Method called at the start of InteractiveRender().
-  // Before this method is called, we as assured that all representations are
-  // updated. However, if this method invalidates any of the representations,
+  // All the representations are in an un-updated state. It is not recommended
+  // to update the representation until important decisions such as use of
+  // lod/compositing are made. It is safe however to use
+  // GetVisibileFullResDataSize() or GetVisibleDisplayedDataSize() since these
+  // methods only partially update the representation pipelines, if at all.
   virtual void BeginInteractiveRender();
   
   // Description:
@@ -251,13 +263,6 @@ protected:
   int GUISize[2];
   int ViewPosition[2];
 
-  // Can be set to true in BeginInteractiveRender() or BeginStillRender() is the
-  // representations are modified by these methods. This flag is reset at the
-  // end of the render.
-  void SetForceRepresentationUpdate(bool b)
-    { this->ForceRepresentationUpdate = b; }
-  vtkGetMacro(ForceRepresentationUpdate, bool);
-
   // Description:
   // Read attributes from an XML element.
   virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
@@ -299,8 +304,6 @@ private:
 
   unsigned long FullResDataSize;
   bool FullResDataSizeValid;
-
-  bool ForceRepresentationUpdate;
 
   double ViewUpdateTime;
   bool ViewUpdateTimeInitialized;

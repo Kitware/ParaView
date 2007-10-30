@@ -94,7 +94,7 @@ public:
       return 0; 
       }
     vtkSMDataRepresentationProxy* repr = this->RepresentationProxy;
-    vtkPVDataInformation* dataInfo = repr->GetFullResDataInformation();
+    vtkPVDataInformation* dataInfo = repr->GetRepresentedDataInformation();
     if(!dataInfo)
       {
       return 0;
@@ -319,9 +319,7 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
     }
   repr->UpdateVTKObjects();
 
-  // Update the representation, so that we can obtain updated data information.
-  repr->Update();
-  geomInfo = repr->GetFullResDataInformation();
+  geomInfo = repr->GetRepresentedDataInformation(/*update=*/true);
 
   // Locate input display.
   pqPipelineFilter* myInput = qobject_cast<pqPipelineFilter*>(this->getInput());
@@ -333,7 +331,7 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
       myInputsInput->getRepresentation(0, this->getView()));
     if (upstreamDisplay)
       {
-      inGeomInfo = upstreamDisplay->getRepresentationProxy()->GetFullResDataInformation();
+      inGeomInfo = upstreamDisplay->getRepresentationProxy()->GetRepresentedDataInformation();
       }
     }
 
@@ -688,7 +686,7 @@ QList<QString> pqPipelineRepresentation::getColorFields()
     ret.append(pqPipelineRepresentation::solidColor());
     }
 
-  vtkPVDataInformation* geomInfo = repr->GetFullResDataInformation();
+  vtkPVDataInformation* geomInfo = repr->GetRepresentedDataInformation();
   if(!geomInfo)
     {
     return ret;
@@ -901,11 +899,13 @@ bool pqPipelineRepresentation::getDataBounds(double bounds[6])
   vtkSMPVRepresentationProxy* repr = 
     this->getRepresentationProxy();
 
-  if(!repr || !repr->GetFullResDataInformation())
+  vtkPVDataInformation* info = repr? 
+    repr->GetRepresentedDataInformation() : 0;
+  if(!info)
     {
     return false;
     }
-  repr->GetFullResDataInformation()->GetBounds(bounds);
+  info->GetBounds(bounds);
   return true;
 }
 
@@ -930,10 +930,6 @@ void pqPipelineRepresentation::onRepresentationChanged()
     // Nothing to do here.
     return;
     }
-
-  // This is essential, since otherwise the geometry filter does not execute
-  // and we won't get the correct arrays available.
-  repr->Update();
 
   // Representation is Volume, is color array set?
   QList<QString> colorFields = this->getColorFields();

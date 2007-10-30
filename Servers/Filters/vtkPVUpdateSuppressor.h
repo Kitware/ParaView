@@ -15,6 +15,9 @@
 // .NAME vtkPVUpdateSuppressor - prevents propagation of update
 // .SECTION Description  I am also going to have this object manage
 // flip books (geometry cache).
+// vtkPVUpdateSuppressor now uses the vtkProcessModule singleton to set up the
+// default values for UpdateNumberOfPieces and UpdatePiece, so we no longer have
+// to set the default values (in most cases).
 
 #ifndef __vtkPVUpdateSuppressor_h
 #define __vtkPVUpdateSuppressor_h
@@ -36,14 +39,18 @@ public:
 
   // Description:
   // Methods for saving, clearing and updating flip books.
-  // Cache update will update and save cache or just use previous cache.
-  // "idx" is the time index, "total" is the number of time steps.
+  // This removes all saved cache.
   void RemoveAllCaches();
 
   // Description:
   // Force update with caching, cacheTime is the key used to save/restore the
   // cached data.
   void CacheUpdate(double cacheTime);
+
+  // Description:
+  // Returns if the given \c cacheTime is available in the cache. 
+  // Does not cause any updates.
+  int IsCached(double cacheTime);
 
   // Description:
   // Force update on the input.

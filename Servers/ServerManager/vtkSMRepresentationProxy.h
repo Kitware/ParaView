@@ -68,19 +68,24 @@ public:
   // Representations that do not have significatant data representations such as
   // 3D widgets, text annotations may return NULL. Default implementation
   // returns NULL.
-  virtual vtkPVDataInformation* GetDisplayedDataInformation()
+  virtual vtkPVDataInformation* GetRepresentedDataInformation(bool update=true)
+    { 
+    (void)update;
+    return 0; 
+    }
+
+  // Description:
+  // Returns the data size of the display data. When using LOD this is the
+  // low-res data size, else it's same as GetFullResMemorySize().
+  // This may trigger a pipeline update to obtain correct data sizes.
+  virtual unsigned long GetDisplayedMemorySize()
     { return 0; }
 
   // Description:
-  // Get the data information for the full resolution data irrespective of
-  // whether current rendering decision was to use LOD. For representations that
-  // don't have separate LOD pipelines, this simply calls
-  // GetDisplayedDataInformation().
-  virtual vtkPVDataInformation* GetFullResDataInformation()
-    {
-    return this->GetDisplayedDataInformation();
-    }
-
+  // Returns the data size for the full-res data.
+  // This may trigger a pipeline update to obtain correct data sizes.
+  virtual unsigned long GetFullResMemorySize()
+    { return 0; }
 
 //BTX
   // Description:

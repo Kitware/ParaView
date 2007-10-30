@@ -19,6 +19,7 @@
 #include "vtkMPIMoveData.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIceTMultiDisplayRenderViewProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
@@ -39,14 +40,16 @@ inline int vtkSMSimpleParallelStrategyGetInt(vtkSMProxy* proxy,
 }
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.12");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.13");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
+  this->PreCollectUpdateSuppressor = 0;
   this->Collect = 0;
   this->PreDistributorSuppressor = 0;
   this->Distributor = 0;
 
+  this->PreCollectUpdateSuppressorLOD = 0;
   this->CollectLOD = 0;
   this->PreDistributorSuppressorLOD = 0;
   this->DistributorLOD = 0;
@@ -70,6 +73,8 @@ void vtkSMSimpleParallelStrategy::BeginCreateVTKObjects()
 {
   this->Superclass::BeginCreateVTKObjects();
 
+  this->PreCollectUpdateSuppressor =
+    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("PreCollectUpdateSuppressor"));
   this->Collect = 
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("Collect"));
   this->PreDistributorSuppressor =
@@ -77,6 +82,8 @@ void vtkSMSimpleParallelStrategy::BeginCreateVTKObjects()
   this->Distributor =
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("Distributor"));
 
+  this->PreCollectUpdateSuppressorLOD =
+    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("PreCollectUpdateSuppressorLOD"));
   this->CollectLOD = 
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("CollectLOD"));
   this->PreDistributorSuppressorLOD =
@@ -84,6 +91,7 @@ void vtkSMSimpleParallelStrategy::BeginCreateVTKObjects()
   this->DistributorLOD =
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("DistributorLOD"));
 
+  this->PreCollectUpdateSuppressor->SetServers(vtkProcessModule::DATA_SERVER);
   this->Collect->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
   this->PreDistributorSuppressor->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
   this->Distributor->SetServers(vtkProcessModule::RENDER_SERVER);
@@ -91,6 +99,7 @@ void vtkSMSimpleParallelStrategy::BeginCreateVTKObjects()
   if (this->CollectLOD && this->PreDistributorSuppressorLOD &&
     this->DistributorLOD)
     {
+    this->PreCollectUpdateSuppressorLOD->SetServers(vtkProcessModule::DATA_SERVER);
     this->CollectLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
     this->PreDistributorSuppressorLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
     this->DistributorLOD->SetServers(vtkProcessModule::RENDER_SERVER);
@@ -105,13 +114,6 @@ void vtkSMSimpleParallelStrategy::BeginCreateVTKObjects()
 void vtkSMSimpleParallelStrategy::EndCreateVTKObjects()
 {
   this->Superclass::EndCreateVTKObjects();
-
-  this->UpdatePieceInformation(this->PreDistributorSuppressor);
-  if (this->GetEnableLOD())
-    {
-    this->UpdatePieceInformation(this->PreDistributorSuppressorLOD);
-    }
-
   this->SetKdTree(this->KdTree);
 }
 
@@ -135,6 +137,9 @@ void vtkSMSimpleParallelStrategy::CreatePipeline(vtkSMSourceProxy* input,
                                this->PreDistributorSuppressor,
                                this->Distributor,
                                this->UpdateSuppressor);
+
+  // Connect the PreCollectUpdateSuppressor to the input.
+  this->Connect(input, this->PreCollectUpdateSuppressor, "Input", outputport);
 }
 
 //----------------------------------------------------------------------------
@@ -147,6 +152,9 @@ void vtkSMSimpleParallelStrategy::CreateLODPipeline(vtkSMSourceProxy* input,
                                this->PreDistributorSuppressorLOD,
                                this->DistributorLOD,
                                this->UpdateSuppressorLOD);
+
+  // Connect the PreCollectUpdateSuppressorLOD to the decimator.
+  this->Connect(this->LODDecimator, this->PreCollectUpdateSuppressorLOD, "Input", 0);
 }
 
 //----------------------------------------------------------------------------
@@ -283,7 +291,7 @@ void vtkSMSimpleParallelStrategy::UpdatePipeline()
   // decide where the data should be delivered for rendering.
 
   bool usecompositing = this->GetUseCompositing();
-  // cout << "usecompositing: " << usecompositing << endl;
+  cout << "usecompositing: " << usecompositing << endl;
 
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->Collect->GetProperty("MoveMode"));
@@ -487,41 +495,96 @@ void vtkSMSimpleParallelStrategy::ProcessViewInformation()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleParallelStrategy::GatherInformation(vtkPVDataInformation* info)
+void vtkSMSimpleParallelStrategy::GatherInformation(vtkPVInformation* info)
 {
-  // When compositing is enabled, data is available at the update suppressors on
-  // the render server (not the client), hence we change the server flag so that
-  // the data is gathered from the correct server.
-  if (this->GetUseCompositing())
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (this->GetUseCache())
     {
-    this->UpdateSuppressor->SetServers(vtkProcessModule::RENDER_SERVER);
-    }
-  
-  this->Superclass::GatherInformation(info);
+    // when using cache, if the cached time is available in the update
+    // suppressor that caches, then we use the information from that update
+    // suppressor, else we follow the usual procedure.
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->UpdateSuppressor->GetID()
+           << "IsCached"
+           << this->CacheTime
+           << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, 
+      vtkProcessModule::DATA_SERVER_ROOT, stream);
 
-  if (this->GetUseCompositing())
-    {
-    this->UpdateSuppressor->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+    vtkClientServerStream values;
+    int is_cached=false;
+    if (pm->GetLastResult(this->ConnectionID,
+        vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &values) &&
+      values.GetArgument(0, 1, &is_cached) && 
+      is_cached)
+      {
+      this->SomethingCached = true;
+      vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+        this->UpdateSuppressor->GetProperty("CacheUpdate"));
+      dvp->SetElement(0, this->CacheTime);
+      this->UpdateSuppressor->UpdateProperty("CacheUpdate", 1);
+      pm->GatherInformation(this->ConnectionID,
+        vtkProcessModule::DATA_SERVER_ROOT,
+        info,
+        this->UpdateSuppressor->GetID());
+      return;
+      }
     }
+
+  // Update the pipeline partially until before the Collect proxy
+  this->PreCollectUpdateSuppressor->InvokeCommand("ForceUpdate");
+  pm->GatherInformation(this->ConnectionID,
+    vtkProcessModule::DATA_SERVER_ROOT,
+    info,
+    this->PreCollectUpdateSuppressor->GetID());
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleParallelStrategy::GatherLODInformation(vtkPVDataInformation* info)
+void vtkSMSimpleParallelStrategy::GatherLODInformation(vtkPVInformation* info)
 {
-  // When compositing is enabled, data is available at the update suppressors on
-  // the render server (not the client), hence we change the server flag so that
-  // the data is gathered from the correct server.
-  if (this->GetUseCompositing())
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  // First update the pipeline partially until before the Collect proxy
+  if (this->GetUseCache())
     {
-    this->UpdateSuppressorLOD->SetServers(vtkProcessModule::RENDER_SERVER);
+    // when using cache, if the cached time is available in the update
+    // suppressor that caches, then we use the information from that update
+    // suppressor, else we follow the usual procedure.
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->UpdateSuppressorLOD->GetID()
+           << "IsCached"
+           << this->CacheTime
+           << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, 
+      vtkProcessModule::DATA_SERVER_ROOT, stream);
+
+    vtkClientServerStream values;
+    int is_cached=false;
+    if (pm->GetLastResult(this->ConnectionID,
+        vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &values) &&
+      values.GetArgument(0, 1, &is_cached) && 
+      is_cached)
+      {
+      this->SomethingCached = true;
+      vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+        this->UpdateSuppressorLOD->GetProperty("CacheUpdate"));
+      dvp->SetElement(0, this->CacheTime);
+      this->UpdateSuppressorLOD->UpdateProperty("CacheUpdate", 1);
+      pm->GatherInformation(this->ConnectionID,
+        vtkProcessModule::DATA_SERVER_ROOT,
+        info,
+        this->UpdateSuppressorLOD->GetID());
+      return;
+      }
     }
 
-  this->Superclass::GatherLODInformation(info);
-
-  if (this->GetUseCompositing())
-    {
-    this->UpdateSuppressorLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
-    }
+  // Update the pipeline partially until before the Collect proxy
+  this->PreCollectUpdateSuppressorLOD->InvokeCommand("ForceUpdate");
+  pm->GatherInformation(this->ConnectionID,
+    vtkProcessModule::DATA_SERVER_ROOT,
+    info,
+    this->PreCollectUpdateSuppressorLOD->GetID());
 }
 
 //----------------------------------------------------------------------------

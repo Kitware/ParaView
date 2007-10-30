@@ -46,7 +46,6 @@ protected:
   // Description:
   // Overridden to set the servers correctly on all subproxies.
   virtual void BeginCreateVTKObjects();
-  virtual void EndCreateVTKObjects();
 
   // Description:
   // Create and initialize the data pipeline.
@@ -59,14 +58,16 @@ protected:
   virtual void CreateLODPipeline(vtkSMSourceProxy* input, int outputport);
 
   // Description:
-  // Gather the information of the displayed data
-  // for the current update state of the data pipeline (non-LOD).
-  virtual void GatherInformation(vtkPVDataInformation*);
+  // Gather the information of the displayed data (non-LOD).
+  // Update the part of the pipeline needed to gather full information
+  // and then gather that information. 
+  virtual void GatherInformation(vtkPVInformation*);
 
   // Description:
-  // Gather the information of the displayed data
-  // for the current update state of the LOD pipeline.
-  virtual void GatherLODInformation(vtkPVDataInformation*);
+  // Gather the information of the displayed data (lod);
+  // Update the part of the pipeline needed to gather full information
+  // and then gather that information. 
+  virtual void GatherLODInformation(vtkPVInformation*);
 
   // Description:
   // Update the LOD pipeline. Subclasses must override this method
@@ -98,11 +99,6 @@ protected:
   // Set the LOD resolution. This invalidates the LOD pipeline if the resolution
   // has indeed changed.
   virtual void SetLODResolution(int resolution);
-
-  // Description:
-  // The update suppressors used by a strategy need correct piece information.
-  // This method passes that information to the update suppressor.
-  void UpdatePieceInformation(vtkSMSourceProxy* proxy);
 
   vtkSMSourceProxy* UpdateSuppressor;
   vtkSMSourceProxy* UpdateSuppressorLOD;

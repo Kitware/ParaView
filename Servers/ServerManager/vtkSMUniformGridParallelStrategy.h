@@ -45,6 +45,8 @@ public:
   bool GetUseLOD()
     { return false; }
 
+  virtual unsigned long GetLODMemorySize()
+    { return this->GetFullResMemorySize(); }
 //BTX
 protected:
   vtkSMUniformGridParallelStrategy();
@@ -59,6 +61,10 @@ protected:
   // Create and initialize the data pipeline.
   virtual void CreatePipeline(vtkSMSourceProxy* input, int outputport);
   virtual void CreateLODPipeline(vtkSMSourceProxy* input, int outputport);
+
+  // Description:
+  // Overridden to avoid unnecessary LOD information collection.
+  virtual void GatherLODInformation(vtkPVInformation*) {}
 
   void InitializeCollectProxy(vtkSMProxy* collect);
   vtkSMSourceProxy* Collect;

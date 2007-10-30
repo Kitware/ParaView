@@ -29,6 +29,7 @@
 
 class vtkInformation;
 class vtkPVDataInformation;
+class vtkPVInformation;
 class vtkSMSourceProxy;
 
 class VTK_EXPORT vtkSMRepresentationStrategy : public vtkSMProxy
@@ -65,18 +66,20 @@ public:
   // will be returned.
   // This method on the strategy does not update the pipeline before getting 
   // the data information i.e. it will returns the current data information.
-  vtkPVDataInformation* GetDisplayedDataInformation();
+  unsigned long GetDisplayedMemorySize();
 
   // Description:
   // Returns data information from the full res pipeline. Note that this
   // returns the current data information irrespective of whether the pipeline
   // is up-to-date.
-  vtkPVDataInformation* GetFullResDataInformation();
+  virtual unsigned long GetFullResMemorySize()
+    { return this->DataSize; }
 
   // Description:
   // Returns data information from the lod pipeline. This returns the current
   // data information irrespective of whether the pipeline is up-to-date.
-  vtkPVDataInformation* GetLODDataInformation();
+  virtual unsigned long GetLODMemorySize()
+    { return this->LODDataSize; }
 
   // Description:
   // Must be set if the representation makes use of the LOD pipeline provided 
@@ -122,7 +125,7 @@ public:
   virtual bool UpdateRequired();
 
   // Description:
-  // Updates the displayed pipeline if update is required.
+  // Updates the display pipeline if update is required.
   // A representation always updates the full-res pipeline if it needs any
   // updating i.e. irrepective of if LOD is being used. On the other hand, LOD
   // pipeline is updated only when the ViewInformation indicates that LOD is
@@ -130,6 +133,21 @@ public:
   // When an update is required, this method invokes StartEvent and EndEvent to
   // mark the start and end of update request.
   virtual void Update();
+
+  // Description:
+  // Updates part of the display pipeline. This updates the part of the pipeline
+  // before any data movement/redistribution happens. This is useful to gather
+  // information about data sizes etc from the server without actually
+  // undertaking any expensive data transfers.
+  // Similar to Update(), the LOD subpipline is updated only if LOD is used.
+  void UpdateDataInformation();
+
+  // Description:
+  // Returns the current data information for the represented data.
+  // One can call UpdateDataInformation() before calling this method to get the
+  // data information from update pipeline. This method does not update the
+  // pipeline.
+  vtkGetObjectMacro(RepresentedDataInformation, vtkPVDataInformation);
 
   // Description:
   // Overridden to clear data valid flags.
@@ -181,14 +199,16 @@ protected:
   virtual void CreateLODPipeline(vtkSMSourceProxy* input, int outputport) =0;
 
   // Description:
-  // Gather the information of the displayed data
-  // for the current update state of the data pipeline (non-LOD).
-  virtual void GatherInformation(vtkPVDataInformation*) = 0;
+  // Gather the information of the displayed data (non-LOD).
+  // Update the part of the pipeline needed to gather full information
+  // and then gather that information. 
+  virtual void GatherInformation(vtkPVInformation*)= 0;
 
   // Description:
-  // Gather the information of the displayed data
-  // for the current update state of the LOD pipeline.
-  virtual void GatherLODInformation(vtkPVDataInformation*) = 0;
+  // Gather the information of the displayed data (lod);
+  // Update the part of the pipeline needed to gather full information
+  // and then gather that information. 
+  virtual void GatherLODInformation(vtkPVInformation*) = 0;
 
   // Description:
   // Update the LOD pipeline. Subclasses must override this method
@@ -262,12 +282,10 @@ protected:
   bool EnableCaching;
 
   bool LODDataValid;
-  bool LODInformationValid;
-  vtkPVDataInformation* LODInformation;
-
   bool DataValid;
+
   bool InformationValid;
-  vtkPVDataInformation* Information;
+  bool LODInformationValid;
 
   int LODResolution;
 
@@ -283,6 +301,12 @@ private:
   bool EnableLOD;
 
   vtkCommand* Observer;
+
+  vtkPVDataInformation* RepresentedDataInformation;
+  void SetRepresentedDataInformation(vtkPVDataInformation*);
+  unsigned long DataSize;
+  unsigned long LODDataSize;
+
 
 //ETX
 };

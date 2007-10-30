@@ -57,7 +57,7 @@ public:
     }
 };
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.56");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.57");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 vtkCxxSetObjectMacro(vtkPVUpdateSuppressor, CacheSizeKeeper, vtkCacheSizeKeeper);
 //----------------------------------------------------------------------------
@@ -80,6 +80,9 @@ vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
     {
     this->SetCacheSizeKeeper(
       vtkProcessModule::GetProcessModule()->GetCacheSizeKeeper());
+
+    this->UpdateNumberOfPieces = pm->GetNumberOfLocalPartitions();
+    this->UpdatePiece = pm->GetPartitionId();
     }
 }
 
@@ -201,6 +204,13 @@ void vtkPVUpdateSuppressor::RemoveAllCaches()
     // Tell the cache size keeper about the newly freed memory size.
     this->CacheSizeKeeper->FreeCacheSize(freed_size);
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVUpdateSuppressor::IsCached(double cacheTime)
+{
+  vtkPVUpdateSuppressorCacheMap::iterator iter = this->Cache->find(cacheTime);
+  return  (iter == this->Cache->end())? 0 : 1;
 }
 
 //----------------------------------------------------------------------------

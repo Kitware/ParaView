@@ -89,7 +89,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.51");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.52");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -473,6 +473,11 @@ int vtkSMRenderViewProxy::GetLODResolution()
 //-----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::SetUseLOD(bool use_lod)
 {
+  if (this->GetUseLOD() != use_lod)
+    {
+    // we only need to invalidate the DisplayDataSize, but we do both for now.
+    this->InvalidateDataSizes();
+    }
   this->Information->Set(USE_LOD(), use_lod);
 }
 
@@ -494,29 +499,10 @@ void vtkSMRenderViewProxy::BeginInteractiveRender()
   vtkRenderWindow *renWin = this->GetRenderWindow(); 
   renWin->SetDesiredUpdateRate(5.0);
 
-  bool using_lod = this->GetUseLOD();
-
-  // Determine if we are using LOD or not.
-  if (this->GetLODDecision())
-    {
-    this->SetUseLOD(true);
-    if (!using_lod)
-      {
-      // We changed LOD decision, implying that the LOD pipelines for all
-      // representations aren't up-to-date, ensure that they are updated.
-      // This can be done by setting the ForceRepresentationUpdate to true
-      // as a result of which the superclass will update the representations once 
-      // again before performing render.
-      this->SetForceRepresentationUpdate(true);
-      }
-    }
-  else
-    {
-    this->SetUseLOD(false);
-    // Even if using_lod was true, we don't need to UpdateAllRepresentations
-    // since calling UpdateAllRepresentations when UseLOD is true updates the
-    // full-res pipeline anyways.
-    }
+  // Determine if we are using LOD or not
+  // This may partially update the representation pipelines to get correct data
+  // size information.
+  this->SetUseLOD(this->GetLODDecision());
 
   this->GetRenderer()->ResetCameraClippingRange();
   this->Superclass::BeginInteractiveRender();
@@ -831,7 +817,7 @@ void vtkSMRenderViewProxy::ComputeVisiblePropBounds(double bds[6])
       iter->GetCurrentObject());
     if (repr && repr->GetVisibility())
       {
-      vtkPVDataInformation* info = repr->GetDisplayedDataInformation();
+      vtkPVDataInformation* info = repr->GetRepresentedDataInformation(true);
       if (!info)
         {
         continue;
@@ -1156,7 +1142,7 @@ vtkIdType vtkSMRenderViewProxy::GetTotalNumberOfPolygons()
       iter->GetCurrentObject());
     if (repr && repr->GetVisibility())
       {
-      vtkPVDataInformation* info = repr->GetDisplayedDataInformation();
+      vtkPVDataInformation* info = repr->GetRepresentedDataInformation(true);
       if (!info)
         {
         continue;
@@ -1460,7 +1446,7 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
       {
       continue;
       }
-    vtkPVDataInformation* datainfo = repr->GetDisplayedDataInformation();
+    vtkPVDataInformation* datainfo = repr->GetRepresentedDataInformation(true);
     if (!datainfo)
       {
       continue;
@@ -1531,7 +1517,7 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
       continue;
       }
 
-    vtkPVDataInformation *gi = repr->GetDisplayedDataInformation();
+    vtkPVDataInformation *gi = repr->GetRepresentedDataInformation(true);
     if (!gi)
       {
       continue;

@@ -22,7 +22,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationStrategy.h"
 
-vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.4");
+vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.5");
 //----------------------------------------------------------------------------
 vtkSMMultiProcessRenderView::vtkSMMultiProcessRenderView()
 {
@@ -89,22 +89,16 @@ bool vtkSMMultiProcessRenderView::GetCompositingDecision(
 //----------------------------------------------------------------------------
 void vtkSMMultiProcessRenderView::BeginStillRender()
 {
-  // When BeginStillRender() is called, we are assured that
-  // UpdateAllRepresentations() has been called ensuring that all representation
-  // pipelines are up-to-date. Since the representation strategies gurantee that
-  // the full-res pipelines are always updated, we don't have to worry about
-  // whether LOD is enabled when the UpdateAllRepresentations() was called.
- 
+  // When BeginStillRender() is called, none of the representations have been
+  // updated. However, if any of the visible representations need an update, 
+  // then when we call GetVisibileFullResDataSize() we are assured that the
+  // representations will atleast be partially updated (until before they start
+  // moving the data around) to ensure that correct data sizes are obtained.
+
   // Find out whether we are going to render with or without compositing.
   // We use the full res data size for this decision.
   this->LastCompositingDecision = 
     this->GetCompositingDecision(this->GetVisibileFullResDataSize(), 1);
-
-  // If the collection decision has changed our representation pipelines may be
-  // out of date. Hence, we tell the superclass to update representations once
-  // again prior to performing the render.
-  // TODO: call this method only if the collection decision really changed.
-  this->SetForceRepresentationUpdate(true);
 
   this->SetUseCompositing(this->LastCompositingDecision);
 
@@ -114,30 +108,16 @@ void vtkSMMultiProcessRenderView::BeginStillRender()
 //----------------------------------------------------------------------------
 void vtkSMMultiProcessRenderView::BeginInteractiveRender()
 {
-  // When BeginInteractiveRender() is called we are assured that
-  // UpdateAllRepresentations() has been called.
-
   // Give the superclass a chance to decide if it wants to use LOD or not.
   this->Superclass::BeginInteractiveRender();
 
-  // Update all representations prior to using their datasizes to determine if
-  // compositing should be used. This is necessary since if LOD decision changed
-  // from false to true, then, the LOD pipelines will be invalid and we need to
-  // use the LOD data information for the collection decision.
-  if (this->GetForceRepresentationUpdate())
-    {
-    this->SetForceRepresentationUpdate(false);
-    this->UpdateAllRepresentations();
-    }
+  // If LOD decision changed, then the superclass would have correctly marked
+  // the this->DisplayedDataSizeValid flag so that the next call to
+  // GetVisibleDisplayedDataSize() will update the LOD pipeline (atleast
+  // partially) if required to obtain correct data sizes.
 
   this->LastCompositingDecision = 
     this->GetCompositingDecision(this->GetVisibleDisplayedDataSize(), 0);
-
-  // If the collection decision has changed our representation pipelines may be
-  // out of date. Hence, we tell the superclass to update representations once
-  // again prior to performing the render.
-  // TODO: call this method only if the collection decision really changed.
-  this->SetForceRepresentationUpdate(true);
 
   this->SetUseCompositing(this->LastCompositingDecision);
 }

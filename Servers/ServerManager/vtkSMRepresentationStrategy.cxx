@@ -18,13 +18,16 @@
 #include "vtkInformation.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVDataSizeInformation.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.15");
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.16");
+vtkCxxSetObjectMacro(vtkSMRepresentationStrategy, 
+  RepresentedDataInformation, vtkPVDataInformation);
 //----------------------------------------------------------------------------
 vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 {
@@ -36,12 +39,12 @@ vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
   this->EnableCaching = true;
  
   this->LODDataValid = false;
-  this->LODInformation = vtkPVGeometryInformation::New();;
-  this->LODInformationValid = false;
+  this->LODDataSize = 0;
   this->LODResolution = 50;
+  this->LODInformationValid =false;
 
   this->DataValid = false;
-  this->Information = vtkPVGeometryInformation::New();
+  this->DataSize = 0;
   this->InformationValid = false;
 
   vtkMemberFunctionCommand<vtkSMRepresentationStrategy>* command =
@@ -51,6 +54,7 @@ vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
   this->Observer = command;
 
   this->KeepLODPipelineUpdated = false;
+  this->RepresentedDataInformation = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -59,11 +63,10 @@ vtkSMRepresentationStrategy::~vtkSMRepresentationStrategy()
   this->AddInput(0, 0, 0, 0);
   this->SetViewInformation(0);
 
-  this->LODInformation->Delete();
-  this->Information->Delete();
-
   this->Observer->Delete();
   this->Observer = 0;
+
+  this->SetRepresentedDataInformation(0);
 }
 
 //----------------------------------------------------------------------------
@@ -107,48 +110,24 @@ void vtkSMRepresentationStrategy::MarkModified(vtkSMProxy* modifiedProxy)
 void vtkSMRepresentationStrategy::InvalidatePipeline()
 {
   this->DataValid = false;
+  this->InformationValid = false;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMRepresentationStrategy::InvalidateLODPipeline()
 {
   this->LODDataValid = false;
+  this->LODInformationValid = false;
 }
 
 //----------------------------------------------------------------------------
-vtkPVDataInformation* vtkSMRepresentationStrategy::GetDisplayedDataInformation()
+unsigned long vtkSMRepresentationStrategy::GetDisplayedMemorySize()
 {
   if (this->GetUseLOD())
     {
-    return this->GetLODDataInformation();
+    return this->GetLODMemorySize();
     }
-
-  return this->GetFullResDataInformation();
-}
-
-//----------------------------------------------------------------------------
-vtkPVDataInformation* vtkSMRepresentationStrategy::GetLODDataInformation()
-{
-  if (!this->LODInformationValid)
-    {
-    this->LODInformationValid = true;
-    this->LODInformation->Initialize();
-    this->GatherLODInformation(this->LODInformation);
-    }
-  return this->LODInformation;
-}
-
-//----------------------------------------------------------------------------
-vtkPVDataInformation* vtkSMRepresentationStrategy::GetFullResDataInformation()
-{
-  if (!this->InformationValid)
-    {
-    this->InformationValid = true;
-    this->Information->Initialize();
-    this->GatherInformation(this->Information);
-    }
-
-  return this->Information;
+  return this->GetFullResMemorySize();
 }
 
 //----------------------------------------------------------------------------
@@ -216,6 +195,30 @@ void vtkSMRepresentationStrategy::Update()
       }
 
     this->InvokeEvent(vtkCommand::EndEvent);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationStrategy::UpdateDataInformation()
+{
+  if (!this->InformationValid)
+    {
+    vtkPVDataInformation* info = vtkPVGeometryInformation::New();
+    this->GatherInformation(info);
+    this->SetRepresentedDataInformation(info);
+    this->DataSize = static_cast<unsigned long>(info->GetMemorySize());
+    this->InformationValid = true;
+    info->Delete();
+    }
+
+  if ( (this->GetUseLOD() || (this->EnableLOD && this->KeepLODPipelineUpdated)) 
+    && !this->LODInformationValid)
+    {
+    vtkPVDataSizeInformation* info = vtkPVDataSizeInformation::New();
+    this->GatherLODInformation(info);
+    this->LODDataSize = static_cast<unsigned long>(info->GetMemorySize());
+    this->LODInformationValid = true;
+    info->Delete();
     }
 }
 

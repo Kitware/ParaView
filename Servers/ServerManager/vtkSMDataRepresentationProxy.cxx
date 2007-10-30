@@ -16,7 +16,6 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVDataInformation.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyProperty.h"
@@ -54,7 +53,7 @@ protected:
 };
 
 
-vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.8");
 vtkCxxSetObjectMacro(vtkSMDataRepresentationProxy, InputProxy, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMDataRepresentationProxy::vtkSMDataRepresentationProxy()
@@ -208,41 +207,6 @@ bool vtkSMDataRepresentationProxy::UpdateRequired()
 }
 
 //----------------------------------------------------------------------------
-vtkPVDataInformation* vtkSMDataRepresentationProxy::GetDisplayedDataInformation()
-{
-  vtkSMRepresentationStrategyVector::iterator iter;
-  for (iter = this->RepresentationStrategies->begin(); 
-    iter != this->RepresentationStrategies->end(); ++iter)
-    {
-    vtkPVDataInformation* subInfo = 
-      iter->GetPointer()->GetDisplayedDataInformation();
-    if (subInfo)
-      {
-      return subInfo;
-      }
-    }
-  return 0;
-
-}
-
-//----------------------------------------------------------------------------
-vtkPVDataInformation* vtkSMDataRepresentationProxy::GetFullResDataInformation()
-{
-  vtkSMRepresentationStrategyVector::iterator iter;
-  for (iter = this->RepresentationStrategies->begin(); 
-    iter != this->RepresentationStrategies->end(); ++iter)
-    {
-    vtkPVDataInformation* subInfo = 
-      iter->GetPointer()->GetFullResDataInformation();
-    if (subInfo)
-      {
-      return subInfo;
-      }
-    }
-  return 0;
-}
-
-//----------------------------------------------------------------------------
 void vtkSMDataRepresentationProxy::SetUseViewUpdateTime(bool val)
 {
   if (val == this->UseViewUpdateTime)
@@ -353,6 +317,71 @@ void vtkSMDataRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)
     }
 
   this->Superclass::MarkModified(modifiedProxy);
+}
+
+//----------------------------------------------------------------------------
+vtkPVDataInformation* vtkSMDataRepresentationProxy::GetRepresentedDataInformation(
+  bool update/*=true*/)
+{
+  if (!this->GetInputProxy())
+    {
+    vtkErrorMacro("Input not set, cannot gather information.");
+    return 0;
+    }
+
+  // We don't use active stratgies since active strategies are returned only
+  // when visibile.
+  vtkSMRepresentationStrategyVector::iterator iter;
+  for (iter = this->RepresentationStrategies->begin(); 
+    iter != this->RepresentationStrategies->end(); ++iter)
+    {
+    if (update)
+      {
+      // update part of pipeline to obtain correct data size information.
+      iter->GetPointer()->UpdateDataInformation();
+      }
+    return iter->GetPointer()->GetRepresentedDataInformation();
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+unsigned long vtkSMDataRepresentationProxy::GetFullResMemorySize()
+{
+  unsigned long size = 0;
+
+  vtkSMRepresentationStrategyVector activeStrategies;
+  this->GetActiveStrategies(activeStrategies);
+
+  vtkSMRepresentationStrategyVector::iterator iter;
+  for (iter = activeStrategies.begin(); iter != activeStrategies.end(); ++iter)
+    {
+    // update part of pipeline to obtain correct data size information.
+    iter->GetPointer()->UpdateDataInformation();
+    size += iter->GetPointer()->GetFullResMemorySize();
+    }
+
+  return size;
+}
+
+//----------------------------------------------------------------------------
+unsigned long vtkSMDataRepresentationProxy::GetDisplayedMemorySize()
+{
+  unsigned long size = 0;
+
+  vtkSMRepresentationStrategyVector activeStrategies;
+  this->GetActiveStrategies(activeStrategies);
+
+  vtkSMRepresentationStrategyVector::iterator iter;
+  for (iter = activeStrategies.begin(); iter != activeStrategies.end(); ++iter)
+    {
+    // update part of pipeline to obtain correct data size information.
+    iter->GetPointer()->UpdateDataInformation();
+    size += iter->GetPointer()->GetDisplayedMemorySize();
+    }
+
+  return size;
 }
 
 //----------------------------------------------------------------------------

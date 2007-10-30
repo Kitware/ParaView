@@ -17,13 +17,13 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkPVDataInformation.h"
+#include "vtkPVDataSizeInformation.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.11");
+vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.12");
 //----------------------------------------------------------------------------
 vtkSMSimpleStrategy::vtkSMSimpleStrategy()
 {
@@ -64,49 +64,6 @@ void vtkSMSimpleStrategy::BeginCreateVTKObjects()
     {
     this->SetEnableLOD(false);
     }
-
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSimpleStrategy::EndCreateVTKObjects()
-{
-  this->Superclass::EndCreateVTKObjects();
-
-  // Update piece information on each of the update suppressors.
-  this->UpdatePieceInformation(this->UpdateSuppressor);
-  if (this->GetEnableLOD())
-    {
-    this->UpdatePieceInformation(this->UpdateSuppressorLOD);
-    }
-
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSimpleStrategy::UpdatePieceInformation(vtkSMSourceProxy* updateSuppressor)
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
-
-  // Init UpdateSuppressor properties.
-  // Seems like we can't use properties for this 
-  // to work properly.
-  stream
-    << vtkClientServerStream::Invoke
-    << pm->GetProcessModuleID() << "GetNumberOfLocalPartitions"
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Invoke
-    << updateSuppressor->GetID() << "SetUpdateNumberOfPieces"
-    << vtkClientServerStream::LastResult
-    << vtkClientServerStream::End;
-  stream
-    << vtkClientServerStream::Invoke
-    << pm->GetProcessModuleID() << "GetPartitionId"
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Invoke
-    << updateSuppressor->GetID() << "SetUpdatePiece"
-    << vtkClientServerStream::LastResult
-    << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, updateSuppressor->GetServers(), stream);
 }
 
 //----------------------------------------------------------------------------
@@ -123,21 +80,29 @@ void vtkSMSimpleStrategy::CreateLODPipeline(vtkSMSourceProxy* input, int outputp
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleStrategy::GatherInformation(vtkPVDataInformation* info)
+void vtkSMSimpleStrategy::GatherInformation(vtkPVInformation* info)
 {
+  this->UpdatePipeline();
+
+  // For simple strategy information sub-pipline is same as the full pipeline
+  // since no data movements are involved.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->GatherInformation(this->ConnectionID,
-    this->UpdateSuppressor->GetServers(),
+    vtkProcessModule::DATA_SERVER_ROOT,
     info,
     this->UpdateSuppressor->GetID());
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleStrategy::GatherLODInformation(vtkPVDataInformation* info)
+void vtkSMSimpleStrategy::GatherLODInformation(vtkPVInformation* info)
 {
+  this->UpdateLODPipeline();
+
+  // For simple strategy information sub-pipline is same as the full pipeline
+  // since no data movements are involved.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->GatherInformation(this->ConnectionID,
-    this->UpdateSuppressorLOD->GetServers(),
+    vtkProcessModule::DATA_SERVER_ROOT,
     info,
     this->UpdateSuppressorLOD->GetID());
 }
