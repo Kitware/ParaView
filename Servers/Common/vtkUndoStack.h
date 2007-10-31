@@ -139,11 +139,19 @@ public:
   // Description:
   // Returns if the stack is currently being redone.
   vtkGetMacro(InRedo, bool);
+
+  // Description:
+  // Get set the maximum stack depth. As more entries are pushed on the stack,
+  // if its size exceeds this limit then old entries will be removed.
+  // Default is 10.
+  vtkSetClampMacro(StackDepth, int, 1, 100);
+  vtkGetMacro(StackDepth, int);
 protected:
   vtkUndoStack();
   ~vtkUndoStack();
 
   vtkUndoStackInternal* Internal;
+  int StackDepth;
 
 private:
   vtkUndoStack(const vtkUndoStack&); // Not implemented.

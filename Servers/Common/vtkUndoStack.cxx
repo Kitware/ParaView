@@ -20,13 +20,14 @@
 
 
 vtkStandardNewMacro(vtkUndoStack);
-vtkCxxRevisionMacro(vtkUndoStack, "1.5");
+vtkCxxRevisionMacro(vtkUndoStack, "1.6");
 //-----------------------------------------------------------------------------
 vtkUndoStack::vtkUndoStack()
 {
   this->Internal = new vtkUndoStackInternal;
   this->InUndo = false;
   this->InRedo = false;
+  this->StackDepth = 10;
 }
 
 //-----------------------------------------------------------------------------
@@ -47,6 +48,12 @@ void vtkUndoStack::Clear()
 void vtkUndoStack::Push(const char* label, vtkUndoSet* changeSet)
 {
   this->Internal->RedoStack.clear();
+
+  while (this->Internal->UndoStack.size() >= 
+    static_cast<unsigned int>(this->StackDepth) && this->StackDepth > 0)
+    {
+    this->Internal->UndoStack.erase(this->Internal->UndoStack.begin()); 
+    }
   this->Internal->UndoStack.push_back(
     vtkUndoStackInternal::Element(label, changeSet));
   this->Modified();
@@ -174,4 +181,5 @@ void vtkUndoStack::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "InUndo: " << this->InUndo << endl;
   os << indent << "InRedo: " << this->InRedo << endl;
+  os << indent << "StackDepth: " << this->StackDepth << endl;
 }
