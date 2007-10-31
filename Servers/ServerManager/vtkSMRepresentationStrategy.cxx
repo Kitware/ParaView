@@ -25,7 +25,7 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.16");
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.17");
 vtkCxxSetObjectMacro(vtkSMRepresentationStrategy, 
   RepresentedDataInformation, vtkPVDataInformation);
 //----------------------------------------------------------------------------
@@ -55,6 +55,9 @@ vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
 
   this->KeepLODPipelineUpdated = false;
   this->RepresentedDataInformation = 0;
+  vtkPVGeometryInformation* info = vtkPVGeometryInformation::New();
+  this->SetRepresentedDataInformation(info);
+  info->Delete();
 }
 
 //----------------------------------------------------------------------------
