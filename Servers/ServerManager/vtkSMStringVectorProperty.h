@@ -55,6 +55,10 @@ public:
   int SetElement(unsigned int idx, const char* value);
 
   // Description:
+  // Sets multiple elements. The size of the property is changed to match count.
+  int SetElements(unsigned int count, const char* values[]);
+
+  // Description:
   // Returns the value of 1 element.
   const char* GetElement(unsigned int idx);
 

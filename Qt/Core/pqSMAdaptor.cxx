@@ -1297,15 +1297,17 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
     }
   else if(svp)
     {
-    for(int i=0; i<num; i++)
+    const char** cvalues = new const char*[num];
+    vtkstd::string *str_values= new vtkstd::string[num];
+    for (int cc=0; cc < num; cc++)
       {
-      QString v = Value[i].toString();
-      if(!v.isNull())
-        {
-        svp->SetElement(i, v.toAscii().data());
-        }
+      str_values[cc] = Value[cc].toString().toAscii().data();
+      cvalues[cc] = str_values[cc].c_str();
       }
-    svp->SetNumberOfElements(num);
+
+    svp->SetElements(num, cvalues);
+    delete []cvalues;
+    delete []str_values;
     }
   else if(idvp)
     {

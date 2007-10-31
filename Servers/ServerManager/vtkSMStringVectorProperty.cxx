@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.33");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.34");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -39,6 +39,13 @@ struct vtkSMStringVectorPropertyInternals
     this->LastPushedValues.clear();
     this->LastPushedValues.insert(this->LastPushedValues.end(),
       this->Values.begin(), this->Values.end());
+    }
+
+  void Resize(unsigned int num)
+    {
+    this->Values.resize(num);
+    this->Initialized.resize(num, 0);
+    this->UncheckedValues.resize(num);
     }
 };
 
@@ -184,9 +191,7 @@ void vtkSMStringVectorProperty::SetNumberOfElements(unsigned int num)
     {
     return;
     }
-  this->Internals->Values.resize(num);
-  this->Internals->Initialized.resize(num, 0);
-  this->Internals->UncheckedValues.resize(num);
+  this->Internals->Resize(num);
   this->Initialized = false;
   this->Modified();
 }
@@ -229,6 +234,57 @@ void vtkSMStringVectorProperty::SetUncheckedElement(
     this->SetNumberOfUncheckedElements(idx+1);
     }
   this->Internals->UncheckedValues[idx] = value;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMStringVectorProperty::SetElements(unsigned int count, const char* values[])
+{
+  unsigned int numElems = this->GetNumberOfElements();
+
+  if (this->Initialized && count == numElems)
+    {
+    // Check is cur values are same as the new values.
+    int modified = 0;
+    for (unsigned int cc=0; cc < numElems; cc++)
+      {
+      const char* value = values[cc]? values[cc] : "";
+      if (this->Internals->Values[cc] != value)
+        {
+        modified = 1;
+        break;
+        }
+      }
+    if (!modified)
+      {
+      // nothing changed.
+      return 1;
+      }
+    }
+
+  if ( vtkSMProperty::GetCheckDomains() )
+    {
+    this->SetNumberOfUncheckedElements(count);
+    for(unsigned int cc=0; cc<count; cc++)
+      {
+      this->SetUncheckedElement(cc, values[cc]?values[cc]:"");
+      }
+    
+    if (!this->IsInDomains())
+      {
+      this->SetNumberOfUncheckedElements(this->GetNumberOfElements());
+      return 0;
+      }
+    }
+
+  this->Internals->Resize(count);
+  for (unsigned int cc=0; cc < count; cc++)
+    {
+    this->Internals->Values[cc] = values[cc]? values[cc]: "";
+    this->Internals->Initialized[cc] = 1;
+    }
+  this->Initialized = true;
+  this->Modified();
+  return 1;
 }
 
 //---------------------------------------------------------------------------
