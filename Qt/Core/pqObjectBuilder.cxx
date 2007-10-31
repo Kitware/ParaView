@@ -242,27 +242,20 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
       {
       return 0;
       }
+
     unsigned int numElems = files.size();
-    if (numElems == 1)
+    if (numElems == 1 || !prop->GetRepeatCommand())
       {
       pqSMAdaptor::setElementProperty(prop, files[0]);
       }
     else
       {
-      // The property can handle multiple file names. This is a file
-      // series reader.
-      if (prop->GetRepeatCommand())
+      QList<QVariant> values;
+      foreach (QString file, files)
         {
-        prop->SetNumberOfElements(files.size());
-        for (unsigned int i=0; i<numElems; i++) 
-          {
-          prop->SetElement(i, files[i].toAscii().data());
-          }
+        values.push_back(file);
         }
-      else
-        {
-        pqSMAdaptor::setElementProperty(prop, files[0]);
-        }
+      pqSMAdaptor::setMultipleElementProperty(prop, values);
       }
     proxy->UpdateVTKObjects();
     prop->UpdateDependentDomains();
