@@ -110,6 +110,13 @@ void pqIntRangeWidget::setMinimum(int val)
   this->Minimum = val;
   this->Slider->setMinimum(val);
 }
+  
+void pqIntRangeWidget::setStrictRange(int min, int max)
+{
+  this->setMinimum(min);
+  this->setMaximum(max);
+  this->LineEdit->setValidator(new QIntValidator(min, max, this->LineEdit));
+}
 
 //-----------------------------------------------------------------------------
 void pqIntRangeWidget::sliderChanged(int val)

@@ -132,6 +132,11 @@ void pqIntRangeWidgetDomain::setRange(int min, int max)
     {
     range->setMinimum(min);
     range->setMaximum(max);
+    if(this->Internal->Domain->GetClassName() ==
+      QString("vtkSMIntRangeDomain"))
+      {
+      range->setStrictRange(min, max);
+      }
     }
 }
 

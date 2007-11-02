@@ -69,6 +69,10 @@ public slots:
   // set the max range value
   void setMaximum(int);
 
+  // set the range on both the slider and line edit's validator
+  // whereas other methods just do it on the slider
+  void setStrictRange(int, int);
+
 private slots:
   void sliderChanged(int);
   void textChanged(const QString&);

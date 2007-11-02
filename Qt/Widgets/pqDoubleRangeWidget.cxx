@@ -112,6 +112,13 @@ void pqDoubleRangeWidget::setMinimum(double val)
   this->Minimum = val;
 }
 
+void pqDoubleRangeWidget::setStrictRange(double min, double max)
+{
+  this->setMinimum(min);
+  this->setMaximum(max);
+  this->LineEdit->setValidator(new QDoubleValidator(min, max, this->LineEdit));
+}
+
 //-----------------------------------------------------------------------------
 void pqDoubleRangeWidget::sliderChanged(int val)
 {

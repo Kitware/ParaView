@@ -132,6 +132,11 @@ void pqDoubleRangeWidgetDomain::setRange(double min, double max)
     {
     range->setMinimum(min);
     range->setMaximum(max);
+    if(this->Internal->Domain->GetClassName() ==
+      QString("vtkSMDoubleRangeDomain"))
+      {
+      range->setStrictRange(min, max);
+      }
     }
 }
 
