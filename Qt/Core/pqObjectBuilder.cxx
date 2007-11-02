@@ -287,11 +287,16 @@ void pqObjectBuilder::destroy(pqPipelineSource* source)
   // * remove inputs.
   // TODO: this step should not be necessary, but it currently
   // is :(. Needs some looking into.
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    source->getProxy()->GetProperty("Input"));
-  if (pp)
+  vtkSmartPointer<vtkSMPropertyIterator> piter;
+  piter.TakeReference(source->getProxy()->NewPropertyIterator());
+  for(piter->Begin(); !piter->IsAtEnd(); piter->Next())
     {
-    pp->RemoveAllProxies();
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      piter->GetProperty());
+    if (pp)
+      {
+      pp->RemoveAllProxies();
+      }
     }
 
   // * remove all representations.
