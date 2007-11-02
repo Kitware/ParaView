@@ -2162,11 +2162,11 @@ This filter creates a new cell array containing a geometric measure of each cell
    </SourceProxy>
 
    <SourceProxy name="PolyDataNormals" class="vtkPPolyDataNormals"
-    label="Normals Generation">
+    label="Generate Surface Normals">
     <Documentation
        long_help="This filter will produce surface normals used for smooth shading. Spltting is used to avoid smoothing across feature edges."
        short_help="Produce surface point normals.">
-The Normals generation filter generates surface normals at the points of the input polygonal dataset to provide smooth shading of the dataset. The resulting dataset is also polygonal. The filter works by calculating a normal vector for each polygon in the dataset and then averaging the normals at the shared points.
+This filter generates surface normals at the points of the input polygonal dataset to provide smooth shading of the dataset. The resulting dataset is also polygonal. The filter works by calculating a normal vector for each polygon in the dataset and then averaging the normals at the shared points.
     </Documentation>
     <InputProperty
        name="Input"
