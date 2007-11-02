@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqIntRangeWidget::pqIntRangeWidget(QWidget* p)
   : QWidget(p) 
 {
+  this->BlockUpdate = false;
   this->Value = 0;
   this->Minimum = 0;
   this->Maximum = 1;
@@ -83,15 +84,18 @@ void pqIntRangeWidget::setValue(int val)
     return;
   }
 
-  // set the slider 
-  this->Slider->blockSignals(true);
-  this->Slider->setValue(val);
-  this->Slider->blockSignals(false);
+  if(!this->BlockUpdate)
+    {
+    // set the slider 
+    this->Slider->blockSignals(true);
+    this->Slider->setValue(val);
+    this->Slider->blockSignals(false);
 
-  // set the text
-  this->LineEdit->blockSignals(true);
-  this->LineEdit->setText(QString().setNum(val));
-  this->LineEdit->blockSignals(false);
+    // set the text
+    this->LineEdit->blockSignals(true);
+    this->LineEdit->setText(QString().setNum(val));
+    this->LineEdit->blockSignals(false);
+    }
 
   this->Value = val;
   emit this->valueChanged(this->Value);
@@ -121,23 +125,25 @@ void pqIntRangeWidget::setStrictRange(int min, int max)
 //-----------------------------------------------------------------------------
 void pqIntRangeWidget::sliderChanged(int val)
 {
-  this->LineEdit->blockSignals(true);
-  this->LineEdit->setText(QString().setNum(val));
-  this->LineEdit->blockSignals(false);
-  
-  this->Value = val;
-  emit this->valueChanged(this->Value);
+  if(!this->BlockUpdate)
+    {
+    this->BlockUpdate = true;
+    this->LineEdit->setText(QString().setNum(val));
+    this->setValue(val);
+    this->BlockUpdate = false;
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqIntRangeWidget::textChanged(const QString& text)
 {
-  int val = text.toInt();
-  this->Slider->blockSignals(true);
-  this->Slider->setValue(val);
-  this->Slider->blockSignals(false);
-  
-  this->Value = val;
-  emit this->valueChanged(this->Value);
+  if(!this->BlockUpdate)
+    {
+    int val = text.toInt();
+    this->BlockUpdate = true;
+    this->Slider->setValue(val);
+    this->setValue(val);
+    this->BlockUpdate = false;
+    }
 }
 

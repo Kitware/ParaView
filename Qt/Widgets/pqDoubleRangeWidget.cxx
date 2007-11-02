@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
   : QWidget(p) 
 {
+  this->BlockUpdate = false;
   this->Value = 0;
   this->Minimum = 0;
   this->Maximum = 1;
@@ -83,18 +84,21 @@ void pqDoubleRangeWidget::setValue(double val)
     return;
   }
 
-  // set the slider 
-  double range = this->Maximum - this->Minimum;
-  double fraction = (val - this->Minimum) / range;
-  int v = qRound(fraction * 100.0);
-  this->Slider->blockSignals(true);
-  this->Slider->setValue(v);
-  this->Slider->blockSignals(false);
+  if(!this->BlockUpdate)
+    {
+    // set the slider 
+    this->Slider->blockSignals(true);
+    double range = this->Maximum - this->Minimum;
+    double fraction = (val - this->Minimum) / range;
+    int v = qRound(fraction * 100.0);
+    this->Slider->setValue(v);
+    this->Slider->blockSignals(false);
 
-  // set the text
-  this->LineEdit->blockSignals(true);
-  this->LineEdit->setText(QString().setNum(val));
-  this->LineEdit->blockSignals(false);
+    // set the text
+    this->LineEdit->blockSignals(true);
+    this->LineEdit->setText(QString().setNum(val));
+    this->LineEdit->blockSignals(false);
+    }
 
   this->Value = val;
   emit this->valueChanged(this->Value);
@@ -122,29 +126,31 @@ void pqDoubleRangeWidget::setStrictRange(double min, double max)
 //-----------------------------------------------------------------------------
 void pqDoubleRangeWidget::sliderChanged(int val)
 {
-  double fraction = val / 100.0;
-  double range = this->Maximum - this->Minimum;
-  double v = (fraction * range) + this->Minimum;
-  this->LineEdit->blockSignals(true);
-  this->LineEdit->setText(QString().setNum(v));
-  this->LineEdit->blockSignals(false);
-  
-  this->Value = val;
-  emit this->valueChanged(this->Value);
+  if(!this->BlockUpdate)
+    {
+    double fraction = val / 100.0;
+    double range = this->Maximum - this->Minimum;
+    double v = (fraction * range) + this->Minimum;
+    this->BlockUpdate = true;
+    this->LineEdit->setText(QString().setNum(v));
+    this->setValue(v);
+    this->BlockUpdate = false;
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqDoubleRangeWidget::textChanged(const QString& text)
 {
-  double val = text.toDouble();
-  double range = this->Maximum - this->Minimum;
-  double fraction = (val - this->Minimum) / range;
-  int sliderVal = qRound(fraction * 100.0);
-  this->Slider->blockSignals(true);
-  this->Slider->setValue(sliderVal);
-  this->Slider->blockSignals(false);
-  
-  this->Value = val;
-  emit this->valueChanged(this->Value);
+  if(!this->BlockUpdate)
+    {
+    double val = text.toDouble();
+    this->BlockUpdate = true;
+    double range = this->Maximum - this->Minimum;
+    double fraction = (val - this->Minimum) / range;
+    int sliderVal = qRound(fraction * 100.0);
+    this->Slider->setValue(sliderVal);
+    this->setValue(val);
+    this->BlockUpdate = false;
+    }
 }
 

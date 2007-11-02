@@ -83,6 +83,7 @@ private:
   double Maximum;
   QSlider* Slider;
   QLineEdit* LineEdit;
+  bool BlockUpdate;
 };
 
 #endif
