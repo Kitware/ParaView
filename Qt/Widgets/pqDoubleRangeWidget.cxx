@@ -116,7 +116,7 @@ void pqDoubleRangeWidget::setStrictRange(double min, double max)
 {
   this->setMinimum(min);
   this->setMaximum(max);
-  this->LineEdit->setValidator(new QDoubleValidator(min, max, this->LineEdit));
+  this->LineEdit->setValidator(new QDoubleValidator(min, max, 0, this->LineEdit));
 }
 
 //-----------------------------------------------------------------------------
