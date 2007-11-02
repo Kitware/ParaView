@@ -631,6 +631,31 @@ bool pqFlatTreeView::isIndexHidden(const QModelIndex &index) const
   return false;
 }
 
+void pqFlatTreeView::getVisibleRect(const QModelIndex &index, QRect &area) const
+{
+  if(!this->HeaderView)
+    {
+    return;
+    }
+
+  pqFlatTreeViewItem *item = this->getItem(index);
+  if(item)
+    {
+    int xPosition = this->HeaderView->sectionPosition(index.column());
+    if(xPosition == -1)
+      {
+      return;
+      }
+
+    area.setRect(xPosition, item->ContentsY,
+        this->getWidthSum(item, index.column()), item->Height);
+    area.setTop(area.top() + pqFlatTreeView::PipeLength);
+
+    // Translate the area back to widget coordinates.
+    area.translate(-this->horizontalOffset(), -this->verticalOffset());
+    }
+}
+
 QModelIndex pqFlatTreeView::getIndexVisibleAt(const QPoint &point) const
 {
   if(!this->HeaderView)

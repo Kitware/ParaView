@@ -159,6 +159,7 @@ public:
   /// \name Index Location Methods
   //@{
   bool isIndexHidden(const QModelIndex &index) const;
+  void getVisibleRect(const QModelIndex &index, QRect &area) const;
   QModelIndex getIndexVisibleAt(const QPoint &point) const;
   QModelIndex getIndexCellAt(const QPoint &point) const;
   void getSelectionIn(const QRect &rect, QItemSelection &items) const;
