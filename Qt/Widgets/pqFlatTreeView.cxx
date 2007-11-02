@@ -1584,7 +1584,13 @@ void pqFlatTreeView::updateData(const QModelIndex &topLeft,
         }
       else
         {
-        QRect area(0, startPoint, this->ContentsWidth, point - startPoint);
+        int updateWidth = this->viewport()->width();
+        if(this->ContentsWidth > updateWidth)
+          {
+          updateWidth = this->ContentsWidth;
+          }
+
+        QRect area(0, startPoint, updateWidth, point - startPoint);
         area.translate(-this->horizontalOffset(), -this->verticalOffset());
         this->viewport()->update(area);
         }
