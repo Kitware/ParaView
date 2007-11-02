@@ -42,6 +42,8 @@ SET(QtWidgets_SRCS
   pqDoubleSpinBox.h
   pqFlatTreeView.cxx
   pqFlatTreeView.h
+  pqIntRangeWidget.cxx
+  pqIntRangeWidget.h
   pqLineEditNumberValidator.cxx
   pqLineEditNumberValidator.h
   pqListWidgetCheckHelper.cxx
@@ -102,6 +104,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqDoubleRangeWidget.h
   pqDoubleSpinBox.h
   pqFlatTreeView.h
+  pqIntRangeWidget.h
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.h
   pqLookmarkToolbar.h

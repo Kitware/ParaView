@@ -69,6 +69,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComboBoxDomain.h"
 #include "pqDoubleRangeWidgetDomain.h"
 #include "pqDoubleRangeWidget.h"
+#include "pqIntRangeWidget.h"
+#include "pqIntRangeWidgetDomain.h"
 #include "pqDoubleSpinBoxDomain.h"
 #include "pqFieldSelectionAdaptor.h"
 #include "pqFileChooserWidget.h"
@@ -335,6 +337,7 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
     QSpinBox* spinBox = qobject_cast<QSpinBox*>(object);
     QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(object);
     pqDoubleRangeWidget* doubleRange = qobject_cast<pqDoubleRangeWidget*>(object);
+    pqIntRangeWidget* intRange = qobject_cast<pqIntRangeWidget*>(object);
     if(comboBox)
       {
       // these combo boxes tend to be true/false combos
@@ -388,6 +391,15 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
       d0->setObjectName("DoubleRangeWidgetDomain");
       property_manager->registerLink(
         doubleRange, "value", SIGNAL(valueChanged(double)),
+        proxy, SMProperty);
+      }
+    else if(intRange)
+      {
+      pqIntRangeWidgetDomain* d0 = new
+        pqIntRangeWidgetDomain(intRange, SMProperty);
+      d0->setObjectName("DoubleRangeWidgetDomain");
+      property_manager->registerLink(
+        intRange, "value", SIGNAL(valueChanged(int)),
         proxy, SMProperty);
       }
     else if(spinBox)
@@ -1209,21 +1221,15 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
         QLabel* label = createPanelLabel(panelLayout->parentWidget(),
                                          propertyLabel,
                                          propertyName);
-        QSlider* slider;
-        slider = new QSlider(Qt::Horizontal, panelLayout->parentWidget());
-        slider->setObjectName(QString(propertyName) + "_Slider");
-        slider->setRange(propertyDomain[0].toInt(), propertyDomain[1].toInt());
 
-        QLineEdit* lineEdit = new QLineEdit(panelLayout->parentWidget());
-        lineEdit->setObjectName(propertyName);
-        setupValidator(lineEdit, elem_property.type()); 
+        pqIntRangeWidget* range;
+        range = new pqIntRangeWidget(panelLayout->parentWidget());
+        range->setObjectName(propertyName);
+        range->setMinimum(propertyDomain[0].toInt());
+        range->setMaximum(propertyDomain[1].toInt());
         panelLayout->addWidget(label, rowCount, 0, 1, 1);
-        QHBoxLayout* hlayout = new QHBoxLayout;
-        hlayout->addWidget(slider);
-        hlayout->addWidget(lineEdit);
-        panelLayout->addLayout(hlayout, rowCount, 1, 1, 1);
-        slider->show();
-        lineEdit->show();
+        panelLayout->addWidget(range, rowCount, 1, 1, 1);
+        range->show();
         rowCount++;
         }
       else if(elem_property.type() == QVariant::Double && 
@@ -1231,21 +1237,9 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
               propertyDomain[0].isValid() && propertyDomain[1].isValid() &&
               domainsTypes.contains("vtkSMDoubleRangeDomain"))
         {
-        /*
-        double range[2];
-        range[0] = propertyDomain[0].toDouble();
-        range[1] = propertyDomain[1].toDouble();
-        */
         QLabel* label = createPanelLabel(panelLayout->parentWidget(),
                                          propertyLabel,
                                          propertyName);
-        /*
-        QDoubleSpinBox* spinBox;
-        spinBox = new QDoubleSpinBox(panelLayout->parentWidget());
-        spinBox->setObjectName(propertyName);
-        spinBox->setRange(range[0], range[1]);
-        spinBox->setSingleStep((range[1] - range[0]) / 20.0);
-        */
         pqDoubleRangeWidget* range;
         range = new pqDoubleRangeWidget(panelLayout->parentWidget());
         range->setObjectName(propertyName);
@@ -1374,16 +1368,6 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
                 domain.size() && domain[i].size() == 2 &&
                 domain[i][0].isValid() && domain[i][1].isValid())
           {
-          /*
-          double range[2];
-          range[0] = domain[i][0].toDouble();
-          range[1] = domain[i][1].toDouble();
-          QDoubleSpinBox* spinBox;
-          spinBox = new QDoubleSpinBox(panelLayout->parentWidget());
-          spinBox->setObjectName(QString("%1_%2").arg(propertyName).arg(i));
-          spinBox->setRange(range[0], range[1]);
-          spinBox->setSingleStep((range[1] - range[0]) / 20.0);
-          */
           pqDoubleRangeWidget* range;
           range = new pqDoubleRangeWidget(panelLayout->parentWidget());
           range->setObjectName(QString("%1_%2").arg(propertyName).arg(i));

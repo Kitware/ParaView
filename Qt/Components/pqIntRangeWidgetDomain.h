@@ -1,7 +1,7 @@
 /*=========================================================================
 
-   Program:   ParaView
-   Module:    pqDoubleRangeWidget.h
+   Program: ParaView
+   Module:    pqIntRangeWidgetDomain.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,56 +29,41 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqDoubleRangeWidget_h
-#define __pqDoubleRangeWidget_h
 
-#include <QWidget>
-#include "QtWidgetsExport.h"
-  
-class QSlider;
-class QLineEdit;
+#ifndef pq_IntRangeWidgetDomain_h
+#define pq_IntRangeWidgetDomain_h
 
-/// a widget with a tied slider and line edit for editing a double property
-class QTWIDGETS_EXPORT pqDoubleRangeWidget : public QWidget
+#include <QObject>
+#include "pqComponentsExport.h"
+
+class pqIntRangeWidget;
+class vtkSMProperty;
+
+/// combo box domain 
+/// observers the domain for a combo box and updates accordingly
+class PQCOMPONENTS_EXPORT pqIntRangeWidgetDomain : public QObject
 {
   Q_OBJECT
-  Q_PROPERTY(double value READ value WRITE setValue)
 public:
-  /// constructor requires the proxy, property
-  pqDoubleRangeWidget(QWidget* parent = NULL);
-  ~pqDoubleRangeWidget();
-
-  /// get the value
-  double value() const;
-  
-  // get the min range value
-  double minimum() const;
-  // get the max range value
-  double maximum() const;
-  
-signals:
-  /// signal the value changed
-  void valueChanged(double);
+  /// constructor requires a pqIntRangeWidget, 
+  /// and the property with the domain to observe
+  /// the list of values in the combo box is automatically 
+  /// updated when the domain changes
+  pqIntRangeWidgetDomain(pqIntRangeWidget* p, vtkSMProperty* prop, int index=-1);
+  ~pqIntRangeWidgetDomain();
 
 public slots:
-  /// set the value
-  void setValue(double);
+  void domainChanged();
+protected slots:
+  void internalDomainChanged();
 
-  // set the min range value
-  void setMinimum(double);
-  // set the max range value
-  void setMaximum(double);
+protected:
+  virtual void setRange(int min, int max);
 
-private slots:
-  void sliderChanged(int);
-  void textChanged(const QString&);
-
+  pqIntRangeWidget* getRangeWidget() const;
 private:
-  double Value;
-  double Minimum;
-  double Maximum;
-  QSlider* Slider;
-  QLineEdit* LineEdit;
+  class pqInternal;
+  pqInternal* Internal;
 };
 
 #endif

@@ -105,6 +105,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqHandleWidget.h
   pqImageTip.h
   pqImplicitPlaneWidget.h
+  pqIntRangeWidgetDomain.h
   pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.h
   pqKeyFrameTypeWidget.h
@@ -439,6 +440,8 @@ ADD_LIBRARY(pqComponents
   pqImageTip.h
   pqImplicitPlaneWidget.cxx
   pqImplicitPlaneWidget.h
+  pqIntRangeWidgetDomain.cxx
+  pqIntRangeWidgetDomain.h
   pqKeyFrameEditor.cxx
   pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.cxx

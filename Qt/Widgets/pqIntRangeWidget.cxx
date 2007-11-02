@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaView
-   Module:    pqDoubleRangeWidget.cxx
+   Module:    pqIntRangeWidget.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,15 +30,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqDoubleRangeWidget.h"
+#include "pqIntRangeWidget.h"
 
 // Qt includes
 #include <QLineEdit>
 #include <QSlider>
 #include <QHBoxLayout>
-#include <QDoubleValidator>
+#include <QIntValidator>
 
-pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
+pqIntRangeWidget::pqIntRangeWidget(QWidget* p)
   : QWidget(p) 
 {
   this->Value = 0;
@@ -48,13 +48,13 @@ pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
   QHBoxLayout* l = new QHBoxLayout(this);
   l->setMargin(0);
   this->Slider = new QSlider(Qt::Horizontal, this);
-  this->Slider->setRange(0,100);
+  this->Slider->setRange(0,1);
   l->addWidget(this->Slider);
   this->Slider->setObjectName("Slider");
   this->LineEdit = new QLineEdit(this);
   l->addWidget(this->LineEdit);
   this->LineEdit->setObjectName("LineEdit");
-  this->LineEdit->setValidator(new QDoubleValidator(this->LineEdit));
+  this->LineEdit->setValidator(new QIntValidator(this->LineEdit));
   this->LineEdit->setText(QString().setNum(this->Value));
 
   QObject::connect(this->Slider, SIGNAL(valueChanged(int)),
@@ -65,18 +65,18 @@ pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
 }
 
 //-----------------------------------------------------------------------------
-pqDoubleRangeWidget::~pqDoubleRangeWidget()
+pqIntRangeWidget::~pqIntRangeWidget()
 {
 }
 
 //-----------------------------------------------------------------------------
-double pqDoubleRangeWidget::value() const
+int pqIntRangeWidget::value() const
 {
   return this->Value;
 }
 
 //-----------------------------------------------------------------------------
-void pqDoubleRangeWidget::setValue(double val)
+void pqIntRangeWidget::setValue(int val)
 {
   if(this->Value == val)
   {
@@ -84,11 +84,8 @@ void pqDoubleRangeWidget::setValue(double val)
   }
 
   // set the slider 
-  double range = this->Maximum - this->Minimum;
-  double fraction = (val - this->Minimum) / range;
-  int v = qRound(fraction * 100.0);
   this->Slider->blockSignals(true);
-  this->Slider->setValue(v);
+  this->Slider->setValue(val);
   this->Slider->blockSignals(false);
 
   // set the text
@@ -101,25 +98,24 @@ void pqDoubleRangeWidget::setValue(double val)
 }
 
 //-----------------------------------------------------------------------------
-void pqDoubleRangeWidget::setMaximum(double val)
+void pqIntRangeWidget::setMaximum(int val)
 {
   this->Maximum = val;
+  this->Slider->setMaximum(val);
 }
 
 //-----------------------------------------------------------------------------
-void pqDoubleRangeWidget::setMinimum(double val)
+void pqIntRangeWidget::setMinimum(int val)
 {
   this->Minimum = val;
+  this->Slider->setMinimum(val);
 }
 
 //-----------------------------------------------------------------------------
-void pqDoubleRangeWidget::sliderChanged(int val)
+void pqIntRangeWidget::sliderChanged(int val)
 {
-  double fraction = val / 100.0;
-  double range = this->Maximum - this->Minimum;
-  double v = (fraction * range) + this->Minimum;
   this->LineEdit->blockSignals(true);
-  this->LineEdit->setText(QString().setNum(v));
+  this->LineEdit->setText(QString().setNum(val));
   this->LineEdit->blockSignals(false);
   
   this->Value = val;
@@ -127,14 +123,11 @@ void pqDoubleRangeWidget::sliderChanged(int val)
 }
 
 //-----------------------------------------------------------------------------
-void pqDoubleRangeWidget::textChanged(const QString& text)
+void pqIntRangeWidget::textChanged(const QString& text)
 {
-  double val = text.toDouble();
-  double range = this->Maximum - this->Minimum;
-  double fraction = (val - this->Minimum) / range;
-  int sliderVal = qRound(fraction * 100.0);
+  int val = text.toInt();
   this->Slider->blockSignals(true);
-  this->Slider->setValue(sliderVal);
+  this->Slider->setValue(val);
   this->Slider->blockSignals(false);
   
   this->Value = val;

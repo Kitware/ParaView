@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaView
-   Module:    pqDoubleRangeWidget.h
+   Module:    pqIntRangeWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqDoubleRangeWidget_h
-#define __pqDoubleRangeWidget_h
+#ifndef __pqIntRangeWidget_h
+#define __pqIntRangeWidget_h
 
 #include <QWidget>
 #include "QtWidgetsExport.h"
@@ -38,45 +38,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QSlider;
 class QLineEdit;
 
-/// a widget with a tied slider and line edit for editing a double property
-class QTWIDGETS_EXPORT pqDoubleRangeWidget : public QWidget
+/// a widget with a tied slider and line edit for editing a int property
+class QTWIDGETS_EXPORT pqIntRangeWidget : public QWidget
 {
   Q_OBJECT
-  Q_PROPERTY(double value READ value WRITE setValue)
+  Q_PROPERTY(int value READ value WRITE setValue)
 public:
   /// constructor requires the proxy, property
-  pqDoubleRangeWidget(QWidget* parent = NULL);
-  ~pqDoubleRangeWidget();
+  pqIntRangeWidget(QWidget* parent = NULL);
+  ~pqIntRangeWidget();
 
   /// get the value
-  double value() const;
+  int value() const;
   
   // get the min range value
-  double minimum() const;
+  int minimum() const;
   // get the max range value
-  double maximum() const;
+  int maximum() const;
   
 signals:
   /// signal the value changed
-  void valueChanged(double);
+  void valueChanged(int);
 
 public slots:
   /// set the value
-  void setValue(double);
+  void setValue(int);
 
   // set the min range value
-  void setMinimum(double);
+  void setMinimum(int);
   // set the max range value
-  void setMaximum(double);
+  void setMaximum(int);
 
 private slots:
   void sliderChanged(int);
   void textChanged(const QString&);
 
 private:
-  double Value;
-  double Minimum;
-  double Maximum;
+  int Value;
+  int Minimum;
+  int Maximum;
   QSlider* Slider;
   QLineEdit* LineEdit;
 };
