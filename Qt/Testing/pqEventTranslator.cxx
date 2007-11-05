@@ -61,6 +61,10 @@ struct pqEventTranslator::pqImplementation
   QVector<pqWidgetEventTranslator*> Translators;
   /// Stores the set of objects that should be ignored when translating events
   QSet<QObject*> IgnoredObjects;
+
+  // list of widgets for which mouse propagation will happen
+  // we'll only translate the first and ignore the rest
+  QList<QWidget*> MouseParents;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -124,6 +128,36 @@ void pqEventTranslator::ignoreObject(QObject* Object)
 
 bool pqEventTranslator::eventFilter(QObject* Object, QEvent* Event)
 {
+
+  // mouse events are propagated to parents
+  // our event translators/players don't quite like that,
+  // so lets consume those extra ones
+  if(Event->type() == QEvent::MouseButtonPress ||
+     Event->type() == QEvent::MouseButtonDblClick ||
+     Event->type() == QEvent::MouseButtonRelease)
+    {
+    if(!this->Implementation->MouseParents.empty() &&
+      this->Implementation->MouseParents.first() == Object)
+      {
+      // right on track
+      this->Implementation->MouseParents.removeFirst();
+      return false;
+      }
+
+    QWidget* widget = qobject_cast<QWidget*>(Object);
+    
+    // find the chain of parent that will get this mouse event
+    this->Implementation->MouseParents.clear();
+    for(QWidget* w = widget->parentWidget(); w; w = w->parentWidget())
+      {
+      this->Implementation->MouseParents.append(w);
+      if(w->isWindow() || w->testAttribute(Qt::WA_NoMousePropagation))
+        {
+        break;
+        }
+      }
+    }
+
   for(int i = 0; i != this->Implementation->Translators.size(); ++i)
     {
     bool error = false;

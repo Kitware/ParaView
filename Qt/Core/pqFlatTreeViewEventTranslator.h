@@ -35,9 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetEventTranslator.h"
 #include "pqCoreExport.h"
-
-class pqFlatTreeView;
-class QModelIndex;
+#include <QPoint>
 
 /**
 Translates low-level Qt events into high-level ParaView events that can be recorded as test cases.
@@ -54,14 +52,12 @@ public:
   
   virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 
+protected: 
+  QPoint LastPos;
+
 private:
   pqFlatTreeViewEventTranslator(const pqFlatTreeViewEventTranslator&);
   pqFlatTreeViewEventTranslator& operator=(const pqFlatTreeViewEventTranslator&);
-
-  pqFlatTreeView* CurrentObject;
-  
-private slots:
-  void onCurrentChanged(const QModelIndex&, const QModelIndex&);
 };
 
 #endif // !_pqFlatTreeViewEventTranslator_h

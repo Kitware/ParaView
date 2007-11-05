@@ -55,7 +55,6 @@ public:
   virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 
 protected:
-  QList<QPointer<QWidget> > Parents;
   QPoint LastPos;
 
 private:
