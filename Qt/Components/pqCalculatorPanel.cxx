@@ -340,15 +340,13 @@ void pqCalculatorPanel::reset()
   vtkSMProxy* CalcProxy = this->proxy();
 
 
-  // restore the function
-  QVariant v = pqSMAdaptor::getElementProperty(
-                 CalcProxy->GetProperty("Function"));
- 
-  this->Internal->Function->setText(v.toString());
-
   // restore the attribute mode
-  v = pqSMAdaptor::getElementProperty(CalcProxy->GetProperty("AttributeMode"));
+  QVariant v = pqSMAdaptor::getElementProperty(CalcProxy->GetProperty("AttributeMode"));
   this->Internal->AttributeMode->setCurrentIndex(v.toInt() == 2 ? 1 : 0);
+  
+  // restore the function (after attribute or function will be cleared)
+  v = pqSMAdaptor::getElementProperty(CalcProxy->GetProperty("Function"));
+  this->Internal->Function->setText(v.toString());
   
   // restore the results array name
   v = pqSMAdaptor::getElementProperty(
