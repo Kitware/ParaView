@@ -50,7 +50,7 @@ bool pqAbstractBooleanEventPlayer::playEvent(QObject* Object, const QString& Com
   if(QAbstractButton* const object = qobject_cast<QAbstractButton*>(Object))
     {
     if(value != object->isChecked())
-      object->setChecked(value);
+      object->click();
     return true;
     }
 
