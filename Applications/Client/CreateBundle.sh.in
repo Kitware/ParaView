@@ -140,7 +140,8 @@ for a in $(cd "${ParaView_BINARY_DIR}/bin" && ls *.so *.dylib); do
         done
         for lib in $(cd "${FFMPEG_LIB_DIR}" && ls libavcodec*dylib* libavformat*dylib* libavutil*dylib*); do
             libfile=$(basename "${FFMPEG_LIB_DIR}/${lib}")
-            install_name_tool paraview.app/Contents/MacOS/${file} -change "${FFMPEG_LIB_DIR}/${lib}" @executable_path/${libfile}
+	    old_path=`otool -L paraview.app/Contents/MacOS/${file} | grep $libfile | cut -f1 -d\( | grep -v :`
+            install_name_tool paraview.app/Contents/MacOS/${file} -change ${old_path} @executable_path/${libfile}
         done
         if [ "x$DEBUG" = "x1" ]; then
             echo "Stage 2.b.${ParaView_BINARY_DIR}/bin/$a"
@@ -156,11 +157,12 @@ for a in $(cd "${FFMPEG_LIB_DIR}" && ls libavcodec*dylib* libavformat*dylib* lib
     if [ -e "${FFMPEG_LIB_DIR}/$a" ]; then
         echo -n .
         file=$(basename "${FFMPEG_LIB_DIR}/$a")
+	old_path=`otool -L ${executable} | grep ${file} | cut -f1 -d\( | grep -v :`
         for executable in ${EXECUTABLES}; do
-            install_name_tool "${executable}" -change "${FFMPEG_LIB_DIR}/$a" @executable_path/${file}
+            install_name_tool "${executable}" -change ${old_path} @executable_path/${file}
         done
         for executable in ${SUB_EXECUTABLES}; do
-            install_name_tool "${executable}" -change "${FFMPEG_LIB_DIR}/$a" @executable_path/../../../${file}
+            install_name_tool "${executable}" -change ${old_path} @executable_path/../../../${file}
         done
         install_name_tool paraview.app/Contents/MacOS/${file} -id @executable_path/${file}
 
@@ -173,7 +175,8 @@ for a in $(cd "${FFMPEG_LIB_DIR}" && ls libavcodec*dylib* libavformat*dylib* lib
         done
         for lib in $(cd "${FFMPEG_LIB_DIR}" && ls libavcodec*dylib* libavformat*dylib* libavutil*dylib*); do
             libfile=$(basename "${FFMPEG_LIB_DIR}/${lib}")
-            install_name_tool paraview.app/Contents/MacOS/${file} -change "${FFMPEG_LIB_DIR}/${lib}" @executable_path/${libfile}
+	    old_path=`otool -L paraview.app/Contents/MacOS/${file} | grep ${libfile} | cut -f1 -d\( | grep -v :`
+            install_name_tool paraview.app/Contents/MacOS/${file} -change ${old_path} @executable_path/${libfile}
         done
         if [ "x$DEBUG" = "x1" ]; then
             echo "Stage 2.b.${FFMPEG_LIB_DIR}/$a"
