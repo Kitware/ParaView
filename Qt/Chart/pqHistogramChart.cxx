@@ -35,8 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqHistogramChart.h"
 
-#include "pqChartAxisModel.h"
+#include "pqChartArea.h"
 #include "pqChartAxis.h"
+#include "pqChartAxisModel.h"
 #include "pqChartContentsSpace.h"
 #include "pqHistogramChartOptions.h"
 #include "pqHistogramModel.h"
@@ -74,8 +75,7 @@ pqHistogramChart::pqHistogramChart(QObject *parentObject)
 {
   this->Internal = new pqHistogramChartInternal();
   this->Options = new pqHistogramChartOptions(this);
-  this->XAxis = 0;
-  this->YAxis = 0;
+  this->Axes = pqHistogramChart::BottomLeft;
   this->Model = 0;
   this->Selection = new pqHistogramSelectionModel(this);
   this->InModelChange = false;
@@ -97,24 +97,52 @@ pqHistogramChart::~pqHistogramChart()
   delete this->Selection;
 }
 
-void pqHistogramChart::setAxes(pqChartAxis *xAxis, pqChartAxis *yAxis)
+void pqHistogramChart::setChartAxes(ChartAxes axes)
 {
-  if(xAxis->getLocation() == pqChartAxis::Left ||
-      xAxis->getLocation() == pqChartAxis::Right)
+  if(this->Axes != axes)
     {
-    qCritical() << "Error: The x-axis must be a horizontal axis.";
-    return;
+    this->Axes = axes;
+    emit this->rangeChanged();
+    emit this->layoutNeeded();
+    }
+}
+
+pqChartAxis *pqHistogramChart::getXAxis() const
+{
+  pqChartArea *chartArea = this->getChartArea();
+  if(!chartArea)
+    {
+    return 0;
     }
 
-  if(yAxis->getLocation() == pqChartAxis::Top ||
-      yAxis->getLocation() == pqChartAxis::Bottom)
+  if(this->Axes == pqHistogramChart::BottomLeft ||
+      this->Axes == pqHistogramChart::BottomRight)
     {
-    qCritical() << "Error: The y-axis must be a vertical axis.";
-    return;
+    return chartArea->getAxis(pqChartAxis::Bottom);
+    }
+  else
+    {
+    return chartArea->getAxis(pqChartAxis::Top);
+    }
+}
+
+pqChartAxis *pqHistogramChart::getYAxis() const
+{
+  pqChartArea *chartArea = this->getChartArea();
+  if(!chartArea)
+    {
+    return 0;
     }
 
-  this->XAxis = xAxis;
-  this->YAxis = yAxis;
+  if(this->Axes == pqHistogramChart::BottomLeft ||
+      this->Axes == pqHistogramChart::TopLeft)
+    {
+    return chartArea->getAxis(pqChartAxis::Left);
+    }
+  else
+    {
+    return chartArea->getAxis(pqChartAxis::Right);
+    }
 }
 
 void pqHistogramChart::setModel(pqHistogramModel *model)
@@ -192,12 +220,7 @@ int pqHistogramChart::getBinAt(int x, int y,
 
 bool pqHistogramChart::getValueAt(int x, int y, pqChartValue &value) const
 {
-  if(!this->XAxis)
-    {
-    return false;
-    }
-
-  const pqChartPixelScale *scale = this->XAxis->getPixelValueScale();
+  const pqChartPixelScale *scale = this->getXAxis()->getPixelValueScale();
   if(this->Internal->Contents.isValid() && scale->isValid() &&
       this->Internal->Contents.contains(x, y))
     {
@@ -234,12 +257,7 @@ bool pqHistogramChart::getValueAt(int x, int y, pqChartValue &value) const
 bool pqHistogramChart::getValueRangeAt(int x, int y,
     pqHistogramSelection &range) const
 {
-  if(!this->XAxis)
-    {
-    return false;
-    }
-
-  const pqChartPixelScale *scale = this->XAxis->getPixelValueScale();
+  const pqChartPixelScale *scale = this->getXAxis()->getPixelValueScale();
   if(this->Internal->Contents.isValid() && scale->isValid() &&
     this->Internal->Contents.contains(x, y))
     {
@@ -338,12 +356,12 @@ void pqHistogramChart::getBinsIn(const QRect &area,
 void pqHistogramChart::getValuesIn(const QRect &area,
     pqHistogramSelectionList &list) const
 {
-  if(!this->XAxis || !area.isValid() || !this->Internal->Contents.isValid())
+  if(!area.isValid() || !this->Internal->Contents.isValid())
     {
     return;
     }
 
-  const pqChartPixelScale *scale = this->XAxis->getPixelValueScale();
+  const pqChartPixelScale *scale = this->getXAxis()->getPixelValueScale();
   if(!scale->isValid() || !area.intersects(this->Internal->Contents))
     {
     return;
@@ -400,12 +418,7 @@ void pqHistogramChart::getSelectionArea(const pqHistogramSelectionList &list,
     }
   else
     {
-    if(!this->XAxis)
-      {
-      return;
-      }
-
-    const pqChartPixelScale *scale = this->XAxis->getPixelValueScale();
+    const pqChartPixelScale *scale = this->getXAxis()->getPixelValueScale();
     if(!scale->isValid())
       {
       return;
@@ -432,12 +445,12 @@ bool pqHistogramChart::getAxisRange(const pqChartAxis *axis,
 {
   if(this->Model && this->Model->getNumberOfBins() > 0)
     {
-    if(axis == this->XAxis)
+    if(axis == this->getXAxis())
       {
       this->Model->getRangeX(min, max);
       return true;
       }
-    else if(axis == this->YAxis)
+    else if(axis == this->getYAxis())
       {
       this->Model->getRangeY(min, max);
       if(axis->getPixelValueScale()->getScaleType() ==
@@ -507,7 +520,7 @@ bool pqHistogramChart::isAxisControlPreferred(
     const pqChartAxis *axis) const
 {
   return this->Model != 0 && this->Model->getNumberOfBins() > 0 &&
-      this->XAxis != 0 && this->XAxis == axis;
+      axis == this->getXAxis();
 }
 
 void pqHistogramChart::generateAxisLabels(pqChartAxis *axis)
@@ -535,14 +548,14 @@ void pqHistogramChart::generateAxisLabels(pqChartAxis *axis)
 
 void pqHistogramChart::layoutChart(const QRect &area)
 {
-  if(!this->Model || !this->XAxis || !this->YAxis || !area.isValid())
+  if(!this->Model || !this->getChartArea() || !area.isValid())
     {
     return;
     }
 
   // Make sure the axes are valid.
-  const pqChartPixelScale *xScale = this->XAxis->getPixelValueScale();
-  const pqChartPixelScale *yScale = this->YAxis->getPixelValueScale();
+  const pqChartPixelScale *xScale = this->getXAxis()->getPixelValueScale();
+  const pqChartPixelScale *yScale = this->getYAxis()->getPixelValueScale();
   if(!xScale->isValid() || !yScale->isValid())
     {
     return;
@@ -852,7 +865,7 @@ void pqHistogramChart::finishBinRemoval()
 
 void pqHistogramChart::updateHighlights()
 {
-  if(!this->InModelChange && this->Internal->Contents.isValid() && this->XAxis)
+  if(!this->InModelChange && this->Internal->Contents.isValid())
     {
     this->layoutSelection();
     emit this->repaintNeeded();
@@ -862,7 +875,7 @@ void pqHistogramChart::updateHighlights()
 void pqHistogramChart::layoutSelection()
 {
   // Make sure the axes are valid.
-  const pqChartPixelScale *xScale = this->XAxis->getPixelValueScale();
+  const pqChartPixelScale *xScale = this->getXAxis()->getPixelValueScale();
   if(!xScale->isValid())
     {
     return;

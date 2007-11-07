@@ -144,7 +144,6 @@ struct LineChartAdapter::pqImplementation
     title->setPalette(titleColors);
     
     pqChartArea *area = this->Chart.getChartArea();
-    area->createAxis(pqChartAxis::Bottom);
     pqChartAxis *xAxis = area->getAxis(pqChartAxis::Bottom);
     pqChartAxisOptions *axisOptions = xAxis->getOptions();
     axisOptions->setGridColorType(pqChartAxisOptions::Specified);
@@ -157,7 +156,6 @@ struct LineChartAdapter::pqImplementation
     title->setFont(bold);
     this->Chart.setAxisTitle(pqChartAxis::Bottom, title);
     
-    area->createAxis(pqChartAxis::Left);
     pqChartAxis *yAxis = area->getAxis(pqChartAxis::Left);
     axisOptions = yAxis->getOptions();
     axisOptions->setGridColorType(pqChartAxisOptions::Specified);
@@ -170,7 +168,6 @@ struct LineChartAdapter::pqImplementation
     this->Chart.setAxisTitle(pqChartAxis::Left, title);
 
     this->LineChart = new pqLineChart(area);
-    this->LineChart->setAxes(xAxis, yAxis);
     this->LineChart->getOptions()->getGenerator()->setColorScheme(
       pqChartSeriesOptionsGenerator::WildFlower);
     area->addLayer(this->LineChart);

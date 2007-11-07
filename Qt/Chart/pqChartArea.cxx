@@ -72,31 +72,20 @@ public:
 class pqChartAreaInternal
 {
 public:
-  enum AxisIndex
-    {
-    LeftIndex = 0,
-    TopIndex,
-    RightIndex,
-    BottomIndex,
-    AxisCount
-    };
-
-public:
   pqChartAreaInternal();
-  ~pqChartAreaInternal();
+  ~pqChartAreaInternal() {}
 
-  int convertEnum(pqChartAxis::AxisLocation location) const;
-
-  QList<pqChartLayer *> Layers; ///< Stores the chart layers.
-  pqChartAreaAxisItem *Option;  ///< Stores the axis behaviors.
-  pqChartAxis **Axis;           ///< Stores the axis objects.
-  bool RangeChanged;            ///< True if the range has changed.
-  bool InResize;                ///< True if the widget is resizing.
-  bool InZoom;                  ///< True if handling a zoom layout.
-  bool SkipContextMenu;         ///< Used for context menu interaction.
-  bool DelayContextMenu;        ///< Used for context menu interaction.
-  bool ContextMenuBlocked;      ///< Used for context menu interaction.
-  bool LayoutPending;           ///< Used to delay chart layout.
+  QList<pqChartLayer *> Layers;  ///< Stores the chart layers.
+  pqChartAreaAxisItem Option[4]; ///< Stores the axis behaviors.
+  pqChartAxis *Axis[4];          ///< Stores the axis objects.
+  int LocationIndex[4];          ///< Maps the axis location to an index.
+  bool RangeChanged;             ///< True if the range has changed.
+  bool InResize;                 ///< True if the widget is resizing.
+  bool InZoom;                   ///< True if handling a zoom layout.
+  bool SkipContextMenu;          ///< Used for context menu interaction.
+  bool DelayContextMenu;         ///< Used for context menu interaction.
+  bool ContextMenuBlocked;       ///< Used for context menu interaction.
+  bool LayoutPending;            ///< Used to delay chart layout.
 };
 
 
@@ -112,8 +101,6 @@ pqChartAreaAxisItem::pqChartAreaAxisItem()
 pqChartAreaInternal::pqChartAreaInternal()
   : Layers()
 {
-  this->Option = new pqChartAreaAxisItem[pqChartAreaInternal::AxisCount];
-  this->Axis = new pqChartAxis *[pqChartAreaInternal::AxisCount];
   this->RangeChanged = false;
   this->InResize = false;
   this->InZoom = false;
@@ -122,44 +109,17 @@ pqChartAreaInternal::pqChartAreaInternal()
   this->ContextMenuBlocked = false;
   this->LayoutPending = false;
 
+  // Set up the location to index map.
+  this->LocationIndex[pqChartAxis::Left] = 0;
+  this->LocationIndex[pqChartAxis::Bottom] = 1;
+  this->LocationIndex[pqChartAxis::Right] = 2;
+  this->LocationIndex[pqChartAxis::Top] = 3;
+  
   // Initialize the axis pointers.
-  for(int i = 0; i < pqChartAreaInternal::AxisCount; i++)
+  for(int i = 0; i < 4; i++)
     {
     this->Axis[i] = 0;
     }
-}
-
-pqChartAreaInternal::~pqChartAreaInternal()
-{
-  // The axis objects will get deleted up by Qt's parent-child cleanup.
-  delete [] this->Option;
-  delete [] this->Axis;
-}
-
-int pqChartAreaInternal::convertEnum(
-    pqChartAxis::AxisLocation location) const
-{
-  switch(location)
-    {
-    case pqChartAxis::Left:
-      {
-      return pqChartAreaInternal::LeftIndex;
-      }
-    case pqChartAxis::Top:
-      {
-      return pqChartAreaInternal::TopIndex;
-      }
-    case pqChartAxis::Right:
-      {
-      return pqChartAreaInternal::RightIndex;
-      }
-    case pqChartAxis::Bottom:
-      {
-      return pqChartAreaInternal::BottomIndex;
-      }
-    }
-
-  return -1;
 }
 
 
@@ -178,9 +138,13 @@ pqChartArea::pqChartArea(QWidget *widgetParent)
   this->AxisLayer->setObjectName("AxisLayer");
   this->Contents->setObjectName("ContentsSpace");
 
+  // Set up the chart axes.
+  this->setupAxes();
+
   // Add the grid layer and axis layer to the list.
-  this->Internal->Layers.append(this->GridLayer);
-  this->Internal->Layers.append(this->AxisLayer);
+  this->addLayer(this->GridLayer);
+  this->addLayer(this->AxisLayer);
+  this->Internal->RangeChanged = false;
 
   // Set the default size and focus policy.
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -211,146 +175,24 @@ QSize pqChartArea::sizeHint() const
   return QSize(100, 100);
 }
 
-void pqChartArea::createAxis(pqChartAxis::AxisLocation location)
-{
-  pqChartAxis *axis = this->getAxis(location);
-  if(!axis)
-    {
-    int index = this->Internal->convertEnum(location);
-    if(index == -1)
-      {
-      return;
-      }
-
-    // Create the axis and a model for the axis.
-    pqChartAxis *across = 0;
-    axis = new pqChartAxis(location, this);
-    this->Internal->Axis[index] = axis;
-    pqChartAxisModel *model = new pqChartAxisModel(this);
-    axis->setModel(model);
-    axis->setContentsScpace(this->Contents);
-    if(location == pqChartAxis::Top || location == pqChartAxis::Bottom)
-      {
-      // Set the neighbors. Make sure the neighbors' neighbors are set.
-      axis->setNeigbors(this->Internal->Axis[pqChartAreaInternal::LeftIndex],
-          this->Internal->Axis[pqChartAreaInternal::RightIndex]);
-      if(this->Internal->Axis[pqChartAreaInternal::LeftIndex])
-        {
-        this->Internal->Axis[pqChartAreaInternal::LeftIndex]->setNeigbors(
-            this->Internal->Axis[pqChartAreaInternal::BottomIndex],
-            this->Internal->Axis[pqChartAreaInternal::TopIndex]);
-        }
-
-      if(this->Internal->Axis[pqChartAreaInternal::RightIndex])
-        {
-        this->Internal->Axis[pqChartAreaInternal::RightIndex]->setNeigbors(
-            this->Internal->Axis[pqChartAreaInternal::BottomIndex],
-            this->Internal->Axis[pqChartAreaInternal::TopIndex]);
-        }
-
-      if(location == pqChartAxis::Top)
-        {
-        axis->setObjectName("TopAxis");
-        model->setObjectName("TopAxisModel");
-        across = this->Internal->Axis[pqChartAreaInternal::BottomIndex];
-
-        // Add the axis to the grid and axis layer.
-        this->GridLayer->setTopAxis(axis);
-        this->AxisLayer->setTopAxis(axis);
-        }
-      else
-        {
-        axis->setObjectName("BottomAxis");
-        model->setObjectName("BottomAxisModel");
-        across = this->Internal->Axis[pqChartAreaInternal::TopIndex];
-
-        // Add the axis to the grid and axis layer.
-        this->GridLayer->setBottomAxis(axis);
-        this->AxisLayer->setBottomAxis(axis);
-        }
-      }
-    else
-      {
-      // Set the neighbors. Make sure the neighbors' neighbors are set.
-      axis->setNeigbors(this->Internal->Axis[pqChartAreaInternal::BottomIndex],
-          this->Internal->Axis[pqChartAreaInternal::TopIndex]);
-      if(this->Internal->Axis[pqChartAreaInternal::TopIndex])
-        {
-        this->Internal->Axis[pqChartAreaInternal::TopIndex]->setNeigbors(
-            this->Internal->Axis[pqChartAreaInternal::LeftIndex],
-            this->Internal->Axis[pqChartAreaInternal::RightIndex]);
-        }
-
-      if(this->Internal->Axis[pqChartAreaInternal::BottomIndex])
-        {
-        this->Internal->Axis[pqChartAreaInternal::BottomIndex]->setNeigbors(
-            this->Internal->Axis[pqChartAreaInternal::LeftIndex],
-            this->Internal->Axis[pqChartAreaInternal::RightIndex]);
-        }
-
-      if(location == pqChartAxis::Left)
-        {
-        axis->setObjectName("LeftAxis");
-        model->setObjectName("LeftAxisModel");
-        across = this->Internal->Axis[pqChartAreaInternal::RightIndex];
-
-        // Add the axis to the grid and axis layer.
-        this->GridLayer->setLeftAxis(axis);
-        this->AxisLayer->setLeftAxis(axis);
-        }
-      else
-        {
-        axis->setObjectName("RightAxis");
-        model->setObjectName("RightAxisModel");
-        across = this->Internal->Axis[pqChartAreaInternal::LeftIndex];
-
-        // Add the axis to the grid and axis layer.
-        this->GridLayer->setRightAxis(axis);
-        this->AxisLayer->setRightAxis(axis);
-        }
-      }
-
-    // Set the parallel axis.
-    if(across)
-      {
-      axis->setParallelAxis(across);
-      across->setParallelAxis(axis);
-      }
-
-    // Listen to the axis update signals.
-    this->connect(axis, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
-    this->connect(axis, SIGNAL(repaintNeeded()), this, SLOT(update()));
-    }
-}
-
 pqChartAxis *pqChartArea::getAxis(pqChartAxis::AxisLocation location) const
 {
-  int index = this->Internal->convertEnum(location);
-  if(index != -1)
-    {
-    return this->Internal->Axis[index];
-    }
-
-  return 0;
+  int index = this->Internal->LocationIndex[location];
+  return this->Internal->Axis[index];
 }
 
 pqChartArea::AxisBehavior pqChartArea::getAxisBehavior(
     pqChartAxis::AxisLocation location) const
 {
-  int index = this->Internal->convertEnum(location);
-  if(index != -1)
-    {
-    return this->Internal->Option[index].Behavior;
-    }
-
-  return pqChartArea::ChartSelect;
+  int index = this->Internal->LocationIndex[location];
+  return this->Internal->Option[index].Behavior;
 }
 
 void pqChartArea::setAxisBehavior(pqChartAxis::AxisLocation location,
     pqChartArea::AxisBehavior behavior)
 {
-  int index = this->Internal->convertEnum(location);
-  if(index != -1 && this->Internal->Option[index].Behavior != behavior)
+  int index = this->Internal->LocationIndex[location];
+  if(this->Internal->Option[index].Behavior != behavior)
     {
     this->Internal->Option[index].Behavior = behavior;
     this->Internal->Option[index].Modified = true;
@@ -390,8 +232,8 @@ void pqChartArea::insertLayer(int index, pqChartLayer *chart)
     this->Internal->Layers.insert(index, chart);
     }
 
-  // Set the contents space handler.
-  chart->setContentsSpace(this->Contents);
+  // Set the layer's reference to the chart area.
+  chart->setChartArea(this);
 
   // Listen for the chart update signals.
   this->connect(chart, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
@@ -413,7 +255,7 @@ void pqChartArea::removeLayer(pqChartLayer *chart)
 
   // Remove the chart layer from the list.
   this->Internal->Layers.removeAt(index);
-  chart->setContentsSpace(0);
+  chart->setChartArea(0);
   this->disconnect(chart, 0, this, 0);
   this->Internal->RangeChanged = true;
 }
@@ -504,7 +346,7 @@ void pqChartArea::layoutChart()
   // driven, give the chart a chance to generate the axis labels.
   int i = 0;
   QList<pqChartLayer *>::Iterator layer;
-  for( ; i < pqChartAreaInternal::AxisCount; i++)
+  for( ; i < 4; i++)
     {
     if(this->Internal->Axis[i] == 0)
       {
@@ -607,42 +449,43 @@ void pqChartArea::layoutChart()
     }
 
   this->Internal->RangeChanged = false;
+  int left = this->Internal->LocationIndex[pqChartAxis::Left];
+  int bottom = this->Internal->LocationIndex[pqChartAxis::Bottom];
+  int right = this->Internal->LocationIndex[pqChartAxis::Right];
+  int top = this->Internal->LocationIndex[pqChartAxis::Top];
 
   // Make sure there is enough vertical space. The top and bottom axes
   // know their preferred size before layout.
   QRect bounds = this->rect();
   int available = 0;
   int fontHeight = 0;
-  int index = pqChartAreaInternal::LeftIndex;
-  if(this->Internal->Axis[index])
+  int index = 0;
+  if(this->Internal->Axis[left])
     {
-    fontHeight = this->Internal->Axis[index]->getFontHeight();
+    fontHeight = this->Internal->Axis[left]->getFontHeight();
     }
 
-  index = pqChartAreaInternal::RightIndex;
-  if(this->Internal->Axis[index] &&
-      this->Internal->Axis[index]->getFontHeight() > fontHeight)
+  if(this->Internal->Axis[right] &&
+      this->Internal->Axis[right]->getFontHeight() > fontHeight)
     {
-    fontHeight = this->Internal->Axis[index]->getFontHeight();
+    fontHeight = this->Internal->Axis[right]->getFontHeight();
     }
 
   fontHeight /= 2;
   int space = 0;
-  index = pqChartAreaInternal::TopIndex;
   available = fontHeight;
-  if(this->Internal->Axis[index])
+  if(this->Internal->Axis[top])
     {
-    space = this->Internal->Axis[index]->getPreferredSpace();
+    space = this->Internal->Axis[top]->getPreferredSpace();
     if(space > fontHeight)
       {
       available = space;
       }
     }
 
-  index = pqChartAreaInternal::BottomIndex;
-  if(this->Internal->Axis[index])
+  if(this->Internal->Axis[bottom])
     {
-    space = this->Internal->Axis[index]->getPreferredSpace();
+    space = this->Internal->Axis[bottom]->getPreferredSpace();
     available += space > fontHeight ? space : fontHeight;
     }
   else
@@ -652,7 +495,7 @@ void pqChartArea::layoutChart()
 
   // Set the 'too small' flag on each of the axis objects.
   bool tooSmall = bounds.height() - available < TOO_SMALL_HEIGHT;
-  for(i = 0; i < pqChartAreaInternal::AxisCount; i++)
+  for(i = 0; i < 4; i++)
     {
     if(this->Internal->Axis[i])
       {
@@ -661,14 +504,14 @@ void pqChartArea::layoutChart()
     }
 
   // Layout the left and right axes first.
-  if(this->Internal->Axis[pqChartAreaInternal::LeftIndex])
+  if(this->Internal->Axis[left])
     {
-    this->Internal->Axis[pqChartAreaInternal::LeftIndex]->layoutAxis(bounds);
+    this->Internal->Axis[left]->layoutAxis(bounds);
     }
 
-  if(this->Internal->Axis[pqChartAreaInternal::RightIndex])
+  if(this->Internal->Axis[right])
     {
-    this->Internal->Axis[pqChartAreaInternal::RightIndex]->layoutAxis(bounds);
+    this->Internal->Axis[right]->layoutAxis(bounds);
     }
 
   QRect axisBounds;
@@ -676,17 +519,15 @@ void pqChartArea::layoutChart()
     {
     // Make sure there is enough horizontal space.
     available = bounds.width();
-    index = pqChartAreaInternal::LeftIndex;
-    if(this->Internal->Axis[index])
+    if(this->Internal->Axis[left])
       {
-      this->Internal->Axis[index]->getBounds(axisBounds);
+      this->Internal->Axis[left]->getBounds(axisBounds);
       available -= axisBounds.width();
       }
 
-    index = pqChartAreaInternal::RightIndex;
-    if(this->Internal->Axis[index])
+    if(this->Internal->Axis[right])
       {
-      this->Internal->Axis[index]->getBounds(axisBounds);
+      this->Internal->Axis[right]->getBounds(axisBounds);
       available -= axisBounds.width();
       }
 
@@ -695,7 +536,7 @@ void pqChartArea::layoutChart()
       {
       // Set the 'too small' flag on each of the axis objects.
       // Re-layout the left and right axes.
-      for(i = 0; i < pqChartAreaInternal::AxisCount; i++)
+      for(i = 0; i < 4; i++)
         {
         if(this->Internal->Axis[i])
           {
@@ -703,43 +544,39 @@ void pqChartArea::layoutChart()
           }
         }
 
-      index = pqChartAreaInternal::LeftIndex;
-      if(this->Internal->Axis[index])
+      if(this->Internal->Axis[left])
         {
-        this->Internal->Axis[index]->layoutAxis(bounds);
+        this->Internal->Axis[left]->layoutAxis(bounds);
         }
 
-      index = pqChartAreaInternal::RightIndex;
-      if(this->Internal->Axis[index])
+      if(this->Internal->Axis[right])
         {
-        this->Internal->Axis[index]->layoutAxis(bounds);
+        this->Internal->Axis[right]->layoutAxis(bounds);
         }
       }
     }
 
   // Layout the top and bottom axes. They need size from the left and
   // right axes layout.
-  if(this->Internal->Axis[pqChartAreaInternal::TopIndex])
+  if(this->Internal->Axis[top])
     {
-    this->Internal->Axis[pqChartAreaInternal::TopIndex]->layoutAxis(bounds);
+    this->Internal->Axis[top]->layoutAxis(bounds);
     }
 
-  if(this->Internal->Axis[pqChartAreaInternal::BottomIndex])
+  if(this->Internal->Axis[bottom])
     {
-    this->Internal->Axis[pqChartAreaInternal::BottomIndex]->layoutAxis(bounds);
-    if(this->Internal->Axis[pqChartAreaInternal::TopIndex])
+    this->Internal->Axis[bottom]->layoutAxis(bounds);
+    if(this->Internal->Axis[top])
       {
       // The top and bottom axes should have the same width. The top
       // axis may need to be layed out again to account for the width
       // of the bottom axis labels.
-      index = pqChartAreaInternal::BottomIndex;
-      this->Internal->Axis[index]->getBounds(axisBounds);
+      this->Internal->Axis[bottom]->getBounds(axisBounds);
       int bottomWidth = axisBounds.width();
-      index = pqChartAreaInternal::TopIndex;
-      this->Internal->Axis[index]->getBounds(axisBounds);
+      this->Internal->Axis[top]->getBounds(axisBounds);
       if(bottomWidth != axisBounds.width())
         {
-        this->Internal->Axis[index]->layoutAxis(bounds);
+        this->Internal->Axis[top]->layoutAxis(bounds);
         }
       }
     }
@@ -748,16 +585,14 @@ void pqChartArea::layoutChart()
     {
     // Check the horizontal space using the bounds from the top and
     // bottom axes.
-    if(this->Internal->Axis[pqChartAreaInternal::TopIndex])
+    if(this->Internal->Axis[top])
       {
-      index = pqChartAreaInternal::TopIndex;
-      this->Internal->Axis[index]->getBounds(axisBounds);
+      this->Internal->Axis[top]->getBounds(axisBounds);
       tooSmall = axisBounds.width() < TOO_SMALL_WIDTH;
       }
-    else if(this->Internal->Axis[pqChartAreaInternal::BottomIndex])
+    else if(this->Internal->Axis[bottom])
       {
-      index = pqChartAreaInternal::BottomIndex;
-      this->Internal->Axis[index]->getBounds(axisBounds);
+      this->Internal->Axis[bottom]->getBounds(axisBounds);
       tooSmall = axisBounds.width() < TOO_SMALL_WIDTH;
       }
 
@@ -765,7 +600,7 @@ void pqChartArea::layoutChart()
       {
       // Set the 'too small' flag on each of the axis objects.
       // Re-layout all of the axes.
-      for(i = 0; i < pqChartAreaInternal::AxisCount; i++)
+      for(i = 0; i < 4; i++)
         {
         if(this->Internal->Axis[i])
           {
@@ -773,77 +608,71 @@ void pqChartArea::layoutChart()
           }
         }
 
-      index = pqChartAreaInternal::LeftIndex;
-      if(this->Internal->Axis[index])
+      if(this->Internal->Axis[left])
         {
-        this->Internal->Axis[index]->layoutAxis(bounds);
+        this->Internal->Axis[left]->layoutAxis(bounds);
         }
 
-      index = pqChartAreaInternal::RightIndex;
-      if(this->Internal->Axis[index])
+      if(this->Internal->Axis[right])
         {
-        this->Internal->Axis[index]->layoutAxis(bounds);
+        this->Internal->Axis[right]->layoutAxis(bounds);
         }
 
-      index = pqChartAreaInternal::TopIndex;
-      if(this->Internal->Axis[index])
+      if(this->Internal->Axis[top])
         {
-        this->Internal->Axis[index]->layoutAxis(bounds);
+        this->Internal->Axis[top]->layoutAxis(bounds);
         }
 
-      index = pqChartAreaInternal::BottomIndex;
-      if(this->Internal->Axis[index])
+      if(this->Internal->Axis[bottom])
         {
-        this->Internal->Axis[index]->layoutAxis(bounds);
+        this->Internal->Axis[bottom]->layoutAxis(bounds);
         }
       }
     else
       {
       // Adjust the size of the left and right axes. The top and bottom
       // axes may have needed more space.
-      index = pqChartAreaInternal::LeftIndex;
-      if(this->Internal->Axis[index])
+      if(this->Internal->Axis[left])
         {
-        this->Internal->Axis[index]->adjustAxisLayout();
+        this->Internal->Axis[left]->adjustAxisLayout();
         }
 
-      index = pqChartAreaInternal::RightIndex;
-      if(this->Internal->Axis[index])
+      if(this->Internal->Axis[right])
         {
-        this->Internal->Axis[index]->adjustAxisLayout();
+        this->Internal->Axis[right]->adjustAxisLayout();
         }
       }
     }
 
   // Calculate the area inside the axes.
   QRect chartBounds = bounds;
-  if(this->Internal->Axis[pqChartAreaInternal::LeftIndex])
+  if(this->Internal->Axis[left])
     {
-    this->Internal->Axis[pqChartAreaInternal::LeftIndex]->getBounds(bounds);
+    this->Internal->Axis[left]->getBounds(bounds);
     chartBounds.setLeft(bounds.right());
     chartBounds.setTop(bounds.top());
     chartBounds.setBottom(bounds.bottom());
     }
 
-  if(this->Internal->Axis[pqChartAreaInternal::TopIndex])
+  if(this->Internal->Axis[top])
     {
-    this->Internal->Axis[pqChartAreaInternal::TopIndex]->getBounds(bounds);
+    this->Internal->Axis[top]->getBounds(bounds);
     chartBounds.setLeft(bounds.left());
     chartBounds.setTop(bounds.bottom());
     chartBounds.setRight(bounds.right());
     }
 
-  if(this->Internal->Axis[pqChartAreaInternal::RightIndex])
+  if(this->Internal->Axis[right])
     {
-    this->Internal->Axis[pqChartAreaInternal::RightIndex]->getBounds(bounds);
+    this->Internal->Axis[right]->getBounds(bounds);
     chartBounds.setTop(bounds.top());
     chartBounds.setRight(bounds.left());
     chartBounds.setBottom(bounds.bottom());
     }
 
-  if(this->Internal->Axis[pqChartAreaInternal::BottomIndex])
+  if(this->Internal->Axis[bottom])
     {
-    this->Internal->Axis[pqChartAreaInternal::BottomIndex]->getBounds(bounds);
+    this->Internal->Axis[bottom]->getBounds(bounds);
     chartBounds.setLeft(bounds.left());
     chartBounds.setRight(bounds.right());
     chartBounds.setBottom(bounds.top());
@@ -875,7 +704,7 @@ bool pqChartArea::event(QEvent *e)
     {
     // Set the font for each of the axes. Ignore the layout request
     // signals so all the axes can be updated before relayout.
-    for(int i = 0; i < pqChartAreaInternal::AxisCount; i++)
+    for(int i = 0; i < 4; i++)
       {
       if(this->Internal->Axis[i])
         {
@@ -1094,6 +923,70 @@ void pqChartArea::changeCursor(const QCursor &newCursor)
 void pqChartArea::updateArea(const QRect &area)
 {
   this->update(area);
+}
+
+void pqChartArea::setupAxes()
+{
+  // Create an axis object for each location.
+  pqChartAxis::AxisLocation location = pqChartAxis::Left;
+  int left = this->Internal->LocationIndex[location];
+  this->Internal->Axis[left] = new pqChartAxis(location, this);
+  this->Internal->Axis[left]->setObjectName("LeftAxis");
+  pqChartAxisModel *model = new pqChartAxisModel(this);
+  model->setObjectName("LeftAxisModel");
+  this->Internal->Axis[left]->setModel(model);
+  this->Internal->Axis[left]->setContentsSpace(this->Contents);
+
+  location = pqChartAxis::Bottom;
+  int bottom = this->Internal->LocationIndex[location];
+  this->Internal->Axis[bottom] = new pqChartAxis(location, this);
+  this->Internal->Axis[bottom]->setObjectName("BottomAxis");
+  model = new pqChartAxisModel(this);
+  model->setObjectName("BottomAxisModel");
+  this->Internal->Axis[bottom]->setModel(model);
+  this->Internal->Axis[bottom]->setContentsSpace(this->Contents);
+
+  location = pqChartAxis::Right;
+  int right = this->Internal->LocationIndex[location];
+  this->Internal->Axis[right] = new pqChartAxis(location, this);
+  this->Internal->Axis[right]->setObjectName("RightAxis");
+  model = new pqChartAxisModel(this);
+  model->setObjectName("RightAxisModel");
+  this->Internal->Axis[right]->setModel(model);
+  this->Internal->Axis[right]->setContentsSpace(this->Contents);
+
+  location = pqChartAxis::Top;
+  int top = this->Internal->LocationIndex[location];
+  this->Internal->Axis[top] = new pqChartAxis(location, this);
+  this->Internal->Axis[top]->setObjectName("TopAxis");
+  model = new pqChartAxisModel(this);
+  model->setObjectName("TopAxisModel");
+  this->Internal->Axis[top]->setModel(model);
+  this->Internal->Axis[top]->setContentsSpace(this->Contents);
+
+  // Set up the axis neighbors and the parallel axis.
+  this->Internal->Axis[left]->setNeigbors(
+      this->Internal->Axis[bottom], this->Internal->Axis[top]);
+  this->Internal->Axis[bottom]->setNeigbors(
+      this->Internal->Axis[left], this->Internal->Axis[right]);
+  this->Internal->Axis[right]->setNeigbors(
+      this->Internal->Axis[bottom], this->Internal->Axis[top]);
+  this->Internal->Axis[top]->setNeigbors(
+      this->Internal->Axis[left], this->Internal->Axis[right]);
+
+  this->Internal->Axis[left]->setParallelAxis(this->Internal->Axis[right]);
+  this->Internal->Axis[bottom]->setParallelAxis(this->Internal->Axis[top]);
+  this->Internal->Axis[right]->setParallelAxis(this->Internal->Axis[left]);
+  this->Internal->Axis[top]->setParallelAxis(this->Internal->Axis[bottom]);
+
+  // Listen to the axis update signals.
+  for(int i = 0; i < 4; i++)
+    {
+    this->connect(this->Internal->Axis[i], SIGNAL(layoutNeeded()),
+        this, SLOT(updateLayout()));
+    this->connect(this->Internal->Axis[i], SIGNAL(repaintNeeded()),
+        this, SLOT(update()));
+    }
 }
 
 

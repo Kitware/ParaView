@@ -77,6 +77,14 @@ public:
     Error    ///< The point sequence contains error bounds information.
     };
 
+  enum ChartAxes
+    {
+    BottomLeft = 0, ///< Series uses the bottom and left axes.
+    BottomRight,    ///< Series uses the bottom and right axes.
+    TopLeft,        ///< Series uses the top and left axes.
+    TopRight        ///< Series uses the top and right axes.
+    };
+
 public:
   /// \brief
   ///   Creates a line chart series object.
@@ -173,6 +181,20 @@ public:
   /// \sa pqLineChartSeries::getRangeX(pqChartValue &, pqChartValue &)
   virtual void getRangeY(pqChartValue &min, pqChartValue &max) const=0;
   //@}
+
+  /// \name Series Layout Methods
+  //@{
+  /// \brief
+  ///   Gets the chart axes used by the series.
+  /// \return
+  ///   The chart axes used by the series.
+  ChartAxes getChartAxes() const {return this->Axes;}
+
+  /// \brief
+  ///   Sets the chart axes used by the series.
+  /// \param axes The new chart axes.
+  void setChartAxes(ChartAxes axes);
+  //@}
  
 signals:
   /// Emitted when the series data has changed drastically.
@@ -232,6 +254,9 @@ signals:
   ///   Emitted when the error bar width for a sequence has changed.
   /// \param sequence The index of the modified sequence.
   void errorWidthChanged(int sequence);
+
+  /// Emitted when the series chart axes have changed.
+  void chartAxesChanged();
 
 protected:
   /// Emits the series reset signal.
@@ -300,6 +325,9 @@ protected:
 
   /// Called to end a multi-sequence change.
   void endMultiSequenceChange();
+
+private:
+  ChartAxes Axes; ///< Stores the series chart axes.
 };
 
 #endif

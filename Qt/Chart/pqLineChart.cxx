@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqLineChart.h"
 
+#include "pqChartArea.h"
 #include "pqChartAxis.h"
 #include "pqChartContentsSpace.h"
 #include "pqChartCoordinate.h"
@@ -198,8 +199,6 @@ pqLineChart::pqLineChart(QObject *parentObject)
   this->Internal = new pqLineChartInternal();
   this->Options = new pqLineChartOptions(this);
   this->Model = 0;
-  this->XAxis = 0;
-  this->YAxis = 0;
   this->NeedsLayout = false;
 
   this->connect(this->Options, SIGNAL(optionsChanged()),
@@ -210,53 +209,6 @@ pqLineChart::~pqLineChart()
 {
   this->clearSeriesList();
   delete this->Internal;
-}
-
-void pqLineChart::setAxes(pqChartAxis *xAxis, pqChartAxis *yAxis)
-{
-  if(xAxis == this->XAxis && yAxis == this->YAxis)
-    {
-    return;
-    }
-
-  if(xAxis->getLocation() == pqChartAxis::Left ||
-      xAxis->getLocation() == pqChartAxis::Right)
-    {
-    qCritical() << "Error: The x-axis must be a horizontal axis.";
-    return;
-    }
-
-  if(yAxis->getLocation() == pqChartAxis::Top ||
-      yAxis->getLocation() == pqChartAxis::Bottom)
-    {
-    qCritical() << "Error: The y-axis must be a vertical axis.";
-    return;
-    }
-
-  if(this->XAxis)
-    {
-    this->disconnect(this->XAxis, 0, this, 0);
-    }
-
-  if(this->YAxis)
-    {
-    this->disconnect(this->YAxis, 0, this, 0);
-    }
-
-  this->XAxis = xAxis;
-  this->YAxis = yAxis;
-  this->NeedsLayout = true;
-  if(this->XAxis)
-    {
-    this->connect(this->XAxis, SIGNAL(pixelScaleChanged()),
-        this, SLOT(handleRangeChange()));
-    }
-
-  if(this->YAxis)
-    {
-    this->connect(this->YAxis, SIGNAL(pixelScaleChanged()),
-        this, SLOT(handleRangeChange()));
-    }
 }
 
 void pqLineChart::setModel(pqLineChartModel *model)
@@ -300,6 +252,9 @@ void pqLineChart::setModel(pqLineChartModel *model)
         this, SLOT(finishSeriesRemoval(int, int)));
     this->connect(this->Model, SIGNAL(seriesMoved(int, int)),
         this, SLOT(handleSeriesMoved(int, int)));
+    this->connect(this->Model,
+        SIGNAL(seriesChartAxesChanged(const pqLineChartSeries *)),
+        this, SLOT(handleSeriesAxesChanged(const pqLineChartSeries *)));
     this->connect(this->Model, SIGNAL(seriesReset(const pqLineChartSeries *)),
         this, SLOT(handleSeriesReset(const pqLineChartSeries *)));
     this->connect(this->Model,
@@ -361,16 +316,7 @@ bool pqLineChart::getAxisRange(const pqChartAxis *axis,
 {
   if(this->Model && this->Model->getNumberOfSeries() > 0)
     {
-    if(axis == this->XAxis)
-      {
-      this->Model->getRangeX(min, max);
-      return true;
-      }
-    else if(axis == this->YAxis)
-      {
-      this->Model->getRangeY(min, max);
-      return true;
-      }
+    return this->Model->getAxisRange(axis, min, max);
     }
 
   return false;
@@ -378,15 +324,8 @@ bool pqLineChart::getAxisRange(const pqChartAxis *axis,
 
 void pqLineChart::layoutChart(const QRect &area)
 {
-  if(!this->Model || !this->XAxis || !this->YAxis || !area.isValid())
-    {
-    return;
-    }
-
-  // Make sure the axes are valid.
-  const pqChartPixelScale *xScale = this->XAxis->getPixelValueScale();
-  const pqChartPixelScale *yScale = this->YAxis->getPixelValueScale();
-  if(!xScale->isValid() || !yScale->isValid())
+  pqChartArea *chartArea = this->getChartArea();
+  if(!this->Model || !chartArea || !area.isValid())
     {
     return;
     }
@@ -408,6 +347,8 @@ void pqLineChart::layoutChart(const QRect &area)
   // Layout each of the series. Only, layout the series if it has
   // changed or if either of the axis scales have changed.
   int i = 0;
+  const pqChartPixelScale *xScale = 0;
+  const pqChartPixelScale *yScale = 0;
   QList<pqLineChartSeriesItem *>::Iterator iter = this->Internal->Series.begin();
   for( ; iter != this->Internal->Series.end(); ++iter)
     {
@@ -445,6 +386,35 @@ void pqLineChart::layoutChart(const QRect &area)
       if((*iter)->Sequences.size() != (*iter)->Series->getNumberOfSequences())
         {
         qWarning("Series layout data invalid.");
+        continue;
+        }
+
+      // Get the pixel scales for the series axes.
+      pqLineChartSeries::ChartAxes axes = (*iter)->Series->getChartAxes();
+      if(axes == pqLineChartSeries::BottomLeft ||
+          axes == pqLineChartSeries::BottomRight)
+        {
+        xScale = chartArea->getAxis(pqChartAxis::Bottom)->getPixelValueScale();
+        }
+      else
+        {
+        xScale = chartArea->getAxis(pqChartAxis::Top)->getPixelValueScale();
+        }
+
+      if(axes == pqLineChartSeries::BottomLeft ||
+          axes == pqLineChartSeries::TopLeft)
+        {
+        yScale = chartArea->getAxis(pqChartAxis::Left)->getPixelValueScale();
+        }
+      else
+        {
+        yScale = chartArea->getAxis(pqChartAxis::Right)->getPixelValueScale();
+        }
+
+      // Make sure the axes are valid.
+      if(!xScale->isValid() || !yScale->isValid())
+        {
+        qWarning("Series pixel scales are invalid.");
         continue;
         }
 
@@ -656,6 +626,43 @@ void pqLineChart::drawChart(QPainter &painter, const QRect &area)
   painter.restore();
 }
 
+void pqLineChart::setChartArea(pqChartArea *area)
+{
+  pqChartArea *oldArea = this->getChartArea();
+  if(area == oldArea)
+    {
+    return;
+    }
+
+  if(oldArea)
+    {
+    // Disconnect from the axis signals.
+    this->disconnect(oldArea->getAxis(pqChartAxis::Left), 0, this, 0);
+    this->disconnect(oldArea->getAxis(pqChartAxis::Bottom), 0, this, 0);
+    this->disconnect(oldArea->getAxis(pqChartAxis::Right), 0, this, 0);
+    this->disconnect(oldArea->getAxis(pqChartAxis::Top), 0, this, 0);
+    }
+
+  pqChartLayer::setChartArea(area);
+  this->NeedsLayout = true;
+  if(area)
+    {
+    // Listen for axis scale changes.
+    this->connect(
+        area->getAxis(pqChartAxis::Left), SIGNAL(pixelScaleChanged()),
+        this, SLOT(handleRangeChange()));
+    this->connect(
+        area->getAxis(pqChartAxis::Bottom), SIGNAL(pixelScaleChanged()),
+        this, SLOT(handleRangeChange()));
+    this->connect(
+        area->getAxis(pqChartAxis::Right), SIGNAL(pixelScaleChanged()),
+        this, SLOT(handleRangeChange()));
+    this->connect(
+        area->getAxis(pqChartAxis::Top), SIGNAL(pixelScaleChanged()),
+        this, SLOT(handleRangeChange()));
+    }
+}
+
 void pqLineChart::handleModelReset()
 {
   // Clean up the previous layout data.
@@ -717,6 +724,13 @@ void pqLineChart::handleSeriesMoved(int current, int index)
   pqLineChartSeriesItem *item = this->Internal->Series.takeAt(current);
   this->Internal->Series.insert(index, item);
   emit this->repaintNeeded();
+}
+
+void pqLineChart::handleSeriesAxesChanged(const pqLineChartSeries *series)
+{
+  pqLineChartSeriesItem *item = this->getItem(series);
+  item->NeedsLayout = true;
+  emit this->layoutNeeded();
 }
 
 void pqLineChart::handleSeriesReset(const pqLineChartSeries *series)

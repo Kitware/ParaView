@@ -64,6 +64,14 @@ public:
     BinRange      ///< Pick only has to be within the bin range.
     };
 
+  enum ChartAxes
+    {
+    BottomLeft = 0, ///< Histogram uses the bottom and left axes.
+    BottomRight,    ///< Histogram uses the bottom and right axes.
+    TopLeft,        ///< Histogram uses the top and left axes.
+    TopRight        ///< Histogram uses the top and right axes.
+    };
+
 public:
   /// \brief
   ///   Creates a histogram chart instance.
@@ -74,22 +82,27 @@ public:
   /// \name Setup Methods
   //@{
   /// \brief
-  ///   Sets the axes for the chart.
-  /// \param xAxis The x-axis object.
-  /// \param yAxis The y-axis object.
-  void setAxes(pqChartAxis *xAxis, pqChartAxis *yAxis);
+  ///   Gets the chart axes used by the series.
+  /// \return
+  ///   The chart axes used by the series.
+  ChartAxes getChartAxes() const {return this->Axes;}
+
+  /// \brief
+  ///   Sets the chart axes used by the series.
+  /// \param axes The new chart axes.
+  void setChartAxes(ChartAxes axes);
 
   /// \brief
   ///   Gets the x-axis for the chart.
   /// \return
   ///   A pointer to the x-axis for the chart.
-  pqChartAxis *getXAxis() const {return this->XAxis;}
+  pqChartAxis *getXAxis() const;
 
   /// \brief
   ///   Gets the y-axis for the chart.
   /// \return
   ///   A pointer to the y-axis for the chart.
-  pqChartAxis *getYAxis() const {return this->YAxis;}
+  pqChartAxis *getYAxis() const;
 
   /// \brief
   ///   Sets the histogram model to be displayed.
@@ -246,8 +259,7 @@ private:
   /// Stores the view items.
   pqHistogramChartInternal *Internal;
   pqHistogramChartOptions *Options; ///< Stores the histogram options.
-  pqChartAxis *XAxis;               ///< Stores the x-axis.
-  pqChartAxis *YAxis;               ///< Stores the y-axis.
+  ChartAxes Axes;                   ///< Stores the chart axes.
   pqHistogramModel *Model;          ///< Stores the histogram model.
 
   /// Stores the selection model.

@@ -223,7 +223,7 @@ void pqChartAxis::setParallelAxis(const pqChartAxis *across)
   this->Across = across;
 }
 
-void pqChartAxis::setContentsScpace(const pqChartContentsSpace *contents)
+void pqChartAxis::setContentsSpace(const pqChartContentsSpace *contents)
 {
   this->Zoom = contents;
 }

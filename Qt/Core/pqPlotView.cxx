@@ -150,15 +150,9 @@ pqPlotView::pqPlotView(const QString& type,
 {
   this->Internal = new pqPlotViewInternal();
 
-  // Create the chart widget.
+  // Create the chart widget and get the chart area.
   this->Internal->Chart = new pqChartWidget();
-
-  // Get the chart area and set up the axes.
   pqChartArea *chartArea = this->Internal->Chart->getChartArea();
-  chartArea->createAxis(pqChartAxis::Left);
-  chartArea->createAxis(pqChartAxis::Bottom);
-  chartArea->createAxis(pqChartAxis::Right);
-  chartArea->createAxis(pqChartAxis::Top);
 
   // Set up the chart legend.
   this->Internal->LegendModel = new pqChartLegendModel(this);

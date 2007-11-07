@@ -35,9 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqChartGridLayer.h"
 
+#include "pqChartArea.h"
+#include "pqChartAxis.h"
 #include "pqChartAxisModel.h"
 #include "pqChartAxisOptions.h"
-#include "pqChartAxis.h"
 
 #include <QPainter>
 #include <QRect>
@@ -73,81 +74,46 @@ void pqChartGridLayer::drawChart(QPainter &painter, const QRect &area)
     }
 
   // Draw the axis grid lines.
-  this->drawAxisGrid(painter, this->TopAxis);
-  this->drawAxisGrid(painter, this->RightAxis);
-  this->drawAxisGrid(painter, this->BottomAxis);
-  this->drawAxisGrid(painter, this->LeftAxis);
+  pqChartArea *chart = this->getChartArea();
+  this->drawAxisGrid(painter, chart->getAxis(pqChartAxis::Top));
+  this->drawAxisGrid(painter, chart->getAxis(pqChartAxis::Right));
+  this->drawAxisGrid(painter, chart->getAxis(pqChartAxis::Bottom));
+  this->drawAxisGrid(painter, chart->getAxis(pqChartAxis::Left));
 }
 
-void pqChartGridLayer::setLeftAxis(const pqChartAxis *axis)
+void pqChartGridLayer::setChartArea(pqChartArea *area)
 {
-  if(this->LeftAxis != axis)
+  pqChartArea *oldArea = this->getChartArea();
+  if(area == oldArea)
     {
-    if(this->LeftAxis)
-      {
-      this->disconnect(this->LeftAxis, 0, this, 0);
-      }
-
-    this->LeftAxis = axis;
-    if(this->LeftAxis)
-      {
-      this->connect(this->LeftAxis->getOptions(), SIGNAL(gridChanged()),
-          this, SIGNAL(repaintNeeded()));
-      }
+    return;
     }
-}
 
-void pqChartGridLayer::setTopAxis(const pqChartAxis *axis)
-{
-  if(this->TopAxis != axis)
+  if(oldArea)
     {
-    if(this->TopAxis)
-      {
-      this->disconnect(this->TopAxis, 0, this, 0);
-      }
-
-    this->TopAxis = axis;
-    if(this->TopAxis)
-      {
-      this->connect(this->TopAxis->getOptions(), SIGNAL(gridChanged()),
-          this, SIGNAL(repaintNeeded()));
-      }
+    // Disconnect from the axis signals.
+    this->disconnect(
+        oldArea->getAxis(pqChartAxis::Left)->getOptions(), 0, this, 0);
+    this->disconnect(
+        oldArea->getAxis(pqChartAxis::Bottom)->getOptions(), 0, this, 0);
+    this->disconnect(
+        oldArea->getAxis(pqChartAxis::Right)->getOptions(), 0, this, 0);
+    this->disconnect(
+        oldArea->getAxis(pqChartAxis::Top)->getOptions(), 0, this, 0);
     }
-}
 
-void pqChartGridLayer::setRightAxis(const pqChartAxis *axis)
-{
-  if(this->RightAxis != axis)
+  pqChartLayer::setChartArea(area);
+  if(area)
     {
-    if(this->RightAxis)
-      {
-      this->disconnect(this->RightAxis, 0, this, 0);
-      }
-
-    this->RightAxis = axis;
-    if(this->RightAxis)
-      {
-      this->connect(this->RightAxis->getOptions(), SIGNAL(gridChanged()),
-          this, SIGNAL(repaintNeeded()));
-      }
-    }
-}
-
-void pqChartGridLayer::setBottomAxis(const pqChartAxis *axis)
-{
-  if(this->BottomAxis != axis)
-    {
-    if(this->BottomAxis)
-      {
-      this->disconnect(this->BottomAxis, 0, this, 0);
-      }
-
-    this->BottomAxis = axis;
-    if(this->BottomAxis)
-      {
-      this->connect(this->BottomAxis->getOptions(), SIGNAL(gridChanged()),
-          this, SIGNAL(repaintNeeded()));
-      }
+    // Listen for axis grid option changes.
+    this->connect(area->getAxis(pqChartAxis::Left)->getOptions(),
+        SIGNAL(gridChanged()), this, SIGNAL(repaintNeeded()));
+    this->connect(area->getAxis(pqChartAxis::Bottom)->getOptions(),
+        SIGNAL(gridChanged()), this, SIGNAL(repaintNeeded()));
+    this->connect(area->getAxis(pqChartAxis::Right)->getOptions(),
+        SIGNAL(gridChanged()), this, SIGNAL(repaintNeeded()));
+    this->connect(area->getAxis(pqChartAxis::Top)->getOptions(),
+        SIGNAL(gridChanged()), this, SIGNAL(repaintNeeded()));
     }
 }
 

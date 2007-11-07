@@ -42,6 +42,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqLineChartSeries::pqLineChartSeries(QObject *parentObject)
   : QObject(parentObject)
 {
+  this->Axes = pqLineChartSeries::BottomLeft;
+}
+
+void pqLineChartSeries::setChartAxes(pqLineChartSeries::ChartAxes axes)
+{
+  if(this->Axes != axes)
+    {
+    this->Axes = axes;
+    emit this->chartAxesChanged();
+    }
 }
 
 void pqLineChartSeries::resetSeries()

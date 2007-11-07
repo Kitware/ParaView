@@ -35,13 +35,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqChartLayer.h"
 
+#include "pqChartArea.h"
+#include "pqChartAxis.h"
 #include "pqChartContentsSpace.h"
+#include "pqChartValue.h"
+
+#include <QPainter>
+#include <QRect>
 
 
 pqChartLayer::pqChartLayer(QObject *parentObject)
   : QObject(parentObject)
 {
-  this->Contents = 0;
+  this->ChartArea = 0;
 }
 
 bool pqChartLayer::getAxisRange(const pqChartAxis *, pqChartValue &,
@@ -63,9 +69,14 @@ void pqChartLayer::drawBackground(QPainter &, const QRect &)
 {
 }
 
-void pqChartLayer::setContentsSpace(const pqChartContentsSpace *contents)
+pqChartContentsSpace *pqChartLayer::getContentsSpace() const
 {
-  this->Contents = contents;
+  if(this->ChartArea)
+    {
+    return this->ChartArea->getContentsSpace();
+    }
+
+  return 0;
 }
 
 

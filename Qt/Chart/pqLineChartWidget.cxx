@@ -45,17 +45,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqChartWidget *pqLineChartWidget::createLineChart(QWidget *parent,
     pqLineChart **layer)
 {
+  // Create the chart and get the chart area.
   pqChartWidget *chart = new pqChartWidget(parent);
-
-  // Get the chart area and set up the axes.
   pqChartArea *chartArea = chart->getChartArea();
-  chartArea->createAxis(pqChartAxis::Left);
-  chartArea->createAxis(pqChartAxis::Bottom);
 
   // Set up the line chart.
   pqLineChart *lineChart = new pqLineChart(chartArea);
-  lineChart->setAxes(chartArea->getAxis(pqChartAxis::Bottom),
-      chartArea->getAxis(pqChartAxis::Left));
   chartArea->addLayer(lineChart);
 
   // Pass back a pointer to the line chart layer.

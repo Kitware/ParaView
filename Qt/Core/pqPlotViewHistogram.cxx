@@ -97,8 +97,6 @@ void pqPlotViewHistogram::initialize(pqChartArea *chartArea)
 
   // Add a histogram layer to the chart.
   this->Internal->Layer = new pqHistogramChart(chartArea);
-  this->Internal->Layer->setAxes(chartArea->getAxis(pqChartAxis::Bottom),
-      chartArea->getAxis(pqChartAxis::Left));
   chartArea->insertLayer(chartArea->getAxisLayerIndex(),
       this->Internal->Layer);
 

@@ -68,24 +68,6 @@ public:
   /// \name Setup Methods
   //@{
   /// \brief
-  ///   Sets the axes for the chart.
-  /// \param xAxis The x-axis object.
-  /// \param yAxis The y-axis object.
-  void setAxes(pqChartAxis *xAxis, pqChartAxis *yAxis);
-
-  /// \brief
-  ///   Gets the x-axis for the chart.
-  /// \return
-  ///   A pointer to the x-axis for the chart.
-  pqChartAxis *getXAxis() const {return this->XAxis;}
-
-  /// \brief
-  ///   Gets the y-axis for the chart.
-  /// \return
-  ///   A pointer to the y-axis for the chart.
-  pqChartAxis *getYAxis() const {return this->YAxis;}
-
-  /// \brief
   ///   Sets the line chart model to be displayed.
   /// \param model A pointer to the new line chart model.
   void setModel(pqLineChartModel *model);
@@ -121,6 +103,8 @@ public:
   virtual void layoutChart(const QRect &area);
 
   virtual void drawChart(QPainter &painter, const QRect &area);
+
+  virtual void setChartArea(pqChartArea *area);
   //@}
 
 private slots:
@@ -161,6 +145,11 @@ private slots:
   /// \param current The current index of the moving series.
   /// \param index The index to move the series to.
   void handleSeriesMoved(int current, int index);
+
+  /// \brief
+  ///   Updates the series layout after an axis change.
+  /// \param series The series that changed.
+  void handleSeriesAxesChanged(const pqLineChartSeries *series);
 
   /// \brief
   ///   Updates the series layout after a major change.
@@ -259,8 +248,6 @@ private:
   pqLineChartInternal *Internal; /// Stores the line chart layout.
   pqLineChartOptions *Options;   ///< Stores the drawing options.
   pqLineChartModel *Model;       ///< A pointer to the model.
-  pqChartAxis *XAxis;            ///< A pointer to the x-axis.
-  pqChartAxis *YAxis;            ///< A pointer to the y-axis.
   bool NeedsLayout;              ///< True if a chart layout is needed.
 };
 

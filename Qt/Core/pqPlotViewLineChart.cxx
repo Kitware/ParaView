@@ -103,10 +103,11 @@ public:
   pqPlotViewLineChartInternal();
   ~pqPlotViewLineChartInternal() {}
 
-  QPointer<pqLineChart> Layer[4];
-  pqLineChartModel *Model[4];
+  QPointer<pqLineChart> Layer;
+  pqLineChartModel *Model;
   QMap<vtkSMProxy *, pqPlotViewLineChartItem *> Representations;
   pqChartLegendModel *Legend;
+  pqLineChartSeries::ChartAxes IndexAxes[4];
 };
 
 
@@ -167,15 +168,15 @@ bool pqPlotViewLineChartItem::setDataType(int dataType)
 pqPlotViewLineChartInternal::pqPlotViewLineChartInternal()
   : Representations()
 {
-  this->Layer[pqPlotViewLineChart::BottomLeft] = 0;
-  this->Layer[pqPlotViewLineChart::BottomRight] = 0;
-  this->Layer[pqPlotViewLineChart::TopLeft] = 0;
-  this->Layer[pqPlotViewLineChart::TopRight] = 0;
-  this->Model[pqPlotViewLineChart::BottomLeft] = 0;
-  this->Model[pqPlotViewLineChart::BottomRight] = 0;
-  this->Model[pqPlotViewLineChart::TopLeft] = 0;
-  this->Model[pqPlotViewLineChart::TopRight] = 0;
+  this->Layer = 0;
+  this->Model = 0;
   this->Legend = 0;
+
+  // Set up the index to series chart axes map.
+  this->IndexAxes[0] = pqLineChartSeries::BottomLeft;
+  this->IndexAxes[1] = pqLineChartSeries::BottomRight;
+  this->IndexAxes[2] = pqLineChartSeries::TopLeft;
+  this->IndexAxes[3] = pqLineChartSeries::TopRight;
 }
 
 
@@ -208,7 +209,7 @@ pqPlotViewLineChart::~pqPlotViewLineChart()
 void pqPlotViewLineChart::initialize(pqChartArea *chartArea,
     pqChartLegendModel *legend)
 {
-  if(this->Internal->Model[pqPlotViewLineChart::BottomLeft])
+  if(this->Internal->Model)
     {
     return;
     }
@@ -216,57 +217,22 @@ void pqPlotViewLineChart::initialize(pqChartArea *chartArea,
   // Save the legend model for later.
   this->Internal->Legend = legend;
 
-  // Add a line chart layer for each of the possible axes
-  // configurations. Add the layers in reverse order to keep the
-  // bottom-left chart on top.
-  int i = 3;
-  for( ; i >= 0; i--)
-    {
-    this->Internal->Layer[i] = new pqLineChart(chartArea);
-    if(i == pqPlotViewLineChart::BottomLeft)
-      {
-      this->Internal->Layer[i]->setAxes(
-          chartArea->getAxis(pqChartAxis::Bottom),
-          chartArea->getAxis(pqChartAxis::Left));
-      }
-    else if(i == pqPlotViewLineChart::BottomRight)
-      {
-      this->Internal->Layer[i]->setAxes(
-          chartArea->getAxis(pqChartAxis::Bottom),
-          chartArea->getAxis(pqChartAxis::Right));
-      }
-    else if(i == pqPlotViewLineChart::TopLeft)
-      {
-      this->Internal->Layer[i]->setAxes(chartArea->getAxis(pqChartAxis::Top),
-          chartArea->getAxis(pqChartAxis::Left));
-      }
-    else if(i == pqPlotViewLineChart::TopRight)
-      {
-      this->Internal->Layer[i]->setAxes(chartArea->getAxis(pqChartAxis::Top),
-          chartArea->getAxis(pqChartAxis::Right));
-      }
+  // Add a line chart layer to the chart.
+  this->Internal->Layer = new pqLineChart(chartArea);
+  this->Internal->Model = new pqLineChartModel(this);
+  this->Internal->Layer->setModel(this->Internal->Model);
+  chartArea->addLayer(this->Internal->Layer);
 
-    this->Internal->Model[i] = new pqLineChartModel(this);
-    this->Internal->Layer[i]->setModel(
-        this->Internal->Model[i]);
-    chartArea->addLayer(this->Internal->Layer[i]);
-    }
-
-  // Set up the color options for the line charts. They should all
-  // share the same series color manager.
+  // Set up the color options for the line charts.
   pqChartSeriesColorManager *manager =
-      this->Internal->Layer[0]->getOptions()->getSeriesColorManager();
+      this->Internal->Layer->getOptions()->getSeriesColorManager();
   manager->getGenerator()->setColorScheme(
       pqChartSeriesOptionsGenerator::Spectrum);
-  for(i = 1; i < 4; i++)
-    {
-    this->Internal->Layer[i]->getOptions()->setSeriesColorManager(manager);
-    }
 }
 
 void pqPlotViewLineChart::update(bool force)
 {
-  if(!this->Internal->Model[pqPlotViewLineChart::BottomLeft])
+  if(!this->Internal->Model)
     {
     return;
     }
@@ -317,7 +283,7 @@ void pqPlotViewLineChart::update(bool force)
           series->LegendId = 0;
           }
 
-        this->Internal->Model[series->Chart]->removeSeries(series->Model);
+        this->Internal->Model->removeSeries(series->Model);
         delete series->Model;
         series = (*jter)->Series.erase(series);
         }
@@ -345,7 +311,7 @@ void pqPlotViewLineChart::update(bool force)
               }
 
             // Remove the series if the x or y array are null.
-            this->Internal->Model[series->Chart]->removeSeries(series->Model);
+            this->Internal->Model->removeSeries(series->Model);
             delete series->Model;
             series = (*jter)->Series.erase(series);
             continue;
@@ -354,11 +320,15 @@ void pqPlotViewLineChart::update(bool force)
 
         // Move the series if needed.
         int axesIndex = (*jter)->Representation->getSeriesAxesIndex(index);
+        if(axesIndex < 0 || axesIndex >= 4)
+          {
+          axesIndex = 0;
+          }
+
         if(axesIndex != series->Chart)
           {
-          this->Internal->Model[series->Chart]->removeSeries(series->Model);
           series->Chart = axesIndex;
-          this->Internal->Model[series->Chart]->appendSeries(series->Model);
+          series->Model->setChartAxes(this->Internal->IndexAxes[series->Chart]);
           }
 
         if(arrayChanged || componentChanged)
@@ -371,8 +341,8 @@ void pqPlotViewLineChart::update(bool force)
 
         // Update the options for the series.
         pqLineChartSeriesOptions *options =
-            this->Internal->Layer[series->Chart]->getOptions()->getSeriesOptions(
-            this->Internal->Model[series->Chart]->getIndexOf(series->Model));
+            this->Internal->Layer->getOptions()->getSeriesOptions(
+            this->Internal->Model->getIndexOf(series->Model));
         QPen seriesPen;
         options->getPen(seriesPen);
         QColor color;
@@ -477,13 +447,19 @@ void pqPlotViewLineChart::update(bool force)
 
           // Add the line chart series to the line chart model.
           plot->Chart = (*jter)->Representation->getSeriesAxesIndex(i);
-          int index = this->Internal->Model[plot->Chart]->getNumberOfSeries();
-          this->Internal->Model[plot->Chart]->appendSeries(plot->Model);
+          if(plot->Chart < 0 || plot->Chart >= 3)
+            {
+            plot->Chart = 0;
+            }
+
+          plot->Model->setChartAxes(this->Internal->IndexAxes[plot->Chart]);
+          int index = this->Internal->Model->getNumberOfSeries();
+          this->Internal->Model->appendSeries(plot->Model);
 
           // Update the series options.
           bool changedOptions = false;
           pqLineChartSeriesOptions *options =
-              this->Internal->Layer[plot->Chart]->getOptions()->getSeriesOptions(index);
+              this->Internal->Layer->getOptions()->getSeriesOptions(index);
           QPen seriesPen;
           options->getPen(seriesPen);
           if((*jter)->Representation->isSeriesColorSet(i))
@@ -573,7 +549,7 @@ void pqPlotViewLineChart::removeRepresentation(
         series->LegendId = 0;
         }
 
-      this->Internal->Model[series->Chart]->removeSeries(series->Model);
+      this->Internal->Model->removeSeries(series->Model);
       delete series->Model;
       }
 
@@ -583,11 +559,7 @@ void pqPlotViewLineChart::removeRepresentation(
 
 void pqPlotViewLineChart::removeAllRepresentations()
 {
-  for(int i = 0; i < 4; i++)
-    {
-    this->Internal->Model[i]->removeAll();
-    }
-
+  this->Internal->Model->removeAll();
   QMap<vtkSMProxy *, pqPlotViewLineChartItem *>::Iterator iter =
       this->Internal->Representations.begin();
   for( ; iter != this->Internal->Representations.end(); ++iter)

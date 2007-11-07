@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QtChartExport.h"
 #include <QObject>
 
+class pqChartAxis;
 class pqChartValue;
 class pqLineChartModelInternal;
 class pqLineChartSeries;
@@ -127,6 +128,16 @@ public:
   /// \name Chart Range Methods
   //@{
   /// \brief
+  ///   Gets the range for the given axis.
+  /// \param axis Which axis to get the range for.
+  /// \param min Used to return the minimum value.
+  /// \param max Used to return the maximum value.
+  /// \return
+  ///   False if the line chart does not use the given axis.
+  bool getAxisRange(const pqChartAxis *axis, pqChartValue &min,
+      pqChartValue &max) const;
+
+  /// \brief
   ///   Get the x-axis range for the chart.
   /// \param min Used to return the minimum x-axis value.
   /// \param max Used to return the maximum x-axis value.
@@ -172,6 +183,11 @@ signals:
   /// \param current The known index of the series.
   /// \param index The new index of the series.
   void seriesMoved(int current, int index);
+
+  /// \brief
+  ///   Emitted when the chart axes for a series have changed.
+  /// \param series The series that changed.
+  void seriesChartAxesChanged(const pqLineChartSeries *series);
 
   /// \brief
   ///   Emitted when the data for a series has changed drastically.
@@ -244,6 +260,9 @@ signals:
 private slots:
   /// \name Series Modification Handlers
   //@{
+  /// Handles a series chart axes changed signal from the chart series.
+  void handleSeriesAxesChanged();
+
   /// Handles a series reset signal from a line chart series.
   void handleSeriesReset();
 

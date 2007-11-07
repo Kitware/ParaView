@@ -124,7 +124,7 @@ public:
   /// \brief
   ///   Sets the axis' contents space object.
   /// \param contents The new contents space object.
-  void setContentsScpace(const pqChartContentsSpace *contents);
+  void setContentsSpace(const pqChartContentsSpace *contents);
 
   /// \brief
   ///   Gets the axis location on the chart.

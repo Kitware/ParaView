@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QtChartExport.h"
 #include <QObject>
 
+class pqChartArea;
 class pqChartAxis;
 class pqChartContentsSpace;
 class pqChartValue;
@@ -125,15 +126,23 @@ public:
   virtual void drawChart(QPainter &painter, const QRect &area)=0;
 
   /// \brief
+  ///   Gets the chart area containing the layer.
+  /// \return
+  ///   A pointer to the chart area.
+  pqChartArea *getChartArea() const {return this->ChartArea;}
+
+  /// \brief
+  ///   Sets the chart area that contains the layer.
+  /// \note
+  ///   The chart area will call this method when the layer is added.
+  /// \param area The chart area.
+  virtual void setChartArea(pqChartArea *area) {this->ChartArea = area;}
+
+  /// \brief
   ///   Gets the layer's contents space object.
   /// \return
   ///   A pointer to the layer's contents space object.
-  const pqChartContentsSpace *getContentsSpace() const {return this->Contents;}
-
-  /// \brief
-  ///   Sets the layer's contents space object.
-  /// \param contents The new contents space object.
-  void setContentsSpace(const pqChartContentsSpace *contents);
+  pqChartContentsSpace *getContentsSpace() const;
 
 signals:
   /// Emitted when the layer layout needs to be calculated.
@@ -150,7 +159,7 @@ signals:
   void rangeChanged();
 
 private:
-  const pqChartContentsSpace *Contents; ///< Stores the contents space.
+  pqChartArea *ChartArea; ///< Stores the chart area.
 };
 
 #endif

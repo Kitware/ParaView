@@ -84,11 +84,6 @@ public:
   /// \name Axis Methods
   //@{
   /// \brief
-  ///   Creates an axis in the specified location.
-  /// \param location Where to create the axis.
-  void createAxis(pqChartAxis::AxisLocation location);
-
-  /// \brief
   ///   Gets the axis in the specified location.
   /// \param location The location of the axis.
   /// \return
@@ -264,6 +259,7 @@ protected:
   //@}
 
 signals:
+  /// Emitted when a delayed chart layout is needed.
   void delayedLayoutNeeded();
 
 private slots:
@@ -282,6 +278,10 @@ private slots:
   ///   Calls for a repaint on the given area.
   /// \param area The area to repaint.
   void updateArea(const QRect &area);
+
+private:
+  /// Creates an axis in each of the chart axis locations.
+  void setupAxes();
 
 private:
   pqChartAreaInternal *Internal;  ///< Stores the list of layers.

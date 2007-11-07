@@ -61,29 +61,7 @@ public:
   //@{
   virtual void layoutChart(const QRect &area);
   virtual void drawChart(QPainter &painter, const QRect &area);
-  //@}
-
-  /// \name Setup Methods
-  //@{
-  /// \brief
-  ///   Sets the left axis for the chart.
-  /// \param axis The chart axis.
-  void setLeftAxis(const pqChartAxis *axis);
-
-  /// \brief
-  ///   Sets the top axis for the chart.
-  /// \param axis The chart axis.
-  void setTopAxis(const pqChartAxis *axis);
-
-  /// \brief
-  ///   Sets the right axis for the chart.
-  /// \param axis The chart axis.
-  void setRightAxis(const pqChartAxis *axis);
-
-  /// \brief
-  ///   Sets the bottom axis for the chart.
-  /// \param axis The chart axis.
-  void setBottomAxis(const pqChartAxis *axis);
+  virtual void setChartArea(pqChartArea *area);
   //@}
 
 private:

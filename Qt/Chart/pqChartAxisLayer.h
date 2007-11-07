@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QtChartExport.h"
 #include "pqChartLayer.h"
 
-class pqChartAxis;
 class QRect;
 
 
@@ -62,35 +61,8 @@ public:
   virtual void drawChart(QPainter &painter, const QRect &area);
   //@}
 
-  /// \name Setup Methods
-  //@{
-  /// \brief
-  ///   Sets the left axis for the chart.
-  /// \param axis The chart axis.
-  void setLeftAxis(const pqChartAxis *axis) {this->LeftAxis = axis;}
-
-  /// \brief
-  ///   Sets the top axis for the chart.
-  /// \param axis The chart axis.
-  void setTopAxis(const pqChartAxis *axis) {this->TopAxis = axis;}
-
-  /// \brief
-  ///   Sets the right axis for the chart.
-  /// \param axis The chart axis.
-  void setRightAxis(const pqChartAxis *axis) {this->RightAxis = axis;}
-
-  /// \brief
-  ///   Sets the bottom axis for the chart.
-  /// \param axis The chart axis.
-  void setBottomAxis(const pqChartAxis *axis) {this->BottomAxis = axis;}
-  //@}
-
 private:
-  QRect *Bounds;                 ///< Stores the boundary.
-  const pqChartAxis *LeftAxis;   ///< Stores the left axis.
-  const pqChartAxis *TopAxis;    ///< Stores the top axis.
-  const pqChartAxis *RightAxis;  ///< Stores the right axis.
-  const pqChartAxis *BottomAxis; ///< Stores the bottom axis.
+  QRect *Bounds; ///< Stores the boundary.
 };
 
 #endif

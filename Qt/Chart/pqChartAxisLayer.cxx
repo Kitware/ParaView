@@ -35,7 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqChartAxisLayer.h"
 
+#include "pqChartArea.h"
 #include "pqChartAxis.h"
+
 #include <QPainter>
 #include <QRect>
 
@@ -44,10 +46,6 @@ pqChartAxisLayer::pqChartAxisLayer(QObject *parentObject)
   : pqChartLayer(parentObject)
 {
   this->Bounds = new QRect();
-  this->LeftAxis = 0;
-  this->TopAxis = 0;
-  this->RightAxis = 0;
-  this->BottomAxis = 0;
 }
 
 pqChartAxisLayer::~pqChartAxisLayer()
@@ -68,25 +66,11 @@ void pqChartAxisLayer::drawChart(QPainter &painter, const QRect &area)
       this->Bounds->width() - 1, this->Bounds->height() - 1);
 
   // Draw each of the axes.
-  if(this->TopAxis)
-    {
-    this->TopAxis->drawAxis(painter, area);
-    }
-
-  if(this->RightAxis)
-    {
-    this->RightAxis->drawAxis(painter, area);
-    }
-
-  if(this->BottomAxis)
-    {
-    this->BottomAxis->drawAxis(painter, area);
-    }
-
-  if(this->LeftAxis)
-    {
-    this->LeftAxis->drawAxis(painter, area);
-    }
+  pqChartArea *chart = this->getChartArea();
+  chart->getAxis(pqChartAxis::Top)->drawAxis(painter, area);
+  chart->getAxis(pqChartAxis::Right)->drawAxis(painter, area);
+  chart->getAxis(pqChartAxis::Bottom)->drawAxis(painter, area);
+  chart->getAxis(pqChartAxis::Left)->drawAxis(painter, area);
 }
 
 

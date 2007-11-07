@@ -35,12 +35,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqLineChartModel.h"
 
+#include "pqChartAxis.h"
 #include "pqChartCoordinate.h"
 #include "pqChartValue.h"
 #include "pqLineChartSeries.h"
 
 #include <QList>
 #include <QVector>
+
+
+class pqLineChartModelItem
+{
+public:
+  pqLineChartModelItem();
+  pqLineChartModelItem(const pqLineChartModelItem &other);
+  ~pqLineChartModelItem() {}
+
+  bool updateRange(pqChartValue &min, pqChartValue &max);
+
+  pqLineChartModelItem &operator=(const pqLineChartModelItem &other);
+  bool operator==(const pqLineChartModelItem &other) const;
+  bool operator!=(const pqLineChartModelItem &other) const;
+
+  pqChartValue Minimum;
+  pqChartValue Maximum;
+  bool IsValid;
+};
 
 
 class pqLineChartModelInternal
@@ -51,15 +71,83 @@ public:
 
   QList<pqLineChartSeries *> List;
   QList<pqLineChartSeries *> MultiSeries;
-  pqChartCoordinate Minimum;
-  pqChartCoordinate Maximum;
+  pqLineChartModelItem Axis[4];
+  int LocationIndex[4];
 };
 
 
 //----------------------------------------------------------------------------
-pqLineChartModelInternal::pqLineChartModelInternal()
-  : List(), MultiSeries(), Minimum(), Maximum()
+pqLineChartModelItem::pqLineChartModelItem()
+  : Minimum(), Maximum()
 {
+  this->IsValid = false;
+}
+
+pqLineChartModelItem::pqLineChartModelItem(const pqLineChartModelItem &other)
+  : Minimum(other.Minimum), Maximum(other.Maximum)
+{
+  this->IsValid = other.IsValid;
+}
+
+bool pqLineChartModelItem::updateRange(pqChartValue &min, pqChartValue &max)
+{
+  bool changed = false;
+  if(this->IsValid)
+    {
+    if(min < this->Minimum)
+      {
+      changed = true;
+      this->Minimum = min;
+      }
+
+    if(max > this->Maximum)
+      {
+      changed = true;
+      this->Maximum = max;
+      }
+    }
+  else
+    {
+    changed = true;
+    this->IsValid = true;
+    this->Minimum = min;
+    this->Maximum = max;
+    }
+
+  return changed;
+}
+
+pqLineChartModelItem &pqLineChartModelItem::operator=(
+    const pqLineChartModelItem &other)
+{
+  this->Minimum = other.Minimum;
+  this->Maximum = other.Maximum;
+  this->IsValid = other.IsValid;
+  return *this;
+}
+
+bool pqLineChartModelItem::operator==(const pqLineChartModelItem &other) const
+{
+  return this->IsValid == other.IsValid && this->Minimum == other.Minimum &&
+      this->Maximum == other.Maximum;
+}
+
+bool pqLineChartModelItem::operator!=(const pqLineChartModelItem &other) const
+{
+  return this->IsValid != other.IsValid || this->Minimum != other.Minimum ||
+      this->Maximum != other.Maximum;
+}
+
+
+//----------------------------------------------------------------------------
+pqLineChartModelInternal::pqLineChartModelInternal()
+  : List(), MultiSeries()
+{
+  // Set up the axis location to index map.
+  this->LocationIndex[pqChartAxis::Left] = 0;
+  this->LocationIndex[pqChartAxis::Bottom] = 1;
+  this->LocationIndex[pqChartAxis::Right] = 2;
+  this->LocationIndex[pqChartAxis::Top] = 3;
 }
 
 
@@ -116,6 +204,8 @@ void pqLineChartModel::insertSeries(pqLineChartSeries *series, int index)
   // Insert the new series. Listen to the series signals for rebroadcast.
   emit this->aboutToInsertSeries(index, index);
   this->Internal->List.insert(index, series);
+  this->connect(series, SIGNAL(chartAxesChanged()),
+      this, SLOT(handleSeriesAxesChanged()));
   this->connect(series, SIGNAL(seriesReset()),
       this, SLOT(handleSeriesReset()));
   this->connect(series, SIGNAL(aboutToInsertPoints(int, int, int)),
@@ -212,16 +302,39 @@ void pqLineChartModel::removeAll()
   emit this->modelReset();
 }
 
+bool pqLineChartModel::getAxisRange(const pqChartAxis *axis, pqChartValue &min,
+    pqChartValue &max) const
+{
+  int index = this->Internal->LocationIndex[axis->getLocation()];
+  if(this->Internal->Axis[index].IsValid)
+    {
+    min = this->Internal->Axis[index].Minimum;
+    max = this->Internal->Axis[index].Maximum;
+    return true;
+    }
+
+  return false;
+}
+
 void pqLineChartModel::getRangeX(pqChartValue &min, pqChartValue &max) const
 {
-  min = this->Internal->Minimum.X;
-  max = this->Internal->Maximum.X;
+  int index = this->Internal->LocationIndex[pqChartAxis::Bottom];
+  min = this->Internal->Axis[index].Minimum;
+  max = this->Internal->Axis[index].Maximum;
 }
 
 void pqLineChartModel::getRangeY(pqChartValue &min, pqChartValue &max) const
 {
-  min = this->Internal->Minimum.Y;
-  max = this->Internal->Maximum.Y;
+  int index = this->Internal->LocationIndex[pqChartAxis::Left];
+  min = this->Internal->Axis[index].Minimum;
+  max = this->Internal->Axis[index].Maximum;
+}
+
+void pqLineChartModel::handleSeriesAxesChanged()
+{
+  pqLineChartSeries *series = qobject_cast<pqLineChartSeries *>(this->sender());
+  this->updateChartRanges();
+  emit this->seriesChartAxesChanged(series);
 }
 
 void pqLineChartModel::handleSeriesReset()
@@ -311,89 +424,91 @@ void pqLineChartModel::handleSeriesErrorWidthChange(int sequence)
 void pqLineChartModel::updateChartRanges()
 {
   // Find the extents of the series data.
-  pqChartCoordinate min, max;
-  QList<pqLineChartSeries *>::Iterator series = this->Internal->List.begin();
-  if(series != this->Internal->List.end())
-    {
-    (*series)->getRangeX(min.X, max.X);
-    (*series)->getRangeY(min.Y, max.Y);
-    ++series;
-    }
-
+  int index = 0;
+  pqLineChartModelItem temp[4];
   pqChartValue seriesMin, seriesMax;
+  QList<pqLineChartSeries *>::Iterator series = this->Internal->List.begin();
   for( ; series != this->Internal->List.end(); ++series)
     {
-    (*series)->getRangeX(seriesMin, seriesMax);
-    if(seriesMin < min.X)
+    pqLineChartSeries::ChartAxes axes = (*series)->getChartAxes();
+    if(axes == pqLineChartSeries::BottomLeft ||
+        axes == pqLineChartSeries::BottomRight)
       {
-      min.X = seriesMin;
+      index = this->Internal->LocationIndex[pqChartAxis::Bottom];
       }
-    if(seriesMax > max.X)
+    else
       {
-      max.X = seriesMax;
+      index = this->Internal->LocationIndex[pqChartAxis::Top];
+      }
+
+    (*series)->getRangeX(seriesMin, seriesMax);
+    temp[index].updateRange(seriesMin, seriesMax);
+
+    if(axes == pqLineChartSeries::BottomLeft ||
+        axes == pqLineChartSeries::TopLeft)
+      {
+      index = this->Internal->LocationIndex[pqChartAxis::Left];
+      }
+    else
+      {
+      index = this->Internal->LocationIndex[pqChartAxis::Right];
       }
 
     (*series)->getRangeY(seriesMin, seriesMax);
-    if(seriesMin < min.Y)
+    temp[index].updateRange(seriesMin, seriesMax);
+    }
+
+  bool changed = false;
+  for(int i = 0; i < 4; i++)
+    {
+    if(temp[i] != this->Internal->Axis[i])
       {
-      min.Y = seriesMin;
-      }
-    if(seriesMax > max.Y)
-      {
-      max.Y = seriesMax;
+      changed = true;
+      this->Internal->Axis[i] = temp[i];
       }
     }
 
-  if(min.X != this->Internal->Minimum.X ||
-      max.X != this->Internal->Maximum.X ||
-      min.Y != this->Internal->Minimum.Y ||
-      max.Y != this->Internal->Maximum.Y)
+  if(changed)
     {
-    this->Internal->Minimum.X = min.X;
-    this->Internal->Maximum.X = max.X;
-    this->Internal->Minimum.Y = min.Y;
-    this->Internal->Maximum.Y = max.Y;
     emit this->chartRangeChanged();
     }
 }
 
 void pqLineChartModel::updateChartRanges(const pqLineChartSeries *series)
 {
-  pqChartCoordinate min, max;
-  series->getRangeX(min.X, max.X);
-  series->getRangeY(min.Y, max.Y);
-  if(this->getNumberOfSeries() > 1)
+  int index = 0;
+  bool xChanged = false;
+  bool yChanged = false;
+  pqChartValue seriesMin, seriesMax;
+  pqLineChartSeries::ChartAxes axes = series->getChartAxes();
+  if(axes == pqLineChartSeries::BottomLeft ||
+      axes == pqLineChartSeries::BottomRight)
     {
-    if(this->Internal->Minimum.X < min.X)
-      {
-      min.X = this->Internal->Minimum.X;
-      }
-
-    if(this->Internal->Maximum.X > max.X)
-      {
-      max.X = this->Internal->Maximum.X;
-      }
-
-    if(this->Internal->Minimum.Y < min.Y)
-      {
-      min.Y = this->Internal->Minimum.Y;
-      }
-
-    if(this->Internal->Maximum.Y > max.Y)
-      {
-      max.Y = this->Internal->Maximum.Y;
-      }
+    index = this->Internal->LocationIndex[pqChartAxis::Bottom];
+    }
+  else
+    {
+    index = this->Internal->LocationIndex[pqChartAxis::Top];
     }
 
-  if(min.X != this->Internal->Minimum.X ||
-      max.X != this->Internal->Maximum.X ||
-      min.Y != this->Internal->Minimum.Y ||
-      max.Y != this->Internal->Maximum.Y)
+  series->getRangeX(seriesMin, seriesMax);
+  xChanged = this->Internal->Axis[index].updateRange(seriesMin, seriesMax);
+
+  if(axes == pqLineChartSeries::BottomLeft ||
+      axes == pqLineChartSeries::TopLeft)
     {
-    this->Internal->Minimum.X = min.X;
-    this->Internal->Maximum.X = max.X;
-    this->Internal->Minimum.Y = min.Y;
-    this->Internal->Maximum.Y = max.Y;
+    index = this->Internal->LocationIndex[pqChartAxis::Left];
+    }
+  else
+    {
+    index = this->Internal->LocationIndex[pqChartAxis::Right];
+    }
+
+  series->getRangeY(seriesMin, seriesMax);
+  yChanged = this->Internal->Axis[index].updateRange(seriesMin, seriesMax);
+
+  if(xChanged || yChanged)
+    {
     emit this->chartRangeChanged();
     }
 }

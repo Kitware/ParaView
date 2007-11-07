@@ -45,17 +45,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqChartWidget *pqHistogramWidget::createHistogram(QWidget *parent,
     pqHistogramChart **layer)
 {
+  // Create the chart and get the chart area.
   pqChartWidget *chart = new pqChartWidget(parent);
-
-  // Get the chart area and set up the axes.
   pqChartArea *chartArea = chart->getChartArea();
-  chartArea->createAxis(pqChartAxis::Left);
-  chartArea->createAxis(pqChartAxis::Bottom);
 
   // Set up the histogram layer.
   pqHistogramChart *histogram = new pqHistogramChart(chartArea);
-  histogram->setAxes(chartArea->getAxis(pqChartAxis::Bottom),
-      chartArea->getAxis(pqChartAxis::Left));
   chartArea->insertLayer(chartArea->getAxisLayerIndex(), histogram);
 
   // Pass back a pointer to the histogram layer.

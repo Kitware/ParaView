@@ -29,14 +29,9 @@ int Histogram(int argc, char* argv[])
 {
   QApplication app(argc, argv);
 
-  // Set up the chart widget.
+  // Set up the chart widget and get the chart area.
   pqChartWidget *chart = new pqChartWidget();
-
-  // Get the chart area and set up the axes.
   pqChartArea *chartArea = chart->getChartArea();
-  chartArea->createAxis(pqChartAxis::Left);
-  chartArea->createAxis(pqChartAxis::Bottom);
-  chartArea->createAxis(pqChartAxis::Right);
 
   // Set up the default interactor.
   pqChartMouseSelection *selection =
@@ -44,8 +39,6 @@ int Histogram(int argc, char* argv[])
 
   // Set up the histogram.
   pqHistogramChart *histogram = new pqHistogramChart(chartArea);
-  histogram->setAxes(chartArea->getAxis(pqChartAxis::Bottom),
-      chartArea->getAxis(pqChartAxis::Left));
   chartArea->insertLayer(chartArea->getAxisLayerIndex(), histogram);
   selection->setHistogram(histogram);
   selection->setSelectionMode("Histogram-Bin");
@@ -67,8 +60,6 @@ int Histogram(int argc, char* argv[])
 
   // Set up the line chart.
   pqLineChart *lineView = new pqLineChart(chartArea);
-  lineView->setAxes(chartArea->getAxis(pqChartAxis::Bottom),
-      chartArea->getAxis(pqChartAxis::Right));
   lineView->getOptions()->getGenerator()->setColorScheme(
       pqChartSeriesOptionsGenerator::WildFlower);
   chartArea->addLayer(lineView);
@@ -80,6 +71,7 @@ int Histogram(int argc, char* argv[])
   // Set up the line chart data.
   pqLineChartModel *lines = new pqLineChartModel();
   pqSimpleLineChartSeries *plot = new pqSimpleLineChartSeries();
+  plot->setChartAxes(pqLineChartSeries::BottomRight);
   plot->addSequence(pqLineChartSeries::Line);
   plot->addPoint(0, pqChartCoordinate(pqChartValue((int)0),
       pqChartValue((float)1.2)));
