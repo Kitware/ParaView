@@ -459,7 +459,6 @@ void pqChartArea::layoutChart()
   QRect bounds = this->rect();
   int available = 0;
   int fontHeight = 0;
-  int index = 0;
   if(this->Internal->Axis[left])
     {
     fontHeight = this->Internal->Axis[left]->getFontHeight();
