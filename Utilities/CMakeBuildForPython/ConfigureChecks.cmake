@@ -601,6 +601,19 @@ else(NOT volatile_WORKS)
   set(volatile 0)
 endif(NOT volatile_WORKS)
 
+if(HAVE_STDARG_PROTOTYPES)
+   set(vaargsHeader "stdarg.h")
+else(HAVE_STDARG_PROTOTYPES)
+   set(vaargsHeader "varargs.h")
+endif(HAVE_STDARG_PROTOTYPES)
+check_c_source_compiles("#include <${vaargsHeader}>\n int main() {va_list list1, list2; list1 = list2;}" NOT_VA_LIST_IS_ARRAY)
+if(NOT_VA_LIST_IS_ARRAY)
+  set(VA_LIST_IS_ARRAY 0)
+else(NOT_VA_LIST_IS_ARRAY)
+  set(VA_LIST_IS_ARRAY 1)
+endif(NOT_VA_LIST_IS_ARRAY)
+
+
 #######################################################################
 #
 # tests for bugs and other stuff

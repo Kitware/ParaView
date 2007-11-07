@@ -889,7 +889,7 @@
 #cmakedefine USE_TOOLBOX_OBJECT_GLUE
 
 /* Define if a va_list is an array of some kind */
-#cmakedefine VA_LIST_IS_ARRAY
+#cmakedefine VA_LIST_IS_ARRAY 1
 
 /* Define if you want SIGFPE handled (see Include/pyfpe.h). */
 #cmakedefine WANT_SIGFPE_HANDLER
