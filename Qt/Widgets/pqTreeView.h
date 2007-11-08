@@ -49,6 +49,8 @@ public:
   pqTreeView(QWidget *parent=0);
   virtual ~pqTreeView() {}
 
+  virtual bool eventFilter(QObject *object, QEvent *e);
+
   virtual void setModel(QAbstractItemModel *model);
   virtual void setRootIndex(const QModelIndex &index);
 
@@ -57,6 +59,9 @@ public:
 
 private slots:
   void invalidateLayout();
+
+private:
+  int ScrollPadding;
 };
 
 #endif

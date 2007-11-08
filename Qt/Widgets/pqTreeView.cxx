@@ -36,17 +36,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeView.h"
 
 #include "pqCheckableHeaderView.h"
+#include <QEvent>
 #include <QLayout>
+#include <QScrollBar>
 
 
 pqTreeView::pqTreeView(QWidget *widgetParent)
   : QTreeView(widgetParent)
 {
+  this->ScrollPadding = 0;
+
   // Change the default header view to a checkable one.
   pqCheckableHeaderView *checkable = new pqCheckableHeaderView(Qt::Horizontal);
   this->setHeader(checkable);
   this->installEventFilter(checkable);
   checkable->setClickable(true);
+
+  // Listen for the show/hide events of the horizontal scroll bar.
+  this->horizontalScrollBar()->installEventFilter(this);
+}
+
+bool pqTreeView::eventFilter(QObject *object, QEvent *e)
+{
+  if(object == this->horizontalScrollBar())
+    {
+    if(e->type() == QEvent::Show && this->ScrollPadding == 0)
+      {
+      this->ScrollPadding = this->horizontalScrollBar()->height();
+      this->invalidateLayout();
+      }
+    else if(e->type() == QEvent::Hide && this->ScrollPadding != 0)
+      {
+      this->ScrollPadding = 0;
+      this->invalidateLayout();
+      }
+    }
+
+  return QTreeView::eventFilter(object, e);
 }
 
 void pqTreeView::setModel(QAbstractItemModel *newModel)
@@ -86,6 +112,8 @@ QSize pqTreeView::sizeHint() const
   int maxItemHint = 10;
   // for no items, let's give a space of X pixels
   int minItemHeight = 20;
+  // add padding for the scrollbar
+  int extra = this->ScrollPadding;
 
   int num = 0;
   QAbstractItemModel *current = this->model();
@@ -94,7 +122,11 @@ QSize pqTreeView::sizeHint() const
     num = current->rowCount(this->rootIndex());
     }
 
-  num = qMin(num, maxItemHint);
+  if(num >= maxItemHint)
+    {
+    extra = 0;
+    num = maxItemHint;
+    }
   
   int pix = minItemHeight;
 
@@ -106,7 +138,7 @@ QSize pqTreeView::sizeHint() const
   int margin[4];
   this->getContentsMargins(margin, margin+1, margin+2, margin+3);
   int h = pix + margin[1] + margin[3] + this->header()->frameSize().height();
-  return QSize(156, h);
+  return QSize(156, h + extra);
 }
 
 QSize pqTreeView::minimumSizeHint() const
