@@ -158,7 +158,6 @@ IF(BUILD_TESTING)
     CreateSourceWithoutConnect
 #    LoadStateSelection
     OpenFile
-    OpenSaveData
 #    SelectionUndo
     )
 
@@ -288,6 +287,7 @@ IF(BUILD_TESTING)
     LoadSaveStateAnimation
     LoadState
     ObjectInspectorSphere
+    OpenSaveData
     OrientationAxis
     Plot3DReader
     PropertyLink
