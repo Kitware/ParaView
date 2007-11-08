@@ -2114,7 +2114,6 @@ void pqMainWindowCore::onFileSaveData()
     this->Implementation->Parent, tr("Save File:"), QString(), filters);
   file_dialog.setObjectName("FileSaveDialog");
   file_dialog.setFileMode(pqFileDialog::AnyFile);
-  file_dialog.setAttribute(Qt::WA_DeleteOnClose, false);
   QObject::connect(&file_dialog, SIGNAL(filesSelected(const QStringList&)), 
     this, SLOT(onFileSaveData(const QStringList&)));
   file_dialog.exec();
