@@ -65,6 +65,7 @@ public:
   QWidget* CreateMainWindow()
   {
     Win = new MainWindow;
+    Win->resize(200,150);
     return Win;
   }
   bool compareView(const QString& referenceImage, double threshold,
