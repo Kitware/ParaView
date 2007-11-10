@@ -50,18 +50,22 @@ class QTPYTHON_EXPORT pqPythonDialog :
   Q_OBJECT
 
 public:
-  pqPythonDialog(QWidget* Parent, int argc, char** argv);
+  pqPythonDialog(QWidget* Parent);
 
+public slots:
   /// Execute a commond in the python shell.
   void runString(const QString& script);
 
   /// Calling this slot will destroy the current python interpretor and start a
   /// new one without closing the dialog.
-  void restartInterpretor(int argc, char** argv);
+  void initializeInterpretor();
+
+signals:
+  void interpreterInitialized();
+
 private slots:
   void runScript();
   void runScript(const QStringList&);
-  
   void clearConsole();
  
 private:

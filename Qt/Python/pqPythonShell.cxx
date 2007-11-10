@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqConsoleWidget.h"
 #include "pqPythonShell.h"
 #include "vtkCommand.h"
+#include "vtkProcessModule.h"
+#include "vtkPVOptions.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPVPythonInteractiveInterpretor.h"
 
@@ -170,6 +172,13 @@ pqPythonShell::pqPythonShell(QWidget* Parent) :
 pqPythonShell::~pqPythonShell()
 {
   delete this->Implementation;
+}
+
+void pqPythonShell::initializeInterpretor()
+{
+  const char* argv0 = vtkProcessModule::GetProcessModule()->
+    GetOptions()->GetArgv0();
+  this->initializeInterpretor(1, (char**)&argv0);
 }
 
 void pqPythonShell::initializeInterpretor(int argc, char* argv[])

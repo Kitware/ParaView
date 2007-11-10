@@ -451,6 +451,8 @@ private slots:
   /// Shows message boxes for server timeout warnings.
   void fiveMinuteTimeoutWarning();
   void finalTimeoutWarning();
+  
+  void initPythonInterpretor();
 
 private:
   pqServerManagerModelItem *getActiveObject() const;
@@ -462,7 +464,6 @@ private:
   pqImplementation* const Implementation;
 
 
-  void initPythonInterpretor();
 };
 
 #endif // !_pqMainWindowCore_h

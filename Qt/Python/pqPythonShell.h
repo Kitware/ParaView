@@ -57,6 +57,7 @@ public:
   /// Initializes the interpretor. If an interpretor is already setup (by an
   /// earlier call to this method), it will be destroyed.
   void initializeInterpretor(int argc, char* argv[]);
+  void initializeInterpretor();
 
 signals:
   void executing(bool);

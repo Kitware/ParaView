@@ -2700,11 +2700,12 @@ void pqMainWindowCore::onToolsPythonShell()
 #ifdef PARAVIEW_ENABLE_PYTHON
   if (!this->Implementation->PythonDialog)
     {
-    const char* argv0 = vtkProcessModule::GetProcessModule()->
-      GetOptions()->GetArgv0();
     this->Implementation->PythonDialog = 
-      new pqPythonDialog(this->Implementation->Parent, 1, (char**)&argv0);
-    this->initPythonInterpretor();
+      new pqPythonDialog(this->Implementation->Parent);
+    QObject::connect(this->Implementation->PythonDialog,
+                     SIGNAL(interpreterInitialized()),
+                     this, SLOT(initPythonInterpretor()));
+    this->Implementation->PythonDialog->initializeInterpretor();
     }
 
   this->Implementation->PythonDialog->show();
@@ -3207,17 +3208,6 @@ void pqMainWindowCore::onServerCreationFinished(pqServer *server)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onRemovingServer(pqServer *server)
 {
-#ifdef PARAVIEW_ENABLE_PYTHON
-  // Initialize interpretor using the new server connection.
-  if (this->Implementation->PythonDialog)
-    {
-    // ensure that the interpretor is destroyed before the server connection is
-    // closed.
-    const char* argv0 = vtkProcessModule::GetProcessModule()->
-      GetOptions()->GetArgv0();    
-    this->Implementation->PythonDialog->restartInterpretor(1, (char**)&argv0);
-    }
-#endif // PARAVIEW_ENABLE_PYTHON
 
   // Make sure the server and its sources are not selected.
   pqServerManagerSelection toDeselect;
@@ -3247,6 +3237,16 @@ void pqMainWindowCore::onRemovingServer(pqServer *server)
     }
 
   this->Implementation->ActiveServer.setCurrent(0);
+
+#ifdef PARAVIEW_ENABLE_PYTHON
+  // Initialize interpretor using the new server connection.
+  if (this->Implementation->PythonDialog)
+    {
+    // ensure that the interpretor is destroyed before the server connection is
+    // closed.
+    this->Implementation->PythonDialog->initializeInterpretor();
+    }
+#endif // PARAVIEW_ENABLE_PYTHON
 }
 
 //-----------------------------------------------------------------------------

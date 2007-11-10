@@ -8,6 +8,7 @@ INCLUDE_DIRECTORIES(
   ${QtPython_BINARY_DIR}
   ${VTK_INCLUDE_DIR}
   ${PYTHON_INCLUDE_PATH}
+  ${PARAVIEW_INCLUDE_DIRS}
   ${VTKPythonWrapping_SOURCE_DIR}/Executable
   ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
 )

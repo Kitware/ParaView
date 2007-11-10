@@ -49,7 +49,7 @@ struct pqPythonDialog::pqImplementation
   Ui::pqPythonDialog Ui;
 };
 
-pqPythonDialog::pqPythonDialog(QWidget* Parent, int argc, char** argv) :
+pqPythonDialog::pqPythonDialog(QWidget* Parent) :
   QDialog(Parent),
   Implementation(new pqImplementation())
 {
@@ -68,6 +68,12 @@ pqPythonDialog::pqPythonDialog(QWidget* Parent, int argc, char** argv) :
     SIGNAL(clicked()),
     this,
     SLOT(runScript()));
+    
+  QObject::connect(
+    this->Implementation->Ui.reset,
+    SIGNAL(clicked()),
+    this,
+    SLOT(initializeInterpretor()));                
 
   QObject::connect(
     this->Implementation->Ui.shellWidget,
@@ -86,9 +92,7 @@ pqPythonDialog::pqPythonDialog(QWidget* Parent, int argc, char** argv) :
     SIGNAL(executing(bool)),
     this->Implementation->Ui.close,
     SLOT(setDisabled(bool)));
-
-  this->Implementation->Ui.shellWidget->initializeInterpretor(argc, argv);
-  
+    
   pqApplicationCore::instance()->settings()->restoreState("PythonDialog", *this);
 }
 
@@ -144,7 +148,9 @@ void pqPythonDialog::clearConsole()
   this->Implementation->Ui.shellWidget->clear();
 }
 
-void pqPythonDialog::restartInterpretor(int argc, char* argv[])
+void pqPythonDialog::initializeInterpretor()
 {
-  this->Implementation->Ui.shellWidget->initializeInterpretor(argc, argv);
+  this->Implementation->Ui.shellWidget->initializeInterpretor();
+  emit this->interpreterInitialized();
 }
+
