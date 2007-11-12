@@ -416,9 +416,7 @@ void pqSampleScalarWidget::onControlledPropertyChanged()
     {
     return;
     }
-    
-  this->reset();
-    this->onSamplesChanged();
+  this->onControlledPropertyDomainChanged();
 }
 
 void pqSampleScalarWidget::onControlledPropertyDomainChanged()
@@ -435,7 +433,7 @@ void pqSampleScalarWidget::onControlledPropertyDomainChanged()
     this->Implementation->UI->ScalarRange->setText(
       tr("Value Range: unlimited"));
     }
-      this->onSamplesChanged();
+  this->onSamplesChanged();
 }
 
 bool pqSampleScalarWidget::getRange(double& range_min, double& range_max)
