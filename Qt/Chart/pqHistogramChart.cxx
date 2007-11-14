@@ -409,8 +409,8 @@ void pqHistogramChart::getSelectionArea(const pqHistogramSelectionList &list,
     if(leftBin >= 0 && leftBin < this->Internal->Items.size() &&
         rightBin >= 0 && rightBin < this->Internal->Items.size())
       {
-      area.setLeft(this->Internal->Items[leftBin].left());
-      area.setRight(this->Internal->Items[rightBin].right());
+      area.setLeft((int)this->Internal->Items[leftBin].left());
+      area.setRight((int)this->Internal->Items[rightBin].right());
       }
     else
       {
@@ -584,7 +584,7 @@ void pqHistogramChart::layoutChart(const QRect &area)
 
   // Set up the size for each bar in the histogram.
   pqChartValue value, min, max;
-  int bottom = yScale->getMinPixel();
+  float bottom = yScale->getMinPixel();
   bool reversed = false;
   if(yScale->isZeroInRange())
     {
