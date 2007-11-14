@@ -151,9 +151,14 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
   vtkClientServer
   vtkPVCommandOptions)
 
+# for vtkPVFileInformation
+IF(WIN32)
+  TARGET_LINK_LIBRARIES(vtk${KIT} netapi32)
+ENDIF(WIN32)
 IF(MINGW)
   TARGET_LINK_LIBRARIES(vtk${KIT} uuid ole32)
 ENDIF(MINGW)
+
 
 IF (PARAVIEW_ENABLE_PYTHON)
   SET(Kit_PYTHON_EXTRA_SRCS)

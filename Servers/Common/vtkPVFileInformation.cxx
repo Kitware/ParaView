@@ -23,11 +23,13 @@
 
 #if defined(_WIN32)
 # define _WIN32_IE 0x0400  // special folder support
+# define _WIN32_WINNT 0x0400  // shared folder support
 # include <windows.h>   // FindFirstFile, FindNextFile, FindClose, ...
 # include <direct.h>    // _getcwd
 # include <shlobj.h>    // SHGetFolderPath
 # include <sys/stat.h>  // stat
 # include <string.h>   // for strcasecmp
+# include <lm.h>
 # define vtkPVServerFileListingGetCWD _getcwd
 #else
 # include <sys/types.h> // DIR, struct dirent, struct stat
@@ -50,7 +52,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.21");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.22");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -69,15 +71,121 @@ inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 }
 
 #if defined(_WIN32)
-static bool vtkPVFileInformationResolveLink(const vtkstd::string& fname,
-                                                      vtkstd::string& result,
+
+// assumes native back-slashes
+static bool IsUncPath(const vtkstd::string& path)
+{
+  if(path.size() >= 2 && path[0] == '\\' && path[1] == '\\')
+    return true;
+  return false;
+}
+
+static bool getUncSharesOnServer(const vtkstd::string& server,
+                          vtkstd::vector<vtkstd::string>& ret)
+{
+  PSHARE_INFO_1 buf;
+  NET_API_STATUS result;
+  DWORD resumeHandle=0, numEntries=0, numTotal=0;
+  WCHAR* wserver = new WCHAR[server.size()+1];
+  MultiByteToWideChar(CP_ACP, 0, server.c_str(), -1, wserver, server.size()+1);
+  do
+    {
+    result = NetShareEnum(wserver, 1, (LPBYTE*)&buf, -1,
+                          &numEntries, &numTotal, &resumeHandle);
+    if(result == ERROR_MORE_DATA || result == ERROR_SUCCESS)
+      {
+      for(DWORD i=0; i<numEntries; i++)
+        {
+        if(buf[i].shi1_type == STYPE_DISKTREE)
+          {
+          int num = WideCharToMultiByte(CP_ACP, 0, buf[i].shi1_netname, 
+                                        -1, NULL, 0, 0, 0);
+          char* share = new char[num];
+          WideCharToMultiByte(CP_ACP, 0, buf[i].shi1_netname, -1, share, num, 0, 0);
+          ret.push_back(vtkstd::string(share));
+          delete [] share;
+          }
+        }
+      }
+    NetApiBufferFree(buf);
+    } while(result == ERROR_MORE_DATA);
+  delete [] wserver;
+  return result == ERROR_SUCCESS;
+}
+
+#endif
+
+static int vtkPVFileInformationGetType(const char* path)
+{
+  int type = vtkPVFileInformation::INVALID;
+  if(vtksys::SystemTools::FileExists(path))
+    {
+    type = vtkPVFileInformation::SINGLE_FILE;
+    }
+  if(vtksys::SystemTools::FileIsDirectory(path))
+    {
+    type = vtkPVFileInformation::DIRECTORY;
+    }
+#if defined(_WIN32)
+  // doing stat on root of devices doesn't work
+
+  // is it the root of a drive?
+  if (type == vtkPVFileInformation::INVALID && path[0] && path[1] == ':')
+    {
+    // Path may be drive letter.
+    DWORD n = GetLogicalDrives();
+    int which = tolower(path[0]) - 'a';
+    if(n & (1 << which))
+      {
+      type = vtkPVFileInformation::DIRECTORY;
+      }
+    }
+  // is it the root of a shared folder?
+  if(IsUncPath(path))
+    {
+    vtkstd::vector<vtksys::String> parts =
+      vtksys::SystemTools::SplitString(path+2, '\\', true);
+    if(parts.empty())
+      {
+      // global network
+      type = vtkPVFileInformation::DIRECTORY;
+      }
+    else
+      {
+      vtkstd::vector<vtkstd::string> shares;
+      bool ret = getUncSharesOnServer(parts[0], shares);
+      if(parts.size() == 1 && ret)
+        {
+        // server exists
+        type = vtkPVFileInformation::DIRECTORY;
+        }
+      else if(parts.size() == 2 && ret)
+        {
+        for(unsigned int i = 0; i<shares.size(); i++)
+          {
+          if(parts[1] == shares[i])
+            {
+            // share on server exists
+            type = vtkPVFileInformation::DIRECTORY;
+            break;
+            }
+          }
+        }
+      }
+    }
+#endif
+  return type;
+}
+
+#if defined(_WIN32)
+static vtkstd::string vtkPVFileInformationResolveLink(const vtkstd::string& fname,
                                                       WIN32_FIND_DATA& wfd)
 {
   IShellLink* shellLink;
   HRESULT hr;
   char Link[MAX_PATH];
   bool coInit = false;
-  bool success = false;
+  vtkstd::string result;
 
   hr = ::CoCreateInstance(CLSID_ShellLink, NULL, 
                           CLSCTX_INPROC_SERVER, IID_IShellLink,
@@ -103,7 +211,6 @@ static bool vtkPVFileInformationResolveLink(const vtkstd::string& fname,
         if(shellLink->GetPath(Link, MAX_PATH, &wfd, SLGP_UNCPRIORITY) == NOERROR)
           {
           result = Link;
-          success = true;
           }
         ppf->Release();
         }
@@ -115,7 +222,7 @@ static bool vtkPVFileInformationResolveLink(const vtkstd::string& fname,
     CoUninitialize();
     }
 
-  return success;
+  return result;
 
 }
 #endif
@@ -177,69 +284,33 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
 
   vtkstd::string path = vtksys::SystemTools::CollapseFullPath(helper->GetPath(),
     working_directory.c_str());
+  path = vtksys::SystemTools::ConvertToOutputPath(path.c_str());
   
   this->SetName(helper->GetPath());
 #if defined(_WIN32)
-  vtkstd::string::size_type idx;
-  for(idx = path.find('/', 0);
-      idx != vtkstd::string::npos;
-      idx = path.find('/', idx))
+  int len = path.size();
+  if(len > 4 && path.compare(len-4, 4, ".lnk") == 0)
     {
-    path.replace(idx, 1, 1, '\\');
+    WIN32_FIND_DATA data;
+    path = vtkPVFileInformationResolveLink(path, data);
     }
-  size_t len = path.size();
-  WIN32_FIND_DATA data;
-  if(len > 4 && strncmp(path.c_str()+len-4, ".lnk", 4) == 0)
-  {
-  vtkPVFileInformationResolveLink(path, path, data);
-  }
 #endif
   this->SetFullPath(path.c_str());
 
-  if (!vtksys::SystemTools::FileExists(this->FullPath))
-    {
-    return;
-    }
+  this->Type = vtkPVFileInformationGetType(this->FullPath);
 
-  bool is_directory = vtksys::SystemTools::FileIsDirectory(this->FullPath);
-  this->Type = (is_directory)? DIRECTORY : SINGLE_FILE;
+  if ((this->Type == DIRECTORY || this->Type == DRIVE) && 
+      helper->GetDirectoryListing())
+    {
+    // Since we want a directory listing, we now to platform specific listing 
+    // with intelligent pattern matching hee-haa.
 #if defined(_WIN32)
-  if (!is_directory)
-    {
-    // Path may be drive letter.
-    char strings[1024];
-    DWORD n = GetLogicalDriveStrings(1024, strings);
-    char* start = strings;
-    char* end = start;
-    for(;end != strings+n; ++end)
-      {
-      if(!*end)
-        {
-        if (stricmp(start,this->FullPath) == 0)
-          {
-          is_directory = true;
-          this->Type = DRIVE;
-          break;
-          }
-        start = end+1;
-        }
-      }
-    }
-#endif
-
-  if (!helper->GetDirectoryListing() || !is_directory)
-    {
-    return;
-    }
-
-  // Since we want a directory listing, we now to platform specific listing 
-  // with intelligent pattern matching hee-haa.
-
-#if defined(_WIN32)
-  this->GetWindowsDirectoryListing();
+    this->GetWindowsDirectoryListing();
 #else
-  this->GetDirectoryListing();
+    this->GetDirectoryListing();
 #endif
+    }
+
 }
 
 //-----------------------------------------------------------------------------
@@ -250,7 +321,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
   // Return favorite directories ...
 
   TCHAR szPath[MAX_PATH];
-
+  
   if(SUCCEEDED(SHGetSpecialFolderPath(NULL, szPath, CSIDL_PERSONAL, false)))
     {
     vtkSmartPointer<vtkPVFileInformation> info =
@@ -282,23 +353,29 @@ void vtkPVFileInformation::GetSpecialDirectories()
     }
 
   // Return drive letters ...
-  char strings[1024];
-  DWORD n = GetLogicalDriveStrings(1024, strings);
-  char* start = strings;
-  char* end = start;
-  for(;end != strings+n; ++end)
+  DWORD n = GetLogicalDrives();
+  for(int i=0; i<sizeof(DWORD)*8; i++)
     {
-    if(!*end)
+    if(n & (1<<i))
       {
+      vtkstd::string driveLetter;
+      driveLetter += 'A' + i;
+      driveLetter += ":\\";
       vtkSmartPointer<vtkPVFileInformation> info =
         vtkSmartPointer<vtkPVFileInformation>::New();
-      info->SetFullPath(start);
-      info->SetName(start);
+      info->SetFullPath(driveLetter.c_str());
+      info->SetName(driveLetter.c_str());
       info->Type = DRIVE;
       this->Contents->AddItem(info);
-      start = end+1;
       }
     }
+  
+  vtkSmartPointer<vtkPVFileInformation> info =
+      vtkSmartPointer<vtkPVFileInformation>::New();
+  info->SetFullPath("Windows Network");
+  info->SetName("Windows Network");
+  info->Type = DIRECTORY;
+  this->Contents->AddItem(info);
 
 #else // _WIN32
 #if defined (__APPLE__ )
@@ -426,6 +503,48 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
 #if defined(_WIN32)
   vtkPVFileInformationSet info_set;
 
+  if(IsUncPath(this->FullPath))
+    {
+    bool didListing = false;
+    vtkstd::vector<vtksys::String> parts =
+      vtksys::SystemTools::SplitString(this->FullPath+2, '\\', true);
+
+    if(parts.size() == 1)
+      {
+      // get list of all shares on server
+      vtkstd::vector<vtkstd::string> shares;
+      if(getUncSharesOnServer(parts[0], shares))
+        {
+        for(unsigned int i=0; i<shares.size(); i++)
+          {
+          vtkPVFileInformation* info = vtkPVFileInformation::New();
+          info->SetName(shares[i].c_str());
+          vtkstd::string fullpath = "\\\\" + parts[0] + "\\" + shares[i];
+          info->SetFullPath(fullpath.c_str());
+          info->Type = DIRECTORY;
+          info->FastFileTypeDetection = this->FastFileTypeDetection;
+          info_set.insert(info);
+          info->Delete();
+          }
+        }
+      didListing = true;
+      }
+
+    if(didListing)
+      {
+      this->OrganizeCollection(info_set);
+
+      for (vtkPVFileInformationSet::iterator iter = info_set.begin();
+        iter != info_set.end(); ++iter)
+        {
+        this->Contents->AddItem(*iter);
+        }
+      return;
+      }
+    // fall through for normal file listing that works after shares are
+    // known
+    }
+
   // Search for all files in the given directory.
   vtkstd::string prefix = this->FullPath;
   vtkPVFileInformationAddTerminatingSlash(prefix);
@@ -453,11 +572,10 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
       continue;
     vtkstd::string fullpath = prefix + filename;
     size_t len = filename.size();
-    bool success = true;
 
     if(len > 4 && strncmp(filename.c_str()+len-4, ".lnk", 4) == 0)
       {
-      success = vtkPVFileInformationResolveLink(fullpath, fullpath, data);
+      fullpath = vtkPVFileInformationResolveLink(fullpath, data);
       }
 
     DWORD isdir = data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
@@ -468,7 +586,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
 
     FileTypes type = isdir ? DIRECTORY : SINGLE_FILE;
 
-    if(success && (isdir || isfile))
+    if(isdir || isfile)
       {
       vtkPVFileInformation* infoD = vtkPVFileInformation::New();
       infoD->SetName(filename.c_str());
