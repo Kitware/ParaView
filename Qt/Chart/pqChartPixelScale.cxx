@@ -168,7 +168,7 @@ int pqChartPixelScale::getMaxPixel() const
   return this->Internal->PixelMax;
 }
 
-int pqChartPixelScale::getPixelFor(const pqChartValue &value) const
+int pqChartPixelScale::getPixel(const pqChartValue &value) const
 {
   // Convert the value to a pixel location using:
   // px = ((vx - v1)*(p2 - p1))/(v2 - v1) + p1
@@ -227,7 +227,67 @@ int pqChartPixelScale::getPixelFor(const pqChartValue &value) const
   return result.getIntValue() + this->Internal->PixelMin;
 }
 
-void pqChartPixelScale::getValueFor(int pixel, pqChartValue &value) const
+float pqChartPixelScale::getPixelF(const pqChartValue &value) const
+{
+  // Convert the value to a pixel location using:
+  // px = ((vx - v1)*(p2 - p1))/(v2 - v1) + p1
+  // If using a log scale, the values should be in exponents in
+  // order to get a linear mapping.
+  pqChartValue result;
+  pqChartValue valueRange;
+  if(this->Internal->Scale == pqChartPixelScale::Logarithmic &&
+      this->Internal->LogAvailable)
+    {
+    // If the value is too small, return the minimum pixel.
+    if(value <= pqChartPixelScale::MinLogValue)
+      {
+      return (float)this->Internal->PixelMin;
+      }
+
+    // If the log scale uses integers, the first value may be zero.
+    // In that case, use -1 instead of taking the log of zero.
+    pqChartValue v1;
+    if(this->Internal->ValueMin.getType() == pqChartValue::IntValue &&
+        this->Internal->ValueMin == 0)
+      {
+      v1 = MinIntLogPower;
+      }
+    else
+      {
+      v1 = log10(this->Internal->ValueMin.getDoubleValue());
+      }
+
+    if(this->Internal->ValueMin.getType() == pqChartValue::IntValue &&
+        this->Internal->ValueMax == 0)
+      {
+      valueRange = MinIntLogPower;
+      }
+    else
+      {
+      valueRange = log10(this->Internal->ValueMax.getDoubleValue());
+      }
+
+    result = log10(value.getDoubleValue());
+    result -= v1;
+    valueRange -= v1;
+    }
+  else
+    {
+    result = value - this->Internal->ValueMin;
+    result.convertTo(pqChartValue::FloatValue);
+    valueRange = this->Internal->ValueMax - this->Internal->ValueMin;
+    }
+
+  result *= this->Internal->PixelMax - this->Internal->PixelMin;
+  if(valueRange != 0)
+    {
+    result /= valueRange;
+    }
+
+  return result.getFloatValue() + (float)this->Internal->PixelMin;
+}
+
+void pqChartPixelScale::getValue(int pixel, pqChartValue &value) const
 {
   // Convert the pixel location to a value using:
   // vx = ((px - p1)*(v2 - v1))/(p2 - p1) + v1

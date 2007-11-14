@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QPainter>
 #include <QRect>
+#include <QRectF>
 #include <QtDebug>
 #include <QVector>
 
@@ -55,8 +56,8 @@ public:
   pqHistogramChartInternal();
   ~pqHistogramChartInternal() {}
 
-  QVector<QRect> Items;      ///< The list of histogram bars.
-  QVector<QRect> Highlights; ///< The list of highlighted ranges.
+  QVector<QRectF> Items;      ///< The list of histogram bars.
+  QVector<QRectF> Highlights; ///< The list of highlighted ranges.
   QRect Bounds;              ///< Stores the chart bounds.
   QRect Contents;            ///< Stores the contents area.
 };
@@ -200,7 +201,7 @@ int pqHistogramChart::getBinAt(int x, int y,
   if(this->Internal->Contents.isValid() &&
       this->Internal->Contents.contains(x, y))
     {
-    QVector<QRect>::Iterator iter = this->Internal->Items.begin();
+    QVector<QRectF>::Iterator iter = this->Internal->Items.begin();
     for(int i = 0; iter != this->Internal->Items.end(); iter++, i++)
       {
       if(mode == pqHistogramChart::BinRange && iter->isValid() &&
@@ -247,7 +248,7 @@ bool pqHistogramChart::getValueAt(int x, int y, pqChartValue &value) const
         }
       }
 
-    scale->getValueFor(x, value);
+    scale->getValue(x, value);
     return true;
     }
 
@@ -288,7 +289,7 @@ bool pqHistogramChart::getValueRangeAt(int x, int y,
 
       // Search through the current selection list.
       pqChartValue value;
-      scale->getValueFor(x, value);
+      scale->getValue(x, value);
       pqHistogramSelectionList::ConstIterator iter = list.begin();
       for( ; iter != list.end(); ++iter)
         {
@@ -319,7 +320,7 @@ void pqHistogramChart::getBinsIn(const QRect &area,
       area.intersects(this->Internal->Contents))
     {
     pqChartValue i((int)0);
-    QVector<QRect>::Iterator iter = this->Internal->Items.begin();
+    QVector<QRectF>::Iterator iter = this->Internal->Items.begin();
     for( ; iter != this->Internal->Items.end(); ++iter, ++i)
       {
       if(area.right() < iter->left())
@@ -424,8 +425,8 @@ void pqHistogramChart::getSelectionArea(const pqHistogramSelectionList &list,
       return;
       }
 
-    area.setLeft(scale->getPixelFor(first.getFirst()));
-    area.setRight(scale->getPixelFor(last.getSecond()));
+    area.setLeft(scale->getPixel(first.getFirst()));
+    area.setRight(scale->getPixel(last.getSecond()));
     }
 
   const pqChartContentsSpace *zoomPan = this->getContentsSpace();
@@ -589,7 +590,7 @@ void pqHistogramChart::layoutChart(const QRect &area)
     {
     pqChartValue zero(0);
     zero.convertTo(yScale->getMaxValue().getType());
-    bottom = yScale->getPixelFor(zero);
+    bottom = yScale->getPixelF(zero);
     }
   else
     {
@@ -601,21 +602,21 @@ void pqHistogramChart::layoutChart(const QRect &area)
       }
     }
 
-  QVector<QRect>::Iterator iter = this->Internal->Items.begin();
+  QVector<QRectF>::Iterator iter = this->Internal->Items.begin();
   for(int i = 0; iter != this->Internal->Items.end(); ++iter, ++i)
     {
     this->Model->getBinValue(i, value);
     this->Model->getBinRange(i, min, max);
-    iter->setLeft(xScale->getPixelFor(min));
-    iter->setRight(xScale->getPixelFor(max));
+    iter->setLeft(xScale->getPixelF(min));
+    iter->setRight(xScale->getPixelF(max));
     if(reversed || value < 0)
       {
       iter->setTop(bottom);
-      iter->setBottom(yScale->getPixelFor(value));
+      iter->setBottom(yScale->getPixelF(value));
       }
     else
       {
-      iter->setTop(yScale->getPixelFor(value));
+      iter->setTop(yScale->getPixelF(value));
       iter->setBottom(bottom);
       }
     }
@@ -633,6 +634,7 @@ void pqHistogramChart::drawBackground(QPainter &painter, const QRect &area)
 
   // Translate the painter and the area to paint to contents space.
   painter.save();
+  painter.setRenderHint(QPainter::Antialiasing, true);
   QRect clipArea = area.intersect(this->Internal->Bounds);
   QRect toPaint = area;
   const pqChartContentsSpace *zoomPan = this->getContentsSpace();
@@ -648,7 +650,7 @@ void pqHistogramChart::drawBackground(QPainter &painter, const QRect &area)
   painter.setClipRect(clipArea);
 
   // Draw in the selection if there is one.
-  QVector<QRect>::Iterator highlight = this->Internal->Highlights.begin();
+  QVector<QRectF>::Iterator highlight = this->Internal->Highlights.begin();
   for( ; highlight != this->Internal->Highlights.end(); ++highlight)
     {
     if(highlight->intersects(toPaint))
@@ -670,6 +672,7 @@ void pqHistogramChart::drawChart(QPainter &painter, const QRect &area)
 
   // Translate the painter and the area to paint to contents space.
   painter.save();
+  painter.setRenderHint(QPainter::Antialiasing, true);
   QRect clipArea = area.intersect(this->Internal->Bounds);
   QRect toPaint = area;
   const pqChartContentsSpace *zoomPan = this->getContentsSpace();
@@ -688,8 +691,8 @@ void pqHistogramChart::drawChart(QPainter &painter, const QRect &area)
   int i = 0;
   bool areaFound = false;
   int total = this->Model->getNumberOfBins();
-  QVector<QRect>::Iterator highlight = this->Internal->Highlights.begin();
-  QVector<QRect>::Iterator iter = this->Internal->Items.begin();
+  QVector<QRectF>::Iterator highlight = this->Internal->Highlights.begin();
+  QVector<QRectF>::Iterator iter = this->Internal->Items.begin();
   for( ; iter != this->Internal->Items.end(); ++iter, ++i)
     {
     // Make sure the bounding rectangle is known.
@@ -712,69 +715,54 @@ void pqHistogramChart::drawChart(QPainter &painter, const QRect &area)
           bin = this->Options->getColorScheme()->getColor(i, total);
           }
 
-        painter.fillRect(iter->x(), iter->y(), iter->width() - 1,
-            iter->height() - 1, bin);
-
-        // Draw in the highlighted portion of the bar if it is selected
-        // and fill highlighting is being used.
-        if(this->Options->getHighlightStyle() == pqHistogramChartOptions::Fill)
-          {
-          for( ; highlight != this->Internal->Highlights.end(); ++highlight)
-            {
-            if(iter->right() < highlight->left())
-              {
-              break;
-              }
-            else if(iter->left() <= highlight->right())
-              {
-              painter.fillRect(iter->intersect(*highlight), bin.light(170));
-              if(iter->right() <= highlight->right())
-                {
-                break;
-                }
-              }
-            }
-          }
-
-        // Draw in the outline last to make sure it is on top.
+        // Set the outline color.
+        QPen outlinePen = painter.pen();
+        outlinePen.setJoinStyle(Qt::MiterJoin);
+        outlinePen.setWidth(1);
         if(this->Options->getOutlineStyle() == pqHistogramChartOptions::Darker)
           {
-          painter.setPen(bin.dark());
+          outlinePen.setColor(bin.dark());
           }
         else
           {
-          painter.setPen(Qt::black);
+          outlinePen.setColor(Qt::black);
           }
 
-        painter.drawRect(iter->x(), iter->y(), iter->width() - 1,
-            iter->height() - 1);
+        painter.setPen(outlinePen);
+        painter.setBrush(bin);
+        QRectF binRect = *iter;
+        painter.drawRect(binRect);
 
-        // If the bar is selected and outline highlighting is used, draw
-        // a lighter and thicker outline around the bar.
-        if(this->Options->getHighlightStyle() ==
-            pqHistogramChartOptions::Outline)
+        // Set up the painter to draw the highlights.
+        if(this->Options->getHighlightStyle() == pqHistogramChartOptions::Fill)
           {
-          for( ; highlight != this->Internal->Highlights.end(); ++highlight)
+          painter.setBrush(bin.light(170));
+          }
+        else
+          {
+          outlinePen.setWidth(2);
+          outlinePen.setColor(bin.light(170));
+          painter.setPen(outlinePen);
+          painter.setBrush(QBrush());
+          binRect.adjust(1, 1, 0, 0);
+          }
+
+        // Draw in the highlighted portion of the bin rectangle.
+        for( ; highlight != this->Internal->Highlights.end(); ++highlight)
+          {
+          if(iter->right() < highlight->left())
             {
-            if(iter->right() < highlight->left())
+            break;
+            }
+          else if(iter->left() <= highlight->right())
+            {
+            painter.save();
+            painter.setClipRect(highlight->intersect(iter->adjusted(0, 0, 1, 1)));
+            painter.drawRect(binRect);
+            painter.restore();
+            if(iter->right() <= highlight->right())
               {
               break;
-              }
-            else if(iter->left() <= highlight->right())
-              {
-              painter.setPen(bin.light(170));
-              QRect inter = iter->intersect(*highlight);
-              inter.setWidth(inter.width() - 1);
-              inter.setHeight(inter.height() - 1);
-              painter.drawRect(inter);
-              inter.translate(1, 1);
-              inter.setWidth(inter.width() - 2);
-              inter.setHeight(inter.height() - 2);
-              painter.drawRect(inter);
-              if(iter->right() <= highlight->right())
-                {
-                break;
-                }
               }
             }
           }
@@ -788,13 +776,13 @@ void pqHistogramChart::drawChart(QPainter &painter, const QRect &area)
 
   // Draw in the selection outline.
   painter.setPen(QColor(60, 90, 135));
+  painter.setBrush(QBrush());
   highlight = this->Internal->Highlights.begin();
   for( ; highlight != this->Internal->Highlights.end(); ++highlight)
     {
     if(highlight->intersects(toPaint))
       {
-      painter.drawRect(highlight->x(), highlight->y(), highlight->width() - 1,
-          highlight->height() - 1);
+      painter.drawRect(*highlight);
       }
     }
 
@@ -891,7 +879,7 @@ void pqHistogramChart::layoutSelection()
     this->Internal->Highlights.resize(list.size());
     }
 
-  QVector<QRect>::Iterator highlight = this->Internal->Highlights.begin();
+  QVector<QRectF>::Iterator highlight = this->Internal->Highlights.begin();
   pqHistogramSelectionList::ConstIterator iter = list.begin();
   for( ; iter != list.end(); ++iter, ++highlight)
     {
@@ -901,8 +889,8 @@ void pqHistogramChart::layoutSelection()
     highlight->setBottom(this->Internal->Contents.bottom());
     if(iter->getType() == pqHistogramSelection::Value)
       {
-      highlight->setLeft(xScale->getPixelFor(iter->getFirst()));
-      highlight->setRight(xScale->getPixelFor(iter->getSecond()));
+      highlight->setLeft(xScale->getPixelF(iter->getFirst()));
+      highlight->setRight(xScale->getPixelF(iter->getSecond()));
       }
     else
       {

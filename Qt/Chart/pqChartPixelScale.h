@@ -155,8 +155,17 @@ public:
   /// \return
   ///   The pixel location for the given value.
   /// \sa pqChartPixelScale::isValid(),
-  ///     pqChartPixelScale::getValueFor(int)
-  int getPixelFor(const pqChartValue &value) const;
+  ///     pqChartPixelScale::getValue(int)
+  int getPixel(const pqChartValue &value) const;
+
+  /// \brief
+  ///   Maps a value to a pixel.
+  /// \param value The data value.
+  /// \return
+  ///   The pixel location for the given value.
+  /// \sa pqChartPixelScale::isValid(),
+  ///     pqChartPixelScale::getValue(int)
+  float getPixelF(const pqChartValue &value) const;
 
   /// \brief
   ///   Maps a pixel to a value.
@@ -164,8 +173,8 @@ public:
   /// \param value Used to return the value equivalent to the pixel
   ///   location.
   /// \sa pqChartPixelScale::isValid(),
-  ///     pqChartPixelScale::getPixelFor(const pqChartValue &)
-  void getValueFor(int pixel, pqChartValue &value) const;
+  ///     pqChartPixelScale::getPixel(const pqChartValue &)
+  void getValue(int pixel, pqChartValue &value) const;
 
   /// \brief
   ///   Used to determine if the pixel/value mapping is valid.

@@ -75,7 +75,7 @@ public:
 
   virtual void clear() {this->Sequence.clear();}
 
-  QPolygon Sequence;
+  QPolygonF Sequence;
 };
 
 
@@ -87,7 +87,7 @@ public:
 
   virtual void clear() {this->Sequence.clear();}
 
-  QList<QPolygon> Sequence;
+  QList<QPolygonF> Sequence;
 };
 
 
@@ -97,9 +97,9 @@ public:
   pqLineChartSeriesErrorDataItem();
   ~pqLineChartSeriesErrorDataItem() {}
 
-  int X;
-  int Upper;
-  int Lower;
+  float X;
+  float Upper;
+  float Lower;
 };
 
 
@@ -112,7 +112,7 @@ public:
   virtual void clear() {this->Sequence.clear();}
 
   QVector<pqLineChartSeriesErrorDataItem> Sequence;
-  int Width;
+  float Width;
 };
 
 
@@ -431,7 +431,7 @@ void pqLineChart::layoutChart(const QRect &area)
         pqLineChartSeriesErrorData *error =
             dynamic_cast<pqLineChartSeriesErrorData *>(*sequence);
 
-        QPolygon *polygon = 0;
+        QPolygonF *polygon = 0;
         int total = (*iter)->Series->getNumberOfPoints(i);
         for(int j = 0; j < total; j++)
           {
@@ -441,8 +441,8 @@ void pqLineChart::layoutChart(const QRect &area)
 
           // Use the axis scale to translate the series' coordinates
           // into chart coordinates.
-          QPoint point(xScale->getPixelFor(coord.X),
-              yScale->getPixelFor(coord.Y));
+          QPointF point(xScale->getPixelF(coord.X),
+              yScale->getPixelF(coord.Y));
 
           // Store the pixel coordinates for the point.
           if(line)
@@ -451,7 +451,7 @@ void pqLineChart::layoutChart(const QRect &area)
             // break them up into manageable chunks.
             if(!polygon || j % 100 == 0 || isBreak)
               {
-              line->Sequence.append(QPolygon());
+              line->Sequence.append(QPolygonF());
               polygon = &line->Sequence.last();
               polygon->reserve(101);
 
@@ -479,7 +479,7 @@ void pqLineChart::layoutChart(const QRect &area)
               // Get the error width for the sequence.
               pqChartValue width;
               (*iter)->Series->getErrorWidth(i, width);
-              error->Width = xScale->getPixelFor(coord.X + width);
+              error->Width = xScale->getPixelF(coord.X + width);
               error->Width -= point.x();
               }
 
@@ -489,8 +489,8 @@ void pqLineChart::layoutChart(const QRect &area)
             // Get the error bounds for the point.
             pqChartValue upper, lower;
             (*iter)->Series->getErrorBounds(i, j, upper, lower);
-            errorData.Upper = yScale->getPixelFor(upper);
-            errorData.Lower = yScale->getPixelFor(lower);
+            errorData.Upper = yScale->getPixelF(upper);
+            errorData.Lower = yScale->getPixelF(lower);
 
             error->Sequence.append(errorData);
             }
@@ -567,11 +567,11 @@ void pqLineChart::drawChart(QPainter &painter, const QRect &area)
           }
 
         // Translate the painter for each point.
-        QPolygon::Iterator jter = points->Sequence.begin();
+        QPolygonF::Iterator jter = points->Sequence.begin();
         for( ; jter != points->Sequence.end(); ++jter)
           {
           // Make sure the point is in the clip area.
-          if(clipArea.contains(*jter))
+          if(clipArea.contains((int)jter->x(), (int)jter->y()))
             {
             painter.save();
             painter.translate(*jter);
@@ -590,7 +590,7 @@ void pqLineChart::drawChart(QPainter &painter, const QRect &area)
           {
           // Draw each polyline segment of the line. The line is broken
           // up to avoid a Qt bug when the polyline is large.
-          QList<QPolygon>::Iterator jter = line->Sequence.begin();
+          QList<QPolygonF>::Iterator jter = line->Sequence.begin();
           for( ; jter != line->Sequence.end(); ++jter)
             {
             painter.drawPolyline(*jter);
@@ -605,15 +605,16 @@ void pqLineChart::drawChart(QPainter &painter, const QRect &area)
             {
             // Draw a line from the upper bounds to the lower bounds
             // through the point.
-            painter.drawLine(jter->X, jter->Upper, jter->X, jter->Lower);
+            painter.drawLine(QPointF(jter->X, jter->Upper), 
+                QPointF(jter->X, jter->Lower));
 
             // Draw lines to cap the error bounds.
             if(error->Width > 0)
               {
-              painter.drawLine(jter->X - error->Width, jter->Upper,
-                  jter->X + error->Width, jter->Upper);
-              painter.drawLine(jter->X - error->Width, jter->Lower,
-                  jter->X + error->Width, jter->Lower);
+              painter.drawLine(QPointF(jter->X - error->Width, jter->Upper),
+                  QPointF(jter->X + error->Width, jter->Upper));
+              painter.drawLine(QPointF(jter->X - error->Width, jter->Lower),
+                  QPointF(jter->X + error->Width, jter->Lower));
               }
             }
           }

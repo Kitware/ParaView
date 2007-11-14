@@ -421,12 +421,12 @@ QPixmap pqColorMapModel::generateGradient(const QSize &size) const
 
   // Loop through the points to draw the gradient(s).
   int px = 1;
-  int p1 = pixelMap.getPixelFor((*iter)->Value);
+  int p1 = pixelMap.getPixel((*iter)->Value);
   for(++i, ++iter; iter != this->Internal->end(); ++i, ++iter)
     {
     // Draw the colors between the previous and next color.
     next = (*iter)->Color;
-    int p2 = pixelMap.getPixelFor((*iter)->Value);
+    int p2 = pixelMap.getPixel((*iter)->Value);
     int w = p2 - p1;
     if(w > 0)
       {

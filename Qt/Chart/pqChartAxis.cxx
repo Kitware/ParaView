@@ -55,7 +55,7 @@ public:
   pqChartAxisItem();
   ~pqChartAxisItem() {}
 
-  int Pixel;
+  float Pixel;
   int Width;
 };
 
@@ -650,7 +650,7 @@ void pqChartAxis::layoutAxis(const QRect &area)
       // Use the pixel-value scale to determine the pixel location for
       // the label.
       this->Model->getLabel(i, value);
-      (*iter)->Pixel = this->Scale->getPixelFor(value);
+      (*iter)->Pixel = this->Scale->getPixelF(value);
       }
 
     // If there is not space for all the labels, set up the skip count.
@@ -687,8 +687,8 @@ void pqChartAxis::layoutAxis(const QRect &area)
           }
 
         needed = 4 * count;
-        pixelRange = this->Internal->Items[0]->Pixel;
-        int pixel = this->Internal->Items[count]->Pixel;
+        pixelRange = (int)this->Internal->Items[0]->Pixel;
+        int pixel = (int)this->Internal->Items[count]->Pixel;
         if(pixel < pixelRange)
           {
           pixelRange = pixelRange - pixel;
@@ -868,6 +868,8 @@ void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
     }
 
   // Draw the axis line.
+  painter.save();
+  painter.setRenderHint(QPainter::Antialiasing, true);
   painter.setPen(this->Options->getAxisColor());
   if(this->Location == pqChartAxis::Left)
     {
@@ -893,14 +895,15 @@ void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
   // Only draw the labels if they are visible.
   if(!this->Options->areLabelsVisible() || this->Internal->SpaceTooSmall)
     {
+    painter.restore();
     return;
     }
 
   // Set up the constant values based on the axis location.
-  int x = 0;
-  int y = 0;
-  int tick = 0;
-  int tickSmall = 0;
+  float x = 0;
+  float y = 0;
+  float tick = 0;
+  float tickSmall = 0;
   if(this->Location == pqChartAxis::Left)
     {
     x = this->Internal->Bounds.right();
@@ -953,11 +956,11 @@ void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
         }
 
       // Make sure the label is inside the axis bounds.
-      if(y > this->Internal->Bounds.bottom())
+      if((int)y > this->Internal->Bounds.bottom())
         {
         continue;
         }
-      else if(y < this->Internal->Bounds.top())
+      else if((int)y < this->Internal->Bounds.top())
         {
         break;
         }
@@ -968,7 +971,7 @@ void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
       if(this->Internal->Skip == 1 || skipIndex == 0)
         {
         painter.setPen(this->Options->getAxisColor());
-        painter.drawLine(tick, y, x, y);
+        painter.drawLine(QPointF(tick, y), QPointF(x, y));
         this->Model->getLabel(i, value);
         label = value.getString(this->Options->getPrecision(),
             this->Options->getNotation());
@@ -976,19 +979,20 @@ void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
         y += halfAscent;
         if(this->Location == pqChartAxis::Left)
           {
-          painter.drawText(tick - (*iter)->Width -
-              this->Internal->TickLabelSpacing, y, label);
+          painter.drawText(QPointF(tick - (*iter)->Width -
+              this->Internal->TickLabelSpacing, y), label);
           }
         else
           {
-          painter.drawText(tick + this->Internal->TickLabelSpacing, y, label);
+          painter.drawText(
+              QPointF(tick + this->Internal->TickLabelSpacing, y), label);
           }
         }
       else if(this->Internal->TickSkip == 1 ||
           skipIndex % this->Internal->TickSkip == 0)
         {
         painter.setPen(this->Options->getAxisColor());
-        painter.drawLine(tickSmall, y, x, y);
+        painter.drawLine(QPointF(tickSmall, y), QPointF(x, y));
         }
       }
     else
@@ -1001,11 +1005,11 @@ void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
         }
 
       // Make sure the label is inside the axis bounds.
-      if(x < this->Internal->Bounds.left())
+      if((int)x < this->Internal->Bounds.left())
         {
         continue;
         }
-      else if(x > this->Internal->Bounds.right())
+      else if((int)x > this->Internal->Bounds.right())
         {
         break;
         }
@@ -1016,7 +1020,7 @@ void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
       if(this->Internal->Skip == 1 || skipIndex == 0)
         {
         painter.setPen(this->Options->getAxisColor());
-        painter.drawLine(x, tick, x, y);
+        painter.drawLine(QPointF(x, tick), QPointF(x, y));
         this->Model->getLabel(i, value);
         label = value.getString(this->Options->getPrecision(),
             this->Options->getNotation());
@@ -1024,23 +1028,25 @@ void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
         x -= (*iter)->Width / 2;
         if(this->Location == pqChartAxis::Top)
           {
-          painter.drawText(
-              x, tick - this->Internal->TickLabelSpacing - fontDescent, label);
+          painter.drawText(QPointF(x,
+              tick - this->Internal->TickLabelSpacing - fontDescent), label);
           }
         else
           {
-          painter.drawText(
-              x, tick + this->Internal->TickLabelSpacing + fontAscent, label);
+          painter.drawText(QPointF(x,
+              tick + this->Internal->TickLabelSpacing + fontAscent), label);
           }
         }
       else if(this->Internal->TickSkip == 1 ||
           skipIndex % this->Internal->TickSkip == 0)
         {
         painter.setPen(this->Options->getAxisColor());
-        painter.drawLine(x, tickSmall, x, y);
+        painter.drawLine(QPointF(x, tickSmall), QPointF(x, y));
         }
       }
     }
+
+  painter.restore();
 }
 
 void pqChartAxis::getBounds(QRect &bounds) const
@@ -1069,11 +1075,11 @@ bool pqChartAxis::isLabelTickVisible(int index) const
   return false;
 }
 
-int pqChartAxis::getLabelLocation(int index) const
+float pqChartAxis::getLabelLocation(int index) const
 {
   if(index >= 0 && index < this->Internal->Items.size())
     {
-    int pixel = this->Internal->Items[index]->Pixel;
+    float pixel = this->Internal->Items[index]->Pixel;
     if(this->Zoom)
       {
       if(this->Location == pqChartAxis::Top ||

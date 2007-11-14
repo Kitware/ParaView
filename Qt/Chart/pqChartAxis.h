@@ -322,7 +322,7 @@ public:
   /// \param index The index of the label.
   /// \return
   ///   The location of the given label.
-  int getLabelLocation(int index) const;
+  float getLabelLocation(int index) const;
   //@}
 
 signals:

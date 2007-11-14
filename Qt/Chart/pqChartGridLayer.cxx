@@ -75,10 +75,13 @@ void pqChartGridLayer::drawChart(QPainter &painter, const QRect &area)
 
   // Draw the axis grid lines.
   pqChartArea *chart = this->getChartArea();
+  painter.save();
+  painter.setRenderHint(QPainter::Antialiasing, true);
   this->drawAxisGrid(painter, chart->getAxis(pqChartAxis::Top));
   this->drawAxisGrid(painter, chart->getAxis(pqChartAxis::Right));
   this->drawAxisGrid(painter, chart->getAxis(pqChartAxis::Bottom));
   this->drawAxisGrid(painter, chart->getAxis(pqChartAxis::Left));
+  painter.restore();
 }
 
 void pqChartGridLayer::setChartArea(pqChartArea *area)
@@ -137,7 +140,7 @@ void pqChartGridLayer::drawAxisGrid(QPainter &painter, const pqChartAxis *axis)
     total = axis->getModel()->getNumberOfLabels();
     }
 
-  int pixel = 0;
+  float pixel = 0;
   bool vertical = axis->getLocation() == pqChartAxis::Left ||
       axis->getLocation() == pqChartAxis::Right;
   painter.setPen(options->getGridColor());
@@ -153,31 +156,31 @@ void pqChartGridLayer::drawAxisGrid(QPainter &painter, const pqChartAxis *axis)
     pixel = axis->getLabelLocation(i);
     if(vertical)
       {
-      if(pixel > this->Bounds->bottom())
+      if((int)pixel > this->Bounds->bottom())
         {
         continue;
         }
-      else if(pixel < this->Bounds->top())
+      else if((int)pixel < this->Bounds->top())
         {
         break;
         }
 
-      painter.drawLine(this->Bounds->left(), pixel,
-          this->Bounds->right(), pixel);
+      painter.drawLine(QPointF(this->Bounds->left(), pixel),
+          QPointF(this->Bounds->right(), pixel));
       }
     else
       {
-      if(pixel < this->Bounds->left())
+      if((int)pixel < this->Bounds->left())
         {
         continue;
         }
-      else if(pixel > this->Bounds->right())
+      else if((int)pixel > this->Bounds->right())
         {
         break;
         }
 
-      painter.drawLine(pixel, this->Bounds->top(),
-          pixel, this->Bounds->bottom());
+      painter.drawLine(QPointF(pixel, this->Bounds->top()),
+          QPointF(pixel, this->Bounds->bottom()));
       }
     }
 }
