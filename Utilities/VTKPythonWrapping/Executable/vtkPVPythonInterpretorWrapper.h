@@ -108,7 +108,6 @@ static PyTypeObject vtkPVPythonInterpretorWrapperType = {
     0, // PyObject *tp_cache;
     0, // PyObject *tp_subclasses;
     0, // PyObject *tp_weaklist;
-    0, // PyObject *tp_weaklist;
 };
 
 static PyObject* vtkWrite(PyObject* self, PyObject* args)

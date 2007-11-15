@@ -26,7 +26,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVPythonInteractiveInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInteractiveInterpretor, "1.3");
+vtkCxxRevisionMacro(vtkPVPythonInteractiveInterpretor, "1.3.2.1");
 //----------------------------------------------------------------------------
 vtkPVPythonInteractiveInterpretor::vtkPVPythonInteractiveInterpretor()
 {
@@ -57,7 +57,10 @@ void vtkPVPythonInteractiveInterpretor::InitializeInternal()
   const char* code = 
     "import code\n"
     "__vtkConsole=code.InteractiveConsole(locals())\n";
-  PyRun_SimpleString(code);
+
+  // The cast is necessary because PyRun_SimpleString() hasn't always been 
+  // const-correct
+  PyRun_SimpleString(const_cast<char*>(code));
 
   // Now get the reference to __vtkConsole and save the pointer.
   PyObject* main_module = PyImport_AddModule((char*)"__main__");
@@ -124,7 +127,10 @@ void vtkPVPythonInteractiveInterpretor::ResetBuffer()
     {
     this->MakeCurrent();
     const char* code = "__vtkConsole.resetbuffer()\n";
-    PyRun_SimpleString(code);
+
+    // The cast is necessary because PyRun_SimpleString() hasn't always been 
+    // const-correct
+    PyRun_SimpleString(const_cast<char*>(code));
     this->ReleaseControl();
     }
 }
