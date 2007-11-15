@@ -52,7 +52,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.22");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.23");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -98,10 +98,10 @@ static bool getUncSharesOnServer(const vtkstd::string& server,
         {
         if(buf[i].shi1_type == STYPE_DISKTREE)
           {
-          int num = WideCharToMultiByte(CP_ACP, 0, buf[i].shi1_netname, 
+          int num = WideCharToMultiByte(CP_ACP, 0, (WCHAR*)buf[i].shi1_netname, 
                                         -1, NULL, 0, 0, 0);
           char* share = new char[num];
-          WideCharToMultiByte(CP_ACP, 0, buf[i].shi1_netname, -1, share, num, 0, 0);
+          WideCharToMultiByte(CP_ACP, 0, (WCHAR*)buf[i].shi1_netname, -1, share, num, 0, 0);
           ret.push_back(vtkstd::string(share));
           delete [] share;
           }
@@ -284,10 +284,10 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
 
   vtkstd::string path = vtksys::SystemTools::CollapseFullPath(helper->GetPath(),
     working_directory.c_str());
-  path = vtksys::SystemTools::ConvertToOutputPath(path.c_str());
   
   this->SetName(helper->GetPath());
 #if defined(_WIN32)
+  path = vtksys::SystemTools::ConvertToWindowsOutputPath(path.c_str());
   int len = path.size();
   if(len > 4 && path.compare(len-4, 4, ".lnk") == 0)
     {
