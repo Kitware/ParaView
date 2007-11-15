@@ -37,28 +37,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsInit.h"
 
 #ifdef Q_WS_X11
-#include <QCleanlooksStyle>
-#include <QMotifStyle>
+#include <QPlastiqueStyle>
 #endif
 
 int main(int argc, char* argv[])
 {
   QApplication app(argc, argv);
-#ifdef Q_WS_X11
-  // There are lots of valid styles for X11.  For many systems the default
-  // is Motif, which is ugly and has been giving dashboard errors.  Rather
-  // than fix the problem, I am just forcing the style to Cleanlooks.
-  if(qobject_cast<QMotifStyle*>(QApplication::style()))
-    {
-    QApplication::setStyle(new QCleanlooksStyle);
-    }
 
-  // Bug(#179200) in cleanlooks style can cause test errors 
-  // when querying desktop settings (scheduled to be fixed in 4.4.0)
-  if(qobject_cast<QCleanlooksStyle*>(QApplication::style()))
-    {
-    QApplication::setDesktopSettingsAware(false);
-    }
+#ifdef Q_WS_X11
+
+  // Using motif style gives us test failures (and its ugly).
+  // Using cleanlooks style gives us errors when using valgrind (Trolltech's bug #179200)
+  // let's just use plastique for now
+  QApplication::setStyle(new QPlastiqueStyle);
 
 #endif
 
