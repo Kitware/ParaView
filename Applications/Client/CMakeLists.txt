@@ -142,8 +142,11 @@ CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/pqClientDocFinder.txt.in"
                @ONLY IMMEDIATE)
   
 IF(BUILD_TESTING)
-  GET_TARGET_PROPERTY(TEST_BINARY "${PV_EXE_NAME}" LOCATION)
-  SET(TEST_BINARY "${TEST_BINARY}" "--test-directory=${PARAVIEW_TEST_DIR}")
+  IF(Q_WS_MAC)
+    SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview.app/Contents/MacOS/paraview --test-directory=${PARAVIEW_TEST_DIR})
+  ELSE(Q_WS_MAC)
+    SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview --test-directory=${PARAVIEW_TEST_DIR})
+  ENDIF(Q_WS_MAC)
 
   SET(TEST_XML ${pqClient_SOURCE_DIR}/Testing/XML)
   SET(TEST_PYTHON ${pqClient_SOURCE_DIR}/Testing/Python)
