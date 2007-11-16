@@ -124,9 +124,11 @@ bool pqPluginManager::loadClientPlugin(const QString& lib, QString& error)
   QPluginLoader qplugin(lib);
   if(qplugin.load())
     {
-    pqPlugin* pqplugin = qobject_cast<pqPlugin*>(qplugin.instance());
+    QObject* pqpluginObject = qplugin.instance();
+    pqPlugin* pqplugin = qobject_cast<pqPlugin*>(pqpluginObject);
     if(pqplugin)
       {
+      pqpluginObject->setParent(this);  // take ownership to clean up later
       success = true;
       this->Plugins.insert(NULL, lib);
       emit this->guiPluginLoaded();
