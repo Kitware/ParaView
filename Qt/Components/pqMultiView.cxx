@@ -976,3 +976,33 @@ void pqMultiView::showDecorations()
     }
   emit this->showFrameDecorations();
 }
+
+//-----------------------------------------------------------------------------
+QSize pqMultiView::clientSize() const
+{
+  QRect bounds;
+  QList<pqMultiViewFrame*> frames = this->findChildren<pqMultiViewFrame*>();
+  foreach (pqMultiViewFrame* frame, frames)
+    {
+    if (frame == this->FillerFrame || !frame->isVisible())
+      {
+      continue;
+      }
+    QWidget* widget = frame->mainWidget();
+    widget = widget? widget : frame->emptyMainWidget();
+    widget = widget? widget : frame;
+    QRect curBounds = widget->rect();
+    curBounds.moveTo(widget->mapToGlobal(QPoint(0, 0)));
+    bounds |= curBounds;
+    }
+  return bounds.size();
+}
+
+//-----------------------------------------------------------------------------
+QSize pqMultiView::computeSize(QSize client_size) const
+{
+  QSize innerSize = this->clientSize();
+  QSize outerSize = this->size();
+  QSize padding = outerSize-innerSize;
+  return client_size + padding;
+}

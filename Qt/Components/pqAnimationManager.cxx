@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqAbortAnimation.h"
 #include "ui_pqAnimationSettings.h"
 
+#include "vtkMath.h"
 #include "vtkProcessModule.h"
 #include "vtkPVServerInformation.h"
 #include "vtkSMAnimationSceneGeometryWriter.h"
@@ -62,10 +63,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 #include "pqView.h"
+#include "pqMultiView.h"
 
-static inline int pqCeil(double val)
+static int pqCeil(double val)
 {
-  return static_cast<int>(val+0.5);
+  if (static_cast<int>(val) == val)
+    {
+    return static_cast<int>(val);
+    }
+  return static_cast<int>(vtkMath::Round(val+0.5));
 }
 
 #define SEQUENCE 0
@@ -77,7 +83,7 @@ class pqAnimationManager::pqInternals
 {
 public:
   QPointer<pqServer> ActiveServer;
-  QPointer<QWidget> ViewWidget;
+  QPointer<pqMultiView> ViewWidget;
   typedef QMap<pqServer*, QPointer<pqAnimationScene> > SceneMap;
   SceneMap Scenes;
   Ui::Dialog* AnimationSettingsDialog;
@@ -111,7 +117,7 @@ pqAnimationManager::~pqAnimationManager()
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationManager::setViewWidget(QWidget* w)
+void pqAnimationManager::setViewWidget(pqMultiView* w)
 {
   this->Internals->ViewWidget = w;
 }
@@ -283,6 +289,7 @@ void pqAnimationManager::updateGUI()
     }
 }
 
+#define PADDING_COMPENSATION QSize(16, 16);
 //-----------------------------------------------------------------------------
 bool pqAnimationManager::saveAnimation()
 {
@@ -291,6 +298,8 @@ bool pqAnimationManager::saveAnimation()
     {
     return false;
     }
+  // Ensure that GUI is up-to-date so that we get correct sizes.
+  pqEventDispatcher::processEventsAndWait(1);
   vtkSMAnimationSceneProxy* sceneProxy = scene->getAnimationSceneProxy();
 
   QDialog dialog;
@@ -303,7 +312,10 @@ bool pqAnimationManager::saveAnimation()
     this->Internals->ActiveServer->isRemote());
 
   // Set current size of the window.
-  QSize viewSize = scene->getViewSize();
+  QSize viewSize = this->Internals->ViewWidget->clientSize();
+  // to avoid some unpredicable padding issues, I am reducing the size by a few
+  // pixels.
+  viewSize -= PADDING_COMPENSATION;
   dialogUI.spinBoxHeight->setValue(viewSize.height());
   dialogUI.spinBoxWidth->setValue(viewSize.width());
 
@@ -582,10 +594,10 @@ int pqAnimationManager::updateViewSizes(QSize newSize, QSize currentSize)
   int magnification = 1;
 
   // If newSize > currentSize, then magnification is involved.
-  int temp = pqCeil(newSize.width()/static_cast<double>(currentSize.width()));
+  int temp = ::pqCeil(newSize.width()/static_cast<double>(currentSize.width()));
   magnification = (temp> magnification)? temp: magnification;
 
-  temp = pqCeil(newSize.height()/static_cast<double>(currentSize.height()));
+  temp = ::pqCeil(newSize.height()/static_cast<double>(currentSize.height()));
   magnification = (temp > magnification)? temp : magnification;
 
   newSize = newSize/magnification;
@@ -598,6 +610,12 @@ int pqAnimationManager::updateViewSizes(QSize newSize, QSize currentSize)
     {
     this->Internals->OldSize = this->Internals->ViewWidget->size();
     this->Internals->OldMaxSize = this->Internals->ViewWidget->maximumSize();
+
+    // currentSize is the client area size for the view widget which may be
+    // smaller than actual size of the widget. The difference is padding.
+    // pqMultiView::computeSize() returns the widget size required to achieve
+    // the client size requested.
+    newSize = this->Internals->ViewWidget->computeSize(newSize);
     this->Internals->ViewWidget->setMaximumSize(newSize);
     this->Internals->ViewWidget->resize(newSize);
     pqEventDispatcher::processEventsAndWait(1);

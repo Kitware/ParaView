@@ -79,10 +79,6 @@ public:
   /// returns true is the cue is present in this scene.
   bool contains(pqAnimationCue*) const;
 
-  /// Combines the sizes of all the view modules
-  /// animated by the scene and returns the total view size.
-  QSize getViewSize() const;
-
   /// Get the clock time range set on the animation scene proxy.
   QPair<double, double> getClockTimeRange() const;
 

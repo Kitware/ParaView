@@ -415,22 +415,6 @@ void pqAnimationScene::removeCues(vtkSMProxy* animated_proxy)
 }
 
 //-----------------------------------------------------------------------------
-QSize pqAnimationScene::getViewSize() const
-{
-  QSize size;
-  // Simply get the first view module and get it's GUISize.
-  vtkSMAnimationSceneProxy* sceneProxy = this->getAnimationSceneProxy();
-  if (sceneProxy->GetNumberOfViewModules() > 0)
-    {
-    vtkSMViewProxy* view = sceneProxy->GetViewModule(0);
-    size.setWidth(view->GetGUISize()[0]);
-    size.setHeight(view->GetGUISize()[1]);
-
-    }
-  return size;
-}
-
-//-----------------------------------------------------------------------------
 void pqAnimationScene::play()
 {
   this->getProxy()->InvokeCommand("Play");

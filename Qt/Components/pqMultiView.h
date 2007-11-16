@@ -98,6 +98,15 @@ public:
 
   virtual void saveState(vtkPVXMLElement *root);
   virtual void loadState(vtkPVXMLElement *root);
+
+  /// This returns the size for all the frames contained by this
+  /// view. Default implementation simply computes the bounding box for all
+  /// frames and then returns its size.
+  virtual QSize clientSize() const;
+
+  /// Given the clientSize compute the size for this widget. This will take
+  /// into consideration the padding around frames.
+  QSize computeSize(QSize clientSize) const;
 signals:
   /// signal for new frame added
   void frameAdded(pqMultiViewFrame*);

@@ -39,9 +39,10 @@ class QSize;
 
 class pqAnimationCue;
 class pqAnimationScene;
-class pqView;
+class pqMultiView;
 class pqProxy;
 class pqServer;
+class pqView;
 class vtkSMProxy;
 
 // pqAnimationManager manages the Animation sub-system.
@@ -79,7 +80,7 @@ public:
   // The the Widget that contains all the views.
   // This is required since the manager may need to change the view size
   // depending upon the users requested animation size.
-  void setViewWidget(QWidget*);
+  void setViewWidget(pqMultiView*);
 
   // Saves the animation geometry from the active scene
   // as visible in the given view.
