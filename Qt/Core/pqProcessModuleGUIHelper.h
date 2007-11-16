@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.1. 
+   under the terms of the ParaView license version 1.1.
 
    See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -74,14 +74,14 @@ public:
   /// Exit the application
   virtual void ExitApplication();
 
-  /// Compares the contents of the window with the given reference image, 
+  /// Compares the contents of the window with the given reference image,
   /// returns true iff they "match" within some tolerance
-  virtual  bool compareView(const QString& ReferenceImage, double Threshold, 
+  virtual  bool compareView(const QString& ReferenceImage, double Threshold,
     ostream& Output, const QString& TempDirectory);
 
- 
+
   // Description:
-  // Get the application singleton. 
+  // Get the application singleton.
   QApplication* GetApplication();
 
   // return the test utility
@@ -94,17 +94,23 @@ public:
   virtual void showOutputWindow();
 
 protected:
-  pqProcessModuleGUIHelper(); 
-  ~pqProcessModuleGUIHelper(); 
-  
-private:
-  /// InitializeApplication initializes the QApplication and 
+  /// InitializeSMApplication initializes the vtkSMApplication.
+  virtual void InitializeSMApplication();
+
+  /// InitializeApplication initializes the QApplication and
   /// the MainWindow.
   virtual int InitializeApplication(int argc, char** argv);
 
   /// Cleans up the main window.
   virtual void FinalizeApplication();
 
+  /// Returns the number of errors registered in the OutputWindow
+  virtual int ErrorCount();
+
+  pqProcessModuleGUIHelper();
+  ~pqProcessModuleGUIHelper();
+
+private:
   /// subclasses can override this method to create their own
   /// subclass of pqMainWindow as the Main Window.
   virtual QWidget* CreateMainWindow() = 0;
@@ -112,10 +118,10 @@ private:
   /// Subclasses can override this to create a different subclass of
   /// pqApplicationCore.
   virtual pqApplicationCore* CreateApplicationCore();
-  
+
   class pqImplementation;
   pqImplementation* const Implementation;
-  
+
   pqProcessModuleGUIHelper(pqProcessModuleGUIHelper&); // Not implemented.
   void operator=(const pqProcessModuleGUIHelper&); // Not implemented.
 };

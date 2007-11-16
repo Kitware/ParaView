@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.1. 
+   under the terms of the ParaView license version 1.1.
 
    See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -71,7 +71,7 @@ public:
     // Redirect Qt debug output to VTK ...
     qInstallMsgHandler(QtMessageOutput);
   }
-  
+
   ~pqImplementation()
   {
     this->SMApplication->Finalize();
@@ -118,7 +118,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.21");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.22");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -145,24 +145,29 @@ void pqProcessModuleGUIHelper::showOutputWindow()
   this->Implementation->OutputWindow->activateWindow();
 }
 
-//-----------------------------------------------------------------------------
-int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv, 
-  int vtkNotUsed(numServerProcs), int vtkNotUsed(myId))
+void pqProcessModuleGUIHelper::InitializeSMApplication()
 {
   this->Implementation->SMApplication->Initialize();
   vtkSMProperty::SetCheckDomains(0);
   this->Implementation->SMApplication->ParseConfigurationFiles();
-  
+}
+
+//-----------------------------------------------------------------------------
+int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
+  int vtkNotUsed(numServerProcs), int vtkNotUsed(myId))
+{
+  this->InitializeSMApplication();
+
   if (!this->InitializeApplication(argc, argv))
     {
     return 1;
     }
-  
+
   int status = 1;
   if (this->Implementation->Window)
     {
     this->Implementation->Window->show();
-    
+
     // get the tester going when the application starts
     if(this->TestUtility())
       {
@@ -176,7 +181,7 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
       }
 
     // load client plugins
-    pqPluginManager* pluginManager = 
+    pqPluginManager* pluginManager =
       pqApplicationCore::instance()->getPluginManager();
     pluginManager->loadPlugins(NULL);
 
@@ -189,32 +194,32 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
     status = app->exec();
     }
   this->FinalizeApplication();
-  
+
   // If there were any errors from Qt / VTK, ensure that we return an error code
   if(!status && this->Implementation->OutputWindowAdapter->getErrorCount())
     {
     status = 1;
     }
-  
+
   return status;
 }
 
 //-----------------------------------------------------------------------------
-int pqProcessModuleGUIHelper::InitializeApplication(int vtkNotUsed(argc), 
+int pqProcessModuleGUIHelper::InitializeApplication(int vtkNotUsed(argc),
            char** vtkNotUsed(argv))
 {
   this->Implementation->ApplicationCore = this->CreateApplicationCore();
-  
+
   // Redirect VTK debug output to a Qt window ...
   this->Implementation->OutputWindow = new pqOutputWindow(0);
   this->Implementation->OutputWindow->setAttribute(Qt::WA_QuitOnClose, false);
-  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter, 
+  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter,
     SIGNAL(displayText(const QString&)), SLOT(onDisplayText(const QString&)));
-  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter, 
+  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter,
     SIGNAL(displayErrorText(const QString&)), SLOT(onDisplayErrorText(const QString&)));
-  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter, 
+  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter,
     SIGNAL(displayWarningText(const QString&)), SLOT(onDisplayWarningText(const QString&)));
-  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter, 
+  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter,
     SIGNAL(displayGenericWarningText(const QString&)), SLOT(onDisplayGenericWarningText(const QString&)));
   vtkOutputWindow::SetInstance(Implementation->OutputWindowAdapter);
 
@@ -241,7 +246,7 @@ void pqProcessModuleGUIHelper::FinalizeApplication()
 //-----------------------------------------------------------------------------
 void pqProcessModuleGUIHelper::SendPrepareProgress()
 {
-  // set flag that we want a delayed progress 
+  // set flag that we want a delayed progress
   // in other words, the progress will be enabled when a current
   // process is taking long enough
   this->Implementation->ReadyEnableProgress = true;
@@ -263,7 +268,7 @@ void pqProcessModuleGUIHelper::SendCleanupPendingProgress()
 }
 
 //-----------------------------------------------------------------------------
-void pqProcessModuleGUIHelper::SetLocalProgress(const char* text, 
+void pqProcessModuleGUIHelper::SetLocalProgress(const char* text,
   int progress)
 {
   // forgive those who don't call SendPrepareProgress beforehand
@@ -274,7 +279,7 @@ void pqProcessModuleGUIHelper::SetLocalProgress(const char* text,
     this->SendPrepareProgress();
     return;
     }
-  
+
   // forgive those who don't cleanup or want to go the extra mile
   if(progress >= 100)
     {
@@ -300,9 +305,9 @@ void pqProcessModuleGUIHelper::SetLocalProgress(const char* text,
     this->Implementation->EnableProgress = true;
     this->Implementation->ApplicationCore->prepareProgress();
     }
-  
+
   this->Implementation->LastProgress = lastprog;
-  
+
   // chop of "vtk" prefix
   if ( strlen(text) > 4 && text[0] == 'v' && text[1] == 't' && text[2] == 'k' )
     {
@@ -316,7 +321,7 @@ void pqProcessModuleGUIHelper::SetLocalProgress(const char* text,
   this->Implementation->ApplicationCore->sendProgress(text, progress);
   //cout << (name? name : "(null)") << " : " << progress << endl;
   // Here we would call something like
-  // this->Window->SetProgress(name, progress). 
+  // this->Window->SetProgress(name, progress).
   // Then the Window can update the progress bar, or something.
 }
 
@@ -339,8 +344,8 @@ void pqProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
 
 //-----------------------------------------------------------------------------
 bool pqProcessModuleGUIHelper::compareView(
-  const QString& vtkNotUsed(referenceImage), 
-  double vtkNotUsed(threshold), ostream& vtkNotUsed(output), 
+  const QString& vtkNotUsed(referenceImage),
+  double vtkNotUsed(threshold), ostream& vtkNotUsed(output),
   const QString& vtkNotUsed(tempDirectory))
 {
   return false;
@@ -358,3 +363,8 @@ pqTestUtility* pqProcessModuleGUIHelper::TestUtility()
   return &this->Implementation->TestUtility;
 }
 
+//-----------------------------------------------------------------------------
+int pqProcessModuleGUIHelper::ErrorCount()
+{
+  return this->Implementation->OutputWindowAdapter->getErrorCount();
+}
