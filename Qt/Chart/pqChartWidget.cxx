@@ -49,19 +49,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 pqChartWidget::pqChartWidget(QWidget *widgetParent)
-  : QAbstractScrollArea(widgetParent)
+  : QWidget(widgetParent)
 {
   // Initialize the chart members
   this->Title = 0;
   this->Legend = 0;
-  this->Charts = new pqChartArea(this->viewport());
+  this->Charts = new pqChartArea(this);
   this->LeftTitle = 0;
   this->TopTitle = 0;
   this->RightTitle = 0;
   this->BottomTitle = 0;
 
+  // Set the background color.
+  this->setBackgroundRole(QPalette::Base);
+  this->setAutoFillBackground(true);
+
   // Set up the chart layout.
-  this->TitleLayout = new QVBoxLayout(this->viewport());
+  this->TitleLayout = new QVBoxLayout(this);
   this->TitleLayout->setMargin(6);
   this->TitleLayout->setSpacing(4);
   this->LegendLayout = new QGridLayout();
@@ -105,7 +109,7 @@ void pqChartWidget::setTitle(pqChartTitle *title)
       {
       // Make sure the new title has the proper parent. Then, insert
       // the new title in the layout.
-      this->Title->setParent(this->viewport());
+      this->Title->setParent(this);
       this->TitleLayout->insertWidget(0, this->Title);
       this->Title->show();
       }
@@ -129,7 +133,7 @@ void pqChartWidget::setLegend(pqChartLegend *legend)
     this->Legend = legend;
     if(this->Legend)
       {
-      this->Legend->setParent(this->viewport());
+      this->Legend->setParent(this);
       if(this->Legend->getLocation() == pqChartLegend::Left)
         {
         this->LegendLayout->addWidget(this->Legend, 1, 0);
@@ -192,7 +196,7 @@ void pqChartWidget::setAxisTitle(pqChartAxis::AxisLocation axis,
       this->LeftTitle = title;
       if(this->LeftTitle)
         {
-        this->LeftTitle->setParent(this->viewport());
+        this->LeftTitle->setParent(this);
         this->LeftTitle->setOrientation(Qt::Vertical);
         this->ChartLayout->insertWidget(0, this->LeftTitle);
         this->LeftTitle->show();
@@ -214,7 +218,7 @@ void pqChartWidget::setAxisTitle(pqChartAxis::AxisLocation axis,
       this->TopTitle = title;
       if(this->TopTitle)
         {
-        this->TopTitle->setParent(this->viewport());
+        this->TopTitle->setParent(this);
         this->TopTitle->setOrientation(Qt::Horizontal);
         this->TopLayout->insertWidget(0, this->TopTitle);
         this->TopTitle->show();
@@ -236,7 +240,7 @@ void pqChartWidget::setAxisTitle(pqChartAxis::AxisLocation axis,
       this->RightTitle = title;
       if(this->RightTitle)
         {
-        this->RightTitle->setParent(this->viewport());
+        this->RightTitle->setParent(this);
         this->RightTitle->setOrientation(Qt::Vertical);
         this->ChartLayout->addWidget(this->RightTitle);
         this->RightTitle->show();
@@ -256,7 +260,7 @@ void pqChartWidget::setAxisTitle(pqChartAxis::AxisLocation axis,
     this->BottomTitle = title;
     if(this->BottomTitle)
       {
-      this->BottomTitle->setParent(this->viewport());
+      this->BottomTitle->setParent(this);
       this->BottomTitle->setOrientation(Qt::Horizontal);
       this->TopLayout->addWidget(this->BottomTitle);
       this->BottomTitle->show();
@@ -269,8 +273,7 @@ void pqChartWidget::setAxisTitle(pqChartAxis::AxisLocation axis,
 QSize pqChartWidget::sizeHint() const
 {
   this->ensurePolished();
-  int f = 150 + 2*this->frameWidth();
-  return QSize(f, f);
+  return QSize(150, 150);
 }
 
 void pqChartWidget::printChart(QPrinter &printer)

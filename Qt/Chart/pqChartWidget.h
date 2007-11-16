@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "QtChartExport.h"
-#include <QAbstractScrollArea>
+#include <QWidget>
 
 #include "pqChartAxis.h" // Needed for enum
 
@@ -64,7 +64,7 @@ class QVBoxLayout;
 ///
 /// The main chart area is created and owned by the chart widget. The
 /// other widgets should be created and passed in.
-class QTCHART_EXPORT pqChartWidget : public QAbstractScrollArea
+class QTCHART_EXPORT pqChartWidget : public QWidget
 {
   Q_OBJECT
 
