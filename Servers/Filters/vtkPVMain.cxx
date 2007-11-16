@@ -23,6 +23,7 @@
 #include "vtkPVAdaptor.h"
 #endif
 
+#include "vtkFloatingPointExceptions.h"
 
 #include "vtkPVMain.h"
 
@@ -48,7 +49,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.20");
+vtkCxxRevisionMacro(vtkPVMain, "1.21");
 
 int vtkPVMain::InitializeMPI = 1;
 
@@ -133,26 +134,6 @@ void vtkPVMain::Finalize()
 #endif
 }
 
-
-#ifdef PARAVIEW_ENABLE_FPE
-void u_fpu_setup()
-{
-#ifdef _MSC_VER
-  // enable floating point exceptions on MSVC
-  short m = 0x372;
-  __asm
-    {
-    fldcw m;
-    }
-#endif  //_MSC_VER
-#ifdef __linux__
-  // This only works on linux x86
-  unsigned int fpucw= 0x1372;
-  __asm__ ("fldcw %0" : : "m" (fpucw));
-#endif  //__linux__
-}
-#endif //PARAVIEW_ENABLE_FPE
-
 //----------------------------------------------------------------------------
 int vtkPVMain::Initialize(vtkPVOptions* options,
                           vtkProcessModuleGUIHelper* helper,
@@ -174,7 +155,7 @@ int vtkPVMain::Initialize(vtkPVOptions* options,
     }  
 #endif
 #ifdef PARAVIEW_ENABLE_FPE
-  u_fpu_setup();
+  vtkFloatingPointExceptions::Enable();
 #endif //PARAVIEW_ENABLE_FPE
 
   // Don't prompt the user with startup errors on unix.
