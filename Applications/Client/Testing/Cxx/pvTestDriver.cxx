@@ -456,7 +456,7 @@ int pvTestDriver::OutputStringHasError(const char* pname, vtkstd::string& output
   };
 
   const char* nonErrors[] = {
-    "Memcheck, a memory error detector for x86-linux",  //valgrind
+    "Memcheck, a memory error detector",  //valgrind
     "error in locking authority file",  //Ice-T
     "WARNING: Far depth failed sanity check, resetting.", //Ice-T
     0
