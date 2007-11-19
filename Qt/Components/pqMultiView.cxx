@@ -988,11 +988,11 @@ QSize pqMultiView::clientSize() const
       {
       continue;
       }
-    QWidget* widget = frame->mainWidget();
-    widget = widget? widget : frame->emptyMainWidget();
-    widget = widget? widget : frame;
-    QRect curBounds = widget->rect();
-    curBounds.moveTo(widget->mapToGlobal(QPoint(0, 0)));
+    QWidget* w = frame->mainWidget();
+    w = w ? w : frame->emptyMainWidget();
+    w = w ? w : frame;
+    QRect curBounds = w->rect();
+    curBounds.moveTo(w->mapToGlobal(QPoint(0, 0)));
     bounds |= curBounds;
     }
   return bounds.size();
