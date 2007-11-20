@@ -40,7 +40,7 @@ inline int vtkSMSimpleParallelStrategyGetInt(vtkSMProxy* proxy,
 }
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.13");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.14");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
@@ -291,7 +291,7 @@ void vtkSMSimpleParallelStrategy::UpdatePipeline()
   // decide where the data should be delivered for rendering.
 
   bool usecompositing = this->GetUseCompositing();
-  cout << "usecompositing: " << usecompositing << endl;
+  // cout << "usecompositing: " << usecompositing << endl;
 
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->Collect->GetProperty("MoveMode"));
