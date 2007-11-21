@@ -1464,6 +1464,86 @@
       </DoubleVectorProperty>
       <!-- End of WidgetRepresentation -->
     </Proxy>
+
+    <Proxy name="CubeAxesActor" class="vtkCubeAxesActor">
+      <Documentation>
+        Proxy for vtkCubeAxesActor.
+      </Documentation>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for this actor.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Pickable"
+        command="SetPickable"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+
+      <DoubleVectorProperty name="Bounds"
+        command="SetBounds"
+        number_of_elements="6"
+        default_values="0 1 0 1 0 1">
+        <Documentation>
+          Set the bounds for this cube axes.
+        </Documentation>
+
+        <DoubleRangeDomain />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="FlyMode"
+        command="SetFlyMode"
+        number_of_elements="1"
+        default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry text="OuterEdges" value="0" />
+          <Entry text="ClosestTriad" value="1" />
+          <Entry text="FurthestTriad" value="2" />
+          <Entry text="StaticTriad" value="3" />
+          <Entry text="StaticEdges" value="4" />
+        </EnumerationDomain>
+        <Documentation>
+          Specify a mode to control how the axes are drawn: either static, 
+          closest triad, furthest triad or outer edges in relation to the 
+          camera position.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Inertia"
+        command="SetInertia"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Set the inertial factor that controls how often (i.e, how
+          many renders) the axes can switch position (jump from one axes 
+          to another).
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="CornerOffset"
+        command="SetCornerOffset"
+        number_of_elements="1"
+        default_values="0.0">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Specify an offset value to "pull back" the axes from the corner at
+          which they are joined to avoid overlap of axes labels. The 
+          "CornerOffset" is the fraction of the axis length to pull back.
+        </Documentation>
+      </DoubleVectorProperty>
+        <!-- TODO: Add more properties for ticks etc. -->
+      <!-- End of CubeAxesActor -->
+    </Proxy>
+    <!-- End of group "props" -->
   </ProxyGroup>
 
   <ProxyGroup name="properties">
@@ -4694,6 +4774,17 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="CubeAxesVisibility"
+        command="SetCubeAxesVisibility"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for the cube axes.
+        </Documentation>
+      </IntVectorProperty>
+
       <SubProxy>
         <Proxy name="SurfaceRepresentation"
           proxygroup="representations" proxyname="SurfaceRepresentation">
@@ -4796,6 +4887,15 @@
           <Property name="CellLabelFontSize" exposed_name="SelectionCellLabelFontSize" />
           <Property name="CellFieldDataArrayIndex" exposed_name="SelectionCellFieldDataArrayIndex" />
           <Property name="CellFieldDataArrayName" exposed_name="SelectionCellFieldDataArrayName" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="CubeAxesRepresentation"
+          proxygroup="representations" proxyname="CubeAxesRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="FlyMode" exposed_name="CubeAxesFlyMode" />
         </ExposedProperties>
       </SubProxy>
     <!-- End of PVRepresentationBase -->
@@ -6039,8 +6139,73 @@
           <Property name="Visibility" exposed_name="CellLabelVisibility" />
         </ExposedProperties>
       </SubProxy>
-
+    <!-- End of DataLabelRepresentation -->
     </DataLabelRepresentationProxy>
+
+    <CubeAxesRepresentationProxy name="CubeAxesRepresentation">
+      <Documentation>
+        CubeAxesRepresentation is a representation for any dataobject which
+        simply shows an axes along the bounding box of the dataobject.
+      </Documentation>
+
+      <InputProperty name="Input" 
+        command="NotUsed">
+        <Documentation>
+          Input around which the bound box is to be shown.
+        </Documentation>
+      </InputProperty>
+
+      <DoubleVectorProperty name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        is_internal="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          This time is not used unless UseViewUpdateTime is off.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="UseViewUpdateTime"
+        command="SetUseViewUpdateTime"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Indicates if the representation should use the view time to update the
+          pipeline or use "UpdateTime" set on the representation instead.
+        </Documentation>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <SourceProxy name="OutlineFilter" class="vtkOutlineFilter">
+          <!-- 
+            Outline filter generates a partial outline on all processes.
+          -->
+          <InputProperty name="Input"
+            command="SetInputConnection">
+               <DataTypeDomain name="input_type">
+                 <DataType value="vtkDataSet"/>
+               </DataTypeDomain>
+          </InputProperty>
+        </SourceProxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Prop2D" 
+          proxygroup="props" proxyname="CubeAxesActor" />
+        <ExposedProperties>
+          <Property name="FlyMode" />
+          <Property name="Inertia" />
+          <Property name="Visibility" />
+        </ExposedProperties>
+      </SubProxy>
+      
+      <!-- End of CubeAxesRepresentation -->
+    </CubeAxesRepresentationProxy>
     
   </ProxyGroup>
 

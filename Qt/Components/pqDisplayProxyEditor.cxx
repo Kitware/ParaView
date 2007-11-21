@@ -163,6 +163,11 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     "checked", SIGNAL(stateChanged(int)),
     reprProxy, reprProxy->GetProperty("Visibility"));
 
+  // setup cube axes visibility.
+  this->Internal->Links->addPropertyLink(this->Internal->ShowCubeAxes,
+    "checked", SIGNAL(stateChanged(int)),
+    reprProxy, reprProxy->GetProperty("CubeAxesVisibility"));
+
   // setup for choosing color
   this->Internal->Links->addPropertyLink(this->Internal->ColorAdaptor,
     "color", SIGNAL(colorChanged(const QVariant&)),

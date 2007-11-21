@@ -134,6 +134,12 @@ public:
   // Check if this representation has the prop by checking its vtkClientServerID
   virtual bool HasVisibleProp3D(vtkProp3D* prop);
 
+  // Description:
+  // Set cube axes visibility. This flag is considered only if
+  // this->GetVisibility() == true, otherwise, cube axes is not shown.
+  void SetCubeAxesVisibility(int);
+  vtkGetMacro(CubeAxesVisibility, int);
+
 //BTX
   enum RepresentationType
     {
@@ -169,9 +175,10 @@ protected:
   vtkSMDataRepresentationProxy* VolumeRepresentation;
   vtkSMDataRepresentationProxy* OutlineRepresentation;
   vtkSMDataRepresentationProxy* ActiveRepresentation;
+  vtkSMDataRepresentationProxy* CubeAxesRepresentation;
 
   int Representation;
-  int SelectionVisibility;
+  int CubeAxesVisibility;
 
 private:
   vtkSMPVRepresentationProxy(const vtkSMPVRepresentationProxy&); // Not implemented
