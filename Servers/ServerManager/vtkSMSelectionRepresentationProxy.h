@@ -82,7 +82,7 @@ protected:
   // Overridden to request the correct type of strategy from the view.
   virtual bool InitializeStrategy(vtkSMViewProxy* view);
 
-    // Description:
+  // Description:
   // This method is called at the beginning of CreateVTKObjects().
   // This gives the subclasses an opportunity to set the servers flags
   // on the subproxies.
