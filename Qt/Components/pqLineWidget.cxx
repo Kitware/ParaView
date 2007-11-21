@@ -37,12 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqProxy.h"
 #include "pqSMSignalAdaptors.h"
+#include "pqSMAdaptor.h"
 #include "vtkEventQtSlotConnect.h"
 
 #include "ui_pqLineWidget.h"
 
 #include <QDoubleValidator>
 
+#include <vtkMath.h>
 #include <vtkMemberFunctionCommand.h>
 #include <vtkPVDataInformation.h>
 #include <vtkSMDoubleVectorProperty.h>
@@ -207,11 +209,11 @@ void pqLineWidget::onXAxis()
        
   if(this->Implementation->WidgetPoint1 && this->Implementation->WidgetPoint2)
     {
-    this->Implementation->WidgetPoint1->SetElement(0, object_center[0] - object_size[0] * 0.6);
+    this->Implementation->WidgetPoint1->SetElement(0, object_center[0] - object_size[0] * 0.5);
     this->Implementation->WidgetPoint1->SetElement(1, object_center[1]);
     this->Implementation->WidgetPoint1->SetElement(2, object_center[2]);
 
-    this->Implementation->WidgetPoint2->SetElement(0, object_center[0] + object_size[0] * 0.6);
+    this->Implementation->WidgetPoint2->SetElement(0, object_center[0] + object_size[0] * 0.5);
     this->Implementation->WidgetPoint2->SetElement(1, object_center[1]);
     this->Implementation->WidgetPoint2->SetElement(2, object_center[2]);
   
@@ -231,11 +233,11 @@ void pqLineWidget::onYAxis()
   if(this->Implementation->WidgetPoint1 && this->Implementation->WidgetPoint2)
     {
     this->Implementation->WidgetPoint1->SetElement(0, object_center[0]);
-    this->Implementation->WidgetPoint1->SetElement(1, object_center[1] - object_size[1] * 0.6);
+    this->Implementation->WidgetPoint1->SetElement(1, object_center[1] - object_size[1] * 0.5);
     this->Implementation->WidgetPoint1->SetElement(2, object_center[2]);
 
     this->Implementation->WidgetPoint2->SetElement(0, object_center[0]);
-    this->Implementation->WidgetPoint2->SetElement(1, object_center[1] + object_size[1] * 0.6);
+    this->Implementation->WidgetPoint2->SetElement(1, object_center[1] + object_size[1] * 0.5);
     this->Implementation->WidgetPoint2->SetElement(2, object_center[2]);
   
     this->getWidgetProxy()->UpdateVTKObjects();
@@ -255,11 +257,11 @@ void pqLineWidget::onZAxis()
     {
     this->Implementation->WidgetPoint1->SetElement(0, object_center[0]);
     this->Implementation->WidgetPoint1->SetElement(1, object_center[1]);
-    this->Implementation->WidgetPoint1->SetElement(2, object_center[2] - object_size[2] * 0.6);
+    this->Implementation->WidgetPoint1->SetElement(2, object_center[2] - object_size[2] * 0.5);
 
     this->Implementation->WidgetPoint2->SetElement(0, object_center[0]);
     this->Implementation->WidgetPoint2->SetElement(1, object_center[1]);
-    this->Implementation->WidgetPoint2->SetElement(2, object_center[2] + object_size[2] * 0.6);
+    this->Implementation->WidgetPoint2->SetElement(2, object_center[2] + object_size[2] * 0.5);
   
     this->getWidgetProxy()->UpdateVTKObjects();
     pqApplicationCore::instance()->render();
@@ -351,15 +353,36 @@ void pqLineWidget::resetBounds()
 void pqLineWidget::getReferenceBoundingBox(double center[3], double sz[3])
 {
   double input_bounds[6];
-  if(this->getReferenceInputBounds(input_bounds))
+  vtkMath::UninitializeBounds(input_bounds);
+  this->getReferenceInputBounds(input_bounds);
+  
+  if(vtkMath::AreBoundsInitialized(input_bounds))
     {
     center[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
     center[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
     center[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
 
-    sz[0] = fabs(input_bounds[1] - input_bounds[0]);
-    sz[1] = fabs(input_bounds[3] - input_bounds[2]);
-    sz[2] = fabs(input_bounds[5] - input_bounds[4]);
+    // extended a bit
+    sz[0] = fabs(input_bounds[1] - input_bounds[0]) * 1.2;
+    sz[1] = fabs(input_bounds[3] - input_bounds[2]) * 1.2;
+    sz[2] = fabs(input_bounds[5] - input_bounds[4]) * 1.2;
+    }
+  else if(this->Implementation->WidgetPoint1 &&
+          this->Implementation->WidgetPoint2)
+    {
+    // get spherical bounds from what we had before
+    double* tmp1 = this->Implementation->WidgetPoint1->GetElements();
+    double* tmp2 = this->Implementation->WidgetPoint2->GetElements();
+    center[0] = (tmp1[0] + tmp2[0])/2.0;
+    center[1] = (tmp1[1] + tmp2[1])/2.0;
+    center[2] = (tmp1[2] + tmp2[2])/2.0;
+    sz[0] = fabs(tmp1[0] - tmp2[0]);
+    sz[1] = fabs(tmp1[1] - tmp2[1]);
+    sz[2] = fabs(tmp1[2] - tmp2[2]);
+    double s = qMax(qMax(sz[0], sz[1]), sz[2]);
+    sz[0] = s;
+    sz[1] = s;
+    sz[2] = s;
     }
 }
 
