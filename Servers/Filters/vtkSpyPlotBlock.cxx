@@ -330,7 +330,7 @@ int vtkSpyPlotBlock::FixInformation(const vtkBoundingBox &globalBounds,
 }
 
 //-----------------------------------------------------------------------------
-int vtkSpyPlotBlock::Read(int isAMR, vtkSpyPlotIStream *stream)
+int vtkSpyPlotBlock::Read(int isAMR, int fileVersion, vtkSpyPlotIStream *stream)
 {
 
   if (isAMR)
@@ -386,6 +386,17 @@ int vtkSpyPlotBlock::Read(int isAMR, vtkSpyPlotIStream *stream)
     return 0;
     }
 
+  //read in bounds, but don't do anything with them
+  if (fileVersion>=103)
+    {
+    int buffer[6];
+    if (!stream->ReadInt32s(buffer, 6))
+      {
+      vtkErrorMacro("Could not read in block's bounding box");
+      return 0;
+      }
+    }
+
   int i;
   if ( this->IsAllocated() )
     {
@@ -415,7 +426,8 @@ int vtkSpyPlotBlock::Read(int isAMR, vtkSpyPlotIStream *stream)
 
 //-----------------------------------------------------------------------------
 int vtkSpyPlotBlock::Scan(vtkSpyPlotIStream *stream, 
-                          unsigned char *isAllocated)
+                          unsigned char *isAllocated,
+                          int fileVersion)
 {
 
   int temp[3];
@@ -453,6 +465,17 @@ int vtkSpyPlotBlock::Scan(vtkSpyPlotIStream *stream,
     {
     vtkGenericWarningMacro("Could not read in block's level");
     return 0;
+    }
+
+  //read in bounds, but don't do anything with them
+  if (fileVersion>=103)
+    {
+    int buffer[6];
+    if (!stream->ReadInt32s(buffer, 6))
+      {
+      vtkGenericWarningMacro("Could not read in block's bounding box");
+      return 0;
+      }
     }
 
   return 1;

@@ -60,11 +60,11 @@ public:
                         int realDimensions[3])const;
   int HadBadGhostCell(int i) const;
   // Read reads in the actual block's information
-  int Read(int isAMR, vtkSpyPlotIStream *stream);
+  int Read(int isAMR, int fileVersion, vtkSpyPlotIStream *stream);
   // Advances the stream to be after the block, information w/r
   // whether the block is allocated in the time step is returned
   // as an arguement
-  static int Scan(vtkSpyPlotIStream *stream, unsigned char *isAllocated);
+  static int Scan(vtkSpyPlotIStream *stream, unsigned char *isAllocated, int fileVersion);
 
   int SetGeometry(int dir,
                   const unsigned char* encodedInfo, 
