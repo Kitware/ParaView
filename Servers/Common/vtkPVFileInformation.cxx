@@ -52,7 +52,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.25");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.26");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -130,7 +130,7 @@ static int vtkPVFileInformationGetType(const char* path)
   // doing stat on root of devices doesn't work
 
   // is it the root of a drive?
-  if (type == vtkPVFileInformation::INVALID && path[0] && path[1] == ':' &&
+  if (path[0] && path[1] == ':' &&
       (path[2] == '\0' || (path[2] == '\\' && path[3] == '\0')))
     {
     // Path may be drive letter.
