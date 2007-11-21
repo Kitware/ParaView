@@ -107,6 +107,12 @@ public:
   // IceTRenderManager.
   float GetZBufferValue(int x, int y);
 
+  // Description:
+  // When set (default), all annotation layers are always visible. Set to off,
+  // to disable rendering of annotation layers altogether.
+  vtkSetMacro(AnnotationLayerVisible, int);
+  vtkGetMacro(AnnotationLayerVisible, int);
+
 //BTX
 
   enum Tags {
@@ -198,6 +204,7 @@ protected:
   int ClientGUISize[2];
 
   int AnnotationLayer;
+  int AnnotationLayerVisible;
 
   int ImageResized;
   int CaptureZBuffer;

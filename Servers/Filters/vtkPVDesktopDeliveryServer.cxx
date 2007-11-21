@@ -62,7 +62,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.10");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.11");
 vtkStandardNewMacro(vtkPVDesktopDeliveryServer);
 
 //----------------------------------------------------------------------------
@@ -81,6 +81,7 @@ vtkPVDesktopDeliveryServer::vtkPVDesktopDeliveryServer()
 
   this->WindowIdRMIId = 0;
   this->ReducedZBuffer = 0;
+  this->AnnotationLayerVisible = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -292,7 +293,8 @@ void vtkPVDesktopDeliveryServer::UseRendererSet(int id)
       {
       // Turn off everything that is not annotation.  The superclass will
       // later turn on any renderers that the client requested.
-      if (ren->GetLayer() >= this->AnnotationLayer)
+      if (ren->GetLayer() >= this->AnnotationLayer && 
+        this->AnnotationLayerVisible)
         {
         ren->DrawOn();
         }
@@ -687,6 +689,8 @@ void vtkPVDesktopDeliveryServer::PrintSelf(ostream& os, vtkIndent indent)
      << this->ParallelRenderManager << endl;
   os << indent << "RemoteDisplay: "
      << (this->RemoteDisplay ? "on" : "off") << endl;
+  os << indent << "AnnotationLayerVisible: " 
+    << this->AnnotationLayerVisible << endl;
 }
 
 

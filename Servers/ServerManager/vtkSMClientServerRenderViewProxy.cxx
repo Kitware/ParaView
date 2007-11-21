@@ -22,7 +22,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMClientServerRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMClientServerRenderViewProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMClientServerRenderViewProxy, "1.10");
 
 //----------------------------------------------------------------------------
 vtkSMClientServerRenderViewProxy::vtkSMClientServerRenderViewProxy()
@@ -142,6 +142,11 @@ void vtkSMClientServerRenderViewProxy::InitializeRenderSyncManager()
           << "AddRenderer" 
           << this->RenderersID
           << this->RendererProxy->GetID() 
+          << vtkClientServerStream::End;
+  stream  << vtkClientServerStream::Invoke
+          << this->RenderSyncManager->GetID()
+          << "SetAnnotationLayerVisible"
+          << 0
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID,
     vtkProcessModule::RENDER_SERVER_ROOT, stream);
