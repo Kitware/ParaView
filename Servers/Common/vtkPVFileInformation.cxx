@@ -29,7 +29,6 @@
 # include <shlobj.h>    // SHGetFolderPath
 # include <sys/stat.h>  // stat
 # include <string.h>   // for strcasecmp
-# include <lm.h>
 # define vtkPVServerFileListingGetCWD _getcwd
 #else
 # include <sys/types.h> // DIR, struct dirent, struct stat
@@ -52,7 +51,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.26");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.27");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -72,45 +71,118 @@ inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 
 #if defined(_WIN32)
 
+static vtkstd::string WindowsNetworkRoot = "Windows Network";
+
 // assumes native back-slashes
 static bool IsUncPath(const vtkstd::string& path)
 {
   if(path.size() >= 2 && path[0] == '\\' && path[1] == '\\')
+    {
     return true;
+    }
   return false;
+}
+
+static bool IsNetworkPath(const vtkstd::string& path)
+{
+  if(path.compare(0, WindowsNetworkRoot.size(), WindowsNetworkRoot) == 0)
+    {
+    return true;
+    }
+  return false;
+}
+
+// returns true if path is valid, false otherwise
+// returns subdirs, if any 
+
+static bool getNetworkSubdirs(const vtkstd::string& name,
+                              DWORD DisplayType,
+                              vtkstd::vector<vtkstd::string>& subdirs)
+{
+  HANDLE han=0;
+  NETRESOURCEA rc;
+  rc.dwScope = RESOURCE_GLOBALNET;
+  rc.dwType = RESOURCETYPE_ANY;  // TODO, restrict this to disk at server level?
+  rc.dwDisplayType = DisplayType;
+  rc.dwUsage = RESOURCEUSAGE_CONTAINER;
+  if(DisplayType == RESOURCEDISPLAYTYPE_NETWORK)
+    {
+    rc.dwUsage |= RESOURCEUSAGE_RESERVED;  // wonder why this is needed?
+    }
+  rc.lpLocalName = NULL;
+  rc.lpProvider = NULL;
+  rc.lpComment = NULL;
+  rc.lpRemoteName = const_cast<char*>(name.c_str());
+
+  DWORD ret = WNetOpenEnumA(RESOURCE_GLOBALNET,
+    RESOURCETYPE_ANY, 0, &rc, &han);
+
+  if(NO_ERROR == ret)
+    {
+    DWORD count = 10;
+    NETRESOURCE res[10];
+    DWORD bufsize = sizeof(NETRESOURCE) * count;
+    do
+      {
+      ret = WNetEnumResourceA(han, &count, res, &bufsize);
+      if(ret == NO_ERROR || ret == ERROR_MORE_DATA)
+        {
+        for(DWORD i=0; i<count; i++)
+          {
+          vtkstd::string subdir = res[i].lpRemoteName;
+          if(subdir.compare(0, name.size(), name) == 0)
+            {
+            subdir = subdir.c_str() + name.size() + 1;
+            }
+          subdirs.push_back(subdir);
+          }
+        }
+      } while(ret == ERROR_MORE_DATA);
+    }
+  return NO_ERROR == ret;
+}
+
+
+static bool getNetworkSubdirs(const vtkstd::string& path,
+                              vtkstd::vector<vtkstd::string>& subdirs)
+{
+  if(!IsNetworkPath(path))
+    {
+    return false;
+    }
+
+  // path follows this convention
+  // Windows Network\Domain\Server\Share
+  // this doesn't return subdirectories of "Share", use normal
+  // win32 API for that
+
+  static const int MaxTokens = 4;
+
+  vtkstd::vector<vtksys::String> pathtokens;
+  pathtokens = vtksys::SystemTools::SplitString(path.c_str()+1, '\\');
+
+  static DWORD DisplayType[MaxTokens] =
+    {
+    RESOURCEDISPLAYTYPE_NETWORK, 
+    RESOURCEDISPLAYTYPE_DOMAIN,
+    RESOURCEDISPLAYTYPE_SERVER,
+    RESOURCEDISPLAYTYPE_SHARE
+    };
+
+  int tokenIndex = pathtokens.size()-1;
+
+  if(tokenIndex >= MaxTokens)
+    return false;
+
+  return getNetworkSubdirs(pathtokens[tokenIndex], 
+                           DisplayType[tokenIndex], subdirs);
 }
 
 static bool getUncSharesOnServer(const vtkstd::string& server,
                           vtkstd::vector<vtkstd::string>& ret)
 {
-  PSHARE_INFO_1 buf;
-  NET_API_STATUS result;
-  DWORD resumeHandle=0, numEntries=0, numTotal=0;
-  WCHAR* wserver = new WCHAR[server.size()+1];
-  MultiByteToWideChar(CP_ACP, 0, server.c_str(), -1, wserver, server.size()+1);
-  do
-    {
-    result = NetShareEnum(wserver, 1, (LPBYTE*)&buf, -1,
-                          &numEntries, &numTotal, &resumeHandle);
-    if(result == ERROR_MORE_DATA || result == ERROR_SUCCESS)
-      {
-      for(DWORD i=0; i<numEntries; i++)
-        {
-        if(buf[i].shi1_type == STYPE_DISKTREE)
-          {
-          int num = WideCharToMultiByte(CP_ACP, 0, (WCHAR*)buf[i].shi1_netname, 
-                                        -1, NULL, 0, 0, 0);
-          char* share = new char[num];
-          WideCharToMultiByte(CP_ACP, 0, (WCHAR*)buf[i].shi1_netname, -1, share, num, 0, 0);
-          ret.push_back(vtkstd::string(share));
-          delete [] share;
-          }
-        }
-      }
-    NetApiBufferFree(buf);
-    } while(result == ERROR_MORE_DATA);
-  delete [] wserver;
-  return result == ERROR_SUCCESS;
+  return getNetworkSubdirs(vtkstd::string("\\\\") + server, 
+                         RESOURCEDISPLAYTYPE_SERVER, ret);
 }
 
 #endif
@@ -141,6 +213,15 @@ static int vtkPVFileInformationGetType(const char* path)
       type = vtkPVFileInformation::DIRECTORY;
       }
     }
+
+  if(IsNetworkPath(path))
+    {
+    // this code doesn't give out anything with 
+    // "Windows Network\..." unless its a directory
+    // that may change
+    type = vtkPVFileInformation::DIRECTORY;
+    }
+
   // is it the root of a shared folder?
   if(IsUncPath(path))
     {
@@ -228,6 +309,20 @@ static vtkstd::string vtkPVFileInformationResolveLink(const vtkstd::string& fnam
 }
 #endif
 
+vtkstd::string MakeAbsolutePath(const vtkstd::string& path,
+                            const vtkstd::string& working_dir)
+{
+  vtkstd::string ret = path;
+#if defined(WIN32)
+  if(!IsUncPath(path) && !IsNetworkPath(path))
+#endif
+    {
+    ret = vtksys::SystemTools::CollapseFullPath(path.c_str(),
+      working_dir.c_str());
+    }
+  return ret;
+}
+
 
 //-----------------------------------------------------------------------------
 class vtkPVFileInformationSet : 
@@ -283,9 +378,8 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
     working_directory = helper->GetWorkingDirectory();
     }
 
-  vtkstd::string path = vtksys::SystemTools::CollapseFullPath(helper->GetPath(),
-    working_directory.c_str());
-  
+  vtkstd::string path = MakeAbsolutePath(helper->GetPath(), working_directory);
+
   this->SetName(helper->GetPath());
 #if defined(_WIN32)
   vtkstd::string::size_type idx;
@@ -380,7 +474,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
   
   vtkSmartPointer<vtkPVFileInformation> info =
       vtkSmartPointer<vtkPVFileInformation>::New();
-  info->SetFullPath("Windows Network");
+  info->SetFullPath(WindowsNetworkRoot.c_str());
   info->SetName("Windows Network");
   info->Type = DIRECTORY;
   this->Contents->AddItem(info);
@@ -510,6 +604,34 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
 {
 #if defined(_WIN32)
   vtkPVFileInformationSet info_set;
+
+  if(IsNetworkPath(this->FullPath))
+    {
+    vtkstd::vector<vtkstd::string> shares;
+    if(getNetworkSubdirs(this->FullPath, shares))
+      {
+      for(unsigned int i=0; i<shares.size(); i++)
+        {
+        vtkPVFileInformation* info = vtkPVFileInformation::New();
+        info->SetName(shares[i].c_str());
+        vtkstd::string fullpath = 
+          vtksys::SystemTools::CollapseFullPath(shares[i].c_str(), this->FullPath);
+        info->SetFullPath(fullpath.c_str());
+        info->Type = DIRECTORY;
+        info->FastFileTypeDetection = this->FastFileTypeDetection;
+        info_set.insert(info);
+        info->Delete();
+        }
+      }
+    this->OrganizeCollection(info_set);
+
+    for (vtkPVFileInformationSet::iterator iter = info_set.begin();
+      iter != info_set.end(); ++iter)
+      {
+      this->Contents->AddItem(*iter);
+      }
+    return;
+    }
 
   if(IsUncPath(this->FullPath))
     {
