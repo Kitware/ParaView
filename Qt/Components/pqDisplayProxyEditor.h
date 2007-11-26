@@ -68,7 +68,8 @@ protected slots:
   void zoomToData();
   void updateEnableState();
   void updateMaterial(int idx);
-   
+  void editCubeAxes();
+
 protected:
 
   /// Set the display whose properties we want to edit.

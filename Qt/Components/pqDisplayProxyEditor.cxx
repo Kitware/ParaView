@@ -62,14 +62,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView client includes
 #include "pqApplicationCore.h"
 #include "pqColorScaleEditor.h"
-#include "pqSMAdaptor.h"
-#include "pqPropertyLinks.h"
+#include "pqCubeAxesEditorDialog.h"
+#include "pqFileDialog.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
+#include "pqPropertyLinks.h"
 #include "pqRenderView.h"
-#include "pqFileDialog.h"
 #include "pqScalarsToColors.h"
-
+#include "pqSMAdaptor.h"
 
 class pqDisplayProxyEditorInternal : public Ui::pqDisplayProxyEditor
 {
@@ -118,6 +118,8 @@ pqDisplayProxyEditor::pqDisplayProxyEditor(pqPipelineRepresentation* repr, QWidg
 
   QObject::connect(this->Internal->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(updateAllViews()));
+  QObject::connect(this->Internal->EditCubeAxes, SIGNAL(clicked(bool)),
+    this, SLOT(editCubeAxes()), Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------
@@ -567,6 +569,7 @@ void pqDisplayProxyEditor::zoomToData()
     }
 }
 
+//-----------------------------------------------------------------------------
 // TODO:  get rid of me !!  as soon as vtkSMDisplayProxy can tell us when new
 // arrays are added.
 void pqDisplayProxyEditor::reloadGUI()
@@ -575,6 +578,7 @@ void pqDisplayProxyEditor::reloadGUI()
 }
 
 
+//-----------------------------------------------------------------------------
 QVariant pqDisplayProxyEditor::specularColor() const
 {
   if(this->Internal->SpecularWhite->isChecked())
@@ -591,6 +595,7 @@ QVariant pqDisplayProxyEditor::specularColor() const
        proxy->GetProperty("DiffuseColor"));
 }
 
+//-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::setSpecularColor(QVariant specColor)
 {
   QList<QVariant> whiteLight;
@@ -610,6 +615,7 @@ void pqDisplayProxyEditor::setSpecularColor(QVariant specColor)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::updateMaterial(int vtkNotUsed(idx))
 {
   // FIXME: when we enable materials.
@@ -654,4 +660,12 @@ void pqDisplayProxyEditor::updateMaterial(int vtkNotUsed(idx))
     this->updateAllViews();
     }
 #endif
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayProxyEditor::editCubeAxes()
+{
+  pqCubeAxesEditorDialog dialog(this);
+  dialog.setRepresentationProxy(this->Internal->Representation->getProxy());
+  dialog.exec();
 }

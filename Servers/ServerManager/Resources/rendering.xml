@@ -1504,11 +1504,11 @@
         number_of_elements="1"
         default_values="1">
         <EnumerationDomain name="enum">
-          <Entry text="OuterEdges" value="0" />
-          <Entry text="ClosestTriad" value="1" />
-          <Entry text="FurthestTriad" value="2" />
-          <Entry text="StaticTriad" value="3" />
-          <Entry text="StaticEdges" value="4" />
+          <Entry text="Outer Edges" value="0" />
+          <Entry text="Closest Triad" value="1" />
+          <Entry text="Furthest Triad" value="2" />
+          <Entry text="Static Triad" value="3" />
+          <Entry text="Static Edges" value="4" />
         </EnumerationDomain>
         <Documentation>
           Specify a mode to control how the axes are drawn: either static, 
@@ -1540,9 +1540,170 @@
           "CornerOffset" is the fraction of the axis length to pull back.
         </Documentation>
       </DoubleVectorProperty>
-        <!-- TODO: Add more properties for ticks etc. -->
+
+      <StringVectorProperty name="XTitle"
+        command="SetXTitle"
+        number_of_elements="1"
+        default_values="X-Axis">
+        <Documentation>
+          Set the title for the X axis.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="YTitle"
+        command="SetYTitle"
+        number_of_elements="1"
+        default_values="Y-Axis">
+        <Documentation>
+          Set the title for the Y axis.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ZTitle"
+        command="SetZTitle"
+        number_of_elements="1"
+        default_values="Z-Axis">
+        <Documentation>
+          Set the title for the Z axis.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty  name="XAxisVisibility"
+        command="SetXAxisVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if X axis is visible.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="YAxisVisibility"
+        command="SetYAxisVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if Y axis is visible.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="ZAxisVisibility"
+        command="SetZAxisVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if Z axis is visible.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="XAxisTickVisibility"
+        command="SetXAxisTickVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if ticks are visible on the X axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="YAxisTickVisibility"
+        command="SetYAxisTickVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if ticks are visible on the Y axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="ZAxisTickVisibility"
+        command="SetZAxisTickVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if ticks are visible on the Z axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="XAxisMinorTickVisibility"
+        command="SetXAxisMinorTickVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if minor ticks are visible on the X axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="YAxisMinorTickVisibility"
+        command="SetYAxisMinorTickVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if minor ticks are visible on the Y axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="ZAxisMinorTickVisibility"
+        command="SetZAxisMinorTickVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if minor ticks are visible on the Z axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="XGridLines"
+        command="SetDrawXGridlines"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify if grid lines are drawn parallel to X axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="YGridLines"
+        command="SetDrawYGridlines"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify if grid lines are drawn parallel to Y axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ZGridLines"
+        command="SetDrawZGridlines"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify if grid lines are drawn parallel to Z axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="TickLocation"
+        command="SetTickLocation"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Inside" value="0" />
+          <Entry text="Outside" value="1" />
+          <Entry text="Both" value="2" />
+        </EnumerationDomain>
+        <Documentation>
+          Set the location of tick marks.
+        </Documentation>
+      </IntVectorProperty>
       <!-- End of CubeAxesActor -->
     </Proxy>
+
     <!-- End of group "props" -->
   </ProxyGroup>
 
@@ -4895,7 +5056,25 @@
           proxygroup="representations" proxyname="CubeAxesRepresentation">
         </Proxy>
         <ExposedProperties>
-          <Property name="FlyMode" exposed_name="CubeAxesFlyMode" />
+          <Property exposed_name="CubeAxesCornerOffset" name="CornerOffset" />
+          <Property exposed_name="CubeAxesFlyMode" name="FlyMode" />
+          <Property exposed_name="CubeAxesInertia" name="Inertia" />
+          <Property exposed_name="CubeAxesTickLocation" name="TickLocation" />
+          <Property exposed_name="CubeAxesXAxisMinorTickVisibility" name="XAxisMinorTickVisibility" />
+          <Property exposed_name="CubeAxesXAxisTickVisibility" name="XAxisTickVisibility" />
+          <Property exposed_name="CubeAxesXAxisVisibility" name="XAxisVisibility" />
+          <Property exposed_name="CubeAxesXGridLines" name="XGridLines" />
+          <Property exposed_name="CubeAxesXTitle" name="XTitle" />
+          <Property exposed_name="CubeAxesYAxisMinorTickVisibility" name="YAxisMinorTickVisibility" />
+          <Property exposed_name="CubeAxesYAxisTickVisibility" name="YAxisTickVisibility" />
+          <Property exposed_name="CubeAxesYAxisVisibility" name="YAxisVisibility" />
+          <Property exposed_name="CubeAxesYGridLines" name="YGridLines" />
+          <Property exposed_name="CubeAxesYTitle" name="YTitle" />
+          <Property exposed_name="CubeAxesZAxisMinorTickVisibility" name="ZAxisMinorTickVisibility" />
+          <Property exposed_name="CubeAxesZAxisTickVisibility" name="ZAxisTickVisibility" />
+          <Property exposed_name="CubeAxesZAxisVisibility" name="ZAxisVisibility" />
+          <Property exposed_name="CubeAxesZGridLines" name="ZGridLines" />
+          <Property exposed_name="CubeAxesZTitle" name="ZTitle" />
         </ExposedProperties>
       </SubProxy>
     <!-- End of PVRepresentationBase -->
@@ -6198,9 +6377,26 @@
         <Proxy name="Prop2D" 
           proxygroup="props" proxyname="CubeAxesActor" />
         <ExposedProperties>
+          <Property name="CornerOffset" />
           <Property name="FlyMode" />
           <Property name="Inertia" />
+          <Property name="TickLocation" />
           <Property name="Visibility" />
+          <Property name="XAxisMinorTickVisibility" />
+          <Property name="XAxisTickVisibility" />
+          <Property name="XAxisVisibility" />
+          <Property name="XGridLines" />
+          <Property name="XTitle" />
+          <Property name="YAxisMinorTickVisibility" />
+          <Property name="YAxisTickVisibility" />
+          <Property name="YAxisVisibility" />
+          <Property name="YGridLines" />
+          <Property name="YTitle" />
+          <Property name="ZAxisMinorTickVisibility" />
+          <Property name="ZAxisTickVisibility" />
+          <Property name="ZAxisVisibility" />
+          <Property name="ZGridLines" />
+          <Property name="ZTitle" />
         </ExposedProperties>
       </SubProxy>
       

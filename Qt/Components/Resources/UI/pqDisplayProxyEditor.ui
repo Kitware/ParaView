@@ -420,8 +420,36 @@
       <property name="spacing" >
        <number>6</number>
       </property>
+      <item row="0" column="1" >
+       <widget class="QPushButton" name="EditCubeAxes" >
+        <property name="enabled" >
+         <bool>false</bool>
+        </property>
+        <property name="toolTip" >
+         <string>&lt;html>Edit properties of the cube axes &lt;/html></string>
+        </property>
+        <property name="statusTip" >
+         <string>&lt;html>Edit properties of the cube axes &lt;/html></string>
+        </property>
+        <property name="whatsThis" >
+         <string>&lt;html>Edit properties of the cube axes &lt;/html></string>
+        </property>
+        <property name="text" >
+         <string>Edit</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0" >
        <widget class="QCheckBox" name="ShowCubeAxes" >
+        <property name="toolTip" >
+         <string>&lt;html>Toggle visibility of the cube axes&lt;/html></string>
+        </property>
+        <property name="statusTip" >
+         <string>&lt;html>Toggle visibility of the cube axes&lt;/html></string>
+        </property>
+        <property name="whatsThis" >
+         <string>&lt;html>Toggle visibility of the cube axes&lt;/html></string>
+        </property>
         <property name="text" >
          <string>Show cube axes</string>
         </property>
@@ -824,11 +852,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqDisplayColorWidget</class>
-   <extends>QWidget</extends>
-   <header>pqDisplayColorWidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>pqColorChooserButton</class>
    <extends>QPushButton</extends>
    <header>pqColorChooserButton.h</header>
@@ -837,6 +860,11 @@
    <class>pqDisplayRepresentationWidget</class>
    <extends>QWidget</extends>
    <header>pqDisplayRepresentationWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqDisplayColorWidget</class>
+   <extends>QWidget</extends>
+   <header>pqDisplayColorWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -869,5 +897,22 @@
   <tabstop>OriginZ</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>ShowCubeAxes</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>EditCubeAxes</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>82</x>
+     <y>490</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>213</x>
+     <y>490</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

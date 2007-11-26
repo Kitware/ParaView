@@ -73,6 +73,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqComparativeVisPanel.h
   pqContourPanel.h
   pqCreateServerStartupDialog.h
+  pqCubeAxesEditorDialog.h
   pqCustomFilterDefinitionWizard.h
   pqCustomFilterManager.h
   pqCustomFilterManagerModel.h
@@ -211,6 +212,7 @@ SET(UI_FORMS
   Resources/UI/pqCreateServerStartupDialog.ui
   Resources/UI/pqCustomFilterDefinitionWizard.ui
   Resources/UI/pqCustomFilterManager.ui
+  Resources/UI/pqCubeAxesEditorDialog.ui
   Resources/UI/pqDisplayProxyEditor.ui
   Resources/UI/pqDisplayProxyEditorWidget.ui
   Resources/UI/pqDisplayRepresentationWidget.ui
@@ -374,6 +376,8 @@ ADD_LIBRARY(pqComponents
   pqContourPanel.h
   pqCreateServerStartupDialog.cxx
   pqCreateServerStartupDialog.h
+  pqCubeAxesEditorDialog.cxx
+  pqCubeAxesEditorDialog.h
   pqCustomFilterDefinitionModel.cxx
   pqCustomFilterDefinitionModel.h
   pqCustomFilterDefinitionWizard.cxx
