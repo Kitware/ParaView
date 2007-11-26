@@ -62,7 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 // editor dialog that comes and goes for editing a single key frame
 // interpolation type
-pqKeyFrameTypeDialog::pqKeyFrameTypeDialog(QWidget* p, QWidget* child)
+pqKeyFrameEditorDialog::pqKeyFrameEditorDialog(QWidget* p, QWidget* child)
   : QDialog(p)
 {
   this->Child = child;
@@ -82,16 +82,47 @@ pqKeyFrameTypeDialog::pqKeyFrameTypeDialog(QWidget* p, QWidget* child)
 }
 
 //-----------------------------------------------------------------------------
-pqKeyFrameTypeDialog::~pqKeyFrameTypeDialog()
+pqKeyFrameEditorDialog::~pqKeyFrameEditorDialog()
 {
   // disconnect child
   this->Child->setParent(NULL);
   this->Child->hide();
 }
 
+class pqKeyFrameEditorWidget : public QWidget
+{
+public:
+  pqKeyFrameEditorWidget(QWidget* p, QWidget* child)
+    : QWidget(p), Child(child)
+    {
+    QVBoxLayout* l = new QVBoxLayout(this);
+    l->setMargin(0);
+    l->addWidget(this->Child);
+    this->Child->show();
+    }
+  ~pqKeyFrameEditorWidget()
+    {
+    this->Child->setParent(NULL);
+    this->Child->hide();
+    }
+private:
+  QWidget* Child;
+};
+
 //-----------------------------------------------------------------------------
-// item model for putting a key frame interpolation widget in the model
-class pqKeyFrameInterpolationItem : public QStandardItem
+// model model for key frame values
+class pqKeyFrameItem : public QObject, public QStandardItem
+{
+public:
+  // return an editor for the item
+  virtual QWidget* editorWidget() { return NULL; }
+  // return an editor for a dialog
+  virtual QWidget* editorDialog() { return NULL; }
+};
+
+//-----------------------------------------------------------------------------
+// model item for putting a key frame interpolation widget in the model
+class pqKeyFrameInterpolationItem : public pqKeyFrameItem
 {
 public:
   pqKeyFrameInterpolationItem() : Widget()
@@ -104,12 +135,14 @@ public:
     QAbstractItemModel* comboModel = this->Widget.typeComboBox()->model();
     return comboModel->data(comboModel->index(idx, 0), role);
     }
+  QWidget* editorDialog() { return &Widget; }
   pqKeyFrameTypeWidget Widget;
 };
 
+
 //-----------------------------------------------------------------------------
-// item model for putting a key frame interpolation widget in the model
-class pqCameraKeyFrameItem : public QObject, public QStandardItem
+// model item for putting a key frame interpolation widget in the model
+class pqCameraKeyFrameItem : public pqKeyFrameItem
 {
 public:
   pqCameraKeyFrameItem() : Widget(), CamWidget(&this->Widget)
@@ -136,6 +169,10 @@ public:
       }
     return d;
     }
+  QWidget* editorDialog()
+    {
+    return &Widget;
+    }
   QWidget Widget;
   QPushButton* Button;
   pqCameraWidget CamWidget;
@@ -153,44 +190,24 @@ public:
     const QStandardItemModel* model = 
       qobject_cast<const QStandardItemModel*>(index.model());
 
-    int time_index = 0;
-    int interpolation_index = this->CameraMode? -1 : 1;
-    int value_index = this->CameraMode? 1 : 2;
-
-    if(index.column() == time_index)
+    if(index.column() == 0)
       {
       return new QLineEdit(p);
       }
-    else if (!this->CameraMode)
+    
+    QStandardItem* item = model->item(index.row(), index.column());
+    pqKeyFrameItem* kfitem = static_cast<pqKeyFrameItem*>(item);
+    if(item && kfitem->editorWidget())
       {
-      if(index.column() == interpolation_index)
-        {
-        pqKeyFrameInterpolationItem* item = 
-          static_cast<pqKeyFrameInterpolationItem*>(model->item(index.row(), 
-              interpolation_index));
-        if(item)
-          {
-          return new pqKeyFrameTypeDialog(p, &item->Widget);
-          }
-        return NULL;
-        }
-      else if(index.column() == value_index)
-        {
-        return new QLineEdit(p);
-        }
+      return new pqKeyFrameEditorWidget(p, kfitem->editorWidget());
       }
-    else
+    else if(item && kfitem->editorDialog())
       {
-      if(index.column() == value_index)
-        {
-        pqCameraKeyFrameItem* item = 
-          static_cast<pqCameraKeyFrameItem*>(model->item(index.row(), value_index));
-        if(item)
-          {
-          return new pqKeyFrameTypeDialog(p, &item->Widget);
-          }
-        return NULL;
-        }
+      return new pqKeyFrameEditorDialog(p, kfitem->editorDialog());
+      }
+    else if(item)
+      {
+      return new QLineEdit(p);
       }
     return NULL;
     }
@@ -198,7 +215,7 @@ public:
                             const QStyleOptionViewItem& option,
                             const QModelIndex & index) const
     {
-    if(qobject_cast<pqKeyFrameTypeDialog*>(editor))
+    if(qobject_cast<pqKeyFrameEditorDialog*>(editor))
       {
       int w = 300;
       int h = 100;
@@ -324,7 +341,7 @@ public:
     }
   QStandardItem* newValueItem(int row)
     {
-    QStandardItem* item = new QStandardItem();
+    QStandardItem* item = new pqKeyFrameItem();
     int count = this->Model.rowCount();
     
     QVariant value = this->ValueRange.first;
@@ -507,9 +524,10 @@ void pqKeyFrameEditor::readKeyFrameData()
         }
       
       idx = this->Internal->Model.index(i, 2);
-      this->Internal->Model.setData(idx,
-        pqSMAdaptor::getElementProperty(keyFrame->GetProperty("KeyValues")),
-        Qt::DisplayRole);
+      pqKeyFrameItem* item = new pqKeyFrameItem();
+      item->setData(pqSMAdaptor::getElementProperty(keyFrame->GetProperty("KeyValues")),
+          Qt::DisplayRole);
+      this->Internal->Model.setItem(i, 2, item);
       }
     }
 

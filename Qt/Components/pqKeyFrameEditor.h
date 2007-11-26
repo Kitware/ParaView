@@ -77,12 +77,12 @@ private:
 
 
 // internal class
-class pqKeyFrameTypeDialog : public QDialog
+class pqKeyFrameEditorDialog : public QDialog
 {
   Q_OBJECT
 public:
-  pqKeyFrameTypeDialog(QWidget* p, QWidget* child);
-  ~pqKeyFrameTypeDialog();
+  pqKeyFrameEditorDialog(QWidget* p, QWidget* child);
+  ~pqKeyFrameEditorDialog();
   QWidget* Child;
 };
 
