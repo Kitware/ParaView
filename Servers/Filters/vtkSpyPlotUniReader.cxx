@@ -12,7 +12,7 @@
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.7.4.1");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.7.4.2");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -451,7 +451,8 @@ int vtkSpyPlotUniReader::ReadInformation()
       {
       // Skip over the block but remember its allocated state
       if (!vtkSpyPlotBlock::Scan(&spis, 
-                                 &(dh->SavedBlockAllocatedStates[block])))
+                                 &(dh->SavedBlockAllocatedStates[block]),
+                                 this->FileVersion))
       {
       vtkErrorMacro( "Problem scanning the block information" );
       return 0;
@@ -558,7 +559,7 @@ int vtkSpyPlotUniReader::MakeCurrent()
       {
       //long l = ifs.tellg();
       vtkSpyPlotBlock *b = &(this->Blocks[block]);
-      if ( !b->Read(this->IsAMR(), &spis))
+      if ( !b->Read(this->IsAMR(), this->FileVersion, &spis))
         {
         vtkErrorMacro( "Problem reading the block information" );
         return 0;
