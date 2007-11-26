@@ -50,6 +50,14 @@ public:
 
   /// Overridden to push changes if user hit accept.
   virtual void done(int r);
+
+signals:
+  /// Fired when the browser begins performing an undoable change.
+  void beginUndo(const QString& label);
+  
+  /// Fired when the browser is finished with the undoable change.
+  void endUndo();
+
 private:
   pqCubeAxesEditorDialog(const pqCubeAxesEditorDialog&); // Not implemented.
   void operator=(const pqCubeAxesEditorDialog&); // Not implemented.

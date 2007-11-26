@@ -39,9 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt Includes.
 
 // ParaView Includes.
+#include "pqApplicationCore.h"
 #include "pqNamedWidgets.h"
 #include "pqPropertyManager.h"
-
+#include "pqUndoStack.h"
 
 class pqCubeAxesEditorDialog::pqInternal : public Ui::CubeAxesEditorDialog
 {
@@ -66,6 +67,15 @@ pqCubeAxesEditorDialog::pqCubeAxesEditorDialog(
 {
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
+  pqUndoStack* ustack = pqApplicationCore::instance()->getUndoStack();
+  if (ustack)
+    {
+    QObject::connect(this, SIGNAL(beginUndo(const QString&)),
+      ustack, SLOT(beginUndoSet(const QString&)));
+    QObject::connect(this, SIGNAL(endUndo()),
+      ustack, SLOT(endUndoSet()));
+    }
+
 }
 
 //-----------------------------------------------------------------------------
@@ -96,9 +106,11 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
 //-----------------------------------------------------------------------------
 void pqCubeAxesEditorDialog::done(int result)
 {
-  if (result == QDialog::Accepted)
+  if (result == QDialog::Accepted && this->Internal->PropertyManager->isModified())
     {
+    emit this->beginUndo("Cube Axes Parameters");
     this->Internal->PropertyManager->accept();
+    emit this->endUndo();
     }
   this->Superclass::done(result);
 }
