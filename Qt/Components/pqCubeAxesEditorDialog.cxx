@@ -104,13 +104,13 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
 
 
 //-----------------------------------------------------------------------------
-void pqCubeAxesEditorDialog::done(int result)
+void pqCubeAxesEditorDialog::done(int res)
 {
-  if (result == QDialog::Accepted && this->Internal->PropertyManager->isModified())
+  if (res == QDialog::Accepted && this->Internal->PropertyManager->isModified())
     {
     emit this->beginUndo("Cube Axes Parameters");
     this->Internal->PropertyManager->accept();
     emit this->endUndo();
     }
-  this->Superclass::done(result);
+  this->Superclass::done(res);
 }
