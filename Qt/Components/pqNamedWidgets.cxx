@@ -338,6 +338,7 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
     QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(object);
     pqDoubleRangeWidget* doubleRange = qobject_cast<pqDoubleRangeWidget*>(object);
     pqIntRangeWidget* intRange = qobject_cast<pqIntRangeWidget*>(object);
+
     if(comboBox)
       {
       // these combo boxes tend to be true/false combos
@@ -397,7 +398,7 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
       {
       pqIntRangeWidgetDomain* d0 = new
         pqIntRangeWidgetDomain(intRange, SMProperty);
-      d0->setObjectName("DoubleRangeWidgetDomain");
+      d0->setObjectName("IntRangeWidgetDomain");
       property_manager->registerLink(
         intRange, "value", SIGNAL(valueChanged(int)),
         proxy, SMProperty);
@@ -697,10 +698,13 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
     {
     QComboBox* comboBox = qobject_cast<QComboBox*>(object);
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(object);
+    QTextEdit* textEdit = qobject_cast<QTextEdit*>(object);
     QSlider* slider = qobject_cast<QSlider*>(object);
+    QSpinBox* spinBox = qobject_cast<QSpinBox*>(object);
     QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(object);
     pqDoubleRangeWidget* doubleRange = qobject_cast<pqDoubleRangeWidget*>(object);
-    QSpinBox* spinBox = qobject_cast<QSpinBox*>(object);
+    pqIntRangeWidget* intRange = qobject_cast<pqIntRangeWidget*>(object);
+
     if(comboBox)
       {
       pqComboBoxDomain* d0 =
@@ -721,6 +725,14 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
       {
       property_manager->unregisterLink(
         lineEdit, "text", SIGNAL(textChanged(const QString&)),
+        proxy, SMProperty);
+      }
+    else if(textEdit)
+      {
+      pqSignalAdaptorTextEdit* adaptor = 
+        textEdit->findChild<pqSignalAdaptorTextEdit*>("TextEditAdaptor");
+      property_manager->unregisterLink(
+        adaptor, "text", SIGNAL(textChanged()),
         proxy, SMProperty);
       }
     else if(slider)
@@ -769,6 +781,18 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
         }
       property_manager->unregisterLink(
         spinBox, "value", SIGNAL(valueChanged(int)),
+        proxy, SMProperty);
+      }
+    else if(intRange)
+      {
+      pqIntRangeWidgetDomain* i0 = 
+        doubleRange->findChild<pqIntRangeWidgetDomain*>("IntRangeWidgetDomain");
+      if(i0)
+        {
+        delete i0;
+        }
+      property_manager->unregisterLink(
+        intRange, "value", SIGNAL(valueChanged(int)),
         proxy, SMProperty);
       }
     }
