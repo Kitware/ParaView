@@ -75,6 +75,10 @@ pqCubeAxesEditorDialog::pqCubeAxesEditorDialog(
     QObject::connect(this, SIGNAL(endUndo()),
       ustack, SLOT(endUndoSet()));
     }
+  QObject::connect(this->Internal->Ok, SIGNAL(clicked()),
+    this, SLOT(accept()), Qt::QueuedConnection);
+  QObject::connect(this->Internal->Cancel, SIGNAL(clicked()),
+    this, SLOT(reject()), Qt::QueuedConnection);
 
 }
 
