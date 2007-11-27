@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVServerInformation.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkClientServerStream.h"
 
 // Qt includes.
 #include <QCoreApplication>
@@ -54,12 +55,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqOptions.h"
 #include "pqServerManagerModel.h"
+#include "pqSettings.h"
 #include "pqTimeKeeper.h"
 
 class pqServer::pqInternals
 {
 public:
   QPointer<pqTimeKeeper> TimeKeeper;
+  // Used to send an heart beat message to the server to avoid 
+  // inactivity timeouts.
+  QTimer HeartbeatTimer;
 
 };
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,6 +98,11 @@ pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _pare
     QTimer::singleShot(
         (timeout-1)*60*1000, this, SIGNAL(finalTimeoutWarning()));
     }
+
+  QObject::connect(&this->Internals->HeartbeatTimer, SIGNAL(timeout()),
+    this, SLOT(heartBeat()));
+
+  this->setHeartBeatTimeout(pqServer::getHeartBeatTimeoutSetting());
 }
 
 //-----------------------------------------------------------------------------
@@ -220,4 +230,76 @@ vtkPVServerInformation* pqServer::getServerInformation() const
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   return pm->GetServerInformation(this->GetConnectionID());
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::setHeartBeatTimeout(int msec)
+{
+  // no need to set heart beats if not a remote connection.
+  if (this->isRemote())
+    {
+    if (msec <= 0)
+      {
+      this->Internals->HeartbeatTimer.stop();
+      }
+    else
+      {
+      this->heartBeat();
+      this->Internals->HeartbeatTimer.start(msec);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::heartBeat()
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID()
+         << "GetProcessModule"
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, vtkProcessModule::SERVERS, stream);
+}
+
+//-----------------------------------------------------------------------------
+const char* pqServer::HEARBEAT_TIME_SETTING_KEY() 
+{
+  return "/server/HeartBeatTime";
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::setHeartBeatTimeoutSetting(int msec)
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqSettings* settings = core->settings();
+  if (settings)
+    {
+    settings->setValue(pqServer::HEARBEAT_TIME_SETTING_KEY(), QVariant(msec));
+    }
+
+  // update all current servers.
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
+  QList<pqServer*> servers = smmodel->findItems<pqServer*>();
+  foreach (pqServer* server, servers)
+    {
+    server->setHeartBeatTimeout(msec);
+    }
+} 
+
+//-----------------------------------------------------------------------------
+int pqServer::getHeartBeatTimeoutSetting()
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqSettings* settings = core->settings();
+  if (settings && settings->contains(pqServer::HEARBEAT_TIME_SETTING_KEY()))
+    {
+    bool ok;
+    int timeout = settings->value(pqServer::HEARBEAT_TIME_SETTING_KEY()).toInt(&ok);
+    if (ok)
+      {
+      return timeout;
+      }
+    }
+  return 10*60*1000; // 10 minutes.
 }

@@ -39,7 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "pqPluginManager.h"
 #include "pqRenderView.h"
-  
+#include "pqServer.h"
+
 class pqApplicationOptions::pqInternal 
   : public Ui::pqApplicationOptions
 {
@@ -86,13 +87,18 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   QObject::connect(this->Internal->DefaultViewType,
                   SIGNAL(currentIndexChanged(int)),
                   this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->HeartBeatTimeout,
+                  SIGNAL(valueChanged(int)),
+                  this, SIGNAL(changesAvailable()));
 }
 
+//-----------------------------------------------------------------------------
 pqApplicationOptions::~pqApplicationOptions()
 {
   delete this->Internal;
 }
 
+//-----------------------------------------------------------------------------
 void pqApplicationOptions::setPage(const QString &page)
 {
   int count = this->Internal->stackedWidget->count();
@@ -106,6 +112,7 @@ void pqApplicationOptions::setPage(const QString &page)
     }
 }
 
+//-----------------------------------------------------------------------------
 QStringList pqApplicationOptions::getPageList()
 {
   QStringList pages;
@@ -118,16 +125,18 @@ QStringList pqApplicationOptions::getPageList()
   return pages;
 }
   
+//-----------------------------------------------------------------------------
 void pqApplicationOptions::applyChanges()
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
   settings->setValue("defaultViewType", 
     this->Internal->DefaultViewType->itemData(
       this->Internal->DefaultViewType->currentIndex()));
-
-
+  pqServer::setHeartBeatTimeoutSetting(
+    this->Internal->HeartBeatTimeout->value()*60*1000);
 }
 
+//-----------------------------------------------------------------------------
 void pqApplicationOptions::resetChanges()
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
@@ -138,5 +147,7 @@ void pqApplicationOptions::resetChanges()
   index = (index==-1)? 0 : index;
   this->Internal->DefaultViewType->setCurrentIndex(index);
 
+  this->Internal->HeartBeatTimeout->setValue(
+    pqServer::getHeartBeatTimeoutSetting()/(60*1000));
 }
 
