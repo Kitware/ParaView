@@ -100,6 +100,13 @@ public:
   /// the command line options specified on the remote server, if any.
  vtkPVServerInformation* getServerInformation() const;
 
+  /// Get/Set the application wide heart beat timeout setting.
+  /// Heartbeats are used in case of remote server connections to avoid the
+  /// connection timing out due to inactivity. When set, the client send a
+  /// heartbeat message to all servers every \c msec milliseconds.
+  static void setHeartBeatTimeoutSetting(int msec);
+  static int getHeartBeatTimeoutSetting();
+
 signals:
   /// Fired when the name of the proxy is changed.
   void nameChanged(pqServerManagerModelItem*);
@@ -118,6 +125,16 @@ signals:
 protected:
   // Creates the TimeKeeper proxy for this connection.
   void createTimeKeeper();
+
+  /// Returns the string key used for the heart beat time interval.
+  static const char* HEARBEAT_TIME_SETTING_KEY();
+
+  /// Set the heartbeat timeout for this instance of pqServer.
+  void setHeartBeatTimeout(int msec);
+
+protected slots:
+  /// Called to send a heartbeat to the server.
+  void heartBeat();
 
 private:
   pqServer(const pqServer&);  // Not implemented.
