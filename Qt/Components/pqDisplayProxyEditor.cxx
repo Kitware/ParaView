@@ -119,7 +119,7 @@ pqDisplayProxyEditor::pqDisplayProxyEditor(pqPipelineRepresentation* repr, QWidg
   QObject::connect(this->Internal->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(updateAllViews()));
   QObject::connect(this->Internal->EditCubeAxes, SIGNAL(clicked(bool)),
-    this, SLOT(editCubeAxes()), Qt::QueuedConnection);
+    this, SLOT(editCubeAxes()));
 }
 
 //-----------------------------------------------------------------------------
