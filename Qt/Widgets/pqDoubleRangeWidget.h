@@ -43,6 +43,9 @@ class QTWIDGETS_EXPORT pqDoubleRangeWidget : public QWidget
 {
   Q_OBJECT
   Q_PROPERTY(double value READ value WRITE setValue)
+  Q_PROPERTY(double minimum READ minimum WRITE setMinimum)
+  Q_PROPERTY(double maximum READ maximum WRITE setMaximum)
+  Q_PROPERTY(bool   strictRange READ strictRange WRITE setStrictRange)
 public:
   /// constructor requires the proxy, property
   pqDoubleRangeWidget(QWidget* parent = NULL);
@@ -55,6 +58,9 @@ public:
   double minimum() const;
   // get the max range value
   double maximum() const;
+ 
+  // returns whether the line edit is also limited 
+  bool strictRange() const;
   
 signals:
   /// signal the value changed
@@ -71,11 +77,12 @@ public slots:
 
   // set the range on both the slider and line edit's validator
   // whereas other methods just do it on the slider
-  void setStrictRange(double min, double max);
+  void setStrictRange(bool);
 
 private slots:
   void sliderChanged(int);
   void textChanged(const QString&);
+  void updateValidator();
 
 private:
   double Value;
@@ -84,6 +91,7 @@ private:
   QSlider* Slider;
   QLineEdit* LineEdit;
   bool BlockUpdate;
+  bool StrictRange;
 };
 
 #endif

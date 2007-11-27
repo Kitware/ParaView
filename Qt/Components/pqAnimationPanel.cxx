@@ -54,7 +54,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationManager.h"
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
-#include "pqDoubleSpinBoxDomain.h"
 #include "pqKeyFrameTimeValidator.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"

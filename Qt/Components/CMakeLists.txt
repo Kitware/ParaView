@@ -87,8 +87,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDisplayProxyEditor.h
   pqDisplayProxyEditorWidget.h
   pqDisplayRepresentationWidget.h
-  pqDoubleRangeWidgetDomain.h
-  pqDoubleSpinBoxDomain.h
   pqEditServerStartupDialog.h
   pqExodusIIPanel.h
   pqExodusPanel.h
@@ -106,7 +104,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqHandleWidget.h
   pqImageTip.h
   pqImplicitPlaneWidget.h
-  pqIntRangeWidgetDomain.h
   pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.h
   pqKeyFrameTypeWidget.h
@@ -170,14 +167,12 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSignalAdaptorSelectionTreeWidget.h
   pqSignalAdaptorTreeWidget.h
   pqSimpleServerStartup.h
-  pqSliderDomain.h
   pqSourceComboBox.h
   #pqSourceHistoryModel.h
   #pqSourceInfoFilterModel.h
   #pqSourceInfoGroupMap.h
   #pqSourceInfoIcons.h
   #pqSourceInfoModel.h
-  pqSpinBoxDomain.h
   pqSpreadSheetDisplayEditor.h
   pqStreamTracerPanel.h
   pqTextDisplayPropertiesWidget.h
@@ -188,6 +183,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqViewContextMenuHandler.h
   pqViewContextMenuManager.h
   pqViewManager.h
+  pqWidgetRangeDomain.h
   pqWriterDialog.h
   pqXDMFPanel.h
   pqXYPlotDisplayProxyEditor.h
@@ -406,10 +402,6 @@ ADD_LIBRARY(pqComponents
   pqDisplayProxyEditorWidget.cxx
   pqDisplayRepresentationWidget.cxx
   pqDisplayRepresentationWidget.h
-  pqDoubleRangeWidgetDomain.cxx
-  pqDoubleRangeWidgetDomain.h
-  pqDoubleSpinBoxDomain.cxx
-  pqDoubleSpinBoxDomain.h
   pqEditServerStartupDialog.cxx
   pqEditServerStartupDialog.h
   pqExodusIIPanel.cxx
@@ -444,8 +436,6 @@ ADD_LIBRARY(pqComponents
   pqImageTip.h
   pqImplicitPlaneWidget.cxx
   pqImplicitPlaneWidget.h
-  pqIntRangeWidgetDomain.cxx
-  pqIntRangeWidgetDomain.h
   pqKeyFrameEditor.cxx
   pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.cxx
@@ -576,8 +566,6 @@ ADD_LIBRARY(pqComponents
   pqSignalAdaptorTreeWidget.h
   pqSimpleServerStartup.cxx
   pqSimpleServerStartup.h
-  pqSliderDomain.cxx
-  pqSliderDomain.h
   pqSourceComboBox.cxx
   pqSourceComboBox.h
   #pqSourceHistoryModel.cxx
@@ -592,8 +580,6 @@ ADD_LIBRARY(pqComponents
   #pqSourceInfoModel.h
   #pqSourceProxyInfo.cxx
   #pqSourceProxyInfo.h
-  pqSpinBoxDomain.cxx
-  pqSpinBoxDomain.h
   pqSplitViewUndoElement.cxx
   pqSplitViewUndoElement.h
   pqStateLoader.cxx
@@ -621,6 +607,8 @@ ADD_LIBRARY(pqComponents
   pqViewContextMenuManager.h
   pqViewManager.cxx
   pqViewManager.h
+  pqWidgetRangeDomain.cxx
+  pqWidgetRangeDomain.h
   pqWriterDialog.cxx
   pqWriterDialog.h
   pqXDMFPanel.cxx

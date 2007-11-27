@@ -67,11 +67,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCollapsedGroup.h"
 #include "pqComboBoxDomain.h"
-#include "pqDoubleRangeWidgetDomain.h"
 #include "pqDoubleRangeWidget.h"
 #include "pqIntRangeWidget.h"
-#include "pqIntRangeWidgetDomain.h"
-#include "pqDoubleSpinBoxDomain.h"
+#include "pqWidgetRangeDomain.h"
 #include "pqFieldSelectionAdaptor.h"
 #include "pqFileChooserWidget.h"
 #include "pqListWidgetItemObject.h"
@@ -83,11 +81,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerObserver.h"
 #include "pqSignalAdaptorSelectionTreeWidget.h"
 #include "pqSignalAdaptors.h"
-#include "pqSliderDomain.h"
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
 #include "pqSMSignalAdaptors.h"
-#include "pqSpinBoxDomain.h"
 #include "pqTreeWidgetCheckHelper.h"
 #include "pqTreeWidget.h"
 #include "pqTreeWidgetItemObject.h"
@@ -169,8 +165,8 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
           }
         else if(sl)
           {
-          pqSliderDomain* d0 = new
-            pqSliderDomain(sl, SMProperty, index);
+          pqWidgetRangeDomain* d0 = new
+            pqWidgetRangeDomain(sl, "minimum", "maximum", SMProperty, index);
           d0->setObjectName("SliderDomain");
           property_manager->registerLink(
             sl, "value", SIGNAL(valueChanged(int)),
@@ -178,24 +174,24 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
           }
         else if(doubleSpinBox)
           {
-          pqDoubleSpinBoxDomain* d0 = new
-            pqDoubleSpinBoxDomain(doubleSpinBox, SMProperty, index);
+          pqWidgetRangeDomain* d0 = new
+            pqWidgetRangeDomain(doubleSpinBox, "minimum", "maximum", SMProperty, index);
           d0->setObjectName("DoubleSpinBoxDomain");
           property_manager->registerLink(doubleSpinBox, "value", SIGNAL(valueChanged(double)),
                                              proxy, SMProperty, index);
           }
         else if(doubleRange)
           {
-          pqDoubleRangeWidgetDomain* d0 = new
-            pqDoubleRangeWidgetDomain(doubleRange, SMProperty, index);
+          pqWidgetRangeDomain* d0 = new
+            pqWidgetRangeDomain(doubleRange, "minimum", "maximum", SMProperty, index);
           d0->setObjectName("DoubleRangeWidgetDomain");
           property_manager->registerLink(doubleRange, "value", SIGNAL(valueChanged(double)),
                                              proxy, SMProperty, index);
           }
         else if(spinBox)
           {
-          pqSpinBoxDomain* d0 = new
-            pqSpinBoxDomain(spinBox, SMProperty, index);
+          pqWidgetRangeDomain* d0 = new
+            pqWidgetRangeDomain(spinBox, "minimum", "maximum", SMProperty, index);
           d0->setObjectName("SpinBoxDomain");
           property_manager->registerLink(spinBox, "value",
                                          SIGNAL(valueChanged(int)),
@@ -369,8 +365,8 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
       }
     else if(slider)
       {
-      pqSliderDomain* d0 = new
-        pqSliderDomain(slider, SMProperty);
+      pqWidgetRangeDomain* d0 = new
+        pqWidgetRangeDomain(slider, "minimum", "maximum", SMProperty);
       d0->setObjectName("SliderDomain");
       property_manager->registerLink(
         slider, "value", SIGNAL(valueChanged(int)),
@@ -378,8 +374,8 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
       }
     else if(doubleSpinBox)
       {
-      pqDoubleSpinBoxDomain* d0 = new
-        pqDoubleSpinBoxDomain(doubleSpinBox, SMProperty);
+      pqWidgetRangeDomain* d0 = new
+        pqWidgetRangeDomain(doubleSpinBox, "minimum", "maximum", SMProperty);
       d0->setObjectName("DoubleSpinBoxDomain");
       property_manager->registerLink(
         doubleSpinBox, "value", SIGNAL(valueChanged(double)),
@@ -387,8 +383,8 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
       }
     else if(doubleRange)
       {
-      pqDoubleRangeWidgetDomain* d0 = new
-        pqDoubleRangeWidgetDomain(doubleRange, SMProperty);
+      pqWidgetRangeDomain* d0 = new
+        pqWidgetRangeDomain(doubleRange, "minimum", "maximum", SMProperty);
       d0->setObjectName("DoubleRangeWidgetDomain");
       property_manager->registerLink(
         doubleRange, "value", SIGNAL(valueChanged(double)),
@@ -396,8 +392,8 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
       }
     else if(intRange)
       {
-      pqIntRangeWidgetDomain* d0 = new
-        pqIntRangeWidgetDomain(intRange, SMProperty);
+      pqWidgetRangeDomain* d0 = new
+        pqWidgetRangeDomain(intRange, "minimum", "maximum", SMProperty);
       d0->setObjectName("IntRangeWidgetDomain");
       property_manager->registerLink(
         intRange, "value", SIGNAL(valueChanged(int)),
@@ -405,8 +401,8 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
       }
     else if(spinBox)
       {
-      pqSpinBoxDomain* d0 = new
-        pqSpinBoxDomain(spinBox, SMProperty);
+      pqWidgetRangeDomain* d0 = new
+        pqWidgetRangeDomain(spinBox, "minimum", "maximum", SMProperty);
       d0->setObjectName("SpinBoxDomain");
 
       property_manager->registerLink(
@@ -555,8 +551,8 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
           }
         else if(sl)
           {
-          pqSliderDomain* d0 = 
-            sl->findChild<pqSliderDomain*>("SliderDomain");
+          pqWidgetRangeDomain* d0 = 
+            sl->findChild<pqWidgetRangeDomain*>("SliderDomain");
           if(d0)
             {
             delete d0;
@@ -567,8 +563,8 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
           }
         else if(doubleSpinBox)
           {
-          pqDoubleSpinBoxDomain* d0 = 
-            doubleSpinBox->findChild<pqDoubleSpinBoxDomain*>("DoubleSpinBoxDomain");
+          pqWidgetRangeDomain* d0 = 
+            doubleSpinBox->findChild<pqWidgetRangeDomain*>("DoubleSpinBoxDomain");
           if(d0)
             {
             delete d0;
@@ -580,8 +576,8 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
           }
         else if(doubleRange)
           {
-          pqDoubleRangeWidgetDomain* d0 = 
-            doubleRange->findChild<pqDoubleRangeWidgetDomain*>("DoubleRangeWidgetDomain");
+          pqWidgetRangeDomain* d0 = 
+            doubleRange->findChild<pqWidgetRangeDomain*>("DoubleRangeWidgetDomain");
           if(d0)
             {
             delete d0;
@@ -593,8 +589,8 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
           }
         else if(spinBox)
           {
-          pqSpinBoxDomain* d0 = 
-            spinBox->findChild<pqSpinBoxDomain*>("SpinBoxDomain");
+          pqWidgetRangeDomain* d0 = 
+            spinBox->findChild<pqWidgetRangeDomain*>("SpinBoxDomain");
           if(d0)
             {
             delete d0;
@@ -737,8 +733,8 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
       }
     else if(slider)
       {
-      pqSliderDomain* d0 = 
-        slider->findChild<pqSliderDomain*>("SliderDomain");
+      pqWidgetRangeDomain* d0 = 
+        slider->findChild<pqWidgetRangeDomain*>("SliderDomain");
       if(d0)
         {
         delete d0;
@@ -749,8 +745,8 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
       }
     else if(doubleSpinBox)
       {
-      pqDoubleSpinBoxDomain* d0 = 
-        doubleSpinBox->findChild<pqDoubleSpinBoxDomain*>("DoubleSpinBoxDomain");
+      pqWidgetRangeDomain* d0 = 
+        doubleSpinBox->findChild<pqWidgetRangeDomain*>("DoubleSpinBoxDomain");
       if(d0)
         {
         delete d0;
@@ -761,8 +757,8 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
       }
     else if(doubleRange)
       {
-      pqDoubleRangeWidgetDomain* d0 = 
-        doubleRange->findChild<pqDoubleRangeWidgetDomain*>("DoubleRangeWidgetDomain");
+      pqWidgetRangeDomain* d0 = 
+        doubleRange->findChild<pqWidgetRangeDomain*>("DoubleRangeWidgetDomain");
       if(d0)
         {
         delete d0;
@@ -773,8 +769,8 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
       }
     else if(spinBox)
       {
-      pqSpinBoxDomain* d0 = 
-        spinBox->findChild<pqSpinBoxDomain*>("SpinBoxDomain");
+      pqWidgetRangeDomain* d0 = 
+        spinBox->findChild<pqWidgetRangeDomain*>("SpinBoxDomain");
       if(d0)
         {
         delete d0;
@@ -785,8 +781,8 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
       }
     else if(intRange)
       {
-      pqIntRangeWidgetDomain* i0 = 
-        doubleRange->findChild<pqIntRangeWidgetDomain*>("IntRangeWidgetDomain");
+      pqWidgetRangeDomain* i0 = 
+        doubleRange->findChild<pqWidgetRangeDomain*>("IntRangeWidgetDomain");
       if(i0)
         {
         delete i0;

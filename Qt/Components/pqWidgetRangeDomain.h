@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSpinBoxDomain.h
+   Module:    pqWidgetRangeDomain.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,27 +30,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef pq_SpinBoxDomain_h
-#define pq_SpinBoxDomain_h
+#ifndef pq_WidgetRangeDomain_h
+#define pq_WidgetRangeDomain_h
 
 #include <QObject>
 #include "pqComponentsExport.h"
 
-class QSpinBox;
 class vtkSMProperty;
+class QWidget;
 
-/// combo box domain 
-/// observers the domain for a combo box and updates accordingly
-class PQCOMPONENTS_EXPORT pqSpinBoxDomain : public QObject
+/// observes the domain for a property and updates the 
+/// minimum and/or maximum properties of the object
+class PQCOMPONENTS_EXPORT pqWidgetRangeDomain : public QObject
 {
   Q_OBJECT
 public:
-  /// constructor requires a QSpinBox, 
-  /// and the property with the domain to observe
-  /// the list of values in the combo box is automatically 
-  /// updated when the domain changes
-  pqSpinBoxDomain(QSpinBox* p, vtkSMProperty* prop, int index=-1);
-  ~pqSpinBoxDomain();
+  pqWidgetRangeDomain(QWidget* p, const QString& minProp, const QString& maxProp,
+                      vtkSMProperty* prop, int index=-1);
+  ~pqWidgetRangeDomain();
 
 public slots:
   void domainChanged();
@@ -58,6 +55,10 @@ protected slots:
   void internalDomainChanged();
 
 protected:
+  virtual void setRange(QVariant min, QVariant max);
+
+  QWidget* getWidget() const;
+private:
   class pqInternal;
   pqInternal* Internal;
 };

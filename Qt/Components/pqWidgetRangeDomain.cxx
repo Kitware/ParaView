@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqDoubleSpinBoxDomain.cxx
+   Module:    pqWidgetRangeDomain.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -31,11 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 // self include
-#include "pqDoubleSpinBoxDomain.h"
+#include "pqWidgetRangeDomain.h"
 
 // Qt includes
-#include <QDoubleSpinBox>
 #include <QTimer>
+#include <QWidget>
 
 // VTK includes
 #include <vtkSmartPointer.h>
@@ -45,14 +45,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMProperty.h>
 #include <vtkSMDomain.h>
 #include <vtkSMDomainIterator.h>
+#include <vtkSMEnumerationDomain.h>
 #include <vtkSMDoubleRangeDomain.h>
-
+#include <vtkSMIntRangeDomain.h>
 
 // ParaView includes
 #include <pqSMAdaptor.h>
 
   
-class pqDoubleSpinBoxDomain::pqInternal
+class pqWidgetRangeDomain::pqInternal
 {
 public:
   pqInternal()
@@ -64,6 +65,8 @@ public:
     {
     this->Connection->Delete();
     }
+  QString MinProp;
+  QString MaxProp;
   vtkSmartPointer<vtkSMProperty> Property;
   int Index;
   vtkSmartPointer<vtkSMDomain> Domain;
@@ -72,10 +75,13 @@ public:
 };
   
 
-pqDoubleSpinBoxDomain::pqDoubleSpinBoxDomain(QDoubleSpinBox* p, vtkSMProperty* prop, int index)
+pqWidgetRangeDomain::pqWidgetRangeDomain(QWidget* p, const QString& minProp,
+  const QString& maxProp, vtkSMProperty* prop, int index)
   : QObject(p)
 {
   this->Internal = new pqInternal();
+  this->Internal->MinProp = minProp;
+  this->Internal->MaxProp = maxProp;
   this->Internal->Property = prop;
   this->Internal->Index = index;
 
@@ -84,11 +90,25 @@ pqDoubleSpinBoxDomain::pqDoubleSpinBoxDomain(QDoubleSpinBox* p, vtkSMProperty* p
   iter->Begin();
   while(!iter->IsAtEnd() && !this->Internal->Domain)
     {
+    vtkSMEnumerationDomain* enumeration;
+    enumeration = vtkSMEnumerationDomain::SafeDownCast(iter->GetDomain());
+    if(enumeration)
+      {
+      this->Internal->Domain = enumeration;
+      }
+
     vtkSMDoubleRangeDomain* drange;
     drange = vtkSMDoubleRangeDomain::SafeDownCast(iter->GetDomain());
     if(drange)
       {
       this->Internal->Domain = drange;
+      }
+    
+    vtkSMIntRangeDomain* irange;
+    irange = vtkSMIntRangeDomain::SafeDownCast(iter->GetDomain());
+    if(irange)
+      {
+      this->Internal->Domain = irange;
       }
     iter->Next();
     }
@@ -96,6 +116,15 @@ pqDoubleSpinBoxDomain::pqDoubleSpinBoxDomain(QDoubleSpinBox* p, vtkSMProperty* p
 
   if(this->Internal->Domain)
     {
+    if(this->Internal->Domain->GetClassName() ==
+       QString("vtkSMDoubleRangeDomain") ||
+       this->Internal->Domain->GetClassName() ==
+       QString("vtkSMIntRangeDomain"))
+      {
+      // some widgets use domain as hint, this tells the widget to be strict
+      this->getWidget()->setProperty("strictRange", true);
+      }
+
     this->Internal->Connection->Connect(this->Internal->Domain, 
                                         vtkCommand::DomainModifiedEvent,
                                         this,
@@ -106,12 +135,12 @@ pqDoubleSpinBoxDomain::pqDoubleSpinBoxDomain(QDoubleSpinBox* p, vtkSMProperty* p
 }
 
 
-pqDoubleSpinBoxDomain::~pqDoubleSpinBoxDomain()
+pqWidgetRangeDomain::~pqWidgetRangeDomain()
 {
   delete this->Internal;
 }
 
-void pqDoubleSpinBoxDomain::domainChanged()
+void pqWidgetRangeDomain::domainChanged()
 {
   if(this->Internal->MarkedForUpdate)
     {
@@ -123,56 +152,45 @@ void pqDoubleSpinBoxDomain::domainChanged()
 }
 
 //-----------------------------------------------------------------------------
-void pqDoubleSpinBoxDomain::setRange(double min, double max)
+void pqWidgetRangeDomain::setRange(QVariant min, QVariant max)
 {
-  QDoubleSpinBox* spinbox = this->getSpinBox();
-  if(!spinbox)
+  QWidget* range = this->getWidget();
+  if(range)
     {
-    return;
+    if(!this->Internal->MinProp.isEmpty())
+      {
+      range->setProperty(this->Internal->MinProp.toAscii().data(), min);
+      }
+    if(!this->Internal->MaxProp.isEmpty())
+      {
+      range->setProperty(this->Internal->MaxProp.toAscii().data(), max);
+      }
     }
-  spinbox->setRange(min, max);
 }
 
 //-----------------------------------------------------------------------------
-void pqDoubleSpinBoxDomain::setSingleStep(double step)
+QWidget* pqWidgetRangeDomain::getWidget() const
 {
-  QDoubleSpinBox* spinbox = this->getSpinBox();
-  if(!spinbox)
-    {
-    return;
-    }
-  spinbox->setSingleStep(step);
+  QWidget* range = qobject_cast<QWidget*>(this->parent());
+  Q_ASSERT(range != NULL);
+  return range;
 }
 
 //-----------------------------------------------------------------------------
-QDoubleSpinBox* pqDoubleSpinBoxDomain::getSpinBox() const
-{
-  QDoubleSpinBox* spinbox = qobject_cast<QDoubleSpinBox*>(this->parent());
-  Q_ASSERT(spinbox != NULL);
-  return spinbox;
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleSpinBoxDomain::internalDomainChanged()
+void pqWidgetRangeDomain::internalDomainChanged()
 {
   pqSMAdaptor::PropertyType type;
   type = pqSMAdaptor::getPropertyType(this->Internal->Property);
-  QList<QVariant> range;
+  int index = type == pqSMAdaptor::SINGLE_ELEMENT ? 0 : this->Internal->Index;
 
-  int idx = type == pqSMAdaptor::MULTIPLE_ELEMENTS ? this->Internal->Index : 0;
-  range = pqSMAdaptor::getMultipleElementPropertyDomain(this->Internal->Property,
-                                                        idx);
+  QList<QVariant> range = pqSMAdaptor::getMultipleElementPropertyDomain(
+    this->Internal->Property, index);
+
   if(range.size() == 2)
     {
-    range = pqSMAdaptor::getMultipleElementPropertyDomain(this->Internal->Property,
-                                                          this->Internal->Index);
-    double min = range[0].canConvert(QVariant::Double) ?
-      range[0].toDouble() : VTK_DOUBLE_MIN;
-    double max = range[1].canConvert(QVariant::Double) ?
-      range[1].toDouble() : VTK_DOUBLE_MAX;
-    this->setSingleStep(1.0);
-    this->setRange(min, max);
+    this->setRange(range[0], range[1]);
     }
+
   this->Internal->MarkedForUpdate = false;
 }
 

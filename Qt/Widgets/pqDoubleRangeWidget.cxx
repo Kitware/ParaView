@@ -45,6 +45,7 @@ pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
   this->Value = 0;
   this->Minimum = 0;
   this->Maximum = 1;
+  this->StrictRange = false;
 
   QHBoxLayout* l = new QHBoxLayout(this);
   l->setMargin(0);
@@ -105,22 +106,57 @@ void pqDoubleRangeWidget::setValue(double val)
 }
 
 //-----------------------------------------------------------------------------
+double pqDoubleRangeWidget::maximum() const
+{
+  return this->Maximum;
+}
+
+//-----------------------------------------------------------------------------
 void pqDoubleRangeWidget::setMaximum(double val)
 {
   this->Maximum = val;
+  this->updateValidator();
+}
+
+//-----------------------------------------------------------------------------
+double pqDoubleRangeWidget::minimum() const
+{
+  return this->Minimum;
 }
 
 //-----------------------------------------------------------------------------
 void pqDoubleRangeWidget::setMinimum(double val)
 {
   this->Minimum = val;
+  this->updateValidator();
 }
 
-void pqDoubleRangeWidget::setStrictRange(double min, double max)
+//-----------------------------------------------------------------------------
+void pqDoubleRangeWidget::updateValidator()
 {
-  this->setMinimum(min);
-  this->setMaximum(max);
-  this->LineEdit->setValidator(new QDoubleValidator(min, max, 0, this->LineEdit));
+  if(this->StrictRange)
+    {
+    this->LineEdit->setValidator(new QDoubleValidator(this->minimum(),
+        this->maximum(), 100, this->LineEdit));
+    }
+  else
+    {
+    this->LineEdit->setValidator(new QDoubleValidator(this->LineEdit));
+    }
+}
+
+//-----------------------------------------------------------------------------
+bool pqDoubleRangeWidget::strictRange() const
+{
+  const QDoubleValidator* dv =
+    qobject_cast<const QDoubleValidator*>(this->LineEdit->validator());
+  return dv->bottom() == this->minimum() && dv->top() == this->maximum();
+}
+
+void pqDoubleRangeWidget::setStrictRange(bool s)
+{
+  this->StrictRange = s;
+  this->updateValidator();
 }
 
 //-----------------------------------------------------------------------------
