@@ -47,6 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextEdit>
 #include <QTreeWidget>
 #include <QLabel>
+#include <QMetaObject>
+#include <QMetaProperty>
 
 // VTK includes
 
@@ -152,50 +154,11 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
         }
       if(index != -1)
         {
-        QLineEdit* le = qobject_cast<QLineEdit*>(propertyWidget);
-        QSlider* sl = qobject_cast<QSlider*>(propertyWidget);
-        QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(object);
-        pqDoubleRangeWidget* doubleRange = qobject_cast<pqDoubleRangeWidget*>(object);
-        QSpinBox* spinBox = qobject_cast<QSpinBox*>(object);
-        if(le)
+        QString userProperty, userSignal;
+        if(pqNamedWidgets::propertyInformation(propertyWidget, userProperty, userSignal))
           {
-          property_manager->registerLink(
-            le, "text", SIGNAL(textChanged(const QString&)),
-            proxy, SMProperty, index);
-          }
-        else if(sl)
-          {
-          pqWidgetRangeDomain* d0 = new
-            pqWidgetRangeDomain(sl, "minimum", "maximum", SMProperty, index);
-          d0->setObjectName("SliderDomain");
-          property_manager->registerLink(
-            sl, "value", SIGNAL(valueChanged(int)),
-            proxy, SMProperty, index);
-          }
-        else if(doubleSpinBox)
-          {
-          pqWidgetRangeDomain* d0 = new
-            pqWidgetRangeDomain(doubleSpinBox, "minimum", "maximum", SMProperty, index);
-          d0->setObjectName("DoubleSpinBoxDomain");
-          property_manager->registerLink(doubleSpinBox, "value", SIGNAL(valueChanged(double)),
-                                             proxy, SMProperty, index);
-          }
-        else if(doubleRange)
-          {
-          pqWidgetRangeDomain* d0 = new
-            pqWidgetRangeDomain(doubleRange, "minimum", "maximum", SMProperty, index);
-          d0->setObjectName("DoubleRangeWidgetDomain");
-          property_manager->registerLink(doubleRange, "value", SIGNAL(valueChanged(double)),
-                                             proxy, SMProperty, index);
-          }
-        else if(spinBox)
-          {
-          pqWidgetRangeDomain* d0 = new
-            pqWidgetRangeDomain(spinBox, "minimum", "maximum", SMProperty, index);
-          d0->setObjectName("SpinBoxDomain");
-          property_manager->registerLink(spinBox, "value",
-                                         SIGNAL(valueChanged(int)),
-                                         proxy, SMProperty, index);
+          pqNamedWidgets::linkObject(propertyWidget, userProperty, userSignal,
+            proxy, SMProperty, index, property_manager);
           }
         }
       }
@@ -203,18 +166,8 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
   else if(pt == pqSMAdaptor::ENUMERATION)
     {
     // enumerations can be combo boxes or check boxes
-    QCheckBox* checkBox = qobject_cast<QCheckBox*>(object);
     QComboBox* comboBox = qobject_cast<QComboBox*>(object);
-    QLineEdit* lineEdit = qobject_cast<QLineEdit*>(object);
-    pqTreeWidget* treeWidget = 
-      qobject_cast<pqTreeWidget*>(object);
-    if(checkBox)
-      {
-      property_manager->registerLink(
-        checkBox, "checked", SIGNAL(toggled(bool)),
-        proxy, SMProperty);
-      }
-    else if(comboBox)
+    if(comboBox)
       {
       pqComboBoxDomain* d0 = new pqComboBoxDomain(comboBox, SMProperty);
       d0->setObjectName("ComboBoxDomain");
@@ -226,15 +179,14 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
         adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
         proxy, SMProperty);
       }
-    else if(lineEdit)
+    else
       {
-      property_manager->registerLink(
-        lineEdit, "text", SIGNAL(textChanged(const QString&)),
-        proxy, SMProperty);
-      }
-    else if (treeWidget)
-      {
-      Q_ASSERT("invalid tree widget for enumeration\n" == 0);
+      QString userProperty, userSignal;
+      if(pqNamedWidgets::propertyInformation(object, userProperty, userSignal))
+        {
+        pqNamedWidgets::linkObject(object, userProperty, userSignal,
+          proxy, SMProperty, -1, property_manager);
+        }
       }
     }
   else if(pt == pqSMAdaptor::SELECTION)
@@ -324,16 +276,10 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
 
       }
     }
-  else if(pt == pqSMAdaptor::SINGLE_ELEMENT)
+  else if(pt == pqSMAdaptor::SINGLE_ELEMENT || pt == pqSMAdaptor::FILE_LIST)
     {
     QComboBox* comboBox = qobject_cast<QComboBox*>(object);
-    QLineEdit* lineEdit = qobject_cast<QLineEdit*>(object);
     QTextEdit* textEdit = qobject_cast<QTextEdit*>(object);
-    QSlider* slider = qobject_cast<QSlider*>(object);
-    QSpinBox* spinBox = qobject_cast<QSpinBox*>(object);
-    QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(object);
-    pqDoubleRangeWidget* doubleRange = qobject_cast<pqDoubleRangeWidget*>(object);
-    pqIntRangeWidget* intRange = qobject_cast<pqIntRangeWidget*>(object);
 
     if(comboBox)
       {
@@ -348,12 +294,6 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
         adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
         proxy, SMProperty);
       }
-    else if(lineEdit)
-      {
-      property_manager->registerLink(
-        lineEdit, "text", SIGNAL(textChanged(const QString&)),
-        proxy, SMProperty);
-      }
     else if(textEdit)
       {
       pqSignalAdaptorTextEdit *adaptor = 
@@ -363,69 +303,14 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
         adaptor, "text", SIGNAL(textChanged()),
         proxy, SMProperty);
       }
-    else if(slider)
+    else
       {
-      pqWidgetRangeDomain* d0 = new
-        pqWidgetRangeDomain(slider, "minimum", "maximum", SMProperty);
-      d0->setObjectName("SliderDomain");
-      property_manager->registerLink(
-        slider, "value", SIGNAL(valueChanged(int)),
-        proxy, SMProperty);
-      }
-    else if(doubleSpinBox)
-      {
-      pqWidgetRangeDomain* d0 = new
-        pqWidgetRangeDomain(doubleSpinBox, "minimum", "maximum", SMProperty);
-      d0->setObjectName("DoubleSpinBoxDomain");
-      property_manager->registerLink(
-        doubleSpinBox, "value", SIGNAL(valueChanged(double)),
-        proxy, SMProperty);
-      }
-    else if(doubleRange)
-      {
-      pqWidgetRangeDomain* d0 = new
-        pqWidgetRangeDomain(doubleRange, "minimum", "maximum", SMProperty);
-      d0->setObjectName("DoubleRangeWidgetDomain");
-      property_manager->registerLink(
-        doubleRange, "value", SIGNAL(valueChanged(double)),
-        proxy, SMProperty);
-      }
-    else if(intRange)
-      {
-      pqWidgetRangeDomain* d0 = new
-        pqWidgetRangeDomain(intRange, "minimum", "maximum", SMProperty);
-      d0->setObjectName("IntRangeWidgetDomain");
-      property_manager->registerLink(
-        intRange, "value", SIGNAL(valueChanged(int)),
-        proxy, SMProperty);
-      }
-    else if(spinBox)
-      {
-      pqWidgetRangeDomain* d0 = new
-        pqWidgetRangeDomain(spinBox, "minimum", "maximum", SMProperty);
-      d0->setObjectName("SpinBoxDomain");
-
-      property_manager->registerLink(
-        spinBox, "value", SIGNAL(valueChanged(int)),
-        proxy, SMProperty);
-      }
-    }
-  else if(pt == pqSMAdaptor::FILE_LIST)
-    {
-    QLineEdit* lineEdit = qobject_cast<QLineEdit*>(object);
-    pqFileChooserWidget* chooser = 
-           qobject_cast<pqFileChooserWidget*>(object);
-    if(lineEdit)
-      {
-      property_manager->registerLink(
-        lineEdit, "text", SIGNAL(textChanged(const QString&)),
-        proxy, SMProperty);
-      }
-    else if(chooser)
-      {
-      property_manager->registerLink(
-        chooser, "Filename", SIGNAL(filenameChanged(const QString&)),
-        proxy, SMProperty);
+      QString userProperty, userSignal;
+      if(pqNamedWidgets::propertyInformation(object, userProperty, userSignal))
+        {
+        pqNamedWidgets::linkObject(object, userProperty, userSignal,
+          proxy, SMProperty, -1, property_manager);
+        }
       }
     }
   else if(pt == pqSMAdaptor::FIELD_SELECTION)
@@ -538,67 +423,11 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
         }
       if(index != -1)
         {
-        QLineEdit* le = qobject_cast<QLineEdit*>(propertyWidget);
-        QSlider* sl = qobject_cast<QSlider*>(propertyWidget);
-        QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(propertyWidget);
-        pqDoubleRangeWidget* doubleRange = qobject_cast<pqDoubleRangeWidget*>(propertyWidget);
-        QSpinBox* spinBox = qobject_cast<QSpinBox*>(propertyWidget);
-        if(le)
+        QString userProperty, userSignal;
+        if(pqNamedWidgets::propertyInformation(propertyWidget, userProperty, userSignal))
           {
-          property_manager->unregisterLink(
-            le, "text", SIGNAL(textChanged(const QString&)),
-            proxy, SMProperty, index);
-          }
-        else if(sl)
-          {
-          pqWidgetRangeDomain* d0 = 
-            sl->findChild<pqWidgetRangeDomain*>("SliderDomain");
-          if(d0)
-            {
-            delete d0;
-            }
-          property_manager->unregisterLink(
-            sl, "value", SIGNAL(valueChanged(int)),
-            proxy, SMProperty, index);
-          }
-        else if(doubleSpinBox)
-          {
-          pqWidgetRangeDomain* d0 = 
-            doubleSpinBox->findChild<pqWidgetRangeDomain*>("DoubleSpinBoxDomain");
-          if(d0)
-            {
-            delete d0;
-            }
-          property_manager->unregisterLink(doubleSpinBox, 
-                                              "value", 
-                                              SIGNAL(valueChanged(double)),
-                                              proxy, SMProperty);
-          }
-        else if(doubleRange)
-          {
-          pqWidgetRangeDomain* d0 = 
-            doubleRange->findChild<pqWidgetRangeDomain*>("DoubleRangeWidgetDomain");
-          if(d0)
-            {
-            delete d0;
-            }
-          property_manager->unregisterLink(doubleRange, 
-                                              "value", 
-                                              SIGNAL(valueChanged(double)),
-                                              proxy, SMProperty);
-          }
-        else if(spinBox)
-          {
-          pqWidgetRangeDomain* d0 = 
-            spinBox->findChild<pqWidgetRangeDomain*>("SpinBoxDomain");
-          if(d0)
-            {
-            delete d0;
-            }
-          property_manager->unregisterLink(spinBox, 
-                                           "value", 
-                                           SIGNAL(valueChanged(int)),
-                                           proxy, SMProperty);
+          pqNamedWidgets::unlinkObject(propertyWidget, userProperty, userSignal,
+            proxy, SMProperty, index, property_manager);
           }
         }
       }
@@ -606,18 +435,8 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
   else if(pt == pqSMAdaptor::ENUMERATION)
     {
     // enumerations can be combo boxes or check boxes
-    QCheckBox* checkBox = qobject_cast<QCheckBox*>(object);
     QComboBox* comboBox = qobject_cast<QComboBox*>(object);
-    QLineEdit* lineEdit = qobject_cast<QLineEdit*>(object);
-    pqTreeWidget* treeWidget = 
-      qobject_cast<pqTreeWidget*>(object);
-    if(checkBox)
-      {
-      property_manager->unregisterLink(
-        checkBox, "checked", SIGNAL(toggled(bool)),
-        proxy, SMProperty);
-      }
-    else if(comboBox)
+    if(comboBox)
       {
       pqComboBoxDomain* d0 =
         comboBox->findChild<pqComboBoxDomain*>("ComboBoxDomain");
@@ -636,15 +455,14 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
         delete adaptor;
         }
       }
-    else if(lineEdit)
+    else
       {
-      property_manager->unregisterLink(
-        lineEdit, "text", SIGNAL(textChanged(const QString&)),
-        proxy, SMProperty);
-      }
-    else if (treeWidget)
-      {
-      Q_ASSERT("invalid tree widget for enumeration\n" == 0);
+      QString userProperty, userSignal;
+      if(pqNamedWidgets::propertyInformation(object, userProperty, userSignal))
+        {
+        pqNamedWidgets::unlinkObject(object, userProperty, userSignal,
+          proxy, SMProperty, -1, property_manager);
+        }
       }
     }
   else if(pt == pqSMAdaptor::SELECTION)
@@ -690,17 +508,10 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
       delete comboAdaptor;
       }
     }
-  else if(pt == pqSMAdaptor::SINGLE_ELEMENT)
+  else if(pt == pqSMAdaptor::SINGLE_ELEMENT || pt == pqSMAdaptor::FILE_LIST)
     {
     QComboBox* comboBox = qobject_cast<QComboBox*>(object);
-    QLineEdit* lineEdit = qobject_cast<QLineEdit*>(object);
     QTextEdit* textEdit = qobject_cast<QTextEdit*>(object);
-    QSlider* slider = qobject_cast<QSlider*>(object);
-    QSpinBox* spinBox = qobject_cast<QSpinBox*>(object);
-    QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(object);
-    pqDoubleRangeWidget* doubleRange = qobject_cast<pqDoubleRangeWidget*>(object);
-    pqIntRangeWidget* intRange = qobject_cast<pqIntRangeWidget*>(object);
-
     if(comboBox)
       {
       pqComboBoxDomain* d0 =
@@ -717,12 +528,6 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
         proxy, SMProperty);
       delete adaptor;
       }
-    else if(lineEdit)
-      {
-      property_manager->unregisterLink(
-        lineEdit, "text", SIGNAL(textChanged(const QString&)),
-        proxy, SMProperty);
-      }
     else if(textEdit)
       {
       pqSignalAdaptorTextEdit* adaptor = 
@@ -731,83 +536,14 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
         adaptor, "text", SIGNAL(textChanged()),
         proxy, SMProperty);
       }
-    else if(slider)
+    else
       {
-      pqWidgetRangeDomain* d0 = 
-        slider->findChild<pqWidgetRangeDomain*>("SliderDomain");
-      if(d0)
+      QString userProperty, userSignal;
+      if(pqNamedWidgets::propertyInformation(object, userProperty, userSignal))
         {
-        delete d0;
+        pqNamedWidgets::unlinkObject(object, userProperty, userSignal,
+          proxy, SMProperty, -1, property_manager);
         }
-      property_manager->unregisterLink(
-        slider, "value", SIGNAL(valueChanged(int)),
-        proxy, SMProperty);
-      }
-    else if(doubleSpinBox)
-      {
-      pqWidgetRangeDomain* d0 = 
-        doubleSpinBox->findChild<pqWidgetRangeDomain*>("DoubleSpinBoxDomain");
-      if(d0)
-        {
-        delete d0;
-        }
-      property_manager->unregisterLink(
-        doubleSpinBox, "value", SIGNAL(valueChanged(double)),
-        proxy, SMProperty);
-      }
-    else if(doubleRange)
-      {
-      pqWidgetRangeDomain* d0 = 
-        doubleRange->findChild<pqWidgetRangeDomain*>("DoubleRangeWidgetDomain");
-      if(d0)
-        {
-        delete d0;
-        }
-      property_manager->unregisterLink(
-        doubleRange, "value", SIGNAL(valueChanged(double)),
-        proxy, SMProperty);
-      }
-    else if(spinBox)
-      {
-      pqWidgetRangeDomain* d0 = 
-        spinBox->findChild<pqWidgetRangeDomain*>("SpinBoxDomain");
-      if(d0)
-        {
-        delete d0;
-        }
-      property_manager->unregisterLink(
-        spinBox, "value", SIGNAL(valueChanged(int)),
-        proxy, SMProperty);
-      }
-    else if(intRange)
-      {
-      pqWidgetRangeDomain* i0 = 
-        doubleRange->findChild<pqWidgetRangeDomain*>("IntRangeWidgetDomain");
-      if(i0)
-        {
-        delete i0;
-        }
-      property_manager->unregisterLink(
-        intRange, "value", SIGNAL(valueChanged(int)),
-        proxy, SMProperty);
-      }
-    }
-  else if(pt == pqSMAdaptor::FILE_LIST)
-    {
-    QLineEdit* lineEdit = qobject_cast<QLineEdit*>(object);
-    pqFileChooserWidget* chooser = 
-           qobject_cast<pqFileChooserWidget*>(object);
-    if(lineEdit)
-      {
-      property_manager->unregisterLink(
-        lineEdit, "text", SIGNAL(textChanged(const QString&)),
-        proxy, SMProperty);
-      }
-    else if(chooser)
-      {
-      property_manager->unregisterLink(
-        chooser, "Filename", SIGNAL(filenameChanged(const QString&)),
-        proxy, SMProperty);
       }
     }
   else if(pt == pqSMAdaptor::FIELD_SELECTION)
@@ -1064,7 +800,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
       {
       continue;
       }
-
+    
     if (!propertiesToShow.contains(propertyName))
       {
       if (SMProperty->IsA("vtkSMStringVectorProperty") && !skippedFirstFileProperty)
@@ -1473,4 +1209,89 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
   panelLayout->invalidate();
 }
 
+bool pqNamedWidgets::propertyInformation(QObject* object, 
+    QString& property, QString& signal)
+{
+  if(!object)
+    {
+    return false;
+    }
+
+  const QMetaObject* mo = object->metaObject();
+  QMetaProperty UserProperty = mo->userProperty();
+
+  if(UserProperty.isValid())
+    {
+    QString propertyName = UserProperty.name();
+    QString signalName;
+    signalName = QString("%1Changed").arg(propertyName);
+    int numMethods = mo->methodCount();
+    int signalIndex = -1;
+    for(int i=0; signalIndex == -1 && i<numMethods; i++)
+      {
+      if(mo->method(i).methodType() == QMetaMethod::Signal)
+        {
+        if(QString(mo->method(i).signature()).startsWith(signalName))
+          {
+          signalIndex = i;
+          }
+        }
+      }
+    if(signalIndex != -1)
+      {
+      QString theSignal = SIGNAL(%1);
+      signal = theSignal.arg(mo->method(signalIndex).signature());
+      property = propertyName;
+      return true;
+      }
+    }
+    
+  QAbstractButton* btn = qobject_cast<QAbstractButton*>(object);
+  if(btn && btn->isCheckable())
+     {
+     property = "checked";
+     signal = SIGNAL(toggled(bool));
+     return true;
+     }
+
+  return false;
+}
+
+void pqNamedWidgets::linkObject(QObject* o, const QString& property,
+                       const QString& signal, pqSMProxy proxy,
+                       vtkSMProperty* smProperty, int index,
+                       pqPropertyManager* pm)
+{
+  pm->registerLink(o, property.toAscii().data(), 
+    signal.toAscii().data(), proxy, smProperty, index);
+
+  // if the widget has min or max property, hook it up too
+  if(o->metaObject()->indexOfProperty("minimum") != -1 ||
+     o->metaObject()->indexOfProperty("maximum") != -1)
+    {
+    QWidget* w = qobject_cast<QWidget*>(o);
+    if(w)
+      {
+      pqWidgetRangeDomain* d0 = new
+        pqWidgetRangeDomain(w, "minimum", "maximum", smProperty, index);
+      d0->setObjectName("WidgetRangeDomain");
+      }
+    }
+}
+
+void pqNamedWidgets::unlinkObject(QObject* o, const QString& property,
+                       const QString& signal, pqSMProxy proxy,
+                       vtkSMProperty* smProperty, int index,
+                       pqPropertyManager* pm)
+{
+  pqWidgetRangeDomain* d0 = 
+    o->findChild<pqWidgetRangeDomain*>("WidgetRangeDomain");
+  if(d0)
+    {
+    delete d0;
+    }
+  
+  pm->unregisterLink(o, property.toAscii().data(), 
+    signal.toAscii().data(), proxy, smProperty, index);
+}
 

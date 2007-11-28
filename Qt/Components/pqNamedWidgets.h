@@ -88,6 +88,28 @@ public:
   static void unlinkObject(QObject* object, pqSMProxy proxy,
                            const QString& property,
                            pqPropertyManager* property_manager);
+
+  /// given an object, find the user property and its associated signal
+  /// this is used to find which property of a widget to link with
+  /// returns whether it was found
+  /// for QCheckBox and QTextEdit, the signal names not derived from the user
+  /// property
+  static bool propertyInformation(QObject* object, 
+    QString& property, QString& signal);
+
+  /// this function does the actual linking, and adds a range domain if one is
+  /// needed
+  static void linkObject(QObject* o, const QString& property,
+                         const QString& signal, pqSMProxy proxy,
+                         vtkSMProperty* smProperty, int index,
+                         pqPropertyManager* pm);
+  
+  /// this function does the actual un-linking, and removes a range domain if one
+  /// exists
+  static void unlinkObject(QObject* o, const QString& property,
+                         const QString& signal, pqSMProxy proxy,
+                         vtkSMProperty* smProperty, int index,
+                         pqPropertyManager* pm);
 };
 
 #endif

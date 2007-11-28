@@ -42,7 +42,7 @@ class QLineEdit;
 class QTWIDGETS_EXPORT pqIntRangeWidget : public QWidget
 {
   Q_OBJECT
-  Q_PROPERTY(int value READ value WRITE setValue)
+  Q_PROPERTY(int value READ value WRITE setValue USER true)
   Q_PROPERTY(int minimum READ minimum WRITE setMinimum)
   Q_PROPERTY(int maximum READ maximum WRITE setMaximum)
   Q_PROPERTY(bool strictRange READ strictRange WRITE setStrictRange)

@@ -81,9 +81,9 @@ double pqDoubleRangeWidget::value() const
 void pqDoubleRangeWidget::setValue(double val)
 {
   if(this->Value == val)
-  {
+    {
     return;
-  }
+    }
 
   if(!this->BlockUpdate)
     {

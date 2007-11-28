@@ -42,7 +42,7 @@ class QLineEdit;
 class QTWIDGETS_EXPORT pqDoubleRangeWidget : public QWidget
 {
   Q_OBJECT
-  Q_PROPERTY(double value READ value WRITE setValue)
+  Q_PROPERTY(double value READ value WRITE setValue USER true)
   Q_PROPERTY(double minimum READ minimum WRITE setMinimum)
   Q_PROPERTY(double maximum READ maximum WRITE setMaximum)
   Q_PROPERTY(bool   strictRange READ strictRange WRITE setStrictRange)

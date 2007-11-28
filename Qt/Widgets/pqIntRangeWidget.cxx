@@ -81,9 +81,9 @@ int pqIntRangeWidget::value() const
 void pqIntRangeWidget::setValue(int val)
 {
   if(this->Value == val)
-  {
+    {
     return;
-  }
+    }
 
   if(!this->BlockUpdate)
     {

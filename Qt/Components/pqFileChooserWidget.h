@@ -46,8 +46,8 @@ class pqServer;
 class PQCOMPONENTS_EXPORT pqFileChooserWidget : public QWidget
 {
   Q_OBJECT
-  Q_PROPERTY(QString Filename READ filename WRITE setFilename)
-  Q_PROPERTY(QString Extension READ extension WRITE setExtension)
+  Q_PROPERTY(QString filename READ filename WRITE setFilename USER true)
+  Q_PROPERTY(QString extension READ extension WRITE setExtension)
 
 public:
   /// constructor
