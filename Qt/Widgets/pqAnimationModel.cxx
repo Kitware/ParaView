@@ -435,57 +435,60 @@ void pqAnimationModel::mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent)
     pqAnimationTrack* t = hitTestTracks(pos);
     pqAnimationKeyFrame* kf = hitTestKeyFrame(t, pos);
 
-    int whichkf = 0;
-    for(whichkf=0; whichkf<t->count(); whichkf++)
+    if(t && kf)
       {
-      if(t->keyFrame(whichkf) == kf)
+      int whichkf = 0;
+      for(whichkf=0; whichkf<t->count(); whichkf++)
         {
-        break;
+        if(t->keyFrame(whichkf) == kf)
+          {
+          break;
+          }
         }
-      }
 
-    if(kf)
-      {
-      double keyPos1 =
-        this->positionFromTime(this->normalizedTimeToTime(kf->normalizedStartTime()));
-      double keyPos2 =
-        this->positionFromTime(this->normalizedTimeToTime(kf->normalizedEndTime()));
-      if(qAbs(keyPos1 - pos.x()) < 3)
+      if(kf)
         {
-        this->CurrentTrackGrabbed = t;
-        this->CurrentKeyFrameGrabbed = kf;
-        this->CurrentKeyFrameEdge = 0;
-        }
-      else if(qAbs(keyPos2 - pos.x()) < 3)
-        {
-        whichkf++;
-        this->CurrentTrackGrabbed = t;
-        this->CurrentKeyFrameGrabbed = kf;
-        this->CurrentKeyFrameEdge = 1;
-        this->InteractiveRange.first = this->StartTime;
-        this->InteractiveRange.second = this->EndTime;
-        }
-      
-      if(whichkf > 0)
-        {
-        this->InteractiveRange.first =
-          this->normalizedTimeToTime(
-            t->keyFrame(whichkf-1)->normalizedStartTime());
-        }
-      else
-        {
-        this->InteractiveRange.first = this->StartTime;
-        }
-      
-      if(whichkf < t->count())
-        {
-        this->InteractiveRange.second =
-          this->normalizedTimeToTime(
-            t->keyFrame(whichkf)->normalizedEndTime());
-        }
-      else
-        {
-        this->InteractiveRange.second = this->EndTime;
+        double keyPos1 =
+          this->positionFromTime(this->normalizedTimeToTime(kf->normalizedStartTime()));
+        double keyPos2 =
+          this->positionFromTime(this->normalizedTimeToTime(kf->normalizedEndTime()));
+        if(qAbs(keyPos1 - pos.x()) < 3)
+          {
+          this->CurrentTrackGrabbed = t;
+          this->CurrentKeyFrameGrabbed = kf;
+          this->CurrentKeyFrameEdge = 0;
+          }
+        else if(qAbs(keyPos2 - pos.x()) < 3)
+          {
+          whichkf++;
+          this->CurrentTrackGrabbed = t;
+          this->CurrentKeyFrameGrabbed = kf;
+          this->CurrentKeyFrameEdge = 1;
+          this->InteractiveRange.first = this->StartTime;
+          this->InteractiveRange.second = this->EndTime;
+          }
+        
+        if(whichkf > 0)
+          {
+          this->InteractiveRange.first =
+            this->normalizedTimeToTime(
+              t->keyFrame(whichkf-1)->normalizedStartTime());
+          }
+        else
+          {
+          this->InteractiveRange.first = this->StartTime;
+          }
+        
+        if(whichkf < t->count())
+          {
+          this->InteractiveRange.second =
+            this->normalizedTimeToTime(
+              t->keyFrame(whichkf)->normalizedEndTime());
+          }
+        else
+          {
+          this->InteractiveRange.second = this->EndTime;
+          }
         }
       }
     }
