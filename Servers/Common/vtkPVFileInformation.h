@@ -79,7 +79,7 @@ public:
   // Get the Contents for this directory.
   // Returns a collection with vtkPVFileInformation objects
   // for the contents of this directory if Type = DIRECTORY
-  // or the contents of this file grouop if Type ==FILE_GROUP.
+  // or the contents of this file group if Type ==FILE_GROUP.
   vtkGetObjectMacro(Contents, vtkCollection);
 //BTX
 protected:
