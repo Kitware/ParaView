@@ -77,6 +77,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "pqXDMFPanel.h"
 
+bool pqObjectInspectorWidget::AutoAccept = false;
+
 class pqStandardCustomPanels : public QObject, public pqObjectPanelInterface
 {
 public:
@@ -318,6 +320,11 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->connect(pqApplicationCore::instance()->getServerManagerModel(), 
       SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*, int)),
       SLOT(handleConnectionChanged(pqPipelineSource*, pqPipelineSource*)));
+  
+  this->AutoAcceptTimer.setSingleShot(true);
+  this->AutoAcceptTimer.setInterval(1000);  // 1 sec
+  QObject::connect(&this->AutoAcceptTimer, SIGNAL(timeout()),
+                   this, SLOT(accept()));
 
 }
 
@@ -332,8 +339,32 @@ pqObjectInspectorWidget::~pqObjectInspectorWidget()
 }
 
 //-----------------------------------------------------------------------------
+void pqObjectInspectorWidget::setAutoAccept(bool status)
+{
+  pqObjectInspectorWidget::AutoAccept = status;
+}
+
+//-----------------------------------------------------------------------------
+bool pqObjectInspectorWidget::autoAccept()
+{
+  return pqObjectInspectorWidget::AutoAccept;
+}
+
+//-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::canAccept(bool status)
 {
+  if(pqObjectInspectorWidget::AutoAccept && status)
+    {
+    // if its going already, stop it and restart it
+    this->AutoAcceptTimer.stop();
+    this->AutoAcceptTimer.start();
+    return;
+    }
+  else if(pqObjectInspectorWidget::AutoAccept)
+    {
+    this->AutoAcceptTimer.stop();
+    }
+
   this->AcceptButton->setEnabled(status);
 
   bool resetStatus = status;
@@ -452,8 +483,7 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
     QObject::connect(this, SIGNAL(viewChanged(pqView*)), 
                      this->CurrentPanel, SLOT(setView(pqView*)));
     
-    QObject::connect(this->CurrentPanel->referenceProxy(),
-      SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
+    QObject::connect(this->CurrentPanel, SIGNAL(modified()),
       this, SLOT(updateAcceptState()));
     }
     
@@ -544,10 +574,6 @@ QSize pqObjectInspectorWidget::sizeHint() const
 //-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::removeProxy(pqPipelineSource* proxy)
 {
-  QObject::disconnect(proxy,
-    SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
-    this, SLOT(updateAcceptState()));
-
   QMap<pqProxy*, pqObjectPanel*>::iterator iter;
   iter = this->QueuedPanels.find(proxy);
   if(iter != this->QueuedPanels.end())
@@ -563,6 +589,9 @@ void pqObjectInspectorWidget::removeProxy(pqPipelineSource* proxy)
   iter = this->PanelStore.find(proxy);
   if (iter != this->PanelStore.end())
     {
+    QObject::disconnect(iter.value(), SIGNAL(modified()),
+      this, SLOT(updateAcceptState()));
+
     delete iter.value();
     this->PanelStore.erase(iter);
     }

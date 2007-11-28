@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginManager.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
+#include "pqObjectInspectorWidget.h"
 
 class pqApplicationOptions::pqInternal 
   : public Ui::pqApplicationOptions
@@ -90,6 +91,9 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   QObject::connect(this->Internal->HeartBeatTimeout,
                   SIGNAL(valueChanged(int)),
                   this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->AutoAccept,
+                  SIGNAL(toggled(bool)),
+                  this, SIGNAL(changesAvailable()));
 }
 
 //-----------------------------------------------------------------------------
@@ -134,6 +138,10 @@ void pqApplicationOptions::applyChanges()
       this->Internal->DefaultViewType->currentIndex()));
   pqServer::setHeartBeatTimeoutSetting(
     this->Internal->HeartBeatTimeout->value()*60*1000);
+
+  bool autoAccept = this->Internal->AutoAccept->isChecked();
+  settings->setValue("autoAccept", autoAccept);
+  pqObjectInspectorWidget::setAutoAccept(autoAccept);
 }
 
 //-----------------------------------------------------------------------------
@@ -149,5 +157,8 @@ void pqApplicationOptions::resetChanges()
 
   this->Internal->HeartBeatTimeout->setValue(
     pqServer::getHeartBeatTimeoutSetting()/(60*1000));
+  
+  this->Internal->AutoAccept->setChecked(
+    settings->value("autoAccept", false).toBool());
 }
 

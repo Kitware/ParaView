@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsExport.h"
 #include <QWidget>
+#include <QTimer>
 #include <QMap>
 #include <QPointer>
 #include "pqProxy.h"
@@ -71,6 +72,12 @@ public:
   /// get the render module to work in
   pqView* view();
 
+  /// gets whether auto accept is on/off
+  static bool autoAccept();
+  
+  /// sets whether auto accept is on/off
+  static void setAutoAccept(bool);
+
 public slots:
   void setProxy(pqProxy *proxy);
 
@@ -93,7 +100,7 @@ public slots:
 
   /// sets the enabled state of the delete button.
   void updateDeleteButtonState();
-  
+
 signals:
   /// emitted before accept.
   void preaccept();
@@ -130,6 +137,8 @@ private:
   QPushButton* ResetButton;
   QPushButton* DeleteButton;
   QPointer<pqView> View;
+  QTimer AutoAcceptTimer;
+  static bool AutoAccept;
   
   pqObjectPanel* CurrentPanel;
   QMap<pqProxy*, pqObjectPanel*> QueuedPanels;

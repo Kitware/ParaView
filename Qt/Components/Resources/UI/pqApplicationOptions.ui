@@ -13,11 +13,11 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
    <property name="spacing" >
     <number>6</number>
+   </property>
+   <property name="margin" >
+    <number>9</number>
    </property>
    <item>
     <widget class="QStackedWidget" name="stackedWidget" >
@@ -35,9 +35,7 @@
        <item row="1" column="2" >
         <widget class="QLabel" name="label_2" >
          <property name="sizePolicy" >
-          <sizepolicy>
-           <hsizetype>0</hsizetype>
-           <vsizetype>5</vsizetype>
+          <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -64,7 +62,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="3" >
+       <item row="3" column="0" colspan="3" >
         <spacer>
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
@@ -88,17 +86,31 @@
          <property name="whatsThis" >
           <string>&lt;html>&lt;p>Set the interval in &lt;b>minutes&lt;/b> after which the client sends a heart beat message to the server to avoid connection termination due to inactivity. &lt;b>0&lt;/b> means no heartbeats.&lt;/p>&lt;/html></string>
          </property>
-         <property name="maximum" >
-          <number>1440</number>
-         </property>
          <property name="minimum" >
           <number>0</number>
+         </property>
+         <property name="maximum" >
+          <number>1440</number>
          </property>
          <property name="singleStep" >
           <number>1</number>
          </property>
          <property name="value" >
           <number>20</number>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" >
+        <widget class="QLabel" name="label_3" >
+         <property name="text" >
+          <string>Auto Accept</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QCheckBox" name="AutoAccept" >
+         <property name="text" >
+          <string/>
          </property>
         </widget>
        </item>
