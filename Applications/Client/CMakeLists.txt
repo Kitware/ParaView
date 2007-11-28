@@ -294,6 +294,7 @@ IF(BUILD_TESTING)
     RectilinearFractal
     RepresentationSelector
     SaveAnimationGeometry
+    SaveColorMap
     SelectReader
     SimpleInteraction
     StreamTracer
