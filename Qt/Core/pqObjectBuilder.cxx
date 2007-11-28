@@ -300,12 +300,15 @@ void pqObjectBuilder::destroy(pqPipelineSource* source)
     }
 
   // * remove all representations.
-  QList<pqDataRepresentation*> reprs = source->getRepresentations(0);
-  foreach (pqDataRepresentation* repr, reprs)
+  for (int cc=0; cc < source->getNumberOfOutputPorts(); cc++)
     {
-    if (repr)
+    QList<pqDataRepresentation*> reprs = source->getRepresentations(cc, NULL);
+    foreach (pqDataRepresentation* repr, reprs)
       {
-      this->destroy(repr);
+      if (repr)
+        {
+        this->destroy(repr);
+        }
       }
     }
 
