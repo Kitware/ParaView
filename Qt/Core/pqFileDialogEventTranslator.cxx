@@ -97,8 +97,7 @@ void pqFileDialogEventTranslator::onFilesSelected(const QString& file)
     }
   else
     {
-    qCritical() << "You must choose a file under the PARAVIEW_DATA_ROOT directory to record file selections.";
-    return;
+    qWarning() << "You must choose a file under the PARAVIEW_DATA_ROOT directory to record file selections.";
     }
   
   emit recordEvent(this->CurrentObject, "filesSelected", cleanedFile);
