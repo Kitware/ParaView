@@ -69,6 +69,8 @@ public:
   /// Callback object used to connect 3D widget events to member methods
   vtkSmartPointer<vtkCommand> StartDragObserver;
   /// Callback object used to connect 3D widget events to member methods
+  vtkSmartPointer<vtkCommand> DragObserver;
+  /// Callback object used to connect 3D widget events to member methods
   vtkSmartPointer<vtkCommand> EndDragObserver;
   pqPropertyLinks Links;
 };
@@ -82,6 +84,8 @@ pqHandleWidget::pqHandleWidget(vtkSMProxy* _smproxy, vtkSMProxy* pxy, QWidget* p
 {
   this->Implementation->StartDragObserver.TakeReference(
     vtkMakeMemberFunctionCommand(*this, &pqHandleWidget::on3DWidgetStartDrag));
+  this->Implementation->DragObserver.TakeReference(
+    vtkMakeMemberFunctionCommand(*this, &pqHandleWidget::on3DWidgetDrag));
   this->Implementation->EndDragObserver.TakeReference(
     vtkMakeMemberFunctionCommand(*this, &pqHandleWidget::on3DWidgetEndDrag));
 
@@ -163,6 +167,8 @@ void pqHandleWidget::createWidget(pqServer* server)
 
   widget->AddObserver(vtkCommand::StartInteractionEvent,
     this->Implementation->StartDragObserver);
+  widget->AddObserver(vtkCommand::InteractionEvent,
+    this->Implementation->DragObserver);
   widget->AddObserver(vtkCommand::EndInteractionEvent,
     this->Implementation->EndDragObserver);
 }
@@ -178,6 +184,8 @@ void pqHandleWidget::cleanupWidget()
       this->Implementation->EndDragObserver);
     widget->RemoveObserver(
       this->Implementation->StartDragObserver);
+    widget->RemoveObserver(
+      this->Implementation->DragObserver);
     pqApplicationCore::instance()->get3DWidgetFactory()->
       free3DWidget(widget);
     }
@@ -228,6 +236,12 @@ void pqHandleWidget::on3DWidgetStartDrag()
 {
   this->setModified();
   emit widgetStartInteraction();
+}
+
+//-----------------------------------------------------------------------------
+void pqHandleWidget::on3DWidgetDrag()
+{
+  this->setModified();
 }
 
 //-----------------------------------------------------------------------------

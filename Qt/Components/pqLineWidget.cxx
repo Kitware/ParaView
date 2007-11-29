@@ -147,6 +147,9 @@ pqLineWidget::pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
   this->Implementation->Observer->Connect(this->getWidgetProxy(),
     vtkCommand::StartInteractionEvent,
     this, SLOT(setModified()));
+  this->Implementation->Observer->Connect(this->getWidgetProxy(),
+    vtkCommand::InteractionEvent,
+    this, SLOT(setModified()));
   
 }
 

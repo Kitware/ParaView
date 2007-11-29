@@ -106,6 +106,8 @@ private slots:
   void onUseCameraNormal();
   /// Called when the user starts dragging the 3D widget
   void on3DWidgetStartDrag();
+  /// Called when the user is dragging the 3D widget
+  void on3DWidgetDrag();
   /// Called when the user stops dragging the 3D widget
   void on3DWidgetEndDrag();
   /// Called whenever the 3D widget visibility is modified

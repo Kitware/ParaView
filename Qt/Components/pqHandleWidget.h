@@ -62,6 +62,8 @@ private slots:
   void onResetBounds();
   /// Called when the user starts dragging the 3D widget
   void on3DWidgetStartDrag();
+  /// Called when the user is dragging the 3D widget
+  void on3DWidgetDrag();
   /// Called when the user stops dragging the 3D widget
   void on3DWidgetEndDrag();
   /// Called when the user changes widget visibility
