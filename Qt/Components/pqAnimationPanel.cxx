@@ -110,7 +110,6 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
   vboxlayout->setObjectName("vboxLayout");
 
   QWidget* container = new QWidget(this);
-  container->setObjectName("scrollWidget");
   container->setSizePolicy(QSizePolicy::MinimumExpanding,
     QSizePolicy::MinimumExpanding);
 
@@ -196,6 +195,7 @@ pqAnimationPanel::pqAnimationPanel(QWidget* _parent) : QWidget(_parent)
 
   this->Internal->ValueAdaptor = new pqSignalAdaptorKeyFrameValue(
     this->Internal->valueFrameLarge, this->Internal->valueFrame);
+  this->Internal->valueFrame->setObjectName("SignalAdaptorKeyFrameValue");
 
   this->Internal->TypeAdaptor = new pqSignalAdaptorKeyFrameType(
     this->Internal->keyFrameWidget, 
