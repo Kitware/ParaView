@@ -533,6 +533,8 @@ void pqObjectInspectorWidget::accept()
   
   // Essential to render all views.
   pqApplicationCore::instance()->render();
+  
+  updateAcceptState();
 }
 
 //-----------------------------------------------------------------------------
