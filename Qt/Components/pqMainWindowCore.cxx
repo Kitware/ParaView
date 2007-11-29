@@ -1360,6 +1360,7 @@ void pqMainWindowCore::setupLookmarkInspector(QDockWidget* dock_widget)
   this->Implementation->LookmarkInspector = 
     new pqLookmarkInspector(this->Implementation->LookmarkManagerModel, 
                             dock_widget);
+  this->Implementation->LookmarkInspector->setObjectName("lookmarkInspector");
 
   QObject::connect(this->Implementation->LookmarkInspector,
                    SIGNAL(removeLookmark(const QString&)),

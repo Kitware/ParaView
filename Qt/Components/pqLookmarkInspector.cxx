@@ -61,8 +61,6 @@ class pqLookmarkInspectorForm : public Ui::pqLookmarkInspector {};
 pqLookmarkInspector::pqLookmarkInspector(pqLookmarkManagerModel *model, QWidget *p)
   : QWidget(p)
 {
-  this->setObjectName("lookmarkInspector");
-
   this->Model = model;
   this->Form = new pqLookmarkInspectorForm();
   this->Form->setupUi(this);

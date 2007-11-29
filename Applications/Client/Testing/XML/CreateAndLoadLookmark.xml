@@ -11,12 +11,12 @@
   <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ExtractEdges" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuTools" command="activate" arguments="actionToolsCreateLookmark" />
-  <pqevent object="MainWindow/pqLookmarkDefinitionWizard/InputFrame/LookmarkName" command="set_string" arguments="My New Lookmark" />
-  <pqevent object="MainWindow/pqLookmarkDefinitionWizard/InputFrame/FinishButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/lookmarkDefinitionWizard/InputFrame/LookmarkName" command="set_string" arguments="My New Lookmark" />
+  <pqevent object="MainWindow/lookmarkDefinitionWizard/InputFrame/FinishButton" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Delete" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Delete" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuView" command="activate" arguments="Lookmark Inspector" />
-  <pqevent object="MainWindow/lookmarkInspectorDock/pqLookmarkInspector/ButtonFrame/LoadButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/lookmarkInspectorDock/pqLookmarkInspector/ButtonFrame/DeleteButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/lookmarkInspectorDock/lookmarkInspector/ButtonFrame/LoadButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/lookmarkInspectorDock/lookmarkInspector/ButtonFrame/DeleteButton" command="activate" arguments="" />
   <pqevent object="MainWindow/lookmarkInspectorDock/1QDockWidgetTitleButton1" command="activate" arguments="" />
 </pqevents>
