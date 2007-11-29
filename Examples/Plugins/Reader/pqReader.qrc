@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/ParaViewResources" >
-        <file>pqReader.xml</file>
-    </qresource>
-</RCC>
