@@ -489,6 +489,10 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
     
     QObject::connect(this->CurrentPanel, SIGNAL(modified()),
       this, SLOT(updateAcceptState()));
+    
+    QObject::connect(this->CurrentPanel->referenceProxy(),
+      SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
+      this, SLOT(updateAcceptState()));
     }
     
   this->PanelArea->layout()->addWidget(this->CurrentPanel);
@@ -537,8 +541,6 @@ void pqObjectInspectorWidget::accept()
   
   // Essential to render all views.
   pqApplicationCore::instance()->render();
-  
-  updateAcceptState();
 }
 
 //-----------------------------------------------------------------------------
@@ -580,6 +582,10 @@ QSize pqObjectInspectorWidget::sizeHint() const
 //-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::removeProxy(pqPipelineSource* proxy)
 {
+  QObject::disconnect(proxy,
+    SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
+    this, SLOT(updateAcceptState()));
+
   QMap<pqProxy*, pqObjectPanel*>::iterator iter;
   iter = this->QueuedPanels.find(proxy);
   if(iter != this->QueuedPanels.end())
