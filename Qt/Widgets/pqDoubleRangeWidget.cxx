@@ -63,6 +63,8 @@ pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
                    this, SLOT(sliderChanged(int)));
   QObject::connect(this->LineEdit, SIGNAL(textChanged(const QString&)),
                    this, SLOT(textChanged(const QString&)));
+  QObject::connect(this->LineEdit, SIGNAL(editingFinished()),
+                   this, SLOT(editingFinished()));
   
 }
 
@@ -168,6 +170,7 @@ void pqDoubleRangeWidget::sliderChanged(int val)
     this->BlockUpdate = true;
     this->LineEdit->setText(QString().setNum(v));
     this->setValue(v);
+    emit this->valueEdited(v);
     this->BlockUpdate = false;
     }
 }
@@ -186,6 +189,12 @@ void pqDoubleRangeWidget::textChanged(const QString& text)
     this->setValue(val);
     this->BlockUpdate = false;
     }
+}
+  
+//-----------------------------------------------------------------------------
+void pqDoubleRangeWidget::editingFinished()
+{
+  emit this->valueEdited(this->Value);
 }
 
 //-----------------------------------------------------------------------------

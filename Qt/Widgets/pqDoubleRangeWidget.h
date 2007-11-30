@@ -66,6 +66,11 @@ signals:
   /// signal the value changed
   void valueChanged(double);
 
+  /// signal the value was edited
+  /// this means the user is done changing text
+  /// or the slider was moved
+  void valueEdited(double);
+
 public slots:
   /// set the value
   void setValue(double);
@@ -82,6 +87,7 @@ public slots:
 private slots:
   void sliderChanged(int);
   void textChanged(const QString&);
+  void editingFinished();
   void updateValidator();
   void updateSlider();
 

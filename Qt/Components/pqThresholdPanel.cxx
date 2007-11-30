@@ -44,9 +44,9 @@ pqThresholdPanel::pqThresholdPanel(pqProxy* pxy, QWidget* p) :
   this->Lower = this->findChild<pqDoubleRangeWidget*>("ThresholdBetween_0");
   this->Upper = this->findChild<pqDoubleRangeWidget*>("ThresholdBetween_1");
 
-  QObject::connect(this->Lower, SIGNAL(valueChanged(double)),
+  QObject::connect(this->Lower, SIGNAL(valueEdited(double)),
                    this, SLOT(lowerChanged(double)));
-  QObject::connect(this->Upper, SIGNAL(valueChanged(double)),
+  QObject::connect(this->Upper, SIGNAL(valueEdited(double)),
                    this, SLOT(upperChanged(double)));
 
   QObject::connect(this->findChild<QComboBox*>("SelectInputScalars"),
