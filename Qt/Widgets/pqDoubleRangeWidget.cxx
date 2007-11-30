@@ -84,24 +84,20 @@ void pqDoubleRangeWidget::setValue(double val)
     {
     return;
     }
+  
+  this->Value = val;
 
   if(!this->BlockUpdate)
     {
     // set the slider 
-    this->Slider->blockSignals(true);
-    double range = this->Maximum - this->Minimum;
-    double fraction = (val - this->Minimum) / range;
-    int v = qRound(fraction * 100.0);
-    this->Slider->setValue(v);
-    this->Slider->blockSignals(false);
+    this->updateSlider();
 
     // set the text
-    this->LineEdit->blockSignals(true);
+    this->BlockUpdate = true;
     this->LineEdit->setText(QString().setNum(val));
-    this->LineEdit->blockSignals(false);
+    this->BlockUpdate = false;
     }
 
-  this->Value = val;
   emit this->valueChanged(this->Value);
 }
 
@@ -116,6 +112,7 @@ void pqDoubleRangeWidget::setMaximum(double val)
 {
   this->Maximum = val;
   this->updateValidator();
+  this->updateSlider();
 }
 
 //-----------------------------------------------------------------------------
@@ -129,6 +126,7 @@ void pqDoubleRangeWidget::setMinimum(double val)
 {
   this->Minimum = val;
   this->updateValidator();
+  this->updateSlider();
 }
 
 //-----------------------------------------------------------------------------
@@ -189,4 +187,16 @@ void pqDoubleRangeWidget::textChanged(const QString& text)
     this->BlockUpdate = false;
     }
 }
+
+//-----------------------------------------------------------------------------
+void pqDoubleRangeWidget::updateSlider()
+{
+  this->Slider->blockSignals(true);
+  double range = this->Maximum - this->Minimum;
+  double fraction = (this->Value - this->Minimum) / range;
+  int v = qRound(fraction * 100.0);
+  this->Slider->setValue(v);
+  this->Slider->blockSignals(false);
+}
+
 

@@ -183,7 +183,7 @@ void pqProxyPanel::accept()
 /// editor will query properties from the server manager
 void pqProxyPanel::reset()
 {
-  this->Implementation->Proxy->UpdatePropertyInformation();
+  this->updateInformationAndDomains();
   this->Implementation->PropertyManager->reject();
   emit this->onreset();
 }

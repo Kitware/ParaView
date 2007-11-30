@@ -83,6 +83,7 @@ private slots:
   void sliderChanged(int);
   void textChanged(const QString&);
   void updateValidator();
+  void updateSlider();
 
 private:
   double Value;
