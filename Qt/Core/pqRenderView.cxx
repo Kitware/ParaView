@@ -976,11 +976,18 @@ void pqRenderView::updateCenterAxes()
   // Reset size of the axes.
   double bounds[6];
   this->getRenderViewProxy()->ComputeVisiblePropBounds(bounds);
+  double widths[3];
+  widths[0] = (bounds[1]-bounds[0]);
+  widths[1] = (bounds[3]-bounds[2]);
+  widths[2] = (bounds[5]-bounds[4]);
+  // lets make some thickness in all directions
+  double diameterOverTen = qMax(widths[0], qMax(widths[1], widths[2])) / 10.0;
+  widths[0] = widths[0] < diameterOverTen ? diameterOverTen : widths[0];
+  widths[1] = widths[1] < diameterOverTen ? diameterOverTen : widths[1];
+  widths[2] = widths[2] < diameterOverTen ? diameterOverTen : widths[2];
 
   QList<QVariant> scaleValues;
-  scaleValues << (bounds[1]-bounds[0])*0.25
-    << (bounds[3]-bounds[2])*0.25 
-    << (bounds[5]-bounds[4])*0.25;
+  scaleValues << (widths[0])*0.25 << (widths[1])*0.25 << (widths[2])*0.25;
 
   pqSMAdaptor::setMultipleElementProperty(
     this->Internal->CenterAxesProxy->GetProperty("Scale"),
