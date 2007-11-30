@@ -47,17 +47,12 @@ public:
   /// destructor
   ~pqThresholdPanel();
 
-  virtual void accept();
-  virtual void reset();
-
 protected slots:
   void lowerChanged(double);
   void upperChanged(double);
+  void variableChanged();
 
 protected:
-  /// populate widgets with properties from the server manager
-  virtual void linkServerManagerProperties();
-
   pqDoubleRangeWidget* Lower;
   pqDoubleRangeWidget* Upper;
 

@@ -32,8 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqThresholdPanel.h"
 
-// Qt includes
+#include <QComboBox>
 #include "pqDoubleRangeWidget.h"
+#include "pqSMAdaptor.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 
 pqThresholdPanel::pqThresholdPanel(pqProxy* pxy, QWidget* p) :
   pqLoadedFormObjectPanel(":/pqWidgets/UI/pqThresholdPanel.ui", pxy, p)
@@ -46,29 +49,13 @@ pqThresholdPanel::pqThresholdPanel(pqProxy* pxy, QWidget* p) :
   QObject::connect(this->Upper, SIGNAL(valueChanged(double)),
                    this, SLOT(upperChanged(double)));
 
-  this->linkServerManagerProperties();
+  QObject::connect(this->findChild<QComboBox*>("SelectInputScalars"),
+    SIGNAL(activated(int)), this, SLOT(variableChanged()),
+    Qt::QueuedConnection);
 }
 
 pqThresholdPanel::~pqThresholdPanel()
 {
-}
-
-void pqThresholdPanel::accept()
-{
-  // accept widgets controlled by the parent class
-  pqLoadedFormObjectPanel::accept();
-}
-
-void pqThresholdPanel::reset()
-{
-  // reset widgets controlled by the parent class
-  pqLoadedFormObjectPanel::reset();
-}
-
-void pqThresholdPanel::linkServerManagerProperties()
-{
-  // parent class hooks up some of our widgets in the ui
-  pqLoadedFormObjectPanel::linkServerManagerProperties();
 }
 
 void pqThresholdPanel::lowerChanged(double val)
@@ -86,6 +73,18 @@ void pqThresholdPanel::upperChanged(double val)
   if(this->Lower->value() > val)
     {
     this->Lower->setValue(val);
+    }
+}
+
+void pqThresholdPanel::variableChanged()
+{
+  // when the user changes the variable, adjust the ranges on the ThresholdBetween
+  vtkSMProperty* prop = this->proxy()->GetProperty("ThresholdBetween");
+  QList<QVariant> range = pqSMAdaptor::getElementPropertyDomain(prop);
+  if(range.size() == 2 && range[0].isValid() && range[1].isValid())
+    {
+    this->Lower->setValue(range[0].toDouble());
+    this->Upper->setValue(range[1].toDouble());
     }
 }
 
