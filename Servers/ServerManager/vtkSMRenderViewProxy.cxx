@@ -89,7 +89,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.52");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.53");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -775,31 +775,11 @@ void vtkSMRenderViewProxy::ResetCamera(double bds[6])
 void vtkSMRenderViewProxy::ResetCameraClippingRange()
 {
   double bds[6];
-  double range1[2];
-  double range2[2];
   vtkRenderer* ren = this->GetRenderer();
-  // Get default clipping range.
-  // Includes 3D widgets but not all processes.
-  ren->GetActiveCamera()->GetClippingRange(range1);
 
   this->ComputeVisiblePropBounds(bds);
   ren->ResetCameraClippingRange(bds);
   
-  // Get part clipping range.
-  // Includes all process partitions, but not 3d Widgets.
-  ren->GetActiveCamera()->GetClippingRange(range2);
-
-  // Merge
-  if (range1[0] < range2[0])
-    {
-    range2[0] = range1[0];
-    }
-  if (range1[1] > range2[1])
-    {
-    range2[1] = range1[1];
-    }
-  // Includes all process partitions and 3D Widgets.
-  ren->GetActiveCamera()->SetClippingRange(range2);
   this->Modified();
 }
 
