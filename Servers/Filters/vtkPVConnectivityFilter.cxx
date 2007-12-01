@@ -20,34 +20,13 @@
 #include "vtkPointData.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVConnectivityFilter, "1.6");
+vtkCxxRevisionMacro(vtkPVConnectivityFilter, "1.7");
 vtkStandardNewMacro(vtkPVConnectivityFilter);
 
 vtkPVConnectivityFilter::vtkPVConnectivityFilter()
 {
   this->ExtractionMode = VTK_EXTRACT_ALL_REGIONS;
   this->ColorRegions = 1;
-}
-
-int vtkPVConnectivityFilter::RequestData(
-  vtkInformation *request,
-  vtkInformationVector **inputVector,
-  vtkInformationVector *outputVector)
-{
-  int retVal =
-    this->Superclass::RequestData(request, inputVector, outputVector);
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
-  vtkUnstructuredGrid *output = vtkUnstructuredGrid::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
-  if (this->ColorRegions)
-    {
-    vtkDataArray* scalars = output->GetPointData()->GetScalars();
-    if (scalars)
-      {
-      scalars->SetName("RegionId");
-      }
-    }
-  return retVal;
 }
 
 void vtkPVConnectivityFilter::PrintSelf(ostream& os, vtkIndent indent)
