@@ -840,7 +840,7 @@ Points that are coincident (or nearly so) may be discarded by the algorithm. Thi
      </IntVectorProperty>
    </SourceProxy>
 
-   <SourceProxy name="PVConnectivityFilter" class="vtkPVConnectivityFilter"
+   <SourceProxy name="PVConnectivityFilter" class="vtkConnectivityFilter"
       label="Connectivity">
       <Documentation
           long_help="Mark connected components with integer point attribute array."
@@ -861,6 +861,40 @@ The Connectivity filter assigns a region id to connected components of the input
              This property specifies the input to the Connectivity filter.
            </Documentation>
       </InputProperty>
+
+     <IntVectorProperty 
+        name="ExtractionMode" 
+        command="SetExtractionMode" 
+        number_of_elements="1"
+        default_values="5" >
+       <EnumerationDomain name="enum">
+         <Entry value="1" text="Extract Point Seeded Regions"/>
+         <Entry value="2" text="Extract Cell Seeded Regions"/>
+         <Entry value="3" text="Extract Specified Regions"/>
+         <Entry value="4" text="Extract Largest Region"/>
+         <Entry value="5" text="Extract All Regions"/>
+         <Entry value="6" text="Extract Closes Point Region"/>
+       </EnumerationDomain>
+       <Documentation>
+         Controls the extraction of connected surfaces.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="ColorRegions"
+        command="SetColorRegions"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Controls the coloring of the connected regions.
+        </Documentation>
+     </IntVectorProperty>
+
+      <Hints>
+        <Property name="ExtractionMode" show="0"/>
+        <Property name="ColorRegions" show="0"/>
+      </Hints>
    <!-- End PVConnectivityFilter -->
    </SourceProxy>
 
