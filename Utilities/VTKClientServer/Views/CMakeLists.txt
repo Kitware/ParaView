@@ -1,2 +1,2 @@
-SET(KIT_WRAP_DEPS Filtering)
-PV_WRAP_VTK_CS(Views Views "${KIT_WRAP_DEPS}")
+SET(KIT_WRAP_DEPS Infovis Filtering)
+PV_WRAP_VTK_CS(Views VIEWS "${KIT_WRAP_DEPS}")
