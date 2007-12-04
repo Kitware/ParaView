@@ -301,5 +301,5 @@ int pqServer::getHeartBeatTimeoutSetting()
       return timeout;
       }
     }
-  return 10*60*1000; // 10 minutes.
+  return 1*60*1000; // 1 minutes.
 }
