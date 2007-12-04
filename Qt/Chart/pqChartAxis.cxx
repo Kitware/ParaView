@@ -273,6 +273,12 @@ void pqChartAxis::setBestFitRange(const pqChartValue &min,
     this->Internal->Minimum = min;
     this->Internal->Maximum = max;
     }
+
+  // Make sure the min and max are the same type.
+  if(this->Internal->Minimum.getType() != this->Internal->Maximum.getType())
+    {
+    this->Internal->Minimum.convertTo(this->Internal->Maximum.getType());
+    }
 }
 
 bool pqChartAxis::isMaxExtraPadded() const
