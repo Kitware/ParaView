@@ -97,13 +97,6 @@ public:
     const QString& group, const QString& name,
     pqPipelineSource* input);
 
-  /// Creates a custom filter with the given Server Manager name (\c sm_name)
-  /// on the given \c server. If the custom filter takes an input,
-  /// an option, input may be provided. It is required that \c input
-  /// is on the same server as the custom filter to create.
-  virtual pqPipelineSource* createCustomFilter(const QString& sm_name,
-    pqServer* server, pqPipelineSource* input=0);
-
   /// Creates a reader of the given server manager group (\c sm_group) and 
   /// name (\c sm_name) on the given \c server. On success, returns the
   /// pqPipelineSource for the created proxy.
@@ -208,12 +201,6 @@ signals:
   /// creates the source or when state is loaded or on undo/redo. 
   void readerCreated(pqPipelineSource*, const QString& filename);
 
-  /// Fired on successful completion of createCustomFilter().
-  /// Remember that this signal is fired only when the creation of the object
-  /// is requested by the GUI. It wont be triggered when the python client
-  /// creates the source or when state is loaded or on undo/redo. 
-  void customFilterCreated(pqPipelineSource*);
-
   /// Fired on successful completion of createView().
   /// Remember that this signal is fired only when the creation of the object
   /// is requested by the GUI. It wont be triggered when the python client
@@ -234,7 +221,7 @@ signals:
 
   /// Fired on successful completion of any method that creates a pqProxy
   /// or subclass including createScalarBarDisplay, createDataRepresentation,
-  /// createView, createCustomFilter, createFilter, createSource,
+  /// createView, createFilter, createSource,
   /// createReader etc.
   void proxyCreated(pqProxy*);
 

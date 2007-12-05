@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMCompoundProxy.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMLookupTableProxy.h"
 #include "vtkSMProxy.h"

@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.100");
+vtkCxxRevisionMacro(vtkSMProxy, "1.101");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -345,7 +345,7 @@ void vtkSMProxy::SetServers(vtkTypeUInt32 servers)
     this->Internals->SubProxies.begin();
   for( ; it2 != this->Internals->SubProxies.end(); it2++)
     {
-    it2->second.GetPointer()->SetServersSelf(servers);
+    it2->second.GetPointer()->SetServers(servers);
     }
 }
 
@@ -1180,12 +1180,16 @@ void vtkSMProxy::ReviveVTKObjects()
            << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, this->Servers, stream);
     }
-  vtkSMProxyInternals::ProxyMap::iterator it2 =
-    this->Internals->SubProxies.begin();
-  for( ; it2 != this->Internals->SubProxies.end(); it2++)
-    {
-    it2->second.GetPointer()->ReviveVTKObjects();
-    }
+
+  // * No need to iterate over subproxies, since a call to LoadRevivalState() on
+  // * subproxies will call ReviveVTKObjects() on the subproxies as well. (Look at
+  // * implementation of LoadRevivalState().
+  //vtkSMProxyInternals::ProxyMap::iterator it2 =
+  //  this->Internals->SubProxies.begin();
+  //for( ; it2 != this->Internals->SubProxies.end(); it2++)
+  //  {
+  //  it2->second.GetPointer()->ReviveVTKObjects();
+  //  }
 }
 
 //---------------------------------------------------------------------------
@@ -1733,7 +1737,7 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
             }
           else
             {
-            subproxy = pm->NewProxy(subElement, 0);
+            subproxy = pm->NewProxy(subElement, 0, 0);
             }
           if (!subproxy)
             {
@@ -1751,7 +1755,8 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
     else
       {
       const char* name = propElement->GetAttribute("name");
-      if (name)
+      vtkstd::string tagName = propElement->GetName();
+      if (name && tagName.find("Property") == (tagName.size()-8))
         {
         this->NewProperty(name, propElement);
         }
@@ -1948,31 +1953,17 @@ int vtkSMProxy::LoadRevivalState(vtkPVXMLElement* revivalElem,
     const char* name = currentElement->GetName();
     if (name && strncmp(name, "VTKObjectID", strlen("VTKObjectID")) == 0)
       {
-      for (unsigned int i=0; 
-           i < currentElement->GetNumberOfNestedElements(); 
-           i++)
+      vtkClientServerID id;
+      int int_id;
+      if (currentElement->GetScalarAttribute("id", &int_id) && int_id)
         {
-        vtkPVXMLElement* element = currentElement->GetNestedElement(i);
-        if (element->GetName() && strcmp(element->GetName(), "Element") == 0)
-          {
-          vtkClientServerID id;
-          int int_id;
-          if (element->GetScalarAttribute("id", &int_id) && int_id)
-            {
-            this->VTKObjectID.ID = int_id;
-            }
-          else
-            {
-            // Some proxies may not have any vtk object they represent (such as
-            // all the animation proxies). It's not an error.
-            // vtkErrorMacro("Element with id attribute not found.");
-            }
-          }
-        else
-          {
-          vtkErrorMacro("Unexpected element, name: " 
-                        << (element->GetName()?element->GetName():"(null)"));
-          }
+        this->VTKObjectID.ID = int_id;
+        }
+      else
+        {
+        // Some proxies may not have any vtk object they represent (such as
+        // all the animation proxies). It's not an error.
+        // vtkErrorMacro("Element with id attribute not found.");
         }
       }
     else if (name && strcmp(name, "SubProxy") == 0)
@@ -2048,15 +2039,10 @@ vtkPVXMLElement* vtkSMProxy::SaveRevivalState(vtkPVXMLElement* root)
   // Save VTKObject ID as well.
   vtkPVXMLElement* idRoot = vtkPVXMLElement::New();
   idRoot->SetName("VTKObjectID");
+  idRoot->AddAttribute("id", 
+                     static_cast<unsigned int>(this->VTKObjectID.ID));
   proxyElement->AddNestedElement(idRoot);
   idRoot->Delete();
-
-  vtkPVXMLElement* elem = vtkPVXMLElement::New();
-  elem->SetName("Element");
-  elem->AddAttribute("id", 
-                     static_cast<unsigned int>(this->VTKObjectID.ID));
-  idRoot->AddNestedElement(elem);
-  elem->Delete();
 
   vtkSMProxyInternals::ProxyMap::iterator iter =
     this->Internals->SubProxies.begin();

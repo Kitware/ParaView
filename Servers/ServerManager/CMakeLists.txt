@@ -41,7 +41,7 @@ SET(Kit_SRCS
   vtkSMClientServerRenderViewProxy.cxx
   vtkSMComparativeViewProxy.cxx
   vtkSMCompositeKeyFrameProxy.cxx
-  vtkSMCompoundProxy.cxx
+  vtkSMCompoundSourceProxy.cxx
   vtkSMCompoundProxyDefinitionLoader.cxx
   vtkSMConnectionCleanerProxy.cxx
   vtkSMCubeAxesRepresentationProxy.cxx
@@ -93,7 +93,7 @@ SET(Kit_SRCS
   vtkSMObject.cxx
   vtkSMOrderedPropertyIterator.cxx
   vtkSMOutlineRepresentationProxy.cxx
-  vtkSMPart.cxx
+  vtkSMOutputPort.cxx
   vtkSMPQStateLoader.cxx
   vtkSMPropertyAdaptor.cxx
   vtkSMProperty.cxx

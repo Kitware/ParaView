@@ -16,38 +16,79 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMCompoundProxy.h"
+#include "vtkSMCompoundSourceProxy.h"
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMCompoundProxyDefinitionLoader);
-vtkCxxRevisionMacro(vtkSMCompoundProxyDefinitionLoader, "1.3");
+vtkCxxRevisionMacro(vtkSMCompoundProxyDefinitionLoader, "1.4");
 
 //---------------------------------------------------------------------------
 vtkSMCompoundProxyDefinitionLoader::vtkSMCompoundProxyDefinitionLoader()
 {
+  this->RootElement = 0;
 }
 
 //---------------------------------------------------------------------------
 vtkSMCompoundProxyDefinitionLoader::~vtkSMCompoundProxyDefinitionLoader()
 {
+  this->RootElement = 0;
 }
 
 //---------------------------------------------------------------------------
-vtkSMCompoundProxy* vtkSMCompoundProxyDefinitionLoader::HandleDefinition(
+vtkSMCompoundSourceProxy* vtkSMCompoundProxyDefinitionLoader::HandleDefinition(
   vtkPVXMLElement* rootElement)
 {
-  vtkSMCompoundProxy* result = vtkSMCompoundProxy::New();
-
-  result->LoadState(rootElement, this);
-
-  return result;
+  vtkSMCompoundSourceProxy* result = vtkSMCompoundSourceProxy::New();
+  this->RootElement = rootElement;
+  if (result->LoadDefinition(rootElement, this))
+    {
+    this->RootElement = 0;
+    return result;
+    }
+  result->Delete();
+  this->RootElement = 0;
+  return 0;
 }
 
 //---------------------------------------------------------------------------
-vtkSMCompoundProxy* vtkSMCompoundProxyDefinitionLoader::LoadDefinition(
+vtkPVXMLElement* vtkSMCompoundProxyDefinitionLoader::LocateProxyElement(int id)
+{
+  if (!this->RootElement)
+    {
+    vtkErrorMacro("No root is defined. Cannot locate proxy element with id " 
+      << id);
+    return 0;
+    }
+
+  vtkPVXMLElement* root = this->RootElement;
+  unsigned int numElems = root->GetNumberOfNestedElements();
+  unsigned int i=0;
+  for (i=0; i<numElems; i++)
+    {
+    vtkPVXMLElement* currentElement = root->GetNestedElement(i);
+    if (currentElement->GetName() &&
+      strcmp(currentElement->GetName(), "Proxy") == 0)
+      {
+      int currentId;
+      if (!currentElement->GetScalarAttribute("id", &currentId))
+        {
+        continue;
+        }
+      if (id != currentId)
+        {
+        continue;
+        }
+      return currentElement;
+      }
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+vtkSMCompoundSourceProxy* vtkSMCompoundProxyDefinitionLoader::LoadDefinition(
   vtkPVXMLElement* rootElement)
 {
-  vtkSMCompoundProxy* result = 0;
+  vtkSMCompoundSourceProxy* result = 0;
   if (!rootElement)
     {
     vtkErrorMacro("Cannot load state from (null) root element.");
@@ -64,7 +105,7 @@ vtkSMCompoundProxy* vtkSMCompoundProxyDefinitionLoader::LoadDefinition(
   this->ClearCreatedProxies();
 
   if (rootElement->GetName() &&
-      strcmp(rootElement->GetName(), "CompoundProxy") == 0)
+      strcmp(rootElement->GetName(), "CompoundSourceProxy") == 0)
     {
     result = this->HandleDefinition(rootElement);
     }

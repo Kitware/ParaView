@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "pqProxy.h"
+#include <QSize> // needed for QSize.
 
 class pqOutputPort;
 class pqPipelineSource;
@@ -98,6 +99,11 @@ public:
   /// the current window size is used.
   /// TODO:  pqView should probably report file types it supports
   virtual bool saveImage(int width, int height, const QString& filename) =0;
+
+  /// Returns the current size of the rendering context.
+  /// Default implementation returns the client size ofthe widget. Subclasses
+  /// may override to change this behaviour.
+  virtual QSize getSize();
 
   /// Capture the view image into a new vtkImageData with the given magnification
   /// and returns it.

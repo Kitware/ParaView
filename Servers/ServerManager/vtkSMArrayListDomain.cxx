@@ -30,7 +30,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.12");
+vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.13");
 
 struct vtkSMArrayListDomainInternals
 {
@@ -101,7 +101,7 @@ void vtkSMArrayListDomain::Update(vtkSMSourceProxy* sp,
                                   int outputport)
 {
   // Make sure the outputs are created.
-  sp->CreateParts();
+  sp->CreateOutputPorts();
   vtkPVDataInformation* info = sp->GetDataInformation(outputport);
 
   if (!info)

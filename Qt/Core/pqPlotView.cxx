@@ -585,7 +585,7 @@ bool pqPlotView::canDisplay(pqOutputPort* opPort) const
   if(!opPort|| !source ||
      opPort->getServer()->GetConnectionID() !=
      this->getServer()->GetConnectionID() || !sourceProxy ||
-     sourceProxy->GetNumberOfParts()==0)
+     sourceProxy->GetOutputPortsCreated()==0)
     {
     return false;
     }

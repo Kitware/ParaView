@@ -34,8 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Server Manager Includes.
 #include "vtkPVClassNameInformation.h"
 #include "vtkPVDataInformation.h"
-#include "vtkSMCompoundProxy.h"
-#include "vtkSMPart.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMSourceProxy.h"
 
 // Qt Includes.
@@ -88,12 +87,8 @@ pqServer* pqOutputPort::getServer() const
 //-----------------------------------------------------------------------------
 vtkPVDataInformation* pqOutputPort::getDataInformation(bool update) const
 {
-  vtkSMCompoundProxy* compoundProxy = vtkSMCompoundProxy::SafeDownCast(
+  vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(
     this->getSource()->getProxy());
-
-  vtkSMSourceProxy* source = compoundProxy?
-    vtkSMSourceProxy::SafeDownCast(compoundProxy->GetConsumableProxy()):
-    vtkSMSourceProxy::SafeDownCast(this->getSource()->getProxy());
 
   if (!source)
     {
@@ -114,12 +109,8 @@ vtkPVDataInformation* pqOutputPort::getDataInformation(bool update) const
 //-----------------------------------------------------------------------------
 const char* pqOutputPort::getDataClassName() const
 {
-  vtkSMCompoundProxy* compoundProxy = vtkSMCompoundProxy::SafeDownCast(
+  vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(
     this->getSource()->getProxy());
-
-  vtkSMSourceProxy* source = compoundProxy?
-    vtkSMSourceProxy::SafeDownCast(compoundProxy->GetConsumableProxy()):
-    vtkSMSourceProxy::SafeDownCast(this->getSource()->getProxy());
 
   if (!source)
     {
@@ -127,8 +118,17 @@ const char* pqOutputPort::getDataClassName() const
     }
 
   vtkPVClassNameInformation* ciInfo = 
-    source->GetPart(this->PortNumber)->GetClassNameInformation();
+    source->GetOutputPort(this->PortNumber)->GetClassNameInformation();
   return ciInfo? ciInfo->GetVTKClassName(): 0;
+}
+
+//-----------------------------------------------------------------------------
+QString pqOutputPort::getPortName() const
+{
+  vtkSMSourceProxy* source = 
+    vtkSMSourceProxy::SafeDownCast(this->getSource()->getProxy());
+  return QString(source->GetOutputPortName(
+      static_cast<unsigned int>(this->PortNumber)));
 }
 
 //-----------------------------------------------------------------------------
@@ -147,6 +147,12 @@ pqPipelineSource* pqOutputPort::getConsumer(int index) const
     }
 
   return this->Internal->Consumers[index];
+}
+
+//-----------------------------------------------------------------------------
+QList<pqPipelineSource*> pqOutputPort::getConsumers() const
+{
+  return this->Internal->Consumers;
 }
 
 //-----------------------------------------------------------------------------

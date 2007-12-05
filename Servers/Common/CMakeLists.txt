@@ -31,6 +31,7 @@ SET(Kit_SRCS
   vtkProcessModuleConnectionManager.cxx
   vtkProcessModule.cxx
   vtkProcessModuleGUIHelper.cxx
+  vtkPVAlgorithmPortsInformation.cxx
   vtkPVArrayInformation.cxx
   vtkPVCacheSizeInformation.cxx
   vtkPVClassNameInformation.cxx
@@ -46,7 +47,6 @@ SET(Kit_SRCS
   vtkPVFileInformationHelper.cxx
   vtkPVGenericAttributeInformation.cxx
   vtkPVInformation.cxx
-  vtkPVNumberOfOutputsInformation.cxx
   vtkPVOpenGLExtensionsInformation.cxx
   vtkPVPluginLoader.cxx
   vtkPVProgressHandler.cxx

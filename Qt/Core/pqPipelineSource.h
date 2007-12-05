@@ -66,6 +66,9 @@ public:
 
   /// Returns the pqOutputPort for the given output port.
   pqOutputPort* getOutputPort(int outputport) const;
+  
+  /// Returns the pqOutputPort given the name of the port.
+  pqOutputPort* getOutputPort(const QString& portName) const;
 
   /// Returns the number of consumers connected to the given output port.
   int getNumberOfConsumers(int outputport) const;
@@ -82,6 +85,9 @@ public:
   /// Equivalent to calling getConsumer(0, index);
   pqPipelineSource *getConsumer(int index) const
     { return this->getConsumer(0, index); }
+
+  /// Returns a list of consumers for all output ports.
+  QList<pqPipelineSource*> getAllConsumers() const;
 
   /// Returns a list of representations for this source in the given view.
   /// If view == NULL, returns all representations of this source.

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVNumberOfOutputsInformation.h
+  Module:    vtkPVAlgorithmPortsInformation.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,27 +12,31 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVNumberOfOutputsInformation - Holds number of outputs
+// .NAME vtkPVAlgorithmPortsInformation - Holds number of outputs
 // .SECTION Description
 // This information object collects the number of outputs from the
 // sources.  This is separate from vtkPVDataInformation because the number of
 // outputs can be determined before Update is called.
 
-#ifndef __vtkPVNumberOfOutputsInformation_h
-#define __vtkPVNumberOfOutputsInformation_h
+#ifndef __vtkPVAlgorithmPortsInformation_h
+#define __vtkPVAlgorithmPortsInformation_h
 
 #include "vtkPVInformation.h"
 
-class VTK_EXPORT vtkPVNumberOfOutputsInformation : public vtkPVInformation
+class VTK_EXPORT vtkPVAlgorithmPortsInformation : public vtkPVInformation
 {
 public:
-  static vtkPVNumberOfOutputsInformation* New();
-  vtkTypeRevisionMacro(vtkPVNumberOfOutputsInformation, vtkPVInformation);
+  static vtkPVAlgorithmPortsInformation* New();
+  vtkTypeRevisionMacro(vtkPVAlgorithmPortsInformation, vtkPVInformation);
   void PrintSelf(ostream &os, vtkIndent indent);
 
   // Description:
   // Get number of outputs for a particular source.
   vtkGetMacro(NumberOfOutputs, int);
+
+  // Description:
+  // Get the number of required inputs for a particular algorithm.
+  vtkGetMacro(NumberOfRequiredInputs, int);
 
   // Description:
   // Transfer information about a single object into this object.
@@ -48,14 +52,16 @@ public:
   virtual void CopyFromStream(const vtkClientServerStream*);
 
 protected:
-  vtkPVNumberOfOutputsInformation();
-  ~vtkPVNumberOfOutputsInformation();
+  vtkPVAlgorithmPortsInformation();
+  ~vtkPVAlgorithmPortsInformation();
 
   int NumberOfOutputs;
+  int NumberOfRequiredInputs;
+
   vtkSetMacro(NumberOfOutputs, int);
 private:
-  vtkPVNumberOfOutputsInformation(const vtkPVNumberOfOutputsInformation&); // Not implemented
-  void operator=(const vtkPVNumberOfOutputsInformation&); // Not implemented
+  vtkPVAlgorithmPortsInformation(const vtkPVAlgorithmPortsInformation&); // Not implemented
+  void operator=(const vtkPVAlgorithmPortsInformation&); // Not implemented
 };
 
 #endif

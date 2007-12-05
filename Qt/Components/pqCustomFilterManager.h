@@ -110,7 +110,7 @@ private slots:
 
 protected:
 
-  QString getUnusedFilterName(const QString &name);
+  QString getUnusedFilterName(const QString& group, const QString &name);
 
 private:
   pqCustomFilterManagerModel *Model; ///< Stores the custom filter list.

@@ -26,9 +26,38 @@
 #include <vtkstd/vector>
 #include "vtkStdString.h"
 
+class vtkSMProxyManagerElement : public vtkSmartPointer<vtkPVXMLElement>
+{
+  typedef vtkSmartPointer<vtkPVXMLElement> Superclass;
+public:
+  bool Custom; // custom is true for definitions not added by vtkSMXMLParser.
+  vtkSMProxyManagerElement() :Custom(false) {}
+  vtkSMProxyManagerElement(vtkPVXMLElement* elem)
+    {
+    this->Custom = false;
+    this->Superclass::operator=(elem);
+    }
+  vtkSMProxyManagerElement(vtkPVXMLElement* elem, bool custom)
+    {
+    this->Custom = custom;
+    this->Superclass::operator=(elem);
+    }
+
+  // Description:
+  // Assign object to reference.  This removes any reference to an old
+  // object.
+  vtkSMProxyManagerElement& operator=(vtkPVXMLElement* r)
+    {
+    this->Custom = false;
+    this->Superclass::operator=(r);
+    return *this;
+    }
+
+};
+
 // Sub-classed to avoid symbol length explosion.
 class vtkSMProxyManagerElementMapType:
-  public vtkstd::map<vtkStdString, vtkSmartPointer<vtkPVXMLElement> > {};
+  public vtkstd::map<vtkStdString, vtkSMProxyManagerElement> {};
 
 class vtkSMProxyManagerProxyInfo : public vtkObjectBase
 {
@@ -146,10 +175,6 @@ struct vtkSMProxyManagerInternals
   // This data structure stores a set of proxies that have been modified.
   typedef vtkstd::set<vtkSMProxy*> SetOfProxies;
   SetOfProxies ModifiedProxies;
-
-  typedef vtkstd::map<vtkStdString, vtkSmartPointer<vtkPVXMLElement> >
-     DefinitionType;
-  DefinitionType CompoundProxyDefinitions;
 
   // Data structure to save registered links.
   typedef vtkstd::map<vtkStdString, vtkSmartPointer<vtkSMLink> >

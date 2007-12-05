@@ -30,6 +30,7 @@
 
 class vtkSMProxyManager;
 class vtkSMProxyDefinitionIteratorInternals;
+class vtkPVXMLElement;
 
 class VTK_EXPORT vtkSMProxyDefinitionIterator : public vtkSMObject
 {
@@ -63,32 +64,51 @@ public:
   const char* GetKey();
 
   // Description:
-  // The traversal mode for the iterator. If the traversal mode is
+  // Returns the XML element defining the proxy.
+  vtkPVXMLElement* GetDefinition();
+
+  // Description:
+  // Returns if the current definition is a custom proxy definition.
+  bool IsCustom();
+
+  // Description:
+  // The traversal mode for the iterator. It is not advisable to change the mode
+  // during an iteration i.e. after changing mode, one must call Begin() before
+  // using the iterator.
+  // If the traversal mode is
   // set to GROUPS, each Next() will move to the next group, in
-  // ONE_GROUP mode, all proxies in one group are visited,
-  // in ALL mode, all proxies are visited. 
-  // In COMPOUND_PROXY_DEFINITIONS mode, the iterator
-  // iterates over compound proxy definitions. 
-  // Note, when in COMPOUND_PROXY_DEFINITIONS mode, the
-  // "Group" is not defined i.e. GetGroup() always returns NULL.
+  // ONE_GROUP mode, all proxy definitions in one group are visited,
+  // In CUSTOM_ONLY mode, the iterator
+  // iterates over custom proxy definitions. 
+  // in ALL mode, all proxy definitions are visited. 
   vtkSetMacro(Mode, int);
   vtkGetMacro(Mode, int);
   void SetModeToGroupsOnly() { this->SetMode(GROUPS_ONLY); }
   void SetModeToOneGroup() { this->SetMode(ONE_GROUP); }
   void SetModeToAll() { this->SetMode(ALL); }
+  void SetModeToCustomOnly() { this->SetMode(CUSTOM_ONLY); }
 //BTX
   enum TraversalMode
   {
     GROUPS_ONLY=0,
     ONE_GROUP=1,
-    ALL=2,
-    COMPOUND_PROXY_DEFINITIONS=3
+    CUSTOM_ONLY=2,
+    ALL=3
   };
 //ETX
 protected:
   vtkSMProxyDefinitionIterator();
   ~vtkSMProxyDefinitionIterator();
 
+  // Description:
+  // If current item is not a custom proxy definition, then 
+  // simply keeps on calling NextInternal() until the end is reached or a custom
+  // proxy definition is encountered. Used in CUSTOM_ONLY mode.
+  void MoveTillCustom();
+
+  // Description:
+  // Implementation for Next().
+  void NextInternal();
   int Mode;
 private:
   vtkSMProxyDefinitionIterator(const vtkSMProxyDefinitionIterator&); // Not implemented.

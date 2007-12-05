@@ -43,8 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqCustomFilterDefinitionModel;
 class pqCustomFilterDefinitionWizardForm;
 class pqCustomFilterManagerModel;
+class pqOutputPort;
 class QModelIndex;
-class vtkSMCompoundProxy;
+class vtkSMCompoundSourceProxy;
 
 /*! \class pqCustomFilterDefinitionWizard
  *  \brief
@@ -269,9 +270,12 @@ private slots:
 private:
   int CurrentPage;                          ///< Stores the current page.
   bool OverwriteOK;                         ///< Used with name validation.
-  vtkSMCompoundProxy *Filter;               ///< Stores the custom filter.
+  vtkSMCompoundSourceProxy *Filter;         ///< Stores the custom filter.
   pqCustomFilterDefinitionModel *Model;     ///< Stores the source hierarchy.
   pqCustomFilterDefinitionWizardForm *Form; ///< Defines the gui layout.
+
+  /// Internal method called by addOutput().
+  void addOutputInternal(pqOutputPort* port, const QString& string);
 };
 
 #endif

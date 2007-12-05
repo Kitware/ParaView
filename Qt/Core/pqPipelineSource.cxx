@@ -39,10 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkClientServerStream.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMCompoundProxy.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyListDomain.h"
@@ -90,22 +88,15 @@ pqPipelineSource::pqPipelineSource(const QString& name, vtkSMProxy* proxy,
 : pqProxy("sources", name, proxy, server, _parent)
 {
   this->Internal = new pqPipelineSourceInternal(name, proxy);
-  vtkSMCompoundProxy* compoundProxy = vtkSMCompoundProxy::SafeDownCast(this->getProxy());
-
-  vtkSMSourceProxy* source = compoundProxy? 
-    vtkSMSourceProxy::SafeDownCast(compoundProxy->GetConsumableProxy()):
-    vtkSMSourceProxy::SafeDownCast(this->getProxy());
+  vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(this->getProxy());
   if (source)
     {
     // Obtain information about number of output ports.
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkPVNumberOfOutputsInformation* info =
-      vtkPVNumberOfOutputsInformation::New();
-    vtkClientServerStream stream;
-    pm->GatherInformation(
-      source->GetConnectionID(), source->GetServers(), info, source->GetID());
-    int numports = info->GetNumberOfOutputs();
-    info->Delete();
+    // Number of output ports is valid even if the output port proxies haven't
+    // been created (so long as CreateVTKObjects() has been called on the
+    // proxy).
+    source->GetID(); // causes CreateVTKObjects() to be called.
+    int numports = source->GetNumberOfOutputPorts();
 
     for (int cc=0; cc < numports; cc++)
       {
@@ -384,6 +375,19 @@ pqOutputPort* pqPipelineSource::getOutputPort(int outputport) const
 }
 
 //-----------------------------------------------------------------------------
+pqOutputPort* pqPipelineSource::getOutputPort(const QString& name) const
+{
+  vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(this->getProxy());
+  unsigned int index = source->GetOutputPortIndex(name.toAscii().data());
+  if (index != VTK_UNSIGNED_INT_MAX)
+    {
+    return this->getOutputPort(static_cast<int>(index));
+    }
+
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
 int pqPipelineSource::getNumberOfConsumers(int outputport) const
 {
   if (outputport < 0 || outputport >= this->Internal->OutputPorts.size())
@@ -406,6 +410,24 @@ pqPipelineSource *pqPipelineSource::getConsumer(int outputport, int index) const
     }
 
   return this->Internal->OutputPorts[outputport]->getConsumer(index);
+}
+
+//-----------------------------------------------------------------------------
+QList<pqPipelineSource*> pqPipelineSource::getAllConsumers() const
+{
+  QList<pqPipelineSource*> consumers;
+  foreach (pqOutputPort* port, this->Internal->OutputPorts)
+    {
+    QList<pqPipelineSource*> portConsumers = port->getConsumers();
+    for (int cc=0; cc < portConsumers.size(); cc++)
+      {
+      if (!consumers.contains(portConsumers[cc]))
+        {
+        consumers.push_back(portConsumers[cc]);
+        }
+      }
+    }
+  return consumers;
 }
 
 //-----------------------------------------------------------------------------

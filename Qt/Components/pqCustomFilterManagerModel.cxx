@@ -149,7 +149,7 @@ void pqCustomFilterManagerModel::addCustomFilter(QString name)
   // Make sure the name is new.
   if(this->Internal->contains(name))
     {
-    qDebug() << "Duplicate compound proxy definition added.";
+    qDebug() << "Duplicate custom proxy definition added.";
     return;
     }
 
@@ -181,7 +181,7 @@ void pqCustomFilterManagerModel::removeCustomFilter(QString name)
   int row = this->Internal->indexOf(name);
   if(row == -1)
     {
-    qDebug() << "Compound proxy definition not found in the model.";
+    qDebug() << "Custom proxy definition not found in the model.";
     return;
     }
 
@@ -213,7 +213,7 @@ void pqCustomFilterManagerModel::importCustomFiltersFromSettings()
   vtkPVXMLParser *parser = vtkPVXMLParser::New();
   parser->Parse(state.toAscii().data());
 
-  proxyManager->LoadCompoundProxyDefinitions(parser->GetRootElement());
+  proxyManager->LoadCustomProxyDefinitions(parser->GetRootElement());
 
   parser->Delete();
 }
@@ -225,19 +225,10 @@ void pqCustomFilterManagerModel::exportCustomFiltersToSettings()
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
   vtkPVXMLElement *root = vtkPVXMLElement::New();
   root->SetName("CustomFilterDefinitions");
-  proxyManager->SaveCompoundProxyDefinitions(root);
-/*
-  QString name;
-  for(int i=0; i<this->rowCount(); i++)
-    {
-    QString name = this->getCustomFilterName(this->index(i,0));
-    vtkPVXMLElement *cf = proxyManager->GetCompoundProxyDefinition(name.toAscii().data());
-    root->AddNestedElement(cf);
-    }
-*/
+  proxyManager->SaveCustomProxyDefinitions(root);
+
   vtksys_ios::ostringstream os;
   root->PrintXML(os,vtkIndent(0));
-  os << ends;
   QString state = os.str().c_str();
   root->Delete();
 

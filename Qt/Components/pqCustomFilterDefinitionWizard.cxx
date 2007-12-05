@@ -38,8 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCustomFilterDefinitionModel.h"
 #include "pqCustomFilterManagerModel.h"
-#include "pqPipelineSource.h"
 #include "pqFlatTreeView.h"
+#include "pqOutputPort.h"
+#include "pqPipelineSource.h"
 
 #include <QHeaderView>
 #include <QMessageBox>
@@ -49,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTreeWidgetItem>
 
 #include "vtkPVXMLElement.h"
-#include "vtkSMCompoundProxy.h"
+#include "vtkSMCompoundSourceProxy.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
@@ -61,7 +62,14 @@ class pqCustomFilterDefinitionWizardForm :
     public Ui::pqCustomFilterDefinitionWizard
 {
 public:
-  QStringList ListNames; ///< Used to make sure names are unique.
+  QStringList ExposedPropertyNames; ///< Used to ensure all exposed 
+                                    ///  property names are unique.
+ 
+  QStringList ExposedPortNames;     ///< Used to ensure all exposed 
+                                    ///  port names are unique.
+  QStringList ToExposeNames;        ///< Used to ensure that same thing
+             /// (either property or port) is not exposed twice.
+
   // Maps a proxy name with a map of <propertyLabel, propertyName>
   // pairs for each of its properties. This assumes that labels of
   // a proxy's properties are unique.
@@ -204,13 +212,20 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
 
   // Create the compound proxy. Add all the proxies to it.
   pqPipelineSource *source = 0;
-  this->Filter = vtkSMCompoundProxy::New();
+  this->Filter = vtkSMCompoundSourceProxy::New();
+  bool first = true;
   QModelIndex index = this->Model->getNextIndex(QModelIndex());
   while(index.isValid())
     {
     source = this->Model->getSourceFor(index);
     if(source)
       {
+      if (first)
+        {
+        this->Filter->SetConnectionID(source->getProxy()->GetConnectionID());
+        this->Filter->SetServers(source->getProxy()->GetServers());
+        first = false;
+        }
       this->Filter->AddProxy(source->getSMName().toAscii().data(),
           source->getProxy());
       }
@@ -235,8 +250,15 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
   for(i = 0; i < total; i++)
     {
     item = this->Form->OutputPorts->topLevelItem(i);
-    this->Filter->SetConsumableProxy(item->text(0).toAscii().data());
-    break; // TEMP: Change when multiple outputs supported.
+    pqOutputPort* port = qobject_cast<pqOutputPort*>(
+      item->data(0, Qt::UserRole).value<QObject*>());
+    if (port)
+      {
+      this->Filter->ExposeOutputPort(
+        port->getSource()->getSMName().toAscii().data(),
+        port->getPortNumber(),
+        item->text(1).toAscii().data());
+      }
     }
 
   // Expose the properties.
@@ -255,7 +277,7 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
   // Register the compound proxy definition with the server manager.
   vtkPVXMLElement *root = this->Filter->SaveDefinition(0);
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
-  proxyManager->RegisterCompoundProxyDefinition(
+  proxyManager->RegisterCustomProxyDefinition("filters",
       this->Form->CustomFilterName->text().toAscii().data(), root);
   root->Delete();
 }
@@ -321,8 +343,7 @@ bool pqCustomFilterDefinitionWizard::validateCustomFilterName()
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
   if(!this->OverwriteOK)
     {
-    if(proxyManager->GetCompoundProxyDefinition(filterName.toAscii().data()) 
-      || proxyManager->GetProxy("filters_prototypes",filterName.toAscii().data()))
+    if(proxyManager->GetProxyDefinition("filters", filterName.toAscii().data()))
       {
       QMessageBox::warning(this, "Duplicate Name",
           "This filter name already exists.\n"
@@ -379,15 +400,17 @@ void pqCustomFilterDefinitionWizard::setupDefaultInputOutput()
           this->Form->LabelToNamePropertyMap[source->getSMName()][propertyName] = 
               propertyName;
           this->Form->InputPorts->setCurrentItem(item);
-          this->Form->ListNames.append("Input");
+          this->Form->ExposedPropertyNames.append("Input");
+          this->Form->ToExposeNames.append(
+            QString("INPUT:%1.%2").arg(item->text(0)).arg(item->text(1)));
           }
         }
       }
 
     // Set up the default output property.
-    while(this->Model->hasChildren(index))
+    while (this->Model->hasChildren(index))
       {
-      if(this->Model->rowCount(index) == 1)
+      if(this->Model->rowCount(index) > 0)
         {
         index = this->Model->index(0, 0, index);
         }
@@ -401,14 +424,7 @@ void pqCustomFilterDefinitionWizard::setupDefaultInputOutput()
     pqPipelineSource *output = this->Model->getSourceFor(index);
     if(output)
       {
-      // Add the exposed output port to the list.
-      QStringList list;
-      list.append(output->getSMName());
-      list.append("Output");
-      QTreeWidgetItem *item = new QTreeWidgetItem(this->Form->OutputPorts,
-          list);
-      this->Form->OutputPorts->setCurrentItem(item);
-      this->Form->ListNames.append("Output");
+      this->addOutputInternal(source->getOutputPort(0), "Output");
       }
     }
 }
@@ -510,11 +526,29 @@ void pqCustomFilterDefinitionWizard::updateInputForm(const QModelIndex &current,
     }
 }
 
-void pqCustomFilterDefinitionWizard::updateOutputForm(const QModelIndex &,
+void pqCustomFilterDefinitionWizard::updateOutputForm(const QModelIndex &current,
     const QModelIndex &)
 {
   // Clear the output name field.
   this->Form->OutputName->setText("");
+  this->Form->OutputCombo->clear();
+
+  // * Get the proxy from the index. 
+  // * Find the names for all output ports for that proxy.
+  // * Populate the OutputCombo with available options.
+  pqPipelineSource *source = this->Model->getSourceFor(current);
+  if(source)
+    {
+    vtkSMSourceProxy *proxy = vtkSMSourceProxy::SafeDownCast(source->getProxy());
+    if(proxy)
+      {
+      unsigned int numPorts = proxy->GetNumberOfOutputPorts();
+      for (unsigned int cc=0; cc < numPorts; cc++)
+        {
+        this->Form->OutputCombo->addItem(proxy->GetOutputPortName(cc));
+        }
+      }
+    }
 }
 
 void pqCustomFilterDefinitionWizard::updatePropertyForm(
@@ -593,7 +627,7 @@ void pqCustomFilterDefinitionWizard::addInput()
     return;
     }
 
-  if(this->Form->ListNames.contains(name))
+  if(this->Form->ExposedPropertyNames.contains(name))
     {
     QMessageBox::warning(this, "Duplicate Name",
         "Another input already has the name entered.\n"
@@ -604,6 +638,16 @@ void pqCustomFilterDefinitionWizard::addInput()
     return;
     }
 
+  QString key = QString("INPUT:%1.%2").arg(source->getSMName()).arg(
+    this->Form->InputCombo->itemText(propertyIndex));
+  if (this->Form->ToExposeNames.contains(key))
+    {
+    QMessageBox::warning(this, "Duplicate Input",
+      "The selected Input has already been added.",
+      QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
+    return;
+    }
+
   // Add the exposed input port to the list.
   QStringList list;
   list.append(source->getSMName());
@@ -611,7 +655,8 @@ void pqCustomFilterDefinitionWizard::addInput()
   list.append(name);
   QTreeWidgetItem *item = new QTreeWidgetItem(this->Form->InputPorts, list);
   this->Form->InputPorts->setCurrentItem(item);
-  this->Form->ListNames.append(name);
+  this->Form->ExposedPropertyNames.append(name);
+  this->Form->ToExposeNames.append(key);
 }
 
 void pqCustomFilterDefinitionWizard::removeInput()
@@ -621,7 +666,10 @@ void pqCustomFilterDefinitionWizard::removeInput()
   if(item)
     {
     int row = this->Form->InputPorts->indexOfTopLevelItem(item) - 1;
-    this->Form->ListNames.removeAll(item->text(2));
+    this->Form->ExposedPropertyNames.removeAll(item->text(2));
+    QString key = QString("INPUT:%1.%2").arg(item->text(0)).arg(
+      item->text(1));
+    this->Form->ToExposeNames.removeAll(key);
     delete item;
     if(row < 0)
       {
@@ -698,7 +746,7 @@ void pqCustomFilterDefinitionWizard::addOutput()
     return;
     }
 
-  if(this->Form->ListNames.contains(name))
+  if(this->Form->ExposedPortNames.contains(name))
     {
     QMessageBox::warning(this, "Duplicate Name",
         "Another output already has the name entered.\n"
@@ -709,22 +757,57 @@ void pqCustomFilterDefinitionWizard::addOutput()
     return;
     }
 
-  // TEMP: Change when multiple outputs supported.
-  if(this->Form->OutputPorts->topLevelItemCount() > 0)
+  // Validate port name.
+  QString portname = this->Form->OutputCombo->currentText();
+  pqOutputPort* port = source->getOutputPort(portname);
+  if (!port)
     {
-    QMessageBox::information(this, "Temporary Limitation",
-        "Only one output port is currently supported.\n"
-        "The first item in the output port list will be used.",
+    QMessageBox::warning(this, "No Output Port Selected",
+        "No output port was selected or selected output port does not exist.\n"
+        "Please select a output port from the \"Output Port\" combo box.",
         QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
+    this->Form->OutputCombo->setFocus();
+    return;
     }
 
+  // Verify that the selected port hasn't already been exposed. 
+  // We don't want to export the same output port twice.
+  QString key = QString("OUTPUT:%1 (%2)").arg(source->getSMName()).arg(port->getPortNumber());
+  if (this->Form->ToExposeNames.contains(key))
+    {
+    QMessageBox::warning(this, "Duplicate Output",
+      "Selected output port has already been exposed.",
+        QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
+    this->Form->OutputCombo->setFocus();
+    return;
+    }
+
+  this->addOutputInternal(port, name);
+}
+
+void pqCustomFilterDefinitionWizard::addOutputInternal(
+  pqOutputPort* port, const QString& name)
+{
+  pqPipelineSource* source = port->getSource();
+  QString key = QString("OUTPUT:%1 (%2)").arg(source->getSMName()).
+    arg(port->getPortNumber());
   // Add the exposed output port to the list.
   QStringList list;
-  list.append(source->getSMName());
+  if (source->getNumberOfOutputPorts() > 1)
+    {
+    list.append(QString("%1 (%2)").arg(source->getSMName()).
+      arg(port->getPortNumber()));
+    }
+  else
+    {
+    list.append(source->getSMName());
+    }
   list.append(name);
   QTreeWidgetItem *item = new QTreeWidgetItem(this->Form->OutputPorts, list);
+  item->setData(0, Qt::UserRole, QVariant::fromValue<QObject*>(port));
   this->Form->OutputPorts->setCurrentItem(item);
-  this->Form->ListNames.append(name);
+  this->Form->ExposedPortNames.append(name);
+  this->Form->ToExposeNames.append(key);
 }
 
 void pqCustomFilterDefinitionWizard::removeOutput()
@@ -734,7 +817,13 @@ void pqCustomFilterDefinitionWizard::removeOutput()
   if(item)
     {
     int row = this->Form->OutputPorts->indexOfTopLevelItem(item) - 1;
-    this->Form->ListNames.removeAll(item->text(1));
+    this->Form->ExposedPortNames.removeAll(item->text(1));
+    pqOutputPort* port = qobject_cast<pqOutputPort*>(
+      item->data(0, Qt::UserRole).value<QObject*>());
+    pqPipelineSource* source = port->getSource();
+    QString key = QString("OUTPUT:%1 (%2)").arg(source->getSMName()).
+      arg(port->getPortNumber());
+    this->Form->ToExposeNames.removeAll(key);
     delete item;
     if(row < 0)
       {
@@ -821,7 +910,7 @@ void pqCustomFilterDefinitionWizard::addProperty()
     return;
     }
 
-  if(this->Form->ListNames.contains(name))
+  if(this->Form->ExposedPropertyNames.contains(name))
     {
     QMessageBox::warning(this, "Duplicate Name",
         "Another property already has the name entered.\n"
@@ -832,6 +921,18 @@ void pqCustomFilterDefinitionWizard::addProperty()
     return;
     }
 
+  QString key = QString("INPUT:%1.%2").arg(source->getSMName()).arg(
+    this->Form->PropertyCombo->itemText(propertyIndex));
+  if (this->Form->ToExposeNames.contains(key))
+    {
+    QMessageBox::warning(this, "Duplicate Property",
+        "The selected property have already been exposed.\n"
+        "Please select another property.",
+        QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
+    this->Form->PropertyCombo->setFocus();
+    return;
+    }
+
   // Add the exposed property to the list.
   QStringList list;
   list.append(source->getSMName());
@@ -839,7 +940,8 @@ void pqCustomFilterDefinitionWizard::addProperty()
   list.append(name);
   QTreeWidgetItem *item = new QTreeWidgetItem(this->Form->PropertyList, list);
   this->Form->PropertyList->setCurrentItem(item);
-  this->Form->ListNames.append(name);
+  this->Form->ExposedPropertyNames.append(name);
+  this->Form->ToExposeNames.append(key);
 }
 
 void pqCustomFilterDefinitionWizard::removeProperty()
@@ -849,7 +951,10 @@ void pqCustomFilterDefinitionWizard::removeProperty()
   if(item)
     {
     int row = this->Form->PropertyList->indexOfTopLevelItem(item) - 1;
-    this->Form->ListNames.removeAll(item->text(2));
+    this->Form->ExposedPropertyNames.removeAll(item->text(2));
+    QString key = QString("INPUT:%1.%2").arg(item->text(0)).arg(
+      item->text(1));
+    this->Form->ToExposeNames.removeAll(key);
     delete item;
     if(row < 0)
       {

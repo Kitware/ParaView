@@ -255,7 +255,8 @@ void pqProxy::setDefaultPropertyValues()
   vtkSMProxy* proxy = this->getProxy();
 
   // If this is a compound proxy, its property values will be set from XML
-  if(proxy->IsA("vtkSMCompoundProxy"))
+  // This seems like a hack. Need some graceful solution.
+  if(proxy->IsA("vtkSMCompoundSourceProxy"))
     {
     return;
     }

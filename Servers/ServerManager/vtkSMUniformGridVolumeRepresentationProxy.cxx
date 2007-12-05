@@ -24,7 +24,6 @@
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMCompoundProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
@@ -34,7 +33,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUniformGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.12");
 //----------------------------------------------------------------------------
 vtkSMUniformGridVolumeRepresentationProxy::vtkSMUniformGridVolumeRepresentationProxy()
 {

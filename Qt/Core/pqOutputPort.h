@@ -68,11 +68,17 @@ public:
   int getPortNumber() const
     { return this->PortNumber; }
 
+  /// Returns the port name for this output port.
+  QString getPortName() const;
+
   /// Returns the number of consumers connected to this output port. 
   int getNumberOfConsumers() const;
 
   /// Get the consumer at a particular index on this output port.
   pqPipelineSource* getConsumer(int index) const;
+
+  /// Returns a list of consumers.
+  QList<pqPipelineSource*> getConsumers() const;
 
   /// Returns a list of representations for this output port in the given view.
   /// If view == NULL, returns all representations of this port.

@@ -15,12 +15,11 @@
 #include "vtkSMOrderedPropertyIterator.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSMCompoundProxy.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMOrderedPropertyIterator);
-vtkCxxRevisionMacro(vtkSMOrderedPropertyIterator, "1.2");
+vtkCxxRevisionMacro(vtkSMOrderedPropertyIterator, "1.3");
 
 //---------------------------------------------------------------------------
 vtkSMOrderedPropertyIterator::vtkSMOrderedPropertyIterator()
@@ -38,16 +37,6 @@ vtkSMOrderedPropertyIterator::~vtkSMOrderedPropertyIterator()
 //---------------------------------------------------------------------------
 void vtkSMOrderedPropertyIterator::SetProxy(vtkSMProxy* proxy)
 {
-  if (proxy && proxy->IsA("vtkSMCompoundProxy"))
-    {
-    vtkSMProxy* mainProxy = 
-      static_cast<vtkSMCompoundProxy*>(proxy)->GetMainProxy();
-    if (mainProxy)
-      {
-      proxy = mainProxy;
-      }
-    }
-
   if (this->Proxy != proxy)
     {
     if (this->Proxy != NULL) { this->Proxy->UnRegister(this); }

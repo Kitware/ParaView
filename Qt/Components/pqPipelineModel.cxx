@@ -55,7 +55,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QtDebug>
 
-#include "vtkSMCompoundProxy.h"
 #include "vtkSMProxy.h"
 
 class pqPipelineModelSource;
@@ -637,8 +636,9 @@ pqPipelineModelOutputPort::pqPipelineModelOutputPort(
 
 QString pqPipelineModelOutputPort::getName() const
 {
-  // TODO: Let the user rename the output port.
-  return QString("Output%1").arg(this->Port);
+  pqOutputPort* opPort = qobject_cast<pqOutputPort*>(
+    this->getObject());
+  return opPort->getPortName();
 }
 
 pqServerManagerModelItem *pqPipelineModelOutputPort::getObject() const 
@@ -1299,7 +1299,7 @@ void pqPipelineModel::addSource(pqPipelineSource *source)
   // the source's xml group name.
   pqPipelineModelSource *item = 0;
   vtkSMProxy *proxy = source->getProxy();
-  if(vtkSMCompoundProxy::SafeDownCast(proxy) != 0)
+  if(proxy->IsA("vtkSMCompoundSourceProxy"))
     {
     item = new pqPipelineModelFilter(server, source,
         pqPipelineModel::CustomFilter);

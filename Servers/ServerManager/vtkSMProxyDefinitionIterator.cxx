@@ -19,16 +19,15 @@
 #include "vtkSMProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyDefinitionIterator);
-vtkCxxRevisionMacro(vtkSMProxyDefinitionIterator, "1.2");
+vtkCxxRevisionMacro(vtkSMProxyDefinitionIterator, "1.3");
 
 class vtkSMProxyDefinitionIteratorInternals
 {
 public:
   vtkSMProxyManagerElementMapType::iterator ProxyIterator;
   vtkSMProxyManagerInternals::GroupMapType::iterator GroupIterator;
-
-  vtkSMProxyManagerInternals::DefinitionType::iterator CompoundProxyIterator;
 };
+
 //-----------------------------------------------------------------------------
 vtkSMProxyDefinitionIterator::vtkSMProxyDefinitionIterator()
 {
@@ -61,8 +60,10 @@ void vtkSMProxyDefinitionIterator::Begin()
       this->Internals->GroupIterator->second.begin();
     }
 
-  this->Internals->CompoundProxyIterator = 
-    pm->Internals->CompoundProxyDefinitions.begin();
+  if (this->Mode == CUSTOM_ONLY)
+    {
+    this->MoveTillCustom();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -81,26 +82,39 @@ void vtkSMProxyDefinitionIterator::Begin(const char* groupName)
     this->Internals->ProxyIterator =
       this->Internals->GroupIterator->second.begin();
     }
+
+  if (this->Mode == CUSTOM_ONLY)
+    {
+    this->MoveTillCustom();
+    }
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMProxyDefinitionIterator::Next()
 {
+  this->NextInternal();
+  if (this->Mode == CUSTOM_ONLY)
+    {
+    this->MoveTillCustom();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMProxyDefinitionIterator::MoveTillCustom()
+{
+  while (!this->IsAtEnd() && !this->IsCustom())
+    {
+    this->NextInternal();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMProxyDefinitionIterator::NextInternal()
+{
   vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
   if (!pm)
     {
     vtkErrorMacro("ProxyManager is not set. Can not perform operation: Next()");
-    return;
-    }
-
-  if (this->Mode == COMPOUND_PROXY_DEFINITIONS)
-    {
-    if (this->Internals->CompoundProxyIterator ==
-      pm->Internals->CompoundProxyDefinitions.end())
-      {
-      return;
-      }
-    this->Internals->CompoundProxyIterator++;
     return;
     }
 
@@ -165,17 +179,6 @@ int vtkSMProxyDefinitionIterator::IsAtEnd()
     return 1;
     }
 
-  if (this->Mode == COMPOUND_PROXY_DEFINITIONS)
-    {
-    if (this->Internals->CompoundProxyIterator == 
-      pm->Internals->CompoundProxyDefinitions.end())
-      {
-      return 1;
-      }
-
-    return 0;
-    }
-
   if (this->Internals->GroupIterator == 
     pm->Internals->GroupMap.end())
     {
@@ -202,11 +205,6 @@ const char* vtkSMProxyDefinitionIterator::GetGroup()
     return 0;
     }
 
-  if (this->Mode == COMPOUND_PROXY_DEFINITIONS)
-    {
-    return 0;
-    }
-
   if (this->Internals->GroupIterator != pm->Internals->GroupMap.end())
     {
     return this->Internals->GroupIterator->first.c_str();
@@ -224,15 +222,6 @@ const char* vtkSMProxyDefinitionIterator::GetKey()
     return 0;
     }
 
-  if (this->Mode == COMPOUND_PROXY_DEFINITIONS)
-    {
-    if (this->Internals->CompoundProxyIterator !=
-      pm->Internals->CompoundProxyDefinitions.end())
-      {
-      this->Internals->CompoundProxyIterator->first.c_str();
-      }
-    return 0;
-    }
   if (this->Internals->GroupIterator != pm->Internals->GroupMap.end())
     {
     if (this->Internals->ProxyIterator != 
@@ -243,6 +232,51 @@ const char* vtkSMProxyDefinitionIterator::GetKey()
     }
   return 0;
 }
+
+//-----------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMProxyDefinitionIterator::GetDefinition()
+{
+  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  if (!pm)
+    {
+    vtkErrorMacro("ProxyManager is not set. Can not perform operation: GetKey()");
+    return 0;
+    }
+
+  if (this->Internals->GroupIterator != pm->Internals->GroupMap.end())
+    {
+    if (this->Internals->ProxyIterator != 
+        this->Internals->GroupIterator->second.end())
+      {
+      return this->Internals->ProxyIterator->second.GetPointer();
+      }
+    }
+
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMProxyDefinitionIterator::IsCustom()
+{
+  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  if (!pm)
+    {
+    vtkErrorMacro("ProxyManager is not set. Can not perform operation: GetKey()");
+    return false;
+    }
+
+  if (this->Internals->GroupIterator != pm->Internals->GroupMap.end())
+    {
+    if (this->Internals->ProxyIterator != 
+        this->Internals->GroupIterator->second.end())
+      {
+      return this->Internals->ProxyIterator->second.Custom;
+      }
+    }
+
+  return false;
+}
+
 
 //-----------------------------------------------------------------------------
 void vtkSMProxyDefinitionIterator::PrintSelf(ostream& os, vtkIndent indent)

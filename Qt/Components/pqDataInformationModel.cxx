@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager includes.
 #include "vtkPVDataInformation.h"
-#include "vtkSMCompoundProxy.h"
 #include "vtkSMSourceProxy.h"
 
 // Qt includes.
@@ -493,19 +492,8 @@ void pqDataInformationModel::refreshModifiedData()
     pqPipelineSource* source = port->getSource();
 
     vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(source->getProxy());
-    if (!proxy)
-      {
-      vtkSMCompoundProxy* compound_proxy = 
-        vtkSMCompoundProxy::SafeDownCast(source->getProxy());
-      if (compound_proxy)
-        {
-        proxy = vtkSMSourceProxy::SafeDownCast(
-          compound_proxy->GetConsumableProxy());
-        }
-      }
-
-    // Get data information only if the proxy has parts.
-    if (!proxy || proxy->GetNumberOfParts() == 0)
+    // Get data information only if the proxy has output ports.
+    if (!proxy || !proxy->GetOutputPortsCreated())
       {
       continue;
       }

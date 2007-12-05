@@ -46,7 +46,7 @@
 #endif
 
 vtkStandardNewMacro(vtkSMAnimationSceneImageWriter);
-vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.8");
+vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.9");
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
   ImageWriter, vtkImageWriter);
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
@@ -224,6 +224,7 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
     this->ImageWriter->SetInput(combinedImage);
     this->ImageWriter->SetFileName(filename.c_str());
     this->ImageWriter->Write();
+    this->ImageWriter->SetInput(0);
 
     errcode = this->ImageWriter->GetErrorCode(); 
     this->FileCount = (!errcode)? this->FileCount + 1 : this->FileCount; 
@@ -233,6 +234,7 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
     {
     this->MovieWriter->SetInput(combinedImage);
     this->MovieWriter->Write();
+    this->MovieWriter->SetInput(0);
 
     int alg_error = this->MovieWriter->GetErrorCode();
     int movie_error = this->MovieWriter->GetError();
@@ -257,6 +259,7 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
       errcode = alg_error;
       }
     }
+  combinedImage = 0;
 
   if (errcode)
     {

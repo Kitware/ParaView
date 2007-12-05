@@ -15,12 +15,11 @@
 #include "vtkSMPropertyIterator.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSMCompoundProxy.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMPropertyIterator);
-vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.8");
+vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.9");
 
 struct vtkSMPropertyIteratorInternals
 {
@@ -47,16 +46,6 @@ vtkSMPropertyIterator::~vtkSMPropertyIterator()
 //---------------------------------------------------------------------------
 void vtkSMPropertyIterator::SetProxy(vtkSMProxy* proxy)
 {
-  if (proxy && proxy->IsA("vtkSMCompoundProxy"))
-    {
-    vtkSMProxy* mainProxy = 
-      static_cast<vtkSMCompoundProxy*>(proxy)->GetMainProxy();
-    if (mainProxy)
-      {
-      proxy = mainProxy;
-      }
-    }
-
   if (this->Proxy != proxy)
     {
     if (this->Proxy != NULL) { this->Proxy->UnRegister(this); }

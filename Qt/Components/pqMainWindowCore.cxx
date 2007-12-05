@@ -50,15 +50,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenuBar>
 
 #include "pqActionGroupInterface.h"
+#include "pqActiveChartOptions.h"
+#include "pqActiveRenderViewOptions.h"
 #include "pqActiveServer.h"
 #include "pqActiveView.h"
 #include "pqActiveViewOptionsManager.h"
-#include "pqActiveRenderViewOptions.h"
-#include "pqActiveChartOptions.h"
 #include "pqAnimationManager.h"
 #include "pqAnimationPanel.h"
 #include "pqAnimationViewWidget.h"
 #include "pqApplicationCore.h"
+#include "pqApplicationOptionsDialog.h"
 #include "pqCameraDialog.h"
 #include "pqCloseViewUndoElement.h"
 #include "pqCustomFilterDefinitionModel.h"
@@ -69,6 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayColorWidget.h"
 #include "pqDisplayRepresentationWidget.h"
 #include "pqFilterInputDialog.h"
+#include "pqFiltersMenuManager.h"
 #include "pqHelperProxyRegisterUndoElement.h"
 #include "pqLinksManager.h"
 #include "pqLookmarkBrowser.h"
@@ -92,8 +94,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineMenu.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineRepresentation.h"
-#include "pqPlotView.h"
 #include "pqPlotViewContextMenuHandler.h"
+#include "pqPlotView.h"
 #include "pqPluginDialog.h"
 #include "pqPluginManager.h"
 #include "pqPQLookupTableManager.h"
@@ -102,7 +104,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyTabWidget.h"
 #include "pqReaderFactory.h"
 #include "pqRenderView.h"
-#include "pqApplicationOptionsDialog.h"
 
 #include "pqSelectionInspectorPanel.h"
 
@@ -195,9 +196,6 @@ public:
     ObjectInspectorDriver(0),
     ActiveViewOptions(0),
     ViewContextMenu(0),
-    RecentFiltersMenu(0),
-    SourceMenu(0),
-    FilterMenu(0),
     PipelineMenu(0),
     PipelineBrowser(0),
     VariableToolbar(0),
@@ -224,79 +222,6 @@ public:
     delete this->LookupTableManager;
   }
 
-  // Stuff related to proxy menu (sources & filters)
-  typedef vtkstd::map<vtkstd::string, vtkstd::string> ProxyIconsType;
-
-  // Used in sort
-  static bool proxyLessThan(vtkSMProxy* first, vtkSMProxy* second)
-    {
-      if (first && second)
-        {
-        if (strcmp(first->GetXMLLabel(), second->GetXMLLabel()) < 0)
-          {
-          return true;
-          }
-        }
-      return false;
-    }
-
-  // Used in unique
-  static bool proxySame(vtkSMProxy* first, vtkSMProxy* second)
-    {
-      if (first && second)
-        {
-        if (strcmp(first->GetXMLLabel() , second->GetXMLLabel()) == 0)
-          {
-          return true;
-          } 
-        }
-      return false;
-    }
-
-  // Given a group name, instantiate the related prototype. The
-  // change in the prototype group is returned in difference.
-  void instantiateGroupPrototypes(vtkstd::string groupName,
-                                  vtkstd::vector<vtkstd::string>& difference);
-
-  // Helper method: given a proxy name, looks up it's prototype in the given
-  // group, gets the XMLLabel and adds an action to the given menu with
-  // it. It also checks for an icon in the given map.
-  void addProxyToMenu(const char* groupName,
-                      const char* proxyname,
-                      QMenu* menu,
-                      pqImplementation::ProxyIconsType* icons,
-                      bool disable=true);
-
-  // Stuff related to the filters menu
-  void updateFiltersFromXML();
-  void updateFiltersFromXML(const QString& xmlfilename);
-  void setupFiltersMenu();
-  void restoreRecentFilterMenu();
-
-  typedef vtkstd::vector<vtkSMProxy*> ProxyVector;
-  ProxyVector AlphabeticalFilters;
-
-  ProxyIconsType FilterIcons;
-
-  struct FilterCategory
-  {
-    FilterCategory(const char* name, const char* label) :
-      Name(name), MenuLabel(label)
-      {
-      }
-    vtkstd::string Name;
-    vtkstd::string MenuLabel;
-    vtkstd::vector<vtkstd::string> Filters;
-  };
-  typedef vtkstd::vector<FilterCategory> FilterCategoriesType;
-  FilterCategoriesType FilterCategories;
-
-  // Stuff related to the sources menu
-  void updateSourcesFromXML();
-  void updateSourcesFromXML(const QString& xmlfilename);
-
-  vtkstd::vector<vtkstd::string> Sources;
-
   QWidget* const Parent;
   pqViewManager MultiViewManager;
   pqVCRController VCRController;
@@ -319,11 +244,8 @@ public:
   pqPickHelper RenderViewPickHelper;
   QPointer<pqUndoStack> UndoStack;
  
-  QPointer<QMenu> RecentFiltersMenu; 
-  QPointer<QMenu> SourceMenu;
-  QPointer<QMenu> FilterMenu;
-  QPointer<QMenu> AlphabeticalMenu;
-  QList<QString> RecentFilterList;
+  QPointer<pqFiltersMenuManager> FiltersMenuManager;
+  QPointer<pqProxyMenuManager> SourcesMenuManager;
 
   pqPipelineMenu* PipelineMenu;
   pqPipelineBrowser *PipelineBrowser;
@@ -351,269 +273,6 @@ public:
   pqCoreTestUtility TestUtility;
   pqActiveServer ActiveServer;
 };
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::pqImplementation::updateSourcesFromXML()
-{
-  QString readersDirName = ":/ParaViewResources";
-  QDir readersDir(readersDirName);
-  QStringList resources = readersDir.entryList(QDir::Files);
-  this->Sources.clear();
-  foreach(QString resource, resources)
-    {
-    this->updateSourcesFromXML(readersDirName + QString("/") + resource);
-    }
-}
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::pqImplementation::updateSourcesFromXML(const QString& xmlfilename)
-{
-  QFile xml(xmlfilename);
-  if (!xml.open(QIODevice::ReadOnly))
-    {
-    qDebug() << "Failed to load " << xmlfilename;
-    return;
-    }
-  
-  QByteArray dat = xml.readAll();
-  
-  vtkSmartPointer<vtkPVXMLParser> parser = 
-    vtkSmartPointer<vtkPVXMLParser>::New();
-  
-  if(!parser->Parse(dat.data()))
-    {
-    qDebug() << "Failed to parse " << xmlfilename;
-    xml.close();
-    return;
-    }
-  
-  // Get all the sources
-  vtkPVXMLElement* elem = parser->GetRootElement();
-  int num = elem->GetNumberOfNestedElements();
-  for(int i=0; i<num; i++)
-    {
-    vtkPVXMLElement* element = elem->GetNestedElement(i);
-    if(QString("Source") == element->GetName())
-      {
-      QString name = element->GetAttribute("name");
-      this->Sources.push_back(name.toStdString());
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::pqImplementation::setupFiltersMenu()
-{
-  this->updateFiltersFromXML();
-  
-  // First add the recently used filters to the Recent menu
-  this->RecentFiltersMenu = 
-    this->FilterMenu->addMenu("&Recent") << pqSetName("Recent");
-  this->restoreRecentFilterMenu();
-  
-  // Next add all categories.
-  pqImplementation::FilterCategoriesType::iterator catIter =
-    this->FilterCategories.begin();
-  for(; catIter != this->FilterCategories.end(); catIter++)
-    {
-    pqImplementation::FilterCategory& category = *catIter;
-    const vtkstd::string& catName = category.Name;
-    const vtkstd::string& catLabel = category.MenuLabel;
-    vtkstd::vector<vtkstd::string>& filters = category.Filters;
-    if (!filters.empty())
-      {
-      QMenu *catMenu = 
-        this->FilterMenu->addMenu(catLabel.c_str()) 
-        << pqSetName(catName.c_str());
-      vtkstd::vector<vtkstd::string>::iterator filterIter =
-        filters.begin();
-      for(; filterIter!=filters.end(); filterIter++)
-        {
-        const char* filterName = filterIter->c_str();
-        this->addProxyToMenu(
-          "filters_prototypes",
-          filterName, 
-          catMenu,
-          &this->FilterIcons);
-        }
-      }
-    }
-
-  // Finally add all filters to the Alphabetical sub-menu..
-  this->AlphabeticalMenu = 
-    this->FilterMenu->addMenu("&Alphabetical") 
-    << pqSetName("Alphabetical");
-
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::pqImplementation::updateFiltersFromXML()
-{
-  QString readersDirName = ":/ParaViewResources";
-  QDir readersDir(readersDirName);
-  QStringList resources = readersDir.entryList(QDir::Files);
-  this->FilterCategories.clear();
-  this->AlphabeticalFilters.clear();
-  foreach(QString resource, resources)
-    {
-    this->updateFiltersFromXML(readersDirName + QString("/") + resource);
-    }
-}
-//-----------------------------------------------------------------------------
-
-void pqMainWindowCore::pqImplementation::updateFiltersFromXML(const QString& xmlfilename)
-{
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-
-  QFile xml(xmlfilename);
-  if (!xml.open(QIODevice::ReadOnly))
-    {
-    qDebug() << "Failed to load " << xmlfilename;
-    return;
-    }
-  
-  QByteArray dat = xml.readAll();
-  
-  vtkSmartPointer<vtkPVXMLParser> parser = 
-    vtkSmartPointer<vtkPVXMLParser>::New();
-  
-  if(!parser->Parse(dat.data()))
-    {
-    qDebug() << "Failed to parse " << xmlfilename;
-    xml.close();
-    return;
-    }
-  
-  vtkPVXMLElement* elem = parser->GetRootElement();
-  int num = elem->GetNumberOfNestedElements();
-  pqImplementation::ProxyVector filters;
-
-  QList<vtkPVXMLElement*> elements;
-  elements.append(parser->GetRootElement());
-
-  // First create a uniquified, alphabetical vector of all filters (recursively)
-  while(!elements.isEmpty())
-    {
-    vtkPVXMLElement* element = elements.takeLast();
-    int numNested = element->GetNumberOfNestedElements();
-    if(numNested)
-      {
-      for(int i=0; i<numNested; i++)
-        {
-        elements.append(element->GetNestedElement(i));
-        }
-      }
-    else
-      {
-      if(QString("Filter") == element->GetName())
-        {
-        QString name = element->GetAttribute("name");
-        QString icon = element->GetAttribute("icon");
-
-        if (!name.isEmpty())
-          {
-          vtkSMProxy* prototype = pxm->GetProxy("filters_prototypes",
-                                                name.toAscii().data());
-          if (prototype)
-            {
-            filters.push_back(prototype);
-            if (!icon.isEmpty())
-              {
-              this->FilterIcons[name.toStdString()] = icon.toStdString();
-              }
-            }
-          }
-        }
-      }
-    }
-  
-  vtkstd::sort(filters.begin(), filters.end(), pqImplementation::proxyLessThan);
-  pqImplementation::ProxyVector::iterator newEnd =
-    vtkstd::unique(filters.begin(), filters.end(), pqImplementation::proxySame);
-
-  pqImplementation::ProxyVector::iterator filterIter = filters.begin();
-  this->AlphabeticalFilters.insert(this->AlphabeticalFilters.begin(),
-                                   filters.begin(), 
-                                   newEnd);
-
-  // Next create the categories
-  for(int i=0; i<num; i++)
-    {
-    vtkPVXMLElement* element = elem->GetNestedElement(i);
-    if(QString("Category") == element->GetName())
-      {
-      QString categoryName = element->GetAttribute("name");
-      if (!categoryName.isEmpty())
-        {
-        QString categoryLabel = element->GetAttribute("menu_label");
-        if (categoryLabel.isEmpty())
-          {
-          categoryLabel = categoryName;
-          }
-        pqImplementation::FilterCategory category(
-          categoryName.toAscii().data(),
-          categoryLabel.toAscii().data());
-        
-        int numChild = element->GetNumberOfNestedElements();
-        for (int j=0; j<numChild; j++)
-          {
-          vtkPVXMLElement* childElem = element->GetNestedElement(j);
-          if (QString(childElem->GetName()) == "Filter")
-            {
-            QString name = childElem->GetAttribute("name");
-            if (!name.isEmpty())
-              {
-              category.Filters.push_back(name.toStdString());
-              }
-            }
-          }
-        if (!category.Filters.empty())
-          {
-          this->FilterCategories.push_back(category);
-          }
-        }
-      }
-    }
-}
-
-void pqMainWindowCore::pqImplementation::instantiateGroupPrototypes(
-  vtkstd::string groupName,
-  vtkstd::vector<vtkstd::string>& difference)
-{
-  difference.clear();
-
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-
-  vtkSMProxyIterator* proxyIter = vtkSMProxyIterator::New();
-  proxyIter->SetModeToOneGroup();
-
-  vtkstd::set<vtkstd::string> proxySetBefore;
-  vtkstd::string prototypeName = groupName + "_prototypes";
-  proxyIter->Begin(prototypeName.c_str());
-  while (!proxyIter->IsAtEnd())
-    {
-    proxySetBefore.insert(proxyIter->GetKey());
-    proxyIter->Next();
-    }
-  pxm->InstantiateGroupPrototypes(groupName.c_str());
-  // If the "before set" is empty, this is the first time the
-  // prototypes are being instantiated: return an empty
-  // difference.
-  if (!proxySetBefore.empty())
-    {
-    vtkstd::set<vtkstd::string> proxySetAfter;
-    proxyIter->Begin(prototypeName.c_str());
-    while (!proxyIter->IsAtEnd())
-      {
-      proxySetAfter.insert(proxyIter->GetKey());
-      proxyIter->Next();
-      }
-    difference.resize(proxySetAfter.size());
-    difference.erase(vtkstd::set_difference(proxySetAfter.begin(),  proxySetAfter.end(),
-                     proxySetBefore.begin(), proxySetBefore.end(),
-                     difference.begin()), difference.end());
-    }
-  proxyIter->Delete();
-}
-
 
 ///////////////////////////////////////////////////////////////////////////
 // pqMainWindowCore
@@ -670,9 +329,13 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   this->connect(observer, SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
       this->Implementation->CustomFilters, SLOT(removeCustomFilter(QString)));
   this->connect(observer, SIGNAL(compoundProxyDefinitionRegistered(QString)),
-                this, SLOT(refreshFiltersMenu()));
+                this, SIGNAL(refreshFiltersMenu()));
   this->connect(observer, SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
-                this, SLOT(refreshFiltersMenu()));
+                this, SIGNAL(refreshFiltersMenu()));
+  this->connect(observer, SIGNAL(compoundProxyDefinitionRegistered(QString)),
+                this, SIGNAL(refreshSourcesMenu()));
+  this->connect(observer, SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
+                this, SIGNAL(refreshSourcesMenu()));
   // Now that the connections are set up, import custom filters from settings
   this->Implementation->CustomFilters->importCustomFiltersFromSettings();
 
@@ -759,10 +422,6 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     this, SLOT(onSourceCreationFinished(pqPipelineSource*)),
     Qt::QueuedConnection);
 
-  this->connect(builder, SIGNAL(customFilterCreated(pqPipelineSource*)),
-    this, SLOT(onSourceCreationFinished(pqPipelineSource*)),
-    Qt::QueuedConnection);
-
   this->connect(builder, 
     SIGNAL(readerCreated(pqPipelineSource*, const QString&)),
     this, SLOT(onSourceCreationFinished(pqPipelineSource*)),
@@ -776,9 +435,6 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     this, SLOT(onSourceCreation(pqPipelineSource*)));
 
   this->connect(builder, SIGNAL(filterCreated(pqPipelineSource*)),
-    this, SLOT(onSourceCreation(pqPipelineSource*)));
-
-  this->connect(builder, SIGNAL(customFilterCreated(pqPipelineSource*)),
     this, SLOT(onSourceCreation(pqPipelineSource*)));
 
   this->connect(builder, 
@@ -800,11 +456,11 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   this->connect(pqApplicationCore::instance()->getPluginManager(),
                 SIGNAL(serverManagerExtensionLoaded()),
                 this,
-                SLOT(refreshFiltersMenu()));
+                SIGNAL(refreshFiltersMenu()));
   this->connect(pqApplicationCore::instance()->getPluginManager(),
                 SIGNAL(serverManagerExtensionLoaded()),
                 this,
-                SLOT(refreshSourcesMenu()));
+                SIGNAL(refreshSourcesMenu()));
   
   this->connect(pqApplicationCore::instance()->getPluginManager(),
                 SIGNAL(guiInterfaceLoaded(QObject*)),
@@ -926,241 +582,44 @@ pqRubberBandHelper* pqMainWindowCore::renderViewSelectionHelper() const
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::setSourceMenu(QMenu* menu)
 {
-  if(this->Implementation->SourceMenu)
+  delete this->Implementation->SourcesMenuManager;
+  this->Implementation->SourcesMenuManager = 0;
+  if (menu)
     {
-    QObject::disconnect(this->Implementation->SourceMenu, 
-                        SIGNAL(triggered(QAction*)),
-                        this, 
-                        SLOT(onCreateSource(QAction*)));
+    pqProxyMenuManager*fmm = new pqProxyMenuManager(menu);
+    fmm->setXMLGroup("sources");
+    fmm->setFilteringXMLDir(":/ParaViewResources");
+    fmm->setElementTagName("Source");
+    fmm->setRecentlyUsedMenuSize(0);
+    QObject::connect(fmm, SIGNAL(selected(const QString&)),
+      this, SLOT(onCreateSource(const QString&)));
+    QObject::connect(this, SIGNAL(refreshSourcesMenu()),
+      fmm, SLOT(update()));
+    this->Implementation->SourcesMenuManager= fmm;
+    fmm->initialize();
     }
-
-  this->Implementation->SourceMenu = menu;
-
-  if(this->Implementation->SourceMenu)
-    {
-    QObject::connect(menu, SIGNAL(triggered(QAction*)), 
-      this, SLOT(onCreateSource(QAction*)));
-
-    this->Implementation->updateSourcesFromXML();
-    this->refreshSourcesMenu();
-    }
-}
-
-void pqMainWindowCore::pqImplementation::addProxyToMenu(
-  const char* groupName,
-  const char* proxyName,
-  QMenu* menu,
-  pqImplementation::ProxyIconsType* icons,
-  bool disable)
-{
-  vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
-  vtkSMProxy* prototype = manager->GetProxy(groupName, proxyName);
-  if (prototype)
-    {
-    const char* label = prototype->GetXMLLabel();
-    if (!label)
-      {
-      label = proxyName;
-      }
-    QAction* action = 
-      menu->addAction(label) 
-      << pqSetName(proxyName) << pqSetData(proxyName);
-    if (disable)
-      {
-      action->setEnabled(false);
-      }
-    if (icons)
-      {
-      pqImplementation::ProxyIconsType::iterator iconIter =
-        icons->find(proxyName);
-      if (iconIter != icons->end())
-        {
-        action->setIcon(QIcon(iconIter->second.c_str()));
-        }
-      }
-    }
-}
-
-
-void pqMainWindowCore::refreshSourcesMenu()
-{
-  if (this->Implementation->SourceMenu)
-    {
-    this->Implementation->SourceMenu->clear();
-
-    pqObjectBuilder* ob = pqApplicationCore::instance()->getObjectBuilder();
-
-    vtkstd::vector<vtkstd::string> newSources;
-    vtkstd::vector<vtkstd::string>::iterator iter;
-    this->Implementation->instantiateGroupPrototypes("sources", newSources);
-    for(iter = newSources.begin(); iter != newSources.end(); ++iter)
-      {
-      vtkSMProxyManager* pxyMgr = vtkSMProxyManager::GetProxyManager();
-      vtkSMProxy* pxy = pxyMgr->GetProxy("sources_prototypes", iter->c_str());
-      if(ob->getFileNamePropertyName(pxy).isEmpty())
-        {
-        this->Implementation->Sources.push_back(*iter);
-        }
-      }
-
-    vtkstd::vector<vtkstd::string>::iterator sourceIter =
-      this->Implementation->Sources.begin();
-    for(; sourceIter != this->Implementation->Sources.end(); sourceIter++)
-      {
-      this->Implementation->addProxyToMenu("sources_prototypes",
-                                           sourceIter->c_str(),
-                                           this->Implementation->SourceMenu,
-                                           0,
-                                           false);
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::refreshFiltersMenu()
-{
-  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
-
-  vtkstd::vector<vtkstd::string> newFilters;
-  this->Implementation->instantiateGroupPrototypes("filters", newFilters);
-  // We now add the new filters that were added to filters_prototypes:
-  // these filters were added by a plugin
-  if (!newFilters.empty())
-    {
-    vtkstd::vector<vtkstd::string>::iterator nfIter = newFilters.begin();
-    for(; nfIter != newFilters.end(); nfIter++)
-      {
-      vtkSMProxy* prototype = proxyManager->GetProxy("filters_prototypes",
-                                                     nfIter->c_str());
-      if (prototype)
-        {
-        this->Implementation->AlphabeticalFilters.push_back(prototype);
-        }
-      }
-    // List changed, sort again.
-    vtkstd::sort(this->Implementation->AlphabeticalFilters.begin(),
-                 this->Implementation->AlphabeticalFilters.end(),
-                 pqImplementation::proxyLessThan);
-    }
-
-  if(this->Implementation->AlphabeticalMenu)
-    {
-    this->Implementation->AlphabeticalMenu->clear();
-
-    pqImplementation::ProxyVector::iterator filterIter =
-      this->Implementation->AlphabeticalFilters.begin();
-    for(;
-        filterIter!=this->Implementation->AlphabeticalFilters.end(); 
-        filterIter++)
-      {
-      const char* filterName = (*filterIter)->GetXMLName();
-
-      this->Implementation->addProxyToMenu(
-        "filters_prototypes",
-        filterName, 
-        this->Implementation->AlphabeticalMenu,
-        &this->Implementation->FilterIcons);
-      }
-
-    // Add custom filters to alphabetical filter menu
-    if(this->Implementation->CustomFilters->rowCount()!=0)
-      {
-      QList<QAction*> menuActions = 
-        this->Implementation->AlphabeticalMenu->actions();
-
-      for(int i=0; i<this->Implementation->CustomFilters->rowCount(); i++)
-        {
-        QString filterName = 
-          this->Implementation->CustomFilters->getCustomFilterName(
-              this->Implementation->CustomFilters->index(i,0));
-        // Check to see if the filter by this name is a custom filter or not
-        //     and add to menu accordingly
-        // Custom filters cannot have the same name as an existing filter. 
-        // If there is for some reason a filter and a custom filter of the 
-        // same name revert to the regular filter.
-        vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
-        if(manager->GetCompoundProxyDefinition(filterName.toAscii().data()) &&
-          !manager->GetProxy("filters_prototypes",filterName.toAscii().data()))
-          {
-          // Find where we should insert the action
-          int j=0;
-          while(j<menuActions.count())
-            {
-            // Compare name with the filter proxy labels if possible
-            QAction *currentFilter = menuActions[j++];
-            vtkSMProxy *proxy = 
-                manager->GetProxy("filters_prototypes",
-                  currentFilter->data().toString().toAscii().data()); 
-            QString actionName = proxy->GetXMLLabel();
-            if(actionName.isNull())
-              {
-              actionName = currentFilter->data().toString();
-              }
-            if(QString::localeAwareCompare(filterName,actionName) <= 0)
-              {
-              break;
-              }
-            }
-          // FInally, insert the action in the menu
-          QAction* action = 
-              new QAction(QIcon(":/pqWidgets/Icons/pqBundle32.png"),filterName,
-                  this->Implementation->AlphabeticalMenu)
-              << pqSetName(filterName) << pqSetData(filterName);
-          this->Implementation->AlphabeticalMenu->insertAction(
-              menuActions[j-1], action);
-          }
-        }
-      }
-    }
-
-  this->updateFiltersMenu();
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::setFilterMenu(QMenu* menu)
 {
-  if(this->Implementation->FilterMenu)
+  delete this->Implementation->FiltersMenuManager;
+  this->Implementation->FiltersMenuManager = 0;
+  if (menu)
     {
-    QList<QAction*> actions = this->Implementation->FilterMenu->actions();
-    foreach(QAction* a, actions)
-      {
-      if(a->menu())
-        {
-        QObject::disconnect(a->menu(), SIGNAL(triggered(QAction*)),
-                         this, SLOT(onCreateFilter(QAction*)));
-        
-        QObject::disconnect(a->menu(), SIGNAL(triggered(QAction*)),
-          this, SLOT(updateRecentFilterMenu(QAction*)));
-        }
-      }
+    pqFiltersMenuManager *fmm = new pqFiltersMenuManager(menu);
+    fmm->setXMLGroup("filters");
+    fmm->setFilteringXMLDir(":/ParaViewResources");
+    fmm->setElementTagName("Filter");
+    fmm->setRecentlyUsedMenuSize(10);
+    QObject::connect(fmm, SIGNAL(selected(const QString&)),
+      this, SLOT(onCreateFilter(const QString&)));
+    QObject::connect(this, SIGNAL(refreshFiltersMenu()),
+      fmm, SLOT(update()));
 
-    this->Implementation->FilterMenu->clear();
-    }
-
-  this->Implementation->FilterMenu = menu;
-
-  if(this->Implementation->FilterMenu)
-    {
-
-    this->Implementation->setupFiltersMenu();
-      
-    // Qt bug - gotta connect to sub menus
-    QList<QAction*> actions = this->Implementation->FilterMenu->actions();
-    foreach(QAction* a, actions)
-      {
-      if(a->menu())
-        {
-        QObject::connect(a->menu(), SIGNAL(triggered(QAction*)),
-                         this, SLOT(onCreateFilter(QAction*)));
-        
-        QObject::connect(a->menu(), SIGNAL(triggered(QAction*)),
-          this, SLOT(updateRecentFilterMenu(QAction*)),
-          Qt::QueuedConnection);
-        }
-      }
+    this->Implementation->FiltersMenuManager = fmm;
+    fmm->initialize();
     
-    this->refreshFiltersMenu();
-
     }
 }
 
@@ -1546,9 +1005,10 @@ void pqMainWindowCore::setupRepresentationToolbar(QToolBar* toolbar)
 void pqMainWindowCore::setupCommonFiltersToolbar(QToolBar* toolbar)
 {
   // use QActions from Filters -> Common
-  if(this->Implementation->FilterMenu)
+  if (this->Implementation->FiltersMenuManager)
     {
-    QList<QAction*> actions = this->Implementation->FilterMenu->actions();
+    QList<QAction*> actions = 
+      this->Implementation->FiltersMenuManager->menu()->actions();
     foreach(QAction* action, actions)
       {
       QMenu* menu = action->menu();
@@ -1561,6 +1021,7 @@ void pqMainWindowCore::setupCommonFiltersToolbar(QToolBar* toolbar)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::setupLookmarkToolbar(QToolBar* toolbar)
 {
   this->Implementation->LookmarkToolbar = toolbar;
@@ -2755,19 +2216,13 @@ void pqMainWindowCore::onEditSettings()
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::onCreateSource(QAction* action)
+void pqMainWindowCore::onCreateSource(const QString& name)
 {
-  if(!action)
-    {
-    return;
-    }
-
   this->makeServerConnectionIfNoneExists();
   
   if (this->getActiveServer())
     {
-    QString sourceName = action->data().toString();
-    if (!this->createSourceOnActiveServer(sourceName))
+    if (!this->createSourceOnActiveServer(name))
       {
       qCritical() << "Source could not be created.";
       }
@@ -2775,188 +2230,13 @@ void pqMainWindowCore::onCreateSource(QAction* action)
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::onCreateFilter(QAction* action)
+void pqMainWindowCore::onCreateFilter(const QString& filterName)
 {
-  if(!action)
-    {
-    return;
-    }
-
-  QString filterName = action->data().toString();
-
-  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
-
-  // Check whether the action is associated with a custom filter or a regular filter
-  // Custom filters cannot have the same name as an existing filter. 
-  // If there is for some reason a filter and a custom filter of the same name,
-  // revert to the regular filter.
-  if(proxyManager->GetCompoundProxyDefinition(filterName.toAscii().data()) &&
-    !proxyManager->GetProxy("filters_prototypes",filterName.toAscii().data()))
-    {
-    if (!this->createCompoundSource(filterName))
-      {
-      qCritical() << "Custom filter could not be created.";
-      }
-    }
-  else if (!this->createFilterForActiveSource(filterName))
+  if (!this->createFilterForActiveSource(filterName))
     {
     qCritical() << "Filter could not be created.";
     } 
 }
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::updateRecentFilterMenu(QAction* action)
-{
-  if(!action)
-    {
-    return;
-    }
-
-  QString filterName = action->data().toString();
-  int idx=this->Implementation->RecentFilterList.indexOf(filterName);
-  if(idx!=-1)
-    {
-    this->Implementation->RecentFilterList.removeAt(idx);
-    }
-
-  this->Implementation->RecentFilterList.push_front(filterName);
-  if(this->Implementation->RecentFilterList.size()>10)
-    {
-    this->Implementation->RecentFilterList.removeLast();
-    }
-
-  this->Implementation->RecentFiltersMenu->clear();
-
-  QList<QString>::iterator begin,end;
-  begin=this->Implementation->RecentFilterList.begin();
-  end=this->Implementation->RecentFilterList.end();
-  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
-  for(;begin!=end;++begin)
-    {
-    QString proxyName = *begin;
-
-    // Check whether the action is associated with a custom filter or a regular 
-    // filter. 
-    if(proxyManager->GetCompoundProxyDefinition(proxyName.toAscii().data()) &&
-     !proxyManager->GetProxy("filters_prototypes",proxyName.toAscii().data()))
-      {
-      QAction* cfAction = 
-          new QAction(QIcon(":/pqWidgets/Icons/pqBundle32.png"),proxyName,
-              this->Implementation->RecentFiltersMenu)
-          << pqSetName(proxyName) << pqSetData(proxyName);
-      this->Implementation->RecentFiltersMenu->addAction(cfAction);
-      }
-    else
-      {
-      this->Implementation->addProxyToMenu("filters_prototypes", 
-                                      proxyName.toAscii().data(),
-                                      this->Implementation->RecentFiltersMenu,
-                                      &this->Implementation->FilterIcons);
-      }
-    }
-
-  this->saveRecentFilterMenu();
-}
-
-
-static const char* RecentFilterMenuSettings[] = {
-  "FilterOne",
-  "FilterTwo",
-  "FilterThree",
-  "FilterFour",
-  "FilterFive",
-  "FilterSix",
-  "FilterSeven",
-  "FilterEight",
-  "FilterNine",
-  "FilterTen",
-  NULL  // keep last
-};
-
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::saveRecentFilterMenu()
-{
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  const char** str;
-
-  QList<QString>::iterator begin,end;
-  begin=this->Implementation->RecentFilterList.begin();
-  end=this->Implementation->RecentFilterList.end();
-
-  for(str=RecentFilterMenuSettings; *str != NULL; str++)
-  {
-    if(begin!=end)
-    {
-      QString key = QString("recentFilterMenu/") + *str;
-      settings->setValue(key, *begin);
-      begin++;    
-    }
-
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::pqImplementation::restoreRecentFilterMenu()
-{
-  this->RecentFiltersMenu->clear();
-
-  // Now load default values from the QSettings, if available.
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-
-  const char** str;
-
-  for(str=RecentFilterMenuSettings; *str != NULL; str++)
-    {
-    QString key = QString("recentFilterMenu/") + *str;
-    if (settings->contains(key))
-      {
-      QString filterName=settings->value(key).toString();
-
-      int idx=this->RecentFilterList.indexOf(filterName);
-      if(idx!=-1)
-        {
-        this->RecentFilterList.removeAt(idx);
-        }
-
-      this->RecentFilterList.push_back(filterName);
-      if(this->RecentFilterList.size()>10)
-        {
-        this->RecentFilterList.removeLast();
-        }
-      }
-    }
-
-  this->RecentFiltersMenu->clear();
-
-  QList<QString>::iterator begin,end;
-  begin=this->RecentFilterList.begin();
-  end=this->RecentFilterList.end();
-  for(;begin!=end;++begin)
-    {
-    QString proxyName = *begin;
-    // Check whether the action is associated with a custom filter or a regular 
-    // filter. 
-    vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
-    if(proxyManager->GetCompoundProxyDefinition(proxyName.toAscii().data()) &&
-     !proxyManager->GetProxy("filters_prototypes",proxyName.toAscii().data()))
-      {
-      QAction* action = 
-          new QAction(QIcon(":/pqWidgets/Icons/pqBundle32.png"),proxyName,
-              this->RecentFiltersMenu)
-          << pqSetName(proxyName) << pqSetData(proxyName);
-      this->RecentFiltersMenu->addAction(action);
-      }
-    else
-      {
-      this->addProxyToMenu("filters_prototypes",
-                           proxyName.toAscii().data(),
-                           this->RecentFiltersMenu,
-                           &this->FilterIcons);
-      }
-    }
-}
-
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onSelectionChanged()
@@ -2975,9 +2255,9 @@ void pqMainWindowCore::onSelectionChanged()
     this->Implementation->PendingDisplayManager.getNumberOfPendingDisplays() > 0;
 
   // Update the filters menu.
-  if(!pendingDisplays)
+  if (!pendingDisplays && this->Implementation->FiltersMenuManager)
     {
-    this->updateFiltersMenu();
+    this->Implementation->FiltersMenuManager->updateEnableState();
     }
 
   // Update the server connect/disconnect actions.
@@ -3401,123 +2681,12 @@ void pqMainWindowCore::onRemovingSource(pqPipelineSource *source)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onPostAccept()
 {
-  this->updateFiltersMenu();
+  if (this->Implementation->FiltersMenuManager)
+    {
+    this->Implementation->FiltersMenuManager->updateEnableState();
+    }
 
   emit this->postAccept();
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::updateFiltersMenu()
-{
-  QMenu* const menu = this->Implementation->FilterMenu;
-  if(!menu)
-    {
-    return;
-    }
-
-  // Get the list of selected sources. Make sure the list contains
-  // only valid sources.
-  const pqServerManagerSelection *selected =
-      pqApplicationCore::instance()->getSelectionModel()->selectedItems();
-  
-  QList<pqOutputPort*> outputPorts;
-  pqServerManagerModelItem* item = NULL;
-  pqServerManagerSelection::ConstIterator iter = selected->begin();
-  for( ; iter != selected->end(); ++iter)
-    {
-    item = *iter;
-    pqPipelineSource* source = qobject_cast<pqPipelineSource *>(item);
-    pqOutputPort* port = source? source->getOutputPort(0) : 
-      qobject_cast<pqOutputPort*>(item);
-    if (port)
-      {
-      outputPorts.append(port);
-      }
-    }
-
-  // Get the list of available filters.
-  QList<QString> supportedFilters;
-  if(outputPorts.size())
-    {
-    outputPorts[0]->getServer()->getSupportedProxies("filters", supportedFilters);
-    }
-
-  // Iterate over all filters in the menu and see if they can be
-  // applied to the current source(s).
-  bool some_enabled = false;
-  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
-  QList<QAction *> menu_actions = menu->findChildren<QAction *>();
-  QList<QAction *>::Iterator action = menu_actions.begin();
-  for( ; action != menu_actions.end(); ++action)
-    {
-    QString filterName = (*action)->data().toString();
-    if (filterName.isEmpty())
-      {
-      continue;
-      }
-
-    // For now simply make sure custom filters are enabled in the menu.
-    // Custom filters cannot have the same name as an existing filter. 
-    // If there is for some reason a filter and a custom filter of the same 
-    // name, revert to the regular filter.
-    if(proxyManager->GetCompoundProxyDefinition(filterName.toAscii().data()) &&
-     !proxyManager->GetProxy("filters_prototypes",filterName.toAscii().data()))
-      {
-      (*action)->setEnabled(true);
-      some_enabled = true;
-      continue;
-      }
-
-    (*action)->setEnabled(false);
-    if (!supportedFilters.contains(filterName))
-      {
-      // skip filters not supported by the server.
-      continue;
-      }
-
-    vtkSMProxy* output = proxyManager->GetProxy("filters_prototypes",
-      filterName.toAscii().data());
-    if (!output)
-      {
-      continue;
-      }
-
-    int numProcs = this->getActiveServer()->getNumberOfPartitions();
-    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(output);
-    if (sp &&
-        sp->GetProcessSupport() == vtkSMSourceProxy::SINGLE_PROCESS &&
-        numProcs > 1 ||
-        sp->GetProcessSupport() == vtkSMSourceProxy::MULTIPLE_PROCESSES &&
-        numProcs == 1)
-      {
-      continue;
-      }
-         
-    vtkSMInputProperty *input = vtkSMInputProperty::SafeDownCast(
-      output->GetProperty("Input"));
-    if(input)
-      {
-      if(!input->GetMultipleInput() && selected->size() > 1)
-        {
-        continue;
-        }
-
-      input->RemoveAllUncheckedProxies();
-      foreach(pqOutputPort* port, outputPorts)
-        {
-        input->AddUncheckedInputConnection(
-          port->getSource()->getProxy(), port->getPortNumber());
-        }
-
-      if(input->IsInDomains())
-        {
-        (*action)->setEnabled(true);
-        some_enabled = true;
-        }
-      }
-    }
-
-  menu->setEnabled(some_enabled);
 }
 
 //-----------------------------------------------------------------------------
@@ -3738,29 +2907,6 @@ pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
   this->Implementation->UndoStack->endUndoSet();
 
   return filter;
-}
-
-//-----------------------------------------------------------------------------
-pqPipelineSource* pqMainWindowCore::createCompoundSource(
-  const QString& name)
-{
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqObjectBuilder* builder = core->getObjectBuilder();  
-
-  pqServerManagerModelItem *item = this->getActiveObject();
-  pqPipelineSource *source = qobject_cast<pqPipelineSource *>(item);
-  pqServer *server = qobject_cast<pqServer *>(item);
-  if(!server && source)
-    {
-    server = source->getServer();
-    }
-
-  this->Implementation->UndoStack->beginUndoSet(
-    QString("Create '%1'").arg(name));
-  pqPipelineSource* cp = builder->createCustomFilter(name, server, source);
-  this->Implementation->UndoStack->endUndoSet();
-
-  return cp;
 }
 
 //-----------------------------------------------------------------------------

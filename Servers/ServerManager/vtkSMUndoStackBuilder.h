@@ -24,7 +24,6 @@
 // Applications can subclass vtkSMUndoStackBuilder to record GUI related
 // changes and add them to the undo stack.
 // .SECTION TODO
-// \li Compound proxies are not handled yet.
 // \li Mutiple clients are not supported. For now, the server can connect to only
 // one client.
 

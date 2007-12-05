@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMCompoundProxy.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInputProperty.h"
@@ -164,42 +163,6 @@ pqPipelineSource* pqObjectBuilder::createFilter(
   filter->setModifiedState(pqProxy::UNINITIALIZED);
 
   emit this->filterCreated(filter);
-  emit this->proxyCreated(filter);
-  return filter;
-}
-
-//-----------------------------------------------------------------------------
-pqPipelineSource* pqObjectBuilder::createCustomFilter(const QString& sm_name,
-    pqServer* server, pqPipelineSource* input/*=0*/)
-{
-  vtkSMProxy* proxy = 
-    this->createProxyInternal(QString(), sm_name, server, "sources");
-  if (!proxy)
-    {
-    return 0;
-    }
-
-  pqPipelineSource* filter = pqApplicationCore::instance()->
-    getServerManagerModel()->findItem<pqPipelineSource*>(proxy);
-  if (!filter)
-    {
-    qDebug() << "Failed to locate pqPipelineSource for the created custom filter proxy "
-      << sm_name;
-    return 0;
-    }
-
-  vtkSMProperty* inputProperty = proxy->GetProperty("Input");
-  if (inputProperty && input)
-    {
-    pqSMAdaptor::setProxyProperty(inputProperty, input->getProxy());
-    proxy->UpdateVTKObjects();
-    inputProperty->UpdateDependentDomains();
-    }
-
-  // Set default property values.
-  filter->setDefaultPropertyValues();
-  filter->setModifiedState(pqProxy::UNINITIALIZED);
-  emit this->customFilterCreated(filter);
   emit this->proxyCreated(filter);
   return filter;
 }
@@ -688,6 +651,11 @@ vtkSMProxy* pqObjectBuilder::createProxyInternal(const QString& sm_group,
     qDebug() << "server cannot be null";
     return 0;
     }
+  if (sm_group.isEmpty() || sm_name.isEmpty())
+    {
+    qCritical() << "Group name and proxy name must be non empty.";
+    return 0;
+    }
 
   QString actual_regname = reg_name;
   if (reg_name.isEmpty())
@@ -698,15 +666,8 @@ vtkSMProxy* pqObjectBuilder::createProxyInternal(const QString& sm_group,
 
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
-  if (sm_group.isEmpty())
-    {
-    proxy.TakeReference(pxm->NewCompoundProxy(sm_name.toAscii().data()));
-    }
-  else
-    {
-    proxy.TakeReference(
-      pxm->NewProxy(sm_group.toAscii().data(), sm_name.toAscii().data()));
-    }
+  proxy.TakeReference(
+    pxm->NewProxy(sm_group.toAscii().data(), sm_name.toAscii().data()));
 
   if (!proxy.GetPointer())
     {

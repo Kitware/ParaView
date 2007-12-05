@@ -27,7 +27,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArrayRangeDomain);
-vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.14");
+vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.15");
 
 //---------------------------------------------------------------------------
 vtkSMArrayRangeDomain::vtkSMArrayRangeDomain()
@@ -154,7 +154,7 @@ void vtkSMArrayRangeDomain::Update(const char* arrayName,
                                    int outputport)
 {
   // Make sure the outputs are created.
-  sp->CreateParts();
+  sp->CreateOutputPorts();
   vtkPVDataInformation* info = sp->GetDataInformation(outputport);
 
   if (!info)

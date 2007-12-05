@@ -17,7 +17,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModuleConnectionManager.h"
-#include "vtkSMCompoundProxy.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMSelectionLink.h"
 #include "vtkSMProxy.h"
@@ -32,7 +31,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.26");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.27");
 vtkCxxSetObjectMacro(vtkSMStateLoader, RootElement, vtkPVXMLElement);
 //---------------------------------------------------------------------------
 struct vtkSMStateLoaderRegistrationInfo
@@ -121,8 +120,7 @@ vtkPVXMLElement* vtkSMStateLoader::LocateProxyElementInternal(
     {
     vtkPVXMLElement* currentElement = root->GetNestedElement(i);
     if (currentElement->GetName() &&
-        (strcmp(currentElement->GetName(), "Proxy") == 0 ||
-         strcmp(currentElement->GetName(), "CompoundProxy") == 0))
+      strcmp(currentElement->GetName(), "Proxy") == 0)
       {
       int currentId;
       if (!currentElement->GetScalarAttribute("id", &currentId))
@@ -237,11 +235,11 @@ int vtkSMStateLoader::HandleProxyCollection(vtkPVXMLElement* collectionElement)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMStateLoader::HandleCompoundProxyDefinitions(
+void vtkSMStateLoader::HandleCustomProxyDefinitions(
   vtkPVXMLElement* element)
 {
   vtkSMProxyManager* pm = this->GetProxyManager();
-  pm->LoadCompoundProxyDefinitions(element);
+  pm->LoadCustomProxyDefinitions(element);
 }
 
 //---------------------------------------------------------------------------
@@ -388,6 +386,21 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*
         }
       }
     }
+
+  // Load all compound proxy definitions.
+   for (i=0; i<numElems; i++)
+    {
+    vtkPVXMLElement* currentElement = rootElement->GetNestedElement(i);
+    const char* name = currentElement->GetName();
+    if (name)
+      {
+      if (strcmp(name, "CustomProxyDefinitions") == 0)
+        {
+        this->HandleCustomProxyDefinitions(currentElement);
+        }
+      }
+    }
+
   for (i=0; i<numElems; i++)
     {
     vtkPVXMLElement* currentElement = rootElement->GetNestedElement(i);
@@ -400,10 +413,6 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*
           {
           return 0;
           }
-        }
-      else if (strcmp(name, "CompoundProxyDefinitions") == 0)
-        {
-        this->HandleCompoundProxyDefinitions(currentElement);
         }
       else if (strcmp(name, "Links") == 0)
         {

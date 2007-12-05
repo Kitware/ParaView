@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkSmartPointer.h" 
-#include "vtkSMCompoundProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
@@ -249,10 +248,6 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
   vtkPVDataInformation* dataInfo = 0;
 
   vtkSMProxy* inputProxy = this->getInput()->getProxy();
-  if (inputProxy->IsA("vtkSMCompoundProxy"))
-    {
-    inputProxy = vtkSMCompoundProxy::SafeDownCast(inputProxy)->GetConsumableProxy();
-    }
   vtkSMSourceProxy* inputSourceProxy = vtkSMSourceProxy::SafeDownCast(inputProxy);
   inputSourceProxy->UpdatePipeline(time);
 

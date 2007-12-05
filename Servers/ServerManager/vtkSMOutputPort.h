@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMPart.h
+  Module:    vtkSMOutputPort.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,27 +12,27 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMPart - proxy for a data object
+// .NAME vtkSMOutputPort - proxy for an output port of a vtkAlgorithm.
 // .SECTION Description
 // This object manages one output port of an algorithm. It is used
 // internally by vtkSMSourceProxy to manage all of it's outputs.
+// .SECTION Notes
+// This class was called vtkSMPart in earlier versions.
 
-#ifndef __vtkSMPart_h
-#define __vtkSMPart_h
+#ifndef __vtkSMOutputPort_h
+#define __vtkSMOutputPort_h
 
 #include "vtkSMProxy.h"
 #include "vtkClientServerStream.h" // needed for SetupUpdateExtent
 class vtkPVClassNameInformation;
 class vtkPVDataInformation;
-class vtkSMPartDisplay;
-class vtkSMDisplay;
 class vtkCollection;
 
-class VTK_EXPORT vtkSMPart : public vtkSMProxy
+class VTK_EXPORT vtkSMOutputPort : public vtkSMProxy
 {
 public:
-  static vtkSMPart* New();
-  vtkTypeRevisionMacro(vtkSMPart, vtkSMProxy);
+  static vtkSMOutputPort* New();
+  vtkTypeRevisionMacro(vtkSMOutputPort, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -92,17 +92,29 @@ public:
     }
 //ETX
 
+
+  // Description:
+  // This method saves state information about the proxy
+  // which can be used to revive the proxy using server side objects
+  // already present. This includes the entire state saved by calling 
+  // SaveState() as well additional information such as server side
+  // object IDs.
+  // Overridden to save information pertinant to reviving the output ports.
+  virtual vtkPVXMLElement* SaveRevivalState(vtkPVXMLElement* root);
+  virtual int LoadRevivalState(vtkPVXMLElement* revivalElement, 
+    vtkSMStateLoaderBase* loader);
+
 protected:
-  vtkSMPart();
-  ~vtkSMPart();
+  vtkSMOutputPort();
+  ~vtkSMOutputPort();
 
   vtkSMProxy* DataObjectProxy;
   vtkClientServerID ProducerID;
   vtkClientServerID ExecutiveID;
 
 private:
-  vtkSMPart(const vtkSMPart&); // Not implemented
-  void operator=(const vtkSMPart&); // Not implemented
+  vtkSMOutputPort(const vtkSMOutputPort&); // Not implemented
+  void operator=(const vtkSMOutputPort&); // Not implemented
 
 //BTX
   friend class vtkSMSourceProxy;

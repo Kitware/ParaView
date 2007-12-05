@@ -98,6 +98,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqExtractThresholdsPanel.h  
   pqFileChooserWidget.h
   pqFilterInputDialog.h
+  pqFiltersMenuManager.h
   pqFieldSelectionAdaptor.h
   pqGlobalRenderViewOptions.h
   pqGlyphPanel.h
@@ -143,6 +144,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPluginDialog.h
   pqPointSourceWidget.h
   pqProxyInformationWidget.h
+  pqProxyMenuManager.h
   pqProxyPanel.h
   pqProxySelectionWidget.h
   pqProxyTabWidget.h
@@ -307,6 +309,8 @@ SOURCE_GROUP("Generated" FILES
 )
 
 ADD_LIBRARY(pqComponents
+  pqProxyMenuManager.cxx
+  pqProxyMenuManager.h
   pq3DWidget.cxx
   pq3DWidget.h
   pqActiveChartOptions.cxx
@@ -424,6 +428,8 @@ ADD_LIBRARY(pqComponents
   pqFileChooserWidget.h
   pqFilterInputDialog.cxx
   pqFilterInputDialog.h
+  pqFiltersMenuManager.cxx
+  pqFiltersMenuManager.h
   pqFieldSelectionAdaptor.cxx
   pqFieldSelectionAdaptor.h
   pqGlobalRenderViewOptions.cxx

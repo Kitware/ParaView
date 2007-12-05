@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QtDebug>
 #include <QTimer>
+#include <QWidget>
 
 // ParaView includes.
 #include "pqApplicationCore.h"
@@ -288,4 +289,11 @@ void pqView::onRepresentationVisibilityChanged(bool visible)
     {
     emit this->representationVisibilityChanged(disp, visible);
     }
+}
+
+//-----------------------------------------------------------------------------
+QSize pqView::getSize()
+{
+  QWidget* widget = this->getWidget();
+  return widget? widget->size(): QSize(0, 0);
 }

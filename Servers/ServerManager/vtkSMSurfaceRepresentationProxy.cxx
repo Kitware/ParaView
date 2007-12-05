@@ -26,11 +26,11 @@
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMCompoundProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIceTMultiDisplayRenderViewProxy.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMSelectionHelper.h"
@@ -38,7 +38,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.21");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.22");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -255,18 +255,12 @@ void vtkSMSurfaceRepresentationProxy::ConvertSurfaceSelectionToVolumeSelection(
   // Process selInput to add SOURCE_ID() and ORIGINAL_SOURCE_ID() keys to it to
   // help the converter in converting the selection.
 
+  // Don't directly use the input->GetID() to handle case for
+  // vtkSMCompoundSourceProxy.
   vtkClientServerID sourceId = this->GeometryFilter->GetID();
-  vtkClientServerID originalSourceId;
-  vtkSMProxy* input = this->GetInputProxy();
-  if (vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(input))
-    {
-    // For compound proxies, the selected proxy is the consumed proxy.
-    originalSourceId = cp->GetConsumableProxy()->GetID();
-    }
-  else
-    {
-    originalSourceId = input->GetID();
-    }
+  vtkSMSourceProxy* input = this->GetInputProxy();
+  vtkSMOutputPort* port = input->GetOutputPort(this->OutputPort);
+  vtkClientServerID originalSourceId = port->GetProducerID();
 
   vtkSMSurfaceRepresentationProxyAddSourceIDs(selInput,
     this->Prop3D->GetID(), sourceId, originalSourceId);

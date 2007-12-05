@@ -309,7 +309,7 @@ public:
 //BTX
   // Description:
   // Set server ids on self and sub-proxies.
-  void SetServers(vtkTypeUInt32 servers);
+  virtual void SetServers(vtkTypeUInt32 servers);
  
   // Description:
   // Return the servers.
@@ -433,6 +433,7 @@ protected:
   // as such.
   friend class vtkSMCameraLink;
   friend class vtkSMCompoundProxy;
+  friend class vtkSMCompoundSourceProxy;
   friend class vtkSMInputProperty;
   friend class vtkSMOrderedPropertyIterator;
   friend class vtkSMPart;

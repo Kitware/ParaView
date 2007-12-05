@@ -35,7 +35,7 @@
 #include "vtkSMCameraProxy.h"
 #include "vtkSMClientDeliveryStrategyProxy.h"
 #include "vtkSMCompositeKeyFrameProxy.h"
-#include "vtkSMCompoundProxy.h"
+#include "vtkSMCompoundSourceProxy.h"
 #include "vtkSMCompoundProxyDefinitionLoader.h"
 #include "vtkSMConnectionCleanerProxy.h"
 #include "vtkSMDataTypeDomain.h"
@@ -72,7 +72,7 @@
 #include "vtkSMNumberOfPartsDomain.h"
 #include "vtkSMObject.h"
 #include "vtkSMOrderedPropertyIterator.h"
-#include "vtkSMPart.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMPQStateLoader.h"
 #include "vtkSMPropertyAdaptor.h"
 #include "vtkSMProperty.h"
@@ -177,7 +177,7 @@ int main(int , char *[])
   c = vtkSMCameraLink::New(); c->Print( cout ); c->Delete();
   c = vtkSMCameraManipulatorProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMCameraProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMCompoundProxy::New(); c->Print( cout ); c->Delete();
+  c = vtkSMCompoundSourceProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMCompoundProxyDefinitionLoader::New(); c->Print( cout ); c->Delete();
   c = vtkSMCompositeKeyFrameProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMClientDeliveryStrategyProxy::New(); c->Print( cout ); c->Delete();
@@ -215,7 +215,7 @@ int main(int , char *[])
   c = vtkSMNumberOfPartsDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMObject::New(); c->Print( cout ); c->Delete();
   c = vtkSMOrderedPropertyIterator::New(); c->Print( cout ); c->Delete();
-  c = vtkSMPart::New(); c->Print( cout ); c->Delete();
+  c = vtkSMOutputPort::New(); c->Print( cout ); c->Delete();
   c = vtkSMPQStateLoader::New(); c->Print( cout ); c->Delete();
   c = vtkSMPropertyAdaptor::New(); c->Print( cout ); c->Delete();
   c = vtkSMProperty::New(); c->Print( cout ); c->Delete();

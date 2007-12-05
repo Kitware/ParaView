@@ -739,7 +739,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
 {
   int rowCount = 0;
   int skippedFirstFileProperty = 0;
-  bool isCompoundProxy = pxy->IsA("vtkSMCompoundProxy");
+  bool isCompoundProxy = pxy->IsA("vtkSMCompoundSourceProxy");
 
   // query for proxy properties, and create widgets
   vtkSMOrderedPropertyIterator *iter = vtkSMOrderedPropertyIterator::New();

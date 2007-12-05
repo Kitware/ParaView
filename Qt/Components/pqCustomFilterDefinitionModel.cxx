@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCustomFilterDefinitionModel.h"
 
+#include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServerManagerSelectionModel.h"
 
@@ -43,8 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPixmap>
 #include <QString>
 
-#include "vtkSMCompoundProxy.h"
-#include "vtkSMProxy.h"
+#include "vtkSMCompoundSourceProxy.h"
 
 
 /// \class pqCustomFilterDefinitionModelItem
@@ -132,7 +132,7 @@ pqCustomFilterDefinitionModelSource::pqCustomFilterDefinitionModelSource(
 
   // Set the type for the source.
   vtkSMProxy *proxy = source->getProxy();
-  if(vtkSMCompoundProxy::SafeDownCast(proxy) != 0)
+  if(proxy->IsA("vtkSMCompoundSourceProxy"))
     {
     this->Type = pqCustomFilterDefinitionModel::CustomFilter;
     }
@@ -320,21 +320,31 @@ void pqCustomFilterDefinitionModel::setContents(
     return;
     }
 
-  // Add all the items to the model.
-  // TODO: Make sure the sources are from the same server.
-  pqPipelineSource *source = 0;
-  pqCustomFilterDefinitionModelSource *item = 0;
+  // Filter the selection to include on pqPipelineSource instances. If any
+  // pqOutputPort is selected, we select the pqPipelineSource to which the
+  // pqOutputPort instance belongs.
+  QList<pqPipelineSource*> sourcesList;
   QMap<pqPipelineSource *, pqCustomFilterDefinitionModelSource *> itemMap;
   pqServerManagerSelection::ConstIterator iter = items->begin();
   for( ; iter != items->end(); ++iter)
     {
-    source = qobject_cast<pqPipelineSource *>(*iter);
-    if(source)
+    pqOutputPort* port = qobject_cast<pqOutputPort*>(*iter);
+    pqPipelineSource *source = port? port->getSource() : 
+      qobject_cast<pqPipelineSource *>(*iter);
+    if (source && !sourcesList.contains(source))
       {
-      item = new pqCustomFilterDefinitionModelSource(this->Root, source);
-      this->Root->Children.append(item);
-      itemMap.insert(source, item);
+      sourcesList.push_back(source);
       }
+    }
+
+  // Add all the items to the model.
+  // TODO: Make sure the sources are from the same server.
+  foreach (pqPipelineSource* source, sourcesList)
+    {
+    pqCustomFilterDefinitionModelSource *item = 
+      new pqCustomFilterDefinitionModelSource(this->Root, source);
+    this->Root->Children.append(item);
+    itemMap.insert(source, item);
     }
 
   // Connect the items based on inputs.
@@ -351,10 +361,11 @@ void pqCustomFilterDefinitionModel::setContents(
       {
       // Loop through the outputs of the source. If the output is in
       // the item map, move it to the correct place.
-      item = *jter;
-      for(i = 0; i < item->Source->getNumberOfConsumers(); i++)
+      pqCustomFilterDefinitionModelSource *item = *jter;
+      QList<pqPipelineSource*> consumers = item->Source->getAllConsumers();
+      for(i = 0; i < consumers.size(); i++)
         {
-        jter = itemMap.find(item->Source->getConsumer(i));
+        jter = itemMap.find(consumers[i]);
         if(jter != itemMap.end())
           {
           output = *jter;

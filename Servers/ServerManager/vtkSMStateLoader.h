@@ -54,7 +54,7 @@ protected:
   void SetRootElement(vtkPVXMLElement*);
 
   virtual int HandleProxyCollection(vtkPVXMLElement* collectionElement);
-  virtual void HandleCompoundProxyDefinitions(vtkPVXMLElement* element);
+  virtual void HandleCustomProxyDefinitions(vtkPVXMLElement* element);
   int HandleLinks(vtkPVXMLElement* linksElement);
   virtual int BuildProxyCollectionInformation(vtkPVXMLElement*);
 

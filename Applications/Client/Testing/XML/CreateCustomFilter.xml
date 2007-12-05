@@ -22,9 +22,6 @@
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/frame_2/AddOutputButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputPorts" command="currentChanged" arguments="/0|1" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/frame_2/OutputDownButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputPorts" command="currentChanged" arguments="/1|1" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/frame_2/RemoveOutputButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/frame_2/RemoveOutputButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputName" command="set_string" arguments="Output" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/frame_2/AddOutputButton" command="activate" arguments="" />
@@ -33,9 +30,7 @@
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputPipeline" command="currentChanged" arguments="/0|0" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputName" command="set_string" arguments="Input1" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/frame/AddInputButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/frame/InputUpButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputPorts" command="currentChanged" arguments="/1|1" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/frame/RemoveInputButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/frame/RemoveInputButton" command="activate" arguments="" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputName" command="set_string" arguments="Input" />
   <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/frame/AddInputButton" command="activate" arguments="" />

@@ -126,21 +126,22 @@ void pqCustomFilterManager::importFiles(const QStringList &files)
       {
       vtkPVXMLElement* currentElement = root->GetNestedElement(i);
       if (currentElement->GetName() &&
-          strcmp(currentElement->GetName(), "CompoundProxyDefinition") == 0)
+          strcmp(currentElement->GetName(), "CustomProxyDefinition") == 0)
         {
         const char* name = currentElement->GetAttribute("name");
-        if (name)
+        const char* group = currentElement->GetAttribute("group");
+        if (name && group)
           {
-          QString newname = this->getUnusedFilterName(QString(name));
+          QString newname = this->getUnusedFilterName(group, name);
           currentElement->SetAttribute("name",newname.toAscii().data());
           }
         }
       }
 
-    // Load the compound proxy definitions using the server manager.
+    // Load the custom proxy definitions using the server manager.
     // This should trigger some register events, which will update the
     // list of custom filters.
-    proxyManager->LoadCompoundProxyDefinitions(root);
+    proxyManager->LoadCustomProxyDefinitions(root);
 
     parser->Delete();
     }
@@ -149,13 +150,15 @@ void pqCustomFilterManager::importFiles(const QStringList &files)
 
 
 //----------------------------------------------------------------------------
-QString pqCustomFilterManager::getUnusedFilterName(const QString &name)
+QString pqCustomFilterManager::getUnusedFilterName(
+  const QString& group, const QString &name)
 {
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
   
   QString tempName = name;
   int counter = 1;
-  while(proxyManager->GetCompoundProxyDefinition(tempName.toAscii().data()) || proxyManager->GetProxy("filters_prototypes",tempName.toAscii().data()))
+  while(proxyManager->GetProxyDefinition(
+      group.toAscii().data(), tempName.toAscii().data()))
     {
     tempName = QString(name + " (" + QString::number(counter) + ")");
     counter++;
@@ -165,6 +168,7 @@ QString pqCustomFilterManager::getUnusedFilterName(const QString &name)
 }
 
 
+//----------------------------------------------------------------------------
 void pqCustomFilterManager::exportSelected(const QStringList &files)
 {
   // Get the selected custom filters from the list.
@@ -187,13 +191,14 @@ void pqCustomFilterManager::exportSelected(const QStringList &files)
   for( ; iter != selection.end(); ++iter)
     {
     // Get the xml for the custom filter. The xml from the server
-    // manager needs to be added to a "CompoundProxyDefinition"
+    // manager needs to be added to a "CustomProxyDefinition"
     // element. That element needs a name attribute set.
     filter = this->Model->getCustomFilterName(*iter);
     definition = vtkPVXMLElement::New();
-    definition->SetName("CompoundProxyDefinition");
+    definition->SetName("CustomProxyDefinition");
     definition->AddAttribute("name", filter.toAscii().data());
-    element = proxyManager->GetCompoundProxyDefinition(filter.toAscii().data());
+    definition->AddAttribute("group", "filters");
+    element = proxyManager->GetProxyDefinition("filters", filter.toAscii().data());
     definition->AddNestedElement(element);
     root->AddNestedElement(definition);
     definition->Delete();
@@ -265,7 +270,7 @@ void pqCustomFilterManager::removeSelected()
   foreach(QString filter, filters)
     {
     // Unregister the custom filter from the server manager.
-    proxyManager->UnRegisterCompoundProxyDefinition(filter.toAscii().data());
+    proxyManager->UnRegisterCustomProxyDefinition("filters", filter.toAscii().data());
     }
 }
 

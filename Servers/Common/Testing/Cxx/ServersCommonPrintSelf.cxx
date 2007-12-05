@@ -38,7 +38,7 @@
 #include "vtkPVFileInformationHelper.h"
 #include "vtkPVGenericAttributeInformation.h"
 #include "vtkPVInformation.h"
-#include "vtkPVNumberOfOutputsInformation.h"
+#include "vtkPVAlgorithmPortsInformation.h"
 #include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVOptionsXMLParser.h"
@@ -73,7 +73,7 @@ int main(int, char * [])
   c = vtkPVServerOptions::New(); c->Print(cout); c->Delete();
   c = vtkProcessModuleGUIHelper::New(); c->Print(cout); c->Delete();
   c = vtkPVDataInformation::New(); c->Print(cout); c->Delete();
-  c = vtkPVNumberOfOutputsInformation::New(); c->Print(cout); c->Delete();
+  c = vtkPVAlgorithmPortsInformation::New(); c->Print(cout); c->Delete();
   c = vtkPVTimerInformation::New(); c->Print(cout); c->Delete();
   c = vtkPVXMLElement::New(); c->Print(cout); c->Delete();
   c = vtkPVXMLParser::New(); c->Print(cout); c->Delete();

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMPart.cxx
+  Module:    vtkSMOutputPort.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,24 +12,24 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMPart.h"
+#include "vtkSMOutputPort.h"
 
 #include "vtkClientServerStream.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVClassNameInformation.h"
-#include "vtkPVDataInformation.h"
-#include "vtkProcessModule.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
+#include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVClassNameInformation.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.33");
+vtkStandardNewMacro(vtkSMOutputPort);
+vtkCxxRevisionMacro(vtkSMOutputPort, "1.1");
 
 
 //----------------------------------------------------------------------------
-vtkSMPart::vtkSMPart()
+vtkSMOutputPort::vtkSMOutputPort()
 {
   this->SetVTKClassName("vtkDataObject");
 
@@ -43,7 +43,7 @@ vtkSMPart::vtkSMPart()
 }
 
 //----------------------------------------------------------------------------
-vtkSMPart::~vtkSMPart()
+vtkSMOutputPort::~vtkSMOutputPort()
 {
   this->ClassNameInformation->Delete();
   this->DataInformation->Delete();
@@ -67,7 +67,7 @@ vtkSMPart::~vtkSMPart()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPart::InitializeWithIDs(vtkClientServerID outputID, 
+void vtkSMOutputPort::InitializeWithIDs(vtkClientServerID outputID, 
                                   vtkClientServerID producerID, 
                                   vtkClientServerID executiveID)
 {
@@ -84,7 +84,72 @@ void vtkSMPart::InitializeWithIDs(vtkClientServerID outputID,
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMPart::GetDataObjectProxy(int recheck)
+vtkPVXMLElement* vtkSMOutputPort::SaveRevivalState(vtkPVXMLElement* root)
+{
+  vtkPVXMLElement* revivalElem = this->Superclass::SaveRevivalState(root);
+  if (revivalElem && this->ObjectsCreated)
+    {
+    vtkPVXMLElement* elem = vtkPVXMLElement::New();
+    elem->SetName("ProducerID");
+    elem->AddAttribute("id", static_cast<unsigned int>(this->ProducerID.ID));
+    revivalElem->AddNestedElement(elem);
+    elem->Delete();
+
+    elem = vtkPVXMLElement::New();
+    elem->SetName("ExecutiveID");
+    elem->AddAttribute("id", static_cast<unsigned int>(this->ExecutiveID.ID));
+    revivalElem->AddNestedElement(elem);
+    elem->Delete();
+    }
+
+  return revivalElem;
+}
+
+//----------------------------------------------------------------------------
+int vtkSMOutputPort::LoadRevivalState(vtkPVXMLElement* revivalElem, 
+  vtkSMStateLoaderBase* loader)
+{
+  if (!this->Superclass::LoadRevivalState(revivalElem, loader))
+    {
+    return 0;
+    }
+
+  unsigned int num_elems = revivalElem->GetNumberOfNestedElements();
+  for (unsigned int cc=0; cc <num_elems; cc++)
+    {
+    vtkPVXMLElement* elem = revivalElem->GetNestedElement(cc);
+    if (elem && elem->GetName())
+      {
+      if (strcmp(elem->GetName(), "ProducerID") == 0)
+        {
+        vtkClientServerID id;
+        int int_id;
+        if (elem->GetScalarAttribute("id", &int_id) && int_id)
+          {
+          this->ProducerID.ID = int_id;
+          }
+        }
+      else if (strcmp(elem->GetName(), "ExecutiveID") == 0)
+        {
+        vtkClientServerID id;
+        int int_id;
+        if (elem->GetScalarAttribute("id", &int_id) && int_id)
+          {
+          this->ExecutiveID.ID = int_id;
+          }
+        }
+      }
+    }
+  if (this->ProducerID.IsNull() || this->ExecutiveID.IsNull())
+    {
+    vtkErrorMacro("Missing producer or executive ID.");
+    return 0;
+    }
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkSMOutputPort::GetDataObjectProxy(int recheck)
 {
   if (!this->DataObjectProxy)
     {
@@ -119,7 +184,7 @@ vtkSMProxy* vtkSMPart::GetDataObjectProxy(int recheck)
 }
 
 //----------------------------------------------------------------------------
-vtkPVDataInformation* vtkSMPart::GetDataInformation()
+vtkPVDataInformation* vtkSMOutputPort::GetDataInformation()
 {
   if (!this->DataInformationValid)
     {
@@ -129,7 +194,7 @@ vtkPVDataInformation* vtkSMPart::GetDataInformation()
 }
 
 //----------------------------------------------------------------------------
-vtkPVClassNameInformation* vtkSMPart::GetClassNameInformation()
+vtkPVClassNameInformation* vtkSMOutputPort::GetClassNameInformation()
 {
   if(this->ClassNameInformationValid == 0)
     {
@@ -139,14 +204,14 @@ vtkPVClassNameInformation* vtkSMPart::GetClassNameInformation()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPart::InvalidateDataInformation()
+void vtkSMOutputPort::InvalidateDataInformation()
 {
   this->DataInformationValid = false;
 }
 
 //----------------------------------------------------------------------------
 // vtkPVPart used to update before gathering this information ...
-void vtkSMPart::GatherDataInformation(int doUpdate)
+void vtkSMOutputPort::GatherDataInformation(int doUpdate)
 {
   if (this->GetID().IsNull())
     {
@@ -167,7 +232,7 @@ void vtkSMPart::GatherDataInformation(int doUpdate)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPart::GatherClassNameInformation()
+void vtkSMOutputPort::GatherClassNameInformation()
 {
   if (this->GetID().IsNull())
     {
@@ -205,7 +270,7 @@ void vtkSMPart::GatherClassNameInformation()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPart::InsertExtractPiecesIfNecessary()
+void vtkSMOutputPort::InsertExtractPiecesIfNecessary()
 {
   if (this->GetID().IsNull())
     {
@@ -446,7 +511,7 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
 //----------------------------------------------------------------------------
 // Create the extent translator (sources with no inputs only).
 // Needs to be before "ExtractPieces" because translator propagates.
-void vtkSMPart::CreateTranslatorIfNecessary()
+void vtkSMOutputPort::CreateTranslatorIfNecessary()
 {
   if (this->GetID().IsNull())
     {
@@ -454,69 +519,56 @@ void vtkSMPart::CreateTranslatorIfNecessary()
     }
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   
-  const char* className = this->GetClassNameInformation()->GetVTKClassName();
-  if (className == NULL)
-    {
-    vtkErrorMacro("Missing data information.");
-    return;
-    }
   vtkClientServerStream stream;
-  if (strcmp(className, "vtkImageData") == 0 ||
-      strcmp(className, "vtkStructuredPoints") == 0 ||
-      strcmp(className, "vtkStructuredGrid") == 0 ||
-      strcmp(className, "vtkRectilinearGrid") == 0 )
+  // Do not overwrite custom extent translators.
+  // PVExtent translator should really be the default,
+  // Then we would not need to do this.
+  stream << vtkClientServerStream::Invoke
+         << this->GetExecutiveID() 
+         << "GetExtentTranslator" 
+         << this->PortIndex
+         << vtkClientServerStream::End
+         << vtkClientServerStream::Invoke
+         << vtkClientServerStream::LastResult
+         << "GetClassName"
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, 
+                 vtkProcessModule::GetRootId(this->Servers),
+                 stream);
+  char* classname = 0;
+  if(!pm->GetLastResult(this->ConnectionID,
+    vtkProcessModule::GetRootId(this->Servers)).GetArgument(0,0,&classname))
     {
-    // Do not overwrite custom extent translators.
-    // PVExtent translator should really be the default,
-    // Then we would not need to do this.
+    vtkErrorMacro(<< "Faild to get server result.");
+    }
+  if(classname && strcmp(classname, "vtkExtentTranslator") == 0)
+    {
+    vtkClientServerID translatorID =
+      pm->NewStreamObject("vtkPVExtentTranslator", stream);
     stream << vtkClientServerStream::Invoke
            << this->GetExecutiveID() 
-           << "GetExtentTranslator" 
+           << "SetExtentTranslator" 
            << this->PortIndex
-           << vtkClientServerStream::End
-           << vtkClientServerStream::Invoke
-           << vtkClientServerStream::LastResult
-           << "GetClassName"
+           << translatorID
            << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, 
-                   vtkProcessModule::GetRootId(this->Servers),
+    // Translator has to be set on source because it is propagated.
+    stream << vtkClientServerStream::Invoke
+           << translatorID << "SetOriginalSource"
+           << this->GetProducerID()
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << translatorID << "SetPortIndex"
+           << this->PortIndex
+           << vtkClientServerStream::End;
+    pm->DeleteStreamObject(translatorID, stream);
+    pm->SendStream(this->ConnectionID,
+                   this->Servers, 
                    stream);
-    char* classname = 0;
-    if(!pm->GetLastResult(this->ConnectionID,
-      vtkProcessModule::GetRootId(this->Servers)).GetArgument(0,0,&classname))
-      {
-      vtkErrorMacro(<< "Faild to get server result.");
-      }
-    if(classname && strcmp(classname, "vtkExtentTranslator") == 0)
-      {
-      vtkClientServerID translatorID =
-        pm->NewStreamObject("vtkPVExtentTranslator", stream);
-      stream << vtkClientServerStream::Invoke
-             << this->GetExecutiveID() 
-             << "SetExtentTranslator" 
-             << this->PortIndex
-             << translatorID
-             << vtkClientServerStream::End;
-      // Translator has to be set on source because it is propagated.
-      stream << vtkClientServerStream::Invoke
-             << translatorID << "SetOriginalSource"
-             << this->GetProducerID()
-             << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke
-             << translatorID << "SetPortIndex"
-             << this->PortIndex
-             << vtkClientServerStream::End;
-      pm->DeleteStreamObject(translatorID, stream);
-      pm->SendStream(this->ConnectionID,
-                     this->Servers, 
-                     stream);
-      }
-   }
-
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPart::UpdatePipeline()
+void vtkSMOutputPort::UpdatePipeline()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
@@ -561,7 +613,7 @@ void vtkSMPart::UpdatePipeline()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPart::UpdatePipeline(double time)
+void vtkSMOutputPort::UpdatePipeline(double time)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
@@ -611,7 +663,7 @@ void vtkSMPart::UpdatePipeline(double time)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPart::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMOutputPort::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 

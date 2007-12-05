@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager includes
 #include "vtkSmartPointer.h"
-#include "vtkSMCompoundProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
 
@@ -239,28 +238,10 @@ void pqProxyPanel::updateInformationAndDomains()
   if (this->Implementation->InformationObsolete)
     {
     vtkSMSourceProxy* sp;
-    vtkSMCompoundProxy* cp;
     sp = vtkSMSourceProxy::SafeDownCast(this->Implementation->Proxy);
-    cp = vtkSMCompoundProxy::SafeDownCast(this->Implementation->Proxy);
     if(sp)
       {
       sp->UpdatePipelineInformation();
-      }
-    else if(cp)
-      {
-      // TODO --  this is a workaround for a bug in the server manager
-      //          fix it the right way
-      //          does that mean calling UpdatePipelineInformation() above
-      //          for a source proxy goes away?
-      int num = cp->GetNumberOfProxies();
-      for(int i=0; i<num; i++)
-        {
-        sp = vtkSMSourceProxy::SafeDownCast(cp->GetProxy(i));
-        if(sp)
-          {
-          sp->UpdatePipelineInformation();
-          }
-        }
       }
     else
       {

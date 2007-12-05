@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMCompoundProxy.h"
 #include "vtkSMInputProperty.h"
 
 // Qt includes.
@@ -448,12 +447,6 @@ int pq3DWidget::getReferenceInputBounds(double bounds[6]) const
     {
     vtkSMProxy* pxy = ivp->GetProxy(0);
     input = vtkSMSourceProxy::SafeDownCast(pxy);
-    vtkSMCompoundProxy* cp;
-    cp = vtkSMCompoundProxy::SafeDownCast(pxy);
-    if(cp)
-      {
-      input = vtkSMSourceProxy::SafeDownCast(cp->GetConsumableProxy());
-      }
     }
 
   if(input)

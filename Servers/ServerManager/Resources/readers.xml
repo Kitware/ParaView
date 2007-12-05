@@ -1566,6 +1566,10 @@
        long_help="Produce polygonal data by reading a Gaussian Cube file.">
        The Gaussian Cube reader produces polygonal data by reading data files produced by the Gaussian software package. The expected file extension is .cube.
      </Documentation>
+
+     <OutputPort name="Output" index="0" />
+     <OutputPort name="Gridded Data" index="1" />
+
      <StringVectorProperty
         name="FileName"
         animateable="0"

@@ -26,7 +26,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMInputArrayDomain);
-vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.14");
+vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.15");
 
 //---------------------------------------------------------------------------
 static const char* const vtkSMInputArrayDomainAttributeTypes[] = {
@@ -92,7 +92,7 @@ int vtkSMInputArrayDomain::IsInDomain(vtkSMSourceProxy* proxy,
     }
 
   // Make sure the outputs are created.
-  proxy->CreateParts();
+  proxy->CreateOutputPorts();
   vtkPVDataInformation* info = proxy->GetDataInformation(outputport);
   if (!info)
     {

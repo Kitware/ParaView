@@ -17,12 +17,12 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMPart.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMFixedTypeDomain);
-vtkCxxRevisionMacro(vtkSMFixedTypeDomain, "1.4");
+vtkCxxRevisionMacro(vtkSMFixedTypeDomain, "1.5");
 
 //---------------------------------------------------------------------------
 vtkSMFixedTypeDomain::vtkSMFixedTypeDomain()
@@ -85,15 +85,15 @@ int vtkSMFixedTypeDomain::IsInDomain(vtkSMSourceProxy* oldProxy,
     }
 
   // Make sure the outputs are created.
-  newProxy->CreateParts();
+  newProxy->CreateOutputPorts();
 
-  if (oldProxy->GetNumberOfParts() != newProxy->GetNumberOfParts())
+  if (oldProxy->GetNumberOfOutputPorts() != newProxy->GetNumberOfOutputPorts())
     {
     return 0;
     }
 
-  unsigned int oNumParts = oldProxy->GetNumberOfParts();
-  unsigned int nNumParts = oldProxy->GetNumberOfParts();
+  unsigned int oNumParts = oldProxy->GetNumberOfOutputPorts();
+  unsigned int nNumParts = oldProxy->GetNumberOfOutputPorts();
   if (oNumParts != nNumParts)
     {
     return 0;
@@ -101,8 +101,8 @@ int vtkSMFixedTypeDomain::IsInDomain(vtkSMSourceProxy* oldProxy,
 
   for (unsigned int i=0; i<oNumParts; i++)
     {
-    vtkPVDataInformation* oDI = oldProxy->GetPart(i)->GetDataInformation();
-    vtkPVDataInformation* nDI = newProxy->GetPart(i)->GetDataInformation();
+    vtkPVDataInformation* oDI = oldProxy->GetOutputPort(i)->GetDataInformation();
+    vtkPVDataInformation* nDI = newProxy->GetOutputPort(i)->GetDataInformation();
   
     if (!oDI || !nDI)
       {

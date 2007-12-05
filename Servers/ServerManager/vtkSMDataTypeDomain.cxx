@@ -19,7 +19,6 @@
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMCompoundProxy.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkStdString.h"
@@ -28,7 +27,7 @@
 
 
 vtkStandardNewMacro(vtkSMDataTypeDomain);
-vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.14");
+vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.15");
 
 struct vtkSMDataTypeDomainInternals
 {
@@ -81,10 +80,6 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMProperty* property)
     for (unsigned int i=0; i<numProxs; i++)
       {
       vtkSMProxy* proxy = pp->GetUncheckedProxy(i);
-      if (vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(proxy))
-        {
-        proxy = cp->GetConsumableProxy();
-        }
       int portno = ip? ip->GetUncheckedOutputPortForConnection(i) : 0;
       if (!this->IsInDomain( 
             vtkSMSourceProxy::SafeDownCast(proxy), portno ) )
@@ -114,7 +109,7 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy,
     }
 
   // Make sure the outputs are created.
-  proxy->CreateParts();
+  proxy->CreateOutputPorts();
   vtkPVDataInformation* info = proxy->GetDataInformation(outputport);
   if (!info)
     {

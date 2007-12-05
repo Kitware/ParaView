@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVNumberOfOutputsInformation.cxx
+  Module:    vtkPVAlgorithmPortsInformation.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,40 +12,45 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVNumberOfOutputsInformation.h"
+#include "vtkPVAlgorithmPortsInformation.h"
 
 #include "vtkAlgorithm.h"
 #include "vtkClientServerStream.h"
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkObjectFactory.h"
 #include "vtkSource.h"
+#include "vtkInformation.h"
 
-vtkStandardNewMacro(vtkPVNumberOfOutputsInformation);
-vtkCxxRevisionMacro(vtkPVNumberOfOutputsInformation, "1.6");
+vtkStandardNewMacro(vtkPVAlgorithmPortsInformation);
+vtkCxxRevisionMacro(vtkPVAlgorithmPortsInformation, "1.1");
 
 //----------------------------------------------------------------------------
-vtkPVNumberOfOutputsInformation::vtkPVNumberOfOutputsInformation()
+vtkPVAlgorithmPortsInformation::vtkPVAlgorithmPortsInformation()
 {
   this->RootOnly = 1;
   this->NumberOfOutputs = 0;
+  this->NumberOfRequiredInputs = 0;
 }
 
 //----------------------------------------------------------------------------
-vtkPVNumberOfOutputsInformation::~vtkPVNumberOfOutputsInformation()
+vtkPVAlgorithmPortsInformation::~vtkPVAlgorithmPortsInformation()
 {
 }
 
 //----------------------------------------------------------------------------
-void vtkPVNumberOfOutputsInformation::PrintSelf(ostream &os, vtkIndent indent)
+void vtkPVAlgorithmPortsInformation::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "NumberOfOutputs: " << this->NumberOfOutputs << "\n";
+  os << indent << "NumberOfRequiredInputs: " 
+    << this->NumberOfRequiredInputs << "\n";
 }
 
 //----------------------------------------------------------------------------
-void vtkPVNumberOfOutputsInformation::CopyFromObject(vtkObject* obj)
+void vtkPVAlgorithmPortsInformation::CopyFromObject(vtkObject* obj)
 {
   this->NumberOfOutputs = 0;
+  this->NumberOfRequiredInputs = 0;
 
   vtkAlgorithm* algorithm = vtkAlgorithm::SafeDownCast(obj);
   if(!algorithm)
@@ -68,31 +73,46 @@ void vtkPVNumberOfOutputsInformation::CopyFromObject(vtkObject* obj)
     {
     this->NumberOfOutputs = algorithm->GetNumberOfOutputPorts();
     }
+
+  int numInputs = algorithm->GetNumberOfInputPorts();
+  for (int cc=0; cc < numInputs; cc++)
+    {
+    vtkInformation* info = algorithm->GetInputPortInformation(cc);
+    if (info && !info->Has(vtkAlgorithm::INPUT_IS_OPTIONAL()))
+      {
+      this->NumberOfRequiredInputs++;
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVNumberOfOutputsInformation::AddInformation(vtkPVInformation* info)
+void vtkPVAlgorithmPortsInformation::AddInformation(vtkPVInformation* info)
 {
-  if (vtkPVNumberOfOutputsInformation::SafeDownCast(info))
+  if (vtkPVAlgorithmPortsInformation::SafeDownCast(info))
     {
-    this->NumberOfOutputs = vtkPVNumberOfOutputsInformation::SafeDownCast(info)
+    this->NumberOfOutputs = vtkPVAlgorithmPortsInformation::SafeDownCast(info)
       ->GetNumberOfOutputs();
+    this->NumberOfRequiredInputs = vtkPVAlgorithmPortsInformation::SafeDownCast(info)
+      ->GetNumberOfRequiredInputs();
     }
 }
 
 //----------------------------------------------------------------------------
 void
-vtkPVNumberOfOutputsInformation::CopyToStream(vtkClientServerStream* css)
+vtkPVAlgorithmPortsInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
-  *css << vtkClientServerStream::Reply << this->NumberOfOutputs
+  *css << vtkClientServerStream::Reply 
+       << this->NumberOfOutputs
+       << this->NumberOfRequiredInputs
        << vtkClientServerStream::End;
 }
 
 //----------------------------------------------------------------------------
 void
-vtkPVNumberOfOutputsInformation
+vtkPVAlgorithmPortsInformation
 ::CopyFromStream(const vtkClientServerStream* css)
 {
   css->GetArgument(0, 0, &this->NumberOfOutputs);
+  css->GetArgument(0, 1, &this->NumberOfRequiredInputs);
 }

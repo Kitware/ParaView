@@ -60,7 +60,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqStateLoader);
-vtkCxxRevisionMacro(pqStateLoader, "1.14");
+vtkCxxRevisionMacro(pqStateLoader, "1.15");
 //-----------------------------------------------------------------------------
 pqStateLoader::pqStateLoader()
 {
@@ -190,45 +190,48 @@ void pqStateLoader::RegisterProxyInternal(const char* group,
 int pqStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement, 
   vtkSMProxy* proxy)
 {
-  if (strcmp(proxy->GetXMLGroup(), "views")==0)
+  if (proxy->GetXMLGroup())
     {
-    unsigned int max = proxyElement->GetNumberOfNestedElements();
-    vtkPVXMLElement* toRemove = 0;
-    for (unsigned int cc=0; cc < max; ++cc)
+    if (strcmp(proxy->GetXMLGroup(), "views")==0)
       {
-      vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
-      if (element->GetName() == QString("Property") &&
-        element->GetAttribute("name") == QString("Representations"))
+      unsigned int max = proxyElement->GetNumberOfNestedElements();
+      vtkPVXMLElement* toRemove = 0;
+      for (unsigned int cc=0; cc < max; ++cc)
         {
-        element->SetAttribute("clear", "0");
-        // This will ensure that when the state for Displays property is loaded
-        // all already present displays won't be cleared.
+        vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
+        if (element->GetName() == QString("Property") &&
+          element->GetAttribute("name") == QString("Representations"))
+          {
+          element->SetAttribute("clear", "0");
+          // This will ensure that when the state for Displays property is loaded
+          // all already present displays won't be cleared.
+          }
+        else if (element->GetName() == QString("Property") &&
+          element->GetAttribute("name") == QString("ViewSize"))
+          {
+          toRemove = element;
+          }
         }
-      else if (element->GetName() == QString("Property") &&
-        element->GetAttribute("name") == QString("ViewSize"))
+      if (toRemove)
         {
-        toRemove = element;
+        proxyElement->RemoveNestedElement(toRemove);
         }
       }
-    if (toRemove)
+    else if (strcmp(proxy->GetXMLGroup(), "misc")==0 && 
+      strcmp(proxy->GetXMLName(), "TimeKeeper") == 0)
       {
-      proxyElement->RemoveNestedElement(toRemove);
-      }
-    }
-  else if (strcmp(proxy->GetXMLGroup(), "misc")==0 && 
-    strcmp(proxy->GetXMLName(), "TimeKeeper") == 0)
-    {
-    unsigned int max = proxyElement->GetNumberOfNestedElements();
-    for (unsigned int cc=0; cc < max; ++cc)
-      {
-      // Views are not loaded from state, since the pqTimeKeeper 
-      // automatically updates the property appropriately.
-      vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
-      if (element->GetName() == QString("Property") &&
-        element->GetAttribute("name") == QString("Views"))
+      unsigned int max = proxyElement->GetNumberOfNestedElements();
+      for (unsigned int cc=0; cc < max; ++cc)
         {
-        proxyElement->RemoveNestedElement(element);
-        break;
+        // Views are not loaded from state, since the pqTimeKeeper 
+        // automatically updates the property appropriately.
+        vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
+        if (element->GetName() == QString("Property") &&
+          element->GetAttribute("name") == QString("Views"))
+          {
+          proxyElement->RemoveNestedElement(element);
+          break;
+          }
         }
       }
     }

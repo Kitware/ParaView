@@ -25,7 +25,7 @@
 
 #include "vtkSMStateLoaderBase.h"
 
-class vtkSMCompoundProxy;
+class vtkSMCompoundSourceProxy;
 
 class VTK_EXPORT vtkSMCompoundProxyDefinitionLoader : public vtkSMStateLoaderBase
 {
@@ -38,7 +38,7 @@ public:
   // Description:
   // Load a compound proxy definition from an xml element.
   // Returns the created compound proxy or NULL (on failure)
-  vtkSMCompoundProxy* LoadDefinition(vtkPVXMLElement* rootElement);
+  vtkSMCompoundSourceProxy* LoadDefinition(vtkPVXMLElement* rootElement);
 
 protected:
   vtkSMCompoundProxyDefinitionLoader();
@@ -49,8 +49,15 @@ protected:
   virtual void CreatedNewProxy(int vtkNotUsed(id), vtkSMProxy* vtkNotUsed(proxy))
     { }
 
-  vtkSMCompoundProxy* HandleDefinition(vtkPVXMLElement* rootElement);
+  vtkSMCompoundSourceProxy* HandleDefinition(vtkPVXMLElement* rootElement);
 
+  // Description:
+  // Return the xml element for the state of the proxy with the given id.
+  // This is used by NewProxy() when the proxy with the given id
+  // is not located in the internal CreatedProxies map.
+  virtual vtkPVXMLElement* LocateProxyElement(int id);
+
+  vtkPVXMLElement* RootElement;
 private:
   vtkSMCompoundProxyDefinitionLoader(const vtkSMCompoundProxyDefinitionLoader&); // Not implemented
   void operator=(const vtkSMCompoundProxyDefinitionLoader&); // Not implemented

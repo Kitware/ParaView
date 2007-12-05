@@ -559,7 +559,7 @@ bool WriteDomain(vtkSMDomain *dom, ostream &docFile)
     {
     vtkSMNumberOfPartsDomain *nopd =
       vtkSMNumberOfPartsDomain::SafeDownCast(dom);
-    switch (nopd->GetPartMultiplicity())
+    switch (nopd->GetOutputPortMultiplicity())
       {
       case vtkSMNumberOfPartsDomain::SINGLE:
         domainWritten = true;

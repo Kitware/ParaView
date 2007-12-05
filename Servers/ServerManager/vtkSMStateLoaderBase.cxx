@@ -20,7 +20,7 @@
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMCompoundProxy.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 
 #include <vtkstd/map>
@@ -35,7 +35,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMStateLoaderBase, "1.1");
+vtkCxxRevisionMacro(vtkSMStateLoaderBase, "1.2");
 //----------------------------------------------------------------------------
 vtkSMStateLoaderBase::vtkSMStateLoaderBase()
 {
@@ -107,25 +107,22 @@ vtkSMProxy* vtkSMStateLoaderBase::NewProxyFromElement(vtkPVXMLElement* proxyElem
     {
     const char* group = proxyElement->GetAttribute("group");
     const char* type = proxyElement->GetAttribute("type");
-    if (!type || !group)
+    if (!type)
       {
-      vtkErrorMacro("Could not create proxy from element.");
+      vtkErrorMacro("Could not create proxy from element, missing 'type'.");
       return 0;
       }
+
+    // if group is 0, implies it is a compound proxy.
     proxy = this->NewProxyInternal(group, type);
     if (!proxy)
       {
       vtkErrorMacro("Could not create a proxy of group: "
-                    << group
+                    << (group? group : "(null)")
                     << " type: "
                     << type);
       return 0;
       }
-    }
-  else if (strcmp(proxyElement->GetName(), "CompoundProxy") == 0)
-    {
-    proxy = vtkSMCompoundProxy::New();
-    proxy->SetConnectionID(this->ConnectionID);
     }
 
   if (!proxy)

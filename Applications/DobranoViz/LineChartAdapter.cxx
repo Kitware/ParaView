@@ -54,7 +54,6 @@
 #include <vtkSMInputProperty.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMSourceProxy.h>
-#include <vtkSMCompoundProxy.h>
 #include <vtkSphereSource.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkUnstructuredGrid.h>
@@ -195,18 +194,6 @@ struct LineChartAdapter::pqImplementation
   {
     this->SourceProxy = Proxy;
     this->ExodusVariableName = QString();
-
-    // TODO: hack -- figure out how compound proxies really fit in
-    vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(Proxy);
-    if(cp)
-      {
-        Proxy = NULL;
-        for(int i=cp->GetNumberOfProxies(); Proxy == NULL && i>0; i--)
-          {
-          Proxy = vtkSMSourceProxy::SafeDownCast(cp->GetProxy(i-1));
-          }
-      }
-
     this->onInputChanged();
   }
   

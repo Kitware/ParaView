@@ -192,12 +192,6 @@ public:
   // becomes the active source.
   pqPipelineSource* createFilterForActiveSource( const QString& xmlname);
 
-  // This will instantiate and register a compound proxy. A compound proxy
-  // definition with the given name must have already been registered with
-  // the proxy manager. If the compound proxy needs an input, the active
-  // source will be used as the input. 
-  pqPipelineSource* createCompoundSource(const QString& name);
-
   // Utility function to create a reader that reads the file(s) on the 
   // active server. 
   pqPipelineSource* createReaderOnActiveServer(const QStringList& filename);
@@ -257,6 +251,8 @@ signals:
   void enablePickCenter(bool);
   void enableShowCenterAxis(bool);
   void pickingCenter(bool);
+  void refreshFiltersMenu();
+  void refreshSourcesMenu();
   
   /** \todo Hide these private implementation details */
   void postAccept();
@@ -387,8 +383,8 @@ public slots:
   void setSelectiveEnabledState(bool);
 
 private slots:
-  void onCreateSource(QAction*);
-  void onCreateFilter(QAction*);
+  void onCreateSource(const QString& sourceName);
+  void onCreateFilter(const QString& filtername);
 
   void onSelectionChanged();
   void onPendingDisplayChanged(bool pendingDisplays);
@@ -431,12 +427,6 @@ private slots:
 
   void onPostAccept();
 
-  void updateFiltersMenu();
-  void refreshFiltersMenu();
-  void refreshSourcesMenu();
-  
-  void updateRecentFilterMenu(QAction* action);
-
   void addPluginActions(QObject* iface);
   void addPluginActions(pqActionGroupInterface* iface);
 
@@ -459,7 +449,6 @@ private:
   void updatePendingActions(pqServer *server, pqPipelineSource *source,
       int numServers, bool pendingDisplays);
   void updateViewUndoRedo(pqRenderView* renderView);
-  void saveRecentFilterMenu();
   class pqImplementation;
   pqImplementation* const Implementation;
 

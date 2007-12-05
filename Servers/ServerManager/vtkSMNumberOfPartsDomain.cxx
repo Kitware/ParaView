@@ -16,17 +16,16 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMCompoundProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMNumberOfPartsDomain);
-vtkCxxRevisionMacro(vtkSMNumberOfPartsDomain, "1.6");
+vtkCxxRevisionMacro(vtkSMNumberOfPartsDomain, "1.7");
 
 //---------------------------------------------------------------------------
 vtkSMNumberOfPartsDomain::vtkSMNumberOfPartsDomain()
 {
-  this->PartMultiplicity = vtkSMNumberOfPartsDomain::SINGLE;
+  this->OutputPortMultiplicity = vtkSMNumberOfPartsDomain::SINGLE;
 }
 
 //---------------------------------------------------------------------------
@@ -49,10 +48,6 @@ int vtkSMNumberOfPartsDomain::IsInDomain(vtkSMProperty* property)
     for (unsigned int i=0; i<numProxs; i++)
       {
       vtkSMProxy* proxy = pp->GetUncheckedProxy(i);
-      if (vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(proxy))
-        {
-        proxy = cp->GetConsumableProxy();
-        }
       if (!this->IsInDomain( 
             vtkSMSourceProxy::SafeDownCast(proxy) ) )
         {
@@ -79,16 +74,16 @@ int vtkSMNumberOfPartsDomain::IsInDomain(vtkSMSourceProxy* proxy)
     }
 
   // Make sure the outputs are created.
-  proxy->CreateParts();
+  proxy->CreateOutputPorts();
 
-  if (proxy->GetNumberOfParts() > 1 && 
-      this->PartMultiplicity == vtkSMNumberOfPartsDomain::MULTIPLE)
+  if (proxy->GetNumberOfOutputPorts() > 1 && 
+      this->OutputPortMultiplicity == vtkSMNumberOfPartsDomain::MULTIPLE)
     {
     return 1;
     }
 
-  if (proxy->GetNumberOfParts() == 1 && 
-      this->PartMultiplicity == vtkSMNumberOfPartsDomain::SINGLE)
+  if (proxy->GetNumberOfOutputPorts() == 1 && 
+      this->OutputPortMultiplicity == vtkSMNumberOfPartsDomain::SINGLE)
     {
     return 1;
     }
@@ -103,7 +98,7 @@ void vtkSMNumberOfPartsDomain::ChildSaveState(vtkPVXMLElement* domainElement)
 
   vtkPVXMLElement* multiplicityElem = vtkPVXMLElement::New();
   multiplicityElem->SetName("Multiplicity");
-  switch (this->PartMultiplicity)
+  switch (this->OutputPortMultiplicity)
     {
     case vtkSMNumberOfPartsDomain::SINGLE:
       multiplicityElem->AddAttribute("value", "single");
@@ -127,11 +122,11 @@ int vtkSMNumberOfPartsDomain::ReadXMLAttributes(
     {
     if (strcmp(multiplicity, "single") == 0)
       {
-      this->SetPartMultiplicity(vtkSMNumberOfPartsDomain::SINGLE);
+      this->SetOutputPortMultiplicity(vtkSMNumberOfPartsDomain::SINGLE);
       }
     else if (strcmp(multiplicity, "multiple") == 0)
       {
-      this->SetPartMultiplicity(vtkSMNumberOfPartsDomain::MULTIPLE);
+      this->SetOutputPortMultiplicity(vtkSMNumberOfPartsDomain::MULTIPLE);
       }
     else
       {
@@ -147,5 +142,5 @@ void vtkSMNumberOfPartsDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "PartMultiplicity: " << this->PartMultiplicity << endl;
+  os << indent << "OutputPortMultiplicity: " << this->OutputPortMultiplicity << endl;
 }

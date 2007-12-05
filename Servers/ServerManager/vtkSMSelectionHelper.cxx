@@ -24,7 +24,6 @@
 #include "vtkPVSelectionInformation.h"
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
-#include "vtkSMCompoundProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
@@ -35,7 +34,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.9");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.10");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)

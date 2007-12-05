@@ -53,8 +53,8 @@ public:
 
   // Description:
   // Set/get the part multiplicity. Can be either SINGLE or MULTIPLE.
-  vtkSetMacro(PartMultiplicity, unsigned char);
-  vtkGetMacro(PartMultiplicity, unsigned char);
+  vtkSetMacro(OutputPortMultiplicity, unsigned char);
+  vtkGetMacro(OutputPortMultiplicity, unsigned char);
 
 //BTX
   enum NumberOfParts
@@ -75,7 +75,7 @@ protected:
 
   virtual void ChildSaveState(vtkPVXMLElement* domainElement);
 
-  unsigned char PartMultiplicity;
+  unsigned char OutputPortMultiplicity;
 
 private:
   vtkSMNumberOfPartsDomain(const vtkSMNumberOfPartsDomain&); // Not implemented
