@@ -218,10 +218,12 @@ public:
   void UnRegisterAllLinks();
   
   // Description:
-  // Register a compound proxy definition with the proxy manager. This
-  // definition (represented as a tree of vtkPVXMLElement objects) can
-  // then be used to instantiate a copy of the compound proxy. See
-  // vtkSMCompoundSourceProxy.h for details.
+  // Register a custom proxy definition with the proxy manager. 
+  // This can be a compound proxy definition (look at
+  // vtkSMCompoundSourceProxy.h) or a regular proxy definition.
+  // For all practical purposes, there's no difference between a proxy
+  // definition added using this method or by parsing a server manager
+  // configuration file.
   void RegisterCustomProxyDefinition(
     const char* group, const char* name, vtkPVXMLElement* top);
 
@@ -233,7 +235,7 @@ public:
   void UnRegisterCustomProxyDefinition(const char* group, const char* name);
 
   // Description:
-  // Unregisters all registered compound proxy definitions.
+  // Unregisters all registered custom proxy definitions.
   // Note that this can only be used to remove definitions added using
   // RegisterCustomProxyDefinition(), cannot be used to remove definitions
   // loaded using vtkSMXMLParser.
@@ -244,12 +246,12 @@ public:
   vtkPVXMLElement* GetProxyDefinition(const char* group, const char* name);
 
   // Description:
-  // Load compound proxy definitions and register them.
+  // Load custom proxy definitions and register them.
   void LoadCustomProxyDefinitions(const char* filename);
   void LoadCustomProxyDefinitions(vtkPVXMLElement* root);
 
   // Description:
-  // Save registered compound proxy definitions.
+  // Save registered custom proxy definitions.
   void SaveCustomProxyDefinitions(const char* filename);
   void SaveCustomProxyDefinitions(vtkPVXMLElement* root);
 
