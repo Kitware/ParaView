@@ -141,8 +141,8 @@ void pqApplicationOptions::applyChanges()
   settings->setValue("defaultViewType", 
     this->Internal->DefaultViewType->itemData(
       this->Internal->DefaultViewType->currentIndex()));
-  pqServer::setHeartBeatTimeoutSetting(
-    this->Internal->HeartBeatTimeout->text().toDouble()*60*1000);
+  pqServer::setHeartBeatTimeoutSetting(static_cast<int>(
+      this->Internal->HeartBeatTimeout->text().toDouble()*60*1000));
 
   bool autoAccept = this->Internal->AutoAccept->isChecked();
   settings->setValue("autoAccept", autoAccept);
