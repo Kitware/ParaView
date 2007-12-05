@@ -176,6 +176,11 @@ pqCustomFilterDefinitionWizard::pqCustomFilterDefinitionWizard(
   QObject::connect(this->Form->CustomFilterName,
       SIGNAL(textEdited(const QString &)),
       this, SLOT(clearNameOverwrite(const QString &)));
+
+  // When combo selection changes, update new label to be same as old.
+  QObject::connect(this->Form->PropertyCombo,
+    SIGNAL(currentIndexChanged(const QString&)),
+    this->Form->PropertyName, SLOT(setText(const QString&)));
 }
 
 pqCustomFilterDefinitionWizard::~pqCustomFilterDefinitionWizard()
