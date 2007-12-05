@@ -70,6 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqSettings.h"
 #include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
@@ -259,12 +260,20 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
     {
     int dataSetType = dataInfo->GetDataSetType();
     if(dataSetType == VTK_POLY_DATA ||
-       dataSetType == VTK_UNSTRUCTURED_GRID ||
        dataSetType == VTK_HYPER_OCTREE ||
        dataSetType == VTK_GENERIC_DATA_SET)
       {
       pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
         "Surface");
+      }
+    else if (dataSetType == VTK_UNSTRUCTURED_GRID)
+      {
+      if (static_cast<double>(dataInfo->GetNumberOfCells()) >= 
+        pqPipelineRepresentation::getUnstructuredGridOutlineThreshold()*1000000.0)
+        {
+        pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
+          "Outline");
+        }
       }
     else if(dataSetType == VTK_RECTILINEAR_GRID ||
        dataSetType == VTK_STRUCTURED_GRID ||
@@ -990,4 +999,43 @@ void pqPipelineRepresentation::updateScalarBarVisibility(bool visible)
       sbRepr->setVisible(true);
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+const char* pqPipelineRepresentation::UNSTRUCTURED_GRID_OUTLINE_THRESHOLD()
+{
+  return "/representation/UnstructuredGridOutlineThreshold";
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineRepresentation::setUnstructuredGridOutlineThreshold(double numcells)
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqSettings* settings = core->settings();
+  if (settings)
+    {
+    settings->setValue(
+      pqPipelineRepresentation::UNSTRUCTURED_GRID_OUTLINE_THRESHOLD(), 
+      QVariant(numcells));
+    }
+}
+
+//-----------------------------------------------------------------------------
+double pqPipelineRepresentation::getUnstructuredGridOutlineThreshold()
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqSettings* settings = core->settings();
+  if (settings && settings->contains(
+      pqPipelineRepresentation::UNSTRUCTURED_GRID_OUTLINE_THRESHOLD()))
+    {
+    bool ok;
+    double numcells = settings->value(
+      pqPipelineRepresentation::UNSTRUCTURED_GRID_OUTLINE_THRESHOLD()).toDouble(&ok);
+    if (ok)
+      {
+      return numcells;
+      }
+    }
+
+  return 0.5; //  1/2 million cells.
 }

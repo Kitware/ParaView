@@ -41,12 +41,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkType.h"
 
 #include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
-#include "pqViewModuleInterface.h"
-#include "pqSettings.h"
-#include "pqRenderView.h"
+#include "pqPipelineRepresentation.h"  
 #include "pqPluginManager.h"
-  
+#include "pqRenderView.h"
+#include "pqServerManagerModel.h"
+#include "pqSettings.h"
+#include "pqViewModuleInterface.h"
 
 struct Manip
 {
@@ -151,11 +151,6 @@ pqGlobalRenderViewOptions::pqGlobalRenderViewOptions(QWidget *widgetParent)
   this->Internal = new pqInternal;
   this->Internal->setupUi(this);
   
-  // outline not used yet
-  this->Internal->label_3->hide();
-  this->Internal->outlineThresholdLabel->hide();
-  this->Internal->outlineThreshold->hide();
-
   this->init();
 }
 
@@ -286,6 +281,7 @@ void pqGlobalRenderViewOptions::setPage(const QString &page)
     }
 }
 
+//-----------------------------------------------------------------------------
 QStringList pqGlobalRenderViewOptions::getPageList()
 {
   QStringList pages("Render View");
@@ -296,7 +292,8 @@ QStringList pqGlobalRenderViewOptions::getPageList()
     }
   return pages;
 }
-  
+ 
+//-----------------------------------------------------------------------------
 void pqGlobalRenderViewOptions::applyChanges()
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
@@ -312,6 +309,9 @@ void pqGlobalRenderViewOptions::applyChanges()
     {
     settings->setValue("LODThreshold", VTK_DOUBLE_MAX);
     }
+
+  pqPipelineRepresentation::setUnstructuredGridOutlineThreshold(
+    this->Internal->outlineThreshold->value()/10.0);
 
   settings->setValue("UseImmediateMode",
     this->Internal->immediateModeRendering->isChecked());
@@ -412,6 +412,7 @@ void pqGlobalRenderViewOptions::applyChanges()
 
 }
 
+//-----------------------------------------------------------------------------
 void pqGlobalRenderViewOptions::resetChanges()
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
@@ -430,6 +431,12 @@ void pqGlobalRenderViewOptions::resetChanges()
     this->Internal->lodThreshold->setValue(static_cast<int>(val.toDouble()*10));
     this->Internal->updateLODThresholdLabel(this->Internal->lodThreshold->value());
     }
+
+
+  this->Internal->outlineThreshold->setValue(
+    static_cast<int>(
+      pqPipelineRepresentation::getUnstructuredGridOutlineThreshold()*10));
+  this->Internal->updateOutlineThresholdLabel(this->Internal->outlineThreshold->value());
   
   val = settings->value("LODResolution", 50);
   this->Internal->lodResolution->setValue(static_cast<int>(160-val.toDouble() + 10));

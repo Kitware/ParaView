@@ -141,6 +141,12 @@ public:
 
   /// Returns the opacity.
   double getOpacity() const;
+
+  /// Get/Set the application wide setting for unstructured grid outline
+  /// threshold. If the unstructured grid number of cells exceeds this limit, it
+  /// will be rendered as outline by default. The value is in million cells.
+  static void setUnstructuredGridOutlineThreshold(double millioncells);
+  static double getUnstructuredGridOutlineThreshold();
 signals:
   /// This is fire when any property that affects the color
   /// mode for the display changes.
@@ -185,6 +191,9 @@ private:
     vtkPVArrayInformation*& arrayInfo);
 
   int getNumberOfComponents(const char* arrayname, int fieldType);
+
+  /// Returns the settings key.
+  static const char* UNSTRUCTURED_GRID_OUTLINE_THRESHOLD();
 };
 
 #endif
