@@ -78,7 +78,7 @@
         </spacer>
        </item>
        <item row="1" column="1" >
-        <widget class="QSpinBox" name="HeartBeatTimeout" >
+        <widget class="QLineEdit" name="HeartBeatTimeout" >
          <property name="toolTip" >
           <string>&lt;html>&lt;p>Set the interval in &lt;b>minutes&lt;/b> after which the client sends a heart beat message to the server to avoid connection termination due to inactivity. &lt;b>0&lt;/b> means no heartbeats.&lt;/p>&lt;/html></string>
          </property>
@@ -87,18 +87,6 @@
          </property>
          <property name="whatsThis" >
           <string>&lt;html>&lt;p>Set the interval in &lt;b>minutes&lt;/b> after which the client sends a heart beat message to the server to avoid connection termination due to inactivity. &lt;b>0&lt;/b> means no heartbeats.&lt;/p>&lt;/html></string>
-         </property>
-         <property name="maximum" >
-          <number>1440</number>
-         </property>
-         <property name="minimum" >
-          <number>0</number>
-         </property>
-         <property name="singleStep" >
-          <number>1</number>
-         </property>
-         <property name="value" >
-          <number>5</number>
          </property>
         </widget>
        </item>

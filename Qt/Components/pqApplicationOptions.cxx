@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqServer.h"
 
+#include <QDoubleValidator>
+
 class pqApplicationOptions::pqInternal 
   : public Ui::pqApplicationOptions
 {
@@ -54,6 +56,9 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
 {
   this->Internal = new pqInternal;
   this->Internal->setupUi(this);
+  QDoubleValidator* validator = new QDoubleValidator(this->Internal->HeartBeatTimeout);
+  validator->setDecimals(2);
+  this->Internal->HeartBeatTimeout->setValidator(validator);
   
   this->Internal->DefaultViewType->addItem("None", "None");
   // Get available view types.
@@ -88,7 +93,7 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
                   SIGNAL(currentIndexChanged(int)),
                   this, SIGNAL(changesAvailable()));
   QObject::connect(this->Internal->HeartBeatTimeout,
-                  SIGNAL(valueChanged(int)),
+                  SIGNAL(textChanged(const QString&)),
                   this, SIGNAL(changesAvailable()));
 }
 
@@ -132,8 +137,8 @@ void pqApplicationOptions::applyChanges()
   settings->setValue("defaultViewType", 
     this->Internal->DefaultViewType->itemData(
       this->Internal->DefaultViewType->currentIndex()));
-  pqServer::setHeartBeatTimeoutSetting(
-    this->Internal->HeartBeatTimeout->value()*60*1000);
+  pqServer::setHeartBeatTimeoutSetting(static_cast<int>(
+      this->Internal->HeartBeatTimeout->text().toDouble()*60*1000));
 }
 
 //-----------------------------------------------------------------------------
@@ -147,7 +152,7 @@ void pqApplicationOptions::resetChanges()
   index = (index==-1)? 0 : index;
   this->Internal->DefaultViewType->setCurrentIndex(index);
 
-  this->Internal->HeartBeatTimeout->setValue(
-    pqServer::getHeartBeatTimeoutSetting()/(60*1000));
+  this->Internal->HeartBeatTimeout->setText(
+    QString("%1").arg(pqServer::getHeartBeatTimeoutSetting()/(60.0*1000), 0, 'f', 2));
 }
 
