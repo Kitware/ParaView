@@ -309,8 +309,6 @@ SOURCE_GROUP("Generated" FILES
 )
 
 ADD_LIBRARY(pqComponents
-  pqProxyMenuManager.cxx
-  pqProxyMenuManager.h
   pq3DWidget.cxx
   pq3DWidget.h
   pqActiveChartOptions.cxx
@@ -524,6 +522,8 @@ ADD_LIBRARY(pqComponents
   pqPointSourceWidget.h
   pqProxyInformationWidget.cxx
   pqProxyInformationWidget.h
+  pqProxyMenuManager.cxx
+  pqProxyMenuManager.h
   pqProxyPanel.cxx
   pqProxyPanel.h
   pqProxySelectionWidget.cxx
