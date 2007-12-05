@@ -132,6 +132,7 @@ void pqProxyMenuManager::triggered()
         {
         this->Internal->RecentlyUsed.pop_back();
         }
+      this->populateRecentlyUsedMenu(0);
       this->saveRecentlyUsedItems();
       }
     }
@@ -226,6 +227,7 @@ void pqProxyMenuManager::populateRecentlyUsedMenu(QMenu* rmenu)
   QMenu* recentMenu = rmenu? rmenu : this->Menu->findChild<QMenu*>("Recent");
   if (recentMenu)
     {
+    recentMenu->clear();
     foreach (QString pname, this->Internal->RecentlyUsed)
       {
       QAction* action = this->getAction(pname);
