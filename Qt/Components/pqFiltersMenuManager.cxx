@@ -60,13 +60,13 @@ void pqFiltersMenuManager::updateEnableState()
 {
   // Get the list of selected sources. Make sure the list contains
   // only valid sources.
-  const pqServerManagerSelection *selected =
+  const pqServerManagerSelection *selItems =
       pqApplicationCore::instance()->getSelectionModel()->selectedItems();
   
   QList<pqOutputPort*> outputPorts;
   pqServerManagerModelItem* item = NULL;
-  pqServerManagerSelection::ConstIterator iter = selected->begin();
-  for( ; iter != selected->end(); ++iter)
+  pqServerManagerSelection::ConstIterator iter = selItems->begin();
+  for( ; iter != selItems->end(); ++iter)
     {
     item = *iter;
     pqPipelineSource* source = qobject_cast<pqPipelineSource *>(item);
@@ -125,14 +125,15 @@ void pqFiltersMenuManager::updateEnableState()
       output->GetProperty("Input"));
     if(input)
       {
-      if(!input->GetMultipleInput() && selected->size() > 1)
+      if(!input->GetMultipleInput() && selItems->size() > 1)
         {
         continue;
         }
 
       input->RemoveAllUncheckedProxies();
-      foreach(pqOutputPort* port, outputPorts)
+      for (int cc=0; cc < outputPorts.size(); cc++)
         {
+        pqOutputPort* port = outputPorts[cc];
         input->AddUncheckedInputConnection(
           port->getSource()->getProxy(), port->getPortNumber());
         }
