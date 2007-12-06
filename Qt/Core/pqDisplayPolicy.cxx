@@ -92,14 +92,16 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
     return view_type;
     }
 
-  QString className = opPort->getDataClassName();
+  vtkPVDataInformation* datainfo = update_pipeline?
+    opPort->getDataInformation(true) : opPort->getCachedDataInformation();
+  QString className = datainfo?  datainfo->GetDataClassName() : QString();
   if (className != "vtkRectilinearGrid")
     {
     return view_type;
     }
+
   // The proxy gives us no hint. In that case we try to determine the
   // preferred view by looking at the output from the source.
-  vtkPVDataInformation* datainfo = opPort->getDataInformation(update_pipeline);
   if (datainfo)
     {
     int extent[6];

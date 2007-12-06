@@ -102,6 +102,11 @@ public:
   /// data information, otherwise the current data information is returned.
   vtkPVDataInformation* getDataInformation(bool update) const;
 
+
+  /// Simply returns the data information as available on the client, without any
+  /// gathers from the server side or any pipeline updates.
+  vtkPVDataInformation* getCachedDataInformation() const;
+
   /// Returns the class name of the output data.
   const char* getDataClassName() const;
 signals:

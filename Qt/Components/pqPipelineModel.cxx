@@ -664,7 +664,6 @@ void pqPipelineModelOutputPort::updateVisibleState(pqView *view)
 }
 pqPipelineModelItem::IconType pqPipelineModelOutputPort::getIconType() const
 {
-  /*
   pqApplicationCore* core = pqApplicationCore::instance();
   pqDisplayPolicy* policy = core->getDisplayPolicy();
   if (policy)
@@ -680,7 +679,7 @@ pqPipelineModelItem::IconType pqPipelineModelOutputPort::getIconType() const
       return LINECHART;
       }
     }
-    */
+  
   return GEOMETRY;
 }
 

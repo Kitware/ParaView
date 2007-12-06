@@ -41,6 +41,12 @@ public:
   vtkPVDataInformation* GetDataInformation();
 
   // Description:
+  // Simply returns the data information as available on the client, without any
+  // gathers from the server side or any pipeline updates.
+  vtkPVDataInformation* GetCachedDataInformation()
+    { return this->DataInformation; }
+
+  // Description:
   // Returns classname information.
   vtkPVClassNameInformation* GetClassNameInformation();
 
