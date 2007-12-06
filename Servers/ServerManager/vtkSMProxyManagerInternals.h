@@ -180,6 +180,31 @@ struct vtkSMProxyManagerInternals
   typedef vtkstd::map<vtkStdString, vtkSmartPointer<vtkSMLink> >
     LinkType;
   LinkType RegisteredLinkMap;
+
+  // Helper method to retrieve the proxy element.
+  vtkPVXMLElement* GetProxyElement(const char* groupName, const char* proxyName)
+    {
+    if (!groupName || !proxyName)
+      {
+      return 0;
+      }
+    // Find the XML element from the proxy.
+    // 
+    vtkSMProxyManagerInternals::GroupMapType::iterator it =
+      this->GroupMap.find(groupName);
+    if (it != this->GroupMap.end())
+      {
+      vtkSMProxyManagerElementMapType::iterator it2 =
+        it->second.find(proxyName);
+
+      if (it2 != it->second.end())
+        {
+        vtkPVXMLElement* element = it2->second.GetPointer();
+        return element;
+        }
+      }
+    return 0;
+    }
 };
 
 #endif

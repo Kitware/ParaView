@@ -94,7 +94,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.67");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.68");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -320,25 +320,12 @@ int vtkSMProxyManager::ProxyElementExists(const char* groupName,
 vtkPVXMLElement* vtkSMProxyManager::GetProxyElement(const char* groupName, 
                                                     const char* proxyName)
 {
-  if (!groupName || !proxyName)
+  vtkPVXMLElement* element = this->Internals->GetProxyElement(groupName, proxyName);
+  if (element)
     {
-    return 0;
+    return element;
     }
-  // Find the XML element from the proxy.
-  // 
-  vtkSMProxyManagerInternals::GroupMapType::iterator it =
-    this->Internals->GroupMap.find(groupName);
-  if (it != this->Internals->GroupMap.end())
-    {
-    vtkSMProxyManagerElementMapType::iterator it2 =
-      it->second.find(proxyName);
 
-    if (it2 != it->second.end())
-      {
-      vtkPVXMLElement* element = it2->second.GetPointer();
-      return element;
-      }
-    }
   vtkErrorMacro( << "No proxy that matches: group=" << groupName 
                  << " and proxy=" << proxyName << " were found.");
   return 0;
@@ -428,6 +415,8 @@ unsigned int vtkSMProxyManager::GetNumberOfProxies(const char* group)
 }
 
 //---------------------------------------------------------------------------
+// No errors are raised if a proxy definition for the requested proxy is not
+// found.
 vtkSMProxy* vtkSMProxyManager::GetPrototypeProxy(const char* groupname, 
   const char* name)
 {
@@ -438,6 +427,14 @@ vtkSMProxy* vtkSMProxyManager::GetPrototypeProxy(const char* groupname,
     {
     return proxy;
     }
+
+  if (!this->Internals->GetProxyElement(groupname, name))
+    {
+    // No definition was located for the requested proxy.
+    // Cannot create the prototype.
+    return 0;
+    }
+
   proxy = this->NewProxy(groupname, name);
   if (!proxy)
     {
@@ -1422,6 +1419,7 @@ void vtkSMProxyManager::RegisterCustomProxyDefinition(
 }
 
 //---------------------------------------------------------------------------
+// Does not raise an error if definition is not found.
 vtkPVXMLElement* vtkSMProxyManager::GetProxyDefinition(
   const char* group, const char* name)
 {
@@ -1430,21 +1428,7 @@ vtkPVXMLElement* vtkSMProxyManager::GetProxyDefinition(
     return 0;
     }
 
-  vtkSMProxyManagerInternals::GroupMapType::iterator it =
-    this->Internals->GroupMap.find(group);
-  if (it != this->Internals->GroupMap.end())
-    {
-    vtkSMProxyManagerElementMapType::iterator it2 =
-      it->second.find(name);
-
-    if (it2 != it->second.end())
-      {
-      vtkPVXMLElement* element = it2->second.GetPointer();
-      return element;
-      }
-    }
-
-  return 0;
+  return this->Internals->GetProxyElement(group, name);
 }
 
 //---------------------------------------------------------------------------
