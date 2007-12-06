@@ -145,6 +145,13 @@ public:
   virtual vtkImageData* CaptureWindow(int magnification);
 
   // Description:
+  // Set or get whether offscreen rendering should be used during
+  // CaptureWindow calls.
+  vtkSetClampMacro(UseOffscreenRenderingForScreenshots, int, 0, 1);
+  vtkBooleanMacro(UseOffscreenRenderingForScreenshots, int);
+  vtkGetMacro(UseOffscreenRenderingForScreenshots, int);
+
+  // Description:
   // Enable measurement of Polygons Per Second
   vtkSetClampMacro(MeasurePolygonsPerSecond, int, 0, 1);
   vtkBooleanMacro(MeasurePolygonsPerSecond, int);
@@ -340,6 +347,7 @@ protected:
   vtkIdType AveragePolygonsPerSecondCount;
   void CalculatePolygonsPerSecond(double time);
   int MeasurePolygonsPerSecond;
+  int UseOffscreenRenderingForScreenshots;
 
   // Description:
   // Get the number of polygons this render module is rendering

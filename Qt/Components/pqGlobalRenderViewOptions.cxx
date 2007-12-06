@@ -220,7 +220,15 @@ void pqGlobalRenderViewOptions::init()
   QObject::connect(this->Internal->triangleStrips,
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
-  
+
+  QObject::connect(this->Internal->depthPeeling,
+                  SIGNAL(toggled(bool)),
+                  this, SIGNAL(changesAvailable()));
+
+  QObject::connect(this->Internal->useOffscreenRenderingForScreenshots,
+                  SIGNAL(toggled(bool)),
+                  this, SIGNAL(changesAvailable()));
+
   QObject::connect(this->Internal->renderingInterrupts,
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
@@ -318,7 +326,13 @@ void pqGlobalRenderViewOptions::applyChanges()
   
   settings->setValue("UseTriangleStrips",
     this->Internal->triangleStrips->isChecked());
-  
+
+  settings->setValue("DepthPeeling",
+    this->Internal->depthPeeling->isChecked());
+
+  settings->setValue("UseOffscreenRenderingForScreenshots",
+    this->Internal->useOffscreenRenderingForScreenshots->isChecked());
+
   settings->setValue("RenderInterruptsEnabled",
     this->Internal->renderingInterrupts->isChecked());
   
@@ -444,14 +458,20 @@ void pqGlobalRenderViewOptions::resetChanges()
   
   val = settings->value("UseImmediateMode", true);
   this->Internal->immediateModeRendering->setChecked(val.toBool());
-  
+
   val = settings->value("UseTriangleStrips", false);
   this->Internal->triangleStrips->setChecked(val.toBool());
-  
+
+  val = settings->value("DepthPeeling", true);
+  this->Internal->depthPeeling->setChecked(val.toBool());
+
+  val = settings->value("UseOffscreenRenderingForScreenshots", true);
+  this->Internal->useOffscreenRenderingForScreenshots->setChecked(val.toBool());
+
   val = settings->value("RenderInterruptsEnabled", false);
   this->Internal->renderingInterrupts->setChecked(val.toBool());
 
-  
+
   //SquirtLevel"), 3);
   val = settings->value("RemoteRenderThreshold", 3);
   if(val.toDouble() >= VTK_LARGE_FLOAT)
@@ -635,4 +655,3 @@ void pqGlobalRenderViewOptions::resetDefaultCameraManipulators()
     this->Internal->CameraControl3DComboBoxList[i]->setCurrentIndex(idx);
     }
 }
-

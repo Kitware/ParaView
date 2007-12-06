@@ -89,7 +89,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.53");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.54");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -126,6 +126,7 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
   this->RenderTimer = vtkTimerLog::New();
   this->ResetPolygonsPerSecondResults();
   this->MeasurePolygonsPerSecond = 0;
+  this->UseOffscreenRenderingForScreenshots = 0;
 
   this->LODThreshold = 0.0;
 
@@ -989,8 +990,12 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindow(int magnification)
 {
   // Offscreen rendering is not functioning properly on the mac.
   // Do not use it.
+  int useOffscreenRenderingForScreenshots = this->UseOffscreenRenderingForScreenshots;
 #if !defined(__APPLE__)
-  this->GetRenderWindow()->SetOffScreenRendering(1);
+  if (0 != useOffscreenRenderingForScreenshots)
+    {
+    this->GetRenderWindow()->SetOffScreenRendering(1);
+    }
 #endif
   this->GetRenderWindow()->SwapBuffersOff();
   this->StillRender();
@@ -1009,7 +1014,10 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindow(int magnification)
   this->GetRenderWindow()->SwapBuffersOn();
   this->GetRenderWindow()->Frame();
 #if !defined(__APPLE__)
-  this->GetRenderWindow()->SetOffScreenRendering(0);
+  if (0 != useOffscreenRenderingForScreenshots)
+    {
+    this->GetRenderWindow()->SetOffScreenRendering(0);
+    }
 #endif
 
   // Update image extents based on ViewPosition
@@ -1829,6 +1837,8 @@ void vtkSMRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RenderWindow: " << this->RenderWindow << endl;
   os << indent << "MeasurePolygonsPerSecond: " 
     << this->MeasurePolygonsPerSecond << endl;
+  os << indent << "UseOffscreenRenderingForScreenshots: "
+    << this->UseOffscreenRenderingForScreenshots << endl;
   os << indent << "AveragePolygonsPerSecond: " 
     << this->AveragePolygonsPerSecond << endl;
   os << indent << "MaximumPolygonsPerSecond: " 

@@ -123,7 +123,7 @@
     <Proxy name="Renderer" class="vtkRenderer">
       <!-- Renderer purposefully doesn't have an active camera property.
       Since the renderer is managed by RenderModule, it sets the camera
-      is perculiar ways, and can't use a property for it-->
+      in peculiar ways, and can't use a property for it -->
       <ProxyProperty 
         name="ViewProps" 
         command="AddViewProp"
@@ -163,10 +163,10 @@
         name="DepthPeeling"
         command="SetUseDepthPeeling"
         number_of_elements="1"
-        default_values="0">
+        default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
-      
+
       <DoubleVectorProperty
         name="Background"
         command="SetBackground"
@@ -3331,6 +3331,19 @@
         Called to reset the camera using current data bounts.
         </Documentation>
       </Property>
+
+      <IntVectorProperty
+        name="UseOffscreenRenderingForScreenshots"
+        command="SetUseOffscreenRenderingForScreenshots"
+        number_of_elements="1"
+        update_self="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether offscreen rendering should be used during
+          CaptureWindow calls.
+        </Documentation>
+      </IntVectorProperty>
 
       <!-- 
         Some common subproxies that are not affected by the type of render
