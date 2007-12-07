@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPluginLoader>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QCoreApplication>
+#include <QDir>
 
 #include "vtkSMXMLParser.h"
 #include "vtkProcessModule.h"
@@ -179,26 +181,23 @@ void pqPluginManager::loadPlugins(pqServer* server)
   if(!server)
     {
     pv_plugin_path = vtksys::SystemTools::GetEnv("PV_PLUGIN_PATH");
+    if(!pv_plugin_path.isEmpty())
+      {
+      pv_plugin_path += ";";
+      }
+    pv_plugin_path += QCoreApplication::applicationDirPath() + QDir::separator()
+      + "plugins";
     }
   else
     {
-    // get the PV_PLUGIN_PATH environment variable on the server
     vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-    vtkSMProxy* helper = pxm->NewProxy("misc", "EnvironmentInformationHelper");
-    helper->SetConnectionID(server->GetConnectionID());
-    helper->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
-    pqSMAdaptor::setElementProperty(helper->GetProperty("Variable"),
-                                    "PV_PLUGIN_PATH");
-    helper->UpdateVTKObjects();
-    vtkPVEnvironmentInformation* info = vtkPVEnvironmentInformation::New();
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    pm->GatherInformation(helper->GetConnectionID(),
-      vtkProcessModule::DATA_SERVER, info, helper->GetID());
-
-    pv_plugin_path = info->GetVariable();
-
-    info->Delete();
-    helper->UnRegister(NULL);
+    vtkSMProxy* pxy = pxm->NewProxy("misc", "PluginLoader");
+    pxy->SetConnectionID(server->GetConnectionID());
+    pxy->UpdateVTKObjects();
+    pxy->UpdatePropertyInformation();
+    pv_plugin_path =
+      pqSMAdaptor::getElementProperty(pxy->GetProperty("SearchPaths")).toString();
+    pxy->UnRegister(NULL);
     }
   
   // trim any whitespace before or after the path delimiters

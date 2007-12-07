@@ -18,9 +18,11 @@
 #include "vtkProcessModule.h"
 #include "vtkClientServerInterpreter.h"
 #include "vtkDynamicLoader.h"
+#include "vtkPVOptions.h"
+#include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkPVPluginLoader);
-vtkCxxRevisionMacro(vtkPVPluginLoader, "1.2");
+vtkCxxRevisionMacro(vtkPVPluginLoader, "1.3");
 
 #ifdef _WIN32
 // __cdecl gives an unmangled name
@@ -40,6 +42,28 @@ vtkPVPluginLoader::vtkPVPluginLoader()
   this->FileName = 0;
   this->ServerManagerXML = NULL;
   this->Error = NULL;
+  this->SearchPaths = NULL;
+
+  vtksys::String paths;
+  const char* env = vtksys::SystemTools::GetEnv("PV_PLUGIN_PATH");
+  if(env)
+    {
+    paths += env;
+    }
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVOptions* opt = pm->GetOptions();
+  const char* path = opt->GetApplicationPath();
+  vtksys::String appDir = vtksys::SystemTools::GetProgramPath(path);
+  if(appDir.size())
+    {
+    appDir += "/plugins";
+    paths = paths.size() ? paths + ";" : paths;
+    paths += appDir;
+    }
+
+  this->SearchPaths = new char[paths.size() + 1];
+  strcpy(this->SearchPaths, paths.c_str());
 }
 
 //-----------------------------------------------------------------------------
@@ -51,6 +75,11 @@ vtkPVPluginLoader::~vtkPVPluginLoader()
     }
 
   this->SetFileName(0);
+  
+  if(this->SearchPaths)
+    {
+    delete [] this->SearchPaths;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -126,5 +155,7 @@ void vtkPVPluginLoader::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Error: " 
     << (this->Error? this->Error : "(none)") << endl;
   os << indent << "Loaded: " << this->Loaded << endl;
+  os << indent << "SearchPaths: " << (this->SearchPaths ? 
+    this->SearchPaths : "(none)") << endl;
 }
 

@@ -1821,6 +1821,14 @@
       </StringVectorProperty>
       
       <StringVectorProperty
+        name="SearchPaths"
+        command="GetSearchPaths"
+        number_of_elements="1"
+        information_only="1">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      
+      <StringVectorProperty
         name="ServerManagerXML"
         command="GetServerManagerXML"
         number_of_elements="1"

@@ -19,6 +19,7 @@
 #include <vtksys/CommandLineArguments.hxx>
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
+#include <vtkstd/string>
 
 
 //----------------------------------------------------------------------------
@@ -33,7 +34,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCommandOptions);
-vtkCxxRevisionMacro(vtkCommandOptions, "1.6");
+vtkCxxRevisionMacro(vtkCommandOptions, "1.7");
 
 //----------------------------------------------------------------------------
 vtkCommandOptions::vtkCommandOptions()
@@ -49,6 +50,7 @@ vtkCommandOptions::vtkCommandOptions()
   this->ErrorMessage = 0;
   this->Argc = 0;
   this->Argv = 0;
+  this->ApplicationPath = 0;
 
   this->XMLConfigFile = 0;
 
@@ -66,6 +68,12 @@ vtkCommandOptions::~vtkCommandOptions()
   this->SetErrorMessage(0);
   this->CleanArgcArgv();
   delete this->Internals;
+  
+  if( this->ApplicationPath )
+    {
+    delete this->ApplicationPath;
+    this->ApplicationPath = 0;
+    }
 
   if (this->XMLParser)
     {
@@ -161,6 +169,7 @@ int vtkCommandOptions::Parse(int argc, const char* const argv[])
   //cout << "Res1: " << res1 << " Res2: " << res2 << endl;
   this->CleanArgcArgv();
   this->Internals->CMD.GetRemainingArguments(&this->Argc, &this->Argv);
+  this->ComputeApplicationPath();
 
   return res1 && res2;
 }
@@ -305,6 +314,40 @@ void vtkCommandOptions::GetRemainingArguments(int* argc, char*** argv)
 int vtkCommandOptions::GetLastArgument()
 {
   return this->Internals->CMD.GetLastArgument();
+}
+
+//----------------------------------------------------------------------------
+void vtkCommandOptions::ComputeApplicationPath()
+{
+  if( this->ApplicationPath )
+    {
+    delete this->ApplicationPath;
+    this->ApplicationPath = 0;
+    }
+  
+  vtkstd::string argv0 = this->GetArgv0();
+  if(argv0.size())
+    {
+    if(argv0.rfind('/') != vtkstd::string::npos || 
+       argv0.rfind('\\') != vtkstd::string::npos)
+      {
+      // is a relative/absolute path, compute it based on cwd
+      argv0 = vtksys::SystemTools::CollapseFullPath(argv0.c_str());
+      }
+    else
+      {
+      // no path separator found, search PATH for it
+      argv0 = vtksys::SystemTools::FindProgram(argv0.c_str()).c_str();
+      }
+    this->ApplicationPath = new char[argv0.size()+1];
+    strcpy(this->ApplicationPath, argv0.c_str());
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkCommandOptions::GetApplicationPath()
+{
+  return this->ApplicationPath;
 }
 
 //----------------------------------------------------------------------------
