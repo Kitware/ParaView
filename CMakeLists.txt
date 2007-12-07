@@ -62,6 +62,19 @@ ELSE(PARAVIEW_VERSION_MINOR MATCHES "[02468]$")
 ENDIF(PARAVIEW_VERSION_MINOR MATCHES "[02468]$")
 
 #########################################################################
+MACRO(APPEND_FLAGS var flags)
+  IF(NOT "${${var}}" MATCHES "${flags}")
+    SET(${var} "${${var}} ${flags}")
+  ENDIF(NOT "${${var}}" MATCHES "${flags}")
+ENDMACRO(APPEND_FLAGS)
+
+IF(MSVC80)
+  APPEND_FLAGS("CMAKE_EXE_LINKER_FLAGS" "/NODEFAULTLIB:MSVCRT")
+  APPEND_FLAGS("CMAKE_MODULE_LINKER_FLAGS" "/NODEFAULTLIB:MSVCRT")
+  APPEND_FLAGS("CMAKE_SHARED_LINKER_FLAGS" "/NODEFAULTLIB:MSVCRT")
+ENDIF(MSVC80)
+
+#########################################################################
 # build VTK/Qt support
 OPTION(PARAVIEW_BUILD_QT_GUI "Build ParaView Qt Client. This requires Qt." ON)
 IF (PARAVIEW_BUILD_QT_GUI)
