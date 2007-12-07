@@ -89,7 +89,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.54");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.55");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -990,8 +990,8 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindow(int magnification)
 {
   // Offscreen rendering is not functioning properly on the mac.
   // Do not use it.
-  int useOffscreenRenderingForScreenshots = this->UseOffscreenRenderingForScreenshots;
 #if !defined(__APPLE__)
+  int useOffscreenRenderingForScreenshots = this->UseOffscreenRenderingForScreenshots;
   if (0 != useOffscreenRenderingForScreenshots)
     {
     this->GetRenderWindow()->SetOffScreenRendering(1);
