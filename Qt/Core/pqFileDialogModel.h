@@ -36,10 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 #include <QObject>
 #include <QAbstractItemModel>
+#include <QFileIconProvider>
 
+#include "vtkPVFileInformation.h"
 class vtkProcessModule;
 class pqServer;
 class QModelIndex;
+
 
 /**
 pqFileDialogModel allows remote browsing of a connected ParaView server's
@@ -123,6 +126,27 @@ private:
   class pqImplementation;
   pqImplementation* const Implementation;
 };
+
+
+class pqFileDialogModelIconProvider : protected QFileIconProvider
+{
+public:
+  enum IconType { Computer, Drive, Folder, File, FolderLink, FileLink, 
+                  NetworkRoot, NetworkDomain, NetworkFolder };
+  pqFileDialogModelIconProvider();
+  QIcon icon(IconType t) const;
+  QIcon icon(vtkPVFileInformation::FileTypes f) const;
+
+protected:
+  QIcon icon(const QFileInfo& info) const;
+  QIcon icon(QFileIconProvider::IconType ico) const;
+
+  QIcon FolderLinkIcon;
+  QIcon FileLinkIcon;
+  QIcon DomainIcon;
+  QIcon NetworkIcon;
+};
+
 
 #endif // !_pqFileDialogModel_h
 

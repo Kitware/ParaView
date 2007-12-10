@@ -51,7 +51,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.27");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.28");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -144,7 +144,8 @@ static bool getNetworkSubdirs(const vtkstd::string& name,
 
 
 static bool getNetworkSubdirs(const vtkstd::string& path,
-                              vtkstd::vector<vtkstd::string>& subdirs)
+                              vtkstd::vector<vtkstd::string>& subdirs,
+                              int& type)
 {
   if(!IsNetworkPath(path))
     {
@@ -174,8 +175,23 @@ static bool getNetworkSubdirs(const vtkstd::string& path,
   if(tokenIndex >= MaxTokens)
     return false;
 
-  return getNetworkSubdirs(pathtokens[tokenIndex], 
-                           DisplayType[tokenIndex], subdirs);
+  vtkstd::string name = pathtokens[tokenIndex];
+
+  if(tokenIndex == 0)
+    {
+    type = vtkPVFileInformation::NETWORK_DOMAIN;
+    }
+  else if(tokenIndex == 1)
+    {
+    type = vtkPVFileInformation::NETWORK_SERVER;
+    }
+  else if(tokenIndex == 2)
+    {
+    type = vtkPVFileInformation::NETWORK_SHARE;
+    name = "\\\\" + name;
+    }
+
+  return getNetworkSubdirs(name, DisplayType[tokenIndex], subdirs);
 }
 
 static bool getUncSharesOnServer(const vtkstd::string& server,
@@ -190,11 +206,14 @@ static bool getUncSharesOnServer(const vtkstd::string& server,
 static int vtkPVFileInformationGetType(const char* path)
 {
   int type = vtkPVFileInformation::INVALID;
-  if(vtksys::SystemTools::FileExists(path))
+
+  vtkstd::string realpath = path;
+  
+  if(vtksys::SystemTools::FileExists(realpath.c_str()))
     {
     type = vtkPVFileInformation::SINGLE_FILE;
     }
-  if(vtksys::SystemTools::FileIsDirectory(path))
+  if(vtksys::SystemTools::FileIsDirectory(realpath.c_str()))
     {
     type = vtkPVFileInformation::DIRECTORY;
     }
@@ -202,31 +221,48 @@ static int vtkPVFileInformationGetType(const char* path)
   // doing stat on root of devices doesn't work
 
   // is it the root of a drive?
-  if (path[0] && path[1] == ':' &&
-      (path[2] == '\0' || (path[2] == '\\' && path[3] == '\0')))
+  if (realpath[0] && realpath[1] == ':' && (realpath[2] == '\0' || 
+      (realpath[2] == '\\' && realpath[3] == '\0')))
     {
     // Path may be drive letter.
     DWORD n = GetLogicalDrives();
-    int which = tolower(path[0]) - 'a';
+    int which = tolower(realpath[0]) - 'a';
     if(n & (1 << which))
       {
-      type = vtkPVFileInformation::DIRECTORY;
+      type = vtkPVFileInformation::DRIVE;
       }
     }
 
-  if(IsNetworkPath(path))
+  if(IsNetworkPath(realpath))
     {
     // this code doesn't give out anything with 
-    // "Windows Network\..." unless its a directory
+    // "Windows Network\..." unless its a directory.
     // that may change
-    type = vtkPVFileInformation::DIRECTORY;
+    vtkstd::vector<vtksys::String> pathtokens;
+    pathtokens = vtksys::SystemTools::SplitString(realpath.c_str(), '\\');
+    if(pathtokens.size() == 1)
+      {
+      type = vtkPVFileInformation::NETWORK_ROOT;
+      }
+    else if(pathtokens.size() == 2)
+      {
+      type = vtkPVFileInformation::NETWORK_DOMAIN;
+      }
+    else if(pathtokens.size() == 3)
+      {
+      type = vtkPVFileInformation::NETWORK_SERVER;
+      }
+    else
+      {
+      type = vtkPVFileInformation::NETWORK_SHARE;
+      }
     }
 
   // is it the root of a shared folder?
-  if(IsUncPath(path))
+  if(IsUncPath(realpath))
     {
     vtkstd::vector<vtksys::String> parts =
-      vtksys::SystemTools::SplitString(path+2, '\\', true);
+      vtksys::SystemTools::SplitString(realpath.c_str()+2, '\\', true);
     if(parts.empty())
       {
       // global network
@@ -239,7 +275,7 @@ static int vtkPVFileInformationGetType(const char* path)
       if(parts.size() == 1 && ret)
         {
         // server exists
-        type = vtkPVFileInformation::DIRECTORY;
+        type = vtkPVFileInformation::NETWORK_SERVER;
         }
       else if(parts.size() == 2 && ret)
         {
@@ -349,6 +385,14 @@ vtkPVFileInformation::~vtkPVFileInformation()
   this->SetFullPath(0);
 }
 
+bool vtkPVFileInformation::IsDirectory(int t)
+{
+  return t == DIRECTORY || t == DIRECTORY_LINK || 
+         t == DRIVE || t == NETWORK_ROOT ||
+         t == NETWORK_DOMAIN || t == NETWORK_SERVER ||
+         t == NETWORK_SHARE;
+}
+
 //-----------------------------------------------------------------------------
 void vtkPVFileInformation::CopyFromObject(vtkObject* object)
 {
@@ -381,6 +425,8 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
   vtkstd::string path = MakeAbsolutePath(helper->GetPath(), working_directory);
 
   this->SetName(helper->GetPath());
+  bool isLink = false;
+
 #if defined(_WIN32)
   vtkstd::string::size_type idx;
   for(idx = path.find('/', 0);
@@ -389,20 +435,29 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
     {
     path.replace(idx, 1, 1, '\\');
     }
-
+  
   int len = path.size();
   if(len > 4 && path.compare(len-4, 4, ".lnk") == 0)
     {
     WIN32_FIND_DATA data;
     path = vtkPVFileInformationResolveLink(path, data);
+    isLink = true;
     }
 #endif
+
   this->SetFullPath(path.c_str());
 
   this->Type = vtkPVFileInformationGetType(this->FullPath);
+  if(isLink && this->Type == SINGLE_FILE)
+    {
+    this->Type = SINGLE_FILE_LINK;
+    }
+  else if(isLink && this->Type == DIRECTORY)
+    {
+    this->Type = DIRECTORY_LINK;
+    }
 
-  if ((this->Type == DIRECTORY || this->Type == DRIVE) && 
-      helper->GetDirectoryListing())
+  if (this->IsDirectory(this->Type) && helper->GetDirectoryListing())
     {
     // Since we want a directory listing, we now to platform specific listing 
     // with intelligent pattern matching hee-haa.
@@ -476,7 +531,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
       vtkSmartPointer<vtkPVFileInformation>::New();
   info->SetFullPath(WindowsNetworkRoot.c_str());
   info->SetName("Windows Network");
-  info->Type = DIRECTORY;
+  info->Type = NETWORK_ROOT;
   this->Contents->AddItem(info);
 
 #else // _WIN32
@@ -608,7 +663,8 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
   if(IsNetworkPath(this->FullPath))
     {
     vtkstd::vector<vtkstd::string> shares;
-    if(getNetworkSubdirs(this->FullPath, shares))
+    int type;
+    if(getNetworkSubdirs(this->FullPath, shares, type))
       {
       for(unsigned int i=0; i<shares.size(); i++)
         {
@@ -617,7 +673,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
         vtkstd::string fullpath = 
           vtksys::SystemTools::CollapseFullPath(shares[i].c_str(), this->FullPath);
         info->SetFullPath(fullpath.c_str());
-        info->Type = DIRECTORY;
+        info->Type = type;
         info->FastFileTypeDetection = this->FastFileTypeDetection;
         info_set.insert(info);
         info->Delete();
@@ -651,7 +707,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
           info->SetName(shares[i].c_str());
           vtkstd::string fullpath = "\\\\" + parts[0] + "\\" + shares[i];
           info->SetFullPath(fullpath.c_str());
-          info->Type = DIRECTORY;
+          info->Type = NETWORK_SHARE;
           info->FastFileTypeDetection = this->FastFileTypeDetection;
           info_set.insert(info);
           info->Delete();
@@ -702,10 +758,13 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
       continue;
     vtkstd::string fullpath = prefix + filename;
     size_t len = filename.size();
+    bool isLink = false;
 
     if(len > 4 && strncmp(filename.c_str()+len-4, ".lnk", 4) == 0)
       {
       fullpath = vtkPVFileInformationResolveLink(fullpath, data);
+      filename.resize(filename.size() - 4);
+      isLink = true;
       }
 
     DWORD isdir = data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
@@ -715,6 +774,10 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
                    !(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
 
     FileTypes type = isdir ? DIRECTORY : SINGLE_FILE;
+    if(isLink)
+      {
+      type = type == DIRECTORY ? DIRECTORY_LINK : SINGLE_FILE_LINK;
+      }
 
     if(isdir || isfile)
       {
@@ -920,7 +983,7 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
     {
     vtkPVFileInformation* obj = *iter;
 
-    if (obj->Type != FILE_GROUP && obj->Type != DIRECTORY)
+    if (obj->Type != FILE_GROUP && !IsDirectory(obj->Type))
       {
       bool match = false;
       vtkstd::string groupName;

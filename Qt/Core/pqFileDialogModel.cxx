@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/algorithm>
 
-#include <QFileIconProvider>
 #include <QStyle>
 #include <QDir>
 #include <QApplication>
@@ -66,19 +65,13 @@ public:
   }
 
   pqFileDialogModelFileInfo(const QString& l, const QString& filepath, 
-           const bool isdir, const QList<pqFileDialogModelFileInfo>& g =
+           int type, const QList<pqFileDialogModelFileInfo>& g =
            QList<pqFileDialogModelFileInfo>()) :
     Label(l),
     FilePath(filepath),
-    IsDir(isdir),
-    IsLink(false),
+    Type(static_cast<vtkPVFileInformation::FileTypes>(type)),
     Group(g)
   {
-  if(this->Label.endsWith(".lnk"))
-    {
-    this->IsLink = true;
-    this->Label.chop(4);
-    }
   }
 
   const QString& label() const
@@ -91,16 +84,11 @@ public:
     return this->FilePath;
   }
   
-  bool isDir() const
+  vtkPVFileInformation::FileTypes type() const
   {
-    return this->IsDir;
+    return this->Type;
   }
   
-  bool isLink() const
-  {
-    return this->IsLink;
-  }
-
   bool isGroup() const
   {
     return !this->Group.empty();
@@ -114,62 +102,88 @@ public:
 private:
   QString Label;
   QString FilePath;
-  bool IsDir;
-  bool IsLink;
+  vtkPVFileInformation::FileTypes Type;
   QList<pqFileDialogModelFileInfo> Group;
 };
 
 /////////////////////////////////////////////////////////////////////
 // Icons
 
-class pqFileDialogModelIconProvider : protected QFileIconProvider
+pqFileDialogModelIconProvider::pqFileDialogModelIconProvider()
 {
-public:
-  enum IconType { Drive, Folder, File, FolderLink, FileLink };
-  pqFileDialogModelIconProvider()
-    {
-    QStyle* style = QApplication::style();
-    this->FolderLinkIcon = style->standardIcon(QStyle::SP_DirLinkIcon);
-    this->FileLinkIcon = style->standardIcon(QStyle::SP_FileLinkIcon);
-    }
+  QStyle* style = QApplication::style();
+  this->FolderLinkIcon = style->standardIcon(QStyle::SP_DirLinkIcon);
+  this->FileLinkIcon = style->standardIcon(QStyle::SP_FileLinkIcon);
+  this->DomainIcon.addPixmap(QPixmap(":/pqCore/Icons/pqDomain16.png"));
+  this->NetworkIcon.addPixmap(QPixmap(":/pqCore/Icons/pqNetwork16.png"));
+}
 
-  QIcon icon(IconType t) const
+QIcon pqFileDialogModelIconProvider::icon(IconType t) const
+{
+  switch(t)
     {
-    switch(t)
-      {
-      case Drive:
-        return QFileIconProvider::icon(QFileIconProvider::Drive);
-      case Folder:
-        return QFileIconProvider::icon(QFileIconProvider::Folder);
-      case File:
-        return QFileIconProvider::icon(QFileIconProvider::File);
-      case FolderLink:
-        return this->FolderLinkIcon;
-      case FileLink:
-        return this->FileLinkIcon;
-      }
-    return QIcon();
+    case Computer:
+      return QFileIconProvider::icon(QFileIconProvider::Computer);
+    case Drive:
+      return QFileIconProvider::icon(QFileIconProvider::Drive);
+    case Folder:
+      return QFileIconProvider::icon(QFileIconProvider::Folder);
+    case File:
+      return QFileIconProvider::icon(QFileIconProvider::File);
+    case FolderLink:
+      return this->FolderLinkIcon;
+    case FileLink:
+      return this->FileLinkIcon;
+    case NetworkFolder:
+      return QFileIconProvider::icon(QFileIconProvider::Network);
+    case NetworkRoot:
+      return this->NetworkIcon;
+    case NetworkDomain:
+      return this->DomainIcon;
     }
+  return QIcon();
+}
 
-  QIcon icon(const pqFileDialogModelFileInfo& info) const
+QIcon pqFileDialogModelIconProvider::icon(vtkPVFileInformation::FileTypes f) const
+{
+  if(f == vtkPVFileInformation::DIRECTORY_LINK)
     {
-    if(info.isDir())
-      return icon(info.isLink() ? FolderLink : Folder);
-    return icon(info.isLink() ? FileLink : File);
+    return icon(pqFileDialogModelIconProvider::FolderLink);
     }
-  QIcon icon(const QFileInfo& info) const
+  else if(f == vtkPVFileInformation::SINGLE_FILE_LINK)
     {
-    return QFileIconProvider::icon(info);
+    return icon(pqFileDialogModelIconProvider::FileLink);
     }
-  QIcon icon(QFileIconProvider::IconType ico) const
+  else if(f == vtkPVFileInformation::NETWORK_SHARE)
     {
-    return QFileIconProvider::icon(ico);
+    return icon(pqFileDialogModelIconProvider::NetworkFolder);
     }
-
-protected:
-  QIcon FolderLinkIcon;
-  QIcon FileLinkIcon;
-};
+  else if(f == vtkPVFileInformation::NETWORK_SERVER)
+    {
+    return icon(pqFileDialogModelIconProvider::Computer);
+    }
+  else if(f == vtkPVFileInformation::NETWORK_DOMAIN)
+    {
+    return icon(pqFileDialogModelIconProvider::NetworkDomain);
+    }
+  else if(f == vtkPVFileInformation::NETWORK_ROOT)
+    {
+    return icon(pqFileDialogModelIconProvider::NetworkRoot);
+    }
+  else if(vtkPVFileInformation::IsDirectory(f))
+    {
+    return icon(pqFileDialogModelIconProvider::Folder);
+    }
+  return icon(pqFileDialogModelIconProvider::File);
+}
+QIcon pqFileDialogModelIconProvider::icon(const QFileInfo& info) const
+{
+  return QFileIconProvider::icon(info);
+}
+QIcon pqFileDialogModelIconProvider::icon(QFileIconProvider::IconType ico) const
+{
+  return QFileIconProvider::icon(ico);
+}
 
 Q_GLOBAL_STATIC(pqFileDialogModelIconProvider, Icons);
 
@@ -332,13 +346,13 @@ public:
         {
         continue;
         }
-      if (info->GetType() == vtkPVFileInformation::DIRECTORY)
+      if (vtkPVFileInformation::IsDirectory(info->GetType()))
         {
-        dirs.push_back(pqFileDialogModelFileInfo(info->GetName(), info->GetFullPath(), true));
+        dirs.push_back(pqFileDialogModelFileInfo(info->GetName(), info->GetFullPath(), info->GetType()));
         }
-      else if (info->GetType() == vtkPVFileInformation::SINGLE_FILE)
+      else if (info->GetType() != vtkPVFileInformation::FILE_GROUP)
         {
-        files.push_back(pqFileDialogModelFileInfo(info->GetName(), info->GetFullPath(), false));
+        files.push_back(pqFileDialogModelFileInfo(info->GetName(), info->GetFullPath(), info->GetType()));
         }
       else if (info->GetType() == vtkPVFileInformation::FILE_GROUP)
         {
@@ -351,10 +365,10 @@ public:
           vtkPVFileInformation* child = vtkPVFileInformation::SafeDownCast(
             childIter->GetCurrentObject());
           groupFiles.push_back(pqFileDialogModelFileInfo(child->GetName(), child->GetFullPath(),
-                                   false));
+                                   child->GetType()));
           }
-        files.push_back(pqFileDialogModelFileInfo(info->GetName(), groupFiles[0].filePath(), false,
-            groupFiles));
+        files.push_back(pqFileDialogModelFileInfo(info->GetName(), groupFiles[0].filePath(),
+          vtkPVFileInformation::SINGLE_FILE, groupFiles));
         }
       }
 
@@ -413,7 +427,7 @@ public:
       return false;
 
     pqFileDialogModelFileInfo& file = this->FileList[Index.row()];
-    return file.isDir();
+    return vtkPVFileInformation::IsDirectory(file.type());
     }
 
   bool isRemote()
@@ -546,18 +560,14 @@ bool pqFileDialogModel::removeDirEntry(const QString& dirName)
   int i=0;
   for(i=0; i<this->Implementation->FileList.size(); i++)
     {
-    if(this->Implementation->FileList[i].isDir() && this->Implementation->FileList[i].filePath()==dirPath)
+    if(this->Implementation->FileList[i].type() == vtkPVFileInformation::DIRECTORY && 
+      this->Implementation->FileList[i].filePath() == dirPath)
       {
+      this->Implementation->FileList.remove(i);
+      this->reset();
       break;
       }
     }
-  
-  if(i<this->Implementation->FileList.size())
-    {
-    this->Implementation->FileList.remove(i);
-    this->reset();
-    }
-
   return true;
 }
 
@@ -612,14 +622,12 @@ bool pqFileDialogModel::dirExists(const QString& path, QString& fullpath)
   info = this->Implementation->GetData(false, dir, false);
   
   // try again for shortcuts
-  if(info->GetType() != vtkPVFileInformation::DIRECTORY &&
-     info->GetType() != vtkPVFileInformation::DRIVE)
+  if(!vtkPVFileInformation::IsDirectory(info->GetType()))
     {
     info = this->Implementation->GetData(false, dir + ".lnk", false);
     }
 
-  if(info->GetType() == vtkPVFileInformation::DIRECTORY ||
-     info->GetType() == vtkPVFileInformation::DRIVE)
+  if(vtkPVFileInformation::IsDirectory(info->GetType()))
     {
     fullpath = info->GetFullPath();
     return true;
@@ -670,7 +678,7 @@ QVariant pqFileDialogModel::data(const QModelIndex & idx, int role) const
     }
   else if(role == Qt::DecorationRole && idx.column() == 0)
     {
-    return Icons()->icon(*file);
+    return Icons()->icon(file->type());
     }
 
   return QVariant();

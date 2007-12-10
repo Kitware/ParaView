@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialogFavoriteModel.h"
 
 #include <pqServer.h>
-#include <QFileIconProvider>
+#include <pqFileDialogModel.h>
 #include <vtkClientServerStream.h>
 #include <vtkCollection.h>
 #include <vtkCollectionIterator.h>
@@ -52,7 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /////////////////////////////////////////////////////////////////////
 // Icons
 
-Q_GLOBAL_STATIC(QFileIconProvider, Icons);
+Q_GLOBAL_STATIC(pqFileDialogModelIconProvider, Icons);
 
 //////////////////////////////////////////////////////////////////////
 // FileInfo
@@ -65,11 +65,10 @@ public:
   }
 
   pqFileDialogFavoriteModelFileInfo(const QString& l, const QString& filepath, 
-           const bool isdir, const bool isroot) :
+           int type) :
     Label(l),
     FilePath(filepath),
-    IsDir(isdir),
-    IsRoot(isroot)
+    Type(type)
   {
   }
 
@@ -83,21 +82,16 @@ public:
     return this->FilePath;
   }
   
-  const bool isDir() const
+  int type() const
   {
-    return this->IsDir;
+    return this->Type;
   }
   
-  const bool isRoot() const
-  {
-    return this->IsRoot;
-  }
 
 private:
   QString Label;
   QString FilePath;
-  bool IsDir;
-  bool IsRoot;
+  int Type;
 };
 
 //////////////////////////////////////////////////////////////////
@@ -148,12 +142,8 @@ public:
       {
       continue;
       }
-    int type = cur_info->GetType();
     this->FavoriteList.push_back(pqFileDialogFavoriteModelFileInfo(
-        cur_info->GetName(), cur_info->GetFullPath(),
-        (type == vtkPVFileInformation::DIRECTORY || 
-          type == vtkPVFileInformation::DRIVE),
-        (type == vtkPVFileInformation::DRIVE)));
+        cur_info->GetName(), cur_info->GetFullPath(), cur_info->GetType()));
     }
 
   iter->Delete();
@@ -190,7 +180,7 @@ bool pqFileDialogFavoriteModel::isDir(const QModelIndex& Index) const
     return false;
     
   pqFileDialogFavoriteModelFileInfo& file = this->Implementation->FavoriteList[Index.row()];
-  return file.isDir();
+  return vtkPVFileInformation::IsDirectory(file.type());
 }
 
 QVariant pqFileDialogFavoriteModel::data(const QModelIndex& idx, int role) const
@@ -214,15 +204,8 @@ QVariant pqFileDialogFavoriteModel::data(const QModelIndex& idx, int role) const
       switch(idx.column())
         {
         case 0:
-          if(file.isRoot())
-            {
-            return Icons()->icon(QFileIconProvider::Drive);
-            }
-          if(file.isDir())
-            {
-            return Icons()->icon(QFileIconProvider::Folder);
-            }
-          return Icons()->icon(QFileIconProvider::File);
+          return Icons()->icon(
+            static_cast<vtkPVFileInformation::FileTypes>(file.type()));
         }
     }
     

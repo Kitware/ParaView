@@ -51,10 +51,23 @@ public:
     {
     INVALID=0,
     SINGLE_FILE,
+    SINGLE_FILE_LINK,
     DIRECTORY,
+    DIRECTORY_LINK,
     FILE_GROUP,
-    DRIVE
+    DRIVE,
+    NETWORK_ROOT,
+    NETWORK_DOMAIN,
+    NETWORK_SERVER,
+    NETWORK_SHARE
     };
+
+  // Description:
+  // Helper that returns whether a FileType is a 
+  // directory (DIRECTORY, DRIVE, NETWORK_ROOT, etc...)
+  // Or in other words, a type that we can do a DirectoryListing on.
+  static bool IsDirectory(int t);
+
   //ETX
 
   // Description:
