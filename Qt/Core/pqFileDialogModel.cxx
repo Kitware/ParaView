@@ -65,11 +65,11 @@ public:
   }
 
   pqFileDialogModelFileInfo(const QString& l, const QString& filepath, 
-           int type, const QList<pqFileDialogModelFileInfo>& g =
+           int t, const QList<pqFileDialogModelFileInfo>& g =
            QList<pqFileDialogModelFileInfo>()) :
     Label(l),
     FilePath(filepath),
-    Type(static_cast<vtkPVFileInformation::FileTypes>(type)),
+    Type(static_cast<vtkPVFileInformation::FileTypes>(t)),
     Group(g)
   {
   }

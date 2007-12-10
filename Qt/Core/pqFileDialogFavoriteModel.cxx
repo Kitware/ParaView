@@ -65,10 +65,10 @@ public:
   }
 
   pqFileDialogFavoriteModelFileInfo(const QString& l, const QString& filepath, 
-           int type) :
+           int t) :
     Label(l),
     FilePath(filepath),
-    Type(type)
+    Type(t)
   {
   }
 
