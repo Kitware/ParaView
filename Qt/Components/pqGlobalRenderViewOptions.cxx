@@ -306,6 +306,10 @@ void pqGlobalRenderViewOptions::applyChanges()
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
 
+  // This needs to be out of beginGroup()/endGroup().
+  pqPipelineRepresentation::setUnstructuredGridOutlineThreshold(
+    this->Internal->outlineThreshold->value()/10.0);
+
   settings->beginGroup("renderModule");
   
   if (this->Internal->enableLOD->isChecked())
@@ -317,9 +321,6 @@ void pqGlobalRenderViewOptions::applyChanges()
     {
     settings->setValue("LODThreshold", VTK_DOUBLE_MAX);
     }
-
-  pqPipelineRepresentation::setUnstructuredGridOutlineThreshold(
-    this->Internal->outlineThreshold->value()/10.0);
 
   settings->setValue("UseImmediateMode",
     this->Internal->immediateModeRendering->isChecked());
@@ -431,8 +432,13 @@ void pqGlobalRenderViewOptions::resetChanges()
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
 
-  settings->beginGroup("renderModule");
+  // This needs to be out of beginGroup()/endGroup().
+  this->Internal->outlineThreshold->setValue(
+    static_cast<int>(
+      pqPipelineRepresentation::getUnstructuredGridOutlineThreshold()*10));
+  this->Internal->updateOutlineThresholdLabel(this->Internal->outlineThreshold->value());
 
+  settings->beginGroup("renderModule");
   QVariant val = settings->value("LODThreshold", 5);
   if(val.toDouble() >= VTK_LARGE_FLOAT)
     {
@@ -445,12 +451,6 @@ void pqGlobalRenderViewOptions::resetChanges()
     this->Internal->lodThreshold->setValue(static_cast<int>(val.toDouble()*10));
     this->Internal->updateLODThresholdLabel(this->Internal->lodThreshold->value());
     }
-
-
-  this->Internal->outlineThreshold->setValue(
-    static_cast<int>(
-      pqPipelineRepresentation::getUnstructuredGridOutlineThreshold()*10));
-  this->Internal->updateOutlineThresholdLabel(this->Internal->outlineThreshold->value());
   
   val = settings->value("LODResolution", 50);
   this->Internal->lodResolution->setValue(static_cast<int>(160-val.toDouble() + 10));

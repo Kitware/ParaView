@@ -312,6 +312,7 @@ IF(BUILD_TESTING)
     UndoRedo5
     UndoRedo6
     UndoRedo7
+    UnstructuredOutline
     VariableSelector
     ViewSettingsDialog
     XdmfRead
