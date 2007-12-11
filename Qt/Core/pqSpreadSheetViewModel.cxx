@@ -436,6 +436,12 @@ QVariant pqSpreadSheetViewModel::headerData (int section, Qt::Orientation orient
       return QVariant(title);
       }
     }
+  else if (orientation == Qt::Vertical && repr && role == Qt::DisplayRole)
+    {
+    // Row number to start from 0.
+    QVariant rowNo = this->Superclass::headerData(section, orientation, role);
+    return QVariant(rowNo.toUInt()-1);
+    }
 
   return this->Superclass::headerData(section, orientation, role);
 }
