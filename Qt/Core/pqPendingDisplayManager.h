@@ -58,6 +58,9 @@ public:
   void setUndoStack(pqUndoStack*);
   pqUndoStack* undoStack() const;
 
+  /// Returns if the source is pending a display creation
+  /// by this manager.
+  bool isPendingDisplay(pqPipelineSource*) const;
 public slots:
   /// add a source for which a display will eventually be made
   void addPendingDisplayForSource(pqPipelineSource* s);

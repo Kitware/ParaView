@@ -89,6 +89,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOptions.h"
 #include "pqOutputPort.h"
 #include "pqPendingDisplayManager.h"
+#include "pqPickHelper.h"
 #include "pqPipelineBrowser.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineMenu.h"
@@ -104,11 +105,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyTabWidget.h"
 #include "pqReaderFactory.h"
 #include "pqRenderView.h"
-
-#include "pqSelectionInspectorPanel.h"
-
 #include "pqRubberBandHelper.h"
-#include "pqPickHelper.h"
+#include "pqSelectionInspectorPanel.h"
 #include "pqSelectionManager.h"
 #include "pqSelectReaderDialog.h"
 #include "pqServer.h"
@@ -122,13 +120,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSimpleServerStartup.h"
 #include "pqSMAdaptor.h"
 #include "pqSplitViewUndoElement.h"
+#include "pqSpreadSheetView.h"
 #include "pqStateLoader.h"
 #include "pqTimerLogDisplay.h"
 #include "pqToolTipTrapper.h"
 #include "pqUndoStackBuilder.h"
 #include "pqVCRController.h"
-#include "pqView.h"
 #include "pqViewContextMenuManager.h"
+#include "pqView.h"
 #include "pqViewManager.h"
 #include "pqWriterFactory.h"
 
@@ -446,6 +445,9 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
 
   this->connect(builder, SIGNAL(proxyCreated(pqProxy*)),
     this, SLOT(onProxyCreation(pqProxy*)));
+
+  this->connect(builder, SIGNAL(viewCreated(pqView*)),
+    this, SLOT(onViewCreated(pqView*)));
 
   // Listen for the signal that the lookmark button for a given view was pressed
   this->connect(&this->Implementation->MultiViewManager, 
@@ -2677,6 +2679,22 @@ void pqMainWindowCore::onRemovingSource(pqPipelineSource *source)
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onViewCreated(pqView* view)
+{
+  pqPipelineSource* source = 0;
+  if (qobject_cast<pqSpreadSheetView*>(view) && 
+    (source = this->getActiveSource()) != 0 &&
+    !this->Implementation->PendingDisplayManager.isPendingDisplay(source))
+    {
+    // If a new spreadsheet view is created, we show the active source in it by
+    // default.
+    pqApplicationCore::instance()->getObjectBuilder()->createDataRepresentation(
+      source->getOutputPort(0), view);
+    // trigger an eventual-render.
+    view->render();
+    }
+}
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onPostAccept()

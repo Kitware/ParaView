@@ -86,6 +86,12 @@ pqUndoStack* pqPendingDisplayManager::undoStack() const
 }
 
 //-----------------------------------------------------------------------------
+bool pqPendingDisplayManager::isPendingDisplay(pqPipelineSource* source) const
+{
+  return (source && this->Internal->SourcesSansDisplays.contains(source));
+}
+
+//-----------------------------------------------------------------------------
 void pqPendingDisplayManager::addPendingDisplayForSource(pqPipelineSource* s)
 {
   if(!s)

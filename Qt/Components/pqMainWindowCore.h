@@ -444,6 +444,11 @@ private slots:
   
   void initPythonInterpretor();
 
+  /// Called when a new view is created by the GUI (not undo/redo or python).
+  /// If a spreadsheet view has been created, we show the current source in it
+  /// by default.
+  void onViewCreated(pqView*);
+
 private:
   pqServerManagerModelItem *getActiveObject() const;
   void updatePendingActions(pqServer *server, pqPipelineSource *source,
