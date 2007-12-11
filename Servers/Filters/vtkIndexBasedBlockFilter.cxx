@@ -32,7 +32,7 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.12");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.13");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -212,7 +212,12 @@ int vtkIndexBasedBlockFilter::RequestData(vtkInformation*,
     outFD->AddArray(ijk);
     ijk->Delete();
     }
-  outFD->AddArray(originalIds);
+
+  if (this->FieldType != FIELD)
+    {
+    // Original ids are only added for points or cells.
+    outFD->AddArray(originalIds);
+    }
   originalIds->Delete();
 
   output->SetFieldData(outFD);
