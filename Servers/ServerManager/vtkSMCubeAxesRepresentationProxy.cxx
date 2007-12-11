@@ -26,7 +26,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMCubeAxesRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMCubeAxesRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMCubeAxesRepresentationProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMCubeAxesRepresentationProxy::vtkSMCubeAxesRepresentationProxy()
 {
@@ -50,8 +50,9 @@ bool vtkSMCubeAxesRepresentationProxy::BeginCreateVTKObjects()
   this->OutlineFilter = vtkSMSourceProxy::SafeDownCast(
     this->GetSubProxy("OutlineFilter"));
   this->CubeAxesActor = this->GetSubProxy("Prop2D");
+  this->Property = this->GetSubProxy("Property");
 
-  if (!this->OutlineFilter || !this->CubeAxesActor)
+  if (!this->OutlineFilter || !this->CubeAxesActor || !this->Property)
     {
     vtkErrorMacro("Missing required subproxies");
     return false;
@@ -59,6 +60,8 @@ bool vtkSMCubeAxesRepresentationProxy::BeginCreateVTKObjects()
 
   this->OutlineFilter->SetServers(vtkProcessModule::DATA_SERVER);
   this->CubeAxesActor->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->Property->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   return true;
 }
@@ -68,6 +71,7 @@ bool vtkSMCubeAxesRepresentationProxy::EndCreateVTKObjects()
 {
   vtkSMSourceProxy* input = this->GetInputProxy();
   this->Connect(input, this->OutlineFilter);
+  this->Connect(this->Property, this->CubeAxesActor, "Property");
   return this->Superclass::EndCreateVTKObjects();
 }
 

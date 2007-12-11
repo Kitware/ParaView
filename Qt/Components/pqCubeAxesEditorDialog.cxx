@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqNamedWidgets.h"
 #include "pqPropertyManager.h"
+#include "pqSignalAdaptors.h"
 #include "pqUndoStack.h"
 
 class pqCubeAxesEditorDialog::pqInternal : public Ui::CubeAxesEditorDialog
@@ -49,14 +50,17 @@ class pqCubeAxesEditorDialog::pqInternal : public Ui::CubeAxesEditorDialog
 public:
   vtkSmartPointer<vtkSMProxy> Representation;
   pqPropertyManager* PropertyManager;
+  pqSignalAdaptorColor* ColorAdaptor;
   pqInternal()
     {
     this->PropertyManager = 0;
+    this->ColorAdaptor = 0;
     }
   ~pqInternal()
     {
     delete this->PropertyManager;
     this->PropertyManager = 0;
+    delete this->ColorAdaptor;
     }
 };
 
@@ -67,6 +71,10 @@ pqCubeAxesEditorDialog::pqCubeAxesEditorDialog(
 {
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
+  this->Internal->ColorAdaptor = new pqSignalAdaptorColor(
+    this->Internal->Color, "chosenColor",
+    SIGNAL(chosenColorChanged(const QColor&)), false);
+
   pqUndoStack* ustack = pqApplicationCore::instance()->getUndoStack();
   if (ustack)
     {
@@ -103,6 +111,10 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
     {
     // set up links between the property manager and the widgets.
     pqNamedWidgets::link(this, repr, this->Internal->PropertyManager);
+    this->Internal->PropertyManager->registerLink(
+      this->Internal->ColorAdaptor, "color", 
+      SIGNAL(colorChanged(const QVariant&)),
+      repr, repr->GetProperty("CubeAxesColor"));
     }
 }
 

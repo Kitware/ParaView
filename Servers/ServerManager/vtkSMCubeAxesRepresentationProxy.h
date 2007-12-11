@@ -73,6 +73,7 @@ protected:
 
   vtkSMSourceProxy* OutlineFilter;
   vtkSMProxy* CubeAxesActor;
+  vtkSMProxy* Property;
   vtkSMRepresentationStrategy* Strategy;
 private:
   vtkSMCubeAxesRepresentationProxy(const vtkSMCubeAxesRepresentationProxy&); // Not implemented

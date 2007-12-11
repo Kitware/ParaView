@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>331</width>
-    <height>350</height>
+    <height>383</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -20,54 +20,117 @@
     <number>6</number>
    </property>
    <item row="5" column="0" colspan="2" >
+    <widget class="pqColorChooserButton" name="Color" >
+     <property name="enabled" >
+      <bool>true</bool>
+     </property>
+     <property name="sizePolicy" >
+      <sizepolicy>
+       <hsizetype>1</hsizetype>
+       <vsizetype>0</vsizetype>
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip" >
+      <string>&lt;html>Set the color to use for axes.&lt;/html></string>
+     </property>
+     <property name="text" >
+      <string>Set Axes Color...</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="2" >
     <spacer>
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeHint" >
       <size>
-       <width>20</width>
-       <height>40</height>
+       <width>313</width>
+       <height>16</height>
       </size>
      </property>
     </spacer>
    </item>
-   <item row="6" column="0" colspan="2" >
-    <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
+   <item row="2" column="1" >
+    <widget class="QComboBox" name="CubeAxesTickLocation" >
+     <item>
+      <property name="text" >
+       <string>Inside</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Outside</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Both</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item rowspan="2" row="3" column="1" >
+    <widget class="QDoubleSpinBox" name="CubeAxesCornerOffset" >
+     <property name="maximum" >
+      <double>1.000000000000000</double>
      </property>
-     <property name="spacing" >
-      <number>4</number>
+     <property name="singleStep" >
+      <double>0.050000000000000</double>
      </property>
+    </widget>
+   </item>
+   <item rowspan="2" row="2" column="0" >
+    <widget class="QLabel" name="label_3" >
+     <property name="text" >
+      <string>Tick Location</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" >
+    <widget class="QLabel" name="label_2" >
+     <property name="text" >
+      <string>Corner Offset</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" >
+    <widget class="QComboBox" name="CubeAxesFlyMode" >
      <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" >
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
+      <property name="text" >
+       <string>Outer Edges</string>
+      </property>
      </item>
      <item>
-      <widget class="QPushButton" name="Ok" >
-       <property name="text" >
-        <string>Ok</string>
-       </property>
-      </widget>
+      <property name="text" >
+       <string>Closest Triad</string>
+      </property>
      </item>
      <item>
-      <widget class="QPushButton" name="Cancel" >
-       <property name="text" >
-        <string>Cancel</string>
-       </property>
-      </widget>
+      <property name="text" >
+       <string>Furthest Triad</string>
+      </property>
      </item>
-    </layout>
+     <item>
+      <property name="text" >
+       <string>Static Triad</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Static Edges</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="1" column="0" >
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>Fly Mode</string>
+     </property>
+    </widget>
    </item>
    <item row="0" column="0" colspan="2" >
     <widget class="QTabWidget" name="tabWidget" >
@@ -238,87 +301,52 @@
      </widget>
     </widget>
    </item>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
-      <string>Fly Mode</string>
+   <item row="7" column="0" colspan="2" >
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
      </property>
-    </widget>
-   </item>
-   <item row="1" column="1" >
-    <widget class="QComboBox" name="CubeAxesFlyMode" >
-     <item>
-      <property name="text" >
-       <string>Outer Edges</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Closest Triad</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Furthest Triad</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Static Triad</string>
-      </property>
-     </item>
-     <item>
-      <property name="text" >
-       <string>Static Edges</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="4" column="0" >
-    <widget class="QLabel" name="label_2" >
-     <property name="text" >
-      <string>Corner Offset</string>
+     <property name="spacing" >
+      <number>4</number>
      </property>
-    </widget>
-   </item>
-   <item rowspan="2" row="2" column="0" >
-    <widget class="QLabel" name="label_3" >
-     <property name="text" >
-      <string>Tick Location</string>
-     </property>
-    </widget>
-   </item>
-   <item rowspan="2" row="3" column="1" >
-    <widget class="QDoubleSpinBox" name="CubeAxesCornerOffset" >
-     <property name="maximum" >
-      <double>1.000000000000000</double>
-     </property>
-     <property name="singleStep" >
-      <double>0.050000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1" >
-    <widget class="QComboBox" name="CubeAxesTickLocation" >
      <item>
-      <property name="text" >
-       <string>Inside</string>
-      </property>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
      <item>
-      <property name="text" >
-       <string>Outside</string>
-      </property>
+      <widget class="QPushButton" name="Ok" >
+       <property name="text" >
+        <string>Ok</string>
+       </property>
+      </widget>
      </item>
      <item>
-      <property name="text" >
-       <string>Both</string>
-      </property>
+      <widget class="QPushButton" name="Cancel" >
+       <property name="text" >
+        <string>Cancel</string>
+       </property>
+      </widget>
      </item>
-    </widget>
+    </layout>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqColorChooserButton</class>
+   <extends>QPushButton</extends>
+   <header>pqColorChooserButton.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
