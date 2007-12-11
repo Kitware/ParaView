@@ -211,15 +211,24 @@ protected:
       }
     }
 public:
-  /// HACK: to disable the corner widget (Qt 4.3 has API to do this).
   void disableCornerWidget()
     {
-    QList<QWidget*> _children = this->findChildren<QWidget*>();
-    foreach (QWidget* child, _children)
+    if (this->metaObject()->indexOfProperty("cornerButtonEnabled") != -1)
       {
-      if (strcmp(child->metaObject()->className(), "QAbstractButton") == 0)
+      // for Qt 4.3
+      this->setProperty("cornerButtonEnabled", false);
+      }
+    else
+      {
+      /// HACK: to disable the corner widget (Qt 4.3 has API to do this).
+      // REMOVE THIS ONCE WE DEPRECATE SUPPORT FOR Qt 4.2
+      QList<QWidget*> _children = this->findChildren<QWidget*>();
+      foreach (QWidget* child, _children)
         {
-        child->setEnabled(false);
+        if (strcmp(child->metaObject()->className(), "QAbstractButton") == 0)
+          {
+          child->setEnabled(false);
+          }
         }
       }
     }
@@ -243,6 +252,7 @@ public:
   this->Table->setSelectionBehavior(QAbstractItemView::SelectRows);
   this->Table->setSelectionModel(&this->SelectionModel);
   this->Table->horizontalHeader()->setMovable(true);
+  this->SingleColumnMode = false;
   }
 
   ~pqInternal()
@@ -253,6 +263,7 @@ public:
   QPointer<QTableView> Table;
   pqSpreadSheetViewModel Model;
   pqSpreadSheetViewSelectionModel SelectionModel;
+  bool SingleColumnMode;
 };
 
 
@@ -276,6 +287,9 @@ pqSpreadSheetView::pqSpreadSheetView(
   QObject::connect(
     &this->Internal->SelectionModel, SIGNAL(selection(vtkSMSourceProxy*)),
     this, SLOT(onCreateSelection(vtkSMSourceProxy*)));
+  QObject::connect(
+    this->Internal->Table->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)),
+    this, SLOT(onSectionDoubleClicked(int)), Qt::QueuedConnection);
   
   foreach(pqRepresentation* rep, this->getRepresentations())
     {
@@ -373,5 +387,37 @@ void pqSpreadSheetView::onCreateSelection(vtkSMSourceProxy* selSource)
   else
     {
     emit this->selected(0);
+    }
+}
+
+//-----------------------------------------------------------------------------
+/// Called when user double clicks on a column header.
+void pqSpreadSheetView::onSectionDoubleClicked(int logicalindex)
+{
+  int numcols = this->Internal->Model.columnCount();
+  if (logicalindex < 0 || logicalindex >= numcols)
+    {
+    return;
+    }
+
+  QHeaderView* header = this->Internal->Table->horizontalHeader();
+  this->Internal->SingleColumnMode = !this->Internal->SingleColumnMode;
+  for (int cc=0; cc < numcols;cc++)
+    {
+    this->Internal->Table->setColumnHidden(cc,
+      (this->Internal->SingleColumnMode && cc!=logicalindex));
+    if (this->Internal->SingleColumnMode && cc == logicalindex)
+      {
+      header->setResizeMode(cc, QHeaderView::Stretch);
+      }
+    else if (!this->Internal->SingleColumnMode)
+      {
+      header->setResizeMode(cc, QHeaderView::Interactive);
+      }
+    }
+
+  if (!this->Internal->SingleColumnMode)
+    {
+    this->Internal->Table->resizeColumnsToContents();
     }
 }

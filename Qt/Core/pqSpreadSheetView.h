@@ -81,6 +81,9 @@ protected slots:
 
   /// When user creates a "surface" selection on the view.
   void onCreateSelection(vtkSMSourceProxy* selSource);
+
+  /// Called when user double clicks on a column header.
+  void onSectionDoubleClicked(int logicalindex);
 private:
   pqSpreadSheetView(const pqSpreadSheetView&); // Not implemented.
   void operator=(const pqSpreadSheetView&); // Not implemented.
