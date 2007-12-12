@@ -1476,5 +1476,49 @@ Produces a single cell uniform grid with data values that vary over a sin(t) wav
      <!-- End of TimeSource -->
    </SourceProxy>
 
+   <SourceProxy name="DataObjectGenerator" 
+                 class="vtkDataObjectGenerator"
+                 label="Data Object Generator">
+     <Documentation
+       long_help="Parses a string to produce composite data objects consisting of simple templated datasets."
+       short_help="Produces simple (composite or atomic) data sets for testing.">
+
+vtkDataObjectGenerator parses a string and produces dataobjects from the
+dataobject template names it sees in the string. For example, if the string
+contains &quot;ID1&quot; the generator will create a vtkImageData. &quot;UF1&quot;, &quot;RD1&quot;, 
+&quot;SD1&quot;, &quot;PD1&quot;, and &quot;UG1&quot; will produce vtkUniformGrid, vtkRectilinearGrid,
+vtkStructuredGrid, vtkPolyData and vtkUnstructuredGrid respectively. You 
+can compose composite datasets from the atomic ones listed above
+by putting them between &quot;(&quot; and &quot;)&quot; in the string to create groups, and 
+then placing a collection of groups together inside one of the three 
+composite dataset identifiers - &quot;MB{}&quot;, &quot;HD&lt;&gt;&quot; or &quot;HB[]&quot;.
+&quot;HB[ (UF1)(UF1)(UF1) ]&quot; will create a vtkHierarchicalBoxDataSet representing
+an octree, in which the firstmost cell is refined, and then the firstmost 
+refined cell is refined itself.
+&quot;HD&lt; (UG1UG1UG1) (PD1)&gt;&quot; will create a vtkHierachicalDataSet which contains
+two refinement levels, the first is a group with three unstructured grids,
+the second, more refined level is a vtkPolyData.
+&quot;MB{ (ID1)(PD1 RG1)(MB{}) }&quot; will create a vtkMultiBlockDataSet consisting
+of three groups. The first group has one data set, a vtkImageData. The
+second group has two datasets, a vtkPolyData and a vtkRectilinearGrid. The
+third contains a vtkMultiBlockDataSet, which in this case is empty.
+     </Documentation>
+
+     <StringVectorProperty 
+       name="Program" 
+       command="SetProgram"
+       number_of_elements="1"
+       default_values="ID1">
+       <Hints>
+         <Widget type="multi_line"/>
+       </Hints>
+       <Documentation>
+         This property contains the string that is parsed to determine the structured of the output data object to produce.
+       </Documentation>
+     </StringVectorProperty>
+
+   <!-- End DataObjectGenerator -->
+   </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>
