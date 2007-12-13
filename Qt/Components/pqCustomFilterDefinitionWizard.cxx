@@ -429,7 +429,7 @@ void pqCustomFilterDefinitionWizard::setupDefaultInputOutput()
     pqPipelineSource *output = this->Model->getSourceFor(index);
     if(output)
       {
-      this->addOutputInternal(source->getOutputPort(0), "Output");
+      this->addOutputInternal(output->getOutputPort(0), "Output");
       }
     }
 }
