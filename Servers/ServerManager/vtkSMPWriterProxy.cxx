@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMPWriterProxy);
-vtkCxxRevisionMacro(vtkSMPWriterProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMPWriterProxy, "1.7");
 //-----------------------------------------------------------------------------
 vtkSMPWriterProxy::vtkSMPWriterProxy()
 {
@@ -51,80 +51,60 @@ void vtkSMPWriterProxy::CreateVTKObjects()
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream str;
 
-  int isXMLPWriter = 0;
-  int isPVDWriter = 0;
+  // Some writers used SetStartPiece/SetEndPiece API while others use SetPiece
+  // API. To handle both cases, we simply call both while telling the process
+  // module to ignore any interpretor errors.
+  str << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID()
+      << "SetReportInterpreterErrors" << 0
+      << vtkClientServerStream::End;
 
   str << vtkClientServerStream::Invoke
-    << this->GetID()
-    << "IsA"
-    << "vtkXMLPDataWriter"
-    << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, 
-                 vtkProcessModule::GetRootId(this->Servers), str);
-  pm->GetLastResult(this->ConnectionID,
-                    vtkProcessModule::GetRootId(this->Servers)).GetArgument(0, 0, &isXMLPWriter);
-
+      << pm->GetProcessModuleID()
+      << "GetNumberOfLocalPartitions"
+      << vtkClientServerStream::End;
   str << vtkClientServerStream::Invoke
-    << this->GetID()
-    << "IsA"
-    << "vtkXMLPVDWriter"
-    << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, 
-    vtkProcessModule::GetRootId(this->Servers), str);
-  pm->GetLastResult(this->ConnectionID,
-    vtkProcessModule::GetRootId(this->Servers)).GetArgument(0, 0, &isPVDWriter);
+      << this->GetID()
+      << "SetNumberOfPieces"
+      << vtkClientServerStream::LastResult 
+      << vtkClientServerStream::End;
 
-  if (isXMLPWriter)
-    {
-    str << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID()
-        << "GetNumberOfLocalPartitions"
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-        << this->GetID()
-        << "SetNumberOfPieces"
-        << vtkClientServerStream::LastResult 
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID()
-        << "GetPartitionId"
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-        << this->GetID()
-        << "SetStartPiece"
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID()
-        << "GetPartitionId"
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-        << this->GetID()
-        << "SetEndPiece"
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-    }
-  else if (isPVDWriter)
-    {
-    str << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID()
-        << "GetNumberOfLocalPartitions"
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-        << this->GetID()
-        << "SetNumberOfPieces"
-        << vtkClientServerStream::LastResult 
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-        << pm->GetProcessModuleID()
-        << "GetPartitionId"
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-        << this->GetID()
-        << "SetPiece"
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-    }
+  // ALTERNATIVE: 1
+  str << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID()
+      << "GetPartitionId"
+      << vtkClientServerStream::End;
+  str << vtkClientServerStream::Invoke
+      << this->GetID()
+      << "SetStartPiece"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+  str << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID()
+      << "GetPartitionId"
+      << vtkClientServerStream::End;
+  str << vtkClientServerStream::Invoke
+      << this->GetID()
+      << "SetEndPiece"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+
+  // ALTERNATIVE: 2
+  str << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID()
+      << "GetPartitionId"
+      << vtkClientServerStream::End;
+  str << vtkClientServerStream::Invoke
+      << this->GetID()
+      << "SetPiece"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+  
+  // Restore ReportInterpreterErrors flag.
+  str << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID()
+      << "SetReportInterpreterErrors" << 1
+      << vtkClientServerStream::End;
 
   pm->SendStream(this->ConnectionID, this->Servers, str);
 }
