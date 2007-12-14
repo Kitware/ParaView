@@ -22,21 +22,99 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredPoints.h"
 #include "vtkStructuredPointsReader.h"
+#include "vtkJPEGReader.h"
+#include "vtkBMPReader.h"
+#include "vtkTIFFReader.h"
+#include "vtkPNMReader.h"
+#include "vtkPNGReader.h"
+#include "vtkSmartPointer.h"
+#include "vtkStructuredPointsWriter.h"
+#include <vtksys/SystemTools.hxx>
+
 
 vtkStandardNewMacro(vtkNetworkImageSource);
-vtkCxxRevisionMacro(vtkNetworkImageSource, "1.1");
-
+vtkCxxRevisionMacro(vtkNetworkImageSource, "1.2");
 //----------------------------------------------------------------------------
 vtkNetworkImageSource::vtkNetworkImageSource()
 {
   this->SetNumberOfInputPorts(0);
   this->Buffer = vtkImageData::New();
+  this->Reply = new vtkClientServerStream();
 }
 
 //----------------------------------------------------------------------------
 vtkNetworkImageSource::~vtkNetworkImageSource()
 {
+  delete this->Reply;
   this->Buffer->Delete();
+}
+
+//----------------------------------------------------------------------------
+int vtkNetworkImageSource::ReadImageFromFile(const char* filename)
+{
+  if (!filename || !filename[0])
+    {
+    vtkErrorMacro("FileName must be set.");
+    return 0;
+    }
+
+  vtkSmartPointer<vtkImageReader2> reader;
+  // determine type of reader to create.
+  vtkstd::string ext = 
+    vtksys::SystemTools::LowerCase(vtksys::SystemTools::GetFilenameLastExtension(filename));
+  if (ext == ".bmp")
+    {
+    reader.TakeReference(vtkBMPReader::New());
+    }
+  else if ( ext == ".jpg")
+    {
+    reader.TakeReference(vtkJPEGReader::New());
+    }
+  else if ( ext == ".png")
+    {
+    reader.TakeReference(vtkPNGReader::New());
+    }
+  else if (ext == ".ppm")
+    {
+    reader.TakeReference(vtkPNMReader::New());
+    }
+  else if ( ext == ".tif")
+    {
+    reader.TakeReference(vtkTIFFReader::New());
+    }
+  else
+    {
+    vtkErrorMacro("Unknown texture file extension: " << filename);
+    return 0;
+    }
+  if (!reader->CanReadFile(filename))
+    {
+    vtkErrorMacro("Reader cannot read file " << filename);
+    return 0;
+    }
+  reader->SetFileName(filename);
+  reader->Update();
+  this->Buffer->ShallowCopy(reader->GetOutput());
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+const vtkClientServerStream& vtkNetworkImageSource::GetImageAsString()
+{
+ // Read the texture image locally and write it out to a binary string.
+  vtkStructuredPointsWriter *writer = vtkStructuredPointsWriter::New();
+  writer->SetInput(this->Buffer);
+  writer->SetFileTypeToBinary();
+  writer->WriteToOutputStringOn();
+  writer->Write();
+
+  this->Reply->Reset(); 
+  (*this->Reply)  << vtkClientServerStream::Reply
+                  << vtkClientServerStream::InsertArray(
+                    writer->GetOutputString(), writer->GetOutputStringLength())
+                  << vtkClientServerStream::End;
+  writer->Delete();
+  return (*this->Reply);
 }
 
 //----------------------------------------------------------------------------

@@ -178,6 +178,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSpreadSheetDisplayEditor.h
   pqStreamTracerPanel.h
   pqTextDisplayPropertiesWidget.h
+  pqTextureComboBox.h
   pqThresholdPanel.h
   pqTimerLogDisplay.h
   pqToolTipTrapper.h
@@ -596,6 +597,8 @@ ADD_LIBRARY(pqComponents
   pqStreamTracerPanel.h
   pqTextDisplayPropertiesWidget.cxx
   pqTextDisplayPropertiesWidget.h
+  pqTextureComboBox.cxx
+  pqTextureComboBox.h
   pqThresholdPanel.cxx
   pqThresholdPanel.h
   pqTimerLogDisplay.cxx

@@ -240,6 +240,13 @@ protected:
   vtkGetMacro(RepeatCommand, int);
   int RepeatCommand;
 
+  // When set to true, the property will push a NULL i.e. 0 when there are no
+  // proxies in the property. Not used when CleanCommand or RemoveCommand is
+  // set. Default is false. 
+  vtkSetMacro(NullOnEmpty, int);
+  vtkGetMacro(NullOnEmpty, int);
+  int NullOnEmpty;
+
   // Description:
   // ivar determining it this property creates a consumer link 
   // between the proxy on which this property is attached and the 

@@ -94,7 +94,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.68");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.69");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -462,6 +462,36 @@ vtkSMProxy* vtkSMProxyManager::GetProxy(const char* group, const char* name)
       if (it2->second.begin() != it2->second.end())
         {
         return it2->second.front()->Proxy.GetPointer();
+        }
+      }
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxyManager::GetProxy(const char* groupname, int id)
+{
+  vtkClientServerID cid(id);
+  return this->GetProxy(groupname, cid);
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxyManager::GetProxy(const char* groupname, vtkClientServerID id)
+{
+  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+    this->Internals->RegisteredProxyMap.find(groupname);
+  if (it != this->Internals->RegisteredProxyMap.end())
+    {
+    vtkSMProxyManagerProxyMapType::iterator it2;
+    for (it2 = it->second.begin(); it2 != it->second.end(); it2++)
+      {
+      vtkSMProxyManagerProxyListType::iterator it3;
+      for (it3 = it2->second.begin();it3 != it2->second.end(); it3++)
+        {
+        if (it3->GetPointer()->Proxy->GetSelfID() == id)
+          {
+          return it3->GetPointer()->Proxy;
+          }
         }
       }
     }

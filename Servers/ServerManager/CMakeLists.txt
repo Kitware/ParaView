@@ -70,6 +70,7 @@ SET(Kit_SRCS
   vtkSMIceTDesktopRenderViewProxy.cxx
   vtkSMIceTMultiDisplayRenderViewProxy.cxx
   vtkSMIdTypeVectorProperty.cxx
+  vtkSMImageTextureProxy.cxx
   vtkSMImplicitPlaneProxy.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMInformationHelper.cxx
@@ -94,6 +95,7 @@ SET(Kit_SRCS
   vtkSMOrderedPropertyIterator.cxx
   vtkSMOutlineRepresentationProxy.cxx
   vtkSMOutputPort.cxx
+  vtkSMNetworkImageSourceProxy.cxx
   vtkSMPQStateLoader.cxx
   vtkSMPropertyAdaptor.cxx
   vtkSMProperty.cxx

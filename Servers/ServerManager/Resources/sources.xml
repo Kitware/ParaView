@@ -1520,5 +1520,33 @@ third contains a vtkMultiBlockDataSet, which in this case is empty.
    <!-- End DataObjectGenerator -->
    </SourceProxy>
 
+   <NetworkImageSourceProxy name="NetworkImageSource"
+     class="vtkNetworkImageSource">
+     <StringVectorProperty name="FileName"
+      command="SetFileName"
+      update_self="1">
+      <Documentation>
+        Set the name of image file to load.
+      </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty name="SourceProcess"
+      command="SetSourceProcess"
+      number_of_elements="1"
+      update_self="1"
+      default_values="0">
+      <EnumerationDomain name="enum" >
+        <Entry value="2" text="DataServer" /> 
+        <Entry value="8" text="RenderServer" /> 
+        <Entry value="16" text="Client" /> 
+      </EnumerationDomain>
+      <Documentation>
+        Set the process on which the image is available.
+      </Documentation>
+     </IntVectorProperty>
+
+     <!-- End of NetworkImageSource -->
+   </NetworkImageSourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>

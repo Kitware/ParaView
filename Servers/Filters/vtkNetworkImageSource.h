@@ -40,6 +40,14 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Read the image from a file.
+  int ReadImageFromFile(const char* filename);
+
+  // Description:
+  // Returns the image data as a string.
+  const vtkClientServerStream& GetImageAsString();
+
+  // Description:
   // Pass in a vtkClientServerStream containing a string that is a binary-
   // encoded .vtk dataset containing a vtkImageData.
   void ReadImageFromString(vtkClientServerStream &css);
@@ -49,6 +57,7 @@ protected:
   ~vtkNetworkImageSource();
 
   vtkImageData* Buffer;
+  vtkClientServerStream* Reply;
 
   int RequestData(vtkInformation *request,
                   vtkInformationVector** inputVector,

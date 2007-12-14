@@ -32,7 +32,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.49");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.50");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -52,6 +52,7 @@ vtkSMProxyProperty::vtkSMProxyProperty()
   this->RemoveCommand = 0;
   this->IsInternal = 0;
   this->AddConsumer = 1;
+  this->NullOnEmpty = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -189,6 +190,13 @@ void vtkSMProxyProperty::AppendCommandToStream(
         proxy->AddConsumer(this, cons);
         }
       this->AppendProxyToStream(proxy, str, objectId, 0);
+      }
+
+    // When no proxies are present in the property, we call the command on
+    // the server side object with NULL argument.
+    if (numProxies == 0 && !this->CleanCommand && this->NullOnEmpty)
+      {
+      this->AppendProxyToStream(NULL, str, objectId, 0);
       }
     }
 }
@@ -507,6 +515,13 @@ int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent,
     {
     this->SetAddConsumer(add_consumer);
     }
+
+  int null_on_empty;
+  if (element->GetScalarAttribute("null_on_empty", &null_on_empty))
+    {
+    this->SetNullOnEmpty(null_on_empty);
+    }
+
 
   if (this->RemoveCommand && !this->GetUpdateSelf())
     {

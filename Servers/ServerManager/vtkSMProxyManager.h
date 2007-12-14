@@ -114,6 +114,14 @@ public:
   //ETX
 
   // Description:
+  // Returns a proxy with the given self ID registered under the indicated
+  // group, if any.
+  vtkSMProxy* GetProxy(const char* groupname, int id);
+  //BTX
+  vtkSMProxy* GetProxy(const char* groupname, vtkClientServerID id);
+  //ETX
+  
+  // Description:
   // Returns all proxies registered under the given group with the given name.
   // The collection is cleared before the proxies are added to it.
   void GetProxies(const char* groupname, const char* name, 

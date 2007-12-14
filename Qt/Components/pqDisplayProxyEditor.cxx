@@ -305,6 +305,8 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     SIGNAL(currentTextChanged(const QString&)),
     this, SLOT(updateEnableState()), Qt::QueuedConnection);
 
+  this->Internal->Texture->setRepresentation(repr);
+
   /*
   if (reprProxy->GetProperty("ScalarOpacityUnitDistance"))
     {

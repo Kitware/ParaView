@@ -870,6 +870,23 @@
         </DataTypeDomain>
       </InputProperty>
     </SourceProxy>
+
+    <ImageTextureProxy name="ImageTexture" class="vtkTexture">
+      <Documentation>
+        This is a proxy for a vtkTexture which also includes an image file
+        reader. This reader can read an image of client/data server or render
+        server and then transmit it to the client/render server where it will be
+        used for texturing.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="Source" 
+          proxygroup="sources" proxyname="NetworkImageSource" />
+        <ExposedProperties>
+          <Property name="FileName" />
+          <Property name="SourceProcess" />
+        </ExposedProperties>
+      </SubProxy>
+    </ImageTextureProxy>
   </ProxyGroup>
 
   <ProxyGroup name="props">
@@ -966,7 +983,8 @@
       </ProxyProperty>
       <ProxyProperty
         name="Texture"
-        command="SetTexture">
+        command="SetTexture"
+        null_on_empty="1" >
         <ProxyGroupDomain name="groups">
           <Group name="textures"/>
         </ProxyGroupDomain>
@@ -4460,6 +4478,7 @@
           <Property name="Pickable" />
           <Property name="Position" />
           <Property name="Scale" />
+          <Property name="Texture" />
         </ExposedProperties>
       </SubProxy>
 
@@ -4994,6 +5013,7 @@
           <Property name="Pickable" />
           <Property name="Position" />
           <Property name="Scale" />
+          <Property name="Texture" />
 
           <!-- Property properties -->
           <Property name="Ambient" />
