@@ -59,8 +59,7 @@ public:
 //BTX
   // Description: 
   // These flags are used to specify destination servers for the
-  // SendStream function. Note that the new interface no longer
-  // support the server flag CLIENT.
+  // SendStream function.
   enum ServerFlags
     {
     DATA_SERVER = 0x01,
