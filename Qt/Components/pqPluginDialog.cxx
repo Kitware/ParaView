@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginDialog.h"
 
 // Qt
+#include <QMessageBox>
 
 // SM
 
@@ -41,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginManager.h"
 #include "pqApplicationCore.h"
 #include "pqFileDialog.h"
+#include "pqServer.h"
 
 // pqComponents
 
@@ -48,14 +50,14 @@ pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
   : QDialog(p), Server(server)
 {
   this->setupUi(this);
-  QObject::connect(this->loadServer, SIGNAL(clicked(bool)),
-                   this, SLOT(loadServerPlugin()));
-  QObject::connect(this->loadClient, SIGNAL(clicked(bool)),
-                   this, SLOT(loadClientPlugin()));
+  QObject::connect(this->loadRemote, SIGNAL(clicked(bool)),
+                   this, SLOT(loadRemotePlugin()));
+  QObject::connect(this->loadLocal, SIGNAL(clicked(bool)),
+                   this, SLOT(loadLocalPlugin()));
   this->refresh();
-  if(!this->Server)
+  if(!this->Server || !this->Server->isRemote())
     {
-    this->serverGroup->setEnabled(false);
+    this->remoteGroup->setEnabled(false);
     }
 }
 
@@ -63,16 +65,16 @@ pqPluginDialog::~pqPluginDialog()
 {
 }
 
-void pqPluginDialog::loadServerPlugin()
+void pqPluginDialog::loadRemotePlugin()
 {
   this->loadPlugin(this->Server);
-  this->refreshServer();
+  this->refreshRemote();
 }
 
-void pqPluginDialog::loadClientPlugin()
+void pqPluginDialog::loadLocalPlugin()
 {
   this->loadPlugin(NULL);
-  this->refreshClient();
+  this->refreshLocal();
 }
 
 void pqPluginDialog::loadPlugin(pqServer* server)
@@ -81,34 +83,51 @@ void pqPluginDialog::loadPlugin(pqServer* server)
                   "Plugins (*.so;*.dylib;*.dll;*.sl)\nAll Files (*)");
   if(fd.exec() == QDialog::Accepted)
     {
+    QString error;
     QString plugin = fd.getSelectedFiles()[0];
     pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-    pm->loadPlugin(server, plugin);
-    }
+    /* a local plugin may contain both server side code and client code */
+    bool result1 = pm->loadPlugin(server, plugin, &error);
+    bool result2 = true;
+    if(!server)
+      {
+      result2 = pm->loadPlugin(this->Server, plugin, &error);
+      }
+    
+    if(!result1 && !result2)
+      {
+      QMessageBox::information(NULL, "Plugin Load Failed", error);
+      }
+  }
 }
 
 void pqPluginDialog::refresh()
 {
-  this->refreshClient();
-  this->refreshServer();
+  this->refreshLocal();
+  this->refreshRemote();
 }
 
-void pqPluginDialog::refreshClient()
+void pqPluginDialog::refreshLocal()
 {
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
   QStringList plugins = pm->loadedPlugins(NULL);
-  this->clientPlugins->clear();
-  this->clientPlugins->addItems(plugins);
+  this->localPlugins->clear();
+  this->localPlugins->addItems(plugins);
+  if(!this->Server->isRemote())
+    {
+    plugins = pm->loadedPlugins(this->Server);
+    this->localPlugins->addItems(plugins);
+    }
 }
 
-void pqPluginDialog::refreshServer()
+void pqPluginDialog::refreshRemote()
 {
-  if(this->Server)
+  if(this->Server && this->Server->isRemote())
     {
     pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
     QStringList plugins = pm->loadedPlugins(this->Server);
-    this->serverPlugins->clear();
-    this->serverPlugins->addItems(plugins);
+    this->remotePlugins->clear();
+    this->remotePlugins->addItems(plugins);
     }
 }
 

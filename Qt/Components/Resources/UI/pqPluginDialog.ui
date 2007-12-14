@@ -20,9 +20,9 @@
     <number>6</number>
    </property>
    <item row="0" column="1" >
-    <widget class="QGroupBox" name="clientGroup" >
+    <widget class="QGroupBox" name="localGroup" >
      <property name="title" >
-      <string>Client Plugins</string>
+      <string>Local Plugins</string>
      </property>
      <layout class="QGridLayout" >
       <property name="margin" >
@@ -32,7 +32,7 @@
        <number>6</number>
       </property>
       <item row="1" column="1" >
-       <widget class="QPushButton" name="loadClient" >
+       <widget class="QPushButton" name="loadLocal" >
         <property name="text" >
          <string>Load</string>
         </property>
@@ -52,15 +52,15 @@
        </spacer>
       </item>
       <item row="0" column="0" colspan="2" >
-       <widget class="QListWidget" name="clientPlugins" />
+       <widget class="QListWidget" name="localPlugins" />
       </item>
      </layout>
     </widget>
    </item>
    <item row="0" column="0" >
-    <widget class="QGroupBox" name="serverGroup" >
+    <widget class="QGroupBox" name="remoteGroup" >
      <property name="title" >
-      <string>Server Plugins</string>
+      <string>Remote Plugins</string>
      </property>
      <layout class="QGridLayout" >
       <property name="margin" >
@@ -83,14 +83,14 @@
        </spacer>
       </item>
       <item row="1" column="1" >
-       <widget class="QPushButton" name="loadServer" >
+       <widget class="QPushButton" name="loadRemote" >
         <property name="text" >
          <string>Load</string>
         </property>
        </widget>
       </item>
       <item row="0" column="0" colspan="2" >
-       <widget class="QListWidget" name="serverPlugins" />
+       <widget class="QListWidget" name="remotePlugins" />
       </item>
      </layout>
     </widget>

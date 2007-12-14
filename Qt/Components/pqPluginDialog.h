@@ -50,13 +50,13 @@ public:
   ~pqPluginDialog();
 
 public slots:
-  void loadServerPlugin();
-  void loadClientPlugin();
+  void loadRemotePlugin();
+  void loadLocalPlugin();
 
 protected:
   void refresh();
-  void refreshClient();
-  void refreshServer();
+  void refreshLocal();
+  void refreshRemote();
   void loadPlugin(pqServer* server);
 
   pqServer* Server;
