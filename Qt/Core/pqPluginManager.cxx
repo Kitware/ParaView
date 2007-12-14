@@ -199,7 +199,60 @@ void pqPluginManager::loadPlugins(pqServer* server)
       pqSMAdaptor::getElementProperty(pxy->GetProperty("SearchPaths")).toString();
     pxy->UnRegister(NULL);
     }
-  
+
+    // add $APPDATA/<organization>/<appname>/Plugins  or
+    // $HOME/.config/<organization>/<appname>/Plugins
+
+  QString settingsRoot;
+  if(server)
+    {
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    vtkSMProxy* helper = pxm->NewProxy("misc", "EnvironmentInformationHelper");
+    helper->SetConnectionID(server->GetConnectionID());
+    helper->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
+#if defined(Q_OS_WIN)
+    pqSMAdaptor::setElementProperty(helper->GetProperty("Variable"), "APPDATA");
+#else
+    pqSMAdaptor::setElementProperty(helper->GetProperty("Variable"), "HOME");
+#endif
+    helper->UpdateVTKObjects();
+    vtkPVEnvironmentInformation* info = vtkPVEnvironmentInformation::New();
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    pm->GatherInformation(helper->GetConnectionID(), 
+      vtkProcessModule::DATA_SERVER, info, helper->GetID());
+    settingsRoot = info->GetVariable();
+    info->Delete();
+    helper->UnRegister(NULL);
+    }
+  else
+    {
+#if defined(Q_OS_WIN)
+    settingsRoot = QString::fromLocal8Bit(getenv("APPDATA"));
+#else
+    settingsRoot = QString::fromLocal8Bit(getenv("HOME"));
+#endif
+    }
+
+#if !defined(Q_OS_WIN)
+  if(!settingsRoot.isEmpty())
+    {
+    settingsRoot += "/.config";
+    }
+#endif
+
+  if(!settingsRoot.isEmpty())
+    {
+    QString homePluginPath = QString("%1/%2/%3/Plugins");
+    homePluginPath = homePluginPath.arg(settingsRoot);
+    homePluginPath = homePluginPath.arg(QCoreApplication::organizationName());
+    homePluginPath = homePluginPath.arg(QCoreApplication::applicationName());
+    if(!pv_plugin_path.isEmpty())
+      {
+      pv_plugin_path += ";";
+      }
+    pv_plugin_path += homePluginPath;
+    }
+
   // trim any whitespace before or after the path delimiters
   // note, shouldn't be a problem with drive letters on Windows "c:\"
   pv_plugin_path = pv_plugin_path.trimmed();
