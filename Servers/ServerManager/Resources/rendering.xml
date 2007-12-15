@@ -965,7 +965,11 @@
     </Proxy>
     
     
-    <Proxy name="Actor" class="vtkActor">
+    <Proxy name="ActorBase" class="not-used">
+      <Documentation>
+        Defines interface for an actor. Don't instantiate this 
+        proxy itself.
+      </Documentation>
       <ProxyProperty
         name="Property"
         command="SetProperty"
@@ -979,14 +983,6 @@
         command="SetMapper">
         <ProxyGroupDomain name="groups">
           <Group name="mappers" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
-      <ProxyProperty
-        name="Texture"
-        command="SetTexture"
-        null_on_empty="1" >
-        <ProxyGroupDomain name="groups">
-          <Group name="textures"/>
         </ProxyGroupDomain>
       </ProxyProperty>
       <IntVectorProperty
@@ -1037,6 +1033,22 @@
         animateable="0">
         <IntRangeDomain name="bool" />
       </IntVectorProperty>
+      <!-- End of ActorBase -->
+    </Proxy>
+
+    <Proxy name="Actor" class="vtkActor"
+      base_proxygroup="props" base_proxyname="ActorBase">
+      <Documentation>
+        Proxy for a vtkActor.
+      </Documentation>
+      <ProxyProperty
+        name="Texture"
+        command="SetTexture"
+        null_on_empty="1" >
+        <ProxyGroupDomain name="groups">
+          <Group name="textures"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
       <!-- End of Actor -->
     </Proxy>
 
@@ -1060,7 +1072,7 @@
     </Proxy>
 
     <Proxy name="LODVolume" class="vtkPVLODVolume"
-      base_proxygroup="props" base_proxyname="Actor">
+      base_proxygroup="props" base_proxyname="ActorBase">
       <ProxyProperty name="LODMapper" command="SetLODMapper">
         <ProxyGroupDomain name="groups">
           <Group name="mappers" />
