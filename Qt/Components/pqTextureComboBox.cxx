@@ -267,7 +267,7 @@ void pqTextureComboBox::reload()
 //-----------------------------------------------------------------------------
 void pqTextureComboBox::onActivated(int index)
 {
-  QVariant data = this->itemData(index);
+  QVariant _data = this->itemData(index);
 
   vtkSMProxy* proxy = this->Internal->Representation->getProxy();
   vtkSMProperty* textureProperty = proxy->GetProperty("Texture");
@@ -277,7 +277,7 @@ void pqTextureComboBox::onActivated(int index)
     return;
     }
 
-  if (data.toString() == "NONE")
+  if (_data.toString() == "NONE")
     {
     emit this->begin("Texture Change");
     vtkSMProxyProperty::SafeDownCast(textureProperty)->RemoveAllProxies();
@@ -285,7 +285,7 @@ void pqTextureComboBox::onActivated(int index)
     this->Internal->Representation->renderView(false);
     emit this->end();
     }
-  else if (data.toString() == "LOAD")
+  else if (_data.toString() == "LOAD")
     {
     emit this->begin("Texture Change");
     // Popup load texture dialog.
@@ -295,7 +295,7 @@ void pqTextureComboBox::onActivated(int index)
   else
     {
     // User choose a texture by name, set it on the representation.
-    vtkSMProxy* textureProxy = this->getTextureProxy(data);
+    vtkSMProxy* textureProxy = this->getTextureProxy(_data);
     if (!textureProxy)
       {
       qDebug() << "Failed to locate the loaded texture by the name " 
@@ -372,10 +372,10 @@ bool pqTextureComboBox::loadTexture(const QString& filename)
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* pqTextureComboBox::getTextureProxy(const QVariant& data) const
+vtkSMProxy* pqTextureComboBox::getTextureProxy(const QVariant& _data) const
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkClientServerID proxyID (data.value<vtkTypeUInt32>());
+  vtkClientServerID proxyID (_data.value<vtkTypeUInt32>());
   return pxm->GetProxy(TEXTURESGROUP, proxyID);
 }
 
