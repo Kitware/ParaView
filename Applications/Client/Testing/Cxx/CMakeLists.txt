@@ -4,6 +4,10 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+SET(PV_TEST_INIT_COMMAND "" CACHE STRING
+  "Command to run before a test begins. Multiple commands are separated by ';'.")
+MARK_AS_ADVANCED(PV_TEST_INIT_COMMAND)
+
 SET(PV_TEST_CLEAN_COMMAND "" CACHE STRING
   "Command to run after a failed test to cleanup processes.  Example: \"killall -9 rsh paraview\"")
 MARK_AS_ADVANCED(PV_TEST_CLEAN_COMMAND)

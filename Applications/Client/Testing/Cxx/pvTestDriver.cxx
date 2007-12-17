@@ -19,6 +19,7 @@
 #include "pvTestDriverConfig.h"
 
 #include <vtksys/SystemTools.hxx>
+#include <vtksys/String.hxx>
 
 #if !defined(_WIN32) || defined(__CYGWIN__)
 # include <unistd.h>
@@ -510,6 +511,25 @@ int pvTestDriver::OutputStringHasError(const char* pname, vtkstd::string& output
 //----------------------------------------------------------------------------
 int pvTestDriver::Main(int argc, char* argv[])
 {
+
+#ifdef PV_TEST_INIT_COMMAND
+  // run user-specified commands before initialization.
+  // For example: "killall -9 rsh paraview;"
+  if(strlen(PV_TEST_INIT_COMMAND) > 0)
+    {
+    vtkstd::vector<vtksys::String> commands = vtksys::SystemTools::SplitString(
+      PV_TEST_INIT_COMMAND, ';');
+    for (unsigned int cc=0; cc < commands.size(); cc++)
+      {
+      vtkstd::string command = commands[cc];
+      if (command.size() > 0)
+        {
+        system(command.c_str());
+        }
+      }
+    }
+#endif
+
   // temporary hack
   // when pvserver supports -rc option then this can be removed
   // until then, ReverseConnection must be set before CollectConfiguredOptions
