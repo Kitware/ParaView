@@ -105,11 +105,9 @@
   <Filter name="TemporalInterpolator" />
   <Filter name="TemporalShiftScale" />
   <Filter name="TessellatorFilter" />
-  <!--
   <Filter name="TextureMapToCylinder" />
   <Filter name="TextureMapToPlane" />
   <Filter name="TextureMapToSphere" />
-  -->
   <Filter name="Threshold" />
   <Filter name="TimeToTextConvertor" />
   <Filter name="TransformFilter" />
