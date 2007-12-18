@@ -94,7 +94,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.69");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.70");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -919,6 +919,12 @@ void vtkSMProxyManager::UpdateRegisteredProxies(int modified_only /*=1*/)
           this->Internals->ModifiedProxies.find(it3->GetPointer()->Proxy.GetPointer())
           != this->Internals->ModifiedProxies.end())
           {
+          vtksys_ios::ostringstream log;
+          log << "Updating Proxy: " << it3->GetPointer()->Proxy.GetPointer() << "--("
+            << it3->GetPointer()->Proxy->GetXMLGroup()
+            << it3->GetPointer()->Proxy->GetXMLName()
+            << ")";
+          vtkProcessModule::DebugLog(log.str().c_str());
           it3->GetPointer()->Proxy.GetPointer()->UpdateVTKObjects();
           }
         }
