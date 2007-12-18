@@ -106,7 +106,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.77");
+vtkCxxRevisionMacro(vtkProcessModule, "1.78");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -164,9 +164,6 @@ vtkProcessModule::vtkProcessModule()
   // We offset lines/vertices.
   vtkMapper::SetResolveCoincidentTopologyPolygonOffsetFaces(0);
   vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(-1.0, -1.0);
-
-  // ofstream *fp = new ofstream("/tmp/pvdebug.log");
-  // this->InitializeDebugLog(*fp);
 }
 
 //-----------------------------------------------------------------------------
@@ -330,6 +327,12 @@ int vtkProcessModule::Start(int argc, char** argv)
     // Starts the client event loop.
     return this->StartClient(argc, argv);
     }
+
+  // if (this->GetPartitionId()==0)
+  //  {
+  //  ofstream *fp = new ofstream("/tmp/pvdebug.log");
+  //  this->InitializeDebugLog(*fp);
+  //  }
 
   // Running in server mode.
   return this->StartServer(0);
