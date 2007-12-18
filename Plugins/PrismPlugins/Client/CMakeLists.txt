@@ -56,8 +56,8 @@ SOURCE_GROUP("Generated" FILES
 ADD_PARAVIEW_ACTION_GROUP(TOOLBARIFACE TOOLBAR_IFACE_SRCS CLASS_NAME PrismToolBarActions 
                           GROUP_NAME "ToolBar/Prism")
 
-ADD_PARAVIEW_ACTION_GROUP(MENUBARIFACE MENU_IFACE_SRCS CLASS_NAME PrismMenuActions 
-                          GROUP_NAME "MenuBar/Prism")
+#ADD_PARAVIEW_ACTION_GROUP(MENUBARIFACE MENU_IFACE_SRCS CLASS_NAME PrismMenuActions 
+#                          GROUP_NAME "MenuBar/Prism")
 # create a plugin for this panel
 ADD_PARAVIEW_PLUGIN(PrismClientPlugin "1.0" 
                     GUI_INTERFACES ${TOOLBARIFACE} ${MENUBARIFACE}

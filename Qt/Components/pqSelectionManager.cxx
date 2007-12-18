@@ -319,14 +319,22 @@ QList<vtkIdType> pqSelectionManager::getGlobalIDs(vtkSMProxy* selectionSource,pq
   return gids;
 }
 
+
 //-----------------------------------------------------------------------------
 QList<QPair<int, vtkIdType> > pqSelectionManager::getIndices()
 {
-  QList<QPair<int, vtkIdType> > indices;
-
-  vtkSMProxy* selectionSource = this->Implementation->getSelectionSourceProxy();
-  int selectionPort = 0;
+ vtkSMProxy* selectionSource = this->Implementation->getSelectionSourceProxy();
   pqOutputPort* opport = this->getSelectedPort();
+  return this->getIndices(selectionSource,opport);
+
+}
+
+
+//-----------------------------------------------------------------------------
+QList<QPair<int, vtkIdType> > pqSelectionManager::getIndices(vtkSMProxy* selectionSource,pqOutputPort* opport)
+{
+  QList<QPair<int, vtkIdType> > indices;
+  int selectionPort = 0;
   vtkSMProxy* dataSource = opport->getSource()->getProxy();
   int dataPort = opport->getPortNumber();
 

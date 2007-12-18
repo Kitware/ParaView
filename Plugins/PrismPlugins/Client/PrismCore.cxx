@@ -344,19 +344,21 @@ void PrismCore::onPrismSelection(vtkObject* caller,
     pqApplicationCore* const core = pqApplicationCore::instance();
     pqSelectionManager* slmanager = qobject_cast<pqSelectionManager*>(
       core->manager("SELECTION_MANAGER"));
-    QList<vtkIdType> globalIds= slmanager->getGlobalIDs(selPrism,opport);
-
+  
+    QList<QPair<int, vtkIdType> > indices = slmanager->getIndices(selPrism,opport);
     QList<QVariant> ids;
-    foreach (vtkIdType gid, globalIds)
-      {
-      ids.push_back(-1);
-      ids.push_back(gid);
-      }
+    int cc;
+    for (cc=0; cc < indices.size(); cc++)
+    {
+      ids.push_back(indices[cc].first);
+      ids.push_back(indices[cc].second);
+    }
+
     
     pqSMAdaptor::setMultipleElementProperty(
        selSource->GetProperty("IDs"), ids);
     pqSMAdaptor::setEnumerationProperty(
-       selSource->GetProperty("ContentType"),"GLOBALIDs");
+       selSource->GetProperty("ContentType"),"Indices");
      selSource->GetProperty("FieldType")->Copy(selPrism->GetProperty("FieldType"));
    
      selSource->UpdateVTKObjects();
@@ -414,19 +416,20 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
     pqApplicationCore* const core = pqApplicationCore::instance();
     pqSelectionManager* slmanager = qobject_cast<pqSelectionManager*>(
       core->manager("SELECTION_MANAGER"));
-    QList<vtkIdType> globalIds= slmanager->getGlobalIDs(selSource,opport);
-
+    QList<QPair<int, vtkIdType> > indices = slmanager->getIndices(selSource,opport);
     QList<QVariant> ids;
-    foreach (vtkIdType gid, globalIds)
-      {
-      ids.push_back(-1);
-      ids.push_back(gid);
-      }
+    int cc;
+    for (cc=0; cc < indices.size(); cc++)
+    {
+      ids.push_back(indices[cc].first);
+      ids.push_back(indices[cc].second);
+    }
+
 
     pqSMAdaptor::setMultipleElementProperty(
       selPrism->GetProperty("IDs"), ids);
     pqSMAdaptor::setEnumerationProperty(
-      selPrism->GetProperty("ContentType"),"GLOBALIDs");
+      selPrism->GetProperty("ContentType"),"Indices");
     selPrism->GetProperty("FieldType")->Copy(selSource->GetProperty("FieldType"));
 
     selPrism->UpdateVTKObjects();

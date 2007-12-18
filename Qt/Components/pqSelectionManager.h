@@ -81,6 +81,10 @@ public:
 
   /// For the current selection, returns the list of indices selected.
   QList<QPair<int, vtkIdType> > getIndices();
+
+  /// For the current selection, returns the list of indices selected.
+  QList<QPair<int, vtkIdType> > getIndices(vtkSMProxy* selectionSource,pqOutputPort* opport);
+
 signals:
   /// fired when the selection changes.
   void selectionChanged(pqSelectionManager*);
