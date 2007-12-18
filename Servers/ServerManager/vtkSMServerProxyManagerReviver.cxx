@@ -31,7 +31,7 @@
 
 #include <vtksys/ios/sstream>
 vtkStandardNewMacro(vtkSMServerProxyManagerReviver);
-vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.10");
+vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.11");
 //-----------------------------------------------------------------------------
 vtkSMServerProxyManagerReviver::vtkSMServerProxyManagerReviver()
 {
@@ -121,6 +121,8 @@ int vtkSMServerProxyManagerReviver::ReviveServerServerManager(
   vtkClientServerID id; 
   id.ID = max_id;
 
+  vtkProcessModule::DebugLog(xml_state);
+
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
   if (!parser->Parse(xml_state))
     {
@@ -148,12 +150,18 @@ int vtkSMServerProxyManagerReviver::ReviveServerServerManager(
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->ReserveID(id);
   pm->SendStreamToClientOnlyOn();
+  vtkProcessModule::DebugLog("Pre--FilterStateXML");
   this->FilterStateXML(parser->GetRootElement());
+  vtkProcessModule::DebugLog("Post--FilterStateXML");
+  
   int ret = loader->LoadState(parser->GetRootElement());
+  vtkProcessModule::DebugLog("Post--LoadState");
   pm->SendStreamToClientOnlyOff();
   
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkProcessModule::DebugLog("Pre--UpdateRegisteredProxies");
   pxm->UpdateRegisteredProxies(0);
+  vtkProcessModule::DebugLog("Post--UpdateRegisteredProxies");
 
   loader->Delete();
   parser->Delete();
@@ -163,6 +171,7 @@ int vtkSMServerProxyManagerReviver::ReviveServerServerManager(
 //-----------------------------------------------------------------------------
 void vtkSMServerProxyManagerReviver::FilterStateXML(vtkPVXMLElement* root)
 {
+  
   unsigned int max = root->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < max; cc++)
     {

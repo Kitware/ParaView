@@ -55,6 +55,7 @@
 #include <vtksys/ios/sstream>
 
 vtkProcessModule* vtkProcessModule::ProcessModule = 0;
+ostream* vtkProcessModule::DebugLogStream = 0;
 
 //*****************************************************************************
 class vtkProcessModuleInternals
@@ -105,7 +106,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.76");
+vtkCxxRevisionMacro(vtkProcessModule, "1.77");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -163,6 +164,9 @@ vtkProcessModule::vtkProcessModule()
   // We offset lines/vertices.
   vtkMapper::SetResolveCoincidentTopologyPolygonOffsetFaces(0);
   vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(-1.0, -1.0);
+
+  // ofstream *fp = new ofstream("/tmp/pvdebug.log");
+  // this->InitializeDebugLog(*fp);
 }
 
 //-----------------------------------------------------------------------------
@@ -1764,6 +1768,31 @@ int vtkProcessModule::GetNumberOfConnections()
     return 0;
     }
   return this->ConnectionManager->GetNumberOfConnections();
+}
+
+//-----------------------------------------------------------------------------
+void vtkProcessModule::InitializeDebugLog(ostream& ref)
+{
+  if (vtkProcessModule::DebugLogStream)
+    {
+    vtkGenericWarningMacro("Debug log already initialized.");
+    }
+  vtkProcessModule::DebugLogStream = &ref;
+}
+
+//-----------------------------------------------------------------------------
+void vtkProcessModule::DebugLog(const char* msg)
+{
+  if (vtkProcessModule::DebugLogStream)
+    {
+    *vtkProcessModule::DebugLogStream << msg << endl;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkProcessModule::FinalizeDebugLog()
+{
+  vtkProcessModule::DebugLogStream = 0;
 }
 
 //-----------------------------------------------------------------------------

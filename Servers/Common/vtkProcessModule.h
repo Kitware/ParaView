@@ -594,7 +594,17 @@ public:
   vtkGetStringMacro(LastProgressName);
 
 //BTX
+  // Description:
+  // Initialize the log file.
+  static void InitializeDebugLog(ostream& ref);
 
+  // Description:
+  // Used to dump debug messages.
+  static void DebugLog(const char*);
+
+  // Description:
+  // Finalize debug log.
+  static void FinalizeDebugLog();
 protected:
   vtkProcessModule();
   ~vtkProcessModule();
@@ -732,6 +742,7 @@ private:
   void operator=(const vtkProcessModule&); // Not implemented.
 
   vtkIdType LastConnectionID;
+  static ostream* DebugLogStream;
 //ETX
 };
 
