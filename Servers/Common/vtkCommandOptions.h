@@ -70,6 +70,10 @@ public:
   const char* GetArgv0();
 
   // Description:
+  // Get full path of executable (based on Argv0)
+  const char* GetApplicationPath();
+
+  // Description:
   // Get the index of the last argument parsed.
   int GetLastArgument();
 
@@ -139,6 +143,8 @@ protected:
 
   void CleanArgcArgv();
 
+  void ComputeApplicationPath();
+
   vtkCommandOptionsXMLParser* XMLParser;
 
 private:
@@ -148,6 +154,7 @@ private:
   char* UnknownArgument;
   char* ErrorMessage;
   char* XMLConfigFile;
+  char* ApplicationPath;
   int ProcessType; // data-server, render-server, combined-server, client
 
   vtkCommandOptions(const vtkCommandOptions&); // Not implemented

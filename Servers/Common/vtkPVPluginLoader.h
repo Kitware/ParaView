@@ -45,6 +45,12 @@ public:
   // Desctiption:
   // Get the error string if the plugin failed to load
   vtkGetStringMacro(Error);
+  
+  // Desctiption:
+  // Get a string of standard search paths (path1;path2;path3)
+  // search paths are based on PV_PLUGIN_PATH,
+  // plugin dir relative to executable.
+  vtkGetStringMacro(SearchPaths);
 
 protected:
   vtkPVPluginLoader();
@@ -56,6 +62,7 @@ protected:
   int Loaded;
   char* ServerManagerXML;
   char* Error;
+  char* SearchPaths;
 
 private:
   vtkPVPluginLoader(const vtkPVPluginLoader&); // Not implemented.
