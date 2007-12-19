@@ -30,6 +30,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIceTMultiDisplayRenderViewProxy.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMMaterialLoaderProxy.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationStrategy.h"
@@ -38,7 +39,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.22");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.23");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -145,6 +146,13 @@ bool vtkSMSurfaceRepresentationProxy::EndCreateVTKObjects()
   this->Connect(this->Mapper, this->Prop3D, "Mapper");
   this->Connect(this->LODMapper, this->Prop3D, "LODMapper");
   this->Connect(this->Property, this->Prop3D, "Property");
+
+  vtkSMMaterialLoaderProxy* mlp = vtkSMMaterialLoaderProxy::SafeDownCast(
+    this->GetSubProxy("MaterialLoader"));
+  if (mlp)
+    {
+    mlp->SetPropertyProxy(this->Property);
+    }
 
   this->LinkSelectionProp(this->Prop3D);
 

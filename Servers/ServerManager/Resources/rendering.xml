@@ -5036,6 +5036,7 @@
           <Property name="EdgeColor" />
           <Property name="Interpolation" />
           <Property name="LineWidth" />
+          <Property name="Material" />
           <Property name="Opacity" />
           <Property name="PointSize" />
           <Property name="Shading" />
