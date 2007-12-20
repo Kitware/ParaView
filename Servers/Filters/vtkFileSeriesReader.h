@@ -72,7 +72,7 @@ public:
 
   // Description:
   // Return the MTime also considering the internal reader.
-  unsigned long GetMTime();
+  virtual unsigned long GetMTime();
 
   // Description:
   // Name of the method used to set the file name of the internal
