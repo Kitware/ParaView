@@ -29,10 +29,11 @@
 #include "vtkPointSet.h"
 #include "vtkPoints.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkStructuredGrid.h"
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.13");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.14");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -105,6 +106,27 @@ int vtkIndexBasedBlockFilter::RequestData(vtkInformation*,
   vtkFieldData* outFD = vtkFieldData::New();
   outFD->CopyStructure(inFD);
 
+  vtkPointSet* psInput = vtkPointSet::SafeDownCast(input);
+  vtkRectilinearGrid* rgInput = vtkRectilinearGrid::SafeDownCast(input);
+  vtkImageData* idInput = vtkImageData::SafeDownCast(input);
+  vtkStructuredGrid* sgInput = vtkStructuredGrid::SafeDownCast(input);
+  int* dimensions = 0;
+  if (rgInput)
+    {
+    dimensions = rgInput->GetDimensions();
+    }
+  else if (idInput)
+    {
+    dimensions = idInput->GetDimensions();
+    }
+  else if (sgInput)
+    {
+    dimensions = sgInput->GetDimensions();
+    }
+
+  vtkDoubleArray* points = 0; 
+  vtkIdTypeArray* ijk = 0;
+
   // The length of the individual arrays will be set in the FIELD case
   int maxNumOutputTuples = 0;
   if(this->FieldType == FIELD)
@@ -128,26 +150,35 @@ int vtkIndexBasedBlockFilter::RequestData(vtkInformation*,
     }
   else
     {
-    outFD->SetNumberOfTuples(this->EndIndex-this->StartIndex+1);
-    maxNumOutputTuples = outFD->GetNumberOfTuples();
+    maxNumOutputTuples = this->EndIndex-this->StartIndex+1;
+    outFD->SetNumberOfTuples(maxNumOutputTuples);
     }
 
-  vtkDoubleArray* points = 0; 
-  vtkIdTypeArray* ijk = 0;
+  if (psInput)
+    {
+    points = vtkDoubleArray::New();
+    points->SetName("Point Coordinates");
+    points->SetNumberOfComponents(3);
+    points->SetNumberOfTuples(maxNumOutputTuples);
+    }
+  if (dimensions)
+    {
+    // Compute i,j,k from point id.
+    ijk = vtkIdTypeArray::New();
+    ijk->SetName("Structured Coordinates");
+    ijk->SetNumberOfComponents(3);
+    ijk->SetNumberOfTuples(maxNumOutputTuples);
+    }
 
   vtkIdTypeArray* originalIds = vtkIdTypeArray::New();
   originalIds->SetName("vtkOriginalIndices");
   originalIds->SetNumberOfComponents(1);
   originalIds->SetNumberOfTuples(maxNumOutputTuples);
-  //originalIds->SetNumberOfTuples(outFD->GetNumberOfTuples());
 
-  vtkPointSet* psInput = vtkPointSet::SafeDownCast(input);
-  vtkRectilinearGrid* rgInput = vtkRectilinearGrid::SafeDownCast(input);
-  vtkImageData* idInput = vtkImageData::SafeDownCast(input);
-  int* dimensions = (rgInput? rgInput->GetDimensions() :
-    (idInput? idInput->GetDimensions() : 0));
   vtkIdType inIndex, outIndex;
-  for (inIndex=this->StartIndex, outIndex=0; inIndex <= this->EndIndex; ++inIndex, ++outIndex)
+  for (inIndex=this->StartIndex, outIndex=0; 
+       inIndex <= this->EndIndex; 
+       ++inIndex, ++outIndex)
     {
     originalIds->SetTupleValue(outIndex, &inIndex);
 
@@ -173,25 +204,11 @@ int vtkIndexBasedBlockFilter::RequestData(vtkInformation*,
       {
       if (psInput)
         {
-        if (!points)
-          {
-          points = vtkDoubleArray::New();
-          points->SetName("Point Coordinates");
-          points->SetNumberOfComponents(3);
-          points->SetNumberOfTuples(outFD->GetNumberOfTuples());
-          }
         points->SetTuple(outIndex, psInput->GetPoint(inIndex));
         }
-      else if (dimensions)
+      if (dimensions)
         {
         // Compute i,j,k from point id.
-        if (!ijk)
-          {
-          ijk = vtkIdTypeArray::New();
-          ijk->SetName("Structured Coordinates");
-          ijk->SetNumberOfComponents(3);
-          ijk->SetNumberOfTuples(outFD->GetNumberOfTuples());
-          }
         vtkIdType tuple[3];
         tuple[0] = (inIndex % dimensions[0]);
         tuple[1] = (inIndex/dimensions[0]) % dimensions[1];
@@ -212,7 +229,6 @@ int vtkIndexBasedBlockFilter::RequestData(vtkInformation*,
     outFD->AddArray(ijk);
     ijk->Delete();
     }
-
   if (this->FieldType != FIELD)
     {
     // Original ids are only added for points or cells.
@@ -254,7 +270,7 @@ bool vtkIndexBasedBlockFilter::DetermineBlockIndices()
 
   case POINT:
   default:
-    numFields = input->GetPointData()->GetNumberOfTuples();
+    numFields = input->GetNumberOfPoints();
     }
 
   int numProcs = this->Controller? this->Controller->GetNumberOfProcesses():1;
