@@ -139,3 +139,9 @@ SET( HDF5_PRINTF_LL_TEST_RUN__TRYRUN_OUTPUT
      "PRINTF_LL_WIDTH=[ll]"
      CACHE STRING "Output from TRY_RUN" FORCE)
 
+# the following lines have been added manually
+# xlc has a pthread.h which can be included, but it's basically empty
+# anyway check_include_files(pthread.h) returns TRUE, so a more
+# sophisticated test would be required. Just force the correct result here.
+SET(HAVE_PTHREAD_H FALSE CACHE BOOL "No usable pthread.h" FORCE)
+SET(CMAKE_HAVE_PTHREAD_H FALSE CACHE BOOL "No usable pthread.h" FORCE)
