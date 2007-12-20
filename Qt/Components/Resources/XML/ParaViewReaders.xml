@@ -173,4 +173,19 @@
           file_description="Comma-separated-values">
   </Reader>
 
+  <Reader name="MFIXReader"
+          extensions="RES"
+          file_description="MFIX Unstructured Grid Files">
+  </Reader>
+
+  <Reader name="FLUENTReader"
+          extensions="cas"
+          file_description="Fluent Case Files">
+  </Reader>
+
+  <Reader name="OpenFOAMReader"
+          extensions="foam"
+          file_description="OpenFOAM Files">
+  </Reader>
+
 </ParaViewReaders>
