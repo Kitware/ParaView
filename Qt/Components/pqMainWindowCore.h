@@ -48,6 +48,7 @@ class pqAnimationManager;
 class pqAnimationPanel;
 class pqAnimationScene;
 class pqAnimationViewWidget;
+class pqDockWindowInterface;
 class pqGenericViewModule;
 class pqLookmarkManagerModel;
 class pqMultiView;
@@ -111,6 +112,11 @@ public:
   void setSourceMenu(QMenu* menu);
   /// Assigns a menu to be populated with filters
   void setFilterMenu(QMenu* menu);
+
+  /// Assigns a menu to be populated with plugin dock windows
+  void setToolbarMenu(pqViewMenu *menu);
+  /// Assigns a menu to be populated with plugin toolbars
+  void setDockWindowMenu(pqViewMenu *menu);
   
   pqPipelineMenu& pipelineMenu();
   pqPipelineBrowser* pipelineBrowser();
@@ -427,8 +433,9 @@ private slots:
 
   void onPostAccept();
 
-  void addPluginActions(QObject* iface);
+  void addPluginInterface(QObject* iface);
   void addPluginActions(pqActionGroupInterface* iface);
+  void addPluginDockWindow(pqDockWindowInterface* iface);
 
   /// This method is called once after the application event loop
   /// begins. This is where we process certain command line options

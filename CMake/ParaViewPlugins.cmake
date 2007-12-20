@@ -317,6 +317,48 @@ MACRO(ADD_PARAVIEW_ACTION_GROUP OUTIFACES OUTSRCS)
       )
 ENDMACRO(ADD_PARAVIEW_ACTION_GROUP)
 
+# create implementation for a dock window interface
+# ADD_PARAVIEW_DOCK_WINDOW(
+#    OUTIFACES
+#    OUTSRCS
+#    CLASS_NAME classname
+#    [DOCK_AREA areaname]
+#
+#  CLASS_NAME: is the name of the class that implements a QDockWidget
+#  DOCK_AREA: option to specify the dock area (Left | Right | Top | Bottom)
+#             Left is the default
+MACRO(ADD_PARAVIEW_DOCK_WINDOW OUTIFACES OUTSRCS)
+
+  SET(ARG_DOCK_AREA)
+
+  PV_PLUGIN_PARSE_ARGUMENTS(ARG "CLASS_NAME;DOCK_AREA" "" ${ARGN} )
+
+  IF(ARG_DOCK_AREA)
+    SET(DOCK_AREA ${ARG_DOCK_AREA})
+  ELSE(ARG_DOCK_AREA)
+    SET(DOCK_AREA Left)
+  ENDIF(ARG_DOCK_AREA)
+  SET(CLASS_NAME ${ARG_CLASS_NAME})
+  SET(${OUTIFACES} ${CLASS_NAME})
+
+  CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Components/pqDockWindowImplementation.h.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/${CLASS_NAME}Implementation.h @ONLY)
+  CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Components/pqDockWindowImplementation.cxx.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/${CLASS_NAME}Implementation.cxx @ONLY)
+
+  GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
+  SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${QT_INCLUDE_DIRS};${PARAVIEW_GUI_INCLUDE_DIRS}")
+  SET(ACTION_MOC_SRCS)
+  QT4_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${CLASS_NAME}Implementation.h)
+  SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
+
+  SET(${OUTSRCS} 
+      ${CMAKE_CURRENT_BINARY_DIR}/${CLASS_NAME}Implementation.cxx
+      ${CMAKE_CURRENT_BINARY_DIR}/${CLASS_NAME}Implementation.h
+      ${ACTION_MOC_SRCS}
+      )
+ENDMACRO(ADD_PARAVIEW_DOCK_WINDOW)
+
 # create implementation for a Qt/ParaView plugin given a 
 # module name and a list of interfaces
 # ADD_PARAVIEW_GUI_EXTENSION(OUTSRCS NAME INTERFACES iface1;iface2;iface3)

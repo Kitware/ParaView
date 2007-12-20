@@ -69,6 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataInformationWidget.h"
 #include "pqDisplayColorWidget.h"
 #include "pqDisplayRepresentationWidget.h"
+#include "pqDockWindowInterface.h"
 #include "pqFilterInputDialog.h"
 #include "pqFiltersMenuManager.h"
 #include "pqHelperProxyRegisterUndoElement.h"
@@ -129,6 +130,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewContextMenuManager.h"
 #include "pqView.h"
 #include "pqViewManager.h"
+#include "pqViewMenu.h"
 #include "pqWriterFactory.h"
 
 #include <pqFileDialog.h>
@@ -245,6 +247,8 @@ public:
  
   QPointer<pqFiltersMenuManager> FiltersMenuManager;
   QPointer<pqProxyMenuManager> SourcesMenuManager;
+  QPointer<pqViewMenu> ToolbarMenu;
+  QPointer<pqViewMenu> DockWindowMenu;
 
   pqPipelineMenu* PipelineMenu;
   pqPipelineBrowser *PipelineBrowser;
@@ -467,7 +471,7 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   this->connect(pqApplicationCore::instance()->getPluginManager(),
                 SIGNAL(guiInterfaceLoaded(QObject*)),
                 this,
-                SLOT(addPluginActions(QObject*)));
+                SLOT(addPluginInterface(QObject*)));
 
 /*
   this->installEventFilter(this);
@@ -623,6 +627,18 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
     fmm->initialize();
     
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::setToolbarMenu(pqViewMenu *menu)
+{
+  this->Implementation->ToolbarMenu = menu;
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::setDockWindowMenu(pqViewMenu *menu)
+{
+  this->Implementation->DockWindowMenu = menu;
 }
 
 //-----------------------------------------------------------------------------
@@ -3195,13 +3211,19 @@ void pqMainWindowCore::onManagePlugins()
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::addPluginActions(QObject* iface)
+void pqMainWindowCore::addPluginInterface(QObject* iface)
 {
   pqActionGroupInterface* actionGroup =
     qobject_cast<pqActionGroupInterface*>(iface);
+  pqDockWindowInterface* dockWindow =
+    qobject_cast<pqDockWindowInterface*>(iface);
   if(actionGroup)
     {
     this->addPluginActions(actionGroup);
+    }
+  else if(dockWindow)
+    {
+    this->addPluginDockWindow(dockWindow);
     }
 }
 
@@ -3235,6 +3257,12 @@ void pqMainWindowCore::addPluginActions(pqActionGroupInterface* iface)
     tb->addActions(iface->actionGroup()->actions());
     mw->addToolBar(tb);
     this->Implementation->PluginToolBars.append(tb);
+
+    // Add the toolbar to the view menu.
+    if(this->Implementation->ToolbarMenu)
+      {
+      this->Implementation->ToolbarMenu->addWidget(tb, splitName[1]);
+      }
     }
   else if(splitName.size() == 2 && splitName[0] == "MenuBar")
     {
@@ -3253,6 +3281,53 @@ void pqMainWindowCore::addPluginActions(pqActionGroupInterface* iface)
   else 
     {
     qWarning("Action group doesn't have an identifier.");
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::addPluginDockWindow(pqDockWindowInterface* iface)
+{
+  QMainWindow* mw = qobject_cast<QMainWindow*>(this->Implementation->Parent);
+  if(!mw)
+    {
+    QWidgetList allWidgets = QApplication::topLevelWidgets();
+    QWidgetList::iterator iter;
+    for(iter = allWidgets.begin(); !mw && iter != allWidgets.end(); ++iter)
+      {
+      mw = qobject_cast<QMainWindow*>(*iter);
+      }
+    }
+
+  if(!mw)
+    {
+    qWarning("Could not find MainWindow for dock window");
+    return;
+    }
+
+  // Get the dock area.
+  QString area = iface->dockArea();
+  Qt::DockWidgetArea dArea = Qt::LeftDockWidgetArea;
+  if(area.compare("Right", Qt::CaseInsensitive) == 0)
+    {
+    dArea = Qt::RightDockWidgetArea;
+    }
+  else if(area.compare("Top", Qt::CaseInsensitive) == 0)
+    {
+    dArea = Qt::TopDockWidgetArea;
+    }
+  else if(area.compare("Bottom", Qt::CaseInsensitive) == 0)
+    {
+    dArea = Qt::BottomDockWidgetArea;
+    }
+
+  // Create the dock window.
+  QDockWidget *dock = iface->dockWindow(mw);
+  mw->addDockWidget(dArea, dock);
+
+  // Add the dock window to the view menu.
+  if(this->Implementation->DockWindowMenu)
+    {
+    this->Implementation->DockWindowMenu->addWidget(dock, dock->windowTitle());
     }
 }
 
