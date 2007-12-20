@@ -82,6 +82,8 @@ protected:
   void Exec();
   void Exec(const char*);
 
+  virtual int FillOutputPortInformation(int port, vtkInformation* info);
+
   //overridden to allow multiple inputs to port 0
   virtual int FillInputPortInformation(int port, vtkInformation *info);
 

@@ -29,7 +29,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.23");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.24");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -144,9 +144,34 @@ int vtkPythonProgrammableFilter::RequestDataObject(
 {
   if (this->OutputDataSetType == VTK_DATA_SET)
     {
-    return this->Superclass::RequestDataObject(
-      inInfo, inputVector, outputVector
-      );
+    // Output type is same as input
+    vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+    if (!inInfo)
+      {
+      return 0;
+      }
+    vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+    if (input)
+      {
+      // for each output
+      for(int i=0; i < this->GetNumberOfOutputPorts(); ++i)
+        {
+        vtkInformation* info = outputVector->GetInformationObject(i);
+        vtkDataObject *output = info->Get(vtkDataObject::DATA_OBJECT());
+        
+        if (!output || !output->IsA(input->GetClassName())) 
+          {
+          vtkDataObject* newOutput = input->NewInstance();
+          newOutput->SetPipelineInformation(info);
+          cout << "Created: " << newOutput->GetClassName() << endl;
+          newOutput->Delete();
+          this->GetOutputPortInformation(0)->Set(
+            vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
+          }
+        }
+      return 1;
+      }
+    return 0;
     }
 
   const char *outTypeStr = 
@@ -290,6 +315,14 @@ void vtkPythonProgrammableFilter::Exec()
   this->Exec(this->Script);
 }
 
+//----------------------------------------------------------------------------
+int vtkPythonProgrammableFilter::FillOutputPortInformation(
+  int vtkNotUsed(port), vtkInformation* info)
+{
+  // now add our info
+  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
+  return 1;
+}
 
 //----------------------------------------------------------------------------
 int vtkPythonProgrammableFilter::FillInputPortInformation(
@@ -301,7 +334,7 @@ int vtkPythonProgrammableFilter::FillInputPortInformation(
     }
   if(port==0)
     {
-    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
     info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
     info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
     }
