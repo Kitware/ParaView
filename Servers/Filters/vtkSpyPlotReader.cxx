@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkRectilinearGrid.h"
-#include "vtkImageData.h"
+#include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedCharArray.h"
 
@@ -61,7 +61,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.53");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.54");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -1403,7 +1403,8 @@ int vtkSpyPlotReader::PrepareAMRData(vtkHierarchicalDataSet *hb,
                                          origin, extents, 
                                          realExtents,
                                          realDims);
-  vtkImageData* ug = vtkImageData::New();
+  //vtkImageData* ug = vtkImageData::New();
+  vtkUniformGrid* ug = vtkUniformGrid::New();
   hb->SetDataSet(*level, hb->GetNumberOfDataSets(*level), ug);
   ug->SetSpacing(spacing);
   ug->SetExtent(extents);
