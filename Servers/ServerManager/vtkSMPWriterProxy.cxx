@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMPWriterProxy);
-vtkCxxRevisionMacro(vtkSMPWriterProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMPWriterProxy, "1.8");
 //-----------------------------------------------------------------------------
 vtkSMPWriterProxy::vtkSMPWriterProxy()
 {
@@ -68,6 +68,7 @@ void vtkSMPWriterProxy::CreateVTKObjects()
       << "SetNumberOfPieces"
       << vtkClientServerStream::LastResult 
       << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers, str);
 
   // ALTERNATIVE: 1
   str << vtkClientServerStream::Invoke
@@ -88,6 +89,7 @@ void vtkSMPWriterProxy::CreateVTKObjects()
       << "SetEndPiece"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers, str);
 
   // ALTERNATIVE: 2
   str << vtkClientServerStream::Invoke
@@ -99,7 +101,8 @@ void vtkSMPWriterProxy::CreateVTKObjects()
       << "SetPiece"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-  
+  pm->SendStream(this->ConnectionID, this->Servers, str);
+
   // Restore ReportInterpreterErrors flag.
   str << vtkClientServerStream::Invoke
       << pm->GetProcessModuleID()
