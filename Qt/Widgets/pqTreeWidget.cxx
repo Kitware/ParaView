@@ -120,11 +120,18 @@ pqTreeWidget::pqTreeWidget(QWidget* p)
                    this, SLOT(invalidateLayout()));
   QObject::connect(this->model(), SIGNAL(modelReset()),
                    this, SLOT(invalidateLayout()));
+
+  this->Timer = new QTimer(this);
+  this->Timer->setSingleShot(true);
+  this->Timer->setInterval(10);
+  QObject::connect(this->Timer, SIGNAL(timeout()),
+    this, SLOT(updateCheckStateInternal()));
 }
 
 //-----------------------------------------------------------------------------
 pqTreeWidget::~pqTreeWidget()
 {
+  delete this->Timer;
   for(int i=0; i<pqMaxCheck; i++)
     {
     delete this->CheckPixmaps[i];
@@ -153,6 +160,15 @@ bool pqTreeWidget::event(QEvent* e)
 
 //-----------------------------------------------------------------------------
 void pqTreeWidget::updateCheckState()
+{
+  this->Timer->start();
+  // updateCheckStateInternal needs to call rowIndex() which forces the tree to
+  // sort. Hence when multiple items are being added/updated the tree is sorted
+  // after every insert. To avoid that we use this timer.
+}
+
+//-----------------------------------------------------------------------------
+void pqTreeWidget::updateCheckStateInternal()
 {
   Qt::CheckState newState = Qt::Checked;
   int numChecked = 0;

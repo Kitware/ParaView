@@ -113,7 +113,18 @@ pqTreeWidgetItemObject* pqSignalAdaptorTreeWidget::appendValue(
 //-----------------------------------------------------------------------------
 void pqSignalAdaptorTreeWidget::setValues(const QList<QVariant>& new_values)
 {
+  this->blockSignals(true);
   int column_count = this->TreeWidget->columnCount();
+
+  QList<QTreeWidgetItem*> items;
+  // Disconnect all items first.
+  int num_items = this->TreeWidget->topLevelItemCount();
+  for (int cc=0; cc < num_items; cc++)
+    {
+    QObject::disconnect(
+      dynamic_cast<pqTreeWidgetItemObject*>(this->TreeWidget->topLevelItem(cc)), 0, 
+      this, 0);
+    }
   this->TreeWidget->clear();
 
   if (new_values.size()%column_count != 0)
@@ -129,16 +140,17 @@ void pqSignalAdaptorTreeWidget::setValues(const QList<QVariant>& new_values)
       column_values.push_back(new_values[cc+i].toString());
       }
     pqTreeWidgetItemObject* item = new pqTreeWidgetItemObject(
-      this->TreeWidget, column_values);
+      (QTreeWidget*)NULL, column_values);
     if (this->Editable)
       {
       item->setFlags(item->flags()| Qt::ItemIsEditable);
       QObject::connect(item, SIGNAL(modified()), 
         this, SIGNAL(valuesChanged()));
       }
-    QObject::connect(item, SIGNAL(destroyed()), this, SIGNAL(valuesChanged()),
-      Qt::QueuedConnection);
+    QObject::connect(item, SIGNAL(destroyed()), this, SIGNAL(valuesChanged()));
+    items.push_back(item);
     }
-
+  this->TreeWidget->addTopLevelItems(items);
+  this->blockSignals(false);
   emit this->valuesChanged();
 }

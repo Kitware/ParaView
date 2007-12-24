@@ -72,6 +72,9 @@ protected slots:
   void updateCheckState();
   void invalidateLayout();
 
+private slots:
+  void updateCheckStateInternal();
+
 protected:
   QPixmap** CheckPixmaps;
   QPixmap pixmap(Qt::CheckState state, bool active);
@@ -80,6 +83,8 @@ protected:
   /// using the information provided by the button modifiers.
   virtual QModelIndex moveCursor(CursorAction cursorAction, 
     Qt::KeyboardModifiers modifiers);
+
+  QTimer* Timer;
 };
 
 #endif // !_pqTreeWidget_h
