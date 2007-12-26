@@ -132,6 +132,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewManager.h"
 #include "pqViewMenu.h"
 #include "pqWriterFactory.h"
+#include "pqSaveSnapshotDialog.h"
 
 #include <pqFileDialog.h>
 #include <pqObjectNaming.h>
@@ -1665,6 +1666,15 @@ void pqMainWindowCore::onFileSaveScreenshot()
     return;
     }
 
+  pqSaveSnapshotDialog ssDialog(this->Implementation->Parent);
+  ssDialog.setViewSize(view->getSize());
+
+  if (ssDialog.exec() != QDialog::Accepted)
+    {
+    return;
+    }
+  QSize chosenSize = ssDialog.viewSize();
+
   QString filters;
   filters += "PNG image (*.png)";
   filters += ";;BMP image (*.bmp)";
@@ -1675,29 +1685,17 @@ void pqMainWindowCore::onFileSaveScreenshot()
   filters += ";;All files (*)";
   pqFileDialog* const file_dialog = new pqFileDialog(NULL,
     this->Implementation->Parent, tr("Save Screenshot:"), QString(), filters);
-  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   file_dialog->setObjectName("FileSaveScreenshotDialog");
   file_dialog->setFileMode(pqFileDialog::AnyFile);
-  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
-    this, SLOT(onFileSaveScreenshot(const QStringList&)));
-  file_dialog->setModal(true);
-  file_dialog->show();
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::onFileSaveScreenshot(const QStringList& files)
-{
-  pqView* view = pqActiveView::instance().current();
-  if(!view)
+  if (file_dialog->exec() == QDialog::Accepted)
     {
-    qDebug() << "Cannnot save image. No active view.";
-    return;
-    }
-  for(int i = 0; i != files.size(); ++i)
-    {
-    if(!view->saveImage(0, 0, files[i]))
+    QStringList files = file_dialog->getSelectedFiles();
+    for(int i = 0; i != files.size(); ++i)
       {
-      qCritical() << "Save Image failed.";
+      if(!view->saveImage(chosenSize.width(), chosenSize.height(), files[i]))
+        {
+        qCritical() << "Save Image failed.";
+        }
       }
     }
 }

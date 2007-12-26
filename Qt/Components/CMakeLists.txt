@@ -154,6 +154,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSMSignalAdaptors.h
   pqSampleScalarAddRangeDialog.h
   pqSampleScalarWidget.h
+  pqSaveSnapshotDialog.h
   pqScalarSetModel.h
   pqSelectionInspectorPanel.h
   pqSelectReaderDialog.h
@@ -248,6 +249,7 @@ SET(UI_FORMS
   Resources/UI/pqRenderViewOptions.ui
   Resources/UI/pqSampleScalarAddRangeDialog.ui
   Resources/UI/pqSampleScalarWidget.ui
+  Resources/UI/pqSaveSnapshotDialog.ui
   Resources/UI/pqSelectionInspectorPanel.ui
   Resources/UI/pqSelectReaderDialog.ui
   Resources/UI/pqServerBrowser.ui
@@ -543,6 +545,8 @@ ADD_LIBRARY(pqComponents
   pqSampleScalarAddRangeDialog.h
   pqSampleScalarWidget.cxx
   pqSampleScalarWidget.h
+  pqSaveSnapshotDialog.cxx
+  pqSaveSnapshotDialog.h
   pqScalarSetModel.cxx
   pqScalarSetModel.h
   pqSelectionInspectorPanel.cxx

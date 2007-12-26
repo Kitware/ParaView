@@ -73,6 +73,10 @@ public:
   QString getViewType() const
     { return this->ViewType; }
 
+
+  /// Computes the magnification and view size given the current view size for
+  /// the full size for the view.
+  static int computeMagnification(const QSize& fullsize, QSize& viewsize);
 public slots:
   /// Request a StillRender on idle. Multiple calls are collapsed into one. 
   virtual void render();

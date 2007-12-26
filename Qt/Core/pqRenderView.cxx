@@ -546,10 +546,14 @@ vtkImageData* pqRenderView::captureImage(int magnification)
 //-----------------------------------------------------------------------------
 bool pqRenderView::saveImage(int width, int height, const QString& filename)
 {
-  QSize cur_size = this->Internal->Viewport->size();
+  QSize cursize = this->Internal->Viewport->size();
+  QSize fullsize = QSize(width, height);
+  QSize newsize = cursize;
+  int magnification = 1;
   if (width>0 && height>0)
     {
-    this->Internal->Viewport->resize(width, height);
+    magnification = pqView::computeMagnification(fullsize, newsize);
+    this->Internal->Viewport->resize(newsize);
     }
   this->render();
   const char* writername = 0;
@@ -577,6 +581,7 @@ bool pqRenderView::saveImage(int width, int height, const QString& filename)
     }
   else if(file.completeSuffix() == "pdf")
     {
+    // FIXME: Does not take user-specified image size into consideration.
     QPrinter printer(QPrinter::HighResolution);
     printer.setOutputFormat(QPrinter::PdfFormat);
     printer.setOutputFileName(filename);
@@ -602,11 +607,11 @@ bool pqRenderView::saveImage(int width, int height, const QString& filename)
     }
 
   int ret = this->getRenderViewProxy()->WriteImage(
-    filename.toAscii().data(), writername);
+    filename.toAscii().data(), writername, magnification);
   if (width>0 && height>0)
     {
-    this->Internal->Viewport->resize(width, height);
-    this->Internal->Viewport->resize(cur_size);
+    this->Internal->Viewport->resize(newsize);
+    this->Internal->Viewport->resize(cursize);
     this->render();
     }
   return (ret == vtkErrorCode::NoError);

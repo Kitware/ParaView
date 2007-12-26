@@ -32,11 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 
 // ParaView Server Manager includes.
-#include "vtkProcessModule.h"
-#include "vtkSMViewProxy.h"
-#include "vtkSmartPointer.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkMath.h"
+#include "vtkProcessModule.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMViewProxy.h"
 
 // Qt includes.
 #include <QList>
@@ -51,6 +52,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqTimeKeeper.h"
+
+inline int pqCeil(double val)
+{
+  if (static_cast<int>(val) == val)
+    {
+    return static_cast<int>(val);
+    }
+  return static_cast<int>(vtkMath::Round(val+0.5));
+}
 
 template<class T>
 inline uint qHash(QPointer<T> p)
@@ -296,4 +306,20 @@ QSize pqView::getSize()
 {
   QWidget* widget = this->getWidget();
   return widget? widget->size(): QSize(0, 0);
+}
+
+//-----------------------------------------------------------------------------
+int pqView::computeMagnification(const QSize& fullsize, QSize& viewsize)
+{
+  int magnification = 1;
+
+  // If fullsize > viewsize, then magnification is involved.
+  int temp = ::pqCeil(fullsize.width()/static_cast<double>(viewsize.width()));
+  magnification = (temp> magnification)? temp: magnification;
+
+  temp = ::pqCeil(fullsize.height()/static_cast<double>(viewsize.height()));
+  magnification = (temp > magnification)? temp : magnification;
+
+  viewsize = fullsize/magnification;
+  return magnification;
 }

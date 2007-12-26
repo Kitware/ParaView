@@ -65,15 +65,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "pqMultiView.h"
 
-static int pqCeil(double val)
-{
-  if (static_cast<int>(val) == val)
-    {
-    return static_cast<int>(val);
-    }
-  return static_cast<int>(vtkMath::Round(val+0.5));
-}
-
 #define SEQUENCE 0
 #define REALTIME 1
 #define SNAP_TO_TIMESTEPS 2
@@ -591,16 +582,7 @@ int pqAnimationManager::updateViewSizes(QSize newSize, QSize currentSize)
         newSize.width()).arg(newSize.height()));
     }
 
-  int magnification = 1;
-
-  // If newSize > currentSize, then magnification is involved.
-  int temp = ::pqCeil(newSize.width()/static_cast<double>(currentSize.width()));
-  magnification = (temp> magnification)? temp: magnification;
-
-  temp = ::pqCeil(newSize.height()/static_cast<double>(currentSize.height()));
-  magnification = (temp > magnification)? temp : magnification;
-
-  newSize = newSize/magnification;
+  int magnification = pqView::computeMagnification(newSize, currentSize);
 
   if (!this->Internals->ViewWidget)
     {
@@ -615,9 +597,9 @@ int pqAnimationManager::updateViewSizes(QSize newSize, QSize currentSize)
     // smaller than actual size of the widget. The difference is padding.
     // pqMultiView::computeSize() returns the widget size required to achieve
     // the client size requested.
-    newSize = this->Internals->ViewWidget->computeSize(newSize);
-    this->Internals->ViewWidget->setMaximumSize(newSize);
-    this->Internals->ViewWidget->resize(newSize);
+    currentSize = this->Internals->ViewWidget->computeSize(currentSize);
+    this->Internals->ViewWidget->setMaximumSize(currentSize);
+    this->Internals->ViewWidget->resize(currentSize);
     pqEventDispatcher::processEventsAndWait(1);
     }
 
