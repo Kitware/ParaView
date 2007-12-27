@@ -435,12 +435,13 @@ void pqPlotView::renderInternal()
 //-----------------------------------------------------------------------------
 vtkImageData* pqPlotView::captureImage(int magnification)
 {
-  QSize curSize = this->getWidget()->size();
+  QWidget* plot_widget = this->getWidget();
+  QSize curSize = plot_widget->size();
   QSize newSize = curSize*magnification;
   if (magnification > 1)
     {
     // Magnify.
-    this->getWidget()->resize(newSize);
+    plot_widget->resize(newSize);
     }
 
   // vtkSMRenderViewProxy::CaptureWindow() ensures that render is called on the
@@ -452,12 +453,12 @@ vtkImageData* pqPlotView::captureImage(int magnification)
   // image.
   pqEventDispatcher::processEventsAndWait(0);
 
-  QPixmap grabbedPixMap = QPixmap::grabWidget(this->getWidget());
+  QPixmap grabbedPixMap = QPixmap::grabWidget(plot_widget);
 
   if (magnification > 1)
     {
     // Restore size.
-    this->getWidget()->resize(curSize);
+    plot_widget->resize(curSize);
     }
 
   // Now we need to convert this pixmap to vtkImageData.
@@ -477,14 +478,14 @@ vtkImageData* pqPlotView::captureImage(int magnification)
 }
 
 //-----------------------------------------------------------------------------
-bool pqPlotView::saveImage(int width, int height, 
-    const QString& filename)
+bool pqPlotView::saveImage(int width, int height, const QString& filename)
 {
+  QWidget* plot_widget = this->getWidget();
   QSize curSize;
   if (width != 0 && height != 0)
     {
-    curSize = this->getWidget()->size();
-    this->getWidget()->resize(width, height);
+    curSize = plot_widget->size();
+    plot_widget->resize(width, height);
     }
 
   if (QFileInfo(filename).suffix().toLower() == "pdf")
@@ -516,21 +517,21 @@ bool pqPlotView::saveImage(int width, int height,
       {
       if (curSize.isValid())
         {
-        this->getWidget()->resize(curSize);
+        plot_widget->resize(curSize);
         }
       return false;
       }
     if (curSize.isValid())
       {
-      this->getWidget()->resize(curSize);
+      plot_widget->resize(curSize);
       }
     return true;
     }
 
-  QPixmap grabbedPixMap = QPixmap::grabWidget(this->getWidget());
+  QPixmap grabbedPixMap = QPixmap::grabWidget(plot_widget);
   if (curSize.isValid())
     {
-    this->getWidget()->resize(curSize);
+    plot_widget->resize(curSize);
     }
   return grabbedPixMap.save(filename);
 }

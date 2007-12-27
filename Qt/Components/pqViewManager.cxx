@@ -890,9 +890,12 @@ void pqViewManager::updateViewPositions()
   
   foreach(pqView* view, this->Internal->Frames)
     {
-    QRect bounds = view->getWidget()->rect();
-    bounds.moveTo(view->getWidget()->mapToGlobal(QPoint(0,0)));
-    totalBounds |= bounds;
+    if (view->getWidget()->isVisible())
+      {
+      QRect bounds = view->getWidget()->rect();
+      bounds.moveTo(view->getWidget()->mapToGlobal(QPoint(0,0)));
+      totalBounds |= bounds;
+      }
     }
 
   /// GUISize, ViewSize and ViewPosition properties are managed
@@ -903,6 +906,10 @@ void pqViewManager::updateViewPositions()
   // Now we loop thorough all view modules and set the GUISize/ViewPosition.
   foreach(pqView* view, this->Internal->Frames)
     {
+    if (!view->getWidget()->isVisible())
+      {
+      continue;
+      }
     vtkSMIntVectorProperty* prop = 0;
 
     // set size containing all views
@@ -1272,8 +1279,11 @@ bool pqViewManager::saveImage(int _width, int _height, const QString& filename)
     if (view)
       {
       vtkImageData* image = view->captureImage(magnification);
-      vtkSMAnimationSceneImageWriter::Merge(fullImage, image);
-      image->Delete();
+      if (image)
+        {
+        vtkSMAnimationSceneImageWriter::Merge(fullImage, image);
+        image->Delete();
+        }
       }
     }
 

@@ -540,7 +540,13 @@ void pqRenderView::resetCenterOfRotation()
 //-----------------------------------------------------------------------------
 vtkImageData* pqRenderView::captureImage(int magnification)
 {
-  return this->getRenderViewProxy()->CaptureWindow(magnification);
+  if (this->getWidget()->isVisible())
+    {
+    return this->getRenderViewProxy()->CaptureWindow(magnification);
+    }
+
+  // Don't return any image when the view is not visible.
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------
