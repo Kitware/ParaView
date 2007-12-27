@@ -1689,13 +1689,21 @@ void pqMainWindowCore::onFileSaveScreenshot()
   file_dialog->setFileMode(pqFileDialog::AnyFile);
   if (file_dialog->exec() == QDialog::Accepted)
     {
-    QStringList files = file_dialog->getSelectedFiles();
-    for(int i = 0; i != files.size(); ++i)
+    bool saved;
+    QString file = file_dialog->getSelectedFiles()[0];
+    if (ssDialog.saveAllViews())
       {
-      if(!view->saveImage(chosenSize.width(), chosenSize.height(), files[i]))
-        {
-        qCritical() << "Save Image failed.";
-        }
+      saved = this->multiViewManager().saveImage( 
+        chosenSize.width(), chosenSize.height(), file);
+      }
+    else
+      {
+      saved = view->saveImage(
+          chosenSize.width(), chosenSize.height(), file);
+      }
+    if (!saved)
+      {
+      qCritical() << "Save Image failed.";
       }
     }
 }
@@ -1709,15 +1717,7 @@ void pqMainWindowCore::onFileSaveAnimation()
     qDebug() << "Cannot save animation since no active scene is present.";
     return;
     }
-
-  // This is essential since we don't want the view frame
-  // decorations to appear in our animation.
-  this->multiViewManager().hideDecorations();
-  if (!mgr->saveAnimation())
-    {
-    // qDebug() << "Animation save failed!";
-    }
-  this->multiViewManager().showDecorations();
+  mgr->saveAnimation();
 }
 
 //-----------------------------------------------------------------------------

@@ -63,7 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 #include "pqView.h"
-#include "pqMultiView.h"
+#include "pqViewManager.h"
 
 #define SEQUENCE 0
 #define REALTIME 1
@@ -74,7 +74,7 @@ class pqAnimationManager::pqInternals
 {
 public:
   QPointer<pqServer> ActiveServer;
-  QPointer<pqMultiView> ViewWidget;
+  QPointer<pqViewManager> ViewWidget;
   typedef QMap<pqServer*, QPointer<pqAnimationScene> > SceneMap;
   SceneMap Scenes;
   Ui::Dialog* AnimationSettingsDialog;
@@ -108,7 +108,7 @@ pqAnimationManager::~pqAnimationManager()
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationManager::setViewWidget(pqMultiView* w)
+void pqAnimationManager::setViewWidget(pqViewManager* w)
 {
   this->Internals->ViewWidget = w;
 }
@@ -281,6 +281,30 @@ void pqAnimationManager::updateGUI()
 }
 
 #define PADDING_COMPENSATION QSize(16, 16);
+inline void enforceMultiple4(QSize& newSize)
+{
+  QSize requested_newSize = newSize;
+  int &width = newSize.rwidth();
+  int &height = newSize.rheight();
+  if ((width % 4) > 0)
+    {
+    width -= width % 4;
+    }
+  if ((height % 4) > 0)
+    {
+    height -= height % 4;
+    }
+
+  if (requested_newSize != newSize)
+    {
+    QMessageBox::warning(NULL, "Resolution Changed",
+      QString("The requested resolution has been changed from (%1, %2)\n").arg(
+        requested_newSize.width()).arg(requested_newSize.height()) + 
+      QString("to (%1, %2) to match format specifications.").arg(
+        newSize.width()).arg(newSize.height()));
+    }
+}
+
 //-----------------------------------------------------------------------------
 bool pqAnimationManager::saveAnimation()
 {
@@ -465,7 +489,8 @@ bool pqAnimationManager::saveAnimation()
     dialogUI.spinBoxHeight->value());
 
   // Enforce any view size conditions (such a multiple of 4). 
-  int magnification = this->updateViewSizes(newSize, viewSize);
+  ::enforceMultiple4(newSize); 
+  int magnification = this->Internals->ViewWidget->prepareForCapture(newSize);
  
   if (disconnect_and_save)
     {
@@ -501,7 +526,7 @@ bool pqAnimationManager::saveAnimation()
     reviver->Delete();
     emit this->endNonUndoableChanges();
     pqApplicationCore::instance()->getObjectBuilder()->removeServer(server);
-    this->restoreViewSizes();
+    this->Internals->ViewWidget->finishedCapture();
     emit this->disconnectServer();
     return status;
     }
@@ -552,68 +577,9 @@ bool pqAnimationManager::saveAnimation()
     break;
     }
   sceneProxy->UpdateVTKObjects();
-
-  this->restoreViewSizes();
+  this->Internals->ViewWidget->finishedCapture();
   emit this->endNonUndoableChanges();
   return status;
-}
-
-//-----------------------------------------------------------------------------
-int pqAnimationManager::updateViewSizes(QSize newSize, QSize currentSize)
-{
-  QSize requested_newSize = newSize;
-  int &width = newSize.rwidth();
-  int &height = newSize.rheight();
-  if ((width % 4) > 0)
-    {
-    width -= width % 4;
-    }
-  if ((height % 4) > 0)
-    {
-    height -= height % 4;
-    }
-
-  if (requested_newSize != newSize)
-    {
-    QMessageBox::warning(NULL, "Resolution Changed",
-      QString("The requested resolution has been changed from (%1, %2)\n").arg(
-        requested_newSize.width()).arg(requested_newSize.height()) + 
-      QString("to (%1, %2) to match format specifications.").arg(
-        newSize.width()).arg(newSize.height()));
-    }
-
-  int magnification = pqView::computeMagnification(newSize, currentSize);
-
-  if (!this->Internals->ViewWidget)
-    {
-    qDebug() << "ViewWidget must be set to the parent of all views.";
-    }
-  else
-    {
-    this->Internals->OldSize = this->Internals->ViewWidget->size();
-    this->Internals->OldMaxSize = this->Internals->ViewWidget->maximumSize();
-
-    // currentSize is the client area size for the view widget which may be
-    // smaller than actual size of the widget. The difference is padding.
-    // pqMultiView::computeSize() returns the widget size required to achieve
-    // the client size requested.
-    currentSize = this->Internals->ViewWidget->computeSize(currentSize);
-    this->Internals->ViewWidget->setMaximumSize(currentSize);
-    this->Internals->ViewWidget->resize(currentSize);
-    pqEventDispatcher::processEventsAndWait(1);
-    }
-
-  return magnification;
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationManager::restoreViewSizes()
-{
-  if (this->Internals->ViewWidget)
-    {
-    this->Internals->ViewWidget->setMaximumSize(this->Internals->OldMaxSize);
-    this->Internals->ViewWidget->resize(this->Internals->OldSize);
-    }
 }
 
 //-----------------------------------------------------------------------------

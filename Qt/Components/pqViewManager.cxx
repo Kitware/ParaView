@@ -39,6 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMStateLoaderBase.h"
+#include "vtkImageData.h"
+#include "vtkSMAnimationSceneImageWriter.h"
+#include "vtkImageIterator.h"
 
 // Qt includes.
 #include <QAction>
@@ -62,6 +65,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCloseViewUndoElement.h"
 #include "pqComparativeRenderView.h"
+#include "pqEventDispatcher.h"
+#include "pqImageUtil.h"
 #include "pqMultiViewFrame.h"
 #include "pqObjectBuilder.h"
 #include "pqPluginManager.h"
@@ -112,6 +117,10 @@ public:
   // * unregister view
   // * close frame
   vtkSmartPointer<vtkSMUndoElement> CloseFrameUndoElement;
+
+  // Used by prepareForCapture and finishedCapture.
+  QSize SavedMaxSize;
+  QSize SavedSize;
 };
 
 //-----------------------------------------------------------------------------
@@ -1184,6 +1193,101 @@ void pqViewManager::onCameraTriggered()
   emit this->triggerCameraAdjustment(this->Internal->ActiveView);
 }
 
+#define PADDING_COMPENSATION QSize(16, 16);
+//-----------------------------------------------------------------------------
+int pqViewManager::prepareForCapture(const QSize& fullsize)
+{
+  this->hideDecorations();
+  // update GUI
+  // FIXME: It would be nice if we could block renders right now, there's not need to
+  // render the views, we just need to update the GUI.
+  pqEventDispatcher::processEventsAndWait(1);
+
+  // This method cannot set the size of the widget to be greater than the
+  // current size, irrespective of the image size the user requested.
+  QSize currentSize = this->clientSize();
+  // to avoid some unpredicable padding issues, I am reducing the size by a few
+  // pixels.
+  currentSize -= PADDING_COMPENSATION;
+
+  int magnification = pqView::computeMagnification(fullsize, currentSize);
+
+  QSize oldSize = this->size();
+  QSize oldMaxSize = this->maximumSize();
+
+  // currentSize is the client area size for the view widget which may be
+  // smaller than actual size of the widget. The difference is padding.
+  // pqMultiView::computeSize() returns the widget size required to achieve
+  // the client size requested.
+  currentSize = this->computeSize(currentSize);
+  this->setMaximumSize(currentSize);
+  this->resize(currentSize);
+  pqEventDispatcher::processEventsAndWait(1);
+
+  this->Internal->SavedSize = oldSize;
+  this->Internal->SavedMaxSize = oldMaxSize;
+  return magnification;
+}
+
+//-----------------------------------------------------------------------------
+void pqViewManager::finishedCapture()
+{
+  this->setMaximumSize(this->Internal->SavedMaxSize);
+  this->resize(this->Internal->SavedSize);
+  this->showDecorations();
+}
+
+//-----------------------------------------------------------------------------
+bool pqViewManager::saveImage(int width, int height, const QString& filename)
+{
+  int magnification = this->prepareForCapture(QSize(width, height));
+
+  // Create full image data.
+  vtkSmartPointer<vtkImageData> fullImage = vtkSmartPointer<vtkImageData>::New();
+  fullImage->SetDimensions(width, height, 1);
+  fullImage->SetScalarTypeToUnsignedChar();
+  fullImage->SetNumberOfScalarComponents(3);
+  fullImage->AllocateScalars();
+  unsigned char rgb[3] = {0, 0, 0};
+  vtkImageIterator<unsigned char> it(fullImage, fullImage->GetExtent());
+  while (!it.IsAtEnd())
+    {
+    unsigned char* span = it.BeginSpan();
+    unsigned char* spanEnd = it.EndSpan();
+    while (spanEnd != span)
+      {
+      *span = rgb[0]; span++;
+      *span = rgb[1]; span++;
+      *span = rgb[2]; span++;
+      }
+    it.NextSpan();
+    }
+
+  // Now iterate over each of the views and merge the rendered image into the
+  // final fullImage.
+  // TODO: handle the case when one view is maximized (generally speaking handle
+  // case when views are not visible).
+  foreach (pqView* view, this->Internal->Frames)
+    {
+    if (view)
+      {
+      vtkImageData* image = view->captureImage(magnification);
+      vtkSMAnimationSceneImageWriter::Merge(fullImage, image);
+      image->Delete();
+      }
+    }
+
+  // fullImage has the combined image from all views. We simply need to save it.
+  QImage bitMap;
+  bool saved = false;
+  if (pqImageUtil::fromImageData(fullImage, bitMap))
+    {
+    saved = bitMap.save(filename);
+    }
+
+  this->finishedCapture();
+  return saved;
+}
 
 
 

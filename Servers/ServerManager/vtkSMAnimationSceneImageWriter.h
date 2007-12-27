@@ -73,6 +73,13 @@ public:
   // Default value is 1.
   vtkSetMacro(FrameRate, double);
   vtkGetMacro(FrameRate, double);
+
+
+  // Description:
+  // Convenience method used to merge a smaller image (\c src) into a 
+  // larger one (\c dest). The location of the smaller image in the larger image
+  // are determined by their extents.
+  static void Merge(vtkImageData* dest, vtkImageData* src);
 protected:
   vtkSMAnimationSceneImageWriter();
   ~vtkSMAnimationSceneImageWriter();
@@ -105,7 +112,6 @@ protected:
     vtkSMViewProxy*, int magnification);
 
   vtkImageData* NewFrame();
-  void Merge(vtkImageData* dest, vtkImageData* src);
 
   vtkSetVector2Macro(ActualSize, int);
   int ActualSize[2];

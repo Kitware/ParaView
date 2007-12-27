@@ -6,26 +6,106 @@
     <x>0</x>
     <y>0</y>
     <width>262</width>
-    <height>108</height>
+    <height>136</height>
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Save Screenshot Resolution</string>
+   <string>Save Snapshot Resolution</string>
   </property>
-  <layout class="QGridLayout" >
+  <layout class="QVBoxLayout" >
    <property name="margin" >
     <number>9</number>
    </property>
    <property name="spacing" >
     <number>6</number>
    </property>
-   <item row="2" column="0" colspan="4" >
+   <item>
+    <widget class="QCheckBox" name="selectedViewOnly" >
+     <property name="toolTip" >
+      <string>&lt;html>When checked, only the acitve view will be saved, otherwise all views will be saved in the image as they are layed out presently.&lt;/html></string>
+     </property>
+     <property name="statusTip" >
+      <string>&lt;html>When checked, only the acitve view will be saved, otherwise all views will be saved in the image as they are layed out presently.&lt;/html></string>
+     </property>
+     <property name="whatsThis" >
+      <string>&lt;html>When checked, only the acitve view will be saved, otherwise all views will be saved in the image as they are layed out presently.&lt;/html></string>
+     </property>
+     <property name="text" >
+      <string>Save only selected view</string>
+     </property>
+     <property name="checked" >
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>Select resolution for the image to save</string>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" >
      <property name="margin" >
       <number>0</number>
      </property>
      <property name="spacing" >
-      <number>4</number>
+      <number>6</number>
+     </property>
+     <item>
+      <widget class="QLineEdit" name="width" />
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2" >
+       <property name="text" >
+        <string>x</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="height" />
+     </item>
+     <item>
+      <widget class="QToolButton" name="lockAspect" >
+       <property name="toolTip" >
+        <string>Lock aspect </string>
+       </property>
+       <property name="statusTip" >
+        <string>Lock aspect </string>
+       </property>
+       <property name="whatsThis" >
+        <string>Lock aspect </string>
+       </property>
+       <property name="text" >
+        <string>L</string>
+       </property>
+       <property name="icon" >
+        <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqOctreeData16.png</iconset>
+       </property>
+       <property name="iconSize" >
+        <size>
+         <width>12</width>
+         <height>12</height>
+        </size>
+       </property>
+       <property name="checkable" >
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
      </property>
      <item>
       <spacer>
@@ -55,57 +135,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item row="1" column="3" >
-    <widget class="QToolButton" name="lockAspect" >
-     <property name="toolTip" >
-      <string>Lock aspect </string>
-     </property>
-     <property name="statusTip" >
-      <string>Lock aspect </string>
-     </property>
-     <property name="whatsThis" >
-      <string>Lock aspect </string>
-     </property>
-     <property name="text" >
-      <string>L</string>
-     </property>
-     <property name="icon" >
-      <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqOctreeData16.png</iconset>
-     </property>
-     <property name="iconSize" >
-      <size>
-       <width>12</width>
-       <height>12</height>
-      </size>
-     </property>
-     <property name="checkable" >
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" >
-    <widget class="QLineEdit" name="width" />
-   </item>
-   <item row="1" column="1" >
-    <widget class="QLabel" name="label_2" >
-     <property name="text" >
-      <string>x</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2" >
-    <widget class="QLineEdit" name="height" />
-   </item>
-   <item row="0" column="0" colspan="4" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
-      <string>Select resolution for the image to save</string>
-     </property>
-     <property name="alignment" >
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

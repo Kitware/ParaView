@@ -48,6 +48,8 @@ public:
   void setViewSize(const QSize& size);
   QSize viewSize() const;
 
+  /// Returns if the user requested to save all views.
+  bool saveAllViews() const;
 protected slots:
   /// Called when the user has edited width. If aspect ratio is locked,
   /// we will scale the height to maintain the aspect ration.

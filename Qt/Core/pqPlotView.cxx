@@ -63,6 +63,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartMouseSelection.h"
 #include "pqChartTitle.h"
 #include "pqChartWidget.h"
+#include "pqEventDispatcher.h"
+#include "pqImageUtil.h"
 #include "pqLineChartRepresentation.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
@@ -71,8 +73,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRepresentation.h"
 #include "pqServer.h"
 #include "pqSMAdaptor.h"
-#include "pqEventDispatcher.h"
-
 
 class pqPlotViewInternal
 {
@@ -435,6 +435,14 @@ void pqPlotView::renderInternal()
 //-----------------------------------------------------------------------------
 vtkImageData* pqPlotView::captureImage(int magnification)
 {
+  QSize curSize = this->getWidget()->size();
+  QSize newSize = curSize*magnification;
+  if (magnification > 1)
+    {
+    // Magnify.
+    this->getWidget()->resize(newSize);
+    }
+
   // vtkSMRenderViewProxy::CaptureWindow() ensures that render is called on the
   // view. Hence, we must explicitly call render here to be consistent.
   this->forceRender();
@@ -445,32 +453,16 @@ vtkImageData* pqPlotView::captureImage(int magnification)
   pqEventDispatcher::processEventsAndWait(0);
 
   QPixmap grabbedPixMap = QPixmap::grabWidget(this->getWidget());
-  grabbedPixMap = grabbedPixMap.scaled(grabbedPixMap.size().width()*magnification,
-    grabbedPixMap.size().height()*magnification);
+
+  if (magnification > 1)
+    {
+    // Restore size.
+    this->getWidget()->resize(curSize);
+    }
 
   // Now we need to convert this pixmap to vtkImageData.
-  QImage image = grabbedPixMap.toImage();
-
   vtkImageData* vtkimage = vtkImageData::New();
-  vtkimage->SetScalarTypeToUnsignedChar();
-  vtkimage->SetNumberOfScalarComponents(3);
-  vtkimage->SetDimensions(image.size().width(), image.size().height(), 1);
-  vtkimage->AllocateScalars();
-
-  QSize imgSize = image.size();
-
-  unsigned char* data = static_cast<unsigned char*>(vtkimage->GetScalarPointer());
-  for (int y=0; y < imgSize.height(); y++)
-    {
-    int index=(imgSize.height()-y-1) * imgSize.width()*3;
-    for (int x=0; x< imgSize.width(); x++)
-      {
-      QRgb color = image.pixel(x, y);
-      data[index++] = qRed(color);
-      data[index++] = qGreen(color);
-      data[index++] = qBlue(color);
-      }
-    }
+  pqImageUtil::toImageData(grabbedPixMap.toImage(), vtkimage);
 
   // Update image extents based on window position.
   int *position = this->getViewProxy()->GetViewPosition();
@@ -481,7 +473,6 @@ vtkImageData* pqPlotView::captureImage(int magnification)
     extents[cc] += position[cc/2]*magnification;
     }
   vtkimage->SetExtent(extents);
-
   return vtkimage;
 }
 
@@ -489,8 +480,10 @@ vtkImageData* pqPlotView::captureImage(int magnification)
 bool pqPlotView::saveImage(int width, int height, 
     const QString& filename)
 {
+  QSize curSize;
   if (width != 0 && height != 0)
     {
+    curSize = this->getWidget()->size();
     this->getWidget()->resize(width, height);
     }
 
@@ -521,12 +514,24 @@ bool pqPlotView::saveImage(int width, int height,
       }
     else
       {
+      if (curSize.isValid())
+        {
+        this->getWidget()->resize(curSize);
+        }
       return false;
+      }
+    if (curSize.isValid())
+      {
+      this->getWidget()->resize(curSize);
       }
     return true;
     }
 
   QPixmap grabbedPixMap = QPixmap::grabWidget(this->getWidget());
+  if (curSize.isValid())
+    {
+    this->getWidget()->resize(curSize);
+    }
   return grabbedPixMap.save(filename);
 }
 

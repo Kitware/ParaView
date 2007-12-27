@@ -81,6 +81,28 @@ public:
   /// Set the undo stack used for the application.
   void setUndoStack(pqUndoStack* stack);
 
+  /// Prepare the multiview for a screen capture for the given size. Returns the
+  /// magnification to be used while performing the capture, if the
+  /// requested size is greater than the widget size. One must call
+  /// finishedCapture() after the capture has finished to return to normal
+  /// operating state. Note that prepareForCapture and finishedCapture are
+  /// needed only when not using saveImage() directly.
+  /// Nesting of prepareForCapture and finishedCapture calls is currently not
+  /// supported.
+  int prepareForCapture(const QSize& size);
+
+  /// Must be called revert adjustments done by prepareForCapture() to return to
+  /// normal operating state.
+  /// Nesting of prepareForCapture and finishedCapture calls is currently not
+  /// supported.
+  void finishedCapture();
+
+  /// Saves an image for the entire view layout. This internally calls
+  /// prepareForCapture and finishedCapture hence not need to call them
+  /// explicitly.
+  /// Returns if the save was successful.
+  bool saveImage(int width, int height, const QString& filename);
+
 signals:
   /// Fired when the active view module changes.
   void activeViewChanged(pqView*);

@@ -43,7 +43,6 @@ class pqSaveSnapshotDialog::pqInternal : public Ui::SaveSnapshotDialog
 {
 public:
   double AspectRatio;
-
 };
 
 //-----------------------------------------------------------------------------
@@ -88,6 +87,12 @@ void pqSaveSnapshotDialog::setViewSize(const QSize& size)
   this->Internal->height->setText(QString::number(size.height()));
 }
 
+
+//-----------------------------------------------------------------------------
+bool pqSaveSnapshotDialog::saveAllViews() const
+{
+  return (!this->Internal->selectedViewOnly->isChecked());
+}
 
 //-----------------------------------------------------------------------------
 void pqSaveSnapshotDialog::onLockAspectRatio(bool lock)

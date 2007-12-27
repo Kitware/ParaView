@@ -39,7 +39,7 @@ class QSize;
 
 class pqAnimationCue;
 class pqAnimationScene;
-class pqMultiView;
+class pqViewManager;
 class pqProxy;
 class pqServer;
 class pqView;
@@ -80,7 +80,7 @@ public:
   // The the Widget that contains all the views.
   // This is required since the manager may need to change the view size
   // depending upon the users requested animation size.
-  void setViewWidget(pqMultiView*);
+  void setViewWidget(pqViewManager*);
 
   // Saves the animation geometry from the active scene
   // as visible in the given view.
@@ -124,9 +124,6 @@ protected slots:
 private:
   pqAnimationManager(const pqAnimationManager&); // Not implemented.
   void operator=(const pqAnimationManager&); // Not implemented.
-
-  int updateViewSizes(QSize requested_size, QSize current_size);
-  void restoreViewSizes();
 
   class pqInternals;
   pqInternals* Internals;
