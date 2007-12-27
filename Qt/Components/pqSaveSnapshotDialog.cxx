@@ -81,10 +81,10 @@ pqSaveSnapshotDialog::~pqSaveSnapshotDialog()
 }
 
 //-----------------------------------------------------------------------------
-void pqSaveSnapshotDialog::setViewSize(const QSize& size)
+void pqSaveSnapshotDialog::setViewSize(const QSize& view_size)
 {
-  this->Internal->width->setText(QString::number(size.width()));
-  this->Internal->height->setText(QString::number(size.height()));
+  this->Internal->width->setText(QString::number(view_size.width()));
+  this->Internal->height->setText(QString::number(view_size.height()));
 }
 
 

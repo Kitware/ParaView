@@ -1238,13 +1238,13 @@ void pqViewManager::finishedCapture()
 }
 
 //-----------------------------------------------------------------------------
-bool pqViewManager::saveImage(int width, int height, const QString& filename)
+bool pqViewManager::saveImage(int _width, int _height, const QString& filename)
 {
-  int magnification = this->prepareForCapture(QSize(width, height));
+  int magnification = this->prepareForCapture(QSize(_width, _height));
 
   // Create full image data.
   vtkSmartPointer<vtkImageData> fullImage = vtkSmartPointer<vtkImageData>::New();
-  fullImage->SetDimensions(width, height, 1);
+  fullImage->SetDimensions(_width, _height, 1);
   fullImage->SetScalarTypeToUnsignedChar();
   fullImage->SetNumberOfScalarComponents(3);
   fullImage->AllocateScalars();
