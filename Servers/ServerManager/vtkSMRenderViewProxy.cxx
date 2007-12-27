@@ -58,6 +58,7 @@
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMUtilities.h"
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
 
@@ -89,7 +90,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.57");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.58");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1030,6 +1031,14 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindow(int magnification)
   capture->SetExtent(extents);
 
   return capture;
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMRenderViewProxy::WriteImage(const char* filename, int magnification)
+{
+  vtkSmartPointer<vtkImageData> shot;
+  shot.TakeReference(this->CaptureWindow(magnification));
+  return vtkSMUtilities::SaveImage(shot, filename);
 }
 
 //-----------------------------------------------------------------------------

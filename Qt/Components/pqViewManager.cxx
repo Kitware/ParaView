@@ -33,15 +33,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqEmptyView.h"
 
 // VTK includes.
+#include "vtkErrorCode.h"
+#include "vtkImageData.h"
+#include "vtkImageIterator.h"
 #include "vtkPVConfig.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMAnimationSceneImageWriter.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMStateLoaderBase.h"
-#include "vtkImageData.h"
-#include "vtkSMAnimationSceneImageWriter.h"
-#include "vtkImageIterator.h"
+#include "vtkSMUtilities.h"
 
 // Qt includes.
 #include <QAction>
@@ -66,7 +68,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCloseViewUndoElement.h"
 #include "pqComparativeRenderView.h"
 #include "pqEventDispatcher.h"
-#include "pqImageUtil.h"
 #include "pqMultiViewFrame.h"
 #include "pqObjectBuilder.h"
 #include "pqPluginManager.h"
@@ -1289,12 +1290,8 @@ bool pqViewManager::saveImage(int _width, int _height, const QString& filename)
 
   // fullImage has the combined image from all views. We simply need to save it.
   QImage bitMap;
-  bool saved = false;
-  if (pqImageUtil::fromImageData(fullImage, bitMap))
-    {
-    saved = bitMap.save(filename);
-    }
-
+  bool saved = 
+    vtkSMUtilities::SaveImage(fullImage, filename.toAscii().data()) == vtkErrorCode::NoError;
   this->finishedCapture();
   return saved;
 }

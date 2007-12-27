@@ -185,6 +185,7 @@ IF(BUILD_TESTING)
         #HistogramChart
         LoadStateMultiView
         FileSeries
+        SaveLargeScreenshot
         #SaveAnimationMultiView   -- need to fix race condition on Mac
         VCRAnimation
         )

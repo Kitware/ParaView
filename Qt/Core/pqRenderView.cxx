@@ -562,30 +562,10 @@ bool pqRenderView::saveImage(int width, int height, const QString& filename)
     this->Internal->Viewport->resize(newsize);
     }
   this->render();
-  const char* writername = 0;
 
   const QFileInfo file(filename);
-  if(file.completeSuffix() == "bmp")
-    {
-    writername = "vtkBMPWriter";
-    }
-  else if(file.completeSuffix() == "tif" || file.completeSuffix() == "tiff")
-    {
-    writername = "vtkTIFFWriter"; 
-    }
-  else if(file.completeSuffix() == "ppm")
-    {
-    writername = "vtkPNMWriter";
-    }
-  else if(file.completeSuffix() == "png")
-    {
-    writername = "vtkPNGWriter";
-    }
-  else if(file.completeSuffix() == "jpg")
-    {
-    writername = "vtkJPEGWriter";
-    }
-  else if(file.completeSuffix() == "pdf")
+  int error_code = vtkErrorCode::UnknownError;
+  if(file.completeSuffix() == "pdf")
     {
     // FIXME: Does not take user-specified image size into consideration.
     QPrinter printer(QPrinter::HighResolution);
@@ -602,25 +582,36 @@ bool pqRenderView::saveImage(int width, int height, const QString& filename)
         viewport_size.height()));
     painter.drawPixmap(QPointF(0.0, 0.0), pix);
     painter.end();
-
-    return true;
+    error_code = vtkErrorCode::NoError;
     }
   else
     {
-    qCritical() << "Failed to determine file type for file:" 
-      << filename.toAscii().data();
-    return false;
+    error_code = this->getRenderViewProxy()->WriteImage(
+      filename.toAscii().data(), magnification);
     }
 
-  int ret = this->getRenderViewProxy()->WriteImage(
-    filename.toAscii().data(), writername, magnification);
+  switch (error_code)
+    {
+  case vtkErrorCode::UnrecognizedFileTypeError:
+    qCritical() << "Failed to determine file type for file:" 
+      << filename.toAscii().data();
+    break;
+
+  case vtkErrorCode::NoError:
+    // success.
+    break;
+
+  default:
+    qCritical() << "Failed to save image.";
+    }
+
   if (width>0 && height>0)
     {
     this->Internal->Viewport->resize(newsize);
     this->Internal->Viewport->resize(cursize);
     this->render();
     }
-  return (ret == vtkErrorCode::NoError);
+  return (error_code == vtkErrorCode::NoError);
 }
 
 //-----------------------------------------------------------------------------

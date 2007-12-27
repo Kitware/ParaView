@@ -168,6 +168,7 @@ SET(Kit_SRCS
   vtkSMUniformGridVolumeRepresentationProxy.cxx
   vtkSMUnstructuredGridParallelStrategy.cxx
   vtkSMUnstructuredGridVolumeRepresentationProxy.cxx
+  vtkSMUtilities.cxx
   vtkSMUpdateInformationUndoElement.cxx
   vtkSMUpdateSuppressorProxy.cxx
   vtkSMVectorProperty.cxx

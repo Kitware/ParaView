@@ -121,9 +121,15 @@ public:
 
   // Description:
   // Generate a screenshot from the render window.
+  // Obsolete, use API without writer name.
   int WriteImage(const char* filename, const char* writerName, int magnification);
   int WriteImage(const char* filename, const char* writerName)
     { return this->WriteImage(filename, writerName, 1); }
+
+  // Description:
+  // Generate a screenshot from the render window.
+  // The file format is determined from the extension of the file to write.
+  int WriteImage(const char* filename, int magnification);
 
   // Description:
   // Enable/Disable the LightKit.
