@@ -161,6 +161,11 @@ void pqQuickLaunchDialog::updateSearch()
   foreach (QString key, search)
     {
     QListWidgetItem *item = new QListWidgetItem(this->Internal->Items[key]);
+    QString actionName = item->data(Qt::UserRole).toString();
+    if (!this->Internal->Actions[actionName]->isEnabled())
+      {
+      item->setFlags(item->flags()&~Qt::ItemIsEnabled);
+      }
     this->Internal->options->addItem(item);
     }
   this->Internal->options->setCurrentRow(0);
