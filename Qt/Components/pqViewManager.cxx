@@ -68,6 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCloseViewUndoElement.h"
 #include "pqComparativeRenderView.h"
 #include "pqEventDispatcher.h"
+#include "pqImageUtil.h"
 #include "pqMultiViewFrame.h"
 #include "pqObjectBuilder.h"
 #include "pqPluginManager.h"
@@ -1288,12 +1289,9 @@ bool pqViewManager::saveImage(int _width, int _height, const QString& filename)
       }
     }
 
-  // fullImage has the combined image from all views. We simply need to save it.
-  QImage bitMap;
-  bool saved = 
-    vtkSMUtilities::SaveImage(fullImage, filename.toAscii().data()) == vtkErrorCode::NoError;
   this->finishedCapture();
-  return saved;
+  // fullImage has the combined image from all views. We simply need to save it.
+  return (pqImageUtil::saveImage(fullImage, filename) == vtkErrorCode::NoError);
 }
 
 

@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCollection.h"
 #include "vtkErrorCode.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkImageData.h"
 #include "vtkProcessModule.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyle.h"
@@ -69,6 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
+#include "pqImageUtil.h"
 #include "pqLinkViewWidget.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
@@ -563,31 +565,12 @@ bool pqRenderView::saveImage(int width, int height, const QString& filename)
     }
   this->render();
 
-  const QFileInfo file(filename);
   int error_code = vtkErrorCode::UnknownError;
-  if(file.completeSuffix() == "pdf")
+  vtkImageData* vtkimage = this->getRenderViewProxy()->CaptureWindow(magnification);
+  if (vtkimage)
     {
-    // FIXME: Does not take user-specified image size into consideration.
-    QPrinter printer(QPrinter::HighResolution);
-    printer.setOutputFormat(QPrinter::PdfFormat);
-    printer.setOutputFileName(filename);
-    
-    QPixmap pix = QPixmap::grabWidget(this->Internal->Viewport);
-    QPainter painter;
-    painter.begin(&printer);
-    QSize viewport_size(pix.rect().size());
-    viewport_size.scale(printer.pageRect().size(), Qt::KeepAspectRatio);
-    painter.setWindow(pix.rect());
-    painter.setViewport(QRect(0,0, viewport_size.width(),
-        viewport_size.height()));
-    painter.drawPixmap(QPointF(0.0, 0.0), pix);
-    painter.end();
-    error_code = vtkErrorCode::NoError;
-    }
-  else
-    {
-    error_code = this->getRenderViewProxy()->WriteImage(
-      filename.toAscii().data(), magnification);
+    error_code = pqImageUtil::saveImage(vtkimage, filename);
+    vtkimage->Delete();
     }
 
   switch (error_code)

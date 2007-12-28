@@ -37,16 +37,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 class QImage;
 class vtkImageData;
-
+class QString;
 
 /// Utility class to convert VTK images to Qt images and vice versa
 class PQCORE_EXPORT pqImageUtil
 {
 public:
-  // convert a QImage to vtkImageData
+  /// convert a QImage to vtkImageData
   static bool toImageData(const QImage& img, vtkImageData* vtkimage);
-  // convert vtkImageData to QImage
+
+  /// convert vtkImageData to QImage
   static bool fromImageData(vtkImageData* vtkimage, QImage& img);
+
+  /// Save an image to a file. Determines the type of the file using the file
+  /// extension. Returns the vtkErrorCode on error (vtkErrorCode::NoError i.e. 0
+  /// if file is successfully saved).
+  static int saveImage(vtkImageData* vtkimage, const QString& filename);
+
+  /// Save an image to a file. Determines the type of the file using the file
+  /// extension. Returns the vtkErrorCode on error (vtkErrorCode::NoError i.e. 0
+  /// if file is successfully saved).
+  static int saveImage(const QImage& image, const QString& filename);
 };
 
 #endif

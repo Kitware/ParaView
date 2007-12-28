@@ -31,8 +31,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqImageUtil.h"
-#include <QImage>
+
+#include "vtkErrorCode.h"
 #include "vtkImageData.h"
+#include "vtkSMUtilities.h"
+
+#include <QFileInfo>
+#include <QImage>
+#include <QPainter>
+#include <QPrinter>
 
 // NOTES:
 // - QImage pixel data is 32 bit aligned, whereas vtkImageData's pixel data 
@@ -40,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // - QImage is a mirror of vtkImageData, which is taken care of by scanning
 //   a row at a time and copying opposing rows
 
+//-----------------------------------------------------------------------------
 bool pqImageUtil::toImageData(const QImage& img, vtkImageData* vtkimage)
 {
   int height = img.height();
@@ -73,9 +81,9 @@ bool pqImageUtil::toImageData(const QImage& img, vtkImageData* vtkimage)
   return true;
 }
 
+//-----------------------------------------------------------------------------
 bool pqImageUtil::fromImageData(vtkImageData* vtkimage, QImage& img)
 {
-
   if (vtkimage->GetScalarType() != VTK_UNSIGNED_CHAR)
     {
     return false;
@@ -110,5 +118,92 @@ bool pqImageUtil::fromImageData(vtkImageData* vtkimage, QImage& img)
 
   img = newimg;
   return true;
+}
+
+//-----------------------------------------------------------------------------
+int pqImageUtil::saveImage(vtkImageData* vtkimage, const QString& filename)
+{
+  int error_code = vtkErrorCode::NoError;
+  if (!vtkimage)
+    {
+    return vtkErrorCode::UnknownError;
+    }
+  if (filename.isEmpty())
+    {
+    return vtkErrorCode::NoFileNameError;
+    }
+
+  const QFileInfo file(filename);
+  if (file.suffix() == "pdf")
+    {
+    // For pdf saving, we need to use Qt.
+    QImage qimage;
+    if (pqImageUtil::fromImageData(vtkimage, qimage))
+      {
+      error_code = pqImageUtil::saveImage(qimage, filename);
+      }
+    else
+      {
+      error_code = vtkErrorCode::UnknownError;
+      }
+    }
+  else
+    {
+    error_code = vtkSMUtilities::SaveImage(vtkimage, filename.toAscii().data());
+    }
+
+  return error_code;
+}
+
+//-----------------------------------------------------------------------------
+int pqImageUtil::saveImage(const QImage& qimage, const QString& filename)
+{
+  int error_code = vtkErrorCode::NoError;
+  if (qimage.isNull())
+    {
+    return vtkErrorCode::UnknownError;
+    }
+
+  if (filename.isEmpty())
+    {
+    return vtkErrorCode::NoFileNameError;
+    }
+
+  const QFileInfo file(filename);
+  if (file.suffix() == "pdf")
+    {
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(filename);
+
+    QPainter painter;
+    painter.begin(&printer);
+    QSize viewport_size(qimage.size());
+    viewport_size.scale(printer.pageRect().size(), Qt::KeepAspectRatio);
+    painter.setWindow(qimage.rect());
+    painter.setViewport(QRect(0,0, viewport_size.width(),
+        viewport_size.height()));
+    painter.drawImage(QPointF(0.0, 0.0), qimage);
+    painter.end();
+
+    // TODO: add some error checking.
+    error_code = vtkErrorCode::NoError;
+    }
+  else
+    {
+    // Use VTK for saving image, so that 3 component images are saved as needed
+    // by vtk for testing etc.
+    vtkImageData* vtkimage = vtkImageData::New();
+    if (pqImageUtil::toImageData(qimage, vtkimage))
+      {
+      error_code = pqImageUtil::saveImage(vtkimage, filename);
+      }
+    else
+      {
+      error_code = vtkErrorCode::UnknownError;
+      }
+    }
+
+  return error_code;
 }
 
