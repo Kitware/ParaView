@@ -24,6 +24,7 @@
 #include <vtkstd/map>
 #include <vtkstd/set>
 #include <vtkstd/vector>
+#include <vtksys/ios/sstream>
 #include "vtkStdString.h"
 
 class vtkSMProxyManagerElement : public vtkSmartPointer<vtkPVXMLElement>
@@ -51,6 +52,26 @@ public:
     this->Custom = false;
     this->Superclass::operator=(r);
     return *this;
+    }
+
+  // Description:
+  // Returns true if the defintions match.
+  bool DefinitionsMatch(vtkPVXMLElement* other)
+    {
+    vtkPVXMLElement* self = this->GetPointer();
+    if (self == other)
+      {
+      return true;
+      }
+    if (!other || !self)
+      {
+      return false;
+      }
+    vtksys_ios::ostringstream selfstream;
+    vtksys_ios::ostringstream otherstream;
+    self->PrintXML(selfstream, vtkIndent());
+    other->PrintXML(otherstream, vtkIndent());
+    return (selfstream.str() == otherstream.str());
     }
 
 };
