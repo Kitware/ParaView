@@ -387,6 +387,7 @@ public slots:
   // pqProgressManager.
   void setSelectiveEnabledState(bool);
 
+  void quickLaunch();
 private slots:
   void onCreateSource(const QString& sourceName);
   void onCreateFilter(const QString& filtername);

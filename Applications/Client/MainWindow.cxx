@@ -388,6 +388,11 @@ MainWindow::MainWindow() :
   QObject::connect(s, SIGNAL(activated()),
     this, SLOT(onSelectionShortcut()));
 
+  QShortcut *ctrlSpace = new QShortcut(Qt::CTRL + Qt::Key_Space,
+    &this->Implementation->Core.multiViewManager());
+  QObject::connect(ctrlSpace, SIGNAL(activated()),
+    this, SLOT(onQuickLaunchShortcut()));
+
   connect(
     &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
     this->Implementation->UI.actionResetCamera, SLOT(setEnabled(bool)));
@@ -1123,3 +1128,8 @@ void MainWindow::setTimeRanges(double start, double end)
     QString("Last Frame (%1)").arg(end, 0, 'g'));
 }
 
+//-----------------------------------------------------------------------------
+void MainWindow::onQuickLaunchShortcut()
+{
+  this->Implementation->Core.quickLaunch();
+}

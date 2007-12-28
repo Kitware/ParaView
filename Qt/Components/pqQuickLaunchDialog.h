@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCS $
+   Module:    pqQuickLaunchDialog.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -28,68 +28,43 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#ifndef __pqQuickLaunchDialog_h 
+#define __pqQuickLaunchDialog_h
 
-#ifndef _MainWindow_h
-#define _MainWindow_h
+#include <QDialog>
+#include "pqComponentsExport.h"
 
-#include <QMainWindow>
-#include <QVariant>
-#include <vtkIOStream.h>
-
-class pqGenericViewModule;
-class pqPipelineSource;
-
-/// Provides the main window for the ParaView application
-class MainWindow :
-  public QMainWindow
+/// A borderless pop-up dialog used to show actions that the user can launch.
+/// Provides search capabilities.
+class PQCOMPONENTS_EXPORT pqQuickLaunchDialog : public QDialog
 {
   Q_OBJECT
-
+  typedef QDialog Superclass;
 public:
-  MainWindow();
-  ~MainWindow();
+  pqQuickLaunchDialog(QWidget *parent=0);
+  virtual ~pqQuickLaunchDialog();
 
-  bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
+  /// Set the actions to be launched using this dialog.
+  void setActions(const QList<QAction*>& actions);
+  void addActions(const QList<QAction*>& actions);
 
-public slots:
-  QVariant findToolBarActionsNotInMenus();
-  
-private slots:
-  void onUndoLabel(const QString&);
-  void onRedoLabel(const QString&);
+  virtual void accept();
 
-  void onCameraUndoLabel(const QString&);
-  void onCameraRedoLabel(const QString&);
+protected slots:
+  void currentRowChanged(int);
+protected:
+  virtual bool eventFilter(QObject *watched, QEvent *event);
 
-  void onPreAccept();
-  void onPostAccept();
-  void endWaitCursor();
-
-  void onHelpAbout();
-  void onHelpHelp();
-
-  void onSelectionShortcut();
-  void onQuickLaunchShortcut();
-
-  void assistantError(const QString& err);
-
-  void onShowCenterAxisChanged(bool);
-
-  void setTimeRanges(double, double);
-
-  void onPlaying(bool);
-
-  void onAddCameraLink();
-  
-  void onDeleteAll();
-
-  void onSelectionModeChanged(int mode);
-
+  void updateSearch();
 private:
-  class pqImplementation;
-  pqImplementation* const Implementation;
+  pqQuickLaunchDialog(const pqQuickLaunchDialog&); // Not implemented.
+  void operator=(const pqQuickLaunchDialog&); // Not implemented.
+
+  class pqInternal;
+  pqInternal *Internal;
 };
 
-#endif // !_MainWindow_h
+#endif
+
 

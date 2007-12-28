@@ -133,6 +133,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewMenu.h"
 #include "pqWriterFactory.h"
 #include "pqSaveSnapshotDialog.h"
+#include "pqQuickLaunchDialog.h"
 
 #include <pqFileDialog.h>
 #include <pqObjectNaming.h>
@@ -205,7 +206,8 @@ public:
     ToolTipTrapper(0),
     InCreateSource(false),
     LinksManager(0),
-    TimerLog(0)
+    TimerLog(0), 
+    QuickLaunchDialog(parent)
   {
 #ifdef PARAVIEW_ENABLE_PYTHON
   this->PythonDialog = 0;
@@ -276,6 +278,7 @@ public:
 
   pqCoreTestUtility TestUtility;
   pqActiveServer ActiveServer;
+  pqQuickLaunchDialog QuickLaunchDialog;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -3516,4 +3519,14 @@ void pqMainWindowCore::setSelectiveEnabledState(bool enable)
 
   // Do selective disbling.
   selectiveEnabledInternal(this->Implementation->Parent, nonblockable, enable);
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::quickLaunch()
+{
+  this->Implementation->QuickLaunchDialog.setActions(
+    this->Implementation->FiltersMenuManager->findChildren<QAction*>());
+  this->Implementation->QuickLaunchDialog.addActions(
+    this->Implementation->SourcesMenuManager->findChildren<QAction*>());
+  this->Implementation->QuickLaunchDialog.exec();
 }
