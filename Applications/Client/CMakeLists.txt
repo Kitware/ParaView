@@ -185,13 +185,16 @@ IF(BUILD_TESTING)
         #HistogramChart
         LoadStateMultiView
         FileSeries
-        SaveLargeScreenshot
         #SaveAnimationMultiView   -- need to fix race condition on Mac
         VCRAnimation
         )
 
       SET(PYTHON_TESTS_REMOTE_ONLY 
         DisconnectAndSaveAnimation)
+
+      SET (PYTHON_TESTS_LARGE_THRESHOLD
+        SaveLargeScreenshot
+        )
 
     ENDIF(PARAVIEW_DATA_ROOT)
   ENDIF(QT_TESTING_WITH_PYTHON)
@@ -218,7 +221,17 @@ IF(BUILD_TESTING)
       ${TEST_BINARY} -dr --run-test=${TEST_PYTHON}/${test}.py
       --test-directory=${PARAVIEW_TEST_DIR}
       --exit)
-  ENDFOREACH(test) 
+  ENDFOREACH(test)
+
+  # Adding these tests spearately since they need a large image threshold:
+  # typically the case when charts are employed.
+  FOREACH(test ${PYTHON_TESTS_LARGE_THRESHOLD})
+    ADD_TEST(pqClient${test}-Python
+      ${TEST_BINARY} -dr --run-test=${TEST_PYTHON}/${test}.py
+      --test-directory=${PARAVIEW_TEST_DIR}
+      --image-threshold=10000
+      --exit)
+  ENDFOREACH(test)
 
   # test the plugins
   IF(BUILD_SHARED_LIBS AND BUILD_EXAMPLES)
