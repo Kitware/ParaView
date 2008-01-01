@@ -103,6 +103,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqView.h
   pqVTKHistogramModel.h
   pqWriterFactory.h
+  pqXMLEventObserver.h
+  pqXMLEventSource.h
   ${PYTHON_MOC_SRCS}
   )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
@@ -311,6 +313,10 @@ ADD_LIBRARY(pqCore
   pqVTKLineChartSeries.h
   pqWriterFactory.cxx
   pqWriterFactory.h
+  pqXMLEventObserver.cxx
+  pqXMLEventObserver.h
+  pqXMLEventSource.cxx
+  pqXMLEventSource.h
   pqXMLUtil.cxx
   pqXMLUtil.h
 

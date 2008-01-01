@@ -34,14 +34,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqXMLEventSource_h
 
 #include "pqEventSource.h"
+#include "pqCoreExport.h"
 
 class QString;
 
 /** Concrete implementation of pqEventSource that retrieves events recorded
 by pqXMLEventObserver */
-class QTTESTING_EXPORT pqXMLEventSource :
+class PQCORE_EXPORT pqXMLEventSource :
   public pqEventSource
 {
+  Q_OBJECT
 public:
   pqXMLEventSource(QObject* p = 0);
   ~pqXMLEventSource();

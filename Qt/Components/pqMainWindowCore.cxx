@@ -1991,9 +1991,7 @@ void pqMainWindowCore::onToolsDumpWidgetNames()
 void pqMainWindowCore::onToolsRecordTest()
 {
   QString filters;
-#ifdef QT_TESTING_WITH_XML
   filters += "XML Files (*.xml);;";
-#endif
 #ifdef QT_TESTING_WITH_PYTHON
   filters += "Python Files (*.py);;";
 #endif
@@ -2084,9 +2082,7 @@ void pqMainWindowCore::onToolsRecordTestScreenshot(const QStringList &fileNames)
 void pqMainWindowCore::onToolsPlayTest()
 {
   QString filters;
-#ifdef QT_TESTING_WITH_XML
   filters += "XML Files (*.xml);;";
-#endif
 #ifdef QT_TESTING_WITH_PYTHON
   filters += "Python Files (*.py);;";
 #endif

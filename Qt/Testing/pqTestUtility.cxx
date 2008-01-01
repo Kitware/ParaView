@@ -40,11 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRecordEventsDialog.h"
 #include "QtTestingConfigure.h"
 
-#ifdef QT_TESTING_WITH_XML
-#include "pqXMLEventSource.h"
-#include "pqXMLEventObserver.h"
-#endif
-
 #ifdef QT_TESTING_WITH_PYTHON
 #include "pqPythonEventSource.h"
 #include "pqPythonEventObserver.h"
@@ -68,12 +63,6 @@ pqTestUtility::pqTestUtility(QObject* p) :
   
   this->Translator.addDefaultWidgetEventTranslators();
   this->Player.addDefaultWidgetEventPlayers();
-
-#ifdef QT_TESTING_WITH_XML
-  // add an XML source
-  this->addEventSource("xml", new pqXMLEventSource(this));
-  this->addEventObserver("xml", new pqXMLEventObserver(this));
-#endif
 
 #ifdef QT_TESTING_WITH_PYTHON
   // add a python event source

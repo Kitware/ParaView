@@ -32,9 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqXMLEventSource.h"
 
-#include <QDomDocument>
 #include <QFile>
 #include <QtDebug>
+
+#include "vtkPVXMLParser.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSmartPointer.h"
 
 ///////////////////////////////////////////////////////////////////////////
 // pqXMLEventSource::pqImplementation
@@ -42,8 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqXMLEventSource::pqImplementation
 {
 public:
-  QDomDocument Document;
-  QDomNode CurrentEvent;
+  vtkSmartPointer<vtkPVXMLElement> XML;
+  unsigned int CurrentEvent;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -60,23 +63,36 @@ pqXMLEventSource::~pqXMLEventSource()
   delete this->Implementation;
 }
 
-void pqXMLEventSource::setContent(const QString& path)
+void pqXMLEventSource::setContent(const QString& xmlfilename)
 {
-  QFile file(path);
-  if(!this->Implementation->Document.setContent(&file, false))
+  QFile xml(xmlfilename);
+  if (!xml.open(QIODevice::ReadOnly))
     {
-    qCritical() << "Error parsing " << path << ": not a valid XML document";
-    return;
-    }
-  
-  QDomElement xml_events = this->Implementation->Document.documentElement();
-  if(xml_events.nodeName() != "pqevents")
-    {
-    qCritical() << path<< " is not an XML test case document";
+    qDebug() << "Failed to load " << xmlfilename;
     return;
     }
 
-  this->Implementation->CurrentEvent = xml_events.firstChild();
+  QByteArray dat = xml.readAll();
+  
+  vtkSmartPointer<vtkPVXMLParser> parser = 
+    vtkSmartPointer<vtkPVXMLParser>::New();
+  
+  if(!parser->Parse(dat.data()))
+    {
+    qDebug() << "Failed to parse " << xmlfilename;
+    xml.close();
+    return;
+    }
+  
+  vtkPVXMLElement* elem = parser->GetRootElement();
+  if(QString(elem->GetName()) != "pqevents")
+    {
+    qCritical() << xmlfilename << " is not an XML test case document";
+    return;
+    }
+
+  this->Implementation->XML = elem;
+  this->Implementation->CurrentEvent = 0;
 }
 
 int pqXMLEventSource::getNextEvent(
@@ -84,21 +100,20 @@ int pqXMLEventSource::getNextEvent(
   QString& command,
   QString& arguments)
 {
-  if(this->Implementation->CurrentEvent.isNull())
+  if(this->Implementation->XML->GetNumberOfNestedElements() ==
+    this->Implementation->CurrentEvent)
+    {
     return DONE;
-    
-  if(!this->Implementation->CurrentEvent.isElement())
-    return FAILURE;
-    
-  if(this->Implementation->CurrentEvent.nodeName() != "pqevent")
-    return FAILURE;
-    
-  object = this->Implementation->CurrentEvent.toElement().attribute("object");
-  command = this->Implementation->CurrentEvent.toElement().attribute("command");
-  arguments = this->Implementation->CurrentEvent.toElement().attribute("arguments");
+    }
 
-  this->Implementation->CurrentEvent =
-    this->Implementation->CurrentEvent.nextSibling();
+  vtkPVXMLElement* elem = this->Implementation->XML->GetNestedElement(
+      this->Implementation->CurrentEvent);
+    
+  object = elem->GetAttribute("object");
+  command = elem->GetAttribute("command");
+  arguments = elem->GetAttribute("arguments");
+  
+  this->Implementation->CurrentEvent++;
 
   return SUCCESS;
 }

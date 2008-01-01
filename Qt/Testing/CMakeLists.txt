@@ -1,12 +1,6 @@
 
 PROJECT(QtTesting)
 
-SET(QT_TESTING_WITH_XML ON)
-# if Qt has XML module
-IF(QT_EDITION_DESKTOPLIGHT)
-  SET(QT_TESTING_WITH_XML OFF)
-ENDIF(QT_EDITION_DESKTOPLIGHT)
-
 IF(QT_TESTING_WITH_PYTHON)
   
   INCLUDE(${VTK_CMAKE_DIR}/FindPythonLibs.cmake)
@@ -38,21 +32,6 @@ IF(QT_TESTING_WITH_PYTHON)
     pqPythonEventSource.h
   )
 ENDIF(QT_TESTING_WITH_PYTHON)
-
-IF(QT_TESTING_WITH_XML)
-  SET(XML_MOCS
-    pqXMLEventObserver.h
-  )
-  SET(XML_SRCS
-    pqXMLEventObserver.cxx
-    pqXMLEventObserver.h
-    pqXMLEventSource.cxx
-    pqXMLEventSource.h
-  )
-ENDIF(QT_TESTING_WITH_XML)
-
-
-
 
 INCLUDE_DIRECTORIES(
   ${QtTesting_BINARY_DIR}
@@ -86,7 +65,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqTabBarEventTranslator.h
   pqWidgetEventTranslator.h
   ${PYTHON_MOCS}
-  ${XML_MOCS}
 )
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
@@ -158,7 +136,6 @@ ADD_LIBRARY(QtTesting
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES}
   ${PYTHON_SRCS}
-  ${XML_SRCS}
 )
 
 SOURCE_GROUP("Generated" FILES

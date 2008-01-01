@@ -65,6 +65,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef QT_TESTING_WITH_PYTHON
 # include "pqPythonEventSourceImage.h"
 #endif
+#include "pqXMLEventSource.h"
+#include "pqXMLEventObserver.h"
+
 
 template<typename WriterT>
 bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
@@ -85,6 +88,9 @@ bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
 pqCoreTestUtility::pqCoreTestUtility(QObject* p) :
   pqTestUtility(p)
 {
+  // add an XML source
+  this->addEventSource("xml", new pqXMLEventSource(this));
+  this->addEventObserver("xml", new pqXMLEventObserver(this));
 
 #ifdef QT_TESTING_WITH_PYTHON
   this->addEventSource("py", new pqPythonEventSourceImage(this));
