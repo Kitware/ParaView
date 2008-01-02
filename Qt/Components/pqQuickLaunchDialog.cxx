@@ -71,11 +71,11 @@ pqQuickLaunchDialog::~pqQuickLaunchDialog()
 }
 
 //-----------------------------------------------------------------------------
-bool pqQuickLaunchDialog::eventFilter (QObject *watched, QEvent *event)
+bool pqQuickLaunchDialog::eventFilter (QObject *watched, QEvent *evt)
 {
-  if (event->type() == QEvent::KeyPress) 
+  if (evt->type() == QEvent::KeyPress) 
     {
-    QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+    QKeyEvent *keyEvent = static_cast<QKeyEvent*>(evt);
     int key = keyEvent->key();
     if (key == Qt::Key_Escape)
       {
@@ -111,11 +111,11 @@ bool pqQuickLaunchDialog::eventFilter (QObject *watched, QEvent *event)
     }
 
   // pass the event on to the parent class
-  return Superclass::eventFilter(watched, event);
+  return Superclass::eventFilter(watched, evt);
 }
 
 //-----------------------------------------------------------------------------
-void pqQuickLaunchDialog::setActions(const QList<QAction*>& actions)
+void pqQuickLaunchDialog::setActions(const QList<QAction*>& actns)
 {
   this->Internal->ActiveAction = 0;
   this->Internal->selection->setText("");
@@ -123,13 +123,13 @@ void pqQuickLaunchDialog::setActions(const QList<QAction*>& actions)
   this->Internal->options->clear();
   this->Internal->SearchString.clear();
   this->Internal->Items.clear();
-  this->addActions(actions);
+  this->addActions(actns);
 }
 
 //-----------------------------------------------------------------------------
-void pqQuickLaunchDialog::addActions(const QList<QAction*>& actions)
+void pqQuickLaunchDialog::addActions(const QList<QAction*>& actns)
 {
-  foreach (QAction* action, actions)
+  foreach (QAction* action, actns)
     {
     if (!action->menu())
       {
