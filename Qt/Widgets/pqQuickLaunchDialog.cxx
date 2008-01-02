@@ -120,6 +120,7 @@ void pqQuickLaunchDialog::setActions(const QList<QAction*>& actns)
   this->Internal->ActiveAction = 0;
   this->Internal->selection->setText("");
   this->Internal->selection->setIcon(QIcon());
+  this->Internal->searchString->setText("( )");
   this->Internal->options->clear();
   this->Internal->SearchString.clear();
   this->Internal->Items.clear();
