@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include <QString>
+#include "QtTestingExport.h"
 class QTextStream;
 
 /**
@@ -46,7 +47,7 @@ signal.
 \sa pqEventTranslator, pqStdoutEventObserver
 */
 
-class pqEventObserver :
+class QTTESTING_EXPORT pqEventObserver :
   public QObject
 {
   Q_OBJECT
