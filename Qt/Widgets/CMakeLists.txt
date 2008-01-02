@@ -56,6 +56,8 @@ SET(QtWidgets_SRCS
   pqProgressBar.h
   pqProgressWidget.cxx
   pqProgressWidget.h
+  pqQuickLaunchDialog.cxx
+  pqQuickLaunchDialog.h
   pqSectionVisibilityContextMenu.cxx
   pqSectionVisibilityContextMenu.h
   pqSetData.cxx
@@ -110,6 +112,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqLookmarkToolbar.h
   pqProgressBar.h
   pqProgressWidget.h
+  pqQuickLaunchDialog.h
   pqSectionVisibilityContextMenu.h
   pqSignalAdaptors.h
   pqSpinBox.h
@@ -123,6 +126,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
 ##########################################################################
 ## Add *.ui files to be uic processed.
 SET(QtWidgets_UI_FORMS
+  Resources/UI/pqQuickLaunchDialog.ui
 )
 
 QT4_WRAP_UI(QtWidgets_UI_BUILT_SOURCES

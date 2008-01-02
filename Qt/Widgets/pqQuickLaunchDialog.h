@@ -33,11 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqQuickLaunchDialog_h
 
 #include <QDialog>
-#include "pqComponentsExport.h"
+#include "QtWidgetsExport.h"
 
 /// A borderless pop-up dialog used to show actions that the user can launch.
 /// Provides search capabilities.
-class PQCOMPONENTS_EXPORT pqQuickLaunchDialog : public QDialog
+class QTWIDGETS_EXPORT pqQuickLaunchDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
@@ -46,16 +46,26 @@ public:
   virtual ~pqQuickLaunchDialog();
 
   /// Set the actions to be launched using this dialog.
+  /// This clears all already added actions.
   void setActions(const QList<QAction*>& actions);
+
+  /// Add actions to be launched using this dialog.
+  /// This adds to already added actions.
   void addActions(const QList<QAction*>& actions);
 
+  /// Overridden to trigger the user selected action.
   virtual void accept();
 
 protected slots:
+  /// Called when the user chooses an item from available choices shown in the
+  /// options list.
   void currentRowChanged(int);
+
 protected:
+  /// Overridden to capture key presses.
   virtual bool eventFilter(QObject *watched, QEvent *event);
 
+  /// Given the user entered text, update the GUI.
   void updateSearch();
 private:
   pqQuickLaunchDialog(const pqQuickLaunchDialog&); // Not implemented.
