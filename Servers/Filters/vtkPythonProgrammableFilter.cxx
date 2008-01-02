@@ -29,7 +29,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.24");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.25");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -138,7 +138,7 @@ int vtkPythonProgrammableFilter::RequestInformation(
 
 //----------------------------------------------------------------------------
 int vtkPythonProgrammableFilter::RequestDataObject(
-  vtkInformation* inInfo, 
+  vtkInformation* vtkNotUsed(request), 
   vtkInformationVector** inputVector , 
   vtkInformationVector* outputVector)
 {
