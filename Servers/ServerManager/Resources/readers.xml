@@ -21,6 +21,26 @@
      </StringVectorProperty>
    <!-- End legacyreader -->
    </SourceProxy>
+
+   <SourceProxy name="stlreadercore" class="vtkSTLReader" label="STL reader">
+     <Documentation
+       short_help="Read STL files."
+       long_help="Read ASCII or binary stereo lithography (STL) files.">
+       The STL reader reads ASCII or binary stereo lithography (STL) files. The expected file extension is .stl. The output of this reader is a polygonal dataset.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the STL reader.
+        </Documentation>
+     </StringVectorProperty>
+   <!-- End stlreader -->
+   </SourceProxy>
+
   </ProxyGroup>
 
   <ProxyGroup name="sources">
@@ -1521,24 +1541,46 @@
      </DoubleVectorProperty>
    </SourceProxy>
 
-   <SourceProxy name="stlreader" class="vtkSTLReader" label="STL reader">
+   <FileSeriesReaderProxy name="stlreader"
+                          class="vtkFileSeriesReader"
+                          label="Legacy VTK reader"
+                          file_name_method="SetFileName">
      <Documentation
-       short_help="Read STL files."
+         short_help="Read STL files."
        long_help="Read ASCII or binary stereo lithography (STL) files.">
-       The STL reader reads ASCII or binary stereo lithography (STL) files. The expected file extension is .stl. The output of this reader is a polygonal dataset.
+       The STL reader reads ASCII or binary stereo lithography (STL) files. The expected file extension is .stl. The output of this reader is a polygonal dataset. This reader also supports file series.
      </Documentation>
+
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources" proxyname="stlreadercore">
+       </Proxy>
+     </SubProxy>
+     
      <StringVectorProperty
-        name="FileName"
+        name="FileNames"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
         animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="0" 
+        repeat_command="1">
         <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the STL reader.
-        </Documentation>
+       <Documentation>
+         The list of files to be read by the reader. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+       </Documentation>
      </StringVectorProperty>
-   <!-- End stlreader -->
-   </SourceProxy>
+
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+     <!-- End legacyreader_t -->
+   </FileSeriesReaderProxy>
 
    <SourceProxy name="byureader" class="vtkBYUReader" label="BYU reader">
      <Documentation
