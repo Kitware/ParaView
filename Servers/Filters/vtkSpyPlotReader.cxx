@@ -61,7 +61,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.56");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.57");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -588,7 +588,7 @@ int vtkSpyPlotReader::RequestData(
     // step in this reader right now
     double *requestedTimeSteps = 
       info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
-    double timeValue = requestedTimeSteps[0];
+    //double timeValue = requestedTimeSteps[0];
     
     // find the first time value larger than requested time value
     // this logic could be improved
