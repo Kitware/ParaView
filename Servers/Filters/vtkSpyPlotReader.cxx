@@ -61,7 +61,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.55");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.56");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -592,13 +592,29 @@ int vtkSpyPlotReader::RequestData(
     
     // find the first time value larger than requested time value
     // this logic could be improved
-    int cnt = 0;
-    while (cnt < tsLength-1 && steps[cnt] < timeValue)
-      {
-      cnt++;
-      }
-    this->CurrentTimeStep = cnt;
+    //int cnt = 0;
+    //while (cnt < tsLength-1 && steps[cnt] < timeValue)
+    //  {
+    //  cnt++;
+    //  }
+    //this->CurrentTimeStep = cnt;
     
+    int cnt=0;
+    int closestStep=0;
+    double minDist=-1;
+    for (cnt=0;cnt<tsLength;cnt++)
+      {
+      double tdist=(steps[cnt]-requestedTimeSteps[0]>requestedTimeSteps[0]-steps[cnt])?
+        steps[cnt]-requestedTimeSteps[0]:
+        requestedTimeSteps[0]-steps[cnt];
+      if (minDist<0 || tdist<minDist)
+        {
+        minDist=tdist;
+        closestStep=cnt;
+        }
+      }
+    this->CurrentTimeStep=closestStep;
+
     this->TimeRequestedFromPipeline = true;
     this->UpdateMetaData(request, outputVector);
     this->TimeRequestedFromPipeline = false;

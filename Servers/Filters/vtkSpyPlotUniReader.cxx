@@ -12,7 +12,7 @@
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.9");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.10");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -1139,15 +1139,30 @@ int vtkSpyPlotUniReader::GetTimeStepFromTime(double time)
                    << this->HaveInformation ); 
     }
   this->ReadInformation();
-  int dump;
-  for ( dump = 0; dump < this->NumberOfDataDumps; ++ dump )
+  //int dump;
+  //for ( dump = 0; dump < this->NumberOfDataDumps; ++ dump )
+  //  {
+  //  if ( time < this->DumpTime[dump] )
+  //    {
+  //    return dump-1;
+  //    }
+  //  }
+  int cnt=0;
+  int closestStep=0;
+  double minDist=-1;
+  for (cnt=0;cnt<this->NumberOfDataDumps;cnt++)
     {
-    if ( time < this->DumpTime[dump] )
+    double tdist=(this->DumpTime[cnt]-time>time-this->DumpTime[cnt])?
+      this->DumpTime[cnt]-time:
+      time-this->DumpTime[cnt];
+    if (minDist<0 || tdist<minDist)
       {
-      return dump-1;
+      minDist=tdist;
+      closestStep=cnt;
       }
     }
-  return this->TimeStepRange[1];
+  return closestStep;
+  //return this->TimeStepRange[1];
 }
 
 //-----------------------------------------------------------------------------
