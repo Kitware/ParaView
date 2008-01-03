@@ -61,7 +61,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.54");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.55");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -251,6 +251,7 @@ int vtkSpyPlotReader::UpdateSpyDataFile(vtkInformation* request,
     return 1;
     }
   this->SetCurrentFileName(this->FileName);
+  this->Map->Clean(0);
   vtkstd::string fileNoExt = 
     vtksys::SystemTools::GetFilenameWithoutLastExtension(this->FileName);
   vtkstd::string filePath = 
