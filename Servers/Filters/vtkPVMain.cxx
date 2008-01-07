@@ -49,7 +49,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.21");
+vtkCxxRevisionMacro(vtkPVMain, "1.22");
 
 int vtkPVMain::InitializeMPI = 1;
 
@@ -116,6 +116,31 @@ void vtkPVMain::Initialize(int* argc, char** argv[])
 #endif
 #ifdef PARAVIEW_BUILD_WITH_ADAPTOR
   vtkPVAdaptorInitialize();
+#endif
+
+#ifdef VTK_USE_X
+  // Hack to support -display parameter.  vtkPVOptions requires parameters to be
+  // specified as -option=value, but it is generally expected that X window
+  // programs allow you to set the display as -display host:port (i.e. without
+  // the = between the option and value).  Unless someone wants to change
+  // vtkPVOptions to work with or without the = (which may or may not be a good
+  // idea), then this is the easiest way around the problem.
+  for (int i = 1; i < *argc-1; i++)
+    {
+    if (strcmp((*argv)[i], "-display") == 0)
+      {
+      char *displayenv = (char *)malloc(strlen((*argv)[i+1]) + 10);
+      sprintf(displayenv, "DISPLAY=%s", (*argv)[i+1]);
+      putenv(displayenv);
+      *argc -= 2;
+      for (int j = i; j < *argc; j++)
+        {
+        (*argv)[j] = (*argv)[j+2];
+        }
+      (*argv)[*argc] = NULL;
+      break;
+      }
+    }
 #endif
   
   //sleep(15);
