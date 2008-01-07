@@ -30,27 +30,40 @@
 #endif
 
 #if @HAVE_XML@
+
 namespace {
   class StaticInit
   {
     public:
     StaticInit()
     {
-      XMLString = @XML_GET_INTERFACE@();
+      static char* xmls[] = 
+      {
+        @XML_GET_INTERFACE@
+      };
+
+      XMLString = xmls;
+      NumberOfStrings = sizeof(xmls) / sizeof(char*);
     }
     ~StaticInit()
     {
-      delete [] XMLString;
+      // clean up new'd arrays
+      for(int i=0; i<NumberOfStrings; i++)
+      {
+        delete [] XMLString[i];
+      }       
     }
-    char* XMLString;
+    char** XMLString;
+    int NumberOfStrings;
   };
 }
 
 // entry point to get XML as a string
-C_EXPORT const char* C_DECL ParaViewPluginXML()
+C_EXPORT void C_DECL ParaViewPluginXMLList(int& num, char** & xml)
 {
   static StaticInit staticinit;
-  return staticinit.XMLString;
+  num = staticinit.NumberOfStrings;
+  xml = staticinit.XMLString;
 }
 #endif // HAVE_XML
 

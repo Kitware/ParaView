@@ -94,11 +94,11 @@ bool pqPluginManager::loadServerPlugin(pqServer* server, const QString& lib,
     if(success)
       {
       prop = pxy->GetProperty("ServerManagerXML");
-      QString xml = pqSMAdaptor::getElementProperty(prop).toString();
-      if(!xml.isEmpty())
+      QList<QVariant> xmls = pqSMAdaptor::getMultipleElementProperty(prop);
+      foreach(QVariant xml, xmls)
         {
         vtkSMXMLParser* parser = vtkSMXMLParser::New();
-        parser->Parse(xml.toAscii().data());
+        parser->Parse(xml.toString().toAscii().data());
         parser->ProcessConfiguration(vtkSMObject::GetProxyManager());
         parser->Delete();
         }

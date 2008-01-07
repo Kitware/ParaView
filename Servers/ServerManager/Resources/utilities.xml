@@ -1833,9 +1833,8 @@
       <StringVectorProperty
         name="ServerManagerXML"
         command="GetServerManagerXML"
-        number_of_elements="1"
         information_only="1">
-        <SimpleStringInformationHelper />
+        <StringArrayHelper />
       </StringVectorProperty>
 
       <!-- End of PluginLoader -->

@@ -22,7 +22,7 @@
 #include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkPVPluginLoader);
-vtkCxxRevisionMacro(vtkPVPluginLoader, "1.4");
+vtkCxxRevisionMacro(vtkPVPluginLoader, "1.5");
 
 #ifdef _WIN32
 // __cdecl gives an unmangled name
@@ -31,7 +31,8 @@ vtkCxxRevisionMacro(vtkPVPluginLoader, "1.4");
 #define C_DECL
 #endif
 
-typedef const char* (C_DECL *PluginXML)();
+typedef const char* (C_DECL *PluginXML1)();
+typedef void (C_DECL *PluginXML2)(int&, char**&);
 typedef void (C_DECL *PluginInit)(vtkClientServerInterpreter*);
 
 
@@ -40,9 +41,10 @@ vtkPVPluginLoader::vtkPVPluginLoader()
 {
   this->Loaded = 0;
   this->FileName = 0;
-  this->ServerManagerXML = NULL;
   this->Error = NULL;
   this->SearchPaths = NULL;
+  
+  this->ServerManagerXML = vtkStringArray::New();
 
   vtksys::String paths;
   const char* env = vtksys::SystemTools::GetEnv("PV_PLUGIN_PATH");
@@ -74,7 +76,7 @@ vtkPVPluginLoader::~vtkPVPluginLoader()
 {
   if(this->ServerManagerXML)
     {
-    delete [] this->ServerManagerXML;
+    this->ServerManagerXML->Delete();
     }
 
   this->SetFileName(0);
@@ -104,31 +106,47 @@ void vtkPVPluginLoader::SetFileName(const char* file)
     this->FileName = new char[len+1];
     strcpy(this->FileName, file);
     }
-
+            
   if(!this->Loaded && FileName && FileName[0] != '\0')
     {
     vtkLibHandle lib = vtkDynamicLoader::OpenLibrary(FileName);
     if(lib)
       {
-      PluginXML xml = 
-        (PluginXML)vtkDynamicLoader::GetSymbolAddress(lib, "ParaViewPluginXML");
+      // old SM xml, new plugins don't have this method
+      PluginXML1 xml1 = 
+        (PluginXML1)vtkDynamicLoader::GetSymbolAddress(lib, "ParaViewPluginXML");
+
+      // new SM xml
+      PluginXML2 xml2 = 
+        (PluginXML2)vtkDynamicLoader::GetSymbolAddress(lib, "ParaViewPluginXMLList");
+
       PluginInit init = 
         (PluginInit)vtkDynamicLoader::GetSymbolAddress(lib, "ParaViewPluginInit");
-      if(xml || init)
+      if(xml1 || xml2 || init)
         {
         this->Loaded = 1;
         if(init)
           {
           (*init)(vtkProcessModule::GetProcessModule()->GetInterpreter());
           }
-        if(xml)
+        if(xml1)
           {
-          const char* xmlString = (*xml)();
+          const char* xmlString = (*xml1)();
           if(xmlString)
             {
-            size_t len = strlen(xmlString);
-            this->ServerManagerXML = new char[len+1];
-            strcpy(this->ServerManagerXML, xmlString);
+            this->ServerManagerXML->SetNumberOfTuples(1);
+            this->ServerManagerXML->SetValue(0, vtkStdString(xmlString));
+            }
+          }
+        if(xml2)
+          {
+          int num;
+          char** xml;
+          (*xml2)(num, xml);
+          this->ServerManagerXML->SetNumberOfTuples(num);
+          for(int i=0; i<num; i++)
+            {
+            this->ServerManagerXML->SetValue(i, vtkStdString(xml[i]));
             }
           }
         this->Modified();
@@ -151,13 +169,13 @@ void vtkPVPluginLoader::SetFileName(const char* file)
 void vtkPVPluginLoader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Loaded: " << this->Loaded << endl;
   os << indent << "FileName: " 
     << (this->FileName? this->FileName : "(none)") << endl;
   os << indent << "ServerManagerXML: " 
-    << (this->ServerManagerXML? this->ServerManagerXML : "(none)") << endl;
+    << (this->ServerManagerXML ? "(exists)" : "(none)") << endl;
   os << indent << "Error: " 
     << (this->Error? this->Error : "(none)") << endl;
-  os << indent << "Loaded: " << this->Loaded << endl;
   os << indent << "SearchPaths: " << (this->SearchPaths ? 
     this->SearchPaths : "(none)") << endl;
 }

@@ -61,7 +61,8 @@ ADD_PARAVIEW_ACTION_GROUP(MENUBARIFACE MENU_IFACE_SRCS CLASS_NAME PrismMenuActio
 # create a plugin for this panel
 ADD_PARAVIEW_PLUGIN(PrismClientPlugin "1.0" 
                     GUI_INTERFACES ${TOOLBARIFACE} ${MENUBARIFACE}
-                    SOURCES PrismToolBarActions.cxx PrismCore.cxx PrismMenuActions.cxx ${RCS_SOURCES} ${MOC_SRCS} ${TOOLBAR_IFACE_SRCS} ${MENU_IFACE_SRCS})
+                    GUI_SOURCES PrismToolBarActions.cxx PrismCore.cxx PrismMenuActions.cxx 
+                                ${RCS_SOURCES} ${MOC_SRCS} ${TOOLBAR_IFACE_SRCS} ${MENU_IFACE_SRCS})
   
 
 ENDIF(QT4_FOUND)

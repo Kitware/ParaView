@@ -21,6 +21,7 @@
 #define __vtkPVPluginLoader_h
 
 #include "vtkObject.h"
+#include "vtkStringArray.h"
 
 class VTK_EXPORT vtkPVPluginLoader : public vtkObject
 {
@@ -36,7 +37,8 @@ public:
   
   // Description:
   // Get the Server Manager XML from a loaded plugin
-  vtkGetStringMacro(ServerManagerXML);
+  // the string array contains chunks of XML to process
+  vtkGetObjectMacro(ServerManagerXML, vtkStringArray);
 
   // Desctiption:
   // Get whether the plugin is loaded
@@ -60,7 +62,7 @@ protected:
 
   char* FileName;
   int Loaded;
-  char* ServerManagerXML;
+  vtkStringArray* ServerManagerXML;
   char* Error;
   char* SearchPaths;
 
