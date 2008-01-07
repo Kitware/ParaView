@@ -57,7 +57,8 @@ public:
     RgbSpace,
     HsvSpace,
     WrappedHsvSpace,
-    LabSpace
+    LabSpace,
+    DivergingSpace
     };
 
 public:
@@ -107,6 +108,11 @@ public:
   static void RGBToLab(double red, double green, double blue,
                        double *L, double *a, double *b);
   static void LabToRGB(double L, double a, double b,
+                       double *red, double *green, double *blue);
+
+  static void RGBToMsh(double red, double green, double blue,
+                       double *M, double *s, double *h);
+  static void MshToRGB(double M, double s, double h,
                        double *red, double *green, double *blue);
 
 signals:

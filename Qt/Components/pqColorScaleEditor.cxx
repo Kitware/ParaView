@@ -203,6 +203,7 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->Form->ColorSpace->addItem("HSV");
   this->Form->ColorSpace->addItem("Wrapped HSV");
   this->Form->ColorSpace->addItem("CIELAB");
+  this->Form->ColorSpace->addItem("Diverging");
 
   // Add the color scale presets menu.
   this->loadBuiltinColorPresets();
@@ -1232,16 +1233,9 @@ void pqColorScaleEditor::loadBuiltinColorPresets()
   model->addBuiltinColorMap(colorMap, "CIELab Blue to Red");
 
   colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::LabSpace);
-  colorMap.addPoint(pqChartValue((double)0.0  ), QColor( 19, 119, 255), 0.0  );
-  colorMap.addPoint(pqChartValue((double)0.125), QColor(119, 150, 255), 0.125);
-  colorMap.addPoint(pqChartValue((double)0.25 ), QColor(167, 180, 255), 0.25 );
-  colorMap.addPoint(pqChartValue((double)0.375), QColor(210, 214, 255), 0.375);
-  colorMap.addPoint(pqChartValue((double)0.5  ), QColor(241, 241, 241), 0.5  );
-  colorMap.addPoint(pqChartValue((double)0.625), QColor(255, 201, 191), 0.625);
-  colorMap.addPoint(pqChartValue((double)0.75 ), QColor(255, 160, 145), 0.75 );
-  colorMap.addPoint(pqChartValue((double)0.875), QColor(255, 121, 103), 0.875);
-  colorMap.addPoint(pqChartValue((double)1.0  ), QColor(234,  60,  54), 1.0  );
+  colorMap.setColorSpace(pqColorMapModel::DivergingSpace);
+  colorMap.addPoint(pqChartValue((double)0.0), QColor( 47, 100, 191), 0.0);
+  colorMap.addPoint(pqChartValue((double)1.0), QColor(193,  55,  59), 1.0);
   model->addBuiltinColorMap(colorMap, "Cool to Warm");
 }
 

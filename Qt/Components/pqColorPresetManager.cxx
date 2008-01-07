@@ -522,6 +522,10 @@ void pqColorPresetManager::importColorMap(vtkPVXMLElement *element)
     {
     colorMap.setColorSpace(pqColorMapModel::WrappedHsvSpace);
     }
+  else if(space == "Diverging")
+    {
+    colorMap.setColorSpace(pqColorMapModel::DivergingSpace);
+    }
   else
     {
     colorMap.setColorSpace(pqColorMapModel::HsvSpace);
@@ -607,7 +611,7 @@ void pqColorPresetManager::exportColorMap(const QModelIndex &index,
     }
 
   // Get the color space and points from the color map model.
-  const char *spaceNames[] = {"RGB", "HSV", "Wrapped", "Lab"};
+  const char *spaceNames[] = {"RGB", "HSV", "Wrapped", "Lab", "Diverging"};
   const pqColorMapModel *colorMap = this->Model->getColorMap(index.row());
   if(colorMap)
     {

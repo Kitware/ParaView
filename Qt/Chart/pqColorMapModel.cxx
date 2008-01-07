@@ -46,6 +46,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
+#ifndef M_PI
+#define M_PI 3.1415926535897932384626
+#endif
+
 //=============================================================================
 class pqColorMapModelItem
 {
@@ -63,6 +67,46 @@ public:
 
 
 class pqColorMapModelInternal : public QList<pqColorMapModelItem *> {};
+
+
+//=============================================================================
+// Given two angular orientations, returns the smallest angle between the two.
+inline double pqColorMapModelAngleDiff(double a1, double a2)
+{
+  double adiff = a1 - a2;
+  if (adiff < 0.0) adiff = -adiff;
+  while (adiff >= M_PI) adiff -= M_PI;
+  return adiff;
+}
+
+// For the case when interpolating from a saturated color to an unsaturated
+// color, find a hue for the unsaturated color that makes sense.
+inline double pqColorMapModelAdjustHue(double satM, double satS, double satH,
+                                       double unsatM)
+{
+  if (satM >= unsatM - 0.1)
+    {
+    // The best we can do is hold hue constant.
+    return satH;
+    }
+  else
+    {
+    // This equation is designed to make the perceptual change of the
+    // interpolation to be close to constant.
+    double hueSpin = (  satS*sqrt(unsatM*unsatM - satM*satM)
+                      / (satM*sin(satS)) );
+    // Spin hue away from 0 except in purple hues.
+    if (satH > -0.3*M_PI)
+      {
+      return satH + hueSpin;
+      }
+    else
+      {
+      return satH - hueSpin;
+      }
+    }
+}
+
 
 
 //----------------------------------------------------------------------------
@@ -138,6 +182,8 @@ int pqColorMapModel::getColorSpaceAsInt() const
       return 2;
     case pqColorMapModel::LabSpace:
       return 3;
+    case pqColorMapModel::DivergingSpace:
+      return 4;
     case pqColorMapModel::HsvSpace:
     default:
       return 1;
@@ -166,6 +212,11 @@ void pqColorMapModel::setColorSpaceFromInt(int space)
     case 3:
       {
       this->setColorSpace(pqColorMapModel::LabSpace);
+      break;
+      }
+    case 4:
+      {
+      this->setColorSpace(pqColorMapModel::DivergingSpace);
       break;
       }
     }
@@ -497,6 +548,61 @@ QPixmap pqColorMapModel::generateGradient(const QSize &size) const
           color.setRgbF(red, green, blue);
           painter.setPen(color);
           }
+        else if(this->Space == pqColorMapModel::DivergingSpace)
+          {
+          double M_next, s_next, h_next, M_previous, s_previous, h_previous;
+          pqColorMapModel::RGBToMsh(next.redF(), next.greenF(), next.blueF(),
+                                    &M_next, &s_next, &h_next);
+          pqColorMapModel::RGBToMsh(
+                           previous.redF(), previous.greenF(), previous.blueF(),
+                           &M_previous, &s_previous, &h_previous);
+
+          double interp = (double)(px - x1)/w;
+
+          // If the endpoints are distinct saturated colors, then place white in
+          // between them.
+          if (   (s_next > 0.05) && (s_previous > 0.05)
+              && (pqColorMapModelAngleDiff(h_next, h_previous) > 0.33*M_PI) )
+            {
+            // Insert the white midpoint by setting one end to white and
+            // adjusting the interpolation value.
+            if (interp < 0.5)
+              {
+              M_next = 95.0;  s_next = 0.0;  h_next = 0.0;
+              interp = 2.0*interp;
+              }
+            else
+              {
+              M_previous = 95.0;  s_previous = 0.0; h_previous = 0.0;
+              interp = 2.0*interp - 1.0;
+              }
+            }
+
+          // If one color has no saturation, thin its hue is invalid.  In this
+          // case, we want to set it to something logical so that the
+          // interpolation of hue makes sense.
+          if ((s_previous < 0.05) && (s_next > 0.05))
+            {
+            h_previous = pqColorMapModelAdjustHue(M_next, s_next, h_next,
+                                                  M_previous);
+            }
+          else if ((s_next < 0.01) && (s_previous > 0.01))
+            {
+            h_next = pqColorMapModelAdjustHue(
+                                             M_previous, s_previous, h_previous,
+                                             M_next);
+            }
+
+          double M = (1-interp)*M_previous + interp*M_next;
+          double s = (1-interp)*s_previous + interp*s_next;
+          double h = (1-interp)*h_previous + interp*h_next;
+
+          double red, green, blue;
+          pqColorMapModel::MshToRGB(M, s, h, &red, &green, &blue);
+          QColor color;
+          color.setRgbF(red, green, blue);
+          painter.setPen(color);
+          }
 
         painter.drawLine(px, 0, px, imageHeight);
         }
@@ -636,4 +742,28 @@ void pqColorMapModel::LabToRGB(double L, double a, double b,
   if (*red>1)   *red=1;
   if (*green>1) *green=1;
   if (*blue>1)  *blue=1;
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapModel::RGBToMsh(double red, double green, double blue,
+                               double *M, double *s, double *h)
+{
+  double L, a, b;
+  pqColorMapModel::RGBToLab(red, green, blue, &L, &a, &b);
+
+  *M = sqrt(L*L + a*a + b*b);
+  *s = (*M > 0.001) ? acos(L/(*M)) : 0.0;
+  *h = (*s > 0.001) ? atan2(b, a) : 0.0;
+}
+
+void pqColorMapModel::MshToRGB(double M, double s, double h,
+                               double *red, double *green, double *blue)
+{
+  double L, a, b;
+
+  L = M*cos(s);
+  a = M*sin(s)*cos(h);
+  b = M*sin(s)*sin(h);
+
+  pqColorMapModel::LabToRGB(L, a, b, red, green, blue);
 }
