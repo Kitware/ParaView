@@ -66,8 +66,6 @@ public:
     {
     }
 
-  pqSMAdaptor::PropertyType Type;
-
   vtkSMProxy* Proxy;
   vtkSMProperty* Property;
   int Index;
@@ -123,7 +121,6 @@ pqPropertyLinksConnection::pqPropertyLinksConnection(
   this->Internal->Index = idx;
   this->Internal->QtObject = qobject;
   this->Internal->QtProperty = qproperty;
-  this->Internal->Type = pqSMAdaptor::getPropertyType(this->Internal->Property);
   this->Internal->OutOfSync = false;
 }
 
@@ -177,7 +174,7 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
     QVariant old;
     old = this->Internal->QtObject->property(this->Internal->QtProperty);
     QVariant prop;
-    switch(this->Internal->Type)
+    switch(pqSMAdaptor::getPropertyType(this->Internal->Property))
       {
     case pqSMAdaptor::PROXY:
     case pqSMAdaptor::PROXYSELECTION:
@@ -320,7 +317,7 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
     // get the property of the object
     QVariant prop;
     prop = this->Internal->QtObject->property(this->Internal->QtProperty);
-    switch(this->Internal->Type)
+    switch(pqSMAdaptor::getPropertyType(this->Internal->Property))
       {
     case pqSMAdaptor::PROXY:
     case pqSMAdaptor::PROXYSELECTION:
