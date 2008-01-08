@@ -19,10 +19,11 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkDynamicLoader.h"
 #include "vtkPVOptions.h"
+#include "vtkStringArray.h"
 #include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkPVPluginLoader);
-vtkCxxRevisionMacro(vtkPVPluginLoader, "1.5");
+vtkCxxRevisionMacro(vtkPVPluginLoader, "1.6");
 
 #ifdef _WIN32
 // __cdecl gives an unmangled name

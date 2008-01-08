@@ -21,7 +21,8 @@
 #define __vtkPVPluginLoader_h
 
 #include "vtkObject.h"
-#include "vtkStringArray.h"
+
+class vtkStringArray;
 
 class VTK_EXPORT vtkPVPluginLoader : public vtkObject
 {
