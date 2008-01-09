@@ -4949,7 +4949,6 @@
     </UnstructuredGridVolumeRepresentationProxy>
 
     <PVRepresentationProxy name="PVRepresentationBase">
-      <!-- End of PVRepresentationBase -->
 
       <IntVectorProperty
         name="Visibility"
