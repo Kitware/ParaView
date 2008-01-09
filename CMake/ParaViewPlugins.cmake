@@ -414,7 +414,7 @@ ENDMACRO(ADD_PARAVIEW_GUI_EXTENSION)
 # internal macro to work around deficiency in FindQt4.cmake, will be removed in
 # the future.
 MACRO(PARAVIEW_QT4_ADD_RESOURCES outfiles )
-  FOREACH (it ${rcc_files})
+  FOREACH (it ${ARGN})
     GET_FILENAME_COMPONENT(outfilename ${it} NAME_WE)
     GET_FILENAME_COMPONENT(infile ${it} ABSOLUTE)
     GET_FILENAME_COMPONENT(rc_path ${infile} PATH)
