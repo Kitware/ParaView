@@ -98,6 +98,11 @@ public slots:
   /// filtering XML).
   void update();
 
+protected:
+  /// overloadable filter to return whether a certain proxy
+  /// be included in the menu
+  virtual bool filter(const QString& /*name*/) { return true; }
+
 signals:
   /// Fired when a item in the menu is selected.
   void selected(const QString& name);

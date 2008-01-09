@@ -176,6 +176,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   #pqSourceInfoGroupMap.h
   #pqSourceInfoIcons.h
   #pqSourceInfoModel.h
+  pqSourcesMenuManager.h
   pqSpreadSheetDisplayEditor.h
   pqStreamTracerPanel.h
   pqTextDisplayPropertiesWidget.h
@@ -591,6 +592,8 @@ ADD_LIBRARY(pqComponents
   #pqSourceInfoModel.h
   #pqSourceProxyInfo.cxx
   #pqSourceProxyInfo.h
+  pqSourcesMenuManager.cxx
+  pqSourcesMenuManager.h
   pqSplitViewUndoElement.cxx
   pqSplitViewUndoElement.h
   pqStateLoader.cxx

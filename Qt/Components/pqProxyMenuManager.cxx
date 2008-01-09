@@ -177,7 +177,10 @@ void pqProxyMenuManager::initialize()
     {
     if (defnIter->IsCustom())
       {
-      this->Internal->addProxy(defnIter->GetKey(), NULL);
+      if(this->filter(defnIter->GetKey()))
+        {
+        this->Internal->addProxy(defnIter->GetKey(), NULL);
+        }
       }
     this->Internal->Definitions.insert(defnIter->GetKey());
     }
@@ -206,8 +209,11 @@ void pqProxyMenuManager::update()
     {
     if (!this->Internal->Definitions.contains(defnIter->GetKey()))
       {
-      newDefns.insert(defnIter->GetKey());
-      this->Internal->addProxy(defnIter->GetKey(), /*icon=*/NULL);
+      if(this->filter(defnIter->GetKey()))
+        {
+        newDefns.insert(defnIter->GetKey());
+        this->Internal->addProxy(defnIter->GetKey(), /*icon=*/NULL);
+        }
       }
     }
   defnIter->Delete();
@@ -461,10 +467,13 @@ void pqProxyMenuManager::updateFromXML(const QString& xmlfilename)
             continue;
             }
 
-          this->Internal->addProxy(name, icon);
-          if (!category.Proxies.contains(name))
+          if(this->filter(name))
             {
-            category.Proxies.push_back(name);
+            this->Internal->addProxy(name, icon);
+            if (!category.Proxies.contains(name))
+              {
+              category.Proxies.push_back(name);
+              }
             }
           }
         }
@@ -478,7 +487,10 @@ void pqProxyMenuManager::updateFromXML(const QString& xmlfilename)
         continue;
         }
 
-      this->Internal->addProxy(name, icon);
+      if(this->filter(name))
+        {
+        this->Internal->addProxy(name, icon);
+        }
       }
     }
 }

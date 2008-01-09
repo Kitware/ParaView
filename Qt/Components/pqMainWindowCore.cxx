@@ -72,6 +72,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDockWindowInterface.h"
 #include "pqFilterInputDialog.h"
 #include "pqFiltersMenuManager.h"
+#include "pqSourcesMenuManager.h"
 #include "pqHelperProxyRegisterUndoElement.h"
 #include "pqLinksManager.h"
 #include "pqLookmarkBrowser.h"
@@ -249,7 +250,7 @@ public:
   QPointer<pqUndoStack> UndoStack;
  
   QPointer<pqFiltersMenuManager> FiltersMenuManager;
-  QPointer<pqProxyMenuManager> SourcesMenuManager;
+  QPointer<pqSourcesMenuManager> SourcesMenuManager;
   QPointer<pqViewMenu> ToolbarMenu;
   QPointer<pqViewMenu> DockWindowMenu;
 
@@ -596,7 +597,7 @@ void pqMainWindowCore::setSourceMenu(QMenu* menu)
   this->Implementation->SourcesMenuManager = 0;
   if (menu)
     {
-    pqProxyMenuManager*fmm = new pqProxyMenuManager(menu);
+    pqSourcesMenuManager*fmm = new pqSourcesMenuManager(menu);
     fmm->setXMLGroup("sources");
     fmm->setFilteringXMLDir(":/ParaViewResources");
     fmm->setElementTagName("Source");
