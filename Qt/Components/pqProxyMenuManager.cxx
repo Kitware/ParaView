@@ -467,13 +467,10 @@ void pqProxyMenuManager::updateFromXML(const QString& xmlfilename)
             continue;
             }
 
-          if(this->filter(name))
+          this->Internal->addProxy(name, icon);
+          if (!category.Proxies.contains(name))
             {
-            this->Internal->addProxy(name, icon);
-            if (!category.Proxies.contains(name))
-              {
-              category.Proxies.push_back(name);
-              }
+            category.Proxies.push_back(name);
             }
           }
         }
@@ -487,10 +484,7 @@ void pqProxyMenuManager::updateFromXML(const QString& xmlfilename)
         continue;
         }
 
-      if(this->filter(name))
-        {
-        this->Internal->addProxy(name, icon);
-        }
+      this->Internal->addProxy(name, icon);
       }
     }
 }
