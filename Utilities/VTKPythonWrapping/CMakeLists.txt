@@ -287,7 +287,6 @@ SET(VTK_FILTERS_SOURCES
   ${VTK_SOURCE_DIR}/Filtering/vtkGeometricErrorMetric.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkGraph.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkGraphAlgorithm.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkGraphDFSIterator.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkGraphIdList.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkAttributesErrorMetric.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkHexagonalPrism.cxx
