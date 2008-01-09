@@ -38,11 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static const QString textToXML(const QString& string)
 {
   QString result = string;
-  result.replace("&", "&amp;");
+  result.replace("&", "&amp;");  // keep first
   result.replace("<", "&lt;");
   result.replace(">", "&gt;");
   result.replace("'", "&apos;");
   result.replace("\"", "&quot;");
+  result.replace("\n", "&#xA;");
   
   return result;
 }
