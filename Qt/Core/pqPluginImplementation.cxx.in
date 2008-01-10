@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // for Windows builds, we need to define QT_NO_DEBUG 
 // so the plugin verification data is correct for Q_EXPORT_PLUGIN2
-#if defined(_WIN32) && defined(NDEBUG)
+#if defined(_WIN32) && defined(NDEBUG) && !defined(QT_NO_DEBUG)
 #define QT_NO_DEBUG
 #endif
 #include <QtPlugin>

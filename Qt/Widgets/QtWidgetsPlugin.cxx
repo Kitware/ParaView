@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#if defined(WIN32) && defined(NDEBUG)
+#if defined(WIN32) && defined(NDEBUG) && !defined(QT_NO_DEBUG)
 # define QT_NO_DEBUG
 #endif
 
