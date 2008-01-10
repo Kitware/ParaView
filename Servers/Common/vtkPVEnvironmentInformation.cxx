@@ -20,7 +20,7 @@
 #include "vtkPVEnvironmentInformationHelper.h"
 
 vtkStandardNewMacro(vtkPVEnvironmentInformation);
-vtkCxxRevisionMacro(vtkPVEnvironmentInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVEnvironmentInformation, "1.3");
 
 //-----------------------------------------------------------------------------
 vtkPVEnvironmentInformation::vtkPVEnvironmentInformation()
@@ -32,6 +32,7 @@ vtkPVEnvironmentInformation::vtkPVEnvironmentInformation()
 //-----------------------------------------------------------------------------
 vtkPVEnvironmentInformation::~vtkPVEnvironmentInformation()
 {
+  this->SetVariable(NULL);
 }
 
 //-----------------------------------------------------------------------------

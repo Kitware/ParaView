@@ -34,7 +34,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCommandOptions);
-vtkCxxRevisionMacro(vtkCommandOptions, "1.7");
+vtkCxxRevisionMacro(vtkCommandOptions, "1.8");
 
 //----------------------------------------------------------------------------
 vtkCommandOptions::vtkCommandOptions()
@@ -69,11 +69,7 @@ vtkCommandOptions::~vtkCommandOptions()
   this->CleanArgcArgv();
   delete this->Internals;
   
-  if( this->ApplicationPath )
-    {
-    delete this->ApplicationPath;
-    this->ApplicationPath = 0;
-    }
+  this->SetApplicationPath(NULL);
 
   if (this->XMLParser)
     {
@@ -319,11 +315,7 @@ int vtkCommandOptions::GetLastArgument()
 //----------------------------------------------------------------------------
 void vtkCommandOptions::ComputeApplicationPath()
 {
-  if( this->ApplicationPath )
-    {
-    delete this->ApplicationPath;
-    this->ApplicationPath = 0;
-    }
+  this->SetApplicationPath(NULL);
   
   vtkstd::string argv0 = this->GetArgv0();
   if(argv0.size())
@@ -339,15 +331,8 @@ void vtkCommandOptions::ComputeApplicationPath()
       // no path separator found, search PATH for it
       argv0 = vtksys::SystemTools::FindProgram(argv0.c_str()).c_str();
       }
-    this->ApplicationPath = new char[argv0.size()+1];
-    strcpy(this->ApplicationPath, argv0.c_str());
+    this->SetApplicationPath(argv0);
     }
-}
-
-//----------------------------------------------------------------------------
-const char* vtkCommandOptions::GetApplicationPath()
-{
-  return this->ApplicationPath;
 }
 
 //----------------------------------------------------------------------------

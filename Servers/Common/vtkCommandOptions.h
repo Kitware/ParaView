@@ -71,7 +71,7 @@ public:
 
   // Description:
   // Get full path of executable (based on Argv0)
-  const char* GetApplicationPath();
+  vtkGetStringMacro(ApplicationPath);
 
   // Description:
   // Get the index of the last argument parsed.
@@ -143,6 +143,7 @@ protected:
 
   void CleanArgcArgv();
 
+  vtkSetStringMacro(ApplicationPath);
   void ComputeApplicationPath();
 
   vtkCommandOptionsXMLParser* XMLParser;
