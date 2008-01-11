@@ -23,7 +23,7 @@
 #include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkPVPluginLoader);
-vtkCxxRevisionMacro(vtkPVPluginLoader, "1.6");
+vtkCxxRevisionMacro(vtkPVPluginLoader, "1.7");
 
 #ifdef _WIN32
 // __cdecl gives an unmangled name
@@ -63,7 +63,10 @@ vtkPVPluginLoader::vtkPVPluginLoader()
     if(appDir.size())
       {
       appDir += "/plugins";
-      paths = paths.size() ? paths + ";" : paths;
+      if(paths.size())
+        {
+        paths += ";";
+        }
       paths += appDir;
       }
     }
