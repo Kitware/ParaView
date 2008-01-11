@@ -123,7 +123,17 @@ public:
   void SetDownConvertVolumeFraction(int vf);
   vtkGetMacro(DownConvertVolumeFraction,int);
   vtkBooleanMacro(DownConvertVolumeFraction,int);
-  
+
+  // Description:
+  // If true, the reader will merge scalar arrays named, for example, "X velocity"
+  // "Y velocity" and "Z velocity" into a vector array named "velocity" with
+  // scalar components X, Y and Z. It will also merge X and Y scalar arrays
+  // (with no Z component) into a vector with scalar components X, Y and 0.
+  // True by default.
+  void SetMergeXYZComponents(int merge);
+  vtkGetMacro(MergeXYZComponents,int);
+  vtkBooleanMacro(MergeXYZComponents,int);
+
   // Description:
   // Get the time step range.
   vtkGetVector2Macro(TimeStepRange, int);
@@ -294,6 +304,8 @@ protected:
   int DownConvertVolumeFraction;
   
   bool TimeRequestedFromPipeline;
+
+  int MergeXYZComponents;
 
 private:
   vtkSpyPlotReader(const vtkSpyPlotReader&);  // Not implemented.

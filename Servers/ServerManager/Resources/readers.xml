@@ -1234,6 +1234,17 @@
        </Documentation>
      </IntVectorProperty>
 
+     <IntVectorProperty
+        name="MergeXYZComponents"
+        command="SetMergeXYZComponents"
+        number_of_elements="1"
+        default_values="1" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is set to 1, cell arrays named (for example) X velocity, Y velocity and Z velocity will be combined into a single vector array named velocity.
+       </Documentation>
+     </IntVectorProperty>
+
      <StringVectorProperty 
         name="CellArrayInfo"
         information_only="1">

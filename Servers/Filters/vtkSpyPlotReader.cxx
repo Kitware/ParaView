@@ -61,7 +61,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.57");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.58");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -93,6 +93,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->TimeStepRange[0] = 0;
   this->TimeStepRange[1] = 0;
   this->DownConvertVolumeFraction = 1;
+  this->MergeXYZComponents = 1;
 
   this->Controller = 0;
   this->SetController(vtkMultiProcessController::GetGlobalController());
@@ -746,18 +747,21 @@ int vtkSpyPlotReader::RequestData(
       activeArray->Delete();
       }
 
-    //this->MergeVectors(cd);
+    if (this->MergeXYZComponents)
+      {
+      this->MergeVectors(cd);
+      }
     } // for
   delete blockIterator;
-  
+
 #endif //  if 0 skip loading for valgrind test
   // All files seem to have 1 ghost level.
 //  this->AddGhostLevelArray(1);
- 
+
   // At this point, each processor has its own blocks
   // They have to exchange the blocks they have get a unique id for
   // each block over the all dataset.
-  
+
 
   // Update the number of levels.  
   if(this->Controller)
@@ -1271,6 +1275,17 @@ void vtkSpyPlotReader::SetDownConvertVolumeFraction(int vf)
 }
 
 //-----------------------------------------------------------------------------
+void vtkSpyPlotReader::SetMergeXYZComponents(int merge)
+{
+  if ( merge == this->MergeXYZComponents )
+    {
+    return;
+    }
+  this->MergeXYZComponents = merge;
+  this->Modified();
+}
+
+//-----------------------------------------------------------------------------
 void vtkSpyPlotReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -1288,6 +1303,16 @@ void vtkSpyPlotReader::PrintSelf(ostream& os, vtkIndent indent)
   
   os << "DownConvertVolumeFraction: ";
   if(this->DownConvertVolumeFraction)
+    {
+    os << "true"<<endl;
+    }
+  else
+    {
+    os << "false"<<endl;
+    }
+
+  os << "MergeXYZComponents: ";
+  if(this->MergeXYZComponents)
     {
     os << "true"<<endl;
     }
