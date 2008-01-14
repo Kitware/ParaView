@@ -335,6 +335,8 @@ void pqViewManager::onFrameAdded(pqMultiViewFrame* frame)
 
   this->buildConvertMenu();
 
+  ui.ConvertActionsFrame->layout()->setSpacing(0);
+
   // Add buttons for all conversion actions.
   QList<QAction*> convertActions = 
     this->Internal->ConvertMenu.actions();
