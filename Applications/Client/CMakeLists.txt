@@ -249,17 +249,21 @@ IF(BUILD_TESTING)
     ENDIF(CMAKE_CONFIGURATION_TYPES)
   
 
-    SET(PLUGIN_TESTS
-        ToolBarPlugin
-        ObjectPanelPlugin
-        )
+    IF (QT_TESTING_WITH_PYTHON)
+      # Since these tests need python, it's essential to verify that testing
+      # with python is enabled.
+      SET(PLUGIN_TESTS
+          ToolBarPlugin
+          ObjectPanelPlugin
+          )
 
-    FOREACH(test ${PLUGIN_TESTS})
-      ADD_TEST(pqClient${test}
-               ${CMAKE_COMMAND} -E chdir ${RUN_PATH}
-               ${TEST_BINARY} -dr --run-test=${TEST_PYTHON}/${test}.py
-               --exit)
-    ENDFOREACH(test)
+      FOREACH(test ${PLUGIN_TESTS})
+        ADD_TEST(pqClient${test}
+                 ${CMAKE_COMMAND} -E chdir ${RUN_PATH}
+                 ${TEST_BINARY} -dr --run-test=${TEST_PYTHON}/${test}.py
+                 --exit)
+      ENDFOREACH(test)
+    ENDIF (QT_TESTING_WITH_PYTHON)
 
   ENDIF(BUILD_SHARED_LIBS AND BUILD_EXAMPLES)
 
