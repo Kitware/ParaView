@@ -12,10 +12,17 @@ QtTesting.playCommand(object4, 'set_boolean', 'false')
 object5 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept'
 QtTesting.playCommand(object5, 'activate', '')
 object6 = 'MainWindow/menubar/menuFilters/Alphabetical'
+
+objectA = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitHorizontalButton'
+QtTesting.playCommand(objectA, 'activate', '')
 QtTesting.playCommand(object6, 'activate', 'ProbeLine')
 QtTesting.playCommand(object5, 'activate', '')
 QtTesting.playCommand(object2, 'activate', 'RTAnalyticSource')
 QtTesting.playCommand(object5, 'activate', '')
+
+objectB = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/SplitVerticalButton'
+QtTesting.playCommand(objectB, 'activate', '')
+
 QtTesting.playCommand(object6, 'activate', 'ExtractHistogram')
 QtTesting.playCommand(object5, 'activate', '')
 object7 = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitVerticalButton'
