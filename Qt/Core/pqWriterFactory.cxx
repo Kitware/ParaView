@@ -187,7 +187,8 @@ void pqWriterFactory::addFileType(const QString& description,
   vtkSmartPointer<vtkSMProxy> writer;
 
   writer = this->Internal->getPrototype(xmlgroup, xmlname);
-  if (!writer)
+  if (!writer && pxm->ProxyElementExists(xmlgroup.toAscii().data(),
+      xmlname.toAscii().data()))
     {
     writer.TakeReference(pxm->NewProxy(xmlgroup.toAscii().data(), 
       xmlname.toAscii().data()));
