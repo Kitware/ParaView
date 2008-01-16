@@ -44,6 +44,89 @@
   </ProxyGroup>
 
   <ProxyGroup name="sources">
+   <SourceProxy name="CosmoReader" 
+                class="vtkCosmoReader"
+                label="COSMO reader">
+     <Documentation
+       short_help="Read a cosmology file."
+       long_help="Read a cosmology file into a vtkUnstructuredGrid.">
+       The Cosmology reader reads a binary file of particle location, 
+       velocity and mass creating a vtkUnstructuredGrid. The default 
+       file extension is .cosmo.
+     </Documentation>
+
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        animateable="0"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the COSMO reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty
+        name="Stride"
+        command="SetStride"
+        number_of_elements="1"
+        default_values="1" >
+        <IntRangeDomain name="range" min="1" />
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="DefaultRangeInfo"
+        command="GetPositionRange"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="PositionRange"
+        command="SetPositionRange"
+        number_of_elements="2"
+        default_values="0 0">
+        <IntRangeDomain name="range">
+             <RequiredProperties>
+                 <Property name="DefaultRangeInfo" function="Range"/>
+             </RequiredProperties>
+        </IntRangeDomain>
+     </IntVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="2"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo" >
+        <ArraySelectionDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <IntVectorProperty 
+        name="MakeCells" 
+        command="SetMakeCells" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is set to 1, a VTK_VERTEX cell is created for each point.
+       </Documentation>
+     </IntVectorProperty>
+
+   <!-- End CosmoReader -->
+   </SourceProxy>
 
    <SourceProxy name="DEMReader" 
                 class="vtkDEMReader"
@@ -474,6 +557,7 @@
          This property lists which point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
+
    <!-- End XMLImageDataReader -->
    </SourceProxy>
 
