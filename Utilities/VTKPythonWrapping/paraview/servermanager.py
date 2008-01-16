@@ -1542,6 +1542,7 @@ def _updateModules():
     _createModule("representations", rendering)
     _createModule("views", rendering)
     _createModule("lookup_tables", rendering)
+    _createModule("textures", rendering)
     _createModule("animation", animation)
     _createModule('animation_keyframes', animation)
     
@@ -1556,6 +1557,7 @@ def _createModules():
     rendering = _createModule('representations')
     _createModule('views', rendering)
     _createModule("lookup_tables", rendering)
+    _createModule("textures", rendering)
     animation = _createModule('animation')
     _createModule('animation_keyframes', animation)
     
