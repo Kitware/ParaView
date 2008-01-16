@@ -49,7 +49,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.22");
+vtkCxxRevisionMacro(vtkPVMain, "1.23");
 
 int vtkPVMain::InitializeMPI = 1;
 
@@ -151,6 +151,7 @@ void vtkPVMain::Finalize()
 #ifdef VTK_USE_MPI
   if (vtkPVMain::InitializeMPI)
     {
+    MPI_Barrier(MPI_COMM_WORLD);
     MPI_Finalize();
     }
 #endif
