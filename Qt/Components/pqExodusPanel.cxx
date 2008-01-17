@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqSMAdaptor.h"
 #include "pqTimeKeeper.h"
+#include "pqTreeWidgetCheckHelper.h"
 #include "pqTreeWidgetItemObject.h"
 
 class pqExodusPanel::pqUI : public QObject, public Ui::ExodusPanel 
@@ -150,6 +151,7 @@ void pqExodusPanel::linkServerManagerProperties()
 
   // we hook up the node/element variables
   QTreeWidget* VariablesTree = this->UI->Variables;
+  new pqTreeWidgetCheckHelper(VariablesTree, 0, this);
   pqTreeWidgetItemObject* item;
   QList<QString> strs;
   QString varName;
@@ -259,6 +261,7 @@ void pqExodusPanel::linkServerManagerProperties()
 
   // we hook up the sideset/nodeset 
   QTreeWidget* SetsTree = this->UI->Sets;
+  new pqTreeWidgetCheckHelper(SetsTree, 0, this);
 
   // do the sidesets
   vtkSMProperty* SideProperty = this->proxy()->GetProperty("SideSetArrayStatus");
@@ -302,6 +305,7 @@ void pqExodusPanel::linkServerManagerProperties()
   QAction* a;
   
   QTreeWidget* BlockTree = this->UI->BlockArrayStatus;
+  new pqTreeWidgetCheckHelper(BlockTree, 0, this);
   a = new QAction("All Blocks On", BlockTree);
   a->setObjectName("BlocksOn");
   QObject::connect(a, SIGNAL(triggered(bool)), BlockTree, SLOT(allOn()));

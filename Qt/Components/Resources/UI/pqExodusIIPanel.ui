@@ -101,9 +101,6 @@
            <string>Blocks</string>
           </property>
          </column>
-         <property name="selectionMode" >
-          <enum>QAbstractItemView::ExtendedSelection</enum>
-         </property>
         </widget>
        </item>
       </layout>
