@@ -1725,7 +1725,7 @@
          default_values="1.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          This property specifies the HB scale.
+          A scaling factor to compute bonds with hydrogen atoms.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -1736,7 +1736,7 @@
          default_values="1.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          This property specifies the B scale.
+          A scaling factor to compute bonds between non-hydrogen atoms
         </Documentation>
       </DoubleVectorProperty>
    <!-- End gaussiancubereader -->
