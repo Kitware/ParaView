@@ -53,11 +53,16 @@ public slots:
   void loadRemotePlugin();
   void loadLocalPlugin();
 
+protected slots:
+  void loadRecentRemotePlugin(int idx);
+  void loadRecentLocalPlugin(int idx);
+
 protected:
   void refresh();
   void refreshLocal();
   void refreshRemote();
-  void loadPlugin(pqServer* server);
+  QString loadPlugin(pqServer* server);
+  QString loadPlugin(pqServer* server, const QString& file);
 
   pqServer* Server;
 

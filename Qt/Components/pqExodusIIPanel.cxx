@@ -59,7 +59,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqTimeKeeper.h"
 #include "pqSMAdaptor.h"
-#include "pqTreeWidgetCheckHelper.h"
 #include "pqTreeWidgetItemObject.h"
 #include "ui_pqExodusIIPanel.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -192,9 +191,6 @@ void pqExodusIIPanel::linkServerManagerProperties()
 
   this->DisplItem = 0;
 
-  // we hook up the node/element variables
-  new pqTreeWidgetCheckHelper(this->UI->Variables, 0, this);
-
   // do block id, global element id
   this->addSelectionToTreeWidget("Object Ids", "ObjectId", this->UI->Variables,
                    PM_ELEM, "GenerateObjectIdCellArray");
@@ -271,11 +267,6 @@ void pqExodusIIPanel::linkServerManagerProperties()
   // do the global variables
   this->addSelectionsToTreeWidget("GlobalResultArrayStatus",
                                   this->UI->Variables, PM_GLOBAL);
-
-  // we hook up the sideset/nodeset 
-  QTreeWidget* SetsTree = this->UI->Sets;
-  new pqTreeWidgetCheckHelper(SetsTree, 0, this);
-
 
   // blocks
   this->addSelectionsToTreeWidget("EdgeBlockArrayStatus",

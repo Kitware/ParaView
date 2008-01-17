@@ -49,11 +49,13 @@ public:
   pqPluginManager(QObject* p = 0);
   ~pqPluginManager();
 
+  enum LoadStatus { LOADED, NOTLOADED, ALREADYLOADED };
+
   /// attempt to load a plugin
-  /// return true on success, if there was a failure, the error is reported
+  /// return status on success, if NOTLOADED was returned, the error is reported
   /// If errorMsg is non-null, then errors are not reported, but the error
   /// message is put in the errorMsg string
-  bool loadPlugin(pqServer* server, const QString& lib, QString* errorMsg=0);
+  LoadStatus loadPlugin(pqServer* server, const QString& lib, QString* errorMsg=0);
   
   /// attempt to load all available plugins on a server, 
   /// or client plugins if NULL
@@ -77,6 +79,9 @@ public:
   /// remove an extra interface
   void removeInterface(QObject* iface);
 
+  /// Return all the paths that plugins will be searched for.
+  QStringList pluginPaths(pqServer*);
+
 signals:
   /// signal for when an interface is loaded
   void guiInterfaceLoaded(QObject* iface);
@@ -89,8 +94,8 @@ signals:
 
 protected:
 
-  bool loadClientPlugin(const QString& lib, QString& error);
-  bool loadServerPlugin(pqServer* server, const QString& lib, QString& error);
+  LoadStatus loadClientPlugin(const QString& lib, QString& error);
+  LoadStatus loadServerPlugin(pqServer* server, const QString& lib, QString& error);
 
 protected slots:
   void onServerConnected(pqServer*);

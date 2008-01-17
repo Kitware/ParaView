@@ -50,7 +50,7 @@ class QTWIDGETS_EXPORT pqTreeWidget : public QTreeWidget
   Q_OBJECT
 public:
   
-  pqTreeWidget(QWidget* p);
+  pqTreeWidget(QWidget* p = NULL);
   ~pqTreeWidget();
 
   bool event(QEvent* e);
