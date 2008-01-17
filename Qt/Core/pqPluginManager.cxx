@@ -209,6 +209,11 @@ pqPluginManager::LoadStatus pqPluginManager::loadPlugin(
   LoadStatus success = NOTLOADED;
   QString error;
   
+  if(this->Plugins.values(server).contains(lib))
+    {
+    return ALREADYLOADED;
+    }
+  
   if(server)
     {
     // look for SM stuff in the plugin
