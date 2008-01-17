@@ -90,7 +90,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.58");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.59");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -378,7 +378,11 @@ void vtkSMRenderViewProxy::EndCreateVTKObjects()
   vtkCommand* observer = this->GetObserver();
   this->Renderer->AddObserver(
     vtkCommand::ResetCameraClippingRangeEvent, observer);
-  this->Renderer->AddObserver(vtkCommand::StartEvent, observer);
+
+  // Synchronize the renderers before any of the parallel render manager code
+  // takes control. Otherwise, interprocess communication may become
+  // interleaved because iceT as well as this observer make MPI calls.
+  this->RenderWindow->AddObserver(vtkCommand::StartEvent, observer, 1);
   this->RenderWindow->AddObserver(vtkCommand::AbortCheckEvent, 
     this->GetObserver());
 
