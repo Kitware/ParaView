@@ -43,6 +43,8 @@ class pqSaveSnapshotDialog::pqInternal : public Ui::SaveSnapshotDialog
 {
 public:
   double AspectRatio;
+  QSize ViewSize;
+  QSize AllViewsSize;
 };
 
 //-----------------------------------------------------------------------------
@@ -72,6 +74,8 @@ pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent,
     this, SLOT(onHeightEdited()));
   QObject::connect(this->Internal->lockAspect, SIGNAL(toggled(bool)),
     this, SLOT(onLockAspectRatio(bool)));
+  QObject::connect(this->Internal->selectedViewOnly, SIGNAL(toggled(bool)),
+    this, SLOT(updateSize()));
 }
 
 //-----------------------------------------------------------------------------
@@ -83,15 +87,44 @@ pqSaveSnapshotDialog::~pqSaveSnapshotDialog()
 //-----------------------------------------------------------------------------
 void pqSaveSnapshotDialog::setViewSize(const QSize& view_size)
 {
-  this->Internal->width->setText(QString::number(view_size.width()));
-  this->Internal->height->setText(QString::number(view_size.height()));
+  this->Internal->ViewSize = view_size;
+  this->updateSize();
 }
 
+
+//-----------------------------------------------------------------------------
+void pqSaveSnapshotDialog::setAllViewsSize(const QSize& view_size)
+{
+  this->Internal->AllViewsSize = view_size;
+  this->updateSize();
+}
 
 //-----------------------------------------------------------------------------
 bool pqSaveSnapshotDialog::saveAllViews() const
 {
   return (!this->Internal->selectedViewOnly->isChecked());
+}
+
+//-----------------------------------------------------------------------------
+void pqSaveSnapshotDialog::updateSize() 
+{
+  if (this->saveAllViews())
+    {
+    this->Internal->width->setText(QString::number(
+        this->Internal->AllViewsSize.width()));
+    this->Internal->height->setText(QString::number(
+        this->Internal->AllViewsSize.height()));
+    }
+  else
+    {
+    this->Internal->width->setText(QString::number(
+        this->Internal->ViewSize.width()));
+    this->Internal->height->setText(QString::number(
+        this->Internal->ViewSize.height()));
+    }
+
+  QSize curSize = this->viewSize();
+  this->Internal->AspectRatio = curSize.width()/curSize.height();
 }
 
 //-----------------------------------------------------------------------------

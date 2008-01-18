@@ -1672,6 +1672,7 @@ void pqMainWindowCore::onFileSaveScreenshot()
 
   pqSaveSnapshotDialog ssDialog(this->Implementation->Parent);
   ssDialog.setViewSize(view->getSize());
+  ssDialog.setAllViewsSize(this->multiViewManager().clientSize());
 
   if (ssDialog.exec() != QDialog::Accepted)
     {

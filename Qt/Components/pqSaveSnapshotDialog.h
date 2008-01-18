@@ -46,7 +46,14 @@ public:
 
   /// Set the default size for the snapshot.
   void setViewSize(const QSize& size);
+
+  /// Returns the user selected size.
   QSize viewSize() const;
+
+  /// Set the default all views size. viewSize is used when used when
+  /// saveAllViews is false, while all views size is used when saveAllViews is
+  /// true.
+  void setAllViewsSize(const QSize& size);
 
   /// Returns if the user requested to save all views.
   bool saveAllViews() const;
@@ -58,6 +65,8 @@ protected slots:
   void onHeightEdited();
 
   void onLockAspectRatio(bool);
+
+  void updateSize();
 
 private:
   pqSaveSnapshotDialog(const pqSaveSnapshotDialog&); // Not implemented.
