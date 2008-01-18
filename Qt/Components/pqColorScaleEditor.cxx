@@ -1213,13 +1213,13 @@ void pqColorScaleEditor::loadBuiltinColorPresets()
   model->addBuiltinColorMap(colorMap, "Red to Blue Rainbow");
 
   colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::LabSpace);
+  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
   colorMap.addPoint(pqChartValue((double)0.0), QColor(0,   0,   0  ), (double)0.0);
   colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 255, 255), (double)1.0);
   model->addBuiltinColorMap(colorMap, "Grayscale");
 
   colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::LabSpace);
+  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
   colorMap.addPoint(pqChartValue((double)0.0), QColor(0,   0,   0  ), (double)0.0);
   colorMap.addPoint(pqChartValue((double)0.4), QColor(230, 0,   0  ), (double)0.4);
   colorMap.addPoint(pqChartValue((double)0.8), QColor(230, 230, 0  ), (double)0.8);
