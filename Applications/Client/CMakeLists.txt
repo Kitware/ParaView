@@ -1,5 +1,13 @@
 PROJECT(pqClient)
 
+MACRO(GET_IMAGE_THRESHOLD_ARG variable testname)
+# Macro used to obtain the command argument to set the image threshold.
+  SET (${variable})
+  IF (${testname}_THRESHOLD)
+    SET (${variable} --image-threshold=${${testname}_THRESHOLD})
+  ENDIF (${testname}_THRESHOLD)
+ENDMACRO(GET_IMAGE_THRESHOLD_ARG)
+
 SET(QT_USE_QTASSISTANT TRUE)
 SET(QT_USE_QTNETWORK TRUE) # QtAssistant depends on it (only for linking)
 SET(QT_USE_QTUITOOLS TRUE)
@@ -185,17 +193,15 @@ IF(BUILD_TESTING)
         #HistogramChart
         LoadStateMultiView
         FileSeries
+        SaveLargeScreenshot
         #SaveAnimationMultiView   -- need to fix race condition on Mac
         VCRAnimation
         )
+      # Set image threshold overrides for the tests.
+      SET(SaveLargeScreenshot_THRESHOLD 10000)
 
       SET(PYTHON_TESTS_REMOTE_ONLY 
         DisconnectAndSaveAnimation)
-
-      SET (PYTHON_TESTS_LARGE_THRESHOLD
-        SaveLargeScreenshot
-        )
-
     ENDIF(PARAVIEW_DATA_ROOT)
   ENDIF(QT_TESTING_WITH_PYTHON)
 
@@ -208,28 +214,22 @@ IF(BUILD_TESTING)
   
   IF(PARAVIEW_DATA_ROOT)
     FOREACH(test ${XML_TESTS_WITH_BASELINES})
+      GET_IMAGE_THRESHOLD_ARG(THRESHOLD_CMD ${test})
       ADD_TEST(pqClient${test}
         ${TEST_BINARY} -dr --run-test=${TEST_XML}/${test}.xml
         --test-directory=${PARAVIEW_TEST_DIR}
         --compare-view=${TEST_IMAGE}/${test}.png
+        ${THRESHOLD_CMD}
         --exit)
     ENDFOREACH(test) 
   ENDIF(PARAVIEW_DATA_ROOT)
   
   FOREACH(test ${PYTHON_TESTS})
+    GET_IMAGE_THRESHOLD_ARG(THRESHOLD_CMD ${test})
     ADD_TEST(pqClient${test}-Python
       ${TEST_BINARY} -dr --run-test=${TEST_PYTHON}/${test}.py
       --test-directory=${PARAVIEW_TEST_DIR}
-      --exit)
-  ENDFOREACH(test)
-
-  # Adding these tests spearately since they need a large image threshold:
-  # typically the case when charts are employed.
-  FOREACH(test ${PYTHON_TESTS_LARGE_THRESHOLD})
-    ADD_TEST(pqClient${test}-Python
-      ${TEST_BINARY} -dr --run-test=${TEST_PYTHON}/${test}.py
-      --test-directory=${PARAVIEW_TEST_DIR}
-      --image-threshold=10000
+      ${THRESHOLD_CMD}
       --exit)
   ENDFOREACH(test)
 
@@ -342,6 +342,13 @@ IF(BUILD_TESTING)
     XdmfReadStructuredGridCollection
   )
 
+  # Add image threshold overrides for tests.
+  SET (XdmfReadImageData_THRESHOLD 20)
+  SET (XdmfReadRectilinearGrid_THRESHOLD 20)
+  SET (XdmfReadRectilinearGridCollection_THRESHOLD 20)
+  SET (XdmfReadStructuredGrid_THRESHOLD 20)
+  SET (XdmfReadStructuredGridCollection_THRESHOLD 20)
+
   # Test compositing for a few client server and client render server tests.
   SET(COMPOSITING_XML_TESTS_WITH_BASELINES
     Calculator
@@ -362,12 +369,15 @@ IF(BUILD_TESTING)
       ON)
     MARK_AS_ADVANCED(PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
     FOREACH(test ${XML_TESTS_WITH_BASELINES})
+      GET_IMAGE_THRESHOLD_ARG(THRESHOLD_CMD ${test})
+      
       ADD_TEST(pqClient${test}-Builtin
         ${TEST_BINARY}
         --test-directory=${PARAVIEW_TEST_DIR}
         -dr
         --run-test=${TEST_XML}/${test}.xml
         --compare-view=${TEST_IMAGE}/${test}.png
+        ${THRESHOLD_CMD}
         --exit)
       
       ADD_TEST(pqClient${test}-ClientServer
@@ -376,6 +386,7 @@ IF(BUILD_TESTING)
         -dr
         --run-test=${TEST_XML}/${test}.xml
         --compare-view=${TEST_IMAGE}/${test}.png
+        ${THRESHOLD_CMD}
         --exit)
 
       IF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
@@ -385,17 +396,20 @@ IF(BUILD_TESTING)
           -dr
           --run-test=${TEST_XML}/${test}.xml
           --compare-view=${TEST_IMAGE}/${test}.png
+          ${THRESHOLD_CMD}
           --exit)
       ENDIF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
     ENDFOREACH(test)
 
     FOREACH(test ${COMPOSITING_XML_TESTS_WITH_BASELINES})
+      GET_IMAGE_THRESHOLD_ARG(THRESHOLD_CMD ${test})
       ADD_TEST(pqClient${test}-ClientServerRemoteRender
         ${TEST_BINARY} --test-server --test-remote-rendering
         --test-directory=${PARAVIEW_TEST_DIR}
         -dr
         --run-test=${TEST_XML}/${test}.xml
         --compare-view=${TEST_IMAGE}/${test}.png
+        ${THRESHOLD_CMD}
         --exit)
         
       IF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
@@ -405,16 +419,19 @@ IF(BUILD_TESTING)
           -dr
           --run-test=${TEST_XML}/${test}.xml
           --compare-view=${TEST_IMAGE}/${test}.png
+          ${THRESHOLD_CMD}
           --exit)
       ENDIF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
     ENDFOREACH(test)
 
     FOREACH(test ${PYTHON_TESTS_REMOTE_ONLY})
+        GET_IMAGE_THRESHOLD_ARG(THRESHOLD_CMD ${test})
         ADD_TEST(pqClient${test}-ClientServer-Python
           ${TEST_BINARY} --test-server
           --test-directory=${PARAVIEW_TEST_DIR}
           -dr
           --run-test=${TEST_PYTHON}/${test}.py
+          ${THRESHOLD_CMD}
           --exit)
 
      #FIXME
