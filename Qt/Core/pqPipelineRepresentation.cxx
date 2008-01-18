@@ -243,14 +243,7 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
   vtkPVArrayInformation* arrayInfo;
 
   // Get the time that this representation is going to use.
-  double time = pqSMAdaptor::getElementProperty(
-    repr->GetProperty("UpdateTime")).toDouble();
-
   vtkPVDataInformation* dataInfo = 0;
-
-  vtkSMProxy* inputProxy = this->getInput()->getProxy();
-  vtkSMSourceProxy* inputSourceProxy = vtkSMSourceProxy::SafeDownCast(inputProxy);
-  inputSourceProxy->UpdatePipeline(time);
 
   dataInfo = this->getOutputPortFromInput()->getDataInformation(true);
 
