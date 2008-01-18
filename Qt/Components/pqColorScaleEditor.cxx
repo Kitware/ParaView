@@ -1234,8 +1234,8 @@ void pqColorScaleEditor::loadBuiltinColorPresets()
 
   colorMap.removeAllPoints();
   colorMap.setColorSpace(pqColorMapModel::DivergingSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor( 47, 100, 191), 0.0);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(193,  55,  59), 1.0);
+  colorMap.addPoint(pqChartValue((double)0.0), QColor( 35, 61, 181), 0.0);
+  colorMap.addPoint(pqChartValue((double)1.0), QColor(172, 36,  32), 1.0);
   model->addBuiltinColorMap(colorMap, "Cool to Warm");
 }
 
