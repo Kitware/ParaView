@@ -84,9 +84,11 @@ pqPluginManager::LoadStatus pqPluginManager::loadServerPlugin(pqServer* server, 
   vtkSMProxy* pxy = pxm->NewProxy("misc", "PluginLoader");
   if(pxy && !lib.isEmpty())
     {
+    pxy->SetConnectionID(server->GetConnectionID());
+    // data & render servers
+    pxy->SetServers(vtkProcessModule::SERVERS);
     vtkSMProperty* prop = pxy->GetProperty("FileName");
     pqSMAdaptor::setElementProperty(prop, lib);
-    pxy->SetConnectionID(server->GetConnectionID());
     pxy->UpdateVTKObjects();
     pxy->UpdatePropertyInformation();
     prop = pxy->GetProperty("Loaded");
