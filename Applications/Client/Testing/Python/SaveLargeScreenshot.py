@@ -32,6 +32,8 @@ QtTesting.playCommand(object1, 'mousePress', '1,1,0,22,8')
 QtTesting.playCommand(object1, 'mouseRelease', '1,0,0,22,8')
 object9 = 'MainWindow/menubar/menuFile'
 QtTesting.playCommand(object9, 'activate', 'actionFileSaveScreenshot')
+object12 = 'MainWindow/SaveSnapshotDialog/selectedViewOnly'
+QtTesting.playCommand(object12, 'set_boolean', 'false')
 object10 = 'MainWindow/SaveSnapshotDialog/width'
 QtTesting.playCommand(object10, 'set_string', '1')
 QtTesting.playCommand(object10, 'set_string', '10')
@@ -45,8 +47,6 @@ QtTesting.playCommand(object11, 'key', '16777217')
 QtTesting.playCommand(object11, 'set_string', '90')
 QtTesting.playCommand(object11, 'set_string', '90')
 QtTesting.playCommand(object11, 'set_string', '900')
-object12 = 'MainWindow/SaveSnapshotDialog/selectedViewOnly'
-QtTesting.playCommand(object12, 'set_boolean', 'false')
 object13 = 'MainWindow/SaveSnapshotDialog/ok'
 QtTesting.playCommand(object13, 'activate', '')
 object14 = 'MainWindow/FileSaveScreenshotDialog'
