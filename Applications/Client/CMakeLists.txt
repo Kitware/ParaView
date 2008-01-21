@@ -343,6 +343,9 @@ IF(BUILD_TESTING)
   )
 
   # Add image threshold overrides for tests.
+  # Generally all tests with wireframes need higher thresholds.
+  SET (Flow2_THRESHOLD 15)
+  SET (UndoRedo4_THRESHOLD 15)
   SET (XdmfReadImageData_THRESHOLD 20)
   SET (XdmfReadRectilinearGrid_THRESHOLD 20)
   SET (XdmfReadRectilinearGridCollection_THRESHOLD 20)
