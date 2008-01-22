@@ -199,6 +199,9 @@ void pqProxyMenuManager::update()
     qCritical() << "XMLGroup must be set.";
     return;
     }
+  
+  // add new proxies from new xml files
+  this->updateFromXML(); 
 
   // Locate new proxy definitions that got added.
   QSet<QString> newDefns;

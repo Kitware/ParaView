@@ -3224,6 +3224,10 @@ void pqMainWindowCore::addPluginInterface(QObject* iface)
     {
     this->addPluginDockWindow(dockWindow);
     }
+
+  // plugins may contain new entries for menus
+  this->Implementation->FiltersMenuManager->update();
+  this->Implementation->SourcesMenuManager->update();
 }
 
 //-----------------------------------------------------------------------------
