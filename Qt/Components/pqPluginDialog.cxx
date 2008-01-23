@@ -75,7 +75,7 @@ pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
     QStringList serverPaths = pm->pluginPaths(server);
     helpText = helpText.arg(serverPaths.join(", "));
     QStringList localPaths = pm->pluginPaths(NULL);
-    helpText = helpText.arg(serverPaths.join(", "));
+    helpText = helpText.arg(localPaths.join(", "));
     }
 
   this->HelpText->setText(helpText);
