@@ -168,7 +168,7 @@ QString pqPluginDialog::loadPlugin(pqServer* server, const QString& plugin)
     ret = QString();
     }
 
-  if(result1 != pqPluginManager::LOADED || result2 != pqPluginManager::LOADED)
+  if(result1 != pqPluginManager::LOADED && result2 != pqPluginManager::LOADED)
     {
     ret = QString();
     }
@@ -205,15 +205,23 @@ void pqPluginDialog::refresh()
 
 void pqPluginDialog::refreshLocal()
 {
+  QStringList allplugins;
+
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-  QStringList plugins = pm->loadedPlugins(NULL);
-  this->localPlugins->clear();
-  this->localPlugins->addItems(plugins);
+  foreach(QString p, pm->loadedPlugins(NULL))
+    {
+    allplugins.append(QString("client - %1").arg(p));
+    }
   if(!this->Server->isRemote())
     {
-    plugins = pm->loadedPlugins(this->Server);
-    this->localPlugins->addItems(plugins);
+    foreach(QString p, pm->loadedPlugins(this->Server))
+      {
+      allplugins.append(QString("server - %1").arg(p));
+      }
     }
+
+  this->localPlugins->clear();
+  this->localPlugins->addItems(allplugins);
 }
 
 void pqPluginDialog::refreshRemote()
