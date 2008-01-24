@@ -64,6 +64,7 @@ pqPendingDisplayManager::pqPendingDisplayManager(QObject* p)
   : QObject(p)
 {
   this->Internal = new MyInternal;
+  this->IgnoreAdd = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -86,6 +87,12 @@ pqUndoStack* pqPendingDisplayManager::undoStack() const
 }
 
 //-----------------------------------------------------------------------------
+void pqPendingDisplayManager::setAddSourceIgnored(bool ignored)
+{
+  this->IgnoreAdd = ignored;
+}
+
+//-----------------------------------------------------------------------------
 bool pqPendingDisplayManager::isPendingDisplay(pqPipelineSource* source) const
 {
   return (source && this->Internal->SourcesSansDisplays.contains(source));
@@ -94,7 +101,7 @@ bool pqPendingDisplayManager::isPendingDisplay(pqPipelineSource* source) const
 //-----------------------------------------------------------------------------
 void pqPendingDisplayManager::addPendingDisplayForSource(pqPipelineSource* s)
 {
-  if(!s)
+  if(!s || this->IgnoreAdd)
     {
     return;
     }

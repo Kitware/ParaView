@@ -58,6 +58,10 @@ public:
   void setUndoStack(pqUndoStack*);
   pqUndoStack* undoStack() const;
 
+  /// Get/Set if adding sources is ignored.
+  void setAddSourceIgnored(bool ignored);
+  bool isAddSourceIgnored() const {return this->IgnoreAdd;}
+
   /// Returns if the source is pending a display creation
   /// by this manager.
   bool isPendingDisplay(pqPipelineSource*) const;
@@ -85,6 +89,7 @@ protected:
 private:
   class MyInternal;
   MyInternal* Internal;
+  bool IgnoreAdd;
 
   pqPendingDisplayManager(const pqPendingDisplayManager&); // Not implemented.
   void operator=(const pqPendingDisplayManager&); // Not implemented.
