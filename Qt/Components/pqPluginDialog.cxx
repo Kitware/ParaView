@@ -108,6 +108,7 @@ void pqPluginDialog::loadRemotePlugin()
     this->RecentRemoteCombo->addItem(plugin);
     pqSettings* settings = pqApplicationCore::instance()->settings();
     QStringList remote = settings->value("/remotePlugins").toStringList();
+    remote.removeAll(plugin);
     remote.insert(0, plugin);
     while(remote.count() > 10)
       {
@@ -126,6 +127,7 @@ void pqPluginDialog::loadLocalPlugin()
     this->RecentLocalCombo->addItem(plugin);
     pqSettings* settings = pqApplicationCore::instance()->settings();
     QStringList local = settings->value("/localPlugins").toStringList();
+    local.removeAll(plugin);
     local.insert(0, plugin);
     while(local.count() > 10)
       {
