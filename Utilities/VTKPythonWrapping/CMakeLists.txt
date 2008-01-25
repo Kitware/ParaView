@@ -231,7 +231,6 @@ SET(VTK_COMMON_SOURCES
   )
 
 SET(VTK_FILTERS_SOURCES
-  ${VTK_SOURCE_DIR}/Filtering/vtkAbstractGraph.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkAbstractGraphAlgorithm.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkAbstractMapper.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkActor2D.cxx
@@ -448,7 +447,6 @@ SET(VTK_COMMON_ABSTRACTS
   )
 
 SET(VTK_FILTERS_ABSTRACTS
-  ${VTK_SOURCE_DIR}/Filtering/vtkAbstractGraph
   ${VTK_SOURCE_DIR}/Filtering/vtkAbstractMapper
   ${VTK_SOURCE_DIR}/Filtering/vtkCell
   ${VTK_SOURCE_DIR}/Filtering/vtkCell3D
