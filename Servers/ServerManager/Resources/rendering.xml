@@ -4436,6 +4436,15 @@
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
 
+      <IntVectorProperty
+          name="SuppressLOD"
+          command="SetSuppressLOD"
+          number_of_elements="1"
+          default_values="0"
+          update_self="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
       <SubProxy>
         <!-- 
           Geometry filter is used to conver non-polydata input to polydata.
@@ -5004,6 +5013,7 @@
         <ExposedProperties>
           <Property name="ColorArrayName" />
           <Property name="ColorAttributeType" />
+          <Property name="SuppressLOD" />
 
           <!-- Geometry Filter properties -->
           <Property name="UseStrips" />

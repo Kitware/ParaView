@@ -133,6 +133,13 @@ public:
   // Overridden to add modification observer.
   virtual void SetViewInformation(vtkInformation*);
 
+  // Description:
+  // SuppressLOD controls whether this representation will use LOD
+  // when asked by the render view. It can be used to disable LOD of
+  // selected representations. The default is 0.
+  vtkSetMacro(SuppressLOD, int);
+  vtkGetMacro(SuppressLOD, int);
+
 //BTX
 protected:
   vtkSMSurfaceRepresentationProxy();
@@ -179,6 +186,8 @@ protected:
   double Specular;
 
   int Representation;
+
+  int SuppressLOD;
 private:
   vtkSMSurfaceRepresentationProxy(const vtkSMSurfaceRepresentationProxy&); // Not implemented
   void operator=(const vtkSMSurfaceRepresentationProxy&); // Not implemented
