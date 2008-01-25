@@ -323,6 +323,8 @@ SET(VTK_FILTERS_SOURCES
   ${VTK_SOURCE_DIR}/Filtering/vtkMultiGroupDataIterator.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkMultiGroupDataSet.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkMultiGroupDataSetAlgorithm.cxx
+  ${VTK_SOURCE_DIR}/Filtering/vtkMutableDirectedGraph.cxx
+  ${VTK_SOURCE_DIR}/Filtering/vtkMutableUndirectedGraph.cxx  
   ${VTK_SOURCE_DIR}/Filtering/vtkNonLinearCell.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkOrderedTriangulator.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkParametricSpline.cxx
@@ -383,6 +385,7 @@ SET(VTK_FILTERS_SOURCES
   ${VTK_SOURCE_DIR}/Filtering/vtkTriangleStrip.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkTriQuadraticHexahedron.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkTrivialProducer.cxx
+  ${VTK_SOURCE_DIR}/Filtering/vtkUndirectedGraph.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkUniformGrid.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkUnstructuredGrid.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkUnstructuredGridAlgorithm.cxx
