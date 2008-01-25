@@ -265,6 +265,7 @@ SET(VTK_FILTERS_SOURCES
   ${VTK_SOURCE_DIR}/Filtering/vtkDataSetAlgorithm.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkDataSetAttributes.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkDataSetCollection.cxx
+  ${VTK_SOURCE_DIR}/Filtering/vtkDirectedGraph.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkDemandDrivenPipeline.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkEmptyCell.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkExecutive.cxx
@@ -285,7 +286,6 @@ SET(VTK_FILTERS_SOURCES
   ${VTK_SOURCE_DIR}/Filtering/vtkGeometricErrorMetric.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkGraph.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkGraphAlgorithm.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkGraphIdList.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkAttributesErrorMetric.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkHexagonalPrism.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkHexahedron.cxx
@@ -387,7 +387,6 @@ SET(VTK_FILTERS_SOURCES
   ${VTK_SOURCE_DIR}/Filtering/vtkUnstructuredGrid.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkUnstructuredGridAlgorithm.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkVertex.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkVertexLinks.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkViewDependentErrorMetric.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkVoxel.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkWedge.cxx
