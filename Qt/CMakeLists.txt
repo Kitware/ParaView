@@ -75,6 +75,7 @@ IF(WIN32 AND QT_QTUITOOLS_FOUND)
     ENDIF(myv MATCHES "UITOOLS" OR myv MATCHES "UiTools" OR "${myv}" MATCHES "\\\\")
   ENDFOREACH(v)
 
+  MESSAGE(STATUS "info-debug-morva-warnings: QT_LIBRARIES='${QT_LIBRARIES}'")
   MESSAGE(STATUS "info-debug-morva-warnings: qtuitools 5")
 ENDIF(WIN32 AND QT_QTUITOOLS_FOUND)
 
