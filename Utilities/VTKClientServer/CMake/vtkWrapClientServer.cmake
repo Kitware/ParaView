@@ -22,7 +22,11 @@ MACRO(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
   # if this is used from outside paraview (e.g. in a plugin, this
   # should come from the ParaViewConfig.cmake file
   IF(NOT VTK_WRAP_ClientServer_EXE)
-    GET_TARGET_PROPERTY(VTK_WRAP_ClientServer_EXE vtkWrapClientServer LOCATION)
+    IF(CMAKE_CROSSCOMPILING)
+      SET(VTK_WRAP_ClientServer_EXE vtkWrapClientServer)
+    ELSE(CMAKE_CROSSCOMPILING)
+      GET_TARGET_PROPERTY(VTK_WRAP_ClientServer_EXE vtkWrapClientServer LOCATION)
+    ENDIF(CMAKE_CROSSCOMPILING)
   ENDIF(NOT VTK_WRAP_ClientServer_EXE)
   # still not found ?
   IF(NOT VTK_WRAP_ClientServer_EXE)
