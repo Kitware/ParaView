@@ -86,6 +86,9 @@ SET(QT_USE_QTXML TRUE)  # uitools depends on xml
 # in any of the SUBDIRS in this directory.
 INCLUDE(${QT_USE_FILE})
 
+MESSAGE(STATUS "info-debug-morva-warnings: QT_LIBRARIES='${QT_LIBRARIES}'")
+MESSAGE(STATUS "info-debug-morva-warnings: qtuitools 6")
+
 
 #########################################################################
 # Include Qt dependent code.
