@@ -40,7 +40,7 @@ inline int vtkSMSimpleParallelStrategyGetInt(vtkSMProxy* proxy,
 }
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.14");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.15");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
@@ -401,6 +401,11 @@ void vtkSMSimpleParallelStrategy::SetUseCompositing(bool compositing)
 //----------------------------------------------------------------------------
 void vtkSMSimpleParallelStrategy::SetKdTree(vtkSMProxy* proxy)
 {
+  if (this->KdTree == proxy)
+    {
+    return;
+    }
+
   vtkSetObjectBodyMacro(KdTree, vtkSMProxy, proxy);
 
   if (this->Distributor)
