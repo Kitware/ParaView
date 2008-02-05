@@ -50,7 +50,7 @@
 #include "vtkHyperOctreeSurfaceFilter.h"
 
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.72");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.73");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -679,6 +679,7 @@ void vtkPVGeometryFilter::DataSetSurfaceExecute(vtkDataSet* input,
   this->DataSetSurfaceFilter->Update();
   // The internal filter is finished.  Remove the observer.
   this->DataSetSurfaceFilter->RemoveObserver(this->InternalProgressObserver);
+  this->DataSetSurfaceFilter->SetInput(0);
 
   output->ShallowCopy(this->DataSetSurfaceFilter->GetOutput());
 }
