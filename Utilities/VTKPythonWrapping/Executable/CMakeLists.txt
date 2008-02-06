@@ -83,6 +83,18 @@ IF (APPLE)
   SET_TARGET_PROPERTIES(pvbatch${PV_EXE_SUFFIX} PROPERTIES LINK_FLAGS "-flat_namespace -undefined suppress -u _PyMac_Error")
 ENDIF (APPLE)
 
+# When paraview is linked statically (for example during
+# cross-compiling) the python wrapper module "init" functions must be
+# referenced and called at startup.  The necessary code is written
+# into pvpythonmodules.h and included in vtkPVPythonInterpretor.cxx
+# for compilation.  Then the vtkPVPythonInterpretor static library
+# "links" to all the module archives.  This creates a circular
+# dependency chain between the interpreter and the wrapper modules.
+#
+# In the future we should change this to have a library whose purpose
+# is to reference all the module init functions.  That library may
+# then depend on the modules and vtkPVPythonInterpretor without
+# creating a cycle.
 IF(UNIX)
   SET(PYTHON_MODULE_PREFIX "lib")
 ELSE(UNIX)
