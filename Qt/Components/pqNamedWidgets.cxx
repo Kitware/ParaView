@@ -100,8 +100,6 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
   vtkSMPropertyIterator *iter = proxy->NewPropertyIterator();
   for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
-    vtkSMProperty* SMProperty = iter->GetProperty();
-
     // all property names with special characters are changed
     QString propertyName = iter->GetKey();
     propertyName.replace(':', '_');
@@ -368,8 +366,6 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
   vtkSMPropertyIterator *iter = proxy->NewPropertyIterator();
   for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
-    vtkSMProperty* SMProperty = iter->GetProperty();
-
     // all property names with special characters are changed
     QString propertyName = iter->GetKey();
     propertyName.replace(':', '_');
