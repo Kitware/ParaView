@@ -333,6 +333,7 @@ SET(VTK_FILTERS_SOURCES
   ${VTK_SOURCE_DIR}/Filtering/vtkNonLinearCell.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkOrderedTriangulator.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkParametricSpline.cxx
+  ${VTK_SOURCE_DIR}/Filtering/vtkPassInputTypeAlgorithm.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkPentagonalPrism.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkPerlinNoise.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkPiecewiseFunction.cxx
