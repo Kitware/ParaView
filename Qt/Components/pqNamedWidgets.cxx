@@ -101,10 +101,6 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
   for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMProperty* SMProperty = iter->GetProperty();
-    if(SMProperty->GetInformationOnly())
-      {
-      continue;
-      }
 
     // all property names with special characters are changed
     QString propertyName = iter->GetKey();
@@ -373,10 +369,6 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
   for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMProperty* SMProperty = iter->GetProperty();
-    if(SMProperty->GetInformationOnly())
-      {
-      continue;
-      }
 
     // all property names with special characters are changed
     QString propertyName = iter->GetKey();
@@ -796,7 +788,8 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
       }
 
     // skip information properties
-    if(SMProperty->GetInformationOnly() || SMProperty->GetIsInternal())
+    if((!propertiesToShow.contains(propertyName) && SMProperty->GetInformationOnly()) || 
+        SMProperty->GetIsInternal())
       {
       continue;
       }
