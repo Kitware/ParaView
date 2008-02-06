@@ -179,6 +179,7 @@ SET(Kit_SRCS
   vtkSMXDMFPropertyDomain.cxx
   vtkSMXMLPVAnimationWriterProxy.cxx
   vtkSMXYPlotRepresentationProxy.cxx
+  vtkSMDataSourceProxy.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS
