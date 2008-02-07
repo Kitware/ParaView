@@ -56,7 +56,10 @@
    <Writer name="EnSightWriter"
            extensions="case"
            file_description="EnSight File"/>
-   <Writer name="CSVWriter"
-           extensions="csv"
-           file_description="CSV File"/>
+  <Writer name="CSVWriter"
+          extensions="csv"
+          file_description="CSV File"/>
+  <Writer name="PCSVWriter"
+          extensions="csv"
+          file_description="CSV File"/>
 </ParaViewWriters>

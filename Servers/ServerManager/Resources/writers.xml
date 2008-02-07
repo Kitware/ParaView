@@ -789,20 +789,25 @@
       <!-- End of SummaryHelper -->
     </SummaryHelperProxy>
 
-    <WriterProxy name="CSVWriter" class="vtkCSVWriter">
+    <PWriterProxy name="CSVWriter" class="vtkPCSVWriter"
+      base_proxygroup="writers" base_proxyname="ParallelWriterBase">
       <Documentation
-        short_help="Write CSV files">
-        Writer to write CSV files. Cannot be used to write in parallel.
+        short_help="Write CSV files in Parallel">
+        Writer to write CSV files, works in parallel or serial.
       </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkRectilinearGrid" />
           <DataType value="vtkPolyData" />
         </DataTypeDomain>
       </InputProperty>
 
-      <StringVectorProperty 
-        name="FileName" 
+      <StringVectorProperty
+        name="FileName"
         command="SetFileName"
         number_of_elements="1">
         <Documentation>
@@ -810,11 +815,18 @@
         </Documentation>
       </StringVectorProperty>
 
+
+
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
+
       </Hints>
       <!-- End of CSVWriter -->
-    </WriterProxy>
+
+
+
+    </PWriterProxy>
+    
   </ProxyGroup>
 </ServerManagerConfiguration>

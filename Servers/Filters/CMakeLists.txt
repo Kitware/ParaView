@@ -48,6 +48,7 @@ SET(Filters_SRCS
   vtkNetworkImageSource.cxx
   vtkOrderedCompositeDistributor.cxx
   vtkPConvertSelection.cxx
+  vtkPCSVWriter.cxx
   vtkPExtractHistogram.cxx
   vtkPhastaReader.cxx
   vtkPointHandleRepresentationSphere.cxx
