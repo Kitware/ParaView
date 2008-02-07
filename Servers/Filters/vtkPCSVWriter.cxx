@@ -29,7 +29,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkPCSVWriter);
-vtkCxxRevisionMacro(vtkPCSVWriter, "1.1");
+vtkCxxRevisionMacro(vtkPCSVWriter, "1.2");
 
 vtkCxxSetObjectMacro(vtkPCSVWriter, Controller, vtkMultiProcessController);
 
@@ -47,8 +47,8 @@ vtkPCSVWriter::~vtkPCSVWriter()
 }
 
 //----------------------------------------------------------------------------
-int vtkPCSVWriter::RequestInformation(vtkInformation *request,
-                                        vtkInformationVector **inputVector,
+int vtkPCSVWriter::RequestInformation(vtkInformation *, // request
+                                        vtkInformationVector **, // inputVector,
                                         vtkInformationVector *outputVector)
 {
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
@@ -94,12 +94,9 @@ void vtkPCSVWriter::AppendCSVDataSet(vtkRectilinearGrid *remoteCSVOutput,
   for (k = 0; k < numNode0PointArrays; k++)
     {
     vtkAbstractArray *node0Array = node0PointData->GetArray(k);
-    char * node0ArrayName = node0Array->GetName();
     vtkAbstractArray *remoteArray = remotePointData->GetArray(
       node0Array->GetName());
-    char * remoteArrayName = remoteArray->GetName();
 
-    int numNode0DataValues = node0Array->GetNumberOfTuples();
     int numRemoteArrayDataValues = remoteArray->GetNumberOfTuples();
     if (remoteArray != NULL)
       {
@@ -115,12 +112,9 @@ void vtkPCSVWriter::AppendCSVDataSet(vtkRectilinearGrid *remoteCSVOutput,
   for (k = 0; k < numNode0PointArrays; k++)
     {
     vtkAbstractArray *node0Array = node0CellData->GetArray(k);
-    char * node0ArrayName = node0Array->GetName();
     vtkAbstractArray *remoteArray = remoteCellData->GetArray(
       node0Array->GetName());
-    char * remoteArrayName = remoteArray->GetName();
 
-    int numNode0DataValues = node0Array->GetNumberOfTuples();
     int numRemoteArrayDataValues = remoteArray->GetNumberOfTuples();
     if (remoteArray != NULL)
       {
@@ -160,11 +154,12 @@ void vtkPCSVWriter::WriteRectilinearDataInParallel(
     }
   else if ( numProcs > 1 )
     {
-    vtkIdType numRemoteValidPoints = 0;
     vtkRectilinearGrid * rectilinearGridCopy = vtkRectilinearGrid::New();
     rectilinearGridCopy->DeepCopy(rectilinearGrid);
 
 #if 0
+
+    vtkIdType numRemoteValidPoints = 0;
 
     /* 2/6/2008: JG: it seems like this code is not needed as the
        rectilinear grid has already been gathered from remote processes.
