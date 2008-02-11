@@ -118,7 +118,7 @@ public:
   // Returns the output port name given its index.
   // Each output port is assigned an unique name (either using the xml
   // configuration or automatically). The automatically assigned names are of
-  // the type Output0, Output1 etc.
+  // the type Output-0, Output-1 etc.
   const char* GetOutputPortName(unsigned int index);
 
   // Description:
