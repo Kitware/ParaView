@@ -1293,7 +1293,7 @@ def LoadPlugin(filename, connection=None):
             parser.Parse(xmlstring)
             parser.ProcessConfiguration(vtkSMObject.GetProxyManager())
             # Update the modules
-            _updateModules()
+            updateModules()
             
 
 def Fetch(input, arg1=None, arg2=None):
@@ -1531,37 +1531,37 @@ def _printProgress(caller, event):
         currentAlgorithm = None
         currentProgress = 0
             
-def _updateModules():
+def updateModules():
     """Called when a plugin is loaded, this method updates
     the proxy class object in all known modules."""
     global sources, filters, writers, rendering, animation
 
-    _createModule("sources", sources)
-    _createModule("filters", filters)
-    _createModule("writers", writers)
-    _createModule("representations", rendering)
-    _createModule("views", rendering)
-    _createModule("lookup_tables", rendering)
-    _createModule("textures", rendering)
-    _createModule("animation", animation)
-    _createModule('animation_keyframes', animation)
+    createModule("sources", sources)
+    createModule("filters", filters)
+    createModule("writers", writers)
+    createModule("representations", rendering)
+    createModule("views", rendering)
+    createModule("lookup_tables", rendering)
+    createModule("textures", rendering)
+    createModule("animation", animation)
+    createModule('animation_keyframes', animation)
     
 def _createModules():
     """Called when the module is loaded, this creates sub-
     modules for all know proxy groups."""
     global sources, filters, writers, rendering, animation
 
-    sources = _createModule('sources')
-    filters = _createModule('filters')
-    writers = _createModule('writers')
-    rendering = _createModule('representations')
-    _createModule('views', rendering)
-    _createModule("lookup_tables", rendering)
-    _createModule("textures", rendering)
-    animation = _createModule('animation')
-    _createModule('animation_keyframes', animation)
+    sources = createModule('sources')
+    filters = createModule('filters')
+    writers = createModule('writers')
+    rendering = createModule('representations')
+    createModule('views', rendering)
+    createModule("lookup_tables", rendering)
+    createModule("textures", rendering)
+    animation = createModule('animation')
+    createModule('animation_keyframes', animation)
     
-def _createModule(groupName, mdl=None):
+def createModule(groupName, mdl=None):
     """Populates a module with proxy classes defined in the given group.
     If mdl is not specified, it also creates the module"""
     pxm = vtkSMObject.GetProxyManager()
