@@ -34,6 +34,15 @@ public:
   vtkTypeRevisionMacro(vtkPVTrivialExtentTranslator, vtkExtentTranslator);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  virtual void Register(vtkObjectBase* o)
+    {
+    this->RegisterInternal(o, 1);
+    }
+  virtual void UnRegister(vtkObjectBase* o)
+    {
+    this->UnRegisterInternal(o, 1);
+    }
+
   void SetDataSet(vtkDataSet*);
   vtkGetObjectMacro(DataSet, vtkDataSet);
 
