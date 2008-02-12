@@ -25,7 +25,11 @@
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkFloatArray.h"
 #include "vtkGarbageCollector.h"
+#include "vtkGenericDataSet.h"
+#include "vtkGenericGeometryFilter.h"
 #include "vtkGeometryFilter.h"
+#include "vtkHyperOctree.h"
+#include "vtkHyperOctreeSurfaceFilter.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -36,21 +40,18 @@
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkPolygon.h"
+#include "vtkPVTrivialProducer.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRectilinearGridOutlineFilter.h"
+#include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStripper.h"
 #include "vtkStructuredGrid.h"
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkGenericDataSet.h"
-#include "vtkGenericGeometryFilter.h"
-#include "vtkHyperOctree.h"
-#include "vtkHyperOctreeSurfaceFilter.h"
 
-
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.73");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.74");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -671,7 +672,25 @@ void vtkPVGeometryFilter::GenericDataSetExecute(
 void vtkPVGeometryFilter::DataSetSurfaceExecute(vtkDataSet* input, 
                                                 vtkPolyData* output)
 {
-  this->DataSetSurfaceFilter->SetInput(input);
+  vtkDataSet* clone = input->NewInstance();
+
+  // If we directly pass clone to the input of the DataSetSurfaceFilter, then
+  // for structured datasets, the information about whole extent of the data is
+  // lost. This is so, because vtkTrivialProducer sets that the whole
+  // extent for the output to be same as the extent of the data. This results is
+  // false boundary surfaces for such data when number of processes > 1. To
+  // overcome that issue, we are creating a new produces which still reports the
+  // "real" whole extent, however, has a special extent translator that never
+  // results in a request for the whole extent, only that provided by the data.
+  vtkPVTrivialProducer* producer = vtkPVTrivialProducer::New();
+  producer->SetWholeExtent(input->GetWholeExtent());
+  producer->SetOutput(clone);
+
+  clone->ShallowCopy(input);
+  this->DataSetSurfaceFilter->SetInputConnection(producer->GetOutputPort());
+  
+  producer->Delete();
+  clone->Delete();
 
   // Observe the progress of the internal filter.
   this->DataSetSurfaceFilter->AddObserver(vtkCommand::ProgressEvent, 
