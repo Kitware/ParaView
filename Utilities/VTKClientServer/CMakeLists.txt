@@ -68,6 +68,7 @@ CS_INITIALIZE_WRAP()
 
 # Create vtkClientServer library.
 ADD_LIBRARY(vtkClientServer
+  vtkClientServerID.cxx
   vtkClientServerID.h
   vtkClientServerInterpreter.cxx
   vtkClientServerInterpreter.h

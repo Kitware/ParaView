@@ -29,7 +29,7 @@
 struct VTK_CLIENT_SERVER_EXPORT vtkClientServerID
 {
   vtkClientServerID() : ID(0) {}
-  vtkClientServerID(vtkTypeUInt32 id) : ID(id) {}
+  explicit vtkClientServerID(vtkTypeUInt32 id) : ID(id) {}
 
   bool IsNull() { return this->ID == 0; }
   void SetToNull() { this->ID = 0; }
@@ -51,15 +51,7 @@ struct VTK_CLIENT_SERVER_EXPORT vtkClientServerID
   vtkTypeUInt32 ID;
 };
 
-inline ostream& operator<<(ostream& os, const vtkClientServerID& id)
-{
-  return os << id.ID;
-}
-
-inline vtkOStreamWrapper& operator<<(vtkOStreamWrapper& os, const vtkClientServerID& id)
-{
-  return os << id.ID;
-}
-
+ostream& operator<<(ostream& os, const vtkClientServerID& id);
+vtkOStreamWrapper& operator<<(vtkOStreamWrapper& os, const vtkClientServerID& id);
                       
 #endif
