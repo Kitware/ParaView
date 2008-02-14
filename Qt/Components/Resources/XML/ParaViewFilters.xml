@@ -42,6 +42,7 @@
   <Filter name="Calculator" />
   <Filter name="CellCenters" />
   <Filter name="CellDataToPointData" />
+  <Filter name="CellDerivatives"/>
   <Filter name="CleanPolyData" />
   <Filter name="CleanUnstructuredGrid" />
   <Filter name="Clip" />

@@ -6897,6 +6897,99 @@ This filter extracts a list of datasets from multigroup datasets.
    <!-- End of TimeToTextConvertor -->
    </SourceProxy>
 
+   <SourceProxy name="CellDerivatives" class="vtkCellDerivatives"
+     label="Compute Derivatives">
+     <Documentation
+        long_help="This filter computes derivatives of scalars and vectors."
+        short_help="Shrink each input cell.">
+CellDerivatives is a filter that computes derivatives of scalars and vectors at the center of cells. You can choose to generate different output including the scalar gradient (a vector), computed tensor vorticity (a vector), gradient of input vectors (a tensor), and strain matrix of the input vectors (a tensor); or you may choose to pass data through to the output.
+     </Documentation>
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array1" attribute_type="point"
+                             number_of_components="1" optional="1"/>
+           <InputArrayDomain name="input_array2" attribute_type="point"
+                             number_of_components="3" optional="1"/>
+           <Documentation>
+             This property specifies the input to the filter.
+           </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty 
+          name="SelectInputScalars" 
+          command="SetInputArrayToProcess"
+          number_of_elements="5"
+          element_types="0 0 0 0 2"
+          label="Scalars">
+        <ArrayListDomain name="array_list" attribute_type="Scalars" 
+                         input_domain_name="input_array1">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property indicates the name of the scalar array to differentiate.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty 
+          name="SelectInputVectors" 
+          command="SetInputArrayToProcess"
+          number_of_elements="5"
+          element_types="0 0 0 0 2"
+          default_values="1"
+          label="Vectors">
+        <ArrayListDomain name="array_list" attribute_type="Vectors" 
+                         input_domain_name="input_array2">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property indicates the name of the vector array to differentiate.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty 
+        name="OutputVectorType" 
+        command="SetVectorMode" 
+        number_of_elements="1"
+        default_values="1"> 
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Nothing"/>
+         <Entry value="1" text="Scalar Gradient"/>
+         <Entry value="2" text="Vorticity"/>
+       </EnumerationDomain>
+       <Documentation>
+This property Controls how the filter works to generate vector cell data. You can choose to compute the gradient of the input scalars, or extract the vorticity of the computed vector gradient tensor. By default, the filter will take the gradient of the input scalar data.
+       </Documentation>
+     </IntVectorProperty>
+
+      <IntVectorProperty 
+        name="OutputTensorType" 
+        command="SetTensorMode" 
+        number_of_elements="1"
+        default_values="1"> 
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Nothing"/>
+         <Entry value="1" text="Vector Gradient"/>
+         <Entry value="2" text="Strain"/>
+       </EnumerationDomain>
+       <Documentation>
+This property controls how the filter works to generate tensor cell data. You can choose to compute the gradient of the input vectors, or compute the strain tensor of the vector gradient tensor. By default, the filter will take the gradient of the vector data to construct a tensor.
+       </Documentation>
+     </IntVectorProperty>
+   <!-- End CellDerivatives -->
+   </SourceProxy>
+
    <ExtractFrustumProxy name="SelectThrough"
     label="Select Through"
     class="vtkExtractSelection">
