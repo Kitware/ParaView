@@ -268,9 +268,23 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
           "Outline");
         }
       }
+    else if (dataSetType == VTK_IMAGE_DATA)
+      {
+      // Use slice representation by default for 2D image data.
+      int* ext = dataInfo->GetExtent();
+      if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
+        {
+        pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
+          "Slice");
+        }
+      else
+        {
+        pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
+          "Outline");
+        }
+      }
     else if(dataSetType == VTK_RECTILINEAR_GRID ||
-       dataSetType == VTK_STRUCTURED_GRID ||
-       dataSetType == VTK_IMAGE_DATA)
+       dataSetType == VTK_STRUCTURED_GRID)
       {
       int* ext = dataInfo->GetExtent();
       if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
@@ -676,7 +690,8 @@ QList<QString> pqPipelineRepresentation::getColorFields()
 
   int representation = this->getRepresentationType();
 
-  if (representation != vtkSMPVRepresentationProxy::VOLUME)
+  if (representation != vtkSMPVRepresentationProxy::VOLUME && 
+    representation != vtkSMPVRepresentationProxy::SLICE)
     {
     // Actor color is one way to color this part.
     // Not applicable when volume rendering.
@@ -919,10 +934,15 @@ void pqPipelineRepresentation::setRepresentation(int representation)
 //-----------------------------------------------------------------------------
 void pqPipelineRepresentation::onRepresentationChanged()
 {
- vtkSMPVRepresentationProxy* repr = this->getRepresentationProxy();
+  vtkSMPVRepresentationProxy* repr = this->getRepresentationProxy();
+  if (!repr)
+    {
+    return;
+    }
 
-  if(!repr || 
-    this->getRepresentationType() != vtkSMPVRepresentationProxy::VOLUME)
+  int reprType = this->getRepresentationType();
+  if (reprType != vtkSMPVRepresentationProxy::VOLUME  &&
+    reprType != vtkSMPVRepresentationProxy::SLICE)
     {
     // Nothing to do here.
     return;

@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt includes
 #include <QFileInfo>
 #include <QIcon>
+#include <QIntValidator>
+#include <QKeyEvent>
 #include <QMetaType>
 #include <QPointer>
 #include <QtDebug>
@@ -44,11 +46,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager includes
 #include "vtkEventQtSlotConnect.h"
-#include "vtkMaterialLibrary.h"
 #include "vtkLabeledDataMapper.h"
+#include "vtkMaterialLibrary.h"
 #include "vtkPVArrayInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSMLookupTableProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyProperty.h"
@@ -70,6 +72,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqScalarsToColors.h"
 #include "pqSMAdaptor.h"
+#include "pqWidgetRangeDomain.h"
 
 class pqDisplayProxyEditorInternal : public Ui::pqDisplayProxyEditor
 {
@@ -80,12 +83,16 @@ public:
     this->InterpolationAdaptor = 0;
     this->ColorAdaptor = 0;
     this->EdgeColorAdaptor = 0;
+    this->SliceDirectionAdaptor = 0;
+    this->SliceDomain = 0;
     }
 
   ~pqDisplayProxyEditorInternal()
     {
     delete this->Links;
     delete this->InterpolationAdaptor;
+    delete this->SliceDirectionAdaptor;
+    delete this->SliceDomain;
     }
 
   pqPropertyLinks* Links;
@@ -95,6 +102,8 @@ public:
   pqSignalAdaptorComboBox* InterpolationAdaptor;
   pqSignalAdaptorColor*    ColorAdaptor;
   pqSignalAdaptorColor*    EdgeColorAdaptor;
+  pqSignalAdaptorComboBox* SliceDirectionAdaptor;
+  pqWidgetRangeDomain* SliceDomain;
 
   // map of <material labels, material files>
   static QMap<QString, QString> MaterialMap;
@@ -138,6 +147,9 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     return;
     }
 
+  delete this->Internal->SliceDomain;
+  this->Internal->SliceDomain = 0;
+
   vtkSMProxy* reprProxy = (repr)? repr->getProxy() : NULL;
   if(this->Internal->Representation)
     {
@@ -151,10 +163,8 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     this->setEnabled(false);
     return;
     }
-  else
-    {
-    this->setEnabled(true);
-    }
+
+  this->setEnabled(true);
   
   // The slots are already connected but we do not want them to execute
   // while we are initializing the GUI
@@ -307,19 +317,33 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
 
   this->Internal->Texture->setRepresentation(repr);
 
-  /*
-  if (reprProxy->GetProperty("ScalarOpacityUnitDistance"))
-    {
-    this->Internal->Links->addPropertyLink(
-      this->Internal->ScalarOpacityUnitDistance, "value",
-      SIGNAL(editingFinished()),
-      reprProxy, reprProxy->GetProperty("ScalarOpacityUnitDistance"));
-    }
-    */
-
   this->Internal->Links->addPropertyLink(this->Internal->EdgeColorAdaptor,
     "color", SIGNAL(colorChanged(const QVariant&)),
     reprProxy, reprProxy->GetProperty("EdgeColor"));
+
+  if (reprProxy->GetProperty("Slice"))
+    {
+    this->Internal->SliceDomain = new pqWidgetRangeDomain(
+      this->Internal->Slice, "minimum", "maximum",
+      reprProxy->GetProperty("Slice"), 0);
+
+    this->Internal->Links->addPropertyLink(this->Internal->Slice,
+      "value", SIGNAL(valueChanged(int)),
+      reprProxy, reprProxy->GetProperty("Slice"));
+
+    QList<QVariant> sliceModes = 
+      pqSMAdaptor::getEnumerationPropertyDomain(
+        reprProxy->GetProperty("SliceMode"));
+    foreach(QVariant item, sliceModes)
+      {
+      this->Internal->SliceDirection->addItem(item.toString());
+      }
+    this->Internal->Links->addPropertyLink(
+      this->Internal->SliceDirectionAdaptor,
+      "currentText", SIGNAL(currentTextChanged(const QString&)),
+      reprProxy, reprProxy->GetProperty("SliceMode"));
+    }
+    
 
 #if 0                                       //FIXME 
   // material
@@ -459,6 +483,13 @@ void pqDisplayProxyEditor::setupGUIConnections()
   QObject::connect(this->Internal->StyleMaterial, SIGNAL(currentIndexChanged(int)),
                    this, SLOT(updateMaterial(int)));
 
+  this->Internal->SliceDirectionAdaptor = new pqSignalAdaptorComboBox(
+    this->Internal->SliceDirection);
+  QObject::connect(this->Internal->SliceDirectionAdaptor, 
+    SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateAllViews()));
+  QObject::connect(this->Internal->SliceDirectionAdaptor,
+    SIGNAL(currentTextChanged(const QString&)),
+    this, SLOT(sliceDirectionChanged()), Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------
@@ -481,10 +512,18 @@ void pqDisplayProxyEditor::updateEnableState()
 
   int reprType = this->Internal->Representation->getRepresentationType();
   
-  //this->Internal->ScalarOpacityUnitDistance->setEnabled(
-  //  reprType == vtkSMPVRepresentationProxy::VOLUME);
   this->Internal->EdgeStyleGroup->setEnabled(
     reprType == vtkSMPVRepresentationProxy::SURFACE_WITH_EDGES);
+
+  this->Internal->SliceGroup->setEnabled(
+    reprType == vtkSMPVRepresentationProxy::SLICE);
+  if (reprType == vtkSMPVRepresentationProxy::SLICE)
+    {
+    // every time the user switches to Slice mode we update the domain for the
+    // slider since the domain depends on the input to the image mapper which
+    // may have changed.
+    QTimer::singleShot(0, this, SLOT(sliceDirectionChanged()));
+    }
 
   vtkSMDataRepresentationProxy* display = 
     this->Internal->Representation->getRepresentationProxy();
@@ -509,7 +548,8 @@ void pqDisplayProxyEditor::updateEnableState()
     if (arrayInfo && arrayInfo->GetDataType() == VTK_UNSIGNED_CHAR)
       {
       // Number of component restriction.
-      if (arrayInfo->GetNumberOfComponents() == 3)
+      // Upto 4 component unsigned chars can be direcly mapped.
+      if (arrayInfo->GetNumberOfComponents() <= 4)
         {
         // One component causes more trouble than it is worth.
         this->Internal->ColorMapScalars->setEnabled(true);
@@ -670,4 +710,18 @@ void pqDisplayProxyEditor::editCubeAxes()
   pqCubeAxesEditorDialog dialog(this);
   dialog.setRepresentationProxy(this->Internal->Representation->getProxy());
   dialog.exec();
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayProxyEditor::sliceDirectionChanged()
+{
+  if (this->Internal->Representation)
+    {
+    vtkSMProxy* reprProxy = this->Internal->Representation->getProxy();
+    vtkSMProperty* prop = reprProxy->GetProperty("SliceMode");
+    if (prop)
+      {
+      prop->UpdateDependentDomains();
+      }
+    }
 }

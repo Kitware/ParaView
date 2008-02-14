@@ -21,7 +21,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMExtentDomain);
-vtkCxxRevisionMacro(vtkSMExtentDomain, "1.7");
+vtkCxxRevisionMacro(vtkSMExtentDomain, "1.8");
 
 //---------------------------------------------------------------------------
 vtkSMExtentDomain::vtkSMExtentDomain()
@@ -74,7 +74,6 @@ void vtkSMExtentDomain::Update(vtkSMProxyProperty *pp)
         this->AddMinimum(j, extent[2*j]);
         this->AddMaximum(j, extent[2*j+1]);
         }
-      this->InvokeModified();
       return;
       }
     }
@@ -101,7 +100,6 @@ void vtkSMExtentDomain::Update(vtkSMProxyProperty *pp)
         this->AddMinimum(j, extent[2*j]);
         this->AddMaximum(j, extent[2*j+1]);
         }
-      this->InvokeModified();
       return;
       }
     }

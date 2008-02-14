@@ -69,6 +69,7 @@ protected slots:
   void updateEnableState();
   void updateMaterial(int idx);
   void editCubeAxes();
+  void sliceDirectionChanged();
 
 protected:
 

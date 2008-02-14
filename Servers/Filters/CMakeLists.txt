@@ -33,6 +33,7 @@ SET(Filters_SRCS
 #  vtkGroup.cxx
   vtkHierarchicalFractal.cxx
   vtkImageCompressor.cxx
+  vtkImageSliceMapper.cxx
   vtkIndexBasedBlockFilter.cxx
   vtkIndexBasedBlockSelectionFilter.cxx
   vtkIntegrateAttributes.cxx
@@ -115,6 +116,7 @@ SET(Filters_SRCS
 #  vtkTemporalCacheFilter.cxx
 #  vtkTemporalPickFilter.cxx
 #  vtkTemporalProbeFilter.cxx
+  vtkTexturePainter.cxx
   vtkTimestepsAnimationPlayer.cxx
   vtkTimeToTextConvertor.cxx
   vtkTrackballPan.cxx

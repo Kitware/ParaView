@@ -507,24 +507,17 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty 
-        name="ColorMode" 
-        command="SetColorMode"
-        number_of_elements="1"
-        default_values="1"
-        animateable="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Default"/>
-          <Entry value="1" text="MapScalars"/>
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <!-- Same as ColorMode but is a better way of setting the color mode since it is really a boolean: map scalars or not. I left ColorMode in for backwards compatibility -->
-      <IntVectorProperty 
         name="MapScalars" 
         command="SetColorMode"
         number_of_elements="1"
         default_values="1"
         animateable="0">
         <BooleanDomain name="bool"/>
+        <Documentation>
+          When set to true, LookupTable will always be used for scalar mapping
+          even when scalars are unsigned chars. Otherwise, when upto 4 component
+          unsigned chars are present, they will be directly used as colors.
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty
         name="ScalarRange"
@@ -849,7 +842,128 @@
         animateable="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <!-- End of FixedPointVolumeRayCastMapper -->
     </SourceProxy>
+
+    <SourceProxy name="ImageSliceMapper" class="vtkImageSliceMapper">
+      <Documentation>
+        Proxy for vtkImageMapper. We may need to change this to be a proxy for a
+        new class, vtkPVImageMapper which can use different point data
+        attributes as scalars in the image.
+      </Documentation>
+
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty name="Slice"
+        command="SetSlice"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Set the current slice number. Slice number is used to load a 2D slice
+          from a 3D input image. If the input image is 2D, then the slice number
+          if ignored. The direction of the slice is determined by SliceMode.
+        </Documentation>
+        <DimensionsDomain name="dims">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="SliceMode" function="Direction"/>
+          </RequiredProperties>
+        </DimensionsDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="SliceMode"
+        command="SetSliceMode"
+        number_of_elements="1"
+        default_values="5">
+        <Documentation>
+          Determines the direction of slicing to obtain a 2D slice from a 3D
+          image.
+        </Documentation>
+        <EnumerationDomain name="enum" >
+          <Entry text="XY Plane" value="5" />
+          <Entry text="YZ Plane" value="7" />
+          <Entry text="XZ Plane" value="6" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ScalarVisibility"
+        command="SetScalarVisibility"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Set if scalar mapping must be used even when the input image data
+          scalars are unsigned chars i.e. they can be directly rendered as
+          color.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ScalarMode"
+        command="SetScalarMode"
+        default_values="0"
+        number_of_elements="1"
+        animateable="0">
+        <Documentation>
+          Select where to find the scalars.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Default"/>
+          <Entry value="1" text="UsePointData"/>
+          <Entry value="2" text="UseCellData"/>
+          <Entry value="3" text="UsePointFieldData"/>
+          <Entry value="4" text="UseCellFieldData"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty 
+        name="ColorArray" 
+        command="SelectColorArray" 
+        number_of_elements="1"
+        animateable="0"> 
+        <Documentation>
+          Choose the name for the scalar array.
+        </Documentation>
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <ProxyProperty
+        name="LookupTable" command="SetLookupTable">
+        <Documentation>
+          Set the lookup table to use for scalar mapping.
+        </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+     <IntVectorProperty 
+        name="MapScalars" 
+        command="SetColorMode"
+        number_of_elements="1"
+        default_values="1"
+        animateable="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When set to true, LookupTable will always be used for scalar mapping
+          even when scalars are unsigned chars. Otherwise, when upto 4 component
+          unsigned chars are present, they will be directly used as colors.
+        </Documentation>
+      </IntVectorProperty>
+
+    <!-- End of ImageSliceMapper -->
+    </SourceProxy>
+  <!-- End of "mappers" -->  
   </ProxyGroup>
 
   <ProxyGroup name="ugrid_raycast_functions">
@@ -4466,7 +4580,6 @@
         <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper" />
         <ExposedProperties>
           <Property name="LookupTable" />
-          <Property name="ColorMode" />
           <Property name="MapScalars" />
           <Property name="ImmediateModeRendering" />
           <Property name="InterpolateScalarsBeforeMapping" />
@@ -4541,6 +4654,125 @@
 
     <!-- End of SurfaceRepresentation -->
     </SurfaceRepresentationProxy>
+
+    <ImageSliceRepresentationProxy name="ImageSliceRepresentation">
+      <Documentation>
+        Representation to show 2D images. If the input image has 3D extents,
+        then this representation shows a single Z slice.
+      </Documentation>
+
+      <InputProperty name="Input" 
+        command="not-used">
+        <Documentation>
+          Set the input to the representation. Must be a vtkImageData producer.
+        </Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+      </InputProperty>
+
+      <DoubleVectorProperty name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        is_internal="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          This time is not used unless UseViewUpdateTime is off.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for this representation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ColorAttributeType"
+        command="SetColorAttributeType"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1">
+        <Documentation>
+          Select the attribute type from where the scalars array is used. The
+          scalar array name is specified using ColorArrayName. Note that if the
+          indicated scalar array is not available, then the image data scalars
+          are used.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="POINT_DATA" />
+          <Entry value="1" text="CELL_DATA" />
+          <Entry value="2" text="FIELD_DATA" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ColorArrayName"
+        command="SetColorArrayName"
+        number_of_elements="1"
+        default_values=""
+        update_self="1">
+        <Documentation>
+          Set the array name to color by.
+          If no array name is set, or choosen array is not available, then the
+          image scalars are used by default.
+        </Documentation>
+        <ArrayListDomain name="array_list" attribute_type="Scalars"
+          input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <SubProxy>
+        <!-- Mapper for high-res image -->
+        <Proxy name="Mapper" 
+          proxygroup="mappers" proxyname="ImageSliceMapper" />
+        <ExposedProperties>
+          <Property name="LookupTable" />
+          <Property name="Slice" />
+          <Property name="SliceMode" />
+          <Property name="MapScalars" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!-- Mapper for low-res image -->
+        <Proxy name="LODMapper" 
+          proxygroup="mappers" proxyname="ImageSliceMapper" />
+        <ShareProperties subproxy="Mapper" >
+          <Exception name="Input" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!-- Prop3D that gets added to the 3D renderer -->
+        <Proxy name="Prop3D" proxygroup="props" proxyname="Actor" />
+        <ExposedProperties>
+          <Property name="Orientation" />
+          <Property name="Origin" />
+          <Property name="Pickable" />
+          <Property name="Position" />
+          <Property name="Scale" />
+          <Property name="Texture" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!-- Property for the vtkProp.  -->
+        <Proxy name="Property" proxygroup="properties" proxyname="Property" />
+      </SubProxy>
+
+      <!-- End of ImageSliceRepresentation -->
+    </ImageSliceRepresentationProxy>
 
     <OutlineRepresentationProxy name="OutlineRepresentation">
       
@@ -4620,7 +4852,6 @@
         <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper" />
         <ExposedProperties>
           <Property name="LookupTable" />
-          <Property name="ColorMode" />
           <Property name="MapScalars" />
           <Property name="ImmediateModeRendering" />
           <Property name="InterpolateScalarsBeforeMapping" />
@@ -5239,7 +5470,7 @@
       base_proxyname="PVRepresentationBase">
       <Documentation>
         This representation is used to show image data as
-        Surface/Outline/Points/Wireframe/Volume.
+        Surface/Outline/Points/Wireframe/Volume/Slice.
       </Documentation>
 
       <InputProperty 
@@ -5258,7 +5489,7 @@
         name="Representation"
         command="SetRepresentation"
         number_of_elements="1"
-        default_values="2"
+        default_values="6"
         update_self="1">
         <EnumerationDomain name="enum">
           <Entry value="0" text="Points" />
@@ -5267,6 +5498,7 @@
           <Entry value="3" text="Outline" />
           <Entry value="4" text="Volume" />
           <Entry value="5" text="Surface With Edges" />
+          <Entry value="6" text="Slice" />
         </EnumerationDomain>
       </IntVectorProperty>
 
@@ -5282,6 +5514,20 @@
           <Property name="LockSampleDistanceToInputSpacing" />
           <Property name="ScalarOpacityUnitDistance" />
           <Property name="ScalarOpacityFunction" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="SliceRepresentation"
+          proxygroup="representations"
+          proxyname="ImageSliceRepresentation" />
+        <ShareProperties subproxy="SurfaceRepresentation" >
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="Slice" />
+          <Property name="SliceMode" />
         </ExposedProperties>
       </SubProxy>
 

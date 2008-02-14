@@ -39,7 +39,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.25");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.26");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -160,12 +160,6 @@ bool vtkSMSurfaceRepresentationProxy::EndCreateVTKObjects()
 
   this->ProcessViewInformation();
   return this->Superclass::EndCreateVTKObjects();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSurfaceRepresentationProxy::Update(vtkSMViewProxy* view)
-{
-  this->Superclass::Update(view);
 }
 
 //----------------------------------------------------------------------------

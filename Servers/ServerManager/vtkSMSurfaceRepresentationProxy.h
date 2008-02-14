@@ -37,12 +37,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Called to update the Representation. 
-  // Overridden to EnableLOD on the prop based on the ViewInformation.
-  virtual void Update(vtkSMViewProxy* view);
-  virtual void Update() { this->Superclass::Update(); };
-
-  // Description:
   // Views typically support a mechanism to create a selection in the view
   // itself, eg. by click-and-dragging over a region in the view. The view
   // passes this selection to each of the representations and asks them to

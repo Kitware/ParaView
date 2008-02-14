@@ -48,6 +48,7 @@ SET(Kit_SRCS
   vtkSMDataLabelRepresentationProxy.cxx
   vtkSMDataRepresentationProxy.cxx
   vtkSMDataTypeDomain.cxx
+  vtkSMDimensionsDomain.cxx
   vtkSMDocumentation.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx
@@ -70,6 +71,7 @@ SET(Kit_SRCS
   vtkSMIceTDesktopRenderViewProxy.cxx
   vtkSMIceTMultiDisplayRenderViewProxy.cxx
   vtkSMIdTypeVectorProperty.cxx
+  vtkSMImageSliceRepresentationProxy.cxx
   vtkSMImageTextureProxy.cxx
   vtkSMImplicitPlaneProxy.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx

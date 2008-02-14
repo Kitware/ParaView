@@ -148,7 +148,8 @@ public:
     SURFACE=2,
     OUTLINE=3,
     VOLUME=4,
-    SURFACE_WITH_EDGES=5
+    SURFACE_WITH_EDGES=5,
+    SLICE=6
     };
 protected:
   vtkSMPVRepresentationProxy();
@@ -174,8 +175,10 @@ protected:
   vtkSMDataRepresentationProxy* SurfaceRepresentation;
   vtkSMDataRepresentationProxy* VolumeRepresentation;
   vtkSMDataRepresentationProxy* OutlineRepresentation;
+  vtkSMDataRepresentationProxy* SliceRepresentation;
   vtkSMDataRepresentationProxy* ActiveRepresentation;
   vtkSMDataRepresentationProxy* CubeAxesRepresentation;
+
 
   int Representation;
   int CubeAxesVisibility;

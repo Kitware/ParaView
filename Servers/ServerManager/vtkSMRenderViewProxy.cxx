@@ -90,7 +90,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.59");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.60");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -175,7 +175,8 @@ vtkSMRepresentationStrategy* vtkSMRenderViewProxy::NewStrategyInternal(
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMRepresentationStrategy* strategy = 0;
 
-  if ((dataType == VTK_POLY_DATA) || dataType == VTK_UNIFORM_GRID)
+  if (dataType == VTK_POLY_DATA || dataType == VTK_UNIFORM_GRID || 
+    dataType == VTK_IMAGE_DATA)
     {
     strategy = vtkSMRepresentationStrategy::SafeDownCast(
       pxm->NewProxy("strategies", "PolyDataStrategy"));
