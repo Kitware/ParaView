@@ -51,7 +51,9 @@ struct VTK_CLIENT_SERVER_EXPORT vtkClientServerID
   vtkTypeUInt32 ID;
 };
 
-ostream& operator<<(ostream& os, const vtkClientServerID& id);
-vtkOStreamWrapper& operator<<(vtkOStreamWrapper& os, const vtkClientServerID& id);
+VTK_CLIENT_SERVER_EXPORT ostream& operator<<(
+  ostream& os, const vtkClientServerID& id);
+VTK_CLIENT_SERVER_EXPORT vtkOStreamWrapper& operator<<(
+  vtkOStreamWrapper& os, const vtkClientServerID& id);
                       
 #endif
