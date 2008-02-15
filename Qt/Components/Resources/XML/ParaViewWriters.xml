@@ -36,10 +36,10 @@
           extensions="vtm"
           file_description="VTK Multi Block Files"/>
   <Writer name="XMLPHierarchicalBoxDataWriter"
-          extensions="vtm"
+          extensions="vthb"
           file_description="VTK Hierarchical Box Files"/>
   <Writer name="DataSetWriter"
-          extensions="vtk"
+          extensions="vthb"
           file_description="Legacy VTK Files"/>
   <Writer name="PLYWriter"
           extensions="ply"
