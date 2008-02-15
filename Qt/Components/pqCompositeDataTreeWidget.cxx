@@ -119,8 +119,8 @@ QList<QVariant> pqCompositeDataTreeWidget::values() const
 {
   QList<QVariant> reply;
 
-  QList<pqTreeWidgetItemObject*> items = this->Internal->Items; 
-  foreach (pqTreeWidgetItemObject* item, items)
+  QList<pqTreeWidgetItemObject*> treeitems = this->Internal->Items; 
+  foreach (pqTreeWidgetItemObject* item, treeitems)
     {
     QVariant nodeType = item->data(0, NODE_TYPE);
     if (!nodeType.isValid())
@@ -176,12 +176,12 @@ QList<QVariant> pqCompositeDataTreeWidget::values() const
 void pqCompositeDataTreeWidget::setValues(const QList<QVariant>& new_values)
 {
   bool prev = this->blockSignals(true);
-  QList<pqTreeWidgetItemObject*> items = this->Internal->Items; 
+  QList<pqTreeWidgetItemObject*> treeitems = this->Internal->Items; 
   bool changed = false;
 
   if (this->IndexMode == INDEX_MODE_FLAT)
     {
-    foreach (pqTreeWidgetItemObject* item, items)
+    foreach (pqTreeWidgetItemObject* item, treeitems)
       {
       QVariant metadata = item->data(0, FLAT_INDEX);
       Qt::CheckState cstate = 
@@ -196,7 +196,7 @@ void pqCompositeDataTreeWidget::setValues(const QList<QVariant>& new_values)
     }
   else if (this->IndexMode == INDEX_MODE_LEVEL)
     {
-    foreach (pqTreeWidgetItemObject* item, items)
+    foreach (pqTreeWidgetItemObject* item, treeitems)
       {
       QVariant metadata = item->data(0, LEVEL_NUMBER);
       Qt::CheckState cstate = 
@@ -220,7 +220,7 @@ void pqCompositeDataTreeWidget::setValues(const QList<QVariant>& new_values)
       pairs.insert(QPair<unsigned int, unsigned int>(level, index));
       }
 
-    foreach (pqTreeWidgetItemObject* item, items)
+    foreach (pqTreeWidgetItemObject* item, treeitems)
       {
       QVariant metadata0 = item->data(0, LEVEL_NUMBER);
       QVariant metadata1 = item->data(0, DATASET_INDEX);
