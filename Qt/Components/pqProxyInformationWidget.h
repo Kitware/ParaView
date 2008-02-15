@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class pqOutputPort;
+class vtkPVDataInformation;
+class QTreeWidgetItem;
 
 /// Widget which provides information about an output port of a source proxy
 class PQCOMPONENTS_EXPORT pqProxyInformationWidget : public QWidget
@@ -58,6 +60,16 @@ public slots:
   /// TODO: have this become automatic instead of relying on 
   /// the accept button in case another client modifies the pipeline.
   void updateInformation();
+
+private slots:
+  void onItemClicked(QTreeWidgetItem* item);
+
+private:
+  /// builds the composite tree structure.
+  QTreeWidgetItem* fillCompositeInformation(vtkPVDataInformation* info,
+    QTreeWidgetItem* parent=0);
+
+  void fillDataInformation(vtkPVDataInformation* info);
 
 private:
   QPointer<pqOutputPort> OutputPort;

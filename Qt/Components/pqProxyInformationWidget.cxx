@@ -36,12 +36,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include <QHeaderView>
+#include <QStringList>
 
 // VTK includes
 #include <vtksys/SystemTools.hxx>
 
 // ParaView Server Manager includes
 #include "vtkPVArrayInformation.h"
+#include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSmartPointer.h"
@@ -77,6 +79,9 @@ pqProxyInformationWidget::pqProxyInformationWidget(QWidget* p)
 {
   this->Ui = new pqUi(this);
   this->Ui->setupUi(this);
+  QObject::connect(this->Ui->compositeTree, SIGNAL(itemClicked(QTreeWidgetItem*, int)),
+    this, SLOT(onItemClicked(QTreeWidgetItem*)), Qt::QueuedConnection);
+  this->updateInformation(); // initialize state.
 }
 
 //-----------------------------------------------------------------------------
@@ -122,11 +127,100 @@ pqOutputPort* pqProxyInformationWidget::getOutputPort()
 //-----------------------------------------------------------------------------
 void pqProxyInformationWidget::updateInformation()
 {
-  this->Ui->properties->setVisible(false);
+  this->Ui->compositeTree->clear();
+  this->Ui->compositeTree->setVisible(false);
   this->Ui->filename->setText(tr("NA"));
   this->Ui->filename->setToolTip(tr("NA"));
   this->Ui->filename->setStatusTip(tr("NA"));
 
+  vtkPVDataInformation* dataInformation = NULL;
+  pqPipelineSource* source = NULL;
+  if(this->OutputPort)
+    {
+    source = this->OutputPort->getSource();
+    dataInformation = this->OutputPort->getDataInformation(/*update=*/false);
+    }
+
+  if (!source || !dataInformation)
+    {
+    this->fillDataInformation(0);
+    return;
+    }
+
+  vtkPVCompositeDataInformation* compositeInformation = 
+    dataInformation->GetCompositeDataInformation();
+
+  if (compositeInformation->GetDataIsComposite())
+    {
+    QTreeWidgetItem* root = this->fillCompositeInformation(dataInformation);
+    this->Ui->compositeTree->setVisible(true);
+    root->setExpanded(true);
+    root->setSelected(true);
+    }
+
+  this->fillDataInformation(dataInformation);
+
+  // Find the first property that has a vtkSMFileListDomain. Assume that
+  // it is the property used to set the filename.
+  vtkSmartPointer<vtkSMPropertyIterator> piter;
+  piter.TakeReference(source->getProxy()->NewPropertyIterator());
+  for (piter->Begin(); !piter->IsAtEnd(); piter->Next())
+    {
+    vtkSMProperty* prop = piter->GetProperty();
+    if (prop->IsA("vtkSMStringVectorProperty"))
+      {
+      vtkSmartPointer<vtkSMDomainIterator> diter;
+      diter.TakeReference(prop->NewDomainIterator());
+      for(diter->Begin(); !diter->IsAtEnd(); diter->Next())
+        {
+        if (diter->GetDomain()->IsA("vtkSMFileListDomain"))
+          {
+          QString filename = 
+            pqSMAdaptor::getElementProperty(piter->GetProperty()).toString();
+          this->Ui->properties->show();
+          this->Ui->filename->setText(vtksys::SystemTools::GetFilenameName(
+              filename.toAscii().data()).c_str());
+          this->Ui->filename->setToolTip(filename);
+          this->Ui->filename->setStatusTip(filename);
+          break;
+          }
+        }
+      if (!diter->IsAtEnd())
+        {
+        break;
+        }
+      }
+    }
+
+  // Check if there are timestep values. If yes, display them.
+  vtkSMDoubleVectorProperty* tsv = vtkSMDoubleVectorProperty::SafeDownCast(
+    source->getProxy()->GetProperty("TimestepValues"));
+  this->Ui->timeValues->clear();
+  //
+  QAbstractItemModel *pModel = this->Ui->timeValues->model();
+  pModel->blockSignals(true);
+  this->Ui->timeValues->blockSignals(true);
+  //
+  if (tsv)
+    {
+    unsigned int numElems = tsv->GetNumberOfElements();
+    for (unsigned int i=0; i<numElems; i++)
+      {
+      QTreeWidgetItem * item = new QTreeWidgetItem(this->Ui->timeValues);
+      item->setData(0, Qt::DisplayRole, i);
+      item->setData(1, Qt::DisplayRole, tsv->GetElement(i));
+      item->setData(1, Qt::ToolTipRole, tsv->GetElement(i));
+      }
+    }
+  this->Ui->timeValues->blockSignals(false);
+  pModel->blockSignals(false);
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyInformationWidget::fillDataInformation(
+  vtkPVDataInformation* dataInformation)
+{
+  this->Ui->properties->setVisible(false);
   // out with the old
   this->Ui->type->setText(tr("NA"));
   this->Ui->numberOfCells->setText(tr("NA"));
@@ -139,178 +233,179 @@ void pqProxyInformationWidget::updateInformation()
   this->Ui->yRange->setText(tr("NA"));
   this->Ui->zRange->setText(tr("NA"));
 
-  // in with the new
-  vtkPVDataInformation* dataInformation = NULL;
-  pqPipelineSource* source = NULL;
-  if(this->OutputPort)
+  if (!dataInformation)
     {
-    source = this->OutputPort->getSource();
-    dataInformation = this->OutputPort->getDataInformation(/*update=*/false);
+    return;
     }
-
-  if(dataInformation)
-    {
-    this->Ui->type->setText(tr(dataInformation->GetPrettyDataTypeString()));
-    
-    QString numCells = QString("%1").arg(dataInformation->GetNumberOfCells());
-    this->Ui->numberOfCells->setText(numCells);
-    
-    QString numPoints = QString("%1").arg(dataInformation->GetNumberOfPoints());
-    this->Ui->numberOfPoints->setText(numPoints);
-    
-    QString memory = QString("%1 MB").arg(dataInformation->GetMemorySize()/1000.0,
-                                       0, 'e', 2);
-    this->Ui->memory->setText(memory);
-
-    vtkPVDataSetAttributesInformation* info[2];
-    info[0] = dataInformation->GetPointDataInformation();
-    info[1] = dataInformation->GetCellDataInformation();
   
-    QPixmap pixmaps[2] = 
-      {
-      QPixmap(":/pqWidgets/Icons/pqPointData16.png"),
-      QPixmap(":/pqWidgets/Icons/pqCellData16.png")
-      };
+  this->Ui->type->setText(tr(dataInformation->GetPrettyDataTypeString()));
+  
+  QString numCells = QString("%1").arg(dataInformation->GetNumberOfCells());
+  this->Ui->numberOfCells->setText(numCells);
+  
+  QString numPoints = QString("%1").arg(dataInformation->GetNumberOfPoints());
+  this->Ui->numberOfPoints->setText(numPoints);
+  
+  QString memory = QString("%1 MB").arg(dataInformation->GetMemorySize()/1000.0,
+                                     0, 'e', 2);
+  this->Ui->memory->setText(memory);
 
-    for(int k=0; k<2; k++)
-      {
-      if(info[k])
-        {
-        int numArrays = info[k]->GetNumberOfArrays();
-        for(int i=0; i<numArrays; i++)
-          {
-          vtkPVArrayInformation* arrayInfo;
-          arrayInfo = info[k]->GetArrayInformation(i);
-          // name, type, data type, data range
-          QTreeWidgetItem * item = new QTreeWidgetItem(this->Ui->dataArrays);
-          item->setData(0, Qt::DisplayRole, arrayInfo->GetName());
-          item->setData(0, Qt::DecorationRole, pixmaps[k]);
-          QString dataType = vtkImageScalarTypeNameMacro(arrayInfo->GetDataType());
-          item->setData(1, Qt::DisplayRole, dataType);
-          int numComponents = arrayInfo->GetNumberOfComponents();
-          QString dataRange;
-          double range[2];
-          for(int j=0; j<numComponents; j++)
-            {
-            if(j != 0)
-              {
-              dataRange.append(", ");
-              }
-            arrayInfo->GetComponentRange(j, range);
-            QString componentRange = QString("[%1, %2]").
-                               arg(range[0]).arg(range[1]);
-            dataRange.append(componentRange);
-            }
-          item->setData(2, Qt::DisplayRole, dataRange);
-          item->setData(2, Qt::ToolTipRole, dataRange);
-          }
-        }
-      }
-    this->Ui->dataArrays->header()->resizeSections(
-      QHeaderView::ResizeToContents);
+  vtkPVDataSetAttributesInformation* info[2];
+  info[0] = dataInformation->GetPointDataInformation();
+  info[1] = dataInformation->GetCellDataInformation();
 
-    double bounds[6];
-    dataInformation->GetBounds(bounds);
-    QString xrange;
-    if (bounds[0] == VTK_DOUBLE_MAX && bounds[1] == -VTK_DOUBLE_MAX)
-      {
-      xrange = "Not available";
-      }
-    else
-      {
-      xrange = QString("%1 to %2 (delta: %3)");
-      xrange = xrange.arg(bounds[0], -1, 'f', 3);
-      xrange = xrange.arg(bounds[1], -1, 'f', 3);
-      xrange = xrange.arg(bounds[1] - bounds[0], -1, 'f', 3);
-      }
-    this->Ui->xRange->setText(xrange);
-
-    QString yrange;
-    if (bounds[2] == VTK_DOUBLE_MAX && bounds[3] == -VTK_DOUBLE_MAX)
-      {
-      yrange = "Not available";
-      }
-    else
-      {
-      yrange = QString("%1 to %2 (delta: %3)");
-      yrange = yrange.arg(bounds[2], -1, 'f', 3);
-      yrange = yrange.arg(bounds[3], -1, 'f', 3);
-      yrange = yrange.arg(bounds[3] - bounds[2], -1, 'f', 3);
-      }
-    this->Ui->yRange->setText(yrange);
-
-    QString zrange;
-    if (bounds[4] == VTK_DOUBLE_MAX && bounds[5] == -VTK_DOUBLE_MAX)
-      {
-      zrange = "Not available";
-      }
-    else
-      {
-      zrange = QString("%1 to %2 (delta: %3)");
-      zrange = zrange.arg(bounds[4], -1, 'f', 3);
-      zrange = zrange.arg(bounds[5], -1, 'f', 3);
-      zrange = zrange.arg(bounds[5] - bounds[4], -1, 'f', 3);
-      }
-    this->Ui->zRange->setText(zrange);
-
-    }
-
-  if (source)
+  QPixmap pixmaps[2] = 
     {
-    // Find the first property that has a vtkSMFileListDomain. Assume that
-    // it is the property used to set the filename.
-    vtkSmartPointer<vtkSMPropertyIterator> piter;
-    piter.TakeReference(source->getProxy()->NewPropertyIterator());
-    for (piter->Begin(); !piter->IsAtEnd(); piter->Next())
-      {
-      vtkSMProperty* prop = piter->GetProperty();
-      if (prop->IsA("vtkSMStringVectorProperty"))
-        {
-        vtkSmartPointer<vtkSMDomainIterator> diter;
-        diter.TakeReference(prop->NewDomainIterator());
-        for(diter->Begin(); !diter->IsAtEnd(); diter->Next())
-          {
-          if (diter->GetDomain()->IsA("vtkSMFileListDomain"))
-            {
-            QString filename = 
-              pqSMAdaptor::getElementProperty(piter->GetProperty()).toString();
-            this->Ui->properties->show();
-            this->Ui->filename->setText(vtksys::SystemTools::GetFilenameName(
-                filename.toAscii().data()).c_str());
-            this->Ui->filename->setToolTip(filename);
-            this->Ui->filename->setStatusTip(filename);
-            break;
-            }
-          }
-        if (!diter->IsAtEnd())
-          {
-          break;
-          }
-        }
-      }
+    QPixmap(":/pqWidgets/Icons/pqPointData16.png"),
+    QPixmap(":/pqWidgets/Icons/pqCellData16.png")
+    };
 
-    // Check if there are timestep values. If yes, display them.
-    vtkSMDoubleVectorProperty* tsv = vtkSMDoubleVectorProperty::SafeDownCast(
-      source->getProxy()->GetProperty("TimestepValues"));
-    this->Ui->timeValues->clear();
-    //
-    QAbstractItemModel *pModel = this->Ui->timeValues->model();
-    pModel->blockSignals(true);
-    this->Ui->timeValues->blockSignals(true);
-    //
-    if (tsv)
+  for(int k=0; k<2; k++)
+    {
+    if(info[k])
       {
-      unsigned int numElems = tsv->GetNumberOfElements();
-      for (unsigned int i=0; i<numElems; i++)
+      int numArrays = info[k]->GetNumberOfArrays();
+      for(int i=0; i<numArrays; i++)
         {
-        QTreeWidgetItem * item = new QTreeWidgetItem(this->Ui->timeValues);
-        item->setData(0, Qt::DisplayRole, i);
-        item->setData(1, Qt::DisplayRole, tsv->GetElement(i));
-        item->setData(1, Qt::ToolTipRole, tsv->GetElement(i));
+        vtkPVArrayInformation* arrayInfo;
+        arrayInfo = info[k]->GetArrayInformation(i);
+        // name, type, data type, data range
+        QTreeWidgetItem * item = new QTreeWidgetItem(this->Ui->dataArrays);
+        item->setData(0, Qt::DisplayRole, arrayInfo->GetName());
+        item->setData(0, Qt::DecorationRole, pixmaps[k]);
+        QString dataType = vtkImageScalarTypeNameMacro(arrayInfo->GetDataType());
+        item->setData(1, Qt::DisplayRole, dataType);
+        int numComponents = arrayInfo->GetNumberOfComponents();
+        QString dataRange;
+        double range[2];
+        for(int j=0; j<numComponents; j++)
+          {
+          if(j != 0)
+            {
+            dataRange.append(", ");
+            }
+          arrayInfo->GetComponentRange(j, range);
+          QString componentRange = QString("[%1, %2]").
+                             arg(range[0]).arg(range[1]);
+          dataRange.append(componentRange);
+          }
+        item->setData(2, Qt::DisplayRole, dataRange);
+        item->setData(2, Qt::ToolTipRole, dataRange);
         }
       }
-    this->Ui->timeValues->blockSignals(false);
-    pModel->blockSignals(false);
     }
+  this->Ui->dataArrays->header()->resizeSections(
+    QHeaderView::ResizeToContents);
+
+  double bounds[6];
+  dataInformation->GetBounds(bounds);
+  QString xrange;
+  if (bounds[0] == VTK_DOUBLE_MAX && bounds[1] == -VTK_DOUBLE_MAX)
+    {
+    xrange = "Not available";
+    }
+  else
+    {
+    xrange = QString("%1 to %2 (delta: %3)");
+    xrange = xrange.arg(bounds[0], -1, 'f', 3);
+    xrange = xrange.arg(bounds[1], -1, 'f', 3);
+    xrange = xrange.arg(bounds[1] - bounds[0], -1, 'f', 3);
+    }
+  this->Ui->xRange->setText(xrange);
+
+  QString yrange;
+  if (bounds[2] == VTK_DOUBLE_MAX && bounds[3] == -VTK_DOUBLE_MAX)
+    {
+    yrange = "Not available";
+    }
+  else
+    {
+    yrange = QString("%1 to %2 (delta: %3)");
+    yrange = yrange.arg(bounds[2], -1, 'f', 3);
+    yrange = yrange.arg(bounds[3], -1, 'f', 3);
+    yrange = yrange.arg(bounds[3] - bounds[2], -1, 'f', 3);
+    }
+  this->Ui->yRange->setText(yrange);
+
+  QString zrange;
+  if (bounds[4] == VTK_DOUBLE_MAX && bounds[5] == -VTK_DOUBLE_MAX)
+    {
+    zrange = "Not available";
+    }
+  else
+    {
+    zrange = QString("%1 to %2 (delta: %3)");
+    zrange = zrange.arg(bounds[4], -1, 'f', 3);
+    zrange = zrange.arg(bounds[5], -1, 'f', 3);
+    zrange = zrange.arg(bounds[5] - bounds[4], -1, 'f', 3);
+    }
+  this->Ui->zRange->setText(zrange);
 }
 
+//-----------------------------------------------------------------------------
+QTreeWidgetItem* pqProxyInformationWidget::fillCompositeInformation(
+  vtkPVDataInformation* info, QTreeWidgetItem* parent/*=0*/)
+{
+  QTreeWidgetItem* node = 0;
+
+  QString label = info? info->GetPrettyDataTypeString() : "NA";
+  if (parent)
+    {
+    node = new QTreeWidgetItem(parent, QStringList(label));
+    }
+  else
+    {
+    node = new QTreeWidgetItem(this->Ui->compositeTree, QStringList(label));
+    }
+  if (!info)
+    {
+    return node;
+    }
+
+  // we save a ptr to the data information to easily locate the data
+  // information.
+  node->setData(0, Qt::UserRole, QVariant::fromValue((void*)info));
+
+  vtkPVCompositeDataInformation* compositeInformation = 
+    info->GetCompositeDataInformation();
+
+  if (!compositeInformation->GetDataIsComposite() || 
+    compositeInformation->GetDataIsMultiPiece())
+    {
+    return node;
+    }
+
+  bool isHB = 
+    (strcmp(info->GetCompositeDataClassName(),"vtkHierarchicalBoxDataSet") ==0);
+
+  unsigned int numChildren = compositeInformation->GetNumberOfChildren();
+  for (unsigned int cc=0; cc < numChildren; cc++)
+    {
+    vtkPVDataInformation* childInfo = 
+      compositeInformation->GetDataInformation(cc);
+    QTreeWidgetItem* childItem = 
+      this->fillCompositeInformation(childInfo, node);
+    if (isHB)
+      {
+      childItem->setText(0, QString("Level %1").arg(cc));
+      }
+    else if (childInfo && childInfo->GetCompositeDataClassName())
+      {
+      childItem->setText(0, QString("Block %1").arg(cc));
+      }
+    else
+      {
+      childItem->setText(0, QString("%1: %2").arg(cc).arg(childItem->text(0)));
+      }
+    }
+
+  return node;
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyInformationWidget::onItemClicked(QTreeWidgetItem* item)
+{
+  vtkPVDataInformation* info = reinterpret_cast<vtkPVDataInformation*>(
+    item->data(0, Qt::UserRole).value<void*>());
+  this->fillDataInformation(info);
+}

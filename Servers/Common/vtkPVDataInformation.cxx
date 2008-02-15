@@ -45,7 +45,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.42");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.43");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -869,6 +869,8 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString()
       return "Graph";
     case VTK_TREE:
       return "Tree";
+    case VTK_MULTIPIECE_DATA_SET:
+      return "Multi-piece Dataset";
     }
   
   return "UnknownType";
@@ -923,6 +925,8 @@ const char* vtkPVDataInformation::GetDataSetTypeAsString()
       return "vtkGraph";
     case VTK_TREE:
       return "vtkTree";
+    case VTK_MULTIPIECE_DATA_SET:
+      return "vtkMultiPieceDataSet";
     }
   
   return "UnknownType";
