@@ -255,6 +255,7 @@ set(PYTHON_SRCS Python/Python-ast.c
                 Python/sysmodule.c 
                 Python/traceback.c 
                 Python/getopt.c 
+                Python/pystrcmp.c
                 Python/pystrtod.c 
                 ${MACHDEP_SRCS}
                 ${THREAD_SRC}
