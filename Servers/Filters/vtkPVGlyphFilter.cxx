@@ -20,8 +20,7 @@
 #include "vtkCompositeDataSet.h"
 #include "vtkGarbageCollector.h"
 #include "vtkHierarchicalBoxDataSet.h"
-#include "vtkMultiGroupDataInformation.h"
-#include "vtkMultiGroupDataSet.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMaskPoints.h"
@@ -32,7 +31,7 @@
 #include "vtkProcessModule.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.28");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.29");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -286,7 +285,7 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
 {
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
 
-  vtkMultiGroupDataSet *hdInput = vtkMultiGroupDataSet::SafeDownCast(
+  vtkCompositeDataSet *hdInput = vtkCompositeDataSet::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   vtkInformation* info = outputVector->GetInformationObject(0);
@@ -334,7 +333,7 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
         }
       
       vtkIdType numBlankedPts = 0;
-      vtkInformation* blockInfo = iter->GetCurrentInformationObject();
+      vtkInformation* blockInfo = iter->GetCurrentMetaData();
       if (blockInfo)
         {
         if (blockInfo->Has(

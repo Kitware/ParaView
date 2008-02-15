@@ -20,7 +20,7 @@
 #include "vtkCompositeDataSet.h"
 #include "vtkDataArray.h"
 #include "vtkDataSet.h"
-#include "vtkMultiGroupDataSet.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkIntegrateAttributes.h"
@@ -29,8 +29,9 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkSurfaceVectors.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkIntegrateFlowThroughSurface, "1.6");
+vtkCxxRevisionMacro(vtkIntegrateFlowThroughSurface, "1.7");
 vtkStandardNewMacro(vtkIntegrateFlowThroughSurface);
 
 //-----------------------------------------------------------------------------
@@ -106,7 +107,7 @@ int vtkIntegrateFlowThroughSurface::RequestData(
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   
   // get the input and ouptut
-  vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+  vtkSmartPointer<vtkDataObject> input = inInfo->Get(vtkDataObject::DATA_OBJECT());
 
   vtkDataSet *dsInput = vtkDataSet::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
@@ -118,7 +119,7 @@ int vtkIntegrateFlowThroughSurface::RequestData(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
   if (hdInput) 
     {
-    vtkMultiGroupDataSet* hds = vtkMultiGroupDataSet::New();
+    vtkMultiBlockDataSet* hds = vtkMultiBlockDataSet::New();
     vtkCompositeDataIterator* iter = hdInput->NewIterator();
     iter->GoToFirstItem();
     while (!iter->IsDoneWithTraversal())
@@ -127,7 +128,7 @@ int vtkIntegrateFlowThroughSurface::RequestData(
       if (ds)
         {
         vtkDataSet* intermData = this->GenerateSurfaceVectors(ds);
-        hds->SetDataSet(0, hds->GetNumberOfDataSets(0), intermData);
+        hds->SetBlock(hds->GetNumberOfBlocks(), intermData);
         intermData->Delete();
         }
       iter->GoToNextItem();

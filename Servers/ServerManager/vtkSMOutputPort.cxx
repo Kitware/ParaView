@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMOutputPort);
-vtkCxxRevisionMacro(vtkSMOutputPort, "1.1");
+vtkCxxRevisionMacro(vtkSMOutputPort, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -415,8 +415,8 @@ void vtkSMOutputPort::InsertExtractPiecesIfNecessary()
 //                       << vtkClientServerStream::End;
       }
     }
-  else if (!strcmp(className, "vtkMultiGroupDataSet") ||
-           !strcmp(className, "vtkMultiBlockDataSet"))
+  else if (strcmp(className, "vtkHierarchicalBoxDataSet") == 0 ||
+           strcmp(className, "vtkMultiBlockDataSet") == 0)
     {
     if (pm->GetNumberOfPartitions(this->ConnectionID) == 1)
       {
@@ -448,7 +448,7 @@ void vtkSMOutputPort::InsertExtractPiecesIfNecessary()
       }
 
     tempDataPiece = pm->NewStreamObject(
-      "vtkMultiGroupDataExtractPiece", stream);
+      "vtkExtractPiece", stream);
     }
 
   // If no filter is to be inserted, just return.

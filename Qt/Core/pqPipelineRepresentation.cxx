@@ -346,6 +346,13 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
       }
     }
 
+  // Propagate solid color from the upstream representation.
+  if (upstreamDisplay)
+    {
+    repr->GetProperty("Color")->Copy(
+      upstreamDisplay->getProxy()->GetProperty("Color"));
+    }
+
   // Look for a new point array.
   // I do not think the logic is exactly as describerd in this methods
   // comment.  I believe this method only looks at "Scalars".
@@ -405,12 +412,13 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
   // Try to inherit the same array selected by the input.
   if (upstreamDisplay)
     {
-    // propagate solid color.
-    repr->GetProperty("Color")->Copy(
-      upstreamDisplay->getProxy()->GetProperty("Color"));
-
-    this->setColorField(upstreamDisplay->getColorField(false));
-    return;
+    QList<QString> myColorFields = this->getColorFields();
+    const QString &upstreamColorField = upstreamDisplay->getColorField(false);
+    if (myColorFields.contains(upstreamColorField))
+      {
+      this->setColorField(upstreamColorField);
+      return;
+      }
     }
 
   // Color by property.

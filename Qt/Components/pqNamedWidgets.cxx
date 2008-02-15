@@ -53,22 +53,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // VTK includes
 
 // ParaView Server Manager includes
+#include "vtkCollection.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMCompositeTreeDomain.h"
+#include "vtkSMDomainIterator.h"
 #include "vtkSMEnumerationDomain.h"
+#include "vtkSMOrderedPropertyIterator.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMStringListDomain.h"
-#include "vtkPVXMLElement.h"
-#include "vtkSMOrderedPropertyIterator.h"
-#include "vtkSMDomainIterator.h"
-#include "vtkSMVectorProperty.h"
-#include "vtkSmartPointer.h"
-#include "vtkCollection.h"
+#include "vtkSMIntVectorProperty.h"
 
 // ParaView includes
 #include "pq3DWidget.h"
 #include "pqApplicationCore.h"
 #include "pqCollapsedGroup.h"
 #include "pqComboBoxDomain.h"
+#include "pqCompositeDataTreeWidget.h"
 #include "pqDoubleRangeWidget.h"
 #include "pqIntRangeWidget.h"
 #include "pqWidgetRangeDomain.h"
@@ -90,6 +92,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeWidget.h"
 #include "pqTreeWidgetItemObject.h"
 
+//-----------------------------------------------------------------------------
 void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager)
 {
   if(!parent || !proxy || !property_manager)
@@ -118,6 +121,7 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
 
 }
 
+//-----------------------------------------------------------------------------
 void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
                          const QString& property, pqPropertyManager* property_manager)
 {
@@ -353,9 +357,20 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
         }
       }
     }
+  else if (pt == pqSMAdaptor::COMPOSITE_TREE)
+    {
+    pqCompositeDataTreeWidget* compositeTree = 
+      qobject_cast<pqCompositeDataTreeWidget*>(object);
+    if (object)
+      {
+      property_manager->registerLink(
+        compositeTree, "values", SIGNAL(valuesChanged()),
+        proxy, SMProperty);
+      }
+    }
 }
 
-
+//-----------------------------------------------------------------------------
 void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager)
 {
   if(!parent || !proxy || !property_manager)
@@ -383,6 +398,7 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
   proxy->UpdateVTKObjects();
 }
 
+//-----------------------------------------------------------------------------
 void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
                            const QString& property, pqPropertyManager* property_manager)
 {
@@ -713,6 +729,7 @@ static void setupValidator(QLineEdit* lineEdit, QVariant::Type type)
     }
 }
 
+//-----------------------------------------------------------------------------
 static QLabel* createPanelLabel(QWidget* parent, QString text, QString pname)
 {
   QLabel* label = new QLabel(parent);
@@ -722,6 +739,7 @@ static QLabel* createPanelLabel(QWidget* parent, QString text, QString pname)
   return label;
 }
 
+//-----------------------------------------------------------------------------
 void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
                                                vtkSMProxy* pxy)
 {
@@ -1189,6 +1207,19 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
       panelLayout->addWidget(combo, rowCount, 1, 1, 1);
       rowCount++;
       }
+    else if (pt == pqSMAdaptor::COMPOSITE_TREE)
+      {
+      pqCompositeDataTreeWidget* tree = new pqCompositeDataTreeWidget(
+        vtkSMIntVectorProperty::SafeDownCast(SMProperty),
+        panelLayout->parentWidget());
+      tree->setObjectName(propertyName);
+        
+      QTreeWidgetItem* header = new QTreeWidgetItem();
+      header->setData(0, Qt::DisplayRole, propertyLabel);
+      tree->setHeaderItem(header);
+      panelLayout->addWidget(tree, rowCount, 0, 1, 2); 
+      rowCount++;
+      }
     }
   iter->Delete();
   panelLayout->addItem(new QSpacerItem(0,0,
@@ -1198,6 +1229,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
   panelLayout->invalidate();
 }
 
+//-----------------------------------------------------------------------------
 bool pqNamedWidgets::propertyInformation(QObject* object, 
     QString& property, QString& signal)
 {
@@ -1246,6 +1278,7 @@ bool pqNamedWidgets::propertyInformation(QObject* object,
   return false;
 }
 
+//-----------------------------------------------------------------------------
 void pqNamedWidgets::linkObject(QObject* o, const QString& property,
                        const QString& signal, pqSMProxy proxy,
                        vtkSMProperty* smProperty, int index,
@@ -1268,6 +1301,7 @@ void pqNamedWidgets::linkObject(QObject* o, const QString& property,
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqNamedWidgets::unlinkObject(QObject* o, const QString& property,
                        const QString& signal, pqSMProxy proxy,
                        vtkSMProperty* smProperty, int index,

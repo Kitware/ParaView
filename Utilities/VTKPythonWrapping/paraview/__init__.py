@@ -750,7 +750,7 @@ def Fetch(input, arg=None):
     In parallel runs an appropriate append Filter merges the
     data on each processor into one data object. The filter chosen will be 
     vtkAppendPolyData for vtkPolyData, vtkAppendRectilinearGrid for 
-    vtkRectilinearGrid, vtkMultiGroupDataGroupFilter for vtkCompositeData, 
+    vtkRectilinearGrid, vtkMultiBlockDataGroupFilter for vtkCompositeData, 
     and vtkAppendFilter for anything else.
     
     If arg is an integer then one particular processor's output is brought to

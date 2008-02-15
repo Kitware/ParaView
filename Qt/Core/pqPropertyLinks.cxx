@@ -247,6 +247,7 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged()
         }
       break;
     case pqSMAdaptor::MULTIPLE_ELEMENTS:
+    case pqSMAdaptor::COMPOSITE_TREE:
         {
         if(this->Internal->Index == -1)
           {
@@ -439,6 +440,7 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
         }
       break;
     case pqSMAdaptor::MULTIPLE_ELEMENTS:
+    case pqSMAdaptor::COMPOSITE_TREE:
         {
         if(this->Internal->Index == -1)
           {

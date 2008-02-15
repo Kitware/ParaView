@@ -1309,7 +1309,7 @@ def Fetch(input, arg1=None, arg2=None):
     In parallel runs an appropriate append Filter merges the
     data on each processor into one data object. The filter chosen will be 
     vtkAppendPolyData for vtkPolyData, vtkAppendRectilinearGrid for 
-    vtkRectilinearGrid, vtkMultiGroupDataGroupFilter for vtkCompositeData, 
+    vtkRectilinearGrid, vtkMultiBlockDataGroupFilter for vtkCompositeData, 
     and vtkAppendFilter for anything else.
     
     If arg1 is an integer then one particular processor's output is brought to
@@ -1334,7 +1334,7 @@ def Fetch(input, arg1=None, arg2=None):
         print "getting appended"
 
         cdinfo = input.GetDataInformation().GetCompositeDataInformation()
-        if (cdinfo.GetDataIsComposite() or cdinfo.GetDataIsHierarchical()):
+        if cdinfo.GetDataIsComposite():
             print "use composite data append"
             gvd.SetReductionType(5)        
 

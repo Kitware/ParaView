@@ -68,7 +68,8 @@ public:
     SINGLE_ELEMENT,
     MULTIPLE_ELEMENTS,
     FILE_LIST,
-    FIELD_SELECTION
+    FIELD_SELECTION,
+    COMPOSITE_TREE,
     };
 
   /// Get the type of the property

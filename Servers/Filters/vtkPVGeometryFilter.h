@@ -32,7 +32,7 @@ class vtkGenericGeometryFilter;
 class vtkHyperOctree;
 class vtkImageData;
 class vtkInformationVector;
-class vtkMultiGroupDataSet;
+class vtkCompositeDataSet;
 class vtkMultiProcessController;
 class vtkOutlineSource;
 class vtkRectilinearGrid;
@@ -140,7 +140,7 @@ protected:
     vtkHyperOctree* input, vtkPolyData* output, int doCommunicate);
   void DataSetSurfaceExecute(vtkDataSet* input, vtkPolyData* output);
   void ExecuteCellNormals(vtkPolyData* output, int doCommunicate);
-  int ExecuteCompositeDataSet(vtkMultiGroupDataSet* mgInput, 
+  int ExecuteCompositeDataSet(vtkCompositeDataSet* mgInput, 
                               vtkAppendPolyData* append, 
                               int& numInputs,
                               int updateGroup);

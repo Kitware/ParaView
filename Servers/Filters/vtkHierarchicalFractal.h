@@ -19,23 +19,26 @@
 // mandelbrot to create cell data. I scale the fractal array to look like a
 // volme fraction.
 // I may also add block id and level as extra cell arrays.
+// If GenerateRectilinearGrids is true then this filter outputs
+// vtkHierarchicalBoxDataSet otherwise it generates a vtkMultiBlockDataSet.
 
 #ifndef __vtkHierarchicalFractal_h
 #define __vtkHierarchicalFractal_h
 
-#include "vtkHierarchicalDataSetAlgorithm.h"
+#include "vtkCompositeDataSetAlgorithm.h"
 
 class vtkIntArray;
 class vtkUniformGrid;
 class vtkRectilinearGrid;
 class vtkDataSet;
+class vtkHierarchicalBoxDataSet;
 
-class VTK_EXPORT vtkHierarchicalFractal : public vtkHierarchicalDataSetAlgorithm
+class VTK_EXPORT vtkHierarchicalFractal : public vtkCompositeDataSetAlgorithm
 {
 public:
   static vtkHierarchicalFractal *New();
 
-  vtkTypeRevisionMacro(vtkHierarchicalFractal,vtkHierarchicalDataSetAlgorithm);
+  vtkTypeRevisionMacro(vtkHierarchicalFractal,vtkCompositeDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -97,7 +100,17 @@ protected:
   int BlockCount;
   int TimeStep;
   int TimeStepRange[2];
-  
+
+  // Convenience method.
+  unsigned int AppedDataSetToLevel(vtkCompositeDataSet* composite,
+    unsigned int level, int extents[6], vtkDataSet* ds);
+
+  // Create either vtkHierarchicalBoxDataSet or vtkMultiBlockDataSet based on
+  // the GenerateRectilinearGrids flag.
+  virtual int RequestDataObject(vtkInformation *req,
+    vtkInformationVector **inV,
+    vtkInformationVector *outV);
+
   // Description:
   // This is called by the superclass.
   // This is the method you should override.
@@ -112,7 +125,7 @@ protected:
                           vtkInformationVector **inputVector, 
                           vtkInformationVector *outputVector);
   
-  void Traverse(int &blockId, int level, vtkHierarchicalDataSet* output, 
+  void Traverse(int &blockId, int level, vtkCompositeDataSet* output, 
                 int x0,int x1, int y0,int y1, int z0,int z1,
                 int onFace[6]);
 
@@ -127,11 +140,11 @@ protected:
   void SetRBlockInfo(vtkRectilinearGrid *grid, int level, int* ext,
                      int onFace[6]);
   
-  void AddVectorArray(vtkHierarchicalDataSet *output);
-  void AddTestArray(vtkHierarchicalDataSet *output);
-  void AddFractalArray(vtkHierarchicalDataSet *output);
-  void AddBlockIdArray(vtkHierarchicalDataSet *output);
-  void AddDepthArray(vtkHierarchicalDataSet *output);
+  void AddVectorArray(vtkCompositeDataSet *output);
+  void AddTestArray(vtkCompositeDataSet *output);
+  void AddFractalArray(vtkCompositeDataSet *output);
+  void AddBlockIdArray(vtkCompositeDataSet *output);
+  void AddDepthArray(vtkHierarchicalBoxDataSet *output);
   
   void AddGhostLevelArray(vtkDataSet *grid,
                           int dim[3],

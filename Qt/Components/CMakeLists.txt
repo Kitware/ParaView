@@ -71,6 +71,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqComboBoxDomain.h
   pqComparativeTracksWidget.h
   pqComparativeVisPanel.h
+  pqCompositeDataTreeWidget.h
   pqContourPanel.h
   pqCreateServerStartupDialog.h
   pqCubeAxesEditorDialog.h
@@ -371,6 +372,8 @@ ADD_LIBRARY(pqComponents
   pqComparativeTracksWidget.h
   pqComparativeVisPanel.cxx
   pqComparativeVisPanel.h
+  pqCompositeDataTreeWidget.cxx
+  pqCompositeDataTreeWidget.h
   pqComponentsExport.h
   pqComponentsInit.cxx
   pqComponentsInit.h

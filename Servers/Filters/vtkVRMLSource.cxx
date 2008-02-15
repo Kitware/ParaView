@@ -33,7 +33,7 @@
 #include "vtkVRMLImporter.h"
 
 
-vtkCxxRevisionMacro(vtkVRMLSource, "1.10");
+vtkCxxRevisionMacro(vtkVRMLSource, "1.11");
 vtkStandardNewMacro(vtkVRMLSource);
 
 //------------------------------------------------------------------------------
@@ -136,7 +136,7 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
 
       if (!append)
         {
-        mbOutput->SetDataSet(idx, 0, output);
+        mbOutput->SetBlock(idx, output);
         }
 
       vtkTransformPolyDataFilter *tf = vtkTransformPolyDataFilter::New();
@@ -222,7 +222,7 @@ void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
     append->Update();
     vtkPolyData* newOutput = vtkPolyData::New();
     newOutput->ShallowCopy(append->GetOutput());
-    mbOutput->SetDataSet(0, 0, newOutput);
+    mbOutput->SetBlock(0, newOutput);
     newOutput->Delete();
     append->Delete();
     }

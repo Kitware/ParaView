@@ -346,11 +346,14 @@ IF(BUILD_TESTING)
   # Generally all tests with wireframes need higher thresholds.
   SET (Flow2_THRESHOLD 15)
   SET (UndoRedo4_THRESHOLD 15)
+
+  # These Xdmf tests have wireframes, hence the increased thresholds.
   SET (XdmfReadImageData_THRESHOLD 20)
   SET (XdmfReadRectilinearGrid_THRESHOLD 20)
   SET (XdmfReadRectilinearGridCollection_THRESHOLD 20)
   SET (XdmfReadStructuredGrid_THRESHOLD 20)
   SET (XdmfReadStructuredGridCollection_THRESHOLD 20)
+  SET (XdmfReadImageDataCollection_THRESHOLD 20)
 
   # Test compositing for a few client server and client render server tests.
   SET(COMPOSITING_XML_TESTS_WITH_BASELINES

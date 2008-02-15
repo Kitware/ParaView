@@ -294,11 +294,8 @@ SET(VTK_FILTERS_SOURCES
   ${VTK_SOURCE_DIR}/Filtering/vtkAttributesErrorMetric.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkHexagonalPrism.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkHexahedron.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkHierarchicalDataInformation.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkHierarchicalDataIterator.cxx
+  ${VTK_SOURCE_DIR}/Filtering/vtkHierarchicalBoxDataSetAlgorithm.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkHierarchicalBoxDataSet.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkHierarchicalDataSet.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkHierarchicalDataSetAlgorithm.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkHyperOctree.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkHyperOctreeAlgorithm.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkHyperOctreeCursor.cxx
@@ -324,10 +321,6 @@ SET(VTK_FILTERS_SOURCES
   ${VTK_SOURCE_DIR}/Filtering/vtkMergePoints.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkMultiBlockDataSet.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkMultiBlockDataSetAlgorithm.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkMultiGroupDataInformation.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkMultiGroupDataIterator.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkMultiGroupDataSet.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkMultiGroupDataSetAlgorithm.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkMutableDirectedGraph.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkMutableUndirectedGraph.cxx  
   ${VTK_SOURCE_DIR}/Filtering/vtkNonLinearCell.cxx
@@ -479,7 +472,6 @@ SET(VTK_FILTERS_ABSTRACTS
   ${VTK_SOURCE_DIR}/Filtering/vtkGenericDataSetAlgorithm
   ${VTK_SOURCE_DIR}/Filtering/vtkGenericPointIterator
   ${VTK_SOURCE_DIR}/Filtering/vtkGenericSubdivisionErrorMetric
-  ${VTK_SOURCE_DIR}/Filtering/vtkHierarchicalDataSetAlgorithm
   ${VTK_SOURCE_DIR}/Filtering/vtkHyperOctreeAlgorithm
   ${VTK_SOURCE_DIR}/Filtering/vtkHyperOctreeCursor
   ${VTK_SOURCE_DIR}/Filtering/vtkHyperOctreePointsGrabber
@@ -496,7 +488,6 @@ SET(VTK_FILTERS_ABSTRACTS
   ${VTK_SOURCE_DIR}/Filtering/vtkInformationExecutivePortVectorKey
   ${VTK_SOURCE_DIR}/Filtering/vtkLocator
   ${VTK_SOURCE_DIR}/Filtering/vtkMapper2D
-  ${VTK_SOURCE_DIR}/Filtering/vtkMultiGroupDataSetAlgorithm
   ${VTK_SOURCE_DIR}/Filtering/vtkNonLinearCell
   ${VTK_SOURCE_DIR}/Filtering/vtkPointSet
   ${VTK_SOURCE_DIR}/Filtering/vtkPointSetSource
@@ -554,7 +545,6 @@ SET(VTK_COMMON_WRAP_EXCLUDES
 
 SET(VTK_FILTERS_WRAP_EXCLUDES
   ${VTK_SOURCE_DIR}/Filtering/vtkFilteringInformationKeyManager.cxx
-  ${VTK_SOURCE_DIR}/Filtering/vtkHierarchicalDataIterator.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkImageIterator.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkImageProgressIterator.cxx
   )

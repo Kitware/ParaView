@@ -136,15 +136,10 @@ protected:
   vtkPVDataInformation();
   ~vtkPVDataInformation();
 
-  void DeepCopy(vtkPVDataInformation *dataInfo);
+  void DeepCopy(vtkPVDataInformation *dataInfo, bool copyCompositeInformation=true);
 
-//BTX
-  friend class vtkPVCompositeDataInformation;
-//ETX
-
-  int AddFromCompositeDataSet(vtkCompositeDataSet* data);
-  void CopyFromCompositeDataSet(vtkCompositeDataSet* data, 
-                                int recurse=1);
+  void AddFromMultiPieceDataSet(vtkCompositeDataSet* data);
+  void CopyFromCompositeDataSet(vtkCompositeDataSet* data);
   void CopyFromDataSet(vtkDataSet* data);
   void CopyFromGenericDataSet(vtkGenericDataSet *data);
   void CopyFromTable(vtkTable* table);

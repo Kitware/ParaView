@@ -16,7 +16,7 @@
 
 #include "vtkCallbackCommand.h"
 #include "vtkCharArray.h"
-#include "vtkDataObject.h"
+#include "vtkDataSet.h"
 #include "vtkFieldData.h"
 #include "vtkInstantiator.h"
 #include "vtkMultiBlockDataSet.h"
@@ -32,7 +32,7 @@
 #include <vtkstd/map>
 #include <vtkstd/algorithm>
 
-vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.18");
+vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.19");
 vtkStandardNewMacro(vtkXMLCollectionReader);
 
 //----------------------------------------------------------------------------
@@ -258,8 +258,8 @@ void vtkXMLCollectionReader::SetupEmptyOutput()
 
   vtkDataObject* doOutput = 
     info->Get(vtkDataObject::DATA_OBJECT());
-  vtkMultiGroupDataSet* hb = 
-    vtkMultiGroupDataSet::SafeDownCast(doOutput);
+  vtkCompositeDataSet* hb = 
+    vtkCompositeDataSet::SafeDownCast(doOutput);
   if (!hb)
     {
     return;
@@ -529,6 +529,15 @@ void vtkXMLCollectionReader::ReadXMLDataImpl()
     output->SetNumberOfBlocks(nBlocks);
     for(int i=0; i < nBlocks; ++i)
       {
+      vtkMultiBlockDataSet* block = vtkMultiBlockDataSet::SafeDownCast(
+        output->GetBlock(i));
+      if (!block)
+        {
+        block = vtkMultiBlockDataSet::New();
+        output->SetBlock(i, block);
+        block->Delete();
+        }
+
       this->CurrentOutput = i;
       vtkDataObject* actualOutput = this->SetupOutput(filePath.c_str(), i);
       this->ReadAFile(i, 
@@ -536,8 +545,8 @@ void vtkXMLCollectionReader::ReadXMLDataImpl()
                       updateNumPieces,
                       updateGhostLevels,
                       actualOutput);
-      output->SetNumberOfDataSets(i, updateNumPieces);
-      output->SetDataSet(i, updatePiece, actualOutput);
+      block->SetNumberOfBlocks(updateNumPieces);
+      block->SetBlock(updatePiece, actualOutput);
       actualOutput->Delete();
       }
     }
@@ -751,8 +760,8 @@ vtkXMLCollectionReaderInternals::ReaderList[] =
   {"vti", "vtkXMLImageDataReader"},
   {"vtr", "vtkXMLRectilinearGridReader"},
   {"vtmb", "vtkXMLMultiBlockDataReader"},
-  {"vtmg", "vtkXMLMultiGroupDataReader"},
-  {"vthd", "vtkXMLHierarchicalDataReader"},
+  {"vtmg", "vtkXMLMultiGroupDataReader"}, // legacy reader - produces vtkMultiBlockDataSet.
+  {"vthd", "vtkXMLHierarchicalDataReader"}, // legacy reader - produces vtkMultiBlockDataSet.
   {"vthb", "vtkXMLHierarchicalBoxDataReader"},
   {"vts", "vtkXMLStructuredGridReader"},
   {"pvtp", "vtkXMLPPolyDataReader"},

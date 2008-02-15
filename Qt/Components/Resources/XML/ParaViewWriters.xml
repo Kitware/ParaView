@@ -32,9 +32,12 @@
   <Writer name="XMLPImageDataWriter"
           extensions="pvti"
           file_description="PVTK ImageData Files"/>
-  <Writer name="XMLPMultiGroupDataWriter"
+  <Writer name="XMLPMultiBlockDataWriter"
           extensions="vtm"
-          file_description="VTK Multi Group Files"/>
+          file_description="VTK Multi Block Files"/>
+  <Writer name="XMLPHierarchicalBoxDataWriter"
+          extensions="vtm"
+          file_description="VTK Hierarchical Box Files"/>
   <Writer name="DataSetWriter"
           extensions="vtk"
           file_description="Legacy VTK Files"/>

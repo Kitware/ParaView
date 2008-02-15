@@ -14,30 +14,29 @@
 =========================================================================*/
 #include "vtkHierarchicalFractal.h"
 
-#include "vtkHierarchicalDataSet.h"
-#include "vtkCompositeDataPipeline.h"
-
-#include "vtkMultiGroupDataInformation.h"
-#include "vtkInformationVector.h"
-#include "vtkInformation.h"
-
-#include "vtkObjectFactory.h"
-
-#include "vtkUniformGrid.h"
-#include "vtkRectilinearGrid.h"
-#include "vtkPointData.h"
+#include "vtkAMRBox.h"
 #include "vtkCellData.h"
-#include "vtkIntArray.h"
-#include "vtkUnsignedCharArray.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataPipeline.h"
 #include "vtkDoubleArray.h"
-#include "vtkImageMandelbrotSource.h"
-#include "vtkMath.h"
-
 #include "vtkExtractCTHPart.h" // for the BOUNDS key
+#include "vtkHierarchicalBoxDataSet.h"
+#include "vtkImageMandelbrotSource.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkIntArray.h"
+#include "vtkMath.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkSmartPointer.h"
+#include "vtkUniformGrid.h"
+#include "vtkUnsignedCharArray.h"
 
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.10");
+vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.11");
 vtkStandardNewMacro(vtkHierarchicalFractal);
 
 //----------------------------------------------------------------------------
@@ -74,6 +73,30 @@ vtkHierarchicalFractal::~vtkHierarchicalFractal()
 {
   this->Levels->Delete();
   this->Levels = NULL;
+}
+
+//----------------------------------------------------------------------------
+int vtkHierarchicalFractal::RequestDataObject(vtkInformation *,
+                                              vtkInformationVector **,
+                                              vtkInformationVector *outV)
+{
+  vtkInformation *outInfo = outV->GetInformationObject(0);
+  vtkCompositeDataSet* outData = NULL;
+
+  if (this->GenerateRectilinearGrids)
+    {
+    outData = vtkMultiBlockDataSet::New();
+    }
+  else
+    {
+    outData = vtkHierarchicalBoxDataSet::New();
+    }
+
+  outData->SetPipelineInformation(outInfo);
+  outInfo->Set(vtkDataObject::DATA_EXTENT_TYPE(), outData->GetExtentType());
+  outInfo->Set(vtkDataObject::DATA_OBJECT(), outData);
+  outData->Delete();
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -387,14 +410,8 @@ int vtkHierarchicalFractal::RequestInformation(
     return 0;
     }
   
-  vtkMultiGroupDataInformation *compInfo
-    =vtkMultiGroupDataInformation::New();
-
   vtkInformation *info=outputVector->GetInformationObject(0);
-  info->Set(vtkCompositeDataPipeline::COMPOSITE_DATA_INFORMATION(),compInfo);
-
   info->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
-  compInfo->Delete();
   return 1;
 }
 
@@ -410,8 +427,8 @@ int vtkHierarchicalFractal::RequestData(
 {
   vtkInformation *info=outputVector->GetInformationObject(0);
   vtkDataObject *doOutput=info->Get(vtkDataObject::DATA_OBJECT());
-  vtkHierarchicalDataSet *output;
-  output=vtkHierarchicalDataSet::SafeDownCast(doOutput);
+  vtkCompositeDataSet *output;
+  output=vtkCompositeDataSet::SafeDownCast(doOutput);
   
   if(output==0)
     {
@@ -426,13 +443,7 @@ int vtkHierarchicalFractal::RequestData(
     return 0;
     }
 
-
-  vtkMultiGroupDataInformation *compInfo=
-    vtkMultiGroupDataInformation::SafeDownCast(
-      info->Get(vtkCompositeDataPipeline::COMPOSITE_DATA_INFORMATION()));
-
   output->Initialize(); // remove all previous blocks
-  output->SetMultiGroupDataInformation(compInfo);
   
   
   // By setting SetMaximumNumberOfPieces(-1) 
@@ -513,7 +524,8 @@ int vtkHierarchicalFractal::RequestData(
     this->AddVectorArray(output);
     this->AddTestArray(output);
     this->AddBlockIdArray(output);
-    this->AddDepthArray(output);
+    this->AddDepthArray(
+      vtkHierarchicalBoxDataSet::SafeDownCast(output));
     }
   this->AddFractalArray(output);
   
@@ -664,7 +676,7 @@ int vtkHierarchicalFractal::LineTest(float x0, float y0, float z0,
 //----------------------------------------------------------------------------
 void vtkHierarchicalFractal::Traverse(int &blockId,
                                       int level,
-                                      vtkHierarchicalDataSet* output, 
+                                      vtkCompositeDataSet* output, 
                                       int x0,
                                       int x3,
                                       int y0,
@@ -745,16 +757,14 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
         if(this->GenerateRectilinearGrids)
           {
           vtkRectilinearGrid *grid=vtkRectilinearGrid::New();
-          int count=output->GetNumberOfDataSets(level);
-          output->SetDataSet(level,count,grid);
+          this->AppedDataSetToLevel(output, level, ext, grid);
           grid->Delete();
           this->SetRBlockInfo(grid, level, ext,onFace);
           }
         else
           {
           vtkUniformGrid *grid=vtkUniformGrid::New();
-          int count=output->GetNumberOfDataSets(level);
-          output->SetDataSet(level,count,grid);
+          this->AppedDataSetToLevel(output, level, ext, grid);
           grid->Delete();
           this->SetBlockInfo(grid, level, ext,onFace);
           }
@@ -828,16 +838,14 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
         if(this->GenerateRectilinearGrids)
           {
           vtkRectilinearGrid *grid=vtkRectilinearGrid::New();
-          int count=output->GetNumberOfDataSets(level);
-          output->SetDataSet(level,count,grid);
+          this->AppedDataSetToLevel(output, level, ext, grid);
           grid->Delete();
           this->SetRBlockInfo(grid, level, ext,onFace);
           }
         else
           {
           vtkUniformGrid *grid=vtkUniformGrid::New();
-          int count=output->GetNumberOfDataSets(level);
-          output->SetDataSet(level,count,grid);
+          this->AppedDataSetToLevel(output, level, ext, grid);
           grid->Delete();
           this->SetBlockInfo(grid, level, ext,onFace);
           }
@@ -850,277 +858,249 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
 }
 
 //----------------------------------------------------------------------------
-void vtkHierarchicalFractal::AddTestArray(vtkHierarchicalDataSet *output)
+void vtkHierarchicalFractal::AddTestArray(vtkCompositeDataSet *output)
 {
   double *origin = this->GetTopLevelOrigin();
-  
-  int levels=output->GetNumberOfLevels();
-  int level=0;
-  while(level<levels)
+ 
+  vtkSmartPointer<vtkCompositeDataIterator> iter;
+  iter.TakeReference(output->NewIterator());
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    int blocks=output->GetNumberOfDataSets(level);
-    int block=0;
-    while(block<blocks)
+    vtkUniformGrid *grid;
+    grid = vtkUniformGrid::SafeDownCast(iter->GetCurrentDataObject());
+    assert("check: grid_exists" && grid!=0);
+
+    vtkDoubleArray* array = vtkDoubleArray::New();
+    int numCells=grid->GetNumberOfCells();
+    array->Allocate(numCells);
+    array->SetNumberOfTuples(numCells);
+    double *arrayPtr = static_cast<double*>(array->GetPointer(0));
+    double  spacing[3];
+    grid->GetSpacing(spacing);
+    int x,y,z;
+    int ext[6];
+    grid->GetExtent(ext);
+    // we need cell extents bu we just get point extents
+    if(ext[5]>0)
       {
-      vtkUniformGrid *grid;
-      grid=vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
-      assert("check: grid_exists" && grid!=0);
-      
-      vtkDoubleArray* array = vtkDoubleArray::New();
-      int numCells=grid->GetNumberOfCells();
-      array->Allocate(numCells);
-      array->SetNumberOfTuples(numCells);
-      double *arrayPtr = static_cast<double*>(array->GetPointer(0));
-      double  spacing[3];
-      grid->GetSpacing(spacing);
-      int x,y,z;
-      int ext[6];
-      grid->GetExtent(ext);
-      // we need cell extents bu we just get point extents
-      if(ext[5]>0)
+      --ext[5];
+      }
+    if(ext[3]>0)
+      {
+      --ext[3];
+      }
+    if(ext[1]>0)
+      {
+      --ext[1];
+      }
+    int debugcounter=0;
+    for (z = ext[4]; z <= ext[5]; ++z)
+      {
+      for (y = ext[2]; y <= ext[3]; ++y)
         {
-        --ext[5];
-        }
-      if(ext[3]>0)
-        {
-        --ext[3];
-        }
-      if(ext[1]>0)
-        {
-        --ext[1];
-        }
-      int debugcounter=0;
-      for (z = ext[4]; z <= ext[5]; ++z)
-        {
-        for (y = ext[2]; y <= ext[3]; ++y)
+        for (x = ext[0]; x <= ext[1]; ++x)
           {
-          for (x = ext[0]; x <= ext[1]; ++x)
-            {
-            *arrayPtr++ = origin[0] + spacing[0]*(static_cast<double>(x) + 0.5)
-              + origin[1] + spacing[1]*(static_cast<double>(y) + 0.5);
-            ++debugcounter;
-            }
+          *arrayPtr++ = origin[0] + spacing[0]*(static_cast<double>(x) + 0.5)
+            + origin[1] + spacing[1]*(static_cast<double>(y) + 0.5);
+          ++debugcounter;
           }
         }
-      assert("check: valid_debugcounter" && debugcounter==numCells);
-      array->SetName("TestX");
-      grid->GetCellData()->AddArray(array);
-      array->Delete();
-      ++block;
       }
-    ++level;
+    assert("check: valid_debugcounter" && debugcounter==numCells);
+    array->SetName("TestX");
+    grid->GetCellData()->AddArray(array);
+    array->Delete();
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkHierarchicalFractal::AddVectorArray(vtkHierarchicalDataSet *output)
+void vtkHierarchicalFractal::AddVectorArray(vtkCompositeDataSet *output)
 {
   double *origin = this->GetTopLevelOrigin();
-  
-  int levels=output->GetNumberOfLevels();
-  int level=0;
-  while(level<levels)
+
+  vtkSmartPointer<vtkCompositeDataIterator> iter;
+  iter.TakeReference(output->NewIterator());
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    int blocks=output->GetNumberOfDataSets(level);
-    int block=0;
-    while(block<blocks)
+    vtkUniformGrid *grid;
+    grid=vtkUniformGrid::SafeDownCast(iter->GetCurrentDataObject());
+    assert("check: grid_exists" && grid!=0);
+
+    vtkDoubleArray* array = vtkDoubleArray::New();
+    array->SetNumberOfComponents(3);
+    int numCells=grid->GetNumberOfCells();
+    array->Allocate(numCells);
+    array->SetNumberOfTuples(numCells);
+    double *arrayPtr = static_cast<double*>(array->GetPointer(0));
+    double  spacing[3];
+    grid->GetSpacing(spacing);
+    int x,y,z;
+    int ext[6];
+    grid->GetExtent(ext);
+    // we need cell extents bu we just get point extents
+    if(ext[5]>0)
       {
-      vtkUniformGrid *grid;
-      grid=vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
-      assert("check: grid_exists" && grid!=0);
-      
-      vtkDoubleArray* array = vtkDoubleArray::New();
-      array->SetNumberOfComponents(3);
-      int numCells=grid->GetNumberOfCells();
-      array->Allocate(numCells);
-      array->SetNumberOfTuples(numCells);
-      double *arrayPtr = static_cast<double*>(array->GetPointer(0));
-      double  spacing[3];
-      grid->GetSpacing(spacing);
-      int x,y,z;
-      int ext[6];
-      grid->GetExtent(ext);
-      // we need cell extents bu we just get point extents
-      if(ext[5]>0)
+      --ext[5];
+      }
+    if(ext[3]>0)
+      {
+      --ext[3];
+      }
+    if(ext[1]>0)
+      {
+      --ext[1];
+      }
+
+    for (z = ext[4]; z <= ext[5]; ++z)
+      {
+      for (y = ext[2]; y <= ext[3]; ++y)
         {
-        --ext[5];
-        }
-      if(ext[3]>0)
-        {
-        --ext[3];
-        }
-      if(ext[1]>0)
-        {
-        --ext[1];
-        }
-      
-      for (z = ext[4]; z <= ext[5]; ++z)
-        {
-        for (y = ext[2]; y <= ext[3]; ++y)
+        for (x = ext[0]; x <= ext[1]; ++x)
           {
-          for (x = ext[0]; x <= ext[1]; ++x)
-            {
-            *arrayPtr++ = origin[0] + spacing[0]*(static_cast<double>(x)+ 0.5);
-            *arrayPtr++ = origin[1] + spacing[1]*(static_cast<double>(y)+ 0.5);
-            *arrayPtr++ = origin[2] + spacing[2]*(static_cast<double>(z)+ 0.5);
-            }
+          *arrayPtr++ = origin[0] + spacing[0]*(static_cast<double>(x)+ 0.5);
+          *arrayPtr++ = origin[1] + spacing[1]*(static_cast<double>(y)+ 0.5);
+          *arrayPtr++ = origin[2] + spacing[2]*(static_cast<double>(z)+ 0.5);
           }
         }
-      array->SetName("VectorXYZ");
-      grid->GetCellData()->AddArray(array);
-      array->Delete();
-      ++block;
       }
-    ++level;
+    array->SetName("VectorXYZ");
+    grid->GetCellData()->AddArray(array);
+    array->Delete();
     }
 }
 
 
 //----------------------------------------------------------------------------
-void vtkHierarchicalFractal::AddFractalArray(vtkHierarchicalDataSet *output)
+void vtkHierarchicalFractal::AddFractalArray(vtkCompositeDataSet *output)
 {
   vtkImageMandelbrotSource* fractalSource = vtkImageMandelbrotSource::New();
   int dims[3];
-  
-  int levels=output->GetNumberOfLevels();
-  int level=0;
-  while(level<levels)
+
+  vtkSmartPointer<vtkCompositeDataIterator> iter;
+  iter.TakeReference(output->NewIterator());
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    int blocks=output->GetNumberOfDataSets(level);
-    int block=0;
-    while(block<blocks)
+    if(!this->GenerateRectilinearGrids)
       {
-      if(!this->GenerateRectilinearGrids)
+      vtkUniformGrid *grid;
+      grid=vtkUniformGrid::SafeDownCast(iter->GetCurrentDataObject());
+      assert("check: grid_exists" && grid!=0);
+
+
+      vtkDoubleArray* array = vtkDoubleArray::New();
+      int numCells=grid->GetNumberOfCells();
+      array->Allocate(numCells);
+      array->SetNumberOfTuples(numCells);
+      double *arrayPtr = static_cast<double*>(array->GetPointer(0));
+      double  spacing[3];
+      double origin[3];
+      grid->GetSpacing(spacing);
+      grid->GetOrigin(origin);
+      grid->GetDimensions(dims);
+      // we get the dimensions according to the points
+      // we need the dimensions according to the cells
+
+      if(dims[0]>1)
         {
-        vtkUniformGrid *grid;
-        grid=vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
-        assert("check: grid_exists" && grid!=0);
-      
-      
-        vtkDoubleArray* array = vtkDoubleArray::New();
-        int numCells=grid->GetNumberOfCells();
-        array->Allocate(numCells);
-        array->SetNumberOfTuples(numCells);
-        double *arrayPtr = static_cast<double*>(array->GetPointer(0));
-        double  spacing[3];
-        double origin[3];
-        grid->GetSpacing(spacing);
-        grid->GetOrigin(origin);
-        grid->GetDimensions(dims);
-        // we get the dimensions according to the points
-        // we need the dimensions according to the cells
-        
-        if(dims[0]>1)
-          {
-          --dims[0];
-          }
-        if(dims[1]>1)
-          {
-          --dims[1];
-          }
-        if(dims[2]>1)
-          {
-          --dims[2];
-          }
-        
-        // Shift point to center of voxel.
-        fractalSource->SetWholeExtent(0,dims[0]-1, 0,dims[1]-1, 0,dims[2]-1);
-        fractalSource->SetOriginCX(origin[0]+(spacing[0]*0.5), 
-                                   origin[1]+(spacing[1]*0.5), 
-                                   origin[2]+(spacing[2]*0.5),
-                                   this->TimeStep/10.0);
-        fractalSource->SetSampleCX(spacing[0], spacing[1], spacing[2], 0.1);
-        fractalSource->Update();
-        vtkDataArray *fractal;
-        fractal=fractalSource->GetOutput()->GetPointData()->GetScalars();
-        float *fractalPtr = static_cast<float *>(fractal->GetVoidPointer(0));
-        
-        for (int i = 0; i < fractal->GetNumberOfTuples(); ++i)
-          {
-          // Change fractal into volume fraction (iso surface at 0.5).
-          *arrayPtr++ = *fractalPtr++ / (2.0 * this->FractalValue);
-          }
-        
-        array->SetName("Fractal Volume Fraction");
-        grid->GetCellData()->AddArray(array);
-        array->Delete();
+        --dims[0];
         }
-      else // rectilinear grid
+      if(dims[1]>1)
         {
-        vtkRectilinearGrid *grid;
-        grid=vtkRectilinearGrid::SafeDownCast(output->GetDataSet(level,block));
-        assert("check: grid_exists" && grid!=0);
-        
-        vtkDoubleArray* array = vtkDoubleArray::New();
-        int numCells=grid->GetNumberOfCells();
-        array->Allocate(numCells);
-        array->SetNumberOfTuples(numCells);
-        double *arrayPtr = static_cast<double*>(array->GetPointer(0));
-        
-        this->ExecuteRectilinearMandelbrot(grid,arrayPtr);
-        array->SetName("Fractal Volume Fraction");
-        grid->GetCellData()->AddArray(array);
-        array->Delete();
+        --dims[1];
         }
-      ++block;
+      if(dims[2]>1)
+        {
+        --dims[2];
+        }
+
+      // Shift point to center of voxel.
+      fractalSource->SetWholeExtent(0,dims[0]-1, 0,dims[1]-1, 0,dims[2]-1);
+      fractalSource->SetOriginCX(origin[0]+(spacing[0]*0.5), 
+        origin[1]+(spacing[1]*0.5), 
+        origin[2]+(spacing[2]*0.5),
+        this->TimeStep/10.0);
+      fractalSource->SetSampleCX(spacing[0], spacing[1], spacing[2], 0.1);
+      fractalSource->Update();
+      vtkDataArray *fractal;
+      fractal=fractalSource->GetOutput()->GetPointData()->GetScalars();
+      float *fractalPtr = static_cast<float *>(fractal->GetVoidPointer(0));
+
+      for (int i = 0; i < fractal->GetNumberOfTuples(); ++i)
+        {
+        // Change fractal into volume fraction (iso surface at 0.5).
+        *arrayPtr++ = *fractalPtr++ / (2.0 * this->FractalValue);
+        }
+
+      array->SetName("Fractal Volume Fraction");
+      grid->GetCellData()->AddArray(array);
+      array->Delete();
       }
-    ++level;
+    else // rectilinear grid
+      {
+      vtkRectilinearGrid *grid;
+      grid=vtkRectilinearGrid::SafeDownCast(iter->GetCurrentDataObject());
+      assert("check: grid_exists" && grid!=0);
+
+      vtkDoubleArray* array = vtkDoubleArray::New();
+      int numCells=grid->GetNumberOfCells();
+      array->Allocate(numCells);
+      array->SetNumberOfTuples(numCells);
+      double *arrayPtr = static_cast<double*>(array->GetPointer(0));
+
+      this->ExecuteRectilinearMandelbrot(grid,arrayPtr);
+      array->SetName("Fractal Volume Fraction");
+      grid->GetCellData()->AddArray(array);
+      array->Delete();
+      }
     }
   fractalSource->Delete();
 }
 
 
 //----------------------------------------------------------------------------
-void vtkHierarchicalFractal::AddBlockIdArray(vtkHierarchicalDataSet *output)
+void vtkHierarchicalFractal::AddBlockIdArray(vtkCompositeDataSet *output)
 {
-  int levels=output->GetNumberOfLevels();
-  int level=0;
-  int blockId=0;
-  while(level<levels)
+  int blockId = 0;
+  vtkSmartPointer<vtkCompositeDataIterator> iter;
+  iter.TakeReference(output->NewIterator());
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); 
+    iter->GoToNextItem(), blockId++)
     {
-    int blocks=output->GetNumberOfDataSets(level);
-    int block=0;
-    while(block<blocks)
+    vtkUniformGrid *grid;
+    grid=vtkUniformGrid::SafeDownCast(iter->GetCurrentDataObject());
+    assert("check: grid_exists" && grid!=0);
+
+
+    vtkIntArray* array = vtkIntArray::New();
+    int numCells=grid->GetNumberOfCells();
+    array->Allocate(numCells);
+    int cell=0;
+    while(cell<numCells)
       {
-      vtkUniformGrid *grid;
-      grid=vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
-      assert("check: grid_exists" && grid!=0);
-      
-      
-      vtkIntArray* array = vtkIntArray::New();
-      int numCells=grid->GetNumberOfCells();
-      array->Allocate(numCells);
-      int cell=0;
-      while(cell<numCells)
-        {
-        array->InsertNextValue(blockId);
-        ++cell;
-        }
-      array->SetName("BlockId");
-      grid->GetCellData()->AddArray(array);
-      array->Delete();
-      ++block;
-      ++blockId;
+      array->InsertNextValue(blockId);
+      ++cell;
       }
-    ++level;
+    array->SetName("BlockId");
+    grid->GetCellData()->AddArray(array);
+    array->Delete();
     }
 }
 
 
 //----------------------------------------------------------------------------
-void vtkHierarchicalFractal::AddDepthArray(vtkHierarchicalDataSet *output)
+void vtkHierarchicalFractal::AddDepthArray(vtkHierarchicalBoxDataSet* output)
 {
   int levels=output->GetNumberOfLevels();
   int level=0;
-  int blockId=0;
   while(level<levels)
     {
     int blocks=output->GetNumberOfDataSets(level);
     int block=0;
     while(block<blocks)
       {
+      vtkAMRBox temp;
       vtkUniformGrid *grid;
-      grid=vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
+      grid=vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block, temp));
       assert("check: grid_exists" && grid!=0);
       
       
@@ -1137,7 +1117,6 @@ void vtkHierarchicalFractal::AddDepthArray(vtkHierarchicalDataSet *output)
       grid->GetCellData()->AddArray(array);
       array->Delete();
       ++block;
-      ++blockId;
       }
     ++level;
     }
@@ -1454,6 +1433,48 @@ void vtkHierarchicalFractal::GetContinuousIncrements(int extent[6],
   
   incY = increments[1] - (e1 - e0 + 1)*increments[0];
   incZ = increments[2] - (e3 - e2 + 1)*increments[1];
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkHierarchicalFractal::AppedDataSetToLevel(
+  vtkCompositeDataSet* composite,
+  unsigned int level,
+  int extents[6],
+  vtkDataSet* dataset)
+{
+  unsigned int index = 0;
+  vtkMultiBlockDataSet* mbDS = vtkMultiBlockDataSet::SafeDownCast(composite);
+  vtkHierarchicalBoxDataSet* hbDS = 
+    vtkHierarchicalBoxDataSet::SafeDownCast(composite);
+  if (mbDS)
+    {
+    vtkMultiBlockDataSet* block = vtkMultiBlockDataSet::SafeDownCast(
+      mbDS->GetBlock(level));
+    if (!block)
+      {
+      block = vtkMultiBlockDataSet::New();
+      mbDS->SetBlock(level, block);
+      block->Delete();
+      }
+    index = block->GetNumberOfBlocks();
+    block->SetBlock(index, dataset);
+    }
+  else if (hbDS)
+    {
+    int loCorner[3], hiCorner[3];
+    loCorner[0] = extents[0];
+    hiCorner[0] = extents[1];
+    loCorner[1] = extents[2];
+    hiCorner[1] = extents[3];
+    loCorner[2] = extents[4];
+    hiCorner[2] = extents[5];
+
+    vtkAMRBox box(this->TwoDimensional? 2:3,loCorner,hiCorner);
+    index = hbDS->GetNumberOfDataSets(level);
+    hbDS->SetDataSet(level, index, box, vtkUniformGrid::SafeDownCast(dataset));
+    }
+
+  return index;
 }
 
 //----------------------------------------------------------------------------

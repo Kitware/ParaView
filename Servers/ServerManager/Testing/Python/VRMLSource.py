@@ -13,7 +13,7 @@ servermanager.Connect()
 file1 = os.path.join(SMPythonTesting.DataDir, "Data/bot2.wrl")
 reader = servermanager.sources.vrmlreader(FileName = file1)
 readerOutput = servermanager.Fetch(reader)
-if readerOutput.GetClassName() != "vtkMultiGroupDataSet":
+if readerOutput.GetClassName() != "vtkMultiBlockDataSet":
     print "ERROR: Wrong dataset type returned:", readerOutput.GetClassName()
     sys.exit(1)
 
@@ -21,15 +21,11 @@ if readerOutput.GetNumberOfPoints() != 337:
     print "ERROR: Wrong number of points returned."
     sys.exit(1)
 
-if readerOutput.GetNumberOfGroups() != 1:
-    print "ERROR: Wrong number of groups returned."
+if readerOutput.GetNumberOfBlocks() != 1:
+    print "ERROR: Wrong number of blocks returned."
     sys.exit(1)
 
-if readerOutput.GetNumberOfDataSets(0) != 1:
-    print "ERROR: Wrong number of groups returned."
-    sys.exit(1)
-
-ds0 = readerOutput.GetDataSet(0,0)
+ds0 = readerOutput.GetBlock(0)
 
 if ds0.GetClassName() != "vtkPolyData":
     print "ERROR: Wrong dataset type returned for dataset (0, 0)."

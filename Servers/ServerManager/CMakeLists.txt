@@ -41,6 +41,7 @@ SET(Kit_SRCS
   vtkSMClientServerRenderViewProxy.cxx
   vtkSMComparativeViewProxy.cxx
   vtkSMCompositeKeyFrameProxy.cxx
+  vtkSMCompositeTreeDomain.cxx
   vtkSMCompoundSourceProxy.cxx
   vtkSMCompoundProxyDefinitionLoader.cxx
   vtkSMConnectionCleanerProxy.cxx

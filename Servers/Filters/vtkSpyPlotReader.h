@@ -49,26 +49,28 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef __vtkSpyPlotReader_h
 #define __vtkSpyPlotReader_h
 
-#include "vtkHierarchicalDataSetAlgorithm.h"
+#include "vtkCompositeDataSetAlgorithm.h"
 
-class vtkDataArraySelection;
-class vtkCallbackCommand;
-class vtkSpyPlotReaderMap;
-class vtkMultiProcessController;
-class vtkDataSetAttributes;
-class vtkDataArray;
-class vtkSpyPlotBlockIterator;
-class vtkSpyPlotBlock;
-class vtkSpyPlotUniReader;
-class vtkCellData;
-class vtkRectilinearGrid;
 class vtkBoundingBox;
+class vtkCallbackCommand;
+class vtkCellData;
+class vtkDataArray;
+class vtkDataArraySelection;
+class vtkDataSetAttributes;
+class vtkHierarchicalBoxDataSet;
+class vtkMultiBlockDataSet;
+class vtkMultiProcessController;
+class vtkRectilinearGrid;
+class vtkSpyPlotBlock;
+class vtkSpyPlotBlockIterator;
+class vtkSpyPlotReaderMap;
+class vtkSpyPlotUniReader;
 
-class VTK_EXPORT vtkSpyPlotReader : public vtkHierarchicalDataSetAlgorithm
+class VTK_EXPORT vtkSpyPlotReader : public vtkCompositeDataSetAlgorithm
 {
 public:
   static vtkSpyPlotReader* New();
-  vtkTypeRevisionMacro(vtkSpyPlotReader,vtkHierarchicalDataSetAlgorithm);
+  vtkTypeRevisionMacro(vtkSpyPlotReader,vtkCompositeDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -178,7 +180,7 @@ protected:
                       int *leftHasBounds);
 
   // Set things up to process an AMR Block
-  int PrepareAMRData(vtkHierarchicalDataSet *hb,
+  int PrepareAMRData(vtkHierarchicalBoxDataSet *hb,
                      vtkSpyPlotBlock *block, 
                      int *level,
                      int extents[6],
@@ -187,7 +189,7 @@ protected:
                      vtkCellData **cd);
 
   // Set things up to process a non-AMR Block
-  int PrepareData(vtkHierarchicalDataSet *hb,
+  int PrepareData(vtkMultiBlockDataSet* hb,
                   vtkSpyPlotBlock *block,
                   vtkRectilinearGrid **rg,
                   int extents[6],
@@ -213,6 +215,13 @@ protected:
                                vtkCellData *cd);
   // The array selections.
   vtkDataArraySelection *CellDataArraySelection;
+
+  // Create either vtkHierarchicalBoxDataSet or vtkMultiBlockDataSet based on
+  // whether the dataset is AMR.
+  virtual int RequestDataObject(vtkInformation *req,
+    vtkInformationVector **inV,
+    vtkInformationVector *outV);
+
   
   // Read the case file and the first binary file do get meta
   // informations (number of files, number of fields, number of timestep).
@@ -253,7 +262,7 @@ protected:
   void AddGhostLevelArray(int numLevels);
 
   // Have all the readers have the same global level structure
-  void SetGlobalLevels(vtkHierarchicalDataSet *hb,
+  void SetGlobalLevels(vtkCompositeDataSet *hb,
                        int processNumber,
                        int numProcessors,
                        int rightHasBounds,

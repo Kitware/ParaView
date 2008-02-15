@@ -4398,7 +4398,7 @@ The Probe filter samples the data set attributes of the current data set at the 
           </ProxyGroupDomain>
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
-            <DataType value="vtkMultiGroupDataSet"/>
+            <DataType value="vtkCompositeDataSet"/>
           </DataTypeDomain>
           <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
           <InputArrayDomain name="input_array"/>
@@ -4443,7 +4443,7 @@ The Plot Over Line filter samples the data set attributes of the current data se
           </ProxyGroupDomain>
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
-            <DataType value="vtkMultiGroupDataSet"/>
+            <DataType value="vtkCompositeDataSet"/>
           </DataTypeDomain>
           <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
           <InputArrayDomain name="input_array"/>
@@ -4490,7 +4490,7 @@ Probe is a filter that computes point attributes at specified point positions. T
           </ProxyGroupDomain>
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
-            <DataType value="vtkMultiGroupDataSet"/>
+            <DataType value="vtkCompositeDataSet"/>
           </DataTypeDomain>
           <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
           <InputArrayDomain name="input_array"/>
@@ -5882,7 +5882,8 @@ This filter operates on any type of data set, provided it has point-centered vec
         default_values="0.000001" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         Set the maximum error allowed in the integration. The meaning of this value depends on the integrator chosen.
+         Set the maximum error allowed in the integration. The meaning of 
+         this value depends on the integrator chosen.
        </Documentation>
      </DoubleVectorProperty>
 
@@ -5990,12 +5991,12 @@ Tessellate a higher-order dataset.
    <!-- End GenericTessellator -->
    </SourceProxy>
 
-   <SourceProxy name="GroupDataSets" class="vtkMultiGroupDataGroupFilter"
+   <SourceProxy name="GroupDataSets" class="vtkMultiBlockDataGroupFilter"
     label="Group Datasets">
     <Documentation
         long_help="Group data sets."
         short_help="Group multiple inputs into one collection.">
-Groups multiple datasets to create a multigroup dataset
+        Groups multiple datasets to create a multiblock dataset
      </Documentation>
      <InputProperty
         name="Input"
@@ -6019,12 +6020,12 @@ Groups multiple datasets to create a multigroup dataset
    <!-- End GroupDataSets -->
    </SourceProxy>
 
-   <SourceProxy name="GroupIdScalars" class="vtkMultiGroupDataGroupIdScalars"
-      label="Level Scalars">
+   <SourceProxy name="BlockIdScalars" class="vtkBlockIdScalars"
+      label="Block Scalars">
      <Documentation
-        long_help="The Level Scalars filter uses colors to show levels of a hierarchical dataset."
+        long_help="The Level Scalars filter uses colors to show levels of a multiblock dataset."
         short_help="Generate point scalars from level.">
-The Level Scalars filter uses colors to show levels of a hierarchical dataset.
+        The Level Scalars filter uses colors to show levels of a multiblock dataset.
      </Documentation>
      <InputProperty
         name="Input"
@@ -6034,7 +6035,31 @@ The Level Scalars filter uses colors to show levels of a hierarchical dataset.
              <Group name="filters"/>
            </ProxyGroupDomain>
            <DataTypeDomain name="input_type">
-             <DataType value="vtkMultiGroupDataSet"/>
+             <DataType value="vtkMultiBlockDataSet"/>
+           </DataTypeDomain>
+           <Documentation>
+             This property specifies the input to the Level Scalars filter.
+           </Documentation>
+     </InputProperty>
+   <!-- End GroupIdScalars -->
+   </SourceProxy>
+
+   <SourceProxy name="LevelIdScalars" class="vtkLevelIdScalars"
+      label="Level Scalars">
+     <Documentation
+        long_help="The Level Scalars filter uses colors to show levels of a hierarchical dataset."
+        short_help="Generate point scalars from level.">
+        The Level Scalars filter uses colors to show levels of a hierarchical dataset.
+     </Documentation>
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkHierarchicalBoxDataSet"/>
            </DataTypeDomain>
            <Documentation>
              This property specifies the input to the Level Scalars filter.
@@ -6065,7 +6090,8 @@ The Level Scalars filter uses colors to show levels of a hierarchical dataset.
         animateable="0">
         <BooleanDomain name="bool"/> 
         <Documentation>
-          Toggle whether to generate faces containing triangle strips. This should render faster and use less memory, but no cell data is copied.
+          Toggle whether to generate faces containing triangle strips. 
+          This should render faster and use less memory, but no cell data is copied.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty
@@ -6383,12 +6409,12 @@ The Level Scalars filter uses colors to show levels of a hierarchical dataset.
     <!-- End ReductionFilter -->
     </SourceProxy>
 
-   <SourceProxy name="ExtractLevel" class="vtkMultiGroupDataExtractGroup"
-     label="Extract Group">
+   <SourceProxy name="ExtractLevel" class="vtkExtractLevel"
+     label="Extract Level">
      <Documentation
-        long_help="This filter extracts a range of groups from a multigroup dataset."
+        long_help="This filter extracts a range of groups from a hierarchical dataset."
         short_help="Extract level.">
-This filter extracts a range of groups from a multigroup dataset    
+      This filter extracts a range of levels from a hierarchical dataset    
      </Documentation>
      <InputProperty
         name="Input"
@@ -6398,38 +6424,45 @@ This filter extracts a range of groups from a multigroup dataset
              <Group name="filters"/>
            </ProxyGroupDomain>
            <DataTypeDomain name="input_type">
-             <DataType value="vtkMultiGroupDataSet"/>
+             <DataType value="vtkHierarchicalBoxDataSet"/>
            </DataTypeDomain>
-           <NumberOfGroupsDomain name="multi_group" multiplicity="multiple"/>
            <Documentation>
              This property specifies the input to the Extract Group filter.
            </Documentation>
      </InputProperty>
 
      <IntVectorProperty 
-        name="GroupRange" 
-        command="SetGroupRange" 
-        number_of_elements="2"
-        default_values="0 0" > 
-       <NumberOfGroupsDomain name="range">
+        name="Levels" 
+        command="AddLevel" 
+        clean_command="RemoveAllLevels"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+        <Hints>
+          <!-- Tells the widget not to use flat-indicies for this property. 
+                Only needed when number_of_elements_per_command==1
+          -->
+          <UseFlatIndex value="0" />
+        </Hints>
+       <CompositeTreeDomain name="tree" mode="non-leaves">
           <RequiredProperties>
              <Property name="Input" function="Input"/>
           </RequiredProperties>
-       </NumberOfGroupsDomain>
+       </CompositeTreeDomain>
        <Documentation>
-         This property lists the ids of the minimum and maximum group to extract from the input multigroup dataset.
+         This property lists the levels to extract
+         from the input hierarchical dataset.
        </Documentation>
      </IntVectorProperty>
-   <!-- End ExtractLevel -->
+
+    <!-- End ExtractLevel -->
    </SourceProxy>
 
-   <SourceProxy name="ExtractDataSets" 
-                class="vtkMultiGroupDataExtractDataSets"
-                label="Extract Datasets">
+   <SourceProxy name="ExtractBlock" class="vtkExtractBlock"
+     label="Extract Block">
      <Documentation
-        long_help="This filter extracts a list of datasets from multigroup datasets."
-        short_help="Extract datasets.">
-This filter extracts a list of datasets from multigroup datasets.
+        long_help="This filter extracts a range of blocks from a multiblock dataset."
+        short_help="Extract level.">
+This filter extracts a range of groups from a multiblock dataset    
      </Documentation>
      <InputProperty
         name="Input"
@@ -6439,7 +6472,61 @@ This filter extracts a list of datasets from multigroup datasets.
              <Group name="filters"/>
            </ProxyGroupDomain>
            <DataTypeDomain name="input_type">
-             <DataType value="vtkMultiGroupDataSet"/>
+             <DataType value="vtkMultiBlockDataSet"/>
+           </DataTypeDomain>
+           <Documentation>
+             This property specifies the input to the Extract Group filter.
+           </Documentation>
+     </InputProperty>
+
+     <IntVectorProperty 
+        name="BlockIndices" 
+        command="AddIndex" 
+        clean_command="RemoveAllIndices"
+        repeat_command="1"
+        number_of_elements_per_command="1"> 
+       <CompositeTreeDomain name="tree" mode="all">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+       </CompositeTreeDomain>
+       <Documentation>
+         This property lists the ids of the blocks to extract
+         from the input multiblock dataset.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="PruneOutput"
+        command="SetPruneOutput"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the output mutliblock dataset will be pruned to remove empty
+          nodes. On by default.
+        </Documentation>
+     </IntVectorProperty>
+
+    <!-- End ExtractBlock -->
+   </SourceProxy>
+
+   <SourceProxy name="ExtractDataSets" 
+                class="vtkExtractDataSets"
+                label="Extract Datasets">
+     <Documentation
+        long_help="This filter extracts a list of datasets from hierarchical datasets."
+        short_help="Extract datasets.">
+This filter extracts a list of datasets from hierarchical datasets.
+     </Documentation>
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkHierarchicalBoxDataSet"/>
            </DataTypeDomain>
            <Documentation>
              This property specifies the input to the Extract Datasets filter.
@@ -6452,6 +6539,11 @@ This filter extracts a list of datasets from multigroup datasets.
         clean_command="ClearDataSetList"
         repeat_command="1"
         number_of_elements_per_command="2">
+       <CompositeTreeDomain name="tree" mode="leaves">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+       </CompositeTreeDomain>
         <Documentation>
           This property provides a list of datasets to extract.
         </Documentation>

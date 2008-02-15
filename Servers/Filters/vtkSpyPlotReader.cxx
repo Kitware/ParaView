@@ -14,27 +14,28 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkSpyPlotReader.h"
 
+#include "vtkAMRBox.h"
 #include "vtkBoundingBox.h"
 #include "vtkByteSwap.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCellData.h"
+#include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
-#include "vtkDataArraySelection.h"
 #include "vtkDataArraySelection.h"
 #include "vtkDoubleArray.h"
 #include "vtkExtractCTHPart.h" // for the BOUNDS key
 #include "vtkFloatArray.h"
-#include "vtkHierarchicalDataSet.h"
+#include "vtkHierarchicalBoxDataSet.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkIntArray.h"
-#include "vtkMultiGroupDataInformation.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkSmartPointer.h"
 #include "vtkUniformGrid.h"
-#include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedCharArray.h"
 
 #include "vtkSpyPlotReaderMap.h"
@@ -61,7 +62,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.58");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.59");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -121,6 +122,34 @@ vtkSpyPlotReader::~vtkSpyPlotReader()
   this->SetController(0);
 }
 
+
+//-----------------------------------------------------------------------------
+// Create either vtkHierarchicalBoxDataSet or vtkMultiBlockDataSet based on
+// whether the dataset is AMR.
+int vtkSpyPlotReader::RequestDataObject(vtkInformation *vtkNotUsed(req),
+  vtkInformationVector **vtkNotUsed(inV),
+  vtkInformationVector *outV)
+{
+  vtkInformation *outInfo = outV->GetInformationObject(0);
+  vtkCompositeDataSet* outData = NULL;
+
+  // IsAMR is updated during the RequestInformation pass.
+  if (this->IsAMR)
+    {
+    outData = vtkHierarchicalBoxDataSet::New();
+    }
+  else
+    {
+    outData = vtkMultiBlockDataSet::New();
+    }
+
+  outData->SetPipelineInformation(outInfo);
+  outInfo->Set(vtkDataObject::DATA_EXTENT_TYPE(), outData->GetExtentType());
+  outInfo->Set(vtkDataObject::DATA_OBJECT(), outData);
+  outData->Delete();
+  return 1;
+}
+
 //-----------------------------------------------------------------------------
 // Read the case file and the first binary file do get meta
 // informations (number of files, number of fields, number of timestep).
@@ -138,14 +167,8 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
     return 0;
     }
   
-  vtkMultiGroupDataInformation *compInfo
-    =vtkMultiGroupDataInformation::New();
-
   vtkInformation *info=outputVector->GetInformationObject(0);
-  info->Set(vtkCompositeDataPipeline::COMPOSITE_DATA_INFORMATION(),compInfo);
-
   info->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
-  compInfo->Delete();
 
   struct stat fs;
   if(stat(this->FileName,&fs)!=0)
@@ -546,10 +569,10 @@ int vtkSpyPlotReader::RequestData(
 
   vtkInformation *info=outputVector->GetInformationObject(0);
   vtkDataObject *doOutput=info->Get(vtkDataObject::DATA_OBJECT());
-  vtkHierarchicalDataSet *hb=vtkHierarchicalDataSet::SafeDownCast(doOutput);  
+  vtkCompositeDataSet *hb=vtkCompositeDataSet::SafeDownCast(doOutput);  
   if(!hb)
     {
-    vtkErrorMacro("The output is not a HierarchicalDataSet");
+    vtkErrorMacro("The output is not a CompositeDataSet");
     return 0;
     }
   if (!info->Has(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()) ||
@@ -565,12 +588,7 @@ int vtkSpyPlotReader::RequestData(
   double* steps =
     info->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
 
-  vtkMultiGroupDataInformation *compInfo=
-    vtkMultiGroupDataInformation::SafeDownCast(
-      info->Get(vtkCompositeDataPipeline::COMPOSITE_DATA_INFORMATION()));
-
   hb->Initialize(); // remove all previous blocks
-  hb->SetMultiGroupDataInformation(compInfo);
   //int numFiles = this->Map->Files.size();
 
   // By setting SetMaximumNumberOfPieces(-1) 
@@ -702,17 +720,18 @@ int vtkSpyPlotReader::RequestData(
     block->GetDimensions(dims);
     if (this->IsAMR)
       {
-      hasBadGhostCells = this->PrepareAMRData(hb, block, &level, 
-                                              extents, 
-                                              realExtents, realDims, &cd);
+      hasBadGhostCells = this->PrepareAMRData(
+        vtkHierarchicalBoxDataSet::SafeDownCast(hb), block, &level, 
+        extents, realExtents, realDims, &cd);
       }
     else
       {
       vtkRectilinearGrid *rg;
       vtkDebugMacro( "Preparing Block: " << blockID << " " 
                      << uniReader->GetFileName() );
-      hasBadGhostCells = this->PrepareData(hb, block, &rg, extents, realExtents,
-                                           realDims, &cd);
+      hasBadGhostCells = this->PrepareData(
+        vtkMultiBlockDataSet::SafeDownCast(hb), block, &rg, extents, realExtents,
+        realDims, &cd);
       grids.push_back(rg);
       }
 
@@ -769,55 +788,52 @@ int vtkSpyPlotReader::RequestData(
     this->SetGlobalLevels(hb, processNumber, numProcessors,
                           rightHasBounds, leftHasBounds);
     }
-  
-  unsigned int numberOfLevels=hb->GetNumberOfLevels();
-  unsigned int level;
  
-  
   // Set the unique block id cell data
   if(this->GenerateBlockIdArray)
     {
-    int blockId=0, k, i;
-    numberOfLevels=hb->GetNumberOfLevels();
-    for (blockId = 0, level = 0; level<numberOfLevels; level++)
+    int blockId=0;
+    vtkSmartPointer<vtkCompositeDataIterator> cdIter;
+    cdIter.TakeReference(hb->NewIterator());
+    cdIter->VisitOnlyLeavesOn();
+    cdIter->TraverseSubTreeOn();
+    for (cdIter->InitTraversal(); !cdIter->IsDoneWithTraversal();
+      cdIter->GoToNextItem(), blockId++)
       {
-      int totalNumberOfDataSets=hb->GetNumberOfDataSets(level);
-      for (i = 0; i < totalNumberOfDataSets; blockId++, i++)
+      vtkDataObject *dataObject = cdIter->GetCurrentDataObject();
+      if (dataObject!=0)
         {
-        vtkDataObject *dataObject=hb->GetDataSet(level,i);
-        if(dataObject!=0)
-          {
-          vtkDataSet *ds=vtkDataSet::SafeDownCast(dataObject);
-          assert("check: ds_exists" && ds!=0);
-          vtkCellData *cd=ds->GetCellData();
-          // Add the block id cell data array
-          
-          vtkDataArray *array=cd->GetArray("blockId");
-          if(array!=0)
-            {
-            cd->RemoveArray("blockId"); // if this is not the first step,
-            // make sure we have a clean array
-            }
-          
-          array = vtkIntArray::New();
-          cd->AddArray(array);
-          array->Delete();
+        vtkDataSet *ds = vtkDataSet::SafeDownCast(dataObject);
+        assert("check: ds_exists" && ds!=0);
         
-          array->SetName("blockId");
-          array->SetNumberOfComponents(1);
-          int c=ds->GetNumberOfCells();
-          array->SetNumberOfTuples(c);
-          int *ptr=static_cast<int *>(array->GetVoidPointer(0));
-          for(k=0; k<c; k++)
-            {
-            ptr[k]=blockId;
-            }
+        // Add the block id cell data array
+        vtkCellData *cd=ds->GetCellData();
+        vtkDataArray *array=cd->GetArray("blockId");
+        if(array!=0)
+          {
+          cd->RemoveArray("blockId"); // if this is not the first step,
+          // make sure we have a clean array
+          }
+        array = vtkIntArray::New();
+        cd->AddArray(array);
+        array->Delete();
+
+        array->SetName("blockId");
+        array->SetNumberOfComponents(1);
+        vtkIdType numCells = ds->GetNumberOfCells();
+        array->SetNumberOfTuples(numCells);
+        int *ptr=static_cast<int *>(array->GetVoidPointer(0));
+        for(vtkIdType k=0; k < numCells; k++)
+          {
+          ptr[k]=blockId;
           }
         }
       }
     }
   
 #if 0
+  unsigned int numberOfLevels=hb->GetNumberOfLevels();
+  unsigned int level;
   //  Display the block list for each level
   numberOfLevels=hb->GetNumberOfLevels();
   for (level = 0; level<numberOfLevels; level++)
@@ -1428,7 +1444,7 @@ void vtkSpyPlotReader::SetGlobalBounds(vtkSpyPlotBlockIterator *biter,
  return;
 }
   
-int vtkSpyPlotReader::PrepareAMRData(vtkHierarchicalDataSet *hb,
+int vtkSpyPlotReader::PrepareAMRData(vtkHierarchicalBoxDataSet *hb,
                                      vtkSpyPlotBlock *block, 
                                      int *level,
                                      int extents[6],
@@ -1445,9 +1461,21 @@ int vtkSpyPlotReader::PrepareAMRData(vtkHierarchicalDataSet *hb,
                                          origin, extents, 
                                          realExtents,
                                          realDims);
+
+  int loCorner[3], hiCorner[3];
+  loCorner[0] = realExtents[0];
+  hiCorner[0] = realExtents[1];
+  loCorner[1] = realExtents[2];
+  hiCorner[1] = realExtents[3];
+  loCorner[2] = realExtents[4];
+  hiCorner[2] = realExtents[5];
+
+  // TODO: is this always 3D?
+  vtkAMRBox box(3,loCorner,hiCorner);
+
   //vtkImageData* ug = vtkImageData::New();
   vtkUniformGrid* ug = vtkUniformGrid::New();
-  hb->SetDataSet(*level, hb->GetNumberOfDataSets(*level), ug);
+  hb->SetDataSet(*level, hb->GetNumberOfDataSets(*level), box, ug);
   ug->SetSpacing(spacing);
   ug->SetExtent(extents);
   ug->SetOrigin(origin);
@@ -1456,7 +1484,7 @@ int vtkSpyPlotReader::PrepareAMRData(vtkHierarchicalDataSet *hb,
   return needsFixing;
 }
                                   
-int vtkSpyPlotReader::PrepareData(vtkHierarchicalDataSet *hb,
+int vtkSpyPlotReader::PrepareData(vtkMultiBlockDataSet *hb,
                                   vtkSpyPlotBlock *block,
                                   vtkRectilinearGrid **rg,
                                   int extents[6],
@@ -1483,7 +1511,7 @@ int vtkSpyPlotReader::PrepareData(vtkHierarchicalDataSet *hb,
   vtkDebugMacro( << " Rectilinear grid pointer: " << rg );
   *rg=vtkRectilinearGrid::New();
   (*rg)->SetExtent(extents);
-  hb->SetDataSet(0, hb->GetNumberOfDataSets(0), *rg);
+  hb->SetBlock(hb->GetNumberOfBlocks(), *rg);
   if (coordinates[0])
     {
     (*rg)->SetXCoordinates(coordinates[0]);
@@ -1715,7 +1743,7 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3],
     }
 }
 
-void vtkSpyPlotReader::SetGlobalLevels(vtkHierarchicalDataSet *hb,
+void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite,
                                        int processNumber,
                                        int numProcessors,
                                        int rightHasBounds,
@@ -1729,12 +1757,21 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkHierarchicalDataSet *hb,
     parent= vtkCommunicator::GetParentProcessor(processNumber);
     }
   
-  unsigned int numberOfLevels=hb->GetNumberOfLevels();
-  // If this is an SMR SpyPlot we need to first determine
-  // the global number of levels
-  
+  vtkHierarchicalBoxDataSet* hbDS = 
+    vtkHierarchicalBoxDataSet::SafeDownCast(composite);
+  vtkMultiBlockDataSet* mbDS =
+    vtkMultiBlockDataSet::SafeDownCast(composite);
+
+  assert("check: ds must be hierarchical or multiblock" && (hbDS || mbDS));
+  unsigned int numberOfLevels=1;
+
+  // If this is an AMR SpyPlot we need to first determine
+  // the global number of levels. Otherwise, the number of levels is 1.
   if (this->IsAMR)
     {
+    // hbDS is non-null.
+    assert("check: ds is vtkHierarchicalBoxDataSet" && hbDS !=0);
+    numberOfLevels = hbDS->GetNumberOfLevels();
     unsigned long ulintMsgValue;
     // Update it from the children
     if(left<numProcessors)
@@ -1795,18 +1832,20 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkHierarchicalDataSet *hb,
         }
       }
     
-    if(numberOfLevels>hb->GetNumberOfLevels())
+    if(numberOfLevels>hbDS->GetNumberOfLevels())
       {
-      hb->SetNumberOfLevels(numberOfLevels);
+      hbDS->SetNumberOfLevels(numberOfLevels);
       }
     }
   // At this point, the global number of levels is set in each processor.
   // Update each level
+  // i.e. for each level synchronize the number of datasets (or pieces).
   unsigned int level;
-  int intMsgValue;
   for (level = 0; level<numberOfLevels; level++)
     {
-    int numberOfDataSets=hb->GetNumberOfDataSets(level);
+    int intMsgValue;
+    int numberOfDataSets= hbDS? hbDS->GetNumberOfDataSets(level):
+      mbDS->GetNumberOfBlocks();
     int totalNumberOfDataSets=numberOfDataSets;
     int leftNumberOfDataSets=0;
     int rightNumberOfDataSets=0;
@@ -1882,31 +1921,59 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkHierarchicalDataSet *hb,
     // Update the level.
     if(totalNumberOfDataSets>numberOfDataSets)
       {
-      hb->SetNumberOfDataSets(level,totalNumberOfDataSets);
-      int i;
-      if(globalIndex>0)
+      // save the current datasets
+      if (hbDS)
         {
-        // move the datasets to the right indices
-        // we have to start at the end because the
-        // original blocks location and final location
-        // may overlap.
-        int j;
-        for (i=numberOfDataSets-1, j=globalIndex+numberOfDataSets-1;
-             i>=0; --i, --j)
+        if (globalIndex==0)
           {
-          hb->SetDataSet(level,j,hb->GetDataSet(level,i));
+          hbDS->SetNumberOfDataSets(level, totalNumberOfDataSets);
           }
-        // add null pointers at the beginning
-        for (i = 0; i<globalIndex; i++)
+        else
           {
-          hb->SetDataSet(level,i,0);
+          vtkstd::vector<vtkSmartPointer<vtkUniformGrid> > datasets;
+          vtkstd::vector<vtkAMRBox> boxes;
+          int kk;
+          for (kk=0; kk < numberOfDataSets; kk++)
+            {
+            vtkAMRBox box;
+            vtkUniformGrid* ug = hbDS->GetDataSet(level, kk, box);
+            datasets.push_back(ug);
+            boxes.push_back(box);
+            }
+          hbDS->SetNumberOfDataSets(level, 0); // removes all current datasets.
+          hbDS->SetNumberOfDataSets(level, totalNumberOfDataSets);
+
+          // put the datasets back starting at globalIndex.
+          // All other indices are in their initialized state.
+          for (kk=0; kk < numberOfDataSets; kk++)
+            {
+            hbDS->SetDataSet(level, kk+globalIndex, boxes[kk], datasets[kk]);
+            }
           }
         }
-      // add null pointers at the end
-      for (i=globalIndex+numberOfDataSets;
-           i<totalNumberOfDataSets; i++)
+      else // if (mbDS)
         {
-        hb->SetDataSet(level,i,0);
+        if (globalIndex == 0)
+          {
+          mbDS->SetNumberOfBlocks(totalNumberOfDataSets);
+          }
+        else
+          {
+          int kk;
+          vtkstd::vector<vtkSmartPointer<vtkDataSet> > datasets;
+          for (kk=0; kk < numberOfDataSets; kk++)
+            {
+            datasets.push_back(vtkDataSet::SafeDownCast(mbDS->GetBlock(kk)));
+            }
+          mbDS->SetNumberOfBlocks(0); // removes all current blocks.
+          mbDS->SetNumberOfBlocks(totalNumberOfDataSets);
+          // put the datasets back starting at globalIndex.
+          // All other indices are in their initialized state.
+          for (kk=0; kk < numberOfDataSets; kk++)
+            {
+            mbDS->SetBlock(kk+globalIndex, datasets[kk]);
+            }
+          }
         }
       }
     } 

@@ -45,7 +45,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.41");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.42");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -176,7 +176,8 @@ void vtkPVDataInformation::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
+void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo,
+  bool copyCompositeInformation/*=true*/)
 {
   int idx;
   double *bounds;
@@ -210,8 +211,11 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
   this->PointDataInformation->DeepCopy(dataInfo->GetPointDataInformation());
   this->CellDataInformation->DeepCopy(dataInfo->GetCellDataInformation());
   this->FieldDataInformation->DeepCopy(dataInfo->GetFieldDataInformation());
-  this->CompositeDataInformation->AddInformation(
-    dataInfo->GetCompositeDataInformation());
+  if (copyCompositeInformation)
+    {
+    this->CompositeDataInformation->AddInformation(
+      dataInfo->GetCompositeDataInformation());
+    }
   this->PointArrayInformation->AddInformation(
     dataInfo->GetPointArrayInformation());
 
@@ -224,40 +228,49 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVDataInformation::AddFromCompositeDataSet(vtkCompositeDataSet* data)
+void vtkPVDataInformation::AddFromMultiPieceDataSet(vtkCompositeDataSet* data)
 {
-  int numDataSets = 0;
   vtkCompositeDataIterator* iter = data->NewIterator();
-  iter->GoToFirstItem();
-  while (!iter->IsDoneWithTraversal())
+  for(iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    numDataSets++;
     vtkDataObject* dobj = iter->GetCurrentDataObject();
-    vtkPVDataInformation* dinf = vtkPVDataInformation::New();
-    dinf->CopyFromObject(dobj);
-    dinf->SetDataClassName(dobj->GetClassName());
-    dinf->DataSetType = dobj->GetDataObjectType();
-    this->AddInformation(dinf, 1);
-    dinf->Delete();
-
-    iter->GoToNextItem();
+    if (dobj)
+      {
+      vtkPVDataInformation* dinf = vtkPVDataInformation::New();
+      dinf->CopyFromObject(dobj);
+      dinf->SetDataClassName(dobj->GetClassName());
+      dinf->DataSetType = dobj->GetDataObjectType();
+      this->AddInformation(dinf, /*addingParts=*/ 1);
+      dinf->Delete();
+      }
     }
   iter->Delete();
-
-  return numDataSets;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data,
-                                                    int recurse)
+void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
 {
   this->Initialize();
+  this->CompositeDataInformation->CopyFromObject(data);
 
-  int numDataSets = this->AddFromCompositeDataSet(data);
-
-  if (recurse)
+  unsigned int numDataSets = this->CompositeDataInformation->GetNumberOfChildren();
+  if (this->CompositeDataInformation->GetDataIsMultiPiece())
     {
-    this->CompositeDataInformation->CopyFromObject(data);
+    // For vtkMultiPieceDataSet, the vtkPVCompositeDataInformation does not
+    // give us individual piece information, we collect that explicitly.
+    this->AddFromMultiPieceDataSet(data);
+    }
+  else
+    {
+    for (unsigned int cc=0; cc < numDataSets; cc++)
+      {
+      vtkPVDataInformation* childInfo = 
+        this->CompositeDataInformation->GetDataInformation(cc);
+      if (childInfo)
+        {
+        this->AddInformation(childInfo, /*addingParts=*/ 1);
+        }
+      }
     }
   this->SetCompositeDataClassName(data->GetClassName());
   this->CompositeDataSetType = data->GetDataObjectType();
@@ -552,11 +565,13 @@ void vtkPVDataInformation::AddInformation(
     return;
     }
 
-  this->SetCompositeDataClassName(info->GetCompositeDataClassName());
-  this->CompositeDataSetType = info->CompositeDataSetType;
-
-  this->CompositeDataInformation->AddInformation(
-    info->CompositeDataInformation);
+  if (!addingParts)
+    {
+    this->SetCompositeDataClassName(info->GetCompositeDataClassName());
+    this->CompositeDataSetType = info->CompositeDataSetType;
+    this->CompositeDataInformation->AddInformation(
+      info->CompositeDataInformation);
+    }
 
   if (info->NumberOfDataSets == 0)
     {
@@ -566,8 +581,9 @@ void vtkPVDataInformation::AddInformation(
   if (this->NumberOfPoints == 0 && 
       this->NumberOfCells == 0 && 
       this->NumberOfDataSets == 0)
-    { // Just copy the other array information.
-    this->DeepCopy(info);
+    { 
+    // Just copy the other array information.
+    this->DeepCopy(info, !addingParts);
     return;
     }
 

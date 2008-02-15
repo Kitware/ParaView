@@ -63,6 +63,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeWidgetItemObject.h"
 #include "vtkSMDoubleVectorProperty.h"
 
+#include <assert.h>
+
 //----------------------------------------------------------------------------
 /*
 class pqExtractDataSetsPanel::pqUI : public QObject, public Ui::ExtractDataSetsPanel 
@@ -105,7 +107,7 @@ pqExtractDataSetsPanel::pqExtractDataSetsPanel(pqProxy* object_proxy, QWidget* p
       {
       vtkPVCompositeDataInformation* cdi =
         input_proxy->GetDataInformation()->GetCompositeDataInformation();
-      unsigned int numGroups = cdi->GetNumberOfGroups();
+      unsigned int numGroups = cdi->GetNumberOfChildren();
       QList<QString> strings;
       int firstTime = 1;
       pqTreeWidgetItemObject *groupitem;
@@ -122,6 +124,7 @@ pqExtractDataSetsPanel::pqExtractDataSetsPanel(pqProxy* object_proxy, QWidget* p
         groupitem->setData(0, Qt::UserRole, -1);
         groupitem->setChecked(0);
 
+        /*
         // loop over datasets
         unsigned int numDataSets = cdi->GetNumberOfDataSets(G);
         for (unsigned int i=0; i<numDataSets; i++)
@@ -157,6 +160,8 @@ pqExtractDataSetsPanel::pqExtractDataSetsPanel(pqProxy* object_proxy, QWidget* p
               (GroupIndex(G,i), StateItem(Qt::Unchecked,dataitem)));
             }
           }
+          */
+        assert("FIXME" && 0);
         if (firstTime)
           {
           // By default select first one

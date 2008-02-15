@@ -48,9 +48,7 @@ Interpretor, a python interpretor to run the script upon the first
          <!-- <Entry value="9" text="vtkPointSet"/> -->
          <!-- <Entry value="10" text="vtkUniformGrid"/> -->
          <!-- <Entry value="11" text="vtkCompositeDataSet"/> -->
-         <!-- <Entry value="12" text="vtkMultigroupDataSet"/> -->
          <!-- <Entry value="13" text="vtkMultiblockDataSet"/> -->
-         <!-- <Entry value="14" text="vtkHierarchicalDataSet"/> -->
          <!-- <Entry value="15" text="vtkHierarchical_BoxDataSet"/> -->
          <!-- <Entry value="16" text="vtkGenericDataSet"/> -->
          <!-- <Entry value="17" text="vtkHyperOctree"/> -->

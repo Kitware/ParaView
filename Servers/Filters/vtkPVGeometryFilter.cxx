@@ -33,7 +33,7 @@
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMultiGroupDataSet.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
@@ -51,7 +51,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.74");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.75");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -241,9 +241,9 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
 
   vtkDataObject* inputDobj = inInfo->Get(vtkDataObject::DATA_OBJECT());
-  vtkMultiGroupDataSet *mgInput = 
-    vtkMultiGroupDataSet::SafeDownCast(inputDobj);
-  if (mgInput) 
+  vtkCompositeDataSet *compInput = 
+    vtkCompositeDataSet::SafeDownCast(inputDobj);
+  if (compInput) 
     {
     return this->RequestCompositeData(request, inputVector, outputVector);
     }
@@ -284,7 +284,7 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
     info->Get(vtkDataObject::DATA_OBJECT()));
   if (!output) {return 0;}
 
-  vtkMultiGroupDataSet *mgInput = vtkMultiGroupDataSet::SafeDownCast(
+  vtkCompositeDataSet *mgInput = vtkCompositeDataSet::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
   if (!mgInput)
     {
@@ -320,66 +320,63 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
 
 //----------------------------------------------------------------------------
 int vtkPVGeometryFilter::ExecuteCompositeDataSet(
-  vtkMultiGroupDataSet* mgInput, 
+  vtkCompositeDataSet* mgInput, 
   vtkAppendPolyData* append, 
   int& numInputs,
   int updateGroup)
 {
-  unsigned int numGroups = mgInput->GetNumberOfGroups();
+  vtkSmartPointer<vtkCompositeDataIterator> iter;
+  iter.TakeReference(mgInput->NewIterator());
 
-  unsigned int group;
-  unsigned int dataset;
   unsigned int totNumBlocks=0;
-  for (group=0; group<numGroups; group++)
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    unsigned int numDataSets = mgInput->GetNumberOfDataSets(group);
-    for (dataset=0; dataset<numDataSets; dataset++)
-      {
-      if (mgInput->GetDataSet(group, dataset))
-        {
-        totNumBlocks++;
-        }
-      }
+    // iter skips empty blocks automatically.
+    totNumBlocks++;
     }
-  
-  for (group=0; group<numGroups; group++)
+ 
+  if (updateGroup)
     {
-    unsigned int numDataSets = mgInput->GetNumberOfDataSets(group);
+    iter->TraverseSubTreeOff();
+    iter->VisitOnlyLeavesOff();
+    }
+
+  unsigned int group = 0;
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem(), group++)
+    {
     if (updateGroup)
       {
       this->CurrentGroup = group;
       }
-    for (dataset=0; dataset<numDataSets; dataset++)
-      {
-      vtkDataObject* block = mgInput->GetDataSet(group, dataset);
-      vtkDataSet* ds = vtkDataSet::SafeDownCast(block);
-      if (ds)
-        {
-        vtkPolyData* tmpOut = vtkPolyData::New();
-        this->ExecuteBlock(ds, tmpOut, 0);
-        append->AddInput(tmpOut);
-        // Call FastDelete() instead of Delete() to avoid garbage
-        // collection checks. This improves the preformance significantly
-        tmpOut->FastDelete();
-        numInputs++;
 
-        this->UpdateProgress(static_cast<float>(numInputs)/totNumBlocks);
-        }
-      else
+    vtkDataObject* block = iter->GetCurrentDataObject();
+    vtkDataSet* ds = vtkDataSet::SafeDownCast(block);
+    if (ds)
+      {
+      vtkPolyData* tmpOut = vtkPolyData::New();
+      this->ExecuteBlock(ds, tmpOut, 0);
+      append->AddInput(tmpOut);
+      // Call FastDelete() instead of Delete() to avoid garbage
+      // collection checks. This improves the preformance significantly
+      tmpOut->FastDelete();
+      numInputs++;
+      this->UpdateProgress(static_cast<float>(numInputs)/totNumBlocks);
+      }
+    else
+      {
+      vtkCompositeDataSet* mgds = vtkCompositeDataSet::SafeDownCast(block);
+      if (mgds)
         {
-        vtkMultiGroupDataSet* mgds = vtkMultiGroupDataSet::SafeDownCast(block);
-        if (mgds)
+        // Do not show the group ids of the sub-composite datasets.
+        // Set updateGroup to 0.
+        if (!this->ExecuteCompositeDataSet(mgds, append, numInputs, 0))
           {
-          // Do not show the group ids of the sub-composite datasets.
-          // Set updateGroup to 0.
-          if (!this->ExecuteCompositeDataSet(mgds, append, numInputs, 0))
-            {
-            return 0;
-            }
+          return 0;
           }
         }
       }
     }
+
   return 1;
 }
 

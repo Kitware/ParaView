@@ -67,7 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMVectorProperty.h"
 #include "vtkSMExtentDomain.h"
 #include "vtkSMFileListDomain.h"
-
+#include "vtkSMCompositeTreeDomain.h"
 // ParaView includes
 #include "pqSMProxy.h"
 
@@ -119,6 +119,7 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
     vtkSMProxyGroupDomain* proxyGroupDomain = NULL;
     vtkSMFileListDomain* fileListDomain = NULL;
     vtkSMStringListDomain* stringListDomain = NULL;
+    vtkSMCompositeTreeDomain* compositeTreeDomain = NULL;
     
     vtkSMDomainIterator* iter = Property->NewDomainIterator();
     for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
@@ -147,12 +148,20 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
         {
         stringListDomain = vtkSMStringListDomain::SafeDownCast(iter->GetDomain());
         }
+      if (!compositeTreeDomain)
+        {
+        compositeTreeDomain = vtkSMCompositeTreeDomain::SafeDownCast(iter->GetDomain());
+        }
       }
     iter->Delete();
 
     if(fileListDomain)
       {
       type = pqSMAdaptor::FILE_LIST;
+      }
+    else if (compositeTreeDomain)
+      {
+      type = pqSMAdaptor::COMPOSITE_TREE;
       }
     else if(stringListRangeDomain || 
       (VectorProperty && VectorProperty->GetRepeatCommand() && 

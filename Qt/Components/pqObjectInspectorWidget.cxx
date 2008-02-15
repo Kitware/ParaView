@@ -56,7 +56,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExodusIIPanel.h"
 #include "pqExodusPanel.h"
 #include "pqExtractCTHPartsPanel.h"
-#include "pqExtractDataSetsPanel.h"
 #include "pqExtractLocationsPanel.h"
 #include "pqExtractSelectionPanel.h"
 #include "pqExtractSelectionsPanel.h"
@@ -113,10 +112,6 @@ public:
       if(QString("StreamTracer") == proxy->getProxy()->GetXMLName())
         {
         return new pqStreamTracerPanel(proxy, p);
-        }
-      if(QString("ExtractDataSets") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqExtractDataSetsPanel(proxy, p);
         }
 //      if(QString("ParticleTracer") == proxy->getProxy()->GetXMLName())
 //        {
@@ -191,7 +186,7 @@ public:
          QString("ArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
          QString("Glyph") == proxy->getProxy()->GetXMLName() ||
          QString("StreamTracer") == proxy->getProxy()->GetXMLName() ||
-         QString("ExtractDataSets") == proxy->getProxy()->GetXMLName() ||
+//         QString("ExtractDataSets") == proxy->getProxy()->GetXMLName() ||
 //         QString("ParticleTracer") == proxy->getProxy()->GetXMLName() ||
          QString("Threshold") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractPointSelection") == proxy->getProxy()->GetXMLName() ||

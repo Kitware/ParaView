@@ -287,17 +287,17 @@
       <!-- End of XMLImageDataWriter -->
     </WriterProxy>
 
-    <WriterProxy name="XMLMultiGroupDataWriter"
-      class="vtkXMLMultiGroupDataWriter"
+    <WriterProxy name="XMLMultiBlockDataWriter"
+      class="vtkXMLMultiBlockDataWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
       <Documentation
-        short_help="Write a multigroup dataset in a xml-based vtk data file.">
-        Writer to write a multigroup dataset in a xml-based vtk data file. 
+        short_help="Write a multiblock dataset in a xml-based vtk data file.">
+        Writer to write a multiblock dataset in a xml-based vtk data file. 
         Cannot be used for parallel writing.
       </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="1">
-          <DataType value="vtkMultiGroupDataSet" />
+          <DataType value="vtkMultiBlockDataSet" />
         </DataTypeDomain>
         <Documentation>
           The input filter/source whose output dataset is to written to the
@@ -308,7 +308,31 @@
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
-      <!-- End of XMLMultiGroupDataWriter -->
+      <!-- End of XMLMultiBlockDataWriter -->
+    </WriterProxy>
+
+    <WriterProxy name="XMLHierarchicalBoxDataWriter"
+      class="vtkXMLHierarchicalBoxDataWriter"
+      base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
+      <Documentation
+        short_help="Write a hierarchical box dataset in a xml-based vtk data file.">
+        Writer to write a hierarchical box dataset in a xml-based vtk data file. 
+        Cannot be used for parallel writing.
+      </Documentation>
+      <InputProperty name="Input" command="SetInputConnection">
+        <DataTypeDomain name="input_type" composite_data_supported="1">
+          <DataType value="vtkHierarchicalBoxDataSet" />
+        </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
+      </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
+      <!-- End of XMLHierarchicalBoxDataWriter -->
     </WriterProxy>
 
     <PWriterProxy name="XMLPPolyDataWriter"
@@ -431,17 +455,17 @@
       <!-- End of XMLPImageDataWriter -->
     </PWriterProxy>
 
-    <PWriterProxy name="XMLPMultiGroupDataWriter"
-      class="vtkXMLPMultiGroupDataWriter"
+    <PWriterProxy name="XMLPMultiBlockDataWriter"
+      class="vtkXMLPMultiBlockDataWriter"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
       <Documentation
-        short_help="Write a multigroup in a xml-based vtk data file.">
-        Writer to write a multigroup in a xml-based vtk data file. Can be used
+        short_help="Write a multiblock in a xml-based vtk data file.">
+        Writer to write a multiblock dataset in a xml-based vtk data file. Can be used
         for parallel writing.
       </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <DataTypeDomain name="input_type" composite_data_supported="1">
-          <DataType value="vtkMultiGroupDataSet" />
+          <DataType value="vtkMultiBlockDataSet" />
         </DataTypeDomain>
         <Documentation>
           The input filter/source whose output dataset is to written to the
@@ -453,6 +477,30 @@
         <Property name="FileName" show="0"/>
       </Hints>
       <!-- End of XMLPMultiGroupDataWriter -->
+    </PWriterProxy>
+
+    <PWriterProxy name="XMLPHierarchicalBoxDataWriter"
+      class="vtkXMLPHierarchicalBoxDataWriter"
+      base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
+      <Documentation
+        short_help="Write a hierarchical box dataset in a xml-based vtk data file.">
+        Writer to write a hierarchical box in a xml-based vtk data file. Can be used
+        for parallel writing.
+      </Documentation>
+      <InputProperty name="Input" command="SetInputConnection">
+        <DataTypeDomain name="input_type" composite_data_supported="1">
+          <DataType value="vtkHierarchicalBoxDataSet" />
+        </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
+      </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
+      <!-- End of XMLPHierarchicalBoxDataWriter -->
     </PWriterProxy>
 
     <WriterProxy name="DataSetWriter" class="vtkGenericDataObjectWriter"

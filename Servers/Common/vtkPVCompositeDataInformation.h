@@ -18,7 +18,7 @@
 // a composite dataset from server to client. It holds a vtkPVDataInformation
 // for each block of the composite dataset.
 // .SECTION See Also
-// vtkHierarchicalDataSet vtkPVDataInformation
+// vtkHierarchicalBoxDataSet vtkPVDataInformation
 
 #ifndef __vtkPVCompositeDataInformation_h
 #define __vtkPVCompositeDataInformation_h
@@ -51,41 +51,46 @@ public:
   virtual void CopyFromStream(const vtkClientServerStream*);
 
   // Description:
-  // True if data passed in CopyFromStream() is vtkHierarchicalDataSet
-  // or sub-class, false otherwise. Is only valid after CopyFromObject()
-  // has been called.
-  vtkGetMacro(DataIsComposite, int);
-
-  // Description:
-  // True if data is a vtkHierarchalDataSet or sub-class. Since these
-  // classes tend to have a very large number of sub-datasets, only
-  // information about the whole dataset is stored. In this case, 
-  // GetDataInformation() will always return 0.
-  vtkGetMacro(DataIsHierarchical, int);
-
-  // Description:
   // Clears all internal data structures.
   virtual void Initialize();
 
   // Description:
-  // Returns the number of levels.
-  unsigned int GetNumberOfGroups();
+  // Returns the number of children.
+  unsigned int GetNumberOfChildren();
 
   // Description:
-  // Given a level, returns the number of datasets.
-  unsigned int GetNumberOfDataSets(unsigned int level);
+  // Returns the information for the data object at the given index. If the
+  // child is a composite dataset itself, then the return vtkPVDataInformation
+  // will have the CompositeDataInformation set appropriately.
+  vtkPVDataInformation* GetDataInformation(unsigned int idx);
 
   // Description:
-  // Given a level and index, returns the data information.
-  vtkPVDataInformation* GetDataInformation(unsigned int level,
-                                           unsigned int idx);
+  // Get/Set if the data is multipiece. If so, then GetDataInformation() will
+  // always return NULL. For vtkMultiblockDataSet, we don't collect information
+  // about individual pieces. One can however, query the number of pieces by
+  // using GetNumberOfChildren().
+  vtkGetMacro(DataIsMultiPiece, int);
 
+  // Description:
+  // Returns if the dataset is a composite dataset.
+  vtkGetMacro(DataIsComposite, int);
+
+  // TODO:
+  // Add API to obtain meta data information for each of the children. 
+
+  // Description:
+  // Get the flat-index range for the composite dataset.
+  vtkGetMacro(FlatIndexMax, unsigned int);
 protected:
   vtkPVCompositeDataInformation();
   ~vtkPVCompositeDataInformation();
 
+  int DataIsMultiPiece;
   int DataIsComposite;
-  int DataIsHierarchical;
+  unsigned int FlatIndexMax;
+  
+  unsigned int NumberOfPieces;
+  vtkSetMacro(NumberOfPieces, unsigned int);
 
 private:
   vtkPVCompositeDataInformationInternals* Internal;

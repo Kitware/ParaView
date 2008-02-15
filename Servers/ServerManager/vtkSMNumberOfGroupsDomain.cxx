@@ -22,7 +22,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMNumberOfGroupsDomain);
-vtkCxxRevisionMacro(vtkSMNumberOfGroupsDomain, "1.7");
+vtkCxxRevisionMacro(vtkSMNumberOfGroupsDomain, "1.8");
 
 //---------------------------------------------------------------------------
 vtkSMNumberOfGroupsDomain::vtkSMNumberOfGroupsDomain()
@@ -97,7 +97,7 @@ int vtkSMNumberOfGroupsDomain::IsInDomain(vtkSMSourceProxy* proxy,
     return 0;
     }
 
-  if (!di->GetCompositeDataClassName())
+  if (!cdi->GetDataIsComposite())
     {
     // This domain isn't applicable if the data is not composite, so don't
     // even consider whether the number of groups is right.
@@ -106,13 +106,14 @@ int vtkSMNumberOfGroupsDomain::IsInDomain(vtkSMSourceProxy* proxy,
     return 1;
     }
 
-  if (cdi->GetNumberOfGroups() > 1 && 
+  // FIXME: THIS IS TOTALLY BOGUS DOMAIN
+  if (cdi->GetNumberOfChildren() > 1 && 
       this->GroupMultiplicity == vtkSMNumberOfGroupsDomain::MULTIPLE)
     {
     return 1;
     }
 
-  if (cdi->GetNumberOfGroups() == 1 && 
+  if (cdi->GetNumberOfChildren() == 1 && 
       this->GroupMultiplicity == vtkSMNumberOfGroupsDomain::SINGLE)
     {
     return 1;
@@ -159,7 +160,7 @@ void vtkSMNumberOfGroupsDomain::Update(vtkSMProxyProperty *pp)
       this->AddMinimum(0, 0);
       if (cInfo)
         {
-        this->AddMaximum(0, cInfo->GetNumberOfGroups()-1);
+        this->AddMaximum(0, cInfo->GetNumberOfChildren()-1);
         }
       else
         {
@@ -190,7 +191,7 @@ void vtkSMNumberOfGroupsDomain::Update(vtkSMProxyProperty *pp)
       this->AddMinimum(0, 0);
       if (cInfo)
         {
-        this->AddMaximum(0, cInfo->GetNumberOfGroups()-1);
+        this->AddMaximum(0, cInfo->GetNumberOfChildren()-1);
         }
       else
         {
