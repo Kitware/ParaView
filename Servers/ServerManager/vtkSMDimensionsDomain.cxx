@@ -22,7 +22,7 @@
 #include "vtkPVDataInformation.h"
 
 vtkStandardNewMacro(vtkSMDimensionsDomain);
-vtkCxxRevisionMacro(vtkSMDimensionsDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMDimensionsDomain, "1.2");
 //----------------------------------------------------------------------------
 vtkSMDimensionsDomain::vtkSMDimensionsDomain()
 {
@@ -54,8 +54,15 @@ void vtkSMDimensionsDomain::Update(vtkSMProperty*)
 void vtkSMDimensionsDomain::Update(vtkSMProxyProperty* pp,
   vtkSMIntVectorProperty* ivp)
 {
-  int extent[6];
+  int extent[6] = {0, 0, 0, 0, 0, 0};
   this->GetExtent(pp, extent);
+  if (extent[1] < extent[0] || extent[3] < extent[2] || extent[5] < extent[4])
+    {
+    // no valid extents provided by the data, just set the range to
+    // (0,0,0,0,0,0,0)
+    extent[0] = extent[1] = extent[2] = 
+      extent[3] = extent[4] = extent[5] = 0;
+    }
   if (ivp)
     {
     this->AddMinimum(0, 0);
