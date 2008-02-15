@@ -297,6 +297,8 @@ IF(BUILD_TESTING)
     ExodusPanel
     ExodusWriter
     ExodusXML
+    ExtractBlock
+    ExtractLevel
     Flow
     Flow2
     Fractal2D

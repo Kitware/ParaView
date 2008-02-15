@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="MainWindow/menubar/menuFile" command="activate" arguments="actionFileOpen" />
+  <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/Iron Xdmf/Iron_Protein.ImageData.Collection.xmf" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ExtractBlock" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/BlockIndices" command="mousePress" arguments="1,1,0,17,11,/0:0/0:0" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/BlockIndices" command="mouseRelease" arguments="1,0,0,17,11,/0:0/0:0" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/BlockIndices" command="mousePress" arguments="1,1,0,12,7,/0:0/3:0" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/BlockIndices" command="mouseRelease" arguments="1,0,0,12,7,/0:0/3:0" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/BlockIndices/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,13,101" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/BlockIndices/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,13,101" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/BlockIndices/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseDblClick" arguments="1,1,0,13,101" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/BlockIndices/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,13,101" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/BlockIndices/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,13,101" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/BlockIndices/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,13,101" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/BlockIndices" command="mousePress" arguments="1,1,0,18,5,/0:0/7:0" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/BlockIndices" command="mouseRelease" arguments="1,0,0,18,5,/0:0/7:0" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/BlockIndices" command="mousePress" arguments="1,1,0,13,8,/0:0/5:0" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/BlockIndices" command="mouseRelease" arguments="1,0,0,13,8,/0:0/5:0" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Contour" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/1pqCollapsedGroup0/pqContourControls/ComputeScalars" command="set_boolean" arguments="true" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="UnnamedNodeArray0" />
+  <pqevent object="MainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="scalars" />
+  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mousePress" arguments="1,1,0,14,13,/0:0/0:0/0:1" />
+  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mouseRelease" arguments="1,0,0,14,13,/0:0/0:0/0:1" /></pqevents>
