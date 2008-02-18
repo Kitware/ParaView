@@ -354,9 +354,9 @@ void pqCompositeDataTreeWidget::updateCheckState(bool checked)
     this->sender());
   if (checked)
     {
-    QList<pqTreeWidgetItemObject*> children = 
+    QList<pqTreeWidgetItemObject*> itemchildren = 
       item->findChildren<pqTreeWidgetItemObject*>();
-    foreach (pqTreeWidgetItemObject* child, children)
+    foreach (pqTreeWidgetItemObject* child, itemchildren)
       {
       child->setCheckState(0, Qt::Checked);
       }
