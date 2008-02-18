@@ -291,6 +291,16 @@ void pqProxyInformationWidget::fillDataInformation(
           }
         item->setData(2, Qt::DisplayRole, dataRange);
         item->setData(2, Qt::ToolTipRole, dataRange);
+        if (arrayInfo->GetIsPartial())
+          {
+          item->setForeground(0, QBrush(QColor("darkBlue")));
+          item->setData(0, Qt::DisplayRole, 
+            QString("%1 (partial)").arg(arrayInfo->GetName()));
+          }
+        else
+          {
+          item->setForeground(0, QBrush(QColor("darkGreen")));
+          }
         }
       }
     }
