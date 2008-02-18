@@ -33,7 +33,7 @@
 #include "vtkTexture.h"
 
 vtkStandardNewMacro(vtkTexturePainter);
-vtkCxxRevisionMacro(vtkTexturePainter, "1.1");
+vtkCxxRevisionMacro(vtkTexturePainter, "1.2");
 vtkCxxSetObjectMacro(vtkTexturePainter, LookupTable, vtkScalarsToColors);
 vtkInformationKeyMacro(vtkTexturePainter, SLICE, Integer);
 vtkInformationKeyMacro(vtkTexturePainter, SLICE_MODE, Integer);
@@ -286,7 +286,12 @@ void vtkTexturePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor,
     // mapping.
     this->Texture->SetInput(extractVOI->GetOutput());
     double outputbounds[6];
-    extractVOI->GetOutput()->GetBounds(outputbounds);
+
+    // TODO: vtkExtractVOI is not passing correct origin. Until that's fixed, I
+    // will just use the input origin/spacing to compute the bounds.
+    clone->SetExtent(evoi);
+    clone->GetBounds(outputbounds);
+    clone = 0;
 
     this->Texture->SetLookupTable(this->LookupTable);
     this->Texture->SetMapColorScalarsThroughLookupTable(
