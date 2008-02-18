@@ -45,7 +45,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.43");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.44");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -976,6 +976,20 @@ int vtkPVDataInformation::DataSetTypeIsA(const char* type)
       }
     }
 
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVDataInformation::IsDataStructured()
+{
+  switch (this->DataSetType)
+    {
+    case VTK_IMAGE_DATA:
+    case VTK_STRUCTURED_GRID:
+    case VTK_RECTILINEAR_GRID:
+    case VTK_UNIFORM_GRID:
+      return 1;
+    }
   return 0;
 }
 

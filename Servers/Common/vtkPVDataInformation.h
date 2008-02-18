@@ -132,6 +132,10 @@ public:
 
   vtkGetVector2Macro(TimeSpan, double);
 
+  // Description:
+  // Returns if the data type is structured.
+  int IsDataStructured();
+
 protected:
   vtkPVDataInformation();
   ~vtkPVDataInformation();

@@ -233,6 +233,8 @@ void pqProxyInformationWidget::fillDataInformation(
   this->Ui->yRange->setText(tr("NA"));
   this->Ui->zRange->setText(tr("NA"));
 
+  this->Ui->groupExtent->setVisible(false);
+
   if (!dataInformation)
     {
     return;
@@ -259,6 +261,33 @@ void pqProxyInformationWidget::fillDataInformation(
     QPixmap(":/pqWidgets/Icons/pqPointData16.png"),
     QPixmap(":/pqWidgets/Icons/pqCellData16.png")
     };
+
+  if (dataInformation->IsDataStructured())
+    {
+    this->Ui->groupExtent->setVisible(true);
+    int ext[6];
+    dataInformation->GetExtent(ext);
+    if (ext[1]>=ext[0] && ext[3] >=ext[2] && ext[5]>=ext[4])
+      {
+      int dims[3];
+      dims[0] = ext[1]-ext[0]+1;
+      dims[1] = ext[3]-ext[2]+1;
+      dims[2] = ext[5]-ext[4]+1;
+
+      this->Ui->xExtent->setText(QString(
+          "%1 to %2 (dimension: %3)").arg(ext[0]).arg(ext[1]).arg(dims[0]));
+      this->Ui->yExtent->setText(QString(
+          "%1 to %2 (dimension: %3)").arg(ext[3]).arg(ext[2]).arg(dims[1]));
+      this->Ui->zExtent->setText(QString(
+          "%1 to %2 (dimension: %3)").arg(ext[5]).arg(ext[4]).arg(dims[2]));
+      }
+    else
+      {
+      this->Ui->xExtent->setText("NA");
+      this->Ui->yExtent->setText("NA");
+      this->Ui->zExtent->setText("NA");
+      }
+    }
 
   for(int k=0; k<2; k++)
     {
