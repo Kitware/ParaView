@@ -51,7 +51,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.75");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.76");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -303,7 +303,7 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
   int numInputs = 0;
 
   int retVal = 0;
-  if (this->ExecuteCompositeDataSet(mgInput, append, numInputs, 1))
+  if (this->ExecuteCompositeDataSet(mgInput, append, numInputs))
     {
     this->GenerateGroupScalars = 0;
     if (numInputs > 0)
@@ -322,8 +322,7 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
 int vtkPVGeometryFilter::ExecuteCompositeDataSet(
   vtkCompositeDataSet* mgInput, 
   vtkAppendPolyData* append, 
-  int& numInputs,
-  int updateGroup)
+  int& numInputs)
 {
   vtkSmartPointer<vtkCompositeDataIterator> iter;
   iter.TakeReference(mgInput->NewIterator());
@@ -335,46 +334,20 @@ int vtkPVGeometryFilter::ExecuteCompositeDataSet(
     totNumBlocks++;
     }
  
-  if (updateGroup)
-    {
-    iter->TraverseSubTreeOff();
-    iter->VisitOnlyLeavesOff();
-    }
-
   unsigned int group = 0;
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem(), group++)
     {
-    if (updateGroup)
-      {
-      this->CurrentGroup = group;
-      }
-
+    this->CurrentGroup = iter->GetCurrentFlatIndex();
     vtkDataObject* block = iter->GetCurrentDataObject();
-    vtkDataSet* ds = vtkDataSet::SafeDownCast(block);
-    if (ds)
-      {
-      vtkPolyData* tmpOut = vtkPolyData::New();
-      this->ExecuteBlock(ds, tmpOut, 0);
-      append->AddInput(tmpOut);
-      // Call FastDelete() instead of Delete() to avoid garbage
-      // collection checks. This improves the preformance significantly
-      tmpOut->FastDelete();
-      numInputs++;
-      this->UpdateProgress(static_cast<float>(numInputs)/totNumBlocks);
-      }
-    else
-      {
-      vtkCompositeDataSet* mgds = vtkCompositeDataSet::SafeDownCast(block);
-      if (mgds)
-        {
-        // Do not show the group ids of the sub-composite datasets.
-        // Set updateGroup to 0.
-        if (!this->ExecuteCompositeDataSet(mgds, append, numInputs, 0))
-          {
-          return 0;
-          }
-        }
-      }
+    
+    vtkPolyData* tmpOut = vtkPolyData::New();
+    this->ExecuteBlock(block, tmpOut, 0);
+    append->AddInput(tmpOut);
+    // Call FastDelete() instead of Delete() to avoid garbage
+    // collection checks. This improves the preformance significantly
+    tmpOut->FastDelete();
+    numInputs++;
+    this->UpdateProgress(static_cast<float>(numInputs)/totNumBlocks);
     }
 
   return 1;

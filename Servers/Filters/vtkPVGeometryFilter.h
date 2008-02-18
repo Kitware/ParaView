@@ -142,8 +142,7 @@ protected:
   void ExecuteCellNormals(vtkPolyData* output, int doCommunicate);
   int ExecuteCompositeDataSet(vtkCompositeDataSet* mgInput, 
                               vtkAppendPolyData* append, 
-                              int& numInputs,
-                              int updateGroup);
+                              int& numInputs);
 
   void ChangeUseStripsInternal(int val, int force);
 
