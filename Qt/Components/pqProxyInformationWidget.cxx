@@ -344,14 +344,14 @@ void pqProxyInformationWidget::fillDataInformation(
 
 //-----------------------------------------------------------------------------
 QTreeWidgetItem* pqProxyInformationWidget::fillCompositeInformation(
-  vtkPVDataInformation* info, QTreeWidgetItem* parent/*=0*/)
+  vtkPVDataInformation* info, QTreeWidgetItem* parentItem/*=0*/)
 {
   QTreeWidgetItem* node = 0;
 
   QString label = info? info->GetPrettyDataTypeString() : "NA";
-  if (parent)
+  if (parentItem)
     {
-    node = new QTreeWidgetItem(parent, QStringList(label));
+    node = new QTreeWidgetItem(parentItem, QStringList(label));
     }
   else
     {

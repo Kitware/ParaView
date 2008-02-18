@@ -245,7 +245,7 @@ void pqCompositeDataTreeWidget::setValues(const QList<QVariant>& new_values)
 void pqCompositeDataTreeWidget::domainChanged()
 {
   bool prev = this->blockSignals(true);
-  QList<QVariant> values = this->values();
+  QList<QVariant> widgetvalues = this->values();
   this->Internal->Items.clear();
   this->clear();
 
@@ -259,7 +259,7 @@ void pqCompositeDataTreeWidget::domainChanged()
   this->buildTree(root, dInfo);
   
   // now update check state.
-  this->setValues(values);
+  this->setValues(widgetvalues);
   this->blockSignals(prev);
   this->expandAll();
 }
