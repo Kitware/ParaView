@@ -3,7 +3,7 @@ PROJECT (PQGUI)
 #########################################################################
 # Setup Qt
 SET(QT_REQUIRED TRUE)
-SET(QT_MIN_VERSION "4.2.2")
+SET(QT_MIN_VERSION "4.3.3")
 FIND_PACKAGE(Qt4)
 
 IF(NOT QT4_FOUND)
