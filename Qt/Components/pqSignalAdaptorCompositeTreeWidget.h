@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCompositeDataTreeWidget.h
+   Module:    pqSignalAdaptorCompositeTreeWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,28 +29,33 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCompositeDataTreeWidget_h 
-#define __pqCompositeDataTreeWidget_h
+#ifndef __pqSignalAdaptorCompositeTreeWidget_h 
+#define __pqSignalAdaptorCompositeTreeWidget_h
 
-#include "pqTreeWidget.h"
+#include <QObject>
+#include <QVariant>
 #include "pqComponentsExport.h"
 
-class vtkSMIntVectorProperty;
-class vtkPVDataInformation;
-class pqTreeWidgetItemObject;
 
-class PQCOMPONENTS_EXPORT pqCompositeDataTreeWidget : public pqTreeWidget
+class pqTreeWidgetItemObject;
+class QTreeWidget;
+class vtkPVDataInformation;
+class vtkSMIntVectorProperty;
+
+/// pqSignalAdaptorCompositeTreeWidget is used to connect a property with
+/// vtkSMCompositeTreeDomain as its domain to a Tree widget. It updates the tree
+/// to show composite data tree.
+class PQCOMPONENTS_EXPORT pqSignalAdaptorCompositeTreeWidget : public QObject
 {
   Q_OBJECT
-  typedef pqTreeWidget Superclass;
+  typedef QObject Superclass;
 
   Q_PROPERTY(QList<QVariant> values READ values WRITE setValues)
 public:
   /// Constructor. \c domain is used to build the tree layout to show in the
   /// widget.
-  pqCompositeDataTreeWidget(vtkSMIntVectorProperty* smproperty,
-    QWidget* parent=0);
-  ~pqCompositeDataTreeWidget();
+  pqSignalAdaptorCompositeTreeWidget(QTreeWidget*, vtkSMIntVectorProperty* smproperty);
+  ~pqSignalAdaptorCompositeTreeWidget();
 
   /// Returns the current value.
   /// This is a QList of unsigned ints.
@@ -71,8 +76,8 @@ private slots:
   void updateCheckState(bool checked);
   
 private:
-  pqCompositeDataTreeWidget(const pqCompositeDataTreeWidget&); // Not implemented.
-  void operator=(const pqCompositeDataTreeWidget&); // Not implemented.
+  pqSignalAdaptorCompositeTreeWidget(const pqSignalAdaptorCompositeTreeWidget&); // Not implemented.
+  void operator=(const pqSignalAdaptorCompositeTreeWidget&); // Not implemented.
 
 
   void buildTree(pqTreeWidgetItemObject* item, 

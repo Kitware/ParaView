@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCompositeDataTreeWidget.cxx
+   Module:    pqSignalAdaptorCompositeTreeWidget.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCompositeDataTreeWidget.h"
+#include "pqSignalAdaptorCompositeTreeWidget.h"
 
 // Server Manager Includes.
 #include "vtkEventQtSlotConnect.h"
@@ -42,13 +42,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMIntVectorProperty.h"
 
 // Qt Includes.
+#include <QPointer>
+#include <QTreeWidget>
 
 // ParaView Includes.
 #include "pqTreeWidgetItemObject.h"
 
-class pqCompositeDataTreeWidget::pqInternal
+class pqSignalAdaptorCompositeTreeWidget::pqInternal
 {
 public:
+  QPointer<QTreeWidget> TreeWidget;
   vtkSmartPointer<vtkSMIntVectorProperty> Property;
   vtkSmartPointer<vtkSMCompositeTreeDomain> Domain;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
@@ -59,11 +62,12 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqCompositeDataTreeWidget::pqCompositeDataTreeWidget(
-  vtkSMIntVectorProperty* smproperty, QWidget* p/*=0*/):
-  Superclass(p)
+pqSignalAdaptorCompositeTreeWidget::pqSignalAdaptorCompositeTreeWidget(
+  QTreeWidget* tree, vtkSMIntVectorProperty* smproperty):
+  Superclass(tree)
 {
   this->Internal = new pqInternal();
+  this->Internal->TreeWidget = tree;
   this->Internal->Property = smproperty;
   this->Internal->DomainMode = vtkSMCompositeTreeDomain::ALL; 
   this->Internal->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
@@ -109,13 +113,13 @@ pqCompositeDataTreeWidget::pqCompositeDataTreeWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqCompositeDataTreeWidget::~pqCompositeDataTreeWidget()
+pqSignalAdaptorCompositeTreeWidget::~pqSignalAdaptorCompositeTreeWidget()
 {
   delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
-QList<QVariant> pqCompositeDataTreeWidget::values() const
+QList<QVariant> pqSignalAdaptorCompositeTreeWidget::values() const
 {
   QList<QVariant> reply;
 
@@ -173,9 +177,9 @@ QList<QVariant> pqCompositeDataTreeWidget::values() const
 }
 
 //-----------------------------------------------------------------------------
-void pqCompositeDataTreeWidget::setValues(const QList<QVariant>& new_values)
+void pqSignalAdaptorCompositeTreeWidget::setValues(const QList<QVariant>& new_values)
 {
-  bool prev = this->blockSignals(true);
+  bool prev = this->Internal->TreeWidget->blockSignals(true);
   QList<pqTreeWidgetItemObject*> treeitems = this->Internal->Items; 
   bool changed = false;
 
@@ -234,7 +238,7 @@ void pqCompositeDataTreeWidget::setValues(const QList<QVariant>& new_values)
         }
       }
     }
-  this->blockSignals(prev);
+  this->Internal->TreeWidget->blockSignals(prev);
   if (changed)
     {
     emit this->valuesChanged();
@@ -242,12 +246,12 @@ void pqCompositeDataTreeWidget::setValues(const QList<QVariant>& new_values)
 }
 
 //-----------------------------------------------------------------------------
-void pqCompositeDataTreeWidget::domainChanged()
+void pqSignalAdaptorCompositeTreeWidget::domainChanged()
 {
-  bool prev = this->blockSignals(true);
+  bool prev = this->Internal->TreeWidget->blockSignals(true);
   QList<QVariant> widgetvalues = this->values();
   this->Internal->Items.clear();
-  this->clear();
+  this->Internal->TreeWidget->clear();
 
   this->Internal->DomainMode = this->Internal->Domain->GetMode();
   vtkPVDataInformation* dInfo = this->Internal->Domain->GetInformation();
@@ -255,17 +259,18 @@ void pqCompositeDataTreeWidget::domainChanged()
   this->FlatIndex = 0;
   this->LevelNo = 0;
   
-  pqTreeWidgetItemObject* root = new pqTreeWidgetItemObject(this, QStringList("Root"));
+  pqTreeWidgetItemObject* root = new pqTreeWidgetItemObject(
+    this->Internal->TreeWidget, QStringList("Root"));
   this->buildTree(root, dInfo);
   
   // now update check state.
   this->setValues(widgetvalues);
-  this->blockSignals(prev);
-  this->expandAll();
+  this->Internal->TreeWidget->blockSignals(prev);
+  this->Internal->TreeWidget->expandAll();
 }
 
 //-----------------------------------------------------------------------------
-void pqCompositeDataTreeWidget::buildTree(pqTreeWidgetItemObject* item,
+void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItemObject* item,
   vtkPVDataInformation* info)
 {
   this->Internal->Items.push_back(item);
@@ -342,7 +347,7 @@ void pqCompositeDataTreeWidget::buildTree(pqTreeWidgetItemObject* item,
 }
 
 //-----------------------------------------------------------------------------
-void pqCompositeDataTreeWidget::updateCheckState(bool checked)
+void pqSignalAdaptorCompositeTreeWidget::updateCheckState(bool checked)
 {
   if (this->InUpdateCheckState)
     {

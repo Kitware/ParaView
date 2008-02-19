@@ -71,7 +71,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqComboBoxDomain.h
   pqComparativeTracksWidget.h
   pqComparativeVisPanel.h
-  pqCompositeDataTreeWidget.h
   pqContourPanel.h
   pqCreateServerStartupDialog.h
   pqCubeAxesEditorDialog.h
@@ -165,6 +164,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerBrowser.h
   pqServerStartupBrowser.h
   pqServerStartupDialog.h
+  pqSignalAdaptorCompositeTreeWidget.h
   pqSignalAdaptorKeyFrameValue.h
   pqSignalAdaptorKeyFrameTime.h
   pqSignalAdaptorKeyFrameType.h
@@ -372,8 +372,6 @@ ADD_LIBRARY(pqComponents
   pqComparativeTracksWidget.h
   pqComparativeVisPanel.cxx
   pqComparativeVisPanel.h
-  pqCompositeDataTreeWidget.cxx
-  pqCompositeDataTreeWidget.h
   pqComponentsExport.h
   pqComponentsInit.cxx
   pqComponentsInit.h
@@ -569,6 +567,8 @@ ADD_LIBRARY(pqComponents
   pqServerStartupBrowser.h
   pqServerStartupDialog.cxx
   pqServerStartupDialog.h
+  pqSignalAdaptorCompositeTreeWidget.cxx
+  pqSignalAdaptorCompositeTreeWidget.h
   pqSignalAdaptorKeyFrameValue.cxx
   pqSignalAdaptorKeyFrameValue.h
   pqSignalAdaptorKeyFrameTime.cxx

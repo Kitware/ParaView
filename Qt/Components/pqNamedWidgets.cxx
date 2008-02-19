@@ -70,7 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCollapsedGroup.h"
 #include "pqComboBoxDomain.h"
-#include "pqCompositeDataTreeWidget.h"
+#include "pqSignalAdaptorCompositeTreeWidget.h"
 #include "pqDoubleRangeWidget.h"
 #include "pqIntRangeWidget.h"
 #include "pqWidgetRangeDomain.h"
@@ -359,12 +359,15 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
     }
   else if (pt == pqSMAdaptor::COMPOSITE_TREE)
     {
-    pqCompositeDataTreeWidget* compositeTree = 
-      qobject_cast<pqCompositeDataTreeWidget*>(object);
-    if (object)
+    QTreeWidget* tree = qobject_cast<QTreeWidget*>(object);
+    if (tree)
       {
+      pqSignalAdaptorCompositeTreeWidget* treeAdaptor = 
+        new pqSignalAdaptorCompositeTreeWidget(tree,
+          vtkSMIntVectorProperty::SafeDownCast(SMProperty));
+      treeAdaptor->setObjectName("CompositeTreeAdaptor");
       property_manager->registerLink(
-        compositeTree, "values", SIGNAL(valuesChanged()),
+        treeAdaptor, "values", SIGNAL(valuesChanged()),
         proxy, SMProperty);
       }
     }
@@ -548,6 +551,20 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
         pqNamedWidgets::unlinkObject(object, userProperty, userSignal,
           proxy, SMProperty, -1, property_manager);
         }
+      }
+    }
+  else if (pt == pqSMAdaptor::COMPOSITE_TREE)
+    {
+    QTreeWidget* tree = qobject_cast<QTreeWidget*>(object);
+    if (tree)
+      {
+      pqSignalAdaptorCompositeTreeWidget* treeAdaptor = 
+        tree->findChild<pqSignalAdaptorCompositeTreeWidget*>(
+          "CompositeTreeAdaptor");
+      property_manager->unregisterLink(
+        treeAdaptor, "values", SIGNAL(valuesChanged()),
+        proxy, SMProperty);
+      delete treeAdaptor;
       }
     }
   else if(pt == pqSMAdaptor::FIELD_SELECTION)
@@ -1209,9 +1226,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
       }
     else if (pt == pqSMAdaptor::COMPOSITE_TREE)
       {
-      pqCompositeDataTreeWidget* tree = new pqCompositeDataTreeWidget(
-        vtkSMIntVectorProperty::SafeDownCast(SMProperty),
-        panelLayout->parentWidget());
+      QTreeWidget* tree = new pqTreeWidget(panelLayout->parentWidget());
       tree->setObjectName(propertyName);
         
       QTreeWidgetItem* header = new QTreeWidgetItem();
