@@ -124,7 +124,8 @@ void pqSaveSnapshotDialog::updateSize()
     }
 
   QSize curSize = this->viewSize();
-  this->Internal->AspectRatio = curSize.width()/curSize.height();
+  this->Internal->AspectRatio = 
+    curSize.width()/static_cast<double>(curSize.height());
 }
 
 //-----------------------------------------------------------------------------
@@ -133,7 +134,8 @@ void pqSaveSnapshotDialog::onLockAspectRatio(bool lock)
   if (lock)
     {
     QSize curSize = this->viewSize();
-    this->Internal->AspectRatio = curSize.width()/curSize.height();
+    this->Internal->AspectRatio = 
+      curSize.width()/static_cast<double>(curSize.height());
     }
 }
 
