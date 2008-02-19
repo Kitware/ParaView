@@ -56,6 +56,9 @@ public:
   pqOutputWindow(QWidget* Parent);
   ~pqOutputWindow();
 
+  void setShowOutput(bool state)
+    { this->ShowOutput = state; }
+
 public slots:
   void onDisplayText(const QString&);
   void onDisplayErrorText(const QString&);
@@ -74,6 +77,7 @@ private:
   virtual void showEvent(QShowEvent*);
   virtual void hideEvent(QHideEvent*);
   
+  int ShowOutput;
   struct pqImplementation;
   pqImplementation* const Implementation;
 };

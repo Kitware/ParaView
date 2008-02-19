@@ -56,6 +56,7 @@ pqOutputWindow::pqOutputWindow(QWidget* Parent) :
   this->Implementation->Ui.setupUi(this);
   this->setObjectName("outputDialog");
   this->setWindowTitle(tr("Output Messages"));
+  this->ShowOutput = true;
 
   QObject::connect(this->Implementation->Ui.clearButton, 
     SIGNAL(clicked(bool)), this, SLOT(clear()));
@@ -76,7 +77,10 @@ void pqOutputWindow::onDisplayText(const QString& text)
   this->Implementation->Ui.consoleWidget->printString(text + "\n");
   cerr << text.toAscii().data() << endl;
 
-  this->show();
+  if (this->ShowOutput)
+    {
+    this->show();
+    }
 }
 
 void pqOutputWindow::onDisplayWarningText(const QString& text)
@@ -97,7 +101,10 @@ void pqOutputWindow::onDisplayWarningText(const QString& text)
   this->Implementation->Ui.consoleWidget->printString(text + "\n");
   cerr << text.toAscii().data() << endl;
 
-  this->show();
+  if (this->ShowOutput)
+    {
+    this->show();
+    }
 }
 
 void pqOutputWindow::onDisplayGenericWarningText(const QString& text)
@@ -110,7 +117,10 @@ void pqOutputWindow::onDisplayGenericWarningText(const QString& text)
   this->Implementation->Ui.consoleWidget->printString(text + "\n");
   cerr << text.toAscii().data() << endl;
 
-  this->show();
+  if (this->ShowOutput)
+    {
+    this->show();
+    }
 }
 
 void pqOutputWindow::onDisplayErrorText(const QString& text)
@@ -123,7 +133,10 @@ void pqOutputWindow::onDisplayErrorText(const QString& text)
   this->Implementation->Ui.consoleWidget->printString(text + "\n");
   cerr << text.toAscii().data() << endl;
 
-  this->show();
+  if (this->ShowOutput)
+    {
+    this->show();
+    }
 }
 
 void pqOutputWindow::accept()
