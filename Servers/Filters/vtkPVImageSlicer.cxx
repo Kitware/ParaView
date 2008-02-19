@@ -22,7 +22,7 @@
 #include "vtkImageData.h"
 
 vtkStandardNewMacro(vtkPVImageSlicer);
-vtkCxxRevisionMacro(vtkPVImageSlicer, "1.1");
+vtkCxxRevisionMacro(vtkPVImageSlicer, "1.2");
 //----------------------------------------------------------------------------
 vtkPVImageSlicer::vtkPVImageSlicer()
 {
@@ -97,18 +97,18 @@ int vtkPVImageSlicer::RequestInformation(
   switch (this->SliceMode)
     {
   case YZ_PLANE:
-    slice = (slice>=dims[0])?dims[0]-1:slice;
+    slice = (static_cast<int>(slice)>=dims[0])?dims[0]-1:slice;
     outWholeExt[0] = outWholeExt[1] = outWholeExt[0]+slice;
     break;
 
   case XZ_PLANE:
-    slice = (slice>=dims[1])?dims[1]-1:slice;
+    slice = (static_cast<int>(slice)>=dims[1])?dims[1]-1:slice;
     outWholeExt[2] = outWholeExt[3] = outWholeExt[2]+slice;
     break;
 
   case XY_PLANE:
   default:
-    slice = (slice>=dims[2])?dims[2]-1:slice;
+    slice = (static_cast<int>(slice)>=dims[2])?dims[2]-1:slice;
     outWholeExt[4] = outWholeExt[5] = outWholeExt[4]+slice;
     break;
     }
