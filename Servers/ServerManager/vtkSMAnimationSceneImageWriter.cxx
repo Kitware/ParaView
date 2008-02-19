@@ -34,6 +34,7 @@
 # include "vtkMPEG2Writer.h"
 #endif
 
+#include <vtkstd/algorithm>
 #include <vtkstd/string>
 #include <vtksys/SystemTools.hxx>
 
@@ -46,7 +47,7 @@
 #endif
 
 vtkStandardNewMacro(vtkSMAnimationSceneImageWriter);
-vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.10");
+vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.11");
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
   ImageWriter, vtkImageWriter);
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
@@ -168,6 +169,11 @@ void vtkSMAnimationSceneImageWriter::Merge(vtkImageData* dest, vtkImageData* src
   int temp = outextent[2];
   outextent[2] = outextent[3];
   outextent[3] = temp;
+  // snap extents to what is available.
+  outextent[0] = vtkstd::max(outextent[0], dest->GetExtent()[0]);
+  outextent[1] = vtkstd::min(outextent[1], dest->GetExtent()[1]);
+  outextent[2] = vtkstd::max(outextent[2], dest->GetExtent()[2]);
+  outextent[3] = vtkstd::min(outextent[3], dest->GetExtent()[3]);
   vtkImageIterator<unsigned char> outIt(dest, outextent);
 
   while (!outIt.IsAtEnd() && !inIt.IsAtEnd())
