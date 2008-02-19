@@ -29,15 +29,6 @@ public:
   vtkTypeRevisionMacro(vtkSMSimpleParallelStrategy, vtkSMSimpleStrategy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Returns the data generator that goes into the distributor.
-  virtual vtkSMSourceProxy* GetDistributedSource()
-    { return this->PreDistributorSuppressor; }
-
-  // Description:
-  // Update the data the gets distributed.
-  virtual void UpdateDistributedData();
-
 //BTX
 protected:
   vtkSMSimpleParallelStrategy();
@@ -46,7 +37,6 @@ protected:
   // Description:
   // Overridden to set the servers correctly on all subproxies.
   virtual void BeginCreateVTKObjects();
-  virtual void EndCreateVTKObjects();
 
   // Description:
   // Create and initialize the data pipeline.
@@ -89,37 +79,20 @@ protected:
   virtual void ProcessViewInformation();
 
   // Description:
-  // Update the distributor to use ordered compositing.
-  // Called in ViewHelperModified.
-  vtkGetMacro(UseOrderedCompositing, bool);
-  virtual void SetUseOrderedCompositing(bool);
-
-  // Description:
   // Called by the view to make the strategy use compositing.
   // Called in ProcessViewInformation.
   void SetUseCompositing(bool);
   vtkGetMacro(UseCompositing, bool);
-
-  // Description:
-  // Called to set the KdTree proxy on the distributor.
-  void SetKdTree(vtkSMProxy*);
 
   void SetLODClientCollect(bool);
   void SetLODClientRender(bool);
 
   vtkSMSourceProxy* PreCollectUpdateSuppressor;
   vtkSMSourceProxy* Collect;
-  vtkSMSourceProxy* PreDistributorSuppressor;
-  vtkSMSourceProxy* Distributor;
 
   vtkSMSourceProxy* PreCollectUpdateSuppressorLOD;
   vtkSMSourceProxy* CollectLOD;
-  vtkSMSourceProxy* PreDistributorSuppressorLOD;
-  vtkSMSourceProxy* DistributorLOD;
 
-  vtkSMProxy* KdTree;
-  
-  bool UseOrderedCompositing;
   bool UseCompositing;
   bool LODClientRender; // when set, indicates that data must be made available on client,
                      // irrespective of UseCompositing flag.
@@ -134,7 +107,6 @@ private:
   // common method.
   void CreatePipelineInternal(vtkSMSourceProxy* input, int outputport,
     vtkSMSourceProxy* collect,
-    vtkSMSourceProxy* predistributorsuppressor, vtkSMSourceProxy* distributor,
     vtkSMSourceProxy* updatesuppressor);
 //ETX
 };

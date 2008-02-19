@@ -42,7 +42,7 @@
 #include "vtkAllToNRedistributePolyData.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.17");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.18");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -209,16 +209,20 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
         vtkDataObject::DATA_OBJECT()));
     }
 
-  // We do not yet collect image data but we pretend to handle it.
+  // We do not yet collect 3D image data but we pretend to handle it.
   // This is here to prevent errors on the client side during structured
   // volume rendering.
   if (this->OutputDataType == VTK_IMAGE_DATA)
     {
-    if (input)
+    vtkImageData* idInput = vtkImageData::SafeDownCast(input);
+    if (!idInput || idInput->GetDataDimension() == 3)
       {
-      output->ShallowCopy(input);
+      if (input)
+        {
+        output->ShallowCopy(input);
+        }
+      return 1;
       }
-    return 1;
     }
 
   this->UpdatePiece = outInfo->Get(

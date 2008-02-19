@@ -66,6 +66,7 @@ protected:
   vtkSMProxy* LODMapper;
   vtkSMProxy* Prop3D;
   vtkSMProxy* Property;
+  vtkSMSourceProxy* Slicer;
 private:
   vtkSMImageSliceRepresentationProxy(const vtkSMImageSliceRepresentationProxy&); // Not implemented
   void operator=(const vtkSMImageSliceRepresentationProxy&); // Not implemented

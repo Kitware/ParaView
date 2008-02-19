@@ -25,10 +25,11 @@
 #include "vtkSMViewProxy.h"
 
 vtkStandardNewMacro(vtkSMImageSliceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMImageSliceRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMImageSliceRepresentationProxy, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMImageSliceRepresentationProxy::vtkSMImageSliceRepresentationProxy()
 {
+  this->Slicer = 0;
   this->Mapper = 0;
   this->LODMapper = 0;
   this->Prop3D = 0;
@@ -49,11 +50,15 @@ bool vtkSMImageSliceRepresentationProxy::BeginCreateVTKObjects()
     }
 
   // Setup pointers to subproxies  for easy access and set server flags. 
+  this->Slicer = vtkSMSourceProxy::SafeDownCast(
+    this->GetSubProxy("Slicer"));
   this->Mapper = this->GetSubProxy("Mapper");
   this->LODMapper = this->GetSubProxy("LODMapper");
   this->Prop3D = this->GetSubProxy("Prop3D");
   this->Property = this->GetSubProxy("Property");
 
+  this->Slicer->SetServers(
+    vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
   this->Mapper->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->LODMapper->SetServers(
@@ -100,8 +105,10 @@ bool vtkSMImageSliceRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view
   // TODO: For now, I am not going to worry about the LOD pipeline.
   strategy->SetEnableLOD(false);
 
-  this->Connect(this->GetInputProxy(), strategy,
+  this->Connect(this->GetInputProxy(), this->Slicer,
     "Input", this->OutputPort);
+
+  this->Connect(this->Slicer, strategy);
   this->Connect(strategy->GetOutput(), this->Mapper);
   // this->Connect(strategy->GetLODOutput(), this->LODMapper);
 

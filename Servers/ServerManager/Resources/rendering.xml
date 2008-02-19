@@ -887,8 +887,8 @@
         </Documentation>
         <EnumerationDomain name="enum" >
           <Entry text="XY Plane" value="5" />
-          <Entry text="YZ Plane" value="7" />
-          <Entry text="XZ Plane" value="6" />
+          <Entry text="YZ Plane" value="6" />
+          <Entry text="XZ Plane" value="7" />
         </EnumerationDomain>
       </IntVectorProperty>
 
@@ -2609,7 +2609,7 @@
       <!-- End of PolyDataStrategy -->
     </SimpleStrategy>
 
-    <SimpleParallelStrategy name="PolyDataParallelStrategy"
+    <UnstructuredDataParallelStrategy name="PolyDataParallelStrategy"
       base_proxygroup="strategies" 
       base_proxyname="PolyDataStrategy">
 
@@ -2690,7 +2690,7 @@
       </SubProxy>
       
       <!-- End of PolyDataParallelStrategy -->
-    </SimpleParallelStrategy>
+    </UnstructuredDataParallelStrategy>
 
     <ClientDeliveryStrategyProxy name="ClientDeliveryStrategy"
       base_proxygroup="strategies"
@@ -2719,6 +2719,8 @@
     <SimpleStrategy name="UnstructuredGridStrategy" >
       <Documentation>
         Representation strategy can be used for unstructured grid volume rendering.
+        This differs from PolyDataStrategy in the LODDecimator. Here, we are
+        using a GeometryFilter as the LODDecimator.
       </Documentation>
 
       <InputProperty
@@ -2844,7 +2846,7 @@
 
     <UniformGridParallelStrategy name="UniformGridParallelStrategy" >
       <Documentation>
-        Representation stragegy can be used for uniform grid volume rendering.
+        Representation strategy can be used for uniform grid volume rendering.
       </Documentation>
 
       <InputProperty
@@ -2892,8 +2894,92 @@
           <Exception name="RemoveAllCaches" />
         </ShareProperties>
       </SubProxy>
-      <!-- End of UnstructuredGridStrategy -->
+
+      <!-- End of UniformGridParallelStrategy -->
     </UniformGridParallelStrategy>
+
+    <ImageDataParallelStrategy name="ImageDataParallelStrategy">
+      <Documentation>
+        Representation strategy that can be used for image data. This strategy
+        delivers the image data to the rendering process, hence not suitable for
+        using when doing volume rendering.
+      </Documentation>
+
+      <InputProperty
+        name="Input"
+        command="not-used">
+        <Documentation>
+          The input to the strategy.
+        </Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+      </InputProperty>
+
+      <SubProxy>
+        <Proxy name="UpdateSuppressor"
+          proxygroup="filters" proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="UpdateTime" />
+          <Property name="RemoveAllCaches" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PreCollectUpdateSuppressor" proxygroup="filters"
+          proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="LODDecimator"  
+          proxygroup="filters" proxyname="OutlineFilter">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="UpdateSuppressorLOD"
+          proxygroup="filters" proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PreCollectUpdateSuppressorLOD" proxygroup="filters"
+          proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressorLOD" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="CacheUpdate" />
+          <Exception name="RemoveAllCaches" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="CollectLOD" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+
+      <!-- End of ImageDataParallelStrategy -->
+    </ImageDataParallelStrategy>
 
     <BlockDeliveryStrategy name="BlockDeliveryStrategy"
       base_proxygroup="strategies"
@@ -4733,13 +4819,61 @@
       </StringVectorProperty>
 
       <SubProxy>
+        <SourceProxy name="Slicer" class="vtkPVImageSlicer">
+          <InputProperty
+            name="Input"
+            command="SetInputConnection">
+            <DataTypeDomain name="input_type">
+              <DataType value="vtkImageData"/>
+            </DataTypeDomain>
+          </InputProperty>
+
+          <IntVectorProperty name="Slice"
+            command="SetSlice"
+            number_of_elements="1"
+            default_values="0">
+            <Documentation>
+              Set the current slice number. Slice number is used to load a 2D slice
+              from a 3D input image. If the input image is 2D, then the slice number
+              if ignored. The direction of the slice is determined by SliceMode.
+            </Documentation>
+            <DimensionsDomain name="dims">
+              <RequiredProperties>
+                <Property name="Input" function="Input"/>
+                <Property name="SliceMode" function="Direction"/>
+              </RequiredProperties>
+            </DimensionsDomain>
+          </IntVectorProperty>
+
+          <IntVectorProperty name="SliceMode"
+            command="SetSliceMode"
+            number_of_elements="1"
+            default_values="5">
+            <Documentation>
+              Determines the direction of slicing to obtain a 2D slice from a 3D
+              image.
+            </Documentation>
+            <EnumerationDomain name="enum" >
+              <Entry text="XY Plane" value="5" />
+              <Entry text="YZ Plane" value="6" />
+              <Entry text="XZ Plane" value="7" />
+            </EnumerationDomain>
+          </IntVectorProperty>
+        </SourceProxy>
+        <ExposedProperties>
+          <Property name="Slice" />
+          <Property name="SliceMode" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
         <!-- Mapper for high-res image -->
         <Proxy name="Mapper" 
           proxygroup="mappers" proxyname="ImageSliceMapper" />
         <ExposedProperties>
           <Property name="LookupTable" />
-          <Property name="Slice" />
-          <Property name="SliceMode" />
+        <!--  <Property name="Slice" />
+          <Property name="SliceMode" />-->
           <Property name="MapScalars" />
         </ExposedProperties>
       </SubProxy>

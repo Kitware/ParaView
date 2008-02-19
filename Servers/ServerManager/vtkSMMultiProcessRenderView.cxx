@@ -22,7 +22,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationStrategy.h"
 
-vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.6");
+vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.7");
 //----------------------------------------------------------------------------
 vtkSMMultiProcessRenderView::vtkSMMultiProcessRenderView()
 {
@@ -48,7 +48,7 @@ vtkSMRepresentationStrategy* vtkSMMultiProcessRenderView::NewStrategyInternal(
     strategy = vtkSMRepresentationStrategy::SafeDownCast(
       pxm->NewProxy("strategies", "PolyDataParallelStrategy"));
     }
-  else if (dataType == VTK_UNIFORM_GRID || dataType == VTK_IMAGE_DATA)
+  else if (dataType == VTK_UNIFORM_GRID)
     {
     strategy = vtkSMRepresentationStrategy::SafeDownCast(
       pxm->NewProxy("strategies", "UniformGridParallelStrategy"));
@@ -57,6 +57,11 @@ vtkSMRepresentationStrategy* vtkSMMultiProcessRenderView::NewStrategyInternal(
     {
     strategy = vtkSMRepresentationStrategy::SafeDownCast(
       pxm->NewProxy("strategies", "UnstructuredGridParallelStrategy"));
+    }
+  else if (dataType == VTK_IMAGE_DATA)
+    {
+    strategy = vtkSMRepresentationStrategy::SafeDownCast(
+      pxm->NewProxy("strategies", "ImageDataParallelStrategy"));
     }
   else
     {

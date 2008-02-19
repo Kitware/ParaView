@@ -72,6 +72,7 @@ SET(Kit_SRCS
   vtkSMIceTDesktopRenderViewProxy.cxx
   vtkSMIceTMultiDisplayRenderViewProxy.cxx
   vtkSMIdTypeVectorProperty.cxx
+  vtkSMImageDataParallelStrategy.cxx
   vtkSMImageSliceRepresentationProxy.cxx
   vtkSMImageTextureProxy.cxx
   vtkSMImplicitPlaneProxy.cxx
@@ -169,6 +170,7 @@ SET(Kit_SRCS
   vtkSMUndoStack.cxx
   vtkSMUniformGridParallelStrategy.cxx
   vtkSMUniformGridVolumeRepresentationProxy.cxx
+  vtkSMUnstructuredDataParallelStrategy.cxx
   vtkSMUnstructuredGridParallelStrategy.cxx
   vtkSMUnstructuredGridVolumeRepresentationProxy.cxx
   vtkSMUtilities.cxx

@@ -29,14 +29,14 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationStrategyVector.h"
-#include "vtkSMSimpleParallelStrategy.h"
+#include "vtkSMUnstructuredDataParallelStrategy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.21");
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.22");
 
 vtkInformationKeyMacro(vtkSMIceTCompositeViewProxy, KD_TREE, ObjectBase);
 //----------------------------------------------------------------------------
@@ -572,8 +572,9 @@ void vtkSMIceTCompositeViewProxy::UpdateOrderedCompositingPipeline()
       }
     else
       {
-      vtkSMSimpleParallelStrategy* pstrategy = 
-        vtkSMSimpleParallelStrategy::SafeDownCast(strategyIter->GetPointer());
+      vtkSMUnstructuredDataParallelStrategy* pstrategy = 
+        vtkSMUnstructuredDataParallelStrategy::SafeDownCast(
+          strategyIter->GetPointer());
       if (pstrategy && pstrategy->GetDistributedSource())
         {
         ppProducers->AddProxy(pstrategy->GetDistributedSource());

@@ -24,40 +24,19 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
 
-inline int vtkSMSimpleParallelStrategyGetInt(vtkSMProxy* proxy, 
-  const char* pname, int default_value)
-{
-  if (proxy && pname)
-    {
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      proxy->GetProperty(pname));
-    if (ivp)
-      {
-      return ivp->GetElement(0);
-      }
-    }
-  return default_value;
-}
-
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.18");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.19");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
   this->PreCollectUpdateSuppressor = 0;
   this->Collect = 0;
-  this->PreDistributorSuppressor = 0;
-  this->Distributor = 0;
 
   this->PreCollectUpdateSuppressorLOD = 0;
   this->CollectLOD = 0;
-  this->PreDistributorSuppressorLOD = 0;
-  this->DistributorLOD = 0;
 
   this->UseCompositing = false;
-  this->UseOrderedCompositing = false;
 
-  this->KdTree = 0;
   this->LODClientRender = false;
   this->LODClientCollect = true;
 }
@@ -65,7 +44,6 @@ vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::~vtkSMSimpleParallelStrategy()
 {
-  this->SetKdTree(0);
 }
 
 //----------------------------------------------------------------------------
@@ -77,32 +55,19 @@ void vtkSMSimpleParallelStrategy::BeginCreateVTKObjects()
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("PreCollectUpdateSuppressor"));
   this->Collect = 
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("Collect"));
-  this->PreDistributorSuppressor =
-    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("PreDistributorSuppressor"));
-  this->Distributor =
-    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("Distributor"));
 
   this->PreCollectUpdateSuppressorLOD =
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("PreCollectUpdateSuppressorLOD"));
   this->CollectLOD = 
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("CollectLOD"));
-  this->PreDistributorSuppressorLOD =
-    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("PreDistributorSuppressorLOD"));
-  this->DistributorLOD =
-    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("DistributorLOD"));
 
   this->PreCollectUpdateSuppressor->SetServers(vtkProcessModule::DATA_SERVER);
   this->Collect->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
-  this->PreDistributorSuppressor->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
-  this->Distributor->SetServers(vtkProcessModule::RENDER_SERVER);
 
-  if (this->CollectLOD && this->PreDistributorSuppressorLOD &&
-    this->DistributorLOD)
+  if (this->CollectLOD)
     {
     this->PreCollectUpdateSuppressorLOD->SetServers(vtkProcessModule::DATA_SERVER);
     this->CollectLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
-    this->PreDistributorSuppressorLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
-    this->DistributorLOD->SetServers(vtkProcessModule::RENDER_SERVER);
     }
   else
     {
@@ -111,31 +76,13 @@ void vtkSMSimpleParallelStrategy::BeginCreateVTKObjects()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleParallelStrategy::EndCreateVTKObjects()
-{
-  this->Superclass::EndCreateVTKObjects();
-  this->SetKdTree(this->KdTree);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSimpleParallelStrategy::UpdateDistributedData()
-{
-  if (!this->DataValid)
-    {
-    // TODO: How to handle this when using cache?
-    // We need to call this only if cache won't be used.
-    this->PreDistributorSuppressor->InvokeCommand("ForceUpdate");
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkSMSimpleParallelStrategy::CreatePipeline(vtkSMSourceProxy* input,
   int outputport)
 {
+  // We set up the pipeline as such
+  //    INPUT --> Collect --> UpdateSuppressor
   this->CreatePipelineInternal(input, outputport,
                                this->Collect, 
-                               this->PreDistributorSuppressor,
-                               this->Distributor,
                                this->UpdateSuppressor);
 
   // Connect the PreCollectUpdateSuppressor to the input.
@@ -146,11 +93,11 @@ void vtkSMSimpleParallelStrategy::CreatePipeline(vtkSMSourceProxy* input,
 void vtkSMSimpleParallelStrategy::CreateLODPipeline(vtkSMSourceProxy* input, 
   int outputport)
 {
+  // We set up the pipeline as such
+  //    INPUT --> LODDecimator --> Collect --> UpdateSuppressor
   this->Connect(input, this->LODDecimator, "Input", outputport);
   this->CreatePipelineInternal(this->LODDecimator, 0,
                                this->CollectLOD, 
-                               this->PreDistributorSuppressorLOD,
-                               this->DistributorLOD,
                                this->UpdateSuppressorLOD);
 
   // Connect the PreCollectUpdateSuppressorLOD to the decimator.
@@ -161,51 +108,13 @@ void vtkSMSimpleParallelStrategy::CreateLODPipeline(vtkSMSourceProxy* input,
 void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
   vtkSMSourceProxy* input, int outputport,
   vtkSMSourceProxy* collect,
-  vtkSMSourceProxy* predistributorsuppressor,
-  vtkSMSourceProxy* distributor,
   vtkSMSourceProxy* updatesuppressor)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
 
   this->Connect(input, collect, "Input", outputport);
-  this->Connect(collect, predistributorsuppressor);
-
-  // This sets the connection on the render server (since Distributor::Servers =
-  // vtkProcessModule::RENDER_SERVER).
-  this->Connect(predistributorsuppressor, distributor);
-
-  // On Render Server, the Distributor is connected to the input of the
-  // UpdateSuppressor. Since there are no distributors on the client
-  // (or data server), we directly connect the PreDistributorSuppressor to the
-  // UpdateSuppressor on the client and data server.
-
-  stream  << vtkClientServerStream::Invoke
-          << predistributorsuppressor->GetID()
-          << "GetOutputPort" << 0
-          << vtkClientServerStream::End;
-  stream  << vtkClientServerStream::Invoke
-          << updatesuppressor->GetID()
-          << "SetInputConnection" << 0
-          << vtkClientServerStream::LastResult
-          << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID,
-    vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
-
-  // Now send to the render server.
-  // This order of sending first to CLIENT|DATA_SERVER and then to render server
-  // ensures that the connections are set up correctly even when data server and
-  // render server are the same.
-  stream  << vtkClientServerStream::Invoke
-          << distributor->GetID() 
-          << "GetOutputPort" << 0
-          << vtkClientServerStream::End;
-  stream  << vtkClientServerStream::Invoke
-          << updatesuppressor->GetID()
-          << "SetInputConnection" << 0 
-          << vtkClientServerStream::LastResult
-          << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
+  this->Connect(collect, updatesuppressor);
 
   // Now we need to set up some default parameters on these filters.
 
@@ -251,36 +160,6 @@ void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
           << "SetServerToClient"
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
-  
-
-  // Set the MultiProcessController on the distributor.
-  stream  << vtkClientServerStream::Invoke
-          << pm->GetProcessModuleID() 
-          << "GetController"
-          << vtkClientServerStream::End;
-  stream  << vtkClientServerStream::Invoke
-          << distributor->GetID()
-          << "SetController"
-          << vtkClientServerStream::LastResult
-          << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
-
-  // TODO: Set the distributor data type -- I don't think that's even necessary,
-  // since the data type must be set only for type conversion and don't really
-  // need any type conversion.
-  
-  // The PreDistributorSuppressor should not supress any updates, 
-  // it's purpose is to force updates, not suppress any.
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    predistributorsuppressor->GetProperty("Enabled"));
-  ivp->SetElement(0, 0);
-  predistributorsuppressor->UpdateVTKObjects();
-
-  // The distributor does not do any distribution by default.
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    distributor->GetProperty("PassThrough"));
-  ivp->SetElement(0, 1);
-  distributor->UpdateVTKObjects();
 }
 
 
@@ -311,14 +190,6 @@ void vtkSMSimpleParallelStrategy::UpdatePipeline()
     }
   this->Collect->UpdateProperty("MoveMode");
 
-  // cout << "use ordered compositing: " << (usecompositing && this->UseOrderedCompositing)
-  //  << endl;
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->Distributor->GetProperty("PassThrough"));
-  ivp->SetElement(0,
-    (usecompositing && this->UseOrderedCompositing)? 0 : 1);
-  this->Distributor->UpdateProperty("PassThrough");
-
   // It is essential to mark the Collect filter explicitly modified.
   vtkClientServerStream stream;
   stream  << vtkClientServerStream::Invoke
@@ -347,12 +218,6 @@ void vtkSMSimpleParallelStrategy::UpdateLODPipeline()
     vtkMPIMoveData::COLLECT);
   this->CollectLOD->UpdateProperty("MoveMode");
 
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->DistributorLOD->GetProperty("PassThrough"));
-  ivp->SetElement(0,
-    (usecompositing && this->UseOrderedCompositing)? 0 : 1);
-  this->DistributorLOD->UpdateProperty("PassThrough");
-
   // It is essential to mark the Collect filter explicitly modified.
   vtkClientServerStream stream;
   stream  << vtkClientServerStream::Invoke
@@ -373,18 +238,6 @@ void vtkSMSimpleParallelStrategy::UpdateLODPipeline()
   this->Superclass::UpdateLODPipeline();
 }
 
-//----------------------------------------------------------------------------
-void vtkSMSimpleParallelStrategy::SetUseOrderedCompositing(bool use)
-{
-  if (this->UseOrderedCompositing != use)
-    {
-    this->UseOrderedCompositing = use;
-
-    // invalidate data, since distribution changed.
-    this->InvalidatePipeline();
-    this->InvalidateLODPipeline();
-    }
-}
 
 //----------------------------------------------------------------------------
 void vtkSMSimpleParallelStrategy::SetUseCompositing(bool compositing)
@@ -395,22 +248,6 @@ void vtkSMSimpleParallelStrategy::SetUseCompositing(bool compositing)
     
     this->InvalidatePipeline();
     this->InvalidateLODPipeline();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSimpleParallelStrategy::SetKdTree(vtkSMProxy* proxy)
-{
-  vtkSetObjectBodyMacro(KdTree, vtkSMProxy, proxy);
-
-  if (this->Distributor)
-    {
-    this->Connect(proxy, this->Distributor, "PKdTree");
-    }
-
-  if (this->DistributorLOD)
-    {
-    this->Connect(proxy, this->DistributorLOD, "PKdTree");
     }
 }
 
@@ -445,28 +282,6 @@ void vtkSMSimpleParallelStrategy::ProcessViewInformation()
   else
     {
     vtkErrorMacro("Missing Key: USE_COMPOSITING()");
-    }
-
- if (this->ViewInformation->Has(vtkSMRenderViewProxy::USE_ORDERED_COMPOSITING()))
-    {
-    this->SetUseOrderedCompositing(
-      this->ViewInformation->Get(
-        vtkSMRenderViewProxy::USE_ORDERED_COMPOSITING())>0);
-    }
-  else
-    {
-    vtkErrorMacro("Missing Key: USE_ORDERED_COMPOSITING()");
-    }
-
-  if (this->ViewInformation->Has(vtkSMIceTCompositeViewProxy::KD_TREE()))
-    {
-    this->SetKdTree(vtkSMProxy::SafeDownCast(
-        this->ViewInformation->Get(vtkSMIceTCompositeViewProxy::KD_TREE())));
-    }
-  else
-    {
-    // Don't warn if missing KD_TREE, since it's defined only by IceT views.
-    //vtkErrorMacro("Missing Key: KD_TREE()");
     }
 
   if (this->ViewInformation->Has(
@@ -591,8 +406,6 @@ void vtkSMSimpleParallelStrategy::GatherLODInformation(vtkPVInformation* info)
 void vtkSMSimpleParallelStrategy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "UseOrderedCompositing: " << this->UseOrderedCompositing
-    << endl;
   os << indent << "UseCompositing: " << this->UseCompositing << endl;
 }
 

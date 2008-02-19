@@ -15,19 +15,19 @@
 // .NAME vtkSMUnstructuredGridParallelStrategy
 // .SECTION Description
 // This is parallel strategy used for UnstructuredGrid volume rendering.
-// We subclass vtkSMSimpleParallelStrategy simply to change the data type for
+// We subclass vtkSMUnstructuredDataParallelStrategy simply to change the data type for
 // the Collect filter.
 
 #ifndef __vtkSMUnstructuredGridParallelStrategy_h
 #define __vtkSMUnstructuredGridParallelStrategy_h
 
-#include "vtkSMSimpleParallelStrategy.h"
+#include "vtkSMUnstructuredDataParallelStrategy.h"
 
-class VTK_EXPORT vtkSMUnstructuredGridParallelStrategy : public vtkSMSimpleParallelStrategy
+class VTK_EXPORT vtkSMUnstructuredGridParallelStrategy : public vtkSMUnstructuredDataParallelStrategy
 {
 public:
   static vtkSMUnstructuredGridParallelStrategy* New();
-  vtkTypeRevisionMacro(vtkSMUnstructuredGridParallelStrategy, vtkSMSimpleParallelStrategy);
+  vtkTypeRevisionMacro(vtkSMUnstructuredGridParallelStrategy, vtkSMUnstructuredDataParallelStrategy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX
