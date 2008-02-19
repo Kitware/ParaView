@@ -277,9 +277,9 @@ void pqProxyInformationWidget::fillDataInformation(
       this->Ui->xExtent->setText(QString(
           "%1 to %2 (dimension: %3)").arg(ext[0]).arg(ext[1]).arg(dims[0]));
       this->Ui->yExtent->setText(QString(
-          "%1 to %2 (dimension: %3)").arg(ext[3]).arg(ext[2]).arg(dims[1]));
+          "%1 to %2 (dimension: %3)").arg(ext[2]).arg(ext[3]).arg(dims[1]));
       this->Ui->zExtent->setText(QString(
-          "%1 to %2 (dimension: %3)").arg(ext[5]).arg(ext[4]).arg(dims[2]));
+          "%1 to %2 (dimension: %3)").arg(ext[4]).arg(ext[5]).arg(dims[2]));
       }
     else
       {
