@@ -33,7 +33,7 @@
 #include "vtkTexture.h"
 
 vtkStandardNewMacro(vtkTexturePainter);
-vtkCxxRevisionMacro(vtkTexturePainter, "1.2");
+vtkCxxRevisionMacro(vtkTexturePainter, "1.3");
 vtkCxxSetObjectMacro(vtkTexturePainter, LookupTable, vtkScalarsToColors);
 vtkInformationKeyMacro(vtkTexturePainter, SLICE, Integer);
 vtkInformationKeyMacro(vtkTexturePainter, SLICE_MODE, Integer);
@@ -187,7 +187,7 @@ void vtkTexturePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor,
   if (this->UpdateTime < input->GetMTime() || this->UpdateTime < this->MTime)
     {
     this->UpdateTime.Modified();
-    int sliceDescription;
+    int sliceDescription = 0;
     int inextent[6];
     int outextent[6];
     // we deliberately use whole extent here. So on processes where the slice is
