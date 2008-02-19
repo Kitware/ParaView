@@ -19,7 +19,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMDataSourceProxy);
-vtkCxxRevisionMacro(vtkSMDataSourceProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMDataSourceProxy, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMDataSourceProxy::vtkSMDataSourceProxy()
@@ -52,7 +52,7 @@ void vtkSMDataSourceProxy::CopyData(vtkSMSourceProxy *sourceProxy)
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, vtkProcessModule::DATA_SERVER_ROOT, stream);
 
-  this->Modified();
+  this->MarkModified(this);
 }
 
 //----------------------------------------------------------------------------
