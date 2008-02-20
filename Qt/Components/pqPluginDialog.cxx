@@ -152,21 +152,21 @@ QString pqPluginDialog::loadPlugin(pqServer* server)
 
 QString pqPluginDialog::loadPlugin(pqServer* server, const QString& plugin)
 {
-  QString error;
+  QString error1, error2;
   QString ret = plugin;
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
   /* a local plugin may contain both server side code and client code */
-  pqPluginManager::LoadStatus result1 = pm->loadPlugin(server, plugin, &error);
+  pqPluginManager::LoadStatus result1 = pm->loadPlugin(server, plugin, &error1);
   pqPluginManager::LoadStatus result2 = pqPluginManager::LOADED;
   if(!server)
     {
-    result2 = pm->loadPlugin(this->Server, plugin, &error);
+    result2 = pm->loadPlugin(this->Server, plugin, &error2);
     }
   
   if(result1 == pqPluginManager::NOTLOADED && 
      result2 == pqPluginManager::NOTLOADED)
     {
-    QMessageBox::information(NULL, "Plugin Load Failed", error);
+    QMessageBox::information(NULL, "Plugin Load Failed", !error1.isEmpty() ? error1 : error2);
     ret = QString();
     }
 

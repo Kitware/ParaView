@@ -228,7 +228,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadPlugin(
     success = loadClientPlugin(lib, error);
     }
   
-  if(!success)
+  if(success == NOTLOADED)
     {
     if(!errorReturn)
       {
