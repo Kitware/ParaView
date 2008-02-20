@@ -1,0 +1,7 @@
+<ParaViewWriters>
+  <Writer name="MyTIFFWriter"
+          extensions="tif"
+          file_description="My Tiff Files">
+  </Writer>
+</ParaViewWriters>
+

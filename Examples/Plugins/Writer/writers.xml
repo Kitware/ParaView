@@ -1,0 +1,23 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="writers">
+   <WriterProxy name="MyTIFFWriter" 
+                class="vtkTIFFWriter"
+                label="MyTIFFWriter">
+     <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkImageData"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+        <Property name="FileType" show="0"/>
+      </Hints>
+
+   </WriterProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

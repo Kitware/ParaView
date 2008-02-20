@@ -2,7 +2,7 @@
 SUBDIRS(SMFilter ParametricSource)
 
 IF(PARAVIEW_BUILD_QT_GUI)
-  SUBDIRS(GUIToolBar Reader GUIObjectPanel GUIView)
+  SUBDIRS(GUIToolBar Reader GUIObjectPanel GUIView Writer)
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 
 
