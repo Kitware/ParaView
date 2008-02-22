@@ -72,9 +72,6 @@ signals:
   /// Fired when the widget value changes.
   void valuesChanged();
 
-private slots:
-  void updateCheckState(bool checked);
-  
 private:
   pqSignalAdaptorCompositeTreeWidget(const pqSignalAdaptorCompositeTreeWidget&); // Not implemented.
   void operator=(const pqSignalAdaptorCompositeTreeWidget&); // Not implemented.
@@ -85,8 +82,6 @@ private:
 
   class pqInternal;
   pqInternal* Internal;
-
-  int InUpdateCheckState;
 
   enum IndexModes
     {

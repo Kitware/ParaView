@@ -48,6 +48,81 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 #include "pqTreeWidgetItemObject.h"
 
+// This TreeItem specialization needs some explaination.
+// Default Qt behaviour for tristate items:
+//   - If all immediate children are checked or partially checked
+//     then the item becomes fully checked.
+// This is not approriate for this widget. A parent item should never be fully
+// checked unless the user explicitly checked it, since otherwise, the behaviour
+// of the filter is to pass the entire subtree through. 
+// This class fixes that issue.
+class pqCompositeTreeWidgetItem : public pqTreeWidgetItemObject
+{
+  typedef pqTreeWidgetItemObject Superclass;
+  int triStateCheckState;
+public:
+  pqCompositeTreeWidgetItem(QTreeWidget* tree, QStringList values):
+    Superclass(tree, values), triStateCheckState(Qt::Unchecked)
+  {
+  }
+
+  pqCompositeTreeWidgetItem(QTreeWidgetItem* item, QStringList values):
+    Superclass(item, values), triStateCheckState(Qt::Unchecked)
+  {
+  }
+
+  virtual QVariant data(int column, int role) const
+    {
+    if (role == Qt::CheckStateRole && 
+      this->childCount() > 0 && (this->flags() & Qt::ItemIsTristate))
+      {
+      // superclass implementation of this method only checks the immediate
+      // children.
+      QVariant vSuggestedValue = this->Superclass::data(column, role);
+      int suggestedValue = vSuggestedValue.toInt();
+      if (this->triStateCheckState == Qt::PartiallyChecked)
+        {
+        if (suggestedValue == Qt::Checked || suggestedValue == Qt::PartiallyChecked)
+          {
+          return Qt::PartiallyChecked;
+          }
+        // suggestedValue == Qt:Unchecked
+        return Qt::Unchecked;
+        }
+      return this->triStateCheckState;
+      }
+    return this->Superclass::data(column, role);
+
+    }
+
+  virtual void setData(int column, int role, const QVariant &value)
+    {
+    // Superclass will also mark all children checked or unchecked.
+    this->Superclass::setData(column, role, value);
+
+    if (role == Qt::CheckStateRole && column==0)
+      {
+      if (this->flags() & Qt::ItemIsTristate)
+        {
+        this->triStateCheckState = value.toInt();
+        }
+
+      // tell my parent it is partially checked (at best).
+      pqCompositeTreeWidgetItem* itemParent = 
+        dynamic_cast<pqCompositeTreeWidgetItem*>(
+          static_cast<QTreeWidgetItem*>(this)->parent());
+      while (itemParent)
+        {
+        itemParent->triStateCheckState = Qt::PartiallyChecked;
+        itemParent = 
+          static_cast<pqCompositeTreeWidgetItem*>(
+            static_cast<QTreeWidgetItem*>(itemParent)->parent());
+        }
+      }
+    }
+
+
+};
 class pqSignalAdaptorCompositeTreeWidget::pqInternal
 {
 public:
@@ -259,7 +334,7 @@ void pqSignalAdaptorCompositeTreeWidget::domainChanged()
   this->FlatIndex = 0;
   this->LevelNo = 0;
   
-  pqTreeWidgetItemObject* root = new pqTreeWidgetItemObject(
+  pqTreeWidgetItemObject* root = new pqCompositeTreeWidgetItem(
     this->Internal->TreeWidget, QStringList("Root"));
   this->buildTree(root, dInfo);
   
@@ -280,8 +355,6 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItemObject* item,
   item->setFlags(item->flags()|Qt::ItemIsUserCheckable);
   QObject::connect(item, SIGNAL(checkedStateChanged(bool)),
     this, SIGNAL(valuesChanged()), Qt::QueuedConnection);
-  QObject::connect(item, SIGNAL(checkedStateChanged(bool)),
-    this, SLOT(updateCheckState(bool)));
   this->FlatIndex++;
   if (!info)
     {
@@ -308,7 +381,7 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItemObject* item,
       for (unsigned int cc=0; cc < cinfo->GetNumberOfChildren(); cc++)
         {
         QString childLabel = QString("DataSet %1").arg(cc);
-        pqTreeWidgetItemObject* child = new pqTreeWidgetItemObject(item,
+        pqTreeWidgetItemObject* child = new pqCompositeTreeWidgetItem(item,
           QStringList(childLabel));
         this->buildTree(child, NULL);
         child->setData(0, DATASET_INDEX, cc);
@@ -332,7 +405,7 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItemObject* item,
 
     if (this->Internal->DomainMode != vtkSMCompositeTreeDomain::NON_LEAVES || !is_leaf)
       {
-      pqTreeWidgetItemObject* child = new pqTreeWidgetItemObject(item,
+      pqTreeWidgetItemObject* child = new pqCompositeTreeWidgetItem(item,
         QStringList(childLabel));
       this->buildTree(child, cinfo->GetDataInformation(cc));
       child->setData(0, LEVEL_NUMBER, this->LevelNo);
@@ -344,40 +417,4 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItemObject* item,
       this->FlatIndex++;
       }
     }
-}
-
-//-----------------------------------------------------------------------------
-void pqSignalAdaptorCompositeTreeWidget::updateCheckState(bool checked)
-{
-  if (this->InUpdateCheckState)
-    {
-    return;
-    }
-
-  this->InUpdateCheckState = true;
-  pqTreeWidgetItemObject* item = qobject_cast<pqTreeWidgetItemObject*>(
-    this->sender());
-  if (checked)
-    {
-    QList<pqTreeWidgetItemObject*> itemchildren = 
-      item->findChildren<pqTreeWidgetItemObject*>();
-    foreach (pqTreeWidgetItemObject* child, itemchildren)
-      {
-      child->setCheckState(0, Qt::Checked);
-      }
-    }
-  else
-    {
-    // mark all parents unchecked.
-    pqTreeWidgetItemObject* itemparent = qobject_cast<pqTreeWidgetItemObject*>(
-      item->QObject::parent());
-    while (itemparent)
-      {
-      itemparent->setCheckState(0, Qt::PartiallyChecked);
-      itemparent = qobject_cast<pqTreeWidgetItemObject*>(
-        itemparent->QObject::parent());
-      }
-    }
-
-  this->InUpdateCheckState = false;
 }

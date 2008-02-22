@@ -1226,7 +1226,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
       }
     else if (pt == pqSMAdaptor::COMPOSITE_TREE)
       {
-      QTreeWidget* tree = new pqTreeWidget(panelLayout->parentWidget());
+      QTreeWidget* tree = new QTreeWidget(panelLayout->parentWidget());
       tree->setObjectName(propertyName);
         
       QTreeWidgetItem* header = new QTreeWidgetItem();
