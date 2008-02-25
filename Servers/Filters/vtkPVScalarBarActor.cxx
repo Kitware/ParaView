@@ -35,7 +35,7 @@
 #define MY_ABS(x)       ((x) < 0 ? -(x) : (x))
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.1");
+vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.2");
 vtkStandardNewMacro(vtkPVScalarBarActor);
 
 //=============================================================================
@@ -163,8 +163,8 @@ void vtkPVScalarBarActor::AllocateAndSizeLabels(int *labelSize,
     targetStringLength--;
 
     // Find the limits of the exponents.
-    double lowExp = log10(MY_ABS(range[0]));
-    double highExp = log10(MY_ABS(range[1]));
+    double lowExp  = (range[0] == 0.0) ? 1.0 : log10(MY_ABS(range[0]));
+    double highExp = (range[1] == 0.0) ? 1.0 : log10(MY_ABS(range[1]));
 
     if (   (vtkstd::min(lowExp, highExp) < -4.0)
         || (vtkstd::max(lowExp, highExp) > targetStringLength-2) )
