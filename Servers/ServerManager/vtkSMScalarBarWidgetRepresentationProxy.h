@@ -23,25 +23,18 @@
 #ifndef __vtkSMScalarBarWidgetRepresentationProxy_h
 #define __vtkSMScalarBarWidgetRepresentationProxy_h
 
-#include "vtkSMRepresentationProxy.h"
+#include "vtkSMNewWidgetRepresentationProxy.h"
+
 class vtkSMViewProxy;
-class vtkScalarBarWidget;
-class vtkSMScalarBarWidgetRepresentationObserver;
 
 class VTK_EXPORT vtkSMScalarBarWidgetRepresentationProxy : 
-  public vtkSMRepresentationProxy
+  public vtkSMNewWidgetRepresentationProxy
 {
 public:
   static vtkSMScalarBarWidgetRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy, vtkSMRepresentationProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
-  
-  // Description:
-  // Enable/Disable the scalar bar. Overridden to set the current 
-  // renderer on the ScalarBarWidget. This also enables the scalar bar 
-  // widget on the client.
-  virtual void SetVisibility(int visible);
-  virtual bool GetVisibility() { return this->Visibility? true : false; }
+  vtkTypeRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy,
+                       vtkSMNewWidgetRepresentationProxy);
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
   vtkSMScalarBarWidgetRepresentationProxy();
@@ -65,14 +58,7 @@ protected:
   virtual bool RemoveFromView(vtkSMViewProxy* view);
 
   vtkSMProxy* ActorProxy;
-  vtkScalarBarWidget* Widget; // Widget on the client. 
-  int Visibility;
   vtkSMViewProxy* ViewProxy;
-  
-//BTX
-  friend class vtkSMScalarBarWidgetRepresentationObserver;
-//ETX
-  vtkSMScalarBarWidgetRepresentationObserver* Observer;
 
 private:
   void ExecuteEvent(unsigned long event);

@@ -34,92 +34,47 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy, "1.6");
-
-class vtkSMScalarBarWidgetRepresentationObserver : public vtkCommand
-{
-public:
-  static vtkSMScalarBarWidgetRepresentationObserver *New() 
-    { return new vtkSMScalarBarWidgetRepresentationObserver; }
-  virtual void Execute(vtkObject*, unsigned long event, void*)
-    {
-      if (this->Proxy)
-        {
-        this->Proxy->ExecuteEvent(event);
-        }
-    }
-  vtkSMScalarBarWidgetRepresentationObserver():Proxy(0) {}
-  vtkSMScalarBarWidgetRepresentationProxy* Proxy;
-};
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy, "1.7");
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetRepresentationProxy::vtkSMScalarBarWidgetRepresentationProxy()
 {
-  this->ActorProxy = 0;
-  this->Widget = vtkScalarBarWidget::New();
-  this->Observer = vtkSMScalarBarWidgetRepresentationObserver::New();
-  this->Observer->Proxy = this;
-  this->ViewProxy = 0;
-  this->Visibility = 1;
+  this->ActorProxy = NULL;
+  this->ViewProxy = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetRepresentationProxy::~vtkSMScalarBarWidgetRepresentationProxy()
 {
-  this->Observer->Proxy = 0;
-  this->Observer->Delete();
-  this->Observer = 0;
-  this->ActorProxy = 0;
-  this->Widget->Delete();
-  this->Widget = 0;
-  this->ViewProxy = 0;
+  this->ActorProxy = NULL;
+  this->ViewProxy = NULL;
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMScalarBarWidgetRepresentationProxy::AddToView(vtkSMViewProxy* view)
 {
-  vtkSMRenderViewProxy* renderView = vtkSMRenderViewProxy::SafeDownCast(view);
-  if (!renderView)
+  if (!this->Superclass::AddToView(view))
     {
-    vtkErrorMacro("View must be a vtkSMRenderViewProxy.");
     return false;
-    }
-
-  if (this->ActorProxy)
-    {
-    renderView->AddPropToRenderer2D(this->ActorProxy);
     }
   
   this->ViewProxy = view;
-  this->SetVisibility(this->Visibility);
 
   return true;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMScalarBarWidgetRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
+bool vtkSMScalarBarWidgetRepresentationProxy::RemoveFromView(
+                                                           vtkSMViewProxy* view)
 {
-  vtkSMRenderViewProxy* renderView = vtkSMRenderViewProxy::SafeDownCast(view);
-  if (!renderView)
+  if (!this->Superclass::RemoveFromView(view))
     {
-    vtkErrorMacro("View must be a vtkSMRenderViewProxy.");
     return false;
     }
 
-  if (this->ActorProxy)
-    {
-    renderView->RemovePropFromRenderer2D(this->ActorProxy);
-    }
-  
-  if (this->Widget->GetEnabled())
-    {
-    this->Widget->SetEnabled(0);
-    }
-  this->Widget->SetInteractor(0);
-  this->Widget->SetCurrentRenderer(0);
   this->ViewProxy = 0;
 
-  return this->Superclass::RemoveFromView(view);
+  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -130,148 +85,35 @@ void vtkSMScalarBarWidgetRepresentationProxy::CreateVTKObjects()
     return;
     }
 
-  this->ActorProxy = this->GetSubProxy("Prop2D");
+  this->ActorProxy = this->GetSubProxy("Prop2DActor");
   if (!this->ActorProxy)
+    {
+    vtkErrorMacro("Failed to find subproxy Prop2DActor.");
+    return;
+    }
+
+  this->ActorProxy->SetServers(
+                    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+
+  this->Superclass::CreateVTKObjects();
+
+  if (!this->RepresentationProxy)
     {
     vtkErrorMacro("Failed to find subproxy Prop2D.");
     return;
     }
 
-  this->ActorProxy->SetServers(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-
-  this->Superclass::CreateVTKObjects();
-
-  // Set up the widget.
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkScalarBarActor* actor = vtkScalarBarActor::SafeDownCast(
-    pm->GetObjectFromID(this->ActorProxy->GetID()));
-
-  if (!actor)
+  vtkSMProxyProperty* tapp = vtkSMProxyProperty::SafeDownCast(
+                      this->RepresentationProxy->GetProperty("ScalarBarActor"));
+  if (!tapp)
     {
-    vtkErrorMacro("Failed to create client side ScalarBarActor.");
+    vtkErrorMacro("Failed to find property ScalarBarActor on ScalarBarRepresentation proxy.");
     return;
     }
-  this->Widget->SetScalarBarActor(actor);
-  this->Widget->AddObserver(vtkCommand::InteractionEvent,
-    this->Observer);
-  this->Widget->AddObserver(vtkCommand::StartInteractionEvent,
-    this->Observer);
-  this->Widget->AddObserver(vtkCommand::EndInteractionEvent,
-    this->Observer);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetRepresentationProxy::SetVisibility(int visible)
-{
-  this->Visibility = visible;
-  if (!this->ViewProxy)
+  if(!tapp->AddProxy(this->ActorProxy))
     {
     return;
     }
-  vtkSMRenderViewProxy* renderView = 
-    vtkSMRenderViewProxy::SafeDownCast(this->ViewProxy);
-  if (!renderView)
-    {
-    vtkErrorMacro("View must be a vtkSMRenderViewProxy.");
-    return;
-    }
-
-  // Set widget interactor.
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::SafeDownCast(
-    pm->GetObjectFromID(renderView->GetInteractorProxy()->GetID()));
-  if (!iren)
-    {
-    vtkErrorMacro("Failed to get client side Interactor.");
-    return;
-    }
-  this->Widget->SetInteractor(iren);
-
-  vtkRenderer* ren = vtkRenderer::SafeDownCast(
-    pm->GetObjectFromID(renderView->GetRenderer2DProxy()->GetID()));
-  if (!ren)
-    {
-    vtkErrorMacro("Failed to get client side 2D renderer.");
-    return;
-    }
-  this->Widget->SetCurrentRenderer(ren);
-  this->Widget->SetEnabled(visible);
-
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ActorProxy->GetProperty("Visibility"));
-  if (!ivp)
-    {
-    vtkErrorMacro("Failed to find property Visibility.");
-    return;
-    }
-  ivp->SetElement(0, visible);
-  this->ActorProxy->UpdateVTKObjects();
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
-{
-  vtkPVGenericRenderWindowInteractor* iren;
-  iren = vtkPVGenericRenderWindowInteractor::SafeDownCast(
-    this->Widget->GetInteractor());
-  switch (event)
-    {
-  case vtkCommand::StartInteractionEvent:
-    // enable Interactive rendering.
-    iren->InteractiveRenderEnabledOn();
-    break;
-    
-  case vtkCommand::EndInteractionEvent:
-    // disable interactive rendering.
-    iren->InteractiveRenderEnabledOff();
-    iren->Render();
-    break;
-
-  case vtkCommand::InteractionEvent:
-    // Take the client position values and push on to the server.
-    vtkScalarBarActor* actor = this->Widget->GetScalarBarActor();
-    double *pos1 = actor->GetPositionCoordinate()->GetValue();
-    double *pos2 = actor->GetPosition2Coordinate()->GetValue();
-    int orientation = actor->GetOrientation();
-    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->ActorProxy->GetProperty("Position"));
-    if (dvp)
-      {
-      dvp->SetElement(0, pos1[0]);
-      dvp->SetElement(1, pos1[1]);
-      }
-    else
-      {
-      vtkErrorMacro("Failed to find property Position on ActorProxy.");
-      }
-
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->ActorProxy->GetProperty("Position2"));
-    if (dvp)
-      {
-      dvp->SetElement(0, pos2[0]);
-      dvp->SetElement(1, pos2[1]);
-      }
-    else
-      {
-      vtkErrorMacro("Failed to find property Position2 on ActorProxy.");
-      }
-
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->ActorProxy->GetProperty("Orientation"));
-    if (ivp)
-      {
-      ivp->SetElement(0, orientation);
-      }
-    else
-      {
-      vtkErrorMacro("Failed to find property Orientation on ActorProxy.");
-      }
-    this->ActorProxy->UpdateVTKObjects();
-    break;
-    }
-  this->InvokeEvent(event); // just in case the GUI wants to know about interaction.
 }
 
 //----------------------------------------------------------------------------

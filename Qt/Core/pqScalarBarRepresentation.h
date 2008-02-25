@@ -42,6 +42,8 @@ class pqScalarsToColors;
 class PQCORE_EXPORT pqScalarBarRepresentation : public pqRepresentation
 {
   Q_OBJECT
+
+  typedef pqRepresentation Superclass;
 public:
   pqScalarBarRepresentation(const QString& group, const QString& name,
     vtkSMProxy* scalarbar, pqServer* server,
@@ -71,6 +73,8 @@ public:
     { this->AutoHidden = h; }
   bool getAutoHidden() const
     { return this->AutoHidden; }
+
+  virtual void setDefaultPropertyValues();
 
 protected slots:
   void onLookupTableModified();

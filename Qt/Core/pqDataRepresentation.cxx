@@ -32,8 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataRepresentation.h"
 
 #include "vtkEventQtSlotConnect.h"
+#include "vtkSMDataRepresentationProxy.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMRepresentationProxy.h"
+#include "vtkSMSourceProxy.h"
 
 #include <QtDebug>
 #include <QPointer>
@@ -192,3 +193,41 @@ pqScalarsToColors* pqDataRepresentation::getLookupTable()
   return (lut? smmodel->findItem<pqScalarsToColors*>(lut): 0);
 }
 
+//-----------------------------------------------------------------------------
+vtkPVDataInformation* pqDataRepresentation::getRepresentedDataInformation(
+  bool update/*=true*/) const
+{
+  vtkSMDataRepresentationProxy* repr = vtkSMDataRepresentationProxy::SafeDownCast(
+    this->getProxy());
+  if (repr)
+    {
+    return repr->GetRepresentedDataInformation(update);
+    }
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVDataInformation* pqDataRepresentation::getInputDataInformation(
+  bool update/*=true*/) const
+{
+  if (!this->getInput())
+    {
+    return 0;
+    }
+
+  if (update)
+    {
+    // this will update the pipeline without any data movements.
+    this->getRepresentedDataInformation(true);
+    }
+
+  vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(
+    this->getInput()->getProxy());
+  if (source)
+    {
+    return source->GetDataInformation(
+      this->getOutputPortFromInput()->getPortNumber(),
+      update);
+    }
+  return 0;
+}

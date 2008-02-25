@@ -87,14 +87,14 @@ public:
 
   // Convenience method to get array information.
   vtkPVArrayInformation* getArrayInformation(
-    const char* arrayname, int fieldType)
+    const char* arrayname, int fieldType, vtkPVDataInformation* argInfo=0)
     {
     if (!arrayname || !arrayname[0] || !this->RepresentationProxy)
       {
       return 0; 
       }
     vtkSMDataRepresentationProxy* repr = this->RepresentationProxy;
-    vtkPVDataInformation* dataInfo = repr->GetRepresentedDataInformation();
+    vtkPVDataInformation* dataInfo = argInfo? argInfo: repr->GetRepresentedDataInformation();
     if(!dataInfo)
       {
       return 0;
@@ -809,17 +809,37 @@ pqPipelineRepresentation::getColorFieldRange(const QString& array, int component
     fieldType = vtkSMDataRepresentationProxy::POINT_DATA;
     }
 
-  vtkPVArrayInformation* info = this->Internal->getArrayInformation(
+  vtkPVArrayInformation* representedInfo = this->Internal->getArrayInformation(
     field.toAscii().data(), fieldType);
-  if(info)
+
+  vtkPVDataInformation* inputInformation = this->getInputDataInformation(true);
+  vtkPVArrayInformation* inputInfo = this->Internal->getArrayInformation(
+    field.toAscii().data(), fieldType, inputInformation);
+
+  // Try to use full input data range is possible. Sometimes, the data array is
+  // only provided by some pre-processing filter added by the representation
+  // (and is not present in the original input), in that case we use the range
+  // provided by the representation.
+  if (inputInfo)
     {
-    if (component <info->GetNumberOfComponents())
+    if (component < inputInfo->GetNumberOfComponents())
       {
       double range[2];
-      info->GetComponentRange(component, range);
+      inputInfo->GetComponentRange(component, range);
       return QPair<double,double>(range[0], range[1]);
       }
     }
+
+  if (representedInfo)
+    {
+    if (component <representedInfo->GetNumberOfComponents())
+      {
+      double range[2];
+      representedInfo->GetComponentRange(component, range);
+      return QPair<double,double>(range[0], range[1]);
+      }
+    }
+
   return ret;
 }
 

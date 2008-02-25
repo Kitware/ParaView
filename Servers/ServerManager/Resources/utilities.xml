@@ -111,6 +111,8 @@
         <EnumerationDomain name="enum">
           <Entry value="0" text="RGB" />
           <Entry value="1" text="HSV" />
+          <Entry value="2" text="Lab" />
+          <Entry value="3" text="Diverging" />
         </EnumerationDomain>
       </IntVectorProperty>
 
@@ -490,6 +492,47 @@
                          default_values="0">
         <BooleanDomain/>
       </IntVectorProperty>
+    </Proxy>
+
+    <Proxy name="ScalarBarWidget" class="vtkScalarBarWidget">
+      <ProxyProperty name="Representation"
+                     command="SetRepresentation">
+        <ProxyGroupDomain name="groups">
+          <Group name="props" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <IntVectorProperty name="Enabled" 
+                         command="SetEnabled"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Selectable"
+                         command="SetSelectable"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Resizable"
+                         command="SetResizable"
+                         number_of_elements="1"
+                         default_values="1"
+                         animateable="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Repositionable"
+                         command="SetRepositionable"
+                         number_of_elements="1"
+                         default_values="1"
+                         animateable="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <!-- End of ScalarBarWidget -->
     </Proxy>
 
     <Proxy name="TextWidget" class="vtkTextWidget">
@@ -1315,7 +1358,7 @@
       </IntVectorProperty>
     </Proxy>
 
-    <ScalarBarActorProxy name="ScalarBarActor" class="vtkScalarBarActor">
+    <ScalarBarActorProxy name="ScalarBarActor" class="vtkPVScalarBarActor">
       <ProxyProperty
         name="LookupTable"
         command="SetLookupTable"
@@ -1364,6 +1407,13 @@
         default_values="0.13 0.5"
         animateable="0">
         <DoubleRangeDomain name="range" min="0 0" max="1 1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="AspectRatio"
+                            command="SetAspectRatio"
+                            number_of_elements="1"
+                            default_values="20">
+        <DoubleRangeDomain name="range" min="0.001" />
       </DoubleVectorProperty>
       
       <StringVectorProperty

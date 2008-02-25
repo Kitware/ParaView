@@ -38,6 +38,7 @@ class pqDataRepresentationInternal;
 class pqOutputPort;
 class pqPipelineSource;
 class pqScalarsToColors;
+class vtkPVDataInformation;
 
 // pqDataRepresentation is the superclass for a display for a pqPipelineSource 
 // i.e. the input for this display proxy is a pqPiplineSource.
@@ -59,6 +60,17 @@ public:
   /// Returns the input pqPipelineSource's output port to which this
   /// representation is connected.
   pqOutputPort* getOutputPortFromInput() const;
+
+  /// Returns the data information for the data coming into the representation
+  /// as input. If update=true, the representation will be updated proir to
+  /// obtaining the data information.
+  vtkPVDataInformation* getInputDataInformation(bool update=true) const;
+
+  /// Returns the represented data information. Depending on the representation
+  /// this may differ from the input data information eg. if the representation
+  /// shows an outline of the data, the this method will return the information
+  /// about the polydata forming the outline not the input dataset.
+  vtkPVDataInformation* getRepresentedDataInformation(bool update=true) const;
 
   /// Returns the lookuptable proxy, if any.
   /// Most consumer displays take a lookup table. This method 

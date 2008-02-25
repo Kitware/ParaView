@@ -48,8 +48,6 @@ protected:
   // Currently a representation can be added to only one view.
   virtual bool RemoveFromView(vtkSMViewProxy* view);
 
-  int Visibility;
-
   vtkSMProxy* TextActorProxy;
   vtkSMProxy* TextPropertyProxy;
   

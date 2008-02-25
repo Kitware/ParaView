@@ -1201,6 +1201,12 @@ void pqColorScaleEditor::loadBuiltinColorPresets()
 {
   pqColorMapModel colorMap;
   pqColorPresetModel *model = this->Form->Presets->getModel();
+  colorMap.setColorSpace(pqColorMapModel::DivergingSpace);
+  colorMap.addPoint(pqChartValue((double)0.0), QColor( 35, 61, 181), 0.0);
+  colorMap.addPoint(pqChartValue((double)1.0), QColor(172, 36,  32), 1.0);
+  model->addBuiltinColorMap(colorMap, "Cool to Warm");
+
+  colorMap.removeAllPoints();
   colorMap.setColorSpace(pqColorMapModel::HsvSpace);
   colorMap.addPoint(pqChartValue((double)0.0), QColor(0, 0, 255), (double)0.0);
   colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 0, 0), (double)0.0);
@@ -1231,12 +1237,6 @@ void pqColorScaleEditor::loadBuiltinColorPresets()
   colorMap.addPoint(pqChartValue((double)0.0), QColor(0, 153, 191), (double)0.0);
   colorMap.addPoint(pqChartValue((double)1.0), QColor(196, 119, 87),(double)1.0);
   model->addBuiltinColorMap(colorMap, "CIELab Blue to Red");
-
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::DivergingSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor( 35, 61, 181), 0.0);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(172, 36,  32), 1.0);
-  model->addBuiltinColorMap(colorMap, "Cool to Warm");
 }
 
 void pqColorScaleEditor::loadColorPoints()
@@ -1632,14 +1632,14 @@ void pqColorScaleEditor::setLegend(pqScalarBarRepresentation *legend)
         proxy, proxy->GetProperty("TitleItalic"));
     this->Form->Links.addPropertyLink(
         this->Form->TitleShadow, "checked", SIGNAL(toggled(bool)),
-        proxy, proxy->GetProperty("TitleShadow"));   
+        proxy, proxy->GetProperty("TitleShadow"));
+    this->Form->Links.addPropertyLink(
+        this->Form->TitleFontSize, "value", SIGNAL(editingFinished()),
+        proxy, proxy->GetProperty("TitleFontSize"), 1);
     this->Form->Links.addPropertyLink(
         this->Form->TitleOpacity, "value", SIGNAL(valueChanged(double)),
         proxy, proxy->GetProperty("TitleOpacity"));
 
-    this->Form->Links.addPropertyLink(
-        this->Form->LabelFormat, "text", SIGNAL(textChanged(const QString&)),
-        proxy, proxy->GetProperty("LabelFormat"));   
     this->Form->Links.addPropertyLink(this->Form->LabelColorAdaptor, 
         "color", SIGNAL(colorChanged(const QVariant&)),
         proxy, proxy->GetProperty("LabelColor"));
@@ -1656,12 +1656,18 @@ void pqColorScaleEditor::setLegend(pqScalarBarRepresentation *legend)
         this->Form->LabelShadow, "checked", SIGNAL(toggled(bool)),
         proxy, proxy->GetProperty("LabelShadow"));   
     this->Form->Links.addPropertyLink(
+        this->Form->LabelFontSize, "value", SIGNAL(editingFinished()),
+        proxy, proxy->GetProperty("LabelFontSize"), 1);
+    this->Form->Links.addPropertyLink(
         this->Form->LabelOpacity, "value", SIGNAL(valueChanged(double)),
         proxy, proxy->GetProperty("LabelOpacity"));
 
     this->Form->Links.addPropertyLink(this->Form->NumberOfLabels,
         "value", SIGNAL(valueChanged(int)),
         proxy, proxy->GetProperty("NumberOfLabels"));
+    this->Form->Links.addPropertyLink(this->Form->AspectRatio,
+                                      "value", SIGNAL(valueChanged(double)),
+                                      proxy, proxy->GetProperty("AspectRatio"));
 
     // Update the legend title gui.
     this->updateLegendTitle();

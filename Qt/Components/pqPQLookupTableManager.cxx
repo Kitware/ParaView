@@ -189,15 +189,15 @@ pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
   pxm->RegisterProxy("lookup_tables", name.toAscii().data(), lutProxy);
   lutProxy->Delete();
 
-  // Setup default LUT to go from Blue to Red.
+  // Setup default LUT to go from Cool to Warm.
   QList<QVariant> values;
-  values << 0.0 << 0.0 << 0.0 << 1.0
-    << 1.0 << 1.0 << 0.0 << 0.0;
+  values << 0.0 << 0.1381 << 0.2411 << 0.7091
+         << 1.0 << 0.6728 << 0.1408 << 0.1266;
 
   pqSMAdaptor::setMultipleElementProperty(
-    lutProxy->GetProperty("RGBPoints"), values);
+                                    lutProxy->GetProperty("RGBPoints"), values);
   pqSMAdaptor::setEnumerationProperty(
-    lutProxy->GetProperty("ColorSpace"), "HSV");
+                              lutProxy->GetProperty("ColorSpace"), "Diverging");
   pqSMAdaptor::setEnumerationProperty(
     lutProxy->GetProperty("VectorMode"), "Magnitude");
   lutProxy->UpdateVTKObjects();

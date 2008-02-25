@@ -1492,6 +1492,64 @@
      </ProxyProperty>
     </ImplicitPlaneRepresentationProxy>
 
+    <Proxy name="ScalarBarRepresentation" 
+           class="vtkScalarBarRepresentation">
+
+      <IntVectorProperty
+         name="Visibility"
+         command="SetVisibility"
+         number_of_elements="1"
+         default_values="1"
+         animateable="1">
+         <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty 
+         name="Position"
+         command="SetPosition"
+         number_of_elements="2"
+         information_property="PositionInfo"
+         default_values="0.87 0.25">
+         <DoubleRangeDomain name="range" min="0 0" max="1 1"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty 
+         name="PositionInfo"
+         command="GetPosition"
+         information_only="1">
+         <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty 
+         name="Position2"
+         command="SetPosition2"
+         number_of_elements="2"
+         information_property="Position2Info"
+         default_values="0.13 0.5">
+         <DoubleRangeDomain name="range" min="0 0" max="1 1"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty 
+         name="Position2Info"
+         command="GetPosition2"
+         information_only="1">
+         <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+
+      <ProxyProperty name="Renderer" command="SetRenderer">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderers"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <ProxyProperty name="ScalarBarActor" command="SetScalarBarActor">
+        <ProxyGroupDomain name="groups">
+          <Group name="annotations"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <!-- End of ScalarBarRepresentation -->
+    </Proxy>
+
     <Proxy name="TextRepresentation" 
            class="vtkTextRepresentation">
 
@@ -6498,27 +6556,39 @@
     </NewWidgetRepresentationProxy>
 
     <ScalarBarWidgetRepresentationProxy name="ScalarBarWidgetRepresentation" class="vtkScalarBarWidget">
-      <IntVectorProperty
-        name="Visibility"
-        command="SetVisibility"
-        number_of_elements="1"
-        update_self="1"
-        default_values="1">
+      <IntVectorProperty name="Enabled"
+                         command="SetEnabled"
+                         number_of_elements="1"
+                         default_values="0"
+                         update_self="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
+
       <SubProxy>
         <Proxy name="Prop2D"
-          proxygroup="annotations"
-          proxyname="ScalarBarActor">
+               proxygroup="props" proxyname="ScalarBarRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility"/>
+          <Property name="Position"/>
+          <Property name="Position2"/>
+          <Property name="PositionInfo"/>
+          <Property name="Position2Info"/>
+          <Property name="ScalarBarActor"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Prop2DActor"
+               proxygroup="annotations" proxyname="ScalarBarActor">
         </Proxy>
         <ExposedProperties>
           <Property name="LookupTable" />
           <Property name="Orientation" />
-          <Property name="Position" />
-          <Property name="Position2" />
           <Property name="Title" />
           <Property name="LabelFormat" />
           <Property name="NumberOfLabels" />
+          <Property name="AspectRatio" />
           <!-- properties for Label -->
           <Property name="LabelColor"     />
           <Property name="LabelOpacity"   />
@@ -6535,6 +6605,18 @@
           <Property name="TitleItalic"    />
           <Property name="TitleShadow"    />
           <Property name="TitleFontSize"  />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Widget"
+               proxygroup="3d_widgets" proxyname="ScalarBarWidget">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Enabled" />
+          <Property name="Selectable" />
+          <Property name="Resizable" />
+          <Property name="Repositionable" />
         </ExposedProperties>
       </SubProxy>
     </ScalarBarWidgetRepresentationProxy>

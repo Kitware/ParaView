@@ -83,6 +83,7 @@ SET(Filters_SRCS
   vtkPVMain.cxx
   vtkPVMergeTables.cxx
   vtkPVRenderViewProxy.cxx
+  vtkPVScalarBarActor.cxx
   vtkPVServerArrayHelper.cxx
   vtkPVServerArraySelection.cxx
   vtkPVServerFileListing.cxx

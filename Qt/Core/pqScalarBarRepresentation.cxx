@@ -56,10 +56,12 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqScalarBarRepresentation::pqScalarBarRepresentation(const QString& group, const QString& name,
-    vtkSMProxy* scalarbar, pqServer* server,
-    QObject* _parent)
-: pqRepresentation(group, name, scalarbar, server, _parent)
+pqScalarBarRepresentation::pqScalarBarRepresentation(const QString& group,
+                                                     const QString& name,
+                                                     vtkSMProxy* scalarbar,
+                                                     pqServer* server,
+                                                     QObject* _parent)
+  : Superclass(group, name, scalarbar, server, _parent)
 {
   this->AutoHidden = false;
   this->Internal = new pqScalarBarRepresentation::pqInternal();
@@ -182,3 +184,27 @@ void pqScalarBarRepresentation::makeTitle(pqPipelineRepresentation* display)
     }
   this->setTitle(arrayname, component);
 }
+
+//-----------------------------------------------------------------------------
+void pqScalarBarRepresentation::setDefaultPropertyValues()
+{
+  this->Superclass::setDefaultPropertyValues();
+  if (!this->isVisible())
+    {
+    // For any non-visible display, we don't set its defaults.
+    return;
+    }
+
+  // Set default arrays and lookup table.
+  vtkSMProxy* proxy = this->getProxy();
+  
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("Selectable"), 0);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("Enabled"), 1);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("Resizable"), 1);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("Repositionable"), 1);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("TitleFontSize"), 12);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("LabelFontSize"), 12);
+
+  proxy->UpdateVTKObjects();
+}
+
