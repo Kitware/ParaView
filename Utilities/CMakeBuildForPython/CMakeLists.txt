@@ -229,6 +229,8 @@ set(PYTHON_SRCS Python/Python-ast.c
                 Python/compile.c 
                 Python/codecs.c 
                 Python/errors.c 
+                Python/formatter_string.c
+                Python/formatter_unicode.c
                 Python/frozen.c 
                 Python/frozenmain.c 
                 Python/future.c 
