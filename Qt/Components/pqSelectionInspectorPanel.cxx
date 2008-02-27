@@ -120,7 +120,7 @@ public:
     this->ThresholdScalarArrayAdaptor = 0;
     this->SelectionSource = 0;
     this->Representation = 0;
-    this->InputSource = 0;
+    this->InputPort = 0;
     this->VTKConnectSelInput = vtkEventQtSlotConnect::New();
     this->VTKConnectRep = vtkEventQtSlotConnect::New();
     }
@@ -144,7 +144,7 @@ public:
     delete this->ThresholdsAdaptor;
     delete this->ThresholdScalarArrayAdaptor;
     this->SelectionSource = 0;
-    this->InputSource = 0;
+    this->InputPort = 0;
     this->Representation = 0;
     this->VTKConnectSelInput->Delete();
     this->VTKConnectRep->Delete();
@@ -155,7 +155,7 @@ public:
 
   pqSignalAdaptorTreeWidget* IndicesAdaptor;
 
-  QPointer<pqPipelineSource> InputSource;
+  QPointer<pqOutputPort> InputPort;
   // The representation whose properties are being edited.
   QPointer<pqDataRepresentation> Representation;
   vtkSmartPointer<vtkSMSourceProxy> SelectionSource;
@@ -291,7 +291,7 @@ void pqSelectionInspectorPanel::onSelectionChanged()
     this->Implementation->SelectionManager->getSelectedPort();
   pqPipelineSource* input = port? port->getSource() : 0;
   int portnum = port? port->getPortNumber(): -1;
-  this->setInputSource(input, portnum);
+  this->setInputSource(port);
 
   pqRenderView* view = qobject_cast<pqRenderView*>(
     pqActiveView::instance().current());
@@ -300,7 +300,7 @@ void pqSelectionInspectorPanel::onSelectionChanged()
     pqDataRepresentation *repr = NULL;
     if(input)
       {
-      repr = input->getRepresentation(pqActiveView::instance().current());
+      repr = port->getRepresentation(pqActiveView::instance().current());
       }
 
     this->setRepresentation(repr);
@@ -321,19 +321,19 @@ void pqSelectionInspectorPanel::onSelectionChanged()
 
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::setInputSource(
-  pqPipelineSource* input, int vtkNotUsed(portnum)) 
+  pqOutputPort* port)
 {
-  if(this->Implementation->InputSource == input)
+  if (this->Implementation->InputPort == port)
     {
     return;
     }
 
-  if (this->Implementation->InputSource)
+  if (this->Implementation->InputPort)
     {
-    QObject::disconnect(this->Implementation->InputSource, 0, this, 0);
+    QObject::disconnect(this->Implementation->InputPort, 0, this, 0);
     }
 
-  this->Implementation->InputSource = input;
+  this->Implementation->InputPort= port;
 
   this->updateSurfaceInformationAndDomains();
   this->updateSurfaceSelectionIDRanges();
@@ -342,7 +342,7 @@ void pqSelectionInspectorPanel::setInputSource(
   this->updateSelectionLabelModes();
 
   vtkSMSourceProxy *inputsrc = 
-    input ? vtkSMSourceProxy::SafeDownCast(input->getProxy()) : 0;
+    port? vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy()) : 0;
   if(inputsrc)
     {
     //this->setEnabled(true);
@@ -580,9 +580,9 @@ void pqSelectionInspectorPanel::updateSelectionSource()
   if (port)
     {
     vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(
-      this->Implementation->InputSource->getProxy());
+      port->getSource()->getProxy());
 
-    if(input)
+    if (input)
       {
       vtkSMSourceProxy* selSrc = 
         input->GetSelectionInput(port->getPortNumber());
@@ -665,15 +665,14 @@ void pqSelectionInspectorPanel::updateSelectionSourceGUI()
 void pqSelectionInspectorPanel::updateThreholdDataArrays()
 {
   this->Implementation->ThresholdScalarArray->clear();
-  if(!this->Implementation->InputSource || 
-    !this->Implementation->InputSource->getProxy())
+  if (!this->Implementation->InputPort)
     {
     //this->Implementation->stackedWidget->
     return;
     }
-  vtkSMSourceProxy* sourceProxy = vtkSMSourceProxy::SafeDownCast(
-    this->Implementation->InputSource->getProxy());
-  vtkPVDataInformation* geomInfo = sourceProxy->GetDataInformation();
+
+  vtkPVDataInformation* geomInfo = 
+    this->Implementation->InputPort->getDataInformation(true);
 
   vtkPVDataSetAttributesInformation* attrInfo;
 
@@ -873,10 +872,7 @@ void pqSelectionInspectorPanel::updateCellLabelMode(const QString& text)
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::updateSelectionLabelEnableState()
 {
-
-  vtkSMProxy* input = this->Implementation->InputSource->getProxy();
-
-  if (input)
+  if (this->Implementation->InputPort)
     {
     this->Implementation->groupSelectionLabel->setEnabled(true);
     if(this->Implementation->checkBoxLabelCells->isChecked())
@@ -905,49 +901,42 @@ void pqSelectionInspectorPanel::updateSelectionLabelEnableState()
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::updateSelectionLabelModes()
 {
-  if(!this->Implementation->InputSource ||
-    !this->Implementation->InputSource->getProxy())
+  //TODO: Fix this to use domains instead.
+  if (!this->Implementation->InputPort)
     {
     return;
     }
 
-  vtkSMProxy* inputSrc = this->Implementation->InputSource->getProxy();
+  vtkSMSourceProxy* sourceProxy = vtkSMSourceProxy::SafeDownCast(
+    this->Implementation->InputPort->getSource()->getProxy());
+  vtkPVDataInformation* geomInfo = sourceProxy->GetDataInformation(
+    this->Implementation->InputPort->getPortNumber());
 
-  if (inputSrc)
+  vtkPVDataSetAttributesInformation* attrInfo;
+
+  this->Implementation->comboLabelMode_Point->clear();
+  this->Implementation->comboLabelMode_Point->addItem("Point IDs");
+  attrInfo = geomInfo->GetPointDataInformation();
+  for(int i=0; i<attrInfo->GetNumberOfArrays(); i++)
     {
-    vtkSMSourceProxy* sourceProxy = vtkSMSourceProxy::SafeDownCast(inputSrc);
-    if(!sourceProxy)
+    QString arrayName = attrInfo->GetArrayInformation(i)->GetName();
+    if(arrayName != "vtkOriginalPointIds") // "Point IDs"
       {
-      return;
+      this->Implementation->comboLabelMode_Point->addItem(arrayName);
       }
-    vtkPVDataInformation* geomInfo = sourceProxy->GetDataInformation();
-
-    vtkPVDataSetAttributesInformation* attrInfo;
-
-    this->Implementation->comboLabelMode_Point->clear();
-    this->Implementation->comboLabelMode_Point->addItem("Point IDs");
-    attrInfo = geomInfo->GetPointDataInformation();
-    for(int i=0; i<attrInfo->GetNumberOfArrays(); i++)
-      {
-      QString arrayName = attrInfo->GetArrayInformation(i)->GetName();
-      if(arrayName != "vtkOriginalPointIds") // "Point IDs"
-        {
-        this->Implementation->comboLabelMode_Point->addItem(arrayName);
-        }
-      }
-
-    this->Implementation->comboLabelMode_Cell->clear();
-    this->Implementation->comboLabelMode_Cell->addItem("Cell IDs");
-    attrInfo = geomInfo->GetCellDataInformation();
-    for(int i=0; i<attrInfo->GetNumberOfArrays(); i++)
-      {
-      QString arrayName = attrInfo->GetArrayInformation(i)->GetName();
-      if(arrayName != "vtkOriginalCellIds") // "Cell IDs"
-        {
-        this->Implementation->comboLabelMode_Cell->addItem(arrayName);
-        }
-      }      
     }
+
+  this->Implementation->comboLabelMode_Cell->clear();
+  this->Implementation->comboLabelMode_Cell->addItem("Cell IDs");
+  attrInfo = geomInfo->GetCellDataInformation();
+  for(int i=0; i<attrInfo->GetNumberOfArrays(); i++)
+    {
+    QString arrayName = attrInfo->GetArrayInformation(i)->GetName();
+    if(arrayName != "vtkOriginalCellIds") // "Cell IDs"
+      {
+      this->Implementation->comboLabelMode_Cell->addItem(arrayName);
+      }
+    }      
 }
 
 //-----------------------------------------------------------------------------
@@ -981,25 +970,23 @@ void pqSelectionInspectorPanel::setupSurfaceSelectionGUI()
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::updateSurfaceSelectionIDRanges()
 {
-  if(!this->Implementation->InputSource)
-  {
+  if (!this->Implementation->InputPort)
+    {
     return;
-  }
+    }
+
   vtkSMSourceProxy* sourceProxy = vtkSMSourceProxy::SafeDownCast(
-    this->Implementation->InputSource->getProxy());
-  if(!sourceProxy)
-  {
-    return;
-  }
-  vtkPVDataInformation* dataInfo = sourceProxy->GetDataInformation(0, false);
+    this->Implementation->InputPort->getSource()->getProxy());
+  vtkPVDataInformation* dataInfo = sourceProxy->GetDataInformation(
+    this->Implementation->InputPort->getPortNumber(), false);
 
   if (!dataInfo)
-  {
+    {
     return;
-  }
+    }
 
   int numPartitions = 
-    this->Implementation->InputSource->getServer()->getNumberOfPartitions();
+    this->Implementation->InputPort->getServer()->getNumberOfPartitions();
 
   this->Implementation->ProcessIDRange->setText(
     QString("Process ID Range: 0 - %1").arg(numPartitions-1));
@@ -1022,18 +1009,18 @@ void pqSelectionInspectorPanel::updateSurfaceSelectionIDRanges()
   vtkPVArrayInformation* gidsInfo = dsainfo->GetAttributeInformation(
     vtkDataSetAttributes::GLOBALIDS);
   if (gidsInfo)
-  {
+    {
     double* range =gidsInfo->GetComponentRange(0);
     vtkTypeInt64 gid_min = static_cast<vtkTypeInt64>(range[0]);
     vtkTypeInt64 gid_max = static_cast<vtkTypeInt64>(range[1]);
 
     this->Implementation->GlobalIDRange->setText(
       QString("Global ID Range: %1 - %2").arg(gid_min).arg(gid_max));
-  }
+    }
   else
-  {
+    {
     this->Implementation->GlobalIDRange->setText("Global ID Range: <not available>");
-  }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1084,17 +1071,15 @@ void pqSelectionInspectorPanel::newValueSurfaceSelection()
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::updateSurfaceInformationAndDomains()
 {
-  if(!this->Implementation->InputSource)
+  if (!this->Implementation->InputPort)
     {
     return;
     }
+
   vtkSMSourceProxy* sourceProxy = vtkSMSourceProxy::SafeDownCast(
-    this->Implementation->InputSource->getProxy());
-  if(!sourceProxy)
-    {
-    return;
-    }
-  vtkPVDataInformation* dataInfo = sourceProxy->GetDataInformation(0, false);
+    this->Implementation->InputPort->getSource()->getProxy());
+  vtkPVDataInformation* dataInfo = sourceProxy->GetDataInformation(
+    this->Implementation->InputPort->getPortNumber(), false);
 
   if (!dataInfo)
     {
@@ -1435,12 +1420,11 @@ void pqSelectionInspectorPanel::onActiveViewChanged()
     this->Implementation->groupSelectionLabel->setEnabled(true);
     pqOutputPort* port = 
       this->Implementation->SelectionManager->getSelectedPort();
-    pqPipelineSource* input = port? port->getSource() : 0;
 
     pqDataRepresentation *repr = NULL;
-    if(input)
+    if (port)
       {
-      repr = input->getRepresentation(renView);
+      repr = port->getRepresentation(renView);
       }
 
     this->setRepresentation(repr);

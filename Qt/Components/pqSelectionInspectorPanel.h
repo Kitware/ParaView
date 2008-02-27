@@ -37,10 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 
 class pqDataRepresentation;
+class pqOutputPort;
 class pqPipelineSource;
+class pqProxy;
 class pqRubberBandHelper;
 class pqSelectionManager;
-class pqProxy;
 class pqServer;
 class pqServerManagerModelItem;
 class vtkSMClientDeliveryRepresentationProxy;
@@ -142,7 +143,7 @@ protected slots:
 private:
   /// Set the display whose properties we want to edit.
   void setRepresentation(pqDataRepresentation* repr);
-  void setInputSource(pqPipelineSource* input, int portnum);
+  void setInputSource(pqOutputPort* port);
   void setSelectionSource(vtkSMSourceProxy* source);
   void setEmptySelectionSource();
   void setSelectionManager(pqSelectionManager*);
