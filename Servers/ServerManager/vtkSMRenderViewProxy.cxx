@@ -90,7 +90,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.60");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.61");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -435,7 +435,7 @@ void vtkSMRenderViewProxy::ProcessEvents(vtkObject* caller, unsigned long eventI
     // renderer.
     this->ResetCameraClippingRange();
     }
-  else if (eventId == vtkCommand::StartEvent && caller == this->Renderer)
+  else if (eventId == vtkCommand::StartEvent && caller == this->RenderWindow)
     {
     // At the start of every render ensure that the 2D renderer and 3D renderer
     // have the same camera.
