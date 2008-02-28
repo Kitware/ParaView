@@ -1137,7 +1137,17 @@ void pqSelectionInspectorPanel::updateSelectionContentType(const QString& type)
     }
   else if(type == QString("IDs"))
     {
-    this->updateSurfaceIDConnections();
+    if (this->Implementation->UseGlobalIDs->isChecked() &&
+      this->Implementation->UseGlobalIDs->isEnabled())
+      {
+      pqSMAdaptor::setElementProperty(
+        idvp, vtkSelection::GLOBALIDS);
+      }
+    else
+      {
+      pqSMAdaptor::setElementProperty(
+        idvp, vtkSelection::INDICES);
+      }
     }
   else //None
     {
