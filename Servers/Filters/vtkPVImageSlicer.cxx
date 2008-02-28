@@ -22,7 +22,7 @@
 #include "vtkImageData.h"
 
 vtkStandardNewMacro(vtkPVImageSlicer);
-vtkCxxRevisionMacro(vtkPVImageSlicer, "1.2");
+vtkCxxRevisionMacro(vtkPVImageSlicer, "1.3");
 //----------------------------------------------------------------------------
 vtkPVImageSlicer::vtkPVImageSlicer()
 {
@@ -153,7 +153,7 @@ int vtkPVImageSlicer::RequestData(
 }
 
 //----------------------------------------------------------------------------
-int vtkImageAlgorithm::FillInputPortInformation(
+int vtkPVImageSlicer::FillInputPortInformation(
   int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkImageData");

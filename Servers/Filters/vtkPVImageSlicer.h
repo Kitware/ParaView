@@ -68,6 +68,8 @@ protected:
                           vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);
 
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
+
   unsigned int Slice;
   int SliceMode;
 private:
