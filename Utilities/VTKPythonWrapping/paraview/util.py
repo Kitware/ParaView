@@ -1,4 +1,9 @@
-import paraview
+import os
+from paraview import vtk 
+if os.name == "posix":
+    from libvtkPVServerCommonPython import *
+else:
+    from vtkPVServerCommonPython import *
 
 def SetOutputWholeExtent(algorithm, extent):
     """
@@ -12,7 +17,7 @@ def SetOutputWholeExtent(algorithm, extent):
     """
     if len(extent) != 6:
         raise "Expected a sequence of length 6"
-    algorithm.GetExecutive().GetOutputInformation(0).Set(paraview.vtkStreamingDemandDrivenPipeline.WHOLE_EXTENT(), extent[0], extent[1], extent[2],extent[3], extent[4], extent[5])
+    algorithm.GetExecutive().GetOutputInformation(0).Set(vtk.vtkStreamingDemandDrivenPipeline.WHOLE_EXTENT(), extent[0], extent[1], extent[2],extent[3], extent[4], extent[5])
 
 def IntegrateCell(dataset, cellId):
     """
@@ -23,4 +28,4 @@ def IntegrateCell(dataset, cellId):
     during volume calculation. In such cases, the result may not be exact.
     """
     
-    return paraview.vtkCellIntegrator.Integrate(dataset, cellId)
+    return vtkCellIntegrator.Integrate(dataset, cellId)

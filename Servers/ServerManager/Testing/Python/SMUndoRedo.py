@@ -7,8 +7,8 @@ import os.path
 import sys
 import time
 
-import paraview
-paraview.ActiveConnection = paraview.Connect()
+from paraview import servermanager
+servermanager.Connect()
 
 
 def RenderAndWait(ren):
@@ -22,14 +22,14 @@ pvsm_file = os.path.join(SMPythonTesting.SMStatesDir, "UndoRedo.pvsm")
 print "State file: %s" % pvsm_file
 SMPythonTesting.LoadServerManagerState(pvsm_file)
 
-pxm = paraview.pyProxyManager()
+pxm = servermanager.ProxyManager()
 renModule = pxm.GetProxy("rendermodules", "RenderModule0")
 renModule.UpdateVTKObjects()
 
-self_cid = paraview.ActiveConnection.ID 
+self_cid = servermanager.ActiveConnection.ID 
 
-undoStack = paraview.vtkSMUndoStack()
-undoStackBuilder = paraview.vtkSMUndoStackBuilder();
+undoStack = servermanager.vtkSMUndoStack()
+undoStackBuilder = servermanager.vtkSMUndoStackBuilder();
 undoStackBuilder.SetUndoStack(undoStack);
 undoStackBuilder.SetConnectionID(self_cid);
 

@@ -29,7 +29,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.25");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.26");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -283,8 +283,8 @@ void vtkPythonProgrammableFilter::Exec(const char* script)
       }
     vtkstd::string initscript;
     initscript  = "";
-    initscript += "import paraview;\n";
-    initscript += "self = paraview.vtkProgrammableFilter('";
+    initscript += "from paraview import vtk;\n";
+    initscript += "self = vtk.vtkProgrammableFilter('";
     initscript += aplus;
     initscript +=  "');\n";
     

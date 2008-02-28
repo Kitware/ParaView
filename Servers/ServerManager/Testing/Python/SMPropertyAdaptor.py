@@ -4,14 +4,14 @@ import SMPythonTesting
 import os
 import os.path
 import sys
-import paraview
+from paraview import servermanager
 
 SMPythonTesting.ProcessCommandLineArguments()
 
-paraview.ActiveConnection = paraview.Connect()
+servermanager.Connect()
 
-pxm = paraview.pyProxyManager()
-propAdap = paraview.vtkSMPropertyAdaptor()
+pxm = servermanager.ProxyManager()
+propAdap = servermanager.vtkSMPropertyAdaptor()
 
 # GlyphSource2D proxy
 glyphSourceProxy = pxm.NewProxy("sources", "GlyphSource2D")
