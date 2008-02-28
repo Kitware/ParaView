@@ -2166,6 +2166,8 @@ void pqMainWindowCore::initPythonInterpretor()
       .arg(activeServer->getResource().toURI())
       .arg(cid)
       .arg(activeServer->getResource().toURI());
+    this->Implementation->PythonDialog->print(
+      "from paraview import servermanager");
     this->Implementation->PythonDialog->runString(initStr);
     }
 

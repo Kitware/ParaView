@@ -60,6 +60,9 @@ public slots:
   /// new one without closing the dialog.
   void initializeInterpretor();
 
+  /// Simply prints some text onto the shell. Note that this does not treat it
+  /// as a python script and hence doesn't execute it.
+  void print(const QString& msg);
 signals:
   void interpreterInitialized();
 

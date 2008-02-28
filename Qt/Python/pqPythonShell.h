@@ -59,6 +59,9 @@ public:
   void initializeInterpretor(int argc, char* argv[]);
   void initializeInterpretor();
 
+  /// Prints some text on the shell.
+  void printMessage(const QString&);
+
 signals:
   void executing(bool);
 

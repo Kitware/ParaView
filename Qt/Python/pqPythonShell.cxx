@@ -242,6 +242,15 @@ void pqPythonShell::printStdout(const QString& text)
   QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 }
 
+void pqPythonShell::printMessage(const QString& text)
+{
+  QTextCharFormat format = this->Implementation->Console.getFormat();
+  format.setForeground(QColor(0, 0, 150));
+  this->Implementation->Console.setFormat(format);
+  
+  this->Implementation->Console.printString(text);
+}
+
 void pqPythonShell::printStderr(const QString& text)
 {
   QTextCharFormat format = this->Implementation->Console.getFormat();
