@@ -34,13 +34,14 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy, "1.8");
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetRepresentationProxy::vtkSMScalarBarWidgetRepresentationProxy()
 {
   this->ActorProxy = NULL;
   this->ViewProxy = NULL;
+  this->Enabled = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -59,6 +60,7 @@ bool vtkSMScalarBarWidgetRepresentationProxy::AddToView(vtkSMViewProxy* view)
     }
   
   this->ViewProxy = view;
+  this->SetEnabled(this->Enabled);
 
   return true;
 }
@@ -114,6 +116,17 @@ void vtkSMScalarBarWidgetRepresentationProxy::CreateVTKObjects()
     {
     return;
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMScalarBarWidgetRepresentationProxy::SetEnabled(int enable)
+{
+  if (this->ViewProxy)
+    {
+    this->Superclass::SetEnabled(enable);
+    }
+
+  this->Enabled = enable;
 }
 
 //----------------------------------------------------------------------------

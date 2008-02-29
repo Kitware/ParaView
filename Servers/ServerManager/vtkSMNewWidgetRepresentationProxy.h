@@ -45,7 +45,7 @@ public:
  
   // Description:
   // Calls set enabled on the WidgetProxy.
-  void SetEnabled(int enable);
+  virtual void SetEnabled(int enable);
 
 //BTX
 protected:

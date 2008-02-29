@@ -6574,7 +6574,6 @@
           <Property name="Position2"/>
           <Property name="PositionInfo"/>
           <Property name="Position2Info"/>
-          <Property name="ScalarBarActor"/>
         </ExposedProperties>
       </SubProxy>
 
@@ -6613,7 +6612,6 @@
                proxygroup="3d_widgets" proxyname="ScalarBarWidget">
         </Proxy>
         <ExposedProperties>
-          <Property name="Enabled" />
           <Property name="Selectable" />
           <Property name="Resizable" />
           <Property name="Repositionable" />

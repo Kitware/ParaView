@@ -36,6 +36,12 @@ public:
                        vtkSMNewWidgetRepresentationProxy);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Calls set enabled on the WidgetProxy.
+  // Overrridden to not pass the enabled state to WidgetProxy unless the
+  // representation has been added to a view.
+  virtual void SetEnabled(int enable);
+
 protected:
   vtkSMScalarBarWidgetRepresentationProxy();
   ~vtkSMScalarBarWidgetRepresentationProxy();
@@ -59,6 +65,7 @@ protected:
 
   vtkSMProxy* ActorProxy;
   vtkSMViewProxy* ViewProxy;
+  int Enabled;
 
 private:
   void ExecuteEvent(unsigned long event);
