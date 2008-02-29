@@ -61,13 +61,13 @@ class pqCompositeTreeWidgetItem : public pqTreeWidgetItemObject
   typedef pqTreeWidgetItemObject Superclass;
   int triStateCheckState;
 public:
-  pqCompositeTreeWidgetItem(QTreeWidget* tree, QStringList values):
-    Superclass(tree, values), triStateCheckState(Qt::Unchecked)
+  pqCompositeTreeWidgetItem(QTreeWidget* tree, QStringList _values):
+    Superclass(tree, _values), triStateCheckState(Qt::Unchecked)
   {
   }
 
-  pqCompositeTreeWidgetItem(QTreeWidgetItem* item, QStringList values):
-    Superclass(item, values), triStateCheckState(Qt::Unchecked)
+  pqCompositeTreeWidgetItem(QTreeWidgetItem* item, QStringList _values):
+    Superclass(item, _values), triStateCheckState(Qt::Unchecked)
   {
   }
 
