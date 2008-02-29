@@ -1534,7 +1534,7 @@ def _printProgress(caller, event):
 def updateModules():
     """Called when a plugin is loaded, this method updates
     the proxy class object in all known modules."""
-    global sources, filters, writers, rendering, animation
+    global sources, filters, writers, rendering, animation, implicit_functions
 
     createModule("sources", sources)
     createModule("filters", filters)
@@ -1545,11 +1545,12 @@ def updateModules():
     createModule("textures", rendering)
     createModule("animation", animation)
     createModule('animation_keyframes', animation)
+    createModule('implicit_functions', implicit_functions)
     
 def _createModules():
     """Called when the module is loaded, this creates sub-
     modules for all know proxy groups."""
-    global sources, filters, writers, rendering, animation
+    global sources, filters, writers, rendering, animation, implicit_functions
 
     sources = createModule('sources')
     filters = createModule('filters')
@@ -1560,6 +1561,7 @@ def _createModules():
     createModule("textures", rendering)
     animation = createModule('animation')
     createModule('animation_keyframes', animation)
+    implicit_functions = createModule('implicit_functions')
     
 def createModule(groupName, mdl=None):
     """Populates a module with proxy classes defined in the given group.
