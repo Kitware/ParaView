@@ -41,7 +41,7 @@
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.3");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.4");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //============================================================================
@@ -1578,8 +1578,8 @@ void vtkCTHFragmentConnect::ShareGhostBlocks()
   // First, setup the count and displacement arrays required by AllGatherV.
   int totalNumberOfBlocks = 0;
   int *sendCounts = new int[numProcs];
-  int *recvCounts = new int[numProcs];
-  int *displacements = new int[numProcs];
+  vtkIdType *recvCounts = new vtkIdType[numProcs];
+  vtkIdType *displacements = new vtkIdType[numProcs];
   for (int ii = 0; ii < numProcs; ++ii)
     {
     displacements[ii] = totalNumberOfBlocks * 7;
