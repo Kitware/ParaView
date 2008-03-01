@@ -19,13 +19,11 @@
 // a particle index as part of the cell data of the output.  It computes
 // the volume of each particle from the volume fraction.
 
-
-
 #ifndef __vtkCTHFragmentConnect_h
 #define __vtkCTHFragmentConnect_h
 
 #include "vtkPolyDataAlgorithm.h"
-#include "vtkstd/vector"
+#include "vtkstd/vector" // using vector internally. ok for leaf classes.
 
 class vtkCellArray;
 class vtkImageData;
@@ -37,7 +35,7 @@ class vtkCTHFragmentConnectIterator;
 class vtkCTHFragmentEquivalenceSet;
 class vtkMultiProcessController;
 
-class VTK_GRAPHICS_EXPORT vtkCTHFragmentConnect : public vtkPolyDataAlgorithm
+class VTK_EXPORT vtkCTHFragmentConnect : public vtkPolyDataAlgorithm
 {
 public:
   static vtkCTHFragmentConnect *New();
