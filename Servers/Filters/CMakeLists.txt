@@ -13,6 +13,7 @@ SET(Filters_SRCS
   vtkAnimationPlayer.cxx
   vtkAppendRectilinearGrid.cxx
   vtkAttributeDataReductionFilter.cxx
+  vtkCTHFragmentConnect.cxx
   vtkCameraManipulator.cxx
   vtkCameraManipulatorGUIHelper.cxx
   vtkCaveRenderManager.cxx
