@@ -41,7 +41,7 @@
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.4");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.5");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //============================================================================
@@ -1633,7 +1633,6 @@ void vtkCTHFragmentConnect::ShareGhostBlocks()
   
 
     
-  /*
   // Now get the actual data
   int MPI_Alltoallv(void *sbuf, int *scounts, int *sdisps, MPI_Datatype sdtype, 
               void *rbuf, int *rcounts, int *rdisps, MPI_Datatype rdtype, 
@@ -3276,7 +3275,7 @@ void vtkCTHFragmentConnect::ResolveEquivalences(vtkIntArray* fragmentIdArray)
 
 //----------------------------------------------------------------------------
 void vtkCTHFragmentConnect::GatherEquivalenceSets(
-       vtkCTHFragmentEquivalenceSet* set)
+  vtkCTHFragmentEquivalenceSet* vtkNotUsed(set))
 {
 /*
   int numProcs = this->Controller->GetNumberOfProcesses();
