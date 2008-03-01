@@ -635,8 +635,6 @@ IF (PARAVIEW_ENABLE_PYTHON)
     vtk
     servermanager
     __init__
-    servermanager
-    vtk
     numeric
     util
     )
@@ -644,9 +642,19 @@ IF (PARAVIEW_ENABLE_PYTHON)
   # Now copy these files if necessary.
   SET(PV_PYTHON_SOURCE_FILES)
   SET(PV_PYTHON_OUTPUT_FILES)
-  FOREACH(file ${VTK_PYTHON_FILES})
+  FOREACH(file ${PV_PYTHON_FILES})
     SET(src "${PV_PYTHON_MODULE_SOURCE_DIR}/${file}.py")
-    SET(PV_PYTHON_SOURCE_FILES ${VTK_PYTHON_SOURCE_FILES} ${src})
+    SET(PV_PYTHON_SOURCE_FILES ${PV_PYTHON_SOURCE_FILES} ${src})
+  ENDFOREACH(file)
+
+  # All VTK util py included in the paraview module.
+  SET(PV_VTK_PYTHON_FILES
+    numpy_support
+    vtkConstants
+    )
+  FOREACH(file ${PV_VTK_PYTHON_FILES})
+    SET(src "${VTK_SOURCE_DIR}/Wrapping/Python/vtk/util/${file}.py")
+    SET(PV_PYTHON_SOURCE_FILES ${PV_PYTHON_SOURCE_FILES} ${src})
   ENDFOREACH(file)
 
   IF ("${VTK_BINARY_DIR}" MATCHES "^${VTK_SOURCE_DIR}$")
@@ -654,6 +662,16 @@ IF (PARAVIEW_ENABLE_PYTHON)
   ELSE ("${VTK_BINARY_DIR}" MATCHES "^${VTK_SOURCE_DIR}$")
     FOREACH(file ${PV_PYTHON_FILES})
       SET(src "${PV_PYTHON_MODULE_SOURCE_DIR}/${file}.py")
+      SET(tgt "${PV_PYTHON_MODULE_BINARY_DIR}/${file}.py")
+      ADD_CUSTOM_COMMAND(DEPENDS ${src}
+        COMMAND ${CMAKE_COMMAND}
+        ARGS -E copy ${src} ${tgt}
+        OUTPUT ${tgt}
+        COMMENT "source copy")
+      SET(PV_PYTHON_OUTPUT_FILES ${PV_PYTHON_OUTPUT_FILES} ${tgt})
+    ENDFOREACH(file)
+    FOREACH(file ${PV_VTK_PYTHON_FILES})
+      SET(src "${VTK_SOURCE_DIR}/Wrapping/Python/vtk/util/${file}.py")
       SET(tgt "${PV_PYTHON_MODULE_BINARY_DIR}/${file}.py")
       ADD_CUSTOM_COMMAND(DEPENDS ${src}
         COMMAND ${CMAKE_COMMAND}
