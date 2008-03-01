@@ -31,19 +31,20 @@
 #include "vtkCellData.h"
 #include "vtkDataSetWriter.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkUniformGrid.h"
+#include "vtkAMRBox.h"
 #include <math.h>
 
-#include "vtkMultiGroupDataSet.h"
 #include "vtkDataSet.h"
 #include "vtkDataObject.h"
-#include "vtkHierarchicalDataSet.h"
+#include "vtkHierarchicalBoxDataSet.h"
 #include "vtkXMLPolyDataWriter.h"
 #include "mpi.h"
 
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.1");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.2");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 
@@ -1026,7 +1027,7 @@ int vtkCTHFragmentConnect::InitializeBlocks(vtkImageData* input)
 
 //----------------------------------------------------------------------------
 // Initialize blocks from multi block input.
-int vtkCTHFragmentConnect::InitializeBlocks(vtkHierarchicalDataSet* input)
+int vtkCTHFragmentConnect::InitializeBlocks(vtkHierarchicalBoxDataSet* input)
 {
   int level;
   int numLevels = input->GetNumberOfLevels();
@@ -1069,7 +1070,8 @@ int vtkCTHFragmentConnect::InitializeBlocks(vtkHierarchicalDataSet* input)
     int numBlocks = input->GetNumberOfDataSets(level);
     for (int levelBlockId = 0; levelBlockId < numBlocks; ++levelBlockId)
       {
-      vtkImageData* image = vtkImageData::SafeDownCast(input->GetDataSet(level,levelBlockId));
+      vtkAMRBox box;
+      vtkImageData* image = input->GetDataSet(level,levelBlockId,box);
       // TODO: We need to check the CELL_DATA and the correct volume fraction array.
 
       if (image)
@@ -1407,7 +1409,7 @@ int vtkCTHFragmentConnect::HasNeighbor(
 // All processes must share a common origin.
 // Returns the total number of blocks in all levels (this process only).
 int vtkCTHFragmentConnect::ComputeOriginAndRootSpacing(
-  vtkHierarchicalDataSet* input)
+  vtkHierarchicalBoxDataSet* input)
 {
   int numLevels = input->GetNumberOfLevels();
   int numBlocks;
@@ -1442,7 +1444,8 @@ int vtkCTHFragmentConnect::ComputeOriginAndRootSpacing(
     numBlocks = input->GetNumberOfDataSets(level);
     for (blockId = 0; blockId < numBlocks; ++blockId)
       {
-      vtkImageData* image = vtkImageData::SafeDownCast(input->GetDataSet(level,blockId));
+      vtkAMRBox box;
+      vtkImageData* image = input->GetDataSet(level,blockId,box);
       if (image)
         {
         ++totalNumberOfBlocksInThisProcess;
@@ -1957,7 +1960,7 @@ int vtkCTHFragmentConnect::RequestData(
     }
     
   // Try AMR
-  vtkHierarchicalDataSet *hds=vtkHierarchicalDataSet::SafeDownCast(
+  vtkHierarchicalBoxDataSet *hds=vtkHierarchicalBoxDataSet::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
   if (hds)
     {

@@ -30,7 +30,7 @@
 class vtkCellArray;
 class vtkImageData;
 class vtkPoints;
-class vtkHierarchicalDataSet;
+class vtkHierarchicalBoxDataSet;
 class vtkCTHFragmentLevel;
 class vtkCTHFragmentConnectBlock;
 class vtkCTHFragmentConnectIterator;
@@ -53,6 +53,7 @@ protected:
   vtkCTHFragmentConnect();
   ~vtkCTHFragmentConnect();
 
+  //BTX
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   virtual int FillInputPortInformation(int port, vtkInformation *info);
 
@@ -88,7 +89,7 @@ protected:
         vtkCTHFragmentConnectIterator pointNeighborIterators[8]);
   // Returns the total number of blocks in all levels (local process only).
   int  ComputeOriginAndRootSpacing(
-        vtkHierarchicalDataSet* input);
+        vtkHierarchicalBoxDataSet* input);
 
   char *VolumeFractionArrayName;
 
@@ -130,7 +131,7 @@ protected:
   vtkCTHFragmentConnectBlock** InputBlocks;
   void DeleteAllBlocks();
   int InitializeBlocks(vtkImageData* input); 
-  int InitializeBlocks(vtkHierarchicalDataSet* input); 
+  int InitializeBlocks(vtkHierarchicalBoxDataSet* input); 
   void AddBlock(vtkCTHFragmentConnectBlock* block);
 
   // New methods for connecting neighbors.
@@ -177,6 +178,7 @@ protected:
 private:
   vtkCTHFragmentConnect(const vtkCTHFragmentConnect&);  // Not implemented.
   void operator=(const vtkCTHFragmentConnect&);  // Not implemented.
+  //ETX
 };
 
 #endif
