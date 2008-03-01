@@ -51,6 +51,10 @@ public:
   // Access to adding or removing manipulators.
   void AddManipulator(vtkCameraManipulator *m);
 
+  // Description:
+  // Removes all manipulators.
+  void RemoveAllManipulators();
+
   //BTX
   // Description:
   // Accessor for the collection of camera manipulators.

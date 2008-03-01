@@ -25,7 +25,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.3");
+vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.4");
 vtkStandardNewMacro(vtkPVInteractorStyle);
 
 //-------------------------------------------------------------------------
@@ -43,6 +43,12 @@ vtkPVInteractorStyle::~vtkPVInteractorStyle()
 {
   this->CameraManipulators->Delete();
   this->CameraManipulators = NULL;
+}
+
+//-------------------------------------------------------------------------
+void vtkPVInteractorStyle::RemoveAllManipulators()
+{
+  this->CameraManipulators->RemoveAllItems();
 }
 
 //-------------------------------------------------------------------------
