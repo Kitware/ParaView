@@ -6068,6 +6068,36 @@ Tessellate a higher-order dataset.
    <!-- End GroupIdScalars -->
    </SourceProxy>
 
+   <SourceProxy name="CTHFragmentConnect" class="vtkCTHFragmentConnect"
+      label="Extract CTH Boundaries and Fragments">
+     <Documentation
+        long_help=""
+        short_help="">
+     </Documentation>
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkHierarchicalBoxDataSet"/>
+           </DataTypeDomain>
+           <Documentation>
+             This property specifies the input to this filter.
+           </Documentation>
+     </InputProperty>
+     <StringVectorProperty name="VolumeFractionArray"
+                           command="SetVolumeFractionArrayName"
+                           number_of_elements="1">
+       <Documentation>
+         The name of the volume fraction array to process.
+       </Documentation>
+     </StringVectorProperty>
+   <!-- End CTHFragmentConnect -->
+   </SourceProxy>
+
     <SourceProxy name="GeometryFilter" class="vtkPVGeometryFilter">
       <InputProperty
         name="Input"

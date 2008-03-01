@@ -50,6 +50,7 @@
   <Filter name="CleanUnstructuredGrid" />
   <Filter name="Clip" />
   <Filter name="Contour" />
+  <Filter name="CTHFragmentConnect"/>
   <Filter name="CTHPart" />
   <Filter name="Curvatures" />
   <Filter name="Cut" />
