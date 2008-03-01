@@ -15,8 +15,6 @@
 #include "vtkCTHFragmentConnect.h"
 
 #include "vtkMultiProcessController.h"
-#include "vtkMPICommunicator.h"
-#include "vtkMPI.h"
 
 #include "vtkCollection.h"
 #include "vtkCellArray.h"
@@ -39,15 +37,12 @@
 #include "vtkDataObject.h"
 #include "vtkHierarchicalBoxDataSet.h"
 #include "vtkXMLPolyDataWriter.h"
-#include "mpi.h"
 
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.2");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.3");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
-
-
 
 //============================================================================
 // A class that implements an equivalent set.  It is used to combine fragments
@@ -1566,19 +1561,18 @@ void vtkCTHFragmentConnect::ShareGhostBlocks()
 {
   int numProcs = this->Controller->GetNumberOfProcesses();
   int myProc = this->Controller->GetLocalProcessId();
-  vtkMPICommunicator* com 
-    = vtkMPICommunicator::SafeDownCast(this->Controller->GetCommunicator());
+  vtkCommunicator* com  = this->Controller->GetCommunicator();
 
   // Bad things can happen if not all processes call 
   // MPI_Alltoallv this at the same time. (mpich)
   this->Controller->Barrier();
   
-
   // First share the number of blocks.
   int *blocksPerProcess = new int[numProcs];
-  MPI_Allgather(&(this->NumberOfInputBlocks), 1, MPI_INT,
-                blocksPerProcess, 1, MPI_INT,
-               *com->GetMPIComm()->GetHandle());
+  com->AllGather(&(this->NumberOfInputBlocks), blocksPerProcess, 1);
+  //MPI_Allgather(&(this->NumberOfInputBlocks), 1, MPI_INT,
+  //blocksPerProcess, 1, MPI_INT,
+  //*com->GetMPIComm()->GetHandle());
   
   // Share the levels and extents of all blocks.
   // First, setup the count and displacement arrays required by AllGatherV.
@@ -1612,9 +1606,12 @@ void vtkCTHFragmentConnect::ShareGhostBlocks()
   int *gatheredBlockInfo = new int[totalNumberOfBlocks*7];
 
   // TODO: check for errors ...
-  MPI_Allgatherv((void*)localBlockInfo, this->NumberOfInputBlocks*7, MPI_INT, 
-                 (void*)gatheredBlockInfo, recvCounts, displacements, 
-                 MPI_INT, *com->GetMPIComm()->GetHandle());
+  com->AllGatherV(localBlockInfo, gatheredBlockInfo,
+                  this->NumberOfInputBlocks*7, recvCounts, 
+                  displacements);
+  //MPI_Allgatherv((void*)localBlockInfo, this->NumberOfInputBlocks*7, MPI_INT, 
+  //(void*)gatheredBlockInfo, recvCounts, displacements, 
+  //MPI_INT, *com->GetMPIComm()->GetHandle());
 
   this->ComputeAndDistributeGhostBlocks(blocksPerProcess,
                                         gatheredBlockInfo,
