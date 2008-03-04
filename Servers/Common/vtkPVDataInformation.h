@@ -33,6 +33,7 @@ class vtkCollection;
 class vtkCompositeDataSet;
 class vtkDataSet;
 class vtkGenericDataSet;
+class vtkGraph;
 class vtkPVArrayInformation;
 class vtkPVCompositeDataInformation;
 class vtkPVDataSetAttributesInformation;
@@ -146,6 +147,7 @@ protected:
   void CopyFromCompositeDataSet(vtkCompositeDataSet* data);
   void CopyFromDataSet(vtkDataSet* data);
   void CopyFromGenericDataSet(vtkGenericDataSet *data);
+  void CopyFromGraph(vtkGraph* graph);
   void CopyFromTable(vtkTable* table);
   void CopyFromSelection(vtkSelection* selection);
 

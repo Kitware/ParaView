@@ -23,8 +23,10 @@
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataArray.h"
+#include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
 #include "vtkGenericDataSet.h"
+#include "vtkGraph.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
@@ -45,7 +47,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.45");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.46");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -466,6 +468,27 @@ void vtkPVDataInformation::CopyFromSelection(vtkSelection* data)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVDataInformation::CopyFromGraph(vtkGraph* data)
+{
+  this->SetDataClassName(data->GetClassName());
+  this->DataSetType = data->GetDataObjectType();
+  this->NumberOfDataSets = 1;
+  this->Bounds[0] = this->Bounds[1] = this->Bounds[2] 
+    = this->Bounds[3] = this->Bounds[4] = this->Bounds[5] = 0;
+
+  if(data->GetPoints())
+    data->GetPoints()->GetBounds(this->Bounds);
+
+  this->MemorySize = data->GetActualMemorySize();
+  this->NumberOfCells = data->GetNumberOfEdges();
+  this->NumberOfPoints = data->GetNumberOfVertices();
+  this->NumberOfRows = 0;
+
+  this->PointDataInformation->CopyFromFieldData(data->GetVertexData());
+  this->CellDataInformation->CopyFromFieldData(data->GetVertexData());
+}
+
+//----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromTable(vtkTable* data)
 {
   this->SetDataClassName(data->GetClassName());
@@ -525,6 +548,13 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if (ads)
     {
     this->CopyFromGenericDataSet(ads);
+    return;
+    }
+
+  vtkGraph* graph = vtkGraph::SafeDownCast(dobj);
+  if( graph)
+    {
+    this->CopyFromGraph(graph);
     return;
     }
 
@@ -883,57 +913,7 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString()
 //----------------------------------------------------------------------------
 const char* vtkPVDataInformation::GetDataSetTypeAsString()
 {
-  switch(this->DataSetType)
-    {
-    case VTK_POLY_DATA:
-      return "vtkPolyData";
-    case VTK_STRUCTURED_POINTS:
-      return "vtkStructuredPoints";
-    case VTK_STRUCTURED_GRID:
-      return "vtkStructuredGrid";
-    case VTK_RECTILINEAR_GRID:
-      return "vtkRectilinearGrid";
-    case VTK_UNSTRUCTURED_GRID:
-      return "vtkUnstructuredGrid";
-    case VTK_PIECEWISE_FUNCTION:
-      return "vtkPiecewiseFunction";
-    case VTK_IMAGE_DATA:
-      return "vtkImageData";
-    case VTK_DATA_OBJECT:
-      return "vtkDataObject";
-    case VTK_DATA_SET:
-      return "vtkDataSet";
-    case VTK_POINT_SET:
-      return "vtkPointSet";
-    case VTK_UNIFORM_GRID:
-      return "vtkUniformGrid";
-    case VTK_COMPOSITE_DATA_SET:
-      return "vtkCompositeDataSet";
-    case VTK_MULTIGROUP_DATA_SET:
-      return "vtkMultigroupDataSet";
-    case VTK_MULTIBLOCK_DATA_SET:
-      return "vtkMultiblockDataSet";
-    case VTK_HIERARCHICAL_DATA_SET:
-      return "vtkHierarchicalDataSet";
-    case VTK_HIERARCHICAL_BOX_DATA_SET:
-      return "vtkHierarchicalBoxDataSet";
-    case VTK_GENERIC_DATA_SET:
-      return "vtkGenericDataSet";
-    case VTK_HYPER_OCTREE:
-      return "vtkHyperOctree";
-    case VTK_TEMPORAL_DATA_SET:
-      return "vtkTemporalDataSet";
-    case VTK_TABLE:
-      return "vtkTable";
-    case VTK_GRAPH:
-      return "vtkGraph";
-    case VTK_TREE:
-      return "vtkTree";
-    case VTK_MULTIPIECE_DATA_SET:
-      return "vtkMultiPieceDataSet";
-    }
-  
-  return "UnknownType";
+  return vtkDataObjectTypes::GetClassNameFromTypeId(this->DataSetType);
 }
 
 //----------------------------------------------------------------------------
