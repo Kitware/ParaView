@@ -1,8 +1,4 @@
-# - try to find SILO library and include files
-#
-#  If SILO is not located somewhere obvious
-#  then set SILO_DIR before running this file.
-#
+#  Try to find SILO library and headers.
 #  This file sets the following variables:
 #
 #  SILO_INCLUDE_DIR, where to find silo.h, etc.
