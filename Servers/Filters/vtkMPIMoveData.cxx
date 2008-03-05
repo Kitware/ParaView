@@ -20,6 +20,7 @@
 #include "vtkCharArray.h"
 #include "vtkDataSetReader.h"
 #include "vtkDataSetWriter.h"
+#include "vtkImageAppend.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -37,12 +38,15 @@
 #include "vtkToolkits.h"
 #include "vtkUnstructuredGrid.h"
 
+#include <vtksys/ios/sstream>
+#define EXTENT_HEADER_SIZE 360
+
 #ifdef VTK_USE_MPI
 #include "vtkMPICommunicator.h"
 #include "vtkAllToNRedistributePolyData.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.18");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.19");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -102,9 +106,9 @@ int vtkMPIMoveData::RequestDataObject(vtkInformation*,
                                       vtkInformationVector**,
                                       vtkInformationVector* outputVector)
 {
-  vtkDataObject* output = 
+  vtkDataObject* output =
     outputVector->GetInformationObject(0)->Get(vtkDataObject::DATA_OBJECT());
-  
+
   vtkDataObject* outputCopy = 0;
   if (this->OutputDataType == VTK_POLY_DATA)
     {
@@ -209,19 +213,13 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
         vtkDataObject::DATA_OBJECT()));
     }
 
-  // We do not yet collect 3D image data but we pretend to handle it.
-  // This is here to prevent errors on the client side during structured
-  // volume rendering.
+
   if (this->OutputDataType == VTK_IMAGE_DATA)
     {
-    vtkImageData* idInput = vtkImageData::SafeDownCast(input);
-    if (!idInput || idInput->GetDataDimension() == 3)
+    if (this->MoveMode == vtkMPIMoveData::PASS_THROUGH && this->MPIMToNSocketConnection)
       {
-      if (input)
-        {
-        output->ShallowCopy(input);
-        }
-      return 1;
+      vtkErrorMacro("Image data delivery to render server not supported.");
+      return 0;
       }
     }
 
@@ -232,7 +230,7 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
 
   // This case deals with everything running as one MPI group
   // Client, Data and render server are all the same program.
-  // This covers single process mode too, although this filter 
+  // This covers single process mode too, although this filter
   // is unnecessary in that mode and really should not be put in.
   if (this->MPIMToNSocketConnection == 0 &&
       this->ClientDataServerSocketController == 0)
@@ -257,12 +255,12 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
       }
     vtkErrorMacro("MoveMode not set.");
     return 0;
-    }    
+    }
 
   // PassThrough with no RenderServer. (Distributed rendering on data server).
-  // Data server copy input to output. 
+  // Data server copy input to output.
   // Render server and client will not have an input.
-  if (this->MoveMode == vtkMPIMoveData::PASS_THROUGH && 
+  if (this->MoveMode == vtkMPIMoveData::PASS_THROUGH &&
       this->MPIMToNSocketConnection == 0)
     {
     if (input)
@@ -275,12 +273,12 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
   // Passthrough and RenderServer (Distributed rendering on render server).
   // Data server MtoN
   // Move data from N data server processes to N render server processes.
-  if (this->MoveMode == vtkMPIMoveData::PASS_THROUGH && 
+  if (this->MoveMode == vtkMPIMoveData::PASS_THROUGH &&
       this->MPIMToNSocketConnection)
     {
     if (this->Server == vtkMPIMoveData::DATA_SERVER)
       {
-      this->DataServerAllToN(input,output, 
+      this->DataServerAllToN(input,output,
                       this->MPIMToNSocketConnection->GetNumberOfConnections());
       this->DataServerSendToRenderServer(output);
       output->Initialize();
@@ -298,7 +296,7 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
   // Duplicate with no RenderServer.(Tile rendering on data server and client).
   // GatherAll on data server.
   // Data server process 0 sends data to client.
-  if (this->MoveMode == vtkMPIMoveData::CLONE && 
+  if (this->MoveMode == vtkMPIMoveData::CLONE &&
       this->MPIMToNSocketConnection ==0)
     {
     if (this->Server == vtkMPIMoveData::DATA_SERVER)
@@ -319,7 +317,7 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
   // Data server process 0 sends to client
   // Data server process 0 sends to render server 0
   // Render server process 0 broad casts to all render server processes.
-  if (this->MoveMode == vtkMPIMoveData::CLONE && 
+  if (this->MoveMode == vtkMPIMoveData::CLONE &&
       this->MPIMToNSocketConnection)
     {
     if (this->Server == vtkMPIMoveData::DATA_SERVER)
@@ -340,7 +338,7 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
       this->RenderServerZeroBroadcast(output);
       }
     }
-  
+
   // Collect and data server or render server (client rendering).
   // GatherToZero on data server.
   // Data server process 0 sends data to client.
@@ -366,7 +364,7 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
 //-----------------------------------------------------------------------------
 // Use LANL filter to redistribute the data.
 // We will marshal more than once, but that is OK.
-void vtkMPIMoveData::DataServerAllToN(vtkDataSet* inData, 
+void vtkMPIMoveData::DataServerAllToN(vtkDataSet* inData,
                                       vtkDataSet* outData, int n)
 {
   vtkMultiProcessController* controller = this->Controller;
@@ -419,7 +417,7 @@ void vtkMPIMoveData::DataServerAllToN(vtkDataSet* inData,
 }
 
 //-----------------------------------------------------------------------------
-void vtkMPIMoveData::DataServerGatherAll(vtkDataSet* input, 
+void vtkMPIMoveData::DataServerGatherAll(vtkDataSet* input,
                                          vtkDataSet* output)
 {
   int numProcs= this->Controller->GetNumberOfProcesses();
@@ -433,7 +431,7 @@ void vtkMPIMoveData::DataServerGatherAll(vtkDataSet* input,
 #ifdef VTK_USE_MPI
   int idx;
   vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(
-                                         this->Controller->GetCommunicator()); 
+                                         this->Controller->GetCommunicator());
 
   if (com == 0)
     {
@@ -455,7 +453,7 @@ void vtkMPIMoveData::DataServerGatherAll(vtkDataSet* input,
   // Allocate arrays used by the AllGatherV call.
   this->BufferLengths = new vtkIdType[numProcs];
   this->BufferOffsets = new vtkIdType[numProcs];
-  
+
   // Compute the degenerate input offsets and lengths.
   // Broadcast our size to all other processes.
   com->AllGather(&inBufferLength, this->BufferLengths, 1);
@@ -470,18 +468,18 @@ void vtkMPIMoveData::DataServerGatherAll(vtkDataSet* input,
   // Gather the marshaled data sets from all procs.
   this->NumberOfBuffers = numProcs;
   this->Buffers = new char[this->BufferTotalLength];
-  com->AllGatherV(inBuffer, this->Buffers, inBufferLength, 
+  com->AllGatherV(inBuffer, this->Buffers, inBufferLength,
                   this->BufferLengths, this->BufferOffsets);
 
   this->ReconstructDataFromBuffer(output);
-  
+
   //int fixme; // Do not clear buffers here
   this->ClearBuffer();
 #endif
 }
 
 //-----------------------------------------------------------------------------
-void vtkMPIMoveData::DataServerGatherToZero(vtkDataSet* input, 
+void vtkMPIMoveData::DataServerGatherToZero(vtkDataSet* input,
                                             vtkDataSet* output)
 {
   int numProcs= this->Controller->GetNumberOfProcesses();
@@ -497,7 +495,7 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataSet* input,
   int idx;
   int myId= this->Controller->GetLocalProcessId();
   vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(
-                                         this->Controller->GetCommunicator()); 
+                                         this->Controller->GetCommunicator());
 
   if (com == 0)
     {
@@ -539,7 +537,7 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataSet* input,
     // Gather the marshaled data sets to 0.
     this->Buffers = new char[this->BufferTotalLength];
     }
-  com->GatherV(inBuffer, this->Buffers, inBufferLength, 
+  com->GatherV(inBuffer, this->Buffers, inBufferLength,
                   this->BufferLengths, this->BufferOffsets, 0);
   this->NumberOfBuffers = numProcs;
 
@@ -561,7 +559,7 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataSet* input,
 //-----------------------------------------------------------------------------
 void vtkMPIMoveData::DataServerSendToRenderServer(vtkDataSet* output)
 {
-  vtkSocketCommunicator* com = 
+  vtkSocketCommunicator* com =
       this->MPIMToNSocketConnection->GetSocketCommunicator();
 
   if (com == 0)
@@ -584,7 +582,7 @@ void vtkMPIMoveData::DataServerSendToRenderServer(vtkDataSet* output)
 //-----------------------------------------------------------------------------
 void vtkMPIMoveData::RenderServerReceiveFromDataServer(vtkDataSet* output)
 {
-  vtkSocketCommunicator* com = 
+  vtkSocketCommunicator* com =
       this->MPIMToNSocketConnection->GetSocketCommunicator();
 
   if (com == 0)
@@ -620,7 +618,7 @@ void vtkMPIMoveData::DataServerZeroSendToRenderServerZero(vtkDataSet* data)
 
   if (myId == 0)
     {
-    vtkSocketCommunicator* com = 
+    vtkSocketCommunicator* com =
         this->MPIMToNSocketConnection->GetSocketCommunicator();
 
     if (com == 0)
@@ -648,7 +646,7 @@ void vtkMPIMoveData::RenderServerZeroReceiveFromDataServerZero(vtkDataSet* data)
 
   if (myId == 0)
     {
-    vtkSocketCommunicator* com = 
+    vtkSocketCommunicator* com =
         this->MPIMToNSocketConnection->GetSocketCommunicator();
 
     if (com == 0)
@@ -713,9 +711,9 @@ void vtkMPIMoveData::DataServerSendToClient(vtkDataSet* output)
     this->MarshalDataToBuffer(tosend);
     this->ClientDataServerSocketController->Send(
                                      &(this->NumberOfBuffers), 1, 1, 23490);
-    this->ClientDataServerSocketController->Send(this->BufferLengths, 
+    this->ClientDataServerSocketController->Send(this->BufferLengths,
                                      this->NumberOfBuffers, 1, 23491);
-    this->ClientDataServerSocketController->Send(this->Buffers, 
+    this->ClientDataServerSocketController->Send(this->Buffers,
                                      this->BufferTotalLength, 1, 23492);
     this->ClearBuffer();
     vtkTimerLog::MarkEndEvent("Dataserver sending to client");
@@ -736,7 +734,7 @@ void vtkMPIMoveData::ClientReceiveFromDataServer(vtkDataSet* output)
   this->ClearBuffer();
   com->Receive(&(this->NumberOfBuffers), 1, 1, 23490);
   this->BufferLengths = new vtkIdType[this->NumberOfBuffers];
-  com->Receive(this->BufferLengths, this->NumberOfBuffers, 
+  com->Receive(this->BufferLengths, this->NumberOfBuffers,
                                   1, 23491);
   // Compute additional buffer information.
   this->BufferOffsets = new vtkIdType[this->NumberOfBuffers];
@@ -747,7 +745,7 @@ void vtkMPIMoveData::ClientReceiveFromDataServer(vtkDataSet* output)
     this->BufferTotalLength += this->BufferLengths[idx];
     }
   this->Buffers = new char[this->BufferTotalLength];
-  com->Receive(this->Buffers, this->BufferTotalLength, 
+  com->Receive(this->Buffers, this->BufferTotalLength,
                                   1, 23492);
   this->ReconstructDataFromBuffer(output);
   this->ClearBuffer();
@@ -768,7 +766,7 @@ void vtkMPIMoveData::RenderServerZeroBroadcast(vtkDataSet* data)
   int myId= this->Controller->GetLocalProcessId();
 
   vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(
-                                         this->Controller->GetCommunicator()); 
+                                         this->Controller->GetCommunicator());
 
   if (com == 0)
     {
@@ -783,7 +781,7 @@ void vtkMPIMoveData::RenderServerZeroBroadcast(vtkDataSet* data)
     this->MarshalDataToBuffer(data);
     bufferLength = this->BufferLengths[0];
     }
-  
+
   // Broadcast the size of the buffer.
   com->Broadcast(&bufferLength, 1, 0);
 
@@ -807,7 +805,7 @@ void vtkMPIMoveData::RenderServerZeroBroadcast(vtkDataSet* data)
     {
     this->ReconstructDataFromBuffer(data);
     }
-  
+
   this->ClearBuffer();
 #endif
 }
@@ -846,6 +844,8 @@ void vtkMPIMoveData::MarshalDataToBuffer(vtkDataSet* data)
     this->NumberOfBuffers = 0;
     }
 
+  vtkImageData* imageData = vtkImageData::SafeDownCast(data);
+
   // Copy input to isolate reader from the pipeline.
   vtkDataSet* d = data->NewInstance();
   d->CopyStructure(data);
@@ -863,15 +863,49 @@ void vtkMPIMoveData::MarshalDataToBuffer(vtkDataSet* data)
   this->BufferLengths[0] = writer->GetOutputStringLength();
   this->BufferOffsets = new vtkIdType[1];
   this->BufferOffsets[0] = 0;
+
+  if (imageData)
+    {
+    // we need to add marshall extents separately, since the writer doesn't
+    // preserve extents.
+    int *extent = imageData->GetExtent();
+    double* origin = imageData->GetOrigin();
+    vtksys_ios::ostringstream stream;
+    stream << "EXTENT " << extent[0] << " " <<
+      extent[1] << " " <<
+      extent[2] << " " <<
+      extent[3] << " " <<
+      extent[4] << " " <<
+      extent[5];
+    stream << " ORIGIN: " << origin[0] << " " << origin[1] << " " << origin[2];
+
+    if (stream.str().size() >= EXTENT_HEADER_SIZE)
+      {
+      vtkErrorMacro("Extent message too long!");
+      this->Buffers = writer->RegisterAndGetOutputString();
+      }
+    else
+      {
+      char extentHeader[EXTENT_HEADER_SIZE];
+      strcpy(extentHeader, stream.str().c_str());
+      this->BufferLengths[0] += EXTENT_HEADER_SIZE;
+      this->Buffers = new char[this->BufferLengths[0]];
+      memcpy(this->Buffers, extentHeader, EXTENT_HEADER_SIZE);
+      memcpy(this->Buffers+EXTENT_HEADER_SIZE, writer->GetOutputString(),
+        writer->GetOutputStringLength());
+      }
+    }
+  else
+    {
+    this->Buffers = writer->RegisterAndGetOutputString();
+    }
   this->BufferTotalLength = this->BufferLengths[0];
-  this->Buffers = writer->RegisterAndGetOutputString();
 
   d->Delete();
   d = 0;
   writer->Delete();
   writer = 0;
 }
-
 
 //-----------------------------------------------------------------------------
 void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataSet* data)
@@ -885,6 +919,7 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataSet* data)
   // PolyData and Unstructured grid need different append filters.
   vtkAppendPolyData* appendPd = NULL;
   vtkAppendFilter*   appendUg = NULL;
+  vtkImageAppend* appendId = NULL;
   if (this->NumberOfBuffers > 1)
     {
     if (data->IsA("vtkPolyData"))
@@ -894,6 +929,11 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataSet* data)
     else if (data->IsA("vtkUnstructuredGrid"))
       {
       appendUg = vtkAppendFilter::New();
+      }
+    else if (data->IsA("vtkImageData"))
+      {
+      appendId = vtkImageAppend::New();
+      appendId->PreserveExtentsOn();
       }
     else
       {
@@ -907,19 +947,57 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataSet* data)
     // Setup a reader.
     vtkDataSetReader *reader = vtkDataSetReader::New();
     reader->ReadFromInputStringOn();
+
+    char* bufferArray = this->Buffers+this->BufferOffsets[idx];
+    vtkIdType bufferLength = this->BufferLengths[idx];
+
+    int extent[6]= {0, 0, 0, 0, 0, 0};
+    float origin[3] = {0, 0, 0};
+    bool extentAvailable = false;
+    if (bufferLength >= EXTENT_HEADER_SIZE &&
+      strncmp(bufferArray, "EXTENT", 6)==0)
+      {
+      sscanf(bufferArray, "EXTENT %d %d %d %d %d %d ORIGIN %f %f %f", &extent[0], &extent[1],
+        &extent[2], &extent[3], &extent[4], &extent[5],
+        &origin[0], &origin[1], &origin[2]);
+      bufferArray += EXTENT_HEADER_SIZE;
+      bufferLength -= EXTENT_HEADER_SIZE;
+      extentAvailable = true;
+      }
+
     vtkCharArray* mystring = vtkCharArray::New();
-    mystring->SetArray(this->Buffers+this->BufferOffsets[idx], 
-                       this->BufferLengths[idx], 1);
+    mystring->SetArray(bufferArray, bufferLength, 1);
     reader->SetInputArray(mystring);
     reader->Modified(); // For append loop
-    reader->GetOutput()->Update();
+    reader->Update();
     if (appendPd)
-      { 
+      {
       appendPd->AddInput(reader->GetPolyDataOutput());
       }
     else if (appendUg)
-      { 
+      {
       appendUg->AddInput(reader->GetUnstructuredGridOutput());
+      }
+    else if (appendId)
+      {
+      vtkImageData* curInput = vtkImageData::SafeDownCast(
+        reader->GetOutput());
+      if (curInput->GetNumberOfPoints() >0)
+        {
+        if (extentAvailable)
+          {
+          vtkImageData* clone = vtkImageData::New();
+          clone->ShallowCopy(curInput);
+          clone->SetOrigin(origin[0], origin[1], origin[2]);
+          clone->SetExtent(extent);
+          appendId->AddInput(clone);
+          clone->Delete();
+          }
+        else
+          {
+          appendId->AddInput(curInput);
+          }
+        }
       }
     else
       {
@@ -954,6 +1032,16 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataSet* data)
     appendUg->Delete();
     appendUg = NULL;
     }
+  if (appendId)
+    {
+    appendId->Update();
+    vtkDataSet* out = appendId->GetOutput();
+    data->CopyStructure(out);
+    data->GetPointData()->PassData(out->GetPointData());
+    data->GetCellData()->PassData(out->GetCellData());
+    appendId->Delete();
+    appendId = NULL;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -963,7 +1051,7 @@ void vtkMPIMoveData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NumberOfBuffers: " << this->NumberOfBuffers << endl;
   os << indent << "Server: " << this->Server << endl;
   os << indent << "MoveMode: " << this->MoveMode << endl;
-  os << indent << "DeliverOutlineToClient : " 
+  os << indent << "DeliverOutlineToClient : "
     << this->DeliverOutlineToClient << endl;
   os << indent << "OutputDataType: ";
   if (this->OutputDataType == VTK_POLY_DATA)
