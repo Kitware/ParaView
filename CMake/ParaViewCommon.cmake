@@ -378,6 +378,14 @@ ELSE(PARAVIEW_USE_SYSTEM_HDF5)
 ENDIF(PARAVIEW_USE_SYSTEM_HDF5)
 
 #########################################################################
+# Configure SILO
+OPTION(PARAVIEW_USE_SILO "Use SILO library" OFF)
+MARK_AS_ADVANCED(PARAVIEW_USE_SILO)
+IF(PARAVIEW_USE_SILO)
+  INCLUDE(${ParaView_SOURCE_DIR}/CMake/FindSILO.cmake)
+ENDIF(PARAVIEW_USE_SILO)
+
+#########################################################################
 # Configure Xdmf
 
 SET(XDMF_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
