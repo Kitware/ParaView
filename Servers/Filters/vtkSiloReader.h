@@ -78,23 +78,20 @@
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "silo.h" // Needed for Silo structs
 // Silo structs are anonymous structs so they
-// cannot be forward declared.  A SiloReaderHelper
+// cannot be forward declared.  A vtkSiloReaderHelper
 // class will be written so that the Silo structs
 // can be removed from this header.
 
 
 class vtkDataSet;
 class vtkDataArray;
-class vtkStringArray;
-class vtkIntArray;
 class vtkUnstructuredGrid;
 class vtkMultiProcessController;
 class vtkMultiBlockDataSet;
-class vtkXMLDataElement;
-class vtkInformationIntegerKey;
 class vtkSiloReaderHelper;
-struct SiloReaderInternals;
+class vtkSiloTableOfContents;
 
+struct SiloReaderInternals;
 
 class VTK_IO_EXPORT vtkSiloReader : public vtkMultiBlockDataSetAlgorithm
 {
@@ -102,7 +99,6 @@ public:
   static vtkSiloReader *New();
   vtkTypeRevisionMacro(vtkSiloReader, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
-
   void SetFileName(char *);
   vtkGetStringMacro(FileName);
 
@@ -112,7 +108,6 @@ protected:
 
   int RequestData(vtkInformation *,
     vtkInformationVector **, vtkInformationVector *);
-
   int RequestInformation(vtkInformation *,
     vtkInformationVector **, vtkInformationVector *);
 
@@ -126,21 +121,13 @@ private:
   static bool MadeGlobalSiloCalls;
   vtkSiloReaderHelper *Helper;
   SiloReaderInternals *Internals;
+  vtkSiloTableOfContents *TOC;
   vtkMultiProcessController *Controller;
 
-  vtkXMLDataElement *TableOfContentsToXML();
-  void XMLToTableOfContents(vtkXMLDataElement *);
   int FileIsInDomain(int);
-  int DetermineFileIndex(DBfile *);
-  int DetermineFileNameIndex(const char *);
   void BroadcastTableOfContents();
+  void TestBroadcastTableOfContents();
   int ReadTableOfContents();
-  int AddFile(const char *);
-  DBfile *GetFile(int);
-  DBfile *OpenFile(int);
-  DBfile *OpenFile(const char *);
-  void CloseFile(int);
-  void CloseAllFiles();
   void RegisterDomainDirs(char **, int, const char*);
   bool ShouldGoToDir(const char *);
   void ReadDir(DBfile *, const char *);
@@ -153,14 +140,12 @@ private:
   void DetermineFileIndexAndDirectory(char *, int &, const char *, char *&, bool *alloc=0);
   void DetermineFilenameAndDirectory(char *, const char *, char *, char *&, bool *alloc=0);
   void GetRelativeVarName(const char *,const char *,char *);
-
   vtkDataSet *GetPointMesh(DBfile *, const char *);
   vtkDataSet *GetQuadMesh(DBfile *, const char *);
   vtkDataSet *GetCurve(DBfile *, const char *);
   vtkDataSet *GetUnstructuredMesh(DBfile *, const char *);
   vtkDataSet *CreateRectilinearMesh(DBquadmesh *);
   vtkDataSet *CreateCurvilinearMesh(DBquadmesh *);
-
   vtkDataArray *GetMaterialArray(DBfile *, const char *, int);
   vtkDataArray *GetPointVar(DBfile *, const char *, int &);
   vtkDataArray *GetPointScalarVar(DBmeshvar *);
@@ -172,11 +157,8 @@ private:
   vtkDataArray *GetUcdScalarVar(DBucdvar *);
   vtkDataArray *GetUcdVectorVar(DBucdvar *);
 
-
-
   vtkSiloReader(const vtkSiloReader&);  // Not implemented.
   void operator=(const vtkSiloReader&);  // Not implemented.
-
 };
 
 #endif // __vtkSiloReader_h

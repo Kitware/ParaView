@@ -102,36 +102,91 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSiloReader, "1.1");
+vtkCxxRevisionMacro(vtkSiloReader, "1.2");
 vtkStandardNewMacro(vtkSiloReader);
 
 //----------------------------------------------------------------------------
 
-// SiloReaderInternals holds data structures
-// used internally that should not be exposed
-// in the header file.
-struct SiloReaderInternals
+struct SiloMeshBlock
 {
+  int Domain; // which domain the mesh belongs to, i.e., which processor should handle it (piece number)
+  int Type;
+  vtkstd::string FileName;
+  vtkstd::string Name;
+  vtkstd::vector<vtkstd::string> Variables;
+  vtkstd::vector<vtkstd::string> Materials;
+};
+
+//----------------------------------------------------------------------------
+
+struct SiloMesh
+{
+  vtkstd::vector< SiloMeshBlock* > blocks;
+  vtkstd::string Name;
+};
+
+//----------------------------------------------------------------------------
+
+class vtkSiloTableOfContents : public vtkObject
+{
+
+public:
+
+  static vtkSiloTableOfContents *New();
+
+  SiloMesh * AddMesh(const char*);
+  SiloMesh * GetMesh(const char*);
+  SiloMeshBlock * AddMeshBlock(const char*, SiloMesh*);
+  SiloMeshBlock * GetMeshBlock(const char*);
+  vtkXMLDataElement * ToXML();
+  void FromXML(vtkXMLDataElement *);
+  void Clear();
+  int AddFile(const char *);
+  DBfile *GetFile(int);
+  DBfile *OpenFile(int);
+  DBfile *OpenFile(const char *);
+  void CloseFile(int);
+  void CloseAllFiles();
+  int DetermineFileIndex(DBfile *);
+  int DetermineFileNameIndex(const char *);
+
   vtkstd::vector< vtkstd::string > Filenames;
   vtkstd::vector< DBfile * > DBFiles;
-  vtkstd::map< vtkstd::string, int> Meshes;
-  vtkstd::map< vtkstd::string, vtkstd::vector< vtkstd::string > > Vars;
-  vtkstd::map< vtkstd::string, vtkstd::vector< vtkstd::string > > Materials;
+  vtkstd::map< vtkstd::string, SiloMesh*> Meshes;
+  vtkstd::map< vtkstd::string, SiloMeshBlock*> MeshBlocks;
   vtkstd::set< vtkstd::string > DomainDirs;
   // TOCPath is the path to the directory containing TOCFile
   vtkstd::string TOCPath;
   vtkstd::string TOCFile;
+
+protected:
+
+  vtkSiloTableOfContents();
+  ~vtkSiloTableOfContents();
+
+private:
+
+  vtkSiloTableOfContents(const vtkSiloTableOfContents&);  // Not implemented.
+  void operator=(const vtkSiloTableOfContents&);  // Not implemented.
+
 };
 
-typedef vtkstd::map< vtkstd::string, int>::const_iterator MeshMapIter;
-typedef vtkstd::map< vtkstd::string, vtkstd::vector< vtkstd::string > >::const_iterator VarMapIter;
-typedef vtkstd::map< vtkstd::string, vtkstd::vector< vtkstd::string > >::const_iterator MatMapIter;
+//----------------------------------------------------------------------------
+
+vtkStandardNewMacro(vtkSiloTableOfContents);
+
+//----------------------------------------------------------------------------
+
+typedef vtkstd::map< vtkstd::string, SiloMesh*>::const_iterator ConstMeshIter;
+typedef vtkstd::map< vtkstd::string, SiloMeshBlock*>::const_iterator ConstMeshBlockMapIter;
+typedef vtkstd::map< vtkstd::string, SiloMesh*>::iterator MeshIter;
+typedef vtkstd::map< vtkstd::string, SiloMeshBlock*>::iterator MeshBlockMapIter;
+typedef vtkstd::vector<SiloMeshBlock*>::iterator MeshBlockIter;
 typedef vtkstd::vector< vtkstd::string >::const_iterator StringListIter;
 
 //----------------------------------------------------------------------------
 
-// This class will soon replace the SiloReaderInternals struct.
-// It will handle conversion between XML and table on contents maps.
+// This class will pull data from Silo files and return vtkDataSets and vtkDataArrays
 class vtkSiloReaderHelper
 {
 public:
@@ -209,18 +264,16 @@ vtkSiloReader::vtkSiloReader()
   this->FileName = 0;
   this->TableOfContentsRead = false;
   this->TableOfContentsFileIndex = 0;
-  this->Internals = new SiloReaderInternals;
   this->Helper = new vtkSiloReaderHelper;
+  this->TOC = vtkSiloTableOfContents::New();
   this->Controller = vtkMultiProcessController::GetGlobalController();
 
   if (this->Controller)
     {
     this->ProcessId = this->Controller->GetLocalProcessId();
     this->NumProcesses = this->Controller->GetNumberOfProcesses();
-    //this->DebugOn();
     vtkDebugMacro("I am process " << this->ProcessId
                   << " out of " << this->NumProcesses);
-    //this->DebugOff();
     }
   else
     {
@@ -254,9 +307,8 @@ vtkSiloReader::vtkSiloReader()
 
 vtkSiloReader::~vtkSiloReader()
 {
-  this->CloseAllFiles();
-  delete this->Internals;
   delete this->Helper;
+  this->TOC->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -355,7 +407,7 @@ int vtkSiloReader::ReadTableOfContents(void)
   vtkDebugMacro("ReadTableOfContents");
 
   // Open the table of contents file
-  if (!this->OpenFile(this->Internals->TOCFile.c_str()))
+  if (!this->TOC->OpenFile(this->TOC->TOCFile.c_str()))
     {
     return 0;
     }
@@ -365,7 +417,7 @@ int vtkSiloReader::ReadTableOfContents(void)
   DBSetDataReadMask(DBMatMatnames|DBMatMatnos|DBMatMatcolors);
 
   // Call ReadDir to parse all metadata in table of contents file
-  this->ReadDir(this->OpenFile(this->TableOfContentsFileIndex), "/");
+  this->ReadDir(this->TOC->OpenFile(this->TableOfContentsFileIndex), "/");
 
   // Reset data read mask.
   DBSetDataReadMask(DBAll);
@@ -377,24 +429,109 @@ int vtkSiloReader::ReadTableOfContents(void)
 
 //----------------------------------------------------------------------------
 
-int vtkSiloReader::AddFile(const char * filename)
+vtkSiloTableOfContents::vtkSiloTableOfContents()
 {
-  //Add the filename to Internals->Filenames vector
-  this->Internals->Filenames.push_back(filename);
-  //Add placeholder to Internals->DBFiles
-  this->Internals->DBFiles.push_back(0);
-  //Return the index of the filename we just added
-  return this->Internals->Filenames.size() - 1;
 }
 
 //----------------------------------------------------------------------------
 
-DBfile *vtkSiloReader::OpenFile(int index)
+vtkSiloTableOfContents::~vtkSiloTableOfContents()
+{
+  this->Clear();
+  this->CloseAllFiles();
+}
+
+//----------------------------------------------------------------------------
+
+void vtkSiloTableOfContents::Clear()
+{
+  MeshBlockMapIter itr = this->MeshBlocks.begin();
+  for ( ; itr != this->MeshBlocks.end(); ++itr)
+    {
+    delete itr->second;
+    }
+  this->MeshBlocks.clear();
+
+  MeshIter meshItr = this->Meshes.begin();
+  for ( ; meshItr != this->Meshes.end(); ++meshItr)
+    {
+    delete meshItr->second;
+    }
+  this->Meshes.clear();
+}
+
+//----------------------------------------------------------------------------
+
+SiloMesh * vtkSiloTableOfContents::AddMesh(const char * meshName)
+{
+  //search map first for mesh name
+
+  SiloMesh * mesh = new SiloMesh;
+  mesh->Name = meshName;
+  this->Meshes.insert( vtkstd::make_pair(meshName, mesh));
+  return mesh;
+}
+
+//----------------------------------------------------------------------------
+
+SiloMeshBlock * vtkSiloTableOfContents::AddMeshBlock(const char * meshName, SiloMesh * parent)
+{
+ // error check for null parent
+ // search map for meshname
+
+  SiloMeshBlock * meshBlock = new SiloMeshBlock;
+  meshBlock->Name = meshName;
+  this->MeshBlocks.insert( vtkstd::make_pair(meshName, meshBlock));
+  parent->blocks.push_back(meshBlock);
+  return meshBlock;
+}
+
+//----------------------------------------------------------------------------
+
+SiloMesh * vtkSiloTableOfContents::GetMesh(const char * meshName)
+{
+  SiloMesh * mesh = 0;
+  MeshIter itr = this->Meshes.find(meshName);
+  if( itr != this->Meshes.end() )
+    {
+    mesh = itr->second;
+    }
+  return mesh;
+}
+
+//----------------------------------------------------------------------------
+
+SiloMeshBlock * vtkSiloTableOfContents::GetMeshBlock(const char * meshName)
+{
+  SiloMeshBlock * meshBlock = 0;
+  MeshBlockMapIter itr = this->MeshBlocks.find(meshName);
+  if( itr != this->MeshBlocks.end() )
+    {
+    meshBlock = itr->second;
+    }
+  return meshBlock;
+}
+
+//----------------------------------------------------------------------------
+
+int vtkSiloTableOfContents::AddFile(const char * filename)
+{
+  //Add the filename to TOC->Filenames vector
+  this->Filenames.push_back(filename);
+  //Add placeholder to TOC->DBFiles
+  this->DBFiles.push_back(0);
+  //Return the index of the filename we just added
+  return this->Filenames.size() - 1;
+}
+
+//----------------------------------------------------------------------------
+
+DBfile *vtkSiloTableOfContents::OpenFile(int index)
 {
   vtkDebugMacro("OpenFile");
 
   // Check that the index argument is within bounds
-  int nFiles = this->Internals->Filenames.size();
+  int nFiles = this->Filenames.size();
   if (index < 0 || index >= nFiles)
     {
     vtkErrorMacro("Index out of range.");
@@ -402,19 +539,19 @@ DBfile *vtkSiloReader::OpenFile(int index)
     }
 
   // Check to see if the file has already been opened.
-  if (this->Internals->DBFiles[index] != NULL)
+  if (this->DBFiles[index] != NULL)
     {
     //this->DebugOn();
     vtkDebugMacro("Returning file: " << index);
     //this->DebugOff();
-    return this->Internals->DBFiles[index];
+    return this->DBFiles[index];
     }
 
   //this->DebugOn();
   vtkDebugMacro("Opening file: " << index);
   //this->DebugOff();
 
-  vtkstd::string fullName = this->Internals->TOCPath + this->Internals->Filenames[index];
+  vtkstd::string fullName = this->TOCPath + this->Filenames[index];
   const char * fname = fullName.c_str();
   vtkDebugMacro("Opening silo file: " << fname);
   // Open the Silo file. Impose priority order on drivers by first
@@ -429,7 +566,7 @@ DBfile *vtkSiloReader::OpenFile(int index)
     }
 
   // Store the dbfile pointer.
-  this->Internals->DBFiles[index] = dbfile;
+  this->DBFiles[index] = dbfile;
 
   // Lets try to make absolutely sure this is really a Silo file and
   // not just a PDB file that PD_Open succeeded on.
@@ -453,12 +590,12 @@ DBfile *vtkSiloReader::OpenFile(int index)
       }
     }
 
-  return this->Internals->DBFiles[index];
+  return this->DBFiles[index];
 }
 
 //----------------------------------------------------------------------------
 
-DBfile *vtkSiloReader::OpenFile(const char *filename)
+DBfile *vtkSiloTableOfContents::OpenFile(const char *filename)
 {
   vtkDebugMacro("OpenFile");
   int fileIndex = this->DetermineFileNameIndex(filename);
@@ -469,16 +606,16 @@ DBfile *vtkSiloReader::OpenFile(const char *filename)
     // Add it to the list and continue.
     fileIndex = this->AddFile(filename);
     }
-  return OpenFile(fileIndex);
+  return this->OpenFile(fileIndex);
 }
 
 //----------------------------------------------------------------------------
 
-DBfile *vtkSiloReader::GetFile(int index)
+DBfile *vtkSiloTableOfContents::GetFile(int index)
 {
   vtkDebugMacro("GetFile");
 
-  int nFiles = this->Internals->Filenames.size();
+  int nFiles = this->Filenames.size();
   if (index < 0 || index >= nFiles)
     {
     vtkErrorMacro("Index out of range.");
@@ -486,20 +623,20 @@ DBfile *vtkSiloReader::GetFile(int index)
     }
 
   // Check that the DBfile at index is valid
-  if (this->Internals->DBFiles[index] == NULL)
+  if (this->DBFiles[index] == NULL)
     {
     vtkErrorMacro("File index " << index << " is null. It probably has not been opened.");
     return 0;
     }
 
-  return this->Internals->DBFiles[index];
+  return this->DBFiles[index];
 }
 
 //----------------------------------------------------------------------------
 
-void vtkSiloReader::CloseAllFiles()
+void vtkSiloTableOfContents::CloseAllFiles()
 {
-  int nFiles = this->Internals->Filenames.size();
+  int nFiles = this->Filenames.size();
   for (int i = 0; i < nFiles; ++i)
     {
     this->CloseFile(i);
@@ -508,26 +645,26 @@ void vtkSiloReader::CloseAllFiles()
 
 //----------------------------------------------------------------------------
 
-void vtkSiloReader::CloseFile(int index)
+void vtkSiloTableOfContents::CloseFile(int index)
 {
   vtkDebugMacro("CloseFile");
 
   //Check that the index argument is within bounds
-  int nFiles = this->Internals->Filenames.size();
+  int nFiles = this->Filenames.size();
   if (index < 0 || index >= nFiles)
     {
     vtkErrorMacro("Index out of range.");
     return;
     }
 
-  if (this->Internals->DBFiles[index] != NULL)
+  if (this->DBFiles[index] != NULL)
     {
-    vtkDebugMacro("Closing silo file " << this->Internals->Filenames[index]);
-    if (DBClose(this->Internals->DBFiles[index]) != 0)
+    vtkDebugMacro("Closing silo file " << this->Filenames[index]);
+    if (DBClose(this->DBFiles[index]) != 0)
       {
-      vtkErrorMacro("Error closing dbfile: " << this->Internals->Filenames[index]);
+      vtkErrorMacro("Error closing dbfile: " << this->Filenames[index]);
       }
-    this->Internals->DBFiles[index] = 0;
+    this->DBFiles[index] = 0;
     }
 }
 
@@ -538,8 +675,8 @@ void vtkSiloReader::SetFileName(char * filename)
   this->FileName = filename;
   if (!filename)
     {
-    this->Internals->TOCFile = "";
-    this->Internals->TOCPath = "";
+    this->TOC->TOCFile = "";
+    this->TOC->TOCPath = "";
     return;
     }
 
@@ -548,24 +685,24 @@ void vtkSiloReader::SetFileName(char * filename)
   unsigned int i = fullName.find_last_of("/");
   if (i == vtkstd::string::npos)
     {
-    this->Internals->TOCFile = fullName;
-    this->Internals->TOCPath = "";
+    this->TOC->TOCFile = fullName;
+    this->TOC->TOCPath = "";
     }
   else
     {
     ++i; //increment i past the slash character
-    this->Internals->TOCFile = fullName.substr(i);
-    this->Internals->TOCPath = fullName.substr(0, i);
+    this->TOC->TOCFile = fullName.substr(i);
+    this->TOC->TOCPath = fullName.substr(0, i);
     }
 }
 
 //----------------------------------------------------------------------------
 
-int vtkSiloReader::DetermineFileIndex(DBfile * file)
+int vtkSiloTableOfContents::DetermineFileIndex(DBfile * file)
 {
-  for (unsigned int i = 0; i < this->Internals->DBFiles.size(); ++i)
+  for (unsigned int i = 0; i < this->DBFiles.size(); ++i)
     {
-    if (this->Internals->DBFiles[i] == file)
+    if (this->DBFiles[i] == file)
       {
       return i;
       }
@@ -575,12 +712,12 @@ int vtkSiloReader::DetermineFileIndex(DBfile * file)
 
 //----------------------------------------------------------------------------
 
-int vtkSiloReader::DetermineFileNameIndex(const char * filename)
+int vtkSiloTableOfContents::DetermineFileNameIndex(const char * filename)
 {
-  int nFiles = this->Internals->Filenames.size();
+  int nFiles = this->Filenames.size();
   for (int i = 0; i < nFiles; ++i)
     {
-    if (this->Internals->Filenames[i] == filename)
+    if (this->Filenames[i] == filename)
       {
       return i;
       }
@@ -595,7 +732,7 @@ int vtkSiloReader::FileIsInDomain(int index)
 {
   vtkDebugMacro("FileIsInDomain: " << index);
 
-  int nFiles = this->Internals->Filenames.size();
+  int nFiles = this->TOC->Filenames.size();
   int filesPerProcess = (nFiles / this->NumProcesses);
   int startFileIndex = filesPerProcess * this->ProcessId;
   int endFileIndex = startFileIndex + filesPerProcess;
@@ -617,175 +754,162 @@ int vtkSiloReader::FileIsInDomain(int index)
 
 //----------------------------------------------------------------------------
 
-vtkXMLDataElement *vtkSiloReader::TableOfContentsToXML()
+// All xml elements get the name "e" to conserve space
+// Attributes:
+// t - type
+// n - name
+//
+vtkXMLDataElement * vtkSiloTableOfContents::ToXML()
 {
-
   vtkXMLDataElement * root = vtkXMLDataElement::New();
-  vtkXMLDataElement * filenames = vtkXMLDataElement::New();
-  vtkXMLDataElement * meshes = vtkXMLDataElement::New();
-  vtkXMLDataElement * vars = vtkXMLDataElement::New();
-  vtkXMLDataElement * materials = vtkXMLDataElement::New();
+  vtkXMLDataElement * filenamesNode = vtkXMLDataElement::New();
+  vtkXMLDataElement * meshesNode = vtkXMLDataElement::New();
 
-  root->SetName("TableOfContents");
-  filenames->SetName("Filenames");
-  meshes->SetName("Meshes");
-  vars->SetName("Vars");
-  materials->SetName("Materials");
+  root->SetName("e");
+  filenamesNode->SetName("e");
+  meshesNode->SetName("e");
 
-  for (unsigned int i = 0; i < this->Internals->Filenames.size(); ++i)
+  // For each filename
+  StringListIter filenameIter = this->Filenames.begin();
+  for (; filenameIter != this->Filenames.end(); ++filenameIter)
     {
-    vtkXMLDataElement * filename = vtkXMLDataElement::New();
-    filename->SetName("e");
-    filename->SetAttribute("n", this->Internals->Filenames[i].c_str());
-    filenames->AddNestedElement(filename);
-    filename->Delete();
+    vtkXMLDataElement * filenameNode = vtkXMLDataElement::New();
+    filenameNode->SetName("e");
+    filenameNode->SetAttribute("n", (*filenameIter).c_str());
+    filenamesNode->AddNestedElement(filenameNode);
+    filenameNode->Delete();
     }
 
-  MeshMapIter meshIter = this->Internals->Meshes.begin();
-  for (; meshIter != this->Internals->Meshes.end(); ++meshIter)
+  // For each mesh
+  MeshIter meshIter = this->Meshes.begin();
+  for (; meshIter != this->Meshes.end(); ++meshIter)
     {
-    vtkXMLDataElement * mesh = vtkXMLDataElement::New();
-    mesh->SetName("e");
-    mesh->SetAttribute("n", meshIter->first.c_str());
-    mesh->SetIntAttribute("t", meshIter->second);
-    meshes->AddNestedElement(mesh);
-    mesh->Delete();
-    }
+    SiloMesh * mesh = meshIter->second;
+    vtkXMLDataElement * meshNode = vtkXMLDataElement::New();
+    meshNode->SetName("e");
+    meshNode->SetAttribute("n", mesh->Name.c_str());
 
-  VarMapIter varIter = this->Internals->Vars.begin();
-  for (; varIter != this->Internals->Vars.end(); ++varIter)
-    {
-    vtkXMLDataElement * var = vtkXMLDataElement::New();
-    var->SetName("e");
-    var->SetAttribute("n", varIter->first.c_str());
-
-    StringListIter iter = varIter->second.begin();
-    for (; iter != varIter->second.end(); ++iter)
+    // For each mesh block
+    MeshBlockIter meshBlockIter = mesh->blocks.begin();
+    for (; meshBlockIter != mesh->blocks.end(); ++meshBlockIter)
       {
-      vtkXMLDataElement * varName = vtkXMLDataElement::New();
-      varName->SetName("e");
-      varName->SetAttribute("n", (*iter).c_str());
-      var->AddNestedElement(varName);
-      varName->Delete();
-      }
+      SiloMeshBlock * meshBlock = *meshBlockIter;
+      vtkXMLDataElement * meshBlockNode = vtkXMLDataElement::New();
+      vtkXMLDataElement * variablesNode = vtkXMLDataElement::New();
+      vtkXMLDataElement * materialsNode = vtkXMLDataElement::New();
+      meshBlockNode->SetName("e");
+      variablesNode->SetName("e");
+      materialsNode->SetName("e");
+      meshBlockNode->SetAttribute("n", meshBlock->Name.c_str());
+      meshBlockNode->SetIntAttribute("t", meshBlock->Type);
 
-    vars->AddNestedElement(var);
-    var->Delete();
+      // For each variable
+      StringListIter varIter = meshBlock->Variables.begin();
+      for (; varIter != meshBlock->Variables.end(); ++varIter)
+        {
+        vtkXMLDataElement * varNode = vtkXMLDataElement::New();
+        varNode->SetName("e");
+        varNode->SetAttribute("n", (*varIter).c_str());
+        variablesNode->AddNestedElement(varNode);
+        varNode->Delete();
+        }
+
+      // For each material
+      StringListIter matIter = meshBlock->Materials.begin();
+      for (; matIter != meshBlock->Materials.end(); ++matIter)
+        {
+        vtkXMLDataElement * matNode = vtkXMLDataElement::New();
+        matNode->SetName("e");
+        matNode->SetAttribute("n", (*matIter).c_str());
+        materialsNode->AddNestedElement(matNode);
+        matNode->Delete();
+        }
+
+      meshBlockNode->AddNestedElement(variablesNode);
+      meshBlockNode->AddNestedElement(materialsNode);
+      meshNode->AddNestedElement(meshBlockNode);
+      meshBlockNode->Delete();
+      variablesNode->Delete();
+      materialsNode->Delete();
+      }
+    meshesNode->AddNestedElement(meshNode);
+    meshNode->Delete();
     }
 
-  MatMapIter matIter = this->Internals->Materials.begin();
-  for (; matIter != this->Internals->Materials.end(); ++matIter)
-    {
-    vtkXMLDataElement * mat = vtkXMLDataElement::New();
-    mat->SetName("e");
-    mat->SetAttribute("n", matIter->first.c_str());
-
-    StringListIter iter = matIter->second.begin();
-    for (; iter != matIter->second.end(); ++iter)
-      {
-      vtkXMLDataElement * matName = vtkXMLDataElement::New();
-      matName->SetName("e");
-      matName->SetAttribute("n", (*iter).c_str());
-      mat->AddNestedElement(matName);
-      matName->Delete();
-      }
-
-    materials->AddNestedElement(mat);
-    mat->Delete();
-    }
-
-  root->AddNestedElement(filenames);
-  root->AddNestedElement(meshes);
-  root->AddNestedElement(vars);
-  root->AddNestedElement(materials);
-
-  filenames->Delete();
-  meshes->Delete();
-  vars->Delete();
-  materials->Delete();
-
+  root->AddNestedElement(filenamesNode);
+  root->AddNestedElement(meshesNode);
+  filenamesNode->Delete();
+  meshesNode->Delete();
   return root;
 }
 
-//----------------------------------------------------------------------------
-
-void vtkSiloReader::XMLToTableOfContents(vtkXMLDataElement * root)
+// All xml elements have the name "e" to conserve space
+// Attributes:
+// t - type
+// n - name
+//
+void vtkSiloTableOfContents::FromXML(vtkXMLDataElement * root)
 {
-  vtkDebugMacro("XMLToTableOfContents");
-
   this->CloseAllFiles();
-  this->Internals->Filenames.clear();
-  this->Internals->DBFiles.clear();
-  this->Internals->Meshes.clear();
-  this->Internals->Vars.clear();
-  this->Internals->Materials.clear();
+  this->Filenames.clear();
+  this->DBFiles.clear();
+  this->Clear();
 
   int size = root->GetNumberOfNestedElements();
-  if (size != 4)
+  if (size != 2)
     {
-    vtkErrorMacro("XML table of contents has invalid structure!");
+    vtkGenericWarningMacro("XML table of contents has invalid structure!");
     return;
     }
 
-  vtkXMLDataElement * filenames = root->GetNestedElement(0);
-  vtkXMLDataElement * meshes = root->GetNestedElement(1);
-  vtkXMLDataElement * vars = root->GetNestedElement(2);
-  vtkXMLDataElement * materials = root->GetNestedElement(3);
+  vtkXMLDataElement * filenamesNode = root->GetNestedElement(0);
+  vtkXMLDataElement * meshesNode = root->GetNestedElement(1);
 
-  int filenamesSize = filenames->GetNumberOfNestedElements();
+  // For each filename
+  int filenamesSize = filenamesNode->GetNumberOfNestedElements();
   for (int i = 0; i < filenamesSize; ++i)
     {
-    vtkXMLDataElement * filename = filenames->GetNestedElement(i);
-    this->AddFile(filename->GetAttribute("n"));
+    vtkXMLDataElement * filenameNode = filenamesNode->GetNestedElement(i);
+    this->AddFile(filenameNode->GetAttribute("n"));
     }
 
-  int meshesSize = meshes->GetNumberOfNestedElements();
+  // For each mesh
+  int meshesSize = meshesNode->GetNumberOfNestedElements();
   for (int i = 0; i < meshesSize; ++i)
     {
-    vtkXMLDataElement * mesh = meshes->GetNestedElement(i);
-    int meshType =  0;
-    mesh->GetScalarAttribute("t", meshType);
+    vtkXMLDataElement * meshNode = meshesNode->GetNestedElement(i);
+    SiloMesh * mesh = this->AddMesh(meshNode->GetAttribute("n"));
 
-    this->Internals->Meshes.insert(vtkstd::make_pair( 
-      mesh->GetAttribute("n"), meshType ));
-    }
-
-
-  int varsSize = vars->GetNumberOfNestedElements();
-  for (int i = 0; i < varsSize; ++i)
-    {
-    vtkXMLDataElement * var = vars->GetNestedElement(i);
-    const char * meshName = var->GetAttribute("n");
-    int numVars = var->GetNumberOfNestedElements();
-    vtkstd::vector< vtkstd::string > varList(numVars);
-
-    for (int k = 0; k < numVars; ++k)
+    // For each mesh block
+    int meshBlocksSize = meshNode->GetNumberOfNestedElements();
+    for (int j = 0; j < meshBlocksSize; ++j)
       {
-      vtkXMLDataElement * varName = var->GetNestedElement(k);
-      const char * varNameStr = varName->GetAttribute("n");
-      varList[k] = varNameStr;
+      vtkXMLDataElement * meshBlockNode = meshNode->GetNestedElement(j);
+      vtkXMLDataElement * variablesNode = meshBlockNode->GetNestedElement(0);
+      vtkXMLDataElement * materialsNode = meshBlockNode->GetNestedElement(1);
+
+      int meshBlockType =  0;
+      meshBlockNode->GetScalarAttribute("t", meshBlockType);
+      SiloMeshBlock * meshBlock = this->AddMeshBlock(
+           meshBlockNode->GetAttribute("n"), mesh);
+      meshBlock->Type = meshBlockType;
+
+      // For each variable
+      int variablesSize = variablesNode->GetNumberOfNestedElements();
+      for (int k = 0; k < variablesSize; ++k)
+        {
+        vtkXMLDataElement * variableNode = variablesNode->GetNestedElement(k);
+        meshBlock->Variables.push_back(variableNode->GetAttribute("n"));
+        }
+
+      // For each material
+      int materialsSize = materialsNode->GetNumberOfNestedElements();
+      for (int k = 0; k < materialsSize; ++k)
+        {
+        vtkXMLDataElement * materialNode = materialsNode->GetNestedElement(k);
+        meshBlock->Materials.push_back(materialNode->GetAttribute("n"));
+        }
       }
-
-    this->Internals->Vars.insert(vtkstd::make_pair(meshName, varList));
-    }
-
-
-  int matsSize = materials->GetNumberOfNestedElements();
-  for (int i = 0; i < matsSize; ++i)
-    {
-    vtkXMLDataElement * mat = materials->GetNestedElement(i);
-    const char * meshName = mat->GetAttribute("n");
-    int numMats = mat->GetNumberOfNestedElements();
-    vtkstd::vector< vtkstd::string > matList(numMats);
-
-    for (int k = 0; k < numMats; ++k)
-      {
-      vtkXMLDataElement * matName = mat->GetNestedElement(k);
-      const char * matNameStr = matName->GetAttribute("n");
-      matList[k] = matNameStr;
-      }
-
-    this->Internals->Materials.insert(vtkstd::make_pair(meshName, matList));
     }
 }
 
@@ -799,7 +923,7 @@ void vtkSiloReader::BroadcastTableOfContents()
   vtkIdType length = 0;
   if (this->ProcessId == 0)
     {
-    root = this->TableOfContentsToXML();
+    root = this->TOC->ToXML();
     vtksys_ios::ostringstream oss;
     root->PrintXML(oss, vtkIndent());
     root->Delete();
@@ -823,10 +947,43 @@ void vtkSiloReader::BroadcastTableOfContents()
     parser->Parse(xmlStr, length);
     delete xmlStr;
     root = parser->GetRootElement();
-    this->XMLToTableOfContents(root);
+    this->TOC->FromXML(root);
     parser->Delete();
     this->TableOfContentsRead = true;
     }
+}
+
+//----------------------------------------------------------------------------
+
+// This method is useful for testing the serialization of the TOC.
+// It converts the table of contents to an xml string,
+// clears the table of contents, and then recreates the
+// table of contents from the xml string.
+void vtkSiloReader::TestBroadcastTableOfContents()
+{
+  vtkDebugMacro("TestBroadcastTableOfContents");
+
+  // Create an XML string from TOC
+  vtkXMLDataElement * root = 0;
+  vtkIdType length = 0;
+  root = this->TOC->ToXML();
+  vtksys_ios::ostringstream oss;
+  root->PrintXML(oss, vtkIndent());
+  root->Delete();
+  root = 0;
+  const vtkstd::string & str = oss.str();
+  length = str.length();
+
+  vtkDebugMacro("Broadcasting xml string length: " << length);
+  vtkDebugMacro(<<str);
+
+  // Recreate the TOC from XML string
+  vtkSiloReaderXMLParser *parser = vtkSiloReaderXMLParser::New();
+  parser->Parse(str.c_str(), length);
+  root = parser->GetRootElement();
+  this->TOC->FromXML(root);
+  parser->Delete();
+  this->TableOfContentsRead = true;
 }
 
 //----------------------------------------------------------------------------
@@ -835,15 +992,14 @@ int vtkSiloReader::CreateDataSet(vtkMultiBlockDataSet *output)
 {
   vtkDebugMacro(<<"CreateDataSet");
 
-  vtkstd::map< vtkstd::string, int>::const_iterator meshIter;
-  vtkstd::map< vtkstd::string, vtkstd::vector< vtkstd::string > >::iterator varMapIter;
-  vtkstd::map< vtkstd::string, vtkstd::vector< vtkstd::string > >::iterator matMapIter;
 
-  // Loop for each mesh
-  for (meshIter = this->Internals->Meshes.begin(); meshIter != this->Internals->Meshes.end(); ++meshIter)
+  MeshBlockMapIter itr = this->TOC->MeshBlocks.begin();
+  for ( ; itr != this->TOC->MeshBlocks.end(); ++itr)
     {
-    const char * meshName = meshIter->first.c_str();
-    int meshType = meshIter->second;
+    SiloMeshBlock * meshBlock = itr->second;
+    const char * meshName = itr->first.c_str();
+    int meshType = meshBlock->Type;
+
     int index = 0;
     char * correctName;
     DetermineFileIndexAndDirectory(const_cast<char *>(meshName), index, 0, correctName);
@@ -853,16 +1009,14 @@ int vtkSiloReader::CreateDataSet(vtkMultiBlockDataSet *output)
       continue;
       }
 
-    //this->DebugOn();
     vtkDebugMacro("File " << index << " mesh: " << meshName);
-    //this->DebugOff();
 
     vtkDataSet *mesh = 0;
     DBfile * correctFile = 0;
     DetermineFileAndDirectory(const_cast<char *>(meshName), correctFile, 0, correctName);
     if (!correctFile) // correctFile is table of contents file
       {
-      correctFile = OpenFile(0);
+      correctFile = this->TOC->OpenFile(0);
       }
 
     switch (meshType)
@@ -896,143 +1050,124 @@ int vtkSiloReader::CreateDataSet(vtkMultiBlockDataSet *output)
     // Convert silo variables to vtk data arrays
     // and add arrays to vtk data set as point or cell data
 
-    // Lookup mesh in mesh/variable map
-    varMapIter = this->Internals->Vars.find(meshName);
-
-    // If mesh is found...
-    if (varMapIter != this->Internals->Vars.end())
+    // Loop for each variable associated with the mesh
+    vtkstd::vector< vtkstd::string >::const_iterator varIter;
+    for (varIter = meshBlock->Variables.begin(); varIter != meshBlock->Variables.end(); ++varIter)
       {
 
-      vtkstd::vector< vtkstd::string >::const_iterator varIter;
+      int cellCentered = 0;
+      vtkDataArray * varArray = 0;
+      const char * varName = (*varIter).c_str();
 
-      // Loop for each variable associated with the mesh
-      for (varIter = varMapIter->second.begin(); varIter != varMapIter->second.end(); ++varIter)
+      DBfile * correctFile = 0;
+      char * correctName;
+      DetermineFileAndDirectory(const_cast<char *>(varName), correctFile, 0, correctName);
+      if (!correctFile) // correctFile is table of contents file
         {
-
-        int cellCentered = 0;
-        vtkDataArray * varArray = 0;
-        const char * varName = (*varIter).c_str();
-
-        DBfile * correctFile = 0;
-        char * correctName;
-        DetermineFileAndDirectory(const_cast<char *>(varName), correctFile, 0, correctName);
-        if (!correctFile) // correctFile is table of contents file
-          {
-          correctFile = OpenFile(0);
-          }
-
-        switch (meshType)
-          {
-          case DB_POINTMESH:
-            varArray = GetPointVar(correctFile, correctName, cellCentered);
-          break;
-          case DB_QUADMESH:
-          case DB_QUAD_RECT:
-          case DB_QUAD_CURV:
-            varArray = GetQuadVar(correctFile, correctName, cellCentered);
-          break;
-          case DB_UCDMESH:
-            varArray = GetUcdVar(correctFile, correctName, cellCentered);
-          break;
-          default:
-          vtkErrorMacro("Mesh \"" << meshName << "\" has unhandled type");
-          }
-
-          // early exit the loop if array is null
-          if (!varArray) 
-            {
-            vtkErrorMacro("Error creating data array from variable: " << varName);
-            continue;
-            }
-
-          // Set array name using the var name unqualified with dirname
-          const char * varWithoutDir = strrchr(varName, '/');
-          if (varWithoutDir)
-            {
-            varArray->SetName(varWithoutDir+1);
-            }
-          else
-            {
-            varArray->SetName(varName);
-            }
-
-          if (cellCentered)
-            {
-            // Sanity check
-            if (varArray->GetNumberOfTuples() != mesh->GetNumberOfCells())
-              {
-              vtkErrorMacro("Array number of tuples does not match mesh number of cells.");
-              }
-            else
-              {
-              mesh->GetCellData()->AddArray(varArray);
-              }
-            }
-          else
-            {
-            // Sanity check
-            if (varArray->GetNumberOfTuples() != mesh->GetNumberOfPoints())
-              {
-              vtkErrorMacro("Array number of tuples does not match mesh number of points.");
-              }
-            else
-              {
-              mesh->GetPointData()->AddArray(varArray);
-              }
-            }
-          varArray->Delete();
-          }
+        correctFile = this->TOC->OpenFile(0);
         }
 
+      switch (meshType)
+        {
+        case DB_POINTMESH:
+          varArray = GetPointVar(correctFile, correctName, cellCentered);
+        break;
+        case DB_QUADMESH:
+        case DB_QUAD_RECT:
+        case DB_QUAD_CURV:
+          varArray = GetQuadVar(correctFile, correctName, cellCentered);
+        break;
+        case DB_UCDMESH:
+          varArray = GetUcdVar(correctFile, correctName, cellCentered);
+        break;
+        default:
+          vtkErrorMacro("Mesh \"" << meshName << "\" has unhandled type");
+        }
+
+      // early exit the loop if array is null
+      if (!varArray) 
+        {
+        vtkErrorMacro("Error creating data array from variable: " << varName);
+        continue;
+        }
+
+      // Set array name using the var name unqualified with dirname
+      const char * varWithoutDir = strrchr(varName, '/');
+      if (varWithoutDir)
+        {
+        varArray->SetName(varWithoutDir+1);
+        }
+      else
+        {
+        varArray->SetName(varName);
+        }
+
+      if (cellCentered)
+        {
+        // Sanity check
+        if (varArray->GetNumberOfTuples() != mesh->GetNumberOfCells())
+          {
+          vtkErrorMacro("Array number of tuples does not match mesh number of cells.");
+          }
+        else
+          {
+          mesh->GetCellData()->AddArray(varArray);
+          }
+        }
+      else
+        {
+        // Sanity check
+        if (varArray->GetNumberOfTuples() != mesh->GetNumberOfPoints())
+          {
+          vtkErrorMacro("Array number of tuples does not match mesh number of points.");
+          }
+        else
+          {
+          mesh->GetPointData()->AddArray(varArray);
+          }
+        }
+      varArray->Delete();
+      }
+
     // Create data sets from material cell lists
-
-    // Lookup mesh in mesh/material map
-    matMapIter = this->Internals->Materials.find(meshName);
-
-    // If mesh is found...
-    if (matMapIter != this->Internals->Materials.end())
+    // Loop for each variable associated with the mesh
+    vtkstd::vector< vtkstd::string >::const_iterator matIter;
+    for (matIter = meshBlock->Materials.begin(); matIter != meshBlock->Materials.end(); ++matIter)
       {
 
-      vtkstd::vector< vtkstd::string >::const_iterator matIter;
+      const char * matName = (*matIter).c_str();
 
-      // Loop for each variable associated with the mesh
-      for (matIter = matMapIter->second.begin(); matIter != matMapIter->second.end(); ++matIter)
+      DBfile * correctFile = 0;
+      char * correctName;
+      DetermineFileAndDirectory(const_cast<char *>(matName), correctFile, 0, correctName);
+      if (!correctFile) // correctFile is table of contents file
         {
+        correctFile = this->TOC->OpenFile(0);
+        }
 
-        const char * matName = (*matIter).c_str();
+      int meshNumCells = mesh->GetNumberOfCells();
+      vtkDataArray * materialArray = 0;
 
-        DBfile * correctFile = 0;
-        char * correctName;
-        DetermineFileAndDirectory(const_cast<char *>(matName), correctFile, 0, correctName);
-        if (!correctFile) // correctFile is table of contents file
+      materialArray = this->GetMaterialArray(correctFile, correctName, meshNumCells);
+      if (materialArray)
+        {
+        // Set array name using the var name unqualified with dirname
+        const char * matWithoutDir = strrchr(matName, '/');
+        if (matWithoutDir)
           {
-          correctFile = OpenFile(0);
+          materialArray->SetName(matWithoutDir+1);
           }
-
-        int meshNumCells = mesh->GetNumberOfCells();
-        vtkDataArray * materialArray = 0;
-
-        materialArray = this->GetMaterialArray(correctFile, correctName, meshNumCells);
-        if (materialArray)
+        else
           {
-          // Set array name using the var name unqualified with dirname
-          const char * matWithoutDir = strrchr(matName, '/');
-          if (matWithoutDir)
-            {
-            materialArray->SetName(matWithoutDir+1);
-            }
-          else
-            {
-            materialArray->SetName(matName);
-            }
-          mesh->GetCellData()->AddArray(materialArray);
+          materialArray->SetName(matName);
           }
+        mesh->GetCellData()->AddArray(materialArray);
         }
       }
 
       output->SetBlock(output->GetNumberOfBlocks(), mesh);
       mesh->Delete();
-      }
+    }
 
   return 1;
 }
@@ -1137,7 +1272,7 @@ void vtkSiloReader::RegisterDomainDirs(char **dirlist, int nList,
             continue;
 
         vtkstd::string str = PrepareDirName(dirlist[i], curDir);
-        this->Internals->DomainDirs.insert(str);
+        this->TOC->DomainDirs.insert(str);
     }
 }
 
@@ -1159,7 +1294,7 @@ void vtkSiloReader::RegisterDomainDirs(char **dirlist, int nList,
 
 bool vtkSiloReader::ShouldGoToDir(const char *dirname)
 {
-  if (this->Internals->DomainDirs.count(dirname) == 0)
+  if (this->TOC->DomainDirs.count(dirname) == 0)
     {
     vtkDebugMacro("Deciding to go into dir \"" << dirname << "\"");
     return true;
@@ -3007,11 +3142,11 @@ void PrintErrorMessage(char *msg)
 {
     if (msg)
       {
-      printf("The following Silo error occurred: %s\n", msg);
+      vtkGenericWarningMacro("The following Silo error occured: " << msg);
       }
     else
       {
-      printf("A Silo error occurred, but the Silo library did not generate an error message.\n");
+      vtkGenericWarningMacro("A Silo error occurred, but the Silo library did not generate an error message.");
       }
 }
 
@@ -3281,6 +3416,7 @@ void vtkSiloReader::ReadDir(DBfile *dbfile, const char *dirname)
 */
 
 
+
     //
     // Multi-meshes
     //
@@ -3299,6 +3435,9 @@ void vtkSiloReader::ReadDir(DBfile *dbfile, const char *dirname)
 
     RegisterDomainDirs(mm->meshnames, mm->nblocks, dirname);
 
+    SiloMesh * multiMesh = this->TOC->AddMesh(multimesh_names[i]);
+
+
     for (int k = 0; k < mm->nblocks; ++k)
       {
       if ( !strcmp(mm->meshnames[k], "EMPTY") )
@@ -3306,13 +3445,11 @@ void vtkSiloReader::ReadDir(DBfile *dbfile, const char *dirname)
         continue;
         }
       int meshType = this->GetMeshType(dbfile, mm->meshnames[k]);
-      this->Internals->Meshes.insert(vtkstd::make_pair(mm->meshnames[k], meshType));
+      SiloMeshBlock * meshBlock = this->TOC->AddMeshBlock(mm->meshnames[k], multiMesh);
+      meshBlock->Type = meshType;
       }
 
-    // Store the multimesh name associated with mesh type
-    //char *name_w_dir = GenerateName(dirname, multimesh_names[i]);
-    //this->Internals->Meshes.insert(vtkstd::make_pair(name_w_dir, DB_MULTIMESH));
-    //delete [] name_w_dir;
+//DB_MULTIMESH
 
     DBFreeMultimesh(mm);
     }
@@ -3615,7 +3752,12 @@ void vtkSiloReader::ReadDir(DBfile *dbfile, const char *dirname)
     char *name_w_dir = GenerateName(dirname, qmesh_names[i]);
 
     // Store the quadmesh name associated with mesh type
-    this->Internals->Meshes.insert(vtkstd::make_pair(name_w_dir, DB_QUADMESH));
+    SiloMesh * mesh = this->TOC->AddMesh(name_w_dir);
+    SiloMeshBlock * meshBlock = this->TOC->AddMeshBlock(name_w_dir, mesh);
+    meshBlock->Type = DB_QUADMESH;
+
+
+
 
 /*
         avtMeshType   mt;
@@ -3713,7 +3855,9 @@ void vtkSiloReader::ReadDir(DBfile *dbfile, const char *dirname)
     char *name_w_dir = GenerateName(dirname, ucdmesh_names[i]);
 
     // Store the ucdmesh name associated with mesh type
-    this->Internals->Meshes.insert(vtkstd::make_pair(name_w_dir, DB_UCDMESH));
+    SiloMesh * mesh = this->TOC->AddMesh(name_w_dir);
+    SiloMeshBlock * meshBlock = this->TOC->AddMeshBlock(name_w_dir, mesh);
+    meshBlock->Type = DB_UCDMESH;
 
 
 /*
@@ -3797,7 +3941,9 @@ void vtkSiloReader::ReadDir(DBfile *dbfile, const char *dirname)
     char *name_w_dir = GenerateName(dirname, ptmesh_names[i]);
 
     // Store the pointmesh name associated with mesh type
-    this->Internals->Meshes.insert(vtkstd::make_pair(name_w_dir, DB_POINTMESH));
+    SiloMesh * mesh = this->TOC->AddMesh(name_w_dir);
+    SiloMeshBlock * meshBlock = this->TOC->AddMeshBlock(name_w_dir, mesh);
+    meshBlock->Type = DB_POINTMESH;
 
 
 /*
@@ -3849,7 +3995,9 @@ void vtkSiloReader::ReadDir(DBfile *dbfile, const char *dirname)
     char *name_w_dir = GenerateName(dirname, curve_names[i]);
 
     // Store the curve name associated with type
-    this->Internals->Meshes.insert(vtkstd::make_pair(name_w_dir, DB_CURVE));
+    SiloMesh * mesh = this->TOC->AddMesh(name_w_dir);
+    SiloMeshBlock * meshBlock = this->TOC->AddMeshBlock(name_w_dir, mesh);
+    meshBlock->Type = DB_CURVE;
 
 /*
         avtCurveMetaData *cmd = new avtCurveMetaData(name_w_dir);
@@ -3910,25 +4058,14 @@ void vtkSiloReader::ReadDir(DBfile *dbfile, const char *dirname)
       char meshForVarWithFile[1024];
       GetRelativeVarName(mv->varnames[k], meshForVar, meshForVarWithFile);
 
-
-      // Make a map iterator
-      vtkstd::map< vtkstd::string, vtkstd::vector< vtkstd::string > >::iterator iter;
-
-      // Search for mesh name in map
-      iter = this->Internals->Vars.find(meshForVarWithFile);
-      if( iter == this->Internals->Vars.end() )
+      SiloMeshBlock * meshBlock = this->TOC->GetMeshBlock(meshForVarWithFile);
+      if (!meshBlock)
         {
-        // mesh name was not found.  Insert a pair containing the
-        // mesh name and a new string vector holding the silo var name
-        this->Internals->Vars.insert(vtkstd::make_pair(
-            meshForVarWithFile,
-            vtkstd::vector< vtkstd::string >(1, mv->varnames[k])));
+        printf("Error adding var %s to nonexisting mesh block %s\n",mv->varnames[k],meshForVarWithFile);
         }
       else
         {
-        // Mesh name was found in the list, add silo var name
-        // to list of vars associated with mesh
-        iter->second.push_back(mv->varnames[k]);
+        meshBlock->Variables.push_back(mv->varnames[k]);
         }
       }
 
@@ -3966,25 +4103,15 @@ void vtkSiloReader::ReadDir(DBfile *dbfile, const char *dirname)
     char *name_w_dir = GenerateName(dirname, qvar_names[i]);
     char *meshname_w_dir = GenerateName(dirname, meshname);
 
-    // Make a map iterator
-    vtkstd::map< vtkstd::string, vtkstd::vector< vtkstd::string > >::iterator iter;
-
-    // Search for mesh name in map
-    iter = this->Internals->Vars.find(meshname_w_dir);
-    if( iter == this->Internals->Vars.end() )
-      {
-      // mesh name was not found.  Insert a pair containing the
-      // mesh name and a new string vector holding the silo var name
-      this->Internals->Vars.insert(vtkstd::make_pair(
-          meshname_w_dir,
-          vtkstd::vector< vtkstd::string >(1, name_w_dir)));
-      }
-    else
-      {
-      // Mesh name was found in the list, add silo var name
-      // to list of vars associated with mesh
-      iter->second.push_back(name_w_dir);
-      }
+      SiloMeshBlock * meshBlock = this->TOC->GetMeshBlock(meshname_w_dir);
+      if (!meshBlock)
+        {
+        printf("Error adding var %s to nonexisting mesh block %s\n",name_w_dir,meshname_w_dir);
+        }
+      else
+        {
+        meshBlock->Variables.push_back(name_w_dir);
+        }
 
 /*
         //
@@ -4046,25 +4173,15 @@ void vtkSiloReader::ReadDir(DBfile *dbfile, const char *dirname)
     char *name_w_dir = GenerateName(dirname, ucdvar_names[i]);
     char *meshname_w_dir = GenerateName(dirname, meshname);
 
-    // Make a map iterator
-    vtkstd::map< vtkstd::string, vtkstd::vector< vtkstd::string > >::iterator iter;
-
-    // Search for mesh name in map
-    iter = this->Internals->Vars.find(meshname_w_dir);
-    if( iter == this->Internals->Vars.end() )
-      {
-      // mesh name was not found.  Insert a pair containing the
-      // mesh name and a new string vector holding the silo var name
-      this->Internals->Vars.insert(vtkstd::make_pair(
-          meshname_w_dir,
-          vtkstd::vector< vtkstd::string >(1, name_w_dir)));
-      }
-    else
-      {
-      // Mesh name was found in the list, add silo var name
-      // to list of vars associated with mesh
-      iter->second.push_back(name_w_dir);
-      }
+      SiloMeshBlock * meshBlock = this->TOC->GetMeshBlock(meshname_w_dir);
+      if (!meshBlock)
+        {
+        printf("Error adding var %s to nonexisting mesh block %s\n",name_w_dir,meshname_w_dir);
+        }
+      else
+        {
+        meshBlock->Variables.push_back(name_w_dir);
+        }
 
 /*
         //
@@ -4128,25 +4245,15 @@ void vtkSiloReader::ReadDir(DBfile *dbfile, const char *dirname)
     char *name_w_dir = GenerateName(dirname, ptvar_names[i]);
     char *meshname_w_dir = GenerateName(dirname, meshname);
 
-    // Make a map iterator
-    vtkstd::map< vtkstd::string, vtkstd::vector< vtkstd::string > >::iterator iter;
-
-    // Search for mesh name in map
-    iter = this->Internals->Vars.find(meshname_w_dir);
-    if( iter == this->Internals->Vars.end() )
-      {
-      // mesh name was not found.  Insert a pair containing the
-      // mesh name and a new string vector holding the silo var name
-      this->Internals->Vars.insert(vtkstd::make_pair(
-          meshname_w_dir,
-          vtkstd::vector< vtkstd::string >(1, name_w_dir)));
-      }
-    else
-      {
-      // Mesh name was found in the list, add silo var name
-      // to list of vars associated with mesh
-      iter->second.push_back(name_w_dir);
-      }
+      SiloMeshBlock * meshBlock = this->TOC->GetMeshBlock(meshname_w_dir);
+      if (!meshBlock)
+        {
+        printf("Error adding var %s to nonexisting mesh block %s\n",name_w_dir,meshname_w_dir);
+        }
+      else
+        {
+        meshBlock->Variables.push_back(name_w_dir);
+        }
 
 /*
         //
@@ -4268,27 +4375,15 @@ void vtkSiloReader::ReadDir(DBfile *dbfile, const char *dirname)
     char *name_w_dir = GenerateName(dirname, mat_names[i]);
     char *meshname_w_dir = GenerateName(dirname, meshname);
 
-    printf("Handling mat: %s\n", name_w_dir);
-    printf("  for mesh: %s\n", meshname_w_dir);
 
-    // Make a map iterator
-    vtkstd::map< vtkstd::string, vtkstd::vector< vtkstd::string > >::iterator iter;
-
-    // Search for mesh name in map
-    iter = this->Internals->Materials.find(meshname_w_dir);
-    if( iter == this->Internals->Materials.end() )
+    SiloMeshBlock * meshBlock = this->TOC->GetMeshBlock(meshname_w_dir);
+    if (!meshBlock)
       {
-      // mesh name was not found.  Insert a pair containing the
-      // mesh name and a new string vector holding the silo var name
-      this->Internals->Materials.insert(vtkstd::make_pair(
-          meshname_w_dir,
-          vtkstd::vector< vtkstd::string >(1, name_w_dir)));
+      printf("Error adding mat %s to nonexisting mesh block %s\n",name_w_dir,meshname_w_dir);
       }
     else
       {
-      // Mesh name was found in the list, add silo var name
-      // to list of vars associated with mesh
-      iter->second.push_back(name_w_dir);
+      meshBlock->Materials.push_back(name_w_dir);
       }
 
     delete [] name_w_dir;
@@ -4335,24 +4430,14 @@ void vtkSiloReader::ReadDir(DBfile *dbfile, const char *dirname)
       char meshForMatWithFile[1024];
       GetRelativeVarName(mm->matnames[k], meshForMat, meshForMatWithFile);
 
-      // Make a map iterator
-      vtkstd::map< vtkstd::string, vtkstd::vector< vtkstd::string > >::iterator iter;
-
-      // Search for mesh name in map
-      iter = this->Internals->Materials.find(meshForMatWithFile);
-      if( iter == this->Internals->Materials.end() )
+      SiloMeshBlock * meshBlock = this->TOC->GetMeshBlock(meshForMatWithFile);
+      if (!meshBlock)
         {
-        // mesh name was not found.  Insert a pair containing the
-        // mesh name and a new string vector holding the silo var name
-        this->Internals->Materials.insert(vtkstd::make_pair(
-            meshForMatWithFile,
-            vtkstd::vector< vtkstd::string >(1, mm->matnames[k])));
+        printf("Error adding mat %s to nonexisting mesh block %s\n",mm->matnames[k],meshForMatWithFile);
         }
       else
         {
-        // Mesh name was found in the list, add silo var name
-        // to list of vars associated with mesh
-        iter->second.push_back(mm->matnames[k]);
+        meshBlock->Materials.push_back(mm->matnames[k]);
         }
       }
 
@@ -5075,7 +5160,7 @@ void vtkSiloReader::DetermineFileAndDirectory(char *input, DBfile *&cFile,
     {
     // The variable is in a different file, so open that file.  This will
     // create the filename and add it to our registry if necessary.
-    cFile = OpenFile(filename);
+    cFile = this->TOC->OpenFile(filename);
     }
 }
 
@@ -5094,7 +5179,7 @@ void vtkSiloReader::DetermineFileIndexAndDirectory(char *input, int &index,
                                 allocated_location);
   if (strcmp(filename, ".") != 0)
     {
-    index = this->DetermineFileNameIndex(filename);
+    index = this->TOC->DetermineFileNameIndex(filename);
     }
 }
 
