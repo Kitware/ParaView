@@ -2,13 +2,9 @@ PROJECT (PQGUI)
 
 #########################################################################
 # Setup Qt
-SET(QT_REQUIRED TRUE)
-SET(QT_MIN_VERSION "4.3.3")
 FIND_PACKAGE(Qt4)
 
-IF(NOT QT4_FOUND)
-  MESSAGE(SEND_ERROR "Qt ${QT_MIN_VERSION} or greater not found.  Please check the QT_QMAKE_EXECUTABLE variable.")
-ELSE(NOT QT4_FOUND)
+IF(QT4_FOUND)
 
 # To make support of ParaView tractable, we only support a single version
 # of Qt at one time.  If you really want to use a newer version of Qt, you
@@ -109,5 +105,5 @@ ENDIF(PARAVIEW_ENABLE_PYTHON)
 
 ADD_SUBDIRECTORY(Components)
 
-ENDIF(NOT QT4_FOUND)
+ENDIF(QT4_FOUND)
 

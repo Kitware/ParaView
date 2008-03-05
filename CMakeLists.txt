@@ -66,18 +66,30 @@ ENDIF(PARAVIEW_VERSION_MINOR MATCHES "[02468]$")
 # build VTK/Qt support
 OPTION(PARAVIEW_BUILD_QT_GUI "Build ParaView Qt Client. This requires Qt." ON)
 IF (PARAVIEW_BUILD_QT_GUI)
+  # need to set up Qt stuff here because there are Qt dependencies before
+  # CMake traverses the Qt directory (VTK/GUISupport/Qt).
+  
+  # set vars to build the QVTK library
   SET(VTK_USE_GUISUPPORT ON CACHE BOOL "Build VTK with GUI Support" FORCE)
   SET(VTK_USE_QVTK ON CACHE BOOL "Build VTK with Qt Support" FORCE)
   SET(DESIRED_QT_VERSION 4 CACHE STRING "Use Qt4" FORCE)
-  # enforce Carbon in VTK for Qt/Mac
+  # ParaView requires this minimum version of Qt, and let's do it here before
+  # our first call to FindQt4.cmake
+  SET(QT_MIN_VERSION "4.3.0")
+  SET(QT_REQUIRED TRUE)
   FIND_PACKAGE(Qt4)
-  IF(Q_WS_MAC)
-    SET(VTK_USE_CARBON ON CACHE BOOL "Build VTK with Carbon" FORCE)
-    SET(VTK_USE_COCOA OFF CACHE BOOL "Build VTK with Cocoa" FORCE)
-  ENDIF(Q_WS_MAC)
-  # Mark these Qt variables as advanced. Users don't really have to set them.
-  MARK_AS_ADVANCED(DESIRED_QT_VERSION VTK_USE_QVTK VTK_USE_GUISUPPORT)
-  MARK_AS_ADVANCED(QT_MKSPECS_DIR QT_PLUGINS_DIR QT_X11_X11_LIBRARY QT_X11_Xext_LIBRARY QT_X11_m_LIBRARY)
+  IF(NOT QT4_FOUND)
+    MESSAGE(SEND_ERROR "Qt ${QT_MIN_VERSION} or greater not found.  Please check the QT_QMAKE_EXECUTABLE variable.")
+  ELSE(NOT QT4_FOUND)
+    # enforce Carbon in VTK for Qt/Mac
+    IF(Q_WS_MAC)
+      SET(VTK_USE_CARBON ON CACHE BOOL "Build VTK with Carbon" FORCE)
+      SET(VTK_USE_COCOA OFF CACHE BOOL "Build VTK with Cocoa" FORCE)
+    ENDIF(Q_WS_MAC)
+    # Mark these Qt variables as advanced. Users don't really have to set them.
+    MARK_AS_ADVANCED(DESIRED_QT_VERSION VTK_USE_QVTK VTK_USE_GUISUPPORT)
+    MARK_AS_ADVANCED(QT_MKSPECS_DIR QT_PLUGINS_DIR QT_X11_X11_LIBRARY QT_X11_Xext_LIBRARY QT_X11_m_LIBRARY)
+  ENDIF(NOT QT4_FOUND)
 ELSE (PARAVIEW_BUILD_QT_GUI)
   SET(VTK_USE_QVTK OFF CACHE BOOL "Build VTK with Qt Support" FORCE)
 ENDIF (PARAVIEW_BUILD_QT_GUI)
