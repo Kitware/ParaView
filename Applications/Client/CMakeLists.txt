@@ -317,6 +317,7 @@ IF(BUILD_TESTING)
     SaveColorMap
     SelectReader
     SimpleInteraction
+    Slice
     StreamTracer
     StreamTracerUpdates
     TemporalInterpolator
