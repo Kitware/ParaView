@@ -81,6 +81,11 @@ IF (PARAVIEW_BUILD_QT_GUI)
   IF(NOT QT4_FOUND)
     MESSAGE(SEND_ERROR "Qt ${QT_MIN_VERSION} or greater not found.  Please check the QT_QMAKE_EXECUTABLE variable.")
   ELSE(NOT QT4_FOUND)
+    # don't go greater than supported version
+    STRING(REGEX MATCH "^4\\.3\\.[0-9]+" qt_version_tmp "${QTVERSION}")
+    IF (NOT qt_version_tmp)
+      MESSAGE(SEND_ERROR "Qt ${QTVERSION} not supported.  Please use Qt 4.3 (you may need to clean your dirtied cache).")
+    ENDIF (NOT qt_version_tmp)
     # enforce Carbon in VTK for Qt/Mac
     IF(Q_WS_MAC)
       SET(VTK_USE_CARBON ON CACHE BOOL "Build VTK with Carbon" FORCE)
