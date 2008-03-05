@@ -76,7 +76,12 @@
 #define __vtkSiloReader_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include "silo.h"
+#include "silo.h" // Needed for Silo structs
+// Silo structs are anonymous structs so they
+// cannot be forward declared.  A SiloReaderHelper
+// class will be written so that the Silo structs
+// can be removed from this header.
+
 
 class vtkDataSet;
 class vtkDataArray;
