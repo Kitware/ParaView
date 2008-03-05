@@ -14,6 +14,8 @@
 =========================================================================*/
 #include "vtkSMApplication.h"
 
+#include "vtkPVConfig.h" // To get PARAVIEW_USE_*
+
 #include "vtkClientServerStream.h"
 #include "vtkDirectory.h"
 #include "vtkObjectFactory.h"
@@ -42,7 +44,7 @@ struct vtkSMApplicationInternals
 };
 
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.18");
+vtkCxxRevisionMacro(vtkSMApplication, "1.19");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()
