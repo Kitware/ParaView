@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "QtChartExport.h"
-#include <Qt> // Needed for return value.
+#include <QObject> // Needed for return value.
 
 class pqChartSeriesOptionsGeneratorInternal;
 class QColor;
