@@ -76,7 +76,7 @@ public:
   /// Resets the camera to include all visible data.
   /// It is essential to call this resetCamera, to ensure that the reset camera
   /// action gets pushed on the interaction undo stack.
-  void resetCamera();
+  virtual void resetCamera();
 
   /// Resets the center of rotation to the focal point.
   void resetCenterOfRotation();
@@ -250,7 +250,7 @@ protected:
   bool eventFilter(QObject* caller, QEvent* e);
 
   /// Creates default interactor style/manipulators.
-  void createDefaultInteractors();
+  virtual void createDefaultInteractors();
 
   /// Center Axes represents the 3D axes in the view. When GUI creates the view,
   /// we explicitly create a center axes, register it and add it to the view 
