@@ -145,6 +145,7 @@ bool pqThreadedEventSource::postNextEvent(const QString& object,
 
 void pqThreadedEventSource::start()
 {
+  this->Internal->ShouldStop = 0;
   this->Internal->start();
 }
 
