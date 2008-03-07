@@ -149,7 +149,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include <pqPythonDialog.h>
-#include "vtkPVPythonInterpretor.h"
 #endif // PARAVIEW_ENABLE_PYTHON
 
 #include <QVTKWidget.h>
@@ -3347,12 +3346,6 @@ pqUndoStack* pqMainWindowCore::getApplicationUndoStack() const
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::applicationInitialize()
 {
-#ifdef PARAVIEW_ENABLE_PYTHON
-  // Ensure that the interpretor uses Global Interpretor locking since 
-  // we may be using python interpretor in the testing thread as well.
-  vtkPVPythonInterpretor::SetMultithreadSupport(true);
-#endif
-
   pqApplicationCore* core = pqApplicationCore::instance();
   pqOptions* options = pqOptions::SafeDownCast(
     vtkProcessModule::GetProcessModule()->GetOptions());

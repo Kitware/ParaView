@@ -21,9 +21,7 @@
 // .SECTION Caveat
 // Since this class uses a static variable to keep track of interpretor lock
 // state, it is not safe to use vtkPVPythonInterpretor instances in different
-// threads. It is however possible to use it in the same thread of a
-// multithreaded application and use python C calls in the other thread(s).
-// In that case, it is necessary to set MultithreadSupport to true.
+// threads. 
 
 #ifndef __vtkPVPythonInterpretor_h
 #define __vtkPVPythonInterpretor_h
@@ -56,8 +54,7 @@ public:
 
   // Description:
   // This method will make the sub-interpretor represented by this object
-  // the active one. If MultithreadSupport is enabled, this method also acquires
-  // the global interpretor lock. A MakeCurrent() call must have a corresponding
+  // the active one. A MakeCurrent() call must have a corresponding
   // ReleaseControl() to avoid deadlocks.
   void MakeCurrent();
 
@@ -75,23 +72,10 @@ public:
 
   // Description:
   // Call in a subinterpretter to pause it and return control to the 
-  // main interpretor. If MultithreadSupport is enabled, this method also
-  // releases the global interpretor lock.
+  // main interpretor. 
   // A MakeCurrent() call must have a corresponding
   // ReleaseControl() to avoid deadlocks.
   void ReleaseControl();
-
-  // Description:
-  // When the interpretor is used in a multithreaded environment, python
-  // requires additional initialization/locking. Set this to true to enable
-  // initialization and locking of the global interpretor, if application is
-  // multithreaded with sub-interpretors being initialized by different threads.
-  // Must be set before python is initialized. 
-  // Currently, it is not safe to use vtkPVPythonInterpretor in different
-  // threads, however it is safe to use vtkPVPythonInterpretor in one thread and
-  // explicit python calls in another (using python global interpretor locks).
-  static void SetMultithreadSupport(bool enable);
-  static bool GetMultithreadSupport();
 
   // Description:
   // In some cases, the application may want to capture the output/error streams

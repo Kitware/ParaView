@@ -63,7 +63,6 @@ struct pqPythonShell::pqImplementation
     this->destroyInterpretor();
     this->Interpreter = vtkPVPythonInteractiveInterpretor::New();
     this->Interpreter->SetCaptureStreams(true);
-    this->Interpreter->SetMultithreadSupport(true);
     this->Interpreter->InitializeSubInterpretor(argc, argv);
     this->Interpreter->MakeCurrent();
     
