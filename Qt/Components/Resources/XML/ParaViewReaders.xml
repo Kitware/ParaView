@@ -185,4 +185,11 @@
           file_description="Cosmology files">
   </Reader>
 
+  #ifdef PARAVIEW_USE_SILO
+  <Reader name="SiloReader"
+          extensions="silo"
+          file_description="Silo files">
+  </Reader>
+  #ifdef PARAVIEW_USE_SILO
+
 </ParaViewReaders>
