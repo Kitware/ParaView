@@ -17,6 +17,7 @@ SET(KWCommon_CMAKE_DIR "@KWCommon_CMAKE_DIR_CONFIG@")
 
 # The configuration options.
 SET(KWCommon_BUILD_SHARED_LIBS "@KWCommon_BUILD_SHARED_LIBS@")
+SET(KWCommon_BUILD_TESTING "@KWCommon_BUILD_TESTING@")
 
 # The C and C++ flags added to the cmake-configured flags.
 SET(KWCommon_REQUIRED_C_FLAGS
