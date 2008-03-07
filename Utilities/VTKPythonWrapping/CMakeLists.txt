@@ -271,6 +271,7 @@ SET(VTK_FILTERS_SOURCES
   ${VTK_SOURCE_DIR}/Filtering/vtkDataSetAttributes.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkDataSetCollection.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkDirectedGraph.cxx
+  ${VTK_SOURCE_DIR}/Filtering/vtkDirectedAcyclicGraph.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkDemandDrivenPipeline.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkEmptyCell.cxx
   ${VTK_SOURCE_DIR}/Filtering/vtkExecutive.cxx
