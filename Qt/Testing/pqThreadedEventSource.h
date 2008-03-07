@@ -68,7 +68,7 @@ public:
                      const QString& argument);
 
   /** tell this source to stop */
-  void stop();
+  virtual void stop();
 
   /** Wait for the GUI thread to acknowledge an event.
       A previously locked mutex must be passed in.
@@ -87,7 +87,7 @@ private slots:
 
 protected:
   // start the thread
-  void start();
+  virtual void start();
 
   // called by the testing thread to signify it is done
   // pass in zero for success, non-zero for failure

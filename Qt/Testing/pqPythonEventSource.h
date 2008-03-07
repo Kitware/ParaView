@@ -55,6 +55,7 @@ public:
 
 protected:
   virtual void run();
+  virtual void start();
 
 protected slots:
   void threadGetProperty();

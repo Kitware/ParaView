@@ -146,12 +146,13 @@ bool pqThreadedEventSource::postNextEvent(const QString& object,
 void pqThreadedEventSource::start()
 {
   this->Internal->ShouldStop = 0;
-  this->Internal->start();
+  this->Internal->start(QThread::LowestPriority);
 }
 
 void pqThreadedEventSource::stop()
 {
   this->Internal->ShouldStop = 1;
+  this->Internal->wait();
 }
 
 bool pqThreadedEventSource::waitForGUI()
@@ -173,7 +174,7 @@ void pqThreadedEventSource::guiAcknowledge()
 {
   while(this->Internal->Waiting == 0)
     {
-    pqInternal::ThreadHelper::msleep(10);
+    pqInternal::ThreadHelper::msleep(50);
     }
   
   this->Internal->Waiting = 0;

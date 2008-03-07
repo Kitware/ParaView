@@ -366,6 +366,7 @@ class pqPythonEventSource::pqInternal
 {
 public:
   QString FileName;
+  PyGILState_STATE MainState;
 };
 
 pqPythonEventSource::pqPythonEventSource(QObject* p)
@@ -380,11 +381,11 @@ pqPythonEventSource::pqPythonEventSource(QObject* p)
 #ifdef SIGINT
     signal(SIGINT, SIG_DFL);
 #endif
-    
-    // add QtTesting to python's inittab, so it is
-    // available to all interpreters
-    PyImport_AppendInittab(const_cast<char*>("QtTesting"), initQtTesting);
     }
+  // add QtTesting to python's inittab, so it is
+  // available to all interpreters
+  PyImport_AppendInittab(const_cast<char*>("QtTesting"), initQtTesting);
+
 }
 
 pqPythonEventSource::~pqPythonEventSource()
@@ -484,6 +485,13 @@ void pqPythonEventSource::threadGetChildren()
   this->guiAcknowledge();
 }
 
+void pqPythonEventSource::start()
+{
+  PyEval_InitThreads();
+  PyEval_ReleaseLock();
+  pqThreadedEventSource::start();
+}
+
 void pqPythonEventSource::run()
 {
   QFile file(this->Internal->FileName);
@@ -493,23 +501,17 @@ void pqPythonEventSource::run()
     return;
     } 
 
-  PyEval_InitThreads();
-  PyEval_ReleaseLock();
-
-  PyThreadState* curState = PyThreadState_Get();
-  PyThreadState* threadState = Py_NewInterpreter();
-  
   Instance = this;
-  PyThreadState_Swap(threadState);
+
+  PyGILState_STATE gstate = PyGILState_Ensure();
 
   // finally run the script
   QByteArray wholeFile = file.readAll();
   int result = PyRun_SimpleString(wholeFile.data()) == 0 ? 0 : 1;
 
-  PyThreadState_Swap(threadState);
-  Py_EndInterpreter(threadState);
-  PyThreadState_Swap(curState);
-  
+  PyGILState_Release(gstate);
+  PyEval_ReleaseLock();
+
   this->done(result);
 }
 
