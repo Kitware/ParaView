@@ -106,7 +106,10 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
     // all property names with special characters are changed
     QString propertyName = iter->GetKey();
     propertyName.replace(':', '_');
-    propertyName.replace(' ', '_');
+    
+    // escape regex chars
+    propertyName.replace(')', "\\)");
+    propertyName.replace('(', "\\(");
 
     const QString regex = QString("^%1$|^%1_.*$").arg(propertyName);
     QList<QObject*> foundObjects = parent->findChildren<QObject*>(QRegExp(regex));
@@ -387,7 +390,11 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
     // all property names with special characters are changed
     QString propertyName = iter->GetKey();
     propertyName.replace(':', '_');
-    propertyName.replace(' ', '_');
+
+    // escape regex chars
+    propertyName.replace(')', "\\)");
+    propertyName.replace('(', "\\(");
+
     const QString regex = QString("^%1$|^%1_.*$").arg(propertyName);
     QList<QObject*> foundObjects = parent->findChildren<QObject*>(QRegExp(regex));
     for(int i=0; i<foundObjects.size(); i++)
@@ -750,7 +757,7 @@ static void setupValidator(QLineEdit* lineEdit, QVariant::Type type)
 static QLabel* createPanelLabel(QWidget* parent, QString text, QString pname)
 {
   QLabel* label = new QLabel(parent);
-  label->setObjectName(pname+QString("_label"));
+  label->setObjectName(QString("_labelFor")+pname);
   label->setText(text);
   label->setWordWrap(true);
   return label;
@@ -798,13 +805,14 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
   for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMProperty* SMProperty = iter->GetProperty();
+    bool informationOnly = SMProperty->GetInformationOnly();
+
     QString propertyName = iter->GetKey();
     if (propertiesToHide.contains(propertyName))
       {
       continue;
       }
     propertyName.replace(':', '_');
-    propertyName.replace(' ', '_');
 
     // When this proxy represents a custom filter, we want to use the property 
     //  names the user provided rather than the built in property labels:
@@ -819,7 +827,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
       }
 
     // skip information properties
-    if((!propertiesToShow.contains(propertyName) && SMProperty->GetInformationOnly()) || 
+    if((!propertiesToShow.contains(propertyName) && informationOnly) || 
         SMProperty->GetIsInternal())
       {
       continue;
@@ -870,6 +878,10 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
       {
       // create a combo box with list of proxies
       QComboBox* combo = new QComboBox(panelLayout->parentWidget());
+      if(informationOnly)
+        {
+        combo->setEnabled(false);
+        }
       combo->setObjectName(propertyName);
       QLabel* label = createPanelLabel(panelLayout->parentWidget(),
                                        propertyLabel,
@@ -889,6 +901,10 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
         new pqProxySelectionWidget(pxy, iter->GetKey(),
                                    propertyLabel,
                                    panelLayout->parentWidget());
+      if(informationOnly)
+        {
+        w->setEnabled(false);
+        }
       w->setObjectName(propertyName);
       panelLayout->addWidget(w, rowCount, 0, 1, 2);
       rowCount++;
@@ -902,6 +918,10 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
         QCheckBox* check;
         check = new QCheckBox(propertyLabel, 
                               panelLayout->parentWidget());
+        if(informationOnly)
+          {
+          check->setEnabled(false);
+          }
         check->setObjectName(propertyName);
         panelLayout->addWidget(check, rowCount, 0, 1, 2);
         rowCount++;
@@ -915,6 +935,10 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
         if (vp && vp->GetRepeatCommand())
           {
           QTreeWidget* tw = new pqTreeWidget(panelLayout->parentWidget());
+          if(informationOnly)
+            {
+            tw->setEnabled(false);
+            }
           tw->setColumnCount(1);
           tw->setRootIsDecorated(false);
           QTreeWidgetItem* h = new QTreeWidgetItem();
@@ -929,6 +953,10 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
           {
           // combo box with strings
           QComboBox* combo = new QComboBox(panelLayout->parentWidget());
+          if(informationOnly)
+            {
+            combo->setEnabled(false);
+            }
           combo->setObjectName(propertyName);
           QLabel* label = createPanelLabel(panelLayout->parentWidget(),
                                            propertyLabel,
@@ -965,6 +993,10 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
         QList<QList<QVariant> > items;
         items = pqSMAdaptor::getSelectionProperty(SMProperty);
         QTreeWidget* tw = new pqTreeWidget(panelLayout->parentWidget());
+        if(informationOnly)
+          {
+          tw->setEnabled(false);
+          }
         tw->setColumnCount(1);
         tw->setRootIsDecorated(false);
         QTreeWidgetItem* h = new QTreeWidgetItem();
@@ -985,6 +1017,10 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
         {
         // combo box with strings
         QComboBox* combo = new QComboBox(panelLayout->parentWidget());
+        if(informationOnly)
+          {
+          combo->setEnabled(false);
+          }
         combo->setObjectName(propertyName);
         QLabel* label = createPanelLabel(panelLayout->parentWidget(),
                                          propertyLabel,
@@ -1004,6 +1040,10 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
 
         pqIntRangeWidget* range;
         range = new pqIntRangeWidget(panelLayout->parentWidget());
+        if(informationOnly)
+          {
+          range->setEnabled(false);
+          }
         range->setObjectName(propertyName);
         range->setMinimum(propertyDomain[0].toInt());
         range->setMaximum(propertyDomain[1].toInt());
@@ -1022,6 +1062,10 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
                                          propertyName);
         pqDoubleRangeWidget* range;
         range = new pqDoubleRangeWidget(panelLayout->parentWidget());
+        if(informationOnly)
+          {
+          range->setEnabled(false);
+          }
         range->setObjectName(propertyName);
         range->setMinimum(propertyDomain[0].toDouble());
         range->setMaximum(propertyDomain[1].toDouble());
@@ -1051,6 +1095,10 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
         if (!multiLineString)
           {
           QLineEdit* lineEdit = new QLineEdit(panelLayout->parentWidget());
+          if(informationOnly)
+            {
+            lineEdit->setEnabled(false);
+            }
           lineEdit->setObjectName(propertyName);
           setupValidator(lineEdit, elem_property.type()); 
           
@@ -1065,6 +1113,10 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
         else
           {
           QTextEdit *textEdit = new QTextEdit(panelLayout->parentWidget());
+          if(informationOnly)
+            {
+            textEdit->setEnabled(false);
+            }
           textEdit->setObjectName(propertyName);
           textEdit->setAcceptRichText(false);
           // The default tab stop is too big
@@ -1128,6 +1180,10 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
            domain.size() && domain[i].size() */)  // link not supported yet
           {
           QComboBox* combo = new QComboBox(panelLayout->parentWidget());
+          if(informationOnly)
+            {
+            combo->setEnabled(false);
+            }
           combo->setObjectName(QString("%1_%2").arg(propertyName).arg(i));
           item = new QWidgetItem(combo);
           }
@@ -1140,6 +1196,10 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
           range[1] = domain[i][1].toInt();
           QSpinBox* spinBox;
           spinBox = new QSpinBox(panelLayout->parentWidget());
+          if(informationOnly)
+            {
+            spinBox->setEnabled(false);
+            }
           spinBox->setObjectName(QString("%1_%2").arg(propertyName).arg(i));
           spinBox->setRange(range[0], range[1]);
           item = new QWidgetItem(spinBox);
@@ -1150,6 +1210,10 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
           {
           pqDoubleRangeWidget* range;
           range = new pqDoubleRangeWidget(panelLayout->parentWidget());
+          if(informationOnly)
+            {
+            range->setEnabled(false);
+            }
           range->setObjectName(QString("%1_%2").arg(propertyName).arg(i));
           range->setMinimum(domain[i][0].toDouble());
           range->setMaximum(domain[i][1].toDouble());
@@ -1158,6 +1222,10 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
         else
           {
           QLineEdit* lineEdit = new QLineEdit(panelLayout->parentWidget());
+          if(informationOnly)
+            {
+            lineEdit->setEnabled(false);
+            }
           lineEdit->setObjectName(QString("%1_%2").arg(propertyName).arg(i));
           setupValidator(lineEdit, v.type()); 
           item = new QWidgetItem(lineEdit);
@@ -1201,6 +1269,10 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
       {
       pqFileChooserWidget* chooser;
       chooser = new pqFileChooserWidget(panelLayout->parentWidget());
+      if(informationOnly)
+        {
+        chooser->setEnabled(false);
+        }
       pqServerManagerModel* m =
         pqApplicationCore::instance()->getServerManagerModel();
       chooser->setServer(m->findServer(pxy->GetConnectionID()));
@@ -1219,6 +1291,10 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
                                        "Scalars",
                                        propertyName);
       QComboBox* combo = new QComboBox(panelLayout->parentWidget());
+      if(informationOnly)
+        {
+        combo->setEnabled(false);
+        }
       combo->setObjectName(QString(propertyName));
       panelLayout->addWidget(label, rowCount, 0, 1, 1);
       panelLayout->addWidget(combo, rowCount, 1, 1, 1);
@@ -1227,6 +1303,10 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
     else if (pt == pqSMAdaptor::COMPOSITE_TREE)
       {
       QTreeWidget* tree = new QTreeWidget(panelLayout->parentWidget());
+      if(informationOnly)
+        {
+        tree->setEnabled(false);
+        }
       tree->setObjectName(propertyName);
         
       QTreeWidgetItem* header = new QTreeWidgetItem();
