@@ -388,6 +388,11 @@ MainWindow::MainWindow() :
   QObject::connect(s, SIGNAL(activated()),
     this, SLOT(onSelectionShortcut()));
 
+  QShortcut *ctrlSpace = new QShortcut(Qt::CTRL + Qt::Key_Space,
+    &this->Implementation->Core.multiViewManager());
+  QObject::connect(ctrlSpace, SIGNAL(activated()),
+    this, SLOT(onQuickLaunchShortcut()));
+
   QShortcut *altSpace = new QShortcut(Qt::ALT + Qt::Key_Space,
     &this->Implementation->Core.multiViewManager());
   QObject::connect(altSpace, SIGNAL(activated()),
