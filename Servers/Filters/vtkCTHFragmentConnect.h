@@ -118,10 +118,12 @@ protected:
   void GatherEquivalenceSets(vtkCTHFragmentEquivalenceSet* set);
   void ShareGhostEquivalences(
     vtkCTHFragmentEquivalenceSet* globalSet,
-    int *offsets);
-
-
-
+    int*  procOffsets);
+  void ReceiveGhostFragmentIds(
+    vtkCTHFragmentEquivalenceSet* globalSet,
+    int* procOffset);
+  void MergeGhostEquivalenceSets(
+    vtkCTHFragmentEquivalenceSet* globalSet);
 
   // Format input block into an easy to access array with
   // extra metadata (information) extracted.

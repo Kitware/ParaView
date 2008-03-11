@@ -41,7 +41,7 @@
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.5");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.6");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //============================================================================
@@ -59,12 +59,17 @@ public:
   vtkCTHFragmentEquivalenceSet();
   ~vtkCTHFragmentEquivalenceSet();
 
+  void Print();
+
   void Initialize();
   void AddEquivalence(int id1, int id2);
 
   // The length of the equivalent array...
-  int GetNumberOfMembers();
-  
+  int GetNumberOfMembers() { return this->EquivalenceArray->GetNumberOfTuples();}
+
+  // Be very careful with this pointer.
+  int *GetPointer() { return this->EquivalenceArray->GetPointer(0);}
+
   // Return the id of the equivalent set.
   int GetEquivalentSetId(int memberId);
 
@@ -102,6 +107,20 @@ void vtkCTHFragmentEquivalenceSet::Initialize()
 {
   this->EquivalenceArray->Initialize();
 }
+
+//----------------------------------------------------------------------------
+// Return the id of the equivalent set.
+void vtkCTHFragmentEquivalenceSet::Print()
+{
+  int num = this->GetNumberOfMembers();
+  cerr << num << endl;
+  for (int ii = 0; ii < num; ++ii)
+    {
+    cerr << "  " << ii << " : " << this->GetEquivalentSetId(ii) << endl;
+    }
+  cerr << endl;
+}
+
 
 //----------------------------------------------------------------------------
 // Return the id of the equivalent set.
@@ -208,12 +227,14 @@ public:
   void ComputeBaseExtent(int blockDims[3]);
   
   // For ghost layers received by other processes.
+  // The argument list here is getting a bit long ....
   void InitializeGhostLayer(unsigned char* volFraction, 
                             int cellExtent[6],
                             int level,
                             double globalOrigin[3],
                             double rootSpacing[3],
-                            int ownerProcessId);
+                            int ownerProcessId,
+                            int blockId);
   // This adds a block as our neighbor and makes the reciprical connection too.
   // It is used to connect ghost layer blocks.  Ghost blocks need the reciprical 
   // connection to continue the connectivity search.
@@ -224,17 +245,21 @@ public:
   void GetCellExtent(int ext[6]);
   void GetCellIncrements(int incs[3]);
   void GetBaseCellExtent(int ext[6]);
+
   unsigned char GetGhostFlag() { return this->GhostFlag;}
+  // Information saved for ghost cells that makes it easier to
+  // resolve equivalent fragment ids.
   int GetOwnerProcessId() { return this->ProcessId;}
+  int GetBlockId() { return this->BlockId;}
 
   //Returns a pointer to the minimum AMR Extent with is the first
   // cell values that is not a ghost cell.
   unsigned char* GetBaseVolumeFractionPointer();
   int*           GetBaseFragmentIdPointer();
+  int*           GetFragmentIdPointer() {return this->FragmentIds;}
   int            GetLevel() {return this->Level;}
   double*        GetSpacing() {return this->Spacing;}
   double*        GetOrigin() {return this->Origin;}
-  int            GetBlockId() {return this->BlockId;}
   // Faces are indexed: 0=xMin, 1=xMax, 2=yMin, 3=yMax, 4=zMin, 5=zMax
   int            GetNumberOfFaceNeighbors(int face)
     {return this->Neighbors[face].size();}
@@ -253,6 +278,10 @@ public:
 private:
 
   unsigned char GhostFlag;
+  // Information saved for ghost cells that makes it easier to
+  // resolve equivalent fragment ids.
+  int BlockId;
+  int ProcessId;
 
   // This id is for connectivity computation.
   // It is essentially a cell array of the image.
@@ -282,9 +311,6 @@ private:
   // There may be more than one neighbor because higher levels.
     vtkstd::vector<vtkCTHFragmentConnectBlock*> Neighbors[6];
 
-  int ProcessId;
-  // For debugging
-  int BlockId;
 };
 
 //----------------------------------------------------------------------------
@@ -365,7 +391,11 @@ void vtkCTHFragmentConnectBlock::Initialize(
 
   int numCells = image->GetNumberOfCells();
   this->FragmentIds = new int[numCells];
-  memset(this->FragmentIds, 0, numCells * sizeof(int));
+  // Initialize fragment ids to -1 / uninitialized
+  for (int ii = 0; ii < numCells; ++ii)
+    {
+    this->FragmentIds[ii] = -1;
+    }
   int imageExt[6];
   image->GetExtent(imageExt);
 
@@ -488,7 +518,8 @@ void vtkCTHFragmentConnectBlock::InitializeGhostLayer(
   int level,
   double globalOrigin[3],
   double rootSpacing[3],
-  int ownerProcessId)
+  int ownerProcessId,
+  int blockId)
 {
   if (this->VolumeFractionArray)
     {
@@ -498,7 +529,7 @@ void vtkCTHFragmentConnectBlock::InitializeGhostLayer(
 
   this->ProcessId = ownerProcessId;
   this->GhostFlag = 1;
-  this->BlockId = -1;
+  this->BlockId = blockId;
 
   this->Image = 0;
   this->Level = level;
@@ -508,7 +539,11 @@ void vtkCTHFragmentConnectBlock::InitializeGhostLayer(
                    *(cellExtent[3]-cellExtent[2]+1)
                    *(cellExtent[5]-cellExtent[4]+1);
   this->FragmentIds = new int[numCells];
-  memset(this->FragmentIds, 0, numCells * sizeof(int));
+  // Initialize fragment ids to -1 / uninitialized
+  for (int ii = 0; ii < numCells; ++ii)
+    {
+    this->FragmentIds[ii] = -1;
+    }
 
   // Extract what we need form the image because we do not reference it again.
   this->VolumeFractionArray = new unsigned char[numCells];
@@ -640,7 +675,6 @@ int* vtkCTHFragmentConnectBlock::GetBaseFragmentIdPointer()
 
   return ptr;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkCTHFragmentConnectBlock::ExtractExtent(unsigned char* buf, int ext[6])
@@ -903,9 +937,9 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
   this->RootSpacing[0]=this->RootSpacing[1]=this->RootSpacing[2]=1.0;
 
   this->RecursionDepth = 0;
-  //this->MaximumRecursionDepth = 10000;
+  this->MaximumRecursionDepth = 10000;
   // Testing the equivalence functionality.
-  this->MaximumRecursionDepth = 1000;
+  //this->MaximumRecursionDepth = 1000;
   
   this->FragmentId = 0;
   this->EquivalenceSet = new vtkCTHFragmentEquivalenceSet;
@@ -1033,7 +1067,7 @@ int vtkCTHFragmentConnect::InitializeBlocks(vtkHierarchicalBoxDataSet* input)
   // Just in case
   this->DeleteAllBlocks();
 
-  cerr << "start processing blocks\n" << endl;
+  //cerr << "start processing blocks\n" << endl;
 
   // We need all blocks to share a common extent index.
   // We find a common origin as the minimum most point in level 0.
@@ -1140,7 +1174,7 @@ int vtkCTHFragmentConnect::InitializeBlocks(vtkHierarchicalBoxDataSet* input)
     this->AddBlock(block);
     }
 
-  cerr << "start ghost blocks\n" << endl;
+  //cerr << "start ghost blocks\n" << endl;
 
   // Broadcast all of the block meta data to all processes.
   // Setup ghost layer blocks.
@@ -1245,10 +1279,6 @@ int vtkCTHFragmentConnect::FindFaceNeighbors(
             {
             retVal = 1;
             }
-          if (neighbor->LevelBlockId == 1584)
-            {
-            cerr << "Debug\n";
-            }
           result->push_back(neighbor);
           }
         }
@@ -1283,10 +1313,6 @@ int vtkCTHFragmentConnect::FindFaceNeighbors(
               {
               retVal = 1;
               }
-          if (neighbor->LevelBlockId == 1584)
-            {
-            cerr << "Debug\n";
-            }
             result->push_back(neighbor);
             }
           }
@@ -1697,16 +1723,6 @@ void vtkCTHFragmentConnect::ComputeAndDistributeGhostBlocks(
         // Block meta data is level and base-cell-extent.
         int ghostBlockLevel = blockMetaDataPtr[0];
         int *ghostBlockExt = blockMetaDataPtr+1;
-        if (ghostBlockLevel == 3)
-          {
-          if (ghostBlockExt[0] < 156 && 156 < ghostBlockExt[1] &&
-              ghostBlockExt[2] < 76 && 76 < ghostBlockExt[3] &&
-              ghostBlockExt[4] < 68 && 68 < ghostBlockExt[5])
-            { // Ghsot block from process 0
-            // -x nerighbot of block 1214
-            cerr << "here process 0\n";
-            }
-          }
 
         if (this->ComputeRequiredGhostExtent(ghostBlockLevel, ghostBlockExt, ext))
           {
@@ -1724,7 +1740,7 @@ void vtkCTHFragmentConnect::ComputeAndDistributeGhostBlocks(
           ghostBlock = new vtkCTHFragmentConnectBlock;
           ghostBlock->InitializeGhostLayer(buf, ext, ghostBlockLevel, 
                                            this->GlobalOrigin, this->RootSpacing,
-                                           otherProc);
+                                           otherProc, id);
           // Save for deleting.
           this->GhostBlocks.push_back(ghostBlock);
           // Add to grid and connect up neighbors.
@@ -1734,6 +1750,7 @@ void vtkCTHFragmentConnect::ComputeAndDistributeGhostBlocks(
         blockMetaDataPtr += 7;
         }
       // Send the message that indicates we have no more requests.
+      requestMsg[0] = myProc;
       requestMsg[1] = -1;
       this->Controller->Send(requestMsg, 8, otherProc, 708923);
       }
@@ -1813,13 +1830,6 @@ int vtkCTHFragmentConnect::ComputeRequiredGhostExtent(
   int remoteBlockIndex[3];
   int remoteLayerExt[6];
 
-
-  if (remoteBaseCellExt[0] < 132 && 132 < remoteBaseCellExt[1] &&
-      remoteBaseCellExt[2] < 60 && 60 < remoteBaseCellExt[3] &&
-      remoteBaseCellExt[4] < 12 && 12 < remoteBaseCellExt[5] && remoteBlockLevel == 2)
-    {
-    cerr << "Here !!!\n";
-    }
 
   // Extract the index from the block extent.
   // Lets choose the middle in case the extent has overlap.
@@ -1937,9 +1947,7 @@ int vtkCTHFragmentConnect::RequestData(
   output->GetPointData()->SetScalars(idScalars);
 
   // Keep a counter of which connected component we are upto.
-  // Start at 1 because 0 indicates empty space.
-  this->FragmentId = 1;
-  this->EquivalenceSet->AddEquivalence(this->FragmentId, this->FragmentId);
+  this->FragmentId = 0;
 
   vtkImageData *inData = vtkImageData::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
@@ -1962,9 +1970,6 @@ int vtkCTHFragmentConnect::RequestData(
     {
     this->InitializeBlocks(hds);
     int blockId;
-    cerr << this->GhostBlocks.size() << " ghost blocks and " 
-         << this->NumberOfInputBlocks << " local blocks\n";
-    cerr << "start Surface\n" << endl;
     for (blockId = 0; blockId < this->NumberOfInputBlocks; ++blockId)
       {
       this->ProcessBlock(blockId);
@@ -1975,20 +1980,17 @@ int vtkCTHFragmentConnect::RequestData(
     this->SaveBlockSurfaces(tmp);
     sprintf(tmp, "C:/Law/tmp/cthGhost%d.vtp", this->Controller->GetLocalProcessId());
     this->SaveGhostSurfaces(tmp);
-    */ 
+    */
+    
+    this->ResolveEquivalences(idScalars);
     this->DeleteAllBlocks();
     }
-
-  this->ResolveEquivalences(idScalars);
-
 
   idScalars->Delete();
   this->BlockIdArray->Delete();
   this->BlockIdArray = 0;
   this->LevelArray->Delete();
   this->LevelArray = 0;
-
-  cerr << "Finished\n";
 
   return 1;
 }
@@ -2030,15 +2032,14 @@ int vtkCTHFragmentConnect::ProcessBlock(int blockId)
       for (ix = ext[0]; ix <= ext[1]; ++ix)
         {
         xIterator->Index[0] = ix;    
-        if (*(xIterator->FragmentIdPointer) == 0 && 
+        if (*(xIterator->FragmentIdPointer) == -1 && 
             *(xIterator->VolumeFractionPointer) > middleValue) //0.5)
           { // We have a new fragment.
           this->RecursionDepth = 0;
+          this->EquivalenceSet->AddEquivalence(this->FragmentId,this->FragmentId);
           this->ConnectFragment(xIterator);
-
           // Move to next fragment.
           ++this->FragmentId;
-          this->EquivalenceSet->AddEquivalence(this->FragmentId,this->FragmentId);
           }
         xIterator->VolumeFractionPointer += cellIncs[0];
         xIterator->FragmentIdPointer += cellIncs[0];
@@ -2583,16 +2584,22 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectIterator * iter
     //idxMax = 2*ii+1this->IndexMax+1;
     // "Left"/min
     this->GetNeighborIterator(&next, iterator, ii,0, (ii+1)%3,0, (ii+2)%3,0);
-    this->AddEquivalence(iterator, &next);
+
     if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
       {
       // Neighbor is outside of fragment.  Make a face.
       this->CreateFace(iterator, ii, 0, &next);
       }    
-    else if (next.FragmentIdPointer[0] == 0)
+    else if (next.FragmentIdPointer[0] == -1)
       { // We have not visited this neighbor yet. Mark the voxel and recurse.
       this->ConnectFragment(&next);
       }
+    else
+      { // The last case is that we have already visited this voxel and it
+      // is in the same fragment.
+      this->AddEquivalence(iterator, &next);
+      }
+
     // Handle the case when the new iterator is a higher level.
     // We need to loop over all the faces of the higher level that touch this face.
     // We will restrict our case to 4 neighbors (max difference in levels is 1).
@@ -2604,52 +2611,68 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectIterator * iter
       vtkCTHFragmentConnectIterator next2;
       // Take the first neighbor found and move +Y
       this->GetNeighborIterator(&next2, &next, (ii+1)%3,1, (ii+2)%3,0, ii,0);
-      this->AddEquivalence(&next2, &next);
       if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
         {
         // Neighbor is outside of fragment.  Make a face.
         this->CreateFace(iterator, ii, 0, &next2);
         }    
-      else if (next2.FragmentIdPointer[0] == 0)
+      else if (next2.FragmentIdPointer[0] == -1)
         { // We have not visited this neighbor yet. Mark the voxel and recurse.
         this->ConnectFragment(&next2);
+        }
+      else
+        { // The last case is that we have already visited this voxel and it
+        // is in the same fragment.
+        this->AddEquivalence(&next2, &next);
         }
       // Take the fist iterator found and move +Z
       this->GetNeighborIterator(&next2, &next, (ii+2)%3,1, ii,0, (ii+1)%3,0);
-      this->AddEquivalence(&next2, &next);
       if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
         {
         // Neighbor is outside of fragment.  Make a face.
         this->CreateFace(iterator, ii, 0, &next2);
         }    
-      else if (next2.FragmentIdPointer[0] == 0)
+      else if (next2.FragmentIdPointer[0] == -1)
         { // We have not visited this neighbor yet. Mark the voxel and recurse.
         this->ConnectFragment(&next2);
         }
+      else
+        { // The last case is that we have already visited this voxel and it
+        // is in the same fragment.
+        this->AddEquivalence(&next2, &next);
+        }
       // To get the +Y+Z start with the +Z iterator and move +Y put results in "next"
       this->GetNeighborIterator(&next, &next2, (ii+1)%3,1, (ii+2)%3,0, ii,0);
-      this->AddEquivalence(&next2, &next);
       if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
         {
         // Neighbor is outside of fragment.  Make a face.
         this->CreateFace(iterator, ii, 0, &next);
         }    
-      else if (next.FragmentIdPointer[0] == 0)
+      else if (next.FragmentIdPointer[0] == -1)
         { // We have not visited this neighbor yet. Mark the voxel and recurse.
         this->ConnectFragment(&next);
+        }
+      else
+        { // The last case is that we have already visited this voxel and it
+        // is in the same fragment.
+        this->AddEquivalence(&next2, &next);
         }
       }
 
     // "Right"/max
     this->GetNeighborIterator(&next, iterator, ii,1, (ii+1)%3,0, (ii+2)%3,0);
-    this->AddEquivalence(iterator, &next);
     if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
       { // Neighbor is outside of fragment.  Make a face.
       this->CreateFace(iterator, ii, 1, &next);
       }
-    else if (next.FragmentIdPointer[0] == 0)
+    else if (next.FragmentIdPointer[0] == -1)
       { // We have not visited this neighbor yet. Mark the voxel and recurse.
       this->ConnectFragment(&next);
+      }
+    else
+      { // The last case is that we have already visited this voxel and it
+      // is in the same fragment.
+      this->AddEquivalence(iterator, &next);
       }
     // Same case as above with the same logic to visit the
     // four smaller cells that touch this face of the current block.
@@ -2658,39 +2681,51 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectIterator * iter
       vtkCTHFragmentConnectIterator next2;
       // Take the first neighbor found and move +Y
       this->GetNeighborIterator(&next2, &next, (ii+1)%3,1, (ii+2)%3,0, ii,0);
-      this->AddEquivalence(&next2, &next);
       if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
         {
         // Neighbor is outside of fragment.  Make a face.
         this->CreateFace(iterator, ii, 1, &next2);
         }    
-      else if (next2.FragmentIdPointer[0] == 0)
+      else if (next2.FragmentIdPointer[0] == -1)
         { // We have not visited this neighbor yet. Mark the voxel and recurse.
         this->ConnectFragment(&next2);
+        }
+      else
+        { // The last case is that we have already visited this voxel and it
+        // is in the same fragment.
+        this->AddEquivalence(&next2, &next);
         }
       // Take the fist iterator found and move +Z
       this->GetNeighborIterator(&next2, &next, (ii+2)%3,1, ii,0, (ii+1)%3,0);
-      this->AddEquivalence(&next2, &next);
       if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
         {
         // Neighbor is outside of fragment.  Make a face.
         this->CreateFace(iterator, ii, 1, &next2);
         }    
-      else if (next2.FragmentIdPointer[0] == 0)
+      else if (next2.FragmentIdPointer[0] == -1)
         { // We have not visited this neighbor yet. Mark the voxel and recurse.
         this->ConnectFragment(&next2);
         }
+      else
+        { // The last case is that we have already visited this voxel and it
+        // is in the same fragment.
+        this->AddEquivalence(&next2, &next);
+        }
       // To get the +Y+Z start with the +Z iterator and move +Y put results in "next"
       this->GetNeighborIterator(&next, &next2, (ii+1)%3,1, (ii+2)%3,0, ii,0);
-      this->AddEquivalence(&next2, &next);
       if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
         {
         // Neighbor is outside of fragment.  Make a face.
         this->CreateFace(iterator, ii, 1, &next);
         }    
-      else if (next.FragmentIdPointer[0] == 0)
+      else if (next.FragmentIdPointer[0] == -1)
         { // We have not visited this neighbor yet. Mark the voxel and recurse.
         this->ConnectFragment(&next);
+        }
+      else
+        { // The last case is that we have already visited this voxel and it
+        // is in the same fragment.
+        this->AddEquivalence(&next2, &next);
         }
       }
     }
@@ -3236,11 +3271,10 @@ void vtkCTHFragmentConnect::AddEquivalence(
   int id1 = *(neighbor1->FragmentIdPointer);
   int id2 = *(neighbor2->FragmentIdPointer);
 
-  if (id1 == 0 || id2 == 0)
-    { // We are just hitting voxels that are not part of any fragment yet.
-    return;
+  if (id1 != id2 && id1 != -1 && id2 != -1)
+    {
+    this->EquivalenceSet->AddEquivalence(id1, id2);
     }
-  this->EquivalenceSet->AddEquivalence(id1, id2);
 }
 
 
@@ -3250,10 +3284,9 @@ void vtkCTHFragmentConnect::ResolveEquivalences(vtkIntArray* fragmentIdArray)
   // Go through the equivalence array collapsing chains 
   // and assigning consecutive ids.
 
-  return;
-
-  // Make the new ids sequential.
-  this->EquivalenceSet->ResolveEquivalences();
+  // Resolve intraprocess and extra process equivalences.
+  // This also renumbers set ids to be sequential.
+  this->GatherEquivalenceSets(this->EquivalenceSet);
   
   // Now change the ids in the cell / point array.
   int num = fragmentIdArray->GetNumberOfTuples();
@@ -3275,18 +3308,18 @@ void vtkCTHFragmentConnect::ResolveEquivalences(vtkIntArray* fragmentIdArray)
 
 //----------------------------------------------------------------------------
 void vtkCTHFragmentConnect::GatherEquivalenceSets(
-  vtkCTHFragmentEquivalenceSet* vtkNotUsed(set))
+  vtkCTHFragmentEquivalenceSet* set)
 {
-/*
   int numProcs = this->Controller->GetNumberOfProcesses();
   int myProcId = this->Controller->GetLocalProcessId();
-  
+  int numLocalMembers = set->GetNumberOfMembers();
+
   // Find a mapping between local fragment id and the global fragment ids.
   int* mapping;
   mapping = new int[numProcs];
   if (myProcId == 0)
     {
-    mapping[0] = set->EquivalenceArray->GetNumberOfTuples();
+    mapping[0] = numLocalMembers;
     for (int ii = 1; ii < numProcs; ++ii)
       {
       this->Controller->Receive(mapping+ii, 1, ii, 875034);
@@ -3294,17 +3327,16 @@ void vtkCTHFragmentConnect::GatherEquivalenceSets(
     // Now send the results back to all processes.
     for (int ii = 1; ii < numProcs; ++ii)
       {
-      this->Controller->Receive(mapping, numProcs, ii, 875035);
+      this->Controller->Send(mapping, numProcs, ii, 875035);
       }
     }
   else
     {
-    int numIds = set->EquivalenceArray->GetNumberOfTuples();
-    this->Controller->Send(numIds, 1, 0, 875034);
+    this->Controller->Send(&numLocalMembers, 1, 0, 875034);
     this->Controller->Receive(mapping, numProcs, 0, 875035);
     }
   // Change mapping to be the id offsets.
-  int totalNumberOIfIds = 0;
+  int totalNumberOfIds = 0;
   for (int ii = 0; ii < numProcs; ++ii)
     {
     int numIds = mapping[ii];
@@ -3313,247 +3345,181 @@ void vtkCTHFragmentConnect::GatherEquivalenceSets(
     }
 
   // Change the set to a global set.
-  vtkCTHFragmentEquivalenceSet *globalSet = new vtkCTHFragmentEquivalenceSet;\
-  globalSet->AddEquivalence(totalNumberOfIds-1, totalNumberOfIds-1);
+  vtkCTHFragmentEquivalenceSet *globalSet = new vtkCTHFragmentEquivalenceSet;
+  // This just initializes the set so that every set has one member.
+  //  Every id is equivalent to itself and no others.
+  if (totalNumberOfIds > 0)
+    { // This crashes if there no fragemnts extracted.
+    globalSet->AddEquivalence(totalNumberOfIds-1, totalNumberOfIds-1);
+    }
   // Add the equivalences from our process.
   int myOffset = mapping[myProcId];
-  int numMembers = set->GetNumberOfMembers();
   int memberSetId;
-  for(int ii = 0; ii < numMembers; ++ii)
+  for(int ii = 0; ii < numLocalMembers; ++ii)
     {
     memberSetId = set->GetEquivalentSetId(ii);
-  // This will be inefficient until I make the scheduled improvemnt to the
-  // add method (Ordered multilevel tree instead of a one level tree).
-    globalSet->AddEquivalence(ii+myOffset, memberSetId+offset);
+    // This will be inefficient until I make the scheduled improvemnt to the
+    // add method (Ordered multilevel tree instead of a one level tree).
+    globalSet->AddEquivalence(ii+myOffset, memberSetId+myOffset);
     }
+
+  //cerr << myProcId << " Input set: " << endl;
+  //set->Print();
+  //cerr << myProcId << " global set: " << endl;
+  //globalSet->Print();
 
   // Now add equivalents between processes.
   // Send all the ghost blocks to the process that owns the block.
   // Compare ids and add the equivalences.
   this->ShareGhostEquivalences(globalSet, mapping);
 
+  //cerr << "Global after ghost: " << myProcId << endl;
+  //globalSet->Print();
 
-
-
-  // Last, merge all of the processes global sets.
+  // Merge all of the processes global sets.
   // Clean the global set so that the resulting set ids are sequential.
+  this->MergeGhostEquivalenceSets(globalSet);
 
+  //cerr << "Global after merge: " << myProcId << endl;
+  //globalSet->Print();
 
 
 
   // Copy the equivalences to the local set for returning our results.
   // Member ids will be back in local coordinate system but the set ids
   // will still be global.
-*/
+  int* localPtr = set->GetPointer();
+  int* globalPtr = globalSet->GetPointer();
+  // Find the location of values for our process.
+  globalPtr += mapping[myProcId];
+  // Now copy the values.
+  memcpy(localPtr, globalPtr, numLocalMembers*sizeof(int));
 }
 
-/*
+//----------------------------------------------------------------------------
+void vtkCTHFragmentConnect::MergeGhostEquivalenceSets(
+  vtkCTHFragmentEquivalenceSet* globalSet)
+{
+  int myProcId = this->Controller->GetLocalProcessId();
+  int* buf = globalSet->GetPointer();
+  int numIds = globalSet->GetNumberOfMembers();
+  
+  // Send all the sets to process 0 to be merged.
+  if (myProcId > 0)
+    {
+    this->Controller->Send(buf, numIds, 0, 342320);
+    // Now receive the final equivalences.
+    this->Controller->Receive(buf, numIds, 0, 342321);
+    return;
+    }
+
+  int numProcs = this->Controller->GetNumberOfProcesses();
+  int* tmp;
+  tmp = new int[numIds];
+  for (int ii = 1; ii < numProcs; ++ii)
+    {
+    this->Controller->Receive(tmp, numIds, ii, 342320);
+    // Merge the values.
+    for (int jj = 0; jj < numIds; ++jj)
+      {
+      if (tmp[jj] != jj)
+        { // TODO: Make sure this is efficient.  Avoid n^2.
+        globalSet->AddEquivalence(jj, tmp[jj]);
+        }
+      }
+    }
+
+  // Make the set ids sequential.
+  globalSet->ResolveEquivalences();
+    
+  // The pointers should still be valid.
+  // The array should not resize here.
+  for (int ii = 1; ii < numProcs; ++ii)
+    {
+    this->Controller->Send(buf, numIds, ii, 342321);
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkCTHFragmentConnect::ShareGhostEquivalences(
-      vtkCTHFragmentEquivalenceSet* globalSet,
-      int *offsets)
+  vtkCTHFragmentEquivalenceSet* globalSet,
+  int* procOffsets)
 {
   int numProcs = this->Controller->GetNumberOfProcesses();
   int myProcId = this->Controller->GetLocalProcessId();
 
 
-  int sendMsg[9];
-  int *ext;
+  int sendMsg[8];
   int bufSize = 0;
   unsigned char* buf = 0;
-  int dataSize;
-  vtkCTHFragmentConnectBlock* ghostBlock;
 
   // Loop through the other processes.
-  int* blockMetaDataPtr = blockMetaData;
   for (int otherProc = 0; otherProc < numProcs; ++otherProc)
     {
     if (otherProc == myProcId)
       {
-      this->ReceiveGhostFragmentIds();
+      this->ReceiveGhostFragmentIds(globalSet, procOffsets);
       }
     else
       {
       // Loop through our ghost blocks sending the 
       // ones that are owned by otherProc.
-      for (int blockId = 0; blockId < this->NumberOfInputBlocks; ++blockId)
+      int num = this->GhostBlocks.size();
+      for (int blockId = 0; blockId < num; ++blockId)
         {
-        vtkCTHFragmentConnectBlock* block = this->InputBlocks[blockId];
-        if (block && block->GetOwnerProcessId() == otherProcId)
+        vtkCTHFragmentConnectBlock* block = this->GhostBlocks[blockId];
+        if (block && block->GetOwnerProcessId() == otherProc && block->GetGhostFlag())
           {
           sendMsg[0] = myProcId;
-          sendMsg[1] 
-          sendMsg[2] = block->GetLevel();
-          int* ext = sendMsg + 3;
-          }
-
-
-
-        requestMsg[0] = myProc;
-        requestMsg[1] = id;
-        ext = requestMsg + 2;
-        // Block meta data is level and base-cell-extent.
-        int ghostBlockLevel = blockMetaDataPtr[0];
-        int *ghostBlockExt = blockMetaDataPtr+1;
-        if (ghostBlockLevel == 3)
-          {
-          if (ghostBlockExt[0] < 156 && 156 < ghostBlockExt[1] &&
-              ghostBlockExt[2] < 76 && 76 < ghostBlockExt[3] &&
-              ghostBlockExt[4] < 68 && 68 < ghostBlockExt[5])
-            { // Ghsot block from process 0
-            // -x nerighbot of block 1214
-            cerr << "here process 0\n";
-            }
-          }
-
-        if (this->ComputeRequiredGhostExtent(ghostBlockLevel, ghostBlockExt, ext))
-          {
-          this->Controller->Send(requestMsg, 8, otherProc, 708923);
-          // Now receive the ghost block.
-          dataSize = (ext[1]-ext[0]+1)*(ext[3]-ext[2]+1)*(ext[5]-ext[4]+1);
-          if (bufSize < dataSize) 
-            {
-            if (buf) { delete [] buf;}
-            buf = new unsigned char[dataSize];
-            bufSize = dataSize;
-            }
-          this->Controller->Receive(buf, dataSize, otherProc, 433240);
-          // Make the ghost block and add it to the grid.
-          ghostBlock = new vtkCTHFragmentConnectBlock;
-          ghostBlock->InitializeGhostLayer(buf, ext, ghostBlockLevel, 
-                                           this->GlobalOrigin, this->RootSpacing,
-                                           otherProc);
-          // Save for deleting.
-          this->GhostBlocks.push_back(ghostBlock);
-          // Add to grid and connect up neighbors.
-          this->AddBlock(ghostBlock);
-          }
-        // Move to the next block.
-        blockMetaDataPtr += 7;
-        }
-      // Send the message that indicates we have no more requests.
-      requestMsg[1] = -1;
-      this->Controller->Send(requestMsg, 8, otherProc, 708923);
-      }
-    }
-    
-  if (buf)
-    {
-    delete [] buf;
-    }
-
+          // Since this is a ghost block, the remote block id
+          // will be different than the id we use.
+          // We just want to make it easy for the process that owns this block
+          // to match the ghost block with the aoriginal.
+          sendMsg[1] = block->GetBlockId();
+          int* ext = sendMsg + 2;
+          block->GetCellExtent(ext);
+          this->Controller->Send(sendMsg, 8, otherProc, 722265);
+          // Now send the fragment id array.
+          int* framentIds = block->GetFragmentIdPointer();
+          this->Controller->Send(framentIds, (ext[1]-ext[0]+1)*(ext[3]-ext[2]+1)*(ext[5]-ext[4]+1),
+                                 otherProc, 722266);
+          } // End if ghost  block owned by other process.
+        } // End loop over all blocks.
+      // Send the message that indicates we have nothing more to send.
+      sendMsg[0] = myProcId;
+      sendMsg[1] = -1;
+      this->Controller->Send(sendMsg, 8, otherProc, 722265);
+      } // End if we shoud send or receive.
+    } // End loop over all processes.
 }
 
-
-
-//ggggggggggggggggggg
-
 //----------------------------------------------------------------------------
-// Loop over all blocks from other processes.  Find all local blocks
-// that touch the block.
-void vtkCTHFragmentConnect::ComputeAndDistributeGhostBlocks(
-  int *numBlocksInProc,
-  int* blockMetaData,
-  int myProc,
-  int numProcs)
+// Receive all the gost blocks from remote processes and 
+// find the equivalences.
+void vtkCTHFragmentConnect::ReceiveGhostFragmentIds(
+  vtkCTHFragmentEquivalenceSet* globalSet,
+  int* procOffsets)
 {
-  int requestMsg[8];
-  int *ext;
-  int bufSize = 0;
-  unsigned char* buf = 0;
-  int dataSize;
-  vtkCTHFragmentConnectBlock* ghostBlock;
-
-  // Loop through the other processes.
-  int* blockMetaDataPtr = blockMetaData;
-  for (int otherProc = 0; otherProc < numProcs; ++otherProc)
-    {
-    if (otherProc == myProc)
-      {
-      this->HandleGhostBlockRequests();
-      // Skip the metat data for this process.
-      blockMetaDataPtr += + 7*numBlocksInProc[myProc];
-      }
-    else
-      {
-      // Loop through the extents in the remote process.
-      for (int id = 0;  id < numBlocksInProc[otherProc]; ++id)
-        {
-        // Request message is (requesting process, block id, required extent)
-        requestMsg[0] = myProc;
-        requestMsg[1] = id;
-        ext = requestMsg + 2;
-        // Block meta data is level and base-cell-extent.
-        int ghostBlockLevel = blockMetaDataPtr[0];
-        int *ghostBlockExt = blockMetaDataPtr+1;
-        if (ghostBlockLevel == 3)
-          {
-          if (ghostBlockExt[0] < 156 && 156 < ghostBlockExt[1] &&
-              ghostBlockExt[2] < 76 && 76 < ghostBlockExt[3] &&
-              ghostBlockExt[4] < 68 && 68 < ghostBlockExt[5])
-            { // Ghsot block from process 0
-            // -x nerighbot of block 1214
-            cerr << "here process 0\n";
-            }
-          }
-
-        if (this->ComputeRequiredGhostExtent(ghostBlockLevel, ghostBlockExt, ext))
-          {
-          this->Controller->Send(requestMsg, 8, otherProc, 708923);
-          // Now receive the ghost block.
-          dataSize = (ext[1]-ext[0]+1)*(ext[3]-ext[2]+1)*(ext[5]-ext[4]+1);
-          if (bufSize < dataSize) 
-            {
-            if (buf) { delete [] buf;}
-            buf = new unsigned char[dataSize];
-            bufSize = dataSize;
-            }
-          this->Controller->Receive(buf, dataSize, otherProc, 433240);
-          // Make the ghost block and add it to the grid.
-          ghostBlock = new vtkCTHFragmentConnectBlock;
-          ghostBlock->InitializeGhostLayer(buf, ext, ghostBlockLevel, this->GlobalOrigin, this->RootSpacing);
-          // Save for deleting.
-          this->GhostBlocks.push_back(ghostBlock);
-          // Add to grid and connect up neighbors.
-          this->AddBlock(ghostBlock);
-          }
-        // Move to the next block.
-        blockMetaDataPtr += 7;
-        }
-      // Send the message that indicates we have no more requests.
-      requestMsg[1] = -1;
-      this->Controller->Send(requestMsg, 8, otherProc, 708923);
-      }
-    }
-    
-  if (buf)
-    {
-    delete [] buf;
-    }
-}
-
-
-//----------------------------------------------------------------------------
-// Keep receiving and filling requests until all processes say they 
-// are finished asking for blocks.
-void vtkCTHFragmentConnect::HandleGhostBlockRequests()
-{
-  int requestMsg[8];
+  int msg[8];
   int otherProc;
   int blockId;
   vtkCTHFragmentConnectBlock* block;
   int bufSize = 0;
-  unsigned char* buf = 0;
+  int* buf = 0;
   int dataSize;
-  int* ext;
+  int* remoteExt;
+  int localId, remoteId;
+  int myProcId = this->Controller->GetLocalProcessId();
+  int localOffset = procOffsets[myProcId];
+  int remoteOffset;
 
   // We do not receive requests from our own process.
   int remainingProcs = this->Controller->GetNumberOfProcesses() - 1;
   while (remainingProcs != 0)
     {
-    this->Controller->Receive(requestMsg, 8, vtkMultiProcessController::ANY_SOURCE, 708923);
-    otherProc = requestMsg[0];
-    blockId = requestMsg[1];
+    this->Controller->Receive(msg, 8, vtkMultiProcessController::ANY_SOURCE, 722265);
+    otherProc = msg[0];
+    blockId = msg[1];
     if (blockId == -1)
       {
       --remainingProcs;
@@ -3567,19 +3533,56 @@ void vtkCTHFragmentConnect::HandleGhostBlockRequests()
         vtkErrorMacro("Missing block request.");
         return;
         }
-      // Crop the block.
-      // Now extract the data for the ghost layer.
-      ext = requestMsg+2;
-      dataSize = (ext[1]-ext[0]+1)*(ext[3]-ext[2]+1)*(ext[5]-ext[4]+1);
+      // Receive the ghost fragment ids.
+      remoteExt = msg+2;
+      dataSize = (remoteExt[1]-remoteExt[0]+1)
+                  *(remoteExt[3]-remoteExt[2]+1)
+                  *(remoteExt[5]-remoteExt[4]+1);
       if (bufSize < dataSize) 
         {
         if (buf) { delete [] buf;}
-        buf = new unsigned char[dataSize];
+        buf = new int[dataSize];
         bufSize = dataSize;
         }
-      block->ExtractExtent(buf, ext);
-      // Send the block.
-      this->Controller->Send(buf, dataSize, otherProc, 433240);
+      remoteOffset = procOffsets[otherProc];
+      this->Controller->Receive(buf, dataSize, otherProc, 722266);
+      // We have our block, and the remote fragmentIds.
+      // Now for the equivalences.
+      // Loop through all of the voxels.
+      int* remoteFragmentIds = buf;
+      int* localFragmentIds = block->GetFragmentIdPointer();
+      int localExt[6];
+      int localIncs[3];
+      block->GetCellExtent(localExt);
+      block->GetCellIncrements(localIncs);
+      int *px, *py, *pz;
+      // Find the starting voxel in the local block.
+      pz = localFragmentIds + (remoteExt[0]-localExt[0])*localIncs[0]
+                            + (remoteExt[2]-localExt[2])*localIncs[1]
+                            + (remoteExt[4]-localExt[4])*localIncs[2];
+      for (int iz = remoteExt[4]; iz <= remoteExt[5]; ++iz)
+        {
+        py = pz;
+        for (int iy = remoteExt[2]; iy <= remoteExt[3]; ++iy)
+          {
+          px = py;
+          for (int ix = remoteExt[0]; ix <= remoteExt[1]; ++ix)
+            {
+            // Convert local fragment ids to global ids.
+            localId = *px;
+            remoteId = *remoteFragmentIds;
+            if (localId >= 0 && remoteId >= 0)
+              {
+              globalSet->AddEquivalence(localId + localOffset, 
+                                        remoteId + remoteOffset);
+              }
+            ++remoteFragmentIds;
+            ++px;
+            }
+          py += localIncs[1];
+          }
+        pz += localIncs[2];
+        }
       }
     }
   if (buf)
@@ -3587,4 +3590,4 @@ void vtkCTHFragmentConnect::HandleGhostBlockRequests()
     delete [] buf;
     }
 }
-*/
+
