@@ -23,7 +23,7 @@
 #include <vtkstd/algorithm>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkPVDReader, "1.6");
+vtkCxxRevisionMacro(vtkPVDReader, "1.7");
 vtkStandardNewMacro(vtkPVDReader);
 
 
@@ -102,8 +102,29 @@ void vtkPVDReader::ReadXMLData()
         {
         cnt++;
         }
+      //because steps[cnt] is sorted, we need this loop to find the actual
+      //index that corresponds to the time we found in case the list did not
+      //arrive in min to max sorted order already
+      int cnt2 = 0;
+      bool found = false;
+      while (cnt2 < tsLength && !found)
+        {
+        double val = strtod(this->GetAttributeValue("timestep", cnt2), NULL);
+        if (val == steps[cnt])
+          {
+          found = true;
+          }
+        else 
+          {
+          cnt2++;
+          }
+        }
+      if (!found) 
+        {
+        cnt2 = 0;
+        }        
       this->SetRestrictionImpl("timestep", 
-                               this->GetAttributeValue("timestep", cnt),
+                               this->GetAttributeValue("timestep", cnt2),
                                false);
       // This is what we will read.
       vtkDataObject* output = outInfo->Get(vtkDataObject::DATA_OBJECT());
