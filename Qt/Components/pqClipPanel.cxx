@@ -60,9 +60,9 @@ void pqClipPanel::setScalarWidgetsVisibility(pqSMProxy aproxy)
     return;
     }
 
-  QLabel* label = this->findChild<QLabel*>("SelectInputScalars_label");
+  QLabel* label = this->findChild<QLabel*>("_labelForSelectInputScalars");
   QComboBox* arraySel = this->findChild<QComboBox*>("SelectInputScalars");
-  QLabel* label2 = this->findChild<QLabel*>("Value_label");
+  QLabel* label2 = this->findChild<QLabel*>("_labelForValue");
   QLineEdit* value = this->findChild<QLineEdit*>("Value");
   if (strcmp(aproxy->GetXMLName(), "Scalar") == 0)
     {
