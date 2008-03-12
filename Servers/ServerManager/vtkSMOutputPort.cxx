@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMOutputPort);
-vtkCxxRevisionMacro(vtkSMOutputPort, "1.3");
+vtkCxxRevisionMacro(vtkSMOutputPort, "1.4");
 
 
 //----------------------------------------------------------------------------
@@ -611,7 +611,7 @@ void vtkSMOutputPort::UpdatePipeline(double time)
          << vtkClientServerStream::Invoke
          << this->GetExecutiveID() << "SetUpdateExtent" << this->PortIndex
          << vtkClientServerStream::LastResult 
-         << pm->GetNumberOfPartitions(this->ConnectionID) * 200 << 0
+         << pm->GetNumberOfPartitions(this->ConnectionID) << 0
          << vtkClientServerStream::End; 
 
   stream << vtkClientServerStream::Invoke
