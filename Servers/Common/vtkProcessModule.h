@@ -345,16 +345,6 @@ public:
   vtkSetMacro(LogThreshold, double);
   vtkGetMacro(LogThreshold, double);
 
-//BTX
-  // Description:
-  // I am experimenting with streaming. This turns streaming on and off.
-  // When this value is zero, pipelines do not update.
-  // When the flag is turned on, then the pipeline streams.
-  void SetStreamBlock(int val);
-  static int GetStreamBlock();
-//ETX
-  void SetStreamBlockFlag(int val);
-
   // Description:
   // We need to get the data path for the demo on the server.
   const char* GetPath(const char* tag, const char* relativePath, const char* file);
@@ -731,8 +721,6 @@ protected:
   // This flag is used to shut the SendStream from sending any thing to
   // the servers. This is useful for reiviving a server manager.
   int SendStreamToClientOnly;
-
-  static int StreamBlockFlag;
 
   int UseMPI;
 

@@ -106,11 +106,9 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.78");
+vtkCxxRevisionMacro(vtkProcessModule, "1.79");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
-
-int vtkProcessModule::StreamBlockFlag = 0;
 
 //-----------------------------------------------------------------------------
 vtkProcessModule::vtkProcessModule()
@@ -1489,35 +1487,6 @@ void vtkProcessModule::ResetLog()
 void vtkProcessModule::SetEnableLog(int flag)
 {
   vtkTimerLog::SetLogging(flag);
-}
-
-//-----------------------------------------------------------------------------
-void vtkProcessModule::SetStreamBlock(int val)
-{
-  if (this->StreamBlockFlag == val)
-    {
-    return;
-    }
-  this->SetStreamBlockFlag(val);
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << this->GetProcessModuleID()
-         << "SetStreamBlockFlag" << val << vtkClientServerStream::End;
-  this->SendStream(
-    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
-    vtkProcessModule::DATA_SERVER, stream);
-}
-
-//-----------------------------------------------------------------------------
-int vtkProcessModule::GetStreamBlock()
-{
-  return vtkProcessModule::StreamBlockFlag;
-}
-
-//-----------------------------------------------------------------------------
-void vtkProcessModule::SetStreamBlockFlag(int val)
-{
-  this->StreamBlockFlag = val;
 }
 
 //============================================================================

@@ -90,7 +90,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.61");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.62");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -532,10 +532,7 @@ void vtkSMRenderViewProxy::BeginStillRender()
   // Interactive renders get called through the PVInteractorStyles
   // which cal ResetCameraClippingRange on the Renderer.
   // We could convert them to call a method on the module directly ...
-  if ( ! vtkProcessModule::GetStreamBlock())
-    {
-    this->GetRenderer()->ResetCameraClippingRange();
-    }
+  this->GetRenderer()->ResetCameraClippingRange();
   renWindow->SetDesiredUpdateRate(0.002);
 
   this->SetUseLOD(false);
