@@ -41,7 +41,7 @@
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.7");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.8");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //============================================================================
@@ -3447,10 +3447,7 @@ void vtkCTHFragmentConnect::ShareGhostEquivalences(
 {
   int numProcs = this->Controller->GetNumberOfProcesses();
   int myProcId = this->Controller->GetLocalProcessId();
-
-
   int sendMsg[8];
-  unsigned char* buf = 0;
 
   // Loop through the other processes.
   for (int otherProc = 0; otherProc < numProcs; ++otherProc)
