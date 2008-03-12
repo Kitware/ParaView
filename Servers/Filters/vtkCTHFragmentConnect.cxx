@@ -41,7 +41,7 @@
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.6");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.7");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //============================================================================
@@ -3450,7 +3450,6 @@ void vtkCTHFragmentConnect::ShareGhostEquivalences(
 
 
   int sendMsg[8];
-  int bufSize = 0;
   unsigned char* buf = 0;
 
   // Loop through the other processes.
