@@ -37,9 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMProxyManager.h"
 #include "pqDataRepresentation.h"
+#include "pqServer.h"
 
 // configured with CMake
-// requires: VIEW_TYPE, VIEW_TYPE_NAME, DISPLAY_TYPE, VIEW_XML_GROUP
+// requires: VIEW_TYPE, VIEW_TYPE_NAME, DISPLAY_TYPE, VIEW_XML_GROUP,
+//      VIEW_XML_NAME
 
 @VIEW_TYPE@Implementation::@VIEW_TYPE@Implementation(QObject* o)
   : QObject(o)
@@ -66,12 +68,29 @@ bool @VIEW_TYPE@Implementation::canCreateView(const QString& viewtype) const
   return viewtype == "@VIEW_TYPE@";
 }
 
-vtkSMProxy* @VIEW_TYPE@Implementation::createViewProxy(const QString& viewtype)
+vtkSMProxy* @VIEW_TYPE@Implementation::createViewProxy(const QString& viewtype,
+                                                       pqServer *server)
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   if(viewtype == "@VIEW_TYPE@")
     {
-    return pxm->NewProxy("@VIEW_XML_GROUP@", "@VIEW_TYPE@");
+    // First, see if there is a render view specific to the server
+    QString xmlname
+      = QString("@VIEW_XML_NAME@%1").arg(server->getRenderViewXMLName());
+    if (pxm->ProxyElementExists("@VIEW_XML_GROUP@", xmlname.toAscii().data()))
+      {
+      return pxm->NewProxy("@VIEW_XML_GROUP@", xmlname.toAscii().data());
+      }
+
+    // Next, see what happens if we augment the type with View, in case this is
+    // how it is registered in XML.
+    if (pxm->ProxyElementExists("@VIEW_XML_GROUP@", "@VIEW_XML_NAME@View"))
+      {
+      return pxm->NewProxy("@VIEW_XML_GROUP@", "@VIEW_XML_NAME@View");
+      }
+
+    // Last, just return whatever objectis registered under the view name.
+    return pxm->NewProxy("@VIEW_XML_GROUP@", "@VIEW_XML_NAME@");
     }
 
   return NULL;

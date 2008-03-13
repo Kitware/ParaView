@@ -49,7 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
-#include "pqComparativeRenderView.h"
 #include "pqDataRepresentation.h"
 #include "pqNameCount.h"
 #include "pqOutputPort.h"
@@ -291,28 +290,16 @@ pqView* pqObjectBuilder::createView(const QString& type,
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* proxy= 0;
-  if(type == pqRenderView::renderViewType())
+
+  QObjectList ifaces =
+    pqApplicationCore::instance()->getPluginManager()->interfaces();
+  foreach(QObject* iface, ifaces)
     {
-    proxy = server->newRenderView();
-    }
-  else if (type == pqComparativeRenderView::comparativeRenderViewType())
-    {
-    QString xmlname = server->getRenderViewXMLName();
-    xmlname = "Comparative" + xmlname;
-    proxy = pxm->NewProxy("views", xmlname.toAscii().data());
-    }
-  else
-    {
-    QObjectList ifaces =
-      pqApplicationCore::instance()->getPluginManager()->interfaces();
-    foreach(QObject* iface, ifaces)
+    pqViewModuleInterface* vmi = qobject_cast<pqViewModuleInterface*>(iface);
+    if(vmi && vmi->viewTypes().contains(type))
       {
-      pqViewModuleInterface* vmi = qobject_cast<pqViewModuleInterface*>(iface);
-      if(vmi && vmi->viewTypes().contains(type))
-        {
-        proxy = vmi->createViewProxy(type);
-        break;
-        }
+      proxy = vmi->createViewProxy(type, server);
+      break;
       }
     }
 

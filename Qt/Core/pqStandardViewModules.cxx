@@ -33,13 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardViewModules.h"
 
 #include "vtkSMProxyManager.h"
-#include "vtkSMViewProxy.h"
+#include "vtkSMRenderViewProxy.h"
 
 #include "pqBarChartRepresentation.h"
 #include "pqComparativeRenderView.h"
 #include "pqLineChartRepresentation.h"
 #include "pqPlotView.h"
 #include "pqRenderView.h"
+#include "pqServer.h"
 #include "pqSpreadSheetView.h"
 #include "pqTableView.h"
 #include "pqTextRepresentation.h"
@@ -107,10 +108,21 @@ bool pqStandardViewModules::canCreateView(const QString& viewtype) const
   return this->viewTypes().contains(viewtype);
 }
 
-vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype)
+vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
+                                                   pqServer *server)
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  if(viewtype == pqPlotView::barChartType())
+  if(viewtype == pqRenderView::renderViewType())
+    {
+    return server->newRenderView();
+    }
+  else if(viewtype == pqComparativeRenderView::comparativeRenderViewType())
+    {
+    QString xmlname = server->getRenderViewXMLName();
+    xmlname = "Comparative" + xmlname;
+    return pxm->NewProxy("views", xmlname.toAscii().data());
+    }
+  else if(viewtype == pqPlotView::barChartType())
     {
     return pxm->NewProxy("views", "BarChartView");
     }

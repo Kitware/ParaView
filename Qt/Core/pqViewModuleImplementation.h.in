@@ -54,7 +54,7 @@ public:
 
   bool canCreateView(const QString& viewtype) const;
   
-  vtkSMProxy* createViewProxy(const QString& viewtype);
+  vtkSMProxy* createViewProxy(const QString& viewtype, pqServer *server);
 
   pqView* createView(const QString& viewtype,
     const QString& group,

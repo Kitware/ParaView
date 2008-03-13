@@ -82,7 +82,8 @@ public:
   ///
   /// implement this to call 
   /// vtkSMProxyManager::NewProxy("plotmodules", "MyCustomViewModule")
-  virtual vtkSMProxy* createViewProxy(const QString& viewtype) = 0;
+  virtual vtkSMProxy* createViewProxy(const QString& viewtype,
+                                      pqServer *server) = 0;
 
   /// Creates the GUI view that corresponds with the server manager view
   /// viewtype is the type of view (e.g. MyCustomViewModule),
