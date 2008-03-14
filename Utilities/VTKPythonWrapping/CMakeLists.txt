@@ -577,9 +577,9 @@ IF (PARAVIEW_ENABLE_PYTHON AND NOT VTK_WRAP_PYTHON)
 
     # If using X with Tk, we need to link to X when we link
     # to Tk in order to support static linking.
-    IF(CMAKE_HAS_X)
-      SET(KIT_PYTHON_LIBS ${KIT_PYTHON_LIBS} -lXt ${CMAKE_X_LIBS})
-    ENDIF(CMAKE_HAS_X)
+    IF(VTK_USE_X)
+      SET(KIT_PYTHON_LIBS ${KIT_PYTHON_LIBS} ${X11_Xt_LIB} ${X11_LIBRARIES})
+    ENDIF(VTK_USE_X)
   ENDIF(UNIX)
   SET(KIT_PYTHON_DEPS)
   SET(VTK_INSTALL_NO_LIBRARIES 1)
