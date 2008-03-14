@@ -43,36 +43,15 @@ ENDIF(Q_WS_MAC AND QT4_FOUND AND NOT QT_QTDESIGNER_INCLUDE_DIR)
 
 # help CMake find debug QtUiTools on Windows
 #
-# Remove "info-debug-morva-warnings" MESSAGE calls after the warnings on the
-# morva dashboards are gone...
-#
 IF(WIN32 AND QT_QTUITOOLS_FOUND)
   IF(NOT QT_QTUITOOLS_LIBRARY_DEBUG MATCHES "QtUiToolsd")
-    MESSAGE(STATUS "info-debug-morva-warnings: qtuitools 1")
-    MESSAGE(STATUS "info-debug-morva-warnings: QT_LIBRARY_DIR='${QT_LIBRARY_DIR}'")
     SET(MY_QT_QTUITOOLS_LIBRARY_DEBUG "${QT_LIBRARY_DIR}/QtUiToolsd.lib")
     IF(EXISTS "${MY_QT_QTUITOOLS_LIBRARY_DEBUG}")
-      MESSAGE(STATUS "info-debug-morva-warnings: qtuitools 2")
       SET(QT_QTUITOOLS_LIBRARY_DEBUG "${MY_QT_QTUITOOLS_LIBRARY_DEBUG}" CACHE FILEPATH "QtUiTools debug library" FORCE)
       SET(QT_QTUITOOLS_LIBRARY optimized ${QT_QTUITOOLS_LIBRARY_RELEASE}
                                debug ${QT_QTUITOOLS_LIBRARY_DEBUG} CACHE FILEPATH "The Qt QtUiTools library" FORCE)
-    ELSE(EXISTS "${MY_QT_QTUITOOLS_LIBRARY_DEBUG}")
-      MESSAGE(STATUS "info-debug-morva-warnings: qtuitools 3")
     ENDIF(EXISTS "${MY_QT_QTUITOOLS_LIBRARY_DEBUG}")
-  ELSE(NOT QT_QTUITOOLS_LIBRARY_DEBUG MATCHES "QtUiToolsd")
-    MESSAGE(STATUS "info-debug-morva-warnings: qtuitools 4")
   ENDIF(NOT QT_QTUITOOLS_LIBRARY_DEBUG MATCHES "QtUiToolsd")
-
-  GET_CMAKE_PROPERTY(vs VARIABLES)
-  FOREACH(v ${vs})
-    SET(myv "${v}")
-    IF(myv MATCHES "UITOOLS" OR myv MATCHES "UiTools" OR "${myv}" MATCHES "\\\\")
-      MESSAGE(STATUS "info-debug-morva-warnings: ${v}='${${v}}'")
-    ENDIF(myv MATCHES "UITOOLS" OR myv MATCHES "UiTools" OR "${myv}" MATCHES "\\\\")
-  ENDFOREACH(v)
-
-  MESSAGE(STATUS "info-debug-morva-warnings: QT_LIBRARIES='${QT_LIBRARIES}'")
-  MESSAGE(STATUS "info-debug-morva-warnings: qtuitools 5")
 ENDIF(WIN32 AND QT_QTUITOOLS_FOUND)
 
 SET(QT_USE_QTUITOOLS TRUE)
@@ -81,9 +60,6 @@ SET(QT_USE_QTXML TRUE)  # uitools depends on xml
 # We don't need to find the Qt4 package or include the use file
 # in any of the SUBDIRS in this directory.
 INCLUDE(${QT_USE_FILE})
-
-MESSAGE(STATUS "info-debug-morva-warnings: QT_LIBRARIES='${QT_LIBRARIES}'")
-MESSAGE(STATUS "info-debug-morva-warnings: qtuitools 6")
 
 
 #########################################################################
@@ -106,4 +82,3 @@ ENDIF(PARAVIEW_ENABLE_PYTHON)
 ADD_SUBDIRECTORY(Components)
 
 ENDIF(QT4_FOUND)
-
