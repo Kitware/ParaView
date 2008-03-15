@@ -578,7 +578,21 @@ IF (PARAVIEW_ENABLE_PYTHON AND NOT VTK_WRAP_PYTHON)
     # If using X with Tk, we need to link to X when we link
     # to Tk in order to support static linking.
     IF(VTK_USE_X)
-      SET(KIT_PYTHON_LIBS ${KIT_PYTHON_LIBS} ${X11_Xt_LIB} ${X11_LIBRARIES})
+      IF(NOT X11_Xt_LIB)
+        SET(X11_LIB_SEARCH_PATH
+          /usr/X11R6/lib
+          /usr/X11R6/lib64
+          /usr/local/lib
+          /usr/openwin/lib
+          /usr/lib
+        )
+        FIND_LIBRARY(X11_Xt_LIB Xt ${X11_LIB_SEARCH_PATH})
+        MARK_AS_ADVANCED(X11_Xt_LIB)
+      ENDIF(NOT X11_Xt_LIB)
+      IF (X11_Xt_LIB)
+        SET(KIT_PYTHON_LIBS ${KIT_PYTHON_LIBS} ${X11_Xt_LIB})
+      ENDIF(X11_Xt_LIB)
+      SET(KIT_PYTHON_LIBS ${KIT_PYTHON_LIBS} ${X11_LIBRARIES})
     ENDIF(VTK_USE_X)
   ENDIF(UNIX)
   SET(KIT_PYTHON_DEPS)
