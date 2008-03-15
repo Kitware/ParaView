@@ -46,7 +46,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.26");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.27");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkCxxSetObjectMacro(vtkIceTRenderer, SortingKdTree, vtkPKdTree);
@@ -68,6 +68,11 @@ vtkIceTRenderer::vtkIceTRenderer()
   this->SetController(vtkMultiProcessController::GetGlobalController());
   this->PropVisibility = 0;
   this->CollectDepthBuffer = 0;
+
+  for ( int i = 0; i < 4; ++ i )
+    {
+    this->PhysicalViewport[i] = 0;
+    }
 }
 
 vtkIceTRenderer::~vtkIceTRenderer()
