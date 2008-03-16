@@ -201,6 +201,10 @@ void pqExodusIIPanel::linkServerManagerProperties()
   
   this->addSelectionToTreeWidget("Global Element Ids", "GlobalElementId", this->UI->Variables,
                    PM_ELEMBLK, "GenerateGlobalElementIdArray");
+
+  // integer array indicating file id (number in file name or position in sequence)
+  this->addSelectionToTreeWidget("File Ids", "FileId", this->UI->Variables,
+                   PM_ELEMBLK, "GenerateFileIdArray");
   
   // do the cell variables
   this->addSelectionsToTreeWidget("ElementResultArrayStatus",
