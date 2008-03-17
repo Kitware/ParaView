@@ -33,6 +33,7 @@ class vtkCTHFragmentLevel;
 class vtkCTHFragmentConnectBlock;
 class vtkCTHFragmentConnectIterator;
 class vtkCTHFragmentEquivalenceSet;
+class vtkCTHFragmentConnectRingBuffer;
 class vtkMultiProcessController;
 
 class VTK_EXPORT vtkCTHFragmentConnect : public vtkPolyDataAlgorithm
@@ -57,7 +58,7 @@ protected:
 
   int ProcessBlock(int blockId);
 
-  void ConnectFragment(vtkCTHFragmentConnectIterator* iterator);
+  void ConnectFragment(vtkCTHFragmentConnectRingBuffer* iterator);
   void GetNeighborIterator(
         vtkCTHFragmentConnectIterator* next,
         vtkCTHFragmentConnectIterator* iterator, 
@@ -106,7 +107,6 @@ protected:
     int myProc,
     int numProcs);
   
-  // These ivars ar to save stack space for recursive functions.
   vtkPolyData* Mesh;
   vtkMultiProcessController* Controller;
 
@@ -159,14 +159,15 @@ protected:
   vtkIntArray *LevelArray;
   
   int FragmentId;
+  // Integrate the volume for this fragment.
+  double Volume;
+  // Save the volume in this array indexed by the fragmentId.
+  vtkDoubleArray* FragmentVolumes;
+  
 
   double GlobalOrigin[3];
   double RootSpacing[3];
   int StandardBlockDimensions[3];
-
-  // Limit recursion depth to avoid stack overflow.
-  int RecursionDepth;
-  int MaximumRecursionDepth;
 
   void SaveBlockSurfaces(const char* fileName);
   void SaveGhostSurfaces(const char* fileName);

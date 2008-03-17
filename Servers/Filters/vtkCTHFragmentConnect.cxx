@@ -41,7 +41,7 @@
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.8");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.9");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //============================================================================
@@ -77,12 +77,14 @@ public:
   // You cannot add anymore equivalences after this is called.
   void ResolveEquivalences();
 
-
-
 private:
   // To merge connected framgments that have different ids because they were
   // traversed by different processes or passes.
   vtkIntArray *EquivalenceArray;
+
+  // Return the id of the equivalent set.
+  int GetReference(int memberId);
+  void EquateInternal(int id1, int id2);
 };
 
 
@@ -126,6 +128,22 @@ void vtkCTHFragmentEquivalenceSet::Print()
 // Return the id of the equivalent set.
 int vtkCTHFragmentEquivalenceSet::GetEquivalentSetId(int memberId)
 {
+  int ref;
+  
+  ref = this->GetReference(memberId);
+  while (ref != memberId)
+    {
+    memberId = ref;
+    ref = this->GetReference(memberId);
+    }
+    
+  return ref;
+}
+
+//----------------------------------------------------------------------------
+// Return the id of the equivalent set.
+int vtkCTHFragmentEquivalenceSet::GetReference(int memberId)
+{
   if (memberId >= this->EquivalenceArray->GetNumberOfTuples())
     { // We might consider this an error ...
     return memberId;
@@ -149,32 +167,52 @@ void vtkCTHFragmentEquivalenceSet::AddEquivalence(int id1, int id2)
     ++num;
     }
 
-  // The set ids for both the elements.
-  int s1 = this->GetEquivalentSetId(id1);
-  int s2 = this->GetEquivalentSetId(id2);
+ // Our rule for references in the equivalent set is that
+ // all elements must point to a member equal to or smaller
+ // than itself.
+ 
+ // The only problem we could encounter is changing a reference.
+ // we do not want to orphan anything previously referenced.
 
-  // Sort to find the smallest id.
-  if (s2 < s1)
+  // Replace the larger references.
+  if (id1 < id2)
     {
-    int tmp = s2;
-    s2 = s1;
-    s1 = tmp;
+    // We could follow the references to the smallest.  It might
+    // make this processing more efficient.  This is a compromise.
+    // The referenced id will always be smaller than the id so
+    // order does not change.
+    this->EquateInternal(this->GetReference(id1), id2);
     }
-    
-  // Set both the arguement elements set ids to the new value.
-  this->EquivalenceArray->SetValue(id1, s1);
-  this->EquivalenceArray->SetValue(id2, s1);
-
-  // Loop through all elements changing s2 to s1.
-  // This will work, but it will be slow (unless we get really lucky).
-  for (int jj = s2; jj < num; ++jj)
+  else
     {
-    if (this->EquivalenceArray->GetValue(jj) == s2)
-      {
-      this->EquivalenceArray->SetValue(jj, s1);
-      }
+    this->EquateInternal(this->GetReference(id2), id1);
     }
 }
+
+//----------------------------------------------------------------------------
+// id1 must be less than or equal to id2.
+void vtkCTHFragmentEquivalenceSet::EquateInternal(int id1, int id2)
+{
+  // This is the reference that might be orphaned in this process.
+  int oldRef = this->GetEquivalentSetId(id2);
+  
+ // The only problem we could encounter is changing a reference.
+ // we do not want to orphan anything previously referenced.
+  if (oldRef == id2 && oldRef == id1)
+    {
+    this->EquivalenceArray->SetValue(id2, id1);
+    }
+  else if (oldRef > id1)
+    {
+    this->EquivalenceArray->SetValue(id2, id1);
+    this->EquateInternal(id1, oldRef);
+    }
+  else
+    { // oldRef < id1
+    this->EquateInternal(oldRef, id1);
+    }
+}
+
 
 //----------------------------------------------------------------------------
 void vtkCTHFragmentEquivalenceSet::ResolveEquivalences()
@@ -203,7 +241,6 @@ void vtkCTHFragmentEquivalenceSet::ResolveEquivalences()
       this->EquivalenceArray->SetValue(ii,newId);
       }
     }
-
 }
 
 
@@ -412,6 +449,8 @@ void vtkCTHFragmentConnectBlock::Initialize(
 
   // Since CTH does not use convention that all blocks share an origin,
   // We must compute a new extent to help locate neighboring blocks.
+  // It is important to compute the global origin so that the base min
+  // extent is a multiple of the block dimensions (0, 8, 16...).
   int shift;
   shift = (int)(((this->Origin[0] - globalOrigin[0]) / this->Spacing[0]) + 0.5); 
   this->CellExtent[0] = imageExt[0] + shift;
@@ -834,6 +873,12 @@ void vtkCTHFragmentLevel::Initialize(
     vtkGenericWarningMacro("Level already initialized.");
     return;
     }
+  // Special case for a level with no blocks in it.
+  if (gridExtent[0] > gridExtent[1] || gridExtent[2] > gridExtent[3] || gridExtent[4] > gridExtent[5])
+    { // This should do the trick.
+    gridExtent[0] = gridExtent[1] = gridExtent[2] = gridExtent[3] = gridExtent[4] = gridExtent[5] = 0;
+    }
+
   this->Level = level;
   memcpy(this->GridExtent, gridExtent, 6*sizeof(int));
   int num = (this->GridExtent[1]-this->GridExtent[0]+1)
@@ -918,45 +963,7 @@ vtkCTHFragmentConnectBlock* vtkCTHFragmentLevel::GetBlock(
   return this->Grid[xIdx + yIdx*yInc + zIdx*zInc];
 }
 
-
-
 //============================================================================
-
-//----------------------------------------------------------------------------
-// Description:
-// Construct object with initial range (0,1) and single contour value
-// of 0.0. ComputeNormal is on, ComputeGradients is off and ComputeScalars is on.
-vtkCTHFragmentConnect::vtkCTHFragmentConnect()
-{
-  this->VolumeFractionArrayName = 0;
-
-  this->NumberOfInputBlocks = 0;
-  this->InputBlocks = 0;
-  this->Controller = vtkMultiProcessController::GetGlobalController();
-  this->GlobalOrigin[0]=this->GlobalOrigin[1]=this->GlobalOrigin[2]=0.0;
-  this->RootSpacing[0]=this->RootSpacing[1]=this->RootSpacing[2]=1.0;
-
-  this->RecursionDepth = 0;
-  this->MaximumRecursionDepth = 10000;
-  // Testing the equivalence functionality.
-  //this->MaximumRecursionDepth = 1000;
-  
-  this->FragmentId = 0;
-  this->EquivalenceSet = new vtkCTHFragmentEquivalenceSet;
-}
-
-//----------------------------------------------------------------------------
-vtkCTHFragmentConnect::~vtkCTHFragmentConnect()
-{
-  this->DeleteAllBlocks();
-  this->Controller = 0;
-  this->GlobalOrigin[0]=this->GlobalOrigin[1]=this->GlobalOrigin[2]=0.0;
-  this->RootSpacing[0]=this->RootSpacing[1]=this->RootSpacing[2]=1.0;
-  
-  this->FragmentId = 0;
-  delete this->EquivalenceSet;
-  this->EquivalenceSet = 0;
-}
 
 //----------------------------------------------------------------------------
 // A class to help traverse pointers acrosss block boundaries.
@@ -982,6 +989,188 @@ void vtkCTHFragmentConnectIterator::Initialize()
   this->Index[0] = this->Index[1] = this->Index[2] = 0;
 }
 
+
+//============================================================================
+
+//----------------------------------------------------------------------------
+// A simple first in last out ring container to hold the seeds for the 
+// breadth first search.
+// I am going to have the container allocate and delete its own iterators.
+// It will simplify the converation from depth first to breadth first.
+class vtkCTHFragmentConnectRingBuffer
+{
+public:
+  vtkCTHFragmentConnectRingBuffer();
+  ~vtkCTHFragmentConnectRingBuffer();
+
+  void Push(vtkCTHFragmentConnectIterator* iterator);
+  int Pop(vtkCTHFragmentConnectIterator* iterator);
+
+  long GetSize() { return this->Size;}
+
+
+private:
+
+  vtkCTHFragmentConnectIterator** Ring;
+  vtkCTHFragmentConnectIterator** End;
+  long RingLength;
+  // The first and last iterator added.
+  vtkCTHFragmentConnectIterator** First;
+  vtkCTHFragmentConnectIterator** Next;
+  // I could do without this size, but it does not cost much.
+  long Size;
+
+  void GrowRing();
+};
+
+//----------------------------------------------------------------------------
+vtkCTHFragmentConnectRingBuffer::vtkCTHFragmentConnectRingBuffer()
+{
+  this->Ring = new vtkCTHFragmentConnectIterator*[1000];
+  this->RingLength = 1000;
+  this->End = this->Ring + this->RingLength;
+  this->First = 0;
+  this->Next = this->Ring;
+  this->Size = 0;
+}
+
+//----------------------------------------------------------------------------
+vtkCTHFragmentConnectRingBuffer::~vtkCTHFragmentConnectRingBuffer()
+{
+  delete [] this->Ring;
+  this->End = 0;
+  this->RingLength = 0;
+  this->Next = this->First = 0;
+  this->Size = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkCTHFragmentConnectRingBuffer::GrowRing()
+{
+  // Allocate a new ring.
+  vtkCTHFragmentConnectIterator** newRing;
+  int newRingLength = this->RingLength * 2;
+  newRing = new vtkCTHFragmentConnectIterator*[newRingLength*2];
+  
+  // Copy items into the new ring.
+  int count = this->Size;
+  vtkCTHFragmentConnectIterator** ptr1 = this->First;
+  vtkCTHFragmentConnectIterator** ptr2 = newRing;
+  while (count > 0)
+    {
+    *ptr2++ = *ptr1++;
+    if (ptr1 == this->End)
+      {
+      ptr1 = this->Ring;
+      }
+    --count;
+    }
+  
+  // Replace the ring.
+  // Size remains the same.
+  delete [] this->Ring;
+  this->Ring = newRing;
+  this->End = newRing + newRingLength;
+  this->RingLength = newRingLength;
+  this->First = newRing;
+  this->Next = newRing + this->Size;
+}
+
+//----------------------------------------------------------------------------
+void vtkCTHFragmentConnectRingBuffer::Push(vtkCTHFragmentConnectIterator* item)
+{
+  // Make the ring buffer larger if necessary.
+  if (this->Size == this->RingLength)
+    {
+    this->GrowRing();
+    }
+  
+  // If we want to reuse these objects for better performance,
+  // We should just make the buffer hold iterators instead of 
+  // pointers to iterators.
+  vtkCTHFragmentConnectIterator* newItem = new vtkCTHFragmentConnectIterator;
+  *newItem = *item;
+  
+  // Add the item.
+  *(this->Next) = newItem;
+  // Special case for an empty ring.
+  // We could initialize start to next to avoid this condition every push.
+  if (this->Size == 0)
+    {
+    this->First = this->Next;
+    }
+
+  // Move the the next-available-slot pointer to the next space.
+  ++this->Next;
+  // End of the linear buffer moves back to the begining.
+  // This makes it a ring.
+  if (this->Next == this->End)
+    {
+    this->Next = this->Ring;
+    }
+
+  ++this->Size;
+}
+
+//----------------------------------------------------------------------------
+int vtkCTHFragmentConnectRingBuffer::Pop(vtkCTHFragmentConnectIterator* item)
+{
+  if (this->Size == 0)
+    {
+    return 0;
+    }
+    
+  *item = **(this->First);
+  delete *this->First;
+  *(this->First) = 0;
+  ++this->First;
+  --this->Size;
+
+  // End of the linear buffer moves back to the begining.
+  // This makes it a ring.
+  if (this->First == this->End)
+    {
+    this->First = this->Ring;
+    }
+    
+  return 1;
+}
+
+
+//============================================================================
+
+
+
+//----------------------------------------------------------------------------
+// Description:
+// Construct object with initial range (0,1) and single contour value
+// of 0.0. ComputeNormal is on, ComputeGradients is off and ComputeScalars is on.
+vtkCTHFragmentConnect::vtkCTHFragmentConnect()
+{
+  this->VolumeFractionArrayName = 0;
+
+  this->NumberOfInputBlocks = 0;
+  this->InputBlocks = 0;
+  this->Controller = vtkMultiProcessController::GetGlobalController();
+  this->GlobalOrigin[0]=this->GlobalOrigin[1]=this->GlobalOrigin[2]=0.0;
+  this->RootSpacing[0]=this->RootSpacing[1]=this->RootSpacing[2]=1.0;
+
+  this->FragmentId = 0;
+  this->EquivalenceSet = new vtkCTHFragmentEquivalenceSet;
+}
+
+//----------------------------------------------------------------------------
+vtkCTHFragmentConnect::~vtkCTHFragmentConnect()
+{
+  this->DeleteAllBlocks();
+  this->Controller = 0;
+  this->GlobalOrigin[0]=this->GlobalOrigin[1]=this->GlobalOrigin[2]=0.0;
+  this->RootSpacing[0]=this->RootSpacing[1]=this->RootSpacing[2]=1.0;
+  
+  this->FragmentId = 0;
+  delete this->EquivalenceSet;
+  this->EquivalenceSet = 0;
+}
 
 
 //----------------------------------------------------------------------------
@@ -1429,6 +1618,13 @@ int vtkCTHFragmentConnect::HasNeighbor(
 //----------------------------------------------------------------------------
 // All processes must share a common origin.
 // Returns the total number of blocks in all levels (this process only).
+// This computes:  GlobalOrigin, RootSpacing and StandardBlockDimensions.
+// StandardBlockDimensions are the size of blocks without the extra
+// overlap layer put on by spyplot format.
+// RootSpacing is the spacing that blocks in level 0 would have.
+// GlobalOrigin is choosen so that there are no negative extents and
+// base extents (without overlap/ghost buffer) lie on grid 
+// (i.e.) the min base extent must be a multiple of the standardBlockDimesions.
 int vtkCTHFragmentConnect::ComputeOriginAndRootSpacing(
   vtkHierarchicalBoxDataSet* input)
 {
@@ -1437,29 +1633,47 @@ int vtkCTHFragmentConnect::ComputeOriginAndRootSpacing(
   int blockId;
   int totalNumberOfBlocksInThisProcess = 0;
   
-  // This is a small pain.
+  // This is a big pain.
   // We have to look through all blocks to get a minimum root origin.
   // The origin must be choosen so there are no negative indexes.
   // Negative indexes would require the use floor or ceiling function instead
   // of simple truncation.
   //  The origin must also lie on the root grid.
-  // 1: Find a root origin and spacing.
-  // 2: Find the minumimum bounds of all blocks.
-  // 3: Compute a new root origin that is less than or equal to the minimum.
-  double spacing[3];
-  double rootOrigin[3];
-  double bounds[6];
-  double minimum[3];
-  int ext[6];
-  int cellDims[3];
-  int largestCellDims[6];
+  // The big pain is finding the correct origin when we do not know which
+  // blocks have ghost layers.  The Spyplot reader strips
+  // ghost layers from outside blocks.
 
-  largestCellDims[0] = largestCellDims[1] = largestCellDims[2] = 0;
+  // Overall processes:
+  // Find the largest of all block dimensions to compute standard dimensions.
+  // Save the largest block information.
+  // Find the overall bounds of the data set.
+  // Find one of the lowest level blocks to compute origin.
+
+  int    lowestLevel;
+  double lowestSpacing[3];
+  double lowestOrigin[3];
+  int    lowestDims[3];
+  int    largestLevel;
+  double largestOrigin[3];
+  double largestSpacing[3];
+  int    largestDims[3];
+  int    largestNumCells;
+  
+  double globalBounds[6];
+
+  // Temporary variables.
+  double spacing[3];
+  double bounds[6];
+  int cellDims[3];
+  int numCells;
+  int ext[6];
+
+  largestNumCells = 0;
+  globalBounds[0] = globalBounds[2] = globalBounds[4] = VTK_LARGE_FLOAT;
+  globalBounds[1] = globalBounds[3] = globalBounds[5] = -VTK_LARGE_FLOAT;
+  lowestSpacing[0] = lowestSpacing[1] = lowestSpacing[2] = 0.0;
 
   // Add each block.
-  minimum[0] = minimum[1] = minimum[2] = VTK_LARGE_FLOAT;
-  this->RootSpacing[0] = this->RootSpacing[1] = this->RootSpacing[2] = 0.0;
-  rootOrigin[0] = rootOrigin[1] = rootOrigin[2] = 0.0;
   for (int level = 0; level < numLevels; ++level)
     {
     numBlocks = input->GetNumberOfDataSets(level);
@@ -1470,112 +1684,191 @@ int vtkCTHFragmentConnect::ComputeOriginAndRootSpacing(
       if (image)
         {
         ++totalNumberOfBlocksInThisProcess;
-        image->GetSpacing(spacing);
         image->GetBounds(bounds);
-        // Compute standard block dimensions.
+        // Compute globalBounds.
+        if (globalBounds[0] > bounds[0]) {globalBounds[0] = bounds[0];}
+        if (globalBounds[1] < bounds[1]) {globalBounds[1] = bounds[1];}
+        if (globalBounds[2] > bounds[2]) {globalBounds[2] = bounds[2];}
+        if (globalBounds[3] < bounds[3]) {globalBounds[3] = bounds[3];}
+        if (globalBounds[4] > bounds[4]) {globalBounds[4] = bounds[4];}
+        if (globalBounds[5] < bounds[5]) {globalBounds[5] = bounds[5];}
         image->GetExtent(ext);
         cellDims[0] = ext[1]-ext[0]; // ext is point extent.
         cellDims[1] = ext[3]-ext[2];
         cellDims[2] = ext[5]-ext[4];
-        if (largestCellDims[0] < cellDims[0])
+        numCells = cellDims[0] * cellDims[1] * cellDims[2];
+        // Compute standard block dimensions.
+        if (numCells > largestNumCells)
           {
-          largestCellDims[0] = cellDims[0];
+          largestDims[0] = cellDims[0];
+          largestDims[1] = cellDims[1];
+          largestDims[2] = cellDims[2];
+          largestNumCells = numCells;
+          image->GetOrigin(largestOrigin);
+          image->GetSpacing(largestSpacing);
+          largestLevel = level;
           }
-        if (largestCellDims[1] < cellDims[1])
-          {
-          largestCellDims[1] = cellDims[1];
-          }
-        if (largestCellDims[2] < cellDims[2])
-          {
-          largestCellDims[2] = cellDims[2];
-          }
-        // Use bounds incase we have negative extents.
-        if (minimum[0] > bounds[0]) {minimum[0] = bounds[0];}
-        if (minimum[1] > bounds[2]) {minimum[1] = bounds[2];}
-        if (minimum[2] > bounds[4]) {minimum[2] = bounds[4];}
-        if (spacing[0] > this->RootSpacing[0]) // Only test axis 0. Assume others agree.
+        // Find the lowest level block.
+        image->GetSpacing(spacing);
+        if (spacing[0] > lowestSpacing[0]) // Only test axis 0. Assume others agree.
           { // This is the lowest level block we have encountered.
-          image->GetOrigin(rootOrigin);
-          image->GetSpacing(this->RootSpacing);
+          image->GetSpacing(lowestSpacing);
+          lowestLevel = level;
+          image->GetOrigin(lowestOrigin);
+          lowestDims[0] = cellDims[0];
+          lowestDims[1] = cellDims[1];
+          lowestDims[2] = cellDims[2];
           }
-        // Any origin of a root block should do.
         }
       }
     }
 
-  // Largest cell dims should be the same for all processes.
-  // Do not bother comparing with other processes.
-  this->StandardBlockDimensions[0] = largestCellDims[0]-2;
-  this->StandardBlockDimensions[1] = largestCellDims[1]-2;
-  this->StandardBlockDimensions[2] = largestCellDims[2]-2;
-
-
+  // Send the results to process 0 that will choose the origin ...
+  double dMsg[18];
+  int    iMsg[9];
+  int myId = 0;
+  int numProcs = 1;
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
   if (controller)
     {
-    double msg[9];
-    int myId = controller->GetLocalProcessId();
-    int numProcs = controller->GetNumberOfProcesses();
+    numProcs = controller->GetNumberOfProcesses();
+    myId = controller->GetLocalProcessId();
     if (myId > 0)
-      {
+      { // Send to process 0.
+      iMsg[0] = lowestLevel;
+      iMsg[1] = largestLevel;
+      iMsg[2] = largestNumCells;
       for (int ii= 0; ii < 3; ++ii)
         {
-        msg[ii] = minimum[ii];
-        msg[3+ii] = rootOrigin[ii];
-        msg[6+ii] = this->RootSpacing[ii];
+        iMsg[3+ii] = lowestDims[ii];
+        iMsg[6+ii] = largestDims[ii];
+        dMsg[ii]   = lowestSpacing[ii];
+        dMsg[3+ii] = lowestOrigin[ii];
+        dMsg[6+ii] = largestOrigin[ii];
+        dMsg[9+ii] = largestSpacing[ii];
+        dMsg[12+ii] = globalBounds[ii];
+        dMsg[15+ii] = globalBounds[ii+3];
         }
-      controller->Send(msg, 9, 0, 8973432);
-      controller->Receive(msg, 9, 0, 8973433);
-      for (int ii= 0; ii < 3; ++ii)
-        {
-        minimum[ii] = msg[ii];
-        rootOrigin[ii] = msg[3+ii];
-        this->RootSpacing[ii] = msg[6+ii];
-        }
+      controller->Send(iMsg, 9, 0, 8973432);
+      controller->Send(dMsg, 15, 0, 8973432);
       }
     else
       {
       // Collect results from all processes.
       for (int id = 1; id < numProcs; ++id)
         {
-        controller->Receive(msg, 9, id, 8973432);
-        // Add our info to the bounds message.
-        if (msg[0] < minimum[0]) {minimum[0] = msg[0];}
-        if (msg[1] < minimum[1]) {minimum[1] = msg[1];}
-        if (msg[2] < minimum[2]) {minimum[2] = msg[2];}
-        if (msg[6] > this->RootSpacing[0])
-          { // The other process has a lower level root.
-          rootOrigin[0] = msg[3];
-          rootOrigin[1] = msg[4];
-          rootOrigin[2] = msg[5];
-          this->RootSpacing[0] = msg[6];
-          this->RootSpacing[1] = msg[7];
-          this->RootSpacing[2] = msg[8];
+        controller->Receive(iMsg, 9, id, 8973432);
+        controller->Receive(dMsg, 18, id, 8973432);
+        numCells = iMsg[2];
+        cellDims[0] = iMsg[6];
+        cellDims[1] = iMsg[7];
+        cellDims[2] = iMsg[8];
+        if (numCells > largestNumCells)
+          {
+          largestDims[0] = cellDims[0];
+          largestDims[1] = cellDims[1];
+          largestDims[2] = cellDims[2];
+          largestNumCells = numCells;
+          largestOrigin[0] = dMsg[6];
+          largestOrigin[1] = dMsg[7];
+          largestOrigin[2] = dMsg[8];
+          largestSpacing[0] = dMsg[9];
+          largestSpacing[1] = dMsg[10];
+          largestSpacing[2] = dMsg[11];
+          largestLevel = iMsg[1];
           }
-        }
-      // Now send the global results back.
-      for (int ii= 0; ii < 3; ++ii)
-        {
-        msg[ii] = minimum[ii];
-        msg[3+ii] = rootOrigin[ii];
-        msg[6+ii] = this->RootSpacing[ii];
-        }
-      for (int id = 1; id < numProcs; ++id)
-        {
-        controller->Send(msg, 9, id, 8973433);
+        // Find the lowest level block.
+        spacing[0] = dMsg[0];
+        spacing[1] = dMsg[1];
+        spacing[2] = dMsg[2];
+        if (spacing[0] > lowestSpacing[0]) // Only test axis 0. Assume others agree.
+          { // This is the lowest level block we have encountered.
+          lowestSpacing[0] = spacing[0];
+          lowestSpacing[1] = spacing[1];
+          lowestSpacing[2] = spacing[2];
+          lowestLevel = iMsg[0];
+          lowestOrigin[0] = dMsg[3];
+          lowestOrigin[1] = dMsg[4];
+          lowestOrigin[2] = dMsg[5];
+          lowestDims[0] = iMsg[6];
+          lowestDims[1] = iMsg[7];
+          lowestDims[2] = iMsg[8];
+          }
+        if (globalBounds[0] > dMsg[9])  {globalBounds[0] = dMsg[9];}
+        if (globalBounds[1] < dMsg[10]) {globalBounds[1] = dMsg[10];}
+        if (globalBounds[2] > dMsg[11]) {globalBounds[2] = dMsg[11];}
+        if (globalBounds[3] < dMsg[12]) {globalBounds[3] = dMsg[12];}
+        if (globalBounds[4] > dMsg[13]) {globalBounds[4] = dMsg[13];}
+        if (globalBounds[5] < dMsg[14]) {globalBounds[5] = dMsg[14];}
         }
       }
     }
 
-  // Now compute the global origin.
-  // It has to be on the root grid.
-  for (int ii = 0; ii < 3; ++ii)
+  if (myId == 0)
     {
-    this->GlobalOrigin[ii] = rootOrigin[ii] 
-                        + this->RootSpacing[ii] 
-                            * floor((minimum[ii]-rootOrigin[ii])/this->RootSpacing[ii]);
+    this->StandardBlockDimensions[0] = largestDims[0]-2;
+    this->StandardBlockDimensions[1] = largestDims[1]-2;
+    this->StandardBlockDimensions[2] = largestDims[2]-2;
+    this->RootSpacing[0] = lowestSpacing[0] * (1 << (lowestLevel));
+    this->RootSpacing[1] = lowestSpacing[1] * (1 << (lowestLevel));
+    this->RootSpacing[2] = lowestSpacing[2] * (1 << (lowestLevel));
+    // Find the grid for the largest block.  We assume this block has the
+    // extra ghost layers.
+    largestOrigin[0] = largestOrigin[0] + largestSpacing[0];
+    largestOrigin[1] = largestOrigin[1] + largestSpacing[1];
+    largestOrigin[2] = largestOrigin[2] + largestSpacing[2];
+    // Convert to the spacing of the blocks.
+    largestSpacing[0] *= this->StandardBlockDimensions[0];
+    largestSpacing[1] *= this->StandardBlockDimensions[1];
+    largestSpacing[2] *= this->StandardBlockDimensions[2];
+    // Find the point on the grid closest to the lowest level origin.
+    // We do not know if this lowest level block has its ghost layers.
+    // Even if the dims are one less that standard, which side is missing
+    // the ghost layer!
+    int idx[3];
+    idx[0] = (int)(fabs(0.5 + (lowestOrigin[0]-largestOrigin[0]) / largestSpacing[0]));
+    idx[1] = (int)(fabs(0.5 + (lowestOrigin[1]-largestOrigin[1]) / largestSpacing[1]));
+    idx[2] = (int)(fabs(0.5 + (lowestOrigin[2]-largestOrigin[2]) / largestSpacing[2]));
+    lowestOrigin[0] = largestOrigin[0] + (double)(idx[0])*largestSpacing[0];
+    lowestOrigin[1] = largestOrigin[1] + (double)(idx[1])*largestSpacing[1];
+    lowestOrigin[2] = largestOrigin[2] + (double)(idx[2])*largestSpacing[2];
+    // OK.  Now we have the grid for the lowest level that has a block.
+    // Change the grid to be of the blocks.
+    lowestSpacing[0] *= this->StandardBlockDimensions[0];
+    lowestSpacing[1] *= this->StandardBlockDimensions[1];
+    lowestSpacing[2] *= this->StandardBlockDimensions[2];
+    
+    // Change the origin so that all indexes will be positive.
+    idx[0] = (int)(floor((globalBounds[0]-lowestOrigin[0]) / lowestSpacing[0]));
+    idx[1] = (int)(floor((globalBounds[2]-lowestOrigin[1]) / lowestSpacing[1]));
+    idx[2] = (int)(floor((globalBounds[4]-lowestOrigin[2]) / lowestSpacing[2]));
+    this->GlobalOrigin[0] = lowestOrigin[0] + (double)(idx[0])*lowestSpacing[0];
+    this->GlobalOrigin[1] = lowestOrigin[1] + (double)(idx[1])*lowestSpacing[1];
+    this->GlobalOrigin[2] = lowestOrigin[2] + (double)(idx[2])*lowestSpacing[2];
+    
+    // Now send these to all the other processes and we are done!
+    for (int ii = 0; ii < 3; ++ii)
+      {
+      dMsg[ii] = this->GlobalOrigin[ii];
+      dMsg[ii+3] = this->RootSpacing[ii];
+      dMsg[ii+6] = (double)(this->StandardBlockDimensions[ii]);
+      }
+    for (int ii = 1; ii < numProcs; ++ii)
+      {
+      controller->Send(dMsg, 9, ii, 8973439);
+      }
     }
-
+  else
+    {
+    controller->Receive(dMsg, 9, 0, 8973439);
+    for (int ii = 0; ii < 3; ++ii)
+      {
+      this->GlobalOrigin[ii] = dMsg[ii];
+      this->RootSpacing[ii] = dMsg[ii+3];
+      this->StandardBlockDimensions[ii] = (int)(dMsg[ii+6]);
+      }
+    }
+    
   return totalNumberOfBlocksInThisProcess;
 }
 
@@ -2015,6 +2308,8 @@ int vtkCTHFragmentConnect::ProcessBlock(int blockId)
   zIterator->VolumeFractionPointer = block->GetBaseVolumeFractionPointer();
   zIterator->FragmentIdPointer = block->GetBaseFragmentIdPointer();
 
+  vtkCTHFragmentConnectRingBuffer *queue = new vtkCTHFragmentConnectRingBuffer;
+
   // Loop through all the voxels.
   int ix, iy, iz;
   int ext[6];
@@ -2035,9 +2330,12 @@ int vtkCTHFragmentConnect::ProcessBlock(int blockId)
         if (*(xIterator->FragmentIdPointer) == -1 && 
             *(xIterator->VolumeFractionPointer) > middleValue) //0.5)
           { // We have a new fragment.
-          this->RecursionDepth = 0;
           this->EquivalenceSet->AddEquivalence(this->FragmentId,this->FragmentId);
-          this->ConnectFragment(xIterator);
+          // We have to mark every voxel we push on the queue.
+          *(xIterator->FragmentIdPointer) = this->FragmentId;
+          // There should be no need to clear the queue.
+          queue->Push(xIterator);
+          this->ConnectFragment(queue);
           // Move to next fragment.
           ++this->FragmentId;
           }
@@ -2050,7 +2348,8 @@ int vtkCTHFragmentConnect::ProcessBlock(int blockId)
     zIterator->VolumeFractionPointer += cellIncs[2];
     zIterator->FragmentIdPointer += cellIncs[2];
     }
-    
+  
+  delete queue;
   delete xIterator;  
   delete yIterator;  
   delete zIterator;  
@@ -2555,182 +2854,187 @@ void vtkCTHFragmentConnect::GetNeighborIterator(
 // This extracts faces at the same time.
 // This is called only when the voxel is part of a fragment.
 // I tried to create a generic API to replace the hard coded conditional ifs.
-void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectIterator * iterator)
+void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * queue)
 {
-  if (this->RecursionDepth > this->MaximumRecursionDepth)
+  while (queue->GetSize())
     {
-    return;
-    }
-  ++this->RecursionDepth;
+    // Get the next voxel/iterator to search.
+    vtkCTHFragmentConnectIterator iterator;
+    queue->Pop(&iterator);
+    
+    double middleValue = 127.5;
 
-  double middleValue = 127.5;
-  // Mark the voxel as part of a fragment.
-  *(iterator->FragmentIdPointer) = this->FragmentId;
+    // Create another iterator on the stack for recursion.
+    vtkCTHFragmentConnectIterator next;
 
-  // Create another iterator on the stack for recursion.
-  vtkCTHFragmentConnectIterator next;
-
-  // Look at the face connected neighbors and recurse.
-  // We are not on the border and volume fraction of neighbor is high and
-  // we have not visited the voxel yet.
-  for (int ii = 0; ii < 3; ++ii)
-    {
-    // I would make these variables to make the computation more clear, 
-    // but they would accumulate on the stack.
-    //axis0 = ii;
-    //axis1 = (ii+1)%3;
-    //axis2 = (ii+2)%3;
-    //idxMin = 2*ii;
-    //idxMax = 2*ii+1this->IndexMax+1;
-    // "Left"/min
-    this->GetNeighborIterator(&next, iterator, ii,0, (ii+1)%3,0, (ii+2)%3,0);
-
-    if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
+    // Look at the face connected neighbors and recurse.
+    // We are not on the border and volume fraction of neighbor is high and
+    // we have not visited the voxel yet.
+    for (int ii = 0; ii < 3; ++ii)
       {
-      // Neighbor is outside of fragment.  Make a face.
-      this->CreateFace(iterator, ii, 0, &next);
-      }    
-    else if (next.FragmentIdPointer[0] == -1)
-      { // We have not visited this neighbor yet. Mark the voxel and recurse.
-      this->ConnectFragment(&next);
-      }
-    else
-      { // The last case is that we have already visited this voxel and it
-      // is in the same fragment.
-      this->AddEquivalence(iterator, &next);
-      }
+      // I would make these variables to make the computation more clear, 
+      // but they would accumulate on the stack.
+      //axis0 = ii;
+      //axis1 = (ii+1)%3;
+      //axis2 = (ii+2)%3;
+      //idxMin = 2*ii;
+      //idxMax = 2*ii+1this->IndexMax+1;
+      // "Left"/min
+      this->GetNeighborIterator(&next, &iterator, ii,0, (ii+1)%3,0, (ii+2)%3,0);
 
-    // Handle the case when the new iterator is a higher level.
-    // We need to loop over all the faces of the higher level that touch this face.
-    // We will restrict our case to 4 neighbors (max difference in levels is 1).
-    // If level skip, things should still work OK. Biggest issue is holes in surface.
-    // This also sort of assumes that at most one other block touches this face.
-    // Holes might appear if this is not true.
-    if (next.Block && next.Block->GetLevel() > iterator->Block->GetLevel())
-      {
-      vtkCTHFragmentConnectIterator next2;
-      // Take the first neighbor found and move +Y
-      this->GetNeighborIterator(&next2, &next, (ii+1)%3,1, (ii+2)%3,0, ii,0);
-      if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
-        {
-        // Neighbor is outside of fragment.  Make a face.
-        this->CreateFace(iterator, ii, 0, &next2);
-        }    
-      else if (next2.FragmentIdPointer[0] == -1)
-        { // We have not visited this neighbor yet. Mark the voxel and recurse.
-        this->ConnectFragment(&next2);
-        }
-      else
-        { // The last case is that we have already visited this voxel and it
-        // is in the same fragment.
-        this->AddEquivalence(&next2, &next);
-        }
-      // Take the fist iterator found and move +Z
-      this->GetNeighborIterator(&next2, &next, (ii+2)%3,1, ii,0, (ii+1)%3,0);
-      if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
-        {
-        // Neighbor is outside of fragment.  Make a face.
-        this->CreateFace(iterator, ii, 0, &next2);
-        }    
-      else if (next2.FragmentIdPointer[0] == -1)
-        { // We have not visited this neighbor yet. Mark the voxel and recurse.
-        this->ConnectFragment(&next2);
-        }
-      else
-        { // The last case is that we have already visited this voxel and it
-        // is in the same fragment.
-        this->AddEquivalence(&next2, &next);
-        }
-      // To get the +Y+Z start with the +Z iterator and move +Y put results in "next"
-      this->GetNeighborIterator(&next, &next2, (ii+1)%3,1, (ii+2)%3,0, ii,0);
       if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
         {
         // Neighbor is outside of fragment.  Make a face.
-        this->CreateFace(iterator, ii, 0, &next);
+        this->CreateFace(&iterator, ii, 0, &next);
         }    
       else if (next.FragmentIdPointer[0] == -1)
         { // We have not visited this neighbor yet. Mark the voxel and recurse.
-        this->ConnectFragment(&next);
+        *(next.FragmentIdPointer) = this->FragmentId;
+        queue->Push(&next);
         }
       else
         { // The last case is that we have already visited this voxel and it
         // is in the same fragment.
-        this->AddEquivalence(&next2, &next);
+        this->AddEquivalence(&iterator, &next);
         }
-      }
 
-    // "Right"/max
-    this->GetNeighborIterator(&next, iterator, ii,1, (ii+1)%3,0, (ii+2)%3,0);
-    if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
-      { // Neighbor is outside of fragment.  Make a face.
-      this->CreateFace(iterator, ii, 1, &next);
-      }
-    else if (next.FragmentIdPointer[0] == -1)
-      { // We have not visited this neighbor yet. Mark the voxel and recurse.
-      this->ConnectFragment(&next);
-      }
-    else
-      { // The last case is that we have already visited this voxel and it
-      // is in the same fragment.
-      this->AddEquivalence(iterator, &next);
-      }
-    // Same case as above with the same logic to visit the
-    // four smaller cells that touch this face of the current block.
-    if (next.Block && next.Block->GetLevel() > iterator->Block->GetLevel())
-      {
-      vtkCTHFragmentConnectIterator next2;
-      // Take the first neighbor found and move +Y
-      this->GetNeighborIterator(&next2, &next, (ii+1)%3,1, (ii+2)%3,0, ii,0);
-      if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
+      // Handle the case when the new iterator is a higher level.
+      // We need to loop over all the faces of the higher level that touch this face.
+      // We will restrict our case to 4 neighbors (max difference in levels is 1).
+      // If level skip, things should still work OK. Biggest issue is holes in surface.
+      // This also sort of assumes that at most one other block touches this face.
+      // Holes might appear if this is not true.
+      if (next.Block && next.Block->GetLevel() > iterator.Block->GetLevel())
         {
-        // Neighbor is outside of fragment.  Make a face.
-        this->CreateFace(iterator, ii, 1, &next2);
-        }    
-      else if (next2.FragmentIdPointer[0] == -1)
-        { // We have not visited this neighbor yet. Mark the voxel and recurse.
-        this->ConnectFragment(&next2);
+        vtkCTHFragmentConnectIterator next2;
+        // Take the first neighbor found and move +Y
+        this->GetNeighborIterator(&next2, &next, (ii+1)%3,1, (ii+2)%3,0, ii,0);
+        if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
+          {
+          // Neighbor is outside of fragment.  Make a face.
+          this->CreateFace(&iterator, ii, 0, &next2);
+          }    
+        else if (next2.FragmentIdPointer[0] == -1)
+          { // We have not visited this neighbor yet. Mark the voxel and recurse.
+         *(next2.FragmentIdPointer) = this->FragmentId;
+          queue->Push(&next2);
+          }
+        else
+          { // The last case is that we have already visited this voxel and it
+          // is in the same fragment.
+          this->AddEquivalence(&next2, &next);
+          }
+        // Take the fist iterator found and move +Z
+        this->GetNeighborIterator(&next2, &next, (ii+2)%3,1, ii,0, (ii+1)%3,0);
+        if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
+          {
+          // Neighbor is outside of fragment.  Make a face.
+          this->CreateFace(&iterator, ii, 0, &next2);
+          }    
+        else if (next2.FragmentIdPointer[0] == -1)
+          { // We have not visited this neighbor yet. Mark the voxel and recurse.
+          *(next2.FragmentIdPointer) = this->FragmentId;
+          queue->Push(&next2);
+          }
+        else
+          { // The last case is that we have already visited this voxel and it
+          // is in the same fragment.
+          this->AddEquivalence(&next2, &next);
+          }
+        // To get the +Y+Z start with the +Z iterator and move +Y put results in "next"
+        this->GetNeighborIterator(&next, &next2, (ii+1)%3,1, (ii+2)%3,0, ii,0);
+        if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
+          {
+          // Neighbor is outside of fragment.  Make a face.
+          this->CreateFace(&iterator, ii, 0, &next);
+          }    
+        else if (next.FragmentIdPointer[0] == -1)
+          { // We have not visited this neighbor yet. Mark the voxel and recurse.
+          *(next.FragmentIdPointer) = this->FragmentId;
+          queue->Push(&next);
+          }
+        else
+          { // The last case is that we have already visited this voxel and it
+          // is in the same fragment.
+          this->AddEquivalence(&next2, &next);
+          }
         }
-      else
-        { // The last case is that we have already visited this voxel and it
-        // is in the same fragment.
-        this->AddEquivalence(&next2, &next);
-        }
-      // Take the fist iterator found and move +Z
-      this->GetNeighborIterator(&next2, &next, (ii+2)%3,1, ii,0, (ii+1)%3,0);
-      if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
-        {
-        // Neighbor is outside of fragment.  Make a face.
-        this->CreateFace(iterator, ii, 1, &next2);
-        }    
-      else if (next2.FragmentIdPointer[0] == -1)
-        { // We have not visited this neighbor yet. Mark the voxel and recurse.
-        this->ConnectFragment(&next2);
-        }
-      else
-        { // The last case is that we have already visited this voxel and it
-        // is in the same fragment.
-        this->AddEquivalence(&next2, &next);
-        }
-      // To get the +Y+Z start with the +Z iterator and move +Y put results in "next"
-      this->GetNeighborIterator(&next, &next2, (ii+1)%3,1, (ii+2)%3,0, ii,0);
+
+      // "Right"/max
+      this->GetNeighborIterator(&next, &iterator, ii,1, (ii+1)%3,0, (ii+2)%3,0);
       if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
-        {
-        // Neighbor is outside of fragment.  Make a face.
-        this->CreateFace(iterator, ii, 1, &next);
-        }    
+        { // Neighbor is outside of fragment.  Make a face.
+        this->CreateFace(&iterator, ii, 1, &next);
+        }
       else if (next.FragmentIdPointer[0] == -1)
         { // We have not visited this neighbor yet. Mark the voxel and recurse.
-        this->ConnectFragment(&next);
+        *(next.FragmentIdPointer) = this->FragmentId;
+        queue->Push(&next);
         }
       else
         { // The last case is that we have already visited this voxel and it
         // is in the same fragment.
-        this->AddEquivalence(&next2, &next);
+        this->AddEquivalence(&iterator, &next);
+        }
+      // Same case as above with the same logic to visit the
+      // four smaller cells that touch this face of the current block.
+      if (next.Block && next.Block->GetLevel() > iterator.Block->GetLevel())
+        {
+        vtkCTHFragmentConnectIterator next2;
+        // Take the first neighbor found and move +Y
+        this->GetNeighborIterator(&next2, &next, (ii+1)%3,1, (ii+2)%3,0, ii,0);
+        if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
+          {
+          // Neighbor is outside of fragment.  Make a face.
+          this->CreateFace(&iterator, ii, 1, &next2);
+          }    
+        else if (next2.FragmentIdPointer[0] == -1)
+          { // We have not visited this neighbor yet. Mark the voxel and recurse.
+          *(next2.FragmentIdPointer) = this->FragmentId;
+          queue->Push(&next2);
+          }
+        else
+          { // The last case is that we have already visited this voxel and it
+          // is in the same fragment.
+          this->AddEquivalence(&next2, &next);
+          }
+        // Take the fist iterator found and move +Z
+        this->GetNeighborIterator(&next2, &next, (ii+2)%3,1, ii,0, (ii+1)%3,0);
+        if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
+          {
+          // Neighbor is outside of fragment.  Make a face.
+          this->CreateFace(&iterator, ii, 1, &next2);
+          }    
+        else if (next2.FragmentIdPointer[0] == -1)
+          { // We have not visited this neighbor yet. Mark the voxel and recurse.
+          *(next2.FragmentIdPointer) = this->FragmentId;
+          queue->Push(&next2);
+          }
+        else
+          { // The last case is that we have already visited this voxel and it
+          // is in the same fragment.
+          this->AddEquivalence(&next2, &next);
+          }
+        // To get the +Y+Z start with the +Z iterator and move +Y put results in "next"
+        this->GetNeighborIterator(&next, &next2, (ii+1)%3,1, (ii+2)%3,0, ii,0);
+        if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
+          {
+          // Neighbor is outside of fragment.  Make a face.
+          this->CreateFace(&iterator, ii, 1, &next);
+          }    
+        else if (next.FragmentIdPointer[0] == -1)
+          { // We have not visited this neighbor yet. Mark the voxel and recurse.
+          *(next.FragmentIdPointer) = this->FragmentId;
+          queue->Push(&next);
+          }
+        else
+          { // The last case is that we have already visited this voxel and it
+          // is in the same fragment.
+          this->AddEquivalence(&next2, &next);
+          }
         }
       }
     }
-  
-  --this->RecursionDepth;
 }
 
 
