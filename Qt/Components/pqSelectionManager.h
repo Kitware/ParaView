@@ -86,8 +86,9 @@ public:
   QList<QPair<int, vtkIdType> > getIndices(vtkSMProxy* selectionSource,pqOutputPort* opport);
 
 signals:
-  /// fired when the selection changes.
-  void selectionChanged(pqSelectionManager*);
+  /// Fired when the selection changes. Argument is the pqOutputPort (if any)
+  /// that was selected. If selection was cleared then the argument is NULL.
+  void selectionChanged(pqOutputPort*);
 
 public slots:
   /// Clear all selections. Note that this does not clear

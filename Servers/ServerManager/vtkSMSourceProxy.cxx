@@ -43,7 +43,7 @@
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.61");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.62");
 
 // This struct will keep all information associated with the output port.
 struct vtkSMSourceProxyOutputPort
@@ -737,7 +737,7 @@ void vtkSMSourceProxy::CreateSelectionProxies()
     {
     vtkSmartPointer<vtkSMSourceProxy> esProxy;
     esProxy.TakeReference(vtkSMSourceProxy::SafeDownCast(
-        pxm->NewProxy("filters", "ExtractSelection")));
+        pxm->NewProxy("filters", "PVExtractSelection")));
     if (esProxy)
       {
       esProxy->SetServers(this->Servers);

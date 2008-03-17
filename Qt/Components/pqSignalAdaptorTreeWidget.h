@@ -67,24 +67,51 @@ public:
   /// The size of values == this->TreeWidget->columnCount().
   /// Returns the newly created item, or 0 on failure.
   pqTreeWidgetItemObject* appendValue(const QList<QVariant>& values);
-  
-  /// Append an item to the tree.
-  void appendItem(pqTreeWidgetItemObject* item);
+  pqTreeWidgetItemObject* appendValue(const QStringList& values);
 
+  /// This adaptor create pqTreeWidgetItemObject instances by default when new
+  /// entries are to be shown in the widget. To change the type of
+  /// pqTreeWidgetItemObject subclass created, simply set a function pointer to
+  /// a callback which will be called every time a new item is needed.
+  /// The signature for the callback is:
+  /// pqTreeWidgetItemObject* callback(QTreeWidget* parent, const QStringList& val)
+  void setItemCreatorFunction(
+    pqTreeWidgetItemObject* (fptr)(QTreeWidget*, const QStringList&))
+    {
+    this->ItemCreatorFunctionPtr = fptr;
+    }
 signals:
   /// Fired when the tree widget is modified.
   void valuesChanged();
+
+  /// Fired when the table is automatically grown due to the user navigating
+  /// past the end. This only supported for editable pqTreeWidget instances.
+  void tableGrown(pqTreeWidgetItemObject* item);
 
 public slots:
   /// Set the values in the widget.
   void setValues(const QList<QVariant>&);
 
+  /// Called when user navigates beyond the end in the indices table widget. We
+  /// add a new row to simplify editing.
+  void growTable();
+
+private slots:
+  void sort(int);
+
 private:
   pqSignalAdaptorTreeWidget(const pqSignalAdaptorTreeWidget&); // Not implemented.
   void operator=(const pqSignalAdaptorTreeWidget&); // Not implemented.
 
+  /// Append an item to the tree.
+  void appendItem(pqTreeWidgetItemObject* item);
+
+  void updateSortingLinks();
+
   QTreeWidget* TreeWidget;
   bool Editable;
+  bool Sortable;
+  pqTreeWidgetItemObject* (*ItemCreatorFunctionPtr)(QTreeWidget*, const QStringList&);
 };
 
 #endif

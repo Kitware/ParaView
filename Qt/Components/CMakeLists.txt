@@ -135,6 +135,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqOptionsContainer.h
   pqOptionsDialog.h
   pqOptionsPage.h
+  pqOutputPortComboBox.h
 #  pqParticleTracerPanel.h
   pqPQLookupTableManager.h
   pqPipelineBrowser.h
@@ -506,6 +507,8 @@ ADD_LIBRARY(pqComponents
   pqOptionsDialog.h
   pqOptionsPage.cxx
   pqOptionsPage.h
+  pqOutputPortComboBox.cxx
+  pqOutputPortComboBox.h
   pqPQLookupTableManager.cxx
   pqPQLookupTableManager.h
 #  pqParticleTracerPanel.cxx

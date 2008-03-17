@@ -14,17 +14,19 @@
 =========================================================================*/
 #include "vtkPVExtractSelection.h"
 
-#include "vtkInformation.h"
-#include "vtkInformationVector.h"
-#include "vtkObjectFactory.h"
-#include "vtkSelection.h"
+#include "vtkCellData.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
 #include "vtkIdTypeArray.h"
-#include "vtkCellData.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkSelection.h"
 
-vtkCxxRevisionMacro(vtkPVExtractSelection, "1.6");
+vtkCxxRevisionMacro(vtkPVExtractSelection, "1.7");
 vtkStandardNewMacro(vtkPVExtractSelection);
 
 //----------------------------------------------------------------------------
@@ -44,7 +46,7 @@ int vtkPVExtractSelection::FillOutputPortInformation(
 {
   if (port==0)
     {
-    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataSet");
+    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
     }
   else
     {
@@ -105,9 +107,8 @@ int vtkPVExtractSelection::RequestData(
         vtkDataObject::DATA_OBJECT()));
     }
 
-  vtkDataSet *geomOutput = vtkDataSet::SafeDownCast(
-    outputVector->GetInformationObject(0)->Get(vtkDataObject::DATA_OBJECT()));
-
+  vtkCompositeDataSet* cdOutput = vtkCompositeDataSet::GetData(outputVector, 0);
+  vtkDataSet *geomOutput = vtkDataSet::GetData(outputVector, 0);
 
   //make an ids selection for the second output
   //we can do this because all of the extractSelectedX filters produce 
@@ -120,7 +121,81 @@ int vtkPVExtractSelection::RequestData(
     outputVector->GetInformationObject(1)->Get(vtkDataObject::DATA_OBJECT()));
 
   output->Clear();
+
+  // TODO: Fix to create multiple vtkSelections for different blocks.
+  if (cdOutput)
+    {
+    output->SetContentType(vtkSelection::SELECTIONS);
+    vtkCompositeDataIterator* iter = cdOutput->NewIterator();
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); 
+      iter->GoToNextItem())
+      {
+      vtkSelection* curSel = this->LocateSelection(iter->GetCurrentFlatIndex(),
+        sel);
+      geomOutput = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+      if (curSel && geomOutput)
+        {
+        vtkSelection* outputChild = this->RequestDataInternal(
+          geomOutput, curSel);
+        outputChild->GetProperties()->Set(vtkSelection::COMPOSITE_INDEX(),
+          iter->GetCurrentFlatIndex());
+        output->AddChild(outputChild);
+        outputChild->Delete();
+        }
+      }
+    iter->Delete();
+    }
+  else if (geomOutput)
+    {
+    vtkSelection* child = this->RequestDataInternal(
+      geomOutput, sel);
+    output->ShallowCopy(child);
+    child->Delete();
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+vtkSelection* vtkPVExtractSelection::LocateSelection(unsigned int composite_index,
+  vtkSelection* sel)
+{
+  if (sel->GetContentType() == vtkSelection::SELECTIONS)
+    {
+    unsigned int numChildren = sel->GetNumberOfChildren();
+    for (unsigned int cc=0; cc < numChildren; cc++)
+      {
+      vtkSelection* child = sel->GetChild(cc);
+      if (child)
+        {
+        vtkSelection* outputChild = this->LocateSelection(composite_index, child);
+        if (outputChild)
+          {
+          return outputChild;
+          }
+        }
+      }
+    return NULL;
+    }
+
+  if (sel->GetProperties()->Has(vtkSelection::COMPOSITE_INDEX()) &&
+    sel->GetProperties()->Get(vtkSelection::COMPOSITE_INDEX()) == 
+    static_cast<int>(composite_index))
+    {
+    return sel;
+    }
+
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkSelection* vtkPVExtractSelection::RequestDataInternal(
+  vtkDataSet* geomOutput, vtkSelection* sel)
+{
+  vtkSelection* output = vtkSelection::New();
+  output->Clear();
   output->SetContentType(vtkSelection::INDICES);
+
   int ft = vtkSelection::CELL;
   if (sel && sel->GetProperties()->Has(vtkSelection::FIELD_TYPE()))
     {
@@ -133,23 +208,26 @@ int vtkPVExtractSelection::RequestData(
     inv = sel->GetProperties()->Get(vtkSelection::INVERSE());
     }
   output->GetProperties()->Set(vtkSelection::INVERSE(), inv);
-  vtkIdTypeArray *oids;
-  if (ft == vtkSelection::CELL)
+  vtkIdTypeArray *oids=0;
+  if (geomOutput)
     {
-    oids = vtkIdTypeArray::SafeDownCast(
-      geomOutput->GetCellData()->GetArray("vtkOriginalCellIds"));
-    }
-  else
-    {
-    oids = vtkIdTypeArray::SafeDownCast(
-      geomOutput->GetPointData()->GetArray("vtkOriginalPointIds"));
+    if (ft == vtkSelection::CELL)
+      {
+      oids = vtkIdTypeArray::SafeDownCast(
+        geomOutput->GetCellData()->GetArray("vtkOriginalCellIds"));
+      }
+    else
+      {
+      oids = vtkIdTypeArray::SafeDownCast(
+        geomOutput->GetPointData()->GetArray("vtkOriginalPointIds"));
+      }
     }
   if (oids)
     {
     output->SetSelectionList(oids);
     }
 
-  return 1;
+  return output;
 }
 
 //----------------------------------------------------------------------------

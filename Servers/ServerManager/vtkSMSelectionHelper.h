@@ -22,9 +22,9 @@
 
 #include "vtkSMObject.h"
 
-class vtkCollection;
-class vtkSMProxy;
 class vtkSelection;
+class vtkSMProxy;
+class vtkSMSourceProxy;
 
 class VTK_EXPORT vtkSMSelectionHelper : public vtkSMObject
 {
@@ -61,11 +61,21 @@ public:
   // Given a selection, returns a proxy for a selection source that has
   // the ids specified by it. This source can then be used as input
   // to a vtkExtractSelection filter.
-  // Make sure to specify the connection id for the server on which
-  // the selection was performed.
+  // CAVEAT: Make sure to specify the connection id for the server on which
+  // the selection was performed. This method can only handle 3 types of
+  // selection FRUSTUM, INDICES and GLOBALIDS. We can easily change this to
+  // handle all other types of selection but that's not required currently and
+  // hence we not adding that code.
   static vtkSMProxy* NewSelectionSourceFromSelection(vtkIdType connectionID,
                                                      vtkSelection* selection);
 
+  // Description:
+  // Given the ContentType for an output vtkSelection, this create a new source
+  // proxy generating the selection, the input selectionSourceProxy is used to
+  // fill the default values for created selection source.
+  static vtkSMProxy* ConvertSelection(int outputType,
+    vtkSMProxy* selectionSourceProxy,
+    vtkSMSourceProxy* dataSource, int outputport);
 protected:
   vtkSMSelectionHelper() {};
   ~vtkSMSelectionHelper() {};
@@ -77,6 +87,13 @@ protected:
 private:
   vtkSMSelectionHelper(const vtkSMSelectionHelper&); // Not implemented.
   void operator=(const vtkSMSelectionHelper&); // Not implemented.
+
+  static vtkSMProxy* NewSelectionSourceFromSelectionInternal(
+    vtkIdType connectionId, vtkSelection* selection, vtkSMProxy* selSource=0);
+
+  static vtkSMProxy* ConvertIndices(
+    vtkSMSourceProxy* inSource, vtkSMSourceProxy* dataSource,
+    int dataPort, bool toGlobalIDs);
 };
 
 #endif

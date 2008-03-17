@@ -47,16 +47,6 @@ public:
   // Get the selection field type.
   vtkGetMacro(SelectionFieldType, int);
 
-  // Description:
-  // Add an index to the selection.
-  void AddIndex(vtkIdType piece, vtkIdType id);
-  void RemoveAllIndices();
-
-  // Description:
-  // Add a global id to the selection.
-  void AddGlobalID(vtkIdType id);
-  void RemoveAllGlobalIDs();
-
 //BTX
 protected:
   vtkSMExtractSelectionProxy();
@@ -69,14 +59,12 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
 
   int UseGlobalIDs;
-
+  int PrevUseGlobalIDs;
   int SelectionFieldType;
+
 private:
   vtkSMExtractSelectionProxy(const vtkSMExtractSelectionProxy&); // Not implemented.
   void operator=(const vtkSMExtractSelectionProxy&); // Not implemented.
-
-  class vtkInternal;
-  vtkInternal* Internal;
 //ETX
 };
 

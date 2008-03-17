@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSelection.h"
-#include "vtkSMExtractSelectionsProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
@@ -229,6 +228,7 @@ void pqExtractSelectionsPanel::setSelectionSource(vtkSMSourceProxy *selSource)
 //-----------------------------------------------------------------------------
 void pqExtractSelectionsPanel::accept()
 {
+  /* FIXME
   pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(
     this->referenceProxy());
   vtkSMExtractSelectionsProxy* smproxy = vtkSMExtractSelectionsProxy::SafeDownCast(
@@ -240,4 +240,5 @@ void pqExtractSelectionsPanel::accept()
     }
 
   this->referenceProxy()->setModifiedState(pqProxy::UNMODIFIED);
+  */
 }

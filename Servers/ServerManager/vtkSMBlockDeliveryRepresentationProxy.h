@@ -51,8 +51,15 @@ public:
 
   // Description:
   // Get/Set the process id to pull data from.
-  // This simply passes it to the block filter.
+  // This simply passes it to the block filter. ProcessID is used only if
+  // FieldType is Field data.
   void SetProcessID(int);
+
+  // Description:
+  // Get/Set the composite dataset index. 
+  // This simply passes it to the block filter. 
+  void SetCompositeDataSetIndex(int idx);
+  void SetCompositeDataSetIndex() { this->SetCompositeDataSetIndex(0); }
 
   // Description:
   // Set the cache size as the maximum number of blocks to cache at a given
@@ -104,6 +111,7 @@ protected:
   bool CacheDirty;
 
   vtkIdType CacheSize;
+  unsigned int CompositeDataSetIndex;
 
   vtkSMRepresentationStrategy* UpdateStrategy;
   vtkSMClientDeliveryStrategyProxy* DeliveryStrategy;

@@ -1,12 +1,19 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
 
+   <!-- ==================================================================== -->
    <ExtractLocationsProxy name="ProbeLocationOverTime"
                           class="vtkPExtractArraysOverTime"
                           label="Probe Location over Time">
      <Documentation> 
-This filter extracts cell and point variables at a given location over time. The output is a 1D rectilinear grid where the x coordinates correspond to time (the same array is also copied to a point array named Time or TimeData (if Time exists in the input)). The point values are interpolated from the nearby cells, ie those of the cell the location lies in. 
+        This filter extracts cell and point variables at a given location over
+        time. The output is a 1D rectilinear grid where the x coordinates
+        correspond to time (the same array is also copied to a point array named
+        Time or TimeData (if Time exists in the input)). The point values are
+        interpolated from the nearby cells, ie those of the cell the location
+        lies in.
      </Documentation>
+
      <InputProperty
          name="Input"
          command="SetInputConnection">
@@ -22,25 +29,13 @@ This filter extracts cell and point variables at a given location over time. The
        </Documentation>
      </InputProperty>
 
-     <DoubleVectorProperty 
-        name="Locations"
-        command="AddLocation"
-        clean_command="RemoveAllLocations"
-        repeat_command="1"
-        number_of_elements_per_command="3"
-        number_of_elements="3"
-        update_self="1"
-        label="Locations" 
-        default_values="0 0 0">
-        <Documentation>
-          The list of locations that will be added to the selection produced by the selection source. Only the first location is currently plotted.
-        </Documentation>
-     </DoubleVectorProperty> 
-
      <SubProxy>
-        <Proxy name="SelectionSource" proxygroup="sources"
-          proxyname="SelectionSource">
+        <Proxy name="SelectionSource" 
+          proxygroup="sources" proxyname="LocationSelectionSource">
         </Proxy>
+        <ExposedProperties>
+          <Property name="Locations" />
+        </ExposedProperties>
      </SubProxy>
 
      <Hints>
@@ -54,21 +49,28 @@ This filter extracts cell and point variables at a given location over time. The
      <!-- End ProbeLocationOverTime -->
    </ExtractLocationsProxy>
     
+   <!-- ==================================================================== -->
    <ExtractSelectionProxy name="ExtractPointsOverTime"
                           class="vtkPExtractArraysOverTime"
                           label="Plot Point over Time"
                           selection_field_type="POINT">
      <Documentation>
-This filter extracts the variables associated with a vertex over time. The output is a 1D rectilinear grid where the x coordinates correspond to time (the same array is also copied to a point array named Time or TimeData (if Time exists in the input)).  The input point coordinates are copied to a point array named Point Coordinates or Points (if Point Coordinates exists in the input).
+        This filter extracts the variables associated with a vertex over time. The
+        output is a 1D rectilinear grid where the x coordinates correspond to
+        time (the same array is also copied to a point array named Time or
+        TimeData (if Time exists in the input)).  The input point coordinates
+        are copied to a point array named Point Coordinates or Points (if Point
+        Coordinates exists in the  input).
+        This filter cannot be used for composite datasets.
      </Documentation>
-     <InputProperty
-         name="Input"
+
+     <InputProperty name="Input"
          command="SetInputConnection">
        <ProxyGroupDomain name="groups">
          <Group name="sources"/>
          <Group name="filters"/>
        </ProxyGroupDomain>
-       <DataTypeDomain name="input_type">
+       <DataTypeDomain name="input_type" composite_data_supported="0">
          <DataType value="vtkDataSet"/>
        </DataTypeDomain>
        <Documentation>
@@ -76,38 +78,7 @@ This filter extracts the variables associated with a vertex over time. The outpu
        </Documentation>
      </InputProperty>
 
-     <IdTypeVectorProperty 
-        name="Indices"
-        command="AddIndex"
-        clean_command="RemoveAllIndices"
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        number_of_elements="2"
-        update_self="1"
-        label="Indices" 
-        default_values="0 0">
-        <Documentation>
-          The list of IDs that will be added to the selection produced by the selection source.
-        </Documentation>
-     </IdTypeVectorProperty> 
-
-     <IdTypeVectorProperty 
-        name="GlobalIDs"
-        command="AddGlobalID"
-        clean_command="RemoveAllGlobalIDs"
-        repeat_command="1"
-        number_of_elements_per_command="1"
-        number_of_elements="1"
-        update_self="1"
-        label="Global IDs"
-        default_values="0">
-        <Documentation>
-          The list of Global IDs that will be added to the selection produced by the selection source.
-        </Documentation>
-     </IdTypeVectorProperty> 
-
-     <IntVectorProperty
-        name="UseGlobalIDs"
+     <IntVectorProperty name="UseGlobalIDs"
         command="SetUseGlobalIDs"
         number_of_elements="1"
         update_self="1"
@@ -119,10 +90,23 @@ This filter extracts the variables associated with a vertex over time. The outpu
      </IntVectorProperty>
 
      <SubProxy>
-        <Proxy name="SelectionSource" proxygroup="sources"
-          proxyname="SelectionSource">
+        <Proxy name="SelectionSourceID" proxygroup="sources"
+          proxyname="IDSelectionSource">
         </Proxy>
+        <ExposedProperties>
+          <Property name="IDs" exposed_name="Indices" />
+        </ExposedProperties>
      </SubProxy>
+
+     <SubProxy>
+        <Proxy name="SelectionSourceGID" proxygroup="sources"
+          proxyname="GlobalIDSelectionSource">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="IDs" exposed_name="GlobalIDs" />
+        </ExposedProperties>
+     </SubProxy>
+
      <Hints>
        <!-- View can be used to specify the preferred view for the proxy -->
        <View type="XYPlotView" />
@@ -130,60 +114,58 @@ This filter extracts the variables associated with a vertex over time. The outpu
      <!-- End ExtractPointsOverTime -->
    </ExtractSelectionProxy>
 
-   <ExtractSelectionProxy name="ExtractCellsOverTime"
-                          class="vtkPExtractArraysOverTime"
-                          label="Plot Cell over Time"
-                          selection_field_type="CELL">
+   <!-- ==================================================================== -->
+   <ExtractSelectionProxy name="ExtractCellsOverTime" 
+      class="vtkPExtractArraysOverTime"
+      base_proxygroup="filters" base_proxyname="ExtractPointsOverTime"
+      label="Plot Cell over Time"
+      selection_field_type="CELL">
+
      <Documentation>
-This filter extracts the variables associated with a cell over time. The output is a 1D rectilinear grid where the x coordinates correspond to time (the same array is also copied to a point array named Time or TimeData (if Time exists in the input)).
+        This filter extracts the variables associated with a cell over time. The
+        output is a 1D rectilinear grid where the x coordinates correspond to
+        time (the same array is also copied to a point array named Time or
+        TimeData (if Time exists in the input)).
+        This filter cannot be used for composite datasets.
      </Documentation>
-     <InputProperty
-         name="Input"
+
+     <Hints>
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <View type="XYPlotView" />
+     </Hints>
+     <!-- End ExtractCellsOverTime -->
+   </ExtractSelectionProxy>
+
+   <!-- ==================================================================== -->
+   <ExtractSelectionProxy name="CompositeDataExtractPointsOverTime"
+                          class="vtkPExtractArraysOverTime"
+                          label="Plot Point over Time (Composite Data)"
+                          selection_field_type="POINT">
+     <Documentation>
+        This filter extracts the variables associated with a vertex over time. The
+        output is a 1D rectilinear grid where the x coordinates correspond to
+        time (the same array is also copied to a point array named Time or
+        TimeData (if Time exists in the input)).  The input point coordinates
+        are copied to a point array named Point Coordinates or Points (if Point
+        Coordinates exists in the  input).
+        This filter can only be used for composite datasets.
+     </Documentation>
+
+     <InputProperty name="Input"
          command="SetInputConnection">
        <ProxyGroupDomain name="groups">
          <Group name="sources"/>
          <Group name="filters"/>
        </ProxyGroupDomain>
        <DataTypeDomain name="input_type">
-         <DataType value="vtkDataSet"/>
+         <DataType value="vtkCompositeDataSet"/>
        </DataTypeDomain>
        <Documentation>
          The input from which the selection is extracted.
        </Documentation>
      </InputProperty>
 
-     <IdTypeVectorProperty 
-        name="Indices"
-        command="AddIndex"
-        clean_command="RemoveAllIndices"
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        number_of_elements="2"
-        update_self="1"
-        label="Indices" 
-        default_values="0 0">
-        <Documentation>
-          The list of IDs that will be added to the selection produced by the selection source.
-        </Documentation>
-     </IdTypeVectorProperty> 
-
-     <IdTypeVectorProperty 
-        name="GlobalIDs"
-        command="AddGlobalID"
-        clean_command="RemoveAllGlobalIDs"
-        repeat_command="1"
-        number_of_elements_per_command="1"
-        number_of_elements="1"
-        update_self="1"
-        label="Global IDs"
-        default_values="0">
-        <Documentation>
-          The list of Global IDs that will be added to the selection produced by the selection source.
-        </Documentation>
-     </IdTypeVectorProperty> 
-
-     <IntVectorProperty
-        name="UseGlobalIDs"
+     <IntVectorProperty name="UseGlobalIDs"
         command="SetUseGlobalIDs"
         number_of_elements="1"
         update_self="1"
@@ -195,22 +177,148 @@ This filter extracts the variables associated with a cell over time. The output 
      </IntVectorProperty>
 
      <SubProxy>
-        <Proxy name="SelectionSource" proxygroup="sources"
-          proxyname="SelectionSource">
+        <Proxy name="SelectionSourceID" proxygroup="sources"
+          proxyname="CompositeDataIDSelectionSource">
         </Proxy>
+        <ExposedProperties>
+          <Property name="IDs" exposed_name="Indices" />
+        </ExposedProperties>
      </SubProxy>
+
+     <SubProxy>
+        <Proxy name="SelectionSourceGID" proxygroup="sources"
+          proxyname="GlobalIDSelectionSource">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="IDs" exposed_name="GlobalIDs" />
+        </ExposedProperties>
+     </SubProxy>
+
+     <Hints>
+       <!-- View can be used to specify the preferred view for the proxy -->
+       <View type="XYPlotView" />
+     </Hints>
+     <!-- End CompositeDataExtractPointsOverTime -->
+   </ExtractSelectionProxy>
+
+   <!-- ==================================================================== -->
+   <ExtractSelectionProxy name="CompositeDataExtractCellsOverTime"
+      class="vtkPExtractArraysOverTime"
+      base_proxygroup="filters"
+      base_proxyname="CompositeDataExtractPointsOverTime"
+      label="Plot Cell over Time (Composite Data)"
+      selection_field_type="CELL">
+     <Documentation>
+        This filter extracts the variables associated with a cell over time. The
+        output is a 1D rectilinear grid where the x coordinates correspond to
+        time (the same array is also copied to a point array named Time or
+        TimeData (if Time exists in the input)).
+        This filter can only be used for composite datasets.
+     </Documentation>
+
      <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
         <View type="XYPlotView" />
      </Hints>
-     <!-- End ExtractCellsOverTime -->
+     <!-- End CompositeDataExtractCellsOverTime -->
    </ExtractSelectionProxy>
 
+   <!-- ==================================================================== -->
+   <ExtractSelectionProxy name="HierarchicalDataExtractPointsOverTime"
+                          class="vtkPExtractArraysOverTime"
+                          label="Plot Point over Time (Hierarchical Data)"
+                          selection_field_type="POINT">
+     <Documentation>
+        This filter extracts the variables associated with a vertex over time. The
+        output is a 1D rectilinear grid where the x coordinates correspond to
+        time (the same array is also copied to a point array named Time or
+        TimeData (if Time exists in the input)).  The input point coordinates
+        are copied to a point array named Point Coordinates or Points (if Point
+        Coordinates exists in the  input).
+        This filter can be used for hierarchical datasets.
+     </Documentation>
+
+     <InputProperty name="Input"
+         command="SetInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkHierarchicalBoxDataSet"/>
+       </DataTypeDomain>
+       <Documentation>
+         The input from which the selection is extracted.
+       </Documentation>
+     </InputProperty>
+
+     <IntVectorProperty name="UseGlobalIDs"
+        command="SetUseGlobalIDs"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Use GlobalIDs (instead of Indices) to generate the selection.
+        </Documentation>
+     </IntVectorProperty>
+
+     <SubProxy>
+        <Proxy name="SelectionSourceID" proxygroup="sources"
+          proxyname="HierarchicalDataIDSelectionSource">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="IDs" exposed_name="Indices" />
+        </ExposedProperties>
+     </SubProxy>
+
+     <SubProxy>
+        <Proxy name="SelectionSourceGID" proxygroup="sources"
+          proxyname="GlobalIDSelectionSource">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="IDs" exposed_name="GlobalIDs" />
+        </ExposedProperties>
+     </SubProxy>
+
+     <Hints>
+       <!-- View can be used to specify the preferred view for the proxy -->
+       <View type="XYPlotView" />
+     </Hints>
+     <!-- End HierarchicalDataExtractPointsOverTime -->
+   </ExtractSelectionProxy>
+
+   <!-- ==================================================================== -->
+   <ExtractSelectionProxy name="HierarchicalDataExtractCellsOverTime"
+      class="vtkPExtractArraysOverTime"
+      base_proxygroup="filters"
+      base_proxyname="HierarchicalDataExtractPointsOverTime"
+      label="Plot Cell over Time (Hierarchical Data)"
+      selection_field_type="CELL">
+     <Documentation>
+        This filter extracts the variables associated with a cell over time. The
+        output is a 1D rectilinear grid where the x coordinates correspond to
+        time (the same array is also copied to a point array named Time or
+        TimeData (if Time exists in the input)).
+        This filter can only be used for hierarchical datasets.
+     </Documentation>
+
+     <Hints>
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <View type="XYPlotView" />
+     </Hints>
+     <!-- End HierarchicalDataExtractCellsOverTime -->
+   </ExtractSelectionProxy>
+
+   <!-- ==================================================================== -->
    <SourceProxy name="ExtractFieldDataOverTime"
                           class="vtkExtractTemporalFieldData"
                           label="Plot Field Variable over Time">
      <Documentation>
-This filter extracts the variables that reside in a dataset's field data and are defined over time. The output is a 1D rectilinear grid where the x coordinates correspond to time (the same array is also copied to a point array named Time or TimeData (if Time exists in the input)).
+This filter extracts the variables that reside in a dataset's field data and are
+defined over time. The output is a 1D rectilinear grid where the x coordinates
+correspond to time (the same array is also copied to a point array named Time or
+TimeData (if Time exists in the input)).
      </Documentation>
      <InputProperty
          name="Input"
@@ -226,9 +334,11 @@ This filter extracts the variables that reside in a dataset's field data and are
          The input from which the selection is extracted.
        </Documentation>
      </InputProperty>
+
      <!-- End ExtractFieldDatasOverTime -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="ImageShrink" class="vtkImageShrink3D" label="Image Shrink">
     <Documentation
       short_help="Subsample an image/volume."
@@ -279,6 +389,7 @@ This filter extracts the variables that reside in a dataset's field data and are
    <!-- End ImageShrink -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="SurfaceVectors" class="vtkSurfaceVectors" label="Surface Vectors">
      <Documentation
           long_help="This filter constrains vectors to lie on a surface."
@@ -336,6 +447,7 @@ The Surface Vectors filter is used for 2D data sets. It constrains vectors to li
    <!-- End SurfaceVectors -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="IntegrateAttributes" class="vtkIntegrateAttributes" 
      label="Integrate Variables">
      <Documentation 
@@ -365,6 +477,7 @@ The Integrate Attributes filter integrates point and cell data over lines and su
    <!-- End IntegrateAttributes -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="IntegrateFlowThroughSurface" class="vtkIntegrateFlowThroughSurface" label="Surface Flow">
      <Documentation
         long_help="This filter integrates flow through a surface."
@@ -406,6 +519,7 @@ The flow integration fitler  integrates the dot product of a point flow vector f
    <!-- End IntegrateFlowThroughSurface -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="AllToN" class="vtkAllToNRedistributePolyData"
                 label="All to N"
                 multiprocess_support="multiple_processes">
@@ -442,6 +556,7 @@ The All to N filter is available when ParaView is run in parallel. It redistribu
    <!-- End AllToN -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="Balance" class="vtkBalancedRedistributePolyData"
                 multiprocess_support="multiple_processes">
       <Documentation
@@ -466,6 +581,7 @@ The Balance filter is available when ParaView is run in parallel. It does load-b
    <!-- End Balance -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="AppendAttributes" class="vtkMergeArrays"
     label="Append Attributes">
       <Documentation
@@ -493,6 +609,7 @@ The Append Attributes filter takes multiple input data sets with the same geomet
    <!-- End AppendAttributes -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="AppendPolyData" class="vtkAppendPolyData"
       label="Append Geometry">
       <Documentation
@@ -519,6 +636,7 @@ The Append Geometry filter operates on multiple polygonal data sets. It merges t
    <!-- End AppendPolyData -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="Append" class="vtkAppendFilter" label="Append Datasets">
       <Documentation
          long_help="Takes an input of multiple datasets and output has only one unstructured grid."
@@ -544,6 +662,7 @@ The Append Datasets filter operates on multiple data sets of any type (polygonal
    <!-- End AppendDataSet -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="CellCenters" class="vtkCellCenters" label="Cell Centers">
      <Documentation
         long_help="Create a point (no geometry) at the center of each input cell."
@@ -578,6 +697,7 @@ The Cell Centers filter places a point at the center of each cell in the input d
    <!-- End CellCenters -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="CellDataToPointData" class="vtkPCellDataToPointData"
      label="Cell Data to Point Data">
      <Documentation
@@ -614,6 +734,7 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
    <!-- End CellDataToPointData -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="CleanPolyData" class="vtkCleanPolyData"
      label="Clean">
      <Documentation
@@ -727,6 +848,7 @@ The Clean filter takes polygonal data as input and generates polygonal data as o
    <!-- End CleanPolyData -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="CleanUnstructuredGrid" class="vtkCleanUnstructuredGrid"
       label="Clean to Grid">
       <Documentation
@@ -751,6 +873,7 @@ The Clean to Grid filter merges points that are within a tolerance of 1/100,000 
    <!-- End CleanUnstructuredGrid -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="Delaunay2D" class="vtkDelaunay2D" label="Delaunay 2D">
       <Documentation
          long_help="Create 2D Delaunay triangulation of input points. 
@@ -841,6 +964,7 @@ Points that are coincident (or nearly so) may be discarded by the algorithm. Thi
      <!-- End Delaunay2D -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="Delaunay3D" class="vtkDelaunay3D" label="Delaunay 3D">
      <Documentation short_help="Create a 3D Delaunay triangulation of input
                                 points."
@@ -987,6 +1111,7 @@ Points that are coincident (or nearly so) may be discarded by the algorithm. Thi
      <!-- End Delaunay3d -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="PVConnectivityFilter" class="vtkConnectivityFilter"
       label="Connectivity">
       <Documentation
@@ -1045,6 +1170,7 @@ The Connectivity filter assigns a region id to connected components of the input
    <!-- End PVConnectivityFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="ImageClip" class="vtkImageClip" label="Crop">
     <Documentation
        long_help="Efficiently extract an area/volume of interest from a 2-d image or 3-d volume."
@@ -1087,6 +1213,7 @@ The Crop filter extracts an area/volume of interest from a 2D image or a 3D volu
    <!-- End ImageClip -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="Curvatures" class="vtkCurvatures" label="Curvature">
     <Documentation
        long_help="This filter will compute the gaussian or mean curvature of the mesh at each point."
@@ -1138,6 +1265,7 @@ The Curvature filter computes the curvature at each point in a polygonal data se
    <!-- End Curvatures -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="DecimatePro" class="vtkDecimatePro" label="Decimate">
      <Documentation
         long_help="Simplify a polygonal model using an adaptive edge collapse algorithm.  This filter works with triangles only."
@@ -1206,6 +1334,7 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
    <!-- End DecimatePro -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="D3" class="vtkDistributedDataFilter" label="D3"
                 multiprocess_support="multiple_processes">
     <Documentation
@@ -1257,6 +1386,7 @@ The D3 filter is available when ParaView is run in parallel. It operates on any 
    <!-- End D3 -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="ElevationFilter" class="vtkElevationFilter" label="Elevation">
      <Documentation
         long_help="Create point attribute array by projecting points onto an elevation vector."
@@ -1334,6 +1464,7 @@ The Input menu allows the user to select the data set to which this filter will 
    <!-- End ElevationFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="CTHPart" class="vtkExtractCTHPart"
     label="Extract CTH Parts">
     <Documentation
@@ -1459,6 +1590,7 @@ Extract CTH Parts is a specialized filter for visualizing the data from a CTH si
    <!-- End CTHPart -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="ExtractEdges" class="vtkExtractEdges"
       label="Extract Edges">
      <Documentation
@@ -1518,6 +1650,7 @@ The Extract Surface filter extracts the polygons forming the outer surface of th
    <!-- End DataSetSurfaceFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="Calculator" class="vtkArrayCalculator">
     <Documentation
        long_help="Compute new attribute arrays as function of existing arrays."
@@ -1706,6 +1839,7 @@ The filter operates on any type of data set, but the input data set must have at
    <!-- End Calculator -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="FeatureEdges" class="vtkFeatureEdges"
     label="Feature Edges">
     <Documentation
@@ -1801,6 +1935,7 @@ The Feature Edges filter extracts various subsets of edges from the input data s
    <!-- End FeatureEdges -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="Gradient" class="vtkImageGradient" label="Gradient">
     <Documentation
       short_help="Compute gradient vectors."
@@ -1854,6 +1989,7 @@ The Gradient filter computes the gradient vector at each point in an image or vo
    <!-- End Gradient -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="UnstructuredGradient" class="vtkGradientFilter"
      label="Gradient (Unstructured)">
      <Documentation
@@ -1909,6 +2045,7 @@ The Gradient (Unstructured) filter estimates the gradient vector at each point o
    <!-- End UnstructuredGradient -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="GradientMagnitude" class="vtkImageGradientMagnitude"
       label="Gradient Magnitude">
      <Documentation
@@ -1964,6 +2101,7 @@ The Gradient Magnitude filter computes the magnitude of the gradient vector at e
    <!-- End Gradient -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="LinearExtrusionFilter" class="vtkPVLinearExtrusionFilter"
     label="Linear Extrusion">
     <Documentation
@@ -2033,6 +2171,7 @@ The Linear Extrusion filter creates a swept surface by translating the input dat
    <!-- End LinearExtrusionFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="LoopSubdivisionFilter" class="vtkLoopSubdivisionFilter"
     label="Loop Subdivision">
     <Documentation
@@ -2070,6 +2209,7 @@ The Loop Subdivision filter increases the granularity of a polygonal mesh. It wo
    <!-- End LoopSubdivisionFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="MaskPoints" class="vtkMaskPoints"
     label="Mask Points">
     <Documentation
@@ -2152,6 +2292,7 @@ The Mask Points filter reduces the number of points in the dataset. It operates 
    <!-- End MaskPoints -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="Median" class="vtkImageMedian3D">
     <Documentation
       short_help="Compute median values in a given neighborhood."
@@ -2203,6 +2344,7 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
    <!-- End Median -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="MeshQuality" class="vtkMeshQuality"
     label="Mesh Quality">
     <Documentation
@@ -2342,6 +2484,7 @@ This filter creates a new cell array containing a geometric measure of each cell
    <!-- End MeshQuality -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="PolyDataNormals" class="vtkPPolyDataNormals"
     label="Generate Surface Normals">
     <Documentation
@@ -2444,6 +2587,7 @@ This filter generates surface normals at the points of the input polygonal datas
    <!-- End  PolyDataNormals -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="OutlineFilter" class="vtkPOutlineFilter"
      label="Outline">
      <Documentation
@@ -2471,6 +2615,7 @@ The Outline filter generates an axis-aligned bounding box for the input dataset.
    <!-- End  OutlineFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="OutlineCornerFilter" class="vtkPOutlineCornerFilter"
     label="Outline Corners">
     <Documentation
@@ -2509,6 +2654,7 @@ The Outline Corners filter generates the corners of a bounding box for the input
    <!-- End  OutlineCornerFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="OctreeDepthScalars" class="vtkHyperOctreeDepth"
      label="Octree Depth Scalars">
      <Documentation
@@ -2534,6 +2680,7 @@ The vtkHyperOctreeDepth filter adds a scalar to each leaf of the octree that rep
    <!-- End  OctreeDepthScalars-->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="OctreeDepthLimit" class="vtkHyperOctreeLimiter"
      label="Octree Depth Limit">
      <Documentation
@@ -2570,6 +2717,7 @@ The Octree Depth Limit filter takes in an octree and produces a new octree that 
    <!-- End  OctreeDepthLimit-->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="ProcessIdScalars" class="vtkProcessIdScalars"
                 label="Process Id Scalars"
                 multiprocess_support="multiple_processes">
@@ -2606,6 +2754,7 @@ The Process Id Scalars filter assigns a unique scalar value to each piece of the
    <!-- End PieceScalars -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="PointDataToCellData" class="vtkPointDataToCellData"
      label="Point Data to Cell Data">
      <Documentation
@@ -2643,6 +2792,7 @@ The Point Data to Cell Data filter averages the values of the point attributes o
    <!-- End PointDataToCellData -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="QuadricClustering" class="vtkQuadricClustering"
     label="Quadric Clustering">
     <Documentation
@@ -2734,6 +2884,7 @@ The Quadric Clustering filter produces a reduced-resolution polygonal approximat
    <!-- End QuadricClustering -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="BrownianPoints" class="vtkBrownianPoints" label="Random Vectors">
     <Documentation
        long_help="This filter creates a new 3-component point data array and sets it as the default vector array. It uses a random number generator to create values."
@@ -2779,6 +2930,7 @@ The Random Vectors filter generates a point-centered array of random vectors. It
    <!-- End BrownianPoints -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="ReflectionFilter" class="vtkReflectionFilter" 
     label="Reflect">
     <Documentation
@@ -2847,6 +2999,7 @@ The Reflect filter reflects the input dataset across the specified plane. This f
    <!-- End ReflectionFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="RibbonFilter" class="vtkRibbonFilter"
     label="Ribbon">
     <Documentation
@@ -2970,6 +3123,7 @@ The Ribbon filter creates ribbons from the lines in the input data set. This fil
    <!-- End RibbonFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="RotationalExtrusionFilter" 
                 class="vtkRotationalExtrusionFilter"
                 label="Rotational Extrusion">
@@ -3052,6 +3206,7 @@ The Rotational Extrusion filter forms a surface by rotating the input about the 
    <!-- End RotationalExtrusionFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="ShrinkFilter" class="vtkShrinkFilter"
                 label="Shrink">
      <Documentation
@@ -3088,6 +3243,7 @@ The Shrink filter causes the individual cells of a dataset to break apart from e
    <!-- End ShrinkFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="SmoothPolyDataFilter" class="vtkSmoothPolyDataFilter"
     label="Smooth">
     <Documentation
@@ -3138,6 +3294,7 @@ The Convergence slider limits the maximum motion of any point. It is expressed a
    <!-- End SmoothPolyDataFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="Stripper" class="vtkStripper"
     label="Triangle Strips">
     <Documentation
@@ -3173,6 +3330,7 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
    <!-- End Stripper -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="Subdivide" class="vtkLinearSubdivisionFilter">
     <Documentation
        long_help="This filter iteratively divide triangles into four smaller triangles.  New points are placed linearly so the output surface matches the input surface."
@@ -3208,6 +3366,7 @@ The Subdivide filter iteratively divides each triangle in the input dataset into
    <!-- End Subdivide -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="TessellatorFilter" class="vtkTessellatorFilter" 
      label="Tessellate">
      <Documentation
@@ -3298,6 +3457,7 @@ The Tessellate filter tessellates cells with nonlinear geometry and/or scalar fi
    <!-- End TessellatorFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="DataSetTriangleFilter" class="vtkDataSetTriangleFilter"
      label="Tetrahedralize">
      <Documentation
@@ -3322,6 +3482,7 @@ The Tetrahedralize filter converts the 3D cells of any type of dataset to tetrah
    <!-- End DataSetTriangleFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="TransformFilter" class="vtkTransformFilter"
     label="Transform">
     <Documentation
@@ -3359,6 +3520,7 @@ The Transform filter allows you to specify the position, size, and orientation o
    <!-- End TransformFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="TriangleFilter" class="vtkTriangleFilter"
      label="Triangulate">
      <Documentation
@@ -3383,6 +3545,7 @@ The Triangulate filter decomposes polygonal data into only triangles, points, an
    <!-- End TriangleFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="TubeFilter" class="vtkTubeFilter" label="Tube">
     <Documentation
        long_help="Convert lines into tubes. Normals are used to avoid cracks between tube segments."
@@ -3471,6 +3634,7 @@ The Tube filter creates tubes around the lines in the input polygonal dataset. T
    <!-- End TubeFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="WarpScalar" class="vtkWarpScalar" label="Warp (scalar)">
      <Documentation
         long_help="This filter moves point coordinates along a vector scaled by a point attribute.  It can be used to produce carpet plots."
@@ -3558,6 +3722,7 @@ The Warp (scalar) filter translates the points of the input data set along a vec
    <!-- End WarpScalar -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="WarpVector" class="vtkWarpVector" label="Warp (vector)">
      <Documentation
         long_help="This filter displaces point coordinates along a vector attribute. It is useful for showing mechanical deformation."
@@ -3610,6 +3775,7 @@ The Warp (vector) filter translates the points of the input dataset using a spec
    <!-- End WarpVector -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="Cut" class="vtkCutter" label="Slice">
     <Documentation
        long_help="This filter slices a data set with a plane. Slicing is similar to a contour. It creates surfaces from volumes and lines from surfaces."
@@ -3681,6 +3847,7 @@ This filter extracts the portion of the input dataset that lies along the specif
    <!-- End Cut -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="ExtractGeometry" class="vtkExtractGeometry" 
                 label="Extract Cells by Region">
     <Documentation
@@ -3770,6 +3937,7 @@ This parameter controls whether to extract cells that are on the boundary of the
    <!-- End ExtractGeometry -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="Clip" class="vtkPVClipDataSet">
     <Documentation
        long_help="Clip with an implicit plane. Clipping does not reduce the dimensionality of the data set. The output data type of this filter is always an unstructured grid."
@@ -3884,6 +4052,7 @@ The Clip filter cuts away a portion of the input data set using an implicit plan
    <!-- End Clip -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="Threshold" class="vtkThreshold">
     <Documentation
        long_help="This filter extracts cells that have point or cell scalars in the specified range."
@@ -3968,6 +4137,7 @@ To select between these two options, select either Point Data or Cell Data from 
    <!-- End Threshold -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="Contour" class="vtkContourFilter">
     <Documentation
        long_help="Generate isolines or isosurfaces using point scalars."
@@ -4072,6 +4242,7 @@ The Contour filter computes isolines or isosurfaces using a selected point-cente
    </SourceProxy>
 
 
+   <!-- ==================================================================== -->
    <SourceProxy name="Glyph" class="vtkPVGlyphFilter">
     <Documentation
        long_help="This filter generates an arrow, cone, cube, cylinder, line, sphere, or 2D glyph at each point of the input data set.  The glyphs can be oriented and scaled by point attributes of the input dataset."
@@ -4258,6 +4429,7 @@ The Glyph filter generates a glyph (i.e., an arrow, cone, cube, cylinder, line, 
    <!-- End Glyph -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="ArbitrarySourceGlyph" class="vtkPVGlyphFilter"
     label="Glyph (Custom Source)">
     <Documentation
@@ -4440,6 +4612,7 @@ The Glyph filter generates a glyph at each point in the input dataset. The glyph
    <!-- End Glyph -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="ExtractGrid" class="vtkPVExtractVOI"
     label="Extract Subset">
     <Documentation
@@ -4529,6 +4702,7 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
    <!-- End ExtractGrid -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="ProbePoint" class="vtkPProbeFilter"
     label="Probe Location">
     <Documentation
@@ -4574,6 +4748,7 @@ The Probe filter samples the data set attributes of the current data set at the 
    <!-- End ProbePoint -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="ProbeLine" class="vtkPProbeFilter"
     label="Plot Over Line">
     <Documentation
@@ -4621,6 +4796,7 @@ The Plot Over Line filter samples the data set attributes of the current data se
    <!-- End ProbeLine -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="Probe" class="vtkPProbeFilter"
     label="Resample with dataset">
     <Documentation
@@ -4666,6 +4842,7 @@ Probe is a filter that computes point attributes at specified point positions. T
    <!-- End Probe -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="StreamTracer" class="vtkDistributedStreamTracer"
     label="Stream Tracer">
     <Documentation
@@ -4916,6 +5093,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
    <!-- End StreamTracer -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="ArbitrarySourceStreamTracer" class="vtkDistributedStreamTracer"
     label="Stream Tracer (Custom Source)">
     <Documentation
@@ -5163,6 +5341,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
    <!-- End StreamTracer -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
     <SourceProxy name="TemporalCache" class="vtkTemporalDataSetCache"
                  label="Temporal Cache">
       <Documentation short_help="Caches data per time step."
@@ -5276,6 +5455,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
       <!-- End TemporalSnapToTimeStep -->
     </SourceProxy>
 
+   <!-- ==================================================================== -->
     <SourceProxy name="TemporalShiftScale" class="vtkTemporalShiftScale"
                  label="Temporal Shift Scale">
       <Documentation short_help="Shift and scale time values."
@@ -5326,6 +5506,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
       <!-- End TemporalShiftScale -->
     </SourceProxy>
 
+   <!-- ==================================================================== -->
     <SourceProxy name="ParticleTracer" class="vtkTemporalStreamTracer">
     <Documentation
        long_help="Trace Particles through time in a vector field."
@@ -5549,6 +5730,7 @@ This filter operates on any type of data set, provided it has point-centered vec
       <!-- End ParticleTracer -->
    </SourceProxy>
     
+   <!-- ==================================================================== -->
    <SourceProxy name="StructuredGridOutlineFilter" 
                 class="vtkStructuredGridOutlineFilter"
                 label="Outline (curvilinear)">
@@ -5654,6 +5836,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
    <!-- End GenericClip -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="GenericContour" class="vtkGenericContourFilter" label="Contour (Generic Datasets)">
     <Documentation
        long_help="Generate isolines or isosurfaces using point scalars."
@@ -5740,6 +5923,7 @@ The Generic Contour filter operates on a generic data set, but the input is requ
    <!-- End GenericContour -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
  <SourceProxy name="GenericCut" class="vtkGenericCutter" label="Slice (Generic Datasets)">
     <Documentation
        long_help="This filter cuts a data set with a plane or sphere.  Cutting is similar to a contour.  It creates surfaces from volumes and lines from surfaces."
@@ -5812,6 +5996,7 @@ The Generic Cut filter takes a generic dataset as input. Use the Input menu to c
    <!-- End GenericCut -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
   <SourceProxy name="GenericGeometryFilter" class="vtkGenericGeometryFilter"
                label="Extract Surface (Generic Datasets)">
      <Documentation
@@ -5837,6 +6022,7 @@ Extract geometry from a higher-order dataset.
    <!-- End GenericGeometryFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
  <SourceProxy name="GenericOutlineFilter" class="vtkGenericOutlineFilter"
      label="Outline (Generic DataSets)">
      <Documentation
@@ -5865,6 +6051,7 @@ The Generic Outline filter generates an axis-aligned bounding box for the input 
    <!-- End  GenericOutlineFilter -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
  <SourceProxy name="GenericStreamTracer" class="vtkGenericStreamTracer"
               label="Stream Tracer (Generic Datasets)">
     <Documentation
@@ -6113,6 +6300,7 @@ This filter operates on any type of data set, provided it has point-centered vec
    <!-- End GenericStreamTracer -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
   <SourceProxy name="GenericTessellator" class="vtkGenericDataSetTessellator"
                label="Tessellator (Generic Datasets)">
      <Documentation
@@ -6167,6 +6355,7 @@ Tessellate a higher-order dataset.
    <!-- End GroupDataSets -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="BlockIdScalars" class="vtkBlockIdScalars"
       label="Block Scalars">
      <Documentation
@@ -6191,6 +6380,7 @@ Tessellate a higher-order dataset.
    <!-- End GroupIdScalars -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="LevelIdScalars" class="vtkLevelIdScalars"
       label="Level Scalars">
      <Documentation
@@ -6215,6 +6405,7 @@ Tessellate a higher-order dataset.
    <!-- End GroupIdScalars -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="CTHFragmentConnect" class="vtkCTHFragmentConnect"
       label="Extract CTH Boundaries and Fragments">
      <Documentation
@@ -6245,6 +6436,7 @@ Tessellate a higher-order dataset.
    <!-- End CTHFragmentConnect -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
     <SourceProxy name="GeometryFilter" class="vtkPVGeometryFilter">
       <InputProperty
         name="Input"
@@ -6319,6 +6511,7 @@ Tessellate a higher-order dataset.
     <!-- End GeometryFilter -->
     </SourceProxy>
 
+   <!-- ==================================================================== -->
     <SourceProxy name="OrderedCompositeDistributor"
                  class="vtkOrderedCompositeDistributor">
       <InputProperty name="Input" command="SetInputConnection">
@@ -6471,6 +6664,7 @@ Tessellate a higher-order dataset.
       <!-- End UpdateSuppressor2 -->
     </UpdateSuppressorProxy>
     
+   <!-- ==================================================================== -->
     <SourceProxy name="MPIMoveData" class="vtkMPIMoveData">
       <InputProperty
         name="Input"
@@ -6517,6 +6711,7 @@ Tessellate a higher-order dataset.
     <!-- End MPIMoveData -->
     </SourceProxy>
 
+   <!-- ==================================================================== -->
     <SourceProxy name="ClientServerMoveData" class="vtkClientServerMoveData">
       <InputProperty name="Input"
         command="SetInputConnection">
@@ -6538,6 +6733,7 @@ Tessellate a higher-order dataset.
     <!-- End ClientServerMoveData -->
     </SourceProxy>
         
+   <!-- ==================================================================== -->
     <SourceProxy name="ReductionFilter" class="vtkReductionFilter">
       <InputProperty name="Input"
         command="SetInputConnection">
@@ -6586,6 +6782,7 @@ Tessellate a higher-order dataset.
     <!-- End ReductionFilter -->
     </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="ExtractLevel" class="vtkExtractLevel"
      label="Extract Level">
      <Documentation
@@ -6620,7 +6817,9 @@ Tessellate a higher-order dataset.
           -->
           <UseFlatIndex value="0" />
         </Hints>
-       <CompositeTreeDomain name="tree" mode="non-leaves">
+       <CompositeTreeDomain name="tree" mode="leaves">
+          <!-- mode="leaves" since multi-pieces are treated as a single leaf
+               node wth the exception of vtkExtractDataSets -->
           <RequiredProperties>
              <Property name="Input" function="Input"/>
           </RequiredProperties>
@@ -6634,6 +6833,7 @@ Tessellate a higher-order dataset.
     <!-- End ExtractLevel -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="ExtractBlock" class="vtkExtractBlock"
      label="Extract Block">
      <Documentation
@@ -6687,6 +6887,7 @@ This filter extracts a range of groups from a multiblock dataset
     <!-- End ExtractBlock -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="ExtractDataSets" 
                 class="vtkExtractDataSets"
                 label="Extract Datasets">
@@ -6728,6 +6929,7 @@ This filter extracts a list of datasets from hierarchical datasets.
    <!-- End ExtractDataSets -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="ExtractHistogram" class="vtkPExtractHistogram"
                 label="Histogram">
      <Documentation
@@ -6806,6 +7008,7 @@ This filter extracts a list of datasets from hierarchical datasets.
    </SourceProxy>
 
    
+   <!-- ==================================================================== -->
    <SourceProxy name="RectilinearGridGeometryFilter" class="vtkRectilinearGridGeometryFilter">
       <Documentation
          long_help="Extracts geometry for a rectilinear grid.  Output is a polydata dataset."
@@ -6849,6 +7052,7 @@ This filter extracts a list of datasets from hierarchical datasets.
    <!-- End TextureMapToPlane -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="TextureMapToSphere" class="vtkTextureMapToSphere"
      label="Texture Map to Sphere">
      <InputProperty
@@ -6887,6 +7091,7 @@ This filter extracts a list of datasets from hierarchical datasets.
    <!-- End TextureMapToCylinder -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="PolyLineToRectilinearGrid"
                 class="vtkPolyLineToRectilinearGridFilter"
                 label="Polyline to Rectilinear Grid">
@@ -6940,14 +7145,17 @@ This filter extracts a list of datasets from hierarchical datasets.
      <!-- End MinMax -->
    </SourceProxy>
 
-   <SourceProxy name="ExtractSelection" label="Extract Selection" 
+   <!-- ==================================================================== -->
+   <SourceProxy name="PVExtractSelection" label="Extract Selection (internal)"
                 class="vtkPVExtractSelection">
      <Documentation>
        This filter extracts a given set of cells or points given a selection. 
        The selection can be obtained from a rubber-band selection 
        (either point, cell, visible or in a frustum) and passed to the filter 
        or specified by providing an ID list.
+       This is an internal filter, use "ExtractSelection" instead.
      </Documentation>
+
      <InputProperty
          name="Input"
          command="SetInputConnection">
@@ -6962,6 +7170,7 @@ This filter extracts a list of datasets from hierarchical datasets.
          The input from which the selection is extracted.
        </Documentation>
      </InputProperty>
+
      <InputProperty
          name="Selection"
          command="SetSelectionConnection">
@@ -6976,162 +7185,25 @@ This filter extracts a list of datasets from hierarchical datasets.
          The input that provides the selection object.
        </Documentation>
      </InputProperty>
+
+     <IntVectorProperty 
+        name="PreserveTopology" 
+        command="SetPreserveTopology" 
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is set to 1 the output preserves the topology of its
+         input and adds an insidedness array to mark which cells are inside or
+         out. If 0 then the output is an unstructured grid which contains only
+         the subset of cells that are inside.
+       </Documentation>
+     </IntVectorProperty>
+
      <!-- End ExtractSelection -->
    </SourceProxy>
-<!--
-   <ExtractSelectionProxy name="ExtractPointSelection" 
-      label="Extract Selection (point)"
-      class="vtkExtractSelection"
-      selection_field_type="POINT" >
-     <Documentation
-      short_help="Extract selection by point."
-      long_help="Extract selection by point." >
-       This filter extracts a set of points given a selection. 
-       The selection can be created by specifying a point id list (either 
-       global ids or point indices).
-     </Documentation>
 
-     <InputProperty
-         name="Input"
-         command="SetInputConnection">
-       <ProxyGroupDomain name="groups">
-         <Group name="sources"/>
-         <Group name="filters"/>
-       </ProxyGroupDomain>
-       <DataTypeDomain name="input_type">
-         <DataType value="vtkDataSet"/>
-       </DataTypeDomain>
-       <Documentation>
-         This property specifies the input from which the selection is extracted.
-       </Documentation>
-     </InputProperty>
-
-     <IdTypeVectorProperty 
-        name="Indices"
-        command="AddIndex"
-        clean_command="RemoveAllIndices"
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        number_of_elements="2"
-        update_self="1"
-        label="Indices" 
-        default_values="0 0">
-        <Documentation>
-          This property contains the list of IDs that will be added to the selection produced by the selection source.
-        </Documentation>
-     </IdTypeVectorProperty> 
-
-     <IdTypeVectorProperty 
-        name="GlobalIDs"
-        command="AddGlobalID"
-        clean_command="RemoveAllGlobalIDs"
-        repeat_command="1"
-        number_of_elements_per_command="1"
-        number_of_elements="1"
-        update_self="1"
-        label="Global IDs"
-        default_values="0">
-        <Documentation>
-          This property contains the list of Global IDs that will be added to the selection produced by the selection source.
-        </Documentation>
-     </IdTypeVectorProperty> 
-
-     <IntVectorProperty
-        name="UseGlobalIDs"
-        command="SetUseGlobalIDs"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          If the value of this property is set to 1, GlobalIDs (instead of Indices) will be used for generating the selection.
-        </Documentation>
-     </IntVectorProperty>
-
-     <SubProxy>
-        <Proxy name="SelectionSource" proxygroup="sources"
-          proxyname="SelectionSource">
-        </Proxy>
-     </SubProxy>
-   </ExtractSelectionProxy>
-
-   <ExtractSelectionProxy name="ExtractCellSelection" 
-      label="Extract Selection (cell)"
-      class="vtkExtractSelection"
-      selection_field_type="CELL" >
-     <Documentation
-        short_help="Extract selection by cell."
-        long_help="Extract selection by cell." >
-       This filter extracts a set of cells given a selection. 
-       The selection can be obtained from a rubber-band selection 
-       (either cell, visible or in a frustum) and passed to the filter 
-       or specified by providing an ID list.
-     </Documentation>
-
-     <InputProperty
-         name="Input"
-         command="SetInputConnection">
-       <ProxyGroupDomain name="groups">
-         <Group name="sources"/>
-         <Group name="filters"/>
-       </ProxyGroupDomain>
-       <DataTypeDomain name="input_type">
-         <DataType value="vtkDataSet"/>
-       </DataTypeDomain>
-       <Documentation>
-         This property specifies the input from which the selection is extracted.
-       </Documentation>
-     </InputProperty>
-
-     <IdTypeVectorProperty 
-        name="Indices"
-        command="AddIndex"
-        clean_command="RemoveAllIndices"
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        number_of_elements="2"
-        update_self="1"
-        label="Indices" 
-        default_values="0 0">
-        <Documentation>
-          This property contains the list of IDs that will be added to the selection produced by the selection source.
-        </Documentation>
-     </IdTypeVectorProperty> 
-
-     <IdTypeVectorProperty 
-        name="GlobalIDs"
-        command="AddGlobalID"
-        clean_command="RemoveAllGlobalIDs"
-        repeat_command="1"
-        number_of_elements_per_command="1"
-        number_of_elements="1"
-        update_self="1"
-        label="Global IDs"
-        default_values="0">
-        <Documentation>
-          This property contains the list of Global IDs that will be added to the selection produced by the selection source.
-        </Documentation>
-     </IdTypeVectorProperty> 
-
-     <IntVectorProperty
-        name="UseGlobalIDs"
-        command="SetUseGlobalIDs"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          If the value of this property is set to 1, GlobalIDs (instead of Indices) will be used for generating the selection.
-        </Documentation>
-     </IntVectorProperty>
-
-     <SubProxy>
-        <Proxy name="SelectionSource" proxygroup="sources"
-          proxyname="SelectionSource">
-        </Proxy>
-     </SubProxy>
-   </ExtractSelectionProxy>
--->
+   <!-- ==================================================================== -->
    <SourceProxy name="TimeToTextConvertor" class="vtkTimeToTextConvertor"
      label="Annotate Time" >
      <Documentation
@@ -7166,6 +7238,7 @@ This filter extracts a list of datasets from hierarchical datasets.
    <!-- End of TimeToTextConvertor -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="CellDerivatives" class="vtkCellDerivatives"
      label="Compute Derivatives">
      <Documentation
@@ -7259,56 +7332,19 @@ This property controls how the filter works to generate tensor cell data. You ca
    <!-- End CellDerivatives -->
    </SourceProxy>
 
-   <ExtractFrustumProxy name="SelectThrough"
-    label="Select Through"
-    class="vtkExtractSelection">
-    <Documentation
-       long_help="Draw a rubber band on the screen and select all cells behind it."
-       short_help="Select cells behind a region of the screen.">
-This extracts all cells within a frustum that is defined as the volume behind a chosen rectangular region of the screen.
-    </Documentation>
-
-     <InputProperty
-         name="Input"
-         command="SetInputConnection">
-       <ProxyGroupDomain name="groups">
-         <Group name="sources"/>
-         <Group name="filters"/>
-       </ProxyGroupDomain>
-       <DataTypeDomain name="input_type">
-         <DataType value="vtkDataSet"/>
-       </DataTypeDomain>
-       <Documentation>
-         The input from which the selection is extracted.
-       </Documentation>
-     </InputProperty>
-
-     <SubProxy>
-        <Proxy name="SelectionSource" proxygroup="sources"
-          proxyname="SelectionSource">                   
-        </Proxy>
-        <ExposedProperties>
-          <Property name="Frustum" /> 
-          <Property name="ShowBounds" />
-          <Property name="InsideOut" />
-          <Property name="PreserveTopology" />
-        </ExposedProperties>
-     </SubProxy>
-
-     <Hints>
-       <Visibility replace_input="2" />
-     </Hints>
-   <!-- End SelectThrough -->
-   </ExtractFrustumProxy>
-
-   <ExtractThresholdsProxy name="ExtractThresholds"
-                          class="vtkExtractSelection"
-                          label="Extract Thresholds">
-     <Documentation> 
-This filter extracts a set of thresholds of its input.
+   <!-- ==================================================================== -->
+   <SourceProxy name="ExtractSelection" class="vtkExtractSelection"
+      label="Extract Selection">
+     <Documentation
+        short_help="Extract different type of selections."
+        long_help="Extract different type of selections." >
+       This filter extracts a set of cells/points given a selection.
+       The selection can be obtained from a rubber-band selection
+       (either cell, visible or in a frustum) or threshold selection
+       and passed to the filter or specified by providing an ID list.
      </Documentation>
-     <InputProperty
-         name="Input"
+
+     <InputProperty name="Input"
          command="SetInputConnection">
        <ProxyGroupDomain name="groups">
          <Group name="sources"/>
@@ -7318,97 +7354,56 @@ This filter extracts a set of thresholds of its input.
          <DataType value="vtkDataSet"/>
        </DataTypeDomain>
        <Documentation>
-         The input from which the selection is extracted.
+         This property specifies the input from which the selection is extracted.
        </Documentation>
      </InputProperty>
 
-     <StringVectorProperty
-         name="ScalarsArray" 
-         command="SetScalarArray" 
-         number_of_elements="5" 
-         element_types="0 0 0 0 2" 
-         update_self="1"
-         animateable="0"> 
-         <ArrayListDomain name="array_list" 
-                          attribute_type="Scalars">
-           <RequiredProperties>
-              <Property name="Input" function="Input"/>
-           </RequiredProperties>
-         </ArrayListDomain>
-         <FieldDataDomain name="field_list">
-           <RequiredProperties>
-              <Property name="Input" function="Input"/>
-           </RequiredProperties>
-         </FieldDataDomain>
-         <Documentation>
-           This property indicates the name of the array from which to threshold.
-         </Documentation>
-     </StringVectorProperty>
+     <InputProperty name="Selection"
+         command="SetSelectionConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkSelection"/>
+       </DataTypeDomain>
+       <Documentation>
+         The input that provides the selection object.
+       </Documentation>
+     </InputProperty>
 
-     <SubProxy>
-        <Proxy name="SelectionSource" proxygroup="sources"
-          proxyname="SelectionSource">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="Thresholds" />
-          <Property name="InsideOut" />
-          <Property name="PreserveTopology" />
-          <Property name="ContainingCells" />
-        </ExposedProperties>
-     </SubProxy>
-     <!-- End ExtractThresholds -->
-   </ExtractThresholdsProxy>
-    
-   <ExtractSelectionsProxy name="ExtractSelections"
-      label="Extract Selections"
-      class="vtkExtractSelection"
-      selection_field_type="CELL" >
-      <Documentation
-         short_help="Extract different type of selections."
-         long_help="Extract different type of selections." >
-        This filter extracts a set of cells/points given a selection.
-        The selection can be obtained from a rubber-band selection
-        (either cell, visible or in a frustum) or threshold selection
-        and passed to the filter or specified by providing an ID list.
-      </Documentation>
+     <IntVectorProperty 
+        name="PreserveTopology" 
+        command="SetPreserveTopology" 
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is set to 1 the output preserves the topology of its
+         input and adds an insidedness array to mark which cells are inside or
+         out. If 0 then the output is an unstructured grid which contains only
+         the subset of cells that are inside.
+       </Documentation>
+     </IntVectorProperty>
 
-      <InputProperty
-          name="Input"
-          command="SetInputConnection">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet"/>
-        </DataTypeDomain>
-        <Documentation>
-          This property specifies the input from which the selection is extracted.
-        </Documentation>
-      </InputProperty>
+     <IntVectorProperty 
+        name="ShowBounds" 
+        command="SetShowBounds" 
+        number_of_elements="1"
+        default_values="0">
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         For frustum selection, if this property is set to 1 the output is the
+         outline of the frustum instead of the contents of the input that lie
+         within the frustum.
+       </Documentation>
+     </IntVectorProperty>
 
-      <SubProxy>
-        <Proxy name="SelectionSource" proxygroup="sources"
-          proxyname="SelectionSource">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="ContentType" />
-          <Property name="FieldType" />
-          <Property name="ContainingCells" />
-          <Property name="PreserveTopology" />
-          <Property name="InsideOut" />
-          <Property name="IDs" />
-          <Property name="Locations" />
-          <Property name="Thresholds" />
-          <Property name="ArrayName" />
-          <Property name="Frustum" />
-          <Property name="ShowBounds" />
-        </ExposedProperties>
-      </SubProxy>
-      <!-- End of ExtractSelections -->
-    </ExtractSelectionsProxy>
+     <!-- End of ExtractSelection -->
+   </SourceProxy>
 
-    <SourceProxy name="ConvertSelection" class="vtkPConvertSelection">
+   <!-- ==================================================================== -->
+   <SourceProxy name="ConvertSelection" class="vtkPConvertSelection">
       <Documentation>
         Converts a selection from one type to another.
       </Documentation>
@@ -7447,18 +7442,17 @@ This filter extracts a set of thresholds of its input.
         </Documentation>
         <EnumerationDomain name="enum">
           <Entry value="0" text="SELECTIONS" />
-          <Entry value="1" text="COMPOSITE_SELECTIONS" />
-          <Entry value="2" text="GLOBALIDs" />
-          <Entry value="3" text="PEDIGREEIDS" />
-          <Entry value="4" text="VALUES" />
-          <Entry value="5" text="INDICES" />
-          <Entry value="6" text="FRUSTUM" />
-          <Entry value="7" text="LOCATION" />
-          <Entry value="8" text="THRESHOLDS" />
+          <Entry value="1" text="GLOBALIDs" />
+          <Entry value="2" text="PEDIGREEIDS" />
+          <Entry value="3" text="VALUES" />
+          <Entry value="4" text="INDICES" />
+          <Entry value="5" text="FRUSTUM" />
+          <Entry value="6" text="LOCATION" />
+          <Entry value="7" text="THRESHOLDS" />
         </EnumerationDomain>
       </IntVectorProperty>
       <!-- End of ConvertSelection -->
-    </SourceProxy>
+   </SourceProxy>
 
   </ProxyGroup>
 

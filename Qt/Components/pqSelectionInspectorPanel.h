@@ -40,18 +40,18 @@ class pqDataRepresentation;
 class pqOutputPort;
 class pqPipelineSource;
 class pqProxy;
-class pqRubberBandHelper;
 class pqSelectionManager;
 class pqServer;
 class pqServerManagerModelItem;
+class pqTreeWidgetItemObject;
+class pqView;
+class QTreeWidgetItem;
 class vtkSMClientDeliveryRepresentationProxy;
 class vtkSMSourceProxy;
 class vtkUnstructuredGrid;
 
-/// pqSelectionInspectorPanel has dual role:
-/// \li showing the data from the active selection
-/// \li showing the data from a "ExtractCellSelection" 
-//      or "ExtractPointSelection" filter.
+/// pqSelectionInspectorPanel is a panel that shows shows the active selection.
+/// It makes is possible for the user to view/change the active selection.
 class PQCOMPONENTS_EXPORT pqSelectionInspectorPanel :
   public QWidget
 {
@@ -61,41 +61,38 @@ public:
   pqSelectionInspectorPanel(QWidget* parent);
   ~pqSelectionInspectorPanel();
 
-  /// Set the selection manager. The selection manager is used to
-  /// obtain the current user defined cell selection.
-  void setRubberBandHelper(pqRubberBandHelper* helper);
-
-signals:
+  /// Set the selection manager.
+  void setSelectionManager(pqSelectionManager*);
 
 public slots:
-  /// Called when user creates a new surface selection (or old 
-  /// surface selection is cleared).
-  void onSelectionChanged();
-
   /// Called when active server changes. We make the decision if process id
   /// needs to be shown for the server connection.
-  void activeServerChanged(pqServer* server);
+  void setServer(pqServer* server);
 
-protected:
-
-  void setupGUI();
-
-  void setupSelelectionLabelGUI();
-  void updateSelectionLabelModes();
-
-  void setupSurfaceSelectionGUI();
-  void updateSurfaceSelectionIDRanges();
-  void updateSurfaceInformationAndDomains();
-
-  void setupFrustumSelectionGUI();
-
-  void setupThresholdSelectionGUI();
-  void updateThreholdDataArrays();
-
-  void updateSelectionRepGUI();
-  void updateSelectionSourceGUI();
+  /// Update the enabled state of the panel depending upon the current state of
+  /// application.
+  void updateEnabledState();
 
 protected slots:
+  /// Called when the active selection changes. The panel we show the details of
+  /// the selection source input going into the pqOutputPort passed as an
+  /// argument. Typically, this is connected to the
+  /// pqSelectionManager::selectionChanged(pqOutputPort*) signal. 
+  void select(pqOutputPort* opport, bool createNew=false);
+
+  /// Called when the "Selection Type" combo-box is changed.
+  void onSelectionTypeChanged(const QString&);
+
+  /// Called when "Field Type" combo-box changes. This updates the enabled state
+  /// of the "Containing Cells" combo-box, since that combo-box only makes sense
+  /// for point selections.
+  void onFieldTypeChanged(const QString&);
+
+  /// Called when the user clicks "Create Selection" button.
+  void createSelectionForCurrentObject();
+
+  /// Called when the active view changes.
+  void onActiveViewChanged(pqView*);
 
   void updatePointLabelMode(const QString&);
   void updateCellLabelMode(const QString&);
@@ -103,51 +100,64 @@ protected slots:
   void updateSelectionPointLabelArrayName();
   void updateSelectionCellLabelArrayName();
 
-  /// Deletes selected elements.
-  void deleteSelectedSurfaceSelection();
+  /// Called to update the IDs/GlobalIDs/Thresholds table.
+  void newValue();
+  void deleteValue();
+  void deleteAllValues();
 
-  /// Deletes all elements.
-  void deleteAllSurfaceSelection();
+  /// Requests update on on the active view. 
+  void updateRepresentationViews();
 
-  // Adds a new value.
-  void newValueSurfaceSelection();
+  /// Reqeusts render in all views the selection is shown.
+  void updateAllSelectionViews();
 
-  void addThresholds();
-  void deleteSelectedThresholds();
-  void deleteAllThresholds();
-  void upperThresholdChanged(double);
-  void lowerThresholdChanged(double);
+  /// Called when user navigates beyond the end in the indices table widget. We
+  /// add a new row to simplify editing.
+  void onTableGrown(pqTreeWidgetItemObject* item);
 
-  void updateSurfaceIDConnections();
-  void updateSelectionFieldType(const QString&);
-  void updateSelectionContentType(const QString&);
+  /// Called when the current item in the "Indices" table changes. If composite
+  /// tree is visible, we update the composite tree selection to match the
+  /// current item.
+  void onCurrentIndexChanged(QTreeWidgetItem* item);
 
-  void updateSelectionSource();
+protected:
+  /// Sets up the GUI by created default signal/slot bindings etc.
+  void setupGUI();
 
-  virtual void onSelectionModeChanged(int mode);
-  virtual void onSelectionContentTypeChanged();
-  virtual void onSelectionFieldTypeChanged();
-  virtual void onActiveViewChanged();
-  /// Requests update on all views the
-  /// Representation is visible in.
-  virtual void updateRepresentationViews();
+  /// Sets up the links for the tab showing the details for an ID selection.
+  void setupIDSelectionGUI();
 
-  virtual void updateAllSelectionViews();
+  /// Sets up the links for the tab showing the defatils for a Global ID
+  /// selection.
+  void setupGlobalIDSelectionGUI();
+
+  void setupSelectionLabelGUI();
+  void updateSelectionLabelModes();
+
+  /// Sets up property links between the selection source proxy and the GUI.
+  void updateSelectionGUI();
+
+  /// Sets up the property links between the "Display Style" group and the
+  /// selection representation proxy.
+  void updateDisplayStyleGUI();
+
+  void setupFrustumSelectionGUI();
+
+  void setupThresholdSelectionGUI();
+  void updateThreholdDataArrays();
 
   /// Converts index selection to global id selection and vice versa.
   void convertSelection(bool toGlobalIds);
 
-  /// Called when user navigates beyond the end in the indices table widget. We
-  /// add a new row to simplify editing.
-  void growIndicesTable();
+  /// Create a new selection source for the current output port if
+  /// * no selection source present
+  /// * selection source type is not same as the "Selection Type" combo
+  void createNewSelectionSourceIfNeeded();
+
+  /// This returns the content type given the "Selection Type". 
+  int getContentType() const;
+
 private:
-  /// Set the display whose properties we want to edit.
-  void setRepresentation(pqDataRepresentation* repr);
-  void setInputSource(pqOutputPort* port);
-  void setSelectionSource(vtkSMSourceProxy* source);
-  void setEmptySelectionSource();
-  void setSelectionManager(pqSelectionManager*);
-  
   struct pqImplementation;
   pqImplementation* const Implementation;
 };

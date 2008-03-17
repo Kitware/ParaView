@@ -34,14 +34,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Server Manager Includes.
 #include "vtkSMProxy.h"
+#include "vtkSMIntVectorProperty.h"
 
 // Qt Includes.
 
 // ParaView Includes.
 #include "pqPropertyLinks.h"
 #include "pqRepresentation.h"
-#include "pqSignalAdaptors.h"
 #include "pqServer.h"
+#include "pqSignalAdaptorCompositeTreeWidget.h"
+#include "pqSignalAdaptors.h"
 
 //-----------------------------------------------------------------------------
 class pqSpreadSheetDisplayEditor::pqInternal : public Ui::SpreadSheetDisplayEditor
@@ -50,6 +52,7 @@ public:
   pqPropertyLinks Links;
   pqSignalAdaptorComboBox* AttributeModeAdaptor;
   pqSignalAdaptorSpinBox* ProcessIDAdaptor;
+  pqSignalAdaptorCompositeTreeWidget* CompositeTreeAdaptor;
 };
 
 //-----------------------------------------------------------------------------
@@ -63,6 +66,11 @@ pqSpreadSheetDisplayEditor::pqSpreadSheetDisplayEditor(
     this->Internal->AttributeMode);
   this->Internal->ProcessIDAdaptor = new pqSignalAdaptorSpinBox(
     this->Internal->ProcessID);
+  this->Internal->CompositeTreeAdaptor = new pqSignalAdaptorCompositeTreeWidget(
+    this->Internal->CompositeTree, 
+    vtkSMIntVectorProperty::SafeDownCast(
+      repr->getProxy()->GetProperty("CompositeDataSetIndex")), 
+    true);
 
   this->setRepresentationInternal(repr);
 
@@ -98,6 +106,10 @@ void pqSpreadSheetDisplayEditor::setRepresentationInternal(pqRepresentation* rep
   this->Internal->Links.addPropertyLink(this->Internal->SelectionOnly,
     "checked", SIGNAL(stateChanged(int)),
     reprProxy, reprProxy->GetProperty("SelectionOnly"));
+  this->Internal->Links.addPropertyLink(this->Internal->CompositeTreeAdaptor,
+    "values", SIGNAL(valuesChanged()),
+    reprProxy, reprProxy->GetProperty("CompositeDataSetIndex"));
+
   QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(updateAllViews()));
 

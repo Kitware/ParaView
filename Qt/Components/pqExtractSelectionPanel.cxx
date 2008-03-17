@@ -54,18 +54,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqExtractSelectionTreeItem : public pqTreeWidgetItemObject
 {
 public:
-  pqExtractSelectionTreeItem(const QStringList& l) 
-    : pqTreeWidgetItemObject(l)
-  {
-  }
-  bool operator< ( const QTreeWidgetItem & other ) const  
-  {
-    int sortCol = treeWidget()->sortColumn();
-    double myNumber = text(sortCol).toDouble();
+  pqExtractSelectionTreeItem(QTreeWidget* _parent, const QStringList& l) 
+    : pqTreeWidgetItemObject(_parent, l, QTreeWidgetItem::UserType+11)
+    {
+    }
+
+  virtual bool operator< ( const QTreeWidgetItem & other ) const  
+    {
+    int sortCol = this->treeWidget()? this->treeWidget()->sortColumn() : 0;
+    double myNumber = this->text(sortCol).toDouble();
     double otherNumber = other.text(sortCol).toDouble();
+    if (myNumber == otherNumber)
+      {
+      int numCols = this->columnCount();
+      for (int cc=0; cc < numCols; cc++)
+        {
+        if (cc == sortCol)
+          {
+          continue;
+          }
+
+        double num1 = this->text(cc).toDouble();
+        double num2 = other.text(cc).toDouble();
+        if (num1 != num2)
+          {
+          return (num1 < num2);
+          }
+        }
+      }
     return myNumber < otherNumber;
-  }
+    }
 };
+
+pqTreeWidgetItemObject* pqExtractSelectionPanelNewItem (QTreeWidget* tree, const QStringList& list)
+{
+ return new pqExtractSelectionTreeItem (tree, list);
+}
 
 class pqExtractSelectionPanel::pqInternal : public Ui::ExtractSelectionPanel
 {
@@ -89,6 +113,12 @@ pqExtractSelectionPanel::pqExtractSelectionPanel(pqProxy* _proxy, QWidget* _pare
 
   this->Internal->IndicesAdaptor=
     new pqSignalAdaptorTreeWidget(this->Internal->Indices, true);
+
+  this->Internal->GlobalIDsAdaptor->setItemCreatorFunction(
+    &pqExtractSelectionPanelNewItem);
+
+  this->Internal->IndicesAdaptor->setItemCreatorFunction(
+    &pqExtractSelectionPanelNewItem);
 
   this->Internal->UseGlobalIDs->toggle();
   this->Internal->UseGlobalIDs->toggle();
@@ -234,8 +264,7 @@ void pqExtractSelectionPanel::newValue()
     value.push_back(QString::number(0));
     }
 
-  pqExtractSelectionTreeItem* item = new pqExtractSelectionTreeItem(value);
-  adaptor->appendItem(item);
+  QTreeWidgetItem* item = adaptor->appendValue(value);
 
   // change the current item and make it editable.
   activeTree->setCurrentItem(item, 0);

@@ -25,6 +25,8 @@
 
 #include "vtkSelectionAlgorithm.h"
 
+class vtkIndexBasedBlockFilter;
+class vtkMultiPieceDataSet;
 class vtkMultiProcessController;
 
 class VTK_EXPORT vtkIndexBasedBlockSelectionFilter : public vtkSelectionAlgorithm
@@ -36,14 +38,24 @@ public:
 
    // Description:
   // Get/Set the number of indices that fit within one block.
-  vtkSetMacro(BlockSize, vtkIdType);
-  vtkGetMacro(BlockSize, vtkIdType);
+  void SetBlockSize(vtkIdType);
+  vtkIdType GetBlockSize();
 
   // Description:
   // Get/Set the block to fetch.
-  vtkSetMacro(Block, vtkIdType);
-  vtkGetMacro(Block, vtkIdType);
+  void SetBlock(vtkIdType);
+  vtkIdType GetBlock();
 
+  // Description:
+  // In case of Composite datasets, set the flat index of the dataset to pass.
+  // The flat index must point to a non-empty, non-composite dataset or a
+  // non-empty multipiece dataset for anything to be passed through. 
+  // If the input is not a composite dataset, then this index is ignored.
+  // If FieldType is FIELD then the CompositeDataSetIndex cannot be
+  // vtkMultiPieceDataSet, it has to be a vtkDataSet.
+  void SetCompositeDataSetIndex(unsigned int);
+  unsigned int GetCompositeDataSetIndex();
+  
   // Description:
   // Get/Set the MPI controller used for gathering.
   void SetController(vtkMultiProcessController*);
@@ -53,23 +65,8 @@ public:
   // Set the field type to pass. This filter can only deal with one field type
   // at a time i.e. either cell data, or point data or field data.
   // Default is POINT_DATA_FIELD.
-  vtkSetMacro(FieldType, int);
-  vtkGetMacro(FieldType, int);
-  void SetFieldTypeToPoint()
-    { this->SetFieldType(POINT); }
-  void SetFieldTypeToCell()
-    { this->SetFieldType(CELL); }
-  void SetFieldTypeToField()
-    { this->SetFieldType(FIELD); }
-
-  //BTX
-  enum FieldDataType
-    {
-    CELL=0,
-    POINT=1,
-    FIELD=2
-    };
-  //ETX 
+  void SetFieldType(int);
+  int GetFieldType();
 
 //BTX
 protected:
@@ -86,13 +83,12 @@ protected:
                           vtkInformationVector**, 
                           vtkInformationVector*);
 
-  bool DetermineBlockIndices();
+  bool DetermineBlockIndices(vtkMultiPieceDataSet* input);
+  vtkSelection* LocateSelection(unsigned int composite_index, vtkSelection* sel);
+
+  vtkIndexBasedBlockFilter* BlockFilter;
 
   vtkMultiProcessController* Controller;
-  vtkIdType BlockSize;
-  vtkIdType Block;
-
-  int FieldType;
   vtkIdType StartIndex;
   vtkIdType EndIndex;
 private:

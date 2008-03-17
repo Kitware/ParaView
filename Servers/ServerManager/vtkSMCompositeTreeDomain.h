@@ -68,7 +68,8 @@ public:
     {
     ALL=0,
     LEAVES=1,
-    NON_LEAVES=2
+    NON_LEAVES=2,
+    NONE=3
     };
   //ETX
 

@@ -47,7 +47,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.46");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.47");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -975,6 +975,27 @@ int vtkPVDataInformation::IsDataStructured()
       return 1;
     }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+vtkPVDataInformation* 
+vtkPVDataInformation::GetDataInformationForCompositeIndex(int index)
+{
+  return this->GetDataInformationForCompositeIndex(&index);
+}
+
+//----------------------------------------------------------------------------
+vtkPVDataInformation* 
+vtkPVDataInformation::GetDataInformationForCompositeIndex(int* index)
+{
+  if (*index == 0)
+    {
+    (*index)--;
+    return this;
+    }
+
+  (*index)--;
+  return this->CompositeDataInformation->GetDataInformationForCompositeIndex(index);
 }
 
 //----------------------------------------------------------------------------

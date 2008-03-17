@@ -115,6 +115,16 @@ public:
   vtkGetObjectMacro(CompositeDataInformation,vtkPVCompositeDataInformation);
 
   // Description:
+  // Given the flat-index for a node in a composite dataset, this method returns
+  // the data information for the node, it available.
+  vtkPVDataInformation* GetDataInformationForCompositeIndex(int index);
+
+  // Description:
+  // This is same as GetDataInformationForCompositeIndex() however note that the
+  // index will get modified in this method.
+  vtkPVDataInformation* GetDataInformationForCompositeIndex(int* index);
+
+  // Description:
   // Name stored in field data.
   const char* GetName();
 

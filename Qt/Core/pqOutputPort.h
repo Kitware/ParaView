@@ -40,6 +40,8 @@ class pqPipelineSource;
 class pqServer;
 class pqView;
 class vtkPVDataInformation;
+class vtkSMOutputPort;
+class vtkSMSourceProxy;
 
 /// pqOutputPort is a server manager model item for an output port of any
 /// pqPipelineSource item. This makes it possible to refer to a particular
@@ -56,6 +58,9 @@ class PQCORE_EXPORT pqOutputPort : public pqServerManagerModelItem
 public:
   pqOutputPort(pqPipelineSource* source, int portno);
   virtual ~pqOutputPort();
+
+  /// Returns the vtkSMOutputPort proxy for this port.
+  vtkSMOutputPort* getOutputPortProxy() const;
 
   /// Returns the pqPipelineSource whose output port this is.
   pqPipelineSource* getSource() const
@@ -102,13 +107,24 @@ public:
   /// data information, otherwise the current data information is returned.
   vtkPVDataInformation* getDataInformation(bool update) const;
 
-
   /// Simply returns the data information as available on the client, without any
   /// gathers from the server side or any pipeline updates.
   vtkPVDataInformation* getCachedDataInformation() const;
 
   /// Returns the class name of the output data.
   const char* getDataClassName() const;
+
+  /// Calls vtkSMSourceProxy::GetSelectionInput() on the underlying source
+  /// proxy.
+  vtkSMSourceProxy* getSelectionInput();
+
+  /// Calls vtkSMSourceProxy::GetSelectionInputPort() on the underlying source
+  /// proxy.
+  unsigned int getSelectionInputPort();
+
+  /// Set the selection input.
+  void setSelectionInput(vtkSMSourceProxy* src, int port);
+
 signals:
   /// Fired when a connection is added between this output port and a consumer.
   void connectionAdded(pqOutputPort* port, pqPipelineSource* consumer);

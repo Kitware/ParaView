@@ -6159,6 +6159,28 @@
          update_self="1"
          number_of_elements="1"
          default_values="0">
+         <Documentation>
+          Select the process to obtain the field data from. Only used when
+          FieldType is "Field Data" (2).
+         </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="CompositeDataSetIndex"
+        command="SetCompositeDataSetIndex"
+        update_self="1"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          In case of Composite datasets, set the flat index of the dataset to 
+          pass. The flat index must point to a non-empty, non-composite dataset 
+          for anything to be passed through. If the input is not a composite 
+          dataset, then this index is ignored.
+        </Documentation>
+        <CompositeTreeDomain name="tree" mode="leaves">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+       </CompositeTreeDomain>
       </IntVectorProperty>
 
       <IdTypeVectorProperty name="CacheSize"
@@ -6230,6 +6252,18 @@
             number_of_elements="1"
             default_values="0">
           </IntVectorProperty>
+
+          <IntVectorProperty name="CompositeDataSetIndex"
+            command="SetCompositeDataSetIndex"
+            number_of_elements="1"
+            default_values="0">
+            <Documentation>
+              In case of Composite datasets, set the flat index of the dataset to 
+              pass. The flat index must point to a non-empty, non-composite dataset 
+              for anything to be passed through. If the input is not a composite 
+              dataset, then this index is ignored.
+            </Documentation>
+          </IntVectorProperty>
         </SourceProxy>
         <ExposedProperties>
           <Property name="BlockSize" />
@@ -6274,6 +6308,24 @@
           <Entry value="1" text="Point Data" />
           <Entry value="2" text="Field Data" />
         </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="CompositeDataSetIndex"
+        command="SetCompositeDataSetIndex"
+        update_self="1"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          In case of Composite datasets, set the flat index of the dataset to 
+          pass. The flat index must point to a non-empty, non-composite dataset 
+          for anything to be passed through. If the input is not a composite 
+          dataset, then this index is ignored.
+        </Documentation>
+        <CompositeTreeDomain name="tree" mode="leaves">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+       </CompositeTreeDomain>
       </IntVectorProperty>
 
       <IdTypeVectorProperty name="CacheSize"
@@ -6351,6 +6403,19 @@
               <Entry value="2" text="Field Data" />
             </EnumerationDomain>
           </IntVectorProperty>
+
+          <IntVectorProperty name="CompositeDataSetIndex"
+            command="SetCompositeDataSetIndex"
+            number_of_elements="1"
+            default_values="0">
+            <Documentation>
+              In case of Composite datasets, set the flat index of the dataset to 
+              pass. The flat index must point to a non-empty, non-composite dataset 
+              for anything to be passed through. If the input is not a composite 
+              dataset, then this index is ignored.
+            </Documentation>
+          </IntVectorProperty>
+
         </SourceProxy>
         <ExposedProperties>
           <Property name="BlockSize" />

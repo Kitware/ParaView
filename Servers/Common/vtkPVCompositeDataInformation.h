@@ -81,6 +81,8 @@ public:
   // Description:
   // Get the flat-index range for the composite dataset.
   vtkGetMacro(FlatIndexMax, unsigned int);
+
+//BTX
 protected:
   vtkPVCompositeDataInformation();
   ~vtkPVCompositeDataInformation();
@@ -92,11 +94,15 @@ protected:
   unsigned int NumberOfPieces;
   vtkSetMacro(NumberOfPieces, unsigned int);
 
+  friend class vtkPVDataInformation;
+  vtkPVDataInformation* GetDataInformationForCompositeIndex(int *index);
+  
 private:
   vtkPVCompositeDataInformationInternals* Internal;
 
   vtkPVCompositeDataInformation(const vtkPVCompositeDataInformation&); // Not implemented
   void operator=(const vtkPVCompositeDataInformation&); // Not implemented
+//ETX
 };
 
 #endif

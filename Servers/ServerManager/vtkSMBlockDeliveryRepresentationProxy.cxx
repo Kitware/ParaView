@@ -72,7 +72,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMBlockDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMBlockDeliveryRepresentationProxy::vtkSMBlockDeliveryRepresentationProxy()
 {
@@ -82,6 +82,7 @@ vtkSMBlockDeliveryRepresentationProxy::vtkSMBlockDeliveryRepresentationProxy()
   this->DeliveryStrategy = 0;
   this->Reduction = 0;
   this->CacheSize = 2;
+  this->CompositeDataSetIndex = 0;
   this->Internal = new vtkInternal();
 }
 
@@ -129,6 +130,27 @@ void vtkSMBlockDeliveryRepresentationProxy::SetProcessID(int id)
       this->CacheDirty = true;
       }
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMBlockDeliveryRepresentationProxy::SetCompositeDataSetIndex(int id)
+{
+  if (id < 0)
+    {
+    id = 0;
+    }
+  if (this->BlockFilter)
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->BlockFilter->GetProperty("CompositeDataSetIndex"));
+    if (ivp)
+      {
+      ivp->SetElement(0, id);
+      this->BlockFilter->UpdateProperty("CompositeDataSetIndex");
+      this->CacheDirty = true;
+      }
+    }
+  this->CompositeDataSetIndex = static_cast<unsigned int>(id);
 }
 
 //----------------------------------------------------------------------------

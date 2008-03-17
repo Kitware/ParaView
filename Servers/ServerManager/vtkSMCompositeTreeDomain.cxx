@@ -23,7 +23,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMCompositeTreeDomain);
-vtkCxxRevisionMacro(vtkSMCompositeTreeDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMCompositeTreeDomain, "1.2");
 vtkCxxSetObjectMacro(vtkSMCompositeTreeDomain, Information, vtkPVDataInformation);
 //----------------------------------------------------------------------------
 vtkSMCompositeTreeDomain::vtkSMCompositeTreeDomain()
@@ -131,6 +131,10 @@ int vtkSMCompositeTreeDomain::ReadXMLAttributes(
       {
       this->Mode = NON_LEAVES;
       }
+    else if (strcmp(mode, "none") == 0)
+      {
+      this->Mode = NONE;
+      }
     else
       {
       vtkErrorMacro("Unrecognized mode: " << mode);
@@ -156,6 +160,8 @@ void vtkSMCompositeTreeDomain::PrintSelf(ostream& os, vtkIndent indent)
   case NON_LEAVES:
     os << "NON_LEAVES";
     break;
+  case NONE:
+    os << "NONE";
   default:
     os << "UNKNOWN";
     }

@@ -21,58 +21,19 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 
-#include <vtkstd/vector>
-
-class vtkSMExtractSelectionProxy::vtkInternal
-{
-public:
-
-  typedef vtkstd::vector<vtkIdType> IdVectorType;
-  IdVectorType Indices;
-  IdVectorType GlobalsIDs;
-};
-
 vtkStandardNewMacro(vtkSMExtractSelectionProxy);
-vtkCxxRevisionMacro(vtkSMExtractSelectionProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMExtractSelectionProxy, "1.7");
 //-----------------------------------------------------------------------------
 vtkSMExtractSelectionProxy::vtkSMExtractSelectionProxy()
 {
   this->UseGlobalIDs = 0;
+  this->PrevUseGlobalIDs = 0;
   this->SelectionFieldType = vtkSelection::CELL;
-  this->Internal = new vtkInternal();
 }
 
 //-----------------------------------------------------------------------------
 vtkSMExtractSelectionProxy::~vtkSMExtractSelectionProxy()
 {
-  delete this->Internal;
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMExtractSelectionProxy::AddIndex(vtkIdType piece, vtkIdType id)
-{
-  this->Internal->Indices.push_back(piece);
-  this->Internal->Indices.push_back(id);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMExtractSelectionProxy::RemoveAllIndices()
-{
-  this->Internal->Indices.clear();
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMExtractSelectionProxy::AddGlobalID(vtkIdType id)
-{
-  // piece number is not used for global ids.
-  this->Internal->GlobalsIDs.push_back(-1);
-  this->Internal->GlobalsIDs.push_back(id);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMExtractSelectionProxy::RemoveAllGlobalIDs()
-{
-  this->Internal->GlobalsIDs.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -90,15 +51,42 @@ void vtkSMExtractSelectionProxy::CreateVTKObjects()
     return;
     }
 
-  vtkSMSourceProxy* selectionSource = 
-    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("SelectionSource"));
-  if (!selectionSource)
+  vtkSMSourceProxy* selectionSourceID = vtkSMSourceProxy::SafeDownCast(
+    this->GetSubProxy("SelectionSourceID"));
+  if (!selectionSourceID)
     {
-    vtkErrorMacro("Missing subproxy: SelectionSource");
+    vtkErrorMacro("Missing subproxy: SelectionSourceID");
     return;
     }
-  
-  this->AddInput(selectionSource, "SetSelectionConnection");
+
+  vtkSMSourceProxy* selectionSourceGID = vtkSMSourceProxy::SafeDownCast(
+    this->GetSubProxy("SelectionSourceGID"));
+  if (!selectionSourceGID)
+    {
+    vtkErrorMacro("Missing subproxy: SelectionSourceGID");
+    return;
+    }
+
+  // Set field type.
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    selectionSourceID->GetProperty("FieldType"));
+  ivp->SetElement(0, this->SelectionFieldType);
+  selectionSourceID->UpdateVTKObjects();
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    selectionSourceGID->GetProperty("FieldType"));
+  ivp->SetElement(0, this->SelectionFieldType);
+  selectionSourceGID->UpdateVTKObjects();
+
+  if (this->UseGlobalIDs)
+    {
+    this->AddInput(selectionSourceGID, "SetSelectionConnection");
+    }
+  else
+    {
+    this->AddInput(selectionSourceID, "SetSelectionConnection");
+    }
+  this->PrevUseGlobalIDs = this->UseGlobalIDs;
 }
 
 //-----------------------------------------------------------------------------
@@ -106,47 +94,35 @@ void vtkSMExtractSelectionProxy::UpdateVTKObjects()
 {
   this->Superclass::UpdateVTKObjects();
 
-  vtkSMProxy* selectionSource = this->GetSubProxy("SelectionSource");
-  if (!selectionSource)
+  if (this->PrevUseGlobalIDs != this->UseGlobalIDs)
     {
-    vtkErrorMacro("Missing subproxy: SelectionSource");
-    return;
-    }
-
-  vtkSMIdTypeVectorProperty* idvp = vtkSMIdTypeVectorProperty::SafeDownCast(
-    selectionSource->GetProperty("IDs"));
-  if (this->UseGlobalIDs)
-    {
-    idvp->SetNumberOfElements(this->Internal->GlobalsIDs.size());
-    if (this->Internal->GlobalsIDs.size() > 0)
+    vtkSMSourceProxy* selectionSourceID = vtkSMSourceProxy::SafeDownCast(
+      this->GetSubProxy("SelectionSourceID"));
+    if (!selectionSourceID)
       {
-      idvp->SetElements(&this->Internal->GlobalsIDs[0]);
+      vtkErrorMacro("Missing subproxy: SelectionSourceID");
+      return;
       }
-    }
-  else
-    {
-    idvp->SetNumberOfElements(this->Internal->Indices.size());
-    if (this->Internal->Indices.size() > 0)
+
+    vtkSMSourceProxy* selectionSourceGID = vtkSMSourceProxy::SafeDownCast(
+      this->GetSubProxy("SelectionSourceGID"));
+    if (!selectionSourceGID)
       {
-      idvp->SetElements(&this->Internal->Indices[0]);
+      vtkErrorMacro("Missing subproxy: SelectionSourceGID");
+      return;
       }
-    }
 
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    selectionSource->GetProperty("FieldType"));
-  ivp->SetElement(0, this->SelectionFieldType);
+    if (this->UseGlobalIDs)
+      {
+      this->AddInput(selectionSourceGID, "SetSelectionConnection");
+      }
+    else
+      {
+      this->AddInput(selectionSourceID, "SetSelectionConnection");
+      }
 
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    selectionSource->GetProperty("ContentType"));
-  if (this->UseGlobalIDs)
-    {
-    ivp->SetElement(0, vtkSelection::GLOBALIDS);
+    this->PrevUseGlobalIDs = this->UseGlobalIDs;
     }
-  else
-    {
-    ivp->SetElement(0, vtkSelection::INDICES);
-    }
-  selectionSource->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

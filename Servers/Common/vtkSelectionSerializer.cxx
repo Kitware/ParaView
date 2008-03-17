@@ -32,7 +32,7 @@
 #include "vtkStringArray.h"
 
 vtkStandardNewMacro(vtkSelectionSerializer);
-vtkCxxRevisionMacro(vtkSelectionSerializer, "1.16");
+vtkCxxRevisionMacro(vtkSelectionSerializer, "1.17");
 
 vtkInformationKeyMacro(vtkSelectionSerializer,ORIGINAL_SOURCE_ID,Integer);
 
@@ -296,14 +296,6 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
             node->GetProperties()->Set(vtkSelection::EPSILON(), val);
             }
           }
-        else if (strcmp("PRESERVE_TOPOLOGY", key) == 0)
-          {
-          int val;
-          if (elem->GetScalarAttribute("value", &val))
-            {
-            node->GetProperties()->Set(vtkSelection::PRESERVE_TOPOLOGY(), val);
-            }
-          }
         else if (strcmp("CONTAINING_CELLS", key) == 0)
           {
           int val;
@@ -334,6 +326,30 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           if (elem->GetScalarAttribute("value", &val))
             {
             node->GetProperties()->Set(vtkSelection::INDEXED_VERTICES(), val);
+            }
+          }
+        else if (strcmp("COMPOSITE_INDEX", key) == 0)
+          {
+          int val;
+          if (elem->GetScalarAttribute("value", &val))
+            {
+            node->GetProperties()->Set(vtkSelection::COMPOSITE_INDEX(), val);
+            }
+          }
+        else if (strcmp("HIERARCHICAL_LEVEL", key) == 0)
+          {
+          int val;
+          if (elem->GetScalarAttribute("value", &val))
+            {
+            node->GetProperties()->Set(vtkSelection::HIERARCHICAL_LEVEL(), val);
+            }
+          }
+        else if (strcmp("HIERARCHICAL_INDEX", key) == 0)
+          {
+          int val;
+          if (elem->GetScalarAttribute("value", &val))
+            {
+            node->GetProperties()->Set(vtkSelection::HIERARCHICAL_INDEX(), val);
             }
           }
         }

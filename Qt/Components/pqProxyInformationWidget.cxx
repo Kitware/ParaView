@@ -235,7 +235,9 @@ void pqProxyInformationWidget::fillDataInformation(
 
   this->Ui->groupExtent->setVisible(false);
 
-  if (!dataInformation)
+  // if dataInformation->GetNumberOfDataSets() == 0, that means that the data
+  // information does not have any valid values.
+  if (!dataInformation || dataInformation->GetNumberOfDataSets()==0)
     {
     return;
     }

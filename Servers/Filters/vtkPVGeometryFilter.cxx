@@ -28,6 +28,7 @@
 #include "vtkGenericDataSet.h"
 #include "vtkGenericGeometryFilter.h"
 #include "vtkGeometryFilter.h"
+#include "vtkHierarchicalBoxDataIterator.h"
 #include "vtkHyperOctree.h"
 #include "vtkHyperOctreeSurfaceFilter.h"
 #include "vtkImageData.h"
@@ -50,8 +51,9 @@
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkUnsignedIntArray.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.76");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.77");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -79,7 +81,7 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
   this->OutlineSource = vtkOutlineSource::New();
 
   this->GenerateGroupScalars = 0;
-  this->CurrentGroup = 0;
+  this->CompositeIndex = 0;
 
   this->PassThroughCellIds = 1;
   this->PassThroughPointIds = 1;
@@ -319,6 +321,51 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVGeometryFilter::AddCompositeIndex(vtkPolyData* pd, unsigned int index)
+{
+  vtkUnsignedIntArray* pindex = vtkUnsignedIntArray::New();
+  pindex->SetNumberOfComponents(1);
+  pindex->SetNumberOfTuples(pd->GetNumberOfPoints());
+  pindex->FillComponent(0, index);
+  pindex->SetName("vtkCompositeIndex");
+
+  vtkUnsignedIntArray* cindex = vtkUnsignedIntArray::New();
+  cindex->SetNumberOfComponents(1);
+  cindex->SetNumberOfTuples(pd->GetNumberOfCells());
+  cindex->FillComponent(0, index);
+  cindex->SetName("vtkCompositeIndex");
+
+  pd->GetPointData()->AddArray(pindex);
+  pd->GetCellData()->AddArray(cindex);
+  cindex->Delete();
+  pindex->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::AddHierarchicalIndex(vtkPolyData* pd, 
+  unsigned int level, unsigned int index)
+{
+  vtkUnsignedIntArray* pindex = vtkUnsignedIntArray::New();
+  pindex->SetNumberOfComponents(2);
+  pindex->SetNumberOfTuples(pd->GetNumberOfPoints());
+  pindex->FillComponent(0, level);
+  pindex->FillComponent(1, index);
+  pindex->SetName("vtkHierarchicalIndex");
+
+  vtkUnsignedIntArray* cindex = vtkUnsignedIntArray::New();
+  cindex->SetNumberOfComponents(2);
+  cindex->SetNumberOfTuples(pd->GetNumberOfCells());
+  cindex->FillComponent(0, level);
+  cindex->FillComponent(1, index);
+  cindex->SetName("vtkHierarchicalIndex");
+
+  pd->GetPointData()->AddArray(pindex);
+  pd->GetCellData()->AddArray(cindex);
+  cindex->Delete();
+  pindex->Delete();
+}
+
+//----------------------------------------------------------------------------
 int vtkPVGeometryFilter::ExecuteCompositeDataSet(
   vtkCompositeDataSet* mgInput, 
   vtkAppendPolyData* append, 
@@ -326,6 +373,9 @@ int vtkPVGeometryFilter::ExecuteCompositeDataSet(
 {
   vtkSmartPointer<vtkCompositeDataIterator> iter;
   iter.TakeReference(mgInput->NewIterator());
+
+  vtkHierarchicalBoxDataIterator* hdIter = 
+    vtkHierarchicalBoxDataIterator::SafeDownCast(iter);
 
   unsigned int totNumBlocks=0;
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
@@ -337,11 +387,22 @@ int vtkPVGeometryFilter::ExecuteCompositeDataSet(
   unsigned int group = 0;
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem(), group++)
     {
-    this->CurrentGroup = iter->GetCurrentFlatIndex();
+    this->CompositeIndex = iter->GetCurrentFlatIndex();
     vtkDataObject* block = iter->GetCurrentDataObject();
     
     vtkPolyData* tmpOut = vtkPolyData::New();
     this->ExecuteBlock(block, tmpOut, 0);
+
+    if (hdIter)
+      {
+      this->AddHierarchicalIndex(tmpOut, 
+        hdIter->GetCurrentLevel(), hdIter->GetCurrentIndex());
+      }
+    else
+      {
+      this->AddCompositeIndex(tmpOut, iter->GetCurrentFlatIndex());
+      }
+
     append->AddInput(tmpOut);
     // Call FastDelete() instead of Delete() to avoid garbage
     // collection checks. This improves the preformance significantly
@@ -534,7 +595,7 @@ void vtkPVGeometryFilter::DataSetExecute(
         newArray->SetNumberOfTuples(numCells);
         for(vtkIdType cellId=0; cellId<numCells; cellId++)
           {
-          newArray->SetValue(cellId, this->CurrentGroup);
+          newArray->SetValue(cellId, this->CompositeIndex);
           }
         newArray->SetName("GroupScalars");
         output->GetCellData()->SetScalars(newArray);
@@ -736,7 +797,7 @@ void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input,
       newArray->SetNumberOfTuples(numCells);
       for(vtkIdType cellId=0; cellId<numCells; cellId++)
         {
-        newArray->SetValue(cellId, this->CurrentGroup);
+        newArray->SetValue(cellId, this->CompositeIndex);
         }
       newArray->SetName("GroupScalars");
       output->GetCellData()->SetScalars(newArray);

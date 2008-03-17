@@ -18,23 +18,30 @@
 #include "vtkCollection.h"
 #include "vtkDoubleArray.h"
 #include "vtkIdTypeArray.h"
+#include "vtkInformationDoubleKey.h"
 #include "vtkInformation.h"
+#include "vtkInformationIntegerKey.h"
+#include "vtkInformationIterator.h"
+#include "vtkInformationStringKey.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVSelectionInformation.h"
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIdTypeVectorProperty.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSourceProxy.h"
 
-#include <vtkstd/set>
+#include <vtkstd/vector>
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.10");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.11");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -137,117 +144,387 @@ void vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelectionInternal(
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelection(
-  vtkIdType connectionID,
-  vtkSelection* selection)
+vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
+  vtkIdType connectionID, 
+  vtkSelection* selection,
+  vtkSMProxy* selSource /*=NULL*/)
 {
-  if(selection->GetNumberOfChildren() == 0)
-  {
-    return 0;
-  }
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-
-  // Now pass the selection ids to a selection source.
-  vtkSMProxy* selectionSourceP = pxm->NewProxy("sources", "SelectionSource");
-  selectionSourceP->SetConnectionID(connectionID);
-  selectionSourceP->SetServers(vtkProcessModule::DATA_SERVER);
-
-  int contentType = selection->GetChild(0)->GetProperties()->Get(
-    vtkSelection::CONTENT_TYPE());
-
-  int fieldType = selection->GetChild(0)->GetProperties()->Get(
-    vtkSelection::FIELD_TYPE());
-
-  if(contentType == vtkSelection::FRUSTUM)
+  if (!selection)
     {
-    vtkSelection* child = selection->GetChild(0);
-    if(!child)
+    return 0;
+    }
+
+  if (selection->GetNumberOfChildren()>0)
+    {
+    vtkGenericWarningMacro("Selection trees are not supported.");
+    return selSource;
+    }
+
+  vtkSMProxy* originalSelSource = selSource;
+
+  vtkInformation* selProperties = selection->GetProperties();
+  int contentType = selProperties->Get(vtkSelection::CONTENT_TYPE());
+
+  // Determine the type of selection source proxy to create that will
+  // generate the a vtkSelection same the "selection" instance passed as an
+  // argument.
+  const char* proxyname = 0;
+  bool use_composite = false;
+  bool use_hierarchical = false;
+  switch (contentType)
+    {
+  case vtkSelection::FRUSTUM:
+    proxyname = "FrustumSelectionSource";
+    break;
+
+  case vtkSelection::INDICES:
+    // we need to choose between IDSelectionSource,
+    // CompositeDataIDSelectionSource and HierarchicalDataIDSelectionSource.
+    proxyname = "IDSelectionSource";
+    if (selProperties->Has(vtkSelection::COMPOSITE_INDEX()))
       {
-      return 0;
+      proxyname = "CompositeDataIDSelectionSource";
+      use_composite = true;
       }
+    else if (selProperties->Has(vtkSelection::HIERARCHICAL_LEVEL()) && 
+       selProperties->Has(vtkSelection::HIERARCHICAL_INDEX()))
+      {
+      proxyname = "HierarchicalDataIDSelectionSource";
+      use_hierarchical = true;
+      use_composite = false;
+      }
+    break;
 
+  case vtkSelection::GLOBALIDS:
+    proxyname = "GlobalIDSelectionSource";
+    break;
+
+  default:
+    vtkGenericWarningMacro("Unhandled ContentType: " << contentType);
+    return selSource;
+    }
+
+  if (selSource && strcmp(selSource->GetXMLName(), proxyname) != 0)
+    {
+    vtkGenericWarningMacro("A composite selection has different types of selections."
+      "This is not supported.");
+    return selSource;
+    }
+  
+  if (!selSource)
+    {
+    // If selSource is not present we need to create a new one. The type of
+    // proxy we instantiate depends on the type of the vtkSelection.
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    selSource = pxm->NewProxy("sources", proxyname);
+    selSource->SetConnectionID(connectionID);
+    selSource->SetServers(vtkProcessModule::DATA_SERVER);
+    }
+
+
+  // Set some common property values using the state of the vtkSelection.
+  if (selProperties->Has(vtkSelection::FIELD_TYPE()))
+    {
     vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      selectionSourceP->GetProperty("ContentType"));
-    ivp->SetElement(0, contentType);
+      selSource->GetProperty("FieldType"));
+    ivp->SetElement(0, selProperties->Get(vtkSelection::FIELD_TYPE()));
+    }
 
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      selectionSourceP->GetProperty("FieldType"));
-    ivp->SetElement(0, fieldType);
+  if (selProperties->Has(vtkSelection::CONTAINING_CELLS()))
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      selSource->GetProperty("ContainingCells"));
+    ivp->SetElement(0, selProperties->Get(vtkSelection::CONTAINING_CELLS()));
+    }
 
+  if (selProperties->Has(vtkSelection::INVERSE()))
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      selSource->GetProperty("InsideOut"));
+    ivp->SetElement(0, selProperties->Get(vtkSelection::INVERSE()));
+    }
+
+  if (contentType == vtkSelection::FRUSTUM)
+    {
     // Set the selection ids, which is the frustum vertex.
     vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    selectionSourceP->GetProperty("Frustum"));
+      selSource->GetProperty("Frustum"));
 
     vtkDoubleArray* verts = vtkDoubleArray::SafeDownCast(
-      child->GetSelectionList());
-    double data[32]; 
-    for(int i=0; i<8; i++)
-      {
-      memcpy(&data[i*4], verts->GetTuple(i), 4*sizeof(double));
-      }
-    dvp->SetElements(data);
+      selection->GetSelectionList());
+    dvp->SetElements(verts->GetPointer(0));
     }
-  else
+  else if (contentType == vtkSelection::GLOBALIDS)
     {
-    unsigned int numChildren = selection->GetNumberOfChildren();
-    unsigned int childId;
-    vtkIdType numIDs=0;
-
-  // Count the total number of ids over. all children
-    for(childId=0; childId< numChildren; childId++)
+    vtkSMIdTypeVectorProperty* ids = vtkSMIdTypeVectorProperty::SafeDownCast(
+      selSource->GetProperty("IDs"));
+    if (!originalSelSource)
       {
-      vtkSelection* child = selection->GetChild(childId);
-      vtkIdTypeArray* idList = vtkIdTypeArray::SafeDownCast(
-        child->GetSelectionList());
-      if (idList)
+      ids->SetNumberOfElements(0);
+      }
+    unsigned int curValues = ids->GetNumberOfElements();
+    vtkIdTypeArray* idList = vtkIdTypeArray::SafeDownCast(
+      selection->GetSelectionList());
+    if (idList)
+      {
+      vtkIdType numIDs = idList->GetNumberOfTuples();
+      ids->SetNumberOfElements(curValues+numIDs);
+      for (vtkIdType cc=0; cc < numIDs; cc++)
         {
-        numIDs += idList->GetNumberOfTuples();
+        ids->SetElement(curValues+cc, idList->GetValue(cc));
         }
+      }
+    }
+  else if (contentType == vtkSelection::INDICES)
+    {
+    vtkIdType procID = -1;
+    if (selProperties->Has(vtkSelection::PROCESS_ID()))
+      {
+      procID = selProperties->Get(vtkSelection::PROCESS_ID());
       }
 
     // Add the selection proc ids and cell ids to the IDs property.
     vtkSMIdTypeVectorProperty* ids = vtkSMIdTypeVectorProperty::SafeDownCast(
-      selectionSourceP->GetProperty("IDs"));
-    ids->SetNumberOfElements(numIDs*2);
-
-    vtkIdType counter = 0;
-    for(childId=0; childId< numChildren; childId++)
+      selSource->GetProperty("IDs"));
+    if (!originalSelSource)
       {
-
-      vtkSelection* child = selection->GetChild(childId);
-      int procID = 0;
-      if (child->GetProperties()->Has(vtkSelection::PROCESS_ID()))
+      // remove default values set by the XML if we created a brand new proxy.
+      ids->SetNumberOfElements(0);
+      }
+    unsigned int curValues = ids->GetNumberOfElements();
+    vtkIdTypeArray* idList = vtkIdTypeArray::SafeDownCast(
+      selection->GetSelectionList());
+    if (idList)
+      {
+      vtkIdType numIDs = idList->GetNumberOfTuples();
+      if (!use_composite && !use_hierarchical)
         {
-        procID = child->GetProperties()->Get(vtkSelection::PROCESS_ID());
-        }
-      vtkIdTypeArray* idList = vtkIdTypeArray::SafeDownCast(
-        child->GetSelectionList());
-      if (idList)
-        {
-        vtkIdType numValues = idList->GetNumberOfTuples();
-        for (vtkIdType idx=0; idx<numValues; idx++)
+        ids->SetNumberOfElements(curValues+numIDs*2);
+        for (vtkIdType cc=0; cc < numIDs; cc++)
           {
-          ids->SetElement(counter++, procID);
-          ids->SetElement(counter++, idList->GetValue(idx));
+          ids->SetElement(curValues+2*cc, procID);
+          ids->SetElement(curValues+2*cc+1, idList->GetValue(cc));
           }
         }
+      else if (use_composite)
+        {
+        vtkIdType composite_index = 0;
+        if (selProperties->Has(vtkSelection::COMPOSITE_INDEX()))
+          {
+          composite_index = selProperties->Get(vtkSelection::COMPOSITE_INDEX());
+          }
 
-      child->GetProperties()->Set(vtkSelection::CONTENT_TYPE(), contentType);
-      child->GetProperties()->Set(vtkSelection::FIELD_TYPE(), fieldType);      
+        ids->SetNumberOfElements(curValues+numIDs*3);
+        for (vtkIdType cc=0; cc < numIDs; cc++)
+          {
+          ids->SetElement(curValues+3*cc, composite_index);
+          ids->SetElement(curValues+3*cc+1, procID);
+          ids->SetElement(curValues+3*cc+2, idList->GetValue(cc));
+          }
+        }
+      else if (use_hierarchical)
+        {
+        vtkIdType level = selProperties->Get(vtkSelection::HIERARCHICAL_LEVEL());
+        vtkIdType dsIndex = selProperties->Get(vtkSelection::HIERARCHICAL_INDEX());
+        ids->SetNumberOfElements(curValues+numIDs*3);
+        for (vtkIdType cc=0; cc < numIDs; cc++)
+          {
+          ids->SetElement(curValues+3*cc, level);
+          ids->SetElement(curValues+3*cc+1, dsIndex);
+          ids->SetElement(curValues+3*cc+2, idList->GetValue(cc));
+          }
+        }
       }
-
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      selectionSourceP->GetProperty("FieldType"));
-    ivp->SetElement(0, fieldType);
-
     }
 
-  /*
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    selectionSourceP->GetProperty("ContentType"));
-  ivp->SetElement(0, selection->GetProperties()->Get(vtkSelection::CONTENT_TYPE()));
-  */
+  return selSource;
+}
 
-  selectionSourceP->UpdateVTKObjects();
-  return selectionSourceP;
+//-----------------------------------------------------------------------------
+vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelection(
+  vtkIdType connectionID,
+  vtkSelection* selection)
+{
+  vtkSMProxy* selSource= 0;
+  if (selection->GetNumberOfChildren() == 0)
+    {
+    selSource = vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
+      connectionID, selection, NULL);
+    }
+  else
+    {
+    unsigned int numChildren = selection->GetNumberOfChildren(); 
+    for (unsigned int cc=0; cc < numChildren; cc++)
+      {
+      vtkSelection* child = selection->GetChild(cc);
+      selSource = vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
+        connectionID, child, selSource);
+      }
+    }
+  if (selSource)
+    {
+    selSource->UpdateVTKObjects();
+    }
+  return selSource;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(int outputType,
+  vtkSMProxy* selectionSourceProxy,
+  vtkSMSourceProxy* dataSource, int dataPort)
+{
+  const char* inproxyname = selectionSourceProxy? 
+    selectionSourceProxy->GetXMLName() : 0;
+  const char* outproxyname = 0;
+  switch (outputType)
+    {
+  case vtkSelection::GLOBALIDS:
+    outproxyname = "GlobalIDSelectionSource";
+    break;
+
+  case vtkSelection::FRUSTUM:
+    outproxyname = "FrustumSelectionSource";
+    break;
+
+  case vtkSelection::LOCATIONS:
+    outproxyname = "LocationSelectionSource";
+    break;
+
+  case vtkSelection::THRESHOLDS:
+    outproxyname = "ThresholdSelectionSource";
+    break;
+
+  case vtkSelection::INDICES:
+      {
+      vtkPVDataInformation* di = dataSource->GetDataInformation(dataPort, true);
+      outproxyname = "IDSelectionSource";
+      if (di->GetCompositeDataClassName())
+        {
+        if (strcmp(di->GetCompositeDataClassName(), "vtkHierarchicalBoxDataSet")==0)
+          {
+          outproxyname = "HierarchicalDataIDSelectionSource";
+          }
+        else
+          {
+          outproxyname = "CompositeDataIDSelectionSource";
+          }
+        }
+      }
+    break;
+
+  default:
+    vtkGenericWarningMacro("Cannot convert to type : " << outputType);
+    return 0;
+    }
+
+  if (selectionSourceProxy && strcmp(inproxyname, outproxyname) == 0)
+    {
+    // No conversion needed.
+    selectionSourceProxy->Register(0);
+    return selectionSourceProxy;
+    }
+
+  if (outputType == vtkSelection::INDICES && selectionSourceProxy &&
+    strcmp(inproxyname, "GlobalIDSelectionSource") == 0)
+    {
+    // convert from global IDs to indices.
+    return vtkSMSelectionHelper::ConvertIndices(
+      vtkSMSourceProxy::SafeDownCast(selectionSourceProxy),
+      dataSource, dataPort, false);
+    }
+  else if (outputType == vtkSelection::GLOBALIDS && selectionSourceProxy && (
+      strcmp(inproxyname, "IDSelectionSource") == 0 ||
+      strcmp(inproxyname, "HierarchicalDataIDSelectionSource") == 0||
+      strcmp(inproxyname, "CompositeDataIDSelectionSource")==0))
+    {
+    // convert from ID seelction to global IDs.
+    return vtkSMSelectionHelper::ConvertIndices(
+      vtkSMSourceProxy::SafeDownCast(selectionSourceProxy),
+      dataSource, dataPort, true);
+    }
+
+  // Conversion not possible, so simply create a new proxy of the requested
+  // output type with some empty defaults.
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxy* outSource = pxm->NewProxy("sources", outproxyname);
+  if (!outSource)
+    {
+    return outSource;
+    }
+
+  // Note that outSource->ConnectionID and outSource->Servers are not yet set.
+  if (vtkSMVectorProperty* vp = vtkSMVectorProperty::SafeDownCast(
+      outSource->GetProperty("IDs")))
+    {
+    // remove default ID values.
+    vp->SetNumberOfElements(0);
+    }
+
+  if (selectionSourceProxy)
+    {
+    outSource->SetServers(selectionSourceProxy->GetServers());
+    outSource->SetConnectionID(selectionSourceProxy->GetConnectionID());
+
+    // try to copy as many properties from the old-source to the new one.
+    outSource->GetProperty("ContainingCells")->Copy(
+      selectionSourceProxy->GetProperty("ContainingCells"));
+    outSource->GetProperty("FieldType")->Copy(
+      selectionSourceProxy->GetProperty("FieldType"));
+    outSource->GetProperty("InsideOut")->Copy(
+      selectionSourceProxy->GetProperty("InsideOut"));
+    outSource->UpdateVTKObjects();
+    }
+  return outSource;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* vtkSMSelectionHelper::ConvertIndices(
+  vtkSMSourceProxy* inSource, vtkSMSourceProxy* dataSource,
+  int dataPort, bool toGlobalIDs)
+{
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
+  // * Update all inputs.
+  inSource->UpdatePipeline();
+  dataSource->UpdatePipeline();
+
+  // * Filter that converts selections.
+  vtkSMSourceProxy* convertor = vtkSMSourceProxy::SafeDownCast(
+    pxm->NewProxy("filters", "ConvertSelection"));
+  convertor->SetConnectionID(inSource->GetConnectionID());
+  convertor->SetServers(inSource->GetServers());
+
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
+    convertor->GetProperty("Input"));
+  ip->AddInputConnection(inSource, 0);
+
+  ip = vtkSMInputProperty::SafeDownCast(convertor->GetProperty("DataInput"));
+  ip->AddInputConnection(dataSource, dataPort);
+
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    convertor->GetProperty("OutputType"));
+  ivp->SetElement(0, toGlobalIDs? vtkSelection::GLOBALIDS : vtkSelection::INDICES);
+  convertor->UpdateVTKObjects();
+
+  // * Request conversion.
+  convertor->UpdatePipeline();
+
+  // * And finally gathering the information back
+  vtkPVSelectionInformation* selInfo = vtkPVSelectionInformation::New();
+  pm->GatherInformation(convertor->GetConnectionID(),
+                        convertor->GetServers(),
+                        selInfo,
+                        convertor->GetID());
+
+
+  vtkSMProxy* outSource = vtkSMSelectionHelper::NewSelectionSourceFromSelection(
+    inSource->GetConnectionID(), selInfo->GetSelection());
+
+
+  // cleanup.
+  convertor->Delete();
+  selInfo->Delete();
+
+  return outSource;
 }

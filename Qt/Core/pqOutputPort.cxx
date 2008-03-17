@@ -85,6 +85,20 @@ pqServer* pqOutputPort::getServer() const
 }
 
 //-----------------------------------------------------------------------------
+vtkSMOutputPort* pqOutputPort::getOutputPortProxy() const
+{
+  vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(
+    this->getSource()->getProxy());
+
+  if (!source || !source->GetOutputPortsCreated())
+    {
+    return NULL;
+    }
+
+  return source->GetOutputPort(this->PortNumber);
+}
+
+//-----------------------------------------------------------------------------
 vtkPVDataInformation* pqOutputPort::getDataInformation(bool update) const
 {
   vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(
@@ -146,6 +160,36 @@ QString pqOutputPort::getPortName() const
   return QString(source->GetOutputPortName(
       static_cast<unsigned int>(this->PortNumber)));
 }
+
+//-----------------------------------------------------------------------------
+/// Called to set the selection input.
+void pqOutputPort::setSelectionInput(vtkSMSourceProxy* selSrc, int port)
+{
+  vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(
+    this->getSource()->getProxy());
+  src->SetSelectionInput(this->getPortNumber(), selSrc, port);
+}
+
+//-----------------------------------------------------------------------------
+/// Calls vtkSMSourceProxy::GetSelectionInput() on the underlying source
+/// proxy.
+vtkSMSourceProxy* pqOutputPort::getSelectionInput()
+{
+  vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(
+    this->getSource()->getProxy());
+  return src->GetSelectionInput(this->getPortNumber());
+}
+
+//-----------------------------------------------------------------------------
+/// Calls vtkSMSourceProxy::GetSelectionInputPort() on the underlying source
+/// proxy.
+unsigned int pqOutputPort::getSelectionInputPort()
+{
+  vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(
+    this->getSource()->getProxy());
+  return src->GetSelectionInputPort(this->getPortNumber());
+}
+
 
 //-----------------------------------------------------------------------------
 int pqOutputPort::getNumberOfConsumers() const

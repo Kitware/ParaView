@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSelection.h"
-#include "vtkSMExtractThresholdsProxy.h"
 #include "vtkSMProxy.h"
 
 #include <QtDebug>

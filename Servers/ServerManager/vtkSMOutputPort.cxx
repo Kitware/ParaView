@@ -17,6 +17,7 @@
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVClassNameInformation.h"
@@ -25,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMOutputPort);
-vtkCxxRevisionMacro(vtkSMOutputPort, "1.4");
+vtkCxxRevisionMacro(vtkSMOutputPort, "1.5");
 
 
 //----------------------------------------------------------------------------
@@ -229,6 +230,7 @@ void vtkSMOutputPort::GatherDataInformation(int doUpdate)
     this->DataInformationValid = true;
     }
   pm->SendCleanupPendingProgress(this->ConnectionID);
+  this->InvokeEvent(vtkCommand::UpdateInformationEvent);
 }
 
 //----------------------------------------------------------------------------

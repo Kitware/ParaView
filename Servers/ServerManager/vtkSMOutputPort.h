@@ -38,6 +38,8 @@ public:
   // Description:
   // Returns data information. If data information is marked
   // invalid, calls GatherDataInformation.
+  // If data information is gathered then this fires the 
+  // vtkCommand::UpdateInformationEvent event.
   vtkPVDataInformation* GetDataInformation();
 
   // Description:
@@ -56,6 +58,7 @@ public:
 
   // Description:
   // Get information about dataset from server.
+  // Fires the vtkCommand::UpdateInformationEvent event.
   void GatherDataInformation(int doUpdate=1);
 
   // Description:

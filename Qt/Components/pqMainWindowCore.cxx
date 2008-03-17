@@ -791,25 +791,20 @@ pqAnimationViewWidget* pqMainWindowCore::setupAnimationView(QDockWidget* dock_wi
 void pqMainWindowCore::setupSelectionInspector(QDockWidget* dock_widget)
 {
   pqSelectionInspectorPanel* const selection_inspector = 
-    new pqSelectionInspectorPanel(dock_widget);
-
-  selection_inspector->setRubberBandHelper(
-    this->renderViewSelectionHelper());
+    new pqSelectionInspectorPanel(dock_widget)
+    << pqSetName("selectionInspectorPanel");
 
   QObject::connect(
     &this->Implementation->ActiveServer, SIGNAL(changed(pqServer*)),
-    selection_inspector, SLOT(activeServerChanged(pqServer*)));
+    selection_inspector, SLOT(setServer(pqServer*)));
+
+  selection_inspector->setSelectionManager(&this->Implementation->SelectionManager);
 
   //QObject::connect(this, SIGNAL(postAccept()),
   //  selection_inspector, SLOT(refresh()));
 
   //QObject::connect(core, SIGNAL(finishedAddingServer(pqServer*)),
   //  selection_inspector, SLOT(setServer(pqServer*)));
-
-  //QObject::connect(selection_inspector, SIGNAL(beginNonUndoableChanges()),
-  //  this->Implementation->UndoStack, SLOT(beginNonUndoableChanges()));
-  //QObject::connect(selection_inspector, SIGNAL(endNonUndoableChanges()),
-  //  this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
 
   dock_widget->setWidget(selection_inspector);
 }

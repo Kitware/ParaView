@@ -160,9 +160,10 @@ void pqSelectionManager::clearSelection()
   if (opport)
     {
     opport->renderAllViews(false);
+    this->Implementation->SelectedPort = 0;
     }
 
-  emit this->selectionChanged(this);
+  emit this->selectionChanged(static_cast<pqOutputPort*>(0));
 }
 
 //-----------------------------------------------------------------------------
@@ -184,7 +185,11 @@ void pqSelectionManager::onSelected(pqOutputPort* selectedPort)
   if (this->Implementation->SelectedPort != selectedPort)
     {
     // Clear previous selection.
+    // this->clearSelection() fires selectionChanged() signal. We don't want to
+    // fire the signal twice unnecessarily, hence we block signals.
+    bool oldVal = this->blockSignals(true);
     this->clearSelection();
+    this->blockSignals(oldVal);
     }
 
   this->Implementation->SelectedPort = selectedPort;
@@ -200,7 +205,7 @@ void pqSelectionManager::onSelected(pqOutputPort* selectedPort)
       pqServerManagerSelectionModel::ClearAndSelect);
     }
 
-  emit this->selectionChanged(this);
+  emit this->selectionChanged(selectedPort);
 }
 
 //-----------------------------------------------------------------------------

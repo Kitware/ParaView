@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVCompositeDataInformation);
-vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.10");
+vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.11");
 
 struct vtkPVCompositeDataInformationInternals
 {
@@ -57,6 +57,50 @@ vtkPVCompositeDataInformation::~vtkPVCompositeDataInformation()
 void vtkPVCompositeDataInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+}
+
+//----------------------------------------------------------------------------
+vtkPVDataInformation* vtkPVCompositeDataInformation::GetDataInformationForCompositeIndex(
+  int *index)
+{
+  if (!this->DataIsComposite)
+    {
+    return 0;
+    }
+
+  if (this->DataIsMultiPiece)
+    {
+    if (*index < this->NumberOfPieces)
+      {
+      *index=-1;
+      return NULL;
+      }
+    (*index -= this->NumberOfPieces);
+    }
+
+  vtkPVCompositeDataInformationInternals::VectorOfDataInformation::iterator iter = 
+    this->Internal->ChildrenInformation.begin();
+  for ( ; iter!= this->Internal->ChildrenInformation.end(); ++iter)
+    {
+    if (iter->GetPointer())
+      {
+      vtkPVDataInformation* info = 
+        iter->GetPointer()->GetDataInformationForCompositeIndex(index);
+      if (*index==-1)
+        {
+        return info;
+        }
+      }
+    else
+      {
+      index--;
+      if (index<0)
+        {
+        return NULL;
+        }
+      }
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------

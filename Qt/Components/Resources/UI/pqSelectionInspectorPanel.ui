@@ -5,410 +5,583 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>284</width>
-    <height>647</height>
+    <width>333</width>
+    <height>915</height>
    </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>3</number>
-   </property>
-   <property name="spacing" >
-    <number>6</number>
-   </property>
    <item>
     <layout class="QGridLayout" >
-     <property name="margin" >
-      <number>10</number>
-     </property>
-     <property name="spacing" >
+     <property name="horizontalSpacing" >
       <number>3</number>
      </property>
-     <item row="1" column="1" >
-      <widget class="QComboBox" name="comboFieldType" >
-       <property name="enabled" >
-        <bool>true</bool>
-       </property>
-       <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>1</hsizetype>
-         <vsizetype>0</vsizetype>
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="whatsThis" >
-        <string>Used to set the label font.</string>
-       </property>
-       <item>
-        <property name="text" >
-         <string>CELL</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>POINT</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="1" column="0" >
-      <widget class="QLabel" name="label_size_5" >
-       <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>1</hsizetype>
-         <vsizetype>0</vsizetype>
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
+     <property name="verticalSpacing" >
+      <number>3</number>
+     </property>
+     <item row="0" column="0" >
+      <widget class="QLabel" name="label_6" >
        <property name="text" >
-        <string>Field Type:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0" colspan="2" >
-      <widget class="QCheckBox" name="checkboxContainCell" >
-       <property name="enabled" >
-        <bool>true</bool>
-       </property>
-       <property name="text" >
-        <string>Containing Cells</string>
-       </property>
-       <property name="tristate" >
-        <bool>false</bool>
+        <string>Current Object:</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1" >
-      <widget class="QComboBox" name="comboSelectionType" >
-       <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>1</hsizetype>
-         <vsizetype>0</vsizetype>
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="whatsThis" >
-        <string>Used to set the label font.</string>
-       </property>
-       <item>
-        <property name="text" >
-         <string>IDs</string>
-        </property>
-       </item>
-       <item>
-        <property name="text" >
-         <string>Frustum</string>
-        </property>
-       </item>
-      </widget>
+      <widget class="pqOutputPortComboBox" name="currentObject" />
      </item>
-     <item row="0" column="0" >
-      <widget class="QLabel" name="label_size_6" >
-       <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>1</hsizetype>
-         <vsizetype>0</vsizetype>
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
+     <item row="1" column="0" colspan="2" >
+      <widget class="QPushButton" name="createSelection" >
        <property name="text" >
-        <string>Selection Type:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0" colspan="2" >
-      <widget class="QCheckBox" name="checkboxInsideOut" >
-       <property name="text" >
-        <string>Inside Out</string>
+        <string>Create Selection</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QStackedWidget" name="stackedWidget" >
-     <property name="autoFillBackground" >
-      <bool>false</bool>
+    <widget class="pqCollapsedGroup" name="groupActiveSelection" >
+     <property name="title" >
+      <string>Active Selection</string>
      </property>
-     <property name="frameShape" >
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="currentIndex" >
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="page_3" >
-      <layout class="QGridLayout" >
-       <property name="margin" >
-        <number>9</number>
-       </property>
-       <property name="spacing" >
-        <number>6</number>
-       </property>
-       <item row="2" column="0" >
-        <layout class="QVBoxLayout" >
-         <property name="margin" >
-          <number>0</number>
-         </property>
-         <property name="spacing" >
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="GlobalIDRange" >
+     <layout class="QVBoxLayout" >
+      <property name="spacing" >
+       <number>3</number>
+      </property>
+      <property name="leftMargin" >
+       <number>3</number>
+      </property>
+      <property name="topMargin" >
+       <number>3</number>
+      </property>
+      <property name="rightMargin" >
+       <number>3</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>3</number>
+      </property>
+      <item>
+       <layout class="QGridLayout" >
+        <property name="leftMargin" >
+         <number>3</number>
+        </property>
+        <property name="topMargin" >
+         <number>3</number>
+        </property>
+        <property name="rightMargin" >
+         <number>3</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>3</number>
+        </property>
+        <property name="horizontalSpacing" >
+         <number>3</number>
+        </property>
+        <property name="verticalSpacing" >
+         <number>3</number>
+        </property>
+        <item row="0" column="0" >
+         <widget class="QLabel" name="label" >
+          <property name="text" >
+           <string>Selected Object:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" >
+         <widget class="QLabel" name="selectedObject" >
+          <property name="text" >
+           <string>&lt;b>[selected object name]&lt;/b></string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" >
+         <widget class="QLabel" name="label_size_6" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text" >
+           <string>Selection Type:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" >
+         <widget class="QComboBox" name="comboSelectionType" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="whatsThis" >
+           <string>Used to set the label font.</string>
+          </property>
+          <item>
            <property name="text" >
-            <string>Global ID Range: 0 - 1</string>
+            <string>IDs</string>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="IndexRange" >
+          </item>
+          <item>
            <property name="text" >
-            <string>Index Range: 0 -1</string>
+            <string>Global IDs</string>
            </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="0" column="0" >
-        <widget class="QCheckBox" name="UseGlobalIDs" >
-         <property name="text" >
-          <string>Use Global Ids</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="ProcessIDRange" >
-         <property name="text" >
-          <string>Process ID Range: 0 - 0</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1" >
-        <layout class="QVBoxLayout" >
-         <property name="margin" >
-          <number>0</number>
-         </property>
-         <property name="spacing" >
-          <number>6</number>
-         </property>
-         <item>
-          <widget class="QPushButton" name="Delete" >
-           <property name="enabled" >
-            <bool>true</bool>
-           </property>
-           <property name="toolTip" >
-            <string>Delete selected values from the current set</string>
-           </property>
+          </item>
+          <item>
            <property name="text" >
-            <string>Delete</string>
+            <string>Frustum</string>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="DeleteAll" >
-           <property name="enabled" >
-            <bool>true</bool>
-           </property>
-           <property name="toolTip" >
-            <string>Delete all values</string>
-           </property>
+          </item>
+          <item>
            <property name="text" >
-            <string>Delete All</string>
+            <string>Thresholds</string>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="NewValue" >
-           <property name="toolTip" >
-            <string>Add a single value to the current set</string>
-           </property>
-           <property name="statusTip" >
-            <string>Add a single value to the current set.</string>
-           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="2" column="0" >
+         <widget class="QLabel" name="label_size_5" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text" >
+           <string>Field Type:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" >
+         <widget class="QComboBox" name="comboFieldType" >
+          <property name="enabled" >
+           <bool>true</bool>
+          </property>
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="whatsThis" >
+           <string>Used to set the label font.</string>
+          </property>
+          <item>
            <property name="text" >
-            <string>New Value</string>
+            <string>CELL</string>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="NewRange" >
-           <property name="enabled" >
-            <bool>false</bool>
-           </property>
-           <property name="toolTip" >
-            <string>Add a single value to the current set</string>
-           </property>
-           <property name="statusTip" >
-            <string>Add a single value to the current set.</string>
-           </property>
+          </item>
+          <item>
            <property name="text" >
-            <string>New Range</string>
+            <string>POINT</string>
            </property>
-          </widget>
-         </item>
-         <item>
-          <spacer>
-           <property name="orientation" >
-            <enum>Qt::Vertical</enum>
+          </item>
+         </widget>
+        </item>
+        <item row="3" column="0" colspan="2" >
+         <widget class="QCheckBox" name="checkboxContainCell" >
+          <property name="enabled" >
+           <bool>true</bool>
+          </property>
+          <property name="text" >
+           <string>Select cells that include the selected points</string>
+          </property>
+          <property name="tristate" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" colspan="2" >
+         <widget class="QCheckBox" name="checkboxInsideOut" >
+          <property name="text" >
+           <string>Invert selection</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" >
+        <property name="spacing" >
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QTreeWidget" name="compositeTree" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Expanding" hsizetype="Fixed" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize" >
+           <size>
+            <width>150</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <column>
+           <property name="text" >
+            <string>Data Hierarchy</string>
            </property>
-           <property name="sizeHint" >
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item row="3" column="0" >
-        <layout class="QVBoxLayout" >
-         <property name="margin" >
-          <number>0</number>
-         </property>
-         <property name="spacing" >
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="pqTreeWidget" name="Indices" >
-           <property name="sizePolicy" >
-            <sizepolicy>
-             <hsizetype>5</hsizetype>
-             <vsizetype>7</vsizetype>
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="editTriggers" >
-            <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::NoEditTriggers</set>
-           </property>
-           <property name="alternatingRowColors" >
-            <bool>true</bool>
-           </property>
-           <property name="selectionMode" >
-            <enum>QAbstractItemView::ExtendedSelection</enum>
-           </property>
-           <property name="rootIsDecorated" >
-            <bool>false</bool>
-           </property>
-           <property name="sortingEnabled" >
-            <bool>true</bool>
-           </property>
-           <column>
-            <property name="text" >
-             <string>Process ID</string>
-            </property>
-           </column>
-           <column>
-            <property name="text" >
-             <string>Index</string>
-            </property>
-           </column>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="page_4" >
-      <layout class="QVBoxLayout" >
-       <property name="margin" >
-        <number>9</number>
-       </property>
-       <property name="spacing" >
-        <number>6</number>
-       </property>
-       <item>
-        <widget class="QCheckBox" name="checkboxShowFrustum" >
-         <property name="text" >
-          <string>Show Frustum</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" >
-          <size>
-           <width>20</width>
-           <height>341</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="page_5" >
-      <layout class="QGridLayout" >
-       <property name="margin" >
-        <number>9</number>
-       </property>
-       <property name="spacing" >
-        <number>6</number>
-       </property>
-       <item row="0" column="0" >
-        <widget class="QFrame" name="frameThresholds" >
-         <property name="frameShape" >
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow" >
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QGridLayout" >
-          <property name="margin" >
+          </column>
+         </widget>
+        </item>
+        <item>
+         <widget class="QStackedWidget" name="stackedWidget" >
+          <property name="autoFillBackground" >
+           <bool>false</bool>
+          </property>
+          <property name="frameShape" >
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="currentIndex" >
            <number>0</number>
           </property>
-          <property name="spacing" >
-           <number>6</number>
-          </property>
-          <item row="0" column="1" colspan="2" >
-           <widget class="QComboBox" name="ThresholdScalarArray" />
-          </item>
-          <item row="2" column="0" >
-           <widget class="QLabel" name="label_4" >
-            <property name="text" >
-             <string>Upper Threshold</string>
-            </property>
-            <property name="wordWrap" >
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" >
-           <widget class="QLabel" name="label_3" >
-            <property name="text" >
-             <string>Lower Threshold</string>
-            </property>
-            <property name="wordWrap" >
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1" colspan="2" >
-           <widget class="pqDoubleRangeWidget" native="1" name="Threshold_Upper" />
-          </item>
-          <item row="4" column="0" colspan="2" >
+          <widget class="QWidget" name="page_IDs" >
            <layout class="QVBoxLayout" >
-            <property name="margin" >
-             <number>0</number>
-            </property>
             <property name="spacing" >
-             <number>0</number>
+             <number>3</number>
+            </property>
+            <property name="leftMargin" >
+             <number>3</number>
+            </property>
+            <property name="topMargin" >
+             <number>3</number>
+            </property>
+            <property name="rightMargin" >
+             <number>3</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>3</number>
             </property>
             <item>
-             <widget class="QTreeWidget" name="thresholdRanges" >
+             <widget class="QLabel" name="ProcessIDRange" >
+              <property name="text" >
+               <string>Process ID Range: 0 - 0</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="pqTreeWidget" name="Indices" >
               <property name="sizePolicy" >
-               <sizepolicy>
-                <hsizetype>5</hsizetype>
-                <vsizetype>7</vsizetype>
+               <sizepolicy vsizetype="Expanding" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="editTriggers" >
+               <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::NoEditTriggers</set>
+              </property>
+              <property name="alternatingRowColors" >
+               <bool>true</bool>
+              </property>
+              <property name="selectionMode" >
+               <enum>QAbstractItemView::ExtendedSelection</enum>
+              </property>
+              <property name="rootIsDecorated" >
+               <bool>false</bool>
+              </property>
+              <property name="sortingEnabled" >
+               <bool>true</bool>
+              </property>
+              <column>
+               <property name="text" >
+                <string>Indices</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+            <item>
+             <layout class="QGridLayout" >
+              <property name="leftMargin" >
+               <number>0</number>
+              </property>
+              <property name="topMargin" >
+               <number>0</number>
+              </property>
+              <property name="rightMargin" >
+               <number>0</number>
+              </property>
+              <property name="bottomMargin" >
+               <number>0</number>
+              </property>
+              <property name="horizontalSpacing" >
+               <number>2</number>
+              </property>
+              <property name="verticalSpacing" >
+               <number>2</number>
+              </property>
+              <item row="0" column="0" >
+               <widget class="QPushButton" name="NewValue" >
+                <property name="toolTip" >
+                 <string>Add a single value to the current set</string>
+                </property>
+                <property name="statusTip" >
+                 <string>Add a single value to the current set.</string>
+                </property>
+                <property name="text" >
+                 <string>New Value</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1" >
+               <widget class="QPushButton" name="DeleteAll" >
+                <property name="enabled" >
+                 <bool>true</bool>
+                </property>
+                <property name="toolTip" >
+                 <string>Delete all values</string>
+                </property>
+                <property name="text" >
+                 <string>Delete All</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1" >
+               <widget class="QPushButton" name="NewRange" >
+                <property name="enabled" >
+                 <bool>false</bool>
+                </property>
+                <property name="toolTip" >
+                 <string>Add a single value to the current set</string>
+                </property>
+                <property name="statusTip" >
+                 <string>Add a single value to the current set.</string>
+                </property>
+                <property name="text" >
+                 <string>New Range</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" >
+               <widget class="QPushButton" name="Delete" >
+                <property name="enabled" >
+                 <bool>true</bool>
+                </property>
+                <property name="toolTip" >
+                 <string>Delete selected values from the current set</string>
+                </property>
+                <property name="text" >
+                 <string>Delete</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="page_GlobalDs" >
+           <layout class="QVBoxLayout" >
+            <property name="spacing" >
+             <number>3</number>
+            </property>
+            <property name="leftMargin" >
+             <number>3</number>
+            </property>
+            <property name="topMargin" >
+             <number>3</number>
+            </property>
+            <property name="rightMargin" >
+             <number>3</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>3</number>
+            </property>
+            <item>
+             <widget class="pqTreeWidget" name="GlobalIDs" >
+              <property name="alternatingRowColors" >
+               <bool>true</bool>
+              </property>
+              <property name="rootIsDecorated" >
+               <bool>false</bool>
+              </property>
+              <property name="sortingEnabled" >
+               <bool>true</bool>
+              </property>
+              <column>
+               <property name="text" >
+                <string>Global IDs</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+            <item>
+             <layout class="QGridLayout" >
+              <property name="leftMargin" >
+               <number>0</number>
+              </property>
+              <property name="topMargin" >
+               <number>0</number>
+              </property>
+              <property name="rightMargin" >
+               <number>0</number>
+              </property>
+              <property name="bottomMargin" >
+               <number>0</number>
+              </property>
+              <property name="horizontalSpacing" >
+               <number>2</number>
+              </property>
+              <property name="verticalSpacing" >
+               <number>2</number>
+              </property>
+              <item row="0" column="0" >
+               <widget class="QPushButton" name="NewValue_GlobalIDs" >
+                <property name="toolTip" >
+                 <string>Add a single value to the current set</string>
+                </property>
+                <property name="statusTip" >
+                 <string>Add a single value to the current set.</string>
+                </property>
+                <property name="text" >
+                 <string>New Value</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1" >
+               <widget class="QPushButton" name="DeleteAll_GlobalIDs" >
+                <property name="enabled" >
+                 <bool>true</bool>
+                </property>
+                <property name="toolTip" >
+                 <string>Delete all values</string>
+                </property>
+                <property name="text" >
+                 <string>Delete All</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1" >
+               <widget class="QPushButton" name="NewRange_GlobalIDs" >
+                <property name="enabled" >
+                 <bool>false</bool>
+                </property>
+                <property name="toolTip" >
+                 <string>Add a single value to the current set</string>
+                </property>
+                <property name="statusTip" >
+                 <string>Add a single value to the current set.</string>
+                </property>
+                <property name="text" >
+                 <string>New Range</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" >
+               <widget class="QPushButton" name="Delete_GlobalIDs" >
+                <property name="enabled" >
+                 <bool>true</bool>
+                </property>
+                <property name="toolTip" >
+                 <string>Delete selected values from the current set</string>
+                </property>
+                <property name="text" >
+                 <string>Delete</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="page_Frustum" >
+           <layout class="QVBoxLayout" >
+            <property name="spacing" >
+             <number>6</number>
+            </property>
+            <property name="leftMargin" >
+             <number>3</number>
+            </property>
+            <property name="topMargin" >
+             <number>3</number>
+            </property>
+            <property name="rightMargin" >
+             <number>3</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>3</number>
+            </property>
+            <item>
+             <widget class="QCheckBox" name="checkboxShowFrustum" >
+              <property name="text" >
+               <string>Show Frustum</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer>
+              <property name="orientation" >
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" >
+               <size>
+                <width>20</width>
+                <height>341</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="page_Thresholds" >
+           <layout class="QGridLayout" >
+            <property name="leftMargin" >
+             <number>3</number>
+            </property>
+            <property name="topMargin" >
+             <number>3</number>
+            </property>
+            <property name="rightMargin" >
+             <number>3</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>3</number>
+            </property>
+            <property name="horizontalSpacing" >
+             <number>3</number>
+            </property>
+            <property name="verticalSpacing" >
+             <number>3</number>
+            </property>
+            <item row="0" column="0" colspan="3" >
+             <layout class="QGridLayout" >
+              <property name="horizontalSpacing" >
+               <number>3</number>
+              </property>
+              <property name="verticalSpacing" >
+               <number>3</number>
+              </property>
+              <item row="0" column="0" >
+               <widget class="QLabel" name="label_2" >
+                <property name="text" >
+                 <string>Scalars</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1" >
+               <widget class="QComboBox" name="ThresholdScalarArray" />
+              </item>
+             </layout>
+            </item>
+            <item row="1" column="0" colspan="3" >
+             <widget class="QPushButton" name="buttonAddThresholds" >
+              <property name="text" >
+               <string>Add Thresholds</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0" colspan="3" >
+             <widget class="pqTreeWidget" name="thresholdRanges" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Expanding" hsizetype="Preferred" >
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -446,17 +619,7 @@
               </column>
              </widget>
             </item>
-           </layout>
-          </item>
-          <item row="4" column="2" >
-           <layout class="QVBoxLayout" >
-            <property name="margin" >
-             <number>0</number>
-            </property>
-            <property name="spacing" >
-             <number>6</number>
-            </property>
-            <item>
+            <item row="3" column="0" >
              <widget class="QPushButton" name="Delete_Threshold" >
               <property name="enabled" >
                <bool>true</bool>
@@ -469,7 +632,7 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="3" column="1" >
              <widget class="QPushButton" name="DeleteAll_Threshold" >
               <property name="enabled" >
                <bool>true</bool>
@@ -482,43 +645,26 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="3" column="2" >
              <spacer>
               <property name="orientation" >
-               <enum>Qt::Vertical</enum>
+               <enum>Qt::Horizontal</enum>
               </property>
               <property name="sizeHint" >
                <size>
-                <width>75</width>
-                <height>157</height>
+                <width>40</width>
+                <height>20</height>
                </size>
               </property>
              </spacer>
             </item>
            </layout>
-          </item>
-          <item row="1" column="1" colspan="2" >
-           <widget class="pqDoubleRangeWidget" native="1" name="Threshold_Lower" />
-          </item>
-          <item row="3" column="0" colspan="3" >
-           <widget class="QPushButton" name="buttonAddThresholds" >
-            <property name="text" >
-             <string>Add Thresholds</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" >
-           <widget class="QLabel" name="label_2" >
-            <property name="text" >
-             <string>Scalars</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -527,18 +673,28 @@
       <string>Display Style</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>2</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>2</number>
+      </property>
+      <property name="rightMargin" >
+       <number>2</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>2</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>6</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>6</number>
       </property>
       <item row="0" column="0" >
        <widget class="QTabWidget" name="tabWidget_SelectionLabelStyle" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>5</vsizetype>
+         <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -554,11 +710,23 @@
           <string>Selection</string>
          </attribute>
          <layout class="QGridLayout" >
-          <property name="margin" >
-           <number>9</number>
+          <property name="leftMargin" >
+           <number>3</number>
           </property>
-          <property name="spacing" >
-           <number>6</number>
+          <property name="topMargin" >
+           <number>3</number>
+          </property>
+          <property name="rightMargin" >
+           <number>3</number>
+          </property>
+          <property name="bottomMargin" >
+           <number>3</number>
+          </property>
+          <property name="horizontalSpacing" >
+           <number>3</number>
+          </property>
+          <property name="verticalSpacing" >
+           <number>3</number>
           </property>
           <item row="1" column="0" >
            <widget class="QLabel" name="label_22" >
@@ -585,11 +753,11 @@
             <property name="toolTip" >
              <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If your dataset contains points/verticies, this scale adjusts the diameter of the rendered points.&lt;/p>&lt;/body>&lt;/html></string>
             </property>
-            <property name="maximum" >
-             <double>1.000000000000000</double>
-            </property>
             <property name="minimum" >
              <double>0.000000000000000</double>
+            </property>
+            <property name="maximum" >
+             <double>1.000000000000000</double>
             </property>
             <property name="singleStep" >
              <double>0.100000000000000</double>
@@ -599,9 +767,7 @@
           <item row="0" column="0" colspan="2" >
            <widget class="pqColorChooserButton" name="Sel_buttonColor" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>1</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -620,9 +786,7 @@
           <item row="2" column="0" colspan="2" >
            <widget class="QStackedWidget" name="stackedWidget_2" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>5</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -632,10 +796,22 @@
             </property>
             <widget class="QWidget" name="page" >
              <layout class="QGridLayout" >
-              <property name="margin" >
+              <property name="leftMargin" >
                <number>9</number>
               </property>
-              <property name="spacing" >
+              <property name="topMargin" >
+               <number>9</number>
+              </property>
+              <property name="rightMargin" >
+               <number>9</number>
+              </property>
+              <property name="bottomMargin" >
+               <number>9</number>
+              </property>
+              <property name="horizontalSpacing" >
+               <number>6</number>
+              </property>
+              <property name="verticalSpacing" >
                <number>6</number>
               </property>
               <item row="0" column="0" >
@@ -650,11 +826,11 @@
                 <property name="toolTip" >
                  <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If your dataset contains points/verticies, this scale adjusts the diameter of the rendered points.&lt;/p>&lt;/body>&lt;/html></string>
                 </property>
-                <property name="maximum" >
-                 <double>100.000000000000000</double>
-                </property>
                 <property name="minimum" >
                  <double>1.000000000000000</double>
+                </property>
+                <property name="maximum" >
+                 <double>100.000000000000000</double>
                 </property>
                 <property name="value" >
                  <double>2.000000000000000</double>
@@ -665,10 +841,22 @@
             </widget>
             <widget class="QWidget" name="page_2" >
              <layout class="QGridLayout" >
-              <property name="margin" >
+              <property name="leftMargin" >
                <number>9</number>
               </property>
-              <property name="spacing" >
+              <property name="topMargin" >
+               <number>9</number>
+              </property>
+              <property name="rightMargin" >
+               <number>9</number>
+              </property>
+              <property name="bottomMargin" >
+               <number>9</number>
+              </property>
+              <property name="horizontalSpacing" >
+               <number>6</number>
+              </property>
+              <property name="verticalSpacing" >
                <number>6</number>
               </property>
               <item row="0" column="1" >
@@ -676,11 +864,11 @@
                 <property name="toolTip" >
                  <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If your dataset contains points/verticies, this scale adjusts the diameter of the rendered points.&lt;/p>&lt;/body>&lt;/html></string>
                 </property>
-                <property name="maximum" >
-                 <double>100.000000000000000</double>
-                </property>
                 <property name="minimum" >
                  <double>1.000000000000000</double>
+                </property>
+                <property name="maximum" >
+                 <double>100.000000000000000</double>
                 </property>
                 <property name="value" >
                  <double>2.000000000000000</double>
@@ -705,11 +893,23 @@
           <string>Cell Label</string>
          </attribute>
          <layout class="QGridLayout" >
-          <property name="margin" >
-           <number>9</number>
+          <property name="leftMargin" >
+           <number>3</number>
           </property>
-          <property name="spacing" >
-           <number>6</number>
+          <property name="topMargin" >
+           <number>3</number>
+          </property>
+          <property name="rightMargin" >
+           <number>3</number>
+          </property>
+          <property name="bottomMargin" >
+           <number>3</number>
+          </property>
+          <property name="horizontalSpacing" >
+           <number>3</number>
+          </property>
+          <property name="verticalSpacing" >
+           <number>3</number>
           </property>
           <item row="0" column="0" >
            <widget class="QCheckBox" name="checkBoxLabelCells" >
@@ -721,33 +921,43 @@
           <item row="1" column="0" >
            <widget class="QGroupBox" name="groupBox_CellLabelStyle" >
             <property name="enabled" >
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="title" >
              <string>Style</string>
             </property>
             <layout class="QGridLayout" >
-             <property name="margin" >
+             <property name="leftMargin" >
               <number>9</number>
              </property>
-             <property name="spacing" >
+             <property name="topMargin" >
+              <number>9</number>
+             </property>
+             <property name="rightMargin" >
+              <number>9</number>
+             </property>
+             <property name="bottomMargin" >
+              <number>9</number>
+             </property>
+             <property name="horizontalSpacing" >
+              <number>6</number>
+             </property>
+             <property name="verticalSpacing" >
               <number>6</number>
              </property>
              <item row="1" column="2" colspan="2" >
               <widget class="QSpinBox" name="spinBoxSize_Cell" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="maximum" >
-                <number>1024</number>
-               </property>
                <property name="minimum" >
                 <number>1</number>
+               </property>
+               <property name="maximum" >
+                <number>1024</number>
                </property>
                <property name="value" >
                 <number>24</number>
@@ -757,9 +967,7 @@
              <item row="0" column="0" colspan="2" >
               <widget class="QLabel" name="label_size_3" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -771,10 +979,19 @@
              </item>
              <item row="2" column="3" >
               <layout class="QHBoxLayout" >
-               <property name="margin" >
+               <property name="spacing" >
                 <number>0</number>
                </property>
-               <property name="spacing" >
+               <property name="leftMargin" >
+                <number>0</number>
+               </property>
+               <property name="topMargin" >
+                <number>0</number>
+               </property>
+               <property name="rightMargin" >
+                <number>0</number>
+               </property>
+               <property name="bottomMargin" >
                 <number>0</number>
                </property>
                <item>
@@ -812,7 +1029,7 @@
                <item>
                 <widget class="QToolButton" name="toolButtonShadow_Cell" >
                  <property name="enabled" >
-                  <bool>true</bool>
+                  <bool>false</bool>
                  </property>
                  <property name="toolTip" >
                   <string>Shadow</string>
@@ -833,9 +1050,7 @@
              <item row="0" column="2" colspan="2" >
               <widget class="QComboBox" name="comboLabelMode_Cell" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -883,9 +1098,7 @@
              <item row="2" column="0" >
               <widget class="QLabel" name="label_cell_font" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -898,9 +1111,7 @@
              <item row="1" column="0" colspan="2" >
               <widget class="QLabel" name="label_size_2" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -913,9 +1124,7 @@
              <item row="4" column="0" >
               <widget class="QLabel" name="label_15" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -928,9 +1137,7 @@
              <item row="4" column="3" >
               <widget class="pqColorChooserButton" name="buttonColor_Cell" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -962,9 +1169,7 @@
              <item row="2" column="1" colspan="2" >
               <widget class="QComboBox" name="comboFontFamily_Cell" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -992,9 +1197,7 @@
              <item row="3" column="0" >
               <widget class="QLabel" name="label_16" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -1007,9 +1210,7 @@
              <item row="3" column="1" colspan="2" >
               <widget class="QComboBox" name="comboTextAlign_Cell" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -1047,33 +1248,55 @@
           <string>Point Label</string>
          </attribute>
          <layout class="QGridLayout" >
-          <property name="margin" >
-           <number>9</number>
+          <property name="leftMargin" >
+           <number>3</number>
           </property>
-          <property name="spacing" >
-           <number>6</number>
+          <property name="topMargin" >
+           <number>3</number>
+          </property>
+          <property name="rightMargin" >
+           <number>3</number>
+          </property>
+          <property name="bottomMargin" >
+           <number>3</number>
+          </property>
+          <property name="horizontalSpacing" >
+           <number>3</number>
+          </property>
+          <property name="verticalSpacing" >
+           <number>3</number>
           </property>
           <item row="1" column="0" >
            <widget class="QGroupBox" name="groupBox_PointLabelStyle" >
             <property name="enabled" >
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="title" >
              <string>Style</string>
             </property>
             <layout class="QGridLayout" >
-             <property name="margin" >
+             <property name="leftMargin" >
               <number>9</number>
              </property>
-             <property name="spacing" >
+             <property name="topMargin" >
+              <number>9</number>
+             </property>
+             <property name="rightMargin" >
+              <number>9</number>
+             </property>
+             <property name="bottomMargin" >
+              <number>9</number>
+             </property>
+             <property name="horizontalSpacing" >
+              <number>6</number>
+             </property>
+             <property name="verticalSpacing" >
               <number>6</number>
              </property>
              <item row="3" column="1" colspan="2" >
               <widget class="QComboBox" name="comboTextAlign_Point" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -1104,9 +1327,7 @@
              <item row="3" column="0" >
               <widget class="QLabel" name="label_17" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -1119,9 +1340,7 @@
              <item row="4" column="3" >
               <widget class="pqColorChooserButton" name="buttonColor_Point" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -1153,9 +1372,7 @@
              <item row="4" column="0" >
               <widget class="QLabel" name="label_14" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -1167,10 +1384,19 @@
              </item>
              <item row="2" column="3" >
               <layout class="QHBoxLayout" >
-               <property name="margin" >
+               <property name="spacing" >
                 <number>0</number>
                </property>
-               <property name="spacing" >
+               <property name="leftMargin" >
+                <number>0</number>
+               </property>
+               <property name="topMargin" >
+                <number>0</number>
+               </property>
+               <property name="rightMargin" >
+                <number>0</number>
+               </property>
+               <property name="bottomMargin" >
                 <number>0</number>
                </property>
                <item>
@@ -1208,7 +1434,7 @@
                <item>
                 <widget class="QToolButton" name="toolButtonShadow_Point" >
                  <property name="enabled" >
-                  <bool>true</bool>
+                  <bool>false</bool>
                  </property>
                  <property name="toolTip" >
                   <string>Shadow</string>
@@ -1229,9 +1455,7 @@
              <item row="2" column="1" colspan="2" >
               <widget class="QComboBox" name="comboFontFamily_Point" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -1259,9 +1483,7 @@
              <item row="0" column="0" colspan="2" >
               <widget class="QLabel" name="label_size_4" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -1274,9 +1496,7 @@
              <item row="1" column="0" colspan="2" >
               <widget class="QLabel" name="label_size" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -1289,9 +1509,7 @@
              <item row="0" column="2" colspan="2" >
               <widget class="QComboBox" name="comboLabelMode_Point" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -1339,9 +1557,7 @@
              <item row="2" column="0" >
               <widget class="QLabel" name="label_point_font" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -1354,18 +1570,16 @@
              <item row="1" column="2" colspan="2" >
               <widget class="QSpinBox" name="spinBoxSize_Point" >
                <property name="sizePolicy" >
-                <sizepolicy>
-                 <hsizetype>1</hsizetype>
-                 <vsizetype>0</vsizetype>
+                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="maximum" >
-                <number>1024</number>
-               </property>
                <property name="minimum" >
                 <number>1</number>
+               </property>
+               <property name="maximum" >
+                <number>1024</number>
                </property>
                <property name="value" >
                 <number>18</number>
@@ -1393,19 +1607,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqDoubleRangeWidget</class>
-   <extends>QWidget</extends>
-   <header>pqDoubleRangeWidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>pqTreeWidget</class>
    <extends>QTreeWidget</extends>
    <header>pqTreeWidget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>pqColorChooserButton</class>
-   <extends>QPushButton</extends>
-   <header>pqColorChooserButton.h</header>
   </customwidget>
   <customwidget>
    <class>pqCollapsedGroup</class>
@@ -1413,13 +1617,22 @@
    <header>pqCollapsedGroup.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>pqColorChooserButton</class>
+   <extends>QPushButton</extends>
+   <header>pqColorChooserButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqOutputPortComboBox</class>
+   <extends>QComboBox</extends>
+   <header>pqOutputPortComboBox.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>comboSelectionType</tabstop>
   <tabstop>comboFieldType</tabstop>
   <tabstop>checkboxContainCell</tabstop>
   <tabstop>checkboxInsideOut</tabstop>
-  <tabstop>UseGlobalIDs</tabstop>
   <tabstop>Indices</tabstop>
   <tabstop>Delete</tabstop>
   <tabstop>DeleteAll</tabstop>
@@ -1450,12 +1663,7 @@
   <tabstop>spinBoxOpacity_Point</tabstop>
   <tabstop>buttonColor_Point</tabstop>
   <tabstop>checkboxShowFrustum</tabstop>
-  <tabstop>thresholdRanges</tabstop>
-  <tabstop>DeleteAll_Threshold</tabstop>
-  <tabstop>ThresholdScalarArray</tabstop>
   <tabstop>Sel_StylePointSize</tabstop>
-  <tabstop>buttonAddThresholds</tabstop>
-  <tabstop>Delete_Threshold</tabstop>
  </tabstops>
  <resources/>
  <connections>

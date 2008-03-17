@@ -56,6 +56,10 @@ protected:
 
   virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
+
+  vtkSelection* LocateSelection(unsigned int composite_index, vtkSelection* sel);
+  vtkSelection* RequestDataInternal(vtkDataSet* geomOutput, vtkSelection* sel);
+
 private:
   vtkPVExtractSelection(const vtkPVExtractSelection&);  // Not implemented.
   void operator=(const vtkPVExtractSelection&);  // Not implemented.

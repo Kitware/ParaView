@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>253</width>
-    <height>311</height>
+    <width>298</width>
+    <height>244</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -19,34 +19,16 @@
    <property name="spacing" >
     <number>6</number>
    </property>
-   <item row="2" column="0" colspan="2" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
-      <string>Select Attributes to Show</string>
-     </property>
+   <item row="4" column="0" colspan="3" >
+    <widget class="QTreeWidget" name="CompositeTree" >
+     <column>
+      <property name="text" >
+       <string>Composite Data Structure</string>
+      </property>
+     </column>
     </widget>
    </item>
-   <item row="0" column="0" colspan="2" >
-    <widget class="QCheckBox" name="ViewData" >
-     <property name="text" >
-      <string>Show data</string>
-     </property>
-     <property name="checked" >
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2" >
-    <widget class="QSpinBox" name="ProcessID" >
-     <property name="alignment" >
-      <set>Qt::AlignRight</set>
-     </property>
-     <property name="maximum" >
-      <number>999</number>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1" >
+   <item row="5" column="1" >
     <spacer>
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
@@ -54,10 +36,27 @@
      <property name="sizeHint" >
       <size>
        <width>20</width>
-       <height>40</height>
+       <height>31</height>
       </size>
      </property>
     </spacer>
+   </item>
+   <item row="1" column="0" colspan="3" >
+    <widget class="QCheckBox" name="SelectionOnly" >
+     <property name="toolTip" >
+      <string>&lt;html>When checked, only selected items will be shown in the view&lt;/html></string>
+     </property>
+     <property name="text" >
+      <string>Show only selected elements</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" >
+    <widget class="QLabel" name="ProcessIDLabel" >
+     <property name="text" >
+      <string>Process ID: (Range 0 - 0)</string>
+     </property>
+    </widget>
    </item>
    <item row="2" column="2" >
     <widget class="QComboBox" name="AttributeMode" >
@@ -78,20 +77,30 @@
      </item>
     </widget>
    </item>
-   <item row="3" column="0" >
-    <widget class="QLabel" name="ProcessIDLabel" >
-     <property name="text" >
-      <string>Process ID: (Range 0 - 0)</string>
+   <item row="3" column="2" >
+    <widget class="QSpinBox" name="ProcessID" >
+     <property name="alignment" >
+      <set>Qt::AlignRight</set>
+     </property>
+     <property name="maximum" >
+      <number>999</number>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="3" >
-    <widget class="QCheckBox" name="SelectionOnly" >
-     <property name="toolTip" >
-      <string>&lt;html>When checked, only selected items will be shown in the view&lt;/html></string>
-     </property>
+   <item row="0" column="0" colspan="2" >
+    <widget class="QCheckBox" name="ViewData" >
      <property name="text" >
-      <string>Show only selected elements</string>
+      <string>Show data</string>
+     </property>
+     <property name="checked" >
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2" >
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>Select Attributes to Show</string>
      </property>
     </widget>
    </item>

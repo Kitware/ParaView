@@ -16,15 +16,15 @@
 
 #include "vtkCommunicator.h"
 #include "vtkDataSet.h"
+#include "vtkExecutive.h"
 #include "vtkIdTypeArray.h"
+#include "vtkIndexBasedBlockFilter.h"
 #include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkExecutive.h"
 
 vtkStandardNewMacro(vtkIndexBasedBlockSelectionFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockSelectionFilter, "1.1");
-vtkCxxSetObjectMacro(vtkIndexBasedBlockSelectionFilter, Controller, vtkMultiProcessController);
+vtkCxxRevisionMacro(vtkIndexBasedBlockSelectionFilter, "1.2");
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockSelectionFilter::vtkIndexBasedBlockSelectionFilter()
 {
@@ -32,20 +32,81 @@ vtkIndexBasedBlockSelectionFilter::vtkIndexBasedBlockSelectionFilter()
   // port 1 -- vtkDataSet used to detemine what ids constitute a block.
   this->SetNumberOfInputPorts(2);
 
-  this->Block = 0;
-  this->BlockSize = 1024;
+  this->BlockFilter = vtkIndexBasedBlockFilter::New();
+
   this->Controller = 0;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 
   this->StartIndex= -1;
   this->EndIndex= -1;
-  this->FieldType = POINT;
 }
 
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockSelectionFilter::~vtkIndexBasedBlockSelectionFilter()
 {
   this->SetController(0);
+  
+  this->BlockFilter->Delete();
+  this->BlockFilter = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkIndexBasedBlockSelectionFilter::SetBlockSize(vtkIdType size)
+{
+  this->BlockFilter->SetBlockSize(size);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+vtkIdType vtkIndexBasedBlockSelectionFilter::GetBlockSize()
+{
+  return this->BlockFilter->GetBlockSize();
+}
+
+//----------------------------------------------------------------------------
+void vtkIndexBasedBlockSelectionFilter::SetBlock(vtkIdType block)
+{
+  this->BlockFilter->SetBlock(block);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+vtkIdType vtkIndexBasedBlockSelectionFilter::GetBlock()
+{
+  return this->BlockFilter->GetBlock();
+}
+
+//----------------------------------------------------------------------------
+void vtkIndexBasedBlockSelectionFilter::SetCompositeDataSetIndex(unsigned int index)
+{
+  this->BlockFilter->SetCompositeDataSetIndex(index);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkIndexBasedBlockSelectionFilter::GetCompositeDataSetIndex()
+{
+  return this->BlockFilter->GetCompositeDataSetIndex();
+}
+
+//----------------------------------------------------------------------------
+void vtkIndexBasedBlockSelectionFilter::SetFieldType(int type)
+{
+  this->BlockFilter->SetFieldType(type);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+int vtkIndexBasedBlockSelectionFilter::GetFieldType()
+{
+  return this->BlockFilter->GetFieldType();
+}
+
+//----------------------------------------------------------------------------
+void vtkIndexBasedBlockSelectionFilter::SetController(vtkMultiProcessController* contr)
+{
+  vtkSetObjectBodyMacro(Controller, vtkMultiProcessController, contr);
+  this->BlockFilter->SetController(contr);
 }
 
 //----------------------------------------------------------------------------
@@ -59,17 +120,18 @@ int vtkIndexBasedBlockSelectionFilter::FillInputPortInformation(
 
   if (port == 1)
     {
-    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
     }
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkIndexBasedBlockSelectionFilter::RequestData(vtkInformation*, 
-  vtkInformationVector**, 
-  vtkInformationVector*)
+int vtkIndexBasedBlockSelectionFilter::RequestData(
+  vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector,
+  vtkInformationVector* outputVector)
 {
-  vtkSelection* output = this->GetOutput();
+  vtkSelection* output = vtkSelection::GetData(outputVector, 0);
   output->Clear();
 
   vtkInformation* outProperties = output->GetProperties();
@@ -78,33 +140,42 @@ int vtkIndexBasedBlockSelectionFilter::RequestData(vtkInformation*,
   outProperties->Set(vtkSelection::PROCESS_ID(), myId);
   output->SetContentType(vtkSelection::INDICES);
 
-  int myType = (this->FieldType == vtkIndexBasedBlockSelectionFilter::POINT)? 
+  int fieldType = this->GetFieldType();
+  int myType = (fieldType == vtkIndexBasedBlockFilter::POINT)? 
     vtkSelection::POINT : vtkSelection::CELL;
   outProperties->Set(vtkSelection::FIELD_TYPE(), myType);
 
-  if (this->FieldType == FIELD)
+  if (fieldType == vtkIndexBasedBlockFilter::FIELD)
     {
     // nothing to do.
     return 1;
     }
 
+  vtkMultiPieceDataSet* datainput = this->BlockFilter->GetPieceToProcess(
+    vtkDataObject::GetData(inputVector[1], 0));
+
+  if (!datainput)
+    {
+    return 1;
+    }
+
   // Do communication and decide which processes pass what data through.
-  if (!this->DetermineBlockIndices())
+  if (!this->DetermineBlockIndices(datainput))
     {
     return 0;
     }
 
-  vtkSelection* input = vtkSelection::SafeDownCast(
-    this->GetExecutive()->GetInputData(0, 0));
-  vtkInformation* inProperties = input->GetProperties();
+  vtkSelection* input = vtkSelection::GetData(inputVector[0], 0);
+  input = this->LocateSelection(this->GetCompositeDataSetIndex(), input);
 
-  if (this->StartIndex < 0 || this->EndIndex < 0)
+  if (!input || this->StartIndex < 0 || this->EndIndex < 0)
     {
     // Nothing to do, the output must be empty since this process does not have
     // the requested block of data.
     return 1;
     }
   
+  vtkInformation* inProperties = input->GetProperties();
   if (inProperties->Get(vtkSelection::CONTENT_TYPE()) != vtkSelection::INDICES)
     {
     vtkErrorMacro("This filter can only handle INDEX based selections.");
@@ -163,77 +234,35 @@ int vtkIndexBasedBlockSelectionFilter::RequestData(vtkInformation*,
 }
 
 //----------------------------------------------------------------------------
-bool vtkIndexBasedBlockSelectionFilter::DetermineBlockIndices()
+bool vtkIndexBasedBlockSelectionFilter::DetermineBlockIndices(
+  vtkMultiPieceDataSet* input)
 {
-  vtkIdType blockStartIndex = this->Block*this->BlockSize;
-  vtkIdType blockEndIndex = blockStartIndex + this->BlockSize - 1;
-
-  vtkDataSet* input = vtkDataSet::SafeDownCast(
-    this->GetExecutive()->GetInputData(1, 0));
-
-  vtkIdType numFields;
-  switch (this->FieldType)
-    {
-  case CELL:
-    numFields = input->GetNumberOfCells();
-    break;
-
-  case POINT:
-  default:
-    numFields = input->GetNumberOfPoints();
-    }
-
-  int numProcs = this->Controller? this->Controller->GetNumberOfProcesses():1;
-  if (numProcs<=1)
-    {
-    this->StartIndex = blockStartIndex;
-    this->EndIndex = (blockEndIndex < numFields)? blockEndIndex : numFields;
-    // cout  << "Delivering : " << this->StartIndex << " --> " << this->EndIndex << endl;
-    return true;
-    }
-
-  int myId = this->Controller->GetLocalProcessId();
-
-  vtkIdType* gathered_data = new vtkIdType[numProcs];
-
-  // cout << myId<< ": numFields: " << numFields<<endl;
-  vtkCommunicator* comm = this->Controller->GetCommunicator();
-  if (!comm->AllGather(&numFields, gathered_data, 1))
-    {
-    vtkErrorMacro("Failed to gather data from all processes.");
-    return false;
-    }
-
-  vtkIdType mydataStartIndex=0;
-  for (int cc=0; cc < myId; cc++)
-    {
-    mydataStartIndex += gathered_data[cc];
-    }
-  vtkIdType mydataEndIndex = mydataStartIndex + numFields - 1;
-
-  if ((mydataStartIndex < blockStartIndex && mydataEndIndex < blockStartIndex) || 
-    (mydataStartIndex > blockEndIndex))
-    {
-    // Block doesn't overlap the data we have at all.
-    this->StartIndex = -1;
-    this->EndIndex = -1;
-    }
-  else
-    {
-    vtkIdType startIndex = (mydataStartIndex < blockStartIndex)?
-      blockStartIndex : mydataStartIndex;
-    vtkIdType endIndex = (blockEndIndex < mydataEndIndex)?
-      blockEndIndex : mydataEndIndex;
-
-    this->StartIndex = startIndex - mydataStartIndex;
-    this->EndIndex = endIndex - mydataStartIndex;
-    }
-
-  // cout << myId <<  ": Delivering : " << this->StartIndex << " --> " 
-  // << this->EndIndex << endl;
-  return true;
+  return this->BlockFilter->DetermineBlockIndices(input, this->StartIndex, this->EndIndex);
 }
 
+//----------------------------------------------------------------------------
+vtkSelection* vtkIndexBasedBlockSelectionFilter::LocateSelection(
+  unsigned int composite_index, vtkSelection* sel)
+{
+  if (sel && sel->GetContentType() == vtkSelection::SELECTIONS)
+    {
+    unsigned int numChildren = sel->GetNumberOfChildren();
+    for (unsigned int cc=0; cc < numChildren; cc++)
+      {
+      vtkSelection* child = sel->GetChild(cc);
+      if (child && 
+        child->GetProperties()->Has(vtkSelection::COMPOSITE_INDEX()) &&
+        static_cast<unsigned int>(child->GetProperties()->Get(vtkSelection::COMPOSITE_INDEX()))
+        == composite_index)
+        {
+        return child;
+        }
+      }
+    return NULL;
+    }
+
+  return sel;
+}
 
 //----------------------------------------------------------------------------
 void vtkIndexBasedBlockSelectionFilter::PrintSelf(ostream& os, vtkIndent indent)

@@ -12,8 +12,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMExtractLocationsProxy - proxy for extract (point/cell) selection
-// filters. 
+// .NAME vtkSMExtractLocationsProxy - proxy for vtkPExtractArraysOverTime
+// filter. It is used to extract cell and point variables at a given location
+// over time.
 // .SECTION Description
 // vtkSMExtractLocationsProxy has a subproxy which is the proxy for the 
 // selection.
@@ -23,8 +24,6 @@
 
 #include "vtkSMSourceProxy.h"
 
-class vtkDoubleArray;
-
 class VTK_EXPORT vtkSMExtractLocationsProxy : public vtkSMSourceProxy
 {
 public:
@@ -32,29 +31,18 @@ public:
   vtkTypeRevisionMacro(vtkSMExtractLocationsProxy, vtkSMSourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Update the VTK object on the server by pushing the values of
-  // all modifed properties (un-modified properties are ignored).
-  // If the object has not been created, it will be created first.
-  virtual void UpdateVTKObjects();
-
-  // Description:
-  // Add an Location to the selection.
-  void AddLocation(double x, double y, double z);
-  void RemoveAllLocations();
-
 //BTX
 protected:
   vtkSMExtractLocationsProxy();
   ~vtkSMExtractLocationsProxy();
 
+  // Create the VTK objects. Overloaded to set default values for the sub-proxy.
   virtual void CreateVTKObjects();
 
 private:
   vtkSMExtractLocationsProxy(const vtkSMExtractLocationsProxy&); // Not implemented.
   void operator=(const vtkSMExtractLocationsProxy&); // Not implemented.
 
-  vtkDoubleArray* Locations;
 //ETX
 };
 

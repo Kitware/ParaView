@@ -24,6 +24,9 @@
 #include "vtkTableAlgorithm.h"
 
 class vtkMultiProcessController;
+class vtkMultiPieceDataSet;
+class vtkIdTypeArray;
+class vtkDoubleArray;
 
 class VTK_EXPORT vtkIndexBasedBlockFilter : public vtkTableAlgorithm
 {
@@ -41,6 +44,16 @@ public:
   // Get/Set the block to fetch.
   vtkSetMacro(Block, vtkIdType);
   vtkGetMacro(Block, vtkIdType);
+
+  // Description:
+  // In case of Composite datasets, set the flat index of the dataset to pass.
+  // The flat index must point to a non-empty, non-composite dataset or a
+  // non-empty multipiece dataset for anything to be passed through. 
+  // If the input is not a composite dataset, then this index is ignored.
+  // If FieldType is FIELD then the CompositeDataSetIndex cannot be
+  // vtkMultiPieceDataSet, it has to be a vtkDataSet.
+  vtkSetMacro(CompositeDataSetIndex, unsigned int);
+  vtkGetMacro(CompositeDataSetIndex, unsigned int);
 
   // Description:
   // Get/Set the MPI controller used for gathering.
@@ -62,6 +75,7 @@ public:
 
   // Description: 
   // Get/Set a process number to read the data from.
+  // ProcessID is only used when FieldType is FIELD.
   vtkSetMacro(ProcessID, int);
   vtkGetMacro(ProcessID, int);
 
@@ -72,6 +86,19 @@ public:
     POINT=1,
     FIELD=2
     };
+
+
+  // Description:
+  // Returns a vtkMultiPieceDataSet with vtkDataSet instances that the
+  // CompositeDataSetIndex selected. If the input is not a composite dataset or
+  // the index chosen is a vtkDataSet, then this creates a new
+  // vtkMultiPieceDataSet and fills it with the single dataset and returns it.
+  vtkMultiPieceDataSet* GetPieceToProcess(vtkDataObject*);
+
+  // Description:
+  // Computes the range of indices to be passed through.
+  bool DetermineBlockIndices(vtkMultiPieceDataSet* input,
+    vtkIdType& startIndex, vtkIdType& endIndex);
   //ETX
 
 //BTX
@@ -90,7 +117,35 @@ protected:
                           vtkInformationVector**, 
                           vtkInformationVector*);
 
-  bool DetermineBlockIndices();
+  // Description:
+  // Create a default executive.
+  // If the DefaultExecutivePrototype is set, a copy of it is created
+  // in CreateDefaultExecutive() using NewInstance().
+  // Otherwise, vtkStreamingDemandDrivenPipeline is created.
+  virtual vtkExecutive* CreateDefaultExecutive();
+
+  // Description:
+  // Passes the cell/point data in the range [startOffset, endOffset], if
+  // possible. Returns the total number of tuples in the point/cell data of the
+  // input.
+  void PassBlock(
+    vtkIdType pieceNumber,
+    vtkTable* output, 
+    vtkIdType &pieceOffset,
+    vtkDataSet* input);
+
+  // Description:
+  // Passes the field data in the range [startOffset, endOffset], if
+  // possible.
+  void PassFieldDataBlock(vtkTable* output, 
+    vtkIdType startOffset, vtkIdType endOffset, vtkDataSet* input);
+
+  // Description:
+  // Arrays used to put extra information in the output.
+  vtkDoubleArray* PointCoordinatesArray;
+  vtkIdTypeArray* StructuredCoordinatesArray;
+  vtkIdTypeArray* OriginalIndicesArray;
+  vtkIdTypeArray* PieceNumberArray;
 
   vtkMultiProcessController* Controller;
   vtkIdType BlockSize;
@@ -100,7 +155,8 @@ protected:
   vtkIdType StartIndex;
   vtkIdType EndIndex;
   int ProcessID;
-
+  unsigned int CompositeDataSetIndex;
+  vtkMultiPieceDataSet* Temporary;
 private:
   vtkIndexBasedBlockFilter(const vtkIndexBasedBlockFilter&); // Not implemented
   void operator=(const vtkIndexBasedBlockFilter&); // Not implemented

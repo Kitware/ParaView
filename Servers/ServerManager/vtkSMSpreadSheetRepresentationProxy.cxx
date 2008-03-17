@@ -16,6 +16,7 @@
 
 #include "vtkIndexBasedBlockFilter.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSelection.h"
@@ -26,7 +27,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSpreadSheetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSpreadSheetRepresentationProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMSpreadSheetRepresentationProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMSpreadSheetRepresentationProxy::vtkSMSpreadSheetRepresentationProxy()
 {
@@ -101,8 +102,9 @@ void vtkSMSpreadSheetRepresentationProxy::PassEssentialAttributes()
   // properties has to be managed a bit more gracefully.
 
   // Pass essential properties to the selection representation
-  // such as "BlockSize", "CacheSize", "FieldType".
-  const char* pnames[] = {"BlockSize", "CacheSize", "FieldType", 0};
+  // such as "BlockSize", "CacheSize", "FieldType", "CompositeDataSetIndex".
+  const char* pnames[] = 
+    {"BlockSize", "CacheSize", "FieldType", "CompositeDataSetIndex", 0};
   for (int cc=0; pnames[cc]; cc++)
     {
     vtkSMProperty* src = this->GetProperty(pnames[cc]);
@@ -168,6 +170,19 @@ vtkIdType vtkSMSpreadSheetRepresentationProxy::GetMaximumNumberOfItems()
   if (!info)
     {
     vtkErrorMacro("Failed to get any data information.");
+    return 0;
+    }
+
+  if (info->GetCompositeDataInformation()->GetDataIsComposite())
+    {
+    // use CompositeDataSetIndex to locate the vtkPVDataInformation.
+    info = info->GetDataInformationForCompositeIndex(this->CompositeDataSetIndex);
+    }
+
+  if (!info)
+    {
+    vtkErrorMacro("Failed to locate composite information for "
+      << this->CompositeDataSetIndex);
     return 0;
     }
 

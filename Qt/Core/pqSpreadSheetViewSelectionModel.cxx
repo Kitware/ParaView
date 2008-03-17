@@ -191,6 +191,10 @@ vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
     {
     return 0;
     }
+
+  int composite_index = pqSMAdaptor::getElementProperty(
+    repr->getProxy()->GetProperty("CompositeDataSetIndex")).toInt();
+
   // convert field_type to selection field type.
   field_type = (field_type == vtkIndexBasedBlockFilter::POINT)?
     vtkSelection::POINT : vtkSelection::CELL;
@@ -204,7 +208,9 @@ vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
   bool updatable = (selsource != 0) && (pqSMAdaptor::getElementProperty(
       selsource->GetProperty("FieldType")).toInt() == field_type) &&
     (pqSMAdaptor::getElementProperty(selsource->GetProperty("ContentType")).toInt() ==
-     vtkSelection::INDICES);
+     vtkSelection::INDICES) &&
+    (pqSMAdaptor::getElementProperty(selsource->GetProperty("CompositeIndex")).toInt() 
+     == composite_index);
 
   if (updatable)
     {
@@ -221,6 +227,8 @@ vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
       selsource->GetProperty("FieldType"), field_type);
     pqSMAdaptor::setElementProperty(
       selsource->GetProperty("ContentType"), vtkSelection::INDICES);
+    pqSMAdaptor::setElementProperty(
+      selsource->GetProperty("CompositeIndex"), composite_index);
     selsource->UpdateVTKObjects();
     }
 
