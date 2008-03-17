@@ -231,9 +231,9 @@ pqSignalAdaptorCompositeTreeWidget::pqSignalAdaptorCompositeTreeWidget(
   int domainMode,
   IndexModes indexMode,
   bool selectMultiple,
-  bool autoUpdateWidgetVisibility) : Superclass(tree)
+  bool autoUpdateVisibility) : Superclass(tree)
 {
-  this->constructor(tree, autoUpdateWidgetVisibility);
+  this->constructor(tree, autoUpdateVisibility);
 
   if (!port)
     {

@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVCompositeDataInformation);
-vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.11");
+vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.12");
 
 struct vtkPVCompositeDataInformationInternals
 {
@@ -70,7 +70,7 @@ vtkPVDataInformation* vtkPVCompositeDataInformation::GetDataInformationForCompos
 
   if (this->DataIsMultiPiece)
     {
-    if (*index < this->NumberOfPieces)
+    if (*index < static_cast<int>(this->NumberOfPieces))
       {
       *index=-1;
       return NULL;

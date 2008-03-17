@@ -32,18 +32,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqTreeWidgetItemObject.h"
 
-pqTreeWidgetItemObject::pqTreeWidgetItemObject(const QStringList& t, int type)
-  : QTreeWidgetItem(t, type) 
+pqTreeWidgetItemObject::pqTreeWidgetItemObject(const QStringList& t, int item_type)
+  : QTreeWidgetItem(t, item_type) 
 {
 }
 
-pqTreeWidgetItemObject::pqTreeWidgetItemObject(QTreeWidget* p, const QStringList& t, int type)
-  : QTreeWidgetItem(p, t, type)
+pqTreeWidgetItemObject::pqTreeWidgetItemObject(QTreeWidget* p, const QStringList& t, int item_type)
+  : QTreeWidgetItem(p, t, item_type)
 {
 }
 
-pqTreeWidgetItemObject::pqTreeWidgetItemObject(QTreeWidgetItem* p, const QStringList& t, int type)
-  : QTreeWidgetItem(p, t, type)
+pqTreeWidgetItemObject::pqTreeWidgetItemObject(QTreeWidgetItem* p, const QStringList& t, int item_type)
+  : QTreeWidgetItem(p, t, item_type)
 {
 }
 
