@@ -15,7 +15,7 @@
 
   <Category name="DataAnalysis" menu_label="&amp;Data Analysis">
     <Filter name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
-    <Filter name="ExtractSelections"
+    <Filter name="ExtractSelection"
             icon=":/pqWidgets/Icons/pqExtractSelection24.png" />
     <Filter name="ExtractHistogram" 
             icon=":/pqWidgets/Icons/pqHistogram24.png"/>
@@ -67,7 +67,7 @@
   <Filter name="ExtractGrid" />
   <Filter name="ExtractHistogram" />
   <Filter name="ExtractLevel" />
-  <Filter name="ExtractSelections" />
+  <Filter name="ExtractSelection" />
   <Filter name="ExtractDataSets" />
   <Filter name="FeatureEdges" />
   <Filter name="Glyph" />

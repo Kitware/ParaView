@@ -52,6 +52,10 @@ public slots:
   /// subclasses should only change properties when accept is called to work
   /// properly with undo/redo
   virtual void accept();
+  
+  /// reset the changes made
+  /// editor will query properties from the server manager
+  virtual void reset();
 
 protected slots:
   // Copy active selection.
@@ -59,18 +63,9 @@ protected slots:
 
   void onActiveSelectionChanged();
 
-  /// This method gets called to refresh all domains 
-  /// and information properties. Subclass can override
-  /// this to update any domain related entities.
-  /// Since this is not a particularly fast operation, we update 
-  /// the information and domains only when the panel is selected 
-  /// or an already active panel is accepted. 
-  virtual void updateInformationAndDomains();
+  void selectionInputChanged();
 
-protected:
-  void linkServerManagerProperties();
   void updateLabels();
-  void setSelectionSource(vtkSMSourceProxy *selSource);
 
 private:
   pqExtractSelectionsPanel(const pqExtractSelectionsPanel&); // Not implemented.

@@ -125,15 +125,7 @@ public:
         {
         return new pqThresholdPanel(proxy, p);
         }
-      if(QString("ExtractPointSelection") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqExtractSelectionsPanel(proxy, p);
-        }
-      if(QString("ExtractCellSelection") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqExtractSelectionsPanel(proxy, p);
-        }
-      if(QString("ExtractSelections") == proxy->getProxy()->GetXMLName())
+      if(QString("ExtractSelection") == proxy->getProxy()->GetXMLName())
         {
         return new pqExtractSelectionsPanel(proxy, p);
         }
@@ -148,11 +140,6 @@ public:
       if(QString("Contour") == proxy->getProxy()->GetXMLName())
         {
         return new pqContourPanel(proxy, p);
-        }
-      if(QString("SelectThrough") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqExtractSelectionsPanel(proxy, p);
-        //return new pqSelectThroughPanel(proxy, p);
         }
       if(QString("ExtractThresholds") == proxy->getProxy()->GetXMLName())
         {
@@ -199,13 +186,10 @@ public:
 //         QString("ExtractDataSets") == proxy->getProxy()->GetXMLName() ||
 //         QString("ParticleTracer") == proxy->getProxy()->GetXMLName() ||
          QString("Threshold") == proxy->getProxy()->GetXMLName() ||
-         QString("ExtractPointSelection") == proxy->getProxy()->GetXMLName() ||
-         QString("ExtractCellSelection") == proxy->getProxy()->GetXMLName() ||
-         QString("ExtractSelections") == proxy->getProxy()->GetXMLName() ||
+         QString("ExtractSelection") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractPointsOverTime") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractCellsOverTime") == proxy->getProxy()->GetXMLName() ||
          QString("Contour") == proxy->getProxy()->GetXMLName() || 
-         QString("SelectThrough") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractThresholds") == proxy->getProxy()->GetXMLName() 
         || QString("CTHPart") == proxy->getProxy()->GetXMLName()
         )

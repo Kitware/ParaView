@@ -111,6 +111,14 @@ QList<const char*> pqPipelineFilter::getInputPorts(vtkSMProxy* proxy)
       propIter->GetProperty());
     if (inputProp)
       {
+      vtkPVXMLElement* hints = inputProp->GetHints();
+      if (hints && hints->FindNestedElementByName("NoGUI"))
+        {
+        // hints suggest that this input property is not to be considered by the
+        // GUI.
+        continue;
+        }
+
       bool has_plist_domain = false;
 
       // Ensure that this property does not have a proxy list domain. If it

@@ -7370,6 +7370,12 @@ This property controls how the filter works to generate tensor cell data. You ca
        <Documentation>
          The input that provides the selection object.
        </Documentation>
+       <Hints>
+        <!-- This tag implies that all the auto-generated panels and the 
+             number of inputs counting code should simply ignore this property.
+        -->
+        <NoGUI />
+       </Hints>
      </InputProperty>
 
      <IntVectorProperty 
