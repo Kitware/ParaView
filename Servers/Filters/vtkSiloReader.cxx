@@ -102,7 +102,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSiloReader, "1.2");
+vtkCxxRevisionMacro(vtkSiloReader, "1.3");
 vtkStandardNewMacro(vtkSiloReader);
 
 //----------------------------------------------------------------------------
@@ -541,19 +541,14 @@ DBfile *vtkSiloTableOfContents::OpenFile(int index)
   // Check to see if the file has already been opened.
   if (this->DBFiles[index] != NULL)
     {
-    //this->DebugOn();
     vtkDebugMacro("Returning file: " << index);
-    //this->DebugOff();
     return this->DBFiles[index];
     }
-
-  //this->DebugOn();
-  vtkDebugMacro("Opening file: " << index);
-  //this->DebugOff();
 
   vtkstd::string fullName = this->TOCPath + this->Filenames[index];
   const char * fname = fullName.c_str();
   vtkDebugMacro("Opening silo file: " << fname);
+  
   // Open the Silo file. Impose priority order on drivers by first
   // trying PDB, then HDF5, then fall-back to UNKNOWN
   DBfile * dbfile = 0;
@@ -681,8 +676,14 @@ void vtkSiloReader::SetFileName(char * filename)
     }
 
   vtkstd::string fullName(filename);
+  
+  #ifdef WIN32
+  char slashChar[] = "\\";
+  #else
+  char slashChar[] = "/";
+  #endif
 
-  unsigned int i = fullName.find_last_of("/");
+  unsigned int i = fullName.find_last_of(slashChar);
   if (i == vtkstd::string::npos)
     {
     this->TOC->TOCFile = fullName;
