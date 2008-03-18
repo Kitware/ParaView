@@ -33,7 +33,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.6");
 
 class vtkSMNewWidgetRepresentationObserver : public vtkCommand
 {
@@ -94,14 +94,14 @@ bool vtkSMNewWidgetRepresentationProxy::AddToView(vtkSMViewProxy* view)
     }
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkAbstractWidget* widget = NULL;
   if (this->WidgetProxy)
     {
-    vtkAbstractWidget* widget = vtkAbstractWidget::SafeDownCast(
+    widget = vtkAbstractWidget::SafeDownCast(
       pm->GetObjectFromID(this->WidgetProxy->GetID()));
     if (widget)
       {
       widget->SetInteractor(renderView->GetInteractor());
-      widget->SetCurrentRenderer(renderView->GetRenderer());
       }
     }
 
@@ -120,10 +120,18 @@ bool vtkSMNewWidgetRepresentationProxy::AddToView(vtkSMViewProxy* view)
     if(this->GetSubProxy("Prop"))
       {
       renderView->AddPropToRenderer(this->RepresentationProxy);
+      if (widget)
+        {
+        widget->SetCurrentRenderer(renderView->GetRenderer());
+        }
       }
     else if(this->GetSubProxy("Prop2D"))
       {
       renderView->AddPropToRenderer2D(this->RepresentationProxy);
+      if (widget)
+        {
+        widget->SetCurrentRenderer(renderView->GetRenderer2D());
+        }
       }
     }
 
