@@ -39,7 +39,7 @@
 
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.15");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.16");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -341,6 +341,15 @@ void vtkIndexBasedBlockFilter::PassBlock(
     dimensions = sgInput->GetDimensions();
     }
 
+  int cellDims[3];
+  if (this->FieldType == CELL && dimensions)
+    {
+    cellDims[0] = dimensions[0] -1;
+    cellDims[1] = dimensions[1] -1;
+    cellDims[2] = dimensions[2] -1;
+    dimensions = cellDims;
+    }
+
   if (psInput && !this->PointCoordinatesArray &&
     this->FieldType == POINT)
     {
@@ -382,22 +391,19 @@ void vtkIndexBasedBlockFilter::PassBlock(
     this->PieceNumberArray->InsertNextValue(pieceNumber);
     outFD->InsertNextTuple(inIndex, inFD);
 
-    if (this->FieldType == POINT)
+    if (this->FieldType == POINT && psInput)
       {
-      if (psInput)
-        {
-        this->PointCoordinatesArray->InsertNextTuple(psInput->GetPoint(inIndex));
-        }
-      
-      if (dimensions)
-        {
-        // Compute i,j,k from point id.
-        vtkIdType tuple[3];
-        tuple[0] = (inIndex % dimensions[0]);
-        tuple[1] = (inIndex/dimensions[0]) % dimensions[1];
-        tuple[2] = (inIndex/(dimensions[0]*dimensions[1]));
-        this->StructuredCoordinatesArray->InsertNextTupleValue(tuple);
-        }
+      this->PointCoordinatesArray->InsertNextTuple(psInput->GetPoint(inIndex));
+      }
+
+    if (dimensions)
+      {
+      // Compute i,j,k from point id.
+      vtkIdType tuple[3];
+      tuple[0] = (inIndex % dimensions[0]);
+      tuple[1] = (inIndex/dimensions[0]) % dimensions[1];
+      tuple[2] = (inIndex/(dimensions[0]*dimensions[1]));
+      this->StructuredCoordinatesArray->InsertNextTupleValue(tuple);
       }
     }
 
