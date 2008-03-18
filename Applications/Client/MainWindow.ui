@@ -115,7 +115,6 @@
     <addaction name="actionVCRFirstFrame" />
     <addaction name="actionVCRPreviousFrame" />
     <addaction name="actionVCRPlay" />
-    <addaction name="actionVCRPause" />
     <addaction name="actionVCRNextFrame" />
     <addaction name="actionVCRLastFrame" />
     <addaction name="actionVCRLoop" />
@@ -274,7 +273,6 @@
    <addaction name="actionVCRFirstFrame" />
    <addaction name="actionVCRPreviousFrame" />
    <addaction name="actionVCRPlay" />
-   <addaction name="actionVCRPause" />
    <addaction name="actionVCRNextFrame" />
    <addaction name="actionVCRLastFrame" />
    <addaction name="actionVCRLoop" />
@@ -864,17 +862,6 @@
    </property>
    <property name="text" >
     <string>&amp;Play</string>
-   </property>
-  </action>
-  <action name="actionVCRPause" >
-   <property name="enabled" >
-    <bool>false</bool>
-   </property>
-   <property name="icon" >
-    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrPause24.png</iconset>
-   </property>
-   <property name="text" >
-    <string>Pa&amp;use</string>
    </property>
   </action>
   <action name="actionToolsPlayTest" >

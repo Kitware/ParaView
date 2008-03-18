@@ -337,9 +337,6 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionVCRPlay, SIGNAL(triggered()), 
     &this->Implementation->Core.VCRController(), SLOT(onPlay()));
   
-  connect(this->Implementation->UI.actionVCRPause, SIGNAL(triggered()), 
-    &this->Implementation->Core.VCRController(), SLOT(onPause()));
-  
   connect(this->Implementation->UI.actionVCRFirstFrame,
     SIGNAL(triggered()), &this->Implementation->Core.VCRController(), SLOT(onFirstFrame()));
     
@@ -374,9 +371,6 @@ MainWindow::MainWindow() :
     this->Implementation->UI.actionVCRLoop, SLOT(setChecked(bool)));
   connect(vcrcontroller, SIGNAL(playing(bool)),
     this, SLOT(onPlaying(bool)));
-  connect(vcrcontroller, SIGNAL(playing(bool)),
-    this->Implementation->UI.actionVCRPause, SLOT(setEnabled(bool)));
-  this->Implementation->UI.actionVCRPause->setVisible(false);
 
   pqProgressManager* progress_manager = 
     pqApplicationCore::instance()->getProgressManager();
@@ -1093,9 +1087,29 @@ QVariant MainWindow::findToolBarActionsNotInMenus()
 //-----------------------------------------------------------------------------
 void MainWindow::onPlaying(bool playing)
 {
-  this->Implementation->UI.actionVCRPlay->setVisible(!playing);
-  this->Implementation->UI.actionVCRPause->setVisible(playing);
+  if(playing)
+    {
+    disconnect(this->Implementation->UI.actionVCRPlay, SIGNAL(triggered()), 
+      &this->Implementation->Core.VCRController(), SLOT(onPlay()));
+    connect(this->Implementation->UI.actionVCRPlay, SIGNAL(triggered()), 
+      &this->Implementation->Core.VCRController(), SLOT(onPause()));
+    this->Implementation->UI.actionVCRPlay->setIcon(
+      QIcon(":/pqWidgets/Icons/pqVcrPause24.png"));
+    this->Implementation->UI.actionVCRPlay->setText("Pa&amp;use");
+    }
+  else
+    {
+    connect(this->Implementation->UI.actionVCRPlay, SIGNAL(triggered()), 
+      &this->Implementation->Core.VCRController(), SLOT(onPlay()));
+    disconnect(this->Implementation->UI.actionVCRPlay, SIGNAL(triggered()), 
+      &this->Implementation->Core.VCRController(), SLOT(onPause()));
+    this->Implementation->UI.actionVCRPlay->setIcon(
+      QIcon(":/pqWidgets/Icons/pqVcrPlay24.png"));
+    this->Implementation->UI.actionVCRPlay->setText("&amp;Play");
+    }
+  
   this->Implementation->Core.setSelectiveEnabledState(!playing);
+  
 }
 
 //-----------------------------------------------------------------------------
