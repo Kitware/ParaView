@@ -93,7 +93,7 @@ class vtkSiloTableOfContents;
 
 struct SiloReaderInternals;
 
-class VTK_IO_EXPORT vtkSiloReader : public vtkMultiBlockDataSetAlgorithm
+class VTK_EXPORT vtkSiloReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkSiloReader *New();
