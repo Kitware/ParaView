@@ -115,7 +115,8 @@ protected:
     vtkCTHFragmentConnectIterator *neighbor1,
     vtkCTHFragmentConnectIterator *neighbor2);
   void ResolveEquivalences(vtkIntArray* fragmentIdArray);
-  void GatherEquivalenceSets(vtkCTHFragmentEquivalenceSet* set);
+  // Returns the offset to convert local member ids into global ids.
+  int  GatherEquivalenceSets(vtkCTHFragmentEquivalenceSet* set);
   void ShareGhostEquivalences(
     vtkCTHFragmentEquivalenceSet* globalSet,
     int*  procOffsets);

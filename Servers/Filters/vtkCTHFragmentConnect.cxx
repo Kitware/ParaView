@@ -41,7 +41,7 @@
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.9");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.10");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //============================================================================
@@ -67,15 +67,18 @@ public:
   // The length of the equivalent array...
   int GetNumberOfMembers() { return this->EquivalenceArray->GetNumberOfTuples();}
 
-  // Be very careful with this pointer.
-  int *GetPointer() { return this->EquivalenceArray->GetPointer(0);}
-
   // Return the id of the equivalent set.
   int GetEquivalentSetId(int memberId);
 
   // Equivalent set ids are reassinged to be sequential.
   // You cannot add anymore equivalences after this is called.
   void ResolveEquivalences();
+
+  void DeepCopy(vtkCTHFragmentEquivalenceSet* in);
+
+  // Needed for seding the set over MPI.
+  // Be very careful with the pointer.
+  int* GetPointer() { return this->EquivalenceArray->GetPointer(0);}
 
 private:
   // To merge connected framgments that have different ids because they were
@@ -86,7 +89,6 @@ private:
   int GetReference(int memberId);
   void EquateInternal(int id1, int id2);
 };
-
 
 //----------------------------------------------------------------------------
 vtkCTHFragmentEquivalenceSet::vtkCTHFragmentEquivalenceSet()
@@ -108,6 +110,12 @@ vtkCTHFragmentEquivalenceSet::~vtkCTHFragmentEquivalenceSet()
 void vtkCTHFragmentEquivalenceSet::Initialize()
 {
   this->EquivalenceArray->Initialize();
+}
+
+//----------------------------------------------------------------------------
+void vtkCTHFragmentEquivalenceSet::DeepCopy(vtkCTHFragmentEquivalenceSet* in)
+{
+  this->EquivalenceArray->DeepCopy(in->EquivalenceArray);
 }
 
 //----------------------------------------------------------------------------
@@ -198,7 +206,7 @@ void vtkCTHFragmentEquivalenceSet::EquateInternal(int id1, int id2)
   
  // The only problem we could encounter is changing a reference.
  // we do not want to orphan anything previously referenced.
-  if (oldRef == id2 && oldRef == id1)
+  if (oldRef == id2 || oldRef == id1)
     {
     this->EquivalenceArray->SetValue(id2, id1);
     }
@@ -3590,7 +3598,7 @@ void vtkCTHFragmentConnect::ResolveEquivalences(vtkIntArray* fragmentIdArray)
 
   // Resolve intraprocess and extra process equivalences.
   // This also renumbers set ids to be sequential.
-  this->GatherEquivalenceSets(this->EquivalenceSet);
+  int localToGlobal = this->GatherEquivalenceSets(this->EquivalenceSet);
   
   // Now change the ids in the cell / point array.
   int num = fragmentIdArray->GetNumberOfTuples();
@@ -3603,7 +3611,7 @@ void vtkCTHFragmentConnect::ResolveEquivalences(vtkIntArray* fragmentIdArray)
       }
     else
       {
-      int newId = this->EquivalenceSet->GetEquivalentSetId(id);
+      int newId = this->EquivalenceSet->GetEquivalentSetId(id+localToGlobal);
       fragmentIdArray->SetValue(ii,newId);
       }
     }
@@ -3611,7 +3619,7 @@ void vtkCTHFragmentConnect::ResolveEquivalences(vtkIntArray* fragmentIdArray)
 
 
 //----------------------------------------------------------------------------
-void vtkCTHFragmentConnect::GatherEquivalenceSets(
+int vtkCTHFragmentConnect::GatherEquivalenceSets(
   vtkCTHFragmentEquivalenceSet* set)
 {
   int numProcs = this->Controller->GetNumberOfProcesses();
@@ -3687,17 +3695,11 @@ void vtkCTHFragmentConnect::GatherEquivalenceSets(
   //cerr << "Global after merge: " << myProcId << endl;
   //globalSet->Print();
 
-
-
   // Copy the equivalences to the local set for returning our results.
-  // Member ids will be back in local coordinate system but the set ids
-  // will still be global.
-  int* localPtr = set->GetPointer();
-  int* globalPtr = globalSet->GetPointer();
-  // Find the location of values for our process.
-  globalPtr += mapping[myProcId];
-  // Now copy the values.
-  memcpy(localPtr, globalPtr, numLocalMembers*sizeof(int));
+  // The ids will be the global ids so the GetId method will work.
+  set->DeepCopy(globalSet);
+
+  return myOffset;
 }
 
 //----------------------------------------------------------------------------
@@ -3742,7 +3744,7 @@ void vtkCTHFragmentConnect::MergeGhostEquivalenceSets(
     {
     this->Controller->Send(buf, numIds, ii, 342321);
     }
-}
+ }
 
 //----------------------------------------------------------------------------
 void vtkCTHFragmentConnect::ShareGhostEquivalences(
