@@ -142,6 +142,11 @@ public:
   /// Returns the opacity.
   double getOpacity() const;
 
+
+  void setColor(double R,double G,double B);
+
+
+
   /// Get/Set the application wide setting for unstructured grid outline
   /// threshold. If the unstructured grid number of cells exceeds this limit, it
   /// will be rendered as outline by default. The value is in million cells.

@@ -552,7 +552,15 @@ double pqPipelineRepresentation::getOpacity() const
   vtkSMProperty* prop = this->getProxy()->GetProperty("Opacity");
   return (prop? pqSMAdaptor::getElementProperty(prop).toDouble() : 1.0);
 }
+//-----------------------------------------------------------------------------
+void pqPipelineRepresentation::setColor(double R,double G,double B)
+{
+  pqSMAdaptor::setMultipleElementProperty(this->getProxy()->GetProperty("Color"),0,R);
+  pqSMAdaptor::setMultipleElementProperty(this->getProxy()->GetProperty("Color"),1,G);
+  pqSMAdaptor::setMultipleElementProperty(this->getProxy()->GetProperty("Color"),2,B);
+  this->getProxy()->UpdateVTKObjects();
 
+}
 //-----------------------------------------------------------------------------
 void pqPipelineRepresentation::resetLookupTableScalarRange()
 {
