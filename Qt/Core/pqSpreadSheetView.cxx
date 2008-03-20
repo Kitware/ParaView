@@ -210,28 +210,6 @@ protected:
       smodel->setActiveBlock(del->Top, del->Bottom);
       }
     }
-public:
-  void disableCornerWidget()
-    {
-    if (this->metaObject()->indexOfProperty("cornerButtonEnabled") != -1)
-      {
-      // for Qt 4.3
-      this->setProperty("cornerButtonEnabled", false);
-      }
-    else
-      {
-      /// HACK: to disable the corner widget (Qt 4.3 has API to do this).
-      // REMOVE THIS ONCE WE DEPRECATE SUPPORT FOR Qt 4.2
-      QList<QWidget*> _children = this->findChildren<QWidget*>();
-      foreach (QWidget* child, _children)
-        {
-        if (strcmp(child->metaObject()->className(), "QAbstractButton") == 0)
-          {
-          child->setEnabled(false);
-          }
-        }
-      }
-    }
 };
 
 //-----------------------------------------------------------------------------
@@ -242,13 +220,14 @@ public:
   {
   pqSpreadSheetView::pqTableView* table = new pqSpreadSheetView::pqTableView();
   table->setAlternatingRowColors(true);
-  table->disableCornerWidget();
 
   pqSpreadSheetView::pqDelegate* delegate = new pqSpreadSheetView::pqDelegate(table);
 
   table->setItemDelegate(delegate);
   this->Table= table;
   this->Table->setModel(&this->Model);
+  this->Table->setAlternatingRowColors(true);
+  this->Table->setCornerButtonEnabled(false);
   this->Table->setSelectionBehavior(QAbstractItemView::SelectRows);
   this->Table->setSelectionModel(&this->SelectionModel);
   this->Table->horizontalHeader()->setMovable(true);
@@ -357,7 +336,8 @@ void pqSpreadSheetView::updateRepresentationVisibility(
 void pqSpreadSheetView::onEndRender()
 {
   // cout << "Render" << endl;
-  this->Internal->Model.forceUpdate();
+  //this->Internal->Model.forceUpdate();
+  this->Internal->Model.update();
 }
 
 //-----------------------------------------------------------------------------

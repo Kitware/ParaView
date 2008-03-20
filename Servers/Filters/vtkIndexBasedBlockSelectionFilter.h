@@ -24,7 +24,9 @@
 #define __vtkIndexBasedBlockSelectionFilter_h
 
 #include "vtkSelectionAlgorithm.h"
-
+//BTX
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer
+//ETX
 class vtkIndexBasedBlockFilter;
 class vtkMultiPieceDataSet;
 class vtkMultiProcessController;
@@ -83,17 +85,30 @@ protected:
                           vtkInformationVector**, 
                           vtkInformationVector*);
 
+  int RequestDataInternal(
+    vtkIdType startIndex, vtkIdType endIndex,
+    vtkSelection* input,
+    vtkSelection* output);
+
+
+  int RequestDataInternal(vtkSelection* input,
+    vtkSelection* output, vtkMultiPieceDataSet* pieces);
+
   bool DetermineBlockIndices(vtkMultiPieceDataSet* input);
-  vtkSelection* LocateSelection(unsigned int composite_index, vtkSelection* sel);
+  vtkSelection* LocateSelection(unsigned int composite_index, vtkSelection* sel, 
+    vtkDataObject* inputDO);
 
   vtkIndexBasedBlockFilter* BlockFilter;
 
   vtkMultiProcessController* Controller;
   vtkIdType StartIndex;
   vtkIdType EndIndex;
+
+  vtkSmartPointer<vtkSelection> Temporary;
 private:
   vtkIndexBasedBlockSelectionFilter(const vtkIndexBasedBlockSelectionFilter&); // Not implemented
   void operator=(const vtkIndexBasedBlockSelectionFilter&); // Not implemented
+
 //ETX
 };
 

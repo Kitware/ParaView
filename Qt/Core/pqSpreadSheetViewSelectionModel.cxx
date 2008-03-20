@@ -32,12 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpreadSheetViewSelectionModel.h"
 
 // Server Manager Includes.
+#include "vtkIndexBasedBlockFilter.h"
 #include "vtkProcessModule.h"
+#include "vtkPVDataInformation.h"
 #include "vtkSelection.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMIdTypeVectorProperty.h"
-#include "vtkIndexBasedBlockFilter.h"
+#include "vtkSMVectorProperty.h"
 
 // Qt Includes.
 #include <QtDebug>
@@ -50,11 +51,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqSpreadSheetViewModel.h"
 
-static uint qHash(QPair<vtkIdType, vtkIdType> pair)
+static uint qHash(pqSpreadSheetViewModel::vtkIndex index)
 {
-  return qHash(pair.second);
+  return qHash(index.Tuple[2]);
 }
-
 
 class pqSpreadSheetViewSelectionModel::pqInternal
 {
@@ -96,82 +96,107 @@ void pqSpreadSheetViewSelectionModel::serverSelectionChanged()
 void pqSpreadSheetViewSelectionModel::select(const QItemSelection& sel, 
     QItemSelectionModel::SelectionFlags command)
 {
-  if (!this->UpdatingSelection && command != QItemSelectionModel::NoUpdate)
+  this->Superclass::select(sel, command);
+  if (this->UpdatingSelection || command == QItemSelectionModel::NoUpdate)
     {
-    // Update VTK Selection.
-    // * Obtain the currently set sel on the selected source (if none, a
-    //    new one is created).
-    // * We then update the ids selected on the
-    vtkSmartPointer<vtkSMSourceProxy> selSource ;
-    selSource.TakeReference(this->getSelectionSource());
-    if (selSource)
+    return;
+    }
+
+  // Update VTK Selection.
+  // * Obtain the currently set sel on the selected source (if none, a
+  //    new one is created).
+  // * We then update the ids selected on the
+  vtkSmartPointer<vtkSMSourceProxy> selSource ;
+  selSource.TakeReference(this->getSelectionSource());
+  if (!selSource)
+    {
+    emit this->selection(0);
+    return;
+    }
+
+  vtkSMVectorProperty* vp = vtkSMVectorProperty::SafeDownCast(
+    selSource->GetProperty("IDs"));
+  QList<QVariant> ids = pqSMAdaptor::getMultipleElementProperty(vp);
+  int numElemsPerCommand = vp->GetNumberOfElementsPerCommand();
+  if (command & QItemSelectionModel::Clear)
+    {
+    ids.clear();
+    }
+  if (command & QItemSelectionModel::Select || 
+    command & QItemSelectionModel::Deselect || 
+    command & QItemSelectionModel::Toggle)
+    {
+    // Get the (process id, index) pairs for the indices indicated in the 
+    // selection.
+    QSet<pqSpreadSheetViewModel::vtkIndex> vtkIndices = 
+      this->Internal->Model->getVTKIndices(sel.indexes());
+
+    QSet<pqSpreadSheetViewModel::vtkIndex> curIndices;
+    for (int cc=0; (cc+numElemsPerCommand) <= ids.size(); )
       {
-      QList<QVariant> ids = pqSMAdaptor::getMultipleElementProperty(
-        selSource->GetProperty("IDs"));
-      if (command & QItemSelectionModel::Clear)
+      pqSpreadSheetViewModel::vtkIndex index(0, -1, 0);
+      if (numElemsPerCommand == 3)
         {
-        ids.clear();
+        index.Tuple[0] = ids[cc].value<vtkIdType>(); cc++;
+        index.Tuple[1] = ids[cc].value<vtkIdType>(); cc++;
+        index.Tuple[2] = ids[cc].value<vtkIdType>(); cc++;
         }
-
-      if (command & QItemSelectionModel::Select || 
-        command & QItemSelectionModel::Deselect || 
-        command & QItemSelectionModel::Toggle)
+      else // numElemsPerCommand == 2
         {
-        // Get the (process id, index) pairs for the indices indicated in the 
-        // selection.
-        QSet<QPair<vtkIdType, vtkIdType> > vtkIndices 
-          = this->Internal->Model->getVTKIndices(sel.indexes());
-
-        QSet<QPair<vtkIdType, vtkIdType> > curIndices;
-        for (int cc=0; cc < ids.size()/2; cc++)
-          {
-          curIndices.insert(QPair<vtkIdType, vtkIdType>(
-              ids[2*cc].value<vtkIdType>(), ids[2*cc+1].value<vtkIdType>()));
-          }
-        if (command & QItemSelectionModel::Select)
-          {
-          curIndices += vtkIndices;
-          }
-        if (command & QItemSelectionModel::Deselect)
-          {
-          curIndices -= vtkIndices;
-          }
-        if (command & QItemSelectionModel::Toggle)
-          {
-          QSet<QPair<vtkIdType, vtkIdType> > toSelect = 
-            vtkIndices - curIndices;
-          QSet<QPair<vtkIdType, vtkIdType> > toDeselect =
-            vtkIndices - toSelect;
-          curIndices -= toDeselect;
-          curIndices += toSelect;
-          }
-
-        ids.clear();
-        QSet<QPair<vtkIdType, vtkIdType> >::iterator iter = curIndices.begin();
-        for(; iter != curIndices.end(); ++iter)
-          {
-          QPair<vtkIdType, vtkIdType> pair = (*iter);
-          ids.push_back(pair.first);
-          ids.push_back(pair.second);
-          }
+        index.Tuple[1] = ids[cc].value<vtkIdType>(); cc++;
+        index.Tuple[2] = ids[cc].value<vtkIdType>(); cc++;
         }
-      if (ids.size() == 0)
+      curIndices.insert(index);
+      }
+
+    if (command & QItemSelectionModel::Select)
+      {
+      curIndices += vtkIndices;
+      }
+    if (command & QItemSelectionModel::Deselect)
+      {
+      curIndices -= vtkIndices;
+      }
+    if (command & QItemSelectionModel::Toggle)
+      {
+      QSet<pqSpreadSheetViewModel::vtkIndex> toSelect = 
+        vtkIndices - curIndices;
+      QSet<pqSpreadSheetViewModel::vtkIndex> toDeselect =
+        vtkIndices - toSelect;
+      curIndices -= toDeselect;
+      curIndices += toSelect;
+      }
+
+    ids.clear();
+    QSet<pqSpreadSheetViewModel::vtkIndex>::iterator iter;
+    for (iter = curIndices.begin(); iter != curIndices.end(); ++iter)
+      {
+      if (numElemsPerCommand == 3)
         {
-        selSource = 0;
+        ids.push_back(iter->Tuple[0]);
+        ids.push_back(iter->Tuple[1]);
+        ids.push_back(iter->Tuple[2]);
         }
-      else
+      else //numElemsPerCommand == 2
         {
-        pqSMAdaptor::setMultipleElementProperty(
-          selSource->GetProperty("IDs"), ids);
-        selSource->UpdateVTKObjects();
+        ids.push_back(iter->Tuple[1]);
+        ids.push_back(iter->Tuple[2]);
         }
       }
-    emit this->selection(selSource);
+    }
+
+  if (ids.size() == 0)
+    {
+    selSource = 0;
     }
   else
     {
-    this->Superclass::select(sel, command);
+    pqSMAdaptor::setMultipleElementProperty(
+      vp, ids);
+    selSource->UpdateVTKObjects();
     }
+
+  emit this->selection(selSource);
 }
 
 //-----------------------------------------------------------------------------
@@ -192,25 +217,41 @@ vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
     return 0;
     }
 
-  int composite_index = pqSMAdaptor::getElementProperty(
-    repr->getProxy()->GetProperty("CompositeDataSetIndex")).toInt();
-
-  // convert field_type to selection field type.
+  // Convert field_type to selection field type.
   field_type = (field_type == vtkIndexBasedBlockFilter::POINT)?
     vtkSelection::POINT : vtkSelection::CELL;
 
   pqOutputPort* opport = repr->getOutputPortFromInput();
-  vtkSMSourceProxy* selsource = vtkSMSourceProxy::SafeDownCast(
-    opport->getSource()->getProxy())->GetSelectionInput(
-    opport->getPortNumber());
+  vtkSMSourceProxy* selsource = opport->getSelectionInput(); 
 
-  // Check if the current selsource is "updatable".
-  bool updatable = (selsource != 0) && (pqSMAdaptor::getElementProperty(
-      selsource->GetProperty("FieldType")).toInt() == field_type) &&
-    (pqSMAdaptor::getElementProperty(selsource->GetProperty("ContentType")).toInt() ==
-     vtkSelection::INDICES) &&
-    (pqSMAdaptor::getElementProperty(selsource->GetProperty("CompositeIndex")).toInt() 
-     == composite_index);
+  // We may be able to simply update the currently existing selection, if any.
+  bool updatable = (selsource != 0);
+
+  // If field types differ, not updatable.
+  if (updatable && pqSMAdaptor::getElementProperty(
+      selsource->GetProperty("FieldType")).toInt() != field_type)
+    {
+    updatable = false;
+    }
+
+  // Determine what selection proxy name we want. If the name differs then not
+  // updatable.
+  const char* proxyname = "IDSelectionSource";
+  vtkPVDataInformation* dinfo = opport->getDataInformation(false);
+  const char* cdclassname = dinfo->GetCompositeDataClassName();
+  if (cdclassname && strcmp(cdclassname, "vtkHierarchicalBoxDataSet") == 0)
+    {
+    proxyname = "HierarchicalDataIDSelectionSource";
+    }
+  else if (cdclassname && strcmp(cdclassname, "vtkMultiBlockDataSet") == 0)
+    {
+    proxyname = "CompositeDataIDSelectionSource";
+    }
+
+  if (updatable && strcmp(selsource->GetXMLName(), proxyname) != 0)
+    {
+    updatable = false;
+    }
 
   if (updatable)
     {
@@ -219,16 +260,12 @@ vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
   else
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    selsource = vtkSMSourceProxy::SafeDownCast(
-      pxm->NewProxy("sources", "SelectionSource"));
+    selsource = 
+      vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", proxyname));
     selsource->SetConnectionID(repr->getServer()->GetConnectionID());
     selsource->SetServers(vtkProcessModule::DATA_SERVER);
     pqSMAdaptor::setElementProperty(
       selsource->GetProperty("FieldType"), field_type);
-    pqSMAdaptor::setElementProperty(
-      selsource->GetProperty("ContentType"), vtkSelection::INDICES);
-    pqSMAdaptor::setElementProperty(
-      selsource->GetProperty("CompositeIndex"), composite_index);
     selsource->UpdateVTKObjects();
     }
 

@@ -14,17 +14,24 @@
 =========================================================================*/
 #include "vtkIndexBasedBlockSelectionFilter.h"
 
+#include "vtkCellData.h"
 #include "vtkCommunicator.h"
 #include "vtkDataSet.h"
 #include "vtkExecutive.h"
+#include "vtkHierarchicalBoxDataIterator.h"
+#include "vtkHierarchicalBoxDataSet.h"
 #include "vtkIdTypeArray.h"
 #include "vtkIndexBasedBlockFilter.h"
 #include "vtkInformation.h"
+#include "vtkMultiPieceDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkSmartPointer.h"
+
+#include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkIndexBasedBlockSelectionFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockSelectionFilter, "1.2");
+vtkCxxRevisionMacro(vtkIndexBasedBlockSelectionFilter, "1.3");
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockSelectionFilter::vtkIndexBasedBlockSelectionFilter()
 {
@@ -151,8 +158,9 @@ int vtkIndexBasedBlockSelectionFilter::RequestData(
     return 1;
     }
 
-  vtkMultiPieceDataSet* datainput = this->BlockFilter->GetPieceToProcess(
-    vtkDataObject::GetData(inputVector[1], 0));
+  vtkDataObject* actualDataInput = vtkDataObject::GetData(inputVector[1], 0);
+  vtkMultiPieceDataSet* datainput = 
+    this->BlockFilter->GetPieceToProcess(actualDataInput);
 
   if (!datainput)
     {
@@ -166,7 +174,7 @@ int vtkIndexBasedBlockSelectionFilter::RequestData(
     }
 
   vtkSelection* input = vtkSelection::GetData(inputVector[0], 0);
-  input = this->LocateSelection(this->GetCompositeDataSetIndex(), input);
+  input = this->LocateSelection(this->GetCompositeDataSetIndex(), input, actualDataInput);
 
   if (!input || this->StartIndex < 0 || this->EndIndex < 0)
     {
@@ -174,14 +182,214 @@ int vtkIndexBasedBlockSelectionFilter::RequestData(
     // the requested block of data.
     return 1;
     }
+
+  return this->RequestDataInternal(input, output, datainput);
+}
+
+//----------------------------------------------------------------------------
+bool vtkIndexBasedBlockSelectionFilter::DetermineBlockIndices(
+  vtkMultiPieceDataSet* input)
+{
+  return this->BlockFilter->DetermineBlockIndices(input, 
+    this->StartIndex, this->EndIndex);
+}
+
+//----------------------------------------------------------------------------
+vtkSelection* vtkIndexBasedBlockSelectionFilter::LocateSelection(
+  unsigned int composite_index, vtkSelection* sel, vtkDataObject* input)
+{
+  unsigned int level = 0;
+  unsigned int indexMin = 0;
+  unsigned int indexMax = 0;
+  bool hierarchical_index_valid = false;
+  if (input->IsA("vtkHierarchicalBoxDataSet"))
+    {
+    hierarchical_index_valid = true;
+    // Convert the composite_index to hierarchical index.
+    vtkHierarchicalBoxDataIterator* iter = 
+      vtkHierarchicalBoxDataIterator::SafeDownCast(
+        static_cast<vtkHierarchicalBoxDataSet*>(input)->NewIterator());
+    iter->VisitOnlyLeavesOff();
+    for (iter->InitTraversal(); 
+      !iter->IsDoneWithTraversal()  && (iter->GetCurrentFlatIndex() <= composite_index);
+      iter->GoToNextItem())
+      {
+      if (iter->GetCurrentFlatIndex() == composite_index)
+        {
+        level = iter->GetCurrentLevel();
+        vtkMultiPieceDataSet* levelPieces = vtkMultiPieceDataSet::SafeDownCast(
+          iter->GetCurrentDataObject());
+        if (levelPieces)
+          {
+          indexMin = 0;
+          indexMax = levelPieces->GetNumberOfPieces()-1;
+          }
+        else
+          {
+          indexMin = iter->GetCurrentIndex();
+          indexMax = indexMin;
+          }
+        break;
+        }
+      }
+    iter->Delete();
+    }
+  else if (!input->IsA("vtkCompositeDataSet"))
+    {
+    return sel;
+    }
+
+  vtkstd::vector<vtkSelection*> selections;
+
+  if (sel && sel->GetContentType() == vtkSelection::SELECTIONS)
+    {
+    unsigned int numChildren = sel->GetNumberOfChildren();
+    for (unsigned int cc=0; cc < numChildren; cc++)
+      {
+      vtkSelection* child = sel->GetChild(cc);
+      if (!child)
+        {
+        continue;
+        }
+      vtkInformation* properties = child->GetProperties();
+      if (properties->Has(vtkSelection::COMPOSITE_INDEX()) &&
+        static_cast<unsigned int>(properties->Get(vtkSelection::COMPOSITE_INDEX()))
+        == composite_index)
+        {
+        return child;
+        }
+      else if (hierarchical_index_valid &&
+        properties->Has(vtkSelection::HIERARCHICAL_LEVEL()) &&
+        properties->Has(vtkSelection::HIERARCHICAL_INDEX()) &&
+        static_cast<unsigned int>(properties->Get(vtkSelection::HIERARCHICAL_LEVEL())) == level &&
+        static_cast<unsigned int>(properties->Get(vtkSelection::HIERARCHICAL_INDEX())) >= indexMin &&
+        static_cast<unsigned int>(properties->Get(vtkSelection::HIERARCHICAL_INDEX())) <= indexMax)
+        {
+        selections.push_back(child);
+        }
+      }
+    
+    if (hierarchical_index_valid && selections.size() > 0)
+      {
+      vtkSelection* compSel = vtkSelection::New();
+      compSel->SetContentType(vtkSelection::SELECTIONS);
+      for (unsigned int cc=0; cc < selections.size(); cc++)
+        {
+        compSel->AddChild(selections[cc]);
+        }
+      this->Temporary.TakeReference(compSel);
+      return this->Temporary;
+      }
+
+    return NULL;
+    }
+
+  return sel;
+}
+
+//----------------------------------------------------------------------------
+int vtkIndexBasedBlockSelectionFilter::RequestDataInternal(vtkSelection* input,
+  vtkSelection* output, vtkMultiPieceDataSet* pieces)
+{
+  unsigned int numPieces = pieces->GetNumberOfPieces();
+  if (numPieces == 1)
+    {
+    return this->RequestDataInternal(this->StartIndex, this->EndIndex,
+      input, output);
+    }
+
+  int fieldType = this->GetFieldType();
   
+  vtkstd::vector<vtkIdType> pieceOffsets;
+  vtkIdType offset = 0;
+  for (unsigned int cc=0; cc < numPieces; cc++)
+    {
+    pieceOffsets.push_back(offset);
+    vtkDataSet* piece = pieces->GetPiece(cc);
+    if (piece)
+      {
+      if (fieldType == vtkIndexBasedBlockFilter::CELL)
+        {
+        offset += piece->GetCellData()->GetNumberOfTuples();
+        }
+      else
+        {
+        offset += piece->GetNumberOfPoints();
+        }
+      }
+    }
+
+  vtkstd::vector<vtkSelection*> selections;
+  if (input->GetContentType() == vtkSelection::SELECTIONS)
+    {
+    for (unsigned int kk=0; kk < input->GetNumberOfChildren(); kk++)
+      {
+      selections.push_back(input->GetChild(kk));
+      }
+    }
+  else
+    {
+    selections.push_back(input);
+    }
+
+  vtkstd::vector<vtkSmartPointer<vtkSelection> > outSelections;
+
+  vtkstd::vector<vtkSelection*>::iterator iter;
+  for (iter = selections.begin(); iter != selections.end(); iter++)
+    {
+    vtkSmartPointer<vtkSelection> outChild = vtkSmartPointer<vtkSelection>::New();
+    if ((*iter)->GetProperties()->Has(vtkSelection::HIERARCHICAL_INDEX()))
+      {
+      unsigned int hi = (*iter)->GetProperties()->Get(vtkSelection::HIERARCHICAL_INDEX());
+      vtkIdType offset = pieceOffsets[hi];
+      vtkIdType startIndex = (offset > this->StartIndex? 0 : this->StartIndex - offset);
+      vtkIdType endIndex = (offset > this->StartIndex? this->EndIndex-offset: this->EndIndex);
+      if (!this->RequestDataInternal(startIndex, endIndex, *iter, outChild))
+        {
+        return 0;
+        }
+      if (outChild->GetContentType() == vtkSelection::INDICES)
+        {
+        outSelections.push_back(outChild);
+        }
+      }
+    }
+
+  if (outSelections.size() == 1)
+    {
+    output->ShallowCopy(outSelections[0]);
+    }
+  else if (outSelections.size() > 1)
+    {
+    output->SetContentType(vtkSelection::SELECTIONS);
+    for (unsigned int cc=0; cc < outSelections.size(); cc++)
+      {
+      output->AddChild(outSelections[cc]);
+      }
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkIndexBasedBlockSelectionFilter::RequestDataInternal(
+  vtkIdType startIndex, vtkIdType endIndex,
+  vtkSelection* input,
+  vtkSelection* output)
+{
+  if (startIndex > endIndex)
+    {
+    // nothing to do.
+    return 1;
+    }
+
   vtkInformation* inProperties = input->GetProperties();
   if (inProperties->Get(vtkSelection::CONTENT_TYPE()) != vtkSelection::INDICES)
     {
-    vtkErrorMacro("This filter can only handle INDEX based selections.");
-    return 0;
+    return 1;
     }
  
+  int myId = this->Controller? this->Controller->GetLocalProcessId()  :0;
   // cout << myId << ": In PID = " <<  inProperties->Get(vtkSelection::PROCESS_ID()) << endl;
   if (inProperties->Has(vtkSelection::PROCESS_ID()) && 
       inProperties->Get(vtkSelection::PROCESS_ID()) != -1 &&
@@ -193,17 +401,9 @@ int vtkIndexBasedBlockSelectionFilter::RequestData(
     return 1;
     }
 
-  int inv = 0;
-  if (!inProperties->Has(vtkSelection::INVERSE()))
-    {
-    inv = inProperties->Get(vtkSelection::INVERSE());
-    }
-  output->GetProperties()->Set(vtkSelection::INVERSE(), inv);
-
-  if (!inProperties->Has(vtkSelection::FIELD_TYPE()))
-    {
-    return 1;
-    }
+  int fieldType = this->GetFieldType();
+  int myType = (fieldType == vtkIndexBasedBlockFilter::POINT)? 
+    vtkSelection::POINT : vtkSelection::CELL;
 
   if (inProperties->Get(vtkSelection::FIELD_TYPE()) != myType)
     {
@@ -212,18 +412,19 @@ int vtkIndexBasedBlockSelectionFilter::RequestData(
     // selections).
     return 1;
     }
+  output->GetProperties()->Copy(input->GetProperties());
   
   // Eventually we'll do some smart lookup to determine which IDs are selected.
   vtkIdTypeArray* inIds = vtkIdTypeArray::SafeDownCast(
     input->GetSelectionList());
+
   vtkIdTypeArray* outIds = vtkIdTypeArray::New();
   outIds->SetNumberOfComponents(1);
-
   vtkIdType numVals = inIds? inIds->GetNumberOfTuples() : 0;
   for (vtkIdType cc=0; cc < numVals; cc++)
     {
     vtkIdType curVal = inIds->GetValue(cc);
-    if (this->StartIndex <= curVal && curVal <= this->EndIndex)
+    if (startIndex <= curVal && curVal <= endIndex)
       {
       outIds->InsertNextValue(curVal);
       }
@@ -231,37 +432,6 @@ int vtkIndexBasedBlockSelectionFilter::RequestData(
   output->SetSelectionList(outIds);
   outIds->Delete();
   return 1;
-}
-
-//----------------------------------------------------------------------------
-bool vtkIndexBasedBlockSelectionFilter::DetermineBlockIndices(
-  vtkMultiPieceDataSet* input)
-{
-  return this->BlockFilter->DetermineBlockIndices(input, this->StartIndex, this->EndIndex);
-}
-
-//----------------------------------------------------------------------------
-vtkSelection* vtkIndexBasedBlockSelectionFilter::LocateSelection(
-  unsigned int composite_index, vtkSelection* sel)
-{
-  if (sel && sel->GetContentType() == vtkSelection::SELECTIONS)
-    {
-    unsigned int numChildren = sel->GetNumberOfChildren();
-    for (unsigned int cc=0; cc < numChildren; cc++)
-      {
-      vtkSelection* child = sel->GetChild(cc);
-      if (child && 
-        child->GetProperties()->Has(vtkSelection::COMPOSITE_INDEX()) &&
-        static_cast<unsigned int>(child->GetProperties()->Get(vtkSelection::COMPOSITE_INDEX()))
-        == composite_index)
-        {
-        return child;
-        }
-      }
-    return NULL;
-    }
-
-  return sel;
 }
 
 //----------------------------------------------------------------------------

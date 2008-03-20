@@ -15,11 +15,11 @@
 // .NAME vtkPVExtractSelection - Adds a second port to vtkExtractSelection, 
 // the second port contains an id selection.
 // .SECTION Description
-// vtkPVExtractSelection adds a second port to its vtkExtractSelection. The
+// vtkPVExtractSelection adds a second port to vtkExtractSelection. The
 // first output (from the parent class) is useful for displaying a subset of
 // a dataset. The second output (the one added by this class) is a vtkSelection
 // of type INDICES. This second output is useful for correlating particular 
-// cells in the subset with the original data set. This is used for instance
+// cells in the subset with the original data set. This is used, for instance,
 // by ParaView's Spreadsheet view.
 
 // .SECTION See Also
@@ -56,7 +56,8 @@ protected:
 
   virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
-
+  vtkSelection* LocateSelection(unsigned int level,
+    unsigned int index, vtkSelection* sel);
   vtkSelection* LocateSelection(unsigned int composite_index, vtkSelection* sel);
   vtkSelection* RequestDataInternal(vtkDataSet* geomOutput, vtkSelection* sel);
 

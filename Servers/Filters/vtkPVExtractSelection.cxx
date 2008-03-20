@@ -19,6 +19,7 @@
 #include "vtkCompositeDataSet.h"
 #include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
+#include "vtkHierarchicalBoxDataIterator.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -26,7 +27,7 @@
 #include "vtkPointData.h"
 #include "vtkSelection.h"
 
-vtkCxxRevisionMacro(vtkPVExtractSelection, "1.7");
+vtkCxxRevisionMacro(vtkPVExtractSelection, "1.8");
 vtkStandardNewMacro(vtkPVExtractSelection);
 
 //----------------------------------------------------------------------------
@@ -67,12 +68,10 @@ int vtkPVExtractSelection::RequestDataObject(
     }
 
   vtkInformation* info = outputVector->GetInformationObject(1);
-  vtkSelection *selOut = vtkSelection::SafeDownCast(
-    info->Get(vtkDataObject::DATA_OBJECT()));
+  vtkSelection *selOut = vtkSelection::GetData(info);
   if (!selOut || !selOut->IsA("vtkSelection")) 
     {
-    vtkDataObject* newOutput = 
-      vtkDataObjectTypes::NewDataObject("vtkSelection");
+    vtkDataObject* newOutput = vtkSelection::New();
     if (!newOutput)
       {
       vtkErrorMacro("Could not create vtkSelectionOutput");
@@ -99,14 +98,10 @@ int vtkPVExtractSelection::RequestData(
     }
 
 
-  vtkSelection* sel = 0;
-  if (inputVector[1]->GetInformationObject(0))
-    {
-    sel = vtkSelection::SafeDownCast(
-      inputVector[1]->GetInformationObject(0)->Get(
-        vtkDataObject::DATA_OBJECT()));
-    }
+  vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
+  vtkSelection* sel = vtkSelection::GetData(inputVector[1], 0);
 
+  vtkCompositeDataSet* cdInput = vtkCompositeDataSet::SafeDownCast(inputDO);
   vtkCompositeDataSet* cdOutput = vtkCompositeDataSet::GetData(outputVector, 0);
   vtkDataSet *geomOutput = vtkDataSet::GetData(outputVector, 0);
 
@@ -122,25 +117,48 @@ int vtkPVExtractSelection::RequestData(
 
   output->Clear();
 
-  // TODO: Fix to create multiple vtkSelections for different blocks.
+  if (!sel)
+    {
+    return 1;
+    }
+
   if (cdOutput)
     {
+    // For composite datasets, the output of this filter is
+    // vtkSelection::SELECTIONS instance with vtkSelection instances for some
+    // nodes in the composite dataset. COMPOSITE_INDEX() or
+    // HIERARCHICAL_LEVEL(), HIERARCHICAL_INDEX() keys are set on each of the
+    // vtkSelection instances correctly to help identify the block they came
+    // from.
     output->SetContentType(vtkSelection::SELECTIONS);
-    vtkCompositeDataIterator* iter = cdOutput->NewIterator();
+    vtkCompositeDataIterator* iter = cdInput->NewIterator();
+    vtkHierarchicalBoxDataIterator* hbIter = 
+      vtkHierarchicalBoxDataIterator::SafeDownCast(iter);
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); 
       iter->GoToNextItem())
       {
       vtkSelection* curSel = this->LocateSelection(iter->GetCurrentFlatIndex(),
         sel);
-      geomOutput = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+      if (!curSel && hbIter)
+        {
+        curSel = this->LocateSelection(hbIter->GetCurrentLevel(), hbIter->GetCurrentIndex(),
+          sel);
+        }
+
+      geomOutput = vtkDataSet::SafeDownCast(cdOutput->GetDataSet(iter));
       if (curSel && geomOutput)
         {
         vtkSelection* outputChild = this->RequestDataInternal(
           geomOutput, curSel);
-        outputChild->GetProperties()->Set(vtkSelection::COMPOSITE_INDEX(),
-          iter->GetCurrentFlatIndex());
-        output->AddChild(outputChild);
-        outputChild->Delete();
+        if (outputChild)
+          {
+          // RequestDataInternal() will not set COMPOSITE_INDEX() for
+          // hierarchical datasets.
+          outputChild->GetProperties()->Set(vtkSelection::COMPOSITE_INDEX(),
+            iter->GetCurrentFlatIndex());
+          output->AddChild(outputChild);
+          outputChild->Delete();
+          }
         }
       }
     iter->Delete();
@@ -154,6 +172,41 @@ int vtkPVExtractSelection::RequestData(
     }
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+vtkSelection* vtkPVExtractSelection::LocateSelection(unsigned int level,
+  unsigned int index, vtkSelection* sel)
+{
+  if (sel->GetContentType() == vtkSelection::SELECTIONS)
+    {
+    unsigned int numChildren = sel->GetNumberOfChildren();
+    for (unsigned int cc=0; cc < numChildren; cc++)
+      {
+      vtkSelection* child = sel->GetChild(cc);
+      if (child)
+        {
+        vtkSelection* outputChild = this->LocateSelection(level, index, child);
+        if (outputChild)
+          {
+          return outputChild;
+          }
+        }
+      }
+    return NULL;
+    }
+
+  if (sel->GetProperties()->Has(vtkSelection::HIERARCHICAL_LEVEL()) &&
+    sel->GetProperties()->Has(vtkSelection::HIERARCHICAL_INDEX()) &&
+    static_cast<unsigned int>(sel->GetProperties()->Get(vtkSelection::HIERARCHICAL_LEVEL())) == 
+    level &&
+    static_cast<unsigned int>(sel->GetProperties()->Get(vtkSelection::HIERARCHICAL_INDEX())) == 
+    index)
+    {
+    return sel;
+    }
+
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -194,6 +247,7 @@ vtkSelection* vtkPVExtractSelection::RequestDataInternal(
 {
   vtkSelection* output = vtkSelection::New();
   output->Clear();
+  output->GetProperties()->Copy(sel->GetProperties(), /*deep=*/1);
   output->SetContentType(vtkSelection::INDICES);
 
   int ft = vtkSelection::CELL;
@@ -201,13 +255,7 @@ vtkSelection* vtkPVExtractSelection::RequestDataInternal(
     {
     ft = sel->GetProperties()->Get(vtkSelection::FIELD_TYPE());
     }
-  output->GetProperties()->Set(vtkSelection::FIELD_TYPE(), ft);
-  int inv = 0;
-  if (sel && sel->GetProperties()->Has(vtkSelection::INVERSE()))
-    {
-    inv = sel->GetProperties()->Get(vtkSelection::INVERSE());
-    }
-  output->GetProperties()->Set(vtkSelection::INVERSE(), inv);
+
   vtkIdTypeArray *oids=0;
   if (geomOutput)
     {

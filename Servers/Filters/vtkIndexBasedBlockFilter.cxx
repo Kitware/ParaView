@@ -22,6 +22,7 @@
 #include "vtkCompositeDataSet.h"
 #include "vtkDoubleArray.h"
 #include "vtkExecutive.h"
+#include "vtkHierarchicalBoxDataIterator.h"
 #include "vtkIdTypeArray.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
@@ -36,10 +37,10 @@
 #include "vtkSmartPointer.h"
 #include "vtkStructuredGrid.h"
 #include "vtkTable.h"
-
+#include "vtkUnsignedIntArray.h"
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.16");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.17");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -61,6 +62,11 @@ vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
   this->StructuredCoordinatesArray = 0;
   this->OriginalIndicesArray = 0;
   this->PieceNumberArray = 0;
+  this->CompositeIndexArray = 0;
+
+  this->CurrentCIndex = 0;
+  this->CurrentHIndex = 0;
+  this->CurrentHLevel = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -88,6 +94,10 @@ vtkExecutive* vtkIndexBasedBlockFilter::CreateDefaultExecutive()
 //----------------------------------------------------------------------------
 vtkMultiPieceDataSet* vtkIndexBasedBlockFilter::GetPieceToProcess(vtkDataObject* dObj)
 {
+  this->CurrentCIndex = 0;
+  this->CurrentHIndex = 0;
+  this->CurrentHLevel = 0;
+
   this->Temporary->SetNumberOfPieces(0);
   vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(dObj);
   if (cd)
@@ -95,6 +105,10 @@ vtkMultiPieceDataSet* vtkIndexBasedBlockFilter::GetPieceToProcess(vtkDataObject*
     vtkSmartPointer<vtkCompositeDataIterator> iter;
     iter.TakeReference(cd->NewIterator());
     iter->VisitOnlyLeavesOff();
+
+    vtkHierarchicalBoxDataIterator* hbIter = 
+      vtkHierarchicalBoxDataIterator::SafeDownCast(iter);
+
     for (iter->InitTraversal(); 
       (!iter->IsDoneWithTraversal() && iter->GetCurrentFlatIndex() 
        <= this->CompositeDataSetIndex); 
@@ -111,12 +125,26 @@ vtkMultiPieceDataSet* vtkIndexBasedBlockFilter::GetPieceToProcess(vtkDataObject*
 
         if (!mp)
           {
+          this->CurrentCIndex = iter->GetCurrentFlatIndex();
+          if (hbIter)
+            {
+            this->CurrentHLevel = hbIter->GetCurrentLevel();
+            this->CurrentHIndex = hbIter->GetCurrentIndex();
+            }
           this->Temporary->SetNumberOfPieces(1);
           this->Temporary->SetPiece(0, 
             vtkDataSet::SafeDownCast(iter->GetCurrentDataObject()));
           return this->Temporary;
           }
 
+        // Note Current*Index is the index of the first piece in the
+        // vtkMultiPieceDataSet that is returned.
+        this->CurrentCIndex = iter->GetCurrentFlatIndex() + 1;
+        if (hbIter)
+          {
+          this->CurrentHLevel = hbIter->GetCurrentLevel();
+          this->CurrentHIndex = 0;
+          }
         return mp;
         }
       }
@@ -135,11 +163,11 @@ int vtkIndexBasedBlockFilter::RequestData(
   vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {
+  vtkDataObject* actualInput = vtkDataObject::GetData(inputVector[0], 0);
+
   // If input is composite dataset then this method will return the dataset in
   // that composite dataset to process.
-  vtkMultiPieceDataSet* input = this->GetPieceToProcess(
-    vtkDataObject::GetData(inputVector[0], 0));
-
+  vtkMultiPieceDataSet* input = this->GetPieceToProcess(actualInput);
   if (!input)
     {
     return 1;
@@ -156,6 +184,19 @@ int vtkIndexBasedBlockFilter::RequestData(
     // Nothing to do, the output must be empty since this process does not have
     // the requested block of data.
     return 1;
+    }
+
+  if (actualInput->IsA("vtkHierarchicalBoxDataSet"))
+    {
+    this->CompositeIndexArray = vtkUnsignedIntArray::New();
+    this->CompositeIndexArray->SetName("vtkCompositeIndexArray");
+    this->CompositeIndexArray->SetNumberOfComponents(2);
+    }
+  else if (actualInput->IsA("vtkCompositeDataSet"))
+    {
+    this->CompositeIndexArray = vtkUnsignedIntArray::New();
+    this->CompositeIndexArray->SetName("vtkCompositeIndexArray");
+    this->CompositeIndexArray->SetNumberOfComponents(1);
     }
 
   // cout << "Block Indices: " << this->StartIndex << ", " << this->EndIndex << endl;
@@ -190,6 +231,7 @@ int vtkIndexBasedBlockFilter::RequestData(
       this->PassBlock(pieceNumber, output, pieceOffset, piece);
       }
     }
+
   if (!output->GetFieldData())
     {
     vtkFieldData* temp = vtkFieldData::New();
@@ -226,6 +268,13 @@ int vtkIndexBasedBlockFilter::RequestData(
       }
     this->PieceNumberArray->Delete();
     this->PieceNumberArray = 0;
+    }
+
+  if (this->CompositeIndexArray)
+    {
+    output->GetFieldData()->AddArray(this->CompositeIndexArray);
+    this->CompositeIndexArray->Delete();
+    this->CompositeIndexArray = 0;
     }
 
   return 1;
@@ -382,6 +431,35 @@ void vtkIndexBasedBlockFilter::PassBlock(
     this->PieceNumberArray->SetName("Piece Number");
     this->PieceNumberArray->SetNumberOfComponents(1);
     this->PieceNumberArray->Allocate(this->EndIndex-this->StartIndex+1);
+    }
+
+  if (this->CompositeIndexArray)
+    {
+    if (this->CompositeIndexArray->GetNumberOfComponents() == 2)
+      {
+      unsigned int *ptr = this->CompositeIndexArray->WritePointer(
+        this->CompositeIndexArray->GetNumberOfTuples()*2,
+        (endIndex-startIndex+1)*2);
+
+      for (vtkIdType cc=startIndex; cc <= endIndex; cc++)
+        {
+        *ptr = this->CurrentHLevel; 
+        ptr++;
+        *ptr = (this->CurrentHIndex+pieceNumber); 
+        ptr++;
+        }
+      }
+    else
+      {
+      unsigned int *ptr = this->CompositeIndexArray->WritePointer(
+        this->CompositeIndexArray->GetNumberOfTuples(),
+        endIndex-startIndex+1);
+      for (vtkIdType cc=startIndex; cc <= endIndex; cc++)
+        {
+        *ptr = this->CurrentCIndex; 
+        ptr++;
+        }
+      }
     }
 
   // cout << "PassThrough: " << startIndex << " --> " << endIndex << endl;

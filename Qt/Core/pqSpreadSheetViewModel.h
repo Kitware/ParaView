@@ -56,6 +56,32 @@ public:
   pqSpreadSheetViewModel();
   ~pqSpreadSheetViewModel();
 
+  class vtkIndex
+    {
+  public:
+    vtkIdType Tuple[3];
+    vtkIndex()
+      {
+      this->Tuple[0] = 0;
+      this->Tuple[1] = 0;
+      this->Tuple[2] = 0;
+      }
+
+  vtkIndex(vtkIdType a, vtkIdType b, vtkIdType c)
+      {
+      this->Tuple[0] = a;
+      this->Tuple[1] = b;
+      this->Tuple[2] = c;
+      }
+
+    bool operator==(const vtkIndex& other) const
+      {
+      return (this->Tuple[0] == other.Tuple[0] && 
+        this->Tuple[1] == other.Tuple[1] && 
+        this->Tuple[2] == other.Tuple[2]);
+      }
+    };
+
   /// Returns the selection model that shows the selection on the representation
   /// being shown by this model.
   QItemSelectionModel* selectionModel() const;
@@ -87,17 +113,20 @@ public:
   /// resets the model.
   void forceUpdate();
 
+  /// resets the model if required.
+  void update();
+
   /// Set the best estimate for the visible block. The model will request data
   /// (if not available) only for the most recently selected active block.
   void setActiveBlock(QModelIndex top, QModelIndex bottom);
 
-  QModelIndex indexFor(int processId, vtkIdType index);
 
   /// Returns the field type for the data currently shown by this model.
   int getFieldType() const;
 
-  /// returns the (process id, index) pair for all qt indices.
-  QSet<QPair<vtkIdType, vtkIdType> > getVTKIndices(const QModelIndexList& indexes);
+  // Returns the vtk indices for the view indices. 
+  QSet<vtkIndex> getVTKIndices(const QModelIndexList& indexes);
+
 signals:
   void requestDelayedUpdate() const;
 
@@ -107,6 +136,8 @@ private slots:
 
   /// called to fetch selection for all pending blocks.
   void delayedSelectionUpdate();
+
+  void markDirty();
 
 protected:
   /// Converts a vtkSelection to a QItemSelection.
@@ -127,6 +158,8 @@ protected:
 private:
   pqSpreadSheetViewModel(const pqSpreadSheetViewModel&); // Not implemented.
   void operator=(const pqSpreadSheetViewModel&); // Not implemented.
+
+  QModelIndex indexFor(vtkSelection* vtkselection, vtkIdType index);
 
   class pqInternal;
   pqInternal* Internal;

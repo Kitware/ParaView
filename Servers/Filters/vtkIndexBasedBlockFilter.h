@@ -27,6 +27,7 @@ class vtkMultiProcessController;
 class vtkMultiPieceDataSet;
 class vtkIdTypeArray;
 class vtkDoubleArray;
+class vtkUnsignedIntArray;
 
 class VTK_EXPORT vtkIndexBasedBlockFilter : public vtkTableAlgorithm
 {
@@ -146,6 +147,7 @@ protected:
   vtkIdTypeArray* StructuredCoordinatesArray;
   vtkIdTypeArray* OriginalIndicesArray;
   vtkIdTypeArray* PieceNumberArray;
+  vtkUnsignedIntArray* CompositeIndexArray;
 
   vtkMultiProcessController* Controller;
   vtkIdType BlockSize;
@@ -157,6 +159,10 @@ protected:
   int ProcessID;
   unsigned int CompositeDataSetIndex;
   vtkMultiPieceDataSet* Temporary;
+
+  unsigned int CurrentCIndex;
+  unsigned int CurrentHLevel;
+  unsigned int CurrentHIndex;
 private:
   vtkIndexBasedBlockFilter(const vtkIndexBasedBlockFilter&); // Not implemented
   void operator=(const vtkIndexBasedBlockFilter&); // Not implemented

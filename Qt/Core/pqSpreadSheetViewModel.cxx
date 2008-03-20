@@ -32,12 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpreadSheetViewModel.h"
 
 // Server Manager Includes.
+#include "vtkEventQtSlotConnect.h"
+#include "vtkIdList.h"
 #include "vtkIdTypeArray.h"
 #include "vtkIndexBasedBlockFilter.h"
 #include "vtkInformation.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVArrayInformation.h"
 #include "vtkSelection.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMInputProperty.h"
@@ -45,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSpreadSheetRepresentationProxy.h"
 #include "vtkStdString.h"
 #include "vtkTable.h"
+#include "vtkUnsignedIntArray.h"
 #include "vtkVariant.h"
 
 // Qt Includes.
@@ -57,9 +60,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqDataRepresentation.h"
 
-static uint qHash(QPair<vtkIdType, vtkIdType> pair)
+static uint qHash(pqSpreadSheetViewModel::vtkIndex index)
 {
-  return qHash(pair.second);
+  return qHash(index.Tuple[2]);
 }
 
 
@@ -70,7 +73,10 @@ public:
   SelectionModel(svmodel)
   {
   this->ActiveBlockNumber = 0;
+  this->Dirty = true;
+  this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   }
+
   QPointer<pqDataRepresentation> DataRepresentation;
   vtkSmartPointer<vtkSMSpreadSheetRepresentationProxy> Representation;
   int NumberOfColumns;
@@ -119,6 +125,9 @@ public:
 
   QTimer SelectionTimer;
   QSet<vtkIdType> PendingSelectionBlocks;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+
+  bool Dirty;
 };
 
 //-----------------------------------------------------------------------------
@@ -181,8 +190,24 @@ void pqSpreadSheetViewModel::setRepresentationProxy(
 {
   if (this->Internal->Representation.GetPointer() != repr)
     {
+    this->Internal->VTKConnect->Disconnect();
     this->Internal->Representation = repr;
+    this->Internal->Dirty = true;
+    if (repr)
+      {
+      // when repr updates, the view is dirty.
+      this->Internal->VTKConnect->Connect(repr, vtkCommand::EndEvent,
+        this, SLOT(markDirty()));
+      this->Internal->VTKConnect->Connect(repr, vtkCommand::PropertyModifiedEvent,
+        this, SLOT(markDirty()));
+      }
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetViewModel::markDirty()
+{
+  this->Internal->Dirty = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -203,8 +228,18 @@ int pqSpreadSheetViewModel::getFieldType() const
 }
 
 //-----------------------------------------------------------------------------
+void pqSpreadSheetViewModel::update()
+{
+  if (this->Internal->Dirty)
+    {
+    this->forceUpdate();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqSpreadSheetViewModel::forceUpdate()
 {
+  this->Internal->Dirty = false;
   // Note that this method is called after the representation has already been
   // updated.
   int old_rows = this->Internal->NumberOfRows;
@@ -263,9 +298,10 @@ void pqSpreadSheetViewModel::updateSelectionForBlock(vtkIdType blockNumber)
     // This selection has information about ids that are currently selected.
     // We now need to create a Qt selection list of indices for the items in
     // the vtk selection.
-    QItemSelection qtSelection = this->convertToQtSelection(selection);;
-    this->Internal->SelectionModel.select(qtSelection, 
-      QItemSelectionModel::Select|QItemSelectionModel::Rows);
+    QItemSelection qtSelection = this->convertToQtSelection(selection);
+    this->Internal->SelectionModel.select(qtSelection,
+      QItemSelectionModel::Select|QItemSelectionModel::Rows|
+      QItemSelectionModel::Clear);
     }
 }
 
@@ -447,7 +483,7 @@ QVariant pqSpreadSheetViewModel::headerData (int section, Qt::Orientation orient
 }
 
 //-----------------------------------------------------------------------------
-QModelIndex pqSpreadSheetViewModel::indexFor(int pid, vtkIdType vtkindex)
+QModelIndex pqSpreadSheetViewModel::indexFor(vtkSelection* vtkselection, vtkIdType vtkindex)
 {
   vtkSMSpreadSheetRepresentationProxy* repr = 
     this->Internal->Representation;
@@ -469,18 +505,93 @@ QModelIndex pqSpreadSheetViewModel::indexFor(int pid, vtkIdType vtkindex)
   vtkIdTypeArray* pidcolumn = vtkIdTypeArray::SafeDownCast(
     activeBlock->GetColumnByName("vtkOriginalProcessIds"));
 
-  for (vtkIdType cc=0; cc < indexcolumn->GetNumberOfTuples(); cc++)
+  vtkUnsignedIntArray* compositeIndexColumn = vtkUnsignedIntArray::SafeDownCast(
+    activeBlock->GetColumnByName("vtkCompositeIndexArray"));
+
+  // Get the list of vtkOriginalIndices that match the given vtkindex.
+  vtkIdList* ids = vtkIdList::New();
+  indexcolumn->LookupValue(vtkindex, ids);
+ 
+  if (vtkselection->GetProperties()->Has(vtkSelection::PROCESS_ID()) && pidcolumn)
     {
-    if (indexcolumn->GetValue(cc) == vtkindex)
+    int pid = vtkselection->GetProperties()->Get(vtkSelection::PROCESS_ID());
+    if (pid != -1)
       {
-      if (pid == -1 || !pidcolumn || pidcolumn->GetValue(cc) == pid)
+      // remove those ids from the "ids" list that don't have the same process ID
+      // as the selection.
+      for (vtkIdType cc=0; cc < ids->GetNumberOfIds();)
         {
-        return this->createIndex(this->Internal->computeRowIndex(cc), 0);
+        vtkIdType id = ids->GetId(static_cast<int>(cc));
+        if (pidcolumn->GetValue(id) != pid)
+          {
+          ids->DeleteId(id);
+          }
+        else
+          {
+          cc++;
+          }
         }
       }
     }
 
-  return QModelIndex();
+  if (vtkselection->GetProperties()->Has(vtkSelection::HIERARCHICAL_LEVEL()) &&
+      vtkselection->GetProperties()->Has(vtkSelection::HIERARCHICAL_INDEX()) &&
+      compositeIndexColumn && compositeIndexColumn->GetNumberOfComponents() == 2)
+    {
+    unsigned int hid = static_cast<unsigned int>(
+      vtkselection->GetProperties()->Get(vtkSelection::HIERARCHICAL_INDEX()));
+    unsigned int hlevel = static_cast<unsigned int>(
+      vtkselection->GetProperties()->Get(vtkSelection::HIERARCHICAL_LEVEL()));
+    // remove those ids from the "ids" list that don't have the same process ID
+    // as the selection.
+    for (vtkIdType cc=0; cc < ids->GetNumberOfIds();)
+      {
+      vtkIdType id = ids->GetId(static_cast<int>(cc));
+      unsigned int val[2];
+      compositeIndexColumn->GetTupleValue(id, val);
+      if (val[0] != hlevel || val[1] != hid)
+        {
+        ids->DeleteId(id);
+        }
+      else
+        {
+        cc++;
+        }
+      }
+    }
+  else if (vtkselection->GetProperties()->Has(vtkSelection::COMPOSITE_INDEX()) && 
+    compositeIndexColumn)
+    {
+    unsigned int cid = static_cast<unsigned int>(
+      vtkselection->GetProperties()->Get(vtkSelection::COMPOSITE_INDEX()));
+    // remove those ids from the "ids" list that don't have the same process ID
+    // as the selection.
+    for (vtkIdType cc=0; cc < ids->GetNumberOfIds();)
+      {
+      vtkIdType id = ids->GetId(static_cast<int>(cc));
+      if (compositeIndexColumn->GetValue(id) != cid)
+        {
+        ids->DeleteId(id);
+        }
+      else
+        {
+        cc++;
+        }
+      }
+    }
+
+  QModelIndex idx;
+  if (ids->GetNumberOfIds() > 0)
+    {
+    if (ids->GetNumberOfIds() > 1)
+      {
+      qCritical() << "Multiple ids match the same selection index. Probably a BUG.";
+      }
+    idx = this->createIndex(this->Internal->computeRowIndex(ids->GetId(0)), 0);
+    }
+
+  ids->Delete();
+  return idx;
 }
 
 //-----------------------------------------------------------------------------
@@ -507,15 +618,12 @@ QItemSelection pqSpreadSheetViewModel::convertToQtSelection(vtkSelection* vtksel
     // Iterate over all indices in the vtk selection, 
     // Determine the qt model index for each and then add that to the
     // qt selection.
-    int pid = vtkselection->GetProperties()->Has(vtkSelection::PROCESS_ID())?
-      vtkselection->GetProperties()->Get(vtkSelection::PROCESS_ID()) : -1;
     vtkIdTypeArray *indices = vtkIdTypeArray::SafeDownCast(
       vtkselection->GetSelectionList());
     for (vtkIdType cc=0; indices && cc < indices->GetNumberOfTuples(); cc++)
       {
       vtkIdType idx = indices->GetValue(cc);
-      // cout << "Selection (" << pid << ", " << index << ") " << endl;
-      QModelIndex qtIndex = this->indexFor(pid, idx);
+      QModelIndex qtIndex = this->indexFor(vtkselection, idx);
       if (qtIndex.isValid())
         {
         // cout << "Selecting: " << qtIndex.row() << endl;
@@ -530,37 +638,67 @@ QItemSelection pqSpreadSheetViewModel::convertToQtSelection(vtkSelection* vtksel
 }
 
 //-----------------------------------------------------------------------------
-QSet<QPair<vtkIdType, vtkIdType> > pqSpreadSheetViewModel::getVTKIndices(
+QSet<pqSpreadSheetViewModel::vtkIndex> pqSpreadSheetViewModel::getVTKIndices(
   const QModelIndexList& indexes)
 {
-  QSet<QPair<vtkIdType, vtkIdType> > vtkindices;
+  // each variant in the vtkindices is 3 tuple
+  // - (-1, pid, id) or
+  // - (cid, pid, id) or
+  // - (hlevel, hindex, id)
+  QSet<vtkIndex> vtkindices;
 
   vtkSMSpreadSheetRepresentationProxy* repr =
     this->getRepresentationProxy();
-  if (repr)
+  if (!repr)
     {
-    foreach (QModelIndex idx, indexes)
+    return vtkindices;
+    }
+
+  foreach (QModelIndex idx, indexes)
+    {
+    int row = idx.row();
+    vtkIdType blockNumber = this->Internal->computeBlockNumber(row);
+    vtkIdType blockOffset = this->Internal->computeBlockOffset(row);
+
+    this->Internal->ActiveBlockNumber = blockNumber;
+    vtkTable* table = vtkTable::SafeDownCast(repr->GetOutput(blockNumber));
+    if (table)
       {
-      int row = idx.row();
-      vtkIdType blockNumber = this->Internal->computeBlockNumber(row);
-      vtkIdType blockOffset = this->Internal->computeBlockOffset(row);
+      vtkIndex value;
 
-      this->Internal->ActiveBlockNumber = blockNumber;
-      vtkTable* table = vtkTable::SafeDownCast(repr->GetOutput(blockNumber));
-      if (table)
+      vtkVariant processId = table->GetValueByName(blockOffset, "vtkOriginalProcessIds");
+
+      const char* column_name = "vtkOriginalIndices";
+      if (repr->GetSelectionOnly())
         {
-        vtkVariant processId = table->GetValueByName(blockOffset, "vtkOriginalProcessIds");
-
-        const char* column_name = "vtkOriginalIndices";
-        if (repr->GetSelectionOnly())
-          {
-          column_name = (this->Internal->getFieldType() == vtkIndexBasedBlockFilter::POINT)?
-            "vtkOriginalPointIds" : "vtkOriginalCellIds";
-          }
-        vtkVariant vtkindex = table->GetValueByName(blockOffset, column_name);
-        int pid = processId.IsValid()? processId.ToInt() : 0;
-        vtkindices.insert(QPair<vtkIdType, vtkIdType>(pid, vtkindex.ToLong()));
+        column_name = (this->Internal->getFieldType() == vtkIndexBasedBlockFilter::POINT)?
+          "vtkOriginalPointIds" : "vtkOriginalCellIds";
         }
+
+      int pid = processId.IsValid()? processId.ToInt() : -1;
+      value.Tuple[1] = pid;
+
+      vtkUnsignedIntArray* compositeIndexColumn = vtkUnsignedIntArray::SafeDownCast( 
+        table->GetColumnByName("vtkCompositeIndexArray"));
+      if (compositeIndexColumn)
+        {
+        if (compositeIndexColumn->GetNumberOfComponents() == 2)
+          {
+          // using hierarchical indexing.
+          unsigned int val[3];
+          compositeIndexColumn->GetTupleValue(blockOffset, val);
+          value.Tuple[0] = static_cast<vtkIdType>(val[0]);
+          value.Tuple[1] = static_cast<vtkIdType>(val[1]);
+          }
+        else
+          {
+          value.Tuple[0] = compositeIndexColumn->GetValue(blockOffset);
+          }
+        }
+
+      vtkVariant vtkindex = table->GetValueByName(blockOffset, column_name);
+      value.Tuple[2] = static_cast<vtkIdType>(vtkindex.ToLongLong());
+      vtkindices.insert(value);
       }
     }
   return vtkindices;

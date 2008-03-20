@@ -27,7 +27,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSpreadSheetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSpreadSheetRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMSpreadSheetRepresentationProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMSpreadSheetRepresentationProxy::vtkSMSpreadSheetRepresentationProxy()
 {
@@ -109,8 +109,14 @@ void vtkSMSpreadSheetRepresentationProxy::PassEssentialAttributes()
     {
     vtkSMProperty* src = this->GetProperty(pnames[cc]);
     vtkSMProperty* dest = this->SelectionRepresentation->GetProperty(pnames[cc]);
-    dest->Copy(src);
-    this->SelectionRepresentation->UpdateProperty(pnames[cc]);
+    if (src->GetMTime() > dest->GetMTime())
+      {
+      // Otherwise Copy() call Modified() every time and the spreadsheet view 
+      // then needs to update everything since is thinks a property on the 
+      // repsentation has changed.
+      dest->Copy(src);
+      this->SelectionRepresentation->UpdateProperty(pnames[cc]);
+      }
     }
 
 }
