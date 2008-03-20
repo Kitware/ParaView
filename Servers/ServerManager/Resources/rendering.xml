@@ -445,7 +445,11 @@
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
+        <InputArrayDomain name="input_array" 
+          attribute_type="point">
+        </InputArrayDomain>
       </InputProperty>
+
       <ProxyProperty
         name="LabelTextProperty"
         command="SetLabelTextProperty">
@@ -453,6 +457,7 @@
           <Group name="properties" />
         </ProxyGroupDomain>
       </ProxyProperty>
+
       <IntVectorProperty
         name="LabelMode"
         command="SetLabelMode"
@@ -469,6 +474,7 @@
           <Entry value="6" text="FieldData" />
         </EnumerationDomain>
       </IntVectorProperty>
+
       <IntVectorProperty
         name="FieldDataArrayIndex"
         command="SetFieldDataArray"
@@ -476,10 +482,20 @@
         default_values="0">
         <IntRangeDomain name="range" min="0" />
       </IntVectorProperty>
+
       <StringVectorProperty name="FieldDataArrayName"
         command="SetFieldDataName"
         number_of_elements="1">
+        <ArrayListDomain name="array_list" 
+          attribute_type="Scalars"
+          input_domain_name="input_array">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
       </StringVectorProperty>
+
+      <!-- End of LabeledDataMapper -->
     </SourceProxy>
 
     <SourceProxy name="PolyDataMapper" class="vtkPolyDataMapper">
@@ -4559,7 +4575,6 @@
           proxygroup="representations"
           proxyname="DataLabelRepresentation" />
         <ExposedProperties>
-          <Property name="PointLabelMode" />
           <Property name="PointLabelColor" />
           <Property name="PointLabelOpacity" />
           <Property name="PointLabelFontFamily" />
@@ -4571,7 +4586,6 @@
           <Property name="PointFieldDataArrayIndex" />
           <Property name="PointFieldDataArrayName" />
           
-          <Property name="CellLabelMode" />
           <Property name="CellLabelColor" />
           <Property name="CellLabelOpacity" />
           <Property name="CellLabelFontFamily" />
@@ -5510,7 +5524,6 @@
           
           <Property name="PointLabelVisibility" 
                     exposed_name="SelectionPointLabelVisibility" />
-          <Property name="PointLabelMode" exposed_name="SelectionPointLabelMode" />
           <Property name="PointLabelColor" exposed_name="SelectionPointLabelColor" />
           <Property name="PointLabelOpacity" exposed_name="SelectionPointLabelOpacity" />
           <Property name="PointLabelFontFamily" exposed_name="SelectionPointLabelFontFamily" />
@@ -5524,7 +5537,6 @@
 
           <Property name="CellLabelVisibility" 
                     exposed_name="SelectionCellLabelVisibility" />
-          <Property name="CellLabelMode" exposed_name="SelectionCellLabelMode" />
           <Property name="CellLabelColor" exposed_name="SelectionCellLabelColor" />
           <Property name="CellLabelOpacity" exposed_name="SelectionCellLabelOpacity" />
           <Property name="CellLabelFontFamily" exposed_name="SelectionCellLabelFontFamily" />

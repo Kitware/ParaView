@@ -451,6 +451,11 @@ void vtkSMDataLabelRepresentationProxy::Update(
   this->GeometryIsValid = 1;
   this->UpdateSuppressorProxy->InvokeCommand("ForceUpdate");
   this->Superclass::Update(view);
+
+  // This updates the domains for the choosing the correct array name on the
+  // mapper.
+  this->MapperProxy->GetProperty("Input")->UpdateDependentDomains();
+  this->CellMapperProxy->GetProperty("Input")->UpdateDependentDomains();
 //  this->InvokeEvent(vtkSMViewProxy::ForceUpdateEvent);
 }
 

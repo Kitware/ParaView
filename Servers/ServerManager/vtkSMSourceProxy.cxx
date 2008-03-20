@@ -43,7 +43,7 @@
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.62");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.63");
 
 // This struct will keep all information associated with the output port.
 struct vtkSMSourceProxyOutputPort
@@ -596,6 +596,16 @@ void vtkSMSourceProxy::MarkModified(vtkSMProxy* modifiedProxy)
     {
     this->UpdatePipeline();
     }
+
+  // Mark the extract selection proxies modified as well.
+  // This is needed to be done explicitly since we don't use vtkSMInputProperty
+  // to connect this proxy to the input of the extract selection filter.
+  vtkstd::vector<vtkSmartPointer<vtkSMSourceProxy> >::iterator iter;
+  for (iter = this->PInternals->SelectionProxies.begin();
+    iter != this->PInternals->SelectionProxies.end(); ++iter)
+  {
+  iter->GetPointer()->MarkModified(modifiedProxy);
+  }
 
   this->Superclass::MarkModified(modifiedProxy);
   this->InvalidateDataInformation();

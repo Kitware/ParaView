@@ -132,7 +132,6 @@ protected:
   void setupGlobalIDSelectionGUI();
 
   void setupSelectionLabelGUI();
-  void updateSelectionLabelModes();
 
   /// Sets up property links between the selection source proxy and the GUI.
   void updateSelectionGUI();

@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveView.h"
 #include "pqApplicationCore.h"
+#include "pqComboBoxDomain.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineRepresentation.h"
@@ -70,7 +71,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSignalAdaptorTreeWidget.h"
 #include "pqSMAdaptor.h"
 #include "pqTreeWidgetItemObject.h"
-
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -146,6 +146,9 @@ public:
     this->VTKConnectSelInput = vtkEventQtSlotConnect::New();
     this->VTKConnectRep = vtkEventQtSlotConnect::New();
     this->UpdatingGUI = false;
+
+    this->PointLabelArrayDomain = 0;
+    this->CellLabelArrayDomain = 0;
     }
 
   ~pqImplementation()
@@ -170,6 +173,9 @@ public:
     this->InputPort = 0;
     this->VTKConnectSelInput->Delete();
     this->VTKConnectRep->Delete();
+
+    delete this->PointLabelArrayDomain;
+    delete this->CellLabelArrayDomain;
     }
 
   // returns the algorithm that is producing the selection we are extracting
@@ -219,6 +225,9 @@ public:
   pqSignalAdaptorTreeWidget* ThresholdsAdaptor;
   pqSignalAdaptorComboBox *ThresholdScalarArrayAdaptor;
   pqSignalAdaptorCompositeTreeWidget* CompositeTreeAdaptor;
+
+  pqComboBoxDomain* PointLabelArrayDomain;
+  pqComboBoxDomain* CellLabelArrayDomain;
 
   bool UseProcessID;
   bool UpdatingGUI;
@@ -406,7 +415,6 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
 
   // TODO: This needs to be changed to use domains where-ever possible.
   this->updateThreholdDataArrays();
-  this->updateSelectionLabelModes();
 
   this->Implementation->UpdatingGUI = false;
 }
@@ -553,6 +561,10 @@ void pqSelectionInspectorPanel::updateDisplayStyleGUI()
     return;
     }
 
+  delete this->Implementation->PointLabelArrayDomain;
+  delete this->Implementation->CellLabelArrayDomain;
+  this->Implementation->PointLabelArrayDomain = 0;
+  this->Implementation->CellLabelArrayDomain = 0;
   this->Implementation->RepLinks->removeAllPropertyLinks();
   this->Implementation->VTKConnectRep->Disconnect();
   this->Implementation->PrevRepresentation = selRepresentation;
@@ -664,6 +676,16 @@ void pqSelectionInspectorPanel::updateDisplayStyleGUI()
   this->Implementation->RepLinks->addPropertyLink(
     this->Implementation->spinBoxOpacity_Cell, "value", SIGNAL(valueChanged(double)),
     reprProxy, reprProxy->GetProperty("SelectionCellLabelOpacity"));
+
+  this->Implementation->PointLabelArrayDomain = new pqComboBoxDomain(
+    this->Implementation->comboLabelMode_Point,
+    reprProxy->GetProperty("SelectionPointFieldDataArrayName"));
+  this->Implementation->PointLabelArrayDomain->addString("Point IDs");
+
+  this->Implementation->CellLabelArrayDomain = new pqComboBoxDomain(
+    this->Implementation->comboLabelMode_Cell,
+    reprProxy->GetProperty("SelectionCellFieldDataArrayName"));
+  this->Implementation->CellLabelArrayDomain->addString("Cell IDs");
 }
 
 //-----------------------------------------------------------------------------
@@ -899,47 +921,6 @@ void pqSelectionInspectorPanel::updateSelectionLabelEnableState()
     { 
     this->Implementation->groupSelectionLabel->setEnabled(false);
     }
-}
-
-//-----------------------------------------------------------------------------
-void pqSelectionInspectorPanel::updateSelectionLabelModes()
-{
-  //TODO: Fix this to use domains instead.
-  if (!this->Implementation->InputPort)
-    {
-    return;
-    }
-
-  vtkSMSourceProxy* sourceProxy = vtkSMSourceProxy::SafeDownCast(
-    this->Implementation->InputPort->getSource()->getProxy());
-  vtkPVDataInformation* geomInfo = sourceProxy->GetDataInformation(
-    this->Implementation->InputPort->getPortNumber());
-
-  vtkPVDataSetAttributesInformation* attrInfo;
-
-  this->Implementation->comboLabelMode_Point->clear();
-  this->Implementation->comboLabelMode_Point->addItem("Point IDs");
-  attrInfo = geomInfo->GetPointDataInformation();
-  for(int i=0; i<attrInfo->GetNumberOfArrays(); i++)
-    {
-    QString arrayName = attrInfo->GetArrayInformation(i)->GetName();
-    if(arrayName != "vtkOriginalPointIds") // "Point IDs"
-      {
-      this->Implementation->comboLabelMode_Point->addItem(arrayName);
-      }
-    }
-
-  this->Implementation->comboLabelMode_Cell->clear();
-  this->Implementation->comboLabelMode_Cell->addItem("Cell IDs");
-  attrInfo = geomInfo->GetCellDataInformation();
-  for(int i=0; i<attrInfo->GetNumberOfArrays(); i++)
-    {
-    QString arrayName = attrInfo->GetArrayInformation(i)->GetName();
-    if(arrayName != "vtkOriginalCellIds") // "Cell IDs"
-      {
-      this->Implementation->comboLabelMode_Cell->addItem(arrayName);
-      }
-    }      
 }
 
 //-----------------------------------------------------------------------------

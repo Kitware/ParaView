@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>333</width>
-    <height>915</height>
+    <height>754</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -1602,6 +1602,19 @@
       </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

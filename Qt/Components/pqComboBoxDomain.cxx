@@ -70,6 +70,7 @@ public:
   vtkSmartPointer<vtkSMDomain> Domain;
   vtkEventQtSlotConnect* Connection;
   QString DomainName;
+  QStringList UserStrings;
   bool MarkedForUpdate;
 };
   
@@ -118,6 +119,18 @@ pqComboBoxDomain::pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop,
 pqComboBoxDomain::~pqComboBoxDomain()
 {
   delete this->Internal;
+}
+
+void pqComboBoxDomain::addString(const QString& str)
+{
+  this->Internal->UserStrings.push_back(str);
+  this->domainChanged();
+}
+
+void pqComboBoxDomain::removeAllStrings()
+{
+  this->Internal->UserStrings.clear();
+  this->domainChanged();
 }
 
 void pqComboBoxDomain::domainChanged()
@@ -172,6 +185,14 @@ void pqComboBoxDomain::internalDomainChanged()
     foreach(vtkSMProxy* pxy, proxies)
       {
       domain.append(pxy->GetXMLLabel());
+      }
+    }
+
+  foreach (QString userStr, this->Internal->UserStrings)
+    {
+    if (!domain.contains(userStr))
+      {
+      domain.push_front(userStr);
       }
     }
 

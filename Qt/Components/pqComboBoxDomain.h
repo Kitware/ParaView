@@ -60,6 +60,10 @@ public:
   void forceDomainChanged() 
     { this->internalDomainChanged(); }
 
+  /// Provides a mechanism to always add a set of strings to the combo box
+  /// irrespective of what the domain tells us.
+  void addString(const QString&);
+  void removeAllStrings();
 public slots:
   void domainChanged();
 protected slots:
