@@ -31,7 +31,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkIndexBasedBlockSelectionFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockSelectionFilter, "1.3");
+vtkCxxRevisionMacro(vtkIndexBasedBlockSelectionFilter, "1.4");
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockSelectionFilter::vtkIndexBasedBlockSelectionFilter()
 {
@@ -341,9 +341,9 @@ int vtkIndexBasedBlockSelectionFilter::RequestDataInternal(vtkSelection* input,
     if ((*iter)->GetProperties()->Has(vtkSelection::HIERARCHICAL_INDEX()))
       {
       unsigned int hi = (*iter)->GetProperties()->Get(vtkSelection::HIERARCHICAL_INDEX());
-      vtkIdType offset = pieceOffsets[hi];
-      vtkIdType startIndex = (offset > this->StartIndex? 0 : this->StartIndex - offset);
-      vtkIdType endIndex = (offset > this->StartIndex? this->EndIndex-offset: this->EndIndex);
+      vtkIdType pieceOffset = pieceOffsets[hi];
+      vtkIdType startIndex = (pieceOffset > this->StartIndex? 0 : this->StartIndex - pieceOffset);
+      vtkIdType endIndex = (pieceOffset > this->StartIndex? this->EndIndex-pieceOffset: this->EndIndex);
       if (!this->RequestDataInternal(startIndex, endIndex, *iter, outChild))
         {
         return 0;
