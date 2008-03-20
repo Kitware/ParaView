@@ -37,7 +37,7 @@ inline void vtkSMPVRepresentationProxySetInt(
 }
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.17");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -391,7 +391,6 @@ void vtkSMPVRepresentationProxy::SetViewUpdateTime(double time)
     }
   this->CubeAxesRepresentation->SetViewUpdateTime(time);
 }
-
 
 //----------------------------------------------------------------------------
 void vtkSMPVRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)

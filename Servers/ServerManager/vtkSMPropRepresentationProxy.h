@@ -52,6 +52,16 @@ public:
   virtual void SetUpdateTime(double time);
 
   // Description:
+  // When set to true, the UpdateTime for this representation is linked to the
+  // ViewTime for the view to which this representation is added (default
+  // behaviour). Otherwise the update time is independent of the ViewTime.
+  virtual void SetUseViewUpdateTime(bool);
+
+  // Description:
+  // Called by the view to pass the view's update time to the representation.
+  virtual void SetViewUpdateTime(double time);
+
+  // Description:
   // Overridden to fill with strategies from SelectionRepresentation.
   virtual void GetActiveStrategies(
     vtkSMRepresentationStrategyVector& activeStrategies);
