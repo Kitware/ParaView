@@ -29,7 +29,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.27");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.28");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -265,12 +265,26 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
       parameter != this->Implementation->Parameters.end();
       ++parameter)
     {
-    fscript += "\t" + parameter->first + " = " + parameter->second + "\n";
+    fscript += "  " + parameter->first + " = " + parameter->second + "\n";
     } 
   
   // Indent user script
-  fscript += "\t";
-  vtkstd::string orgscript(script);
+  fscript += "  ";
+
+  // Replace tabs with two spaces
+  vtkstd::string orgscript;
+  size_t len = strlen(script);
+  for(size_t i=0; i< len; i++)
+    {
+    if (script[i] == '\t')
+      {
+      orgscript += "  ";
+      }
+    else
+      {
+      orgscript.push_back(script[i]);
+      }
+    }
   // Remove DOS line endings. They confuse the indentation code below.
   orgscript.erase(
     vtkstd::remove(orgscript.begin(), orgscript.end(), '\r'), orgscript.end());
@@ -282,7 +296,7 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
     // indent new lines
     if (*it == '\n')
       {
-      fscript += "\t";
+      fscript += "  ";
       }
     }
   fscript += "\n";
