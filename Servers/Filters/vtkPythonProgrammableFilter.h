@@ -16,11 +16,24 @@
 // on its input dataset to produce an output dataset.
 // .SECTION Description
 // This filter will execute a python script to produce an output dataset.
-// The filter keeps a copy of the python script in Script, and creates 
-// Interpretor, a python interpretor to run the script in upon the first 
-// execution. Use SetOutputDataSetType to choose and output data type instead
-// of using the default of using the same type as is on the input.
-// Use InformationScript to set meta-information during RequestInformation().
+// An new interpretor is created at the beginning of RequestInformation().
+// The state of the python interpretor is preserved until the
+// next execution of RequestInformation().
+// After the interpretor is creates the vtk module is imported with 
+// "from paraview import vtk".
+//
+// Then the interpretor runs the InformationScript during RequestInformation().
+// This script is run in a python function called RequestInformation().
+// An argument named self that refers to the programmable filter is passed
+// to the function.
+// The interpretor also runs the Script during RequestData().
+// This script is run in a python function called RequestData().
+// An argument named self that refers to the programmable filter is passed
+// to the function.
+// Furthermore, a set of parameters passed with the SetParameter()
+// call are defined as Python variables inside both scripts. This allows
+// the developer to keep the scripts the same but change their behaviour
+// using parameters.
 // .SECTION Caveat
 // Note that this algorithm sets the output extent translator to be
 // vtkOnePieceExtentTranslator. This means that all processes will ask
@@ -42,7 +55,13 @@ public:
 
   // Description: 
   // Set the text of the python script to execute.
-  void SetScript(const char *script);
+  vtkSetStringMacro(Script)
+  vtkGetStringMacro(Script)
+
+  // Description: 
+  // Set the text of the python script to execute in RequestInformation().
+  vtkSetStringMacro(InformationScript)
+  vtkGetStringMacro(InformationScript)
 
   // Description:
   // Set a name-value parameter that will be available to the script
@@ -52,11 +71,6 @@ public:
   // Description:
   // Clear all name-value parameters
   void ClearParameters();
-
-  // Description: 
-  // Set the text of the python script to execute in RequestInformation().
-  vtkSetStringMacro(InformationScript)
-  vtkGetStringMacro(InformationScript)
 
   // Description: 
   // For internal use only.
@@ -70,7 +84,7 @@ public:
 
   // Description:
   // This is overridden to break a cyclic reference between "this" and 
-  // this->Interpretor which has a self that points to "this". 
+  // this->Interpretor which has a self that points to "this".
   virtual void UnRegister(vtkObjectBase *o);
 
 protected:
@@ -79,8 +93,7 @@ protected:
 
   // Description:
   // For internal use only.
-  void Exec();
-  void Exec(const char*);
+  void Exec(const char*, const char*);
 
   virtual int FillOutputPortInformation(int port, vtkInformation* info);
 

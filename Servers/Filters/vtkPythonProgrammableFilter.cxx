@@ -29,7 +29,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.26");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.27");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -40,27 +40,36 @@ class vtkPythonProgrammableFilterImplementation
 {
 public:
   vtkPythonProgrammableFilterImplementation() :
-    Running(0),
-    Interpretor(NULL)
+    Interpretor(NULL), PythonVarDefined(false)
   {
   }
 
   void DestroyInterpretor()
     {
-    vtkstd::string script;
-    script  = "";
-    script += "self = 0\n";
-    this->Interpretor->RunSimpleString(script.c_str());
-    this->Interpretor->Delete();
-    this->Interpretor = 0;
+      if (this->Interpretor)
+        {
+        this->PythonVarDefined = false;
+        // The following is necessary because the Delete() may
+        // cause the destruction of vtkPythonProgrammableFilter
+        // which calls DestroyInterpretor() in its destructor.
+        // If this->Interpretor is not set to 0, it will be
+        // deleted a second time causing segmentation fault.
+        vtkPVPythonInterpretor* interp = this->Interpretor;
+        this->Interpretor = 0;
+        interp->Delete();
+        }
     }
 
-  //state used to get by a reference counting cyclic loop
-  int Running;
   vtkPVPythonInterpretor* Interpretor;
   
   // Stores name-value parameters that will be passed to running scripts
   ParametersT Parameters;
+
+  // PythonVarDefined is true if python interp has a variable
+  // that points to this filter. This means thatthere is reference 
+  // loop due to:
+  // filter <-> interpretor
+  bool PythonVarDefined;
 };
 
 //----------------------------------------------------------------------------
@@ -69,71 +78,29 @@ vtkPythonProgrammableFilter::vtkPythonProgrammableFilter() :
 {
   this->Script = NULL;
   this->InformationScript = NULL;
+  this->SetExecuteMethod(vtkPythonProgrammableFilter::ExecuteScript, this);
   this->OutputDataSetType = VTK_POLY_DATA;
+}
+
+//----------------------------------------------------------------------------
+vtkPythonProgrammableFilter::~vtkPythonProgrammableFilter()
+{
+  this->SetScript(NULL);
+  this->SetInformationScript(NULL);
+
+  this->Implementation->DestroyInterpretor();
+  delete this->Implementation;
 }
 
 //----------------------------------------------------------------------------
 void vtkPythonProgrammableFilter::UnRegister(vtkObjectBase *o)
 {
   this->Superclass::UnRegister(o);
-  if (this->GetReferenceCount() == 4 && 
-      this->Implementation->Interpretor != NULL &&
-      !this->Implementation->Running
-    )
+  bool hasRefLoop = this->Implementation->PythonVarDefined ? true : false;
+  if (this->GetReferenceCount() == 3 && hasRefLoop)
     {
-    vtkPVPythonInterpretor *cpy = this->Implementation->Interpretor;
-    vtkstd::string script;
-    script  = "";
-    script += "self = 0\n";
-    cpy->RunSimpleString(script.c_str());
-    this->Implementation->Interpretor = NULL;
-    cpy->UnRegister(this);
+    this->Implementation->DestroyInterpretor();
     }
-}
-
-//----------------------------------------------------------------------------
-vtkPythonProgrammableFilter::~vtkPythonProgrammableFilter()
-{
-  if (this->Script != NULL)
-    {
-    delete[] this->Script;
-    }
-  this->SetInformationScript(NULL);
-
-  if (this->Implementation->Interpretor != NULL)
-    {
-    this->Implementation->Interpretor->Delete();
-    }
-    
-  delete this->Implementation;
-}
-
-//----------------------------------------------------------------------------
-int vtkPythonProgrammableFilter::RequestInformation(
-  vtkInformation*, 
-  vtkInformationVector**, 
-  vtkInformationVector* outputVector)
-{
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-
-  // Setup ExtentTranslator so that all downstream piece requests are
-  // converted to whole extent update requests, as need by the histogram filter.
-  vtkStreamingDemandDrivenPipeline* sddp = 
-    vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
-  if (strcmp(
-      sddp->GetExtentTranslator(outInfo)->GetClassName(), 
-      "vtkOnePieceExtentTranslator") != 0)
-    {
-    vtkExtentTranslator* et = vtkOnePieceExtentTranslator::New();
-    sddp->SetExtentTranslator(outInfo, et);
-    et->Delete();
-    }
-
-  if (this->InformationScript)
-    {
-    this->Exec(this->InformationScript);    
-    }
-  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -163,7 +130,6 @@ int vtkPythonProgrammableFilter::RequestDataObject(
           {
           vtkDataObject* newOutput = input->NewInstance();
           newOutput->SetPipelineInformation(info);
-          cout << "Created: " << newOutput->GetClassName() << endl;
           newOutput->Delete();
           this->GetOutputPortInformation(0)->Set(
             vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
@@ -203,28 +169,39 @@ int vtkPythonProgrammableFilter::RequestDataObject(
 }
 
 //----------------------------------------------------------------------------
-void vtkPythonProgrammableFilter::SetScript(const char *script)
-{  
-  if (script == NULL)
+int vtkPythonProgrammableFilter::RequestInformation(
+  vtkInformation*, 
+  vtkInformationVector**, 
+  vtkInformationVector* outputVector)
+{
+  // Start with a new interpretor
+  this->Implementation->DestroyInterpretor();
+
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+
+  // Setup ExtentTranslator so that all downstream piece requests are
+  // converted to whole extent update requests, as need by the histogram filter.
+  vtkStreamingDemandDrivenPipeline* sddp = 
+    vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
+  if (strcmp(
+      sddp->GetExtentTranslator(outInfo)->GetClassName(), 
+      "vtkOnePieceExtentTranslator") != 0)
     {
-    return;
+    vtkExtentTranslator* et = vtkOnePieceExtentTranslator::New();
+    sddp->SetExtentTranslator(outInfo, et);
+    et->Delete();
     }
 
-  if (this->Script != NULL)
+  if (this->InformationScript)
     {
-    delete[] this->Script;
+    this->Exec(this->InformationScript, "RequestInformation");
     }
-  
-  int len = strlen(script) + 1;
-  this->Script = new char[len];
-  memcpy(this->Script, script, len-1);   
-  this->Script[len-1] = 0;
-  this->SetExecuteMethod(vtkPythonProgrammableFilter::ExecuteScript, this);
-  this->Modified();
+  return 1;
 }
 
 //----------------------------------------------------------------------------
-void vtkPythonProgrammableFilter::SetParameter(const char *raw_name, const char *raw_value)
+void vtkPythonProgrammableFilter::SetParameter(const char *raw_name, 
+                                               const char *raw_value)
 {
   const vtkstd::string name = raw_name ? raw_name : "";
   const vtkstd::string value = raw_value ? raw_value : "";
@@ -251,68 +228,99 @@ void vtkPythonProgrammableFilter::ExecuteScript(void *arg)
 {  
   vtkPythonProgrammableFilter *self = 
     static_cast<vtkPythonProgrammableFilter*>(arg);
-  if (self != NULL)
+  if (self)
     {
-    self->Exec();
+    self->Exec(self->GetScript(), "RequestData");
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPythonProgrammableFilter::Exec(const char* script)
+void vtkPythonProgrammableFilter::Exec(const char* script,
+                                       const char* funcname)
 {
   if (!script || !strlen(script))
     {
     return;
     }
 
-  this->Implementation->Running = 1;
   if (this->Implementation->Interpretor == NULL)
     {
     this->Implementation->Interpretor = vtkPVPythonInterpretor::New();
     this->Implementation->Interpretor->SetCaptureStreams(true);
     const char* argv0 = vtkProcessModule::GetProcessModule()->
       GetOptions()->GetArgv0();
-    this->Implementation->Interpretor->InitializeSubInterpretor(1, (char**)&argv0);
+    this->Implementation->Interpretor->InitializeSubInterpretor(
+      1, (char**)&argv0);
+    }
 
+  // Construct a script that defines a function
+  vtkstd::string fscript;
+  fscript  = "def ";
+  fscript += funcname;
+
+  // Set the parameters defined by user.
+  fscript += "(self):\n";
+  for(ParametersT::const_iterator parameter = 
+        this->Implementation->Parameters.begin();
+      parameter != this->Implementation->Parameters.end();
+      ++parameter)
+    {
+    fscript += "\t" + parameter->first + " = " + parameter->second + "\n";
+    } 
+  
+  // Indent user script
+  fscript += "\t";
+  vtkstd::string orgscript(script);
+  // Remove DOS line endings. They confuse the indentation code below.
+  orgscript.erase(
+    vtkstd::remove(orgscript.begin(), orgscript.end(), '\r'), orgscript.end());
+
+  vtkstd::string::iterator it = orgscript.begin();
+  for(; it != orgscript.end(); it++)
+    {
+    fscript += *it;
+    // indent new lines
+    if (*it == '\n')
+      {
+      fscript += "\t";
+      }
+    }
+  fscript += "\n";
+  this->Implementation->Interpretor->RunSimpleString(fscript.c_str());
+
+  if (!this->Implementation->PythonVarDefined)
+    {
+    vtkstd::string initscript;
+    initscript = "from paraview import vtk\n";
+
+    // Set self to point to this
     char addrofthis[1024];
     sprintf(addrofthis, "%p", this);    
     char *aplus = addrofthis; 
-    if ((addrofthis[0] == '0') && ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
+    if ((addrofthis[0] == '0') && 
+        ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
       {
       aplus += 2; //skip over "0x"
       }
-    vtkstd::string initscript;
-    initscript  = "";
-    initscript += "from paraview import vtk;\n";
-    initscript += "self = vtk.vtkProgrammableFilter('";
+    initscript += "_progfilter = vtk.vtkProgrammableFilter('";
     initscript += aplus;
-    initscript +=  "');\n";
-    
-    for(
-      ParametersT::const_iterator parameter = this->Implementation->Parameters.begin();
-      parameter != this->Implementation->Parameters.end();
-      ++parameter)
-      {
-      initscript += parameter->first + " = " + parameter->second + "\n";
-      } 
-    
+    initscript += "')\n";
     this->Implementation->Interpretor->RunSimpleString(initscript.c_str());
+    // The interpretor has a pointer to the filter therefore there is
+    // a reference loop.
+    this->Implementation->PythonVarDefined = true;
     }
-  this->Implementation->Interpretor->RunSimpleString(script);
+  
+  vtkstd::string runscript;
+  // Call the function
+  runscript += funcname;
+  runscript += "(_progfilter)\n";
+
+  this->Implementation->Interpretor->RunSimpleString(runscript.c_str());
 
   this->Implementation->Interpretor->FlushMessages();
-  this->Implementation->DestroyInterpretor();
-  this->Implementation->Running = 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkPythonProgrammableFilter::Exec()
-{
-  if (this->Script == NULL)
-    {
-    return;
-    }
-  this->Exec(this->Script);
+  //this->Implementation->Interpretor->Delete();
+  //this->Implementation->Interpretor = NULL;
 }
 
 //----------------------------------------------------------------------------
