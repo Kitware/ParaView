@@ -1250,18 +1250,27 @@ def CreateRepresentation(aProxy, view, **extraArgs):
     keyword arguments where the key is the name of the property.In addition
     registrationGroup and registrationName (optional) can be specified (as
     keyword arguments) to automatically register the proxy with the proxy
-    manager."""
+    manager.
+    
+    This method tries to create the best possible representation for the given
+    proxy in the given view. Additionally, the user can specify proxyName
+    (optional) to create a representation of a particular type."""
 
     global rendering
     if not aProxy:
         raise exceptions.RuntimeError, "proxy argument cannot be None."
     if not view:
         raise exceptions.RuntimeError, "render module argument cannot be None."
-    display = view.SMProxy.CreateDefaultRepresentation(aProxy.SMProxy, 0)
+    if "proxyName" in extraArgs:
+      display = CreateProxy("representations", extraArgs['proxyName'], None)
+      del extraArgs['proxyName']
+    else:
+      display = view.SMProxy.CreateDefaultRepresentation(aProxy.SMProxy, 0)
+      if display:
+        display.UnRegister(None)
     if not display:
         return None
     display.SetConnectionID(aProxy.GetConnectionID())
-    display.UnRegister(None)
     extraArgs['proxy'] = display
     proxy = rendering.__dict__[display.GetXMLName()](**extraArgs)
     proxy.Input = aProxy
