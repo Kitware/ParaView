@@ -347,6 +347,30 @@
    <header>pqColorChooserButton.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>CubeAxesXTitle</tabstop>
+  <tabstop>CubeAxesXAxisVisibility</tabstop>
+  <tabstop>CubeAxesXAxisTickVisibility</tabstop>
+  <tabstop>CubeAxesXAxisMinorTickVisibility</tabstop>
+  <tabstop>CubeAxesXGridLines</tabstop>
+  <tabstop>CubeAxesYTitle</tabstop>
+  <tabstop>CubeAxesYAxisVisibility</tabstop>
+  <tabstop>CubeAxesYAxisTickVisibility</tabstop>
+  <tabstop>CubeAxesYAxisMinorTickVisibility</tabstop>
+  <tabstop>CubeAxesYGridLines</tabstop>
+  <tabstop>CubeAxesZTitle</tabstop>
+  <tabstop>CubeAxesZAxisVisibility</tabstop>
+  <tabstop>CubeAxesZAxisTickVisibility</tabstop>
+  <tabstop>CubeAxesZAxisMinorTickVisibility</tabstop>
+  <tabstop>CubeAxesZGridLines</tabstop>
+  <tabstop>CubeAxesFlyMode</tabstop>
+  <tabstop>CubeAxesTickLocation</tabstop>
+  <tabstop>CubeAxesCornerOffset</tabstop>
+  <tabstop>Color</tabstop>
+  <tabstop>Ok</tabstop>
+  <tabstop>Cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

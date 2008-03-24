@@ -916,14 +916,21 @@
   <tabstop>ViewZoomToData</tabstop>
   <tabstop>ColorInterpolateColors</tabstop>
   <tabstop>ColorMapScalars</tabstop>
+  <tabstop>Texture</tabstop>
   <tabstop>EditColorMapButton</tabstop>
   <tabstop>RescaleButton</tabstop>
   <tabstop>ColorActorColor</tabstop>
+  <tabstop>SliceDirection</tabstop>
+  <tabstop>Slice</tabstop>
+  <tabstop>StyleRepresentation</tabstop>
   <tabstop>StyleInterpolation</tabstop>
   <tabstop>StyleMaterial</tabstop>
   <tabstop>StylePointSize</tabstop>
   <tabstop>StyleLineWidth</tabstop>
   <tabstop>Opacity</tabstop>
+  <tabstop>EdgeColor</tabstop>
+  <tabstop>ShowCubeAxes</tabstop>
+  <tabstop>EditCubeAxes</tabstop>
   <tabstop>SpecularIntensity</tabstop>
   <tabstop>SpecularPower</tabstop>
   <tabstop>SpecularWhite</tabstop>
