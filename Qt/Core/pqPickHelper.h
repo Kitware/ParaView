@@ -73,9 +73,13 @@ public slots:
   /// that it is not in pick mode.
   void setView(pqView*);
 
+  /// Use beginPick()/endPick() when the helper should enter into a picking
+  /// mode. For instantaneous picking, simply call pick().
   void beginPick();
   void endPick();
 
+  /// Instantly picks and fires pickFinished().
+  void pick();
 signals:
   /// fired after mouse up in pick mode
   void pickFinished(double x, double y, double z);

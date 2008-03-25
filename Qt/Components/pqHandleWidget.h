@@ -48,7 +48,6 @@ public:
   pqHandleWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* p);
   ~pqHandleWidget();
 
-
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
   /// This typically calls PlaceWidget on the underlying 3D Widget 
   /// with reference proxy bounds.
@@ -56,6 +55,10 @@ public:
   /// and the widget is initialized i.e. the reference proxy, controlled proxy
   /// and hints have been set.
   virtual void resetBounds();
+
+  /// Set the view that this panel works with. Overridden to update picking
+  /// shortcut.
+  virtual void setView(pqView*);
 
 private slots:
   /// Called to reset the 3D widget bounds to the reference proxy bounds
@@ -68,6 +71,8 @@ private slots:
   void on3DWidgetEndDrag();
   /// Called when the user changes widget visibility
   void onWidgetVisibilityChanged(bool visible);
+  /// Called on pick.
+  void pick(double, double, double);
 
 protected:
   /// Internal method to create the widget.
@@ -75,6 +80,12 @@ protected:
   
   /// Internal method to cleanup widget.
   void cleanupWidget();
+
+  /// Overridden to update picking shortcut.
+  void updatePickShortcut();
+
+  /// Called every time the widget enabled/visible state needs to be updated.
+  virtual void updateWidgetVisibility();
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

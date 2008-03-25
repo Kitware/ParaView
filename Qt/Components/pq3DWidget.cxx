@@ -458,6 +458,14 @@ int pq3DWidget::getReferenceInputBounds(double bounds[6]) const
 }
 
 //-----------------------------------------------------------------------------
+bool pq3DWidget::realWidgetVisibility() const
+{
+  return (this->Internal->Selected
+    && this->Internal->WidgetVisible &&
+    this->Internal->WidgetProxy && this->renderView());
+}
+
+//-----------------------------------------------------------------------------
 void pq3DWidget::updateWidgetVisibility()
 {
   const bool widget_visible = this->Internal->Selected

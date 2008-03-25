@@ -155,15 +155,18 @@ protected:
   /// Called when one of the controlled properties change (e.g: by undo/redo)
   virtual void onControlledPropertyChanged();
 
-
   /// Used to get the input bounds on for the reference proxy, if any.
   /// returns 1 on success, 0 otherwise.
   int getReferenceInputBounds(double bounds[6]) const;
 
+  /// Called every time the widget enabled/visible state needs to be updated.
+  virtual void updateWidgetVisibility();
+
+  /// Returns the actual visibility of the widget.
+  bool realWidgetVisibility() const;
 private:
   void setControlledProxy(vtkSMProxy*);
 
-  void updateWidgetVisibility();
   pq3DWidgetInternal* const Internal;
 };
 

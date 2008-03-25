@@ -235,6 +235,14 @@ pqRenderView* pqPickHelper::getRenderView() const
 }
 
 //-----------------------------------------------------------------------------
+void pqPickHelper::pick()
+{
+  this->beginPick();
+  this->processEvents(vtkCommand::LeftButtonReleaseEvent);
+  this->endPick();
+}
+
+//-----------------------------------------------------------------------------
 void pqPickHelper::beginPick()
 {
   this->setPickOn(PICK);

@@ -29,17 +29,20 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "pqHandleWidget.h"
+#include "ui_pqHandleWidget.h"
 
 #include "pq3DWidgetFactory.h"
 #include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
-#include "pqHandleWidget.h"
+#include "pqPickHelper.h"
 #include "pqPropertyLinks.h"
+#include "pqServerManagerModel.h"
+#include "pqSMAdaptor.h"
 #include "pqSMSignalAdaptors.h"
-
-#include "ui_pqHandleWidget.h"
+#include "pqView.h"
 
 #include <QDoubleValidator>
+#include <QShortcut>
 
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkMemberFunctionCommand.h>
@@ -54,7 +57,8 @@ class pqHandleWidget::pqImplementation
 {
 public:
   pqImplementation() :
-    UI(new Ui::pqHandleWidget())
+    UI(new Ui::pqHandleWidget()),
+    PickShortcut(0)
   {
   }
   
@@ -73,6 +77,10 @@ public:
   /// Callback object used to connect 3D widget events to member methods
   vtkSmartPointer<vtkCommand> EndDragObserver;
   pqPropertyLinks Links;
+
+  // Used to enabled picking of the point position.
+  pqPickHelper PickHelper;
+  QShortcut *PickShortcut;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -124,6 +132,10 @@ pqHandleWidget::pqHandleWidget(vtkSMProxy* _smproxy, vtkSMProxy* pxy, QWidget* p
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
   this->createWidget(smmodel->findServer(_smproxy->GetConnectionID()));
+
+  QObject::connect(&this->Implementation->PickHelper,
+    SIGNAL(pickFinished(double, double, double)),
+    this, SLOT(pick(double, double, double)));
 }
 
 //-----------------------------------------------------------------------------
@@ -131,6 +143,55 @@ pqHandleWidget::~pqHandleWidget()
 {
   this->cleanupWidget();
   delete this->Implementation;
+}
+
+//-----------------------------------------------------------------------------
+void pqHandleWidget::setView(pqView* pqview)
+{
+  delete this->Implementation->PickShortcut;
+  this->Implementation->PickShortcut = 0;
+  this->Superclass::setView(pqview);
+  if (pqview)
+    {
+    this->Implementation->PickShortcut = new QShortcut(
+      QKeySequence(tr("P")), pqview->getWidget());
+    QObject::connect(this->Implementation->PickShortcut,
+      SIGNAL(activated()),
+      &this->Implementation->PickHelper,
+      SLOT(pick()));
+    }
+  this->Implementation->PickHelper.setView(pqview);
+  this->updatePickShortcut();
+}
+
+//-----------------------------------------------------------------------------
+void pqHandleWidget::updateWidgetVisibility()
+{
+  this->Superclass::updateWidgetVisibility();
+  this->updatePickShortcut();
+}
+
+//-----------------------------------------------------------------------------
+void pqHandleWidget::updatePickShortcut()
+{
+  bool pickable = this->realWidgetVisibility();
+  if (this->Implementation->PickShortcut)
+    {
+    this->Implementation->PickShortcut->setEnabled(pickable);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqHandleWidget::pick(double x, double y, double z)
+{
+  vtkSMRepresentationProxy* widget = this->getWidgetProxy();
+  QList<QVariant> value;
+  value << x << y << z;
+  pqSMAdaptor::setMultipleElementProperty(
+    widget->GetProperty("WorldPosition"),
+    value);
+  widget->UpdateVTKObjects();
+  this->render();
 }
 
 //-----------------------------------------------------------------------------
@@ -198,6 +259,7 @@ void pqHandleWidget::onWidgetVisibilityChanged(bool visible)
   this->Implementation->UI->show3DWidget->blockSignals(true);
   this->Implementation->UI->show3DWidget->setChecked(visible);
   this->Implementation->UI->show3DWidget->blockSignals(false);
+  this->updatePickShortcut();
 }
 
 //-----------------------------------------------------------------------------
