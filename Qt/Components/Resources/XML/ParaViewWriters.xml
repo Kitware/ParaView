@@ -44,6 +44,9 @@
   <Writer name="PLYWriter"
           extensions="ply"
           file_description="PLY Polygonal File Format"/>
+  <Writer name="STLWriter"
+          extensions="stl"
+          file_description="Stereo Lithography File Format"/>
   <Writer name="MetaImageWriter"
           extensions="mhd"
           file_description="Meta Image Files"/>

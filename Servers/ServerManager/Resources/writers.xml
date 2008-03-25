@@ -526,7 +526,6 @@
       <!-- End of DataSetWriter -->
     </WriterProxy>
 
-
     <WriterProxy name="PLYWriter" class="vtkPLYWriter"
       base_proxygroup="writers" base_proxyname="DataWriterBase">
       <Documentation
@@ -555,6 +554,35 @@
         <Property name="FileType" show="0"/>
       </Hints>
       <!-- End of PLYWriter -->
+    </WriterProxy>
+
+    <WriterProxy name="STLWriter" class="vtkSTLWriter"
+      base_proxygroup="writers" base_proxyname="DataWriterBase">
+      <Documentation
+        short_help="Write stereo lithography files.">
+        STLWriter writes stereo lithography (.stl) files in either ASCII or
+        binary form. Stereo lithography files only contain triangles. If polygons
+        with more than 3 vertices are present, only the first 3 vertices are
+        written.  Use TriangleFilter to convert polygons to triangles.
+      </Documentation>
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
+      </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
+      <!-- End of STLWriter -->
     </WriterProxy>
 
     <WriterProxy name="MetaImageWriter" class="vtkMetaImageWriter"
