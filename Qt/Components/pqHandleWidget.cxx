@@ -138,11 +138,11 @@ pqHandleWidget::~pqHandleWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqHandleWidget::pick(double x, double y, double z)
+void pqHandleWidget::pick(double dx, double dy, double dz)
 {
   vtkSMRepresentationProxy* widget = this->getWidgetProxy();
   QList<QVariant> value;
-  value << x << y << z;
+  value << dx << dy << dz;
   pqSMAdaptor::setMultipleElementProperty(
     widget->GetProperty("WorldPosition"),
     value);

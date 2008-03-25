@@ -210,11 +210,11 @@ void pqLineWidget::setControlledProperty(const char* function,
 }
 
 //-----------------------------------------------------------------------------
-void pqLineWidget::pick(double x, double y, double z)
+void pqLineWidget::pick(double dx, double dy, double dz)
 {
   vtkSMRepresentationProxy* widget = this->getWidgetProxy();
   QList<QVariant> value;
-  value << x << y << z;
+  value << dx << dy << dz;
   if (this->Implementation->PickPoint1)
     {
     pqSMAdaptor::setMultipleElementProperty(
