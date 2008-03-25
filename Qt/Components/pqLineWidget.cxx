@@ -230,6 +230,7 @@ void pqLineWidget::pick(double x, double y, double z)
   this->Implementation->PickPoint1 = 
     !this->Implementation->PickPoint1;
 
+  this->setModified();
   this->render();
 }
 

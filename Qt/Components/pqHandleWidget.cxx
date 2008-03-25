@@ -147,6 +147,7 @@ void pqHandleWidget::pick(double x, double y, double z)
     widget->GetProperty("WorldPosition"),
     value);
   widget->UpdateVTKObjects();
+  this->setModified();
   this->render();
 }
 
