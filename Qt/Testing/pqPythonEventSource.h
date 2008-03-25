@@ -48,7 +48,7 @@ public:
 
   void setContent(const QString& path);
 
-  static QString getProperty(QString& object, const QString& prop);
+  static QString getProperty(QString& object, QString& prop);
   static void setProperty(QString& object, QString& prop, const QString& value);
   static QStringList getChildren(QString& object);
   static QString invokeMethod(QString& object, QString& method);

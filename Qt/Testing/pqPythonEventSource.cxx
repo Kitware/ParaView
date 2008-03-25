@@ -52,6 +52,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include <QThread>
 #include <QApplication>
+#include <QMetaObject>
+#include <QMetaProperty>
 
 // Qt testing includes
 #include "pqObjectNaming.h"
@@ -116,6 +118,7 @@ QtTesting_getProperty(PyObject* /*self*/, PyObject* args)
 
   PropertyObject = object;
   PropertyResult = property;
+  PropertyValue = QString::null;
 
   if(Instance && QThread::currentThread() != QApplication::instance()->thread())
     {
@@ -128,7 +131,7 @@ QtTesting_getProperty(PyObject* /*self*/, PyObject* args)
     }
   else if(QThread::currentThread() == QApplication::instance()->thread())
     {
-    PropertyResult = pqPythonEventSource::getProperty(PropertyObject, PropertyResult);
+    PropertyValue = pqPythonEventSource::getProperty(PropertyObject, PropertyResult);
     }
   else
     {
@@ -141,9 +144,15 @@ QtTesting_getProperty(PyObject* /*self*/, PyObject* args)
     PyErr_SetString(PyExc_ValueError, "object not found");
     return NULL;
     }
+  
+  if(PropertyResult == QString::null)
+    {
+    PyErr_SetString(PyExc_ValueError, "property not found");
+    return NULL;
+    }
 
   return Py_BuildValue(const_cast<char*>("s"), 
-             PropertyResult.toAscii().data());
+             PropertyValue.toAscii().data());
 }
 
 static PyObject*
@@ -400,7 +409,7 @@ void pqPythonEventSource::setContent(const QString& path)
   this->start();
 }
   
-QString pqPythonEventSource::getProperty(QString& object, const QString& prop)
+QString pqPythonEventSource::getProperty(QString& object, QString& prop)
 {
   // ensure other tasks have been completed
   pqEventDispatcher::processEventsAndWait(1);
@@ -410,14 +419,26 @@ QString pqPythonEventSource::getProperty(QString& object, const QString& prop)
   if(!qobject)
     {
     object = QString::null;
+    return QString();
+    }
+  int idx = qobject->metaObject()->indexOfProperty(prop.toAscii().data());
+  if(idx == -1)
+    {
+    prop = QString::null;
+    return QString();
     }
   else
     {
-    ret = qobject->property(prop.toAscii().data()).toString();
+    QMetaProperty metaProp =  qobject->metaObject()->property(idx);
+    ret = metaProp.read(qobject);
+
+    if(metaProp.type() == QVariant::List || metaProp.type() ==
+      QVariant::StringList)
+      {
+      return ret.toStringList().join(";");
+      }
+    return ret.toString();
     }
-
-  return ret.toString();
-
 }
 
 
@@ -439,13 +460,25 @@ void pqPythonEventSource::setProperty(QString& object, QString& prop,
   if(!qobject)
     {
     object = QString::null;
+    return;
+    }
+  
+  int idx = qobject->metaObject()->indexOfProperty(prop.toAscii().data());
+  if(idx == -1)
+    {
+    prop = QString::null;
+    return;
     }
   else
     {
-    if(!qobject->setProperty(prop.toAscii().data(), value))
+    QVariant val = value;
+    QMetaProperty metaProp =  qobject->metaObject()->property(idx);
+    if(metaProp.type() == QVariant::List || metaProp.type() ==
+            QVariant::StringList)
       {
-      prop = QString::null;
+      val = value.split(";");
       }
+    qobject->setProperty(prop.toAscii().data(), val);
     }
 }
 
