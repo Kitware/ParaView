@@ -56,6 +56,7 @@ class PQCOMPONENTS_EXPORT pqSampleScalarWidget :
   typedef QWidget Superclass;
 
   Q_OBJECT
+  Q_PROPERTY(QVariantList samples READ samples WRITE setSamples)
 
 public:
   // If preserve_order == true, then the widget will preserve value orders
