@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkEventQtSlotConnect.h"
 #include "vtkProcessModule.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
@@ -42,7 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMClientDeliveryRepresentationProxy.h"
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkUnstructuredGrid.h"
@@ -54,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QVBoxLayout>
 
+#include "pq3DWidgetFactory.h"
 #include "pqActiveView.h"
 #include "pqApplicationCore.h"
 #include "pqComboBoxDomain.h"
@@ -235,6 +239,7 @@ public:
   bool UseProcessID;
   bool UpdatingGUI;
 
+  QList<vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> > LocationWigets;
   enum 
     {
     IDS = 0,
@@ -416,6 +421,9 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
 
   // Set up property links between the selection source and the GUI.
   this->updateSelectionGUI();
+
+  // Updates the 3D widgets used.
+  this->updateLocationWidgets();
 
   // Set up property links between the selection representation and the GUI.
   this->updateDisplayStyleGUI();
@@ -971,6 +979,16 @@ void pqSelectionInspectorPanel::setupLocationsSelectionGUI()
     this, SLOT(deleteAllValues()));
   QObject::connect(this->Implementation->NewValue_Locations, SIGNAL(clicked()),
     this, SLOT(newValue()));
+
+  QObject::connect(this->Implementation->Delete_Locations, SIGNAL(clicked()),
+    this, SLOT(updateLocationWidgets()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->DeleteAll_Locations, SIGNAL(clicked()),
+    this, SLOT(updateLocationWidgets()), Qt::QueuedConnection);
+  QObject::connect(this->Implementation->NewValue_Locations, SIGNAL(clicked()),
+    this, SLOT(updateLocationWidgets()), Qt::QueuedConnection);
+
+  QObject::connect(this->Implementation->showLocationWidgets, SIGNAL(toggled(bool)),
+    this, SLOT(updateLocationWidgets()), Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------
@@ -1233,6 +1251,10 @@ void pqSelectionInspectorPanel::onSelectionTypeChanged(const QString& )
   // create new selection proxy based on the type that the user choose. If
   // possible try to preserve old selection properties.
   this->select(this->Implementation->InputPort, true);
+  if (this->Implementation->InputPort)
+    {
+    this->Implementation->InputPort->renderAllViews();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1253,6 +1275,7 @@ void pqSelectionInspectorPanel::createSelectionForCurrentObject()
     }
 
   this->select(port, true);
+  port->renderAllViews();
 }
 
 //-----------------------------------------------------------------------------
@@ -1329,5 +1352,146 @@ void pqSelectionInspectorPanel::onCurrentIndexChanged(QTreeWidgetItem* item)
     {
     int cid = item->text(0).toInt();
     this->Implementation->CompositeTreeAdaptor->select(cid);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::removeWidgetsFromView()
+{
+  if (!this->Implementation->ActiveView)
+    {
+    return;
+    }
+
+  vtkSMRenderViewProxy* view = 
+    this->Implementation->ActiveView->getRenderViewProxy();
+
+  foreach (vtkSMNewWidgetRepresentationProxy* widget,
+    this->Implementation->LocationWigets)
+    {
+    pqSMAdaptor::setElementProperty(widget->GetProperty("Enabled"), 0);
+    widget->UpdateVTKObjects();
+    view->RemoveRepresentation(widget);
+    }
+  this->Implementation->ActiveView->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::addWidgetsToView()
+{
+  if (!this->Implementation->ActiveView)
+    {
+    return;
+    }
+
+  vtkSMRenderViewProxy* view = 
+    this->Implementation->ActiveView->getRenderViewProxy();
+
+  foreach (vtkSMNewWidgetRepresentationProxy* widget,
+    this->Implementation->LocationWigets)
+    {
+    // this method avoids duplicate addition if the widget has been already added.
+    view->AddRepresentation(widget);
+    pqSMAdaptor::setElementProperty(widget->GetProperty("Enabled"), 1);
+    widget->UpdateVTKObjects();
+    }
+  this->Implementation->ActiveView->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::allocateWidgets(unsigned int numWidgets)
+{
+  pq3DWidgetFactory* factory = pqApplicationCore::instance()->get3DWidgetFactory();
+
+  while (static_cast<unsigned int>(this->Implementation->LocationWigets.size()) > numWidgets)
+    {
+    vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> widget = 
+      this->Implementation->LocationWigets.takeLast();
+    if (this->Implementation->ActiveView)
+      {
+      pqSMAdaptor::setElementProperty(widget->GetProperty("Enabled"), 0);
+      this->Implementation->ActiveView->getRenderViewProxy()->RemoveRepresentation(
+        widget);
+      }
+    this->Implementation->VTKConnectSelInput->Disconnect(widget, 0, this, 0);
+    factory->free3DWidget(widget);
+    }
+
+  for (unsigned int kk = this->Implementation->LocationWigets.size(); 
+    kk < numWidgets; kk++)
+    {
+    vtkSMNewWidgetRepresentationProxy* widget = 
+      factory->get3DWidget("HandleWidgetRepresentation",
+        this->Implementation->InputPort->getServer());
+    widget->UpdateVTKObjects();
+
+    this->Implementation->VTKConnectSelInput->Connect(widget, 
+      vtkCommand::vtkCommand::EndInteractionEvent,
+      this, SLOT(updateLocationFromWidgets()), 0, 0, Qt::QueuedConnection);
+    this->Implementation->LocationWigets.push_back(widget);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::updateLocationWidgets()
+{
+  bool show_widgets = 
+    (this->Implementation->showLocationWidgets->checkState() == Qt::Checked);
+  if (!show_widgets || this->getContentType() != vtkSelection::LOCATIONS ||
+    !this->Implementation->getSelectionSource())
+    {
+    this->removeWidgetsFromView();
+    this->allocateWidgets(0);
+    return;
+    }
+
+  pqSignalAdaptorTreeWidget* adaptor = this->Implementation->LocationsAdaptor;
+  const QList<QVariant>& values = adaptor->values();
+
+  unsigned int numLocations = values.size()/3;
+
+  // this will allocate new widgets if needed and delete old widgets.
+  this->allocateWidgets(numLocations);
+
+  this->addWidgetsToView();
+
+  for (unsigned int cc=0; cc < numLocations; cc++)
+    {
+    vtkSMNewWidgetRepresentationProxy* widget = 
+      this->Implementation->LocationWigets[cc];
+    QList<QVariant> posValues;
+    posValues << values[3*cc] << values[3*cc+1] << values[3*cc+2];
+    pqSMAdaptor::setMultipleElementProperty(widget->GetProperty("WorldPosition"),
+      posValues);
+    widget->UpdateVTKObjects();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::updateLocationFromWidgets()
+{
+  bool show_widgets = 
+    (this->Implementation->showLocationWidgets->checkState() == Qt::Checked);
+  if (!show_widgets || this->getContentType() != vtkSelection::LOCATIONS ||
+    !this->Implementation->getSelectionSource())
+    {
+    return;
+    }
+
+  int numLocations = this->Implementation->LocationWigets.size();
+  if (numLocations > 0)
+    {
+    pqSignalAdaptorTreeWidget* adaptor = this->Implementation->LocationsAdaptor;
+    QList<QVariant> values;
+    for (int kk = 0; kk < numLocations; kk++)
+      {
+      vtkSMNewWidgetRepresentationProxy* widget = 
+        this->Implementation->LocationWigets[kk];
+      widget->UpdatePropertyInformation();
+      QList<QVariant> posValues = pqSMAdaptor::getMultipleElementProperty(
+        widget->GetProperty("WorldPosition"));
+      values += posValues; 
+      }
+    adaptor->setValues(values);
     }
 }

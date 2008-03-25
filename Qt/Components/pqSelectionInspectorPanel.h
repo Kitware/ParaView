@@ -120,6 +120,9 @@ protected slots:
   /// current item.
   void onCurrentIndexChanged(QTreeWidgetItem* item);
 
+  void updateLocationWidgets();
+  void updateLocationFromWidgets();
+
 protected:
   /// Sets up the GUI by created default signal/slot bindings etc.
   void setupGUI();
@@ -155,6 +158,10 @@ protected:
 
   /// This returns the content type given the "Selection Type". 
   int getContentType() const;
+
+  void removeWidgetsFromView();
+  void addWidgetsToView();
+  void allocateWidgets(unsigned int numWidgets);
 
 private:
   struct pqImplementation;

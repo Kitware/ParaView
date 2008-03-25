@@ -668,6 +668,13 @@
               </item>
              </layout>
             </item>
+            <item>
+             <widget class="QCheckBox" name="showLocationWidgets" >
+              <property name="text" >
+               <string>Show location widgets</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
           <widget class="QWidget" name="page_Thresholds" >
