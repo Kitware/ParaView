@@ -41,7 +41,7 @@
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.10");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.11");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //============================================================================
@@ -80,7 +80,11 @@ public:
   // Be very careful with the pointer.
   int* GetPointer() { return this->EquivalenceArray->GetPointer(0);}
 
+  // We should fix the pointer API and hide this ivar.
+  int Resolved;
+
 private:
+
   // To merge connected framgments that have different ids because they were
   // traversed by different processes or passes.
   vtkIntArray *EquivalenceArray;
@@ -93,12 +97,14 @@ private:
 //----------------------------------------------------------------------------
 vtkCTHFragmentEquivalenceSet::vtkCTHFragmentEquivalenceSet()
 {
+  this->Resolved = 0;
   this->EquivalenceArray = vtkIntArray::New();
 }
 
 //----------------------------------------------------------------------------
 vtkCTHFragmentEquivalenceSet::~vtkCTHFragmentEquivalenceSet()
 {
+  this->Resolved = 0;
   if (this->EquivalenceArray)
     {
     this->EquivalenceArray->Delete();
@@ -109,12 +115,14 @@ vtkCTHFragmentEquivalenceSet::~vtkCTHFragmentEquivalenceSet()
 //----------------------------------------------------------------------------
 void vtkCTHFragmentEquivalenceSet::Initialize()
 {
+  this->Resolved = 0;
   this->EquivalenceArray->Initialize();
 }
 
 //----------------------------------------------------------------------------
 void vtkCTHFragmentEquivalenceSet::DeepCopy(vtkCTHFragmentEquivalenceSet* in)
 {
+  this->Resolved = in->Resolved;
   this->EquivalenceArray->DeepCopy(in->EquivalenceArray);
 }
 
@@ -139,7 +147,7 @@ int vtkCTHFragmentEquivalenceSet::GetEquivalentSetId(int memberId)
   int ref;
   
   ref = this->GetReference(memberId);
-  while (ref != memberId)
+  while (!this->Resolved && ref != memberId)
     {
     memberId = ref;
     ref = this->GetReference(memberId);
@@ -165,6 +173,12 @@ int vtkCTHFragmentEquivalenceSet::GetReference(int memberId)
 // both the ids.  Negative ids are not allowed.
 void vtkCTHFragmentEquivalenceSet::AddEquivalence(int id1, int id2)
 {
+  if (this->Resolved)
+    {
+    cerr << "Set already resolved.  you cannot add more equivalences.\n";
+    return;
+    }
+    
   int num = this->EquivalenceArray->GetNumberOfTuples();
 
   // Expand the range to include both ids.
@@ -175,7 +189,7 @@ void vtkCTHFragmentEquivalenceSet::AddEquivalence(int id1, int id2)
     ++num;
     }
 
- // Our rule for references in the equivalent set is that
+ // Our rule for references 9in the equivalent set is that
  // all elements must point to a member equal to or smaller
  // than itself.
  
@@ -249,6 +263,8 @@ void vtkCTHFragmentEquivalenceSet::ResolveEquivalences()
       this->EquivalenceArray->SetValue(ii,newId);
       }
     }
+  this->Resolved = 1;
+  cerr << "Final number of equivalent sets: " << count << endl;
 }
 
 
@@ -290,6 +306,9 @@ public:
   void GetCellExtent(int ext[6]);
   void GetCellIncrements(int incs[3]);
   void GetBaseCellExtent(int ext[6]);
+  // This was a major time consumer so use the pointer directly.
+  const int* GetBaseCellExtent() { return this->BaseCellExtent;}
+
 
   unsigned char GetGhostFlag() { return this->GhostFlag;}
   // Information saved for ghost cells that makes it easier to
@@ -343,7 +362,7 @@ private:
   // Extent of the cell arrays as in memory.
   int CellExtent[6];
   // Useful for neighbor computations and to avoid processing overlapping cells.
-  int PointExtentWithoutOverlap[6];
+  int BaseCellExtent[6];
 
   // The blocks do not follow the convention of sharing an origin.
   // Just save these for placing the faces.  We will have to find
@@ -369,7 +388,7 @@ vtkCTHFragmentConnectBlock::vtkCTHFragmentConnectBlock ()
   for (int ii = 0; ii < 6; ++ii)
     {
     this->CellExtent[ii] = 0;
-    this->PointExtentWithoutOverlap[ii] = 0;
+    this->BaseCellExtent[ii] = 0;
     }
   this->FragmentIds = 0;
   this->Spacing[0] = this->Spacing[1] = this->Spacing[2] = 0.0;
@@ -395,7 +414,7 @@ vtkCTHFragmentConnectBlock::~vtkCTHFragmentConnectBlock()
   for (int ii = 0; ii < 6; ++ii)
     {
     this->CellExtent[ii] = 0;
-    this->PointExtentWithoutOverlap[ii] = 0;
+    this->BaseCellExtent[ii] = 0;
     }
   
   if (this->FragmentIds != 0)
@@ -475,12 +494,12 @@ void vtkCTHFragmentConnectBlock::Initialize(
     }
 
   // On this pass, assume that there is no overalp.
-  this->PointExtentWithoutOverlap[0] = this->CellExtent[0];
-  this->PointExtentWithoutOverlap[1] = this->CellExtent[1]+1;
-  this->PointExtentWithoutOverlap[2] = this->CellExtent[2];
-  this->PointExtentWithoutOverlap[3] = this->CellExtent[3]+1;
-  this->PointExtentWithoutOverlap[4] = this->CellExtent[4];
-  this->PointExtentWithoutOverlap[5] = this->CellExtent[5]+1;
+  this->BaseCellExtent[0] = this->CellExtent[0];
+  this->BaseCellExtent[1] = this->CellExtent[1];
+  this->BaseCellExtent[2] = this->CellExtent[2];
+  this->BaseCellExtent[3] = this->CellExtent[3];
+  this->BaseCellExtent[4] = this->CellExtent[4];
+  this->BaseCellExtent[5] = this->CellExtent[5];
 
   this->CellIncrements[0] = 1;
   // Point extent -> cell increments.  Do not add 1.
@@ -543,13 +562,13 @@ void vtkCTHFragmentConnectBlock::ComputeBaseExtent(int blockDims[3])
     iMin = 2* ii;
     iMax = iMin + 1;
     // This assumes that all extents are positive.  ceil is too complicated.
-    tmp = this->PointExtentWithoutOverlap[iMin];
+    tmp = this->BaseCellExtent[iMin];
     tmp = (tmp+baseDim-1) / baseDim;
-    this->PointExtentWithoutOverlap[iMin] = tmp*baseDim;
+    this->BaseCellExtent[iMin] = tmp*baseDim;
     
-    tmp = this->PointExtentWithoutOverlap[iMax];
+    tmp = this->BaseCellExtent[iMax]+1;
     tmp = tmp / baseDim;
-    this->PointExtentWithoutOverlap[iMax] = tmp*baseDim;
+    this->BaseCellExtent[iMax] = tmp*baseDim - 1;
     }
 }
 
@@ -604,12 +623,12 @@ void vtkCTHFragmentConnectBlock::InitializeGhostLayer(
   this->CellExtent[5] = cellExtent[5];
 
   // No overlap in ghost layers
-  this->PointExtentWithoutOverlap[0] = cellExtent[0];
-  this->PointExtentWithoutOverlap[1] = cellExtent[1]+1;
-  this->PointExtentWithoutOverlap[2] = cellExtent[2];
-  this->PointExtentWithoutOverlap[3] = cellExtent[3]+1;
-  this->PointExtentWithoutOverlap[4] = cellExtent[4];
-  this->PointExtentWithoutOverlap[5] = cellExtent[5]+1;
+  this->BaseCellExtent[0] = cellExtent[0];
+  this->BaseCellExtent[1] = cellExtent[1];
+  this->BaseCellExtent[2] = cellExtent[2];
+  this->BaseCellExtent[3] = cellExtent[3];
+  this->BaseCellExtent[4] = cellExtent[4];
+  this->BaseCellExtent[5] = cellExtent[5];
 
   this->CellIncrements[0] = 1;
   // Point extent -> cell increments.  Do not add 1.
@@ -683,12 +702,15 @@ void vtkCTHFragmentConnectBlock::GetCellIncrements(int incs[3])
 //----------------------------------------------------------------------------
 void vtkCTHFragmentConnectBlock::GetBaseCellExtent(int ext[6])
 {
-  ext[0] = this->PointExtentWithoutOverlap[0];
-  ext[1] = this->PointExtentWithoutOverlap[1]-1;
-  ext[2] = this->PointExtentWithoutOverlap[2];
-  ext[3] = this->PointExtentWithoutOverlap[3]-1;
-  ext[4] = this->PointExtentWithoutOverlap[4];
-  ext[5] = this->PointExtentWithoutOverlap[5]-1;
+  // Since this is taking a significant amount of time in the
+  // GetNeighborIterator method, wemight consider storing
+  // the base cell extent directly.
+  *ext++ + this->BaseCellExtent[0];
+  *ext++ + this->BaseCellExtent[1];
+  *ext++ + this->BaseCellExtent[2];
+  *ext++ + this->BaseCellExtent[3];
+  *ext++ + this->BaseCellExtent[4];
+  *ext++ + this->BaseCellExtent[5];
 }
 
 //----------------------------------------------------------------------------
@@ -698,11 +720,11 @@ unsigned char* vtkCTHFragmentConnectBlock::GetBaseVolumeFractionPointer()
 {
   unsigned char* ptr = this->VolumeFractionArray;
 
-  ptr += this->CellIncrements[0] * (this->PointExtentWithoutOverlap[0] 
+  ptr += this->CellIncrements[0] * (this->BaseCellExtent[0] 
                                     - this->CellExtent[0]);
-  ptr += this->CellIncrements[1] * (this->PointExtentWithoutOverlap[2] 
+  ptr += this->CellIncrements[1] * (this->BaseCellExtent[2] 
                                     - this->CellExtent[2]);
-  ptr += this->CellIncrements[2] * (this->PointExtentWithoutOverlap[4] 
+  ptr += this->CellIncrements[2] * (this->BaseCellExtent[4] 
                                     - this->CellExtent[4]);
   
   return ptr;
@@ -713,11 +735,11 @@ int* vtkCTHFragmentConnectBlock::GetBaseFragmentIdPointer()
 {
   int* ptr = this->FragmentIds;
 
-  ptr += this->CellIncrements[0] * (this->PointExtentWithoutOverlap[0] 
+  ptr += this->CellIncrements[0] * (this->BaseCellExtent[0] 
                                     - this->CellExtent[0]);
-  ptr += this->CellIncrements[1] * (this->PointExtentWithoutOverlap[2] 
+  ptr += this->CellIncrements[1] * (this->BaseCellExtent[2] 
                                     - this->CellExtent[2]);
-  ptr += this->CellIncrements[2] * (this->PointExtentWithoutOverlap[4] 
+  ptr += this->CellIncrements[2] * (this->BaseCellExtent[4] 
                                     - this->CellExtent[4]);
 
   return ptr;
@@ -909,7 +931,6 @@ void vtkCTHFragmentLevel::SetStandardBlockDimensions(int dims[3])
 int vtkCTHFragmentLevel::AddBlock(vtkCTHFragmentConnectBlock* block)
 {
   int xIdx, yIdx, zIdx;
-  int ext[6];
   
   // First make sure the level is correct.
   // We assume that the block dimensions are correct.
@@ -918,7 +939,8 @@ int vtkCTHFragmentLevel::AddBlock(vtkCTHFragmentConnectBlock* block)
     vtkGenericWarningMacro("Wrong level.");
     return VTK_ERROR;
     }
-  block->GetBaseCellExtent(ext);
+  const int *ext;
+  ext = block->GetBaseCellExtent();
   
   if (ext[0] < 0 || ext[2] < 0 || ext[4] < 0)
     {
@@ -1019,12 +1041,12 @@ public:
 
 private:
 
-  vtkCTHFragmentConnectIterator** Ring;
-  vtkCTHFragmentConnectIterator** End;
+  vtkCTHFragmentConnectIterator* Ring;
+  vtkCTHFragmentConnectIterator* End;
   long RingLength;
   // The first and last iterator added.
-  vtkCTHFragmentConnectIterator** First;
-  vtkCTHFragmentConnectIterator** Next;
+  vtkCTHFragmentConnectIterator* First;
+  vtkCTHFragmentConnectIterator* Next;
   // I could do without this size, but it does not cost much.
   long Size;
 
@@ -1034,8 +1056,9 @@ private:
 //----------------------------------------------------------------------------
 vtkCTHFragmentConnectRingBuffer::vtkCTHFragmentConnectRingBuffer()
 {
-  this->Ring = new vtkCTHFragmentConnectIterator*[1000];
-  this->RingLength = 1000;
+  int initialSize = 2000;
+  this->Ring = new vtkCTHFragmentConnectIterator[initialSize];
+  this->RingLength = initialSize;
   this->End = this->Ring + this->RingLength;
   this->First = 0;
   this->Next = this->Ring;
@@ -1056,14 +1079,14 @@ vtkCTHFragmentConnectRingBuffer::~vtkCTHFragmentConnectRingBuffer()
 void vtkCTHFragmentConnectRingBuffer::GrowRing()
 {
   // Allocate a new ring.
-  vtkCTHFragmentConnectIterator** newRing;
+  vtkCTHFragmentConnectIterator* newRing;
   int newRingLength = this->RingLength * 2;
-  newRing = new vtkCTHFragmentConnectIterator*[newRingLength*2];
+  newRing = new vtkCTHFragmentConnectIterator[newRingLength*2];
   
   // Copy items into the new ring.
   int count = this->Size;
-  vtkCTHFragmentConnectIterator** ptr1 = this->First;
-  vtkCTHFragmentConnectIterator** ptr2 = newRing;
+  vtkCTHFragmentConnectIterator* ptr1 = this->First;
+  vtkCTHFragmentConnectIterator* ptr2 = newRing;
   while (count > 0)
     {
     *ptr2++ = *ptr1++;
@@ -1073,6 +1096,8 @@ void vtkCTHFragmentConnectRingBuffer::GrowRing()
       }
     --count;
     }
+
+  //cerr << "Grow ring buffer: " << newRingLength << endl;
   
   // Replace the ring.
   // Size remains the same.
@@ -1093,14 +1118,8 @@ void vtkCTHFragmentConnectRingBuffer::Push(vtkCTHFragmentConnectIterator* item)
     this->GrowRing();
     }
   
-  // If we want to reuse these objects for better performance,
-  // We should just make the buffer hold iterators instead of 
-  // pointers to iterators.
-  vtkCTHFragmentConnectIterator* newItem = new vtkCTHFragmentConnectIterator;
-  *newItem = *item;
-  
   // Add the item.
-  *(this->Next) = newItem;
+  *(this->Next) = *item;
   // Special case for an empty ring.
   // We could initialize start to next to avoid this condition every push.
   if (this->Size == 0)
@@ -1128,9 +1147,8 @@ int vtkCTHFragmentConnectRingBuffer::Pop(vtkCTHFragmentConnectIterator* item)
     return 0;
     }
     
-  *item = **(this->First);
-  delete *this->First;
-  *(this->First) = 0;
+  *item = *(this->First);
+  //this->First->Initialize();
   ++this->First;
   --this->Size;
 
@@ -1312,8 +1330,8 @@ int vtkCTHFragmentConnect::InitializeBlocks(vtkHierarchicalBoxDataSet* input)
         block->LevelBlockId = levelBlockId;
         
         // Collect information about the blocks in this level.
-        int ext[6];
-        block->GetBaseCellExtent(ext);
+        const int *ext;
+        ext = block->GetBaseCellExtent();
         // We need the cumulative extent to determine the grid extent.
         if (cumulativeExt[0] > ext[0]) {cumulativeExt[0] = ext[0];}
         if (cumulativeExt[1] < ext[1]) {cumulativeExt[1] = ext[1];}
@@ -1392,11 +1410,11 @@ void vtkCTHFragmentConnect::CheckLevelsForNeighbors(
 {
   vtkstd::vector<vtkCTHFragmentConnectBlock*> neighbors;
   vtkCTHFragmentConnectBlock* neighbor;
-  int ext[6];
   int blockIndex[3];
 
   // Extract the index from the block extent.
-  block->GetBaseCellExtent(ext);
+  const int *ext;
+  ext = block->GetBaseCellExtent();
   blockIndex[0] = ext[0] / this->StandardBlockDimensions[0];
   blockIndex[1] = ext[2] / this->StandardBlockDimensions[1];
   blockIndex[2] = ext[4] / this->StandardBlockDimensions[2];
@@ -1919,11 +1937,11 @@ void vtkCTHFragmentConnect::ShareGhostBlocks()
   for (int ii = 0; ii < this->NumberOfInputBlocks; ++ii)
     {
     localBlockInfo[ii*7] = this->InputBlocks[ii]->GetLevel();
-    int ext[6];
+    const int *ext;
     // Lets do just the cell extent without overlap.
     // Edges and corners or overlap can cause problems when
     // neighbors are a different level.
-    this->InputBlocks[ii]->GetBaseCellExtent(ext);
+    ext = this->InputBlocks[ii]->GetBaseCellExtent();
     for (int jj = 0; jj < 6; ++jj)
       {
       localBlockInfo[ii*7+1 + jj] = ext[jj];
@@ -2275,13 +2293,13 @@ int vtkCTHFragmentConnect::RequestData(
       {
       this->ProcessBlock(blockId);
       }
-    /*
-    char tmp[128];
-    sprintf(tmp, "C:/Law/tmp/cthSurface%d.vtp", this->Controller->GetLocalProcessId());
-    this->SaveBlockSurfaces(tmp);
-    sprintf(tmp, "C:/Law/tmp/cthGhost%d.vtp", this->Controller->GetLocalProcessId());
-    this->SaveGhostSurfaces(tmp);
-    */
+    
+    //char tmp[128];
+    //sprintf(tmp, "C:/Law/tmp/cthSurface%d.vtp", this->Controller->GetLocalProcessId());
+    //this->SaveBlockSurfaces(tmp);
+    //sprintf(tmp, "C:/Law/tmp/cthGhost%d.vtp", this->Controller->GetLocalProcessId());
+    //this->SaveGhostSurfaces(tmp);
+    
     
     this->ResolveEquivalences(idScalars);
     this->DeleteAllBlocks();
@@ -2320,10 +2338,10 @@ int vtkCTHFragmentConnect::ProcessBlock(int blockId)
 
   // Loop through all the voxels.
   int ix, iy, iz;
-  int ext[6];
+  const int *ext;
   int cellIncs[3];
   block->GetCellIncrements(cellIncs);
-  block->GetBaseCellExtent(ext);
+  ext = block->GetBaseCellExtent();
   for (iz = ext[4]; iz <= ext[5]; ++iz)
     {
     zIterator->Index[2] = iz;
@@ -2423,7 +2441,13 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
   if (v101 > middleValue) { t101 = 1.0;}
   if (v110 > middleValue) { t110 = 1.0;}
   if (v111 > middleValue) { t111 = 1.0;}
-  
+
+  // We use the gradient ater threshold to choose a direction
+  // to move the point.  After considering he discussion about
+  // clamping below, we should zeroout iterators that are not
+  // face connected (after threshold) to the iterator/voxel
+  // that is generating this face.  We do not know which iterator 
+  // that is because it was not passed in .......
   
   double g[3]; // Gradient at center.
   g[2] = -t000-t001-t010-t011+t100+t101+t110+t111;
@@ -2467,11 +2491,22 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
   
   // Compute how far to the surface we must travel.
   double k = (middleValue - centerValue) / (surfaceValue - centerValue);
-  if (k < 0.0 || k > 1.0) 
+    // clamping caused artifacts in my test data sphere.
+    // What sort of artifacts????  I forget.
+    // the test spy data looks ok so lets go ahead with clamping.
+    // since we only need to clamp for non manifold surfaces, the
+    // ideal solution would be to let the common points diverge.
+    // since we use face connectivity, the points will not be connected anyway.
+    // We could also keep clean from creating non manifold surfaces.
+    // I do not generate the surface in a second pass (when we have 
+    // the fragment ids) because it would be too expensive.
+  if (k < 0.0) 
     {
-    // clamping caused artifacts (sphere example).
-    // No clamping causes spikes.
-    // TODO: SOft clamp or iterate to better solution.
+    k = 0.0;
+    }
+  if (k > 1.0) 
+    {
+    k = 1.0;
     }
   
   // This should give us decent displacement factors.
@@ -2549,10 +2584,11 @@ void vtkCTHFragmentConnect::CreateFace(
   double pt10[3];
   double pt11[3];
 
-  if (iterator->Block->GetGhostFlag())
+  if (iterator->Block == 0 || iterator->Block->GetGhostFlag())
     {
     return;
     }
+
 
   // This should not occur, but we will check as a sanity condition.
   if (iterator->Block == 0)
@@ -2737,17 +2773,17 @@ void vtkCTHFragmentConnect::GetNeighborIterator(
   int axis1, int maxFlag1,
   int axis2, int maxFlag2)
 {
-  int ext[6];
-  iterator->Block->GetBaseCellExtent(ext);
-  int incs[3];
-  iterator->Block->GetCellIncrements(incs);
-  
   if (iterator->Block == 0)
     { // No input, no output.  This should not happen.
     vtkWarningMacro("Can not find neighbor for NULL block.");
     *next = *iterator;
     return;
     }
+    
+  const int *ext;
+  ext = iterator->Block->GetBaseCellExtent();
+  int incs[3];
+  iterator->Block->GetCellIncrements(incs);
 
   if (maxFlag0 && iterator->Index[axis0] < ext[2*axis0+1])
     { // Neighbor is inside this block.
@@ -2836,7 +2872,7 @@ void vtkCTHFragmentConnect::GetNeighborIterator(
         }
       }
 
-    block->GetBaseCellExtent(ext);
+    ext = block->GetBaseCellExtent();
     if ((ext[0] <= next->Index[0] && next->Index[0] <= ext[1]) && 
         (ext[2] <= next->Index[1] && next->Index[1] <= ext[3]) &&
         (ext[4] <= next->Index[2] && next->Index[2] <= ext[5]))
@@ -2950,21 +2986,24 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
           this->AddEquivalence(&next2, &next);
           }
         // To get the +Y+Z start with the +Z iterator and move +Y put results in "next"
-        this->GetNeighborIterator(&next, &next2, (ii+1)%3,1, (ii+2)%3,0, ii,0);
-        if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
+        if (next2.Block)
           {
-          // Neighbor is outside of fragment.  Make a face.
-          this->CreateFace(&iterator, ii, 0, &next);
-          }    
-        else if (next.FragmentIdPointer[0] == -1)
-          { // We have not visited this neighbor yet. Mark the voxel and recurse.
-          *(next.FragmentIdPointer) = this->FragmentId;
-          queue->Push(&next);
-          }
-        else
-          { // The last case is that we have already visited this voxel and it
-          // is in the same fragment.
-          this->AddEquivalence(&next2, &next);
+          this->GetNeighborIterator(&next, &next2, (ii+1)%3,1, (ii+2)%3,0, ii,0);
+          if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
+            {
+            // Neighbor is outside of fragment.  Make a face.
+            this->CreateFace(&iterator, ii, 0, &next);
+            }    
+          else if (next.FragmentIdPointer[0] == -1)
+            { // We have not visited this neighbor yet. Mark the voxel and recurse.
+            *(next.FragmentIdPointer) = this->FragmentId;
+            queue->Push(&next);
+            }
+          else
+            { // The last case is that we have already visited this voxel and it
+            // is in the same fragment.
+            this->AddEquivalence(&next2, &next);
+            }
           }
         }
 
@@ -3024,21 +3063,24 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
           this->AddEquivalence(&next2, &next);
           }
         // To get the +Y+Z start with the +Z iterator and move +Y put results in "next"
-        this->GetNeighborIterator(&next, &next2, (ii+1)%3,1, (ii+2)%3,0, ii,0);
-        if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
+        if (next2.Block)
           {
-          // Neighbor is outside of fragment.  Make a face.
-          this->CreateFace(&iterator, ii, 1, &next);
-          }    
-        else if (next.FragmentIdPointer[0] == -1)
-          { // We have not visited this neighbor yet. Mark the voxel and recurse.
-          *(next.FragmentIdPointer) = this->FragmentId;
-          queue->Push(&next);
-          }
-        else
-          { // The last case is that we have already visited this voxel and it
-          // is in the same fragment.
-          this->AddEquivalence(&next2, &next);
+          this->GetNeighborIterator(&next, &next2, (ii+1)%3,1, (ii+2)%3,0, ii,0);
+          if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
+            {
+            // Neighbor is outside of fragment.  Make a face.
+            this->CreateFace(&iterator, ii, 1, &next);
+            }    
+          else if (next.FragmentIdPointer[0] == -1)
+            { // We have not visited this neighbor yet. Mark the voxel and recurse.
+            *(next.FragmentIdPointer) = this->FragmentId;
+            queue->Push(&next);
+            }
+          else
+            { // The last case is that we have already visited this voxel and it
+            // is in the same fragment.
+            this->AddEquivalence(&next2, &next);
+            }
           }
         }
       }
@@ -3215,56 +3257,60 @@ void vtkCTHFragmentConnect::SaveBlockSurfaces(const char* fileName)
   vtkIntArray* idArray = vtkIntArray::New();
   vtkIntArray* levelArray = vtkIntArray::New();
   vtkCTHFragmentConnectBlock* block;
-  int ext[6];
+  const int *ext;
   vtkIdType corners[8];
   vtkIdType face[4];
   double pt[3];
   int level;
   int levelId;
-  double spacing;
-  
-
   int ii;
   
   for (ii = 0; ii < this->NumberOfInputBlocks; ++ii)
     {
     block = this->InputBlocks[ii];
-    block->GetBaseCellExtent(ext);
-    levelId = block->LevelBlockId;
+    ext = block->GetBaseCellExtent();
+    // Ghost blocks do not have spacing.
+    //double *spacing;
+    //spacing = block->GetSpacing();
+    double spacing[3];
     level = block->GetLevel();
-    spacing = 1.0 / (double)(1 << level);
+    spacing[0] = this->RootSpacing[0] / (double)(1 << level);
+    spacing[1] = this->RootSpacing[1] / (double)(1 << level);
+    spacing[2] = this->RootSpacing[2] / (double)(1 << level);
+    //spacing[0] = spacing[1] = spacing[2] = 1.0 / (double)(1 << level);
+    levelId = block->LevelBlockId;
     // Insert the points.
-    pt[0] = ext[0]*spacing;
-    pt[1] = ext[2]*spacing;
-    pt[2] = ext[4]*spacing;
+    pt[0] = ext[0]*spacing[0] + this->GlobalOrigin[0];
+    pt[1] = ext[2]*spacing[1] + this->GlobalOrigin[1];
+    pt[2] = ext[4]*spacing[2] + this->GlobalOrigin[2];
     corners[0] = pts->InsertNextPoint(pt);
-    pt[0] = (ext[1]+1)*spacing;
-    pt[1] = ext[2]*spacing;
-    pt[2] = ext[4]*spacing;
+    pt[0] = (ext[1]+1)*spacing[0] + this->GlobalOrigin[0];
+    pt[1] = ext[2]*spacing[1] + this->GlobalOrigin[1];
+    pt[2] = ext[4]*spacing[2] + this->GlobalOrigin[2];
     corners[1] = pts->InsertNextPoint(pt);
-    pt[0] = ext[0]*spacing;
-    pt[1] = (ext[3]+1)*spacing;
-    pt[2] = ext[4]*spacing;
+    pt[0] = ext[0]*spacing[0] + this->GlobalOrigin[0];
+    pt[1] = (ext[3]+1)*spacing[1] + this->GlobalOrigin[1];
+    pt[2] = ext[4]*spacing[2] + this->GlobalOrigin[2];
     corners[2] = pts->InsertNextPoint(pt);
-    pt[0] = (ext[1]+1)*spacing;
-    pt[1] = (ext[3]+1)*spacing;
-    pt[2] = ext[4]*spacing;
+    pt[0] = (ext[1]+1)*spacing[0] + this->GlobalOrigin[0];
+    pt[1] = (ext[3]+1)*spacing[1] + this->GlobalOrigin[1];
+    pt[2] = ext[4]*spacing[2] + this->GlobalOrigin[2];
     corners[3] = pts->InsertNextPoint(pt);
-    pt[0] = ext[0]*spacing;
-    pt[1] = ext[2]*spacing;
-    pt[2] = (ext[5]+1)*spacing;
+    pt[0] = ext[0]*spacing[0] + this->GlobalOrigin[0];
+    pt[1] = ext[2]*spacing[1] + this->GlobalOrigin[1];
+    pt[2] = (ext[5]+1)*spacing[2] + this->GlobalOrigin[2];
     corners[4] = pts->InsertNextPoint(pt);
-    pt[0] = (ext[1]+1)*spacing;
-    pt[1] = ext[2]*spacing;
-    pt[2] = (ext[5]+1)*spacing;
+    pt[0] = (ext[1]+1)*spacing[0] + this->GlobalOrigin[0];
+    pt[1] = ext[2]*spacing[1] + this->GlobalOrigin[1];
+    pt[2] = (ext[5]+1)*spacing[2] + this->GlobalOrigin[2];
     corners[5] = pts->InsertNextPoint(pt);
-    pt[0] = ext[0]*spacing;
-    pt[1] = (ext[3]+1)*spacing;
-    pt[2] = (ext[5]+1)*spacing;
+    pt[0] = ext[0]*spacing[0] + this->GlobalOrigin[0];
+    pt[1] = (ext[3]+1)*spacing[1] + this->GlobalOrigin[1];
+    pt[2] = (ext[5]+1)*spacing[2] + this->GlobalOrigin[2];
     corners[6] = pts->InsertNextPoint(pt);
-    pt[0] = (ext[1]+1)*spacing;
-    pt[1] = (ext[3]+1)*spacing;
-    pt[2] = (ext[5]+1)*spacing;
+    pt[0] = (ext[1]+1)*spacing[0] + this->GlobalOrigin[0];
+    pt[1] = (ext[3]+1)*spacing[1] + this->GlobalOrigin[1];
+    pt[2] = (ext[5]+1)*spacing[2] + this->GlobalOrigin[2];
     corners[7] = pts->InsertNextPoint(pt);
     // Now the faces.
     face[0] = corners[0];
@@ -3342,7 +3388,7 @@ void vtkCTHFragmentConnect::SaveGhostSurfaces(const char* fileName)
   vtkIntArray* idArray = vtkIntArray::New();
   vtkIntArray* levelArray = vtkIntArray::New();
   vtkCTHFragmentConnectBlock* block;
-  int ext[6];
+  const int *ext;
   vtkIdType corners[8];
   vtkIdType face[4];
   double pt[3];
@@ -3356,7 +3402,7 @@ void vtkCTHFragmentConnect::SaveGhostSurfaces(const char* fileName)
   for (ii = 0; ii < this->GhostBlocks.size(); ++ii)
     {
     block = this->GhostBlocks[ii];
-    block->GetBaseCellExtent(ext);
+    ext = block->GetBaseCellExtent();
     levelId = ii;
     level = block->GetLevel();
     spacing = 1.0 / (double)(1 << level);
@@ -3716,6 +3762,11 @@ void vtkCTHFragmentConnect::MergeGhostEquivalenceSets(
     this->Controller->Send(buf, numIds, 0, 342320);
     // Now receive the final equivalences.
     this->Controller->Receive(buf, numIds, 0, 342321);
+    // We have to mark the set as resolved because the set being
+    // received has been resolved.  If we do not do this then
+    // We cannot get the proper set id.  Useing the pointer
+    // here is a bad api.  TODO: Fix the API and make "Resolved" private.
+    globalSet->Resolved = 1;
     return;
     }
 
