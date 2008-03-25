@@ -1426,7 +1426,7 @@ void pqSelectionInspectorPanel::allocateWidgets(unsigned int numWidgets)
     widget->UpdateVTKObjects();
 
     this->Implementation->VTKConnectSelInput->Connect(widget, 
-      vtkCommand::vtkCommand::EndInteractionEvent,
+      vtkCommand::EndInteractionEvent,
       this, SLOT(updateLocationFromWidgets()), 0, 0, Qt::QueuedConnection);
     this->Implementation->LocationWigets.push_back(widget);
     }
