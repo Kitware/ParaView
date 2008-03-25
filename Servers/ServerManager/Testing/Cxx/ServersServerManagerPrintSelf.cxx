@@ -48,8 +48,6 @@
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMExponentialKeyFrameProxy.h"
 #include "vtkSMExtentDomain.h"
-#include "vtkSMExtractLocationsProxy.h"
-#include "vtkSMExtractSelectionProxy.h"
 #include "vtkSMFieldDataDomain.h"
 #include "vtkSMIntArrayInformationHelper.h"
 #include "vtkSMFileListDomain.h"
@@ -191,8 +189,6 @@ int main(int , char *[])
   c = vtkSMEnumerationDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMExponentialKeyFrameProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMExtentDomain::New(); c->Print( cout ); c->Delete();
-  c = vtkSMExtractLocationsProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMExtractSelectionProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMFieldDataDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMFileListDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMFixedTypeDomain::New(); c->Print( cout ); c->Delete();

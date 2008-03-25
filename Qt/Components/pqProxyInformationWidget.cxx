@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 
 // VTK includes
+#include "vtkCommand.h"
+#include "vtkEventQtSlotConnect.h"
 #include <vtksys/SystemTools.hxx>
 
 // ParaView Server Manager includes
@@ -50,9 +52,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMProperty.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMProxy.h"
 
 // ParaView widget includes
 
@@ -77,6 +78,7 @@ public:
 pqProxyInformationWidget::pqProxyInformationWidget(QWidget* p)
   : QWidget(p), OutputPort(NULL)
 {
+  this->VTKConnect = vtkEventQtSlotConnect::New();
   this->Ui = new pqUi(this);
   this->Ui->setupUi(this);
   QObject::connect(this->Ui->compositeTree, SIGNAL(itemClicked(QTreeWidgetItem*, int)),
@@ -87,6 +89,8 @@ pqProxyInformationWidget::pqProxyInformationWidget(QWidget* p)
 //-----------------------------------------------------------------------------
 pqProxyInformationWidget::~pqProxyInformationWidget()
 {
+  this->VTKConnect->Disconnect();
+  this->VTKConnect->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -97,6 +101,7 @@ void pqProxyInformationWidget::setOutputPort(pqOutputPort* source)
     return;
     }
   
+  this->VTKConnect->Disconnect();
   if(this->OutputPort)
     {
     QObject::disconnect(this->OutputPort->getServer()->getTimeKeeper(),
@@ -112,6 +117,14 @@ void pqProxyInformationWidget::setOutputPort(pqOutputPort* source)
                      SIGNAL(timeChanged()),
                      this, SLOT(updateInformation()),
                      Qt::QueuedConnection);
+
+    if (this->OutputPort->getOutputPortProxy())
+      {
+      this->VTKConnect->Connect(
+        this->OutputPort->getOutputPortProxy(), 
+        vtkCommand::UpdateInformationEvent,
+        this, SLOT(updateInformation()));
+      }
     }
 
   this->updateInformation();

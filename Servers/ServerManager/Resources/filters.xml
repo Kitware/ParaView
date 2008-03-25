@@ -2,155 +2,19 @@
   <ProxyGroup name="filters">
 
    <!-- ==================================================================== -->
-   <ExtractLocationsProxy name="ProbeLocationOverTime"
-                          class="vtkPExtractArraysOverTime"
-                          label="Probe Location over Time">
-     <Documentation> 
-        This filter extracts cell and point variables at a given location over
-        time. The output is a 1D rectilinear grid where the x coordinates
-        correspond to time (the same array is also copied to a point array named
-        Time or TimeData (if Time exists in the input)). The point values are
+   <SourceProxy name="ExtractSelectionOverTime" class="vtkExtractArraysOverTime"
+      label="Extract Selection (Over Time)">
+      <Documentation>
+        This filter extracts the selection over time, i.e.  cell and/or point 
+        variables at a cells/point selected are extracted over time
+        The output multi-block consists of 1D rectilinear grids where the x coordinate
+        corresponds to time (the same array is also copied to a point array named
+        Time or TimeData (if Time exists in the input)). 
+        If selection input is a Location based selection then the point values are
         interpolated from the nearby cells, ie those of the cell the location
         lies in.
      </Documentation>
 
-     <InputProperty
-         name="Input"
-         command="SetInputConnection">
-       <ProxyGroupDomain name="groups">
-         <Group name="sources"/>
-         <Group name="filters"/>
-       </ProxyGroupDomain>
-       <DataTypeDomain name="input_type">
-         <DataType value="vtkDataSet"/>
-       </DataTypeDomain>
-       <Documentation>
-         The input from which the selection is extracted.
-       </Documentation>
-     </InputProperty>
-
-     <SubProxy>
-        <Proxy name="SelectionSource" 
-          proxygroup="sources" proxyname="LocationSelectionSource">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="Locations" />
-        </ExposedProperties>
-     </SubProxy>
-
-     <Hints>
-       <PropertyGroup type="Handle" label="Location Widget">
-         <Property function="WorldPosition" name="Locations" />
-       </PropertyGroup>
-        <!-- View can be used to specify the preferred view for the proxy -->
-       <View type="XYPlotView" />
-     </Hints>
-
-     <!-- End ProbeLocationOverTime -->
-   </ExtractLocationsProxy>
-    
-   <!-- ==================================================================== -->
-   <ExtractSelectionProxy name="ExtractPointsOverTime"
-                          class="vtkPExtractArraysOverTime"
-                          label="Plot Point over Time"
-                          selection_field_type="POINT">
-     <Documentation>
-        This filter extracts the variables associated with a vertex over time. The
-        output is a 1D rectilinear grid where the x coordinates correspond to
-        time (the same array is also copied to a point array named Time or
-        TimeData (if Time exists in the input)).  The input point coordinates
-        are copied to a point array named Point Coordinates or Points (if Point
-        Coordinates exists in the  input).
-        This filter cannot be used for composite datasets.
-     </Documentation>
-
-     <InputProperty name="Input"
-         command="SetInputConnection">
-       <ProxyGroupDomain name="groups">
-         <Group name="sources"/>
-         <Group name="filters"/>
-       </ProxyGroupDomain>
-       <DataTypeDomain name="input_type" composite_data_supported="0">
-         <DataType value="vtkDataSet"/>
-       </DataTypeDomain>
-       <Documentation>
-         The input from which the selection is extracted.
-       </Documentation>
-     </InputProperty>
-
-     <IntVectorProperty name="UseGlobalIDs"
-        command="SetUseGlobalIDs"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Use GlobalIDs (instead of Indices) to generate the selection.
-        </Documentation>
-     </IntVectorProperty>
-
-     <SubProxy>
-        <Proxy name="SelectionSourceID" proxygroup="sources"
-          proxyname="IDSelectionSource">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="IDs" exposed_name="Indices" />
-        </ExposedProperties>
-     </SubProxy>
-
-     <SubProxy>
-        <Proxy name="SelectionSourceGID" proxygroup="sources"
-          proxyname="GlobalIDSelectionSource">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="IDs" exposed_name="GlobalIDs" />
-        </ExposedProperties>
-     </SubProxy>
-
-     <Hints>
-       <!-- View can be used to specify the preferred view for the proxy -->
-       <View type="XYPlotView" />
-     </Hints>
-     <!-- End ExtractPointsOverTime -->
-   </ExtractSelectionProxy>
-
-   <!-- ==================================================================== -->
-   <ExtractSelectionProxy name="ExtractCellsOverTime" 
-      class="vtkPExtractArraysOverTime"
-      base_proxygroup="filters" base_proxyname="ExtractPointsOverTime"
-      label="Plot Cell over Time"
-      selection_field_type="CELL">
-
-     <Documentation>
-        This filter extracts the variables associated with a cell over time. The
-        output is a 1D rectilinear grid where the x coordinates correspond to
-        time (the same array is also copied to a point array named Time or
-        TimeData (if Time exists in the input)).
-        This filter cannot be used for composite datasets.
-     </Documentation>
-
-     <Hints>
-        <!-- View can be used to specify the preferred view for the proxy -->
-        <View type="XYPlotView" />
-     </Hints>
-     <!-- End ExtractCellsOverTime -->
-   </ExtractSelectionProxy>
-
-   <!-- ==================================================================== -->
-   <ExtractSelectionProxy name="CompositeDataExtractPointsOverTime"
-                          class="vtkPExtractArraysOverTime"
-                          label="Plot Point over Time (Composite Data)"
-                          selection_field_type="POINT">
-     <Documentation>
-        This filter extracts the variables associated with a vertex over time. The
-        output is a 1D rectilinear grid where the x coordinates correspond to
-        time (the same array is also copied to a point array named Time or
-        TimeData (if Time exists in the input)).  The input point coordinates
-        are copied to a point array named Point Coordinates or Points (if Point
-        Coordinates exists in the  input).
-        This filter can only be used for composite datasets.
-     </Documentation>
-
      <InputProperty name="Input"
          command="SetInputConnection">
        <ProxyGroupDomain name="groups">
@@ -158,6 +22,7 @@
          <Group name="filters"/>
        </ProxyGroupDomain>
        <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet"/>
          <DataType value="vtkCompositeDataSet"/>
        </DataTypeDomain>
        <Documentation>
@@ -165,151 +30,29 @@
        </Documentation>
      </InputProperty>
 
-     <IntVectorProperty name="UseGlobalIDs"
-        command="SetUseGlobalIDs"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Use GlobalIDs (instead of Indices) to generate the selection.
-        </Documentation>
-     </IntVectorProperty>
-
-     <SubProxy>
-        <Proxy name="SelectionSourceID" proxygroup="sources"
-          proxyname="CompositeDataIDSelectionSource">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="IDs" exposed_name="Indices" />
-        </ExposedProperties>
-     </SubProxy>
-
-     <SubProxy>
-        <Proxy name="SelectionSourceGID" proxygroup="sources"
-          proxyname="GlobalIDSelectionSource">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="IDs" exposed_name="GlobalIDs" />
-        </ExposedProperties>
-     </SubProxy>
-
-     <Hints>
-       <!-- View can be used to specify the preferred view for the proxy -->
-       <View type="XYPlotView" />
-     </Hints>
-     <!-- End CompositeDataExtractPointsOverTime -->
-   </ExtractSelectionProxy>
-
-   <!-- ==================================================================== -->
-   <ExtractSelectionProxy name="CompositeDataExtractCellsOverTime"
-      class="vtkPExtractArraysOverTime"
-      base_proxygroup="filters"
-      base_proxyname="CompositeDataExtractPointsOverTime"
-      label="Plot Cell over Time (Composite Data)"
-      selection_field_type="CELL">
-     <Documentation>
-        This filter extracts the variables associated with a cell over time. The
-        output is a 1D rectilinear grid where the x coordinates correspond to
-        time (the same array is also copied to a point array named Time or
-        TimeData (if Time exists in the input)).
-        This filter can only be used for composite datasets.
-     </Documentation>
-
-     <Hints>
-        <!-- View can be used to specify the preferred view for the proxy -->
-        <View type="XYPlotView" />
-     </Hints>
-     <!-- End CompositeDataExtractCellsOverTime -->
-   </ExtractSelectionProxy>
-
-   <!-- ==================================================================== -->
-   <ExtractSelectionProxy name="HierarchicalDataExtractPointsOverTime"
-                          class="vtkPExtractArraysOverTime"
-                          label="Plot Point over Time (Hierarchical Data)"
-                          selection_field_type="POINT">
-     <Documentation>
-        This filter extracts the variables associated with a vertex over time. The
-        output is a 1D rectilinear grid where the x coordinates correspond to
-        time (the same array is also copied to a point array named Time or
-        TimeData (if Time exists in the input)).  The input point coordinates
-        are copied to a point array named Point Coordinates or Points (if Point
-        Coordinates exists in the  input).
-        This filter can be used for hierarchical datasets.
-     </Documentation>
-
-     <InputProperty name="Input"
-         command="SetInputConnection">
+     <InputProperty name="Selection"
+         command="SetSelectionConnection">
        <ProxyGroupDomain name="groups">
          <Group name="sources"/>
          <Group name="filters"/>
        </ProxyGroupDomain>
        <DataTypeDomain name="input_type">
-         <DataType value="vtkHierarchicalBoxDataSet"/>
+         <DataType value="vtkSelection"/>
        </DataTypeDomain>
        <Documentation>
-         The input from which the selection is extracted.
+         The input that provides the selection object.
        </Documentation>
+       <Hints>
+        <!-- This tag implies that all the auto-generated panels and the 
+             number of inputs counting code should simply ignore this property.
+        -->
+        <NoGUI />
+       </Hints>
      </InputProperty>
-
-     <IntVectorProperty name="UseGlobalIDs"
-        command="SetUseGlobalIDs"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Use GlobalIDs (instead of Indices) to generate the selection.
-        </Documentation>
-     </IntVectorProperty>
-
-     <SubProxy>
-        <Proxy name="SelectionSourceID" proxygroup="sources"
-          proxyname="HierarchicalDataIDSelectionSource">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="IDs" exposed_name="Indices" />
-        </ExposedProperties>
-     </SubProxy>
-
-     <SubProxy>
-        <Proxy name="SelectionSourceGID" proxygroup="sources"
-          proxyname="GlobalIDSelectionSource">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="IDs" exposed_name="GlobalIDs" />
-        </ExposedProperties>
-     </SubProxy>
-
-     <Hints>
-       <!-- View can be used to specify the preferred view for the proxy -->
-       <View type="XYPlotView" />
-     </Hints>
-     <!-- End HierarchicalDataExtractPointsOverTime -->
-   </ExtractSelectionProxy>
-
-   <!-- ==================================================================== -->
-   <ExtractSelectionProxy name="HierarchicalDataExtractCellsOverTime"
-      class="vtkPExtractArraysOverTime"
-      base_proxygroup="filters"
-      base_proxyname="HierarchicalDataExtractPointsOverTime"
-      label="Plot Cell over Time (Hierarchical Data)"
-      selection_field_type="CELL">
-     <Documentation>
-        This filter extracts the variables associated with a cell over time. The
-        output is a 1D rectilinear grid where the x coordinates correspond to
-        time (the same array is also copied to a point array named Time or
-        TimeData (if Time exists in the input)).
-        This filter can only be used for hierarchical datasets.
-     </Documentation>
-
-     <Hints>
-        <!-- View can be used to specify the preferred view for the proxy -->
-        <View type="XYPlotView" />
-     </Hints>
-     <!-- End HierarchicalDataExtractCellsOverTime -->
-   </ExtractSelectionProxy>
-
+      
+     <!-- End of ExtractSelectionOverTime -->
+   </SourceProxy>
+   
    <!-- ==================================================================== -->
    <SourceProxy name="ExtractFieldDataOverTime"
                           class="vtkExtractTemporalFieldData"

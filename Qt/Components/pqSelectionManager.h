@@ -98,14 +98,15 @@ public slots:
   /// Used to keep track of active render module
   void setActiveView(pqView*);
 
+  /// Updates the selected port.
+  void select(pqOutputPort*);
+
 private slots:
   /// Called when a source is removed from the pipeline browser
   void sourceRemoved(pqPipelineSource*);
 
   /// Called when the view fires signal indicating that is has made a selection.
   void onSelected(pqOutputPort*);
-
-protected:  
 
 private:
   pqSelectionManagerImplementation* Implementation;

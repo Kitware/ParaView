@@ -127,6 +127,7 @@ public:
     this->RepLinks = new pqPropertyLinks;
     this->IndicesAdaptor = 0;
     this->GlobalIDsAdaptor = 0;
+    this->LocationsAdaptor = 0;
     this->SelectionSource = 0;
     this->CompositeTreeAdaptor = 0;
     // Selection Labels Properties
@@ -158,6 +159,7 @@ public:
     delete this->SelectionLinks;
     delete this->RepLinks;
     delete this->CompositeTreeAdaptor;
+    delete this->LocationsAdaptor;
 
     delete this->SelectionColorAdaptor;
     delete this->PointColorAdaptor;
@@ -199,6 +201,7 @@ public:
 
   pqSignalAdaptorTreeWidget* IndicesAdaptor;
   pqSignalAdaptorTreeWidget* GlobalIDsAdaptor;
+  pqSignalAdaptorTreeWidget* LocationsAdaptor;
 
   QPointer<pqOutputPort> InputPort;
   // The representation whose properties are being edited.
@@ -231,6 +234,15 @@ public:
 
   bool UseProcessID;
   bool UpdatingGUI;
+
+  enum 
+    {
+    IDS = 0,
+    GLOBALIDS = 1,
+    FRUSTUM = 2,
+    LOCATIONS = 3,
+    THRESHOLDS = 4
+    };
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -296,6 +308,7 @@ void pqSelectionInspectorPanel::setupGUI()
   this->setupIDSelectionGUI();
   this->setupGlobalIDSelectionGUI();
   this->setupFrustumSelectionGUI();
+  this->setupLocationsSelectionGUI();
   this->setupThresholdSelectionGUI();
   this->setupSelectionLabelGUI();
 
@@ -417,6 +430,8 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
   this->updateThreholdDataArrays();
 
   this->Implementation->UpdatingGUI = false;
+
+  this->Implementation->SelectionManager->select(opport);
 }
 
 //-----------------------------------------------------------------------------
@@ -442,16 +457,19 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
   const char* proxyname = selSource->GetXMLName();
   if (proxyname == QString("FrustumSelectionSource"))
     {
-    this->Implementation->comboSelectionType->setCurrentIndex(2); // FRUSTUM
+    this->Implementation->comboSelectionType->setCurrentIndex(
+      pqImplementation::FRUSTUM); // FRUSTUM
     }
   else if (proxyname == QString("GlobalIDSelectionSource"))
     {
-    this->Implementation->comboSelectionType->setCurrentIndex(1); // Global IDs
+    this->Implementation->comboSelectionType->setCurrentIndex(
+      pqImplementation::GLOBALIDS); // Global IDs
     idsAdaptor = this->Implementation->GlobalIDsAdaptor;
     }
   else if (proxyname == QString("IDSelectionSource"))
     {
-    this->Implementation->comboSelectionType->setCurrentIndex(0); // IDs.
+    this->Implementation->comboSelectionType->setCurrentIndex(
+      pqImplementation::IDS); // IDs.
     this->Implementation->Indices->setColumnCount(2);
     this->Implementation->Indices->setHeaderLabels(
       QStringList() << "Process ID" << "Index");
@@ -467,7 +485,8 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     }
   else if (proxyname == QString("CompositeDataIDSelectionSource"))
     {
-    this->Implementation->comboSelectionType->setCurrentIndex(0); // IDs.
+    this->Implementation->comboSelectionType->setCurrentIndex(
+      pqImplementation::IDS); // IDs.
     this->Implementation->Indices->setColumnCount(3);
     this->Implementation->Indices->setHeaderLabels(
       QStringList() << "Composite ID" << "Process ID" << "Index");
@@ -491,7 +510,8 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     }
   else if (proxyname == QString("HierarchicalDataIDSelectionSource"))
     {
-    this->Implementation->comboSelectionType->setCurrentIndex(0); // IDs.
+    this->Implementation->comboSelectionType->setCurrentIndex(
+      pqImplementation::IDS); // IDs.
     this->Implementation->Indices->setColumnCount(3);
     this->Implementation->Indices->setHeaderLabels(
       QStringList() << "Level" << "DataSet" << "Index");
@@ -508,7 +528,14 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     }
   else if (proxyname == QString("ThresholdSelectionSource"))
     {
-    this->Implementation->comboSelectionType->setCurrentIndex(3); // Thresholds.
+    this->Implementation->comboSelectionType->setCurrentIndex(
+      pqImplementation::THRESHOLDS); // Thresholds.
+    }
+  else if (proxyname == QString("LocationSelectionSource"))
+    {
+    this->Implementation->comboSelectionType->setCurrentIndex(
+      pqImplementation::LOCATIONS);
+    idsAdaptor = this->Implementation->LocationsAdaptor;
     }
   else
     {
@@ -534,6 +561,13 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     this->Implementation->SelectionLinks->addPropertyLink(
       idsAdaptor, "values", SIGNAL(valuesChanged()),
       selSource, selSource->GetProperty("IDs"));
+    }
+
+  if (selSource->GetProperty("Locations"))
+    {
+    this->Implementation->SelectionLinks->addPropertyLink(
+      idsAdaptor, "values", SIGNAL(valuesChanged()),
+      selSource, selSource->GetProperty("Locations"));
     }
 
   if (selSource->GetProperty("Thresholds"))
@@ -924,6 +958,22 @@ void pqSelectionInspectorPanel::updateSelectionLabelEnableState()
 }
 
 //-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::setupLocationsSelectionGUI()
+{
+  this->Implementation->LocationsAdaptor = 
+    new pqSignalAdaptorTreeWidget(this->Implementation->Locations, true);
+  this->Implementation->LocationsAdaptor->setItemCreatorFunction(
+    &pqSelectionInspectorPanelNewItem);
+
+  QObject::connect(this->Implementation->Delete_Locations, SIGNAL(clicked()),
+    this, SLOT(deleteValue()));
+  QObject::connect(this->Implementation->DeleteAll_Locations, SIGNAL(clicked()),
+    this, SLOT(deleteAllValues()));
+  QObject::connect(this->Implementation->NewValue_Locations, SIGNAL(clicked()),
+    this, SLOT(newValue()));
+}
+
+//-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::setupGlobalIDSelectionGUI()
 {
   this->Implementation->GlobalIDsAdaptor =
@@ -931,8 +981,6 @@ void pqSelectionInspectorPanel::setupGlobalIDSelectionGUI()
   this->Implementation->GlobalIDsAdaptor->setItemCreatorFunction(
     &pqSelectionInspectorPanelNewItem);
 
-
-  // Link surface selection properties
   QObject::connect(this->Implementation->Delete_GlobalIDs, SIGNAL(clicked()),
     this, SLOT(deleteValue()));
   QObject::connect(this->Implementation->DeleteAll_GlobalIDs, SIGNAL(clicked()),
@@ -977,22 +1025,27 @@ void pqSelectionInspectorPanel::newValue()
   pqSignalAdaptorTreeWidget* adaptor = 0;
   switch (this->Implementation->stackedWidget->currentIndex())
     {
-  case 0: // IDs
+  case pqImplementation::IDS: // IDs
     activeTree = this->Implementation->Indices;
     adaptor = this->Implementation->IndicesAdaptor;
     break;
 
-  case 1: // GlobalIDs
+  case pqImplementation::GLOBALIDS: // GlobalIDs
     activeTree = this->Implementation->GlobalIDs;
     adaptor = this->Implementation->GlobalIDsAdaptor;
     break;
 
-  case 3: // Thresholds
+  case pqImplementation::THRESHOLDS: // Thresholds
     activeTree = this->Implementation->thresholdRanges;
     adaptor = this->Implementation->ThresholdsAdaptor;
     break;
 
-  case 2: // Frustum
+  case pqImplementation::LOCATIONS: 
+    activeTree = this->Implementation->Locations;
+    adaptor = this->Implementation->LocationsAdaptor;
+    break;
+
+  case pqImplementation::FRUSTUM: // Frustum
   default:
     return;
     }
@@ -1021,19 +1074,23 @@ void pqSelectionInspectorPanel::deleteValue()
   QTreeWidget* activeTree = 0;
   switch (this->Implementation->stackedWidget->currentIndex())
     {
-  case 0: // IDs
+  case pqImplementation::IDS: // IDs
     activeTree = this->Implementation->Indices;
     break;
 
-  case 1: // GlobalIDs
+  case pqImplementation::GLOBALIDS: // GlobalIDs
     activeTree = this->Implementation->GlobalIDs;
     break;
 
-  case 3: // Thresholds
+  case pqImplementation::THRESHOLDS: // Thresholds
     activeTree = this->Implementation->thresholdRanges;
     break;
 
-  case 2: // Frustum
+  case pqImplementation::LOCATIONS:
+    activeTree = this->Implementation->Locations;
+    break;
+
+  case pqImplementation::FRUSTUM: // Frustum
   default:
     return;
     }
@@ -1051,19 +1108,23 @@ void pqSelectionInspectorPanel::deleteAllValues()
   QTreeWidget* activeTree = 0;
   switch (this->Implementation->stackedWidget->currentIndex())
     {
-  case 0: // IDs
+  case pqImplementation::IDS: // IDs
     activeTree = this->Implementation->Indices;
     break;
 
-  case 1: // GlobalIDs
+  case pqImplementation::GLOBALIDS: // GlobalIDs
     activeTree = this->Implementation->GlobalIDs;
     break;
 
-  case 3: // Thresholds
+  case pqImplementation::THRESHOLDS: // Thresholds
     activeTree = this->Implementation->thresholdRanges;
     break;
 
-  case 2: // Frustum
+  case pqImplementation::LOCATIONS:
+    activeTree = this->Implementation->Locations;
+    break;
+
+  case pqImplementation::FRUSTUM: // Frustum
   default:
     return;
     }
@@ -1147,48 +1208,6 @@ void pqSelectionInspectorPanel::onActiveViewChanged(pqView* view)
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionInspectorPanel::convertSelection(bool toGIDs)
-{
-  vtkSMProxy* selectionSource = this->Implementation->getSelectionSource();
-  if (!selectionSource)
-    {
-    return;
-    }
-
-  if (toGIDs) // Convert INDICES to GLOBALIDS.
-    {
-    QList<vtkIdType> globalIds = 
-      this->Implementation->SelectionManager->getGlobalIDs();
-
-    // Now to set gids on the IDs property, we need to insert process numbers.
-    QList<QVariant> ids;
-    foreach (vtkIdType gid, globalIds)
-      {
-      ids.push_back(gid);
-      }
-    pqSMAdaptor::setMultipleElementProperty(
-      selectionSource->GetProperty("IDs"), ids);
-    }
-  else  // Convert GLOBALIDS to INDICES.
-    {
-    QList<QPair<int, vtkIdType> > indices =
-      this->Implementation->SelectionManager->getIndices();
-
-    QList<QVariant> ids;
-    for(int cc=0; cc < indices.size(); cc++)
-      {
-      QPair<int, vtkIdType> pair = indices[cc];
-      ids.push_back(pair.first);
-      ids.push_back(pair.second);
-      }
-    pqSMAdaptor::setMultipleElementProperty(
-      selectionSource->GetProperty("IDs"), ids);
-    }
-
-  selectionSource->UpdateVTKObjects();
-}
-
-//-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::onTableGrown(pqTreeWidgetItemObject* item)
 {
   if (this->Implementation->CompositeTreeAdaptor)
@@ -1241,17 +1260,20 @@ int pqSelectionInspectorPanel::getContentType() const
 {
   switch (this->Implementation->comboSelectionType->currentIndex())
     {
-  case 0: // IDs
+  case pqImplementation::IDS: // IDs
     return vtkSelection::INDICES; 
 
-  case 1: // GlobalsIDs
+  case pqImplementation::GLOBALIDS: // GlobalsIDs
     return vtkSelection::GLOBALIDS;
 
-  case 2: // Frustum
+  case pqImplementation::FRUSTUM: // Frustum
     return vtkSelection::FRUSTUM;
 
-  case 3: // Threshold
+  case pqImplementation::THRESHOLDS: // Threshold
     return vtkSelection::THRESHOLDS;
+
+  case pqImplementation::LOCATIONS:
+    return vtkSelection::LOCATIONS;
 
   default:
     qDebug() << "Case not handled.";

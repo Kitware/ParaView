@@ -209,6 +209,12 @@ void pqSelectionManager::onSelected(pqOutputPort* selectedPort)
 }
 
 //-----------------------------------------------------------------------------
+void pqSelectionManager::select(pqOutputPort* selectedPort)
+{
+  this->Implementation->SelectedPort = selectedPort;
+}
+
+//-----------------------------------------------------------------------------
 static void getGlobalIDs(vtkSelection* sel, QList<vtkIdType>& gids)
 {
   if (sel && sel->GetContentType() == vtkSelection::SELECTIONS)

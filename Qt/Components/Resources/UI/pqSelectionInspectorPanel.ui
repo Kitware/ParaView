@@ -142,6 +142,11 @@
           </item>
           <item>
            <property name="text" >
+            <string>Locations</string>
+           </property>
+          </item>
+          <item>
+           <property name="text" >
             <string>Thresholds</string>
            </property>
           </item>
@@ -189,7 +194,7 @@
         <item row="3" column="0" colspan="2" >
          <widget class="QCheckBox" name="checkboxContainCell" >
           <property name="enabled" >
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="text" >
            <string>Select cells that include the selected points</string>
@@ -528,6 +533,140 @@
                </size>
               </property>
              </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="page_Locations" >
+           <layout class="QVBoxLayout" >
+            <property name="spacing" >
+             <number>3</number>
+            </property>
+            <property name="leftMargin" >
+             <number>3</number>
+            </property>
+            <property name="topMargin" >
+             <number>3</number>
+            </property>
+            <property name="rightMargin" >
+             <number>3</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>3</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_3" >
+              <property name="text" >
+               <string>Locations</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="pqTreeWidget" name="Locations" >
+              <property name="selectionMode" >
+               <enum>QAbstractItemView::MultiSelection</enum>
+              </property>
+              <property name="rootIsDecorated" >
+               <bool>false</bool>
+              </property>
+              <property name="sortingEnabled" >
+               <bool>true</bool>
+              </property>
+              <property name="columnCount" >
+               <number>3</number>
+              </property>
+              <column>
+               <property name="text" >
+                <string>X</string>
+               </property>
+              </column>
+              <column>
+               <property name="text" >
+                <string>Y</string>
+               </property>
+              </column>
+              <column>
+               <property name="text" >
+                <string>Z</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+            <item>
+             <layout class="QGridLayout" >
+              <property name="leftMargin" >
+               <number>0</number>
+              </property>
+              <property name="topMargin" >
+               <number>0</number>
+              </property>
+              <property name="rightMargin" >
+               <number>0</number>
+              </property>
+              <property name="bottomMargin" >
+               <number>0</number>
+              </property>
+              <property name="horizontalSpacing" >
+               <number>2</number>
+              </property>
+              <property name="verticalSpacing" >
+               <number>2</number>
+              </property>
+              <item row="0" column="0" >
+               <widget class="QPushButton" name="NewValue_Locations" >
+                <property name="toolTip" >
+                 <string>Add a single value to the current set</string>
+                </property>
+                <property name="statusTip" >
+                 <string>Add a single value to the current set.</string>
+                </property>
+                <property name="text" >
+                 <string>New Value</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1" >
+               <widget class="QPushButton" name="DeleteAll_Locations" >
+                <property name="enabled" >
+                 <bool>true</bool>
+                </property>
+                <property name="toolTip" >
+                 <string>Delete all values</string>
+                </property>
+                <property name="text" >
+                 <string>Delete All</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1" >
+               <widget class="QPushButton" name="NewRange_Locations" >
+                <property name="enabled" >
+                 <bool>false</bool>
+                </property>
+                <property name="toolTip" >
+                 <string>Add a single value to the current set</string>
+                </property>
+                <property name="statusTip" >
+                 <string>Add a single value to the current set.</string>
+                </property>
+                <property name="text" >
+                 <string>New Range</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" >
+               <widget class="QPushButton" name="Delete_Locations" >
+                <property name="enabled" >
+                 <bool>true</bool>
+                </property>
+                <property name="toolTip" >
+                 <string>Delete selected values from the current set</string>
+                </property>
+                <property name="text" >
+                 <string>Delete</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
            </layout>
           </widget>

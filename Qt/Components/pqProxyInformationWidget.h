@@ -37,8 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class pqOutputPort;
-class vtkPVDataInformation;
 class QTreeWidgetItem;
+class vtkEventQtSlotConnect;
+class vtkPVDataInformation;
 
 /// Widget which provides information about an output port of a source proxy
 class PQCOMPONENTS_EXPORT pqProxyInformationWidget : public QWidget
@@ -73,6 +74,7 @@ private:
 
 private:
   QPointer<pqOutputPort> OutputPort;
+  vtkEventQtSlotConnect* VTKConnect;
   class pqUi;
   pqUi* Ui;
 };

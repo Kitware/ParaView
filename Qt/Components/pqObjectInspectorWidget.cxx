@@ -57,10 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExodusIIPanel.h"
 #include "pqExodusPanel.h"
 #include "pqExtractCTHPartsPanel.h"
-#include "pqExtractLocationsPanel.h"
-#include "pqExtractSelectionPanel.h"
 #include "pqExtractSelectionsPanel.h"
-#include "pqExtractThresholdsPanel.h"
 #include "pqGlyphPanel.h"
 #include "pqLoadedFormObjectPanel.h"
 #include "pqObjectBuilder.h"
@@ -125,25 +122,14 @@ public:
         {
         return new pqThresholdPanel(proxy, p);
         }
-      if(QString("ExtractSelection") == proxy->getProxy()->GetXMLName())
+      if (QString("ExtractSelection") == proxy->getProxy()->GetXMLName() ||
+        QString("ExtractSelectionOverTime") == proxy->getProxy()->GetXMLName())
         {
         return new pqExtractSelectionsPanel(proxy, p);
-        }
-      if(QString("ExtractPointsOverTime") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqExtractSelectionPanel(proxy, p);
-        }
-      if(QString("ExtractCellsOverTime") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqExtractSelectionPanel(proxy, p);
         }
       if(QString("Contour") == proxy->getProxy()->GetXMLName())
         {
         return new pqContourPanel(proxy, p);
-        }
-      if(QString("ExtractThresholds") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqExtractThresholdsPanel(proxy, p);
         }
       if(QString("CTHPart") == proxy->getProxy()->GetXMLName())
         {
@@ -187,11 +173,9 @@ public:
 //         QString("ParticleTracer") == proxy->getProxy()->GetXMLName() ||
          QString("Threshold") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractSelection") == proxy->getProxy()->GetXMLName() ||
-         QString("ExtractPointsOverTime") == proxy->getProxy()->GetXMLName() ||
-         QString("ExtractCellsOverTime") == proxy->getProxy()->GetXMLName() ||
+         QString("ExtractSelectionOverTime") == proxy->getProxy()->GetXMLName() ||
          QString("Contour") == proxy->getProxy()->GetXMLName() || 
-         QString("ExtractThresholds") == proxy->getProxy()->GetXMLName() 
-        || QString("CTHPart") == proxy->getProxy()->GetXMLName()
+         QString("CTHPart") == proxy->getProxy()->GetXMLName()
         )
         {
         return true;

@@ -191,7 +191,7 @@ void pqExtractSelectionsPanel::updateLabels()
     columnValues << QString("%1 ID Selection").arg(
       fieldType == 0? "Cell" : "Point") << endl << endl << endl;
     columnValues  << "Composite ID" 
-      << "\t\t" << "Process ID" << "\t\t" << "Index" << endl;
+      << "\t" << "Process ID" << "\t\t" << "Index" << endl;
     vtkSMProperty* idvp = selectionSource->GetProperty("IDs");
     QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(idvp);
     for (int cc=0; cc <value.size(); cc++)
@@ -210,6 +210,21 @@ void pqExtractSelectionsPanel::updateLabels()
     columnValues  << "Level" << "\t\t" << "Dataset" << "\t\t" 
       << "Index" << endl;
     vtkSMProperty* idvp = selectionSource->GetProperty("IDs");
+    QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(idvp);
+    for (int cc=0; cc <value.size(); cc++)
+      {
+      if((cc%3) == 0)
+        {
+        columnValues << endl;
+        }
+      columnValues << value[cc].toString() << "\t\t";
+      }
+    }
+  else if (strcmp(xmlname, "LocationSelectionSource") == 0)
+    {
+    columnValues << "Location-based Selection" << endl << endl << endl;
+    columnValues << "Probe Locations" << endl;
+    vtkSMProperty* idvp = selectionSource->GetProperty("Locations");
     QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(idvp);
     for (int cc=0; cc <value.size(); cc++)
       {

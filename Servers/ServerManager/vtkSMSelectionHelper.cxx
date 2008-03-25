@@ -41,7 +41,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.11");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.12");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -427,20 +427,30 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(int outputType,
   if (outputType == vtkSelection::INDICES && selectionSourceProxy &&
     strcmp(inproxyname, "GlobalIDSelectionSource") == 0)
     {
-    // convert from global IDs to indices.
-    return vtkSMSelectionHelper::ConvertIndices(
-      vtkSMSourceProxy::SafeDownCast(selectionSourceProxy),
-      dataSource, dataPort, false);
+    vtkSMVectorProperty* ids = vtkSMVectorProperty::SafeDownCast(
+      selectionSourceProxy->GetProperty("IDs"));
+    if (ids->GetNumberOfElements() > 0)
+      {
+      // convert from global IDs to indices.
+      return vtkSMSelectionHelper::ConvertIndices(
+        vtkSMSourceProxy::SafeDownCast(selectionSourceProxy),
+        dataSource, dataPort, false);
+      }
     }
   else if (outputType == vtkSelection::GLOBALIDS && selectionSourceProxy && (
       strcmp(inproxyname, "IDSelectionSource") == 0 ||
       strcmp(inproxyname, "HierarchicalDataIDSelectionSource") == 0||
       strcmp(inproxyname, "CompositeDataIDSelectionSource")==0))
     {
-    // convert from ID seelction to global IDs.
-    return vtkSMSelectionHelper::ConvertIndices(
-      vtkSMSourceProxy::SafeDownCast(selectionSourceProxy),
-      dataSource, dataPort, true);
+    vtkSMVectorProperty* ids = vtkSMVectorProperty::SafeDownCast(
+      selectionSourceProxy->GetProperty("IDs"));
+    if (ids->GetNumberOfElements() > 0)
+      {
+      // convert from ID seelction to global IDs.
+      return vtkSMSelectionHelper::ConvertIndices(
+        vtkSMSourceProxy::SafeDownCast(selectionSourceProxy),
+        dataSource, dataPort, true);
+      }
     }
 
   // Conversion not possible, so simply create a new proxy of the requested

@@ -131,6 +131,9 @@ protected:
   /// selection.
   void setupGlobalIDSelectionGUI();
 
+  /// Sets up the GUI for the Locations selection.
+  void setupLocationsSelectionGUI();
+
   void setupSelectionLabelGUI();
 
   /// Sets up property links between the selection source proxy and the GUI.
@@ -144,9 +147,6 @@ protected:
 
   void setupThresholdSelectionGUI();
   void updateThreholdDataArrays();
-
-  /// Converts index selection to global id selection and vice versa.
-  void convertSelection(bool toGlobalIds);
 
   /// Create a new selection source for the current output port if
   /// * no selection source present

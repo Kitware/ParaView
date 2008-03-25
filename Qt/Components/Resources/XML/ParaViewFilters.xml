@@ -17,20 +17,16 @@
     <Filter name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
     <Filter name="ExtractSelection"
             icon=":/pqWidgets/Icons/pqExtractSelection24.png" />
+    <Filter name="ExtractSelectionOverTime"
+            icon=":/pqWidgets/Icons/pqPlotCellOverTime24.png" />
     <Filter name="ExtractHistogram" 
             icon=":/pqWidgets/Icons/pqHistogram24.png"/>
     <Filter name="IntegrateAttributes" />
-    <Filter name="ExtractCellsOverTime" 
-            icon=":/pqWidgets/Icons/pqPlotCellOverTime24.png" />
-    <Filter name="ExtractPointsOverTime"
-            icon=":/pqWidgets/Icons/pqPlotPointOverTime24.png" />
     <Filter name="ExtractFieldDataOverTime" />
-    <Filter name="ExtractThresholds" /> 
     <Filter name="ProbeLine" 
             icon=":/pqWidgets/Icons/pqPlotLineOverTime24.png" />
     <Filter name="ProbePoint" 
             icon=":/pqWidgets/Icons/pqProbeLocation24.png" />
-    <Filter name="ProbeLocationOverTime" />
     <Filter name="Programmable Filter" 
             icon=":/pqWidgets/Icons/pqProgrammableFilter24.png"/>
   </Category>
@@ -68,6 +64,7 @@
   <Filter name="ExtractHistogram" />
   <Filter name="ExtractLevel" />
   <Filter name="ExtractSelection" />
+  <Filter name="ExtractSelectionOverTime" />
   <Filter name="ExtractDataSets" />
   <Filter name="FeatureEdges" />
   <Filter name="Glyph" />
