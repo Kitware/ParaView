@@ -65,6 +65,7 @@ public:
     this->Links.setUseUncheckedProperties(false);
     this->Links.setAutoUpdateVTKObjects(true);
     this->Observer = vtkEventQtSlotConnect::New();
+    this->PickPoint1 = true;
   }
   
   ~pqImplementation()
@@ -82,6 +83,8 @@ public:
   /// Maps Qt widgets to the 3D widget
   pqPropertyLinks Links;
   vtkEventQtSlotConnect* Observer;
+
+  bool PickPoint1;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -91,6 +94,9 @@ pqLineWidget::pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
   Superclass(o, pxy, p),
   Implementation(new pqImplementation())
 {
+  // enable picking.
+  this->pickingSupported(QKeySequence(tr("P")));
+
   this->Implementation->UI.setupUi(this);
   this->Implementation->UI.visible->setChecked(this->widgetVisible());
 
@@ -201,6 +207,30 @@ void pqLineWidget::setControlledProperty(const char* function,
         prop->GetXMLLabel());
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqLineWidget::pick(double x, double y, double z)
+{
+  vtkSMRepresentationProxy* widget = this->getWidgetProxy();
+  QList<QVariant> value;
+  value << x << y << z;
+  if (this->Implementation->PickPoint1)
+    {
+    pqSMAdaptor::setMultipleElementProperty(
+      widget->GetProperty("Point1WorldPosition"), value);
+    }
+  else
+    {
+    pqSMAdaptor::setMultipleElementProperty(
+      widget->GetProperty("Point2WorldPosition"), value);
+    }
+  widget->UpdateVTKObjects();
+
+  this->Implementation->PickPoint1 = 
+    !this->Implementation->PickPoint1;
+
+  this->render();
 }
 
 //-----------------------------------------------------------------------------

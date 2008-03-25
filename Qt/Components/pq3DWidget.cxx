@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt includes.
 #include <QtDebug>
 #include <QPointer>
+#include <QShortcut>
 
 // ParaView GUI includes.
 #include "pqApplicationCore.h"
@@ -58,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqRenderView.h"
 #include "pqSMAdaptor.h"
+#include "pqPickHelper.h"
 
 class pq3DWidgetInternal
 {
@@ -65,7 +67,8 @@ public:
   pq3DWidgetInternal() :
     IgnorePropertyChange(false),
     WidgetVisible(true),
-    Selected(false)
+    Selected(false),
+    PickShortcut(0)
   {
   }
     
@@ -82,6 +85,10 @@ public:
   bool WidgetVisible;
   /// Stores the selected/not selected state of the 3D widget (controlled by the owning panel)
   bool Selected;
+
+  pqPickHelper PickHelper;
+  QKeySequence PickSequence;
+  QShortcut* PickShortcut;
 };
 
 //-----------------------------------------------------------------------------
@@ -97,6 +104,10 @@ pq3DWidget::pq3DWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _p) :
   this->Internal->IgnorePropertyChange = false;
 
   this->setControlledProxy(pxy);
+
+  QObject::connect(&this->Internal->PickHelper,
+    SIGNAL(pickFinished(double, double, double)),
+    this, SLOT(pick(double, double, double)));
 }
 
 //-----------------------------------------------------------------------------
@@ -159,13 +170,23 @@ pqRenderView* pq3DWidget::renderView() const
 }
 
 //-----------------------------------------------------------------------------
-void pq3DWidget::setView(pqView* pqview)
+void pq3DWidget::pickingSupported(const QKeySequence& key)
 {
+  this->Internal->PickSequence = key;
+}
+
+//-----------------------------------------------------------------------------
+void pq3DWidget::setView(pqView* pqview)
+{ 
   if (pqview == this->renderView())
     {
     this->Superclass::setView(pqview);
     return;
     }
+
+  // get rid of old shortcut.
+  delete this->Internal->PickShortcut;
+  this->Internal->PickShortcut = 0;
 
   bool cur_visbility = this->widgetVisible();
   this->hideWidget();
@@ -180,6 +201,15 @@ void pq3DWidget::setView(pqView* pqview)
     }
 
   this->Superclass::setView(pqview);
+  this->Internal->PickHelper.setView(pqview);
+
+  if (pqview && !this->Internal->PickSequence.isEmpty())
+    {
+    this->Internal->PickShortcut = new QShortcut(
+      this->Internal->PickSequence, pqview->getWidget());
+    QObject::connect(this->Internal->PickShortcut, SIGNAL(activated()),
+      &this->Internal->PickHelper, SLOT(pick()));
+    }
 
   if (this->renderView() && widget)
     {
@@ -194,6 +224,7 @@ void pq3DWidget::setView(pqView* pqview)
     {
     this->showWidget();
     }
+  this->updatePickShortcut();
 }
 
 //-----------------------------------------------------------------------------
@@ -458,14 +489,6 @@ int pq3DWidget::getReferenceInputBounds(double bounds[6]) const
 }
 
 //-----------------------------------------------------------------------------
-bool pq3DWidget::realWidgetVisibility() const
-{
-  return (this->Internal->Selected
-    && this->Internal->WidgetVisible &&
-    this->Internal->WidgetProxy && this->renderView());
-}
-
-//-----------------------------------------------------------------------------
 void pq3DWidget::updateWidgetVisibility()
 {
   const bool widget_visible = this->Internal->Selected
@@ -496,4 +519,19 @@ void pq3DWidget::updateWidgetVisibility()
     // state changes.
     //pqApplicationCore::instance()->render();
     }
+  this->updatePickShortcut();
 }
+
+//-----------------------------------------------------------------------------
+void pq3DWidget::updatePickShortcut()
+{
+  bool pickable = (this->Internal->Selected
+    && this->Internal->WidgetVisible &&
+    this->Internal->WidgetProxy && this->renderView());
+
+  if (this->Internal->PickShortcut)
+    {
+    this->Internal->PickShortcut->setEnabled(pickable);
+    }
+}
+

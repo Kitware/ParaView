@@ -68,6 +68,9 @@ protected:
   virtual void setControlledProperty(const char* function,
     vtkSMProperty * controlled_property);
 
+  /// Called on pick.
+  virtual void pick(double, double, double);
+
 private slots:
   void onWidgetVisibilityChanged(bool visible);
 

@@ -56,23 +56,21 @@ public:
   /// and hints have been set.
   virtual void resetBounds();
 
-  /// Set the view that this panel works with. Overridden to update picking
-  /// shortcut.
-  virtual void setView(pqView*);
-
 private slots:
   /// Called to reset the 3D widget bounds to the reference proxy bounds
   void onResetBounds();
+
   /// Called when the user starts dragging the 3D widget
   void on3DWidgetStartDrag();
+
   /// Called when the user is dragging the 3D widget
   void on3DWidgetDrag();
+
   /// Called when the user stops dragging the 3D widget
   void on3DWidgetEndDrag();
+
   /// Called when the user changes widget visibility
   void onWidgetVisibilityChanged(bool visible);
-  /// Called on pick.
-  void pick(double, double, double);
 
 protected:
   /// Internal method to create the widget.
@@ -81,11 +79,9 @@ protected:
   /// Internal method to cleanup widget.
   void cleanupWidget();
 
-  /// Overridden to update picking shortcut.
-  void updatePickShortcut();
+  /// Called on pick.
+  virtual void pick(double, double, double);
 
-  /// Called every time the widget enabled/visible state needs to be updated.
-  virtual void updateWidgetVisibility();
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

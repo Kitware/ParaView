@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pq3DWidgetInternal;
 class pqProxy;
 class pqRenderView;
+class QKeySequence;
 class vtkPVXMLElement;
 class vtkSMNewWidgetRepresentationProxy;
 class vtkSMProperty;
@@ -137,6 +138,9 @@ public slots:
 protected slots:
   /// Called to request a render.
   void render();
+  
+  /// Called on each pick, default implementation does nothing.
+  virtual void pick(double, double, double) {};
 
 protected:
   /// Subclasses can override this method to map properties to
@@ -146,6 +150,10 @@ protected:
   virtual void setControlledProperty(const char* function,
     vtkSMProperty * controlled_property);
   
+  /// Subclasses should call this method if they support picking.
+  /// When the user picks a position,
+  /// the virtual method pick(double, double, double) will be called.
+  void pickingSupported(const QKeySequence& key);
 
   void setControlledProperty(vtkSMProperty* widget_property, vtkSMProperty* controlled_property);
 
@@ -159,14 +167,13 @@ protected:
   /// returns 1 on success, 0 otherwise.
   int getReferenceInputBounds(double bounds[6]) const;
 
-  /// Called every time the widget enabled/visible state needs to be updated.
-  virtual void updateWidgetVisibility();
-
-  /// Returns the actual visibility of the widget.
-  bool realWidgetVisibility() const;
 private:
   void setControlledProxy(vtkSMProxy*);
 
+  /// updates the enable state of the picking shortcut.
+  void updatePickShortcut();
+
+  void updateWidgetVisibility();
   pq3DWidgetInternal* const Internal;
 };
 
