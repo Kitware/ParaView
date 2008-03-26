@@ -32,6 +32,7 @@
 #include "vtkUniformGrid.h"
 #include "vtkAMRBox.h"
 #include <math.h>
+#include "vtkDoubleArray.h"
 
 #include "vtkDataSet.h"
 #include "vtkDataObject.h"
@@ -41,7 +42,7 @@
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.11");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.12");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //============================================================================
@@ -705,12 +706,12 @@ void vtkCTHFragmentConnectBlock::GetBaseCellExtent(int ext[6])
   // Since this is taking a significant amount of time in the
   // GetNeighborIterator method, wemight consider storing
   // the base cell extent directly.
-  *ext++ + this->BaseCellExtent[0];
-  *ext++ + this->BaseCellExtent[1];
-  *ext++ + this->BaseCellExtent[2];
-  *ext++ + this->BaseCellExtent[3];
-  *ext++ + this->BaseCellExtent[4];
-  *ext++ + this->BaseCellExtent[5];
+  *ext++ = this->BaseCellExtent[0];
+  *ext++ = this->BaseCellExtent[1];
+  *ext++ = this->BaseCellExtent[2];
+  *ext++ = this->BaseCellExtent[3];
+  *ext++ = this->BaseCellExtent[4];
+  *ext++ = this->BaseCellExtent[5];
 }
 
 //----------------------------------------------------------------------------
@@ -1182,6 +1183,8 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
   this->RootSpacing[0]=this->RootSpacing[1]=this->RootSpacing[2]=1.0;
 
   this->FragmentId = 0;
+  this->FragmentVolume = 0.0;
+  this->FragmentVolumes = vtkDoubleArray::New();
   this->EquivalenceSet = new vtkCTHFragmentEquivalenceSet;
 }
 
@@ -1194,6 +1197,10 @@ vtkCTHFragmentConnect::~vtkCTHFragmentConnect()
   this->RootSpacing[0]=this->RootSpacing[1]=this->RootSpacing[2]=1.0;
   
   this->FragmentId = 0;
+  this->FragmentVolume = 0.0;
+  this->FragmentVolumes->Delete();
+  this->FragmentVolumes = 0;
+
   delete this->EquivalenceSet;
   this->EquivalenceSet = 0;
 }
@@ -2243,6 +2250,7 @@ int vtkCTHFragmentConnect::RequestData(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   this->FragmentId = 0;
+  this->FragmentVolume = 0.0;
   this->EquivalenceSet->Initialize();
 
   this->BlockIdArray = vtkIntArray::New();
@@ -2267,6 +2275,7 @@ int vtkCTHFragmentConnect::RequestData(
 
   // Keep a counter of which connected component we are upto.
   this->FragmentId = 0;
+  this->FragmentVolume = 0.0;
 
   vtkImageData *inData = vtkImageData::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
@@ -2363,7 +2372,10 @@ int vtkCTHFragmentConnect::ProcessBlock(int blockId)
           queue->Push(xIterator);
           this->ConnectFragment(queue);
           // Move to next fragment.
+          // Save the volume from the last fragment.
+          this->FragmentVolumes->InsertTuple1(this->FragmentId, this->FragmentVolume);
           ++this->FragmentId;
+          this->FragmentVolume = 0.0;
           }
         xIterator->VolumeFractionPointer += cellIncs[0];
         xIterator->FragmentIdPointer += cellIncs[0];
@@ -2905,6 +2917,13 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
     // Get the next voxel/iterator to search.
     vtkCTHFragmentConnectIterator iterator;
     queue->Pop(&iterator);
+    
+    // Lets integrate volume when we remove the iterator from the queue.
+    // We could also do it wehn we add the iterator to the queue, but
+    // the adds occur in so many places.
+    double* spacing = iterator.Block->GetSpacing();
+    this->FragmentVolume += spacing[0] * spacing[1] * spacing[2]
+           * (double)(*(iterator.VolumeFractionPointer)) / 255.0;
     
     double middleValue = 127.5;
 
@@ -3943,4 +3962,14 @@ void vtkCTHFragmentConnect::ReceiveGhostFragmentIds(
     delete [] buf;
     }
 }
+
+
+//----------------------------------------------------------------------------
+// Make a cell array that has fragment volume as a temporary solution.
+// The volume array should really be field data.
+//void vtkCTHFragmentEquivalenceSet::GenerateVolumeArray()
+//{
+//  pd->GetCellData()->AddArray(idArray);
+//}
+
 

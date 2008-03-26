@@ -25,6 +25,7 @@
 #include "vtkPolyDataAlgorithm.h"
 #include "vtkstd/vector" // using vector internally. ok for leaf classes.
 
+class vtkDoubleArray;
 class vtkCellArray;
 class vtkImageData;
 class vtkPoints;
@@ -161,7 +162,9 @@ protected:
   
   int FragmentId;
   // Integrate the volume for this fragment.
-  double Volume;
+  // We will do the same for all attributes?
+  double FragmentVolume;
+
   // Save the volume in this array indexed by the fragmentId.
   vtkDoubleArray* FragmentVolumes;
   
