@@ -1279,6 +1279,9 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
         <EnumerationDomain name="enum">
           <Entry value="0" text="CELL" />
           <Entry value="1" text="POINT" />
+          <Entry value="2" text="FIELD" />
+          <Entry value="3" text="VERTEX" />
+          <Entry value="4" text="EDGE" />
         </EnumerationDomain>
      </IntVectorProperty>
 
