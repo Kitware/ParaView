@@ -33,29 +33,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayColorWidget.h"
 
 #include "vtkEventQtSlotConnect.h"
-#include "vtkPVArrayInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVGeometryInformation.h"
-#include "vtkSMIntVectorProperty.h"
 #include "vtkSMPVRepresentationProxy.h"
-#include "vtkSMStringVectorProperty.h"
+#include "vtkSMProperty.h"
+#include "vtkSMOutputPort.h"
 
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QIcon>
-#include <QList>
 #include <QRegExp>
-#include <QtDebug>
 #include <QTimer>
 
 #include "pqApplicationCore.h"
 #include "pqPipelineRepresentation.h"
+#include "pqOutputPort.h"
 #include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
 pqDisplayColorWidget::pqDisplayColorWidget( QWidget *p ) :
   QWidget( p ),
-  BlockEmission(false)
+  BlockEmission(false),
+  Updating(false)
 {
   this->CellDataIcon = new QIcon(":/pqWidgets/Icons/pqCellData16.png");
   this->PointDataIcon = new QIcon(":/pqWidgets/Icons/pqPointData16.png");
@@ -255,52 +252,67 @@ void pqDisplayColorWidget::updateGUI()
 //-----------------------------------------------------------------------------
 void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* display) 
 {
-  if(display == this->Display)
+  if(display == this->Representation)
     {
     return;
     }
 
-  if (this->Display)
+  if (this->Representation)
     {
-    QObject::disconnect(this->Display, 0, this, 0);
+    QObject::disconnect(this->Representation, 0, this, 0);
     }
 
   this->VTKConnect->Disconnect();
-  this->Display = qobject_cast<pqPipelineRepresentation*>(display);
-  if(this->Display)
+  this->Representation = qobject_cast<pqPipelineRepresentation*>(display);
+  if(this->Representation)
     {
-    vtkSMProxy* repr = this->Display->getProxy();
+    vtkSMProxy* repr = this->Representation->getProxy();
     this->VTKConnect->Connect(repr->GetProperty("ColorAttributeType"),
-      vtkCommand::ModifiedEvent, this, SLOT(reloadGUI()),
-      NULL, 0.0,
-      Qt::QueuedConnection);
+      vtkCommand::ModifiedEvent, this, SLOT(needReloadGUI()),
+      NULL, 0.0);
     this->VTKConnect->Connect(repr->GetProperty("ColorArrayName"),
-      vtkCommand::ModifiedEvent, this, SLOT(reloadGUI()),
-      NULL, 0.0,
-      Qt::QueuedConnection);
+      vtkCommand::ModifiedEvent, this, SLOT(needReloadGUI()),
+      NULL, 0.0);
     this->VTKConnect->Connect(
       repr->GetProperty("Representation"), vtkCommand::ModifiedEvent, 
-      this, SLOT(reloadGUI()),
-      NULL, 0.0,
-      Qt::QueuedConnection);
+      this, SLOT(needReloadGUI()),
+      NULL, 0.0);
+    
+    this->VTKConnect->Connect(
+      this->Representation->getOutputPortFromInput()->getOutputPortProxy(),
+      vtkCommand::UpdateInformationEvent, 
+      this, SLOT(needReloadGUI()),
+      NULL, 0.0);
 
     // Every time the display updates, it is possible that the arrays available for 
     // coloring have changed, hence we reload the list.
-    QObject::connect(this->Display, SIGNAL(updated()), 
-      this, SLOT(reloadGUI()), Qt::QueuedConnection);
+    QObject::connect(this->Representation, SIGNAL(updated()), 
+      this, SLOT(needReloadGUI()));
     }
-  QTimer::singleShot(0, this, SLOT(reloadGUI()));
+  this->needReloadGUI();
 }
 
 //-----------------------------------------------------------------------------
 pqPipelineRepresentation* pqDisplayColorWidget::getRepresentation() const
 {
-  return this->Display;
+  return this->Representation;
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayColorWidget::needReloadGUI()
+{
+  if(this->Updating)
+    {
+    return;
+    }
+  this->Updating = true;
+  QTimer::singleShot(0, this, SLOT(reloadGUI()));
 }
 
 //-----------------------------------------------------------------------------
 void pqDisplayColorWidget::reloadGUI()
 {
+  this->Updating = false;
   this->BlockEmission = true;
   this->clear();
 

@@ -341,6 +341,8 @@ void pqPipelineSource::setDefaultPropertyValues()
     // initialized correctly eg. FileName in case of readers,
     // all Input/Source properties in case filters etc.
     sp->UpdatePipelineInformation();
+
+    sp->CreateOutputPorts();
     }
 
   this->Superclass::setDefaultPropertyValues();

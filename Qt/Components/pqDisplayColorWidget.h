@@ -115,6 +115,7 @@ private slots:
   /// Called when any important property on the display changes.
   /// This updates the selected value.
   void updateGUI();
+  void needReloadGUI();
 
 private:
   /// Converts a variable type and name into a packed string representation 
@@ -128,8 +129,9 @@ private:
   QHBoxLayout* Layout;
   QComboBox* Variables;
   bool BlockEmission;
+  bool Updating;
   vtkEventQtSlotConnect* VTKConnect;
-  QPointer<pqPipelineRepresentation> Display;
+  QPointer<pqPipelineRepresentation> Representation;
   QList<QString> AvailableArrays;
 };
 
