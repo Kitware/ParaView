@@ -114,7 +114,7 @@ public:
 
 
 vtkStandardNewMacro(vtkPVSelectionSource);
-vtkCxxRevisionMacro(vtkPVSelectionSource, "1.1");
+vtkCxxRevisionMacro(vtkPVSelectionSource, "1.2");
 //----------------------------------------------------------------------------
 vtkPVSelectionSource::vtkPVSelectionSource()
 {
@@ -430,7 +430,8 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
 
   case THRESHOLDS:
       {
-      source->SetContentType(vtkSelection::THRESHOLDS);
+      source->SetContentType(vtkSelection::THRESHOLDS); 
+      source->SetArrayName(this->ArrayName);
       vtkInternal::VectorOfDoubles::iterator iter;
       for (iter = this->Internal->Thresholds.begin();
         iter != this->Internal->Thresholds.end(); )
