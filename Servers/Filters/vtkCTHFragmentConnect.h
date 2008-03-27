@@ -116,8 +116,7 @@ protected:
     vtkCTHFragmentConnectIterator *neighbor1,
     vtkCTHFragmentConnectIterator *neighbor2);
   void ResolveEquivalences(vtkIntArray* fragmentIdArray);
-  // Returns the offset to convert local member ids into global ids.
-  int  GatherEquivalenceSets(vtkCTHFragmentEquivalenceSet* set);
+  void GatherEquivalenceSets(vtkCTHFragmentEquivalenceSet* set);
   void ShareGhostEquivalences(
     vtkCTHFragmentEquivalenceSet* globalSet,
     int*  procOffsets);
@@ -126,7 +125,11 @@ protected:
     int* procOffset);
   void MergeGhostEquivalenceSets(
     vtkCTHFragmentEquivalenceSet* globalSet);
-
+  void ResolveVolumes();
+  void GenerateVolumeArray(
+    vtkIntArray* fragemntIds,
+    vtkPolyData *output);
+  
   // Format input block into an easy to access array with
   // extra metadata (information) extracted.
   int NumberOfInputBlocks;
@@ -167,8 +170,17 @@ protected:
 
   // Save the volume in this array indexed by the fragmentId.
   vtkDoubleArray* FragmentVolumes;
+  // This is getting a bit ugly but ...
+  // When we resolve (merge equivalent) fragments we need a mapping
+  // from local ids to global ids.
+  // This array give an offset into the global array for each process.
+  // The array is computed when we resolve ids, and is used 
+  // when resoving other attributes like volume
+  int *NumberOfRawFragmentsInProcess;  // in each process.
+  int *LocalToGlobalOffsets;
+  int TotalNumberOfRawFragments;
+  int NumberOfResolvedFragments;
   
-
   double GlobalOrigin[3];
   double RootSpacing[3];
   int StandardBlockDimensions[3];
