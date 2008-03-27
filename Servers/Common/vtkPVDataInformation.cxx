@@ -47,7 +47,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.48");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.49");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -903,8 +903,16 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString()
       return "Graph";
     case VTK_TREE:
       return "Tree";
+    case VTK_SELECTION:
+      return "Selection";
+    case VTK_DIRECTED_GRAPH:
+      return "Directed Graph";
+    case VTK_UNDIRECTED_GRAPH:
+      return "Undirected Graph";
     case VTK_MULTIPIECE_DATA_SET:
       return "Multi-piece Dataset";
+    case VTK_DIRECTED_ACYCLIC_GRAPH:
+      return "Directed Acyclic Graph";
     }
   
   return "UnknownType";
