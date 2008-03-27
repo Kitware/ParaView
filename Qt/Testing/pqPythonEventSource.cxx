@@ -444,7 +444,7 @@ QString pqPythonEventSource::getProperty(QString& object, QString& prop)
 
 void pqPythonEventSource::threadGetProperty()
 {
-  PropertyResult = this->getProperty(PropertyObject, PropertyResult);
+  PropertyValue = this->getProperty(PropertyObject, PropertyResult);
   this->guiAcknowledge();
 }
 
