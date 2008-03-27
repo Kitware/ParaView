@@ -47,7 +47,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.47");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.48");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -485,7 +485,7 @@ void vtkPVDataInformation::CopyFromGraph(vtkGraph* data)
   this->NumberOfRows = 0;
 
   this->PointDataInformation->CopyFromFieldData(data->GetVertexData());
-  this->CellDataInformation->CopyFromFieldData(data->GetVertexData());
+  this->CellDataInformation->CopyFromFieldData(data->GetEdgeData());
 }
 
 //----------------------------------------------------------------------------
