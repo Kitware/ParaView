@@ -18,8 +18,9 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkInformation.h"
+#include "vtkPVDataInformation.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMRepresentationProxy, "1.9");
 vtkCxxSetObjectMacro(vtkSMRepresentationProxy, ViewInformation, vtkInformation);
 //----------------------------------------------------------------------------
 vtkSMRepresentationProxy::vtkSMRepresentationProxy()
@@ -68,6 +69,18 @@ bool vtkSMRepresentationProxy::GetVisibility()
     return true;
     }
   return false;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMRepresentationProxy::GetBounds(double bounds[6])
+{
+  vtkPVDataInformation* info = this->GetRepresentedDataInformation(true);
+  if (!info)
+    {
+    return false;
+    }
+  info->GetBounds(bounds);
+  return true;
 }
 
 //----------------------------------------------------------------------------

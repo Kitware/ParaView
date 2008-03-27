@@ -64,6 +64,11 @@ public:
   virtual bool GetVisibility();
 
   // Description:
+  // Get the bounds for the representation.  Returns true if successful.
+  // Default implementation returns non-transformed bounds.
+  virtual bool GetBounds(double bounds[6]);
+
+  // Description:
   // Get the data information for the represented data.
   // Representations that do not have significatant data representations such as
   // 3D widgets, text annotations may return NULL. Default implementation

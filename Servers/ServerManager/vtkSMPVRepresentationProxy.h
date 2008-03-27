@@ -140,6 +140,11 @@ public:
   void SetCubeAxesVisibility(int);
   vtkGetMacro(CubeAxesVisibility, int);
 
+  // Description:
+  // Get the bounds and transform according to rotation, translation, and scaling.
+  // Returns true if the bounds are "valid" (and false otherwise)
+  virtual bool GetBounds(double bounds[6]);
+
 //BTX
   enum RepresentationType
     {

@@ -22,11 +22,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkProp3D.h"
+#include "vtkTransform.h"
 #include "vtkProperty.h"
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIceTMultiDisplayRenderViewProxy.h"
 #include "vtkSMIntVectorProperty.h"
@@ -39,7 +39,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.26");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.27");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -177,6 +177,82 @@ void vtkSMSurfaceRepresentationProxy::SetViewInformation(vtkInformation* info)
     // Get the current values from the view helper.
     this->ProcessViewInformation();
     }
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMSurfaceRepresentationProxy::GetBounds(double bounds[6])
+{
+  if ( this->Superclass::GetBounds(bounds) == false )
+    {
+    return false;
+    }
+
+  // translation / rotation / scaling
+  vtkSMDoubleVectorProperty *posProp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->Prop3D->GetProperty("Position") );
+  vtkSMDoubleVectorProperty *rotProp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->Prop3D->GetProperty("Orientation") );
+  vtkSMDoubleVectorProperty *sclProp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->Prop3D->GetProperty("Scale") );
+
+  double *position = posProp->GetElements();
+  double *rotation = rotProp->GetElements();
+  double *scale = sclProp->GetElements();
+
+  if (scale[0] != 1.0 || scale[1] != 1.0 || scale[2] != 1.0 ||
+    position[0] != 0.0 || position[1] != 0.0 || position[2] != 0.0 ||
+    rotation[0] != 0.0 || rotation[1] != 0.0 || rotation[2] != 0.0)
+    {
+    vtkSmartPointer<vtkTransform> transform = 
+      vtkSmartPointer<vtkTransform>::New();
+    transform->Translate(position);
+    transform->RotateZ(rotation[2]);
+    transform->RotateX(rotation[0]);
+    transform->RotateY(rotation[1]);
+    transform->Scale(scale);
+
+    int i, j, k;
+    double origX[3], x[3];
+    double bds[6];
+    bool first = true;
+    for (i = 0; i < 2; i++)
+      {
+      origX[0] = bounds[i];
+      for (j = 0; j < 2; j++)
+        {
+        origX[1] = bounds[2 + j];
+        for (k = 0; k < 2; k++)
+          {
+          origX[2] = bounds[4 + k];
+          transform->TransformPoint(origX, x);
+          if (first)
+            {
+            bds[0] = bds[1] = x[0];
+            bds[2] = bds[3] = x[1];
+            bds[4] = bds[5] = x[2];
+            first = false;
+            }
+          else
+            {
+            if (x[0] < bds[0]) { bds[0] = x[0]; }  
+            else if (x[0] > bds[1]) { bds[1] = x[0]; }  
+            if (x[1] < bds[2]) { bds[2] = x[1]; }  
+            else if (x[1] > bds[3]) { bds[3] = x[1]; }  
+            if (x[2] < bds[4]) { bds[4] = x[2]; }  
+            else if (x[2] > bds[5]) { bds[5] = x[2]; }  
+            }
+          }
+        }
+      }
+    bounds[0] = bds[0];
+    bounds[1] = bds[1];
+    bounds[2] = bds[2];
+    bounds[3] = bds[3];
+    bounds[4] = bds[4];
+    bounds[5] = bds[5];
+    }
+
+  return true;
 }
 
 //----------------------------------------------------------------------------

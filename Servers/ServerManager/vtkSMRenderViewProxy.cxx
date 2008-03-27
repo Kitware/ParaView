@@ -90,7 +90,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.63");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.64");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -801,18 +801,16 @@ void vtkSMRenderViewProxy::ComputeVisiblePropBounds(double bds[6])
       iter->GetCurrentObject());
     if (repr && repr->GetVisibility())
       {
-      vtkPVDataInformation* info = repr->GetRepresentedDataInformation(true);
-      if (!info)
+      double tmp[6];
+      if (repr->GetBounds(tmp))
         {
-        continue;
+        if (tmp[0] < bds[0]) { bds[0] = tmp[0]; }  
+        if (tmp[1] > bds[1]) { bds[1] = tmp[1]; }  
+        if (tmp[2] < bds[2]) { bds[2] = tmp[2]; }  
+        if (tmp[3] > bds[3]) { bds[3] = tmp[3]; }  
+        if (tmp[4] < bds[4]) { bds[4] = tmp[4]; }  
+        if (tmp[5] > bds[5]) { bds[5] = tmp[5]; }  
         }
-      double *tmp = info->GetBounds();
-      if (tmp[0] < bds[0]) { bds[0] = tmp[0]; }  
-      if (tmp[1] > bds[1]) { bds[1] = tmp[1]; }  
-      if (tmp[2] < bds[2]) { bds[2] = tmp[2]; }  
-      if (tmp[3] > bds[3]) { bds[3] = tmp[3]; }  
-      if (tmp[4] < bds[4]) { bds[4] = tmp[4]; }  
-      if (tmp[5] > bds[5]) { bds[5] = tmp[5]; }  
       }
     }
 

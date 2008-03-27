@@ -65,6 +65,11 @@ public:
   // This implementation converts a prop selection to a selection source.
   virtual vtkSMProxy* ConvertSelection(vtkSelection* input);
 
+  // Description:
+  // Get the bounds and transform according to rotation, translation, and scaling.
+  // Returns true if the bounds are "valid" (and false otherwise)
+  virtual bool GetBounds(double bounds[6]);
+
 //BTX
 protected:
   vtkSMOutlineRepresentationProxy();

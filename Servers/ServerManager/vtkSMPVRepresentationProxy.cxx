@@ -37,7 +37,7 @@ inline void vtkSMPVRepresentationProxySetInt(
 }
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.18");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -472,6 +472,12 @@ bool vtkSMPVRepresentationProxy::HasVisibleProp3D(vtkProp3D* prop)
     }
 
   return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPVRepresentationProxy::GetBounds(double bounds[6])
+{
+  return this->ActiveRepresentation->GetBounds(bounds);
 }
 
 //----------------------------------------------------------------------------
