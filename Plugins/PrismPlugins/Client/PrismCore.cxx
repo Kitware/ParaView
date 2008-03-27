@@ -323,7 +323,7 @@ void PrismCore::onPrismSelection(vtkObject* caller,
 
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     vtkSMSourceProxy* selSource =vtkSMSourceProxy::SafeDownCast(
-      pxm->NewProxy("sources", "SelectionSource"));
+      pxm->NewProxy("sources", "CompositeDataIDSelectionSource"));
 
     vtkSMSourceProxy* selPrism = prismP->GetSelectionInput(portIndex);
        
@@ -357,9 +357,7 @@ void PrismCore::onPrismSelection(vtkObject* caller,
     
     pqSMAdaptor::setMultipleElementProperty(
        selSource->GetProperty("IDs"), ids);
-    pqSMAdaptor::setEnumerationProperty(
-       selSource->GetProperty("ContentType"),"Indices");
-     selSource->GetProperty("FieldType")->Copy(selPrism->GetProperty("FieldType"));
+      selSource->GetProperty("FieldType")->Copy(selPrism->GetProperty("FieldType"));
    
      selSource->UpdateVTKObjects();
     sourceP->SetSelectionInput(0,selSource,0);
@@ -396,7 +394,7 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
 
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     vtkSMSourceProxy* selPrism =vtkSMSourceProxy::SafeDownCast(
-      pxm->NewProxy("sources", "SelectionSource"));
+      pxm->NewProxy("sources", "CompositeDataIDSelectionSource"));
 
     vtkSMSourceProxy* selSource = sourceP->GetSelectionInput(portIndex);
     if(!selSource)
@@ -428,8 +426,6 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
 
     pqSMAdaptor::setMultipleElementProperty(
       selPrism->GetProperty("IDs"), ids);
-    pqSMAdaptor::setEnumerationProperty(
-      selPrism->GetProperty("ContentType"),"Indices");
     selPrism->GetProperty("FieldType")->Copy(selSource->GetProperty("FieldType"));
 
     selPrism->UpdateVTKObjects();

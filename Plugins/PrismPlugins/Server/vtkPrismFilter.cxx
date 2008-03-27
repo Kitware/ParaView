@@ -23,9 +23,11 @@ Module:    vtkPrismFilter.cxx
 #include "vtkUnstructuredGrid.h"
 #include "vtkSmartPointer.h"
 #include "vtkPoints.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkCompositeDataIterator.h"
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismFilter, "1.4");
+vtkCxxRevisionMacro(vtkPrismFilter, "1.5");
 vtkStandardNewMacro(vtkPrismFilter);
 
 class vtkPrismFilter::MyInternal
@@ -135,6 +137,7 @@ void vtkPrismFilter::SetTable(int tableId)
     }
 
   this->Internal->Reader->SetTable(tableId);
+  this->Modified();
 }
 
 int vtkPrismFilter::GetTable()
@@ -269,8 +272,14 @@ int vtkPrismFilter::RequestGeometryData(
                                         vtkInformationVector **inputVector,
                                         vtkInformationVector *outputVector)
 {
+
+  if(this->GetXAxisVarName()=="none")
+    return 1;
+
+
+
   vtkInformation *info = outputVector->GetInformationObject(1);
-  vtkUnstructuredGrid *output = vtkUnstructuredGrid::SafeDownCast(
+  vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::SafeDownCast(
     info->Get(vtkDataObject::DATA_OBJECT()));
   if ( !output ) 
     {
@@ -279,7 +288,7 @@ int vtkPrismFilter::RequestGeometryData(
     }
 
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-  vtkDataSet *input = vtkDataSet::SafeDownCast(
+  vtkMultiBlockDataSet *input = vtkMultiBlockDataSet::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
   if ( !input ) 
     {
@@ -287,102 +296,126 @@ int vtkPrismFilter::RequestGeometryData(
     return 0;
     }
 
-  vtkIdType cellId, ptId;
-  vtkIdType numCells, numPts;
-  vtkPointData *inPD  = input->GetPointData();
-  vtkCellData  *inCD  = input->GetCellData();
-  vtkPointData  *outPD = output->GetPointData();
-  vtkCellData  *outCD = output->GetCellData();
-  int maxCellSize     = input->GetMaxCellSize();
-  vtkIdList *cellPts  = NULL;
+      
   double weight       = 0.0;
   double *weights     = NULL;
   double x[3], newX[3];
-
-  vtkDebugMacro( << "Mapping point data to new cell center point..." );
-
-  // construct new points at the centers of the cells 
-  vtkPoints *newPoints = vtkPoints::New();
+  vtkIdType cellId, ptId;
+  vtkIdType numCells, numPts;
+  vtkIdList *cellPts  = NULL;
   vtkDataArray *inputScalars[3];
 
-  inputScalars[0] = inCD->GetScalars( this->GetXAxisVarName() );
-  inputScalars[1] = inCD->GetScalars( this->GetYAxisVarName() );
-  inputScalars[2] = inCD->GetScalars( this->GetZAxisVarName() );
-
-  vtkIdType newIDs[1] = {0};
-  if ( (numCells=input->GetNumberOfCells()) < 1 )
-    {
-    vtkDebugMacro(<< "No input cells, nothing to do." );
-    return 0;
-    }
-
-  weights = new double[maxCellSize];
-  cellPts = vtkIdList::New();
-  cellPts->Allocate( maxCellSize );
-
-  // Pass cell data (note that this passes current cell data through to the
-  // new points that will be created at the cell centers)
-  outCD->PassData( inCD );
-
-  // create space for the newly interpolated values
-  outPD->CopyAllocate( inPD,numCells );
-
-  int abort=0;
-  double funcArgs[3]  = { 0.0, 0.0, 0.0 };
-  double newPt[3] = {0.0, 0.0, 0.0};
-  vtkIdType progressInterval=numCells/20 + 1;
-  output->Allocate( numCells ); 
-  for ( cellId=0; cellId < numCells && !abort; cellId++ )
-    {
-    if ( !(cellId % progressInterval) )
+  unsigned int j=0;
+  vtkCompositeDataIterator* iter= input->NewIterator();
+  iter->SkipEmptyNodesOn();
+  iter->TraverseSubTreeOn();
+  iter->VisitOnlyLeavesOn();
+  iter->GoToFirstItem();
+  while(!iter->IsDoneWithTraversal())
+  {
+    vtkDataSet *inputData=NULL;
+    inputData=vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+    iter->GoToNextItem();
+    if(inputData)
       {
-      this->UpdateProgress( (double)cellId/numCells );
-      abort = GetAbortExecute();
-      }
+      vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New(); 
+      output->SetBlock(j,polydata);
+      j++;
 
-    input->GetCellPoints( cellId, cellPts );
-    numPts = cellPts->GetNumberOfIds();
-    if ( numPts > 0 )
-      {
-      weight = 1.0 / numPts;
-      for (ptId=0; ptId < numPts; ptId++)
+
+      vtkPointData  *outPD = polydata->GetPointData();
+      vtkCellData  *outCD = polydata->GetCellData();
+      vtkPointData *inPD  = inputData->GetPointData();
+      vtkCellData  *inCD  = inputData->GetCellData();
+      int maxCellSize     = inputData->GetMaxCellSize();
+
+      vtkDebugMacro( << "Mapping point data to new cell center point..." );
+
+      // construct new points at the centers of the cells 
+      vtkPoints *newPoints = vtkPoints::New();
+
+      inputScalars[0] = inCD->GetScalars( this->GetXAxisVarName() );
+      inputScalars[1] = inCD->GetScalars( this->GetYAxisVarName() );
+      inputScalars[2] = inCD->GetScalars( this->GetZAxisVarName() );
+
+      vtkIdType newIDs[1] = {0};
+      if ( (numCells=inputData->GetNumberOfCells()) < 1 )
         {
-        weights[ptId] = weight;
+        vtkDebugMacro(<< "No input cells, nothing to do." );
+        return 0;
         }
-      outPD->InterpolatePoint(inPD, cellId, cellPts, weights);
+
+      weights = new double[maxCellSize];
+      cellPts = vtkIdList::New();
+      cellPts->Allocate( maxCellSize );
+
+      // Pass cell data (note that this passes current cell data through to the
+      // new points that will be created at the cell centers)
+      outCD->PassData( inCD );
+
+      // create space for the newly interpolated values
+      outPD->CopyAllocate( inPD,numCells );
+
+      int abort=0;
+      double funcArgs[3]  = { 0.0, 0.0, 0.0 };
+      double newPt[3] = {0.0, 0.0, 0.0};
+      vtkIdType progressInterval=numCells/20 + 1;
+      polydata->Allocate( numCells ); 
+      for ( cellId=0; cellId < numCells && !abort; cellId++ )
+        {
+        if ( !(cellId % progressInterval) )
+          {
+          this->UpdateProgress( (double)cellId/numCells );
+          abort = GetAbortExecute();
+          }
+
+        inputData->GetCellPoints( cellId, cellPts );
+        numPts = cellPts->GetNumberOfIds();
+        if ( numPts > 0 )
+          {
+          weight = 1.0 / numPts;
+          for (ptId=0; ptId < numPts; ptId++)
+            {
+            weights[ptId] = weight;
+            }
+          outPD->InterpolatePoint(inPD, cellId, cellPts, weights);
+          }
+
+        // calculate the position for the new point at the cell center
+        funcArgs[0] = inputScalars[0]->GetTuple1( cellId );
+        funcArgs[1] = inputScalars[1]->GetTuple1( cellId );
+        funcArgs[2] = inputScalars[2]->GetTuple1( cellId );
+        this->CalculateValues( funcArgs, newPt );
+        newIDs[0] = newPoints->InsertNextPoint( newPt );
+        polydata->InsertNextCell( VTK_VERTEX, 1, newIDs );
+        }
+
+      // pass the new points to the output data, etc.
+
+      for (ptId=0; ptId < numCells; ptId++)
+        {
+
+        newPoints->GetPoint(ptId, x);
+
+        newX[0] = x[0]*this->Internal->Scale[0];
+        newX[1] = x[1]*this->Internal->Scale[1];
+        newX[2] = x[2]*this->Internal->Scale[2];
+
+        newPoints->SetPoint(ptId, newX);
+
+        }
+
+      polydata->SetPoints( newPoints );
+      newPoints->Delete();
+      polydata->Squeeze();
+
+      cellPts->Delete();
+      delete [] weights;
       }
-
-    // calculate the position for the new point at the cell center
-    funcArgs[0] = inputScalars[0]->GetTuple1( cellId );
-    funcArgs[1] = inputScalars[1]->GetTuple1( cellId );
-    funcArgs[2] = inputScalars[2]->GetTuple1( cellId );
-    this->CalculateValues( funcArgs, newPt );
-    newIDs[0] = newPoints->InsertNextPoint( newPt );
-    output->InsertNextCell( VTK_VERTEX, 1, newIDs );
     }
 
-  // pass the new points to the output data, etc.
-
-  for (ptId=0; ptId < numCells; ptId++)
-    {
-
-    newPoints->GetPoint(ptId, x);
-
-    newX[0] = x[0]*this->Internal->Scale[0];
-    newX[1] = x[1]*this->Internal->Scale[1];
-    newX[2] = x[2]*this->Internal->Scale[2];
-
-    newPoints->SetPoint(ptId, newX);
-
-    }
-
-  output->SetPoints( newPoints );
-  newPoints->Delete();
-  output->Squeeze();
-
-  cellPts->Delete();
-  delete [] weights;
-
+  iter->Delete();
+  
   return 1;
 }
 
@@ -525,7 +558,7 @@ int vtkPrismFilter::FillOutputPortInformation(
     }
   if(port==1)
     {
-    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkUnstructuredGrid");
+    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkMultiBlockDataSet");
     }
 
   return 1;
@@ -537,7 +570,7 @@ int vtkPrismFilter::FillInputPortInformation(
 {
   if(port==0)
     {
-    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataSet");
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
     }
 
   return 1;
