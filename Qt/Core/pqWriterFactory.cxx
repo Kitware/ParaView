@@ -93,10 +93,19 @@ struct pqWriterInfo
     // always work in parallel.
     if (writer)
       {
-      if (source->getServer()->getNumberOfPartitions() > 1
-        && !writer->GetSupportsParallel())
+      if (source->getServer()->getNumberOfPartitions() > 1)
         {
-        return false;
+        if (!writer->GetSupportsParallel())
+          {
+          return false;
+          }
+        }
+      else
+        {
+        if (writer->GetParallelOnly())
+          {
+          return false;
+          }
         }
       }
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(

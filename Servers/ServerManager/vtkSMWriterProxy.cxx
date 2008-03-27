@@ -28,6 +28,7 @@ vtkSMWriterProxy::vtkSMWriterProxy()
 {
   this->ErrorCode = vtkErrorCode::NoError;
   this->SupportsParallel = 0;
+  this->ParallelOnly = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -37,6 +38,10 @@ int vtkSMWriterProxy::ReadXMLAttributes(vtkSMProxyManager* pm,
   if (element->GetAttribute("supports_parallel"))
     {
     element->GetScalarAttribute("supports_parallel", &this->SupportsParallel);
+    }
+  if (element->GetAttribute("parallel_only"))
+    {
+    element->GetScalarAttribute("parallel_only", &this->ParallelOnly);
     }
 
   return this->Superclass::ReadXMLAttributes(pm, element);
@@ -90,4 +95,6 @@ void vtkSMWriterProxy::PrintSelf(ostream& os, vtkIndent indent)
      << vtkErrorCode::GetStringFromErrorCode(this->ErrorCode) << endl;
   os << indent << "SupportsParallel: "
      << this->SupportsParallel << endl;
+  os << indent << "ParallelOnly: "
+     << this->ParallelOnly << endl;
 }

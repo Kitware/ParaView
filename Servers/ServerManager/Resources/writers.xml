@@ -526,6 +526,50 @@
       <!-- End of DataSetWriter -->
     </WriterProxy>
 
+    <PSWriterProxy name="PDataSetWriter" class="vtkParallelSerialWriter"
+      file_name_method="SetFileName" parallel_only="1">
+      <Documentation
+        short_help="Writer that writes polydata as legacy vtk files.">
+        Writer to write any type of data object in a legacy vtk data file. 
+        This version is used when running in parallel. It gathers data to
+        first node and saves 1 file.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="Writer"
+          proxygroup="writers" proxyname="DataSetWriter">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="FileType" />
+        </ExposedProperties>
+      </SubProxy>
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
+      </InputProperty>
+      <StringVectorProperty 
+        name="FileName" 
+        command="SetFileName"
+        number_of_elements="1">
+       <Documentation>
+        The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
+      <!-- End of PDataSetWriter -->
+    </PSWriterProxy>
+
     <WriterProxy name="PLYWriter" class="vtkPLYWriter"
       base_proxygroup="writers" base_proxyname="DataWriterBase">
       <Documentation
@@ -556,14 +600,62 @@
       <!-- End of PLYWriter -->
     </WriterProxy>
 
+    <PSWriterProxy name="PPLYWriter" class="vtkParallelSerialWriter"
+      file_name_method="SetFileName" parallel_only="1">
+      <Documentation
+        short_help="Write polygonal data in Stanford University PLY format.">
+        Writer to write polygonal data in Stanford University PLY format. The 
+        data can be written in either binary (little or big endian) or ASCII 
+        representation. As for PointData and CellData, vtkPLYWriter cannot 
+        handle normals or vectors. It only handles RGB PointData and CellData. 
+        This version is used when running in parallel. It gathers data to
+        first node and saves 1 file.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="Writer"
+          proxygroup="writers" proxyname="PLYWriter">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="FileType" />
+        </ExposedProperties>
+      </SubProxy>
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
+      </InputProperty>
+      <StringVectorProperty 
+        name="FileName" 
+        command="SetFileName"
+        number_of_elements="1">
+       <Documentation>
+        The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
+      <!-- End of PLYWriter -->
+    </PSWriterProxy>
+
     <WriterProxy name="STLWriter" class="vtkSTLWriter"
       base_proxygroup="writers" base_proxyname="DataWriterBase">
       <Documentation
         short_help="Write stereo lithography files.">
         STLWriter writes stereo lithography (.stl) files in either ASCII or
-        binary form. Stereo lithography files only contain triangles. If polygons
-        with more than 3 vertices are present, only the first 3 vertices are
-        written.  Use TriangleFilter to convert polygons to triangles.
+        binary form. Stereo lithography files only contain triangles. If
+        polygons with more than 3 vertices are present, only the first 3
+        vertices are written.  Use TriangleFilter to convert polygons to
+        triangles.
       </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
@@ -584,6 +676,53 @@
       </Hints>
       <!-- End of STLWriter -->
     </WriterProxy>
+
+    <PSWriterProxy name="PSTLWriter" class="vtkParallelSerialWriter"
+      file_name_method="SetFileName" parallel_only="1">
+      <Documentation
+        short_help="Write stereo lithography files.">
+        STLWriter writes stereo lithography (.stl) files in either ASCII or
+        binary form. Stereo lithography files only contain triangles. If
+        polygons with more than 3 vertices are present, only the first 3
+        vertices are written.  Use TriangleFilter to convert polygons to
+        triangles. This version of the reader is used when running in
+        parallel. It gathers all the geometry to first node and saves 1 file.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="Writer"
+          proxygroup="writers" proxyname="STLWriter">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="FileType" />
+        </ExposedProperties>
+      </SubProxy>
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
+      </InputProperty>
+      <StringVectorProperty 
+        name="FileName" 
+        command="SetFileName"
+        number_of_elements="1">
+       <Documentation>
+        The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
+      <!-- End of PSTLWriter -->
+    </PSWriterProxy>
 
     <WriterProxy name="MetaImageWriter" class="vtkMetaImageWriter"
       base_proxygroup="writers" base_proxyname="DataWriterBase">
@@ -891,17 +1030,12 @@
         </Documentation>
       </StringVectorProperty>
 
-
-
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
 
       </Hints>
       <!-- End of CSVWriter -->
-
-
-
     </PWriterProxy>
     
   </ProxyGroup>

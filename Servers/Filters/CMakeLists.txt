@@ -52,6 +52,7 @@ SET(Filters_SRCS
   vtkPConvertSelection.cxx
   vtkPCSVWriter.cxx
   vtkPExtractHistogram.cxx
+  vtkParallelSerialWriter.cxx
   vtkPhastaReader.cxx
   vtkPointHandleRepresentationSphere.cxx
   vtkPolyLineToRectilinearGridFilter.cxx

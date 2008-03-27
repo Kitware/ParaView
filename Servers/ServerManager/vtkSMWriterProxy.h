@@ -50,8 +50,17 @@ public:
   // Description:
   // Flag indicating if the writer supports writing in parallel.
   // Not set by default.
-  vtkGetMacro(SupportsParallel, int);
   vtkSetMacro(SupportsParallel, int);
+  int GetSupportsParallel()
+  {
+    return this->SupportsParallel || this->ParallelOnly;
+  }
+
+  // Description:
+  // Flag indicating if the writer works only in parallel. If this is set,
+  // SupportsParallel is always true.
+  vtkGetMacro(ParallelOnly, int);
+  vtkSetMacro(ParallelOnly, int);
 
 protected:
   vtkSMWriterProxy();
@@ -63,6 +72,7 @@ protected:
 
   int ErrorCode;
   int SupportsParallel;
+  int ParallelOnly;
 private:
   vtkSMWriterProxy(const vtkSMWriterProxy&); // Not implemented
   void operator=(const vtkSMWriterProxy&); // Not implemented
