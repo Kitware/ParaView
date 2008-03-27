@@ -103,7 +103,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.19");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.20");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
@@ -444,7 +444,7 @@ void pqLookmarkStateLoader::RegisterProxy(int id, vtkSMProxy* proxy)
     return;
     }
 
-  return this->Superclass::RegisterProxy(id, proxy);
+  this->Superclass::RegisterProxy(id, proxy);
 }
 
 
