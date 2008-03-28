@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
     // Tell process module that we support Multiple connections.
     // This must be set before starting the event loop.
     vtkProcessModule::GetProcessModule()->SupportMultipleConnectionsOff();
-    helper->Run(options);
+    ret = helper->Run(options);
     }
   helper->Delete();
   pvmain->Delete();
