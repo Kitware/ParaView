@@ -724,8 +724,7 @@
       <!-- End of PSTLWriter -->
     </PSWriterProxy>
 
-    <WriterProxy name="MetaImageWriter" class="vtkMetaImageWriter"
-      base_proxygroup="writers" base_proxyname="DataWriterBase">
+    <WriterProxy name="MetaImageWriter" class="vtkMetaImageWriter">
       <Documentation
         short_help="Write a binary UNC meta image data.">
         Writer to write a binary UNC meta image data. This is a fairly simple 
@@ -746,10 +745,17 @@
           file.
         </Documentation>
       </InputProperty>
+      <StringVectorProperty 
+        name="FileName" 
+        command="SetFileName"
+        number_of_elements="1">
+       <Documentation>
+        The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
-        <Property name="FileType" show="0"/>
       </Hints>
       <!-- End of MetaImageWriter -->
     </WriterProxy>
