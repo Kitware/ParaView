@@ -22,10 +22,11 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkParallelSerialWriter);
-vtkCxxRevisionMacro(vtkParallelSerialWriter, "1.1");
+vtkCxxRevisionMacro(vtkParallelSerialWriter, "1.2");
 
 vtkCxxSetObjectMacro(vtkParallelSerialWriter,Writer,vtkAlgorithm);
 
@@ -99,7 +100,8 @@ int vtkParallelSerialWriter::RequestData(
 {
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
-  vtkDataObject* inputCopy = input->NewInstance();
+  vtkSmartPointer<vtkDataObject> inputCopy;
+  inputCopy.TakeReference(input->NewInstance());
   inputCopy->ShallowCopy(input);
 
   if (!this->Writer)
@@ -110,12 +112,11 @@ int vtkParallelSerialWriter::RequestData(
   vtkMultiProcessController* controller = 
     vtkProcessModule::GetProcessModule()->GetController();
 
-  vtkMPIMoveData* md = vtkMPIMoveData::New();
+  vtkSmartPointer<vtkMPIMoveData> md = vtkSmartPointer<vtkMPIMoveData>::New();
   md->SetOutputDataType(VTK_POLY_DATA);
   md->SetController(controller);
   md->SetMoveModeToCollect();
   md->SetInputConnection(0, inputCopy->GetProducerPort());
-  inputCopy->Delete();
   md->UpdateInformation();
   vtkInformation* outInfo = md->GetExecutive()->GetOutputInformation(0);
   outInfo->Set(
@@ -130,7 +131,8 @@ int vtkParallelSerialWriter::RequestData(
   md->Update();
 
   vtkDataObject* output = md->GetOutputDataObject(0);
-  vtkDataObject* outputCopy = output->NewInstance();
+  vtkSmartPointer<vtkDataObject> outputCopy;
+  outputCopy.TakeReference(output->NewInstance());
   outputCopy->ShallowCopy(output);
   
   if (controller->GetLocalProcessId() == 0)
