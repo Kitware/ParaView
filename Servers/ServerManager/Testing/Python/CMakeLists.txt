@@ -84,6 +84,7 @@ ENDIF (PVServerManagerTestData)
 
 SET (PVBATCH_TESTS
   Simple
+  ParallelSerialWriter
 )
 
 FOREACH (tfile ${PVBATCH_TESTS})

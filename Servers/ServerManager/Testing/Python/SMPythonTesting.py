@@ -3,8 +3,11 @@
 import os
 import re
 import sys
+import exceptions
 from paraview import servermanager
 
+class TestError(exceptions.Exception):
+  pass
 
 __ProcessedCommandLineArguments__ = False
 DataDir = ""
