@@ -102,7 +102,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSiloReader, "1.3");
+vtkCxxRevisionMacro(vtkSiloReader, "1.4");
 vtkStandardNewMacro(vtkSiloReader);
 
 //----------------------------------------------------------------------------
@@ -2681,7 +2681,7 @@ void vtkSiloReader::ReadInConnectivity(vtkUnstructuredGrid *ugrid, DBzonelist *z
 
     vtkIdTypeArray *cellLocations = vtkIdTypeArray::New();
     cellLocations->SetNumberOfValues(numCells);
-    int *cl = cellLocations->GetPointer(0);
+    vtkIdType *cl = cellLocations->GetPointer(0);
 
     int zoneIndex = 0;
     int currentIndex = 0;
