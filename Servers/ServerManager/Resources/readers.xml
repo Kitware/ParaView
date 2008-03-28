@@ -2192,6 +2192,15 @@
            This property specifies the file name for the Silo reader.
         </Documentation>
      </StringVectorProperty>
+     <StringVectorProperty
+         name="TOCString"
+         command="GetTOCString"
+         information_only="1">
+        <Documentation>
+           This property is a string representation of the table of contents.
+        </Documentation>
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
    <!-- End SiloReader -->
    </SourceProxy>
 #endif

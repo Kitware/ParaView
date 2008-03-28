@@ -101,6 +101,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   void SetFileName(char *);
   vtkGetStringMacro(FileName);
+  const char * GetTOCString();
 
 protected:
   vtkSiloReader();

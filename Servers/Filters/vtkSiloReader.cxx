@@ -102,7 +102,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSiloReader, "1.5");
+vtkCxxRevisionMacro(vtkSiloReader, "1.6");
 vtkStandardNewMacro(vtkSiloReader);
 
 //----------------------------------------------------------------------------
@@ -140,6 +140,7 @@ public:
   SiloMeshBlock * GetMeshBlock(const char*);
   vtkXMLDataElement * ToXML();
   void FromXML(vtkXMLDataElement *);
+  const char * GetTOCString();
   void Clear();
   int AddFile(const char *);
   DBfile *GetFile(int);
@@ -158,6 +159,7 @@ public:
   // TOCPath is the path to the directory containing TOCFile
   vtkstd::string TOCPath;
   vtkstd::string TOCFile;
+  vtkstd::string TOCString;
 
 protected:
 
@@ -402,7 +404,7 @@ void vtkSiloReader::PrintSelf(ostream& os, vtkIndent indent)
 
 //----------------------------------------------------------------------------
 
-int vtkSiloReader::ReadTableOfContents(void)
+int vtkSiloReader::ReadTableOfContents()
 {
   vtkDebugMacro("ReadTableOfContents");
 
@@ -429,6 +431,13 @@ int vtkSiloReader::ReadTableOfContents(void)
 
 //----------------------------------------------------------------------------
 
+const char * vtkSiloReader::GetTOCString()
+{
+  return this->TOC->GetTOCString();
+}
+
+//----------------------------------------------------------------------------
+
 vtkSiloTableOfContents::vtkSiloTableOfContents()
 {
 }
@@ -439,6 +448,19 @@ vtkSiloTableOfContents::~vtkSiloTableOfContents()
 {
   this->Clear();
   this->CloseAllFiles();
+}
+
+//----------------------------------------------------------------------------
+
+const char * vtkSiloTableOfContents::GetTOCString()
+{
+  if (this->TOCString == "")
+    {
+    // TOCString hasn't been generated yet, ToXML will generate it.
+    // ToXML() returns an XMLElement, which we then delete.
+    this->ToXML()->Delete();
+    }
+  return this->TOCString.c_str();
 }
 
 //----------------------------------------------------------------------------
@@ -755,11 +777,38 @@ int vtkSiloReader::FileIsInDomain(int index)
 
 //----------------------------------------------------------------------------
 
-// All xml elements get the name "e" to conserve space
+// All xml elements have the tag "e" to conserve space
 // Attributes:
 // t - type
 // n - name
 //
+// XML Structure:
+/*
+<e>                       <!-- root node -->
+  <e>                       <!-- filenames -->
+    <e n="filename.silo"/>
+    <e n="more-filenames.silo"/>
+  </e>
+  <e>                       <!-- meshes --!>
+    <e n="mesh1">             <!-- mesh name --!>
+      <e n="mesh1" t="510">     <!-- mesh block name and type -->
+        <e>                       <!-- variables -->
+          <e n="var1"/>             <!-- var name-->
+          <e n="var2"/>
+        </e>
+        <e>                       <!-- materials -->
+          <e n="mat1"/>             <!-- material name -->
+          <e n="mat2"/>
+        </e>
+      </e>
+              <!-- more mesh blocks could go here... -->
+    </e>
+          <!-- more meshes could go here... -->
+  </e>
+</e>
+*/
+//
+// The returned vtkXMLDAtaElement must be deleted by the caller.
 vtkXMLDataElement * vtkSiloTableOfContents::ToXML()
 {
   vtkXMLDataElement * root = vtkXMLDataElement::New();
@@ -841,6 +890,12 @@ vtkXMLDataElement * vtkSiloTableOfContents::ToXML()
   root->AddNestedElement(meshesNode);
   filenamesNode->Delete();
   meshesNode->Delete();
+
+  // Store XML string
+  vtksys_ios::ostringstream oss;
+  root->PrintXML(oss, vtkIndent());
+  this->TOCString = oss.str();
+
   return root;
 }
 
@@ -912,6 +967,7 @@ void vtkSiloTableOfContents::FromXML(vtkXMLDataElement * root)
         }
       }
     }
+
 }
 
 //----------------------------------------------------------------------------
@@ -1010,7 +1066,8 @@ int vtkSiloReader::CreateDataSet(vtkMultiBlockDataSet *output)
       continue;
       }
 
-    vtkDebugMacro("File " << index << " mesh: " << meshName);
+    vtkDebugMacro("Process " << this->ProcessId << " of "
+      << this->NumProcesses << " in file " << index << " processing mesh: " << meshName);
 
     vtkDataSet *mesh = 0;
     DBfile * correctFile = 0;
@@ -1150,24 +1207,28 @@ int vtkSiloReader::CreateDataSet(vtkMultiBlockDataSet *output)
       vtkDataArray * materialArray = 0;
 
       materialArray = this->GetMaterialArray(correctFile, correctName, meshNumCells);
-      if (materialArray)
+      if (!materialArray)
         {
-        // Set array name using the var name unqualified with dirname
-        const char * matWithoutDir = strrchr(matName, '/');
-        if (matWithoutDir)
-          {
-          materialArray->SetName(matWithoutDir+1);
-          }
-        else
-          {
-          materialArray->SetName(matName);
-          }
-        mesh->GetCellData()->AddArray(materialArray);
+        vtkErrorMacro("Error creating material array from variable: " << matName);
+        continue;
         }
+
+      // Set array name using the var name unqualified with dirname
+      const char * matWithoutDir = strrchr(matName, '/');
+      if (matWithoutDir)
+        {
+        materialArray->SetName(matWithoutDir+1);
+        }
+      else
+        {
+        materialArray->SetName(matName);
+        }
+      mesh->GetCellData()->AddArray(materialArray);
+      materialArray->Delete();
       }
 
-      output->SetBlock(output->GetNumberOfBlocks(), mesh);
-      mesh->Delete();
+    output->SetBlock(output->GetNumberOfBlocks(), mesh);
+    mesh->Delete();
     }
 
   return 1;
@@ -1267,13 +1328,14 @@ vtkDataArray * vtkSiloReader::GetMaterialArray(DBfile * file, const char * matNa
 void vtkSiloReader::RegisterDomainDirs(char **dirlist, int nList,
                                       const char *curDir)
 {
-    for (int i = 0 ; i < nList ; i++)
+  for (int i = 0 ; i < nList ; i++)
     {
-        if (strcmp(dirlist[i], "EMPTY") == 0)
-            continue;
-
-        vtkstd::string str = PrepareDirName(dirlist[i], curDir);
-        this->TOC->DomainDirs.insert(str);
+    if (strcmp(dirlist[i], "EMPTY") == 0)
+      {
+      continue;
+      }
+      vtkstd::string str = PrepareDirName(dirlist[i], curDir);
+      this->TOC->DomainDirs.insert(str);
     }
 }
 
