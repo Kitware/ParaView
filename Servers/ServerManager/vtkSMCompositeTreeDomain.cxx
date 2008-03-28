@@ -23,7 +23,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMCompositeTreeDomain);
-vtkCxxRevisionMacro(vtkSMCompositeTreeDomain, "1.2");
+vtkCxxRevisionMacro(vtkSMCompositeTreeDomain, "1.3");
 vtkCxxSetObjectMacro(vtkSMCompositeTreeDomain, Information, vtkPVDataInformation);
 //----------------------------------------------------------------------------
 vtkSMCompositeTreeDomain::vtkSMCompositeTreeDomain()
@@ -143,6 +143,34 @@ int vtkSMCompositeTreeDomain::ReadXMLAttributes(
     }
   return 1;
 }
+
+//----------------------------------------------------------------------------
+int vtkSMCompositeTreeDomain::SetDefaultValues(vtkSMProperty* property)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(property);
+  if (ivp && this->Information && ivp->GetNumberOfElements() == 1)
+    {
+    if (this->Mode == LEAVES)
+      {
+      // change the property default to be the first non-empty leaf.
+      vtkPVDataInformation* info = this->Information;
+      int index = 0;
+      while (info && info->GetCompositeDataClassName() &&
+        !info->GetCompositeDataInformation()->GetDataIsMultiPiece())
+        {
+        index++;
+        info = this->Information->GetDataInformationForCompositeIndex(index);
+        }
+      if (info)
+        {
+        ivp->SetElement(0, index);
+        return 1;
+        }
+      }
+    }
+  return 0;
+}
+
 //----------------------------------------------------------------------------
 void vtkSMCompositeTreeDomain::PrintSelf(ostream& os, vtkIndent indent)
 {

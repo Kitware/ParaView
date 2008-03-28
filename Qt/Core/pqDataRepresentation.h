@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.1. 
+   under the terms of the ParaView license version 1.1.
 
    See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,10 +40,10 @@ class pqPipelineSource;
 class pqScalarsToColors;
 class vtkPVDataInformation;
 
-// pqDataRepresentation is the superclass for a display for a pqPipelineSource 
-// i.e. the input for this display proxy is a pqPiplineSource.
-// This class manages the linking between the pqPiplineSource 
-// and pqDataRepresentation.
+/// pqDataRepresentation is the superclass for a display for a pqPipelineSource
+/// i.e. the input for this display proxy is a pqPiplineSource.
+/// This class manages the linking between the pqPiplineSource
+/// and pqDataRepresentation.
 class PQCORE_EXPORT pqDataRepresentation : public pqRepresentation
 {
   Q_OBJECT
@@ -54,7 +54,7 @@ public:
     QObject* parent=0);
   virtual ~pqDataRepresentation();
 
-  // Get the source/filter of which this is a display.
+  /// Get the source/filter of which this is a display.
   pqPipelineSource* getInput() const;
 
   /// Returns the input pqPipelineSource's output port to which this
@@ -73,40 +73,39 @@ public:
   vtkPVDataInformation* getRepresentedDataInformation(bool update=true) const;
 
   /// Returns the lookuptable proxy, if any.
-  /// Most consumer displays take a lookup table. This method 
+  /// Most consumer displays take a lookup table. This method
   /// provides access to the Lookup table, if one exists.
   virtual vtkSMProxy* getLookupTableProxy();
 
   /// Returns the pqScalarsToColors object for the lookup table
   /// proxy if any.
-  /// Most consumer displays take a lookup table. This method 
+  /// Most consumer displays take a lookup table. This method
   /// provides access to the Lookup table, if one exists.
   virtual pqScalarsToColors* getLookupTable();
 
-  /// Sets default values for the underlying proxy. 
-  /// This is during the initialization stage of the pqProxy 
+  /// Sets default values for the underlying proxy.
+  /// This is during the initialization stage of the pqProxy
   /// for proxies created by the GUI itself i.e.
   /// for proxies loaded through state or created by python client
-  /// this method won't be called. 
+  /// this method won't be called.
   /// The default implementation iterates over all properties
-  /// of the proxy and sets them to default values. 
+  /// of the proxy and sets them to default values.
   virtual void setDefaultPropertyValues();
 
 protected slots:
-  // called when input property on display changes. We must detect if
-  // (and when) the display is connected to a new proxy.
+  /// called when input property on display changes. We must detect if
+  /// (and when) the display is connected to a new proxy.
   virtual void onInputChanged();
 
 protected:
-  // Use this method to initialize the pqObject state using the
-  // underlying vtkSMProxy. This needs to be done only once,
-  // after the object has been created. 
-  virtual void initialize() 
+  /// Use this method to initialize the pqObject state using the
+  /// underlying vtkSMProxy. This needs to be done only once,
+  /// after the object has been created.
+  virtual void initialize()
     {
     this->Superclass::initialize();
     this->onInputChanged();
     }
-
 
 private:
   pqDataRepresentation(const pqDataRepresentation&); // Not implemented.
