@@ -187,6 +187,7 @@ IF(BUILD_TESTING)
     SET(PYTHON_TESTS
       OpenHelp
       ToolBarAndMenus
+      TestContourWidget
       )
     IF(PARAVIEW_DATA_ROOT)
       SET(PYTHON_TESTS ${PYTHON_TESTS}
