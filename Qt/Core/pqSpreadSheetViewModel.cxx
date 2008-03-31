@@ -416,6 +416,11 @@ QVariant pqSpreadSheetViewModel::data(
       {
       vtkVariant value = table->GetValue(blockOffset, column);
       QString str = value.ToString().c_str();
+      if (value.IsChar() || value.IsUnsignedChar() || value.IsSignedChar())
+        {
+        // Don't show ASCII characted for char arrays.
+        str = QString::number(value.ToInt());
+        }
       str.replace(" ", "\t");
       return str;
       }
