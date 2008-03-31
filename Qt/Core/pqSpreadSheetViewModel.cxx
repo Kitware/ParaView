@@ -272,7 +272,7 @@ void pqSpreadSheetViewModel::forceUpdate()
     }
 
   this->Internal->SelectionModel.clear();
-  if (old_rows == this->Internal->NumberOfColumns &&
+  if (old_rows == this->Internal->NumberOfRows &&
     old_columns == this->Internal->NumberOfColumns)
     {
     this->Internal->SelectionTimer.start();
