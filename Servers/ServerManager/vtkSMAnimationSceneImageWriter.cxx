@@ -47,7 +47,7 @@
 #endif
 
 vtkStandardNewMacro(vtkSMAnimationSceneImageWriter);
-vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.11");
+vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.12");
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
   ImageWriter, vtkImageWriter);
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
@@ -68,7 +68,7 @@ vtkSMAnimationSceneImageWriter::vtkSMAnimationSceneImageWriter()
   this->Suffix = 0;
   this->FrameRate = 1.0;
 
-  this->BackgroundColor[0] = this->BackgroundColor[1] = 
+  this->BackgroundColor[0] = this->BackgroundColor[1] =
     this->BackgroundColor[2] = 0.0;
 }
 
@@ -106,6 +106,22 @@ bool vtkSMAnimationSceneImageWriter::SaveInitialize()
   this->AnimationScene->SetOverrideStillRender(1);
 
   this->FileCount = 0;
+
+  // Iterate over all views and enable offscreen rendering. This avoid toggling
+  // of the offscreen rendering flag on every frame.
+  unsigned int num_modules = this->AnimationScene->GetNumberOfViewModules();
+  for (unsigned int cc=0; cc < num_modules; cc++)
+    {
+    vtkSMRenderViewProxy* rmview = vtkSMRenderViewProxy::SafeDownCast(
+      this->AnimationScene->GetViewModule(cc));
+    if (rmview)
+      {
+      if (rmview->GetUseOffscreenRenderingForScreenshots())
+        {
+        rmview->SetUseOffscreen(1);
+        }
+      }
+    }
 
   return true;
 }
@@ -147,7 +163,7 @@ vtkImageData* vtkSMAnimationSceneImageWriter::CaptureViewImage(
   if (rmview)
     {
     return rmview->CaptureWindow(magnification);
-    } 
+    }
   return NULL;
 }
 
@@ -214,7 +230,7 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
     }
   else if (num_modules == 1)
     {
-    // If only one view, we speed things up slightly by using the 
+    // If only one view, we speed things up slightly by using the
     // captured image directly.
     vtkSMViewProxy* view = this->AnimationScene->GetViewModule(0);
     vtkImageData* capture = this->CaptureViewImage(view, this->Magnification);
@@ -237,8 +253,8 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
     this->ImageWriter->Write();
     this->ImageWriter->SetInput(0);
 
-    errcode = this->ImageWriter->GetErrorCode(); 
-    this->FileCount = (!errcode)? this->FileCount + 1 : this->FileCount; 
+    errcode = this->ImageWriter->GetErrorCode();
+    this->FileCount = (!errcode)? this->FileCount + 1 : this->FileCount;
 
     }
   else if (this->MovieWriter)
@@ -257,7 +273,7 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
       //Unassigned Error. If this happens the Writer should be changed to set
       //a meaningful error code.
 
-      errcode = vtkErrorCode::UserError;      
+      errcode = vtkErrorCode::UserError;
       }
     else
       {
@@ -293,6 +309,19 @@ bool vtkSMAnimationSceneImageWriter::SaveFinalize()
     this->SetMovieWriter(0);
     }
   this->SetImageWriter(0);
+
+  // restore offscreen rendering state.
+  unsigned int num_modules = this->AnimationScene->GetNumberOfViewModules();
+  for (unsigned int cc=0; cc < num_modules; cc++)
+    {
+    vtkSMRenderViewProxy* rmview = vtkSMRenderViewProxy::SafeDownCast(
+      this->AnimationScene->GetViewModule(cc));
+    if (rmview)
+      {
+      rmview->SetUseOffscreen(0);
+      }
+    }
+
   return true;
 }
 
@@ -362,7 +391,7 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
     if(dot_pos != vtkstd::string::npos)
       {
       this->SetPrefix(filename.substr(0, dot_pos).c_str());
-      this->SetSuffix(filename.substr(dot_pos).c_str()); 
+      this->SetSuffix(filename.substr(dot_pos).c_str());
       }
     else
       {
@@ -406,6 +435,6 @@ void vtkSMAnimationSceneImageWriter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ErrorCode: " << this->ErrorCode << endl;
   os << indent << "FrameRate: " << this->FrameRate << endl;
   os << indent << "BackgroundColor: " << this->BackgroundColor[0]
-    << ", " << this->BackgroundColor[1] << ", " << this->BackgroundColor[2] 
+    << ", " << this->BackgroundColor[1] << ", " << this->BackgroundColor[2]
     << endl;
 }

@@ -90,7 +90,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.64");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.65");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -987,17 +987,38 @@ vtkPVXMLElement* vtkSMRenderViewProxy::SaveState(vtkPVXMLElement* root)
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::SetUseOffscreen(int offscreen)
+{
+  if (this->ObjectsCreated)
+    {
+    this->GetRenderWindow()->SetOffScreenRendering(offscreen);
+    }
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMRenderViewProxy::GetUseOffscreen()
+{
+  if (this->ObjectsCreated)
+    {
+    return this->GetRenderWindow()->GetOffScreenRendering();
+    }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
 vtkImageData* vtkSMRenderViewProxy::CaptureWindow(int magnification)
 {
   // Offscreen rendering is not functioning properly on the mac.
   // Do not use it.
 #if !defined(__APPLE__)
   int useOffscreenRenderingForScreenshots = this->UseOffscreenRenderingForScreenshots;
-  if (0 != useOffscreenRenderingForScreenshots)
+  int prevOffscreen = this->GetRenderWindow()->GetOffScreenRendering();
+  if (useOffscreenRenderingForScreenshots && !prevOffscreen)
     {
     this->GetRenderWindow()->SetOffScreenRendering(1);
     }
 #endif
+
   this->GetRenderWindow()->SwapBuffersOff();
   this->StillRender();
 
@@ -1014,8 +1035,9 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindow(int magnification)
 
   this->GetRenderWindow()->SwapBuffersOn();
   this->GetRenderWindow()->Frame();
+
 #if !defined(__APPLE__)
-  if (0 != useOffscreenRenderingForScreenshots)
+  if (useOffscreenRenderingForScreenshots && !prevOffscreen)
     {
     this->GetRenderWindow()->SetOffScreenRendering(0);
     }

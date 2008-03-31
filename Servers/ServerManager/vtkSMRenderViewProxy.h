@@ -158,6 +158,11 @@ public:
   vtkGetMacro(UseOffscreenRenderingForScreenshots, int);
 
   // Description:
+  // Switches the render window into an offscreen mode.
+  void SetUseOffscreen(int offscreen);
+  int GetUseOffscreen();
+
+  // Description:
   // Enable measurement of Polygons Per Second
   vtkSetClampMacro(MeasurePolygonsPerSecond, int, 0, 1);
   vtkBooleanMacro(MeasurePolygonsPerSecond, int);
