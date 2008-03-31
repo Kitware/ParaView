@@ -5768,6 +5768,7 @@
           <Entry value="5" text="COMPOSITE_DATASET_APPEND" />
           <Entry value="6" text="CUSTOM" />
           <Entry value="7" text="MULTIBLOCK_MERGE" />
+          <Entry value="8" text="TABLE_MERGE" />
         </EnumerationDomain>
       </IntVectorProperty>
 

@@ -28,7 +28,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.18");
+vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.19");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
 {
@@ -183,7 +183,11 @@ void vtkSMClientDeliveryRepresentationProxy::SetReductionType(int type)
   case MULTIBLOCK_MERGE:
     classname = "vtkMultiBlockMergeFilter"; 
     break;
-
+  
+  case TABLE_MERGE:
+    classname = "vtkPVMergeTables";
+    break;
+  
   default:
     vtkErrorMacro("Unknown reduction type: " << type);
     return;
