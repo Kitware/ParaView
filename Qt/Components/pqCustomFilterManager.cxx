@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqCustomFilterManagerForm : public Ui::pqCustomFilterManager {};
 
 
+//-----------------------------------------------------------------------------
 pqCustomFilterManager::pqCustomFilterManager(pqCustomFilterManagerModel *model,
     QWidget *widgetParent)
   : QDialog(widgetParent)
@@ -86,11 +87,13 @@ pqCustomFilterManager::pqCustomFilterManager(pqCustomFilterManagerModel *model,
       this, SLOT(selectCustomFilter(const QString &)));
 }
 
+//-----------------------------------------------------------------------------
 pqCustomFilterManager::~pqCustomFilterManager()
 {
   delete this->Form;
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterManager::selectCustomFilter(const QString &name)
 {
   QModelIndex index = this->Model->getIndexFor(name);
@@ -101,6 +104,7 @@ void pqCustomFilterManager::selectCustomFilter(const QString &name)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterManager::importFiles(const QStringList &files)
 {
   // Clear the current selection. The new custom filter definitions
@@ -197,8 +201,16 @@ void pqCustomFilterManager::exportSelected(const QStringList &files)
     definition = vtkPVXMLElement::New();
     definition->SetName("CustomProxyDefinition");
     definition->AddAttribute("name", filter.toAscii().data());
-    definition->AddAttribute("group", "filters");
     element = proxyManager->GetProxyDefinition("filters", filter.toAscii().data());
+    if (element)
+      {
+      definition->AddAttribute("group", "filters");
+      }
+    else
+      {
+      element = proxyManager->GetProxyDefinition("sources", filter.toAscii().data());
+      definition->AddAttribute("group", "sources");
+      }
     definition->AddNestedElement(element);
     root->AddNestedElement(definition);
     definition->Delete();
@@ -215,6 +227,7 @@ void pqCustomFilterManager::exportSelected(const QStringList &files)
   root->Delete();
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterManager::importFiles()
 {
   // Let the user select a file.
@@ -235,6 +248,7 @@ void pqCustomFilterManager::importFiles()
   fileDialog->show();
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterManager::exportSelected()
 {
   // Let the user select a file to save.
@@ -255,6 +269,7 @@ void pqCustomFilterManager::exportSelected()
   fileDialog->show();
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterManager::removeSelected()
 {
   // Get the selected custom filters from the list.
@@ -267,13 +282,25 @@ void pqCustomFilterManager::removeSelected()
     {
     filters.append(this->Model->getCustomFilterName(*iter));
     }
+
   foreach(QString filter, filters)
     {
     // Unregister the custom filter from the server manager.
-    proxyManager->UnRegisterCustomProxyDefinition("filters", filter.toAscii().data());
+    if (proxyManager->GetProxyDefinition("filters", filter.toAscii().data()))
+      {
+      proxyManager->UnRegisterCustomProxyDefinition(
+        "filters", filter.toAscii().data());
+      }
+    else if (proxyManager->GetProxyDefinition(
+        "sources", filter.toAscii().data()))
+      {
+      proxyManager->UnRegisterCustomProxyDefinition(
+        "sources", filter.toAscii().data());
+      }
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterManager::updateButtons(const QItemSelection &,
     const QItemSelection &)
 {

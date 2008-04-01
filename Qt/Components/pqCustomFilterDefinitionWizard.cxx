@@ -76,6 +76,7 @@ public:
   QMap< QString, QMap<QString,QString> > LabelToNamePropertyMap; 
 };
 
+//-----------------------------------------------------------------------------
 pqCustomFilterDefinitionWizard::pqCustomFilterDefinitionWizard(
     pqCustomFilterDefinitionModel *model, QWidget *widgetParent)
   : QDialog(widgetParent)
@@ -183,6 +184,7 @@ pqCustomFilterDefinitionWizard::pqCustomFilterDefinitionWizard(
     this->Form->PropertyName, SLOT(setText(const QString&)));
 }
 
+//-----------------------------------------------------------------------------
 pqCustomFilterDefinitionWizard::~pqCustomFilterDefinitionWizard()
 {
   if(this->Form)
@@ -197,7 +199,7 @@ pqCustomFilterDefinitionWizard::~pqCustomFilterDefinitionWizard()
     }
 }
 
-
+//-----------------------------------------------------------------------------
 QString pqCustomFilterDefinitionWizard::getCustomFilterName() const
 {
   if(this->Filter)
@@ -208,6 +210,7 @@ QString pqCustomFilterDefinitionWizard::getCustomFilterName() const
   return QString();
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::createCustomFilter()
 {
   if(this->Filter != 0 || this->Form->CustomFilterName->text().isEmpty())
@@ -241,8 +244,8 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
   // Expose the input properties.
   int i = 0;
   QTreeWidgetItem *item = 0;
-  int total = this->Form->InputPorts->topLevelItemCount();
-  for( ; i < total; i++)
+  int numInputs = this->Form->InputPorts->topLevelItemCount();
+  for( ; i < numInputs; i++)
     {
     item = this->Form->InputPorts->topLevelItem(i);
     this->Filter->ExposeProperty(item->text(0).toAscii().data(),
@@ -251,7 +254,7 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
     }
 
   // Set the output proxies.
-  total = this->Form->OutputPorts->topLevelItemCount();
+  int total = this->Form->OutputPorts->topLevelItemCount();
   for(i = 0; i < total; i++)
     {
     item = this->Form->OutputPorts->topLevelItem(i);
@@ -282,8 +285,16 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
   // Register the compound proxy definition with the server manager.
   vtkPVXMLElement *root = this->Filter->SaveDefinition(0);
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
-  proxyManager->RegisterCustomProxyDefinition("filters",
+  if (numInputs > 0)
+    {
+    proxyManager->RegisterCustomProxyDefinition("filters",
       this->Form->CustomFilterName->text().toAscii().data(), root);
+    }
+  else
+    {
+    proxyManager->RegisterCustomProxyDefinition("sources",
+      this->Form->CustomFilterName->text().toAscii().data(), root);
+    }
   root->Delete();
 }
 
@@ -346,9 +357,10 @@ bool pqCustomFilterDefinitionWizard::validateCustomFilterName()
 
   // Make sure the name is unique.
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
-  if(!this->OverwriteOK)
+  if (!this->OverwriteOK)
     {
-    if(proxyManager->GetProxyDefinition("filters", filterName.toAscii().data()))
+    if (proxyManager->GetProxyDefinition("filters", filterName.toAscii().data()) || 
+      proxyManager->GetProxyDefinition("sources", filterName.toAscii().data()))
       {
       QMessageBox::warning(this, "Duplicate Name",
           "This filter name already exists.\n"
@@ -361,6 +373,7 @@ bool pqCustomFilterDefinitionWizard::validateCustomFilterName()
   return true;
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::setupDefaultInputOutput()
 {
   if(this->Model->rowCount() == 1)
@@ -434,6 +447,7 @@ void pqCustomFilterDefinitionWizard::setupDefaultInputOutput()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::navigateBack()
 {
   if(this->CurrentPage > 0)
@@ -454,6 +468,7 @@ void pqCustomFilterDefinitionWizard::navigateBack()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::navigateNext()
 {
   if(this->CurrentPage < 3)
@@ -479,6 +494,7 @@ void pqCustomFilterDefinitionWizard::navigateNext()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::finishWizard()
 {
   // Make sure the name has been entered and is unique.
@@ -488,11 +504,13 @@ void pqCustomFilterDefinitionWizard::finishWizard()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::clearNameOverwrite(const QString &)
 {
   this->OverwriteOK = false;
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::updateInputForm(const QModelIndex &current,
     const QModelIndex &)
 {
@@ -531,6 +549,7 @@ void pqCustomFilterDefinitionWizard::updateInputForm(const QModelIndex &current,
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::updateOutputForm(const QModelIndex &current,
     const QModelIndex &)
 {
@@ -556,6 +575,7 @@ void pqCustomFilterDefinitionWizard::updateOutputForm(const QModelIndex &current
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::updatePropertyForm(
     const QModelIndex &current, const QModelIndex &)
 {
@@ -596,6 +616,7 @@ void pqCustomFilterDefinitionWizard::updatePropertyForm(
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::addInput()
 {
   // Validate the entry. Make sure there is an object and a property
@@ -664,6 +685,7 @@ void pqCustomFilterDefinitionWizard::addInput()
   this->Form->ToExposeNames.append(key);
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::removeInput()
 {
   // Remove the selected row from the list.
@@ -693,6 +715,7 @@ void pqCustomFilterDefinitionWizard::removeInput()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::moveInputUp()
 {
   // Move the selected row up one if possible.
@@ -709,6 +732,7 @@ void pqCustomFilterDefinitionWizard::moveInputUp()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::moveInputDown()
 {
   // Move the selected row down one if possible.
@@ -725,6 +749,7 @@ void pqCustomFilterDefinitionWizard::moveInputDown()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::addOutput()
 {
   // Validate the entry. Make sure there is an object and a property
@@ -790,6 +815,7 @@ void pqCustomFilterDefinitionWizard::addOutput()
   this->addOutputInternal(port, name);
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::addOutputInternal(
   pqOutputPort* port, const QString& name)
 {
@@ -815,6 +841,7 @@ void pqCustomFilterDefinitionWizard::addOutputInternal(
   this->Form->ToExposeNames.append(key);
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::removeOutput()
 {
   // Remove the selected row from the list.
@@ -847,6 +874,7 @@ void pqCustomFilterDefinitionWizard::removeOutput()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::moveOutputUp()
 {
   // Move the selected row up one if possible.
@@ -863,6 +891,7 @@ void pqCustomFilterDefinitionWizard::moveOutputUp()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::moveOutputDown()
 {
   // Move the selected row down one if possible.
@@ -879,6 +908,7 @@ void pqCustomFilterDefinitionWizard::moveOutputDown()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::addProperty()
 {
   // Validate the entry. Make sure there is an object and a property
@@ -949,6 +979,7 @@ void pqCustomFilterDefinitionWizard::addProperty()
   this->Form->ToExposeNames.append(key);
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::removeProperty()
 {
   // Remove the selected row from the list.
@@ -978,6 +1009,7 @@ void pqCustomFilterDefinitionWizard::removeProperty()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::movePropertyUp()
 {
   // Move the selected row up one if possible.
@@ -994,6 +1026,7 @@ void pqCustomFilterDefinitionWizard::movePropertyUp()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::movePropertyDown()
 {
   // Move the selected row down one if possible.
@@ -1010,6 +1043,7 @@ void pqCustomFilterDefinitionWizard::movePropertyDown()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::updateInputButtons(
     const QModelIndex &current, const QModelIndex &)
 {
@@ -1019,6 +1053,7 @@ void pqCustomFilterDefinitionWizard::updateInputButtons(
   this->Form->InputDownButton->setEnabled(indexIsValid);
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::updateOutputButtons(
     const QModelIndex &current, const QModelIndex &)
 {
@@ -1028,6 +1063,7 @@ void pqCustomFilterDefinitionWizard::updateOutputButtons(
   this->Form->OutputDownButton->setEnabled(indexIsValid);
 }
 
+//-----------------------------------------------------------------------------
 void pqCustomFilterDefinitionWizard::updatePropertyButtons(
     const QModelIndex &current, const QModelIndex &)
 {
