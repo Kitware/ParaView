@@ -1056,12 +1056,17 @@
     </Proxy>
 
     <Proxy name="TextActor" class="vtkTextActor">
+      <Documentation>
+        Proxy for a text actor. Not to be used directly.
+      </Documentation>
+
       <StringVectorProperty 
         name="Text" 
         command="SetInput" 
         number_of_elements="1"
         animateable="0"> 
       </StringVectorProperty>
+
       <IntVectorProperty
         name="Visibility"
         command="SetVisibility"
@@ -1070,6 +1075,7 @@
         animateable="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+
       <DoubleVectorProperty
         name="Position"
         command="SetPosition"
@@ -1086,14 +1092,16 @@
         animateable="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
+
       <ProxyProperty name="TextProperty"
         command="SetTextProperty">
         <ProxyGroupDomain name="groups">
           <Group name="properties"/>
         </ProxyGroupDomain>
       </ProxyProperty>
+
+      <!-- End of TextActor -->
     </Proxy>
-    
     
     <Proxy name="ActorBase" class="not-used">
       <Documentation>
