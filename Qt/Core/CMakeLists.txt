@@ -4,6 +4,7 @@ INCLUDE_DIRECTORIES(
   ${VTK_INCLUDE_DIR}
   ${PARAVIEW_INCLUDE_DIRS}
   ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
+  ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt
   ${QtWidgets_SOURCE_DIR}
   ${QtWidgets_BINARY_DIR}
   ${QtChart_SOURCE_DIR}
