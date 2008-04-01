@@ -6,7 +6,6 @@
 
 #include <QApplication>
 #include <QTimer>
-#include <iostream>
 
 int ColorMap(int argc, char* argv[])
 {
