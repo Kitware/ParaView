@@ -33,7 +33,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMTextSourceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMTextSourceRepresentationProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMTextSourceRepresentationProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMTextSourceRepresentationProxy::vtkSMTextSourceRepresentationProxy()
 {
@@ -153,16 +153,20 @@ void vtkSMTextSourceRepresentationProxy::AddInput(unsigned int inputPort,
   ip->RemoveAllProxies();
   ip->AddInputConnection(input, outputPort);
 
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->CollectProxy->GetProperty("OutputDataType"));
+  ivp->SetElement(0, VTK_TABLE);
+  this->CollectProxy->UpdateVTKObjects();
+
+  // It is essential to update the CollectProxy before connecting it in the
+  // pipeline since we changed the OutputDataType.
+
   ip = vtkSMInputProperty::SafeDownCast(
     this->UpdateSuppressorProxy->GetProperty("Input"));
   ip->RemoveAllProxies();
   ip->AddProxy(this->CollectProxy);
   this->UpdateSuppressorProxy->UpdateVTKObjects();
-
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->CollectProxy->GetProperty("OutputDataType"));
-  ivp->SetElement(0, VTK_TABLE);
-  this->CollectProxy->UpdateVTKObjects();
+  
 
   this->Dirty = true;
 }
