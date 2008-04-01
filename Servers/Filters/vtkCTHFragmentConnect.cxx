@@ -42,18 +42,15 @@
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.13");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.14");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //============================================================================
 // A class that implements an equivalent set.  It is used to combine fragments
-// from different processes.  It also handles the multiple fragments
-// generated when the recursive depth limit is hit.
+// from different processes.
 //
-// This quick implementation has every member of the set point to the smallest
-// member.  It might have a large complexity if random equivalences are added,
-// but since the fragment connectivity algorithm has increasing ids, this 
-// should not be a problem.
+// I believe that this class is a strictly ordered tree of equivalences.
+// Every member points to its own id or an id smaller than itself.
 class vtkCTHFragmentEquivalenceSet
 {
 public:
@@ -1865,9 +1862,9 @@ int vtkCTHFragmentConnect::ComputeOriginAndRootSpacing(
     // Even if the dims are one less that standard, which side is missing
     // the ghost layer!
     int idx[3];
-    idx[0] = (int)(fabs(0.5 + (lowestOrigin[0]-largestOrigin[0]) / largestSpacing[0]));
-    idx[1] = (int)(fabs(0.5 + (lowestOrigin[1]-largestOrigin[1]) / largestSpacing[1]));
-    idx[2] = (int)(fabs(0.5 + (lowestOrigin[2]-largestOrigin[2]) / largestSpacing[2]));
+    idx[0] = (int)(floor(0.5 + (lowestOrigin[0]-largestOrigin[0]) / largestSpacing[0]));
+    idx[1] = (int)(floor(0.5 + (lowestOrigin[1]-largestOrigin[1]) / largestSpacing[1]));
+    idx[2] = (int)(floor(0.5 + (lowestOrigin[2]-largestOrigin[2]) / largestSpacing[2]));
     lowestOrigin[0] = largestOrigin[0] + (double)(idx[0])*largestSpacing[0];
     lowestOrigin[1] = largestOrigin[1] + (double)(idx[1])*largestSpacing[1];
     lowestOrigin[2] = largestOrigin[2] + (double)(idx[2])*largestSpacing[2];
