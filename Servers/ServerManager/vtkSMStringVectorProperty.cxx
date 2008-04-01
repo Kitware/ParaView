@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.34");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.35");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -429,11 +429,10 @@ int vtkSMStringVectorProperty::LoadState(vtkPVXMLElement* element,
       int index;
       if (currentElement->GetScalarAttribute("index", &index))
         {
-        char* value = currentElement->GetSanitizedAttribute("value");
+        const char* value = currentElement->GetAttribute("value");
         if (value)
           {
           this->SetElement(index, value);
-          delete[] value;
           }
         }
       }
@@ -462,8 +461,8 @@ void vtkSMStringVectorProperty::ChildSaveState(vtkPVXMLElement* propertyElement,
     vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
     elementElement->SetName("Element");
     elementElement->AddAttribute("index", i);
-    elementElement->AddSanitizedAttribute("value", 
-                                          (this->GetElement(i)?this->GetElement(i):""));
+    elementElement->AddAttribute("value", 
+                                 (this->GetElement(i)?this->GetElement(i):""));
     propertyElement->AddNestedElement(elementElement);
     elementElement->Delete();
     }
@@ -480,7 +479,7 @@ void vtkSMStringVectorProperty::ChildSaveState(vtkPVXMLElement* propertyElement,
       vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
       elementElement->SetName("Element");
       elementElement->AddAttribute("index", cc);
-      elementElement->AddSanitizedAttribute("value", 
+      elementElement->AddAttribute("value", 
         this->Internals->LastPushedValues[cc]);
       element->AddNestedElement(elementElement);
       elementElement->Delete();

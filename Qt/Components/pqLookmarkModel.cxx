@@ -90,9 +90,8 @@ void pqLookmarkModel::initializeState(vtkPVXMLElement *lookmark)
 {
   // REQUIRED PROPERTIES: name and state
  
-  char *tempName = lookmark->GetSanitizedAttribute("Name");
+  const char *tempName = lookmark->GetAttribute("Name");
   this->Name = tempName;
-  delete [] tempName;
 
   vtkPVXMLElement *stateRoot = lookmark->FindNestedElementByName("ServerManagerState");
   if(!stateRoot)
@@ -117,9 +116,8 @@ void pqLookmarkModel::initializeState(vtkPVXMLElement *lookmark)
   if(lookmark->GetScalarAttribute("RestoreTime",&val))
     this->RestoreTime = val;
 
-  char *tempDesc = lookmark->GetSanitizedAttribute("Comments");
+  const char *tempDesc = lookmark->GetAttribute("Comments");
   this->Description = tempDesc;
-  delete [] tempDesc;
 
   vtkPVXMLElement *iconElement = lookmark->FindNestedElementByName("Icon");
   if(iconElement)
@@ -309,7 +307,7 @@ void pqLookmarkModel::load(
 
 void pqLookmarkModel::saveState(vtkPVXMLElement *lookmark) const
 {
-  lookmark->AddSanitizedAttribute("Name", this->getName().toAscii().constData());
+  lookmark->AddAttribute("Name", this->getName().toAscii().constData());
   lookmark->AddAttribute("RestoreData", this->getRestoreDataFlag());
   lookmark->AddAttribute("RestoreCamera", this->getRestoreCameraFlag());
   lookmark->AddAttribute("RestoreTime", this->getRestoreTimeFlag());
@@ -334,7 +332,7 @@ void pqLookmarkModel::saveState(vtkPVXMLElement *lookmark) const
 
   if(!this->Description.isEmpty() && !this->Description.isNull())
     {
-    lookmark->AddSanitizedAttribute("Comments", this->getDescription().toAscii().constData());
+    lookmark->AddAttribute("Comments", this->getDescription().toAscii().constData());
     }
 
   // Icon

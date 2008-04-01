@@ -20,6 +20,7 @@
 #define __vtkPVXMLElement_h
 
 #include "vtkObject.h"
+#include "vtkStdString.h" // needed for vtkStdString.
 
 class vtkCollection;
 class vtkPVXMLParser;
@@ -50,14 +51,6 @@ public:
   // Get the attribute with the given name.  If it doesn't exist,
   // returns 0. 
   const char* GetAttribute(const char* name);
-
-  // Description:
-  // Like GetAttribute(const char*), but this method does XML
-  // escape DE-coding.
-  // &quot; to "  &gt; to > &lt; to < &apos; to ` and ;PVEOL; to \n
-  // WARNING: The caller is responsible for delete[]'ing the memory that
-  //this method news and returns.
-  char* GetSanitizedAttribute(const char* name);
 
   // Description:
   // Get the character data for the element.
@@ -138,12 +131,6 @@ public:
 #endif
 
   // Description:
-  // Like the AddAttribute(const char*, const char*), but this method
-  // does XML escape encoding.
-  // " to &quot; > to &gt; < to &lt; ' to &apos; and \n|\r|\r\n to ;PVEOL;
-  void AddSanitizedAttribute(const char* attrName, const char* attrValue);
-
-  // Description:
   // Given it's name and value, set an attribute.
   // If an attribute with the given name already exists,
   // it replaces the old attribute.
@@ -170,6 +157,10 @@ public:
   // of the sub-tree under this node. The elements are populated
   // in the vtkCollection passed as an argument.
   void GetElementsByName(const char* name, vtkCollection* elements);
+
+  // Description:
+  // Encode a string. 
+  static vtkStdString Encode(const char* plaintext);
 
 protected:
   vtkPVXMLElement();
