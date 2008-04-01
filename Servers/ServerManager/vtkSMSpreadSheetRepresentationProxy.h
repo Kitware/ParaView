@@ -96,6 +96,8 @@ protected:
   virtual bool CreatePipeline(vtkSMSourceProxy* input, int outputport);
 
   void PassEssentialAttributes();
+  void InvokeStartEvent();
+  void InvokeEndEvent();
   vtkSMBlockDeliveryRepresentationProxy* SelectionRepresentation;
 
   int SelectionOnly;
