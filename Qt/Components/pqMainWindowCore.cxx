@@ -2731,7 +2731,17 @@ void pqMainWindowCore::onPostAccept()
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqMainWindowCore::getActiveSource()
 {
-  return qobject_cast<pqPipelineSource *>(this->getActiveObject());
+  pqServerManagerModelItem* item = this->getActiveObject();
+  if (item && qobject_cast<pqPipelineSource*>(item))
+    {
+    return static_cast<pqPipelineSource*>(item);
+    }
+  else if (item && qobject_cast<pqOutputPort*>(item))
+    {
+    pqOutputPort* port = static_cast<pqOutputPort*>(item);
+    return port->getSource();
+    }
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
