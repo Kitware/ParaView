@@ -71,11 +71,10 @@ pqSpreadSheetViewSelectionModel::pqSpreadSheetViewSelectionModel(
   this->Internal = new pqInternal();
   this->Internal->Model = amodel;
 
-  QObject::connect(amodel->selectionModel(), 
-    SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
-    this, SLOT(serverSelectionChanged()));
+  QObject::connect(amodel, 
+    SIGNAL(selectionChanged(const QItemSelection&)),
+    this, SLOT(serverSelectionChanged(const QItemSelection&)));
 }
-
 
 //-----------------------------------------------------------------------------
 pqSpreadSheetViewSelectionModel::~pqSpreadSheetViewSelectionModel()
@@ -84,11 +83,11 @@ pqSpreadSheetViewSelectionModel::~pqSpreadSheetViewSelectionModel()
 }
 
 //-----------------------------------------------------------------------------
-void pqSpreadSheetViewSelectionModel::serverSelectionChanged()
+void pqSpreadSheetViewSelectionModel::serverSelectionChanged(
+  const QItemSelection& sel)
 {
   this->UpdatingSelection = true;
-  this->select(this->Internal->Model->selectionModel()->selection(),
-    QItemSelectionModel::ClearAndSelect);
+  this->select(sel, QItemSelectionModel::ClearAndSelect);
   this->UpdatingSelection = false;
 }
 

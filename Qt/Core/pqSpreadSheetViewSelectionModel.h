@@ -72,7 +72,7 @@ signals:
   void selection(vtkSMSourceProxy*);
 
 protected slots:
-  void serverSelectionChanged();
+  void serverSelectionChanged(const QItemSelection&);
 
 protected:
   /// Locate the selection source currently set on the representation being shown.

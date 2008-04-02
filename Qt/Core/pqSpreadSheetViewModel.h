@@ -82,10 +82,6 @@ public:
       }
     };
 
-  /// Returns the selection model that shows the selection on the representation
-  /// being shown by this model.
-  QItemSelectionModel* selectionModel() const;
-
   /// Returns the number of rows.
   int rowCount(const QModelIndex& parent=QModelIndex()) const;
 
@@ -100,7 +96,6 @@ public:
   /// specified orientation.
   QVariant headerData (int section, Qt::Orientation orientation, 
     int role=Qt::DisplayRole) const; 
-
  
   /// Set/Get the data representation.
   void setRepresentation(pqDataRepresentation*);
@@ -120,7 +115,6 @@ public:
   /// (if not available) only for the most recently selected active block.
   void setActiveBlock(QModelIndex top, QModelIndex bottom);
 
-
   /// Returns the field type for the data currently shown by this model.
   int getFieldType() const;
 
@@ -129,6 +123,9 @@ public:
 
 signals:
   void requestDelayedUpdate() const;
+
+  /// Fired whenever the server side selection changes.
+  void selectionChanged(const QItemSelection& selection);
 
 private slots:
   /// called to fetch data for all pending blocks.

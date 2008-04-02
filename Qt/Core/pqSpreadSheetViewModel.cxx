@@ -153,12 +153,6 @@ pqSpreadSheetViewModel::~pqSpreadSheetViewModel()
 }
 
 //-----------------------------------------------------------------------------
-QItemSelectionModel* pqSpreadSheetViewModel::selectionModel() const
-{
-  return &this->Internal->SelectionModel;
-}
-
-//-----------------------------------------------------------------------------
 int pqSpreadSheetViewModel::rowCount(const QModelIndex&) const
 {
   return this->Internal->NumberOfRows;
@@ -272,6 +266,8 @@ void pqSpreadSheetViewModel::forceUpdate()
     }
 
   this->Internal->SelectionModel.clear();
+  emit this->selectionChanged(this->Internal->SelectionModel.selection());
+
   if (old_rows == this->Internal->NumberOfRows &&
     old_columns == this->Internal->NumberOfColumns)
     {
@@ -294,14 +290,25 @@ void pqSpreadSheetViewModel::updateSelectionForBlock(vtkIdType blockNumber)
   if (repr && 
     this->Internal->getFieldType() != vtkIndexBasedBlockFilter::FIELD)
     {
-    vtkSelection* selection = repr->GetSelectionOutput(blockNumber);
-    // This selection has information about ids that are currently selected.
-    // We now need to create a Qt selection list of indices for the items in
-    // the vtk selection.
-    QItemSelection qtSelection = this->convertToQtSelection(selection);
-    this->Internal->SelectionModel.select(qtSelection,
-      QItemSelectionModel::Select|QItemSelectionModel::Rows|
-      QItemSelectionModel::Clear);
+    // If we are showing only the selected items, then there's not point in
+    // highlighting the selected items, since all items are selected. So we
+    // don't do any selection highlighting if SelectionOnly is true.
+    if (repr->GetSelectionOnly())
+      {
+      this->Internal->SelectionModel.clear();
+      }
+    else
+      {
+      vtkSelection* selection = repr->GetSelectionOutput(blockNumber);
+      // This selection has information about ids that are currently selected.
+      // We now need to create a Qt selection list of indices for the items in
+      // the vtk selection.
+      QItemSelection qtSelection = this->convertToQtSelection(selection);
+      this->Internal->SelectionModel.select(qtSelection,
+        QItemSelectionModel::Select|QItemSelectionModel::Rows|
+        QItemSelectionModel::Clear);
+      }
+    emit this->selectionChanged(this->Internal->SelectionModel.selection());
     }
 }
 
