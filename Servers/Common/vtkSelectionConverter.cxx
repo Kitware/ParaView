@@ -31,7 +31,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSelectionConverter);
-vtkCxxRevisionMacro(vtkSelectionConverter, "1.13");
+vtkCxxRevisionMacro(vtkSelectionConverter, "1.14");
 
 //----------------------------------------------------------------------------
 vtkSelectionConverter::vtkSelectionConverter()
@@ -188,7 +188,8 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
     }
 
   vtkUnsignedIntArray* compositeIndexArray = 0;
-  vtkUnsignedIntArray* hierarchicalIndexArray = 0;
+  vtkUnsignedIntArray* amrLevelArray = 0;
+  vtkUnsignedIntArray* amrIndexArray = 0;
 
   // key == composite index or hierarchical index.
   // value == set of indices.
@@ -203,14 +204,9 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
     input->GetSelectionData()->GetArray("vertptrs"));
   vtkIdTypeArray* vertlist = vtkIdTypeArray::SafeDownCast(
     input->GetSelectionData()->GetArray("vertlist"));
-  if (inputProperties->Has(vtkSelection::INDEXED_VERTICES())
-      &&
-      (inputProperties->Get(vtkSelection::INDEXED_VERTICES()) == 1)
-      &&
-      vertptrs
-      &&
-      vertlist
-    )
+  if (inputProperties->Has(vtkSelection::INDEXED_VERTICES()) &&
+      (inputProperties->Get(vtkSelection::INDEXED_VERTICES()) == 1) &&
+      vertptrs && vertlist)
     {    
     vtkIdTypeArray* pointMapArray = vtkIdTypeArray::SafeDownCast(
       ds->GetPointData()->GetArray("vtkOriginalPointIds"));
@@ -219,13 +215,17 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
       return;
       }
 
+    // NOTE: this is a cell-data array.
     compositeIndexArray = vtkUnsignedIntArray::SafeDownCast(
-        ds->GetPointData()->GetArray("vtkCompositeIndex"));
+        ds->GetCellData()->GetArray("vtkCompositeIndex"));
     // compositeIndexArray may not be present at all if the input dataset is not a
     // composite dataset.
-    
-    hierarchicalIndexArray = vtkUnsignedIntArray::SafeDownCast(
-      ds->GetPointData()->GetArray("vtkHierarchicalIndex")); // may be null.
+   
+    // NOTE: these are cell-data arrays.
+    amrLevelArray = vtkUnsignedIntArray::SafeDownCast(
+      ds->GetCellData()->GetArray("vtkAMRLevel")); // may be null.
+    amrIndexArray = vtkUnsignedIntArray::SafeDownCast(
+      ds->GetCellData()->GetArray("vtkAMRIndex")); // may be null.
 
     outputProperties->Set(vtkSelection::FIELD_TYPE(), vtkSelection::POINT);
 
@@ -241,6 +241,21 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
         vtkIdType cellIndex = inputList->GetValue(hitId);
         ds->GetCellPoints(cellIndex, idlist);
 
+        vtkKeyType key;
+        if (amrLevelArray && amrIndexArray)
+          {
+          unsigned int val[2];
+          amrLevelArray->GetTupleValue(cellIndex, &val[0]);
+          amrIndexArray->GetTupleValue(cellIndex, &val[1]);
+          key = vtkKeyType(val[0], val[1]);
+          }
+        else if (compositeIndexArray)
+          {
+          unsigned int composite_index = 0;
+          composite_index = compositeIndexArray->GetValue(cellIndex);
+          key = vtkKeyType(composite_index);
+          }
+
         vtkIdType npts = vertlist->GetValue(ptr);
         for (vtkIdType v = 0; v < npts; v++)
           {
@@ -250,20 +265,6 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
           if (pointMapArray)
             {
             originalPtId = pointMapArray->GetValue(ptId);
-            }
-
-          vtkKeyType key;
-          if (hierarchicalIndexArray)
-            {
-            unsigned int val[2];
-            hierarchicalIndexArray->GetTupleValue(ptId, val);
-            key = vtkKeyType(val[0], val[1]);
-            }
-          else if (compositeIndexArray)
-            {
-            unsigned int composite_index = 0;
-            composite_index = compositeIndexArray->GetValue(ptId);
-            key = vtkKeyType(composite_index);
             }
 
           vtkstd::set<vtkIdType>& visverts = indices[key];
@@ -284,8 +285,10 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
 
     compositeIndexArray = vtkUnsignedIntArray::SafeDownCast(
         ds->GetCellData()->GetArray("vtkCompositeIndex"));
-    hierarchicalIndexArray = vtkUnsignedIntArray::SafeDownCast(
-      ds->GetCellData()->GetArray("vtkHierarchicalIndex")); // may be null.
+    amrLevelArray = vtkUnsignedIntArray::SafeDownCast(
+      ds->GetCellData()->GetArray("vtkAMRLevel")); // may be null.
+    amrIndexArray = vtkUnsignedIntArray::SafeDownCast(
+      ds->GetCellData()->GetArray("vtkAMRIndex")); // may be null.
 
     for (vtkIdType hitId=0; hitId<numHits; hitId++)
       {
@@ -293,10 +296,11 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
       vtkIdType cellIndex = cellMapArray->GetValue(geomCellId);
 
       vtkKeyType key;
-      if (hierarchicalIndexArray)
+      if (amrLevelArray && amrIndexArray)
         {
         unsigned int val[2];
-        hierarchicalIndexArray->GetTupleValue(geomCellId, val);
+        amrLevelArray->GetTupleValue(geomCellId, &val[0]);
+        amrIndexArray->GetTupleValue(geomCellId, &val[1]);
         key = vtkKeyType(val[0], val[1]);
         }
       else if (compositeIndexArray)
@@ -335,7 +339,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
       {
       vtkSelection* child = vtkSelection::New();
       child->GetProperties()->Copy(outputProperties, /*deep=*/0);
-      if (hierarchicalIndexArray)
+      if (amrLevelArray && amrIndexArray)
         {
         child->GetProperties()->Set(vtkSelection::HIERARCHICAL_LEVEL(),
           mit->first.HierarchicalIndex[0]);
@@ -375,7 +379,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
       {
       outputArray->SetValue(index, *sit); 
       }
-    if (hierarchicalIndexArray)
+    if (amrLevelArray && amrIndexArray)
       {
       outputProperties->Set(vtkSelection::HIERARCHICAL_LEVEL(),
         indices.begin()->first.HierarchicalIndex[0]);

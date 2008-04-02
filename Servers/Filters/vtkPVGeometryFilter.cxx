@@ -53,7 +53,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkUnsignedIntArray.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.77");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.78");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -323,46 +323,32 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::AddCompositeIndex(vtkPolyData* pd, unsigned int index)
 {
-  vtkUnsignedIntArray* pindex = vtkUnsignedIntArray::New();
-  pindex->SetNumberOfComponents(1);
-  pindex->SetNumberOfTuples(pd->GetNumberOfPoints());
-  pindex->FillComponent(0, index);
-  pindex->SetName("vtkCompositeIndex");
-
   vtkUnsignedIntArray* cindex = vtkUnsignedIntArray::New();
   cindex->SetNumberOfComponents(1);
   cindex->SetNumberOfTuples(pd->GetNumberOfCells());
   cindex->FillComponent(0, index);
   cindex->SetName("vtkCompositeIndex");
-
-  pd->GetPointData()->AddArray(pindex);
   pd->GetCellData()->AddArray(cindex);
   cindex->Delete();
-  pindex->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::AddHierarchicalIndex(vtkPolyData* pd, 
   unsigned int level, unsigned int index)
 {
-  vtkUnsignedIntArray* pindex = vtkUnsignedIntArray::New();
-  pindex->SetNumberOfComponents(2);
-  pindex->SetNumberOfTuples(pd->GetNumberOfPoints());
-  pindex->FillComponent(0, level);
-  pindex->FillComponent(1, index);
-  pindex->SetName("vtkHierarchicalIndex");
+  vtkUnsignedIntArray* dslevel = vtkUnsignedIntArray::New();
+  dslevel->SetNumberOfTuples(pd->GetNumberOfCells());
+  dslevel->FillComponent(0, level);
+  dslevel->SetName("vtkAMRLevel");
+  pd->GetCellData()->AddArray(dslevel);
+  dslevel->Delete();
 
-  vtkUnsignedIntArray* cindex = vtkUnsignedIntArray::New();
-  cindex->SetNumberOfComponents(2);
-  cindex->SetNumberOfTuples(pd->GetNumberOfCells());
-  cindex->FillComponent(0, level);
-  cindex->FillComponent(1, index);
-  cindex->SetName("vtkHierarchicalIndex");
-
-  pd->GetPointData()->AddArray(pindex);
-  pd->GetCellData()->AddArray(cindex);
-  cindex->Delete();
-  pindex->Delete();
+  vtkUnsignedIntArray* dsindex = vtkUnsignedIntArray::New();
+  dsindex->SetNumberOfTuples(pd->GetNumberOfCells());
+  dsindex->FillComponent(0, index);
+  dsindex->SetName("vtkAMRIndex");
+  pd->GetCellData()->AddArray(dsindex);
+  dsindex->Delete();
 }
 
 //----------------------------------------------------------------------------
