@@ -760,8 +760,7 @@
       <!-- End of MetaImageWriter -->
     </WriterProxy>
 
-    <WriterProxy name="PNGWriter" class="vtkPNGWriter"
-      base_proxygroup="writers" base_proxyname="DataWriterBase">
+    <WriterProxy name="PNGWriter" class="vtkPNGWriter">
       <Documentation
         short_help="Write image data as a PNG file.">
         Writer to write image data as a PNG file. It supports 1 to 4 component
@@ -780,10 +779,17 @@
           file.
         </Documentation>
       </InputProperty>
+      <StringVectorProperty 
+        name="FileName" 
+        command="SetFileName"
+        number_of_elements="1">
+       <Documentation>
+        The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
-        <Property name="FileType" show="0"/>
       </Hints>
       <!-- End of PNGWriter -->
     </WriterProxy>
